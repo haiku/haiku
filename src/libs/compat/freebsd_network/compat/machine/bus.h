@@ -110,7 +110,6 @@
 #ifndef _FBSD_COMPAT_MACHINE_BUS_H_
 #define _FBSD_COMPAT_MACHINE_BUS_H_
 
-
 #include <machine/_bus.h>
 #include <machine/cpufunc.h>
 
@@ -138,18 +137,89 @@ struct resource;
 #define BUS_SPACE_BARRIER_WRITE		2
 
 
-uint8_t bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset);
-uint16_t bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset);
-uint32_t bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset);
-void bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint8_t value);
-void bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint16_t value);
-void bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint32_t value);
+// Copied from arch/x86/arch_cpu.h
+// Can't use the header as it inderictly includes arch/x86/arch_thread_types.h
+// Which has a namespace, so can't be used in FreeBSD's C-code atm.
+#define out8(value,port) \
+	__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))
+
+#define out16(value,port) \
+	__asm__ ("outw %%ax,%%dx" : : "a" (value), "d" (port))
+
+#define out32(value,port) \
+	__asm__ ("outl %%eax,%%dx" : : "a" (value), "d" (port))
+
+#define in8(port) ({ \
+	uint8 _v; \
+	__asm__ volatile ("inb %%dx,%%al" : "=a" (_v) : "d" (port)); \
+	_v; \
+})
+
+#define in16(port) ({ \
+	uint16 _v; \
+	__asm__ volatile ("inw %%dx,%%ax":"=a" (_v) : "d" (port)); \
+	_v; \
+})
+
+#define in32(port) ({ \
+	uint32 _v; \
+	__asm__ volatile ("inl %%dx,%%eax":"=a" (_v) : "d" (port)); \
+	_v; \
+})
+
+
+inline uint8_t
+bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
+		bus_size_t offset) {
+	return tag == I386_BUS_SPACE_MEM ?
+		(*(volatile u_int8_t *)(handle + offset)) :
+		in8(handle + offset);
+}
+
+
+inline uint16_t
+bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
+		bus_size_t offset) {
+	return tag == I386_BUS_SPACE_MEM ?
+		(*(volatile u_int16_t *)(handle + offset)) :
+		in16(handle + offset);
+}
+
+
+inline uint32_t
+bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
+		bus_size_t offset) {
+	return tag == I386_BUS_SPACE_MEM ?
+		(*(volatile u_int32_t *)(handle + offset)) :
+		in32(handle + offset);
+}
+
+
+inline void bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, uint8_t value) {
+	if (tag == I386_BUS_SPACE_MEM)
+		*(volatile uint8_t *)(handle + offset) = value;
+	else
+		out8(value, handle + offset);
+}
+
+
+inline void bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, uint16_t value) {
+	if (tag == I386_BUS_SPACE_MEM)
+		*(volatile uint16_t *)(handle + offset) = value;
+	else
+		out16(value, handle + offset);
+}
+
+
+inline void bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, uint32_t value) {
+	if (tag == I386_BUS_SPACE_MEM)
+		*(volatile uint32_t *)(handle + offset) = value;
+	else
+		out32(value, handle + offset);
+}
 
 
 static inline void

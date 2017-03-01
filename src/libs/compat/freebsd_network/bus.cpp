@@ -501,42 +501,6 @@ bus_generic_driver_added(device_t dev, driver_t *driver)
 }
 
 
-#define BUS_SPACE_READ(size, type, fun) \
-	type bus_space_read_##size(bus_space_tag_t tag, \
-		bus_space_handle_t handle, bus_size_t offset) \
-	{ \
-		type value; \
-		if (tag == I386_BUS_SPACE_IO) \
-			value = fun(handle + offset); \
-		else \
-			value = *(volatile type *)(handle + offset); \
-		if (tag == I386_BUS_SPACE_IO) \
-			TRACE_BUS_SPACE_RW(("bus_space_read_%s(0x%lx, 0x%lx, 0x%lx) = 0x%lx\n", \
-				#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
-		return value; \
-	}
-
-#define BUS_SPACE_WRITE(size, type, fun) \
-	void bus_space_write_##size(bus_space_tag_t tag, \
-		bus_space_handle_t handle, bus_size_t offset, type value) \
-	{ \
-		if (tag == I386_BUS_SPACE_IO) \
-			TRACE_BUS_SPACE_RW(("bus_space_write_%s(0x%lx, 0x%lx, 0x%lx, 0x%lx)\n", \
-				#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
-		if (tag == I386_BUS_SPACE_IO) \
-			fun(value, handle + offset); \
-		else \
-			*(volatile type *)(handle + offset) = value; \
-	}
-
-BUS_SPACE_READ(1, uint8_t, in8)
-BUS_SPACE_READ(2, uint16_t, in16)
-BUS_SPACE_READ(4, uint32_t, in32)
-
-BUS_SPACE_WRITE(1, uint8_t, out8)
-BUS_SPACE_WRITE(2, uint16_t, out16)
-BUS_SPACE_WRITE(4, uint32_t, out32)
-
 int
 bus_child_present(device_t child)
 {
