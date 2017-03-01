@@ -166,8 +166,7 @@ Protocol::GetFolders(FolderList& folders, BString& separator)
 		FolderEntry entry;
 		entry.folder = allFolders.StringAt(i);
 		for (int32 j = 0; j < subscribedFolders.CountStrings(); j++) {
-			if (entry.folder == subscribedFolders.StringAt(j)
-				|| entry.folder.ICompare("INBOX") == 0) {
+			if (entry.folder == subscribedFolders.StringAt(j)) {
 				entry.subscribed = true;
 				break;
 			}
