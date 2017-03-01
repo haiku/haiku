@@ -168,7 +168,7 @@ struct resource;
 })
 
 
-inline uint8_t
+static inline uint8_t
 bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
 		bus_size_t offset) {
 	return tag == I386_BUS_SPACE_MEM ?
@@ -177,7 +177,7 @@ bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
-inline uint16_t
+static inline uint16_t
 bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
 		bus_size_t offset) {
 	return tag == I386_BUS_SPACE_MEM ?
@@ -186,7 +186,7 @@ bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
-inline uint32_t
+static inline uint32_t
 bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
 		bus_size_t offset) {
 	return tag == I386_BUS_SPACE_MEM ?
@@ -195,7 +195,8 @@ bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
-inline void bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
+static inline void
+bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
 	bus_size_t offset, uint8_t value) {
 	if (tag == I386_BUS_SPACE_MEM)
 		*(volatile uint8_t *)(handle + offset) = value;
@@ -204,7 +205,8 @@ inline void bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
-inline void bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
+static inline void
+bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
 	bus_size_t offset, uint16_t value) {
 	if (tag == I386_BUS_SPACE_MEM)
 		*(volatile uint16_t *)(handle + offset) = value;
@@ -213,7 +215,8 @@ inline void bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
-inline void bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
+static inline void
+bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
 	bus_size_t offset, uint32_t value) {
 	if (tag == I386_BUS_SPACE_MEM)
 		*(volatile uint32_t *)(handle + offset) = value;
