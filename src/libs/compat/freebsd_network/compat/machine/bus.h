@@ -138,7 +138,7 @@ struct resource;
 
 
 // Copied from arch/x86/arch_cpu.h
-// Can't use the header as it inderictly includes arch/x86/arch_thread_types.h
+// Can't use the header as it indirectly includes arch/x86/arch_thread_types.h
 // Which has a namespace, so can't be used in FreeBSD's C-code atm.
 #define out8(value,port) \
 	__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))
@@ -170,34 +170,38 @@ struct resource;
 
 static inline uint8_t
 bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
-		bus_size_t offset) {
-	return tag == I386_BUS_SPACE_MEM ?
-		(*(volatile u_int8_t *)(handle + offset)) :
-		in8(handle + offset);
+		bus_size_t offset)
+{
+	return tag == I386_BUS_SPACE_MEM
+		? (*(volatile u_int8_t *)(handle + offset))
+		: in8(handle + offset);
 }
 
 
 static inline uint16_t
 bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
-		bus_size_t offset) {
-	return tag == I386_BUS_SPACE_MEM ?
-		(*(volatile u_int16_t *)(handle + offset)) :
-		in16(handle + offset);
+		bus_size_t offset)
+{
+	return tag == I386_BUS_SPACE_MEM
+		? (*(volatile u_int16_t *)(handle + offset))
+		: in16(handle + offset);
 }
 
 
 static inline uint32_t
 bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
-		bus_size_t offset) {
-	return tag == I386_BUS_SPACE_MEM ?
-		(*(volatile u_int32_t *)(handle + offset)) :
-		in32(handle + offset);
+		bus_size_t offset)
+{
+	return tag == I386_BUS_SPACE_MEM
+		? (*(volatile u_int32_t *)(handle + offset))
+		: in32(handle + offset);
 }
 
 
 static inline void
 bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint8_t value) {
+	bus_size_t offset, uint8_t value)
+{
 	if (tag == I386_BUS_SPACE_MEM)
 		*(volatile uint8_t *)(handle + offset) = value;
 	else
@@ -207,7 +211,8 @@ bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
 
 static inline void
 bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint16_t value) {
+	bus_size_t offset, uint16_t value)
+{
 	if (tag == I386_BUS_SPACE_MEM)
 		*(volatile uint16_t *)(handle + offset) = value;
 	else
@@ -217,7 +222,8 @@ bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
 
 static inline void
 bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint32_t value) {
+	bus_size_t offset, uint32_t value)
+{
 	if (tag == I386_BUS_SPACE_MEM)
 		*(volatile uint32_t *)(handle + offset) = value;
 	else
