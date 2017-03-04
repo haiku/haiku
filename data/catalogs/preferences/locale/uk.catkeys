@@ -6,26 +6,26 @@ Unable to find the available languages! You can't use this preflet!	Locale Prefl
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar і Tracker потребують перезавантаження для вступу змін в силу. Ви бажаєте зробити це зараз?
 Long format:	TimeFormatSettings		Довгий формат:
 Currency	TimeFormatSettings		Валюта
-Locale	System name		Locale
-Short format:	TimeFormatSettings		Скорочений формат:
+Locale	System name		Локаль
+Short format:	TimeFormatSettings		Короткий формат:
 Language	Locale Preflet Window		Мова
 Preferred languages	Locale Preflet Window		Бажані мови
-Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня для вибраної мови
+Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня з бажаної мови
 Formatting	Locale Preflet Window		Форматування
-Locale	Locale Preflet Window		Locale
-Numbers	TimeFormatSettings		Номери
+Locale	Locale Preflet Window		Локаль
+Numbers	TimeFormatSettings		Числа
 24 hour	TimeFormatSettings		24 години
 OK	Locale Preflet Window		Гаразд
 Restart	Locale Preflet Window		Перезавантаження
 Full format:	TimeFormatSettings		Повний формат:
 Defaults	Locale Preflet Window		Типово
-Cancel	Locale Preflet Window		Відмінити
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Перекласти додатки і назви тек в Deskbar і Tracker.
+Cancel	Locale Preflet Window		Скасувати
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Перекласти імена програм та тек у Deskbar і Tracker.
 Revert	Locale Preflet Window		Повернути
 Medium format:	TimeFormatSettings		Середній формат:
 12 hour	TimeFormatSettings		12 годин
 Time	TimeFormatSettings		Час
 Date	TimeFormatSettings		Дата
 Positive:	TimeFormatSettings		Додатній:
-Locale	Locale Preflet		Locale
+Locale	Locale Preflet		Локаль
 Options	Locale Preflet Window		Опції

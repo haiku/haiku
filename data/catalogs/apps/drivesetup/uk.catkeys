@@ -68,7 +68,7 @@ The panel could not return successfully.	MainWindow		Панель не вдал�
 Cancel	MainWindow		Відміна
 Delete partition	MainWindow		Видалити розділ
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ви впевнені, що бажаєте змінити параметри вибраного розділу?\n\nРозділ може більше не розпізнаватись іншими операційними системами!
-Disk system \"%s\" not found!	MainWindow		Дискова система \"%s\"\" не знайдена!
+Disk system \"%s\" not found!	MainWindow		Дискова система \"%s\" не знайдена!
 Eject	MainWindow		Витягнути
 Partition	MainWindow		Розділ
 Validation of the given parameters failed.	MainWindow		Перевірка введених параметрів призупинена.

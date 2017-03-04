@@ -11,7 +11,7 @@ Novas	ChartWindow		Нові зорі
 LineArray	ChartWindow		Масив ліній
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s   (логарифмічна шкала)
 Free motion	ChartWindow		Вільний рух
-(high) 100% 	ChartWindow		(високий) 100%
+(high) 100% 	ChartWindow		(високий) 100% 
 Green	ChartWindow		Зелений
 Amas	ChartWindow		Amas
 2 threads	ChartWindow		2 потоки
@@ -35,8 +35,8 @@ Animation:	ChartWindow		Анімація:
 Frames/s	ChartWindow		Кадрів/с
 Auto demo	ChartWindow		Демонстрація
 CPU load	ChartWindow		Завантаження процесора
-DrawBitmap	ChartWindow		Малюнок
+DrawBitmap	ChartWindow		Растове зображення
 Red	ChartWindow		Червоний
-None	ChartWindow		Жоден
+None	ChartWindow		Жодного
 Battle	ChartWindow		Битва
 Space:	ChartWindow		Космос:

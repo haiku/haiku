@@ -1,11 +1,11 @@
 1	ukrainian	x-vnd.Haiku-DataTranslations	3820343452
 DataTranslations	System name		Перетворення даних
-Cancel	DataTranslations		Відмінити
+Cancel	DataTranslations		Скасувати
 Name:	DataTranslations		І’мя:
 Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Ім'я: %s \nВерсія: %ld.%ld.%ld\n\nІнфо:\n%s\n\nШлях:\n%s\n
-The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є перетворювачем і його не буде встановлено.
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Ім'я: %s \nВерсія: %ld.%ld.%ld\n\nІнфо:\n%s\n\nШлях:\n%s\n
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель для встановлення типових параметрів для перетворювачів, особливо, коли вони не визначені додатком.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Неможливо встановити %s:\n%s
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Елемент з назвою '%name' повністю присутній у теці перетворювачів! Переписати існуючий перетворювач?
 DataTranslations - Note	DataTranslations		Перетворення даних — Примітка
 Overwrite	DataTranslations		Перезаписати

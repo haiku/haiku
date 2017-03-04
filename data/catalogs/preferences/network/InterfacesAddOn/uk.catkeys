@@ -2,9 +2,9 @@
 Interface	InterfaceWindow		Інтерфейс
 Network:	IntefaceHardwareView		Мережа
 Static	IntefaceAddressView		Статичний
-None	InterfacesListView		Жоден
+None	InterfacesListView		Жодного
 IP:	InterfacesListView	IPv4 address label	IP:
-Renegotiate address	InterfacesListView		Переглянути адресу
+Renegotiate address	InterfacesListView		Переукласти адресу
 Status:	IntefaceHardwareView		Стан:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Link speed:	IntefaceHardwareView		Швидкість з'єднання:

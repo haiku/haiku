@@ -1,0 +1,19 @@
+1	english (united kingdom)	x-vnd.Haiku-DriveSetup	2127259962
+OK	MainWindow		Alright
+Initialize	InitializeParametersPanel		Initialise
+OK	AbstractParametersPanel		Alright
+No disk devices have been recognized.	DiskView		No disc devices have been recognised.
+Failed to initialize the disk %s!\n	MainWindow		Failed to initialise the disc %s!\n
+Change parameters	MainWindow		Change parametres
+Initialize	MainWindow		Initialise
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisation of the partition %s failed. (Nothing has been written to disk.)
+The disk has been successfully initialized.\n	MainWindow		The disk has been successfully initialised.\n
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Failed to change the parametres of the partition. No changes have been written to disk.
+Change parameters…	MainWindow		Change parametres…
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Are you sure you want to initialise the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Are you sure you want to change parametres of the selected partition?\n\nThe partition may no longer be recognized by other operating systems any more!
+Validation of the given parameters failed.	MainWindow		Validation of the given parametres failed.
+Validation of the given creation parameters failed.	MainWindow		Validation of the given creation parametres failed.
+Validation of the given initialization parameters failed.	MainWindow		Validation of the given initialisation parametres failed.
+Could not change the parameters of the selected partition.	MainWindow		Could not change the parametres of the selected partition.
+Parameters	PartitionList		Parametres

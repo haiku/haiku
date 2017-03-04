@@ -3,4 +3,4 @@ Write core file	DebugServer		Записати файл ядра
 Terminate	DebugServer		Припинити
 Debug	DebugServer		Відладка
 Save report	DebugServer		Зберегти звіт
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Програма:\n\n %app\n\nвикликала помилку, яка заважає продовженню. Haiku зупинить виконання програми.
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Програма:\n\n %app\n\nвикликала помилку, яка заважає продовженню. Haiku зупинить її виконання.

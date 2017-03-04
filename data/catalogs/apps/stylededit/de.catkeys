@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	2588854353
+1	german	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Texteditor
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Paste	Menus		Einfügen
@@ -17,6 +17,7 @@ Page setup…	Menus		Seite einrichten…
 Print…	Menus		Drucken…
 Can't undo	Menus		Rückgängig nicht möglich
 Save	Menus		Speichern
+Default	Menus		Standard
 Replace with:	FindandReplaceWindow		Ersetzen durch:
 Cancel	SaveAlert		Abbrechen
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".

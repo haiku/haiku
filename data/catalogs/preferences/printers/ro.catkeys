@@ -1,13 +1,16 @@
-1	romanian	x-vnd.Be-PRNT	4242582634
+1	romanian	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimantă: %printer_name%\nDriver:  %driver%\n
 Waiting	JobListView		Se așteaptă
 Print test page	PrintersWindow		Tipărește o pagină de test
+ pending jobs	PrinterListView		 sarcini în așteptare
 page	JobListView		pagină
 Cancel	AddPrinterDialog		Anulează
+Test page	PrintersWindow		Pagină de test
 Add printer	AddPrinterDialog		Adaugă imprimantă
 Green	TestPageView		Verde
 Printers	PrintersWindow		Imprimante
 Add…	PrintersWindow		Adaugă…
+No pending jobs	PrinterListView		Nicio sarcină în așteptare
 Default Printer	PrinterListView		Imprimantă implicită
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 pages	JobListView		pagini
@@ -35,5 +38,7 @@ No printer found!	TransportMenu		Nicio imprimantă găsită!
 Print jobs: No printer selected	PrintersWindow		Sarcini de tipărire: Nicio imprimantă selectată
 Cyan	TestPageView		Cyan
 Unknown status	JobListView		Stare necunoscută
+1 pending job	PrinterListView		1 sarcină în așteptare
 Connected to:	AddPrinterDialog		Conectat la:
 Printer type:	AddPrinterDialog		Tip de imprimantă:
+Test page	TestPageView		Pagină de test

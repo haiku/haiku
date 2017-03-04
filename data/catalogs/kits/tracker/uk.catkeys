@@ -302,7 +302,7 @@ File	FilePanelPriv		Файл
 Real name	ContainerWindow		Справжнє ім'я
 Error moving \"%name\"	FSUtils		Помилка переміщення \"%name\"
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви повинні кинути об'єкт на одну з іконок диску у вікні\"Диски\".
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо Ви перемістите теку "home" %osName\ може вести себе неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення теки "home" будь-що затиснувши кнопку Shift клікніть \"Перемістити\".
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо Ви перемістите теку "home" %osName може вести себе неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення теки "home" будь-що затиснувши кнопку Shift клікніть \"Перемістити\".
 Cancel	WidgetAttributeText		Відмінити
 Could not find an application to open \"%name\" (%error). 	FSUtils		Не вдалося знайти програму для відкриття \"%name\" (%error).
 Create a Query template	FindPanel		Створення шаблону запиту

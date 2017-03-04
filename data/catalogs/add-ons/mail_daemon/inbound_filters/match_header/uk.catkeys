@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Вибрати дію>
-Header field (e.g. Subject, From, ...)	ConfigView		Поле заголовка
+Header field (e.g. Subject, From, ...)	ConfigView		Поле заголовка (наприклад Тема, Від, ...)
 Account	ConfigView		Обліковий запис
 has	ConfigView		має
 Move to	ConfigView		Перемістити до

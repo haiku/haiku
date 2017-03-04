@@ -1,0 +1,12 @@
+1	english (united kingdom)	x-vnd.Haiku-Pulse	706922532
+OK	PrefsWindow		Alright
+Active color	ConfigView		Active colour
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolour 0xrrggbb]\n\t[--activecolour 0xrrggbb] [--idlecolour 0xrrggbb]\n
+Fade colors	ConfigView		Fade colours
+OK	DeskbarPulseView		Alright
+Frame color	ConfigView		Frame colour
+OK	PulseApp		Alright
+Bar colors	ConfigView		Bar colours
+OK	PulseView		Alright
+OK	CPUButton		Alright
+Idle color	ConfigView		Idle colour

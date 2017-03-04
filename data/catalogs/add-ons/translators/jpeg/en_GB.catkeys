@@ -1,0 +1,5 @@
+1	english (united kingdom)	x-vnd.Haiku-JPEGTranslator	3308746898
+Prevent colors 'washing out'	JPEGTranslator		Prevent colours 'washing out'
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colour-space conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Make file smaller (slightly worse quality)
+Read greyscale images as RGB32	JPEGTranslator		Read grey-scale images as RGB32

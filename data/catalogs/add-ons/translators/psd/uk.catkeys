@@ -8,7 +8,7 @@ Photoshop image translator	PSDTranslator		Перетворювач зображ�
 Version %d.%d.%d, %s	PSDConfig		Версія %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Документ Photoshop (PSD-файл)
 Photoshop image	PSDTranslator		Зображення Photoshop
-RLE	PSDConfig		кодування повторів (RLE)
+RLE	PSDConfig		RLE
 Photoshop Big Document (PSB file)	PSDConfig		Документ Photoshop Big (PSB файл)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Зображення Photoshop (%s)

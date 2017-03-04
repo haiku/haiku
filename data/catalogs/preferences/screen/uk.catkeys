@@ -9,9 +9,9 @@ Swap displays:	Screen		Поміняти дисплеї:
 Combine displays:	Screen		Обє'днати дисплеї:
 Done	Screen		Готово
 Set background…	Screen		Встановити тло…
-Undo	Screen		Скасувати
+Undo	Screen		Відмінити
 if needed	Screen		якщо потрібно
-Screen preferences by the Haiku team	Screen		Настройки Екрану від команди Haiku
+Screen preferences by the Haiku team	Screen		Налаштування екрану від команди Haiku
 Settings will revert in %seconds.	Screen		Налаштування повернуться через %seconds.
 Screen	System name		Екран
 OK	Screen		Гаразд
@@ -24,7 +24,7 @@ Warning	Screen		Увага
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu kHz\nВертикальна частота:\t%lu - %lu Hz\n\nМаксимально пікселів:\t%g MHz
 Keep	Screen		Зберегти
 Unknown mode	Screen		Невідомий режим
-disable	Screen		відмінити
+disable	Screen		вимкнути
 Columns:	Screen		Стовбці:
 All workspaces	Screen		Всі робочі простори
 always	Screen		завжди
@@ -34,9 +34,9 @@ About	Screen		Про
 24 bits/pixel, 16 Million colors	Screen		24біти/піксель, 16 міліонів кольорів
 horizontally	Screen		горизонтально
 Other…	Screen		Інше…
-Cancel	Screen		Відмінити
+Cancel	Screen		Скасувати
 bits/pixel	Screen		бітів/піксель
-Refresh rate:	Screen		Частота обновлення:
+Refresh rate:	Screen		Частота оновлення:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?
 Confirm changes	Screen		Підтвердити зміни
@@ -47,7 +47,7 @@ Screen	Screen		Екран
 %.1f Hz	Screen		%.1f Hz
 8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
 Apply	Screen		Прийняти
-Refresh rate	Screen		Частота обновлення
+Refresh rate	Screen		Частота оновлення
 %sSerial no.: %s	Screen		%sSerial no.: %s
 Colors:	Screen		Кольори:
 Video format:	Screen		Відео формат:

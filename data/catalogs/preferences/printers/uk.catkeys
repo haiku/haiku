@@ -4,13 +4,13 @@ Waiting	JobListView		Очікування
 Print test page	PrintersWindow		Друк пробної сторінки
  pending jobs	PrinterListView		 очікування завдань
 page	JobListView		сторінка
-Cancel	AddPrinterDialog		Відмінити
+Cancel	AddPrinterDialog		Скасувати
 Test page	PrintersWindow		Пробна сторінка
 Add printer	AddPrinterDialog		Додати принтер
 Green	TestPageView		Зелений
 Printers	PrintersWindow		Принтери
 Add…	PrintersWindow		Додати …
-No pending jobs	PrinterListView		Немає черги завдань.
+No pending jobs	PrinterListView		Немає завдань у черзі.
 Default Printer	PrinterListView		Типовий принтер
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
 pages	JobListView		сторінки
@@ -24,7 +24,7 @@ Restart job	PrintersWindow		Перезапустити завдання
 Add	AddPrinterDialog		Додати
 Make default	PrintersWindow		Зробити типовим
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
-Cancel job	PrintersWindow		Відмінити завдання
+Cancel job	PrintersWindow		Скасувати завдання
 Yellow	TestPageView		Жовтий
 Blue	TestPageView		Синій
 Remove	PrintersWindow		Видалити

@@ -1,0 +1,8 @@
+1	english (united kingdom)	x-vnd.Haiku-About	4193938727
+Licenses: 	AboutView		Licences: 
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT licence>. Some system libraries contain third party code distributed under the <LGPL licence>. You can find the copyrights to third party code below.\n\n
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Centre Ltd and Clark Cooper.
+MIT license. All rights reserved.	AboutView		MIT licence. All rights reserved.
+[Click a license name to read the respective license.]\n\n	AboutView		[Click a licence name to read the respective licence.]\n\n
+License: 	AboutView		Licence: 
+2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger based on the Generalised Timing Formula

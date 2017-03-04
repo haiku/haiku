@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-PSRV	2930356711
+1	romanian	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Nedefinit
 Return the number of available transports	PrintServerApp Scripting		Întoarce numărul de transporturi disponibile
 Return the number of available printers	PrintServerApp Scripting		Întoarce numărul de imprimante disponibile
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Da
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Registru
 Would you like to set one up now?	PrintServerApp		Doriți să configurați una acum?
+Print job setup:	ConfigWindow		Configurare sarcină tipărire:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Portret
 All pages	ConfigWindow		Toate paginile

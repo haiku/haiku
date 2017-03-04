@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	1888169680
+1	romanian	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Încărcare…
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea…
 Every 30 seconds	CodyCam		La fiecare 30 de secunde
@@ -76,6 +76,7 @@ cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Never	CodyCam		Niciodată
 Cannot create a video window	CodyCam		Nu se poate crea o fereastră video
 Every 10 minutes	CodyCam		La fiecare 10 minute
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nu s-a putut găsi sursa video.\nAveți nevoie de o cameră web pentru a utiliza CodyCam.
 Cannot start the video source	CodyCam		Nu se poate porni sursa video
 Cannot start the video window	CodyCam		Nu se poate porni fereastra video
 password expected	CodyCam		parolă așteptată

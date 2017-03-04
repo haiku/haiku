@@ -1,17 +1,17 @@
 1	ukrainian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		Гаразд
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Гарячим клавішам невдалося зберегти ваші установки.
-Cancel	ShortcutsWindow		Відмінити
-Append KeySet…	ShortcutsWindow		Додати список гарячих клавіш…
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Гарячим клавішам не вдалося зберегти ваші установки.
+Cancel	ShortcutsWindow		Скасувати
+Append KeySet…	ShortcutsWindow		Додати список …
 Control	ShortcutsSpec	Name for modifier on keyboard	Керування
 Key	ShortcutsWindow		Клавіша
-Open KeySet…	ShortcutsWindow		Відкрити список горячих клавіш…
-Error, NULL state description?	ShortcutsSpec		Помилка, нульовий опису стану?
+Open KeySet…	ShortcutsWindow		Відкрити список…
+Error, NULL state description?	ShortcutsSpec		Помилка, опис нульового стану?
 Revert to saved	ShortcutsWindow		Повернутися до збереження
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити Рядок \"Ваш текст тут\"
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити рядок \"Ваш текст тут\"
 *MouseUp	ShortcutsWindow		*Мишку вгору
-(Choose application with file requester)	ShortcutsWindow		(Виберіть додаток з запиту файла)
+(Choose application with file requester)	ShortcutsWindow		(Виберіть програму з запитом файла)
 *LaunchHandler text/html	ShortcutsWindow		*Запустити обробник текст/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалося відкрити список!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
@@ -29,7 +29,7 @@ File	ShortcutsWindow		Файл
 Quit	ShortcutsWindow		Вийти
 *MouseDown	ShortcutsWindow		*Мишку вниз
 Don't save	ShortcutsWindow		Не зберігати
-Application	ShortcutsWindow		Додаток
+Application	ShortcutsWindow		Програма
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *Beep	ShortcutsWindow		*Сигнал
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
@@ -37,6 +37,6 @@ Save KeySet as…	ShortcutsWindow		Зберегти список як…
 Open	ShortcutsWindow		Відкрити
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалось розібратись у вашому файлі списку!
 Select	ShortcutsWindow		Вибрати
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Горячим клавішам не вдалось зберегти ваш файл список!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалось зберегти файл вашого списку!
 Oh no	ShortcutsWindow		О ні
 Shortcuts	System name		Гарячі клавіші

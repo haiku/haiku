@@ -5,7 +5,7 @@ Defaults	KeyboardWindow		Типово
 Key repeat rate	KeyboardView		Швидкість повтору
 Revert	KeyboardWindow		Повернути
 Delay until key repeat	KeyboardView		Затримка при повторі
-Keyboard	System name		Keyboard
+Keyboard	System name		Клавіатура
 OK	KeyboardApplication		Гаразд
 Fast	KeyboardView		Швидко
 Slow	KeyboardView		Повільно

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Login	2683778354
+1	romanian	x-vnd.Haiku-Login	336867745
 Error: %1	Login App		Eroare: %1
 Hide password	Login View		Ascunde parola
 Desktop	Desktop Window		Desktop
@@ -17,3 +17,4 @@ Halt	Login View		Oprește
 Password:	Login View		Parolă:
 OK	Login App		OK
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNu face fereastra modală\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktop-ul afișat în spatele aplicației de Autentificare prin plasarea replicanților pe acesta.\n\nCând ați terminat, închideți doar aplicația (Cmd-Q).

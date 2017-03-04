@@ -8,10 +8,10 @@ to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		в�
 The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Програма:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Ця програма ще не має необхідних привілеїв.
 Password:	KeyRequestWindow		Гасло:
-Cancel	KeyRequestWindow		Відмінити
+Cancel	KeyRequestWindow		Скасувати
 Keyring:	KeyRequestWindow		Набір ключів:
 Unlock keyring	KeyRequestWindow		Рззблокувати набір ключів
 An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		Програма бажає отримати доступ до набору ключів, але він заблокований гаслом. Введіть гасло для розблокування.\nРозблокування набору ключів триватиме до вимкнення системи або до моменту нового заблокування.\nПри відміні діалогу набір ключів залишиться заблокованим.
 Allow once	AppAccessRequestWindow		Дозволити одноразово
-Disallow	AppAccessRequestWindow		Відмінити дозвіл
+Disallow	AppAccessRequestWindow		Скасувати дозвіл
 requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		запросити доступ до набору ключів:\n%keyringName%\n\n

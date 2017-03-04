@@ -1,0 +1,7 @@
+1	english (united kingdom)	x-vnd.Haiku-Time	3031565343
+OK	Time		Alright
+Synchronize	Time		Synchronise
+The following error occured while synchronizing:r\n%s	Time		The following error occurred whilst synchronising:r\n%s
+Synchronize at boot	Time		Synchronise at boot
+The following error occured while synchronizing:r\n%s: %s	Time		The following error occurred whilst synchronising:r\n%s: %s
+Synchronize again	Time		Synchronise again

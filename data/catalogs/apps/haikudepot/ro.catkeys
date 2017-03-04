@@ -1,10 +1,12 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1090759318
+1	romanian	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Nume
 Available packages	MainWindow		Pachete disponibile
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
+Repository	FilterView		Depozit
 Close	RatePackageWindow		Închidere
 The captcha puzzle needs to be solved.	UserLoginWindow		Puzzle captcha trebuie rezolvat.
 Changelog	PackageInfoView		Jurnal de modificări
+Repository:	FilterView		Depozit:
 Your rating:	RatePackageWindow		Evaluarea ta:
 The passwords do not match.	UserLoginWindow		Parolele nu se potrivesc.
 Log in…	MainWindow		Autentificare…
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Evaluarea a fost actual
 <no info>	PackageInfoView		<no info>
 Starting the package daemon failed:\n\n%Error%	App		Pornirea demonului de pachete a eșuat:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		O eroare s-a întâmplat inițializând managerul de pachete: %message%
+All repositories	FilterView		Toate depozitele
 Email address:	UserLoginWindow		Adresă email:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Evaluarea a fost încărcată cu succes. Puteți s-o actualizați sau elimina oricând prin evaluarea din nou a pachetului.
 Very unstable	RatePackageWindow		Foarte instabil
@@ -102,6 +105,7 @@ Close	MainWindow		Închidere
 Preferred language:	UserLoginWindow		Limbă preferată:
 Failed to rate package	RatePackageWindow		Eșec la evaluarea pachetului
 Internet & Network	Model		Internet & Rețea
+Refresh repositories	MainWindow		Actualizare depozite
 Cancel	MainWindow		Anulează
 Quit HaikuDepot	App		Închide HaikuDepot
 Input validation	UserLoginWindow		Validare intrare
@@ -139,6 +143,7 @@ Failed to create account	UserLoginWindow		Eșec la crearea contului
 There are problems with the data you entered:\n\n	UserLoginWindow		Există probleme cu datele pe care le-ați introdus:\n\n
 Featured packages	MainWindow		Pachete recomandate
 Start package daemon	App		Pornire demon de pachet
+Manage repositories…	MainWindow		Gestionare depozite...
 Success	RatePackageWindow		Succes
 Business	Model		Afaceri
 Audio	Model		Audio

@@ -23,7 +23,7 @@ Tilde trigger	Keymap window		Тільда
 Grave trigger	Keymap window		Апостроф
 Role	Modifier keys window	As in the role of a modifier key	Роль
 Caps lock	Keyboard Layout View		Caps lock
-Select dead keys	Keymap window		Вибрати модифікатор
+Select dead keys	Keymap window		Вибрати мертві клавіші
 Bulgarian (Cyrillic)	Keyboard Layout View		Болгарська (кирилиця)
 Cancel	Modifier keys window		Скасувати
 Russian	Keyboard Layout View		Російська
@@ -40,13 +40,13 @@ Estonian	Keyboard Layout View		Естонська
 Russian (Mac)	Keyboard Layout View		Російська (Mac)
 Defaults	Keymap window		Типово
 Quit	Keymap window		Вихід
-Dutch	Keyboard Layout View		Голландська
+Dutch	Keyboard Layout View		Голандська
 Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
 Circumflex trigger	Keymap window		Ціркумфлекс
 ISO-9995	Keyboard Layout View		ISO-9995
 Hebrew	Keyboard Layout View		Іврит
 Diaeresis trigger	Keymap window		Діарезіс
-Disabled	Modifier keys window	Do nothing	Вимкнено
+Disabled	Modifier keys window	Do nothing	Вимкнути
 Belarusian (Latin)	Keyboard Layout View		Білоруська (латиниця)
 Danish	Keyboard Layout View		Датська
 Open…	Keymap window		Відкрити…
@@ -56,13 +56,13 @@ System:	Keymap window		Системні:
 Lithuanian	Keyboard Layout View		Литовська
 Finnish	Keyboard Layout View		Фінська
 Svorak	Keyboard Layout View		Svorak
-Left command	Keyboard Layout View		Команда Left
+Left command	Keyboard Layout View		Ліва Сommand
 Romanian	Keyboard Layout View		Румунська
 Set modifier keys…	Keymap window		Призначити клавіші-модифікатори...
 Option:	Modifier keys window	Option key role name	Параметр:
 Czech (Mac)	Keyboard Layout View		Чеська (Mac)
 Control	Keyboard Layout View	Control key	Керування
-Left option	Keyboard Layout View		Ліва option
+Left option	Keyboard Layout View		Ліва Option
 Portuguese	Keyboard Layout View		Португальська
 Right control	Keyboard Layout View		Права Control
 Belgian (point)	Keyboard Layout View		Бельгійська (point)
@@ -74,8 +74,8 @@ Esperanto	Keyboard Layout View		Есперанто
 Arabic (102)	Keyboard Layout View		Арабська (102)
 United-Kingdom	Keyboard Layout View		Великобританія
 German (Mac)	Keyboard Layout View		Німецька (Mac)
-Right option	Keyboard Layout View		Права option
-Right shift	Keyboard Layout View		Правий shift
+Right option	Keyboard Layout View		Права Option
+Right shift	Keyboard Layout View		Правий Shift
 Key	Modifier keys window	As in a computer keyboard key	Клавіша
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавіша Ctrl
 Control:	Modifier keys window	Control key role name	Керування:
@@ -91,7 +91,7 @@ Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клав
 Layout	Keymap window		Макет
 Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
 Albanian	Keyboard Layout View		Албанська
-Right command	Keyboard Layout View		Права command
+Right command	Keyboard Layout View		Права Command
 Revert	Keymap window		Повернути
 Command:	Modifier keys window	Command key role name	Команда:
 Latin-American	Keyboard Layout View		Латиноамериканська
@@ -109,11 +109,11 @@ File	Keymap window		Файл
 Num lock	Keyboard Layout View		Num lock
 Swedish	Keyboard Layout View		Шведська
 Macedonian	Keyboard Layout View		Македонська
-(Current)	Keymap window		(Активна)
+(Current)	Keymap window		(Поточна)
 Font	Keymap window		Шрифт
-Keymap	System name		Keymap
+Keymap	System name		Розкладка
 French (Mac)	Keyboard Layout View		Французька (Mac)
-Left shift	Keyboard Layout View		Лівий shift
+Left shift	Keyboard Layout View		Лівий Shift
 Shift	Keyboard Layout View	Shift key	Shift
 Ukrainian	Keyboard Layout View		Українська
 Croatian	Keyboard Layout View		Хорватська
@@ -122,4 +122,4 @@ Czech	Keyboard Layout View		Чеська
 Set modifier keys	Modifier keys window		Призначити клавіші-модифікатори
 Colemak	Keyboard Layout View		Колемак
 Modifier keys	Modifier keys window		Клавіші-модифікатори
-Acute trigger	Keymap window		Акюте
+Acute trigger	Keymap window		Ак'юте

@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Notifications	746652830
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Сталася помилка при збереженні налаштувань.\nМожливо бракує дискового простору.
-Notifications	GeneralView		Повідомлення
-seconds of inactivity	GeneralView		Оповіщення
+Notifications	GeneralView		Оповіщення
+seconds of inactivity	GeneralView		секунд неактивності
 Revert	PrefletWin		Повернути
 Mini icon	DisplayView		Міні іконки
 Enable notifications	GeneralView		Включити оповіщення
@@ -10,9 +10,9 @@ OK	GeneralView		Гаразд
 OK	PrefletWin		Гаразд
 Type	NotificationView		Тип
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Оповіщення не можуть бути зупинені, сервер недоступний.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Неможливо включити оповіщення бо сервер не знайдено.\nЦе означає, що ваш InfoPopper встановлений не повністю.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Неможливо увімкнути оповіщення бо сервер не знайдено.\nЦе означає, що ваш InfoPopper встановлений не повністю.
 Important	NotificationView		Важливо
-Cannot disable notifications because the server can't be reached.	GeneralView		Неможливо заборонити оповіщення, бо сервер недоступний.
+Cannot disable notifications because the server can't be reached.	GeneralView		Неможливо вимкнути оповіщення, бо сервер недоступний.
 Progress	NotificationView		Хід
 General	PrefletView		Основні
 Apply	PrefletWin		Застосувати
@@ -20,20 +20,20 @@ Display	PrefletView		Дисплей
 Search:	NotificationView		Пошук:
 Allowed	NotificationView		Дозволити
 Yes	NotificationView		Так
-Last received	NotificationView		Останні отримані
+Last received	NotificationView		Отримані недавно
 Large icon	DisplayView		Великі іконки
 Icon size:	DisplayView		Розмір іконки:
 Hide notifications from screen after	GeneralView		Приховати оповіщення з екрану після
-Notifications	System name		Notifications
+Notifications	System name		Оповіщення
 Notifications	NotificationView		Оповіщення
 No	NotificationView		Ні
 Title	NotificationView		Назва
 Information	NotificationView		Інформація
 Window width:	DisplayView		Ширина вікна:
-Application	NotificationView		Додаток
-Enabled	NotificationView		Включити
-Unknown	NotificationView		Невідомий
-Enable notifications at startup	GeneralView		Включити оповіщення при старті
+Application	NotificationView		Програма
+Enabled	NotificationView		Увімкнути
+Unknown	NotificationView		Невідомо
+Enable notifications at startup	GeneralView		Увімкнути оповіщення при старті
 Notifications	PrefletView		Оповіщення
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Не вдалося знайти сервер оповіщень. Це означає, що установка  InfoPopper була завершена невдало.
-Applications	NotificationView		Додатки
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Не вдалося знайти сервер оповіщень. Це означає, що установка InfoPopper була завершена невдало.
+Applications	NotificationView		Програми

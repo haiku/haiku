@@ -1,28 +1,28 @@
 1	ukrainian	x-vnd.Haiku-ScreenSaver	557704281
-Could not load screen saver	ScreenSaver		Не вдалося загрузити зберігач
+Could not load screen saver	ScreenSaver		Не вдалося завантажити Оберігач
 30 seconds	ScreenSaver		30 секунд
-Start screensaver	ScreenSaver		Запустити зберігач
+Start screensaver	ScreenSaver		Запустити Оберігач
 Password…	ScreenSaver		Гасло…
 Password:	ScreenSaver		Гасло:
-Password lock	ScreenSaver		Гасло блокування:
+Password lock	ScreenSaver		Блокування гасла:
 Screensavers	ScreenSaver		Зберігачі екрану
-Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling not available
-ScreenSaver	System name		Зберігач екрану
+Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling не увімкнено
+ScreenSaver	System name		Оберігач екрану
 Test	ScreenSaver		Тест
 General	ScreenSaver		Основний
-Fade now when mouse is here	ScreenSaver		Зникнути зараз коли курсор знаходиться тут
-Enable screensaver	ScreenSaver		Увімкнути зберігач
+Fade now when mouse is here	ScreenSaver		Задіяти зараз коли курсор знаходиться тут
+Enable screensaver	ScreenSaver		Увімкнути Оберігач
 Don't fade when mouse is here	ScreenSaver		Не зникати коли курсор знаходиться тут
-Cancel	ScreenSaver		Відмінити
+Cancel	ScreenSaver		Не задіювати коли курсор знаходиться тут
 Turn off screen	ScreenSaver		Вимкнути екран
 No options available	ScreenSaver		Опції недоступні
 Password Window	ScreenSaver		Вікно гасла
-Screensaver settings	ScreenSaver		Налаштування зберігача
+Screensaver settings	ScreenSaver		Налаштування Оберігача
 Passwords don't match. Please try again.	ScreenSaver		Гасла не збігаються. Будь ласка, спробуйте знову.
 OK	ScreenSaver		Гаразд
 Blackness	ScreenSaver		Темнота
-Use custom password	ScreenSaver		Використовувати гасло користувача
+Use custom password	ScreenSaver		Використовувати вибране гасло
 Done	ScreenSaver		Готово
 Confirm password:	ScreenSaver		Підтвердіть гасло:
 No preview available	PreviewView		Попередній перегляд неможливий
-Use network password	ScreenSaver		Використати мережеве гасло
+Use network password	ScreenSaver		Використати гасло мережі

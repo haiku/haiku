@@ -2,7 +2,7 @@
 GMT (UNIX compatible)	Time		GMT (сумісний з UNIX)
 OK	Time		Гаразд
 Asia	Time		Азія
-\nNow: 	Time		\nЗараз:
+\nNow: 	Time		\nЗараз: 
 Africa	Time		Африка
 Reset to default server list	Time		Скинути до типового списку сервера
 Stop	Time		Зупинити
@@ -25,16 +25,16 @@ The following error occured while synchronizing:r\n%s	Time		При синхро�
 Europe	Time		Європа
 Remove	Time		Вилучити
 Time	Time		Час
-Indian	Time		Індія
+Indian	Time		Індійський
 Sending request failed	Time		Не вдалося надіслати запит
 Arctic	Time		Арктика
 Display time with seconds	Time		Показувати секунди
 Time	System name		Час
 America	Time		Америка
-Synchronize at boot	Time		Синхронізувати завантаження
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Час, розробка:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсі права застережені 2004-2012, Haiku.
+Synchronize at boot	Time		Синхронізувати при завантаженні
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата та Час, автори:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсі права застережені 2004-2012, Haiku.
 Received invalid time	Time		Отримано неправильний час
-Antarctica	Time		Антарктика
+Antarctica	Time		Отримано невірний час
 Show time zone	Time		Встановити часову зону
 Show clock in Deskbar	Time		Показувати час в Deskbar
 The following error occured while synchronizing:r\n%s: %s	Time		При синхронізації трапилась така помилка:r\n%s: %s

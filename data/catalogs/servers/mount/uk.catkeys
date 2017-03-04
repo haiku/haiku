@@ -6,7 +6,7 @@ Mount warning	AutoMounter		Зауваги при монтуванні
 Mount read/write	AutoMounter		Підмонтувати для запису/читання
 Mounting volume '%s'\n\n	AutoMounter		Підмонтування тому '%s'\n\n
 Cancel	AutoMounter		Скасувати
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Неможливо відмонтувати диск \"%s\":\n\t%s\n\nПрискорити відмонтування?\n\nПримітка: Якщо додаток продовжить запис на том можлива втрата даних.\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Неможливо відмонтувати диск \"%s\":\n\t%s\n\nПрискорити відмонтування?\n\nПримітка: Якщо програма продовжить запис на том можлива втрата даних.\n
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відмонтувати диск \"%s\":\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Монтування тому <безіменний том>\n\n
 OK	AutoMounter		Гаразд

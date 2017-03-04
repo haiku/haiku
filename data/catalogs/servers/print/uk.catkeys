@@ -4,24 +4,24 @@ Return the number of available transports	PrintServerApp Scripting		Поверн
 Return the number of available printers	PrintServerApp Scripting		Повернути число доступних принтерів
 Get currently available ports/devices	Transport Scripting		Надати доступні порти/пристрої
 Retrieve or select the active printer	PrintServerApp Scripting		Відновити або вибрати активний принтер
-Cancel	PrintServerApp		Відмінити
-Retrieve a specific printer	PrintServerApp Scripting		Відновити особливий принтер
+Cancel	PrintServerApp		Скасувати
+Retrieve a specific printer	PrintServerApp Scripting		Відновити визначений принтер
 Page %1 to %2	ConfigWindow		Стор. %1 до %2
-Get name of the printer add-on used for this printer	Printer Scripting		Надати ім'я додатка для цього принтера
+Get name of the printer add-on used for this printer	Printer Scripting		Отримати і'мя додатка, що працює з цим принтером.
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Гаразд
-Cancel	ConfigWindow		Відмінити
+Cancel	ConfigWindow		Скасувати
 Printer server	ConfigWindow		Принт-сервер
 Page %1 to %2, %3 copies	ConfigWindow		Стор. %1 до %2, %3 копій
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер з цим іменем існує, але драйвер для нього не знайдено! Замінити?
 Yes	PrintServerApp		Так
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ледгер
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Книжкова
 Would you like to set one up now?	PrintServerApp		Бажаєте встановити його зараз?
-Print job setup:	ConfigWindow		Налаштування завдань для друку
+Print job setup:	ConfigWindow		Налаштування завдань друку
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Портрет
 All pages	ConfigWindow		Всі сторінки
-There is no default printer set up.	PrintServerApp		Не встановлено  принтер по замовчуванню.
+There is no default printer set up.	PrintServerApp		Не встановлено типовий  принтер.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Лист
@@ -30,26 +30,26 @@ A2	ConfigWindow	ISO 216 paper size	A2
 Select a printer	ConfigWindow		Вибрати принтер
 Show configuration window	PrintServerApp Scripting		Показати вікно конфігурації
 A4	ConfigWindow	ISO 216 paper size	A4
-Get comments about this printer	Printer Scripting		Подати опис цього принтера
+Get comments about this printer	Printer Scripting		Отримати опис цього принтера
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер з цим іменем існує, але його неможливо повністю використати! Замінити?
 No	PrintServerApp		Ні
-Get the transport configuration for this printer	Printer Scripting		Подати конфігурацію транспорту  цього принтера
+Get the transport configuration for this printer	Printer Scripting		Отримати конфігурацію транспорту цього принтера
 Landscape	ConfigWindow		Альбом
-Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Легал
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Легальний
 There are no printers set up.	PrintServerApp		Принтер не встановлено.
-Get name of the transport add-on used for this printer	Printer Scripting		Подайте ім'я транспорту для цього принтера
+Get name of the transport add-on used for this printer	Printer Scripting		Отримати ім'я транспорту для цього принтера
 All pages, %1 copies	ConfigWindow		Всі сторінки, %1 копій
-Delete a specific printer	PrintServerApp Scripting		Видалити позначений принтер
+Delete a specific printer	PrintServerApp Scripting		Видалити зазначений принтер
 Create a new printer	PrintServerApp Scripting		Створити новий принтер
 OK	PrintServerApp		Гаразд
-Print setup	ConfigWindow		Настройка друку
+Print setup	ConfigWindow		Налаштування друку
 A1	ConfigWindow	ISO 216 paper size	A1
-Retrieve a specific transport	PrintServerApp Scripting		Відновити позначений транспорт
-Get name of printer	Printer Scripting		Назвіть принтер
+Retrieve a specific transport	PrintServerApp Scripting		Відновити зазначений транспорт
+Get name of printer	Printer Scripting		Отримати ім'я принтер
 A3	ConfigWindow	ISO 216 paper size	A3
-Get name of transport	Transport Scripting		Назвіть транспорт
+Get name of transport	Transport Scripting		Отримати ім'я транспорту
 A5	ConfigWindow	ISO 216 paper size	A5
-Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ принтером по замовчуванню?
+Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ типовим принтером?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Таблоїд
-Page setup	ConfigWindow		Настройка друку
-Paper setup:	ConfigWindow		Настройка паперу:
+Page setup	ConfigWindow		Налаштування друку
+Paper setup:	ConfigWindow		Налаштування паперу:

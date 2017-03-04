@@ -1,0 +1,28 @@
+1	english (united kingdom)	x-vnd.Haiku-libtracker	2661861242
+OK	WidgetAttributeText		Alright
+Warning space color	SettingsView		Warning space colour
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Could not open \"%document\" because the application \"%app\" is in the Rubbish Bin. 
+Emptying Trash… 	StatusWindow		Emptying Rubbish… 
+Empty Trash	ContainerWindow		Empty Rubbish Bin
+Preparing to empty Trash…	StatusWindow		Preparing to empty the Rubbish Bin…
+OK	AutoMounterSettings		Alright
+Sorry, you can't copy items to the Trash.	PoseView		Sorry, you can't copy items to the Rubbish Bin.
+Move to Trash	ContainerWindow		Move to the Rubbish Bin
+Free space color	SettingsView		Free space colour
+Sorry, you can't copy items to the Trash.	FSClipBoard		Sorry, you can't copy items to the Rubbish Bin.
+Sorry, you can't create links in the Trash.	PoseView		Sorry, you can't create links in the Rubbish Bin.
+OK	InfoWindow		Alright
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Some of the selected items cannot be moved to the Rubbish Bin. Would you like to delete them instead? (This operation cannot be reverted.)
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		The selected item cannot be moved to the Rubbish Bin. Would you like to delete it instead? (This operation cannot be reverted.)
+trash	B_TRASH_DIRECTORY		Rubbish Bin
+OK	OpenWithWindow		Alright
+OK	PoseView		Alright
+Include trash	FindPanel		Include rubbish
+Move to Trash	FilePanelPriv		Move to the Rubbish Bin
+Used space color	SettingsView		Used space colour
+Trash	Model		Rubbish
+Error moving \"%name\" to Trash. (%error)	FSUtils		Error moving \"%name\" to the Rubbish Bin. (%error)
+OK	FSUtils		Alright
+You can't move or copy the trash.	FSUtils		You can't move or copy Rubbish.
+Move to Trash	FSUtils		Move to the Rubbish Bin
+Empty Trash	InfoWindow		Empty Rubbish

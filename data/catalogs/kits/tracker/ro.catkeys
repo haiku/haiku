@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1984816260
+1	romanian	x-vnd.Haiku-libtracker	1597598656
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare…
@@ -372,6 +372,7 @@ Open selection with:	OpenWithWindow		Deschide selecție cu:
 Preparing to create links…	StatusWindow		Se pregătește crearea legăturilor…
 Size	Default Query Columns		Dimensiune
 Show navigator	SettingsView		Afișează navigator
+All Haiku disks	AutoMounterSettings		Toate discurile Haiku
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Enumeră dosarele întâi
 Name	SelectionWindow		Nume

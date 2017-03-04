@@ -1,9 +1,10 @@
-1	romanian	x-vnd.haiku-screenshot	3896204963
+1	romanian	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		secunde
 Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Include margine fereastră
 Screenshot	System name		Captură de ecran
 Select	ScreenshotWindow		Selectează
+The destination path exists but is not a folder.	ScreenshotWindow		Calea de destinație există dar nu este un dosar.
 Capture active window	ScreenshotWindow		Capturează fereastra activă
 Cancel	ScreenshotWindow		Anulează
 Name:	ScreenshotWindow		Nume:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	captură de ecran
 New screenshot	ScreenshotWindow		Captură de ecran nouă
 Artwork folder	ScreenshotWindow		Dosar artwork
 Home folder	ScreenshotWindow		Dosar personal
+Failed to save screenshot	ScreenshotWindow		Nu s-a putut salva captura de ecran
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		Configurări…
 overwrite	ScreenshotWindow		suprascrie
 Delay:	ScreenshotWindow		Întârziere:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Eroare la salvarea \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Include indicator maus
 Translator Settings	ScreenshotWindow		Configurări traducător
