@@ -107,5 +107,6 @@ requires {
 	lib:libsolv
 	lib:libsolvext
 	lib:libz
-	vl_gothic
+	noto
+	noto_sans_cjk_jp
 }

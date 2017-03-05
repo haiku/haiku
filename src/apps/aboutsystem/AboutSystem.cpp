@@ -1191,18 +1191,13 @@ AboutView::_CreateCreditsView()
 		.SetLicenses("OpenGroup", "DEC", NULL));
 			// TODO: URL
 
-	// VL-Gothic font
-	_AddPackageCredit(PackageCredit("VL-Gothic font")
-		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1990-2003 Wada Laboratory,"
-			" the University of Tokyo."), COPYRIGHT_STRING
-			"2003-2004 Electronic Font Open Laboratory (/efont/).",
-			COPYRIGHT_STRING "2003-2012 M+ FONTS PROJECT.",
-			COPYRIGHT_STRING "2006-2012 Daisuke SUZUKI.",
-			COPYRIGHT_STRING "2006-2012 Project Vine.",
-			B_TRANSLATE("MIT license. All rights reserved."),
+	// Noto fonts copyright
+	_AddPackageCredit(PackageCredit("Noto fonts")
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING
+			"2012-2016 Google Internationalization team."),
 			NULL)
-		.SetLicense(kBSDThreeClause)
-		.SetURL("http://vlgothic.dicey.org/"));
+		.SetLicense("SIL Open Font Licence v1.1")
+		.SetURL("http://www.google.com/get/noto/"));
 
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")

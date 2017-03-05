@@ -305,7 +305,7 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	int32 length, FontCacheReference& fallbackCacheReference,
 	FontCacheEntry*& fallbackEntry)
 {
-	// We need the fallback font, since potentially, we have to obtain missing
+	// We need a fallback font, since potentially, we have to obtain missing
 	// glyphs from it. We need to obtain the fallback font while we have not
 	// locked anything, since locking the FontManager with the write-lock held
 	// can obvisouly lead to a deadlock.
@@ -319,29 +319,46 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 		entry->ReadUnlock();
 	}
 
-	if (gFontManager->Lock()) {
-		// TODO: We always get the fallback glyphs from VL Gothic at the
-		// moment, but of course the fallback font should a) contain the
-		// missing glyphs at all and b) be similar to the original font.
-		// So there should be a mapping of some kind to know the most
-		// suitable fallback font.
-		FontStyle* fallbackStyle = gFontManager->GetStyleByIndex(
-			"VL Gothic", 0);
-		if (fallbackStyle != NULL) {
-			ServerFont fallbackFont(*fallbackStyle, font.Size());
-			gFontManager->Unlock();
-			// Force the write-lock on the fallback entry, since we
-			// don't transfer or copy GlyphCache objects from one cache
-			// to the other, but create new glyphs which are stored in
-			// "entry" in any case, which requires the write cache for
-			// sure (used FontEngine of fallbackEntry).
-			fallbackEntry = FontCacheEntryFor(fallbackFont, forceVector, entry,
-				utf8String, length, fallbackCacheReference, true);
-			// NOTE: We don't care if fallbackEntry is NULL, fetching
-			// alternate glyphs will simply not work.
-		} else
-			gFontManager->Unlock();
+	// TODO: We always get the fallback glyphs from the Noto family, but of
+	// course the fallback font should a) contain the missing glyphs at all
+	// and b) be similar to the original font. So there should be a mapping
+	// of some kind to know the most suitable fallback font.
+	static const char* fallbacks[] = {
+		"Noto Sans",
+		"Noto Sans CJK JP",
+		NULL
+	};
+
+	int i = 0;
+
+	// Try to get the glyph from the fallback fonts
+	while(fallbacks[i] != NULL)
+	{
+		if (gFontManager->Lock()) {
+			FontStyle* fallbackStyle = gFontManager->GetStyleByIndex(
+				fallbacks[i], 0);
+			if (fallbackStyle != NULL) {
+				ServerFont fallbackFont(*fallbackStyle, font.Size());
+				gFontManager->Unlock();
+
+				// Force the write-lock on the fallback entry, since we
+				// don't transfer or copy GlyphCache objects from one cache
+				// to the other, but create new glyphs which are stored in
+				// "entry" in any case, which requires the write cache for
+				// sure (used FontEngine of fallbackEntry).
+				fallbackEntry = FontCacheEntryFor(fallbackFont, forceVector,
+					entry, utf8String, length, fallbackCacheReference, true);
+
+				if (fallbackEntry != NULL)
+					break;
+			} else
+				gFontManager->Unlock();
+		}
+
+		i++;
 	}
+	// NOTE: We don't care if fallbackEntry is still NULL, fetching
+	// alternate glyphs will simply not work.
 
 	if (!entry->WriteLock()) {
 		FontCache::Default()->Recycle(entry);

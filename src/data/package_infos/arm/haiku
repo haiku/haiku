@@ -81,5 +81,6 @@ requires {
 	lib:libstdc++
 	lib:libsupc++
 	lib:libz
-	vl_gothic
+	noto
+	noto_sans_cjk_jp
 }
