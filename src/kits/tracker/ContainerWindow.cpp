@@ -2020,7 +2020,7 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	BMenu* listViewMenu = new BMenu("List view");
+	BMenu* listViewMenu = new BMenu(B_TRANSLATE("List view"));
 
 	message = new BMessage(kListMode);
 	message->AddInt32("icon_size", B_MINI_ICON);
