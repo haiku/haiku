@@ -204,6 +204,18 @@ MediaConverterApp::_CreateOutputFile(BDirectory directory,
 
 	name.Append(outputFormat->file_extension);
 
+	BEntry directoryEntry;
+	directory.GetEntry(&directoryEntry);
+	if (!directoryEntry.Exists()) {
+		BAlert* alert = new BAlert(B_TRANSLATE("Error"),
+			B_TRANSLATE("Selected directory not found. "
+				"Defaulting to /boot/home"),
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
+		directory.SetTo("/boot/home");
+	}
+
 	BEntry inEntry(ref);
 	BEntry outEntry;
 
@@ -318,6 +330,11 @@ MediaConverterApp::_RunConvert()
 
 
 			} else {
+				srcIndex++;
+				BString error(
+					B_TRANSLATE("Error converting '%filename'"));
+				error.ReplaceAll("%filename", inRef.name);
+				fWin->SetStatusMessage(error.String());
 				fWin->Unlock();
 				break;
 			}
@@ -391,6 +408,9 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 						B_TRANSLATE("Audio quality not supported"));
 					fWin->Unlock();
 				}
+			} else {
+				fWin->SetStatusMessage(
+					B_TRANSLATE("Error creating track."));
 			}
 
 		} else if (inFormat.IsVideo() && (videoCodec != NULL)) {
@@ -465,9 +485,14 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 					fWin->SetVideoQualityLabel(videoQualitySupport);
 					fWin->Unlock();
 				}
+			} else {
+				fWin->SetStatusMessage(
+					B_TRANSLATE("Error creating video."));
 			}
 		} else {
 			//  didn't do anything with the track
+			fWin->SetStatusMessage(
+				B_TRANSLATE("Input file not recognized as Audio or Video"));
 			inFile->ReleaseTrack(inTrack);
 		}
 	}

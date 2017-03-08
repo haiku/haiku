@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -1005,6 +1006,19 @@ MediaConverterWindow::_CreateMenu()
 void
 MediaConverterWindow::_SetOutputFolder(BEntry entry)
 {
-	fOutputDir.SetTo(&entry);
+	BPath path;
+	entry.GetPath(&path);
+	if (access(path.Path(), W_OK) != -1) {
+		fOutputDir.SetTo(&entry);
+	} else {
+		BString errorString(B_TRANSLATE("Error writing to location: %strPath%."
+			" Defaulting to location: /boot/home"));
+		errorString.ReplaceFirst("%strPath%", path.Path());
+		BAlert* alert = new BAlert(B_TRANSLATE("Error"),
+			errorString.String(), B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
+		fOutputDir.SetTo("/boot/home");
+	}
 	TruncateOutputFolderPath();
 }
