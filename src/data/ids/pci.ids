@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.02.15
-#	Date:    2017-02-15 03:15:02
+#	Version: 2017.03.04
+#	Date:    2017-03-04 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10718,6 +10718,8 @@
 	1c30  GP106GL
 	1c35  GP106
 	1c60  GP106M [GeForce GTX 1060 Mobile]
+	1c61  GP106M [GeForce GTX 1050 Ti Mobile]
+	1c62  GP106M [GeForce GTX 1050 Mobile]
 	1c70  GP106GL
 	1c80  GP107
 	1c81  GP107 [GeForce GTX 1050]
@@ -10729,6 +10731,7 @@
 	1ca8  GP107GL
 	1caa  GP107GL
 	1d01  GP108
+	1d81  GV100
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
 		103c 1934  FlexFabric 20Gb 2-port 650M Adapter
@@ -11048,6 +11051,7 @@
 	8813  RTL8813AE 802.11ac PCIe Wireless Network Adapter
 	8821  RTL8821AE 802.11ac PCIe Wireless Network Adapter
 	b723  RTL8723BE PCIe Wireless Network Adapter
+		10ec 8739  Dell Wireless 1801
 10ed  Ascii Corporation
 	7310  V7310
 10ee  Xilinx Corporation
@@ -16457,6 +16461,14 @@
 		1028 1fc1  Express Flash NVMe PM1725 800GB SFF
 		1028 1fc2  Express Flash NVMe PM1725 1.6TB SFF
 		1028 1fc4  Express Flash NVMe PM1725 1.6TB AIC
+	a822  NVMe SSD Controller 172Xa
+		1028 1fd9  Dell Express Flash NVMe PM1725a 800GB SFF
+		1028 1fda  Dell Express Flash NVMe PM1725a 1.6TB SFF
+		1028 1fdb  Dell Express Flash NVMe PM1725a 3.2TB SFF
+		1028 1fdc  Dell Express Flash NVMe PM1725a 6.4TB SFF
+		1028 1fdd  Dell Express Flash NVMe PM1725a 1.6TB AIC
+		1028 1fde  Dell Express Flash NVMe PM1725a 3.2TB AIC
+		1028 1fdf  Dell Express Flash NVMe PM1725a 6.4TB AIC
 144e  OLITEC
 144f  Askey Computer Corp.
 1450  Octave Communications Ind.
@@ -17096,14 +17108,14 @@
 	16c8  BCM57301 NetXtreme-C 10Gb Ethernet Controller
 	16c9  BCM57302 NetXtreme-C 10Gb/25Gb Ethernet Controller
 	16ca  BCM57304 NetXtreme-C 10Gb/25Gb/40Gb/50Gb Ethernet Controller
-	16cb  BCM57304 NetXtreme-C Ethernet Virtual Function
+	16cb  NetXtreme-C Ethernet Virtual Function
 	16cc  BCM57417 NetXtreme-E Ethernet Partition
 	16ce  BCM57311 NetXtreme-C 10Gb RDMA Ethernet Controller
 	16cf  BCM57312 NetXtreme-C 10Gb/25Gb RDMA Ethernet Controller
 	16d0  BCM57402 NetXtreme-E 10Gb Ethernet Controller
 	16d1  BCM57404 NetXtreme-E 10Gb/25Gb Ethernet Controller
 	16d2  BCM57406 NetXtreme-E 10GBASE-T Ethernet Controller
-	16d3  BCM57404 NetXtreme-E Ethernet Virtual Function
+	16d3  NetXtreme-E Ethernet Virtual Function
 	16d4  BCM57402 NetXtreme-E Ethernet Partition
 	16d5  BCM57407 NetXtreme-E 10GBase-T Ethernet Controller
 	16d6  BCM57412 NetXtreme-E 10Gb RDMA Ethernet Controller
@@ -17115,14 +17127,15 @@
 		1590 0212  Ethernet 10Gb 2-port 535FLR-T Adapter
 	16d9  BCM57417 NetXtreme-E 10GBASE-T RDMA Ethernet Controller
 		108e 4866  Dual Port 10GBase-T Ethernet Controller
-	16dc  BCM57414 NetXtreme-E Ethernet Virtual Function
+	16dc  NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
 	16de  BCM57412 NetXtreme-E Ethernet Partition
 	16df  BCM57314 NetXtreme-C 10Gb/25Gb/40Gb/50Gb RDMA Ethernet Controller
-	16e1  BCM57314 NetXtreme-C Ethernet Virtual Function
+	16e1  NetXtreme-C Ethernet Virtual Function
 	16e2  BCM57417 NetXtreme-E 10Gb/25Gb RDMA Ethernet Controller
 		108e 4866  Dual Port 10Gb/25Gb SFP28 Ethernet Controller
 	16e3  BCM57416 NetXtreme-E 10Gb RDMA Ethernet Controller
+	16e5  NetXtreme-C RDMA Virtual Function
 	16e7  BCM57404 NetXtreme-E Ethernet Partition
 	16e8  BCM57406 NetXtreme-E Ethernet Partition
 	16e9  BCM57407 NetXtreme-E 25Gb Ethernet Controller
@@ -17407,6 +17420,10 @@
 	b334  BCM56334 StrataXGS 24x1GE 4x10GE Switch Controller
 	b800  BCM56800 StrataXGS 10GE Switch Controller
 	b842  BCM56842 Trident 10GE Switch Controller
+# Trident2
+	b850  Broadcom BCM56850 Switch ASIC
+# Tomahawk
+	b960  Broadcom BCM56960 Switch ASIC
 14e5  Pixelfusion Ltd
 14e6  SHINING Technology Inc
 14e7  3CX
