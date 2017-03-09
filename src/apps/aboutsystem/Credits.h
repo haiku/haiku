@@ -325,6 +325,7 @@ static const Translation kTranslations[] = {
 	"Colin Günther\n" \
 	"Jessica Hamilton\n" \
 	"Julian Harnath\n" \
+	"Brian Hill\n" \
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
 	"Ryan Leavengood\n" \
@@ -455,6 +456,7 @@ static const Translation kTranslations[] = {
 	"Christopher ML Zumwalt May\n" \
 	"Andrew McCall\n" \
 	"Nathan Mentley\n" \
+	"Robert Mercer (Vidrep)\n" \
 	"Marius Middelthon\n" \
 	"Marco Minutoli\n" \
 	"Misza\n" \
