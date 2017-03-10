@@ -6,6 +6,7 @@
 
 
 #include <AdapterIO.h>
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <BufferIO.h>
 #include <DataIO.h>
@@ -190,13 +191,6 @@ public:
 		return fPosition->GetSize(size);
 	}
 
-	// Utility methods
-
-	status_t InitCheck() const
-	{
-		return fErr;
-	}
-
 protected:
 
 	bool IsMedia() const
@@ -235,15 +229,13 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 	// way, we create an instance which is buffering our reads and
 	// writes.
 	BMediaIOWrapper* buffered_source = new BMediaIOWrapper(source);
-	status_t ret = buffered_source->InitCheck();
-	if (ret != B_OK)
-		return ret;
+	ObjectDeleter<BMediaIOWrapper> ioDeleter(buffered_source);
 
 	// get list of available readers from the server
 	entry_ref refs[MAX_READERS];
 	int32 count;
 
-	ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
+	status_t ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
 		MAX_READERS);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateReader: can't get list of readers: %s\n",
@@ -282,6 +274,7 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 			TRACE("PluginManager::CreateReader: Sniff success "
 				"(%" B_PRId32 " stream(s))\n", *streamCount);
 			(*reader)->GetFileFormatInfo(mff);
+			ioDeleter.Detach();
 			return B_OK;
 		}
 
