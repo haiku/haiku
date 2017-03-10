@@ -150,8 +150,8 @@ RepositoriesView::RepositoriesView()
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.AddGroup(B_HORIZONTAL, 0, 0.0)
-			.Add(new BStringView("instruction", B_TRANSLATE_COMMENT("Select"
-				" repositories to use with Haiku package management:",
+			.Add(new BStringView("instruction", B_TRANSLATE_COMMENT("Enable"
+				" repositories to use with package management:",
 				"Label text")), 0.0)
 			.AddGlue()
 		.End()
