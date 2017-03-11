@@ -9,7 +9,7 @@ resource app_version {
 	variety = B_APPV_BETA,
 	internal = 0,
 	short_info = "SoftwareUpdater",
-	long_info  = "Software Updater ©2008-2016 Haiku"
+	long_info  = "Software Updater ©2008-2017 Haiku"
 };
 
 resource vector_icon {
