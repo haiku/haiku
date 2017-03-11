@@ -78,7 +78,7 @@ RemotePackageRepository HaikuPorts
 	nafees_nastaleeq-1.02-3
 	nafees_riqa-1.00-3
 	netsurf_buildsystem-1.5-2
-	noto-20170202-4
+	noto-20170202-6
 	noto_chroscore-20170202-4
 	noto_regional-20170202-4
 	noto_sans_cjk_jp-1.004-2
@@ -1039,7 +1039,7 @@ RemotePackageRepository HaikuPorts
 	vision-0.9.8-2
 	vlc-2.2.1-4
 	vorbis_tools-1.4.0-3
-	weather-0.1.1_git-4
+	weather-0.1.1_git-5
 	weechat-1.5-2
 	weechat_devel-1.5-2
 	wget-1.18-2

@@ -11,7 +11,7 @@ RemotePackageRepository HaikuPorts
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
 	fontawesome-4.6.3-1
-	noto-20170202-4
+	noto-20170202-6
 	noto_chroscore-20170202-4
 	noto_regional-20170202-4
 	noto_sans_cjk_kr-1.004-2
@@ -377,7 +377,7 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-3
 	vision-0.9.8-3
 	vim-7.4-5
-	weather-0.1.1_git-4
+	weather-0.1.1_git-5
 	wget-1.18-1
 	whereismymouse-1.0-1
 	which-2.21-1
