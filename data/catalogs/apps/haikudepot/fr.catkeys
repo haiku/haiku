@@ -1,10 +1,12 @@
-1	french	x-vnd.Haiku-HaikuDepot	1090759318
+1	french	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
+Repository	FilterView		Dépôt
 Close	RatePackageWindow		Fermer
 The captcha puzzle needs to be solved.	UserLoginWindow		Vous devez résoudre l’énigme Captcha.
 Changelog	PackageInfoView		Journal des modifications
+Repository:	FilterView		Dépôt :
 Your rating:	RatePackageWindow		Votre évaluation :
 The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas.
 Log in…	MainWindow		Connexion…
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Votre évaluation a ét
 <no info>	PackageInfoView		<pas d’info>
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l’initialisation du gestionnaire de paquet : %message%
+All repositories	FilterView		Tous les dépôts
 Email address:	UserLoginWindow		Adresse e-mail :
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Votre évaluation a été prise en compte. Vous pouvez la mettre à jour ou l’effacer en évaluant de nouveau le paquet.
 Very unstable	RatePackageWindow		Très instable
@@ -102,6 +105,7 @@ Close	MainWindow		Fermer
 Preferred language:	UserLoginWindow		Langue préférée :
 Failed to rate package	RatePackageWindow		Impossible d’évaluer le paquet
 Internet & Network	Model		Internet & Réseau
+Refresh repositories	MainWindow		Rafraîchir les dépôts
 Cancel	MainWindow		Annuler
 Quit HaikuDepot	App		Quitter le Dépôt Haiku
 Input validation	UserLoginWindow		Validation des entrées
@@ -139,6 +143,7 @@ Failed to create account	UserLoginWindow		La création du compte a échoué
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n
 Featured packages	MainWindow		Paquets sélectionnés
 Start package daemon	App		Démarrer le gestionnaire de paquets
+Manage repositories…	MainWindow		Gérer les dépôts…
 Success	RatePackageWindow		Opération réussie
 Business	Model		Professionnel
 Audio	Model		Son

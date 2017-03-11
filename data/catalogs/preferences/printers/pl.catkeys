@@ -1,13 +1,16 @@
-1	polish	x-vnd.Be-PRNT	4242582634
+1	polish	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drukarka: %printer_name%\nSterownik:  %driver%\n
 Waiting	JobListView		Oczekuję
 Print test page	PrintersWindow		Wydrukuj stronę testową
+ pending jobs	PrinterListView		 oczekujących zadań
 page	JobListView		strona
 Cancel	AddPrinterDialog		Anuluj
+Test page	PrintersWindow		Strona testowa
 Add printer	AddPrinterDialog		Dodaj drukarkę
 Green	TestPageView		Zielony
 Printers	PrintersWindow		Drukarki
 Add…	PrintersWindow		Dodaj…
+No pending jobs	PrinterListView		Brak oczekujących zadań
 Default Printer	PrinterListView		Domyślna drukarka
 Transport: %transport% %transport_address%	PrinterListView		Podsystem transportu: %transport%, adres: %transport_address%
 pages	JobListView		strony
@@ -35,5 +38,7 @@ No printer found!	TransportMenu		Nie znaleziono drukarek!
 Print jobs: No printer selected	PrintersWindow		Drukowanie: Nie wybrano drukarki
 Cyan	TestPageView		Niebieskozielony
 Unknown status	JobListView		Nieznany status
+1 pending job	PrinterListView		1 oczekujące zadanie
 Connected to:	AddPrinterDialog		Podłączono do:
 Printer type:	AddPrinterDialog		Typ drukarki:
+Test page	TestPageView		Strona testowa

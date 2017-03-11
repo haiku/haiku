@@ -1,0 +1,41 @@
+1	ukrainian	x-vnd.Haiku-Repositories	1893477165
+Completed	TaskLooper	Completed task status message	Завершено
+Enabled	RepositoriesView	Column title	Увімкнено
+Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Може бути підключена тільки одна URL адреса для кожного схоасвища. Будь-ласка змініть вибір.
+Repositories	System name		Сховища
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Сталася помилка при підключенні сховища %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Видалити це сховище?
+Description	TaskLooper	Failed task error description	Опис
+Add	AddRepoWindow	Button label	Додати
+URL	RepositoriesView	Column title	URL адреса
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Сховищам не вдалося отримати імена під'єднаних в даний час сховищ.
+Keep trying	TaskTimer	Button label	триває збереження
+This is not a valid URL.	AddRepoWindow	Add URL error message	Це невірна адреса URL. 
+Repository URL:	AddRepoWindow	Text box label	URL сховища:
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Помилка при налаштуванні сховища для %name%.
+Details	TaskLooper	Job log details header	Деталі
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Добра новина! Завдання для сховища %name% завершене.
+Aborted	TaskLooper	Aborted task status message	Скасувати
+Remove	RepositoriesView	Button label	Видалити
+Changes completed	RepositoriesView	Status view text	Зміни проведені
+Name	RepositoriesView	Column title	Ім'я
+Enable	RepositoriesView	Button label	Під'єднати
+Remove All	RepositoriesView	Button label	Видалити усі
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при відновленні кеша сховища для %name%
+Select repositories to use with Haiku package management:	RepositoriesView	Label text	Вибір сховищ для роботи з обслуговувачем пакетів Haiku:
+Failed	TaskLooper	Failed task status message	Призупинено
+OK	Constants	Button label	Гаразд
+Cancel task	TaskTimer	Button label	Скасувати завдання
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Видалити ці сховища?
+Cancel	Constants	Button label	Відмінити
+Changes pending:	RepositoriesView	Status view text	Очікування змін:
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при відімкненні сховища %name%
+Remove	Constants	Button label	Видалити
+Stop and quit	RepositoriesWindow	Button label	Зупинити та вийти
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Завдання сховища %name% потребує багато часу для завершення.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Деякі завдання надалі виконуються. Зупинити їх та вийти?
+This repository URL already exists.	RepositoriesView	Error message	URL адреса цього сховища повністю присутня.
+Disable	RepositoriesView	Button label	Відімкнути
+Enable All	RepositoriesView	Button label	Під'єднати всі
+Unknown	Constants	Unknown repository name	Невідомо
+Disable All	RepositoriesView	Button label	Від'єднати усі

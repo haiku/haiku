@@ -1,0 +1,24 @@
+1	french	x-vnd.Haiku-Repositories	350133022
+Enabled	RepositoriesView	Column title	Actif
+Repositories	System name		Dépôts
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Une erreur s'est produite à l'activation du dépôt %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Souhaitez-vous retirer ce dépôt ?
+Description	TaskLooper	Failed task error description	Description
+Add	AddRepoWindow	Button label	Ajouter
+URL	RepositoriesView	Column title	URL
+Keep trying	TaskTimer	Button label	Réessayer
+This is not a valid URL.	AddRepoWindow	Add URL error message	Cette URL n'est pas valide.
+Repository URL:	AddRepoWindow	Text box label	URL du dépôt :
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erreur à l'obtention de la configuration du dépôt %name%.
+Details	TaskLooper	Job log details header	Détails
+Remove	RepositoriesView	Button label	Retirer
+Name	RepositoriesView	Column title	Nom
+OK	Constants	Button label	OK
+Cancel task	TaskTimer	Button label	Annuler la tâche
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Souhaitez-vous retirer ces dépôts ?
+Cancel	Constants	Button label	Annuler
+Changes pending:	RepositoriesView	Status view text	Modifications en attente :
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Une erreur s'est produite lors de la désactivation du dépôt %name%
+Remove	Constants	Button label	Retirer
+Stop and quit	RepositoriesWindow	Button label	Arrêter et sortir
+Disable	RepositoriesView	Button label	Désactiver

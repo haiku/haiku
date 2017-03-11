@@ -1,9 +1,10 @@
-1	polish	x-vnd.Haiku-PackageInstaller	1477424735
+1	polish	x-vnd.Haiku-PackageInstaller	252728737
 Install to:	PackageView		Zainstaluj w:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akceptuj
 No package selected.	UninstallView		Żaden pakiet nie został wybrany.
 Continue	PackageInstall		Kontynuuj
+Remove	UninstallView		Usuń
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Żądany pakiet nie zainstalował się poprawnie w Twoim systemie. To może być problem ze ścieżkami docelowymi plików z pakietu. Proszę skontaktuj się z dystrybutorem paczki.
 Image not loaded correctly	PackageImageViewer		Obraz nie załadował się poprawnie
 No package selected.	PackageInfo		Żaden pakiet nie został wybrany.
@@ -26,6 +27,7 @@ Other…	PackageView		Inne…
 No installation type selected	PackageView		Sposób instalacji nie został wybrany
 Installing files and folders	PackageInstall		Instalowanie plików i katalogów
 Package installer	PackageView		Instalator pakietów
+Install…	UninstallView		Zainstaluj…
 Skip all	PackageView		Pomiń wszystkie
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Element o nazwie „%s” już istnieje w podanej ścieżce.\nZastąpić element tym z pakietu czy pominąć?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skrypt o nazwie „%s” już istnieje w podanej ścieżce.\nZastąpić skrypt tym z pakietu czy pominąć?
@@ -41,11 +43,13 @@ Installing package	PackageStatus		Instalacja pakietu
 Ask again	PackageView		Zapytaj ponownie
 Abort	PackageView		Przerwij
 Replace all	PackageView		Zastąp wszystkie
+Package description	UninstallView		Opis pakietu
 Decline	PackageTextViewer		Odrzuć
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Plik o nazwie „%s” istnieje już w podanej ścieżce.\nZastąpić ten plik plikiem z paczki, czy pominąć go?
 All existing files will be skipped?	PackageView		Czy pominąć wszystkie pliki?
 Continue	PackageInfo		Kontynuuj
 %index% of %total%	PackageInstall		%index z %total
+The package you selected has been successfully removed from your system.	UninstallView		Wybrany pakiet został pomyślnie usunięty.
 Abort	PackageInfo		Przerwij
 PackageInstaller	System name		InstalatorPakietów
 Abort	PackageInstall		Przerwij
@@ -54,6 +58,7 @@ Continue	PackageTextViewer		Kontynuuj
 Begin	PackageView		Instaluj
 OK	UninstallView		OK
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Dowiązanie symboliczne o nazwie „%s” istnieje już w podanym miejscu.\nZastąpić istniejące dowiązanie tym z pakietu czy pominąć?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Wybrany pakiet nie został usunięty. Plik informacyjny pakietu mógł zostać uszkodzony.
 Replace	PackageView		Zastąp
 Installation progress	PackageView		Postęp instalacji
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Plik pakietu jest nie do odczytania.\nJedną z możliwości jest to, że żądany plik nie jest poprawnym pakietem .pkg systemu BeOS.

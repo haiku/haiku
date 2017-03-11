@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-BluetoothPrefs	4254479778
+1	polish	x-vnd.Haiku-BluetoothPrefs	145165464
 About Bluetooth…	Window		O aplikacji Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Domyślny czas zapytania:
@@ -6,8 +6,10 @@ Manufacturer: 	Device View		Producent:
 Add device to list	Inquiry panel		Dodaj urządzenie do listy
 Starting scan...	Inquiry panel		Rozpoczynanie skanowania...
 Smart phone	Settings view		Telefon typu smartphone
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Z pomocą:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDziękuję osobom, które wspomogły...\n\nSprzętem:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEkonomicznie:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nŁatkami:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestowaniem:\n - Petter H. Juliussen\nWiedzą:\n - zespół yellowTAB
 Server	Settings view		Serwer
 Stop bluetooth services…	Window		Zatrzymaj usługi bluetooth…
+The Bluetooth services are not currently running on this system.	main		Usługi Bluetooth nie są obecnie uruchomione.
 Identify host as:	Settings view		Identyfikuj host jako:
 Refresh…	Remote devices		Odśwież…
 Pair…	Remote devices		Paruj…
@@ -18,6 +20,7 @@ Local devices found on system:	Settings view		Urządzenia lokalne znalezione w s
 Remaining %1 seconds	Inquiry panel		Pozostało %1 sekund
 Server	Window		Serwer
 Scanning completed.	Inquiry panel		Skanowanie zakończone.
+Launch now	main		Uruchom teraz
 Remove	Remote devices		Usuń
 Quit	main		Wyjdź
 15 secs	Settings view		15 sekund

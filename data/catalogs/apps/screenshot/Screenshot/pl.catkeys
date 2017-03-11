@@ -1,9 +1,10 @@
-1	polish	x-vnd.haiku-screenshot	3896204963
+1	polish	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		sekund
 Desktop	ScreenshotWindow		Pulpit
 Include window border	ScreenshotWindow		Dołącz obramowanie okna
 Screenshot	System name		Zrzut ekranu
 Select	ScreenshotWindow		Wybierz
+The destination path exists but is not a folder.	ScreenshotWindow		Ścieżka docelowa istnieje, ale nie jest katalogiem.
 Capture active window	ScreenshotWindow		Przechwyć aktywne okno
 Cancel	ScreenshotWindow		Anuluj
 Name:	ScreenshotWindow		Nazwa:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	zrzut_ekranu
 New screenshot	ScreenshotWindow		Nowy zrzut ekranu
 Artwork folder	ScreenshotWindow		Katalog na obrazki
 Home folder	ScreenshotWindow		Katalog domowy
+Failed to save screenshot	ScreenshotWindow		Nie można zapisać zrzutu ekranu
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		Ustawienia…
 overwrite	ScreenshotWindow		nadpisz
 Delay:	ScreenshotWindow		Opóźnienie:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Błąd zapisu „%s”:\n\t%s
 Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
 Translator Settings	ScreenshotWindow		Ustawienia translatora

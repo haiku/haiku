@@ -1,4 +1,4 @@
-1	polish	x.vnd.OBOS-Inspector	1686702095
+1	polish	x.vnd.OBOS-Inspector	577867100
 User Translators	ActiveTranslatorsWindow		Translatory użytkownika
 No image available to save.	ImageWindow		Brak obrazu do zapisania.
 Sorry, unable to write the image file.	ImageView		Niestety, nie udało się zapisać obrazu.
@@ -23,8 +23,10 @@ Quit	ImageWindow		Zakończ
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Wybrany dokument: %1\n\nUżyty translator:\nNazwa: %2\nInformacje: %3\nWersja: %4\n
 Active Translators	ImageWindow		Translatory aktywne
 View	ImageWindow		Widok
+Open…	ImageWindow		Otwórz…
 Previous Page	ImageWindow		Poprzednia strona
 OK	ImageView		OK
 System Translators	ActiveTranslatorsWindow		Translatory systemowe
+Save…	ImageWindow		Zapisz…
 Unknown	ImageView		Nieznany
 File	ImageWindow		Plik

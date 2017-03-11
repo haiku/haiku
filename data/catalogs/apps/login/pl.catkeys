@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Login	2683778354
+1	polish	x-vnd.Haiku-Login	336867745
 Error: %1	Login App		Błąd: %1
 Hide password	Login View		Ukryj hasło
 Desktop	Desktop Window		Pulpit
@@ -17,3 +17,4 @@ Halt	Login View		Zatrzymaj
 Password:	Login View		Hasło:
 OK	Login App		OK
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNie twórz okna modalnego\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Możesz dostosować pulpit pokazany za aplikacją logowania poprzez upuszczanie replikantów.\n\nKiedy skończysz, zakończ aplikację (Cmd-Q).

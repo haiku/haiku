@@ -1,14 +1,14 @@
-1	japanese	x-vnd.Haiku-SpiderScreensaver	1499771850
-Max. polygon count	Screensaver Spider		最大ポリゴン数
-Gray	Screensaver Spider		灰色
-Purple	Screensaver Spider		紫
-Red	Screensaver Spider		赤
-Trail depth	Screensaver Spider		探索深さ
-Color	Screensaver Spider		色
-Blue	Screensaver Spider		青
-for  bonefish	Screensaver Spider		bonefish のために
-Spider by stippi	Screensaver Spider		stippi 作の Spider
-Green	Screensaver Spider		緑
-Cyan	Screensaver Spider		シアン
-Max. points per polygon	Screensaver Spider		ポリゴンごとの最大ポイント数
-Yellow	Screensaver Spider		黄
+1	japanese	x-vnd.Haiku-SpiderScreensaver	2004357156
+Blue	SpiderView		青
+Gray	SpiderView		灰
+Max. points per polygon	SpiderView		ポリゴンあたりの最大頂点数
+Max. polygon count	SpiderView		最大ポリゴン数
+for  bonefish	SpiderView		for  bonefish
+Purple	SpiderView		紫
+Red	SpiderView		赤
+Color	SpiderView		色
+Spider by stippi	SpiderView		Spider stippi 作
+Green	SpiderView		緑
+Cyan	SpiderView		シアン
+Yellow	SpiderView		黄
+Trail depth	SpiderView		Trail depth

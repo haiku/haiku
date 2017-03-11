@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PSRV	2930356711
+1	polish	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Nieokreślone
 Return the number of available transports	PrintServerApp Scripting		Zwróć liczbę dostępnych transportów
 Return the number of available printers	PrintServerApp Scripting		Zwróć liczbę dostępnych drukarek
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Tak
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Rejestr
 Would you like to set one up now?	PrintServerApp		Czy chcesz ustawić jeden teraz?
+Print job setup:	ConfigWindow		Ustawienia zadania drukowania:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Pionowa
 All pages	ConfigWindow		Wszystkie strony

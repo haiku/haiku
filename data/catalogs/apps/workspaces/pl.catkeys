@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-WORK	3614422175
+1	polish	x-vnd.Be-WORK	3927737357
 Invalid argument: %s\n	Workspaces		Nieprawidłowy argument: %s\n
 Quit	Workspaces		Zakończ
 Workspaces	System name		Workspaces
@@ -7,6 +7,7 @@ Remove replicant	Workspaces		Usuń replikant
 Show window border	Workspaces		Pokaż ramkę okna
 Auto-raise	Workspaces		Autoaktywacja
 Always on top	Workspaces		Zawsze na wierzchu
+Switch on mouse wheel	Workspaces		Przełącz kółkiem myszy
 Live in the Deskbar	Workspaces		Rezyduje w Deskbarze
 Show window tab	Workspaces		Pokaż kartę okna
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Użycie: %s [opcje] [obszar roboczy]\ngdzie „opcje” to:\n  --notitle\t\tbez belki tytułowej, obramowanie i zmiana rozmiaru pozostaje\n  --noborder\t\ttytuł, obramowanie i zmiana rozmiaru usunięta\n  --avoidfocus\t\tzapobiega oknu bycie odbiorcą zdarzeń klawiatury\n  --alwaysontop\t\tutrzymuje okno na wierzchu\n  --notmovable\t\tokno nie może być przemieszczane\n  --autoraise\t\tautomatyczna aktywacja obszaru roboczego okna, kiedy jest na krawędzi ekranu\n  --help\t\twyświetlenie tego opisu i zakończenie\noraz „obszar roboczy” jest numerem obszaru roboczego na który się przełączyć (0-31)\n

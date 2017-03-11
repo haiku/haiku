@@ -1,0 +1,41 @@
+1	polish	x-vnd.Haiku-Repositories	1893477165
+Completed	TaskLooper	Completed task status message	Zakończono
+Enabled	RepositoriesView	Column title	Włączone
+Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Tylko jeden URL dla każdego repozytorium może być włączony.  Zmień swój wybór.
+Repositories	System name		Repozytoria
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Wystąpił błąd podczas włączania repozytorium %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Usunąć to repozytorium?
+Description	TaskLooper	Failed task error description	Opis
+Add	AddRepoWindow	Button label	Dodaj
+URL	RepositoriesView	Column title	URL
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Panel Repozytoria nie mógł uzyskać nazw obecnie włączonych repozytoriów.
+Keep trying	TaskTimer	Button label	Próbuj dalej
+This is not a valid URL.	AddRepoWindow	Add URL error message	To nie jest poprawny URL.
+Repository URL:	AddRepoWindow	Text box label	URL repozytorium:
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Wystąpił błąd podczas pobierania konfiguracji repozytorium %name%.
+Details	TaskLooper	Job log details header	Szczegóły
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Dobre wieści! Zadanie dla repozytorium %name% zakończone.
+Aborted	TaskLooper	Aborted task status message	Przerwano
+Remove	RepositoriesView	Button label	Usuń
+Changes completed	RepositoriesView	Status view text	Zmiany zakończone
+Name	RepositoriesView	Column title	Nazwa
+Enable	RepositoriesView	Button label	Włącz
+Remove All	RepositoriesView	Button label	Usuń wszystkie
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Wystąpił błąd podczas odświeżania pamięci podręcznej repozytorium %name%
+Select repositories to use with Haiku package management:	RepositoriesView	Label text	Wybierz repozytoria do użycia:
+Failed	TaskLooper	Failed task status message	Wystąpił błąd
+OK	Constants	Button label	OK
+Cancel task	TaskTimer	Button label	Anuluj zadanie
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Usunąć te repozytoria?
+Cancel	Constants	Button label	Anuluj
+Changes pending:	RepositoriesView	Status view text	Oczekujące zmiany:
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Wystąpił błąd podczas wyłączania repozytorium %name%
+Remove	Constants	Button label	Usuń
+Stop and quit	RepositoriesWindow	Button label	Zatrzymaj i zakończ
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Zadanie dla repozytorium %name% zajmuje zbyt wiele czasu.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Niektóre zadania nie są skończone. Zatrzymać je i zakończyć aplikację?
+This repository URL already exists.	RepositoriesView	Error message	Ten URL repozytorium już istnieje.
+Disable	RepositoriesView	Button label	Wyłącz
+Enable All	RepositoriesView	Button label	Włącz wszystkie
+Unknown	Constants	Unknown repository name	Nieznana
+Disable All	RepositoriesView	Button label	Wyłącz wszystkie

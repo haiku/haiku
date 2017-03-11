@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	1140137500
+1	polish	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Font zwykły:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -21,6 +21,7 @@ Failure	Colors tab		Niepowodzenie
 Hinting menu	AntialiasingSettingsView		Menu hintingu
 Scroll bar:	DecorSettingsView		Pasek przewijania:
 Document background	Colors tab		Tło dokumentu
+Status bar	Colors tab		Pasek stanu
 Revert	APRWindow		Cofnij
 Window tab	Colors tab		Zakładka okna
 Tooltip background	Colors tab		Tło podpowiedzi

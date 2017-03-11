@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	3805057997
+1	polish	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Pobier
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Tryb wyświetlania
 Medium	MediaPlayer-SettingsWindow		Średnie
+Open network stream	MediaPlayer-NetworkStream		Otwórz strumień sieciowy
 Close	MediaPlayer-PlaylistWindow		Zamknij
 Open…	MediaPlayer-PlaylistWindow		Otwórz…
 Toggle mute.	MediaPlayer-Main		Przełącz wyciszenie.
 Undo	MediaPlayer-PlaylistWindow		Cofnij
+Stream URL:	MediaPlayer-NetworkStream		URL strumienia:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Użyj sprzętowych nakładek wideo jeśli możliwe
 File info…	MediaPlayer-Main		Informacje o pliku…
 Pause playback.	MediaPlayer-Main		Wstrzymaj odtwarzanie.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Przeskocz do poprzedniego utworu.
 Close window after playing video	MediaPlayer-SettingsWindow		Zamknij okno po odtwarzaniu wideo
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Płynnie skaluj filmy (tryb bez nakładki)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		Otwórz strumień sieciowy
 50% scale	MediaPlayer-Main		50%
 Subtitles	MediaPlayer-Main		Napisy
 Prev	MediaPlayer-Main		Poprzedni
@@ -126,6 +129,8 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiowanie wpisu
 none	Subtitles menu		brak
 Move file to Trash	MediaPlayer-PlaylistWindow		Przenieś plik do Kosza
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		Błędny URL!
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Wycisz
 Toggle pause/play.	MediaPlayer-Main		Przełącz wstrzymanie/odtwarzanie.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -140,12 +145,14 @@ Start media server	MediaPlayer-Main		Uruchom serwer mediów
 Toggle fullscreen.	MediaPlayer-Main		Przełącz tryb pełnoekranowy.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Pobiera czas trwania aktualnie odtwarzanego elementu w mikrosekundach.
 ToggleFullscreen	MediaPlayer-Main		PrzałączeniePełnegoEkranu
+Bad URL	MediaPlayer-NetworkStream		Błędny URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} few{# kanały} many{# kanałów} other{# kanału}}
 <unnamed>	PlaylistItem-name		<bez nazwy>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		brak
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Pobiera/ustawia głośność (0.0-2.0).
 Duration	MediaPlayer-Main		Czas trwania
+Cancel	MediaPlayer-NetworkStream		Anuluj
 Playlist…	MediaPlayer-Main		Lista odtwarzania…
 <unknown>	PlaylistItem-author		<nieznany>
 Save as…	MediaPlayer-PlaylistWindow		Zapisz jako…

@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-debug_server	1440673937
+1	polish	x-vnd.Haiku-debug_server	2134779566
+Write core file	DebugServer		Zapisz zrzut pamięci
 Terminate	DebugServer		Przerwij
 Debug	DebugServer		Debug
 Save report	DebugServer		Zapisz raport

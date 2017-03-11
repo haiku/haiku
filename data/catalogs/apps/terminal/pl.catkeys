@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	1384628839
+1	polish	x-vnd.Haiku-Terminal	1269023683
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień katalog
@@ -82,6 +82,7 @@ Close	Terminal TermWindow		Zamknij
 Text	Terminal AppearancePrefView		Tekst
 Clear all	Terminal TermWindow		Wyczyść wszystko
 Text encoding	Terminal TermWindow		Kodowanie tekstu
+Allow bold text	Terminal AppearancePrefView		Zezwól na pogrubiony tekst
 Close window	Terminal TermWindow		Zamknij okno
 Copy absolute path	Terminal TermView		Kopiuj ścieżkę absolutną
 Save as default	Terminal TermWindow		Zapisz jako domyślny

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CodyCam	1888169680
+1	polish	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Wyślij…
 Capturing Image…	VideoConsumer.cpp		Przechwytywanie obrazu…
 Every 30 seconds	CodyCam		co 30 sekund
@@ -76,6 +76,7 @@ cmd: '%s'\n	FtpClient		polecenie: „%s”\n
 Never	CodyCam		nigdy
 Cannot create a video window	CodyCam		Nie udało się utworzyć okna wideo
 Every 10 minutes	CodyCam		co 10 minut
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nie znaleziono źródła wideo.\nPotrzebujesz kamerki internetowej, aby używać CodyCam.
 Cannot start the video source	CodyCam		Nie udało się rozpocząć przechwytywania ze źródła
 Cannot start the video window	CodyCam		Nie udało się uruchomić okna wideo
 password expected	CodyCam		oczekiwano hasła
