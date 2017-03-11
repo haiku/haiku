@@ -53,7 +53,7 @@ RepoRow::RefreshEnabledField()
 {
 	BStringField* field = (BStringField*)GetField(kEnabledColumn);
 	if (fTaskState == STATE_NOT_IN_QUEUE)
-		field->SetString(fEnabled ? "\xE2\x9C\x94" : "");
+		field->SetString(fEnabled ? B_TRANSLATE("Enabled") : "");
 	else
 		field->SetString(B_UTF8_ELLIPSIS);
 	Invalidate();

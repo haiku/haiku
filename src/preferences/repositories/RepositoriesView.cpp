@@ -29,7 +29,7 @@
 
 
 static const BString kTitleEnabled =
-	B_TRANSLATE_COMMENT("Enabled", "Column title");
+	B_TRANSLATE_COMMENT("Status", "Column title");
 static const BString kTitleName = B_TRANSLATE_COMMENT("Name", "Column title");
 static const BString kTitleUrl = B_TRANSLATE_COMMENT("URL", "Column title");
 static const BString kLabelRemove =
@@ -86,7 +86,7 @@ RepositoriesView::RepositoriesView()
 	float col1width = be_plain_font->StringWidth(kTitleName) + 15;
 	float col2width = be_plain_font->StringWidth(kTitleUrl) + 15;
 	fListView->AddColumn(new BStringColumn(kTitleEnabled, col0width, col0width,
-		col0width, B_TRUNCATE_END, B_ALIGN_CENTER), kEnabledColumn);
+		2 * col0width, B_TRUNCATE_END), kEnabledColumn);
 	fListView->AddColumn(new BStringColumn(kTitleName, 90, col1width, 300,
 		B_TRUNCATE_END), kNameColumn);
 	fListView->AddColumn(new BStringColumn(kTitleUrl, 500, col2width, 5000,
