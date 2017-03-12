@@ -255,6 +255,15 @@ get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
 	if (platform != B_CPU_x86 && platform != B_CPU_x86_64)
 		return NULL;
 
+	// XXX: This *really* isn't accurate. There is differing math
+	// based on the CPU vendor.. Don't use these numbers anywhere
+	// except "fast and dumb" identification of processor names.
+	//
+	// see cpuidtool.c to decode cpuid signatures (sysinfo) into a
+	// value for this function.
+	//
+	// sysinfo has code in it which obtains the proper fam/mod/step ids
+
 	uint16 family = ((cpuModel >> 8) & 0xf) | ((cpuModel >> 16) & 0xff0);
 	uint16 model = ((cpuModel >> 4) & 0xf) | ((cpuModel >> 12) & 0xf0);
 	uint8 stepping = cpuModel & 0xf;
@@ -315,7 +324,8 @@ get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
 				return "FX-Series";
 			if (model == 0x10 || model == 0x13)
 				return "A-Series";
-		}
+		} else if (family == 0x8f)
+			return "Ryzen 7"
 
 		// Fallback to manual parsing of the model string
 		get_cpuid_model_string(cpuidName);

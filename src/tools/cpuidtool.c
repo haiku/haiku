@@ -7,7 +7,7 @@
  */
 
 /*
- * Pass a standard CPUID in hex, and get out a CPUID for OS.h
+ * Pass a standard CPUID in hex, and get out a CPUID for cpu_type.h
  */
 
 
@@ -71,41 +71,23 @@ xtoi(const char* xs, unsigned int* result)
 int
 main(int argc, char *argv[])
 {
-	if (argc != 3) {
+	if (argc != 2) {
 		printf("Provide the cpuid in hex, and you will get how we id it\n");
-		printf("usage: cpuidhaiku <AMD|INTEL> <cpuid_hex>\n");
+		printf("usage: cpuidhaiku <cpuid_hex>\n");
 		return 1;
 	}
 
 	unsigned int cpuid = 0;
-	xtoi(argv[2], &cpuid);
+	xtoi(argv[1], &cpuid);
 
 	printf("cpuid: 0x%X\n", cpuid);
 
-	unsigned int extFam = (cpuid & EXT_FAMILY_MASK) >> 20;
-	unsigned int extMod = (cpuid & EXT_MODEL_MASK) >> 16;
-	unsigned int family = (cpuid & FAMILY_MASK) >> 8;
-	unsigned int model = (cpuid & MODEL_MASK) >> 4;
-	unsigned int stepping = (cpuid & STEPPING_MASK);
+    int family = ((cpuid >> 8) & 0xf) | ((cpuid >> 16) & 0xff0);
+    int model = ((cpuid >> 4) & 0xf) | ((cpuid >> 12) & 0xf0);
+    int stepping = cpuid & 0xf;
 
-	unsigned int cpuidHaiku;
-	if (strncmp(argv[1], "AMD", 3) == 0) {
-		if (family == 0xF) {
-			cpuidHaiku = (extFam << 20) + (extMod << 16)
-				+ (family << 4) + model;
-		} else
-			cpuidHaiku = (family << 4) + model;
-		cpuidHaiku += 0x1100; // AMD vendor id
-	} else if (strncmp(argv[1], "INTEL", 5) == 0) {
-		cpuidHaiku = (extFam << 20) + (extMod << 16)
-			+ (family << 4) + model;
-		cpuidHaiku += 0x1000; // Intel vendor id
-	} else {
-		printf("Vendor should be AMD or INTEL\n");
-		return 1;
-	}
-
-	printf("Haiku CPUID: 0x%lx\n", cpuidHaiku);
+	printf("Haiku CPUID: Family: 0x%x, Model: 0x%x, Stepping: 0x%x\n", family,
+		model, stepping);
 
 	return 0;
 }
