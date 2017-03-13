@@ -1,20 +1,22 @@
 <html>
 <head>
-	<title>How To Create a Project Using Makefile Engine</title>
+	<title>How To Create a Project Using the Makefile Engine</title>
 </head>
 <body>
-<h1>How To Create a Project Using Makefile Engine</h1>
+<h1>How To Create a Project Using the Makefile Engine</h1>
 
-<p>Haiku helps developers in build process of their projects by providing so
-called Makefile engine. It's made of two files, that reside in 
-/boot/develop/etc directory and are named 'makefile' and 'makefile-engine'.
-Together, these two files provide you with simple ready-to-be used build
-engine for your projects. This How To describes makefile-engine v2.5.1 and
-makefile template v2.5. Regardless of mentioning the 'makefiles' in this
-How To, the same technique can be used for creating Jamfile-driven
+<p>Haiku helps developers with the build process of their projects by providing the so
+called makefile-engine. It's made of two files, that reside in 
+<tt>/boot/system/develop/etc</tt> directory and are named 'Makefile' and 'makefile-engine'.<br />
+Together, these two files provide you with a simple ready-to-be used build
+engine for your projects.</p>
+
+<p>This How-To describes the makefile-engine v2.6 and the
+Makefile template v2.6. Regardless of mentioning the 'makefiles' in this
+How-To, the same technique can be used for creating Jamfile-driven
 projects. Corresponding Jamfile and Jamfile-engine template files are provided
-with Haiku. We made both, the makefile and Jamfile engines completely 
-target-compatible for user's convenience.</p>
+with Haiku. We made both, the Makefile and Jamfile engines completely 
+target-compatible for the user's convenience.</p>
 
 <h2>Contents</h2>
 <p>
@@ -28,10 +30,10 @@ target-compatible for user's convenience.</p>
 
 <div id="getting_started"><h2>Getting Started</h2></div>
 
-<p>To start a project, just copy makefile from /boot/develop/etc directory, into
-your project directory. Write few files, you want to add into project. Add
-either relative or full paths to them, into SRCS variable definition in 
-makefile and run make. Example files for Hello World project:</p>
+<p>To start a project, just copy Makefile from <tt>/boot/system/develop/etc</tt> directory, into
+your project directory. Write a few files that you want to add to your project. Add
+either relative or full paths to them into the SRCS variable definition in the 
+Makefile and run <tt>make</tt>. Example files for a "Hello World" project:</p>
 
 <p><em>hello.cpp</em>:</p>
 
@@ -44,25 +46,29 @@ int main(void)
 }
 </code></pre>
 
-<p><em>makefile</em>:</p>
+<p><em>Makefile</em>:</p>
 
 <pre><code>NAME = hello
 TYPE = APP
 SRCS = hello.cpp
-include $(BUILDHOME)/etc/makefile-engine
+
+## Include the Makefile-Engine
+DEVEL_DIRECTORY := \
+	$(shell findpaths -r "makefile_engine" B_FIND_PATH_DEVELOP_DIRECTORY)
+include $(DEVEL_DIRECTORY)/etc/makefile-engine
 </code></pre>
 
-<p>After adding both these files into same directory, just go there in Terminal,
-using 'cd' command and run 'make'. This will create a new directory, named in
-similar format: 'objects.x86-gcc2-release' (name depends on current compiler,
-that may be either "gcc2" or "gcc4", and defining DEBUG will force using
+<p>After creating both these files in same directory, just go there in Terminal,
+using the '<tt>cd</tt>' command and run '<tt>make</tt>'. This will create a new directory,
+named in the format: 'objects.x86-cc2-release' (the name depends on current compiler,
+that may be either "cc2" or "cc4", and defining DEBUG will force using
 "debug" instead of "release"), which will contain .o files (one
 for each source file), .d files with dependencies, generated automatically by
 the engine and a binary file, named 'hello' for the example case above.</p>
 
 <div id="config"><h2>Configuring a Project</h2></div>
 
-<p>In makefile, there are many variables, to configure builder helpers for your
+<p>In Makefile, there are many variables to configure builder helpers for your
 needs. Let's take a look at them:</p>
 
 <ul>
@@ -72,51 +78,50 @@ needs. Let's take a look at them:</p>
 <li><strong>APP</strong> - Application</li>
 <li><strong>SHARED</strong> - Shared library or add-on</li>
 <li><strong>STATIC</strong> - Static library archive</li>
-<li><strong>DRIVER</strong> - Kernel Driver</li>
+<li><strong>DRIVER</strong> - Kernel driver</li>
 </ul></li>
-<li><strong>APP_MIME_SIG</strong> specifies application's mime signature for 
+<li><strong>APP_MIME_SIG</strong> specifies the application's mime signature for 
 localization features. Note that it should correspond to MIME type
-provided to BApplication's constructor and the application MIME type
+provided to the BApplication's constructor and the application MIME type
 defined in resource file. In case this parameter is not set, the
-default value x-vnd.Haiku-$(NAME) will be used.</li>
+default value '<tt>x-vnd.Haiku-$(NAME)</tt>' will be used.</li>
 <li><strong>SRCS</strong> specifies the source files to use. You may specify both, full 
-paths and paths relative to the position of makefile, all objects,
-regardless of the position of their sources will be created in the
-common object directory. Please note, that this means, that makefile
+paths and paths relative to the location of the Makefile. All objects,
+regardless of the location of their sources will be created in the
+common object directory. Please note, that this means, that the Makefile
 won't work correctly, if two source files with the same name
-(e.g. source.c and source.cpp) are included from different
+(e.g. <tt>source.c</tt> and <tt>source.cpp</tt>) are included from different
 directories. Also note, that spaces in folder names do not work well
 with the engine.</li>
 <li><strong>RDEFS</strong> specifies the resource definition files to be used. You may
 specify both, relative and full paths to the files.</li>
 <li><strong>RSRCS</strong> specifies the binary file compiled from <em>RDEF</em>, or created
-separately by Resource Editors, both <em>RDEFS</em> and <em>RSRCS</em> can be
-defined in the same makefile.</li>
-<li><strong>LIBS</strong> specifies additional libraries, that binary file should be
-linked against. There are two acceptable forms of library 
-specifications:
+separately by resource editors. Both <em>RDEFS</em> and <em>RSRCS</em> can be
+defined in the same Makefile.</li>
+<li><strong>LIBS</strong> specifies additional libraries, that the binary file should be
+linked against. There are two acceptable forms of library specifications:
 <ul>
-<li>if your library follows the naming pattern of libXXX.so or libXXX.a,
-you can simply specify XXX, e.g. for library libbe.so, that would be:
-be</li>
+<li>if your library follows the naming pattern of <tt>libXXX.so</tt> or <tt>libXXX.a</tt>,
+you can simply specify XXX, e.g. for the library <tt>libbe.so</tt>, that would be:
+<tt>be</tt></li>
 <li>for version-independent linking of standard C++ libraries, please
-add $(STDCPPLIBS instead of raw "stdc++[.r4] [supc++]" library names</li>
-<li>for localization support add following libraries: locale localestub</li>
+add <tt>$(STDCPPLIBS</tt> instead of raw "<tt>stdc++[.r4] [supc++]</tt>" library names</li>
+<li>for localization support add the following libraries: <tt>locale</tt> <tt>localestub</tt></li>
 <li>if your library doesn't follow the standard library naming
 scheme, you need to specify the path to the library and its name, e.g.
-for library: my_lib.a, the entry would be either: my_lib.a or 
-path/my_lib.a</li>
+for the library: <tt>my_lib.a</tt>, the entry would be either: <tt>my_lib.a</tt> or 
+<tt>path/my_lib.a</tt></li>
 </ul></li>
 <li><strong>LIBPATHS</strong> specifies additional paths to directories following the
-standard libXXX.so or libXXX.a naming scheme. You can specify both,
-full paths or paths relative to the makefile. The paths included may
-not be recursive, so include all paths, where libraries can be found.
+standard <tt>libXXX.so</tt> or <tt>libXXX.a</tt> naming scheme. You can specify both,
+full paths or paths relative to the Makefile. The paths included may
+not be recursive, so include all the paths where libraries can be found.
 Directories where source files are found are automatically included.</li>
 <li><strong>SYSTEM_INCLUDE_PATHS</strong> specifies additional paths to look for system
-headers. These use the form: #include &lt;header&gt;. Source file
+headers. These use the form: <tt>#include &lt;header&gt;</tt>. Source file
 directories are <em>NOT</em> automatically included here.</li>
 <li><strong>LOCAL_INCLUDE_PATHS</strong> specifies additional paths to look for local
-headers. There use the form: #include "header". Source file
+headers. There use the form: <tt>#include "header"</tt>. Source file
 directories are automatically included.</li>
 <li><strong>OPTIMIZE</strong> specifies the level of optimization desired, can be one of
 following: <em>NONE</em>, <em>SOME</em>, <em>FULL</em>.</li>
@@ -126,9 +131,9 @@ information about localization, see the corresponding section of this
 how-to.</li>
 <li><strong>DEFINES</strong> specifies any preprocessor symbols to be defined. The symbols
 will not have their values set automatically, you have to provide
-these values (if any). For example, setting <em>DEFINES</em> to "DEBUG=1" will
-cause the compiler option "-DDEBUG=1" to be used. However, setting
-<em>DEFINES</em> to "DEBUG" would pass "-DDEBUG" option.</li>
+these values (if any). For example, setting <em>DEFINES</em> to "<tt>DEBUG=1</tt>" will
+cause the compiler option "<tt>-DDEBUG=1</tt>" to be used. However, setting
+<em>DEFINES</em> to "<tt>DEBUG</tt>" would pass "<tt>-DDEBUG</tt>" option.</li>
 <li><strong>WARNINGS</strong> specifies the level of warnings reported by compiler. If this
 option is unspecified, the default warnings will be used. It can be
 set to one of the following:
@@ -151,15 +156,17 @@ that this will disable all optimization.</li>
 location of driver in the /dev hierarchy. It's user by the
 driverinstall rule. E.g. <em>DRIVER_PATH</em> = video/usb will instruct
 the driverinstall rule to place a symlink to your driver's binary into
-~/add-ons/kernel/drivers/dev/video/usb, so that your driver will
-appear in /dev/video/usb when loaded. Default is "misc".</li>
+<tt>~/config/non-packaged/add-ons/kernel/drivers/dev/video/usb</tt>, so that your driver will
+appear in <tt>/dev/video/usb</tt> when loaded. Default is "misc".</li>
 <li><strong>INSTALL_DIR</strong> specifies the installation directory of application.</li>
 </ul>
 
-<p>Please also note, that if you're building your own makefile, that will use this
-engine, last line must contain:</p>
+<p>Please also note, that if you're building your own Makefile, that will use this
+engine, last lines must contain:</p>
 
-<pre><code>include $(BUILDHOME)/etc/makefile-engine
+<pre><code>DEVEL_DIRECTORY := \
+	$(shell findpaths -r "makefile_engine" B_FIND_PATH_DEVELOP_DIRECTORY)
+include $(DEVEL_DIRECTORY)/etc/makefile-engine
 </code></pre>
 
 <div id="localization"><h2>Using Localization</h2></div>
@@ -181,46 +188,50 @@ int main(void)
 }
 </code></pre>
 
-<p>This file uses header file Catalog.h, that belongs to locale library. So to
+<p>This file uses header file <tt>Catalog.h</tt>, that belongs to locale library. So to
 actually be able to use localization in your programs, you have to adjust few
-settings in your makefile.</p>
+settings in your Makefile.</p>
 
 <ol>
-<li>Adjust a value to your project's <strong>APP_MIME_SIG</strong> variable. 
+<li><p>Adjust a value to your project's <strong>APP_MIME_SIG</strong> variable. 
 Application's mime signature should also be set in the following
-format: x.vnd-&lt;author&gt;-&lt;project_name&gt;</li>
-<li>Add following two libraries into your <strong>LIBS</strong> variable: locale localestub</li>
-<li>Add every language, that you want to support, into <strong>LOCALES</strong> variable, 
-e.g. 'LOCALES = en de fr' for English, German and French locale 
-support.</li>
-<li><p>Add the Resource Definition script (also please specify it in <em>RDEF</em> 
-variable) containing the following entries into project:</p>
+format: <tt>x.vnd-&lt;author&gt;-&lt;project_name&gt;</tt></p></li>
+<li><p>Add following two libraries into your <strong>LIBS</strong> variable: <tt>locale</tt> 
+<tt>localestub</tt></p></li>
+<li><p>Add every language, that you want to support, into <strong>LOCALES</strong> variable, 
+e.g. '<tt>LOCALES = en de fr</tt>' for English, German and French locale 
+support.</p></li>
+<li><p>Add the resource definition script (also specified in the <em>RDEF</em> 
+variable) containing the following entries to project:</p>
 
-<p>resource app_signature "application/x-vnd.<author>-<project_name>";</p>
-
-<p>resource app<em>name</em>catalog_entry "<author>-<project_name>:System name:Terminal";</p></li>
-<li><p>Run 'make' to build binary file.</p></li>
-<li>Run either: 'make catkeys' to get locales/en.catkeys file.</li>
-<li>Copy this file to locales/&lt;language_code&gt;.catkeys and translate it,
-as needed.</li>
-<li>When you prepared all needed .catkeys files, run 'make catalogs' to create
-catalogs files from them.</li>
-<li>Run either 'make catalogsinstall' or 'make bindcatalogs' to make catalogs
-available for application. For more information about differences
-between these two commands, please see the next section.</li>
+<pre>resource app_signature "application/x-vnd.&lt;author&gt;-&lt;project_name&gt;";
+resource app<em>name</em>catalog_entry "&lt;author&gt;-&lt;project_name&gt;:System name:Terminal";</pre></li>
+<li><p>Run '<tt>make</tt>' to build the binary file.</p></li>
+<li><p>Run '<tt>make catkeys</tt>' to get the <tt>locales/en.catkeys</tt> file.</p></li>
+<li><p>Copy this file to <tt>locales/&lt;language_code&gt;.catkeys</tt> and translate it,
+as needed.</p></li>
+<li><p>When you've prepared all needed .catkeys files, run '<tt>make catalogs</tt>' to create
+catalog files from them.</p></li>
+<li><p>Run either '<tt>make catalogsinstall</tt>' or '<tt>make bindcatalogs</tt>' to make the catalogs
+available for the application. For more information about differences
+between these two commands, please see the next section.</p></li>
 </ol>
 
-<p>Here is also example makefile for the localized_hello.cpp above:</p>
+<p>Here is an example Makefile for the <tt>localized_hello.cpp</tt> above:</p>
 
-<p><em>makefile</em>:</p>
+<p><em>Makefile</em>:</p>
 
 <pre><code>NAME = hello
 TYPE = APP
-APP_MIME_SIG = x.vnd-example-hello
+APP_MIME_SIG = x-vnd.example-hello
 SRCS = localized_hello.cpp
 LIBS = locale localestub
 LOCALES = en de fr
-include $(BUILDHOME)/etc/makefile-engine
+
+## Include the Makefile-Engine
+DEVEL_DIRECTORY := \
+	$(shell findpaths -r "makefile_engine" B_FIND_PATH_DEVELOP_DIRECTORY)
+include $(DEVEL_DIRECTORY)/etc/makefile-engine
 </code></pre>
 
 <div id="targets"><h2>Target Reference</h2></div>
@@ -228,33 +239,32 @@ include $(BUILDHOME)/etc/makefile-engine
 <p>This is supposed to be the list of all non-file related targets.</p>
 
 <ul>
-<li><strong>default</strong> is the same as running make without arguments, it builds output
+<li><strong>default</strong> is the same as running <tt>make</tt> without arguments, it builds theoutput
 file</li>
-<li><strong>catkeys</strong> creates locales/en.catkeys file, containing all strings from
-sources, ready to be localized.</li>
+<li><strong>catkeys</strong> creates the <tt>locales/en.catkeys</tt> file, containing all strings from
+the sources, ready to be localized.</li>
 <li><strong>catalogs</strong> compiles all .catkeys files into corresponding .catalog files</li>
-<li><strong>clean</strong> cleans project directory of building leftovers, removes
+<li><strong>clean</strong> cleans the project directory of building leftovers, removes
 everything in the objects folder.</li>
-<li><strong>rmapp</strong> removes only the executable application file from objects folder</li>
-<li><strong>driverinstall</strong> installs driver into system.</li>
-<li><strong>install</strong> installs program into directory, specified by <em>INSTALL_DIR</em>
+<li><strong>rmapp</strong> removes only the executable application file from the objects folder</li>
+<li><strong>driverinstall</strong> installs the driver in the system.</li>
+<li><strong>install</strong> installs the program into the directory specified by the <em>INSTALL_DIR</em>
 variable.</li>
-<li><strong>catalogsinstall</strong> installs localization resources catalogs into 
-/boot/home/config/data/locale/catalogs/&lt;APP_MIME_SIG&gt; 
-directory for testing purposes. Note that for the distribution of
-release version catalogs should be stored in
-/boot/common/data/locale/catalogs/&lt;APP_MIME_SIG&gt; instead of
-home.</li>
-<li><strong>bindcatalogs</strong> binds localization resources catalogs into executable 
-file's resources (it's alternative way of storing localization 
+<li><strong>catalogsinstall</strong> installs localization resource catalogs into 
+<tt>/boot/home/config/non-packaged/data/locale/catalogs/&lt;APP_MIME_SIG&gt;</tt>
+for testing purposes. Note that for the distribution of a release version, catalogs should be stored in
+<tt>/boot/system/non-packaged/data/locale/catalogs/&lt;APP_MIME_SIG&gt;</tt> instead of
+home. Even better, create a proper HPKG and don't install in any non-packaged folder at all.</li>
+<li><strong>bindcatalogs</strong> binds localization resource catalogs into the executable 
+file's resources (it's an alternative way of storing localization 
 catalogs that doesn't require to distribute separate catalog files).</li>
 </ul>
 
 <table border="0" width="100%">
 <tr>
-<td align="left">This How To was created on November 28, 2011 by Peter
+<td align="left">This How-To was originally created on November 28, 2011 by Peter
 Poláčik</td>
-<td align="right">Copyright &copy; 2011 Haiku Inc.</td>
+<td align="right">Copyright &copy; 2017 Haiku Inc.</td>
 </tr>
 </table>
 </body>
