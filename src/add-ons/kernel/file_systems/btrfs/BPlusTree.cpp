@@ -168,10 +168,22 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 			stream->entries[i].Offset(), stream->entries[i].Size());
 		if (_value != NULL) {
 			*_value = malloc(stream->entries[i].Size());
-			memcpy(*_value, ((uint8 *)&stream->entries[0] 
-				+ stream->entries[i].Offset()),
-				stream->entries[i].Size());
+			uint32 totalOffset = stream->entries[i].Offset() + sizeof(btrfs_header);
 			key.SetOffset(stream->entries[i].key.Offset());
+
+			if ((fVolume->BlockSize() - totalOffset % fVolume->BlockSize())
+				>= stream->entries[i].Size()) {
+				//If there is enough space for *_value
+				stream = (btrfs_stream*)cached.SetTo(physical
+					+ totalOffset / fVolume->BlockSize());
+				memcpy(*_value, ((uint8 *)&stream->header
+					+ totalOffset % fVolume->BlockSize()),
+					stream->entries[i].Size());
+			} else {
+				read_pos(fVolume->Device(), physical
+					* fVolume->BlockSize() + totalOffset,
+					*_value, stream->entries[i].Size());
+			}
 			if (_size != NULL)
 				*_size = stream->entries[i].Size();
 		}	
