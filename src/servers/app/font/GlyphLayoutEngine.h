@@ -325,6 +325,7 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	// of some kind to know the most suitable fallback font.
 	static const char* fallbacks[] = {
 		"Noto Sans",
+		"Noto Sans Symbols",
 		"Noto Sans CJK JP",
 		NULL
 	};
