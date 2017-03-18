@@ -1136,7 +1136,7 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("AntiGrain Geometry")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2006 Maxim "
 			"Shemanarev (McSeem)."))
-		.SetLicenses("Anti-Grain Geometry", kBSDThreeClause, "GPC", NULL)
+		.SetLicenses("Anti-Grain Geometry", kBSDThreeClause, NULL)
 		.SetURL("http://www.antigrain.com"));
 
 	// PDFLib copyrights
