@@ -12,7 +12,7 @@ Scan	Status View		Examiner
 Rescan	Status View		Réexaminer
 file unavailable	Status View		fichier indisponible
 Get info	Pie View		Collecter les informations
-DiskUsage	System name		Utilisation Disque
+DiskUsage	System name		Utilisation des disques
 Created	Info Window		Créé
 Modified	Info Window		Modifié
 Abort	Status View		Abandonner

@@ -3,7 +3,7 @@ Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Без стиску
 Indexed	PSDLoader		Індексоване
 Grayscale	PSDLoader		Відтінки сірого
-Photoshop image translator	PSDConfig		Транслятор зображень Photoshop
+Photoshop image translator	PSDConfig		Перетвоювач зображень Photoshop
 Photoshop image translator	PSDTranslator		Перетворювач зображень Photoshop
 Version %d.%d.%d, %s	PSDConfig		Версія %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Документ Photoshop (PSD-файл)

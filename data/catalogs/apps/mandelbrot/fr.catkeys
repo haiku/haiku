@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Mandelbrot	863406292
+1	french	x-vnd.Haiku-Mandelbrot	157023036
 About	MandelbrotWindow		À propos
 Julia	MandelbrotWindow		Julia
 Grassland	MandelbrotWindow		Prairie
@@ -15,8 +15,10 @@ Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Bateau Enflammé
 Quit	MandelbrotWindow		Quitter
 Frost	MandelbrotWindow		Givre
+Set	MandelbrotWindow		Ensemble
 Iterations	MandelbrotWindow		Itérations
 Mandelbrot	System name		Mandelbrot
 Deepfrost	MandelbrotWindow		Gel
 Tricorn	MandelbrotWindow		Tricorne
+Multibrot	MandelbrotWindow		Multibrot
 Orbit Trap	MandelbrotWindow		Piège Orbital

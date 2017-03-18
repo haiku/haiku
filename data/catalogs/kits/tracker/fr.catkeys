@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1983922683
+1	french	x-vnd.Haiku-libtracker	1597598656
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -130,6 +130,7 @@ preferences	B_PREFERENCES_DIRECTORY		préférences
 Unmatched parenthesis.	libtracker		Parenthèses non appariées.
 Cancel	FSUtils		Annuler
 Edit name	ContainerWindow		Éditer le nom
+Nested *?+.	libtracker		Les *?+ imbriqués.
 Show volumes on Desktop	SettingsView		Afficher les volumes sur le bureau
 KiB	WidgetAttributeText		Kio
 Error %error loading Add-On %name.	ContainerWindow		Erreur %error au chargement de l’extension %name.
@@ -315,6 +316,7 @@ You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas d
 Unknown	FilePermissionsView		Inconnu
 Junk on end.	libtracker		Indésirables à la fin.
 All files and folders	FindPanel		Tout les fichiers et dossiers
+Trailing \\.	libtracker		Les \\ à la fin.
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{pour # fichier} other{pour # fichiers}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque la bibliothèque : %library).\n
 The Tracker must be running to see Info windows.	PoseView		Le Tracker doit être en fonction pour voir les fenêtres d’informations.

@@ -6,7 +6,7 @@ Unable to find the available languages! You can't use this preflet!	Locale Prefl
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Le Tracker et la Deskbar ont besoin d’être redémarrés pour prendre en compte cette modification. Souhaitez-vous les redémarrer maintenant ?
 Long format:	TimeFormatSettings		Format long :
 Currency	TimeFormatSettings		Devise
-Locale	System name		Paramères régionaux
+Locale	System name		Paramètres régionaux
 Short format:	TimeFormatSettings		Format court :
 Language	Locale Preflet Window		Langue
 Preferred languages	Locale Preflet Window		Langues préférées

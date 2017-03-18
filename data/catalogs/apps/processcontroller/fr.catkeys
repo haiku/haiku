@@ -31,7 +31,7 @@ Debug this thread!	ProcessController		Déboguer cette tâche !
 Normal priority	ProcessController		Priorité normale
 New Terminal	ProcessController		Nouveau Terminal
 Urgent priority	ProcessController		Priorité urgente
-About ProcessController…	ProcessController		À propos de ProcessControlleur…
+About ProcessController…	ProcessController		À propos du Gestionnaire de tâche…
 Ok!	ProcessController		Ok !
 Quit an application	ProcessController		Quitter une application
 Install in Deskbar	ProcessController		Installer dans la Deskbar
@@ -42,9 +42,9 @@ OK	ProcessController		OK
 Damned!	ProcessController		Damnation !
 Debug this team!	ProcessController		Déboguer ce processus !
 Usage: %s [-deskbar]\n	ProcessController		Utilisation : %s [-deskbar]\n
-ProcessController	System name		ProcessControlleur
+ProcessController	System name		Gestionnaire de tâche
 Real-time display priority	ProcessController		Priorité affichage temps-réel
 Please confirm	ProcessController		Veuillez confirmer
 System resources & caches…	ProcessController		Resources du système & caches…
 That's no Fun!	ProcessController		C’est pas fun !
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vous pouvez exécuter ProcessControlleur dans une fenêtre ou l’installer dans la Deskbar.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Vous pouvez exécuter le Gestionnaire de tâche dans une fenêtre ou l’installer dans la Deskbar.

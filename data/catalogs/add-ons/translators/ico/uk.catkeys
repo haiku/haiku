@@ -5,8 +5,8 @@ Windows %s %ld bit image	ICOTranslator		Вікна зображення %s %ld b
 Valid icon sizes are 16, 32, or 48	ConfigView		Доступні розміри іконок є 16, 32, або 48
 Windows icons	ICOTranslator		Значки Windows
 Enforce valid icon sizes	ConfigView		Змусити доступні розміри іконок
-ICO Settings	main		Настройки ICO
-Windows icon translator	ICOTranslator		Перетворювач вікон іконок
+ICO Settings	main		Налаштування ICO
+Windows icon translator	ICOTranslator		Перетворювач іконок Windows
 pixels in either direction.	ConfigView		пікселів в кожному напрямку.
 Write 32 bit images on true color input	ConfigView		Записати зображення 32 bit на вхід true color
 Icon	ICOTranslator		Іконка

@@ -15,7 +15,7 @@ Start [ms]: 	MediaConverter		Début [ms] :
 Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
 Output format	MediaConverter		Format de sortie
 End   [ms]: 	MediaConverter		Fin [ms] : 
-MediaConverter	System name		MédiaConvertisseur
+MediaConverter	System name		Convertisseur de média
 No video	Video codecs list		Pas de vidéo
 Duration:	MediaConverter-FileInfo		Durée :
 OK	MediaConverter		OK

@@ -8,7 +8,7 @@ Connecting to POP3 server…	pop3		Під'єднання до POP3 сервер�
 Getting UniqueIDs…	pop3		Отримання унікального ID…
 : No reply.\n	pop3		: Без відповіді.\n
 Error while connecting to server %serv	pop3		Помилка при під'єднанні до сервера %serv
-Error while authenticating user %user	pop3		Error while connecting to server %serv
+Error while authenticating user %user	pop3		Помилка при авторизації користувача %user
 Destination:	ConfigView		Призначення:
 APOP	ConfigView		APOP
 Sending password…	pop3		Відправка гасла…

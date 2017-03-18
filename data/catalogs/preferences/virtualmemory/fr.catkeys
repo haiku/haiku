@@ -10,7 +10,7 @@ Current Swap:	SettingsWindow		Fichier d’échange actuel :
 Use volume:	SettingsWindow		Utiliser le volume :
 Keep enabled	SettingsWindow		Laisser actif
 Revert	SettingsWindow		Défaire
-VirtualMemory	System name		Mémoire Virtuelle
+VirtualMemory	System name		Mémoire virtuelle
 Use boot volume	SettingsWindow		Utiliser le volume d’amorçage
 Load defaults	SettingsWindow		Charger les valeurs par défaut
 OK	VirtualMemoryApp		OK

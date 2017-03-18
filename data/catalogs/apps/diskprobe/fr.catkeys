@@ -15,7 +15,7 @@ Floating-point value:	TypeEditors		Valeur en virgule flottante :
 Attributes	ProbeView		Attributs
 Device offset: 	ProbeView		Déplacement dans le périphérique : 
 Selection	ProbeView		Sélection
-DiskProbe	System name		Sondeur Disque
+DiskProbe	System name		Sondeur de disque
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	quoi : '%.4s'\n\n
 File	FileWindow		Fichier
 OK	DiskProbe		OK

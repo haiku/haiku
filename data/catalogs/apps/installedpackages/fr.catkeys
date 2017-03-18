@@ -2,7 +2,7 @@
 No package selected.	UninstallView		Aucun paquet sélectionné.
 Remove	UninstallView		Enlever
 Package description	UninstallView		Description du paquet
-InstalledPackages	System name		Paquets Installés
+InstalledPackages	System name		Paquets installés
 The package you selected has been successfully removed from your system.	UninstallView		Le paquet que vous avez sélectionné a été enlevé de votre système avec succès.
 OK	UninstallView		OK
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Le paquet que vous avez sélectionné n’a pas été enlevé de votre système. Les informations sur le paquet installé ont peut-être été corrompues.

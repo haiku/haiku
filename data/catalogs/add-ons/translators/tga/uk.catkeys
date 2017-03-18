@@ -10,7 +10,7 @@ Written by the Haiku Translation Kit Team	TGAView		Автори Haiku Translatio
 Targa image (%d bits RLE truecolor)	TGATranslator		Зображення Targa (повнокольрове RLE %d біт)
 TGA images	TGATranslator		Зображення TGA
 Version %d.%d.%d, %s	TGAView		Версія %d.%d.%d, %s
-TGATranslator Settings	TGATranslator		Настройки Перетворювача TGA
+TGATranslator Settings	TGATranslator		Налаштування перетворювача TGA
 TGA image translator	TGATranslator		Перетворювач зображеньTGA
 Targa image (%d bits RLE gray)	TGATranslator		Зображення Targa (сіре RLE %d біт)
-TGA Settings	TGAMain		Настройки TGA
+TGA Settings	TGAMain		Налаштування TGA

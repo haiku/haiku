@@ -1,18 +1,29 @@
-1	french	x-vnd.Haiku-Repositories	350133022
+1	french	x-vnd.Haiku-Repositories	1893477165
+Completed	TaskLooper	Completed task status message	Terminé
 Enabled	RepositoriesView	Column title	Actif
+Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Une seule URL par dépôt peut être activée. Veuillez modifier vos sélections.
 Repositories	System name		Dépôts
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Une erreur s'est produite à l'activation du dépôt %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Souhaitez-vous retirer ce dépôt ?
 Description	TaskLooper	Failed task error description	Description
 Add	AddRepoWindow	Button label	Ajouter
 URL	RepositoriesView	Column title	URL
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dépôts n'a pas pu récupérer les noms des référentiels actuellement activés.
 Keep trying	TaskTimer	Button label	Réessayer
 This is not a valid URL.	AddRepoWindow	Add URL error message	Cette URL n'est pas valide.
 Repository URL:	AddRepoWindow	Text box label	URL du dépôt :
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erreur à l'obtention de la configuration du dépôt %name%.
 Details	TaskLooper	Job log details header	Détails
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	La tâche avec le dépôt %name% a abouti.
+Aborted	TaskLooper	Aborted task status message	Abandon
 Remove	RepositoriesView	Button label	Retirer
+Changes completed	RepositoriesView	Status view text	Modifications appliquées
 Name	RepositoriesView	Column title	Nom
+Enable	RepositoriesView	Button label	Activer
+Remove All	RepositoriesView	Button label	Tout retirer
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Une erreur est survenue lors de l'actualisation du cache du dépôt %name%
+Select repositories to use with Haiku package management:	RepositoriesView	Label text	Sélection des dépôts à utiliser pour obtenir les paquets :
+Failed	TaskLooper	Failed task status message	Échec
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	Annuler la tâche
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Souhaitez-vous retirer ces dépôts ?
@@ -21,4 +32,10 @@ Changes pending:	RepositoriesView	Status view text	Modifications en attente :
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Une erreur s'est produite lors de la désactivation du dépôt %name%
 Remove	Constants	Button label	Retirer
 Stop and quit	RepositoriesWindow	Button label	Arrêter et sortir
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La tâche avec le dépôt %name% prend beaucoup de temps pour se terminer.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Des tâches sont toujours en cours. Souhaitez-vous les interrompre et quitter ?
+This repository URL already exists.	RepositoriesView	Error message	Cette URL de dépôt existe déjà.
 Disable	RepositoriesView	Button label	Désactiver
+Enable All	RepositoriesView	Button label	Tout activer
+Unknown	Constants	Unknown repository name	Inconnu
+Disable All	RepositoriesView	Button label	Tout désactiver

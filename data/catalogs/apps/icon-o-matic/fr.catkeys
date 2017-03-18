@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	2781670565
+1	french	x-vnd.haiku-icon_o_matic	1313597739
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -135,6 +135,7 @@ Path	Icon-O-Matic-Menus		Chemin
 Freeze transformation	Icon-O-Matic-ShapesList		Figer la transformation
 File	Icon-O-Matic-Menus		Fichier
 Error: 	Icon-O-Matic-Exporter		Erreur : 
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Ajouter des transformations
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Chemin
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Impossible d’ouvrir le fichier « %s » en tant que document SVG.\n\nError : %s
