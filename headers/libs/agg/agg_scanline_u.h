@@ -252,7 +252,7 @@ namespace agg
         typedef base_type::coord_type coord_type;
 
         scanline_u8_am() : base_type(), m_alpha_mask(0) {}
-        scanline_u8_am(const AlphaMask& am) : base_type(), m_alpha_mask(&am) {}
+        scanline_u8_am(AlphaMask& am) : base_type(), m_alpha_mask(&am) {}
 
         //--------------------------------------------------------------------
         void finalize(int span_y)
@@ -275,7 +275,7 @@ namespace agg
         }
 
     private:
-        const AlphaMask* m_alpha_mask;
+        AlphaMask* m_alpha_mask;
     };
 
 
@@ -464,28 +464,21 @@ namespace agg
         typedef base_type::coord_type coord_type;
 
 
-        scanline32_u8_am() : m_alpha_mask(0)
-		{
-			this->base_type();
-		}
-
-        scanline32_u8_am(const AlphaMask& am) : m_alpha_mask(&am)
-		{
-			this->base_type();
-		}
+        scanline32_u8_am() : base_type(), m_alpha_mask(0) {}
+        scanline32_u8_am(AlphaMask& am) : base_type(), m_alpha_mask(&am) {}
 
         //--------------------------------------------------------------------
         void finalize(int span_y)
         {
-            this->base_type::finalize(span_y);
+            base_type::finalize(span_y);
             if(m_alpha_mask)
             {
-                typename base_type::iterator span = this->base_type::begin();
-                unsigned count = this->base_type::num_spans();
+                typename base_type::iterator span = base_type::begin();
+                unsigned count = base_type::num_spans();
                 do
                 {
                     m_alpha_mask->combine_hspan(span->x, 
-                                                this->base_type::y(),
+                                                base_type::y(), 
                                                 span->covers, 
                                                 span->len);
                     ++span;
@@ -495,7 +488,7 @@ namespace agg
         }
 
     private:
-        const AlphaMask* m_alpha_mask;
+        AlphaMask* m_alpha_mask;
     };
 
 
