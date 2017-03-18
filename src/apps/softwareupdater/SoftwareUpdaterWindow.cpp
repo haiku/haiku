@@ -43,14 +43,16 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fCurrentState(STATE_HEAD),
 	fWaitingSem(-1),
 	fWaitingForButton(false),
-	fUserCancelRequested(false)
+	fUserCancelRequested(false),
+	fWarningAlertCount(0)
 {
-	fIcon = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+	int32 iconSize = int(be_plain_font->Size() * 32.0 / 12.0);
+	fIcon = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
 	team_info teamInfo;
 	get_team_info(B_CURRENT_TEAM, &teamInfo);
 	app_info appInfo;
 	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-	BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, B_LARGE_ICON);
+	BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, icon_size(iconSize));
 
 	fStripeView = new StripeView(fIcon);
 
@@ -127,6 +129,8 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	
 	fCancelAlertResponse.SetMessage(new BMessage(kMsgCancelResponse));
 	fCancelAlertResponse.SetTarget(this);
+	fWarningAlertDismissed.SetMessage(new BMessage(kMsgWarningDismissed));
+	fWarningAlertDismissed.SetTarget(this);
 }
 
 
@@ -236,6 +240,10 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgWarningDismissed:
+			fWarningAlertCount--;
+			break;
+		
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -293,6 +301,19 @@ SoftwareUpdaterWindow::AddPackageInfo(uint32 install_type,
 }
 
 
+void
+SoftwareUpdaterWindow::ShowWarningAlert(const char* text)
+{
+	BAlert* alert = new BAlert("warning", text, B_TRANSLATE("OK"), NULL, NULL,
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->Go(&fWarningAlertDismissed);
+	alert->CenterIn(Frame());
+	// Offset multiple alerts
+	alert->MoveBy(fWarningAlertCount * 15, fWarningAlertCount * 15);
+	fWarningAlertCount++;
+}
+
+
 BLayoutItem*
 SoftwareUpdaterWindow::layout_item_for(BView* view)
 {
@@ -342,9 +363,10 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
 		fPackagesLayoutItem->SetVisible(true);
 		// Re-enable resizing
-		SetSizeLimits(fDefaultRect.Width(), 9999,
-		fDefaultRect.Height() + fListView->MinSize().Height() + 30, 9999);
-		ResizeTo(Bounds().Width(), 400);
+		float defaultWidth = fDefaultRect.Width();
+		SetSizeLimits(defaultWidth, 9999,
+			fDefaultRect.Height() + 4 * fListView->ItemHeight(), 9999);
+		ResizeTo(defaultWidth, .75 * defaultWidth);
 	}
 	
 	// Progress bar and string view
@@ -455,11 +477,19 @@ PackageItem::PackageItem(const char* name, const char* version,
 	fName(name),
 	fVersion(version),
 	fSummary(summary),
-	fTooltip(tooltip),
+	fToolTip(NULL),
 	fSuperItem(super)
 {
 	fLabelOffset = be_control_look->DefaultLabelSpacing();
-//	SetToolTip(fTooltip);
+	if (tooltip != NULL)
+		fToolTip = new BTextToolTip(tooltip);
+}
+
+
+PackageItem::~PackageItem()
+{
+	if (fToolTip != NULL)
+		fToolTip->ReleaseReference();
 }
 
 
@@ -578,6 +608,21 @@ PackageListView::FrameResized(float newWidth, float newHeight)
 }
 
 
+bool
+PackageListView::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	BListItem* item = ItemAt(IndexOf(point));
+	if (item == NULL)
+		return false;
+	PackageItem* pItem = dynamic_cast<PackageItem*>(item);
+	if (pItem != NULL) {
+		*_tip = pItem->ToolTip();
+		return true;
+	}
+	return false;
+}
+
+
 void
 PackageListView::AddPackage(uint32 install_type, const char* name,
 	const char* cur_ver, const char* new_ver, const char* summary,
@@ -585,21 +630,23 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 {
 	SuperItem* super;
 	BString version;
-	BString tooltip;
+	BString tooltip(B_TRANSLATE_COMMENT("Package:", "Tooltip text"));
+	tooltip.Append(" ").Append(name).Append("\n")
+		.Append(B_TRANSLATE_COMMENT("Repository:", "Tooltip text"))
+		.Append(" ").Append(repository).Append("\n");
 	switch (install_type) {
 		case PACKAGE_UPDATE:
 		{
 			if (fSuperUpdateItem == NULL) {
-				fSuperUpdateItem = new SuperItem(
-					B_TRANSLATE("Packages to be updated"));
+				fSuperUpdateItem = new SuperItem(B_TRANSLATE_COMMENT(
+					"Packages to be updated", "List super item label"));
 				AddItem(fSuperUpdateItem);
 			}
 			super = fSuperUpdateItem;
 			
 			version.SetTo(new_ver);
-			tooltip.SetTo(B_TRANSLATE("Repository:"));
-			tooltip.Append(" ").Append(repository)
-				.Append("\n").Append(B_TRANSLATE("Update version"))
+			tooltip.Append(B_TRANSLATE_COMMENT("Updating version",
+					"Tooltip text"))
 				.Append(" ").Append(cur_ver)
 				.Append(" ").Append(B_TRANSLATE("to"))
 				.Append(" ").Append(new_ver);
@@ -609,16 +656,15 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 		case PACKAGE_INSTALL:
 		{
 			if (fSuperInstallItem == NULL) {
-				fSuperInstallItem = new SuperItem(
-					B_TRANSLATE("New packages to be installed"));
+				fSuperInstallItem = new SuperItem(B_TRANSLATE_COMMENT(
+					"New packages to be installed", "List super item label"));
 				AddItem(fSuperInstallItem);
 			}
 			super = fSuperInstallItem;
 			
 			version.SetTo(new_ver);
-			tooltip.SetTo(B_TRANSLATE("Repository:"));
-			tooltip.Append(" ").Append(repository)
-				.Append("\n").Append(B_TRANSLATE("Install version"))
+			tooltip.Append(B_TRANSLATE_COMMENT("Installing version",
+					"Tooltip text"))
 				.Append(" ").Append(new_ver);
 			break;
 		}
@@ -626,16 +672,15 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 		case PACKAGE_UNINSTALL:
 		{
 			if (fSuperUninstallItem == NULL) {
-				fSuperUninstallItem = new SuperItem(
-					B_TRANSLATE("Packages to be uninstalled"));
+				fSuperUninstallItem = new SuperItem(B_TRANSLATE_COMMENT(
+					"Packages to be uninstalled", "List super item label"));
 				AddItem(fSuperUninstallItem);
 			}
 			super = fSuperUninstallItem;
 			
 			version.SetTo("");
-			tooltip.SetTo(B_TRANSLATE("Repository:"));
-			tooltip.Append(" ").Append(repository)
-				.Append("\n").Append(B_TRANSLATE("Uninstall version"))
+			tooltip.Append(B_TRANSLATE_COMMENT("Uninstalling version",
+					"Tooltip text"))
 				.Append(" ").Append(new_ver);
 			break;
 		}
@@ -657,34 +702,18 @@ PackageListView::SortItems()
 		SortItemsUnder(fSuperUpdateItem, true, SortPackageItems);
 }
 
-/*
-BSize
-PackageListView::PreferredSize()
-{
-	return BSize(B_SIZE_UNSET, 200);
-}*/
 
-/*
-void
-PackageListView::GetPreferredSize(float* _width, float* _height)
+float
+PackageListView::ItemHeight()
 {
-	// TODO: Something more nice as default? I need to see how this looks
-	// when there are actually any packages...
-	if (_width != NULL)
-		*_width = 400.0;
-
-	if (_height != NULL)
-		*_height = 200.0;
-}*/
-
-/*
-BSize
-PackageListView::MaxSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	if (fSuperUpdateItem != NULL)
+		return fSuperUpdateItem->GetPackageItemHeight();
+	if (fSuperInstallItem != NULL)
+		return fSuperInstallItem->GetPackageItemHeight();
+	if (fSuperUninstallItem != NULL)
+		return fSuperUninstallItem->GetPackageItemHeight();
+	return 0;
 }
-*/
 
 
 FinalWindow::FinalWindow(BRect rect, BPoint location, const char* header,
@@ -698,12 +727,13 @@ FinalWindow::FinalWindow(BRect rect, BPoint location, const char* header,
 	fDetailView(NULL),
 	fCancelButton(NULL)
 {
-	fIcon = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+	int32 iconSize = int(be_plain_font->Size() * 32.0 / 12.0);
+	fIcon = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
 	team_info teamInfo;
 	get_team_info(B_CURRENT_TEAM, &teamInfo);
 	app_info appInfo;
 	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-	BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, B_LARGE_ICON);
+	BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, icon_size(iconSize));
 
 	SetSizeLimits(rect.Width(), B_SIZE_UNLIMITED, 0, B_SIZE_UNLIMITED);
 	fStripeView = new StripeView(fIcon);

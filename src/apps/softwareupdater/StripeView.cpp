@@ -6,33 +6,28 @@
  *		Ryan Leavengood <leavengood@gmail.com>
  *		John Scipione <jscipione@gmail.com>
  *		Joseph Groover <looncraz@looncraz.net>
+ *		Brian Hill <supernova@warpmail.net>
  */
 
 
 #include "StripeView.h"
 
-
-static const float kStripeWidth = 30.0;
+#include <LayoutUtils.h>
 
 
 StripeView::StripeView(BBitmap* icon)
 	:
 	BView("StripeView", B_WILL_DRAW),
-	fIcon(icon)
+	fIcon(icon),
+	fWidth(0.0),
+	fStripeWidth(0.0)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	float width = 0.0f;
-	if (icon != NULL)
-		width += icon->Bounds().Width() + 32.0f;
-
-	SetExplicitSize(BSize(width, B_SIZE_UNSET));
-	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
-}
-
-
-StripeView::~StripeView()
-{
+	if (icon != NULL) {
+		fStripeWidth = icon->Bounds().Width();
+		fWidth = 2 * fStripeWidth + 2.0f;
+	}
 }
 
 
@@ -46,28 +41,37 @@ StripeView::Draw(BRect updateRect)
 	FillRect(updateRect);
 
 	BRect stripeRect = Bounds();
-	stripeRect.right = kStripeWidth;
+	stripeRect.right = fStripeWidth;
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fIcon, BPoint(15.0f, 10.0f));
+	DrawBitmapAsync(fIcon, BPoint(fStripeWidth / 2.0f, 10.0f));
+}
+
+
+BSize
+StripeView::PreferredSize()
+{
+	return BSize(fWidth, B_SIZE_UNSET);
 }
 
 
 void
-StripeView::SetIcon(BBitmap* icon)
+StripeView::GetPreferredSize(float* _width, float* _height)
 {
-	if (fIcon != NULL)
-		delete fIcon;
+	if (_width != NULL)
+		*_width = fWidth;
 
-	fIcon = icon;
+	if (_height != NULL)
+		*_height = fStripeWidth + 20.0f;
+}
 
-	float width = 0.0f;
-	if (icon != NULL)
-		width += icon->Bounds().Width() + 32.0f;
 
-	SetExplicitSize(BSize(width, B_SIZE_UNSET));
-	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
+BSize
+StripeView::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(fWidth, B_SIZE_UNLIMITED));
 }

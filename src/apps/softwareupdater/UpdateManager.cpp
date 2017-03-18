@@ -79,7 +79,6 @@ UpdateManager::JobFailed(BSupportKit::BJob* job)
 void
 UpdateManager::JobAborted(BSupportKit::BJob* job)
 {
-	//DIE(job->Result(), "aborted");
 	printf("Job aborted\n");
 }
 
@@ -219,15 +218,27 @@ UpdateManager::ConfirmChanges(bool fromMostSpecific)
 void
 UpdateManager::Warn(status_t error, const char* format, ...)
 {
+	char buffer[256];
 	va_list args;
 	va_start(args, format);
 	vfprintf(stderr, format, args);
+	vsnprintf(buffer, 256, format, args);
 	va_end(args);
 
 	if (error == B_OK)
 		printf("\n");
 	else
 		printf(": %s\n", strerror(error));
+	
+	if (fStatusWindow != NULL)
+		fStatusWindow->ShowWarningAlert(buffer);
+	else {
+		BString text("SoftwareUpdater:\n");
+		text.Append(buffer);
+		BAlert* alert = new BAlert("warning", text, B_TRANSLATE("OK"), NULL,
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->Go(NULL);
+	}
 }
 
 
@@ -531,6 +542,9 @@ UpdateManager::_UpdateDownloadProgress(const char* header,
 void
 UpdateManager::_FinalUpdate(const char* header, const char* text)
 {
+	if (fFinalWindow != NULL)
+		return;
+	
 	BNotification notification(B_INFORMATION_NOTIFICATION);
 	notification.SetGroup("SoftwareUpdater");
 	notification.SetTitle(header);

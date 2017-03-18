@@ -6,6 +6,7 @@
  *		Ryan Leavengood <leavengood@gmail.com>
  *		John Scipione <jscipione@gmail.com>
  *		Joseph Groover <looncraz@looncraz.net>
+ *		Brian Hill <supernova@warpmail.net>
  */
 #ifndef _STRIPE_VIEW_H
 #define _STRIPE_VIEW_H
@@ -18,15 +19,16 @@
 class StripeView : public BView {
 public:
 							StripeView(BBitmap* icon);
-							~StripeView();
 
 	virtual void			Draw(BRect updateRect);
-		
-			BBitmap*		Icon() const { return fIcon; };
-			void			SetIcon(BBitmap* icon);
+	virtual BSize			PreferredSize();
+	virtual	void			GetPreferredSize(float* _width, float* _height);
+	virtual	BSize			MaxSize();
 
 private:
 			BBitmap*		fIcon;
+			float			fWidth;
+			float			fStripeWidth;
 };
 
 

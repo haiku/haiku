@@ -17,6 +17,7 @@
 #include <ScrollView.h>
 #include <StatusBar.h>
 #include <StringView.h>
+#include <ToolTip.h>
 #include <Window.h>
 
 #include "StripeView.h"
@@ -62,16 +63,18 @@ public:
 								const char* summary,
 								const char* tooltip,
 								SuperItem* super);
+							~PackageItem();
 	virtual void			DrawItem(BView*, BRect, bool);
 	virtual void			Update(BView *owner, const BFont *font);
 	void					SetItemHeight(const BFont* font);
 	int						ICompare(PackageItem* item);
+	BTextToolTip*			ToolTip() { return fToolTip; };
 	
 private:
 			BString			fName;
 			BString			fVersion;
 			BString			fSummary;
-			BString			fTooltip;
+			BTextToolTip*	fToolTip;
 			BFont			fRegularFont;
 			BFont			fSmallFont;
 			font_height		fSmallFontHeight;
@@ -85,9 +88,6 @@ class PackageListView : public BOutlineListView {
 public:
 							PackageListView();
 			virtual	void	FrameResized(float newWidth, float newHeight);
-//			virtual BSize	PreferredSize();
-//			virtual	void	GetPreferredSize(float* _width, float* _height);
-//			virtual	BSize	MaxSize();
 			void			AddPackage(uint32 install_type,
 								const char* name,
 								const char* cur_ver,
@@ -95,6 +95,10 @@ public:
 								const char* summary,
 								const char* repository);
 			void			SortItems();
+			float			ItemHeight();
+
+protected:
+	virtual	bool			GetToolTipAt(BPoint point, BToolTip** _tip);
 
 private:
 			SuperItem*		fSuperUpdateItem;
@@ -119,6 +123,7 @@ public:
 								const char* new_ver,
 								const char* summary,
 								const char* repository);
+			void			ShowWarningAlert(const char* text);
 			const BBitmap*	GetIcon() { return fIcon; };
 			BRect			GetDefaultRect() { return fDefaultRect; };
 			BPoint			GetLocation() { return Frame().LeftTop(); };
@@ -154,6 +159,8 @@ private:
 			uint32			fButtonResult;
 			bool			fUserCancelRequested;
 			BInvoker		fCancelAlertResponse;
+			int32			fWarningAlertCount;
+			BInvoker		fWarningAlertDismissed;
 			
 };
 

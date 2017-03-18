@@ -9,7 +9,6 @@
 
 #include "UpdateAction.h"
 
-#include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <package/manager/Exceptions.h>
@@ -42,11 +41,11 @@ UpdateAction::~UpdateAction()
 status_t
 UpdateAction::Perform()
 {
-	fUpdateManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
-		| BPackageManager::B_ADD_REMOTE_REPOSITORIES
-		| BPackageManager::B_REFRESH_REPOSITORIES);
-	
 	try {
+		fUpdateManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
+			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
+			| BPackageManager::B_REFRESH_REPOSITORIES);
+	
 		// These values indicate that all updates should be installed
 		int packageCount = 0;
 		const char* const packages = "";
@@ -55,16 +54,6 @@ UpdateAction::Perform()
 //		fUpdateManager->SetDebugLevel(1);
 		fUpdateManager->Update(&packages, packageCount);
 	} catch (BFatalErrorException ex) {
-		BString errorString;
-		errorString.SetToFormat(
-			"Fatal error occurred while updating packages: "
-			"%s (%s)\n", ex.Message().String(),
-			ex.Details().String());
-		BAlert* alert(new(std::nothrow) BAlert(B_TRANSLATE("Fatal error"),
-			errorString, B_TRANSLATE("Close"), NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT));
-		if (alert != NULL)
-			alert->Go();
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());
 		return ex.Error();

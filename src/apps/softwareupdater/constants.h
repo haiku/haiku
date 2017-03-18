@@ -32,9 +32,7 @@ static const uint32 kMsgProgressUpdate = 'iPRO';
 static const uint32 kMsgCancel = 'iCAN';
 static const uint32 kMsgCancelResponse = 'iCRE';
 static const uint32 kMsgUpdateConfirmed = 'iCON';
-static const uint32 kMsgClose = 'iCLO';
-static const uint32 kMsgShow = 'iSHO';
-static const uint32 kMsgShowInfo = 'iSHI';
+static const uint32 kMsgWarningDismissed = 'iWDI';
 static const uint32 kMsgRegister = 'iREG';
 static const uint32 kMsgFinalQuit = 'iFIN';
 
@@ -44,7 +42,6 @@ static const uint32 kMsgFinalQuit = 'iFIN';
 #define kKeyPackageName "key_packagename"
 #define kKeyPackageCount "key_packagecount"
 #define kKeyPercentage "key_percentage"
-#define kKeyFrame "key_frame"
 #define kKeyMessenger "key_messenger"
 
 
