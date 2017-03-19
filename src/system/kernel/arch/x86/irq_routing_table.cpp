@@ -434,6 +434,8 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 {
 	for (uint8 device = 0; device < kMaxPCIDeviceCount; device++) {
 		if (pci->read_pci_config(bus, device, 0, PCI_vendor_id, 2) == 0xffff) {
+			TRACE("PCI bus %" B_PRIu8 ":%" B_PRIu8 " not present.\n",
+				bus, device);
 			// not present
 			continue;
 		}
@@ -450,6 +452,8 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 			if (pci->read_pci_config(bus, device, function, PCI_vendor_id, 2)
 				== 0xffff) {
 				// not present
+				TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " "
+					"not present.\n", bus, device, function);
 				continue;
 			}
 
@@ -483,6 +487,8 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 			uint8 interruptPin = pci->read_pci_config(bus, device, function,
 				PCI_interrupt_pin, 1);
 			if (interruptPin == 0 || interruptPin > 4) {
+				TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " "
+					"not routed.\n", bus, device, function);
 				// not routed
 				continue;
 			}
@@ -492,9 +498,15 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 			if (irqEntry != NULL) {
 				// we already have a matching entry for that device/pin, make
 				// sure the function mask includes us
+				TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " "
+					"already matched. Will mask.\n", bus, device, function);
 				irqEntry->pci_function_mask |= 1 << function;
 				continue;
 			}
+
+			TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " has %" B_PRIu8 " "
+				"parents, searching them...\n", bus, device, function,
+				parents.Count());
 
 			// This function has no matching routing table entry yet. Try to
 			// figure one out in the parent, based on the device number and
@@ -507,6 +519,8 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 					parent.device, parentPin);
 				if (irqEntry == NULL) {
 					// try the unmatched table as well
+					TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " "
+						"no matchedTable entry.\n", bus, device, function);
 					irqEntry = find_routing_table_entry(unmatchedTable,
 						parent.bus, parent.device, parentPin);
 				}
@@ -514,6 +528,10 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 				if (irqEntry == NULL) {
 					// no match in that parent, go further up
 					parentPin = ((parent.device + parentPin - 1) % 4) + 1;
+
+					TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " "
+						"no unmatchedTable entry, looking at parent pin %"
+						B_PRIu8 "...\n", bus, device, function, parentPin);
 					continue;
 				}
 
