@@ -115,6 +115,8 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 	uint8 headerType = pci->read_pci_config(entry.pci_bus, entry.pci_device, 0,
 		PCI_header_type, 1);
 	if (headerType == 0xff) {
+		TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 " entry not found\n",
+			entry.pci_bus, entry.pci_device);
 		// the device is not present
 		return B_ENTRY_NOT_FOUND;
 	}
@@ -128,16 +130,23 @@ fill_pci_info_for_entry(pci_module_info* pci, irq_routing_entry& entry)
 		// check for device presence by looking for a valid vendor
 		uint16 vendorId = pci->read_pci_config(entry.pci_bus, entry.pci_device,
 			function, PCI_vendor_id, 2);
-		if (vendorId == 0xffff)
+		if (vendorId == 0xffff) {
+			TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " vendor 0xffff\n",
+				entry.pci_bus, entry.pci_device, function);
 			continue;
+		}
 
 		uint8 interruptPin = pci->read_pci_config(entry.pci_bus,
 			entry.pci_device, function, PCI_interrupt_pin, 1);
 
 		// Finally match the pin with the entry, note that PCI pins are 1 based
 		// while ACPI ones are 0 based.
-		if (interruptPin != entry.pin + 1)
+		if (interruptPin != entry.pin + 1) {
+			TRACE("PCI %" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 " IRQ Pin %" B_PRIu8
+				" != %" B_PRIu8 "\n", entry.pci_bus, entry.pci_device, function,
+				interruptPin, entry.pin + 1);
 			continue;
+		}
 
 		if (entry.bios_irq == 0) {
 			// Keep the originally assigned IRQ around so we can use it for
