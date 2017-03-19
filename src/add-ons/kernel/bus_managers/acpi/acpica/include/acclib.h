@@ -1,8 +1,9 @@
-/*******************************************************************************
+/******************************************************************************
  *
- * Module Name: rsmem24 - Memory resource descriptors
+ * Name: acclib.h -- C library support. Prototypes for the (optional) local
+ *                   implementations of required C library functions.
  *
- ******************************************************************************/
+ *****************************************************************************/
 
 /******************************************************************************
  *
@@ -149,207 +150,282 @@
  *
  *****************************************************************************/
 
-#include "acpi.h"
-#include "accommon.h"
-#include "acresrc.h"
-
-#define _COMPONENT          ACPI_RESOURCES
-        ACPI_MODULE_NAME    ("rsmemory")
+#ifndef _ACCLIB_H
+#define _ACCLIB_H
 
 
-/*******************************************************************************
- *
- * AcpiRsConvertMemory24
- *
- ******************************************************************************/
+/*
+ * Prototypes and macros for local implementations of C library functions
+ */
 
-ACPI_RSCONVERT_INFO     AcpiRsConvertMemory24[4] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_MEMORY24,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_MEMORY24),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsConvertMemory24)},
+/* is* functions. The AcpiGbl_Ctypes array is defined in utclib.c */
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_MEMORY24,
-                        sizeof (AML_RESOURCE_MEMORY24),
-                        0},
+extern const UINT8 AcpiGbl_Ctypes[];
 
-    /* Read/Write bit */
+#define _ACPI_XA     0x00    /* extra alphabetic - not supported */
+#define _ACPI_XS     0x40    /* extra space */
+#define _ACPI_BB     0x00    /* BEL, BS, etc. - not supported */
+#define _ACPI_CN     0x20    /* CR, FF, HT, NL, VT */
+#define _ACPI_DI     0x04    /* '0'-'9' */
+#define _ACPI_LO     0x02    /* 'a'-'z' */
+#define _ACPI_PU     0x10    /* punctuation */
+#define _ACPI_SP     0x08    /* space, tab, CR, LF, VT, FF */
+#define _ACPI_UP     0x01    /* 'A'-'Z' */
+#define _ACPI_XD     0x80    /* '0'-'9', 'A'-'F', 'a'-'f' */
 
-    {ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET (Data.Memory24.WriteProtect),
-                        AML_OFFSET (Memory24.Flags),
-                        0},
-    /*
-     * These fields are contiguous in both the source and destination:
-     * Minimum Base Address
-     * Maximum Base Address
-     * Address Base Alignment
-     * Range Length
-     */
-    {ACPI_RSC_MOVE16,   ACPI_RS_OFFSET (Data.Memory24.Minimum),
-                        AML_OFFSET (Memory24.Minimum),
-                        4}
-};
+#define isdigit(c)  (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_DI))
+#define isspace(c)  (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_SP))
+#define isxdigit(c) (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_XD))
+#define isupper(c)  (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_UP))
+#define islower(c)  (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_LO))
+#define isprint(c)  (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_LO | _ACPI_UP | _ACPI_DI | _ACPI_XS | _ACPI_PU))
+#define isalpha(c)  (AcpiGbl_Ctypes[(unsigned char)(c)] & (_ACPI_LO | _ACPI_UP))
 
+/* Error code */
 
-/*******************************************************************************
- *
- * AcpiRsConvertMemory32
- *
- ******************************************************************************/
+#define EPERM            1 /* Operation not permitted */
+#define ENOENT           2 /* No such file or directory */
+#define EINTR            4 /* Interrupted system call */
+#define EIO              5 /* I/O error */
+#define EBADF            9 /* Bad file number */
+#define EAGAIN          11 /* Try again */
+#define ENOMEM          12 /* Out of memory */
+#define EACCES          13 /* Permission denied */
+#define EFAULT          14 /* Bad address */
+#define EBUSY           16 /* Device or resource busy */
+#define EEXIST          17 /* File exists */
+#define ENODEV          19 /* No such device */
+#define EINVAL          22 /* Invalid argument */
+#define EPIPE           32 /* Broken pipe */
+#define ERANGE          34 /* Math result not representable */
 
-ACPI_RSCONVERT_INFO     AcpiRsConvertMemory32[4] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_MEMORY32,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_MEMORY32),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsConvertMemory32)},
+/* Strings */
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_MEMORY32,
-                        sizeof (AML_RESOURCE_MEMORY32),
-                        0},
+char *
+strcat (
+    char                    *DstString,
+    const char              *SrcString);
 
-    /* Read/Write bit */
+char *
+strchr (
+    const char              *String,
+    int                     ch);
 
-    {ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET (Data.Memory32.WriteProtect),
-                        AML_OFFSET (Memory32.Flags),
-                        0},
-    /*
-     * These fields are contiguous in both the source and destination:
-     * Minimum Base Address
-     * Maximum Base Address
-     * Address Base Alignment
-     * Range Length
-     */
-    {ACPI_RSC_MOVE32,   ACPI_RS_OFFSET (Data.Memory32.Minimum),
-                        AML_OFFSET (Memory32.Minimum),
-                        4}
-};
+char *
+strpbrk (
+    const char              *String,
+    const char              *Delimiters);
 
+char *
+strtok (
+    char                    *String,
+    const char              *Delimiters);
 
-/*******************************************************************************
- *
- * AcpiRsConvertFixedMemory32
- *
- ******************************************************************************/
+char *
+strcpy (
+    char                    *DstString,
+    const char              *SrcString);
 
-ACPI_RSCONVERT_INFO     AcpiRsConvertFixedMemory32[4] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_FIXED_MEMORY32,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_FIXED_MEMORY32),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsConvertFixedMemory32)},
+int
+strcmp (
+    const char              *String1,
+    const char              *String2);
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_FIXED_MEMORY32,
-                        sizeof (AML_RESOURCE_FIXED_MEMORY32),
-                        0},
+ACPI_SIZE
+strlen (
+    const char              *String);
 
-    /* Read/Write bit */
+char *
+strncat (
+    char                    *DstString,
+    const char              *SrcString,
+    ACPI_SIZE               Count);
 
-    {ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET (Data.FixedMemory32.WriteProtect),
-                        AML_OFFSET (FixedMemory32.Flags),
-                        0},
-    /*
-     * These fields are contiguous in both the source and destination:
-     * Base Address
-     * Range Length
-     */
-    {ACPI_RSC_MOVE32,   ACPI_RS_OFFSET (Data.FixedMemory32.Address),
-                        AML_OFFSET (FixedMemory32.Address),
-                        2}
-};
+int
+strncmp (
+    const char              *String1,
+    const char              *String2,
+    ACPI_SIZE               Count);
 
+char *
+strncpy (
+    char                    *DstString,
+    const char              *SrcString,
+    ACPI_SIZE               Count);
 
-/*******************************************************************************
- *
- * AcpiRsGetVendorSmall
- *
- ******************************************************************************/
-
-ACPI_RSCONVERT_INFO     AcpiRsGetVendorSmall[3] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_VENDOR,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_VENDOR),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsGetVendorSmall)},
-
-    /* Length of the vendor data (byte count) */
-
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        sizeof (UINT8)},
-
-    /* Vendor data */
-
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_SMALL_HEADER),
-                        0}
-};
+char *
+strstr (
+    char                    *String1,
+    char                    *String2);
 
 
-/*******************************************************************************
- *
- * AcpiRsGetVendorLarge
- *
- ******************************************************************************/
+/* Conversion */
 
-ACPI_RSCONVERT_INFO     AcpiRsGetVendorLarge[3] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_VENDOR,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_VENDOR),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsGetVendorLarge)},
-
-    /* Length of the vendor data (byte count) */
-
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        sizeof (UINT8)},
-
-    /* Vendor data */
-
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_LARGE_HEADER),
-                        0}
-};
+UINT32
+strtoul (
+    const char              *String,
+    char                    **Terminator,
+    UINT32                  Base);
 
 
-/*******************************************************************************
- *
- * AcpiRsSetVendor
- *
- ******************************************************************************/
+/* Memory */
 
-ACPI_RSCONVERT_INFO     AcpiRsSetVendor[7] =
-{
-    /* Default is a small vendor descriptor */
+int
+memcmp (
+    void                    *Buffer1,
+    void                    *Buffer2,
+    ACPI_SIZE               Count);
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_VENDOR_SMALL,
-                        sizeof (AML_RESOURCE_SMALL_HEADER),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsSetVendor)},
+void *
+memcpy (
+    void                    *Dest,
+    const void              *Src,
+    ACPI_SIZE               Count);
 
-    /* Get the length and copy the data */
+void *
+memmove (
+    void                    *Dest,
+    const void              *Src,
+    ACPI_SIZE               Count);
 
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        0},
+void *
+memset (
+    void                    *Dest,
+    int                     Value,
+    ACPI_SIZE               Count);
 
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_SMALL_HEADER),
-                        0},
 
-    /*
-     * All done if the Vendor byte length is 7 or less, meaning that it will
-     * fit within a small descriptor
-     */
-    {ACPI_RSC_EXIT_LE,  0, 0, 7},
+/* upper/lower case */
 
-    /* Must create a large vendor descriptor */
+int
+tolower (
+    int                     c);
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_VENDOR_LARGE,
-                        sizeof (AML_RESOURCE_LARGE_HEADER),
-                        0},
+int
+toupper (
+    int                     c);
 
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        0},
+/*
+ * utprint - printf/vprintf output functions
+ */
+const char *
+AcpiUtScanNumber (
+    const char              *String,
+    UINT64                  *NumberPtr);
 
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_LARGE_HEADER),
-                        0}
-};
+const char *
+AcpiUtPrintNumber (
+    char                    *String,
+    UINT64                  Number);
+
+int
+vsnprintf (
+    char                    *String,
+    ACPI_SIZE               Size,
+    const char              *Format,
+    va_list                 Args);
+
+int
+snprintf (
+    char                    *String,
+    ACPI_SIZE               Size,
+    const char              *Format,
+    ...);
+
+int
+sprintf (
+    char                    *String,
+    const char              *Format,
+    ...);
+
+#ifdef ACPI_APPLICATION
+#define SEEK_SET            0
+#define SEEK_CUR            1
+#define SEEK_END            2
+
+/*
+ * NOTE: Currently we only need to update errno for file IOs. Other
+ *       Clibrary invocations in ACPICA do not make descisions according to
+ *       the errno.
+ */
+extern int errno;
+
+#ifndef EOF
+#define EOF                 (-1)
+#endif
+
+#define putchar(c)          fputc(stdout, c)
+#define getchar(c)          fgetc(stdin)
+
+int
+vprintf (
+    const char              *Format,
+    va_list                 Args);
+
+int
+printf (
+    const char              *Format,
+    ...);
+
+int
+vfprintf (
+    FILE                    *File,
+    const char              *Format,
+    va_list                 Args);
+
+int
+fprintf (
+    FILE                    *File,
+    const char              *Format,
+    ...);
+
+FILE *
+fopen (
+    const char              *Path,
+    const char              *Modes);
+
+void
+fclose (
+    FILE                    *File);
+
+int
+fread (
+    void                    *Buffer,
+    ACPI_SIZE               Size,
+    ACPI_SIZE               Count,
+    FILE                    *File);
+
+int
+fwrite (
+    void                    *Buffer,
+    ACPI_SIZE               Size,
+    ACPI_SIZE               Count,
+    FILE                    *File);
+
+int
+fseek (
+    FILE                    *File,
+    long                    Offset,
+    int                     From);
+
+long
+ftell (
+    FILE                    *File);
+
+int
+fgetc (
+    FILE                    *File);
+
+int
+fputc (
+    FILE                    *File,
+    char                    c);
+
+char *
+fgets (
+    char                    *s,
+    ACPI_SIZE               Size,
+    FILE                    *File);
+#endif
+
+#endif /* _ACCLIB_H */

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -110,6 +110,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -241,74 +277,6 @@ AcpiTbInstallTableWithOverride (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbInstallFixedTable
- *
- * PARAMETERS:  Address                 - Physical address of DSDT or FACS
- *              Signature               - Table signature, NULL if no need to
- *                                        match
- *              TableIndex              - Where the table index is returned
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Install a fixed ACPI table (DSDT/FACS) into the global data
- *              structure.
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiTbInstallFixedTable (
-    ACPI_PHYSICAL_ADDRESS   Address,
-    char                    *Signature,
-    UINT32                  *TableIndex)
-{
-    ACPI_TABLE_DESC         NewTableDesc;
-    ACPI_STATUS             Status;
-
-
-    ACPI_FUNCTION_TRACE (TbInstallFixedTable);
-
-
-    if (!Address)
-    {
-        ACPI_ERROR ((AE_INFO, "Null physical address for ACPI table [%s]",
-            Signature));
-        return (AE_NO_MEMORY);
-    }
-
-    /* Fill a table descriptor for validation */
-
-    Status = AcpiTbAcquireTempTable (&NewTableDesc, Address,
-        ACPI_TABLE_ORIGIN_INTERNAL_PHYSICAL);
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_ERROR ((AE_INFO, "Could not acquire table length at %8.8X%8.8X",
-            ACPI_FORMAT_UINT64 (Address)));
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Validate and verify a table before installation */
-
-    Status = AcpiTbVerifyTempTable (&NewTableDesc, Signature);
-    if (ACPI_FAILURE (Status))
-    {
-        goto ReleaseAndExit;
-    }
-
-    /* Add the table to the global root table list */
-
-    AcpiTbInstallTableWithOverride (&NewTableDesc, TRUE, TableIndex);
-
-ReleaseAndExit:
-
-    /* Release the temporary table descriptor */
-
-    AcpiTbReleaseTempTable (&NewTableDesc);
-    return_ACPI_STATUS (Status);
-}
-
-
-/*******************************************************************************
- *
  * FUNCTION:    AcpiTbInstallStandardTable
  *
  * PARAMETERS:  Address             - Address of the table (might be a virtual
@@ -320,8 +288,7 @@ ReleaseAndExit:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function is called to install an ACPI table that is
- *              neither DSDT nor FACS (a "standard" table.)
+ * DESCRIPTION: This function is called to verify and install an ACPI table.
  *              When this function is called by "Load" or "LoadTable" opcodes,
  *              or by AcpiLoadTable() API, the "Reload" parameter is set.
  *              After sucessfully returning from this function, table is
@@ -461,6 +428,14 @@ AcpiTbInstallStandardTable (
     /* Add the table to the global root table list */
 
     AcpiTbInstallTableWithOverride (&NewTableDesc, Override, TableIndex);
+
+    /* Invoke table handler if present */
+
+    if (AcpiGbl_TableHandler)
+    {
+        (void) AcpiGbl_TableHandler (ACPI_TABLE_EVENT_INSTALL,
+            NewTableDesc.Pointer, AcpiGbl_TableHandlerContext);
+    }
 
 ReleaseAndExit:
 

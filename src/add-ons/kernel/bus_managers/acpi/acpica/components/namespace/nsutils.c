@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -366,7 +402,7 @@ AcpiNsBuildInternalName (
         }
         else
         {
-            InternalName[1] = AML_MULTI_NAME_PREFIX_OP;
+            InternalName[1] = AML_MULTI_NAME_PREFIX;
             InternalName[2] = (char) NumSegments;
             Result = &InternalName[3];
         }
@@ -397,7 +433,7 @@ AcpiNsBuildInternalName (
         }
         else
         {
-            InternalName[i] = AML_MULTI_NAME_PREFIX_OP;
+            InternalName[i] = AML_MULTI_NAME_PREFIX;
             InternalName[(ACPI_SIZE) i+1] = (char) NumSegments;
             Result = &InternalName[(ACPI_SIZE) i+2];
         }
@@ -606,7 +642,7 @@ AcpiNsExternalizeName (
     {
         switch (InternalName[PrefixLength])
         {
-        case AML_MULTI_NAME_PREFIX_OP:
+        case AML_MULTI_NAME_PREFIX:
 
             /* <count> 4-byte names */
 
@@ -766,28 +802,23 @@ AcpiNsTerminate (
     void)
 {
     ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *Prev;
+    ACPI_OPERAND_OBJECT     *Next;
 
 
     ACPI_FUNCTION_TRACE (NsTerminate);
 
 
-#ifdef ACPI_EXEC_APP
+    /* Delete any module-level code blocks */
+
+    Next = AcpiGbl_ModuleCodeList;
+    while (Next)
     {
-        ACPI_OPERAND_OBJECT     *Prev;
-        ACPI_OPERAND_OBJECT     *Next;
-
-        /* Delete any module-level code blocks */
-
-        Next = AcpiGbl_ModuleCodeList;
-        while (Next)
-        {
-            Prev = Next;
-            Next = Next->Method.Mutex;
-            Prev->Method.Mutex = NULL; /* Clear the Mutex (cheated) field */
-            AcpiUtRemoveReference (Prev);
-        }
+        Prev = Next;
+        Next = Next->Method.Mutex;
+        Prev->Method.Mutex = NULL; /* Clear the Mutex (cheated) field */
+        AcpiUtRemoveReference (Prev);
     }
-#endif
 
     /*
      * Free the entire namespace -- all nodes and all objects
@@ -843,7 +874,7 @@ AcpiNsOpensScope (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiNsGetNode
+ * FUNCTION:    AcpiNsGetNodeUnlocked
  *
  * PARAMETERS:  *Pathname   - Name to be found, in external (ASL) format. The
  *                            \ (backslash) and ^ (carat) prefixes, and the
@@ -859,12 +890,12 @@ AcpiNsOpensScope (
  * DESCRIPTION: Look up a name relative to a given scope and return the
  *              corresponding Node. NOTE: Scope can be null.
  *
- * MUTEX:       Locks namespace
+ * MUTEX:       Doesn't locks namespace
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsGetNode (
+AcpiNsGetNodeUnlocked (
     ACPI_NAMESPACE_NODE     *PrefixNode,
     const char              *Pathname,
     UINT32                  Flags,
@@ -875,7 +906,7 @@ AcpiNsGetNode (
     char                    *InternalPath;
 
 
-    ACPI_FUNCTION_TRACE_PTR (NsGetNode, ACPI_CAST_PTR (char, Pathname));
+    ACPI_FUNCTION_TRACE_PTR (NsGetNodeUnlocked, ACPI_CAST_PTR (char, Pathname));
 
 
     /* Simplest case is a null pathname */
@@ -907,14 +938,6 @@ AcpiNsGetNode (
         return_ACPI_STATUS (Status);
     }
 
-    /* Must lock namespace during lookup */
-
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
-    {
-        goto Cleanup;
-    }
-
     /* Setup lookup scope (search starting point) */
 
     ScopeInfo.Scope.Node = PrefixNode;
@@ -930,9 +953,55 @@ AcpiNsGetNode (
             Pathname, AcpiFormatException (Status)));
     }
 
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-
-Cleanup:
     ACPI_FREE (InternalPath);
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiNsGetNode
+ *
+ * PARAMETERS:  *Pathname   - Name to be found, in external (ASL) format. The
+ *                            \ (backslash) and ^ (carat) prefixes, and the
+ *                            . (period) to separate segments are supported.
+ *              PrefixNode   - Root of subtree to be searched, or NS_ALL for the
+ *                            root of the name space. If Name is fully
+ *                            qualified (first INT8 is '\'), the passed value
+ *                            of Scope will not be accessed.
+ *              Flags       - Used to indicate whether to perform upsearch or
+ *                            not.
+ *              ReturnNode  - Where the Node is returned
+ *
+ * DESCRIPTION: Look up a name relative to a given scope and return the
+ *              corresponding Node. NOTE: Scope can be null.
+ *
+ * MUTEX:       Locks namespace
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiNsGetNode (
+    ACPI_NAMESPACE_NODE     *PrefixNode,
+    const char              *Pathname,
+    UINT32                  Flags,
+    ACPI_NAMESPACE_NODE     **ReturnNode)
+{
+    ACPI_STATUS             Status;
+
+
+    ACPI_FUNCTION_TRACE_PTR (NsGetNode, ACPI_CAST_PTR (char, Pathname));
+
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    Status = AcpiNsGetNodeUnlocked (PrefixNode, Pathname,
+        Flags, ReturnNode);
+
+    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return_ACPI_STATUS (Status);
 }

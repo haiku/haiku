@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,11 +111,48 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
 #include "accommon.h"
 #include "acnamesp.h"
+#include "amlcode.h"
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utdecode")
@@ -340,7 +377,7 @@ AcpiUtGetObjectTypeName (
     if (!ObjDesc)
     {
         ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Null Object Descriptor\n"));
-        return_PTR ("[NULL Object Descriptor]");
+        return_STR ("[NULL Object Descriptor]");
     }
 
     /* These descriptor types share a common area */
@@ -353,7 +390,7 @@ AcpiUtGetObjectTypeName (
             ACPI_GET_DESCRIPTOR_TYPE (ObjDesc),
             AcpiUtGetDescriptorName (ObjDesc), ObjDesc));
 
-        return_PTR ("Invalid object");
+        return_STR ("Invalid object");
     }
 
     return_STR (AcpiUtGetTypeName (ObjDesc->Common.Type));
@@ -676,6 +713,59 @@ AcpiUtGetNotifyName (
 
     return ("Hardware-Specific");
 }
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtGetArgumentTypeName
+ *
+ * PARAMETERS:  ArgType             - an ARGP_* parser argument type
+ *
+ * RETURN:      Decoded ARGP_* type
+ *
+ * DESCRIPTION: Decode an ARGP_* parser type, as defined in the amlcode.h file,
+ *              and used in the acopcode.h file. For example, ARGP_TERMARG.
+ *              Used for debug only.
+ *
+ ******************************************************************************/
+
+static const char           *AcpiGbl_ArgumentType[20] =
+{
+    /* 00 */ "Unknown ARGP",
+    /* 01 */ "ByteData",
+    /* 02 */ "ByteList",
+    /* 03 */ "CharList",
+    /* 04 */ "DataObject",
+    /* 05 */ "DataObjectList",
+    /* 06 */ "DWordData",
+    /* 07 */ "FieldList",
+    /* 08 */ "Name",
+    /* 09 */ "NameString",
+    /* 0A */ "ObjectList",
+    /* 0B */ "PackageLength",
+    /* 0C */ "SuperName",
+    /* 0D */ "Target",
+    /* 0E */ "TermArg",
+    /* 0F */ "TermList",
+    /* 10 */ "WordData",
+    /* 11 */ "QWordData",
+    /* 12 */ "SimpleName",
+    /* 13 */ "NameOrRef"
+};
+
+const char *
+AcpiUtGetArgumentTypeName (
+    UINT32                  ArgType)
+{
+
+    if (ArgType > ARGP_MAX)
+    {
+        return ("Unknown ARGP");
+    }
+
+    return (AcpiGbl_ArgumentType[ArgType]);
+}
+
 #endif
 
 

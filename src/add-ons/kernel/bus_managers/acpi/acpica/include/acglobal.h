@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -110,6 +110,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -317,10 +353,6 @@ ACPI_INIT_GLOBAL (UINT32,               AcpiGbl_NestingLevel, 0);
 
 ACPI_GLOBAL (ACPI_THREAD_STATE *,       AcpiGbl_CurrentWalkList);
 
-/* Maximum number of While() loop iterations before forced abort */
-
-ACPI_GLOBAL (UINT16,                    AcpiGbl_MaxLoopIterations);
-
 /* Control method single step flag */
 
 ACPI_GLOBAL (UINT8,                     AcpiGbl_CmSingleStep);
@@ -394,6 +426,7 @@ ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_CstyleDisassembly, TRUE);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_ForceAmlDisassembly, FALSE);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DmOpt_Verbose, TRUE);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DmEmitExternalOpcodes, FALSE);
+ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DoDisassemblerOptimizations, TRUE);
 
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DmOpt_Disasm);
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DmOpt_Listing);
@@ -406,7 +439,6 @@ ACPI_GLOBAL (ACPI_EXTERNAL_FILE *,      AcpiGbl_ExternalFileList);
 #ifdef ACPI_DEBUGGER
 
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_AbortMethod, FALSE);
-ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_MethodExecuting, FALSE);
 ACPI_INIT_GLOBAL (ACPI_THREAD_ID,       AcpiGbl_DbThreadId, ACPI_INVALID_THREAD_ID);
 
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DbOpt_NoIniMethods);
@@ -425,7 +457,6 @@ ACPI_GLOBAL (ACPI_OBJECT_TYPE,          AcpiGbl_DbArgTypes[ACPI_DEBUGGER_MAX_ARG
 
 /* These buffers should all be the same size */
 
-ACPI_GLOBAL (char,                      AcpiGbl_DbLineBuf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL (char,                      AcpiGbl_DbParsedBuf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL (char,                      AcpiGbl_DbScopeBuf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL (char,                      AcpiGbl_DbDebugFilename[ACPI_DB_LINE_BUFFER_SIZE]);
@@ -440,9 +471,6 @@ ACPI_GLOBAL (UINT16,                    AcpiGbl_NodeTypeCountMisc);
 ACPI_GLOBAL (UINT32,                    AcpiGbl_NumNodes);
 ACPI_GLOBAL (UINT32,                    AcpiGbl_NumObjects);
 
-ACPI_GLOBAL (ACPI_MUTEX,                AcpiGbl_DbCommandReady);
-ACPI_GLOBAL (ACPI_MUTEX,                AcpiGbl_DbCommandComplete);
-
 #endif /* ACPI_DEBUGGER */
 
 #if defined (ACPI_DISASSEMBLER) || defined (ACPI_ASL_COMPILER)
@@ -453,6 +481,50 @@ ACPI_GLOBAL (const char,                *AcpiGbl_PldHorizontalPositionList[]);
 ACPI_GLOBAL (const char,                *AcpiGbl_PldShapeList[]);
 
 #endif
+
+/*
+ * Meant for the -ca option.
+ */
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentInlineComment,     NULL);
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentEndNodeComment,    NULL);
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentOpenBraceComment,  NULL);
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentCloseBraceComment, NULL);
+
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_RootFilename, NULL);
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentFilename, NULL);
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentParentFilename, NULL);
+ACPI_INIT_GLOBAL (char*,   AcpiGbl_CurrentIncludeFilename, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_LastListHead, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_DefBlkCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_DefBlkCommentListTail, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_RegCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_RegCommentListTail, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_IncCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_IncCommentListTail, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_EndBlkCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_EndBlkCommentListTail, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_ADDR_NODE,   *AcpiGbl_CommentAddrListHead, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_PARSE_OBJECT,   *AcpiGbl_CurrentScope,     NULL);
+
+ACPI_INIT_GLOBAL (ACPI_FILE_NODE,      *AcpiGbl_FileTreeRoot, NULL);
+
+ACPI_GLOBAL (ACPI_CACHE_T *,            AcpiGbl_RegCommentCache);
+ACPI_GLOBAL (ACPI_CACHE_T *,            AcpiGbl_CommentAddrCache);
+ACPI_GLOBAL (ACPI_CACHE_T *,            AcpiGbl_FileCache);
+
+ACPI_INIT_GLOBAL (BOOLEAN, Gbl_CaptureComments, FALSE);
+
+ACPI_INIT_GLOBAL (BOOLEAN, AcpiGbl_DebugAslConversion, FALSE);
+ACPI_INIT_GLOBAL (ACPI_FILE, AcpiGbl_ConvDebugFile, NULL);
+
+ACPI_GLOBAL (char, AcpiGbl_TableSig[4]);
 
 /*****************************************************************************
  *

@@ -1346,6 +1346,32 @@ AcpiOsReleaseMutex(ACPI_MUTEX handle)
 void
 AcpiOsWaitEventsComplete()
 {
-    //TODO: FreeBSD See description.
-    return;
+	//TODO: FreeBSD See description.
+	return;
+}
+
+
+/******************************************************************************
+ *
+ * FUNCTION:    AcpiOsEnterSleep
+ *
+ * PARAMETERS:  SleepState          - Which sleep state to enter
+ *              RegaValue           - Register A value
+ *              RegbValue           - Register B value
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: A hook before writing sleep registers to enter the sleep
+ *              state. Return AE_CTRL_TERMINATE to skip further sleep register
+ *              writes.
+ *
+ *****************************************************************************/
+
+ACPI_STATUS
+AcpiOsEnterSleep (
+	UINT8                   SleepState,
+	UINT32                  RegaValue,
+	UINT32                  RegbValue)
+{
+	return (AE_OK);
 }

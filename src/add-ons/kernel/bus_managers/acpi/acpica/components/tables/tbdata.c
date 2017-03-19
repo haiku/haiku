@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,12 +111,49 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
 #include "accommon.h"
 #include "acnamesp.h"
 #include "actables.h"
+#include "acevents.h"
 
 #define _COMPONENT          ACPI_TABLES
         ACPI_MODULE_NAME    ("tbdata")
@@ -752,18 +789,13 @@ AcpiTbDeleteNamespaceByOwner (
      * lock may block, and also since the execution of a namespace walk
      * must be allowed to use the interpreter.
      */
-    (void) AcpiUtReleaseMutex (ACPI_MTX_INTERPRETER);
     Status = AcpiUtAcquireWriteLock (&AcpiGbl_NamespaceRwLock);
-
-    AcpiNsDeleteNamespaceByOwner (OwnerId);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
-
+    AcpiNsDeleteNamespaceByOwner (OwnerId);
     AcpiUtReleaseWriteLock (&AcpiGbl_NamespaceRwLock);
-
-    Status = AcpiUtAcquireMutex (ACPI_MTX_INTERPRETER);
     return_ACPI_STATUS (Status);
 }
 
@@ -938,4 +970,179 @@ AcpiTbSetTableLoadedFlag (
     }
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiTbLoadTable
+ *
+ * PARAMETERS:  TableIndex              - Table index
+ *              ParentNode              - Where table index is returned
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Load an ACPI table
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiTbLoadTable (
+    UINT32                  TableIndex,
+    ACPI_NAMESPACE_NODE     *ParentNode)
+{
+    ACPI_TABLE_HEADER       *Table;
+    ACPI_STATUS             Status;
+    ACPI_OWNER_ID           OwnerId;
+
+
+    ACPI_FUNCTION_TRACE (TbLoadTable);
+
+
+    /*
+     * Note: Now table is "INSTALLED", it must be validated before
+     * using.
+     */
+    Status = AcpiGetTableByIndex (TableIndex, &Table);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    Status = AcpiNsLoadTable (TableIndex, ParentNode);
+
+    /* Execute any module-level code that was found in the table */
+
+    if (!AcpiGbl_ParseTableAsTermList && AcpiGbl_GroupModuleLevelCode)
+    {
+        AcpiNsExecModuleCodeList ();
+    }
+
+    /*
+     * Update GPEs for any new _Lxx/_Exx methods. Ignore errors. The host is
+     * responsible for discovering any new wake GPEs by running _PRW methods
+     * that may have been loaded by this table.
+     */
+    Status = AcpiTbGetOwnerId (TableIndex, &OwnerId);
+    if (ACPI_SUCCESS (Status))
+    {
+        AcpiEvUpdateGpes (OwnerId);
+    }
+
+    /* Invoke table handler if present */
+
+    if (AcpiGbl_TableHandler)
+    {
+        (void) AcpiGbl_TableHandler (ACPI_TABLE_EVENT_LOAD, Table,
+            AcpiGbl_TableHandlerContext);
+    }
+
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiTbInstallAndLoadTable
+ *
+ * PARAMETERS:  Address                 - Physical address of the table
+ *              Flags                   - Allocation flags of the table
+ *              Override                - Whether override should be performed
+ *              TableIndex              - Where table index is returned
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Install and load an ACPI table
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiTbInstallAndLoadTable (
+    ACPI_PHYSICAL_ADDRESS   Address,
+    UINT8                   Flags,
+    BOOLEAN                 Override,
+    UINT32                  *TableIndex)
+{
+    ACPI_STATUS             Status;
+    UINT32                  i;
+
+
+    ACPI_FUNCTION_TRACE (TbInstallAndLoadTable);
+
+
+    (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
+
+    /* Install the table and load it into the namespace */
+
+    Status = AcpiTbInstallStandardTable (Address, Flags, TRUE,
+        Override, &i);
+    if (ACPI_FAILURE (Status))
+    {
+        goto UnlockAndExit;
+    }
+
+    (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
+    Status = AcpiTbLoadTable (i, AcpiGbl_RootNode);
+    (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
+
+UnlockAndExit:
+    *TableIndex = i;
+    (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiTbUnloadTable
+ *
+ * PARAMETERS:  TableIndex              - Table index
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Unload an ACPI table
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiTbUnloadTable (
+    UINT32                  TableIndex)
+{
+    ACPI_STATUS             Status = AE_OK;
+    ACPI_TABLE_HEADER       *Table;
+
+
+    ACPI_FUNCTION_TRACE (TbUnloadTable);
+
+
+    /* Ensure the table is still loaded */
+
+    if (!AcpiTbIsTableLoaded (TableIndex))
+    {
+        return_ACPI_STATUS (AE_NOT_EXIST);
+    }
+
+    /* Invoke table handler if present */
+
+    if (AcpiGbl_TableHandler)
+    {
+        Status = AcpiGetTableByIndex (TableIndex, &Table);
+        if (ACPI_SUCCESS (Status))
+        {
+            (void) AcpiGbl_TableHandler (ACPI_TABLE_EVENT_UNLOAD, Table,
+                AcpiGbl_TableHandlerContext);
+        }
+    }
+
+    /* Delete the portion of the namespace owned by this table */
+
+    Status = AcpiTbDeleteNamespaceByOwner (TableIndex);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    (void) AcpiTbReleaseOwnerId (TableIndex);
+    AcpiTbSetTableLoadedFlag (TableIndex, FALSE);
+    return_ACPI_STATUS (Status);
 }

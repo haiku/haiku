@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 /*
@@ -127,6 +163,7 @@
 #include "acparser.h"
 #include "acdispat.h"
 #include "amlcode.h"
+#include "acconvert.h"
 
 #define _COMPONENT          ACPI_PARSER
         ACPI_MODULE_NAME    ("psloop")
@@ -176,6 +213,9 @@ AcpiPsGetArguments (
     ACPI_FUNCTION_TRACE_PTR (PsGetArguments, WalkState);
 
 
+    ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
+        "Get arguments for opcode [%s]\n", Op->Common.AmlOpName));
+
     switch (Op->Common.AmlOpcode)
     {
     case AML_BYTE_OP:       /* AML_BYTEDATA_ARG */
@@ -210,6 +250,22 @@ AcpiPsGetArguments (
             !WalkState->ArgCount)
         {
             WalkState->Aml = WalkState->ParserState.Aml;
+
+            switch (Op->Common.AmlOpcode)
+            {
+            case AML_METHOD_OP:
+            case AML_BUFFER_OP:
+            case AML_PACKAGE_OP:
+            case AML_VARIABLE_PACKAGE_OP:
+            case AML_WHILE_OP:
+
+                break;
+
+            default:
+
+                ASL_CV_CAPTURE_COMMENTS (WalkState);
+                break;
+            }
 
             Status = AcpiPsGetNextArg (WalkState, &(WalkState->ParserState),
                 GET_CURRENT_ARG_TYPE (WalkState->ArgTypes), &Arg);
@@ -318,7 +374,7 @@ AcpiPsGetArguments (
 
         case AML_BUFFER_OP:
         case AML_PACKAGE_OP:
-        case AML_VAR_PACKAGE_OP:
+        case AML_VARIABLE_PACKAGE_OP:
 
             if ((Op->Common.Parent) &&
                 (Op->Common.Parent->Common.AmlOpcode == AML_NAME_OP) &&
@@ -556,6 +612,8 @@ AcpiPsParseLoop (
 
     while ((ParserState->Aml < ParserState->AmlEnd) || (Op))
     {
+        ASL_CV_CAPTURE_COMMENTS (WalkState);
+
         AmlOpStart = ParserState->Aml;
         if (!Op)
         {
@@ -589,12 +647,26 @@ AcpiPsParseLoop (
             AcpiExStartTraceOpcode (Op, WalkState);
         }
 
-
         /*
          * Start ArgCount at zero because we don't know if there are
          * any args yet
          */
-        WalkState->ArgCount  = 0;
+        WalkState->ArgCount = 0;
+
+        switch (Op->Common.AmlOpcode)
+        {
+        case AML_BYTE_OP:
+        case AML_WORD_OP:
+        case AML_DWORD_OP:
+        case AML_QWORD_OP:
+
+            break;
+
+        default:
+
+            ASL_CV_CAPTURE_COMMENTS (WalkState);
+            break;
+        }
 
         /* Are there any arguments that must be processed? */
 

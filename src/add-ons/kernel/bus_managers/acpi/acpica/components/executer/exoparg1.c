@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -110,6 +110,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -376,7 +412,7 @@ AcpiExOpcode_1A_1T_1R (
     case AML_FIND_SET_RIGHT_BIT_OP:
     case AML_FROM_BCD_OP:
     case AML_TO_BCD_OP:
-    case AML_COND_REF_OF_OP:
+    case AML_CONDITIONAL_REF_OF_OP:
 
         /* Create a return object of type Integer for these opcodes */
 
@@ -507,7 +543,7 @@ AcpiExOpcode_1A_1T_1R (
             }
             break;
 
-        case AML_COND_REF_OF_OP:        /* CondRefOf (SourceObject, Result)  */
+        case AML_CONDITIONAL_REF_OF_OP:     /* CondRefOf (SourceObject, Result)  */
             /*
              * This op is a little strange because the internal return value is
              * different than the return value stored in the result descriptor
@@ -579,13 +615,13 @@ AcpiExOpcode_1A_1T_1R (
     /*
      * ACPI 2.0 Opcodes
      */
-    case AML_COPY_OP:               /* Copy (Source, Target) */
+    case AML_COPY_OBJECT_OP:        /* CopyObject (Source, Target) */
 
         Status = AcpiUtCopyIobjectToIobject (
             Operand[0], &ReturnDesc, WalkState);
         break;
 
-    case AML_TO_DECSTRING_OP:       /* ToDecimalString (Data, Result) */
+    case AML_TO_DECIMAL_STRING_OP:  /* ToDecimalString (Data, Result) */
 
         Status = AcpiExConvertToString (
             Operand[0], &ReturnDesc, ACPI_EXPLICIT_CONVERT_DECIMAL);
@@ -597,7 +633,7 @@ AcpiExOpcode_1A_1T_1R (
         }
         break;
 
-    case AML_TO_HEXSTRING_OP:       /* ToHexString (Data, Result) */
+    case AML_TO_HEX_STRING_OP:      /* ToHexString (Data, Result) */
 
         Status = AcpiExConvertToString (
             Operand[0], &ReturnDesc, ACPI_EXPLICIT_CONVERT_HEX);
@@ -622,8 +658,9 @@ AcpiExOpcode_1A_1T_1R (
 
     case AML_TO_INTEGER_OP:         /* ToInteger (Data, Result) */
 
-        Status = AcpiExConvertToInteger (
-            Operand[0], &ReturnDesc, ACPI_ANY_BASE);
+        /* Perform "explicit" conversion */
+
+        Status = AcpiExConvertToInteger (Operand[0], &ReturnDesc, 0);
         if (ReturnDesc == Operand[0])
         {
             /* No conversion performed, add ref to handle return value */
@@ -711,7 +748,7 @@ AcpiExOpcode_1A_0T_1R (
 
     switch (WalkState->Opcode)
     {
-    case AML_LNOT_OP:               /* LNot (Operand) */
+    case AML_LOGICAL_NOT_OP:        /* LNot (Operand) */
 
         ReturnDesc = AcpiUtCreateIntegerObject ((UINT64) 0);
         if (!ReturnDesc)
@@ -762,7 +799,8 @@ AcpiExOpcode_1A_0T_1R (
          * NOTE:  We use LNOT_OP here in order to force resolution of the
          * reference operand to an actual integer.
          */
-        Status = AcpiExResolveOperands (AML_LNOT_OP, &TempDesc, WalkState);
+        Status = AcpiExResolveOperands (AML_LOGICAL_NOT_OP,
+            &TempDesc, WalkState);
         if (ACPI_FAILURE (Status))
         {
             ACPI_EXCEPTION ((AE_INFO, Status,
@@ -1008,7 +1046,7 @@ AcpiExOpcode_1A_0T_1R (
                  * 2) Dereference the node to an actual object. Could be a
                  *    Field, so we need to resolve the node to a value.
                  */
-                Status = AcpiNsGetNode (WalkState->ScopeInfo->Scope.Node,
+                Status = AcpiNsGetNodeUnlocked (WalkState->ScopeInfo->Scope.Node,
                     Operand[0]->String.Pointer,
                     ACPI_NS_SEARCH_PARENT,
                     ACPI_CAST_INDIRECT_PTR (

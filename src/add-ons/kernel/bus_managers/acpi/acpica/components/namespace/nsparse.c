@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2017, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
@@ -119,10 +155,114 @@
 #include "acparser.h"
 #include "acdispat.h"
 #include "actables.h"
+#include "acinterp.h"
 
 
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nsparse")
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    NsExecuteTable
+ *
+ * PARAMETERS:  TableDesc       - An ACPI table descriptor for table to parse
+ *              StartNode       - Where to enter the table into the namespace
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Load ACPI/AML table by executing the entire table as a
+ *              TermList.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiNsExecuteTable (
+    UINT32                  TableIndex,
+    ACPI_NAMESPACE_NODE     *StartNode)
+{
+    ACPI_STATUS             Status;
+    ACPI_TABLE_HEADER       *Table;
+    ACPI_OWNER_ID           OwnerId;
+    ACPI_EVALUATE_INFO      *Info = NULL;
+    UINT32                  AmlLength;
+    UINT8                   *AmlStart;
+    ACPI_OPERAND_OBJECT     *MethodObj = NULL;
+
+
+    ACPI_FUNCTION_TRACE (NsExecuteTable);
+
+
+    Status = AcpiGetTableByIndex (TableIndex, &Table);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    /* Table must consist of at least a complete header */
+
+    if (Table->Length < sizeof (ACPI_TABLE_HEADER))
+    {
+        return_ACPI_STATUS (AE_BAD_HEADER);
+    }
+
+    AmlStart = (UINT8 *) Table + sizeof (ACPI_TABLE_HEADER);
+    AmlLength = Table->Length - sizeof (ACPI_TABLE_HEADER);
+
+    Status = AcpiTbGetOwnerId (TableIndex, &OwnerId);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    /* Create, initialize, and link a new temporary method object */
+
+    MethodObj = AcpiUtCreateInternalObject (ACPI_TYPE_METHOD);
+    if (!MethodObj)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    /* Allocate the evaluation information block */
+
+    Info = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_EVALUATE_INFO));
+    if (!Info)
+    {
+        Status = AE_NO_MEMORY;
+        goto Cleanup;
+    }
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
+        "Create table code block: %p\n", MethodObj));
+
+    MethodObj->Method.AmlStart = AmlStart;
+    MethodObj->Method.AmlLength = AmlLength;
+    MethodObj->Method.OwnerId = OwnerId;
+    MethodObj->Method.InfoFlags |= ACPI_METHOD_MODULE_LEVEL;
+
+    Info->PassNumber = ACPI_IMODE_EXECUTE;
+    Info->Node = StartNode;
+    Info->ObjDesc = MethodObj;
+    Info->NodeFlags = Info->Node->Flags;
+    Info->FullPathname = AcpiNsGetNormalizedPathname (Info->Node, TRUE);
+    if (!Info->FullPathname)
+    {
+        Status = AE_NO_MEMORY;
+        goto Cleanup;
+    }
+
+    Status = AcpiPsExecuteTable (Info);
+
+Cleanup:
+    if (Info)
+    {
+        ACPI_FREE (Info->FullPathname);
+        Info->FullPathname = NULL;
+    }
+    ACPI_FREE (Info);
+    AcpiUtRemoveReference (MethodObj);
+    return_ACPI_STATUS (Status);
+}
 
 
 /*******************************************************************************
@@ -228,7 +368,9 @@ AcpiNsOneCompleteParse (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
         "*PARSE* pass %u parse\n", PassNumber));
+    AcpiExEnterInterpreter ();
     Status = AcpiPsParseAml (WalkState);
+    AcpiExExitInterpreter ();
 
 Cleanup:
     AcpiPsDeleteParseTree (ParseRoot);
@@ -260,40 +402,53 @@ AcpiNsParseTable (
     ACPI_FUNCTION_TRACE (NsParseTable);
 
 
-    /*
-     * AML Parse, pass 1
-     *
-     * In this pass, we load most of the namespace. Control methods
-     * are not parsed until later. A parse tree is not created. Instead,
-     * each Parser Op subtree is deleted when it is finished. This saves
-     * a great deal of memory, and allows a small cache of parse objects
-     * to service the entire parse. The second pass of the parse then
-     * performs another complete parse of the AML.
-     */
-    ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 1\n"));
-
-    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS1,
-        TableIndex, StartNode);
-    if (ACPI_FAILURE (Status))
+    if (AcpiGbl_ParseTableAsTermList)
     {
-        return_ACPI_STATUS (Status);
+        ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start load pass\n"));
+
+        Status = AcpiNsExecuteTable (TableIndex, StartNode);
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
     }
-
-    /*
-     * AML Parse, pass 2
-     *
-     * In this pass, we resolve forward references and other things
-     * that could not be completed during the first pass.
-     * Another complete parse of the AML is performed, but the
-     * overhead of this is compensated for by the fact that the
-     * parse objects are all cached.
-     */
-    ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 2\n"));
-    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2,
-        TableIndex, StartNode);
-    if (ACPI_FAILURE (Status))
+    else
     {
-        return_ACPI_STATUS (Status);
+        /*
+         * AML Parse, pass 1
+         *
+         * In this pass, we load most of the namespace. Control methods
+         * are not parsed until later. A parse tree is not created.
+         * Instead, each Parser Op subtree is deleted when it is finished.
+         * This saves a great deal of memory, and allows a small cache of
+         * parse objects to service the entire parse. The second pass of
+         * the parse then performs another complete parse of the AML.
+         */
+        ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 1\n"));
+
+        Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS1,
+            TableIndex, StartNode);
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+
+        /*
+         * AML Parse, pass 2
+         *
+         * In this pass, we resolve forward references and other things
+         * that could not be completed during the first pass.
+         * Another complete parse of the AML is performed, but the
+         * overhead of this is compensated for by the fact that the
+         * parse objects are all cached.
+         */
+        ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 2\n"));
+        Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2,
+            TableIndex, StartNode);
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
     }
 
     return_ACPI_STATUS (Status);

@@ -1,8 +1,8 @@
-/*******************************************************************************
+/******************************************************************************
  *
- * Module Name: rsmem24 - Memory resource descriptors
+ * Module Name: acapps - common include for ACPI applications/tools
  *
- ******************************************************************************/
+ *****************************************************************************/
 
 /******************************************************************************
  *
@@ -149,207 +149,164 @@
  *
  *****************************************************************************/
 
-#include "acpi.h"
-#include "accommon.h"
-#include "acresrc.h"
+#ifndef _ACCONVERT
+#define _ACCONVERT
 
-#define _COMPONENT          ACPI_RESOURCES
-        ACPI_MODULE_NAME    ("rsmemory")
+/* Definitions for comment state */
 
+#define ASL_COMMENT_STANDARD    1
+#define ASLCOMMENT_INLINE       2
+#define ASL_COMMENT_OPEN_PAREN  3
+#define ASL_COMMENT_CLOSE_PAREN 4
+#define ASL_COMMENT_CLOSE_BRACE 5
 
-/*******************************************************************************
- *
- * AcpiRsConvertMemory24
- *
- ******************************************************************************/
+/* Definitions for comment print function*/
 
-ACPI_RSCONVERT_INFO     AcpiRsConvertMemory24[4] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_MEMORY24,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_MEMORY24),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsConvertMemory24)},
-
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_MEMORY24,
-                        sizeof (AML_RESOURCE_MEMORY24),
-                        0},
-
-    /* Read/Write bit */
-
-    {ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET (Data.Memory24.WriteProtect),
-                        AML_OFFSET (Memory24.Flags),
-                        0},
-    /*
-     * These fields are contiguous in both the source and destination:
-     * Minimum Base Address
-     * Maximum Base Address
-     * Address Base Alignment
-     * Range Length
-     */
-    {ACPI_RSC_MOVE16,   ACPI_RS_OFFSET (Data.Memory24.Minimum),
-                        AML_OFFSET (Memory24.Minimum),
-                        4}
-};
+#define AML_COMMENT_STANDARD    1
+#define AMLCOMMENT_INLINE       2
+#define AML_COMMENT_END_NODE    3
+#define AML_NAMECOMMENT         4
+#define AML_COMMENT_CLOSE_BRACE 5
+#define AML_COMMENT_ENDBLK      6
+#define AML_COMMENT_INCLUDE     7
 
 
-/*******************************************************************************
- *
- * AcpiRsConvertMemory32
- *
- ******************************************************************************/
+#ifdef ACPI_ASL_COMPILER
+/*
+ * cvcompiler
+ */
+void
+CvProcessComment (
+    ASL_COMMENT_STATE       CurrentState,
+    char                    *StringBuffer,
+    int                     c1);
 
-ACPI_RSCONVERT_INFO     AcpiRsConvertMemory32[4] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_MEMORY32,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_MEMORY32),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsConvertMemory32)},
+void
+CvProcessCommentType2 (
+    ASL_COMMENT_STATE       CurrentState,
+    char                    *StringBuffer);
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_MEMORY32,
-                        sizeof (AML_RESOURCE_MEMORY32),
-                        0},
+UINT32
+CvCalculateCommentLengths(
+   ACPI_PARSE_OBJECT        *Op);
 
-    /* Read/Write bit */
+void
+CvProcessCommentState (
+    char                    input);
 
-    {ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET (Data.Memory32.WriteProtect),
-                        AML_OFFSET (Memory32.Flags),
-                        0},
-    /*
-     * These fields are contiguous in both the source and destination:
-     * Minimum Base Address
-     * Maximum Base Address
-     * Address Base Alignment
-     * Range Length
-     */
-    {ACPI_RSC_MOVE32,   ACPI_RS_OFFSET (Data.Memory32.Minimum),
-                        AML_OFFSET (Memory32.Minimum),
-                        4}
-};
+char*
+CvAppendInlineComment (
+    char                    *InlineComment,
+    char                    *ToAdd);
 
+void
+CvAddToCommentList (
+    char*                   ToAdd);
 
-/*******************************************************************************
- *
- * AcpiRsConvertFixedMemory32
- *
- ******************************************************************************/
+void
+CvPlaceComment (
+    UINT8                   Type,
+    char                    *CommentString);
 
-ACPI_RSCONVERT_INFO     AcpiRsConvertFixedMemory32[4] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_FIXED_MEMORY32,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_FIXED_MEMORY32),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsConvertFixedMemory32)},
+UINT32
+CvParseOpBlockType (
+    ACPI_PARSE_OBJECT       *Op);
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_FIXED_MEMORY32,
-                        sizeof (AML_RESOURCE_FIXED_MEMORY32),
-                        0},
+ACPI_COMMENT_NODE*
+CvCommentNodeCalloc (
+    void);
 
-    /* Read/Write bit */
+void
+CgWriteAmlDefBlockComment (
+    ACPI_PARSE_OBJECT       *Op);
 
-    {ACPI_RSC_1BITFLAG, ACPI_RS_OFFSET (Data.FixedMemory32.WriteProtect),
-                        AML_OFFSET (FixedMemory32.Flags),
-                        0},
-    /*
-     * These fields are contiguous in both the source and destination:
-     * Base Address
-     * Range Length
-     */
-    {ACPI_RSC_MOVE32,   ACPI_RS_OFFSET (Data.FixedMemory32.Address),
-                        AML_OFFSET (FixedMemory32.Address),
-                        2}
-};
+void
+CgWriteOneAmlComment (
+    ACPI_PARSE_OBJECT       *Op,
+    char*                   CommentToPrint,
+    UINT8                   InputOption);
+
+void
+CgWriteAmlComment (
+    ACPI_PARSE_OBJECT       *Op);
 
 
-/*******************************************************************************
- *
- * AcpiRsGetVendorSmall
- *
- ******************************************************************************/
+/*
+ * cvparser
+ */
+void
+CvInitFileTree (
+    ACPI_TABLE_HEADER       *Table,
+    UINT8                   *AmlStart,
+    UINT32                  AmlLength);
 
-ACPI_RSCONVERT_INFO     AcpiRsGetVendorSmall[3] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_VENDOR,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_VENDOR),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsGetVendorSmall)},
+void
+CvClearOpComments (
+    ACPI_PARSE_OBJECT       *Op);
 
-    /* Length of the vendor data (byte count) */
+ACPI_FILE_NODE*
+CvFilenameExists (
+    char                    *Filename,
+    ACPI_FILE_NODE           *Head);
 
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        sizeof (UINT8)},
+void
+CvLabelFileNode (
+    ACPI_PARSE_OBJECT       *Op);
 
-    /* Vendor data */
+void
+CvCaptureListComments (
+    ACPI_PARSE_STATE        *ParserState,
+    ACPI_COMMENT_NODE       *ListHead,
+    ACPI_COMMENT_NODE       *ListTail);
 
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_SMALL_HEADER),
-                        0}
-};
+void
+CvCaptureCommentsOnly (
+    ACPI_PARSE_STATE        *ParserState);
 
+void
+CvCaptureComments (
+    ACPI_WALK_STATE         *WalkState);
 
-/*******************************************************************************
- *
- * AcpiRsGetVendorLarge
- *
- ******************************************************************************/
+void
+CvTransferComments (
+    ACPI_PARSE_OBJECT       *Op);
 
-ACPI_RSCONVERT_INFO     AcpiRsGetVendorLarge[3] =
-{
-    {ACPI_RSC_INITGET,  ACPI_RESOURCE_TYPE_VENDOR,
-                        ACPI_RS_SIZE (ACPI_RESOURCE_VENDOR),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsGetVendorLarge)},
+/*
+ * cvdisasm
+ */
+void
+CvSwitchFiles (
+    UINT32                  level,
+    ACPI_PARSE_OBJECT       *op);
 
-    /* Length of the vendor data (byte count) */
-
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        sizeof (UINT8)},
-
-    /* Vendor data */
-
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_LARGE_HEADER),
-                        0}
-};
+BOOLEAN
+CvFileHasSwitched (
+    ACPI_PARSE_OBJECT       *Op);
 
 
-/*******************************************************************************
- *
- * AcpiRsSetVendor
- *
- ******************************************************************************/
+void
+CvCloseParenWriteComment (
+    ACPI_PARSE_OBJECT       *Op,
+    UINT32                  Level);
 
-ACPI_RSCONVERT_INFO     AcpiRsSetVendor[7] =
-{
-    /* Default is a small vendor descriptor */
+void
+CvCloseBraceWriteComment (
+    ACPI_PARSE_OBJECT       *Op,
+    UINT32                  Level);
 
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_VENDOR_SMALL,
-                        sizeof (AML_RESOURCE_SMALL_HEADER),
-                        ACPI_RSC_TABLE_SIZE (AcpiRsSetVendor)},
+void
+CvPrintOneCommentList (
+    ACPI_COMMENT_NODE       *CommentList,
+    UINT32                  Level);
 
-    /* Get the length and copy the data */
+void
+CvPrintOneCommentType (
+    ACPI_PARSE_OBJECT       *Op,
+    UINT8                   CommentType,
+    char*                   EndStr,
+    UINT32                  Level);
 
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        0},
 
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_SMALL_HEADER),
-                        0},
+#endif
 
-    /*
-     * All done if the Vendor byte length is 7 or less, meaning that it will
-     * fit within a small descriptor
-     */
-    {ACPI_RSC_EXIT_LE,  0, 0, 7},
-
-    /* Must create a large vendor descriptor */
-
-    {ACPI_RSC_INITSET,  ACPI_RESOURCE_NAME_VENDOR_LARGE,
-                        sizeof (AML_RESOURCE_LARGE_HEADER),
-                        0},
-
-    {ACPI_RSC_COUNT16,  ACPI_RS_OFFSET (Data.Vendor.ByteLength),
-                        0,
-                        0},
-
-    {ACPI_RSC_MOVE8,    ACPI_RS_OFFSET (Data.Vendor.ByteData[0]),
-                        sizeof (AML_RESOURCE_LARGE_HEADER),
-                        0}
-};
+#endif /* _ACCONVERT */
