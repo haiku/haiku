@@ -156,7 +156,7 @@ struct MulticastStateHash {
 	bool CompareValues(ValueType* value1, ValueType* value2) const
 		{ return value1->Interface()->index == value2->Interface()->index
 			&& value1->Address().s_addr == value2->Address().s_addr; }
-	ValueType*& GetLink(ValueType* value) const { return value->HashLink(); }
+	ValueType*& GetLink(ValueType* value) const { return value->MulticastGroupsHashLink(); }
 };
 
 

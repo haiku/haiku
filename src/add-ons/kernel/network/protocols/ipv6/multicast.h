@@ -188,6 +188,7 @@ public:
 	};
 
 	MulticastGroupInterface*& HashLink() { return fLink; }
+	MulticastGroupInterface*& MulticastGroupsHashLink() { return fMulticastGroupsLink; }
 
 private:
 	// for g++ 2.95
@@ -199,6 +200,7 @@ private:
 	FilterMode fFilterMode;
 	AddressSet fAddresses;
 	MulticastGroupInterface* fLink;
+	MulticastGroupInterface* fMulticastGroupsLink;
 };
 
 
