@@ -15,18 +15,21 @@
 #include <LayoutUtils.h>
 
 
-StripeView::StripeView(BBitmap* icon)
+static const float kTopOffset = 10.0f;
+
+
+StripeView::StripeView(BBitmap& icon)
 	:
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon),
-	fWidth(0.0),
-	fStripeWidth(0.0)
+	fIconSize(0.0),
+	fWidth(0.0)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	if (icon != NULL) {
-		fStripeWidth = icon->Bounds().Width();
-		fWidth = 2 * fStripeWidth + 2.0f;
+	if (fIcon.IsValid()) {
+		fIconSize = fIcon.Bounds().Width();
+		fWidth = 2 * fIconSize + 2.0f;
 	}
 }
 
@@ -34,20 +37,20 @@ StripeView::StripeView(BBitmap* icon)
 void
 StripeView::Draw(BRect updateRect)
 {
-	if (fIcon == NULL)
+	if (fIconSize == 0)
 		return;
 
 	SetHighColor(ViewColor());
 	FillRect(updateRect);
 
 	BRect stripeRect = Bounds();
-	stripeRect.right = fStripeWidth;
+	stripeRect.right = fIconSize;
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fIcon, BPoint(fStripeWidth / 2.0f, 10.0f));
+	DrawBitmapAsync(&fIcon, BPoint(fIconSize / 2.0f, kTopOffset));
 }
 
 
@@ -65,7 +68,7 @@ StripeView::GetPreferredSize(float* _width, float* _height)
 		*_width = fWidth;
 
 	if (_height != NULL)
-		*_height = fStripeWidth + 20.0f;
+		*_height = fIconSize + 2 * kTopOffset;
 }
 
 

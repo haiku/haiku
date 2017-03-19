@@ -19,7 +19,6 @@ public:
 		status_t				Perform();
 
 private:
-
 		UpdateManager*			fUpdateManager;
 };
 

@@ -23,6 +23,7 @@ enum {
 	STATE_DISPLAY_PROGRESS,
 	STATE_GET_CONFIRMATION,
 	STATE_APPLY_UPDATES,
+	STATE_FINAL_MESSAGE,
 	STATE_MAX
 };
 
@@ -33,6 +34,7 @@ static const uint32 kMsgCancel = 'iCAN';
 static const uint32 kMsgCancelResponse = 'iCRE';
 static const uint32 kMsgUpdateConfirmed = 'iCON';
 static const uint32 kMsgWarningDismissed = 'iWDI';
+static const uint32 kMsgNetworkAlert = 'iNAL';
 static const uint32 kMsgRegister = 'iREG';
 static const uint32 kMsgFinalQuit = 'iFIN';
 
@@ -43,6 +45,7 @@ static const uint32 kMsgFinalQuit = 'iFIN';
 #define kKeyPackageCount "key_packagecount"
 #define kKeyPercentage "key_percentage"
 #define kKeyMessenger "key_messenger"
+#define kKeyAlertResult "key_alertresult"
 
 
 #endif // CONSTANTS_H

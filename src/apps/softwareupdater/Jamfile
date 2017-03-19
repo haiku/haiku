@@ -15,6 +15,6 @@ Application SoftwareUpdater :
 	# package_daemon
 	ProblemWindow.cpp
 	
-	: be localestub package translation [ TargetLibsupc++ ]
+	: be localestub package translation libbnetapi.so [ TargetLibsupc++ ]
 	: SoftwareUpdater.rdef
 ;

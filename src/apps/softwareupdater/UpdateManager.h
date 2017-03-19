@@ -30,18 +30,16 @@ public:
 									BPackageKit::BPackageInstallationLocation location);
 								~UpdateManager();
 
+			void				CheckNetworkConnection();
 	virtual	void				JobFailed(BSupportKit::BJob* job);
 	virtual	void				JobAborted(BSupportKit::BJob* job);
-	
 			void				FinalUpdate(const char* header,
 									const char* text);
 private:
 	// UserInteractionHandler
 	virtual	void				HandleProblems();
 	virtual	void				ConfirmChanges(bool fromMostSpecific);
-
 	virtual	void				Warn(status_t error, const char* format, ...);
-
 
 	virtual	void				ProgressPackageDownloadStarted(
 									const char* packageName);
@@ -85,7 +83,6 @@ private:
 									fClientInstallationInterface;
 			
 			SoftwareUpdaterWindow*	fStatusWindow;
-			FinalWindow*			fFinalWindow;
 			ProblemWindow*			fProblemWindow;
 			uint32					fCurrentStep;
 			bool					fChangesConfirmed;

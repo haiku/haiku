@@ -39,7 +39,6 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fUpdateButton(NULL),
 	fCancelButton(NULL),
 	fStatusBar(NULL),
-	fIcon(NULL),
 	fCurrentState(STATE_HEAD),
 	fWaitingSem(-1),
 	fWaitingForButton(false),
@@ -47,24 +46,15 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fWarningAlertCount(0)
 {
 	int32 iconSize = int(be_plain_font->Size() * 32.0 / 12.0);
-	fIcon = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
-	team_info teamInfo;
-	get_team_info(B_CURRENT_TEAM, &teamInfo);
-	app_info appInfo;
-	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-	BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, icon_size(iconSize));
-
-	fStripeView = new StripeView(fIcon);
+		// At 12 point font, icon size is 32, at 24 point it is 64
+	BBitmap icon = GetIcon(iconSize);
+	fStripeView = new StripeView(icon);
 
 	fUpdateButton = new BButton(B_TRANSLATE("Update now"),
 		new BMessage(kMsgUpdateConfirmed));
 	fUpdateButton->MakeDefault(true);
-//	fUpdateButton->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_UNSET,
-//		B_ALIGN_BOTTOM));
 	fCancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(kMsgCancel));
-//	fCancelButton->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_UNSET,
-//		B_ALIGN_BOTTOM));
 
 	fHeaderView = new BStringView("header",
 		B_TRANSLATE("Checking for updates"), B_WILL_DRAW);
@@ -134,12 +124,6 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 }
 
 
-SoftwareUpdaterWindow::~SoftwareUpdaterWindow()
-{
-	delete fIcon;
-}
-
-
 void
 SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 {
@@ -198,6 +182,12 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		
 		case kMsgCancel:
 		{
+			if (_GetState() == STATE_FINAL_MESSAGE) {
+				PostMessage(B_QUIT_REQUESTED);
+				be_app->PostMessage(kMsgFinalQuit);
+				break;
+			}
+			
 			BAlert* alert = new BAlert("cancel request", B_TRANSLATE("Updates"
 				" have not been completed, are you sure you want to quit?"),
 				B_TRANSLATE("Quit"), B_TRANSLATE("Don't quit"), NULL,
@@ -219,6 +209,7 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			fHeaderView->SetText(B_TRANSLATE("Cancelling updates"));
 			fDetailView->SetText(
 				B_TRANSLATE("Attempting to cancel the updates..."));
+			fCancelButton->SetEnabled(false);
 			Unlock();
 			fUserCancelRequested = true;
 			
@@ -243,6 +234,21 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		case kMsgWarningDismissed:
 			fWarningAlertCount--;
 			break;
+		
+		case kMsgNetworkAlert:
+		{
+			BAlert* alert = new BAlert("network_connection",
+				B_TRANSLATE_COMMENT("No active network connection was found",
+					"Alert message"),
+				B_TRANSLATE_COMMENT("Continue anyway", "Alert button label"),
+				B_TRANSLATE_COMMENT("Quit","Alert button label"),
+				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			int32 result = alert->Go();
+			BMessage reply;
+			reply.AddInt32(kKeyAlertResult, result);
+			message->SendReply(&reply);
+			break;
+		}
 		
 		default:
 			BWindow::MessageReceived(message);
@@ -314,6 +320,40 @@ SoftwareUpdaterWindow::ShowWarningAlert(const char* text)
 }
 
 
+BBitmap
+SoftwareUpdaterWindow::GetIcon(int32 iconSize)
+{
+	BBitmap icon(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
+	team_info teamInfo;
+	get_team_info(B_CURRENT_TEAM, &teamInfo);
+	app_info appInfo;
+	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
+	BNodeInfo::GetTrackerIcon(&appInfo.ref, &icon, icon_size(iconSize));
+	return icon;
+}
+
+
+BBitmap
+SoftwareUpdaterWindow::GetNotificationIcon()
+{
+	return GetIcon(B_LARGE_ICON);
+}
+
+
+void
+SoftwareUpdaterWindow::FinalUpdate(const char* header, const char* detail)
+{
+	if (_GetState() == STATE_FINAL_MESSAGE)
+		return;
+	
+	_SetState(STATE_FINAL_MESSAGE);
+	Lock();
+	fHeaderView->SetText(header);
+	fDetailView->SetText(detail);
+	Unlock();
+}
+
+
 BLayoutItem*
 SoftwareUpdaterWindow::layout_item_for(BView* view)
 {
@@ -368,6 +408,14 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 			fDefaultRect.Height() + 4 * fListView->ItemHeight(), 9999);
 		ResizeTo(defaultWidth, .75 * defaultWidth);
 	}
+	else if (fCurrentState == STATE_FINAL_MESSAGE) {
+		fPackagesLayoutItem->SetVisible(false);
+		float defaultWidth = fDefaultRect.Width();
+		float defaultHeight = fDefaultRect.Height();
+		SetSizeLimits(defaultWidth, defaultWidth, defaultHeight,
+			defaultHeight);
+		ResizeTo(defaultWidth, defaultHeight);
+	}
 	
 	// Progress bar and string view
 	// Hide detail text while showing status bar
@@ -381,6 +429,8 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	}
 	
 	// Cancel button
+	if (fCurrentState == STATE_FINAL_MESSAGE)
+ 		fCancelButton->SetLabel(B_TRANSLATE("Quit"));
 	fCancelButton->SetEnabled(fCurrentState != STATE_APPLY_UPDATES);
 	
 	Unlock();
@@ -566,7 +616,7 @@ PackageItem::SetItemHeight(const BFont* font)
 
 
 int
-PackageItem::ICompare(PackageItem* item)
+PackageItem::NameCompare(PackageItem* item)
 {
 	// sort by package name
 	return fName.ICompare(item->fName);
@@ -578,7 +628,7 @@ SortPackageItems(const BListItem* item1, const BListItem* item2)
 {
 	PackageItem* first = (PackageItem*)item1;
 	PackageItem* second = (PackageItem*)item2;
-	return first->ICompare(second);
+	return first->NameCompare(second);
 }
 
 
@@ -648,7 +698,7 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 			tooltip.Append(B_TRANSLATE_COMMENT("Updating version",
 					"Tooltip text"))
 				.Append(" ").Append(cur_ver)
-				.Append(" ").Append(B_TRANSLATE("to"))
+				.Append(" ").Append(B_TRANSLATE_COMMENT("to", "Tooltip text"))
 				.Append(" ").Append(new_ver);
 			break;
 		}
@@ -700,6 +750,10 @@ PackageListView::SortItems()
 {
 	if (fSuperUpdateItem != NULL)
 		SortItemsUnder(fSuperUpdateItem, true, SortPackageItems);
+	if (fSuperInstallItem != NULL)
+		SortItemsUnder(fSuperInstallItem, true, SortPackageItems);
+	if (fSuperUninstallItem != NULL)
+		SortItemsUnder(fSuperUninstallItem, true, SortPackageItems);
 }
 
 
@@ -713,85 +767,4 @@ PackageListView::ItemHeight()
 	if (fSuperUninstallItem != NULL)
 		return fSuperUninstallItem->GetPackageItemHeight();
 	return 0;
-}
-
-
-FinalWindow::FinalWindow(BRect rect, BPoint location, const char* header,
-	const char* detail)
-	:
-	BWindow(rect,
-		B_TRANSLATE_SYSTEM_NAME("SoftwareUpdater"), B_TITLED_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE
-		| B_NOT_CLOSABLE | B_NOT_RESIZABLE),
-	fHeaderView(NULL),
-	fDetailView(NULL),
-	fCancelButton(NULL)
-{
-	int32 iconSize = int(be_plain_font->Size() * 32.0 / 12.0);
-	fIcon = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
-	team_info teamInfo;
-	get_team_info(B_CURRENT_TEAM, &teamInfo);
-	app_info appInfo;
-	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-	BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, icon_size(iconSize));
-
-	SetSizeLimits(rect.Width(), B_SIZE_UNLIMITED, 0, B_SIZE_UNLIMITED);
-	fStripeView = new StripeView(fIcon);
-	fHeaderView = new BStringView("header", header, B_WILL_DRAW);
-	fHeaderView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	fHeaderView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
-	fDetailView = new BStringView("detail", detail, B_WILL_DRAW);
-	fDetailView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	fDetailView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
-	fCancelButton = new BButton(B_TRANSLATE("Quit"),
-		new BMessage(kMsgCancel));
-	fCancelButton->MakeDefault(true);
-	
-	BFont font;
-	fHeaderView->GetFont(&font);
-	font.SetFace(B_BOLD_FACE);
-	font.SetSize(font.Size() * 1.5);
-	fHeaderView->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
-		| B_FONT_FLAGS);
-	
-	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
-		.Add(fStripeView)
-		.AddGroup(B_VERTICAL, 0)
-			.SetInsets(0, B_USE_WINDOW_SPACING,
-				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
-			.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING)
-				.Add(fHeaderView)
-				.Add(fDetailView)
-				.AddGroup(B_HORIZONTAL)
-					.AddGlue()
-					.Add(fCancelButton)
-				.End()
-			.End()
-		.End()
-	.End();
-	
-	MoveTo(location);
-	Show();
-}
-
-
-FinalWindow::~FinalWindow()
-{
-	delete fIcon;
-}
-
-
-void
-FinalWindow::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		
-		case kMsgCancel:
-			PostMessage(B_QUIT_REQUESTED);
-			be_app->PostMessage(kMsgFinalQuit);
-			break;
-		
-		default:
-			BWindow::MessageReceived(message);
-	}
 }

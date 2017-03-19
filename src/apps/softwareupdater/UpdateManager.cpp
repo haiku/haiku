@@ -17,6 +17,10 @@
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <Message.h>
+#include <Messenger.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <Notification.h>
 
 #include <package/CommitTransactionResult.h>
@@ -45,7 +49,6 @@ UpdateManager::UpdateManager(BPackageInstallationLocation location)
 	BPackageManager::UserInteractionHandler(),
 	fClientInstallationInterface(),
 	fStatusWindow(NULL),
-	fFinalWindow(NULL),
 	fCurrentStep(ACTION_STEP_INIT),
 	fChangesConfirmed(false)
 {
@@ -58,10 +61,45 @@ UpdateManager::~UpdateManager()
 {
 	if (fStatusWindow != NULL)
 		fStatusWindow->PostMessage(B_QUIT_REQUESTED);
-	if (fFinalWindow != NULL)
-		fFinalWindow->PostMessage(B_QUIT_REQUESTED);
 	if (fProblemWindow != NULL)
 		fProblemWindow->PostMessage(B_QUIT_REQUESTED);
+}
+
+
+void
+UpdateManager::CheckNetworkConnection()
+{
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		uint32 flags = interface.Flags();
+		if ((flags & IFF_LOOPBACK) == 0
+			&& (flags & (IFF_UP | IFF_LINK)) == (IFF_UP | IFF_LINK)) {
+			return;
+		}
+	}
+	
+	// No network connection detected, display warning
+	int32 result = 0;
+	BMessenger messenger(fStatusWindow);
+	if (messenger.IsValid()) {
+		BMessage message(kMsgNetworkAlert);
+		BMessage reply;
+		messenger.SendMessage(&message, &reply);
+		reply.FindInt32(kKeyAlertResult, &result);
+	}
+	else {
+		BAlert* alert = new BAlert("network_connection",
+		B_TRANSLATE_COMMENT("No active network connection was found",
+			"Alert message"),
+		B_TRANSLATE_COMMENT("Continue anyway", "Alert button label"),
+		B_TRANSLATE_COMMENT("Quit","Alert button label"),
+		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		result = alert->Go();
+	}
+	if (result)
+		throw BAbortedByUserException();
 }
 
 
@@ -230,8 +268,11 @@ UpdateManager::Warn(status_t error, const char* format, ...)
 	else
 		printf(": %s\n", strerror(error));
 	
-	if (fStatusWindow != NULL)
+	if (fStatusWindow != NULL) {
+		if (fStatusWindow->UserCancelRequested())
+			throw BAbortedByUserException();
 		fStatusWindow->ShowWarningAlert(buffer);
+	}
 	else {
 		BString text("SoftwareUpdater:\n");
 		text.Append(buffer);
@@ -542,25 +583,18 @@ UpdateManager::_UpdateDownloadProgress(const char* header,
 void
 UpdateManager::_FinalUpdate(const char* header, const char* text)
 {
-	if (fFinalWindow != NULL)
-		return;
-	
 	BNotification notification(B_INFORMATION_NOTIFICATION);
 	notification.SetGroup("SoftwareUpdater");
 	notification.SetTitle(header);
 	notification.SetContent(text);
-	const BBitmap* icon = fStatusWindow->GetIcon();
-	if (icon != NULL)
-		notification.SetIcon(icon);
+	BBitmap icon(fStatusWindow->GetNotificationIcon());
+	if (icon.IsValid())
+		notification.SetIcon(&icon);
 	notification.Send();
 	
-	BPoint location(fStatusWindow->GetLocation());
-	BRect rect(fStatusWindow->GetDefaultRect());
-	fStatusWindow->PostMessage(B_QUIT_REQUESTED);
-	fStatusWindow = NULL;
-	
-	fFinalWindow = new FinalWindow(rect, location, header, text);
+	fStatusWindow->FinalUpdate(header, text);
 }
+
 
 void
 UpdateManager::_SetCurrentStep(int32 step)

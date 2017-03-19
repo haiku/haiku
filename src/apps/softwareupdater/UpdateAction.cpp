@@ -42,6 +42,8 @@ status_t
 UpdateAction::Perform()
 {
 	try {
+		fUpdateManager->CheckNetworkConnection();
+		
 		fUpdateManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 			| BPackageManager::B_REFRESH_REPOSITORIES);
@@ -61,10 +63,6 @@ UpdateAction::Perform()
 		fprintf(stderr, "Updates aborted by user: %s\n",
 			ex.Message().String());
 		// No need for a final message since user initiated cancel request
-		// Note: activate FinalUpdate() call for testing final message window
-		//fUpdateManager->FinalUpdate(B_TRANSLATE("Updates cancelled"),
-		//	B_TRANSLATE("No packages have been updated."));
-		// Note: comment out when testing final message window
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
 	} catch (BNothingToDoException ex) {

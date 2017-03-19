@@ -18,7 +18,7 @@
 
 class StripeView : public BView {
 public:
-							StripeView(BBitmap* icon);
+							StripeView(BBitmap& icon);
 
 	virtual void			Draw(BRect updateRect);
 	virtual BSize			PreferredSize();
@@ -26,9 +26,9 @@ public:
 	virtual	BSize			MaxSize();
 
 private:
-			BBitmap*		fIcon;
+			BBitmap			fIcon;
+			float			fIconSize;
 			float			fWidth;
-			float			fStripeWidth;
 };
 
 
