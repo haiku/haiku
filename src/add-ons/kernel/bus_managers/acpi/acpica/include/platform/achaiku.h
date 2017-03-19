@@ -181,6 +181,11 @@ struct mutex;
 #define ACPI_MACHINE_WIDTH          64
 #else
 #define ACPI_MACHINE_WIDTH          32
+/* TODO: Temporary fix for #12377
+    Use 32 bit addresses to match addr_t for now.
+*/
+#define ACPI_32BIT_PHYSICAL_ADDRESS
+
 #endif
 
 
