@@ -586,8 +586,9 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 					continue;
 				}
 
-				panic("unable to find irq routing for PCI %u:%u:%u", bus,
-					device, function);
+				dprintf("WARNING: unable to find irq routing for PCI "
+					"%" B_PRIu8 ":%" B_PRIu8 ":%" B_PRIu8 ". Device may be "
+					"unstable / broken.\n", bus, device, function);
 				return B_ERROR;
 			}
 		}
