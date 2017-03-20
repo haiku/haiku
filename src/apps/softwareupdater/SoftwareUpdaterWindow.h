@@ -87,7 +87,8 @@ private:
 class PackageListView : public BOutlineListView {
 public:
 								PackageListView();
-			virtual	void		FrameResized(float newWidth, float newHeight);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+	virtual void				MouseDown(BPoint where);
 			void				AddPackage(uint32 install_type,
 									const char* name,
 									const char* cur_ver,

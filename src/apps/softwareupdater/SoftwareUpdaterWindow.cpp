@@ -407,8 +407,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		SetSizeLimits(defaultWidth, 9999,
 			fDefaultRect.Height() + 4 * fListView->ItemHeight(), 9999);
 		ResizeTo(defaultWidth, .75 * defaultWidth);
-	}
-	else if (fCurrentState == STATE_FINAL_MESSAGE) {
+	} else if (fCurrentState == STATE_FINAL_MESSAGE) {
 		fPackagesLayoutItem->SetVisible(false);
 		float defaultWidth = fDefaultRect.Width();
 		float defaultHeight = fDefaultRect.Height();
@@ -422,8 +421,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	if (fCurrentState == STATE_DISPLAY_PROGRESS) {
 		fDetailsLayoutItem->SetVisible(false);
 		fProgressLayoutItem->SetVisible(true);
-	}
-	else {
+	} else {
 		fProgressLayoutItem->SetVisible(false);
 		fDetailsLayoutItem->SetVisible(true);
 	}
@@ -658,6 +656,17 @@ PackageListView::FrameResized(float newWidth, float newHeight)
 }
 
 
+void
+PackageListView::MouseDown(BPoint where)
+{
+	BOutlineListView::MouseDown(where);
+	BToolTip* tooltip = NULL;
+	bool found = GetToolTipAt(where, &tooltip);
+	if (found)
+		ShowToolTip(tooltip);
+}
+
+
 bool
 PackageListView::GetToolTipAt(BPoint point, BToolTip** _tip)
 {
@@ -731,7 +740,7 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 			version.SetTo("");
 			tooltip.Append(B_TRANSLATE_COMMENT("Uninstalling version",
 					"Tooltip text"))
-				.Append(" ").Append(new_ver);
+				.Append(" ").Append(cur_ver);
 			break;
 		}
 		

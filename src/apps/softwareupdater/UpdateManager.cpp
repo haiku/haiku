@@ -88,8 +88,7 @@ UpdateManager::CheckNetworkConnection()
 		BMessage reply;
 		messenger.SendMessage(&message, &reply);
 		reply.FindInt32(kKeyAlertResult, &result);
-	}
-	else {
+	} else {
 		BAlert* alert = new BAlert("network_connection",
 		B_TRANSLATE_COMMENT("No active network connection was found",
 			"Alert message"),
@@ -260,7 +259,7 @@ UpdateManager::Warn(status_t error, const char* format, ...)
 	va_list args;
 	va_start(args, format);
 	vfprintf(stderr, format, args);
-	vsnprintf(buffer, 256, format, args);
+	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
 	if (error == B_OK)
@@ -272,8 +271,7 @@ UpdateManager::Warn(status_t error, const char* format, ...)
 		if (fStatusWindow->UserCancelRequested())
 			throw BAbortedByUserException();
 		fStatusWindow->ShowWarningAlert(buffer);
-	}
-	else {
+	} else {
 		BString text("SoftwareUpdater:\n");
 		text.Append(buffer);
 		BAlert* alert = new BAlert("warning", text, B_TRANSLATE("OK"), NULL,

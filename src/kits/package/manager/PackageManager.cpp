@@ -86,7 +86,7 @@ BPackageManager::Init(uint32 flags)
 	// create the solver
 	status_t error = BSolver::Create(fSolver);
 	if (error != B_OK)
-		DIE(error, "failed to create solver");
+		DIE(error, "Failed to create solver");
 
 	if (fSystemRepository == NULL || fHomeRepository == NULL
 		|| fLocalRepository == NULL) {
@@ -126,7 +126,7 @@ BPackageManager::Init(uint32 flags)
 		error = roster.GetRepositoryNames(repositoryNames);
 		if (error != B_OK) {
 			fUserInteractionHandler->Warn(error,
-				"failed to get repository names");
+				"Failed to get repository names");
 		}
 
 		int32 repositoryNameCount = repositoryNames.CountStrings();
@@ -168,10 +168,10 @@ BPackageManager::Install(const BSolverPackageSpecifierList& packages)
 	status_t error = fSolver->Install(packages, &unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
-			DIE(error, "failed to find a match for \"%s\"",
+			DIE(error, "Failed to find a match for \"%s\"",
 				unmatchedSpecifier->SelectString().String());
 		} else
-			DIE(error, "failed to compute packages to install");
+			DIE(error, "Failed to compute packages to install");
 	}
 
 	_HandleProblems();
@@ -205,10 +205,10 @@ BPackageManager::Uninstall(const BSolverPackageSpecifierList& packages)
 		BSolver::B_FIND_INSTALLED_ONLY, foundPackages, &unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
-			DIE(error, "failed to find a match for \"%s\"",
+			DIE(error, "Failed to find a match for \"%s\"",
 				unmatchedSpecifier->SelectString().String());
 		} else
-			DIE(error, "failed to compute packages to uninstall");
+			DIE(error, "Failed to compute packages to uninstall");
 	}
 
 	// determine the inverse base package closure for the found packages
@@ -237,7 +237,7 @@ BPackageManager::Uninstall(const BSolverPackageSpecifierList& packages)
 	for (;;) {
 		error = fSolver->VerifyInstallation(BSolver::B_VERIFY_ALLOW_UNINSTALL);
 		if (error != B_OK)
-			DIE(error, "failed to compute packages to uninstall");
+			DIE(error, "Failed to compute packages to uninstall");
 
 		_HandleProblems();
 
@@ -296,10 +296,10 @@ BPackageManager::Update(const BSolverPackageSpecifierList& packages)
 		&unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
-			DIE(error, "failed to find a match for \"%s\"",
+			DIE(error, "Failed to find a match for \"%s\"",
 				unmatchedSpecifier->SelectString().String());
 		} else
-			DIE(error, "failed to compute packages to update");
+			DIE(error, "Failed to compute packages to update");
 	}
 
 	_HandleProblems();
@@ -320,7 +320,7 @@ BPackageManager::FullSync()
 	// solve
 	status_t error = fSolver->FullSync();
 	if (error != B_OK)
-		DIE(error, "failed to compute packages to synchronize");
+		DIE(error, "Failed to compute packages to synchronize");
 
 	_HandleProblems();
 
@@ -340,7 +340,7 @@ BPackageManager::VerifyInstallation()
 	for (;;) {
 		status_t error = fSolver->VerifyInstallation();
 		if (error != B_OK)
-			DIE(error, "failed to compute package dependencies");
+			DIE(error, "Failed to compute package dependencies");
 
 		_HandleProblems();
 
@@ -362,7 +362,7 @@ BPackageManager::InstalledRepository&
 BPackageManager::InstallationRepository()
 {
 	if (fInstalledRepositories.IsEmpty())
-		DIE("no installation repository");
+		DIE("No installation repository");
 
 	return *fInstalledRepositories.LastItem();
 }
@@ -416,7 +416,7 @@ BPackageManager::_HandleProblems()
 
 		status_t error = fSolver->SolveAgain();
 		if (error != B_OK)
-			DIE(error, "failed to recompute packages to un/-install");
+			DIE(error, "Failed to recompute packages to un/-install");
 	}
 }
 
@@ -427,7 +427,7 @@ BPackageManager::_AnalyzeResult()
 	BSolverResult result;
 	status_t error = fSolver->GetResult(result);
 	if (error != B_OK)
-		DIE(error, "failed to compute packages to un/-install");
+		DIE(error, "Failed to compute packages to un/-install");
 
 	InstalledRepository& installationRepository = InstallationRepository();
 	PackageList& packagesToActivate
@@ -537,7 +537,7 @@ BPackageManager::_PreparePackageChanges(
 
 	status_t error = fInstallationInterface->PrepareTransaction(*transaction);
 	if (error != B_OK)
-		DIE(error, "failed to create transaction");
+		DIE(error, "Failed to create transaction");
 
 	// download the new packages and prepare the transaction
 	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
@@ -551,7 +551,7 @@ BPackageManager::_PreparePackageChanges(
 		BEntry entry;
 		error = entry.SetTo(&transaction->TransactionDirectory(), fileName);
 		if (error != B_OK)
-			DIE(error, "failed to create package entry");
+			DIE(error, "Failed to create package entry");
 
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
@@ -563,13 +563,14 @@ BPackageManager::_PreparePackageChanges(
 			status_t error = DownloadPackage(url, entry,
 				package->Info().Checksum());
 			if (error != B_OK)
-				DIE(error, "failed to download package");
+				DIE(error, "Failed to download package %s",
+					package->Info().Name().String());
 		} else if (package->Repository() != &installationRepository) {
 			// clone the existing package
 			LocalRepository* localRepository
 				= dynamic_cast<LocalRepository*>(package->Repository());
 			if (localRepository == NULL) {
-				DIE("internal error: repository %s is not a local repository",
+				DIE("Internal error: repository %s is not a local repository",
 					package->Repository()->Name().String());
 			}
 			_ClonePackageFile(localRepository, package, entry);
@@ -606,7 +607,7 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 	status_t error = fInstallationInterface->CommitTransaction(transaction,
 		transactionResult);
 	if (error != B_OK)
-		DIE(error, "failed to commit transaction");
+		DIE(error, "Failed to commit transaction");
 	if (transactionResult.Error() != B_TRANSACTION_OK)
 		DIE(transactionResult);
 
@@ -618,7 +619,7 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 			.GetEntry(&transactionDirectoryEntry)) != B_OK
 		|| (error = transactionDirectoryEntry.Remove()) != B_OK) {
 		fUserInteractionHandler->Warn(error,
-			"failed to remove transaction directory");
+			"Failed to remove transaction directory");
 	}
 
 	fUserInteractionHandler->ProgressApplyingChangesDone(
@@ -637,7 +638,7 @@ BPackageManager::_ClonePackageFile(LocalRepository* repository,
 	BPath destinationPath;
 	status_t error = entry.GetPath(&destinationPath);
 	if (error != B_OK) {
-		DIE(error, "failed to entry path of package file to install \"%s\"",
+		DIE(error, "Failed to entry path of package file to install \"%s\"",
 			package->Info().FileName().String());
 	}
 
@@ -645,7 +646,7 @@ BPackageManager::_ClonePackageFile(LocalRepository* repository,
 	// support that.
 	error = BCopyEngine().CopyEntry(sourcePath.Path(), destinationPath.Path());
 	if (error != B_OK)
-		DIE(error, "failed to copy package file \"%s\"", sourcePath.Path());
+		DIE(error, "Failed to copy package file \"%s\"", sourcePath.Path());
 }
 
 
@@ -668,7 +669,7 @@ BPackageManager::_FindBasePackage(const PackageList& packages,
 	}
 
 	if (basePackage == NULL) {
-		fUserInteractionHandler->Warn(B_OK, "package %s-%s doesn't have a "
+		fUserInteractionHandler->Warn(B_OK, "Package %s-%s doesn't have a "
 			"matching requires for its base package \"%s\"",
 			info.Name().String(), info.Version().ToString().String(),
 			info.BasePackage().String());
@@ -711,7 +712,7 @@ BPackageManager::_AddRemoteRepository(BPackageRoster& roster, const char* name,
 	status_t error = roster.GetRepositoryConfig(name, &config);
 	if (error != B_OK) {
 		fUserInteractionHandler->Warn(error,
-			"failed to get config for repository \"%s\". Skipping.", name);
+			"Failed to get config for repository \"%s\". Skipping.", name);
 		return;
 	}
 
@@ -719,7 +720,7 @@ BPackageManager::_AddRemoteRepository(BPackageRoster& roster, const char* name,
 	error = _GetRepositoryCache(roster, config, refresh, cache);
 	if (error != B_OK) {
 		fUserInteractionHandler->Warn(error,
-			"failed to get cache for repository \"%s\". Skipping.", name);
+			"Failed to get cache for repository \"%s\". Skipping.", name);
 		return;
 	}
 
@@ -744,7 +745,7 @@ BPackageManager::_GetRepositoryCache(BPackageRoster& roster,
 	status_t error = RefreshRepository(config);
 	if (error != B_OK) {
 		fUserInteractionHandler->Warn(error,
-			"refreshing repository \"%s\" failed", config.Name().String());
+			"Refreshing repository \"%s\" failed", config.Name().String());
 	}
 
 	return roster.GetRepositoryCache(config.Name(), &_cache);
@@ -893,13 +894,13 @@ BPackageManager::MiscLocalRepository::GetPackagePath(BSolverPackage* package,
 {
 	PackagePathMap::const_iterator it = fPackagePaths.find(package);
 	if (it == fPackagePaths.end()) {
-		DIE("package %s not in local repository",
+		DIE("Package %s not in local repository",
 			package->VersionedName().String());
 	}
 
 	status_t error = _path.SetTo(it->second.c_str());
 	if (error != B_OK)
-		DIE(error, "failed to init package path %s", it->second.c_str());
+		DIE(error, "Failed to init package path %s", it->second.c_str());
 }
 
 
@@ -933,14 +934,14 @@ BPackageManager::InstalledRepository::GetPackagePath(BSolverPackage* package,
 			packagesWhich = B_USER_PACKAGES_DIRECTORY;
 			break;
 		default:
-			DIE("don't know packages directory path for installation location "
+			DIE("Don't know packages directory path for installation location "
 				"\"%s\"", Name().String());
 	}
 
 	BString fileName(package->Info().FileName());
 	status_t error = find_directory(packagesWhich, &_path);
 	if (error != B_OK || (error = _path.Append(fileName)) != B_OK) {
-		DIE(error, "failed to get path of package file \"%s\" in installation "
+		DIE(error, "Failed to get path of package file \"%s\" in installation "
 			"location \"%s\"", fileName.String(), Name().String());
 	}
 }
@@ -950,10 +951,10 @@ void
 BPackageManager::InstalledRepository::DisablePackage(BSolverPackage* package)
 {
 	if (fDisabledPackages.HasItem(package))
-		DIE("package %s already disabled", package->VersionedName().String());
+		DIE("Package %s already disabled", package->VersionedName().String());
 
 	if (package->Repository() != this) {
-		DIE("package %s not in repository %s",
+		DIE("Package %s not in repository %s",
 			package->VersionedName().String(), Name().String());
 	}
 
@@ -994,7 +995,7 @@ BPackageManager::InstalledRepository::ApplyChanges()
 		i++) {
 		status_t error = AddPackage(package->Info());
 		if (error != B_OK) {
-			DIE(error, "failed to add package %s to %s repository",
+			DIE(error, "Failed to add package %s to %s repository",
 				package->Name().String(), Name().String());
 		}
 	}

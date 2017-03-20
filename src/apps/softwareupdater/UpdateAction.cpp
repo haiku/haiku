@@ -49,12 +49,13 @@ UpdateAction::Perform()
 			| BPackageManager::B_REFRESH_REPOSITORIES);
 	
 		// These values indicate that all updates should be installed
-		int packageCount = 0;
-		const char* const packages = "";
+		//int packageCount = 0;
+		//const char* const packages = "";
 
 		// perform the update
 //		fUpdateManager->SetDebugLevel(1);
-		fUpdateManager->Update(&packages, packageCount);
+		//fUpdateManager->Update(&packages, packageCount);
+		fUpdateManager->FullSync();
 	} catch (BFatalErrorException ex) {
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());
