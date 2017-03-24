@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -4894,10 +4894,8 @@ BView::MessageReceived(BMessage* message)
 	if (!message->HasSpecifiers()) {
 		switch (message->what) {
 			case B_VIEW_RESIZED:
-				// By the time the message arrives, the bounds may have
-				// changed already, that's why we don't use the values
-				// in the message itself.
-				FrameResized(fBounds.Width(), fBounds.Height());
+				FrameResized(message->GetInt32("width", 0),
+					message->GetInt32("height", 0));
 				break;
 
 			case B_VIEW_MOVED:

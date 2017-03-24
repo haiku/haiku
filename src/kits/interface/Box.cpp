@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2017 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -322,7 +322,7 @@ BBox::FrameResized(float width, float height)
 		// TODO: this must be made part of the be_control_look stuff!
 		int32 borderSize = fStyle == B_PLAIN_BORDER ? 0 : 2;
 
-		BRect invalid(bounds);
+		BRect invalid(fBounds);
 		if (fBounds.right < bounds.right) {
 			// enlarging
 			invalid.left = fBounds.right - borderSize;
@@ -351,8 +351,8 @@ BBox::FrameResized(float width, float height)
 		}
 	}
 
-	fBounds.right = bounds.right;
-	fBounds.bottom = bounds.bottom;
+	fBounds.right = fBounds.left + width;
+	fBounds.bottom = fBounds.top + height;
 }
 
 
@@ -395,6 +395,7 @@ void
 BBox::FrameMoved(BPoint newLocation)
 {
 	BView::FrameMoved(newLocation);
+	fBounds.OffsetTo(newLocation);
 }
 
 
