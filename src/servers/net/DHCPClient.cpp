@@ -39,8 +39,10 @@
 #define DHCP_CLIENT_PORT	68
 #define DHCP_SERVER_PORT	67
 
-#define DEFAULT_TIMEOUT		4	// secs
-#define MAX_TIMEOUT			64	// secs
+#define DEFAULT_TIMEOUT		0.25	// secs
+#define MAX_TIMEOUT			64		// secs
+
+#define AS_USECS(t) (1000000 * t)
 
 #define MAX_RETRIES			5
 
@@ -151,6 +153,22 @@ struct dhcp_message {
 
 	static const char* TypeToString(message_type type);
 } _PACKED;
+
+struct socket_timeout {
+	socket_timeout(int socket)
+		:
+		timeout((time_t)AS_USECS(DEFAULT_TIMEOUT)),
+		tries(0)
+	{
+		UpdateSocket(socket);
+	}
+
+	time_t timeout; // in micro secs
+	uint8 tries;
+
+	bool Shift(int socket, bigtime_t stateMaxTime, const char* device);
+	void UpdateSocket(int socket) const;
+};
 
 #define DHCP_FLAG_BROADCAST		0x8000
 
@@ -417,6 +435,39 @@ dhcp_message::TypeToString(message_type type)
 }
 
 
+void
+socket_timeout::UpdateSocket(int socket) const
+{
+	struct timeval value;
+	value.tv_sec = timeout / 1000000;
+	value.tv_usec = timeout % 1000000;
+	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
+}
+
+
+bool
+socket_timeout::Shift(int socket, bigtime_t stateMaxTime, const char* device)
+{
+	tries++;
+	timeout += timeout;
+	if (timeout > AS_USECS(MAX_TIMEOUT))
+		timeout = AS_USECS(MAX_TIMEOUT);
+
+	if (tries > MAX_RETRIES) {
+		if (stateMaxTime == -1)
+			return false;
+		bigtime_t remaining = (stateMaxTime - system_time()) / 2 + 1;
+		timeout = std::min(remaining, (bigtime_t)AS_USECS(MAX_TIMEOUT));
+	}
+
+	syslog(LOG_DEBUG, "%s: Timeout shift: %lu secs (try %lu)\n",
+		device, timeout, tries);
+
+	UpdateSocket(socket);
+	return true;
+}
+
+
 //	#pragma mark -
 
 
@@ -652,9 +703,7 @@ DHCPClient::_StateTransition(int socket, dhcp_state& state)
 	BNetworkAddress broadcast;
 	broadcast.SetToBroadcast(AF_INET, DHCP_SERVER_PORT);
 
-	time_t timeout;
-	uint32 tries;
-	_ResetTimeout(socket, state, timeout, tries);
+	socket_timeout timeout(socket);
 
 	dhcp_message discover(DHCP_DISCOVER);
 	_PrepareMessage(discover, state);
@@ -679,12 +728,11 @@ DHCPClient::_StateTransition(int socket, dhcp_state& state)
 		char buffer[2048];
 		struct sockaddr_in from;
 		socklen_t fromLength = sizeof(from);
-
 		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
 			0, (struct sockaddr*)&from, &fromLength);
 		if (bytesReceived < 0 && errno == B_TIMED_OUT) {
 			// depending on the state, we'll just try again
-			if (!_TimeoutShift(socket, state, timeout, tries))
+			if (!_TimeoutShift(socket, state, timeout))
 				return B_TIMED_OUT;
 			skipRequest = false;
 			continue;
@@ -893,60 +941,22 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 }
 
 
-void
-DHCPClient::_ResetTimeout(int socket, dhcp_state& state, time_t& timeout,
-	uint32& tries)
-{
-	timeout = DEFAULT_TIMEOUT;
-	tries = 0;
-
-	struct timeval value;
-	value.tv_sec = timeout;
-	value.tv_usec = rand() % 1000000;
-	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
-}
-
-
 bool
-DHCPClient::_TimeoutShift(int socket, dhcp_state& state, time_t& timeout,
-	uint32& tries)
+DHCPClient::_TimeoutShift(int socket, dhcp_state& state,
+	socket_timeout& timeout)
 {
-	if (state == RENEWING && system_time() > fRebindingTime) {
-		state = REBINDING;
+	bigtime_t stateMaxTime = -1;
+	if (state == RENEWING)
+		stateMaxTime = fRebindingTime;
+	else if (state == REBINDING)
+		stateMaxTime = fLeaseTime;
+
+	if (system_time() > stateMaxTime) {
+		state = state == REBINDING ? INIT : REBINDING;
 		return false;
 	}
 
-	if (state == REBINDING && system_time() > fLeaseTime) {
-		state = INIT;
-		return false;
-	}
-
-	tries++;
-	timeout += timeout;
-	if (timeout > MAX_TIMEOUT)
-		timeout = MAX_TIMEOUT;
-
-	if (tries > MAX_RETRIES) {
-		bigtime_t remaining = 0;
-		if (state == RENEWING)
-			remaining = (fRebindingTime - system_time()) / 2 + 1;
-		else if (state == REBINDING)
-			remaining = (fLeaseTime - system_time()) / 2 + 1;
-		else
-			return false;
-
-		timeout = std::max(remaining / 1000000, bigtime_t(60));
-	}
-
-	syslog(LOG_DEBUG, "%s: Timeout shift: %lu secs (try %lu)\n",
-		Device(), timeout, tries);
-
-	struct timeval value;
-	value.tv_sec = timeout;
-	value.tv_usec = rand() % 1000000;
-	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &value, sizeof(value));
-
-	return true;
+	return timeout.Shift(socket, stateMaxTime, Device());
 }
 
 
