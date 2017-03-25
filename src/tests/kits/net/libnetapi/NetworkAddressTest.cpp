@@ -52,14 +52,16 @@ NetworkAddressTest::TestSetTo()
 	CPPUNIT_ASSERT(address.Family() == AF_INET);
 	CPPUNIT_ASSERT(address == BNetworkAddress(htonl(INADDR_LOOPBACK)));
 
-	CPPUNIT_ASSERT(address.SetTo("::1") == B_OK);
+	CPPUNIT_ASSERT(address.SetTo("::1", (uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES) == B_OK);
 	CPPUNIT_ASSERT(address.Family() == AF_INET6);
 	CPPUNIT_ASSERT(address == BNetworkAddress(in6addr_loopback));
 
 	CPPUNIT_ASSERT(address.SetTo(AF_INET, "::1") != B_OK);
 	CPPUNIT_ASSERT(address.SetTo(AF_INET6, "127.0.0.1") != B_OK);
 	CPPUNIT_ASSERT(address.SetTo(AF_INET, "127.0.0.1") == B_OK);
-	CPPUNIT_ASSERT(address.SetTo(AF_INET6, "::1") == B_OK);
+	CPPUNIT_ASSERT(address.SetTo(AF_INET6, "::1", (uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES) == B_OK);
 }
 
 
@@ -153,6 +155,22 @@ NetworkAddressTest::TestFlatten()
 }
 
 
+void
+NetworkAddressTest::TestEquals()
+{
+	BNetworkAddress v4AddressA("192.168.1.100");
+	BNetworkAddress v4AddressB("192.168.1.100");
+	BNetworkAddress v6AddressA("feed::dead:beef", (uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES);
+	BNetworkAddress v6AddressB("feed::dead:beef", (uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES);
+
+	CPPUNIT_ASSERT(v4AddressA.Equals(v4AddressB));
+	CPPUNIT_ASSERT(v6AddressA.Equals(v6AddressB));
+	CPPUNIT_ASSERT(!v4AddressA.Equals(v6AddressA));
+}
+
+
 /*static*/ void
 NetworkAddressTest::AddTests(BTestSuite& parent)
 {
@@ -173,6 +191,8 @@ NetworkAddressTest::AddTests(BTestSuite& parent)
 		"NetworkAddressTest::TestIsLocal", &NetworkAddressTest::TestIsLocal));
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
 		"NetworkAddressTest::TestFlatten", &NetworkAddressTest::TestFlatten));
+	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
+		"NetworkAddressTest::TestEquals", &NetworkAddressTest::TestEquals));
 
 	parent.addTest("NetworkAddressTest", &suite);
 }

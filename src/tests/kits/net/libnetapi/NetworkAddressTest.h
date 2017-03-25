@@ -22,6 +22,7 @@ public:
 			void				TestSetAddressFromFamilyPort();
 			void				TestIsLocal();
 			void				TestFlatten();
+			void				TestEquals();
 
 	static	void				AddTests(BTestSuite& suite);
 };
