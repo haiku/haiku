@@ -157,7 +157,7 @@ struct dhcp_message {
 struct socket_timeout {
 	socket_timeout(int socket)
 		:
-		timeout((time_t)AS_USECS(DEFAULT_TIMEOUT)),
+		timeout(time_t(AS_USECS(DEFAULT_TIMEOUT))),
 		tries(0)
 	{
 		UpdateSocket(socket);
@@ -457,7 +457,7 @@ socket_timeout::Shift(int socket, bigtime_t stateMaxTime, const char* device)
 		if (stateMaxTime == -1)
 			return false;
 		bigtime_t remaining = (stateMaxTime - system_time()) / 2 + 1;
-		timeout = std::min(remaining, (bigtime_t)AS_USECS(MAX_TIMEOUT));
+		timeout = std::max(remaining, bigtime_t(60));
 	}
 
 	syslog(LOG_DEBUG, "%s: Timeout shift: %lu secs (try %lu)\n",
