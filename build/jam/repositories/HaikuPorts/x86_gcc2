@@ -577,6 +577,7 @@ RemotePackageRepository HaikuPorts
 	timetracker-0.2-1
 	tinyxml-2.6.2-3
 	tinyxml_devel-2.6.2-3
+	tnftp-20151004-1
 	twolame-0.3.13-3
 	twolame_devel-0.3.13-3
 	ubertuber-0.9.11-2
@@ -1636,6 +1637,7 @@ RemotePackageRepository HaikuPorts
 	tig_x86
 	timetracker
 	tinyxml
+	tnftp
 	transmission_x86
 	twolame
 	twolame_x86
