@@ -3,7 +3,7 @@
 # Place user customizations in /.profile
 #
 
-ps |& grep -e $PPID |& grep -e $SHELL |& grep -q -e $PPID > /dev/null 2>&1
+ps 2>&1 | grep -e $PPID 2>&1 | grep -e $SHELL 2>&1 | grep -q -e $PPID > /dev/null 2>&1
 if [ $? -eq 1 ] ; then
 	echo -e "\nWelcome to the Haiku shell.\n"
 	export PS1="\w> "
@@ -35,7 +35,7 @@ alias ll="ls -lA"
 alias la="ls -A"
 alias m="more"
 
-shopt -s checkwinsize
+test -n "$BASH_VERSION" && shopt -s checkwinsize
 
 #
 # and now we include a few useful things...
@@ -51,7 +51,7 @@ shopt -s checkwinsize
 # Chet Ramey
 # chet@ins.CWRU.Edu
 #
-whence()
+test -n "$KSH_VERSION" || whence()
 {
 	local vflag= path=
 
@@ -106,7 +106,20 @@ whence()
 	return $returnValue
 }
 
-alias which='whence'
+if test -n "$KSH_VERSION"; then
+	ps1_pwd() {
+		local e=$? d=${PWD:-?}/ p=~
+		[[ $p = ?(*/) ]] || d=${d/#$p\//\~/}
+		print -nr -- "${d%/}"
+		return $e
+	}
+	PS1=${PS1/'\w'/'$(ps1_pwd)'}
+	alias which='whence -p'
+else
+	test -n "$BASH_VERSION" || PS1=$(printf '%s' "$PS1" | \
+	    sed 's/\\w/$PWD/')
+	alias which='whence'
+fi
 
 function dir {
 	ls -lF "$@";
