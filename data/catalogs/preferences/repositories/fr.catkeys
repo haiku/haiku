@@ -8,7 +8,7 @@ Remove this repository?	RepositoriesView	Removal alert confirmation message	Souh
 Description	TaskLooper	Failed task error description	Description
 Add	AddRepoWindow	Button label	Ajouter
 URL	RepositoriesView	Column title	URL
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dépôts n'a pas pu récupérer les noms des référentiels actuellement activés.
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Dépôts n'a pas pu récupérer les noms des dépôts actuellement activés.
 Keep trying	TaskTimer	Button label	Réessayer
 This is not a valid URL.	AddRepoWindow	Add URL error message	Cette URL n'est pas valide.
 Repository URL:	AddRepoWindow	Text box label	URL du dépôt :
