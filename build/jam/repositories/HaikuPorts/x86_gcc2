@@ -437,8 +437,8 @@ RemotePackageRepository HaikuPorts
 	netcat-1.10-2
 	netpulse-0.2.3-7
 	ocaml-4.02.1-1
-	openjpeg-2.1.0-2
-	openjpeg_devel-2.1.0-2
+	openjpeg-2.1.2-2
+	openjpeg_devel-2.1.2-2
 	opensound-4.2_git-2
 	openssh-7.4p1-2
 	openssl-1.0.2g-1
