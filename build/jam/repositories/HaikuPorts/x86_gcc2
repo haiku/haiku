@@ -5,7 +5,7 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	avr_libc_x86-1.8.0-2
 	be_book-2008_10_26-1
-	ca_root_certificates-2015_10_28-1
+	ca_root_certificates-2017_01_18-1
 	caladea-20130214-3
 	carlito-20130920-1
 	check_common-0.10.0-2
