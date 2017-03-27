@@ -568,8 +568,9 @@ XHCI::Start()
 
 	TRACE_ALWAYS("successfully started the controller\n");
 #ifdef TRACE_USB
-	TRACE("No-Op test\n");
-	Noop();
+	TRACE("No-Op test...\n");
+	status_t noopResult = Noop();
+	TRACE("No-Op %ssuccessful\n", noopResult < B_OK ? "un" : "");
 #endif
 	return BusManager::Start();
 }
@@ -2043,13 +2044,16 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 status_t
 XHCI::DoCommand(xhci_trb* trb)
 {
-	if (!Lock())
+	if (!Lock()) {
+		TRACE("Unable to get lock!\n");
 		return B_ERROR;
+	}
 
 	QueueCommand(trb);
 	Ring(0, 0);
 
 	if (acquire_sem(fCmdCompSem) < B_OK) {
+		TRACE("Unable to obtain fCmdCompSem semaphore!\n");
 		Unlock();
 		return B_ERROR;
 	}
@@ -2082,7 +2086,7 @@ XHCI::DoCommand(xhci_trb* trb)
 status_t
 XHCI::Noop()
 {
-	TRACE("Noop\n");
+	TRACE("Issue No-Op\n");
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
