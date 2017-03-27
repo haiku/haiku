@@ -245,6 +245,7 @@ m_free(struct mbuf *memoryBuffer)
 }
 
 
+void
 m_extadd(struct mbuf *memoryBuffer, caddr_t buffer, u_int size,
     void (*freeHook)(void *, void *), void *arg1, void *arg2, int flags, int type)
 {
