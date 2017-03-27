@@ -245,23 +245,12 @@ m_free(struct mbuf *memoryBuffer)
 }
 
 
-// TODO once all driver are updated to FreeBSD 8 this can be changed
-#if __FreeBSD_version__ >= 8
 m_extadd(struct mbuf *memoryBuffer, caddr_t buffer, u_int size,
     void (*freeHook)(void *, void *), void *arg1, void *arg2, int flags, int type)
 {
 	// TODO: implement?
 	panic("m_extadd() called.");
 }
-#else
-void
-m_extadd(struct mbuf *memoryBuffer, caddr_t buffer, u_int size,
-    void (*freeHook)(void *, void *), void *args, int flags, int type)
-{
-	// TODO: implement?
-	panic("m_extadd() called.");
-}
-#endif
 
 
 status_t

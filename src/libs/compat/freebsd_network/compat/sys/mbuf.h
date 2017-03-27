@@ -76,15 +76,8 @@
 #define CSUM_PSEUDO_HDR	0x0800
 #define CSUM_DELAY_DATA	(CSUM_TCP | CSUM_UDP)
 
-// TODO After all network driver are updated to the FreeBSD 8 version this can
-// changed
-#if __FreeBSD_version__ >= 8
 #define MEXTADD(m, buf, size, free, arg1, arg2, flags, type) \
 	m_extadd((m), (caddr_t)(buf), (size), (free),(arg1),(arg2),(flags), (type))
-#else
-#define MEXTADD(m, buf, size, free, args, flags, type) \
-	m_extadd((m), (caddr_t)(buf), (size), (free),(args),(flags), (type))
-#endif
 
 
 extern int max_linkhdr;
@@ -171,15 +164,8 @@ struct mbuf*	m_devget(char*, int, int, struct ifnet*,
 struct mbuf*	m_dup(struct mbuf*, int);
 int				m_dup_pkthdr(struct mbuf*, struct mbuf*, int);
 
-// TODO After all network driver are updated to the FreeBSD 8 version this can
-// changed
-#if __FreeBSD_version__ >= 8
 void			m_extadd(struct mbuf*, caddr_t, u_int, void(*) (void*, void*),
 	void*, void*, int, int);
-#else
-void 			m_extadd(struct mbuf*, caddr_t, u_int, void(*) (void*, void*),
-	void*, int, int);
-#endif
 
 u_int			m_fixhdr(struct mbuf*);
 struct mbuf*	m_free(struct mbuf*);
