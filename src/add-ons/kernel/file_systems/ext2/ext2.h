@@ -194,6 +194,7 @@ struct ext2_super_block {
 #define	EXT2_STATE_INVALID						0x02
 
 #define EXT2_BLOCK_GROUP_NORMAL_SIZE			32
+#define EXT2_BLOCK_GROUP_64BIT_SIZE				64
 
 // block group flags
 #define EXT2_BLOCK_GROUP_INODE_UNINIT	0x1

@@ -202,9 +202,21 @@ DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 bool
 ext2_super_block::IsValid()
 {
-	// TODO: check some more values!
-	if (Magic() != (uint32)EXT2_SUPER_BLOCK_MAGIC)
+	if (Magic() != (uint32)EXT2_SUPER_BLOCK_MAGIC
+			|| BlockShift() > 16
+			|| BlocksPerGroup() != (1UL << BlockShift()) * 8
+			|| InodeSize() > (1UL << BlockShift())
+			|| RevisionLevel() > EXT2_MAX_REVISION
+			|| ReservedGDTBlocks() > (1UL << BlockShift()) / 4)
 		return false;
+	if (Has64bitFeature()) {
+		if (GroupDescriptorSize() > EXT2_BLOCK_GROUP_64BIT_SIZE	 || GroupDescriptorSize() < EXT2_BLOCK_GROUP_NORMAL_SIZE)
+			return false;
+	}
+	else {
+		if (GroupDescriptorSize() != EXT2_BLOCK_GROUP_NORMAL_SIZE)
+			return false;
+	}
 	
 	return true;
 }
