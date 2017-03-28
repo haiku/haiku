@@ -165,7 +165,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		+ offset + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	TRACE("map physical memory 0x%08" B_PRIx32 " : 0x%08" B_PRIx32 " "
-		"(base: 0x%08" B_PRIxPHYSADDR "; offset: %" B_PRIx32 ");"
+		"(base: 0x%08" B_PRIxPHYSADDR "; offset: 0x%" B_PRIx32 ");"
 		"size: %" B_PRId32 "\n", fPCIInfo->u.h0.base_registers[0],
 		fPCIInfo->u.h0.base_registers[1], physicalAddress, offset,
 		fPCIInfo->u.h0.base_register_sizes[0]);
@@ -572,6 +572,9 @@ XHCI::Start()
 	status_t noopResult = Noop();
 	TRACE("No-Op %ssuccessful\n", noopResult < B_OK ? "un" : "");
 #endif
+
+	//DumpRing(fCmdRing, (XHCI_MAX_COMMANDS - 1));
+
 	return BusManager::Start();
 }
 
@@ -1910,7 +1913,8 @@ XHCI::Interrupt()
 	}
 
 	if ((status & STS_EINT) == 0) {
-		TRACE("STS: %" B_PRIx32 " IRQ_PENDING: %" B_PRIx32 "\n", status, temp);
+		TRACE("STS: 0x%" B_PRIx32 " IRQ_PENDING: 0x%" B_PRIx32 "\n",
+			status, temp);
 		return B_UNHANDLED_INTERRUPT;
 	}
 
@@ -1944,7 +1948,7 @@ XHCI::QueueCommand(xhci_trb* trb)
 	i = fCmdIdx;
 	j = fCmdCcs;
 
-	TRACE("command[%u] = %" B_PRIx32 " (0x%016" B_PRIx64 ", 0x%08" B_PRIx32
+	TRACE("command[%u] = %" B_PRId32 " (0x%016" B_PRIx64 ", 0x%08" B_PRIx32
 		", 0x%08" B_PRIx32 ")\n", i, TRB_3_TYPE_GET(trb->dwtrb3), trb->qwtrb0,
 		trb->dwtrb2, trb->dwtrb3);
 
@@ -2038,6 +2042,25 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		}
 	}
 
+}
+
+
+void
+XHCI::DumpRing(xhci_trb *trbs, uint32 size)
+{
+	if (!Lock()) {
+		TRACE("Unable to get lock!\n");
+		return;
+	}
+
+	for (uint32 i = 0; i < size; i++) {
+		TRACE("command[%" B_PRId32 "] = %" B_PRId32 " (0x%016" B_PRIx64 ","
+			" 0x%08" B_PRIx32 ", 0x%08" B_PRIx32 ")\n", i,
+			TRB_3_TYPE_GET(B_LENDIAN_TO_HOST_INT32(trbs[i].dwtrb3)),
+			trbs[i].qwtrb0, trbs[i].dwtrb2, trbs[i].dwtrb3);
+	}
+
+	Unlock();
 }
 
 

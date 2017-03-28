@@ -155,6 +155,7 @@ private:
 									xhci_endpoint *endpoint);
 
 			// Command
+			void				DumpRing(xhci_trb *trb, uint32 size);
 			void				QueueCommand(xhci_trb *trb);
 			void				HandleCmdComplete(xhci_trb *trb);
 			void				HandleTransferComplete(xhci_trb *trb);
