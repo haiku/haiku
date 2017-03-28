@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2014-2017, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -113,7 +113,7 @@ MidiSettingsView::MessageReceived(BMessage* message)
 			} else if (olditem != NULL) {
 				for (int32 i = 0; i < fListView->CountItems(); i++) {
 					BStringItem* item = (BStringItem*)fListView->ItemAt(i);
-					if (!strcmp(item->Text(), olditem->Text())) {
+					if (strcmp(item->Text(), olditem->Text()) == 0) {
 						fListView->Select(i);
 						break;
 					}
@@ -200,17 +200,17 @@ MidiSettingsView::_LoadSettings()
 {
 	struct BPrivate::midi_settings settings;
 	if (BPrivate::read_midi_settings(&settings) == B_OK)
-		fActiveSoundFont = new BString(settings.soundfont_file);
+		fActiveSoundFont.SetTo(settings.soundfont_file);
 }
 
 
 void
 MidiSettingsView::_SaveSettings()
 {
-	fActiveSoundFont = new BString(_SelectedSoundFont());
-	if (fActiveSoundFont->Length() > 0) {
+	fActiveSoundFont = _SelectedSoundFont();
+	if (fActiveSoundFont.Length() > 0) {
 		struct BPrivate::midi_settings settings;
-		strlcpy(settings.soundfont_file, fActiveSoundFont->String(),
+		strlcpy(settings.soundfont_file, fActiveSoundFont.String(),
 			sizeof(settings.soundfont_file));
 		BPrivate::write_midi_settings(settings);
 	}
@@ -228,7 +228,7 @@ MidiSettingsView::_SelectActiveSoundFont()
 	}
 	for (int32 i = 0; i < fListView->CountItems(); i++) {
 		BStringItem* item = (BStringItem*)fListView->ItemAt(i);
-		if (!strcmp(item->Text(), fActiveSoundFont->String())) {
+		if (strcmp(item->Text(), fActiveSoundFont.String()) == 0) {
 			fListView->Select(i);
 			break;
 		}

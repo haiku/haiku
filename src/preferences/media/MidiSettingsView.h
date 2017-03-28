@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016, Haiku, Inc. All rights reserved.
+ * Copyright 2014-2017, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,11 +7,12 @@
 #define MIDIVIEW_H_
 
 
+#include <String.h>
+
 #include "MediaViews.h"
 
 class BButton;
 class BListView;
-class BString;
 class BStringView;
 
 class MidiSettingsView : public SettingsView {
@@ -32,7 +33,7 @@ private:
 	void			_UpdateSoundFontStatus();
 
 	BListView*		fListView;
-	BString*		fActiveSoundFont;
+	BString			fActiveSoundFont;
 	BStringView*	fSoundFontStatus;
 };
 
