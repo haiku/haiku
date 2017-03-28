@@ -27,6 +27,7 @@
 #	define TRACE(x...) ;
 #endif
 #define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
+#define WARN(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
 class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
@@ -933,7 +934,7 @@ Journal::_RecoverPassRevoke(uint32 lastCommitID)
 			if (status != B_OK)
 				return status;
 		} else {
-				// TODO: Warn that we found an unrecognized block
+			WARN("Journal::_RecoverPassRevoke(): Found an unrecognized block\n");
 			break;
 		}
 
@@ -1045,7 +1046,7 @@ Journal::_RecoverPassReplay(uint32 lastCommitID)
 		} else if (blockType == JOURNAL_COMMIT_BLOCK)
 			nextCommitID++;
 		else if (blockType != JOURNAL_REVOKE_BLOCK) {
-				// TODO: Warn that we found an unrecognized block
+			WARN("Journal::_RecoverPassReplay(): Found an unrecognized block\n");
 			break;
 		} // If blockType == JOURNAL_REVOKE_BLOCK we just skip it
 
