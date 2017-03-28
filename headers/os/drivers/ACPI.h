@@ -15,8 +15,8 @@ typedef union acpi_object_type acpi_object_type;
 
 #define B_ACPI_MODULE_NAME "bus_managers/acpi/v1"
 
-typedef addr_t acpi_physical_address;
-typedef addr_t acpi_io_address;
+typedef phys_addr_t acpi_physical_address;
+typedef phys_addr_t acpi_io_address;
 typedef size_t acpi_size;
 
 /* Actually a ptr to a NS Node */
