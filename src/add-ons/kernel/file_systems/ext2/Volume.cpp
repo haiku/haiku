@@ -207,15 +207,8 @@ ext2_super_block::IsValid()
 			|| BlocksPerGroup() != (1UL << BlockShift()) * 8
 			|| InodeSize() > (1UL << BlockShift())
 			|| RevisionLevel() > EXT2_MAX_REVISION
-			|| ReservedGDTBlocks() > (1UL << BlockShift()) / 4)
+			|| ReservedGDTBlocks() > (1UL << BlockShift()) / 4) {
 		return false;
-	if (Has64bitFeature()) {
-		if (GroupDescriptorSize() > EXT2_BLOCK_GROUP_64BIT_SIZE	 || GroupDescriptorSize() < EXT2_BLOCK_GROUP_NORMAL_SIZE)
-			return false;
-	}
-	else {
-		if (GroupDescriptorSize() != EXT2_BLOCK_GROUP_NORMAL_SIZE)
-			return false;
 	}
 	
 	return true;
