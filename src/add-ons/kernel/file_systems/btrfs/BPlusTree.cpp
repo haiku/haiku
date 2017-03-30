@@ -116,7 +116,7 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 		}
 		TRACE("Find() getting index %" B_PRIu32 " at %" B_PRId64 "\n", i - 1,
 			stream->index[i - 1].BlockNum());
-		
+
 		if (fVolume->FindBlock(stream->index[i - 1].BlockNum(), physical)
 			!= B_OK) {
 			ERROR("Find() unmapped block %" B_PRId64 "\n",
@@ -132,14 +132,14 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 	for (i = 0; i < stream->header.ItemCount(); i++) {
 		int32 comp = _CompareKeys(key, stream->entries[i].key);
 		TRACE("Find() dump %" B_PRIu32 " %" B_PRIu32 " offset %" B_PRId64
-			" comp %" B_PRId32 "\n", stream->entries[i].Offset(), 
+			" comp %" B_PRId32 "\n", stream->entries[i].Offset(),
 			stream->entries[i].Size(), stream->entries[i].key.Offset(), comp);
 	}
 #endif
 
 	for (i = 0; i < stream->header.ItemCount(); i++) {
 		int32 comp = _CompareKeys(key, stream->entries[i].key);
-		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 " oid %" B_PRId64 
+		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 " oid %" B_PRId64
 			" type %d offset %" B_PRId64 " comp %" B_PRId32 "\n",
 			stream->entries[i].Offset(), stream->entries[i].Size(),
 			stream->entries[i].key.ObjectID(), stream->entries[i].key.Type(),
@@ -162,21 +162,21 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 			return B_ENTRY_NOT_FOUND;
 	}
 
-	if (i < stream->header.ItemCount() 
+	if (i < stream->header.ItemCount()
 		&& stream->entries[i].key.Type() == key.Type()) {
 		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 "\n",
 			stream->entries[i].Offset(), stream->entries[i].Size());
+
 		if (_value != NULL) {
 			*_value = malloc(stream->entries[i].Size());
 			uint32 totalOffset = stream->entries[i].Offset() + sizeof(btrfs_header);
-			key.SetOffset(stream->entries[i].key.Offset());
+
 
 			if ((fVolume->BlockSize() - totalOffset % fVolume->BlockSize())
 				>= stream->entries[i].Size()) {
 				//If there is enough space for *_value
-				stream = (btrfs_stream*)cached.SetTo(physical
-					+ totalOffset / fVolume->BlockSize());
-				memcpy(*_value, ((uint8 *)&stream->header
+				memcpy(*_value, ((uint8 *)cached.SetTo(physical
+					+ totalOffset / fVolume->BlockSize())
 					+ totalOffset % fVolume->BlockSize()),
 					stream->entries[i].Size());
 			} else {
@@ -184,12 +184,14 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 					* fVolume->BlockSize() + totalOffset,
 					*_value, stream->entries[i].Size());
 			}
+
+			key.SetOffset(stream->entries[i].key.Offset());
 			if (_size != NULL)
 				*_size = stream->entries[i].Size();
-		}	
+		}
 		return B_OK;
 	}
-	
+
 
 	TRACE("Find() not found %" B_PRId64 " %" B_PRId64 "\n", key.Offset(),
 		key.ObjectID());
