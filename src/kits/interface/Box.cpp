@@ -286,7 +286,7 @@ BBox::AttachedToWindow()
 		AdoptSystemColors();
 
 	// The box could have been resized in the mean time
-	fBounds = Bounds();
+	fBounds = Bounds().OffsetToCopy(0, 0);
 }
 
 
@@ -322,37 +322,39 @@ BBox::FrameResized(float width, float height)
 		// TODO: this must be made part of the be_control_look stuff!
 		int32 borderSize = fStyle == B_PLAIN_BORDER ? 0 : 2;
 
-		BRect invalid(fBounds);
-		if (fBounds.right < bounds.right) {
+		// Horizontal
+		BRect invalid(bounds);
+		if (fBounds.Width() < bounds.Width()) {
 			// enlarging
-			invalid.left = fBounds.right - borderSize;
-			invalid.right = fBounds.right;
+			invalid.left = bounds.left + fBounds.right - borderSize;
+			invalid.right = bounds.left + fBounds.right;
 
 			Invalidate(invalid);
-		} else if (fBounds.right > bounds.right) {
+		} else if (fBounds.Width() > bounds.Width()) {
 			// shrinking
-			invalid.left = bounds.right - borderSize;
+			invalid.left = bounds.left + bounds.right - borderSize;
 
 			Invalidate(invalid);
 		}
 
+		// Vertical
 		invalid = bounds;
-		if (fBounds.bottom < bounds.bottom) {
+		if (fBounds.Height() < bounds.Height()) {
 			// enlarging
-			invalid.top = fBounds.bottom - borderSize;
-			invalid.bottom = fBounds.bottom;
+			invalid.top = bounds.top + fBounds.bottom - borderSize;
+			invalid.bottom = bounds.top + fBounds.bottom;
 
 			Invalidate(invalid);
-		} else if (fBounds.bottom > bounds.bottom) {
+		} else if (fBounds.Height() > bounds.Height()) {
 			// shrinking
-			invalid.top = bounds.bottom - borderSize;
+			invalid.top = bounds.top + bounds.bottom - borderSize;
 
 			Invalidate(invalid);
 		}
 	}
 
-	fBounds.right = fBounds.left + width;
-	fBounds.bottom = fBounds.top + height;
+	fBounds.right = width;
+	fBounds.bottom = height;
 }
 
 
@@ -395,7 +397,6 @@ void
 BBox::FrameMoved(BPoint newLocation)
 {
 	BView::FrameMoved(newLocation);
-	fBounds.OffsetTo(newLocation);
 }
 
 
@@ -629,7 +630,7 @@ BBox::operator=(const BBox &)
 void
 BBox::_InitObject(BMessage* archive)
 {
-	fBounds = Bounds();
+	fBounds = Bounds().OffsetToCopy(0, 0);
 
 	fLabel = NULL;
 	fLabelView = NULL;
@@ -783,8 +784,6 @@ BBox::_DrawFancy(BRect labelBox)
 void
 BBox::_ClearLabel()
 {
-	fBounds.top = 0;
-
 	if (fLabel) {
 		free(fLabel);
 		fLabel = NULL;
