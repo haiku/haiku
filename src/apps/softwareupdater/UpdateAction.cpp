@@ -43,19 +43,25 @@ UpdateAction::Perform()
 {
 	try {
 		fUpdateManager->CheckNetworkConnection();
+		int32 action = fUpdateManager->GetUpdateType();
+		if (action == CANCEL_UPDATE)
+			throw BAbortedByUserException();
+		else if (action <= INVALID_SELECTION || action >= UPDATE_TYPE_END)
+			throw BException("Invalid update type, cannot continue with updates");
 		
 		fUpdateManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 			| BPackageManager::B_REFRESH_REPOSITORIES);
-	
-		// These values indicate that all updates should be installed
-		//int packageCount = 0;
-		//const char* const packages = "";
-
-		// perform the update
+		
 //		fUpdateManager->SetDebugLevel(1);
-		//fUpdateManager->Update(&packages, packageCount);
-		fUpdateManager->FullSync();
+		if(action == UPDATE) {
+			// These values indicate that all updates should be installed
+			int packageCount = 0;
+			const char* const packages = "";
+			fUpdateManager->Update(&packages, packageCount);
+		} else if (action == FULLSYNC)
+			fUpdateManager->FullSync();
+			
 	} catch (BFatalErrorException ex) {
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());

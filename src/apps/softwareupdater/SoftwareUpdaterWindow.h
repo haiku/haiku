@@ -13,11 +13,12 @@
 #include <Button.h>
 #include <GroupView.h>
 #include <OutlineListView.h>
+#include <MenuItem.h>
 #include <Point.h>
+#include <PopUpMenu.h>
 #include <ScrollView.h>
 #include <StatusBar.h>
 #include <StringView.h>
-#include <ToolTip.h>
 #include <Window.h>
 
 #include "StripeView.h"
@@ -42,13 +43,17 @@ public:
 									{ return fPackageItemHeight; };
 	BBitmap*					GetIcon() { return fPackageIcon; };
 	int16						GetIconSize() { return fIconSize; };
+	void						SetDetailLevel(bool showMoreDetails);
+	bool						GetDetailLevel() { return fShowMoreDetails; };
 
 private:
+			void				_SetHeights();
 			void				_GetPackageIcon();
 			
 			BString				fLabel;
 			BFont				fRegularFont;
 			BFont				fBoldFont;
+			bool				fShowMoreDetails;
 			font_height			fFontHeight;
 			float				fPackageItemHeight;
 			BBitmap*			fPackageIcon;
@@ -59,22 +64,22 @@ private:
 class PackageItem : public BListItem {
 public:
 								PackageItem(const char* name,
-									const char* version,
+									const char* simple_version,
+									const char* detailed_version,
+									const char* repository,
 									const char* summary,
-									const char* tooltip,
 									SuperItem* super);
-								~PackageItem();
 	virtual void				DrawItem(BView*, BRect, bool);
 	virtual void				Update(BView *owner, const BFont *font);
 	void						SetItemHeight(const BFont* font);
 	int							NameCompare(PackageItem* item);
-	BTextToolTip*				ToolTip() { return fToolTip; };
 	
 private:
 			BString				fName;
-			BString				fVersion;
+			BString				fSimpleVersion;
+			BString				fDetailedVersion;
+			BString				fRepository;
 			BString				fSummary;
-			BTextToolTip*		fToolTip;
 			BFont				fRegularFont;
 			BFont				fSmallFont;
 			font_height			fSmallFontHeight;
@@ -87,6 +92,8 @@ private:
 class PackageListView : public BOutlineListView {
 public:
 								PackageListView();
+			void				AttachedToWindow();
+	virtual void				MessageReceived(BMessage*);
 	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual void				MouseDown(BPoint where);
 			void				AddPackage(uint32 install_type,
@@ -98,13 +105,15 @@ public:
 			void				SortItems();
 			float				ItemHeight();
 
-protected:
-	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
-
 private:
+			void				_SetItemHeights();
+
 			SuperItem*			fSuperUpdateItem;
 			SuperItem*			fSuperInstallItem;
 			SuperItem*			fSuperUninstallItem;
+			bool				fShowMoreDetails;
+			BPopUpMenu			*fMenu;
+			BMenuItem			*fDetailMenuItem;
 };
 
 
@@ -112,7 +121,7 @@ class SoftwareUpdaterWindow : public BWindow {
 public:
 								SoftwareUpdaterWindow();
 			void				MessageReceived(BMessage* message);
-			bool				ConfirmUpdates(const char* text);
+			bool				ConfirmUpdates();
 			void				UpdatesApplying(const char* header,
 									const char* detail);
 			bool				UserCancelRequested();

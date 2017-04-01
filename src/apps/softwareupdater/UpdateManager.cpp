@@ -102,6 +102,21 @@ UpdateManager::CheckNetworkConnection()
 }
 
 
+int32
+UpdateManager::GetUpdateType()
+{
+	int32 action = USER_SELECTION_NEEDED;
+	BMessenger messenger(fStatusWindow);
+	if (messenger.IsValid()) {
+		BMessage message(kMsgGetUpdateType);
+		BMessage reply;
+		messenger.SendMessage(&message, &reply);
+		reply.FindInt32(kKeyAlertResult, &action);
+	}
+	return action;
+}
+
+
 void
 UpdateManager::JobFailed(BSupportKit::BJob* job)
 {
@@ -137,6 +152,7 @@ UpdateManager::HandleProblems()
 	ProblemWindow::SolverPackageSet uninstallPackages;
 	if (!fProblemWindow->Go(fSolver,installPackages, uninstallPackages))
 		throw BAbortedByUserException();
+	fProblemWindow->Hide();
 
 /*	int32 problemCount = fSolver->CountProblems();
 	for (int32 i = 0; i < problemCount; i++) {
@@ -217,32 +233,8 @@ UpdateManager::ConfirmChanges(bool fromMostSpecific)
 	printf("Upgrade count=%" B_PRId32 ", Install count=%" B_PRId32
 		", Uninstall count=%" B_PRId32 "\n",
 		upgradeCount, installCount, uninstallCount);
-	BString text;
-	if (upgradeCount == 1)
-		text.SetTo(B_TRANSLATE_COMMENT("There is 1 update "
-		"%dependancies%available.",
-		"Do not translate %dependancies%"));
-	else
-		text.SetTo(B_TRANSLATE_COMMENT("There are %count% updates "
-		"%dependancies%available.",
-		"Do not translate %count% or %dependancies%"));
-	BString countString;
-	countString << upgradeCount;
-	text.ReplaceFirst("%count%", countString);
-	BString dependancies("");
-	if (installCount) {
-		dependancies.SetTo("(");
-		dependancies.Append(B_TRANSLATE("with")).Append(" ");
-		if (installCount == 1)
-			dependancies.Append(B_TRANSLATE("1 new dependancy"));
-		else {
-			dependancies << installCount;
-			dependancies.Append(" ").Append(B_TRANSLATE("new dependancies"));
-		}
-		dependancies.Append(") ");
-	}
-	text.ReplaceFirst("%dependancies%", dependancies);
-	fChangesConfirmed = fStatusWindow->ConfirmUpdates(text.String());
+	
+	fChangesConfirmed = fStatusWindow->ConfirmUpdates();
 	if (!fChangesConfirmed)
 		throw BAbortedByUserException();
 	

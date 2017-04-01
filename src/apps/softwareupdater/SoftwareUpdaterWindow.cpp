@@ -45,9 +45,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fUserCancelRequested(false),
 	fWarningAlertCount(0)
 {
-	int32 iconSize = int(be_plain_font->Size() * 32.0 / 12.0);
-		// At 12 point font, icon size is 32, at 24 point it is 64
-	BBitmap icon = GetIcon(iconSize);
+	BBitmap icon = GetIcon(32 * icon_layout_scale());
 	fStripeView = new StripeView(icon);
 
 	fUpdateButton = new BButton(B_TRANSLATE("Update now"),
@@ -78,7 +76,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fHeaderView->SetFont(&font,
 		B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE | B_FONT_FLAGS);
 	
-	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, B_USE_ITEM_SPACING)
 		.Add(fStripeView)
 		.AddGroup(B_VERTICAL, 0)
 			.SetInsets(0, B_USE_WINDOW_SPACING,
@@ -250,6 +248,42 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		
+		case kMsgGetUpdateType:
+		{
+			BString text(
+				B_TRANSLATE("Please choose from these update options:\n\n"
+				"Update:\n"
+				"	Updates all installed packages.\n"
+				"Full sync:\n"
+				"	Synchronizes the installed packages with the repositories."
+				));
+			BAlert* alert = new BAlert("update_type",
+				text,
+				B_TRANSLATE_COMMENT("Cancel", "Alert button label"),
+				B_TRANSLATE_COMMENT("Full sync","Alert button label"),
+				B_TRANSLATE_COMMENT("Update","Alert button label"),
+				B_WIDTH_AS_USUAL, B_INFO_ALERT);
+			int32 result = alert->Go();
+			int32 action = INVALID_SELECTION;
+			switch(result) {
+				case 0:
+					action = CANCEL_UPDATE;
+					break;
+				
+				case 1:
+					action = FULLSYNC;
+					break;
+				
+				case 2:
+					action = UPDATE;
+					break;
+			}
+			BMessage reply;
+			reply.AddInt32(kKeyAlertResult, action);
+			message->SendReply(&reply);
+			break;
+		}
+		
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -257,11 +291,11 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 
 
 bool
-SoftwareUpdaterWindow::ConfirmUpdates(const char* text)
+SoftwareUpdaterWindow::ConfirmUpdates()
 {
 	Lock();
 	fHeaderView->SetText(B_TRANSLATE("Updates found"));
-	fDetailView->SetText(text);
+	fDetailView->SetText(B_TRANSLATE("The following changes will be made:"));
 	fListView->SortItems();
 	Unlock();
 	
@@ -446,6 +480,7 @@ SuperItem::SuperItem(const char* label)
 	:
 	BListItem(),
 	fLabel(label),
+	fShowMoreDetails(false),
 	fPackageIcon(NULL)
 {
 }
@@ -464,6 +499,7 @@ SuperItem::DrawItem(BView* owner, BRect item_rect, bool complete)
     owner->GetPreferredSize(&width, NULL);
     BString label(fLabel);
     owner->TruncateString(&label, B_TRUNCATE_END, width);
+    owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
     owner->SetFont(&fBoldFont);
     owner->DrawString(label.String(), BPoint(item_rect.left,
 		item_rect.bottom - fFontHeight.descent - 1));
@@ -478,10 +514,25 @@ SuperItem::Update(BView *owner, const BFont *font)
 	fBoldFont = *font;
 	fBoldFont.SetFace(B_BOLD_FACE);
 	BListItem::Update(owner, &fBoldFont);
-	
+	_SetHeights();
+}
+
+
+void
+SuperItem::SetDetailLevel(bool showMoreDetails)
+{
+	fShowMoreDetails = showMoreDetails;
+	_SetHeights();
+}
+
+
+void
+SuperItem::_SetHeights()
+{
 	// Calculate height for PackageItem
 	fRegularFont.GetHeight(&fFontHeight);
-	fPackageItemHeight = 2 * (fFontHeight.ascent + fFontHeight.descent
+	int lineCount = fShowMoreDetails ? 3 : 2;
+	fPackageItemHeight = lineCount * (fFontHeight.ascent + fFontHeight.descent
 		+ fFontHeight.leading);
 	
 	// Calculate height for this item
@@ -518,26 +569,19 @@ SuperItem::_GetPackageIcon()
 }
 
 
-PackageItem::PackageItem(const char* name, const char* version,
-	const char* summary, const char* tooltip, SuperItem* super)
+PackageItem::PackageItem(const char* name, const char* simple_version,
+	const char* detailed_version, const char* repository, const char* summary,
+	SuperItem* super)
 	:
 	BListItem(),
 	fName(name),
-	fVersion(version),
+	fSimpleVersion(simple_version),
+	fDetailedVersion(detailed_version),
+	fRepository(repository),
 	fSummary(summary),
-	fToolTip(NULL),
 	fSuperItem(super)
 {
 	fLabelOffset = be_control_look->DefaultLabelSpacing();
-	if (tooltip != NULL)
-		fToolTip = new BTextToolTip(tooltip);
-}
-
-
-PackageItem::~PackageItem()
-{
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
 }
 
 
@@ -548,6 +592,7 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
     owner->GetPreferredSize(&width, NULL);
     float nameWidth = width / 2.0;
     float offset_width = 0;
+    bool showMoreDetails = fSuperItem->GetDetailLevel();
 	
 	BBitmap* icon = fSuperItem->GetIcon();
 	if (icon != NULL && icon->IsValid()) {
@@ -562,12 +607,15 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 		offset_width += iconSize + fLabelOffset;
 	}
 	
+	owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	// Package name
 	font_height fontHeight = fSuperItem->GetFontHeight();
     BString name(fName);
     owner->TruncateString(&name, B_TRUNCATE_END, nameWidth);
 	BPoint cursor(item_rect.left + offset_width,
 		item_rect.bottom - fSmallTotalHeight - fontHeight.descent - 1);
+	if (showMoreDetails)
+		cursor.y -= fSmallTotalHeight + 1;
 	owner->DrawString(name.String(), cursor);
 	cursor.x += owner->StringWidth(name.String()) + fLabelOffset;
 	
@@ -575,17 +623,29 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	owner->SetFont(&fSmallFont);
 	owner->SetHighColor(tint_color(ui_color(B_LIST_ITEM_TEXT_COLOR), 0.7));
 	
-	// Version
-	BString version(fVersion);
-	owner->TruncateString(&version, B_TRUNCATE_END, width - cursor.x);
-	owner->DrawString(version.String(), cursor);
+	// Simple version or repository
+	BString versionOrRepo;
+	if (showMoreDetails)
+		versionOrRepo.SetTo(fRepository);
+	else
+		versionOrRepo.SetTo(fSimpleVersion);
+	owner->TruncateString(&versionOrRepo, B_TRUNCATE_END, width - cursor.x);
+	owner->DrawString(versionOrRepo.String(), cursor);
 	
 	// Summary
 	BString summary(fSummary);
 	cursor.x = item_rect.left + offset_width;
-	cursor.y = item_rect.bottom - fontHeight.descent;
+	cursor.y += fSmallTotalHeight;
 	owner->TruncateString(&summary, B_TRUNCATE_END, width - cursor.x);
 	owner->DrawString(summary.String(), cursor);
+	
+	// Detailed version
+	if (showMoreDetails) {
+		BString version(fDetailedVersion);
+		cursor.y += fSmallTotalHeight;
+		owner->TruncateString(&version, B_TRUNCATE_END, width - cursor.x);
+		owner->DrawString(version.String(), cursor);
+	}
 	
 	owner->SetFont(&fRegularFont);
 }
@@ -635,17 +695,51 @@ PackageListView::PackageListView()
 	BOutlineListView("Package list"),
 	fSuperUpdateItem(NULL),
 	fSuperInstallItem(NULL),
-	fSuperUninstallItem(NULL)
+	fSuperUninstallItem(NULL),
+	fShowMoreDetails(false)
 {
+	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	fDetailMenuItem = new BMenuItem("Show more details", new BMessage());
+	fMenu->AddItem(fDetailMenuItem);
+	
 	SetExplicitMinSize(BSize(B_SIZE_UNSET, 40));
 	SetExplicitPreferredSize(BSize(B_SIZE_UNSET, 400));
 }
 
 
 void
+PackageListView::AttachedToWindow()
+{
+	BOutlineListView::AttachedToWindow();
+	fDetailMenuItem->SetTarget(this);
+}
+
+
+void
+PackageListView::MessageReceived(BMessage* message)
+{
+	switch(message->what)
+	{
+		case kMsgMoreDetailsOff:
+		case kMsgMoreDetailsOn:
+		{
+			fShowMoreDetails = message->what == kMsgMoreDetailsOn;
+			_SetItemHeights();
+			InvalidateLayout();
+			ResizeToPreferred();
+			break;
+		}
+		
+		default:
+			BOutlineListView::MessageReceived(message);
+	}
+}
+
+
+void
 PackageListView::FrameResized(float newWidth, float newHeight)
 {
-	BListView::FrameResized(newWidth, newHeight);
+	BOutlineListView::FrameResized(newWidth, newHeight);
 	
 	float count = CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -660,25 +754,24 @@ void
 PackageListView::MouseDown(BPoint where)
 {
 	BOutlineListView::MouseDown(where);
-	BToolTip* tooltip = NULL;
-	bool found = GetToolTipAt(where, &tooltip);
-	if (found)
-		ShowToolTip(tooltip);
-}
-
-
-bool
-PackageListView::GetToolTipAt(BPoint point, BToolTip** _tip)
-{
-	BListItem* item = ItemAt(IndexOf(point));
-	if (item == NULL)
-		return false;
-	PackageItem* pItem = dynamic_cast<PackageItem*>(item);
-	if (pItem != NULL) {
-		*_tip = pItem->ToolTip();
-		return true;
+	
+	int32 button;
+	Looper()->CurrentMessage()->FindInt32("buttons", &button);
+	if (button & B_SECONDARY_MOUSE_BUTTON) {
+		if (fShowMoreDetails) {
+			fDetailMenuItem->SetMarked(true);
+			fDetailMenuItem->Message()->what = kMsgMoreDetailsOff;
+		} else {
+			fDetailMenuItem->SetMarked(false);
+			fDetailMenuItem->Message()->what = kMsgMoreDetailsOn;
+		}
+		// Offset point so cursor isn't over checkmark
+		ConvertToScreen(&where);
+		where.x -= 10;
+		where.y -= 10;
+		fMenu->Go(where, true, true, BRect(where.x - 2, where.y - 2,
+			where.x + 2, where.y + 2), true);
 	}
-	return false;
 }
 
 
@@ -688,11 +781,12 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 	const char* repository)
 {
 	SuperItem* super;
-	BString version;
-	BString tooltip(B_TRANSLATE_COMMENT("Package:", "Tooltip text"));
-	tooltip.Append(" ").Append(name).Append("\n")
-		.Append(B_TRANSLATE_COMMENT("Repository:", "Tooltip text"))
-		.Append(" ").Append(repository).Append("\n");
+	BString simpleVersion;
+	BString detailedVersion("");
+	BString repositoryText(B_TRANSLATE_COMMENT("from repository",
+		"List item text"));
+	repositoryText.Append(" ").Append(repository);
+	
 	switch (install_type) {
 		case PACKAGE_UPDATE:
 		{
@@ -703,11 +797,12 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 			}
 			super = fSuperUpdateItem;
 			
-			version.SetTo(new_ver);
-			tooltip.Append(B_TRANSLATE_COMMENT("Updating version",
-					"Tooltip text"))
+			simpleVersion.SetTo(new_ver);
+			detailedVersion.Append(B_TRANSLATE_COMMENT("Updating version",
+					"List item text"))
 				.Append(" ").Append(cur_ver)
-				.Append(" ").Append(B_TRANSLATE_COMMENT("to", "Tooltip text"))
+				.Append(" ").Append(B_TRANSLATE_COMMENT("to",
+					"List item text"))
 				.Append(" ").Append(new_ver);
 			break;
 		}
@@ -721,9 +816,9 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 			}
 			super = fSuperInstallItem;
 			
-			version.SetTo(new_ver);
-			tooltip.Append(B_TRANSLATE_COMMENT("Installing version",
-					"Tooltip text"))
+			simpleVersion.SetTo(new_ver);
+			detailedVersion.Append(B_TRANSLATE_COMMENT("Installing version",
+					"List item text"))
 				.Append(" ").Append(new_ver);
 			break;
 		}
@@ -737,9 +832,9 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 			}
 			super = fSuperUninstallItem;
 			
-			version.SetTo("");
-			tooltip.Append(B_TRANSLATE_COMMENT("Uninstalling version",
-					"Tooltip text"))
+			simpleVersion.SetTo("");
+			detailedVersion.Append(B_TRANSLATE_COMMENT("Uninstalling version",
+					"List item text"))
 				.Append(" ").Append(cur_ver);
 			break;
 		}
@@ -748,8 +843,8 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 			return;
 	
 	}
-	PackageItem* item = new PackageItem(name, version.String(), summary,
-		tooltip.String(), super);
+	PackageItem* item = new PackageItem(name, simpleVersion.String(),
+		detailedVersion.String(), repositoryText.String(), summary, super);
 	AddUnder(item, super);
 }
 
@@ -776,4 +871,42 @@ PackageListView::ItemHeight()
 	if (fSuperUninstallItem != NULL)
 		return fSuperUninstallItem->GetPackageItemHeight();
 	return 0;
+}
+
+
+void
+PackageListView::_SetItemHeights()
+{
+	int32 itemCount = 0;
+	float itemHeight = 0;
+	BListItem* item = NULL;
+	if (fSuperUpdateItem != NULL) {
+		fSuperUpdateItem->SetDetailLevel(fShowMoreDetails);
+		itemHeight = fSuperUpdateItem->GetPackageItemHeight();
+		itemCount = CountItemsUnder(fSuperUpdateItem, true);
+		for (int32 i = 0; i < itemCount; i++) {
+			item = ItemUnderAt(fSuperUpdateItem, true, i);
+			item->SetHeight(itemHeight);
+		}
+	}
+	if (fSuperInstallItem != NULL) {
+		fSuperInstallItem->SetDetailLevel(fShowMoreDetails);
+		itemHeight = fSuperInstallItem->GetPackageItemHeight();
+		itemCount = CountItemsUnder(fSuperInstallItem, true);
+		for (int32 i = 0; i < itemCount; i++) {
+			item = ItemUnderAt(fSuperInstallItem, true, i);
+			item->SetHeight(itemHeight);
+		}
+		
+	}
+	if (fSuperUninstallItem != NULL) {
+		fSuperUninstallItem->SetDetailLevel(fShowMoreDetails);
+		itemHeight = fSuperUninstallItem->GetPackageItemHeight();
+		itemCount = CountItemsUnder(fSuperUninstallItem, true);
+		for (int32 i = 0; i < itemCount; i++) {
+			item = ItemUnderAt(fSuperUninstallItem, true, i);
+			item->SetHeight(itemHeight);
+		}
+		
+	}
 }

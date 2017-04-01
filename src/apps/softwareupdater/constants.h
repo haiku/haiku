@@ -27,6 +27,17 @@ enum {
 	STATE_MAX
 };
 
+enum update_type {
+	USER_SELECTION_NEEDED = 0,
+	INVALID_SELECTION,
+	CANCEL_UPDATE,
+	UPDATE,
+	UPDATE_CHECK_ONLY,
+	FULLSYNC,
+	FULLSYNC_CHECK_ONLY,
+	UPDATE_TYPE_END
+} ;
+
 // Message what values
 static const uint32 kMsgTextUpdate = 'iUPD';
 static const uint32 kMsgProgressUpdate = 'iPRO';
@@ -35,8 +46,11 @@ static const uint32 kMsgCancelResponse = 'iCRE';
 static const uint32 kMsgUpdateConfirmed = 'iCON';
 static const uint32 kMsgWarningDismissed = 'iWDI';
 static const uint32 kMsgNetworkAlert = 'iNAL';
+static const uint32 kMsgGetUpdateType = 'iGUP';
 static const uint32 kMsgRegister = 'iREG';
 static const uint32 kMsgFinalQuit = 'iFIN';
+static const uint32 kMsgMoreDetailsOn = 'iDON';
+static const uint32 kMsgMoreDetailsOff = 'iDOF';
 
 // Message data keys
 #define kKeyHeader "key_header"

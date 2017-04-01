@@ -31,6 +31,7 @@ public:
 								~UpdateManager();
 
 			void				CheckNetworkConnection();
+			int32				GetUpdateType();
 	virtual	void				JobFailed(BSupportKit::BJob* job);
 	virtual	void				JobAborted(BSupportKit::BJob* job);
 			void				FinalUpdate(const char* header,

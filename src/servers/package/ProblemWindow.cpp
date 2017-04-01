@@ -59,7 +59,7 @@ ProblemWindow::ProblemWindow()
 	:
 	BWindow(BRect(0, 0, 400, 300), B_TRANSLATE_COMMENT("Package problems",
 			"Window title"), B_TITLED_WINDOW_LOOK,
-		B_NORMAL_WINDOW_FEEL,
+		B_MODAL_APP_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
 	fDoneSemaphore(-1),
@@ -87,9 +87,9 @@ ProblemWindow::ProblemWindow()
 				"a solution for each:")))
 		.Add(new BScrollView(NULL, viewPort = new BViewPort(), 0, false, true))
 		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
 			.Add(fCancelButton = new BButton(B_TRANSLATE("Cancel"),
 				new BMessage(B_CANCEL)))
-			.AddGlue()
 			.Add(fRetryButton = new BButton(B_TRANSLATE("Retry"),
 				new BMessage(kRetryMessage)))
 		.End();

@@ -28,8 +28,16 @@ public:
 private:
 			BBitmap			fIcon;
 			float			fIconSize;
-			float			fWidth;
+			float			fPreferredWidth;
+			float			fPreferredHeight;
 };
+
+
+static inline int32
+icon_layout_scale()
+{
+	return max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
+}
 
 
 #endif /* _STRIPE_VIEW_H */
