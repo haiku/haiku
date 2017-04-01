@@ -18,6 +18,7 @@
 #include <MediaIO.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
+#include <MimeType.h>
 
 extern "C" {
 	#include "avcodec.h"
@@ -242,6 +243,27 @@ StreamBase::Open()
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
+	// First try to identify the file using the MIME database, as ffmpeg
+	// (especially old versions) is not very good at this and relies on us
+	// to give it the file extension as an hint.
+	// For this we need some valid data in the buffer, the first 512 bytes
+	// should do because our MIME sniffing never uses more.
+	const char* extension = NULL;
+	if (fSource->Read(buffer, 512) == 512) {
+		BMimeType type;
+		if (BMimeType::GuessMimeType(buffer, 512, &type) == B_OK) {
+			BMessage message;
+			if (type.GetFileExtensions(&message) == B_OK) {
+				extension = message.FindString("extensions");
+			}
+		}
+	}
+
+	// If the format is not identified, try Amiga MOD-files, because these do
+	// not currently have a sniffing rule.
+	if (extension == NULL)
+		extension = ".mod";
+
 	// Allocate I/O context with buffer and hook functions, pass ourself as
 	// cookie.
 	memset(buffer, 0, bufferSize);
@@ -257,7 +279,7 @@ StreamBase::Open()
 	fContext->pb = fIOContext;
 
 	// Allocate our context and probe the input format
-	if (avformat_open_input(&fContext, ".mod", NULL, NULL) < 0) {
+	if (avformat_open_input(&fContext, extension, NULL, NULL) < 0) {
 		TRACE("StreamBase::Open() - avformat_open_input() failed!\n");
 		// avformat_open_input() frees the context in case of failure
 		fContext = NULL;
