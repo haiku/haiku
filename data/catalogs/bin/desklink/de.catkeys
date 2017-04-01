@@ -8,7 +8,7 @@ Sound preferences…	MediaReplicant		Klänge...
 Open %name	DeskButton	Don't translate variable %name	%name öffnen
 No media server running	VolumeControl		Mediaserver läuft nicht
 Media preferences…	MediaReplicant		Audio & Video...
-Open MediaPlayer	MediaReplicant		Öffne Media-Player
+Open MediaPlayer	MediaReplicant		Media-Player öffnen
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Einstellungen
 %ld dB	VolumeControl		%ld dB
