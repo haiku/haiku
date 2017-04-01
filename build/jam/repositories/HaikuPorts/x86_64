@@ -943,8 +943,8 @@ RemotePackageRepository HaikuPorts
 	sdl2_mixer_devel-2.0.1-2
 	sdl2_net-2.0.1-1
 	sdl2_net_devel-2.0.1-1
-	sdl2_ttf-2.0.14-2
-	sdl2_ttf_devel-2.0.14-2
+	sdl2_ttf-2.0.14-5
+	sdl2_ttf_devel-2.0.14-5
 	sdl_gfx-2.0.25-2
 	sdl_gfx_devel-2.0.25-2
 	sdl_image-1.2.12-6
