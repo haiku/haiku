@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2016, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -331,6 +331,10 @@ static MountTable* sMountsTable;
 static dev_t sNextMountID = 1;
 
 #define MAX_TEMP_IO_VECS 8
+
+// How long to wait for busy vnodes (10s)
+#define BUSY_VNODE_RETRIES 2000
+#define BUSY_VNODE_DELAY 5000
 
 mode_t __gUmask = 022;
 
@@ -894,6 +898,27 @@ lookup_vnode(dev_t mountID, ino_t vnodeID)
 }
 
 
+/*!	\brief Checks whether or not a busy vnode should be waited for (again).
+
+	This will also wait for BUSY_VNODE_DELAY before returning if one should
+	still wait for the vnode becoming unbusy.
+
+	\return \c true if one should retry, \c false if not.
+*/
+static bool
+retry_busy_vnode(int32& tries, dev_t mountID, ino_t vnodeID)
+{
+	if (--tries < 0) {
+		// vnode doesn't seem to become unbusy
+		dprintf("vnode %" B_PRIdDEV ":%" B_PRIdINO
+			" is not becoming unbusy!\n", mountID, vnodeID);
+		return false;
+	}
+	snooze(BUSY_VNODE_DELAY);
+	return true;
+}
+
+
 /*!	Creates a new vnode with the given mount and node ID.
 	If the node already exists, it is returned instead and no new node is
 	created. In either case -- but not, if an error occurs -- the function write
@@ -927,7 +952,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	vnode->ref_count = 1;
 	vnode->SetBusy(true);
 
-	// look up the the node -- it might have been added by someone else in the
+	// look up the node -- it might have been added by someone else in the
 	// meantime
 	rw_lock_write_lock(&sVnodeLock);
 	struct vnode* existingVnode = lookup_vnode(mountID, vnodeID);
@@ -1147,8 +1172,7 @@ get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 
 	rw_lock_read_lock(&sVnodeLock);
 
-	int32 tries = 2000;
-		// try for 10 secs
+	int32 tries = BUSY_VNODE_RETRIES;
 restart:
 	struct vnode* vnode = lookup_vnode(mountID, vnodeID);
 	AutoLocker<Vnode> nodeLocker(vnode);
@@ -1156,13 +1180,14 @@ restart:
 	if (vnode && vnode->IsBusy()) {
 		nodeLocker.Unlock();
 		rw_lock_read_unlock(&sVnodeLock);
-		if (!canWait || --tries < 0) {
-			// vnode doesn't seem to become unbusy
-			dprintf("vnode %" B_PRIdDEV ":%" B_PRIdINO
-				" is not becoming unbusy!\n", mountID, vnodeID);
+		if (!canWait) {
+			dprintf("vnode %" B_PRIdDEV ":%" B_PRIdINO " is busy!\n",
+				mountID, vnodeID);
 			return B_BUSY;
 		}
-		snooze(5000); // 5 ms
+		if (!retry_busy_vnode(tries, mountID, vnodeID))
+			return B_BUSY;
+
 		rw_lock_read_lock(&sVnodeLock);
 		goto restart;
 	}
@@ -3663,6 +3688,8 @@ new_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
 
+	int32 tries = BUSY_VNODE_RETRIES;
+restart:
 	// create the node
 	bool nodeCreated;
 	struct vnode* vnode;
@@ -3673,6 +3700,13 @@ new_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 
 	WriteLocker nodeLocker(sVnodeLock, true);
 		// create_new_vnode_and_lock() has locked for us
+
+	if (!nodeCreated && vnode->IsBusy()) {
+		nodeLocker.Unlock();
+		if (!retry_busy_vnode(tries, volume->id, vnodeID))
+			return B_BUSY;
+		goto restart;
+	}
 
 	// file system integrity check:
 	// test if the vnode already exists and bail out if this is the case!
@@ -3699,6 +3733,8 @@ publish_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 {
 	FUNCTION(("publish_vnode()\n"));
 
+	int32 tries = BUSY_VNODE_RETRIES;
+restart:
 	WriteLocker locker(sVnodeLock);
 
 	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
@@ -3726,6 +3762,11 @@ publish_vnode(fs_volume* volume, ino_t vnodeID, void* privateNode,
 	} else if (vnode->IsBusy() && vnode->IsUnpublished()
 		&& vnode->private_node == privateNode && vnode->ops == ops) {
 		// already known, but not published
+	} else if (vnode->IsBusy()) {
+		locker.Unlock();
+		if (!retry_busy_vnode(tries, volume->id, vnodeID))
+			return B_BUSY;
+		goto restart;
 	} else
 		return B_BAD_VALUE;
 
