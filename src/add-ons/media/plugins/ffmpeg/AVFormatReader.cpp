@@ -249,10 +249,10 @@ StreamBase::Open()
 	// For this we need some valid data in the buffer, the first 512 bytes
 	// should do because our MIME sniffing never uses more.
 	const char* extension = NULL;
+	BMessage message;
 	if (fSource->Read(buffer, 512) == 512) {
 		BMimeType type;
 		if (BMimeType::GuessMimeType(buffer, 512, &type) == B_OK) {
-			BMessage message;
 			if (type.GetFileExtensions(&message) == B_OK) {
 				extension = message.FindString("extensions");
 			}
