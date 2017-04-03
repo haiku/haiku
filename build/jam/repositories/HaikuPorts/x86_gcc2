@@ -207,8 +207,8 @@ RemotePackageRepository HaikuPorts
 	gtk_doc-1.20-1
 	guilib-1.2.1-1
 	guilib_devel-1.2.1-1
-	gutenprint-5.2.11-2
-	gutenprint_devel-5.2.11-2
+	gutenprint-5.2.12-2
+	gutenprint_devel-5.2.12-2
 	gyp-git-2
 	gzip-1.6-2
 	hdialog-0.2-2
