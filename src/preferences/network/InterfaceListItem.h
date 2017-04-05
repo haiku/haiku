@@ -17,13 +17,22 @@
 #include <NetworkSettingsAddOn.h>
 
 
+enum BNetworkInterfaceType {
+    B_NETWORK_INTERFACE_TYPE_WIFI = 'wifi',
+    B_NETWORK_INTERFACE_TYPE_ETHERNET = 'ethr',
+    B_NETWORK_INTERFACE_TYPE_VPN = 'nvpn',
+    B_NETWORK_INTERFACE_TYPE_OTHER = 'othe',
+};
+
+
 class BBitmap;
 
 
 class InterfaceListItem : public BListItem,
 	public BNetworkKit::BNetworkConfigurationListener {
 public:
-								InterfaceListItem(const char* name);
+								InterfaceListItem(const char* name,
+									BNetworkInterfaceType type);
 								~InterfaceListItem();
 
 			void				DrawItem(BView* owner,
@@ -42,6 +51,8 @@ private:
 			const char*			_StateText() const;
 
 private:
+			BNetworkInterfaceType fType;
+
 			BBitmap* 			fIcon;
 			BBitmap*			fIconOffline;
 			BBitmap*			fIconPending;

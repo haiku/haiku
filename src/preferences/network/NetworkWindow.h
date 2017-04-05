@@ -78,6 +78,7 @@ private:
 			ItemMap				fInterfaceItemMap;
 			BListItem*			fServicesItem;
 			BListItem*			fDialUpItem;
+			BListItem*			fVPNItem;
 			BListItem*			fOtherItem;
 
 			SettingsMap			fSettingsMap;

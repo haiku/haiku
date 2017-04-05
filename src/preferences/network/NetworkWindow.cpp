@@ -25,6 +25,7 @@
 #include <Deskbar.h>
 #include <Directory.h>
 #include <LayoutBuilder.h>
+#include <NetworkDevice.h>
 #include <NetworkInterface.h>
 #include <NetworkNotifications.h>
 #include <NetworkRoster.h>
@@ -94,6 +95,7 @@ NetworkWindow::NetworkWindow()
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fServicesItem(NULL),
 	fDialUpItem(NULL),
+	fVPNItem(NULL),
 	fOtherItem(NULL)
 {
 	// Profiles section
@@ -336,7 +338,15 @@ NetworkWindow::_ScanInterfaces()
 		if ((interface.Flags() & IFF_LOOPBACK) != 0)
 			continue;
 
-		InterfaceListItem* item = new InterfaceListItem(interface.Name());
+		BNetworkDevice device(interface.Name());
+		BNetworkInterfaceType type = B_NETWORK_INTERFACE_TYPE_OTHER;
+
+		if (device.IsWireless())
+			type = B_NETWORK_INTERFACE_TYPE_WIFI;
+		else if (device.IsEthernet())
+			type = B_NETWORK_INTERFACE_TYPE_ETHERNET;
+
+		InterfaceListItem* item = new InterfaceListItem(interface.Name(), type);
 		item->SetExpanded(true);
 
 		fInterfaceItemMap.insert(std::pair<BString, InterfaceListItem*>(
@@ -440,6 +450,7 @@ NetworkWindow::_ScanAddOns()
 
 		_SortItemsUnder(fServicesItem);
 		_SortItemsUnder(fDialUpItem);
+		_SortItemsUnder(fVPNItem);
 		_SortItemsUnder(fOtherItem);
 	}
 
@@ -480,6 +491,11 @@ NetworkWindow::_ListItemFor(BNetworkSettingsType type)
 			if (fDialUpItem == NULL)
 				fDialUpItem = _CreateItem(B_TRANSLATE("Dial Up"));
 			return fDialUpItem;
+
+		case B_NETWORK_SETTINGS_TYPE_VPN:
+			if (fVPNItem == NULL)
+				fVPNItem = _CreateItem(B_TRANSLATE("VPN"));
+			return fVPNItem;
 
 		case B_NETWORK_SETTINGS_TYPE_OTHER:
 			if (fOtherItem == NULL)

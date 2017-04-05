@@ -19,7 +19,6 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <IconUtils.h>
-#include <NetworkDevice.h>
 #include <OutlineListView.h>
 #include <Resources.h>
 #include <String.h>
@@ -32,9 +31,11 @@
 #define B_TRANSLATION_CONTEXT "InterfaceListItem"
 
 
-InterfaceListItem::InterfaceListItem(const char* name)
+InterfaceListItem::InterfaceListItem(const char* name,
+	BNetworkInterfaceType type)
 	:
 	BListItem(0, false),
+	fType(type),
 	fIcon(NULL),
 	fFirstLineOffset(0),
 	fLineOffset(0),
@@ -166,16 +167,15 @@ InterfaceListItem::ConfigurationUpdated(const BMessage& message)
 void
 InterfaceListItem::_Init()
 {
-	const char* mediaTypeName = NULL;
-
-	BNetworkDevice device(Name());
-	if (device.IsWireless())
-		mediaTypeName = "wifi";
-	else if (device.IsEthernet())
-		mediaTypeName = "ether";
-
-	_PopulateBitmaps(mediaTypeName);
-		// Load the interface icons
+	switch(fType) {
+		default:
+		case B_NETWORK_INTERFACE_TYPE_WIFI:
+			_PopulateBitmaps("wifi");
+			break;
+		case B_NETWORK_INTERFACE_TYPE_ETHERNET:
+			_PopulateBitmaps("ether");
+			break;
+	}
 }
 
 
@@ -257,13 +257,19 @@ InterfaceListItem::_UpdateState()
 	fHasLink = fInterface.HasLink();
 	fConnecting = (fInterface.Flags() & IFF_CONFIGURING) != 0;
 
-	BNetworkDevice device(Name());
-	if (device.IsWireless())
-		fSubtitle = B_TRANSLATE("Wireless device");
-	else if (device.IsEthernet())
-		fSubtitle = B_TRANSLATE("Ethernet device");
-	else
-		fSubtitle = "";
+	switch (fType) {
+		case B_NETWORK_INTERFACE_TYPE_WIFI:
+			fSubtitle = B_TRANSLATE("Wireless device");
+			break;
+		case B_NETWORK_INTERFACE_TYPE_ETHERNET:
+			fSubtitle = B_TRANSLATE("Ethernet device");
+			break;
+		case B_NETWORK_INTERFACE_TYPE_VPN:
+			fSubtitle = B_TRANSLATE("VPN connection");
+			break;
+		default:
+			fSubtitle = "";
+	}
 }
 
 
