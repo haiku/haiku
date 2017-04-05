@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons network_settings openvpn ;
+
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
+UsePrivateHeaders app libroot kernel net shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
+
+AddResources OpenVPN : OpenVPN.rdef ;
+
+Addon OpenVPNInterface :
+	OpenVPNInterfaceAddOn.cpp
+
+	: be bnetapi shared <nogrist>Network [ TargetLibsupc++ ]
+		[ TargetLibstdc++ ] localestub
+;
+
+DoCatalogs OpenVPNInterface : x-vnd.Haiku-OpenVPNInterface :
+	OpenVPNInterfaceAddOn.cpp
+;

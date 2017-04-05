@@ -9,3 +9,7 @@ SubInclude HAIKU_TOP src add-ons network_settings dnsclient ;
 SubInclude HAIKU_TOP src add-ons network_settings ftpd ;
 SubInclude HAIKU_TOP src add-ons network_settings sshd ;
 SubInclude HAIKU_TOP src add-ons network_settings telnetd ;
+
+# VPN add-ons
+SubInclude HAIKU_TOP src add-ons network_settings openvpn ;
+
