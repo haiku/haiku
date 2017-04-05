@@ -83,7 +83,8 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 		- BPoint(be_plain_font->StringWidth(stateText)
 			+ be_control_look->DefaultLabelSpacing(), 0);
 	BPoint namePoint = bounds.LeftTop()
-		+ BPoint(ICON_SIZE + 12, fFirstLineOffset);
+		+ BPoint(ICON_SIZE + (be_control_look->DefaultLabelSpacing() * 2),
+		fFirstLineOffset);
 
 	if (fDisabled) {
 		owner->SetDrawingMode(B_OP_ALPHA);
@@ -119,7 +120,8 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 	owner->SetFont(be_plain_font);
 	owner->DrawString(stateText, statePoint);
 
-	BPoint linePoint = bounds.LeftTop() + BPoint(ICON_SIZE + 12,
+	BPoint linePoint = bounds.LeftTop()
+		+ BPoint(ICON_SIZE + (be_control_look->DefaultLabelSpacing() * 2),
 		fFirstLineOffset + fLineOffset);
 	owner->DrawString(fSubtitle, linePoint);
 
