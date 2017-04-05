@@ -1,3 +1,2 @@
-- remove atomic.S when Haiku is finished
 - add missing settings support (ConnectRetryDelay, etc.)
 - finish support for server mode

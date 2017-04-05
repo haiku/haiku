@@ -348,17 +348,19 @@ PPPManager::Interfaces(int32 *count,
 	while (true) {
 		requestCount = *count = CountInterfaces(filter);
 		if (*count <= 0) {
-			printf("No interface, count, first round:%ld\n", *count);
+			printf("No interface, count, first round: %" B_PRId32 "\n", *count);
 			return NULL;
 		}
 		
 		requestCount += 10;
-			// request some more interfaces in case some are added in the mean time
+		// request some more interfaces in case some are added in the mean time
 		interfaces = new ppp_interface_id[requestCount];
-		// printf("interfaces addr: %p\n, requestCount: %ld", interfaces, requestCount);
+
+		//printf("interfaces addr: %p\n, requestCount: %ld", interfaces,
+		//	requestCount);
 		*count = GetInterfaces(interfaces, requestCount, filter);
 		if (*count <= 0) {
-			printf("No interface, count second round:%ld\n", *count);
+			printf("No interface, count second round: %" B_PRId32 "\n", *count);
 			delete interfaces;
 			return NULL;
 		}

@@ -24,7 +24,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pppoe
 	] : true ;
 
 KernelAddon ipcp :
-	atomic.S
 	kernel_cpp.cpp
 
 	# imported from kernel util
@@ -40,8 +39,6 @@ SEARCH on [ FGristFiles inet_addr.c ]
 
 SEARCH on [ FGristFiles kernel_cpp.cpp ]
         = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles atomic.S ]
-        = [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;
 
 LinkAgainst ipcp : libkernelppp.a ;
 

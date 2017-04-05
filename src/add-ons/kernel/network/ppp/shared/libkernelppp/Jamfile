@@ -19,14 +19,12 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
 
-
 {
 	SubDirC++Flags -fno-rtti ;
 }
 
 
 KernelStaticLibrary libkernelppp.a :
-	atomic.S
 	kernel_cpp.cpp
 	
 	KPPPConfigurePacket.cpp
@@ -46,10 +44,7 @@ KernelStaticLibrary libkernelppp.a :
 	_KPPPMRUHandler.cpp
 	_KPPPAuthenticationHandler.cpp
 	_KPPPPFCHandler.cpp
-	: -fno-pic
 ;
 
 SEARCH on [ FGristFiles kernel_cpp.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles atomic.S ]
-	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;

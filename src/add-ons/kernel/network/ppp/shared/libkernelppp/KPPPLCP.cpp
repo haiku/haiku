@@ -90,7 +90,7 @@ KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 KPPPOptionHandler*
 KPPPLCP::OptionHandlerAt(int32 index) const
 {
-	dprintf("total optionhandler count %ld\n", CountOptionHandlers());
+	dprintf("total optionhandler count %" B_PRId32 "\n", CountOptionHandlers());
 	KPPPOptionHandler *optionHandler = fOptionHandlers.ItemAt(index);
 
 	if (optionHandler == fOptionHandlers.GetDefaultItem())
@@ -164,7 +164,7 @@ KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 KPPPLCPExtension*
 KPPPLCP::LCPExtensionAt(int32 index) const
 {
-	dprintf("LCPExtension count %ld\n", CountLCPExtensions());
+	dprintf("LCPExtension count %" B_PRId32 "\n", CountLCPExtensions());
 	KPPPLCPExtension *lcpExtension = fLCPExtensions.ItemAt(index);
 
 	if (lcpExtension == fLCPExtensions.GetDefaultItem())

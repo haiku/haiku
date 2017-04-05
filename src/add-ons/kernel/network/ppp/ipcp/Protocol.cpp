@@ -153,7 +153,7 @@ IPCP::StackControl(uint32 op, void *data)
 		break;
 
 		default:
-			ERROR("IPCP: Unknown ioctl: %ld\n", op);
+			ERROR("IPCP: Unknown ioctl: %" B_PRIu32 "\n", op);
 			return KPPPProtocol::StackControl(op, data);
 	}
 

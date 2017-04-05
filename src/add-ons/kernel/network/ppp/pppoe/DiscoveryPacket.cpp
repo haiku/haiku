@@ -34,9 +34,9 @@ DiscoveryPacket::DiscoveryPacket(net_buffer *packet, uint32 start)
 	
 	if(length > packet->size - PPPoE_HEADER_SIZE) {
 		dprintf("packet size less than pppoe payload\n");
-		dprintf("pppoe payload:%d\n", length);
-		dprintf("PPPoE_HEADER_SIZE:%d\n", PPPoE_HEADER_SIZE);
-		dprintf("packet->size:%ld\n", packet->size);
+		dprintf("pppoe payload: %d\n", length);
+		dprintf("PPPoE_HEADER_SIZE: %d\n", PPPoE_HEADER_SIZE);
+		dprintf("packet->size: %" B_PRIu32 "\n", packet->size);
 		fInitStatus = B_ERROR;
 		return;
 			// there are no tags (or one corrupted tag)

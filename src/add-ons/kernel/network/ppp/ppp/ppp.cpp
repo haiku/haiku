@@ -71,9 +71,9 @@ ppp_init(const char *name, net_device **_device)
 
 	if (idInterface <= 0 || pppInterface == NULL) {
 		if (idInterface <= 0)
-			dprintf("%s: idInterface:%ld\n", __func__, idInterface);
+			dprintf("%s: idInterface: %" B_PRIu32 "\n", __func__, idInterface);
 		else
-			dprintf("%s: pppInterface == NULL %ld\n", __func__, idInterface);
+			dprintf("%s: pppInterface == NULL %" B_PRIu32 "\n", __func__, idInterface);
 		put_module(NET_BUFFER_MODULE_NAME);
 		return B_NO_MEMORY;
 	}
