@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,12 +32,13 @@ struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 	uint32				up_count;
 		// a device can be brought up by more than one interface
 	int32				ref_count;
+	bool				busy;
 
 	net_deframe_func	deframe_func;
 	int32				deframe_ref_count;
 
 	int32				monitor_count;
-	recursive_lock			monitor_lock;
+	recursive_lock		monitor_lock;
 	DeviceMonitorList	monitor_funcs;
 
 	DeviceHandlerList	receive_funcs;

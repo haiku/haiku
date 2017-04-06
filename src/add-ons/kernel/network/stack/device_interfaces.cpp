@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -152,6 +152,7 @@ domain_receive_adapter(void* cookie, net_device* device, net_buffer* buffer)
 static net_device_interface*
 find_device_interface(const char* name)
 {
+	ASSERT_LOCKED_MUTEX(&sLock);
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 
 	while (net_device_interface* interface = iterator.Next()) {
@@ -182,6 +183,7 @@ allocate_device_interface(net_device* device, net_device_module_info* module)
 	interface->device = device;
 	interface->up_count = 0;
 	interface->ref_count = 1;
+	interface->busy = false;
 	interface->monitor_count = 0;
 	interface->deframe_func = NULL;
 	interface->deframe_ref_count = 0;
@@ -409,6 +411,9 @@ get_device_interface(uint32 index)
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (net_device_interface* interface = iterator.Next()) {
 		if (interface->device->index == index) {
+			if (interface->busy)
+				break;
+
 			if (atomic_add(&interface->ref_count, 1) != 0)
 				return interface;
 		}
@@ -428,6 +433,9 @@ get_device_interface(const char* name, bool create)
 
 	net_device_interface* interface = find_device_interface(name);
 	if (interface != NULL) {
+		if (interface->busy)
+			return NULL;
+
 		if (atomic_add(&interface->ref_count, 1) != 0)
 			return interface;
 
@@ -763,11 +771,17 @@ device_removed(net_device* device)
 {
 	MutexLocker locker(sLock);
 
-	// hold a reference to the device interface being removed
-	// so our put_() will (eventually) do the final cleanup
-	net_device_interface* interface = get_device_interface(device->name, false);
+	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
 		return B_DEVICE_NOT_FOUND;
+	if (interface->busy)
+		return B_BUSY;
+
+	// Acquire a reference to the device interface being removed
+	// so our put_() will (eventually) do the final cleanup
+	atomic_add(&interface->ref_count, 1);
+	interface->busy = true;
+	locker.Unlock();
 
 	// Propagate the loss of the device throughout the stack.
 
@@ -776,8 +790,9 @@ device_removed(net_device* device)
 
 	// By now all of the monitors must have removed themselves. If they
 	// didn't, they'll probably wait forever to be callback'ed again.
-	recursive_lock_lock(&interface->monitor_lock);
+	RecursiveLocker monitorLocker(interface->monitor_lock);
 	interface->monitor_funcs.RemoveAll();
+	monitorLocker.Unlock();
 
 	// All of the readers should be gone as well since we are out of
 	// interfaces and put_domain_datalink_protocols() is called for
