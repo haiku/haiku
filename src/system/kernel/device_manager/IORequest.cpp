@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -38,6 +38,33 @@ enum {
 };
 
 
+struct virtual_vec_cookie {
+	uint32			vec_index;
+	generic_size_t	vec_offset;
+	area_id			mapped_area;
+	void*			physical_page_handle;
+	addr_t			virtual_address;
+
+	virtual_vec_cookie()
+		:
+		vec_index(0),
+		vec_offset(0),
+		mapped_area(-1),
+		physical_page_handle(NULL),
+		virtual_address((addr_t)-1)
+	{
+	}
+
+	void PutPhysicalPageIfNeeded()
+	{
+		if (virtual_address != (addr_t)-1) {
+			vm_put_physical_page(virtual_address, physical_page_handle);
+			virtual_address = (addr_t)-1;
+		}
+	}
+};
+
+
 // #pragma mark -
 
 
@@ -55,15 +82,6 @@ IORequestChunk::~IORequestChunk()
 
 
 //	#pragma mark -
-
-
-struct virtual_vec_cookie {
-	uint32			vec_index;
-	generic_size_t	vec_offset;
-	area_id			mapped_area;
-	void*			physical_page_handle;
-	addr_t			virtual_address;
-};
 
 
 IOBuffer*
@@ -124,21 +142,11 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 		if (cookie == NULL)
 			return B_NO_MEMORY;
 
-		cookie->vec_index = 0;
-		cookie->vec_offset = 0;
-		cookie->mapped_area = -1;
-		cookie->physical_page_handle = NULL;
-		cookie->virtual_address = 0;
 		_cookie = cookie;
 	}
 
 	// recycle a potential previously mapped page
-	if (cookie->physical_page_handle != NULL) {
-// TODO: This check is invalid! The physical page mapper is not required to
-// return a non-NULL handle (the generic implementation does not)!
-		vm_put_physical_page(cookie->virtual_address,
-			cookie->physical_page_handle);
-	}
+	cookie->PutPhysicalPageIfNeeded();
 
 	if (cookie->vec_index >= fVecCount)
 		return B_BAD_INDEX;
@@ -203,7 +211,8 @@ IOBuffer::FreeVirtualVecCookie(void* _cookie)
 	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
 	if (cookie->mapped_area >= 0)
 		delete_area(cookie->mapped_area);
-// TODO: A vm_get_physical_page() may still be unmatched!
+
+	cookie->PutPhysicalPageIfNeeded();
 
 	free_etc(cookie, fVIP ? HEAP_PRIORITY_VIP : 0);
 }
