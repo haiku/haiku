@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1942,6 +1942,11 @@ open_stdio(int targetFD, int openMode)
 int
 main()
 {
+	if (find_port(B_LAUNCH_DAEMON_PORT_NAME) >= 0) {
+		fprintf(stderr, "The launch_daemon is already running!\n");
+		return EXIT_FAILURE;
+	}
+
 	// Make stdin/out/err available
 	open_stdio(STDIN_FILENO, O_RDONLY);
 	open_stdio(STDOUT_FILENO, O_WRONLY);
