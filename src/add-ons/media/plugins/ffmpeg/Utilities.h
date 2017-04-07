@@ -44,7 +44,6 @@ ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 	uint16& pixelWidthAspectOut, uint16& pixelHeightAspectOut)
 {
 	assert(contextIn.sample_aspect_ratio.num >= 0);
-	assert(contextIn.sample_aspect_ratio.den > 0);
 	assert(contextIn.width > 0);
 	assert(contextIn.height > 0);
 
@@ -53,7 +52,8 @@ ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 	// Aßmus
 	AVRational pixelAspectRatio;
 
-	if (contextIn.sample_aspect_ratio.num == 0) {
+	if (contextIn.sample_aspect_ratio.num == 0
+		|| contextIn.sample_aspect_ratio.den == 0) {
 		// AVCodecContext doesn't contain a video aspect ratio, so calculate it
 		// ourselve based solely on the video dimensions
 		av_reduce(&pixelAspectRatio.num, &pixelAspectRatio.den, contextIn.width,
