@@ -233,7 +233,7 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 	for (int32 i = 0;i < node->all_key_count;i++) {
 		uint16 length;
 		char* key = (char *)node->KeyAt(i, &length);
-		if (length > 255) {
+		if (length > BPLUSTREE_MAX_KEY_LENGTH) {
 			Print("  %2" B_PRId32 ". Invalid length (%u)!!\n", i, length);
 			dump_block((char *)node, header->node_size, sizeof(off_t));
 			break;

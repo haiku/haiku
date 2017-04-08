@@ -156,6 +156,40 @@ dump_double_indirect_stream(Disk& disk, bfs_inode* node, bool showOffsets)
 }
 
 
+void
+list_bplustree(Disk& disk, Directory* directory, off_t size)
+{
+	directory->Rewind();
+
+	char name[B_FILE_NAME_LENGTH];
+	char buffer[512];
+	uint64 count = 0;
+	block_run run;
+	while (directory->GetNextEntry(name, &run) == B_OK) {
+		snprintf(buffer, sizeof(buffer), " %s", name);
+		dump_block_run("", run, buffer);
+		count++;
+	}
+
+	printf("--\n%lld items.\n", count);
+}
+
+
+void
+count_bplustree(Disk& disk, Directory* directory, off_t size)
+{
+	directory->Rewind();
+
+	char name[B_FILE_NAME_LENGTH];
+	uint64 count = 0;
+	block_run run;
+	while (directory->GetNextEntry(name, &run) == B_OK)
+		count++;
+
+	printf("%lld items.\n", count);
+}
+
+
 block_run
 parseBlockRun(Disk &disk, char *first, char *last)
 {
@@ -186,6 +220,8 @@ main(int argc, char **argv)
 					"parameters:\n"
 				"\t-i\tdump inode\n"
 				"\t-b\tdump b+tree\n"
+				"\t-c\tlist b+tree leaves\n"
+				"\t-c\tcount b+tree leaves\n"
 				"\t-v\tvalidate b+tree\n"
 				"\t-h\thexdump\n"
 				"\t-o\tshow disk offsets\n",
@@ -197,6 +233,8 @@ main(int argc, char **argv)
 	bool dumpInode = false;
 	bool dumpSuperBlock = false;
 	bool dumpBTree = false;
+	bool listBTree = false;
+	bool countBTree = false;
 	bool validateBTree = false;
 	bool dumpHex = false;
 	bool showOffsets = false;
@@ -217,6 +255,12 @@ main(int argc, char **argv)
 						break;
 					case 'b':
 						dumpBTree = true;
+						break;
+					case 'l':
+						listBTree = true;
+						break;
+					case 'c':
+						countBTree = true;
 						break;
 					case 'v':
 						validateBTree = true;
@@ -242,7 +286,7 @@ main(int argc, char **argv)
 	putchar('\n');
 
 	if (!dumpSuperBlock && !dumpRootNode && !dumpInode && !dumpBTree
-		&& !dumpHex) {
+		&& !dumpHex && !listBTree && !countBTree) {
 		printf("  Name:\t\t\t\"%s\"\n", disk.SuperBlock()->name);
 		printf("    (disk is %s)\n\n",
 			disk.ValidateSuperBlock() == B_OK ? "valid" : "invalid!!");
@@ -301,7 +345,8 @@ main(int argc, char **argv)
 	block_run run;
 	Inode *inode = NULL;
 
-	if (dumpInode || dumpBTree || dumpHex || validateBTree) {
+	if (dumpInode || dumpBTree || dumpHex || validateBTree || listBTree
+		|| countBTree) {
 		// Set the block_run to the right value (as specified on the command
 		// line)
 		if (!argv[1]) {
@@ -338,7 +383,25 @@ main(int argc, char **argv)
 		printf("B+Tree at block %" B_PRIdOFF ":\n-----------------------------"
 			"------------\n", disk.ToBlock(run));
 		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {
-			dump_bplustree(disk, (Directory *)inode, inode->Size(), dumpHex);
+			dump_bplustree(disk, (Directory*)inode, inode->Size(), dumpHex);
+			putchar('\n');
+		} else
+			fprintf(stderr, "Inode is not a directory!\n");
+	}
+
+	if (listBTree && inode != NULL) {
+		printf("Directory contents: ------------------------------------------\n");
+		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {
+			list_bplustree(disk, (Directory*)inode, inode->Size());
+			putchar('\n');
+		} else
+			fprintf(stderr, "Inode is not a directory!\n");
+	}
+
+	if (countBTree && inode != NULL) {
+		printf("Count contents: ------------------------------------------\n");
+		if (inode->IsDirectory() || inode->IsAttributeDirectory()) {
+			count_bplustree(disk, (Directory*)inode, inode->Size());
 			putchar('\n');
 		} else
 			fprintf(stderr, "Inode is not a directory!\n");
