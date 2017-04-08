@@ -986,8 +986,8 @@ Inode::_RemoveAttribute(Transaction& transaction, const char* name,
 		Inode* attribute;
 		if ((hasIndex || fVolume->CheckForLiveQuery(name))
 			&& GetAttribute(name, &attribute) == B_OK) {
-			uint8 data[BPLUSTREE_MAX_KEY_LENGTH];
-			size_t length = BPLUSTREE_MAX_KEY_LENGTH;
+			uint8 data[MAX_INDEX_KEY_LENGTH];
+			size_t length = MAX_INDEX_KEY_LENGTH;
 			if (attribute->ReadAt(0, data, &length) == B_OK) {
 				index->Update(transaction, name, attribute->Type(), data,
 					length, NULL, 0, this);
@@ -1082,7 +1082,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 		return B_BAD_VALUE;
 
 	// needed to maintain the index
-	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH];
+	uint8 oldBuffer[MAX_INDEX_KEY_LENGTH];
 	uint8* oldData = NULL;
 	size_t oldLength = 0;
 	bool created = false;
@@ -1091,7 +1091,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	// If they get changed during the write (hey, user programs), we may mess
 	// up our index trees!
 	// TODO: for attribute files, we need to log the first
-	// BPLUSTREE_MAX_KEY_LENGTH bytes of the data stream, or the same as above
+	// MAX_INDEX_KEY_LENGTH bytes of the data stream, or the same as above
 	// might happen.
 
 	Index index(fVolume);
@@ -1114,8 +1114,8 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 		if (smallData != NULL) {
 			oldLength = smallData->DataSize();
 			if (oldLength > 0) {
-				if (oldLength > BPLUSTREE_MAX_KEY_LENGTH)
-					oldLength = BPLUSTREE_MAX_KEY_LENGTH;
+				if (oldLength > MAX_INDEX_KEY_LENGTH)
+					oldLength = MAX_INDEX_KEY_LENGTH;
 				memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
 			}
 		} else
@@ -1161,7 +1161,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 				bigtime_t oldModified = attribute->LastModified();
 				writeLocker.Unlock();
 
-				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
+				oldLength = MAX_INDEX_KEY_LENGTH;
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
 
@@ -1215,10 +1215,10 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	// TODO: find a better way than this "pos" thing (the begin of the old key
 	//	must be copied to the start of the new one for a comparison)
 	if (status == B_OK && pos == 0) {
-		// index only the first BPLUSTREE_MAX_KEY_LENGTH bytes
+		// Index only the first MAX_INDEX_KEY_LENGTH bytes
 		uint16 length = *_length;
-		if (length > BPLUSTREE_MAX_KEY_LENGTH)
-			length = BPLUSTREE_MAX_KEY_LENGTH;
+		if (length > MAX_INDEX_KEY_LENGTH)
+			length = MAX_INDEX_KEY_LENGTH;
 
 		// Update index. Note, Index::Update() may be called even if
 		// initializing the index failed - it will just update the live
@@ -1256,8 +1256,8 @@ Inode::RemoveAttribute(Transaction& transaction, const char* name)
 		small_data* smallData = FindSmallData(node.Node(), name);
 		if (smallData != NULL) {
 			uint32 length = smallData->DataSize();
-			if (length > BPLUSTREE_MAX_KEY_LENGTH)
-				length = BPLUSTREE_MAX_KEY_LENGTH;
+			if (length > MAX_INDEX_KEY_LENGTH)
+				length = MAX_INDEX_KEY_LENGTH;
 			index.Update(transaction, name, smallData->Type(),
 				smallData->Data(), length, NULL, 0, this);
 		}
@@ -1361,20 +1361,19 @@ Inode::IsEmpty()
 {
 	TreeIterator iterator(fTree);
 
-	// index and attribute directories are really empty when they are
-	// empty - directories for standard files always contain ".", and
-	// "..", so we need to ignore those two
-
 	uint32 count = 0;
-	char name[BPLUSTREE_MAX_KEY_LENGTH];
+	char name[MAX_INDEX_KEY_LENGTH + 1];
 	uint16 length;
 	ino_t id;
-	while (iterator.GetNextEntry(name, &length, B_FILE_NAME_LENGTH,
+	while (iterator.GetNextEntry(name, &length, MAX_INDEX_KEY_LENGTH + 1,
 			&id) == B_OK) {
-		if (Mode() & (S_ATTR_DIR | S_INDEX_DIR))
+		if ((Mode() & (S_ATTR_DIR | S_INDEX_DIR)) != 0)
 			return false;
 
-		if (++count > 2 || (strcmp(".", name) && strcmp("..", name)))
+		// Unlike index and attribute directories, directories
+		// for standard files always contain ".", and "..", so
+		// we need to ignore those two
+		if (++count > 2 || (strcmp(".", name) != 0 && strcmp("..", name) != 0))
 			return false;
 	}
 	return true;

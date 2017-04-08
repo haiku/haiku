@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
@@ -1692,10 +1692,8 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 	if (_SeekDown(stack, key, keyLength) != B_OK)
 		RETURN_ERROR(B_ERROR);
 
-	uint8 keyBuffer[BPLUSTREE_MAX_KEY_LENGTH + 1];
-
+	uint8 keyBuffer[BPLUSTREE_MAX_KEY_LENGTH];
 	memcpy(keyBuffer, key, keyLength);
-	keyBuffer[keyLength] = 0;
 
 	node_and_key nodeAndKey;
 	const bplustree_node* node;
@@ -2746,10 +2744,18 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	// include the termination for string types
 	bool needsTermination = fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE;
 	if (length + (needsTermination ? 1 : 0) > maxLength) {
-		// the buffer is too small, restore the last key and return an error
-		fCurrentNodeOffset = savedNodeOffset;
-		fCurrentKey = savedKey;
-		return B_BUFFER_OVERFLOW;
+		if (!needsTermination) {
+			// The buffer is too small, restore the last key and return
+			// an error
+			fCurrentNodeOffset = savedNodeOffset;
+			fCurrentKey = savedKey;
+			return B_BUFFER_OVERFLOW;
+		}
+
+		// Always cut off strings at the maximum buffer size, and leave
+		// room for a terminating null byte.
+		// This allows to handle larger key sizes gracefully.
+		length = maxLength - 1;
 	}
 
 	memcpy(key, keyStart, length);

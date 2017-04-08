@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * Parts of this code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -166,10 +166,15 @@ struct small_data {
 	inline	bool				IsLast(const bfs_inode* inode) const;
 } _PACKED;
 
-// the file name is part of the small_data structure
+// The file name is part of the small_data structure
 #define FILE_NAME_TYPE			'CSTR'
 #define FILE_NAME_NAME			0x13
 #define FILE_NAME_NAME_LENGTH	1
+
+// The maximum key length of attribute data that is put  in the index.
+// This excludes a terminating null byte.
+// This must be smaller than or equal as BPLUSTREE_MAX_KEY_LENGTH.
+#define MAX_INDEX_KEY_LENGTH	255
 
 
 //**************************************

@@ -2175,8 +2175,8 @@ BlockAllocator::_AddInodeToIndex(Inode* inode)
 			if (inode->InSizeIndex())
 				status = tree->Insert(transaction, inode->Size(), inode->ID());
 		} else {
-			uint8 key[BPLUSTREE_MAX_KEY_LENGTH];
-			size_t keyLength = BPLUSTREE_MAX_KEY_LENGTH;
+			uint8 key[MAX_INDEX_KEY_LENGTH];
+			size_t keyLength = MAX_INDEX_KEY_LENGTH;
 			if (inode->ReadAttribute(index->name, B_ANY_TYPE, 0, key,
 					&keyLength) == B_OK) {
 				status = tree->Insert(transaction, key, keyLength, inode->ID());
