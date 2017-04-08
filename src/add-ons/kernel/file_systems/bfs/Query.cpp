@@ -153,7 +153,6 @@ private:
 			status_t			_ConvertValue(type_code type);
 			bool				_CompareTo(const uint8* value, uint16 size);
 			uint8*				_Value() const { return (uint8*)&fValue; }
-			status_t			_MatchEmptyString();
 
 private:
 			char*				fAttribute;
@@ -379,12 +378,9 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 
 	// first, check if we are matching for a live query and use that value
 	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
-		if (key == NULL) {
-			if (type == B_STRING_TYPE)
-				return _MatchEmptyString();
-
+		if (key == NULL)
 			return NO_MATCH;
-		}
+
 		buffer = const_cast<uint8*>(key);
 	} else if (!strcmp(fAttribute, "name")) {
 		// we need to lock before accessing Inode::Name()
@@ -454,7 +450,7 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 				}
 				inode->ReleaseAttribute(attribute);
 			} else
-				return _MatchEmptyString();
+				return NO_MATCH;
 		}
 	}
 	// prepare own value for use, if it is possible to convert it
@@ -888,26 +884,6 @@ Equation::_CompareTo(const uint8* value, uint16 size)
 	}
 	FATAL(("Unknown/Unsupported operation: %d\n", fOp));
 	return false;
-}
-
-
-status_t
-Equation::_MatchEmptyString()
-{
-	// There is no matching attribute, we will just bail out if we
-	// already know that our value is not of a string type.
-	// If not, it will be converted to a string - and then be compared with "".
-	// That's why we have to call ConvertValue() here - but it will be
-	// a cheap call for the next time
-	// TODO: Should we do this only for OP_UNEQUAL?
-	if (fType != 0 && fType != B_STRING_TYPE)
-		return NO_MATCH;
-
-	status_t status = _ConvertValue(B_STRING_TYPE);
-	if (status == B_OK)
-		status = _CompareTo((const uint8*)"", fSize) ? MATCH_OK : NO_MATCH;
-
-	return status;
 }
 
 
