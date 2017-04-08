@@ -553,13 +553,13 @@ if [ IsPackageAvailable tiff4_devel ] {
 
 # libwebp
 if [ IsPackageAvailable libwebp_devel ] {
-	if $(HAIKU_PACKAGING_ARCH) = x86_gcc2 {
+	if $(HAIKU_PACKAGING_ARCH) = x86 {
 		ExtractBuildFeatureArchives libwebp :
 			file: base libwebp
 				runtime: lib
 			file: devel libwebp_devel
 				depends: base
-				library: $(developLibDir)/libwebp.so.7
+				library: $(developLibDir)/libwebp.so.6
 				headers: $(developHeadersDir) $(developHeadersDir)/webp
 			;
 	} else {
@@ -568,7 +568,7 @@ if [ IsPackageAvailable libwebp_devel ] {
 				runtime: lib
 			file: devel libwebp_devel
 				depends: base
-				library: $(developLibDir)/libwebp.so.6
+				library: $(developLibDir)/libwebp.so.7
 				headers: $(developHeadersDir) $(developHeadersDir)/webp
 			;
 	}
