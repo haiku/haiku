@@ -107,8 +107,10 @@ main(int argc, char **argv)
 				print_formatting_conventions();
 				break;
 			case 'c':	// for compatibility, we used to use 'c' for ctype
-			case 'm':
 				printf("%s.UTF-8\n", preferred_language().String());
+				break;
+			case 'm':
+				puts("UTF-8");
 				break;
 			case 't':
 				print_time_conventions();
