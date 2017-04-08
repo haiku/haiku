@@ -445,8 +445,17 @@ intel_set_display_mode(display_mode* mode)
 	// centering, since the data from propose_display_mode will not actually be
 	// used as is in this case.
 	if (sanitize_display_mode(target)) {
-		TRACE("%s: invalid mode set!\n", __func__);
-		return B_BAD_VALUE;
+		TRACE("Video mode was adjusted by sanitize_display_mode\n");
+		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
+			mode->timing.h_display, mode->timing.h_sync_start,
+			mode->timing.h_sync_end, mode->timing.h_total,
+			mode->timing.v_display, mode->timing.v_sync_start,
+			mode->timing.v_sync_end, mode->timing.v_total);
+		TRACE("Sanitized: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
+			target.timing.h_display, target.timing.h_sync_start,
+			target.timing.h_sync_end, target.timing.h_total,
+			target.timing.v_display, target.timing.v_sync_start,
+			target.timing.v_sync_end, target.timing.v_total);
 	}
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
