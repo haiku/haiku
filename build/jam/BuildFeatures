@@ -553,7 +553,7 @@ if [ IsPackageAvailable tiff4_devel ] {
 
 # libwebp
 if [ IsPackageAvailable libwebp_devel ] {
-	if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+	if $(HAIKU_PACKAGING_ARCH) = x86_gcc2 {
 		ExtractBuildFeatureArchives libwebp :
 			file: base libwebp
 				runtime: lib
