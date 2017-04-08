@@ -1110,7 +1110,6 @@ status_t
 AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 {
 	assert(fDecodedDataBufferSize == 0);
-	assert(fTempPacket.size > 0);
 
 	memset(fDecodedDataBuffer, 0, sizeof(AVFrame));
     av_frame_unref(fDecodedDataBuffer);
@@ -1231,15 +1230,6 @@ AVCodecDecoder::_UpdateMediaHeaderForAudioFrame()
 status_t
 AVCodecDecoder::_DecodeNextVideoFrame()
 {
-#if 0
-	// Well, I heard this was not supposed to happen, but it does
-	// (for example with http://thud.us/videos/misc/xvid-samples/flyby-divx.avi
-	// see #11409). Since that video otherwise plays fine when removing the
-	// assert, I'm assuming we are being overcautious here and commenting it
-	// out.
-	assert(fTempPacket.size >= 0);
-#endif
-
 	while (true) {
 		status_t loadingChunkStatus
 			= _LoadNextChunkIfNeededAndAssignStartTime();
