@@ -66,7 +66,7 @@ union value {
 	uint32	Uint32;
 	float	Float;
 	double	Double;
-	char	String[INODE_FILE_NAME_LENGTH];
+	char	String[MAX_INDEX_KEY_LENGTH + 1];
 };
 
 
@@ -441,8 +441,8 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 				type = attribute->Type();
 				size = attribute->Size();
 
-				if (size > INODE_FILE_NAME_LENGTH)
-					size = INODE_FILE_NAME_LENGTH;
+				if (size > MAX_INDEX_KEY_LENGTH)
+					size = MAX_INDEX_KEY_LENGTH;
 
 				if (attribute->ReadAt(0, buffer, &size) < B_OK) {
 					inode->ReleaseAttribute(attribute);
@@ -746,7 +746,7 @@ Equation::_CopyString(char* start, char* end)
 	int32 length = end + 2 - start;
 	// just to make sure; since that's the max. attribute name length and
 	// the max. string in an index, it make sense to have it that way
-	if (length > INODE_FILE_NAME_LENGTH || length <= 0)
+	if (length > MAX_INDEX_KEY_LENGTH + 1 || length <= 0)
 		return NULL;
 
 	char* copy = (char*)malloc(length);
@@ -797,8 +797,8 @@ Equation::_ConvertValue(type_code type)
 			type = B_STRING_TYPE;
 			// supposed to fall through
 		case B_STRING_TYPE:
-			strncpy(fValue.String, string, INODE_FILE_NAME_LENGTH);
-			fValue.String[INODE_FILE_NAME_LENGTH - 1] = '\0';
+			strncpy(fValue.String, string, MAX_INDEX_KEY_LENGTH + 1);
+			fValue.String[MAX_INDEX_KEY_LENGTH] = '\0';
 			fSize = strlen(fValue.String);
 			break;
 		case B_TIME_TYPE:
