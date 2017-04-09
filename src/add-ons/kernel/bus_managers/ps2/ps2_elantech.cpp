@@ -274,12 +274,12 @@ probe_elantech(ps2_dev* dev)
 		return B_ERROR;
 	}
 
-	INFO("Elantech found\n");
+	INFO("Elantech found, under development so no features activated!\n");
 
 	dev->name = kElantechPath[dev->idx];
 	dev->packet_size = PS2_PACKET_ELANTECH;
 
-	return B_OK;
+	return B_ERROR;
 }
 
 

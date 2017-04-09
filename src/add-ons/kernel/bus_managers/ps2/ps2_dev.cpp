@@ -89,13 +89,11 @@ ps2_dev_detect_pointing(ps2_dev* dev, device_hooks** hooks)
 		goto dev_found;
 	}
 
-#if 0
 	status = probe_elantech(dev);
 	if (status == B_OK) {
 		*hooks = &gElantechDeviceHooks;
 		goto dev_found;
 	}
-#endif
 
 	// reset the mouse for the case that the previous probes leaf the mouse in
 	// a undefined state
