@@ -589,7 +589,26 @@ BOutlineListView::ResizeToPreferred()
 void
 BOutlineListView::GetPreferredSize(float* _width, float* _height)
 {
-	BListView::GetPreferredSize(_width, _height);
+	int32 count = CountItems();
+
+	if (count > 0) {
+		float maxWidth = 0.0;
+		for (int32 i = 0; i < count; i++) {
+			// The item itself does not take his OutlineLevel into account, so
+			// we must make up for that. Also add space for the latch.
+			float itemWidth = ItemAt(i)->Width() + be_plain_font->Size()
+				+ (ItemAt(i)->OutlineLevel() + 1)
+					* be_control_look->DefaultItemSpacing();
+			if (itemWidth > maxWidth)
+				maxWidth = itemWidth;
+		}
+
+		if (_width != NULL)
+			*_width = maxWidth;
+		if (_height != NULL)
+			*_height = ItemAt(count - 1)->Bottom();
+	} else
+		BView::GetPreferredSize(_width, _height);
 }
 
 

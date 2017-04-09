@@ -1473,33 +1473,51 @@ BListView::_InitObject(list_view_type type)
 void
 BListView::_FixupScrollBar()
 {
+
 	BScrollBar* vertScroller = ScrollBar(B_VERTICAL);
-	if (!vertScroller)
-		return;
+	if (vertScroller != NULL) {
+		BRect bounds = Bounds();
+		int32 count = CountItems();
 
-	BRect bounds = Bounds();
-	int32 count = CountItems();
+		float itemHeight = 0.0;
 
-	float itemHeight = 0.0;
+		if (CountItems() > 0)
+			itemHeight = ItemAt(CountItems() - 1)->Bottom();
 
-	if (CountItems() > 0)
-		itemHeight = ItemAt(CountItems() - 1)->Bottom();
+		if (bounds.Height() > itemHeight) {
+			// no scrolling
+			vertScroller->SetRange(0.0, 0.0);
+			vertScroller->SetValue(0.0);
+				// also scrolls ListView to the top
+		} else {
+			vertScroller->SetRange(0.0, itemHeight - bounds.Height() - 1.0);
+			vertScroller->SetProportion(bounds.Height () / itemHeight);
+			// scroll up if there is empty room on bottom
+			if (itemHeight < bounds.bottom)
+				ScrollBy(0.0, bounds.bottom - itemHeight);
+		}
 
-	if (bounds.Height() > itemHeight) {
-		// no scrolling
-		vertScroller->SetRange(0.0, 0.0);
-		vertScroller->SetValue(0.0);
-			// also scrolls ListView to the top
-	} else {
-		vertScroller->SetRange(0.0, itemHeight - bounds.Height() - 1.0);
-		vertScroller->SetProportion(bounds.Height () / itemHeight);
-		// scroll up if there is empty room on bottom
-		if (itemHeight < bounds.bottom)
-			ScrollBy(0.0, bounds.bottom - itemHeight);
+		if (count != 0)
+			vertScroller->SetSteps(
+				ceilf(FirstItem()->Height()), bounds.Height());
 	}
 
-	if (count != 0)
-		vertScroller->SetSteps(ceilf(FirstItem()->Height()), bounds.Height());
+	BScrollBar* horizontalScroller = ScrollBar(B_HORIZONTAL);
+	if (horizontalScroller != NULL) {
+		float w;
+		GetPreferredSize(&w, NULL);
+		BRect scrollBarSize = horizontalScroller->Bounds();
+
+		if (w <= scrollBarSize.Width()) {
+			// no scrolling
+			horizontalScroller->SetRange(0.0, 0.0);
+			horizontalScroller->SetValue(0.0);
+		} else {
+			horizontalScroller->SetRange(0, w - scrollBarSize.Width());
+			horizontalScroller->SetProportion(scrollBarSize.Width() / w);
+		}
+		printf("Range: %f - %f\n", w, scrollBarSize.Width());
+	}
 }
 
 
