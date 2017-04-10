@@ -592,7 +592,7 @@ RemotePackageRepository HaikuPorts
 	vcdimager_devel-0.7.24-3
 	vim-7.4-5
 	virtualbox_guest_additions-4.3.53_svn-7
-	vision-0.9.8-1
+	vision-0.10.1-1
 	vlc-0.8.6i-1
 	vlc_devel-0.8.6i-1
 	vlink-0.15-1
