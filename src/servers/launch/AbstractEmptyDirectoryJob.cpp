@@ -23,7 +23,7 @@ status_t
 AbstractEmptyDirectoryJob::CreateAndEmpty(const char* path) const
 {
 	BEntry entry(path);
-	if (entry.InitCheck() != B_OK) {
+	if (!entry.Exists()) {
 		create_directory(path, 0777);
 
 		status_t status = entry.SetTo(path);
