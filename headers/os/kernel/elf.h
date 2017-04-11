@@ -151,6 +151,38 @@ typedef struct {
 #define EM_ST100		60 /* STMicroelectronics ST100 processor */
 #define EM_TINYJ		61 /* Advanced Logic Corp. TinyJ embedded processor */
 #define EM_X86_64		62 /* Advanced Micro Devices X86-64 processor */
+#define EM_PDSP			63 /* Sony DSP Processor */
+
+#define EM_FX66			66 /* Siemens FX66 microcontroller */
+#define EM_ST9PLUS		67 /* STMicroelectronics ST9+ 8/16 mc */
+#define EM_ST7			68 /* STmicroelectronics ST7 8 bit mc */
+#define EM_68HC16		69 /* Motorola MC68HC16 microcontroller */
+#define EM_68HC11		70 /* Motorola MC68HC11 microcontroller */
+#define EM_68HC08		71 /* Motorola MC68HC08 microcontroller */
+#define EM_68HC05		72 /* Motorola MC68HC05 microcontroller */
+#define EM_SVX			73 /* Silicon Graphics SVx */
+#define EM_ST19			74 /* STMicroelectronics ST19 8 bit mc */
+#define EM_VAX			75 /* Digital VAX */
+#define EM_CRIS			76 /* Axis Communications 32-bit embedded processor */
+#define EM_JAVELIN		77 /* Infineon Technologies 32-bit embedded processor */
+#define EM_FIREPATH		78 /* Element 14 64-bit DSP Processor */
+#define EM_ZSP			79 /* LSI Logic 16-bit DSP Processor */
+#define EM_MMIX			80 /* Donald Knuth's educational 64-bit processor */
+#define EM_HUANY		81 /* Harvard University machine-independent object files */
+#define EM_PRISM		82 /* SiTera Prism */
+#define EM_AVR			83 /* Atmel AVR 8-bit microcontroller */
+#define EM_FR30			84 /* Fujitsu FR30 */
+#define EM_D10V			85 /* Mitsubishi D10V */
+#define EM_D30V			86 /* Mitsubishi D30V */
+#define EM_V850			87 /* NEC v850 */
+#define EM_M32R			88 /* Mitsubishi M32R */
+#define EM_MN10300		89 /* Matsushita MN10300 */
+#define EM_MN10200		90 /* Matsushita MN10200 */
+#define EM_PJ			91 /* picoJava */
+#define EM_OPENRISC		92 /* OpenRISC 32-bit embedded processor */
+#define EM_ARC_A5		93 /* ARC Cores Tangent-A5 */
+#define EM_XTENSA		94 /* Tensilica Xtensa Architecture */
+#define EM_NUM			95
 
 /* architecture class (EI_CLASS) */
 #define ELFCLASSNONE	0
