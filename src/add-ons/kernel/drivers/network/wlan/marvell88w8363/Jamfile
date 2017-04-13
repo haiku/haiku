@@ -8,7 +8,8 @@ UsePrivateKernelHeaders ;
 
 ## TODO once all driver are updated to their FreeBSD 8 version this define
 ## can be omitted
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 __FreeBSD_version__=8 ] 
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 __FreeBSD_version__=8
+		_XOPEN_SOURCE ] 
 	-Wno-format 
 	-Wno-unused 
 	-Wno-uninitialized ;

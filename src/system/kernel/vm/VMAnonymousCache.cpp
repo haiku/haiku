@@ -1386,7 +1386,7 @@ swap_file_delete(const char* path)
 
 	mutex_lock(&sAvailSwapSpaceLock);
 	sAvailSwapSpace -= (off_t)(swapFile->last_slot - swapFile->first_slot)
-		* PAGE_SIZE;
+		* B_PAGE_SIZE;
 	mutex_unlock(&sAvailSwapSpaceLock);
 
 	close(swapFile->fd);

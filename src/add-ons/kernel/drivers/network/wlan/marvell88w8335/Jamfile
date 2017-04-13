@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] 
 	-Wno-format 
 	-Wno-unused 
 	-Wno-uninitialized ;
