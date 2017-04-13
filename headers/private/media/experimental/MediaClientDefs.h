@@ -13,10 +13,11 @@
 namespace BPrivate { namespace media {
 
 
-typedef uint64 media_client_id;
+typedef int64 media_client_id;
+typedef int64 media_connection_id;
+
 typedef uint64 media_client_kinds;
 typedef uint64 media_connection_kinds;
-typedef uint64 media_connection_id;
 
 
 enum media_client_kind {

@@ -78,7 +78,7 @@ public:
 BMediaClient::BMediaClient(const char* name,
 	media_type type, media_client_kinds kinds)
 	:
-	fLastID(0)
+	fLastID(-1)
 {
 	CALLED();
 

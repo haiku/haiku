@@ -21,7 +21,7 @@ BMediaConnection::BMediaConnection(media_connection_kinds kinds)
 	CALLED();
 
 	fConnection.kinds = kinds;
-	fConnection.id = 0;
+	fConnection.id = -1;
 	//fConnection.client = media_client::null;
 }
 
