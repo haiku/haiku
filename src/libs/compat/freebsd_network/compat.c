@@ -609,7 +609,7 @@ _kernel_malloc(size_t size, int flags)
 	// size. While it also states that this shouldn't be relied upon, at least
 	// bus_dmamem_alloc expects it and drivers may depend on it as well.
 	void *ptr
-		= memalign(size >= PAGE_SIZE ? PAGE_SIZE : next_power_of_2(size), size);
+		= memalign(size >= PAGESIZE ? PAGESIZE : next_power_of_2(size), size);
 	if (ptr == NULL)
 		return NULL;
 
