@@ -289,7 +289,7 @@ abort()
 	fprintf(stderr, "Abort\n");
 
 	raise(SIGABRT);
-	exit(EXIT_FAILURE);
+	debugger("abort() called");
 }
 
 
