@@ -7,7 +7,7 @@ UsePrivateKernelHeaders ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 EM_FAST_INTR=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 EM_FAST_INTR=1 _XOPEN_SOURCE ] ;
 
 KernelAddon ipro1000 :
 	e1000_80003es2lan.c
