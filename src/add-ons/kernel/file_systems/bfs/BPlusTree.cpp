@@ -2744,7 +2744,7 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	// include the termination for string types
 	bool needsTermination = fTree->fHeader.DataType() == BPLUSTREE_STRING_TYPE;
 	if (length + (needsTermination ? 1 : 0) > maxLength) {
-		if (!needsTermination) {
+		if (!needsTermination || maxLength < INODE_FILE_NAME_LENGTH) {
 			// The buffer is too small, restore the last key and return
 			// an error
 			fCurrentNodeOffset = savedNodeOffset;
