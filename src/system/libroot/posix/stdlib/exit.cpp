@@ -290,6 +290,7 @@ abort()
 
 	raise(SIGABRT);
 	debugger("abort() called");
+	exit(EXIT_FAILURE);
 }
 
 
