@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : tr
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] ;
 
 KernelStaticLibrary broadcom570x_mii.a
 	:
