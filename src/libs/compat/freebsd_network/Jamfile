@@ -10,7 +10,7 @@ UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
 Includes [ FGristFiles kernel_c++_structs.h ]
 	: <src!system!kernel>kernel_c++_struct_sizes.h ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 _XOPEN_SOURCE ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
 	bus.cpp

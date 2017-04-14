@@ -111,7 +111,7 @@ CDaffyDuck::~CDaffyDuck()
 {
 
 	if (NULL != m_pDuckPage)
-		m_pOsSupport->FreePhysPageBlock( PAGE_SIZE, m_pDuckPage);
+		m_pOsSupport->FreePhysPageBlock( B_PAGE_SIZE, m_pDuckPage);
 	
 }	// CDaffyDuck::~CDaffyDuck()
 
@@ -823,7 +823,7 @@ CDaffyDuck * CDaffyDuck::MakeDaffyDuck(COsSupport *pOsSupport)
 	PHYS_ADDR PhysAddr;
 	PPAGE_BLOCK pPageBlock;
 	
-	Status = pOsSupport->AllocPhysPageBlock( PAGE_SIZE, pPageBlock);
+	Status = pOsSupport->AllocPhysPageBlock( B_PAGE_SIZE, pPageBlock);
 	if (ECHOSTATUS_OK != Status)
 	{
 		ECHO_DEBUGPRINTF(("CDaffyDuck::CDaffyDuck - duck entry page block malloc failed\n"));

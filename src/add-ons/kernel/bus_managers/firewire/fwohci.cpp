@@ -150,7 +150,7 @@ static void fwohci_task_dma(void *);
 /*
  * memory allocated for DMA programs
  */
-#define DMA_PROG_ALLOC		(8 * PAGE_SIZE)
+#define DMA_PROG_ALLOC		(8 * B_PAGE_SIZE)
 
 #define NDB FWMAXQUEUE
 
