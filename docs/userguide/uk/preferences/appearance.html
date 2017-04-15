@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -49,80 +49,79 @@
 <li><a href="../../en/preferences/appearance.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
+    <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
 ::  <a href="backgrounds.html">Тло (Backgrounds)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Вигляд (Appearance)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Налаштування (Preferences)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
-<p>За допомогою панелі настройки Вигляд (Appearance) Ви отримуєте можливість змінити деякі властивості зовнішнього вигляду Haiku.</p>
+<p>За допомогою панелі налаштувань Вигляд (Appearance) Ви отримуєте можливість змінити деякі властивості зовнішнього вигляду Haiku.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="fonts" name="fonts">Fonts (Шрифти)</a></h2>
+<a id="fonts" name="fonts">Шрифти (Fonts)</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
 <p>Haiku визначає три стандартні шрифти для різних цілей. Ви можете встановити звичайний, потовщений і моноширинний шрифти і їхні розміри для використання в системі.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="installing_fonts" name="installing_fonts">Installing new fonts</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<a id="installing_fonts" name="installing_fonts">Встановлення нових шрифтів</a></h3>
+<p>Нові шрифти що не йдуть як частина основного пакунку *.hpkg, можуть бути встановлені копіюванням у відповідну підтеку згідно типу (<tt>psfonts</tt> або <tt>ttfonts</tt>) спеціальної теки <tt>non-packaged</tt> (див. параграф <a href="../filesystem-layout.html">Filesystem layout (Ієрархія файлової системи)</a>). Для шрифтів TrueType це може бути:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> для шрифтів доступних кожному користувачеві.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> для шрифтів доступних тільки вам особисто.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Кольори (Colors)</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>In the <span class="menu">Colors</span> tab, you can change the colors of different parts of the user interface. The color well accepts drag&amp;drops from other programs, letting you drag colors over from e.g. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> or the <span class="app">Backgrounds</span> panel.</p>
+<p>IНа першій вкладці, <span class="menu">Colors (Кольори)</span>, Ви зможете міняти колір різних елементів інтерфейса. Метод хапай та кидай дозволить Вам вказати потрібний колір з інших програм, наприклад,<span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> або з панелі <span class="app">Backgrounds (Тло)</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="decorators" name="decorators">Window decorators</a></h2>
+<a id="decorators" name="decorators">Window decorators (Віконні декоратори)</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
-<p>Haiku's default decorator lets you set the arrow style of the scroll bar: either single arrows at the end of scrollbars to conserve a bit of space, or double arrows — the traditional BeOS way — potentially saving some mouse moving when scrolling up and down or left and right...</p>
+<p>Декоратори визначають вигляд та поведінку вікон та інших елементів графічного інтерфейсу. На даний час Haiku іде тільки з одним типовим. Якщо Ви зможете відшукати та встановити інші декоратори то вибрати їх можна буде з випадаючого меню.</p>
+<p>Типовий декоратор Haiku дозволяє вибрати два варіанти смуги прокрутки або одинокі стрілки по краях полоси або подвійні як у BeOS - потенціально економлячи рухи мишки при скроллінгу згори вниз та зліва направо...</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Зглажування (Antialiasing)</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>The tab <span class="menu">Antialiasing</span> provides different settings for how things are rendered on screen.</p>
+<p>Друга панель, <span class="menu">Зглажування (Antialiasing)</span>, дозволяє налаштувати відображення тексту на екрані.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Уточнення начерку (Glyph hinting)</h3>
-<p>Включений режим <span class="menu">Уточнення (Glyph hinting)</span> Вирівнює символи таким чином, що їх вертикальні і горизонтальні межі будуть розташовані між двома пікселями. Результатом чого стане відмінна контрасність символів, особливо чорного тексту на білому фоні. Текст стає надзвичайно чітким.Також цей режим використовують  <span class="menu">Виключно для моноширинних шрифтів (Monospaced Fonts Only</span>, що особливо корисно для пристроїв з малою роздільчою здатністю, наприклад, нетбуків. Дрібні шрифти стануть виглядати непогано особливо в текстових редакторах і Terminal'i.</p>
+<p>Включений режим <span class="menu">Уточнення (Glyph hinting)</span> вирівнює символи таким чином, що їх вертикальні і горизонтальні межі будуть розташовані між двома пікселями. Результатом чого стане відмінна контрасність символів, особливо чорного тексту на білому фоні. Текст стає надзвичайно чітким. Також цей режим використовують  <span class="menu">виключно для моноширинних шрифтів (Monospaced Fonts Only)</span>, що особливо корисно для пристроїв з малою роздільчою здатністю, наприклад, нетбуків. Дрібні шрифти стануть виглядати непогано особливо у текстових редакторах і  Терміналі (Terminal).</p>
 <p>Помітити перевагу, що надає Уточнення начерку можна на двох збільшених знімках екрану:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Уточнення: вимкнене</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Уточнення: включене</td></tr>
 </table>
-<p>Слід відмітити, що текст у всіх вікнах <span class="app">Magnify</span> на цій сторінці відображається зрозуміло з різними параметрами Уточнення. Тобто Ви можете порівняти результати настройки на реальному прикладі: Заголовок вікна, що набрано напівжирним шрифтом або напис "35 x 15 @ 8 pixels/pixel".</p>
+<p>Слід відмітити, що текст у всіх вікнах <span class="app">Magnify</span> на цій сторінці відображається зрозуміло з різними параметрами Уточнення. Тобто Ви можете порівняти результати налаштування на реальному прикладі: заголовок вікна, що набрано товстим шрифтом або напис "35 x 15 @ 8 pixels/pixel".</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Тип зглажування</h3>
-<p>Іншою технікою покращення відображення графіки і тексту є<i>Зглажування (Antialiasing)</i>, Яке підтримує однаково добре як векторну графіку так і текст.Лінії зглажуються за рахунок зміни кольору деяких пікселів. Використовують два методи зглажування:</p>
+Тип зглажування (Antialiazing)</h3>
+<p>Іншою технікою покращення відображення графіки і тексту є <i>Зглажування (Antialiasing)</i>, яке підтримує однаково добре як векторну графіку так і текст. Лінії зглажуються за рахунок зміни кольору деяких пікселів. Використовують два методи зглажування:</p>
 <p><span class="menu">Відтінки сірого (Grayscale)</span> змінює інтенсивність кольору пікселя на межі.<br />
-<span class="menu">Субпіксельне зглажування (LCD subpixel)</span>Дуже ефективне особливо на РК-моніторах . При такому зглажуванні змінюється  не інтенсивність  кольору пікселя, а відтінок, що встановлює межу елемента на долі пікселя, за рахунок того, що РК-монітори використовують червону, зелену і синю компоненту для зображення кожного пікселя .</p>
+<span class="menu">Субпіксельне зглажування (LCD subpixel)</span> дуже ефективне особливо на РК-моніторах. При такому зглажуванні змінюється  не інтенсивність  кольору пікселя, а відтінок, що встановлює межу елемента на долі пікселя, за рахунок того, що РК-монітори використовують червону, зелену і синю компоненту для зображення кожного пікселя.</p>
 <p>Порівняємо два цих методи на збільшених знімках екрану</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Відтінки сірого: увімкнені, Уточнення виключено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Субпіксельне зглажування:увімкнене, Уточнення: виключено</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Відтінки сірого увімкнені, Уточнення вимкнено</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />Субпіксельне зглажування увімкнене, Уточнення вимкнено</td></tr>
 </table>
-<p>Субпіксельне зглажування додає кольорові артефакти на межах об'єктів, що наврядчи сподобаєтьбся будь-кому. Haiku дозволяє Вам одночасно використовувати обидва методи зглажування і вибрати оптимальне їх співвідношення переміщуючи бігунок</p>
-<div class="box-info">Субпіксельне зглажування в комбінації з уточненням поки що проходять перевірку патентної чистоти програмного забезпечення тому цей режим не є доступним по замовчуванню. В залежності від місця проживання Ви можете отримати розблоковану версію. Вибачте, звяжіться з Вашим представником.</div>
+<p>Субпіксельне зглажування додає кольорові артефакти на межах об'єктів, що наврядчи комусь сподобається. Haiku дозволяє Вам одночасно використовувати обидва методи зглажування і вибрати оптимальне їх співвідношення переміщенням бігунка.</p>
+<div class="box-info">Субпіксельне зглажування в комбінації з уточненням поки що проходять перевірку патентної чистоти програмного забезпечення тому цей режим не є доступним по замовчуванню. В залежності від місця проживання Ви можете отримати розблоковану версію. Вибачте, зв'яжіться з Вашим представником.</div>
 <p>Якщо Ви активуєте Уточнення з субпіксельним зглажуванням шляхом модифікації і перекомпіляції вихідного коду, то зможете порівняти результат зі зглажуванням відтінками сірого:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Відтінки сірого і Уточнення увімкнені</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Субпіксельне зглажування і Уточнення увімкнені</td></tr>
@@ -130,8 +129,8 @@
 <p><br /></p>
 <p>У нижній частині панелі розташовані дві кнопки:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">По замовчуванню (Defaults)</span></td><td> </td><td>Скинути всі настройки до значень по замовчуванню.</td></tr>
-<tr><td><span class="button">Повернути (Revert)</span></td><td> </td><td>Повернути настройки, що були встановлені до запуску панелі Вигляд (Apperance).</td></tr>
+<tr><td><span class="button">Типово (Defaults)</span></td><td> </td><td>Скинути всі налаштування до типових значень.</td></tr>
+<tr><td><span class="button">Повернути (Revert)</span></td><td> </td><td>Повернути налаштування, що були встановлені до запуску панелі Вигляд (Apperance).</td></tr>
 </table>
 
 </div>
@@ -139,7 +138,7 @@
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
+    <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
 ::  <a href="backgrounds.html">Тло (Backgrounds)</a>  »
 </span></div>
 </div>

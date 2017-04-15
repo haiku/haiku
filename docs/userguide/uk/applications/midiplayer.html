@@ -17,13 +17,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Програвач Midi</title>
+	<title>Miдiпрогравач (MidiPlayer)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -49,38 +49,38 @@
 <li><a href="../../en/applications/midiplayer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="mediaplayer.html">MediaPlayer</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
-::  <a href="packageinstaller.html">PackageInstaller</a>  »
+ «  <a href="mediaplayer.html">Медіапрогравач (MediaPlayer)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
+::  <a href="packageinstaller.html">Встановлювач пакетів (PackageInstaller)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />Програвач Midi</h2>
+<h2><img src="../../images/apps-images/midiplayer-icon_64.png" alt="midiplayer-icon_64.png" width="64" height="64" />Miдiпрогравач (MidiPlayer)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки(Applications)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/apps/MidiPlayer</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки (Applications)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/apps/MidiPlayer</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/MidiPlayerSettings</span></td></tr>
 </table>
 <p><br /></p>
-<p>As the name suggests, MidiPlayer is used to playback midi music files. Midi files are special, as they don't contain the actual digitized and in some way encoded music, but only a description of it: Hold this note for that long with this volume and use instrument X for it.<br />
-While this keeps file sizes pretty small, it also follows that depending on the instrument library (the so-called "SoundFont") the results can differ hugely. Also, these SoundFonts tend to be quite large, increasingly so with the number and quality of the instrument samples.</p>
-<div class="box-info"><p>Haiku doesn't come with a SoundFont installed, because they are so large and only few people generally need one. Most of those who do, already have high quality or custom SoundFonts. To be able to at least hear <i>something</i> you can install a free one from an optional package. In Terminal, enter: <tt>installoptionalpackage TimGMSoundFont</tt></p>
-<p>To use any other SoundFont, create a link to it in <tt>/boot/system/data/synth</tt> and name it <tt>big_synth.sy</tt>.</p></div>
+<p>Як випливає з назви, Miдiпрогравач (MidiPlayer) використовується для відтворення музичних міді файлів. Midi файли є особливими, так як вони не містять фактично оцифрованої та певним чином закодованої музики, а тільки опис її: тримати цю ноту так-то довго, з таким-то рівнем звуку, та використовуючи такий-то інструмент для цього.<br />
+Не зважаючи на те що розмір файлів досить малий, випливає також що в залежності від бібліотеки інструментів (так званих «Звукових шрифтів»  («SoundFont»)) результати можуть дуже відрізнятися. Крім того ці SoundFonts мають тенденцію бути досить великими в зв'язку з кількістю та якістю зразків звучання інструменту.</p>
+<div class="box-info"><p>У складі Haiku не встановлений жоден SoundFont, тому що вони є досить великі та незначна кількість людей потребує їх. Більшість серед тих хто це робить вже мають якісні або користувацькі Звукові шрифти. Щоб мати можливість послухати <i>щось</i> Ви можете встановити безкоштовний необов'язковий пакет. Наберіть в Терміналі: <tt>installoptionalpackage TimGMSoundFont</tt></p>
+<p>Для використання інших SoundFont, створіть посилання на нього у теці <tt>/boot/system/data/synth</tt> та назвіть його <tt>big_synth.sy</tt>.</p></div>
 <img src="../images/apps-images/midiplayer.png" alt="midiplayer.png" />
-<p>MidiPlayer's interface is very simple. Just double-click or drag &amp; drop a midi file and playback starts. You control the volume with the slider and add reverb effects from the <span class="menu">Reverb</span> pop-up menu. Activating the scope will show a visualization in form of an oscilloscope running at the top.</p>
+<p>Інстерфейс Програвача Midi дуже нескладний. Просто клікніть або захопіть та опустіть на його вікно  midi файл і відтворення стартує. 
+Налаштуйте гучність повзунком та додайте спотворюючі ефекти за допомогою випаючого меню  <span class="menu">Відбивання (Reverb)</span>. </p>
 
 </div>
 </div>
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="mediaplayer.html">MediaPlayer</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
-::  <a href="packageinstaller.html">PackageInstaller</a>  »
+ «  <a href="mediaplayer.html">Медіапрогравач (MediaPlayer)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
+::  <a href="packageinstaller.html">Встановлювач пакетів (PackageInstaller)</a>  »
 </span></div>
 </div>
 -->

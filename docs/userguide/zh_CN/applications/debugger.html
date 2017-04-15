@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		dgy18787
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Debugger</title>
+	<title>调试器（Debugger）</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -65,11 +67,11 @@
 <span class="path">~/config/settings/Debugger/</span></td></tr>
 </table>
 <p><br /></p>
-<p>The Debugger is an application the common user hasn't much use for. It's targetted at developers to investigate bugs in programs. Sometimes those bugs result in crashes and that is where even end users come into contact with the Debugger. When a program crashes, you're confronted with this alert:</p>
+<p>调试器是一般用户不太会用得到的工具。它一般供开发者使用，来检查软件程序中的错误。有时，这些错误会导致软件崩溃，这时候，就算是一般用户也有可能接触到调试器。当一个程序崩溃了，会弹出这样一个对话框：</p>
 <img src="../images/apps-images/debugger_alert.png" alt="debugger_alert.png" />
-<p>It gives four options to react to the crash:</p>
+<p>对于崩溃的程序，可以采取四个动作：</p>
 <ul>
-<li><p><span class="button">Terminate</span> will clean up after the crashed app but otherwise does nothing further.</p></li>
+<li><p><span class="button">终止（Terminate）</span> 会将程序终止，不会进行额外动作。</p></li>
 <li><p><span class="button">Debug</span> will start the Debugger for further investigation.</p></li>
 <li><p><span class="button">Write core file</span> creates a possibly huge dump of the system's state. Better attach a regular debug report first when submitting a bug report and only provide a core file on request.</p></li>
 <li><p><span class="button">Save report</span> creates a debug report which is saved as a text file on the Desktop and can be emailed to the developer of the crashed app or attached to a ticket at its bugtracker, if available.<br />

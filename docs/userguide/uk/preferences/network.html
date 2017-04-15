@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Network</title>
+	<title>Мережа (Network)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -46,62 +48,62 @@
 <li><a href="../../en/preferences/network.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="mouse.html">Mouse</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="printers.html">Printers</a>  »
+ «  <a href="mouse.html">Мишка (Mouse)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
+::  <a href="printers.html">Принтери (Printers)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/network-icon_64.png" alt="network-icon_64.png" width="64" height="64" />Network</h2>
+<h2><img src="../../images/prefs-images/network-icon_64.png" alt="network-icon_64.png" width="64" height="64" />Мережа (Network)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/preferences/Network</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">/boot/system/settings/network/</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Налаштування (Preferences)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/preferences/Network</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">/boot/system/settings/network/</span></td></tr>
 </table>
 <p><br /></p>
-<p>The Network preference is the one-stop panel to configure all available network devices and services. To the left is a collapsible list of your devices and services, the right has information or settings for the selected entry.<br />
-At the bottom you find a checkbox to <span class="menu">Show <a href="../desktop-applets/networkstatus.html">Network status</a> in Deskbar</span>. <span class="button">Revert</span> brings back the settings that were active when you've started the panel.</p>
+<p>Налаштування мережі - спільна панель у якій можна налаштувати всі доступні мережеві пристрої та сервіси. Зліва розташовано список Ваших пристроїв та сервісів який можна звернути, справа маємо інформацію про налаштування вибраного елемента.<br />
+В нижній частині Ви знайдете прапорець <span class="menu">Показати (Show) <a href="../desktop-applets/networkstatus.html">Стан мережі (Network status)</a> у Deskbar'і</span>. Кнопка <span class="button">Повернути (Revert)</span> дає змогу відкотитися на налаштування які були активні до запуску панелі.</p>
 
-<h2>Devices</h2>
+<h2>Пристрої
+</h2>
 <img src="../images/prefs-images/network-prefs-device.png" alt="network-prefs-device.png" />
 
-<p>Here we see the wireless device, using the iprowifi4965 driver. From the pop-up menu you select the WLAN to connect to. After every WLAN name in the menu, you're shown a little icon representing the signal strength.<br />
-Once a WLAN is selected, Haiku will try to connect to it automatically on every bootup. Select <span class="menu">Choose automatically</span> and it'll try to connect to the WLAN with the best signal around.</p>
-<p>If you're connecting to a protected network, you'll be asked for the password and if to either allow that connection only once, or always, which will save the password so you won't be bothered to enter it in the future.</p>
-<p>The buttons below let you <span class="button">Disable</span> the device, or <span class="button">Renegotiate</span> the connection.</p>
+<p>Тут ми бачимо, бездротовий пристрій, що використовує драйвер iprowifi4965. З спливаючого меню виберіть WLAN для підключення. Після кожного WLAN імені в меню  зображена невелика іконка, що показує рівень сигналу. <br />
+Після того, як WLAN обраний, Haiku буде намагатися підключитися до нього автоматично при кожному завантаженні. Виберіть пункт <span class="menu">Вибирати автоматично (Choose automatically)</span> і адаптер буде намагатися підключитися до бездротової мережі з найкращим рівнем сигналу.</p>
+<p>Якщо ви підключаєтеся до захищеної мережі, вам буде запропоновано ввести гасло або одноразово або зберегти його для наступних сесій.</p>
+<p>Кнопки нижче дозволяють <span class="button">Відключити (Disable)</span> пристрій, або <span class="button">Переукласти (Renegotiate)</span> з'єднання.</p>
 
-<p>Beneath a device you find a list of the available protocols, IPv4 and IPv6:</p>
+<p>Під пристроєм ви знайдете список доступних протоколів IPv4 та IPv6:</p>
 <img src="../images/prefs-images/network-prefs-ipv4.png" alt="network-prefs-ipv4.png" />
 
-<p>From the pop-up menu you set the mode to assign the vital network parameters  <span class="menu">IP Address</span>, <span class="menu">Netmask</span> and <span class="menu">Gateway</span>. You can choose <span class="menu">DHCP</span> to dynamically get the configuration from your network (router etc.), or specify them yourself by selecting <span class="menu">Static</span> and pressing <span class="button">Apply</span> when finished.</p>
+<p>З спливаючого меню задається режим для призначення життєво важливих параметрів  <span class="menu">IP адреси (IP Address)</span>, <span class="menu">Нетмаски (Netmask)</span> та <span class="menu">Шлюза (Gateway)</span>. Ви можете вибрати пункт <span class="menu">DHCP</span> для отримання динамічної конфігурації мережі (маршрутизатора etc.), або вказати їх самостійно за допомогою пункту <span class="menu">Статичний (Static), </span>натиснувши <span class="button">Прийняти (Apply)</span> для завершення.</p>
 
-<p>The settings for a tethered device are similar, without the WLAN connecting pop-up menu, obviously.</p>
+<p>Налаштування прив'язаного пристрою аналогічне, без спливаючого меню WLAN з'єднання, очевидно.</p>
 
-<h2>Services</h2>
-<h3>DNS settings</h3>
+<h2>Сервіси</h2>
+<h3>Налаштування DNS</h3>
 <img src="../images/prefs-images/network-prefs-dns.png" alt="network-prefs-dns.png" />
 
-<p>If you're using DHCP the IP address for a DNS server and the domain are provided by you network (router etc.). You can add and remove other DNS servers and adjust their priorities by moving them up and down in the list with the buttons to the right of it.<br />
-<span class="button">Apply</span> will activate your new settings.</p>
+<p>Якщо Ви використовуєте DHCP  IP адреса для DNS сервера і домен надаються Вам мережею (маршрутизатором etc.). Ви можете додати видалити інші DNS сервери та змінити їхні пріорітети переміщаючи їх вгору і вниз по списку за допомогою кнопок праворуч від нього.<br />
+Кнопка <span class="button">Прийняти (Apply)</span> активуватиме Ваші нові налаштування.</p>
 
-<h3>FTP, SSH, Telnet</h3>
+<h3>Сервери FTP, SSH, Telnet</h3>
 
 <img src="../images/prefs-images/network-prefs-ftp.png" alt="network-prefs-ftp.png" />
 
-<p>Haiku provides a few servers that you can <span class="button">Enable</span> or <span class="button">Disable</span>. On the right side of the window, you'll find information on that particular server that you should heed: The FTP and the Telnet server are <b>insecure</b> and <b>unencrypted</b>. By default they're turned off and should only be turned on, if you're aware of the security risks.</p>
+<p>Haiku надає кілька серверів, які ви можете <span class="button">Включити (Enable)</span> або <span class="button">Вимкнути (Disable)</span>. На правій стороні вікна, ви знайдете інформацію про конкретний сервер на яку слід звернути увагу: FTP та  Telnet сервери є: <b>небезпечними</b> та <b>незашифрованими</b>. Типово вони вимкнені і можуть бути включені якщо Ви обізнані з ризиками безпеки.</p>
 
-<h2>Settings files</h2>
+<h2>Файли налаштувань</h2>
 
-<p>The network settings are found in the folder  <span class="path">/system/settings/network/</span>. Normally you don't have to care about those, other than maybe having to delete them to begin with a clean slate after things have gone terribly wrong...</p>
-<p>One file however can be really useful, especially when working from the Terminal. The <tt>hosts</tt> file lets you define aliases to specific IP addresses in the network. For example:</p>
+<p>Налаштування мережі знаходяться в теці  <span class="path">/system/settings/network/</span>. Як правило, ви не повинні піклуватися про них, крім можливо випадку, коли виникло бажання видалити їх та почати все з чистого листа, якщо все пішло жахливо неправильно...</p>
+<p>Один файл, проте, може бути дуже корисним, особливо при роботі з Терміналом. Його назва <tt>hosts</tt>, він дозволяє визначити псевдоніми конкретних IP-адрес в мережі. Наприклад:</p>
 <pre>127.0.0.1		localhost	#loopback
 192.168.178.3		NAS		#Synology
 192.168.178.102		XIOS		#Mediaplayer</pre>
-<p>Besides the loopback to the localhost, I have the IP to my Synology storage under "NAS" and to my media player under "XIOS". To start an FTP session with my network storage, I don't have to remember it's IP address, but can simply enter:</p>
+<p>Крім замикання на localhost, у мене є IP-адреса мого сховища Synology в розділі «NAS» та мого медіаплеєр під «Xios». Для того, щоб почати сеанс FTP з моєї мережею зберігання даних, я не повинен пам'ятати, що це IP-адреса, а просто ввести:</p>
 <pre class="terminal">ftp NAS</pre>
 
 </div>
@@ -109,9 +111,9 @@ Once a WLAN is selected, Haiku will try to connect to it automatically on every 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="mouse.html">Mouse</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="printers.html">Printers</a>  »
+ «  <a href="mouse.html">Мишка (Mouse)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
+::  <a href="printers.html">Принтери (Printers)</a>  »
 </span></div>
 </div>
 

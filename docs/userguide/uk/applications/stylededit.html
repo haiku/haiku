@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>StyledEdit</title>
+	<title>Редактор StyledEdit</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -46,26 +48,25 @@
 <li><a href="../../en/applications/stylededit.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="soundrecorder.html">SoundRecorder</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
-::  <a href="terminal.html">Terminal</a>  »
+ «  <a href="soundrecorder.html">Звукозапис (SoundRecorder)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
+::  <a href="terminal.html">Термінал (Terminal)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />StyledEdit</h2>
+<h2><img src="../../images/apps-images/stylededit-icon_64.png" alt="stylededit-icon_64.png" width="64" height="64" />Редактор StyledEdit</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки(Applications)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Додатки (Applications)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><i>відсутні</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyledEdit це простенький текстовий редактор для Haiku. Незважаючи на те, що зберігає файли в текстовому форматі, забезпечує запис додаткових атрибутів для обмеження можливостей форматування при перегляді у StyledEdit.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>Якщо Вас це зацікавило, то такі додаткові атрибути у Терміналі можна подивитися за допомогою команди <span class="cli">listattr</span>:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -77,19 +78,19 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Як Ви бачите присутні всі параметри форматування які доступні з меню StyledEdit: обводка рядків (вкл. / викл.), вирівнювання (вліво / по центру / вправо), кожний в окремому атрибуті. Стилі (шрифт, розмір, колір) кожної літери спотворюються в іншу.</p>
+<div class="box-info">Оскільки ці атрибути є особливістю файлової системи BFS це означає, що не тільки інші платформи просто побачать звичайний текстовий файл, але і що форматування буде втрачено при зберіганні файлу на не BFS розділі. Вищевказані атрибути просто щезнуть, а те, що залишилося це звичайний, простий текстовий файл.</div>
+<p> У будь-якому випадку, це гарна ідея, маючи можливість розмальовки тексту для різних шрифтів та розмірів в той же час  мати звичайний текстовий файл. Файл <span class="cli">ReadMe.txt</span>, наприклад, є читабельним у командному процесорі на будь-якій платформі та зберігає стильність при перегляді через подвійне клікання у Haiku.</p>
+<p>Насправді використання StyledEdit настільки просте, що ми пропустимо пояснення кожного буденного пункту меню. Просто наберіть свій текст, потім виберіть слова які Ви бажаєте відформатувати та застосуйте до них шрифт, розмір і колір з пункту меню <span class="menu">Шрифт (Font)</span>. Виділення рядків та вирівнювання тексту з пункту <span class="menu">Документ (Document)</span> працює тільки для всього файлу.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="soundrecorder.html">SoundRecorder</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
-::  <a href="terminal.html">Terminal</a>  »
+ «  <a href="soundrecorder.html">Звукозапис (SoundRecorder)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
+::  <a href="terminal.html">Термінал (Terminal)</a>  »
 </span></div>
 </div>
 

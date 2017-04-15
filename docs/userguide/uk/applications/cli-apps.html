@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -56,50 +56,50 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Додатки командної стрічки властиві Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розміщення:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br />
+<tr><td>Розташування:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br />
 <span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Всі додатки командної стрічки, що постачаються з Haiku знаходяться або в <span class="path">/boot/system/bin</span> або в
+ <span class="path">/boot/common/bin</span>. Ваші власні або додатково встановлені <span class="path">~/config/bin</span>. Всі ці розташування є частиною змінної PATH  і тому автоматично знаходяться.<br />
+Нижче наведений список не є вичерпним списком всіх специфічних додатків командної стрічки Haiku, а лише спробою виділення найкорисніших, що можливо вам смакуватимуть. Спробуйте ознайомитись з тим що є у теці <span class="path">bin/</span> на свій розсуд. Виконання програми з параметром  <tt>--help</tt> показує використання команди і всіх її можливих варіантів.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-attributes" name="cli-attributes">Relating to attributes: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
-<p>These commands are used to display, read out, add and remove attributes of files. Remember that these meta data are currently only available on BFS formatted volumes. Moving files onto other file systems will strip all attributes!<br />
-All these commands are described in topic <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a>.</p>
+<a id="cli-attributes" name="cli-attributes">Стосовно атрибутів: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Дані команди використовуються для відображення, зчитування, додавання та видалення атрибутів файлів. Пам'ятайте, що ці мета-дані в даний час доступні тільки на томах відформатованих у BFS. Переміщення файлів на інші файлові системи видалить всі атрибути!<br />
+Всі ці команди описано в розділі <a href="../attributes.html#attributes-terminal">Атрибути у Терміналі</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-index" name="cli-index">Relating to the index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>With these commands you list, make, reindex and remove attributes to BFS' index. Every volume has it's own index, remember that when copying files from one volume to another.<br />
-These commands are described in topic <a href="../index.html">Index</a>.</p>
+<a id="cli-index" name="cli-index">Стосовно index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Цими командами  ви перераховуєте, виконуєте, переиндексовуєте та видаляєте атрибути  BFS індексу. Кожен том має власний індекс, пам'ятайте, це при копіюванні файлів з одного тому на інший.<br />
+Ці команди описані в розділі <a href="../index.html">Index</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-pkg" name="cli-pkg">Relating to package management: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to create so-called recipes for automatic package building.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: It is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt>.</p>
+<a id="cli-pkg" name="cli-pkg">Стосовно обслуговування пакетів: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
+<p>Команда <span class="cli">package</span> використовується для обслуговування пакетів HPKG. Подивіться на розділ <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Встановлення програм</a> для вивчення основ. Зазвичай інструмент <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> використовується для створення так званих рецептів для автоматичного складання пакетів.</p>
+<p><span class="cli">pkgman</span> використовується для пошуку, установки, оновлення і видалення пакетів. Дозволяє додавати, видаляти сховища пакетів  та освіжати їх списки. Особливий вид поновлення викликається з параметром <tt>full-sync</tt>: Він є агресивніший та дозволяє при необхідності відновлювати старі версії і видаляти пакети.<br />
+Для деталізації параметру вводять "--help", наприклад, <tt>pkgman search --help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-scripting" name="cli-scripting">Useful scripting commands</a></h3>
-<p>Here are a few commandline tools that are especially useful for scripting (see also topic <a href="../bash-scripting.html">Bash and Scripting</a>).</p>
+<a id="cli-scripting" name="cli-scripting">Використання команд скриптування</a></h3>
+<p>Ось кілька інструментів командного рядка, які особливо корисні для написання сценаріїв (дивись також розділ <a href="../bash-scripting.html">Bash and Scripting (Bash і створення сценаріїв)</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+		<td valign="top"><p><span class="cli">alert</span> викликає вікно з типовим попередженням з наперед визначеною іконкою та пояснювальним текстом з трьома кнопками. Вона повертає назву натиснутої кнопки і стан виходу (починаючи з 0). Як приклад це зроблено у стрічці:</p>
 <pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> відображає панель завантаження або збереження файла і дозволяє користувачеві вибрати файл або місце розташування. Як результат ви отримаєте обраний файл або шлях папки. Є кілька параметрів, доступних, наприклад, для встановлення початкової теки, заголовка вікна, типового імені при збереженні або обмеженні дозволених типів файлів. Приблизно ось так</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... Thanks to Scot Hacker's BeOS Bible, there's a nice <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+<td valign="top"><p><span class="cli">hey</span> крихітний допоміжний інструмент, який посилає BMessages до програм і видає їхню відповідь.  Він може бути використаний для виконання сценаріїв додатків, тобто "дистанційного керування" програмою зі сценарію або командного рядка. Його використання трохи складніше... Дякуємо за BeOS Bible Скоту Хакеру та прекрасний <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey підручник</a> Крісу Херботу.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
@@ -160,7 +160,7 @@ mountvolume RAMimage</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications (Програми)</a> 
 </span></div>
 </div>
 

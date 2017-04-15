@@ -21,7 +21,7 @@ body {
 	line-height: 1.5;
 	margin: 0;
 	padding: 0;
-	font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+	font-family: "Noto Sans", Arial, Helvetica, sans-serif;
 }
 
 /* link colors and text decoration */
@@ -168,7 +168,7 @@ ul.lang-menu li a {
 	margin: 0 auto;
 }
 
-#content div {
+#content > div {
 	margin-top: 30px;
 	margin-left: 40px;
 	margin-right: 40px;
@@ -225,6 +225,8 @@ table.index a:hover, table.index a:active {
 	padding: 10px 15px 10px 80px;
 	margin-bottom: 15px;
 	margin-top: 15px;
+	margin-left: 40px;
+	margin-right: 40px;
 	min-height: 42px;
 }
 .box-info {
@@ -373,7 +375,7 @@ pre.terminal {			/* Terminal output*/
 	
 	/* some links we want to print the url along with (CSS2) */
 	a.printurl:after {
-		content: " <" attr(href) ">";
+		content: " &lt;" attr(href) "&gt;";
 		font-weight: normal;
 		font-size: small;
 	}

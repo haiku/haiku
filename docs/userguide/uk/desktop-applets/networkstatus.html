@@ -10,18 +10,20 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>NetworkStatus</title>
+	<title>Стан мережі (NetworkStatus)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -49,34 +51,32 @@
 <span>
  «  <a href="launchbox.html">LaunchBox</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="powerstatus.html">PowerStatus</a>  »
+::  <a href="powerstatus.html">Стан живлення (PowerStatus)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />NetworkStatus</h2>
+<h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />Стан мережі (NetworkStatus)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Аплети Робочого столу (Desktop Applets)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><i>відсутні</i></td></tr>
 </table>
-<p>NetworkStatus shows the status of your network connections. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever installed, it's operated via a right-click context menu.</p>
-<p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
-The first section contains all network devices' names and their state. Clicking on such an entry brings up a window showing its IP, broadcast and netmask address.<br />
-Below is a list of all wireless networks found by the first wireless adapter and an indicator of their signal strength. Have a look at the <a href="..\workshop-wlan.html">Workshop: Wireless networking</a> for more information on how to set up a connection.<br />
-Lastly, you can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
+<p>NetworkStatus показує стан мережевих підключень. Якщо він ще не працює, при запуску аплет запитає, у якому режимі треба відкритись в режимі вікна чи поселитись в Deskbar'і. У віконному режимі ви зможете змінити розмір іконки при зміні розмірів вікна та використовувати <a href="../gui.html#replicants"> Реплікант (Replicant) </a> для обробки та  перетягування його на робочий стіл. <br />
+Будь-де встановлений, він працює через контекстне меню, яке викликається правою кнопкою мишки.</p>
+<p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />Перша секція вкючає імена всіх мережевих з'єднань. Клікання по кожному з них видає вікно яке показує його IP адресу, шлюз та нетмаску.<br />
+Нижче іде список бездротових мереж знайдених першим адаптером та індикатор рівня сигналу. Можете глянути на семінар <a href="..\workshop-wlan.html">Бездротові мережі</a> для отримання інформації про те як налаштувати з'єднання.<br />
+Накінець Ви можете <span class="menu">Відкрити налаштування мережі... (Open network preferences...)</span> для зміни <a href="../preferences/network.html">конфігурації Вашої мережі</a> або <span class="menu">Вийти </span> з аплета.</p>
 
-<h2>Status icons</h2>
+<h2>Іконки стану</h2>
 <table summary="status icons" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Готово (Ready)</td><td>З'єднання встановлено.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Конфігурування (Configuring)</td><td>Триває під'єднання.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>Немає збереженої конфігураціїі (No stateful configuration)</td><td>Потребується деяке налаштування (перевірте <a href="../preferences/network.html">конфігурацію IP (IP configuration)</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>З'єднання відсутнє (No link)</td><td>Відсутнє фізичне з'єднання (можливо, мережевий кабель не підключений та бездротові мережі недоступні).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>Немає доступних мережевих адаптерів (якщо ви впевнені, що принаймні один підключений, ймовірно, поки що відсутні драйвери).</td></tr>
 </table>
 
 </div>
@@ -86,7 +86,7 @@ Lastly, you can <span class="menu">Open network preferences...</span> to change 
 <div class="inner"><span>
  «  <a href="launchbox.html">LaunchBox</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="powerstatus.html">PowerStatus</a>  »
+::  <a href="powerstatus.html">Стан живлення (PowerStatus)</a>  »
 </span></div>
 </div>
 

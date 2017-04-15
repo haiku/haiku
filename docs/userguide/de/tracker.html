@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,12 +58,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#mounting-volumes">Datenträger einbinden</a><br />
+	<a href="#mounting-volumes">Datenträger einhängen</a><br />
 	<a href="#navigating">Navigieren</a><br />
 	<a href="#appearance">Aussehen</a><br />
 	<a href="#tracker-preferences">Tracker Einstellungen</a><br />
@@ -79,12 +80,13 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mounting-volumes" name="mounting-volumes">Einbinden von Datenträgern</a></h2>
+<a id="mounting-volumes" name="mounting-volumes">Einhängen von Datenträgern</a></h2>
 <p>Um einen Datenträger (sei es eine Festplatte oder Partition, eine CD oder USB-Stick) unter Haiku verwenden zu können, muss dieser erst in das System eingebunden werden. Über einen Rechtsklick auf den Arbeitsplatz oder einem bereits eingebundenen Datenträger kann der Menüpunkt <span class="menu">Einhängen</span> aufgerufen werden. Dieser Punkt <span class="menu">Einhängen</span> findet sich auch in der Deskbar.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>Es können <span class="menu">Einstellungen</span> vorgenommen werden, ob und welche Datenträger bei einem Systemstart eingebunden werden<br />
 Im obigen Bild beispielsweise werden automatisch alle Datenträger eingebunden, die während dem Betrieb hinzugefügt werden (beispielsweise eine CD oder ein USB-Stick) und während dem Systemstart nur die Datenträger, die beim letzten Mal eingebunden waren.</p>
-<div class="box-warning">Bevor man einen Datenträger, wie zum Beispiel einen USB-Stick, vom Computer trennt, sollte man ihn unbedingt vorher über "Aushängen" im System abmelden. Nur so wird sichergestellt, dass alle Dateioperationen auf diesem Datenträger vollständig abgeschlossen wurden. Anderenfalls ist ein Datenverlust nicht auszuschließen!</div>
+<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume and its icon has disappeared. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<div class="box-warning">Haiku kann auch nicht-BFS formattierte Datenträger einhängen. Aber Achtung: diese anderen Dateisysteme wurden nicht riguros getestet. Schreibzugriffe können in Einzelfällen zu Datenverlust führen. Wer kein Risiko eingehen will, sollte immer <span class="button">Schreibgeschützt einhängen</span> wählen!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

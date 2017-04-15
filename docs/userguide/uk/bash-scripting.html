@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -49,15 +49,15 @@
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="preferences.html">Налаштування (Preferences)</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
 <!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 <h1>Bash і написання скриптів</h1>
 
@@ -67,7 +67,8 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Bash</a></h2>
-<p>Враховуючи, що скрипти залежать від оболонки , якою вони інтерпретуються,  спробуйте для початку ознайомитись з BASH, що використовується у  Haiku. В тенетах існує  багато ресурсів про неї, бо вона є досить поширеною.  Хорошою настановою послужить  робота Йохана Янсона (Johan Jansson) <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
+<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.<br />
+The <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash Reference Manual (PDF, 720 KiB)</a> is a nice resource to get into the details.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -76,13 +77,13 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Скрипти в  Haiku</a></h2>
-<p>Haiku used to have scripts for booting and shutting down. Today it uses the <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> instead. However, the user can still augment this process with certain user scripts.
-If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
+<p>Зрозуміло, що в роботі Haiku теж використовуються скрипти. Завантаження і завершення роботи - типово скриптові процедури. Сьогодні замість них використовується <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a>. Ці чітко визначені послідовності можуть бути розширені за допомогою користувацьких скриптів.<br />
+Якщо  вони ще не існують Вам доведеться самостійно їх створити. В іншому випадку просто додайте потрібні команди в те місце де вони повинні виконуватись.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="userbootscript" name="userbootscript"> UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> буде виконаний після того як система завершить процес завантаження. Наприклад, Ви можете додати кілька програм, котрі стартуватимуть при кожному завантаженні:</p>
+<a id="userbootscript" name="userbootscript"> UserBootscript (Завантажувальний скрипт користувача)</a></h3>
+<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> буде виконаний після того як система завершить процес завантаження. Наприклад, Ви можете додати кілька програм, які стартуватимуть при кожному завантаженні:</p>
 <pre># Запуск LaunchBox
 /boot/system/apps/LaunchBox &amp;
 
@@ -90,7 +91,7 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 /boot/system/apps/Workspaces &amp;</pre>
 <p>Не забудьте додати в кінці команди знак "<tt>&amp;</tt>" щоб запустити цей процес у фоновому режимі, інакше скрипт зависне , поки ця команда не буде завершена (У нашому випадку, коли запущений додаток буде закрито).</p>
 
-<p>Простішою альтернативою для додатків, котрі запускаються під час завантаження - розмістити посилання на потрібні програми в папці<span class="path">/boot/home/config/settings/boot/launch</span> directory. Це можна зробити правим кліком по додатку, котрий Ви бажаєте помістити в автозапуск вибором в меню <span class="menu">Створити посилання (Create Link)</span> і переміщенням по папках з використанням <a href="tracker.html#navigating">навігації</a> до потрібного каталогу.</p>
+<p>Простішою альтернативою для додатків, котрі запускаються під час завантаження - розміщення посилання на потрібні програми в теці<span class="path">/boot/home/config/settings/boot/launch</span>. Це можна зробити правим кліком по додатку, котрий Ви бажаєте помістити в автозапуск вибором в меню <span class="menu">Створити посилання (Create Link)</span> і переміщенням по теках з використанням <a href="tracker.html#navigating">навігації</a> до потрібного каталогу.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -108,8 +109,8 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="preferences.html">Preferences</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="preferences.html">Налаштування (Preferences)</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
 <!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
 </span></div>
 </div>

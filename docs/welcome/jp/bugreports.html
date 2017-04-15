@@ -57,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>目次</td></tr>
@@ -75,7 +74,7 @@
 
 <h1>バグの報告</h1>
 
-<p>開発者はすべてのハードウェア構成でテストを行えませんし、オペレーティングシステムとのあらゆる関わり方をテストすることもできないので、ユーザーの動作報告などの情報に頼っています。そして Haiku はまだ幼いプロジェクトのため、バグに遭遇する可能性が高いです。私たちはバグを報告してくれるのを待っています。少しずつ Haiku を改善してもっと良いものにしていきませんか?</p>
+<p>開発者はすべてのハードウェア構成でテストをできません。また、オペレーティングシステムとのあらゆる関わり方をテストすることもできません。そのため私たちは、動作報告をユーザーに頼っています。そして Haiku はまだ幼いプロジェクトのため、バグに遭遇する可能性が高いです。私たちはあなたがバグ報告に時間を割いてくれることに対して感謝します。共に私たちは Haiku を少しづつ改善していくことができます。</p>
 <p>私たちのバグトラッカーを有効に保つため、<a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">バグトラッカーでのエチケット</a>を絶対に守ってください。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -143,10 +142,10 @@ syslog (system log の略称) はシステムに発生した有益な情報を�
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">スクリーン上でのデバッグ</a></h3>
-<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
-This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
-Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
-One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/jp/bootloader.html">Boot Loader</a>.</p>
+<p><b>スクリーン上のデバッグ出力は極めて特定の問題とすでにわかっている (タイミング) 問題について役立つでしょう。必要でないなら使用しないでください。</b><br />
+これは Haiku がユーザーのマシンでうまく起動せず、なおかつ何らかの理由で <span class="menu">Debug syslog option</span> もうまく動作しないときに使います。Haiku の起動ロゴが現れる前に、<span class="key">SHIFT</span> を押したままにしてブートローダーメニューに入り、<span class="menu">Select safe mode options</span> を選びます。下の方に <span class="menu">[ ] Enable on screen debug output</span> がリストにあります (注意: ほかのオプションも Haiku のブートを試みる際に有効にできます。Haiku がひとつ以上のオプションを有効にした時のみ起動する場合は、必ずどのオプションかを挙げるようにしてください)。<br />
+最後に、<span class="menu">Return to main menu</span> を選択し、それから <span class="menu">Continue booting</span> を選択します。<br />
+1 ページ以上のテキストがスクリーンに表示されますが、最後の数行のみがチケットに添付する必要がある物でしょう。詳細は、<a href="../../userguide/jp/bootloader.html">ブートローダー</a>を参照ください。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">ハードウェアとドライバーのバグ</a></h2>
@@ -164,7 +163,7 @@ One or more pages of text will display on the screen, only the last few lines ne
 <p>最初の 4 つのコマンドはターミナルに入力できます。<span class="cli"> &gt; output.txt</span> をコマンドの最後に追加することで、"output.txt" というテキストファイルに出力されるようになります。つまり、それをバグレポートやメールに添付できるようになります。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="next" name="next">そして次は</a></h2>
+<a id="next" name="next">次はどうする</a></h2>
 <p>バグをレポートした後は、開発者があなたの報告を見て修正を試みるでしょう。しかし忘れないでいてもらいたいのは、私たちはボランティアであるので、しばらくの間報告が放置されることもあります。情報を追加することで早くバグを修正できるようになります。しかし、説明的でないコメントを追加することはしないでください。</p>
 <p>バグのレポートはあなたの時間を無駄に消費するわけではありません。バグの報告をしたあなたは一つの Haiku の開発プロセスにあります。開発者はバグを修正するために質問をすることがあります。それを無視せず、質問には答えるようにしてください。あなたの参加は、バグが 'fixed' となるまで終わりません。</p>
 

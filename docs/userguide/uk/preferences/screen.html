@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Screen</title>
+	<title>Екран (Screen)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -46,41 +48,40 @@
 <li><a href="../../en/preferences/screen.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="repositories.html">Repositories</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="screensaver.html">ScreenSaver</a>  »
+ «  <a href="repositories.html">Сховища - Репозиторії (Repositories)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
+::  <a href="screensaver.html">Зберігач екрану (ScreenSaver)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />Screen</h2>
+<h2><img src="../../images/prefs-images/screen-icon_64.png" alt="screen-icon_64.png" width="64" height="64" />Екран (Screen)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/preferences/Screen</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/kernel/drivers/vesa</span> - Only when running in VESA mode.<br />
-<span class="path">~/config/settings/Screen_data</span> - Stores the panel's window position.</td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Налаштування (Preferences)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/preferences/Screen</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/kernel/drivers/vesa</span> - тільки при запущеному режимі VESA.<br />
+<span class="path">~/config/settings/Screen_data</span> - зберігає позицію вікна панелей.</td></tr>
 </table>
-<p>Each of your <a href="../workspaces.html">workspaces</a> can have its own resolution, color depth and refresh rate.</p>
+<p>Кожне Ваше <a href="../workspaces.html">робоче місце (workspaces)</a> може мати власну роздільчу здатність, глибину кольору та частоту оновлення.</p>
 <img src="../images/prefs-images/screen.png" alt="screen.png" />
-<p>The top menu specifies if your changes are applied only to the current or to all workspaces. Depending on your graphics card, the other menus contain all supported resolution, color depth and refresh rate settings.</p>
-<p>After clicking on <span class="button">Apply</span>, the graphics mode is changed and an alert appears, asking you to keep or cancel the changes. If you don't answer that alert, the graphics mode reverts after 12 seconds to the previous setting. Maybe you couldn't see the alert because your monitor didn't support the setting.</p>
-<p>There's a key combination that always works, not only when the Screen preferences are open: <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">ESC</span> sets a fall-back video safe mode. Handy if your monitor doesn't report its capabilities correctly and your settings result in a distorted or black screen. Here too, an alert pops up and if you do nothing for 12 seconds or press <span class="key">ESC</span> you'll revert back.</p>
-<p>On the left side of the window, you see a representation of your screen with the manufacturer and model it reports and it's resolution in dots per inch (dpi). It also shows the name of graphics card if it's supported by a driver. Otherwise it says "VESA", the quick fallback solution that works with pretty much every hardware.</p>
-<div class="box-info">While Haiku's VESA mode performs very well, you may experience some limitations. You may not be able to drive your widescreen display in its native resolution, resulting in a somewhat blurred picture. There may also be limitations with regard to available color depths and refresh rates.</div>
-<p><span class="button">Revert</span> brings back the setting that was active when you started the Screen preferences.</p>
-<p>To the bottom left you can set the number of workspaces and arrange them in columns and rows and open the <a href="backgrounds.html">Backgrounds</a> preferences.</p>
+<p>Верхнє меню визначає до яких робочих місць застосовувати зміни (конкретно до якогось чи для всіх). Залежно від вашої відеокарти, інші меню містять доступні роздільчу здатність, глибину кольору та частоту оновлення.</p>
+<p>Після клікання по кнопці <span class="button">Прийняти (Apply)</span>, графічний режим міняється та з'являється попередження з питанням зберегти чи відхилити зміни. Якщо Ви не будете відповідати на це попередження через 12 секунд повернеться попередній режим. Ви можете не побачити його у випадку коли Ваш монітор не підтримує такі налаштування.</p>
+<p>Існує комбінація клавіш яка працює завжди, навіть коли налаштування екрану відкриті, це: <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">ESC</span> яка встановлює запасний безпечний відіорежим.  Це зручно коли Ваш монітор не може правильно повідомляти свої можливості і Ваші налаштування викликають або спотворення або чорний екран. При цьому спливає попередження і якщо Ви нічого не робите протягом 12 секунд або натиснете клавішу <span class="key">ESC</span> то все повернеться назад.</p>
+<p>У лівій частині вікна, Ви побачите макет екрану з повідомленням про модель, виробника, роздільчу здатність в крапках на дюйм (dpi). Вказується назва відеокарти, якщо вона підтримується драйвером. В іншому випадку буде запис про включення "VESA", безпечного режиму що дозволяє працювати з більшістю апаратного забезпечення.</p>
+<div class="box-info">Незважаючи на те що режим VESA у Haiku працює дуже добре, Ви можете зіткнутися з деякими обмеженнями. Ви не зможете використати свій широкоформатний монітор в його рідній роздільчій здатності в результаті чого буде трохи розмите зображення. Можуть накладатися обмеження щодо доступних глибини кольору і частоти оновлення. </div>
+<p>Кнопка <span class="button">Повернути (Revert)</span> дозволяє застосувати ті налаштування які були активні до запуску панелі Екран (Screen).</p>
+<p>Внизу зліва Ви можете встановлювати кількість робочих місць, розміщувати їх колонками та рядками і увімкнути  налаштування <a href="backgrounds.html">Тло (Backgrounds)</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="repositories.html">Repositories</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="screensaver.html">ScreenSaver</a>  »
+ «  <a href="repositories.html">Сховища - Репозиторії (Repositories)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
+::  <a href="screensaver.html">Зберігач екрану (ScreenSaver)</a>  »
 </span></div>
 </div>
 

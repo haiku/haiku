@@ -10,18 +10,20 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ProcessController</title>
+	<title>Контролер процесів (ProcessController)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -47,63 +49,63 @@
 <li><a href="../../en/desktop-applets/processcontroller.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="powerstatus.html">PowerStatus</a> 
+ «  <a href="powerstatus.html">Стан живлення (PowerStatus)</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="workspaces.html">Робочі простори (Workspaces)</a>  »
+::  <a href="workspaces.html">Робочі місця (Workspaces)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
+<h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />Контролер процесів (ProcessController)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Аплети Робочого столу (Desktop Applets)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><i>відсутні</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
-<p>Indicators on the left show each CPU's usage, while the bar on the right shows the memory consumption. Remember that the number of indicators depend on the number of processors/cores in the computer.</p>
-<p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.<br />
-To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />Найперше завдання аплету Контролер процесів (ProcessController) показати активність процесорів  та ступінь використання пам'яті. Він дозволяє здійснювати моніторинг окремих команд, змінювати їх пріоритет та вбивати їх, якщо програма зависає. У багатопроцесорних середовищах він дозволяє відключати окремі процесори / ядра. При аваріях Tracker'а або Deskbar'а ви можете перезапустити їх з меню ProcessController.</p>
+<p>Індикатори зліва показують використання кожного з процесорів, той що справа показує споживання фізичної пам'яті. Зауважте, що кількість індикаторів залежить від числа процесорів / ядер в комп'ютері.</p>
+<p>Якщо він не запущений, то при запуску Контролера процесів (ProcessController) буде запитано чи відкрити його у режимі вікна чи поселити у Deskbar. У віконному режимі Ви можете поміняти його розмір, а зробивши з нього <a href="../gui.html#replicants">Реплікант (Replicant)</a> переміщувати по Робочому столі.<br />
+Де би він не був встановлений аплет керується з правоклікового контекстного меню.<br />
+Для видалення аплету з Deskbar зніміть прапорець у пункті <span class="menu">Поселити у Deskbar (Live in the Deskbar)</span>  його контекстному меню.</p>
+<h2>Вихід з додатків</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<p>Для виходу з додатка просто виберіть його ім'я за допомогою меню <span class="menu">Вийти з додатку (Quit an application)</span>. Чистий шлях для закриття додатку клікнути по цій закриваючій кнопці. Будьте уважні не вийдіть випадково з системного процесу такого як сервер або демон. Ваша система може втратити роботоздатність. </p>
+<h2>Використання пам'яті</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
-<p>Monitoring memory usage can be rather inaccurate.</p>
-<p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
-<p>The first row <i>System resources &amp; caches...</i> shows the total amount of memory used by the system and all applications. The length of the blue bar is based on the total physical memory in your computer. The next rows show memory used by each process. Note that the length of the bar is based only on the actually used part of the memory.</p>
+<p>Моніторинг використання пам'яті може бути вельми неточним.</p>
+<p>Це меню дозволяє моніторити використання пам'яті різними командами системи. Вслід за назвою команди ідуть дві колонки: перша показує зарезервовану пам'ять що перезаписується, в той час як друга показує всю пам'ять включаючи ту що є виключно для читання (загальні бібліотеки, наприклад).
+
+</p>
+<p>Перший рядок <i>Системні ресурси та кеш (System resources &amp; caches...)</i> показує загальний обсяг пам'яті що використовують система та додатки. Довжина голубої смуги вказує на загальний обсяг фізичної пам'яті Вашого комп'ютера. Наступні рядки показують використання пам'яті кожним процесом. Зауважте, що довжина смуги базується на кількості використаної пам'яті.</p>
 <table>
-		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Memory used only by given application (with write access)</td></tr>
-		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
+		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Пам'ять що використовується тільки цим додатком (з доступом для запису)</td></tr>
+		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Пам'ять в тому числі призначена тільки  для читання (може використовуватися спільно з іншими додатками)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
-<p>This menu allows you to change thread priorities, kill teams or debug them.</p>
-<div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
+<h2>Потоки та використання процесора</h2>
+<p>Це меню дозволяє змінювати приорітети потоків , вбивати та відлагоджувати команди.</p>
+<div class="box-stop">Зміни у командах в цьому меню проникають глибоко в систему та можуть призвести до втрати даних і нестабільності системи. Тримайте мишку у цьому місці міцніше!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>код ядра</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>код користувача</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>простоювання нитки</td></tr>
 </table>
-<p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
-<p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
-<p>The last level of the menu allows you to change a thread's priority. Be careful with that! As a rule of thumb the priority of a thread should be inverse its CPU usage. That is, the more it tries to claim CPU time, the lower should be it's priority. In general, don't mess with an app's priorities; contact its author, that's his business.
-</p>
+<p>На першому рівні ви бачите назви команд. При натисканні на одну з них, ви можете вбити всю команду. Темно-синя частина смуги це час, проведений в коді ядра, світло-синя частина в коді користувача, зелена частина в непрацюючому потоці (потоках). Смуга повністю заповнена синім кольором означає, що команда використовує всю потужність процесора.</p>
+<p>Другий рівень показує окремі нитки команди. При натисканні на один, ви можете налагоджувати або вбити його. Смуга заповнена повністю синім означає, що потік прив'язаний до одного процесора / ядра.</p>
+<p>Останній рівень меню дозволяє змінити пріоритет потоку. Будьте обережні з цим! Як правило, пріоритет нитки повинен бути зворотним до використання ним процесора. Тобто, чим більше він намагається претендувати на час центрального процесора, тим менший повинен бути його пріоритет. Загалом, не зв'язуйтеся з пріоритетами додатків; зконтактуйте краще з  автором програми, це його справа.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
-«  <a href="powerstatus.html">PowerStatus</a> 
+«  <a href="powerstatus.html">Стан живлення (PowerStatus)</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="workspaces.html">Робочі простори (Workspaces)</a>  »
+::  <a href="workspaces.html">Робочі місця (Workspaces)</a>  »
 </span></div>
 </div>
 

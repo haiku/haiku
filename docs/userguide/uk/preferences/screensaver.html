@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>ScreenSaver</title>
+	<title>Зберігач екрану (ScreenSaver)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -46,50 +48,47 @@
 <li><a href="../../en/preferences/screensaver.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="screen.html">Screen</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="shortcuts">Shortcuts</a>  »
+ «  <a href="screen.html">Екран (Screen)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
+::  <a href="shortcuts.html">Гарячі клавіші (Shortcuts)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
-<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />ScreenSaver</h2>
+<h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />Зберігач екрану (ScreenSaver)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Налаштування (Preferences)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
 </table>
 
-<p>The panel of the ScreenSaver preferences is split into two tabs:
+<p>Панель налаштуваньЗберігач екрану  (ScreenSaver) об'єднана у двох вкладках  :
 </p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="fade" id="fade">Fade</a></h2>
+<a name="fade" id="fade">Згасання (Fade)</a></h2>
 <img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
 <br />
-<p>The top checkbox enables/disables the screen saver.<br />
-With the slider below it, you control after how long an idle time the screen saver kicks in.
+<p>Верхній прапорець вмикає / відключає екранну заставку.<br />
+За допомогою повзунка під ним можна встановити час простою для включення  зберігача.</p>
+<p>Наступні два повзунки використовуватися тільки після їх активації прапорцями: <br />
+Один повзунок визначає, через скільки хвилин вимкнути екран. <br />
+Інший, через скільки хвилин Вам буде потрібен пароль, щоб розблокувати машину.
 </p>
-<p>The next two sliders are only usable after you activated their checkboxes:<br />
-One slider determines after how many minutes the screen is powered off.<br />
-The other, after how many minutes you need a password to unlock your machine.
-</p>
-<p>By clicking into different corners of the two screens at the bottom, you tell the system when to immediately start the screen saver or when to prevent it from kicking in when you rest the mouse in the indicated corner. Click in the middle of the screens to disable that feature again.
-</p>
+<p>При натисканні на різні кути двох екранів в нижній частині Ви вказуєте, коли система негайно запустить екранну заставку або коли при розташуванні курсора мишки в певному його місці не допустити згасання. Натисніть в середині екрану, щоб відключити цю функцію знову.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="screensavers" id="modules">Screensavers</a></h2>
+<a name="screensavers" id="modules">Зберігачі екрану (Screensavers)</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>The second tab shows a list of all installed screen savers and their individual settings. You can test your settings with the <span class="button">Test</span> button below the list.<br />
-New screen savers that don't come as part of a regular .hpkg package, can be installed by copying them into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>):</p>
+<p>На другій вкладці відображається список всіх встановлених зберігачів екрану з їх індивідуальними налаштуваннями. Ви можете перевірити свої налаштування кнопкою <span class="button">Тест (Test)</span> нижче списку. <br />
+Нові заставки, які не постачаються як частина регулярного пакету .hpkg, можна встановити шляхом копіювання їх у відповідну <tt>non-packaged</tt> теку (дивись розділ <a href="../filesystem-layout.html">Макет файлової системи (Filesystem layout)</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td> for screen savers available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td> for screen savers only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td>для Зберігачів екрану доступних кожному користувачеві.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td>для Зберігачів екрану доступних особисто Вам.</td></tr>
 </table>
 
 </div>
@@ -97,9 +96,9 @@ New screen savers that don't come as part of a regular .hpkg package, can be ins
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="screen.html">Screen</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="shortcuts">Shortcuts</a> »
+ «  <a href="screen.html">Екран (Screen)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a> 
+::  <a href="shortcuts.html">Гарячі клавіші (Shortcuts)</a> »
 </span></div>
 </div>
 

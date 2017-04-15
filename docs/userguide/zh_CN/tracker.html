@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -86,6 +86,7 @@
 <br />
 上述设置将会自动挂载您所连接/插入的所有存储设备，然后在启动时挂载所有曾经挂载过的磁盘。</p>
 <div class="box-warning">在您断开硬件设备或者USB磁盘的连接前，一定要保证您已经成功的卸载了该磁卷。这样可以保证所有的数据传输已经结束，否则可能会导致数据丢失或者损坏磁盘。</div>
+<div class="box-warning">Haiku 可以关在非 BFS 格式化分区。需要注意的是，目前这些非BFS文件系统未经过严格的测试。在某些情况下，写入这些分区会出现异常。如果希望保证数据安全，请在挂载时总是选择 <span class="button">Mount read-only</span> 。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

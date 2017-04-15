@@ -16,13 +16,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Робочі простори (Workspaces Applet)</title>
+	<title>Робочі місця (Workspaces Applet)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -48,43 +48,42 @@
 <li><a href="../../en/desktop-applets/workspaces.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="processcontroller.html">ProcessController</a> 
+ «  <a href="processcontroller.html">Контролер процесів (ProcessController)</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
-<h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Workspaces</a></h1>
+<h1><img src="../../images/desktop-applets-images/workspaces-icon_64.png" alt="workspaces-icon_64.png" width="64" height="64" /><a name="applet" id="applet">Робочі місця</a></h1>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Workspaces_settings</span> - тут зберігаються позиції вікон .</td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Аплети Робочого столу (Desktop Applets)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/apps/Workspaces</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
+<span class="path">~/config/settings/Workspaces_settings</span> - тут зберігаються позиції вікон.</td></tr>
 </table>
 <p><br /></p>
 <img src="../images/workspaces-images/workspaces.png" alt="workspaces.png" />
-<p>Ви знайдете цей придаток в меню <span class="menu">Desktop Applets</span> Deskbar'a. Це мініатюрна версія всіх робочих столів. Декілька опцій доступні під контекстним меню цього придатку.<br />
-<span class="menu">Зміна робочого столу...</span> відкриє настройки <a href="../preferences/screen.html">Screen</a> , де можна встановити кількість робочих столів і їх розташування </p>
-<p>Оскільки придаток є <a href="../gui.html#replicants">Реплікантом</a> Ви можете змінити розмір вікна і розмістити його на екрані (переконайтесь, що опція <span class="menu">Show Replicants</span>  активована у меню Deskbar).</p>
+<p>Ви знайдете цей придаток в меню <span class="menu">Аплети Робочого столу (Desktop Applets)</span> Deskbar'a. Це мініатюрна версія всіх робочих місць. Декілька опцій доступні у контекстному меню цього придатку.<br />
+<span class="menu">Зміна кількості робочих місць...</span> відкриє налаштування <a href="../preferences/screen.html">Екран (Screen)</a> , де можна встановити кількість робочих місць та їх розташування (кількість стовпчиків і стрічок).</p>
+<p>Оскільки придаток є <a href="../gui.html#replicants">Реплікантом</a> Ви можете змінити розмір вікна і розмістити його на екрані (переконайтесь, що опція <span class="menu">Показати Репліканти (Show Replicants)</span>  активована у меню Deskbar).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="moving" name="moving">Moving windows between workspaces</a></h2>
-<p>To move a window, you grab it in the Workspaces applet and simply drag it to another workspace. This has the advantage, that you can move it without leaving your current desktop. Of course, that only works well when there aren't too many windows in a workspace and your target isn't obscured by other windows. Another possibility is to grab a window by its tab and just holding on to it while switching workspaces with <span class="key">ALT</span> <span class="key">Fx</span>.</p>
-<p>For more information on workspaces in general and more keyboard shortcuts, see topic <a href="../workspaces.html">Workspaces</a>.</p>
-<div class="box-info">Try this: Make the Workspaces window really big and hide the window tab and border. Now go to the <a href="../preferences/shortcuts.html">Shortcuts preferences</a> and assign <span class="key">CTRL</span> <span class="key">^</span> to the Workspaces applet (<span class="path">/system/preferences/Shortcuts</span>).<br />
-Now you can quickly summon the applet with a key combo and equally quickly dismiss it again with <span class="key">ESC</span>.</div>
+<a id="moving" name="moving">Переміщення вікон між робочими місцями.</a></h2>
+<p>Для переміщення вікна досить захопити його у відкритому придатку Робочі місця та перетягнути на інше робоче місце. Перевага в тому що це можна зробити не виходячи з поточного робочого столу. Звичайно, це працюватиме добре працює тільки при наявності не дуже великої кількості вікон у коли ваша мета не затінюється іншими вікнами. Ще одна можливість утримуючи вікно за вкладку, просто натиснути клавіші <span class="key">ALT</span> <span class="key">Fx</span>.</p>
+<p>Для кращого ознайомлення з Робочими місцями та гарячими клавішами клавіатури почитайте розділ <a href="../workspaces.html"> Робочі місця (Workspaces)</a>.</p>
+<div class="box-info">Спробуйте таке: зробіть вікно робочих місць настільки великим щоб сховалися вікно заголовка та межі. Тепер зайдіть у <a href="../preferences/shortcuts.html">Налаштування гарячих клавіш</a> і призначте <span class="клавішу">CTRL</span> <span class="key">^</span> придаткові Робочі місця (<span class="path">/system/preferences/Shortcuts</span>).<br />
+Тепер ви зможете швидко викликати аплет  ключем  і настільки ж швидко повторно відхилити його <span class="клавішою">ESC</span>.</div>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="special" name="special">Special functionality</a></h2>
-<p>The Workspaces applet provides some additional functionality when clicking on a window while holding certain modifier keys:</p>
+<a id="special" name="special">Особливий функціонал</a></h2>
+<p>Аплет Робочі місця (Workspaces) супроводжується додатковим функціоналом при використанні у вікні спеціальних комбінацій клавіш:</p>
 <table summary="functionality-thru-modifiers" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Brings the window to the front.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Minimizes the window.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Sends the window to the back.</td></tr>
+<tr><td><span class="key">CTRL</span></td><td style="width:15px;"></td><td>Переміщає вікно до переду.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">SHIFT</span></td><td></td><td>Мінімізує вікно.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>Відправляє вікно до заду.</td></tr>
 </table>
 
 </div>
@@ -92,7 +91,7 @@ Now you can quickly summon the applet with a key combo and equally quickly dismi
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="processcontroller.html">ProcessController</a> 
+ «  <a href="processcontroller.html">Контролер процесів (ProcessController)</a> 
 ::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
 </span></div>
 </div>

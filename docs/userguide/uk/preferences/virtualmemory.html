@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>VirtualMemory</title>
+	<title>Віртуальна пам'ять (VirtualMemory)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -46,30 +48,29 @@
 <li><a href="../../en/preferences/virtualmemory.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="touchpad.html">Touchpad</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a>
+ «  <a href="touchpad.html">Сенсорна панель - Тачпад (Touchpad)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a>
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
+<h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />Віртуальна пам'ять (VirtualMemory)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Розташування в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Налаштування (Preferences)</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
+<span class="path">~/config/settings/VM_data</span> - Зберігає позицію вікна панелі.</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>Віртуальна пам'ять дозволяє використовувати область підкачки з жорсткого диску, якщо фізична пам'ять більше потрібна для інших речей. Таким чином, навіть якщо у вас багато оперативної пам'яті,  використання віртуальної зовсім непогана ідея.</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>Ви можете встановити її розмір, навіть більший, ніж обсяг вашої оперативної пам'яті, якщо це необхідно.  При величезних розмірах сучасних жорстких дисків, призначити свап величиною у фізичну  пам'ять не повинно стати жодною проблемою. Тим не менше, ви зможете швидко змінити її розмір, якщо ваш вільний простір трохи зменшиться. Подивіться програмою <a href="../applications/diskusage.html"> Використання диску (DiskUsage)</a>, що забирає ваш вільний дисковий простор.</p>
+<p>Як правило, файл підкачки виділяють на завантажувальному розділі. Якщо ви часто будете зтикатися з необхідністю змінювати розмір свапа, ви можете спробувати використовувати для вашого файла підкачки окремий жорсткий диск. Просто інший розділ на тому ж жорсткому диску з вашою системою та  даними не допоможе. <br />
+Збільшення оперативної пам'яті буде у такому випадку найбільш ефективним виходом ...</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">По замовчуванню (Defaults)</span></td><td> </td><td>Скинути всі настройки до значень по замовчуванню.</td></tr>
-<tr><td><span class="button">Повернути (Revert)</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">Типово (Defaults)</span></td><td> </td><td>Скинути всі налаштування до типових значень.</td></tr>
+<tr><td><span class="button">Повернути (Revert)</span></td><td> </td><td>Повернути ті налаштування що були до запуску аплету Віртуальна пам'ять (VirtualMemory).</td></tr>
 </table>
 
 </div>
@@ -78,8 +79,8 @@ Upgrading your RAM is of course the most effective way to go...</p>
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="touchpad.html">Touchpad</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a>
+ «  <a href="touchpad.html">Сенсорна панель - Тачпад (Touchpad)</a> 
+::  <a href="../preferences.html" class="uplink">Налаштування (Preferences)</a>
 </span></div>
 </div>
 -->

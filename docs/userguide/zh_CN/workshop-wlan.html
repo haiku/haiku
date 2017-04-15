@@ -58,7 +58,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 
 <table class="index" id="index" summary="index">
@@ -117,15 +116,16 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">建议</a></h2>
 <h3>离线下载二进制固件文件</h3>
-<p>如果您无法通过 <tt>install-wifi-firmwares.sh</tt> 脚本来获取二进制固件文件（例如，在 Haiku 中缺少互联网链接），您可以下载 <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">此 shell 脚本</a>，然后从其他包安装有 <tt>wget</tt> 和 <tt>zip</tt> 命令的系统中运行。<br />
+<p>如果您无法通过 <tt>install-wifi-firmwares.sh</tt> 脚本来获取二进制固件文件（例如，在 Haiku 中缺少互联网连接），您可以下载 <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">此 shell 脚本</a>，然后从其他包安装有 <tt>wget</tt> 和 <tt>zip</tt> 命令的系统中运行。<br />
+Windows 用户需要使用 Windows 可执行的 <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> 和 <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> 安装在默认位置，然后使用 <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">BAT脚本</a>。<br />
 该脚本将会下载所需要的文件，并创建一个可以解压到 Haiku <tt>/boot</tt> 目录的压缩文件。在解压之后，在终端中输入如下指令：
 </p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>检查授权并接受一边安装所有目前可用的固件文件。</p>
-<h3>Avoiding connection loss</h3>
-<p>Haiku's drivers for some WLAN chipsets like the iprowifi4965 are prone to lose connection when using WPA encryption. If you're affected by that, try to disable the "HT mode" (high throughput, 802.11n) before connecting to a network:</p>
+<h3>避免连接断开</h3>
+<p>Haiku 系统的一些 WLAN 芯片驱动，如 iprowifi4965 已经证实在使用 WPA 加密时会断开连接。如果您也受此影响，可以尝试在连接网络之前，禁用 "HT 模式" (高吞吐量模式，802.11n) 。</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>If that fixes the problem, put the line into <span class="path">~/config/settings/boot/UserBootscript</span> to have it applied automatically every boot-up.</p>
+<p>如果该指令可以解决问题，可以将该指令行写入  <span class="path">~/config/settings/boot/UserBootscript</span> 启动脚本，在每次开机时自动调用执行。</p>
 </div>
 </div>
 

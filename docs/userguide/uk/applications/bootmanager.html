@@ -16,13 +16,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Завантажувач</title>
+	<title>BootManager(Завантажувач)</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -49,52 +49,51 @@
 </ul>
 <span>
  «  <a href="activitymonitor.html">ActivityMonitor</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
 ::  <a href="charactermap.html">Таблиця символів (CharacterMap)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Завантажувач</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager (Завантажувач)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Не входить, звичайно запускається з меню <span class="menu">Інструменти</span> Встановлювача</i></td></tr>
-<tr><td>Розміщення:</td><td></td><td><span class="path">/boot/system/apps/BootManager(Завантажувач)</span></td></tr>
-<tr><td>Настройки:</td><td></td><td><i>жодних</i><br />Попередній запис MBR по замовчуванню зберігається в <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>Розташування:</td><td></td><td><span class="path">/boot/system/apps/BootManager(Завантажувач)</span></td></tr>
+<tr><td>Налаштування:</td><td></td><td><i>жодних</i><br />Попередній запис MBR по замовчуванню зберігається в <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Якщо Ви не додавали розділ з Haiku до наявного завантажувача такого ,наприклад ,як GRUB, Завантажувач встановить маленьке загрузочне  меню до MBR, Яке може виглядати десь отак:</p>
+<p>Якщо Ви не додавали розділ з Haiku до наявного завантажувача такого, наприклад, як GRUB, BootManager (Завантажувач) встановить маленьке завантажувальне  меню до MBR, яке виглядатиме десь отак:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Завантажувач не є протестованим до кінця, тому накладаються обмеження, про які Ви не повинні забувати: меню може бути встановлене тільки на перший жорсткий диск, на ньому має бути принаймні 2KiB вільного місця після основного загрузочного запису (MBR).</div>
-<p>Завантажувач буде супроводжувати Вас у процесі встановлення загрузочного меню.</p>
+<div class="box-info">Boot Manager (Завантажувач) не є протестованим до кінця, тому накладаються обмеження, про які Ви не повинні забувати: меню може бути встановлене тільки на перший жорсткий диск, на ньому має бути принаймні 2KiB вільного місця після основного загрузочного запису (MBR).</div>
+<p>BootManager (Завантажувач) супроводжуватиме Вас у процесі встановлення загрузочного меню.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="1-drives" id="1-drives">Вибір диску призначення</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu again.<br />
-Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>BootManager (Завантажувач) запускається зі списком доступних розділів серед яких треба вибрати потрібні. Якщо загрузочне меню вже існує на цьому диску кнопка <span class="button">Uninstall (Видалити)</span> стає активною і дозволяє відновити збережену резервну копію MBR, видаляючи меню завантаження знову.<br />
+В іншому випадку виберіть <span class="button">Install (Встановити)</span> для продовження.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">Резервне копіювання головного завантажувального запису (MBR)</a></h2>
+<p>У разі, якщо що-небудь піде не так, або бажатимете видалити  меню завантаження, Master Boot Record (MBR) буде збережено. Це, безумовно, дуже важливий крок, переконайтеся, що ви часом не перезаписуєте будь-якої іншої резервної копії MBR, яка наприклад залишилась від деяких попередніх експериментів!</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>Просто виберіть місце призначення для файлу резервної копії "<tt>MBR</tt>" або залиште типовий шлях. Після натискання кнопки <span class="button">Далі</span> Ви отримаєте підтвердження успішного резервування.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">Конфігурація завантажувального меню</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>Далі ви побачите список всіх розділів на диску призначення. Встановивши прапорців ви вказуєте, що записи будуть відображатися в меню завантаження, текстові вікна дозволяють перейменувати запис.</p>
+<p>Після цього вибираєте у спливаючому меню типовий розділ для завантаження та встановлюєте затримку повзунком. Де "<i>Негайно</i>" пропустить меню завантаження повністю, а "<i>Ніколи</i>" просто зупинить завантаження на меню. Ви можете змінити налаштування тайм-ауту, утримуючи <span class="key">ALT</span> під час завантаження.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">Запис завантажувального меню</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>Перед записом меню завантаження  в MBR, ви отримаєте коротку інформацію про конфігурацію, а потім один останній шанс, щоб перервати операцію. Не хвилюйтеся до тих ппоки ви зберігаєте резервну копію MBR, ви можете легко скасувати зміни. Якщо всеж сталася помилка ви завжди зможете завантажитися з компакт-диска Haiku або USB флешки та відновити резервну копію MBR.</p>
 
 </div>
 </div>
@@ -102,7 +101,7 @@ Otherwise, choose <span class="button">Install</span> to continue.</p>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="activitymonitor.html">ActivityMonitor</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Додатки (Applications)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (Програми)</a> 
 ::  <a href="charactermap.html">Таблиця символів (CharacterMap)</a>  »
 </span></div>
 </div>

@@ -91,7 +91,7 @@
 <ul>
 	<li><p>尝试在当前版本的Haiku系统中重现您的问题。  有许多用于测试的预编译镜像都是<a href="http://haiku-files.org/">可用的</a>。</p></li>
 	<li><p>包括基本的信息，例如以何种方式测试 Haiku（利用真实的硬件，VMware，还是 QEMU）。</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
+	<li><p>注意您所运行的系统版本。您可以在桌面栏菜单的 <span class="menu">关于 Haiku...</span> 找到该信息。<br /> 同时您还需要注意您所测试的 Haiku 的构建类型（gcc2，gcc4，gcc2hybird，gcc4hybird）。 可下载的镜像都会给出相应的命名，对于自主构建的镜像，您需要了解自己的构建方法。</p></li>
 	<li><p>描述您所遇到的问题。尽量把问题讲得精确和明白：详细的描述系统的行为反馈，和您期望的反馈。</p></li>
 	<li><p>描述出现该错误所需要的操作步骤。这将会有助于开发者重现该错误，并对其进行修复和完善。</p></li>
 	<li><p>附带你所掌握的尽可能多的信息。如果是一个GUI错误，或者其中的程序错误，尽量使用 <span class="key">PRINT</span> 键来截取当时的屏幕图像。</p></li>
@@ -103,9 +103,10 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">服务错误</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
-Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+<p>当 app server，registrar server 或者 input server 等重要组件崩溃时，您将无法看到通常的崩溃警告。相反的，整个屏幕将会呈现白色，并且启动一个 gdb 会话，相关的输出信息直接在屏幕中进行显示。您可能还可以继续移动鼠标，这将会覆盖掉屏幕中的白色区域和 gdb 输出信息。仍在运行的程序 (例如，进程控制器或者桌面栏的时钟) 可能也会覆盖屏幕中的调试信息。
+<br />
+除却所有显示的丑陋和操作的不便，它与软件出错基本一样。 最重要的是获取一个有关错误的回溯（使用 <span class="cli">bt</span> 命令）。您可能还需要使用数码相机记录下相关的屏幕显示，因为这种情况下，您无法拷贝相关的文本，<br />
+根据不同的崩溃问题，您可以尝试通过 <span class="cli">save-report</span> 指令在桌面保存崩溃报告，然后按下电源键尝试重启。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">内核错误</a></h2>

@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Repositories</title>
+	<title>Screen</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -55,24 +57,23 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
-<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Repositories</h2>
+<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" /><acronym title="Repositories">Paketquellen</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Einstellungen</span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
 </table>
-<p>Repositories are collections of software packages. Set up by default, there's the <i>Haiku</i> repo with all of the operating system's packages and <i>HaikuPorts</i>, which provides a large number of ported and native Haiku software. There are several more repositories, curated by members of the Haiku community. Checkout <a href="https://www.haiku-os.org/community/software">Software Sites</a> on the website.</p>
-<p>This is the preference panel to manage your respositories (you can open it also from <a href="../applications/haikudepot.html">HaikuDepot's</a> <span class="menu">Tools</span> menu):</p>
+<p>Paketquellen sind Sammlungen von Softwarepaketen. Standardmäßig konfiguriert ist die <i>Haiku</i> Quelle mit allen Paketen des Betriebssstems und <i>HaikuPorts</i>, die eine große Zahl an Portierungen und nativen Haiku Anwendungen bietet. Es existieren noch einige weitere Paketquellen, die von Haiku Enthusiasten zusammengestellt und gepflegt werden. Siehe dazu die <a href="https://www.haiku-os.org/community/software">Software Sites</a> auf der Website.</p>
+<p>Dies ist das Einstellungsfenster mit dem die Paketquellen verwaltet werden (auch erreichbar aus  <a href="../applications/haikudepot.html">HaikuDepot's</a> <span class="menu">Werkzeuge</span> Menü):</p>
 <img src="../images/prefs-images/repositories.png" alt="repositories.png" />
-<p>The first column in the list of known repositories shows if a repo is currently enabled. If it doesn't have a checkmark, it will not be queried by HaikuDepot or <span class="cli">pkgman</span> from the command line. Use the buttons to <span class="button">Enable</span> or <span class="button">Disable</span> the selected repositories, or double-click a repo to toggle the status.</p>
-<p>Depending on the size of the repository and the speed of the internet connection, enabling a repository may take a few seconds. If it takes longer, you're informed of pending tasks in the little text box above the <span class="button">+/-</span> buttons. If it takes unusually long, you'll be asked to either cancel or retry.</p>
-<p>To be able to remove a repository completely with the "<span class="button">-</span>" button, it has to be disabled.<br />
-You add a new repository with the "<span class="button"> </span>" button, which will open this panel:</p>
+<p>Die erste Spalte in der Liste bekannter Paketquellen zeigt an, ob eine Quelle gerade aktiv ist. Befindet sich dort kein Haken, wird die Quelle auch nicht von HaikuDepot oder <span class="cli">pkgman</span> (in der Konsole) abgefragt. Die Buttons unten werden benutzt, um die ausgewählten Paketquellen zu <span class="button">Aktivieren</span> oder zu <span class="button">Deaktivieren</span>. Noch schneller geht's mit einem Doppelklick, der den Status umschaltet.</p>
+<p>Je nach Größe der Paketquelle und der Geschwindigkeit der Internetverbindung, kann das Aktivieren einer Paketquelle einige Sekunden dauern. Falls es länger dauern sollte, wird man durch die kleine Textbox über den <span class="button">+/-</span> Buttons darüber informiert, dass noch Transaktionen ausstehen. Dauern diese ungewöhnlich lange, wird nachgefragt, ob sie nochmal probiert oder abgebrochen werden sollen. </p>
+<p>Um mit dem "<span class="button">-</span>" Button eine Paketquelle komplett entfernen zu können, muss diese deaktiviert sein.<br />
+Eine neue Paketquelle wird mit dem "<span class="button">+</span>" Button hinzugefügt, was dieses Fenster öffnet:</p>
 <img src="../images/prefs-images/repositories_add.png" alt="repositories_add.png" />
-<p>To add a new repository, just paste its URL into the text field. It'll be named "Unknown" until you enable it.</p>
-<div class="box-warning">It goes without saying that adding a repository and downloading and installing software from it is a matter of trust. Don't carelessly just add any URL you happen upon on the internets.</div>
+<p>Um eine neue Paketquelle hinzuzufügen, wird einfach deren URL in das Textfeld eingefügt. Sie wird als "Unbekannt" angezeigt, bis sie aktiviert wurde.</p>
+<div class="box-warning">Es versteht sich von selbst, dass das Hinzufügen von Paketquellen und das Herunterladen und Installieren von Software aus ihnen Vertrauenssache ist. Man sollte also nicht unüberlegt URLs hinzufügen, über die man in irgendeinem Forum stolpert.</div>
 </div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -82,7 +83,8 @@
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>Löydät myös valikon <span class="menu">Asetukset</span> niin että sinun ei tarvitse liittää kaikkia manuaalisesti jokaisen alkulatauksen jälkeen.<br />
 Yllä oleva asetus liittää automaattisesti jokaisen tallennuslaitteen, jonka liität tai lisäät ja liittää alkulatauksen yhteydessä myös kaikki levyt, jotka oli liitetty aiemmin.</p>
-<div class="box-warning">Ennen kuin poistat esimerkiksi kiintolevyn tai USB-tikun, varmistu, että olet poistanut taltion onnistuneesti. Tämä takaa, että kaikki tiedonsiirrot ovat päättyneet onnistuneesti. Muussa tapauksessa tietoja voi kadota tai levy rikkoutuu!</div>
+<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume and its icon has disappeared. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<div class="box-warning">Haiku is able to mount non-BFS formatted volumes. Be warned, however, that these non-BFS filesystems haven't been rigorously tested. Writing to those volumes may cause corruption in some cases. If you want to be on the safe side, always choose <span class="button">Mount read-only</span> when mounting!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

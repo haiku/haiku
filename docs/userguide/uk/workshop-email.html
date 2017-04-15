@@ -9,18 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Managing Email</title>
+	<title>Семінар: Керування поштою
+</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -55,92 +58,96 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Зміст</td></tr>
 <tr class="index"><td>
-	<a href="#mailsystem">Haiku's mail system</a><br />
-	<a href="#statuses">Using custom statuses</a><br />
-	<a href="#queries">Using queries</a><br />
-	<a href="#tips">More tips</a>
+	<a href="#mailsystem">Поштова система Haiku</a><br />
+	<a href="#statuses">Використання призначених для користувача станів</a><br />
+	<a href="#queries">Використання запитів</a><br />
+	<a href="#tips">Більше порад</a>
 </td></tr>
 </table>
 
-<h1>Workshop: Managing Email</h1>
+<h1>Семінар: Керування поштою
+</h1>
 
-<p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
+<p> Цей семінар розказує як правильно керувати поштовою службою. Передбачається що сервіс правильно зконфігурований у налаштуваннях <a href="preferences/e-mail.html">Пошта (E-Mail)</a> і Ви знайомі з основними функціями програми <a href="applications/mail.html">Пошта (Mail)</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mailsystem" name="mailsystem">Haiku's mail system</a></h2>
-<p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
-Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
-<p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
-<p>There's the <span class="app">mail_daemon</span> that takes care of the communication with your mail servers. The <a href="preferences/e-mail.html">E-Mail</a> preferences is the one central point to configure your email accounts and how often they're checked, for example.</p>
-<p>Every message that is fetched or sent is saved as one single email file, with its header information (like sender, subject, date) and status (like New, Replied, Sent) in BFS attributes. This enables searching/filtering them with Haiku's fast queries.</p>
+<a id="mailsystem" name="mailsystem">Поштова система Haiku</a></h2>
+<p>Якщо ви прийшли в Haiku з інших операційних систем, ви, ймовірно, використовували програми MS Outlook або Thunderbird Mozilla. Ви повинні були налаштувати їх, ввівши всі дані на поштовому сервері адресу і т.д., і вони використовують свої власні контакти бази даних. Вони дбали про надсилання та отримання електронної пошти та зберігали їх в якомусь великому спеціальному файлі.
+Зміна вами клієнта електронної пошти викликатиме клопіт з відправкою/отриманням та конвертацією листів. Використання більше одного клієнта паралельно для перевірки, теж створюватиме додаткову метушню.
+
+</p>
+<p>Поштова система Haiku інакша. Вона складається з окремих невеликих модулів.</p>
+<p>Додаток <span class="app">mail_daemon</span> піклується про звязок з вашими поштовими серверами. Налаштування <a href="preferences/e-mail.html">Пошта (E-Mail)</a> центральна точка конфігурування ваших облікових записів, тут ви також можете встановити частоту перевірки пошти, для прикладу.</p>
+<p>Кожне повідомлення як отримане так і відправлене електронною поштою зберігається як один файл, з інформацією у заголовку ( відправник, тема, дата) і станом (нове, відповідь, переслане) у BFS атрибутах. Це дає можливість їх пошуку / фільтрації за швидкими запитами Haiku.</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
-As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
-<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<p>Кожне повідомлення є окремим файлом перегляд або пошук якого не є сладнішим ніж перегляд зображень за допомогою <a href="applications/showimage.html">Переглядача зображень (ShowImage)</a>. У відкритому вікні Tracker Ви можете переміщатись вибираючи файл для перегляду за допомогою кнопок попередній/наступний.<br />
+Оскільки вони є незалежними файлами, то використання як переглядача пошти додатку Haiku <a href="applications/mail.html">Пошта (Mail)</a> не повинно викликати жодних проблем.</p>
+<p>Крім того, формування нового повідомлення просто створює ще один файл, який передається mail_daemon'у для здійснення відправки. Керування контактами покладено на додаток <a href="applications/people.html"> Особи (People)</a>.</p>
+<p>Другими словами, де інші поштові клієнти роблять все, від спілкування з поштовими серверами для забезпечення відправки всіх ваших листів до їх пошуку та фільтрації, Haiku використовує ланцюг невеликих інструментів та загального керування файлами:</p>
 <ul>
-<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
-<li><p>Tracker windows and queries to find and show email files.</p></li>
-<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+<li><p><span class="app">Мail_daemon</span> відправляє/отримує повідомлення та зберігає їх як звичайні файли.</p></li>
+<li><p>Вікна Tracker'а та запити знаходять і показують повідомлення.</p></li>
+<li><p>Програма <span class="app">Пошта (Mail)</span> допомагає переглядати повідомлення та створювати нові на основі загальносистемного додатку керування контактами <span class="app">Особи (People)</span>.</p></li>
 </ul>
-<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
-Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+<p>Використання Tracker'а та запитів для обслуговування пошти надзвичайно потужна ідея. Отриманий досвід можна використати для вирішення інших проблем зв'язаних з обробкою файлів. Будь то зображення, музика, відео, контакти або будь-які інші документи, використання Tracker'а лежить в основі керування файлами.<br />
+Крім того, поліпшення в будь-якій з цих ланок системи принести користь не тільки електронній пошті, але й  усім програмам, які використовують їх.
+</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="status" name="status">Using custom statuses</a></h2>
-<p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
-<p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
+<a id="status" name="status">Використання призначених для користувача статусів</a></h2>
+<p>При отриманні нових повідомлень деколи виникає бажання переглянути їх пізніше з метою детальнішого ознайомлення. Якщо вибрати у поштовому меню <span class="menu">Закрити та | Зберегти як нове (Close and | Leave as New)</span> то ваш запит збережеться у "<i>Нові повідомлення (New messages)</i>", речі мають тенденцію накопичуватися, таким чином ...</p>
+<p>Одне з можливих рішень, звичайно, просто почати відповідь негайно і зберегти його як чернетку. Але якщо ви не бажаєте  відповідати, а просто хочете повторно прочитати його пізніше, то це не буде доброю ідеєю.</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
-<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
-Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
-In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
-<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+<p>Краще використайте <span class="menu">Закрийте  | та Встановіть на... (Close and | Set to...)</span> для створення нового статусу та використання його для класифікації повідомлень. Для прикладу можна вибрати статус "<i>Пізніше (Later)</i>", і відповісти коли матимете більше часу.<br />
+Або використовувати різні статуси для певних проектів. Наприклад, я створив статус "<i>HUG</i>" (for "Настанови користувачеві") під яким я збираю повідомлення стосовно змісту, коммітів, цікавих ідей, зміни коду та інших важливих аспектів.<br />
+У будь-якому випадку намагайтесь зберегти ім'я статусу коротким.  Таким чином, щоб він завжди поміщався у колонці "Статус" Tracker'а звичайної ширини.</p>
+<p>Вам не потрібно відкривати програму <span class="app">Пошта (Mail)</span> для встановлення статусу. З Tracker додатків <span class="app">Помітити як прочитане (Mark as Read)</span> та <span class="app">Помітити як... (Mark as...)</span> ви можете вибрати кілька повідомлень і встановити їх статус за один прохід.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="queries" name="queries">Using queries</a></h2>
-<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
-<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="desktop-applets/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
-<p><a href="queries.html">Queries</a>, to the rescue!</p>
-<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<a id="queries" name="queries">Використання запитів</a></h2>
+<p>Звичайно можна вказати теку для зберігання усієї пошти, щоб при відкритті мати доступ до повідомлень. Але з часом вона настільки розростеться і її відкриття займатиме через необхідність відкриття атрибутів та сортування дуже багато часу. Крім того слідкувати за старезними листами від нігерійських принців та іншими дрібними неприємностями надзвичайно швидко набридає ...</p>
+<div class="box-info">Купа часу при відкритті теки витрачається на розміщення файлів для читання з диска в правильному порядку сортування і відображення їх у вікні. Якщо є потреба у відкритті теки з величезною кількістю файлів, можна скоротити очікування, зробивши вікно Tracker "невидимим", тобто або звести його до мінімуму або перенести в інше Робоче місце. Дивіться <a href="desktop-applets/processcontroller.html"> Контролер процесів (ProcessController) </a>, щоб побачити, як це впливає на завантаження процесора.</div>
+<p><a href="queries.html">Запити (Queries)</a>, на допомогу!</p>
+<p>Використовуючи запити Ви можете значно скоротити перегдяд повідомлень. Насправді, значок поштової скриньки у Deskbar використовує запити.</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
-<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
-<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
-<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+<p>Підменю <span class="menu">Відкрити чернетки (Open Draft)</span> робить запит для статусу "<i>Чернетка (Draft)</i>", який встановлює <span class="app">Пошта (Mail)</span> при збереженні повідомлення.</p>
+<p><span class="menu">Відкрити теку 
+Вхідні (Open Inbox Folder)</span> та <span class="menu">Відкрити теку Пошта (Open Mail Folder)</span> є тільки посиланнями на звичайні папки (що не дуже корисно, на мій погляд). </p>
+<p>Підменю <span class="menu"># нові повідомлення (new messages)</span> виводить запит для листів зі статусом "<i>Нові (New)</i>" (той же запит використовується для зміни значка поштової скриньки, щоб показати наявність листів у ній, до речі).</p>
 
-<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
-<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+<p>Ви також можете додати свої власні запити (або теки, додатки, скрипти і т.д.) до цього контекстного меню , помістивши їх або посилання на них до <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
+<div class="box-info">Запит <span class="path">~/config/settings/Mail/mailbox</span> є окремим випадком: він виконується при виборі лівою кнопкою миші значка поштової скриньки в Deskbar. IЯкщо ви хочете змінити цю поведінку, ви можете замінити його на будь-який інший файл (або посилання на файл), просто назвіть його "<i>mailbox</i>". Він не повинен бути запитом, посилання на теку запитів, сценарій або програму працює так само добре.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-examples" name="query-examples">Query examples</a></h3>
-<p>Here are a few examples of useful queries:</p>
+<a id="query-examples" name="query-examples">Приклади запитів</a></h3>
+<p>Ось кілька прикладів використання запитів:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
-This finds all mails with the custom status "<i>Later</i>".</td>
+Шукає всі повідомлення за вибраним статусом "<i>Пізніше (Later)</i>".</td>
 <td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
-This finds all mails of the past 2 days.</td></tr>
+Шукає всі повідомлення за останні 2 дні.</td></tr>
 
 <tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
-This finds all mails by Ingo Weinhold of the past 2 weeks.</td>
+Шукає всі повідомлення від Ingo Weinhold'а за останні 2 тижня.</td>
 <td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
-This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
+Шукає всі пости від Haiku commit list за останні 12 годин.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tips" name="tips">More tips</a></h2>
+<a id="tips" name="tips">Більше порад</a></h2>
 <ul>
-<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
-<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
+<li><p>Якщо ви не збережете запит як "<i>Запит (Query)</i>" але як "<i>Шаблон запиту (Query template)</i>", то замість вікна з результатами буде показано вікно Пошук... (Find...). Таким чином, ви можете легко змінити рядок пошуку, наприклад, для теми або відправника,  або змінити граничний термін з "<i>2 днів</i>" на "<i>3 дні</i>".</p></li>
+<li><p>Активація "випереджаючого фільтрування" в <a href="tracker.html#tracker-preferences">Налаштуваннях Tracker'а</a> дозволить прискорити фільтрування результатів запиту. Часто цього досить, щоб опитати всі листи за  останні 3 дні і вимкнути фільтрацію. Великою перевагою є те, що ви не повинні точно вказувати атрибут для пошуку, оскільки всі відображення беруться до уваги при фільтрації.</p></li>
 <!-- <li _translation_id="4718"><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li> -->
 </ul>
 
@@ -149,9 +156,9 @@ This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Додатки (Applications)</a>  »
+ «  <a href="queries.html">Запити (Queries)</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
+::  <a href="applications.html">Applications (Програми)</a>  »
 </span></div>
 </div>
 

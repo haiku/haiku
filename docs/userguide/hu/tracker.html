@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2014, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -82,7 +83,8 @@
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>Egy <span class="menu">Beállítások</span> menü is a rendelkezésünkre áll, így megadható, hogy ne kelljen minden esetben kézzel csatolni a szükséges lemezeket.<br />
 A fenti beállítás alapján a rendszer az összes elérhető BeOS lemezt automatikusan csatolni fogja, ugyanakkor indításkor a legutóbb használt lemezeket is csatolja majd.</p>
-<div class="box-warning">Miután eltávolítunk egy lemezt a gépből, előtte le kell választani azt. Ez a lépés garantálja, hogy minden adatátvitel befejeződött. Ellenkező esetben adatvesztés történhet a lemezen!</div>
+<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume and its icon has disappeared. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<div class="box-warning">Haiku is able to mount non-BFS formatted volumes. Be warned, however, that these non-BFS filesystems haven't been rigorously tested. Writing to those volumes may cause corruption in some cases. If you want to be on the safe side, always choose <span class="button">Mount read-only</span> when mounting!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

@@ -116,8 +116,9 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">ヒント</a></h2>
 <h3>ファームウェアファイルをオフラインでダウンロードする</h3>
-<p>バイナリファームウェアファイルを <tt>install-wifi-firmwares.sh</tt> スクリプトで入手できない場合 (たとえば、Haiku でインターネット接続ができないため)、<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">このシェルスクリプト</a>もダウンロードすれば、<tt>wget</tt> と <tt>zip</tt> がインストールされたほかのどんな OS からも実行できます。<br />
-このスクリプトは必要なファイルをダウンロードし、Haiku の <tt>/boot</tt> で解凍するための zip ファイルを作成するでしょう。解凍後、ターミナルを開いて、以下を入力します。</p>
+<p>バイナリファームウェアファイルを <tt>install-wifi-firmwares.sh</tt> スクリプトで入手できない場合 (たとえば、Haiku でインターネット接続ができないため)、同様に<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">このシェルスクリプト</a>をダウンロードし、<tt>wget</tt> と <tt>zip</tt> がインストールされたほかの OS から実行できます。<br />
+Windows ユーザーは、Windows 用の <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> と <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> を規定の位置にインストールしている必要があります。それから、<a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">このバッチファイルスクリプト</a>を使用してください。<br />
+このスクリプトは必要なファイルをダウンロードし、Haiku の <tt>/boot</tt> で解凍するための zip ファイルを作成するでしょう。解凍後、ターミナルを開いて以下を入力します。</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
 <h3>接続の切断を避ける</h3>

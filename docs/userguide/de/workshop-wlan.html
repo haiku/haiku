@@ -117,6 +117,7 @@ Die Ausgabe zeigt den öffenlichen Namen (SSID), die MAC Adresse, Signalstärke 
 <a id="tips" name="tips">Tipps</a></h2>
 <h3>Beschaffen von Firmwaredateien ohne Internetverbindung</h3>
 <p>Wenn man die Firmwaredateien nicht über das <tt>install-wifi-firmwares.sh</tt> Skript herunterladen kann (vielleicht hat man ja keine funktionierende Internetverbindung unter Haiku), kann man stattdessen <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">dieses Shellskript</a> herunterladen und unter einem anderen Betriebssystem mit installiertem <tt>wget</tt> und <tt>zip</tt> ausführen.<br />
+Windows Benutzer müssen <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> und <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> für Windows in deren Standard-Orten installiert haben und <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">dieses Batchskript</a> benutzen.<br />
 Das Skript lädt die benötigten Dateien herunter und erstellt eine ZIP Datei, die man dann unter Haiku in <tt>/boot</tt> entpackt. Ist das geschehen, öffnet man ein Terminal und schreibt:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Es werden die entsprechenden Lizenzen angezeigt, die akzeptiert werden müssen bevor die Firmwaredateien installiert werden.</p>

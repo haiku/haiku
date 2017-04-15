@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Workshop: Filetypes, Attributes, Index and Queries</title>
+	<title>Семінар: Типи файлів (Filetypes), атрибути (Attributes), індекси (Index) та запити (Queries)</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -46,177 +48,180 @@
 <li><a href="../en/workshop-filetypes+attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Додатки (Applications)</a>  »
+ «  <a href="queries.html">Запити (Queries)</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
+::  <a href="applications.html">Applications (Програми)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Зміст</td></tr>
 <tr class="index"><td>
-	<a href="#preparations">Preparations</a><br />
-	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	<a href="#icon">Icon</a><br />
-        <a href="#file-recognition">File recognition</a><br />
-	<a href="#description">Description</a><br />
-	<a href="#pref_app">Preferred Application</a><br />
-	<a href="#extra_attribute">Extra Attributes</a><br />
-	<a href="#indexing">Indexing</a><br />
-	<a href="#filling-data">Filling in the data</a><br />
-	<a href="#query-db">Querying the database</a>
+	<a href="#preparations">Підготовка</a><br />
+	<a href="#custom-filetype">Створення та вибір типу файлів</a><br />
+	<a href="#icon">Іконка</a><br />
+        <a href="#file-recognition">Розпізнавання файлів</a><br />
+	<a href="#description">Опис</a><br />
+	<a href="#pref_app">Бажані програми</a><br />
+	<a href="#extra_attribute">Супер атрибути</a><br />
+	<a href="#indexing">Індексування</a><br />
+	<a href="#filling-data">Наповнення даними</a><br />
+	<a href="#query-db">Запит до бази даних</a>
 </td></tr>
 </table>
 
-<h1>Workshop: Filetypes, Attributes, Index and Queries</h1>
+<h1>Семінар: Типи файлів (Filetypes), атрибути (Attributes), індекси (Index) та запити (Queries)</h1>
 
-<p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
+<p>Цей семінар показує як використовувати <a href="attributes.html">Атрибути (Attributes)</a>, <a href="queries.html">Запити (Queries)</a>, <a href="index.html">Індекс (Index)</a> та встановлені <a href="filetypes.html">Типи файлів (Filetypes)</a>. Для прикладу створимо базу даних для зберігання нашої DVD бібліотеки.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preparations" name="preparations">Preparations</a></h2>
-<p>Let's first decide what filetype and attributes would serve our needs. Originally, I planned to use a bookmark file with a link to the movie's IMdB page, but since Haiku didn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at that time, I came up with this: The file itself will be a JPEG image for the movie cover.<br />
-With <span class="app">WebPositive</span>, Haiku now has a browser using bookmark files again, so you could as well use a bookmark file instead of an image as basic filetype for our database files.<br />
-In any case, to these files we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
-<p>Here are the attributes I'd like to see for my DVDs:</p>
+<a id="preparations" name="preparations">Підготовка</a></h2>
+<p>Спочатку визначимо які типи файлів та атрибути Ви потребуватимите при обслуговування. Спочатку я планував використовувати файл закладок з посиланням на IMDB сторінку фільму, але Haiku не мала "закладабельного" браузера, такого як у BeOS <span class="app">NetPositive</span> свого часу. Я прийшов до такого, нехай файлом для обкладинки фільму буде файл зображення JPEG.<br />
+З появою <span class="app">WebPositive</span>, Haiku  знову має браузер який працює з закладками, так що ви могли б також використовувати файл закладок замість зображення в якості основного типу файлу для наших файлів бази даних. <br />
+У будь-якому випадку, до цих файлів ми додамо кілька атрибутів. Тут ми повинні вирішити, якщо бажаємо, запросити його пізніше (після того як додали його в індекс), то який тип атрибута повинен бути. Числа (INT, Float) можна оцінити інакше, ніж текст (&lt;/=/&gt; проти є/містить/почати з).</p>
+<p>Ось атрибути, які я хотів би мати для своїх DVD-дисків:
+
+
+</p>
 <ul>
-<li>Movie title</li>
-<li>Genre</li>
-<li>URL to e.g. IMdB</li>
-<li>Director/Cast</li>
-<li>Plot</li>
-<li>My rating from 1 to 10</li>
-<li>Coordinates in my shelf, e.g. A2, B3, so I find the DVD also in Real Life :)</li>
-<li>If so, who's borrowed the disk...</li>
+<li>Назва фільму</li>
+<li>Жанр</li>
+<li>URL відповідного IMdB</li>
+<li>Режисер/Актори</li>
+<li>Сюжет</li>
+<li>Моя оцінка від 0 до 10</li>
+<li>Місце на моїх поличках де я би дійсно міг знайти DVD</li>
+<li>Якщо його там немає, то хто позичив цей диск</li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h2>
-<p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
+<a id="custom-filetype" name="custom-filetype">Створення вибраного типу файлу</a></h2>
+<p>Запустіть налаштування <span class="app">Типи файлів (Filetypes)</span> натискуванням кнопки <span class="button">Додати... (Add...)</span> нижче ієрархічного списку зліва. У маленькому діалоговому вікні що відкриється виберіть до якої групи MIME належатиме вибраний вами тип файлу. Покладіть його в "<i>програму (application)</i>" та встановіть "Внутрішнє ім'я" як <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
-<p>Now, a panel for your new DVDdb filetype opens:</p>
+<p>Выдкриється панель вашого нового типу файлів DVDdb (DVD Database):</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">Icon</a></h3>
-<p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
+<a id="icon" name="icon">Іконка (Icon)</a></h3>
+<p>Двічі клікніть по цьому віконцю для активації графічного редактора <a href="applications/icon-o-matic.html">Icon-O-Matic</a> у спробі створити картинку для вашого типу файлів. Ви можете перетягнути у вікно редактора якусь готову іконку призначену для іншого типу щоб зробити модифіковану версію з неї під власні потреби.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
-<p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
+<a id="file-recognition" name="file-recognition">Розпізнавання файлу (File recognition)</a></h3>
+<p>Ви можете додати суфікси, як .txt, .jpg, .mp3, щоб розпізнати файли по їх розширенню. Це корисно при роботі з файлами у системах що не використовують MIME типи. Для нашого випадку це не підходить.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="description" name="description">Description</a></h3>
+<a id="description" name="description">Опис (Description)</a></h3>
 <ul>
-<li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
-<li><i>Description</i> - A bit more detailed description.</li>
+<li><i>Введіть ім'я (Type name)</i> - З'являється, наприклад, атрибуті меню вікна Tracker та у атрибуті "Вид" файла.</li>
+<li><i>Опис (Description)</i> - більш деталізований опис.</li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="pref_app" name="pref_app">Preferred Application</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
+<a id="pref_app" name="pref_app">Бажана програма (Preferred application)</a></h3>
+<p>Контекстне меню де показані всі програми здатні обробляти цей конкретний тип файлів. Тут можна вибрати програму що відкриватиме визначений файл двокліком.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Вибрати (Select...)</span></td><td> </td><td>відкриває діалогове вікно файлу де можна вибрати програму для відкриття цього типу файлів. Тут ми встановили <span class="app">Переглядач зображень (ShowImage)</span> для показу обкладинки DVD.</td></tr>
+<tr><td class="onelinetop"><span class="button">Такий як... (Same as...)</span></td><td> </td><td>Відкриється діалогове вікно файлу, де ви вибираєте кожен файл, який вже має кращий набір бажаних програм, що ви шукаєте.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<a id="extra_attribute" name="extra_attribute">Додаткові атрибути (Extra attributes)</a></h3>
+<p>Тут ми вводимо всі вибрані атрибути, які визначили при підготовці. Натисканні кнопки  <span class="button">Додати..(Add...)</span> відкриває панель для введення всіх даних для нового атрибута. Ви можете змінити присутній атрибут простим двокліком мишки.</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
-<li><p><i>Internal name</i> - Is used for indexing and querying the attribute.</p></li>
-<li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
+<li><p><i>Ім'я атрибута (Attribute name)</i> - з'являється, наприклад, як заголовок стовпця у вікні Tracker'а.</p></li>
+<li><p><i>Внутрішнє ім'я (Internal name)</i> - використовується для індексації та запиту атрибута.</p>
+
+</li>
+<li><i>Тип (Type)</i> - визначає збережену величину атрибута, яка може бути запрошена.
     <ul>
-    <li><span class="menu">String</span> for normal text</li>
-    <li><span class="menu">Boolean</span> for binary data: 0 or 1</li>
-    <li><span class="menu">Integer</span> for integer numbers with different ranges:
+    <li><span class="menu">Стрічка</span> для звичайного тексту</li>
+    <li><span class="menu">Boolean</span> для двійкових даних : 0 або 1</li>
+    <li><span class="menu">Integer</span> ціле для цілих чисел з різними діапазонами:
         <ul>
-        <li><span class="menu">8 bit</span>: ± 255</li>
-        <li><span class="menu">16 bit</span>: ± 65,535</li>
-        <li><span class="menu">32 bit</span>: ± 4,294,967,295</li>
-        <li><span class="menu">64 bit</span>: ± 18,446,744,073,709,551,615</li>
+        <li><span class="menu">8 біт</span>: ± 255</li>
+        <li><span class="menu">16 біт</span>: ± 65,535</li>
+        <li><span class="menu">32 біт</span>: ± 4,294,967,295</li>
+        <li><span class="menu">64 біт</span>: ± 18,446,744,073,709,551,615</li>
         </ul>
     </li>
-    <li><span class="menu">Float</span> for floatingpoint numbers, single precision</li>
-    <li><span class="menu">Double</span> for floatingpoint numbers, double precision</li>
-    <li><span class="menu">Time</span> for time and date format</li>
-    </ul>
-</li>
+    <li><span class="menu">Float</span> для чисел з плаваючою комою одинарної точності</li>
+    <li><span class="menu">Double</span> для чисел з плаваючою комою подвійної точності</li>
+    <li><span class="menu">Час</span> для формату дати та часу</li>
+    </ul></li>
 </ul>
 <ul>
-<li><i>Visible</i> - This checkbox determines if the attribute is visible in a Tracker window at all. Since the Tracker will be the interface to our DVD database, we check it and define its appearance with:<ul>
-    <li><span class="menu">Display as</span> - Leave on "Default". In the future more option will become available, e.g. a bar or stars for a rating etc.</li>
-    <li><span class="menu">Editable</span> - Determines if the attribute shall be editable in Tracker.</li>
-    <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
-    <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
+<li><i>Видимий (Visible)</i> - цей прапорець визначає чи є атрибут видимим для всіх у вікні Tracker. Оскільки Tracker буде інтерфейсом для нашої DVD бази даних ми перевіряємо його та визначаємо  вигляд як:<ul>
+    <li><span class="menu">Показати як (Display as)</span> - залишити на "Типовий (Default)".  У майбутньому може бути доступно більше опцій, наприклад, панель або зірки рейтингу.</li>
+    <li><span class="menu">Редагований (Editable)</span> - визначає чи атрибут можна змінювати у Tracker.</li>
+    <li><span class="menu">Ширина (Width)</span> -типова ширина колонки атрибута у вікні Tracker.</li>
+    <li><span class="menu">Розташування (Alignment)</span> - атрибут відображається зліва, посередині або справа.</li>
 </ul></li></ul>
-<p>Now, insert all the info for our attributes:</p>
+<p>Тепер введіть усі дані для ваших атрибутів:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
-<tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Movie title</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Genre</td></tr>
-<tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>yes</td>	<td>Director/Cast</td></tr>
-<tr><td>DVDdb:plot</td>		<td>text</td>		<td>no</td>	<td>Plot</td></tr>
-<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>yes</td>	<td>Rating 1 to 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>no</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
+<tr><th>Внутрішнє ім'я (Internal Name)</th><th>Тип атрибуту (Attribute type)</th><th>індексований(indexed?)</th><th>Опис (Description)</th></tr>
+<tr><td>DVDdb:title</td>	<td>текст</td>		<td>так</td>	<td>Назва фільму</td></tr>
+<tr><td>DVDdb:genre</td>	<td>текст</td>		<td>так</td>	<td>Жанр</td></tr>
+<tr><td>DVDdb:url</td>		<td>текст</td>		<td>ні</td>	<td>URL адреса</td></tr>
+<tr><td>DVDdb:cast</td>		<td>текст</td>		<td>так</td>	<td>Режисер/Актори</td></tr>
+<tr><td>DVDdb:plot</td>		<td>текст</td>		<td>ні</td>	<td>Сюжет</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>так</td>	<td>Оцінка від 1 до 10</td></tr>
+<tr><td>DVDdb:coord</td>	<td>текст</td>		<td>ні</td>	<td>Поличка (де знаходиться)</td></tr>
+<tr><td>DVDdb:lent</td>		<td>текст</td>		<td>так</td>	<td>позичені</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="indexing" name="indexing">Indexing</a></h2>
-<p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
-So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
-<p>This leaves these attributes:</p>
+<a id="indexing" name="indexing">Індексування (Indexing)</a></h2>
+<p>До початку введення даних до вашої невеличкої бази даних DVD, ви повинні додати атрибути для <a href="index.html">Індексу (Index)</a>. Тільки індексовані атрибути можна використовувати для прискорення <a href="queries.html">Запитів (Queries)</a>Haiku.<br />
+Отже, що ми шукатимемо в майбутньому? Ми, ймовірно, не будемо питати "Що у нас лежить в комірці B4 на моїй полиці?" або "Чи маємо ми URL IMdB або чи сюжет фільму містить слово 'pope-shenooda'?".</p>
+<p>Залишіть ці атрибути:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th></tr>
-<tr><td>DVDdb:title</td><td>text</td></tr>
-<tr><td>DVDdb:genre</td><td>text</td></tr>
-<tr><td>DVDdb:cast</td><td>text</td></tr>
+<tr><th>Внутрішнє ім'я (Internal Name)</th><th>Тип атрибуту (Attribute type)</th></tr>
+<tr><td>DVDdb:title</td><td>текст</td></tr>
+<tr><td>DVDdb:genre</td><td>текст</td></tr>
+<tr><td>DVDdb:cast</td><td>текст</td></tr>
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<p>Для їх індексування відкрийте Термінал (Terminal) і просто один за другим введіть:</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
-<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+<p>Опція <span class="командної стрічки (cli)">-t</span> визначає тип атрибуту, який для всіх є "стрічкою" крім оцінки яка має значення ціле число.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h2>
-<p>Now, everything's set and we can begin putting some data into our base.<br />
-Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
-<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
-<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<a id="filling-data" name="filling-data">Наповнення даними</a></h2>
+<p>Тепер коли все налаштовано ми можемо почати вносити дані до нашої бази.<br />
+Позаяк базовий наш файл зображення обкладинки ми мусимо перейти на онлайн ресурс, наприклад, IMdB. Подивіться на перший фільм та збережіть його обкладинку або постер до нової теки де ми бажаємо зберігати нашу DVDdb.</p>
+<p>Відкривши цю теку ми бачимо звичайне вікно Tracker з одним файлом JPEG в ньому. Клацнемо правою кнопкою мишки та поміняємо його тип файлу на <tt>application/DVDdb</tt> за допомогою додатку <span class="app">Типи файлів (Filetype)</span>. Більше інформації про це у документі <a href="filetypes.html">Типи файлів (Filetypes)</a>.</p>
+<p>Тепер ми активуємо всі наші DVDdb атрибути з меню вікна Tracker'а <span class="menu">Атрибути (Attributes)</span> та переставимо стовпці за своїм смаком:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
-<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
-<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+<p>Клікнувши по поки що порожньому атрибуту (або натиснувши <span class="key">ALT</span> <span class="key">E</span>) ми увійдемо у режим редагування та зможемо заповнити кожен атрибут. Натискання <span class="key">TAB</span> та <span class="key">SHIFT</span> <span class="key">TAB</span> дозволяє мандрувати поміж атрибутами.</p>
+<p>У нашому прикладі ми почали з закачки  JPG обкладинки та зміни її типу файлу до applications/DVDdb. Існує ще один елегантний спосіб створення файлу для такої роботи. Просто скопіюйте порожній файл вашого типу файлів до <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> та переіменуйте його у DVDdb.</p>
+<p>Клікнувши правою кнопкою мишки у вікні Tracker'а, ви знайдете запис <span class="menu">Новий... (New...)</span> типово це "Нова тека (New folder)".</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h2>
-<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
-<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
-Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<a id="query-db" name="query-db">Опитування бази даних</a></h2>
+<p>Кілька годин марудної роботи і ви матимете прекрасну маленьку базу даних  по запиту у якій можна знайти усі фільми Брюса Вілліса з оцінкою 7+...  ;-)</p>
+<p>Ви можете призначити розумний макет атрибутів для результатів запиту конкретного типу файлу.<br />
+Відкрийте папку, що містить файли DVDdb і організуйте атрибути так, як ви б хотіли, щоб результати запиту були представлені. Зкопіюйте цей макет з <span class="menu">Атрибути | Копіювати макет (Attributes | Copy layout)</span>.</p>
+<p>Відкрийте <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, створіть нову теку та переіменуйте її у <i>group/filetype</i>, замінивши косу риску нижнім дефісом, у нашому випадку  "applications_DVDdb".</p>
+<p>Відкрийте нову теку і вставте туди макет з <span class="menu">Атрибути | Вставити макет (Attributes | Paste layout)</span>. Вуаля:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>
@@ -224,9 +229,9 @@ Open the folder containing your DVDdb files and arrange the attributes how you'd
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="queries.html">Queries</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="applications.html">Додатки (Applications)</a>  »
+ «  <a href="queries.html">Запити (Queries)</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
+::  <a href="applications.html">Applications (Програми)</a>  »
 </span></div>
 </div>
 
