@@ -2,14 +2,16 @@ SubDir HAIKU_TOP src add-ons network_settings dialup ;
 
 UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders app libroot kernel net shared ;
+UsePrivateSystemHeaders ;
+UsePrivateKernelHeaders ; # FIXME: shouldn't be needed
 UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] : true ;
 
 # additonal headers for built-in add-ons:
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pppoe ] : true ; # PPPoE
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] : true ; # IPCP
 
 AddResources DialUp : DialUpPreflet.rdef ;
 
@@ -29,12 +31,10 @@ Addon DialUpInterface :
 	PPPoEAddon.cpp
 
 	: be shared <nogrist>Network [ TargetLibsupc++ ]
-		[ TargetLibstdc++ ] localestub
+		[ TargetLibstdc++ ] localestub libppp.a
 ;
 
 
 DoCatalogs DialUpInterface : x-vnd.Haiku-DialUpInterface :
 	DialUpView.cpp
 ;
-
-#LinkSharedOSLibs DialUp : libppp.a be ;
