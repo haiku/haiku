@@ -264,6 +264,9 @@ InterfaceListItem::_UpdateState()
 		case B_NETWORK_INTERFACE_TYPE_ETHERNET:
 			fSubtitle = B_TRANSLATE("Ethernet device");
 			break;
+		case B_NETWORK_INTERFACE_TYPE_DIAL_UP:
+			fSubtitle = B_TRANSLATE("Dial-up connection");
+			break;
 		case B_NETWORK_INTERFACE_TYPE_VPN:
 			fSubtitle = B_TRANSLATE("VPN connection");
 			break;

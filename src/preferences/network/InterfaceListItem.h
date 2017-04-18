@@ -20,6 +20,7 @@
 enum BNetworkInterfaceType {
     B_NETWORK_INTERFACE_TYPE_WIFI = 'wifi',
     B_NETWORK_INTERFACE_TYPE_ETHERNET = 'ethr',
+    B_NETWORK_INTERFACE_TYPE_DIAL_UP = 'dial',
     B_NETWORK_INTERFACE_TYPE_VPN = 'nvpn',
     B_NETWORK_INTERFACE_TYPE_OTHER = 'othe',
 };
