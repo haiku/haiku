@@ -1,8 +1,8 @@
-SubDir HAIKU_TOP src preferences network DialUpAddOn ;
+SubDir HAIKU_TOP src add-ons network_settings dialup ;
 
-UsePrivateHeaders net ;
-# For NetworkSetupAddOn.h, to be moved to private once...
-UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] ;
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
+UsePrivateHeaders app libroot kernel net shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
@@ -13,7 +13,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] ; # IPC
 
 AddResources DialUp : DialUpPreflet.rdef ;
 
-Addon DialUp :
+Addon DialUpInterface :
 	AddOn.cpp
 	DialUpView.cpp
 
@@ -27,6 +27,14 @@ Addon DialUp :
 	GeneralAddon.cpp
 	IPCPAddon.cpp
 	PPPoEAddon.cpp
+
+	: be shared <nogrist>Network [ TargetLibsupc++ ]
+		[ TargetLibstdc++ ] localestub
 ;
 
-LinkSharedOSLibs DialUp : libppp.a be ;
+
+DoCatalogs DialUpInterface : x-vnd.Haiku-DialUpInterface :
+	DialUpView.cpp
+;
+
+#LinkSharedOSLibs DialUp : libppp.a be ;
