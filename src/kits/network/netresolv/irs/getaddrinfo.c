@@ -801,7 +801,6 @@ explore_numeric(const struct addrinfo *pai, const char *hostname,
 		return 0;
 
 	switch (afd->a_af) {
-#if 0 /*X/Open spec*/
 	case AF_INET:
 		if (inet_aton(hostname, (struct in_addr *)pton) == 1) {
 			if (pai->ai_family == afd->a_af ||
@@ -822,7 +821,6 @@ explore_numeric(const struct addrinfo *pai, const char *hostname,
 				ERR(EAI_FAMILY);	/*xxx*/
 		}
 		break;
-#endif
 	default:
 		if (inet_pton(afd->a_af, hostname, pton) == 1) {
 			if (pai->ai_family == afd->a_af ||
