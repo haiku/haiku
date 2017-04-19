@@ -40,6 +40,7 @@
 #define OPEN_MAX				(128)
 #define PAGESIZE				(4096)
 #define PATH_MAX				(1024)
+#define PIPE_BUF				(4 * 1024)
 #define PIPE_MAX				(512)
 #define PTHREAD_KEYS_MAX		256
 #define PTHREAD_STACK_MIN		(2 * PAGESIZE)

@@ -26,7 +26,7 @@ struct fd_info {
 
 /* maximum write size to a pipe/FIFO that is guaranteed not to be interleaved
    with other writes (aka {PIPE_BUF}; must be >= _POSIX_PIPE_BUF) */
-#define VFS_FIFO_ATOMIC_WRITE_SIZE	(4 * 1024)
+#define VFS_FIFO_ATOMIC_WRITE_SIZE	PIPE_BUF
 
 /* pipe/FIFO buffer capacity */
 #define VFS_FIFO_BUFFER_CAPACITY	(64 * 1024)
