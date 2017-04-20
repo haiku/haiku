@@ -88,7 +88,7 @@ typedef struct elf_version_info {
 typedef struct image_t {
 	// image identification
 	char				path[B_PATH_NAME_LENGTH];
-	char				name[B_OS_NAME_LENGTH];
+	char				name[B_FILE_NAME_LENGTH];
 	image_id			id;
 	image_type			type;
 
