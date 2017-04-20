@@ -16,7 +16,7 @@ class UpdateAction {
 public:
 								UpdateAction();
 								~UpdateAction();
-		status_t				Perform();
+		status_t				Perform(update_type action_request);
 
 private:
 		UpdateManager*			fUpdateManager;

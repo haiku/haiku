@@ -10,6 +10,8 @@ Application SoftwareUpdater :
 	StripeView.cpp
 	UpdateAction.cpp
 	UpdateManager.cpp
+	CheckAction.cpp
+	CheckManager.cpp
 	WorkingLooper.cpp
 	
 	# package_daemon

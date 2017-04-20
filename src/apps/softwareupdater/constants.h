@@ -8,6 +8,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#define kAppSignature "application/x-vnd.haiku-softwareupdater"
+
 enum {
 	ACTION_STEP_INIT = 0,
 	ACTION_STEP_START,
@@ -34,9 +36,8 @@ enum update_type {
 	UPDATE,
 	UPDATE_CHECK_ONLY,
 	FULLSYNC,
-	FULLSYNC_CHECK_ONLY,
 	UPDATE_TYPE_END
-} ;
+};
 
 // Message what values
 static const uint32 kMsgTextUpdate = 'iUPD';

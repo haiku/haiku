@@ -18,7 +18,6 @@
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Message.h>
-#include <NodeInfo.h>
 #include <Roster.h>
 #include <String.h>
 
@@ -63,7 +62,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fDetailView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	fDetailView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 	fStatusBar = new BStatusBar("progress");
-	fStatusBar->SetMaxValue(1.0);
+	fStatusBar->SetMaxValue(100);
 	
 	fListView = new PackageListView();
 	fScrollView = new BScrollView("scrollview", fListView, B_WILL_DRAW,
@@ -175,6 +174,8 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			fStatusBar->SetTo(percent, packageName.String(),
 				packageCount.String());
 			Unlock();
+			
+			fListView->UpdatePackageProgress(packageName.String(), percent);
 			break;
 		}
 		
@@ -332,11 +333,11 @@ SoftwareUpdaterWindow::UserCancelRequested()
 void
 SoftwareUpdaterWindow::AddPackageInfo(uint32 install_type,
 	const char* package_name, const char* cur_ver, const char* new_ver,
-	const char* summary, const char* repository)
+	const char* summary, const char* repository, const char* file_name)
 {
 	Lock();
 	fListView->AddPackage(install_type, package_name, cur_ver, new_ver,
-		summary, repository);
+		summary, repository, file_name);
 	Unlock();
 }
 
@@ -481,7 +482,8 @@ SuperItem::SuperItem(const char* label)
 	BListItem(),
 	fLabel(label),
 	fShowMoreDetails(false),
-	fPackageIcon(NULL)
+	fPackageIcon(NULL),
+	fItemCount(0)
 {
 }
 
@@ -495,15 +497,21 @@ SuperItem::~SuperItem()
 void
 SuperItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 {
+	owner->PushState();
+	
 	float width;
     owner->GetPreferredSize(&width, NULL);
     BString label(fLabel);
+    label.Append(" (");
+    label << fItemCount;
+    label.Append(")");
     owner->TruncateString(&label, B_TRUNCATE_END, width);
     owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
     owner->SetFont(&fBoldFont);
     owner->DrawString(label.String(), BPoint(item_rect.left,
 		item_rect.bottom - fFontHeight.descent - 1));
-	owner->SetFont(&fRegularFont);
+	
+	owner->PopState();
 }
 
 
@@ -548,7 +556,7 @@ void
 SuperItem::_GetPackageIcon()
 {
 	delete fPackageIcon;
-	fIconSize = int(fPackageItemHeight * .7);
+	fIconSize = int(fPackageItemHeight * .8);
 
 	status_t result = B_ERROR;
 	BRect iconRect(0, 0, fIconSize - 1, fIconSize - 1);
@@ -571,7 +579,7 @@ SuperItem::_GetPackageIcon()
 
 PackageItem::PackageItem(const char* name, const char* simple_version,
 	const char* detailed_version, const char* repository, const char* summary,
-	SuperItem* super)
+	const char* file_name, SuperItem* super)
 	:
 	BListItem(),
 	fName(name),
@@ -579,7 +587,10 @@ PackageItem::PackageItem(const char* name, const char* simple_version,
 	fDetailedVersion(detailed_version),
 	fRepository(repository),
 	fSummary(summary),
-	fSuperItem(super)
+	fSuperItem(super),
+	fFileName(file_name),
+	fDownloadProgress(0),
+	fDrawBarFlag(false)
 {
 	fLabelOffset = be_control_look->DefaultLabelSpacing();
 }
@@ -588,6 +599,8 @@ PackageItem::PackageItem(const char* name, const char* simple_version,
 void
 PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 {
+	owner->PushState();
+	
 	float width;
     owner->GetPreferredSize(&width, NULL);
     float nameWidth = width / 2.0;
@@ -601,13 +614,20 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 
 		//owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 		owner->SetDrawingMode(B_OP_ALPHA);
-		owner->DrawBitmap(icon, BPoint(item_rect.left,
-			item_rect.top + offsetMarginHeight));
+		BPoint location = BPoint(item_rect.left,
+			item_rect.top + offsetMarginHeight);
+		owner->DrawBitmap(icon, location);
 		owner->SetDrawingMode(B_OP_COPY);
+		
+		if (fDrawBarFlag)
+			_DrawBar(location, owner, icon_size(iconSize));
+		
 		offset_width += iconSize + fLabelOffset;
 	}
 	
+	owner->SetFont(&fRegularFont);
 	owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	
 	// Package name
 	font_height fontHeight = fSuperItem->GetFontHeight();
     BString name(fName);
@@ -647,7 +667,61 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 		owner->DrawString(version.String(), cursor);
 	}
 	
-	owner->SetFont(&fRegularFont);
+	owner->PopState();
+}
+
+
+// Modified slightly from Tracker's BPose::DrawBar
+void
+PackageItem::_DrawBar(BPoint where, BView* view, icon_size which)
+{
+	int32 yOffset;
+	int32 size = which - 1;
+	int32 barWidth = (int32)(7.0f / 32.0f * (float)which);
+	if (barWidth < 4) {
+		barWidth = 4;
+		yOffset = 0;
+	} else
+		yOffset = 2;
+	int32 barHeight = size - 3 - 2 * yOffset;
+	
+
+	// the black shadowed line
+	view->SetHighColor(32, 32, 32, 92);
+	view->MovePenTo(BPoint(where.x + size, where.y + 1 + yOffset));
+	view->StrokeLine(BPoint(where.x + size, where.y + size - yOffset));
+	view->StrokeLine(BPoint(where.x + size - barWidth + 1,
+		where.y + size - yOffset));
+
+	view->SetDrawingMode(B_OP_ALPHA);
+
+	// the gray frame
+	view->SetHighColor(76, 76, 76, 192);
+	BRect rect(where.x + size - barWidth,where.y + yOffset,
+		where.x + size - 1,where.y + size - 1 - yOffset);
+	view->StrokeRect(rect);
+
+	// calculate bar height
+	int32 barPos = barHeight - int32(barHeight * fDownloadProgress / 100.0);
+	if (barPos < 0)
+		barPos = 0;
+	else if (barPos > barHeight)
+		barPos = barHeight;
+
+	// the free space bar
+	view->SetHighColor(255, 255, 255, 192);
+
+	rect.InsetBy(1,1);
+	BRect bar(rect);
+	bar.bottom = bar.top + barPos - 1;
+	if (barPos > 0)
+		view->FillRect(bar);
+
+	// the used space bar
+	bar.top = bar.bottom + 1;
+	bar.bottom = rect.bottom;
+	view->SetHighColor(0, 203, 0, 192);
+	view->FillRect(bar);
 }
 
 
@@ -681,6 +755,13 @@ PackageItem::NameCompare(PackageItem* item)
 }
 
 
+void
+PackageItem::SetDownloadProgress(float percent)
+{
+	fDownloadProgress = percent;
+}
+
+
 int
 SortPackageItems(const BListItem* item1, const BListItem* item2)
 {
@@ -696,7 +777,9 @@ PackageListView::PackageListView()
 	fSuperUpdateItem(NULL),
 	fSuperInstallItem(NULL),
 	fSuperUninstallItem(NULL),
-	fShowMoreDetails(false)
+	fShowMoreDetails(false),
+	fLastProgressItem(NULL),
+	fLastProgressValue(-1)
 {
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	fDetailMenuItem = new BMenuItem("Show more details", new BMessage());
@@ -778,7 +861,7 @@ PackageListView::MouseDown(BPoint where)
 void
 PackageListView::AddPackage(uint32 install_type, const char* name,
 	const char* cur_ver, const char* new_ver, const char* summary,
-	const char* repository)
+	const char* repository, const char* file_name)
 {
 	SuperItem* super;
 	BString simpleVersion;
@@ -844,11 +927,43 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 	
 	}
 	PackageItem* item = new PackageItem(name, simpleVersion.String(),
-		detailedVersion.String(), repositoryText.String(), summary, super);
+		detailedVersion.String(), repositoryText.String(), summary, file_name,
+		super);
 	AddUnder(item, super);
+	super->SetItemCount(CountItemsUnder(super, true));
 }
 
 
+void
+PackageListView::UpdatePackageProgress(const char* packageName, float percent)
+{
+	// Update only every 1 percent change
+	int16 wholePercent = int16(percent);
+	if (wholePercent == fLastProgressValue)
+		return;
+	fLastProgressValue = wholePercent;
+	
+	// A new package started downloading, find the PackageItem by name
+	if (percent == 0) {
+		fLastProgressItem = NULL;
+		int32 count = FullListCountItems();
+		for (int32 i = 0; i < count; i++) {
+			PackageItem* item = dynamic_cast<PackageItem*>(FullListItemAt(i));
+			if (item != NULL && strcmp(item->FileName(), packageName) == 0) {
+				fLastProgressItem = item;
+				fLastProgressItem->ShowProgressBar();
+				break;
+			}
+		}	
+	}
+	
+	if (fLastProgressItem != NULL) {
+		fLastProgressItem->SetDownloadProgress(percent);
+		Invalidate();
+	}
+}
+
+									
 void
 PackageListView::SortItems()
 {

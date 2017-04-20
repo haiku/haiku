@@ -20,13 +20,15 @@ public:
 								SoftwareUpdaterApp();
 								~SoftwareUpdaterApp();
 			virtual bool		QuitRequested();
-			void				ReadyToRun();
+			virtual void		ReadyToRun();
+			virtual void		ArgvReceived(int32 argc, char **argv);
 			void				MessageReceived(BMessage* message);
 
 private:
 			WorkingLooper*		fWorker;
 			BMessenger			fWindowMessenger;
 			bool				fFinalQuitFlag;
+			update_type			fActionRequested;
 };
 
 

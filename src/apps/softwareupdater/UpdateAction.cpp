@@ -13,8 +13,6 @@
 #include <Catalog.h>
 #include <package/manager/Exceptions.h>
 
-#include "constants.h"
-
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "UpdateAction"
@@ -39,15 +37,21 @@ UpdateAction::~UpdateAction()
 
 
 status_t
-UpdateAction::Perform()
+UpdateAction::Perform(update_type action_request)
 {
 	try {
 		fUpdateManager->CheckNetworkConnection();
-		int32 action = fUpdateManager->GetUpdateType();
+		
+		update_type action = action_request;
+		// Prompt the user if needed
+		if (action == USER_SELECTION_NEEDED)
+			action = fUpdateManager->GetUpdateType();
+		
 		if (action == CANCEL_UPDATE)
 			throw BAbortedByUserException();
 		else if (action <= INVALID_SELECTION || action >= UPDATE_TYPE_END)
-			throw BException("Invalid update type, cannot continue with updates");
+			throw BException(B_TRANSLATE(
+				"Invalid update type, cannot continue with updates"));
 		
 		fUpdateManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
@@ -61,7 +65,11 @@ UpdateAction::Perform()
 			fUpdateManager->Update(&packages, packageCount);
 		} else if (action == FULLSYNC)
 			fUpdateManager->FullSync();
-			
+		else
+			// Should not happen but just in case
+			throw BException(B_TRANSLATE(
+				"Invalid update type, cannot continue with updates"));
+	
 	} catch (BFatalErrorException ex) {
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());
@@ -79,7 +87,8 @@ UpdateAction::Perform()
 			B_TRANSLATE("There were no updates found."));
 		return B_OK;
 	} catch (BException ex) {
-		fprintf(stderr, "Exception occurred while updating packages : %s\n",
+		fprintf(stderr, B_TRANSLATE(
+				"Exception occurred while updating packages : %s\n"),
 			ex.Message().String());
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());

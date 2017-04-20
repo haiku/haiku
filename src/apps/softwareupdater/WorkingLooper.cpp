@@ -10,12 +10,22 @@
 #include "WorkingLooper.h"
 
 
-WorkingLooper::WorkingLooper()
+WorkingLooper::WorkingLooper(update_type action)
 	:
-	BLooper("WorkingLooper")
+	BLooper("WorkingLooper"),
+	fUpdateAction(NULL),
+	fCheckAction(NULL),
+	fActionRequested(action)
 {
 	Run();
 	PostMessage(kMsgStart);
+}
+
+
+WorkingLooper::~WorkingLooper()
+{
+	delete fUpdateAction;
+	delete fCheckAction;
 }
 
 
@@ -25,7 +35,13 @@ WorkingLooper::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgStart:
 		{
-			fAction.Perform();
+			if (fActionRequested == UPDATE_CHECK_ONLY) {
+				fCheckAction = new CheckAction;
+				fCheckAction->Perform();
+			} else {
+				fUpdateAction = new UpdateAction();
+				fUpdateAction->Perform(fActionRequested);
+			}
 			break;
 		}
 		

@@ -12,6 +12,7 @@
 #include <Looper.h>
 #include <Message.h>
 
+#include "CheckAction.h"
 #include "UpdateAction.h"
 
 
@@ -20,11 +21,15 @@ const uint32 kMsgStart = 'iSTA';
 
 class WorkingLooper : public BLooper {
 public:
-							WorkingLooper();
+							WorkingLooper(update_type action);
+							~WorkingLooper();
 			void			MessageReceived(BMessage* message);
 
 private:
-			UpdateAction	fAction;
+			UpdateAction*	fUpdateAction;
+			CheckAction*	fCheckAction;
+			update_type		fActionRequested;
+			
 };
 
 

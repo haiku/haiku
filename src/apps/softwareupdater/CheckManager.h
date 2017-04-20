@@ -7,9 +7,11 @@
  *		Rene Gollent <rene@gollent.com>
  *		Brian Hill <supernova@warpmail.net>
  */
-#ifndef UPDATE_MANAGER_H
-#define UPDATE_MANAGER_H
+#ifndef CHECK_MANAGER_H
+#define CHECK_MANAGER_H
 
+
+#include <Bitmap.h>
 
 #include <package/DaemonClient.h>
 #include <package/manager/PackageManager.h>
@@ -25,19 +27,16 @@ using BPackageKit::BPrivate::BDaemonClient;
 using BPackageKit::BManager::BPrivate::BPackageManager;
 
 
-class UpdateManager : public BPackageManager,
+class CheckManager : public BPackageManager,
 	private BPackageManager::UserInteractionHandler {
 public:
-								UpdateManager(
+								CheckManager(
 									BPackageInstallationLocation location);
-								~UpdateManager();
 
 			void				CheckNetworkConnection();
-			update_type			GetUpdateType();
 	virtual	void				JobFailed(BSupportKit::BJob* job);
 	virtual	void				JobAborted(BSupportKit::BJob* job);
-			void				FinalUpdate(const char* header,
-									const char* text);
+
 private:
 	// UserInteractionHandler
 	virtual	void				HandleProblems();
@@ -48,7 +47,7 @@ private:
 									const char* packageName);
 	virtual	void				ProgressPackageDownloadActive(
 									const char* packageName,
-									float completionValue,
+									float completionPercentage,
 									off_t bytes, off_t totalBytes);
 	virtual	void				ProgressPackageDownloadComplete(
 									const char* packageName);
@@ -57,41 +56,20 @@ private:
 	virtual	void				ProgressPackageChecksumComplete(
 									const char* packageName);
 
-	virtual	void				ProgressStartApplyingChanges(
-									InstalledRepository& repository);
-	virtual	void				ProgressTransactionCommitted(
-									InstalledRepository& repository,
-									const BPackageKit::BCommitTransactionResult& result);
-	virtual	void				ProgressApplyingChangesDone(
-									InstalledRepository& repository);
-
 private:
-			void				_PrintResult(InstalledRepository&
+			void				_CountUpdates(InstalledRepository&
 									installationRepository,
-									int32& upgradeCount,
-									int32& installCount,
-									int32& uninstallCount);
-			void				_UpdateStatusWindow(const char* header,
-									const char* detail);
-			void				_UpdateDownloadProgress(const char* header,
-									const char* packageName,
-									float percentageComplete);
-			void				_FinalUpdate(const char* header,
+									int32& updateCount);
+			void				_SendNotification(const char* title,
 									const char* text);
-			void				_SetCurrentStep(int32 step);
+			BBitmap				_GetIcon();
 
 private:
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
 			
-			SoftwareUpdaterWindow*	fStatusWindow;
 			ProblemWindow*			fProblemWindow;
-			uint32					fCurrentStep;
-			bool					fChangesConfirmed;
-			bool					fNewDownloadStarted;
-			int32					fPackageDownloadsTotal;
-			int32					fPackageDownloadsCount;
 };
 
 
-#endif	// UPDATE_MANAGER_H 
+#endif	// CHECK_MANAGER_H 

@@ -14,6 +14,7 @@
 #include <GroupView.h>
 #include <OutlineListView.h>
 #include <MenuItem.h>
+#include <NodeInfo.h>
 #include <Point.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
@@ -45,6 +46,8 @@ public:
 	int16						GetIconSize() { return fIconSize; };
 	void						SetDetailLevel(bool showMoreDetails);
 	bool						GetDetailLevel() { return fShowMoreDetails; };
+	void						SetItemCount(int32 count)
+									{ fItemCount = count; };
 
 private:
 			void				_SetHeights();
@@ -58,6 +61,7 @@ private:
 			float				fPackageItemHeight;
 			BBitmap*			fPackageIcon;
 			int16				fIconSize;
+			int32				fItemCount;
 };
 
 
@@ -68,13 +72,20 @@ public:
 									const char* detailed_version,
 									const char* repository,
 									const char* summary,
+									const char* file_name,
 									SuperItem* super);
 	virtual void				DrawItem(BView*, BRect, bool);
 	virtual void				Update(BView *owner, const BFont *font);
 	void						SetItemHeight(const BFont* font);
 	int							NameCompare(PackageItem* item);
+	const char*					FileName() { return fFileName.String(); };
+	void						SetDownloadProgress(float percent);
+	void						ShowProgressBar() { fDrawBarFlag = true; };
 	
 private:
+			void				_DrawBar(BPoint where, BView* view,
+									icon_size which);
+
 			BString				fName;
 			BString				fSimpleVersion;
 			BString				fDetailedVersion;
@@ -86,6 +97,9 @@ private:
 			float				fSmallTotalHeight;
 			float				fLabelOffset;
 			SuperItem*			fSuperItem;
+			BString				fFileName;
+			float				fDownloadProgress;
+			bool				fDrawBarFlag;
 };
 
 
@@ -101,7 +115,10 @@ public:
 									const char* cur_ver,
 									const char* new_ver,
 									const char* summary,
-									const char* repository);
+									const char* repository,
+									const char* file_name);
+			void				UpdatePackageProgress(const char* packageName,
+									float percent);
 			void				SortItems();
 			float				ItemHeight();
 
@@ -114,6 +131,8 @@ private:
 			bool				fShowMoreDetails;
 			BPopUpMenu			*fMenu;
 			BMenuItem			*fDetailMenuItem;
+			PackageItem*		fLastProgressItem;
+			int16				fLastProgressValue;
 };
 
 
@@ -130,7 +149,8 @@ public:
 									const char* cur_ver,
 									const char* new_ver,
 									const char* summary,
-									const char* repository);
+									const char* repository,
+									const char* file_name);
 			void				ShowWarningAlert(const char* text);
 			BBitmap				GetIcon(int32 iconSize);
 			BBitmap				GetNotificationIcon();

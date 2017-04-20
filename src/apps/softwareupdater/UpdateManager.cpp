@@ -23,18 +23,11 @@
 #include <NetworkRoster.h>
 #include <Notification.h>
 
-#include <package/CommitTransactionResult.h>
-#include <package/DownloadFileRequest.h>
-#include <package/RefreshRepositoryRequest.h>
 #include <package/manager/Exceptions.h>
 #include <package/solver/SolverPackage.h>
-#include <package/solver/SolverProblem.h>
-#include <package/solver/SolverProblemSolution.h>
 
 #include "constants.h"
-#include "AutoDeleter.h"
 #include "ProblemWindow.h"
-#include "ResultWindow.h"
 
 using namespace BPackageKit;
 using namespace BPackageKit::BManager::BPrivate;
@@ -102,7 +95,7 @@ UpdateManager::CheckNetworkConnection()
 }
 
 
-int32
+update_type
 UpdateManager::GetUpdateType()
 {
 	int32 action = USER_SELECTION_NEEDED;
@@ -113,7 +106,7 @@ UpdateManager::GetUpdateType()
 		messenger.SendMessage(&message, &reply);
 		reply.FindInt32(kKeyAlertResult, &action);
 	}
-	return action;
+	return (update_type)action;
 }
 
 
@@ -278,13 +271,7 @@ UpdateManager::ProgressPackageDownloadStarted(const char* packageName)
 {
 	if (fCurrentStep == ACTION_STEP_DOWNLOAD) {
 		BString header(B_TRANSLATE("Downloading packages"));
-		BString packageCount;
-		packageCount.SetToFormat(
-			B_TRANSLATE_COMMENT("%i of %i", "Do not translate %i"),
-			fPackageDownloadsCount,
-			fPackageDownloadsTotal);
-		_UpdateDownloadProgress(header.String(), packageName, packageCount,
-			0.0);
+		_UpdateDownloadProgress(header.String(), packageName, 0.0);
 		fNewDownloadStarted = false;
 	}
 	
@@ -294,24 +281,18 @@ UpdateManager::ProgressPackageDownloadStarted(const char* packageName)
 
 void
 UpdateManager::ProgressPackageDownloadActive(const char* packageName,
-	float completionPercentage, off_t bytes, off_t totalBytes)
+	float completionValue, off_t bytes, off_t totalBytes)
 {
 	if (fCurrentStep == ACTION_STEP_DOWNLOAD) {
 		// Fix a bug where a 100% completion percentage gets sent at the start
 		// of a package download
 		if (!fNewDownloadStarted) {
-			if (completionPercentage > 0 && completionPercentage < 1)
+			if (completionValue > 0 && completionValue < 1)
 				fNewDownloadStarted = true;
 			else
-				completionPercentage = 0.0;
+				completionValue = 0.0;
 		}
-		BString packageCount;
-		packageCount.SetToFormat(
-			B_TRANSLATE_COMMENT("%i of %i", "Do not translate %i"),
-			fPackageDownloadsCount,
-			fPackageDownloadsTotal);
-		_UpdateDownloadProgress(NULL, packageName, packageCount,
-			completionPercentage);
+		_UpdateDownloadProgress(NULL, packageName, completionValue * 100.0);
 	}
 
 	static const char* progressChars[] = {
@@ -335,8 +316,8 @@ UpdateManager::ProgressPackageDownloadActive(const char* packageName,
 	}
 
 	int position;
-	int ipart = (int)(completionPercentage * width);
-	int fpart = (int)(((completionPercentage * width) - ipart) * 8);
+	int ipart = (int)(completionValue * width);
+	int fpart = (int)(((completionValue * width) - ipart) * 8);
 
 	printf("\r"); // return to the beginning of the line
 
@@ -354,7 +335,7 @@ UpdateManager::ProgressPackageDownloadActive(const char* packageName,
 	}
 
 	// Also print the progress percentage
-	printf(" %3d%%", (int)(completionPercentage * 100));
+	printf(" %3d%%", (int)(completionValue * 100));
 
 	fflush(stdout);
 	
@@ -364,8 +345,10 @@ UpdateManager::ProgressPackageDownloadActive(const char* packageName,
 void
 UpdateManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	if (fCurrentStep == ACTION_STEP_DOWNLOAD)
+	if (fCurrentStep == ACTION_STEP_DOWNLOAD) {
+		_UpdateDownloadProgress(NULL, packageName, 100.0);
 		fPackageDownloadsCount++;
+	}
 	
 	// Overwrite the progress bar with whitespace
 	printf("\r");
@@ -497,7 +480,8 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 				upgradedPackageVersions.StringAt(position).String(),
 				package->Info().Version().ToString().String(),
 				package->Info().Summary().String(),
-				package->Repository()->Name().String());
+				package->Repository()->Name().String(),
+				package->Info().FileName().String());
 			upgradeCount++;
 		} else {
 			printf("    install package %s-%s from %s\n",
@@ -509,7 +493,8 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 				NULL,
 				package->Info().Version().ToString().String(),
 				package->Info().Summary().String(),
-				package->Repository()->Name().String());
+				package->Repository()->Name().String(),
+				package->Info().FileName().String());
 			installCount++;
 		}
 	}
@@ -525,7 +510,8 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 			package->Info().Version().ToString(),
 			NULL,
 			package->Info().Summary().String(),
-			package->Repository()->Name().String());
+			package->Repository()->Name().String(),
+			package->Info().FileName().String());
 		uninstallCount++;
 	}
 }
@@ -551,21 +537,25 @@ UpdateManager::_UpdateStatusWindow(const char* header, const char* detail)
 
 void
 UpdateManager::_UpdateDownloadProgress(const char* header,
-	const char* packageName, const char* packageCount,
-	float completionPercentage)
+	const char* packageName, float percentageComplete)
 {
-	if (packageName == NULL || packageCount == NULL)
+	if (packageName == NULL)
 		return;
 	
 	if (fStatusWindow->UserCancelRequested())
 		throw BAbortedByUserException();
 	
+	BString packageCount;
+	packageCount.SetToFormat(
+		B_TRANSLATE_COMMENT("%i of %i", "Do not translate %i"),
+		fPackageDownloadsCount,
+		fPackageDownloadsTotal);
 	BMessage message(kMsgProgressUpdate);
 	if (header != NULL)
 		message.AddString(kKeyHeader, header);
 	message.AddString(kKeyPackageName, packageName);
-	message.AddString(kKeyPackageCount, packageCount);
-	message.AddFloat(kKeyPercentage, completionPercentage);
+	message.AddString(kKeyPackageCount, packageCount.String());
+	message.AddFloat(kKeyPercentage, percentageComplete);
 	fStatusWindow->PostMessage(&message);
 }
 
