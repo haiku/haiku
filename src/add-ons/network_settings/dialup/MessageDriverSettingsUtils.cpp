@@ -1,24 +1,9 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004 Waldemar Kornewald. All rights reserved.
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include "MessageDriverSettingsUtils.h"
 
@@ -49,7 +34,7 @@ FindMessageParameter(const char *name, const BMessage& message, BMessage *save,
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -63,7 +48,7 @@ AddValues(const BMessage& message, driver_parameter *parameter)
 			index++)
 		if(!add_driver_parameter_value(value, parameter))
 			return false;
-	
+
 	return true;
 }
 
@@ -74,7 +59,7 @@ AddParameters(const BMessage& message, driver_parameter *to)
 {
 	if(!to)
 		return false;
-	
+
 	return AddParameters(message,
 		reinterpret_cast<driver_settings*>(&to->parameter_count));
 }
@@ -93,11 +78,11 @@ AddParameters(const BMessage& message, driver_settings *to)
 		parameter = new_driver_parameter(name);
 		if(!AddValues(current, parameter))
 			return false;
-		
+
 		AddParameters(current, parameter);
 		add_driver_parameter(parameter, to);
 	}
-	
+
 	return true;
 }
 
@@ -106,12 +91,12 @@ driver_settings*
 MessageToDriverSettings(const BMessage& message)
 {
 	driver_settings *settings = new_driver_settings();
-	
+
 	if(!AddParameters(message, settings)) {
 		free_driver_settings(settings);
 		return NULL;
 	}
-	
+
 	return settings;
 }
 
@@ -122,22 +107,22 @@ AddParameter(const driver_parameter *parameter, BMessage *message)
 {
 	if(!parameter || !message)
 		return false;
-	
+
 	if(parameter->name)
 		message->AddString(MDSU_NAME, parameter->name);
 	else
 		return false;
-	
+
 	for(int32 index = 0; index < parameter->value_count; index++)
 		if(parameter->values[index])
 			message->AddString(MDSU_VALUES, parameter->values[index]);
-	
+
 	for(int32 index = 0; index < parameter->parameter_count; index++) {
 		BMessage parameterMessage;
 		AddParameter(&parameter->parameters[index], &parameterMessage);
 		message->AddMessage(MDSU_PARAMETERS, &parameterMessage);
 	}
-	
+
 	return true;
 }
 
@@ -147,7 +132,7 @@ ReadMessageDriverSettings(const char *name, BMessage *message)
 {
 	if(!name || !message)
 		return false;
-	
+
 	void *handle = load_driver_settings(name);
 	if(!handle)
 		return false;
@@ -156,15 +141,15 @@ ReadMessageDriverSettings(const char *name, BMessage *message)
 		unload_driver_settings(handle);
 		return false;
 	}
-	
+
 	for(int32 index = 0; index < settings->parameter_count; index++) {
 		BMessage parameter;
 		AddParameter(&settings->parameters[index], &parameter);
 		message->AddMessage(MDSU_PARAMETERS, &parameter);
 	}
-	
+
 	unload_driver_settings(handle);
-	
+
 	return true;
 }
 
@@ -187,7 +172,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	const char *name;
 	if(parameter.FindString(MDSU_NAME, &name) != B_OK || !name)
 		return false;
-	
+
 	BString line, word(name);
 	EscapeWord(word);
 	bool needsEscaping = word.FindFirst(' ') >= 0;
@@ -197,7 +182,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	line << word;
 	if(needsEscaping)
 		line << '\"';
-	
+
 	for(int32 index = 0; parameter.FindString(MDSU_VALUES, index, &name) == B_OK;
 			index++)
 		if(name) {
@@ -211,28 +196,28 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 			if(needsEscaping)
 				line << '\"';
 		}
-	
+
 	type_code type;
 	int32 parameterCount;
 	parameter.GetInfo(MDSU_PARAMETERS, &type, &parameterCount);
-	
+
 	if(parameterCount > 0)
 		line << " {";
-	
+
 	line << '\n';
 	file.Write(line.String(), line.Length());
-	
+
 	if(parameterCount > 0) {
 		BMessage subParameter;
 		for(int32 index = 0; parameter.FindMessage(MDSU_PARAMETERS, index,
 				&subParameter) == B_OK; index++)
 			WriteParameter(file, subParameter, level + 1);
-		
+
 		line.SetTo('\t', level);
 		line << "}\n";
 		file.Write(line.String(), line.Length());
 	}
-	
+
 	return true;
 }
 
@@ -242,10 +227,10 @@ WriteMessageDriverSettings(BFile& file, const BMessage& message)
 {
 	if(file.InitCheck() != B_OK || !file.IsWritable())
 		return false;
-	
+
 	file.SetSize(0);
 	file.Seek(0, SEEK_SET);
-	
+
 	BMessage parameter;
 	for(int32 index = 0; message.FindMessage(MDSU_PARAMETERS, index, &parameter) == B_OK;
 			index++) {
@@ -253,6 +238,6 @@ WriteMessageDriverSettings(BFile& file, const BMessage& message)
 			file.Write("\n", 1);
 		WriteParameter(file, parameter, 0);
 	}
-	
+
 	return true;
 }

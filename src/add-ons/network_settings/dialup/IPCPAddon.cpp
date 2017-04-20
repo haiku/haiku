@@ -1,24 +1,8 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004 Waldemar Kornewald. All rights reserved.
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // IPCPAddon saves the loaded settings.
@@ -78,38 +62,38 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fIPAddress = fPrimaryDNS = fSecondaryDNS = "";
 	fSettings = settings;
 	fProfile = profile;
-	
+
 	if(fIPCPView)
 		fIPCPView->Reload();
 			// reset all views (empty settings)
-	
+
 	if(!settings || !profile || isNew)
 		return true;
-	
+
 	BMessage protocol;
-	
+
 	// settings
 	int32 protocolIndex = FindIPCPProtocol(*fSettings, &protocol);
 	if(protocolIndex < 0)
 		return true;
-	
+
 	protocol.AddBool(MDSU_VALID, true);
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
-	
+
 	// profile
 	protocolIndex = FindIPCPProtocol(*fProfile, &protocol);
 	if(protocolIndex < 0)
 		return true;
-	
+
 	fIsEnabled = true;
-	
+
 	// the "Local" side parameter
 	BMessage local;
 	int32 localSideIndex = 0;
 	if(!FindMessageParameter(IPCP_LOCAL_SIDE_KEY, protocol, &local, &localSideIndex))
 		local.MakeEmpty();
 			// just fall through and pretend we have an empty "Local" side parameter
-	
+
 	// now load the supported parameters (the client-relevant subset)
 	BString name;
 	BMessage parameter;
@@ -120,11 +104,11 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	else {
 		if(fIPAddress == "auto")
 			fIPAddress = "";
-		
+
 		parameter.AddBool(MDSU_VALID, true);
 		local.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
-	
+
 	index = 0;
 	if(!FindMessageParameter(IPCP_PRIMARY_DNS_KEY, local, &parameter, &index)
 			|| parameter.FindString(MDSU_VALUES, &fPrimaryDNS) != B_OK)
@@ -132,11 +116,11 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	else {
 		if(fPrimaryDNS == "auto")
 			fPrimaryDNS = "";
-		
+
 		parameter.AddBool(MDSU_VALID, true);
 		local.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
-	
+
 	index = 0;
 	if(!FindMessageParameter(IPCP_SECONDARY_DNS_KEY, local, &parameter, &index)
 			|| parameter.FindString(MDSU_VALUES, &fSecondaryDNS) != B_OK)
@@ -144,19 +128,19 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	else {
 		if(fSecondaryDNS == "auto")
 			fSecondaryDNS = "";
-		
+
 		parameter.AddBool(MDSU_VALID, true);
 		local.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
-	
+
 	local.AddBool(MDSU_VALID, true);
 	protocol.ReplaceMessage(MDSU_PARAMETERS, localSideIndex, &local);
 	protocol.AddBool(MDSU_VALID, true);
 	fProfile->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
-	
+
 	if(fIPCPView)
 		fIPCPView->Reload();
-	
+
 	return true;
 }
 
@@ -168,7 +152,7 @@ IPCPAddon::IsModified(bool *settings, bool *profile) const
 		*settings = *profile = false;
 		return;
 	}
-	
+
 	*settings = fIsEnabled != fIPCPView->IsEnabled();
 	*profile = (*settings || fIPAddress != fIPCPView->IPAddress()
 		|| fPrimaryDNS != fIPCPView->PrimaryDNS()
@@ -181,20 +165,20 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 {
 	if(!fSettings || !settings)
 		return false;
-	
+
 	if(!fIPCPView->IsEnabled())
 		return true;
-	
+
 	BMessage protocol, local;
 	protocol.AddString(MDSU_NAME, PPP_PROTOCOL_KEY);
 	protocol.AddString(MDSU_VALUES, kKernelModuleName);
 	settings->AddMessage(MDSU_PARAMETERS, &protocol);
 		// the settings contain a simple "protocol ipcp" string
-	
+
 	// now create the profile with all subparameters
 	local.AddString(MDSU_NAME, IPCP_LOCAL_SIDE_KEY);
 	bool needsLocal = false;
-	
+
 	if(fIPCPView->IPAddress() && strlen(fIPCPView->IPAddress()) > 0) {
 		// save IP address, too
 		needsLocal = true;
@@ -203,7 +187,7 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 		ip.AddString(MDSU_VALUES, fIPCPView->IPAddress());
 		local.AddMessage(MDSU_PARAMETERS, &ip);
 	}
-	
+
 	if(fIPCPView->PrimaryDNS() && strlen(fIPCPView->PrimaryDNS()) > 0) {
 		// save service name, too
 		needsLocal = true;
@@ -212,7 +196,7 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 		dns.AddString(MDSU_VALUES, fIPCPView->PrimaryDNS());
 		local.AddMessage(MDSU_PARAMETERS, &dns);
 	}
-	
+
 	if(fIPCPView->SecondaryDNS() && strlen(fIPCPView->SecondaryDNS()) > 0) {
 		// save service name, too
 		needsLocal = true;
@@ -221,12 +205,12 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 		dns.AddString(MDSU_VALUES, fIPCPView->SecondaryDNS());
 		local.AddMessage(MDSU_PARAMETERS, &dns);
 	}
-	
+
 	if(needsLocal)
 		protocol.AddMessage(MDSU_PARAMETERS, &local);
-	
+
 	profile->AddMessage(MDSU_PARAMETERS, &protocol);
-	
+
 	return true;
 }
 
@@ -238,12 +222,12 @@ IPCPAddon::GetPreferredSize(float *width, float *height) const
 	if(Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect) != B_OK)
 		rect.Set(0, 0, 200, 300);
 			// set default values
-	
+
 	if(width)
 		*width = rect.Width();
 	if(height)
 		*height = rect.Height();
-	
+
 	return true;
 }
 
@@ -257,7 +241,7 @@ IPCPAddon::CreateView(BPoint leftTop)
 		fIPCPView = new IPCPView(this, rect);
 		fIPCPView->Reload();
 	}
-	
+
 	fIPCPView->MoveTo(leftTop);
 	return fIPCPView;
 }
@@ -268,14 +252,14 @@ IPCPAddon::FindIPCPProtocol(const BMessage& message, BMessage *protocol) const
 {
 	if(!protocol)
 		return -1;
-	
+
 	BString name;
 	for(int32 index = 0; FindMessageParameter(PPP_PROTOCOL_KEY, message, protocol,
 			&index); index++)
 		if(protocol->FindString(MDSU_VALUES, &name) == B_OK
 				&& name == kKernelModuleName)
 			return index;
-	
+
 	return -1;
 }
 
@@ -313,14 +297,14 @@ IPCPView::IPCPView(IPCPAddon *addon, BRect frame)
 	rect.bottom = rect.top + 15;
 	fIsEnabled = new BCheckBox(rect, "isEnabled", kLabelEnabled,
 		new BMessage(kMsgUpdateControls));
-	
+
 	// set divider of text controls
 	float controlWidth = max(max(StringWidth(fIPAddress->Label()),
 		StringWidth(fPrimaryDNS->Label())), StringWidth(fSecondaryDNS->Label()));
 	fIPAddress->SetDivider(controlWidth + 5);
 	fPrimaryDNS->SetDivider(controlWidth + 5);
 	fSecondaryDNS->SetDivider(controlWidth + 5);
-	
+
 	AddChild(fIsEnabled);
 	AddChild(fIPAddress);
 	AddChild(fPrimaryDNS);
@@ -336,7 +320,7 @@ IPCPView::Reload()
 	fIPAddress->SetText(Addon()->IPAddress());
 	fPrimaryDNS->SetText(Addon()->PrimaryDNS());
 	fSecondaryDNS->SetText(Addon()->SecondaryDNS());
-	
+
 	UpdateControls();
 }
 
@@ -356,7 +340,7 @@ IPCPView::MessageReceived(BMessage *message)
 		case kMsgUpdateControls:
 			UpdateControls();
 		break;
-		
+
 		default:
 			BView::MessageReceived(message);
 	}

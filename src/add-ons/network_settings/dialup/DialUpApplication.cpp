@@ -1,24 +1,8 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004 Waldemar Kornewald. All rights reserved.
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <Application.h>
 #include <Window.h>
@@ -40,7 +24,7 @@ class DialUpApplication : public BApplication {
 class DialUpWindow : public BWindow {
 	public:
 		DialUpWindow(BRect frame);
-		
+
 		virtual bool QuitRequested()
 			{ be_app->PostMessage(B_QUIT_REQUESTED); return true; }
 };
@@ -49,11 +33,11 @@ class DialUpWindow : public BWindow {
 int main()
 {
 	new DialUpApplication();
-	
+
 	be_app->Run();
-	
+
 	delete be_app;
-	
+
 	return 0;
 }
 
@@ -72,6 +56,6 @@ DialUpWindow::DialUpWindow(BRect frame)
 	: BWindow(frame, "DialUp", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	DialUpView *view = new DialUpView(Bounds());
-	
+
 	AddChild(view);
 }

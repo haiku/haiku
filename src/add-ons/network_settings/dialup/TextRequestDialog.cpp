@@ -1,24 +1,9 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004 Waldemar Kornewald. All rights reserved.
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include "TextRequestDialog.h"
 #include "InterfaceUtils.h"
@@ -54,7 +39,7 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *information,
 	rect.InsetBy(5, 5);
 	rect.bottom = rect.top;
 		// init
-	
+
 	if(information) {
 		BRect textRect(rect);
 		textRect.OffsetTo(0, 0);
@@ -72,7 +57,7 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *information,
 		backgroundView->AddChild(fTextView);
 	} else
 		fTextView = NULL;
-	
+
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
 	fTextControl = new BTextControl(rect, "request", request, text, NULL);
@@ -80,7 +65,7 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *information,
 	fTextControl->SetDivider(fTextControl->StringWidth(fTextControl->Label()) + 5);
 	if(text && strlen(text) > 0)
 		fTextControl->TextView()->SelectAll();
-	
+
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 25;
 	rect.left = rect.right - kDefaultButtonWidth;
@@ -96,10 +81,10 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *information,
 	backgroundView->AddChild(fOKButton);
 	backgroundView->AddChild(fTextControl);
 	AddChild(backgroundView);
-	
+
 	fTextControl->MakeFocus(true);
 	SetDefaultButton(fOKButton);
-	
+
 	UpdateControls();
 }
 
@@ -117,22 +102,22 @@ TextRequestDialog::MessageReceived(BMessage *message)
 		case kMsgButton: {
 			if(!fInvoker || !fInvoker->Message())
 				return;
-			
+
 			int32 which;
 			message->FindInt32("which", &which);
 			BMessage toSend(*fInvoker->Message());
 			toSend.AddInt32("which", which);
 			if(which == 1)
 				toSend.AddString("text", fTextControl->Text());
-			
+
 			fInvoker->Invoke(&toSend);
 			PostMessage(B_QUIT_REQUESTED);
 		} break;
-		
+
 		case kMsgUpdateControls:
 			UpdateControls();
 		break;
-		
+
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -152,7 +137,7 @@ TextRequestDialog::Go(BInvoker *invoker)
 	fInvoker = invoker;
 	MoveTo(center_on_screen(Bounds()));
 	Show();
-	
+
 	return B_OK;
 }
 

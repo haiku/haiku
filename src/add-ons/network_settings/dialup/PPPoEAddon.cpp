@@ -1,24 +1,8 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2003-2004 Waldemar Kornewald. All rights reserved.
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 //-----------------------------------------------------------------------
 // PPPoEAddon saves the loaded settings.
@@ -118,24 +102,24 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fInterfaceName = fServiceName = "";
 	fSettings = settings;
 	fProfile = profile;
-	
+
 	if(fPPPoEView)
 		fPPPoEView->Reload();
-	
+
 	if(!settings || !profile || isNew)
 		return true;
-	
+
 	BMessage device;
 	int32 deviceIndex = 0;
 	if(!FindMessageParameter(PPP_DEVICE_KEY, *fSettings, &device, &deviceIndex))
 		return false;
 			// error: no device
-	
+
 	BString name;
 	if(device.FindString(MDSU_VALUES, &name) != B_OK || name != kKernelModuleName)
 		return false;
 			// error: no device
-	
+
 	BMessage parameter;
 	int32 index = 0;
 	if(!FindMessageParameter(PPPoE_INTERFACE_KEY, device, &parameter, &index)
@@ -146,7 +130,7 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 		parameter.AddBool(MDSU_VALID, true);
 		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
-	
+
 	index = 0;
 	if(!FindMessageParameter(PPPoE_SERVICE_NAME_KEY, device, &parameter, &index)
 			|| parameter.FindString(MDSU_VALUES, &fServiceName) != B_OK)
@@ -155,13 +139,13 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 		parameter.AddBool(MDSU_VALID, true);
 		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
-	
+
 	device.AddBool(MDSU_VALID, true);
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, deviceIndex, &device);
-	
+
 	if(fPPPoEView)
 		fPPPoEView->Reload();
-	
+
 	return true;
 }
 
@@ -170,12 +154,12 @@ void
 PPPoEAddon::IsModified(bool *settings, bool *profile) const
 {
 	*profile = false;
-	
+
 	if(!fSettings) {
 		*settings = false;
 		return;
 	}
-	
+
 	*settings = (fInterfaceName != fPPPoEView->InterfaceName()
 		|| fServiceName != fPPPoEView->ServiceName());
 }
@@ -188,15 +172,15 @@ PPPoEAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempora
 			|| strlen(fPPPoEView->InterfaceName()) == 0)
 		return false;
 			// TODO: tell user that an interface is needed (if we fail because of this)
-	
+
 	BMessage device, interface;
 	device.AddString(MDSU_NAME, PPP_DEVICE_KEY);
 	device.AddString(MDSU_VALUES, kKernelModuleName);
-	
+
 	interface.AddString(MDSU_NAME, PPPoE_INTERFACE_KEY);
 	interface.AddString(MDSU_VALUES, fPPPoEView->InterfaceName());
 	device.AddMessage(MDSU_PARAMETERS, &interface);
-	
+
 	if(fPPPoEView->ServiceName() && strlen(fPPPoEView->ServiceName()) > 0) {
 		// save service name, too
 		BMessage service;
@@ -204,9 +188,9 @@ PPPoEAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempora
 		service.AddString(MDSU_VALUES, fPPPoEView->ServiceName());
 		device.AddMessage(MDSU_PARAMETERS, &service);
 	}
-	
+
 	settings->AddMessage(MDSU_PARAMETERS, &device);
-	
+
 	return true;
 }
 
@@ -218,12 +202,12 @@ PPPoEAddon::GetPreferredSize(float *width, float *height) const
 	if(Addons()->FindFloat(DUN_DEVICE_VIEW_WIDTH, &viewWidth) != B_OK)
 		viewWidth = 270;
 			// default value
-	
+
 	if(width)
 		*width = viewWidth;
 	if(height)
 		*height = fHeight;
-	
+
 	return true;
 }
 
@@ -236,12 +220,12 @@ PPPoEAddon::CreateView(BPoint leftTop)
 		if(!Addons()->FindFloat(DUN_DEVICE_VIEW_WIDTH, &width))
 			width = 270;
 				// default value
-		
+
 		BRect rect(0, 0, width, fHeight);
 		fPPPoEView = new PPPoEView(this, rect);
 		fPPPoEView->Reload();
 	}
-	
+
 	fPPPoEView->MoveTo(leftTop);
 	return fPPPoEView;
 }
@@ -270,7 +254,7 @@ PPPoEView::PPPoEView(PPPoEAddon *addon, BRect frame)
 	rect.right += 75;
 	rect.bottom = rect.top + 15;
 	AddChild(new BStringView(rect, "optional", kLabelOptional));
-	
+
 	AddChild(fInterface);
 	AddChild(fServiceName);
 }
@@ -308,17 +292,17 @@ PPPoEView::MessageReceived(BMessage *message)
 			if(item)
 				fInterfaceName = item->Label();
 		} break;
-		
+
 		case kMsgSelectOther:
 			(new TextRequestDialog("InterfaceName", NULL, kRequestInterfaceName,
 				fInterfaceName.String()))->Go(new BInvoker(
 				new BMessage(kMsgFinishSelectOther), this));
 		break;
-		
+
 		case kMsgFinishSelectOther: {
 			int32 which;
 			message->FindInt32("which", &which);
-			
+
 			const char *name = message->FindString("text");
 			BMenu *menu = fInterface->Menu();
 			BMenuItem *item;
@@ -328,25 +312,25 @@ PPPoEView::MessageReceived(BMessage *message)
 					item->SetMarked(true);
 				else
 					fOtherInterface->SetMarked(true);
-				
+
 				return;
 			}
-			
+
 			fInterfaceName = name;
-			
+
 			item = menu->FindItem(fInterfaceName.String());
 			if(item && menu->IndexOf(item) <= menu->CountItems() - 2) {
 				item->SetMarked(true);
 				return;
 			}
-			
+
 			BString label(kLabelOtherInterface);
 			label << " " << name;
 			fOtherInterface->SetLabel(label.String());
 			fOtherInterface->SetMarked(true);
 				// XXX: this is needed to tell the owning menu to update its label
 		} break;
-		
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -361,13 +345,13 @@ PPPoEView::ReloadInterfaces()
 	while(menu->CountItems() > 2)
 		delete menu->RemoveItem((int32) 0);
 	fOtherInterface->SetLabel(kLabelOtherInterface);
-	
+
 	PPPManager manager;
 	char *interfaces = new char[8192];
 		// reserve enough space for approximately 512 entries
 	int32 count = manager.ControlModule("pppoe", PPPoE_GET_INTERFACES, interfaces,
 		8192);
-	
+
 	BMenuItem *item;
 	char *name = interfaces;
 	int32 insertAt;
@@ -376,12 +360,12 @@ PPPoEView::ReloadInterfaces()
 		insertAt = FindNextMenuInsertionIndex(menu, name);
 		if(insertAt > menu->CountItems() - 2)
 			insertAt = menu->CountItems() - 2;
-		
+
 		item->SetTarget(this);
 		menu->AddItem(item, insertAt);
 		name += strlen(name) + 1;
 	}
-	
+
 	// set interface or some default value if nothing was found
 	if(Addon()->InterfaceName() && strlen(Addon()->InterfaceName()) > 0)
 		fInterfaceName = Addon()->InterfaceName();
@@ -389,9 +373,9 @@ PPPoEView::ReloadInterfaces()
 		fInterfaceName = interfaces;
 	else
 		fInterfaceName = "";
-	
+
 	delete interfaces;
-	
+
 	item = menu->FindItem(fInterfaceName.String());
 	if(item && menu->IndexOf(item) <= menu->CountItems() - 2)
 		item->SetMarked(true);
