@@ -51,7 +51,7 @@ class PPPoEAddon : public DialUpAddon {
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
-		virtual BView *CreateView(BPoint leftTop);
+		virtual BView *CreateView();
 
 		void UnregisterView()
 			{ fPPPoEView = NULL; }

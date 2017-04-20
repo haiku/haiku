@@ -47,7 +47,7 @@ class ConnectionOptionsAddon : public DialUpAddon {
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
-		virtual BView *CreateView(BPoint leftTop);
+		virtual BView *CreateView();
 
 	private:
 		bool fIsNew;
@@ -60,7 +60,7 @@ class ConnectionOptionsAddon : public DialUpAddon {
 
 class ConnectionOptionsView : public BView {
 	public:
-		ConnectionOptionsView(ConnectionOptionsAddon *addon, BRect frame);
+		ConnectionOptionsView(ConnectionOptionsAddon *addon);
 
 		ConnectionOptionsAddon *Addon() const
 			{ return fAddon; }

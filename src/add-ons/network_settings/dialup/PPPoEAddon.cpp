@@ -213,7 +213,7 @@ PPPoEAddon::GetPreferredSize(float *width, float *height) const
 
 
 BView*
-PPPoEAddon::CreateView(BPoint leftTop)
+PPPoEAddon::CreateView()
 {
 	if(!fPPPoEView) {
 		float width;
@@ -226,7 +226,6 @@ PPPoEAddon::CreateView(BPoint leftTop)
 		fPPPoEView->Reload();
 	}
 
-	fPPPoEView->MoveTo(leftTop);
 	return fPPPoEView;
 }
 

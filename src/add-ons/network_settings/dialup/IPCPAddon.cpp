@@ -16,6 +16,8 @@
 	// for max()
 
 #include <StringView.h>
+#include <LayoutBuilder.h>
+#include <SpaceLayoutItem.h>
 
 #include <PPPDefs.h>
 #include <IPCP.h>
@@ -44,7 +46,8 @@ static const char *kKernelModuleName = "ipcp";
 IPCPAddon::IPCPAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fSettings(NULL),
-	fProfile(NULL)
+	fProfile(NULL),
+	fIPCPView(NULL)
 {
 }
 
@@ -233,16 +236,13 @@ IPCPAddon::GetPreferredSize(float *width, float *height) const
 
 
 BView*
-IPCPAddon::CreateView(BPoint leftTop)
+IPCPAddon::CreateView()
 {
-	if(!fIPCPView) {
-		BRect rect;
-		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
-		fIPCPView = new IPCPView(this, rect);
+	if (!fIPCPView) {
+		fIPCPView = new IPCPView(this);
 		fIPCPView->Reload();
 	}
 
-	fIPCPView->MoveTo(leftTop);
 	return fIPCPView;
 }
 
@@ -264,51 +264,29 @@ IPCPAddon::FindIPCPProtocol(const BMessage& message, BMessage *protocol) const
 }
 
 
-IPCPView::IPCPView(IPCPAddon *addon, BRect frame)
-	: BView(frame, kLabelIPCP, B_FOLLOW_NONE, 0),
+IPCPView::IPCPView(IPCPAddon *addon)
+	: BView(kLabelIPCP, 0),
 	fAddon(addon)
 {
-	BRect rect = Bounds();
-	rect.InsetBy(10, 10);
-	rect.bottom = rect.top + 20;
-	BRect optionalRect(rect);
-	rect.right -= 75;
-	fIPAddress = new BTextControl(rect, "ip", kLabelIPAddress, NULL, NULL);
-	optionalRect.left = rect.right + 5;
-	optionalRect.bottom = optionalRect.top + 15;
-	AddChild(new BStringView(optionalRect, "optional_1", kLabelOptional));
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 20;
-	fPrimaryDNS = new BTextControl(rect, "primaryDNS", kLabelPrimaryDNS, NULL, NULL);
-	optionalRect.top = rect.top;
-	optionalRect.bottom = optionalRect.top + 15;
-	AddChild(new BStringView(optionalRect, "optional_2", kLabelOptional));
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 20;
-	fSecondaryDNS = new BTextControl(rect, "secondaryDNS", kLabelSecondaryDNS, NULL,
+	fIPAddress = new BTextControl("ip", kLabelIPAddress, NULL, NULL);
+	fPrimaryDNS = new BTextControl("primaryDNS", kLabelPrimaryDNS, NULL, NULL);
+	fSecondaryDNS = new BTextControl("secondaryDNS", kLabelSecondaryDNS, NULL,
 		NULL);
-	optionalRect.top = rect.top;
-	optionalRect.bottom = optionalRect.top + 15;
-	AddChild(new BStringView(optionalRect, "optional_3", kLabelOptional));
-	rect.top = rect.bottom + 50;
-	rect.bottom = rect.top + 10;
-	AddChild(new BStringView(rect, "expert", kLabelExtendedOptions));
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 15;
-	fIsEnabled = new BCheckBox(rect, "isEnabled", kLabelEnabled,
+	fIsEnabled = new BCheckBox("isEnabled", kLabelEnabled,
 		new BMessage(kMsgUpdateControls));
 
-	// set divider of text controls
-	float controlWidth = max(max(StringWidth(fIPAddress->Label()),
-		StringWidth(fPrimaryDNS->Label())), StringWidth(fSecondaryDNS->Label()));
-	fIPAddress->SetDivider(controlWidth + 5);
-	fPrimaryDNS->SetDivider(controlWidth + 5);
-	fSecondaryDNS->SetDivider(controlWidth + 5);
-
-	AddChild(fIsEnabled);
-	AddChild(fIPAddress);
-	AddChild(fPrimaryDNS);
-	AddChild(fSecondaryDNS);
+	BLayoutBuilder::Grid<>(this, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(B_USE_HALF_ITEM_INSETS)
+		.Add(fIsEnabled, 0, 0)
+		.Add(new BStringView("expert", kLabelExtendedOptions), 0, 1)
+		.Add(fIPAddress, 0, 2)
+		.Add(new BStringView("optional_1", kLabelOptional), 1, 2)
+		.Add(fPrimaryDNS, 0, 3)
+		.Add(new BStringView("optional_2", kLabelOptional), 1, 3)
+		.Add(fSecondaryDNS, 0, 4)
+		.Add(new BStringView("optional_3", kLabelOptional), 1, 4)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 5)
+	.End();
 }
 
 

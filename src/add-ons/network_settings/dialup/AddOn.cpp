@@ -102,7 +102,7 @@ BView*
 DialUpInterfaceItem::View()
 {
 	if (fView == NULL)
-		fView = new DialUpView(BRect(0, 0, 100, 100)/*, fSettings*/);
+		fView = new DialUpView(/*fSettings*/);
 
 	return fView;
 }

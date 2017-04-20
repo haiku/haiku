@@ -20,6 +20,7 @@
 #include <Button.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <LayoutBuilder.h>
 #include <PopUpMenu.h>
 #include <StringView.h>
 
@@ -317,24 +318,14 @@ GeneralAddon::GetPreferredSize(float *width, float *height) const
 
 
 BView*
-GeneralAddon::CreateView(BPoint leftTop)
+GeneralAddon::CreateView()
 {
-	if(!fGeneralView) {
-		BRect rect;
-		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
-		fGeneralView = new GeneralView(this, rect);
+	if (!fGeneralView) {
+		fGeneralView = new GeneralView(this);
 		fGeneralView->Reload();
 	}
 
-	fGeneralView->MoveTo(leftTop);
 	return fGeneralView;
-}
-
-
-BView*
-GeneralAddon::AuthenticationView() const
-{
-	return fGeneralView ? fGeneralView->AuthenticationView() : NULL;
 }
 
 
@@ -348,7 +339,7 @@ GeneralAddon::GetAuthenticator(const BString& moduleName, BMessage *entry) const
 	for(int32 index = 0; Addons()->FindMessage(DUN_AUTHENTICATOR_ADDON_TYPE, index,
 			entry) == B_OK; index++) {
 		entry->FindString("KernelModuleName", &name);
-		if(name == moduleName)
+		if (name == moduleName)
 			return true;
 	}
 
@@ -377,70 +368,43 @@ GeneralAddon::MarkAuthenticatorAsValid(const BString& moduleName)
 }
 
 
-GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
-	: BView(frame, kLabelGeneral, B_FOLLOW_NONE, 0),
+GeneralView::GeneralView(GeneralAddon *addon)
+	: BView(kLabelGeneral, 0),
 	fAddon(addon)
 {
-	BRect rect = Bounds();
-	rect.InsetBy(5, 5);
-	rect.bottom = 100;
-	fDeviceBox = new BBox(rect, "Device");
+	fDeviceBox = new BBox("Device");
 	Addon()->Addons()->AddFloat(DUN_DEVICE_VIEW_WIDTH,
-		fDeviceBox->Bounds().Width() - 10);
-	rect.top = rect.bottom + 10;
-	rect.bottom = rect.top
-		+ 25 // space for topmost control
-		+ 3 * 20 // size of controls
-		+ 3 * 5; // space beween controls and bottom of box
-	fAuthenticationBox = new BBox(rect, "Authentication");
+		fDeviceBox->Bounds().Width() - 10); // FIXME: remove
 
-	fDeviceField = new BMenuField(BRect(5, 0, 250, 20), "Device",
+	fDeviceField = new BMenuField("Device",
 		kLabelDevice, new BPopUpMenu(kLabelNoDevicesFound));
-	fDeviceField->SetDivider(StringWidth(fDeviceField->Label()) + 5);
 	fDeviceField->Menu()->SetRadioMode(true);
 	AddDevices();
 	fDeviceBox->SetLabel(fDeviceField);
 
-	fAuthenticatorField = new BMenuField(BRect(5, 0, 250, 20), "Authenticator",
+	fAuthenticatorField = new BMenuField("Authenticator",
 		kLabelAuthenticator, new BPopUpMenu(kLabelNoAuthenticatorsFound));
-	fAuthenticatorField->SetDivider(StringWidth(fAuthenticatorField->Label()) + 5);
 	fAuthenticatorField->Menu()->SetRadioMode(true);
 	AddAuthenticators();
-	fAuthenticationBox->SetLabel(fAuthenticatorField);
 
-	rect = fAuthenticationBox->Bounds();
-	rect.InsetBy(10, 5);
-	rect.top = 25;
-//	fAuthenticationView = new BControl(rect, "authenticationView", NULL, NULL,
-//		B_FOLLOW_NONE, 0);
-		// BControl automatically sets the view color when attached (we want that)
-	fAuthenticationView = new BView(rect, "authenticationView", B_FOLLOW_NONE, 0);
-	fAuthenticationView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	rect = fAuthenticationView->Bounds();
-	rect.bottom = rect.top + 20;
-	fUsername = new BTextControl(rect, "username", kLabelName, NULL, NULL);
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 20;
-	fPassword = new BTextControl(rect, "password", kLabelPassword, NULL, NULL);
+	fUsername = new BTextControl("username", kLabelName, NULL, NULL);
+	fPassword = new BTextControl("password", kLabelPassword, NULL, NULL);
 	fPassword->TextView()->HideTyping(true);
 
-	// set dividers
-	float width = max(StringWidth(fUsername->Label()),
-		StringWidth(fPassword->Label()));
-	fUsername->SetDivider(width + 5);
-	fPassword->SetDivider(width + 5);
+	fSavePassword = new BCheckBox("SavePassword", kLabelSavePassword, NULL);
 
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 20;
-	fSavePassword = new BCheckBox(rect, "SavePassword", kLabelSavePassword, NULL);
-
-	fAuthenticationView->AddChild(fUsername);
-	fAuthenticationView->AddChild(fPassword);
-	fAuthenticationView->AddChild(fSavePassword);
-	fAuthenticationBox->AddChild(fAuthenticationView);
-
-	AddChild(fDeviceBox);
-	AddChild(fAuthenticationBox);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(B_USE_HALF_ITEM_INSETS)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fDeviceBox)
+			.AddGlue()
+		.End()
+		.Add(fAuthenticatorField)
+		.Add(fUsername)
+		.Add(fPassword)
+		.Add(fSavePassword)
+		.AddGlue()
+	.End();
 }
 
 
@@ -582,39 +546,18 @@ void
 GeneralView::ReloadDeviceView()
 {
 	// first remove existing device view(s)
-	while(fDeviceBox->CountChildren() > 1)
+	while (fDeviceBox->CountChildren() > 1)
 		fDeviceBox->RemoveChild(fDeviceBox->ChildAt(1));
 
-	if(!fDeviceAddon)
+	if (!fDeviceAddon)
 		return;
 
-	BRect rect(fDeviceBox->Bounds());
-	float width, height;
-	if(!fDeviceAddon->GetPreferredSize(&width, &height)) {
-		width = rect.Width();
-		height = 50;
+	BView* deviceView = fDeviceAddon->CreateView();
+	if (deviceView) {
+		BLayoutBuilder::Group<>(fDeviceBox, B_VERTICAL)
+			.Add(deviceView)
+		.End();
 	}
-
-	if(width > rect.Width())
-		width = rect.Width();
-	if(height < 10)
-		height = 10;
-			// set minimum height
-	else if(height > 200)
-		height = 200;
-			// set maximum height
-
-	rect.InsetBy((rect.Width() - width) / 2, 0);
-		// center horizontally
-	rect.top = 25;
-	rect.bottom = rect.top + height;
-	float deltaY = height + 30 - fDeviceBox->Bounds().Height();
-	fDeviceBox->ResizeBy(0, deltaY);
-	fAuthenticationBox->MoveBy(0, deltaY);
-
-	BView *deviceView = fDeviceAddon->CreateView(rect.LeftTop());
-	if(deviceView)
-		fDeviceBox->AddChild(deviceView);
 }
 
 
@@ -623,10 +566,10 @@ GeneralView::UpdateControls()
 {
 	BMenu *menu = fAuthenticatorField->Menu();
 	int32 index = menu->IndexOf(menu->FindMarked());
-	if(index < 0)
+	if (index < 0)
 		fAuthenticatorNone->SetMarked(true);
 
-	if(index == 0) {
+	if (index == 0) {
 		fUsername->SetEnabled(false);
 		fPassword->SetEnabled(false);
 		fSavePassword->SetEnabled(false);

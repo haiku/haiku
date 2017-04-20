@@ -13,6 +13,8 @@
 
 #include "MessageDriverSettingsUtils.h"
 
+#include <LayoutBuilder.h>
+
 #include <PPPDefs.h>
 #include <settings_tools.h>
 
@@ -162,42 +164,34 @@ ConnectionOptionsAddon::GetPreferredSize(float *width, float *height) const
 
 
 BView*
-ConnectionOptionsAddon::CreateView(BPoint leftTop)
+ConnectionOptionsAddon::CreateView()
 {
 	if(!fConnectionOptionsView) {
-		BRect rect;
-		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
-		fConnectionOptionsView = new ConnectionOptionsView(this, rect);
+		fConnectionOptionsView = new ConnectionOptionsView(this);
 		fConnectionOptionsView->Reload();
 	}
 
-	fConnectionOptionsView->MoveTo(leftTop);
 	return fConnectionOptionsView;
 }
 
 
-ConnectionOptionsView::ConnectionOptionsView(ConnectionOptionsAddon *addon, BRect frame)
-	: BView(frame, kLabelConnectionOptions, B_FOLLOW_NONE, 0),
+ConnectionOptionsView::ConnectionOptionsView(ConnectionOptionsAddon *addon)
+	: BView(kLabelConnectionOptions, 0),
 	fAddon(addon)
 {
-	BRect rect = Bounds();
-	rect.InsetBy(10, 10);
-	rect.bottom = rect.top + 15;
-	fDialOnDemand = new BCheckBox(rect, "DialOnDemand", kLabelDialOnDemand,
+	fDialOnDemand = new BCheckBox("DialOnDemand", kLabelDialOnDemand,
 		new BMessage(kMsgUpdateControls));
-	rect.top = rect.bottom + 3;
-	rect.bottom = rect.top + 15;
-	rect.left += 20;
-	fAskBeforeDialing = new BCheckBox(rect, "AskBeforeDialing", kLabelAskBeforeDialing,
+	fAskBeforeDialing = new BCheckBox("AskBeforeDialing", kLabelAskBeforeDialing,
 		NULL);
-	rect.left -= 20;
-	rect.top = rect.bottom + 20;
-	rect.bottom = rect.top + 15;
-	fAutoRedial = new BCheckBox(rect, "AutoRedial", kLabelAutoRedial, NULL);
+	fAutoRedial = new BCheckBox("AutoRedial", kLabelAutoRedial, NULL);
 
-	AddChild(fDialOnDemand);
-	AddChild(fAskBeforeDialing);
-	AddChild(fAutoRedial);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(B_USE_HALF_ITEM_INSETS)
+		.Add(fDialOnDemand)
+		.Add(fAskBeforeDialing)
+		.Add(fAutoRedial)
+		.AddGlue()
+	.End();
 }
 
 

@@ -110,7 +110,7 @@ class DialUpAddon {
 
 			\param leftTop Specifies the view's left-top coordinates.
 		*/
-		virtual BView *CreateView(BPoint leftTop)
+		virtual BView *CreateView()
 			{ return NULL; }
 
 	private:

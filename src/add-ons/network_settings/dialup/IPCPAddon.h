@@ -52,7 +52,7 @@ class IPCPAddon : public DialUpAddon {
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
-		virtual BView *CreateView(BPoint leftTop);
+		virtual BView *CreateView();
 
 	private:
 		int32 FindIPCPProtocol(const BMessage& message, BMessage *protocol) const;
@@ -68,7 +68,7 @@ class IPCPAddon : public DialUpAddon {
 
 class IPCPView : public BView {
 	public:
-		IPCPView(IPCPAddon *addon, BRect frame);
+		IPCPView(IPCPAddon *addon);
 
 		IPCPAddon *Addon() const
 			{ return fAddon; }

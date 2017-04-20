@@ -22,7 +22,7 @@ class GeneralAddon;
 
 class DialUpView : public BView {
 	public:
-		DialUpView(BRect frame);
+		DialUpView();
 		virtual ~DialUpView();
 
 		virtual void AttachedToWindow();
@@ -33,7 +33,6 @@ class DialUpView : public BView {
 		// used by ppp_up application
 		bool SelectInterfaceNamed(const char *name);
 		bool NeedsRequest() const;
-		BView *AuthenticationView() const;
 		BView *StatusView() const;
 		BView *ConnectButton() const;
 		bool SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary);

@@ -31,6 +31,7 @@
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 #include <TabView.h>
 
@@ -89,8 +90,8 @@ up_down_thread(void *data)
 }
 
 
-DialUpView::DialUpView(BRect frame)
-	: BView(frame, "DialUpView", B_FOLLOW_ALL, 0),
+DialUpView::DialUpView()
+	: BView("DialUpView", 0),
 	fListener(this),
 	fUpDownThread(-1),
 	fDriverSettings(NULL),
@@ -98,8 +99,6 @@ DialUpView::DialUpView(BRect frame)
 	fWatching(PPP_UNDEFINED_INTERFACE_ID),
 	fKeepLabel(false)
 {
-	BRect bounds = Bounds();
-		// for caching
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// add messenger to us so add-ons can contact us
@@ -108,54 +107,36 @@ DialUpView::DialUpView(BRect frame)
 
 	// create pop-up with all interfaces and "New..."/"Delete current" items
 	fInterfaceMenu = new BPopUpMenu(kLabelCreateNew);
-	BRect rect = bounds;
-	rect.InsetBy(5, 5);
-	rect.bottom = rect.top + 20;
-	fMenuField = new BMenuField(rect, "Interfaces", kLabelInterface, fInterfaceMenu);
-	fMenuField->SetDivider(StringWidth(fMenuField->Label()) + 5);
+	fMenuField = new BMenuField("Interfaces", kLabelInterface, fInterfaceMenu);
 
-	rect.top = rect.bottom + 10;
-	rect.bottom = bounds.bottom
-		- 20 // height of bottom controls
-		- 20; // space for bottom controls
-	fTabView = new BTabView(rect, "TabView", B_WIDTH_FROM_LABEL);
+	fTabView = new BTabView("TabView", B_WIDTH_FROM_LABEL);
 	BRect tabViewRect(fTabView->Bounds());
-	tabViewRect.bottom -= fTabView->TabHeight();
-	fAddons.AddRect(DUN_TAB_VIEW_RECT, tabViewRect);
+	fAddons.AddRect(DUN_TAB_VIEW_RECT, tabViewRect); // FIXME: remove
 
-	BRect tmpRect(rect);
-	tmpRect.top += (tmpRect.Height() - 15) / 2;
-	tmpRect.bottom = tmpRect.top + 15;
-	fStringView = new BStringView(tmpRect, "NoInterfacesFound",
+	fStringView = new BStringView("NoInterfacesFound",
 		kTextNoInterfacesFound);
 	fStringView->SetAlignment(B_ALIGN_CENTER);
 	fStringView->Hide();
-	tmpRect.top = tmpRect.bottom + 10;
-	tmpRect.bottom = tmpRect.top + 25;
-	fCreateNewButton = new BButton(tmpRect, "CreateNewButton",
+	fCreateNewButton = new BButton("CreateNewButton",
 		kLabelCreateNewInterface, new BMessage(kMsgCreateNew));
-	fCreateNewButton->ResizeToPreferred();
-	tmpRect.left = (rect.Width() - fCreateNewButton->Bounds().Width()) / 2 + rect.left;
-	fCreateNewButton->MoveTo(tmpRect.left, tmpRect.top);
 	fCreateNewButton->Hide();
 
-	rect.top = rect.bottom + 15;
-	rect.bottom = rect.top + 15;
-	rect.right = rect.left + 200;
-	fStatusView = new BStringView(rect, "StatusView", kTextNotConnected, B_FOLLOW_BOTTOM);
+	fStatusView = new BStringView("StatusView", kTextNotConnected);
 
-	rect.InsetBy(0, -5);
-	rect.left = rect.right + 5;
-	rect.right = bounds.right - 5;
-	fConnectButton = new BButton(rect, "ConnectButton", kLabelConnect,
-		new BMessage(kMsgConnectButton), B_FOLLOW_BOTTOM);
+	fConnectButton = new BButton("ConnectButton", kLabelConnect,
+		new BMessage(kMsgConnectButton));
 
-	AddChild(fMenuField);
-	AddChild(fTabView);
-	AddChild(fStringView);
-	AddChild(fCreateNewButton);
-	AddChild(fStatusView);
-	AddChild(fConnectButton);
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fMenuField)
+		.Add(fTabView)
+		.Add(fStringView)
+		.Add(fCreateNewButton)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fStatusView)
+			.AddGlue()
+			.Add(fConnectButton)
+		.End()
+	.End();
 
 	// initialize
 	LoadInterfaces();
@@ -291,13 +272,6 @@ bool
 DialUpView::NeedsRequest() const
 {
 	return fGeneralAddon ? fGeneralAddon->NeedsAuthenticationRequest() : false;
-}
-
-
-BView*
-DialUpView::AuthenticationView() const
-{
-	return fGeneralAddon ? fGeneralAddon->AuthenticationView() : NULL;
 }
 
 
@@ -555,34 +529,31 @@ void
 DialUpView::CreateTabs()
 {
 	// create tabs for all registered and valid tab add-ons
-	DialUpAddon *addon;
-	BView *target;
-	float width, height;
+	DialUpAddon *addon = NULL;
+	BView *target = NULL;
 	TemplateList<DialUpAddon*> addons;
 
-	for(int32 index = 0;
+	for (int32 index = 0;
 			fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++) {
-		if(!addon || addon->Position() < 0)
+		if (!addon || addon->Position() < 0)
 			continue;
 
 		int32 insertIndex = 0;
-		for(; insertIndex < addons.CountItems(); insertIndex++)
-			if(addons.ItemAt(insertIndex)->Position() > addon->Position())
+		for(; insertIndex < addons.CountItems(); insertIndex++) {
+			if (addons.ItemAt(insertIndex)->Position() > addon->Position())
 				break;
+		}
 
 		addons.AddItem(addon, insertIndex);
 	}
 
-	for(int32 index = 0; index < addons.CountItems(); index++) {
+	for (int32 index = 0; index < addons.CountItems(); index++) {
 		addon = addons.ItemAt(index);
 
-		if(!addon->GetPreferredSize(&width, &height))
-			continue;
-
-		target = addon->CreateView(BPoint(0, 0));
-		if(!target)
+		target = addon->CreateView();
+		if (target == NULL)
 			continue;
 
 		fTabView->AddTab(target, NULL);
@@ -730,7 +701,7 @@ DialUpView::LoadAddons()
 	GeneralAddon *fGeneralAddon = new GeneralAddon(&fAddons);
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, fGeneralAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, fGeneralAddon);
-/*
+
 	// "IPCP" protocol
 	IPCPAddon *ipcpAddon = new IPCPAddon(&fAddons);
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, ipcpAddon);
@@ -739,7 +710,7 @@ DialUpView::LoadAddons()
 	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
 	fAddons.AddPointer(DUN_DEVICE_ADDON_TYPE, pppoeAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, pppoeAddon);
-*/
+
 	// "PAP" authenticator
 	BMessage addon;
 	addon.AddString("FriendlyName", "Plain-text Authentication");
