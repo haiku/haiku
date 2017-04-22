@@ -86,6 +86,13 @@ efi_gpt_identify_partition(int fd, partition_data* partition, void** _cookie)
 	}
 
 	*_cookie = header;
+	if (header->IsDirty()) {
+		// Either the main or the backup table is missing, it looks like someone
+		// tried to erase the GPT with something else. Let's lower the priority,
+		// so that other partitioning systems which use either only the start or
+		// only the end of the drive, have a chance to run instead.
+		return 0.75;
+	}
 	return 0.96;
 		// This must be higher as Intel partitioning, as EFI can contain this
 		// partitioning for compatibility

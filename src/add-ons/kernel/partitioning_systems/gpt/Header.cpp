@@ -51,7 +51,8 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 	:
 	fBlockSize(blockSize),
 	fStatus(B_NO_INIT),
-	fEntries(NULL)
+	fEntries(NULL),
+	fDirty(false)
 {
 	// TODO: check the correctness of the protective MBR and warn if invalid
 
@@ -88,6 +89,7 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 		fHeader.SetAbsoluteBlock(EFI_HEADER_LOCATION);
 		fHeader.SetEntriesBlock(EFI_PARTITION_ENTRIES_BLOCK);
 		fHeader.SetAlternateBlock(lastBlock);
+		fDirty = true;
 	} else if (status != B_OK) {
 		// Recreate backup header from primary
 		_SetBackupHeaderFromPrimary(lastBlock);
@@ -135,7 +137,8 @@ Header::Header(uint64 lastBlock, uint32 blockSize)
 	:
 	fBlockSize(blockSize),
 	fStatus(B_NO_INIT),
-	fEntries(NULL)
+	fEntries(NULL),
+	fDirty(true)
 {
 	TRACE(("EFI::Header: Initialize GPT, block size %" B_PRIu32 "\n",
 		blockSize));
@@ -194,6 +197,13 @@ Header::InitCheck() const
 }
 
 
+bool
+Header::IsDirty() const
+{
+	return fDirty;
+}
+
+
 #ifndef _BOOT_MODE
 status_t
 Header::WriteEntry(int fd, uint32 entryIndex)
@@ -214,6 +224,8 @@ Header::WriteEntry(int fd, uint32 entryIndex)
 		fBackupHeader.EntriesBlock() * fBlockSize + entryOffset,
 		fEntries + entryOffset, fHeader.EntrySize());
 
+	if (status == B_OK && backupStatus == B_OK)
+		fDirty = false;
 	return status == B_OK ? backupStatus : status;
 }
 
@@ -251,6 +263,8 @@ Header::Write(int fd)
 	status_t backupStatus = _Write(fd,
 		fBackupHeader.EntriesBlock() * fBlockSize, fEntries, _EntryArraySize());
 
+	if (status == B_OK && backupStatus == B_OK)
+		fDirty = false;
 	return status == B_OK ? backupStatus : status;
 }
 
