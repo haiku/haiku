@@ -31,7 +31,7 @@ Addon DialUpInterface :
 	PPPoEAddon.cpp
 
 	: be shared <nogrist>Network [ TargetLibsupc++ ]
-		[ TargetLibstdc++ ] localestub libppp.a
+		[ TargetLibstdc++ ] localestub libbsd.so libppp.a
 ;
 
 
