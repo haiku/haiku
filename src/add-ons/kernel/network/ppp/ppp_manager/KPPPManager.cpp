@@ -71,7 +71,7 @@ CreateInterface(const driver_settings *settings, ppp_interface_id parentID)
 		return 0l;
 	}
 
-	TRACE("setting ppp_interface_count %ld\n", ppp_interface_count);
+	TRACE("setting ppp_interface_count %" B_PRIu32 "\n", ppp_interface_count);
 
 	return ppp_interface_count; // only support 1 ppp connection right now
 }
@@ -113,7 +113,7 @@ CreateInterfaceWithName(const char *name, ppp_interface_id parentID)
 		return 0l;
 	}
 
-	TRACE("setting ppp_interface_count %ld\n", ppp_interface_count);
+	TRACE("setting ppp_interface_count %" B_PRIu32 "\n", ppp_interface_count);
 
 	return ppp_interface_count;
 }
@@ -199,14 +199,14 @@ GetInterface(ppp_interface_id ID)
 		= sEntryList.GetIterator();
 	while (iterator.HasNext()) {
 		entry_private* pentry = iterator.Next();
-		TRACE("testing interface id:%ld\n", pentry->accessing);
+		TRACE("testing interface id:%" B_PRId32 "\n", pentry->accessing);
 		if ((ppp_interface_id)(pentry->accessing) == ID) {
-			TRACE("get interface id:%ld\n", ID);
+			TRACE("get interface id:%" B_PRId32 "\n", ID);
 			return pentry->interface;
 		}
 	}
 
-	TRACE("can not get interface id:%ld\n", ID);
+	TRACE("can not get interface id:%" B_PRId32 "\n", ID);
 
 	return NULL;
 }

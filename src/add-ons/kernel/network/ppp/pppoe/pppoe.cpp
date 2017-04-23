@@ -228,7 +228,8 @@ pppoe_input(void *cookie, net_device *_device, net_buffer *packet)
 		}
 	}
 
-	TRACE("in pppoed processing sDevices->CountItems(): %ld\n", sDevices->CountItems());
+	TRACE("in pppoed processing sDevices->CountItems(): %" B_PRId32 "\n",
+		sDevices->CountItems());
 
 	for (int32 index = 0; index < sDevices->CountItems(); index++) {
 		device = sDevices->ItemAt(index);

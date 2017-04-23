@@ -28,7 +28,7 @@ static net_stack_module_info *sStackModule;
 status_t
 ppp_deframe(net_device* device, net_buffer* buffer)
 {
-	TRACE("%s: buffer type:%lx\n", __func__, buffer->type);
+	TRACE("%s: buffer type:0x%" B_PRIx32 "\n", __func__, buffer->type);
 	return B_OK;
 }
 
@@ -189,7 +189,7 @@ static status_t
 ppp_frame_control(net_datalink_protocol* protocol, int32 option,
 	void* argument, size_t length)
 {
-	TRACE("%s: option:%ld\n", __func__, option);
+	TRACE("%s: option:%" B_PRId32 "\n", __func__, option);
 
 	if (option >= PPPC_CONTROL_MODULE && option <=PPP_CONTROL_OPS_END)
 	{

@@ -172,7 +172,7 @@ status_t
 ppp_control(net_device *_device, int32 op, void *argument,
 	size_t length)
 {
-	TRACE("%s %ld\n", __func__, op);
+	TRACE("%s op:%" B_PRId32 "\n", __func__, op);
 	ppp_device *device = (ppp_device *)_device;
 
 	if (device->KPPP_Interface == NULL) {
