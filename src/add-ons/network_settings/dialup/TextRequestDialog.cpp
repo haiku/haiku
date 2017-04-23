@@ -11,6 +11,7 @@
 #include <Button.h>
 #include <TextControl.h>
 #include <TextView.h>
+#include <string.h>
 
 
 // GUI constants

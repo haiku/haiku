@@ -12,8 +12,6 @@
 #include "IPCPAddon.h"
 
 #include "MessageDriverSettingsUtils.h"
-#include <stl_algobase.h>
-	// for max()
 
 #include <StringView.h>
 #include <LayoutBuilder.h>

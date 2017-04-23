@@ -14,8 +14,6 @@
 #include "InterfaceUtils.h"
 #include "MessageDriverSettingsUtils.h"
 #include "TextRequestDialog.h"
-#include <stl_algobase.h>
-	// for max()
 
 #include <Box.h>
 #include <MenuField.h>

@@ -13,8 +13,6 @@
 
 #include "InterfaceUtils.h"
 #include "MessageDriverSettingsUtils.h"
-#include <stl_algobase.h>
-	// for max()
 
 #include <Box.h>
 #include <Button.h>
