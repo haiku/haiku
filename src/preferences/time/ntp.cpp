@@ -18,6 +18,8 @@
 #include <OS.h>
 
 #include <Catalog.h>
+#include <NetworkAddress.h>
+#include <NetworkAddressResolver.h>
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -114,11 +116,13 @@ status_t
 ntp_update_time(const char* hostname, const char** errorString,
 	int32* errorCode)
 {
-	hostent	*server = gethostbyname(hostname);
+	BNetworkAddressResolver resolver(hostname, NTP_PORT);
+	BNetworkAddress address;
+	uint32 cookie = 0;
+	bool success = false;
 
-	if (server == NULL) {
-	
-		*errorString = B_TRANSLATE("Could not contact server");
+	if (resolver.InitCheck() != B_OK) {
+		*errorString = B_TRANSLATE("Could not resolve server address");
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -144,15 +148,17 @@ ntp_update_time(const char* hostname, const char** errorString,
 		return B_ERROR;
 	}
 
-	struct sockaddr_in address;
-	address.sin_family = AF_INET;
-	address.sin_port = htons(NTP_PORT);
-	address.sin_addr.s_addr = *(uint32 *)server->h_addr_list[0];
+	while (resolver.GetNextAddress(&cookie, address) == B_OK) {
+		if (sendto(connection, reinterpret_cast<char*>(&message),
+				sizeof(ntp_data), 0, &address.SockAddr(),
+				address.Length()) != -1) {
+			success = true;
+			break;
+		}
+	}
 
-	if (sendto(connection, (char *)&message, sizeof(ntp_data),
-			0, (struct sockaddr *)&address, sizeof(address)) < 0) {
+	if (!success) {
 		*errorString = B_TRANSLATE("Sending request failed");
-		*errorCode = errno;
 		close(connection);
 		return B_ERROR;
 	}
@@ -175,9 +181,9 @@ ntp_update_time(const char* hostname, const char** errorString,
 
 	message.transmit_timestamp.SetTo(0);
 
-	socklen_t addressSize = sizeof(address);
-	if (recvfrom(connection, (char *)&message, sizeof(ntp_data), 0,
-			(sockaddr *)&address, &addressSize) < (ssize_t)sizeof(ntp_data)) {
+	socklen_t addressSize = address.Length();
+	if (recvfrom(connection, reinterpret_cast<char*>(&message), sizeof(ntp_data), 0,
+			&address.SockAddr(), &addressSize) < (ssize_t)sizeof(ntp_data)) {
 		*errorString = B_TRANSLATE("Message receiving failed");
 		*errorCode = errno;
 		close(connection);
