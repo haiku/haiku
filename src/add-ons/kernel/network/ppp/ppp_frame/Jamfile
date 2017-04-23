@@ -22,5 +22,6 @@ KernelAddon ppp_frame :
 ;
 
 # Installation
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/ppp
+HaikuInstall install-ppp
+	: /boot/home/config/non-packaged/add-ons/kernel/network/ppp
 	: ppp_frame ;

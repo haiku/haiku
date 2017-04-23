@@ -27,5 +27,6 @@ KernelAddon KPPPManager :
 LinkAgainst KPPPManager : libkernelppp.a ;
 
 # Installation
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/ppp
+HaikuInstall install-ppp
+	: /boot/home/config/non-packaged/add-ons/kernel/network/ppp
 	: KPPPManager ;

@@ -31,6 +31,6 @@ BinCommand ppp_up :
 ;
 
 # Installation
-HaikuInstall install-networking
-	: /boot/beos/bin
-	: ppp_up ;
+HaikuInstall install-ppp
+    : /boot/home/config/non-packaged/bin
+    : ppp_up ;

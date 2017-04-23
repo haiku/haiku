@@ -25,6 +25,6 @@ KernelAddon pppoe :
 LinkAgainst pppoe : libkernelppp.a ;
 
 # Installation
-HaikuInstall install-networking
-	: /boot/home/config/add-ons/kernel/haiku/ppp
+HaikuInstall install-ppp
+	: /boot/home/config/non-packaged/add-ons/kernel/network/ppp
 	: pppoe ;
