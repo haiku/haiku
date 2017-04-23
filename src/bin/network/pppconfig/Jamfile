@@ -18,7 +18,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 BinCommand pppconfig :
 	pppconfig.cpp
 	:
-	be libppp.a $(TARGET_LIBSUPC++) $(TARGET_NETWORK_LIBS)
+	be libppp.a [ TargetLibsupc++ ] libbsd.so $(TARGET_NETWORK_LIBS)
 ;
 
 # Installation -- in the test directory for the time being
