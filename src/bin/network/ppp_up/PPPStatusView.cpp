@@ -152,10 +152,10 @@ PPPStatusView::Pulse()
 	int32 hours = time / 60;
 	char minsec[7];
 	if(hours) {
-		sprintf(minsec, ":%02ld:%02ld", minutes, seconds);
+		sprintf(minsec, ":%02" B_PRId32 ":%02" B_PRId32, minutes, seconds);
 		text << hours << minsec;
 	} else if(minutes) {
-		sprintf(minsec, "%ld:%02ld", minutes, seconds);
+		sprintf(minsec, "%" B_PRId32 ":%02" B_PRId32, minutes, seconds);
 		text << minsec;
 	} else
 		text << seconds;
