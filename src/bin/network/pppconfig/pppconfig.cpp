@@ -1,6 +1,10 @@
 /*
  * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2006-2017, Haiku, Inc. All rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *   Alexander von Gluck IV <kallisti5@unixzen.com>
  */
 
 #include <cstdio>
@@ -53,7 +57,8 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 		return -1;
 	}
 
-	fprintf(stderr, "Get %ld ppp interfaces, first is %ld!\n", count, interfaces[0]);
+	fprintf(stderr, "Get %" B_PRId32 " ppp interfaces, first is %" B_PRIu32 "!\n",
+		count, interfaces[0]);
 
 	ppp_interface_info_t info;
 	PPPInterface interface;
@@ -70,14 +75,14 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 			// type and unit (if it has one)
 			if (info.info.if_unit >= 0) {
 				printf("Type: Visible\n");
-				printf("\tInterface: ppp%ld\n", info.info.if_unit);
+				printf("\tInterface: ppp%" B_PRId32 "\n", info.info.if_unit);
 			} else
 				printf("Type: Hidden\n");
 			
 			printf("\tName: %s\n", info.info.name);
 			
 			// ID
-			printf("\tID: %ld\n", interface.ID());
+			printf("\tID: %" B_PRIu32 "\n", interface.ID());
 			
 			// mode
 			printf("\tMode: ");
@@ -131,16 +136,16 @@ create(const char *name, bool bringUp = true)
 		return -1;
 	}
 	
-	printf("Created interface with ID: %ld\n", interface.ID());
+	printf("Created interface with ID: %" B_PRIu32 "\n", interface.ID());
 	
 	ppp_interface_info_t info;
 	interface.GetInterfaceInfo(&info);
 	
 	if (info.info.if_unit >= 0)
-		printf("Interface: ppp%ld\n", info.info.if_unit);
+		printf("Interface: ppp%" B_PRId32 "\n", info.info.if_unit);
 	else
 		printf("This interface is hidden! You can delete it by typing:\n"
-			"pppconfig delete %ld\n", interface.ID());
+			"pppconfig delete %" B_PRIu32 "\n", interface.ID());
 	
 	if (bringUp) {
 		interface.Up();
@@ -538,8 +543,8 @@ controlprotocol(const char *name)
 	printf("protocol: %s\n", info.info.name);
 	printf("type: %s\n", info.info.type);
 	printf("activationPhase: %d\n", info.info.activationPhase);
-	printf("addressFamily: %ld\n", info.info.addressFamily);
-	printf("flags: %ld\n", info.info.flags);
+	printf("addressFamily: %" B_PRId32 "\n", info.info.addressFamily);
+	printf("flags: %" B_PRId32 "\n", info.info.flags);
 	printf("side: %d\n", info.info.side);
 	printf("level: %d\n", info.info.level);
 	printf("connectionPhase: %d\n", info.info.connectionPhase);
@@ -582,10 +587,10 @@ controldevice(const char *name)
 	}
 
 	printf("name: %s\n", info.info.name);
-	printf("MTU: %ld\n", info.info.MTU);
-	printf("inputTransferRate: %ld\n", info.info.inputTransferRate);
-	printf("outputTransferRate: %ld\n", info.info.outputTransferRate);
-	printf("outputBytesCount: %ld\n", info.info.outputBytesCount);
+	printf("MTU: %" B_PRIu32 "\n", info.info.MTU);
+	printf("inputTransferRate: %" B_PRIu32 "\n", info.info.inputTransferRate);
+	printf("outputTransferRate: %" B_PRIu32 "\n", info.info.outputTransferRate);
+	printf("outputBytesCount: %" B_PRIu32 "\n", info.info.outputBytesCount);
 	printf("isUp: %d\n", info.info.isUp);
 
 	return 0;
@@ -663,7 +668,7 @@ show_details(const char *name)
 		
 	PPPInterface interface(ID);
 	if (interface.InitCheck() != B_OK) {
-		fprintf(stderr, "Error: Could not find interface ID: %ld!\n", ID);
+		fprintf(stderr, "Error: Could not find interface ID: %" B_PRIu32 "!\n", ID);
 		return -1;
 	}
 	
@@ -674,14 +679,14 @@ show_details(const char *name)
 	// type and name (if it has one)
 	if (info.info.if_unit >= 0) {
 		printf("Type: Visible\n");
-		printf("Interface: ppp%ld\n", info.info.if_unit);
+		printf("Interface: ppp%" B_PRId32 "\n", info.info.if_unit);
 	} else
 		printf("Type: Hidden\n");
 	
 	printf("Name: %s\n", info.info.name);
 	
 	// ID
-	printf("ID: %ld\n", interface.ID());
+	printf("ID: %" B_PRIu32 "\n", interface.ID());
 	
 	// ConnectOnDemand
 	printf("ConnectOnDemand: %s\n", info.info.doesConnectOnDemand ?
@@ -692,8 +697,8 @@ show_details(const char *name)
 		"Enabled" : "Disabled");
 	
 	// MRU and interfaceMTU
-	printf("MRU: %ld\n", info.info.MRU);
-	printf("Interface MTU: %ld\n", info.info.interfaceMTU);
+	printf("MRU: %" B_PRIu32 "\n", info.info.MRU);
+	printf("Interface MTU: %" B_PRIu32 "\n", info.info.interfaceMTU);
 	
 	// mode
 	printf("Mode: ");
