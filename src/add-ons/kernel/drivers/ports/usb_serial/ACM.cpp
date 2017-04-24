@@ -57,12 +57,23 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 		slaveIndex = cmDesc ? cmDesc->data_interface
 			: unionDesc ? unionDesc->slave_interfaces[0] : 0;
 
-		TRACE("ACM device found on configuration #%d: master itf: %d, slave/data itf: %d\n",
-				config->descr->configuration, masterIndex, slaveIndex);
+		TRACE("ACM device found on configuration #%d: master itf: %d, "
+				"slave/data itf: %d\n", config->descr->configuration,
+				masterIndex, slaveIndex);
+
+		// Some ACM USB devices report the wrong unions which rightfully
+		// breaks probing. Some drivers keep a list of these devices,
+		// for now we just assume idential indexes are wrong.
+		if (masterIndex == slaveIndex) {
+			TRACE_ALWAYS("Command interface matches data interface, "
+				"assuming broken union quirk!\n");
+			masterIndex = 0;
+			slaveIndex = 1;
+		}
+
 		status = B_OK;
 		break;
 	}
-
 
 	if (status == B_OK && masterIndex < config->interface_count) {
 		// check that the indicated master interface fits our need
@@ -72,8 +83,10 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 			|| descriptor->interface_class == USB_CDC_DATA_INTERFACE_CLASS)
 			&& interface->endpoint_count >= 1) {
 			SetControlPipe(interface->endpoint[0].handle);
-		} else
+		} else {
+			TRACE("Indicated command interface doesn't fit our needs!\n");
 			status = ENODEV;
+		}
 	}
 
 	if (status == B_OK && slaveIndex < config->interface_count) {
@@ -91,8 +104,10 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 				SetReadPipe(interface->endpoint[1].handle);
 			else
 				SetWritePipe(interface->endpoint[1].handle);
-		} else
+		} else {
+			TRACE("Indicated data interface doesn't fit our needs!\n");
 			status = ENODEV;
+		}
 	}
 
 	TRACE_FUNCRET("< ACMDevice::AddDevice() returns: 0x%08x\n", status);
