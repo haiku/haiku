@@ -24,7 +24,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	People PoorMan PowerStatus
 	RemoteDesktop
-	Screenshot SerialConnect SoundRecorder
+	Screenshot SerialConnect SoftwareUpdater SoundRecorder
 	TV
 ] ;
 
@@ -34,7 +34,7 @@ DESKBAR_APPLICATIONS +=
 	Icon-O-Matic Installer
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	People PoorMan
-	SerialConnect SoundRecorder
+	SerialConnect SoftwareUpdater SoundRecorder
 	TV
 ;
 
