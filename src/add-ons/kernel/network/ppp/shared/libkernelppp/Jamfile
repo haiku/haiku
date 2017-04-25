@@ -1,14 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp shared libkernelppp ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-		# Needed for the atomic_add64() prototype. :-/
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# We need the public network headers also when not compiling for Haiku.
-		# Unfortunately we get more than we want, namely all POSIX headers.
-}
+SubDirC++Flags -fno-rtti ;
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
@@ -19,14 +12,9 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
 
-{
-	SubDirC++Flags -fno-rtti ;
-}
-
-
 KernelStaticLibrary libkernelppp.a :
 	kernel_cpp.cpp
-	
+
 	KPPPConfigurePacket.cpp
 	KPPPDevice.cpp
 	KPPPInterface.cpp
@@ -39,7 +27,7 @@ KernelStaticLibrary libkernelppp.a :
 	KPPPStateMachine.cpp
 	KPPPUtils.cpp
 	settings_tools.cpp
-	
+
 	# integrated modules
 	_KPPPMRUHandler.cpp
 	_KPPPAuthenticationHandler.cpp

@@ -3,13 +3,10 @@ SubDir HAIKU_TOP src add-ons kernel network ppp modem ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-
-# for kernel_cpp.h and BLocker
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
-UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
 
