@@ -34,7 +34,7 @@ platform_init_heap(struct stage2_args *args, void **_base, void **_top)
 		return B_NO_MEMORY;
 
 	*_base = (void*)staging;
-	*_top = (void*)((int8*)staging + STAGE_PAGES * PAGE_SIZE);
+	*_top = (void*)((int8*)staging + STAGE_PAGES * B_PAGE_SIZE);
 
 	return B_OK;
 }
