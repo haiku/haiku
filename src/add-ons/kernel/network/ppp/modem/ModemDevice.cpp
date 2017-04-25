@@ -25,14 +25,14 @@ dump_packet(struct mbuf *packet)
 {
 	if(!packet)
 		return;
-	
+
 	uint8 *data = mtod(packet, uint8*);
 	uint8 buffer[33];
 	uint8 bufferIndex = 0;
-	
+
 	TRACE("Dumping packet;len=%ld;pkthdr.len=%d\n", packet->m_len,
 		packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : -1);
-	
+
 	for(uint32 index = 0; index < packet->m_len; index++) {
 		buffer[bufferIndex++] = sDigits[data[index] >> 4];
 		buffer[bufferIndex++] = sDigits[data[index] & 0x0F];
@@ -52,7 +52,7 @@ modem_put_line(int32 handle, const char *string, int32 length)
 	char line[128];
 	if(length > 126)
 		return -1;
-	
+
 	sprintf(line, "%s\r", string);
 	return write(handle, line, length + 1);
 }
@@ -63,9 +63,9 @@ modem_get_line(int32 handle, char *string, int32 length, const char *echo)
 {
 	if(!string || length < 40)
 		return -1;
-	
+
 	int32 result, position = 0;
-	
+
 	while(position < length) {
 		result = read(handle, string + position, 1);
 		if(result < 0)
@@ -77,14 +77,14 @@ modem_get_line(int32 handle, char *string, int32 length, const char *echo)
 					position = 0;
 					continue;
 				}
-				
+
 				return position;
 			}
-			
+
 			position++;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -96,7 +96,7 @@ worker_thread(void *data)
 	ModemDevice *device = (ModemDevice*) data;
 	int32 handle = device->Handle();
 	uint8 buffer[MODEM_MTU];
-	
+
 	// send init string
 	if(modem_put_line(handle, device->InitString(), strlen(device->InitString())) < 0
 			|| modem_get_line(handle, (char*) buffer, sizeof(buffer),
@@ -105,7 +105,7 @@ worker_thread(void *data)
 		device->FailedDialing();
 		return B_ERROR;
 	}
-	
+
 	// send dial string
 	if(modem_put_line(handle, device->DialString(), strlen(device->DialString())) < 0
 			|| modem_get_line(handle, (char*) buffer, sizeof(buffer),
@@ -114,54 +114,54 @@ worker_thread(void *data)
 		device->FailedDialing();
 		return B_ERROR;
 	}
-	
+
 	if(strlen((char*) buffer) > 8)
 		device->SetSpeed(atoi((char*) buffer + 8));
 	else
 		device->SetSpeed(19200);
-	
+
 	// TODO: authenticate if needed
-	
+
 	device->FinishedDialing();
-	
+
 	// start decoding
 	int32 length = 0, position = 0;
 	bool inPacket = true, needsEscape = false;
-	
+
 	while(true) {
 		// ignore data if buffer is full
 		if(position == MODEM_MTU)
 			position = 0;
-		
+
 		length = read(handle, buffer + position, MODEM_MTU - position);
-		
+
 		if(length < 0 || !device->IsUp()) {
 			device->ConnectionLost();
 			return B_ERROR;
 		}
-		
+
 		// decode the packet
 		for(int32 index = 0; index < length; ) {
 			if(buffer[position] == FLAG_SEQUENCE) {
 				if(inPacket && position > 0)
 					device->DataReceived(buffer, position);
 						// DataReceived() will check FCS
-				
+
 				length = length - index - 1;
 					// remaining data length
 				memmove(buffer, buffer + position + 1, length);
 				position = index = 0;
-				
+
 				needsEscape = false;
 				inPacket = true;
 				continue;
 			}
-			
+
 			if(buffer[position + index] < 0x20) {
 				++index;
 				continue;
 			}
-			
+
 			if(needsEscape) {
 				buffer[position] = buffer[position + index] ^ 0x20;
 				++position;
@@ -191,23 +191,23 @@ ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	if(!settings || !settings->parameters)
 		TRACE("ModemDevice::ctor: No settings!\n");
 #endif
-	
+
 	fACFC = new ACFCHandler(REQUEST_ACFC | ALLOW_ACFC, interface);
 	if(!interface.LCP().AddOptionHandler(fACFC)) {
 		fInitStatus = B_ERROR;
 		return;
 	}
-	
+
 	interface.SetPFCOptions(PPP_REQUEST_PFC | PPP_ALLOW_PFC);
-	
+
 	SetSpeed(19200);
 	SetMTU(MODEM_MTU);
 		// MTU size does not contain PPP header
-	
+
 	fPortName = get_parameter_value(MODEM_PORT_KEY, settings);
 	fInitString = get_parameter_value(MODEM_INIT_KEY, settings);
 	fDialString = get_parameter_value(MODEM_DIAL_KEY, settings);
-	
+
 	TRACE("ModemDevice::ctor: interfaceName: %s\n", fPortName);
 }
 
@@ -223,7 +223,7 @@ ModemDevice::InitCheck() const
 {
 	if(fState != INITIAL && Handle() == -1)
 		return B_ERROR;
-	
+
 	return PortName() && InitString() && DialString()
 		&& KPPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
 }
@@ -233,16 +233,16 @@ bool
 ModemDevice::Up()
 {
 	TRACE("ModemDevice: Up()\n");
-	
+
 	if(InitCheck() != B_OK)
 		return false;
-	
+
 	if(IsUp())
 		return true;
-	
+
 	fState = INITIAL;
 		// reset state
-	
+
 	// check if we are allowed to go up now (user intervention might disallow that)
 	if(!UpStarted()) {
 		CloseModem();
@@ -250,17 +250,17 @@ ModemDevice::Up()
 		return true;
 			// there was no error
 	}
-	
+
 	OpenModem();
-	
+
 	fState = DIALING;
-	
+
 	if(fWorkerThread == -1) {
 		fWorkerThread = spawn_kernel_thread(worker_thread, "Modem: worker_thread",
 			B_NORMAL_PRIORITY, this);
 		resume_thread(fWorkerThread);
 	}
-	
+
 	return true;
 }
 
@@ -269,29 +269,29 @@ bool
 ModemDevice::Down()
 {
 	TRACE("ModemDevice: Down()\n");
-	
+
 	if(InitCheck() != B_OK)
 		return false;
-	
+
 	fState = TERMINATING;
-	
+
 	if(!IsUp()) {
 		fState = INITIAL;
 		CloseModem();
 		DownEvent();
 		return true;
 	}
-	
+
 	DownStarted();
 		// this tells StateMachine that DownEvent() does not mean we lost connection
-	
+
 	// worker_thread will notice that we are terminating (IsUp() == false)
 	// ConnectionLost() will be called so we can terminate the connection there.
 	int32 tmp;
 	wait_for_thread(fWorkerThread, &tmp);
-	
+
 	DownEvent();
-	
+
 	return true;
 }
 
@@ -331,16 +331,16 @@ ModemDevice::OpenModem()
 {
 	if(Handle() >= 0)
 		return;
-	
+
 	fHandle = open(PortName(), O_RDWR);
-	
+
 	// init port
 	struct termios options;
 	if(ioctl(fHandle, TCGETA, &options) != B_OK) {
 		ERROR("ModemDevice: Could not retrieve port options!\n");
 		return;
 	}
-	
+
 	// adjust options
 	options.c_cflag &= ~CBAUD;
 	options.c_cflag |= B115200;
@@ -349,7 +349,7 @@ ModemDevice::OpenModem()
 	options.c_oflag &= ~OPOST;
 	options.c_cc[VMIN] = 0;
 	options.c_cc[VTIME] = 10;
-	
+
 	// set new options
 	if(ioctl(fHandle, TCSETA, &options) != B_OK) {
 		ERROR("ModemDevice: Could not init port!\n");
@@ -363,7 +363,7 @@ ModemDevice::CloseModem()
 {
 	if(Handle() >= 0)
 		close(Handle());
-	
+
 	fHandle = -1;
 }
 
@@ -397,7 +397,7 @@ ModemDevice::ConnectionLost()
 	if(write(Handle(), ESCAPE_SEQUENCE, strlen(ESCAPE_SEQUENCE)) < 0)
 		return;
 	snooze(ESCAPE_DELAY);
-	
+
 	modem_put_line(Handle(), AT_HANG_UP, strlen(AT_HANG_UP));
 	CloseModem();
 }
@@ -410,7 +410,7 @@ ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 	TRACE("ModemDevice: Send()\n");
 	dump_packet(packet);
 #endif
-	
+
 	if(!packet)
 		return B_ERROR;
 	else if(InitCheck() != B_OK || protocolNumber != 0) {
@@ -420,40 +420,40 @@ ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 		m_freem(packet);
 		return PPP_NO_CONNECTION;
 	}
-	
+
 	// we might need room for our header
 	if(fACFC->LocalState() != ACFC_ACCEPTED) {
 		M_PREPEND(packet, 2);
 		if(!packet)
 			return B_ERROR;
 	}
-	
+
 	int32 position = 0, length;
 	if(packet->m_flags & M_PKTHDR)
 		length = packet->m_pkthdr.len;
 	else
 		length = packet->m_len;
-	
+
 	// we need a contiguous chunk of memory
 	packet = m_pullup(packet, length);
 	if(!packet)
 		return B_ERROR;
-	
+
 	uint8 buffer[2 * (MODEM_MTU + PACKET_OVERHEAD)], *data = mtod(packet, uint8*);
-	
+
 	// add header
 	if(fACFC->LocalState() != ACFC_ACCEPTED) {
 		data[0] = ALL_STATIONS;
 		data[1] = UI;
 	}
-	
+
 	// add FCS
 	uint16 fcs = 0xffff;
 	fcs = pppfcs16(fcs, data, length);
 	fcs ^= 0xffff;
 	data[length++] = fcs & 0x00ff;
 	data[length++] = (fcs & 0xff00) >> 8;
-	
+
 	// encode packet
 	buffer[position++] = FLAG_SEQUENCE;
 		// mark beginning of packet
@@ -467,15 +467,15 @@ ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 	}
 	buffer[position++] = FLAG_SEQUENCE;
 		// mark end of packet
-	
+
 	m_freem(packet);
-	
+
 	// send to modem
 	atomic_add((int32*) &fOutputBytes, position);
 	if(write(Handle(), buffer, position) < 0)
 		return PPP_NO_CONNECTION;
 	atomic_add((int32*) &fOutputBytes, -position);
-	
+
 	return B_OK;
 }
 
@@ -484,25 +484,25 @@ status_t
 ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 {
 	// TODO: report corrupted packets to KPPPInterface
-	
+
 	if(length < 3)
 		return B_ERROR;
-	
+
 	// check FCS
 	uint16 fcs = 0xffff;
 	fcs = pppfcs16(fcs, buffer, length - 2);
 	fcs ^= 0xffff;
 	if(buffer[length - 2] != fcs & 0x00ff || buffer[length - 1] != (fcs & 0xff00) >> 8)
 		return B_ERROR;
-	
+
 	if(buffer[0] == ALL_STATIONS && buffer[1] == UI)
 		buffer += 2;
-	
+
 	mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_len = packet->m_pkthdr.len = length - 2;
 	uint8 *data = mtod(packet, uint8*);
 	memcpy(data, buffer, length - 2);
-	
+
 	return Receive(packet);
 }
 
@@ -511,13 +511,13 @@ status_t
 ModemDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	// we do not need to lock because only the worker_thread calls this method
-	
+
 	if(!packet)
 		return B_ERROR;
 	else if(InitCheck() != B_OK || !IsUp()) {
 		m_freem(packet);
 		return B_ERROR;
 	}
-	
+
 	return Interface().ReceiveFromDevice(packet);
 }

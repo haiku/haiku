@@ -27,7 +27,7 @@ ACFCHandler::AddToRequest(KPPPConfigurePacket& request)
 	if(fLocalState == ACFC_REJECTED
 			|| (Options() & REQUEST_ACFC) == 0)
 		return B_OK;
-	
+
 	// add ACFC request
 	ppp_configure_item item;
 	item.type = kACFCType;
@@ -42,7 +42,7 @@ ACFCHandler::ParseNak(const KPPPConfigurePacket& nak)
 	// naks do not contain ACFC items
 	if(nak.ItemWithType(kACFCType))
 		return B_ERROR;
-	
+
 	return B_OK;
 }
 
@@ -52,11 +52,11 @@ ACFCHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	if(reject.ItemWithType(kACFCType)) {
 		fLocalState = ACFC_REJECTED;
-		
+
 		if(Options() & FORCE_ACFC_REQUEST)
 			return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
@@ -68,11 +68,11 @@ ACFCHandler::ParseAck(const KPPPConfigurePacket& ack)
 		fLocalState = ACFC_ACCEPTED;
 	else {
 		fLocalState = ACFC_DISABLED;
-		
+
 		if(Options() & FORCE_ACFC_REQUEST)
 			return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
@@ -83,14 +83,14 @@ ACFCHandler::ParseRequest(const KPPPConfigurePacket& request,
 {
 	if(!request.ItemWithType(kACFCType))
 		return B_OK;
-	
+
 	if((Options() & ALLOW_ACFC) == 0) {
 		ppp_configure_item item;
 		item.type = kACFCType;
 		item.length = 2;
 		return reject.AddItem(&item) ? B_OK : B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
@@ -99,15 +99,15 @@ status_t
 ACFCHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	ppp_configure_item *item = ack.ItemWithType(kACFCType);
-	
+
 	if(item && (Options() & ALLOW_ACFC) == 0)
 		return B_ERROR;
-	
+
 	if(item)
 		fPeerState = ACFC_ACCEPTED;
 	else
 		fPeerState = ACFC_DISABLED;
-	
+
 	return B_OK;
 }
 

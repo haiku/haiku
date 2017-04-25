@@ -27,7 +27,7 @@ add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 {
 	if(mainInterface.Mode() != PPP_CLIENT_MODE || type != PPP_DEVICE_KEY_TYPE)
 		return B_ERROR;
-	
+
 	ModemDevice *device;
 	bool success;
 	if(subInterface) {
@@ -37,10 +37,10 @@ add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 		device = new ModemDevice(mainInterface, settings);
 		success = mainInterface.SetDevice(device);
 	}
-	
+
 	TRACE("Modem: add_to(): %s\n",
 		success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
-	
+
 	return success && device && device->InitCheck() == B_OK;
 }
 
@@ -58,22 +58,22 @@ static ppp_module_info modem_module = {
 
 _EXPORT
 status_t
-std_ops(int32 op, ...) 
+std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
 			if(get_module(NET_CORE_MODULE_NAME, (module_info**)&core) != B_OK)
 				return B_ERROR;
 		return B_OK;
-		
+
 		case B_MODULE_UNINIT:
 			put_module(NET_CORE_MODULE_NAME);
 		break;
-		
+
 		default:
 			return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 

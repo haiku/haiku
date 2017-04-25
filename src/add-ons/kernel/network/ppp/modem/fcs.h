@@ -3,15 +3,15 @@
 		http://www.faqs.org/rfcs/rfc1662.html
 		*/
 
-/* 
-    * u16 represents an unsigned 16-bit number.  Adjust the typedef for 
-    * your hardware. 
-    */ 
-   typedef uint16 u16; 
+/*
+    * u16 represents an unsigned 16-bit number.  Adjust the typedef for
+    * your hardware.
+    */
+   typedef uint16 u16;
 
-   /* 
-    * FCS lookup table as calculated by the table generator. 
-    */ 
+   /*
+    * FCS lookup table as calculated by the table generator.
+    */
    static u16 fcstab[256] = {
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
     0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
@@ -45,18 +45,18 @@
     0x6b46, 0x7acf, 0x4854, 0x59dd, 0x2d62, 0x3ceb, 0x0e70, 0x1ff9,
     0xf78f, 0xe606, 0xd49d, 0xc514, 0xb1ab, 0xa022, 0x92b9, 0x8330,
     0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
-}; 
+};
 
-   #define PPPINITFCS16    0xffff  /* Initial FCS value */ 
-   #define PPPGOODFCS16    0xf0b8  /* Good final FCS value */ 
+   #define PPPINITFCS16    0xffff  /* Initial FCS value */
+   #define PPPGOODFCS16    0xf0b8  /* Good final FCS value */
 
-   /* 
-    * Calculate a new fcs given the current fcs and the new data. 
-    */ 
-   u16 pppfcs16(u16 fcs, unsigned char *cp, int len) 
-   { 
-       while (len--) 
-           fcs = (fcs >> 8) ^ fcstab[(fcs ^ *cp++) & 0xff]; 
+   /*
+    * Calculate a new fcs given the current fcs and the new data.
+    */
+   u16 pppfcs16(u16 fcs, unsigned char *cp, int len)
+   {
+       while (len--)
+           fcs = (fcs >> 8) ^ fcstab[(fcs ^ *cp++) & 0xff];
 
-       return (fcs); 
-   } 
+       return (fcs);
+   }

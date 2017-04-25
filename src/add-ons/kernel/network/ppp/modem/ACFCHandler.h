@@ -30,23 +30,23 @@ enum acfc_state {
 class ACFCHandler : public KPPPOptionHandler {
 	public:
 		ACFCHandler(uint32 options, KPPPInterface& interface);
-		
+
 		uint32 Options() const
 			{ return fOptions; }
 		acfc_state LocalState() const
 			{ return fLocalState; }
 		acfc_state PeerState() const
 			{ return fPeerState; }
-		
+
 		virtual status_t AddToRequest(KPPPConfigurePacket& request);
 		virtual status_t ParseNak(const KPPPConfigurePacket& nak);
 		virtual status_t ParseReject(const KPPPConfigurePacket& reject);
 		virtual status_t ParseAck(const KPPPConfigurePacket& ack);
-		
+
 		virtual status_t ParseRequest(const KPPPConfigurePacket& request,
 			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject);
 		virtual status_t SendingAck(const KPPPConfigurePacket& ack);
-		
+
 		virtual void Reset();
 
 	private:
