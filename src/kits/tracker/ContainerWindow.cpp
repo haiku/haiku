@@ -100,10 +100,6 @@ All rights reserved.
 #define B_TRANSLATION_CONTEXT "ContainerWindow"
 
 
-const uint32 kRedo = 'REDO';
-	// this is the same as B_REDO in Dano/Zeta/Haiku
-
-
 #ifdef _IMPEXP_BE
 _IMPEXP_BE
 #endif
@@ -555,7 +551,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	// ToDo: remove me once we have undo/redo menu items
 	// (that is, move them to AddShortcuts())
 	AddShortcut('Z', B_COMMAND_KEY, new BMessage(B_UNDO), this);
-	AddShortcut('Z', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kRedo), this);
+	AddShortcut('Z', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO), this);
 }
 
 
@@ -1684,9 +1680,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 			FSUndo();
 			break;
 
-		//case B_REDO:
-			// only defined in Dano/Zeta/OpenBeOS
-		case kRedo:
+		case B_REDO:
 			FSRedo();
 			break;
 
