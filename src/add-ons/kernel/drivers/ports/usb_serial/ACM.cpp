@@ -63,7 +63,7 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 
 		// Some ACM USB devices report the wrong unions which rightfully
 		// breaks probing. Some drivers keep a list of these devices,
-		// for now we just assume idential indexes are wrong.
+		// for now we just assume identical indexes are wrong.
 		if (masterIndex == slaveIndex) {
 			TRACE_ALWAYS("Command interface matches data interface, "
 				"assuming broken union quirk!\n");
