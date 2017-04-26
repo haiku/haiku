@@ -482,8 +482,11 @@ ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 	uint16 fcs = 0xffff;
 	fcs = pppfcs16(fcs, buffer, length - 2);
 	fcs ^= 0xffff;
-	if(buffer[length - 2] != fcs & 0x00ff || buffer[length - 1] != (fcs & 0xff00) >> 8)
+	if (buffer[length - 2] != (fcs & 0x00ff)
+		|| buffer[length - 1] != (fcs & 0xff00) >> 8) {
+		ERROR("ModemDevice: Incorrect FCS!\n");
 		return B_ERROR;
+	}
 
 	if(buffer[0] == ALL_STATIONS && buffer[1] == UI)
 		buffer += 2;
