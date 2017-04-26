@@ -123,10 +123,10 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		// load settings from description file
 		char path[B_PATH_NAME_LENGTH];
 		sprintf(path, "ptpnet/%s", name);
-			// XXX: TODO: change base path to "/etc/ptpnet"
 
 		void *handle = load_driver_settings(path);
 		if (!handle) {
+			ERROR("KPPPInterface: Unable to load %s PPP driver settings!\n", path);
 			fInitStatus = B_ERROR;
 			return;
 		}
@@ -138,6 +138,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 			// use the given settings
 
 	if (!fSettings) {
+		ERROR("KPPPInterface: No fSettings!\n");
 		fInitStatus = B_ERROR;
 		return;
 	}
@@ -145,6 +146,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	// add internal modules
 	// LCP
 	if (!AddProtocol(&LCP())) {
+		ERROR("KPPPInterface: Could not add LCP protocol!\n");
 		fInitStatus = B_ERROR;
 		return;
 	}
