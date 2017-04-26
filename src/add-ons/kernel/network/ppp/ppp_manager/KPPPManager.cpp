@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Lin Longzhou, linlongzhou@163.com
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 #include <net_stack.h>
@@ -35,10 +36,10 @@ static uint32 ppp_interface_count;
 
 
 //	#pragma mark -
-static KPPPInterface * GetInterface(ppp_interface_id ID);
+static KPPPInterface* GetInterface(ppp_interface_id ID);
 
 static ppp_interface_id
-CreateInterface(const driver_settings *settings, ppp_interface_id parentID)
+CreateInterface(const driver_settings* settings, ppp_interface_id parentID)
 {
 	MutexLocker _(sListLock); // auto_lock
 
@@ -53,16 +54,17 @@ CreateInterface(const driver_settings *settings, ppp_interface_id parentID)
 	}
 
 	ppp_interface_count++;
-
-	if (GetInterface(ppp_interface_count) != NULL)
+	if (GetInterface(ppp_interface_count) != NULL) {
+		TRACE("PPP Interface already exists!\n");
 		return 0l;
+	}
 
 	entry_private* pentry = new (std::nothrow) entry_private;
 	memset(pentry, 0, sizeof(entry_private));
 	pentry->accessing = ppp_interface_count;
 	sEntryList.Add(pentry);
 
-	KPPPInterface *device = new (std::nothrow) KPPPInterface(NULL,
+	KPPPInterface* device = new (std::nothrow) KPPPInterface(NULL,
 		pentry, ppp_interface_count, NULL, NULL);
 
 	if (device == NULL || pentry == NULL) {
@@ -78,7 +80,7 @@ CreateInterface(const driver_settings *settings, ppp_interface_id parentID)
 
 
 static ppp_interface_id
-CreateInterfaceWithName(const char *name, ppp_interface_id parentID)
+CreateInterfaceWithName(const char* name, ppp_interface_id parentID)
 {
 	MutexLocker _(sListLock); // auto_lock
 
@@ -94,7 +96,7 @@ CreateInterfaceWithName(const char *name, ppp_interface_id parentID)
 
 	ppp_interface_count++;
 	if (GetInterface(ppp_interface_count) != NULL) {
-		TRACE("PPP Interface already exist!\n");
+		TRACE("PPP Interface already exists!\n");
 		return 0l;
 	}
 
@@ -159,7 +161,7 @@ RemoveInterface(ppp_interface_id ID)
 }
 
 
-static net_device *
+static net_device*
 RegisterInterface(ppp_interface_id ID)
 {
 	// MutexLocker _(sListLock); // auto_lock
@@ -179,7 +181,7 @@ RegisterInterface(ppp_interface_id ID)
 	if (entry == NULL)
 		return NULL;
 
-	ppp_device *device = new (std::nothrow) ppp_device;
+	ppp_device* device = new (std::nothrow) ppp_device;
 	if (device == NULL)
 		return NULL;
 
@@ -190,7 +192,7 @@ RegisterInterface(ppp_interface_id ID)
 }
 
 
-static KPPPInterface *
+static KPPPInterface*
 GetInterface(ppp_interface_id ID)
 {
 	// MutexLocker _(sListLock); // auto_lock
@@ -224,7 +226,7 @@ UnregisterInterface(ppp_interface_id ID)
 
 
 static status_t
-ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t length)
+ControlInterface(ppp_interface_id ID, uint32 op, void* data, size_t length)
 {
 	MutexLocker _(sListLock); // auto_lock
 
@@ -244,7 +246,7 @@ ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t length)
 
 
 static int32
-GetInterfaces(ppp_interface_id *interfaces, int32 count, ppp_interface_filter filter)
+GetInterfaces(ppp_interface_id* interfaces, int32 count, ppp_interface_filter filter)
 {
 	MutexLocker _(sListLock);
 
