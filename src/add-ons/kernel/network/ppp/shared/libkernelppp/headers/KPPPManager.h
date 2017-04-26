@@ -11,7 +11,7 @@
 #include <PPPControl.h>
 #include <PPPReportDefs.h>
 
-#define PPP_INTERFACE_MODULE_NAME	NETWORK_MODULES_ROOT	"/ppp/KPPPManager/v1"
+#define PPP_INTERFACE_MODULE_NAME	NETWORK_MODULES_ROOT	"/ppp/ppp_manager/v1"
 
 #define PPP_UNDEFINED_INTERFACE_ID	0
 	// CreateInterface() returns this value on failure

@@ -12,13 +12,13 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
 
-KernelAddon KPPPManager :
+KernelAddon ppp_manager :
 	KPPPManager.cpp
 ;
 
-LinkAgainst KPPPManager : libkernelppp.a ;
+LinkAgainst ppp_manager : libkernelppp.a ;
 
 # Installation
 HaikuInstall install-ppp
 	: /boot/home/config/non-packaged/add-ons/kernel/network/ppp
-	: KPPPManager ;
+	: ppp_manager ;
