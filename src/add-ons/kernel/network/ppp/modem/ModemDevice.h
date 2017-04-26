@@ -2,9 +2,9 @@
  * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef MODEM_DEVICE__H
 #define MODEM_DEVICE__H
+
 
 #include "Modem.h"
 

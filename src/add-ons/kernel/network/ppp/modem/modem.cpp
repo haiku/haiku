@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <KernelExport.h>
 #include <driver_settings.h>
 
@@ -23,12 +24,12 @@ static bool
 add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 	driver_parameter *settings, ppp_module_key_type type)
 {
-	if(mainInterface.Mode() != PPP_CLIENT_MODE || type != PPP_DEVICE_KEY_TYPE)
+	if (mainInterface.Mode() != PPP_CLIENT_MODE || type != PPP_DEVICE_KEY_TYPE)
 		return B_ERROR;
 
 	ModemDevice *device;
 	bool success;
-	if(subInterface) {
+	if (subInterface) {
 		device = new ModemDevice(*subInterface, settings);
 		success = subInterface->SetDevice(device);
 	} else {

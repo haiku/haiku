@@ -2,7 +2,6 @@
  * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef MODEM__H
 #define MODEM__H
 
@@ -12,8 +11,8 @@
 #include <net_buffer.h>
 #include <net_stack.h>
 
-class ModemDevice;
 
+class ModemDevice;
 
 #define CONTROL_ESCAPE		0x7d
 #define FLAG_SEQUENCE		0x7e
