@@ -48,7 +48,7 @@ BSimpleMediaClient::BeginOutput()
 
 
 void
-BSimpleMediaClient::SetNotificationHook(notify_hook notifyHook, void* cookie)
+BSimpleMediaClient::SetHook(notify_hook notifyHook, void* cookie)
 {
 	CALLED();
 
@@ -91,7 +91,7 @@ BSimpleMediaClient::HandleSeek(bigtime_t mediaTime, bigtime_t performanceTime)
 
 
 status_t
-BSimpleMediaClient::HandleFormatSuggestion(media_type type, int32 quality,
+BSimpleMediaClient::FormatSuggestion(media_type type, int32 quality,
 	media_format* format)
 {
 	if (fNotifyHook != NULL) {
@@ -169,7 +169,7 @@ void
 BSimpleMediaInput::Connected(const media_format& format)
 {
 	if (fNotifyHook != NULL)
-		(*fNotifyHook)(BSimpleMediaConnection::B_INPUT_CONNECTED, this);
+		(*fNotifyHook)(this, BSimpleMediaConnection::B_INPUT_CONNECTED);
 
 	BMediaInput::Connected(format);
 }
@@ -179,7 +179,7 @@ void
 BSimpleMediaInput::Disconnected()
 {
 	if (fNotifyHook != NULL)
-		(*fNotifyHook)(BSimpleMediaConnection::B_INPUT_DISCONNECTED, this);
+		(*fNotifyHook)(this, BSimpleMediaConnection::B_INPUT_DISCONNECTED);
 
 	BMediaConnection::Disconnected();
 }
@@ -191,7 +191,7 @@ BSimpleMediaInput::HandleBuffer(BBuffer* buffer)
 	CALLED();
 
 	if (fProcessHook != NULL)
-		(*fProcessHook)((BMediaConnection*)this, buffer);
+		(*fProcessHook)(this, buffer);
 }
 
 
@@ -214,8 +214,8 @@ status_t
 BSimpleMediaOutput::FormatProposal(media_format* format)
 {
 	if (fNotifyHook != NULL) {
-		return (*fNotifyHook)(BSimpleMediaConnection::B_FORMAT_PROPOSAL,
-			this, format);
+		return (*fNotifyHook)(this,
+			BSimpleMediaConnection::B_FORMAT_PROPOSAL, format);
 	}
 
 	return BMediaOutput::FormatProposal(format);
@@ -226,7 +226,7 @@ void
 BSimpleMediaOutput::Connected(const media_format& format)
 {
 	if (fNotifyHook != NULL)
-		(*fNotifyHook)(BSimpleMediaConnection::B_OUTPUT_CONNECTED, this);
+		(*fNotifyHook)(this, BSimpleMediaConnection::B_OUTPUT_CONNECTED);
 
 	BSimpleMediaConnection::Connected(format);
 }
@@ -236,7 +236,7 @@ void
 BSimpleMediaOutput::Disconnected()
 {
 	if (fNotifyHook != NULL)
-		(*fNotifyHook)(BSimpleMediaConnection::B_OUTPUT_DISCONNECTED, this);
+		(*fNotifyHook)(this, BSimpleMediaConnection::B_OUTPUT_DISCONNECTED);
 
 	BSimpleMediaConnection::Disconnected();
 }

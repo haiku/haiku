@@ -48,7 +48,7 @@ public:
 	virtual BSimpleMediaInput*		BeginInput();
 	virtual BSimpleMediaOutput*		BeginOutput();
 
-			void					SetNotificationHook(notify_hook notifyHook = NULL,
+			void					SetHook(notify_hook notifyHook = NULL,
 										void* cookie = NULL);
 
 protected:
@@ -58,7 +58,7 @@ protected:
 	virtual void					HandleSeek(bigtime_t mediaTime,
 										bigtime_t performanceTime);
 
-	virtual status_t				HandleFormatSuggestion(media_type type,
+	virtual status_t				FormatSuggestion(media_type type,
 										int32 quality, media_format* format);
 
 private:
@@ -103,8 +103,8 @@ public:
 	// Used to notify or inquire the client about what to do when certain
 	// events happen.
 	typedef status_t				(*notify_hook)(
-										notification what,
 										BMediaConnection* connection,
+										notification what,
 										...);
 
 			// Use this to set your callbacks.
