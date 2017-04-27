@@ -52,17 +52,25 @@
 // USB Command Register
 #define CMD_RUN				(1 << 0)
 #define CMD_HCRST			(1 << 1)	// Host Controller Reset
-#define CMD_EIE				(1 << 2)
-#define CMD_HSEIE			(1 << 3)
+#define CMD_INTE			(1 << 2)	// IRQ Enable
+#define CMD_HSEE			(1 << 3)	// Host System Error En
+#define CMD_LHCRST			(1 << 7)	// Light Host Controller Reset
+#define CMD_CSS				(1 << 8)	// Controller Save State
+#define CMD_CRS				(1 << 9)	// Controller Restore State
+#define CMD_EWE				(1 << 10)	// Enable Wrap Event
 
 #define XHCI_STS			0x04		// USB Status
 // USB Status Register
-#define STS_HCH				(1 << 0)
-#define STS_HSE				(1 << 2)
-#define STS_EINT			(1 << 3)
-#define STS_PCD				(1 << 4)
-#define STS_CNR				(1 << 11)
-#define STS_HCE				(1 << 12)
+#define STS_HCH				(1 << 0)	// Host Controller Halt
+#define STS_HSE				(1 << 2)	// Host System Error
+#define STS_EINT			(1 << 3)	// Event Interrupt
+#define STS_PCD				(1 << 4)	// Port Change Detect
+#define STS_SSS				(1 << 8)	// Save State Status
+#define STS_RSS				(1 << 9)	// Restore State Status
+#define STS_SRE				(1 << 10)	// Save Restore Error
+#define STS_CNR				(1 << 11)	// Controller Not Ready
+#define STS_HCE				(1 << 12)	// Host Controller Error
+
 #define XHCI_PAGESIZE		0x08		// PAGE SIZE
 #define XHCI_DNCTRL			0x14
 // Section 5.4.5

@@ -540,7 +540,7 @@ XHCI::Start()
 	TRACE("enabling interrupt\n");
 	WriteRunReg32(XHCI_IMAN(0), ReadRunReg32(XHCI_IMAN(0)) | IMAN_INTR_ENA);
 
-	WriteOpReg(XHCI_CMD, CMD_RUN | CMD_EIE | CMD_HSEIE);
+	WriteOpReg(XHCI_CMD, CMD_RUN | CMD_INTE | CMD_HSEE);
 
 	// wait for start up state
 	int32 tries = 100;
