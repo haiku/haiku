@@ -8,7 +8,9 @@
 
 #include <SupportDefs.h>
 #include <net/if.h>
-#include <netinet/if_ether.h>
+
+#include <net_buffer.h>
+#include <net_stack.h>
 
 class ModemDevice;
 
@@ -30,12 +32,13 @@ class ModemDevice;
 #define MODEM_INIT_KEY			"Init"
 #define MODEM_DIAL_KEY			"Dial"
 
-extern struct core_module_info *core;
+extern net_stack_module_info *gStackModule;
+extern net_buffer_module_info *gBufferModule;
 
 
 #if DEBUG
 // defined in ModemDevice.cpp
-extern void dump_packet(struct mbuf *packet);
+extern void dump_packet(net_buffer *packet);
 #endif // DEBUG
 
 

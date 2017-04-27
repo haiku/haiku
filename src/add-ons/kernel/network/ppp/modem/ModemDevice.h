@@ -59,10 +59,10 @@ class ModemDevice : public KPPPDevice {
 		void FailedDialing();
 		void ConnectionLost();
 
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber = 0);
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber = 0);
 		status_t DataReceived(uint8 *buffer, uint32 length);
 			// this will put the data into an mbuf and call Receive()
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber = 0);
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber = 0);
 
 	private:
 		const char *fPortName, *fInitString, *fDialString;

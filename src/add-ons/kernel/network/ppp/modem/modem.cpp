@@ -5,8 +5,6 @@
 
 #include <KernelExport.h>
 #include <driver_settings.h>
-#include <core_funcs.h>
-#include <net_module.h>
 
 #include <KPPPInterface.h>
 #include <KPPPModule.h>
@@ -16,12 +14,12 @@
 
 #define MODEM_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/modem"
 
-struct core_module_info *core = NULL;
+net_stack_module_info *gStackModule = NULL;
+net_buffer_module_info *gBufferModule = NULL;
 status_t std_ops(int32 op, ...);
 
 
-static
-bool
+static bool
 add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 	driver_parameter *settings, ppp_module_key_type type)
 {
@@ -60,14 +58,20 @@ _EXPORT
 status_t
 std_ops(int32 op, ...)
 {
-	switch(op) {
+	switch (op) {
 		case B_MODULE_INIT:
-			if(get_module(NET_CORE_MODULE_NAME, (module_info**)&core) != B_OK)
+			if (get_module(NET_STACK_MODULE_NAME, (module_info**) &gStackModule) != B_OK)
 				return B_ERROR;
+			if (get_module(NET_BUFFER_MODULE_NAME,
+				(module_info **)&gBufferModule) != B_OK) {
+				put_module(NET_STACK_MODULE_NAME);
+				return B_ERROR;
+			}
 		return B_OK;
 
 		case B_MODULE_UNINIT:
-			put_module(NET_CORE_MODULE_NAME);
+			put_module(NET_BUFFER_MODULE_NAME);
+			put_module(NET_STACK_MODULE_NAME);
 		break;
 
 		default:

@@ -9,7 +9,6 @@
 #include "ACFCHandler.h"
 #include "fcs.h"
 
-#include <core_funcs.h>
 #include <unistd.h>
 #include <termios.h>
 	// for port settings
@@ -21,7 +20,7 @@
 #if DEBUG
 static char sDigits[] = "0123456789ABCDEF";
 void
-dump_packet(struct mbuf *packet)
+dump_packet(net_buffer *packet)
 {
 	if(!packet)
 		return;
@@ -404,47 +403,38 @@ ModemDevice::ConnectionLost()
 
 
 status_t
-ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber)
+ModemDevice::Send(net_buffer *packet, uint16 protocolNumber)
 {
 #if DEBUG
 	TRACE("ModemDevice: Send()\n");
 	dump_packet(packet);
 #endif
 
-	if(!packet)
+	if (!packet)
 		return B_ERROR;
-	else if(InitCheck() != B_OK || protocolNumber != 0) {
-		m_freem(packet);
+	else if (InitCheck() != B_OK || protocolNumber != 0) {
+		gBufferModule->free(packet);
 		return B_ERROR;
-	} else if(!IsUp()) {
-		m_freem(packet);
+	} else if (!IsUp()) {
+		gBufferModule->free(packet);
 		return PPP_NO_CONNECTION;
 	}
 
-	// we might need room for our header
-	if(fACFC->LocalState() != ACFC_ACCEPTED) {
-		M_PREPEND(packet, 2);
-		if(!packet)
-			return B_ERROR;
-	}
-
-	int32 position = 0, length;
-	if(packet->m_flags & M_PKTHDR)
-		length = packet->m_pkthdr.len;
-	else
-		length = packet->m_len;
-
-	// we need a contiguous chunk of memory
-	packet = m_pullup(packet, length);
-	if(!packet)
-		return B_ERROR;
-
-	uint8 buffer[2 * (MODEM_MTU + PACKET_OVERHEAD)], *data = mtod(packet, uint8*);
+	uint8 buffer[2 * (MODEM_MTU + PACKET_OVERHEAD)];
 
 	// add header
-	if(fACFC->LocalState() != ACFC_ACCEPTED) {
+	if (fACFC->LocalState() != ACFC_ACCEPTED) {
+		NetBufferPrepend<uint8> bufferHeader(packet, 2);
+		uint8* data = bufferHeader.operator->();
 		data[0] = ALL_STATIONS;
 		data[1] = UI;
+	}
+
+	int32 position = 0, length = packet->size;
+	uint8* data;
+	if (gBufferModule->direct_access(packet, 0, length + 2, (void**)&data) != B_OK) {
+		ERROR("ModemDevice: Failed to access buffer!\n");
+		return B_ERROR;
 	}
 
 	// add FCS
@@ -468,11 +458,12 @@ ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 	buffer[position++] = FLAG_SEQUENCE;
 		// mark end of packet
 
-	m_freem(packet);
+	gBufferModule->free(packet);
+	data = NULL;
 
 	// send to modem
 	atomic_add((int32*) &fOutputBytes, position);
-	if(write(Handle(), buffer, position) < 0)
+	if (write(Handle(), buffer, position) < 0)
 		return PPP_NO_CONNECTION;
 	atomic_add((int32*) &fOutputBytes, -position);
 
@@ -484,8 +475,7 @@ status_t
 ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 {
 	// TODO: report corrupted packets to KPPPInterface
-
-	if(length < 3)
+	if (length < 3)
 		return B_ERROR;
 
 	// check FCS
@@ -498,9 +488,12 @@ ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 	if(buffer[0] == ALL_STATIONS && buffer[1] == UI)
 		buffer += 2;
 
-	mbuf *packet = m_gethdr(MT_DATA);
-	packet->m_len = packet->m_pkthdr.len = length - 2;
-	uint8 *data = mtod(packet, uint8*);
+	net_buffer* packet = gBufferModule->create(length - 2);
+	uint8* data;
+	if (gBufferModule->direct_access(packet, 0, length, (void**)&data) != B_OK) {
+		ERROR("ModemDevice: Failed to access buffer!\n");
+		return B_ERROR;
+	}
 	memcpy(data, buffer, length - 2);
 
 	return Receive(packet);
@@ -508,14 +501,14 @@ ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 
 
 status_t
-ModemDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
+ModemDevice::Receive(net_buffer *packet, uint16 protocolNumber)
 {
 	// we do not need to lock because only the worker_thread calls this method
 
-	if(!packet)
+	if (!packet)
 		return B_ERROR;
-	else if(InitCheck() != B_OK || !IsUp()) {
-		m_freem(packet);
+	else if (InitCheck() != B_OK || !IsUp()) {
+		gBufferModule->free(packet);
 		return B_ERROR;
 	}
 

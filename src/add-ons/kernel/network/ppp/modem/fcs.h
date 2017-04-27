@@ -53,7 +53,7 @@
    /*
     * Calculate a new fcs given the current fcs and the new data.
     */
-   u16 pppfcs16(u16 fcs, unsigned char *cp, int len)
+   u16 pppfcs16(u16 fcs, const unsigned char *cp, int len)
    {
        while (len--)
            fcs = (fcs >> 8) ^ fcstab[(fcs ^ *cp++) & 0xff];

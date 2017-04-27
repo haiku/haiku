@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp ;
 
 SubInclude HAIKU_TOP src add-ons kernel network ppp ipcp ;
-# SubInclude HAIKU_TOP src add-ons kernel network ppp modem ;
+SubInclude HAIKU_TOP src add-ons kernel network ppp modem ;
 SubInclude HAIKU_TOP src add-ons kernel network ppp pap ;
 SubInclude HAIKU_TOP src add-ons kernel network ppp pppoe ;
 SubInclude HAIKU_TOP src add-ons kernel network ppp shared ;
