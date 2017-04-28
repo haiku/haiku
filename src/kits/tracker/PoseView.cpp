@@ -4069,6 +4069,9 @@ BPoseView::SelectPose(BPose* pose, int32 index, bool scrollIntoView)
 		ClearSelection();
 
 	AddPoseToSelection(pose, index, scrollIntoView);
+
+	if (pose != NULL)
+		fSelectionPivotPose = pose;
 }
 
 
