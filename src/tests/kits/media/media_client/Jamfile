@@ -6,5 +6,7 @@ UsePrivateHeaders [ FDirName media experimental ] ;
 
 SimpleTest media_client :
 	media_client.cpp
+	MediaPlay.cpp
+	MediaTest.cpp
 	: libmedia.so be root [ TargetLibsupc++ ]
 ;
