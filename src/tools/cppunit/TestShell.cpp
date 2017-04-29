@@ -37,7 +37,7 @@ BTestShell::BTestShell(const string &description, SyncObject *syncObject)
 	, fListTestsAndExit(false)
 	, fTestDir(NULL)
 #ifndef NO_ELF_SYMBOL_PATCHING
-	, fPatchGroupLocker(new(nothrow) BLocker)
+	, fPatchGroupLocker(new BLocker)
 	, fPatchGroup(NULL)
 	, fOldDebuggerHook(NULL)
 	, fOldLoadAddOnHook(NULL)
@@ -496,20 +496,20 @@ BTestShell::InstallPatches()
 {
 #ifndef NO_ELF_SYMBOL_PATCHING
 	if (fPatchGroup) {
-		cerr << "BTestShell::InstallPatches(): Patch group already exist!"
+		std::cerr << "BTestShell::InstallPatches(): Patch group already exist!"
 			<< endl;
 		return;
 	}
 	BAutolock locker(fPatchGroupLocker);
 	if (!locker.IsLocked()) {
-		cerr << "BTestShell::InstallPatches(): Failed to acquire patch "
+		std::cerr << "BTestShell::InstallPatches(): Failed to acquire patch "
 			"group lock!" << endl;
 		return;
 	}
-	fPatchGroup = new(nothrow) ElfSymbolPatchGroup;
+	fPatchGroup = new(std::nothrow) ElfSymbolPatchGroup;
 	// init the symbol patch group
 	if (!fPatchGroup) {
-		cerr << "BTestShell::InstallPatches(): Failed to allocate patch "
+		std::cerr << "BTestShell::InstallPatches(): Failed to allocate patch "
 			"group!" << endl;
 		return;
 	}
@@ -526,8 +526,8 @@ BTestShell::InstallPatches()
 		// everything went fine
 		fPatchGroup->Patch();
 	} else {
-		cerr << "BTestShell::InstallPatches(): Failed to patch all symbols!"
-			<< endl;
+		std::cerr << "BTestShell::InstallPatches(): Failed to patch all "
+			"symbols!" << endl;
 		UninstallPatches();
 	}
 #endif // ! NO_ELF_SYMBOL_PATCHING
@@ -543,7 +543,7 @@ BTestShell::UninstallPatches()
 #ifndef NO_ELF_SYMBOL_PATCHING
 	BAutolock locker(fPatchGroupLocker);
 	if (!locker.IsLocked()) {
-		cerr << "BTestShell::UninstallPatches(): "
+		std::cerr << "BTestShell::UninstallPatches(): "
 			"Failed to acquire patch group lock!" << endl;
 		return;
 	}
