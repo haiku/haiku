@@ -3,7 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-/** A simple class wrapping a path. Has a fixed-sized buffer. */
+
+/*! A simple class wrapping a path. Has a fixed-sized buffer. */
+
 
 #include <fs/KPath.h>
 
@@ -66,7 +68,7 @@ KPath::SetTo(const char* path, bool normalize, size_t bufferSize,
 		bufferSize = B_PATH_NAME_LENGTH;
 
 	// free the previous buffer, if the buffer size differs
-	if (fBuffer && fBufferSize != bufferSize) {
+	if (fBuffer != NULL && fBufferSize != bufferSize) {
 		free(fBuffer);
 		fBuffer = NULL;
 		fBufferSize = 0;
@@ -75,14 +77,14 @@ KPath::SetTo(const char* path, bool normalize, size_t bufferSize,
 	fLocked = false;
 
 	// allocate buffer
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		fBuffer = (char*)malloc(bufferSize);
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		return B_NO_MEMORY;
-	if (fBuffer) {
-		fBufferSize = bufferSize;
-		fBuffer[0] = '\0';
-	}
+
+	fBufferSize = bufferSize;
+	fBuffer[0] = '\0';
+
 	return SetPath(path, normalize, traverseLeafLink);
 }
 
@@ -196,7 +198,7 @@ KPath::DetachBuffer()
 const char*
 KPath::Leaf() const
 {
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		return NULL;
 
 	// only "/" has trailing slashes -- then we have to return the complete
@@ -215,7 +217,7 @@ status_t
 KPath::ReplaceLeaf(const char* newLeaf)
 {
 	const char* leaf = Leaf();
-	if (!leaf)
+	if (leaf == NULL)
 		return B_NO_INIT;
 
 	int32 leafIndex = leaf - fBuffer;
@@ -227,7 +229,7 @@ KPath::ReplaceLeaf(const char* newLeaf)
 	}
 
 	// if a leaf was given, append it
-	if (newLeaf)
+	if (newLeaf != NULL)
 		return Append(newLeaf);
 	return B_OK;
 }
@@ -238,7 +240,7 @@ KPath::RemoveLeaf()
 {
 	// get the leaf -- bail out, if not initialized or only the "/" is left
 	const char* leaf = Leaf();
-	if (!leaf || leaf == fBuffer)
+	if (leaf == NULL || leaf == fBuffer)
 		return false;
 
 	// chop off the leaf
@@ -330,9 +332,9 @@ KPath::operator==(const KPath& other) const
 	if (!fBuffer)
 		return !other.fBuffer;
 
-	return (other.fBuffer
+	return other.fBuffer
 		&& fPathLength == other.fPathLength
-		&& strcmp(fBuffer, other.fBuffer) == 0);
+		&& strcmp(fBuffer, other.fBuffer) == 0;
 }
 
 
@@ -342,7 +344,7 @@ KPath::operator==(const char* path) const
 	if (!fBuffer)
 		return (!path);
 
-	return path && !strcmp(fBuffer, path);
+	return path && strcmp(fBuffer, path) == 0;
 }
 
 
@@ -363,7 +365,7 @@ KPath::operator!=(const char* path) const
 void
 KPath::_ChopTrailingSlashes()
 {
-	if (fBuffer) {
+	if (fBuffer != NULL) {
 		while (fPathLength > 1 && fBuffer[fPathLength - 1] == '/')
 			fBuffer[--fPathLength] = '\0';
 	}
