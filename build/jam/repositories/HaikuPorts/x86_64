@@ -116,7 +116,7 @@ RemotePackageRepository HaikuPorts
 	wqy_microhei-0.2.0~beta-4
 	wqy_zenhei-0.9.45-3
 	x_series_fonts-2.0-3
-	youtube_dl-2017.01.24-1
+	youtube_dl-2017.04.28-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_64)

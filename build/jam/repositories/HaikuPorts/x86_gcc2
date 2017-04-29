@@ -37,7 +37,7 @@ RemotePackageRepository HaikuPorts
 	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-4
-	youtube_dl-2016.08.12-1
+	youtube_dl-2017.04.28-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
