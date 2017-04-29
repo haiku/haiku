@@ -61,10 +61,11 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			if (get_module(NET_STACK_MODULE_NAME, (module_info**) &gStackModule) != B_OK)
+			if (get_module(NET_STACK_MODULE_NAME,
+					(module_info**)&gStackModule) != B_OK)
 				return B_ERROR;
 			if (get_module(NET_BUFFER_MODULE_NAME,
-				(module_info **)&gBufferModule) != B_OK) {
+					(module_info **)&gBufferModule) != B_OK) {
 				put_module(NET_STACK_MODULE_NAME);
 				return B_ERROR;
 			}
