@@ -6,6 +6,8 @@
 
 #include "KPathTest.h"
 
+#include <string.h>
+
 #include <fs/KPath.h>
 
 #include <cppunit/TestCaller.h>
