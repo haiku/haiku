@@ -1378,9 +1378,23 @@ BContainerWindow::MessageReceived(BMessage* message)
 		case kPasteLinksFromClipboard:
 		{
 			BView* view = CurrentFocus();
-			if (view->LockLooper()) {
-				view->MessageReceived(message);
-				view->UnlockLooper();
+			if (dynamic_cast<BTextView*>(view) == NULL) {
+				// The selected item is not a BTextView, so forward the
+				// message to the PoseView.
+				if (fPoseView != NULL)
+					fPoseView->MessageReceived(message);
+			} else {
+				// Since we catch the generic clipboard shortcuts in a way that
+				// means the BTextView will never get them, we must
+				// manually forward them ourselves.
+				//
+				// However, we have to take care to not forward the custom
+				// clipboard messages, else we would wind up in infinite
+				// recursion.
+				if (message->what == B_CUT || message->what == B_COPY
+						|| message->what == B_PASTE) {
+					view->MessageReceived(message);
+				}
 			}
 			break;
 		}
