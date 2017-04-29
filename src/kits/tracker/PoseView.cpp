@@ -7939,7 +7939,7 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection,
  	if (pose == fSelectionPivotPose && !extendSelection)
  		return;
 
-	if ((modifiers() & B_SHIFT_KEY) != 0 && fSelectionPivotPose) {
+	if (fMultipleSelection && (modifiers() & B_SHIFT_KEY) != 0 && fSelectionPivotPose) {
 		// multi pose extend/shrink current selection
 		bool select = !pose->IsSelected() || !extendSelection;
 			// This weird bit of logic causes the selection to always
