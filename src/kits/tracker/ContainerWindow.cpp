@@ -1399,6 +1399,26 @@ BContainerWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_UNDO: {
+			BView* view = CurrentFocus();
+			if (dynamic_cast<BTextView*>(view) == NULL) {
+				FSUndo();
+			} else {
+				view->MessageReceived(message);
+			}
+			break;
+		}
+
+		case B_REDO: {
+			BView* view = CurrentFocus();
+			if (dynamic_cast<BTextView*>(view) == NULL) {
+				FSRedo();
+			} else {
+				view->MessageReceived(message);
+			}
+			break;
+		}
+
 		case kNewFolder:
 			PostMessage(message, PoseView());
 			break;
@@ -1688,14 +1708,6 @@ BContainerWindow::MessageReceived(BMessage* message)
 
 		case B_NODE_MONITOR:
 			UpdateTitle();
-			break;
-
-		case B_UNDO:
-			FSUndo();
-			break;
-
-		case B_REDO:
-			FSRedo();
 			break;
 
 		default:
