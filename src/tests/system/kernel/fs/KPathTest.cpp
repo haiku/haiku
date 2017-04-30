@@ -97,8 +97,7 @@ KPathTest::TestLeaf()
 
 	path.SetTo("/");
 	CPPUNIT_ASSERT(strcmp(path.Path(), "/") == 0);
-//	CPPUNIT_ASSERT(path.Leaf() == NULL);
-// TODO: why '/'?
+	CPPUNIT_ASSERT(strcmp(path.Leaf(), "") == 0);
 
 	path.SetTo("a/b");
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a/b") == 0);
@@ -150,18 +149,29 @@ KPathTest::TestRemoveLeaf()
 
 	path.SetTo("a//b/c");
 	removed = path.RemoveLeaf();
-	CPPUNIT_ASSERT(removed);
+	CPPUNIT_ASSERT_MESSAGE("1. removed", removed);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a//b") == 0);
 	CPPUNIT_ASSERT(path.Length() == 4);
 
 	removed = path.RemoveLeaf();
-	CPPUNIT_ASSERT(removed);
+	CPPUNIT_ASSERT_MESSAGE("2. removed", removed);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a") == 0);
 	CPPUNIT_ASSERT(path.Length() == 1);
 
 	removed = path.RemoveLeaf();
-	CPPUNIT_ASSERT(!removed);
+	CPPUNIT_ASSERT_MESSAGE("3. !removed", !removed);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a") == 0);
+	CPPUNIT_ASSERT(path.Length() == 1);
+
+	path.SetTo("/a");
+	removed = path.RemoveLeaf();
+	CPPUNIT_ASSERT_MESSAGE("4. removed", removed);
+	CPPUNIT_ASSERT(strcmp(path.Path(), "/") == 0);
+	CPPUNIT_ASSERT(path.Length() == 1);
+
+	removed = path.RemoveLeaf();
+	CPPUNIT_ASSERT_MESSAGE("5. !removed", !removed);
+	CPPUNIT_ASSERT(strcmp(path.Path(), "/") == 0);
 	CPPUNIT_ASSERT(path.Length() == 1);
 }
 
@@ -219,8 +229,52 @@ KPathTest::TestNormalize()
 
 
 void
+KPathTest::TestAssign()
+{
+	KPath one("first", false, 10);
+	CPPUNIT_ASSERT(one.Length() == 5);
+	KPath two("second", false, 20);
+
+	two = one;
+	CPPUNIT_ASSERT(strcmp(two.Path(), one.Path()) == 0);
+	CPPUNIT_ASSERT(two.Path() != one.Path());
+	CPPUNIT_ASSERT(two.BufferSize() == one.BufferSize());
+	CPPUNIT_ASSERT(two.Length() == one.Length());
+
+	one = "/whatever";
+	CPPUNIT_ASSERT(one.Length() == 9);
+	CPPUNIT_ASSERT(one.BufferSize() == two.BufferSize());
+	CPPUNIT_ASSERT(strcmp(one.Path(), "/whatever") == 0);
+}
+
+
+void
 KPathTest::TestEquals()
 {
+	KPath a("one");
+	KPath b("two");
+	CPPUNIT_ASSERT_MESSAGE("1.", !(a == b));
+
+	b = a;
+	CPPUNIT_ASSERT_MESSAGE("2.", a == b);
+
+	b = "ones";
+	CPPUNIT_ASSERT_MESSAGE("3.", !(a == b));
+}
+
+
+void
+KPathTest::TestNotEquals()
+{
+	KPath a("one");
+	KPath b("two");
+	CPPUNIT_ASSERT_MESSAGE("1.", a != b);
+
+	b = a;
+	CPPUNIT_ASSERT_MESSAGE("2.", !(a != b));
+
+	b = "ones";
+	CPPUNIT_ASSERT_MESSAGE("3.", a != b);
 }
 
 
@@ -244,7 +298,11 @@ KPathTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestNormalize", &KPathTest::TestNormalize));
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
+		"KPathTest::TestAssign", &KPathTest::TestAssign));
+	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestEquals", &KPathTest::TestEquals));
+	suite.addTest(new CppUnit::TestCaller<KPathTest>(
+		"KPathTest::TestNotEquals", &KPathTest::TestNotEquals));
 
 	parent.addTest("KPathTest", &suite);
 }

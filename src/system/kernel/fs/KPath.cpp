@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -106,7 +107,7 @@ KPath::Adopt(KPath& other)
 status_t
 KPath::InitCheck() const
 {
-	return fBuffer ? B_OK : B_NO_MEMORY;
+	return fBuffer != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -203,14 +204,11 @@ KPath::Leaf() const
 	if (fBuffer == NULL)
 		return NULL;
 
-	// only "/" has trailing slashes -- then we have to return the complete
-	// buffer, as we have to do in case there are no slashes at all
-	if (fPathLength != 1 || fBuffer[0] != '/') {
-		for (int32 i = fPathLength - 1; i >= 0; i--) {
-			if (fBuffer[i] == '/')
-				return fBuffer + i + 1;
-		}
+	for (int32 i = fPathLength - 1; i >= 0; i--) {
+		if (fBuffer[i] == '/')
+			return fBuffer + i + 1;
 	}
+
 	return fBuffer;
 }
 
@@ -242,7 +240,7 @@ KPath::RemoveLeaf()
 {
 	// get the leaf -- bail out, if not initialized or only the "/" is left
 	const char* leaf = Leaf();
-	if (leaf == NULL || leaf == fBuffer)
+	if (leaf == NULL || leaf == fBuffer || leaf[0] == '\0')
 		return false;
 
 	// chop off the leaf
@@ -305,6 +303,7 @@ KPath::Normalize(bool traverseLeafLink)
 		// it completely to avoid weird problems.
 		fBuffer[0] = '\0';
 		fPathLength = 0;
+		return error;
 	}
 
 	fPathLength = strlen(fBuffer);
@@ -323,7 +322,7 @@ KPath::operator=(const KPath& other)
 KPath&
 KPath::operator=(const char* path)
 {
-	SetTo(path);
+	SetPath(path);
 	return *this;
 }
 
@@ -331,7 +330,7 @@ KPath::operator=(const char* path)
 bool
 KPath::operator==(const KPath& other) const
 {
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		return !other.fBuffer;
 
 	return other.fBuffer
@@ -343,7 +342,7 @@ KPath::operator==(const KPath& other) const
 bool
 KPath::operator==(const char* path) const
 {
-	if (!fBuffer)
+	if (fBuffer == NULL)
 		return (!path);
 
 	return path && strcmp(fBuffer, path) == 0;

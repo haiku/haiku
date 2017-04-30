@@ -22,7 +22,9 @@ public:
 			void				TestAdopt();
 			void				TestDetachBuffer();
 			void				TestNormalize();
+			void				TestAssign();
 			void				TestEquals();
+			void				TestNotEquals();
 
 	static	void				AddTests(BTestSuite& suite);
 };
