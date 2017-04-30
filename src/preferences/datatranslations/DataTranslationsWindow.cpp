@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014, Haiku, Inc.
+ * Copyright 2002-2017, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -34,6 +34,7 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
+#include <SupportDefs.h>
 #include <TextView.h>
 #include <TranslationDefs.h>
 #include <TranslatorRoster.h>
@@ -307,7 +308,7 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 
 	offsets[1] = message.Length();
 	// Convert the version number into a readable format
-	temp.SetToFormat("%s %ld.%ld.%ld\n\n", labels[1], 
+	temp.SetToFormat("%s %" B_PRId32 ".%" B_PRId32 ".%" B_PRId32 "\n\n", labels[1],
 		B_TRANSLATION_MAJOR_VERSION(version),
 		B_TRANSLATION_MINOR_VERSION(version),
 		B_TRANSLATION_REVISION_VERSION(version));
