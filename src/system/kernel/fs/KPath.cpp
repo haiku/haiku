@@ -123,7 +123,7 @@ KPath::Adopt(KPath& other)
 status_t
 KPath::InitCheck() const
 {
-	if (fBuffer != NULL || fLazy && !fFailed && fBufferSize != 0)
+	if (fBuffer != NULL || (fLazy && !fFailed && fBufferSize != 0))
 		return B_OK;
 
 	return fFailed ? B_NO_MEMORY : B_NO_INIT;
