@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2017, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -750,7 +750,7 @@ KDiskDeviceManager::CreateFileDevice(const char* filePath, bool* newlyCreated)
 
 	// normalize the file path
 	KPath normalizedFilePath;
-	status_t error = normalizedFilePath.SetTo(filePath, true);
+	status_t error = normalizedFilePath.SetTo(filePath, KPath::NORMALIZE);
 	if (error != B_OK)
 		return error;
 	filePath = normalizedFilePath.Path();

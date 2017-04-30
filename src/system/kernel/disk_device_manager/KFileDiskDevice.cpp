@@ -55,7 +55,7 @@ KFileDiskDevice::SetTo(const char* filePath, const char* devicePath)
 	// (should actually not be necessary, since this method is only invoked
 	// by the DDM, which has already normalized the path)
 	KPath tmpFilePath;
-	status_t error = tmpFilePath.SetTo(filePath, true);
+	status_t error = tmpFilePath.SetTo(filePath, KPath::NORMALIZE);
 	if (error != B_OK)
 		return error;
 	// check the file

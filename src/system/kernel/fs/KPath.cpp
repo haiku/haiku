@@ -29,18 +29,18 @@ KPath::KPath(size_t bufferSize)
 	fPathLength(0),
 	fLocked(false)
 {
-	SetTo(NULL, false, bufferSize);
+	SetTo(NULL, KPath::DEFAULT, bufferSize);
 }
 
 
-KPath::KPath(const char* path, bool normalize, size_t bufferSize)
+KPath::KPath(const char* path, int32 flags, size_t bufferSize)
 	:
 	fBuffer(NULL),
 	fBufferSize(0),
 	fPathLength(0),
 	fLocked(false)
 {
-	SetTo(path, normalize, bufferSize);
+	SetTo(path, flags, bufferSize);
 }
 
 
@@ -62,8 +62,7 @@ KPath::~KPath()
 
 
 status_t
-KPath::SetTo(const char* path, bool normalize, size_t bufferSize,
-	bool traverseLeafLink)
+KPath::SetTo(const char* path, int32 flags, size_t bufferSize)
 {
 	if (bufferSize == 0)
 		bufferSize = B_PATH_NAME_LENGTH;
@@ -86,7 +85,7 @@ KPath::SetTo(const char* path, bool normalize, size_t bufferSize,
 	fBufferSize = bufferSize;
 	fBuffer[0] = '\0';
 
-	return SetPath(path, normalize, traverseLeafLink);
+	return SetPath(path, flags);
 }
 
 
@@ -112,16 +111,16 @@ KPath::InitCheck() const
 
 
 status_t
-KPath::SetPath(const char* path, bool normalize, bool traverseLeafLink)
+KPath::SetPath(const char* path, int32 flags)
 {
 	if (fBuffer == NULL)
 		return B_NO_INIT;
 
 	if (path != NULL) {
-		if (normalize) {
+		if ((flags & NORMALIZE) != 0) {
 			// normalize path
 			status_t error = vfs_normalize_path(path, fBuffer, fBufferSize,
-				traverseLeafLink,
+				(flags & TRAVERSE_LEAF_LINK) != 0,
 				team_get_kernel_team_id() == team_get_current_team_id());
 			if (error != B_OK) {
 				SetPath(NULL);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -285,7 +285,7 @@ _user_find_file_disk_device(const char *_filename, size_t *neededSize)
 	if (error != B_OK)
 		return error;
 
-	KPath path(filename, true);
+	KPath path(filename, KPath::NORMALIZE);
 
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -408,7 +408,7 @@ _user_register_file_device(const char *_filename)
 	if (error != B_OK)
 		return error;
 
-	KPath path(filename, true);
+	KPath path(filename, KPath::NORMALIZE);
 
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {

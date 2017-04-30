@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _K_PATH_H
@@ -14,22 +15,26 @@ namespace DiskDevice {
 
 class KPath {
 public:
+	enum {
+		DEFAULT = 0,
+		NORMALIZE = 0x01,
+		TRAVERSE_LEAF_LINK = 0x02,
+	};
+public:
 								KPath(size_t bufferSize = B_PATH_NAME_LENGTH);
-								KPath(const char* path, bool normalize = false,
+								KPath(const char* path, int32 flags = DEFAULT,
 									size_t bufferSize = B_PATH_NAME_LENGTH);
 								KPath(const KPath& other);
 								~KPath();
 
-			status_t			SetTo(const char* path, bool normalize = false,
-									size_t bufferSize = B_PATH_NAME_LENGTH,
-									bool traverseLeafLink = false);
+			status_t			SetTo(const char* path, int32 flags = DEFAULT,
+									size_t bufferSize = B_PATH_NAME_LENGTH);
 			void				Adopt(KPath& other);
 
 			status_t			InitCheck() const;
 
 			status_t			SetPath(const char* path,
-									bool normalize = false,
-									bool traverseLeafLink = false);
+									int32 flags = DEFAULT);
 			const char*			Path() const;
 			size_t				Length() const
 									{ return fPathLength; }
