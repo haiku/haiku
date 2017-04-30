@@ -27,9 +27,12 @@ KPath::KPath(size_t bufferSize)
 	fBuffer(NULL),
 	fBufferSize(0),
 	fPathLength(0),
-	fLocked(false)
+	fLocked(false),
+	fLazy(false),
+	fFailed(false),
+	fIsNull(false)
 {
-	SetTo(NULL, KPath::DEFAULT, bufferSize);
+	SetTo(NULL, DEFAULT, bufferSize);
 }
 
 
@@ -38,7 +41,10 @@ KPath::KPath(const char* path, int32 flags, size_t bufferSize)
 	fBuffer(NULL),
 	fBufferSize(0),
 	fPathLength(0),
-	fLocked(false)
+	fLocked(false),
+	fLazy(false),
+	fFailed(false),
+	fIsNull(false)
 {
 	SetTo(path, flags, bufferSize);
 }
@@ -49,7 +55,10 @@ KPath::KPath(const KPath& other)
 	fBuffer(NULL),
 	fBufferSize(0),
 	fPathLength(0),
-	fLocked(false)
+	fLocked(false),
+	fLazy(false),
+	fFailed(false),
+	fIsNull(false)
 {
 	*this = other;
 }
@@ -73,17 +82,18 @@ KPath::SetTo(const char* path, int32 flags, size_t bufferSize)
 		fBuffer = NULL;
 		fBufferSize = 0;
 	}
+
 	fPathLength = 0;
 	fLocked = false;
-
-	// allocate buffer
-	if (fBuffer == NULL)
-		fBuffer = (char*)malloc(bufferSize);
-	if (fBuffer == NULL)
-		return B_NO_MEMORY;
-
 	fBufferSize = bufferSize;
-	fBuffer[0] = '\0';
+	fLazy = (flags & LAZY_ALLOC) != 0;
+	fIsNull = path == NULL;
+
+	if (path != NULL || !fLazy) {
+		status_t status = _AllocateBuffer();
+		if (status != B_OK)
+			return status;
+	}
 
 	return SetPath(path, flags);
 }
@@ -97,37 +107,61 @@ KPath::Adopt(KPath& other)
 	fBuffer = other.fBuffer;
 	fBufferSize = other.fBufferSize;
 	fPathLength = other.fPathLength;
+	fLazy = other.fLazy;
+	fFailed = other.fFailed;
+	fIsNull = other.fIsNull;
 
 	other.fBuffer = NULL;
-	other.fBufferSize = 0;
+	if (!other.fLazy)
+		other.fBufferSize = 0;
 	other.fPathLength = 0;
+	other.fFailed = false;
+	other.fIsNull = other.fLazy;
 }
 
 
 status_t
 KPath::InitCheck() const
 {
-	return fBuffer != NULL ? B_OK : B_NO_MEMORY;
+	if (fBuffer != NULL || fLazy && !fFailed && fBufferSize != 0)
+		return B_OK;
+
+	return fFailed ? B_NO_MEMORY : B_NO_INIT;
 }
 
 
+/*!	\brief Sets the buffer to \a path.
+
+	\param flags Understands the following two options:
+		- \c NORMALIZE
+		- \c TRAVERSE_LEAF_LINK
+*/
 status_t
 KPath::SetPath(const char* path, int32 flags)
 {
-	if (fBuffer == NULL)
-		return B_NO_INIT;
+	if (path == NULL && fLazy && fBuffer == NULL) {
+		fIsNull = true;
+		return B_OK;
+	}
+
+	if (fBuffer == NULL) {
+		if (fLazy) {
+			status_t status = _AllocateBuffer();
+			if (status != B_OK)
+				return B_NO_MEMORY;
+		} else
+			return B_NO_INIT;
+	}
+
+	fIsNull = false;
 
 	if (path != NULL) {
 		if ((flags & NORMALIZE) != 0) {
 			// normalize path
-			status_t error = vfs_normalize_path(path, fBuffer, fBufferSize,
-				(flags & TRAVERSE_LEAF_LINK) != 0,
-				team_get_kernel_team_id() == team_get_current_team_id());
-			if (error != B_OK) {
-				SetPath(NULL);
-				return error;
-			}
-			fPathLength = strlen(fBuffer);
+			status_t status = _Normalize(path,
+				(flags & TRAVERSE_LEAF_LINK) != 0);
+			if (status != B_OK)
+				return status;
 		} else {
 			// don't normalize path
 			size_t length = strlen(path);
@@ -141,6 +175,8 @@ KPath::SetPath(const char* path, int32 flags)
 	} else {
 		fBuffer[0] = '\0';
 		fPathLength = 0;
+		if (fLazy)
+			fIsNull = true;
 	}
 	return B_OK;
 }
@@ -149,17 +185,31 @@ KPath::SetPath(const char* path, int32 flags)
 const char*
 KPath::Path() const
 {
-	return fBuffer;
+	return fIsNull ? NULL : fBuffer;
 }
 
 
+/*!	\brief Locks the buffer for external changes.
+
+	\param force In lazy mode, this will allocate a buffer when set.
+		Otherwise, \c NULL will be returned if set to NULL.
+*/
 char*
-KPath::LockBuffer()
+KPath::LockBuffer(bool force)
 {
+	if (fBuffer == NULL && fLazy) {
+		if (fIsNull && !force)
+			return NULL;
+
+		_AllocateBuffer();
+	}
+
 	if (fBuffer == NULL || fLocked)
 		return NULL;
 
 	fLocked = true;
+	fIsNull = false;
+
 	return fBuffer;
 }
 
@@ -171,7 +221,12 @@ KPath::UnlockBuffer()
 		TRACE(("KPath::UnlockBuffer(): ERROR: Buffer not locked!\n"));
 		return;
 	}
+
 	fLocked = false;
+
+	if (fBuffer == NULL)
+		return;
+
 	fPathLength = strnlen(fBuffer, fBufferSize);
 	if (fPathLength == fBufferSize) {
 		TRACE(("KPath::UnlockBuffer(): WARNING: Unterminated buffer!\n"));
@@ -189,7 +244,6 @@ KPath::DetachBuffer()
 
 	if (fBuffer != NULL) {
 		fBuffer = NULL;
-		fBufferSize = 0;
 		fPathLength = 0;
 		fLocked = false;
 	}
@@ -295,26 +349,15 @@ KPath::Normalize(bool traverseLeafLink)
 	if (fPathLength == 0)
 		return B_BAD_VALUE;
 
-	status_t error = vfs_normalize_path(fBuffer, fBuffer, fBufferSize,
-		traverseLeafLink,
-		team_get_kernel_team_id() == team_get_current_team_id());
-	if (error != B_OK) {
-		// vfs_normalize_path() might have screwed up the previous path -- unset
-		// it completely to avoid weird problems.
-		fBuffer[0] = '\0';
-		fPathLength = 0;
-		return error;
-	}
-
-	fPathLength = strlen(fBuffer);
-	return B_OK;
+	return _Normalize(fBuffer, traverseLeafLink);
 }
 
 
 KPath&
 KPath::operator=(const KPath& other)
 {
-	SetTo(other.fBuffer, false, other.fBufferSize);
+	SetTo(other.fBuffer, fLazy ? KPath::LAZY_ALLOC : KPath::DEFAULT,
+		other.fBufferSize);
 	return *this;
 }
 
@@ -333,7 +376,7 @@ KPath::operator==(const KPath& other) const
 	if (fBuffer == NULL)
 		return !other.fBuffer;
 
-	return other.fBuffer
+	return other.fBuffer != NULL
 		&& fPathLength == other.fPathLength
 		&& strcmp(fBuffer, other.fBuffer) == 0;
 }
@@ -343,9 +386,9 @@ bool
 KPath::operator==(const char* path) const
 {
 	if (fBuffer == NULL)
-		return (!path);
+		return path == NULL;
 
-	return path && strcmp(fBuffer, path) == 0;
+	return path != NULL && strcmp(fBuffer, path) == 0;
 }
 
 
@@ -360,6 +403,41 @@ bool
 KPath::operator!=(const char* path) const
 {
 	return !(*this == path);
+}
+
+
+status_t
+KPath::_AllocateBuffer()
+{
+	if (fBuffer == NULL && fBufferSize != 0)
+		fBuffer = (char*)malloc(fBufferSize);
+	if (fBuffer == NULL) {
+		fFailed = true;
+		return B_NO_MEMORY;
+	}
+
+	fBuffer[0] = '\0';
+	fFailed = false;
+	return B_OK;
+}
+
+
+status_t
+KPath::_Normalize(const char* path, bool traverseLeafLink)
+{
+	status_t error = vfs_normalize_path(path, fBuffer, fBufferSize,
+		traverseLeafLink,
+		team_get_kernel_team_id() == team_get_current_team_id());
+	if (error != B_OK) {
+		// vfs_normalize_path() might have screwed up the previous
+		// path -- unset it completely to avoid weird problems.
+		fBuffer[0] = '\0';
+		fPathLength = 0;
+		return error;
+	}
+
+	fPathLength = strlen(fBuffer);
+	return B_OK;
 }
 
 

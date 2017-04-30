@@ -14,6 +14,9 @@
 #include <cppunit/TestSuite.h>
 
 
+typedef void* mutex;
+
+
 // Kernel stubs
 
 
@@ -39,6 +42,36 @@ vfs_normalize_path(const char* path, char* buffer, size_t bufferSize,
 }
 
 
+// #pragma mark - DEBUG only
+
+
+extern "C" void*
+memalign_etc(size_t alignment, size_t size, uint32 flags)
+{
+	return malloc(size);
+}
+
+
+extern "C" status_t
+_mutex_lock(mutex* lock, void* locker)
+{
+	return B_OK;
+}
+
+
+extern "C" status_t
+_mutex_trylock(mutex* lock)
+{
+	return B_OK;
+}
+
+
+extern "C" void
+_mutex_unlock(mutex* lock)
+{
+}
+
+
 // #pragma mark -
 
 
@@ -57,22 +90,22 @@ KPathTest::TestSetToAndPath()
 {
 	KPath path;
 	status_t status = path.InitCheck();
-//	CPPUNIT_ASSERT(status == B_NO_INIT);
+	CPPUNIT_ASSERT_MESSAGE("1. ", status == B_OK);
 
 	status = path.SetTo("a/b/c");
-	CPPUNIT_ASSERT(status == B_OK);
+	CPPUNIT_ASSERT_MESSAGE("2. ", status == B_OK);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a/b/c") == 0);
 	CPPUNIT_ASSERT(path.Length() == 5);
 	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
 
 	status = path.SetPath("abc/def");
-	CPPUNIT_ASSERT(status == B_OK);
+	CPPUNIT_ASSERT_MESSAGE("3. ", status == B_OK);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "abc/def") == 0);
 	CPPUNIT_ASSERT(path.Length() == 7);
 	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
 
 	status = path.SetTo("a/b/c", false, 10);
-	CPPUNIT_ASSERT(status == B_OK);
+	CPPUNIT_ASSERT_MESSAGE("4. ", status == B_OK);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a/b/c") == 0);
 	CPPUNIT_ASSERT(path.Length() == 5);
 	CPPUNIT_ASSERT(path.BufferSize() == 10);
@@ -81,6 +114,38 @@ KPathTest::TestSetToAndPath()
 	CPPUNIT_ASSERT(status == B_BUFFER_OVERFLOW);
 	CPPUNIT_ASSERT(strcmp(path.Path(), "a/b/c") == 0);
 	CPPUNIT_ASSERT(path.Length() == 5);
+
+	status = path.SetTo(NULL, KPath::DEFAULT, SIZE_MAX);
+	CPPUNIT_ASSERT(status == B_NO_MEMORY);
+}
+
+
+void
+KPathTest::TestLazyAlloc()
+{
+	KPath path(NULL, KPath::LAZY_ALLOC);
+	CPPUNIT_ASSERT(path.Path() == NULL);
+	CPPUNIT_ASSERT(path.Length() == 0);
+	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
+	CPPUNIT_ASSERT(path.InitCheck() == B_OK);
+
+	path.SetPath("/b");
+	CPPUNIT_ASSERT(path.Path() != NULL);
+	CPPUNIT_ASSERT(strcmp(path.Path(), "/b") == 0);
+	CPPUNIT_ASSERT(path.Length() == 2);
+	CPPUNIT_ASSERT(path.BufferSize() == B_PATH_NAME_LENGTH);
+
+	KPath second("yo", KPath::LAZY_ALLOC);
+	CPPUNIT_ASSERT(second.Path() != NULL);
+	CPPUNIT_ASSERT(strcmp(second.Path(), "yo") == 0);
+	CPPUNIT_ASSERT(second.Length() == 2);
+	CPPUNIT_ASSERT(second.BufferSize() == B_PATH_NAME_LENGTH);
+
+	status_t status = path.SetTo(NULL, KPath::LAZY_ALLOC, SIZE_MAX);
+	CPPUNIT_ASSERT(status == B_OK);
+	status = path.SetPath("test");
+	CPPUNIT_ASSERT(status == B_NO_MEMORY);
+	CPPUNIT_ASSERT(path.InitCheck() == B_NO_MEMORY);
 }
 
 
@@ -118,7 +183,7 @@ KPathTest::TestReplaceLeaf()
 {
 	KPath path;
 	status_t status = path.ReplaceLeaf("x");
-//	CPPUNIT_ASSERT(status == B_NO_INIT);
+	CPPUNIT_ASSERT(status == B_OK);
 
 	path.SetTo("/a/b/c");
 	CPPUNIT_ASSERT(path.Length() == 6);
@@ -194,7 +259,53 @@ KPathTest::TestAdopt()
 	CPPUNIT_ASSERT(strcmp(one.Path(), "second") == 0);
 	CPPUNIT_ASSERT(two.Length() == 0);
 	CPPUNIT_ASSERT(two.BufferSize() == 0);
-//	CPPUNIT_ASSERT(two.InitCheck() == B_NO_INIT);
+	CPPUNIT_ASSERT(two.InitCheck() == B_NO_INIT);
+
+	two.SetTo(NULL, KPath::LAZY_ALLOC);
+	CPPUNIT_ASSERT(two.InitCheck() == B_OK);
+	CPPUNIT_ASSERT(two.Path() == NULL);
+	CPPUNIT_ASSERT(two.Length() == 0);
+	one.Adopt(two);
+
+	CPPUNIT_ASSERT(two.InitCheck() == B_OK);
+	CPPUNIT_ASSERT(one.Path() == NULL);
+	CPPUNIT_ASSERT(one.Length() == 0);
+	one.SetPath("test");
+	CPPUNIT_ASSERT(one.Path() != NULL);
+	CPPUNIT_ASSERT(strcmp(one.Path(), "test") == 0);
+	CPPUNIT_ASSERT(one.Length() == 4);
+}
+
+
+void
+KPathTest::TestLockBuffer()
+{
+	KPath path;
+	CPPUNIT_ASSERT(path.Path() != NULL);
+	CPPUNIT_ASSERT(path.Length() == 0);
+	char* buffer = path.LockBuffer();
+	CPPUNIT_ASSERT(path.Path() == buffer);
+	strcpy(buffer, "test");
+	CPPUNIT_ASSERT(path.Length() == 0);
+	path.UnlockBuffer();
+	CPPUNIT_ASSERT(path.Length() == 4);
+
+	KPath second(NULL, KPath::LAZY_ALLOC);
+	CPPUNIT_ASSERT(second.Path() == NULL);
+	CPPUNIT_ASSERT(second.Length() == 0);
+	buffer = second.LockBuffer();
+	CPPUNIT_ASSERT(second.Path() == NULL);
+	CPPUNIT_ASSERT(buffer == NULL);
+
+	KPath third(NULL, KPath::LAZY_ALLOC);
+	CPPUNIT_ASSERT(third.Path() == NULL);
+	buffer = third.LockBuffer(true);
+	CPPUNIT_ASSERT(third.Path() != NULL);
+	CPPUNIT_ASSERT(buffer != NULL);
+	strcpy(buffer, "test");
+	CPPUNIT_ASSERT(third.Length() == 0);
+	third.UnlockBuffer();
+	CPPUNIT_ASSERT(third.Length() == 4);
 }
 
 
@@ -209,7 +320,7 @@ KPathTest::TestDetachBuffer()
 	CPPUNIT_ASSERT(strcmp(buffer, "test") == 0);
 
 	CPPUNIT_ASSERT(path.Path() == NULL);
-//	CPPUNIT_ASSERT(path.InitCheck() == B_NO_INIT);
+	CPPUNIT_ASSERT(path.InitCheck() == B_NO_INIT);
 }
 
 
@@ -221,6 +332,12 @@ KPathTest::TestNormalize()
 	CPPUNIT_ASSERT(path.InitCheck() == B_OK);
 
 	status_t status = path.Normalize(true);
+	CPPUNIT_ASSERT(status == B_NOT_SUPPORTED);
+	CPPUNIT_ASSERT(path.Path() != NULL);
+	CPPUNIT_ASSERT(path.Path()[0] == '\0');
+	CPPUNIT_ASSERT(path.Path() == path.Leaf());
+
+	status = path.SetTo("test/../in", KPath::NORMALIZE);
 	CPPUNIT_ASSERT(status == B_NOT_SUPPORTED);
 	CPPUNIT_ASSERT(path.Path() != NULL);
 	CPPUNIT_ASSERT(path.Path()[0] == '\0');
@@ -286,6 +403,8 @@ KPathTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestSetToAndPath", &KPathTest::TestSetToAndPath));
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
+		"KPathTest::TestLazyAlloc", &KPathTest::TestLazyAlloc));
+	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestLeaf", &KPathTest::TestLeaf));
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestReplaceLeaf", &KPathTest::TestReplaceLeaf));
@@ -293,6 +412,8 @@ KPathTest::AddTests(BTestSuite& parent)
 		"KPathTest::TestRemoveLeaf", &KPathTest::TestRemoveLeaf));
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestAdopt", &KPathTest::TestAdopt));
+	suite.addTest(new CppUnit::TestCaller<KPathTest>(
+		"KPathTest::TestLockBuffer", &KPathTest::TestLockBuffer));
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(
 		"KPathTest::TestDetachBuffer", &KPathTest::TestDetachBuffer));
 	suite.addTest(new CppUnit::TestCaller<KPathTest>(

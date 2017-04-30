@@ -16,10 +16,12 @@ public:
 	virtual						~KPathTest();
 
 			void				TestSetToAndPath();
+			void				TestLazyAlloc();
 			void				TestLeaf();
 			void				TestReplaceLeaf();
 			void				TestRemoveLeaf();
 			void				TestAdopt();
+			void				TestLockBuffer();
 			void				TestDetachBuffer();
 			void				TestNormalize();
 			void				TestAssign();

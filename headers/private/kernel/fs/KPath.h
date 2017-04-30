@@ -13,12 +13,14 @@
 namespace BPrivate {
 namespace DiskDevice {
 
+
 class KPath {
 public:
 	enum {
 		DEFAULT = 0,
 		NORMALIZE = 0x01,
 		TRAVERSE_LEAF_LINK = 0x02,
+		LAZY_ALLOC = 0x04
 	};
 public:
 								KPath(size_t bufferSize = B_PATH_NAME_LENGTH);
@@ -41,7 +43,7 @@ public:
 
 			size_t				BufferSize() const
 									{ return fBufferSize; }
-			char*				LockBuffer();
+			char*				LockBuffer(bool force = false);
 			void				UnlockBuffer();
 			char*				DetachBuffer();
 
@@ -64,12 +66,19 @@ public:
 			bool				operator!=(const char* path) const;
 
 private:
+			status_t			_AllocateBuffer();
+			status_t			_Normalize(const char* path,
+									bool traverseLeafLink);
 			void				_ChopTrailingSlashes();
 
+private:
 			char*				fBuffer;
 			size_t				fBufferSize;
 			size_t				fPathLength;
 			bool				fLocked;
+			bool				fLazy;
+			bool				fFailed;
+			bool				fIsNull;
 };
 
 
