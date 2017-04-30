@@ -1193,9 +1193,10 @@ AboutView::_CreateCreditsView()
 
 	// Bitstream Charter font
 	_AddPackageCredit(PackageCredit("Bitstream Charter font")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1989-1992 Bitstream Inc.,"
-			" Cambridge, MA.\n"
-			"BITSTREAM CHARTER is a registered trademark of Bitstream Inc."),
+		.SetCopyrights(COPYRIGHT_STRING "1989-1992 Bitstream Inc.,"
+			"Cambridge, MA.",
+			B_TRANSLATE("BITSTREAM CHARTER is a registered trademark of "
+				"Bitstream Inc."),
 			NULL)
 		.SetLicense("Bitstream Charter")
 		.SetURL("http://www.bitstream.com/"));
