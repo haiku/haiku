@@ -179,19 +179,19 @@ KPathTest::TestRemoveLeaf()
 void
 KPathTest::TestAdopt()
 {
-	KPath one("one", false, 10);
+	KPath one("first", false, 10);
 	CPPUNIT_ASSERT(one.InitCheck() == B_OK);
 	CPPUNIT_ASSERT(one.BufferSize() == 10);
-	CPPUNIT_ASSERT(one.Length() == 3);
-	KPath two("two", false, 20);
+	CPPUNIT_ASSERT(one.Length() == 5);
+	KPath two("second", false, 20);
 	CPPUNIT_ASSERT(two.InitCheck() == B_OK);
 	CPPUNIT_ASSERT(two.BufferSize() == 20);
 
 	one.Adopt(two);
 	CPPUNIT_ASSERT(one.InitCheck() == B_OK);
 	CPPUNIT_ASSERT(one.BufferSize() == 20);
-	CPPUNIT_ASSERT(one.Length() == 3);
-	CPPUNIT_ASSERT(strcmp(one.Path(), "two") == 0);
+	CPPUNIT_ASSERT(one.Length() == 6);
+	CPPUNIT_ASSERT(strcmp(one.Path(), "second") == 0);
 	CPPUNIT_ASSERT(two.Length() == 0);
 	CPPUNIT_ASSERT(two.BufferSize() == 0);
 //	CPPUNIT_ASSERT(two.InitCheck() == B_NO_INIT);

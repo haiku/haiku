@@ -96,6 +96,7 @@ KPath::Adopt(KPath& other)
 
 	fBuffer = other.fBuffer;
 	fBufferSize = other.fBufferSize;
+	fPathLength = other.fPathLength;
 
 	other.fBuffer = NULL;
 	other.fBufferSize = 0;
