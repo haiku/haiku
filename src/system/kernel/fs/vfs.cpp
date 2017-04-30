@@ -2769,7 +2769,7 @@ fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 
 	// FD only, or FD + relative path
 	struct vnode* vnode = get_vnode_from_fd(fd, kernel);
-	if (!vnode)
+	if (vnode == NULL)
 		return B_FILE_ERROR;
 
 	if (path != NULL) {
@@ -4337,7 +4337,7 @@ vfs_read_stat(int fd, const char* path, bool traverseLeafLink,
 {
 	status_t status;
 
-	if (path) {
+	if (path != NULL) {
 		// path given: get the stat of the node referred to by (fd, path)
 		KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
 		if (pathBuffer.InitCheck() != B_OK)
@@ -8197,11 +8197,11 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char* name, int openMode,
 int
 _kern_open(int fd, const char* path, int openMode, int perms)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	if (openMode & O_CREAT)
+	if ((openMode & O_CREAT) != 0)
 		return file_create(fd, pathBuffer.LockBuffer(), openMode, perms, true);
 
 	return file_open(fd, pathBuffer.LockBuffer(), openMode, true);
@@ -8249,10 +8249,7 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char* name)
 int
 _kern_open_dir(int fd, const char* path)
 {
-	if (path == NULL)
-		return dir_open(fd, NULL, true);;
-
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8324,15 +8321,11 @@ _kern_create_dir(int fd, const char* path, int perms)
 status_t
 _kern_remove_dir(int fd, const char* path)
 {
-	if (path) {
-		KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
-		if (pathBuffer.InitCheck() != B_OK)
-			return B_NO_MEMORY;
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-		return dir_remove(fd, pathBuffer.LockBuffer(), true);
-	}
-
-	return dir_remove(fd, NULL, true);
+	return dir_remove(fd, pathBuffer.LockBuffer(), true);
 }
 
 
@@ -8357,16 +8350,12 @@ _kern_remove_dir(int fd, const char* path)
 status_t
 _kern_read_link(int fd, const char* path, char* buffer, size_t* _bufferSize)
 {
-	if (path) {
-		KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
-		if (pathBuffer.InitCheck() != B_OK)
-			return B_NO_MEMORY;
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-		return common_read_link(fd, pathBuffer.LockBuffer(),
-			buffer, _bufferSize, true);
-	}
-
-	return common_read_link(fd, NULL, buffer, _bufferSize, true);
+	return common_read_link(fd, pathBuffer.LockBuffer(),
+		buffer, _bufferSize, true);
 }
 
 
@@ -8468,7 +8457,7 @@ _kern_rename(int oldFD, const char* oldPath, int newFD, const char* newPath)
 status_t
 _kern_access(int fd, const char* path, int mode, bool effectiveUserGroup)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8533,7 +8522,7 @@ _kern_read_stat(int fd, const char* path, bool traverseLeafLink,
 	written.
 
 	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL.
+	\param path The absolute or relative path. May be \c NULL.
 	\param traverseLeafLink If \a path is given, \c true specifies that the
 		   function shall not stick to symlinks, but traverse them.
 	\param stat The buffer containing the stat data to be written.
@@ -8562,7 +8551,7 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 
 	status_t status;
 
-	if (path) {
+	if (path != NULL) {
 		// path given: write the stat of the node referred to by (fd, path)
 		KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
 		if (pathBuffer.InitCheck() != B_OK)
@@ -8592,15 +8581,11 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 int
 _kern_open_attr_dir(int fd, const char* path, bool traverseLeafLink)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	if (path != NULL)
-		pathBuffer.SetTo(path);
-
-	return attr_dir_open(fd, path ? pathBuffer.LockBuffer() : NULL,
-		traverseLeafLink, true);
+	return attr_dir_open(fd, pathBuffer.LockBuffer(), traverseLeafLink, true);
 }
 
 
@@ -8608,7 +8593,7 @@ int
 _kern_open_attr(int fd, const char* path, const char* name, uint32 type,
 	int openMode)
 {
-	KPath pathBuffer(path, KPath::DEFAULT, B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -8677,14 +8662,11 @@ _kern_getcwd(char* buffer, size_t size)
 status_t
 _kern_setcwd(int fd, const char* path)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath pathBuffer(path, KPath::LAZY_ALLOC, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	if (path != NULL)
-		pathBuffer.SetTo(path);
-
-	return set_cwd(fd, path != NULL ? pathBuffer.LockBuffer() : NULL, true);
+	return set_cwd(fd, pathBuffer.LockBuffer(), true);
 }
 
 
@@ -8874,7 +8856,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 
 	// copy the leaf name onto the stack
 	char stackLeaf[B_FILE_NAME_LENGTH];
-	if (leaf) {
+	if (leaf != NULL) {
 		if (!IS_USER_ADDRESS(leaf))
 			return B_BAD_ADDRESS;
 
@@ -9465,7 +9447,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 	if (!IS_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
 
-	if (userPath) {
+	if (userPath != NULL) {
 		// path given: get the stat of the node referred to by (fd, path)
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
@@ -9524,7 +9506,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 
 	status_t status;
 
-	if (userPath) {
+	if (userPath != NULL) {
 		// path given: write the stat of the node referred to by (fd, path)
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
