@@ -552,6 +552,13 @@ TFilePanel::SetClientObject(BFilePanel* panel)
 }
 
 
+bool
+TFilePanel::IsOpenButtonAlwaysEnabled() const
+{
+	return !fIsSavePanel && (fNodeFlavors & B_DIRECTORY_NODE) != 0;
+}
+
+
 void
 TFilePanel::AdjustButton()
 {
@@ -613,7 +620,7 @@ TFilePanel::AdjustButton()
 	}
 
 	button->SetLabel(buttonText.String());
-	button->SetEnabled(enabled);
+	button->SetEnabled(IsOpenButtonAlwaysEnabled() || enabled);
 }
 
 
@@ -799,7 +806,7 @@ TFilePanel::Init(const BMessage*)
 		B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 	fBackView->AddChild(cancel_button);
 
-	if (!fIsSavePanel)
+	if (!fIsSavePanel && (fNodeFlavors & B_DIRECTORY_NODE) == 0)
 		default_button->SetEnabled(false);
 
 	default_button->MakeDefault(true);
@@ -1643,9 +1650,9 @@ TFilePanel::HandleOpenButton()
 		}
 	}
 
-	// don't do anything unless there are items selected
-    // message->fMessage->message from here to end
 	if (selection->CountItems()) {
+			// there are items selected
+			// message->fMessage->message from here to end
 		BMessage message(*fMessage);
 		// go through selection and add appropriate items
 		for (int32 index = 0; index < selection->CountItems(); index++) {
@@ -1660,6 +1667,10 @@ TFilePanel::HandleOpenButton()
 			}
 		}
 
+		OpenSelectionCommon(&message);
+	} else if (IsOpenButtonAlwaysEnabled()) {
+		BMessage message(*fMessage);
+		message.AddRef("refs", TargetModel()->EntryRef());
 		OpenSelectionCommon(&message);
 	}
 }

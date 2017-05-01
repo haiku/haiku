@@ -137,6 +137,7 @@ private:
 	bool SelectChildInParent(const entry_ref* parent,
 		const node_ref* child);
 	void OpenSelectionCommon(BMessage*);
+	bool IsOpenButtonAlwaysEnabled() const;
 
 	bool fIsSavePanel;
 	uint32 fNodeFlavors;
