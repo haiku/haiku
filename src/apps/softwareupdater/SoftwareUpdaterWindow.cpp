@@ -41,6 +41,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fCurrentState(STATE_HEAD),
 	fWaitingSem(-1),
 	fWaitingForButton(false),
+	fUpdateConfirmed(false),
 	fUserCancelRequested(false),
 	fWarningAlertCount(0)
 {
@@ -68,6 +69,10 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fScrollView = new BScrollView("scrollview", fListView, B_WILL_DRAW,
 		false, true);
 
+	fDetailsCheckbox = new BCheckBox("detailscheckbox",
+		B_TRANSLATE("Show more details"),
+		new BMessage(kMsgMoreDetailsToggle));
+
 	BFont font;
 	fHeaderView->GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
@@ -88,6 +93,10 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 			.End()
 			.AddStrut(B_USE_SMALL_SPACING)
 			.AddGroup(new BGroupView(B_HORIZONTAL))
+				.Add(fDetailsCheckbox)
+				.AddGlue()
+			.End()
+			.AddGroup(new BGroupView(B_HORIZONTAL))
 				.AddGlue()
 				.Add(fCancelButton)
 				.Add(fUpdateButton)
@@ -99,6 +108,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fProgressLayoutItem = layout_item_for(fStatusBar);
 	fPackagesLayoutItem = layout_item_for(fScrollView);
 	fUpdateButtonLayoutItem = layout_item_for(fUpdateButton);
+	fDetailsCheckboxLayoutItem = layout_item_for(fDetailsCheckbox);
 	
 	_SetState(STATE_DISPLAY_STATUS);
 	CenterOnScreen();
@@ -186,7 +196,26 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 				be_app->PostMessage(kMsgFinalQuit);
 				break;
 			}
+			if (!fUpdateConfirmed) {
+				// Downloads have not started yet, we will request to cancel
+				// without confirming
+				Lock();
+				fHeaderView->SetText(B_TRANSLATE("Cancelling updates"));
+				fDetailView->SetText(
+					B_TRANSLATE("Attempting to cancel the updates..."));
+				fCancelButton->SetEnabled(false);
+				Unlock();
+				fUserCancelRequested = true;
+				
+				if (fWaitingForButton) {
+					fButtonResult = message->what;
+					delete_sem(fWaitingSem);
+					fWaitingSem = -1;
+				}
+				break;
+			}
 			
+			// Confirm with the user to cancel
 			BAlert* alert = new BAlert("cancel request", B_TRANSLATE("Updates"
 				" have not been completed, are you sure you want to quit?"),
 				B_TRANSLATE("Quit"), B_TRANSLATE("Don't quit"), NULL,
@@ -198,7 +227,7 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		
 		case kMsgCancelResponse:
 		{
-			// Verify whether the cancel request was confirmed
+			// Verify whether the cancel alert was confirmed
 			int32 selection = -1;
 			message->FindInt32("which", &selection);
 			if (selection != 0)
@@ -226,28 +255,18 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 				fButtonResult = message->what;
 				delete_sem(fWaitingSem);
 				fWaitingSem = -1;
+				fUpdateConfirmed = true;
 			}
 			break;
 		}
+		
+		case kMsgMoreDetailsToggle:
+			fListView->SetMoreDetails(fDetailsCheckbox->Value() != 0);
+			break;
 
 		case kMsgWarningDismissed:
 			fWarningAlertCount--;
 			break;
-		
-		case kMsgNetworkAlert:
-		{
-			BAlert* alert = new BAlert("network_connection",
-				B_TRANSLATE_COMMENT("No active network connection was found",
-					"Alert message"),
-				B_TRANSLATE_COMMENT("Continue anyway", "Alert button label"),
-				B_TRANSLATE_COMMENT("Quit","Alert button label"),
-				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			int32 result = alert->Go();
-			BMessage reply;
-			reply.AddInt32(kKeyAlertResult, result);
-			message->SendReply(&reply);
-			break;
-		}
 		
 		case kMsgGetUpdateType:
 		{
@@ -281,6 +300,24 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			}
 			BMessage reply;
 			reply.AddInt32(kKeyAlertResult, action);
+			message->SendReply(&reply);
+			break;
+		}
+		
+		case kMsgNoRepositories:
+		{
+			BString text(
+				B_TRANSLATE_COMMENT(
+				"No remote repositories are available. Please verify that some"
+				" repositories are enabled using the Repositories preflet or"
+				" the \'pkgman\' command.", "Error message"));
+			BAlert* alert = new BAlert("repositories", text,
+				B_TRANSLATE_COMMENT("Quit", "Alert button label"),
+				B_TRANSLATE_COMMENT("Open Repositories","Alert button label"),
+				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			int32 result = alert->Go();
+			BMessage reply;
+			reply.AddInt32(kKeyAlertResult, result);
 			message->SendReply(&reply);
 			break;
 		}
@@ -423,6 +460,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	if (fCurrentState == STATE_HEAD) {
 		fProgressLayoutItem->SetVisible(false);
 		fPackagesLayoutItem->SetVisible(false);
+		fDetailsCheckboxLayoutItem->SetVisible(false);
 	}
 	fCurrentState = state;
 	
@@ -437,6 +475,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	// Show at confirmation prompt, hide at final update
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
 		fPackagesLayoutItem->SetVisible(true);
+		fDetailsCheckboxLayoutItem->SetVisible(true);
 		// Re-enable resizing
 		float defaultWidth = fDefaultRect.Width();
 		SetSizeLimits(defaultWidth, 9999,
@@ -444,6 +483,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		ResizeTo(defaultWidth, .75 * defaultWidth);
 	} else if (fCurrentState == STATE_FINAL_MESSAGE) {
 		fPackagesLayoutItem->SetVisible(false);
+		fDetailsCheckboxLayoutItem->SetVisible(false);
 		float defaultWidth = fDefaultRect.Width();
 		float defaultHeight = fDefaultRect.Height();
 		SetSizeLimits(defaultWidth, defaultWidth, defaultHeight,
@@ -781,41 +821,8 @@ PackageListView::PackageListView()
 	fLastProgressItem(NULL),
 	fLastProgressValue(-1)
 {
-	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	fDetailMenuItem = new BMenuItem("Show more details", new BMessage());
-	fMenu->AddItem(fDetailMenuItem);
-	
 	SetExplicitMinSize(BSize(B_SIZE_UNSET, 40));
 	SetExplicitPreferredSize(BSize(B_SIZE_UNSET, 400));
-}
-
-
-void
-PackageListView::AttachedToWindow()
-{
-	BOutlineListView::AttachedToWindow();
-	fDetailMenuItem->SetTarget(this);
-}
-
-
-void
-PackageListView::MessageReceived(BMessage* message)
-{
-	switch(message->what)
-	{
-		case kMsgMoreDetailsOff:
-		case kMsgMoreDetailsOn:
-		{
-			fShowMoreDetails = message->what == kMsgMoreDetailsOn;
-			_SetItemHeights();
-			InvalidateLayout();
-			ResizeToPreferred();
-			break;
-		}
-		
-		default:
-			BOutlineListView::MessageReceived(message);
-	}
 }
 
 
@@ -830,31 +837,6 @@ PackageListView::FrameResized(float newWidth, float newHeight)
 		item->Update(this, be_plain_font);
 	}
 	Invalidate();
-}
-
-
-void
-PackageListView::MouseDown(BPoint where)
-{
-	BOutlineListView::MouseDown(where);
-	
-	int32 button;
-	Looper()->CurrentMessage()->FindInt32("buttons", &button);
-	if (button & B_SECONDARY_MOUSE_BUTTON) {
-		if (fShowMoreDetails) {
-			fDetailMenuItem->SetMarked(true);
-			fDetailMenuItem->Message()->what = kMsgMoreDetailsOff;
-		} else {
-			fDetailMenuItem->SetMarked(false);
-			fDetailMenuItem->Message()->what = kMsgMoreDetailsOn;
-		}
-		// Offset point so cursor isn't over checkmark
-		ConvertToScreen(&where);
-		where.x -= 10;
-		where.y -= 10;
-		fMenu->Go(where, true, true, BRect(where.x - 2, where.y - 2,
-			where.x + 2, where.y + 2), true);
-	}
 }
 
 
@@ -986,6 +968,16 @@ PackageListView::ItemHeight()
 	if (fSuperUninstallItem != NULL)
 		return fSuperUninstallItem->GetPackageItemHeight();
 	return 0;
+}
+
+
+void
+PackageListView::SetMoreDetails(bool showMore)
+{
+	fShowMoreDetails = showMore;
+	_SetItemHeights();
+	InvalidateLayout();
+	ResizeToPreferred();
 }
 
 

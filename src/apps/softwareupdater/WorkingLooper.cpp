@@ -10,12 +10,13 @@
 #include "WorkingLooper.h"
 
 
-WorkingLooper::WorkingLooper(update_type action)
+WorkingLooper::WorkingLooper(update_type action, bool verbose)
 	:
 	BLooper("WorkingLooper"),
 	fUpdateAction(NULL),
 	fCheckAction(NULL),
-	fActionRequested(action)
+	fActionRequested(action),
+	fVerbose(verbose)
 {
 	Run();
 	PostMessage(kMsgStart);
@@ -36,10 +37,10 @@ WorkingLooper::MessageReceived(BMessage* message)
 		case kMsgStart:
 		{
 			if (fActionRequested == UPDATE_CHECK_ONLY) {
-				fCheckAction = new CheckAction;
+				fCheckAction = new CheckAction(fVerbose);
 				fCheckAction->Perform();
 			} else {
-				fUpdateAction = new UpdateAction();
+				fUpdateAction = new UpdateAction(fVerbose);
 				fUpdateAction->Perform(fActionRequested);
 			}
 			break;

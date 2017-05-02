@@ -31,11 +31,13 @@ class CheckManager : public BPackageManager,
 	private BPackageManager::UserInteractionHandler {
 public:
 								CheckManager(
-									BPackageInstallationLocation location);
+									BPackageInstallationLocation location,
+									bool verbose);
 
 			void				CheckNetworkConnection();
 	virtual	void				JobFailed(BSupportKit::BJob* job);
 	virtual	void				JobAborted(BSupportKit::BJob* job);
+			void				NoUpdatesNotification();
 
 private:
 	// UserInteractionHandler
@@ -69,6 +71,10 @@ private:
 									fClientInstallationInterface;
 			
 			ProblemWindow*			fProblemWindow;
+			bool					fVerbose;
+			BString					fNotificationId;
+			BString					fHeaderChecking;
+			BString					fTextContacting;
 };
 
 

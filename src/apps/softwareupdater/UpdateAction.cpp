@@ -23,10 +23,12 @@ using namespace BPackageKit;
 using namespace BPackageKit::BManager::BPrivate;
 
 
-UpdateAction::UpdateAction()
+UpdateAction::UpdateAction(bool verbose)
+	:
+	fVerbose(verbose)
 {
 	fUpdateManager = new(std::nothrow)
-		UpdateManager(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM);
+		UpdateManager(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, verbose);
 }
 
 
@@ -56,6 +58,7 @@ UpdateAction::Perform(update_type action_request)
 		fUpdateManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 			| BPackageManager::B_REFRESH_REPOSITORIES);
+		fUpdateManager->CheckRepositories();
 		
 //		fUpdateManager->SetDebugLevel(1);
 		if(action == UPDATE) {
@@ -75,21 +78,24 @@ UpdateAction::Perform(update_type action_request)
 			ex.Message());
 		return ex.Error();
 	} catch (BAbortedByUserException ex) {
-		fprintf(stderr, "Updates aborted by user: %s\n",
-			ex.Message().String());
+		if (fVerbose)
+			fprintf(stderr, "Updates aborted by user: %s\n",
+				ex.Message().String());
 		// No need for a final message since user initiated cancel request
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
 	} catch (BNothingToDoException ex) {
-		fprintf(stderr, "Nothing to do while updating packages : %s\n",
-			ex.Message().String());
+		if (fVerbose)
+			fprintf(stderr, "Nothing to do while updating packages : %s\n",
+				ex.Message().String());
 		fUpdateManager->FinalUpdate(B_TRANSLATE("No updates available"),
 			B_TRANSLATE("There were no updates found."));
 		return B_OK;
 	} catch (BException ex) {
-		fprintf(stderr, B_TRANSLATE(
+		if (fVerbose)
+			fprintf(stderr, B_TRANSLATE(
 				"Exception occurred while updating packages : %s\n"),
-			ex.Message().String());
+				ex.Message().String());
 		fUpdateManager->FinalUpdate(B_TRANSLATE("Updates did not complete"),
 			ex.Message());
 		return B_ERROR;

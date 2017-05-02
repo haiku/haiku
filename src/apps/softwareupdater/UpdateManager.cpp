@@ -16,12 +16,14 @@
 #include <unistd.h>
 
 #include <Alert.h>
+#include <Application.h>
 #include <Catalog.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 #include <Notification.h>
+#include <Roster.h>
 
 #include <package/manager/Exceptions.h>
 #include <package/solver/SolverPackage.h>
@@ -36,14 +38,16 @@ using namespace BPackageKit::BManager::BPrivate;
 #define B_TRANSLATION_CONTEXT "UpdateManager"
 
 
-UpdateManager::UpdateManager(BPackageInstallationLocation location)
+UpdateManager::UpdateManager(BPackageInstallationLocation location,
+	bool verbose)
 	:
 	BPackageManager(location, &fClientInstallationInterface, this),
 	BPackageManager::UserInteractionHandler(),
 	fClientInstallationInterface(),
 	fStatusWindow(NULL),
 	fCurrentStep(ACTION_STEP_INIT),
-	fChangesConfirmed(false)
+	fChangesConfirmed(false),
+	fVerbose(verbose)
 {
 	fStatusWindow = new SoftwareUpdaterWindow();
 	_SetCurrentStep(ACTION_STEP_START);
@@ -73,25 +77,9 @@ UpdateManager::CheckNetworkConnection()
 		}
 	}
 	
-	// No network connection detected, display warning
-	int32 result = 0;
-	BMessenger messenger(fStatusWindow);
-	if (messenger.IsValid()) {
-		BMessage message(kMsgNetworkAlert);
-		BMessage reply;
-		messenger.SendMessage(&message, &reply);
-		reply.FindInt32(kKeyAlertResult, &result);
-	} else {
-		BAlert* alert = new BAlert("network_connection",
-		B_TRANSLATE_COMMENT("No active network connection was found",
-			"Alert message"),
-		B_TRANSLATE_COMMENT("Continue anyway", "Alert button label"),
-		B_TRANSLATE_COMMENT("Quit","Alert button label"),
-		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		result = alert->Go();
-	}
-	if (result)
-		throw BAbortedByUserException();
+	// No network connection detected, cannot continue
+	throw BException(B_TRANSLATE_COMMENT(
+		"No active network connection was found", "Error message"));
 }
 
 
@@ -111,8 +99,35 @@ UpdateManager::GetUpdateType()
 
 
 void
+UpdateManager::CheckRepositories()
+{
+	int32 count = fOtherRepositories.CountItems();
+	if (fVerbose)
+		printf("Remote repositories available: %" B_PRId32 "\n", count);
+	if (count == 0) {
+		BMessenger messenger(fStatusWindow);
+		if (messenger.IsValid()) {
+			BMessage message(kMsgNoRepositories);
+			BMessage reply;
+			messenger.SendMessage(&message, &reply);
+			int32 result;
+			reply.FindInt32(kKeyAlertResult, &result);
+			if (result == 1)
+				be_roster->Launch("application/x-vnd.Haiku-Repositories");
+		}
+		be_app->PostMessage(kMsgFinalQuit);
+		throw BException(B_TRANSLATE_COMMENT(
+			"No remote repositories are available", "Error message"));
+	}
+}
+
+
+void
 UpdateManager::JobFailed(BSupportKit::BJob* job)
 {
+	if (!fVerbose)
+		return;
+	
 	BString error = job->ErrorString();
 	if (error.Length() > 0) {
 		error.ReplaceAll("\n", "\n*** ");
@@ -124,7 +139,8 @@ UpdateManager::JobFailed(BSupportKit::BJob* job)
 void
 UpdateManager::JobAborted(BSupportKit::BJob* job)
 {
-	printf("Job aborted\n");
+	if (fVerbose)
+		puts("Job aborted");
 }
 
 
@@ -146,67 +162,14 @@ UpdateManager::HandleProblems()
 	if (!fProblemWindow->Go(fSolver,installPackages, uninstallPackages))
 		throw BAbortedByUserException();
 	fProblemWindow->Hide();
-
-/*	int32 problemCount = fSolver->CountProblems();
-	for (int32 i = 0; i < problemCount; i++) {
-		// print problem and possible solutions
-		BSolverProblem* problem = fSolver->ProblemAt(i);
-		printf("problem %" B_PRId32 ": %s\n", i + 1,
-			problem->ToString().String());
-
-		int32 solutionCount = problem->CountSolutions();
-		for (int32 k = 0; k < solutionCount; k++) {
-			const BSolverProblemSolution* solution = problem->SolutionAt(k);
-			printf("  solution %" B_PRId32 ":\n", k + 1);
-			int32 elementCount = solution->CountElements();
-			for (int32 l = 0; l < elementCount; l++) {
-				const BSolverProblemSolutionElement* element
-					= solution->ElementAt(l);
-				printf("    - %s\n", element->ToString().String());
-			}
-		}
-
-		// let the user choose a solution
-		printf("Please select a solution, skip the problem for now or quit.\n");
-		for (;;) {
-			if (solutionCount > 1)
-				printf("select [1...%" B_PRId32 "/s/q]: ", solutionCount);
-			else
-				printf("select [1/s/q]: ");
-
-			char buffer[32];
-			if (fgets(buffer, sizeof(buffer), stdin) == NULL
-				|| strcmp(buffer, "q\n") == 0) {
-				//exit(1);
-			}
-
-			if (strcmp(buffer, "s\n") == 0)
-				break;
-
-			
-			char* end;
-			long selected = strtol(buffer, &end, 0);
-			if (end == buffer || *end != '\n' || selected < 1
-				|| selected > solutionCount) {
-				printf("*** invalid input\n");
-				continue;
-			}
-
-			status_t error = fSolver->SelectProblemSolution(problem,
-				problem->SolutionAt(selected - 1));
-			if (error != B_OK)
-				DIE(error, "failed to set solution");
-			
-			break;
-		}
-	}*/
 }
 
 
 void
 UpdateManager::ConfirmChanges(bool fromMostSpecific)
 {
-	printf("The following changes will be made:\n");
+	if (fVerbose)
+		puts("The following changes will be made:");
 
 	int32 count = fInstalledRepositories.CountItems();
 	int32 upgradeCount = 0;
@@ -223,9 +186,10 @@ UpdateManager::ConfirmChanges(bool fromMostSpecific)
 				installCount, uninstallCount);
 	}
 	
-	printf("Upgrade count=%" B_PRId32 ", Install count=%" B_PRId32
-		", Uninstall count=%" B_PRId32 "\n",
-		upgradeCount, installCount, uninstallCount);
+	if (fVerbose)
+		printf("Upgrade count=%" B_PRId32 ", Install count=%" B_PRId32
+			", Uninstall count=%" B_PRId32 "\n",
+			upgradeCount, installCount, uninstallCount);
 	
 	fChangesConfirmed = fStatusWindow->ConfirmUpdates();
 	if (!fChangesConfirmed)
@@ -243,14 +207,16 @@ UpdateManager::Warn(status_t error, const char* format, ...)
 	char buffer[256];
 	va_list args;
 	va_start(args, format);
-	vfprintf(stderr, format, args);
 	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
-	if (error == B_OK)
-		printf("\n");
-	else
-		printf(": %s\n", strerror(error));
+	if (fVerbose) {
+		fputs(buffer, stderr);
+		if (error == B_OK)
+			puts("");
+		else
+			printf(": %s\n", strerror(error));
+	}
 	
 	if (fStatusWindow != NULL) {
 		if (fStatusWindow->UserCancelRequested())
@@ -275,7 +241,8 @@ UpdateManager::ProgressPackageDownloadStarted(const char* packageName)
 		fNewDownloadStarted = false;
 	}
 	
-	printf("Downloading %s...\n", packageName);
+	if (fVerbose)
+		printf("Downloading %s...\n", packageName);
 }
 
 
@@ -295,49 +262,51 @@ UpdateManager::ProgressPackageDownloadActive(const char* packageName,
 		_UpdateDownloadProgress(NULL, packageName, completionValue * 100.0);
 	}
 
-	static const char* progressChars[] = {
-		"\xE2\x96\x8F",
-		"\xE2\x96\x8E",
-		"\xE2\x96\x8D",
-		"\xE2\x96\x8C",
-		"\xE2\x96\x8B",
-		"\xE2\x96\x8A",
-		"\xE2\x96\x89",
-		"\xE2\x96\x88",
-	};
-
-	int width = 70;
-
-	struct winsize winSize;
-	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
-		&& winSize.ws_col < 77) {
-		// We need 7 characters for the percent display
-		width = winSize.ws_col - 7;
-	}
-
-	int position;
-	int ipart = (int)(completionValue * width);
-	int fpart = (int)(((completionValue * width) - ipart) * 8);
-
-	printf("\r"); // return to the beginning of the line
-
-	for (position = 0; position < width; position++) {
-		if (position < ipart) {
-			// This part is fully downloaded, show a full block
-			printf(progressChars[7]);
-		} else if (position > ipart) {
-			// This part is not downloaded, show a space
-			printf(" ");
-		} else {
-			// This part is partially downloaded
-			printf(progressChars[fpart]);
+	if (fVerbose) {
+		static const char* progressChars[] = {
+			"\xE2\x96\x8F",
+			"\xE2\x96\x8E",
+			"\xE2\x96\x8D",
+			"\xE2\x96\x8C",
+			"\xE2\x96\x8B",
+			"\xE2\x96\x8A",
+			"\xE2\x96\x89",
+			"\xE2\x96\x88",
+		};
+	
+		int width = 70;
+	
+		struct winsize winSize;
+		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
+			&& winSize.ws_col < 77) {
+			// We need 7 characters for the percent display
+			width = winSize.ws_col - 7;
 		}
+	
+		int position;
+		int ipart = (int)(completionValue * width);
+		int fpart = (int)(((completionValue * width) - ipart) * 8);
+	
+		fputs("\r", stdout); // return to the beginning of the line
+	
+		for (position = 0; position < width; position++) {
+			if (position < ipart) {
+				// This part is fully downloaded, show a full block
+				fputs(progressChars[7], stdout);
+			} else if (position > ipart) {
+				// This part is not downloaded, show a space
+				fputs(" ", stdout);
+			} else {
+				// This part is partially downloaded
+				fputs(progressChars[fpart], stdout);
+			}
+		}
+	
+		// Also print the progress percentage
+		printf(" %3d%%", (int)(completionValue * 100));
+	
+		fflush(stdout);
 	}
-
-	// Also print the progress percentage
-	printf(" %3d%%", (int)(completionValue * 100));
-
-	fflush(stdout);
 	
 }
 
@@ -350,15 +319,17 @@ UpdateManager::ProgressPackageDownloadComplete(const char* packageName)
 		fPackageDownloadsCount++;
 	}
 	
-	// Overwrite the progress bar with whitespace
-	printf("\r");
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	for (int i = 0; i < (w.ws_col); i++)
-		printf(" ");
-	printf("\r\x1b[1A"); // Go to previous line.
-
-	printf("Downloading %s...done.\n", packageName);
+	if (fVerbose) {
+		// Overwrite the progress bar with whitespace
+		fputs("\r", stdout);
+		struct winsize w;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		for (int i = 0; i < (w.ws_col); i++)
+			fputs(" ", stdout);
+		fputs("\r\x1b[1A", stdout); // Go to previous line.
+	
+		printf("Downloading %s...done.\n", packageName);
+	}
 }
 
 
@@ -369,14 +340,16 @@ UpdateManager::ProgressPackageChecksumStarted(const char* title)
 	if (fCurrentStep == ACTION_STEP_START)
 		_UpdateStatusWindow(NULL, title);
 	
-	printf("%s...", title);
+	if (fVerbose)
+		printf("%s...", title);
 }
 
 
 void
 UpdateManager::ProgressPackageChecksumComplete(const char* title)
 {
-	printf("done.\n");
+	if (fVerbose)
+		puts("done.");
 }
 
 
@@ -388,7 +361,8 @@ UpdateManager::ProgressStartApplyingChanges(InstalledRepository& repository)
 	BString detail(B_TRANSLATE("Packages are being updated"));
 	fStatusWindow->UpdatesApplying(header.String(), detail.String());
 	
-	printf("[%s] Applying changes ...\n", repository.Name().String());
+	if (fVerbose)
+		printf("[%s] Applying changes ...\n", repository.Name().String());
 }
 
 
@@ -402,30 +376,33 @@ UpdateManager::ProgressTransactionCommitted(InstalledRepository& repository,
 		"updates."));
 	_FinalUpdate(header.String(), detail.String());
 
-	const char* repositoryName = repository.Name().String();
+	if (fVerbose) {
+		const char* repositoryName = repository.Name().String();
 
-	int32 issueCount = result.CountIssues();
-	for (int32 i = 0; i < issueCount; i++) {
-		const BTransactionIssue* issue = result.IssueAt(i);
-		if (issue->PackageName().IsEmpty()) {
-			printf("[%s] warning: %s\n", repositoryName,
-				issue->ToString().String());
-		} else {
-			printf("[%s] warning: package %s: %s\n", repositoryName,
-				issue->PackageName().String(), issue->ToString().String());
+		int32 issueCount = result.CountIssues();
+		for (int32 i = 0; i < issueCount; i++) {
+			const BTransactionIssue* issue = result.IssueAt(i);
+			if (issue->PackageName().IsEmpty()) {
+				printf("[%s] warning: %s\n", repositoryName,
+					issue->ToString().String());
+			} else {
+				printf("[%s] warning: package %s: %s\n", repositoryName,
+					issue->PackageName().String(), issue->ToString().String());
+			}
 		}
+	
+		printf("[%s] Changes applied. Old activation state backed up in \"%s\"\n",
+			repositoryName, result.OldStateDirectory().String());
+		printf("[%s] Cleaning up ...\n", repositoryName);
 	}
-
-	printf("[%s] Changes applied. Old activation state backed up in \"%s\"\n",
-		repositoryName, result.OldStateDirectory().String());
-	printf("[%s] Cleaning up ...\n", repositoryName);
 }
 
 
 void
 UpdateManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
-	printf("[%s] Done.\n", repository.Name().String());
+	if (fVerbose)
+		printf("[%s] Done.\n", repository.Name().String());
 }
 
 
@@ -436,7 +413,8 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 	if (!installationRepository.HasChanges())
 		return;
 
-	printf("  in %s:\n", installationRepository.Name().String());
+	if (fVerbose)
+		printf("  in %s:\n", installationRepository.Name().String());
 
 	PackageList& packagesToActivate
 		= installationRepository.PackagesToActivate();
@@ -470,11 +448,12 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 
 		int position = upgradedPackages.IndexOf(package->Info().Name());
 		if (position >= 0) {
-			printf("    upgrade package %s-%s to %s from %s\n",
-				package->Info().Name().String(),
-				upgradedPackageVersions.StringAt(position).String(),
-				package->Info().Version().ToString().String(),
-				repository.String());
+			if (fVerbose)
+				printf("    upgrade package %s-%s to %s from %s\n",
+					package->Info().Name().String(),
+					upgradedPackageVersions.StringAt(position).String(),
+					package->Info().Version().ToString().String(),
+					repository.String());
 			fStatusWindow->AddPackageInfo(PACKAGE_UPDATE,
 				package->Info().Name().String(),
 				upgradedPackageVersions.StringAt(position).String(),
@@ -484,10 +463,11 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 				package->Info().FileName().String());
 			upgradeCount++;
 		} else {
-			printf("    install package %s-%s from %s\n",
-				package->Info().Name().String(),
-				package->Info().Version().ToString().String(),
-				repository.String());
+			if (fVerbose)
+				printf("    install package %s-%s from %s\n",
+					package->Info().Name().String(),
+					package->Info().Version().ToString().String(),
+					repository.String());
 			fStatusWindow->AddPackageInfo(PACKAGE_INSTALL,
 				package->Info().Name().String(),
 				NULL,
@@ -504,7 +484,9 @@ UpdateManager::_PrintResult(InstalledRepository& installationRepository,
 		i++) {
 		if (upgradedPackages.HasString(package->Info().Name()))
 			continue;
-		printf("    uninstall package %s\n", package->VersionedName().String());
+		if (fVerbose)
+			printf("    uninstall package %s\n",
+				package->VersionedName().String());
 		fStatusWindow->AddPackageInfo(PACKAGE_UNINSTALL,
 			package->Info().Name().String(),
 			package->Info().Version().ToString(),
@@ -563,14 +545,16 @@ UpdateManager::_UpdateDownloadProgress(const char* header,
 void
 UpdateManager::_FinalUpdate(const char* header, const char* text)
 {
-	BNotification notification(B_INFORMATION_NOTIFICATION);
-	notification.SetGroup("SoftwareUpdater");
-	notification.SetTitle(header);
-	notification.SetContent(text);
-	BBitmap icon(fStatusWindow->GetNotificationIcon());
-	if (icon.IsValid())
-		notification.SetIcon(&icon);
-	notification.Send();
+	if (!fStatusWindow->IsFront()) {
+		BNotification notification(B_INFORMATION_NOTIFICATION);
+		notification.SetGroup("SoftwareUpdater");
+		notification.SetTitle(header);
+		notification.SetContent(text);
+		BBitmap icon(fStatusWindow->GetNotificationIcon());
+		if (icon.IsValid())
+			notification.SetIcon(&icon);
+		notification.Send();
+	}
 	
 	fStatusWindow->FinalUpdate(header, text);
 }

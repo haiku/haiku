@@ -29,11 +29,13 @@ class UpdateManager : public BPackageManager,
 	private BPackageManager::UserInteractionHandler {
 public:
 								UpdateManager(
-									BPackageInstallationLocation location);
+									BPackageInstallationLocation location,
+									bool verbose);
 								~UpdateManager();
 
 			void				CheckNetworkConnection();
 			update_type			GetUpdateType();
+			void				CheckRepositories();
 	virtual	void				JobFailed(BSupportKit::BJob* job);
 	virtual	void				JobAborted(BSupportKit::BJob* job);
 			void				FinalUpdate(const char* header,
@@ -91,6 +93,7 @@ private:
 			bool					fNewDownloadStarted;
 			int32					fPackageDownloadsTotal;
 			int32					fPackageDownloadsCount;
+			bool					fVerbose;
 };
 
 

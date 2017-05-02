@@ -23,10 +23,10 @@ using namespace BPackageKit;
 using namespace BPackageKit::BManager::BPrivate;
 
 
-CheckAction::CheckAction()
+CheckAction::CheckAction(bool verbose)
 {
 	fCheckManager = new(std::nothrow)
-		CheckManager(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM);
+		CheckManager(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, verbose);
 }
 
 
@@ -61,7 +61,8 @@ CheckAction::Perform()
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
 	} catch (BNothingToDoException ex) {
-		fprintf(stdout, B_TRANSLATE("There were no updates found."));
+		puts(B_TRANSLATE("There were no updates found."));
+		fCheckManager->NoUpdatesNotification();
 		be_app->PostMessage(kMsgFinalQuit);
 		return B_OK;
 	} catch (BException ex) {

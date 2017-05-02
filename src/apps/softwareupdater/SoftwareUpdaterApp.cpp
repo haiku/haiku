@@ -9,6 +9,9 @@
 
 #include "SoftwareUpdaterApp.h"
 
+#include <getopt.h>
+#include <stdlib.h>
+
 #include <Catalog.h>
 
 #undef B_TRANSLATION_CONTEXT
@@ -16,7 +19,7 @@
 
 
 static const char* const kUsage = B_TRANSLATE_COMMENT(
-	"Usage:  SoftwareUpdater <command>\n"
+	"Usage:  SoftwareUpdater <command> [ <option> ]\n"
 	"Updates installed packages.\n"
 	"\n"
 	"Commands:\n"
@@ -24,8 +27,19 @@ static const char* const kUsage = B_TRANSLATE_COMMENT(
 	"  check      - Check for available updates but only display a "
 		"notification with results.\n"
 	"  full-sync  - Synchronize the installed packages with the "
-		"repositories.\n", "Command line usage help")
+		"repositories.\n"
+	"\n"
+	"Options:\n"
+	"  -h or --help       Print this usage help\n"
+	"  -v or --verbose    Output verbose information\n",
+	"Command line usage help")
 ;
+
+static struct option const kLongOptions[] = {
+	{"verbose", no_argument, 0, 'v'},
+	{"help", no_argument, 0, 'h'},
+	{NULL}
+};
 
 
 SoftwareUpdaterApp::SoftwareUpdaterApp()
@@ -33,7 +47,9 @@ SoftwareUpdaterApp::SoftwareUpdaterApp()
 	BApplication(kAppSignature),
 	fWorker(NULL),
 	fFinalQuitFlag(false),
-	fActionRequested(UPDATE)
+	fActionRequested(UPDATE),
+	fVerbose(false),
+	fArgvsAccepted(true)
 {
 }
 
@@ -67,29 +83,63 @@ SoftwareUpdaterApp::QuitRequested()
 void
 SoftwareUpdaterApp::ReadyToRun()
 {
-	fWorker = new WorkingLooper(fActionRequested);
+	// Argvs no longer accepted once the process starts
+	fArgvsAccepted = false;
+	
+	fWorker = new WorkingLooper(fActionRequested, fVerbose);
 }
 
 
 void
 SoftwareUpdaterApp::ArgvReceived(int32 argc, char **argv)
 {
-	// Only one command allowed
-	if (argc > 2) {
-		fprintf(stderr, kUsage);
-		PostMessage(B_QUIT_REQUESTED);
+	if (!fArgvsAccepted) {
+		fputs(B_TRANSLATE("Argument variables are no longer accepted\n"),
+			stderr);
 		return;
-	} else if (argc == 2) {
-		fActionRequested = USER_SELECTION_NEEDED;
-		const char* command = argv[1];
-		if (strcmp("update", command) == 0)
-			fActionRequested = UPDATE;
-		else if (strcmp("check", command) == 0)
-			fActionRequested = UPDATE_CHECK_ONLY;
-		else if (strcmp("full-sync", command) == 0)
-			fActionRequested = FULLSYNC;
-		else
-			fprintf(stderr, kUsage);
+	}
+	
+	int c;
+	while ((c = getopt_long(argc, argv, "hv", kLongOptions, NULL)) != -1) {
+		switch (c) {
+			case 0:
+				break;
+			case 'h':
+				fputs(kUsage, stdout);
+				exit(0);
+				break;
+			case 'v':
+				fVerbose = true;
+				break;
+			default:
+				fputs(kUsage, stderr);
+				exit(1);
+				break;
+		}
+	}
+	
+	const char* command = "";
+	int32 argCount = argc - optind;
+	if (argCount == 0)
+		return;
+	else if (argCount > 1) {
+		fputs(kUsage, stderr);
+		exit(1);
+	} else
+		command = argv[optind];
+	
+	fActionRequested = USER_SELECTION_NEEDED;
+	if (strcmp("update", command) == 0)
+		fActionRequested = UPDATE;
+	else if (strcmp("check", command) == 0)
+		fActionRequested = UPDATE_CHECK_ONLY;
+	else if (strcmp("full-sync", command) == 0)
+		fActionRequested = FULLSYNC;
+	else {
+		fputs(B_TRANSLATE_COMMENT("Unrecognized argument", "Error message"),
+			stderr);
+		fprintf(stderr, " \"%s\"\n", command);
+		fputs(kUsage, stderr);
 	}
 }
 
@@ -116,11 +166,6 @@ SoftwareUpdaterApp::MessageReceived(BMessage* message)
 int
 main(int argc, const char* const* argv)
 {
-	if (argc > 2) {
-		fprintf(stderr, kUsage);
-		return 1;
-	}
-	
 	SoftwareUpdaterApp app;
 	return app.Run();
 }

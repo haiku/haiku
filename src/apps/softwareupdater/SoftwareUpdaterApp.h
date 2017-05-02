@@ -29,6 +29,8 @@ private:
 			BMessenger			fWindowMessenger;
 			bool				fFinalQuitFlag;
 			update_type			fActionRequested;
+			bool				fVerbose;
+			bool				fArgvsAccepted;
 };
 
 

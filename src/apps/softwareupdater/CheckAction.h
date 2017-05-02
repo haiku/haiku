@@ -14,7 +14,7 @@
 
 class CheckAction {
 public:
-								CheckAction();
+								CheckAction(bool verbose);
 								~CheckAction();
 		status_t				Perform();
 

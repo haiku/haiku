@@ -11,12 +11,11 @@
 
 
 #include <Button.h>
+#include <CheckBox.h>
 #include <GroupView.h>
 #include <OutlineListView.h>
-#include <MenuItem.h>
 #include <NodeInfo.h>
 #include <Point.h>
-#include <PopUpMenu.h>
 #include <ScrollView.h>
 #include <StatusBar.h>
 #include <StringView.h>
@@ -106,10 +105,7 @@ private:
 class PackageListView : public BOutlineListView {
 public:
 								PackageListView();
-			void				AttachedToWindow();
-	virtual void				MessageReceived(BMessage*);
 	virtual	void				FrameResized(float newWidth, float newHeight);
-	virtual void				MouseDown(BPoint where);
 			void				AddPackage(uint32 install_type,
 									const char* name,
 									const char* cur_ver,
@@ -121,6 +117,7 @@ public:
 									float percent);
 			void				SortItems();
 			float				ItemHeight();
+			void				SetMoreDetails(bool showMore);
 
 private:
 			void				_SetItemHeights();
@@ -129,8 +126,6 @@ private:
 			SuperItem*			fSuperInstallItem;
 			SuperItem*			fSuperUninstallItem;
 			bool				fShowMoreDetails;
-			BPopUpMenu			*fMenu;
-			BMenuItem			*fDetailMenuItem;
 			PackageItem*		fLastProgressItem;
 			int16				fLastProgressValue;
 };
@@ -174,15 +169,18 @@ private:
 			BStatusBar*			fStatusBar;
 			PackageListView*	fListView;
 			BScrollView*		fScrollView;
+			BCheckBox*			fDetailsCheckbox;
 			BLayoutItem*		fDetailsLayoutItem;
 			BLayoutItem*		fPackagesLayoutItem;
 			BLayoutItem*		fProgressLayoutItem;
 			BLayoutItem*		fUpdateButtonLayoutItem;
+			BLayoutItem*		fDetailsCheckboxLayoutItem;
 			
 			uint32				fCurrentState;
 			sem_id				fWaitingSem;
 			bool				fWaitingForButton;
 			uint32				fButtonResult;
+			bool				fUpdateConfirmed;
 			bool				fUserCancelRequested;
 			BInvoker			fCancelAlertResponse;
 			int32				fWarningAlertCount;

@@ -14,12 +14,13 @@
 
 class UpdateAction {
 public:
-								UpdateAction();
+								UpdateAction(bool verbose);
 								~UpdateAction();
 		status_t				Perform(update_type action_request);
 
 private:
 		UpdateManager*			fUpdateManager;
+		bool					fVerbose;
 };
 
 

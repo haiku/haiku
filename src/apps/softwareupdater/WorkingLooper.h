@@ -21,7 +21,7 @@ const uint32 kMsgStart = 'iSTA';
 
 class WorkingLooper : public BLooper {
 public:
-							WorkingLooper(update_type action);
+							WorkingLooper(update_type action, bool verbose);
 							~WorkingLooper();
 			void			MessageReceived(BMessage* message);
 
@@ -29,6 +29,7 @@ private:
 			UpdateAction*	fUpdateAction;
 			CheckAction*	fCheckAction;
 			update_type		fActionRequested;
+			bool			fVerbose;
 			
 };
 

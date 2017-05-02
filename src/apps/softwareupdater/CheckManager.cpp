@@ -15,6 +15,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <Application.h>
 #include <Catalog.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -38,12 +39,25 @@ using namespace BPackageKit::BManager::BPrivate;
 #define B_TRANSLATION_CONTEXT "CheckManager"
 
 
-CheckManager::CheckManager(BPackageInstallationLocation location)
+CheckManager::CheckManager(BPackageInstallationLocation location,
+	bool verbose)
 	:
 	BPackageManager(location, &fClientInstallationInterface, this),
 	BPackageManager::UserInteractionHandler(),
-	fClientInstallationInterface()
+	fClientInstallationInterface(),
+	fVerbose(verbose),
+	fNotificationId("")
 {
+	if (verbose) {
+		app_info info;
+		if (be_app->GetAppInfo(&info)!= B_OK)
+			fVerbose = false;
+		else
+			fNotificationId << info.team;
+	}
+	fHeaderChecking = B_TRANSLATE("Checking for updates");
+	fTextContacting = B_TRANSLATE("Contacting software repositories to check "
+			"for package updates.");
 }
 
 
@@ -62,7 +76,7 @@ CheckManager::CheckNetworkConnection()
 	}
 	
 	// No network connection detected, cannot continue
-	fprintf(stderr, B_TRANSLATE("No active network connection was found.\n"));
+	fputs(B_TRANSLATE("No active network connection was found.\n"), stderr);
 	throw BAbortedByUserException();
 }
 
@@ -81,7 +95,7 @@ CheckManager::JobFailed(BSupportKit::BJob* job)
 void
 CheckManager::JobAborted(BSupportKit::BJob* job)
 {
-	printf("Job aborted\n");
+	puts("Job aborted");
 	BString error = job->ErrorString();
 	if (error.Length() > 0) {
 		error.ReplaceAll("\n", "\n*** ");
@@ -91,9 +105,20 @@ CheckManager::JobAborted(BSupportKit::BJob* job)
 
 
 void
+CheckManager::NoUpdatesNotification()
+{
+	if (fVerbose) {
+		BString header = B_TRANSLATE("No updates available");
+		BString text = B_TRANSLATE("There were no updates found.");
+		_SendNotification(header.String(), text.String());
+	}
+}
+
+
+void
 CheckManager::HandleProblems()
 {
-	printf("Encountered problems:\n");
+	puts("Encountered problems:");
 
 	int32 problemCount = fSolver->CountProblems();
 	for (int32 i = 0; i < problemCount; i++) {
@@ -132,7 +157,7 @@ CheckManager::ConfirmChanges(bool fromMostSpecific)
 		count << updateCount;
 		title.ReplaceFirst("%count%", count);
 		BString text(B_TRANSLATE("Click here to install updates."));
-		_SendNotification(title, text);
+		_SendNotification(title.String(), text.String());
 	}
 	throw BAbortedByUserException();
 }
@@ -147,7 +172,7 @@ CheckManager::Warn(status_t error, const char* format, ...)
 	va_end(args);
 
 	if (error == B_OK)
-		printf("\n");
+		puts("");
 	else
 		printf(": %s\n", strerror(error));
 }
@@ -156,6 +181,9 @@ CheckManager::Warn(status_t error, const char* format, ...)
 void
 CheckManager::ProgressPackageDownloadStarted(const char* packageName)
 {
+	if (fVerbose)
+		_SendNotification(fHeaderChecking.String(), fTextContacting.String());
+	
 	printf("Downloading %s...\n", packageName);
 }
 
@@ -188,18 +216,18 @@ CheckManager::ProgressPackageDownloadActive(const char* packageName,
 	int ipart = (int)(completionPercentage * width);
 	int fpart = (int)(((completionPercentage * width) - ipart) * 8);
 
-	printf("\r"); // return to the beginning of the line
+	fputs("\r", stdout); // return to the beginning of the line
 
 	for (position = 0; position < width; position++) {
 		if (position < ipart) {
 			// This part is fully downloaded, show a full block
-			printf(progressChars[7]);
+			fputs(progressChars[7], stdout);
 		} else if (position > ipart) {
 			// This part is not downloaded, show a space
-			printf(" ");
+			fputs(" ", stdout);
 		} else {
 			// This part is partially downloaded
-			printf(progressChars[fpart]);
+			fputs(progressChars[fpart], stdout);
 		}
 	}
 
@@ -215,12 +243,12 @@ void
 CheckManager::ProgressPackageDownloadComplete(const char* packageName)
 {
 	// Overwrite the progress bar with whitespace
-	printf("\r");
+	fputs("\r", stdout);
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	for (int i = 0; i < (w.ws_col); i++)
-		printf(" ");
-	printf("\r\x1b[1A"); // Go to previous line.
+		fputs(" ", stdout);
+	fputs("\r\x1b[1A", stdout); // Go to previous line.
 
 	printf("Downloading %s...done.\n", packageName);
 }
@@ -229,6 +257,9 @@ CheckManager::ProgressPackageDownloadComplete(const char* packageName)
 void
 CheckManager::ProgressPackageChecksumStarted(const char* title)
 {
+	if (fVerbose)
+		_SendNotification(fHeaderChecking.String(), title);
+	
 	printf("%s...", title);
 }
 
@@ -236,7 +267,7 @@ CheckManager::ProgressPackageChecksumStarted(const char* title)
 void
 CheckManager::ProgressPackageChecksumComplete(const char* title)
 {
-	printf("done.\n");
+	puts("done.");
 }
 
 
@@ -275,11 +306,12 @@ CheckManager::_SendNotification(const char* title, const char* text)
 	notification.SetTitle(title);
 	notification.SetContent(text);
 	notification.SetOnClickApp(kAppSignature);
+	if(fVerbose)
+		notification.SetMessageID(fNotificationId);
 	BBitmap icon(_GetIcon());
 	if (icon.IsValid())
 		notification.SetIcon(&icon);
-	bigtime_t timeout = 30000000;
-	notification.Send(timeout);
+	notification.Send();
 }
 
 
