@@ -834,21 +834,15 @@ BPose::DrawBar(BPoint where, BView* view, icon_size which)
 {
 	view->PushState();
 
-	int32 size;
-	int32 barWidth;
-	int32 barHeight;
+	int32 size = which - 1;
 	int32 yOffset;
-	if (which >= B_LARGE_ICON) {
-		size = which - 1;
-		barWidth = (int32)(7.0f / 32.0f * (float)which);
-		yOffset = 2;
-		barHeight = size - 4 - 2 * yOffset;
-	} else {
-		size = B_MINI_ICON;
+	int32 barWidth = (int32)(7.0f / 32.0f * (float)which);
+	if (barWidth < 4) {
 		barWidth = 4;
 		yOffset = 0;
-		barHeight = size - 4 - 2 * yOffset;
-	}
+	} else
+		yOffset = 2;
+	int32 barHeight = size - 4 - 2 * yOffset;
 
 	// the black shadowed line
 	view->SetHighColor(32, 32, 32, 92);
