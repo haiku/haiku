@@ -922,17 +922,6 @@
 */
 
 
-/*!
-	\var directory_which B_BEOS_DATA_DIRECTORY
-	\brief The BeOS data directory.
-
-	\deprecated Legacy BeOS definition to be phased out, use
-	            \c B_SYSTEM_DATA_DIRECTORY instead.
-
-	\since BeOS R3
-*/
-
-
 //// find_path[s]() flags
 
 
