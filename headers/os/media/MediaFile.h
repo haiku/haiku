@@ -16,6 +16,7 @@
 namespace BPrivate {
 	namespace media {
 		class MediaExtractor;
+		class MediaStreamer;
 		class MediaWriter;
 	}
 	class _AddonManager;
@@ -172,6 +173,8 @@ private:
 			int32				fWriterID;
 			media_file_format	fMFI;
 
+			BPrivate::media::MediaStreamer* fStreamer;
+
 			bool				fFileClosed;
 			bool				fDeleteSource;
 			bool				_reserved_was_fUnused[2];
@@ -186,6 +189,8 @@ private:
 									const BUrl* url,
 									const media_file_format* fileFormat,
 									int32 flags);
+			void				_InitStreamer(const BUrl& url,
+									BDataIO** adapter);
 
 								BMediaFile();
 								BMediaFile(const BMediaFile&);
@@ -193,10 +198,9 @@ private:
 
 			BDataIO*			fSource;
 
-
 	// FBC data and virtuals
 
-			uint32				_reserved_BMediaFile_[32];
+			uint32				_reserved_BMediaFile_[31];
 
 	virtual	status_t			_Reserved_BMediaFile_0(int32 arg, ...);
 	virtual	status_t			_Reserved_BMediaFile_1(int32 arg, ...);

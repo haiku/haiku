@@ -137,6 +137,11 @@ public:
 			delete fDataIOAdapter;
 	}
 
+	status_t InitCheck() const
+	{
+		return fErr;
+	}
+
 	// BMediaIO interface
 
 	virtual void GetFlags(int32* flags) const
@@ -231,11 +236,15 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 	BMediaIOWrapper* buffered_source = new BMediaIOWrapper(source);
 	ObjectDeleter<BMediaIOWrapper> ioDeleter(buffered_source);
 
+	status_t ret = buffered_source->InitCheck();
+	if (ret != B_OK)
+		return ret;
+
 	// get list of available readers from the server
 	entry_ref refs[MAX_READERS];
 	int32 count;
 
-	status_t ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
+	ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
 		MAX_READERS);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateReader: can't get list of readers: %s\n",

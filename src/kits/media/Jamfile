@@ -92,6 +92,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			EncoderPlugin.cpp
 			MediaExtractor.cpp
 			MediaPlugin.cpp
+			MediaStreamer.cpp
 			MediaWriter.cpp
 			PluginManager.cpp
 			ReaderPlugin.cpp
