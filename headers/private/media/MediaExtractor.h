@@ -10,10 +10,7 @@
 #define _MEDIA_EXTRACTOR_H
 
 
-#include <Url.h>
-
 #include "ReaderPlugin.h"
-#include "StreamerPlugin.h"
 #include "DecoderPlugin.h"
 
 
@@ -40,7 +37,6 @@ struct stream_info {
 class MediaExtractor {
 public:
 								MediaExtractor(BDataIO* source, int32 flags);
-								MediaExtractor(const BUrl& url, int32 flags);
 
 								~MediaExtractor();
 
@@ -91,7 +87,6 @@ private:
 
 			BDataIO*			fSource;
 			Reader*				fReader;
-			Streamer*			fStreamer;
 
 			stream_info*		fStreamInfo;
 			int32				fStreamCount;

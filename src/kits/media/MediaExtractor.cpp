@@ -56,27 +56,9 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 	:
 	fExtractorThread(-1),
 	fReader(NULL),
-	fStreamer(NULL),
 	fStreamInfo(NULL),
 	fStreamCount(0)
 {
-	_Init(source, flags);
-}
-
-
-MediaExtractor::MediaExtractor(const BUrl& url, int32 flags)
-	:
-	fExtractorThread(-1),
-	fReader(NULL),
-	fStreamer(NULL),
-	fStreamInfo(NULL),
-	fStreamCount(0)
-{
-	BDataIO* source = NULL;
-	fInitStatus = gPluginManager.CreateStreamer(&fStreamer, url, &source);
-	if (fInitStatus != B_OK)
-		return;
-
 	_Init(source, flags);
 }
 
@@ -183,9 +165,6 @@ MediaExtractor::~MediaExtractor()
 	}
 
 	gPluginManager.DestroyReader(fReader);
-
-	if (fStreamer != NULL)
-		gPluginManager.DestroyStreamer(fStreamer);
 
 	delete[] fStreamInfo;
 	// fSource is owned by the BMediaFile

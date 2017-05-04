@@ -48,28 +48,10 @@ MediaWriter::MediaWriter(BDataIO* target, const media_file_format& fileFormat)
 	:
 	fTarget(target),
 	fWriter(NULL),
-	fStreamer(NULL),
 	fStreamInfos(),
 	fFileFormat(fileFormat)
 {
 	CALLED();
-
-	gPluginManager.CreateWriter(&fWriter, fFileFormat, fTarget);
-}
-
-
-MediaWriter::MediaWriter(BUrl url, const media_file_format& fileFormat)
-	:
-	fTarget(NULL),
-	fWriter(NULL),
-	fStreamer(NULL),
-	fStreamInfos(),
-	fFileFormat(fileFormat)
-{
-	CALLED();
-
-	if (gPluginManager.CreateStreamer(&fStreamer, url, &fTarget) != B_OK)
-		return;
 
 	gPluginManager.CreateWriter(&fWriter, fFileFormat, fTarget);
 }
