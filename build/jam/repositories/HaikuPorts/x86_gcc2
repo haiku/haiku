@@ -286,8 +286,8 @@ RemotePackageRepository HaikuPorts
 	libffi_devel-3.0.13-2
 	libgcrypt-1.7.2-2
 	libgcrypt_devel-1.7.2-2
-	libgpg_error-1.21-1
-	libgpg_error_devel-1.21-1
+	libgpg_error-1.27-2
+	libgpg_error_devel-1.27-2
 	libicns-0.8.1-3
 	libicns_devel-0.8.1-3
 	libiconv-1.13.1-6
@@ -826,8 +826,8 @@ RemotePackageRepository HaikuPorts
 	libftdi_x86_devel-1.0-3
 	libgcrypt_x86-1.7.2-2
 	libgcrypt_x86_devel-1.7.2-2
-	libgpg_error_x86-1.21-1
-	libgpg_error_x86_devel-1.21-1
+	libgpg_error_x86-1.27-2
+	libgpg_error_x86_devel-1.27-2
 	libgphoto2_x86-2.5.9-1
 	libgphoto2_x86_devel-2.5.9-1
 	libgsasl_x86-1.8.0-1
