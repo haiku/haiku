@@ -64,6 +64,7 @@ requires {
 #endif
 	lib:libcurl
 	lib:libfreetype
+	lib:libfontconfig
 	lib:libicudata >= 57
 	lib:libicui18n >= 57
 	lib:libicuio >= 57

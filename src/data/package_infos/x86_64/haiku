@@ -61,8 +61,9 @@ requires {
 	cmd:unzip
 #endif
 	lib:libcurl
-	lib:libgcc_s
 	lib:libfreetype
+	lib:libfontconfig
+	lib:libgcc_s
 	lib:libicudata >= 57
 	lib:libicui18n >= 57
 	lib:libicuio >= 57

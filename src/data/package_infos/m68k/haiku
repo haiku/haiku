@@ -62,6 +62,7 @@ requires {
 	cmd:unzip
 #endif
 	lib:libfreetype
+	lib:libfontconfig
 	lib:libgcc_s
 #ifdef HAIKU_REGULAR_BUILD
 	lib:libjpeg
