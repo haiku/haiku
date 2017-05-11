@@ -1026,7 +1026,7 @@ RemotePackageRepository HaikuPorts
 	qt5_x86_devel-5.6.1-1
 	qt5_x86_docs-5.6.1-1
 	quassel_x86-0.10.0-3
-	quicklaunch-1.1-1
+	quicklaunch-1.2-1
 	qupzilla_x86-1.8.6-1
 	qutim_x86-0.3.3-1
 	radare2_x86-0.9.9-1
