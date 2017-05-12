@@ -430,8 +430,9 @@ ModemDevice::Send(net_buffer *packet, uint16 protocolNumber)
 		data[1] = UI;
 	}
 
-	int32 position = 0, length = packet->size,
-		offset = (fACFC->LocalState() != ACFC_ACCEPTED) ? 2 : 0;
+	int32 position = 0;
+	int32 length = packet->size;
+	int32 offset = (fACFC->LocalState() != ACFC_ACCEPTED) ? 2 : 0;
 	uint8* data;
 	if (gBufferModule->direct_access(packet, offset, length, (void**)&data) != B_OK) {
 		ERROR("ModemDevice: Failed to access buffer!\n");
