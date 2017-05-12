@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel media audio ich ;
-
-UsePrivateHeaders media ;
-
-KernelAddon ich :
-	ich.c
-;

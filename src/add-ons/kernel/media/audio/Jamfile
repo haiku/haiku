@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel media audio ;
-
-SubInclude HAIKU_TOP src add-ons kernel media audio ich ;
