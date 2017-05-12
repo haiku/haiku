@@ -19,5 +19,3 @@ SimpleTest execbenchTest :
 SimpleTest forkbenchTest :
 	forkbench.c
 ;
-
-SubInclude HAIKU_TOP src tests system benchmarks libMicro ;
