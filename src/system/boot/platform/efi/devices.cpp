@@ -440,7 +440,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 	}
 
 	if ((partition->offset + partition->size) <= device->Size())
-			return true;
+		return true;
 
 	return false;
 }
@@ -482,19 +482,17 @@ platform_add_block_devices(struct stage2_args *args, NodeList *devicesList)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
-		NodeList *partitions, boot::Partition **_partition)
+platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
+		NodeList *partitions, NodeList *bootPartitions)
 {
 	NodeIterator iterator = partitions->GetIterator();
 	boot::Partition *partition = NULL;
-	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
-		if (device_contains_partition((EfiDevice*)bootDevice, partition)) {
-			*_partition = partition;
-			return B_OK;
-		}
+	while ((partition = (boot::Partition*)iterator.Next()) != NULL) {
+		if (device_contains_partition((EfiDevice*)bootDevice, partition))
+			bootPartitions->Insert(partition);
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	return bootPartitions->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 

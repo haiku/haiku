@@ -58,8 +58,8 @@ namespace boot {
 
 extern status_t platform_add_boot_device(struct stage2_args *args, NodeList *devicesList);
 extern status_t platform_add_block_devices(struct stage2_args *args, NodeList *devicesList);
-extern status_t platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
-					NodeList *partitions, boot::Partition **_partition);
+extern status_t platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
+					NodeList *partitions, NodeList *bootPartitions);
 extern status_t platform_register_boot_device(Node *device);
 
 /* menu functions */
