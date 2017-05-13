@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
@@ -165,7 +165,7 @@ JsonToMessageTest::TestObjectB()
 	CPPUNIT_ASSERT_EQUAL(false, boolValue);
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindPointer("testNull", &ptrValue));
-	CPPUNIT_ASSERT_EQUAL(0, (uint32) ptrValue);
+	CPPUNIT_ASSERT_EQUAL(0, (addr_t)ptrValue);
 }
 
 
