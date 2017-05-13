@@ -37,8 +37,8 @@ public:
 private:
 			void				TestUnterminated(const char* input);
 
-			void				TestParseAndWrite(char* input,
-									char* expectedOutput);
+			void				TestParseAndWrite(const char* input,
+									const char* expectedOutput);
 };
 
 

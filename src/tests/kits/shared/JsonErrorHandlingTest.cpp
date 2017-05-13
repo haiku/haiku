@@ -301,12 +301,8 @@ JsonErrorHandlingTest::TestBadStringEscape()
 void
 JsonErrorHandlingTest::TestBadNumber()
 {
-	BString expectedMessage;
-	expectedMessage.SetToFormat("malformed number",
-		JSON_SAMPLE_BROKEN_NUMBER);
-
 	TestParseWithErrorMessage(JSON_SAMPLE_BROKEN_NUMBER, 1, B_BAD_DATA,
-		expectedMessage.String());
+		"malformed number");
 }
 
 

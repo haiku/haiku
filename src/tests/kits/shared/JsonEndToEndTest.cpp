@@ -29,7 +29,7 @@ JsonEndToEndTest::~JsonEndToEndTest()
 
 
 void
-JsonEndToEndTest::TestParseAndWrite(char* input, char* expectedOutput)
+JsonEndToEndTest::TestParseAndWrite(const char* input, const char* expectedOutput)
 {
 	BDataIO* inputData = new BMemoryIO(input, strlen(input));
 	ObjectDeleter<BDataIO> inputDataDeleter(inputData);

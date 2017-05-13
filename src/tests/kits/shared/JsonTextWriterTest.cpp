@@ -111,7 +111,7 @@ JsonTextWriterTest::TestInteger()
 	BMallocIO* outputData = new BMallocIO();
 	ObjectDeleter<BMallocIO> outputDataDeleter(outputData);
 	BJsonTextWriter writer(outputData);
-	static char* expectedOut = JSON_SAMPLE_NUMBER_B_EXPECTED_OUT;
+	static const char* expectedOut = JSON_SAMPLE_NUMBER_B_EXPECTED_OUT;
 
 	CPPUNIT_ASSERT_EQUAL(B_OK,
 		writer.WriteInteger(JSON_SAMPLE_NUMBER_B_LITERAL));
@@ -134,7 +134,7 @@ JsonTextWriterTest::TestDouble()
 	BMallocIO* outputData = new BMallocIO();
 	ObjectDeleter<BMallocIO> outputDataDeleter(outputData);
 	BJsonTextWriter writer(outputData);
-	static char* expectedOut = "3.142857";
+	static const char* expectedOut = "3.142857";
 
 	CPPUNIT_ASSERT_EQUAL(B_OK,
 		writer.WriteDouble(JSON_SAMPLE_NUMBER_A_LITERAL));
@@ -157,7 +157,7 @@ JsonTextWriterTest::TestFalse()
 	BMallocIO* outputData = new BMallocIO();
 	ObjectDeleter<BMallocIO> outputDataDeleter(outputData);
 	BJsonTextWriter writer(outputData);
-	static char* expectedOut = "false";
+	static const char* expectedOut = "false";
 
 	CPPUNIT_ASSERT_EQUAL(B_OK, writer.WriteFalse());
 	writer.Complete();
