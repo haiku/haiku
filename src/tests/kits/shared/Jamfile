@@ -10,6 +10,10 @@ UnitTestLib libsharedtest.so :
 
 	CalendarViewTest.cpp
 	DriverSettingsMessageAdapterTest.cpp
+	JsonEndToEndTest.cpp
+	JsonErrorHandlingTest.cpp
+	JsonTextWriterTest.cpp
+	JsonToMessageTest.cpp
 	GeolocationTest.cpp
 	NaturalCompareTest.cpp
 

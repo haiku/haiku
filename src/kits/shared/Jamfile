@@ -39,6 +39,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp
+			JsonWriter.cpp
+			JsonEventListener.cpp
+			JsonMessageWriter.cpp
+			JsonTextWriter.cpp
+			JsonEvent.cpp
 			Json.cpp
 			Keymap.cpp
 			LongAndDragTrackingFilter.cpp
