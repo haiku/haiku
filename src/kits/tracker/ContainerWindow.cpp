@@ -4396,8 +4396,12 @@ BorderedView::BorderedView()
 void
 BorderedView::WindowActivated(bool active)
 {
-	// Update border color
-	PoseViewFocused(active);
+	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
+	if (window == NULL)
+		return;
+
+	if (window->PoseView()->IsFocus())
+		PoseViewFocused(active); // Update border color
 }
 
 
@@ -4420,15 +4424,16 @@ BorderedView::PoseViewFocused(bool focused)
 	if (focused && window->IsActive() && fEnableBorderHighlight) {
 		base = B_KEYBOARD_NAVIGATION_COLOR;
 		tint = B_NO_TINT;
-
-		BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
-		if (hScrollBar != NULL)
-			hScrollBar->SetBorderHighlighted(focused);
-
-		BScrollBar* vScrollBar = window->PoseView()->VScrollBar();
-		if (vScrollBar != NULL)
-			vScrollBar->SetBorderHighlighted(focused);
 	}
+
+	BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
+	if (hScrollBar != NULL)
+		hScrollBar->SetBorderHighlighted(focused);
+
+	BScrollBar* vScrollBar = window->PoseView()->VScrollBar();
+	if (vScrollBar != NULL)
+		vScrollBar->SetBorderHighlighted(focused);
+
 	SetViewUIColor(base, tint);
 	Invalidate();
 }
