@@ -828,6 +828,7 @@ RemotePackageRepository HaikuPorts
 	lua52_devel-5.2.4-1
 	lua_devel-5.3.4-1
 	lynx-2.8.9dev.11-1
+	lyx-2.2.2-3
 	lz4-r131-1
 	lz4_devel-r131-1
 	lzip-1.18-1
@@ -1783,6 +1784,7 @@ RemotePackageRepository HaikuPorts
 	lua51
 	lua52
 	lynx
+	lyx
 	lz4
 	lzip
 	lzo
