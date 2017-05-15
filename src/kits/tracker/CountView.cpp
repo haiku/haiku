@@ -204,7 +204,7 @@ BCountView::Draw(BRect updateRect)
 
 	SetLowColor(color);
 	be_control_look->DrawBorder(this, bounds, updateRect,
-		ui_color(B_NAVIGATION_BASE_COLOR), B_PLAIN_BORDER, 0,
+		color, B_PLAIN_BORDER, 0,
 		BControlLook::B_BOTTOM_BORDER | BControlLook::B_LEFT_BORDER);
 	be_control_look->DrawMenuBarBackground(this, bounds, updateRect, color);
 
