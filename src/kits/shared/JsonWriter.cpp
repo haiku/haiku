@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "JsonWriter.h"
 
 #include <stdio.h>
@@ -30,7 +31,6 @@ BJsonWriter::HandleError(status_t status, int32 line,
 	if(fErrorStatus == B_OK) {
 		if (message == NULL)
 			message = "?";
-
 		fErrorStatus = status;
 		fprintf(stderr, "! json err @line %" B_PRIi32 " - %s : %s\n", line,
 			strerror(status), message);

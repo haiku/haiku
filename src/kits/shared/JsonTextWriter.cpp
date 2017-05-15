@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "JsonTextWriter.h"
 
 #include <stdio.h>
@@ -22,7 +23,8 @@ b_json_is_7bit_clean(uint8 c)
 
 
 static bool
-b_json_is_illegal(uint8 c) {
+b_json_is_illegal(uint8 c)
+{
 	return c < 0x20 || c == 0x7f;
 }
 
@@ -210,27 +212,35 @@ BJsonTextWriterStackedEventListener::Handle(const BJsonEvent& event)
 			break;
 
 		case B_JSON_OBJECT_START:
+		{
 			writeResult = StreamChar('{');
 
 			if (writeResult == B_OK) {
 				SetStackedListenerOnWriter(
-					new BJsonTextWriterObjectStackedEventListener(fWriter, this));
+					new BJsonTextWriterObjectStackedEventListener(
+						fWriter, this));
 			}
 			break;
+		}
 
 		case B_JSON_ARRAY_START:
+		{
 			writeResult = StreamChar('[');
 
 			if (writeResult == B_OK) {
 				SetStackedListenerOnWriter(
-					new BJsonTextWriterArrayStackedEventListener(fWriter, this));
+					new BJsonTextWriterArrayStackedEventListener(
+						fWriter, this));
 			}
 			break;
+		}
 
 		default:
+		{
 			HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
-            		"unexpected type of json item to add to container");
-            return false;
+				"unexpected type of json item to add to container");
+			return false;
+		}
 	}
 
 	if (writeResult == B_OK)
@@ -313,15 +323,16 @@ BJsonTextWriterStackedEventListener::StreamStringEncoded(const char* string,
 
 
 status_t
-BJsonTextWriterStackedEventListener::StreamQuotedEncodedString(const char* string)
+BJsonTextWriterStackedEventListener::StreamQuotedEncodedString(
+	const char* string)
 {
 	return fWriter->StreamQuotedEncodedString(string);
 }
 
 
 status_t
-BJsonTextWriterStackedEventListener::StreamQuotedEncodedString(const char* string,
-	off_t offset, size_t length)
+BJsonTextWriterStackedEventListener::StreamQuotedEncodedString(
+	const char* string, off_t offset, size_t length)
 {
 	return fWriter->StreamQuotedEncodedString(string, offset, length);
 }
@@ -362,7 +373,8 @@ BJsonTextWriterStackedEventListener::SetStackedListenerOnWriter(
 BJsonTextWriterArrayStackedEventListener::BJsonTextWriterArrayStackedEventListener(
 	BJsonTextWriter* writer,
 	BJsonTextWriterStackedEventListener* parent)
-	: BJsonTextWriterStackedEventListener(writer, parent)
+	:
+	BJsonTextWriterStackedEventListener(writer, parent)
 {
 }
 
@@ -431,7 +443,8 @@ BJsonTextWriterArrayStackedEventListener::WillAdd()
 BJsonTextWriterObjectStackedEventListener::BJsonTextWriterObjectStackedEventListener(
 	BJsonTextWriter* writer,
 	BJsonTextWriterStackedEventListener* parent)
-	: BJsonTextWriterStackedEventListener(writer, parent)
+	:
+	BJsonTextWriterStackedEventListener(writer, parent)
 {
 }
 
@@ -591,7 +604,7 @@ BJsonTextWriter::StreamStringEncoded(const char* string,
 	status_t writeResult = B_OK;
 	uint8* string8bit = (uint8*)string;
 
-	while (writeResult == B_OK && 0 != length) {
+	while (writeResult == B_OK && length != 0) {
 		uint8 c = string8bit[offset];
 		const char* simpleEsc = b_json_simple_esc_sequence(c);
 
@@ -633,11 +646,9 @@ BJsonTextWriter::StreamStringEncoded(const char* string,
 					offset++;
 					length--;
 				} else {
-
 						// if the character is < 128 then it can be rendered
 						// verbatim - check how many are like this and then
 						// render those verbatim.
-
 					const char* stringInitial = &string[offset];
 					uint32 unicodeCharacter = BUnicodeChar::FromUTF8(
 						&stringInitial);
@@ -693,5 +704,3 @@ BJsonTextWriter::StreamChar(char c)
 {
 	return fDataIO->WriteExactly(&c, 1);
 }
-
-

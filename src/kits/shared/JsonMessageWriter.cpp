@@ -3,9 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "JsonMessageWriter.h"
 
-#include <stdio.h>
+#include "JsonMessageWriter.h"
 
 
 namespace BPrivate {
@@ -179,19 +178,25 @@ BStackedMessageEventListener::Handle(const BJsonEvent& event)
 			break;
 
 		case B_JSON_OBJECT_START:
+		{
 			SetStackedListenerOnWriter(new BStackedObjectMessageEventListener(
 				fWriter, this));
 			break;
+		}
 
 		case B_JSON_ARRAY_START:
+		{
 			SetStackedListenerOnWriter(new BStackedArrayMessageEventListener(
 				fWriter, this));
 			break;
+		}
 
 		default:
+		{
 			HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
-            		"unexpected type of json item to add to container");
-            return false;
+				"unexpected type of json item to add to container");
+			return false;
+		}
 	}
 
 	return ErrorStatus() == B_OK;
@@ -304,7 +309,8 @@ BStackedMessageEventListener::SetStackedListenerOnWriter(
 BStackedArrayMessageEventListener::BStackedArrayMessageEventListener(
 	BJsonMessageWriter* writer,
 	BStackedMessageEventListener* parent)
-	: BStackedMessageEventListener(writer, parent, B_JSON_MESSAGE_WHAT_ARRAY)
+	:
+	BStackedMessageEventListener(writer, parent, B_JSON_MESSAGE_WHAT_ARRAY)
 {
 	fCount = 0;
 }
@@ -314,7 +320,8 @@ BStackedArrayMessageEventListener::BStackedArrayMessageEventListener(
 	BJsonMessageWriter* writer,
 	BStackedMessageEventListener* parent,
 	BMessage* message)
-	: BStackedMessageEventListener(writer, parent, message)
+	:
+	BStackedMessageEventListener(writer, parent, message)
 {
 	message->what = B_JSON_MESSAGE_WHAT_ARRAY;
 	fCount = 0;
@@ -334,11 +341,13 @@ BStackedArrayMessageEventListener::Handle(const BJsonEvent& event)
 
 	switch (event.EventType()) {
 		case B_JSON_ARRAY_END:
+		{
 			if (fParent != NULL)
 				fParent->AddMessage(fMessage);
 			SetStackedListenerOnWriter(fParent);
 			delete this;
 			break;
+		}
 
 		default:
 			return BStackedMessageEventListener::Handle(event);
@@ -370,7 +379,8 @@ BStackedArrayMessageEventListener::DidAdd()
 BStackedObjectMessageEventListener::BStackedObjectMessageEventListener(
 	BJsonMessageWriter* writer,
 	BStackedMessageEventListener* parent)
-	: BStackedMessageEventListener(writer, parent, B_JSON_MESSAGE_WHAT_OBJECT)
+	:
+	BStackedMessageEventListener(writer, parent, B_JSON_MESSAGE_WHAT_OBJECT)
 {
 }
 
@@ -379,7 +389,8 @@ BStackedObjectMessageEventListener::BStackedObjectMessageEventListener(
 	BJsonMessageWriter* writer,
 	BStackedMessageEventListener* parent,
 	BMessage* message)
-	: BStackedMessageEventListener(writer, parent, message)
+	:
+	BStackedMessageEventListener(writer, parent, message)
 {
 	message->what = B_JSON_MESSAGE_WHAT_OBJECT;
 }
@@ -398,11 +409,13 @@ BStackedObjectMessageEventListener::Handle(const BJsonEvent& event)
 
 	switch (event.EventType()) {
 		case B_JSON_OBJECT_END:
+		{
 			if (fParent != NULL)
 				fParent->AddMessage(fMessage);
 			SetStackedListenerOnWriter(fParent);
 			delete this;
 			break;
+		}
 
 		case B_JSON_OBJECT_NAME:
 			fNextItemName.SetTo(event.Content());
@@ -479,22 +492,27 @@ BJsonMessageWriter::Handle(const BJsonEvent& event)
 	else {
 		switch(event.EventType()) {
 			case B_JSON_OBJECT_START:
+			{
 				SetStackedListener(new BStackedObjectMessageEventListener(
 					this, NULL, fTopLevelMessage));
 				break;
+			}
 
 			case B_JSON_ARRAY_START:
+			{
 				fTopLevelMessage->what = B_JSON_MESSAGE_WHAT_ARRAY;
 				SetStackedListener(new BStackedArrayMessageEventListener(
 					this, NULL, fTopLevelMessage));
 				break;
+			}
 
 			default:
+			{
 				HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
 					"a message object can only handle an object or an array"
 					"at the top level");
 				return false;
-
+			}
 		}
 	}
 

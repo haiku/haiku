@@ -4,6 +4,8 @@
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
  */
+
+
 #include "Json.h"
 
 #include <cstdio>
@@ -25,7 +27,8 @@ namespace BPrivate {
 
 
 static bool
-b_jsonparse_is_hex(char c) {
+b_jsonparse_is_hex(char c)
+{
 	return isdigit(c)
 		|| (c > 0x41 && c <= 0x46)
 		|| (c > 0x61 && c <= 0x66);
@@ -33,7 +36,8 @@ b_jsonparse_is_hex(char c) {
 
 
 static bool
-b_jsonparse_all_hex(const char* c) {
+b_jsonparse_all_hex(const char* c)
+{
 	for (int i = 0; i < 4; i++) {
 		if (!b_jsonparse_is_hex(c[i]))
 			return false;
@@ -57,27 +61,37 @@ public:
 	{
 	}
 
-	BJsonEventListener* Listener() const {
+
+	BJsonEventListener* Listener() const
+	{
 		return fListener;
 	}
 
-	BDataIO* Data() const {
+
+	BDataIO* Data() const
+	{
 		return fData;
 	}
 
-	int LineNumber() const {
+
+	int LineNumber() const
+	{
 		return fLineNumber;
 	}
 
-	int IncrementLineNumber() {
-		return fLineNumber++;
+
+	void IncrementLineNumber()
+	{
+		fLineNumber++;
 	}
+
 
 		// TODO; there is considerable opportunity for performance improvements
 		// here by buffering the input and then feeding it into the parse
 		// algorithm character by character.
 
-	status_t NextChar(char* buffer) {
+	status_t NextChar(char* buffer)
+	{
 
 		if (fHasPushbackChar) {
 			buffer[0] = fPushbackChar;
@@ -88,7 +102,9 @@ public:
 		return Data()->ReadExactly(buffer, 1);
 	}
 
-	void PushbackChar(char c) {
+
+	void PushbackChar(char c)
+	{
 		fPushbackChar = c;
 		fHasPushbackChar = true;
 	}
@@ -156,14 +172,18 @@ BJson::NextChar(JsonParseContext& jsonParseContext, char* c)
 			return true;
 
 		case B_PARTIAL_READ:
+		{
 			jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 				jsonParseContext.LineNumber(), "unexpected end of input");
 			return false;
+		}
 
 		default:
+		{
 			jsonParseContext.Listener()->HandleError(result, -1,
 				"io related read error");
 			return false;
+		}
 	}
 }
 
@@ -272,10 +292,8 @@ BJson::ParseObjectNameValuePair(JsonParseContext& jsonParseContext)
 			case '\"': // name of the object
 			{
 				if (!didParseName) {
-					if (!ParseString(jsonParseContext,
-						B_JSON_OBJECT_NAME)) {
+					if (!ParseString(jsonParseContext, B_JSON_OBJECT_NAME))
 						return false;
-					}
 
 					didParseName = true;
 				} else {
@@ -323,7 +341,7 @@ bool
 BJson::ParseObject(JsonParseContext& jsonParseContext)
 {
 	if (!jsonParseContext.Listener()->Handle(
-		BJsonEvent(B_JSON_OBJECT_START))) {
+			BJsonEvent(B_JSON_OBJECT_START))) {
 		return false;
 	}
 
@@ -336,13 +354,16 @@ BJson::ParseObject(JsonParseContext& jsonParseContext)
 
 		switch (c) {
 			case '}': // terminate the object
+			{
 				if (!jsonParseContext.Listener()->Handle(
-					BJsonEvent(B_JSON_OBJECT_END))) {
+						BJsonEvent(B_JSON_OBJECT_END))) {
 					return false;
 				}
 				return true;
+			}
 
 			case ',': // next value.
+			{
 				if (firstItem) {
 					jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 						jsonParseContext.LineNumber(), "unexpected"
@@ -354,6 +375,7 @@ BJson::ParseObject(JsonParseContext& jsonParseContext)
 				if (!ParseObjectNameValuePair(jsonParseContext))
 					return false;
 				break;
+			}
 
 			default:
 			{
@@ -379,7 +401,7 @@ bool
 BJson::ParseArray(JsonParseContext& jsonParseContext)
 {
 	if (!jsonParseContext.Listener()->Handle(
-		BJsonEvent(B_JSON_ARRAY_START))) {
+			BJsonEvent(B_JSON_ARRAY_START))) {
 		return false;
 	}
 
@@ -392,13 +414,16 @@ BJson::ParseArray(JsonParseContext& jsonParseContext)
 
 		switch (c) {
 			case ']': // terminate the array
+			{
 				if (!jsonParseContext.Listener()->Handle(
-					BJsonEvent(B_JSON_ARRAY_END))) {
+						BJsonEvent(B_JSON_ARRAY_END))) {
 					return false;
 				}
 				return true;
+			}
 
 			case ',': // next value.
+			{
 				if (firstItem) {
 					jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 						jsonParseContext.LineNumber(), "unexpected"
@@ -409,6 +434,7 @@ BJson::ParseArray(JsonParseContext& jsonParseContext)
 				if (!ParseAny(jsonParseContext))
 					return false;
 				break;
+			}
 
 			default:
 			{
@@ -445,25 +471,25 @@ BJson::ParseEscapeUnicodeSequence(JsonParseContext& jsonParseContext,
 	}
 
 	if (!b_jsonparse_all_hex(buffer)) {
-			BString errorMessage;
-			errorMessage.SetToFormat(
-				"malformed unicode sequence [%s] in string parsing",
-				buffer);
-			jsonParseContext.Listener()->HandleError(B_BAD_DATA,
-				jsonParseContext.LineNumber(), errorMessage.String());
-			return false;
+		BString errorMessage;
+		errorMessage.SetToFormat(
+			"malformed unicode sequence [%s] in string parsing",
+			buffer);
+		jsonParseContext.Listener()->HandleError(B_BAD_DATA,
+			jsonParseContext.LineNumber(), errorMessage.String());
+		return false;
 	}
 
 	uint intValue;
 
 	if (sscanf(buffer, "%4x", &intValue) != 1) {
-			BString errorMessage;
-			errorMessage.SetToFormat(
-				"unable to process unicode sequence [%s] in string "
-				" parsing", buffer);
-			jsonParseContext.Listener()->HandleError(B_BAD_DATA,
-				jsonParseContext.LineNumber(), errorMessage.String());
-			return false;
+		BString errorMessage;
+		errorMessage.SetToFormat(
+			"unable to process unicode sequence [%s] in string "
+			" parsing", buffer);
+		jsonParseContext.Listener()->HandleError(B_BAD_DATA,
+			jsonParseContext.LineNumber(), errorMessage.String());
+		return false;
 	}
 
 	char character[7];
@@ -511,12 +537,14 @@ BJson::ParseStringEscapeSequence(JsonParseContext& jsonParseContext,
 			stringResult += "\"";
 			break;
 		case 'u':
+		{
 				// unicode escape sequence.
 			if (!ParseEscapeUnicodeSequence(jsonParseContext,
-				stringResult)) {
+					stringResult)) {
 				return false;
 			}
 			break;
+		}
 		default:
 		{
 			BString errorMessage;
@@ -546,19 +574,24 @@ BJson::ParseString(JsonParseContext& jsonParseContext,
 
 		switch (c) {
 			case '"':
+			{
 					// terminates the string assembled so far.
 				jsonParseContext.Listener()->Handle(
 					BJsonEvent(eventType, stringResult.String()));
 				return true;
+			}
 
 			case '\\':
+			{
 				if (!ParseStringEscapeSequence(jsonParseContext,
 					stringResult)) {
 					return false;
 				}
 				break;
+			}
 
 			default:
+			{
 				uint8 uc = static_cast<uint8>(c);
 
 				if(uc < 0x20) { // control characters are not allowed
@@ -573,6 +606,7 @@ BJson::ParseString(JsonParseContext& jsonParseContext,
 
 				stringResult.Append(&c, 1);
 				break;
+			}
 		}
 	}
 }
@@ -585,7 +619,7 @@ BJson::ParseExpectedVerbatimStringAndRaiseEvent(
 	json_event_type jsonEventType)
 {
 	if (ParseExpectedVerbatimString(jsonParseContext, expectedString,
-		expectedStringLength, leadingChar)) {
+			expectedStringLength, leadingChar)) {
 		if (!jsonParseContext.Listener()->Handle(BJsonEvent(jsonEventType)))
 			return false;
 	}
@@ -695,6 +729,7 @@ BJson::ParseNumber(JsonParseContext& jsonParseContext)
 
 		switch (result) {
 			case B_OK:
+			{
 				if (isdigit(c)) {
 					value += c;
 					break;
@@ -707,7 +742,7 @@ BJson::ParseNumber(JsonParseContext& jsonParseContext)
 
 				jsonParseContext.PushbackChar(c);
 				// intentional fall through
-
+			}
 			case B_PARTIAL_READ:
 			{
 				errno = 0;
@@ -723,11 +758,12 @@ BJson::ParseNumber(JsonParseContext& jsonParseContext)
 
 				return true;
 			}
-
 			default:
+			{
 				jsonParseContext.Listener()->HandleError(result, -1,
 					"io related read error");
 				return false;
+			}
 		}
 	}
 }
