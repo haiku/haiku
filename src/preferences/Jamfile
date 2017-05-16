@@ -6,7 +6,6 @@ SubInclude HAIKU_TOP src preferences bluetooth ;
 SubInclude HAIKU_TOP src preferences datatranslations ;
 SubInclude HAIKU_TOP src preferences deskbar ;
 SubInclude HAIKU_TOP src preferences filetypes ;
-SubInclude HAIKU_TOP src preferences fonts ;
 SubInclude HAIKU_TOP src preferences joysticks ;
 SubInclude HAIKU_TOP src preferences keyboard ;
 SubInclude HAIKU_TOP src preferences keymap ;
