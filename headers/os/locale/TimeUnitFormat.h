@@ -43,16 +43,17 @@ class BTimeUnitFormat : public BFormat {
 	typedef	BFormat				Inherited;
 
 public:
-								BTimeUnitFormat();
+								BTimeUnitFormat(const time_unit_style style =
+									B_TIME_UNIT_FULL);
 								BTimeUnitFormat(const BLanguage& language,
-									const BFormattingConventions& conventions);
+									const BFormattingConventions& conventions,
+									const time_unit_style style = B_TIME_UNIT_FULL);
 								BTimeUnitFormat(const BTimeUnitFormat& other);
 	virtual						~BTimeUnitFormat();
 
 			status_t			Format(BString& buffer,
 									const int32 value,
-									const time_unit_element unit,
-									time_unit_style style = B_TIME_UNIT_FULL
+									const time_unit_element unit
 									) const;
 
 private:

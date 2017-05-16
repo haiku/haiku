@@ -28,9 +28,10 @@ class BDurationFormat : public BFormat {
 public:
 								BDurationFormat(const BLanguage& language,
 									const BFormattingConventions& conventions,
-									const BString& separator = ", ");
-								BDurationFormat(
-									const BString& separator = ", ");
+									const BString& separator = ", ",
+									const time_unit_style style = B_TIME_UNIT_FULL);
+								BDurationFormat(const BString& separator = ", ",
+									const time_unit_style style = B_TIME_UNIT_FULL);
 								BDurationFormat(const BDurationFormat& other);
 	virtual						~BDurationFormat();
 
@@ -39,8 +40,7 @@ public:
 
 			status_t			Format(BString& buffer,
 									const bigtime_t startValue,
-									const bigtime_t stopValue,
-									time_unit_style style = B_TIME_UNIT_FULL
+									const bigtime_t stopValue
 									) const;
 
 private:
