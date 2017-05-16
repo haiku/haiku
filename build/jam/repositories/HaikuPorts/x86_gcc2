@@ -54,7 +54,7 @@ RemotePackageRepository HaikuPorts
 	apr_util-1.5.4-2
 	apr_util_devel-1.5.4-2
 	armyknife-5.1.0-1
-	artpaint-2.1.0git-5
+	artpaint-2.1.2-1
 	asciidoc-8.6.8-2
 	aspell-0.60.6.1-2
 	aspell_devel-0.60.6.1-2
