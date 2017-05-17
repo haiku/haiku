@@ -9,6 +9,7 @@
 #include "network.h"
 
 #include <KernelExport.h>
+#include <boot/partitions.h>
 #include <boot/platform.h>
 #include <boot/vfs.h>
 #include <boot/stdio.h>
