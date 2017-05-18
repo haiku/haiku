@@ -38,4 +38,5 @@ open_mode_to_access(int openMode)
 	return R_OK | W_OK;
 }
 
+
 #endif	// UTILITY_H

@@ -26,7 +26,7 @@
 #	define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
 
 
-BPlusTree::BPlusTree(Volume* volume, struct btrfs_stream *stream)
+BPlusTree::BPlusTree(Volume* volume, struct btrfs_stream* stream)
 	:
 	fStream(stream),
 	fRootBlock(0),
@@ -62,7 +62,7 @@ BPlusTree::~BPlusTree()
 
 
 int32
-BPlusTree::_CompareKeys(struct btrfs_key &key1, struct btrfs_key &key2)
+BPlusTree::_CompareKeys(struct btrfs_key& key1, struct btrfs_key& key2)
 {
 	if (key1.ObjectID() > key2.ObjectID())
 		return 1;
@@ -86,12 +86,12 @@ BPlusTree::_CompareKeys(struct btrfs_key &key1, struct btrfs_key &key2)
 	It can also return other errors to indicate that something went wrong.
 */
 status_t
-BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
+BPlusTree::_Find(struct btrfs_key& key, void** _value, size_t* _size,
 	bplustree_traversing type)
 {
 	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
 		key.ObjectID(),	key.Type(), key.Offset());
-	btrfs_stream *stream = fStream;
+	btrfs_stream* stream = fStream;
 	CachedBlock cached(fVolume);
 	fsblock_t physical;
 	if (stream == NULL) {
@@ -99,7 +99,7 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
 			return B_ERROR;
 		}
-		stream = (btrfs_stream *)cached.SetTo(physical);
+		stream = (btrfs_stream*)cached.SetTo(physical);
 	}
 
 	while (stream->header.Level() != 0) {
@@ -123,7 +123,7 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 				stream->index[i - 1].BlockNum());
 			return B_ERROR;
 		}
-		stream = (btrfs_stream *)cached.SetTo(physical);
+		stream = (btrfs_stream*)cached.SetTo(physical);
 	}
 
 	uint32 i;
@@ -175,7 +175,7 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 			if ((fVolume->BlockSize() - totalOffset % fVolume->BlockSize())
 				>= stream->entries[i].Size()) {
 				//If there is enough space for *_value
-				memcpy(*_value, ((uint8 *)cached.SetTo(physical
+				memcpy(*_value, ((uint8*)cached.SetTo(physical
 					+ totalOffset / fVolume->BlockSize())
 					+ totalOffset % fVolume->BlockSize()),
 					stream->entries[i].Size());
@@ -201,21 +201,21 @@ BPlusTree::_Find(struct btrfs_key &key, void** _value, size_t* _size,
 
 
 status_t
-BPlusTree::FindNext(struct btrfs_key &key, void** _value, size_t* _size)
+BPlusTree::FindNext(struct btrfs_key& key, void** _value, size_t* _size)
 {
 	return _Find(key, _value, _size, BPLUSTREE_FORWARD);
 }
 
 
 status_t
-BPlusTree::FindPrevious(struct btrfs_key &key, void** _value, size_t* _size)
+BPlusTree::FindPrevious(struct btrfs_key& key, void** _value, size_t* _size)
 {
 	return _Find(key, _value, _size, BPLUSTREE_BACKWARD);
 }
 
 
 status_t
-BPlusTree::FindExact(struct btrfs_key &key, void** _value, size_t* _size)
+BPlusTree::FindExact(struct btrfs_key& key, void** _value, size_t* _size)
 {
 	return _Find(key, _value, _size, BPLUSTREE_EXACT);
 }
@@ -240,7 +240,7 @@ BPlusTree::_RemoveIterator(TreeIterator* iterator)
 //	#pragma mark -
 
 
-TreeIterator::TreeIterator(BPlusTree* tree, struct btrfs_key &key)
+TreeIterator::TreeIterator(BPlusTree* tree, struct btrfs_key& key)
 	:
 	fTree(tree),
 	fCurrentKey(key)
@@ -260,7 +260,7 @@ TreeIterator::~TreeIterator()
 /*!	Iterates through the tree in the specified direction.
 */
 status_t
-TreeIterator::Traverse(bplustree_traversing direction, struct btrfs_key &key,
+TreeIterator::Traverse(bplustree_traversing direction, struct btrfs_key& key,
 	void** value, size_t* size)
 {
 	if (fTree == NULL)
@@ -281,7 +281,7 @@ TreeIterator::Traverse(bplustree_traversing direction, struct btrfs_key &key,
 /*!	just sets the current key in the iterator.
 */
 status_t
-TreeIterator::Find(struct btrfs_key &key)
+TreeIterator::Find(struct btrfs_key& key)
 {
 	if (fTree == NULL)
 		return B_INTERRUPTED;
@@ -295,4 +295,3 @@ TreeIterator::Stop()
 {
 	fTree = NULL;
 }
-

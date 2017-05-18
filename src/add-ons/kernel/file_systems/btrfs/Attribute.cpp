@@ -92,13 +92,13 @@ Attribute::Stat(struct stat& stat)
 	TRACE("Stat\n");
 
 	size_t nameLength = strlen(fName);
-	btrfs_dir_entry *entries;
+	btrfs_dir_entry* entries;
 	size_t length;
 	status_t status = _Lookup(fName, nameLength, &entries, &length);
 	if (status < B_OK)
 		return status;
 
-	btrfs_dir_entry *entry;
+	btrfs_dir_entry* entry;
 	status = _FindEntry(entries, length, fName, nameLength, &entry);
 	if (status != B_OK) {
 		free(entries);
@@ -120,13 +120,13 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 		return ERANGE;
 
 	size_t nameLength = strlen(fName);
-	btrfs_dir_entry *entries;
+	btrfs_dir_entry* entries;
 	size_t length;
 	status_t status = _Lookup(fName, nameLength, &entries, &length);
 	if (status < B_OK)
 		return status;
 
-	btrfs_dir_entry *entry;
+	btrfs_dir_entry* entry;
 	status = _FindEntry(entries, length, fName, nameLength, &entry);
 	if (status != B_OK) {
 		free(entries);
@@ -149,7 +149,7 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 
 status_t
 Attribute::_Lookup(const char* name, size_t nameLength,
-	btrfs_dir_entry **_entries, size_t *_length)
+	btrfs_dir_entry** _entries, size_t* _length)
 {
 	uint32 hash = calculate_crc((uint32)~1, (uint8*)name, nameLength);
 	struct btrfs_key key;
@@ -157,7 +157,7 @@ Attribute::_Lookup(const char* name, size_t nameLength,
 	key.SetObjectID(fInode->ID());
 	key.SetOffset(hash);
 
-	btrfs_dir_entry *entries;
+	btrfs_dir_entry* entries;
 	size_t length;
 	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
 		(void**)&entries, &length);
@@ -180,19 +180,18 @@ Attribute::_Lookup(const char* name, size_t nameLength,
 
 
 status_t
-Attribute::_FindEntry(btrfs_dir_entry *entries, size_t length,
-	const char* name, size_t nameLength, btrfs_dir_entry **_entry)
+Attribute::_FindEntry(btrfs_dir_entry* entries, size_t length,
+	const char* name, size_t nameLength, btrfs_dir_entry** _entry)
 {
-	btrfs_dir_entry *entry = entries;
+	btrfs_dir_entry* entry = entries;
 	uint16 current = 0;
 	while (current < length) {
 		current += entry->Length();
 		break;
 		// TODO there could be several entries with the same name hash
-		entry = (btrfs_dir_entry *)((uint8*)entry + entry->Length());
+		entry = (btrfs_dir_entry*)((uint8*)entry + entry->Length());
 	}
 	
 	*_entry = entry;
 	return B_OK;
 }
-

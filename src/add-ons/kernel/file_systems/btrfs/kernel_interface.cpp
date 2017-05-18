@@ -68,14 +68,14 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 
 
 static float
-btrfs_identify_partition(int fd, partition_data *partition, void **_cookie)
+btrfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	btrfs_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
 	if (status != B_OK)
 		return -1;
 
-	identify_cookie *cookie = new identify_cookie;
+	identify_cookie* cookie = new identify_cookie;
 	memcpy(&cookie->super_block, &superBlock, sizeof(btrfs_super_block));
 
 	*_cookie = cookie;
@@ -84,9 +84,9 @@ btrfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 
 static status_t
-btrfs_scan_partition(int fd, partition_data *partition, void *_cookie)
+btrfs_scan_partition(int fd, partition_data* partition, void* _cookie)
 {
-	identify_cookie *cookie = (identify_cookie *)_cookie;
+	identify_cookie* cookie = (identify_cookie*)_cookie;
 
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
@@ -138,9 +138,9 @@ btrfs_mount(fs_volume* _volume, const char* device, uint32 flags,
 
 
 static status_t
-btrfs_unmount(fs_volume *_volume)
+btrfs_unmount(fs_volume* _volume)
 {
-	Volume* volume = (Volume *)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	status_t status = volume->Unmount();
 	delete volume;
@@ -452,7 +452,7 @@ btrfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 
 
 static status_t
-btrfs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+btrfs_close(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	return B_OK;
 }
@@ -482,8 +482,8 @@ btrfs_access(fs_volume* _volume, fs_vnode* _node, int accessMode)
 
 
 static status_t
-btrfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
-	size_t *_bufferSize)
+btrfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
+	size_t* _bufferSize)
 {
 	Inode* inode = (Inode*)_node->private_node;
 	return inode->ReadAt(0, (uint8*)buffer, _bufferSize);
@@ -516,8 +516,8 @@ btrfs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 
 
 static status_t
-btrfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+btrfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	struct dirent* dirent, size_t bufferSize, uint32* _num)
 {
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -560,7 +560,7 @@ btrfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-btrfs_rewind_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void *_cookie)
+btrfs_rewind_dir(fs_volume* /*_volume*/, fs_vnode* /*node*/, void* _cookie)
 {
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
 
@@ -576,7 +576,7 @@ btrfs_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void * /*_cookie*/
 
 
 static status_t
-btrfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+btrfs_free_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	delete (DirectoryIterator*)_cookie;
 	return B_OK;
@@ -584,7 +584,7 @@ btrfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 
 
 static status_t
-btrfs_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
+btrfs_open_attr_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 {
 	Inode* inode = (Inode*)_node->private_node;
 	TRACE("%s()\n", __FUNCTION__);
@@ -714,7 +714,6 @@ btrfs_write_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
 {
 	return EROFS;
 }
-
 
 
 static status_t
@@ -859,7 +858,7 @@ static file_system_module_info sBtrfsFileSystem = {
 };
 
 
-module_info *modules[] = {
-	(module_info *)&sBtrfsFileSystem,
+module_info* modules[] = {
+	(module_info*)&sBtrfsFileSystem,
 	NULL,
 };

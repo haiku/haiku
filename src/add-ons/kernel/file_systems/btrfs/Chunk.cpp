@@ -43,7 +43,7 @@ Chunk::Chunk(struct btrfs_chunk* chunk, fsblock_t offset)
 		"sector_size %" B_PRIu32 "\n", chunk->Length(), chunk->Owner(), 
 		chunk->StripeLength(), chunk->Type(), chunk->StripeCount(), 
 		chunk->SubStripes(), chunk->SectorSize());
-	for(int32 i = 0; i < chunk->StripeCount(); i++) {
+	for (int32 i = 0; i < chunk->StripeCount(); i++) {
 		TRACE("chunk.stripe[%" B_PRId32 "].physical %" B_PRId64 " deviceid %"
 			B_PRId64 "\n", i, chunk->stripes[i].Offset(),
 			chunk->stripes[i].DeviceID());
@@ -66,14 +66,14 @@ Chunk::Size() const
 
 
 status_t
-Chunk::FindBlock(off_t logical, off_t &physical)
+Chunk::FindBlock(off_t logical, off_t& physical)
 {
 	if (fChunk == NULL)
 		return B_NO_INIT;
 
 	if (logical < (off_t)fChunkOffset
 		|| logical > (off_t)(fChunkOffset + fChunk->Length()))
-			return B_BAD_VALUE;
+		return B_BAD_VALUE;
 	
 	// only one stripe
 	physical = logical + fChunk->stripes[0].Offset() - fChunkOffset;

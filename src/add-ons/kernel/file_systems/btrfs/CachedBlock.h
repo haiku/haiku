@@ -27,8 +27,8 @@ public:
 			off_t			BlockNumber() const { return fBlockNumber; }
 
 private:
-							CachedBlock(const CachedBlock &);
-							CachedBlock &operator=(const CachedBlock &);
+							CachedBlock(const CachedBlock&);
+							CachedBlock& operator=(const CachedBlock&);
 								// no implementation
 						
 protected:
@@ -91,7 +91,8 @@ CachedBlock::SetTo(off_t block)
 {
 	Unset();
 	fBlockNumber = block;
-	return fBlock = (uint8 *)block_cache_get(fVolume->BlockCache(), block);
+	return fBlock = (uint8*)block_cache_get(fVolume->BlockCache(), block);
 }
+
 
 #endif	// CACHED_BLOCK_H

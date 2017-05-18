@@ -73,20 +73,20 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 	}
 
 	btrfs_key key;
-	btrfs_dir_entry *entries;
+	btrfs_dir_entry* entries;
 	size_t entries_length;
 	status_t status = fIterator->GetNextEntry(key, (void**)&entries,
 		&entries_length);
 	if (status != B_OK)
 		return status;
 
-	btrfs_dir_entry *entry = entries;
+	btrfs_dir_entry* entry = entries;
 	uint16 current = 0;
 	while (current < entries_length) {
 		current += entry->Length();
 		break;
 		// TODO there could be several entries with the same name hash
-		entry = (btrfs_dir_entry *)((uint8*)entry + entry->Length());
+		entry = (btrfs_dir_entry*)((uint8*)entry + entry->Length());
 	}
 
 	size_t length = entry->NameLength();
@@ -127,7 +127,7 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	key.SetObjectID(fInode->ID());
 	key.SetOffset(hash);
 
-	btrfs_dir_entry *entries;
+	btrfs_dir_entry* entries;
 	size_t length;
 	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
 		(void**)&entries, &length);
@@ -137,13 +137,13 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 		return status;
 	}
 
-	btrfs_dir_entry *entry = entries;
+	btrfs_dir_entry* entry = entries;
 	uint16 current = 0;
 	while (current < length) {
 		current += entry->Length();
 		break;
 		// TODO there could be several entries with the same name hash
-		entry = (btrfs_dir_entry *)((uint8*)entry + entry->Length());
+		entry = (btrfs_dir_entry*)((uint8*)entry + entry->Length());
 	}
 
 	TRACE("DirectoryIterator::Lookup() entries_length %ld name_length %d\n",

@@ -6,7 +6,6 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-
 #include <lock.h>
 
 #include "btrfs.h"
@@ -53,8 +52,8 @@ public:
 
 	static	status_t			Identify(int fd, btrfs_super_block* superBlock);
 
-			status_t			FindBlock(off_t logical, fsblock_t &physical);
-			status_t			FindBlock(off_t logical, off_t &physical);
+			status_t			FindBlock(off_t logical, fsblock_t& physical);
+			status_t			FindBlock(off_t logical, off_t& physical);
 
 private:
 			mutex				fLock;
@@ -78,5 +77,5 @@ private:
 			BPlusTree*			fChecksumTree;
 };
 
-#endif	// VOLUME_H
 
+#endif	// VOLUME_H

@@ -38,12 +38,12 @@ public:
 									uint8* buffer, size_t* _length);
 private:
 			status_t			_Lookup(const char* name, size_t nameLength,
-									btrfs_dir_entry **entries = NULL,
-									size_t *length = NULL);
-			status_t			_FindEntry(btrfs_dir_entry *entries,
+									btrfs_dir_entry** entries = NULL,
+									size_t* length = NULL);
+			status_t			_FindEntry(btrfs_dir_entry* entries,
 									size_t length, const char* name,
 									size_t nameLength,
-									btrfs_dir_entry **_entry);
+									btrfs_dir_entry** _entry);
 
 			::Volume*			fVolume;
 			Inode*				fInode;

@@ -30,6 +30,7 @@ enum bplustree_traversing {
 
 //	#pragma mark - in-memory structures
 
+
 template<class T> class Stack;
 class TreeIterator;
 
@@ -44,15 +45,15 @@ struct node_and_key {
 class BPlusTree {
 public:
 								BPlusTree(Volume* volume,
-									struct btrfs_stream *stream);
+									struct btrfs_stream* stream);
 								BPlusTree(Volume* volume,
 									fsblock_t rootBlock);
 								~BPlusTree();
-			status_t			FindExact(struct btrfs_key &key, void** value,
+			status_t			FindExact(struct btrfs_key& key, void** value,
 									size_t* size = NULL);
-			status_t			FindNext(struct btrfs_key &key, void** value,
+			status_t			FindNext(struct btrfs_key& key, void** value,
 									size_t* size = NULL);
-			status_t			FindPrevious(struct btrfs_key &key, void** value,
+			status_t			FindPrevious(struct btrfs_key& key, void** value,
 									size_t* size = NULL);
 
 private:
@@ -60,9 +61,9 @@ private:
 								BPlusTree& operator=(const BPlusTree& other);
 									// no implementation
 
-			int32				_CompareKeys(struct btrfs_key &key1,
-									struct btrfs_key &key2);
-			status_t			_Find(struct btrfs_key &key, void** value,
+			int32				_CompareKeys(struct btrfs_key& key1,
+									struct btrfs_key& key2);
+			status_t			_Find(struct btrfs_key& key, void** value,
 									size_t* size, bplustree_traversing type);
 			void				_AddIterator(TreeIterator* iterator);
 			void				_RemoveIterator(TreeIterator* iterator);
@@ -79,19 +80,19 @@ private:
 
 class TreeIterator : public SinglyLinkedListLinkImpl<TreeIterator> {
 public:
-								TreeIterator(BPlusTree* tree, struct btrfs_key &key);
+								TreeIterator(BPlusTree* tree, struct btrfs_key& key);
 								~TreeIterator();
 
 			status_t			Traverse(bplustree_traversing direction,
-									struct btrfs_key &key, void** value,
-									size_t *size = NULL);
-			status_t			Find(struct btrfs_key &key);
+									struct btrfs_key& key, void** value,
+									size_t* size = NULL);
+			status_t			Find(struct btrfs_key& key);
 
 			status_t			Rewind();
-			status_t			GetNextEntry(struct btrfs_key &key, void** value,
-									size_t *size = NULL);
-			status_t			GetPreviousEntry(struct btrfs_key &key, void** value,
-									size_t *size = NULL);
+			status_t			GetNextEntry(struct btrfs_key& key, void** value,
+									size_t* size = NULL);
+			status_t			GetPreviousEntry(struct btrfs_key& key, void** value,
+									size_t* size = NULL);
 
 			BPlusTree*			Tree() const { return fTree; }
 
@@ -117,19 +118,20 @@ TreeIterator::Rewind()
 	return B_OK;
 }
 
+
 inline status_t
-TreeIterator::GetNextEntry(struct btrfs_key &key, void** value, size_t *size)
+TreeIterator::GetNextEntry(struct btrfs_key& key, void** value, size_t* size)
 {
 	return Traverse(BPLUSTREE_FORWARD, key, value, size);
 }
 
+
 inline status_t
-TreeIterator::GetPreviousEntry(struct btrfs_key &key, void** value,
-	size_t *size)
+TreeIterator::GetPreviousEntry(struct btrfs_key& key, void** value,
+	size_t* size)
 {
 	return Traverse(BPLUSTREE_BACKWARD, key, value, size);
 }
-
 
 
 #endif	// B_PLUS_TREE_H

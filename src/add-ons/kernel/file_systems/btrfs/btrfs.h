@@ -32,10 +32,12 @@ struct btrfs_key {
 	void SetOffset(uint64 off) { offset = B_HOST_TO_LENDIAN_INT64(off); }
 } _PACKED;
 
+
 struct btrfs_timespec {
 	uint64	seconds;
 	uint32	nanoseconds;
 } _PACKED;
+
 
 struct btrfs_header {
 	uint8	checksum[32];
@@ -49,33 +51,36 @@ struct btrfs_header {
 	uint8	level;
 	uint64 BlockNum() const { return B_LENDIAN_TO_HOST_INT64(blocknum); }
 	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
-	uint64 Generation() const {
-		return B_LENDIAN_TO_HOST_INT64(generation); }
-	uint64 Owner() const {
-		return B_LENDIAN_TO_HOST_INT64(owner); }
-	uint32 ItemCount() const {
-		return B_LENDIAN_TO_HOST_INT32(item_count); }
+	uint64 Generation() const
+		{ return B_LENDIAN_TO_HOST_INT64(generation); }
+	uint64 Owner() const
+		{ return B_LENDIAN_TO_HOST_INT64(owner); }
+	uint32 ItemCount() const
+		{ return B_LENDIAN_TO_HOST_INT32(item_count); }
 	uint8 Level() const { return level; }
 } _PACKED;
+
 
 struct btrfs_index {
 	btrfs_key key;
 	uint64	blocknum;
 	uint64	generation;
 	uint64 BlockNum() const { return B_LENDIAN_TO_HOST_INT64(blocknum); }
-	uint64 Generation() const {
-		return B_LENDIAN_TO_HOST_INT64(generation); }
+	uint64 Generation() const
+		{ return B_LENDIAN_TO_HOST_INT64(generation); }
 } _PACKED;
+
 
 struct btrfs_entry {
 	btrfs_key key;
 	uint32 offset;
 	uint32 size;
-	uint32 Offset() const {
-		return B_LENDIAN_TO_HOST_INT32(offset); }
-	uint32 Size() const {
-		return B_LENDIAN_TO_HOST_INT32(size); }
+	uint32 Offset() const
+		{ return B_LENDIAN_TO_HOST_INT32(offset); }
+	uint32 Size() const
+		{ return B_LENDIAN_TO_HOST_INT32(size); }
 } _PACKED;
+
 
 struct btrfs_stream {
 	btrfs_header header;
@@ -85,6 +90,7 @@ struct btrfs_stream {
 	};
 } _PACKED;
 
+
 struct btrfs_stripe {
 	uint64	device_id;
 	uint64	offset;
@@ -92,6 +98,7 @@ struct btrfs_stripe {
 	uint64	DeviceID() const { return B_LENDIAN_TO_HOST_INT64(device_id); }
 	uint64	Offset() const { return B_LENDIAN_TO_HOST_INT64(offset); }
 } _PACKED;
+
 
 struct btrfs_chunk {
 	uint64	length;
@@ -118,6 +125,7 @@ struct btrfs_chunk {
 	uint16 SubStripes() const
 		{ return B_LENDIAN_TO_HOST_INT16(sub_stripes); }
 } _PACKED;
+
 
 struct btrfs_device {
 	uint64	id;
@@ -174,18 +182,19 @@ struct btrfs_super_block {
 		// implemented in Volume.cpp
 	uint64 TotalSize() const { return B_LENDIAN_TO_HOST_INT64(total_size); }
 	uint32 BlockSize() const { return B_LENDIAN_TO_HOST_INT32(sector_size); }
-	uint64 RootDirObjectID() const {
-		return B_LENDIAN_TO_HOST_INT64(root_dir_object_id); }
-	uint64 Generation() const {
-		return B_LENDIAN_TO_HOST_INT64(generation); }
-	uint64 Root() const {
-		return B_LENDIAN_TO_HOST_INT64(root); }
-	uint64 ChunkRoot() const {
-		return B_LENDIAN_TO_HOST_INT64(chunk_root); }
-	uint64 LogRoot() const {
-		return B_LENDIAN_TO_HOST_INT64(log_root); }
+	uint64 RootDirObjectID() const
+		{ return B_LENDIAN_TO_HOST_INT64(root_dir_object_id); }
+	uint64 Generation() const
+		{ return B_LENDIAN_TO_HOST_INT64(generation); }
+	uint64 Root() const
+		{ return B_LENDIAN_TO_HOST_INT64(root); }
+	uint64 ChunkRoot() const
+		{ return B_LENDIAN_TO_HOST_INT64(chunk_root); }
+	uint64 LogRoot() const
+		{ return B_LENDIAN_TO_HOST_INT64(log_root); }
 	uint8 ChunkRootLevel() const { return chunk_root_level; }
 } _PACKED;
+
 
 struct btrfs_inode {
 	uint64	generation;
@@ -212,21 +221,22 @@ struct btrfs_inode {
 	uint32 Mode() const { return B_LENDIAN_TO_HOST_INT32(mode); }
 	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
 	uint64 Sequence() const { return B_LENDIAN_TO_HOST_INT64(sequence); }
-	static void _DecodeTime(struct timespec &timespec,
-		const struct btrfs_timespec &time)
+	static void _DecodeTime(struct timespec& timespec,
+		const struct btrfs_timespec& time)
 	{
 		timespec.tv_sec = B_LENDIAN_TO_HOST_INT64(time.seconds);
 		timespec.tv_nsec = B_LENDIAN_TO_HOST_INT32(time.nanoseconds);
 	}
-	void GetAccessTime(struct timespec &timespec) const 
+	void GetAccessTime(struct timespec& timespec) const 
 		{ _DecodeTime(timespec, access_time); }
-	void GetChangeTime(struct timespec &timespec) const 
+	void GetChangeTime(struct timespec& timespec) const 
 		{ _DecodeTime(timespec, change_time); }
-	void GetModificationTime(struct timespec &timespec) const 
+	void GetModificationTime(struct timespec& timespec) const 
 		{ _DecodeTime(timespec, modification_time); }
-	void GetCreationTime(struct timespec &timespec) const 
+	void GetCreationTime(struct timespec& timespec) const 
 		{ _DecodeTime(timespec, creation_time); }
 } _PACKED;
+
 
 struct btrfs_root {
 	btrfs_inode inode;
@@ -241,10 +251,11 @@ struct btrfs_root {
 	btrfs_key drop_progress;
 	uint8	drop_level;
 	uint8	level;
-	uint64 Generation() const {
-		return B_LENDIAN_TO_HOST_INT64(generation); }
+	uint64 Generation() const
+		{ return B_LENDIAN_TO_HOST_INT64(generation); }
 	uint64 BlockNum() const { return B_LENDIAN_TO_HOST_INT64(blocknum); }
 } _PACKED;
+
 
 struct btrfs_dir_entry {
 	btrfs_key location;
@@ -258,6 +269,7 @@ struct btrfs_dir_entry {
 	uint16 Length() const
 		{ return sizeof(*this) + NameLength() + DataLength(); }
 } _PACKED;
+
 
 struct btrfs_extent_data {
 	uint64	generation;
@@ -275,20 +287,20 @@ struct btrfs_extent_data {
 		};
 		uint8 inline_data[0];
 	};
-	uint64 Generation() const {
-		return B_LENDIAN_TO_HOST_INT64(generation); }
-	uint64 MemoryBytes() const {
-		return B_LENDIAN_TO_HOST_INT64(memory_size); }
+	uint64 Generation() const
+		{ return B_LENDIAN_TO_HOST_INT64(generation); }
+	uint64 MemoryBytes() const
+		{ return B_LENDIAN_TO_HOST_INT64(memory_size); }
 	uint8 Compression() const { return compression; }
 	uint8 Type() const { return type; }
-	uint64 DiskOffset() const {
-		return B_LENDIAN_TO_HOST_INT64(disk_offset); }
-	uint64 DiskSize() const {
-		return B_LENDIAN_TO_HOST_INT64(disk_size); }
-	uint64 ExtentOffset() const {
-		return B_LENDIAN_TO_HOST_INT64(extent_offset); }
-	uint64 Size() const {
-		return B_LENDIAN_TO_HOST_INT64(size); }
+	uint64 DiskOffset() const
+		{ return B_LENDIAN_TO_HOST_INT64(disk_offset); }
+	uint64 DiskSize() const
+		{ return B_LENDIAN_TO_HOST_INT64(disk_size); }
+	uint64 ExtentOffset() const
+		{ return B_LENDIAN_TO_HOST_INT64(extent_offset); }
+	uint64 Size() const
+		{ return B_LENDIAN_TO_HOST_INT64(size); }
 } _PACKED;
 
 
@@ -326,9 +338,11 @@ struct file_cookie {
 	int			open_mode;
 };
 
+
 #define BTRFS_OPEN_MODE_USER_MASK		0x7fffffff
 
 extern fs_volume_ops gBtrfsVolumeOps;
 extern fs_vnode_ops gBtrfsVnodeOps;
+
 
 #endif	// BTRFS_H

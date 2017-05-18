@@ -6,5 +6,4 @@
  *		Jérôme Duval
  */
 
-uint32 calculate_crc(uint32 crc, uint8 *data, uint16 length);
-
+uint32 calculate_crc(uint32 crc, uint8* data, uint16 length);

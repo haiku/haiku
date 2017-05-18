@@ -348,7 +348,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	search_key.SetOffset(0);
 	search_key.SetType(BTRFS_KEY_TYPE_ROOT_ITEM);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_EXTENT_TREE);
-	struct btrfs_root *root;
+	struct btrfs_root* root;
 	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find extent root\n");
 		return B_ERROR;
@@ -478,7 +478,7 @@ Volume::LoadSuperBlock()
 
 
 status_t
-Volume::FindBlock(off_t logical, fsblock_t &physicalBlock)
+Volume::FindBlock(off_t logical, fsblock_t& physicalBlock)
 {
 	off_t physical;
 	status_t status = FindBlock(logical, physical);
@@ -490,7 +490,7 @@ Volume::FindBlock(off_t logical, fsblock_t &physicalBlock)
 
 
 status_t
-Volume::FindBlock(off_t logical, off_t &physical)
+Volume::FindBlock(off_t logical, off_t& physical)
 {
 	if (fChunkTree == NULL
 		|| (logical >= (off_t)fChunk->Offset()
@@ -503,7 +503,7 @@ Volume::FindBlock(off_t logical, off_t &physical)
 	search_key.SetOffset(logical);
 	search_key.SetType(BTRFS_KEY_TYPE_CHUNK_ITEM);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_CHUNK_TREE);
-	struct btrfs_chunk *chunk;
+	struct btrfs_chunk* chunk;
 	size_t chunk_length;
 	status_t status = fChunkTree->FindPrevious(search_key, (void**)&chunk,
 		&chunk_length);
