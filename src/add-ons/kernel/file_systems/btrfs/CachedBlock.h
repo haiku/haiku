@@ -29,7 +29,7 @@ private:
 							CachedBlock(const CachedBlock&);
 							CachedBlock& operator=(const CachedBlock&);
 								// no implementation
-						
+
 protected:
 			Volume*			fVolume;
 			off_t			fBlockNumber;

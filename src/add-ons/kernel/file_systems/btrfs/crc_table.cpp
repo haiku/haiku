@@ -11,7 +11,7 @@
 	UDF tag id CRC values.
 
 	This code based off of crc code in UDF-2.50 specs, as permitted.
-	See UDF-2.50 6.5 for more information. 
+	See UDF-2.50 6.5 for more information.
 
 	Reflected version by Jéme Duval
 */

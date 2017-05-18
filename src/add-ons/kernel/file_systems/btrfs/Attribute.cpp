@@ -161,7 +161,7 @@ Attribute::_Lookup(const char* name, size_t nameLength,
 			B_PRIu32 " \"%s\"\n", hash, name);
 		return status;
 	}
-	
+
 	if (_entries == NULL)
 		free(entries);
 	else
@@ -186,7 +186,7 @@ Attribute::_FindEntry(btrfs_dir_entry* entries, size_t length,
 		// TODO there could be several entries with the same name hash
 		entry = (btrfs_dir_entry*)((uint8*)entry + entry->Length());
 	}
-	
+
 	*_entry = entry;
 	return B_OK;
 }

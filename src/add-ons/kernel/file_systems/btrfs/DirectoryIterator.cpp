@@ -109,11 +109,11 @@ status_t
 DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 {
 	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
-		if (strcmp(name, ".") == 0 
+		if (strcmp(name, ".") == 0
 			|| fInode->ID() == BTRFS_OBJECT_ID_CHUNK_TREE) {
 			*_id = fInode->ID();
 			return B_OK;
-		} 
+		}
 		return fInode->FindParent(_id);
 	}
 

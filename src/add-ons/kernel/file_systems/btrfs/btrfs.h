@@ -19,7 +19,7 @@ struct btrfs_key {
 	uint64	object_id;
 	uint8	type;
 	uint64	offset;
-	
+
 	uint64	ObjectID() const { return B_LENDIAN_TO_HOST_INT64(object_id); }
 	uint8	Type() const { return type; }
 	uint64	Offset() const { return B_LENDIAN_TO_HOST_INT64(offset); }
@@ -223,13 +223,13 @@ struct btrfs_inode {
 		timespec.tv_sec = B_LENDIAN_TO_HOST_INT64(time.seconds);
 		timespec.tv_nsec = B_LENDIAN_TO_HOST_INT32(time.nanoseconds);
 	}
-	void GetAccessTime(struct timespec& timespec) const 
+	void GetAccessTime(struct timespec& timespec) const
 		{ _DecodeTime(timespec, access_time); }
-	void GetChangeTime(struct timespec& timespec) const 
+	void GetChangeTime(struct timespec& timespec) const
 		{ _DecodeTime(timespec, change_time); }
-	void GetModificationTime(struct timespec& timespec) const 
+	void GetModificationTime(struct timespec& timespec) const
 		{ _DecodeTime(timespec, modification_time); }
-	void GetCreationTime(struct timespec& timespec) const 
+	void GetCreationTime(struct timespec& timespec) const
 		{ _DecodeTime(timespec, creation_time); }
 } _PACKED;
 

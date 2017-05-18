@@ -193,7 +193,7 @@ btrfs_super_block::IsValid()
 	// TODO: check some more values!
 	if (strncmp(magic, BTRFS_SUPER_BLOCK_MAGIC, sizeof(magic)) != 0)
 		return false;
-	
+
 	return true;
 }
 
@@ -240,7 +240,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 {
 	flags |= B_MOUNT_READ_ONLY;
 		// we only support read-only for now
-	
+
 	if ((flags & B_MOUNT_READ_ONLY) != 0) {
 		TRACE("Volume::Mount(): Read only\n");
 	} else {
@@ -264,7 +264,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Identify() failed\n");
 		return status;
 	}
-	
+
 	fBlockSize = fSuperBlock.BlockSize();
 	TRACE("block size %" B_PRIu32 "\n", fBlockSize);
 
@@ -278,7 +278,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		if (key->Type() != BTRFS_KEY_TYPE_CHUNK_ITEM) {
 			break;
 		}
-		
+
 		struct btrfs_chunk* chunk = (struct btrfs_chunk*)(key + 1);
 		fChunk = new(std::nothrow) Chunk(chunk, key->Offset());
 		if (fChunk == NULL)
@@ -298,7 +298,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	FindBlock(fSuperBlock.LogRoot(), physical);
 	TRACE("Volume::Mount() log_root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
 		fSuperBlock.LogRoot(), physical);
-		
+
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
 	status = opener.GetSize(&diskSize);
@@ -311,7 +311,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		fBlockSize);
 	if (fBlockCache == NULL)
 		return B_ERROR;
-	
+
 	TRACE("Volume::Mount(): Initialized block cache: %p\n", fBlockCache);
 
 	fChunkTree = new(std::nothrow) BPlusTree(this, fSuperBlock.ChunkRoot());
@@ -347,7 +347,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	free(root);
 	if (fExtentTree == NULL)
 		return B_NO_MEMORY;
-	
+
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_FS_TREE);
 	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
@@ -359,7 +359,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	free(root);
 	if (fFSTree == NULL)
 		return B_NO_MEMORY;
-	
+
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_DEV_TREE);
 	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
@@ -385,7 +385,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	free(root);
 	if (fChecksumTree == NULL)
 		return B_NO_MEMORY;
-	
+
 	// ready
 	status = get_vnode(fFSVolume, BTRFS_OBJECT_ID_CHUNK_TREE,
 		(void**)&fRootNode);

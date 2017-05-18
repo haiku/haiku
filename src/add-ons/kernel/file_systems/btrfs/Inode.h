@@ -62,7 +62,7 @@ public:
 
 			void*		FileCache() const { return fCache; }
 			void*		Map() const { return fMap; }
-			
+
 			status_t	FindParent(ino_t* id);
 private:
 						Inode(Volume* volume);

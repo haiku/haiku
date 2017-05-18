@@ -175,18 +175,18 @@ btrfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 		return B_NO_MEMORY;
 
 	status_t status = inode->InitCheck();
-	if (status != B_OK)
+	if (status != B_OK) {
 		delete inode;
-
-	if (status == B_OK) {
-		_node->private_node = inode;
-		_node->ops = &gBtrfsVnodeOps;
-		*_type = inode->Mode();
-		*_flags = 0;
-	} else
 		ERROR("get_vnode: InitCheck() failed. Error: %s\n", strerror(status));
+		return status;
+	}
 
-	return status;
+	_node->private_node = inode;
+	_node->ops = &gBtrfsVnodeOps;
+	*_type = inode->Mode();
+	*_flags = 0;
+
+	return B_OK;
 }
 
 
@@ -623,7 +623,9 @@ btrfs_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;
 		return B_OK;
-	} else if (status != B_OK)
+	}
+
+	if (status != B_OK)
 		return status;
 
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -860,7 +862,7 @@ static file_system_module_info sBtrfsFileSystem = {
 
 	&btrfs_mount,
 
-	
+
 	/* capability querying operations */
 	NULL,
 
