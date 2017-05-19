@@ -9,9 +9,6 @@
 
 #include "Chunk.h"
 
-#include <stdlib.h>
-#include <string.h>
-
 
 //#define TRACE_BTRFS
 #ifdef TRACE_BTRFS

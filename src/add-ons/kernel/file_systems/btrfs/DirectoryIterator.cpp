@@ -5,10 +5,6 @@
 
 
 #include "DirectoryIterator.h"
-
-#include <new>
-#include <stdlib.h>
-
 #include "CRCTable.h"
 
 

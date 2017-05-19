@@ -9,11 +9,6 @@
 
 
 #include "Attribute.h"
-
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "BPlusTree.h"
 #include "CRCTable.h"
 #include "Utility.h"

@@ -7,11 +7,6 @@
 
 
 #include "Inode.h"
-
-#include <string.h>
-#include <stdlib.h>
-#include <zlib.h>
-
 #include "BPlusTree.h"
 #include "CachedBlock.h"
 #include "Utility.h"

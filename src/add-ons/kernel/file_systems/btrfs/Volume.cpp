@@ -9,18 +9,6 @@
 
 
 #include "Volume.h"
-
-#include <errno.h>
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <fs_cache.h>
-#include <fs_volume.h>
-
-#include <util/AutoLock.h>
-
 #include "BPlusTree.h"
 #include "CachedBlock.h"
 #include "Chunk.h"

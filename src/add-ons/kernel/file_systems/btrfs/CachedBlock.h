@@ -7,7 +7,6 @@
 
 //!	interface for the block cache
 
-#include <fs_cache.h>
 
 #include "Volume.h"
 

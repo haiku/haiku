@@ -6,7 +6,6 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include <lock.h>
 
 #include "btrfs.h"
 

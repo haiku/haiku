@@ -17,8 +17,7 @@
 */
 
 
-#include <stdio.h>
-#include <sys/types.h>
+#include "system_dependencies.h"
 
 
 typedef unsigned int uint32 ;

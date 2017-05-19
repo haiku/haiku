@@ -9,12 +9,7 @@
 
 
 #include "BPlusTree.h"
-
 #include "CachedBlock.h"
-
-#include <stdlib.h>
-#include <string.h>
-#include <util/AutoLock.h>
 
 
 //#define TRACE_BTRFS

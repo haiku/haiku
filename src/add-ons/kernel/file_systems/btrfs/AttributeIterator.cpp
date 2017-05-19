@@ -6,9 +6,6 @@
 
 #include "AttributeIterator.h"
 
-#include <new>
-#include <stdlib.h>
-
 
 //#define TRACE_BTRFS
 #ifdef TRACE_BTRFS

@@ -1,0 +1,57 @@
+SubDir HAIKU_TOP src tools btrfs_shell ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems btrfs ] ;
+
+# prevent inclusion of HaikuBuildCompatibility.h
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
+
+# set some additional defines
+{
+	local defines =
+		#BTRFS_BIG_ENDIAN_ONLY
+		FS_SHELL
+		TRACE_BTRFS # ENABLE DEBUGGING
+		;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;
+	HOST_LINKFLAGS += -lz ;	# zlib link
+}
+
+
+# platform specific libraries
+local fsShellCommandLibs ;
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
+}
+
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+}
+
+UsePrivateHeaders shared storage fs_shell ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
+
+local btrfsSources =
+	Attribute.cpp
+	AttributeIterator.cpp
+	BPlusTree.cpp
+	Chunk.cpp
+	CRCTable.cpp
+	DirectoryIterator.cpp
+	Inode.cpp
+	Volume.cpp
+	kernel_interface.cpp
+;
+
+BuildPlatformMergeObject <build>btrfs.o : $(btrfsSources) ;
+
+BuildPlatformMain <build>btrfs_shell
+	:
+	:
+	<build>btrfs.o
+	<build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBROOT) $(fsShellCommandLibs)
+;

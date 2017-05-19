@@ -5,17 +5,6 @@
  */
 
 
-#include <dirent.h>
-#include <util/kernel_cpp.h>
-#include <string.h>
-
-#include <AutoDeleter.h>
-#include <fs_cache.h>
-#include <fs_info.h>
-#include <io_requests.h>
-#include <NodeMonitor.h>
-#include <util/AutoLock.h>
-
 #include "Attribute.h"
 #include "AttributeIterator.h"
 #include "btrfs.h"
@@ -266,7 +255,7 @@ btrfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-#ifndef BTRFS_SHELL
+#ifndef FS_SHELL
 	if (io_request_is_write(request) && volume->IsReadOnly()) {
 		notify_io_request(request, B_READ_ONLY_DEVICE);
 		return B_READ_ONLY_DEVICE;
@@ -274,7 +263,7 @@ btrfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request
 #endif
 
 	if (inode->FileCache() == NULL) {
-#ifndef BTRFS_SHELL
+#ifndef FS_SHELL
 		notify_io_request(request, B_BAD_VALUE);
 #endif
 		return B_BAD_VALUE;
@@ -752,6 +741,23 @@ btrfs_remove_attr(fs_volume* _volume, fs_vnode* vnode,
 	return EROFS;
 }
 
+//	#pragma mark -
+
+
+static status_t
+btrfs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return B_OK;
+		case B_MODULE_UNINIT:
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
+
 
 fs_volume_ops gBtrfsVolumeOps = {
 	&btrfs_unmount,
@@ -839,7 +845,7 @@ static file_system_module_info sBtrfsFileSystem = {
 	{
 		"file_systems/btrfs" B_CURRENT_FS_API_VERSION,
 		0,
-		NULL,
+		btrfs_std_ops,
 	},
 
 	"btrfs",						// short_name
@@ -854,7 +860,28 @@ static file_system_module_info sBtrfsFileSystem = {
 
 	&btrfs_mount,
 
+	
+	/* capability querying operations */
 	NULL,
+
+	NULL,	// validate_resize
+	NULL,	// validate_move
+	NULL,	// validate_set_content_name
+	NULL,	// validate_set_content_parameters
+	NULL,	// validate_initialize,
+
+	/* shadow partition modification */
+	NULL,	// shadow_changed
+
+	/* writing */
+	NULL,	// defragment
+	NULL,	// repair
+	NULL,	// resize
+	NULL,	// move
+	NULL,	// set_content_name
+	NULL,	// set_content_parameters
+	NULL,	// initialize
+	NULL	// unitialize
 };
 
 
