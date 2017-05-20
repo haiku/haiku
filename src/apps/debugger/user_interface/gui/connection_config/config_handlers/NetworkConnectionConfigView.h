@@ -10,6 +10,7 @@
 
 class BMenuField;
 class BTextControl;
+class Setting;
 
 
 class NetworkConnectionConfigView : public ConnectionConfigView{
@@ -27,6 +28,9 @@ private:
 			BMenuField*			fProtocolField;
 			BTextControl*		fHostInput;
 			BTextControl*		fPortInput;
+			Settings*			fSettings;
+			Setting*			fHostSetting;
+			Setting*			fPortSetting;
 };
 
 
