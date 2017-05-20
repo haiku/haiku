@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2016-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "TargetHostInterfaceRoster.h"
@@ -96,6 +96,8 @@ TargetHostInterfaceRoster::RegisterInterfaceInfos()
 		if (info == NULL) \
 			return B_NO_MEMORY; \
 		interfaceReference.SetTo(info, true); \
+		if (info->Init() != B_OK) \
+			return B_NO_MEMORY; \
 		if (!fInterfaceInfos.AddItem(info)) \
 			return B_NO_MEMORY; \
 		interfaceReference.Detach();
