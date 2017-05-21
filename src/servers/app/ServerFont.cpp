@@ -497,58 +497,84 @@ static
 void
 ParseFcMap(FcChar32 charMap[], FcChar32 baseCodePoint, unicode_block& blocksForMap)
 {
+	uint32 block = 0;
+	const uint8 BITS_PER_BLOCK = 32;
+	uint32 currentCodePoint = 0;
+	
 	for (int i = 0; i < FC_CHARSET_MAP_SIZE; ++i) {
 		FcChar32 curMapBlock = charMap[i];
-		uint32 rangeStart = 0;
-		uint32 block = 0;
-
-		for (int bit = 0; bit < 32; ++bit) {
-			uint32 startPoint = 0;
-			int32 foundStartBlock = -1;
-			int32 foundEndBlock = -1;
-
-			if ((curMapBlock & 0x8) != 0) {
-				if (rangeStart == 0) {
-					rangeStart = bit;
-					startPoint = baseCodePoint + block + (rangeStart);
-					foundStartBlock = FindBlockForCodepoint(startPoint, 0);
-					if (foundStartBlock >= 0) {
-						blocksForMap = blocksForMap
-							| kUnicodeBlockMap[foundStartBlock].block;
-					}
-				}
-			} else if (rangeStart > 0 && foundStartBlock > 0) {
+		int32 rangeStart = -1;
+		int32 startBlock = -1;
+		int32 endBlock = -1;
+		uint32 startPoint = 0;
+	
+		currentCodePoint = baseCodePoint + block;
+				
+		for (int bit = 0; bit < BITS_PER_BLOCK; ++bit) {		
+			if (curMapBlock == 0 && startBlock < 0)
+				// if no more bits are set then short-circuit the loop
+				break;
+			
+			if ((curMapBlock & 0x1) != 0 && rangeStart < 0) {
+				rangeStart = bit;
+				startPoint = currentCodePoint + rangeStart;
+				startBlock = FindBlockForCodepoint(startPoint, 0);
+				if (startBlock >= 0) {
+					blocksForMap = blocksForMap
+						| kUnicodeBlockMap[startBlock].block;
+				} 
+			} else if (rangeStart >= 0 && startBlock >= 0) {
 					// when we find an empty bit, that's the end of the range
-				uint32 endPoint = baseCodePoint + block + (bit - 1);
+				uint32 endPoint = currentCodePoint + (bit - 1);
 
-				foundEndBlock = FindBlockForCodepoint(endPoint,
-					foundStartBlock);
+				endBlock = FindBlockForCodepoint(endPoint,
+					startBlock);
 					// start the binary search at the block where we found the
 					// start codepoint to ideally find the end in the same
 					// block.
-				++foundStartBlock;
+				++startBlock;
 
-				while (foundStartBlock <= foundEndBlock) {
+				while (startBlock <= endBlock) {
 					// if the starting codepoint is found in a different block
 					// than the ending codepoint, we should add all the blocks
 					// inbetween.
 					blocksForMap = blocksForMap
-						| kUnicodeBlockMap[foundStartBlock].block;
-					++foundStartBlock;
+						| kUnicodeBlockMap[startBlock].block;
+					++startBlock;
 				}
 
-				foundStartBlock = -1;
-				foundEndBlock = -1;
-				rangeStart = 0;
-			} else {
-				foundStartBlock = -1;
-				rangeStart = 0;
-			}
+				startBlock = -1;
+				endBlock = -1;
+				rangeStart = -1;
+			} 
 
 			curMapBlock >>= 1;
 		}
+		
+		if (rangeStart >= 0 && startBlock >= 0) {
+				// if we hit the end of the block and had
+				// found a start of the range then we
+				// should end the range at the end of the block
+			uint32 endPoint = currentCodePoint + BITS_PER_BLOCK - 1;
 
-		block += 32;
+			endBlock = FindBlockForCodepoint(endPoint,
+				startBlock);
+				// start the binary search at the block where we found the
+				// start codepoint to ideally find the end in the same
+				// block.
+			++startBlock;
+
+			while (startBlock <= endBlock) {
+				// if the starting codepoint is found in a different block
+				// than the ending codepoint, we should add all the blocks
+				// inbetween.
+				blocksForMap = blocksForMap
+					| kUnicodeBlockMap[startBlock].block;
+				++startBlock;
+			}
+		}
+
+		block += BITS_PER_BLOCK;
 	}
 }
 
