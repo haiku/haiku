@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2016-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "ConnectionConfigWindow.h"
@@ -15,6 +15,7 @@
 
 #include "AppMessageCodes.h"
 #include "ConnectionConfigHandlerRoster.h"
+#include "Settings.h"
 #include "TargetHostInterfaceInfo.h"
 #include "TargetHostInterfaceRoster.h"
 #include "TargetHostInterface.h"
@@ -34,13 +35,17 @@ ConnectionConfigWindow::ConnectionConfigWindow()
 	fConnectionTypeField(NULL),
 	fConfigGroupView(NULL),
 	fCloseButton(NULL),
-	fConnectButton(NULL)
+	fConnectButton(NULL),
+	fCurrentSettings(NULL),
+	fActiveInfo(NULL)
 {
 }
 
 
 ConnectionConfigWindow::~ConnectionConfigWindow()
 {
+	if (fCurrentSettings != NULL)
+		fCurrentSettings->ReleaseReference();
 }
 
 
@@ -80,7 +85,12 @@ ConnectionConfigWindow::QuitRequested()
 void
 ConnectionConfigWindow::ConfigurationChanged(Settings* settings)
 {
-	// TODO: implement
+	if (fCurrentSettings != NULL)
+		fCurrentSettings->ReleaseReference();
+	fCurrentSettings = settings;
+	fCurrentSettings->AcquireReference();
+
+	fConnectButton->SetEnabled(fActiveInfo->IsConfigured(settings));
 }
 
 
@@ -88,6 +98,23 @@ void
 ConnectionConfigWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_CREATE_CONNECTION:
+		{
+			TargetHostInterfaceRoster* roster
+				= TargetHostInterfaceRoster::Default();
+			AutoLocker<TargetHostInterfaceRoster> rosterLocker(roster);
+
+			TargetHostInterface* interface;
+			status_t error = roster->CreateInterface(fActiveInfo,
+				fCurrentSettings, interface);
+
+			// TODO: notify user.
+			if (error != B_OK)
+				break;
+
+			PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -181,9 +208,10 @@ ConnectionConfigWindow::_UpdateActiveConfig(TargetHostInterfaceInfo* info)
 
 		ObjectDeleter<ConnectionConfigView> viewDeleter(view);
 		BLayoutItem* item = fConfigGroupView->GroupLayout()->AddView(view);
-		if (item != NULL) {
+		if (item != NULL)
 			viewDeleter.Detach();
-		}
+
+		fActiveInfo = info;
 	}
 
 	fConfigGroupView->InvalidateLayout();

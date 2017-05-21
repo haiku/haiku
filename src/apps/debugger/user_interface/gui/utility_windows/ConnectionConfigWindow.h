@@ -51,6 +51,9 @@ private:
 			BGroupView*			fConfigGroupView;
 			BButton*			fCloseButton;
 			BButton*			fConnectButton;
+			Settings*			fCurrentSettings;
+			TargetHostInterfaceInfo*
+								fActiveInfo;
 };
 
 #endif // CONNECTION_CONFIG_WINDOW_H
