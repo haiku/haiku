@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2016-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "NetworkTargetHostInterfaceInfo.h"
@@ -8,6 +8,7 @@
 
 #include "NetworkTargetHostInterface.h"
 #include "SettingsDescription.h"
+#include "Settings.h"
 #include "Setting.h"
 
 
@@ -46,7 +47,7 @@ NetworkTargetHostInterfaceInfo::Init()
 
 	settingDeleter.Detach();
 	setting = new(std::nothrow) BoundedSettingImpl(kPortSetting, "Port",
-		(uint16)0, (uint16)65535, (uint16)8305);
+		(uint16)1, (uint16)65535, (uint16)8305);
 	if (setting == NULL)
 		return B_NO_MEMORY;
 	if (!fDescription->AddSetting(setting)) {
@@ -68,6 +69,15 @@ NetworkTargetHostInterfaceInfo::IsLocal() const
 bool
 NetworkTargetHostInterfaceInfo::IsConfigured(Settings* settings) const
 {
+	BVariant hostSetting = settings->Value(kHostnameSetting);
+	BVariant portSetting = settings->Value(kPortSetting);
+
+	if (hostSetting.Type() != B_STRING_TYPE || !portSetting.IsNumber())
+		return false;
+
+	if (strlen(hostSetting.ToString()) == 0)
+		return false;
+
 	return true;
 }
 

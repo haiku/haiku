@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2016-2017, Rene Gollent, rene@gollent.com.
  * Copyright 2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -18,7 +18,8 @@
 
 NetworkTargetHostInterface::NetworkTargetHostInterface()
 	:
-	TargetHostInterface()
+	TargetHostInterface(),
+	fTargetHost(NULL)
 {
 	SetName("Network");
 }
