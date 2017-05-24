@@ -48,7 +48,8 @@ hpet_init(void)
 		return;
 	}
 
-	TRACE(("hpet_init: found HPET at %x.\n", hpet->hpet_address.address));
+	TRACE(("hpet_init: found HPET at 0x%" B_PRIx64 ".\n",
+		hpet->hpet_address.address));
 	gKernelArgs.arch_args.hpet_phys = hpet->hpet_address.address;
 	gKernelArgs.arch_args.hpet = (void *)mmu_map_physical_memory(
 		gKernelArgs.arch_args.hpet_phys, B_PAGE_SIZE, kDefaultPageFlags);
