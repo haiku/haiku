@@ -41,7 +41,7 @@ platform_add_menus(Menu* menu)
 
 	switch (menu->Type()) {
 		case MAIN_MENU:
-			item = new(std::nothrow) MenuItem("Select fail-safe video mode",
+			item = new(std::nothrow) MenuItem("Select screen resolution",
 				video_mode_menu());
 			if (item != NULL) {
 				menu->AddItem(item);
@@ -53,7 +53,7 @@ platform_add_menus(Menu* menu)
 			break;
 
 		case SAFE_MODE_MENU:
-			item = new(std::nothrow) MenuItem("Use fail-safe video mode");
+			item = new(std::nothrow) MenuItem("Use fail-safe graphics driver");
 			if (item != NULL) {
 				menu->AddItem(item);
 				item->SetType(MENU_ITEM_MARKABLE);

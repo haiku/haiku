@@ -20,11 +20,11 @@ platform_add_menus(Menu *menu)
 
 	switch (menu->Type()) {
 		case MAIN_MENU:
-			menu->AddItem(item = new(nothrow) MenuItem("Select fail-safe video mode", video_mode_menu()));
+			menu->AddItem(item = new(nothrow) MenuItem("Select screen resolution", video_mode_menu()));
 			item->SetTarget(video_mode_hook);
 			break;
 		case SAFE_MODE_MENU:
-			menu->AddItem(item = new(nothrow) MenuItem("Use fail-safe video mode"));
+			menu->AddItem(item = new(nothrow) MenuItem("Use fail-safe graphics driver"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData(B_SAFEMODE_FAIL_SAFE_VIDEO_MODE);
 			item->SetHelpText("The system will use VESA mode and won't try to open any video graphics driver");
