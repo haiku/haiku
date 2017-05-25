@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.04.23
-#	Date:    2017-04-23 03:15:02
+#	Version: 2017.05.25
+#	Date:    2017-05-25 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -429,6 +429,7 @@
 	0062  SAS1078 PCI-Express Fusion-MPT SAS
 		1000 0062  SAS1078 PCI-Express Fusion-MPT SAS
 	0064  SAS2116 PCI-Express Fusion-MPT SAS-2 [Meteor]
+		1000 30c0  SAS 9201-16i
 	0065  SAS2116 PCI-Express Fusion-MPT SAS-2 [Meteor]
 	006e  SAS2308 PCI-Express Fusion-MPT SAS-2
 	0070  SAS2004 PCI-Express Fusion-MPT SAS-2 [Spitfire]
@@ -543,6 +544,7 @@
 	0097  SAS3008 PCI-Express Fusion-MPT SAS-3
 		1000 3090  SAS9311-8i
 		1000 30e0  SAS9300-8i
+		1000 3130  SAS 9300-16i
 		1028 1f45  HBA330 Adapter
 		1028 1f46  12Gbps HBA
 		1028 1f53  HBA330 Mini
@@ -3955,6 +3957,7 @@
 	1438  Liverpool Processor Root Port
 	1439  Family 16h Processor Functions 5:1
 	145b  Zeppelin Non-Transparent Bridge
+	145c  USB3 Host Controller
 	1510  Family 14h Processor Root Complex
 		174b 1001  PURE Fusion Mini
 	1512  Family 14h Processor Root Port
@@ -4039,6 +4042,7 @@
 	43a1  Hudson PCI to PCI bridge (PCIE port 1)
 	43a2  Hudson PCI to PCI bridge (PCIE port 2)
 	43a3  Hudson PCI to PCI bridge (PCIE port 3)
+	43bb  USB 3.1 XHCI Controller
 	7006  AMD-751 [Irongate] System Controller
 	7007  AMD-751 [Irongate] AGP Bridge
 	700a  AMD-IGR4 AGP Host to PCI Bridge
@@ -10696,6 +10700,7 @@
 	17fd  GM200GL [Tesla M40]
 	1b00  GP102 [TITAN X]
 	1b01  GP102
+	1b02  GP102 [TITAN Xp]
 	1b06  GP102 [GeForce GTX 1080 Ti]
 	1b30  GP102GL [Quadro P6000]
 	1b38  GP102GL [Tesla P40]
@@ -10740,7 +10745,7 @@
 	1cb1  GP107GL [Quardo P1000]
 	1cb2  GP107GL [Quardo P600]
 	1cb3  GP107GL [Quardo P400]
-	1d01  GP108
+	1d01  GP108 [GeForce GT 1030]
 	1d81  GV100
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
@@ -10776,6 +10781,9 @@
 		10df e310  Lancer Gen6: LPe31000 Fibre Channel Host Adapter
 		10df e311  Lancer Gen6: LPe31000 Fibre Channel Host Adapter
 		10df e312  Lancer Gen6: LPe31000 Fibre Channel Host Adapter
+		10df e322  Lancer Gen6: LPe31000 Fibre Channel Host Adapter
+		10df e323  Lancer Gen6: LPe31000 Fibre Channel Host Adapter
+		10df e325  Lancer Gen6: LPe31000 Fibre Channel Host Adapter
 	f011  Saturn: LightPulse Fibre Channel Host Adapter
 	f015  Saturn: LightPulse Fibre Channel Host Adapter
 	f085  LP850 Fibre Channel Host Adapter
@@ -13053,7 +13061,7 @@
 		144d c00c  P30/P35 notebook
 		14ef 0220  PCD-RP-220S
 		17aa 201c  ThinkPad X60/X60s
-		17aa 20c4  ThinkPad T61
+		17aa 20c4  ThinkPad T61/R61
 		17aa 20c6  ThinkPad R61
 	0477  RL5c477
 	0478  RL5c478
@@ -13119,6 +13127,7 @@
 		103c 30c1  Compaq 6910p
 		103c 30cc  Pavilion dv6700
 		103c 30cf  Pavilion dv9668eg Laptop
+		17aa 20c5  ThinkPad R61
 		17aa 20c7  ThinkPad R61
 	0841  R5C841 CardBus/SD/SDIO/MMC/MS/MSPro/xD/IEEE1394
 	0843  R5C843 MMC Host Controller
@@ -13149,9 +13158,11 @@
 		1028 040a  Latitude E6410
 		1028 040b  Latitude E6510
 	e823  PCIe SDXC/MMC Host Controller
+		17aa 21cf  ThinkPad T520
 	e832  R5C832 PCIe IEEE 1394 Controller
 		1028 040a  Latitude E6410
 		1028 040b  Latitude E6510
+		17aa 21cf  ThinkPad T520
 	e852  PCIe xD-Picture Card Controller
 1181  Telmatics International
 1183  Fujikura Ltd
@@ -15148,7 +15159,7 @@
 	0206  GPS180PEX GPS Receiver (PCI Express)
 	0207  GLN180PEX GPS/GLONASS receiver (PCI Express)
 	0208  GPS180AMC GPS Receiver (PCI Express / MicroTCA / AdvancedMC)
-	0209  GRC181PEX GPS/GLONASS/BEIDOU receiver (PCI Express)
+	0209  GNS181PEX GPS/Galileo/GLONASS/BEIDOU receiver (PCI Express)
 	0301  TCR510PCI IRIG Timecode Reader
 	0302  TCR167PCI IRIG Timecode Reader
 	0303  TCR511PCI IRIG Timecode Reader
@@ -16067,6 +16078,7 @@
 	509e  T520-509E Unified Wire Ethernet Controller
 	509f  T540-509F Unified Wire Ethernet Controller
 	50a0  T540-50A0 Unified Wire Ethernet Controller
+	50a1  T540-50A1 Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -16118,6 +16130,7 @@
 	549e  T520-509E Unified Wire Ethernet Controller
 	549f  T540-509F Unified Wire Ethernet Controller
 	54a0  T540-50A0 Unified Wire Ethernet Controller
+	54a1  T540-50A1 Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -16169,6 +16182,7 @@
 	559e  T520-509E Unified Wire Storage Controller
 	559f  T540-509F Unified Wire Storage Controller
 	55a0  T540-50A0 Unified Wire Storage Controller
+	55a1  T540-50A1 Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -16220,6 +16234,7 @@
 	569e  T520-509E Unified Wire Storage Controller
 	569f  T540-509F Unified Wire Storage Controller
 	56a0  T540-50A0 Unified Wire Storage Controller
+	56a1  T540-50A1 Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -16310,6 +16325,7 @@
 	589e  T520-509E Unified Wire Ethernet Controller [VF]
 	589f  T540-509F Unified Wire Ethernet Controller [VF]
 	58a0  T540-50A0 Unified Wire Ethernet Controller [VF]
+	58a1  T540-50A1 Unified Wire Ethernet Controller [VF]
 	6001  T6225-CR Unified Wire Ethernet Controller
 	6002  T6225-SO-CR Unified Wire Ethernet Controller
 	6003  T6425-CR Unified Wire Ethernet Controller
@@ -17003,6 +17019,7 @@
 	1693  NetLink BCM5787M Gigabit Ethernet PCI Express
 		1025 0121  Aspire 5920G
 		103c 30c0  6710b
+		17aa 20d5  ThinkPad R61
 	1694  NetLink BCM57790 Gigabit Ethernet PCIe
 	1696  NetXtreme BCM5782 Gigabit Ethernet
 		103c 12bc  d530 CMT (DG746A)
@@ -20257,7 +20274,12 @@
 		1af4 1100  QEMU Virtual Machine
 	0006  PCI Rocker Ethernet switch device
 	0007  PCI SD Card Host Controller Interface
+	0008  QEMU PCIe Host bridge
+	0009  QEMU PCI Expander bridge
 	000a  PCI-PCI bridge (multiseat)
+	000b  QEMU PCIe Expander bridge
+	000c  QEMU PCIe Root port
+	000d  QEMU XHCI Host Controller
 	0100  QXL paravirtual graphic card
 		1af4 1100  QEMU Virtual Machine
 1b37  Signal Processing Devices Sweden AB
@@ -20483,6 +20505,8 @@
 	0006  ExaNIC X10-HPT
 1cf7  Subspace Dynamics
 1d00  Pure Storage
+1d18  RME
+	0001  Fireface UFX+
 1d1d  CNEX Labs
 	1f1f  QEMU NVM Express LightNVM Controller
 	2807  8800 series NVMe SSD
@@ -20497,6 +20521,7 @@
 1d44  DPT
 	a400  PM2x24/PM3224
 1d49  Lenovo
+1d4c  Diamanti, Inc.
 1d5c  Fantasia Trading LLC
 1d61  Technobox, Inc.
 1d62  Nebbiolo Technologies
@@ -21185,6 +21210,7 @@
 	0001  I-30xx Scanner Interface
 5555  Genroco, Inc
 	0003  TURBOstor HFP-832 [HiPPI NIC]
+	3b00  Epiphan DVI2PCIe video capture card
 5646  Vector Fabrics BV
 5654  VoiceTronix Pty Ltd
 5678  Dawicontrol Computersysteme GmbH
@@ -21300,7 +21326,7 @@
 		8086 1315  Centrino Wireless-N 1000 BGN
 		8086 1316  Centrino Wireless-N 1000 BG
 	0085  Centrino Advanced-N 6205 [Taylor Peak]
-		8086 1311  Centrino Advanced-N 6205 AGN
+		8086 1311  Centrino Advanced-N 6205 (802.11a/b/g/n)
 		8086 1316  Centrino Advanced-N 6205 ABG
 	0087  Centrino Advanced-N + WiMAX 6250 [Kilmer Peak]
 		8086 1301  Centrino Advanced-N + WiMAX 6250 2x2 AGN
@@ -21346,6 +21372,7 @@
 		1028 04da  Vostro 3750
 		106b 00dc  MacBookPro8,2 [Core i7, 15", 2011]
 		144d c652  NP300E5C series laptop
+		17aa 21cf  ThinkPad T520
 	0105  Xeon E3-1200/2nd Generation Core Processor Family PCI Express Root Port
 		106b 00dc  MacBookPro8,2 [Core i7, 15", 2011]
 	0106  2nd Generation Core Processor Family Integrated Graphics Controller
@@ -21363,6 +21390,7 @@
 	0122  2nd Generation Core Processor Family Integrated Graphics Controller
 	0126  2nd Generation Core Processor Family Integrated Graphics Controller
 		1028 04cc  Vostro 3350
+		17aa 21cf  ThinkPad T520
 	0150  Xeon E3-1200 v2/3rd Gen Core processor DRAM Controller
 		1043 84ca  P8 series motherboard
 		15d9 0624  X9SCM-F Motherboard
@@ -22860,8 +22888,9 @@
 		4c53 1090  Cx9/Vx9 mainboard
 	1462  82870P2 P64H2 Hot Plug Controller
 	1501  82567V-3 Gigabit Network Connection
-	1502  82579LM Gigabit Network Connection
+	1502  82579LM Gigabit Network Connection (Lewisville)
 		1028 04a3  Precision M4600
+		17aa 21ce  ThinkPad T520
 		8086 357a  Server Board S1200BTS
 	1503  82579V Gigabit Network Connection
 		1043 849c  P8P67 Deluxe Motherboard
@@ -23239,6 +23268,7 @@
 	163b  Broadwell-U Integrated Graphics
 	163d  Broadwell-U Integrated Graphics
 	163e  Broadwell-U Integrated Graphics
+	1889  Ethernet Adaptive Virtual Function
 	1900  Skylake Host Bridge/DRAM Registers
 	1901  Skylake PCIe Controller (x16)
 	1902  HD Graphics 510
@@ -23341,37 +23371,43 @@
 	1b48  82597EX 10GbE Ethernet Controller
 		8086 a01f  PRO/10GbE LR Server Adapter
 		8086 a11f  PRO/10GbE LR Server Adapter
-	1c00  6 Series/C200 Series Chipset Family 4 port SATA IDE Controller
-	1c01  6 Series/C200 Series Chipset Family 4 port SATA IDE Controller
-	1c02  6 Series/C200 Series Chipset Family SATA AHCI Controller
+	1c00  6 Series/C200 Series Chipset Family Desktop SATA Controller (IDE mode, ports 0-3)
+	1c01  6 Series/C200 Series Chipset Family Mobile SATA Controller (IDE mode, ports 0-3)
+	1c02  6 Series/C200 Series Chipset Family 6 port Desktop SATA AHCI Controller
 		1028 04aa  XPS 8300
 		1043 844d  P8 series motherboard
 		8086 7270  Server Board S1200BTS
-	1c03  6 Series/C200 Series Chipset Family 6 port SATA AHCI Controller
+	1c03  6 Series/C200 Series Chipset Family 6 port Mobile SATA AHCI Controller
 		1028 04a3  Precision M4600
 		1028 04b2  Vostro 3350
 		1028 04da  Vostro 3750
+		17aa 21cf  ThinkPad T520
 		8086 7270  Apple MacBookPro8,2 [Core i7, 15", 2011]
-	1c04  6 Series/C200 Series Chipset Family SATA RAID Controller
+	1c04  6 Series/C200 Series Desktop SATA RAID Controller
 		103c 3118  Smart Array B110i SATA RAID Controller
-	1c05  6 Series/C200 Series Chipset Family SATA RAID Controller
-	1c08  6 Series/C200 Series Chipset Family 2 port SATA IDE Controller
-	1c09  6 Series/C200 Series Chipset Family 2 port SATA IDE Controller
+	1c05  6 Series/C200 Series Mobile SATA RAID Controller
+	1c06  Z68 Express Chipset SATA RAID Controller
+	1c08  6 Series/C200 Series Chipset Family Desktop SATA Controller (IDE mode, ports 4-5)
+	1c09  6 Series/C200 Series Chipset Family Mobile SATA Controller (IDE mode, ports 4-5)
 	1c10  6 Series/C200 Series Chipset Family PCI Express Root Port 1
 		1028 04aa  XPS 8300
 		1028 04da  Vostro 3750
 		1043 844d  P8 series motherboard
+		17aa 21cf  ThinkPad T520
 		8086 7270  Server Board S1200BTS / Apple MacBook Pro 8,1/8,2
 	1c12  6 Series/C200 Series Chipset Family PCI Express Root Port 2
 		1028 04aa  XPS 8300
+		17aa 21cf  ThinkPad T520
 		8086 7270  Apple MacBookPro8,2 [Core i7, 15", 2011]
 	1c14  6 Series/C200 Series Chipset Family PCI Express Root Port 3
 		1028 04da  Vostro 3750
 		8086 7270  Apple MacBookPro8,2 [Core i7, 15", 2011]
 	1c16  6 Series/C200 Series Chipset Family PCI Express Root Port 4
 		1028 04aa  XPS 8300
+		17aa 21cf  ThinkPad T520
 	1c18  6 Series/C200 Series Chipset Family PCI Express Root Port 5
 		1028 04da  Vostro 3750
+		17aa 21cf  ThinkPad T520
 		8086 7270  Server Board S1200BTS
 	1c1a  6 Series/C200 Series Chipset Family PCI Express Root Port 6
 		1028 04da  Vostro 3750
@@ -23387,6 +23423,7 @@
 		1028 04da  Vostro 3750
 		1043 8418  P8P67 Deluxe Motherboard
 		1043 841b  P8H67 Series Motherboard
+		17aa 21cf  ThinkPad T520
 # Realtek ALC888 audio codec
 		8086 2008  DQ67SW board
 		8086 7270  Apple MacBookPro8,2 [Core i7, 15", 2011]
@@ -23396,6 +23433,7 @@
 		1028 04b2  Vostro 3350
 		1028 04da  Vostro 3750
 		1043 844d  P8 series motherboard
+		17aa 21cf  ThinkPad T520
 		8086 7270  Server Board S1200BTS / Apple MacBook Pro 8,1/8,2
 	1c24  6 Series/C200 Series Chipset Family Thermal Management Controller
 	1c25  6 Series/C200 Series Chipset Family DMI to PCI Bridge
@@ -23405,6 +23443,7 @@
 		1028 04b2  Vostro 3350
 		1028 04da  Vostro 3750
 		1043 844d  P8 series motherboard
+		17aa 21cf  ThinkPad T520
 		8086 7270  Server Board S1200BTS / Apple MacBook Pro 8,1/8,2
 	1c27  6 Series/C200 Series Chipset Family USB Universal Host Controller #1
 		8086 7270  Apple MacBookPro8,2 [Core i7, 15", 2011]
@@ -23416,6 +23455,7 @@
 		1028 04b2  Vostro 3350
 		1028 04da  Vostro 3750
 		1043 844d  P8 series motherboard
+		17aa 21cf  ThinkPad T520
 		8086 7270  Server Board S1200BTS / Apple MacBook Pro 8,1/8,2
 	1c33  6 Series/C200 Series Chipset Family LAN Controller
 	1c35  6 Series/C200 Series Chipset Family VECI Controller
@@ -23425,6 +23465,7 @@
 		1028 04b2  Vostro 3350
 		1028 04da  Vostro 3750
 		1043 844d  P8 series motherboard
+		17aa 21cf  ThinkPad T520
 		8086 7270  Apple MacBookPro8,2 [Core i7, 15", 2011]
 	1c3b  6 Series/C200 Series Chipset Family MEI Controller #2
 	1c3c  6 Series/C200 Series Chipset Family IDE-r Controller
@@ -23452,6 +23493,7 @@
 	1c4e  Q67 Express Chipset Family LPC Controller
 	1c4f  QM67 Express Chipset Family LPC Controller
 		1028 04a3  Precision M4600
+		17aa 21cf  ThinkPad T520
 	1c50  B65 Express Chipset Family LPC Controller
 	1c51  6 Series/C200 Series Chipset Family LPC Controller
 	1c52  C202 Chipset Family LPC Controller
@@ -23732,10 +23774,10 @@
 	201c  Sky Lake-E Non-Transparent Bridge Registers
 	2021  Sky Lake-E CBDMA Registers
 	2024  Sky Lake-E MM/Vt-d Configuration Registers
-	2030  Sky Lake-E PCI Express Root Port 1A
-	2031  Sky Lake-E PCI Express Root Port 1B
-	2032  Sky Lake-E PCI Express Root Port 1C
-	2033  Sky Lake-E PCI Express Root Port 1D
+	2030  Sky Lake-E PCI Express Root Port A
+	2031  Sky Lake-E PCI Express Root Port B
+	2032  Sky Lake-E PCI Express Root Port C
+	2033  Sky Lake-E PCI Express Root Port D
 	2035  Sky Lake-E RAS Configuration Registers
 	204c  Sky Lake-E M3KTI Registers
 	204d  Sky Lake-E M3KTI Registers
@@ -25358,6 +25400,7 @@
 		103c 30d9  Presario C700
 		104d 9005  Vaio VGN-FZ260E
 		104d 902d  VAIO VGN-NR120E
+		17aa 20a5  ThinkPad R61
 		17c0 4083  Medion WIM 2210 Notebook PC [MD96850]
 	2820  82801H (ICH8 Family) 4 port SATA Controller [IDE mode]
 		1028 01da  OptiPlex 745
@@ -25384,6 +25427,7 @@
 	2828  82801HM/HEM (ICH8M/ICH8M-E) SATA Controller [IDE mode]
 		1028 01f3  Inspiron 1420
 		103c 30c0  Compaq 6710b
+		17aa 20a8  ThinkPad R61
 		e4bf cc47  CCG-RUMBA
 	2829  82801HM/HEM (ICH8M/ICH8M-E) SATA Controller [AHCI mode]
 		1025 0121  Aspire 5920G
@@ -25909,16 +25953,16 @@
 		103c 30c0  Compaq 6710b
 		103c 30d9  Presario C700
 		104d 902d  VAIO VGN-NR120E
-		17aa 20b5  ThinkPad T61/R61
-		17c0 4082  Medion WIM 2210 Notebook PC [MD96850]
+		17aa 20b5  GM965 [X3100] on ThinkPad T61/R61
+		17c0 4082  GM965 on Medion WIM 2210 Notebook PC [MD96850]
 		e4bf cc47  CCG-RUMBA
 	2a03  Mobile GM965/GL960 Integrated Graphics Controller (secondary)
 		1028 01f3  Inspiron 1420
 		103c 30c0  Compaq 6710b
 		103c 30d9  Presario C700
 		104d 902d  VAIO VGN-NR120E
-		17aa 20b5  ThinkPad T61/R61
-		17c0 4082  Medion WIM 2210 Notebook PC [MD96850]
+		17aa 20b5  GM965 [X3100] on ThinkPad T61/R61
+		17c0 4082  GM965 on Medion WIM 2210 Notebook PC [MD96850]
 		e4bf cc47  CCG-RUMBA
 	2a04  Mobile PM965/GM965 MEI Controller
 		103c 30c1  Compaq 6910p
@@ -27064,7 +27108,7 @@
 	4224  PRO/Wireless 2915ABG [Calexico2] Network Connection
 	4227  PRO/Wireless 3945ABG [Golan] Network Connection
 		8086 1010  ThinkPad R60e
-		8086 1011  ThinkPad T60/R60e/X60s
+		8086 1011  ThinkPad T60/R60e/X60s/R61
 		8086 1014  PRO/Wireless 3945BG Network Connection
 	4229  PRO/Wireless 4965 AG or AGN [Kedron] Network Connection
 		8086 1100  Vaio VGN-SZ79SN_C
@@ -27183,6 +27227,8 @@
 	5845  QEMU NVM Express Controller
 		1af4 1100  QEMU Virtual Machine
 	5902  HD Graphics 610
+	590f  Xeon E3-1200 v6/7th Gen Core Processor Host Bridge/DRAM Registers
+	5910  Xeon E3-1200 v6/7th Gen Core Processor Host Bridge/DRAM Registers
 	5912  HD Graphics 630
 	5a84  Celeron N3350/Pentium N4200/Atom E3900 Series Integrated Graphics Controller
 	5a88  Celeron N3350/Pentium N4200/Atom E3900 Series Imaging Unit
@@ -28274,7 +28320,7 @@
 		9004 7888  AHA-2930UW SCSI Controller
 	8b78  ABA-1030
 	ec78  AHA-4944W/UW
-# acquired by PMC-Sierra
+# acquired by Microsemi
 9005  Adaptec
 	0010  AHA-2940U2/U2W
 		9005 2180  AHA-2940U2 SCSI Controller
@@ -28886,9 +28932,11 @@ f1d0  AJA Video
 	cafe  Kona SD
 	cfee  Xena LS/SD-22-DA/SD-DA
 	daff  KONA LHi
+	db01  Corvid22
 	db09  Corvid 24
 	dcaf  Kona HD
 	dfee  Xena HD-DA
+	eb0e  Corvid 44
 	efac  Xena SD-MM/SD-22-MM
 	facd  Xena HD-MM
 f5f5  F5 Networks, Inc.
