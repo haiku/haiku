@@ -156,6 +156,12 @@ setup_environment(struct passwd* passwd, bool preserveEnvironment)
 	if (ioctl(STDIN_FILENO, TIOCSPGRP, &pid) != 0)
 		return errno;
 
+	if (passwd->pw_gid && setgid(passwd->pw_gid) != 0)
+		return errno;
+
+	if (passwd->pw_uid && setuid(passwd->pw_uid) != 0)
+		return errno;
+
 	const char* home = getenv("HOME");
 	if (home == NULL)
 		return B_ENTRY_NOT_FOUND;
