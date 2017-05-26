@@ -12,11 +12,11 @@ rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {
 	Depends $(anybootImage) : $(mbrPart) ;
 	Depends $(anybootImage) : $(imageFile) ;
 
-	BuildAnybootImage1 $(anybootImage) : $(anyboot) $(isoPart) $(mbrPart) $(imageFile) ;
+	BuildAnybootImage1 $(anybootImage) : $(anyboot) $(mbrPart) $(isoPart) $(imageFile) ;
 }
 
 actions BuildAnybootImage1 {
-	$(2[1]) $(1) $(2[2]) $(2[3]) $(2[4])
+	$(2[1]) -b $(2[2]) $(2[3]) $(2[4]) $(1)
 }
 
 local baseMBR = base_mbr.bin ;
