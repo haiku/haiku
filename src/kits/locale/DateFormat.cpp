@@ -237,6 +237,9 @@ BDateFormat::GetFields(BDateElement*& fields, int& fieldCount,
 			case UDAT_DATE_FIELD:
 				fields[i] = B_DATE_ELEMENT_DAY;
 				break;
+			case UDAT_DAY_OF_WEEK_FIELD:
+				fields[i] = B_DATE_ELEMENT_WEEKDAY;
+				break;
 			default:
 				fields[i] = B_DATE_ELEMENT_INVALID;
 				break;
