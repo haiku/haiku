@@ -784,6 +784,7 @@ INPUT                  = . \
                          midi2 \
                          net \
                          posix \
+                         shared \
                          storage \
                          support \
                          translation \
@@ -905,7 +906,8 @@ IMAGE_PATH             = . \
                          keyboard \
                          midi2/images \
                          net/images \
-                         storage/images
+                         storage/images \
+                         shared/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

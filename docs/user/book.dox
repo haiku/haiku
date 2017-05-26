@@ -61,6 +61,7 @@
 
 	- \ref drivers
 	- \ref keyboard
+	- \ref json
 */
 
 ///// Define main kits /////
@@ -610,4 +611,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 /*!
 	\defgroup drivers Device Drivers
+
+	\defgroup json Json Handling
+	\brief Provides for parsing and writing of data in Json encoding.
 */

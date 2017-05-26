@@ -1,0 +1,216 @@
+/*!
+\page json Json Handling
+
+<a href="http://www.json.org/">JSON</a> is a simple textual description of a
+data structure.  An example of some JSON would be;
+
+\code
+[ "apple", "orange", { "drink": "tonic water", "count" : 123 } ]
+\endcode
+
+This example is a list that contains two strings followed by an "object".  The
+term object refers to a construct akin to a "dictionary" or a "map".  It is also
+possible for top-level objects to be non-collection types such as strings.  The
+following is also valid JSON;
+
+\code
+"fijoa"
+\endcode
+
+This page details how Haiku provides facilities for both parsing as well as
+writing data encoded as Json.
+
+\section parsing-in-memory-model Parsing with Generic In-Memory Model
+
+For some applications, parsing to an in-memory data structure is ideal.  In
+such cases, the \c BJson class provides static methods for parsing a block
+of JSON data into a \c BMessage object.  The application logic is then able to
+introspect the \c BMessage to obtain values.
+
+\subsection bmessage-structure BMessage Structure
+
+The \c BMessage class has the ability to carry a collection of key-value pairs.
+In the case of a Json object type, the key-value pairs correlate to a JSON
+object or array.  In the case of a JSON array type, the key-value pairs are
+the index of the elements in the JSON array represented as strings.
+
+For example, the following JSON array...
+
+\code
+[ "a", "b", "c" ]
+\endcode
+
+...would be represented by the following \c BMessage ;
+
+<table>
+	<tr>
+		<th>Key</th>
+		<th>Value</th>
+	</tr>
+	<tr>
+		<td>\c "0"</td>
+		<td>\c "a"</td>
+	</tr>
+	<tr>
+		<td>\c "1"</td>
+		<td>\c "b"</td>
+	</tr>
+	<tr>
+		<td>\c "2"</td>
+		<td>\c "c"</td>
+	</tr>
+</table>
+
+A Json object that, in its entirety, consists of a non-collection type such as
+a simple string or a boolean is not able to be represented by a \c BMessage ;
+at the top level there must be an array or an object for the parse to be
+successful.
+
+\section parsing-streaming Stream-based Parsing
+
+Streaming is useful in many situations;
+
+	- where handling the parsed data is easier to undertake as a stream of
+		events
+	- where the quantity of input or output data could be non-trivial and
+		holding that quantity of material in memory is undesirable
+	- where being able to start processing a stream of data before the entire
+		payload has arrived is desirable
+
+This architecture is sometimes known as an event-based parser or a "SAX" parser.
+
+The \c BJson class provides a static method that accepts a stream of Json
+data in the form of a \c BDataIO. A \c BJsonEventListener sub-class is also
+supplied and as each Json token is read-in from the stream, it will be
+provided to the listener.  The listener must implement three callback methods
+to handle the Json tokens;
+
+<table>
+	<tr>
+		<th>Method</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>\c Handle(..)</td>
+		<td>Provides JSON events to the listener</td>
+	</tr>
+	<tr>
+		<td>\c HandleError(..)</td>
+		<td>Signals parse or processing errors to the listener</td>
+	</tr>
+	<tr>
+		<td>\c Complete(..)</td>
+		<td>Informs the listener that parsing has completed</td>
+	</tr>
+</table>
+
+Events are embodied in instances of the \c BJsonEvent class and each of
+these has a type.  Example types are;
+
+	- \c B_JSON_STRING
+	- \c B_JSON_OBJECT_START
+	- \c B_JSON_TRUE
+
+In this way, the listener is able to interpret the incoming stream of data as
+Json and handle it in some way.
+
+The following Json...
+
+\code
+{"color": "red", "alpha": 0.6}
+\endcode
+
+Would yield the following stream of events;
+
+<table>
+	<tr>
+		<th>Event Type</th>
+		<th>Event Data</th>
+	</tr>
+	<tr>
+		<td>\c B_JSON_OBJECT_START</td>
+		<td>-</td>
+	</tr>
+	<tr>
+		<td>\c B_JSON_OBJECT_NAME</td>
+		<td>"color"</td>
+	</tr>
+	<tr>
+		<td>\c B_JSON_STRING</td>
+		<td>"red"</td>
+	</tr>
+	<tr>
+		<td>\c B_JSON_OBJECT_NAME</td>
+		<td>"alpha"</td>
+	</tr>
+	<tr>
+		<td>\c B_JSON_NUMBER</td>
+		<td>0.6</td>
+	</tr>
+	<tr>
+		<td>\c B_JSON_OBJECT_END</td>
+		<td>-</td>
+	</tr>
+</table>
+
+\subsection parsing-streaming-numbers Number Handling
+
+The Json number literal format does not specify a numeric type such as \c int32
+or \c double.  To cope with the widest range of possibilities, the
+\c B_JSON_NUMBER event type captures the content as a string and then the
+\c BJsonEvent object is able to provide the original string for specific
+handling as well as convenient accessors for parsing to \c double or \c int64
+types.  This provides a high level of flexibility for the client.
+
+\subsection parsing-streaming-stacked-listeners Stacked Listeners
+
+One implementation approach for a listener implement that might be used to
+read a data-transfer-object (DTO) is to create "sub-listeners" that mirror
+the structure of the Json data.
+
+In the following example, a nested data structure is being parsed.
+
+\image html stacked-listeners.svg
+
+A primary-listener is employed called \c ColorGradientsListener.  The
+primary-listener accepts Json parse events and will relay them to a
+sub-listener.  The sub-listener is implemented to specifically deal with one
+tier of the inbound data.  The sub-listeners are structured in a stack where
+the sub-listener at the head of the stack has a pointer to it's parent.  The
+primary-listener maintains a pointer to the current head of the stack and will
+direct events to that sub-listener.
+
+In response to events, the sub-listener can take-up the data, pop itself from
+the stack or push additional sub-listeners from the stack.
+
+The same approach has been used in the following classes in a more generic
+manner;
+
+	- \c BJsonTextWriter
+	- \c BJsonMessageWriter
+
+The intention with this approach is that the structure of the event handling
+code in the sub-listeners mirrors that of the data-structure being parsed.
+Hopefully this makes creating the filling of a specific data-model easier even
+when very specific behaviours are required.
+
+From a schema of the data structure it is probably also possible to create
+these sub-listeners and in this way automatically generate the C++ parse
+code as event listeners.
+
+\section writing Writing
+
+In order to render a data-structure as textual Json data, the opposite flow
+occurs; events are emitted by the client software into a class
+\c BJsonTextWriter.  This class supports public methods such as
+\c WriteFalse() , \c WriteObjectStart() and \c WriteString(...) that control
+the outbound Json stream.
+
+\section end-to-end End to End
+
+Because \c BJsonTextWriter is accepting JSON parse events, it is also a
+\c JsonEventListener and so can be used as a listener with the stream parsing;
+producing Json output from Json input.  The output will however not include
+inbound whitespace because whitespace is not grammatically significant in Json.
+
+*/
