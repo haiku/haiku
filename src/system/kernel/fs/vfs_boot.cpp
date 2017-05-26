@@ -455,7 +455,7 @@ vfs_bootstrap_file_systems(void)
 
 	for (int32 i = 0; sPredefinedLinks[i].path != NULL; i++) {
 		_kern_create_symlink(-1, sPredefinedLinks[i].path,
-			sPredefinedLinks[i].target, 0);
+			sPredefinedLinks[i].target, 0777);
 			// we don't care if it will succeed or not
 	}
 
@@ -517,7 +517,7 @@ vfs_mount_boot_file_system(kernel_args* args)
 		char path[B_FILE_NAME_LENGTH + 1];
 		snprintf(path, sizeof(path), "/%s", info.volume_name);
 
-		_kern_create_symlink(-1, path, "/boot", 0);
+		_kern_create_symlink(-1, path, "/boot", 0777);
 	}
 
 	// If we're booting off a packaged system, mount packagefs.
