@@ -106,4 +106,7 @@ Ld runtime_loader :
 	: --no-undefined -shared -soname=runtime_loader
 ;
 
+MODE on runtime_loader = $(EXEMODE) ;
+Chmod runtime_loader ;
+
 HaikuSubInclude arch $(TARGET_ARCH) ;
