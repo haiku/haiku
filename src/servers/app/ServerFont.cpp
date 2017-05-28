@@ -500,21 +500,24 @@ ParseFcMap(FcChar32 charMap[], FcChar32 baseCodePoint, unicode_block& blocksForM
 	uint32 block = 0;
 	const uint8 BITS_PER_BLOCK = 32;
 	uint32 currentCodePoint = 0;
-	
+
+	if (baseCodePoint > kUnicodeBlockMap[kNumUnicodeBlockRanges-1].end)
+		return;
+
 	for (int i = 0; i < FC_CHARSET_MAP_SIZE; ++i) {
 		FcChar32 curMapBlock = charMap[i];
 		int32 rangeStart = -1;
 		int32 startBlock = -1;
 		int32 endBlock = -1;
 		uint32 startPoint = 0;
-	
+
 		currentCodePoint = baseCodePoint + block;
-				
-		for (int bit = 0; bit < BITS_PER_BLOCK; ++bit) {		
+
+		for (int bit = 0; bit < BITS_PER_BLOCK; ++bit) {
 			if (curMapBlock == 0 && startBlock < 0)
 				// if no more bits are set then short-circuit the loop
 				break;
-			
+
 			if ((curMapBlock & 0x1) != 0 && rangeStart < 0) {
 				rangeStart = bit;
 				startPoint = currentCodePoint + rangeStart;
@@ -522,7 +525,7 @@ ParseFcMap(FcChar32 charMap[], FcChar32 baseCodePoint, unicode_block& blocksForM
 				if (startBlock >= 0) {
 					blocksForMap = blocksForMap
 						| kUnicodeBlockMap[startBlock].block;
-				} 
+				}
 			} else if (rangeStart >= 0 && startBlock >= 0) {
 					// when we find an empty bit, that's the end of the range
 				uint32 endPoint = currentCodePoint + (bit - 1);
@@ -546,11 +549,11 @@ ParseFcMap(FcChar32 charMap[], FcChar32 baseCodePoint, unicode_block& blocksForM
 				startBlock = -1;
 				endBlock = -1;
 				rangeStart = -1;
-			} 
+			}
 
 			curMapBlock >>= 1;
 		}
-		
+
 		if (rangeStart >= 0 && startBlock >= 0) {
 				// if we hit the end of the block and had
 				// found a start of the range then we
@@ -597,8 +600,10 @@ ServerFont::GetUnicodeBlocks(unicode_block& blocksForFont)
 		return B_ERROR;
 
 	FcCharSet *charSet = FcFreeTypeCharSet(face, NULL);
-	if (charSet == NULL)
+	if (charSet == NULL) {
+		PutTransformedFace(face);
 		return B_ERROR;
+	}
 
 	FcChar32 charMap[FC_CHARSET_MAP_SIZE];
 	FcChar32 next = 0;
@@ -609,6 +614,8 @@ ServerFont::GetUnicodeBlocks(unicode_block& blocksForFont)
 		baseCodePoint = FcCharSetNextPage(charSet, charMap, &next);
 	}
 
+	FcCharSetDestroy(charSet);
+	PutTransformedFace(face);
 #endif // FONTCONFIG_ENABLED
 
 	return B_OK;
@@ -633,8 +640,10 @@ ServerFont::IncludesUnicodeBlock(uint32 start, uint32 end, bool& hasBlock)
 		return B_ERROR;
 
 	FcCharSet *charSet = FcFreeTypeCharSet(face, NULL);
-	if (charSet == NULL)
+	if (charSet == NULL) {
+		PutTransformedFace(face);
 		return B_ERROR;
+	}
 
 	uint32 curCodePoint = start;
 
@@ -649,6 +658,8 @@ ServerFont::IncludesUnicodeBlock(uint32 start, uint32 end, bool& hasBlock)
 		++curCodePoint;
 	}
 
+	FcCharSetDestroy(charSet);
+	PutTransformedFace(face);
 #endif // FONTCONFIG_ENABLED
 
 	return B_OK;
