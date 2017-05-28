@@ -178,14 +178,12 @@ static pll_limits kLimitsPinLvds = {
 	112000, 1700000, 3500000
 };
 
-#if 0
-static pll_limits kLimits = {
+static pll_limits kLimits85x = {
 	// p, p1, p2,  n,   m, m1, m2
 	{  4,  2,  4,  5,  96, 20,  8},
 	{128, 33,  2, 18, 140, 28, 18},
 	165000, 930000, 1400000
 };
-#endif
 
 
 static bool
@@ -380,6 +378,8 @@ compute_dpll_9xx(display_mode* current, pll_divisors* divisors, bool isLVDS)
 			memcpy(&limits, &kLimitsPinLvds, sizeof(pll_limits));
 		else
 			memcpy(&limits, &kLimitsPinSdvo, sizeof(pll_limits));
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_85x)) {
+		memcpy(&limits, &kLimits85x, sizeof(pll_limits));
 	} else {
 		if (isLVDS)
 			memcpy(&limits, &kLimits9xxLvds, sizeof(pll_limits));
