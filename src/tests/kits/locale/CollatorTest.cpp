@@ -50,11 +50,11 @@ CollatorTest::TestSortKeys()
 
 		for (int32 strength = B_COLLATE_PRIMARY; strength < 4; strength++) {
 			BString a, b;
-			collator.GetSortKey(tests[i].first, &a, strength);
-			collator.GetSortKey(tests[i].second, &b, strength);
+			collator.SetStrength(strength);
+			collator.GetSortKey(tests[i].first, &a);
+			collator.GetSortKey(tests[i].second, &b);
 
-			int difference = collator.Compare(tests[i].first, tests[i].second,
-				strength);
+			int difference = collator.Compare(tests[i].first, tests[i].second);
 			CPPUNIT_ASSERT_EQUAL(tests[i].sign[strength - 1], difference);
 			int keydiff = strcmp(a.String(), b.String());
 			// Check that the keys compare the same as the strings. Either both

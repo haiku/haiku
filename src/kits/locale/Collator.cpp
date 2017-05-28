@@ -24,7 +24,6 @@
 
 BCollator::BCollator()
 	:
-	fDefaultStrength(B_COLLATE_PRIMARY),
 	fIgnorePunctuation(true)
 {
 	// TODO: the collator construction will have to change; the default
@@ -33,16 +32,17 @@ BCollator::BCollator()
 
 	UErrorCode error = U_ZERO_ERROR;
 	fICUCollator = Collator::createInstance(error);
+	SetStrength(B_COLLATE_TERTIARY);
 }
 
 
 BCollator::BCollator(const char* locale, int8 strength, bool ignorePunctuation)
 	:
-	fDefaultStrength(strength),
 	fIgnorePunctuation(ignorePunctuation)
 {
 	UErrorCode error = U_ZERO_ERROR;
 	fICUCollator = Collator::createInstance(locale, error);
+	SetStrength(strength);
 }
 
 
@@ -50,15 +50,8 @@ BCollator::BCollator(BMessage* archive)
 	:
 	BArchivable(archive),
 	fICUCollator(NULL),
-	fDefaultStrength(B_COLLATE_PRIMARY),
 	fIgnorePunctuation(true)
 {
-	int32 data;
-	if (archive->FindInt32("loc:strength", &data) == B_OK)
-		fDefaultStrength = (uint8)data;
-	else
-		fDefaultStrength = B_COLLATE_PRIMARY;
-
 	archive->FindBool("loc:punctuation", &fIgnorePunctuation);
 
 	UErrorCode error = U_ZERO_ERROR;
@@ -101,25 +94,10 @@ BCollator& BCollator::operator=(const BCollator& source)
 		fICUCollator = source.fICUCollator != NULL
 			? source.fICUCollator->clone()
 			: NULL;
-		fDefaultStrength = source.fDefaultStrength;
 		fIgnorePunctuation = source.fIgnorePunctuation;
 	}
 
 	return *this;
-}
-
-
-void
-BCollator::SetDefaultStrength(int8 strength)
-{
-	fDefaultStrength = strength;
-}
-
-
-int8
-BCollator::DefaultStrength() const
-{
-	return fDefaultStrength;
 }
 
 
@@ -138,10 +116,19 @@ BCollator::IgnorePunctuation() const
 
 
 status_t
-BCollator::GetSortKey(const char* string, BString* key, int8 strength) const
+BCollator::SetNumericSorting(bool enable)
 {
-	_SetStrength(strength);
+	UErrorCode error = U_ZERO_ERROR;
+	fICUCollator->setAttribute(UCOL_NUMERIC_COLLATION,
+		enable ? UCOL_ON : UCOL_OFF, error);
 
+	return error == U_ZERO_ERROR ? B_OK : B_ERROR;
+}
+
+
+status_t
+BCollator::GetSortKey(const char* string, BString* key) const
+{
 	// TODO : handle fIgnorePunctuation
 
 	int length = strlen(string);
@@ -175,10 +162,8 @@ BCollator::GetSortKey(const char* string, BString* key, int8 strength) const
 
 
 int
-BCollator::Compare(const char* s1, const char* s2, int8 strength) const
+BCollator::Compare(const char* s1, const char* s2) const
 {
-	_SetStrength(strength);
-
 	// TODO : handle fIgnorePunctuation
 
 	UErrorCode error = U_ZERO_ERROR;
@@ -193,8 +178,6 @@ BCollator::Archive(BMessage* archive, bool deep) const
 	if (status < B_OK)
 		return status;
 
-	if (status == B_OK)
-		status = archive->AddInt32("loc:strength", fDefaultStrength);
 	if (status == B_OK)
 		status = archive->AddBool("loc:punctuation", fIgnorePunctuation);
 
@@ -229,10 +212,10 @@ BCollator::Instantiate(BMessage* archive)
 
 
 status_t
-BCollator::_SetStrength(int8 strength) const
+BCollator::SetStrength(int8 strength) const
 {
 	if (strength == B_COLLATE_DEFAULT)
-		strength = fDefaultStrength;
+		strength = B_COLLATE_TERTIARY;
 
 	Collator::ECollationStrength icuStrength;
 	switch (strength) {
