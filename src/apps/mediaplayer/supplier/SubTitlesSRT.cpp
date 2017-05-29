@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include <File.h>
+#include <TextEncoding.h>
 
 #include "FileReadWrite.h"
 
@@ -37,6 +38,8 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 	SubTitle subTitle;
 	int32 lastSequenceNumber = 0;
 	int32 currentLine = 0;
+
+	BPrivate::BTextEncoding* decoder = NULL;
 
 	int32 state = EXPECT_SEQUENCE_NUMBER;
 	while (lineProvider.Next(line)) {
@@ -123,8 +126,20 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 					subTitle.duration = 0;
 
 					state = EXPECT_SEQUENCE_NUMBER;
-				} else
-					subTitle.text << line << '\n';
+				} else {
+					if (decoder == NULL) {
+						// We try to guess the encoding from the first line of
+						// text in the subtitle file.
+						decoder = new BPrivate::BTextEncoding(line.String(),
+							line.Length());
+					}
+					char buffer[line.Length() * 4];
+					size_t inLength = line.Length();
+					size_t outLength = line.Length() * 4;
+					decoder->Decode(line.String(), inLength, buffer, outLength);
+					buffer[outLength] = 0;
+					subTitle.text << buffer << '\n';
+				}
 				break;
 		}
 		line.SetTo("");
