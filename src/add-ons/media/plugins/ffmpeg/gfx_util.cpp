@@ -45,6 +45,7 @@ extern "C" {
 #define AV_PIX_FMT_BGR565 PIX_FMT_BGR565
 #define AV_PIX_FMT_BGR555 PIX_FMT_BGR555
 #define AV_PIX_FMT_RGB32 PIX_FMT_RGB32
+#define AV_PIX_FMT_GBRP PIX_FMT_GBRP
 #endif
 
 
@@ -104,6 +105,10 @@ resolve_colorspace(color_space colorSpace, AVPixelFormat pixelFormat, int width,
 #endif
 				TRACE("resolve_colorspace: gfx_conv_YCbCr422p_RGB32_c\n");
 				return gfx_conv_YCbCr422_RGB32_c;
+			}
+
+			if (pixelFormat == AV_PIX_FMT_GBRP) {
+				return gfx_conv_GBRP_RGB32_c;
 			}
 
 			// Packed Formats

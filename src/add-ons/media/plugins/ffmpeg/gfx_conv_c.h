@@ -30,6 +30,8 @@ void gfx_conv_YCbCr420p_RGB32_c(AVFrame *in, AVFrame *out, int width,
 	int height);
 void gfx_conv_YCbCr422_RGB32_c(AVFrame *in, AVFrame *out, int width,
 	int height);
+void gfx_conv_GBRP_RGB32_c(AVFrame *in, AVFrame *out, int width,
+	int height);
 
 
 #endif // _GFX_CONV_C_H

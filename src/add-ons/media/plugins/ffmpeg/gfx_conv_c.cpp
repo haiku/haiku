@@ -295,3 +295,27 @@ gfx_conv_YCbCr422_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
 	}
 
 }
+
+
+void
+gfx_conv_GBRP_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
+{
+	uint8 *gBase = (uint8 *)in->data[0];
+	uint8 *bBase = (uint8 *)in->data[1];
+	uint8 *rBase = (uint8 *)in->data[2];
+
+	uint32 *rgbBase = (uint32 *)out->data[0];
+
+	for (int32 i = 0; i < height; i++) {
+
+		for (int32 j = 0; j < width; j ++) {
+			rgbBase[j] = gBase[j] | (bBase[j] << 8) | (rBase[j] << 16);
+		}
+
+		gBase += in->linesize[0];
+		bBase += in->linesize[1];
+		rBase += in->linesize[2];
+
+		rgbBase += out->linesize[0] / 4;
+	}
+}
