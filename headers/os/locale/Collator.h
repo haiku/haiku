@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2011, Haiku, Inc.
+ * Copyright 2003-2017, Haiku, Inc.
  * Distributed under the terms of the MIT Licence.
  */
 #ifndef _COLLATOR_H_
@@ -18,7 +18,6 @@ namespace U_ICU_NAMESPACE {
 };
 
 class BString;
-class BCollatorAddOn;
 
 
 enum collator_strengths {
