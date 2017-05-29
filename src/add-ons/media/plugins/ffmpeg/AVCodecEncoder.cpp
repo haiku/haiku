@@ -511,6 +511,11 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 
 	fContext->strict_std_compliance = -2;
 
+	// Some codecs need this to be set before open
+	fFrame->format = fContext->pix_fmt;
+	fFrame->width = fContext->width;
+	fFrame->height = fContext->height;
+
 	// Open the codec
 	int result = avcodec_open2(fContext, fCodec, NULL);
 	if (result >= 0)
