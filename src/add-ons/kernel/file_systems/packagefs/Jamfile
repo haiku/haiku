@@ -140,7 +140,7 @@ SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES) ]
 SEARCH on [ FGristFiles $(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES_V1) ]
 	+= [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 SEARCH on [ FGristFiles $(libSharedSources) ]
-	+= [ FDirName $(HAIKU_TOP) src kits shared ] ;
+	+= [ FDirName $(HAIKU_TOP) src build libshared ] ;
 SEARCH on [ FGristFiles $(storageKitSources) ]
 	+= [ FDirName $(HAIKU_TOP) src kits storage ] ;
 SEARCH on [ FGristFiles $(supportKitSources) ]

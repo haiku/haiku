@@ -36,23 +36,31 @@ void
 NaturalCompareTest::TestSome()
 {
 	static const Sample samples[] = {
+		// NULL in either side of the comparison
 		{NULL, NULL, 0},
 		{NULL, "A", -1},
+		{"A", NULL,  1},
+		// Case insensitive
 		{"a", "A", 0},
+		{"é", "É", 0},
+		// Handling of accented characters
 		{"ä", "a", 1},
+		// Natural number ordering
 		{"3", "99", -1},
 		{"9", "19", -1},
 		{"13", "99", -1},
 		{"9", "111", -1},
 		{"00000009", "111", -1},
+		// Natural number ordering, ignoring leading space
 		{"Hallo2", "hallo12", -1},
 		{"Hallo 2", "hallo12", -1},
 		{"Hallo  2", "hallo12", -1},
 		{"Hallo  2 ", "hallo12", -1},
-		{"12 äber 42", "12aber42", 1},
-		{"12 äber 42", "12aber43", 1},
-		{"12 äber 44", "12aber43", 1},
-		{"12 äber 44", "12 aber45", 1},
+		// A mix of everything
+		{"12 äber 42", "12aber42", -1},
+		{"12 äber 42", "12aber43", -1},
+		{"12 äber 44", "12aber43", -1},
+		{"12 äber 44", "12 aber45", -1},
 	};
 	_RunTests(samples, sizeof(samples) / sizeof(Sample));
 }
