@@ -369,7 +369,7 @@ BInfoWindow::Show()
 		"will use to find the window width");
 
 	// window height depends on file type
-	int lines = 8;
+	int lines = 9;
 	if (fModel->IsExecutable())
 		lines++;
 	float height = font->Size() * (lines * 2 + 1);
@@ -643,7 +643,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 			BRect permissionsBounds(kBorderWidth + 1,
 						fAttributeView->Bounds().bottom,
 						fAttributeView->Bounds().right,
-						fAttributeView->Bounds().bottom + 80);
+						fAttributeView->Bounds().bottom + 103);
 
 			if (fPermissionsView == NULL) {
 				// Only true on first call.

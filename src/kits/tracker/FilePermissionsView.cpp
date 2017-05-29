@@ -52,6 +52,23 @@ const uint32 kNewOwnerEntered = 'nwow';
 const uint32 kNewGroupEntered = 'nwgr';
 
 
+class RotatedStringView: public BStringView
+{
+public:
+	RotatedStringView(BRect r, const char* name, const char* label)
+		: BStringView(r, name, label)
+	{
+	}
+
+	void Draw(BRect invalidate)
+	{
+		RotateBy(-M_PI / 5);
+		TranslateBy(0, Bounds().Height() / 1.5);
+		BStringView::Draw(invalidate);
+	}
+};
+
+
 //	#pragma mark - FilePermissionsView
 
 
@@ -63,23 +80,22 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// Constants for the column labels: "User", "Group" and "Other".
-	const float kColumnLabelMiddle = 77, kColumnLabelTop = 6,
-		kColumnLabelSpacing = 37, kColumnLabelBottom = 20,
-		kColumnLabelWidth = 35, kAttribFontHeight = 10;
+	const float kColumnLabelMiddle = 77, kColumnLabelTop = 0,
+		kColumnLabelSpacing = 37, kColumnLabelBottom = 39,
+		kColumnLabelWidth = 80, kAttribFontHeight = 10;
 
 	BStringView* strView;
 
-	strView = new BStringView(
+	strView = new RotatedStringView(
 		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2,
 			kColumnLabelTop,
 			kColumnLabelMiddle + kColumnLabelWidth / 2,
 			kColumnLabelBottom),
 		"", B_TRANSLATE("Owner"));
 	AddChild(strView);
-	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 
-	strView = new BStringView(
+	strView = new RotatedStringView(
 		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
 				+ kColumnLabelSpacing,
 			kColumnLabelTop,
@@ -87,10 +103,9 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 			kColumnLabelBottom),
 		"", B_TRANSLATE("Group"));
 	AddChild(strView);
-	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 
-	strView = new BStringView(
+	strView = new RotatedStringView(
 		BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
 				+ 2 * kColumnLabelSpacing,
 			kColumnLabelTop,
@@ -99,13 +114,12 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 			kColumnLabelBottom),
 		"", B_TRANSLATE("Other"));
 	AddChild(strView);
-	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 
 	// Constants for the row labels: "Read", "Write" and "Execute".
-	const float kRowLabelLeft = 10, kRowLabelTop = kColumnLabelTop + 15,
+	const float kRowLabelLeft = 10, kRowLabelTop = kColumnLabelBottom + 5,
 		kRowLabelVerticalSpacing = 18, kRowLabelRight = kColumnLabelMiddle
-		- kColumnLabelWidth / 2 - 5, kRowLabelHeight = 14;
+		- kColumnLabelSpacing / 2 - 5, kRowLabelHeight = 14;
 
 	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop,
 			kRowLabelRight, kRowLabelTop + kRowLabelHeight),
@@ -131,7 +145,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	strView->SetFontSize(kAttribFontHeight);
 
 	// Constants for the 3x3 check box array.
-	const float kLeftMargin = kRowLabelRight + 15,
+	const float kLeftMargin = kRowLabelRight + 5,
 		kTopMargin = kRowLabelTop - 2,
 		kHorizontalSpacing = kColumnLabelSpacing,
 		kVerticalSpacing = kRowLabelVerticalSpacing,
@@ -168,8 +182,8 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	}
 
 	const float kTextControlLeft = 170, kTextControlRight = 270,
-		kTextControlTop = kColumnLabelTop, kTextControlHeight = 14,
-		kTextControlSpacing = 16;
+		kTextControlTop = kRowLabelTop - 19,
+		kTextControlHeight = 14, kTextControlSpacing = 16;
 
 	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop,
 		kTextControlRight, kTextControlTop + kTextControlHeight), "",
