@@ -49,7 +49,7 @@ TWalker::~TWalker()
 }
 
 
-// all the following calls are pure viruals, should not get called
+// all the following calls are pure virtuals, should not get called
 status_t
 TWalker::GetNextEntry(BEntry*, bool )
 {
