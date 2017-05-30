@@ -145,6 +145,8 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 		line.SetTo("");
 		currentLine++;
 	}
+
+	delete decoder;
 }
 
 
