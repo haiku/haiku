@@ -23,4 +23,6 @@ extern const unicode_block kNoBlock;
 extern const struct unicode_block_entry kUnicodeBlocks[];
 extern const uint32 kNumUnicodeBlocks;
 
+int32 BlockForCharacter(const uint32 character);
+
 #endif	// UNICODE_BLOCKS_H

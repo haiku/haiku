@@ -257,3 +257,30 @@ const struct unicode_block_entry kUnicodeBlocks[] = {
 
 const uint32 kNumUnicodeBlocks
 	= sizeof(kUnicodeBlocks) / sizeof(kUnicodeBlocks[0]);
+
+
+int32
+BlockForCharacter(const uint32 character)
+{
+	uint32 min = 0;
+	uint32 max = kNumUnicodeBlocks;
+	uint32 guess = (max + min) / 2;
+
+	while ((max >= min) && (guess < kNumUnicodeBlocks)) {
+		uint32 start = kUnicodeBlocks[guess].start;
+		uint32 end = kUnicodeBlocks[guess].end;
+
+		if (start <= character && end >= character)
+			return guess;
+
+		if (end < character) {
+			min = guess + 1;
+		} else {
+			max = guess - 1;
+		}
+
+		guess = (max + min) / 2;
+	}
+
+	return -1;
+}
