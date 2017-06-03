@@ -145,7 +145,9 @@ BHttpTime::ToString(int8 format)
 	expirationTm.tm_mday = fDate.Date().Day();
 	expirationTm.tm_mon = fDate.Date().Month() - 1;
 	expirationTm.tm_year = fDate.Date().Year() - 1900;
-	expirationTm.tm_wday = fDate.Date().DayOfWeek();
+	// strftime starts weekday count at 0 for Sunday,
+	// while DayOfWeek starts at 1 for Monday and thus uses 7 for Sunday
+	expirationTm.tm_wday = fDate.Date().DayOfWeek() % 7;
 	expirationTm.tm_yday = 0;
 	expirationTm.tm_isdst = 0;
 
