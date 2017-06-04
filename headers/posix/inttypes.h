@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _INTTYPES_H_
@@ -14,7 +14,6 @@ typedef struct {
 	intmax_t	rem;	/* remainder */
 } imaxdiv_t;
 
-#if !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS)
 /* fprintf() macros for signed integers */
 #	define PRId8			"d"
 #	define PRIdLEAST8		"d"
@@ -192,7 +191,6 @@ typedef struct {
 #	define SCNoPTR			__HAIKU_PRI_PREFIX_ADDR "o"
 #	define SCNxMAX			SCNx64
 #	define SCNxPTR			__HAIKU_PRI_PREFIX_ADDR "x"
-#endif /* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
 
 #ifdef __cplusplus

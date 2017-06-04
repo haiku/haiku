@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2017 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDINT_H_
@@ -135,8 +135,6 @@ typedef uint64_t uintmax_t;
 #define WINT_MAX 	((wint_t)-1)
 
 
-#if !defined(__cplusplus) || defined(__STDC_CONSTANT_MACROS)
-
 /* Macros of Integer Constant Expressions */
 #define INT8_C(value) 	value
 #define INT16_C(value) 	value
@@ -157,8 +155,6 @@ typedef uint64_t uintmax_t;
 #define INTMAX_C(value) 	value ## LL
 #define UINTMAX_C(value)	value ## ULL
 #endif
-
-#endif /* !defined(__cplusplus) || defined(__STDC_CONSTANT_MACROS) */
 
 
 /* BSD compatibility */
