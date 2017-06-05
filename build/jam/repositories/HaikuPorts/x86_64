@@ -293,6 +293,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre-3.5.25-3
 	djvulibre_devel-3.5.25-3
 	dmg2img-1.6.6-1
+	dmidecode-3.1-1
 	dmtx_utils-0.7.4-2
 	documentviewer-0.3_git-10
 	docutils-0.12-1
@@ -436,6 +437,7 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	gpgme-1.6.0-1
 	gpgme_devel-1.6.0-1
+	gphoto2-2.5.11-1
 	gptfdisk-1.0.1-1
 	graphicsmagick-1.3.25-1
 	graphicsmagick_devel-1.3.25-1
@@ -659,6 +661,8 @@ RemotePackageRepository HaikuPorts
 	libidl_devel-0.8.14-2
 	libidn-1.33-1
 	libidn_devel-1.33-1
+	libiptcdata-1.0.4-1
+	libiptcdata_devel-1.0.4-1
 	libircclient-1.8-1
 	libircclient_devel-1.8-1
 	libksba-1.3.5-1
@@ -1141,8 +1145,8 @@ RemotePackageRepository HaikuPorts
 	ruby_devel-2.2.2-5
 	samba-3.6.25-3
 	samba_devel-3.6.25-3
-	sane_backends-1.0.25-4
-	sane_backends_devel-1.0.25-4
+	sane_backends-1.0.27-2
+	sane_backends_devel-1.0.27-2
 	sanity-0.6-4
 	sawteeth-1.3-5
 	sbc-1.3-2
@@ -1483,6 +1487,7 @@ RemotePackageRepository HaikuPorts
 	discount
 	djvulibre
 	dmg2img
+	dmidecode
 	dmtx_utils
 	docbook_xml_dtd
 	docbook_xsl_stylesheets
@@ -1578,6 +1583,7 @@ RemotePackageRepository HaikuPorts
 	gnutls35
 	gperf
 	gpgme
+	gphoto2
 	gptfdisk
 	graphicsmagick
 	graphite2
@@ -1712,6 +1718,7 @@ RemotePackageRepository HaikuPorts
 	libiconv
 	libidl
 	libidn
+	libiptcdata
 	libircclient
 	libksba
 	liblangtag
