@@ -357,7 +357,7 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 		snprintf(buffer, bufferLength, "%s%" B_PRId32 "%%%s", open, fPercent,
 			close);
 	} else if (fShowTime && fTimeLeft >= 0) {
-		snprintf(buffer, bufferLength, "%s%" B_PRId32 ":%02" B_PRId32 "%s",
+		snprintf(buffer, bufferLength, "%s%" B_PRIdTIME ":%02" B_PRIdTIME "%s",
 			open, fTimeLeft / 3600, (fTimeLeft / 60) % 60, close);
 	}
 }
@@ -417,7 +417,7 @@ PowerStatusView::Update(bool force)
 					"%%%s", open, fPercent, close);
 				if (fTimeLeft >= 0) {
 					length += snprintf(text + length, sizeof(text) - length,
-						"\n%" B_PRId32 ":%02" B_PRId32, fTimeLeft / 3600,
+						"\n%" B_PRIdTIME ":%02" B_PRIdTIME, fTimeLeft / 3600,
 						(fTimeLeft / 60) % 60);
 				}
 

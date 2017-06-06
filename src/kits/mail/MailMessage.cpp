@@ -753,7 +753,7 @@ BEmailMessage::RenderToRFC822(BPositionIO* file)
 	}
 
 	// add the date field
-	int32 creationTime = time(NULL);
+	time_t creationTime = time(NULL);
 	{
 		char date[128];
 		struct tm tm;

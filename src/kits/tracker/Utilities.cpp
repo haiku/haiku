@@ -984,7 +984,7 @@ EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume)
 	if (volume->GetRootDirectory(&rootDirectory) == B_OK
 		&& rootDirectory.GetCreationTime(&created) == B_OK
 		&& fs_stat_dev(volume->Device(), &info) == 0) {
-		message->AddInt32("creationDate", created);
+		message->AddInt64("creationDate", created);
 		message->AddInt64("capacity", volume->Capacity());
 		message->AddString("deviceName", info.device_name);
 		message->AddString("volumeName", info.volume_name);
@@ -996,13 +996,20 @@ EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume)
 status_t
 MatchArchivedVolume(BVolume* volume, const BMessage* message, int32 index)
 {
-	time_t created;
+	int64 created64;
 	off_t capacity;
 
-	if (message->FindInt32("creationDate", index, &created) != B_OK
-		|| message->FindInt64("capacity", index, &capacity) != B_OK) {
-		return B_ERROR;
+	if (message->FindInt64("creationDate", index, &created64) != B_OK) {
+		int32 created32;
+		if (message->FindInt32("creationDate", index, &created32) != B_OK)
+			return B_ERROR;
+		created64 = created32;
 	}
+
+	time_t created = created64;
+
+	if (message->FindInt64("capacity", index, &capacity) != B_OK)
+		return B_ERROR;
 
 	BVolumeRoster roster;
 	BVolume tempVolume;
