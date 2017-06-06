@@ -176,7 +176,7 @@ RemotePackageRepository HaikuPorts
 	gettext-0.19.8.1-2
 	gettext_libintl-0.19.8.1-2
 	gdb-6.3-1
-	giddy3-1.5-1
+	giddy3-1.5-2
 	giflib-5.1.2-1
 	giflib_devel-5.1.2-1
 	giflib6-5.0.5-2

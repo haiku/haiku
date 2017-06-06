@@ -395,6 +395,7 @@ RemotePackageRepository HaikuPorts
 	getopt-1.1.6-1
 	gettext-0.19.8.1-3
 	gettext_libintl-0.19.8.1-3
+	giddy3-1.5-2
 	gif2apng-1.9-2
 	giflib-5.1.2-2
 	giflib6-5.0.5-3
@@ -1561,6 +1562,7 @@ RemotePackageRepository HaikuPorts
 	getconf
 	getopt
 	gettext
+	giddy3
 	gif2apng
 	giflib
 	giflib6
