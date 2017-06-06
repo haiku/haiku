@@ -233,7 +233,7 @@ _user_set_real_time_clock(bigtime_t time)
 
 
 status_t
-_user_set_timezone(time_t timezoneOffset, const char *name, size_t nameLength)
+_user_set_timezone(int32 timezoneOffset, const char *name, size_t nameLength)
 {
 	bigtime_t offset = (bigtime_t)timezoneOffset * 1000000LL;
 
@@ -270,9 +270,9 @@ _user_set_timezone(time_t timezoneOffset, const char *name, size_t nameLength)
 
 
 status_t
-_user_get_timezone(time_t *_timezoneOffset, char *userName, size_t nameLength)
+_user_get_timezone(int32 *_timezoneOffset, char *userName, size_t nameLength)
 {
-	time_t offset = (time_t)(sTimezoneOffset / 1000000LL);
+	int32 offset = (int32)(sTimezoneOffset / 1000000LL);
 
 	if (_timezoneOffset != NULL
 		&& (!IS_USER_ADDRESS(_timezoneOffset)
