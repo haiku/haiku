@@ -176,8 +176,13 @@ typedef	generic_addr_t			generic_size_t;
 #define B_PRIiINO		B_PRIi64
 
 /* time_t */
-#define B_PRIdTIME		B_PRId32
-#define B_PRIiTIME		B_PRIi32
+#if defined(__i386__) && !defined(__x86_64__)
+#	define B_PRIdTIME	B_PRId32
+#	define B_PRIiTIME	B_PRIi32
+#else
+#	define B_PRIdTIME	B_PRId64
+#	define B_PRIiTIME	B_PRIi64
+#endif
 
 /* bigtime_t */
 #define B_PRIdBIGTIME	B_PRId64

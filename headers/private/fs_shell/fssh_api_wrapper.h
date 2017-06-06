@@ -1615,8 +1615,13 @@
 #define B_PRIdINO		FSSH_B_PRIdINO
 #define B_PRIiINO		FSSH_B_PRIiINO
 /* time_t */
-#define B_PRIdTIME		FSSH_B_PRId32
-#define B_PRIiTIME		FSSH_B_PRIi32
+#if defined(__i386__) && !defined(__x86_64__)
+#	define B_PRIdTIME		FSSH_B_PRId32
+#	define B_PRIiTIME		FSSH_B_PRIi32
+#else
+#	define B_PRIdTIME		FSSH_B_PRId64
+#	define B_PRIiTIME		FSSH_B_PRIi64
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////

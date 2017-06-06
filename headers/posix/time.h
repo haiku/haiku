@@ -13,9 +13,14 @@ struct sigevent;	/* defined in <signal.h> */
 
 
 typedef __haiku_int32 clock_t;
-typedef __haiku_int32 time_t;
 typedef __haiku_int32 suseconds_t;
 typedef __haiku_uint32 useconds_t;
+
+#if defined(__i386__) && !defined(__x86_64__)
+typedef __haiku_int32 time_t;
+#else
+typedef __haiku_int64 time_t;
+#endif
 
 
 #define CLOCKS_PER_SEC	1000000
