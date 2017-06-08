@@ -933,7 +933,7 @@ RemotePackageRepository HaikuPorts
 	patchutils-0.3.4-1
 	pciutils-3.5.2-1
 	pciutils_devel-3.5.2-1
-	pe-2.4.5-3
+	pe-2.4.5-5
 	perl-5.18.2-2
 	phantomlimb-1-4
 	photograbber-2.2-2
