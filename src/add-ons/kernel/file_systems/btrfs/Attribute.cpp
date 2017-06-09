@@ -9,7 +9,7 @@
 
 
 #include "Attribute.h"
-#include "BPlusTree.h"
+#include "BTree.h"
 #include "CRCTable.h"
 #include "Utility.h"
 

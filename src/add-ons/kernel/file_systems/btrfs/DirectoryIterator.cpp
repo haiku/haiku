@@ -23,7 +23,7 @@ DirectoryIterator::DirectoryIterator(Inode* inode)
 	fInode(inode),
 	fIterator(NULL)
 {
-	struct btrfs_key key;
+	btrfs_key key;
 	key.SetType(BTRFS_KEY_TYPE_DIR_INDEX);
 	key.SetObjectID(inode->ID());
 	fIterator = new(std::nothrow) TreeIterator(inode->GetVolume()->FSTree(),
@@ -118,7 +118,7 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	}
 
 	uint32 hash = calculate_crc((uint32)~1, (uint8*)name, nameLength);
-	struct btrfs_key key;
+	btrfs_key key;
 	key.SetType(BTRFS_KEY_TYPE_DIR_ITEM);
 	key.SetObjectID(fInode->ID());
 	key.SetOffset(hash);
@@ -156,7 +156,7 @@ status_t
 DirectoryIterator::Rewind()
 {
 	fIterator->Rewind();
-	fOffset = BPLUSTREE_BEGIN;
+	fOffset = BTREE_BEGIN;
 	return B_OK;
 }
 

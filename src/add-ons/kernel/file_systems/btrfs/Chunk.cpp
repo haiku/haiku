@@ -19,21 +19,21 @@
 #	define FATAL(x...) dprintf("\33[34mbtrfs:\33[0m " x)
 
 
-Chunk::Chunk(struct btrfs_chunk* chunk, fsblock_t offset)
+Chunk::Chunk(btrfs_chunk* chunk, fsblock_t offset)
 	:
 	fChunk(NULL),
 	fInitStatus(B_OK)
 {
 	fChunkOffset = offset;
-	fChunk = (struct btrfs_chunk*)malloc(sizeof(struct btrfs_chunk)
-		+ chunk->StripeCount() * sizeof(struct btrfs_stripe));
+	fChunk = (btrfs_chunk*)malloc(sizeof(btrfs_chunk)
+		+ chunk->StripeCount() * sizeof(btrfs_stripe));
 	if (fChunk == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
 
-	memcpy(fChunk, chunk, sizeof(struct btrfs_chunk)
-		+ chunk->StripeCount() * sizeof(struct btrfs_stripe));
+	memcpy(fChunk, chunk, sizeof(btrfs_chunk)
+		+ chunk->StripeCount() * sizeof(btrfs_stripe));
 
 	TRACE("chunk[0] length %" B_PRIu64 " owner %" B_PRIu64 " stripe_length %"
 		B_PRIu64 " type %" B_PRIu64 " stripe_count %u sub_stripes %u "
@@ -57,8 +57,8 @@ Chunk::~Chunk()
 uint32
 Chunk::Size() const
 {
-	return sizeof(struct btrfs_chunk)
-		+ fChunk->StripeCount() * sizeof(struct btrfs_stripe);
+	return sizeof(btrfs_chunk)
+		+ fChunk->StripeCount() * sizeof(btrfs_stripe);
 }
 
 

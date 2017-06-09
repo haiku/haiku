@@ -14,7 +14,7 @@ enum volume_flags {
 	VOLUME_READ_ONLY	= 0x0001
 };
 
-class BPlusTree;
+class BTree;
 class Chunk;
 class Inode;
 
@@ -38,8 +38,8 @@ public:
 									{ return fFSVolume ? fFSVolume->id : -1; }
 			fs_volume*			FSVolume() const { return fFSVolume; }
 			const char*			Name() const;
-			BPlusTree*			FSTree() const { return fFSTree; }
-			BPlusTree*			RootTree() const { return fRootTree; }
+			BTree*			FSTree() const { return fFSTree; }
+			BTree*			RootTree() const { return fRootTree; }
 
 			uint32				BlockSize() const { return fBlockSize; }
 			btrfs_super_block&	SuperBlock() { return fSuperBlock; }
@@ -68,12 +68,12 @@ private:
 			Inode*				fRootNode;
 
 			Chunk*				fChunk;
-			BPlusTree*			fChunkTree;
-			BPlusTree*			fRootTree;
-			BPlusTree*			fDevTree;
-			BPlusTree*			fExtentTree;
-			BPlusTree*			fFSTree;
-			BPlusTree*			fChecksumTree;
+			BTree*			fChunkTree;
+			BTree*			fRootTree;
+			BTree*			fDevTree;
+			BTree*			fExtentTree;
+			BTree*			fFSTree;
+			BTree*			fChecksumTree;
 };
 
 

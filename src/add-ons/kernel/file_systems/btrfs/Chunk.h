@@ -14,7 +14,7 @@
 
 class Chunk {
 public:
-								Chunk(struct btrfs_chunk* chunk,
+								Chunk(btrfs_chunk* chunk,
 									fsblock_t offset);
 								~Chunk();
 			uint32				Size() const;
@@ -23,7 +23,7 @@ public:
 			fsblock_t			End() const
 									{ return fChunkOffset + fChunk->Length(); }
 private:
-			struct btrfs_chunk*	fChunk;
+			btrfs_chunk*	fChunk;
 			fsblock_t			fChunkOffset;
 			status_t			fInitStatus;
 };

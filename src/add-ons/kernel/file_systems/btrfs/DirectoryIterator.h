@@ -6,7 +6,7 @@
 #define DIRECTORYITERATOR_H
 
 
-#include "BPlusTree.h"
+#include "BTree.h"
 #include "Inode.h"
 
 

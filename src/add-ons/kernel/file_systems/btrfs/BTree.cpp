@@ -5,10 +5,10 @@
  */
 
 
-//! B+Tree implementation
+//! BTree implementation
 
 
-#include "BPlusTree.h"
+#include "BTree.h"
 #include "CachedBlock.h"
 
 
@@ -21,7 +21,7 @@
 #	define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
 
 
-BPlusTree::BPlusTree(Volume* volume, struct btrfs_stream* stream)
+BTree::BTree(Volume* volume, btrfs_stream* stream)
 	:
 	fStream(stream),
 	fRootBlock(0),
@@ -31,7 +31,7 @@ BPlusTree::BPlusTree(Volume* volume, struct btrfs_stream* stream)
 }
 
 
-BPlusTree::BPlusTree(Volume* volume, fsblock_t rootBlock)
+BTree::BTree(Volume* volume, fsblock_t rootBlock)
 	:
 	fStream(NULL),
 	fRootBlock(rootBlock),
@@ -41,7 +41,7 @@ BPlusTree::BPlusTree(Volume* volume, fsblock_t rootBlock)
 }
 
 
-BPlusTree::~BPlusTree()
+BTree::~BTree()
 {
 	// if there are any TreeIterators left, we need to stop them
 	// (can happen when the tree's inode gets deleted while
@@ -57,7 +57,7 @@ BPlusTree::~BPlusTree()
 
 
 int32
-BPlusTree::_CompareKeys(struct btrfs_key& key1, struct btrfs_key& key2)
+BTree::_CompareKeys(btrfs_key& key1, btrfs_key& key2)
 {
 	if (key1.ObjectID() > key2.ObjectID())
 		return 1;
@@ -81,8 +81,8 @@ BPlusTree::_CompareKeys(struct btrfs_key& key1, struct btrfs_key& key2)
 	It can also return other errors to indicate that something went wrong.
 */
 status_t
-BPlusTree::_Find(struct btrfs_key& key, void** _value, size_t* _size,
-	bplustree_traversing type)
+BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
+	btree_traversing type)
 {
 	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
 		key.ObjectID(),	key.Type(), key.Offset());
@@ -106,7 +106,7 @@ BPlusTree::_Find(struct btrfs_key& key, void** _value, size_t* _size,
 				B_PRId32 "\n", i, stream->index[i].BlockNum(), comp);
 			if (comp < 0)
 				continue;
-			if (comp > 0 || type == BPLUSTREE_BACKWARD)
+			if (comp > 0 || type == BTREE_BACKWARD)
 				break;
 		}
 		TRACE("Find() getting index %" B_PRIu32 " at %" B_PRId64 "\n", i - 1,
@@ -142,16 +142,16 @@ BPlusTree::_Find(struct btrfs_key& key, void** _value, size_t* _size,
 		if (comp == 0)
 			break;
 		if (comp < 0 && i > 0) {
-			if (type == BPLUSTREE_EXACT)
+			if (type == BTREE_EXACT)
 				return B_ENTRY_NOT_FOUND;
-			if (type == BPLUSTREE_BACKWARD)
+			if (type == BTREE_BACKWARD)
 				i--;
 			break;
 		}
 	}
 
 	if (i == stream->header.ItemCount()) {
-		if (type == BPLUSTREE_BACKWARD)
+		if (type == BTREE_BACKWARD)
 			i--;
 		else
 			return B_ENTRY_NOT_FOUND;
@@ -196,28 +196,28 @@ BPlusTree::_Find(struct btrfs_key& key, void** _value, size_t* _size,
 
 
 status_t
-BPlusTree::FindNext(struct btrfs_key& key, void** _value, size_t* _size)
+BTree::FindNext(btrfs_key& key, void** _value, size_t* _size)
 {
-	return _Find(key, _value, _size, BPLUSTREE_FORWARD);
+	return _Find(key, _value, _size, BTREE_FORWARD);
 }
 
 
 status_t
-BPlusTree::FindPrevious(struct btrfs_key& key, void** _value, size_t* _size)
+BTree::FindPrevious(btrfs_key& key, void** _value, size_t* _size)
 {
-	return _Find(key, _value, _size, BPLUSTREE_BACKWARD);
+	return _Find(key, _value, _size, BTREE_BACKWARD);
 }
 
 
 status_t
-BPlusTree::FindExact(struct btrfs_key& key, void** _value, size_t* _size)
+BTree::FindExact(btrfs_key& key, void** _value, size_t* _size)
 {
-	return _Find(key, _value, _size, BPLUSTREE_EXACT);
+	return _Find(key, _value, _size, BTREE_EXACT);
 }
 
 
 void
-BPlusTree::_AddIterator(TreeIterator* iterator)
+BTree::_AddIterator(TreeIterator* iterator)
 {
 	MutexLocker _(fIteratorLock);
 	fIterators.Add(iterator);
@@ -225,7 +225,7 @@ BPlusTree::_AddIterator(TreeIterator* iterator)
 
 
 void
-BPlusTree::_RemoveIterator(TreeIterator* iterator)
+BTree::_RemoveIterator(TreeIterator* iterator)
 {
 	MutexLocker _(fIteratorLock);
 	fIterators.Remove(iterator);
@@ -235,7 +235,7 @@ BPlusTree::_RemoveIterator(TreeIterator* iterator)
 //	#pragma mark -
 
 
-TreeIterator::TreeIterator(BPlusTree* tree, struct btrfs_key& key)
+TreeIterator::TreeIterator(BTree* tree, btrfs_key& key)
 	:
 	fTree(tree),
 	fCurrentKey(key)
@@ -255,7 +255,7 @@ TreeIterator::~TreeIterator()
 /*!	Iterates through the tree in the specified direction.
 */
 status_t
-TreeIterator::Traverse(bplustree_traversing direction, struct btrfs_key& key,
+TreeIterator::Traverse(btree_traversing direction, btrfs_key& key,
 	void** value, size_t* size)
 {
 	if (fTree == NULL)
@@ -276,7 +276,7 @@ TreeIterator::Traverse(bplustree_traversing direction, struct btrfs_key& key,
 /*!	just sets the current key in the iterator.
 */
 status_t
-TreeIterator::Find(struct btrfs_key& key)
+TreeIterator::Find(btrfs_key& key)
 {
 	if (fTree == NULL)
 		return B_INTERRUPTED;

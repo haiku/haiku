@@ -78,7 +78,7 @@ private:
 			void*		fCache;
 			void*		fMap;
 			status_t	fInitStatus;
-			struct btrfs_inode fNode;
+			btrfs_inode fNode;
 };
 
 

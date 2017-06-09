@@ -37,7 +37,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
 local btrfsSources =
 	Attribute.cpp
 	AttributeIterator.cpp
-	BPlusTree.cpp
+	BTree.cpp
 	Chunk.cpp
 	CRCTable.cpp
 	DirectoryIterator.cpp

@@ -12,7 +12,7 @@ KernelAddon btrfs :
 	kernel_interface.cpp
 	Attribute.cpp
 	AttributeIterator.cpp
-	BPlusTree.cpp
+	BTree.cpp
 	Chunk.cpp
 	CRCTable.cpp
 	DirectoryIterator.cpp

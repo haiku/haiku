@@ -106,7 +106,7 @@ struct btrfs_chunk {
 	uint32	sector_size;
 	uint16	stripe_count;
 	uint16	sub_stripes;
-	struct btrfs_stripe stripes[0];
+	btrfs_stripe stripes[0];
 	uint64 Length() const { return B_LENDIAN_TO_HOST_INT64(length); }
 	uint64 Owner() const { return B_LENDIAN_TO_HOST_INT64(owner); }
 	uint64 StripeLength() const
@@ -169,7 +169,7 @@ struct btrfs_super_block {
 	uint8	root_level;
 	uint8	chunk_root_level;
 	uint8	log_root_level;
-	struct btrfs_device device;
+	btrfs_device device;
 	char	label[256];
 	uint64	reserved[32];
 	uint8	system_chunk_array[2048];
@@ -206,10 +206,10 @@ struct btrfs_inode {
 	uint64	flags;
 	uint64	sequence;
 	uint64	reserved[4];
-	struct btrfs_timespec access_time;
-	struct btrfs_timespec change_time;
-	struct btrfs_timespec modification_time;
-	struct btrfs_timespec creation_time;
+	btrfs_timespec access_time;
+	btrfs_timespec change_time;
+	btrfs_timespec modification_time;
+	btrfs_timespec creation_time;
 	uint64 Generation() const { return B_LENDIAN_TO_HOST_INT64(generation); }
 	uint64 Size() const { return B_LENDIAN_TO_HOST_INT64(size); }
 	uint32 UserID() const { return B_LENDIAN_TO_HOST_INT32(uid); }
@@ -218,7 +218,7 @@ struct btrfs_inode {
 	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
 	uint64 Sequence() const { return B_LENDIAN_TO_HOST_INT64(sequence); }
 	static void _DecodeTime(struct timespec& timespec,
-		const struct btrfs_timespec& time)
+		const btrfs_timespec& time)
 	{
 		timespec.tv_sec = B_LENDIAN_TO_HOST_INT64(time.seconds);
 		timespec.tv_nsec = B_LENDIAN_TO_HOST_INT32(time.nanoseconds);
