@@ -11,6 +11,14 @@
 #include "Volume.h"
 
 
+//#define TRACE_BTRFS
+#ifdef TRACE_BTRFS
+#	define TRACE(x...) dprintf("\33[34mbtrfs:\33[0m " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 class CachedBlock {
 public:
 							CachedBlock(Volume* volume);
