@@ -164,22 +164,9 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 
 		if (_value != NULL) {
 			*_value = malloc(stream->entries[i].Size());
-			uint32 totalOffset = stream->entries[i].Offset() + sizeof(btrfs_header);
-
-
-			if ((fVolume->BlockSize() - totalOffset % fVolume->BlockSize())
-				>= stream->entries[i].Size()) {
-				//If there is enough space for *_value
-				memcpy(*_value, ((uint8*)cached.SetTo(physical
-					+ totalOffset / fVolume->BlockSize())
-					+ totalOffset % fVolume->BlockSize()),
-					stream->entries[i].Size());
-			} else {
-				read_pos(fVolume->Device(), physical
-					* fVolume->BlockSize() + totalOffset,
-					*_value, stream->entries[i].Size());
-			}
-
+			memcpy(*_value, ((uint8 *)&stream->entries[0]
+				+ stream->entries[i].Offset()),
+				stream->entries[i].Size());
 			key.SetOffset(stream->entries[i].key.Offset());
 			if (_size != NULL)
 				*_size = stream->entries[i].Size();

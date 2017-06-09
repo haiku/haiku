@@ -177,7 +177,7 @@ struct btrfs_super_block {
 	bool IsValid();
 		// implemented in Volume.cpp
 	uint64 TotalSize() const { return B_LENDIAN_TO_HOST_INT64(total_size); }
-	uint32 BlockSize() const { return B_LENDIAN_TO_HOST_INT32(sector_size); }
+	uint32 BlockSize() const { return B_LENDIAN_TO_HOST_INT32(node_size); }
 	uint64 RootDirObjectID() const
 		{ return B_LENDIAN_TO_HOST_INT64(root_dir_object_id); }
 	uint64 Generation() const
