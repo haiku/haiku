@@ -41,7 +41,9 @@ public:
 			BTree*			FSTree() const { return fFSTree; }
 			BTree*			RootTree() const { return fRootTree; }
 
+			uint32				SectorSize() const { return fSectorSize; }
 			uint32				BlockSize() const { return fBlockSize; }
+
 			btrfs_super_block&	SuperBlock() { return fSuperBlock; }
 
 			status_t			LoadSuperBlock();
@@ -62,6 +64,7 @@ private:
 			char				fName[32];
 
 			uint32				fFlags;
+			uint32				fSectorSize;
 			uint32				fBlockSize;
 
 			void*				fBlockCache;

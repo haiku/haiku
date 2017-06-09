@@ -266,7 +266,9 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	}
 
 	fBlockSize = fSuperBlock.BlockSize();
+	fSectorSize = fSuperBlock.SectorSize();
 	TRACE("block size %" B_PRIu32 "\n", fBlockSize);
+	TRACE("sector size %" B_PRIu32 "\n", fSectorSize);
 
 	uint8* start = (uint8*)&fSuperBlock.system_chunk_array[0];
 	uint8* end = (uint8*)&fSuperBlock.system_chunk_array[2048];
