@@ -280,7 +280,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		timeData.tm_min = 0;
 		nextHour = mktime(&timeData);
 
-		PRINT(("%" B_PRId32 " minutes, %" B_PRId32 " seconds till next hour\n",
+		PRINT(("%" B_PRIdTIME " minutes, %" B_PRIdTIME " seconds till next hour\n",
 			(nextHour - now) / 60, (nextHour - now) % 60));
 
 		time_t nextMinute = now + 60;
@@ -289,7 +289,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		timeData.tm_sec = 0;
 		nextMinute = mktime(&timeData);
 
-		PRINT(("%" B_PRId32 " seconds till next minute\n", nextMinute - now));
+		PRINT(("%" B_PRIdTIME " seconds till next minute\n", nextMinute - now));
 
 		bigtime_t delta;
 		if (fQueryListContainer->DynamicDateRefreshEveryMinute())
