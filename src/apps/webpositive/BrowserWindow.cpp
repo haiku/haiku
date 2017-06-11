@@ -736,6 +736,12 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 				_InvokeButtonVisibly(fURLInputGroup->GoButton());
 				return;
 			}
+			// Lock the URL text control to prevent changes while user is
+			// typing and set a timer to unlock it after a set period
+			// of time.
+			else {
+				fURLInputGroup->LockURLInput();
+			}
 		} else if (target == fFindTextControl->TextView()) {
 			// Handle B_RETURN when the find text control has focus.
 			if (bytes[0] == B_RETURN) {
@@ -844,8 +850,8 @@ BrowserWindow::MessageReceived(BMessage* message)
 			entry_ref ref;
 			BString name;
 
-			if (message->FindRef("directory", &ref) == B_OK &&
-				message->FindString("name", &name) == B_OK) {
+			if (message->FindRef("directory", &ref) == B_OK
+				&& message->FindString("name", &name) == B_OK) {
 				BDirectory dir(&ref);
 				BFile output(&dir, name,
 					B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
@@ -2448,7 +2454,7 @@ BrowserWindow::_EncodeURIComponent(const BString& search)
 void
 BrowserWindow::_VisitURL(const BString& url)
 {
-	//fURLInputGroup->TextView()->SetText(url);
+	// fURLInputGroup->TextView()->SetText(url);
 	CurrentWebView()->LoadURL(url.String());
 }
 

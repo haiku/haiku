@@ -151,6 +151,7 @@ public:
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
+	virtual	void				SetPreviousText(const char* text);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -302,6 +303,11 @@ URLInputGroup::URLTextView::KeyDown(const char* bytes, int32 numBytes)
 void
 URLInputGroup::URLTextView::MakeFocus(bool focus)
 {
+	// Unlock the URL input ahead of time if focus was lost.
+	if (!focus) {
+		fURLInputGroup->LockURLInput(false);
+	}
+
 	if (focus == IsFocus())
 		return;
 
@@ -313,6 +319,13 @@ URLInputGroup::URLTextView::MakeFocus(bool focus)
 	}
 
 	fURLInputGroup->Invalidate();
+}
+
+
+void
+URLInputGroup::URLTextView::SetPreviousText(const char* text)
+{
+	fPreviousText = text;
 }
 
 
@@ -583,7 +596,9 @@ private:
 URLInputGroup::URLInputGroup(BMessage* goMessage)
 	:
 	BGroupView(B_HORIZONTAL, 0.0),
-	fWindowActive(false)
+	fURLLockTimeout(NULL),
+	fWindowActive(false),
+	fURLLocked(false)
 {
 	GroupLayout()->SetInsets(2, 2, 2, 2);
 
@@ -608,11 +623,13 @@ URLInputGroup::URLInputGroup(BMessage* goMessage)
 
 	SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_CENTER));
+
 }
 
 
 URLInputGroup::~URLInputGroup()
 {
+	delete fURLLockTimeout;
 }
 
 
@@ -666,9 +683,14 @@ URLInputGroup::TextView() const
 void
 URLInputGroup::SetText(const char* text)
 {
-	// Ignore setting the text, if the user is currently editing the URL.
-	if (fWindowActive && fTextView->IsFocus())
+	// Ignore setting the text, if the user edited the URL in the last
+	// couple of seconds. Instead set the previous text in the text view,
+	// so if the user presses ESC the input will update to show the new
+	// text.
+	if (fURLLocked) {
+		fTextView->SetPreviousText(text);
 		return;
+	}
 
 	if (!text || !Text() || strcmp(Text(), text) != 0) {
 		fTextView->SetUpdateAutoCompleterChoices(false);
@@ -696,5 +718,40 @@ void
 URLInputGroup::SetPageIcon(const BBitmap* icon)
 {
 	fIconView->SetIcon(icon);
+}
+
+
+void
+URLInputGroup::LockURLInput(bool lock)
+{
+	fURLLocked = lock;
+	if (lock) {
+		if (fURLLockTimeout == NULL) {
+			fURLLockTimeout = new BMessageRunner(this,
+				new BMessage(MSG_LOCK_TIMEOUT), LOCK_TIMEOUT, 1);
+		} else {
+			fURLLockTimeout->SetInterval(LOCK_TIMEOUT);
+		}
+	}
+}
+
+
+void
+URLInputGroup::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_LOCK_TIMEOUT:
+		{
+			delete fURLLockTimeout;
+			fURLLockTimeout = NULL;
+			LockURLInput(false);
+			break;
+		}
+		default:
+		{
+			BGroupView(message);
+			break;
+		}
+	}
 }
 
