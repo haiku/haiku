@@ -53,12 +53,7 @@ init_hardware(void)
 {
 	TRACE((DEVICE_NAME ": init_hardware()\n"));
 
-	// If we don't have the VESA mode info, then we have a
-	// dumb framebuffer, in which case we bail, and leave it
-	// up to the framebuffer driver to handle.
-	return (get_boot_item(VESA_MODES_BOOT_INFO, NULL) != NULL
-			&& get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL) != NULL)
-		? B_OK : B_ERROR;
+	return get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL) != NULL ? B_OK : B_ERROR;
 }
 
 

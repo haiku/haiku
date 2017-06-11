@@ -53,6 +53,16 @@ is_mode_supported(display_mode* mode)
 {
 	vesa_mode* modes = gInfo->vesa_modes;
 
+	if (modes == NULL) {
+		// we're a UEFI framebuffer, just confirm it's our current mode
+		const display_mode &current = gInfo->shared_info->current_mode;
+		return mode->virtual_width == current.virtual_width
+			&& mode->virtual_height == current.virtual_height
+			&& mode->h_display_start == current.h_display_start
+			&& mode->v_display_start == current.v_display_start
+			&& mode->space == current.space;
+	}
+
 	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
 		// TODO: list is ordered, we could use binary search
@@ -75,12 +85,20 @@ create_mode_list(void)
 {
 	const color_space kVesaSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
+	const color_space kUefiSpaces[] = {
+		(color_space)gInfo->shared_info->current_mode.space
+	};
 
 	uint32 initialModesCount = 0;
+	bool vesaAvailable = gInfo->vesa_modes != NULL;
 
 	// Add initial VESA modes.
-	display_mode* initialModes = (display_mode*)malloc(
-		sizeof(display_mode) * gInfo->shared_info->vesa_mode_count);
+	display_mode* initialModes = NULL;
+	if (vesaAvailable) {
+		initialModes = (display_mode*)malloc(
+			sizeof(display_mode) * gInfo->shared_info->vesa_mode_count);
+	}
+
 	if (initialModes != NULL) {
 		initialModesCount = gInfo->shared_info->vesa_mode_count;
 		vesa_mode* vesaModes = gInfo->vesa_modes;
@@ -91,12 +109,27 @@ create_mode_list(void)
 			fill_display_mode(vesaModes[i].width, vesaModes[i].height,
 				&initialModes[i]);
 		}
+	} else {
+		// UEFI doesn't give us any VESA modes
+		initialModes = (display_mode*)malloc(sizeof(display_mode));
+		if (initialModes != NULL) {
+			initialModesCount = 1;
+
+			compute_display_timing(initialModes[0].virtual_width,
+				initialModes[0].virtual_height, 60, false,
+				&initialModes[0].timing);
+			fill_display_mode(initialModes[0].virtual_width,
+				initialModes[0].virtual_height, &initialModes[0]);
+		}
 	}
+
+	const color_space *colorSpaces = vesaAvailable ? kVesaSpaces : kUefiSpaces;
+	size_t colorSpaceCount = vesaAvailable ?
+		sizeof(kVesaSpaces) / sizeof(kVesaSpaces[0]) : 1;
 
 	gInfo->mode_list_area = create_display_modes("vesa modes",
 		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
-		initialModes, initialModesCount,
-		kVesaSpaces, sizeof(kVesaSpaces) / sizeof(kVesaSpaces[0]),
+		initialModes, initialModesCount, colorSpaces, colorSpaceCount,
 		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
 
 	free(initialModes);
@@ -163,6 +196,10 @@ vesa_set_display_mode(display_mode* _mode)
 		return B_BAD_VALUE;
 
 	vesa_mode* modes = gInfo->vesa_modes;
+	if (modes == NULL)
+		return B_BAD_VALUE;
+			// UEFI has no VESA modes
+
 	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
 		// TODO: list is ordered, we could use binary search

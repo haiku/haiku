@@ -402,10 +402,12 @@ vesa_init(vesa_info& info)
 		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
 	}
 
-	vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
-		sharedInfo.dpms_capabilities);
-	if (bufferInfo->depth <= 8)
-		vbe_set_bits_per_gun(info, 8);
+	if (modes != NULL) {
+		vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
+			sharedInfo.dpms_capabilities);
+		if (bufferInfo->depth <= 8)
+			vbe_set_bits_per_gun(info, 8);
+	}
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;
@@ -477,6 +479,9 @@ vesa_get_dpms_mode(vesa_info& info, uint32& mode)
 	mode = B_DPMS_ON;
 		// we always return a valid mode
 
+	if (info.modes == NULL)
+		return B_ERROR;
+
 	// Prepare BIOS environment
 	bios_state* state;
 	status_t status = vbe_call_prepare(&state);
@@ -514,6 +519,9 @@ out:
 status_t
 vesa_set_dpms_mode(vesa_info& info, uint32 mode)
 {
+	if (info.modes == NULL)
+		return B_ERROR;
+
 	// Only let supported modes through
 	mode &= info.shared_info->dpms_capabilities;
 
