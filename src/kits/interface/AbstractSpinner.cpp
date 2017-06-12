@@ -1452,7 +1452,7 @@ BAbstractSpinner::_DrawLabel(BRect updateRect)
 	float y = rect.top
 		+ roundf((rect.Height() + 1.0f - fontHeight.ascent
 			- fontHeight.descent) / 2.0f)
-		+ fontHeight.ascent + kFrameMargin * 2;
+		+ fontHeight.ascent;
 
 	uint32 flags = be_control_look->Flags(this);
 
@@ -1624,7 +1624,7 @@ BAbstractSpinner::_ValidateLayoutData()
 	if (fLayoutData->valid)
 		return;
 
-	font_height fontHeight = fLayoutData->font_info;
+	font_height& fontHeight = fLayoutData->font_info;
 	GetFontHeight(&fontHeight);
 
 	if (Label() != NULL) {
