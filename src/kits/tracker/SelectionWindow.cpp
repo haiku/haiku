@@ -36,9 +36,10 @@ All rights reserved.
 #include <Alert.h>
 #include <Box.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
-#include <MessageFilter.h>
 #include <WindowPrivate.h>
 
 #include "AutoLock.h"
@@ -63,7 +64,8 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 	BWindow(BRect(0, 0, 270, 0), B_TRANSLATE("Select"),	B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_V_RESIZABLE
 			| B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS
-			| B_NOT_ANCHORED_ON_ACTIVATE),
+			| B_NOT_ANCHORED_ON_ACTIVATE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_CLOSE_ON_ESCAPE),
 	fParentWindow(window)
 {
 	if (window->Feel() & kDesktopWindowFeel) {
@@ -75,12 +77,7 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 
 	AddToSubset(fParentWindow);
 
-	BView* backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL,
-		B_WILL_DRAW);
-	backgroundView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	AddChild(backgroundView);
-
-	BMenu* menu = new BPopUpMenu("");
+	BMenu* menu = new BPopUpMenu("popup");
 	menu->AddItem(new BMenuItem(B_TRANSLATE("starts with"),	NULL));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("ends with"), NULL));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("contains"), NULL));
@@ -94,106 +91,44 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 		// Set wildcard matching to default.
 
 	// Set up the menu field
-	fMatchingTypeMenuField = new BMenuField(BRect(7, 6,
-		Bounds().right - 5, 0), NULL, B_TRANSLATE("Name"), menu);
-	backgroundView->AddChild(fMatchingTypeMenuField);
-	fMatchingTypeMenuField->SetDivider(fMatchingTypeMenuField->StringWidth(
-		B_TRANSLATE("Name")) + 8);
-	fMatchingTypeMenuField->ResizeToPreferred();
+	fMatchingTypeMenuField = new BMenuField("name", B_TRANSLATE("Name"), menu);
 
 	// Set up the expression text control
-	fExpressionTextControl = new BTextControl(BRect(7,
-			fMatchingTypeMenuField->Bounds().bottom + 11,
-			Bounds().right - 6, 0),
-		NULL, NULL, NULL, NULL, B_FOLLOW_LEFT_RIGHT);
-	backgroundView->AddChild(fExpressionTextControl);
-	fExpressionTextControl->ResizeToPreferred();
-	fExpressionTextControl->MakeFocus(true);
+	fExpressionTextControl = new BTextControl("expression", NULL, "", NULL);
 
 	// Set up the Invert checkbox
-	fInverseCheckBox = new BCheckBox(
-		BRect(7, fExpressionTextControl->Frame().bottom + 6, 6, 6), NULL,
-		B_TRANSLATE("Invert"), NULL);
-	backgroundView->AddChild(fInverseCheckBox);
-	fInverseCheckBox->ResizeToPreferred();
+	fInverseCheckBox = new BCheckBox("inverse", B_TRANSLATE("Invert"), NULL);
+	fInverseCheckBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	// Set up the Ignore Case checkbox
 	fIgnoreCaseCheckBox = new BCheckBox(
-		BRect(fInverseCheckBox->Frame().right + 10,
-			fInverseCheckBox->Frame().top, 6, 6),
-		NULL, B_TRANSLATE("Ignore case"), NULL);
+		"ignore", B_TRANSLATE("Ignore case"), NULL);
+	fIgnoreCaseCheckBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	fIgnoreCaseCheckBox->SetValue(1);
-	backgroundView->AddChild(fIgnoreCaseCheckBox);
-	fIgnoreCaseCheckBox->ResizeToPreferred();
 
 	// Set up the Select button
-	fSelectButton = new BButton(BRect(0, 0, 5, 5), NULL,
-		B_TRANSLATE("Select"), new BMessage(kSelectButtonPressed),
-		B_FOLLOW_RIGHT);
-
-	backgroundView->AddChild(fSelectButton);
-	fSelectButton->ResizeToPreferred();
-	fSelectButton->MoveTo(Bounds().right - 10 - fSelectButton->Bounds().right,
-		fExpressionTextControl->Frame().bottom + 9);
+	fSelectButton = new BButton("select", B_TRANSLATE("Select"),
+		new BMessage(kSelectButtonPressed));
+	fSelectButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	fSelectButton->MakeDefault(true);
-#if !B_BEOS_VERSION_DANO
-	fSelectButton->SetLowColor(backgroundView->ViewColor());
-	fSelectButton->SetViewColor(B_TRANSPARENT_COLOR);
-#endif
 
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-	// Center the checkboxes vertically to the button
-	float topMiddleButton =
-		(fSelectButton->Bounds().Height() / 2 -
-		(fh.ascent + fh.descent + fh.leading + 4) / 2)
-		+ fSelectButton->Frame().top;
-	fInverseCheckBox->MoveTo(fInverseCheckBox->Frame().left, topMiddleButton);
-	fIgnoreCaseCheckBox->MoveTo(fIgnoreCaseCheckBox->Frame().left,
-		topMiddleButton);
-
-	float bottomMinWidth = 32 + fSelectButton->Bounds().Width()
-		+ fInverseCheckBox->Bounds().Width()
-		+ fIgnoreCaseCheckBox->Bounds().Width();
-	float topMinWidth = be_plain_font->StringWidth(
-		B_TRANSLATE("Name matches wildcard expression:###"));
-	float minWidth = bottomMinWidth > topMinWidth
-		? bottomMinWidth : topMinWidth;
-
-	class EscapeFilter : public BMessageFilter {
-	public:
-		EscapeFilter(BWindow* target)
-			:
-			BMessageFilter(B_KEY_DOWN),
-			fTarget(target)
-		{
-		}
-
-		virtual filter_result Filter(BMessage* message, BHandler** _target)
-		{
-			int8 byte;
-			if (message->what == B_KEY_DOWN
-				&& message->FindInt8("byte", &byte) == B_OK
-				&& byte == B_ESCAPE) {
-				fTarget->Hide();
-				return B_SKIP_MESSAGE;
-			}
-			return B_DISPATCH_MESSAGE;
-		}
-
-	private:
-		BWindow* fTarget;
-	};
-	AddCommonFilter(new(std::nothrow) EscapeFilter(this));
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.Add(fMatchingTypeMenuField)
+		.Add(fExpressionTextControl)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fInverseCheckBox)
+			.Add(fIgnoreCaseCheckBox)
+			.AddGlue(100.0)
+			.Add(fSelectButton)
+			.End()
+		.End();
 
 	Run();
 
 	Lock();
-	ResizeTo(minWidth, fSelectButton->Frame().bottom + 6);
-
-	SetSizeLimits(minWidth, 1280, Bounds().bottom, Bounds().bottom);
-
 	MoveCloseToMouse();
+	fExpressionTextControl->MakeFocus(true);
 	Unlock();
 }
 
