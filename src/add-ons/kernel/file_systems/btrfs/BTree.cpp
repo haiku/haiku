@@ -57,19 +57,19 @@ BTree::~BTree()
 
 
 int32
-BTree::_CompareKeys(btrfs_key& key1, btrfs_key& key2)
+btrfs_key::Compare(const btrfs_key& key) const
 {
-	if (key1.ObjectID() > key2.ObjectID())
+	if (ObjectID() > key.ObjectID())
 		return 1;
-	if (key1.ObjectID() < key2.ObjectID())
+	if (ObjectID() < key.ObjectID())
 		return -1;
-	if (key1.Type() > key2.Type())
+	if (Type() > key.Type())
 		return 1;
-	if (key1.Type() < key2.Type())
+	if (Type() < key.Type())
 		return -1;
-	if (key1.Offset() > key2.Offset())
+	if (Offset() > key.Offset())
 		return 1;
-	if (key1.Offset() < key2.Offset())
+	if (Offset() < key.Offset())
 		return -1;
 	return 0;
 }
@@ -101,12 +101,12 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 		TRACE("Find() level %d\n", stream->header.Level());
 		uint32 i = 1;
 		for (; i < stream->header.ItemCount(); i++) {
-			int32 comp = _CompareKeys(stream->index[i].key, key);
+			int32 comp = key.Compare(stream->index[i].key);
 			TRACE("Find() found index %" B_PRIu32 " at %" B_PRId64 " comp %"
 				B_PRId32 "\n", i, stream->index[i].BlockNum(), comp);
-			if (comp < 0)
+			if (comp > 0)
 				continue;
-			if (comp > 0 || type == BTREE_BACKWARD)
+			if (comp < 0 || type == BTREE_BACKWARD)
 				break;
 		}
 		TRACE("Find() getting index %" B_PRIu32 " at %" B_PRId64 "\n", i - 1,
@@ -125,7 +125,7 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 #ifdef TRACE_BTRFS
 	TRACE("Find() dump count %" B_PRId32 "\n", stream->header.ItemCount());
 	for (i = 0; i < stream->header.ItemCount(); i++) {
-		int32 comp = _CompareKeys(key, stream->entries[i].key);
+		int32 comp = key.Compare(stream->entries[i].key);
 		TRACE("Find() dump %" B_PRIu32 " %" B_PRIu32 " offset %" B_PRId64
 			" comp %" B_PRId32 "\n", stream->entries[i].Offset(),
 			stream->entries[i].Size(), stream->entries[i].key.Offset(), comp);
@@ -133,7 +133,7 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 #endif
 
 	for (i = 0; i < stream->header.ItemCount(); i++) {
-		int32 comp = _CompareKeys(key, stream->entries[i].key);
+		int32 comp = key.Compare(stream->entries[i].key);
 		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 " oid %" B_PRId64
 			" type %d offset %" B_PRId64 " comp %" B_PRId32 "\n",
 			stream->entries[i].Offset(), stream->entries[i].Size(),

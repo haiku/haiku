@@ -58,8 +58,6 @@ private:
 								BTree& operator=(const BTree& other);
 									// no implementation
 
-			int32				_CompareKeys(btrfs_key& key1,
-									btrfs_key& key2);
 			status_t			_Find(btrfs_key& key, void** value,
 									size_t* size, btree_traversing type);
 			void				_AddIterator(TreeIterator* iterator);

@@ -26,6 +26,8 @@ struct btrfs_key {
 	void SetObjectID(uint64 id) { object_id = B_HOST_TO_LENDIAN_INT64(id); }
 	void SetType(uint8 key_type) { type = key_type; }
 	void SetOffset(uint64 off) { offset = B_HOST_TO_LENDIAN_INT64(off); }
+	int32 Compare(const btrfs_key& key) const;
+		//implemented in BTree.cpp
 } _PACKED;
 
 
