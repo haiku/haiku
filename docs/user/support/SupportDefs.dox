@@ -203,7 +203,7 @@
 
 /*!
 	\typedef typedef int32 status_t
-	\brief Represents one of the status codes defined in Error.h.
+	\brief Represents one of the status codes defined in Errors.h.
 
 	\since BeOS R3
 */
