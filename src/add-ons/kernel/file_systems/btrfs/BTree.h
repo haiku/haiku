@@ -14,6 +14,8 @@
 #define BTREE_NULL			-1LL
 #define BTREE_FREE			-2LL
 
+#define BTRFS_MAX_TREE_DEPTH		8
+
 
 enum btree_traversing {
 	BTREE_FORWARD = 1,
@@ -36,6 +38,62 @@ class TreeIterator;
 struct node_and_key {
 	off_t	nodeOffset;
 	uint16	keyIndex;
+};
+
+
+class BNode {
+public:
+								BNode(void* cache);
+								BNode(void* cache, off_t block);
+								~BNode();
+
+					// just return from Header
+				uint64			BlockNum() const
+					{ return fNode->header.BlockNum(); }
+				uint64			Flags() const
+					{ return fNode->header.Flags(); }
+				uint64			Generation() const
+					{ return fNode->header.Generation(); }
+				uint64			Owner() const
+					{ return fNode->header.Owner(); }
+				uint32			ItemCount() const
+					{ return fNode->header.ItemCount(); }
+				uint8			Level() const
+					{ return fNode->header.Level(); }
+
+				btrfs_index*	Index(uint32 i) const
+					{ return &fNode->index[i]; }
+
+				btrfs_entry*	Item(uint32 i) const
+					{ return &fNode->entries[i]; }
+				uint8*			ItemData(uint32 i) const
+					{ return (uint8*)Item(0) + Item(i)->Offset(); }
+
+				void			Keep();
+				void			Unset();
+
+
+				void			SetTo(off_t block);
+				void			SetToWritable(off_t block,
+									int32 transactionId, bool empty);
+
+				off_t			BlockNumber() const { return fBlockNumber; }
+				bool			IsWritable() const { return fWritable; }
+private:
+								BNode(const BNode&);
+								BNode& operator=(const BNode&);
+									//no implementation
+
+			btrfs_stream* 		fNode;
+			void* 				fCache;
+			off_t				fBlockNumber;
+			uint32 				fCurrentSlot;
+			bool				fWritable;
+};
+
+
+class BPath {
+	BNode* nodes[BTRFS_MAX_TREE_DEPTH];
 };
 
 

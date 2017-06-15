@@ -21,6 +21,79 @@
 #	define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
 
 
+BNode::BNode(void* cache)
+	:
+	fNode(NULL),
+	fCache(cache),
+	fBlockNumber(0),
+	fCurrentSlot(0),
+	fWritable(false)
+{
+}
+
+
+BNode::BNode(void* cache, off_t block)
+	:
+	fNode(NULL),
+	fCache(cache),
+	fBlockNumber(0),
+	fCurrentSlot(0),
+	fWritable(false)
+{
+	SetTo(block);
+}
+
+
+BNode::~BNode()
+{
+	Unset();
+}
+
+
+void
+BNode::Keep()
+{
+	fNode = NULL;
+}
+
+void
+BNode::Unset()
+{
+	if (fNode != NULL) {
+		block_cache_put(fCache, fBlockNumber);
+		fNode = NULL;
+	}
+}
+
+
+void
+BNode::SetTo(off_t block)
+{
+	Unset();
+	fBlockNumber = block;
+	fNode = (btrfs_stream*)block_cache_get(fCache, block);
+}
+
+
+void
+BNode::SetToWritable(off_t block, int32 transactionId, bool empty)
+{
+	Unset();
+	fBlockNumber = block;
+	fWritable = true;
+	if (empty) {
+		fNode = (btrfs_stream*)block_cache_get_empty(fCache, block,
+			transactionId);
+	} else {
+		fNode = (btrfs_stream*)block_cache_get_writable(fCache, block,
+			transactionId);
+	}
+}
+
+
+//-pragma mark
+
+
 BTree::BTree(Volume* volume, btrfs_stream* stream)
 	:
 	fStream(stream),
