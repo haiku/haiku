@@ -389,7 +389,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_NO_MEMORY;
 
 	// ready
-	status = get_vnode(fFSVolume, BTRFS_OBJECT_ID_CHUNK_TREE,
+	status = get_vnode(fFSVolume, BTRFS_FIRST_SUBVOLUME,
 		(void**)&fRootNode);
 	if (status != B_OK) {
 		ERROR("could not create root node: get_vnode() failed!\n");
@@ -492,7 +492,7 @@ Volume::FindBlock(off_t logical, off_t& physical)
 	btrfs_key search_key;
 	search_key.SetOffset(logical);
 	search_key.SetType(BTRFS_KEY_TYPE_CHUNK_ITEM);
-	search_key.SetObjectID(BTRFS_OBJECT_ID_CHUNK_TREE);
+ 	search_key.SetObjectID(BTRFS_OBJECT_ID_FIRST_CHUNK_TREE);
 	btrfs_chunk* chunk;
 	size_t chunk_length;
 	status_t status = fChunkTree->FindPrevious(search_key, (void**)&chunk,
