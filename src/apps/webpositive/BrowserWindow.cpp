@@ -735,12 +735,10 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 				// Do it in such a way that the user sees the Go-button go down.
 				_InvokeButtonVisibly(fURLInputGroup->GoButton());
 				return;
-			}
-			// Lock the URL text control to prevent changes while user is
-			// typing and set a timer to unlock it after a set period
-			// of time.
-			else {
-				fURLInputGroup->LockURLInput();
+			} else if (bytes[0] == B_ESCAPE) {
+				// Replace edited text with the current URL.
+				fURLInputGroup->LockURLInput(false);
+				fURLInputGroup->SetText(CurrentWebView()->MainFrameURL());
 			}
 		} else if (target == fFindTextControl->TextView()) {
 			// Handle B_RETURN when the find text control has focus.
@@ -1314,6 +1312,10 @@ BrowserWindow::SetCurrentWebView(BWebView* webView)
 		} else
 			webView->MakeFocus(true);
 
+		bool state = fURLInputGroup->IsURLInputLocked();
+		fURLInputGroup->LockURLInput(false);
+			// Unlock it so the following code can update the URL
+
 		if (userData != NULL) {
 			fURLInputGroup->SetPageIcon(userData->PageIcon());
 			if (userData->URLInputContents().Length())
@@ -1329,6 +1331,9 @@ BrowserWindow::SetCurrentWebView(BWebView* webView)
 			fURLInputGroup->SetPageIcon(NULL);
 			fURLInputGroup->SetText(webView->MainFrameURL());
 		}
+
+		fURLInputGroup->LockURLInput(state);
+			// Restore the state
 
 		// Trigger update of the interface to the new page, by requesting
 		// to resend all notifications.
@@ -1474,8 +1479,15 @@ BrowserWindow::CloseWindowRequested(BWebView* view)
 void
 BrowserWindow::LoadNegotiating(const BString& url, BWebView* view)
 {
-	if (view != CurrentWebView())
-		return;
+	if (view != CurrentWebView()) {
+		// Update the userData contents instead so the user sees
+		// the correct URL when they switch back to that tab.
+		PageUserData* userData = static_cast<PageUserData*>(
+			view->GetUserData());
+		if (userData != NULL && userData->URLInputContents().Length() == 0) {
+			userData->SetURLInputContents(url);
+		}
+	}
 
 	fURLInputGroup->SetText(url.String());
 
@@ -1729,6 +1741,8 @@ void
 BrowserWindow::UpdateGlobalHistory(const BString& url)
 {
 	BrowsingHistory::DefaultInstance()->AddItem(BrowsingHistoryItem(url));
+
+	fURLInputGroup->SetText(CurrentWebView()->MainFrameURL());
 }
 
 

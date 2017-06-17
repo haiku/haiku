@@ -151,7 +151,6 @@ public:
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
-	virtual	void				SetPreviousText(const char* text);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -170,7 +169,6 @@ private:
 private:
 			URLInputGroup*		fURLInputGroup;
 			TextViewCompleter*	fURLAutoCompleter;
-			BString				fPreviousText;
 			bool				fUpdateAutoCompleterChoices;
 };
 
@@ -181,7 +179,6 @@ URLInputGroup::URLTextView::URLTextView(URLInputGroup* parent)
 	fURLInputGroup(parent),
 	fURLAutoCompleter(new TextViewCompleter(this,
 		new BrowsingHistoryChoiceModel())),
-	fPreviousText(""),
 	fUpdateAutoCompleterChoices(true)
 {
 	MakeResizable(true);
@@ -285,8 +282,8 @@ URLInputGroup::URLTextView::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_ESCAPE:
-			// Revert to text as it was when we received keyboard focus.
-			SetText(fPreviousText.String());
+			// Text already unlocked && replaced in BrowserWindow,
+			// now select it.
 			SelectAll();
 			break;
 
@@ -295,37 +292,34 @@ URLInputGroup::URLTextView::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		default:
+		{
+			BString currentText = Text();
 			BTextView::KeyDown(bytes, numBytes);
+			// Lock the URL input if it was modified
+			if (!fURLInputGroup->IsURLInputLocked()
+				&& Text() != currentText)
+				fURLInputGroup->LockURLInput();
 			break;
+		}
 	}
 }
 
 void
 URLInputGroup::URLTextView::MakeFocus(bool focus)
 {
-	// Unlock the URL input ahead of time if focus was lost.
-	if (!focus) {
+	// Unlock the URL input if focus was lost.
+	if (!focus)
 		fURLInputGroup->LockURLInput(false);
-	}
 
 	if (focus == IsFocus())
 		return;
 
 	BTextView::MakeFocus(focus);
 
-	if (focus) {
-		fPreviousText = Text();
+	if (focus)
 		SelectAll();
-	}
 
 	fURLInputGroup->Invalidate();
-}
-
-
-void
-URLInputGroup::URLTextView::SetPreviousText(const char* text)
-{
-	fPreviousText = text;
 }
 
 
@@ -596,7 +590,6 @@ private:
 URLInputGroup::URLInputGroup(BMessage* goMessage)
 	:
 	BGroupView(B_HORIZONTAL, 0.0),
-	fURLLockTimeout(NULL),
 	fWindowActive(false),
 	fURLLocked(false)
 {
@@ -629,7 +622,6 @@ URLInputGroup::URLInputGroup(BMessage* goMessage)
 
 URLInputGroup::~URLInputGroup()
 {
-	delete fURLLockTimeout;
 }
 
 
@@ -683,14 +675,9 @@ URLInputGroup::TextView() const
 void
 URLInputGroup::SetText(const char* text)
 {
-	// Ignore setting the text, if the user edited the URL in the last
-	// couple of seconds. Instead set the previous text in the text view,
-	// so if the user presses ESC the input will update to show the new
-	// text.
-	if (fURLLocked) {
-		fTextView->SetPreviousText(text);
+	// Ignore setting the text, if the input is locked.
+	if (fURLLocked)
 		return;
-	}
 
 	if (!text || !Text() || strcmp(Text(), text) != 0) {
 		fTextView->SetUpdateAutoCompleterChoices(false);
@@ -721,37 +708,15 @@ URLInputGroup::SetPageIcon(const BBitmap* icon)
 }
 
 
+bool
+URLInputGroup::IsURLInputLocked() const
+{
+	return fURLLocked;
+}
+
+
 void
 URLInputGroup::LockURLInput(bool lock)
 {
 	fURLLocked = lock;
-	if (lock) {
-		if (fURLLockTimeout == NULL) {
-			fURLLockTimeout = new BMessageRunner(this,
-				new BMessage(MSG_LOCK_TIMEOUT), LOCK_TIMEOUT, 1);
-		} else {
-			fURLLockTimeout->SetInterval(LOCK_TIMEOUT);
-		}
-	}
 }
-
-
-void
-URLInputGroup::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case MSG_LOCK_TIMEOUT:
-		{
-			delete fURLLockTimeout;
-			fURLLockTimeout = NULL;
-			LockURLInput(false);
-			break;
-		}
-		default:
-		{
-			BGroupView(message);
-			break;
-		}
-	}
-}
-
