@@ -64,8 +64,8 @@
 <span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Kaikki Haikun mukana toimitettavat komentorivisovellukset ovat kansiossa  <span class="path">/boot/system/bin</span>. Omat tai ylimääräisinä asennetut komentorivisovellukset voivat olla myös siellä tai kansiossa <span class="path">~/config/bin</span>, kun ne asennetaan .hpkg-pakkauksesta. Muussa tapauksessa voit laittaa ne kansioon <span class="path">/boot/system/non-packaged/bin/</span> tai kansioon <span class="path">~/config/non-packaged/bin/</span>. Kaikki nämä sijainnit ovat PATH-muuttujan osia ja löytyvät siksi automaattisesti.<br />
+Seuraava ei ole tyhjentävä luettelo kaikista Haiku-kohtaisista CLI-sovelluksista, se palvelee vain korostamalla muutamaa kaikkein hyödyllisintä antaen sinulle makua komentorivisovelluksista. Rohkaistu itse omalta osaltasi tutkimaan, mitä on <span class="path">bin/</span> -kansioissa. Sovelluksen suorittaminen parametrillä <tt>--help</tt> näyttää komennon käytön ja kaikki sen eri valitsimet.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">Attribuutteihin liittyvät sovellukset: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
@@ -78,10 +78,10 @@ Kaikki nämä komennot on kuvailtu aiheessa <a href="../attributes.html#attribut
 Nämä komennot kuvaillaan aiheessa <a href="../index.html">Hakemisto</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-pkg" name="cli-pkg">Relating to package management: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to create so-called recipes for automatic package building.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: It is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt>.</p>
+<a id="cli-pkg" name="cli-pkg">Pakkaushallintaan liittyvää: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
+<p>Komentoa <span class="cli">package</span> käytetään hallitsemaan HPKG-pakkauksia. Vilkaise artikkelia <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Sovellusten asentaminen</a> oppiaksesi perusteet. Tavallisesti käytetään työkalua <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> luomaan niin kutsuttua valmistusohjeita (recipes) pakkausten automaattiseen rakentamiseen.</p>
+<p>Komentoa <span class="cli">pkgman</span> käytetään etsimään, asentamaan, päivittämäänä ja poistamaan pakkauksia. Pakkaustietovarastoja voidaan lisätä, poistaa tai niiden pakkausluetteloita voidaan päivittää. Erityistyyppinen päivitys kutsutaan parametrillä <tt>full-sync</tt>: Se on agressiivisempi ja alentaa tai poistaa pakkauksia, jos on välttämätöntä.<br />
+Lisätietoja parametreistä saa lisäämällä ”--help”, esim.: <tt>pkgman search --help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">Hyödylliset skriptikomennot</a></h3>
@@ -139,19 +139,19 @@ mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 		<td valign="top"><p><span class="cli">open</span> on hyvin kätevä pieni työkalu. Sillä voi avata minkä tahansa tiedoston sen parhaimmaksi katsotulla sovelluksella, tai käynnistää tietyn sovelluksen sen tunnisteen avulla tietämättä sen tarkkaa polkua. Se toimii myös verkko-osoitteiden ja vieläpä "virtuaali"-kansioiden kanssa <tt>.</tt> nykyiselle kansiolle ja  <tt>..</tt> äitikansiolle, avaten kansion Seuraajassa.</p>
 </td></tr>
 <tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
-To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+		<td valign="top"><p>Ramlevy on kuten kiintolevy, jota käytetään vain tietokoneen muistissa. Se tekee siitä hyvin nopean, mutta myös lyhytkestoisen, koska sen sisältö häviää, kun suljet tietokoneen tai se kaatuu tai koet virtakatkoksen.<br />
+Yhden gibitavun ramlevyn luomiseksi formatoi muistia nimellä ”RAMses” ja liitä se kirjoittamalla seuraavat rivit Pääteikkunassa tai luomalla niistä skriptin:</p>
 <pre class="terminal">ramdisk create -s 1gb
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
 mountvolume RAMses</pre>
-<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
-<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
+<p>Huomaa: Kun luodaan ramlevy, komento <span class="cli">ramdisk</span> tulostaa polun siihen. Jos luot useita levyjä, tuo polku <span class="path">/dev/disk/virtual/ram/0/raw</span> muuttuu!</p>
+<p>Sisällön säilyttämiseksi, ellei iske mikään tuho kuten virtakatkos, ramlevy voidaan asettaa lukemaan/kirjoittamaan järjestelmäkuva kiintolevylle. Sitä varten sinun on tarjottava halutun kokoinen tiedosto, joka luetaan joka kerta, kun käynnistät ramlevyn, ja kirjoittaa siihen kun irrotat ramlevyn. Luodaksesi 500 mebitavun kokoisen ”RAMimage”-järjestelmäkuvatiedoston ja sen formatoimiseksi tee tämä:</p>
 <pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
-<p>From now on, you start the ramdisk like this:</p>
+<p>Tämän jälkeen käynnistät ramlevyn kuten tämä:</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
+<p>On hyvin tärkeää aina irrottaa ramlevy siististi joka Jäljittäjästä tai Pääteikkunan komennolla <span class="cli">unmount /RAMimage</span>, tai muutokset eivät tallennu takaisin levykuvatiedostoon!</p>
 </td></tr>
 </table>
 </div>

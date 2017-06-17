@@ -13,6 +13,7 @@
  *		Oscar Carballal
  *		killa.fr0gg
  *		miguel~1.mx
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -58,11 +59,10 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Índice</td></tr>
+<tr class="heading"><td>Contenido</td></tr>
 <tr class="index"><td>
 	<a href="#preparations">Preparativos</a><br />
 	<a href="#custom-filetype">Crear un tipo de archivo personalizado</a><br />
@@ -84,9 +84,9 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">Preparativos</a></h2>
-<p>Let's first decide what filetype and attributes would serve our needs. Originally, I planned to use a bookmark file with a link to the movie's IMdB page, but since Haiku didn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at that time, I came up with this: The file itself will be a JPEG image for the movie cover.<br />
-With <span class="app">WebPositive</span>, Haiku now has a browser using bookmark files again, so you could as well use a bookmark file instead of an image as basic filetype for our database files.<br />
-In any case, to these files we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
+<p>Primero decida qué tipo de archivo y atributos cubrirá nuestras necesidades. Originalmente, yo quise utilizar un archivo de marcadores con un enlace a la página de la película en IMDB, pero Haiku no disponía en ese momento de un navegador con marcadores como el <span class="app">NetPositive</span> de BeOS, así que se me ocurrió esto: el archivo mismo sería una imagen JPEG para la portada de la película.<br />
+Con <span class="app">WebPositive</span>, Haiku ahora tiene otra vez un navegador que usa marcadores, así que igual podría usar un archivo marcador en lugar de una imagen como su tipo de archivo base para nuestros archivos de base de datos.<br />
+De cualquier forma, a estos archivos añadimos algunos atributos. Aquí tendremos que decidir si vamos a querer hacer una consulta sobre ellos más adelante (y tendríamos que añadirle al índice) y si es así, qué tipo de atributo deberá ser. Los números (int, float) pueden ser evaluados de forma diferente al texto (&lt;/=/&gt; en lugar de es/contiene/comienza por).</p>
 <p>Aquí están los atributos que me gustaría ver para mis DVDs:</p>
 <ul>
 <li>Título de la película</li>
@@ -137,7 +137,7 @@ In any case, to these files we add a couple of attributes. Here we have to decid
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="extra_attribute" name="extra_attribute">Atributos adicionales</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel to enter all the data for the new attribute. You can edit an existing attribute with a double-click.</p>
+<p>Aquí ingresamos todos los atributos personalizados que decidimos en nuestras preparaciones. Dando clic en el botón <span class="button">Add... (Añadir)</span> abre un panel para ingresar todos los datos para el nuevo atributo. Puede editar un atributo existente con un doble clic.</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
 <li><p><i>Attribute Name</i> (nombre del atributo) - Aparece, p. ej., como la columna de encabezado en las ventanas de Tracker.</p></li>

@@ -58,6 +58,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Zavádzač systému</h1>
 
@@ -72,32 +73,31 @@ Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí pro
 <tr><td><b>Vyberte zavádzací zväzok</b></td><td> </td><td>Vyberte, ktorú inštaláciu/verziu Haiku chcete spustiť.</td></tr>
 <tr><td><b>Vyberte voľby bezpečného režimu</b></td><td> </td><td>V prípade problémov súvisiacich s hardvérom alebo ak sa systém stane nestabilný alebo ho nie je možné spustiť z dôvodu nesprávneho správania doplnku, existuje niekoľko volieb, ktoré môžete skúsiť. Pri označení každej z volieb sa zobrazí na spodku obrazovky jej krátky popis.</td></tr>
 <tr><td></td><td></td><td>
-	<p><span class="menu">Bezpečný režim</span><br />
-		Uvedie systém do bezpečného režimu. Túto voľbu je možné zapnúť nezávisle na ostatných voľbách.</p>
-	<p><span class="menu">Zakázať používateľské doplnky</span><br />
-		Zabráni načítaniu všetkých používateľom nainštalovaných doplnkov. Použijú sa iba doplnky v adresári system. Pozri <a href="#troubleshooting">Riešenie problémov</a> nižšie.</p>
-	<p><span class="menu">Zakázať IDE DMA</span><br />
-		Zakáže IDE DMA, čím zvýši kompatibilitu IDE na úkor výkonu.</p>
-	<p><span class="menu">Ignorovať pamäť nad 4 GiB</span><br />
-		Ignoruje všetku pamäť nad adresným obmedzením 4 GiB. Má preferenciu pred nastavením v súbore nastavení jadra.
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
 </p>
-	<p><span class="menu">Použiť bezpečný video režim</span><br />
-		Systém použije režim VESA a nebude sa pokúšať používať žiadne grafické ovládače.</p>
-	<p><span class="menu">Zakázať IO-APIC</span><br />
-		Zakáže používanie IO APIC na smerovanie prerušení, čím vynúti použitie historického PIC.</p>
-	<p><span class="menu">Zakázať miestny APIC</span><br />
-		Zakáže používanie miestneho APIC, tiež zakáže SMP.</p>
-	<p><span class="menu">Zakázať SMP</span><br />
-		Zakáže všetky jadrá CPU okrem jedného.</p>
-	<p><span class="menu">Nevolať BIOS</span><br />
-		Zabráni systému volať funkcie BIOSu.</p>
-	<p><span class="menu">Zakázať APM</span><br />
-		Zakáže hardvérovú podporu Pokročilého riadenia napájania (APM). Má preferenciu pred nastavením APM v súbore nastavení jadra.</p>
-	<p><span class="menu">Zakázať ACPI</span><br />
-		Zakáže hardvérovú podporu ACPI. Má preferenciu pred nastavením ACPI v súbore nastavení jadra.</p>
-	<p><span class="menu">Položky čiernej listiny</span><br />
-		Umožňuje vybrať súbory systému, ktoré sa majú ignorovať. To je užitočné napr. na dočasné vypnutie ovládačov. Pozri <a href="#troubleshooting">Riešenie problémov</a> nižšie.</p>
-</td></tr>
+	<p><span class="menu">Use fail-safe graphics driver</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Vyberte voľby ladenia</b>
 </td><td> </td><td>Tu nájdete niekoľko volieb, ktoré pomáhajú pri ladení alebo získavaní podrobností do <a href="../../welcome/sk/bugreports.html">hlásenia chyby</a>. Dolu má opäť každá voľba krátke vysvetlenie.</td></tr>
 <tr><td></td><td></td><td>
@@ -121,7 +121,7 @@ Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí pro
 		Zobrazí syslog z predošlej relácie Haiku</p>
 	<p><span class="menu">Uložiť syslog z predošlej relácie</span><br />
 		Uloží syslog z predošlej relácie Haiku na disk. Momentálne sú podporované iba súborové systémy FAT32.</p></td></tr>
-<tr><td class="onelinetop"><b>Vyberte bezpečný grafický režim</b></td><td> </td><td>Ak ste museli aktivovať voľbu <i>Použiť bezpečný grafický režim</i>, tu môžete nastaviť rozlíšenie a farebnú hĺbku.</td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

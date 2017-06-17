@@ -14,6 +14,7 @@
  *		miguel~1.mx
  *		Humdinger
  *		killa.fr0gg
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -59,10 +60,9 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Índice</td></tr>
+<tr class="heading"><td>Contenido</td></tr>
 <tr class="index"><td>
 	<a href="#deskbar-menu">El menú Deskbar</a><br />
 	<a href="#tray">La bandeja de sistema</a><br />
@@ -90,57 +90,58 @@
 <li><p><b>Preferencias del Deskbar (Barra de Escritorio)</b> - Abre un panel para configurar el Deskbar (mirar abajo).</p></li>
 <li><p><b>Apagar</b> - Ofrece la opción de  <span class="menu">Reiniciar</span> o <span class="menu">Apagar el Sistema</span>.</p></li>
 <li><p><b>Documentos, Carpetas, Aplicaciones Recientes</b> - Lista de los últimos documentos, carpetas y aplicaciones a las que se ha accedido recientemente (ver <span class="menu">Preferencias del Deskbar</span> abajo).</p></li>
-<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - Listado de las aplicaciones, demos, applets y preferencias.
+<br />Puede añadir enlaces a otros programas (o cualquier carpeta, documento, consulta, etc.) al ponerlas en <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferencias del Deskbar</h3>
 <img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
-<p>The Deskbar preference panel is devided into three sections.</p>
+<p>El panel de preferencias del Deskbar se divide en tres secciones.</p>
 
-<h4>Applications</h4>
-<p>The following settings don't apply to your installed applications, but to the behavior and visuals of the list of running applications.</p>
+<h4>Aplicaciones</h4>
+<p>Los ajustes a continuación no aplican para sus aplicaciones instaladas, sino al comportamiento y aspecto visual del listado de aplicaciones ejecutándose.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
-<tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Show application expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Expand new applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Hide application names</span></td><td> </td><td>Removes the text labels of running applications.</td></tr>
-<tr><td><span class="menu">Icon size</span></td><td> </td><td>Adjusts the icon size of running applications. </td></tr>
+<tr><td><span class="menu">Ordenar aplicaciones en ejecución</span></td><td> </td><td>Ordena la lista de aplicaciones activas alfabéticamente.</td></tr>
+<tr><td><span class="menu">Tracker siempre primero</span></td><td> </td><td>Aún si el listado está en orden alfabético, Tracker siempre ocupará la primera posición de la lista.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Mostrar expansor de aplicaciónes</span></td><td> </td><td>Muestra un pequeño "widget" para mostrar/esconder todas las ventanas de un programa directamente bajo su nombre en el Deskbar.</td></tr>
+<tr><td><span class="menu">Expandir nuevas aplicaciones</span></td><td> </td><td>Los programas recién iniciados tendrán sus ventanas automáticamente expandidas bajo su entrada en el Deskbar.</td></tr>
+<tr><td><span class="menu">Esconder nombre de aplicación</span></td><td> </td><td>Quita las etiquetas de texto de las aplicaciones en ejecución.</td></tr>
+<tr><td><span class="menu">Tamaño de ícono</span></td><td> </td><td>Ajusta el tamaño del ícono de las aplicaciones en ejecución.</td></tr>
 </table>
 
-<h4>Menu</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<h4>Menú</h4>
+<p>Aunque los primeros incisos del menú de la Barra de Escritorio estan fijos, puede personalizar aquellos que están debajo de <span class="menu">Apagar…</span>.<br />
+Aquí puede definir la cantidad de documentos, carpetas y aplicaciones recientes que se muestran en su menú del Deskbar, si es que acaso quiere que aparezcan.<br />
+El botón de <span class="button">Editar en el Tracker…</span> abre la carpeta <span class="path">~/config/settings/deskbar/menu/</span>. Dentro de la carpeta se encuentran los archivos y carpetas que se exhiben en el Deskbar. Las secciones predeterminadas son <span class="menu">Applications</span> (aplicaciones), <span class="menu">Demos</span>, <span class="menu">Deskbar Applets</span> (applets del Deskbar), y <span class="menu">Preferences</span> (preferencias).<br />
+Se pueden quitar o agregar secciones, como enlaces a aplicaciones, documentos o incluso consultas, copiando o quitándolos de esta carpeta.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
-<div class="box-info"><p>Programs installed from a package automatically put an entry into the Deskbar. Depending on the number of packages you have installed, this can become a bit crowded. If you prefer to have total control, and only want to see applications you link there yourself (possibly in categorizing sub-folders), here's how to do it:<br />
-You create a link of the <span class="path">menu</span> folder in <span class="path">~/config/settings/deskbar/</span> and rename to <span class="path">menu_entries</span>. From Terminal that is achieved with:</p>
+<div class="box-info"><p>Los programas instalados desde un paquete ponen automaticamente una entrada en el Deskbar. Dependiendo de la cantidad de paquetes que tenga instalados, esto se puede volver algo amontonado. Si prefiere tener control completo, y solamente desea ver las aplicaciones que Ud. pone ahí (tal vez categorizandolas en sub-carpetas), aquí está como hacerlo:<br />
+Debe crear un enlace de la carpeta <span class="path">menu</span> en <span class="path">~/config/settings/deskbar/</span> y cambiarle el nombre a <span class="path">menu_entries</span>. Desde la Terminal esto se logra con la siguiente orden:</p>
 <pre class="terminal">ln -s ~/config/settings/deskbar/menu ~/config/settings/deskbar/menu_entries</pre></div>
 
-<h4>Window</h4>
-<p>Finally, the preferences for the Deskbar window.</p>
+<h4>Ventana</h4>
+<p>Finalmente, la ventana de preferencias del Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
-<tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
+<tr><td><span class="menu">Siempre encima</span></td><td> </td><td>El Deskbar siempre permanece encima de las demás ventanas.</td></tr>
+<tr><td><span class="menu">Auto-elevar</span></td><td> </td><td>El Deskbar salta a primer plano si el puntero del ratón lo toca.</td></tr>
+<tr><td><span class="menu">Auto-esconder</span></td><td> </td><td>El Deskbar se reduce a unos pocos pixeles y solamente se muestra si el puntero del mouse le toca.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">La Bandeja del sistema</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>Among other things, the tray is housing the clock. Hover the mouse over it to display the date in a tooltip. Left-click it to show a calendar. Right-click it to hide/show the clock or launch the <a href="preferences/time.html">Time</a> preferences to set it.</p>
+<p>Entre otras cosas, el área de sistema hospeda al reloj. Si coloca el puntero sobre él, mostrará la fecha en una descripción emergente. Con un clic derecho se esconderá/mostrará el reloj o iniciará las preferencias de <a href="preferences/time.html">Hora</a> para configurarlas.</p>
 <p>Cualquier programa puede instalar un icono en el área de sistema para proporcionar una interfaz al usuario. El sistema de correo electrónico, por mencionar alguno, muestra un símbolo diferente cuando hay correo sin leer y ofrece un menú contextual para, p. ej., crear o verificar el correo nuevo. El <span class="app">Controlador de Procesos</span> es otro ejemplo que usa un icono en el área de sistema para proporcionar información (CPU, uso de memoria) y ofrece un menú contextual.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">La lista de programas en ejecución</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows from the submenu. By right-clicking you can <span class="menu">Hide/Show all</span> windows or <span class="menu">Close all</span> and with them the entire application.</p>
-<p>A <span class="key">SHIFT</span> <span class="key">CTRL</span> click on an application hides all its windows, a <span class="key">CTRL</span> click shows them again.</p>
-<div class="box-info">Sometimes an application may hang and even though all its windows are gone, the entry in the list of running applications in the Deskbar just won't disappear. In such a situation you use the Vulcan Death Grip to get rid of it: hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Fascinating!</div>
+<p>Se puede cambiar a una aplicación concreta en ejecución haciendo clic en su entrada en el Deskbar y seleccionando una de sus ventanas desde el submenú. Dando clic con el botón derecho puede <span class="menu">Esconder/Mostrar todas</span> las ventanas o <span class="menu">Cerrar</span> todas.</p>
+<p>Un clic junto a <span class="key">SHIFT</span> <span class="key">CTRL</span> sobre cualquier aplicación esconde todas sus ventanas, un clic y <span class="key">CTRL</span> las muestra de nuevo.</p>
+<div class="box-info">A veces una aplicación se podría colgar y aunque ya no tenga ventanas abiertas, la entrada en el listado de aplicaciones en ejecución del Deskbar no desaparece. En una situación así, utilice la Llave Mortal Vulcana para eliminarla: mantenga presionadas <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> y haga clic en la entrada infractora en el Deskbar. Fascinante!</div>
 <p>Si se activaron los Expanders en las selecciones del Deskbar, se puede expandir/colapsar la lista de ventanas directamente bajo una entrada de aplicación.</p>
 <p>Enfrente de cada ventana de aplicación hay un símbolo que proporciona información sobre su estado. Un símbolo brillante significa que una ventana está visible, uno oscuro, que está minimizado. Tres líneas enfrente a un símbolo muestra que no está en el espacio de trabajo actual.</p>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009-2015, Haiku. All rights reserved.
+ * Copyright 2009-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,6 +57,14 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#shortcuts">Tastenkürzel</a><br />
+	<a href="#commands">Befehle</a></td></tr>
+</table>
 
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -71,190 +79,212 @@ Am besten besucht, ist der englischsprachige Kanal #haiku von irc.freenode.org.<
 <p>Hier einige Tipps, vor allem für IRC-Neulinge:</p>
 <ul>
 <li><p>Such mal nach "IRC Regeln" um die grundsätzlichen Verhaltensregeln im Chat zu kennen. Die Seite <a href="http://www.schreibfabrik.de/faq.htm">IRC FAQ, Net(t)iquette, Regeln &amp; Infos</a> ist beispielsweise nicht schlecht.</p></li>
-<li><p>Durch die Registrierung seines Nicknames kann man verhindern, dass andere damit Schabernack treiben. Außerdem ist es eine vertrauensbildende Maßnahme gegenüber den anderen Kanalbewohnern. Siehe dazu <a href="http://freenode.net/faq.shtml#nicksetup">Freenode's FAQ</a>.</p></li>
+<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/kb/answer/registration ">Freenode's FAQ</a> on that matter.</p></li>
 <li><p>In Haikus 'Sounds' Einstellungen kann man einen Klang angeben, der immer ertönt wenn der eigene Nick erwähnt wird. Schließlich hat niemand immer das Chat-Fenster im Blick. Beginnt man seine Eingaben mit dem Nicknamen der Person, die man anspricht, erhöht das die Chancen wahrgenommen zu werden. Wie das Terminal beherrscht Vision die Tab-Vervollständigung von Nicknamen, d. h. beginnt man die Eingabe eines Nicknames und drückt nach einigen Buchstaben die Tabulatortaste, vervollständigt Vision den Nicknamen mit dem ersten Treffer.</p></li>
 </ul>
-<p>Hier eine Liste von Befehlen, die in Vision eingegeben werden können. Sie wurden mit Genehmigung von der Vision Webseite kopiert. </p>
-<p>Die Syntax:</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>Vision provides a few handy keyboard shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>When the input control has focus, this will cycle through your recently entered text.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Activates the window that appears above / below the currently active (selected) one in the "Window list"</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Similar to <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, but with a twist. Instead of activating the window immedietly above / below the current one, it looks ahead. If there are any windows with higher status bits then the current window, it jumps to those. It jumps to the highest found status bit first.<br />
+
+To understand this, you must know that Vision color codes windows in the list with different "status bits" depending on how its contents have changed since it last had focus:
+<ul>
+<li><b><span style="color:black">black</span></b> - no new text</li>
+<li><b><span style="color:silver">gray</span></b> - new text, but nothing exciting (joins, parts, etc.)</li>
+<li><b><span style="color:green">green</span></b> - someone has said something</li>
+<li><b><span style="color:red">red</span></b> - someone has said something, and mentioned your nickname</li>
+</ul>
+Vision treats these with sequential priority. When you press<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Vision will first jump to a red window above / below the current one if it sees one. If it doesn't see a red one, it will jump to a green one, and so on.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commands" name="commands">Built-in commands</a></h2>
+<p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
+<p>The syntax:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
-<tr><td><tt>/BEFEHL</tt></td><td width="10"></td><td>der Befehl</td></tr>
-<tr><td><tt>&lt;benötigt&gt;</tt></td><td></td><td>ein benötigter Parameter</td></tr>
-<tr><td><tt>[optional]</tt></td><td></td><td>ein optionaler Parameter</td></tr>
-<tr><td><tt>|</tt></td><td></td><td>eine Oder-Verknüpfung</td></tr>
-<tr><td><tt>...</tt></td><td></td><td>weitere Parameter möglich</td></tr>
+<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>the command</td></tr>
+<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>a required parameter</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>an optional parameter</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>a logical OR</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>more parameters possible</td></tr>
 </table>
 
 <ul>
 <li><p><span class="menu">/ABOUT</span><br />
-Öffnet Visions "Über" Fenster.</p></li>
+Opens Vision's About window.</p></li>
 
-<li><p><span class="menu">/ACRONYM [Wort]</span><br />
-Öffnet www.acronymfinder.com mit der für HTML bevorzugten Anwendung.</p></li>
+<li><p><span class="menu">/ACRONYM [word]</span><br />
+Opens www.acronymfinder.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/AWAY [Begründung]</span><br />
-Setzt den "Away" Status im aktuellen Netzwerk. Wird keine Begründung mit angegeben, wird er auf 'BRB' gesetzt ("be right back" - "Bin gleich zurück").</p></li>
+<li><p><span class="menu">/AWAY [away-reason]</span><br />
+Sets away status on current network. If no away reason is specified, it is set to 'BRB'. (be right back)</p></li>
 
 <li><p><span class="menu">/BACK</span><br />
-Setzt den Status im aktuellen Netzwerk zurück ("back" - "Bin zurück").</p></li>
+Sets your status to 'back' on current network.</p></li>
 
 <li><p><span class="menu">/CLEAR</span><br />
-Leert den aktuellen Textpuffer.</p></li>
+Clears the contents of the current text buffer.</p></li>
 
-<li><p><span class="menu">/CTCP &lt;Username|Kanal&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
-Wendet den angegebenen CTCP Befehl auf einen User oder Kanal an.</p></li>
+<li><p><span class="menu">/CTCP &lt;nick|channel&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
+Executes the specified ctcp command on a channel or nick.</p></li>
 
-<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;Username&gt;</span><br />
-Öffnet eine private DCC Chat Sitzung mit dem angegebenen Usern.</p></li>
+<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;nick&gt;</span><br />
+Opens a private dcc chat session with the specified nick.</p></li>
 
-<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;Username&gt; [Datei]</span><br />
-Schickt eine Datei an &lt;Username&gt;. Wird keine Datei angegeben, öffnet sich ein Auswahl-Dialog,</p></li>
+<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;nick&gt; [file]</span><br />
+Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</p></li>
 
-<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;Username1&gt; [Username2] ...</span><br />
-De-ops oder de-voices &lt;Username(n)&gt;.</p></li>
+<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;nick1&gt; [nick2] ...</span><br />
+De-ops or de-voices &lt;nick(s)&gt;.</p></li>
 
-<li><p><span class="menu">/DESCRIBE &lt;Username&gt; &lt;Nachricht&gt;</span><br />
-Wie /ME, aber es wird eine Anfrage an  &lt;Username&gt; geöffnet.</p></li>
+<li><p><span class="menu">/DESCRIBE &lt;nick&gt; &lt;message&gt;</span><br />
+Same as /ME, but opens a query on &lt;nick&gt;.</p></li>
 
-<li><p><span class="menu">/DNS &lt;Domäne/IP Adresse&gt;</span><br />
-Löst die angegebene IP oder Domäne auf.</p></li>
+<li><p><span class="menu">/DNS &lt;domain name/IP address&gt;</span><br />
+Resolves the given IP or domain name.</p></li>
 
 <li><p><span class="menu">/EXIT</span><br />
-Beendet Vision.</p></li>
+Quits Vision.</p></li>
 
-<li><p><span class="menu">/GAWAY [Begründung]</span><br />
-Wie /AWAY, aber für alle verbundenen Netzwerke.</p></li>
+<li><p><span class="menu">/GAWAY [away-reason]</span><br />
+Same as /AWAY [away-reason], but applies to all connected networks.</p></li>
 
 <li><p><span class="menu">/GBACK</span><br />
-Wie /BACK, aber für alle verbundenen Netzwerke.</p></li>
+Same as /BACK, but on applies to all connected networks.</p></li>
 
-<li><p><span class="menu">/GOOGLE [Suchbegriff]</span><br />
-Öffnet www.google.com mit der für HTML bevorzugte Anwendung.</p></li>
+<li><p><span class="menu">/GOOGLE [search-string]</span><br />
+Opens www.google.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/INVITE /I &lt;Username&gt; &lt;Kanal&gt;</span><br />
-Lädt &lt;Username&gt; in den &lt;Kanal&gt; ein.</p></li>
+<li><p><span class="menu">/INVITE /I &lt;nick&gt; &lt;channel&gt;</span><br />
+Invites &lt;nick&gt; to the &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/JOIN /J &lt;Kanal&gt; [Kanal-Schlüssel]</span><br />
-Betritt den &lt;Kanal&gt;. Übergibt den [Kanal-Schlüssel], falls erforderlich.</p></li>
+<li><p><span class="menu">/JOIN /J &lt;channel&gt; [channel-key]</span><br />
+Joins the &lt;channel&gt;. Provide a [channel-key] if necessary.</p></li>
 
-<li><p><span class="menu">/KICK /K &lt;Username&gt; [Begründung]</span><br />
-Kickt &lt;Username&gt; aus dem aktuellen Kanal. Wird keine [Begründung] angegeben, wird die in den Einstellungen definierte benutzt.</p></li>
+<li><p><span class="menu">/KICK /K &lt;nick&gt; [reason]</span><br />
+Kicks &lt;nick&gt; from current channel. If [reason] is not specified, it will be set to the reason specified in Preferences.</p></li>
 
-<li><p><span class="menu">/KILL &lt;Username&gt; [Nachricht]</span><br />
-Der IRC Operator-Befehl um einen User aus dem Netzwerk zu werfen.</p></li>
+<li><p><span class="menu">/KILL &lt;nick&gt; [message]</span><br />
+IRC operator command to disconnect a user from the network.</p></li>
 
 <li><p><span class="menu">/LIST</span><br />
-Öffnet ein neues Panel mit einer Liste aller Kanäle des aktuellen Netzwerks [außer versteckte Kanäle].</p></li>
+Opens a new view which lists all the channels on the current network. [except hidden channels]</p></li>
 
 <li><p><span class="menu">/M</span><br />
-Zeigt die Kanal-Modi des aktuellen Kanals an.</p></li>
+Displays the channel modes of the current channel.</p></li>
 
-<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;Username1&gt; [Username2] ...</span><br />
-Wie <span class="menu">MODE &lt;Kanal&gt; &lt;Modi&gt; &lt;Username&gt;</span>, aber für den aktuellen Kanal.</p></li>
+<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
+Same as <span class="menu">MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, but on current channel.</p></li>
 
 <li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Wie <span class="menu">/MODE &lt;Kanal&gt; &lt;Modi&gt;</span>, aber für den aktuellen Kanal.</p></li>
+Same as <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, but on current channel.</p></li>
 
-<li><p><span class="menu">/ME &lt;Text&gt;</span><br />
-Anzeige: <i>* {DeinNickname} &lt;Text&gt;.</i></p></li>
+<li><p><span class="menu">/ME &lt;text&gt;</span><br />
+Displays: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
 
-<li><p><span class="menu">/MODE &lt;Kanal&gt; &lt;+-ohvbeqa&gt; &lt;Username1&gt; [Username2] ...</span><br />
-Setzt den Modus für &lt;Username(n)&gt; auf  &lt;Kanal&gt;.<br />
-z. B. <span class="menu">/MODE #Kanal +o Username</span><br />
-oder <span class="menu">/MODE #Kanal +oo-o Username1 Username2 Username3</span></p></li>
+<li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
+Sets mode for &lt;nick(s)&gt; on &lt;channel&gt;.<br />
+e.g. <span class="menu">/MODE #channel +o nick1</span><br />
+or <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
 
-<li><p><span class="menu">/MODE &lt;Kanal&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Setzt den Modus von &lt;Kanal&gt; (die Kommas dienen nur zur optischen Trennung).<br />
-z. B. <span class="menu">/MODE #Kanal +ms</span>.</p></li>
+<li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Sets the mode of &lt;channel&gt;. (Note: Commata just for optical separation.)<br />
+e.g. <span class="menu">/MODE #channel +ms</span></p></li>
 
-<li><p><span class="menu">/MSG &lt;Username&gt; &lt;Nachricht&gt;</span><br />
-Schickt eine &lt;Nachricht&gt; an &lt;Username&gt;.</p></li>
+<li><p><span class="menu">/MSG &lt;nick&gt; &lt;message&gt;</span><br />
+Sends a &lt;message&gt; to &lt;nick&gt;.</p></li>
 
 <li><p><span class="menu">/NAMES</span><br />
-Listet alle Kanäle und alle User des Netzwerks im Netzwerkpanel auf (Achtung: damit sollte man vorsichtig sein).</p></li>
+Displays all channels and all nicks of the network in the network window. (Careful with this one)</p></li>
 
-<li><p><span class="menu">/NAMES &lt;Kanal&gt;</span><br />
-Listet alle User in &lt;Kanal&gt;.</p></li>
+<li><p><span class="menu">/NAMES &lt;channel&gt;</span><br />
+Displays nick(s) in &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/NICK &lt;neuer-Username&gt;</span><br />
-Ändert den Usernamen zu &lt;neuer-Username&gt;.</p></li>
+<li><p><span class="menu">/NICK &lt;newnick&gt;</span><br />
+Changes your nick to &lt;newnick&gt;.</p></li>
 
-<li><p><span class="menu">/NOTICE &lt;Username&gt; &lt;Nachricht&gt;</span><br />
-Schickt einen Hinweis mit der &lt;Nachricht&gt; an &lt;Username&gt;.</p></li>
+<li><p><span class="menu">/NOTICE &lt;nick&gt; &lt;message&gt;</span><br />
+Sends a notice to &lt;nick&gt; with the given &lt;message&gt;.</p></li>
 
-<li><p><span class="menu">/NOTIFY &lt;Username1&gt; [Username2] ...</span><br />
-Fügt &lt;Username(n)&gt; zur Benachrichtungsliste.</p></li>
+<li><p><span class="menu">/NOTIFY &lt;nick1&gt; [nick2] ...</span><br />
+Adds &lt;nick(s)&gt; to your notify list.</p></li>
 
-<li><p><span class="menu">/PEXEC /RRUN &lt;Anwendung1&gt; [ | &lt;Anwendung2&gt; | ... ]</span><br />
-Startet die angebene &lt;Anwendung&gt;. Wird mehr als eine Anwendung übergeben, werden sie nacheinander ausgeführt.<br />
-z. B. <span class="menu">/PEXEC Terminal | StyledEdit</span> öffnet ein Terminal und danach StyledEdit<br />
-oder <span class="menu">/PEXEC ls -la ~/Downloads/</span> zeigt den INhalt des ~/Downloads/ Ordner im aktuellen Fenster an (also Achtung!).</p></li>
+<li><p><span class="menu">/PEXEC /RRUN &lt;app1&gt; [ | &lt;app2&gt; | ... ]</span><br />
+Executes the given &lt;app&gt;. If more than one application is provided, they will be executed in a pipe.<br />
+e.g. <span class="menu">/PEXEC Terminal | StyledEdit</span> opens a new Terminal, and afterwards StyledEdit<br />
+or <span class="menu">/PEXEC ls -la ~/Downloads/</span> displays the contents of your ~/Downloads/ directory in the current window (Attention!)</p></li>
 
-<li><p><span class="menu">/OP /VOICE &lt;Username1&gt; [Username2] ...</span><br />
-"Ops" oder "voices" für &lt;Username(n)&gt;.</p></li>
+<li><p><span class="menu">/OP /VOICE &lt;nick1&gt; [nick2] ...</span><br />
+Ops or voices to &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/PART</span><br />
-Verlässt den aktuellen Kanal der Netzwerk.</p></li>
+Leaves current channel or network.</p></li>
 
-<li><p><span class="menu">/PING &lt;Username&gt;</span><br />
-Pingt &lt;Username&gt; und gibt die Ping-Zeit aus. Entspricht <span class="menu">/CTCP &lt;Username&gt; PING</span>.</p></li>
+<li><p><span class="menu">/PING &lt;nick&gt;</span><br />
+Pings the &lt;nick&gt; and returns the ping-time. Equivalent to <span class="menu">/CTCP &lt;nick&gt; PING</span>.</p></li>
 
-<li><p><span class="menu">/QUERY /Q &lt;Username&gt; [Nachricht]</span><br />
-Öffnet ein Anfragefenster für &lt;Username&gt; und sendet optional gleich eine [Nachricht].</p></li>
+<li><p><span class="menu">/QUERY /Q &lt;nick&gt; [message]</span><br />
+Opens a query window on &lt;nick&gt;, optionally along with a [message].</p></li>
 
-<li><p><span class="menu">/QUIT /QUI [eigene-Verabschiedung]</span><br />
-Verlässt das aktuelle Netzwerk. Wird keine [eigene-Verabschiedung] angegeben, wird die in den Einstellungen definierte benutzt.</p></li>
+<li><p><span class="menu">/QUIT /QUI [custom-quit-message]</span><br />
+Quits current network. If [custom-quit-message] is not specified, the default set in Preferences will be used.</p></li>
 
-<li><p><span class="menu">/RAW /QUOTE &lt;Befehl|Text&gt;</span><br />
-Sendet einen IRC Befehl.</p></li>
+<li><p><span class="menu">/RAW /QUOTE &lt;command|text&gt;</span><br />
+Sends a raw IRC command.</p></li>
 
 <li><p><span class="menu">/RECONNECT</span><br />
-Baut die Verbindung zum aktuellen Netzwerk erneut auf, wenn die 47 automatischen Versuche fehlgeschlagen sind.</p></li>
+Will reconnect you to the current network if the 47 automatic reconnection attempts have failed.</p></li>
 
-<li><p><span class="menu">/SLEEP &lt;Dezi-Sekunden&gt;</span><br />
-Lässt den aktuellen Thread für die angegebene Zeit schlafen ; für zukünftiges Scripting.</p></li>
+<li><p><span class="menu">/SLEEP &lt;deciseconds&gt;</span><br />
+Causes current thread to sleep for the specified time ; for future scripting use.</p></li>
 
 <li><p><span class="menu">/SQUIT</span><br />
-IRC Operator-Befehl um die Verbindung zu einen Server abzubrechen.</p></li>
+IRC operator command to disconnect a server.</p></li>
 
 <li><p><span class="menu">/T</span><br />
-Zeigt das Thema des aktuellen Kanals an.</p></li>
+Displays the channel-topic of current channel.</p></li>
 
-<li><p><span class="menu">/T &lt;Neues-Kanal-Thema&gt;</span><br />
-Wie <span class="menu">/TOPIC &lt;Kanal&gt; &lt;Neues-Kanal-Thema&gt;</span>, aber für den aktuellen Kanal.
-</p></li>
+<li><p><span class="menu">/T &lt;new-channel-topic&gt;</span><br />
+Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, but on current channel.</p></li>
 
-<li><p><span class="menu">/TIME &lt;Usernam&gt;</span><br />
-Zeigt die lokale Zeit von &lt;Username&gt;. Entspricht <span class="menu">/CTCP &lt;Username&gt; TIME</span>.</p></li>
+<li><p><span class="menu">/TIME &lt;nick&gt;</span><br />
+Returns local time of &lt;nick&gt;. Equivalent to <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
 
-<li><p><span class="menu">/TOPIC &lt;Kanal&gt;</span><br />
-Zeigt das Thema von &lt;Kanal&gt;.</p></li>
+<li><p><span class="menu">/TOPIC &lt;channel&gt;</span><br />
+Displays the channel-topic of &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/TOPIC &lt;Kanal&gt; &lt;Neues-Kanal-Thema&gt;</span><br />
-Setzt das Thema von &lt;Kanal&gt; auf &lt;Neues-Kanal-Thema&gt;.</p></li>
+<li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
+Sets the channel topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>
 
-<li><p><span class="menu">/UNNOTIFY &lt;Username1&gt; [Username2] ...</span><br />
-Entfernt &lt;Username(n)&gt; von der Benachrichtigungsiste.</p></li>
+<li><p><span class="menu">/UNNOTIFY &lt;nick1&gt; [nick2] ...</span><br />
+Removes &lt;nick(s)&gt; from your notify list.</p></li>
 
 <li><p><span class="menu">/UPTIME [-l]</span><br />
-Zeigt die System-Laufzeit. Mit [-l] wird die Laufzeit nur lokal ausgegeben und nicht zum Netzwerk gesendet.</p></li>
+Displays the systems uptime. If [-l] is specified, the uptime will be echoed locally, and not sent to the network.</p></li>
 
-<li><p><span class="menu">/VERSION &lt;Username&gt;</span><br />
-Zeigt die Version des IRC-Programms von  &lt;Username&gt;. Entspricht <span class="menu">/CTCP &lt;Username&gt; VERSION</span>.</p></li>
+<li><p><span class="menu">/VERSION &lt;nick&gt;</span><br />
+Returns the client-version of &lt;nicks&gt; IRC-client. Equivalent to <span class="menu">/CTCP &lt;nick&gt; VERSION</span>.</p></li>
 
-<li><p><span class="menu">/VISIT &lt;URL&gt;</span><br />
-Öffnet die &lt;URL&gt; mit der für HTML bevorzugten Anwendung.</p></li>
+<li><p><span class="menu">/VISIT &lt;url&gt;</span><br />
+Opens &lt;url&gt; with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/WEBSTER /DICTIONARY [Wort]</span><br />
-Öffnet www.m-w.com (Merriam Webster) mit der für HTML bevorzugten Anwendung.</p></li>
+<li><p><span class="menu">/WEBSTER /DICTIONARY [word]</span><br />
+Opens www.m-w.com (Merriam Webster) with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
 <li><p><span class="menu">/VUPTIME [-l]</span><br />
-Zeigt die Laufzeit von Vision. Der [-l] Parameter ist derselbe wie für <span class="menu">/UPTIME</span>.</p></li>
+Displays the Vision uptime. The [-l] parameter has the same effect as in <span class="menu">/UPTIME</span>.</p></li>
 
 <li><p><span class="menu">/WALLOPS</span><br />
-IRC Operator-Befehl zum Senden einer "wallops" Nachricht (sichtbar für alle mit aktivem umode w.).</p></li>
+IRC operator command that sends a wallops message (visible to those with umode  w active).</p></li>
 
-<li><p><span class="menu">/WHOIS /W &lt;Username&gt;</span><br />
-Zeigt whois Infos von &lt;Username&gt;.</p></li>
+<li><p><span class="menu">/WHOIS /W &lt;nick&gt;</span><br />
+Returns whois information of &lt;nick&gt;.</p></li>
 </ul>
 
 </div>

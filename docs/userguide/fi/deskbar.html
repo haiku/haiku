@@ -57,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -71,7 +70,7 @@
 
 <p>Työpöytäpalkki on pieni paneeli, joka oletuksena sijaitsee näytön oikeanpuoleisessa yläkulmassa. Se on Haikun versio Windowsin tehtäväpalkista Käynnistä-painikkeineen. Se sisältää Työpöytäpalkkivalikon, josta voit käynnistää sovellukset ja asetusohjelmat, tarjottimen kellolla ja muilla työkaluilla sen alla sekä alimmaisena parhaillaan suoritettavien ohjelmien luettelo.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>Voit siirtää Työpöytäpalkin mihin nurkkaan tahansa tai palkkina näytön ylä- tai alarajalle tarttumalla pisteviiva-alueeseen tarjottimen sivussa ja raahaamalla ja pudottamalla sen uuteen paikkaan. Voit taittaa sen myös pienempään tilaan raahaamalla ja pudottamalla pisteviiva-alue Työpöytäpalkkivalikkoon.</p>
+<p>Voit siirtää Työpöytäpalkin mihin nurkkaan tahansa tai palkkina näytön ylä- tai alarajalle tarttumalla pisteviiva-alueeseen tarjottimen sivussa ja raahaamalla ja pudottamalla sen uuteen paikkaan. Voit taittaa sen myös pienempään tilaan raahaamalla ja pudottamalla pisteviiva-alueen Työpöytäpalkkivalikkoon.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -107,11 +106,12 @@
 </table>
 
 <h4>Valikko</h4>
-<p>Kun Työpöytäpalkin pari ensimmäistä valikkoriviä ovat kiinteitä, voit räätälöidä <span class="menu">Sammuta virta...</span>-valikkorivin alla olevia.<br />
-Tässä voit asettaa Työpöytäpalkin valikossa näkyvien äskettäisten asiakirjojen, kansioiden ja sovellusten lukumäärän, tai haluatko nähdä niitä ollenkaan.<br />Painike <span class="button">Muokkaa valikkoa...</span> avaa kansion <span class="path">~/config/settings/deskbar/menu/</span>. Siitä löydät tiedostot ja kansiot, jotka ilmaantuvat Työpöytäpalkkiin. Oletuksena nämä ovat <span class="menu">Asetusohjelmat</span>, <span class="menu">Esittelyohjelmat</span>, <span class="menu">Sovellukset</span>, ja <span class="menu">Työpöytäsovelmat</span>.<br />Voit poistaa ja lisätä kohteita kuten linkkejä sovelluksiin, asiakirjoihin tai jopa kyselyjä yksinkertaisesti kopioimalla/poistamalla niitä tästä kansiosta tai tähän kansioon.</p>
+<p>Vaikka Työpöytäpalkin pari ensimmäistä valikkoriviä ovat kiinteitä, voit räätälöidä <span class="menu">Sammuta virta...</span>-valikkorivin alla olevia.<br />
+Tässä voit asettaa Työpöytäpalkin valikossa näkyvien äskettäisten asiakirjojen, kansioiden ja sovellusten lukumäärän, tai haluatko nähdä niitä ollenkaan.<br />Painike <span class="button">Muokkaa valikkoa...</span> avaa kansion <span class="path">~/config/settings/deskbar/menu/</span>. Siitä löydät tiedostot ja kansiot, jotka ilmaantuvat Työpöytäpalkkiin, oletuksena näitä ovat <span class="menu">Sovellukset</span>, <span class="menu">Esittelyohjelmat</span>, <span class="menu">Työpöytäsovelmat</span>, ja <span class="menu">Asetusohjelmat</span>.<br />
+Voit poistaa ja lisätä kohteita kuten linkkejä sovelluksiin, asiakirjoihin tai jopa kyselyjä yksinkertaisesti kopioimalla/poistamalla niitä tästä kansiosta tai tähän kansioon.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
-<div class="box-info"><p>Programs installed from a package automatically put an entry into the Deskbar. Depending on the number of packages you have installed, this can become a bit crowded. If you prefer to have total control, and only want to see applications you link there yourself (possibly in categorizing sub-folders), here's how to do it:<br />
-You create a link of the <span class="path">menu</span> folder in <span class="path">~/config/settings/deskbar/</span> and rename to <span class="path">menu_entries</span>. From Terminal that is achieved with:</p>
+<div class="box-info"><p>Pakkauksesta automaattisesti asennetut ohjelmat laittavat valikkorivin Työpöytäpalkkiin. Asennettujen pakkausten lukumäärästä riippuen Työpöytäpalkki voi kasvaa liian laajaksi. Jos haluat mieluiten ohjata asetuksia itse ja haluat nähdä Työpöytäpalkissa vain ne sovellukset, jotka linkität sinne (mahdollisesti luokittelemalla alikansioihin), niin tee se näin:<br />
+Luo valikolle <span class="path">menu</span>-kansion linkki paikkaan <span class="path">~/config/settings/deskbar/</span> ja nimeä uudelleen <span class="path">menu_entries</span>. Pääteikkunassa linkki luodaan:</p>
 <pre class="terminal">ln -s ~/config/settings/deskbar/menu ~/config/settings/deskbar/menu_entries</pre></div>
 
 <h4>Ikkuna</h4>
@@ -133,9 +133,9 @@ You create a link of the <span class="path">menu</span> folder in <span class="p
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Käynnissä olevien ohjelmien luettelo</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows from the submenu. By right-clicking you can <span class="menu">Hide/Show all</span> windows or <span class="menu">Close all</span> and with them the entire application.</p>
-<p>A <span class="key">SHIFT</span> <span class="key">CTRL</span> click on an application hides all its windows, a <span class="key">CTRL</span> click shows them again.</p>
-<div class="box-info">Sometimes an application may hang and even though all its windows are gone, the entry in the list of running applications in the Deskbar just won't disappear. In such a situation you use the Vulcan Death Grip to get rid of it: hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Fascinating!</div>
+<p>Voit vaihtaa tiettyä suoritettavaa sovellusta napsauttamalla sen riviä Työpöytäpalkissa ja valitsemalla alivalikosta (yhden sen) ikkunoista. Hiiren kakkospainikkeella voit tehdä ikkunoille <span class="menu">Piilota/Näytä kaikki</span> tai <span class="menu">Sulje kaikki</span> ja sulkea niillä koko sovelluksen.</p>
+<p>Painamalla näppäimiä <span class="key">VAIHTO</span> <span class="key">CTRL</span> ja napsauttamalla sovellusta piilotat kaikki sen ikkunat, näppäin <span class="key">CTRL</span> ja hiiren napsautus näyttää ne taas.</p>
+<div class="box-info">Joskus sovellus voi kaatua ja vaikka kaikki sen ikkunat ovat kadonneet, niin se voi näkyä käynnissä olevana sovelluksena Työpöytäpalkissa. Sellaisissa tapauksissa Vulcan-kuolonotteella pääset siitä: pidä alhaalla näppäimiä <span class="key">VAIHTO</span> <span class="key">CTRL</span> <span class="key">ALT</span> ja napsauta kyseistä valikkoriviä Työpöytäpalkissa. Mielenkiintoista!</div>
 <p>Jos aktivoit Laajentajat Työpöytäpalkin asetuksissa, voit laajentaa/supistaa ikkunoiden luettelon suoraan sovellusrivin alla.</p>
 <p>Jokaisen sovellusikkunan edessä on symboli, joka tarjoaa tietoa sen tilasta. Kirkas symboli tarkoittaa, että ikkuna on näkyvissä, tumma symboli tarkoittaa, että se on minimoitu. Kolme viivaa symbolin edessä näyttää, että se ei ole nykyisessä työtilassa.</p>
 

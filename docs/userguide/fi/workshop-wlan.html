@@ -58,7 +58,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -116,16 +115,16 @@ Tulostus näyttää julkisen nimen (SSID), MAC-osoitteen, signaalivoimakkuuden j
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Vihjeet</a></h2>
-<h3>Offline download of binary firmware files</h3>
-<p>If you cannot obtain the binary firmware files via the <tt>install-wifi-firmwares.sh</tt> script (for example due to lack of internet connection within Haiku), you can also download <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">this shell script</a>, and run it from another OS that has <tt>wget</tt> and <tt>zip</tt> installed.<br />
-Windows users need to have <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> and <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> for Windows installed in their default locations and use <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">this batch script</a>.<br />
-The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
+<h3>Laiteohjelmistotiedostojen lataus ilman verkkoa</h3>
+<p>Jos et saa binaarilaiteohjelmistotiedostoja <tt>install-wifi-firmwares.sh</tt>-skriptin avulla (esimerkiksi koska sinulla ei ole internet-yhteyttä Haiku-käyttöjärjestelmässä), voi myös ladata <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">tämän pääteikkunaskriptin</a>, ja suorittaa sen toisessa käyttöjärjestelmässä, jossa on <tt>wget</tt> ja <tt>zip</tt> asennettuna.<br />
+Windows-käyttäjillä on oltava <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> ja <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> asennettuna Windowsin oletussijainteihin ja heidän on käytettävä <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">tätä eräajoskriptiä</a>.<br />
+Skripti lataa tarvittavat tiedostot ja luo zip-tiedoston, joka puretaan Haikun <tt>/boot</tt>-kansioon. Kun purkaminen on suoritettu, avaa Pääteikkuna ja kirjoita:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Review the licenses and accept them to install all of the now available firmware files.</p>
-<h3>Avoiding connection loss</h3>
-<p>Haiku's drivers for some WLAN chipsets like the iprowifi4965 are prone to lose connection when using WPA encryption. If you're affected by that, try to disable the "HT mode" (high throughput, 802.11n) before connecting to a network:</p>
+<p>Käy läpi lisenssit ja hyväksy ne kaikkien nyt saatavissa olevien laiteohjelmistotiedostojen asentamiseksi.</p>
+<h3>Yhteyden katkeamisen välttäminen</h3>
+<p>Haiku-ajureilla joillekin WLAN-piirisarjoille kuten iprowifi4965:lle on taipumusta kadottaa yhteys, kun käytetään WPA-salausta. Jos sinulla tapahtuu tällaista, yritä ottaa pois käytöstä ”HT mode” (high throughput, 802.11n) ennen verkkoon kytkeytymistä:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
-<p>If that fixes the problem, put the line into <span class="path">~/config/settings/boot/UserBootscript</span> to have it applied automatically every boot-up.</p>
+<p>Jos se korjaa pulman, laita kyseinen rivi <span class="path">~/config/settings/boot/UserBootscript</span>-skriptiin, jotta se suoritetaan automaattisesti joka kerta käynnistymisen yhteydessä.</p>
 </div>
 </div>
 

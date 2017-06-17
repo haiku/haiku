@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009-2015, Haiku. All rights reserved.
+ * Copyright 2009-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,6 +59,13 @@
 <div>
 <div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#shortcuts">Keyboard shortcuts</a><br />
+	<a href="#commands">Built-in commands</a></td></tr>
+</table>
+
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision 聊天客户端</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
@@ -72,40 +79,63 @@
 <p>Some advice, especially if you're new to IRC:</p>
 <ul>
 <li><p>Search the web for "IRC etiquette" to learn about the do's and don'ts of chatting. Without much searching, I found <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a> by Christoph Haas to be quite helpful.</p></li>
-<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/faq.shtml#nicksetup">Freenode's FAQ</a> on that matter.</p></li>
+<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/kb/answer/registration ">Freenode's FAQ</a> on that matter.</p></li>
 <li><p>Set up a sound in Haiku's Sounds preferences to be notified if someone mentions your nickname. People don't always watch their IRC client screen. Putting the nickname of the person you're talking to at the beginning of what you're about to post increases your chance to be noticed. Similar to the Terminal, Vision supports tab-completion for nicknames, i.e. if you enter the starting letters of  a nickname and press the tab key, Vision completes it with the first name that matches.</p></li>
 </ul>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>Vision provides a few handy keyboard shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>When the input control has focus, this will cycle through your recently entered text.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Activates the window that appears above / below the currently active (selected) one in the "Window list"</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Similar to <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, but with a twist. Instead of activating the window immedietly above / below the current one, it looks ahead. If there are any windows with higher status bits then the current window, it jumps to those. It jumps to the highest found status bit first.<br />
+
+To understand this, you must know that Vision color codes windows in the list with different "status bits" depending on how its contents have changed since it last had focus:
+<ul>
+<li><b><span style="color:black">black</span></b> - no new text</li>
+<li><b><span style="color:silver">gray</span></b> - new text, but nothing exciting (joins, parts, etc.)</li>
+<li><b><span style="color:green">green</span></b> - someone has said something</li>
+<li><b><span style="color:red">red</span></b> - someone has said something, and mentioned your nickname</li>
+</ul>
+Vision treats these with sequential priority. When you press<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Vision will first jump to a red window above / below the current one if it sees one. If it doesn't see a red one, it will jump to a green one, and so on.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commands" name="commands">Built-in commands</a></h2>
 <p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
-<p>语法规则：</p>
+<p>The syntax:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
-<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>命令</td></tr>
-<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>必须参数</td></tr>
-<tr><td><tt>[optional]</tt></td><td></td><td>可选参数</td></tr>
-<tr><td><tt>|</tt></td><td></td><td>逻辑或操作符</td></tr>
-<tr><td><tt>...</tt></td><td></td><td>更多可用参数</td></tr>
+<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>the command</td></tr>
+<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>a required parameter</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>an optional parameter</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>a logical OR</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>more parameters possible</td></tr>
 </table>
 
 <ul>
 <li><p><span class="menu">/ABOUT</span><br />
-打开 Vision 的关于窗口。</p></li>
+Opens Vision's About window.</p></li>
 
 <li><p><span class="menu">/ACRONYM [word]</span><br />
-使用当前的 html 默认程序打开 www.acronymfinder.com 站点 (注意: 如果该处理程序不时浏览器，它将会根据文件类型使用指定程序打开。)</p></li>
+Opens www.acronymfinder.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
 <li><p><span class="menu">/AWAY [away-reason]</span><br />
-在当前网络中设置离开状态。如果未指名离开原因，将会被设置为 ‘BRB’。（be right back, 马上回来）</p></li>
+Sets away status on current network. If no away reason is specified, it is set to 'BRB'. (be right back)</p></li>
 
 <li><p><span class="menu">/BACK</span><br />
-设置当前网络中的状态为 'back' 。</p></li>
+Sets your status to 'back' on current network.</p></li>
 
 <li><p><span class="menu">/CLEAR</span><br />
-清除当前文本缓冲区中的内容。</p></li>
+Clears the contents of the current text buffer.</p></li>
 
 <li><p><span class="menu">/CTCP &lt;nick|channel&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
 Executes the specified ctcp command on a channel or nick.</p></li>
 
 <li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;nick&gt;</span><br />
-使用指定昵称打开私有 dcc 聊天会话。</p></li>
+Opens a private dcc chat session with the specified nick.</p></li>
 
 <li><p><span class="menu">/DCC &lt;SEND&gt; &lt;nick&gt; [file]</span><br />
 Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</p></li>
@@ -114,25 +144,25 @@ Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</
 De-ops or de-voices &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/DESCRIBE &lt;nick&gt; &lt;message&gt;</span><br />
-与 /ME 相同，但是打开一个有关 &lt;nick&gt; 的查询。</p></li>
+Same as /ME, but opens a query on &lt;nick&gt;.</p></li>
 
 <li><p><span class="menu">/DNS &lt;domain name/IP address&gt;</span><br />
-解析给定 IP 地址或者域名。</p></li>
+Resolves the given IP or domain name.</p></li>
 
 <li><p><span class="menu">/EXIT</span><br />
-退出 Vision。</p></li>
+Quits Vision.</p></li>
 
 <li><p><span class="menu">/GAWAY [away-reason]</span><br />
-与 /AWAY [away-reason] 相同，但是应用于所有连接网络。</p></li>
+Same as /AWAY [away-reason], but applies to all connected networks.</p></li>
 
 <li><p><span class="menu">/GBACK</span><br />
-与 /BACK 相同，但是应用于所有连接网络。</p></li>
+Same as /BACK, but on applies to all connected networks.</p></li>
 
 <li><p><span class="menu">/GOOGLE [search-string]</span><br />
 Opens www.google.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
 <li><p><span class="menu">/INVITE /I &lt;nick&gt; &lt;channel&gt;</span><br />
-邀请 &lt;nick&gt; 到 &lt;channel&gt; 聊天室。</p></li>
+Invites &lt;nick&gt; to the &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/JOIN /J &lt;channel&gt; [channel-key]</span><br />
 Joins the &lt;channel&gt;. Provide a [channel-key] if necessary.</p></li>
@@ -147,7 +177,7 @@ IRC operator command to disconnect a user from the network.</p></li>
 Opens a new view which lists all the channels on the current network. [except hidden channels]</p></li>
 
 <li><p><span class="menu">/M</span><br />
-显示当前频道的频道模式。</p></li>
+Displays the channel modes of the current channel.</p></li>
 
 <li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
 Same as <span class="menu">MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, but on current channel.</p></li>
@@ -174,10 +204,10 @@ Sends a &lt;message&gt; to &lt;nick&gt;.</p></li>
 Displays all channels and all nicks of the network in the network window. (Careful with this one)</p></li>
 
 <li><p><span class="menu">/NAMES &lt;channel&gt;</span><br />
-显示 &lt;channel&gt; 频道中的所有用户。</p></li>
+Displays nick(s) in &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/NICK &lt;newnick&gt;</span><br />
-修改您的昵称为 &lt;newnick&gt; 。</p></li>
+Changes your nick to &lt;newnick&gt;.</p></li>
 
 <li><p><span class="menu">/NOTICE &lt;nick&gt; &lt;message&gt;</span><br />
 Sends a notice to &lt;nick&gt; with the given &lt;message&gt;.</p></li>
@@ -194,7 +224,7 @@ or <span class="menu">/PEXEC ls -la ~/Downloads/</span> displays the contents of
 Ops or voices to &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/PART</span><br />
-离开当前频道或网络。</p></li>
+Leaves current channel or network.</p></li>
 
 <li><p><span class="menu">/PING &lt;nick&gt;</span><br />
 Pings the &lt;nick&gt; and returns the ping-time. Equivalent to <span class="menu">/CTCP &lt;nick&gt; PING</span>.</p></li>
@@ -215,10 +245,10 @@ Will reconnect you to the current network if the 47 automatic reconnection attem
 Causes current thread to sleep for the specified time ; for future scripting use.</p></li>
 
 <li><p><span class="menu">/SQUIT</span><br />
-IRC 操作指令，断开服务器连接。</p></li>
+IRC operator command to disconnect a server.</p></li>
 
 <li><p><span class="menu">/T</span><br />
-显示当前频道的频道主题。</p></li>
+Displays the channel-topic of current channel.</p></li>
 
 <li><p><span class="menu">/T &lt;new-channel-topic&gt;</span><br />
 Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, but on current channel.</p></li>
@@ -227,13 +257,13 @@ Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</spa
 Returns local time of &lt;nick&gt;. Equivalent to <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
 
 <li><p><span class="menu">/TOPIC &lt;channel&gt;</span><br />
-显示 &lt;channel&gt; 频道的频道主题。</p></li>
+Displays the channel-topic of &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
-设置 &lt;channel&gt; 频道的频道主题为 &lt;new-channel-topic&gt; 。</p></li>
+Sets the channel topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>
 
 <li><p><span class="menu">/UNNOTIFY &lt;nick1&gt; [nick2] ...</span><br />
-从您的通知列表中移除 &lt;nick(s)&gt; 。</p></li>
+Removes &lt;nick(s)&gt; from your notify list.</p></li>
 
 <li><p><span class="menu">/UPTIME [-l]</span><br />
 Displays the systems uptime. If [-l] is specified, the uptime will be echoed locally, and not sent to the network.</p></li>
@@ -254,7 +284,7 @@ Displays the Vision uptime. The [-l] parameter has the same effect as in <span c
 IRC operator command that sends a wallops message (visible to those with umode  w active).</p></li>
 
 <li><p><span class="menu">/WHOIS /W &lt;nick&gt;</span><br />
-返回 &lt;nick&gt; 的 whois 信息。</p></li>
+Returns whois information of &lt;nick&gt;.</p></li>
 </ul>
 
 </div>

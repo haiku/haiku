@@ -73,30 +73,30 @@
 <tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		переведення системи у безпечний режим. Це діє незалежно від інших опцій.</p>
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Дозволяє заборонити загрузку усіх встановлених користувачем програм. Запускатимуться тільки програми з теки "system". Дивись <a href="#troubleshooting">Troubleshooting (Труднощі)</a> нижче.</p>
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Забороняє IDE DMA, збільшуючи сумісність IDE за рахунок продуктивності.</p>
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ігнорує об'єм пам'яті вище 4 GiB з записом налаштувань у файл ядра.
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
 </p>
-	<p><span class="menu">Use fail-safe video mode</span><br />
-		Робота відеопідсистеми виключно на драйвері VESA.</p>
+	<p><span class="menu">Use fail-safe graphics driver</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Заборона IO APIC для маршрутизації переривань, з використанням застарілої PIC.</p>
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Заборона використання локальної APIC, разом з SMP.</p>
+		Disables using the local APIC, also disables SMP.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Заборона роботи всіх ядер крім одного.</p>
+		Disables all but one CPU core.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Не опитувати функції BIOS.</p>
+		Stops the system from calling BIOS functions.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Заборона APM з переписуванням налаштувань APM у файлі ядра.</p>
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Заборона ACPI з переписуванням налаштувань  ACPI у файлі ядра.</p>
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		Дозволяє вибирати системні файли які можна ігнорувати. Корисно, наприклад, відключати драйвери. Дивись <a href="#troubleshooting">Troubleshooting (Труднощі)</a> нижче.</p></td></tr>
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
@@ -118,7 +118,7 @@
 		Показати системний журнал з попередніх сесій Haiku</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		Зберігати системний журнал з попередніх сесій Haiku на диск. Поки що підтримуються тільки томи з FAT32.</p></td></tr>
-<tr><td class="onelinetop"><b>Вибір безпечного відео-режиму <br />(Select fail safe video mode)</b></td><td> </td><td>Якщо Ви активували опцію <i>Use fail-safe video mode</i>, то зможете вибрати роздільчу здатність екрану і глибину кольору.</td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

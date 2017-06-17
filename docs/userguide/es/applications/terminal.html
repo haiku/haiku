@@ -12,6 +12,7 @@
  * Translators:
  *		miguel~1.mx
  *		Humdinger
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -57,7 +58,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -68,44 +68,44 @@
 <span class="path">~/config/settings/inputrc</span> - agrega/sobrescribe predeterminados en <span class="path">/boot/system/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
-<p>La Terminal es la interfaz de Haiku a Bash, un intérprete de comandos (Bourne Again Shell en inglés).</p>
-<p>Please refer to the topic on <a href="../bash-scripting.html">Scripting</a> for a few links to online tutorials on working in the shell and also have a look at <a href="cli-apps.html">Haiku's commandline applications</a>. Here, we'll concentrate on the Terminal application itself.</p>
+<p>La Terminal es la interfaz de Haiku al bash, el intérprete de comandos Bourne Again (Bourne Again Shell por sus siglas en inglés).</p>
+<p>Por favor refiérase al tema <a href="../bash-scripting.html">Scripting</a> para ver algunos enlaces a tutoriales en línea sobre trabajo en el intérprete de comandos y también vea las <a href="cli-apps.html">aplicaciones de línea de comandos de Haiku</a>. Aquí nos concentraremos en la aplicación Terminal.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="windows-tabs" name="windows-tabs">Windows and tabs</a></h2>
+<a id="windows-tabs" name="windows-tabs">Ventanas y fichas</a></h2>
 <p>Puede abrir tantas Terminales como se necesite, cada una de ellas en su propia ventana simplemente abriendo más Terminales o con <span class="key">ALT</span> <span class="key">N</span> desde una Terminal que ya esté corriendo. O puede usar la vista por pestañas de Terminal y abrir otra pestaña con <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
-By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
-Via <span class="menu">Edit | Window title...</span> the Terminal window's title can be edited in a similar way.</p>
-<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
-<p>Una ventana de Terminal se puede retamañar como cualquier o puede usar los ajustes preestablecidos desde el menú <span class="menu">Settings | Window Size</span> (Selecciones | Ventana). <span class="key">ALT</span> <span class="key">ENTER</span> habilita o deshabilita el modo a pantalla completa.</p>
-<p>All the settings you change directly through the <span class="menu">Settings</span> menu, like <span class="menu">Window title</span>, <span class="menu">Window size</span>, <span class="menu">Text encoding</span> or <span class="menu">Font size</span> are only kept for the current session. If you want to make permanent changes, you have to apply them in the <span class="menu">Settings...</span> panel.</p>
+<p>Si da doble clic en una parte vacía de la barra de pestañas abrirá una nueva pestaña; si da doble clic en una pestaña podrá cambiarle el título. Hay varias variables designadas con '%' que se explican con información emergente cuando reposa el puntero sobre el campo de texto.<br />
+De manera predeterminada, <tt>%1d: %p</tt>, una pestaña muestra el directorio actual, y separado por <tt>:</tt>, el nombre del proceso que se ejecuta actualmente (o <tt>--</tt> si solamente es el intérprete de comandos bash, probablemente en reposo). La captura de pantalla que se muestra arriba presenta la primera pestaña con una sesión FTP en el <span class="path">Escritorio</span> y una segunda pestaña en reposo en el directorio de usuario <span class="path">home</span>.<br />
+A través de <span class="menu">Editar | Título de Ventana…</span> se puede editar el título de la ventana de la Terminal de manera similar.</p>
+<p>Un clic derecho en una ficha muestra un menú contextual para <span class="menu">Cerrar pestaña</span>, <span class="menu">Cerrar otras pestañas</span> o, igual que dar doble clic, <span class="menu">Editar título de pestaña…</span></p>
+<p>Se puede cambiar el tamaño de una ventana de Terminal igual que cualquier otra ventana o puede usar los ajustes preestablecidos desde el menú <span class="menu">Settings | Window Size</span> (Configuración | Ventana). <span class="key">ALT</span> <span class="key">ENTER</span> alterna el modo de pantalla completa.</p>
+<p>Toda configuración que haga desde el menú <span class="menu">Configuración</span>, como el <span class="menu">Título de ventana</span>, <span class="menu">Tamaño de ventana</span>, <span class="menu">Codificación de texto</span> o <span class="menu">Tamaño de letra</span> solamente se mantienen para la sesión actual. Si quiere hacer cambios permanentes, debe aplicarlos en el panel de <span class="menu">Configuración…</span></p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Settings</a></h2>
-<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<a id="settings" name="settings">Configuración</a></h2>
+<p><span class="menu">Configuración | Configuración… </span> abre un panel para configurar los ajustes estándar de una Terminal.</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>Most of the offered settings speak for themselves.<br />
-Hover your mouse over the "formulas" for naming tab and window titles to get tooltips for the available variables. <br />
-You can choose pre-defined color schema like <span class="menu">Midnight</span> or <span class="menu">Retro</span> or create a <span class="menu">Custom</span> one by selecting which color you want to change (<span class="menu">Text</span>, <span class="menu">Background</span>, <span class="menu">Cursor</span> etc.) and then use  the color picker below.</p>
-<p>A few more options follow: you can have a <span class="menu">Blinking cursor</span> and choose to <span class="menu">Use bright instead of bold text</span>. The latter setting avoids the sometimes rather unsightly rendering of bold fonts in the Terminal.<br />
-Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.</p>
+<p>La mayoría de los ajustes ofrecidos se explican sólos.<br />
+Descanse el ratón sobre las "fórmulas" para darle nombre a los títulos de ventanas y pestañas para ver información emergente de las variables disponibles. <br />
+Puede escoger un esquema de colores predefinido como <span class="menu">Midnight</span> (Medianoche) o <span class="menu">Retro</span> o crear uno <span class="menu">Custom</span> (Personalizado) seleccionando un color que quiera cambiar (el <span class="menu">Texto</span>, <span class="menu">Fondo</span>, <span class="menu">Cursor</span> etc.) y luego usar el selector de colores abajo.</p>
+<p>A continuación algunas opciones adicionales: puede tener un <span class="menu">Cursor parpadeante</span> y elegir <span class="menu">Usar texto brillante en lugar de texto resaltado</span>. El último ajuste evita el generado visual a veces desagradable de tipografía resaltada en negrita en la Terminal.<br />
+Si activa la casilla de selección para <span class="menu">Confirmar salida si existen programas activos</span> y recibirá una alerta cuando quiera cerrar una ventana de Terminal que tenga un programa en ejecución.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td class="onelinetop"><span class="button">Save to file...</span></td><td width="10"> </td><td>let's you save different settings as separate profiles, which on double-click open an accordingly configured Terminal.</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you opened the settings panel.</td></tr>
-<tr><td><span class="button">Defaults</span></td><td> </td><td>resets everything to default values.</td></tr>
+<tr><td class="onelinetop"><span class="button">Guardar a archivo…</span></td><td width="10"> </td><td>Le permite guardar configuraciones diferentes como perfiles separados, que cuando les hace doble clic abrirán una Terminal configurada de manera acorde.</td></tr>
+<tr><td><span class="button">Revertir</span></td><td> </td><td>regresa la configuración que estaba activa cuando abrió el panel de configuración previamente.</td></tr>
+<tr><td><span class="button">Valores predeterminados</span></td><td> </td><td>restablece todo a los valores predeterminados.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Atajos de teclado</a></h2>
-<p>Encontrará una lista de atajos útiles en <a href="../keyboard-shortcuts.html#terminal">Atajos y combinaciones de teclas</a>.</p>
-<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
-<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
-<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
+<a id="shortcuts" name="shortcuts">Accesos Rápidos de Teclado</a></h2>
+<p>Encontrará una lista de atajos útiles en <a href="../keyboard-shortcuts.html#terminal">Métodos abreviados y combinaciones de teclas</a>.</p>
+<p>Otra característica agradable que es más una combinación e teclado y ratón: Cuando mantiene presionado <span class="key">ALT</span> se resaltará una ruta o URL que esté bajo el puntero del ratón. Un clic izquierdo abre el archivo/carpeta o sitio web. Un clic derecho abre un menú contextual para ya sea <span class="menu">Copiar la ruta</span> o <span class="menu">Copiar la ruta absoluta</span>. Imagine que se encuentra ubicado en <span class="path">/MisDatos/source/haiku/</span> y tiene la ruta <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> bajo el puntero del ratón, el último menú le mostrará la ruta absoluta, combinada &lt;<i>respiro profundo</i>&gt;:<br /> <span class="path">/MisDatos/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>Si mantiene presionadas <span class="key">ALT</span> <span class="key">SHIFT</span>, será resaltada la ruta desde el inicio sólo hasta donde tiene el puntero.</p>
+<p>A propósito, dar clic con el botón derecho en la Terminal insertará el contenido del portapapeles. Si se hace en combinación con copiar partes de rutas resaltadas, esto se puede usar para navegación acelerada de jerarquías de directorios profundos.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -117,15 +117,15 @@ Ambos archivos pueden crearse en la carpeta <span class="path">/boot/home/config
 <p>El archivo <span class="cli">profile</span> se caraga cada vez que se abre una Terminal nueva. Selecciona toda clase de "aliases" y variables que afectarán el comportamiento y apariencia de Bash. Encontrará muchos recursos en línea que detallen todas las posibilidades.</p>
 <p>El "Haiku/BeOS Tip Server" (Servidor de consejos de Haiku/BeOS, en inglés) tiene bastantes consejos para iniciar, por ejemplo:</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personalizar el prompt de la Terminal</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Más personalizaciones del prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Incrementar a Bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Atajos de teclado personalizados</a></li>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personalizar el prompt de la Terminal (en inglés)</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Más personalizaciones del prompt (en inglés)</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Incrementar a Bash (en inglés)</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Atajos de teclado personalizados (en inglés)</a></li>
 </ul>
-<p>Y hay más, <a href="http://betips.net/index.php?s=.profile">déle un vistazo</a>.</p>
+<p>Y hay más, <a href="http://betips.net/index.php?s=.profile">déle un vistazo</a> (en inglés).</p>
 
 <h3>inputrc</h3>
-<p>El archivo <span class="cli">inputrc</span> trata con teclas de acceso rápido. Ya que Haiku proporciona predeterminados útiles, probablemente no tenga que lidiar con estas selecciones más envueltas. Si tiene necesidades especiales aquí, consulte alguno de los vastos recursos en línea, p. ej., <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> (La biblioteca de lectura en línea de GNU, en inglés).</p>
+<p>El archivo <span class="cli">inputrc</span> trata con teclas de acceso rápido. Ya que Haiku proporciona predeterminados útiles, probablemente no tenga que lidiar con estas selecciones más envueltas. Si tiene necesidades especiales aquí, consulte alguno de los vastos recursos en línea, p. ej., la <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">GNU Readline Library</a> (La biblioteca de lectura en línea de GNU, en inglés).</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

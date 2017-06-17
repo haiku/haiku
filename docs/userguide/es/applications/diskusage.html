@@ -13,6 +13,7 @@
  *		killa.fr0gg
  *		miguel~1.mx
  *		Oscar Carballal
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -58,7 +59,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage (Uso del disco)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -69,8 +69,8 @@
 <p><br /></p>
 <p>DiskUsage exhibe gráficamente el uso del espacio de los volúmenes.<br />
 Es una herramienta muy útil para contestar la pregunta, "<i>¿Qué pasó con todo mi espacio?</i>"</p>
-<p>After launching, DiskUsage shows only an empty window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
-It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
+<p>Luego de iniciar, DiskUsage muestra solamente una ventana vacía con todas las unidades montadas, en pestañas en la parte de arriba. Deberá seleccionar la que le interese y hacer clic en <span class="button">Scan (Rastrear)</span> para iniciar el proceso en el disco. Para discos grandes esto puede tomar algo de tiempo… Mientras espera, puede cambiarse a una pestaña diferente y empezar a explorar ese volumen o iniciar el proceso de rastreo ahí también.<br />
+No se recomienda iniciar varios procesos de rastreo concurrentes en la misma unidad física de disco, ya que el reposicionado costante de los cabezales del disco sólo extenderá el tiempo de espera.</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>Los círculos concéntricos representan los diferentes niveles en la jerarquía del sistema de archivos. En la imagen superior, el círculo del centro representa el directorio <span class="path">/boot/home/</span>. Cada segmento del anillo que esté fuera de ese círculo es un archivo o una carpeta dentro de <span class="path">/boot/home/</span>. Cada segmento más alejado le llevará a un nivel más profundo de la jerarquía de archivos. Puede que haya que redimensionar la ventana para acomodar directorios muy profundos.</p>
 <div class="box-info"><ul>
@@ -79,11 +79,11 @@ It's not recommended to start several concurrent scan processes on the same phys
 <li>DiskUsage ignora los enlaces simbólicos.</li>
 </ul></div>
 <p>Mientras mueve el ratón sobre un segmento, la información acerca de ese archivo o directorio aparecerá en la barra de estado de la parte inferior.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
+<p>Dar clic derecho en un segmento muestra un menú contextual para <span class="menu">Get Info (Obtener información)</span>, <span class="menu">Open (Abrir)</span> (con Tracker), <span class="menu">Open With (Abrir con)</span> otra aplicación compatible o <span class="menu">Rescan (Volver a escanear)</span> ese directorio en particular.<br />
+Dar clic izquierdo en el segmento hace que la carpeta seleccionada sea ubicada en el centro del círculo.<br />
+Un clic izquierdo en el centro del círculo le llevará un nivel arriba en la jerarquía.</p>
 <p>Se pueden arrastrar archivos y directorios desde DiskUsage a otras aplicaciones, al Escritorio o a otras ventanas de Tracker para copiar. De la misma forma, arrastrar volúmenes y directorios dentro de DiskUsage provocará que el programa haga zoom directamente en ellos, haciendo que sean el centro del círculo.</p>
-<p>You can also use the Tracker add-on from the context menu of any folder to start DiskUsage with that particular location.</p>
+<p>También puede utilizar la extensión del Tracker del menú contextual de cualquier folder para iniciar DiskUsage en esa ubicación particular.</p>
 
 </div>
 </div>

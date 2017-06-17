@@ -12,6 +12,7 @@
  * Translators:
  *		miguel~1.mx
  *		Oscar Carballal
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -57,11 +58,10 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch (Buscador de texto)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Sin acceso, normalmente se abre vía su agregado en Tracker</i></td></tr>
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
@@ -72,25 +72,24 @@
 
 <p>Se introduce la cadena a buscar en la caja de texto de la parte superior y se pulsa <span class="key">RETURN</span> o se hace clic en <span class="button">Buscar</span> para comenzar. Si <span class="menu">Mostrar líneas</span> está marcado, las coincidencias son expandidas automáticamente para mostrar las líneas del fichero que contiene la cadena de búsqueda.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Sólo unas palabras acerca de ciertos elementos del menú que más allá de eso se explican por si mismos:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
 <tr><td colspan="5"><h3>Menú Archivo</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">Nueva ventana</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
-</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries from the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line tool <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Nueva ventana</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Abre una nueva ventana donde puede ingresar otra entrada y buscar en los mismos archivos/carpetas.</td></tr>
+<tr><td><span class="menu">Establecer destino…</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Le permite elegir una nueva colección de archivos y carpetas en donde buscar.</td></tr>
+<tr><td colspan="5"><h3>Menú Acción</h3></td></tr>
+<tr><td><span class="menu">Recortar selección</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Quita todas las entradas que no estan actualmente seleccionadas del listado.</td></tr>
+<tr><td><span class="menu">Abrir selección</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Abre los archivos actualmente seleccionados con su aplicación designada (igual que darles doble clic). Si es un editor de texto el que lo soporta (como Pe), puede saltar a la línea exacta de la cadena de búsqueda encontrada.</td></tr>
+<tr><td><span class="menu">Abrir archivos en el Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Abre en el Tracker la ubicación del archivo seleccionado actualmente.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Copiar texto al portapapeles</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Copia la selección actual al portapapeles.</td></tr>
+<tr><td colspan="5"><h3>Menú de configuración</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Saltarse las carpetas que inician con un punto</span></td><td> </td><td>Este ajuste es útil cuando está trabajando en un ambiente estilo UNIX, donde normalmente los archivos administrativos se encuentran escondidos en "<tt>.carpetas/</tt>". Sistemas de control de versiones como SVN y CVS son ejemplos de aplicaciones que utilizan esta característica y son ampliamente usadas en Haiku.</td></tr>
+<tr><td colspan="3"><span class="menu">Búsqueda de texto con ordenes de escape</span></td><td> </td><td>TextSearch utiliza la herramienta de línea de comandos <span class="cli">grep</span>. Para la herramienta, los caracteres especiales como <tt>'"*\$?!</tt> y espacios deben ser definidos como ordenes de escape con <tt>\</tt>. La desactivación de este ajusta significa que tendría que hacer esto usted mismo, pero a cambio le da las facultades de las <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">expresiones regulares</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Sólo archivos de texto</span></td><td> </td><td>Actualmente TextSearch sólo es útil para encontrar cadenas de texto en archivos de texto sin formato. Si desactiva esta opción, realizará la búsqueda en cualquier tipo de archivo de cualquier manera.</td></tr>
+<tr><td colspan="5"><h3>Menú de historial</h3></td></tr>
+<tr><td colspan="4"></td><td>Contiene las cadenas recientes de búsquedas.</td></tr>
+<tr><td colspan="5"><h3>Menú de codificaciones</h3></td></tr>
+<tr><td colspan="4"></td><td>Le permite escoger diferentes codificaciones de caracteres de ser necesario.</td></tr>
 </table>
 </div>
 </div>

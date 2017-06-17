@@ -72,7 +72,7 @@
 
 <h1>Deskbar</h1>
 
-<p>Deskbar は小さなパネルで、デフォルトでは画面右上の角に配置されています。これは、Windows での「スタート」ボタンの Haiku 版です。アプリケーションや設定を開くための Deskbar メニューと、時計やその他のツールを表示するトレイを持ち、実行しているプログラムの一覧をその下に表示します。</p>
+<p>Deskbar は小さなパネルで、デフォルトでは画面右上の隅に配置されています。これは、Windows での「スタート」ボタンの Haiku 版です。アプリケーションや設定を開くための Deskbar メニューと、時計やその他のツールを表示するトレイを持ち、実行しているプログラムの一覧をその下に表示します。</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
 <p>トレイの片側にある凸の部分をつかんで新しい位置にドラッグ＆ドロップすると、画面の角、上部あるいは下部に Deskbar を動かせます。Deskbar メニューに凸の部分をドラッグ＆ドロップすることで、バーを小さく折りたたむこともできます。</p>
 
@@ -112,9 +112,9 @@
 
 <h4>メニュー (Menu)</h4>
 <p>Deskbar の最初の 2 つのメニューは固定されていますが、ユーザーは、<span class="menu">シャットダウン… (Shutdown...)</span> より下のメニューをカスタマイズできます。<br />
-ここでは、Deskbar のメニューに表示する、最近利用したドキュメント、フォルダー、アプリケーションの数を指定できます。あるいは、それらを表示するかどうかを設定できます。<br />
-<span class="button">メニューの編集… (Edit Menu...)</span>  ボタンは <span class="path">~/config/settings/deskbar/menu/</span> フォルダーを開きます。そこには、Deskbar で表示されるファイルとフォルダーがあることに気づくでしょう。初期設定では、<span class="menu">アプリケーション (Applications)</span>、<span class="menu">デモ (Demos)</span>、<span class="menu">デスクトップアプレット (Deskbar Applets)</span>、<span class="menu">環境設定 (Preferences)</span> となっています。<br />
-アプリケーションへのリンクやドキュメント、クエリといった項目を追加または削除するには、単にこのフォルダーにコピー、削除するだけです。</p>
+ここでは、Deskbar メニューに表示する、最近利用したドキュメント、フォルダー、アプリケーションの数を指定できます。あるいは、それらを表示させないかどうかを設定できます。<br />
+<span class="button">Tracker で編集… (Edit in Tracker...)</span>  ボタンは <span class="path">~/config/settings/deskbar/menu/</span> フォルダーを開きます。そこには、Deskbar で表示されるファイルとフォルダーが見つかるでしょう。初期設定では、<span class="menu">アプリケーション (Applications)</span>、<span class="menu">デモ (Demos)</span>、<span class="menu">デスクトップアプレット (Deskbar Applets)</span>、<span class="menu">環境設定 (Preferences)</span> となっています。<br />
+単にこのフォルダーにコピー、削除するだけで、アプリケーションへのリンクやドキュメントといった項目またはクエリでさえも、追加または削除できます。</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>パッケージからインストールされたプログラムは、自動的に Deskbar メニュー内に項目を作成します。パッケージをインストールするにつれて、それは少し込み入ってくるでしょう。もしユーザーが総合的に管理するのが好きで、自分自身でリンクした (たぶんサブフォルダーに分類された) アプリケーションを見たいだけであるなら、以下がそのやり方です。<br />
 <span class="path">menu</span> フォルダーのリンクを、<span class="path">~/config/settings/deskbar/</span> 内に作成し、それを <span class="path">menu_entries</span> にリネームします。以上は、ターミナルから以下のように実現できます。</p>

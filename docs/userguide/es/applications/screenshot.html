@@ -12,6 +12,7 @@
  * Translators:
  *		miguel~1.mx
  *		Loïc
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -57,7 +58,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -67,36 +67,39 @@
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Screenshots are taken by either starting the Screenshot application or by pressing the <span class="key">PRINT</span> key,</p>
+<p>Las capturas de pantallan se toman ya sea con la aplicación Captura de Pantalla o presionando la tecla <span class="key">Impr Pant</span> key,</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>In the Screenshot panel you can toggle between taking the whole screen or just the active window and decide if the window border and mouse pointer should be included. You can also enter a delay before a screenshot is taken.</p>
-<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
-<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<p>En el panel de Captura de Pantalla puede intercambiar entre capturar la pantalla completa o sólo la ventana activa, y puede decidir si se debe incluir el borde de la ventana y el puntero del ratón. También puede establecer una demora antes que se tome la captura.</p>
+<p>Debajo de eso, puede definir el nombre, formato y ubicación que se usará para la captura de pantalla cuando haga clic en el botón <span class="button">Save</span>. En vez de guardar el archivo a disco también puede decidir <span class="button">Copiar al portapapeles</span> para poder pegar la captura directamente en otra aplicación, o tomar una <span class="button">Nueva captura</span>.</p>
+<p>Todos los ajustes serán recordados la próxima vez que tome una captura, permitiéndole usar las siguientes combinaciones de teclado:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the Screenshot panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Toma una captura de pantalla sin ninguna demora e inicia el panel de Captura de Pantalla.</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Toma una captura de pantalla de manera silenciosa (sin abrir el panel), pero respetando los ajustes anteriores.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>También toma una captura de pantalla de manera silenciosa con los ajustes guardados, pero en vez de guardarlo como un archivo, se copia al portapapeles.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Tomar una captura de pantalla desde la Terminal</h2>
-<p>There's a special <span class="cli">screenshot</span> application to be used from Terminal or a script.<br />
-<span class="cli">screenshot --help</span> shows the familiar options as parameters:</p>
+<p>Hay una aplicación especial <span class="cli">screenshot</span> que se puede usar desde la Terminal o un script.<br />
+<span class="cli">Screenshot --help</span> muestra las opciones familiarizadas como parámetros:</p>
 
 <pre class="terminal">~&gt; Screenshot --help
 
-Screenshot [OPTION]... Creates a bitmap of the current screen
+Screenshot [OPTION]… Crea un mapa de bits de la pantalla actual
 
 OPTION
-  -o, --options         Show options window first
-  -m, --mouse-pointer   Include the mouse pointer
-  -b, --border          Include the window border
-  -w, --window          Capture the active window instead of the entire screen
-  -d, --delay=seconds   Take screenshot after specified delay [in seconds]
-  -s, --silent          Saves the screenshot without showing the app window
-                        overrides --options, saves to home folder as png
+  -o, --options         Muestra la pantalla de opciones primero
+  -m, --mouse-pointer   Incluye el puntero del ratón
+  -b, --border          Incluye el borde de la ventana
+  -w, --window          Captura la venana activa en lugar de la pantalla completa
+  -d, --delay=seconds   Toma una captura luego de una demora especificada [en segundos]
+  -s, --silent          Guarda la captura sin mostrar la ventana de la aplicación
+  -f, --format=image    Especifica el formato de imagen que quiere guardar como 
+                        [bmp], [gif], [jpg], [png], [ppm], [tga], [tif]
+  -c, --clipboard       Copia la captura de pantalla al portapapeles del sistema sin
+                        mostrar la ventana de la aplicación
 
-Note: OPTION -b, --border takes only effect when used with -w, --window
+Note: OPTION -b, --border sólo toma efecto si se utiliza junto a -w, --window
 </pre>
 
 </div>

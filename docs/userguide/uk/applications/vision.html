@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009-2015, Haiku. All rights reserved.
+ * Copyright 2009-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,6 +56,14 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#shortcuts">Keyboard shortcuts</a><br />
+	<a href="#commands">Built-in commands</a></td></tr>
+</table>
 
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -70,191 +78,212 @@
 <p>Деякі поради, особливо якщо ви новачок в IRC:</p>
 <ul>
 <li><p>Пошукайте в тенетах про "IRC етикет" щоб дізнатися що можна робити в чаті а що ні. Без довгих пошуків, я знайшов  <a href="https://workaround.org/getting-help-on-irc/">Отримання допомоги по IRC</a> від Крістофа Хааса і залишився задоволеним.</p></li>
-<li><p>Реєструючи свій нік переконайтесь у відсутності жодних махінацій та заслугуйте довіру відвідувачів. Дивись <a href="http://freenode.net/faq.shtml#nicksetup">Freenode's FAQ</a> на цю тему.</p>
-
-</li>
+<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/kb/answer/registration ">Freenode's FAQ</a> on that matter.</p></li>
 <li><p>Налаштуйте звук в аплеті  налаштувань Звуки Haiku (Haiku's Sounds) щоб отримувати сигнал коли хтось згадує ваш нік на каналі. Люди не завжди дивляться у екран свого IRC клієнта. Розміщення ніка людини з якою ви розмовляєте на початку збільшує шанси бути поміченим. Подібно до Терміналу, Vision підтримує завершення табуляції для ніків, тобто якщо ви ввели початкові літери та натисните клавішу <span class="key">Tab</span>, Vision завершить його першим іменем що співпадає.</p></li>
 </ul>
-<p>Це перелік вбудованих команд який ми наводимо з дозволу сайту Vision.</p>
-<p>Синтаксис:</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>Vision provides a few handy keyboard shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>When the input control has focus, this will cycle through your recently entered text.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Activates the window that appears above / below the currently active (selected) one in the "Window list"</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Similar to <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, but with a twist. Instead of activating the window immedietly above / below the current one, it looks ahead. If there are any windows with higher status bits then the current window, it jumps to those. It jumps to the highest found status bit first.<br />
+
+To understand this, you must know that Vision color codes windows in the list with different "status bits" depending on how its contents have changed since it last had focus:
+<ul>
+<li><b><span style="color:black">black</span></b> - no new text</li>
+<li><b><span style="color:silver">gray</span></b> - new text, but nothing exciting (joins, parts, etc.)</li>
+<li><b><span style="color:green">green</span></b> - someone has said something</li>
+<li><b><span style="color:red">red</span></b> - someone has said something, and mentioned your nickname</li>
+</ul>
+Vision treats these with sequential priority. When you press<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Vision will first jump to a red window above / below the current one if it sees one. If it doesn't see a red one, it will jump to a green one, and so on.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commands" name="commands">Built-in commands</a></h2>
+<p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
+<p>The syntax:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
-<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>команда</td></tr>
-<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>очікуваний параметр</td></tr>
-<tr><td><tt>[optional]</tt></td><td></td><td>необов'язковий параметр</td></tr>
-<tr><td><tt>|</tt></td><td></td><td>логічне АБО</td></tr>
-<tr><td><tt>...</tt></td><td></td><td>якомога більше параметрів</td></tr>
+<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>the command</td></tr>
+<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>a required parameter</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>an optional parameter</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>a logical OR</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>more parameters possible</td></tr>
 </table>
 
 <ul>
-<li><p><span class="menu">/ПРО(/ABOUT)</span><br />
-Відкрити вікно про Vision.</p></li>
+<li><p><span class="menu">/ABOUT</span><br />
+Opens Vision's About window.</p></li>
 
-<li><p><span class="menu">/АКРОНІМ (/ACRONYM) [слово]</span><br />
-Відкриває www.acronymfinder.com у вашому поточному обробнику html. (Зауваження: Якщо ваш файл обробник не браузер, то відкриється програма зазначена у аплеті Типи файлів (FileTypes).)</p></li>
+<li><p><span class="menu">/ACRONYM [word]</span><br />
+Opens www.acronymfinder.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/ВІДІЙШОВ (/AWAY) [причина відходу]</span><br />
-встановлює статус відійшов для поточної мережі, коли причина не зазначена вона визначається як 'BRB'. (be right back - повернуся)</p></li>
+<li><p><span class="menu">/AWAY [away-reason]</span><br />
+Sets away status on current network. If no away reason is specified, it is set to 'BRB'. (be right back)</p></li>
 
-<li><p><span class="menu">/ПОВЕРНУТИСЬ (/BACK)</span><br />
-Встановлює статус до 'повернутись' у поточній мережі.</p></li>
+<li><p><span class="menu">/BACK</span><br />
+Sets your status to 'back' on current network.</p></li>
 
-<li><p><span class="menu">/ОЧИСТИТИ (/CLEAR)</span><br />
-Очищує вміст буфера поточного тексту.</p></li>
+<li><p><span class="menu">/CLEAR</span><br />
+Clears the contents of the current text buffer.</p></li>
 
-<li><p><span class="menu">/CTCP&lt;нік|канал(nick|channel)&gt;
-&lt;ПІНГ(PING)|ВЕРСІЯ(VERSION)|ВКАЗІВНИК(FINGER)|ЧАС(TIME)|КЛІЄНТ(CLIENTINFO|КОРИСТУВАЧ(USERINFO)&gt;</span><br />
-Виконує зазначені команди ctcp на каналі або ніку.</p></li>
+<li><p><span class="menu">/CTCP &lt;nick|channel&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
+Executes the specified ctcp command on a channel or nick.</p></li>
 
-<li><p><span class="menu">/DCC &lt;ЧАТ (CHAT)&gt; &lt;нік&gt;</span><br />
-Відкриває приватну dcc чат-сесію з зазначеним ніком.</p></li>
+<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;nick&gt;</span><br />
+Opens a private dcc chat session with the specified nick.</p></li>
 
-<li><p><span class="menu">/DCC &lt;ВІДПРАВИТИ (SEND)&gt; &lt;нік&gt; [файл]</span><br />
-Відправляє файл до &lt;ніка&gt;. Якщо файл не вказаний відкриється панель Файл (File).</p></li>
+<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;nick&gt; [file]</span><br />
+Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</p></li>
 
-<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;нік1&gt; [нік2] ...</span><br />
-De-ops або de-voices &lt;ніка(ів)&gt;.</p></li>
+<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;nick1&gt; [nick2] ...</span><br />
+De-ops or de-voices &lt;nick(s)&gt;.</p></li>
 
-<li><p><span class="menu">/ОПИС /DESCRIBE &lt;нік&gt; &lt;повідомлення&gt;</span><br />
-Таке саме як /ME, але відкриває запит для &lt;нік&gt;.</p></li>
+<li><p><span class="menu">/DESCRIBE &lt;nick&gt; &lt;message&gt;</span><br />
+Same as /ME, but opens a query on &lt;nick&gt;.</p></li>
 
-<li><p><span class="menu">/DNS &lt;домен/IP адреса&gt;</span><br />
-Дозволяє дану IP адресу або доменне ім'я.</p></li>
+<li><p><span class="menu">/DNS &lt;domain name/IP address&gt;</span><br />
+Resolves the given IP or domain name.</p></li>
 
-<li><p><span class="menu">/ВИЙТИ (/EXIT)</span><br />
-Вихід з Vision.</p></li>
+<li><p><span class="menu">/EXIT</span><br />
+Quits Vision.</p></li>
 
-<li><p><span class="menu">/GAWAY [покинути- причина]</span><br />
-Таке саме як /ПОКИНУТИ (/AWAY) [покинути-причина], але стосується усіх під'єднаних мереж.</p></li>
+<li><p><span class="menu">/GAWAY [away-reason]</span><br />
+Same as /AWAY [away-reason], but applies to all connected networks.</p></li>
 
 <li><p><span class="menu">/GBACK</span><br />
-Таке саме як /BACK, але стосується усіх під'єднаних мереж.</p></li>
+Same as /BACK, but on applies to all connected networks.</p></li>
 
-<li><p><span class="menu">/GOOGLE [стрічка пошуку]</span><br />
-Відкриває www.google.com у вашому поточному обробнику html. (Зауваження: якщо файл-обробник не браузер, то відкриється програма зазначена у аплеті Типи файлів (FileTypes).)</p></li>
+<li><p><span class="menu">/GOOGLE [search-string]</span><br />
+Opens www.google.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/ЗАПРОСИТИ (/INVITE)&lt;нік&gt; &lt;канал&gt;</span><br />
-Запрошує &lt;нік&gt; до &lt;каналу&gt;.</p></li>
+<li><p><span class="menu">/INVITE /I &lt;nick&gt; &lt;channel&gt;</span><br />
+Invites &lt;nick&gt; to the &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/ПРИ'ЄДНАТИСЬ (/JOIN /J)&lt;канал&gt; [гасло каналу]</span><br />
-При'єднує до &lt;каналу&gt;. Введіть [гасло каналу] при потребі.</p></li>
+<li><p><span class="menu">/JOIN /J &lt;channel&gt; [channel-key]</span><br />
+Joins the &lt;channel&gt;. Provide a [channel-key] if necessary.</p></li>
 
-<li><p><span class="menu">/ШПІЦАНУТИ (ВИГНАТИ) (KICK /K)&lt;nick&gt; [причина]</span><br />
-Шпіцує (виганяє) &lt;нік&gt; з поточного каналу. Якщо [причина] не зазначена її встановлюють ту що зазначена в налаштуваннях.</p></li>
+<li><p><span class="menu">/KICK /K &lt;nick&gt; [reason]</span><br />
+Kicks &lt;nick&gt; from current channel. If [reason] is not specified, it will be set to the reason specified in Preferences.</p></li>
 
-<li><p><span class="menu">/ВБИТИ (/KILL) &lt;нік&gt; [повідомлення]</span><br />
-Команда IRC оператора для від'єднання користувача від мережі.</p></li>
+<li><p><span class="menu">/KILL &lt;nick&gt; [message]</span><br />
+IRC operator command to disconnect a user from the network.</p></li>
 
-<li><p><span class="menu">/СПИСОК/ (LIST)</span><br />
-Відкриває нове вікно та показує список каналів у поточній мережі. [за виключенням схованих]</p></li>
+<li><p><span class="menu">/LIST</span><br />
+Opens a new view which lists all the channels on the current network. [except hidden channels]</p></li>
 
-<li><p><span class="menu">/MODE /M</span><br />
-Відображає режими каналів поточного каналу.</p></li>
+<li><p><span class="menu">/M</span><br />
+Displays the channel modes of the current channel.</p></li>
 
-<li><p><span class="menu">/MODE /M &lt;+-ohvbeqa&gt; &lt;нік1&gt; [нік2] ...</span><br />
-Таке саме як <span class="menu">MODE &lt;канал&gt; &lt;режим&gt; &lt;нік&gt;</span>, але для поточного каналу.</p></li>
+<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
+Same as <span class="menu">MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, but on current channel.</p></li>
 
-<li><p><span class="menu">/MODE /M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Таке саме як <span class="menu">/MODE &lt;канал&gt; &lt;режим&gt;</span>, але для поточногоканалу.</p></li>
+<li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Same as <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, but on current channel.</p></li>
 
-<li><p><span class="menu">/ME &lt;текст&gt;</span><br />
-Показати: <i>* {Ваш нік} &lt;текст&gt;.</i></p></li>
+<li><p><span class="menu">/ME &lt;text&gt;</span><br />
+Displays: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
 
-<li><p><span class="menu">/MODE &lt;канал&gt; &lt;+-ohvbeqa&gt; &lt;нік1&gt; [нік2] ...</span><br />
-Встановити режим &lt;ніка(ів)&gt; на &lt;каналі&gt;.<br />
-наприклад, <span class="menu">/MODE #канал +o нік1</span><br />
-або <span class="menu">/MODE #канал +oo-o нік1 нік2 нік3</span></p></li>
+<li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
+Sets mode for &lt;nick(s)&gt; on &lt;channel&gt;.<br />
+e.g. <span class="menu">/MODE #channel +o nick1</span><br />
+or <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
 
-<li><p><span class="menu">/MODE &lt;канал&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Встановити режим &lt;каналу&gt;. (Зауваження: Кома просто візуальний розділювач.)<br />
-наприклал, <span class="menu">/MODE #канал +ms</span></p></li>
+<li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Sets the mode of &lt;channel&gt;. (Note: Commata just for optical separation.)<br />
+e.g. <span class="menu">/MODE #channel +ms</span></p></li>
 
-<li><p><span class="menu">/MSG &lt;нік&gt; &lt;повідомлення&gt;</span><br />
-Відсилає &lt;повідомлення&gt; до &lt;нік&gt;.</p></li>
+<li><p><span class="menu">/MSG &lt;nick&gt; &lt;message&gt;</span><br />
+Sends a &lt;message&gt; to &lt;nick&gt;.</p></li>
 
-<li><p><span class="menu">/ІМЕНА(/NAMES)</span><br />
-Показує всі канали та всі ніки мережі у вікні мережі. (Будьте з цим обережні)</p></li>
+<li><p><span class="menu">/NAMES</span><br />
+Displays all channels and all nicks of the network in the network window. (Careful with this one)</p></li>
 
-<li><p><span class="menu">/ІМЕНА (/NAMES) &lt;канал&gt;</span><br />
-Показує нік(и) на &lt;каналі&gt;.</p></li>
+<li><p><span class="menu">/NAMES &lt;channel&gt;</span><br />
+Displays nick(s) in &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/НІК (/NICK) &lt;newnick&gt;</span><br />
-Змінює ваш нік на &lt;новий нік&gt;.</p></li>
+<li><p><span class="menu">/NICK &lt;newnick&gt;</span><br />
+Changes your nick to &lt;newnick&gt;.</p></li>
 
-<li><p><span class="menu">/ПОПЕРЕДЖАТИ (/NOTICE) &lt;nick&gt; &lt;message&gt;</span><br />
-Відсилає попередження до &lt;нік&gt; при отриманні &lt;повідомлення&gt;.</p></li>
+<li><p><span class="menu">/NOTICE &lt;nick&gt; &lt;message&gt;</span><br />
+Sends a notice to &lt;nick&gt; with the given &lt;message&gt;.</p></li>
 
-<li><p><span class="menu">/Попередження (/NOTIFY)&lt;нік1&gt; [нік2] ...</span><br />
-Додає &lt;нік(и)&gt; до вашого списку попереджень.</p></li>
+<li><p><span class="menu">/NOTIFY &lt;nick1&gt; [nick2] ...</span><br />
+Adds &lt;nick(s)&gt; to your notify list.</p></li>
 
-<li><p><span class="menu">/ВИКОНАТИ /ЗАПУСТИТИ (/PEXEC /RRUN)&lt;додаток1&gt; [ | &lt;додаток2&gt; | ... ]</span><br />
-Запускає отриманий &lt;додаток&gt;. Якщо їх більше одного то це буде зроблено по конвеєру.<br />
-наприклад, <span class="menu">/PEXEC Terminal | StyledEdit</span> відкриє  новий Terminal, а після нього StyledEdit<br /> або <span class="menu">/PEXEC ls -la ~/Downloads/</span> покаже ввміст вашої теки ~/Downloads/  у поточному вікні. (Будьмо уважні!)</p></li>
+<li><p><span class="menu">/PEXEC /RRUN &lt;app1&gt; [ | &lt;app2&gt; | ... ]</span><br />
+Executes the given &lt;app&gt;. If more than one application is provided, they will be executed in a pipe.<br />
+e.g. <span class="menu">/PEXEC Terminal | StyledEdit</span> opens a new Terminal, and afterwards StyledEdit<br />
+or <span class="menu">/PEXEC ls -la ~/Downloads/</span> displays the contents of your ~/Downloads/ directory in the current window (Attention!)</p></li>
 
-<li><p><span class="menu">/OP /VOICE &lt;нік1&gt; [нік2] ...</span><br />
-Ops або voices до &lt;ніка(ів)&gt;.</p></li>
+<li><p><span class="menu">/OP /VOICE &lt;nick1&gt; [nick2] ...</span><br />
+Ops or voices to &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/PART</span><br />
-Залишити поточний канал або мережу.</p></li>
+Leaves current channel or network.</p></li>
 
-<li><p><span class="menu">/ПІНГ (/PING) &lt;нік&gt;</span><br />
-Пінгує &lt;нік&gt; та повертає час пінгування. Еквівалентно до <span class="menu">/CTCP &lt;нік&gt; ПІНГ (PING)</span>.</p></li>
+<li><p><span class="menu">/PING &lt;nick&gt;</span><br />
+Pings the &lt;nick&gt; and returns the ping-time. Equivalent to <span class="menu">/CTCP &lt;nick&gt; PING</span>.</p></li>
 
-<li><p><span class="menu">/ЗАПИТ (/QUERY /Q) &lt;нік&gt; [повідомлення]</span><br />
-Відкриває вікно запитів на &lt;нік&gt;, не обов'язково зв'язане з [повідомленням].</p></li>
+<li><p><span class="menu">/QUERY /Q &lt;nick&gt; [message]</span><br />
+Opens a query window on &lt;nick&gt;, optionally along with a [message].</p></li>
 
-<li><p><span class="menu">/ВИЙТИ (/QUIT /QUI) [вибране повідомлення про вихід]</span><br />
-Вийти з поточної мережі. Якщо [вибране повідомлення про вихід] не визначено, буде використане типове з налаштувань.</p></li>
+<li><p><span class="menu">/QUIT /QUI [custom-quit-message]</span><br />
+Quits current network. If [custom-quit-message] is not specified, the default set in Preferences will be used.</p></li>
 
-<li><p><span class="menu">/RAW /QUOTE &lt;команда|текст&gt;</span><br />
-Відсилає необроблену  IRC команду.</p></li>
+<li><p><span class="menu">/RAW /QUOTE &lt;command|text&gt;</span><br />
+Sends a raw IRC command.</p></li>
 
-<li><p><span class="menu">/ПЕРЕЗ'ЄДНАННЯ (/RECONNECT)</span><br />
-Відбудеться перепід'єднання до поточної мережі, після  47 невдалих спроб їх буле призупинено.</p></li>
+<li><p><span class="menu">/RECONNECT</span><br />
+Will reconnect you to the current network if the 47 automatic reconnection attempts have failed.</p></li>
 
-<li><p><span class="menu">/SLEEP (/SLEEP)&lt;десятки секунд&gt;</span><br />Заставляє поточний потік спати протягом певного часу; для використання сценаріїв у майбутньому.</p></li>
+<li><p><span class="menu">/SLEEP &lt;deciseconds&gt;</span><br />
+Causes current thread to sleep for the specified time ; for future scripting use.</p></li>
 
 <li><p><span class="menu">/SQUIT</span><br />
-Команда IRC оператора для від'єднання від сервера.</p></li>
+IRC operator command to disconnect a server.</p></li>
 
 <li><p><span class="menu">/T</span><br />
-Показує теми поточного каналу.</p></li>
+Displays the channel-topic of current channel.</p></li>
 
-<li><p><span class="menu">/T &lt;нова тема каналу&gt;</span><br />
-Так само як <span class="menu">/TOPIC &lt;канал&gt; &lt;нова тема каналу&gt;</span>, але на поточному каналі.</p></li>
+<li><p><span class="menu">/T &lt;new-channel-topic&gt;</span><br />
+Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, but on current channel.</p></li>
 
-<li><p><span class="menu">/ЧАС (/TIME) &lt;nick&gt;</span><br />
-Показує місцевий час &lt;нік&gt;. Еквівалентно до <span class="menu">/CTCP &lt;нік&gt; ЧАС (TIME).</span></p></li>
+<li><p><span class="menu">/TIME &lt;nick&gt;</span><br />
+Returns local time of &lt;nick&gt;. Equivalent to <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
 
-<li><p><span class="menu">/ТЕМА (/TOPIC)&lt;канал&gt;</span><br />
-Показує тему&lt;каналу&gt;.</p></li>
+<li><p><span class="menu">/TOPIC &lt;channel&gt;</span><br />
+Displays the channel-topic of &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/ТЕМА (/TOPIC)&lt;канал&gt; &lt;нова тема каналу&gt;</span><br />
+<li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
+Sets the channel topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>
 
-Встановлює тему &lt;каналу&gt; на &lt;нову тему каналу&gt;.</p></li>
-
-<li><p><span class="menu">/UNNOTIFY &lt;нік1&gt; [нік2] ...</span><br />
-Видаляє &lt;нік(и)&gt; з вашого списку попереджень.</p></li>
+<li><p><span class="menu">/UNNOTIFY &lt;nick1&gt; [nick2] ...</span><br />
+Removes &lt;nick(s)&gt; from your notify list.</p></li>
 
 <li><p><span class="menu">/UPTIME [-l]</span><br />
-Показує час безвідмовної роботи системи. Якщо [-l] є визначено аптайм показуватиметься локально та не буде відсилатись до мережі.</p></li>
+Displays the systems uptime. If [-l] is specified, the uptime will be echoed locally, and not sent to the network.</p></li>
 
-<li><p><span class="menu">/ВЕРСІЯ (/VERSION)&lt;nick&gt;</span><br />
-Показує версію IRC-клієнта &lt;нік&gt;. Еквівалентно до <span class="menu">/CTCP &lt;нік&gt; ВЕРСІЯ (VERSION)</span>.</p></li>
+<li><p><span class="menu">/VERSION &lt;nick&gt;</span><br />
+Returns the client-version of &lt;nicks&gt; IRC-client. Equivalent to <span class="menu">/CTCP &lt;nick&gt; VERSION</span>.</p></li>
 
-<li><p><span class="menu">/ВІДВІДАТИ (/VISIT) &lt;url-адреса&gt;</span><br />
-Відкриває &lt;url-адресу&gt; вашим поточним обробником html. (Зауваження: якщо обробник не визначено, то його відкриє програма зазначена у Типах файлів (FileTypes).)</p></li>
+<li><p><span class="menu">/VISIT &lt;url&gt;</span><br />
+Opens &lt;url&gt; with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/WEBSTER /DICTIONARY [слово]</span><br />
-Відкриє www.m-w.com (Меріам Вебстер) у вашому поточному обробнику html. (Зауваження: якщо обробник не визначено, то його відкриє програма зазначена у Типах файлів (FileTypes).)</p></li>
+<li><p><span class="menu">/WEBSTER /DICTIONARY [word]</span><br />
+Opens www.m-w.com (Merriam Webster) with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
 <li><p><span class="menu">/VUPTIME [-l]</span><br />
-Показує час безвідмовної роботи Vision. Параметр[-l] має такий самий ефект як у <span class="menu">/UPTIME</span>.</p></li>
+Displays the Vision uptime. The [-l] parameter has the same effect as in <span class="menu">/UPTIME</span>.</p></li>
 
 <li><p><span class="menu">/WALLOPS</span><br />
-Команда IRC оператора яка відправляє повідомлення про помилку (воно видиме тим у кого активований режим  w).</p></li>
+IRC operator command that sends a wallops message (visible to those with umode  w active).</p></li>
 
-<li><p><span class="menu">/ХТО Є (/WHOIS /W) &lt;нік&gt;</span><br />
-Показує інформацію про &lt;нік&gt;.</p></li>
+<li><p><span class="menu">/WHOIS /W &lt;nick&gt;</span><br />
+Returns whois information of &lt;nick&gt;.</p></li>
 </ul>
 
 </div>

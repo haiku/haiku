@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009-2015, Haiku. All rights reserved.
+ * Copyright 2009-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,6 +59,13 @@
 <div>
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#shortcuts">Keyboard shortcuts</a><br />
+	<a href="#commands">Built-in commands</a></td></tr>
+</table>
+
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
@@ -72,9 +79,32 @@
 <p>Some advice, especially if you're new to IRC:</p>
 <ul>
 <li><p>Search the web for "IRC etiquette" to learn about the do's and don'ts of chatting. Without much searching, I found <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a> by Christoph Haas to be quite helpful.</p></li>
-<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/faq.shtml#nicksetup">Freenode's FAQ</a> on that matter.</p></li>
+<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/kb/answer/registration ">Freenode's FAQ</a> on that matter.</p></li>
 <li><p>Set up a sound in Haiku's Sounds preferences to be notified if someone mentions your nickname. People don't always watch their IRC client screen. Putting the nickname of the person you're talking to at the beginning of what you're about to post increases your chance to be noticed. Similar to the Terminal, Vision supports tab-completion for nicknames, i.e. if you enter the starting letters of  a nickname and press the tab key, Vision completes it with the first name that matches.</p></li>
 </ul>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>Vision provides a few handy keyboard shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>When the input control has focus, this will cycle through your recently entered text.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Activates the window that appears above / below the currently active (selected) one in the "Window list"</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Similar to <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, but with a twist. Instead of activating the window immedietly above / below the current one, it looks ahead. If there are any windows with higher status bits then the current window, it jumps to those. It jumps to the highest found status bit first.<br />
+
+To understand this, you must know that Vision color codes windows in the list with different "status bits" depending on how its contents have changed since it last had focus:
+<ul>
+<li><b><span style="color:black">black</span></b> - no new text</li>
+<li><b><span style="color:silver">gray</span></b> - new text, but nothing exciting (joins, parts, etc.)</li>
+<li><b><span style="color:green">green</span></b> - someone has said something</li>
+<li><b><span style="color:red">red</span></b> - someone has said something, and mentioned your nickname</li>
+</ul>
+Vision treats these with sequential priority. When you press<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Vision will first jump to a red window above / below the current one if it sees one. If it doesn't see a red one, it will jump to a green one, and so on.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commands" name="commands">Built-in commands</a></h2>
 <p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
 <p>The syntax:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">

@@ -73,29 +73,29 @@
 <tr><td><b>Select safe mode options</b>
 </td><td> </td><td>ハードウェア周りに問題が生じた場合、または不正なアドオンのためにシステムが不安定あるいは起動しなくなった場合に試してみるべきオプションがいくつかあります。オプションに選択バーを移動させると、画面の下部に短い説明が表示されます。</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Safe mode</span><br />
-		システムをセーフモードにします。このオプションは、ほかのオプションと独立して有効にできます。</p>
+		システムをセーフモードにします。このオプションは、ほかのオプションと無関係に有効にできます。</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		ユーザーがインストールしたすべてのアドオンを読み込まないようにします。システムディレクトリにあるアドオンだけが読み込まれます。下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
+		ユーザーがインストールしたすべてのアドオンを読み込まれないようにします。システムディレクトリにあるアドオンだけが読み込まれます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		IDE DMA を無効にします。速度を犠牲にして、IDE の互換性を向上します。</p>
+		IDE DMA を無効にします。IDE の互換性は向上しますが、速度が犠牲になります。</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		4 GiB アドレス限界を超えるメモリを無視します。カーネル設定ファイル中の設定を上書きします。</p>
-	<p><span class="menu">Use fail-safe video mode</span><br />
-		システムは VESA モードを使用し、ほかのグラフィックドライバーを使用しません。</p>
+		4 GiB アドレス限界を超えるすべてのメモリを無視します。カーネル設定ファイル中の設定を上書きします。</p>
+	<p><span class="menu">Use fail-safe graphics driver</span><br />
+		システムは VESA モードを使用し、どのビデオグラフィックドライバーも使用しようとはしません。</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
 		割り込みルーティング用の IO APIC の使用を無効にします。代わりに、従来の PIC を使用します。</p>
 	<p><span class="menu">Disable local APIC</span><br />
 		ローカル APIC の使用を無効にします。また、SMP も無効にします。</p>
 	<p><span class="menu">Disable SMP</span><br />
-		1 つを除いてすべての CPU コアを無効にします。</p>
+		ひとつの CPU コアを除いて無効にします。</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		システムが BIOS 機能を呼び出すことを禁止します。</p>
+		システムが BIOS 機能を呼び出すことを止めます。</p>
 	<p><span class="menu">Disable APM</span><br />
-		アドバンストパワーマネージメント (APM) のハードウェアサポートを無効にし、カーネル設定ファイル内の APM 設定を上書きします。</p>
+		アドバンストパワーマネージメント (APM) のハードウェアサポートを無効にします。カーネル設定ファイル内の APM 設定を上書きします。</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		アドバンスドコンフィグレーションアンドパワーインターフェイス (ACPI) のハードウェアサポートを無効にし、カーネル設定ファイル内の ACPI 設定を上書きします。</p>
+		アドバンスドコンフィグレーションアンドパワーインターフェイス (ACPI) のハードウェアサポートを無効にします。カーネル設定ファイル内の ACPI 設定を上書きします。</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		無視しなければならないシステムファイルを選択できるようにします。たとえば、ドライバーを一時的に無効にする場合に役立ちます。下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p></td></tr>
+		無視しなければならないシステムファイルを選択できるようにします。たとえば、ドライバーを一時的に無効にする場合に役立ちます。以下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>これを選択すると、デバッグに役立ついくつかのオプションや、<a href="../../welcome/en/bugreports.html">バグ報告</a>のために詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Enable serial debug output</span><br />
@@ -117,7 +117,7 @@
 		前回の Haiku のセッションの syslog を表示します。</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		前回の Haiku のセッションの syslog をディスクに保存します。現在、FAT32 ボリュームのみがサポートされています。</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td><i>Use fail-safe video mode</i> を有効にしなければならないときに、解像度と色深度を設定できます。</td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>特定の画面解像度と色深度を設定できます。</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

@@ -58,18 +58,17 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Käynnistyslataaja</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
+<p>Haikun käynnistyslataaja voi attaa kun koet laitteistopulmia tai haluat valita, minkä Haiku-asennuksen käynnistät, jos sinulla on useampia kuin yksi (ehkä asennus-CD:ltä tai USB-tikulta). Se on myös kätevä kun olet asentanut ohjelmistokomponentin, joka oireilee ja estää sinua käynnistämästä järjestelmää uudelleen komponentin poistamiseksi, katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p>
 <p>Käynnistyslataajan valitsimiin pääsemiseksi sinun on painettava ja pidettävä alhaalla  <span class="key">VAIHTO</span>-näppäintä ennen Haikun käynnistysprosessin alkamista. Jos käynnistyshallinta on asennettu, voit aloittaa pitämällä <span class="key">VAIHTO</span>-näppäintä ennen Haikun käynnistysrivin valintaa. Jos Haiku on ainoa koneeseen asennettu käyttöjärjestelmä, voit aloittaa näppäimen pitämisen alhaalla jo silloin, kun näet näytölläsi BIOS-käynnistysviestit.</p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Käynnistyslataajavalitsimet</a></h2>
 <p>Kun olet päässyt sinne, näkyviin tulee neljä valikkoa:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Valitse käynnistyslevy</b></td><td> </td><td>Choose which Haiku installation/version to start.</td></tr>
+<tr><td><b>Valitse käynnistyslevy</b></td><td> </td><td>Valitse, minkä Haiku-asennuksen/version käynnistät.</td></tr>
 <tr><td><b>Valitse turvatilavalitsimet</b>
 </td><td> </td><td>Laitteistopulmien tapahtuessa voit kokeilla useita valitsimia tai jos järjestelmä tulee epästabiiliksi tai sitä ei pysty käynnistämään huonosti käyttäytyvän lisäosan vuoksi. Kun valintapalkin siirtää valitsimelle, niin näytön alalaitaan ilmaantuu lyhyt selite.</td></tr>
 <tr><td></td><td></td><td>
@@ -82,22 +81,22 @@
 	<p><span class="menu">Ohita muisti 4 gibitavun takana</span><br />
 		Ohittaa kaiken muistin 4 gibitavun rajan takana, korvaa asetukset käyttöjärjestelmäytimen asetustiedostossa.
 </p>
-	<p><span class="menu">Käytä vikasietoista videotilaa</span><br />
+	<p><span class="menu">Käytä vikasietoista videoajuria</span><br />
 		Järjestelmä käyttää VESA-tilaa ja ei yritä käyttää videografiikka-ajureita.</p>
 	<p><span class="menu">Ota pois käytöstä IO-APIC</span><br />
-		Ottaa pois käytöstä IO APIC keskeytysreitityksen, pakotetaan sen sijaan perinne-PIC.</p>
+		Ottaa pois käytöstä IO APIC-keskeytysreitityksen, pakotetaan sen sijaan perinne-PIC-keskeytysreititykseen.</p>
 	<p><span class="menu">Ota pois käytöstä paikallinen APIC</span><br />
 		Ottaa pois käytöstä paikallisen APIC:in, ottaa pois käytöstä myös SMP:n.</p>
 	<p><span class="menu">Ota pois käytöstä SMP</span><br />
 		Ottaa pois käytöstä kaiken muun paitsi yhden prosessoriytimen.</p>
 	<p><span class="menu">Älä kutsu BIOS:ia</span><br />
-		Pysäyttää järjestelmän kutsumasta BIOS-funktioita.</p>
+		Estää järjestelmän kutsumasta BIOS-funktioita.</p>
 	<p><span class="menu">Ota pois käytöstä APM</span><br />
 		Ottaa pois käytöstä Advanced Power Management -laitetuen, korvaa APM-asetukset käyttöjärjestelmäytimen asetustiedostossa.</p>
 	<p><span class="menu">Ota pois käytöstä ACPI</span><br />
 		Ottaa pois käytöstä Advanced Configuration ja Power Interface -laitetuen, korvaa ACPI-asetukset käyttöjärjestelmäytimen asetustiedostossa.</p>
 	<p><span class="menu">Merkitse kohde mustalle listalle</span><br />
-		Sallii valita järjestelmätiedostoja, jotka ohitetaan. Hyödyllinen esim. otettaessa tilapäisesti ajureita pois. Katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p></td></tr>
+		Sallii valita järjestelmätiedostoja, jotka ohitetaan. Hyödyllinen esim. otettaessa tilapäisesti ajureita pois käytöstä. Katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p></td></tr>
 <tr><td><b>Valitse vianjäljitysvalitsimet</b>
 </td><td> </td><td>Tästä löydät useita valitsimia, jotka opastavat vianjäljityksessä tai yksityiskohtien hakemisessa <a href="../../welcome/fi/bugreports.html">vikailmoitukseen</a>. Taas näytön alalaidassa näytetään lyhyt selite.</td></tr>
 <tr><td></td><td></td><td>
@@ -120,7 +119,7 @@
 		Näyttää järjestelmälokin edellisestä Haiku-istunnosta</p>
 	<p><span class="menu">Tallenna järjestelmäloki edellisestä istunnosta</span><br />
 		Tallentaa järjestelmälokin edellisestä Haiku-istunnosta levylle. Nykyisin tuetaan vain FAT32-taltioita.</p></td></tr>
-<tr><td class="onelinetop"><b>Valitse vikaturvallinen videotila</b></td><td> </td><td>Jos sinun oli aktivoitava valitsin <i>Käytä vikaturvallista videotila</i>a, voit asettaa resoluution ja värisyvyyden.</td></tr>
+<tr><td class="onelinetop"><b>Valitse näytön resoluutio</b></td><td> </td><td>Sallii sinun pakottaa tietyn näyttöresoluution ja värisyvyyden.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -132,8 +131,8 @@
 <li><p><span class="menu">Ota pois käytöstä käyttäjälisäosat</span>-aktivointi estää kaikkien lisäosien käytön (ajurit, kääntäjät, jne.), jotka olet asentanut Home-kansion alaiseen hierarkkiaan.</p></li>
 <li><p>Jos häiritsevä ajuri, lisäosa jne. on asennettu järjestelmähierarkiaan, asiat ovat hiukan mutkikkaampia, koska se alue on kirjoitussuojattu. Tässä <span class="menu">Merkitse kohteita mustalle listalle</span> voi näytellä tärkeää roolia. Sen avulla voit navigoida läpi koko järjestelmähierarkian ja ottaa pois käytöstä komponentit, jotka sotkevat järjestelmää merkitsemällä kohteita <span class="key">VÄLILYÖNTI</span>-näppäimellä tai <span class="key">RETURN</span>-näppäimellä. <span class="key">ESC</span>-näppäin palauttaa sinut yhden tason ylöspäin ylempään hakemistoon.</p>
 <p>Verkossa oleva artikkeli <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Kuinka merkitä pakkaustiedoston mustalle listalle pysyvästi</a> näyttää, kuinka tästä asetuksesta tekee pysyvän.</p></li>
-<li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
-So, if you encounter boot problems after installing some package, boot a Haiku version from before that time and uninstall the offending package.</p></li>
+<li><p>Kohdasta <span class="menu">Valitse käynnistyslevy</span> voit määritellä, että minkä aikaisemman ”version” käynnistät. Joka kerta kun asennat pakkauksen tai poistat sen, vanha tila tallennetaan ja voit käynnistää järjestelmän siihen tilaan valitsemalla sen käynnistyslatausvalitsimissa esitetystä luettelosta.<br />
+Joten jos kohtaat käynnistyspulmia, käynnistä Haiku-versioon ennen sitä aikaa ja poista haittallinen pakkaus.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -149,7 +148,7 @@ So, if you encounter boot problems after installing some package, boot a Haiku v
 	<tr><td><b>Käynnistetään levy</b></td><td> </td><td>Liitetään käynnistyslevy</td></tr>
 	<tr><td><b>Mikropiirit</b></td><td> </td><td>Ladataan prosessorikohtaiset moduulit</td></tr>
 	<tr><td><b>Kansio</b></td><td> </td><td>Alijärjestelmien loppualustus.</td></tr>
-	<tr><td><b>Raketti</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Raketti</b></td><td> </td><td>Käynnistystaustaohjelma on käynnistänyt järjestelmän.</td></tr>
 </table>
 
 </div>

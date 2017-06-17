@@ -59,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h1>Boot Loader</h1>
 
@@ -74,29 +75,30 @@
 </td><td> </td><td>Es gibt mehrere Möglichkeiten Haiku bei hardware-bezogenen Problemen zum Booten zu bringen, oder falls das System durch ein installiertes Add-On instabil wurde, indem man verschiedene Komponenten deaktiviert. Wird über die Pfeiltasten eine Option auswählt, wird am unteren Bildschirmrand eine kurze Erklärung angezeigt.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Versetzt das System in einen abgesicherten Modus. Diese Einstellung kann unabhängig von den anderen Optionen aktiviert werden.</p>
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Verhindert das Laden jeglicher vom Benutzer installierten Add-Ons. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Deaktiviert IDE DMA, erhöht die IDE-Kompatibilität auf Kosten der Performance.</p>
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignoriert den Speicher über dem 4 GiB Adresslimit, setzt die Einstellung in der 'kernel' Datei außer Kraft.</p>
-	<p><span class="menu">Use fail-safe video mode</span><br />
-		Aktiviert den VESA-Mode, es wird nicht versucht einen speziellen Grafiktreiber zu benutzen.</p>
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
+	<p><span class="menu">Use fail-safe graphics driver</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Deaktiviert den IO APIC für das Interrupt-Routing und erzwingt stattdessen die Benutzung von "Legacy PIC".</p>
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Deaktiviert den lokalen APIC und auch SMP (Multiprozessor).</p>
+		Disables using the local APIC, also disables SMP.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Deaktiviert alle CPU Cores bis auf einen.</p>
+		Disables all but one CPU core.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Es werden keine BIOS-Funktionen aufgerufen.</p>
+		Stops the system from calling BIOS functions.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Deaktiviert Advanced Power Management Hardware-Unterstützung, setzt APM-Einstellungen in der 'kernel' Datei außer Kraft.</p>
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Deaktiviert Advanced Configuration and Power Interface Hardware-Unterstützung, setzt ACPI-Einstellungen in der 'kernel' Datei außer Kraft.</p>
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		Ermöglicht die Auswahl von Systemdateien, die ignoriert werden sollen. Nützlich, um beispielsweise Treiber vorübergehend zu deaktivieren. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p></td></tr>
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen <a href="../../welcome/de/bugreports.html">Bugreport</a> zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.</td></tr>
 <tr><td></td><td></td><td>
@@ -119,7 +121,7 @@
 		Zeigt das Syslog der letzten Haiku Sitzung an.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		Speichert das Syslog der letzten Haiku Sitzung auf FAT32 formatiertes Laufwerk, z. B. USB-Stick.</p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Falls die Option <i>Use fail-safe video mode</i> gewählt werden muss, um Haiku zu starten, kann man hier die Bildschirmauflösung und Farbtiefe auswählen.</td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

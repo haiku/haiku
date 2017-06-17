@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009-2015, Haiku. All rights reserved.
+ * Copyright 2009-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,6 +58,13 @@
 <div>
 <div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#shortcuts">Keyboard shortcuts</a><br />
+	<a href="#commands">Built-in commands</a></td></tr>
+</table>
+
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
@@ -66,194 +73,217 @@
 </table>
 <p><br /></p>
 <p>Vision on aluperin BeOS-käyttöjärjestelmää varten kehitetty IRC-asiakasohjelma. Dokumentaatio ja vianjäljitys löytyy osoiteesta <a href="http://vision.sourceforge.net/">Vision-webbisivu</a>.</p>
-<div class="box-info">Löydät opastusta muilta Haiku-käyttäjiltä ja kehittäjiltä <a href="http://www.haiku-os.org/community/irc">Haiku-kanavilta</a> eri kielillä.<br />
+<div class="box-info">Löydät opastusta muilta Haiku-käyttäjiltä ja kehittäjiltä <a href="https://www.haiku-os.org/community/irc">Haiku-kanavilta</a> eri kielillä.<br />
 Kaikkein sujuvinta on englanninkielinen #haiku osoitteessa irc.freenode.org.</div>
-<p>Some advice, especially if you're new to IRC:</p>
+<p>Joitakin neuvoja, erityisesti jos olet uusi IRC-kanavalla:</p>
 <ul>
-<li><p>Search the web for "IRC etiquette" to learn about the do's and don'ts of chatting. Without much searching, I found <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a> by Christoph Haas to be quite helpful.</p></li>
-<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/faq.shtml#nicksetup">Freenode's FAQ</a> on that matter.</p></li>
+<li><p>Etsi webistä ”IRC-etiketti” oppiaksesi mitä saa tehdä ja mitä ei saa tehdä juteltaessa. Ilman suurempaa etsimistä löysin <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a>, jonka tekijä on Christoph Haas. Se on ihan hyödyllinen.</p></li>
+<li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/kb/answer/registration ">Freenode's FAQ</a> on that matter.</p></li>
 <li><p>Set up a sound in Haiku's Sounds preferences to be notified if someone mentions your nickname. People don't always watch their IRC client screen. Putting the nickname of the person you're talking to at the beginning of what you're about to post increases your chance to be noticed. Similar to the Terminal, Vision supports tab-completion for nicknames, i.e. if you enter the starting letters of  a nickname and press the tab key, Vision completes it with the first name that matches.</p></li>
 </ul>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>Vision provides a few handy keyboard shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">↑</span> / <span class="key">↓</span></td><td style="width:15px;"></td><td>When the input control has focus, this will cycle through your recently entered text.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Activates the window that appears above / below the currently active (selected) one in the "Window list"</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Similar to <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, but with a twist. Instead of activating the window immedietly above / below the current one, it looks ahead. If there are any windows with higher status bits then the current window, it jumps to those. It jumps to the highest found status bit first.<br />
+
+To understand this, you must know that Vision color codes windows in the list with different "status bits" depending on how its contents have changed since it last had focus:
+<ul>
+<li><b><span style="color:black">black</span></b> - no new text</li>
+<li><b><span style="color:silver">gray</span></b> - new text, but nothing exciting (joins, parts, etc.)</li>
+<li><b><span style="color:green">green</span></b> - someone has said something</li>
+<li><b><span style="color:red">red</span></b> - someone has said something, and mentioned your nickname</li>
+</ul>
+Vision treats these with sequential priority. When you press<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">↑</span> / <span class="key">↓</span>, Vision will first jump to a red window above / below the current one if it sees one. If it doesn't see a red one, it will jump to a green one, and so on.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="commands" name="commands">Built-in commands</a></h2>
 <p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
-<p>Syntaksi:</p>
+<p>The syntax:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
-<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>komento</td></tr>
-<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>vaadittu parametri</td></tr>
-<tr><td><tt>[optional]</tt></td><td></td><td>valinnainen parametri</td></tr>
-<tr><td><tt>|</tt></td><td></td><td>looginen OR</td></tr>
-<tr><td><tt>...</tt></td><td></td><td>lisäparametrit mahdollisia</td></tr>
+<tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>the command</td></tr>
+<tr><td><tt>&lt;required&gt;</tt></td><td></td><td>a required parameter</td></tr>
+<tr><td><tt>[optional]</tt></td><td></td><td>an optional parameter</td></tr>
+<tr><td><tt>|</tt></td><td></td><td>a logical OR</td></tr>
+<tr><td><tt>...</tt></td><td></td><td>more parameters possible</td></tr>
 </table>
 
 <ul>
 <li><p><span class="menu">/ABOUT</span><br />
-Avaa Visionin Ohjelmasta-ikkunan.</p></li>
+Opens Vision's About window.</p></li>
 
-<li><p><span class="menu">/ACRONYM [sana]</span><br />
-Avaa www.acronymfinder.com nykyisellä html-käsittelijällä. (Huomaa: Jos tiedostokäsittelijä ei ole selain, se avaa Tiedostotyyppiasetukset-sovelluksessa määritellyn sovelluksen.)</p></li>
+<li><p><span class="menu">/ACRONYM [word]</span><br />
+Opens www.acronymfinder.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/AWAY [poissaolon syy]</span><br />
-Asettaa poissaolon syyn nykyiseen verkkoon. Jos mitään poissaolon syytä ei ole määritelty, se on asetettu arvoon 'BRB'. (palaan pian)</p></li>
+<li><p><span class="menu">/AWAY [away-reason]</span><br />
+Sets away status on current network. If no away reason is specified, it is set to 'BRB'. (be right back)</p></li>
 
 <li><p><span class="menu">/BACK</span><br />
-Asettaa tilasi 'olen palannut takaisin' nykyisessä verkossa.</p></li>
+Sets your status to 'back' on current network.</p></li>
 
 <li><p><span class="menu">/CLEAR</span><br />
-Nolla nykyisen tekstipuskurin sisällön.</p></li>
+Clears the contents of the current text buffer.</p></li>
 
-<li><p><span class="menu">/CTCP &lt;käyttäjätunnus|kanava&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
-Suorittaa määritellyn ctcp-komennon kanavalla tai käyttäjätunnuksella.</p></li>
+<li><p><span class="menu">/CTCP &lt;nick|channel&gt; &lt;PING|VERSION|FINGER|TIME|CLIENTINFO|USERINFO&gt;</span><br />
+Executes the specified ctcp command on a channel or nick.</p></li>
 
-<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;käyttäjätunnus&gt;</span><br />
-Avaa yksityisen dcc-verkkojutteluistunnon määritellyllä käyttäjätunnuksella.</p></li>
+<li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;nick&gt;</span><br />
+Opens a private dcc chat session with the specified nick.</p></li>
 
-<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;käyttäjätunnus&gt; [tiedosto]</span><br />
-Lähettää tiedoston käyttäjälle &lt;käyttäjätunnus&gt;. Jos tiedostoa ei ole määritelty, Tiedosto-paneeli avautuu.</p></li>
+<li><p><span class="menu">/DCC &lt;SEND&gt; &lt;nick&gt; [file]</span><br />
+Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</p></li>
 
-<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
-Suorittaa De-ops tai de-voices &lt;käyttäjätunnus(käyttäjätunnuksille)&gt;.</p></li>
+<li><p><span class="menu">/DEOP /DOP /DEVOICE &lt;nick1&gt; [nick2] ...</span><br />
+De-ops or de-voices &lt;nick(s)&gt;.</p></li>
 
-<li><p><span class="menu">/DESCRIBE &lt;käyttäjätunnus&gt; &lt;viesti&gt;</span><br />
-Sama kuin /ME, mutta avaa kyselyn käyttäjälle &lt;käyttäjätunnus&gt;.</p></li>
+<li><p><span class="menu">/DESCRIBE &lt;nick&gt; &lt;message&gt;</span><br />
+Same as /ME, but opens a query on &lt;nick&gt;.</p></li>
 
-<li><p><span class="menu">/DNS &lt;verkkoaluenimi/IP-osoite&gt;</span><br />
-Ratkaisee annetun IP-osoitteen tai verkkoaluenimen.</p></li>
+<li><p><span class="menu">/DNS &lt;domain name/IP address&gt;</span><br />
+Resolves the given IP or domain name.</p></li>
 
 <li><p><span class="menu">/EXIT</span><br />
-Poistuu Vision-ohjelmasta.</p></li>
+Quits Vision.</p></li>
 
-<li><p><span class="menu">/GAWAY [poissaolon syy]</span><br />
-Sama kuin /AWAY [poissaolon syy], mutta toteuttaa kaikille yhdistetyille verkoille.</p></li>
+<li><p><span class="menu">/GAWAY [away-reason]</span><br />
+Same as /AWAY [away-reason], but applies to all connected networks.</p></li>
 
 <li><p><span class="menu">/GBACK</span><br />
-Sama kuin /BACK, mutta toteuttaa kaikille yhdistetyille verkoille.</p></li>
+Same as /BACK, but on applies to all connected networks.</p></li>
 
-<li><p><span class="menu">/GOOGLE [hakumerkkijono]</span><br />
-Avaa www.google.com nykyisellä html-käsittelijälläsi. (Huomaa: Jos tiedostokäsittelijä ei ole selain, avaa Tiedostotyyppiasetukset-ohjelmassa määritellyn sovelluksen.)</p></li>
+<li><p><span class="menu">/GOOGLE [search-string]</span><br />
+Opens www.google.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/INVITE /I &lt;käyttäjätunnus&gt; &lt;kanava&gt;</span><br />
-Kutsuu &lt;käyttäjätunnus&gt; &lt;kanava&gt;:lle.</p></li>
+<li><p><span class="menu">/INVITE /I &lt;nick&gt; &lt;channel&gt;</span><br />
+Invites &lt;nick&gt; to the &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/JOIN /J &lt;kanava&gt; [kanava-avain]</span><br />
-Liity &lt;kanava&gt;:lle. Tarjoa [kanava-avain], jos välttämätöntä.</p></li>
+<li><p><span class="menu">/JOIN /J &lt;channel&gt; [channel-key]</span><br />
+Joins the &lt;channel&gt;. Provide a [channel-key] if necessary.</p></li>
 
-<li><p><span class="menu">/KICK /K &lt;käyttäjätunnus&gt; [syy]</span><br />
-Antaa potkut käyttäjälle &lt;käyttäjätunnus&gt; nykyiseltä kanavalta. Jos [syy] ei ole määritelty, syyksi asetetaaan Asetuksissa määritelty syy.</p></li>
+<li><p><span class="menu">/KICK /K &lt;nick&gt; [reason]</span><br />
+Kicks &lt;nick&gt; from current channel. If [reason] is not specified, it will be set to the reason specified in Preferences.</p></li>
 
-<li><p><span class="menu">/KILL &lt;käyttäjätunnus&gt; [viesti]</span><br />
-IRC-operaattorikomento käyttäjän poistamiseksi verkosta.</p></li>
+<li><p><span class="menu">/KILL &lt;nick&gt; [message]</span><br />
+IRC operator command to disconnect a user from the network.</p></li>
 
 <li><p><span class="menu">/LIST</span><br />
-Avaa uuden näkymän, jossa luetellaan nykyisen verkon kaikki kanavat. [paitsi piilotetut kanavat]</p></li>
+Opens a new view which lists all the channels on the current network. [except hidden channels]</p></li>
 
 <li><p><span class="menu">/M</span><br />
-Näyttää nykyisen kanavan kanavatilat.</p></li>
+Displays the channel modes of the current channel.</p></li>
 
-<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
-Sama kuin <span class="menu">MODE &lt;kanava&gt; &lt;tilat&gt; &lt;käyttäjätunnus&gt;</span>, mutta nykyiselle kanavalle.</p></li>
+<li><p><span class="menu">/M &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
+Same as <span class="menu">MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, but on current channel.</p></li>
 
 <li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Sama kuin <span class="menu">/MODE &lt;kanava&gt; &lt;tilat&gt;</span>, mutta nykyiselle kanavalle.</p></li>
+Same as <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, but on current channel.</p></li>
 
 <li><p><span class="menu">/ME &lt;text&gt;</span><br />
 Displays: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
 
-<li><p><span class="menu">/MODE &lt;kanava&gt; &lt;+-ohvbeqa&gt; &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
-Asettaa tilan käyttäjälle &lt;käyttäjätunnus (käyttäjätunnukset)&gt; &lt;kanava&gt;:lle.<br />
-esim.: <span class="menu">/MODE #channel +o käyttäjätunnus1</span><br />
-tai <span class="menu">/MODE #channel +oo-o käyttäjätunnus1 käyttäjätunnus2 käyttäjätunnus3</span></p></li>
+<li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
+Sets mode for &lt;nick(s)&gt; on &lt;channel&gt;.<br />
+e.g. <span class="menu">/MODE #channel +o nick1</span><br />
+or <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
 
-<li><p><span class="menu">/MODE &lt;kanava&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Asettaa &lt;kanavan&gt; tilan. (Huomaa: Commata vain optiselle erotukselle.)<br />
-esim.: <span class="menu">/MODE #kanava +ms</span></p></li>
+<li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
+Sets the mode of &lt;channel&gt;. (Note: Commata just for optical separation.)<br />
+e.g. <span class="menu">/MODE #channel +ms</span></p></li>
 
-<li><p><span class="menu">/MSG &lt;käyttäjätunnus&gt; &lt;viesti&gt;</span><br />
-Lähettää &lt;viesti&gt;:n käyttäjälle &lt;käyttäjätunnus&gt;.</p></li>
+<li><p><span class="menu">/MSG &lt;nick&gt; &lt;message&gt;</span><br />
+Sends a &lt;message&gt; to &lt;nick&gt;.</p></li>
 
 <li><p><span class="menu">/NAMES</span><br />
-Näyttää kaikki verkon kanavat ja kaikki käyttäjätunnukset verkkoikkunassa. (Ole varovainen tämän kanssa)</p></li>
+Displays all channels and all nicks of the network in the network window. (Careful with this one)</p></li>
 
-<li><p><span class="menu">/NAMES &lt;kanava&gt;</span><br />
-Näyttää käyttäjätunnuksen (käyttäjätunnukset)  &lt;kanava&gt;:lla.</p></li>
+<li><p><span class="menu">/NAMES &lt;channel&gt;</span><br />
+Displays nick(s) in &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/NICK &lt;uusi käyttäjätunnus&gt;</span><br />
-Muuttaa käyttäjätunnukseksesi &lt;uusi käyttäjätunnus&gt;.</p></li>
+<li><p><span class="menu">/NICK &lt;newnick&gt;</span><br />
+Changes your nick to &lt;newnick&gt;.</p></li>
 
-<li><p><span class="menu">/NOTICE &lt;käyttäjätunnus&gt; &lt;viesti&gt;</span><br />
-Lähettää ilmoituksen käyttäjälle &lt;käyttäjätunnus&gt; tietyllä &lt;viesti&gt;:llä.</p></li>
+<li><p><span class="menu">/NOTICE &lt;nick&gt; &lt;message&gt;</span><br />
+Sends a notice to &lt;nick&gt; with the given &lt;message&gt;.</p></li>
 
-<li><p><span class="menu">/NOTIFY &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
-Lisää &lt;käyttäjätunnukset&gt; ilmoitusluetteloosi.</p></li>
+<li><p><span class="menu">/NOTIFY &lt;nick1&gt; [nick2] ...</span><br />
+Adds &lt;nick(s)&gt; to your notify list.</p></li>
 
-<li><p><span class="menu">/PEXEC /RRUN &lt;sovellus1&gt; [ | &lt;sovellus2&gt; | ... ]</span><br />
-Suorittaa tietyn &lt;sovelluksen&gt;. Jos tarjotaan enemmän kuin yhden sovelluksen, ne suoritetaan putkessa.<br />
-esim.: <span class="menu">/PEXEC Terminal | StyledEdit</span> avaa uuden Pääteikkunan, ja jälkeenpäin Tyylitetyn Editorin<br />
-tai <span class="menu">/PEXEC ls -la ~/Downloads/</span> näyttää ~/Downloads/-hakemistosi sisällön nykyisessä ikkunassa (Huomio!)</p></li>
+<li><p><span class="menu">/PEXEC /RRUN &lt;app1&gt; [ | &lt;app2&gt; | ... ]</span><br />
+Executes the given &lt;app&gt;. If more than one application is provided, they will be executed in a pipe.<br />
+e.g. <span class="menu">/PEXEC Terminal | StyledEdit</span> opens a new Terminal, and afterwards StyledEdit<br />
+or <span class="menu">/PEXEC ls -la ~/Downloads/</span> displays the contents of your ~/Downloads/ directory in the current window (Attention!)</p></li>
 
-<li><p><span class="menu">/OP /VOICE &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
-Ops tai äänet &lt;käyttäjätunnuksille&gt;.</p></li>
+<li><p><span class="menu">/OP /VOICE &lt;nick1&gt; [nick2] ...</span><br />
+Ops or voices to &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/PART</span><br />
-Jättää nykyisen kanavan tai verkon.</p></li>
+Leaves current channel or network.</p></li>
 
-<li><p><span class="menu">/PING &lt;käyttäjätunnus&gt;</span><br />
-Yhteyskokeilu &lt;käyttäjätunnukseen&gt; ja palauttaa yhteyskokeiluajan. Sama kuin <span class="menu">/CTCP &lt;käyttäjätunnus&gt; PING</span>.</p></li>
+<li><p><span class="menu">/PING &lt;nick&gt;</span><br />
+Pings the &lt;nick&gt; and returns the ping-time. Equivalent to <span class="menu">/CTCP &lt;nick&gt; PING</span>.</p></li>
 
-<li><p><span class="menu">/QUERY /Q &lt;käyttäjätunnus&gt; [viesti]</span><br />
-Avaa kyselyikkunan &lt;käyttäjätunnuksella&gt;, valinnaisesti lisäksi [sanoma]lla.</p></li>
+<li><p><span class="menu">/QUERY /Q &lt;nick&gt; [message]</span><br />
+Opens a query window on &lt;nick&gt;, optionally along with a [message].</p></li>
 
-<li><p><span class="menu">/QUIT /QUI [oma-poistumisviesti]</span><br />
-Poistuu nykyisestä verkosta. Jos [oma-poistumisviesti] ei ole määritelty, käytetään asetusten oletusjoukkoa.</p></li>
+<li><p><span class="menu">/QUIT /QUI [custom-quit-message]</span><br />
+Quits current network. If [custom-quit-message] is not specified, the default set in Preferences will be used.</p></li>
 
-<li><p><span class="menu">/RAW /QUOTE &lt;komento|teksti&gt;</span><br />
-Lähettää raaka-IRC komennon.</p></li>
+<li><p><span class="menu">/RAW /QUOTE &lt;command|text&gt;</span><br />
+Sends a raw IRC command.</p></li>
 
 <li><p><span class="menu">/RECONNECT</span><br />
-Yhdistää uudelleen nykyiseen verkkoosi, os 47 automaattista uudelleenyhdistämisyritystä on epäonnistunut.</p></li>
+Will reconnect you to the current network if the 47 automatic reconnection attempts have failed.</p></li>
 
-<li><p><span class="menu">/SLEEP &lt;desisekuntia&gt;</span><br />
-Saa nykyisen säikeen nukkumaan määritellyn ajan ; tulevaan skriptauskäyttöön.</p></li>
+<li><p><span class="menu">/SLEEP &lt;deciseconds&gt;</span><br />
+Causes current thread to sleep for the specified time ; for future scripting use.</p></li>
 
 <li><p><span class="menu">/SQUIT</span><br />
-IRC-operaattorikomento katkaisemaan yhteyden palvelimeen.</p></li>
+IRC operator command to disconnect a server.</p></li>
 
 <li><p><span class="menu">/T</span><br />
-Näyttää nykyisen kanavan kanava-aiheen.</p></li>
+Displays the channel-topic of current channel.</p></li>
 
-<li><p><span class="menu">/T &lt;uusi-kanava-aihe&gt;</span><br />
-Sama kuin <span class="menu">/TOPIC &lt;kanava&gt; &lt;uusi-kanava-aihe&gt;</span>, mutta nykyiselle kanavalle.</p></li>
+<li><p><span class="menu">/T &lt;new-channel-topic&gt;</span><br />
+Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, but on current channel.</p></li>
 
-<li><p><span class="menu">/TIME &lt;käyttäjätunnus&gt;</span><br />
-Palauttaa &lt;käyttäjätunnuksen&gt; paikallisen ajan. Sama kuin <span class="menu">/CTCP &lt;käyttäjätunnus&gt; TIME.</span></p></li>
+<li><p><span class="menu">/TIME &lt;nick&gt;</span><br />
+Returns local time of &lt;nick&gt;. Equivalent to <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
 
-<li><p><span class="menu">/TOPIC &lt;kanava&gt;</span><br />
-Näyttää &lt;kanavan&gt; kanava-aiheen.</p></li>
+<li><p><span class="menu">/TOPIC &lt;channel&gt;</span><br />
+Displays the channel-topic of &lt;channel&gt;.</p></li>
 
-<li><p><span class="menu">/TOPIC &lt;kanava&gt; &lt;uusi-kanava-aihe&gt;</span><br />
-Asettaa &lt;kanavan&gt; kanava-aiheeksi &lt;uusi-kanava-aihe&gt;.</p></li>
+<li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
+Sets the channel topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>
 
-<li><p><span class="menu">/UNNOTIFY &lt;käyttäjätunnus1&gt; [käyttäjätunnus2] ...</span><br />
-Poistaa &lt;käyttäjätunnukset&gt; ilmoitusluettelostasi.</p></li>
+<li><p><span class="menu">/UNNOTIFY &lt;nick1&gt; [nick2] ...</span><br />
+Removes &lt;nick(s)&gt; from your notify list.</p></li>
 
 <li><p><span class="menu">/UPTIME [-l]</span><br />
-Näyttää ajan, jonka järjestelmät ovat olleet päällä. Jos [-l] on määritelty, päälläoloaika kaiutetaan paikallisesti, ja sitä ei lähetetä verkkoon.</p></li>
+Displays the systems uptime. If [-l] is specified, the uptime will be echoed locally, and not sent to the network.</p></li>
 
-<li><p><span class="menu">/VERSION &lt;käyttäjätunnus&gt;</span><br />
-Palauttaa &lt;käyttätunnusten&gt; IRC-asiakasohjelman asiakasversion. Sama kuin <span class="menu">/CTCP &lt;käyttäjätunnus&gt; VERSION</span>.</p></li>
+<li><p><span class="menu">/VERSION &lt;nick&gt;</span><br />
+Returns the client-version of &lt;nicks&gt; IRC-client. Equivalent to <span class="menu">/CTCP &lt;nick&gt; VERSION</span>.</p></li>
 
-<li><p><span class="menu">/VISIT &lt;verko-osoite&gt;</span><br />
-Avaa &lt;verkko-osoitteen&gt; nykyisellä html-käsittelijälläsi. (Huomaa: Jos käsittelijä ei ole selain, se avaa sovelluksen, joka on määritelty TiedostoTyyppiAsetukset-sovelluksessa.)</p></li>
+<li><p><span class="menu">/VISIT &lt;url&gt;</span><br />
+Opens &lt;url&gt; with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
-<li><p><span class="menu">/WEBSTER /DICTIONARY [sana]</span><br />
-Avaa www.m-w.com (Merriam Webster) nykyisellä html-käsittelijälläsi. (Huomaa: Jos käsittelijä ei ole selain, se avaa sovelluksen, joka on määritelty TiedostoTyyppiAsetukset-sovelluksessa.)</p></li>
+<li><p><span class="menu">/WEBSTER /DICTIONARY [word]</span><br />
+Opens www.m-w.com (Merriam Webster) with your current html handler. (Note: If the handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
 <li><p><span class="menu">/VUPTIME [-l]</span><br />
-Näyttää Vision-ohjelman päälläoloajan. Parametrilla [-l] on sama vaikutus kuin parametrilla <span class="menu">/UPTIME</span>.</p></li>
+Displays the Vision uptime. The [-l] parameter has the same effect as in <span class="menu">/UPTIME</span>.</p></li>
 
 <li><p><span class="menu">/WALLOPS</span><br />
-IRC-operaattorikomento, joka lähettää wallops-viestin (näkyvissä niille käyttäjille, joiden umode w on aktiivinen).</p></li>
+IRC operator command that sends a wallops message (visible to those with umode  w active).</p></li>
 
-<li><p><span class="menu">/WHOIS /W &lt;käyttäjätunnus&gt;</span><br />
-Palauttaa &lt;käyttäjätunnuksen&gt; whois-tiedot.</p></li>
+<li><p><span class="menu">/WHOIS /W &lt;nick&gt;</span><br />
+Returns whois information of &lt;nick&gt;.</p></li>
 </ul>
 
 </div>

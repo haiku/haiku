@@ -12,12 +12,13 @@
  * Translators:
  *		killa.fr0gg
  *		miguel~1.mx
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>La interfaz gráfica de usuario de Haiku</title>
+	<title>Interfaz gráfica de usuario de Haiku</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -57,62 +58,61 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
+<tr class="heading"><td>Contenido</td></tr>
 <tr class="index"><td>
-		<a href="#move-resize">Easy moving and resizing</a><br />
-                <a href="#stack-tile">Stack &amp; Tile</a><br />
-                <a href="#open-save-panel">Open and save panels</a><br />
-                <a href="#replicants">Replicants</a></td></tr>
+		<a href="#move-resize">Mover y cambiar tamaño facilmente</a><br />
+                <a href="#stack-tile">Apilar &amp; Juntar</a><br />
+                <a href="#open-save-panel">Paneles de abrir y guardar</a><br />
+                <a href="#replicants">Replicantes</a></td></tr>
 </table>
 
-<h1>La interfaz gráfica de usuario de Haiku</h1>
+<h1>Interfaz gráfica de usuario de Haiku</h1>
 
-<p>La interfaz gráfica de Haiku es una parte integral del sistema. A diferencia de sistemas operativos basados en UNIX, Haiku no tiene administrador de ventanas por separado y arrancar el sistema simplemente en una terminal de shell de línea de comandos no es posible. Siendo el foco de Haiku el usuario de escritorio, esto no se considera necesario.</p>
-<p>Puesto que probablemente tenga experiencia con otros ambientes gráficos, saltémonos los menús estándar, los menús contextuales del clic derecho, el arrastrar y soltar (drag&amp;drop), etc. Demos un vistazo a los contados aspectos únicos de la Interfaz Gráfica de Usuario de Haiku en su lugar.</p>
+<p>La interfaz gráfica de Haiku es una parte integral del sistema. A diferencia de sistemas operativos basados en UNIX, Haiku no tiene un administrador de ventanas separado y no es posible iniciar el sistema en una simple terminal de intérprete de comandos. El enfoque de Haiku siendo el usuario de escritorio, esto no se considera necesario.</p>
+<p>Puesto que probablemente tenga experiencia con otros ambientes gráficos, saltémonos las explicaciones estándar como los menús, menús contextuales del botón derecho, el arrastrar y soltar (drag&amp;drop), etc. En lugar de eso demos un vistazo a algunos aspectos únicos de la Interfaz Gráfica de Haiku.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
 <p>Hay únicamente unas cuantas cosas en la interfaz gráfica de usuario de Haiku que no son obvias y merecen una explicación.</p>
 <ol>
-<li><p>El Deskbar es el menú "inicio" de Haiku, si así lo desea ver. Vea el tema <a href="deskbar.html">Deskbar</a>.</p></li>
+<li><p>El Deskbar es el menú "inicio" y barra de tareas de Haiku, si así lo desea ver. Vea el tema <a href="deskbar.html">Deskbar</a>.</p></li>
 <li>La pestaña amarilla ofrece más que sólo el nombre del programa o un nombre de archivo de un documento:
 <ul><li>Puede moverla sosteniendo la tecla <span class="key">MAYÚSCULAS</span> mientras la arrastra a otra posición, permitiéndole clasificar un número de ventanas y convenientemente llegar a ellas mediante su nombre de pestaña.</li>
 <li>Se minimiza una ventana con un doble clic en su pestaña (o con <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Una ventana oculta puede alcanzarse por su entrada en el <a href="deskbar.html">Deskbar</a> o el <a href="twitcher.html">Twitcher</a>.</li>
 <li>Se puede enviar una ventana al fondo con un clic derecho en su pestaña (o su borde).</li></ul></li>
-<li><p>El botón de cierre.</p></li>
+<li><p>El botón de Cerrar.</p></li>
 <li><p>El botón "zoom" (o con <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). En la mayoría de las aplicaciones, esto expandirá una ventana a su tamaño máximo. Sin embargo, no siempre es así. Las ventanas del Tracker, por ejemplo, se retamañarán para ajustar mejor a los contenidos.</p></li>
-<li><p>The window border. Left-dragging moves the window, right-dragging resizes.</p></li>
-<li><p>The resize corner.</p></li>
+<li><p>El borde de la ventana. Si arrastra con el botón izquierdo, moverá la ventana, si arrastra con el botón derecho, cambiará el tamaño de la ventana.</p></li>
+<li><p>La esquina para cambiar el tamaño.</p></li>
 </ol>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="move-resize" name="move-resize">A quick way to move or resize windows</a></h2>
-<p>Moving and resizing windows is a large part of interacting with several concurrently running applications. Instead of aiming at the small yellow title tab or the even tinier window border, there's a more convenient way to move a window. Also, additionally to its small size, the resize corner has another limitation: It only allows resizing at and in the direction of the lower right corner. <br />Right-dragging a border for resizing works, but again you'll have to aim carefully.</p>
-<p>To address these issues, Haiku provides a neat solution using the window management key combo <span class="key">CTRL</span> <span class="key">ALT</span> and the mouse. See also chapter <a href="keyboard-shortcuts.html#general">Shortcuts and key combinations</a> for more shortcuts concerning window management.</p>
+<a id="move-resize" name="move-resize">Una forma rápida de mover o cambiar el tamaño de las ventanas</a></h2>
+<p>Una gran parte de interactuar con aplicaciones que se ejecutan al mismo tiempo es mover y cambiar el tamaño de sus ventanas. En vez de apuntar a la pequeña pestaña amarilla, o el aún más pequeño borde de ventana, existe una forma más cómoda de mover una ventana. Además, adicional a su pequeño tamaño, la esquina para cambiar tamaño tiene otra limitante: sólo permite cambiar de tamaño desde la esquina inferior derecha y en su dirección. <br />Puede arrastrar un borde con el botón derecho para cambiar el tamaño de la ventana, pero debe apuntar con cuidado.</p>
+<p>Para resolver estas cuestiones, Haiku proporciona una solución ingeniosa usando la combinación de teclas <span class="key">CTRL</span> <span class="key">ALT</span> y el ratón. Vea también el capítulo <a href="keyboard-shortcuts.html#general">Métodos de acceso rápido y combinaciones de teclas</a> para ver otros accesos rápidos relacionados al manejo de ventanas.</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
-<p>Holding down <span class="key">CTRL</span> <span class="key">ALT</span> will highlight the window borders nearest to the mouse pointer. Move the mouse in the direction of another border to change the target. Click and dragging with the <i>right mouse button</i> will resize the window along the highlighted border(s).</p>
-<p>Hold down <span class="key">CTRL</span> <span class="key">ALT</span> and click and drag with the <i>left mouse button</i> anywhere in a window to move it around. A quick click with the <i>right mouse button</i> sends it to the back.</p>
+<p>Si mantiene <span class="key">CTRL</span> <span class="key">ALT</span> resaltará los bordes de la ventana que esté más cerca del puntero. Si mueve el ratón en dirección de otro borde para cambiar el blanco. Haga clic y arrastre con el <i>botón derecho del ratón</i> para cambiar el tamaño de la ventana junta al borde resaltado.</p>
+<p>Mantenga presionado <span class="key">CTRL</span> <span class="key">ALT</span> y haga clic y arrastre con el <i>botón izquierdo del ratón</i> en cualquier parte de la ventana para moverla. Un clic rápido con el <i>botón derecho</i> la envía al fondo.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Apilar &amp; Juntar</a></h2>
+<p>La interfaz de Haiku proporciona una característica única que pone en acción el hecho que las ventanas tienen una pestaña amarilla en lugar de una barra de título de ancho completo. Esta característica se llama "Apilar &amp; Juntar" (Stack &amp; Tile, en inglés).<br />
+En el ejemplo a continuación, una ventana de Tracker con marcadores está juntada a la izquierda on una ventana de WebPositive, la cual está a su vez apilada con otra ventana de Tracker mostrando la carpeta origen <tt>haiku</tt>. En esta animación, el usuario da clic en las pestañas de las ventanas apiladas para alternar entre traer al frente una ventana y otra.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Estando conectadas de esta manera, el grupo de ventanas se pueden mover y cambiar de tamaño junas - un arreglo agradable para trabajar en un ámbiente más centrado a proyectos. En lugar de buscar la ventana correcta del navegador que contiene documentación, el editor, ventanas del Tracker y quizás un mensaje de correo relacionado a un proyecto en el que está trabajando, lo que puede hacer es sencillamente apilarlas y juntarlas todas en grupo.</p>
+<p>Es fácil hacer el arreglo de la ventanas: Mantenga presionado <span class="key">OPT</span> mientras arrastra una ventana por su pestaña cerca de la pestaña o borde de otra venana hasta que sea resaltada y luego suelte el botón del ratón.</p>
+<p>Apilar &amp; Juntar consiste de dos partes relacionadas.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<i>Apilar</i>" es poner la ventanas una sobre otra, automaticamente moviendo las pestañas amarillas en posición.<br />
+Mientras mantiene presionado <span class="key">OPT</span>, las pestañas cambian de color cuando se sobreponen; suelte la venana para establecer el apilado.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>Juntar</i>" significa pegar las ventanas horizontal o verticalmente.<br />
+De nuevo, mientras mantiene presionado <span class="key">OPT</span>, los bordes que se han de fusionar cuando suelte la ventana cambian de color cuando se acerca la una a la otra.</p></td></tr></table>
+<p>Para separarlas, el proceso es el mismo, manteniendo presionado <span class="key">OPT</span> mientras arrastra una ventana por su pestaña fuera del grupo.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
