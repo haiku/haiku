@@ -91,6 +91,39 @@ BNode::SetToWritable(off_t block, int32 transactionId, bool empty)
 }
 
 
+int32
+BNode::SearchSlot(const btrfs_key& key, int* slot) const
+{
+	//binary search for item slot in a node
+	int entrySize = sizeof(btrfs_entry);
+	if (Level() != 0) {
+		// internal node
+		entrySize = sizeof(btrfs_index);
+	}
+
+	int low = 0;
+	int high = ItemCount();
+	int mid;
+	int base = sizeof(btrfs_header);
+	const btrfs_key* other;
+	while (low < high) {
+		mid = (low + high) / 2;
+		other = (const btrfs_key*)((uint8*)fNode + base + mid * entrySize);
+		int comp = key.Compare(*other);
+		if (comp < 0)
+			high = mid;
+		else if (comp > 0)
+			low = mid + 1;
+		else {
+			*slot = mid;
+			return B_OK;
+		}
+	}
+	*slot = low;
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 //-pragma mark
 
 
