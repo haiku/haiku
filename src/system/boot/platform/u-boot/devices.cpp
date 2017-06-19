@@ -9,6 +9,7 @@
 #include <boot/disk_identifier.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
+#include <boot/partitions.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 
