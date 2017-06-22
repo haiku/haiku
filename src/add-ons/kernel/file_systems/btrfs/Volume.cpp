@@ -344,8 +344,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_ERROR;
 	}
 	TRACE("Volume::Mount(): Found extent root: %" B_PRIu64 "\n",
-		root->BlockNum());
-	fExtentTree = new(std::nothrow) BTree(this, root->BlockNum());
+		root->LogicalAddress());
+	fExtentTree = new(std::nothrow) BTree(this, root->LogicalAddress());
 	free(root);
 	if (fExtentTree == NULL)
 		return B_NO_MEMORY;
@@ -356,8 +356,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Couldn't find fs root\n");
 		return B_ERROR;
 	}
-	TRACE("Volume::Mount(): Found fs root: %" B_PRIu64 "\n", root->BlockNum());
-	fFSTree = new(std::nothrow) BTree(this, root->BlockNum());
+	TRACE("Volume::Mount(): Found fs root: %" B_PRIu64 "\n", root->LogicalAddress());
+	fFSTree = new(std::nothrow) BTree(this, root->LogicalAddress());
 	free(root);
 	if (fFSTree == NULL)
 		return B_NO_MEMORY;
@@ -369,8 +369,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_ERROR;
 	}
 	TRACE("Volume::Mount(): Found dev root: %" B_PRIu64 "\n",
-		root->BlockNum());
-	fDevTree = new(std::nothrow) BTree(this, root->BlockNum());
+		root->LogicalAddress());
+	fDevTree = new(std::nothrow) BTree(this, root->LogicalAddress());
 	free(root);
 	if (fDevTree == NULL)
 		return B_NO_MEMORY;
@@ -382,8 +382,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return B_ERROR;
 	}
 	TRACE("Volume::Mount(): Found checksum root: %" B_PRIu64 "\n",
-		root->BlockNum());
-	fChecksumTree = new(std::nothrow) BTree(this, root->BlockNum());
+		root->LogicalAddress());
+	fChecksumTree = new(std::nothrow) BTree(this, root->LogicalAddress());
 	free(root);
 	if (fChecksumTree == NULL)
 		return B_NO_MEMORY;

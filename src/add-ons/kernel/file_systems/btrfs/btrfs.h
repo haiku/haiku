@@ -40,14 +40,15 @@ struct btrfs_timespec {
 struct btrfs_header {
 	uint8	checksum[32];
 	uint8	fsid[16];
-	uint64	blocknum;
+	uint64	logical_address;
 	uint64	flags;
 	uint8	chunk_tree_uuid[16];
 	uint64	generation;
 	uint64	owner;
 	uint32	item_count;
 	uint8	level;
-	uint64 BlockNum() const { return B_LENDIAN_TO_HOST_INT64(blocknum); }
+	uint64 LogicalAddress() const
+		{ return B_LENDIAN_TO_HOST_INT64(logical_address); }
 	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
 	uint64 Generation() const
 		{ return B_LENDIAN_TO_HOST_INT64(generation); }
@@ -61,9 +62,10 @@ struct btrfs_header {
 
 struct btrfs_index {
 	btrfs_key key;
-	uint64	blocknum;
+	uint64	logical_address;
 	uint64	generation;
-	uint64 BlockNum() const { return B_LENDIAN_TO_HOST_INT64(blocknum); }
+	uint64 LogicalAddress() const
+		{ return B_LENDIAN_TO_HOST_INT64(logical_address); }
 	uint64 Generation() const
 		{ return B_LENDIAN_TO_HOST_INT64(generation); }
 } _PACKED;
@@ -241,7 +243,7 @@ struct btrfs_root {
 	btrfs_inode inode;
 	uint64	generation;
 	uint64	root_dirid;
-	uint64	blocknum;
+	uint64	logical_address;
 	uint64	limit_bytes;
 	uint64	used_bytes;
 	uint64	last_snapshot;
@@ -252,7 +254,8 @@ struct btrfs_root {
 	uint8	level;
 	uint64 Generation() const
 		{ return B_LENDIAN_TO_HOST_INT64(generation); }
-	uint64 BlockNum() const { return B_LENDIAN_TO_HOST_INT64(blocknum); }
+	uint64 LogicalAddress() const
+		{ return B_LENDIAN_TO_HOST_INT64(logical_address); }
 } _PACKED;
 
 

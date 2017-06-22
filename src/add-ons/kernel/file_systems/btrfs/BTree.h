@@ -48,8 +48,8 @@ public:
 								~BNode();
 
 					// just return from Header
-				uint64			BlockNum() const
-					{ return fNode->header.BlockNum(); }
+				uint64			LogicalAddress() const
+					{ return fNode->header.LogicalAddress(); }
 				uint64			Flags() const
 					{ return fNode->header.Flags(); }
 				uint64			Generation() const
@@ -77,7 +77,7 @@ public:
 				void			SetToWritable(off_t block,
 									int32 transactionId, bool empty);
 
-				off_t			BlockNumber() const { return fBlockNumber; }
+				off_t			BlockNum() const { return fBlockNumber;}
 				bool			IsWritable() const { return fWritable; }
 
 				int32			SearchSlot(const btrfs_key& key, int* slot) const;
