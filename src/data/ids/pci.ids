@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.05.25
-#	Date:    2017-05-25 03:15:02
+#	Version: 2017.06.22
+#	Date:    2017-06-22 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -559,6 +559,7 @@
 	00af  SAS3408 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 		1d49 0200  ThinkSystem 430-8i SAS/SATA 12Gb HBA
 		1d49 0202  ThinkSystem 430-8e SAS/SATA 12Gb HBA
+		1d49 0204  ThinkSystem 430-8i SAS/SATA 12Gb Dense HBA
 	00be  SAS3504 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00bf  SAS3404 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 	00c0  SAS3324 PCI-Express Fusion-MPT SAS-3
@@ -2203,13 +2204,15 @@
 		174b e324  Sapphire Nitro R9 390
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
-	67c0  Ellesmere [Polaris10]
+	67c0  Ellesmere [Radeon Pro WX 7100]
 	67c4  Ellesmere [Radeon Pro WX 7100]
+		1002 0336  Radeon Pro Duo
+		1002 1336  Radeon Pro Duo
 	67c7  Ellesmere [Radeon Pro WX 5100]
 	67ca  Ellesmere [Polaris10]
 	67cc  Ellesmere [Polaris10]
 	67cf  Ellesmere [Polaris10]
-	67df  Ellesmere [Radeon RX 470/480]
+	67df  Ellesmere [Radeon RX 470/480/580]
 		1002 0b37  Radeon RX 480
 		1043 04a8  Radeon RX 480
 		1043 04b0  Radeon RX 470
@@ -2225,6 +2228,7 @@
 		174b e349  Radeon RX 470
 		1787 a470  Radeon RX 470
 		1787 a480  Radeon RX 480
+		1da2 e353  Sapphire Radeon RX 580 Pulse 8GB
 	67e0  Baffin [Polaris11]
 	67e1  Baffin [Polaris11]
 	67e3  Baffin [Radeon Pro WX 4100]
@@ -2232,7 +2236,7 @@
 	67e9  Baffin [Polaris11]
 	67eb  Baffin [Polaris11]
 	67ef  Baffin [Radeon RX 460]
-	67ff  Baffin [Polaris11]
+	67ff  Baffin [Radeon RX 560]
 	6800  Wimbledon XT [Radeon HD 7970M]
 		1002 0124  Radeon HD 7970M
 		8086 2110  Radeon HD 7970M
@@ -2938,9 +2942,10 @@
 		174b e308  Radeon R9 380 Nitro 4G D5
 	6980  Polaris12
 	6981  Polaris12
-	6985  Polaris12
+	6985  Lexa XT [Radeon PRO WX 3100]
 	6986  Polaris12
 	6987  Polaris12
+	6995  Lexa XT [Radeon PRO WX 2100]
 	699f  Lexa PRO [Radeon RX 550]
 	700f  RS100 AGP Bridge
 	7010  RS200/RS250 AGP Bridge
@@ -3802,6 +3807,7 @@
 		1014 0338  PCI-X DDR Auxiliary Cache Adapter (575C)
 	0302  Winnipeg PCI-X Host Bridge
 	0308  CalIOC2 PCI-E Root Port
+	0311  FC 5740/1954 4-Port 10/100/1000 Base-TX PCI-X Adapter for POWER
 	0314  ZISC 036 Neural accelerator card
 	032d  Axon - Cell Companion Chip
 		1014 03a1  PCIe PowerXCell 8i Cell Accelerator Board
@@ -3832,6 +3838,7 @@
 		1014 04c7  PCIe3 x 8 Cache SAS RAID Internal Adapter 6GB(2CCA)
 		1014 04c8  PCIe3 x 8 Cache SAS RAID Internal Adapter 6GB(2CD2)
 		1014 04c9  PCIe3 x 8 Cache SAS RAID Internal Adapter 6GB(2CCD)
+	03dc  POWER8 Host Bridge (PHB3)
 	044b  GenWQE Accelerator Adapter
 	04aa  Flash Adapter 90 (PCIe2 0.9TB)
 	04da  PCI-E IPR SAS+ Adapter (ASIC)
@@ -5396,6 +5403,7 @@
 		1546 803c  FWB-PCIE1X11B
 	8240  XIO2001 PCI Express-to-PCI Bridge
 	8241  TUSB73x0 SuperSpeed USB 3.0 xHCI Host Controller
+		1014 04b2  S824 (8286-42A)
 	8400  ACX 100 22Mbps Wireless Interface
 		1186 3b00  DWL-650+ PC Card cardbus 22Mbs Wireless Adapter [AirPlus]
 		1186 3b01  DWL-520+ 22Mbps PCI Wireless Adapter
@@ -6105,15 +6113,27 @@
 	8031  8300 Series 10GbE Converged Network Adapter (FCoE)
 	8032  8300 Series 10GbE Converged Network Adapter (iSCSI)
 	8070  FastLinQ QL41000 Series 10/25/40/50GbE Controller
+		1077 0001  10GE 2P QL41162HxRJ-DE Adapter
+		1077 0002  10GE 2P QL41112HxCU-DE Adapter
+		1077 000b  25GE 2P QL41262HxCU-DE Adapter
 		1077 0011  FastLinQ QL41212H 25GbE Adapter
 		1077 0012  FastLinQ QL41112H 10GbE Adapter
 	8080  FastLinQ QL41000 Series 10/25/40/50GbE Controller (FCoE)
+		1077 0001  10GE 2P QL41162HxRJ-DE Adapter
+		1077 0002  10GE 2P QL41112HxCU-DE Adapter
+		1077 000b  25GE 2P QL41262HxCU-DE Adapter
 		1077 000d  FastLinQ QL41262H 25GbE FCoE Adapter
 		1077 000e  FastLinQ QL41162H 10GbE FCoE Adapter
 	8084  FastLinQ QL41000 Series 10/25/40/50GbE Controller (iSCSI)
+		1077 0001  10GE 2P QL41162HxRJ-DE Adapter
+		1077 0002  10GE 2P QL41112HxCU-DE Adapter
+		1077 000b  25GE 2P QL41262HxCU-DE Adapter
 		1077 000d  FastLinQ QL41262H 25GbE iSCSI Adapter
 		1077 000e  FastLinQ QL41162H 10GbE iSCSI Adapter
 	8090  FastLinQ QL41000 Series Gigabit Ethernet Controller (SR-IOV VF)
+		1077 0001  25GE 2P QL41262HxCU-DE Adapter
+		1077 0002  10GE 2P QL41112HxCU-DE Adapter
+		1077 000b  25GE 2P QL41262HxCU-DE Adapter
 		1077 000d  FastLinQ QL41262H 25GbE FCoE Adapter (SR-IOV VF)
 		1077 000e  FastLinQ QL41162H 10GbE iSCSI Adapter (SR-IOV VF)
 		1077 0011  FastLinQ QL41212H 25GbE Adapter (SR-IOV VF)
@@ -9945,6 +9965,8 @@
 	0f02  GF108 [GeForce GT 730]
 	0f06  GF108 [GeForce GT 730]
 	0fb0  GM200 High Definition Audio
+	0fb8  GP108 High Definition Audio Controller
+	0fb9  GP107GL High Definition Audio Controller
 	0fbb  GM204 High Definition Audio Controller
 	0fc0  GK107 [GeForce GT 640 OEM]
 	0fc1  GK107 [GeForce GT 640]
@@ -10742,10 +10764,11 @@
 	1ca7  GP107GL
 	1ca8  GP107GL
 	1caa  GP107GL
-	1cb1  GP107GL [Quardo P1000]
-	1cb2  GP107GL [Quardo P600]
-	1cb3  GP107GL [Quardo P400]
+	1cb1  GP107GL [Quadro P1000]
+	1cb2  GP107GL [Quadro P600]
+	1cb3  GP107GL [Quadro P400]
 	1d01  GP108 [GeForce GT 1030]
+	1d10  GP108 [GeForce MX150]
 	1d81  GV100
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
@@ -10769,7 +10792,8 @@
 	e100  Proteus-X: LightPulse IOV Fibre Channel Host Adapter
 	e131  LightPulse 8Gb/s PCIe Shared I/O Fibre Channel Adapter
 	e180  Proteus-X: LightPulse IOV Fibre Channel Host Adapter
-	e200  Lancer-X: LightPulse Fibre Channel Host Adapter
+	e200  LightPulse LPe16002
+		1014 03f1  PCIe2 16 Gb 2-port Fibre Channel Adapter (FC EL5B; CCIN 577F)
 	e208  LightPulse 16Gb Fibre Channel Host Adapter (Lancer-VF)
 	e220  OneConnect NIC (Lancer)
 		17aa 1054  ThinkServer LPm16002B-M6-L AnyFabric
@@ -10798,6 +10822,7 @@
 	f0e5  Zephyr LightPulse Fibre Channel Host Adapter
 	f0f5  Neptune LightPulse Fibre Channel Host Adapter
 	f100  Saturn-X: LightPulse Fibre Channel Host Adapter
+		1014 038a  8Gb PCI Express Dual Port FC Adapter for POWER
 		103c 3282  8Gb Dual-port PCI-e FC HBA
 	f111  Saturn-X LightPulse Fibre Channel Host Adapter
 	f112  Saturn-X LightPulse Fibre Channel Host Adapter
@@ -10820,6 +10845,8 @@
 	fc40  Saturn-X: LightPulse Fibre Channel Host Adapter
 	fc50  Proteus-X: LightPulse IOV Fibre Channel Host Adapter
 	fd00  Helios-X LightPulse Fibre Channel Host Adapter
+# Also IBM FC 5759 / FC 1910 for POWER
+		10df fd02  LightPulse LP11002 Dual-port 4Gigabit PCI Fibre Channel Adapter
 	fd11  Helios-X LightPulse Fibre Channel Host Adapter
 	fd12  Helios-X LightPulse Fibre Channel Host Adapter
 	fe00  Zephyr-X LightPulse Fibre Channel Host Adapter
@@ -11026,6 +11053,7 @@
 		1775 11cc  CC11/CL11
 		1849 8168  Motherboard (one of many)
 		7470 3468  TG-3468 Gigabit PCI Express Network Adapter
+		8086 2055  NUC Kit DN2820FYKH
 		8086 d615  Desktop Board D510MO/D525MW
 	8169  RTL8169 PCI Gigabit Ethernet Controller
 		1025 0079  Aspire 5024WLMi
@@ -16079,6 +16107,7 @@
 	509f  T540-509F Unified Wire Ethernet Controller
 	50a0  T540-50A0 Unified Wire Ethernet Controller
 	50a1  T540-50A1 Unified Wire Ethernet Controller
+	50a2  T580-50A2 Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -16131,6 +16160,7 @@
 	549f  T540-509F Unified Wire Ethernet Controller
 	54a0  T540-50A0 Unified Wire Ethernet Controller
 	54a1  T540-50A1 Unified Wire Ethernet Controller
+	54a2  T580-50A2 Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -16183,6 +16213,7 @@
 	559f  T540-509F Unified Wire Storage Controller
 	55a0  T540-50A0 Unified Wire Storage Controller
 	55a1  T540-50A1 Unified Wire Storage Controller
+	55a2  T580-50A2 Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -16235,6 +16266,7 @@
 	569f  T540-509F Unified Wire Storage Controller
 	56a0  T540-50A0 Unified Wire Storage Controller
 	56a1  T540-50A1 Unified Wire Storage Controller
+	56a2  T580-50A2 Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -16326,6 +16358,7 @@
 	589f  T540-509F Unified Wire Ethernet Controller [VF]
 	58a0  T540-50A0 Unified Wire Ethernet Controller [VF]
 	58a1  T540-50A1 Unified Wire Ethernet Controller [VF]
+	58a2  T580-50A2 Unified Wire Ethernet Controller [VF]
 	6001  T6225-CR Unified Wire Ethernet Controller
 	6002  T6225-SO-CR Unified Wire Ethernet Controller
 	6003  T6425-CR Unified Wire Ethernet Controller
@@ -17001,6 +17034,7 @@
 		1028 1f68  BCM57800 1-Gigabit Ethernet
 	168d  NetXtreme II BCM57840 10/20 Gigabit Ethernet
 	168e  NetXtreme II BCM57810 10 Gigabit Ethernet
+		1014 0492  PCIe2 2-port 10 GbE BaseT RJ45 Adapter (FC EN0W; CCIN 2CC4)
 		103c 1798  Flex-10 10Gb 2-port 530FLB Adapter [Meru]
 		103c 17a5  Flex-10 10Gb 2-port 530M Adapter
 		103c 18d3  Ethernet 10Gb 2-port 530T Adapter
@@ -17927,7 +17961,8 @@
 	0001  SOC-it 101 System Controller
 1540  PROVIDEO MULTIMEDIA Co Ltd
 1541  MACHONE Communications
-1542  Concurrent Computer Corporation
+# nee VIVID Technology Inc.
+1542  Concurrent Real-Time
 	9260  RCIM-II Real-Time Clock & Interrupt Module
 	9271  RCIM-III Real-Time Clock & Interrupt Module (PCIe)
 	9272  Pulse Width Modulator Card
@@ -19744,15 +19779,15 @@
 		1924 800e  SFN7x42Q-R2 Flareon Ultra 7000 Series 10/40G Adapter
 		1924 800f  SFN7xx4F-R1 Flareon Ultra 7000 Series 10G Adapter
 	0a03  SFC9220 10/40G Ethernet Controller
-		1924 8011  SFN8022-R1 Flareon 8000 Series 10G Adapter
-		1924 8012  SFN8522-R1 Flareon Ultra 8000 Series 10G Adapter
-		1924 8013  SFN8042-R1 Flareon 8000 Series 10/40G Adapter
-		1924 8014  SFN8542-R1 Flareon Ultra 8000 Series 10/40G Adapter
-		1924 8016  SFN8022-R2 Flareon 8000 Series 10G Adapter
-		1924 8017  SFN8522-R2 Flareon Ultra 8000 Series 10G Adapter
-		1924 8018  SFN8042-R2 Flareon 8000 Series 10/40G Adapter
-		1924 8019  SFN8542-R2 Flareon Ultra 8000 Series 10/40G Adapter
-		1924 801a  SFN8722-R1 Flareon Ultra 8000 Series OCP 10G Adapter
+		1924 8011  SFN8022-R1 8000 Series 10G Adapter
+		1924 8012  SFN8522-R1 8000 Series 10G Adapter
+		1924 8013  SFN8042-R1 8000 Series 10/40G Adapter
+		1924 8014  SFN8542-R1 8000 Series 10/40G Adapter
+		1924 8016  SFN8022-R2 8000 Series 10G Adapte
+		1924 8017  SFN8522-R2 8000 Series 10G Adapter
+		1924 8018  SFN8042-R2 8000 Series 10/40G Adapter
+		1924 8019  SFN8542-R2 8000 Series 10/40G Adapter
+		1924 801a  SFN8722-R1 8000 Series OCP 10G Adapter
 	1803  SFC9020 10G Ethernet Controller (Virtual Function)
 	1813  SFL9021 10GBASE-T Ethernet Controller (Virtual Function)
 	1903  SFC9120 10G Ethernet Controller (Virtual Function)
@@ -20006,7 +20041,7 @@
 	0212  BladeEngine2 10Gb Gen2 PCIe iSCSI Adapter
 	0221  BladeEngine3 10Gb Gen2 PCIe Network Adapter
 	0222  BladeEngine3 10Gb Gen2 PCIe iSCSI Adapter
-	0700  OneConnect 10Gb NIC
+	0700  OneConnect OCe10100/OCe10102 Series 10 GbE
 		103c 1747  NC550SFP DualPort 10GbE Server Adapter
 		103c 1749  NC550SFP Dual Port Server Adapter
 		103c 174a  NC551m Dual Port FlexFabric 10Gb Adapter
@@ -20015,6 +20050,10 @@
 	0702  OneConnect 10Gb iSCSI Initiator
 	0704  OneConnect 10Gb FCoE Initiator
 	0710  OneConnect 10Gb NIC (be3)
+# FC 5287 / FC 5284; CCIN 5287
+		1014 03d0  PCIe2 2-port 10GbE SR Adapter for POWER
+# FC 5288 / FC 5286; CCIN 5288
+		1014 03d1  PCIe2 2-port 10GbE SFP+ Copper Adapter for POWER
 		103c 3315  NC553i 10Gb 2-port FlexFabric Converged Network Adapter
 		103c 3340  NC552SFP 2-port 10Gb Server Adapter
 		103c 3341  NC552m 10Gb 2-port FlexFabric Converged Network Adapter
@@ -20295,6 +20334,7 @@
 	001e  ADQ208
 	001f  DSU
 	0020  ADQ14
+	0023  ADQ7
 	2014  TX320
 	2019  S6000
 # now owned by HGST (a Western Digital subsidiary)
@@ -20503,6 +20543,7 @@
 	0004  ExaNIC X10-GM
 	0005  ExaNIC X40
 	0006  ExaNIC X10-HPT
+	0007  ExaNIC X40
 1cf7  Subspace Dynamics
 1d00  Pure Storage
 1d18  RME
@@ -20551,6 +20592,7 @@
 1d8f  Enyx
 1d95  Graphcore Ltd
 1da1  Teko Telecom S.r.l.
+1da2  Sapphire Technology Limited
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040 [DC-315 / DC-395 series]
 	2020  DC-390
@@ -22511,6 +22553,7 @@
 	10ba  80003ES2LAN Gigabit Ethernet Controller (Copper)
 	10bb  80003ES2LAN Gigabit Ethernet Controller (Serdes)
 	10bc  82571EB Gigabit Ethernet Controller (Copper)
+		1014 0368  4-Port 10/100/1000 Base-TX PCI Express Adapter for POWER
 		103c 704b  NC364T PCI Express Quad Port Gigabit Server Adapter
 		108e 11bc  x4 PCI-Express Quad Gigabit Ethernet UTP Low Profile Adapter
 		8086 10bc  PRO/1000 PT Quad Port LP Server Adapter
@@ -23072,6 +23115,8 @@
 		18d4 0c08  X550 10Gb 2-port RJ45 OCP Mezz Card MOP81-I-10GT2
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
+		8086 001b  Ethernet Server Adapter X550-T2 for OCP
+		8086 001d  Ethernet 10G 2P X550-t Adapter
 		8086 0022  Ethernet Converged Network Adapter X550-T2
 	1564  X550 Virtual Function
 	1565  X550 Virtual Function
@@ -23214,10 +23259,18 @@
 	15be  Ethernet Connection (6) I219-V
 	15bf  JHL6240 Thunderbolt 3 NHI (Low Power) [Alpine Ridge LP 2016]
 	15c0  JHL6240 Thunderbolt 3 Bridge (Low Power) [Alpine Ridge LP 2016]
+	15c2  Ethernet Connection X553 Backplane
+	15c3  Ethernet Connection X553 Backplane
+	15c4  Ethernet Connection X553 10 GbE SFP+
 	15c5  X553 Virtual Function
+	15c6  Ethernet Connection X553 1GbE
+	15c7  Ethernet Connection X553 1GbE
+	15c8  Ethernet Connection X553/X557-AT 10GBASE-T
+	15ce  Ethernet Connection X553 10 GbE SFP+
 	15d0  Ethernet SDI Adapter FM10420-100GbE-QDA2
 	15d1  Ethernet Controller 10G X550T
 		8086 0002  Ethernet Converged Network Adapter X550-T1
+		8086 001b  Ethernet Server Adapter X550-T1 for OCP
 		8086 0021  Ethernet Converged Network Adapter X550-T1
 		8086 00a2  Ethernet Converged Network Adapter X550-T1
 	15d2  JHL6540 Thunderbolt 3 NHI (C step) [Alpine Ridge 4C 2016]
@@ -23230,6 +23283,8 @@
 	15d9  JHL6340 Thunderbolt 3 NHI (C step) [Alpine Ridge 2C 2016]
 	15da  JHL6340 Thunderbolt 3 Bridge (C step) [Alpine Ridge 2C 2016]
 	15e3  Ethernet Connection (5) I219-LM
+	15e4  Ethernet Connection X553 1GbE
+	15e5  Ethernet Connection X553 1GbE
 	1600  Broadwell-U Host Bridge -OPI
 	1601  Broadwell-U PCI Express x16 Controller
 	1602  Broadwell-U Integrated Graphics
