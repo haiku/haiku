@@ -101,6 +101,7 @@ class BPath {
 
 class BTree {
 public:
+								BTree(Volume* volume);
 								BTree(Volume* volume,
 									btrfs_stream* stream);
 								BTree(Volume* volume,
@@ -112,6 +113,8 @@ public:
 									size_t* size = NULL);
 			status_t			FindPrevious(btrfs_key& key, void** value,
 									size_t* size = NULL);
+
+			status_t			SetRoot(off_t logical, fsblock_t* block);
 
 private:
 								BTree(const BTree& other);

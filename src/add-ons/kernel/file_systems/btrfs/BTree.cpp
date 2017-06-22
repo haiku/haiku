@@ -127,6 +127,16 @@ BNode::SearchSlot(const btrfs_key& key, int* slot) const
 //-pragma mark
 
 
+BTree::BTree(Volume* volume)
+	:
+	fStream(NULL),
+	fRootBlock(0),
+	fVolume(volume)
+{
+	mutex_init(&fIteratorLock, "btrfs b+tree iterator");
+}
+
+
 BTree::BTree(Volume* volume, btrfs_stream* stream)
 	:
 	fStream(stream),
@@ -196,11 +206,7 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 	CachedBlock cached(fVolume);
 	fsblock_t physical;
 	if (stream == NULL) {
-		if (fVolume->FindBlock(fRootBlock, physical) != B_OK) {
-			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
-			return B_ERROR;
-		}
-		stream = (btrfs_stream*)cached.SetTo(physical);
+		stream = (btrfs_stream*)cached.SetTo(fRootBlock);
 	}
 
 	while (stream->header.Level() != 0) {
@@ -306,6 +312,21 @@ status_t
 BTree::FindExact(btrfs_key& key, void** _value, size_t* _size)
 {
 	return _Find(key, _value, _size, BTREE_EXACT);
+}
+
+
+status_t
+BTree::SetRoot(off_t logical, fsblock_t* block)
+{
+	if (block != NULL) {
+		fRootBlock = *block;
+	} else {
+		if (fVolume->FindBlock(logical, fRootBlock) != B_OK) {
+			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
+			return B_ERROR;
+		}
+	}
+	return B_OK;
 }
 
 
