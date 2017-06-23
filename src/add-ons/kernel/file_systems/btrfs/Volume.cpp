@@ -320,6 +320,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (fChunkTree == NULL)
 		return B_NO_MEMORY;
 	fChunkTree->SetRoot(fSuperBlock.ChunkRoot(), NULL);
+	TRACE("Volume::Mount() chunk_root: %" B_PRIu64 " (physical block %" B_PRIu64
+		")\n", fSuperBlock.ChunkRoot(), fChunkTree->RootBlock());
 	FindBlock(fSuperBlock.Root(), physical);
 	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
 		fSuperBlock.Root(), physical);
@@ -334,6 +336,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (fRootTree == NULL)
 		return B_NO_MEMORY;
 	fRootTree->SetRoot(fSuperBlock.Root(), NULL);
+	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical block %" B_PRIu64 ")\n",
+		fSuperBlock.Root(), fRootTree->RootBlock());
 
 	TRACE("Volume::Mount(): Searching extent root\n");
 	btrfs_key search_key;

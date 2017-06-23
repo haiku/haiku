@@ -117,6 +117,8 @@ public:
 
 			status_t			SetRoot(off_t logical, fsblock_t* block);
 
+			fsblock_t			RootBlock() const { return fRootBlock; }
+
 private:
 								BTree(const BTree& other);
 								BTree& operator=(const BTree& other);
