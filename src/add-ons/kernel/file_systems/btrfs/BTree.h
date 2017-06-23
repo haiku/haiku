@@ -80,7 +80,8 @@ public:
 				off_t			BlockNum() const { return fBlockNumber;}
 				bool			IsWritable() const { return fWritable; }
 
-				int32			SearchSlot(const btrfs_key& key, int* slot) const;
+				int32			SearchSlot(const btrfs_key& key, int* slot,
+									btree_traversing type) const;
 private:
 								BNode(const BNode&);
 								BNode& operator=(const BNode&);

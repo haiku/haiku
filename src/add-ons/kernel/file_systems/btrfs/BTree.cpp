@@ -92,7 +92,7 @@ BNode::SetToWritable(off_t block, int32 transactionId, bool empty)
 
 
 int32
-BNode::SearchSlot(const btrfs_key& key, int* slot) const
+BNode::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) const
 {
 	//binary search for item slot in a node
 	int entrySize = sizeof(btrfs_entry);
@@ -103,24 +103,33 @@ BNode::SearchSlot(const btrfs_key& key, int* slot) const
 
 	int low = 0;
 	int high = ItemCount();
-	int mid;
+	int mid, comp;
 	int base = sizeof(btrfs_header);
 	const btrfs_key* other;
 	while (low < high) {
 		mid = (low + high) / 2;
 		other = (const btrfs_key*)((uint8*)fNode + base + mid * entrySize);
-		int comp = key.Compare(*other);
+		comp = key.Compare(*other);
 		if (comp < 0)
 			high = mid;
 		else if (comp > 0)
 			low = mid + 1;
 		else {
 			*slot = mid;
-			return B_OK;
+			return B_OK; 		//if key is in node
 		}
 	}
-	*slot = low;
-	return B_ENTRY_NOT_FOUND;
+
+	TRACE("SearchSlot() found slot %" B_PRId32 " comp %" B_PRId32 "\n",
+		*slot, comp);
+	if (type == BTREE_BACKWARD)
+		*slot = low - 1;
+	else if (type == BTREE_FORWARD)
+		*slot = low;
+
+	if (*slot < 0 || type == BTREE_EXACT)
+		return B_ENTRY_NOT_FOUND;
+	return B_OK;
 }
 
 
