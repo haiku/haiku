@@ -9,7 +9,6 @@
 
 
 #include "BTree.h"
-#include "CachedBlock.h"
 
 
 //#define TRACE_BTRFS
@@ -138,7 +137,6 @@ BNode::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) const
 
 BTree::BTree(Volume* volume)
 	:
-	fStream(NULL),
 	fRootBlock(0),
 	fVolume(volume)
 {
@@ -148,7 +146,6 @@ BTree::BTree(Volume* volume)
 
 BTree::BTree(Volume* volume, btrfs_stream* stream)
 	:
-	fStream(stream),
 	fRootBlock(0),
 	fVolume(volume)
 {
@@ -158,7 +155,6 @@ BTree::BTree(Volume* volume, btrfs_stream* stream)
 
 BTree::BTree(Volume* volume, fsblock_t rootBlock)
 	:
-	fStream(NULL),
 	fRootBlock(rootBlock),
 	fVolume(volume)
 {
@@ -211,86 +207,40 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 {
 	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
 		key.ObjectID(),	key.Type(), key.Offset());
-	btrfs_stream* stream = fStream;
-	CachedBlock cached(fVolume);
-	fsblock_t physical;
-	if (stream == NULL) {
-		stream = (btrfs_stream*)cached.SetTo(fRootBlock);
-	}
+	BNode node(fVolume->BlockCache(), fRootBlock);
+	int slot, ret;
+	fsblock_t physicalBlock;
 
-	while (stream->header.Level() != 0) {
-		TRACE("Find() level %d\n", stream->header.Level());
-		uint32 i = 1;
-		for (; i < stream->header.ItemCount(); i++) {
-			int32 comp = key.Compare(stream->index[i].key);
-			TRACE("Find() found index %" B_PRIu32 " at %" B_PRId64 " comp %"
-				B_PRId32 "\n", i, stream->index[i].LogicalAddress(), comp);
-			if (comp > 0)
-				continue;
-			if (comp < 0 || type == BTREE_BACKWARD)
-				break;
-		}
-		TRACE("Find() getting index %" B_PRIu32 " at %" B_PRId64 "\n", i - 1,
-			stream->index[i - 1].LogicalAddress());
+	while (node.Level() != 0) {
+		TRACE("Find() level %d\n", node.Level());
+		ret = node.SearchSlot(key, &slot, BTREE_BACKWARD);
+		if (ret != B_OK)
+			return ret;
+		TRACE("Find() getting index %" B_PRIu32 "\n", slot);
 
-		if (fVolume->FindBlock(stream->index[i - 1].LogicalAddress(), physical)
+		if (fVolume->FindBlock(node.Index(slot)->LogicalAddress(), physicalBlock)
 			!= B_OK) {
 			ERROR("Find() unmapped block %" B_PRId64 "\n",
-				stream->index[i - 1].LogicalAddress());
+				node.Index(slot)->LogicalAddress());
 			return B_ERROR;
 		}
-		stream = (btrfs_stream*)cached.SetTo(physical);
+		node.SetTo(physicalBlock);
 	}
 
-	uint32 i;
-#ifdef TRACE_BTRFS
-	TRACE("Find() dump count %" B_PRId32 "\n", stream->header.ItemCount());
-	for (i = 0; i < stream->header.ItemCount(); i++) {
-		int32 comp = key.Compare(stream->entries[i].key);
-		TRACE("Find() dump %" B_PRIu32 " %" B_PRIu32 " offset %" B_PRId64
-			" comp %" B_PRId32 "\n", stream->entries[i].Offset(),
-			stream->entries[i].Size(), stream->entries[i].key.Offset(), comp);
-	}
-#endif
+	TRACE("Find() dump count %" B_PRId32 "\n", node.ItemCount());
+	ret = node.SearchSlot(key, &slot, type);
 
-	for (i = 0; i < stream->header.ItemCount(); i++) {
-		int32 comp = key.Compare(stream->entries[i].key);
-		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 " oid %" B_PRId64
-			" type %d offset %" B_PRId64 " comp %" B_PRId32 "\n",
-			stream->entries[i].Offset(), stream->entries[i].Size(),
-			stream->entries[i].key.ObjectID(), stream->entries[i].key.Type(),
-			stream->entries[i].key.Offset(), comp);
-		if (comp == 0)
-			break;
-		if (comp < 0 && i > 0) {
-			if (type == BTREE_EXACT)
-				return B_ENTRY_NOT_FOUND;
-			if (type == BTREE_BACKWARD)
-				i--;
-			break;
-		}
-	}
-
-	if (i == stream->header.ItemCount()) {
-		if (type == BTREE_BACKWARD)
-			i--;
-		else
-			return B_ENTRY_NOT_FOUND;
-	}
-
-	if (i < stream->header.ItemCount()
-		&& stream->entries[i].key.Type() == key.Type()) {
+	if ( ret == B_OK && node.Item(slot)->key.Type() == key.Type()) {
 		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 "\n",
-			stream->entries[i].Offset(), stream->entries[i].Size());
+			node.Item(slot)->Offset(), node.Item(slot)->Size());
 
 		if (_value != NULL) {
-			*_value = malloc(stream->entries[i].Size());
-			memcpy(*_value, ((uint8 *)&stream->entries[0]
-				+ stream->entries[i].Offset()),
-				stream->entries[i].Size());
-			key.SetOffset(stream->entries[i].key.Offset());
+			*_value = malloc(node.Item(slot)->Size());
+			memcpy(*_value, node.ItemData(slot),
+				node.Item(slot)->Size());
+			key.SetOffset(node.Item(slot)->key.Offset());
 			if (_size != NULL)
-				*_size = stream->entries[i].Size();
+				*_size = node.Item(slot)->Size();
 		}
 		return B_OK;
 	}

@@ -131,7 +131,6 @@ private:
 private:
 			friend class TreeIterator;
 
-			btrfs_stream* fStream;
 			fsblock_t			fRootBlock;
 			Volume*				fVolume;
 			mutex				fIteratorLock;
