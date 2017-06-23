@@ -288,19 +288,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		start += sizeof(btrfs_key) + fChunk->Size();
 	}
 
-	TRACE("Volume::Mount() generation: %" B_PRIu64 "\n",
-		fSuperBlock.Generation());
-	fsblock_t physical = 0;
-	FindBlock(fSuperBlock.Root(), physical);
-	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
-		fSuperBlock.Root(), physical);
-	FindBlock(fSuperBlock.ChunkRoot(), physical);
-	TRACE("Volume::Mount() chunk_root: %" B_PRIu64 " (physical %" B_PRIu64
-		")\n", fSuperBlock.ChunkRoot(), physical);
-	FindBlock(fSuperBlock.LogRoot(), physical);
-	TRACE("Volume::Mount() log_root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
-		fSuperBlock.LogRoot(), physical);
-
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
 	status = opener.GetSize(&diskSize);
@@ -322,15 +309,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fChunkTree->SetRoot(fSuperBlock.ChunkRoot(), NULL);
 	TRACE("Volume::Mount() chunk_root: %" B_PRIu64 " (physical block %" B_PRIu64
 		")\n", fSuperBlock.ChunkRoot(), fChunkTree->RootBlock());
-	FindBlock(fSuperBlock.Root(), physical);
-	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
-		fSuperBlock.Root(), physical);
-	FindBlock(fSuperBlock.ChunkRoot(), physical);
-	TRACE("Volume::Mount() chunk_root: %" B_PRIu64 " (physical %" B_PRIu64
-		")\n", fSuperBlock.ChunkRoot(), physical);
-	FindBlock(fSuperBlock.LogRoot(), physical);
-	TRACE("Volume::Mount() log_root: %" B_PRIu64 " (physical %" B_PRIu64 ")\n",
-		fSuperBlock.LogRoot(), physical);
 
 	fRootTree = new(std::nothrow) BTree(this);
 	if (fRootTree == NULL)
@@ -345,7 +323,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	search_key.SetType(BTRFS_KEY_TYPE_ROOT_ITEM);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_EXTENT_TREE);
 	btrfs_root* root;
-	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
+	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find extent root\n");
 		return B_ERROR;
 	}
@@ -357,9 +335,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fExtentTree->SetRoot(root->LogicalAddress(), NULL);
 	free(root);
 
+	TRACE("Volume::Mount(): Searching fs root\n");
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_FS_TREE);
-	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
+	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find fs root\n");
 		return B_ERROR;
 	}
@@ -371,9 +350,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fFSTree->SetRoot(root->LogicalAddress(), NULL);
 	free(root);
 
+	TRACE("Volume::Mount(): Searching dev root\n");
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_DEV_TREE);
-	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
+	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find dev root\n");
 		return B_ERROR;
 	}
@@ -385,9 +365,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fDevTree->SetRoot(root->LogicalAddress(), NULL);
 	free(root);
 
+	TRACE("Volume::Mount(): Searching checksum root\n");
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_CHECKSUM_TREE);
-	if (fRootTree->FindNext(search_key, (void**)&root) != B_OK) {
+	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find checksum root\n");
 		return B_ERROR;
 	}
