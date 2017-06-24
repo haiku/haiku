@@ -36,11 +36,11 @@ RemotePackageRepository HaikuPorts
 	be_book-2008_10_26-1
 	ca_root_certificates-2017_01_18-1
 	caladea-20130214-3
-	calc_data-2.12.5.3-1
+	calc_data-2.12.5.3-2
 	cantarell-0.0.16-1
 	cardo-1.04-2
 	carlito-20130920-1
-	check_common-0.10.0-2
+	check_common-0.10.0-3
 	clear_sans-1.00-1
 	colordiff-1.0.13-1
 	colormake-0.9.20140503-1
@@ -54,7 +54,7 @@ RemotePackageRepository HaikuPorts
 	droid-113-2
 	essays1743-2.001-2
 	exiftool-10.42-1
-	file_data-5.30-1
+	file_data-5.30-2
 	fira_fonts-3.111-1
 	flare_data-0.19-1
 	fontawesome-4.6.3-1
@@ -69,7 +69,7 @@ RemotePackageRepository HaikuPorts
 	kacst_fonts-5.0-3
 	lateef_font-1.001-3
 	lcov-1.12-1
-	libcaca_doc-0.99.beta19-4
+	libcaca_doc-0.99.beta19-5
 	liberation_fonts-2.00.1-4
 	libertine-5.3.0_2012_07_02-1
 	lohit-2.3.8-2
@@ -94,8 +94,8 @@ RemotePackageRepository HaikuPorts
 	opentyrian_data-21-1
 	overpass-2.1-1
 	paratype-1.0-2
-	pari_data-2.7.6-2
-	pciutils_data-3.5.2-1
+	pari_data-2.7.6-3
+	pciutils_data-3.5.2-2
 	poppler_data-0.4.7-1
 	redoflacs-0.30-1
 	roboto-1.2-2
