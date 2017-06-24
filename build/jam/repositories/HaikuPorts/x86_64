@@ -669,103 +669,101 @@ RemotePackageRepository HaikuPorts
 	libmtp_devel-1.1.12-2
 	libmwaw-0.3.10-3
 	libmwaw_devel-0.3.10-3
-	libnatpmp-20140401-1
-	libnatpmp_devel-20140401-1
-	libnsbmp-0.1.4-1
-	libnsbmp_devel-0.1.4-1
-	libnsgif-0.1.4-1
-	libnsgif_devel-0.1.4-1
-	libnsutils-0.0.3-1
-	libnsutils_devel-0.0.3-1
-	liboauth-1.0.3-1
-	liboauth_devel-1.0.3-1
-	libodfgen-0.1.6-1
-	libodfgen_devel-0.1.6-1
+	libnatpmp-20140401-2
+	libnatpmp_devel-20140401-2
+	libnsbmp-0.1.4-2
+	libnsbmp_devel-0.1.4-2
+	libnsgif-0.1.4-2
+	libnsgif_devel-0.1.4-2
+	libnsutils-0.0.3-2
+	libnsutils_devel-0.0.3-2
+	liboauth-1.0.3-2
+	liboauth_devel-1.0.3-2
+	libodfgen-0.1.6-2
+	libodfgen_devel-0.1.6-2
 	libogg-1.3.2-4
 	libogg_devel-1.3.2-4
-	libopenmpt-0.2.7386~beta20.3-1
-	libopenmpt_devel-0.2.7386~beta20.3-1
-	libopenshot-0.1.1-5
-	libopenshot_audio-0.1.1-2
-	libopenshot_audio_devel-0.1.1-2
-	libopenshot_devel-0.1.1-5
-	libotr-4.1.0-2
-	libotr_devel-4.1.0-2
-	libp11-0.4.4-1
-	libp11_devel-0.4.4-1
-	libpagemaker-0.0.3-1
-	libpagemaker_devel-0.0.3-1
-	libpaper-1.1.24-1
-	libpaper_devel-1.1.24-1
-	libparserutils-0.2.3-1
-	libparserutils_devel-0.2.3-1
+	libopenmpt-0.2.7386~beta20.3-2
+	libopenmpt_devel-0.2.7386~beta20.3-2
+	libopenshot-0.1.1-6
+	libopenshot_audio-0.1.1-3
+	libopenshot_audio_devel-0.1.1-3
+	libopenshot_devel-0.1.1-6
+	libotr-4.1.0-3
+	libotr_devel-4.1.0-3
+	libp11-0.4.4-2
+	libp11_devel-0.4.4-2
+	libpagemaker-0.0.3-2
+	libpagemaker_devel-0.0.3-2
+	libpaper-1.1.24-2
+	libpaper_devel-1.1.24-2
+	libparserutils-0.2.3-2
+	libparserutils_devel-0.2.3-2
 	libpcap-1.8.1-3
 	libpcap_devel-1.8.1-3
 	libpcre-8.40-3
-	libpcre0-8.21-7
-	libpcre2-10.23-1
-	libpcre2_devel-10.23-1
+	libpcre2-10.23-2
+	libpcre2_devel-10.23-2
 	libpcre_devel-8.40-3
-	libplist-1.12-1
-	libplist_devel-1.12-1
-	libpng-1.5.28-1
+	libplist-1.12-2
+	libplist_devel-1.12-2
 	libpng16-1.6.29-2
 	libpng16_devel-1.6.29-2
-	libpng_devel-1.5.28-1
-	libpthread_stubs-0.3-2
-	libqt4-4.8.7-6
-	libqt4_devel-4.8.7-6
-	libquicktime-1.2.4-3
-	libquicktime_devel-1.2.4-3
-	libraw-0.18.2-1
-	libraw_devel-0.18.2-1
-	libraw_tools-0.18.2-1
-	libreplaygain-475-1
-	libreplaygain_devel-475-1
-	librevenge-0.0.4-3
-	librevenge_devel-0.0.4-3
-	librsync-2.0.0-2
-	librsync_devel-2.0.0-2
-	libsamplerate-0.1.9-1
-	libsamplerate_devel-0.1.9-1
-	libsanta-3.0.1-4
-	libsanta_devel-3.0.1-4
-	libsdl-1.2.15-11
-	libsdl2-2.0.5-3
-	libsdl2_devel-2.0.5-3
-	libsdl_devel-1.2.15-11
-	libshout-2.4.1-2
-	libshout_devel-2.4.1-2
-	libsmf-1.3-1
-	libsmf_devel-1.3-1
-	libsndfile-1.0.27-2
-	libsndfile_devel-1.0.27-2
-	libsodium-1.0.12-4
-	libsodium_devel-1.0.12-4
+	libpthread_stubs-0.3-3
+	libqt4-4.8.7-7
+	libqt4_devel-4.8.7-7
+	libquicktime-1.2.4-4
+	libquicktime_devel-1.2.4-4
+	libraw-0.18.2-2
+	libraw_devel-0.18.2-2
+	libraw_tools-0.18.2-2
+	libreplaygain-475-2
+	libreplaygain_devel-475-2
+	librevenge-0.0.4-4
+	librevenge_devel-0.0.4-4
+	librsync-2.0.0-3
+	librsync_devel-2.0.0-3
+	libsamplerate-0.1.9-2
+	libsamplerate_devel-0.1.9-2
+	libsanta-3.0.1-5
+	libsanta_devel-3.0.1-5
+	libsdl-1.2.15-12
+	libsdl2-2.0.5-4
+	libsdl2_devel-2.0.5-4
+	libsdl_devel-1.2.15-12
+	libshout-2.4.1-3
+	libshout_devel-2.4.1-3
+	libsmf-1.3-2
+	libsmf_devel-1.3-2
+	libsndfile-1.0.27-3
+	libsndfile_devel-1.0.27-3
+	libsodium-1.0.12-5
+	libsodium_devel-1.0.12-5
 	libsolv-0.3.0_haiku_2014_12_22-2
 	libsolv_devel-0.3.0_haiku_2014_12_22-2
-	libsoundtouch-1.9.2-2
-	libsoundtouch_devel-1.9.2-2
-	libssh2-1.8.0-1
-	libssh2_devel-1.8.0-1
-	libstaroffice-0.0.3-1
-	libstaroffice_devel-0.0.3-1
-	libsvgtiny-0.1.5-1
-	libsvgtiny_devel-0.1.5-1
-	libsvm-v321-1
-	libsvm_devel-v321-1
-	libtar-1.2.20-3
-	libtar_devel-1.2.20-3
-	libtasn1-4.10-1
-	libtasn1_devel-4.10-1
+	libsoundtouch-1.9.2-3
+	libsoundtouch_devel-1.9.2-3
+	libssh2-1.8.0-2
+	libssh2_devel-1.8.0-2
+	libstaroffice-0.0.3-2
+	libstaroffice_devel-0.0.3-2
+	libsvgtiny-0.1.5-2
+	libsvgtiny_devel-0.1.5-2
+	libsvm-v321-2
+	libsvm_devel-v321-2
+	libsvm_tools-v321-2
+	libtar-1.2.20-4
+	libtar_devel-1.2.20-4
+	libtasn1-4.10-2
+	libtasn1_devel-4.10-2
 	libtheora-1.1.1-6
 	libtheora_devel-1.1.1-6
-	libtimidity-0.1.0-2
-	libtimidity_devel-0.1.0-2
+	libtimidity-0.1.0-3
+	libtimidity_devel-0.1.0-3
 	libtool-2.4.2-3
 	libtool_libltdl-2.4.2-3
-	libtorrent_rasterbar-1.0.9-2
-	libtorrent_rasterbar_devel-1.0.9-2
+	libtorrent_rasterbar-1.0.9-3
+	libtorrent_rasterbar_devel-1.0.9-3
 	libunistring-0.9.7-1
 	libunistring_devel-0.9.7-1
 	libupnp-1.6.21-1
@@ -1714,10 +1712,8 @@ RemotePackageRepository HaikuPorts
 	libparserutils
 	libpcap
 	libpcre
-	libpcre0
 	libpcre2
 	libplist
-	libpng
 	libpng16
 	libpthread_stubs
 	libqt4
