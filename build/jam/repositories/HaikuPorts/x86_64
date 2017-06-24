@@ -120,257 +120,233 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_64)
-	2048-1.0.0-2
-	a52dec-0.7.4-4
-	a52dec_devel-0.7.4-4
-	a_book-1.1-4
-	aalib-1.4~rc5-1
-	aalib_devel-1.4~rc5-1
-	aalibtranslator-0.0.1-3
-	advancemame-1.4-1
-	ale-0.9.1-3
-	amoebax-0.2.1-1
-	apache-2.4.3-2
-	apng2gif-1.7-1
-	app2png-1.0.0-1
-	apr-1.5.2-3
-	apr_devel-1.5.2-3
-	apr_util-1.5.4-4
-	apr_util_devel-1.5.4-4
-	arc-5.21p-1
-	arm_none_eabi_binutils-2.26.1_2016_07_22-1
-	artpaint-2.1.0git-5
-	asciidoc-8.6.9-1
-	aspell-0.60.6.1-2
-	aspell_devel-0.60.6.1-2
-	astyle-2.05-1
-	atool-0.39.0-1
-	audiofile-0.3.6-1
-	audiofile_devel-0.3.6-1
+	2048-1.0.0-3
+	a52dec-0.7.4-5
+	a52dec_devel-0.7.4-5
+	a_book-1.1-5
+	aalib-1.4~rc5-2
+	aalib_devel-1.4~rc5-2
+	aalibtranslator-0.0.1-4
+	advancemame-1.4-2
+	ale-0.9.1-4
+	amoebax-0.2.1-2
+	apache-2.4.3-3
+	apng2gif-1.7-2
+	app2png-1.0.0-2
+	apr-1.5.2-4
+	apr_devel-1.5.2-4
+	apr_util-1.5.4-5
+	apr_util_devel-1.5.4-5
+	arc-5.21p-2
+	arm_none_eabi_binutils-2.26.1_2016_07_22-2
+	artpaint-2.1.0git-6
+	asciidoc-8.6.9-2
+	aspell-0.60.6.1-3
+	aspell_devel-0.60.6.1-3
+	astyle-2.05-2
+	atool-0.39.0-2
+	audiofile-0.3.6-2
+	audiofile_devel-0.3.6-2
 	autoconf-2.69-7
-	autoconf213-2.13-2
-	autoconf264-2.64-1
+	autoconf213-2.13-3
+	autoconf264-2.64-2
 	automake-1.15.0-2
 	automake113-1.13.1-2
-	avr_binutils-2.26.1_2016_07_22-1
-	avr_gcc-4.8.2_2014_03_20-1
-	babybe-2.2~git-1
-	backup-0.0.1-3
-	bafx-0.2.3-3
+	avr_binutils-2.26.1_2016_07_22-2
+	avr_gcc-4.8.2_2014_03_20-2
+	babybe-2.2~git-2
+	backup-0.0.1-4
+	bafx-0.2.3-4
 	bash-4.4.012-2
-	bchunk-1.2.0-2
-	bebuilder-0.5.2~git-1
-	becasso-2.0-3
-	beecrypt-4.2.1-1
-	beecrypt_devel-4.2.1-1
-	befar-4.2_beta-5
-	bencode_tools-20110315-1
-	bencode_tools_devel-20110315-1
-	beohms-0.1~git-1
-	bepdf-2.0.1~beta1-3
-	bepodder-1.3.0-5
-	bescreencapture-2.2.1-1
-	bescreencapture_inputfilter-2.2.1-1
-	bevexed-20141224-4
-	bigreqsproto-1.1.2-1
-	bin86-0.16.21-1
+	bchunk-1.2.0-3
+	bebuilder-0.5.2~git-2
+	becasso-2.0-4
+	beecrypt-4.2.1-2
+	beecrypt_devel-4.2.1-2
+	befar-4.2_beta-6
+	bencode_tools-20110315-2
+	bencode_tools_devel-20110315-2
+	beohms-0.1~git-2
+	bepdf-2.0.1~beta1-4
+	bepodder-1.3.0-6
+	bescreencapture-2.2.1-2
+	bescreencapture_inputfilter-2.2.1-2
+	bevexed-20141224-5
+	bigreqsproto-1.1.2-2
+	bin86-0.16.21-2
 	binutils-2.26.1_2016_07_22-4
 	bison-3.0.4-4
-	blogpositive-0.4.0-2
-	bmake-20160220-1
-	bochs-2.6-2
-	bonnie++-1.03e-1
-	boost-1.55.0-6
-	boost163-1.63.0-1
-	boost163_devel-1.63.0-1
-	boost_atomic-1.55.0-6
-	boost_chrono-1.55.0-6
-	boost_context-1.55.0-6
-	boost_coroutine-1.55.0-6
-	boost_date_time-1.55.0-6
-	boost_devel-1.55.0-6
-	boost_filesystem-1.55.0-6
-	boost_graph-1.55.0-6
-	boost_iostreams-1.55.0-6
-	boost_locale-1.55.0-6
-	boost_log-1.55.0-6
-	boost_math-1.55.0-6
-	boost_program_options-1.55.0-6
-	boost_random-1.55.0-6
-	boost_regex-1.55.0-6
-	boost_serialization-1.55.0-6
-	boost_signals-1.55.0-6
-	boost_system-1.55.0-6
-	boost_test-1.55.0-6
-	boost_thread-1.55.0-6
-	boost_timer-1.55.0-6
-	boost_unit_test_framework-1.55.0-6
-	boost_wave-1.55.0-6
-	botan-2.0.1-1
-	botan_devel-2.0.1-1
-	box2d-2.3.1-4
-	box2d_devel-2.3.1-4
-	buildbot_slave-0.8.8-2
-	burnitnow-1.1-1
-	butterfly-1.6.2-1
-	byacc-20150711-1
-	bzflag-2.4.8-2
+	blogpositive-0.4.0-3
+	bmake-20160220-2
+	bochs-2.6-3
+	bonnie++-1.03e-2
+	boost163-1.63.0-2
+	boost163_devel-1.63.0-2
+	botan-2.0.1-2
+	botan_devel-2.0.1-2
+	box2d-2.3.1-5
+	box2d_devel-2.3.1-5
+	buildbot_slave-0.8.12-2
+	burnitnow-1.1-2
+	butterfly-1.6.2-2
+	byacc-20150711-2
+	bzflag-2.4.8-3
 	bzip2-1.0.6-6
 	bzip2_devel-1.0.6-6
-	c_ares-1.11.0-1
-	c_ares_devel-1.11.0-1
-	cabextract-1.6-1
-	cairo-1.14.8-1
-	cairo_devel-1.14.8-1
-	cal-1.0.0-2
-	calc-2.12.5.3-1
-	calc_devel-2.12.5.3-1
-	canna-1.0.2-2
-	cantata-2.0.1-1
-	capitalbe-1.1-3
-	capstone-3.0.4-1
-	capstone_devel-3.0.4-1
-	catkeyseditor-0.1.1-1
-	caya-0.0.3-4
-	ccache-3.3.4-1
-	ccd2iso-0.3-1
-	cdrtools-3.02~a07-1
-	cdrtools_devel-3.02~a07-1
-	cereal-1.2.2-1
-	check-0.10.0-2
-	check_devel-0.10.0-2
-	chmlib-0.40-3
-	chmlib_devel-0.40-3
-	chromaprint-1.4.1-1
-	chromaprint_devel-1.4.1-1
-	clipdinger-1.0-1
-	cln-1.3.4-2
-	cln_devel-1.3.4-2
-	clockwerk-1.0~git-2
-	cloog-0.18.3-2
-	cloog_devel-0.18.3-2
-	clucene-2.3.3.4-3
-	clucene_devel-2.3.3.4-3
+	c_ares-1.11.0-2
+	c_ares_devel-1.11.0-2
+	cabextract-1.6-2
+	cairo-1.14.8-2
+	cairo_devel-1.14.8-2
+	cal-1.0.0-3
+	calc-2.12.5.3-2
+	calc_devel-2.12.5.3-2
+	canna-1.0.2-3
+	cantata-2.0.1-2
+	capitalbe-1.1-4
+	capstone-3.0.4-2
+	capstone_devel-3.0.4-2
+	catkeyseditor-0.1.1-2
+	caya-0.0.3-5
+	ccache-3.3.4-2
+	ccd2iso-0.3-2
+	cdrtools-3.02~a07-2
+	cdrtools_devel-3.02~a07-2
+	cereal-1.2.2-2
+	check-0.10.0-3
+	check_devel-0.10.0-3
+	chmlib-0.40-4
+	chmlib_devel-0.40-4
+	chromaprint-1.4.1-2
+	chromaprint_devel-1.4.1-2
+	clipdinger-1.0-2
+	cln-1.3.4-3
+	cln_devel-1.3.4-3
+	clockwerk-1.0~git-3
+	cloog-0.18.3-3
+	cloog_devel-0.18.3-3
+	clucene-2.3.3.4-4
+	clucene_devel-2.3.3.4-4
 	cmake-3.7.2-2
-	color_lines-0.6-1
-	colors-2.3-4
-	commandtimer-2.0~git-1
-	compositeproto-0.4.2-1
-	copynametoclipboard-1.0.1-2
+	color_lines-0.6-2
+	colors-2.3-5
+	commandtimer-2.0~git-2
+	compositeproto-0.4.2-2
+	copynametoclipboard-1.0.1-3
 	coreutils-8.26-3
-	cpio-2.12-1
-	cppunit-1.13.2-3
-	cppunit_devel-1.13.2-3
+	cpio-2.12-2
+	cppunit-1.13.2-4
+	cppunit_devel-1.13.2-4
 	ctags-5.8-5
 	curl-7.53.1-2
 	curl_devel-7.53.1-2
-	curlftpfs-0.9.2-1
-	cutecom-0.22.0-1
-	cvs-1.12.13.1-7
-	cvsps-2.2b1-1
-	cython-0.23.4-1
-	daa2iso-0.1.7e-3
-	damageproto-1.2.1-1
-	dash-0.5.7-2
-	db-6.0.30-1
-	db61-6.1.23-1
-	db61_devel-6.1.23-1
-	db_devel-6.0.30-1
-	dbus-1.8.6-2
-	dbus_devel-1.8.6-2
-	dcadec-0.2.0-1
-	dcadec_devel-0.2.0-1
-	dcraw-9.27.0-1
-	defendguin-0.0.12-1
-	desknotes-1.1-4
-	dfu_programmer-0.6.2-2
-	dialog-1.3_20160828-2
-	diffstat-1.61-1
+	curlftpfs-0.9.2-2
+	cutecom-0.22.0-2
+	cvs-1.12.13.1-8
+	cvsps-2.2b1-2
+	daa2iso-0.1.7e-4
+	damageproto-1.2.1-2
+	dash-0.5.7-3
+	db-6.0.30-2
+	db61-6.1.23-2
+	db61_devel-6.1.23-2
+	db_devel-6.0.30-2
+	dbus-1.8.6-3
+	dbus_devel-1.8.6-3
+	dcadec-0.2.0-2
+	dcadec_devel-0.2.0-2
+	dcraw-9.27.0-2
+	defendguin-0.0.12-2
+	desknotes-1.1-5
+	dfu_programmer-0.6.2-3
+	dialog-1.3_20160828-3
+	dialog_devel-1.3_20160828-3
+	diffstat-1.61-2
 	diffutils-3.5-2
-	digiclock-1.0-2
-	discount-2.2.1-1
-	discount_devel-2.2.1-1
-	djvulibre-3.5.25-3
-	djvulibre_devel-3.5.25-3
-	dmg2img-1.6.6-1
-	dmidecode-3.1-1
-	dmtx_utils-0.7.4-2
-	documentviewer-0.3_git-10
-	docutils-0.12-1
-	dos2unix-7.3.2-1
-	dosbox-0.74-4
-	dovecot-2.2.24-1
-	doxygen-1.8.12-1
-	dtc-1.4.4-1
-	ducksaver-1.1.0-2
-	dulwich-0.12.0-1
-	dvdauthor-0.7.2-2
-	dvdbackup-0.4.2-1
-	ed-1.14.1-1
-	edgar-1.26-1
-	enca-1.18-1
-	enca_devel-1.18-1
-	erlang-19.3-1
-	espeak-1.48.04-3
+	digiclock-1.0-3
+	discount-2.2.1-2
+	discount_devel-2.2.1-2
+	djvulibre-3.5.25-4
+	djvulibre_devel-3.5.25-4
+	dmg2img-1.6.6-2
+	dmidecode-3.1-2
+	dmtx_utils-0.7.4-3
+	documentviewer-0.3_git-11
+	docutils-0.12-2
+	dos2unix-7.3.2-2
+	dosbox-0.74-5
+	dovecot-2.2.24-2
+	doxygen-1.8.12-2
+	dtc-1.4.4-2
+	ducksaver-1.1.0-3
+	dulwich-0.12.0-2
+	dvdauthor-0.7.2-3
+	dvdbackup-0.4.2-2
+	ed-1.14.1-2
+	edgar-1.26-2
+	enca-1.18-2
+	enca_devel-1.18-2
+	erlang-19.3-2
+	espeak-1.48.04-4
 	expat-2.2.0-3
 	expat_devel-2.2.0-3
-	expect-5.45-1
-	expect_devel-5.45-1
-	extra_cmake_modules-5.31.0-1
-	faac-1.28-3
-	faac_devel-1.28-3
-	faad2-2.7-2
-	faad2_devel-2.7-2
-	fairtrade-1.0.0~git-1
-	fastjar-0.98-1
-	fdupes-1.6.1-1
+	expect-5.45-2
+	expect_devel-5.45-2
+	extra_cmake_modules-5.31.0-2
+	faac-1.28-4
+	faac_devel-1.28-4
+	faad2-2.7-3
+	faad2_devel-2.7-3
+	fairtrade-1.0.0~git-2
+	fastjar-0.98-2
+	fdupes-1.6.1-2
 	ffmpeg-3.2.4-2
-	ffmpeg2-2.8.11-1
-	ffmpeg2_bin-2.8.11-1
-	ffmpeg2_devel-2.8.11-1
+	ffmpeg2-2.8.11-2
+	ffmpeg2_bin-2.8.11-2
+	ffmpeg2_devel-2.8.11-2
 	ffmpeg_devel-3.2.4-2
-	ffsb-6.0_rc2-2
-	fftw-3.3.6-1
-	fftw_devel-3.3.6-1
-	fife-0.4.0~20150801-1
-	fifechan-0.1.2-2
-	fifechan_devel-0.1.2-2
-	figlet-222-1
-	file-5.30-1
-	file_devel-5.30-1
-	finance-1.0.0-3
+	ffsb-6.0_rc2-3
+	fftw-3.3.6-2
+	fftw_devel-3.3.6-2
+	fife-0.4.0~20150801-2
+	fifechan-0.1.2-3
+	fifechan_devel-0.1.2-3
+	figlet-222-2
+	file-5.30-2
+	file_devel-5.30-2
+	finance-1.0.0-4
 	findutils-4.4.2-5
-	fixesproto-5.0-1
-	flac-1.3.2-1
-	flac123-0.0.12-1
-	flac_devel-1.3.2-1
-	flare-0.19-3
+	fixesproto-5.0-2
+	flac-1.3.2-2
+	flac123-0.0.12-2
+	flac_devel-1.3.2-2
+	flare-0.19-4
 	flex-2.6.1-3
-	flickcurl-1.26-3
-	flickcurl_devel-1.26-3
-	flite-2.0.0-2
-	flite_devel-2.0.0-2
+	flickcurl-1.26-4
+	flickcurl_devel-1.26-4
+	flite-2.0.0-3
+	flite_devel-2.0.0-3
 	fluidlite-1.0.0-3
 	fluidlite_devel-1.0.0-3
-	fluidsynth-1.1.6-4
-	fluidsynth_devel-1.1.6-4
-	foldershaper-1.0-3
+	fluidsynth-1.1.6-5
+	fluidsynth_devel-1.1.6-5
+	foldershaper-1.0-4
 	fontconfig-2.12.1-3
 	fontconfig_devel-2.12.1-3
-	fontsproto-2.1.3-1
-	fontutil-1.3.1-1
-	fortuna-1.0.0-2
-	fossil-1.37-1
-	freealut-1.1.0-3
-	freealut_devel-1.1.0-3
-	freeciv-2.5.6-4
+	fontsproto-2.1.3-2
+	fontutil-1.3.1-2
+	fortuna-1.0.0-3
+	fossil-1.37-2
+	freealut-1.1.0-4
+	freealut_devel-1.1.0-4
+	freeciv-2.5.6-5
 	freetype-2.7.1-2
 	freetype_devel-2.7.1-2
-	fribidi-0.19.7-3
-	fribidi_devel-0.19.7-3
-	ftgl-2.1.3~rc5-2
-	ftgl_devel-2.1.3~rc5-2
-	fusesmb_haiku-0.9-1
+	fribidi-0.19.7-4
+	fribidi_devel-0.19.7-4
+	ftgl-2.1.3~rc5-3
+	ftgl_devel-2.1.3~rc5-3
+	fusesmb_haiku-0.9-2
 	gawk-4.1.4-2
 	gcab-0.7-1
 	gcab_devel-0.7-1
@@ -1423,6 +1399,7 @@ RemotePackageRepository HaikuPorts
 	boost163
 	botan
 	box2d
+	buildbot_slave
 	burnitnow
 	butterfly
 	byacc
@@ -1468,7 +1445,6 @@ RemotePackageRepository HaikuPorts
 	cutecom
 	cvs
 	cvsps
-	cython
 	daa2iso
 	damageproto
 	dash
