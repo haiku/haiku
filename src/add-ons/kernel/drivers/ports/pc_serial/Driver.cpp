@@ -14,6 +14,7 @@
 #include <Drivers.h>
 #include <driver_settings.h>
 #include <image.h>
+#include <kernel/safemode.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -523,10 +524,13 @@ scan_isa_hardcoded()
 {
 #ifdef HANDLE_ISA_COM
 	int i;
+	bool serialDebug = true;
+
+	serialDebug = get_safemode_boolean("serial_debug_output", serialDebug);
 
 	for (i = 0; i < 4; i++) {
 		// skip the port used for kernel debugging...
-		if (sHardcodedPorts[i].ioBase == gKernelDebugPort) {
+		if (serialDebug && sHardcodedPorts[i].ioBase == gKernelDebugPort) {
 			TRACE_ALWAYS("Skipping port %d as it is used for kernel debug.\n", i);
 			continue;
 		}
