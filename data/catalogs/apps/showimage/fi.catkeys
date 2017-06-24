@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	575555985
+1	finnish	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Käytä taustana…
 File	Menus		Tiedosto
 Slide delay	Menus		Diaviive
@@ -7,6 +7,7 @@ Zoom in	Menus		Lähennä
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ on muuttunut. Haluatko sulkea asiakirjan?
 Page setup…	Menus		Sivuasetus...
 Print…	Menus		Tulosta...
+Get info…	Menus		Haetaan tiedot...
 OK	SaveToFile		Valmis
 Previous page	Menus		Edellinen sivu
 View	Menus		Näkymä

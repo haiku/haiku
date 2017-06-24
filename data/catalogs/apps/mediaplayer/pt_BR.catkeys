@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	2711018042
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3099592804
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -125,6 +125,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar Entrada
 none	Subtitles menu		nenhum
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover o arquivo para a Lixeira
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Mudo
 Toggle pause/play.	MediaPlayer-Main		Alternar pausa/reprodução.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -145,6 +146,7 @@ OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nenhum
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtém/define o volume (0.0-2.0).
 Duration	MediaPlayer-Main		Duração
+Cancel	MediaPlayer-NetworkStream		Cancelar
 Playlist…	MediaPlayer-Main		Lista de reprodução…
 <unknown>	PlaylistItem-author		<desconhecido>
 Save as…	MediaPlayer-PlaylistWindow		Salvar como...

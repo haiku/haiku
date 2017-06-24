@@ -1,3 +1,3 @@
 1	finnish	x-vnd.Haiku-FTPService	4086152171
 FTP server	FTPServiceAddOn		FTP-palvelin
-The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		FTP-palvelin sallii sinun hakea muualta tiedostoja koneeltasi käyttäen FTP-yhteyskäytäntöä.\n\nHuomaa, että se on turvaton ja salaamaton yhteys.
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		FTP-palvelin sallii sinun hakea koneeltasi tiedostoja muualta käyttäen FTP-yhteyskäytäntöä.\n\nHuomaa, että se on turvaton ja salaamaton yhteys.

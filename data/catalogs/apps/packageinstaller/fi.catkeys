@@ -1,13 +1,16 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	591566249
+1	finnish	x-vnd.Haiku-PackageInstaller	252728737
 Install to:	PackageView		Asenna kohteeseen:
 OK	PackageView		Valmis
 Accept	PackageTextViewer		Hyväksy
+No package selected.	UninstallView		Yhtään pakettia ei ole valittu.
 Continue	PackageInstall		Jatka
+Remove	UninstallView		Poista
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pyydetyn paketin asentaminen järjestelmääsi epäonnistui. Tämä saattaa johtua kohdepakettitiedoston pulmasta. Ota yhteyttä tässä asiassa pakettijakelijaan.
 Image not loaded correctly	PackageImageViewer		Tiedostovedosta ei ladattu oikein
 No package selected.	PackageInfo		Yhtään pakettia ei ole valittu.
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Annettu paketti näyttää jo olevan asennettu järjestelmääsi. Haluaisitko poistaa nykyisen paketin ja jatkaa asennusta?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Haluatko muistaa tämän päätöksen loppuasennuksen aikana?\n
+Installed packages	UninstallWindow		Asennetaan paketteja
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
 Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
 Disclaimer	PackageTextViewer		Vastuuvapauslauseke
@@ -24,6 +27,7 @@ Other…	PackageView		Muut...
 No installation type selected	PackageView		Asennustyyppiä ei ole valittu
 Installing files and folders	PackageInstall		Asennetaan tiedostoja ja kansioita
 Package installer	PackageView		Paketin asennusohjelma
+Install…	UninstallView		Asenna...
 Skip all	PackageView		Ohita kaikki
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko kohde vastaavalla tästä paketista vai ohitetaanko se?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
@@ -39,18 +43,22 @@ Installing package	PackageStatus		Asennetaan pakettia
 Ask again	PackageView		Kysy uudelleen
 Abort	PackageView		Keskeytä
 Replace all	PackageView		Korvaa kaikki
+Package description	UninstallView		Pakkauskuvaus
 Decline	PackageTextViewer		Kieltäydy
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
 Continue	PackageInfo		Jatka
 %index% of %total%	PackageInstall		%index% / %total%
+The package you selected has been successfully removed from your system.	UninstallView		Valitsemasi pakkauksen poistaminen järjestelmästäsi onnistui.
 Abort	PackageInfo		Keskeytä
 PackageInstaller	System name		Pakettiasennus
 Abort	PackageInstall		Keskeytä
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Jatka
 Begin	PackageView		Alku
+OK	UninstallView		Valmis
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki ’%s’ on jo olemassa annetulla polulla.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Valitsemaasi pakkausta ei ole poistettu järjestelmästäsi. Annetun asennetun pakkauksen tietotiedosto saattaa olla rikkinäinen.
 Replace	PackageView		Korvaa
 Installation progress	PackageView		Asennuksen eteneminen
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedoston lukeminen epäonnistui.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.

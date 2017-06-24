@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PSRV	2930356711
+1	finnish	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Määrittelemätön
 Return the number of available transports	PrintServerApp Scripting		Palauta käytettävissä olevien siirtojen lukumäärä
 Return the number of available printers	PrintServerApp Scripting		Palauta käytettävissä olevien tulostimien lukumäärä
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Kyllä
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger-koko
 Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
+Print job setup:	ConfigWindow		Tulosta työasetukset:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Pystysuora
 All pages	ConfigWindow		Kaikki sivut

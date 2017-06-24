@@ -1,4 +1,4 @@
-1	croatian	x.vnd.OBOS-Inspector	1505025840
+1	croatian	x.vnd.OBOS-Inspector	396190845
 No image available to save.	ImageWindow		Nema dostupne slike za spremanje.
 Sorry, unable to write the image file.	ImageView		Oprostite, nemoguće je zapisati slikovnu datoteku.
 Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Broj dokumenata: %1\n\nKorišteni prevoditelj:\nIme: %2\nInfo: %3\nVerzija: %4\n
@@ -18,8 +18,10 @@ Quit	ImageWindow		Izađi
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Odabrani dokument: %1\n\nKorišteni prevoditelj:\nIme: %2\nInfo: %3\nVerzija: %4\n
 Active Translators	ImageWindow		Aktivni prevoditelji
 View	ImageWindow		Prikaz
+Open…	ImageWindow		Otvori...
 Previous Page	ImageWindow		Prethodna stranica
 OK	ImageView		U redu
 System Translators	ActiveTranslatorsWindow		Prevoditelji sustava
+Save…	ImageWindow		Spremi...
 Unknown	ImageView		Napoznato
 File	ImageWindow		Datoteka

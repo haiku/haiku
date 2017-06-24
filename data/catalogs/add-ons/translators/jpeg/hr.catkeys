@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-JPEGTranslator	1454704173
+1	croatian	x-vnd.Haiku-JPEGTranslator	4277694269
 Output quality	JPEGTranslator		Izlazna kvaliteta
 JPEG images	JPEGTranslator		JPEG slike
 JPEG Library Error: %s\n	be_jerror		Greška JPEG biblioteke: %s\n
@@ -11,6 +11,7 @@ Show warning messages	JPEGTranslator		Pokaži poruke upozorenja
 High	JPEGTranslator		Visoko
 Write	JPEGTranslator		Piši
 Write black-and-white images as RGB24	JPEGTranslator		Piši crno-bijele slike kao RGB24
+Version %d.%d.%d	JPEGTranslator		Verzija %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Čitaj sve slike kao RGB32
 Read	JPEGTranslator		Čitaj
 JPEG Library Warning: %s\n	be_jerror		Upozorenje JPEG biblioteke: %s\n

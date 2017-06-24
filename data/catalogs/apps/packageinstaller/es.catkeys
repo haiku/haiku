@@ -1,7 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-PackageInstaller	591566249
+1	spanish; castilian	x-vnd.Haiku-PackageInstaller	600665259
 Install to:	PackageView		Instalar a:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceptar
+No package selected.	UninstallView		No hay un paquete seleccionado.
 Continue	PackageInstall		Continuar
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		El paquete solicitado ha fallado al instalarse en su sistema. Esto puede ser un problema del destino de los paquetes. Por favor, consulte este error con el distribuidor del paquete.
 Image not loaded correctly	PackageImageViewer		Imagen no cargada correctamente
@@ -50,6 +51,7 @@ Abort	PackageInstall		Cancelar
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Continuar
 Begin	PackageView		Empezar
+OK	UninstallView		OK
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		El enlace simbólico llamado '%s' ya existe en la ruta dada.\n¿Remplazar el enlace con el contenido en este paquete o saltarlo?
 Replace	PackageView		Reemplazar
 Installation progress	PackageView		Progreso de instalación

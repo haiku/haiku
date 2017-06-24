@@ -18,6 +18,6 @@ Modified	Info Window		Muokattu
 Abort	Status View		Keskeytä
 Open with	Pie View		Avaa sovelluksella
 Open	Pie View		Avaa
-{0, plural, one{# file} other{# files}}	Status View		{0, monikko, yksi{# tiedosto} muut{# tiedostoa}}
+{0, plural, one{# file} other{# files}}	Status View		{0, monikko, one{# tiedosto} other{# tiedostoa}}
 %a, %d %b %Y, %r	Info Window		%a, %d. %Bta %Y, %r
 Free on %refName%	Scanner		Vapaata levyasemalla %refName%
