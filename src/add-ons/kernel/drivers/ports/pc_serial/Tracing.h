@@ -10,20 +10,20 @@
 
 void load_settings();
 void create_log_file();
-void usb_serial_trace(bool force, const char *format, ...);
+void pc_serial_trace(bool force, const char *format, ...);
 
-#define TRACE_ALWAYS(x...) usb_serial_trace(true, x);
-#define TRACE(x...) usb_serial_trace(false, x);
+#define TRACE_ALWAYS(x...) pc_serial_trace(true, x);
+#define TRACE(x...) pc_serial_trace(false, x);
 
 extern bool gLogFunctionCalls;
 #define TRACE_FUNCALLS(x...) \
 	if (gLogFunctionCalls) \
-		usb_serial_trace(false, x);
+		pc_serial_trace(false, x);
 
 extern bool gLogFunctionReturns;
 #define TRACE_FUNCRET(x...) \
 	if (gLogFunctionReturns) \
-		usb_serial_trace(false, x);
+		pc_serial_trace(false, x);
 
 extern bool gLogFunctionResults;
 #define TRACE_FUNCRES(func, param) \

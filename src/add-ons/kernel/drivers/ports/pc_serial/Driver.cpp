@@ -524,9 +524,7 @@ scan_isa_hardcoded()
 {
 #ifdef HANDLE_ISA_COM
 	int i;
-	bool serialDebug = true;
-
-	serialDebug = get_safemode_boolean("serial_debug_output", serialDebug);
+	bool serialDebug = get_safemode_boolean("serial_debug_output", true);
 
 	for (i = 0; i < 4; i++) {
 		// skip the port used for kernel debugging...

@@ -70,7 +70,7 @@ create_log_file()
 
 
 void
-usb_serial_trace(bool force, const char *format, ...)
+pc_serial_trace(bool force, const char *format, ...)
 {
 	if (!gLogEnabled && !force)
 		return;
