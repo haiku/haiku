@@ -764,22 +764,22 @@ RemotePackageRepository HaikuPorts
 	libtool_libltdl-2.4.2-3
 	libtorrent_rasterbar-1.0.9-3
 	libtorrent_rasterbar_devel-1.0.9-3
-	libunistring-0.9.7-1
-	libunistring_devel-0.9.7-1
-	libupnp-1.6.21-1
-	libupnp_devel-1.6.21-1
-	libusb-1.0.21-1
-	libusb_compat-0.1.5-5
-	libusb_compat_devel-0.1.5-5
-	libusb_devel-1.0.21-1
-	libusbmuxd-1.0.10-1
-	libusbmuxd_devel-1.0.10-1
-	libutf8proc-1.3.1~2-1
-	libutf8proc_devel-1.3.1~2-1
-	libuuid-1.0.3-3
-	libuuid_devel-1.0.3-3
-	libuv-1.10.2-1
-	libuv_devel-1.10.2-1
+	libunistring-0.9.7-2
+	libunistring_devel-0.9.7-2
+	libupnp-1.6.21-2
+	libupnp_devel-1.6.21-2
+	libusb-1.0.21-2
+	libusb_compat-0.1.5-6
+	libusb_compat_devel-0.1.5-6
+	libusb_devel-1.0.21-2
+	libusbmuxd-1.0.10-2
+	libusbmuxd_devel-1.0.10-2
+	libutf8proc-1.3.1~2-2
+	libutf8proc_devel-1.3.1~2-2
+	libuuid-1.0.3-4
+	libuuid_devel-1.0.3-4
+	libuv-1.10.2-2
+	libuv_devel-1.10.2-2
 	libvisio-0.1.5-2
 	libvisio_devel-0.1.5-2
 	libvorbis-1.3.5-4
@@ -791,10 +791,6 @@ RemotePackageRepository HaikuPorts
 	libwapcaplet-0.4.0-2
 	libwapcaplet_devel-0.4.0-2
 	libwebp-0.6.0-2
-	libwebp5-0.4.4-1
-	libwebp5_devel-0.4.4-1
-	libwebp6-0.5.2-1
-	libwebp6_devel-0.5.2-1
 	libwebp_devel-0.6.0-2
 	libwpd-0.10.1-1
 	libwpd_devel-0.10.1-1
@@ -1756,8 +1752,6 @@ RemotePackageRepository HaikuPorts
 	libvpx3
 	libwapcaplet
 	libwebp
-	libwebp5
-	libwebp6
 	libwpd
 	libwpg
 	libwps
