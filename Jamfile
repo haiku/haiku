@@ -49,7 +49,7 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 				curl freetype icu libsolv zlib
 
 				regular_image @{
-					ffmpeg glu jasper jpeg libicns libpng libwebp mesa
+					ffmpeg glu jasper jpeg libicns libpng16 libwebp mesa
 				}@
 			] ;
 			if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
