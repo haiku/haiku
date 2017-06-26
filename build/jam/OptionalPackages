@@ -162,14 +162,14 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentPowerPC ] {
 
 # FFMpeg
 if [ IsOptionalHaikuImagePackageAdded FFMpeg ] {
-	local packages = ffmpeg speex libtheora libvorbis libogg libvpx ;
+	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
 	AddHaikuImagePackages $(packages) ;
 }
 
 
 # FFMpeg-devel
 if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
-	local packages = ffmpeg speex libtheora libvorbis libogg libvpx ;
+	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
 	AddHaikuImagePackages $(packages)_devel ;
 }
 
