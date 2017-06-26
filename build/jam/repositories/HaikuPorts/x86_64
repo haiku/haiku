@@ -780,521 +780,513 @@ RemotePackageRepository HaikuPorts
 	libuuid_devel-1.0.3-4
 	libuv-1.10.2-2
 	libuv_devel-1.10.2-2
-	libvisio-0.1.5-2
-	libvisio_devel-0.1.5-2
+	libvisio-0.1.5-3
+	libvisio_devel-0.1.5-3
 	libvorbis-1.3.5-4
 	libvorbis_devel-1.3.5-4
 	libvpx-1.0.0-2
 	libvpx3-1.5.0-2
 	libvpx3_devel-1.5.0-2
 	libvpx_devel-1.0.0-2
-	libwapcaplet-0.4.0-2
-	libwapcaplet_devel-0.4.0-2
+	libwapcaplet-0.4.0-3
+	libwapcaplet_devel-0.4.0-3
 	libwebp-0.6.0-2
 	libwebp_devel-0.6.0-2
-	libwpd-0.10.1-1
-	libwpd_devel-0.10.1-1
-	libwpg-0.3.1-1
-	libwpg_devel-0.3.1-1
-	libwps-0.4.5-1
-	libwps_devel-0.4.5-1
-	libx11-1.6.3-2
-	libx11_devel-1.6.3-2
-	libxau-1.0.8-3
-	libxau_devel-1.0.8-3
-	libxcb-1.6-3
-	libxcb_devel-1.6-3
-	libxcm-0.5.3-2
-	libxcm_devel-0.5.3-2
-	libxext-1.3.3-1
-	libxext_devel-1.3.3-1
-	libxfixes-5.0.1-1
-	libxfixes_devel-5.0.1-1
-	libxfont-1.5.2-1
-	libxfont_devel-1.5.2-1
-	libxi-1.7.6-1
-	libxi_devel-1.7.6-1
-	libxinerama-1.1.3-1
-	libxinerama_devel-1.1.3-1
-	libxkbfile-1.0.9-1
-	libxkbfile_devel-1.0.9-1
+	libwpd-0.10.1-2
+	libwpd_devel-0.10.1-2
+	libwpg-0.3.1-2
+	libwpg_devel-0.3.1-2
+	libwps-0.4.5-2
+	libwps_devel-0.4.5-2
+	libx11-1.6.3-3
+	libx11_devel-1.6.3-3
+	libxau-1.0.8-4
+	libxau_devel-1.0.8-4
+	libxcb-1.6-4
+	libxcb_devel-1.6-4
+	libxcm-0.5.3-3
+	libxcm_devel-0.5.3-3
+	libxext-1.3.3-2
+	libxext_devel-1.3.3-2
+	libxfixes-5.0.1-2
+	libxfixes_devel-5.0.1-2
+	libxfont-1.5.2-2
+	libxfont_devel-1.5.2-2
+	libxi-1.7.6-2
+	libxi_devel-1.7.6-2
+	libxinerama-1.1.3-2
+	libxinerama_devel-1.1.3-2
+	libxkbfile-1.0.9-2
+	libxkbfile_devel-1.0.9-2
 	libxml2-2.9.3-5
 	libxml2_devel-2.9.3-5
 	libxml2_python-2.9.3-5
-	libxpm-3.5.12-1
-	libxpm_devel-3.5.12-1
+	libxpm-3.5.12-2
+	libxpm_devel-3.5.12-2
 	libxslt-1.1.28-9
 	libxslt_devel-1.1.28-9
-	libxtst-1.2.2-1
-	libxtst_devel-1.2.2-1
-	libyajl-2.1.0-1
-	libyajl_devel-2.1.0-1
-	libykpers-1.18.0-1
-	libykpers_devel-1.18.0-1
-	libyubikey-1.13-3
-	libyubikey_devel-1.13-3
-	libzip-1.1.3-1
-	libzip_devel-1.1.3-1
-	libzmf-0.0.1-2
-	libzmf_devel-0.0.1-2
-	lighttpd-1.4.44-1
-	lighttpd_devel-1.4.44-1
-	lighttpd_mod_geoip-1.4.44-1
-	linaro_qemu-2014.01-2
-	links-2.8-3
-	live555-2016.06.22-3
-	live555_devel-2016.06.22-3
-	llvm-4.0.0-1
+	libxtst-1.2.2-2
+	libxtst_devel-1.2.2-2
+	libyajl-2.1.0-2
+	libyajl_devel-2.1.0-2
+	libykpers-1.18.0-2
+	libykpers_devel-1.18.0-2
+	libyubikey-1.13-4
+	libyubikey_devel-1.13-4
+	libzip-1.1.3-2
+	libzip_devel-1.1.3-2
+	libzmf-0.0.1-3
+	libzmf_devel-0.0.1-3
+	lighttpd-1.4.44-2
+	lighttpd_devel-1.4.44-2
+	lighttpd_mod_geoip-1.4.44-2
+	linaro_qemu-2014.01-3
+	links-2.8-4
+	live555-2016.06.22-4
+	live555_devel-2016.06.22-4
+	llvm-4.0.0-2
 	llvm_clang-4.0.0-1
-	llvm_clang_analysis-4.0.0-1
-	lm4tools-0.1.3-1
-	lmms-1.2.0~rc2-1
-	lpsolve-5.5.2.5-1
-	lpsolve_devel-5.5.2.5-1
-	lsdvd-0.17-1
-	lua-5.3.4-1
-	lua51-5.1.4-7
-	lua51_devel-5.1.4-7
-	lua52-5.2.4-1
-	lua52_devel-5.2.4-1
-	lua_devel-5.3.4-1
-	luajit-2.0.4-2
-	luajit_devel-2.0.4-2
-	lynx-2.8.9dev.11-1
-	lyx-2.2.2-3
-	lz4-r131-1
-	lz4_devel-r131-1
-	lzip-1.18-1
-	lzo-2.10-1
-	lzo_devel-2.10-1
+	llvm_clang_analysis-4.0.0-2
+	lm4tools-0.1.3-2
+	lmms-1.2.0~rc2-2
+	lpsolve-5.5.2.5-2
+	lpsolve_devel-5.5.2.5-2
+	lrzsz-0.12.20-2
+	lsdvd-0.17-2
+	lua-5.3.4-2
+	lua51-5.1.4-8
+	lua51_devel-5.1.4-8
+	lua52-5.2.4-2
+	lua52_devel-5.2.4-2
+	lua_devel-5.3.4-2
+	luajit-2.0.4-3
+	luajit_devel-2.0.4-3
+	lynx-2.8.9dev.11-2
+	lyx-2.2.2-4
+	lz4-r131-2
+	lz4_devel-r131-2
+	lzip-1.18-2
+	lzo-2.10-2
+	lzo_devel-2.10-2
 	m4-1.4.18-2
 	make-4.1-2
 	man-1.6g-5
-	mawk-1.3.4_20161120-1
-	mc-4.8.19-1
-	mdds-1.0.0-1
-	mdds12-1.2.2-1
-	mdds12_devel-1.2.2-1
-	mdds_devel-1.0.0-1
-	mercurial-3.2.1-3
+	mawk-1.3.4_20161120-2
+	mc-4.8.19-2
+	mdds-1.0.0-2
+	mdds12-1.2.2-2
+	mdds12_devel-1.2.2-2
+	mdds_devel-1.0.0-2
+	mercurial-3.2.1-4
 	mesa-17.0.2-3
 	mesa_devel-17.0.2-3
 	mesa_swpipe-17.0.2-3
-	microbe-20130728-1
-	midikeyboard-1.0.0-4
-	milkytracker-0.90.86-2
-	mimetic-0.9.8-1
-	mimetic_devel-0.9.8-1
-	minesweeper-20150109-4
-	minicom-2.6.2-1
-	minimizeall-1.0.0-4
-	mjpegtools-2.1.0-1
-	mjpegtools_devel-2.1.0-1
+	microbe-20130728-2
+	midikeyboard-1.0.0-5
+	milkytracker-0.90.86-3
+	mimetic-0.9.8-2
+	mimetic_devel-0.9.8-2
+	minesweeper-20150109-5
+	minicom-2.6.2-2
+	minimizeall-1.0.0-5
+	mjpegtools-2.1.0-2
+	mjpegtools_devel-2.1.0-2
 	mkdepend-1.7-5
-	mksh-54-1
-	moe-1.1.2-4
-	monkeystudio-1.9.0.4-2
+	mksh-54-2
+	moe-1.1.2-5
+	monkeystudio-1.9.0.4-3
 	mpc-1.0.3-3
 	mpc_devel-1.0.3-3
 	mpfr-3.1.4-5
 	mpfr_devel-3.1.4-5
-	mpg123-1.24.0-1
-	mpg123_devel-1.24.0-1
-	mplayer-1.3.0-1
-	mpv-0.23.0-2
-	mrpeeps-1.2-2
-	msgpack_c_cpp-2.1.0-1
-	msgpack_c_cpp_devel-2.1.0-1
+	mpg123-1.24.0-2
+	mpg123_devel-1.24.0-2
+	mplayer-1.3.0-2
+	mpv-0.23.0-3
+	mrpeeps-1.2-3
+	msgpack_c_cpp-2.1.0-2
+	msgpack_c_cpp_devel-2.1.0-2
 	mtools-4.0.18-1
-	mtr-0.73-1
-	mupdf-1.8-1
-	mupdf_devel-1.8-1
-	muscle-6.00-2
-	muscle_devel-6.00-2
-	musepack_tools-475-1
-	musepack_tools_devel-475-1
-	mutt-1.8.0-1
+	mtr-0.73-2
+	mupdf-1.8-2
+	mupdf_devel-1.8-2
+	muscle-6.00-3
+	muscle_devel-6.00-3
+	musepack_tools-475-2
+	musepack_tools_devel-475-2
+	mutt-1.8.0-2
 	nano-2.7.5-2
-	nanosvgtranslator-1.0.2-3
-	nasm-2.12.01-1
-	ncurses-5.9-10
+	nanosvgtranslator-1.0.2-4
+	nasm-2.12.01-2
 	ncurses6-6.0-3
 	ncurses6_devel-6.0-3
-	ncurses_devel-5.9-10
-	neon-0.30.2-3
-	neon_devel-0.30.2-3
-	neonlights-0.2-1
+	neon-0.30.2-4
+	neon_devel-0.30.2-4
+	neonlights-0.2-2
 	netcat-1.10-3
-	netpulse-0.2.3-7
-	nettle-3.3-1
-	nettle_devel-3.3-1
-	nfd-1.0-2
-	nightandday-0.1.2-4
+	netpulse-0.2.3-8
+	nettle-3.3-2
+	nettle_devel-3.3-2
+	nfd-1.0-3
+	nightandday-0.1.2-5
 	ninja-1.5.1-3
-	npth-1.3-1
-	npth_devel-1.3-1
-	nsgenbind-0.4-1
-	nspr-4.12-1
-	nspr_devel-4.12-1
-	nss-3.23-3
-	nss_devel-3.23-3
-	ocaml-4.01.0-1
-	octave-4.2.1-1
-	octave_devel-4.2.1-1
-	odt2txt-0.5-1
-	openal-1.13.0-2
-	openal_devel-1.13.0-2
-	openblas-0.2.19-4
-	openblas_devel-0.2.19-4
-	openexr-2.2.0-3
-	openexr_devel-2.2.0-3
-	openjpeg-2.1.2-2
-	openjpeg_devel-2.1.2-2
-	openldap-2.4.44-2
-	openldap_devel-2.4.44-2
-	openshot-2.0.7-3
-	openssh-7.5p1-1
+	npth-1.3-2
+	npth_devel-1.3-2
+	nsgenbind-0.4-2
+	nspr-4.12-2
+	nspr_devel-4.12-2
+	nss-3.23-4
+	nss_devel-3.23-4
+	ocaml-4.01.0-2
+	octave-4.2.1-2
+	octave_devel-4.2.1-2
+	odt2txt-0.5-2
+	openal-1.13.0-3
+	openal_devel-1.13.0-3
+	openblas-0.2.19-5
+	openblas_devel-0.2.19-5
+	openexr-2.2.0-4
+	openexr_devel-2.2.0-4
+	openjpeg-2.1.2-3
+	openjpeg_devel-2.1.2-3
+	openldap-2.4.44-3
+	openldap_devel-2.4.44-3
+	openshot-2.0.7-4
+	openssh-7.5p1-2
 	openssl-1.0.2k-2
 	openssl_devel-1.0.2k-2
-	openttd-1.6.1-1
-	optipng-0.7.6-2
-	optipngtranslator-0.0.1-2
-	opus-1.1.3-1
-	opus_devel-1.1.3-1
-	opus_tools-0.1.9-2
-	opusfile-0.7-1
-	opusfile_devel-0.7-1
-	orc-0.4.19-3
-	orc_devel-0.4.19-3
-	orcus-0.12.1-2
-	orcus_devel-0.12.1-2
-	otter_browser-0.9.12-1
-	p7zip-9.20.1-6
-	padblocker-1.0-1
-	paladin-1.4~git-2
-	pango-1.40.4-1
-	pango_devel-1.40.4-1
-	paperkey-1.4-1
-	pari-2.7.6-2
-	pari_devel-2.7.6-2
-	parted-3.2-1
-	parted_devel-3.2-1
+	openttd-1.6.1-2
+	optipng-0.7.6-3
+	optipngtranslator-0.0.1-3
+	opus-1.1.3-2
+	opus_devel-1.1.3-2
+	opus_tools-0.1.9-3
+	opusfile-0.7-2
+	opusfile_devel-0.7-2
+	orc-0.4.19-4
+	orc_devel-0.4.19-4
+	orcus-0.12.1-3
+	orcus_devel-0.12.1-3
+	otter_browser-0.9.12-2
+	p7zip-9.20.1-7
+	padblocker-1.0-2
+	paladin-1.4~git-3
+	pango-1.40.4-2
+	pango_devel-1.40.4-2
+	paperkey-1.4-2
+	pari-2.7.6-3
+	pari_devel-2.7.6-3
+	parted-3.2-2
+	parted_devel-3.2-2
 	patch-2.7.5-2
-	patchutils-0.3.4-1
-	pciutils-3.5.2-1
-	pciutils_devel-3.5.2-1
-	pe-2.4.5-3
+	patchutils-0.3.4-2
+	pciutils-3.5.2-2
+	pciutils_devel-3.5.2-2
+	pe-2.4.5-5
 	perl-5.18.2-3
-	phantomlimb-1-4
-	physfs-2.0.3-3
-	physfs_devel-2.0.3-3
-	pigz-2.3.4-1
-	pinentry-1.0.0-1
-	piozone-1.0-1
-	pipepanic-0.1.3-5
-	pixman-0.32.6-2
-	pixman_devel-0.32.6-2
+	phantomlimb-1-5
+	physfs-2.0.3-4
+	physfs_devel-2.0.3-4
+	pigz-2.3.4-2
+	pinentry-1.0.0-2
+	piozone-1.0-2
+	pipepanic-0.1.3-6
+	pixman-0.32.6-3
+	pixman_devel-0.32.6-3
 	pkgconfig-0.29.2-2
-	png2ico-2002.12.08-1
-	pngcrush-1.8.11-1
-	pnglite-0.1.17-1
-	pnglite_devel-0.1.17-1
-	pngquant-2.7.2-2
-	podofo-0.9.5-2
-	podofo_devel-0.9.5-2
-	polarssl-1.3.9-1
-	polarssl_devel-1.3.9-1
-	ponpokodiff-0.2.0-5
-	poppler-0.52.0-2
-	poppler_devel-0.52.0-2
-	poppler_glib-0.52.0-2
-	poppler_qt5-0.52.0-2
-	popt-1.16-3
-	popt_devel-1.16-3
-	potrace-1.14-1
-	potrace_devel-1.14-1
-	presentproto-1.1-1
-	primesieve-5.7.3-1
-	primesieve_devel-5.7.3-1
-	proj-4.9.2-1
-	proj_devel-4.9.2-1
-	protobuf-2.4.1-4
-	protobuf_devel-2.4.1-4
-	pwgen-2.06-1
-	pycrypto-2.6.1-1
-	pyenet-20141025-1
-	pylzma-0.4.8-2
-	pyqt-5.8-2
-	pyqt_python-5.8-2
-	pyqt_python3-5.8-2
+	png2ico-2002.12.08-2
+	pngcrush-1.8.11-2
+	pnglite-0.1.17-2
+	pnglite_devel-0.1.17-2
+	pngquant-2.7.2-3
+	pngquant_devel-2.7.2-3
+	podofo-0.9.5-3
+	podofo_devel-0.9.5-3
+	polarssl-1.3.9-2
+	polarssl_devel-1.3.9-2
+	ponpokodiff-0.2.0-6
+	poppler-0.52.0-3
+	poppler_devel-0.52.0-3
+	poppler_glib-0.52.0-3
+	poppler_qt5-0.52.0-3
+	popt-1.16-4
+	popt_devel-1.16-4
+	potrace-1.14-2
+	potrace_devel-1.14-2
+	presentproto-1.1-2
+	primesieve-5.7.3-2
+	primesieve_devel-5.7.3-2
+	proj-4.9.2-2
+	proj_devel-4.9.2-2
+	protobuf-2.4.1-5
+	protobuf_devel-2.4.1-5
+	pwgen-2.06-2
+	pycrypto-2.6.1-2
+	pylzma-0.4.8-3
+	pyqt-5.8-3
+	pyqt_python-5.8-3
+	pyqt_python3-5.8-3
 	python-2.7.13-2
-	python3-3.6.1-1
-	python3_cython-0.25.2-1
-	python3_fonttools-3.0-2
-	python3_httplib2-0.9.2-2
-	python3_mako-1.0.3-2
-	python3_markdown-2.6.8-1
-	python3_markups-2.0.0-1
-	python3_numpy-1.11.2-2
-	python3_pip-7.0.3-2
-	python3_requests-2.9.1-2
-	python3_setuptools-28.8.0-2
-	python_ecdsa-0.13-1
-	python_html2text-2016.4.2-1
-	python_httplib2-0.9.2-1
+	python3-3.6.1-2
+	python3_cython-0.25.2-2
+	python3_fonttools-3.0-3
+	python3_httplib2-0.9.2-3
+	python3_mako-1.0.3-3
+	python3_markdown-2.6.8-2
+	python3_markups-2.0.0-2
+	python3_numpy-1.11.2-3
+	python3_pip-7.0.3-3
+	python3_requests-2.9.1-3
+	python3_setuptools-28.8.0-3
+	python_ecdsa-0.13-2
+	python_httplib2-0.9.2-2
 	python_mako-1.0.3-2
-	python_paramiko-1.16.0-1
-	python_requests-2.9.1-1
+	python_paramiko-1.16.0-2
+	python_requests-2.9.1-2
 	python_setuptools-22.0.0-2
-	python_twisted-13.2.0-1
-	python_zope.interface-4.1.3-1
-	pyyaml-3.11-1
-	qbittorrent-3.3.11-1
-	qbs-1.7.1-1
-	qca-2.1.3-1
-	qca2-2.0.3-1
-	qca2_devel-2.0.3-1
-	qca_devel-2.1.3-1
-	qemu-2.8.0-1
+	python_twisted-16.2.0-2
+	python_zope.interface-4.1.3-2
+	pyyaml-3.11-2
+	qbittorrent-3.3.11-2
+	qbs-1.7.1-2
+	qca-2.1.3-2
+	qca2-2.0.3-2
+	qca2_devel-2.0.3-2
+	qca_devel-2.1.3-2
+	qemu-2.8.0-2
 	qrencode-3.4.4-3
 	qrencode_devel-3.4.4-3
-	qrencode_kdl-3.4.4-1
-	qrencode_kdl_devel-3.4.4-1
-	qsystray-0.1-3
-	qt5-5.8.0-2
-	qt5_devel-5.8.0-2
-	qt5_docs-5.8.0-2
-	querywatcher-1.4-4
-	quicklaunch-1.2-1
-	qupzilla-1.8.9-1
-	qutim-0.3.3-1
-	r-3.3.3-1
-	radare2-1.2.1-1
-	radare2_devel-1.2.1-1
-	randrproto-1.5.0-1
-	raptor-2.0.15-1
-	raptor_devel-2.0.15-1
-	rasqal-0.9.33-1
-	rasqal_devel-0.9.33-1
-	rawaes-1.1-1
-	re2-0.2016.05.01-1
-	re2_devel-0.2016.05.01-1
-	re2c-0.16-1
+	qrencode_kdl-3.4.4-2
+	qrencode_kdl_devel-3.4.4-2
+	qsystray-0.1-4
+	qt5-5.8.0-3
+	qt5_devel-5.8.0-3
+	qt5_docs-5.8.0-3
+	querywatcher-1.4-5
+	quicklaunch-1.2-2
+	qupzilla-1.8.9-2
+	r-3.3.3-2
+	radare2-1.2.1-2
+	radare2_devel-1.2.1-2
+	randrproto-1.5.0-2
+	raptor-2.0.15-2
+	raptor_devel-2.0.15-2
+	rasqal-0.9.33-2
+	rasqal_devel-0.9.33-2
+	rawaes-1.1-2
+	re2-0.2016.05.01-2
+	re2_devel-0.2016.05.01-2
+	re2c-0.16-2
 	readline-7.0-2
-	readline6-6.3.8-1
-	readline6_devel-6.3.8-1
 	readline_devel-7.0-2
-	recordproto-1.14.2-1
-	redland-1.0.17-1
-	redland_devel-1.0.17-1
-	remember-1.0.0-1
-	remotecontrol-1.1-3
-	rename-3.9.0-2
-	renderproto-0.11.1-1
-	resourceproto-1.2.0-1
-	resourcer-1.0-5
-	rocksndiamonds-4.0.0.2-1
-	rsync-3.1.2-1
-	rtmpdump-2.4_20161210-1
-	rtmpdump_devel-2.4_20161210-1
-	rubberband-1.8.1-2
-	rubberband_devel-1.8.1-2
+	recordproto-1.14.2-2
+	redland-1.0.17-2
+	redland_devel-1.0.17-2
+	remember-1.0.0-2
+	remotecontrol-1.1-4
+	rename-3.9.0-3
+	renderproto-0.11.1-2
+	resourceproto-1.2.0-2
+	resourcer-1.0-6
+	rocksndiamonds-4.0.0.2-2
+	rsync-3.1.2-2
+	rtmpdump-2.4_20161210-2
+	rtmpdump_devel-2.4_20161210-2
+	rubberband-1.8.1-3
+	rubberband_devel-1.8.1-3
 	ruby-2.2.2-6
 	ruby_devel-2.2.2-6
-	samba-3.6.25-3
-	samba_devel-3.6.25-3
-	sane_backends-1.0.27-2
-	sane_backends_devel-1.0.27-2
-	sanity-0.6-4
-	sawteeth-1.3-5
-	sbc-1.3-2
-	sbc_devel-1.3-2
-	sbc_tools-1.3-2
-	schroedinger-1.0.11-2
-	schroedinger_devel-1.0.11-2
-	scintilla-3.7.4-1
-	scintilla_devel-3.7.4-1
+	samba-3.6.25-4
+	samba_devel-3.6.25-4
+	sane_backends-1.0.25-5
+	sane_backends_devel-1.0.25-5
+	sanity-0.6-5
+	sawteeth-1.3-6
+	sbc-1.3-3
+	sbc_devel-1.3-3
+	sbc_tools-1.3-3
+	schroedinger-1.0.11-3
+	schroedinger_devel-1.0.11-3
+	scintilla-3.7.4-2
+	scintilla_devel-3.7.4-2
 	scons-2.5.1-3
-	scribus-1.4.6-2
-	scribus_devel-1.4.6-2
-	scrnsaverproto-1.2.2-1
-	sdl2_gfx-1.0.3-1
-	sdl2_gfx_devel-1.0.3-1
-	sdl2_image-2.0.1-3
-	sdl2_image_devel-2.0.1-3
-	sdl2_mixer-2.0.1-2
-	sdl2_mixer_devel-2.0.1-2
-	sdl2_net-2.0.1-1
-	sdl2_net_devel-2.0.1-1
-	sdl2_ttf-2.0.14-5
-	sdl2_ttf_devel-2.0.14-5
-	sdl_gfx-2.0.26-1
-	sdl_gfx_devel-2.0.26-1
-	sdl_image-1.2.12-7
-	sdl_image_devel-1.2.12-7
-	sdl_mixer-1.2.12-6
-	sdl_mixer_devel-1.2.12-6
-	sdl_net-1.2.8-6
-	sdl_net_devel-1.2.8-6
-	sdl_sound-1.0.3-7
-	sdl_sound_devel-1.0.3-7
-	sdl_ttf-2.0.11-5
-	sdl_ttf_devel-2.0.11-5
+	scribus-1.4.6-3
+	scribus_devel-1.4.6-3
+	scrnsaverproto-1.2.2-2
+	sdl2_gfx-1.0.3-2
+	sdl2_gfx_devel-1.0.3-2
+	sdl2_image-2.0.1-4
+	sdl2_image_devel-2.0.1-4
+	sdl2_mixer-2.0.1-3
+	sdl2_mixer_devel-2.0.1-3
+	sdl2_net-2.0.1-2
+	sdl2_net_devel-2.0.1-2
+	sdl2_ttf-2.0.14-6
+	sdl2_ttf_devel-2.0.14-6
+	sdl_gfx-2.0.26-2
+	sdl_gfx_devel-2.0.26-2
+	sdl_image-1.2.12-8
+	sdl_image_devel-1.2.12-8
+	sdl_mixer-1.2.12-7
+	sdl_mixer_devel-1.2.12-7
+	sdl_net-1.2.8-7
+	sdl_net_devel-1.2.8-7
+	sdl_sound-1.0.3-8
+	sdl_sound_devel-1.0.3-8
+	sdl_ttf-2.0.11-6
+	sdl_ttf_devel-2.0.11-6
 	sed-4.4-2
-	seeker-1.0-6
-	serf-1.3.9-2
-	serf_devel-1.3.9-2
-	shanty-0.4-1
+	seeker-1.0-7
+	serf-1.3.9-3
+	serf_devel-1.3.9-3
+	shanty-0.4-2
 	sharutils-4.15.2-3
-	shredder-1.0.0-2
-	sip_python-4.19.1-2
-	sip_python3-4.19.1-2
-	smpeg-0.4.5-5
-	smpeg2-2.0.0-2
-	smpeg2_devel-2.0.0-2
-	smpeg_devel-0.4.5-5
-	smplayer-16.4.0-2
-	smtube-16.3.0-1
-	snappy-1.1.4-1
-	snappy_devel-1.1.4-1
-	solarus-1.5.1-2
-	soxr-0.1.1-2
-	soxr_devel-0.1.1-2
-	sparsehash-2.0.3-2
+	shredder-1.0.0-3
+	sip_python-4.19.1-3
+	sip_python3-4.19.1-3
+	smpeg-0.4.5-6
+	smpeg2-2.0.0-3
+	smpeg2_devel-2.0.0-3
+	smpeg_devel-0.4.5-6
+	smplayer-16.4.0-3
+	smtube-16.3.0-2
+	snappy-1.1.4-2
+	snappy_devel-1.1.4-2
+	solarus-1.5.1-3
+	soxr-0.1.1-3
+	soxr_devel-0.1.1-3
+	sparsehash-2.0.3-3
 	speex-1.2.0-2
 	speex_devel-1.2.0-2
 	sqlite-3.17.0.0-2
 	sqlite_devel-3.17.0.0-2
-	squashfs_tools-4.3-1
-	srm-1.2.12-1
-	stegsnow-20130616-1
-	stfl-0.24-1
-	stfl_devel-0.24-1
-	stockfish-8-1
-	substrate-1.0b-1
-	subversion-1.9.4-5
-	subversion_devel-1.9.4-5
-	superlu-5.2.1-1
-	superlu_devel-5.2.1-1
-	swig-3.0.12-1
-	symetrie-0.0.1-4
-	szip-2.1-1
-	szip_devel-2.1-1
-	taglib-1.11.1-1
-	taglib_devel-1.11.1-1
-	takenotes-1.0.0-7
+	sqlitebrowser-3.9.1-2
+	squashfs_tools-4.3-2
+	srm-1.2.12-2
+	stegsnow-20130616-2
+	stfl-0.24-2
+	stfl_devel-0.24-2
+	stockfish-8-2
+	substrate-1.0b-2
+	subversion-1.9.4-6
+	subversion_devel-1.9.4-6
+	superlu-5.2.1-2
+	superlu_devel-5.2.1-2
+	swig-3.0.12-2
+	symetrie-0.0.1-5
+	szip-2.1-2
+	szip_devel-2.1-2
+	taglib-1.11.1-2
+	taglib_devel-1.11.1-2
+	takenotes-1.0.0-8
 	tar-1.29-3
-	tcl-8.5.18-4
-	tcl_devel-8.5.18-4
+	tcl-8.5.18-5
+	tcl_devel-8.5.18-5
 	tcpdump-4.8.1-2
-	tesseract-3.02.02-2
-	tesseract_devel-3.02.02-2
+	tesseract-3.02.02-3
+	tesseract_devel-3.02.02-3
 	texinfo-6.1-3
-	texinfo4-4.13a-1
-	textsaver-1.0-1
-	the_silver_searcher-1.0.2-1
-	thememanager-1.0~git-2
-	tidy-5.1.25-1
-	tidy_devel-5.1.25-1
-	tiff-3.9.7-1
+	texinfo4-4.13a-2
+	textsaver-1.0-2
+	the_silver_searcher-1.0.2-2
+	thememanager-1.0~git-3
+	tidy-5.1.25-2
+	tidy_devel-5.1.25-2
 	tiff4-4.0.7-2
 	tiff4_devel-4.0.7-2
 	tiff4_tools-4.0.7-2
-	tiff_devel-3.9.7-1
-	tiff_tools-3.9.7-1
-	tig-2.2.1-1
-	timecop-0.61-3
-	tinyxml-2.6.2-3
-	tinyxml2-2.2.0-1
-	tinyxml2_devel-2.2.0-1
-	tinyxml_devel-2.6.2-3
-	tnftp-20151004-1
-	tox-0.1.4-1
-	tox_devel-0.1.4-1
-	trackergrep-5.2-3
-	transmission-2.92-3
-	transplus-0.6-2
-	tree-1.7.0-1
-	treecc-0.3.10-1
-	tuxmath-1.7.2-1
-	tuxpaint-0.9.22-2
-	tuxtype2-1.5.2-2
-	twolame-0.3.13-3
-	twolame_devel-0.3.13-3
-	u_boot_tools-2012.10-1
-	ubertuber-0.9.11-2
-	uchardet-0.0.6-1
-	uchardet_devel-0.0.6-1
-	uif2iso-0.1.7c-3
-	unarr-1.0.0-1
-	unarr_devel-1.0.0-1
-	unittest++-1.6.1-1
-	unittest++_devel-1.6.1-1
-	unixodbc-2.3.4-1
-	unixodbc_devel-2.3.4-1
-	unrar-5.4.5-1
-	unrtf-0.21.9-1
+	tig-2.2.1-2
+	timecop-0.61-4
+	tinyxml-2.6.2-4
+	tinyxml2-2.2.0-2
+	tinyxml2_devel-2.2.0-2
+	tinyxml_devel-2.6.2-4
+	tnftp-20151004-2
+	tox-0.1.4-2
+	tox_devel-0.1.4-2
+	trackergrep-5.2-4
+	transplus-0.6-3
+	tree-1.7.0-2
+	treecc-0.3.10-2
+	tuxmath-1.7.2-2
+	tuxpaint-0.9.22-3
+	tuxtype2-1.5.2-3
+	twolame-0.3.13-4
+	twolame_devel-0.3.13-4
+	u_boot_tools-2012.10-2
+	ubertuber-0.9.11-3
+	uchardet-0.0.6-2
+	uchardet_devel-0.0.6-2
+	uif2iso-0.1.7c-4
+	unarr-1.0.0-2
+	unarr_devel-1.0.0-2
+	unittest++-1.6.1-2
+	unittest++_devel-1.6.1-2
+	unixodbc-2.3.4-2
+	unixodbc_devel-2.3.4-2
+	unrar-5.4.5-2
+	unrtf-0.21.9-2
 	unzip-6.0-4
-	urllib3-1.15.1-1
-	util_macros-1.19.0-2
-	vala-0.32.1-1
-	vala_common-0.32.1-1
-	vamp_plugin_sdk-2.6-1
-	vamp_plugin_sdk_devel-2.6-1
-	vcdimager-0.7.24-3
-	vcdimager_devel-0.7.24-3
-	videoproto-2.3.3-1
-	vim-8.0.0473-1
-	vision-0.10.1-1
-	vlc-2.2.1-4
-	vncserver-1.27-2
-	vorbis_tools-1.4.0-3
-	vwget-20141229-2
-	wavpack-5.1.0-1
-	wavpack_bin-5.1.0-1
-	wavpack_devel-5.1.0-1
-	weather-0.1.1_git-5
-	weechat-1.7-1
-	weechat_devel-1.7-1
+	urllib3-1.15.1-2
+	util_macros-1.19.0-3
+	vala-0.32.1-2
+	vala_common-0.32.1-2
+	vamp_plugin_sdk-2.6-2
+	vamp_plugin_sdk_devel-2.6-2
+	vcdimager-0.7.24-4
+	vcdimager_devel-0.7.24-4
+	videoproto-2.3.3-2
+	vim-8.0.0473-2
+	vision-0.10.1-2
+	vncserver-1.27-3
+	vorbis_tools-1.4.0-4
+	vwget-20141229-3
+	wavpack-5.1.0-2
+	wavpack_bin-5.1.0-2
+	wavpack_devel-5.1.0-2
+	weather-0.1.1_git-6
+	webwatch-1.0~git-4
+	weechat-1.7-2
+	weechat_devel-1.7-2
 	wget-1.19.1-2
-	whereismymouse-1.0-1
+	whereismymouse-1.0-2
 	which-2.21-4
-	wireshark-2.2.4-1
-	wpa_supplicant-2.0-5
-	wxqt-3.1.1~git-2
-	wxqt_devel-3.1.1~git-2
-	x264-20160712-2
-	x264_devel-20160712-2
-	x265-2.0-1
-	x265_devel-2.0-1
-	xcb_proto-1.6-2
-	xcmiscproto-1.2.2-1
-	xdelta-3.1.0-1
-	xerces_c-3.1.4-2
-	xerces_c_devel-3.1.4-2
-	xextproto-7.3.0-1
-	xineramaproto-1.2.1-1
-	xml_parser-2.36-1
-	xmlto-0.0.26-1
-	xpdf-3.04-1
-	xproto-7.0.31-1
-	xtrans-1.3.5-2
+	wireshark-2.2.4-2
+	wpa_supplicant-2.0-6
+	wxqt-3.1.1~git-3
+	wxqt_devel-3.1.1~git-3
+	x264-20160712-3
+	x264_devel-20160712-3
+	x265-2.0-2
+	x265_devel-2.0-2
+	xcb_proto-1.6-3
+	xcmiscproto-1.2.2-2
+	xdelta-3.1.0-2
+	xerces_c-3.1.4-3
+	xerces_c_devel-3.1.4-3
+	xextproto-7.3.0-2
+	xineramaproto-1.2.1-2
+	xml_parser-2.36-2
+	xmlto-0.0.26-2
+	xpdf-3.04-2
+	xproto-7.0.31-2
+	xtrans-1.3.5-3
 	xz_utils-5.2.2-3
 	xz_utils_devel-5.2.2-3
-	yab-1.7.5.3-4
-	yaml_cpp-0.5.3-1
-	yaml_cpp_devel-0.5.3-1
+	yab-1.7.5.3-5
+	yaml_cpp-0.5.3-2
+	yaml_cpp_devel-0.5.3-2
 	yasm-1.3.0-4
-	ykclient-2.15-1
-	ykclient_devel-2.15-1
+	ykclient-2.15-2
+	ykclient_devel-2.15-2
 	zip-3.0-4
 	zlib-1.2.11-3
 	zlib_devel-1.2.11-3
-	zopfli-1.0.1-1
-	zsh-5.3.1-1
-	zstd-1.1.2-1
-	zstd_bin-1.1.2-1
-	zstd_devel-1.1.2-1
+	zopfli-1.0.1-2
+	zsh-5.3.1-2
+	zstd-1.1.2-2
+	zstd_bin-1.1.2-2
+	zstd_devel-1.1.2-2
 
 	:
 
@@ -1782,6 +1774,7 @@ RemotePackageRepository HaikuPorts
 	lm4tools
 	lmms
 	lpsolve
+	lrzsz
 	lsdvd
 	lua
 	lua51
@@ -1830,7 +1823,6 @@ RemotePackageRepository HaikuPorts
 	nano
 	nanosvgtranslator
 	nasm
-	ncurses
 	ncurses6
 	neon
 	neonlights
@@ -1902,7 +1894,6 @@ RemotePackageRepository HaikuPorts
 	protobuf
 	pwgen
 	pycrypto
-	pyenet
 	pylzma
 	pyqt
 	python
@@ -1918,7 +1909,6 @@ RemotePackageRepository HaikuPorts
 	python3_requests
 	python3_setuptools
 	python_ecdsa
-	python_html2text
 	python_httplib2
 	python_mako
 	python_paramiko
@@ -1948,7 +1938,6 @@ RemotePackageRepository HaikuPorts
 	re2
 	re2c
 	readline
-	readline6
 	recordproto
 	redland
 	redoflacs
@@ -2001,6 +1990,7 @@ RemotePackageRepository HaikuPorts
 	sparsehash
 	speex
 	sqlite
+	sqlitebrowser
 	squashfs_tools
 	srm
 	stegsnow
@@ -2034,7 +2024,6 @@ RemotePackageRepository HaikuPorts
 	tnftp
 	tox
 	trackergrep
-	transmission
 	transplus
 	tree
 	treecc
@@ -2061,12 +2050,12 @@ RemotePackageRepository HaikuPorts
 	videoproto
 	vim
 	vision
-	vlc
 	vncserver
 	vorbis_tools
 	vwget
 	wavpack
 	weather
+	webwatch
 	weechat
 	wget
 	whereismymouse
@@ -2116,7 +2105,6 @@ RemotePackageRepository HaikuPorts
 	m4
 	make
 	readline
-	readline6
 	sed
 	tar
 	which
