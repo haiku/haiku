@@ -279,7 +279,9 @@ BTree::SetRoot(off_t logical, fsblock_t* block)
 {
 	if (block != NULL) {
 		fRootBlock = *block;
+		//TODO: mapping physical block -> logical address
 	} else {
+		fLogicalRoot = logical;
 		if (fVolume->FindBlock(logical, fRootBlock) != B_OK) {
 			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
 			return B_ERROR;
