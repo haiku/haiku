@@ -41,65 +41,6 @@ struct node_and_key {
 };
 
 
-class BNode {
-public:
-								BNode(void* cache);
-								BNode(void* cache, off_t block);
-								~BNode();
-
-					// just return from Header
-				uint64			LogicalAddress() const
-					{ return fNode->header.LogicalAddress(); }
-				uint64			Flags() const
-					{ return fNode->header.Flags(); }
-				uint64			Generation() const
-					{ return fNode->header.Generation(); }
-				uint64			Owner() const
-					{ return fNode->header.Owner(); }
-				uint32			ItemCount() const
-					{ return fNode->header.ItemCount(); }
-				uint8			Level() const
-					{ return fNode->header.Level(); }
-
-				btrfs_index*	Index(uint32 i) const
-					{ return &fNode->index[i]; }
-
-				btrfs_entry*	Item(uint32 i) const
-					{ return &fNode->entries[i]; }
-				uint8*			ItemData(uint32 i) const
-					{ return (uint8*)Item(0) + Item(i)->Offset(); }
-
-				void			Keep();
-				void			Unset();
-
-
-				void			SetTo(off_t block);
-				void			SetToWritable(off_t block,
-									int32 transactionId, bool empty);
-
-				off_t			BlockNum() const { return fBlockNumber;}
-				bool			IsWritable() const { return fWritable; }
-
-				int32			SearchSlot(const btrfs_key& key, int* slot,
-									btree_traversing type) const;
-private:
-								BNode(const BNode&);
-								BNode& operator=(const BNode&);
-									//no implementation
-
-			btrfs_stream* 		fNode;
-			void* 				fCache;
-			off_t				fBlockNumber;
-			uint32 				fCurrentSlot;
-			bool				fWritable;
-};
-
-
-class BPath {
-	BNode* nodes[BTRFS_MAX_TREE_DEPTH];
-};
-
-
 class BTree {
 public:
 								BTree(Volume* volume);
@@ -135,7 +76,71 @@ private:
 			Volume*				fVolume;
 			mutex				fIteratorLock;
 			SinglyLinkedList<TreeIterator> fIterators;
-};
+
+public:
+	class Node {
+	public:
+		Node(void* cache);
+		Node(void* cache, off_t block);
+		~Node();
+
+			// just return from Header
+		uint64	LogicalAddress() const
+			{ return fNode->header.LogicalAddress(); }
+		uint64	Flags() const
+			{ return fNode->header.Flags(); }
+		uint64	Generation() const
+			{ return fNode->header.Generation(); }
+		uint64	Owner() const
+			{ return fNode->header.Owner(); }
+		uint32	ItemCount() const
+			{ return fNode->header.ItemCount(); }
+		uint8	Level() const
+			{ return fNode->header.Level(); }
+
+		btrfs_index*	Index(uint32 i) const
+			{ return &fNode->index[i]; }
+
+		btrfs_entry*	Item(uint32 i) const
+			{ return &fNode->entries[i]; }
+		uint8*	ItemData(uint32 i) const
+			{ return (uint8*)Item(0) + Item(i)->Offset(); }
+
+		void	Keep();
+		void	Unset();
+
+		void	SetTo(off_t block);
+		void	SetToWritable(off_t block,
+				int32 transactionId, bool empty);
+
+		off_t	BlockNum() const { return fBlockNumber;}
+		bool	IsWritable() const { return fWritable; }
+
+		int32	SearchSlot(const btrfs_key& key, int* slot,
+					btree_traversing type) const;
+		private:
+		Node(const Node&);
+		Node& operator=(const Node&);
+			//no implementation
+
+		btrfs_stream* 		fNode;
+		void* 				fCache;
+		off_t				fBlockNumber;
+		uint32 				fCurrentSlot;
+		bool				fWritable;
+	};
+
+
+	class Path {
+	public:
+		Path();
+	private:
+		Path(const Path&);
+		Path operator=(const Path&);
+		Node*	nodes[BTRFS_MAX_TREE_DEPTH];
+	};
+
+};	// class BTree
 
 
 class TreeIterator : public SinglyLinkedListLinkImpl<TreeIterator> {

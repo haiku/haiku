@@ -20,7 +20,7 @@
 #	define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
 
 
-BNode::BNode(void* cache)
+BTree::Node::Node(void* cache)
 	:
 	fNode(NULL),
 	fCache(cache),
@@ -31,7 +31,7 @@ BNode::BNode(void* cache)
 }
 
 
-BNode::BNode(void* cache, off_t block)
+BTree::Node::Node(void* cache, off_t block)
 	:
 	fNode(NULL),
 	fCache(cache),
@@ -43,20 +43,20 @@ BNode::BNode(void* cache, off_t block)
 }
 
 
-BNode::~BNode()
+BTree::Node::~Node()
 {
 	Unset();
 }
 
 
 void
-BNode::Keep()
+BTree::Node::Keep()
 {
 	fNode = NULL;
 }
 
 void
-BNode::Unset()
+BTree::Node::Unset()
 {
 	if (fNode != NULL) {
 		block_cache_put(fCache, fBlockNumber);
@@ -66,7 +66,7 @@ BNode::Unset()
 
 
 void
-BNode::SetTo(off_t block)
+BTree::Node::SetTo(off_t block)
 {
 	Unset();
 	fBlockNumber = block;
@@ -75,7 +75,7 @@ BNode::SetTo(off_t block)
 
 
 void
-BNode::SetToWritable(off_t block, int32 transactionId, bool empty)
+BTree::Node::SetToWritable(off_t block, int32 transactionId, bool empty)
 {
 	Unset();
 	fBlockNumber = block;
@@ -91,7 +91,7 @@ BNode::SetToWritable(off_t block, int32 transactionId, bool empty)
 
 
 int32
-BNode::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) const
+BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) const
 {
 	//binary search for item slot in a node
 	int entrySize = sizeof(btrfs_entry);
@@ -207,7 +207,7 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 {
 	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
 		key.ObjectID(),	key.Type(), key.Offset());
-	BNode node(fVolume->BlockCache(), fRootBlock);
+	BTree::Node node(fVolume->BlockCache(), fRootBlock);
 	int slot, ret;
 	fsblock_t physicalBlock;
 
