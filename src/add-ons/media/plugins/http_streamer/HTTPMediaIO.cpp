@@ -17,11 +17,11 @@
 #define HTTP_TIMEOUT 10000000
 
 
-class FileListener : public BUrlProtocolAsynchronousListener {
+class FileListener : public BUrlProtocolListener {
 public:
 		FileListener(HTTPMediaIO* owner)
 			:
-			BUrlProtocolAsynchronousListener(true),
+			BUrlProtocolListener(),
 			fRequest(NULL),
 			fAdapterIO(owner),
 			fInitSem(-1),
