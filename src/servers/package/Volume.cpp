@@ -1238,7 +1238,8 @@ Volume::_SetLatestState(VolumeState* state, bool isActive)
 		fActiveState = state;
 	}
 
-	delete fLatestState;
+	if (fLatestState != fActiveState)
+		delete fLatestState;
 	fLatestState = state;
 	fChangeCount++;
 
