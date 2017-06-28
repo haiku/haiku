@@ -11,7 +11,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	ftp@libedit ftpd
 	getarch groupadd groupdel groupmod
 	hd hey
-	ideinfo@ide idestatus@ide ifconfig iroster isvolume
+	ifconfig iroster isvolume
 	kernel_debugger keymap keystore
 	launch_roster linkcatkeys listarea listattr listimage listdev listfont
 	listport listres listsem listusb locale logger login lsindex
@@ -222,7 +222,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	acpi@x86,x86_64	agp_gart@x86,x86_64 ata@ata
 	config_manager
 	firewire@x86
-	ide@ide scsi isa@x86,x86_64
+	scsi isa@x86,x86_64
 	pci ps2@x86,x86_64
 	random
 	usb

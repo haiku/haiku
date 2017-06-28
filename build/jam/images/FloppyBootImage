@@ -27,7 +27,7 @@ if $(NET_BOOT) = 1 {
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	acpi@x86,x86_64 ata@ata config_manager dpc pci
-	ide@ide isa@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
+	isa@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	attribute_overlay bfs iso9660 packagefs write_overlay
@@ -37,15 +37,9 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS =
 AddFilesToFloppyBootArchive system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 
-if $(HAIKU_ATA_STACK) = 1 {
-	AddFilesToFloppyBootArchive system add-ons kernel busses ata
-		: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
-			it8211 ;
-} else {
-	AddFilesToFloppyBootArchive system add-ons kernel busses ide
-		: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
-			it8211 ;
-}
+AddFilesToFloppyBootArchive system add-ons kernel busses ata
+	: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
+		it8211 ;
 
 AddFilesToFloppyBootArchive system add-ons kernel busses scsi
 	: ahci ;
@@ -53,7 +47,7 @@ AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
 AddFilesToFloppyBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive system add-ons kernel generic
-	: ata_adapter@ata ide_adapter@ide locked_pool scsi_periph ;
+	: ata_adapter@ata locked_pool scsi_periph ;
 AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
@@ -113,7 +107,7 @@ if $(NET_BOOT) = 1 {
 AddBootModuleSymlinksToFloppyBootArchive [ FFilterByBuildFeatures
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	openpic@ppc
-	ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
+	ata_adapter@ata locked_pool scsi_periph
 	generic_x86@x86
 	ahci generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
 	it8211

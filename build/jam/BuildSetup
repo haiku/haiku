@@ -160,13 +160,10 @@ if $(HAIKU_INCLUDE_PATENTED_CODE) {
 		+= HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ;
 }
 
-HAIKU_ATA_STACK ?= 1 ;
-
 # network libraries
 HAIKU_NETWORK_LIBS = network ;
 HAIKU_NETAPI_LIB = bnetapi ;
 HAIKU_SELECT_UNAME_ETC_LIB = ;	# libroot, against which we link anyway
-
 
 HAIKU_EXECUTABLE_MIME_TYPE = "application/x-vnd.Be-elfexecutable" ;
 

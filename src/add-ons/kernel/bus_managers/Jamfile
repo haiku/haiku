@@ -6,7 +6,6 @@ SubInclude HAIKU_TOP src add-ons kernel bus_managers config_manager ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers fdt ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers firewire ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers ata ;
-SubInclude HAIKU_TOP src add-ons kernel bus_managers ide ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers isa ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers pci ;
 SubInclude HAIKU_TOP src add-ons kernel bus_managers ps2 ;

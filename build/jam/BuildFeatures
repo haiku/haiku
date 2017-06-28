@@ -672,11 +672,5 @@ if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 	EnableBuildFeatures gpl ;
 }
 
-
-# ATA vs. IDE
-#HACK: remove when old ide code is removed!
-if $(HAIKU_ATA_STACK) = 1 {
-	EnableBuildFeatures ata ;
-} else {
-	EnableBuildFeatures ide ;
-}
+# ATA Drivers + Bus
+EnableBuildFeatures ata ;

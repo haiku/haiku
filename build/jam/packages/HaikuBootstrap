@@ -30,13 +30,8 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToPackage add-ons kernel busses agp_gart : <agp_gart>intel@x86,x86_64 ;
 
-if $(HAIKU_ATA_STACK) = 1 {
-	AddFilesToPackage add-ons kernel busses ata
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
-} else {
-	AddFilesToPackage add-ons kernel busses ide
-		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
-}
+AddFilesToPackage add-ons kernel busses ata
+	: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
@@ -48,7 +43,7 @@ AddFilesToPackage add-ons kernel debugger
 	  <kdebug>run_on_exit ;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
-	: ata_adapter@ata bios@x86,x86_64 dpc ide_adapter@ide
+	: ata_adapter@ata bios@x86,x86_64 dpc
 		locked_pool mpu401 scsi_periph <module>tty ;
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@m68k apple@ppc efi_gpt intel session ;
@@ -169,9 +164,9 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 # boot module links
 AddBootModuleSymlinksToPackage
 	acpi@x86,x86_64 ata@ata pci isa@x86,x86_64 config_manager dpc
-	ide@ide scsi usb
+	scsi usb
 	openpic@ppc
-	ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
+	ata_adapter@ata locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
