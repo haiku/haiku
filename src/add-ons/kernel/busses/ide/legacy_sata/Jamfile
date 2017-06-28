@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide legacy_sata ;
-
-UsePrivateHeaders drivers kernel ;
-
-KernelAddon legacy_sata :
-	legacy_sata.c
-	;
-

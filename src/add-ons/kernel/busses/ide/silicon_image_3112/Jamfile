@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide silicon_image_3112 ;
-
-UsePrivateHeaders drivers kernel ;
-
-KernelAddon silicon_image_3112 :
-	silicon_image_3112.c
-	;

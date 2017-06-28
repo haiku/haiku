@@ -4,7 +4,6 @@ SubInclude HAIKU_TOP src add-ons kernel generic ata_adapter ;
 SubInclude HAIKU_TOP src add-ons kernel generic atomizer ;
 SubInclude HAIKU_TOP src add-ons kernel generic bios ;
 SubInclude HAIKU_TOP src add-ons kernel generic dpc ;
-SubInclude HAIKU_TOP src add-ons kernel generic ide_adapter ;
 SubInclude HAIKU_TOP src add-ons kernel generic locked_pool ;
 SubInclude HAIKU_TOP src add-ons kernel generic mpu401 ;
 SubInclude HAIKU_TOP src add-ons kernel generic scsi_periph ;

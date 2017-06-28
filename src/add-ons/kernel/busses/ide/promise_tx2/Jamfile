@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide promise_tx2 ;
-
-UsePrivateHeaders drivers kernel ;
-
-KernelAddon promise_tx2 :
-	promise_tx2.c
-	;
