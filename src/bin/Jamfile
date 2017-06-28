@@ -36,7 +36,6 @@ StdBinCommands
 	finddir.c
 	fstrim.cpp
 	hd.c
-	idestatus.c
 	listarea.c
 	listimage.c
 	listport.c
@@ -261,7 +260,6 @@ SubInclude HAIKU_TOP src bin coreutils ;
 SubInclude HAIKU_TOP src bin desklink ;
 SubInclude HAIKU_TOP src bin fwcontrol ;
 SubInclude HAIKU_TOP src bin hid_decode ;
-SubInclude HAIKU_TOP src bin ideinfo ;
 SubInclude HAIKU_TOP src bin keymap ;
 SubInclude HAIKU_TOP src bin keystore ;
 SubInclude HAIKU_TOP src bin listdev ;

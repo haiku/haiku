@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src bin ideinfo ;
-
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers ide ;
-
-UsePrivateHeaders drivers ;
-
-StdBinCommands
-	ideinfo.c
-	;
