@@ -640,6 +640,10 @@ hda_widget_get_associations(hda_audio_group* audioGroup)
 	uint32 index = 0;
 	for (uint32 i = 0; i < MAX_ASSOCIATIONS; i++) {
 		for (uint32 j = 0; j < audioGroup->widget_count; j++) {
+			if (index >= MAX_ASSOCIATIONS) {
+				TRACE("too many associations, bailing!\n");
+				return B_ERROR;
+			}
 			hda_widget& widget = audioGroup->widgets[j];
 
 			if (widget.type != WT_PIN_COMPLEX)
