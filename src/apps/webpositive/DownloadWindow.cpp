@@ -149,7 +149,7 @@ DownloadWindow::DownloadWindow(BRect frame, bool visible,
 	menu->AddItem(newWindowItem);
 	newWindowItem->SetTarget(be_app);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Hide"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'D'));
 	menuBar->AddItem(menu);
 
