@@ -6,7 +6,12 @@
 #define _KERNEL_UTIL_AVL_TREE_BASE_H
 
 
-#include <SupportDefs.h>
+#ifndef FS_SHELL
+#	include <SupportDefs.h>
+#else
+#	include <algorithm>
+#	include "fssh_api_wrapper.h"
+#endif
 
 
 class AVLTreeIterator;

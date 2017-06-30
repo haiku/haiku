@@ -6,22 +6,26 @@
 
 #include <util/AVLTreeBase.h>
 
-#include <algorithm>
-
-#include <KernelExport.h>
-
+#ifndef FS_SHELL
+#	include <algorithm>
+#	include <KernelExport.h>
+#endif
 
 #ifdef _KERNEL_MODE
 #	define CHECK_FAILED(message...)	panic(message)
 #else
-#	include <stdio.h>
-#	include <OS.h>
-#	define CHECK_FAILED(message...)					\
-		do {										\
-			fprintf(stderr, message);				\
-			fprintf(stderr, "\n");					\
-			debugger("AVLTreeBase check failed");	\
-		} while (false)
+#	ifndef FS_SHELL
+#		include <stdio.h>
+#		include <OS.h>
+#		define CHECK_FAILED(message...)					\
+			do {										\
+				fprintf(stderr, message);				\
+				fprintf(stderr, "\n");					\
+				debugger("AVLTreeBase check failed");	\
+			} while (false)
+#	else
+#		define CHECK_FAILED(message...) dprintf(message)
+#	endif
 #endif
 
 

@@ -33,6 +33,7 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 }
 
+UsePrivateKernelHeaders ;
 UsePrivateHeaders shared storage fs_shell ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
@@ -49,7 +50,11 @@ local btrfsSources =
 	kernel_interface.cpp
 ;
 
-BuildPlatformMergeObject <build>btrfs.o : $(btrfsSources) ;
+local utilitySources =
+	AVLTreeBase.cpp
+;
+
+BuildPlatformMergeObject <build>btrfs.o : $(btrfsSources) $(utilitySources) ;
 
 BuildPlatformMain <build>btrfs_shell
 	:
@@ -60,3 +65,6 @@ BuildPlatformMain <build>btrfs_shell
 	<build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
+
+SEARCH on [ FGristFiles $(utilitySources) ]
+	+= [ FDirName $(HAIKU_TOP) src system kernel util ] ;

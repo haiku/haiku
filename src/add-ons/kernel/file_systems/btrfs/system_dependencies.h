@@ -7,6 +7,7 @@
 // This needs to be included before the fs_shell wrapper
 #include <zlib.h>
 #include <new>
+#include <util/AVLTree.h>
 
 #include "fssh_api_wrapper.h"
 #include "fssh_auto_deleter.h"
@@ -18,6 +19,7 @@
 #include <util/AutoLock.h>
 #include <util/SinglyLinkedList.h>
 #include <util/Stack.h>
+#include <util/AVLTree.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <ByteOrder.h>
