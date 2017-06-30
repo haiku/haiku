@@ -9,8 +9,13 @@
 #include "fssh_defs.h"
 
 
-typedef int32_t fssh_clock_t;
+#if defined(__i386__) && !defined(__x86_64__)
 typedef int32_t fssh_time_t;
+#else
+typedef int64_t fssh_time_t;
+#endif
+
+typedef int32_t fssh_clock_t;
 typedef int32_t fssh_suseconds_t;
 typedef uint32_t fssh_useconds_t;
 
