@@ -164,7 +164,6 @@ SYSTEM_ADD_ONS_PRINT += [ FFilterByBuildFeatures
 	Gutenprint@gutenprint
 	PCL5\ Compatible
 	PCL6\ Compatible
-	PDF\ Writer
 	PS\ Compatible
 	Preview
 ] ;

@@ -300,12 +300,6 @@ for linkTarget in $(SYSTEM_DEMOS) {
 # Deskbar menu entries file
 AddFilesToPackage data deskbar : <deskbar>menu_entries ;
 
-
-# PDF Writer enconding files
-CopyDirectoryToPackage data
-	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
-	: "PDF Writer" : -x Jamfile ;
-
 # licenses
 CopyDirectoryToPackage data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
@@ -320,15 +314,6 @@ CopyDirectoryToPackage data
 CopyDirectoryToPackage documentation
 	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
 	: diskusage ;
-
-# Copy documentation and sample programs as per PDFlib Lite's license
-# requirement.
-CopyDirectoryToPackage documentation
-	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
-	: pdflib ;
-CopyDirectoryToPackage develop sample-code
-	: [ FDirName $(HAIKU_TOP) src libs pdflib bind pdflib ]
-	: pdflib ;
 
 
 # empty directory

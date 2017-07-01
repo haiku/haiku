@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src libs pdflib libs ;
-
-SubInclude HAIKU_TOP src libs pdflib libs flate ;
-SubInclude HAIKU_TOP src libs pdflib libs pdcore ;
-SubInclude HAIKU_TOP src libs pdflib libs pdflib ;
-SubInclude HAIKU_TOP src libs pdflib libs png ;
-SubInclude HAIKU_TOP src libs pdflib libs tiff ;

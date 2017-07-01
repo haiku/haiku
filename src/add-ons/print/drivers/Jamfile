@@ -4,6 +4,5 @@ SubInclude HAIKU_TOP src add-ons print drivers canon_lips ;
 SubInclude HAIKU_TOP src add-ons print drivers gutenprint ;
 SubInclude HAIKU_TOP src add-ons print drivers pcl5 ;
 SubInclude HAIKU_TOP src add-ons print drivers pcl6 ;
-SubInclude HAIKU_TOP src add-ons print drivers pdf ;
 SubInclude HAIKU_TOP src add-ons print drivers postscript ;
 SubInclude HAIKU_TOP src add-ons print drivers preview ;

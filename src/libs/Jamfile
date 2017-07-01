@@ -13,7 +13,6 @@ SubInclude HAIKU_TOP src libs libtelnet ;
 SubInclude HAIKU_TOP src libs libunwind ;
 SubInclude HAIKU_TOP src libs linprog ;
 SubInclude HAIKU_TOP src libs mapm ;
-SubInclude HAIKU_TOP src libs pdflib ;
 SubInclude HAIKU_TOP src libs posix_error_mapper ;
 SubInclude HAIKU_TOP src libs print ;
 SubInclude HAIKU_TOP src libs stdc++ ;

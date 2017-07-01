@@ -1,7 +1,0 @@
-CrossReferences 1.0
-"[sS]iehe Tabelle ([0-9]+ )" -> "Tabelle ([0-9]+)".
-
-"[sS]iehe Abbildung ([0-9]+ )", "[sS]iehe Abb. ([0-9]+ )" 
--> 
-"Abbildung ([0-9]+)", "Abb. ([0-9]+ )".
-

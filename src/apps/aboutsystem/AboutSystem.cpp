@@ -1139,14 +1139,6 @@ AboutView::_CreateCreditsView()
 		.SetLicenses("Anti-Grain Geometry", kBSDThreeClause, NULL)
 		.SetURL("http://www.antigrain.com"));
 
-	// PDFLib copyrights
-	_AddPackageCredit(PackageCredit("PDFLib")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1997-2006 PDFlib GmbH and "
-			"Thomas Merz. All rights reserved.\n"
-			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH."))
-		.SetLicense("PDFlib Lite")
-		.SetURL("http://www.pdflib.com"));
-
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
 		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1996-2002, 2006 "
