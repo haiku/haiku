@@ -22,11 +22,7 @@
 
 #include <arpa/inet.h>
 
-#if USE_SSL
-#include <openssl/md5.h>
-#else
 #include "md5.h"
-#endif
 
 #include <Alert.h>
 #include <Catalog.h>
@@ -814,15 +810,11 @@ POP3Protocol::MD5Digest(unsigned char* in, char* asciiDigest)
 {
 	unsigned char digest[16];
 
-#ifdef USE_SSL
-	MD5(in, ::strlen((char*)in), digest);
-#else
 	MD5_CTX context;
 
 	MD5Init(&context);
 	MD5Update(&context, in, ::strlen((char*)in));
 	MD5Final(digest, &context);
-#endif
 
 	for (int i = 0;  i < 16;  i++) {
 		sprintf(asciiDigest + 2 * i, "%02x", digest[i]);

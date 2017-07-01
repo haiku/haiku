@@ -9,32 +9,14 @@ UsePrivateHeaders mail shared ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-local sources =
+AddResources POP3 : POP3.rdef ;
+
+Addon POP3 :
 	ConfigView.cpp
 	MessageIO.cpp
 	POP3.cpp
 	md5c.c
-;
-
-# use OpenSSL, if enabled
-if [ FIsBuildFeatureEnabled openssl ] {
-	SubDirC++Flags -DUSE_SSL ;
-	UseBuildFeatureHeaders openssl ;
-	Includes [ FGristFiles $(sources) ]
-		: [ BuildFeatureAttribute openssl : headers ] ;
-		# Dependency needed to trigger downloading/unzipping the package before
-		# compiling the files.
-	SetupFeatureObjectsDir ssl ;
-} else {
-	SetupFeatureObjectsDir no-ssl ;
-}
-
-AddResources POP3 : POP3.rdef ;
-
-Addon POP3
-	: $(sources)
 	: be libbnetapi.so libmail.so localestub
-		[ BuildFeatureAttribute openssl : libraries ]
 		[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		$(TARGET_NETWORK_LIBS)
 ;

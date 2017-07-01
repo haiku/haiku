@@ -42,18 +42,14 @@ POP3ConfigView::POP3ConfigView(const BMailProtocolSettings& settings)
 		| B_MAIL_PROTOCOL_HAS_HOSTNAME
 		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
 		| B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD
-#if USE_SSL
 		| B_MAIL_PROTOCOL_HAS_FLAVORS
-#endif
 		)
 {
 	AddAuthMethod(B_TRANSLATE("Plain text"));
 	AddAuthMethod(B_TRANSLATE("APOP"));
 
-#if USE_SSL
 	AddFlavor(B_TRANSLATE("No encryption"));
 	AddFlavor(B_TRANSLATE("SSL"));
-#endif
 
 	SetTo(settings);
 
