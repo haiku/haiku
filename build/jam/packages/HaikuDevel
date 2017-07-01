@@ -41,8 +41,8 @@ for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
 AddFilesToPackage develop lib :
 	libcolumnlistview.a
 	<$(architecture)>liblocalestub.a
-	libm.a
-	libpthread.a
+	libm.a libpthread.a
+	libprint.a libprintutils.a
 	<$(architecture)>libshared.a ;
 
 # the POSIX error code mapper library
