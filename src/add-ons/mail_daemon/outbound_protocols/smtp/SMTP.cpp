@@ -374,7 +374,6 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 	#ifdef USE_SSL
 		use_ssl = (fSettingsMessage.FindInt32("flavor") == 1);
-		use_STARTTLS = (fSettingsMessage.FindInt32("flavor") == 2);
 		ssl = NULL;
 		ctx = NULL;
 	#endif
@@ -461,48 +460,6 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 		delete[] cmd;
 		return B_ERROR;
 	}
-
-#ifdef USE_SSL
-	// Check for STARTTLS
-	if (use_STARTTLS) {
-		const char *res = fLog.String();
-		char *p;
-
-		SSL_library_init();
-		RAND_seed(this,sizeof(SMTPProtocol));
-		::sprintf(cmd, "STARTTLS" CRLF);
-
-		if ((p = ::strstr(res, "STARTTLS")) != NULL) {
-			// Server advertises STARTTLS support
-			if (SendCommand(cmd) != B_OK) {
-				delete[] cmd;
-				return B_ERROR;
-			}
-
-			// We should start TLS negotiation
-			use_ssl = true;
-			ctx = SSL_CTX_new(TLSv1_method());
-    		ssl = SSL_new(ctx);
-    		sbio = BIO_new_socket(fSocket,BIO_NOCLOSE);
-    		BIO_set_nbio(sbio, 0);
-    		SSL_set_bio(ssl, sbio, sbio);
-    		SSL_set_connect_state(ssl);
-    		if(SSL_do_handshake(ssl) != 1)
-    			return B_ERROR;
-
-    		// Should send EHLO command again
-    		if(!esmtp)
-    			::sprintf(cmd, "HELO %s" CRLF, localhost);
-    		else
-    			::sprintf(cmd, "EHLO %s" CRLF, localhost);
-
-    		if (SendCommand(cmd) != B_OK) {
-    			delete[] cmd;
-    			return B_ERROR;
-    		}
-		}
-	}
-#endif	// USE_SSL
 
 	delete[] cmd;
 

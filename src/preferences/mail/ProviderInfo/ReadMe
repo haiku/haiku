@@ -35,7 +35,6 @@ you can pass the following options to the last six items:
 "SMTP SSL":
 	0	Unencrypted
 	1	SSL
-	2	STARTTLS
  
 "Username Pattern":
 	0	username is the email address (default)

@@ -58,7 +58,6 @@ private:
 			BIO*				sbio;
 
 			bool				use_ssl;
-			bool				use_STARTTLS;
 #endif
 
 			status_t			fStatus;

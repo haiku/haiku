@@ -5,5 +5,5 @@ resource(4, "POP Authentication") 0;
 resource(5, "SMTP Authentication") 1;
 resource(6, "POP SSL") 0;
 resource(7, "IMAP SSL") 0;
-resource(8, "SMTP SSL") 2;
+resource(8, "SMTP SSL") 0;
 resource(9, "Username Pattern") 1;

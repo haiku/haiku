@@ -49,12 +49,10 @@ SMTPConfigView::SMTPConfigView(const BMailAccountSettings& settings)
 {
 	B_TRANSLATE_MARK_VOID("Unencrypted");
 	B_TRANSLATE_MARK_VOID("SSL");
-	B_TRANSLATE_MARK_VOID("STARTTLS");
 
 #ifdef USE_SSL
 	AddFlavor(B_TRANSLATE_NOCOLLECT("Unencrypted"));
 	AddFlavor(B_TRANSLATE("SSL"));
-	AddFlavor(B_TRANSLATE("STARTTLS"));
 #endif
 
 	AddAuthMethod(B_TRANSLATE("None"), false);
