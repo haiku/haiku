@@ -603,7 +603,7 @@ POP3Protocol::RetrieveInternal(const char* command, int32 message,
 		if (result == B_TIMED_OUT) {
 			// No data available, even after waiting a minute.
 			fLog = "POP3 timeout - no data received after a long wait.";
-			return B_ERROR;
+			return B_TIMED_OUT;
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
 			amountToReceive = bufSize - 1 - amountInBuffer;
