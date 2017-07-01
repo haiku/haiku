@@ -10,9 +10,6 @@ UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail shared ;
 SubDirHdrs [ FDirName $(SUBDIR) imap_lib ] ;
 
-UseLibraryHeaders linprog alm ;
-
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 local sources =
