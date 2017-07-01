@@ -15,10 +15,8 @@
 #include <MailProtocol.h>
 #include <MailSettings.h>
 
-#ifdef USE_SSL
-#	include <openssl/ssl.h>
-#	include <openssl/rand.h>
-#endif
+
+class BSocket;
 
 
 class SMTPProtocol : public BOutboundMailProtocol {
@@ -47,18 +45,12 @@ private:
 			status_t			_SendMessage(const entry_ref& ref);
 			status_t			_POP3Authentication();
 
-			int					fSocket;
+			BSocket*			fSocket;
 			BString				fLog;
 			BMessage			fSettingsMessage;
 			int32				fAuthType;
 
-#ifdef USE_SSL
-			SSL_CTX*			ctx;
-			SSL*				ssl;
-			BIO*				sbio;
-
 			bool				use_ssl;
-#endif
 
 			status_t			fStatus;
 			BString				fServerName;	// required for DIGEST-MD5

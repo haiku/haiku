@@ -14,14 +14,10 @@
 
 #include <map>
 
-#include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
-#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/select.h>
-#include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -33,6 +29,8 @@
 #include <MenuField.h>
 #include <Message.h>
 #include <Path.h>
+#include <Socket.h>
+#include <SecureSocket.h>
 #include <TextControl.h>
 
 #include <crypt.h>
@@ -41,11 +39,7 @@
 #include <NodeMessage.h>
 #include <ProtocolConfigView.h>
 
-#ifdef USE_SSL
-#	include <openssl/md5.h>
-#else
-#	include "md5.h"
-#endif
+#include "md5.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -291,12 +285,10 @@ SMTPProtocol::Connect()
 		if (fSettingsMessage.FindInt32("port") > 0)
 			errorMessage << ":" << fSettingsMessage.FindInt32("port");
 
-		// << strerror(err) - BNetEndpoint sucks, we can't use this;
 		if (fLog.Length() > 0)
 			errorMessage << B_TRANSLATE(". The server says:\n") << fLog;
 		else {
-			errorMessage
-				<< B_TRANSLATE(": Connection refused or host not found.");
+			errorMessage << ". " << strerror(status);
 		}
 
 		ShowError(errorMessage.String());
@@ -353,7 +345,7 @@ SMTPProtocol::HandleSendMessages(const BMessage& message, off_t totalBytes)
 		if (status != B_OK) {
 			BString error;
 			error << "An error occurred while sending the message "
-				<< ref.name << ":\n" << fLog;
+				<< ref.name << " (" << strerror(status) << "):\n" << fLog;
 			ShowError(error.String());
 
 			ResetProgress();
@@ -372,83 +364,49 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 {
 	ReportProgress(0, 0, B_TRANSLATE("Connecting to server" B_UTF8_ELLIPSIS));
 
-	#ifdef USE_SSL
-		use_ssl = (fSettingsMessage.FindInt32("flavor") == 1);
-		ssl = NULL;
-		ctx = NULL;
-	#endif
+	use_ssl = (fSettingsMessage.FindInt32("flavor") == 1);
 
 	if (port <= 0)
-	#ifdef USE_SSL
 		port = use_ssl ? 465 : 25;
-	#else
-		port = 25;
-	#endif
 
-	uint32 hostIP = inet_addr(address);  // first see if we can parse it as a numeric address
-	if ((hostIP == 0)||(hostIP == (uint32)-1)) {
-		struct hostent * he = gethostbyname(address);
-		hostIP = he ? *((uint32*)he->h_addr) : 0;
+	BNetworkAddress addr(address);
+	if (addr.InitCheck() != B_OK) {
+		BString str;
+		str.SetToFormat("Invalid network address for SMTP server: %s",
+			strerror(addr.InitCheck()));
+		ShowError(str.String());
+		return addr.InitCheck();
 	}
+		
+	if (addr.Port() == 0)
+		addr.SetPort(port);
 
-	if (hostIP == 0)
-		return EHOSTUNREACH;
-
-	fSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (fSocket < 0)
-		return errno;
-
-	struct sockaddr_in saAddr;
-	memset(&saAddr, 0, sizeof(saAddr));
-	saAddr.sin_family = AF_INET;
-	saAddr.sin_port = htons(port);
-	saAddr.sin_addr.s_addr = hostIP;
-	int result = connect(fSocket, (struct sockaddr *)&saAddr,
-		sizeof(saAddr));
-	if (result < 0) {
-		close(fSocket);
-		fSocket = -1;
-		return errno;
+	if (use_ssl)
+		fSocket = new(std::nothrow) BSecureSocket;
+	else
+		fSocket = new(std::nothrow) BSocket;
+	
+	if (!fSocket)
+		return B_NO_MEMORY;
+	
+	if (fSocket->Connect(addr) != B_OK) {
+		BString error;
+		error << "Could not connect to SMTP server "
+			<< fSettingsMessage.FindString("server");
+		error << ":" << addr.Port();
+		ShowError(error.String());
+		delete fSocket;
+		return B_ERROR;
 	}
-
-#ifdef USE_SSL
-	if (use_ssl) {
-		SSL_library_init();
-    	SSL_load_error_strings();
-    	RAND_seed(this,sizeof(SMTPProtocol));
-    	/*--- Because we're an add-on loaded at an unpredictable time, all
-    	      the memory addresses and things contained in ourself are
-    	      esssentially random. */
-
-    	ctx = SSL_CTX_new(SSLv23_method());
-    	ssl = SSL_new(ctx);
-    	sbio=BIO_new_socket(fSocket,BIO_NOCLOSE);
-    	SSL_set_bio(ssl,sbio,sbio);
-
-    	if (SSL_connect(ssl) <= 0) {
-    		BString error;
-			error << "Could not connect to SMTP server "
-				<< fSettingsMessage.FindString("server");
-			if (port != 465)
-				error << ":" << port;
-			error << ". (SSL connection error)";
-			ShowError(error.String());
-			SSL_CTX_free(ctx);
-			close(fSocket);
-			fSocket = -1;
-			return B_ERROR;
-		}
-	}
-#endif	// USE_SSL
 
 	BString line;
 	ReceiveResponse(line);
 
 	char localhost[255];
-	gethostname(localhost,255);
+	gethostname(localhost, 255);
 
 	if (localhost[0] == 0)
-		strcpy(localhost,"namethisbebox");
+		strcpy(localhost, "namethisbebox");
 
 	char *cmd = new char[::strlen(localhost)+8];
 	if (!esmtp)
@@ -749,16 +707,7 @@ SMTPProtocol::Close()
 		// Error
 	}
 
-#ifdef USE_SSL
-        if (use_ssl)  {
-                if (ssl)
-                        SSL_shutdown(ssl);
-                if (ctx)
-                        SSL_CTX_free(ctx);
-        }
-#endif
-
-	close(fSocket);
+	delete fSocket;
 }
 
 
@@ -838,16 +787,7 @@ SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 			if (data[i] == '\r' && data[i+1] == '\n' && data[i+2] == '.') {
 				foundCRLFPeriod = true;
 				// Send data up to the CRLF, and include the period too.
-#ifdef USE_SSL
-				if (use_ssl) {
-					if (SSL_write(ssl,data,i + 3) < 0) {
-						amountUnread = 0; // Stop when an error happens.
-						bufferLen = 0;
-						break;
-					}
-				} else
-#endif
-				if (send (fSocket,data, i + 3,0) < 0) {
+				if (fSocket->Write(data, i + 3) < 0) {
 					amountUnread = 0; // Stop when an error happens.
 					bufferLen = 0;
 					break;
@@ -864,14 +804,7 @@ SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 		if (!foundCRLFPeriod) {
 			if (amountUnread <= 0) { // No more data, all we have is in the buffer.
 				if (bufferLen > 0) {
-#ifdef USE_SSL
-					if (use_ssl)
-						SSL_write(ssl, data, bufferLen);
-					else
-						send(fSocket, data, bufferLen, 0);
-#else
-					send(fSocket, data, bufferLen, 0);
-#endif
+					fSocket->Write(data, bufferLen);
 					ReportProgress(bufferLen, 0);
 					if (bufferLen >= 2)
 						messageEndedWithCRLF = (data[bufferLen-2] == '\r' &&
@@ -883,18 +816,9 @@ SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 			// Send most of the buffer, except a few characters to overlap with
 			// the next read, in case the CRLFPeriod is split between reads.
 			if (bufferLen > 3) {
-#ifdef USE_SSL
-				if (use_ssl) {
-					if (SSL_write(ssl, data, bufferLen - 3) < 0)
-						break;
-				} else {
-					if (send(fSocket, data, bufferLen - 3, 0) < 0)
-						break; // Stop when an error happens.
-				}
-#else
-				if (send(fSocket, data, bufferLen - 3, 0) < 0)
+				if (fSocket->Write(data, bufferLen - 3) < 0)
 					break; // Stop when an error happens.
-#endif
+
 				ReportProgress(bufferLen - 3, 0);
 				memmove (data, data + bufferLen - 3, 3);
 				bufferLen = 3;
@@ -927,42 +851,14 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	int32 errCode;
 	BString searchStr = "";
 
-	struct timeval tv;
-	struct fd_set fds;
-
-	tv.tv_sec = long(timeout / 1e6);
-	tv.tv_usec = long(timeout-(tv.tv_sec * 1e6));
-
-	/* Initialize (clear) the socket mask. */
-	FD_ZERO(&fds);
-
-	/* Set the socket in the mask. */
-	FD_SET(fSocket, &fds);
-        int result = -1;
-#ifdef USE_SSL
-        if ((use_ssl) && (SSL_pending(ssl)))
-            result = 1;
-        else
-#endif
-            result = select(1 + fSocket, &fds, NULL, NULL, &tv);
-	if (result < 0)
-		return errno;
-
-	if (result > 0) {
+	if (fSocket->WaitForReadable(timeout) == B_OK) {
 		while (1) {
-                 #ifdef USE_SSL
-			if (use_ssl)
-				r = SSL_read(ssl,buf,SMTP_RESPONSE_SIZE - 1);
-			else
-		  #endif
-			r = recv(fSocket,buf, SMTP_RESPONSE_SIZE - 1,0);
+			r = fSocket->Read(buf, SMTP_RESPONSE_SIZE - 1);
 			if (r <= 0)
 				break;
 
-			if (!gotCode)
-			{
-				if (buf[3] == ' ' || buf[3] == '-')
-				{
+			if (!gotCode) {
+				if (buf[3] == ' ' || buf[3] == '-') {
 					errCode = atol(buf);
 					gotCode = true;
 					searchStr << errCode << ' ';
@@ -990,13 +886,7 @@ SMTPProtocol::SendCommand(const char *cmd)
 {
 	D(bug("C:%s\n", cmd));
 
-#ifdef USE_SSL
-	if (use_ssl && ssl) {
-		if (SSL_write(ssl,cmd,::strlen(cmd)) < 0)
-                    return B_ERROR;
-	} else
-#endif
-	if (send(fSocket,cmd, ::strlen(cmd),0) < 0)
+	if (fSocket->Write(cmd, ::strlen(cmd)) < 0)
 		return B_ERROR;
 	fLog = "";
 

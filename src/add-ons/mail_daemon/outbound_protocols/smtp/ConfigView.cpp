@@ -42,18 +42,11 @@ SMTPConfigView::SMTPConfigView(const BMailAccountSettings& settings)
 	MailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS
 		| B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD
 		| B_MAIL_PROTOCOL_HAS_HOSTNAME
-#ifdef USE_SSL
 		| B_MAIL_PROTOCOL_HAS_FLAVORS
-#endif
 		)
 {
-	B_TRANSLATE_MARK_VOID("Unencrypted");
-	B_TRANSLATE_MARK_VOID("SSL");
-
-#ifdef USE_SSL
-	AddFlavor(B_TRANSLATE_NOCOLLECT("Unencrypted"));
+	AddFlavor(B_TRANSLATE("Unencrypted"));
 	AddFlavor(B_TRANSLATE("SSL"));
-#endif
 
 	AddAuthMethod(B_TRANSLATE("None"), false);
 	AddAuthMethod(B_TRANSLATE("ESMTP"));
