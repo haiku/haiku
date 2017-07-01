@@ -12,7 +12,9 @@ SubDirHdrs [ FDirName $(SUBDIR) imap_lib ] ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
-local sources =
+AddResources IMAP : IMAP.rdef ;
+
+Addon IMAP :
 	IMAPProtocol.cpp
 	ConfigView.cpp
 	FolderConfigWindow.cpp
@@ -26,20 +28,6 @@ local sources =
 	Commands.cpp
 	Protocol.cpp
 	Response.cpp
-;
-
-AddResources IMAP : IMAP.rdef ;
-
-if [ FIsBuildFeatureEnabled openssl ] {
-	SubDirC++Flags -DUSE_SSL ;
-	SetupFeatureObjectsDir ssl ;
-} else {
-	SetupFeatureObjectsDir no-ssl ;
-}
-
-Addon IMAP
-	:
-	$(sources)
 	:
 	be libmail.so localestub $(TARGET_NETWORK_LIBS) libbnetapi.so
 	shared [ TargetLibsupc++ ] [ TargetLibstdc++ ]

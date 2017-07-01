@@ -57,15 +57,11 @@ ConfigView::ConfigView(const BMailAccountSettings& accountSettings,
 		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
 		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
 		| B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD
-#ifdef USE_SSL
 	 	| B_MAIL_PROTOCOL_HAS_FLAVORS
-#endif
 	 )
 {
-#ifdef USE_SSL
 	AddFlavor(B_TRANSLATE("No encryption"));
 	AddFlavor(B_TRANSLATE("SSL"));
-#endif
 
 	SetTo(settings);
 
