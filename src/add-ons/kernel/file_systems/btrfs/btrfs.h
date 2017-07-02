@@ -12,8 +12,61 @@
 typedef uint64 fileblock_t;		// file block number
 typedef uint64 fsblock_t;		// filesystem block number
 
-
 #define BTRFS_SUPER_BLOCK_OFFSET	0x10000
+#define BTRFS_NUM_ROOT_BACKUPS				4
+
+
+struct btrfs_backup_roots {
+	uint64	root;
+	uint64	root_generation;
+	uint64	chunk_root;
+	uint64	chunk_root_generation;
+	uint64	extent_root;
+	uint64	extent_root_generation;
+	uint64	fs_root;
+	uint64	fs_root_generation;
+	uint64	device_root;
+	uint64	device_root_generation;
+	uint64	csum_root;
+	uint64	csum_root_generation;
+	uint64	total_size;
+	uint64	used_size;
+	uint64	num_devices;
+	uint8	unused_1[32];
+	uint8	root_level;
+	uint8	chunk_root_level;
+	uint8	extent_root_level;
+	uint8	fs_root_level;
+	uint8	device_root_level;
+	uint8	csum_root_level;
+	uint8	unused_2[10];
+
+	uint64 Root() const { return B_LENDIAN_TO_HOST_INT64(root); }
+	uint64 RootGen() const
+		{ return B_LENDIAN_TO_HOST_INT64(root_generation); }
+	uint64 ChunkRoot() const { return B_LENDIAN_TO_HOST_INT64(chunk_root); }
+	uint64 ChunkRootGen() const
+		{ return B_LENDIAN_TO_HOST_INT64(chunk_root_generation); }
+	uint64 ExtentRoot() const { return B_LENDIAN_TO_HOST_INT64(extent_root); }
+	uint64 ExtentRootGen() const
+		{ return B_LENDIAN_TO_HOST_INT64(extent_root_generation); }
+	uint64 FSRoot() const { return B_LENDIAN_TO_HOST_INT64(fs_root); }
+	uint64 FSRootGen() const
+		{ return B_LENDIAN_TO_HOST_INT64(fs_root_generation); }
+	uint64 DeviceRoot() const { return B_LENDIAN_TO_HOST_INT64(device_root); }
+	uint64 DeviceRootGen() const
+		{ return B_LENDIAN_TO_HOST_INT64(device_root_generation); }
+	uint64 CSumRoot() const { return B_LENDIAN_TO_HOST_INT64(csum_root); }
+	uint64 CSumRootGen() const
+		{ return B_LENDIAN_TO_HOST_INT64(csum_root_generation); }
+	uint8 RootLevel() const { return root_level; }
+	uint8 ChunkRootLevel() const { return chunk_root_level; }
+	uint8 ExtentRootLevel() const { return extent_root_level; }
+	uint8 FSRootLevel() const { return fs_root_level; }
+	uint8 DeviceRootLevel() const { return device_root_level; }
+	uint8 CSumRootLevel() const { return csum_root_level; }
+} _PACKED;
+
 
 struct btrfs_key {
 	uint64	object_id;
@@ -177,6 +230,7 @@ struct btrfs_super_block {
 	char	label[256];
 	uint64	reserved[32];
 	uint8	system_chunk_array[2048];
+	btrfs_backup_roots backup_roots[BTRFS_NUM_ROOT_BACKUPS];
 
 	bool IsValid();
 		// implemented in Volume.cpp
@@ -236,6 +290,16 @@ struct btrfs_inode {
 		{ _DecodeTime(timespec, modification_time); }
 	void GetCreationTime(struct timespec& timespec) const
 		{ _DecodeTime(timespec, creation_time); }
+} _PACKED;
+
+
+struct btrfs_inode_ref {
+	uint8	index;
+	uint16	name_length;
+	uint8	name[];
+
+	uint8 Index() const { return index; }
+	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
 } _PACKED;
 
 
@@ -303,6 +367,51 @@ struct btrfs_extent_data {
 		{ return B_LENDIAN_TO_HOST_INT64(extent_offset); }
 	uint64 Size() const
 		{ return B_LENDIAN_TO_HOST_INT64(size); }
+} _PACKED;
+
+
+struct btrfs_block_group {
+	uint64	used_space;
+	uint64	chunk_object_id;
+	uint64	flags;
+
+	uint64 UsedSpace() const { return B_LENDIAN_TO_HOST_INT64(used_space); }
+	uint64 ChunkObjectID() const
+		{ return B_HOST_TO_LENDIAN_INT64(chunk_object_id); }
+	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
+} _PACKED;
+
+
+struct btrfs_extent {
+	uint64	refs;
+	uint64	generation;
+	uint64	flags;
+
+	uint64 RefCount() const { return B_LENDIAN_TO_HOST_INT64(refs); }
+	uint64 Generation() const { return B_LENDIAN_TO_HOST_INT64(generation); }
+	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
+} _PACKED;
+
+
+struct btrfs_extent_inline_ref {
+	uint8	type;
+	uint64	offset;
+
+	uint8 Type() const { return type; }
+	uint64 Offset() const { return B_LENDIAN_TO_HOST_INT64(offset); }
+} _PACKED;
+
+
+struct btrfs_extent_data_ref {
+	uint64	root_id;
+	uint64	inode_id;
+	uint64	offset;
+	uint32	ref_count;
+
+	uint64 RootID() const { return B_LENDIAN_TO_HOST_INT64(root_id); }
+	uint64 InodeID() const { return B_LENDIAN_TO_HOST_INT64(inode_id); }
+	uint64 Offset() const { return B_LENDIAN_TO_HOST_INT64(offset);}
+	uint32 RefCount() const { return B_LENDIAN_TO_HOST_INT32(ref_count); }
 } _PACKED;
 
 
