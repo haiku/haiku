@@ -173,8 +173,8 @@ RemotePackageRepository HaikuPorts
 	genesis_commander-0.42-2
 	getconf-r260000-1
 	getopt-1.1.6-1
-	gettext-0.19.8.1-2
-	gettext_libintl-0.19.8.1-2
+	gettext-0.19.8.1-4
+	gettext_libintl-0.19.8.1-4
 	gdb-6.3-1
 	giddy3-1.5-2
 	giflib-5.1.2-1
@@ -733,8 +733,8 @@ RemotePackageRepository HaikuPorts
 	gcc6809_x86-4.6.4-1
 	gdk_pixbuf_x86-2.31.5-1
 	gdk_pixbuf_x86_devel-2.31.5-1
-	gettext_x86-0.19.8.1-2
-	gettext_x86_libintl-0.19.8.1-2
+	gettext_x86-0.19.8.1-4
+	gettext_x86_libintl-0.19.8.1-4
 	giflib_x86-5.1.2-1
 	giflib_x86_devel-5.1.2-1
 	glew_x86-1.11.0-1
