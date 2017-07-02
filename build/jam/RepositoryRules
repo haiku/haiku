@@ -363,12 +363,12 @@ actions BootstrapRepositoryFetchPackage1
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	if [ -n "$secondaryCrossDevelPackages" ]; then
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
-			$(HAIKU_PORTER_EXTRA_OPTIONS) \
+			--all-dependencies $(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--cross-devel-package "$haikuCrossDevelPackage" \
 			"$secondaryCrossDevelPackages" $portSpec
 	else
 		$(HOST_HAIKU_PORTER) -j$(HAIKU_PORTER_CONCURRENT_JOBS) \
-			$(HAIKU_PORTER_EXTRA_OPTIONS) \
+			--all-dependencies $(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--cross-devel-package "$haikuCrossDevelPackage" $portSpec
 	fi
 }
@@ -659,11 +659,11 @@ actions BuildHaikuPortsSourcePackageDirectory1
 	if [ -n "$secondaryCrossDevelPackages" ]; then
 		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
 			"$secondaryCrossDevelPackages" \
-			$(HAIKU_PORTER_EXTRA_OPTIONS) \
+			--all-dependencies $(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--create-source-packages-for-bootstrap --portsfile $packageList
 	else
 		$(HOST_HAIKU_PORTER) --cross-devel-package "$haikuCrossDevelPackage" \
-			$(HAIKU_PORTER_EXTRA_OPTIONS) \
+			--all-dependencies $(HAIKU_PORTER_EXTRA_OPTIONS) \
 			--create-source-packages-for-bootstrap --portsfile $packageList
 	fi
 }
