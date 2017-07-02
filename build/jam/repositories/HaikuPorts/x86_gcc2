@@ -322,9 +322,11 @@ RemotePackageRepository HaikuPorts
 	libpaper_devel-1.1.24-1
 	libpcap-1.7.4-1
 	libpcap_devel-1.7.4-1
-	libpcre0-8.21-6
-	libpcre-8.38-1
-	libpcre_devel-8.38-1
+	libpcre-8.40-3
+	libpcre_devel-8.40-3
+	libpcre0-8.21-7
+	libpcre2-10.23-1
+	libpcre2_devel-10.23-1
 	libpng-1.5.25-2
 	libpng_devel-1.5.25-2
 	libpng16-1.6.20-2
@@ -529,8 +531,8 @@ RemotePackageRepository HaikuPorts
 	sdl_ttf_devel-2.0.11-5
 	sdl2_image-2.0.0-4
 	sdl2_image_devel-2.0.0-4
-	sdl2_ttf-2.0.12-3
-	sdl2_ttf_devel-2.0.12-3
+	sdl2_ttf-2.0.14-6
+	sdl2_ttf_devel-2.0.14-6
 	sdllopan-10-3
 	sed-4.2.1-6
 	seeker-1.0-4
@@ -872,9 +874,11 @@ RemotePackageRepository HaikuPorts
 	libpaper_x86_devel-1.1.24-1
 	libparserutils_x86-0.2.3-1
 	libparserutils_x86_devel-0.2.3-1
-	libpcre_x86-8.38-1
-	libpcre_x86_devel-8.38-1
-	libpcre0_x86-8.21-6
+	libpcre_x86-8.40-3
+	libpcre_x86_devel-8.40-3
+	libpcre0_x86-8.21-7
+	libpcre2_x86-10.23-1
+	libpcre2_x86_devel-10.23-1
 	libpng_x86-1.5.25-2
 	libpng_x86_devel-1.5.25-2
 	libpng16_x86-1.6.20-2
@@ -992,8 +996,8 @@ RemotePackageRepository HaikuPorts
 	openexr_x86_devel-2.2.0-1
 	openjdk_x86-1.7.u80_b32-3
 	openjdk_x86_devel-1.7.u80_b32-3
-	openjpeg_x86-2.1.2-1
-	openjpeg_x86_devel-2.1.2-1
+	openjpeg_x86-2.1.2-3
+	openjpeg_x86_devel-2.1.2-3
 	openssl_x86-1.0.2g-1
 	openssl_x86_devel-1.0.2g-1
 	openttd_x86-1.6.1-1
@@ -1388,6 +1392,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_x86
 	libpcre0
 	libpcre0_x86
+	libpcre2
+	libpcre2_x86
 	libpng
 	libpng_x86
 	libpng16
