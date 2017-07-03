@@ -22,5 +22,7 @@ status_t authenticate_user(const char* prompt, passwd* passwd, spwd* spwd,
 status_t authenticate_user(const char* prompt, const char* user,
 			passwd** _passwd, spwd** _spwd, int maxTries, bool useStdio);
 
+status_t setup_environment(struct passwd* passwd, bool preserveEnvironment);
+
 
 #endif	// MULTIUSER_UTILS_H

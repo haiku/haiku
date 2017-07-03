@@ -64,7 +64,7 @@ read_string(char* string, size_t bufferSize)
 		if (bufferSize > 1) {
 			string[0] = c;
 			string++;
-			bufferSize--; 
+			bufferSize--;
 		}
 	}
 
@@ -129,46 +129,6 @@ login(const char* user, struct passwd** _passwd)
 		return B_PERMISSION_DENIED;
 
 	*_passwd = passwd;
-	return B_OK;
-}
-
-
-static status_t
-setup_environment(struct passwd* passwd, bool preserveEnvironment)
-{
-	const char* term = getenv("TERM");
-	if (!preserveEnvironment) {
-		static char *empty[1];
-		environ = empty;
-	}
-
-	// always preserve $TERM
-	if (term != NULL)
-		setenv("TERM", term, false);
-	if (passwd->pw_shell)
-		setenv("SHELL", passwd->pw_shell, true);
-	if (passwd->pw_dir)
-		setenv("HOME", passwd->pw_dir, true);
-
-	setenv("USER", passwd->pw_name, true);
-
-	pid_t pid = getpid();
-	if (ioctl(STDIN_FILENO, TIOCSPGRP, &pid) != 0)
-		return errno;
-
-	if (passwd->pw_gid && setgid(passwd->pw_gid) != 0)
-		return errno;
-
-	if (passwd->pw_uid && setuid(passwd->pw_uid) != 0)
-		return errno;
-
-	const char* home = getenv("HOME");
-	if (home == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	if (chdir(home) != 0)
-		return errno;
-
 	return B_OK;
 }
 
