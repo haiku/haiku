@@ -7,6 +7,7 @@
 
 
 #include <arch/ppc/arch_thread_types.h>
+#include <arch/ppc/cpu.h>
 #include <kernel.h>
 
 
