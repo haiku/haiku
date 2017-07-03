@@ -538,7 +538,7 @@ tcp_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 {
 	TCPEndpoint* protocol = (TCPEndpoint*)_protocol;
 
-	if ((level & LEVEL_MASK) == IPPROTO_TCP)
+	if (level == IPPROTO_TCP)
 		return protocol->GetOption(option, value, _length);
 
 	return protocol->next->module->getsockopt(protocol->next, level, option,
