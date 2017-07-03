@@ -20,7 +20,7 @@
 #ifdef notdef
 static const char rcsid[] = "Id: inet_net_ntop.c,v 1.1.2.1 2002/08/02 02:17:21 marka Exp ";
 #else
-__RCSID("$NetBSD: inet_net_ntop.c,v 1.3 2012/03/20 17:08:13 matt Exp $");
+__RCSID("$NetBSD: inet_net_ntop.c,v 1.4 2017/05/09 02:56:44 maya Exp $");
 #endif
 #endif
 
@@ -198,7 +198,7 @@ inet_net_ntop_ipv6(const u_char *src, int bits, char *dst, size_t size)
 		memset(inbuf + p, 0, 16 - p);
 		b = bits % 8;
 		if (b != 0) {
-			m = ~0 << (8 - b);
+			m = ~0u << (8 - b);
 			inbuf[p-1] &= m;
 		}
 
