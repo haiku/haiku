@@ -11,8 +11,8 @@ BootstrapPackageRepository HaikuPortsCross
 	:
 	# repository architecture packages (stage 1)
 	binutils_bootstrap-2.26.1_2016_02_29-1
-	zlib_bootstrap-1.2.8-2
-	zlib_bootstrap_devel-1.2.8-2
+	zlib_bootstrap-1.2.11-1
+	zlib_bootstrap_devel-1.2.11-1
 	:
 	# repository architecture packages (stage 2)
 	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1

@@ -39,8 +39,8 @@ BootstrapPackageRepository HaikuPortsCross
 	python_bootstrap-2.7.6-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
-	zlib_bootstrap-1.2.8-2
-	zlib_bootstrap_devel-1.2.8-2
+	zlib_bootstrap-1.2.11-1
+	zlib_bootstrap_devel-1.2.11-1
 
 	secondary_x86_gcc2 @{
 		binutils_bootstrap_x86_gcc2-2.17_2013_04_21-3
@@ -52,8 +52,8 @@ BootstrapPackageRepository HaikuPortsCross
 		icu_bootstrap_x86_gcc2_devel-4.8.1.1-1
 		ncurses6_bootstrap_x86_gcc2-6.0-1
 		ncurses6_bootstrap_x86_gcc2_devel-6.0-1
-		zlib_bootstrap_x86_gcc2-1.2.8-2
-		zlib_bootstrap_x86_gcc2_devel-1.2.8-2
+		zlib_bootstrap_x86_gcc2-1.2.11-1
+		zlib_bootstrap_x86_gcc2_devel-1.2.11-1
 	}@ # secondary_x86_gcc2
 	:
 	# repository architecture packages (stage 2)

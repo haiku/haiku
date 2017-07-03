@@ -33,8 +33,8 @@ BootstrapPackageRepository HaikuPortsCross
 	python_bootstrap-2.7.6-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
-	zlib_bootstrap-1.2.8-2
-	zlib_bootstrap_devel-1.2.8-2
+	zlib_bootstrap-1.2.11-1
+	zlib_bootstrap_devel-1.2.11-1
 	:
 	# repository architecture packages (stage 2)
 	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1
