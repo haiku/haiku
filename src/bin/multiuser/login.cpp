@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#include <termios.h>
 #include <unistd.h>
 
 #include "multiuser_utils.h"
@@ -27,30 +26,6 @@ const char* kProgramName = __progname;
 
 const uint32 kRetries = 3;
 const uint32 kTimeout = 60;
-
-
-static status_t
-set_tty_echo(bool enabled)
-{
-	struct termios termios;
-
-	if (ioctl(STDIN_FILENO, TCGETA, &termios) != 0)
-		return errno;
-
-	// do we have to change the current setting at all?
-	if (enabled == ((termios.c_lflag & ECHO) != 0))
-		return B_OK;
-
-	if (enabled)
-		termios.c_lflag |= ECHO;
-	else
-		termios.c_lflag &= ~ECHO;
-
-	if (ioctl(STDIN_FILENO, TCSETA, &termios) != 0)
-		return errno;
-
-	return B_OK;
-}
 
 
 static status_t
@@ -91,8 +66,6 @@ login(const char* user, struct passwd** _passwd)
 		printf("login: ");
 		fflush(stdout);
 
-		set_tty_echo(true);
-
 		status_t status = read_string(userBuffer, sizeof(userBuffer));
 		if (status < B_OK)
 			return status;
@@ -105,15 +78,10 @@ login(const char* user, struct passwd** _passwd)
 	if (!user[0])
 		exit(1);
 
-	printf("password: ");
-	fflush(stdout);
-
-	set_tty_echo(false);
-
 	char password[64];
-	status_t status = read_string(password, sizeof(password));
+	status_t status = read_password("password: ", password, sizeof(password),
+		false);
 
-	set_tty_echo(true);
 	putchar('\n');
 
 	if (status < B_OK)
@@ -206,8 +174,9 @@ main(int argc, char *argv[])
 		if (status == B_OK)
 			break;
 
+		sleep(3);
 		fprintf(stderr, "Login failed.\n");
-		sleep(1);
+		retries--;
 
 		user = NULL;
 			// ask for the user name as well after the first failure
@@ -215,7 +184,7 @@ main(int argc, char *argv[])
 
 	alarm(0);
 
-	if (status < B_OK) {
+	if (status < B_OK || passwd == NULL) {
 		// login failure
 		syslog(LOG_NOTICE, "login%s failed for \"%s\"", get_from(fromHost),
 			passwd->pw_name);
