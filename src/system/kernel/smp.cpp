@@ -1540,6 +1540,9 @@ call_all_cpus_sync(void (*func)(void*, int), void* cookie)
 }
 
 
+// Ensure the symbols for memory_barriers are still included
+// in the kernel for binary compatibility. Calls are forwarded
+// to the more efficent per-processor atomic implementations.
 #undef memory_read_barrier
 #undef memory_write_barrier
 
