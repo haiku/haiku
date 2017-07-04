@@ -38,11 +38,13 @@ public:
 									{ return fFSVolume ? fFSVolume->id : -1; }
 			fs_volume*			FSVolume() const { return fFSVolume; }
 			const char*			Name() const;
-			BTree*			FSTree() const { return fFSTree; }
-			BTree*			RootTree() const { return fRootTree; }
+			BTree*				FSTree() const { return fFSTree; }
+			BTree*				ExtentTree() const { return fExtentTree; }
+			BTree*				RootTree() const { return fRootTree; }
 
 			uint32				SectorSize() const { return fSectorSize; }
 			uint32				BlockSize() const { return fBlockSize; }
+			Chunk*				SystemChunk() const { return fChunk; }
 
 			btrfs_super_block&	SuperBlock() { return fSuperBlock; }
 
@@ -71,12 +73,12 @@ private:
 			Inode*				fRootNode;
 
 			Chunk*				fChunk;
-			BTree*			fChunkTree;
-			BTree*			fRootTree;
-			BTree*			fDevTree;
-			BTree*			fExtentTree;
-			BTree*			fFSTree;
-			BTree*			fChecksumTree;
+			BTree*				fChunkTree;
+			BTree*				fRootTree;
+			BTree*				fDevTree;
+			BTree*				fExtentTree;
+			BTree*				fFSTree;
+			BTree*				fChecksumTree;
 };
 
 

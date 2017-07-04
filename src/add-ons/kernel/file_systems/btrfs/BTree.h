@@ -56,6 +56,8 @@ public:
 			status_t			FindPrevious(btrfs_key& key, void** value,
 									size_t* size = NULL);
 
+			Volume*				SystemVolume() const { return fVolume; }
+
 			status_t			SetRoot(off_t logical, fsblock_t* block);
 			fsblock_t			RootBlock() const { return fRootBlock; }
 			off_t				LogicalRoot() const { return fLogicalRoot; }
