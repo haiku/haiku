@@ -27,11 +27,8 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 }
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
-
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
-}
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared storage fs_shell ;
