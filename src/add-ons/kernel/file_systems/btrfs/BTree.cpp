@@ -203,7 +203,7 @@ btrfs_key::Compare(const btrfs_key& key) const
 */
 status_t
 BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
-	btree_traversing type)
+	bool read, btree_traversing type)
 {
 	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
 		key.ObjectID(),	key.Type(), key.Offset());
@@ -229,8 +229,15 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 
 	TRACE("Find() dump count %" B_PRId32 "\n", node.ItemCount());
 	ret = node.SearchSlot(key, &slot, type);
+	if ((slot >= node.ItemCount() || node.Item(slot)->key.Type() != key.Type())
+			&& read == true
+		|| ret != B_OK) {
+		TRACE("Find() not found %" B_PRId64 " %" B_PRId64 "\n", key.Offset(),
+			key.ObjectID());
+		return B_ENTRY_NOT_FOUND;
+	}
 
-	if ( ret == B_OK && node.Item(slot)->key.Type() == key.Type()) {
+	if (read == true) {
 		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 "\n",
 			node.Item(slot)->Offset(), node.Item(slot)->Size());
 
@@ -239,38 +246,35 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 			memcpy(*_value, node.ItemData(slot),
 				node.Item(slot)->Size());
 			key.SetOffset(node.Item(slot)->key.Offset());
+			key.SetObjectID(node.Item(slot)->key.ObjectID());
 			if (_size != NULL)
 				*_size = node.Item(slot)->Size();
 		}
-		return B_OK;
+	} else {
+		*_value = (void*)&slot;
 	}
-
-
-	TRACE("Find() not found %" B_PRId64 " %" B_PRId64 "\n", key.Offset(),
-		key.ObjectID());
-
-	return B_ENTRY_NOT_FOUND;
+	return B_OK;
 }
 
 
 status_t
-BTree::FindNext(btrfs_key& key, void** _value, size_t* _size)
+BTree::FindNext(btrfs_key& key, void** _value, size_t* _size, bool read)
 {
-	return _Find(key, _value, _size, BTREE_FORWARD);
+	return _Find(key, _value, _size, read, BTREE_FORWARD);
 }
 
 
 status_t
-BTree::FindPrevious(btrfs_key& key, void** _value, size_t* _size)
+BTree::FindPrevious(btrfs_key& key, void** _value, size_t* _size, bool read)
 {
-	return _Find(key, _value, _size, BTREE_BACKWARD);
+	return _Find(key, _value, _size, read, BTREE_BACKWARD);
 }
 
 
 status_t
-BTree::FindExact(btrfs_key& key, void** _value, size_t* _size)
+BTree::FindExact(btrfs_key& key, void** _value, size_t* _size, bool read)
 {
-	return _Find(key, _value, _size, BTREE_EXACT);
+	return _Find(key, _value, _size, read, BTREE_EXACT);
 }
 
 
@@ -338,7 +342,7 @@ TreeIterator::Traverse(btree_traversing direction, btrfs_key& key,
 
 	fCurrentKey.SetOffset(fCurrentKey.Offset() + direction);
 	status_t status = fTree->_Find(fCurrentKey, value, size,
-		direction);
+		true, direction);
 	if (status != B_OK) {
 		TRACE("TreeIterator::Traverse() Find failed\n");
 		return B_ENTRY_NOT_FOUND;
