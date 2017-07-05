@@ -832,8 +832,8 @@ RemotePackageRepository HaikuPorts
 	libedit_x86_devel-2015_03_21_3.1-5
 	libelf_x86-0.8.13-1
 	libelf_x86_devel-0.8.13-1
-	libepoxy_x86-1.4.3-1
-	libepoxy_x86_devel-1.4.3-1
+	libepoxy_x86-1.4.3-2
+	libepoxy_x86_devel-1.4.3-2
 	libevent_x86-2.0.21-11
 	libevent_x86_devel-2.0.21-11
 	libexecinfo_x86-1.1-1
