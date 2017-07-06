@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.06.22
-#	Date:    2017-06-22 03:15:02
+#	Version: 2017.07.01
+#	Date:    2017-07-01 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2432,6 +2432,7 @@
 		144d c0c7  Radeon HD 7550M
 	6842  Thames LE [Radeon HD 7000M Series]
 	6843  Thames [Radeon HD 7670M]
+	6863  Vega 10 [Radeon Vega Frontier Edition]
 	687f  Vega [Radeon RX Vega]
 	6888  Cypress XT [FirePro V8800]
 	6889  Cypress PRO [FirePro V7800]
@@ -6021,6 +6022,7 @@
 		1077 02a7  QL45212-DE 25GbE Adapter
 		1077 e4f6  FastLinQ QL45211H 25GbE Adapter
 		1077 e4f7  FastLinQ QL45212H 25GbE Adapter
+		1590 0223  Synergy 6810C 25/50Gb Ethernet Adapter
 	165c  FastLinQ QL45000 Series 40GbE Controller (FCoE)
 		1077 e4f1  FastLinQ QL45462H 40GbE FCoE Adapter
 		1077 e4f2  FastLinQ QL45461H 40GbE FCoE Adapter
@@ -6074,8 +6076,12 @@
 	2432  ISP2432-based 4Gb Fibre Channel to PCI Express HBA
 		103c 7040  FC1142SR 4Gb 1-port PCIe Fibre Channel Host Bus Adapter [HPAE311A]
 	2532  ISP2532-based 8Gb Fibre Channel to PCI Express HBA
+		1014 041e  FC EN0Y/EN12 PCIe2 LP 8 Gb 4-port Fibre Channel Adapter for POWER
 		103c 3262  StorageWorks 81Q
 		103c 3263  StorageWorks 82Q
+		1077 015c  QLE2560 PCI Express to 8Gb FC Single Channel
+		1077 015d  QLE2562 PCI Express to 8Gb FC Dual Channel
+		1077 015e  QLE2564 PCI Express to 8Gb FC Quad Channel
 		1077 0167  QME2572 Dual Port FC8 HBA Mezzanine
 		1590 00fc  StoreFabric 84Q 8Gb Quad Port Fibre Channel Host Bus Adapter
 	3022  ISP4022-based Ethernet NIC
@@ -6090,6 +6096,7 @@
 	7322  IBA7322 QDR InfiniBand HCA
 	8000  10GbE Converged Network Adapter (TCP/IP Networking)
 	8001  10GbE Converged Network Adapter (FCoE)
+		1014 03af  FC 5708/5270 10 Gb FCoE PCIe Dual Port Adapter for POWER
 	8020  cLOM8214 1/10GbE Controller
 		1028 1f64  QMD8262-k 10G DP bNDC KR
 		103c 3346  CN1000Q Dual Port Converged Network Adapter
@@ -10640,6 +10647,7 @@
 	134f  GM108M [GeForce 920MX]
 	137a  GM108GLM [Quadro K620M / Quadro M500M]
 		17aa 505a  Quadro M500M
+	137b  GM108GLM [Quadro M520 Mobile]
 	137d  GM108M [GeForce 940A]
 	1380  GM107 [GeForce GTX 750 Ti]
 	1381  GM107 [GeForce GTX 750]
@@ -10685,6 +10693,7 @@
 	13d8  GM204M [GeForce GTX 970M]
 	13d9  GM204M [GeForce GTX 965M]
 	13da  GM204M [GeForce GTX 980]
+	13e7  GM204 [GeForce GTX 980 Engineering Sample]
 	13f0  GM204GL [Quadro M5000]
 	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
@@ -10710,7 +10719,7 @@
 	1617  GM204M [GeForce GTX 980M]
 	1618  GM204M [GeForce GTX 970M]
 	1619  GM204M [GeForce GTX 965M]
-	161a  GM204M [GeForce GTX 980]
+	161a  GM204M [GeForce GTX 980 Mobile]
 	1667  GM204M [GeForce GTX 965M]
 	1725  GP100
 	172e  GP100
@@ -16374,6 +16383,9 @@
 	6015  T6201-BT Unified Wire Ethernet Controller
 	6080  T6225-6080 Unified Wire Ethernet Controller
 	6081  T62100-6081 Unified Wire Ethernet Controller
+	6082  T6225-6082 Unified Wire Ethernet Controller
+	6083  T62100-6083 Unified Wire Ethernet Controller
+	6084  T64100-6084 Unified Wire Ethernet Controller
 	6401  T6225-CR Unified Wire Ethernet Controller
 	6402  T6225-SO-CR Unified Wire Ethernet Controller
 	6403  T6425-CR Unified Wire Ethernet Controller
@@ -16389,6 +16401,9 @@
 	6415  T6201-BT Unified Wire Ethernet Controller
 	6480  T6225-6080 Unified Wire Ethernet Controller
 	6481  T62100-6081 Unified Wire Ethernet Controller
+	6482  T6225-6082 Unified Wire Ethernet Controller
+	6483  T62100-6083 Unified Wire Ethernet Controller
+	6484  T64100-6084 Unified Wire Ethernet Controller
 	6501  T6225-CR Unified Wire Storage Controller
 	6502  T6225-SO-CR Unified Wire Storage Controller
 	6503  T6425-CR Unified Wire Storage Controller
@@ -16404,6 +16419,9 @@
 	6515  T6201-BT Unified Wire Storage Controller
 	6580  T6225-6080 Unified Wire Storage Controller
 	6581  T62100-6081 Unified Wire Storage Controller
+	6582  T6225-6082 Unified Wire Storage Controller
+	6583  T62100-6083 Unified Wire Storage Controller
+	6584  T64100-6084 Unified Wire Storage Controller
 	6601  T6225-CR Unified Wire Storage Controller
 	6602  T6225-SO-CR Unified Wire Storage Controller
 	6603  T6425-CR Unified Wire Storage Controller
@@ -16419,6 +16437,9 @@
 	6615  T6201-BT Unified Wire Storage Controller
 	6680  T6225-6080 Unified Wire Storage Controller
 	6681  T62100-6081 Unified Wire Storage Controller
+	6682  T6225-6082 Unified Wire Storage Controller
+	6683  T62100-6083 Unified Wire Storage Controller
+	6684  T64100-6084 Unified Wire Storage Controller
 	6801  T6225-CR Unified Wire Ethernet Controller [VF]
 	6802  T6225-SO-CR Unified Wire Ethernet Controller [VF]
 	6803  T6425-CR Unified Wire Ethernet Controller [VF]
@@ -16434,6 +16455,9 @@
 	6815  T6201-BT Unified Wire Ethernet Controller [VF]
 	6880  T6225-6080 Unified Wire Ethernet Controller [VF]
 	6881  T62100-6081 Unified Wire Ethernet Controller [VF]
+	6882  T6225-6082 Unified Wire Ethernet Controller [VF]
+	6883  T62100-6083 Unified Wire Ethernet Controller [VF]
+	6884  T64100-6084 Unified Wire Ethernet Controller [VF]
 	a000  PE10K Unified Wire Ethernet Controller
 1426  Storage Technology Corp.
 1427  Better On-Line Solutions
@@ -20645,6 +20669,7 @@
 		1fc9 3015  Ethernet Adapter
 	4026  TN9610 10GbE SFP+ Ethernet Adapter
 	4027  TN9710P 10GBase-T/NBASE-T Ethernet Adapter
+		1154 0368  LGY-PCIE-MG
 		1432 8104  10 Gigabit Ethernet PCI Express Adapter
 		1fc9 3015  Ethernet Adapter
 	4527  TN9710Q 5GBase-T/NBASE-T Ethernet Adapter
@@ -23057,6 +23082,7 @@
 	1529  82599 10 Gigabit Dual Port Network Connection with FCoE
 	152a  82599 10 Gigabit Dual Port Backplane Connection with FCoE
 	152e  82599 Virtual Function
+	152f  I350 Virtual Function
 	1530  X540 Virtual Function
 	1533  I210 Gigabit Network Connection
 		103c 0003  Ethernet I210-T1 GbE NIC
@@ -23282,6 +23308,10 @@
 	15d8  Ethernet Connection (4) I219-V
 	15d9  JHL6340 Thunderbolt 3 NHI (C step) [Alpine Ridge 2C 2016]
 	15da  JHL6340 Thunderbolt 3 Bridge (C step) [Alpine Ridge 2C 2016]
+	15df  Ethernet Connection (8) I219-LM
+	15e0  Ethernet Connection (8) I219-V
+	15e1  Ethernet Connection (9) I219-LM
+	15e2  Ethernet Connection (9) I219-V
 	15e3  Ethernet Connection (5) I219-LM
 	15e4  Ethernet Connection X553 1GbE
 	15e5  Ethernet Connection X553 1GbE
@@ -28573,6 +28603,12 @@
 		9005 0552  Series 8 - ASR-8805 - 8 internal 0 external 12G SAS Port/PCIe 3.0
 		9005 0553  Series 8 - ASR-8085 - 0 internal 8 external 12G SAS Port/PCIe 3.0
 		9005 0554  Series 8 - ASR-8885 - 8 internal 8 external 12G SAS Port/PCIe 3.0
+	028f  Smart Storage PQI 12G SAS/PCIe 3
+		103c 0600  Smart Array P408i-p SR Gen10
+		103c 0601  Smart Array P408e-p SR Gen10
+		103c 0602  Smart Array P408i-a SR Gen10
+		103c 0603  Smart Array P408i-c SR Gen10
+		103c 0655  Smart Array P408e-m SR Gen10
 	0410  AIC-9410W SAS (Razor HBA RAID)
 		9005 0410  ASC-48300(Spirit RAID)
 		9005 0411  ASC-58300 (Oakmont RAID)
