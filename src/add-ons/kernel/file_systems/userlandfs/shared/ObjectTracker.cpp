@@ -13,13 +13,17 @@ static char sTrackerBuffer[sizeof(ObjectTracker)];
 // constructor
 ObjectTrackable::ObjectTrackable()
 {
-	ObjectTracker::GetDefault()->AddTrackable(this);
+	ObjectTracker* tracker = ObjectTracker::GetDefault();
+	if (tracker != NULL)
+		tracker->AddTrackable(this);
 }
 
 // destructor
 ObjectTrackable::~ObjectTrackable()
 {
-	ObjectTracker::GetDefault()->RemoveTrackable(this);
+	ObjectTracker* tracker = ObjectTracker::GetDefault();
+	if (tracker != NULL)
+		tracker->RemoveTrackable(this);
 }
 
 
@@ -77,9 +81,6 @@ ObjectTracker::GetDefault()
 void
 ObjectTracker::AddTrackable(ObjectTrackable* trackable)
 {
-	if (!this)
-		return;
-
 	if (trackable) {
 		AutoLocker<Locker> _(fLock);
 		fTrackables.Insert(trackable);
@@ -90,9 +91,6 @@ ObjectTracker::AddTrackable(ObjectTrackable* trackable)
 void
 ObjectTracker::RemoveTrackable(ObjectTrackable* trackable)
 {
-	if (!this)
-		return;
-
 	if (trackable) {
 		AutoLocker<Locker> _(fLock);
 		fTrackables.Remove(trackable);
