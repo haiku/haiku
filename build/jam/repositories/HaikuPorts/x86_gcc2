@@ -254,6 +254,9 @@ RemotePackageRepository HaikuPorts
 	lbreakout2-2.6.5-3
 	lcms-2.5-1
 	lcms_devel-2.5-1
+	leptonica-1.73-4
+	leptonica_devel-1.73-4
+	leptonica_tools-1.73-4
 	less-481-1
 	lha-1.14i-2
 	libao-1.2.0-1
@@ -744,6 +747,8 @@ RemotePackageRepository HaikuPorts
 	gettext_x86_libintl-0.19.8.1-4
 	giflib_x86-5.1.2-1
 	giflib_x86_devel-5.1.2-1
+	giflib6_x86-5.0.5-4
+	giflib6_x86_devel-5.0.5-4
 	glew_x86-1.11.0-1
 	glew_x86_devel-1.11.0-1
 	glew_x86_util-1.11.0-1
@@ -792,6 +797,9 @@ RemotePackageRepository HaikuPorts
 	lcms_x86_devel-2.8-1
 	lensfun_x86-0.3.2-1
 	lensfun_x86_devel-0.3.2-1
+	leptonica_x86-1.73-4
+	leptonica_x86_devel-1.73-4
+	leptonica_x86_tools-1.73-4
 	libaacs_x86-0.8.1-1
 	libaacs_x86_devel-0.8.1-1
 	libao_x86-1.2.0-1
@@ -1284,6 +1292,7 @@ RemotePackageRepository HaikuPorts
 	giddy3
 	giflib
 	giflib6
+	giflib6_x86
 	git
 	glew
 	glib2
@@ -1344,6 +1353,8 @@ RemotePackageRepository HaikuPorts
 	lbreakout2
 	lcms
 	lcms_x86
+	leptonica
+	leptonica_x86
 	lensfun_x86
 	less
 	lha
