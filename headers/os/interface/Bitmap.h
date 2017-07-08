@@ -114,7 +114,7 @@ public:
 private:
 	friend class BView;
 	friend class BApplication;
-	friend class BPrivate::BPrivateScreen;
+	friend class ::BPrivate::BPrivateScreen;
 	friend class Private;
 
 	virtual	status_t			Perform(perform_code d, void* arg);

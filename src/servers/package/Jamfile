@@ -33,6 +33,7 @@ Server package_daemon
 DoCatalogs package_daemon :
 	x-vnd.haiku-package_daemon
 	:
+	PackageManager.cpp
 	ProblemWindow.cpp
 	ResultWindow.cpp
 ;

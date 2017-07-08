@@ -10,6 +10,7 @@
 
 #include <package/manager/PackageManager.h>
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <package/CommitTransactionResult.h>
 #include <package/DownloadFileRequest.h>
@@ -31,6 +32,9 @@
 #include <package/ValidateChecksumJob.h>
 
 #include "PackageManagerUtils.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackageManagerKit"
 
 
 using BPackageKit::BPrivate::FetchFileJob;
@@ -126,7 +130,7 @@ BPackageManager::Init(uint32 flags)
 		error = roster.GetRepositoryNames(repositoryNames);
 		if (error != B_OK) {
 			fUserInteractionHandler->Warn(error,
-				"Failed to get repository names");
+				B_TRANSLATE("Failed to get repository names"));
 		}
 
 		int32 repositoryNameCount = repositoryNames.CountStrings();
@@ -619,7 +623,7 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 			.GetEntry(&transactionDirectoryEntry)) != B_OK
 		|| (error = transactionDirectoryEntry.Remove()) != B_OK) {
 		fUserInteractionHandler->Warn(error,
-			"Failed to remove transaction directory");
+			B_TRANSLATE("Failed to remove transaction directory"));
 	}
 
 	fUserInteractionHandler->ProgressApplyingChangesDone(
@@ -669,8 +673,8 @@ BPackageManager::_FindBasePackage(const PackageList& packages,
 	}
 
 	if (basePackage == NULL) {
-		fUserInteractionHandler->Warn(B_OK, "Package %s-%s doesn't have a "
-			"matching requires for its base package \"%s\"",
+		fUserInteractionHandler->Warn(B_OK, B_TRANSLATE("Package %s-%s "
+			"doesn't have a matching requires for its base package \"%s\""),
 			info.Name().String(), info.Version().ToString().String(),
 			info.BasePackage().String());
 		return -1;
@@ -711,16 +715,16 @@ BPackageManager::_AddRemoteRepository(BPackageRoster& roster, const char* name,
 	BRepositoryConfig config;
 	status_t error = roster.GetRepositoryConfig(name, &config);
 	if (error != B_OK) {
-		fUserInteractionHandler->Warn(error,
-			"Failed to get config for repository \"%s\". Skipping.", name);
+		fUserInteractionHandler->Warn(error, B_TRANSLATE(
+			"Failed to get config for repository \"%s\". Skipping."), name);
 		return;
 	}
 
 	BRepositoryCache cache;
 	error = _GetRepositoryCache(roster, config, refresh, cache);
 	if (error != B_OK) {
-		fUserInteractionHandler->Warn(error,
-			"Failed to get cache for repository \"%s\". Skipping.", name);
+		fUserInteractionHandler->Warn(error, B_TRANSLATE(
+			"Failed to get cache for repository \"%s\". Skipping."), name);
 		return;
 	}
 
@@ -744,8 +748,8 @@ BPackageManager::_GetRepositoryCache(BPackageRoster& roster,
 
 	status_t error = RefreshRepository(config);
 	if (error != B_OK) {
-		fUserInteractionHandler->Warn(error,
-			"Refreshing repository \"%s\" failed", config.Name().String());
+		fUserInteractionHandler->Warn(error, B_TRANSLATE(
+			"Refreshing repository \"%s\" failed"), config.Name().String());
 	}
 
 	return roster.GetRepositoryCache(config.Name(), &_cache);
