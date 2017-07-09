@@ -6,7 +6,7 @@
  *		Axel Dörfler <axeld@pinc-software.de>
  *		Rene Gollent <rene@gollent.com>
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 
 

@@ -6,7 +6,7 @@
  *		Ryan Leavengood <leavengood@gmail.com>
  *		John Scipione <jscipione@gmail.com>
  *		Joseph Groover <looncraz@looncraz.net>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 
 

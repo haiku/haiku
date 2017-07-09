@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Alexander von Gluck IV <kallisti5@unixzen.com>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 
 #include "SoftwareUpdaterApp.h"
@@ -71,11 +71,8 @@ SoftwareUpdaterApp::QuitRequested()
 	
 	// Simulate a cancel request from window- this gives the updater a chance
 	// to quit cleanly
-	if (fWindowMessenger.IsValid()) {
+	if (fWindowMessenger.IsValid())
 		fWindowMessenger.SendMessage(kMsgCancel);
-		return false;
-	}
-	
 	return true;
 }
 

@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Alexander von Gluck IV <kallisti5@unixzen.com>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 #ifndef _SOFTWARE_UPDATER_APP_H
 #define _SOFTWARE_UPDATER_APP_H

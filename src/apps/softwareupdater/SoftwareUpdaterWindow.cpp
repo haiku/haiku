@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Alexander von Gluck IV <kallisti5@unixzen.com>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 
 
@@ -15,10 +15,12 @@
 #include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <Roster.h>
+#include <Screen.h>
 #include <String.h>
 
 #include "constants.h"
@@ -29,9 +31,9 @@
 
 SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	:
-	BWindow(BRect(0, 0, 300, 100),
+	BWindow(BRect(0, 0, 300, 10),
 		B_TRANSLATE_SYSTEM_NAME("SoftwareUpdater"), B_TITLED_WINDOW,
-		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE | B_NOT_CLOSABLE),
+		B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fStripeView(NULL),
 	fHeaderView(NULL),
 	fDetailView(NULL),
@@ -43,8 +45,13 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fWaitingForButton(false),
 	fUpdateConfirmed(false),
 	fUserCancelRequested(false),
-	fWarningAlertCount(0)
+	fWarningAlertCount(0),
+	fSettingsReadStatus(B_ERROR),
+	fSaveFrameChanges(false),
+	fMessageRunner(NULL),
+	fFrameChangeMessage(kMsgWindowFrameChanged)
 {
+	// Layout
 	BBitmap icon = GetIcon(32 * icon_layout_scale());
 	fStripeView = new StripeView(icon);
 
@@ -95,9 +102,6 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 			.AddGroup(new BGroupView(B_HORIZONTAL))
 				.Add(fDetailsCheckbox)
 				.AddGlue()
-			.End()
-			.AddGroup(new BGroupView(B_HORIZONTAL))
-				.AddGlue()
 				.Add(fCancelButton)
 				.Add(fUpdateButton)
 			.End()
@@ -107,18 +111,36 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fDetailsLayoutItem = layout_item_for(fDetailView);
 	fProgressLayoutItem = layout_item_for(fStatusBar);
 	fPackagesLayoutItem = layout_item_for(fScrollView);
+	fCancelButtonLayoutItem = layout_item_for(fCancelButton);
 	fUpdateButtonLayoutItem = layout_item_for(fUpdateButton);
 	fDetailsCheckboxLayoutItem = layout_item_for(fDetailsCheckbox);
 	
 	_SetState(STATE_DISPLAY_STATUS);
 	CenterOnScreen();
-	Show();
 	SetFlags(Flags() ^ B_AUTO_UPDATE_SIZE_LIMITS);
 	
 	// Prevent resizing for now
 	fDefaultRect = Bounds();
 	SetSizeLimits(fDefaultRect.Width(), fDefaultRect.Width(),
 		fDefaultRect.Height(), fDefaultRect.Height());
+	
+	// Read settings file
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);
+	if (status == B_OK) {
+		fSettingsPath.Append(kSettingsFilename);
+		fSettingsReadStatus = _ReadSettings(fInitialSettings);
+	}
+	// Move to saved setting position
+	if (fSettingsReadStatus == B_OK) {
+		BRect windowFrame;
+		status = fInitialSettings.FindRect(kKeyWindowFrame, &windowFrame);
+		if (status == B_OK) {
+			BScreen screen(this);
+			if (screen.Frame().Contains(windowFrame.LeftTop()))
+				MoveTo(windowFrame.LeftTop());
+		}
+	}
+	Show();
 	
 	BMessage registerMessage(kMsgRegister);
 	registerMessage.AddMessenger(kKeyMessenger, BMessenger(this));
@@ -128,6 +150,48 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fCancelAlertResponse.SetTarget(this);
 	fWarningAlertDismissed.SetMessage(new BMessage(kMsgWarningDismissed));
 	fWarningAlertDismissed.SetTarget(this);
+}
+
+
+bool
+SoftwareUpdaterWindow::QuitRequested()
+{
+	PostMessage(kMsgCancel);
+	return false;
+}
+
+
+void
+SoftwareUpdaterWindow::FrameMoved(BPoint newPosition)
+{
+	BWindow::FrameMoved(newPosition);
+
+	// Create a message runner to consolidate all function calls from a
+	// move into one message post after moving has ceased for .5 seconds
+	if (fSaveFrameChanges) {
+		if (fMessageRunner == NULL) {
+			fMessageRunner = new BMessageRunner(this, &fFrameChangeMessage,
+				500000, 1);
+		} else
+			fMessageRunner->SetInterval(500000);
+	}
+}
+
+
+void
+SoftwareUpdaterWindow::FrameResized(float newWidth, float newHeight)
+{
+	BWindow::FrameResized(newWidth, newHeight);
+
+	// Create a message runner to consolidate all function calls from a
+	// resize into one message post after resizing has ceased for .5 seconds
+	if (fSaveFrameChanges) {
+		if (fMessageRunner == NULL) {
+			fMessageRunner = new BMessageRunner(this, &fFrameChangeMessage,
+				500000, 1);
+		} else
+			fMessageRunner->SetInterval(500000);
+	}
 }
 
 
@@ -164,7 +228,8 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 				break;
 			
 			BString packageName;
-			status_t result = message->FindString(kKeyPackageName, &packageName);
+			status_t result = message->FindString(kKeyPackageName,
+				&packageName);
 			if (result != B_OK)
 				break;
 			BString packageCount;
@@ -192,7 +257,6 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		case kMsgCancel:
 		{
 			if (_GetState() == STATE_FINAL_MESSAGE) {
-				PostMessage(B_QUIT_REQUESTED);
 				be_app->PostMessage(kMsgFinalQuit);
 				break;
 			}
@@ -203,7 +267,6 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 				fHeaderView->SetText(B_TRANSLATE("Cancelling updates"));
 				fDetailView->SetText(
 					B_TRANSLATE("Attempting to cancel the updates..."));
-				fCancelButton->SetEnabled(false);
 				Unlock();
 				fUserCancelRequested = true;
 				
@@ -237,7 +300,6 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 			fHeaderView->SetText(B_TRANSLATE("Cancelling updates"));
 			fDetailView->SetText(
 				B_TRANSLATE("Attempting to cancel the updates..."));
-			fCancelButton->SetEnabled(false);
 			Unlock();
 			fUserCancelRequested = true;
 			
@@ -262,10 +324,17 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		
 		case kMsgMoreDetailsToggle:
 			fListView->SetMoreDetails(fDetailsCheckbox->Value() != 0);
+			_WriteSettings();
 			break;
 
 		case kMsgWarningDismissed:
 			fWarningAlertCount--;
+			break;
+		
+		case kMsgWindowFrameChanged:
+			delete fMessageRunner;
+			fMessageRunner = NULL;
+			_WriteSettings();
 			break;
 		
 		case kMsgGetUpdateType:
@@ -461,9 +530,10 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		fProgressLayoutItem->SetVisible(false);
 		fPackagesLayoutItem->SetVisible(false);
 		fDetailsCheckboxLayoutItem->SetVisible(false);
+		fCancelButtonLayoutItem->SetVisible(false);
 	}
 	fCurrentState = state;
-	
+		
 	// Update confirmation button
 	// Show only when asking for confirmation to update
 	if (fCurrentState == STATE_GET_CONFIRMATION) 
@@ -471,24 +541,23 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	else
 		fUpdateButtonLayoutItem->SetVisible(false);
 	
-	// View package info view
+	// View package info view and checkbox
 	// Show at confirmation prompt, hide at final update
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
 		fPackagesLayoutItem->SetVisible(true);
 		fDetailsCheckboxLayoutItem->SetVisible(true);
-		// Re-enable resizing
-		float defaultWidth = fDefaultRect.Width();
-		SetSizeLimits(defaultWidth, 9999,
-			fDefaultRect.Height() + 4 * fListView->ItemHeight(), 9999);
-		ResizeTo(defaultWidth, .75 * defaultWidth);
+		if (fSettingsReadStatus == B_OK) {
+			bool showMoreDetails;
+			status_t result = fInitialSettings.FindBool(kKeyShowDetails,
+				&showMoreDetails);
+			if (result == B_OK) {
+				fDetailsCheckbox->SetValue(showMoreDetails ? 1 : 0);
+				fListView->SetMoreDetails(showMoreDetails);
+			}
+		}
 	} else if (fCurrentState == STATE_FINAL_MESSAGE) {
 		fPackagesLayoutItem->SetVisible(false);
 		fDetailsCheckboxLayoutItem->SetVisible(false);
-		float defaultWidth = fDefaultRect.Width();
-		float defaultHeight = fDefaultRect.Height();
-		SetSizeLimits(defaultWidth, defaultWidth, defaultHeight,
-			defaultHeight);
-		ResizeTo(defaultWidth, defaultHeight);
 	}
 	
 	// Progress bar and string view
@@ -501,10 +570,52 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		fDetailsLayoutItem->SetVisible(true);
 	}
 	
-	// Cancel button
-	if (fCurrentState == STATE_FINAL_MESSAGE)
- 		fCancelButton->SetLabel(B_TRANSLATE("Quit"));
-	fCancelButton->SetEnabled(fCurrentState != STATE_APPLY_UPDATES);
+	// Resizing
+	if (fCurrentState == STATE_GET_CONFIRMATION) {
+		// Enable resizing
+		float defaultWidth = fDefaultRect.Width();
+		SetSizeLimits(defaultWidth, B_SIZE_UNLIMITED,
+			fDefaultRect.Height() + 4 * fListView->ItemHeight(),
+			B_SIZE_UNLIMITED);
+		SetFlags(Flags() ^ B_NOT_RESIZABLE);
+		// Recall saved settings
+		BScreen screen(this);
+		BRect screenFrame = screen.Frame();
+		bool windowResized = false;
+		if (fSettingsReadStatus == B_OK) {
+			BRect windowFrame;
+			status_t result = fInitialSettings.FindRect(kKeyWindowFrame,
+				&windowFrame);
+			if (result == B_OK) {
+				if (screenFrame.Contains(windowFrame)) {
+					ResizeTo(windowFrame.Width(), windowFrame.Height());
+					windowResized = true;
+				}
+			}
+		}
+		if (!windowResized)
+			ResizeTo(defaultWidth, .75 * defaultWidth);
+		// Check that the bottom of window is on screen
+		float screenBottom = screenFrame.bottom;
+		float windowBottom = DecoratorFrame().bottom;
+		if (windowBottom > screenBottom)
+			MoveBy(0, screenBottom - windowBottom);
+		fSaveFrameChanges = true;
+	} else if (fCurrentState == STATE_APPLY_UPDATES)
+		fSaveFrameChanges = false;
+	else if (fCurrentState == STATE_FINAL_MESSAGE) {
+		// Disable resizing
+		fSaveFrameChanges = false;
+		ResizeTo(fDefaultRect.Width(), fDefaultRect.Height());
+		SetFlags(Flags() | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_RESIZABLE);
+	}
+	
+	// Quit button
+	if (fCurrentState == STATE_FINAL_MESSAGE) {
+		fCancelButtonLayoutItem->SetVisible(true);
+ 		fCancelButton->SetLabel(B_TRANSLATE_COMMENT("Quit", "Button label"));
+ 		fCancelButton->MakeDefault(true);
+	}
 	
 	Unlock();
 }
@@ -514,6 +625,35 @@ uint32
 SoftwareUpdaterWindow::_GetState()
 {
 	return fCurrentState;
+}
+
+
+status_t
+SoftwareUpdaterWindow::_WriteSettings()
+{
+	BFile file;
+	status_t status = file.SetTo(fSettingsPath.Path(),
+		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (status == B_OK) {
+		BMessage settings;
+		settings.AddBool(kKeyShowDetails, fDetailsCheckbox->Value() != 0);
+		settings.AddRect(kKeyWindowFrame, Frame());
+		status = settings.Flatten(&file);
+	}
+	file.Unset();
+	return status;
+}
+
+
+status_t
+SoftwareUpdaterWindow::_ReadSettings(BMessage& settings)
+{
+	BFile file;
+	status_t status = file.SetTo(fSettingsPath.Path(), B_READ_ONLY);
+	if (status == B_OK)
+		status = settings.Unflatten(&file);
+	file.Unset();
+	return status;
 }
 
 
@@ -641,28 +781,24 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 {
 	owner->PushState();
 	
-	float width;
-    owner->GetPreferredSize(&width, NULL);
+	float width = owner->Frame().Width();
     float nameWidth = width / 2.0;
-    float offset_width = 0;
+    float offsetWidth = 0;
     bool showMoreDetails = fSuperItem->GetDetailLevel();
 	
 	BBitmap* icon = fSuperItem->GetIcon();
 	if (icon != NULL && icon->IsValid()) {
 		int16 iconSize = fSuperItem->GetIconSize();
 		float offsetMarginHeight = floor((Height() - iconSize) / 2);
-
-		//owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 		owner->SetDrawingMode(B_OP_ALPHA);
 		BPoint location = BPoint(item_rect.left,
 			item_rect.top + offsetMarginHeight);
 		owner->DrawBitmap(icon, location);
 		owner->SetDrawingMode(B_OP_COPY);
+		offsetWidth = iconSize + fLabelOffset;
 		
 		if (fDrawBarFlag)
 			_DrawBar(location, owner, icon_size(iconSize));
-		
-		offset_width += iconSize + fLabelOffset;
 	}
 	
 	owner->SetFont(&fRegularFont);
@@ -672,7 +808,7 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	font_height fontHeight = fSuperItem->GetFontHeight();
     BString name(fName);
     owner->TruncateString(&name, B_TRUNCATE_END, nameWidth);
-	BPoint cursor(item_rect.left + offset_width,
+	BPoint cursor(item_rect.left + offsetWidth,
 		item_rect.bottom - fSmallTotalHeight - fontHeight.descent - 1);
 	if (showMoreDetails)
 		cursor.y -= fSmallTotalHeight + 1;
@@ -694,7 +830,7 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	
 	// Summary
 	BString summary(fSummary);
-	cursor.x = item_rect.left + offset_width;
+	cursor.x = item_rect.left + offsetWidth;
 	cursor.y += fSmallTotalHeight;
 	owner->TruncateString(&summary, B_TRUNCATE_END, width - cursor.x);
 	owner->DrawString(summary.String(), cursor);
@@ -936,7 +1072,7 @@ PackageListView::UpdatePackageProgress(const char* packageName, float percent)
 				fLastProgressItem->ShowProgressBar();
 				break;
 			}
-		}	
+		}
 	}
 	
 	if (fLastProgressItem != NULL) {
@@ -974,6 +1110,8 @@ PackageListView::ItemHeight()
 void
 PackageListView::SetMoreDetails(bool showMore)
 {
+	if (showMore == fShowMoreDetails)
+		return;
 	fShowMoreDetails = showMore;
 	_SetItemHeights();
 	InvalidateLayout();

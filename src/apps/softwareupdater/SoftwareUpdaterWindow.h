@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Alexander von Gluck IV <kallisti5@unixzen.com>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 #ifndef _SOFTWARE_UPDATER_WINDOW_H
 #define _SOFTWARE_UPDATER_WINDOW_H
@@ -13,8 +13,10 @@
 #include <Button.h>
 #include <CheckBox.h>
 #include <GroupView.h>
-#include <OutlineListView.h>
+#include <MessageRunner.h>
 #include <NodeInfo.h>
+#include <OutlineListView.h>
+#include <Path.h>
 #include <Point.h>
 #include <ScrollView.h>
 #include <StatusBar.h>
@@ -134,6 +136,9 @@ private:
 class SoftwareUpdaterWindow : public BWindow {
 public:
 								SoftwareUpdaterWindow();
+			bool				QuitRequested();
+			void				FrameMoved(BPoint newPosition);
+			void				FrameResized(float newWidth, float newHeight);
 			void				MessageReceived(BMessage* message);
 			bool				ConfirmUpdates();
 			void				UpdatesApplying(const char* header,
@@ -159,6 +164,8 @@ private:
 			uint32				_WaitForButtonClick();
 			void				_SetState(uint32 state);
 			uint32				_GetState();
+			status_t			_WriteSettings();
+			status_t			_ReadSettings(BMessage& settings);
 			
 			BRect				fDefaultRect;
 			StripeView*			fStripeView;
@@ -173,6 +180,7 @@ private:
 			BLayoutItem*		fDetailsLayoutItem;
 			BLayoutItem*		fPackagesLayoutItem;
 			BLayoutItem*		fProgressLayoutItem;
+			BLayoutItem*		fCancelButtonLayoutItem;
 			BLayoutItem*		fUpdateButtonLayoutItem;
 			BLayoutItem*		fDetailsCheckboxLayoutItem;
 			
@@ -185,7 +193,12 @@ private:
 			BInvoker			fCancelAlertResponse;
 			int32				fWarningAlertCount;
 			BInvoker			fWarningAlertDismissed;
-			
+			BPath				fSettingsPath;
+			status_t			fSettingsReadStatus;
+			BMessage			fInitialSettings;
+			bool				fSaveFrameChanges;
+			BMessageRunner*		fMessageRunner;
+			BMessage			fFrameChangeMessage;
 };
 
 

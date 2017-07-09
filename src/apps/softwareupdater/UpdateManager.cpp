@@ -6,7 +6,7 @@
  *		Axel Dörfler <axeld@pinc-software.de>
  *		Rene Gollent <rene@gollent.com>
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 
 
@@ -57,9 +57,9 @@ UpdateManager::UpdateManager(BPackageInstallationLocation location,
 UpdateManager::~UpdateManager()
 {
 	if (fStatusWindow != NULL)
-		fStatusWindow->PostMessage(B_QUIT_REQUESTED);
+		fStatusWindow->Quit();
 	if (fProblemWindow != NULL)
-		fProblemWindow->PostMessage(B_QUIT_REQUESTED);
+		fProblemWindow->Quit();
 }
 
 

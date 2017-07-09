@@ -3,12 +3,13 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
 #define kAppSignature "application/x-vnd.haiku-softwareupdater"
+#define kSettingsFilename "SoftwareUpdater_settings"
 
 enum {
 	ACTION_STEP_INIT = 0,
@@ -51,6 +52,7 @@ static const uint32 kMsgNoRepositories = 'iNRE';
 static const uint32 kMsgRegister = 'iREG';
 static const uint32 kMsgFinalQuit = 'iFIN';
 static const uint32 kMsgMoreDetailsToggle = 'iDTO';
+static const uint32 kMsgWindowFrameChanged = 'iWFC';
 
 // Message data keys
 #define kKeyHeader "key_header"
@@ -61,5 +63,8 @@ static const uint32 kMsgMoreDetailsToggle = 'iDTO';
 #define kKeyMessenger "key_messenger"
 #define kKeyAlertResult "key_alertresult"
 
+// Settings keys
+#define kKeyShowDetails "ShowDetails"
+#define kKeyWindowFrame "WindowFrame"
 
 #endif // CONSTANTS_H

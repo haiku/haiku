@@ -5,7 +5,7 @@
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  *		Rene Gollent <rene@gollent.com>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 #ifndef UPDATE_MANAGER_H
 #define UPDATE_MANAGER_H

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 #ifndef _WORKING_LOOPER_H
 #define _WORKING_LOOPER_H

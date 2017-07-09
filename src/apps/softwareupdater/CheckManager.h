@@ -5,7 +5,7 @@
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  *		Rene Gollent <rene@gollent.com>
- *		Brian Hill <supernova@warpmail.net>
+ *		Brian Hill <supernova@tycho.email>
  */
 #ifndef CHECK_MANAGER_H
 #define CHECK_MANAGER_H
