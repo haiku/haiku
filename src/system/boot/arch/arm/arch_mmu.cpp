@@ -17,8 +17,6 @@
 #include <arm_mmu.h>
 #include <kernel.h>
 
-#include <board_config.h>
-
 #include <OS.h>
 
 #include <string.h>
@@ -32,7 +30,7 @@ extern "C" {
 };
 
 
-//#define TRACE_MMU
+#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
@@ -88,13 +86,16 @@ struct memblock {
 };
 
 
+#warning TODO: Plot pref. base from fdt!
 static struct memblock LOADER_MEMORYMAP[] = {
+/*
 	{
 		"devices",
 		DEVICE_BASE,
 		DEVICE_BASE + DEVICE_SIZE - 1,
 		ARM_MMU_L2_FLAG_B,
 	},
+*/
 	{
 		"RAM_kernel", // 8MB space for kernel, drivers etc
 		KERNEL_LOAD_BASE,
@@ -111,7 +112,6 @@ static struct memblock LOADER_MEMORYMAP[] = {
 	},
 #endif
 };
-
 
 //static const uint32 kDefaultPageTableFlags = MMU_FLAG_READWRITE;
 	// not cached not buffered, R/W

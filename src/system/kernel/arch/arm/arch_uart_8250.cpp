@@ -9,7 +9,6 @@
 
 #include <arch/arm/reg.h>
 #include <arch/generic/debug_uart_8250.h>
-#include <board_config.h>
 #include <debug.h>
 #include <new>
 
@@ -42,7 +41,7 @@ void
 ArchUART8250::InitEarly()
 {
 	// Perform special hardware UART configuration
-
+#warning TODO: Detect OMAP3 from fdt!
 #if BOARD_CPU_OMAP3
 	/* UART1 */
 	RMWREG32(CM_FCLKEN1_CORE, 13, 1, 1);

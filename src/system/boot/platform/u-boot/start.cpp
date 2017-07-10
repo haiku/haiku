@@ -20,7 +20,6 @@
 #include <arch/cpu.h>
 #include <platform_arch.h>
 #include <platform/openfirmware/openfirmware.h>
-#include <board_config.h>
 
 #include <string.h>
 

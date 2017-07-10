@@ -6,7 +6,7 @@ STACK_SIZE = 16384;
 ENTRY(_start)
 SECTIONS
 {
-	. = BOARD_LOADER_BASE;
+	. = BOOT_LOADER_BASE;
 
 	/* text/read-only data */
 	.text :	{ *(.text .gnu.linkonce.t.*) }

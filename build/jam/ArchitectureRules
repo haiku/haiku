@@ -233,50 +233,16 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
 
 		case arm :
-			switch $(HAIKU_BOOT_BOARD) {
-				case beagleboard :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case beaglebone :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case neo_freerunner :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case overo :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case rpi2 :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case cubieboard4 :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case verdex :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
-				case * :
-				{
-					Exit "Set HAIKU_BOOT_BOARD for your target ARM device!" ;
-				}
-			}
+			HAIKU_BOOT_PLATFORM ?= u-boot ;
 
+			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
+			# SOC's like allwinner need an offset to skip the hardcoded initial loader
+			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
+
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
+			HAIKU_BOOT_LOADER_BASE ?= 0x1000000 ;
 
 		case x86 :
 			HAIKU_BOOT_PLATFORM ?= bios_ia32 ;
@@ -365,17 +331,20 @@ rule KernelArchitectureSetup architecture
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
-	# Include embedded board-specific file.
-	if $(HAIKU_BOOT_BOARD) {
-		include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
-			BoardSetup ] ;
-		if $(HAIKU_BOARD_LOADER_BASE) {
-			HAIKU_BOOT_LDFLAGS +=
-				--defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
-		}
+	# Any special kernel base addresses
+	if $(HAIKU_BOOT_LOADER_BASE) {
+		HAIKU_BOOT_LDFLAGS +=
+			--defsym BOOT_LOADER_BASE=$(HAIKU_BOOT_LOADER_BASE) ;
 	}
 
 	switch $(cpu) {
+		case arm :
+			# Workaround for ld using 32k for alignment despite forcing it in the config...
+			# should definitely not be needed!
+			HAIKU_KERNEL_LINKFLAGS +=
+			    -Wl,-z -Wl,max-page-size=0x1000
+			    -Wl,-z -Wl,common-page-size=0x1000 ;
+
 		case ppc :
 			# Build a position independent PPC kernel. We need to be able to
 			# relocate the kernel, since the virtual address space layout at
