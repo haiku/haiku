@@ -30,7 +30,7 @@ extern "C" {
 };
 
 
-//#define TRACE_MMU
+#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
