@@ -254,11 +254,6 @@ rule KernelArchitectureSetup architecture
 					HAIKU_BOOT_PLATFORM ?= u-boot ;
 					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 				}
-				case rpi1 :
-				{
-					HAIKU_BOOT_PLATFORM ?= u-boot ;
-					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-				}
 				case rpi2 :
 				{
 					HAIKU_BOOT_PLATFORM ?= u-boot ;

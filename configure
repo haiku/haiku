@@ -85,7 +85,7 @@ options:
                               ones the secondary architectures.
   --target-board <board>      ARM only: Target board to build for.
                               <board> is one of: "beagleboard","beaglebone",
-                              "rpi1","rpi2","cubieboard4","verdex","overo"
+                              "rpi2","cubieboard4","verdex","overo"
   --update                    re-runs last configure invocation [must be given
                               as first option!]
   --use-clang                 Build with host Clang instead of GCC cross
@@ -476,7 +476,6 @@ supportedTargetArchs="
 supportedTargetBoards="
 	beagleboard
 	beaglebone
-	rpi1
 	rpi2
 	cubieboard4
 	verdex

@@ -159,7 +159,7 @@ actions BuildUImageScript1
 # requires mtools package on linux
 rule BuildUBootSDImage image : files
 {
-	Depends $(image) : $(files) ;
+	Depends $(image) : $(files) $(TARGET_DEVICE_TREES) ;
 	SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1MiB
 	SDIMAGE_MTOOLS_H on $(image) = 255 ;
 	SDIMAGE_MTOOLS_S on $(image) = 63 ;
@@ -193,8 +193,12 @@ actions BuildUBootSDImage1
 	# populate
 	MTOOLSRC=$(1).mtools mcopy $(2[1-]) i:
 	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
+	# populate fdts
+	MTOOLSRC=$(1).mtools mmd i:\fdt
+	MTOOLSRC=$(1).mtools mcopy $(TARGET_DEVICE_TREES[1-]) i:\fdt\
 	# list content
 	MTOOLSRC=$(1).mtools mdir i:
+	MTOOLSRC=$(1).mtools mdir i:\fdt
 	# cleanup
 	$(RM) $(1).mtools
 	$(RM) uEnv.txt
@@ -247,16 +251,6 @@ BuildUImage haiku_loader_linux.ub : haiku_loader :
 	-A $(TARGET_ARCH) -O linux -T kernel -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_LINUX)
 		-n 'haiku_loader $(TARGET_BOOT_BOARD)' ;
-
-if $(HAIKU_BOARD_FDT_NAME) {
-	local fdtBinary = $(HAIKU_BOARD_FDT_NAME).dtb ;
-	CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch $(TARGET_ARCH) $(HAIKU_BOARD_FDT_NAME).dts ] ;
-
-	BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) $(fdtBinary) :
-		-A $(TARGET_ARCH) -O $(uImageFakeOS) -T multi -C none
-		-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
-			-n 'haiku_loader $(TARGET_BOOT_BOARD)' ;
-}
 
 if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) :

@@ -36,7 +36,7 @@ ubootFile = [ DownloadFile u-boot.img : $(HAIKU_BOARD_UBOOT_IMAGE_URL)/u-boot.im
 # U-Boot environment
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
-fatload mmc 0 ${fdt_addr_r} $(HAIKU_BOARD_FDT_NAME).dtb \
+fatload mmc 0 ${fdt_addr_r} /fdt/$(HAIKU_BOARD_FDT_NAME).dtb \
     fdt addr ${fdt_addr_r} \
     fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub \
     fatload mmc 0 ${kernel_addr_r} haiku_loader_linux.ub \
@@ -45,7 +45,6 @@ fatload mmc 0 ${fdt_addr_r} $(HAIKU_BOARD_FDT_NAME).dtb \
 HAIKU_BOARD_SDIMAGE_FILES =
 	$(mloFile)
 	$(ubootFile)
-	$(HAIKU_BOARD_FDT_NAME).dtb
 	haiku_loader_linux.ub
 	haiku-floppyboot.tgz.ub
     $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)

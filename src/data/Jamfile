@@ -5,3 +5,8 @@ HaikuSubInclude keyboard_layouts ;
 HaikuSubInclude keymaps ;
 HaikuSubInclude mime_db ;
 HaikuSubInclude settings ;
+
+# Known device trees
+if $(TARGET_ARCH) = "arm" {
+	HaikuSubInclude dts arch $(TARGET_KERNEL_ARCH) ;
+}

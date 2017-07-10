@@ -72,7 +72,7 @@ HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
 setenv bootargs debug_screen true; \
 if mmc rescan; then \
-	fatload mmc 0 0x80100000 $(HAIKU_BOARD_FDT_NAME).dtb ; \
+	fatload mmc 0 0x80100000 /fdt/$(HAIKU_BOARD_FDT_NAME).dtb ; \
 	fatload mmc 0 0x81200000 haiku-floppyboot.tgz.ub; \
 	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_linux.ub; \
 	bootm $(HAIKU_BOARD_LOADER_UIBASE) 0x81200000 0x80100000; \
@@ -86,7 +86,6 @@ HAIKU_BOARD_SDIMAGE_FILES =
 	haiku_loader_linux.ub
 	haiku_loader_nbsd.ub
 	haiku-floppyboot.tgz.ub
-	$(HAIKU_BOARD_FDT_NAME).dtb
 	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
 ;
 

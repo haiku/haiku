@@ -58,7 +58,7 @@ ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
 # it to the proper location. Our image is smaller than 2MB so this works.
 #HAIKU_BOARD_SDIMAGE_UBOOT_UENV_NAME = uEnv.txt ;
 HAIKU_BOARD_SDIMAGE_UBOOT_UENV = "uenvcmd=run loadImage; run mmcboot; \
-		loadImage=fatload mmc0 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_linux.ub; fatload mmc 0 0x80100000 $(HAIKU_BOARD_FDT_NAME).dtb; fatload mmc 0 0x81200000 haiku-floppyboot.tgz.ub; \
+		loadImage=fatload mmc0 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_linux.ub; fatload mmc 0 0x80100000 /fdt/$(HAIKU_BOARD_FDT_NAME).dtb; fatload mmc 0 0x81200000 haiku-floppyboot.tgz.ub; \
 		mmcboot=bootm $(HAIKU_BOARD_LOADER_UIBASE) 0x81200000 0x80100000" ;
 
 HAIKU_BOARD_SDIMAGE_FILES =
@@ -67,7 +67,6 @@ HAIKU_BOARD_SDIMAGE_FILES =
 	haiku_loader_nbsd.ub
 	haiku_loader_linux.ub
 	haiku-floppyboot.tgz.ub
-	$(HAIKU_BOARD_FDT_NAME).dtb
 ;
 
 

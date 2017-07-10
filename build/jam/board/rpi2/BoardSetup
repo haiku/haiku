@@ -35,7 +35,7 @@ HAIKU_BOARD_FIRMWARE_FILES =
 
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
-fatload mmc 0 ${fdt_addr_r} $(HAIKU_BOARD_FDT_NAME).dtb \
+fatload mmc 0 ${fdt_addr_r} /fdt/$(HAIKU_BOARD_FDT_NAME).dtb \
     fdt addr ${fdt_addr_r} \
     fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub \
     fatload mmc 0 ${kernel_addr_r} haiku_loader_linux.ub \
@@ -45,7 +45,6 @@ HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 HAIKU_BOARD_SDIMAGE_FILES = 
 	$(HAIKU_BOARD_FIRMWARE_FILES)
 	$(configFile)
-	$(HAIKU_BOARD_FDT_NAME).dtb
 	$(ubootFile)
 	haiku_loader_linux.ub
 	haiku-floppyboot.tgz.ub
