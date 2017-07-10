@@ -332,9 +332,9 @@ rule KernelArchitectureSetup architecture
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
 	# Any special kernel base addresses
-	if $(HAIKU_BOARD_LOADER_BASE) {
+	if $(HAIKU_BOOT_LOADER_BASE) {
 		HAIKU_BOOT_LDFLAGS +=
-			--defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
+			--defsym BOOT_LOADER_BASE=$(HAIKU_BOOT_LOADER_BASE) ;
 	}
 
 	switch $(cpu) {
