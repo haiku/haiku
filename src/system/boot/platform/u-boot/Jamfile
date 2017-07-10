@@ -233,16 +233,14 @@ actions BlessSDImage1 bind HAIKU_BOARD_SDIMAGE_BOOT0_SEEK HAIKU_BOARD_SDIMAGE_BO
 HAIKU_BOOT_LOADER_ENTRY_LINUX = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIKU_BOOT_LOADER_BASE)|bc` ;
 
 # uimage targets
-local tgzArchive = haiku-floppyboot.tgz ;
-
-BuildUImage $(tgzArchive).ub : $(tgzArchive) :
+BuildUImage haiku-floppyboot.tgz.ub : haiku-floppyboot.tgz :
 	-A $(TARGET_ARCH) -O linux -T ramdisk -C none
-		-n '$(tgzArchive)' ;
+		-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
 
 BuildUImage haiku_loader.ub : haiku_loader :
 	-A $(TARGET_ARCH) -O linux -T kernel -C none
 	-a $(HAIKU_BOOT_LOADER_BASE) -e $(HAIKU_BOOT_LOADER_ENTRY_LINUX)
-		-n 'haiku_loader' ;
+		-n 'Haiku $(TARGET_KERNEL_ARCH) loader' ;
 
 if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) :
@@ -267,7 +265,8 @@ NotFile haiku-flash-uimage ;
 Depends haiku-flash-uimage : haiku-$(TARGET_KERNEL_ARCH)_flash_image_uimage.img ;
 
 # SD/mmc image targets
-BuildUBootSDImage haiku-$(TARGET_KERNEL_ARCH).mmc : $(HAIKU_IMAGE) haiku_loader.ub ;
+BuildUBootSDImage haiku-$(TARGET_KERNEL_ARCH).mmc :
+	$(HAIKU_IMAGE) haiku_loader.ub haiku-floppyboot.tgz.ub ;
 BlessSDImage haiku-$(TARGET_KERNEL_ARCH).mmc ;
 NotFile haiku-mmc-image ;
 Depends haiku-mmc-image : haiku-$(TARGET_KERNEL_ARCH).mmc ;
