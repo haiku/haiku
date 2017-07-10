@@ -19,7 +19,6 @@
 #include <arch/arm/arch_uart_pl011.h>
 #endif
 
-#include <board_config.h>
 #include <boot/platform.h>
 #include <arch/cpu.h>
 #include <boot/stage2.h>
@@ -124,17 +123,8 @@ serial_init(const void *fdt)
 	// first try with hints from the FDT
 	gUART = debug_uart_from_fdt(fdt);
 
-	// fallback to known board UARTs
-	#if defined(BOARD_UART_DEBUG) && defined(BOARD_UART_CLOCK)
-	if (gUART == NULL) {
-		#ifdef BOARD_UART_PL011
-		gUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
-		#else
-		gUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
-		#endif
-	}
-	#endif
-
+	// Do we can some kind of direct fallback here
+	// (aka, guess arch_get_uart_pl011 or arch_get_uart_8250?)
 	if (gUART == NULL)
 		return;
 

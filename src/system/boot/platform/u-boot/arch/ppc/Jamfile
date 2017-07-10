@@ -4,6 +4,7 @@ SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
 UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] 
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
+
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 UseLibraryHeaders [ FDirName libfdt ] ;

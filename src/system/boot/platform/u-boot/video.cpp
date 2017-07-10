@@ -14,7 +14,6 @@
 #include <boot/platform/generic/video.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
-#include <board_config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,6 +103,8 @@ platform_switch_to_text_mode(void)
 extern "C" status_t
 platform_init_video(void)
 {
+
+#warning TODO: Fix u-boot arm framebuffer location from fdt!
 #ifdef __ARM__
 	#if defined(BOARD_CPU_ARM920T)
 		extern ArchFramebuffer *arch_get_fb_arm_920(addr_t base);
