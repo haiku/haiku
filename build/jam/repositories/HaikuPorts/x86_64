@@ -975,9 +975,10 @@ RemotePackageRepository HaikuPorts
 	links-2.8-4
 	live555-2016.06.22-4
 	live555_devel-2016.06.22-4
-	llvm-4.0.0-2
-	llvm_clang-4.0.0-1
-	llvm_clang_analysis-4.0.0-2
+	llvm-4.0.1-1
+	llvm_clang-4.0.1-1
+	llvm_clang_analysis-4.0.1-1
+	llvm_libs-4.0.1-1
 	lm4tools-0.1.3-2
 	lmdb-0.9.21-1
 	lmdb_devel-0.9.21-1
@@ -1018,9 +1019,9 @@ RemotePackageRepository HaikuPorts
 	mdds12_devel-1.2.3-1
 	mdds_devel-1.0.0-2
 	mercurial-3.2.1-4
-	mesa-17.0.2-3
-	mesa_devel-17.0.2-3
-	mesa_swpipe-17.0.2-3
+	mesa-17.1.4-1
+	mesa_devel-17.1.4-1
+	mesa_swpipe-17.1.4-1
 	microbe-20130728-2
 	midikeyboard-1.0.0-5
 	mikmod-3.2.8-1
