@@ -12,17 +12,16 @@
 
 //#include <arch_platform.h>
 #include <arch/debug_console.h>
-#include <arch/generic/debug_uart_8250.h>
-#include <arch/arm/arch_uart_pl011.h>
+#include <arch/generic/debug_uart.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
 #include <vm/vm.h>
 #include <string.h>
 
-#include "board_config.h"
 
-
+// TODO: Declare this in some header
 DebugUART *gArchDebugUART;
+extern DebugUART *debug_uart_from_fdt(const void *fdt);
 
 
 void
@@ -95,12 +94,13 @@ arch_debug_serial_early_boot_message(const char *string)
 status_t
 arch_debug_console_init(kernel_args *args)
 {
-	#if defined(BOARD_UART_PL011)
-	gArchDebugUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
-	#else
-	// More Generic 8250
-	gArchDebugUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
-	#endif
+	// first try with hints from the FDT
+	gArchDebugUART = debug_uart_from_fdt(args->platform_args.fdt);
+
+	// Do we can some kind of direct fallback here
+	// (aka, guess arch_get_uart_pl011 or arch_get_uart_8250?)
+	if (gArchDebugUART == NULL)
+		return B_ERROR;
 
 	gArchDebugUART->InitEarly();
 

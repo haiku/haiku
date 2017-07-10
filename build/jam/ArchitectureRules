@@ -234,6 +234,7 @@ rule KernelArchitectureSetup architecture
 
 		case arm :
 			HAIKU_BOOT_PLATFORM ?= u-boot ;
+			HAIKU_BOARD_LOADER_BASE ?= 0x1000000 ;
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
@@ -325,14 +326,10 @@ rule KernelArchitectureSetup architecture
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
-	# Include embedded board-specific file.
-	if $(HAIKU_BOOT_BOARD) {
-		include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
-			BoardSetup ] ;
-		if $(HAIKU_BOARD_LOADER_BASE) {
-			HAIKU_BOOT_LDFLAGS +=
-				--defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
-		}
+	# Any special kernel base addresses
+	if $(HAIKU_BOARD_LOADER_BASE) {
+		HAIKU_BOOT_LDFLAGS +=
+			--defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
 	}
 
 	switch $(cpu) {
