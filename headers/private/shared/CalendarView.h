@@ -28,11 +28,11 @@ public:
 								BCalendarView(BRect frame, const char* name,
 									uint32 resizeMask = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
-										| B_NAVIGABLE);
+										| B_NAVIGABLE | B_PULSE_NEEDED);
 
 								BCalendarView(const char* name,
 									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
-										| B_NAVIGABLE);
+										| B_NAVIGABLE | B_PULSE_NEEDED);
 
 	virtual						~BCalendarView();
 
@@ -49,7 +49,8 @@ public:
 
 	virtual void				DrawDay(BView* owner, BRect frame,
 									const char* text, bool isSelected = false,
-									bool isEnabled = true, bool focus = false);
+									bool isEnabled = true, bool focus = false,
+									bool highlight = false);
 	virtual void				DrawDayName(BView* owner, BRect frame,
 									const char* text);
 	virtual void				DrawWeekNumber(BView* owner, BRect frame,
@@ -69,6 +70,8 @@ public:
 	virtual void				MouseDown(BPoint where);
 
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
+
+	virtual void				Pulse();
 
 	virtual void				ResizeToPreferred();
 	virtual void				GetPreferredSize(float* width, float* height);
@@ -138,6 +141,7 @@ private:
 			void				_InitObject();
 
 			void				_SetToDay();
+			void				_SetToCurrentDay();
 			void				_GetYearMonthForSelection(
 									const Selection& selection, int32* year,
 									int32* month) const;
@@ -154,12 +158,16 @@ private:
 			void				_DrawDay(int32 curRow, int32 curColumn,
 									int32 row, int32 column, int32 counter,
 									BRect frame, const char* text,
-									bool focus = false);
+									bool focus = false, bool highlight = false);
 			void				_DrawItem(BView* owner, BRect frame,
 									const char* text, bool isSelected = false,
-									bool isEnabled = true, bool focus = false);
+									bool isEnabled = true, bool focus = false,
+									bool highlight = false);
 
 			void				_UpdateSelection();
+			void				_UpdateCurrentDay();
+			void				_UpdateCurrentDate();
+
 			BRect				_FirstCalendarItemFrame() const;
 			BRect				_SetNewSelectedDay(const BPoint& where);
 
@@ -169,6 +177,7 @@ private:
 			BMessage*			fSelectionMessage;
 
 			BDate				fDate;
+			BDate				fCurrentDate;
 
 			Selection			fFocusedDay;
 			Selection			fNewFocusedDay;
@@ -177,6 +186,10 @@ private:
 			Selection			fSelectedDay;
 			Selection			fNewSelectedDay;
 			bool				fSelectionChanged;
+
+			Selection			fCurrentDay;
+			Selection			fNewCurrentDay;
+			bool				fCurrentDayChanged;
 
 			int32				fStartOfWeek;
 			bool				fDayNameHeaderVisible;
