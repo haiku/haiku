@@ -7275,7 +7275,9 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		FileDeviceDeleter() : id(-1) {}
 		~FileDeviceDeleter()
 		{
-			KDiskDeviceManager::Default()->DeleteFileDevice(id);
+			KDiskDeviceManager* ddm = KDiskDeviceManager::Default();
+			if (ddm != NULL)
+				ddm->DeleteFileDevice(id);
 		}
 
 		partition_id id;
@@ -7780,8 +7782,11 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		partition->SetVolumeID(-1);
 		partition->SetMountCookie(NULL);
 
-		if (mount->owns_file_device)
-			KDiskDeviceManager::Default()->DeleteFileDevice(partition->ID());
+		if (mount->owns_file_device) {
+			KDiskDeviceManager* ddm = KDiskDeviceManager::Default();
+			if (ddm != NULL)
+				ddm->DeleteFileDevice(partition->ID());
+		}
 		partition->Unregister();
 	}
 
