@@ -1132,6 +1132,8 @@ RemotePackageRepository HaikuPorts
 	patchutils-0.3.4-2
 	pciutils-3.5.2-2
 	pciutils_devel-3.5.2-2
+	pdflib-5.0.3-3
+	pdfwriter-1.0-2
 	pe-2.4.5-5
 	perl-5.18.2-3
 	phantomlimb-1-5
@@ -2111,6 +2113,8 @@ RemotePackageRepository HaikuPorts
 	patchutils
 	pathtools
 	pciutils
+	pdflib
+	pdfwriter
 	pe
 	perl
 	phantomlimb
