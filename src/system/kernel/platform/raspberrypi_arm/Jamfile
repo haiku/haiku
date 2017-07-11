@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src system kernel platform raspberrypi_arm ;
-
-SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
-SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
-
-KernelMergeObject kernel_platform_raspberrypi_arm.o :
-	platform.cpp
-;
