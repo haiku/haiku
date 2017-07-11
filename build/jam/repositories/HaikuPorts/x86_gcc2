@@ -688,6 +688,8 @@ RemotePackageRepository HaikuPorts
 	cairo_x86_devel-1.12.18-3
 	capstone_x86-3.0.4-1
 	capstone_x86_devel-3.0.4-1
+	cdrtools_x86-3.02~a07-2
+	cdrtools_x86_devel-3.02~a07-2
 	check_x86-0.10.0-2
 	check_x86_devel-0.10.0-2
 	cmake_x86-3.5.2-1
@@ -714,6 +716,8 @@ RemotePackageRepository HaikuPorts
 	enca_x86_devel-1.18-1
 	expat_x86-2.2.0-1
 	expat_x86_devel-2.2.0-1
+	faac_x86-1.28-4
+	faac_x86_devel-1.28-4
 	faad2_x86-2.7-1
 	faad2_x86_devel-2.7-1
 	file_x86-5.25-1
@@ -1201,6 +1205,7 @@ RemotePackageRepository HaikuPorts
 	caya
 	ccache
 	cdrtools
+	cdrtools_x86
 	chat
 	check
 	clipdinger
@@ -1248,6 +1253,7 @@ RemotePackageRepository HaikuPorts
 	exomizer
 	expat
 	faac
+	faac_x86
 	faad2
 	faad2_x86
 	fasm
