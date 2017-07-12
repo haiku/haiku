@@ -269,7 +269,7 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 
 	int32 buffer_count = 0;
 
-	if (group > 0) {
+	if (group != NULL) {
 		if (group->CountBuffers(&buffer_count) != B_OK)
 			return B_ERROR;
 	}
