@@ -776,7 +776,7 @@ AddressTextControl::MessageReceived(BMessage* message)
 							fRefDropMenu = new BPopUpMenu("RecipientMenu");
 
 							while (node.GetNextAttrName(buffer) == B_OK) {
-								if (strstr(buffer, "email") <= 0)
+								if (strstr(buffer, "email") == NULL)
 									continue;
 
 								attr = buffer;
