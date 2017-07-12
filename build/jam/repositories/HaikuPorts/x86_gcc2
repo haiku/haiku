@@ -473,7 +473,9 @@ RemotePackageRepository HaikuPorts
 	patch-2.7.5-1
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
+	pdflib-5.0.3-3
 	pdftranslator-1.0.2-1
+	pdfwriter-1.0-2
 	pe-2.4.5-5
 	pecorename-1.5-4
 	perl-5.18.2-2
@@ -1584,7 +1586,9 @@ RemotePackageRepository HaikuPorts
 	paragui
 	patch
 	pciutils
+	pdflib
 	pdftranslator
+	pdfwriter
 	pe
 	pecorename
 	perl
