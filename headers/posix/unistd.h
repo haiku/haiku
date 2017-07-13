@@ -39,6 +39,7 @@
 	/* TODO: Check this! */
 /* TODO: Update these to the current POSIX version! Ideally after actually
 	supporting the features. */
+#define _POSIX_BARRIERS						(200112L)
 #define _POSIX_SEMAPHORES					(200112L)
 #define _POSIX_THREADS						(200112L)
 #define _POSIX_MAPPED_FILES					(200809L)
