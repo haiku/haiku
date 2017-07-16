@@ -53,7 +53,7 @@ void DUMP_BMESSAGE(BMessage *msg)
 	int32 count = 0;
 
 	DBGMSG(("\t************ START - DUMP BMessage ***********\n"));
-	DBGMSG(("\taddress: 0x%x\n", (int)msg));
+	DBGMSG(("\taddress: %p\n", msg));
 	if (!msg)
 		return;	
 

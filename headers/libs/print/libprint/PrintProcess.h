@@ -39,8 +39,8 @@ public:
 private:
 	BFile *fFile;
 	bool  fReverse;
-	int   fPictureCount;
-	int   fRest;
+	int32 fPictureCount;
+	int32 fRest;
 	off_t fOffset;
 	bool  fHollow;
 };
@@ -49,7 +49,7 @@ typedef list<PageData *>	PageDataList;
 
 class SpoolData {
 public:
-	SpoolData(BFile *file, int page_count, int nup, bool reverse);
+	SpoolData(BFile *file, int32 page_count, int32 nup, bool reverse);
 	~SpoolData();
 	bool startEnum();
 	bool enumObject(PageData **);

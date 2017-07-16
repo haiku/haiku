@@ -54,8 +54,8 @@ PageData::PageData(BFile *file, bool reverse)
 	fHollow  = false;
 
 	if (reverse) {
-		file->Read(&fPictureCount, sizeof(long));
-		DBGMSG(("picture_count = %d\n", (int)fPictureCount));
+		file->Read(&fPictureCount, sizeof(int32));
+		DBGMSG(("picture_count = %" B_PRId32 "\n", fPictureCount));
 		fOffset = fFile->Position();
 		off_t o = fOffset;
 		// seek to start of next page
@@ -75,8 +75,8 @@ PageData::startEnum()
 		return false;
 
 	if (fOffset == 0) {
-		fFile->Read(&fPictureCount, sizeof(long));
-		DBGMSG(("picture_count = %d\n", (int)fPictureCount));
+		fFile->Read(&fPictureCount, sizeof(int32));
+		DBGMSG(("picture_count = %" B_PRId32 "\n", fPictureCount));
 		fOffset = fFile->Position();
 	} else {
 		fFile->Seek(fOffset, SEEK_SET);
@@ -104,15 +104,15 @@ PageData::enumObject(PictureData **picture_data)
 }
 
 
-SpoolData::SpoolData(BFile *file, int page_count, int nup, bool reverse)
+SpoolData::SpoolData(BFile *file, int32 page_count, int32 nup, bool reverse)
 {
-	DBGMSG(("nup        = %d\n", nup));
-	DBGMSG(("page_count = %d\n", page_count));
+	DBGMSG(("nup        = %" B_PRId32 "\n", nup));
+	DBGMSG(("page_count = %" B_PRId32 "\n", page_count));
 	DBGMSG(("reverse    = %s\n", reverse ? "true" : "false"));
 
 	if (reverse) {
 		if (nup > 1) {
-			for (int page_index = 0; page_index < page_count; page_index++) {
+			for (int32 page_index = 0; page_index < page_count; page_index++) {
 				if (page_index % nup == 0) {
 					fPages.push_front(new PageData(file, reverse));
 					fIt = fPages.begin();

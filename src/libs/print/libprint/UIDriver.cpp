@@ -66,7 +66,7 @@ UIDriver::ConfigJob()
 }
 
 
-long
+status_t
 UIDriver::PageSetup(JobData* jobData, PrinterData* printerData,
 	const PrinterCap* printerCap)
 {
@@ -75,7 +75,7 @@ UIDriver::PageSetup(JobData* jobData, PrinterData* printerData,
 }
 
 
-long
+status_t
 UIDriver::JobSetup(JobData *jobData, PrinterData *printerData,
 	const PrinterCap *printerCap)
 {

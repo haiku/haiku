@@ -26,9 +26,9 @@ protected:
 
 			UIDriver&	operator=(const UIDriver &);
 
-	virtual	long		PageSetup(JobData* jobData, PrinterData* printerData,
+	virtual	status_t	PageSetup(JobData* jobData, PrinterData* printerData,
 							const PrinterCap* printerCap);
-	virtual	long		JobSetup(JobData* jobData, PrinterData* printerData,
+	virtual	status_t	JobSetup(JobData* jobData, PrinterData* printerData,
 							const PrinterCap* printerCap);
 
 private:
