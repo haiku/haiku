@@ -19,6 +19,7 @@ static const char kSOH =  1;
 static const char kEOT =  4;
 static const char kACK =  6;
 static const char kNAK = 21;
+static const char kCAN = 24;
 static const char kSUB = 26;
 
 static const int kBlockSize = 128;
@@ -90,6 +91,16 @@ XModemSender::BytesReceived(const uint8_t* data, size_t length)
 					fEotSent = true;
 				}
 				break;
+
+			case kCAN:
+			{
+				BMessage msg(kMsgProgress);
+				msg.AddInt32("pos", 0);
+				msg.AddInt32("size", 0);
+				msg.AddString("info", "Remote cancelled transfer");
+				fListener.SendMessage(&msg);
+				return true;
+			}
 
 			default:
 				break;
