@@ -23,11 +23,13 @@ class XModemSender {
 							BHandler* listener);
 						~XModemSender();
 
-		bool			BytesReceived(const char* data, size_t length);
+		bool			BytesReceived(const uint8_t* data, size_t length);
 	private:
 
 		void			SendBlock();
 		status_t		NextBlock();
+
+		uint16_t		CRC(const uint8_t* buffer, size_t size);
 
 	private:
 		BDataIO*		fSource;
@@ -37,6 +39,7 @@ class XModemSender {
 		off_t			fSourceSize;
 		uint8_t			fBuffer[128];
 		bool			fEotSent;
+		bool			fUseCRC;
 		BString			fStatus;
 };
 

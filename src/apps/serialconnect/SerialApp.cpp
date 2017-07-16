@@ -108,7 +108,7 @@ void SerialApp::MessageReceived(BMessage* message)
 		}
 		case kMsgDataRead:
 		{
-			const char* bytes;
+			const uint8_t* bytes;
 			ssize_t length;
 			message->FindData("data", B_RAW_TYPE, (const void**)&bytes,
 				&length);

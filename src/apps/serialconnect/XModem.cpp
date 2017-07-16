@@ -29,7 +29,8 @@ XModemSender::XModemSender(BDataIO* source, BSerialPort* sink, BHandler* listene
 	fSink(sink),
 	fListener(listener),
 	fBlockNumber(0),
-	fEotSent(false)
+	fEotSent(false),
+	fUseCRC(false)
 {
 	fStatus = "Waiting for receiver" B_UTF8_ELLIPSIS;
 
@@ -50,7 +51,7 @@ XModemSender::~XModemSender()
 
 
 bool
-XModemSender::BytesReceived(const char* data, size_t length)
+XModemSender::BytesReceived(const uint8_t* data, size_t length)
 {
 	size_t i;
 
@@ -58,6 +59,14 @@ XModemSender::BytesReceived(const char* data, size_t length)
 	{
 		switch (data[i])
 		{
+			case 'C':
+				// A 'C' to request the first block is a request to use a CRC
+				// in place of an 8-bit checksum.
+				// In any other place, it is ignored.
+				if (fBlockNumber <= 1)
+					fUseCRC = true;
+				else
+					break;
 			case kNAK:
 				if (fEotSent) {
 					fSink->Write(&kEOT, 1);
@@ -102,12 +111,22 @@ XModemSender::SendBlock()
 	header[1] = fBlockNumber;
 	header[2] = 255 - fBlockNumber;
 
-	for (i = 0; i < kBlockSize; i++)
-		checksum += fBuffer[i];
-
 	fSink->Write(header, 3);
 	fSink->Write(fBuffer, kBlockSize);
-	fSink->Write(&checksum, 1);
+
+	if (fUseCRC) {
+		uint16_t crc = CRC(fBuffer, kBlockSize);
+		uint8_t crcBuf[2];
+		crcBuf[0] = crc >> 8;
+		crcBuf[1] = crc & 0xFF;
+		fSink->Write(crcBuf, 2);
+	} else {
+		// Use a traditional (and fragile) checksum
+		for (i = 0; i < kBlockSize; i++)
+			checksum += fBuffer[i];
+
+		fSink->Write(&checksum, 1);
+	}
 }
 
 
@@ -117,13 +136,32 @@ XModemSender::NextBlock()
 	memset(fBuffer, kSUB, kBlockSize);
 
 	if (fSource->Read(fBuffer, kBlockSize) > 0) {
-		fBlockNumber++;
+		// Notify for progress bar update
 		BMessage msg(kMsgProgress);
 		msg.AddInt32("pos", fBlockNumber);
 		msg.AddInt32("size", fSourceSize / kBlockSize);
 		msg.AddString("info", fStatus);
 		fListener.SendMessage(&msg);
+
+		// Remember that we moved to next block
+		fBlockNumber++;
 		return B_OK;
 	}
 	return B_ERROR;
+}
+
+uint16_t XModemSender::CRC(const uint8_t *buf, size_t len)
+{
+	uint16_t crc = 0;
+	while( len-- ) {
+		int i;
+		crc ^= ((uint16_t)(*buf++)) << 8;
+		for( i = 0; i < 8; ++i ) {
+			if( crc & 0x8000 )
+				crc = (crc << 1) ^ 0x1021;
+			else
+				crc = crc << 1;
+		}
+	}
+	return crc;
 }
