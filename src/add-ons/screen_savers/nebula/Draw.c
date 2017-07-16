@@ -65,15 +65,14 @@ void mblur(char* srcParam, int nbpixels)
 {
 	unsigned int clear1UpperBit = 0x7f7f7f7f;
 	unsigned int clear3UpperBits = 0x1f1f1f1f;
-	unsigned long* src = (unsigned long*)srcParam;
+	unsigned int* src = (unsigned int*)srcParam;
 
 	if ((nbpixels >>= 2) == 0)
 		return;
 
 	do {
-		long eax, ebx;
+		unsigned int eax, ebx;
 		eax = *src;
-		src++;
 
 		ebx = eax;
 		eax >>= 1;
@@ -84,6 +83,7 @@ void mblur(char* srcParam, int nbpixels)
 		ebx &= clear3UpperBits;
 
 		eax += ebx;
-		src[-1] = eax;
+		*src = eax;
+		src++;
 	} while (--nbpixels != 0);
 }
