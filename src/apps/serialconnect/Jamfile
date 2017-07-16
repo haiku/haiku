@@ -10,6 +10,7 @@ Application SerialConnect :
 	SerialApp.cpp
 	SerialWindow.cpp
 	TermView.cpp
+	XModem.cpp
 	encoding.c
 	input.c
 	parser.c

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2017, Adrien Destugues, pulkomandy@gmail.com
  * Distributed under the terms of the MIT licence.
  */
 
@@ -12,6 +12,8 @@
 #include <PropertyInfo.h>
 #include <SerialPort.h>
 #include <String.h>
+
+#include "XModem.h"
 
 
 class BFile;
@@ -44,6 +46,8 @@ class SerialApp: public BApplication
 						BFile*			fLogFile;
 						BString			fPortPath;
 
+						XModemSender*	fFileSender;
+
 		static			status_t		PollSerial(void*);
 
 		static const	BPropertyInfo	kScriptingProperties;
@@ -57,7 +61,9 @@ enum messageConstants {
 	kMsgDataWrite       = 'dawr',
 	kMsgLogfile         = 'logf',
 	kMsgOpenPort        = 'open',
+	kMsgProgress        = 'prog',
 	kMsgSettings        = 'stty',
+	kMsgSendXmodem      = 'xmtx',
 };
 
 #endif

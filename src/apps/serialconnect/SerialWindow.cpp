@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015, Adrien Destugues, pulkomandy@pulkomandy.tk
+ * Copyright 2012-2017, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -15,6 +15,7 @@
 #include <MenuItem.h>
 #include <ScrollView.h>
 #include <SerialPort.h>
+#include <StatusBar.h>
 
 #include "SerialApp.h"
 #include "TermView.h"
@@ -63,18 +64,27 @@ SerialWindow::SerialWindow()
 
 	ResizeTo(r.right - 1, r.bottom + B_H_SCROLL_BAR_HEIGHT - 1);
 
+	r = fTermView->Frame();
+	r.top = r.bottom - 37;
+
+	fStatusBar = new BStatusBar(r, "file transfer progress", NULL, NULL);
+	fStatusBar->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+	fStatusBar->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fStatusBar->Hide();
+
 	AddChild(menuBar);
 	AddChild(fTermView);
 	AddChild(scrollBar);
+	AddChild(fStatusBar);
 
 	fConnectionMenu = new BMenu("Connection");
-	BMenu* fileMenu = new BMenu("File");
+	fFileMenu = new BMenu("File");
 	BMenu* settingsMenu = new BMenu("Settings");
 
 	fConnectionMenu->SetRadioMode(true);
 
 	menuBar->AddItem(fConnectionMenu);
-	menuBar->AddItem(fileMenu);
+	menuBar->AddItem(fFileMenu);
 	menuBar->AddItem(settingsMenu);
 
 	// TODO edit menu - what's in it ?
@@ -83,15 +93,17 @@ SerialWindow::SerialWindow()
 
 	BMenuItem* logFile = new BMenuItem("Log to file" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgLogfile));
-	fileMenu->AddItem(logFile);
-#if 0
+	fFileMenu->AddItem(logFile);
 	// TODO implement these
-	BMenuItem* xmodemSend = new BMenuItem("X/Y/ZModem send" B_UTF8_ELLIPSIS,
-		NULL);
-	fileMenu->AddItem(xmodemSend);
+	BMenuItem* xmodemSend = new BMenuItem("XModem send" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgSendXmodem));
+	fFileMenu->AddItem(xmodemSend);
+	xmodemSend->SetEnabled(false);
+#if 0
 	BMenuItem* xmodemReceive = new BMenuItem(
 		"X/Y/Zmodem receive" B_UTF8_ELLIPSIS, NULL);
-	fileMenu->AddItem(xmodemReceive);
+	fFileMenu->AddItem(xmodemReceive);
+	xmodemReceive->SetEnabled(false);
 #endif
 
 	// Configuring all this by menus may be a bit unhandy. Make a setting
@@ -279,6 +291,18 @@ void SerialWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what)
 	{
+		case kMsgOpenPort:
+		{
+			BString path;
+			bool open = (message->FindString("port name", &path) == B_OK);
+			int i = 1; // Skip "log to file", which woeks even when offline.
+			BMenuItem* item;
+			while((item = fFileMenu->ItemAt(i++)))
+			{
+				item->SetEnabled(open);
+			}
+			return;
+		}
 		case kMsgDataRead:
 		{
 			const char* bytes;
@@ -289,11 +313,13 @@ void SerialWindow::MessageReceived(BMessage* message)
 			return;
 		}
 		case kMsgLogfile:
+		case kMsgSendXmodem:
 		{
 			// Let's lazy init the file panel
 			if (fLogFilePanel == NULL) {
-				fLogFilePanel = new BFilePanel(B_SAVE_PANEL, &be_app_messenger,
-					NULL, B_FILE_NODE, false);
+				fLogFilePanel = new BFilePanel(
+					message->what == kMsgSendXmodem ? B_OPEN_PANEL : B_SAVE_PANEL,
+					&be_app_messenger, NULL, B_FILE_NODE, false);
 				fLogFilePanel->SetMessage(message);
 			}
 			fLogFilePanel->Show();
@@ -389,6 +415,30 @@ void SerialWindow::MessageReceived(BMessage* message)
 				}
 			}
 
+			return;
+		}
+		case kMsgProgress:
+		{
+			// File transfer progress
+			int32 pos = message->FindInt32("pos");
+			int32 size = message->FindInt32("size");
+			BString label = message->FindString("info");
+
+			if (pos >= size) {
+				if (!fStatusBar->IsHidden()) {
+					fStatusBar->Hide();
+					fTermView->ResizeBy(0, fStatusBar->Bounds().Height() - 1);
+				}
+			} else {
+				BString text;
+				text.SetToFormat("%" B_PRId32 "/%" B_PRId32, pos, size);
+				fStatusBar->SetMaxValue(size);
+				fStatusBar->SetTo(pos, label, text);
+				if (fStatusBar->IsHidden()) {
+					fStatusBar->Show();
+					fTermView->ResizeBy(0, -(fStatusBar->Bounds().Height() - 1));
+				}
+			}
 			return;
 		}
 	}
