@@ -1251,8 +1251,8 @@ RemotePackageRepository HaikuPorts
 	sablotron_devel-1.0.3-1
 	samba-3.6.25-4
 	samba_devel-3.6.25-4
-	sane_backends-1.0.27-2
-	sane_backends_devel-1.0.27-2
+	sane_backends-1.0.27-3
+	sane_backends_devel-1.0.27-3
 	sanity-0.6-5
 	sawteeth-1.3-6
 	sbc-1.3-3
