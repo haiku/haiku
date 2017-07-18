@@ -398,6 +398,7 @@ RemotePackageRepository HaikuPorts
 	figlet-222-2
 	file-5.31-1
 	file_devel-5.31-1
+	filwip-1.0.0-8
 	finance-1.0.0-4
 	findutils-4.4.2-5
 	fish-2.6.0-2
@@ -1670,6 +1671,7 @@ RemotePackageRepository HaikuPorts
 	fifechan
 	figlet
 	file
+	filwip
 	finance
 	findutils
 	fish
