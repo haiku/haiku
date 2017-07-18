@@ -3324,10 +3324,13 @@ BWindow::_DetermineTarget(BMessage* message, BHandler* target)
 		{
 			// if we have a default button, it might want to hear
 			// about pressing the <enter> key
+			const int32 kNonLockModifierKeys = B_SHIFT_KEY | B_COMMAND_KEY
+				| B_CONTROL_KEY | B_OPTION_KEY | B_MENU_KEY;
 			int32 rawChar;
 			if (DefaultButton() != NULL
 				&& message->FindInt32("raw_char", &rawChar) == B_OK
-				&& rawChar == B_ENTER)
+				&& rawChar == B_ENTER
+				&& (modifiers() & kNonLockModifierKeys) == 0)
 				return DefaultButton();
 
 			// supposed to fall through
