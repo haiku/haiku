@@ -474,6 +474,9 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		return B_ERROR;
 	}
 
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	fOutputColorSpace = B_RGB32;
+#else
 	// Make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
 	// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the
 	// default colordepth is RGB32).
@@ -481,6 +484,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		fOutputColorSpace = B_YCbCr422;
 	else
 		fOutputColorSpace = B_RGB32;
+#endif
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext != NULL)
