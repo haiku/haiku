@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -583,8 +583,15 @@ rootfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int omode,
 
 
 static status_t
-rootfs_open(fs_volume* _volume, fs_vnode* _v, int oflags, void** _cookie)
+rootfs_open(fs_volume* _volume, fs_vnode* _v, int openMode, void** _cookie)
 {
+	struct rootfs_vnode* vnode = (rootfs_vnode*)_v->private_node;
+
+	if (S_ISDIR(vnode->stream.type) && (openMode & O_RWMASK) != O_RDONLY)
+		return B_IS_A_DIRECTORY;
+	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(vnode->stream.type))
+		return B_NOT_A_DIRECTORY;
+
 	// allow to open the file, but it can't be done anything with it
 
 	*_cookie = NULL;
