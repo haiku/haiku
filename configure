@@ -459,7 +459,7 @@ else
 	exit 1
 fi
 
-haikuRequiredLegacyGCCVersion="2.95.3-haiku-2014_07_26"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-2017_07_20"
 export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 supportedTargetArchs="
