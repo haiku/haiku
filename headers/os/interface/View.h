@@ -514,7 +514,7 @@ public:
 			void				DelayedInvalidate(bigtime_t delay,
 									BRect invalRect);
 
-			void				SetDiskMode(char* filename, long offset);
+			void				SetDiskMode(char* filename, off_t offset);
 
 			void				BeginPicture(BPicture* a_picture);
 			void				AppendToPicture(BPicture* a_picture);
@@ -523,13 +523,13 @@ public:
 			void				DrawPicture(const BPicture* a_picture);
 			void				DrawPicture(const BPicture* a_picture,
 									BPoint where);
-			void				DrawPicture(const char* filename, long offset,
+			void				DrawPicture(const char* filename, off_t offset,
 									BPoint where);
 			void				DrawPictureAsync(const BPicture* a_picture);
 			void				DrawPictureAsync(const BPicture* a_picture,
 									BPoint where);
 			void				DrawPictureAsync(const char* filename,
-									long offset, BPoint where);
+									off_t offset, BPoint where);
 
 			void				BeginLayer(uint8 opacity);
 			void				EndLayer();
