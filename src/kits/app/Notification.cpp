@@ -19,6 +19,8 @@
 
 #include <Bitmap.h>
 #include <Message.h>
+#include <NodeInfo.h>
+#include <Roster.h>
 
 
 BNotification::BNotification(notification_type type)
@@ -30,6 +32,19 @@ BNotification::BNotification(notification_type type)
 	fFile(NULL),
 	fBitmap(NULL)
 {
+	int32 iconSize = B_LARGE_ICON;
+	fBitmap = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
+	if (fBitmap) {
+		team_info teamInfo;
+		get_team_info(B_CURRENT_TEAM, &teamInfo);
+		app_info appInfo;
+		be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
+		if (BNodeInfo::GetTrackerIcon(&appInfo.ref, fBitmap,
+			icon_size(iconSize)) != B_OK) {
+			delete fBitmap;
+			fBitmap = NULL;
+		}
+	}
 }
 
 
