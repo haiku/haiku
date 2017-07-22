@@ -1,7 +1,6 @@
 #ifndef _B_GENERIC_NUMBER_FORMAT_H_
 #define _B_GENERIC_NUMBER_FORMAT_H_
 
-#include <FloatFormatParameters.h>
 #include <IntegerFormatParameters.h>
 
 class BString;
@@ -40,31 +39,12 @@ public:
 							   int32 *fieldCount = NULL,
 							   bool allFieldPositions = false) const;
 
-		status_t FormatFloat(const BFloatFormatParameters *parameters,
-							 double number, BString *buffer,
-							 format_field_position *positions = NULL,
-							 int32 positionCount = 1,
-							 int32 *fieldCount = NULL,
-							 bool allFieldPositions = false) const;
-
-		status_t FormatFloat(const BFloatFormatParameters *parameters,
-							 double number, char *buffer, size_t bufferSize,
-							 format_field_position *positions = NULL,
-							 int32 positionCount = 1,
-							 int32 *fieldCount = NULL,
-							 bool allFieldPositions = false) const;
-
 		// default number format parameters
 
 		status_t SetDefaultIntegerFormatParameters(
 			const BIntegerFormatParameters *parameters);
 		BIntegerFormatParameters *DefaultIntegerFormatParameters();
 		const BIntegerFormatParameters *DefaultIntegerFormatParameters() const;
-
-		status_t SetDefaultFloatFormatParameters(
-			const BFloatFormatParameters *parameters);
-		BFloatFormatParameters *DefaultFloatFormatParameters();
-		const BFloatFormatParameters *DefaultFloatFormatParameters() const;
 
 		// other parameters configuring the formatter
 
@@ -158,7 +138,6 @@ private:
 		static status_t _SetSymbol(Symbol **symbol, const char *str);
 
 		BIntegerFormatParameters	fIntegerParameters;
-		BFloatFormatParameters		fFloatParameters;
 		Symbol						*fDigitSymbols;
 		Symbol						*fFractionSeparator;
 		GroupingInfo				*fGroupingInfo;
