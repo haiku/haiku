@@ -7,9 +7,6 @@
 #include <Collator.h>
 #include <Country.h>
 #include <Currency.h>
-#include <FloatFormat.h>
-#include <FloatFormatImpl.h>
-#include <FloatFormatParameters.h>
 #include <Format.h>
 #include <FormatImpl.h>
 #include <FormatParameters.h>

@@ -37,9 +37,6 @@ local sources =
 
 	# old, needs investigation
 	# Currency.cpp
-	# FloatFormat.cpp
-	# FloatFormatImpl.cpp
-	# FloatFormatParameters.cpp
 	# FormatImpl.cpp
 	# FormatParameters.cpp
 	# GenericNumberFormat.cpp
