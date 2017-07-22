@@ -292,17 +292,16 @@ PNGTranslator::DerivedIdentify(BPositionIO *inSource,
 	return identify_png_header(inSource, outInfo);
 }
 
-
-// Workaround for gcc2 complaining about clobbered variables when we do a
-// setjmp, even though the variables are not accessed when returning from
-// a longjmp. Moving setjmp to a different function is enough to hide the
-// problem from gcc2.
-static int
-setjmp_wrapper(jmp_buf buf)
+void throw_error(png_structp ppng, png_const_charp error_msg)
 {
-	return setjmp(buf);
+	throw std::exception();
 }
 
+void alert_warning(png_structp ppng, png_const_charp error_msg)
+{
+	// Ignore
+	// TODO show a BAlert?
+}
 
 status_t
 PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
@@ -329,156 +328,160 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 		ppng = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!ppng)
 			break;
+
 		// alocate / init memory for image information
 		pinfo = png_create_info_struct(ppng);
 		if (!pinfo)
 			break;
-		// set error handling
-		if (setjmp_wrapper(png_jmpbuf(ppng)))
-			// When an error occurs in libpng, it uses
-			// the longjmp function to continue execution
-			// from this point
-			break;
 
-		// set read callback function
-		png_set_read_fn(ppng, static_cast<void *>(inSource), pngcb_read_data);
+		// set up erorr handling to use C++ exceptions instead of setjmp
+		png_set_error_fn(ppng, png_get_error_ptr(ppng), throw_error,
+			alert_warning);
 
-		// Read in PNG image info
-		png_set_sig_bytes(ppng, 8);
-		png_read_info(ppng, pinfo);
+		try {
+			// set read callback function
+			png_set_read_fn(ppng, static_cast<void *>(inSource), pngcb_read_data);
 
-		png_uint_32 width, height;
-		int bit_depth, color_type, interlace_type;
-		png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
-			&interlace_type, NULL, NULL);
+			// Read in PNG image info
+			png_set_sig_bytes(ppng, 8);
+			png_read_info(ppng, pinfo);
 
-		// Setup image transformations to make converting it easier
-		bool balpha = false;
+			png_uint_32 width, height;
+			int bit_depth, color_type, interlace_type;
+			png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
+				&interlace_type, NULL, NULL);
 
-		if (bit_depth == 16)
-			png_set_strip_16(ppng);
-		else if (bit_depth < 8)
-			png_set_packing(ppng);
+			// Setup image transformations to make converting it easier
+			bool balpha = false;
 
-		if (color_type == PNG_COLOR_TYPE_PALETTE)
-			png_set_palette_to_rgb(ppng);
+			if (bit_depth == 16)
+				png_set_strip_16(ppng);
+			else if (bit_depth < 8)
+				png_set_packing(ppng);
 
-		if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-			// In order to convert from low-depth gray images to RGB,
-			// I first need to convert them to grayscale, 8 bpp
-			png_set_expand_gray_1_2_4_to_8(ppng);
+			if (color_type == PNG_COLOR_TYPE_PALETTE)
+				png_set_palette_to_rgb(ppng);
 
-		if (png_get_valid(ppng, pinfo, PNG_INFO_tRNS)) {
-			// if there is transparency data in the
-			// PNG, but not in the form of an alpha channel
-			balpha = true;
-			png_set_tRNS_to_alpha(ppng);
-		}
-
-		// change RGB to BGR as it is in 'bits'
-		if (color_type & PNG_COLOR_MASK_COLOR)
-			png_set_bgr(ppng);
-
-		// have libpng convert gray to RGB for me
-		if (color_type == PNG_COLOR_TYPE_GRAY ||
-			color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-			png_set_gray_to_rgb(ppng);
-
-		if (color_type & PNG_COLOR_MASK_ALPHA)
-			// if image contains an alpha channel
-			balpha = true;
-
-		if (!balpha)
-			// add filler byte for images without alpha
-			// so that the pixels are 4 bytes each
-			png_set_filler(ppng, 0xff, PNG_FILLER_AFTER);
-
-		// Check that transformed PNG rowbytes matches
-		// what is expected
-		const int32 kbytes = 4;
-		png_uint_32 rowbytes = png_get_rowbytes(ppng, pinfo);
-		if (rowbytes < kbytes * width)
-			rowbytes = kbytes * width;
-
-		if (!bdataonly) {
-			// Write out the data to outDestination
-			// Construct and write Be bitmap header
-			TranslatorBitmap bitsHeader;
-			bitsHeader.magic = B_TRANSLATOR_BITMAP;
-			bitsHeader.bounds.left = 0;
-			bitsHeader.bounds.top = 0;
-			bitsHeader.bounds.right = width - 1;
-			bitsHeader.bounds.bottom = height - 1;
-			bitsHeader.rowBytes = 4 * width;
-			if (balpha)
-				bitsHeader.colors = B_RGBA32;
-			else
-				bitsHeader.colors = B_RGB32;
-			bitsHeader.dataSize = bitsHeader.rowBytes * height;
-			if (swap_data(B_UINT32_TYPE, &bitsHeader,
-				sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK) {
-				result = B_ERROR;
-				break;
+			if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
+				// In order to convert from low-depth gray images to RGB,
+				// I first need to convert them to grayscale, 8 bpp
+				png_set_expand_gray_1_2_4_to_8(ppng);
 			}
-			outDestination->Write(&bitsHeader, sizeof(TranslatorBitmap));
 
-			if (bheaderonly) {
-				result = B_OK;
-				break;
+			if (png_get_valid(ppng, pinfo, PNG_INFO_tRNS)) {
+				// if there is transparency data in the
+				// PNG, but not in the form of an alpha channel
+				balpha = true;
+				png_set_tRNS_to_alpha(ppng);
 			}
-		}
 
-		if (interlace_type == PNG_INTERLACE_NONE) {
-			// allocate buffer for storing PNG row
-			prow = new uint8[rowbytes];
-			if (!prow) {
-				result = B_NO_MEMORY;
-				break;
+			// change RGB to BGR as it is in 'bits'
+			if (color_type & PNG_COLOR_MASK_COLOR)
+				png_set_bgr(ppng);
+
+			// have libpng convert gray to RGB for me
+			if (color_type == PNG_COLOR_TYPE_GRAY ||
+					color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+				png_set_gray_to_rgb(ppng);
 			}
-			for (png_uint_32 i = 0; i < height; i++) {
-				png_read_row(ppng, prow, NULL);
-				outDestination->Write(prow, width * kbytes);
+
+			if (color_type & PNG_COLOR_MASK_ALPHA) {
+				// if image contains an alpha channel
+				balpha = true;
 			}
-			result = B_OK;
-				// Set OK status here, because, in the event of
-				// an error, png_read_end() will longjmp to error
-				// handler above and not execute lines below it
 
-			// finish reading, pass NULL for info because I
-			// don't need the extra data
-			png_read_end(ppng, NULL);
-
-			break;
-
-		} else {
-			// interlaced PNG image
-			prows = new uint8 *[height];
-			if (!prows) {
-				result = B_NO_MEMORY;
-				break;
+			if (!balpha) {
+				// add filler byte for images without alpha
+				// so that the pixels are 4 bytes each
+				png_set_filler(ppng, 0xff, PNG_FILLER_AFTER);
 			}
-			// allocate enough memory to store the whole image
-			for (nalloc = 0; nalloc < height; nalloc++) {
-				prows[nalloc] = new uint8[rowbytes];
-				if (!prows[nalloc])
+
+			// Check that transformed PNG rowbytes matches
+			// what is expected
+			const int32 kbytes = 4;
+			png_uint_32 rowbytes = png_get_rowbytes(ppng, pinfo);
+			if (rowbytes < kbytes * width)
+				rowbytes = kbytes * width;
+
+			if (!bdataonly) {
+				// Write out the data to outDestination
+				// Construct and write Be bitmap header
+				TranslatorBitmap bitsHeader;
+				bitsHeader.magic = B_TRANSLATOR_BITMAP;
+				bitsHeader.bounds.left = 0;
+				bitsHeader.bounds.top = 0;
+				bitsHeader.bounds.right = width - 1;
+				bitsHeader.bounds.bottom = height - 1;
+				bitsHeader.rowBytes = 4 * width;
+				if (balpha)
+					bitsHeader.colors = B_RGBA32;
+				else
+					bitsHeader.colors = B_RGB32;
+				bitsHeader.dataSize = bitsHeader.rowBytes * height;
+				if (swap_data(B_UINT32_TYPE, &bitsHeader,
+					sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK) {
+					result = B_ERROR;
 					break;
+				}
+				outDestination->Write(&bitsHeader, sizeof(TranslatorBitmap));
+
+				if (bheaderonly) {
+					result = B_OK;
+					break;
+				}
 			}
 
-			if (nalloc < height)
-				result = B_NO_MEMORY;
-			else {
-				png_read_image(ppng, prows);
+			if (interlace_type == PNG_INTERLACE_NONE) {
+				// allocate buffer for storing PNG row
+				prow = new uint8[rowbytes];
+				if (!prow) {
+					result = B_NO_MEMORY;
+					break;
+				}
+				for (png_uint_32 i = 0; i < height; i++) {
+					png_read_row(ppng, prow, NULL);
+					outDestination->Write(prow, width * kbytes);
+				}
 
-				for (png_uint_32 i = 0; i < height; i++)
-					outDestination->Write(prows[i], width * kbytes);
-				result = B_OK;
-					// Set OK status here, because, in the event of
-					// an error, png_read_end() will longjmp to error
-					// handler above and not execute lines below it
-
+				// finish reading, pass NULL for info because I
+				// don't need the extra data
 				png_read_end(ppng, NULL);
-			}
+				result = B_OK;
 
+				break;
+
+			} else {
+				// interlaced PNG image
+				prows = new uint8 *[height];
+				if (!prows) {
+					result = B_NO_MEMORY;
+					break;
+				}
+				// allocate enough memory to store the whole image
+				for (nalloc = 0; nalloc < height; nalloc++) {
+					prows[nalloc] = new uint8[rowbytes];
+					if (!prows[nalloc])
+						break;
+				}
+
+				if (nalloc < height)
+					result = B_NO_MEMORY;
+				else {
+					png_read_image(ppng, prows);
+
+					for (png_uint_32 i = 0; i < height; i++)
+						outDestination->Write(prows[i], width * kbytes);
+
+					result = B_OK;
+						// If png_read_end throws an exception, we still accept
+						// the image as valid.
+					png_read_end(ppng, NULL);
+				}
+
+				break;
+			}
+		} catch (std::exception& e) {
+			// An error occured, abort decoding and cleanup
 			break;
 		}
 	}
@@ -840,82 +843,84 @@ PNGTranslator::translate_from_bits_to_png(BPositionIO *inSource,
 			result = B_ERROR;
 			break;
 		}
-		// set error handling
-		if (setjmp_wrapper(png_jmpbuf(ppng))) {
-			// When an error occurs in libpng, it uses
-			// the longjmp function to continue execution
-			// from this point
-			result = B_ERROR;
-			break;
-		}
 
-		png_set_write_fn(ppng, static_cast<void *>(outDestination),
-			pngcb_write_data, pngcb_flush_data);
+		// set up erorr handling to use C++ exceptions instead of setjmp
+		png_set_error_fn(ppng, png_get_error_ptr(ppng), throw_error,
+			alert_warning);
 
-		// Allocate memory needed to buffer image data
-		pbitsrow = new uint8[bitsHeader.rowBytes];
-		if (!pbitsrow) {
-			result = B_NO_MEMORY;
-			break;
-		}
-		if (interlace_type == PNG_INTERLACE_NONE) {
-			prow = new uint8[width * pngBytesPerPixel];
-			if (!prow) {
+		try {
+			png_set_write_fn(ppng, static_cast<void *>(outDestination),
+				pngcb_write_data, pngcb_flush_data);
+
+			// Allocate memory needed to buffer image data
+			pbitsrow = new uint8[bitsHeader.rowBytes];
+			if (!pbitsrow) {
 				result = B_NO_MEMORY;
 				break;
 			}
-		} else {
-			prows = new uint8 *[height];
-			if (!prows) {
-				result = B_NO_MEMORY;
-				break;
-			}
-			// allocate enough memory to store the whole image
-			for (nalloc = 0; nalloc < height; nalloc++) {
-				prows[nalloc] = new uint8[width * pngBytesPerPixel];
-				if (!prows[nalloc])
+			if (interlace_type == PNG_INTERLACE_NONE) {
+				prow = new uint8[width * pngBytesPerPixel];
+				if (!prow) {
+					result = B_NO_MEMORY;
 					break;
+				}
+			} else {
+				prows = new uint8 *[height];
+				if (!prows) {
+					result = B_NO_MEMORY;
+					break;
+				}
+				// allocate enough memory to store the whole image
+				for (nalloc = 0; nalloc < height; nalloc++) {
+					prows[nalloc] = new uint8[width * pngBytesPerPixel];
+					if (!prows[nalloc])
+						break;
+				}
+				if (nalloc < height) {
+					result = B_NO_MEMORY;
+					// clear out rest of the pointers,
+					// so we don't call delete[] with invalid pointers
+					for (; nalloc < height; nalloc++)
+						prows[nalloc] = NULL;
+					break;
+				}
 			}
-			if (nalloc < height) {
-				result = B_NO_MEMORY;
-				// clear out rest of the pointers,
-				// so we don't call delete[] with invalid pointers
-				for (; nalloc < height; nalloc++)
-					prows[nalloc] = NULL;
-				break;
+
+			// Specify image info
+			png_set_IHDR(ppng, pinfo, width, height, bit_depth, color_type,
+				interlace_type, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+			png_write_info(ppng, pinfo);
+
+			png_set_bgr(ppng);
+
+			// write out image data
+			if (interlace_type == PNG_INTERLACE_NONE) {
+				for (png_uint_32 i = 0; i < height; i++) {
+					inSource->Read(pbitsrow, bitsHeader.rowBytes);
+
+					pix_bits_to_png(pbitsrow, prow, bitsHeader.colors, width,
+						pmap, bitsBytesPerPixel);
+
+					png_write_row(ppng, prow);
+				}
+			} else {
+				for (png_uint_32 i = 0; i < height; i++) {
+					inSource->Read(pbitsrow, bitsHeader.rowBytes);
+
+					pix_bits_to_png(pbitsrow, prows[i], bitsHeader.colors,
+						width, pmap, bitsBytesPerPixel);
+				}
+				png_write_image(ppng, prows);
 			}
+			result = B_OK;
+				// If png_read_end throws an exception, we still accept
+				// the image as valid.
+			png_write_end(ppng, NULL);
+
+			break;
+		} catch(std::exception& e) {
+			break;
 		}
-
-		// Specify image info
-		png_set_IHDR(ppng, pinfo, width, height, bit_depth, color_type,
-			interlace_type, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-		png_write_info(ppng, pinfo);
-
-		png_set_bgr(ppng);
-
-		// write out image data
-		if (interlace_type == PNG_INTERLACE_NONE) {
-			for (png_uint_32 i = 0; i < height; i++) {
-				inSource->Read(pbitsrow, bitsHeader.rowBytes);
-
-				pix_bits_to_png(pbitsrow, prow, bitsHeader.colors, width,
-					pmap, bitsBytesPerPixel);
-
-				png_write_row(ppng, prow);
-			}
-		} else {
-			for (png_uint_32 i = 0; i < height; i++) {
-				inSource->Read(pbitsrow, bitsHeader.rowBytes);
-
-				pix_bits_to_png(pbitsrow, prows[i], bitsHeader.colors, width,
-					pmap, bitsBytesPerPixel);
-			}
-			png_write_image(ppng, prows);
-		}
-		png_write_end(ppng, NULL);
-
-		result = B_OK;
-		break;
 	}
 
 	if (ppng) {
