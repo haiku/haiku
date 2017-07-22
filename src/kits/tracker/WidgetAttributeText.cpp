@@ -52,6 +52,7 @@ All rights reserved.
 #include <MessageFormat.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <SupportDefs.h>
 #include <TextView.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -198,11 +199,11 @@ TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 
 	time_t timeValue = (time_t)value;
 
+	// Find the longest possible format that will fit the available space
 	struct {
 		BDateFormatStyle dateStyle;
 		BTimeFormatStyle timeStyle;
-	} formats[5] = {
-		{ B_FULL_DATE_FORMAT, B_MEDIUM_TIME_FORMAT },
+	} formats[] = {
 		{ B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT },
 		{ B_LONG_DATE_FORMAT, B_SHORT_TIME_FORMAT },
 		{ B_MEDIUM_DATE_FORMAT, B_SHORT_TIME_FORMAT },
@@ -211,13 +212,19 @@ TruncTimeBase(BString* outString, int64 value, const View* view, float width)
 
 	BString date;
 	BDateTimeFormat formatter;
-	for (int i = 0; resultWidth > width && i < 5; ++i) {
+	for (unsigned int i = 0; i < B_COUNT_OF(formats); ++i) {
 		if (formatter.Format(date, timeValue, formats[i].dateStyle,
 				formats[i].timeStyle) == B_OK) {
 			resultWidth = view->StringWidth(date.String(), date.Length());
+			if (resultWidth <= width) {
+				// Found a format that fits the available space, stop searching
+				break;
+			}
 		}
 	}
 
+	// If we couldn't fit the date, try with just the time
+	// TODO we could use only the time for "today" dates
 	if (resultWidth > width
 		&& BDateFormat().Format(date, timeValue,
 			B_SHORT_DATE_FORMAT) == B_OK) {
