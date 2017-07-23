@@ -18,20 +18,122 @@
 #include <unicode/numfmt.h>
 
 
+class BNumberFormatImpl {
+public:
+					BNumberFormatImpl();
+					~BNumberFormatImpl();
+
+	NumberFormat*	GetInteger(BFormattingConventions* convention);
+	NumberFormat*	GetFloat(BFormattingConventions* convention);
+	NumberFormat*	GetCurrency(BFormattingConventions* convention);
+
+private:
+	NumberFormat*	fIntegerFormat;
+	NumberFormat*	fFloatFormat;
+	NumberFormat*	fCurrencyFormat;
+};
+
+
+BNumberFormatImpl::BNumberFormatImpl()
+{
+	// They are initialized lazily as needed
+	fIntegerFormat = NULL;
+	fFloatFormat = NULL;
+	fCurrencyFormat = NULL;
+}
+
+
+BNumberFormatImpl::~BNumberFormatImpl()
+{
+	delete fIntegerFormat;
+	delete fFloatFormat;
+	delete fCurrencyFormat;
+}
+
+
+NumberFormat*
+BNumberFormatImpl::GetInteger(BFormattingConventions* convention)
+{
+	if (fIntegerFormat == NULL) {
+		UErrorCode err = U_ZERO_ERROR;
+		fIntegerFormat = NumberFormat::createInstance(
+			*BFormattingConventions::Private(convention).ICULocale(),
+			UNUM_DECIMAL, err);
+
+		if (fIntegerFormat == NULL)
+			return NULL;
+		if (U_FAILURE(err)) {
+			delete fIntegerFormat;
+			fIntegerFormat = NULL;
+			return NULL;
+		}
+	}
+
+	return fIntegerFormat;
+}
+
+
+NumberFormat*
+BNumberFormatImpl::GetFloat(BFormattingConventions* convention)
+{
+	if (fFloatFormat == NULL) {
+		UErrorCode err = U_ZERO_ERROR;
+		fFloatFormat = NumberFormat::createInstance(
+			*BFormattingConventions::Private(convention).ICULocale(),
+			UNUM_DECIMAL, err);
+
+		if (fFloatFormat == NULL)
+			return NULL;
+		if (U_FAILURE(err)) {
+			delete fFloatFormat;
+			fFloatFormat = NULL;
+			return NULL;
+		}
+	}
+
+	return fFloatFormat;
+}
+
+
+NumberFormat*
+BNumberFormatImpl::GetCurrency(BFormattingConventions* convention)
+{
+	if (fCurrencyFormat == NULL) {
+		UErrorCode err = U_ZERO_ERROR;
+		fCurrencyFormat = NumberFormat::createCurrencyInstance(
+			*BFormattingConventions::Private(convention).ICULocale(),
+			err);
+
+		if (fCurrencyFormat == NULL)
+			return NULL;
+		if (U_FAILURE(err)) {
+			delete fCurrencyFormat;
+			fCurrencyFormat = NULL;
+			return NULL;
+		}
+	}
+
+	return fCurrencyFormat;
+}
+
+
 BNumberFormat::BNumberFormat()
 	: BFormat()
 {
+	fPrivateData = new BNumberFormatImpl();
 }
 
 
 BNumberFormat::BNumberFormat(const BNumberFormat &other)
 	: BFormat(other)
 {
+	fPrivateData = new BNumberFormatImpl(*other.fPrivateData);
 }
 
 
 BNumberFormat::~BNumberFormat()
 {
+	delete fPrivateData;
 }
 
 
@@ -39,7 +141,7 @@ BNumberFormat::~BNumberFormat()
 
 
 ssize_t
-BNumberFormat::Format(char* string, size_t maxSize, const double value) const
+BNumberFormat::Format(char* string, size_t maxSize, const double value)
 {
 	BString fullString;
 	status_t status = Format(fullString, value);
@@ -51,20 +153,15 @@ BNumberFormat::Format(char* string, size_t maxSize, const double value) const
 
 
 status_t
-BNumberFormat::Format(BString& string, const double value) const
+BNumberFormat::Format(BString& string, const double value)
 {
-	UErrorCode err = U_ZERO_ERROR;
-	ObjectDeleter<NumberFormat> numberFormatter(NumberFormat::createInstance(
-		*BFormattingConventions::Private(&fConventions).ICULocale(),
-		UNUM_DECIMAL, err));
+	NumberFormat* formatter = fPrivateData->GetFloat(&fConventions);
 
-	if (numberFormatter.Get() == NULL)
+	if (formatter == NULL)
 		return B_NO_MEMORY;
-	if (U_FAILURE(err))
-		return B_BAD_VALUE;
 
 	UnicodeString icuString;
-	numberFormatter->format(value, icuString);
+	formatter->format(value, icuString);
 
 	string.Truncate(0);
 	BStringByteSink stringConverter(&string);
@@ -75,7 +172,7 @@ BNumberFormat::Format(BString& string, const double value) const
 
 
 ssize_t
-BNumberFormat::Format(char* string, size_t maxSize, const int32 value) const
+BNumberFormat::Format(char* string, size_t maxSize, const int32 value)
 {
 	BString fullString;
 	status_t status = Format(fullString, value);
@@ -87,20 +184,15 @@ BNumberFormat::Format(char* string, size_t maxSize, const int32 value) const
 
 
 status_t
-BNumberFormat::Format(BString& string, const int32 value) const
+BNumberFormat::Format(BString& string, const int32 value)
 {
-	UErrorCode err = U_ZERO_ERROR;
-	ObjectDeleter<NumberFormat> numberFormatter(NumberFormat::createInstance(
-		*BFormattingConventions::Private(&fConventions).ICULocale(),
-		UNUM_DECIMAL, err));
+	NumberFormat* formatter = fPrivateData->GetInteger(&fConventions);
 
-	if (numberFormatter.Get() == NULL)
+	if (formatter == NULL)
 		return B_NO_MEMORY;
-	if (U_FAILURE(err))
-		return B_BAD_VALUE;
 
 	UnicodeString icuString;
-	numberFormatter->format((int32_t)value, icuString);
+	formatter->format((int32_t)value, icuString);
 
 	string.Truncate(0);
 	BStringByteSink stringConverter(&string);
@@ -112,7 +204,6 @@ BNumberFormat::Format(BString& string, const int32 value) const
 
 ssize_t
 BNumberFormat::FormatMonetary(char* string, size_t maxSize, const double value)
-	const
 {
 	BString fullString;
 	status_t status = FormatMonetary(fullString, value);
@@ -124,24 +215,15 @@ BNumberFormat::FormatMonetary(char* string, size_t maxSize, const double value)
 
 
 status_t
-BNumberFormat::FormatMonetary(BString& string, const double value) const
+BNumberFormat::FormatMonetary(BString& string, const double value)
 {
-	if (string == NULL)
-		return B_BAD_VALUE;
+	NumberFormat* formatter = fPrivateData->GetCurrency(&fConventions);
 
-	UErrorCode err = U_ZERO_ERROR;
-	ObjectDeleter<NumberFormat> numberFormatter(
-		NumberFormat::createCurrencyInstance(
-			*BFormattingConventions::Private(&fConventions).ICULocale(),
-			err));
-
-	if (numberFormatter.Get() == NULL)
+	if (formatter == NULL)
 		return B_NO_MEMORY;
-	if (U_FAILURE(err))
-		return B_BAD_VALUE;
 
 	UnicodeString icuString;
-	numberFormatter->format(value, icuString);
+	formatter->format(value, icuString);
 
 	string.Truncate(0);
 	BStringByteSink stringConverter(&string);

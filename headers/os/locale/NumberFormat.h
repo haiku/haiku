@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2014, Haiku, Inc.
+ * Copyright 2003-2017, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_NUMBER_FORMAT_H_
@@ -16,30 +16,31 @@ enum BNumberElement {
 	B_NUMBER_ELEMENT_CURRENCY
 };
 
+class BNumberFormatImpl;
+
 
 class BNumberFormat : public BFormat {
 public:
 								BNumberFormat();
-								BNumberFormat(const BNumberFormat &other);
 								~BNumberFormat();
 
-								// formatting
-
 			ssize_t				Format(char* string, size_t maxSize,
-									const double value) const;
-			status_t			Format(BString& string, const double value)
-									const;
+									const double value);
+			status_t			Format(BString& string, const double value);
 			ssize_t				Format(char* string, size_t maxSize,
-									const int32 value) const;
-			status_t			Format(BString& string, const int32 value)
-									const;
-
-								// monetary
+									const int32 value);
+			status_t			Format(BString& string, const int32 value);
 
 			ssize_t				FormatMonetary(char* string, size_t maxSize,
-									const double value) const;
+									const double value);
 			status_t			FormatMonetary(BString& string,
-									const double value) const;
+									const double value);
+
+private:
+								BNumberFormat(const BNumberFormat &other);
+
+private:
+			BNumberFormatImpl*	fPrivateData;
 };
 
 
