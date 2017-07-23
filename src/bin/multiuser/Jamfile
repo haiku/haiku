@@ -11,6 +11,8 @@ StaticLibrary libmultiuser_utils.a : multiuser_utils.cpp ;
 
 BinCommand login : login.cpp : libmultiuser_utils.a ;
 
+BinCommand su : su.cpp : libmultiuser_utils.a ;
+
 BinCommand passwd : passwd.cpp : libmultiuser_utils.a ;
 
 BinCommand useradd : useradd.cpp ;
@@ -23,5 +25,6 @@ BinCommand groupdel : groupdel.cpp ;
 
 BinCommand groupmod : groupmod.cpp : [ TargetLibstdc++ ] ;
 
-# set set-uid bit on passwd
+# set set-uid bit on passwd, su
 MODE on passwd = 04755 ;
+MODE on su = 04755 ;
