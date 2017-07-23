@@ -10,10 +10,8 @@
 
 
 enum BNumberElement {
-	B_NUMBER_ELEMENT_INVALID = B_BAD_DATA,
-	B_NUMBER_ELEMENT_INTEGER = 0,
-	B_NUMBER_ELEMENT_FRACTIONAL,
-	B_NUMBER_ELEMENT_CURRENCY
+	B_DECIMAL_SEPARATOR = 10, // Values 0-9 are reserved for digit symbols
+	B_GROUPING_SEPARATOR,
 };
 
 class BNumberFormatImpl;
@@ -35,6 +33,10 @@ public:
 									const double value);
 			status_t			FormatMonetary(BString& string,
 									const double value);
+
+			status_t			Parse(const BString& string, double& value);
+
+			BString			GetSeparator(BNumberElement element);
 
 private:
 								BNumberFormat(const BNumberFormat &other);

@@ -2,6 +2,7 @@
  * Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Copyright 2012, John Scipione, jscipione@gmail.com
+ * Copyright 2017, Adrien Destugues, pulkomandy@pulkomandy.tk
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +16,8 @@
 
 #include <ICUWrapper.h>
 
+#include <unicode/dcfmtsym.h>
+#include <unicode/decimfmt.h>
 #include <unicode/numfmt.h>
 
 
@@ -230,4 +233,61 @@ BNumberFormat::FormatMonetary(BString& string, const double value)
 	icuString.toUTF8(stringConverter);
 
 	return B_OK;
+}
+
+
+status_t
+BNumberFormat::Parse(const BString& string, double& value)
+{
+	NumberFormat* parser = fPrivateData->GetFloat(&fConventions);
+
+	if (parser == NULL)
+		return B_NO_MEMORY;
+
+	UnicodeString unicode(string.String());
+	Formattable result(0);
+	UErrorCode err = U_ZERO_ERROR;
+
+	parser->parse(unicode, result, err);
+
+	if (err != U_ZERO_ERROR)
+		return B_BAD_DATA;
+
+	value = result.getDouble();
+
+	return B_OK;
+}
+
+
+BString
+BNumberFormat::GetSeparator(BNumberElement element)
+{
+	DecimalFormatSymbols::ENumberFormatSymbol symbol;
+	BString result;
+
+	switch(element) {
+		case B_DECIMAL_SEPARATOR:
+			symbol = DecimalFormatSymbols::kDecimalSeparatorSymbol;
+			break;
+		case B_GROUPING_SEPARATOR:
+			symbol = DecimalFormatSymbols::kGroupingSeparatorSymbol;
+			break;
+
+		default:
+			return result;
+	}
+
+	NumberFormat* format = fPrivateData->GetFloat(&fConventions);
+	DecimalFormat* decimal = dynamic_cast<DecimalFormat*>(format);
+
+	if (decimal == NULL)
+		return result;
+
+	const DecimalFormatSymbols* symbols = decimal->getDecimalFormatSymbols();
+	UnicodeString string = symbols->getSymbol(symbol);
+
+	BStringByteSink stringConverter(&result);
+	string.toUTF8(stringConverter);
+
+	return result;
 }
