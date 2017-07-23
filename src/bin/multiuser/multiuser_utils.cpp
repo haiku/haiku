@@ -172,7 +172,7 @@ authenticate_user(const char* prompt, const char* user, passwd** _passwd,
 
 
 status_t
-setup_environment(struct passwd* passwd, bool preserveEnvironment)
+setup_environment(struct passwd* passwd, bool preserveEnvironment, bool chngdir)
 {
 	const char* term = getenv("TERM");
 	if (!preserveEnvironment) {
@@ -200,12 +200,14 @@ setup_environment(struct passwd* passwd, bool preserveEnvironment)
 	if (passwd->pw_uid && setuid(passwd->pw_uid) != 0)
 		return errno;
 
-	const char* home = getenv("HOME");
-	if (home == NULL)
-		return B_ENTRY_NOT_FOUND;
+	if (chngdir) {
+		const char* home = getenv("HOME");
+		if (home == NULL)
+			return B_ENTRY_NOT_FOUND;
 
-	if (chdir(home) != 0)
-		return errno;
+		if (chdir(home) != 0)
+			return errno;
+	}
 
 	return B_OK;
 }
