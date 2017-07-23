@@ -22,6 +22,7 @@
 
 #include <Bitmap.h>
 #include <Debug.h>
+#include <String.h>
 
 #include "Utilities.h"
 
@@ -126,6 +127,13 @@ AVCodecDecoder::AVCodecDecoder()
 	fDecodedDataBuffer(av_frame_alloc()),
 	fDecodedDataBufferOffset(0),
 	fDecodedDataBufferSize(0)
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+	,
+	fBufferSinkContext(NULL),
+	fBufferSourceContext(NULL),
+	fFilterGraph(NULL),
+	fFilterFrame(NULL)
+#endif
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
 
@@ -163,6 +171,11 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_free(fRawDecodedAudio);
 	av_free(fContext);
 	av_free(fDecodedDataBuffer);
+
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+	av_frame_free(&fFilterFrame);
+	avfilter_graph_free(&fFilterGraph);
+#endif
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext != NULL)
@@ -1641,9 +1654,10 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		} else
 			useDeinterlacedPicture = true;
 #else
-		// avpicture_deinterlace is gone
-		// TODO: implement alternate deinterlace using avfilter
-		TRACE("[v] avpicture_deinterlace() - not implemented\n");
+		// deinterlace implemented using avfilter
+		_ProcessFilterGraph(&deinterlacedPicture, &rawPicture,
+				fContext->pix_fmt, displayWidth, displayHeight);
+		useDeinterlacedPicture = true;
 #endif
 	}
 
@@ -1723,3 +1737,101 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 
 	return B_OK;
 }
+
+
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+
+/*! \brief Init the deinterlace filter graph.
+
+	\returns B_OK the filter graph could be built.
+	\returns B_BAD_VALUE something was wrong with building the graph.
+*/
+status_t
+AVCodecDecoder::_InitFilterGraph(enum AVPixelFormat pixfmt, int32 width,
+	int32 height)
+{
+	if (fFilterGraph != NULL) {
+		av_frame_free(&fFilterFrame);
+		avfilter_graph_free(&fFilterGraph);
+	}
+
+	fFilterGraph = avfilter_graph_alloc();
+
+	BString arguments;
+	arguments.SetToFormat("buffer=video_size=%dx%d:pix_fmt=%d:time_base=1/1:"
+		"pixel_aspect=0/1[in];[in]yadif[out];[out]buffersink", width, height,
+		pixfmt);
+	AVFilterInOut* inputs = NULL;
+	AVFilterInOut* outputs = NULL;
+	TRACE("[v] _InitFilterGraph(): %s\n", arguments.String());
+	int ret = avfilter_graph_parse2(fFilterGraph, arguments.String(), &inputs,
+		&outputs);
+	if (ret < 0) {
+		fprintf(stderr, "avfilter_graph_parse2() failed\n");
+		return B_BAD_VALUE;
+	}
+
+	ret = avfilter_graph_config(fFilterGraph, NULL);
+	if (ret < 0) {
+		fprintf(stderr, "avfilter_graph_config() failed\n");
+		return B_BAD_VALUE;
+	}
+
+	fBufferSourceContext = avfilter_graph_get_filter(fFilterGraph,
+		"Parsed_buffer_0");
+	fBufferSinkContext = avfilter_graph_get_filter(fFilterGraph,
+		"Parsed_buffersink_2");
+	if (fBufferSourceContext == NULL || fBufferSinkContext == NULL) {
+		fprintf(stderr, "avfilter_graph_get_filter() failed\n");
+		return B_BAD_VALUE;
+	}
+	fFilterFrame = av_frame_alloc();
+	fLastWidth = width;
+	fLastHeight = height;
+	fLastPixfmt = pixfmt;
+
+	return B_OK;
+}
+
+
+/*! \brief Process an AVPicture with the deinterlace filter graph.
+
+    We decode exactly one video frame into dst.
+	Equivalent function for avpicture_deinterlace() from version 2.x.
+
+	\returns B_OK video frame successfully deinterlaced.
+	\returns B_BAD_DATA No frame could be output.
+	\returns B_NO_MEMORY Not enough memory available for correct operation.
+*/
+status_t
+AVCodecDecoder::_ProcessFilterGraph(AVPicture *dst, const AVPicture *src,
+	enum AVPixelFormat pixfmt, int32 width, int32 height)
+{
+	if (fFilterGraph == NULL || width != fLastWidth
+		|| height != fLastHeight || pixfmt != fLastPixfmt) {
+
+		status_t err = _InitFilterGraph(pixfmt, width, height);
+		if (err != B_OK)
+			return err;
+	}
+
+	memcpy(fFilterFrame->data, src->data, sizeof(src->data));
+	memcpy(fFilterFrame->linesize, src->linesize, sizeof(src->linesize));
+	fFilterFrame->width = width;
+	fFilterFrame->height = height;
+	fFilterFrame->format = pixfmt;
+
+	int ret = av_buffersrc_add_frame(fBufferSourceContext, fFilterFrame);
+	if (ret < 0)
+		return B_NO_MEMORY;
+
+	ret = av_buffersink_get_frame(fBufferSinkContext, fFilterFrame);
+	if (ret < 0)
+		return B_BAD_DATA;
+
+	av_picture_copy(dst, (const AVPicture *)fFilterFrame, pixfmt, width,
+		height);
+	av_frame_unref(fFilterFrame);
+	return B_OK;
+}
+#endif

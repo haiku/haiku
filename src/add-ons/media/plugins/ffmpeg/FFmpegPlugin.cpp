@@ -87,6 +87,9 @@ FFmpegPlugin::GlobalInitilizer::GlobalInitilizer()
 
 	av_register_all();
 		// This will also call av_codec_init() by registering codecs.
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+	avfilter_register_all();
+#endif
 }
 
 

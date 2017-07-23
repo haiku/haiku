@@ -19,6 +19,11 @@
 
 extern "C" {
 	#include "avcodec.h"
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+	#include "avfilter.h"
+	#include "buffersink.h"
+	#include "buffersrc.h"
+#endif
 	#include "swresample.h"
 	#include "swscale.h"
 }
@@ -95,6 +100,14 @@ private:
 			void		_UpdateMediaHeaderForVideoFrame();
 			status_t	_DeinterlaceAndColorConvertVideoFrame();
 
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+			// video deinterlace filter graph
+			status_t	_InitFilterGraph(enum AVPixelFormat pixfmt,
+							int32 width, int32 height);
+			status_t	_ProcessFilterGraph(AVPicture *dst,
+							const AVPicture *src, enum AVPixelFormat pixfmt,
+							int32 width, int32 height);
+#endif
 
 			media_header		fHeader;
 									// Contains the properties of the current
@@ -144,6 +157,17 @@ private:
 			int32				fDecodedDataBufferSize;
 
 			AVPacket			fTempPacket;
+
+#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
+			// video deinterlace feature
+			AVFilterContext*	fBufferSinkContext;
+			AVFilterContext*	fBufferSourceContext;
+			AVFilterGraph*		fFilterGraph;
+			AVFrame*			fFilterFrame;
+			int32				fLastWidth;
+			int32				fLastHeight;
+			enum AVPixelFormat	fLastPixfmt;
+#endif
 };
 
 #endif // AVCODEC_DECODER_H
