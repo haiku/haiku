@@ -36,13 +36,9 @@ local sources =
 	UnicodeChar.cpp # Already used in FirstBootPrompt.
 
 	# old, needs investigation
-	# Currency.cpp
 	# FormatImpl.cpp
 	# FormatParameters.cpp
 	# GenericNumberFormat.cpp
-	# IntegerFormat.cpp
-	# IntegerFormatImpl.cpp
-	# IntegerFormatParameters.cpp
 	# NumberFormatParameters.cpp
 	;
 

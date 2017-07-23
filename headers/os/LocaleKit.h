@@ -6,15 +6,11 @@
 #include <Catalog.h>
 #include <Collator.h>
 #include <Country.h>
-#include <Currency.h>
 #include <Format.h>
 #include <FormatImpl.h>
 #include <FormatParameters.h>
 #include <FormattingConventions.h>
 #include <GenericNumberFormat.h>
-#include <IntegerFormat.h>
-#include <IntegerFormatImpl.h>
-#include <IntegerFormatParameters.h>
 #include <Language.h>
 #include <Locale.h>
 #include <NumberFormat.h>
