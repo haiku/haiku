@@ -80,6 +80,8 @@ extern "C" {
 	{ PTHREAD_MUTEX_RECURSIVE, 0, -42, -1, 0 }
 #define PTHREAD_COND_INITIALIZER	\
 	{ 0, -42, NULL, 0, 0 }
+#define PTHREAD_RWLOCK_INITIALIZER	\
+	{ 0, -1, {{0}} }
 
 /* mutex functions */
 extern int pthread_mutex_destroy(pthread_mutex_t *mutex);

@@ -12,11 +12,11 @@
 #include <AutoLocker.h>
 #include <libroot_lock.h>
 #include <syscalls.h>
+#include <user_mutex_defs.h>
 #include <user_thread.h>
 #include <util/DoublyLinkedList.h>
 
 #include "pthread_private.h"
-
 
 #define MAX_READER_COUNT	1000000
 
@@ -93,8 +93,8 @@ struct SharedRWLock {
 struct LocalRWLock {
 	uint32_t	flags;
 	int32_t		owner;
-	int32_t		lock_sem;
-	int32_t		lock_count;
+	int32_t		mutex;
+	int32_t		unused;
 	int32_t		reader_count;
 	int32_t		writer_count;
 		// Note, that reader_count and writer_count are not used the same way.
@@ -106,33 +106,47 @@ struct LocalRWLock {
 	{
 		flags = 0;
 		owner = -1;
-		lock_sem = create_sem(0, "pthread rwlock");
-		lock_count = 1;
+		mutex = 0;
 		reader_count = 0;
 		writer_count = 0;
 		new(&waiters) WaiterList;
 
-		return lock_sem >= 0 ? B_OK : EAGAIN;
+		return B_OK;
 	}
 
 	status_t Destroy()
 	{
-		if (lock_sem < 0)
-			return B_BAD_VALUE;
-		return delete_sem(lock_sem) == B_OK ? B_OK : B_BAD_VALUE;
+		Locker locker(this);
+		if (reader_count > 0 || waiters.Head() != NULL || writer_count > 0)
+			return EBUSY;
+		return B_OK;
 	}
 
 	bool StructureLock()
 	{
-		if (atomic_add((int32*)&lock_count, -1) <= 0)
-			acquire_sem(lock_sem);
+		// Enter critical region: lock the mutex
+		int32 status = atomic_or((int32*)&mutex, B_USER_MUTEX_LOCKED);
+
+		// If already locked, call the kernel
+		if ((status & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) != 0) {
+			do {
+				status = _kern_mutex_lock((int32*)&mutex, NULL, 0, 0);
+			} while (status == B_INTERRUPTED);
+
+			if (status != B_OK)
+				return false;
+		}
 		return true;
 	}
 
 	void StructureUnlock()
 	{
-		if (atomic_add((int32*)&lock_count, 1) < 0)
-			release_sem(lock_sem);
+		// Exit critical region: unlock the mutex
+		int32 status = atomic_and((int32*)&mutex,
+			~(int32)B_USER_MUTEX_LOCKED);
+
+		if ((status & B_USER_MUTEX_WAITING) != 0)
+			_kern_mutex_unlock((int32*)&mutex, 0);
 	}
 
 	status_t ReadLock(bigtime_t timeout)

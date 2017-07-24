@@ -105,15 +105,15 @@ struct _pthread_rwlock {
 	__haiku_std_int32	owner;
 	union {
 		struct {
-			__haiku_std_int32	sem;
-		} shared;
-		struct {
-			__haiku_std_int32	lock_sem;
-			__haiku_std_int32	lock_count;
+			__haiku_std_int32	mutex;
+			__haiku_std_int32	unused;
 			__haiku_std_int32	reader_count;
 			__haiku_std_int32	writer_count;
 			void*				waiters[2];
 		} local;
+		struct {
+			__haiku_std_int32	sem;
+		} shared;
 	} u;
 };
 
