@@ -471,6 +471,12 @@ BMediaFile::_UnInit()
 	free(fTrackList);
 	fTrackList = NULL;
 	fTrackNum = 0;
+
+	// Tells the extractor to stop its asynchronous processing
+	// before deleting its source
+	if (fExtractor != NULL)
+		fExtractor->StopProcessing();
+
 	if (fDeleteSource) {
 		delete fSource;
 		fSource = NULL;

@@ -72,6 +72,9 @@ public:
 			status_t			GetStreamMetaData(int32 stream,
 									BMessage* _data) const;
 
+			void				StopProcessing();
+
+
 private:
 			void				_Init(BDataIO* source, int32 flags);
 
