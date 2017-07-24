@@ -4098,7 +4098,7 @@ BView::EndLineArray()
 
 
 void
-BView::SetDiskMode(char* filename, off_t offset)
+BView::SetDiskMode(char* filename, long offset)
 {
 	// TODO: implement
 	// One BeBook version has this to say about SetDiskMode():
@@ -4280,7 +4280,7 @@ BView::DrawPicture(const BPicture* picture, BPoint where)
 
 
 void
-BView::DrawPicture(const char* filename, off_t offset, BPoint where)
+BView::DrawPicture(const char* filename, long offset, BPoint where)
 {
 	if (!filename)
 		return;
@@ -4317,7 +4317,7 @@ BView::DrawPictureAsync(const BPicture* picture, BPoint where)
 
 
 void
-BView::DrawPictureAsync(const char* filename, off_t offset, BPoint where)
+BView::DrawPictureAsync(const char* filename, long offset, BPoint where)
 {
 	if (!filename)
 		return;
