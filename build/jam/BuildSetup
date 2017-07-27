@@ -195,6 +195,7 @@ switch $(HOST_GCC_MACHINE) {
 	case armv7l-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case armv7hl-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case armv7b-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	case aarch64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
 	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
 }
@@ -206,6 +207,7 @@ switch $(HOST_GCC_MACHINE) {
 	case i686-apple-darwin10 :	HOST_PLATFORM_IS_64_BIT = 1 ;
 	case i686-apple-darwin11 :	HOST_PLATFORM_IS_64_BIT = 1 ;
 	case x86_64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+	case aarch64-* :			HOST_PLATFORM_IS_64_BIT = 1 ;
 }
 
 # If HAIKU_HOST_USE_32BIT is set, add the required gcc base flag (the LD flag
