@@ -453,6 +453,7 @@ RepositoriesView::_TaskCompleted(RepoRow* rowItem, int16 count, BString& newName
 	if (kNewRepoDefaultName.Compare(rowItem->Name()) == 0
 		&& newName.Compare("") != 0) {
 		rowItem->SetName(newName.String());
+		_SaveList();
 	}
 	_UpdateFromRepoConfig(rowItem);
 }
@@ -509,8 +510,6 @@ RepositoriesView::AddManualRepository(BString url)
 		return;
 	
 	BString name(kNewRepoDefaultName);
-	BString newPathIdentifier = _GetPathIdentifier(newRepoUrl.Path());
-	bool foundMatchingRoot = false;
 	int32 index;
 	int32 listCount = fListView->CountRows();
 	for (index = 0; index < listCount; index++) {
@@ -524,14 +523,6 @@ RepositoriesView::AddManualRepository(BString url)
 				kOKLabel))->Go(NULL);
 			return;
 		}
-		// Predict the repo name from another url with matching path root
-		if (!foundMatchingRoot) {
-			BString rowPathIdentifier = _GetPathIdentifier(rowRepoUrl.Path());
-			 if (newPathIdentifier.ICompare(rowPathIdentifier) == 0) {
-				foundMatchingRoot = true;
-				name = repoItem->Name();
-			 }
-		}
 	}
 	RepoRow* newRepo = _AddRepo(name, url, false);
 	_FindSiblings();
@@ -539,21 +530,8 @@ RepositoriesView::AddManualRepository(BString url)
 	fListView->AddToSelection(newRepo);
 	_UpdateButtons();
 	_SaveList();
-}
-
-
-BString
-RepositoriesView::_GetPathIdentifier(BString urlPath)
-{
-	// Find second /
-	int32 index = urlPath.FindFirst("/");
-	if (index == B_ERROR)
-		return urlPath;
-	index = urlPath.FindFirst("/", index + 1);
-	if (index == B_ERROR)
-		return urlPath;
-	else
-		return urlPath.Truncate(index);
+	if (fEnableButton->IsEnabled())
+		fEnableButton->Invoke();
 }
 
 

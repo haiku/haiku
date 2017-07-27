@@ -48,7 +48,6 @@ private:
 	void					_UpdateFromRepoConfig(RepoRow* rowItem);
 
 	// GUI functions
-	BString					_GetPathIdentifier(BString urlPath);
 	status_t				_EmptyList();
 	void					_InitList();
 	void					_RefreshList();
