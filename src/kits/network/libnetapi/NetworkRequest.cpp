@@ -107,7 +107,7 @@ BNetworkRequest::_GetLine(BString& destString)
 	fInputBuffer.RemoveData(temporaryBuffer, characterIndex + 1);
 
 	// Strip end-of-line character(s)
-	if (temporaryBuffer[characterIndex - 1] == '\r')
+	if (characterIndex != 0 && temporaryBuffer[characterIndex - 1] == '\r')
 		destString.SetTo(temporaryBuffer, characterIndex - 1);
 	else
 		destString.SetTo(temporaryBuffer, characterIndex);
