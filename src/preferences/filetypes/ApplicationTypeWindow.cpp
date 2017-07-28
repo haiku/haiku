@@ -330,8 +330,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 
 	// Signature
 
-	fSignatureControl = new BTextControl(B_TRANSLATE("Signature:"), NULL,
-		new BMessage(kMsgSignatureChanged));
+	fSignatureControl = new BTextControl("signature",
+		B_TRANSLATE("Signature:"), new BMessage(kMsgSignatureChanged));
 	fSignatureControl->SetModificationMessage(
 		new BMessage(kMsgSignatureChanged));
 
@@ -424,15 +424,15 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	BBox* versionBox = new BBox("versionBox");
 	versionBox->SetLabel(B_TRANSLATE("Version info"));
 
-	fMajorVersionControl = new BTextControl(B_TRANSLATE("Version:"),
-		NULL, NULL, new BMessage(kMsgVersionInfoChanged));
+	fMajorVersionControl = new BTextControl("version major",
+		B_TRANSLATE("Version:"), NULL, new BMessage(kMsgVersionInfoChanged));
 	_MakeNumberTextControl(fMajorVersionControl);
 
-	fMiddleVersionControl = new BTextControl(".", NULL, NULL,
+	fMiddleVersionControl = new BTextControl("version middle", ".", NULL,
 		new BMessage(kMsgVersionInfoChanged));
 	_MakeNumberTextControl(fMiddleVersionControl);
 
-	fMinorVersionControl = new BTextControl(".", NULL, NULL,
+	fMinorVersionControl = new BTextControl("version minor", ".", NULL,
 		new BMessage(kMsgVersionInfoChanged));
 	_MakeNumberTextControl(fMinorVersionControl);
 
@@ -453,11 +453,11 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		new BMessage(kMsgVersionInfoChanged)));
 
 	BMenuField* varietyField = new BMenuField("", fVarietyMenu);
-	fInternalVersionControl = new BTextControl("/", NULL, NULL,
+	fInternalVersionControl = new BTextControl("version internal", "/", NULL,
 		new BMessage(kMsgVersionInfoChanged));
-	fShortDescriptionControl =
-		new BTextControl(B_TRANSLATE("Short description:"), NULL, NULL,
-			new BMessage(kMsgVersionInfoChanged));
+	fShortDescriptionControl = new BTextControl("short description",
+		B_TRANSLATE("Short description:"), NULL,
+		new BMessage(kMsgVersionInfoChanged));
 
 	// TODO: workaround for a GCC 4.1.0 bug? Or is that really what the standard says?
 	version_info versionInfo;
