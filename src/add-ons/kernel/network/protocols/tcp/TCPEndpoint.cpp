@@ -439,8 +439,9 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fReceiveWindow(socket->receive.buffer_size),
 	fReceiveMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fReceiveQueue(socket->receive.buffer_size),
-	fRoundTripTime(TCP_INITIAL_RTT / kTimestampFactor),
-	fRoundTripDeviation(TCP_INITIAL_RTT / kTimestampFactor),
+	fSmoothedRoundTripTime(0),
+	fRoundTripVariation(0),
+	fSendTime(0),
 	fRetransmitTimeout(TCP_INITIAL_RTT),
 	fReceivedTimestamp(0),
 	fCongestionWindow(0),
@@ -2173,6 +2174,9 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
+		if (fSendTime == 0 && (segmentLength != 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE ) == 1))
+			fSendTime = tcp_now();
+
 		if (shouldStartRetransmitTimer && size > 0) {
 			TRACE("starting initial retransmit timer of: %" B_PRIdBIGTIME,
 				fRetransmitTimeout);
@@ -2281,19 +2285,23 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		if (fSendNext < fSendUnacknowledged)
 			fSendNext = fSendUnacknowledged;
 
-		if (segment.options & TCP_HAS_TIMESTAMPS)
-			_UpdateRoundTripTime(tcp_diff_timestamp(segment.timestamp_reply));
-		else {
-			// TODO: Fallback to RFC 793 type estimation; This just resets
-			// any potential exponential back off that happened due to
-			// retransmits.
-			fRetransmitTimeout = TCP_INITIAL_RTT;
+		if (fFlags & FLAG_OPTION_TIMESTAMP) {
+			uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
+			_UpdateRoundTripTime(tcp_diff_timestamp(segment.timestamp_reply),
+				1 + ((flightSize - 1) / (fSendMaxSegmentSize << 1)));
+		}
+
+		// Karn's algorithm: RTT measurement must not be made using segments that were retransmitted
+		else if (fSendTime > 1 && fSendNext == fSendMax) {
+			_UpdateRoundTripTime(tcp_diff_timestamp(fSendTime), 1);
+			fSendTime = 1;
 		}
 
 		if (fSendUnacknowledged == fSendMax) {
 			TRACE("all acknowledged, cancelling retransmission timer");
 			gStackModule->cancel_timer(&fRetransmitTimer);
 			T(TimerSet(this, "retransmit", -1));
+			fSendTime = 0;
 		} else {
 			TRACE("data acknowledged, resetting retransmission timer to: %"
 				B_PRIdBIGTIME, fRetransmitTimeout);
@@ -2337,20 +2345,23 @@ TCPEndpoint::_Retransmit()
 
 
 void
-TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime)
+TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime, uint32 expectedSamples)
 {
-	int32 rtt = roundTripTime;
+	if(fSmoothedRoundTripTime == 0) {
+		fSmoothedRoundTripTime = roundTripTime;
+		fRoundTripVariation = roundTripTime >> 1;
+		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation << 2))
+				* kTimestampFactor;
+	} else {
+		int32 delta = fSmoothedRoundTripTime - roundTripTime;
+		if (delta < 0)
+			delta = -delta;
+		fRoundTripVariation += ((delta - fRoundTripVariation) >> 2) / expectedSamples;
+		fSmoothedRoundTripTime += ((roundTripTime - fSmoothedRoundTripTime) >> 3) / expectedSamples;
+		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation << 2))
+			* kTimestampFactor;
+	}
 
-	// "smooth" round trip time as per Van Jacobson
-	rtt -= fRoundTripTime / 8;
-	fRoundTripTime += rtt;
-	if (rtt < 0)
-		rtt = -rtt;
-	rtt -= fRoundTripDeviation / 4;
-	fRoundTripDeviation += rtt;
-
-	fRetransmitTimeout = ((fRoundTripTime / 4 + fRoundTripDeviation) / 2)
-		* kTimestampFactor;
 	if (fRetransmitTimeout < TCP_MIN_RETRANSMIT_TIMEOUT)
 		fRetransmitTimeout = TCP_MIN_RETRANSMIT_TIMEOUT;
 
@@ -2378,7 +2389,7 @@ TCPEndpoint::_RetransmitTimer(net_timer* timer, void* _endpoint)
 	T(TimerTriggered(endpoint, "retransmit"));
 
 	MutexLocker locker(endpoint->fLock);
-	if (!locker.IsLocked())
+	if (!locker.IsLocked() || gStackModule->is_timer_active(timer))
 		return;
 
 	endpoint->_Retransmit();
@@ -2506,8 +2517,8 @@ TCPEndpoint::Dump() const
 		fInitialReceiveSequence.Number());
 	kprintf("    duplicate acknowledge count: %" B_PRIu32 "\n",
 		fDuplicateAcknowledgeCount);
-	kprintf("  round trip time: %" B_PRId32 " (deviation %" B_PRId32 ")\n",
-		fRoundTripTime, fRoundTripDeviation);
+	kprintf("  smoothed round trip time: %" B_PRId32 " (deviation %" B_PRId32 ")\n",
+		fSmoothedRoundTripTime, fRoundTripVariation);
 	kprintf("  retransmit timeout: %" B_PRId64 "\n", fRetransmitTimeout);
 	kprintf("  congestion window: %" B_PRIu32 "\n", fCongestionWindow);
 	kprintf("  slow start threshold: %" B_PRIu32 "\n", fSlowStartThreshold);
