@@ -1379,6 +1379,13 @@ TCPEndpoint::_AddData(tcp_segment_header& segment, net_buffer* buffer)
 	if ((segment.flags & TCP_FLAG_PUSH) != 0)
 		fReceiveQueue.SetPushPointer();
 
+	if (fSendUnacknowledged == fSendMax) {
+		TRACE("data received, resetting ideal timer to: %"
+				B_PRIdBIGTIME, fRetransmitTimeout);
+		gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+		T(TimerSet(this, "ideal", fRetransmitTimeout));
+	}
+
 	return fReceiveQueue.Available() > 0;
 }
 
@@ -2298,9 +2305,10 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		}
 
 		if (fSendUnacknowledged == fSendMax) {
-			TRACE("all acknowledged, cancelling retransmission timer");
-			gStackModule->cancel_timer(&fRetransmitTimer);
-			T(TimerSet(this, "retransmit", -1));
+			TRACE("all acknowledged, cancelling retransmission timer. Using it as ideal timer for: %"
+				B_PRIdBIGTIME, fRetransmitTimeout);
+			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+			T(TimerSet(this, "ideal", fRetransmitTimeout));
 			fSendTime = 0;
 		} else {
 			TRACE("data acknowledged, resetting retransmission timer to: %"
@@ -2328,6 +2336,21 @@ TCPEndpoint::_Retransmit()
 	if (fState < ESTABLISHED) {
 		fRetransmitTimeout = TCP_SYN_RETRANSMIT_TIMEOUT;
 		fCongestionWindow = fSendMaxSegmentSize;
+	} else if (fSendUnacknowledged == fSendMax) {
+		TRACE("Ideal timeout");
+		// idle period time out - did not receive any segment for a time equal
+		// to the retransmission timeout
+
+		uint32 initialWindow;
+		if (fSendMaxSegmentSize > 2190)
+			initialWindow = 2 * fSendMaxSegmentSize;
+		else if (fSendMaxSegmentSize > 1095)
+			initialWindow = 3 * fSendMaxSegmentSize;
+		else
+			initialWindow = 4 * fSendMaxSegmentSize;
+
+		fCongestionWindow = min_c(initialWindow, fCongestionWindow);
+		return;
 	} else {
 		_ResetSlowStart();
 		fDuplicateAcknowledgeCount = 0;
