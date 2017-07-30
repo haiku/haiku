@@ -2281,18 +2281,15 @@ XHCI::CompleteEvents()
 
 		while (1) {
 			uint32 temp = B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3);
+			uint8 event = TRB_3_TYPE_GET(temp);
 			TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
-				B_PRIx32 ")\n", i, (uint8)TRB_3_TYPE_GET(temp), fEventRing[i].qwtrb0,
+				B_PRIx32 ")\n", i, event, fEventRing[i].qwtrb0,
 				fEventRing[i].dwtrb2, B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3));
 			uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
 			if (j != k)
 				break;
 
-			uint8 event = TRB_3_TYPE_GET(temp);
 
-			TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
-				B_PRIx32 ")\n", i, event, fEventRing[i].qwtrb0,
-				fEventRing[i].dwtrb2, B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3));
 			switch (event) {
 			case TRB_TYPE_COMMAND_COMPLETION:
 				HandleCmdComplete(&fEventRing[i]);
