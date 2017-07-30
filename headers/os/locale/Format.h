@@ -5,7 +5,6 @@
 #ifndef _B_FORMAT_H_
 #define _B_FORMAT_H_
 
-#include <FormatParameters.h>
 #include <FormattingConventions.h>
 #include <Locker.h>
 #include <Language.h>

@@ -7,7 +7,6 @@
 
 
 #include <Format.h>
-#include <FormatParameters.h>
 
 
 class BString;
