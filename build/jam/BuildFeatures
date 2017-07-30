@@ -677,10 +677,5 @@ if $(TARGET_PACKAGING_ARCH) = x86_64 {
 	}
 }
 
-# GPL add-ons
-if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-	EnableBuildFeatures gpl ;
-}
-
 # ATA Drivers + Bus
 EnableBuildFeatures ata ;
