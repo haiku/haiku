@@ -22,4 +22,3 @@ SubInclude HAIKU_TOP src add-ons media plugins wav_reader ;
 # licensed add-ons, you need to run configure with the --include-gpl-addons
 # parameter
 SubIncludeGPL HAIKU_TOP src add-ons media plugins ac3_decoder ;
-#SubIncludeGPL HAIKU_TOP src add-ons media plugins xvid_decoder ;

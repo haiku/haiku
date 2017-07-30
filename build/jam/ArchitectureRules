@@ -593,7 +593,6 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons media plugins theora ;
 	EnableWerror src add-ons media plugins vorbis ;
 #	EnableWerror src add-ons media plugins wav_reader ;
-	EnableWerror src add-ons media plugins xvid_decoder ;
 	EnableWerror src add-ons print ;
 	EnableWerror src add-ons screen_savers ;
 	EnableWerror src add-ons tracker ;
