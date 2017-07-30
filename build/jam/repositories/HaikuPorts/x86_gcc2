@@ -46,7 +46,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
-	2cdt-2016.06.17-1
+	2cdt-2016.10.16-1
 	a_book-1.1-4
 	a52dec-0.7.4-2
 	a52dec_devel-0.7.4-2
@@ -106,7 +106,7 @@ RemotePackageRepository HaikuPorts
 	clockwerk-git-3
 	confuse-2.7-3
 	confuse_devel-2.7-3
-	cpctools-0.3.0-4
+	cpctools-0.3.0-5
 	cpio-2.12-1
 	cppunit-1.12.1-2
 	cppunit_devel-1.12.1-2
@@ -176,7 +176,7 @@ RemotePackageRepository HaikuPorts
 	gcc-2.95.3_2014_10_14-4
 	gcc_syslibs_devel-2.95.3_2014_10_14-4
 	genesis_commander-0.42-2
-	getconf-r260000-1
+	getconf-0.5-1
 	getopt-1.1.6-1
 	gettext-0.19.8.1-4
 	gettext_libintl-0.19.8.1-4
@@ -222,8 +222,6 @@ RemotePackageRepository HaikuPorts
 	hexvexed-1.0.0-2
 	htmldoc-1.8.29-1
 	html_parser-3.71-2
-	hubbub-0.3.0-1
-	hubbub_devel-0.3.0-1
 	icebreaker-1.9.7-1
 	icu-57.1-1
 	icu_devel-57.1-1
@@ -252,8 +250,8 @@ RemotePackageRepository HaikuPorts
 	lame-3.99.5-7
 	lame_devel-3.99.5-7
 	lbreakout2-2.6.5-3
-	lcms-2.5-1
-	lcms_devel-2.5-1
+	lcms-2.5-3
+	lcms_devel-2.5-3
 	leptonica-1.73-4
 	leptonica_devel-1.73-4
 	leptonica_tools-1.73-4
@@ -275,9 +273,9 @@ RemotePackageRepository HaikuPorts
 	libcuefile_devel-r475-1
 	libdca-0.0.5-3
 	libdca_devel-0.0.5-3
-	libdsk-1.5.0-1
-	libdsk_devel-1.5.0-1
-	libdsk_tools-1.5.0-1
+	libdsk-1.5.4-1
+	libdsk_devel-1.5.4-1
+	libdsk_tools-1.5.4-1
 	libdvbpsi-1.2.0-1
 	libdvbpsi_devel-1.2.0-1
 	libdvdcss-1.3.0-1
@@ -354,8 +352,8 @@ RemotePackageRepository HaikuPorts
 	libsndfile_devel-1.0.25-3
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
-	libspectrum-1.1.1-1
-	libspectrum_devel-1.1.1-1
+	libspectrum-1.1.1-2
+	libspectrum_devel-1.1.1-2
 	libssh2-1.5.0-2
 	libssh2_devel-1.5.0-2
 	libtasn1-4.12-1
@@ -370,8 +368,8 @@ RemotePackageRepository HaikuPorts
 	libusb_devel-1.0.20-2
 	libusb_compat-0.1.5-4
 	libusb_compat_devel-0.1.5-4
-	libutf8proc-1.1.6-1
-	libutf8proc_devel-1.1.6-1
+	libutf8proc-1.3.1~2-1
+	libutf8proc_devel-1.3.1~2-1
 	libuuid-1.0.3-3
 	libuuid_devel-1.0.3-3
 	libvorbis-1.3.5-2
@@ -382,8 +380,8 @@ RemotePackageRepository HaikuPorts
 	libwebp_devel-0.6.0-1
 	libwebp5-0.4.4-1
 	libwebp5_devel-0.4.4-1
-	libwebp6-0.5.2-1
-	libwebp6_devel-0.5.2-1
+	libwebp6-0.5.2-2
+	libwebp6_devel-0.5.2-2
 	libx11-1.6.3-2
 	libx11_devel-1.6.3-2
 	libxau-1.0.8-2
@@ -399,7 +397,7 @@ RemotePackageRepository HaikuPorts
 	libzip_devel-0.11.2-1
 	lighttpd-1.4.35-3
 	lighttpd_devel-1.4.35-3
-	links-2.8-2
+	links-2.8-3
 	live555-2016.01.29-3
 	live555_devel-2016.01.29-3
 	lmarbles-1.0.8-2
@@ -467,9 +465,9 @@ RemotePackageRepository HaikuPorts
 	opus_tools-0.1.9-1
 	p7zip-9.20.1-6
 	padblocker-1.0-1
-	paladin-1.4~git-2
-	paragui-1.1.8-1
-	paragui_devel-1.1.8-1
+	paladin-1.4~git-3
+	paragui-1.1.8-3
+	paragui_devel-1.1.8-3
 	patch-2.7.5-1
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
@@ -637,8 +635,8 @@ RemotePackageRepository HaikuPorts
 	yab_ide-2.2.7-2
 	yasm-1.3.0-3
 	zip-3.0-3
-	zlib-1.2.8-4
-	zlib_devel-1.2.8-4
+	zlib-1.2.11-2
+	zlib_devel-1.2.11-2
 	zsh-5.0.7-2
 
 	# secondary architecture (x86)
@@ -655,35 +653,36 @@ RemotePackageRepository HaikuPorts
 	automoc_x86-0.9.88-3
 	avr_binutils_x86-2.26.1_2016_07_22-1
 	avr_gcc_x86-4.8.2_2014_03_20-1
-	avrdude_x86-6.0.1-2
+	avrdude_x86-6.3-1
 	bepdf_x86-2.0.1~beta1-2
 	beshare_x86-2.31-1
 	binutils_x86-2.26.1_2016_07_22-2
 	bison_x86-3.0.4-3
-	boost_x86-1.55.0-6
-	boost_x86_atomic-1.55.0-6
-	boost_x86_chrono-1.55.0-6
-	boost_x86_context-1.55.0-6
-	boost_x86_coroutine-1.55.0-6
-	boost_x86_date_time-1.55.0-6
-	boost_x86_devel-1.55.0-6
-	boost_x86_filesystem-1.55.0-6
-	boost_x86_graph-1.55.0-6
-	boost_x86_iostreams-1.55.0-6
-	boost_x86_locale-1.55.0-6
-	boost_x86_log-1.55.0-6
-	boost_x86_math-1.55.0-6
-	boost_x86_program_options-1.55.0-6
-	boost_x86_random-1.55.0-6
-	boost_x86_regex-1.55.0-6
-	boost_x86_serialization-1.55.0-6
-	boost_x86_signals-1.55.0-6
-	boost_x86_system-1.55.0-6
-	boost_x86_test-1.55.0-6
-	boost_x86_thread-1.55.0-6
-	boost_x86_timer-1.55.0-6
-	boost_x86_unit_test_framework-1.55.0-6
-	boost_x86_wave-1.55.0-6
+	boost_x86-1.57.0-1
+	boost_x86_atomic-1.57.0-1
+	boost_x86_chrono-1.57.0-1
+	boost_x86_container-1.57.0-1
+	boost_x86_context-1.57.0-1
+	boost_x86_coroutine-1.57.0-1
+	boost_x86_date_time-1.57.0-1
+	boost_x86_devel-1.57.0-1
+	boost_x86_filesystem-1.57.0-1
+	boost_x86_graph-1.57.0-1
+	boost_x86_iostreams-1.57.0-1
+	boost_x86_locale-1.57.0-1
+	boost_x86_log-1.57.0-1
+	boost_x86_math-1.57.0-1
+	boost_x86_program_options-1.57.0-1
+	boost_x86_random-1.57.0-1
+	boost_x86_regex-1.57.0-1
+	boost_x86_serialization-1.57.0-1
+	boost_x86_signals-1.57.0-1
+	boost_x86_system-1.57.0-1
+	boost_x86_test-1.57.0-1
+	boost_x86_thread-1.57.0-1
+	boost_x86_timer-1.57.0-1
+	boost_x86_unit_test_framework-1.57.0-1
+	boost_x86_wave-1.57.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
 	cairo_x86-1.12.18-3
@@ -776,8 +775,8 @@ RemotePackageRepository HaikuPorts
 	graphite2_x86_devel-1.3.8-1
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.6.0-1
-	haikuwebkit_x86_devel-1.6.0-1
+	haikuwebkit_x86-1.6.1-1
+	haikuwebkit_x86_devel-1.6.1-1
 	handbrake_x86-0.10.5-1
 	harfbuzz_x86-1.3.0-1
 	harfbuzz_x86_devel-1.3.0-1
@@ -900,8 +899,8 @@ RemotePackageRepository HaikuPorts
 	libnsutils_x86_devel-0.0.3-1
 	libogg_x86-1.3.2-2
 	libogg_x86_devel-1.3.2-2
-	libotr_x86-4.1.0-1
-	libotr_x86_devel-4.1.0-1
+	libotr_x86-4.1.0-2
+	libotr_x86_devel-4.1.0-2
 	libpaper_x86-1.1.24-1
 	libpaper_x86_devel-1.1.24-1
 	libparserutils_x86-0.2.3-1
@@ -995,7 +994,7 @@ RemotePackageRepository HaikuPorts
 	mosh_x86-1.2.4-2
 	mpc_x86-1.0.3-1
 	mpc_x86_devel-1.0.3-1
-	mpd_x86-0.19.10_git-1
+	mpd_x86-0.19.17-1
 	mpfr_x86-3.1.4-1
 	mpfr_x86_devel-3.1.4-1
 	mpg123_x86-1.22.4-1
@@ -1139,8 +1138,8 @@ RemotePackageRepository HaikuPorts
 	xmlroff_x86_devel-0.6.2-2
 	xz_utils_x86-5.2.2-1
 	xz_utils_x86_devel-5.2.2-1
-	zlib_x86-1.2.8-4
-	zlib_x86_devel-1.2.8-4
+	zlib_x86-1.2.11-2
+	zlib_x86_devel-1.2.11-2
 	:
 	# source packages
 	2cdt
@@ -1337,7 +1336,6 @@ RemotePackageRepository HaikuPorts
 	htmldoc
 	html_parser
 	hub
-	hubbub
 	hubbub_x86
 	icebreaker
 	icu
