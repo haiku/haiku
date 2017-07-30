@@ -2019,7 +2019,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		for (; td_chain != NULL; td_chain = td_chain->next_chain) {
 			int64 offset = source - td_chain->this_phy;
 			TRACE("HandleTransferComplete td %p offset %" B_PRId64 " %"
-				B_PRIx64 "\n", td_chain, offset, source);
+				B_PRIxADDR "\n", td_chain, offset, source);
 			offset = offset / sizeof(xhci_trb);
 			if (offset <= td_chain->trb_count && offset >= 0) {
 				TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found "
