@@ -1257,6 +1257,7 @@ command_cp(int argc, const char* const* argv)
 					switch (arg[i]) {
 						case 'a':
 							options.attributesOnly = true;
+							break;
 						case 'd':
 							options.dereference = false;
 							break;
