@@ -10,7 +10,6 @@
 #include <FormatImpl.h>
 #include <FormatParameters.h>
 #include <FormattingConventions.h>
-#include <GenericNumberFormat.h>
 #include <Language.h>
 #include <Locale.h>
 #include <NumberFormat.h>

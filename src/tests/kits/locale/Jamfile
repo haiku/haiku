@@ -14,7 +14,6 @@ Depends LocaleKitTests
 	collatorSpeed
 	collatorTest
 	ICUTest
-#	libNumberFormatTests.so
 	localekittest.so
 	;
 
@@ -30,7 +29,6 @@ LocaleTest catalogSpeed.cpp ;
 LocaleTest catalogTest.cpp ;
 LocaleTest collatorSpeed.cpp ;
 LocaleTest collatorTest.cpp ;
-LocaleTest genericNumberFormatTest.cpp ;
 
 Includes [ FGristFiles ICUTest.cpp ] : [ BuildFeatureAttribute icu : headers ] ;
 	# Dependency needed to trigger downloading/unzipping the package before

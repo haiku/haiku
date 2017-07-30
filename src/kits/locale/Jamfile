@@ -38,7 +38,6 @@ local sources =
 	# old, needs investigation
 	# FormatImpl.cpp
 	# FormatParameters.cpp
-	# GenericNumberFormat.cpp
 	# NumberFormatParameters.cpp
 	;
 
