@@ -148,6 +148,7 @@ main(int argc, char **argv)
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
+			break;
 		}
 		default: {
 			res = targetCatImpl.WriteToFile(outputFile.String());
