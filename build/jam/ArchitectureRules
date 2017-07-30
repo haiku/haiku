@@ -574,7 +574,6 @@ rule ArchitectureSetupWarnings architecture
 #	EnableWerror src add-ons media media-add-ons video_producer_demo ;
 	EnableWerror src add-ons media media-add-ons videowindow ;
 	EnableWerror src add-ons media media-add-ons writer ;
-	EnableWerror src add-ons media plugins ac3_decoder ;
 	EnableWerror src add-ons media plugins aiff_reader ;
 	EnableWerror src add-ons media plugins ape_reader ;
 #	EnableWerror src add-ons media plugins asf_reader ;

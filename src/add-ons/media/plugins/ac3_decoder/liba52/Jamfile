@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src add-ons media plugins ac3_decoder liba52 ;
-
-StaticLibrary liba52.a :
-	bit_allocate.c
-	bitstream.c
-	downmix.c
-	imdct.c
-	parse.c
-;

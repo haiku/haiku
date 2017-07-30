@@ -16,9 +16,3 @@ SubInclude HAIKU_TOP src add-ons media plugins musepack ;
 SubInclude HAIKU_TOP src add-ons media plugins raw_decoder ;
 SubInclude HAIKU_TOP src add-ons media plugins rtsp_streamer ;
 SubInclude HAIKU_TOP src add-ons media plugins wav_reader ;
-
-# The following add-ons are GPL licensed, and can only be used with
-# software whose license is GPL compatible. To include these GPL
-# licensed add-ons, you need to run configure with the --include-gpl-addons
-# parameter
-SubIncludeGPL HAIKU_TOP src add-ons media plugins ac3_decoder ;
