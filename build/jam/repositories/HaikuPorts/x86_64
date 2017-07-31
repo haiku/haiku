@@ -1134,7 +1134,7 @@ RemotePackageRepository HaikuPorts
 	pciutils-3.5.2-2
 	pciutils_devel-3.5.2-2
 	pdflib-5.0.3-3
-	pdfwriter-1.0-2
+	pdfwriter-1.0-3
 	pe-2.4.5-5
 	perl-5.18.2-3
 	phantomlimb-1-5
@@ -1299,8 +1299,8 @@ RemotePackageRepository HaikuPorts
 	shanty-0.4-2
 	sharutils-4.15.2-3
 	shredder-1.0.0-3
-	sip_python-4.19.2-1
-	sip_python3-4.19.2-1
+	sip_python-4.19.3-1
+	sip_python3-4.19.3-1
 	smpeg-0.4.5-6
 	smpeg2-2.0.0-3
 	smpeg2_devel-2.0.0-3
