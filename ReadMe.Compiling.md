@@ -36,7 +36,7 @@ nightly builds.
  * `nasm`
  * `wget`
  * `[un]zip`
- * `cdrtools` (**not** `genisoimage`!)
+ * `cdrtools` (preferred) or `genisoimage`
  * case-sensitive file system
 
 Whether they are installed can be tested by running them in a shell with
