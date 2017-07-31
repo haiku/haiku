@@ -56,10 +56,14 @@ UpdateManager::UpdateManager(BPackageInstallationLocation location,
 
 UpdateManager::~UpdateManager()
 {
-	if (fStatusWindow != NULL)
+	if (fStatusWindow != NULL) {
+		fStatusWindow->Lock();
 		fStatusWindow->Quit();
-	if (fProblemWindow != NULL)
+	}
+	if (fProblemWindow != NULL) {
+		fProblemWindow->Lock();
 		fProblemWindow->Quit();
+	}
 }
 
 
@@ -550,9 +554,6 @@ UpdateManager::_FinalUpdate(const char* header, const char* text)
 		notification.SetGroup("SoftwareUpdater");
 		notification.SetTitle(header);
 		notification.SetContent(text);
-		BBitmap icon(fStatusWindow->GetNotificationIcon());
-		if (icon.IsValid())
-			notification.SetIcon(&icon);
 		notification.Send();
 	}
 	

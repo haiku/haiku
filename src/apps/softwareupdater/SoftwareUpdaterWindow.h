@@ -39,29 +39,27 @@ public:
 								SuperItem(const char* label);
 								~SuperItem();
 	virtual void				DrawItem(BView*, BRect, bool);
-	virtual void				Update(BView *owner, const BFont *font);
-	font_height					GetFontHeight() { return fFontHeight; };
-	float						GetPackageItemHeight()
-									{ return fPackageItemHeight; };
-	BBitmap*					GetIcon() { return fPackageIcon; };
-	int16						GetIconSize() { return fIconSize; };
+	float						GetPackageItemHeight();
+	float						GetPackageItemHeight(bool showMoreDetails);
+	BBitmap*					GetIcon(bool showMoreDetails);
+	float						GetIconSize(bool showMoreDetails);
 	void						SetDetailLevel(bool showMoreDetails);
 	bool						GetDetailLevel() { return fShowMoreDetails; };
-	void						SetItemCount(int32 count)
-									{ fItemCount = count; };
+	void						SetItemCount(int32 count);
+	float						ZoomWidth(BView *owner);
 
 private:
-			void				_SetHeights();
-			void				_GetPackageIcon();
+			BBitmap*			_GetPackageIcon(float listItemHeight);
 			
 			BString				fLabel;
+			BString				fItemText;
 			BFont				fRegularFont;
 			BFont				fBoldFont;
 			bool				fShowMoreDetails;
-			font_height			fFontHeight;
-			float				fPackageItemHeight;
-			BBitmap*			fPackageIcon;
-			int16				fIconSize;
+			font_height			fBoldFontHeight;
+			float				fPackageItemLineHeight;
+			BBitmap*			fPackageLessIcon;
+			BBitmap*			fPackageMoreIcon;
 			int32				fItemCount;
 };
 
@@ -77,11 +75,15 @@ public:
 									SuperItem* super);
 	virtual void				DrawItem(BView*, BRect, bool);
 	virtual void				Update(BView *owner, const BFont *font);
-	void						SetItemHeight(const BFont* font);
+	void						CalculateZoomWidths(BView *owner);
 	int							NameCompare(PackageItem* item);
 	const char*					FileName() { return fFileName.String(); };
 	void						SetDownloadProgress(float percent);
 	void						ShowProgressBar() { fDrawBarFlag = true; };
+	float						MoreDetailsWidth()
+									{ return fMoreDetailsWidth; };
+	float						LessDetailsWidth()
+									{ return fLessDetailsWidth; };
 	
 private:
 			void				_DrawBar(BPoint where, BView* view,
@@ -92,7 +94,6 @@ private:
 			BString				fDetailedVersion;
 			BString				fRepository;
 			BString				fSummary;
-			BFont				fRegularFont;
 			BFont				fSmallFont;
 			font_height			fSmallFontHeight;
 			float				fSmallTotalHeight;
@@ -101,6 +102,8 @@ private:
 			BString				fFileName;
 			float				fDownloadProgress;
 			bool				fDrawBarFlag;
+			float				fMoreDetailsWidth;
+			float				fLessDetailsWidth;
 };
 
 
@@ -108,6 +111,8 @@ class PackageListView : public BOutlineListView {
 public:
 								PackageListView();
 	virtual	void				FrameResized(float newWidth, float newHeight);
+			void				ExpandOrCollapse(BListItem *superItem,
+									bool expand);
 			void				AddPackage(uint32 install_type,
 									const char* name,
 									const char* cur_ver,
@@ -120,6 +125,7 @@ public:
 			void				SortItems();
 			float				ItemHeight();
 			void				SetMoreDetails(bool showMore);
+			BPoint				ZoomPoint();
 
 private:
 			void				_SetItemHeights();
@@ -139,6 +145,7 @@ public:
 			bool				QuitRequested();
 			void				FrameMoved(BPoint newPosition);
 			void				FrameResized(float newWidth, float newHeight);
+			void				Zoom(BPoint origin, float width, float height);
 			void				MessageReceived(BMessage* message);
 			bool				ConfirmUpdates();
 			void				UpdatesApplying(const char* header,
@@ -153,7 +160,6 @@ public:
 									const char* file_name);
 			void				ShowWarningAlert(const char* text);
 			BBitmap				GetIcon(int32 iconSize);
-			BBitmap				GetNotificationIcon();
 			BRect				GetDefaultRect() { return fDefaultRect; };
 			BPoint				GetLocation() { return Frame().LeftTop(); };
 			BLayoutItem*		layout_item_for(BView* view);
@@ -199,6 +205,8 @@ private:
 			bool				fSaveFrameChanges;
 			BMessageRunner*		fMessageRunner;
 			BMessage			fFrameChangeMessage;
+			float				fZoomHeightBaseline;
+			float				fZoomWidthBaseline;
 };
 
 

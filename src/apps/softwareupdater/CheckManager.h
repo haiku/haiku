@@ -64,7 +64,6 @@ private:
 									int32& updateCount);
 			void				_SendNotification(const char* title,
 									const char* text);
-			BBitmap				_GetIcon();
 
 private:
 			BPackageManager::ClientInstallationInterface

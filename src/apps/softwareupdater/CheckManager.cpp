@@ -308,22 +308,5 @@ CheckManager::_SendNotification(const char* title, const char* text)
 	notification.SetOnClickApp(kAppSignature);
 	if(fVerbose)
 		notification.SetMessageID(fNotificationId);
-	BBitmap icon(_GetIcon());
-	if (icon.IsValid())
-		notification.SetIcon(&icon);
 	notification.Send();
-}
-
-
-BBitmap
-CheckManager::_GetIcon()
-{
-	int32 iconSize = B_LARGE_ICON;
-	BBitmap icon(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
-	team_info teamInfo;
-	get_team_info(B_CURRENT_TEAM, &teamInfo);
-	app_info appInfo;
-	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-	BNodeInfo::GetTrackerIcon(&appInfo.ref, &icon, icon_size(iconSize));
-	return icon;
 }

@@ -150,6 +150,15 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fCancelAlertResponse.SetTarget(this);
 	fWarningAlertDismissed.SetMessage(new BMessage(kMsgWarningDismissed));
 	fWarningAlertDismissed.SetTarget(this);
+	
+	// Common elements used for the zoom height and width calculations
+	fZoomHeightBaseline = 6
+		+ be_control_look->ComposeSpacing(B_USE_SMALL_SPACING)
+		+ 2 * be_control_look->ComposeSpacing(B_USE_WINDOW_SPACING);
+	fZoomWidthBaseline = fStripeView->PreferredSize().Width()
+		+ be_control_look->ComposeSpacing(B_USE_ITEM_SPACING)
+		+ fScrollView->ScrollBar(B_VERTICAL)->PreferredSize().Width()
+		+ be_control_look->ComposeSpacing(B_USE_WINDOW_SPACING);
 }
 
 
@@ -192,6 +201,15 @@ SoftwareUpdaterWindow::FrameResized(float newWidth, float newHeight)
 		} else
 			fMessageRunner->SetInterval(500000);
 	}
+}
+
+
+void
+SoftwareUpdaterWindow::Zoom(BPoint origin, float width, float height)
+{
+	// Override default zoom behavior and keep window at same position instead
+	// of centering on screen
+	BWindow::Zoom(Frame().LeftTop(), width, height);
 }
 
 
@@ -324,9 +342,32 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 		
 		case kMsgMoreDetailsToggle:
 			fListView->SetMoreDetails(fDetailsCheckbox->Value() != 0);
+			PostMessage(kMsgSetZoomLimits);
 			_WriteSettings();
 			break;
 
+		case kMsgSetZoomLimits:
+		{
+			int32 count = fListView->CountItems();
+			if (count < 1)
+				break;
+			// Convert last item's bottom point to its layout group coordinates
+			BPoint zoomPoint = fListView->ZoomPoint();
+			fScrollView->ConvertToParent(&zoomPoint);
+			// Determine which BControl object height to use
+			float controlHeight;
+			if (fUpdateButtonLayoutItem->IsVisible())
+				fUpdateButton->GetPreferredSize(NULL, &controlHeight);
+			else
+				fDetailsCheckbox->GetPreferredSize(NULL, &controlHeight);
+			// Calculate height and width values
+			float zoomHeight = fZoomHeightBaseline + zoomPoint.y
+				+ controlHeight;
+			float zoomWidth = fZoomWidthBaseline + zoomPoint.x;
+			SetZoomLimits(zoomWidth, zoomHeight);
+			break;
+		}
+		
 		case kMsgWarningDismissed:
 			fWarningAlertCount--;
 			break;
@@ -474,13 +515,6 @@ SoftwareUpdaterWindow::GetIcon(int32 iconSize)
 }
 
 
-BBitmap
-SoftwareUpdaterWindow::GetNotificationIcon()
-{
-	return GetIcon(B_LARGE_ICON);
-}
-
-
 void
 SoftwareUpdaterWindow::FinalUpdate(const char* header, const char* detail)
 {
@@ -570,14 +604,15 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		fDetailsLayoutItem->SetVisible(true);
 	}
 	
-	// Resizing
+	// Resizing and zooming
 	if (fCurrentState == STATE_GET_CONFIRMATION) {
-		// Enable resizing
+		// Enable resizing and zooming
 		float defaultWidth = fDefaultRect.Width();
 		SetSizeLimits(defaultWidth, B_SIZE_UNLIMITED,
 			fDefaultRect.Height() + 4 * fListView->ItemHeight(),
 			B_SIZE_UNLIMITED);
-		SetFlags(Flags() ^ B_NOT_RESIZABLE);
+		SetFlags(Flags() ^ (B_NOT_RESIZABLE | B_NOT_ZOOMABLE));
+		PostMessage(kMsgSetZoomLimits);
 		// Recall saved settings
 		BScreen screen(this);
 		BRect screenFrame = screen.Frame();
@@ -601,13 +636,17 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		if (windowBottom > screenBottom)
 			MoveBy(0, screenBottom - windowBottom);
 		fSaveFrameChanges = true;
+	} else if (fUpdateConfirmed && (fCurrentState == STATE_DISPLAY_PROGRESS
+			|| fCurrentState == STATE_DISPLAY_STATUS)) {
+		PostMessage(kMsgSetZoomLimits);
 	} else if (fCurrentState == STATE_APPLY_UPDATES)
 		fSaveFrameChanges = false;
 	else if (fCurrentState == STATE_FINAL_MESSAGE) {
-		// Disable resizing
+		// Disable resizing and zooming
 		fSaveFrameChanges = false;
 		ResizeTo(fDefaultRect.Width(), fDefaultRect.Height());
-		SetFlags(Flags() | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_RESIZABLE);
+		SetFlags(Flags() | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_RESIZABLE
+			| B_NOT_ZOOMABLE);
 	}
 	
 	// Quit button
@@ -661,16 +700,28 @@ SuperItem::SuperItem(const char* label)
 	:
 	BListItem(),
 	fLabel(label),
+	fRegularFont(be_plain_font),
+	fBoldFont(be_plain_font),
 	fShowMoreDetails(false),
-	fPackageIcon(NULL),
+	fPackageLessIcon(NULL),
+	fPackageMoreIcon(NULL),
 	fItemCount(0)
 {
+	fBoldFont.SetFace(B_BOLD_FACE);
+	fBoldFont.GetHeight(&fBoldFontHeight);
+	font_height fontHeight;
+	fRegularFont.GetHeight(&fontHeight);
+	fPackageItemLineHeight = fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading;
+	fPackageLessIcon = _GetPackageIcon(GetPackageItemHeight(false));
+	fPackageMoreIcon = _GetPackageIcon(GetPackageItemHeight(true));
 }
 
 
 SuperItem::~SuperItem()
 {
-	delete fPackageIcon;
+	delete fPackageLessIcon;
+	delete fPackageMoreIcon;
 }
 
 
@@ -680,29 +731,50 @@ SuperItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	owner->PushState();
 	
 	float width;
-    owner->GetPreferredSize(&width, NULL);
-    BString label(fLabel);
-    label.Append(" (");
-    label << fItemCount;
-    label.Append(")");
-    owner->TruncateString(&label, B_TRUNCATE_END, width);
-    owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
-    owner->SetFont(&fBoldFont);
-    owner->DrawString(label.String(), BPoint(item_rect.left,
-		item_rect.bottom - fFontHeight.descent - 1));
+	owner->GetPreferredSize(&width, NULL);
+	BString text(fItemText);
+	owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	owner->SetFont(&fBoldFont);
+	owner->TruncateString(&text, B_TRUNCATE_END, width);
+	owner->DrawString(text.String(), BPoint(item_rect.left,
+		item_rect.bottom - fBoldFontHeight.descent));
 	
 	owner->PopState();
 }
 
 
-void
-SuperItem::Update(BView *owner, const BFont *font)
+float
+SuperItem::GetPackageItemHeight()
 {
-	fRegularFont = *font;
-	fBoldFont = *font;
-	fBoldFont.SetFace(B_BOLD_FACE);
-	BListItem::Update(owner, &fBoldFont);
-	_SetHeights();
+	return GetPackageItemHeight(fShowMoreDetails);
+}
+
+
+float
+SuperItem::GetPackageItemHeight(bool showMoreDetails)
+{
+	int lineCount = showMoreDetails ? 3 : 2;
+	return lineCount * fPackageItemLineHeight;
+}
+
+
+BBitmap*
+SuperItem::GetIcon(bool showMoreDetails)
+{
+	if (showMoreDetails)
+		return fPackageMoreIcon;
+	else
+		return fPackageLessIcon;
+}
+
+
+float
+SuperItem::GetIconSize(bool showMoreDetails)
+{
+	if (showMoreDetails)
+		return fPackageMoreIcon->Bounds().Height();
+	else
+		return fPackageLessIcon->Bounds().Height();
 }
 
 
@@ -710,50 +782,52 @@ void
 SuperItem::SetDetailLevel(bool showMoreDetails)
 {
 	fShowMoreDetails = showMoreDetails;
-	_SetHeights();
 }
 
 
 void
-SuperItem::_SetHeights()
+SuperItem::SetItemCount(int32 count)
 {
-	// Calculate height for PackageItem
-	fRegularFont.GetHeight(&fFontHeight);
-	int lineCount = fShowMoreDetails ? 3 : 2;
-	fPackageItemHeight = lineCount * (fFontHeight.ascent + fFontHeight.descent
-		+ fFontHeight.leading);
-	
-	// Calculate height for this item
-	fBoldFont.GetHeight(&fFontHeight);
-	SetHeight(fFontHeight.ascent + fFontHeight.descent
-		+ fFontHeight.leading + 4);
-	
-	_GetPackageIcon();
+	fItemCount = count;
+	fItemText = fLabel;
+	fItemText.Append(" (");
+	fItemText << fItemCount;
+	fItemText.Append(")");
 }
 
 
-void
-SuperItem::_GetPackageIcon()
+float
+SuperItem::ZoomWidth(BView *owner)
 {
-	delete fPackageIcon;
-	fIconSize = int(fPackageItemHeight * .8);
+	owner->PushState();
+	owner->SetFont(&fBoldFont);
+	float width = owner->StringWidth(fItemText.String());
+	owner->PopState();
+	return width;
+}
 
+
+BBitmap*
+SuperItem::_GetPackageIcon(float listItemHeight)
+{
+	int32 iconSize = int(listItemHeight * .8);
 	status_t result = B_ERROR;
-	BRect iconRect(0, 0, fIconSize - 1, fIconSize - 1);
-	fPackageIcon = new BBitmap(iconRect, 0, B_RGBA32);
+	BRect iconRect(0, 0, iconSize - 1, iconSize - 1);
+	BBitmap* packageIcon = new BBitmap(iconRect, 0, B_RGBA32);
 	BMimeType nodeType;
 	nodeType.SetTo("application/x-vnd.haiku-package");
-	result = nodeType.GetIcon(fPackageIcon, icon_size(fIconSize));
+	result = nodeType.GetIcon(packageIcon, icon_size(iconSize));
 	// Get super type icon
 	if (result != B_OK) {
 		BMimeType superType;
 		if (nodeType.GetSupertype(&superType) == B_OK)
-			result = superType.GetIcon(fPackageIcon, icon_size(fIconSize));
+			result = superType.GetIcon(packageIcon, icon_size(iconSize));
 	}
 	if (result != B_OK) {
-		delete fPackageIcon;
-		fPackageIcon = NULL;
+		delete packageIcon;
+		return NULL;
 	}
+	return packageIcon;
 }
 
 
@@ -767,12 +841,19 @@ PackageItem::PackageItem(const char* name, const char* simple_version,
 	fDetailedVersion(detailed_version),
 	fRepository(repository),
 	fSummary(summary),
+	fSmallFont(be_plain_font),
 	fSuperItem(super),
 	fFileName(file_name),
 	fDownloadProgress(0),
-	fDrawBarFlag(false)
+	fDrawBarFlag(false),
+	fMoreDetailsWidth(0),
+	fLessDetailsWidth(0)
 {
 	fLabelOffset = be_control_look->DefaultLabelSpacing();
+	fSmallFont.SetSize(be_plain_font->Size() - 2);
+	fSmallFont.GetHeight(&fSmallFontHeight);
+	fSmallTotalHeight = fSmallFontHeight.ascent + fSmallFontHeight.descent
+		+ fSmallFontHeight.leading;
 }
 
 
@@ -786,9 +867,9 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
     float offsetWidth = 0;
     bool showMoreDetails = fSuperItem->GetDetailLevel();
 	
-	BBitmap* icon = fSuperItem->GetIcon();
+	BBitmap* icon = fSuperItem->GetIcon(showMoreDetails);
 	if (icon != NULL && icon->IsValid()) {
-		int16 iconSize = fSuperItem->GetIconSize();
+		float iconSize = icon->Bounds().Height();
 		float offsetMarginHeight = floor((Height() - iconSize) / 2);
 		owner->SetDrawingMode(B_OP_ALPHA);
 		BPoint location = BPoint(item_rect.left,
@@ -801,15 +882,14 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 			_DrawBar(location, owner, icon_size(iconSize));
 	}
 	
-	owner->SetFont(&fRegularFont);
+	owner->SetFont(be_plain_font);
 	owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	
 	// Package name
-	font_height fontHeight = fSuperItem->GetFontHeight();
     BString name(fName);
     owner->TruncateString(&name, B_TRUNCATE_END, nameWidth);
 	BPoint cursor(item_rect.left + offsetWidth,
-		item_rect.bottom - fSmallTotalHeight - fontHeight.descent - 1);
+		item_rect.bottom - fSmallTotalHeight - fSmallFontHeight.descent - 2);
 	if (showMoreDetails)
 		cursor.y -= fSmallTotalHeight + 1;
 	owner->DrawString(name.String(), cursor);
@@ -905,21 +985,49 @@ void
 PackageItem::Update(BView *owner, const BFont *font)
 {
 	BListItem::Update(owner, font);
-	SetItemHeight(font);
+	SetHeight(fSuperItem->GetPackageItemHeight());
 }
 
 
 void
-PackageItem::SetItemHeight(const BFont* font)
+PackageItem::CalculateZoomWidths(BView *owner)
 {
-	SetHeight(fSuperItem->GetPackageItemHeight());
+	owner->PushState();
 	
-	fRegularFont = *font;
-	fSmallFont = *font;
-	fSmallFont.SetSize(font->Size() - 2);
-	fSmallFont.GetHeight(&fSmallFontHeight);
-	fSmallTotalHeight = fSmallFontHeight.ascent + fSmallFontHeight.descent
-		+ fSmallFontHeight.leading;
+	// More details
+	float offsetWidth = 2 * be_control_look->DefaultItemSpacing()
+		+ be_plain_font->Size()
+		+ fSuperItem->GetIconSize(true) + fLabelOffset;
+	// Name and repo
+	owner->SetFont(be_plain_font);
+	float stringWidth = owner->StringWidth(fName.String());
+	owner->SetFont(&fSmallFont);
+	stringWidth += fLabelOffset + owner->StringWidth(fRepository.String());
+	// Summary
+	float summaryWidth = owner->StringWidth(fSummary.String());
+	if (summaryWidth > stringWidth)
+		stringWidth = summaryWidth;
+	// Version
+	float versionWidth = owner->StringWidth(fDetailedVersion.String());
+	if (versionWidth > stringWidth)
+		stringWidth = versionWidth;
+	fMoreDetailsWidth = offsetWidth + stringWidth;
+	
+	// Less details
+	offsetWidth = 2 * be_control_look->DefaultItemSpacing()
+		+ be_plain_font->Size()
+		+ fSuperItem->GetIconSize(false) + fLabelOffset;
+	// Name and version
+	owner->SetFont(be_plain_font);
+	stringWidth = owner->StringWidth(fName.String());
+	owner->SetFont(&fSmallFont);
+	stringWidth += fLabelOffset + owner->StringWidth(fSimpleVersion.String());
+	// Summary
+	if (summaryWidth > stringWidth)
+		stringWidth = summaryWidth;
+	fLessDetailsWidth = offsetWidth + stringWidth;
+	
+	owner->PopState();
 }
 
 
@@ -966,13 +1074,15 @@ void
 PackageListView::FrameResized(float newWidth, float newHeight)
 {
 	BOutlineListView::FrameResized(newWidth, newHeight);
-	
-	float count = CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BListItem *item = ItemAt(i);
-		item->Update(this, be_plain_font);
-	}
 	Invalidate();
+}
+
+
+void
+PackageListView::ExpandOrCollapse(BListItem *superItem, bool expand)
+{
+	BOutlineListView::ExpandOrCollapse(superItem, expand);
+	Window()->PostMessage(kMsgSetZoomLimits);
 }
 
 
@@ -1049,6 +1159,7 @@ PackageListView::AddPackage(uint32 install_type, const char* name,
 		super);
 	AddUnder(item, super);
 	super->SetItemCount(CountItemsUnder(super, true));
+	item->CalculateZoomWidths(this);
 }
 
 
@@ -1116,6 +1227,33 @@ PackageListView::SetMoreDetails(bool showMore)
 	_SetItemHeights();
 	InvalidateLayout();
 	ResizeToPreferred();
+}
+
+
+BPoint
+PackageListView::ZoomPoint()
+{
+	BPoint zoomPoint(0, 0);
+	int32 count = CountItems();
+	for (int32 i = 0; i < count; i++)
+	{
+		BListItem* item = ItemAt(i);
+		float itemWidth = 0;
+		if (item->OutlineLevel() == 0) {
+			SuperItem* sItem = dynamic_cast<SuperItem*>(item);
+			itemWidth = sItem->ZoomWidth(this);
+		} else {
+			PackageItem* pItem = dynamic_cast<PackageItem*>(item);
+			itemWidth = fShowMoreDetails ? pItem->MoreDetailsWidth()
+				: pItem->LessDetailsWidth();
+		}
+		if (itemWidth > zoomPoint.x)
+			zoomPoint.x = itemWidth;
+	}
+	if (count > 0)
+		zoomPoint.y = ItemFrame(count - 1).bottom;
+
+	return zoomPoint;
 }
 
 

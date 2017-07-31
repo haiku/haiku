@@ -5,7 +5,7 @@ resource app_flags B_SINGLE_LAUNCH;
 resource app_version {
 	major  = 1,
 	middle = 0,
-	minor  = 2,
+	minor  = 3,
 	variety = B_APPV_BETA,
 	internal = 0,
 	short_info = "SoftwareUpdater",
