@@ -18,7 +18,7 @@ struct print_file_header {
 	off_t	first_page;
 
 	int32	_reserved[3];
-};
+} _PACKED;
 
 struct _page_header_;
 

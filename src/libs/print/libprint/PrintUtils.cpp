@@ -130,11 +130,7 @@ AddFields(BMessage* to, const BMessage* from, const char* excludeList[],
 {
 	if (to == from)
 		return;
-#ifndef B_BEOS_VERSION_DANO
 	char* name;
-#else
-	const char* name;
-#endif
 	type_code type;
 	int32 count;
 	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count)

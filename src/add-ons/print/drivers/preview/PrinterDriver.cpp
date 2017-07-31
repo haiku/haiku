@@ -38,18 +38,6 @@ PrinterDriver::~PrinterDriver()
 }
 
 
-#ifdef B_BEOS_VERSION_DANO
-struct print_file_header {
-       int32   version;
-       int32   page_count;
-       off_t   first_page;
-       int32   _reserved_3_;
-       int32   _reserved_4_;
-       int32   _reserved_5_;
-};
-#endif
-
-
 status_t
 PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 {

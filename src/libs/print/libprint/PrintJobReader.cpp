@@ -126,11 +126,7 @@ PrintJobReader::PrintJobReader(BFile* jobFile)
 	, fNumberOfPages(-1)
 	, fPageIndex(NULL)
 {
-#ifndef B_BEOS_VERSION_DANO
 	print_file_header header;
-#else
-	BPrintJob::print_file_header header;
-#endif
 	fJobFile.Seek(0, SEEK_SET);
 	if (fJobFile.Read(&header, sizeof(header)) == sizeof(header)) {
 		if (fJobSettings.Unflatten(&fJobFile) == B_OK) {

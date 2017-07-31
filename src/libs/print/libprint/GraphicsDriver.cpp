@@ -90,11 +90,7 @@ GraphicsDriver::_SetupData(BFile* spoolFile)
 		return true;
 	}
 
-#ifndef B_BEOS_VERSION_DANO
 	print_file_header pfh;
-#else			
-	BPrintJob::print_file_header pfh;
-#endif
 	spoolFile->Seek(0, SEEK_SET);
 	spoolFile->Read(&pfh, sizeof(pfh));
 

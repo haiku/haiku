@@ -97,7 +97,7 @@ struct _page_header_ {
 	int32 number_of_pictures;
 	off_t next_page;
 	int32 reserved[10];
-};
+} _PACKED;
 
 
 static void
