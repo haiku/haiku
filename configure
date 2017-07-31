@@ -388,11 +388,6 @@ if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
 	usage; exit 0;
 fi
 
-# ensure umask is not too restrictive
-if [ $(umask) -gt 22 ]; then
-	echo "Your umask is too restrictive (should be: <= 0022; is actually:" $(umask)")"
-	exit 1
-fi
 
 # get cwd and the source directory
 currentDir=`pwd`
