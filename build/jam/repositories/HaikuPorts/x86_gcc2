@@ -173,8 +173,8 @@ RemotePackageRepository HaikuPorts
 	fusesmb_haiku-0.9-1
 	gawk-4.1.3-1
 	gcal-3.6.3-1
-	gcc-2.95.3_2014_10_14-4
-	gcc_syslibs_devel-2.95.3_2014_10_14-4
+	gcc-2.95.3_2017_07_20-1
+	gcc_syslibs_devel-2.95.3_2017_07_20-1
 	genesis_commander-0.42-2
 	getconf-0.5-1
 	getopt-1.1.6-1
