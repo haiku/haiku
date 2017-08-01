@@ -43,6 +43,20 @@
 #define HCS_U1_DEVICE_LATENCY(p)	(((p) >> 0) & 0xff)
 #define HCS_U2_DEVICE_LATENCY(p)	(((p) >> 16) & 0xffff)
 #define XHCI_HCCPARAMS		0x10		// Capability Parameters
+#define HCC_AC64(p)				(((p) >> 0) & 0x1)
+#define HCC_BNC(p)				(((p) >> 1) & 0x1)
+#define HCC_CSZ(p)				(((p) >> 2) & 0x1)
+#define HCC_PPC(p)				(((p) >> 3) & 0x1)
+#define HCC_PIND(p)				(((p) >> 4) & 0x1)
+#define HCC_LHRC(p)				(((p) >> 5) & 0x1)
+#define HCC_LTC(p)				(((p) >> 6) & 0x1)
+#define HCC_NSS(p)				(((p) >> 7) & 0x1)
+#define HCC_PAE(p)				(((p) >> 8) & 0x1)
+#define HCC_SPC(p)				(((p) >> 9) & 0x1)
+#define HCC_SEC(p)				(((p) >> 10) & 0x1)
+#define HCC_CFC(p)				(((p) >> 11) & 0x1)
+#define HCC_MAXPSASIZE(p)		(((p) >> 12) & 0xf)
+#define HCC_XECP(p)				(((p) >> 16) & 0xfff)
 #define XHCI_DBOFF			0x14		// Doorbell Register offset
 #define XHCI_RTSOFF			0x18		// Runtime Register Space offset
 
@@ -288,7 +302,8 @@
 #define XHCI_MAX_SLOTS			255
 #define XHCI_MAX_PORTS			127
 #define XHCI_MAX_ENDPOINTS		32
-#define XHCI_MAX_SCRATCHPADS	1024
+// the spec says 1023, however this would cross the page boundary
+#define XHCI_MAX_SCRATCHPADS	256
 #define XHCI_MAX_DEVICES		128
 #define XHCI_MAX_TRANSFERS		8
 #define XHCI_MAX_TRBS_PER_TD	18
