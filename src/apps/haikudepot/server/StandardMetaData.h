@@ -2,10 +2,8 @@
  * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
-#ifndef ICON_META_DATA_H
-#define ICON_META_DATA_H
+#ifndef STANDARD_META_DATA_H
+#define STANDARD_META_DATA_H
 
 #include <DateTime.h>
 #include <File.h>
@@ -14,14 +12,17 @@
 #include <String.h>
 
 
-/* This class models (some of) the meta-data that is bundled into the tar file
- * that is downloaded to the HaikuDepot client from the HaikuDepotServer
- * application server system.  The file is included in the tar-ball data.
+/* This class models (some of) the meta-data that is bundled into data that is
+ * relayed from the HaikuDepotServer application server down to the client.
+ * This includes the tar-ball of icons as well as "bulk data" such as streams of
+ * information about repositories and packages.
  */
 
 
-class IconMetaData {
+class StandardMetaData {
 public:
+										StandardMetaData();
+
 			uint64_t					GetCreateTimestamp();
 			BDateTime					GetCreateTimestampAsDateTime();
 			void						SetCreateTimestamp(uint64_t value);
@@ -31,6 +32,7 @@ public:
 			void						SetDataModifiedTimestamp(
 											uint64_t value);
 
+			bool						IsPopulated();
 private:
 			BDateTime					_CreateDateTime(
 											uint64_t millisSinceEpoc);
@@ -39,4 +41,4 @@ private:
 };
 
 
-#endif // ICON_META_DATA_H
+#endif // STANDARD_META_DATA_H

@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src tests apps haikudepot ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
+
+UsePrivateHeaders shared ;
+
+UnitTestLib haikudepottest.so :
+	HaikuDepotTestAddon.cpp
+
+	StandardMetaData.cpp
+	StandardMetaDataJsonEventListener.cpp
+	StandardMetaDataJsonEventListenerTest.cpp
+
+	: be shared bnetapi [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+;
+
+SEARCH on [ FGristFiles StandardMetaData.cpp StandardMetaDataJsonEventListener.cpp ]
+	= [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;

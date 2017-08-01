@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include <AutoDeleter.h>
+#include <FileIO.h>
 #include <HttpRequest.h>
 #include <HttpTime.h>
 #include <Json.h>
@@ -19,6 +20,7 @@
 #include <support/ZlibCompressionAlgorithm.h>
 
 #include "ServerSettings.h"
+#include "StandardMetaDataJsonEventListener.h"
 #include "StorageUtils.h"
 #include "TarArchiveService.h"
 #include "ToFileUrlProtocolListener.h"
@@ -80,7 +82,7 @@ ServerIconExportUpdateProcess::Run()
 			if (result == B_OK) {
 				if (0 != remove(tarGzFilePath.Path())) {
 					fprintf(stdout, "unable to delete the temporary tgz path; "
-					    "%s", tarGzFilePath.Path());
+					    "%s\n", tarGzFilePath.Path());
 				}
 			}
 		}
@@ -108,7 +110,7 @@ ServerIconExportUpdateProcess::_IfModifiedSinceHeaderValue(BString& headerValue,
 		return B_FILE_NOT_FOUND;
 	}
 
-	IconMetaData iconMetaData;
+	StandardMetaData iconMetaData;
 	status_t result = _PopulateIconMetaData(iconMetaData, iconMetaDataPath);
 
 	if (result == B_OK) {
@@ -120,6 +122,9 @@ ServerIconExportUpdateProcess::_IfModifiedSinceHeaderValue(BString& headerValue,
 		BPrivate::BHttpTime modifiedHttpTime(modifiedDateTime);
 		headerValue.SetTo(modifiedHttpTime
 			.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
+	} else {
+		fprintf(stderr, "unable to parse the icon meta-data date and time -"
+			" cannot set the 'If-Modified-Since' header\n");
 	}
 
 	return result;
@@ -226,53 +231,33 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 
 
 status_t
-ServerIconExportUpdateProcess::_PopulateIconMetaData(IconMetaData& iconMetaData,
-	BMessage& message) const
+ServerIconExportUpdateProcess::_PopulateIconMetaData(
+	StandardMetaData& iconMetaData, BPath& path) const
 {
-	status_t result = B_OK;
-	double value; // numeric resolution issue?
+	FILE *file = fopen(path.Path(), "rb");
 
-	if (result == B_OK)
-		result = message.FindDouble("createTimestamp", &value);
+	if (file == NULL) {
+		fprintf(stderr, "unable to find the icon meta data file at [%s]\n",
+			path.Path());
+		return B_FILE_NOT_FOUND;
+	}
 
-	if (result == B_OK)
-		iconMetaData.SetCreateTimestamp((uint64) value);
+	BFileIO iconMetaDataFile(file, true); // takes ownership
+		// the "$" here indicates that the data is at the top level.
+	StandardMetaDataJsonEventListener listener("$", iconMetaData);
+	BPrivate::BJson::Parse(&iconMetaDataFile, &listener);
 
-	if (result == B_OK)
-		result = message.FindDouble("dataModifiedTimestamp", &value);
+	status_t result = listener.ErrorStatus();
 
-	if (result == B_OK)
-		iconMetaData.SetDataModifiedTimestamp((uint64) value);
+	if (result != B_OK)
+		return result;
 
-	return result;
-}
+	if (!iconMetaData.IsPopulated()) {
+		fprintf(stderr, "the icon meta data was read from [%s], but no values "
+			"were extracted\n", path.Path());
+		return B_BAD_DATA;
+	}
 
-
-status_t
-ServerIconExportUpdateProcess::_PopulateIconMetaData(IconMetaData& iconMetaData,
-	BString& jsonString) const
-{
-	BMessage infoMetaDataMessage;
-	status_t result = BJson::Parse(jsonString, infoMetaDataMessage);
-
-	if (result == B_OK)
-		return _PopulateIconMetaData(iconMetaData, infoMetaDataMessage);
-
-	return result;
-}
-
-
-status_t
-ServerIconExportUpdateProcess::_PopulateIconMetaData(IconMetaData& iconMetaData,
-	BPath& path) const
-{
-
-	BString infoMetaDataStr;
-	status_t result = StorageUtils::AppendToString(path, infoMetaDataStr);
-
-	if (result == B_OK)
-		return _PopulateIconMetaData(iconMetaData, infoMetaDataStr);
-
-	return result;
+	return B_OK;
 }
 

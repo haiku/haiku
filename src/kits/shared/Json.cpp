@@ -387,7 +387,7 @@ BJson::ParseObject(JsonParseContext& jsonParseContext)
 				} else {
 					jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 						jsonParseContext.LineNumber(), "expected"
-							"separator when parsing an object");
+							" separator when parsing an object");
 				}
 			}
 		}
@@ -446,7 +446,7 @@ BJson::ParseArray(JsonParseContext& jsonParseContext)
 				} else {
 					jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 						jsonParseContext.LineNumber(), "expected"
-							"separator when parsing an array");
+							" separator when parsing an array");
 				}
 			}
 		}

@@ -14,7 +14,7 @@
 #include <String.h>
 #include <Url.h>
 
-#include "IconMetaData.h"
+#include "StandardMetaData.h"
 
 
 class ServerIconExportUpdateProcess : public AbstractServerProcess {
@@ -37,14 +37,8 @@ private:
 									BPath& iconMetaDataPath) const;
 
 			status_t			_PopulateIconMetaData(
-									IconMetaData& iconMetaData, BPath& path)
+									StandardMetaData& iconMetaData, BPath& path)
 									const;
-			status_t			_PopulateIconMetaData(
-									IconMetaData& iconMetaData,
-									BString& jsonString) const;
-			status_t			_PopulateIconMetaData(
-									IconMetaData& iconMetaData,
-									BMessage& message) const;
 
 			BString				fBaseUrl;
 			BPath				fLocalStorageDirectoryPath;

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps haikudepot ;
 
-UsePrivateHeaders interface shared package support net ;
+UsePrivateHeaders interface shared storage package support net ;
 
 # source directories
 local sourceDirs =
@@ -79,7 +79,8 @@ Application HaikuDepot :
 	ServerSettings.cpp
 	WebAppInterface.cpp
 	ServerIconExportUpdateProcess.cpp
-	IconMetaData.cpp
+	StandardMetaDataJsonEventListener.cpp
+	StandardMetaData.cpp
 	
 	# tar
 	TarArchiveHeader.cpp
