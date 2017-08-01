@@ -763,10 +763,13 @@ BCalendarView::_SetToDay()
 void
 BCalendarView::_SetToCurrentDay()
 {
-	BDate date(fDate.Year(), fDate.Month(), 1);
+	BDate date(fCurrentDate.Year(), fCurrentDate.Month(), 1);
 	if (!date.IsValid())
 		return;
-
+	if (fDate.Year() != date.Year() || fDate.Month() != date.Month()) {
+		fNewCurrentDay.SetTo(-1, -1);
+		return;
+	}
 	const int32 firstDayOffset = (7 + date.DayOfWeek() - fStartOfWeek) % 7;
 
 	int32 day = 1 - firstDayOffset;
@@ -780,7 +783,7 @@ BCalendarView::_SetToCurrentDay()
 		}
 	}
 
-	fNewCurrentDay.SetTo(0, 0);
+	fNewCurrentDay.SetTo(-1, -1);
 }
 
 
@@ -881,9 +884,12 @@ BCalendarView::_SetupDayNumbers()
 				fSelectedDay.SetTo(row, column);
 				fNewFocusedDay.SetTo(row, column);
 			}
-			if (day == fCurrentDate.Day()
-				&& fDate.Month() == fCurrentDate.Month())
+			if (day == fCurrentDate.Day() && counter >= firstDayOffset
+				&& counter < firstDayOffset + daysInMonth
+				&& fDate.Month() == fCurrentDate.Month()
+				&& fDate.Year() == fCurrentDate.Year())
 				fCurrentDay.SetTo(row, column);
+
 			counter++;
 			fDayNumbers[row][column].Truncate(0);
 			fDayNumbers[row][column] << day;
@@ -1215,13 +1221,11 @@ BCalendarView::_UpdateCurrentDate()
 
 	fCurrentDate = date;
 
-	if (fDate.Year() == date.Year() && fDate.Month() == date.Month()) {
-		_SetToCurrentDay();
-		fCurrentDayChanged = true;
-		Draw(_RectOfDay(fCurrentDay));
-		Draw(_RectOfDay(fNewCurrentDay));
-		fCurrentDayChanged = false;
-	}
+	_SetToCurrentDay();
+	fCurrentDayChanged = true;
+	Draw(_RectOfDay(fCurrentDay));
+	Draw(_RectOfDay(fNewCurrentDay));
+	fCurrentDayChanged = false;
 
 	return;
 }
