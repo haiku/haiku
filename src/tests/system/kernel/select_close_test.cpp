@@ -11,7 +11,7 @@
 static status_t
 close_fd(void* data)
 {
-	int fd = int(data);
+	int fd = *((int*)data);
 	snooze(1000000);
 	close(fd);
 	fprintf(stderr, "fd %d closed\n", fd);
@@ -25,7 +25,7 @@ main()
 	int fd = dup(0);
 
 	thread_id thread = spawn_thread(close_fd, "close fd", B_NORMAL_PRIORITY,
-		(void*)fd);
+		&fd);
 	resume_thread(thread);
 
 	fd_set readSet;
