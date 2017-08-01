@@ -191,18 +191,13 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	TRACE("mapped runtime registers: 0x%p\n", fRuntimeRegisters);
 	TRACE("mapped doorbell registers: 0x%p\n", fDoorbellRegisters);
 
-	TRACE("interface version: 0x%04" B_PRIx32 "\n",
+	TRACE_ALWAYS("interface version: 0x%04" B_PRIx32 "\n",
 		HCI_VERSION(ReadCapReg32(XHCI_HCI_VERSION)));
-	TRACE("structural parameters1: 0x%08" B_PRIx32 "\n",
-		ReadCapReg32(XHCI_HCSPARAMS1));
-	TRACE("structural parameters2: 0x%08" B_PRIx32 "\n",
-		ReadCapReg32(XHCI_HCSPARAMS2));
-	TRACE("structural parameters3: 0x%08" B_PRIx32 "\n",
-		ReadCapReg32(XHCI_HCSPARAMS3));
-	TRACE("capability parameters: 0x%08" B_PRIx32 "\n",
-		ReadCapReg32(XHCI_HCCPARAMS));
-
+	TRACE_ALWAYS("structural parameters: 1:0x%08" B_PRIx32 " 2:0x%08"
+		B_PRIx32 " 3:0x%08" B_PRIx32 "\n", ReadCapReg32(XHCI_HCSPARAMS1),
+		ReadCapReg32(XHCI_HCSPARAMS2), ReadCapReg32(XHCI_HCSPARAMS3));
 	uint32 cparams = ReadCapReg32(XHCI_HCCPARAMS);
+	TRACE_ALWAYS("capability params: 0x%08" B_PRIx32 "\n", cparams);
 
 	uint32 eec = 0xffffffff;
 	uint32 eecp = HCS0_XECP(cparams) << 2;
