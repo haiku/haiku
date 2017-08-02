@@ -144,7 +144,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 HaikuSubInclude solver ;
 
-DoCatalogs libpackage.so
+DoCatalogs libpackage.so :
 	x-vnd.Haiku-libpackage
 	:
 	PackageManager.cpp
