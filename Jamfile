@@ -29,7 +29,7 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 		bzip2 ctags diffutils expat ffmpeg findutils gawk glu grep gutenprint
 		gzip jasper jpeg
 		less libicns libpcap libpng16 libwebp
-		mesa mesa_devel mesa_swrast
+		mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
 		netcat
 		sed sharutils
 		tar tcpdump unzip wget which zip
@@ -53,7 +53,8 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 				}@
 			] ;
 			if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
-				AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs ] ;
+				AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs
+					mesa_swpipe ] ;
 			}
 		}
 	}
