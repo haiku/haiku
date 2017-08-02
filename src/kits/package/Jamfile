@@ -142,10 +142,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
-HaikuSubInclude solver ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 
 DoCatalogs libpackage.so :
 	x-vnd.Haiku-libpackage
 	:
 	PackageManager.cpp
 ;
+
+HaikuSubInclude solver ;
