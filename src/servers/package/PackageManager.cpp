@@ -32,6 +32,7 @@ using BPackageKit::BManager::BPrivate::BAbortedByUserException;
 using BPackageKit::BManager::BPrivate::BFatalErrorException;
 using BPackageKit::BManager::BPrivate::BRepositoryBuilder;
 
+
 PackageManager::PackageManager(Root* root, Volume* volume)
 	:
 	BPackageManager(volume->Location(), this, this),
