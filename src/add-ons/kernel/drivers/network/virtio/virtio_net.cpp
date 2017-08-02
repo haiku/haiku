@@ -14,12 +14,13 @@
 #define ETHER_ADDR_LEN	ETHER_ADDRESS_LENGTH
 #include "virtio_net.h"
 
-#define MAX_FRAME_SIZE	1536
-
 #define VIRTIO_NET_DRIVER_MODULE_NAME "drivers/network/virtio_net/driver_v1"
 #define VIRTIO_NET_DEVICE_MODULE_NAME "drivers/network/virtio_net/device_v1"
 #define VIRTIO_NET_DEVICE_ID_GENERATOR	"virtio_net/device_id"
 
+#define BUFFER_SIZE	2048
+// #define MAX_FRAME_SIZE	(BUFFER_SIZE - sizeof(virtio_net_hdr))
+#define MAX_FRAME_SIZE 1536
 
 typedef struct {
 	device_node*			node;
@@ -29,9 +30,21 @@ typedef struct {
 	uint32 					features;
 
 	uint32					pairs_count;
-	::virtio_queue*			receive_queues;
-	::virtio_queue*			send_queues;
 
+	virtio_net_hdr			hdr;
+	physical_entry			hdr_entry;
+
+	::virtio_queue*			rx_queues;
+	uint8					rx_buffer[2048];
+	physical_entry			rx_entry;
+	sem_id 					rx_done;
+
+	::virtio_queue*			tx_queues;
+	uint8					tx_buffer[2048];
+	physical_entry			tx_entry;
+	sem_id 					tx_done;
+
+	::virtio_queue			ctrl_queue;
 
 	bool					nonblocking;
 	uint32					maxframesize;
@@ -131,9 +144,12 @@ virtio_net_init_device(void* _info, void** _cookie)
 	sDeviceManager->put_node(parent);
 
 	info->virtio->negociate_features(info->virtio_device,
-		0 /*  */, &info->features, &get_feature_name);
+		VIRTIO_NET_F_STATUS | VIRTIO_NET_F_MAC
+		/* VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_MQ */,
+		 &info->features, &get_feature_name);
 
 	if ((info->features & VIRTIO_NET_F_MQ) != 0
+			&& (info->features & VIRTIO_NET_F_CTRL_VQ) != 0
 			&& info->virtio->read_device_config(info->virtio_device,
 				offsetof(struct virtio_net_config, max_virtqueue_pairs),
 				&info->pairs_count, sizeof(info->pairs_count)) == B_OK) {
@@ -147,6 +163,7 @@ virtio_net_init_device(void* _info, void** _cookie)
 
 	// TODO read config
 
+	// Setup queues
 	uint32 queueCount = info->pairs_count * 2;
 	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0)
 		queueCount++;
@@ -158,16 +175,31 @@ virtio_net_init_device(void* _info, void** _cookie)
 		return status;
 	}
 
-	info->receive_queues = new(std::nothrow) virtio_queue[info->pairs_count];
-	info->send_queues = new(std::nothrow) virtio_queue[info->pairs_count];
-	if (info->receive_queues == NULL || info->send_queues == NULL)
+	info->rx_queues = new(std::nothrow) virtio_queue[info->pairs_count];
+	info->tx_queues = new(std::nothrow) virtio_queue[info->pairs_count];
+	if (info->rx_queues == NULL || info->tx_queues == NULL)
 		return B_NO_MEMORY;
 	for (uint32 i = 0; i < info->pairs_count; i++) {
-		info->receive_queues[i] = virtioQueues[i * 2];
-		info->send_queues[i] = virtioQueues[i * 2 + 1];
+		info->rx_queues[i] = virtioQueues[i * 2];
+		info->tx_queues[i] = virtioQueues[i * 2 + 1];
 	}
+	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0)
+		info->ctrl_queue = virtioQueues[info->pairs_count * 2];
 
-	// TODO setup interrupts
+	// Setup buffers
+	get_memory_map(&info->rx_buffer, sizeof(info->tx_buffer), &info->rx_entry, 1);
+	get_memory_map(&info->tx_buffer, sizeof(info->tx_buffer), &info->tx_entry, 1);
+	get_memory_map(&info->hdr, sizeof(info->hdr), &info->hdr_entry, 1);
+
+	// Setup interrupt
+	info->rx_done = create_sem(0, "virtio_net_rx");
+	info->tx_done = create_sem(0, "virtio_net_tx");
+
+	status = info->virtio->setup_interrupt(info->virtio_device, NULL, info);
+	if (status != B_OK) {
+		ERROR("interrupt setup failed (%s)\n", strerror(status));
+		return status;
+	}
 
 	*_cookie = info;
 	return B_OK;
@@ -179,6 +211,11 @@ virtio_net_uninit_device(void* _cookie)
 {
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)_cookie;
+
+	delete_sem(info->rx_done);
+	delete_sem(info->tx_done);
+	delete[] info->rx_queues;
+	delete[] info->tx_queues;
 }
 
 
@@ -229,13 +266,57 @@ virtio_net_free(void* cookie)
 }
 
 
+static void
+virtio_net_rx_done(void* driverCookie, void* cookie)
+{
+	CALLED();
+	virtio_net_driver_info* info = (virtio_net_driver_info*)cookie;
+	release_sem_etc(info->rx_done, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
 static status_t
 virtio_net_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	CALLED();
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
-	// TODO implement
-	return B_ERROR;
+	virtio_net_driver_info* info = handle->info;
+
+	// return B_ERROR;
+
+	physical_entry entries[2];
+	entries[0] = info->hdr_entry;
+	entries[1] = info->rx_entry;
+
+	memset(&info->hdr, 0, sizeof(info->hdr));
+
+	// queue the rx buffer
+	status_t status = info->virtio->queue_request_v(info->rx_queues[0],
+		entries, 0, 2, virtio_net_rx_done, info);
+	if (status != B_OK) {
+		ERROR("rx queueing on queue %d failed (%s)\n", 0, strerror(status));
+		return status;
+	}
+
+	// wait for reception
+	status = acquire_sem_etc(info->rx_done, 1, B_RELATIVE_TIMEOUT, 10000);
+	if (status != B_OK) {
+		ERROR("acquire_sem(rx_done) failed (%s)\n", strerror(status));
+		return status;
+	}
+
+	*_length = MIN(MAX_FRAME_SIZE, *_length);
+	memcpy(buffer, &info->rx_buffer, *_length);
+	return B_OK;
+}
+
+
+static void
+virtio_net_tx_done(void* driverCookie, void* cookie)
+{
+	CALLED();
+	virtio_net_driver_info* info = (virtio_net_driver_info*)cookie;
+	release_sem_etc(info->tx_done, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -245,19 +326,46 @@ virtio_net_write(void* cookie, off_t pos, const void* buffer,
 {
 	CALLED();
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
-	// TODO implement
-	return B_ERROR;
+	virtio_net_driver_info* info = handle->info;
+
+	// legacy interface: one descriptor for all
+	// so we have no choice but to concat a virtio_net_hdr with buffer data
+	// together...
+
+	physical_entry entries[2];
+	entries[0] = info->hdr_entry;
+	entries[1] = info->tx_entry;
+
+	memset(&info->hdr, 0, sizeof(info->hdr));
+	memcpy(&info->tx_buffer, buffer, MIN(MAX_FRAME_SIZE, *_length));
+
+	// queue the virtio_net_hdr + buffer data
+	status_t status = info->virtio->queue_request_v(info->tx_queues[0],
+		entries, 2, 0, virtio_net_tx_done, info);
+	if (status != B_OK) {
+		ERROR("tx queueing on queue %d failed (%s)\n", 0, strerror(status));
+		return status;
+	}
+
+	// wait for transmission done signal
+	status = acquire_sem_etc(info->tx_done, 1, B_RELATIVE_TIMEOUT, 10000);
+	if (status != B_OK) {
+		ERROR("acquire_sem(tx_done) failed (%s)\n", strerror(status));
+		return status;
+	}
+
+	return B_OK;
 }
 
 
 static status_t
 virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 {
-	CALLED();
+	// CALLED();
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
 	virtio_net_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %lx)\n", op);
+	// TRACE("ioctl(op = %lx)\n", op);
 
 	switch (op) {
 		case ETHER_GETADDR:
