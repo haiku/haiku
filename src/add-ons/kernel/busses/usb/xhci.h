@@ -197,6 +197,13 @@ private:
 	inline	uint32				ReadDoorReg32(uint32 reg);
 	inline	void				WriteDoorReg32(uint32 reg, uint32 value);
 
+			// Context functions
+	inline	addr_t				_OffsetContextAddr(addr_t p);
+	inline	uint32				_ReadContext(uint32* p);
+	inline	void				_WriteContext(uint32* p, uint32 value);
+	inline	uint64				_ReadContext(uint64* p);
+	inline	void				_WriteContext(uint64* p, uint64 value);
+
 			void				_SwitchIntelPorts();
 
 	static	pci_module_info *	sPCIModule;
@@ -251,6 +258,7 @@ private:
 
 			// Devices
 			struct xhci_device	fDevices[XHCI_MAX_DEVICES];
+			int32				fContextSizeShift; // 0/1 for 32/64 bytes
 
 			sem_id				fEventSem;
 			thread_id			fEventThread;

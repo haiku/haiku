@@ -127,6 +127,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fPortCount(0),
 		fSlotCount(0),
 		fScratchpadCount(0),
+		fContextSizeShift(0),
 		fEventSem(-1),
 		fEventThread(-1),
 		fEventIdx(0),
@@ -198,6 +199,9 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		ReadCapReg32(XHCI_HCSPARAMS2), ReadCapReg32(XHCI_HCSPARAMS3));
 	uint32 cparams = ReadCapReg32(XHCI_HCCPARAMS);
 	TRACE_ALWAYS("capability params: 0x%08" B_PRIx32 "\n", cparams);
+
+	// if 64 bytes context structures, then 1
+	fContextSizeShift = HCC_CSZ(cparams);
 
 	uint32 eec = 0xffffffff;
 	uint32 eecp = HCS0_XECP(cparams) << 2;
@@ -654,14 +658,14 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	TRACE("SubmitControlRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		endpoint->device->device_ctx->endpoints[id-1].dwendpoint0,
-		endpoint->device->device_ctx->endpoints[id-1].dwendpoint1,
-		endpoint->device->device_ctx->endpoints[id-1].qwendpoint2);
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
 	Ring(endpoint->device->slot, id);
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		endpoint->device->device_ctx->endpoints[id-1].dwendpoint0,
-		endpoint->device->device_ctx->endpoints[id-1].dwendpoint1,
-		endpoint->device->device_ctx->endpoints[id-1].qwendpoint2);
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
 	return B_OK;
 }
 
@@ -736,14 +740,14 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	TRACE("SubmitNormalRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0,
-		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1,
-		endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2);
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
 	Ring(endpoint->device->slot, id);
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0,
-		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1,
-		endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2);
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
 	return B_OK;
 }
 
@@ -1111,7 +1115,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	device->slot = slot;
 
 	device->input_ctx_area = fStack->AllocateArea((void **)&device->input_ctx,
-		&device->input_ctx_addr, sizeof(*device->input_ctx),
+		&device->input_ctx_addr, sizeof(*device->input_ctx) << fContextSizeShift,
 		"XHCI input context");
 	if (device->input_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a input context area\n");
@@ -1119,9 +1123,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		return NULL;
 	}
 
-	memset(device->input_ctx, 0, sizeof(*device->input_ctx));
-	device->input_ctx->input.dropFlags = 0;
-	device->input_ctx->input.addFlags = 3;
+	memset(device->input_ctx, 0, sizeof(*device->input_ctx) << fContextSizeShift);
+	_WriteContext(&device->input_ctx->input.dropFlags, 0);
+	_WriteContext(&device->input_ctx->input.addFlags, 3);
 
 	uint32 route = 0;
 	uint8 routePort = hubPort;
@@ -1148,49 +1152,54 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		TRACE("speed updated %d\n", speed);
 	}
 
-	device->input_ctx->slot.dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
+	uint32 dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
 
 	// add the speed
 	switch (speed) {
 	case USB_SPEED_LOWSPEED:
-		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(2);
+		dwslot0 |= SLOT_0_SPEED(2);
 		break;
 	case USB_SPEED_HIGHSPEED:
-		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(3);
+		dwslot0 |= SLOT_0_SPEED(3);
 		break;
 	case USB_SPEED_FULLSPEED:
-		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(1);
+		dwslot0 |= SLOT_0_SPEED(1);
 		break;
 	case USB_SPEED_SUPER:
-		device->input_ctx->slot.dwslot0 |= SLOT_0_SPEED(4);
+		dwslot0 |= SLOT_0_SPEED(4);
 		break;
 	default:
 		TRACE_ERROR("unknown usb speed\n");
 		break;
 	}
 
-	device->input_ctx->slot.dwslot1 = SLOT_1_RH_PORT(rhPort); // TODO enable power save
-	device->input_ctx->slot.dwslot2 = SLOT_2_IRQ_TARGET(0);
+	_WriteContext(&device->input_ctx->slot.dwslot0, dwslot0);
+	// TODO enable power save
+	_WriteContext(&device->input_ctx->slot.dwslot1, SLOT_1_RH_PORT(rhPort));
+	uint32 dwslot2 = SLOT_2_IRQ_TARGET(0);
 
 	// If LS/FS device connected to non-root HS device
 	if (route != 0 && parent->Speed() == USB_SPEED_HIGHSPEED
 		&& (speed == USB_SPEED_LOWSPEED || speed == USB_SPEED_FULLSPEED)) {
 		struct xhci_device *parenthub = (struct xhci_device *)
 			parent->ControllerCookie();
-		device->input_ctx->slot.dwslot2 |= SLOT_2_PORT_NUM(hubPort);
-		device->input_ctx->slot.dwslot2 |= SLOT_2_TT_HUB_SLOT(parenthub->slot);
+		dwslot2 |= SLOT_2_PORT_NUM(hubPort);
+		dwslot2 |= SLOT_2_TT_HUB_SLOT(parenthub->slot);
 	}
 
-	device->input_ctx->slot.dwslot3 = SLOT_3_SLOT_STATE(0)
-		| SLOT_3_DEVICE_ADDRESS(0);
+	_WriteContext(&device->input_ctx->slot.dwslot2, dwslot2);
+
+	_WriteContext(&device->input_ctx->slot.dwslot3, SLOT_3_SLOT_STATE(0)
+		| SLOT_3_DEVICE_ADDRESS(0));
 
 	TRACE("slot 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%08" B_PRIx32
-		"\n", device->input_ctx->slot.dwslot0,
-		device->input_ctx->slot.dwslot1, device->input_ctx->slot.dwslot2,
-		device->input_ctx->slot.dwslot3);
+		"\n", _ReadContext(&device->input_ctx->slot.dwslot0),
+		_ReadContext(&device->input_ctx->slot.dwslot1),
+		_ReadContext(&device->input_ctx->slot.dwslot2),
+		_ReadContext(&device->input_ctx->slot.dwslot3));
 
 	device->device_ctx_area = fStack->AllocateArea((void **)&device->device_ctx,
-		&device->device_ctx_addr, sizeof(*device->device_ctx),
+		&device->device_ctx_addr, sizeof(*device->device_ctx) << fContextSizeShift,
 		"XHCI device context");
 	if (device->device_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a device context area\n");
@@ -1198,7 +1207,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		delete_area(device->input_ctx_area);
 		return NULL;
 	}
-	memset(device->device_ctx, 0, sizeof(*device->device_ctx));
+	memset(device->device_ctx, 0, sizeof(*device->device_ctx) << fContextSizeShift);
 
 	device->trb_area = fStack->AllocateArea((void **)&device->trbs,
 		&device->trb_addr, sizeof(*device->trbs) * (XHCI_MAX_ENDPOINTS - 1)
@@ -1258,13 +1267,15 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	}
 
 	device->state = XHCI_STATE_ADDRESSED;
-	device->address = SLOT_3_DEVICE_ADDRESS_GET(
-		device->device_ctx->slot.dwslot3);
+	device->address = SLOT_3_DEVICE_ADDRESS_GET(_ReadContext(
+		&device->device_ctx->slot.dwslot3));
 
 	TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n", device->address,
-		SLOT_3_SLOT_STATE_GET(device->device_ctx->slot.dwslot3));
+		SLOT_3_SLOT_STATE_GET(_ReadContext(
+			&device->device_ctx->slot.dwslot3)));
 	TRACE("endpoint0 state 0x%08" B_PRIx32 "\n",
-		ENDPOINT_0_STATE_GET(device->device_ctx->endpoints[0].dwendpoint0));
+		ENDPOINT_0_STATE_GET(_ReadContext(
+			&device->device_ctx->endpoints[0].dwendpoint0)));
 
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(parent);
@@ -1305,12 +1316,15 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	if (speed == USB_SPEED_FULLSPEED && deviceDescriptor.max_packet_size_0 != 8) {
 		TRACE("Full speed device with different max packet size for Endpoint 0\n");
-		device->input_ctx->endpoints[0].dwendpoint1 &=
-			~ENDPOINT_1_MAXPACKETSIZE(0xffff);
-		device->input_ctx->endpoints[0].dwendpoint1 |=
-			ENDPOINT_1_MAXPACKETSIZE(deviceDescriptor.max_packet_size_0);
-		device->input_ctx->input.dropFlags = 0;
-		device->input_ctx->input.addFlags = (1 << 1);
+		uint32 dwendpoint1 = _ReadContext(
+			&device->input_ctx->endpoints[0].dwendpoint1);
+		dwendpoint1 &= ~ENDPOINT_1_MAXPACKETSIZE(0xffff);
+		dwendpoint1 |= ENDPOINT_1_MAXPACKETSIZE(
+			deviceDescriptor.max_packet_size_0);
+		_WriteContext(&device->input_ctx->endpoints[0].dwendpoint1,
+			dwendpoint1);
+		_WriteContext(&device->input_ctx->input.dropFlags, 0);
+		_WriteContext(&device->input_ctx->input.addFlags, (1 << 1));
 		EvaluateContext(device->input_ctx_addr, device->slot);
 	}
 
@@ -1339,11 +1353,16 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			return NULL;
 		}
 
-		device->input_ctx->slot.dwslot0 |= SLOT_0_HUB_BIT;
-		device->input_ctx->slot.dwslot1 |= SLOT_1_NUM_PORTS(hubDescriptor.num_ports);
+		uint32 dwslot0 = _ReadContext(&device->input_ctx->slot.dwslot0);
+		dwslot0 |= SLOT_0_HUB_BIT;
+		_WriteContext(&device->input_ctx->slot.dwslot0, dwslot0);
+		uint32 dwslot1 = _ReadContext(&device->input_ctx->slot.dwslot1);
+		dwslot1 |= SLOT_1_NUM_PORTS(hubDescriptor.num_ports);
+		_WriteContext(&device->input_ctx->slot.dwslot1, dwslot1);
 		if (speed == USB_SPEED_HIGHSPEED) {
-			device->input_ctx->slot.dwslot2 |=
-				SLOT_2_TT_TIME(HUB_TTT_GET(hubDescriptor.characteristics));
+			uint32 dwslot2 = _ReadContext(&device->input_ctx->slot.dwslot2);
+			dwslot2 |= SLOT_2_TT_TIME(HUB_TTT_GET(hubDescriptor.characteristics));
+			_WriteContext(&device->input_ctx->slot.dwslot2, dwslot2);
 		}
 
 		deviceObject = new(std::nothrow) Hub(parent, hubAddress, hubPort,
@@ -1409,10 +1428,12 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		return B_BAD_VALUE;
 
 	if (id > 0) {
-		if (SLOT_0_NUM_ENTRIES_GET(device->device_ctx->slot.dwslot0) == 1) {
-			device->input_ctx->slot.dwslot0 &= ~(SLOT_0_NUM_ENTRIES(0x1f));
-			device->input_ctx->slot.dwslot0 |=
-				SLOT_0_NUM_ENTRIES(XHCI_MAX_ENDPOINTS - 1);
+		uint32 devicedwslot0 = _ReadContext(&device->device_ctx->slot.dwslot0);
+		if (SLOT_0_NUM_ENTRIES_GET(devicedwslot0) == 1) {
+			uint32 inputdwslot0 = _ReadContext(&device->input_ctx->slot.dwslot0);
+			inputdwslot0 &= ~(SLOT_0_NUM_ENTRIES(0x1f));
+			inputdwslot0 |= SLOT_0_NUM_ENTRIES(XHCI_MAX_ENDPOINTS - 1);
+			_WriteContext(&device->input_ctx->slot.dwslot0, inputdwslot0);
 			EvaluateContext(device->input_ctx_addr, device->slot);
 		}
 
@@ -1441,8 +1462,9 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
 			device->slot); */
 
-		device->input_ctx->input.dropFlags = 0;
-		device->input_ctx->input.addFlags = (1 << endpoint) | (1 << 0);
+		_WriteContext(&device->input_ctx->input.dropFlags, 0);
+		_WriteContext(&device->input_ctx->input.addFlags,
+			(1 << endpoint) | (1 << 0));
 
 		// configure the Control endpoint 0 (type 4)
 		uint32 type = 4;
@@ -1467,12 +1489,15 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		EvaluateContext(device->input_ctx_addr, device->slot);
 
 		ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
-		TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n", device->address,
-			SLOT_3_SLOT_STATE_GET(device->device_ctx->slot.dwslot3));
+		TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n",
+			device->address, SLOT_3_SLOT_STATE_GET(_ReadContext(
+				&device->device_ctx->slot.dwslot3)));
 		TRACE("endpoint[0] state 0x%08" B_PRIx32 "\n",
-			ENDPOINT_0_STATE_GET(device->device_ctx->endpoints[0].dwendpoint0));
+			ENDPOINT_0_STATE_GET(_ReadContext(
+				&device->device_ctx->endpoints[0].dwendpoint0)));
 		TRACE("endpoint[%d] state 0x%08" B_PRIx32 "\n", id,
-			ENDPOINT_0_STATE_GET(device->device_ctx->endpoints[id].dwendpoint0));
+			ENDPOINT_0_STATE_GET(_ReadContext(
+				&device->device_ctx->endpoints[id].dwendpoint0)));
 		device->state = XHCI_STATE_CONFIGURED;
 	}
 	pipe->SetControllerCookie(&device->endpoints[id]);
@@ -1578,15 +1603,14 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr,
 	uint16 interval, uint16 maxPacketSize, uint16 maxFrameSize, usb_speed speed)
 {
 	struct xhci_device* device = &fDevices[slot];
-	struct xhci_endpoint_ctx* endpoint = &device->input_ctx->endpoints[number];
 
 	uint8 maxBurst = (maxPacketSize & 0x1800) >> 11;
 	maxPacketSize = (maxPacketSize & 0x7ff);
 
-	endpoint->dwendpoint0 = 0;
-	endpoint->dwendpoint1 = 0;
-	endpoint->qwendpoint2 = 0;
-	endpoint->dwendpoint4 = 0;
+	uint32 dwendpoint0 = 0;
+	uint32 dwendpoint1 = 0;
+	uint64 qwendpoint2 = 0;
+	uint32 dwendpoint4 = 0;
 
 	// Assigning Interval
 	uint16 calcInterval = 0;
@@ -1611,48 +1635,60 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr,
 		calcInterval = interval - 1;
 	}
 
-	endpoint->dwendpoint0 |= ENDPOINT_0_INTERVAL(calcInterval);
+	dwendpoint0 |= ENDPOINT_0_INTERVAL(calcInterval);
 
 	// Assigning CERR for non-isoch endpoints
 	if ((type & 0x3) != 1) {
-		endpoint->dwendpoint1 |= ENDPOINT_1_CERR(3);
+		dwendpoint1 |= ENDPOINT_1_CERR(3);
 	}
 
-	endpoint->dwendpoint1 |= ENDPOINT_1_EPTYPE(type);
+	dwendpoint1 |= ENDPOINT_1_EPTYPE(type);
 
 	// Assigning MaxBurst for HighSpeed
 	if (speed == USB_SPEED_HIGHSPEED &&
 		((type & 0x3) == 1 || (type & 0x3) == 3)) {
-		endpoint->dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
+		dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
 	}
 
 	// TODO Assign MaxBurst for SuperSpeed
 
-	endpoint->dwendpoint1 |= ENDPOINT_1_MAXPACKETSIZE(maxPacketSize);
-	endpoint->qwendpoint2 |= ENDPOINT_2_DCS_BIT | ringAddr;
+	dwendpoint1 |= ENDPOINT_1_MAXPACKETSIZE(maxPacketSize);
+	qwendpoint2 |= ENDPOINT_2_DCS_BIT | ringAddr;
 
 	// Assign MaxESITPayload
 	// Assign AvgTRBLength
 	switch (type) {
 		case 4:
-			endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(8);
+			dwendpoint4 = ENDPOINT_4_AVGTRBLENGTH(8);
 			break;
 		case 1:
 		case 3:
 		case 5:
 		case 7:
-			endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(min_c(maxFrameSize,
+			dwendpoint4 = ENDPOINT_4_AVGTRBLENGTH(min_c(maxFrameSize,
 				B_PAGE_SIZE)) | ENDPOINT_4_MAXESITPAYLOAD((
 					(maxBurst+1) * maxPacketSize));
 			break;
 		default:
-			endpoint->dwendpoint4 =	ENDPOINT_4_AVGTRBLENGTH(B_PAGE_SIZE);
+			dwendpoint4 = ENDPOINT_4_AVGTRBLENGTH(B_PAGE_SIZE);
 			break;
 	}
 
+	_WriteContext(&device->input_ctx->endpoints[number].dwendpoint0,
+		dwendpoint0);
+	_WriteContext(&device->input_ctx->endpoints[number].dwendpoint1,
+		dwendpoint1);
+	_WriteContext(&device->input_ctx->endpoints[number].qwendpoint2,
+		qwendpoint2);
+	_WriteContext(&device->input_ctx->endpoints[number].dwendpoint4,
+		dwendpoint4);
+
 	TRACE("endpoint 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 " 0x%"
-		B_PRIx32 "\n", endpoint->dwendpoint0, endpoint->dwendpoint1,
-		endpoint->qwendpoint2, endpoint->dwendpoint4);
+		B_PRIx32 "\n",
+		_ReadContext(&device->input_ctx->endpoints[number].dwendpoint0),
+		_ReadContext(&device->input_ctx->endpoints[number].dwendpoint1),
+		_ReadContext(&device->input_ctx->endpoints[number].qwendpoint2),
+		_ReadContext(&device->input_ctx->endpoints[number].dwendpoint4));
 
 	return B_OK;
 }
@@ -2466,4 +2502,47 @@ inline void
 XHCI::WriteDoorReg32(uint32 reg, uint32 value)
 {
 	*(volatile uint32 *)(fDoorbellRegisters + reg) = value;
+}
+
+
+inline addr_t
+XHCI::_OffsetContextAddr(addr_t p)
+{
+	if (fContextSizeShift == 1) {
+		// each structure is page aligned, each pointer is 32 bits aligned
+		uint32 offset = p & ((B_PAGE_SIZE - 1) & ~31U);
+		p += offset;
+	}
+	return p;
+}
+
+inline uint32
+XHCI::_ReadContext(uint32* p)
+{
+	p = (uint32*)_OffsetContextAddr((addr_t)p);
+	return *p;
+}
+
+
+inline void
+XHCI::_WriteContext(uint32* p, uint32 value)
+{
+	p = (uint32*)_OffsetContextAddr((addr_t)p);
+	*p = value;
+}
+
+
+inline uint64
+XHCI::_ReadContext(uint64* p)
+{
+	p = (uint64*)_OffsetContextAddr((addr_t)p);
+	return *p;
+}
+
+
+inline void
+XHCI::_WriteContext(uint64* p, uint64 value)
+{
+	p = (uint64*)_OffsetContextAddr((addr_t)p);
+	*p = value;
 }
