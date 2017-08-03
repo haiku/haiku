@@ -498,16 +498,17 @@ NetworkStatusView::_DetermineInterfaceStatus(
 	const BNetworkInterface& interface)
 {
 	uint32 flags = interface.Flags();
-	int32 status = kStatusNoLink;
 
-	// TODO: no kStatusLinkNoConfig yet
-
+	if ((flags & IFF_LINK) == 0)
+		return kStatusNoLink;
+	if ((flags & (IFF_UP | IFF_LINK | IFF_CONFIGURING)) == IFF_LINK)
+		return kStatusLinkNoConfig;
 	if (flags & IFF_CONFIGURING)
-		status = kStatusConnecting;
-	else if ((flags & (IFF_UP | IFF_LINK)) == (IFF_UP | IFF_LINK))
-		status = kStatusReady;
+		return kStatusConnecting;
+	if ((flags & (IFF_UP | IFF_LINK)) == (IFF_UP | IFF_LINK))
+		return kStatusReady;
 
-	return status;
+	return kStatusUnknown;
 }
 
 
