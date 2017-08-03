@@ -129,6 +129,17 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 
 	int32 modifier = 0;
 	message->FindInt32("modifiers", &modifier);
+
+	if (modifier & B_COMMAND_KEY && key == B_UP_ARROW) {
+		filter->Looper()->PostMessage(kOpenParentDir);
+		return B_SKIP_MESSAGE;
+	}
+
+	if (modifier & B_COMMAND_KEY && key == 'w') {
+		filter->Looper()->PostMessage(kCancelButton);
+		return B_SKIP_MESSAGE;
+	}
+
 	if (!modifier && key == B_ESCAPE) {
 		if (view->ActivePose())
 			view->CommitActivePose(false);
