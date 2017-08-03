@@ -503,7 +503,7 @@ NetworkStatusView::_DetermineInterfaceStatus(
 		return kStatusNoLink;
 	if ((flags & (IFF_UP | IFF_LINK | IFF_CONFIGURING)) == IFF_LINK)
 		return kStatusLinkNoConfig;
-	if (flags & IFF_CONFIGURING)
+	if ((flags & IFF_CONFIGURING) == IFF_CONFIGURING)
 		return kStatusConnecting;
 	if ((flags & (IFF_UP | IFF_LINK)) == (IFF_UP | IFF_LINK))
 		return kStatusReady;
