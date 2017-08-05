@@ -35,6 +35,10 @@
 #define B_TRANSLATE_MARK(string) \
 	B_CATKEY((string), B_TRANSLATION_CONTEXT)
 
+#undef B_TRANSLATE_MARK_CONTEXT
+#define B_TRANSLATE_MARK_CONTEXT(string, context) \
+	B_CATKEY((string), (context))
+
 #undef B_TRANSLATE_MARK_COMMENT
 #define B_TRANSLATE_MARK_COMMENT(string, comment) \
 	B_CATKEY((string), B_TRANSLATION_CONTEXT, (comment))
@@ -54,6 +58,10 @@
 #undef B_TRANSLATE_MARK_VOID
 #define B_TRANSLATE_MARK_VOID(string) \
 	B_CATKEY((string), B_TRANSLATION_CONTEXT)
+
+#undef B_TRANSLATE_MARK_CONTEXT_VOID
+#define B_TRANSLATE_MARK_CONTEXT_VOID(string, context) \
+	B_CATKEY((string), (context))
 
 #undef B_TRANSLATE_MARK_COMMENT_VOID
 #define B_TRANSLATE_MARK_COMMENT_VOID(string, comment) \

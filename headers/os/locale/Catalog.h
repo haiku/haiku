@@ -151,6 +151,9 @@ private:
 #undef B_TRANSLATE_MARK
 #define B_TRANSLATE_MARK(string) (string)
 
+#undef B_TRANSLATE_MARK_CONTEXT
+#define B_TRANSLATE_MARK_CONTEXT(string, context) (string)
+
 #undef B_TRANSLATE_MARK_COMMENT
 #define B_TRANSLATE_MARK_COMMENT(string, comment) (string)
 
@@ -166,6 +169,9 @@ private:
 // the same for void contexts:
 #undef B_TRANSLATE_MARK_VOID
 #define B_TRANSLATE_MARK_VOID(string)
+
+#undef B_TRANSLATE_MARK_CONTEXT_VOID
+#define B_TRANSLATE_MARK_CONTEXT_VOID(string, context)
 
 #undef B_TRANSLATE_MARK_COMMENT_VOID
 #define B_TRANSLATE_MARK_COMMENT_VOID(string, comment)
