@@ -119,8 +119,8 @@ public:
 		off_t	BlockNum() const { return fBlockNumber;}
 		bool	IsWritable() const { return fWritable; }
 
-		int32	SearchSlot(const btrfs_key& key, int* slot,
-					btree_traversing type) const;
+		status_t	SearchSlot(const btrfs_key& key, int* slot,
+						btree_traversing type) const;
 		private:
 		Node(const Node&);
 		Node& operator=(const Node&);

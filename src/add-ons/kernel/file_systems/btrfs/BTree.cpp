@@ -90,8 +90,9 @@ BTree::Node::SetToWritable(off_t block, int32 transactionId, bool empty)
 }
 
 
-int32
-BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) const
+status_t
+BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
+	const
 {
 	//binary search for item slot in a node
 	int entrySize = sizeof(btrfs_entry);
@@ -100,14 +101,13 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) 
 		entrySize = sizeof(btrfs_index);
 	}
 
-	int low = 0;
 	int high = ItemCount();
-	int mid, comp;
-	int base = sizeof(btrfs_header);
+	int low = 0, mid = 0, comp = 0;
+	uint8* base = (uint8*)fNode + sizeof(btrfs_header);
 	const btrfs_key* other;
 	while (low < high) {
 		mid = (low + high) / 2;
-		other = (const btrfs_key*)((uint8*)fNode + base + mid * entrySize);
+		other = (const btrfs_key*)(base + mid * entrySize);
 		comp = key.Compare(*other);
 		if (comp < 0)
 			high = mid;
@@ -119,15 +119,25 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type) 
 		}
 	}
 
+	// |--item1--|--item2--|--item3--|--etc--|
+	//     m-1        m        m+1
+	//           k          		: comp < 0
+	//                     k		: comp > 0
+	if (type == BTREE_BACKWARD) {
+		*slot = mid - 1;
+		if (comp > 0)
+			*slot = mid;
+	} else if (type == BTREE_FORWARD) {
+		*slot = mid;
+		if (comp > 0)
+			*slot = mid + 1;
+	}
+
+	if (type == BTREE_EXACT || *slot < 0)
+		return B_ENTRY_NOT_FOUND;
+
 	TRACE("SearchSlot() found slot %" B_PRId32 " comp %" B_PRId32 "\n",
 		*slot, comp);
-	if (type == BTREE_BACKWARD)
-		*slot = low - 1;
-	else if (type == BTREE_FORWARD)
-		*slot = low;
-
-	if (*slot < 0 || type == BTREE_EXACT)
-		return B_ENTRY_NOT_FOUND;
 	return B_OK;
 }
 
