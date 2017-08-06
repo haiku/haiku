@@ -270,31 +270,30 @@
 <variablelist>
 <title>Standard System Accelerators:</title>
 
-<varlistentry><term>B_COMMAND_KEY + N: </term><listitem>New Document</listitem></varlistentry>
-<varlistentry><term>B_COMMAND_KEY + O: </term><listitem>Open Document</listitem></varlistentry>
-<varlistentry><term>B_COMMAND_KEY + S: </term><listitem>Save Document</listitem></varlistentry>
-<varlistentry><term>B_COMMAND_KEY + Shift + S: </term><listitem>Save As (show Save dialog window)</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + N: </term><listitem>New document</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + O: </term><listitem>Open document</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + S: </term><listitem>Save document</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + Shift + S: </term><listitem>Save as… (show Save dialog window)</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + P: </term><listitem>Print</listitem></varlistentry>
-<varlistentry><term>B_COMMAND_KEY + W: </term><listitem>Close Active Window</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + W: </term><listitem>Close active window</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + Q: </term><listitem>Quit</listitem></varlistentry>
 
 <varlistentry><term>B_COMMAND_KEY + C: </term><listitem>Copy</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + X: </term><listitem>Cut</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + V: </term><listitem>Paste</listitem></varlistentry>
 
-<varlistentry><term>B_COMMAND_KEY + F: </term><listitem>Show Find Window</listitem></varlistentry>
-<varlistentry><term>B_COMMAND_KEY + G: </term><listitem>Find Again</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + F: </term><listitem>Show find window</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + G: </term><listitem>Find again</listitem></varlistentry>
 
-<varlistentry><term>B_COMMAND_KEY + B_OPTION_KEY + F: </term><listitem>Show Replace Window</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + B_OPTION_KEY + F: </term><listitem>Show Replace window</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + L: </term><listitem>Replace and Find</listitem></varlistentry>
 
-
-<varlistentry><term>B_COMMAND_KEY + ,: </term><listitem>Program Settings</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + ,: </term><listitem>Settings window</listitem></varlistentry>
 
 <varlistentry><term>B_COMMAND_KEY + B: </term><listitem>(Word processor) Bold font</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + U: </term><listitem>(Word processor) Underline font</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + I: </term><listitem>(Word processor) Italicized font</listitem></varlistentry>
-<varlistentry><term>B_COMMAND_KEY + A: </term><listitem>Select All</listitem></varlistentry>
+<varlistentry><term>B_COMMAND_KEY + A: </term><listitem>Select all</listitem></varlistentry>
 
 <varlistentry><term>B_COMMAND_KEY + Z: </term><listitem>Undo</listitem></varlistentry>
 <varlistentry><term>B_COMMAND_KEY + B_SHIFT_KEY + Z: </term><listitem>Redo</listitem></varlistentry>
@@ -446,7 +445,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>...Ellipses...</title>
 
-<para>An ellipsis is a series of 3 dots (...) used to tell the user that a control, often a menu item or button, will open a window. For example, a menu item named "New..." will display a window which has the title "New". However, if creating a new document does not require showing a window, then an ellipsis should not be used. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Some BeOS keymaps, such as the US QWERTY keymap, allow you to type in an ellipsis with the Option + period keyboard shortcut.</para>
+<para>An ellipsis is a series of 3 dots (…) used to tell the user that a control, often a menu item or button, will open a window. For example, a menu item named "New…" will display a window which has the title "New". However, if creating a new document does not require showing a window, then an ellipsis should not be used. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Some BeOS keymaps, such as the US QWERTY keymap, allow you to type in an ellipsis with the Option + period keyboard shortcut.</para>
 </sect1>
 
 <sect1>
@@ -611,47 +610,28 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Marking and Toggling Items</title>
 
-<para>Menus can also contain items which indicate the state of a feature, such as the visibility of a tool window. There are two ways that this can be done. The first is to use a menu item with a dynamic title. In both states, it must be completely clear to the user what will happen when the item is clicked just be reading the title. The other method is to place a checkmark beside the item indicating the current state. The advantage to this method is that it can be used for choosing from more than two states at the expense of screen space. When using this method, all possible states need to be listed in order to prevent confusion.</para>
-
+<para>Menus can also contain items which indicate the state of a feature, such as the visibility of a tool window. The preferred method is to place a checkmark beside the item indicating the positive state. This is less confusing than to dynamically change menu item labels and has the advantage that it can be used for choosing from more than two states at the expense of screen space. When there are more than two states, all possible states need to be listed in order to prevent confusion.
 
 <literallayout>
-<emphasis>Examples of Good Dynamic Menu Item Usage</emphasis>
-|Window|
------------------
-Show Tool Window
-Hide Tool Window
------------------
-Show Color Picker
-Hide Color Picker
------------------
-
-|Settings|
----------------------------
-Change to Wireframe Preview
-Change to Full Preview
----------------------------
-
-
-Examples of Good Multiple State Item Usage:
+<emphasis>Examples of Good Toogling/Multiple State Item Usage</emphasis>
 
 |Help|
 -----------------------
-Read the Manual...
+Open manual...
 -----------------------
-* Show Tooltips
-  Do Not Show Tooltips
+* Show tooltips
 -----------------------
-Go to the MyApp Website
+Go to the MyApp website
 -----------------------
 
 |Font|
 -----------------------
-Choose Font and Size...
+Choose font and size...
 -----------------------
 * Normal
   Bold
   Italics
-  Bold Italics
+  Bold italics
   Strikeout
   Underline
 -----------------------
@@ -674,7 +654,7 @@ Choose Font and Size...
 	the About window. This is not a commonly-accessed item, so do not provide a
 	keyboard shortcut for it.</para></listitem></varlistentry>
 
-<varlistentry><term>Settings… (Command - ,) </term><listitem><para>Show the
+<varlistentry><term>Settings…</term><listitem><para>Show the
 	window which is used to customize settings for your program. This can be a
 	submenu if your program only has a couple of settings.</para></listitem>
 </varlistentry>
@@ -694,7 +674,7 @@ New (Command + N) </term><listitem><para>Create a new document. This item should
 Open... (Command + O) </term><listitem><para>Open a document from disk.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Open Recent </term><listitem><para>This is a submenu in the File menu to allow fast access to recent documents. It should not open a window of any kind except if your program uses a one-window-per-document architecture. The number of recent items should be limited to no more than 5 items.</para></listitem></varlistentry>
+Open recent </term><listitem><para>This is a submenu in the File menu to allow fast access to recent documents. It should not open a window of any kind except if your program uses a one-window-per-document architecture. The number of recent items should be limited to no more than 5 items.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Close (Command + W) </term><listitem><para>The function of this item depends on the program architecture. In a program which has one document per window, this closes the window. If there is only one open window, this quits the program. Although it is not recommended, if a program allows for multiple documents to be shown in the same window, this item closes one document.</para></listitem></varlistentry>
@@ -703,10 +683,10 @@ Close (Command + W) </term><listitem><para>The function of this item depends on 
 Save (Command + S) </term><listitem><para>Save the current document. This should not show a window unless it is a new document that has not yet been saved. It does not normally show a window, so no ellipsis is necessary.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Save As... (Command + Shift + S) </term><listitem><para>This performs the same basic kind of task as Save, but it always shows a window.</para></listitem></varlistentry>
+Save as… (Command + Shift + S) </term><listitem><para>This performs the same basic kind of task as Save, but it always shows a window.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Save All </term><listitem><para>This item executes a Save command for all documents in the program. The procedure for handling new documents which have not yet been saved is as follows:
+Save all </term><listitem><para>This item executes a Save command for all documents in the program. The procedure for handling new documents which have not yet been saved is as follows:
 	<para>
 	<orderedlist>
 	<listitem>Remember the current document window</listitem>
@@ -720,16 +700,16 @@ Save All </term><listitem><para>This item executes a Save command for all docume
 Revert </term><listitem><para>Undoes all changes made to the document since the last save.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Import From... </term><listitem><para>Import data from another file format into a new document. Like Open, this always shows a window.</para></listitem></varlistentry>
+Import from… </term><listitem><para>Import data from another file format into a new document. Like Open…, this always shows a window.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Export To... </term><listitem><para>Convert the data in the current document to another format. Like Save As, this always shows a window.</para></listitem></varlistentry>
+Export to… </term><listitem><para>Convert the data in the current document to another format. Like Save as…, this always shows a window.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Page Setup... </term><listitem><para>Shows the page settings window for printer setup.</para></listitem></varlistentry>
+Page setup… </term><listitem><para>Shows the page settings window for printer setup.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Print... (Command + P) </term><listitem><para>This always shows the print window before printing the current document. This is not intended to be the same as when a toolbar button is pressed.</para></listitem></varlistentry>
+Print… (Command + P) </term><listitem><para>This always shows the print window before printing the current document. This is not intended to be the same as when a toolbar button is pressed.</para></listitem></varlistentry>
 </variablelist>
 
 
@@ -752,7 +732,7 @@ Copy (Command + C) </term><listitem><para>Copies the currently-selected data in 
 Paste (Command + V) </term><listitem><para>Inserts the data on the clipboard into the current document. If there is an existing selection in the current document, the paste operation replaces the selected data with the pasted data.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Select All (Command + A) </term><listitem><para>Selects all data in the current document.</para></listitem></varlistentry>
+Select all (Command + A) </term><listitem><para>Selects all data in the current document.</para></listitem></varlistentry>
 </variablelist>
 
 
@@ -763,7 +743,7 @@ Select All (Command + A) </term><listitem><para>Selects all data in the current 
 Find… (Command + F) </term><listitem><para>This always shows a Find window for the program. The Find window should then allow the user to choose whatever options he desires for the find and disappear when the actual find is executed.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Find Again (Command + G) </term><listitem><para>This repeats the most recent Find. If no find has been performed in the program yet, it should show the Find window. Because this command does not normally show a window, no ellipsis is needed.</para></listitem></varlistentry>
+Find again (Command + G) </term><listitem><para>This repeats the most recent Find. If no find has been performed in the program yet, it should show the Find window. Because this command does not normally show a window, no ellipsis is needed.</para></listitem></varlistentry>
 </variablelist>
 
 
@@ -771,10 +751,10 @@ Find Again (Command + G) </term><listitem><para>This repeats the most recent Fin
 <title>Help: Different ways that the user can learn more about your program and get help when needed.</title>
 
 <varlistentry><term>
-Read the Manual… </term><listitem><para>Shows the manual for the program in a new window. The manual should never be shown in a BAlert.</para></listitem></varlistentry>
+Open manual… </term><listitem><para>Shows the manual for the program in a new window. The manual should never be shown in a BAlert.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default web browser at the website for the program or the program's company, respectively.</para></listitem></varlistentry>
+Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default web browser at the website for the program or the program's company, respectively.</para></listitem></varlistentry>
 </variablelist>
 
 </sect1>
@@ -916,8 +896,8 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 	and at the same time reduce the amount of time the user needs to find the
 	file he wants by reducing the number of options. Offering a possible file
 	name when saving a new document is another way to help the user. The title
-	of the panel needs to match the task, whether it is Import, Export As,
-	Save As, Save, Open, or something else.</para>
+	of the panel needs to match the task, whether it is Import, Export as,
+	Save as, Save, Open, or something else.</para>
 </sect1>
 </chapter>
 
