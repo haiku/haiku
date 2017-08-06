@@ -195,7 +195,7 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$binutilsSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--enable-targets=$binutilsTargets \
 	--disable-nls --disable-shared --disable-werror \
-	--with-sysroot="$sysrootDir" \
+	--with-sysroot="$sysrootDir" --disable-initfini-array \
 	$binutilsConfigureArgs \
 	|| exit 1
 $MAKE $additionalMakeArgs || exit 1
