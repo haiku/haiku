@@ -610,7 +610,13 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Marking and Toggling Items</title>
 
-<para>Menus can also contain items which indicate the state of a feature, such as the visibility of a tool window. The preferred method is to place a checkmark beside the item indicating the positive state. This is less confusing than to dynamically change menu item labels and has the advantage that it can be used for choosing from more than two states at the expense of screen space. When there are more than two states, all possible states need to be listed in order to prevent confusion.
+<para>Menus can also contain items which indicate the state of a feature, such
+as the visibility of a tool window. The preferred method is to place a checkmark
+beside the item indicating the positive state. This is less confusing than to
+dynamically change menu item labels and has the advantage that it can be used
+for choosing from more than two states at the expense of screen space. When
+there are more than two states, all possible states need to be listed in order
+to prevent confusion.</para>
 
 <literallayout>
 <emphasis>Examples of Good Toogling/Multiple State Item Usage</emphasis>
