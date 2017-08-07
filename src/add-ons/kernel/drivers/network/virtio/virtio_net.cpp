@@ -299,14 +299,14 @@ virtio_net_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 	}
 
 	// wait for reception
-	status = acquire_sem_etc(info->rx_done, 1, B_RELATIVE_TIMEOUT, 10000);
+	status = acquire_sem(info->rx_done);
 	if (status != B_OK) {
 		ERROR("acquire_sem(rx_done) failed (%s)\n", strerror(status));
 		return status;
 	}
 
-	*_length = MIN(MAX_FRAME_SIZE, *_length);
-	memcpy(buffer, &info->rx_buffer, *_length);
+	*_length = MIN(entries[1].size, *_length);
+	user_memcpy(buffer, &info->rx_buffer, *_length);
 	return B_OK;
 }
 
@@ -334,10 +334,12 @@ virtio_net_write(void* cookie, off_t pos, const void* buffer,
 
 	physical_entry entries[2];
 	entries[0] = info->hdr_entry;
+	entries[0].size = sizeof(virtio_net_hdr);
 	entries[1] = info->tx_entry;
+	entries[1].size = MIN(MAX_FRAME_SIZE, *_length);
 
 	memset(&info->hdr, 0, sizeof(info->hdr));
-	memcpy(&info->tx_buffer, buffer, MIN(MAX_FRAME_SIZE, *_length));
+	user_memcpy(&info->tx_buffer, buffer, MIN(MAX_FRAME_SIZE, *_length));
 
 	// queue the virtio_net_hdr + buffer data
 	status_t status = info->virtio->queue_request_v(info->tx_queues[0],
