@@ -33,6 +33,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
@@ -96,6 +97,7 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 	char *pad;
 	struct stat sbuf;
 	int rval;
+	struct timeval tv;
 
 	if (doopen != NULL && domkdir) {
 		__set_errno(EINVAL);
@@ -114,6 +116,9 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 	}
 
 	/* Fill space with random characters */
+	/* seed rand() first, otherwise generated sequences are same */
+	gettimeofday(&tv, 0);
+	srand((getpid() << 16) ^ getuid() ^ tv.tv_sec ^ tv.tv_usec);
 	while (trv >= path && *trv == 'X') {
 		uint32_t value = rand() % (sizeof(padchar) - 1);
 		*trv-- = padchar[value];
