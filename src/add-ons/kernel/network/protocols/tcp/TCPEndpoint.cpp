@@ -612,7 +612,7 @@ TCPEndpoint::Connect(const sockaddr* address)
 	} else if (fState == ESTABLISHED) {
 		return EISCONN;
 	} else if (fState != CLOSED)
-		return EINPROGRESS;
+		return EALREADY;
 
 	// consider destination address INADDR_ANY as INADDR_LOOPBACK
 	sockaddr_storage _address;
