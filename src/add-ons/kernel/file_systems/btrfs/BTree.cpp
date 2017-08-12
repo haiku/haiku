@@ -519,13 +519,16 @@ BTree::_RemoveIterator(TreeIterator* iterator)
 //	#pragma mark -
 
 
-TreeIterator::TreeIterator(BTree* tree, btrfs_key& key)
+TreeIterator::TreeIterator(BTree* tree, const btrfs_key& key)
 	:
 	fTree(tree),
-	fCurrentKey(key)
+	fKey(key),
+	fIteratorStatus(B_NO_INIT)
 {
-	Rewind();
 	tree->_AddIterator(this);
+	fPath = new(std::nothrow) BTree::Path(tree);
+	if (fPath == NULL)
+		fIteratorStatus = B_NO_MEMORY;
 }
 
 
@@ -533,25 +536,71 @@ TreeIterator::~TreeIterator()
 {
 	if (fTree)
 		fTree->_RemoveIterator(this);
+
+	delete fPath;
+	fPath = NULL;
+}
+
+
+void
+TreeIterator::Rewind(bool inverse)
+{
+	if (inverse)
+		fKey.SetOffset(BTREE_END);
+	else
+		fKey.SetOffset(BTREE_BEGIN);
+	fIteratorStatus = B_NO_INIT;
 }
 
 
 /*!	Iterates through the tree in the specified direction.
 */
 status_t
-TreeIterator::Traverse(btree_traversing direction, btrfs_key& key,
-	void** value, uint32* size)
+TreeIterator::_Traverse(btree_traversing direction)
 {
-	if (fTree == NULL)
-		return B_INTERRUPTED;
-
-	fCurrentKey.SetOffset(fCurrentKey.Offset() + direction);
-	BTree::Path path(fTree);
-	status_t status = fTree->_Find(&path, fCurrentKey, value, size, direction);
-	if (status != B_OK) {
-		TRACE("TreeIterator::Traverse() Find failed\n");
-		return B_ENTRY_NOT_FOUND;
+	status_t status = fTree->Traverse(direction, fPath, fKey);
+	if (status < B_OK) {
+		ERROR("TreeIterator::Traverse() Find failed\n");
+		return status;
 	}
+
+	return (fIteratorStatus = B_OK);
+}
+
+
+// Like GetEntry in BTree::Path but here we check the type and moving.
+status_t
+TreeIterator::_GetEntry(btree_traversing type, void** _value, uint32* _size,
+	uint32* _offset)
+{
+	status_t status;
+	if (fIteratorStatus == B_NO_INIT) {
+		status = _Traverse(type);
+		if (status != B_OK)
+			return status;
+		type = BTREE_EXACT;
+	}
+
+	if (fIteratorStatus != B_OK)
+		return fIteratorStatus;
+
+	int move = fPath->Move(0, type);
+	if (move > 0)
+		status = fTree->NextLeaf(fPath);
+	else if (move < 0)
+		status = fTree->PreviousLeaf(fPath);
+	if (status != B_OK)
+		return status;
+
+	btrfs_key found;
+	status = fPath->GetCurrentEntry(&found, _value, _size, _offset);
+	if (status != B_OK)
+		return status;
+
+	fKey.SetObjectID(found.ObjectID());
+	fKey.SetOffset(found.Offset());
+	if (fKey.Type() != found.Type() && fKey.Type() != BTRFS_KEY_TYPE_ANY)
+		return B_ENTRY_NOT_FOUND;
 
 	return B_OK;
 }
@@ -560,11 +609,13 @@ TreeIterator::Traverse(btree_traversing direction, btrfs_key& key,
 /*!	just sets the current key in the iterator.
 */
 status_t
-TreeIterator::Find(btrfs_key& key)
+TreeIterator::Find(const btrfs_key& key)
 {
-	if (fTree == NULL)
-		return B_INTERRUPTED;
-	fCurrentKey = key;
+	if (fIteratorStatus == B_INTERRUPTED)
+		return fIteratorStatus;
+
+	fKey = key;
+	fIteratorStatus = B_NO_INIT;
 	return B_OK;
 }
 
@@ -573,4 +624,5 @@ void
 TreeIterator::Stop()
 {
 	fTree = NULL;
+	fIteratorStatus = B_INTERRUPTED;
 }

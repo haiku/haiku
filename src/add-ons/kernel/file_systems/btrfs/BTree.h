@@ -176,31 +176,37 @@ public:
 
 class TreeIterator : public SinglyLinkedListLinkImpl<TreeIterator> {
 public:
-								TreeIterator(BTree* tree, btrfs_key& key);
+								TreeIterator(BTree* tree, const btrfs_key& key);
 								~TreeIterator();
 
-			status_t			Traverse(btree_traversing direction,
-									btrfs_key& key, void** value,
-									uint32* size = NULL);
-			status_t			Find(btrfs_key& key);
+			void				Rewind(bool inverse = false);
+			status_t			Find(const btrfs_key& key);
+			status_t			GetNextEntry(void** _value,
+									uint32* _size = NULL,
+									uint32* _offset = NULL);
+			status_t			GetPreviousEntry(void** _value,
+									uint32* _size = NULL,
+									uint32* _offset = NULL);
 
-			status_t			Rewind();
-			status_t			GetNextEntry(btrfs_key& key, void** value,
-									uint32* size = NULL);
-			status_t			GetPreviousEntry(btrfs_key& key, void** value,
-									uint32* size = NULL);
-
-			BTree*			Tree() const { return fTree; }
+			BTree*				Tree() const { return fTree; }
+			btrfs_key			Key() const { return fKey; }
 
 private:
 			friend class BTree;
 
+			status_t			_Traverse(btree_traversing direction);
+			status_t			_Find(btree_traversing type, btrfs_key& key,
+									void** _value);
+			status_t			_GetEntry(btree_traversing type, void** _value,
+									uint32* _size, uint32* _offset);
 			// called by BTree
 			void				Stop();
 
 private:
 			BTree*			fTree;
-			btrfs_key	fCurrentKey;
+			BTree::Path*	fPath;
+			btrfs_key		fKey;
+			status_t		fIteratorStatus;
 };
 
 
@@ -219,25 +225,16 @@ BTree::Path::GetCurrentEntry(btrfs_key* _key, void** _value, uint32* _size,
 
 
 inline status_t
-TreeIterator::Rewind()
+TreeIterator::GetNextEntry(void** _value, uint32* _size, uint32* _offset)
 {
-	fCurrentKey.SetOffset(BTREE_BEGIN);
-	return B_OK;
+	return _GetEntry(BTREE_FORWARD, _value, _size, _offset);
 }
 
 
 inline status_t
-TreeIterator::GetNextEntry(btrfs_key& key, void** value, uint32* size)
+TreeIterator::GetPreviousEntry(void** _value, uint32* _size, uint32* _offset)
 {
-	return Traverse(BTREE_FORWARD, key, value, size);
-}
-
-
-inline status_t
-TreeIterator::GetPreviousEntry(btrfs_key& key, void** value,
-	uint32* size)
-{
-	return Traverse(BTREE_BACKWARD, key, value, size);
+	return _GetEntry(BTREE_BACKWARD, _value, _size, _offset);
 }
 
 

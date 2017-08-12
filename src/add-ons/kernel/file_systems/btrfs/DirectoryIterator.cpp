@@ -26,6 +26,7 @@ DirectoryIterator::DirectoryIterator(Inode* inode)
 	btrfs_key key;
 	key.SetType(BTRFS_KEY_TYPE_DIR_INDEX);
 	key.SetObjectID(inode->ID());
+	key.SetOffset(BTREE_BEGIN);
 	fIterator = new(std::nothrow) TreeIterator(inode->GetVolume()->FSTree(),
 		key);
 }
@@ -33,8 +34,8 @@ DirectoryIterator::DirectoryIterator(Inode* inode)
 
 DirectoryIterator::~DirectoryIterator()
 {
-	if (fIterator != NULL)
-		delete fIterator;
+	delete fIterator;
+	fIterator = NULL;
 }
 
 
@@ -69,11 +70,9 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 		return fInode->FindParent(_id);
 	}
 
-	btrfs_key key;
 	btrfs_dir_entry* entries;
 	uint32 entries_length;
-	status_t status = fIterator->GetNextEntry(key, (void**)&entries,
-		&entries_length);
+	status_t status = fIterator->GetNextEntry((void**)&entries, &entries_length);
 	if (status != B_OK)
 		return status;
 

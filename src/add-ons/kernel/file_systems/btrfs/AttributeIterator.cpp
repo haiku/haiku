@@ -22,9 +22,10 @@ AttributeIterator::AttributeIterator(Inode* inode)
 	fInode(inode),
 	fIterator(NULL)
 {
-	struct btrfs_key key;
+	btrfs_key key;
 	key.SetType(BTRFS_KEY_TYPE_XATTR_ITEM);
 	key.SetObjectID(inode->ID());
+	key.SetOffset(BTREE_BEGIN);
 	fIterator = new(std::nothrow) TreeIterator(inode->GetVolume()->FSTree(),
 		key);
 }
@@ -33,6 +34,7 @@ AttributeIterator::AttributeIterator(Inode* inode)
 AttributeIterator::~AttributeIterator()
 {
 	delete fIterator;
+	fIterator = NULL;
 }
 
 
@@ -46,10 +48,9 @@ AttributeIterator::InitCheck()
 status_t
 AttributeIterator::GetNext(char* name, size_t* _nameLength)
 {
-	btrfs_key key;
 	btrfs_dir_entry* entries;
 	uint32 entries_length;
-	status_t status = fIterator->GetPreviousEntry(key, (void**)&entries,
+	status_t status = fIterator->GetPreviousEntry((void**)&entries,
 		&entries_length);
 	if (status != B_OK)
 		return status;
