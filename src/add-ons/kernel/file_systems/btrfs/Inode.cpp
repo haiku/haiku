@@ -167,7 +167,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	search_key.SetObjectID(fID);
 	search_key.SetOffset(pos + 1);
 
-	size_t item_size;
+	uint32 item_size;
 	btrfs_extent_data* extent_data;
 	status_t status = fVolume->FSTree()->FindPrevious(search_key,
 		(void**)&extent_data, &item_size);
@@ -222,7 +222,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 		int status;
 		ssize_t offset = 0;
-		size_t inline_size = item_size - 13;
+		uint32 inline_size = item_size - 13;
 		bool headerRead = false;
 
 		TRACE("Inode::ReadAt(%" B_PRIdINO ") diff %" B_PRIdOFF " size %"

@@ -486,7 +486,7 @@ Volume::FindBlock(off_t logical, off_t& physical)
 	search_key.SetType(BTRFS_KEY_TYPE_CHUNK_ITEM);
  	search_key.SetObjectID(BTRFS_OBJECT_ID_FIRST_CHUNK_TREE);
 	btrfs_chunk* chunk;
-	size_t chunk_length;
+	uint32 chunk_length;
 	status_t status = fChunkTree->FindPrevious(search_key, (void**)&chunk,
 		&chunk_length);
 	if (status != B_OK)

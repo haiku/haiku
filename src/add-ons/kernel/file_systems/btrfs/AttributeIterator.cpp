@@ -48,7 +48,7 @@ AttributeIterator::GetNext(char* name, size_t* _nameLength)
 {
 	btrfs_key key;
 	btrfs_dir_entry* entries;
-	size_t entries_length;
+	uint32 entries_length;
 	status_t status = fIterator->GetPreviousEntry(key, (void**)&entries,
 		&entries_length);
 	if (status != B_OK)

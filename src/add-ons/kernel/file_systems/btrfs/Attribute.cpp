@@ -88,7 +88,7 @@ Attribute::Stat(struct stat& stat)
 
 	size_t nameLength = strlen(fName);
 	btrfs_dir_entry* entries;
-	size_t length;
+	uint32 length;
 	status_t status = _Lookup(fName, nameLength, &entries, &length);
 	if (status < B_OK)
 		return status;
@@ -116,7 +116,7 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 
 	size_t nameLength = strlen(fName);
 	btrfs_dir_entry* entries;
-	size_t length;
+	uint32 length;
 	status_t status = _Lookup(fName, nameLength, &entries, &length);
 	if (status < B_OK)
 		return status;
@@ -144,7 +144,7 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 
 status_t
 Attribute::_Lookup(const char* name, size_t nameLength,
-	btrfs_dir_entry** _entries, size_t* _length)
+	btrfs_dir_entry** _entries, uint32* _length)
 {
 	uint32 hash = calculate_crc((uint32)~1, (uint8*)name, nameLength);
 	struct btrfs_key key;
@@ -153,7 +153,7 @@ Attribute::_Lookup(const char* name, size_t nameLength,
 	key.SetOffset(hash);
 
 	btrfs_dir_entry* entries;
-	size_t length;
+	uint32 length;
 	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
 		(void**)&entries, &length);
 	if (status != B_OK) {

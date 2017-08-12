@@ -3,8 +3,8 @@
  * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
-#ifndef B_PLUS_TREE_H
-#define B_PLUS_TREE_H
+#ifndef B_TREE_H
+#define B_TREE_H
 
 
 #include "btrfs.h"
@@ -50,11 +50,11 @@ public:
 									fsblock_t rootBlock);
 								~BTree();
 			status_t			FindExact(btrfs_key& key, void** value,
-									size_t* size = NULL, bool read = true);
+									uint32* size = NULL, bool read = true);
 			status_t			FindNext(btrfs_key& key, void** value,
-									size_t* size = NULL, bool read = true);
+									uint32* size = NULL, bool read = true);
 			status_t			FindPrevious(btrfs_key& key, void** value,
-									size_t* size = NULL, bool read = true);
+									uint32* size = NULL, bool read = true);
 
 			Volume*				SystemVolume() const { return fVolume; }
 
@@ -67,7 +67,7 @@ private:
 								BTree& operator=(const BTree& other);
 									// no implementation
 
-			status_t			_Find(btrfs_key& key, void** value, size_t* size,
+			status_t			_Find(btrfs_key& key, void** value, uint32* size,
 									bool read, btree_traversing type);
 			void				_AddIterator(TreeIterator* iterator);
 			void				_RemoveIterator(TreeIterator* iterator);
@@ -153,14 +153,14 @@ public:
 
 			status_t			Traverse(btree_traversing direction,
 									btrfs_key& key, void** value,
-									size_t* size = NULL);
+									uint32* size = NULL);
 			status_t			Find(btrfs_key& key);
 
 			status_t			Rewind();
 			status_t			GetNextEntry(btrfs_key& key, void** value,
-									size_t* size = NULL);
+									uint32* size = NULL);
 			status_t			GetPreviousEntry(btrfs_key& key, void** value,
-									size_t* size = NULL);
+									uint32* size = NULL);
 
 			BTree*			Tree() const { return fTree; }
 
@@ -188,7 +188,7 @@ TreeIterator::Rewind()
 
 
 inline status_t
-TreeIterator::GetNextEntry(btrfs_key& key, void** value, size_t* size)
+TreeIterator::GetNextEntry(btrfs_key& key, void** value, uint32* size)
 {
 	return Traverse(BTREE_FORWARD, key, value, size);
 }
@@ -196,10 +196,10 @@ TreeIterator::GetNextEntry(btrfs_key& key, void** value, size_t* size)
 
 inline status_t
 TreeIterator::GetPreviousEntry(btrfs_key& key, void** value,
-	size_t* size)
+	uint32* size)
 {
 	return Traverse(BTREE_BACKWARD, key, value, size);
 }
 
 
-#endif	// B_PLUS_TREE_H
+#endif	// B_TREE_H

@@ -33,7 +33,8 @@ DirectoryIterator::DirectoryIterator(Inode* inode)
 
 DirectoryIterator::~DirectoryIterator()
 {
-	delete fIterator;
+	if (fIterator != NULL)
+		delete fIterator;
 }
 
 
@@ -61,7 +62,7 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 		*_nameLength = 1;
 		strlcpy(name, ".", *_nameLength + 1);
 		fOffset = 2;
-		if (fInode->ID() == BTRFS_OBJECT_ID_CHUNK_TREE) {
+		if (fInode->ID() == BTRFS_FIRST_SUBVOLUME) {
 			*_id = fInode->ID();
 			return B_OK;
 		}
@@ -70,7 +71,7 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 
 	btrfs_key key;
 	btrfs_dir_entry* entries;
-	size_t entries_length;
+	uint32 entries_length;
 	status_t status = fIterator->GetNextEntry(key, (void**)&entries,
 		&entries_length);
 	if (status != B_OK)
@@ -110,7 +111,7 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 {
 	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
 		if (strcmp(name, ".") == 0
-			|| fInode->ID() == BTRFS_OBJECT_ID_CHUNK_TREE) {
+			|| fInode->ID() == BTRFS_FIRST_SUBVOLUME) {
 			*_id = fInode->ID();
 			return B_OK;
 		}
@@ -124,7 +125,7 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	key.SetOffset(hash);
 
 	btrfs_dir_entry* entries;
-	size_t length;
+	uint32 length;
 	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
 		(void**)&entries, &length);
 	if (status != B_OK) {

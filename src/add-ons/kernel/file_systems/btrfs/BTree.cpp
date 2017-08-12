@@ -212,7 +212,7 @@ btrfs_key::Compare(const btrfs_key& key) const
 	It can also return other errors to indicate that something went wrong.
 */
 status_t
-BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
+BTree::_Find(btrfs_key& key, void** _value, uint32* _size,
 	bool read, btree_traversing type)
 {
 	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
@@ -268,21 +268,21 @@ BTree::_Find(btrfs_key& key, void** _value, size_t* _size,
 
 
 status_t
-BTree::FindNext(btrfs_key& key, void** _value, size_t* _size, bool read)
+BTree::FindNext(btrfs_key& key, void** _value, uint32* _size, bool read)
 {
 	return _Find(key, _value, _size, read, BTREE_FORWARD);
 }
 
 
 status_t
-BTree::FindPrevious(btrfs_key& key, void** _value, size_t* _size, bool read)
+BTree::FindPrevious(btrfs_key& key, void** _value, uint32* _size, bool read)
 {
 	return _Find(key, _value, _size, read, BTREE_BACKWARD);
 }
 
 
 status_t
-BTree::FindExact(btrfs_key& key, void** _value, size_t* _size, bool read)
+BTree::FindExact(btrfs_key& key, void** _value, uint32* _size, bool read)
 {
 	return _Find(key, _value, _size, read, BTREE_EXACT);
 }
@@ -345,7 +345,7 @@ TreeIterator::~TreeIterator()
 */
 status_t
 TreeIterator::Traverse(btree_traversing direction, btrfs_key& key,
-	void** value, size_t* size)
+	void** value, uint32* size)
 {
 	if (fTree == NULL)
 		return B_INTERRUPTED;
