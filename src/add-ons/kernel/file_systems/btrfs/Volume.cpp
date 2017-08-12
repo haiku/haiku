@@ -317,15 +317,18 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount() root: %" B_PRIu64 " (physical block %" B_PRIu64 ")\n",
 		fSuperBlock.Root(), fRootTree->RootBlock());
 
+	BTree::Path path(fRootTree);
+
 	TRACE("Volume::Mount(): Searching extent root\n");
 	btrfs_key search_key;
 	search_key.SetOffset(0);
 	search_key.SetType(BTRFS_KEY_TYPE_ROOT_ITEM);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_EXTENT_TREE);
 	btrfs_root* root;
-	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
+	status = fRootTree->FindExact(&path, search_key, (void**)&root);
+	if (status != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find extent root\n");
-		return B_ERROR;
+		return status;
 	}
 	TRACE("Volume::Mount(): Found extent root: %" B_PRIu64 "\n",
 		root->LogicalAddress());
@@ -338,9 +341,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount(): Searching fs root\n");
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_FS_TREE);
-	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
+	status = fRootTree->FindExact(&path, search_key, (void**)&root);
+	if (status != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find fs root\n");
-		return B_ERROR;
+		return status;
 	}
 	TRACE("Volume::Mount(): Found fs root: %" B_PRIu64 "\n",
 		root->LogicalAddress());
@@ -353,9 +357,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount(): Searching dev root\n");
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_DEV_TREE);
-	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
+	status = fRootTree->FindExact(&path, search_key, (void**)&root);
+	if (status != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find dev root\n");
-		return B_ERROR;
+		return status;
 	}
 	TRACE("Volume::Mount(): Found dev root: %" B_PRIu64 "\n",
 		root->LogicalAddress());
@@ -368,9 +373,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount(): Searching checksum root\n");
 	search_key.SetOffset(0);
 	search_key.SetObjectID(BTRFS_OBJECT_ID_CHECKSUM_TREE);
-	if (fRootTree->FindExact(search_key, (void**)&root) != B_OK) {
+	status = fRootTree->FindExact(&path, search_key, (void**)&root);
+	if (status != B_OK) {
 		ERROR("Volume::Mount(): Couldn't find checksum root\n");
-		return B_ERROR;
+		return status;
 	}
 	TRACE("Volume::Mount(): Found checksum root: %" B_PRIu64 "\n",
 		root->LogicalAddress());
@@ -484,11 +490,11 @@ Volume::FindBlock(off_t logical, off_t& physical)
 	btrfs_key search_key;
 	search_key.SetOffset(logical);
 	search_key.SetType(BTRFS_KEY_TYPE_CHUNK_ITEM);
- 	search_key.SetObjectID(BTRFS_OBJECT_ID_FIRST_CHUNK_TREE);
+	search_key.SetObjectID(BTRFS_OBJECT_ID_FIRST_CHUNK_TREE);
 	btrfs_chunk* chunk;
-	uint32 chunk_length;
-	status_t status = fChunkTree->FindPrevious(search_key, (void**)&chunk,
-		&chunk_length);
+	BTree::Path path(fChunkTree);
+	status_t status = fChunkTree->FindPrevious(&path, search_key,
+		(void**)&chunk);
 	if (status != B_OK)
 		return status;
 

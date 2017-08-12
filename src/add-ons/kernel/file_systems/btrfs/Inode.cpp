@@ -78,9 +78,11 @@ Inode::UpdateNodeFromDisk()
 	search_key.SetType(BTRFS_KEY_TYPE_INODE_ITEM);
 	search_key.SetObjectID(fID);
 	search_key.SetOffset(0);
+	BTree::Path path(fVolume->FSTree());
 
 	btrfs_inode* node;
-	if (fVolume->FSTree()->FindExact(search_key, (void**)&node) != B_OK) {
+	if (fVolume->FSTree()->FindExact(&path, search_key, (void**)&node)
+		!= B_OK) {
 		ERROR("Inode::UpdateNodeFromDisk(): Couldn't find inode %"
 			B_PRIdINO "\n", fID);
 		return B_ENTRY_NOT_FOUND;
@@ -111,9 +113,10 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t* _length)
 	search_key.SetType(BTRFS_KEY_TYPE_EXTENT_DATA);
 	search_key.SetObjectID(fID);
 	search_key.SetOffset(pos + 1);
+	BTree::Path path(fVolume->FSTree());
 
 	btrfs_extent_data* extent_data;
-	status_t status = fVolume->FSTree()->FindPrevious(search_key,
+	status_t status = fVolume->FSTree()->FindPrevious(&path, search_key,
 		(void**)&extent_data);
 	if (status != B_OK) {
 		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%" B_PRIx32
@@ -166,10 +169,11 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	search_key.SetType(BTRFS_KEY_TYPE_EXTENT_DATA);
 	search_key.SetObjectID(fID);
 	search_key.SetOffset(pos + 1);
+	BTree::Path path(fVolume->FSTree());
 
 	uint32 item_size;
 	btrfs_extent_data* extent_data;
-	status_t status = fVolume->FSTree()->FindPrevious(search_key,
+	status_t status = fVolume->FSTree()->FindPrevious(&path, search_key,
 		(void**)&extent_data, &item_size);
 	if (status != B_OK) {
 		ERROR("Inode::FindBlock(): Couldn't find extent_data 0x%" B_PRIx32
@@ -292,9 +296,10 @@ Inode::FindParent(ino_t* id)
 	search_key.SetType(BTRFS_KEY_TYPE_INODE_REF);
 	search_key.SetObjectID(fID);
 	search_key.SetOffset(-1);
+	BTree::Path path(fVolume->FSTree());
 
 	void* node_ref;
-	if (fVolume->FSTree()->FindPrevious(search_key, &node_ref) != B_OK) {
+	if (fVolume->FSTree()->FindPrevious(&path, search_key, &node_ref) != B_OK) {
 		ERROR("Inode::FindParent(): Couldn't find inode for %" B_PRIdINO "\n",
 			fID);
 		return B_ERROR;

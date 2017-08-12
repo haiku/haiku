@@ -151,10 +151,11 @@ Attribute::_Lookup(const char* name, size_t nameLength,
 	key.SetType(BTRFS_KEY_TYPE_XATTR_ITEM);
 	key.SetObjectID(fInode->ID());
 	key.SetOffset(hash);
+	BTree::Path path(fInode->GetVolume()->FSTree());
 
 	btrfs_dir_entry* entries;
 	uint32 length;
-	status_t status = fInode->GetVolume()->FSTree()->FindExact(key,
+	status_t status = fInode->GetVolume()->FSTree()->FindExact(&path, key,
 		(void**)&entries, &length);
 	if (status != B_OK) {
 		TRACE("AttributeIterator::Lookup(): Couldn't find entry with hash %"

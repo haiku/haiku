@@ -43,21 +43,33 @@ struct node_and_key {
 
 class BTree {
 public:
+	class Path;
+
+public:
 								BTree(Volume* volume);
 								BTree(Volume* volume,
 									btrfs_stream* stream);
 								BTree(Volume* volume,
 									fsblock_t rootBlock);
 								~BTree();
-			status_t			FindExact(btrfs_key& key, void** value,
-									uint32* size = NULL, bool read = true);
-			status_t			FindNext(btrfs_key& key, void** value,
-									uint32* size = NULL, bool read = true);
-			status_t			FindPrevious(btrfs_key& key, void** value,
-									uint32* size = NULL, bool read = true);
+
+			status_t			FindExact(Path* path, btrfs_key& key,
+									void** _value, uint32* _size = NULL,
+									uint32* _offset = NULL) const;
+			status_t			FindNext(Path* path, btrfs_key& key,
+									void** _value, uint32* _size = NULL,
+									uint32* _offset = NULL) const;
+			status_t			FindPrevious(Path* path, btrfs_key& key,
+									void** _value, uint32* _size = NULL,
+									uint32* _offset = NULL) const;
+
+			status_t			Traverse(btree_traversing type, Path* path,
+									const btrfs_key& key) const;
+
+			status_t			PreviousLeaf(Path* path) const;
+			status_t			NextLeaf(Path* path) const;
 
 			Volume*				SystemVolume() const { return fVolume; }
-
 			status_t			SetRoot(off_t logical, fsblock_t* block);
 			fsblock_t			RootBlock() const { return fRootBlock; }
 			off_t				LogicalRoot() const { return fLogicalRoot; }
@@ -67,8 +79,10 @@ private:
 								BTree& operator=(const BTree& other);
 									// no implementation
 
-			status_t			_Find(btrfs_key& key, void** value, uint32* size,
-									bool read, btree_traversing type);
+			status_t			_Find(Path* path, btrfs_key& key,
+									void** _value, uint32* _size,
+									uint32* _offset, btree_traversing type)
+									const;
 			void				_AddIterator(TreeIterator* iterator);
 			void				_RemoveIterator(TreeIterator* iterator);
 private:
@@ -113,8 +127,7 @@ public:
 		void	Unset();
 
 		void	SetTo(off_t block);
-		void	SetToWritable(off_t block,
-				int32 transactionId, bool empty);
+		void	SetToWritable(off_t block, int32 transactionId, bool empty);
 
 		off_t	BlockNum() const { return fBlockNumber;}
 		bool	IsWritable() const { return fWritable; }
@@ -129,18 +142,33 @@ public:
 		btrfs_stream* 		fNode;
 		Volume*				fVolume;
 		off_t				fBlockNumber;
-		uint32 				fCurrentSlot;
 		bool				fWritable;
 	};
 
 
 	class Path {
 	public:
-		Path();
+		Path(BTree* tree);
+		~Path();
+
+		Node*		GetNode(int level, int* _slot = NULL) const;
+		Node*		SetNode(off_t block, int slot);
+		Node*		SetNode(const Node* node, int slot);
+		status_t	GetCurrentEntry(btrfs_key* _key, void** _value,
+						uint32* _size = NULL, uint32* _offset = NULL);
+		status_t	GetEntry(int slot, btrfs_key* _key, void** _value,
+						uint32* _size = NULL, uint32* _offset = NULL);
+
+		int			Move(int level, int step);
+
+		BTree*		Tree() const { return fTree; }
 	private:
 		Path(const Path&);
 		Path operator=(const Path&);
-		Node*	nodes[BTRFS_MAX_TREE_DEPTH];
+	private:
+		Node*	fNodes[BTRFS_MAX_TREE_DEPTH];
+		int		fSlots[BTRFS_MAX_TREE_DEPTH];
+		BTree*	fTree;
 	};
 
 };	// class BTree
@@ -174,6 +202,17 @@ private:
 			BTree*			fTree;
 			btrfs_key	fCurrentKey;
 };
+
+
+//	#pragma mark - BTree::Path inline functions
+
+
+inline status_t
+BTree::Path::GetCurrentEntry(btrfs_key* _key, void** _value, uint32* _size,
+	uint32* _offset)
+{
+	return GetEntry(fSlots[0], _key, _value, _size, _offset);
+}
 
 
 //	#pragma mark - TreeIterator inline functions

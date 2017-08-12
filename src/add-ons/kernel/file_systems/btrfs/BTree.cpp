@@ -25,7 +25,6 @@ BTree::Node::Node(Volume* volume)
 	fNode(NULL),
 	fVolume(volume),
 	fBlockNumber(0),
-	fCurrentSlot(0),
 	fWritable(false)
 {
 }
@@ -36,7 +35,6 @@ BTree::Node::Node(Volume* volume, off_t block)
 	fNode(NULL),
 	fVolume(volume),
 	fBlockNumber(0),
-	fCurrentSlot(0),
 	fWritable(false)
 {
 	SetTo(block);
@@ -142,7 +140,109 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
 }
 
 
-//-pragma mark
+//	#pragma mark - BTree::Path implementation
+
+
+BTree::Path::Path(BTree* tree)
+	:
+	fTree(tree)
+{
+	for (int i = 0; i < BTRFS_MAX_TREE_DEPTH; ++i) {
+		fNodes[i] = NULL;
+		fSlots[i] = 0;
+	}
+}
+
+
+BTree::Path::~Path()
+{
+	for (int i = 0; i < BTRFS_MAX_TREE_DEPTH; ++i) {
+		delete fNodes[i];
+		fNodes[i] = NULL;
+		fSlots[i] = 0;
+	}
+}
+
+
+BTree::Node*
+BTree::Path::GetNode(int level, int* _slot) const
+{
+	if (_slot != NULL)
+		*_slot = fSlots[level];
+	return fNodes[level];
+}
+
+
+BTree::Node*
+BTree::Path::SetNode(off_t block, int slot)
+{
+	Node node(fTree->SystemVolume(), block);
+	return SetNode(&node, slot);
+}
+
+
+BTree::Node*
+BTree::Path::SetNode(const Node* node, int slot)
+{
+	uint8 level = node->Level();
+	if (fNodes[level] == NULL) {
+		fNodes[level] = new Node(fTree->SystemVolume(), node->BlockNum());
+		if (fNodes[level] == NULL)
+			return NULL;
+	} else
+		fNodes[level]->SetTo(node->BlockNum());
+
+	if (slot == -1)
+		fSlots[level] = fNodes[level]->ItemCount() - 1;
+	else
+		fSlots[level] = slot;
+	return fNodes[level];
+}
+
+
+int
+BTree::Path::Move(int level, int step)
+{
+	fSlots[level] += step;
+	if (fSlots[level] < 0)
+		return -1;
+	if (fSlots[level] >= fNodes[level]->ItemCount())
+		return 1;
+	return 0;
+}
+
+
+status_t
+BTree::Path::GetEntry(int slot, btrfs_key* _key, void** _value, uint32* _size,
+	uint32* _offset)
+{
+	BTree::Node* leaf = fNodes[0];
+	if (slot < 0 || slot >= leaf->ItemCount())
+		return B_ENTRY_NOT_FOUND;
+
+	if (_key != NULL)
+		*_key = leaf->Item(slot)->key;
+
+	uint32 itemSize = leaf->Item(slot)->Size();
+	if (_value != NULL) {
+		*_value = malloc(itemSize);
+		if (*_value == NULL)
+			return B_NO_MEMORY;
+
+		memcpy(*_value, leaf->ItemData(slot), itemSize);
+	}
+
+	if (_size != NULL)
+		*_size = itemSize;
+
+	if (_offset != NULL)
+		*_offset = leaf->Item(slot)->Offset();
+
+	return B_OK;
+}
+
+
+//	#pragma mark - BTree implementation
 
 
 BTree::BTree(Volume* volume)
@@ -206,85 +306,180 @@ btrfs_key::Compare(const btrfs_key& key) const
 }
 
 
+/* Traverse from root to fill in the path along way its finding.
+ * Return current slot at leaf if successful.
+ */
+status_t
+BTree::Traverse(btree_traversing type, Path* path, const btrfs_key& key)
+	const
+{
+	TRACE("BTree::Traverse() objectid %" B_PRId64 " type %d offset %"
+		B_PRId64 " \n", key.ObjectID(),	key.Type(), key.Offset());
+	fsblock_t physicalBlock = fRootBlock;
+	Node node(fVolume, physicalBlock);
+	int slot;
+	status_t status = B_OK;
+
+	while (node.Level() != 0) {
+		TRACE("BTree::Traverse() level %d count %d\n", node.Level(),
+			node.ItemCount());
+		status = node.SearchSlot(key, &slot, BTREE_BACKWARD);
+		if (status != B_OK)
+			return status;
+		if (path->SetNode(&node, slot) == NULL)
+			return B_NO_MEMORY;
+
+		TRACE("BTree::Traverse() getting index %" B_PRIu32 "\n", slot);
+
+		status = fVolume->FindBlock(node.Index(slot)->LogicalAddress(),
+				physicalBlock);
+		if (status != B_OK) {
+			ERROR("BTree::Traverse() unmapped block %" B_PRId64 "\n",
+				node.Index(slot)->LogicalAddress());
+			return status;
+		}
+		node.SetTo(physicalBlock);
+	}
+
+	TRACE("BTree::Traverse() dump count %" B_PRId32 "\n", node.ItemCount());
+	status = node.SearchSlot(key, &slot, type);
+	if (status != B_OK)
+		return status;
+	if (path->SetNode(&node, slot) == NULL)
+		return B_NO_MEMORY;
+
+	TRACE("BTree::Traverse() found %" B_PRIu32 " %" B_PRIu32 "\n",
+		node.Item(slot)->Offset(), node.Item(slot)->Size());
+	return slot;
+}
+
+
 /*!	Searches the key in the tree, and stores the allocated found item in
 	_value, if successful.
 	Returns B_OK when the key could be found, B_ENTRY_NOT_FOUND if not.
 	It can also return other errors to indicate that something went wrong.
 */
 status_t
-BTree::_Find(btrfs_key& key, void** _value, uint32* _size,
-	bool read, btree_traversing type)
+BTree::_Find(Path* path, btrfs_key& wanted, void** _value, uint32* _size,
+	uint32* _offset, btree_traversing type) const
 {
-	TRACE("Find() objectid %" B_PRId64 " type %d offset %" B_PRId64 " \n",
-		key.ObjectID(),	key.Type(), key.Offset());
-	BTree::Node node(fVolume, fRootBlock);
-	int slot, ret;
-	fsblock_t physicalBlock;
+	status_t status = Traverse(type, path, wanted);
+	if (status < B_OK)
+		return status;
 
-	while (node.Level() != 0) {
-		TRACE("Find() level %d\n", node.Level());
-		ret = node.SearchSlot(key, &slot, BTREE_BACKWARD);
-		if (ret != B_OK)
-			return ret;
-		TRACE("Find() getting index %" B_PRIu32 "\n", slot);
+	btrfs_key found;
+	status = path->GetCurrentEntry(&found, _value, _size, _offset);
+	if (status != B_OK)
+		return status;
 
-		if (fVolume->FindBlock(node.Index(slot)->LogicalAddress(), physicalBlock)
-			!= B_OK) {
-			ERROR("Find() unmapped block %" B_PRId64 "\n",
-				node.Index(slot)->LogicalAddress());
-			return B_ERROR;
-		}
-		node.SetTo(physicalBlock);
-	}
-
-	TRACE("Find() dump count %" B_PRId32 "\n", node.ItemCount());
-	ret = node.SearchSlot(key, &slot, type);
-	if ((slot >= node.ItemCount() || node.Item(slot)->key.Type() != key.Type())
-			&& read == true
-		|| ret != B_OK) {
-		TRACE("Find() not found %" B_PRId64 " %" B_PRId64 "\n", key.Offset(),
-			key.ObjectID());
+	if (found.Type() != wanted.Type() && wanted.Type() != BTRFS_KEY_TYPE_ANY)
 		return B_ENTRY_NOT_FOUND;
-	}
 
-	if (read == true) {
-		TRACE("Find() found %" B_PRIu32 " %" B_PRIu32 "\n",
-			node.Item(slot)->Offset(), node.Item(slot)->Size());
-
-		if (_value != NULL) {
-			*_value = malloc(node.Item(slot)->Size());
-			memcpy(*_value, node.ItemData(slot),
-				node.Item(slot)->Size());
-			key.SetOffset(node.Item(slot)->key.Offset());
-			key.SetObjectID(node.Item(slot)->key.ObjectID());
-			if (_size != NULL)
-				*_size = node.Item(slot)->Size();
-		}
-	} else {
-		*_value = (void*)&slot;
-	}
+	wanted = found;
 	return B_OK;
 }
 
 
 status_t
-BTree::FindNext(btrfs_key& key, void** _value, uint32* _size, bool read)
+BTree::FindNext(Path* path, btrfs_key& key, void** _value, uint32* _size,
+	uint32* _offset) const
 {
-	return _Find(key, _value, _size, read, BTREE_FORWARD);
+	return _Find(path, key, _value, _size, _offset, BTREE_FORWARD);
 }
 
 
 status_t
-BTree::FindPrevious(btrfs_key& key, void** _value, uint32* _size, bool read)
+BTree::FindPrevious(Path* path, btrfs_key& key, void** _value, uint32* _size,
+	uint32* _offset) const
 {
-	return _Find(key, _value, _size, read, BTREE_BACKWARD);
+	return _Find(path, key, _value, _size, _offset, BTREE_BACKWARD);
 }
 
 
 status_t
-BTree::FindExact(btrfs_key& key, void** _value, uint32* _size, bool read)
+BTree::FindExact(Path* path, btrfs_key& key, void** _value, uint32* _size,
+	uint32* _offset) const
 {
-	return _Find(key, _value, _size, read, BTREE_EXACT);
+	return _Find(path, key, _value, _size, _offset, BTREE_EXACT);
+}
+
+
+status_t
+BTree::PreviousLeaf(Path* path) const
+{
+	// TODO: use Traverse() ???
+	int level = 0;
+	int slot;
+	Node* node = NULL;
+	// iterate to the root until satisfy the condition
+	while (true) {
+		node = path->GetNode(level, &slot);
+		if (node == NULL || slot != 0)
+			break;
+		level++;
+	}
+
+	// the current leaf is already the left most leaf or
+	// path was not initialized
+	if (node == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	path->Move(level, BTREE_BACKWARD);
+	fsblock_t physicalBlock;
+	// change all nodes below this level and slot to the ending
+	do {
+		status_t status = fVolume->FindBlock(
+			node->Index(slot)->LogicalAddress(), physicalBlock);
+		if (status != B_OK)
+			return status;
+
+		node = path->SetNode(physicalBlock, -1);
+		if (node == NULL)
+			return B_NO_MEMORY;
+		slot = node->ItemCount() - 1;
+		level--;
+	} while(level != 0);
+
+	return B_OK;
+}
+
+
+status_t
+BTree::NextLeaf(Path* path) const
+{
+	int level = 0;
+	int slot;
+	Node* node = NULL;
+	// iterate to the root until satisfy the condition
+	while (true) {
+		node = path->GetNode(level, &slot);
+		if (node == NULL || slot < node->ItemCount() - 1)
+			break;
+		level++;
+	}
+
+	// the current leaf is already the right most leaf or
+	// path was not initialized
+	if (node == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	path->Move(level, BTREE_FORWARD);
+	fsblock_t physicalBlock;
+	// change all nodes below this level and slot to the beginning
+	do {
+		status_t status = fVolume->FindBlock(
+			node->Index(slot)->LogicalAddress(), physicalBlock);
+		if (status != B_OK)
+			return status;
+
+		node = path->SetNode(physicalBlock, 0);
+		if (node == NULL)
+			return B_NO_MEMORY;
+		slot = 0;
+		level--;
+	} while(level != 0);
+
+	return B_OK;
 }
 
 
@@ -351,8 +546,8 @@ TreeIterator::Traverse(btree_traversing direction, btrfs_key& key,
 		return B_INTERRUPTED;
 
 	fCurrentKey.SetOffset(fCurrentKey.Offset() + direction);
-	status_t status = fTree->_Find(fCurrentKey, value, size,
-		true, direction);
+	BTree::Path path(fTree);
+	status_t status = fTree->_Find(&path, fCurrentKey, value, size, direction);
 	if (status != B_OK) {
 		TRACE("TreeIterator::Traverse() Find failed\n");
 		return B_ENTRY_NOT_FOUND;
