@@ -13,6 +13,7 @@
 #include "CachedBlock.h"
 #include "Chunk.h"
 #include "Inode.h"
+#include "ExtentAllocator.h"
 
 
 //#define TRACE_BTRFS
@@ -386,6 +387,16 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fChecksumTree->SetRoot(root->LogicalAddress(), NULL);
 	free(root);
 
+	// Initialize ExtentAllocator;
+	fExtentAllocator = new(std::nothrow) ExtentAllocator(this);
+	if (fExtentAllocator == NULL)
+		return B_NO_MEMORY;
+	status = fExtentAllocator->Initialize();
+	if (status != B_OK) {
+		ERROR("could not initalize extent allocator!\n");
+		return status;
+	}
+
 	// ready
 	status = get_vnode(fFSVolume, BTRFS_FIRST_SUBVOLUME,
 		(void**)&fRootNode);
@@ -432,10 +443,12 @@ Volume::Unmount()
 	delete fChecksumTree;
 	delete fFSTree;
 	delete fDevTree;
+	delete fExtentAllocator;
 	fExtentTree = NULL;
 	fChecksumTree = NULL;
 	fFSTree = NULL;
 	fDevTree = NULL;
+	fExtentAllocator = NULL;
 
 	TRACE("Volume::Unmount(): Putting root node\n");
 	put_vnode(fFSVolume, RootNode()->ID());

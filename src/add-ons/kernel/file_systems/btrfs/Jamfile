@@ -16,6 +16,7 @@ KernelAddon btrfs :
 	Chunk.cpp
 	CRCTable.cpp
 	DirectoryIterator.cpp
+	ExtentAllocator.cpp
 	Inode.cpp
 	Volume.cpp
 	: kernel_libz.a
