@@ -89,9 +89,11 @@ BrowserApp::BrowserApp()
 	cookieStorePath << "/Cookies";
 	fCookies = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
 		cookieStorePath.String());
-	BMessage cookieArchive = fCookies->GetValue("cookies", cookieArchive);
 	fContext = new BUrlContext();
-	fContext->SetCookieJar(BNetworkCookieJar(&cookieArchive));
+	if (fCookies->InitCheck() == B_OK) {
+		BMessage cookieArchive = fCookies->GetValue("cookies", cookieArchive);
+		fContext->SetCookieJar(BNetworkCookieJar(&cookieArchive));
+	}
 #endif
 
 	BString sessionStorePath = kApplicationName;
