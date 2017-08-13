@@ -48,7 +48,7 @@
 
 static int _gettemp(char *, int *, int, int);
 
-static const unsigned char padchar[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+static const char padchar[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 
 #if 0
@@ -97,7 +97,7 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 	char *pad;
 	struct stat sbuf;
 	int rval;
-	static int seed = 0;
+	static unsigned int seed = 0;
 
 	if (doopen != NULL && domkdir) {
 		__set_errno(EINVAL);
