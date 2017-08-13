@@ -1,0 +1,155 @@
+/*
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/interface/LayoutBuilder.h	 rev 51359
+ *		src/kits/interface/LayoutBuilder.cpp	 rev 51359
+ */
+
+/*!
+	\class BLayoutBuilder::Grid<>
+	\ingroup layout
+	\ingroup libbe
+	\brief BLayoutBuilder::Base subclass for building BGridLayouts.
+
+	\since Haiku R1
+
+	Each item is added to the grid layout at (column, row) and may span multiple
+	columns and rows.
+*/
+
+/*!
+	\name Constructors
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BLayoutBuilder::Grid<ParentBuilder>::Grid(BWindow *window,
+		float horizontal, float vertical)
+	\brief Creates a new BGroupLayout, and attaches it to a BWindow.
+
+	\note The top BView* in \a window has its ViewColor set to
+	      \c B_PANEL_BACKGROUND_COLOR.
+	\param window Thew BWindow* to attach the newly created BGroupLayout to.
+	\param horizontal The horizontal spacing for the new BGridLayout.
+	\param vertical The vertical spacing for the new BGridLayout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Grid<ParentBuilder>::Grid(BGridLayout* layout)
+	\brief Creates a builder targeting an existing BGridLayout.
+
+	Methods called on this builder will be directed to \a layout.
+
+	\param layout The BGridLayout to target with this builder.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Grid<ParentBuilder>::Grid(BGridView* view)
+	\brief Creates a builder targeting a BGridView.
+
+	Methods called on this builder will be directed to
+	\c view->GridLayout().
+
+	\param view The BGridView this builder will target.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Grid<ParentBuilder>::Grid(
+		float horizontal, float vertical)
+	\brief Creates a new BGridView and targets it.
+
+	Methods called on this builder will be directed to the new BGridView's
+	BGridLayout.
+
+	\param horizontal The horizontal spacing for the new BGridLayout.
+	\param vertical The vertical spacing for the new BGridLayout.
+
+	\since Haiku R1
+*/
+//! @}
+
+
+/*!
+	\name Adding BViews and BLayoutItems
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::Add(BView* view,
+		int32 column, int32 row, int32 columnCount, int32 rowCount)
+	\brief Add a BView to the BGridLayout this builder represents.
+
+	\param view The BView to be added.
+	\see BGridLayout::AddView(BView*)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::Add(
+		BLayoutItem* item, int32 column, int32 row,
+		int32 columnCount, int32 rowCount)
+	\brief Add a BLayoutItem to the BGridLayout this builder represents.
+
+	\param item The BLayoutItem to be added.
+
+	\see BGridLayout::AddItem(BLayoutItem*)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::AddMenuField(
+		BMenuField* item, int32 column, int32 row, alignment labelAlignment,
+		int32 labelColumnCount, int32 fieldColumnCount, int32 rowCount)
+	\brief Add a BMenuField to the layout
+
+	\param item The BMenuField to be added.
+
+	A BMenuField is composed of a label and a menu. This method allows to
+	lay the sub-components in separate grid cells, allowing easy alignment
+	of the menu with other items in the layout.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::AddTextControl(
+		BTextControl* item, int32 column, int32 row, alignment labelAlignment,
+		int32 labelColumnCount, int32 textColumnCount, int32 rowCount)
+	\brief Add a BMenuField to the layout
+
+	\param item The BMenuField to be added.
+
+	A BTextControl is composed of a label and a text area. This method allows to
+	lay the sub-components in separate grid cells, allowing easy alignment
+	of the text area with other items in the layout.
+
+	\since Haiku R1
+*/
+
+
+//! @}
