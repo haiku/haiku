@@ -150,6 +150,7 @@ private:
 	tcp_sequence	fLastAcknowledgeSent;
 	tcp_sequence	fInitialSendSequence;
 	uint32			fDuplicateAcknowledgeCount;
+	uint32			fPreviousFlightSize;
 
 	net_route		*fRoute;
 		// TODO: don't use a net_route, but a net_route_info!!!

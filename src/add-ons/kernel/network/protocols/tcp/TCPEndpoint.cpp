@@ -432,6 +432,7 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fSendQueue(socket->send.buffer_size),
 	fInitialSendSequence(0),
 	fDuplicateAcknowledgeCount(0),
+	fPreviousFlightSize(0),
 	fRoute(NULL),
 	fReceiveNext(0),
 	fReceiveMaxAdvertised(0),
@@ -1277,17 +1278,28 @@ TCPEndpoint::_HandleReset(status_t error)
 void
 TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 {
+	if (fDuplicateAcknowledgeCount == 0)
+		fPreviousFlightSize = (fSendMax - fSendUnacknowledged).Number();
+
 	if (++fDuplicateAcknowledgeCount < 3)
 		return;
 
 	if (fDuplicateAcknowledgeCount == 3) {
-		_ResetSlowStart();
+		fSlowStartThreshold = max_c(fPreviousFlightSize / 2, 2 * fSendMaxSegmentSize);
 		fCongestionWindow = fSlowStartThreshold + 3 * fSendMaxSegmentSize;
 		fSendNext = segment.acknowledge;
-	} else if (fDuplicateAcknowledgeCount > 3)
-		fCongestionWindow += fSendMaxSegmentSize;
+		_SendQueued();
+		TRACE("_DuplicateAcknowledge(): packet sent under fast restransmit on the receipt of 3rd dup ack");
 
-	_SendQueued();
+	} else if (fDuplicateAcknowledgeCount > 3) {
+		uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
+		if ((fDuplicateAcknowledgeCount - 3) * fSendMaxSegmentSize <= flightSize)
+			fCongestionWindow += fSendMaxSegmentSize;
+		if (fSendQueue.Available(fSendMax) != 0) {
+			fSendNext = fSendMax;
+			_SendQueued();
+		}
+	}
 }
 
 
@@ -1641,6 +1653,10 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	int32 action = KEEP;
 
+	// immediately acknowledge out-of-order segment to trigger fast-retransmit at the sender
+	if (drop != 0)
+		action |= IMMEDIATE_ACKNOWLEDGE;
+
 	drop = (int32)(segment.sequence + buffer->size
 		- (fReceiveNext + fReceiveWindow)).Number();
 	if (drop > 0) {
@@ -1685,14 +1701,13 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		if (fSendMax < segment.acknowledge)
 			return DROP | IMMEDIATE_ACKNOWLEDGE;
 
-		if (segment.acknowledge < fSendUnacknowledged) {
+		if (segment.acknowledge == fSendUnacknowledged) {
 			if (buffer->size == 0 && advertisedWindow == fSendWindow
-				&& (segment.flags & TCP_FLAG_FINISH) == 0) {
+				&& (segment.flags & TCP_FLAG_FINISH) == 0 && fSendUnacknowledged != fSendMax) {
 				TRACE("Receive(): duplicate ack!");
-
 				_DuplicateAcknowledge(segment);
 			}
-
+		} else if (segment.acknowledge < fSendUnacknowledged) {
 			return DROP;
 		} else {
 			// this segment acknowledges in flight data
@@ -1701,8 +1716,6 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 				// deflate the window.
 				fCongestionWindow = fSlowStartThreshold;
 			}
-
-			fDuplicateAcknowledgeCount = 0;
 
 			if (fSendMax == segment.acknowledge)
 				TRACE("Receive(): all inflight data ack'd!");
@@ -2044,6 +2057,11 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	bool shouldStartRetransmitTimer = fSendNext == fSendUnacknowledged;
 	bool retransmit = fSendNext < fSendMax;
 
+	if (fDuplicateAcknowledgeCount != 0) {
+		// send at most 1 SMSS of data when under limited transmit, fast transmit/recovery
+		length = min_c(length, fSendMaxSegmentSize);
+	}
+
 	do {
 		uint32 segmentMaxSize = fSendMaxSegmentSize
 			- tcp_options_length(segment);
@@ -2221,6 +2239,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 	ASSERT(fSendUnacknowledged <= segment.acknowledge);
 
 	if (fSendUnacknowledged < segment.acknowledge) {
+		fDuplicateAcknowledgeCount = 0;
 		fSendQueue.RemoveUntil(segment.acknowledge);
 
 		// the acknowledgment of the SYN/ACK MUST NOT increase the size of the congestion window
@@ -2287,7 +2306,7 @@ TCPEndpoint::_Retransmit()
 		fCongestionWindow = fSendMaxSegmentSize;
 	} else {
 		_ResetSlowStart();
-
+		fDuplicateAcknowledgeCount = 0;
 		// Do exponential back off of the retransmit timeout
 		fRetransmitTimeout *= 2;
 		if (fRetransmitTimeout > TCP_MAX_RETRANSMIT_TIMEOUT)
