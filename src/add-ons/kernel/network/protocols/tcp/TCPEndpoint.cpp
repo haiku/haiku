@@ -1281,8 +1281,15 @@ TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 	if (fDuplicateAcknowledgeCount == 0)
 		fPreviousFlightSize = (fSendMax - fSendUnacknowledged).Number();
 
-	if (++fDuplicateAcknowledgeCount < 3)
-		return;
+	if (++fDuplicateAcknowledgeCount < 3) {
+		if (fSendQueue.Available(fSendMax) != 0  && fSendWindow != 0) {
+			fSendNext = fSendMax;
+			fCongestionWindow += fDuplicateAcknowledgeCount * fSendMaxSegmentSize;
+			_SendQueued();
+			TRACE("_DuplicateAcknowledge(): packet sent under limited transmit on receipt of dup ack");
+			fCongestionWindow -= fDuplicateAcknowledgeCount * fSendMaxSegmentSize;
+		}
+	}
 
 	if (fDuplicateAcknowledgeCount == 3) {
 		fSlowStartThreshold = max_c(fPreviousFlightSize / 2, 2 * fSendMaxSegmentSize);
