@@ -1798,7 +1798,20 @@ BrowserWindow::AuthenticationChallenge(BString message, BString& inOutUser,
 void
 BrowserWindow::_UpdateTitle(const BString& title)
 {
-	BString windowTitle = title;
+	BString windowTitle;
+
+	if (title.Length() > 0)
+		windowTitle = title;
+	else {
+		BWebView* webView = CurrentWebView();
+		if (webView != NULL) {
+			BString url = webView->MainFrameURL();
+			int32 leafPos = url.FindLast('/');
+			url.Remove(0, leafPos + 1);
+			windowTitle = url;
+		}
+	}
+
 	if (windowTitle.Length() > 0)
 		windowTitle << " - ";
 	windowTitle << kApplicationName;
