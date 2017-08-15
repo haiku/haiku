@@ -234,7 +234,7 @@ BrowserApp::ReadyToRun()
 	}
 
 	// If no refs led to a new open page, restore previous session.
-	if (pagesCreated == 0) {
+	if (fSession->InitCheck() == B_OK && pagesCreated == 0) {
 		BMessage archivedWindow;
 		for (int i = 0; fSession->FindMessage("window", i, &archivedWindow) == B_OK;
 			i++) {
