@@ -994,24 +994,37 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 							if (wInfo == NULL)
 								continue;
 
+							BString windowName(wInfo->name);
+
+							BString teamPrefix(teamItem->Label());
+							teamPrefix.Append(": ");
+
+							BString teamSuffix(" - ");
+							teamSuffix.Append(teamItem->Label());
+
+							if (windowName.StartsWith(teamPrefix))
+								windowName.RemoveFirst(teamPrefix);
+							if (windowName.EndsWith(teamSuffix))
+								windowName.RemoveLast(teamSuffix);
+
 							if (TWindowMenu::WindowShouldBeListed(wInfo)) {
 								// Check if we have a matching window item...
 								item = teamItem->ExpandedWindowItem(
 									wInfo->server_token);
 								if (item != NULL) {
-									item->SetTo(wInfo->name,
+									item->SetTo(windowName,
 										wInfo->server_token, wInfo->is_mini,
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0);
 
-									if (strcasecmp(item->Label(), wInfo->name) > 0)
-										item->SetLabel(wInfo->name);
+									if (strcasecmp(item->Label(), windowName) > 0)
+										item->SetLabel(windowName);
 
 									if (item->Modified())
 										itemModified = true;
 								} else if (teamItem->IsExpanded()) {
 									// Add the item
-									item = new TWindowMenuItem(wInfo->name,
+									item = new TWindowMenuItem(windowName,
 										wInfo->server_token, wInfo->is_mini,
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0, false);
