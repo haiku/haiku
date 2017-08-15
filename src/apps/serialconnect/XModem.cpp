@@ -64,9 +64,11 @@ XModemSender::BytesReceived(const uint8_t* data, size_t length)
 				// A 'C' to request the first block is a request to use a CRC
 				// in place of an 8-bit checksum.
 				// In any other place, it is ignored.
-				if (fBlockNumber <= 1)
+				if (fBlockNumber <= 1) {
+					fStatus = "CRC requested";
 					fUseCRC = true;
-				else
+					SendBlock();
+				} else
 					break;
 			case kNAK:
 				if (fEotSent) {
