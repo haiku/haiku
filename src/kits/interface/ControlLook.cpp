@@ -2518,13 +2518,6 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// save the clipping constraints of the view
-	view->PushState();
-
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
-
 	// If the button is flat and neither activated nor otherwise highlighted
 	// (mouse hovering or focussed), draw it flat.
 	if ((flags & B_FLAT) != 0
@@ -2538,9 +2531,6 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 			leftTopRadius, rightTopRadius, leftBottomRadius, rightBottomRadius,
 			base, popupIndicator, flags, borders, orientation);
 	}
-
-	// restore the clipping constraints of the view
-	view->PopState();
 }
 
 
