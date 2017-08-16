@@ -83,8 +83,8 @@ private:
 public:
 	class Node {
 	public:
-		Node(void* cache);
-		Node(void* cache, off_t block);
+		Node(Volume* volume);
+		Node(Volume* volume, off_t block);
 		~Node();
 
 			// just return from Header
@@ -127,7 +127,7 @@ public:
 			//no implementation
 
 		btrfs_stream* 		fNode;
-		void* 				fCache;
+		Volume*				fVolume;
 		off_t				fBlockNumber;
 		uint32 				fCurrentSlot;
 		bool				fWritable;
