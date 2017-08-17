@@ -1570,25 +1570,20 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	}
 
 	BRect background = rect;
-	uint32 bordersToDraw = 0;
 	switch (side) {
 		case B_TOP_BORDER:
-			bordersToDraw = (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER);
 			rect.top += 4;
 			background.bottom = rect.top;
 			break;
 		case B_BOTTOM_BORDER:
-			bordersToDraw = (B_LEFT_BORDER | B_BOTTOM_BORDER | B_RIGHT_BORDER);
 			rect.bottom -= 4;
 			background.top = rect.bottom;
 			break;
 		case B_LEFT_BORDER:
-			bordersToDraw = (B_LEFT_BORDER | B_BOTTOM_BORDER | B_TOP_BORDER);
 			rect.left += 4;
 			background.right = rect.left;
 			break;
 		case B_RIGHT_BORDER:
-			bordersToDraw = (B_RIGHT_BORDER | B_BOTTOM_BORDER | B_TOP_BORDER);
 			rect.right -= 4;
 			background.left = rect.right;
 		break;
@@ -1600,10 +1595,10 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 	// frame and fill
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
-		edgeLightColor, borders & bordersToDraw);
+		edgeLightColor, borders);
 
 	_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor,
-		frameShadowColor, borders & bordersToDraw);
+		frameShadowColor, borders);
 
 	if (rect.IsValid()) {
 		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {

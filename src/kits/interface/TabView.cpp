@@ -274,7 +274,7 @@ BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 		borders |= BControlLook::B_RIGHT_BORDER;
 
 	if (position == B_TAB_FRONT) {
-		frame.bottom += 1.0f;
+		frame.bottom -= 1.0f;
 		be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
 			borders);
 	} else {
@@ -789,8 +789,8 @@ BTabView::FocusTab() const
 void
 BTabView::Draw(BRect updateRect)
 {
-	DrawBox(TabFrame(fSelection));
 	DrawTabs();
+	DrawBox(TabFrame(fSelection));
 
 	if (IsFocus() && fFocus != -1)
 		TabAt(fFocus)->DrawFocusMark(this, TabFrame(fFocus));
@@ -800,8 +800,6 @@ BTabView::Draw(BRect updateRect)
 BRect
 BTabView::DrawTabs()
 {
-	// TODO: Rewrite this method
-
 	// draw an inactive tab frame behind all tabs
 	BRect bounds(Bounds());
 	bounds.bottom = fTabHeight;
@@ -813,13 +811,13 @@ BTabView::DrawTabs()
 	} else
 		borders |= BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER;
 
-	// TODO: Why do we have to do this?
+	// DrawInactiveTab draws 2px border
+	// draw a little wider tab frame to align B_PLAIN_BORDER with it
 	if (fBorderStyle == B_PLAIN_BORDER) {
 		bounds.left -= 1;
 		bounds.right += 1;
 	}
 
-	// TODO: Doesn't draw bottom border, why?
 	be_control_look->DrawInactiveTab(this, bounds, bounds, base, 0, borders);
 
 	// draw the tabs on top of the inactive tab bounds
@@ -847,28 +845,6 @@ BTabView::DrawTabs()
 			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 	}
 
-	// TODO: Why do we have to do this?
-	// TODO: Why don't we have to do this for B_FANCY_BORDER?
-	// TODO: Why does this draw the wrong color (152 instead of 151)
-	if (fBorderStyle != B_FANCY_BORDER) {
-		// draw the bottom border of the tabs
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-		// draw the bottom border left of the active tab
-		bounds = Bounds();
-		bounds.top = bounds.bottom = fTabHeight;
-		bounds.right = activeTabFrame.left;
-		be_control_look->DrawBorder(this, bounds, bounds, base, B_PLAIN_BORDER,
-			0, BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
-
-		// draw the bottom border right of the active tab
-		bounds = Bounds();
-		bounds.top = bounds.bottom = fTabHeight;
-		bounds.left = activeTabFrame.right;
-		be_control_look->DrawBorder(this, bounds, bounds, base, B_PLAIN_BORDER,
-			0, BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
-	}
-
 	return fSelection < CountTabs() ? TabFrame(fSelection) : BRect();
 }
 
@@ -880,11 +856,12 @@ BTabView::DrawBox(BRect selectedTabRect)
 	rect.top = fTabHeight;
 
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	if (fBorderStyle == B_FANCY_BORDER)
-		be_control_look->DrawGroupFrame(this, rect, rect, base);
-	else if (fBorderStyle == B_PLAIN_BORDER) {
+	if (fBorderStyle == B_FANCY_BORDER) {
+		be_control_look->DrawGroupFrame(this, rect, rect, base,
+			BControlLook::B_ALL_BORDERS & ~BControlLook::B_TOP_BORDER);
+	} else if (fBorderStyle == B_PLAIN_BORDER) {
 		be_control_look->DrawBorder(this, rect, rect, base, B_PLAIN_BORDER,
-			0, BControlLook::B_ALL_BORDERS);
+			0, BControlLook::B_ALL_BORDERS & ~BControlLook::B_TOP_BORDER);
 	} else
 		; // B_NO_BORDER draws no box
 }
