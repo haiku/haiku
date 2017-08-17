@@ -1551,6 +1551,15 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment,
 int32
 TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 {
+	// PAWS processing takes precedence over regular TCP acceptability check
+	if ((fFlags & FLAG_OPTION_TIMESTAMP) != 0 && (segment.flags & TCP_FLAG_RESET) == 0) {
+		if ((segment.options & TCP_HAS_TIMESTAMPS) == 0)
+			return DROP;
+		if ((int32)(fReceivedTimestamp - segment.timestamp_value) > 0
+			&& (fReceivedTimestamp - segment.timestamp_value) <= INT32_MAX)
+			return DROP | IMMEDIATE_ACKNOWLEDGE;
+	}
+
 	uint32 advertisedWindow = (uint32)segment.advertised_window
 		<< fSendWindowShift;
 	size_t segmentLength = buffer->size;

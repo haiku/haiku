@@ -117,8 +117,7 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		option->kind = TCP_OPTION_TIMESTAMP;
 		option->length = 10;
 		option->timestamp.value = htonl(segment.timestamp_value);
-		// TSecr is opaque to us, we send it as we received it.
-		option->timestamp.reply = segment.timestamp_reply;
+		option->timestamp.reply = htonl(segment.timestamp_reply);
 		bump_option(option, length);
 	}
 
@@ -210,7 +209,7 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
 			case TCP_OPTION_TIMESTAMP:
 				if (option->length == 10 && size >= 10) {
 					segment.options |= TCP_HAS_TIMESTAMPS;
-					segment.timestamp_value = option->timestamp.value;
+					segment.timestamp_value = ntohl(option->timestamp.value);
 					segment.timestamp_reply =
 						ntohl(option->timestamp.reply);
 				}
