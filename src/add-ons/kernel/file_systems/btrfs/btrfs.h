@@ -294,11 +294,11 @@ struct btrfs_inode {
 
 
 struct btrfs_inode_ref {
-	uint8	index;
+	uint64	index;
 	uint16	name_length;
 	uint8	name[];
 
-	uint8 Index() const { return index; }
+	uint64 Index() const { return index; }
 	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
 } _PACKED;
 
