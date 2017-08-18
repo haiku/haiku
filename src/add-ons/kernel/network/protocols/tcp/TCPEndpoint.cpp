@@ -318,7 +318,8 @@ enum {
 	FLAG_NO_RECEIVE				= 0x04,
 	FLAG_CLOSED					= 0x08,
 	FLAG_DELETE_ON_CLOSE		= 0x10,
-	FLAG_LOCAL					= 0x20
+	FLAG_LOCAL					= 0x20,
+	FLAG_RECOVERY				= 0x40
 };
 
 
@@ -431,8 +432,10 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fSendMaxSegments(0),
 	fSendQueue(socket->send.buffer_size),
 	fInitialSendSequence(0),
+	fPreviousHighestAcknowledge(0),
 	fDuplicateAcknowledgeCount(0),
 	fPreviousFlightSize(0),
+	fRecover(0),
 	fRoute(NULL),
 	fReceiveNext(0),
 	fReceiveMaxAdvertised(0),
@@ -1293,12 +1296,16 @@ TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 	}
 
 	if (fDuplicateAcknowledgeCount == 3) {
-		fSlowStartThreshold = max_c(fPreviousFlightSize / 2, 2 * fSendMaxSegmentSize);
-		fCongestionWindow = fSlowStartThreshold + 3 * fSendMaxSegmentSize;
-		fSendNext = segment.acknowledge;
-		_SendQueued();
-		TRACE("_DuplicateAcknowledge(): packet sent under fast restransmit on the receipt of 3rd dup ack");
-
+		if ((segment.acknowledge - 1) > fRecover || (fCongestionWindow > fSendMaxSegmentSize &&
+			(fSendUnacknowledged - fPreviousHighestAcknowledge) <= 4 * fSendMaxSegmentSize)) {
+			fFlags |= FLAG_RECOVERY;
+			fRecover = fSendMax.Number() - 1;
+			fSlowStartThreshold = max_c(fPreviousFlightSize / 2, 2 * fSendMaxSegmentSize);
+			fCongestionWindow = fSlowStartThreshold + 3 * fSendMaxSegmentSize;
+			fSendNext = segment.acknowledge;
+			_SendQueued();
+			TRACE("_DuplicateAcknowledge(): packet sent under fast restransmit on the receipt of 3rd dup ack");
+		}
 	} else if (fDuplicateAcknowledgeCount > 3) {
 		uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
 		if ((fDuplicateAcknowledgeCount - 3) * fSendMaxSegmentSize <= flightSize)
@@ -1738,7 +1745,12 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 			if (fDuplicateAcknowledgeCount >= 3) {
 				// deflate the window.
-				fCongestionWindow = fSlowStartThreshold;
+				if (segment.acknowledge > fRecover) {
+					uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
+					fCongestionWindow = min_c(fSlowStartThreshold,
+						max_c(flightSize, fSendMaxSegmentSize) + fSendMaxSegmentSize);
+					fFlags &= ~FLAG_RECOVERY;
+				}
 			}
 
 			if (fSendMax == segment.acknowledge)
@@ -2238,6 +2250,7 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 	fSendUnacknowledged = fInitialSendSequence;
 	fSendMax = fInitialSendSequence;
 	fSendUrgentOffset = fInitialSendSequence;
+	fRecover = fInitialSendSequence.Number();
 
 	// we are counting the SYN here
 	fSendQueue.SetInitialSequence(fSendNext + 1);
@@ -2266,14 +2279,20 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 	ASSERT(fSendUnacknowledged <= segment.acknowledge);
 
 	if (fSendUnacknowledged < segment.acknowledge) {
-		fDuplicateAcknowledgeCount = 0;
 		fSendQueue.RemoveUntil(segment.acknowledge);
+		uint32 bytesAcknowledged = segment.acknowledge - fSendUnacknowledged.Number();
+		fPreviousHighestAcknowledge = fSendUnacknowledged;
+		fSendUnacknowledged = segment.acknowledge;
+
+		if (fPreviousHighestAcknowledge > fSendUnacknowledged) {
+			// need to update the recover variable upon a sequence wraparound
+			fRecover = segment.acknowledge - 1;
+		}
 
 		// the acknowledgment of the SYN/ACK MUST NOT increase the size of the congestion window
 		if (fSendUnacknowledged != fInitialSendSequence) {
 			if (fCongestionWindow < fSlowStartThreshold)
-				fCongestionWindow += min_c(segment.acknowledge - fSendUnacknowledged.Number(),
-					fSendMaxSegmentSize);
+				fCongestionWindow += min_c(bytesAcknowledged, fSendMaxSegmentSize);
 			else {
 				uint32 increment = fSendMaxSegmentSize * fSendMaxSegmentSize;
 
@@ -2288,7 +2307,18 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 			fSendMaxSegments = UINT32_MAX;
 		}
 
-		fSendUnacknowledged = segment.acknowledge;
+		if ((fFlags & FLAG_RECOVERY) != 0) {
+			fSendNext = fSendUnacknowledged;
+			_SendQueued();
+			fCongestionWindow -= bytesAcknowledged;
+
+			if (bytesAcknowledged > fSendMaxSegmentSize)
+				fCongestionWindow += fSendMaxSegmentSize;
+
+			fSendNext = fSendMax;
+		} else
+			fDuplicateAcknowledgeCount = 0;
+
 		if (fSendNext < fSendUnacknowledged)
 			fSendNext = fSendUnacknowledged;
 
@@ -2364,6 +2394,10 @@ TCPEndpoint::_Retransmit()
 
 	fSendNext = fSendUnacknowledged;
 	_SendQueued();
+
+	fRecover = fSendNext.Number() - 1;
+	if ((fFlags & FLAG_RECOVERY) != 0)
+		fFlags &= ~FLAG_RECOVERY;
 }
 
 

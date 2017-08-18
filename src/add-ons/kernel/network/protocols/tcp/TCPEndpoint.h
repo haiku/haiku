@@ -149,8 +149,10 @@ private:
 	BufferQueue		fSendQueue;
 	tcp_sequence	fLastAcknowledgeSent;
 	tcp_sequence	fInitialSendSequence;
+	tcp_sequence	fPreviousHighestAcknowledge;
 	uint32			fDuplicateAcknowledgeCount;
 	uint32			fPreviousFlightSize;
+	uint32			fRecover;
 
 	net_route		*fRoute;
 		// TODO: don't use a net_route, but a net_route_info!!!
