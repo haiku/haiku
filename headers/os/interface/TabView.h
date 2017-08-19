@@ -86,6 +86,13 @@ private:
 
 class BTabView : public BView {
 public:
+			enum tab_side {
+				kLeftSide	= 1 << 0,
+				kRightSide	= 1 << 1,
+				kTopSide	= 1 << 2,
+				kBottomSide	= 1 << 3
+			};
+
 								BTabView(const char* name,
 									button_width width = B_WIDTH_AS_USUAL,
 									uint32 flags = B_FULL_UPDATE_ON_RESIZE
@@ -165,6 +172,9 @@ public:
 	virtual	void				SetBorder(border_style borderStyle);
 			border_style		Border() const;
 
+	virtual	void				SetTabSide(tab_side tabSide);
+			tab_side			TabSide() const;
+
 			BView*				ContainerView() const;
 
 			int32				CountTabs() const;
@@ -172,7 +182,6 @@ public:
 
 private:
 	// FBC padding and forbidden methods
-	virtual	void				_ReservedTabView2();
 	virtual	void				_ReservedTabView3();
 	virtual	void				_ReservedTabView4();
 	virtual	void				_ReservedTabView5();
@@ -205,8 +214,9 @@ private:
 			int32				fFocus;
 			float				fTabOffset;
 			border_style		fBorderStyle;
+			tab_side			fTabSide;
 
-			uint32				_reserved[10];
+			uint32				_reserved[9];
 };
 
 #endif // _TAB_VIEW_H
