@@ -904,39 +904,6 @@ BTabView::TabFrame(int32 index) const
 			return BRect(offset + index * width, 0.0f,
 				offset + index * width + width, height);
 	}
-
-	// TODO: fix to remove "offset" in DrawTab and DrawLabel ...
-	switch (fTabWidthSetting) {
-		case B_WIDTH_FROM_LABEL:
-		{
-			float x = 6.0f;
-			for (int32 i = 0; i < index; i++){
-				x += StringWidth(TabAt(i)->Label()) + 20.0f;
-			}
-
-			return BRect(x - fTabOffset, 0.0f,
-				x - fTabOffset + StringWidth(TabAt(index)->Label()) + 20.0f,
-				fTabHeight);
-		}
-
-		case B_WIDTH_FROM_WIDEST:
-		{
-			float width = 0.0f;
-
-			for (int32 i = 0; i < CountTabs(); i++) {
-				float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
-				if (tabWidth > width)
-					width = tabWidth;
-			}
-			return BRect((6.0f + index * width) - fTabOffset, 0.0f,
-				(6.0f + index * width + width) - fTabOffset, fTabHeight);
-		}
-
-		case B_WIDTH_AS_USUAL:
-		default:
-			return BRect((6.0f + index * 100.0f) - fTabOffset, 0.0f,
-				(6.0f + index * 100.0f + 100.0f) - fTabOffset, fTabHeight);
-	}
 }
 
 
