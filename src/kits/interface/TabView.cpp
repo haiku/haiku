@@ -275,7 +275,7 @@ BTab::DrawFocusMark(BView* owner, BRect frame)
 void
 BTab::DrawLabel(BView* owner, BRect frame)
 {
-	float rotation;
+	float rotation = 0.0f;
 	BPoint center(frame.left + frame.Width() / 2,
 		frame.top + frame.Height() / 2);
 	switch (fTabView->TabSide()) {
@@ -318,7 +318,7 @@ void
 BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	uint32 borders;
+	uint32 borders = 0;
 	if (fTabView->TabSide() == BTabView::kTopSide
 		|| fTabView->TabSide() == BTabView::kBottomSide) {
 		borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
@@ -883,7 +883,7 @@ BTabView::DrawTabs()
 {
 	BRect bounds(Bounds());
 	BRect tabsBounds;
-	uint32 borders;
+	uint32 borders = 0;
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	if (fTabSide == kTopSide || fTabSide == kBottomSide) {
 		if (fTabSide == kTopSide)
