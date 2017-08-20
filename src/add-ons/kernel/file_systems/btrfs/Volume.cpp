@@ -439,12 +439,16 @@ status_t
 Volume::Unmount()
 {
 	TRACE("Volume::Unmount()\n");
+	delete fRootTree;
 	delete fExtentTree;
+	delete fChunkTree;
 	delete fChecksumTree;
 	delete fFSTree;
 	delete fDevTree;
 	delete fExtentAllocator;
+	fRootTree = NULL;
 	fExtentTree = NULL;
+	fChunkTree = NULL;
 	fChecksumTree = NULL;
 	fFSTree = NULL;
 	fDevTree = NULL;
