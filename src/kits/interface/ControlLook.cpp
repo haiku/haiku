@@ -2228,7 +2228,7 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	const rgb_color& background, float contrast, float brightness,
 	uint32 flags, uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!rect.IsValid())
 		return;
 
 	// save the clipping constraints of the view
@@ -2510,7 +2510,7 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
 	bool popupIndicator, uint32 flags, uint32 borders, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!rect.IsValid())
 		return;
 
 	// save the clipping constraints of the view
