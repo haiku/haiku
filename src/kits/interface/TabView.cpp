@@ -1571,7 +1571,7 @@ B_IF_GCC_2(_ReservedTabView1__8BTabView, _ZN8BTabView17_ReservedTabView1Ev)(
 
 extern "C" void
 B_IF_GCC_2(_ReservedTabView2__8BTabView, _ZN8BTabView17_ReservedTabView2Ev)(
-	BTabView* tabView, tab_side tabSide)
+	BTabView* tabView, BTabView::tab_side tabSide)
 {
 	tabView->BTabView::SetTabSide(tabSide);
 }
