@@ -27,6 +27,9 @@ enum btree_traversing {
 };
 
 
+class Transaction;
+
+
 //	#pragma mark - in-memory structures
 
 
@@ -44,6 +47,7 @@ struct node_and_key {
 class BTree {
 public:
 	class Path;
+	class Node;
 
 public:
 								BTree(Volume* volume);
@@ -71,8 +75,10 @@ public:
 
 			Volume*				SystemVolume() const { return fVolume; }
 			status_t			SetRoot(off_t logical, fsblock_t* block);
+			void				SetRoot(Node* root);
 			fsblock_t			RootBlock() const { return fRootBlock; }
 			off_t				LogicalRoot() const { return fLogicalRoot; }
+			uint8				RootLevel() const { return fRootLevel; }
 
 private:
 								BTree(const BTree& other);
@@ -90,6 +96,7 @@ private:
 
 			fsblock_t			fRootBlock;
 			off_t				fLogicalRoot;
+			uint8				fRootLevel;
 			Volume*				fVolume;
 			mutex				fIteratorLock;
 			SinglyLinkedList<TreeIterator> fIterators;
@@ -114,6 +121,12 @@ public:
 			{ return fNode->header.ItemCount(); }
 		uint8	Level() const
 			{ return fNode->header.Level(); }
+		void	SetLogicalAddress(uint64 address)
+			{ fNode->header.SetLogicalAddress(address); }
+		void	SetGeneration(uint64 generation)
+			{ fNode->header.SetGeneration(generation); }
+		void	SetItemCount(uint32 itemCount)
+			{ fNode->header.SetItemCount(itemCount); }
 
 		btrfs_index*	Index(uint32 i) const
 			{ return &fNode->index[i]; }
@@ -170,6 +183,10 @@ public:
 						uint32* _size = NULL, uint32* _offset = NULL);
 
 		int			Move(int level, int step);
+
+		status_t	CopyOnWrite(Transaction& transaction, int level,
+						uint32 start, int num, int length);
+		status_t	InternalCopy(Transaction& transaction, int level);
 
 		BTree*		Tree() const { return fTree; }
 	private:

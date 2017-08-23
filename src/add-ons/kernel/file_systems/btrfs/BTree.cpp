@@ -9,6 +9,7 @@
 
 
 #include "BTree.h"
+#include "Journal.h"
 
 
 //#define TRACE_BTRFS
@@ -419,12 +420,131 @@ BTree::Path::GetEntry(int slot, btrfs_key* _key, void** _value, uint32* _size,
 }
 
 
+/*
+ * Allocate and copy block and do all the changes that it can.
+ * for now, we only copy-on-write tree block,
+ * file data is "nocow" by default.
+ *
+ * 	o	parent	o
+ * 	|	 ===> 	 \
+ * 	o	      	x o
+ */
+status_t
+BTree::Path::CopyOnWrite(Transaction& transaction, int level, uint32 start,
+	int num, int length)
+{
+	Node* node = fNodes[level];
+	if (node == NULL)
+		return B_BAD_VALUE;
+
+	status_t status;
+	if (transaction.HasBlock(node->BlockNum())) {
+		// cow-ed block can not be cow-ed again
+		status = node->MoveEntries(start, start + num - 1, length);
+		if (status != B_OK)
+			return status;
+
+		node->SetGeneration(transaction.SystemID());
+		if (length < 0)
+			node->SetItemCount(node->ItemCount() - num);
+		else if (length > 0)
+			node->SetItemCount(node->ItemCount() + num);
+
+		return B_OK;
+	}
+
+	uint64 address;
+	fsblock_t block;
+	status = fTree->SystemVolume()->GetNewBlock(address, block);
+	if (status != B_OK)
+		return status;
+
+	fNodes[level] = new(std::nothrow) BTree::Node(fTree->SystemVolume());
+	if (fNodes[level] == NULL)
+		return B_NO_MEMORY;
+
+	fNodes[level]->SetToWritable(block, transaction.ID(), true);
+
+	status = fNodes[level]->Copy(node, start, start + num - 1, length);
+	if (status != B_OK)
+		return status;
+
+	fNodes[level]->SetGeneration(transaction.SystemID());
+	fNodes[level]->SetLogicalAddress(address);
+	if (length < 0)
+		fNodes[level]->SetItemCount(node->ItemCount() - num);
+	else if (length > 0)
+		fNodes[level]->SetItemCount(node->ItemCount() + num);
+	else
+		fNodes[level]->SetItemCount(num);
+
+	// change pointer of this node in parent
+	int parentSlot;
+	Node* parentNode = GetNode(level + 1, &parentSlot);
+	if (parentNode != NULL)
+		parentNode->Index(parentSlot)->SetLogicalAddress(address);
+
+	if (level == fTree->RootLevel())
+		fTree->SetRoot(fNodes[level]);
+
+	delete node;
+	return B_OK;
+}
+
+
+/* Copy-On-Write all internal nodes start from a specific level.
+ * level > 0: to root
+ * level <= 0: to leaf
+ *
+ *		path	cow-path       path    cow-path
+ *	=================================================
+ *		root	cow-root       root	level < 0
+ *		 |  	|               |
+ *		 n1 	cow-n1         ...______
+ *		 |  	|               |       \
+ *		 n2 	cow-n2          n1     cow-n1
+ *		 |  	/               |        |
+ *		...____/                n2     cow-n2
+ *		 |  	                |        |
+ *		leaf	level > 0      leaf    cow-leaf
+ */
+status_t
+BTree::Path::InternalCopy(Transaction& transaction, int level)
+{
+	if (std::abs(level) >= fTree->RootLevel())
+		return B_OK;
+
+	TRACE("Path::InternalCopy() level %i\n", level);
+	int from, to;
+	if (level > 0) {
+		from = level;
+		to = fTree->RootLevel();
+	} else {
+		from = 0;
+		to = std::abs(level);
+	}
+
+	Node* node = NULL;
+	status_t status;
+	while (from <= to) {
+		node = fNodes[from];
+		status = CopyOnWrite(transaction, from, 0, node->ItemCount(), 0);
+		from++;
+		if (status != B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark - BTree implementation
 
 
 BTree::BTree(Volume* volume)
 	:
 	fRootBlock(0),
+	fRootLevel(0),
 	fVolume(volume)
 {
 	mutex_init(&fIteratorLock, "btrfs b+tree iterator");
@@ -434,6 +554,7 @@ BTree::BTree(Volume* volume)
 BTree::BTree(Volume* volume, btrfs_stream* stream)
 	:
 	fRootBlock(0),
+	fRootLevel(0),
 	fVolume(volume)
 {
 	mutex_init(&fIteratorLock, "btrfs b+tree iterator");
@@ -660,20 +781,36 @@ BTree::NextLeaf(Path* path) const
 }
 
 
+/* Set root infomation, to use this function root must be valid and
+ * exists on disk.
+ */
 status_t
 BTree::SetRoot(off_t logical, fsblock_t* block)
 {
 	if (block != NULL) {
 		fRootBlock = *block;
-		//TODO: mapping physical block -> logical address
 	} else {
-		fLogicalRoot = logical;
 		if (fVolume->FindBlock(logical, fRootBlock) != B_OK) {
 			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
 			return B_ERROR;
 		}
 	}
+
+	btrfs_header header;
+	read_pos(fVolume->Device(), fRootBlock * fVolume->BlockSize(), &header,
+		sizeof(btrfs_header));
+	fRootLevel = header.Level();
+	fLogicalRoot = header.LogicalAddress();
 	return B_OK;
+}
+
+
+void
+BTree::SetRoot(Node* root)
+{
+	fRootBlock = root->BlockNum();
+	fLogicalRoot = root->LogicalAddress();
+	fRootLevel = root->Level();
 }
 
 

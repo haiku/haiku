@@ -110,6 +110,13 @@ struct btrfs_header {
 	uint32 ItemCount() const
 		{ return B_LENDIAN_TO_HOST_INT32(item_count); }
 	uint8 Level() const { return level; }
+
+	void SetLogicalAddress(uint64 logical)
+		{ logical_address = B_HOST_TO_LENDIAN_INT64(logical); }
+	void SetGeneration(uint64 gen)
+		{ generation = B_HOST_TO_LENDIAN_INT64(gen); }
+	void SetItemCount(uint32 itemCount)
+		{ item_count = B_HOST_TO_LENDIAN_INT32(itemCount); }
 } _PACKED;
 
 
@@ -121,6 +128,11 @@ struct btrfs_index {
 		{ return B_LENDIAN_TO_HOST_INT64(logical_address); }
 	uint64 Generation() const
 		{ return B_LENDIAN_TO_HOST_INT64(generation); }
+
+	void SetLogicalAddress(uint64 address)
+		{ logical_address = B_HOST_TO_LENDIAN_INT64(address); }
+	void SetGeneration(uint64 gen)
+		{ generation = B_HOST_TO_LENDIAN_INT64(gen); }
 } _PACKED;
 
 
