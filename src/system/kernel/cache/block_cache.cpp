@@ -3301,6 +3301,21 @@ cache_blocks_in_sub_transaction(void* _cache, int32 id)
 }
 
 
+/*!	Check if block is in transaction
+*/
+bool
+cache_has_block_in_transaction(void* _cache, int32 id, off_t blockNumber)
+{
+	block_cache* cache = (block_cache*)_cache;
+	TransactionLocker locker(cache);
+
+	cached_block* block = cache->hash->Lookup(blockNumber);
+
+	return (block != NULL && block->transaction != NULL
+		&& block->transaction->id == id);
+}
+
+
 //	#pragma mark - public block cache API
 
 

@@ -835,6 +835,7 @@
 #define cache_blocks_in_transaction		fssh_cache_blocks_in_transaction
 #define cache_blocks_in_main_transaction fssh_cache_blocks_in_main_transaction
 #define cache_blocks_in_sub_transaction	fssh_cache_blocks_in_sub_transaction
+#define cache_has_block_in_transaction	fssh_cache_has_block_in_transaction
 
 /* block cache */
 #define block_cache_delete				fssh_block_cache_delete

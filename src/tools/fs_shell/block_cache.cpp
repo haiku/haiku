@@ -1462,6 +1462,20 @@ fssh_cache_blocks_in_sub_transaction(void* _cache, int32_t id)
 }
 
 
+bool
+fssh_cache_has_block_in_transaction(void* _cache, int32_t id,
+	fssh_off_t blockNumber)
+{
+	block_cache* cache = (block_cache*)_cache;
+	MutexLocker locker(&cache->lock);
+
+	cached_block* block = (cached_block*)hash_lookup(cache->hash, &blockNumber);
+
+	return (block != NULL && block->transaction != NULL
+		&& block->transaction->id == id);
+}
+
+
 //	#pragma mark - public block cache API
 
 

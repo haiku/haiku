@@ -53,6 +53,7 @@ extern status_t cache_next_block_in_transaction(void *cache, int32 id,
 extern int32 cache_blocks_in_transaction(void *cache, int32 id);
 extern int32 cache_blocks_in_main_transaction(void *cache, int32 id);
 extern int32 cache_blocks_in_sub_transaction(void *cache, int32 id);
+extern bool cache_has_block_in_transaction(void* cache, int32 id, off_t blockNumber);
 
 /* block cache */
 extern void block_cache_delete(void *cache, bool allowWrites);

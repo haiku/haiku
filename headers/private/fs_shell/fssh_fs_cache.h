@@ -62,6 +62,8 @@ extern int32_t			fssh_cache_blocks_in_main_transaction(void *_cache,
 							int32_t id);
 extern int32_t			fssh_cache_blocks_in_sub_transaction(void *_cache,
 							int32_t id);
+extern bool				fssh_cache_has_block_in_transaction(void *_cache,
+							int32_t id, fssh_off_t blockNumber);
 
 /* block cache */
 extern void				fssh_block_cache_delete(void *_cache, bool allowWrites);
