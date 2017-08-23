@@ -17,6 +17,8 @@ enum volume_flags {
 class BTree;
 class Chunk;
 class Inode;
+class Journal;
+class Transaction;
 class ExtentAllocator;
 
 
@@ -46,6 +48,7 @@ public:
 			uint32				SectorSize() const { return fSectorSize; }
 			uint32				BlockSize() const { return fBlockSize; }
 			Chunk*				SystemChunk() const { return fChunk; }
+			Journal*			GetJournal() const { return fJournal; }
 			ExtentAllocator*	GetAllocator() const { return fExtentAllocator; }
 
 			btrfs_super_block&	SuperBlock() { return fSuperBlock; }
@@ -76,6 +79,7 @@ private:
 
 			ExtentAllocator*	fExtentAllocator;
 			Chunk*				fChunk;
+			Journal*			fJournal;
 			BTree*				fChunkTree;
 			BTree*				fRootTree;
 			BTree*				fDevTree;

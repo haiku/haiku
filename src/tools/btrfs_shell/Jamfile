@@ -44,6 +44,7 @@ local btrfsSources =
 	DirectoryIterator.cpp
 	ExtentAllocator.cpp
 	Inode.cpp
+	Journal.cpp
 	Volume.cpp
 	kernel_interface.cpp
 ;

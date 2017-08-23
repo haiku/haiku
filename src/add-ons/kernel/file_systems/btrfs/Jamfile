@@ -18,6 +18,7 @@ KernelAddon btrfs :
 	DirectoryIterator.cpp
 	ExtentAllocator.cpp
 	Inode.cpp
+	Journal.cpp
 	Volume.cpp
 	: kernel_libz.a
 ;

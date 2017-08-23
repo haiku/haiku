@@ -13,6 +13,7 @@
 #include "CachedBlock.h"
 #include "Chunk.h"
 #include "Inode.h"
+#include "Journal.h"
 #include "ExtentAllocator.h"
 
 
@@ -387,6 +388,11 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fChecksumTree->SetRoot(root->LogicalAddress(), NULL);
 	free(root);
 
+	// Initialize Journal
+	fJournal = new(std::nothrow) Journal(this);
+	if (fJournal == NULL)
+		return B_NO_MEMORY;
+
 	// Initialize ExtentAllocator;
 	fExtentAllocator = new(std::nothrow) ExtentAllocator(this);
 	if (fExtentAllocator == NULL)
@@ -445,6 +451,7 @@ Volume::Unmount()
 	delete fChecksumTree;
 	delete fFSTree;
 	delete fDevTree;
+	delete fJournal;
 	delete fExtentAllocator;
 	fRootTree = NULL;
 	fExtentTree = NULL;
@@ -452,6 +459,7 @@ Volume::Unmount()
 	fChecksumTree = NULL;
 	fFSTree = NULL;
 	fDevTree = NULL;
+	fJournal = NULL;
 	fExtentAllocator = NULL;
 
 	TRACE("Volume::Unmount(): Putting root node\n");
