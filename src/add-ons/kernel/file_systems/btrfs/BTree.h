@@ -133,6 +133,9 @@ public:
 
 		off_t	BlockNum() const { return fBlockNumber;}
 		bool	IsWritable() const { return fWritable; }
+		status_t	Copy(const Node* origin, uint32 start, uint32 end,
+						int length) const;
+		status_t	MoveEntries(uint32 start, uint32 end, int length) const;
 
 		status_t	SearchSlot(const btrfs_key& key, int* slot,
 						btree_traversing type) const;
@@ -141,6 +144,8 @@ public:
 		Node& operator=(const Node&);
 			//no implementation
 
+		void	_Copy(const Node* origin, uint32 at, uint32 from, uint32 to,
+					int length) const;
 		status_t	_SpaceCheck(int length) const;
 		int		_CalculateSpace(uint32 from, uint32 to, uint8 type = 1) const;
 

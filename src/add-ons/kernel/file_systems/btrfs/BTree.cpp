@@ -185,6 +185,30 @@ BTree::Node::SpaceLeft() const
 }
 
 
+void
+BTree::Node::_Copy(const Node* origin, uint32 at, uint32 from, uint32 to,
+	int length) const
+{
+	TRACE("Node::_Copy() at: %d from: %d to: %d length: %d\n",
+		at, from, to, length);
+
+	if (Level() == 0) {
+		memcpy(Item(at), origin->Item(from), origin->_CalculateSpace(from, to));
+		// Item offset of copied node must be changed to get the
+		// item data offset correctly. length can be zero
+		// but let it there doesn't harm anything.
+		for (uint32 i = at; i - at <= to - from; ++i)
+			Item(i)->SetOffset(Item(i)->Offset() - length);
+
+		memcpy(ItemData(at + to - from), origin->ItemData(to),
+			origin->_CalculateSpace(from, to, 2));
+	} else {
+		memcpy(Index(at), origin->Index(from),
+			origin->_CalculateSpace(from, to));
+	}
+}
+
+
 status_t
 BTree::Node::_SpaceCheck(int length) const
 {
@@ -194,6 +218,101 @@ BTree::Node::_SpaceCheck(int length) const
 		return B_DIRECTORY_NOT_EMPTY;	// not enough data to delete
 	if (length > 0 && length >= SpaceLeft())
 		return B_DEVICE_FULL;			// no spare space
+	return B_OK;
+}
+
+
+/*
+ * copy node header, items and items data
+ * length is size to insert/remove
+ * if node is a internal node, length isnt used
+ * length = 0: Copy a whole
+ * length < 0: removing
+ * length > 0: inserting
+ */
+status_t
+BTree::Node::Copy(const Node* origin, uint32 start, uint32 end, int length)
+	const
+{
+	status_t status = origin->_SpaceCheck(length);
+	if (status != B_OK)
+		return status;
+
+	memcpy(fNode, origin->fNode, sizeof(btrfs_header));
+	if (length == 0) {
+		// like removing [0, start - 1] and keeping [start, end]
+		length = -origin->_CalculateSpace(0, start - 1, 2);
+		_Copy(origin, 0, start, end, length);
+	} else if (length < 0) {
+		//removing all items in [start, end]
+		if (start > 0)
+			_Copy(origin, 0, 0, start - 1, 0);	// <-- [start,...
+		if (end + 1 < origin->ItemCount()) {
+			// ..., end] -->
+			// we only care data size
+			length += origin->_CalculateSpace(start, end);
+			_Copy(origin, start, end + 1, origin->ItemCount() - 1, length);
+		}
+	} else {
+		//inserting in [start, end] - make a hole for later
+		if (start > 0)
+			_Copy(origin, 0, 0, start - 1, 0);
+		if (start < origin->ItemCount()) {
+			length -= origin->_CalculateSpace(start, end);
+			_Copy(origin, end + 1, start, origin->ItemCount() - 1, length);
+		}
+	}
+
+	return B_OK;
+}
+
+
+/* Like copy but here we use memmove on current node.
+ */
+status_t
+BTree::Node::MoveEntries(uint32 start, uint32 end, int length) const
+{
+	status_t status = _SpaceCheck(length);
+	if (status != B_OK || length == 0/*B_OK*/)
+		return status;
+
+	int entrySize = sizeof(btrfs_entry);
+	if (Level() != 0)
+		entrySize = sizeof(btrfs_index);
+
+	uint8* base = (uint8*)fNode + sizeof(btrfs_header);
+	end++;
+	if (length < 0) {
+		// removing [start, end]
+		TRACE("Node::MoveEntries() removing ... start %" B_PRIu32 " end %"
+			B_PRIu32 " length %i\n", start, end, length);
+		length += _CalculateSpace(start, end - 1);
+	} else {
+		// length > 0
+		// inserting into [start, end] - make room for later
+		TRACE("Node::MoveEntries() inserting ... start %" B_PRIu32 " end %"
+			B_PRIu32 " length %i\n", start, end, length);
+		length -= _CalculateSpace(start, end - 1);
+		std::swap(start, end);
+	}
+
+	if (end >= ItemCount())
+		return B_OK;
+
+	int dataSize = _CalculateSpace(end, ItemCount() - 1, 2);
+	// moving items/block pointers
+	memmove(base + start * entrySize, base + end * entrySize,
+		_CalculateSpace(end, ItemCount() - 1));
+	if (Level() == 0) {
+		// moving item data
+		int num = start - end;
+		for(uint32 i = start; i < ItemCount() + num; ++i)
+			Item(i)->SetOffset(Item(i)->Offset() - length);
+
+		memmove(ItemData(ItemCount() - 1) - length, ItemData(ItemCount() - 1),
+			dataSize);
+	}
+
 	return B_OK;
 }
 

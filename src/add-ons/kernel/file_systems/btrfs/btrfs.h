@@ -132,6 +132,7 @@ struct btrfs_entry {
 		{ return B_LENDIAN_TO_HOST_INT32(offset); }
 	uint32 Size() const
 		{ return B_LENDIAN_TO_HOST_INT32(size); }
+	void SetOffset(uint32 off) { offset = B_HOST_TO_LENDIAN_INT32(off); }
 } _PACKED;
 
 
