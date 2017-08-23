@@ -534,6 +534,20 @@ Volume::FindBlock(off_t logical, off_t& physical)
 }
 
 
+/* Wrapper function for allocating new block
+ */
+status_t
+Volume::GetNewBlock(uint64& logical, fsblock_t& physical, uint64 start,
+	uint64 flags)
+{
+	status_t status = fExtentAllocator->AllocateTreeBlock(logical, start, flags);
+	if (status != B_OK)
+		return status;
+
+	return FindBlock(logical, physical);
+}
+
+
 //	#pragma mark - Disk scanning and initialization
 
 

@@ -62,6 +62,9 @@ public:
 
 			status_t			FindBlock(off_t logical, fsblock_t& physical);
 			status_t			FindBlock(off_t logical, off_t& physical);
+			status_t			GetNewBlock(uint64& logical, fsblock_t& physical,
+									uint64 start = (uint64)-1,
+									uint64 flags = BTRFS_BLOCKGROUP_FLAG_METADATA);
 
 private:
 			mutex				fLock;
