@@ -128,18 +128,23 @@ public:
 
 		void	SetTo(off_t block);
 		void	SetToWritable(off_t block, int32 transactionId, bool empty);
+		int		SpaceUsed() const;
+		int		SpaceLeft() const;
 
 		off_t	BlockNum() const { return fBlockNumber;}
 		bool	IsWritable() const { return fWritable; }
 
 		status_t	SearchSlot(const btrfs_key& key, int* slot,
 						btree_traversing type) const;
-		private:
+	private:
 		Node(const Node&);
 		Node& operator=(const Node&);
 			//no implementation
 
-		btrfs_stream* 		fNode;
+		status_t	_SpaceCheck(int length) const;
+		int		_CalculateSpace(uint32 from, uint32 to, uint8 type = 1) const;
+
+		btrfs_stream*		fNode;
 		Volume*				fVolume;
 		off_t				fBlockNumber;
 		bool				fWritable;

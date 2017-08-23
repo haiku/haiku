@@ -140,6 +140,64 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
 }
 
 
+/*
+ * calculate used space except the header.
+ * type is only for leaf node
+ * type 1: only item space
+ * type 2: only item data space
+ * type 3: both type 1 and 2
+ */
+int
+BTree::Node::_CalculateSpace(uint32 from, uint32 to, uint8 type) const
+{
+	if (to < from || to >= ItemCount())
+		return 0;
+
+	if (Level() != 0)
+		return sizeof(btrfs_index) * (to - from + 1);
+
+	uint32 result = 0;
+	if ((type & 1) == 1) {
+		result += sizeof(btrfs_entry) * (to - from + 1);
+	}
+	if ((type & 2) == 2) {
+		result += Item(from)->Offset() + Item(from)->Size()
+			- Item(to)->Offset();
+	}
+
+	return result;
+}
+
+
+int
+BTree::Node::SpaceUsed() const
+{
+	if (Level() == 0)
+		return _CalculateSpace(0, ItemCount() - 1, 3);
+	return _CalculateSpace(0, ItemCount() - 1, 0);
+}
+
+
+int
+BTree::Node::SpaceLeft() const
+{
+	return fVolume->BlockSize() - SpaceUsed() - sizeof(btrfs_header);
+}
+
+
+status_t
+BTree::Node::_SpaceCheck(int length) const
+{
+	// this is a little bit weird here because we can't find
+	// any suitable error code
+	if (length < 0 && std::abs(length) >= SpaceUsed())
+		return B_DIRECTORY_NOT_EMPTY;	// not enough data to delete
+	if (length > 0 && length >= SpaceLeft())
+		return B_DEVICE_FULL;			// no spare space
+	return B_OK;
+}
+
+
 //	#pragma mark - BTree::Path implementation
 
 
