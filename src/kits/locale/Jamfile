@@ -34,6 +34,7 @@ local sources =
 	TimeUnitFormat.cpp
 	Format.cpp # Used by some of the above.
 	UnicodeChar.cpp # Already used in FirstBootPrompt.
+	RelativeDateTimeFormat.cpp
 	;
 
 local architectureObject ;
