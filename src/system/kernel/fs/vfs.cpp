@@ -6147,13 +6147,14 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 			break;
 
 		case F_DUPFD:
+		case F_DUPFD_CLOEXEC:
 		{
 			struct io_context* context = get_current_io_context(kernel);
 
 			status = new_fd_etc(context, descriptor, (int)argument);
 			if (status >= 0) {
 				mutex_lock(&context->io_mutex);
-				fd_set_close_on_exec(context, fd, false);
+				fd_set_close_on_exec(context, fd, op == F_DUPFD_CLOEXEC);
 				mutex_unlock(&context->io_mutex);
 
 				atomic_add(&descriptor->ref_count, 1);

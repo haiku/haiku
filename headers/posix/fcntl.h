@@ -20,6 +20,7 @@
 #define F_GETLK         0x0020		/* get locking information */
 #define F_SETLK         0x0080		/* set locking information */
 #define F_SETLKW        0x0100		/* as above, but waits if blocked */
+#define F_DUPFD_CLOEXEC 0x0200		/* duplicate fd with close on exec set */
 
 /* advisory locking types */
 #define F_RDLCK         0x0040		/* read or shared lock */
