@@ -436,6 +436,41 @@ BufferQueue::SetPushPointer()
 		fPushPointer = fList.Tail()->sequence + fList.Tail()->size;
 }
 
+
+int
+BufferQueue::PopulateSackInfo(tcp_sequence sequence, int maxSackCount, tcp_sack* sacks)
+{
+	SegmentList::ReverseIterator iterator = fList.GetReverseIterator();
+	net_buffer* buffer = iterator.Next();
+
+	int sackCount = 0;
+	while (buffer != NULL && buffer->sequence > sequence) {
+		if (buffer->sequence + buffer->size < sacks[sackCount].left_edge) {
+			if (sackCount + 1 == maxSackCount)
+				break;
+			++sackCount;
+			sacks[sackCount].left_edge = buffer->sequence;
+			sacks[sackCount].right_edge = buffer->sequence + buffer->size;
+		} else {
+			sacks[sackCount].left_edge = buffer->sequence;
+			if (sacks[sackCount].right_edge == 0)
+				sacks[sackCount].right_edge = buffer->sequence + buffer->size;
+		}
+
+		buffer = iterator.Next();
+	}
+
+	if (sacks[0].left_edge != 0) {
+		for (int i = 0; i <= sackCount; ++i) {
+			sacks[i].left_edge = htonl(sacks[i].left_edge);
+			sacks[i].right_edge = htonl(sacks[i].right_edge);
+		}
+		++sackCount;
+	}
+
+	return sackCount;
+}
+
 #if DEBUG_BUFFER_QUEUE
 
 /*!	Perform a sanity check of the whole queue.

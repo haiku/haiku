@@ -42,6 +42,7 @@ public:
 
 	inline	size_t				PushedData() const;
 			void				SetPushPointer();
+			int				PopulateSackInfo(tcp_sequence sequence, int maxSackCount, tcp_sack* sacks);
 
 			size_t				Used() const { return fNumBytes; }
 	inline	size_t				Free() const;
