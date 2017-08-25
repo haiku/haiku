@@ -319,7 +319,8 @@ enum {
 	FLAG_CLOSED					= 0x08,
 	FLAG_DELETE_ON_CLOSE		= 0x10,
 	FLAG_LOCAL					= 0x20,
-	FLAG_RECOVERY				= 0x40
+	FLAG_RECOVERY				= 0x40,
+	FLAG_OPTION_SACK_PERMITTED	= 0x80,
 };
 
 
@@ -451,7 +452,7 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fCongestionWindow(0),
 	fSlowStartThreshold(0),
 	fState(CLOSED),
-	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP)
+	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP | FLAG_OPTION_SACK_PERMITTED)
 {
 	// TODO: to be replaced with a real read/write locking strategy!
 	mutex_init(&fLock, "tcp lock");
@@ -1413,6 +1414,9 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 			fReceivedTimestamp = segment.timestamp_value;
 		} else
 			fFlags &= ~FLAG_OPTION_TIMESTAMP;
+
+		if ((segment.options & TCP_SACK_PERMITTED) == 0)
+			fFlags &= ~FLAG_OPTION_SACK_PERMITTED;
 	}
 
 	if (fSendMaxSegmentSize > 2190)
@@ -2019,6 +2023,18 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			segment.timestamp_value = tcp_now();
 		}
 
+		// SACK information is embedded with duplicate acknowledgements
+		if (!fReceiveQueue.IsContiguous() && fLastAcknowledgeSent == fReceiveNext
+			&& (fFlags & FLAG_OPTION_SACK_PERMITTED) != 0) {
+			segment.options |= TCP_HAS_SACK;
+			int maxSackCount = 4 - ((fFlags & FLAG_OPTION_TIMESTAMP) != 0);
+			segment.sacks = (tcp_sack*)calloc(maxSackCount, sizeof(tcp_sack));
+			if (segment.sacks != NULL)
+				segment.sackCount = fReceiveQueue.PopulateSackInfo(fReceiveNext, maxSackCount, segment.sacks);
+			else
+				segment.sackCount = 0;
+		}
+
 		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
 			&& fSendNext == fInitialSendSequence) {
 			// add connection establishment options
@@ -2027,6 +2043,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 				segment.options |= TCP_HAS_WINDOW_SCALE;
 				segment.window_shift = fReceiveWindowShift;
 			}
+			if ((fFlags & FLAG_OPTION_SACK_PERMITTED) != 0)
+				segment.options |= TCP_SACK_PERMITTED;
 		}
 	}
 
