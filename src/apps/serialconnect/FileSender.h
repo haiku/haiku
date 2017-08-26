@@ -19,6 +19,7 @@ class BSerialPort;
 
 class FileSender {
 	public:
+		virtual				~FileSender();
 		virtual	bool		BytesReceived(const uint8_t* data,
 								size_t length) = 0;
 };

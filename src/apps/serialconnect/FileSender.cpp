@@ -13,6 +13,11 @@
 #include <SerialPort.h>
 
 
+FileSender::~FileSender()
+{
+}
+
+
 RawSender::RawSender(BDataIO* source, BSerialPort* sink, BHandler* listener)
 {
 	// FIXME doing this all here in the constructor is not good. We need to
