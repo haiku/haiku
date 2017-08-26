@@ -1277,13 +1277,14 @@
 #define S_LINK_AUTO_DELETE	FSSH_S_LINK_AUTO_DELETE
 
 /* standard file types */
-#define S_IFMT	FSSH_S_IFMT
-#define S_IFLNK	FSSH_S_IFLNK
-#define S_IFREG	FSSH_S_IFREG
-#define S_IFBLK	FSSH_S_IFBLK
-#define S_IFDIR	FSSH_S_IFDIR
-#define S_IFCHR	FSSH_S_IFCHR
-#define S_IFIFO	FSSH_S_IFIFO
+#define S_IFMT		FSSH_S_IFMT
+#define S_IFSOCK	FSSH_S_IFSOCK
+#define S_IFLNK		FSSH_S_IFLNK
+#define S_IFREG		FSSH_S_IFREG
+#define S_IFBLK		FSSH_S_IFBLK
+#define S_IFDIR		FSSH_S_IFDIR
+#define S_IFCHR		FSSH_S_IFCHR
+#define S_IFIFO		FSSH_S_IFIFO
 
 #define S_ISREG(mode)	FSSH_S_ISREG(mode)
 #define S_ISLNK(mode)	FSSH_S_ISLNK(mode)

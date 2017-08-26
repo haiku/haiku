@@ -59,6 +59,7 @@ typedef struct fssh_stat fssh_struct_stat;
 
 /* standard file types */
 #define FSSH_S_IFMT				00000170000 /* type of file */
+#define FSSH_S_IFSOCK			00000140000 /* socket */
 #define	FSSH_S_IFLNK			00000120000 /* symbolic link */
 #define FSSH_S_IFREG 			00000100000 /* regular */
 #define FSSH_S_IFBLK 			00000060000 /* block special */
