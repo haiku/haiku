@@ -475,6 +475,17 @@ struct btrfs_extent_data_ref {
 #define BTRFS_BLOCKGROUP_FLAG_RAID6			256
 #define BTRFS_BLOCKGROUP_FLAG_MASK			511
 
+// d_type in struct dirent
+#define BTRFS_FILETYPE_UNKNOWN				0
+#define BTRFS_FILETYPE_REGULAR				1
+#define BTRFS_FILETYPE_DIRECTORY			2
+#define BTRFS_FILETYPE_CHRDEV				3	// character device
+#define BTRFS_FILETYPE_BLKDEV				4	// block device
+#define BTRFS_FILETYPE_FIFO					5	// fifo device
+#define BTRFS_FILETYPE_SOCKET				6
+#define BTRFS_FILETYPE_SYMLINK				7
+#define BTRFS_FILETYPE_XATTR				8	// ondisk but not user-visible
+
 
 struct file_cookie {
 	bigtime_t	last_notification;
