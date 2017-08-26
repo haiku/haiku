@@ -70,6 +70,26 @@ DurationFormatTest::TestDuration()
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(expected, buffer);
 	}
+
+	{
+		BDurationFormat format(englishLanguage, englishFormat,
+			":", B_TIME_UNIT_ABBREVIATED);
+		status_t result = format.Format(buffer, 0, 800000000000ll);
+
+		expected << "1 wk:2 days:6 hr:13 min:20 sec";
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(expected, buffer);
+	}
+
+	{
+		BDurationFormat format(frenchLanguage, frenchFormat,
+			":", B_TIME_UNIT_ABBREVIATED);
+		result = format.Format(buffer, 0, 800000000000ll);
+
+		expected << "1 sem.:2 j:6 h:13 min:20 s";
+		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(expected, buffer);
+	}
 }
 
 
