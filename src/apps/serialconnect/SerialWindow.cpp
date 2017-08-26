@@ -87,19 +87,31 @@ SerialWindow::SerialWindow()
 	menuBar->AddItem(fFileMenu);
 	menuBar->AddItem(settingsMenu);
 
-	// TODO edit menu - what's in it ?
+	// TODO edit menu - what's in it ? Usual copy/paste would be nice but we
+	// need a way to select text in the window.
 	//BMenu* editMenu = new BMenu("Edit");
 	//menuBar->AddItem(editMenu);
 
 	BMenuItem* logFile = new BMenuItem("Log to file" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgLogfile));
 	fFileMenu->AddItem(logFile);
-	// TODO implement these
+
+	// The "send" items are disabled initially. They are enabled only once we
+	// are connected to a serial port.
+	BMessage* sendMsg = new BMessage(kMsgSendFile);
+	sendMsg->AddString("protocol", "xmodem");
 	BMenuItem* xmodemSend = new BMenuItem("XModem send" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgSendXmodem));
+		sendMsg);
 	fFileMenu->AddItem(xmodemSend);
 	xmodemSend->SetEnabled(false);
+
+	BMenuItem* rawSend = new BMenuItem("Raw send" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgSendFile));
+	fFileMenu->AddItem(rawSend);
+	rawSend->SetEnabled(false);
+
 #if 0
+	// TODO implement this
 	BMenuItem* xmodemReceive = new BMenuItem(
 		"X/Y/Zmodem receive" B_UTF8_ELLIPSIS, NULL);
 	fFileMenu->AddItem(xmodemReceive);
@@ -313,12 +325,12 @@ void SerialWindow::MessageReceived(BMessage* message)
 			return;
 		}
 		case kMsgLogfile:
-		case kMsgSendXmodem:
+		case kMsgSendFile:
 		{
 			// Let's lazy init the file panel
 			if (fLogFilePanel == NULL) {
 				fLogFilePanel = new BFilePanel(
-					message->what == kMsgSendXmodem ? B_OPEN_PANEL : B_SAVE_PANEL,
+					message->what == kMsgSendFile ? B_OPEN_PANEL : B_SAVE_PANEL,
 					&be_app_messenger, NULL, B_FILE_NODE, false);
 				fLogFilePanel->SetMessage(message);
 			}

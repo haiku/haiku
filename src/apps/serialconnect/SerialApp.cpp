@@ -164,9 +164,11 @@ void SerialApp::MessageReceived(BMessage* message)
 				debugger("Invalid BMessage received");
 			return;
 		}
-		case kMsgSendXmodem:
+		case kMsgSendFile:
 		{
 			entry_ref ref;
+
+			BString protocol = message->FindString("protocol");
 
 			if (message->FindRef("refs", &ref) == B_OK) {
 				BFile* file = new BFile(&ref, B_READ_ONLY);
@@ -175,7 +177,10 @@ void SerialApp::MessageReceived(BMessage* message)
 					puts(strerror(error));
 				else {
 					delete fFileSender;
-					fFileSender = new XModemSender(file, &fSerialPort, fWindow);
+					if (protocol == "xmodem")
+						fFileSender = new XModemSender(file, &fSerialPort, fWindow);
+					else
+						fFileSender = new RawSender(file, &fSerialPort, fWindow);
 				}
 			} else {
 				message->PrintToStream();

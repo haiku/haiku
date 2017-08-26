@@ -13,6 +13,7 @@
 #include <SerialPort.h>
 #include <String.h>
 
+#include "FileSender.h"
 #include "XModem.h"
 
 
@@ -46,7 +47,7 @@ class SerialApp: public BApplication
 						BFile*			fLogFile;
 						BString			fPortPath;
 
-						XModemSender*	fFileSender;
+						FileSender*		fFileSender;
 
 		static			status_t		PollSerial(void*);
 
@@ -63,7 +64,7 @@ enum messageConstants {
 	kMsgOpenPort        = 'open',
 	kMsgProgress        = 'prog',
 	kMsgSettings        = 'stty',
-	kMsgSendXmodem      = 'xmtx',
+	kMsgSendFile        = 'sndf',
 };
 
 #endif
