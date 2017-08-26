@@ -35,6 +35,7 @@ class SerialWindow: public BWindow
 						BMenu*			fLineTerminatorMenu;
 						BMenu*			fFileMenu;
 						BFilePanel*		fLogFilePanel;
+						BFilePanel*		fSendFilePanel;
 						BStatusBar*		fStatusBar;
 
 		static const	int				kBaudrates[];

@@ -42,6 +42,7 @@ SerialWindow::SerialWindow()
 	: BWindow(BRect(100, 100, 400, 400), SerialWindow::kWindowTitle,
 		B_DOCUMENT_WINDOW, B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fLogFilePanel(NULL)
+	, fSendFilePanel(NULL)
 {
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "menuBar");
 	menuBar->ResizeToPreferred();
@@ -249,6 +250,7 @@ SerialWindow::SerialWindow()
 SerialWindow::~SerialWindow()
 {
 	delete fLogFilePanel;
+	delete fSendFilePanel;
 }
 
 
@@ -325,16 +327,25 @@ void SerialWindow::MessageReceived(BMessage* message)
 			return;
 		}
 		case kMsgLogfile:
-		case kMsgSendFile:
 		{
 			// Let's lazy init the file panel
 			if (fLogFilePanel == NULL) {
-				fLogFilePanel = new BFilePanel(
-					message->what == kMsgSendFile ? B_OPEN_PANEL : B_SAVE_PANEL,
+				fLogFilePanel = new BFilePanel(B_SAVE_PANEL,
 					&be_app_messenger, NULL, B_FILE_NODE, false);
 				fLogFilePanel->SetMessage(message);
 			}
 			fLogFilePanel->Show();
+			return;
+		}
+		case kMsgSendFile:
+		{
+			// Let's lazy init the file panel
+			if (fSendFilePanel == NULL) {
+				fSendFilePanel = new BFilePanel(B_OPEN_PANEL,
+					&be_app_messenger, NULL, B_FILE_NODE, false);
+			}
+			fSendFilePanel->SetMessage(message);
+			fSendFilePanel->Show();
 			return;
 		}
 		case kMsgSettings:
