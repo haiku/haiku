@@ -12,6 +12,7 @@
 #include "DurationFormatTest.h"
 #include "LanguageTest.h"
 #include "MessageFormatTest.h"
+#include "RelativeDateTimeFormatTest.h"
 #include "UnicodeCharTest.h"
 
 
@@ -25,6 +26,7 @@ getTestSuite()
 	DurationFormatTest::AddTests(*suite);
 	LanguageTest::AddTests(*suite);
 	MessageFormatTest::AddTests(*suite);
+	RelativeDateTimeFormatTest::AddTests(*suite);
 	UnicodeCharTest::AddTests(*suite);
 
 	return suite;
