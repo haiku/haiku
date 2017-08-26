@@ -10,6 +10,7 @@
 #include <FormattingConventions.h>
 #include <Language.h>
 #include <TimeFormat.h>
+#include <TimeZone.h>
 
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
@@ -31,6 +32,7 @@ DateFormatTest::TestCustomFormat()
 	struct Test {
 		const char* language;
 		const char* formatting;
+		const char* timeZone;
 		int32 fields;
 
 		BString expected;
@@ -41,20 +43,18 @@ DateFormatTest::TestCustomFormat()
 	BString buffer;
 
 	const Test tests[] = {
-		{ "en", "en_US", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
+		{ "en", "en_US", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
 			"10:21 PM", "22:21", "10:21 PM" },
-		{ "en", "en_US",
+		{ "en", "en_US", "GMT+1",
 			B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE | B_DATE_ELEMENT_SECOND,
 			"10:21:18 PM", "22:21:18", "10:21:18 PM" },
-		// FIXME we need a way to set the timezone for this test to work
-		// reliably.
-		{ "en", "en_US", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
+		{ "en", "en_US", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
 			| B_DATE_ELEMENT_TIMEZONE,
 			"10:21 PM GMT+1", "22:21 GMT+1", "10:21 PM GMT+1" },
-		{ "en", "en_US", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
+		{ "en", "en_US", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
 			| B_DATE_ELEMENT_SECOND | B_DATE_ELEMENT_TIMEZONE,
 			"10:21:18 PM GMT+1", "22:21:18 GMT+1", "10:21:18 PM GMT+1" },
-		{ "fr", "fr_FR", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
+		{ "fr", "fr_FR", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
 			"22:21", "22:21", "10:21 PM" },
 		{ NULL }
 	};
@@ -65,6 +65,7 @@ DateFormatTest::TestCustomFormat()
 
 		BLanguage language(tests[i].language);
 		BFormattingConventions formatting(tests[i].formatting);
+		BTimeZone timeZone(tests[i].timeZone);
 		status_t result;
 
 		// Test default for language/formatting
@@ -74,7 +75,7 @@ DateFormatTest::TestCustomFormat()
 				tests[i].fields);
 
 			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-				B_SHORT_TIME_FORMAT);
+				B_SHORT_TIME_FORMAT, &timeZone);
 
 			CPPUNIT_ASSERT_EQUAL(B_OK, result);
 			CPPUNIT_ASSERT_EQUAL(tests[i].expected, buffer);
@@ -87,7 +88,7 @@ DateFormatTest::TestCustomFormat()
 			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
 				tests[i].fields);
 			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-				B_SHORT_TIME_FORMAT);
+				B_SHORT_TIME_FORMAT, &timeZone);
 
 			CPPUNIT_ASSERT_EQUAL(B_OK, result);
 			CPPUNIT_ASSERT_EQUAL(tests[i].force24, buffer);
@@ -100,7 +101,7 @@ DateFormatTest::TestCustomFormat()
 			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
 				tests[i].fields);
 			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-				B_SHORT_TIME_FORMAT);
+				B_SHORT_TIME_FORMAT, &timeZone);
 
 			CPPUNIT_ASSERT_EQUAL(B_OK, result);
 			CPPUNIT_ASSERT_EQUAL(tests[i].force12, buffer);
@@ -115,6 +116,7 @@ DateFormatTest::TestFormat()
 	struct Value {
 		const char* language;
 		const char* convention;
+		const char* timeZone;
 		time_t time;
 		const char* shortDate;
 		const char* longDate;
@@ -124,11 +126,11 @@ DateFormatTest::TestFormat()
 	};
 
 	static const Value values[] = {
-		{"en", "en_US", 12345, "1/1/70", "January 1, 1970",
+		{"en", "en_US", "GMT+1", 12345, "1/1/70", "January 1, 1970",
 			"4:25 AM", "4:25:45 AM", "1/1/70, 4:25 AM"},
-		{"fr", "fr_FR", 12345, "01/01/1970", "1 janvier 1970",
+		{"fr", "fr_FR", "GMT+1", 12345, "01/01/1970", "1 janvier 1970",
 			"04:25", "04:25:45", "01/01/1970 04:25"},
-		{"fr", "fr_FR", 12345678, "23/05/1970", "23 mai 1970",
+		{"fr", "fr_FR", "GMT+1", 12345678, "23/05/1970", "23 mai 1970",
 			"22:21", "22:21:18", "23/05/1970 22:21"},
 		{NULL}
 	};
@@ -141,28 +143,33 @@ DateFormatTest::TestFormat()
 
 		BLanguage language(values[i].language);
 		BFormattingConventions formatting(values[i].convention);
+		BTimeZone timeZone(values[i].timeZone);
 		BDateFormat dateFormat(language, formatting);
 		BTimeFormat timeFormat(language, formatting);
 		BDateTimeFormat dateTimeFormat(language, formatting);
 
-		result = dateFormat.Format(output, values[i].time, B_SHORT_DATE_FORMAT);
+		result = dateFormat.Format(output, values[i].time, B_SHORT_DATE_FORMAT,
+			&timeZone);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortDate), output);
 
-		result = dateFormat.Format(output, values[i].time, B_LONG_DATE_FORMAT);
+		result = dateFormat.Format(output, values[i].time, B_LONG_DATE_FORMAT,
+			&timeZone);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].longDate), output);
 
-		result = timeFormat.Format(output, values[i].time, B_SHORT_TIME_FORMAT);
+		result = timeFormat.Format(output, values[i].time, B_SHORT_TIME_FORMAT,
+			&timeZone);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortTime), output);
 
-		result = timeFormat.Format(output, values[i].time, B_MEDIUM_TIME_FORMAT);
+		result = timeFormat.Format(output, values[i].time, B_MEDIUM_TIME_FORMAT,
+			&timeZone);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].longTime), output);
 
 		result = dateTimeFormat.Format(output, values[i].time,
-			B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT);
+			B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, &timeZone);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
 		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortDateTime), output);
 	}
