@@ -180,6 +180,8 @@ SerialDevice::SetModes(struct termios *tios)
 	// update the termios of the device side
 	gTTYModule->tty_control(fDeviceTTYCookie, TCSETA, &config, sizeof(termios));
 
+	SetHardwareFlowControl((tios->c_cflag & CRTSCTS) != 0);
+
 	usb_cdc_line_coding lineCoding;
 	lineCoding.speed = speed;
 	lineCoding.stopbits = (tios->c_cflag & CSTOPB)
@@ -521,7 +523,7 @@ status_t
 SerialDevice::SetLineCoding(usb_cdc_line_coding *coding)
 {
 	// default implementation - does nothing
-	return B_OK;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -529,7 +531,15 @@ status_t
 SerialDevice::SetControlLineState(uint16 state)
 {
 	// default implementation - does nothing
-	return B_OK;
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+SerialDevice::SetHardwareFlowControl(bool enable)
+{
+	// default implementation - does nothing
+	return B_NOT_SUPPORTED;
 }
 
 

@@ -185,7 +185,8 @@ FTDIDevice::SetLineCoding(usb_cdc_line_coding *lineCoding)
 status_t
 FTDIDevice::SetControlLineState(uint16 state)
 {
-	TRACE_FUNCALLS("> FTDIDevice::SetControlLineState(0x%08x, 0x%04x)\n", this, state);
+	TRACE_FUNCALLS("> FTDIDevice::SetControlLineState(0x%08x, 0x%04x)\n",
+		this, state);
 
 	int32 control;
 	control = (state & USB_CDC_CONTROL_SIGNAL_STATE_RTS) ? FTDI_SIO_SET_RTS_HIGH
@@ -197,8 +198,10 @@ FTDIDevice::SetControlLineState(uint16 state)
 		FTDI_SIO_MODEM_CTRL, control,
 		FTDI_PIT_DEFAULT, 0, NULL, &length);
 
-	if (status != B_OK)
-		TRACE_ALWAYS("= FTDIDevice::SetControlLineState(): control set request failed: 0x%08x\n", status);
+	if (status != B_OK) {
+		TRACE_ALWAYS("= FTDIDevice::SetControlLineState(): "
+			"control set request failed: 0x%08x\n", status);
+	}
 
 	control = (state & USB_CDC_CONTROL_SIGNAL_STATE_DTR) ? FTDI_SIO_SET_DTR_HIGH
 		: FTDI_SIO_SET_DTR_LOW;
@@ -208,10 +211,37 @@ FTDIDevice::SetControlLineState(uint16 state)
 		FTDI_SIO_MODEM_CTRL, control,
 		FTDI_PIT_DEFAULT, 0, NULL, &length);
 
-	if (status != B_OK)
-		TRACE_ALWAYS("= FTDIDevice::SetControlLineState(): control set request failed: 0x%08x\n", status);
+	if (status != B_OK) {
+		TRACE_ALWAYS("= FTDIDevice::SetControlLineState(): "
+			"control set request failed: 0x%08x\n", status);
+	}
 
-	TRACE_FUNCRET("< FTDIDevice::SetControlLineState() returns: 0x%08x\n", status);
+	TRACE_FUNCRET("< FTDIDevice::SetControlLineState() returns: 0x%08x\n",
+		status);
+	return status;
+}
+
+
+status_t
+FTDIDevice::SetHardwareFlowControl(bool enable)
+{
+	TRACE_FUNCALLS("> FTDIDevice::SetHardwareFlowControl(0x%08x, %d)\n",
+		this, enable);
+
+	uint32 control = enable ? FTDI_SIO_RTS_CTS_HS : FTDI_SIO_DISABLE_FLOW_CTRL;
+
+	size_t length = 0;
+	status_t status = gUSBModule->send_request(Device(),
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+		FTDI_SIO_SET_FLOW_CTRL, 0,
+		FTDI_PIT_DEFAULT | (control << 8), 0, NULL, &length);
+
+	if (status != B_OK)
+		TRACE_ALWAYS("= FTDIDevice::SetHardwareFlowControl(): "
+			"request failed: 0x%08x\n", status);
+
+	TRACE_FUNCRET("< FTDIDevice::SetHardwareFlowControl() returns: 0x%08x\n",
+		status);
 	return status;
 }
 
