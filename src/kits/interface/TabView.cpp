@@ -340,20 +340,6 @@ BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 	}
 
 	if (position == B_TAB_FRONT) {
-		switch (fTabView->TabSide()) {
-			case BTabView::kTopSide:
-				frame.bottom -= 1.0f;
-				break;
-			case BTabView::kBottomSide:
-				frame.top += 1.0f;
-				break;
-			case BTabView::kLeftSide:
-				frame.right -= 1.0f;
-				break;
-			case BTabView::kRightSide:
-				frame.left += 1.0f;
-				break;
-		}
 		be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
 			borders, fTabView->TabSide());
 	} else {

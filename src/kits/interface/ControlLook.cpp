@@ -1506,7 +1506,7 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 	// draw the rest of frame and fill
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
-		edgeLightColor, borders & bordersToDraw);
+		edgeLightColor, borders);
 	if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
 		if ((borders & B_LEFT_BORDER) == 0)
 			rect.left++;

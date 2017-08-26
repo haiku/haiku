@@ -75,12 +75,8 @@ TabContainerView::MessageReceived(BMessage* message)
 void
 TabContainerView::Draw(BRect updateRect)
 {
-	// Stroke separator line at bottom.
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	BRect frame(Bounds());
-	SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-	StrokeLine(frame.LeftBottom(), frame.RightBottom());
-	frame.bottom--;
 
 	// Draw empty area before first tab.
 	uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;

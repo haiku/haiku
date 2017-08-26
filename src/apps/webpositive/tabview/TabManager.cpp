@@ -64,9 +64,6 @@ public:
 	{
 		BRect bounds(Bounds());
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-		StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
-		bounds.bottom--;
 		uint32 flags = be_control_look->Flags(this);
 		uint32 borders = BControlLook::B_TOP_BORDER
 			| BControlLook::B_BOTTOM_BORDER;
@@ -182,7 +179,7 @@ public:
 		bigtime_t clickSpeed = 2000000;
 		get_click_speed(&clickSpeed);
 		bigtime_t clickTime = Window()->CurrentMessage()->FindInt64("when");
-		if (!IsEnabled() || (Value() == B_CONTROL_ON) 
+		if (!IsEnabled() || (Value() == B_CONTROL_ON)
 			|| clickTime < fCloseTime + clickSpeed) {
 			return;
 		}
@@ -284,7 +281,7 @@ public:
 				}
 				fTabMenuButton->MenuClosed();
 				delete tabMenu;
-				
+
 				break;
 			}
 			default:
@@ -513,6 +510,8 @@ WebTabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect,
 				iconBounds.bottom = (fIcon->Bounds().Height() + 1) / scale - 1;
 			}
 		}
+		// account for borders
+		frame.top -= 2.0f;
 		BPoint iconPos(frame.left + kIconInset - 1,
 			frame.top + floorf((frame.Height() - iconBounds.Height()) / 2));
 		iconBounds.OffsetTo(iconPos);
