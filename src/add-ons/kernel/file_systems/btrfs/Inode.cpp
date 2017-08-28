@@ -490,3 +490,43 @@ Inode::MakeReference(Transaction& transaction, BTree::Path* path,
 
 	return B_OK;
 }
+
+
+// Remove the "name" and unlink it with inode.
+status_t
+Inode::Dereference(Transaction& transaction, BTree::Path* path, ino_t parentID,
+	const char* name)
+{
+	BTree* tree = path->Tree();
+
+	// remove inode_ref item
+	btrfs_key key;
+	key.SetObjectID(fID);
+	key.SetType(BTRFS_KEY_TYPE_INODE_REF);
+	key.SetOffset(parentID);
+	btrfs_inode_ref* inodeRef;
+	status_t status = tree->RemoveEntries(transaction, path, key,
+		(void**)&inodeRef, 1);
+	if (status != B_OK)
+		return status;
+
+	// remove dir_item
+	uint32 hash = calculate_crc((uint32)~1, (uint8*)name, strlen(name));
+	key.SetObjectID(parentID);
+	key.SetType(BTRFS_KEY_TYPE_DIR_ITEM);
+	key.SetOffset(hash);
+	status = tree->RemoveEntries(transaction, path, key, NULL, 1);
+	if (status != B_OK)
+		return status;
+
+	// remove dir_index
+	uint64 index = inodeRef->Index();
+	free(inodeRef);
+	key.SetType(BTRFS_KEY_TYPE_DIR_INDEX);
+	key.SetOffset(index);
+	status = tree->RemoveEntries(transaction, path, key, NULL, 1);
+	if (status != B_OK)
+		return status;
+
+	return B_OK;
+}

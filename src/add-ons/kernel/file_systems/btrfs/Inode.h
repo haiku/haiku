@@ -76,6 +76,8 @@ public:
 			status_t	Remove(Transaction& transaction, BTree::Path* path);
 			status_t	MakeReference(Transaction& transaction, BTree::Path* path,
 							Inode* parent, const char* name, int32 mode);
+			status_t	Dereference(Transaction& transaction, BTree::Path* path,
+							ino_t parentID, const char* name);
 private:
 						Inode(Volume* volume);
 						Inode(const Inode&);
