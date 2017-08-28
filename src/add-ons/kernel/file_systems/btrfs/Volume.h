@@ -46,6 +46,8 @@ public:
 			BTree*				RootTree() const { return fRootTree; }
 
 			uint32				SectorSize() const { return fSectorSize; }
+			uint32				MaxInlineSize() const
+									{ return fSectorSize / 2; }
 			uint32				BlockSize() const { return fBlockSize; }
 			Chunk*				SystemChunk() const { return fChunk; }
 			Journal*			GetJournal() const { return fJournal; }

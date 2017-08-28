@@ -43,6 +43,22 @@ Inode::Inode(Volume* volume, ino_t id)
 }
 
 
+Inode::Inode(Volume* volume, ino_t id, const btrfs_inode& item)
+	:
+	fVolume(volume),
+	fID(id),
+	fCache(NULL),
+	fMap(NULL),
+	fInitStatus(B_OK),
+	fNode(item)
+{
+	if (!IsDirectory() && !IsSymLink()) {
+		fCache = file_cache_create(fVolume->ID(), ID(), Size());
+		fMap = file_map_create(fVolume->ID(), ID(), Size());
+	}
+}
+
+
 Inode::Inode(Volume* volume)
 	:
 	fVolume(volume),
@@ -91,6 +107,49 @@ Inode::UpdateNodeFromDisk()
 	memcpy(&fNode, node, sizeof(btrfs_inode));
 	free(node);
 	return B_OK;
+}
+
+
+/*
+ * Create new Inode object with inode_item
+ */
+Inode*
+Inode::Create(Transaction& transaction, ino_t id, Inode* parent, int32 mode,
+	uint64 size, uint64 flags)
+{
+	TRACE("Inode::Create() id % " B_PRIu64 " mode %" B_PRId32 " flags %"
+		B_PRIu64"\n", id, flags, mode);
+
+	Volume* volume = parent->GetVolume();
+	uint64 nbytes = size;	// allocated size
+	if (size > volume->MaxInlineSize())
+		nbytes = (size / volume->SectorSize() + 1) * volume->SectorSize();
+
+	btrfs_inode inode;
+
+	inode.generation = B_HOST_TO_LENDIAN_INT64(transaction.SystemID());
+	inode.transaction_id = B_HOST_TO_LENDIAN_INT64(transaction.SystemID());
+	inode.size = B_HOST_TO_LENDIAN_INT64(size);
+	inode.nbytes = B_HOST_TO_LENDIAN_INT64(nbytes);
+	inode.blockgroup = 0;	// normal inode only
+	inode.num_links = B_HOST_TO_LENDIAN_INT32(1);
+	inode.uid = B_HOST_TO_LENDIAN_INT32(geteuid());
+	inode.gid = B_HOST_TO_LENDIAN_INT32(parent ? parent->GroupID() : getegid());
+	inode.mode = B_HOST_TO_LENDIAN_INT32(mode);;
+	inode.rdev = 0;	// normal file only
+	inode.flags = B_HOST_TO_LENDIAN_INT64(flags);
+	inode.sequence = 0;	// incremented each time mtime value is changed
+
+	uint64 now = real_time_clock_usecs();
+	struct timespec timespec;
+	timespec.tv_sec = now / 1000000;
+	timespec.tv_nsec = (now % 1000000) * 1000;
+	btrfs_inode::SetTime(inode.access_time, timespec);
+	btrfs_inode::SetTime(inode.creation_time, timespec);
+	btrfs_inode::SetTime(inode.change_time, timespec);
+	btrfs_inode::SetTime(inode.modification_time, timespec);
+
+	return new Inode(volume, id, inode);
 }
 
 

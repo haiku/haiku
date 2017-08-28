@@ -303,6 +303,11 @@ struct btrfs_inode {
 		{ _DecodeTime(timespec, modification_time); }
 	void GetCreationTime(struct timespec& timespec) const
 		{ _DecodeTime(timespec, creation_time); }
+	static void SetTime(btrfs_timespec& time, const struct timespec& timespec)
+	{
+		time.seconds = B_HOST_TO_LENDIAN_INT64(timespec.tv_sec);
+		time.nanoseconds = B_HOST_TO_LENDIAN_INT64(timespec.tv_nsec);
+	}
 } _PACKED;
 
 

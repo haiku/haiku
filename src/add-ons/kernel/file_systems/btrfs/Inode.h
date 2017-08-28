@@ -9,6 +9,7 @@
 
 #include "btrfs.h"
 #include "Volume.h"
+#include "Journal.h"
 
 
 //#define TRACE_BTRFS
@@ -22,6 +23,8 @@
 class Inode {
 public:
 						Inode(Volume* volume, ino_t id);
+						Inode(Volume* volume, ino_t id,
+							const btrfs_inode& item);
 						~Inode();
 
 			status_t	InitCheck();
@@ -64,6 +67,9 @@ public:
 			void*		Map() const { return fMap; }
 
 			status_t	FindParent(ino_t* id);
+	static	Inode*		Create(Transaction& transaction, ino_t id,
+							Inode* parent, int32 mode, uint64 size = 0,
+							uint64 flags = 0);
 private:
 						Inode(Volume* volume);
 						Inode(const Inode&);
@@ -71,6 +77,7 @@ private:
 							// no implementation
 
 			uint64		_NumBlocks();
+private:
 
 			rw_lock		fLock;
 			::Volume*	fVolume;
