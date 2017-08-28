@@ -49,6 +49,7 @@ public:
 			uint32				MaxInlineSize() const
 									{ return fSectorSize / 2; }
 			uint32				BlockSize() const { return fBlockSize; }
+			ino_t				GetNextInodeID() { return ++fLargestInodeID; }
 			Chunk*				SystemChunk() const { return fChunk; }
 			Journal*			GetJournal() const { return fJournal; }
 			ExtentAllocator*	GetAllocator() const { return fExtentAllocator; }
@@ -72,6 +73,7 @@ private:
 			mutex				fLock;
 			fs_volume*			fFSVolume;
 			int					fDevice;
+			ino_t				fLargestInodeID;
 			btrfs_super_block	fSuperBlock;
 			char				fName[32];
 

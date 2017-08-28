@@ -388,6 +388,17 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fChecksumTree->SetRoot(root->LogicalAddress(), NULL);
 	free(root);
 
+	search_key.SetObjectID(-1);
+	search_key.SetType(0);
+	status = fFSTree->FindPrevious(&path, search_key, NULL);
+	if (status != B_OK) {
+		ERROR("Volume::Mount() Couldn't find any inode!!\n");
+		return status;
+	}
+	fLargestInodeID = search_key.ObjectID();
+	TRACE("Volume::Mount() Find larget inode id % " B_PRIu64 "\n",
+		fLargestInodeID);
+
 	// Initialize Journal
 	fJournal = new(std::nothrow) Journal(this);
 	if (fJournal == NULL)
