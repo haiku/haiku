@@ -319,6 +319,13 @@ struct btrfs_inode_ref {
 
 	uint64 Index() const { return index; }
 	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
+	uint16 Length() const
+		{ return sizeof(btrfs_inode_ref) + NameLength(); }
+	void SetName(const char* name, uint16 nameLength)
+	{
+		name_length = B_HOST_TO_LENDIAN_INT16(nameLength);
+		memcpy(this->name, name, nameLength);
+	}
 } _PACKED;
 
 
@@ -348,11 +355,26 @@ struct btrfs_dir_entry {
 	uint16	data_length;
 	uint16	name_length;
 	uint8	type;
+	uint8	name[];
+	uint8	data[];		// attribute data
 	uint16 DataLength() const { return B_LENDIAN_TO_HOST_INT16(data_length); }
 	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
 	ino_t InodeID() const { return location.ObjectID(); }
 	uint16 Length() const
 		{ return sizeof(*this) + NameLength() + DataLength(); }
+	void SetTransactionID(uint64 id)
+		{ transaction_id = B_HOST_TO_LENDIAN_INT64(id); }
+	void SetAttributeData(void* data, uint16 dataLength)
+	{
+		data_length = B_HOST_TO_LENDIAN_INT16(dataLength);
+		if (data != NULL)
+			memcpy(this->data, data, dataLength);
+	}
+	void SetName(const char* name, uint16 nameLength)
+	{
+		name_length = B_HOST_TO_LENDIAN_INT16(nameLength);
+		memcpy(this->name, name, nameLength);
+	}
 } _PACKED;
 
 

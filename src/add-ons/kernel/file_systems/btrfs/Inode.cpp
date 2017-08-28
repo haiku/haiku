@@ -8,6 +8,7 @@
 
 #include "Inode.h"
 #include "CachedBlock.h"
+#include "CRCTable.h"
 #include "Utility.h"
 
 
@@ -372,6 +373,21 @@ Inode::FindParent(ino_t* id)
 }
 
 
+uint64
+Inode::FindNextIndex(BTree::Path* path) const
+{
+	btrfs_key key;
+	key.SetObjectID(fID);
+	key.SetType(BTRFS_KEY_TYPE_DIR_INDEX);
+	key.SetOffset(-1);
+
+	if (fVolume->FSTree()->FindPrevious(path, key, NULL))
+		return 2;		// not found any dir index item
+
+	return key.Offset() + 1;
+}
+
+
 /* Insert inode_item
  */
 status_t
@@ -391,6 +407,68 @@ Inode::Insert(Transaction& transaction, BTree::Path* path)
 	if (status != B_OK)
 		return status;
 
+	return B_OK;
+}
+
+
+/* Insert 3 items: inode_ref, dir_item, dir_index
+ * Basically, make a link between name and its node (location)
+ */
+status_t
+Inode::MakeReference(Transaction& transaction, BTree::Path* path,
+	Inode* parent, const char* name, int32 mode)
+{
+	BTree* tree = fVolume->FSTree();
+	uint16 nameLength = strlen(name);
+	uint64 index = parent->FindNextIndex(path);
+	void* data[1];
+
+	// insert inode_ref
+	btrfs_entry entry;
+	btrfs_inode_ref inodeRef;
+
+	inodeRef.index = index;
+	inodeRef.SetName(name, nameLength);
+	data[0] = (void*)&inodeRef;
+
+	entry.key.SetObjectID(fID);
+	entry.key.SetType(BTRFS_KEY_TYPE_INODE_REF);
+	entry.key.SetOffset(parent->ID());
+	entry.SetSize(inodeRef.Length());
+
+	status_t status = tree->InsertEntries(transaction, path, &entry, data, 1);
+	if (status != B_OK)
+		return status;
+
+	// insert dir_entry
+	uint32 hash = calculate_crc((uint32)~1, (uint8*)name, nameLength);
+	btrfs_dir_entry directoryEntry;
+	directoryEntry.location.SetObjectID(fID);
+	directoryEntry.location.SetType(BTRFS_KEY_TYPE_INODE_ITEM);
+	directoryEntry.location.SetOffset(0);
+	directoryEntry.SetTransactionID(transaction.SystemID());
+	// TODO: xattribute, 0 for standard directory
+	directoryEntry.SetAttributeData(NULL, 0);
+	directoryEntry.SetName(name, nameLength);
+	directoryEntry.type = get_filetype(mode);
+	data[0] = (void*)&directoryEntry;
+
+	entry.key.SetObjectID(parent->ID());
+	entry.key.SetType(BTRFS_KEY_TYPE_DIR_ITEM);
+	entry.key.SetOffset(hash);
+	entry.SetSize(directoryEntry.Length());
+
+	status = tree->InsertEntries(transaction, path, &entry, data, 1);
+	if (status != B_OK)
+		return status;
+
+	// insert dir_index (has same data with dir_entry)
+	entry.key.SetType(BTRFS_KEY_TYPE_DIR_INDEX);
+	entry.key.SetOffset(index);
+
+	status = tree->InsertEntries(transaction, path, &entry, data, 1);
+	if (status != B_OK)
+		return status;
 
 	return B_OK;
 }

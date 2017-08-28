@@ -68,10 +68,13 @@ public:
 			void*		Map() const { return fMap; }
 
 			status_t	FindParent(ino_t* id);
+			uint64		FindNextIndex(BTree::Path* path) const;
 	static	Inode*		Create(Transaction& transaction, ino_t id,
 							Inode* parent, int32 mode, uint64 size = 0,
 							uint64 flags = 0);
 			status_t	Insert(Transaction& transaction, BTree::Path* path);
+			status_t	MakeReference(Transaction& transaction, BTree::Path* path,
+							Inode* parent, const char* name, int32 mode);
 private:
 						Inode(Volume* volume);
 						Inode(const Inode&);
