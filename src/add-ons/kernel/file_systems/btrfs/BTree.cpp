@@ -780,6 +780,43 @@ BTree::InsertEntries(Transaction& transaction, Path* path,
 }
 
 
+/* Like MakeEntries, but here we remove entries instead.
+ * Removed data stored in _data
+ * May merge those functions into one.
+ */
+status_t
+BTree::RemoveEntries(Transaction& transaction, Path* path,
+	const btrfs_key& startKey, void** _data, int num)
+{
+	TRACE("BTree::RemoveEntries() num %i key (% " B_PRIu64 " %" B_PRIu8 " %"
+		B_PRIu64 ")\n", num, startKey.ObjectID(), startKey.Type(),
+		startKey.Offset());
+
+	status_t status = Traverse(BTREE_EXACT, path, startKey);
+	if (status < B_OK)
+		return status;
+
+	int slot = status;
+	int length = -sizeof(btrfs_entry) * num;
+	for (int i = 0; i < num; i++) {
+		uint32 itemSize;
+		path->GetEntry(slot + i, NULL, &_data[i], &itemSize);
+		length -= itemSize;
+	}
+
+	status = path->InternalCopy(transaction, 1);
+	if (status != B_OK)
+		return status;
+
+	status = path->CopyOnWrite(transaction, 0, slot, num, length);
+	if (status == B_DIRECTORY_NOT_EMPTY) {
+		// TODO: merge node or push data
+	}
+
+	return status;
+}
+
+
 status_t
 BTree::PreviousLeaf(Path* path) const
 {

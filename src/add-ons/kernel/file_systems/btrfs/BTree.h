@@ -78,6 +78,9 @@ public:
 			status_t			InsertEntries(Transaction& transaction,
 									Path* path, btrfs_entry* entries,
 									void** data, int num);
+			status_t			RemoveEntries(Transaction& transaction,
+									Path* path, const btrfs_key& startKey,
+									void** _data, int num);
 
 			Volume*				SystemVolume() const { return fVolume; }
 			status_t			SetRoot(off_t logical, fsblock_t* block);
