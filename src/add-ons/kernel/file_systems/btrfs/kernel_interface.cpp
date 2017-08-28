@@ -529,6 +529,48 @@ btrfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
 
 
 static status_t
+btrfs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	Transaction transaction(volume);
+	BTree::Path path(volume->FSTree());
+
+	ino_t id;
+	status_t status = DirectoryIterator(directory).Lookup(name, strlen(name),
+		&id);
+	if (status != B_OK)
+		return status;
+
+	Inode inode(volume, id);
+	status = inode.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = inode.Remove(transaction, &path);
+	if (status != B_OK)
+		return status;
+	status = inode.Dereference(transaction, &path, directory->ID(), name);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_remove(volume->ID(), directory->ID(), name);
+	entry_cache_remove(volume->ID(), id, "..");
+
+	status = transaction.Done();
+	if (status == B_OK)
+		notify_entry_removed(volume->ID(), directory->ID(), name, id);
+	else {
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+		entry_cache_add(volume->ID(), id, "..", id);
+	}
+
+	return status;
+}
+
+
+static status_t
 btrfs_open_dir(fs_volume* /*_volume*/, fs_vnode* _node, void** _cookie)
 {
 	Inode* inode = (Inode*)_node->private_node;
@@ -861,7 +903,7 @@ fs_vnode_ops gBtrfsVnodeOps = {
 
 	/* directory operations */
 	&btrfs_create_dir,
-	NULL, 	// fs_remove_dir,
+	&btrfs_remove_dir,
 	&btrfs_open_dir,
 	&btrfs_close_dir,
 	&btrfs_free_dir_cookie,
