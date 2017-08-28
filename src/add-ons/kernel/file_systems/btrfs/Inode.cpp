@@ -7,7 +7,6 @@
 
 
 #include "Inode.h"
-#include "BTree.h"
 #include "CachedBlock.h"
 #include "Utility.h"
 
@@ -372,3 +371,26 @@ Inode::FindParent(ino_t* id)
 	return B_OK;
 }
 
+
+/* Insert inode_item
+ */
+status_t
+Inode::Insert(Transaction& transaction, BTree::Path* path)
+{
+	BTree* tree = path->Tree();
+
+	btrfs_entry item;
+	item.key.SetObjectID(fID);
+	item.key.SetType(BTRFS_KEY_TYPE_INODE_ITEM);
+	item.key.SetOffset(0);
+	item.SetSize(sizeof(btrfs_inode));
+
+	void* data[1];
+	data[0] = (void*)&fNode;
+	status_t status = tree->InsertEntries(transaction, path, &item, data, 1);
+	if (status != B_OK)
+		return status;
+
+
+	return B_OK;
+}

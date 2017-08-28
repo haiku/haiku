@@ -10,6 +10,7 @@
 #include "btrfs.h"
 #include "Volume.h"
 #include "Journal.h"
+#include "BTree.h"
 
 
 //#define TRACE_BTRFS
@@ -70,6 +71,7 @@ public:
 	static	Inode*		Create(Transaction& transaction, ino_t id,
 							Inode* parent, int32 mode, uint64 size = 0,
 							uint64 flags = 0);
+			status_t	Insert(Transaction& transaction, BTree::Path* path);
 private:
 						Inode(Volume* volume);
 						Inode(const Inode&);
