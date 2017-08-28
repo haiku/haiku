@@ -411,6 +411,24 @@ Inode::Insert(Transaction& transaction, BTree::Path* path)
 }
 
 
+/* Remove inode_item
+ */
+status_t
+Inode::Remove(Transaction& transaction, BTree::Path* path)
+{
+	BTree* tree = path->Tree();
+	btrfs_key key;
+	key.SetObjectID(fID);
+	key.SetType(BTRFS_KEY_TYPE_INODE_ITEM);
+	key.SetOffset(0);
+	status_t status = tree->RemoveEntries(transaction, path, key, NULL, 1);
+	if (status != B_OK)
+		return status;
+
+	return B_OK;
+}
+
+
 /* Insert 3 items: inode_ref, dir_item, dir_index
  * Basically, make a link between name and its node (location)
  */

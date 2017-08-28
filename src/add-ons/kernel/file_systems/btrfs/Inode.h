@@ -73,6 +73,7 @@ public:
 							Inode* parent, int32 mode, uint64 size = 0,
 							uint64 flags = 0);
 			status_t	Insert(Transaction& transaction, BTree::Path* path);
+			status_t	Remove(Transaction& transaction, BTree::Path* path);
 			status_t	MakeReference(Transaction& transaction, BTree::Path* path,
 							Inode* parent, const char* name, int32 mode);
 private:
