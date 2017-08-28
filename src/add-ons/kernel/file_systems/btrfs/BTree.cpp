@@ -420,6 +420,18 @@ BTree::Path::GetEntry(int slot, btrfs_key* _key, void** _value, uint32* _size,
 }
 
 
+status_t
+BTree::Path::SetEntry(int slot, const btrfs_entry& entry, void* value)
+{
+	if (slot < 0)
+		return B_ENTRY_NOT_FOUND;
+
+	memcpy(fNodes[0]->Item(slot), &entry, sizeof(btrfs_entry));
+	memcpy(fNodes[0]->ItemData(slot), value, entry.Size());
+	return B_OK;
+}
+
+
 /*
  * Allocate and copy block and do all the changes that it can.
  * for now, we only copy-on-write tree block,
@@ -699,6 +711,72 @@ BTree::FindExact(Path* path, btrfs_key& key, void** _value, uint32* _size,
 	uint32* _offset) const
 {
 	return _Find(path, key, _value, _size, _offset, BTREE_EXACT);
+}
+
+
+/*
+ * Insert "num" of consecutive empty entries start with slot of "startKey"
+ * if successful return the starting slot, otherwise return error code.
+ */
+status_t
+BTree::MakeEntries(Transaction& transaction, Path* path,
+	const btrfs_key& startKey, int num, int length)
+{
+	TRACE("BTree::MakeEntries() num %i key (% " B_PRIu64 " %" B_PRIu8 " %"
+		B_PRIu64 ")\n", num, startKey.ObjectID(), startKey.Type(),
+		startKey.Offset());
+
+	status_t status = Traverse(BTREE_FORWARD, path, startKey);
+	if (status < B_OK)
+		return status;
+
+	int slot = status;
+	status = path->InternalCopy(transaction, 1);
+	if (status != B_OK)
+		return status;
+
+	status = path->CopyOnWrite(transaction, 0, slot, num, length);
+	if (status == B_DEVICE_FULL) {
+		// TODO: push data or split node
+		return status;
+	}
+
+	if (status != B_OK)
+		return status;
+	return slot;
+}
+
+
+/* MakeEntries and then fill in them.
+ */
+status_t
+BTree::InsertEntries(Transaction& transaction, Path* path,
+	btrfs_entry* entries, void** data, int num)
+{
+	int totalLength = sizeof(btrfs_entry) * num;
+	for (int i = 0; i < num; i++)
+		totalLength += entries[i].Size();
+
+	status_t slot = MakeEntries(transaction, path, entries[0].key, num,
+		totalLength);
+	if (slot < B_OK)
+		return slot;
+
+	uint32 upperLimit;
+	if (slot > 0) {
+		path->GetEntry(slot - 1, NULL, NULL, NULL, &upperLimit);
+	} else
+		upperLimit = fVolume->BlockSize() - sizeof(btrfs_header);
+
+	TRACE("BTree::InsertEntries() num: %i upper limit %" B_PRIu32 "\n", num,
+		upperLimit);
+	for (int i = 0; i < num; i++) {
+		upperLimit -= entries[i].Size();
+		entries[i].SetOffset(upperLimit);
+		path->SetEntry(slot + i, entries[i], data[i]);
+	}
+
+	return B_OK;
 }
 
 

@@ -72,6 +72,12 @@ public:
 
 			status_t			PreviousLeaf(Path* path) const;
 			status_t			NextLeaf(Path* path) const;
+			status_t			MakeEntries(Transaction& transaction,
+									Path* path, const btrfs_key& startKey,
+									int num, int length);
+			status_t			InsertEntries(Transaction& transaction,
+									Path* path, btrfs_entry* entries,
+									void** data, int num);
 
 			Volume*				SystemVolume() const { return fVolume; }
 			status_t			SetRoot(off_t logical, fsblock_t* block);
@@ -181,6 +187,7 @@ public:
 						uint32* _size = NULL, uint32* _offset = NULL);
 		status_t	GetEntry(int slot, btrfs_key* _key, void** _value,
 						uint32* _size = NULL, uint32* _offset = NULL);
+		status_t	SetEntry(int slot, const btrfs_entry& entry, void* value);
 
 		int			Move(int level, int step);
 
