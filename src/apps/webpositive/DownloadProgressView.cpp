@@ -15,6 +15,8 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Directory.h>
+#include <DateTimeFormat.h>
+#include <DurationFormat.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <GroupLayoutBuilder.h>
@@ -28,7 +30,7 @@
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <StringView.h>
-#include <TimeUnitFormat.h>
+#include <TimeFormat.h>
 
 #include "BrowserWindow.h"
 #include "WebDownload.h"
@@ -55,6 +57,8 @@ const bigtime_t kShowEstimatedFinishInterval = 4000000LL;
 
 bigtime_t DownloadProgressView::sLastEstimatedFinishSpeedToggleTime = -1;
 bool DownloadProgressView::sShowSpeed = true;
+static const time_t kSecondsPerDay = 24 * 60 * 60;
+static const time_t kSecondsPerHour = 60 * 60;
 
 
 class IconView : public BView {
@@ -788,73 +792,39 @@ DownloadProgressView::_UpdateStatusText()
 		time_t now = (time_t)real_time_clock();
 		time_t finishTime = (time_t)(now + secondsRemaining);
 
-		tm _time;
-		tm* time = localtime_r(&finishTime, &_time);
-		int32 year = time->tm_year + 1900;
-
-		char timeText[32];
-		time_t secondsPerDay = 24 * 60 * 60;
-		// TODO: Localization of time string...
-		if (now < finishTime - secondsPerDay) {
-			// process is going to take more than a day!
-			sprintf(timeText, "%0*d:%0*d %0*d/%0*d/%" B_PRId32,
-				2, time->tm_hour, 2, time->tm_min,
-				2, time->tm_mon + 1, 2, time->tm_mday, year);
+		BString timeText;
+		if (finishTime - now > kSecondsPerDay) {
+			BDateTimeFormat().Format(timeText, finishTime,
+				B_MEDIUM_DATE_FORMAT, B_MEDIUM_TIME_FORMAT);
 		} else {
-			sprintf(timeText, "%0*d:%0*d",
-				2, time->tm_hour, 2, time->tm_min);
+			BTimeFormat().Format(timeText, finishTime,
+				B_MEDIUM_TIME_FORMAT);
 		}
 
-		BString buffer1(B_TRANSLATE_COMMENT("Finish: ", "Finishing time"));
-		buffer1 << timeText;
-		finishTime -= now;
-		time = gmtime(&finishTime);
-
-		BTimeUnitFormat timeFormat;
-
-		BString buffer2;
-		if (finishTime > secondsPerDay) {
-			int64 days = finishTime / secondsPerDay;
-
-			BString time;
-			timeFormat.Format(time, days, B_TIME_UNIT_DAY);
-
-			buffer2 << B_TRANSLATE("Over %days left");
-			buffer2.ReplaceFirst("%days", time);
-		} else if (finishTime > 60 * 60) {
-			int64 hours = finishTime / (60 * 60);
-			BString time;
-			timeFormat.Format(time, hours, B_TIME_UNIT_HOUR);
-
-			buffer2 << B_TRANSLATE("Over %hours left");
-			buffer2.ReplaceFirst("%hours", time);
-		} else if (finishTime > 60) {
-			int64 minutes = finishTime / 60;
-			if (minutes == 1)
-				buffer2 << B_TRANSLATE("Over 1 minute left");
-			else
-				timeFormat.Format(buffer2, minutes, B_TIME_UNIT_MINUTE);
+		BString statusString;
+		BDurationFormat formatter;
+		BString finishString;
+		if (finishTime - now > kSecondsPerHour) {
+			statusString.SetTo(B_TRANSLATE("(Finish: %date - Over %duration left)"));
+			formatter.Format(finishString, now * 1000000LL, finishTime * 1000000LL);
 		} else {
-			BString time;
-			timeFormat.Format(time, finishTime, B_TIME_UNIT_SECOND);
-
-			buffer2 << B_TRANSLATE("%seconds left");
-			buffer2.ReplaceFirst("%seconds", time);
+			statusString.SetTo(B_TRANSLATE("(Finish: %date - %duration left)"));
+			formatter.Format(finishString, now * 1000000LL, finishTime * 1000000LL);
 		}
 
-		buffer = "(";
-		buffer << buffer1 << " - " << buffer2 << ")";
+		statusString.ReplaceFirst("%date", timeText);
+		statusString.ReplaceFirst("%duration", finishString);
 
-		float stringWidth = fInfoView->StringWidth(buffer.String());
+		float stringWidth = fInfoView->StringWidth(statusString.String());
 		if (stringWidth < fInfoView->Bounds().Width())
-			fInfoView->SetText(buffer.String());
+			fInfoView->SetText(statusString.String());
 		else {
 			// complete string too wide, try with shorter version
-			buffer = "(";
-			buffer << buffer1 << ")";
-			stringWidth = fInfoView->StringWidth(buffer.String());
+			statusString.SetTo(B_TRANSLATE("(Finish: %date)"));
+			statusString.ReplaceFirst("%date", timeText);
+			stringWidth = fInfoView->StringWidth(statusString.String());
 			if (stringWidth < fInfoView->Bounds().Width())
-				fInfoView->SetText(buffer.String());
+				fInfoView->SetText(statusString.String());
 		}
 	}
 }
