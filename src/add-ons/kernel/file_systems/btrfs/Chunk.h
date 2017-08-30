@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Jérôme Duval
+ *		Chế Vũ Gia Hy
  */
 #ifndef CHUNK_H
 #define CHUNK_H

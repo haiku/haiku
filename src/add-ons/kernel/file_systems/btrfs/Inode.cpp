@@ -1,4 +1,5 @@
 /*
+ * Copyright 2017, Chế Vũ Gia Hy, cvghy116@gmail.com.
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008-2014, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.

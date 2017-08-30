@@ -1,3 +1,7 @@
+/*
+ * Copyright 2017, Chế Vũ Gia Hy, cvghy116@gmail.com.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef EXTENT_ALLOCATOR_H
 #define EXTENT_ALLOCATOR_H
 
