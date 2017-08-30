@@ -19,6 +19,7 @@ public:
 			void	TestFormat();
 			void	TestFormatDate();
 			void	TestMonthNames();
+			void	TestDayNames();
 			void	TestParseDate();
 			void	TestParseTime();
 

@@ -217,6 +217,124 @@ DateFormatTest::TestMonthNames()
 
 	CPPUNIT_ASSERT_EQUAL(BString("December"), buffer);
 	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(1, buffer, B_FULL_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("January"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(12, buffer, B_FULL_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("December"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(1, buffer, B_LONG_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Jan"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(12, buffer, B_LONG_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Dec"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(1, buffer, B_MEDIUM_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Jan"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(12, buffer, B_MEDIUM_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Dec"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(1, buffer, B_SHORT_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("J"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetMonthName(12, buffer, B_SHORT_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("D"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+}
+
+
+void
+DateFormatTest::TestDayNames()
+{
+	BLanguage language("en");
+	BFormattingConventions formatting("en_US");
+	BDateFormat format(language, formatting);
+
+	BString buffer;
+	status_t result = format.GetDayName(1, buffer);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Sunday"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(2, buffer);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Monday"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(1, buffer, B_FULL_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Sunday"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(2, buffer, B_FULL_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Monday"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(1, buffer, B_LONG_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Sun"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(2, buffer, B_LONG_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Mon"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(1, buffer, B_MEDIUM_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Su"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(2, buffer, B_MEDIUM_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("Mo"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(1, buffer, B_SHORT_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("S"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
+
+	buffer.Truncate(0);
+	result = format.GetDayName(2, buffer, B_SHORT_DATE_FORMAT);
+
+	CPPUNIT_ASSERT_EQUAL(BString("M"), buffer);
+	CPPUNIT_ASSERT_EQUAL(B_OK, result);
 }
 
 
@@ -319,6 +437,8 @@ DateFormatTest::AddTests(BTestSuite& parent)
 		"DateFormatTest::TestFormatDate", &DateFormatTest::TestFormatDate));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
 		"DateFormatTest::TestMonthNames", &DateFormatTest::TestMonthNames));
+	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
+		"DateFormatTest::TestDayNames", &DateFormatTest::TestDayNames));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
 		"DateFormatTest::TestParseDate", &DateFormatTest::TestParseDate));
 	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
