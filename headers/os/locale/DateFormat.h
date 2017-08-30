@@ -72,9 +72,11 @@ public:
 
 			status_t			GetStartOfWeek(BWeekday* weekday) const;
 			status_t			GetMonthName(int month, BString& outName,
-									const BDateFormatStyle style) const;
+									const BDateFormatStyle style
+									= B_FULL_DATE_FORMAT) const;
 			status_t			GetDayName(int day, BString& outName,
-									const BDateFormatStyle style) const;
+									const BDateFormatStyle style
+									= B_FULL_DATE_FORMAT) const;
 
 								// parsing
 
