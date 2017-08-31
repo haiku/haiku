@@ -433,6 +433,10 @@ NetworkTimeView::MessageReceived(BMessage* message)
 				fSettings.GetSynchronizeAtBoot());
 			_UpdateServerList();
 			break;
+
+		default:
+			BGroupView::MessageReceived(message);
+			break;
 	}
 }
 
