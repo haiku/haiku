@@ -65,7 +65,7 @@ typedef struct {
 #include <fs/devfs.h>
 
 
-#define TRACE_VIRTIO_NET
+//#define TRACE_VIRTIO_NET
 #ifdef TRACE_VIRTIO_NET
 #	define TRACE(x...) dprintf("virtio_net: " x)
 #else
@@ -395,6 +395,10 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case ETHER_ADDMULTI:
 			TRACE("ioctl: add multicast\n");
+			break;
+
+		case ETHER_REMMULTI:
+			TRACE("ioctl: remove multicast\n");
 			break;
 
 		case ETHER_GET_LINK_STATE:
