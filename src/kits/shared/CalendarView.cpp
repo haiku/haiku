@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 
+#include <DateFormat.h>
 #include <LayoutUtils.h>
 #include <Window.h>
 
@@ -171,6 +172,7 @@ BCalendarView::AttachedToWindow()
 void
 BCalendarView::FrameResized(float width, float height)
 {
+	_SetupDayNames();
 	Invalidate(Bounds());
 }
 
@@ -703,6 +705,17 @@ BCalendarView::SetDayNameHeaderVisible(bool visible)
 }
 
 
+void
+BCalendarView::UpdateDayNameHeader()
+{
+	if (!fDayNameHeaderVisible)
+		return;
+
+	_SetupDayNames();
+	Invalidate(Bounds().InsetBySelf(1.0, 1.0));
+}
+
+
 bool
 BCalendarView::IsWeekNumberHeaderVisible() const
 {
@@ -844,8 +857,26 @@ BCalendarView::_GetPreferredSize(float* _width, float* _height)
 void
 BCalendarView::_SetupDayNames()
 {
-	for (int32 i = 0; i <= 6; ++i)
-		fDayNames[i] = fDate.ShortDayName(1 + (fStartOfWeek - 1 + i) % 7);
+	BDateFormatStyle style = B_LONG_DATE_FORMAT;
+	float width, height;
+	while (style !=  B_DATE_FORMAT_STYLE_COUNT) {
+		_PopulateDayNames(style);
+		GetPreferredSize(&width, &height);
+		if (width < Bounds().Width())
+			return;
+		style = static_cast<BDateFormatStyle>(static_cast<int>(style) + 1);
+	}
+}
+
+
+void
+BCalendarView::_PopulateDayNames(BDateFormatStyle style)
+{
+	for (int32 i = 0; i <= 6; ++i) {
+		fDayNames[i] = "";
+		BDateFormat().GetDayName(1 + (fStartOfWeek - 1 + i) % 7,
+			fDayNames[i], style);
+	}
 }
 
 

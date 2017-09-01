@@ -97,6 +97,7 @@ public:
 
 			bool				IsDayNameHeaderVisible() const;
 			void				SetDayNameHeaderVisible(bool visible);
+			void				UpdateDayNameHeader();
 
 			bool				IsWeekNumberHeaderVisible() const;
 			void				SetWeekNumberHeaderVisible(bool visible);
@@ -150,6 +151,8 @@ private:
 			void				_SetupDayNames();
 			void				_SetupDayNumbers();
 			void				_SetupWeekNumbers();
+
+			void				_PopulateDayNames(BDateFormatStyle style);
 
 			void				_DrawDays();
 			void				_DrawFocusRect();
