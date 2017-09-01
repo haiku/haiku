@@ -24,6 +24,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 #include <Path.h>
 #include <StringView.h>
@@ -91,6 +92,10 @@ DateTimeView::MessageReceived(BMessage* message)
 					BView::MessageReceived(message);
 					break;
 			}
+			break;
+
+		case B_LOCALE_CHANGED:
+			fCalendarView->UpdateDayNameHeader();
 			break;
 
 		case kDayChanged:

@@ -14,6 +14,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 #include <Screen.h>
 #include <SeparatorView.h>
@@ -76,6 +77,13 @@ TTimeWindow::MessageReceived(BMessage* message)
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
+
+		case B_LOCALE_CHANGED:
+		{
+			BLocaleRoster::Default()->Refresh();
+			fDateTimeView->MessageReceived(message);
+			break;
+		}
 
 		case kMsgRevert:
 			fDateTimeView->MessageReceived(message);

@@ -18,6 +18,7 @@
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <LocaleRoster.h>
 
 #include "NetworkTimeView.h"
 #include "TimeMessages.h"
@@ -71,6 +72,7 @@ TimeApplication::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kSelectClockTab:
 		case kShowHideTime:
+		case B_LOCALE_CHANGED:
 			fWindow->PostMessage(message);
 			break;
 
