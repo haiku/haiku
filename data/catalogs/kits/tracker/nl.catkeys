@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	3594023845
+1	dutch; flemish	x-vnd.Haiku-libtracker	3896051137
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Invoegtoepassingen
 Desktop	Model		Bureaublad
@@ -376,7 +376,6 @@ Attributes	ContainerWindow		Eigenschappen
 Handles %type	OpenWithWindow		Behandelt %type
 ends with	FindPanel		eindigt met
 New	ContainerWindow		Nieuw
-Name matches wildcard expression:###	SelectionWindow		Naam komt overeen met de wildcardtekens:###
 less than	FindPanel		minder dan
 64 x 64	DeskWindow		64 x 64
 Modified	ContainerWindow		Gewijzigd

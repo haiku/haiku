@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CodyCam	1888169680
+1	finnish	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Kopioi palvelimelle...
 Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
 Every 30 seconds	CodyCam		Joka 30. sekunti
@@ -76,6 +76,7 @@ cmd: '%s'\n	FtpClient		komento: ’%s’\n
 Never	CodyCam		Ei koskaan
 Cannot create a video window	CodyCam		Videoikkunan luominen epäonnistui
 Every 10 minutes	CodyCam		Joka 10. minuutti
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Videolähteen löytäminen epäonnistui.\nCody-kameraohjelman käyttämiseksi tarvitset webbikameran.
 Cannot start the video source	CodyCam		Videolähteen käynnistäminen epäonnistui
 Cannot start the video window	CodyCam		Videoikkunan käynnistäminen epäonnistui
 password expected	CodyCam		odotettiin salasanaa

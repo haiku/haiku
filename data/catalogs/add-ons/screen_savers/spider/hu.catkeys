@@ -1,14 +1,14 @@
-1	hungarian	x-vnd.Haiku-SpiderScreensaver	1499771850
-Max. polygon count	Screensaver Spider		Maximális sokszög
-Gray	Screensaver Spider		Szürke
-Purple	Screensaver Spider		Lila
-Red	Screensaver Spider		Vörös
-Trail depth	Screensaver Spider		Követési mélység
-Color	Screensaver Spider		Szín
-Blue	Screensaver Spider		Kék
-for  bonefish	Screensaver Spider		bonefish részére
-Spider by stippi	Screensaver Spider		Pók - Készítette: stippi
-Green	Screensaver Spider		Zöld
-Cyan	Screensaver Spider		Cián
-Max. points per polygon	Screensaver Spider		Maximális sokszögenkénti pont
-Yellow	Screensaver Spider		Sárga
+1	hungarian	x-vnd.Haiku-SpiderScreensaver	2004357156
+Blue	SpiderView		Kék
+Gray	SpiderView		Szürke
+Max. points per polygon	SpiderView		Pontok maximális száma sokszögenként
+Max. polygon count	SpiderView		Pontok maximális száma
+for  bonefish	SpiderView		bonefish részére
+Purple	SpiderView		Lila
+Red	SpiderView		Piros
+Color	SpiderView		Szín
+Spider by stippi	SpiderView		Pók stippitől
+Green	SpiderView		Zöld
+Cyan	SpiderView		Cián
+Yellow	SpiderView		Sárga
+Trail depth	SpiderView		Nyomvonal intenzitása

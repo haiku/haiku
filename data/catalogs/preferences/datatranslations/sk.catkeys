@@ -1,8 +1,7 @@
-1	slovak	x-vnd.Haiku-DataTranslations	3820343452
+1	slovak	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		Preklad dát
 Cancel	DataTranslations		Zrušiť
 Name:	DataTranslations		Názov:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Názov: %s \nVerzia: %ld.%ld.%ld\n\nInfo:\n%s\n\nCesta:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Zdá sa, že položka „%name“ nie je prekladač a nebude nainštalovaná.
 Could not install %s:\n%s	DataTranslations		Nebolo možné nainštalovať %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Tento ovládací panel použite na nastavenie predvolených hodnôt prekladačov, ktoré sa použijú, keď aplikácia neuvedie žiadne iné nastavenia.

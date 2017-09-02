@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	1564741333
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1866768625
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Adicionais
 Mount settings…	ContainerWindow		Configurações de montagem...
@@ -391,7 +391,6 @@ Attributes	ContainerWindow		Atributos
 Handles %type	OpenWithWindow		Manipula %type
 ends with	FindPanel		termina com
 New	ContainerWindow		Novo
-Name matches wildcard expression:###	SelectionWindow		Nome corresponde à expressão especial:###
 less than	FindPanel		menor que
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		desenvolvimento

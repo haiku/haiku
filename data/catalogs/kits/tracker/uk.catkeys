@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1597598656
+1	ukrainian	x-vnd.Haiku-libtracker	1899625948
 OK	WidgetAttributeText		Гаразд
 Add-ons	FilePanelPriv		Додатки
 Mount settings…	ContainerWindow		Налаштування монтування…
@@ -439,7 +439,6 @@ Handles %type	OpenWithWindow		Не працює з %type
 ends with	FindPanel		закінчити з
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		Новий
-Name matches wildcard expression:###	SelectionWindow		Ім'я відповідає символам виразу :###
 less than	FindPanel		менше ніж
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		develop

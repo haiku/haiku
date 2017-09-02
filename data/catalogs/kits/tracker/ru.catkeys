@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	779898691
+1	russian	x-vnd.Haiku-libtracker	1081925983
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -415,7 +415,6 @@ Handles %type	OpenWithWindow		Поддерживает %type
 ends with	FindPanel		заканчивается на
 URL	Bookmark Query Columns		Cсылка (URL)
 New	ContainerWindow		Создать
-Name matches wildcard expression:###	SelectionWindow		Имя совпадает с регулярным выражением:###
 less than	FindPanel		меньше чем
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		Разработка

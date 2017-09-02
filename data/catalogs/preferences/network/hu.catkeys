@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Network	2512967175
+1	hungarian	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Állandó
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Szolgáltatások
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Automatikus választás
 connected	IntefaceView		kapcsolódva
 Ethernet device	InterfaceListItem		Vezetékes eszköz
 The netmask defines your local network	IntefaceAddressView		A hálózati masz határozza meg a helyi hálózatot
+Dial-up connection	InterfaceListItem		Telefonos kapcsolat
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Hálózat
+VPN connection	InterfaceListItem		VPN kapcsolat
 Show network status in Deskbar	NetworkWindow		A felület megjelenítése az Asztalsávon
 The method for obtaining an IP address	IntefaceAddressView		Az IP-cím megszerzésének módja
 connected	InterfaceListItem		kapcsolódva
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Küldött:
 open	Open network		titkosítatlan
 IP Address:	IntefaceAddressView		IP-cím:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Fogadott:
 Disable	IntefaceView		Letiltás
 <no wireless networks found>	IntefaceView		<nem található vezetéknélküli hálózat>

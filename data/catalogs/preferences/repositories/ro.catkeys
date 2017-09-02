@@ -1,0 +1,5 @@
+1	romanian	x-vnd.Haiku-Repositories	3924514588
+Description	TaskLooper	Failed task error description	Descriere
+Add	AddRepoWindow	Button label	Adaugă
+URL	RepositoriesView	Column title	URL
+Name	RepositoriesView	Column title	Nume

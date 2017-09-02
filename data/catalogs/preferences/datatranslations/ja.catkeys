@@ -1,8 +1,7 @@
-1	japanese	x-vnd.Haiku-DataTranslations	3820343452
+1	japanese	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		DataTranslations
 Cancel	DataTranslations		取り消し
 Name:	DataTranslations		名前:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		名称: %s \nバージョン:  %ld.%ld.%ld\n\n情報: \n%s\n\nパス: \n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' はトランスレーターではないようなのでインストールされません。
 Could not install %s:\n%s	DataTranslations		インストールできませんでした %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		このコントロールパネルを使って、トランスレーターのデフォルト値を設定してください。アプリケーションで設定できる設定はありません。

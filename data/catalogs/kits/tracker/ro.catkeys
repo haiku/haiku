@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1597598656
+1	romanian	x-vnd.Haiku-libtracker	1899625948
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare…
@@ -439,7 +439,6 @@ Handles %type	OpenWithWindow		Gestionează %type
 ends with	FindPanel		se termină cu
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		Nou
-Name matches wildcard expression:###	SelectionWindow		Numele se potrivește expresiei metacaracter:###
 less than	FindPanel		mai puțin decât
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		dezvoltă

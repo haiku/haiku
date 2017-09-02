@@ -20,7 +20,7 @@ Stop	InstallerWindow		Pysäytä
 If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Jos käyttöjärjestelmäkoestuksen käyttäminen ei toimi sinulla, GRUB 2 käyttää ylimääräistä asetustiedostoa omien rivien lisäämiseksi käynnistysvalikkoon. Niiden lisäämiseksi ylimmäiseksi sinun on luotava/muokattava tiedosto käynnistämällä suosikkieditorisi Pääteikkunasta tällä tavoin:\n\n
 OK	InstallerApp		Valmis
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Valitse lähde- ja kohdelevyt ponnahdusvalikoista. Napsauta sitten ”Aloita”.
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
+\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku levyosiossa /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Käynnistyshallinnan käynnistäminen epäonnistui
 Install from:	InstallerWindow		Asenna levyltä:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
@@ -106,5 +106,5 @@ Onto:	InstallerWindow		levylle:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Käynnistyshallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun käynnistät Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi \"Tervetuloa\" ja \"Käyttäjäopas\" -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
 Tools	InstallerWindow		Työkalut
-The mount point could not be retrieved.	InstallProgress		Liittämispistettä ei voitu noutaa.
+The mount point could not be retrieved.	InstallProgress		Liittämispisteen noutaminen epäonnistui.
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <suosikkieditorisi nimi> /etc/grub.d/40_custom\n\n

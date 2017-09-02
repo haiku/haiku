@@ -1,8 +1,7 @@
-1	polish	x-vnd.Haiku-DataTranslations	3820343452
+1	polish	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		Translatory
 Cancel	DataTranslations		Anuluj
 Name:	DataTranslations		Nazwa:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nazwa: %s \nWersja: %ld.%ld.%ld\n\nInfo:\n%s\n\nŚcieżka:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Element „%name” nie wydaje się być translatorem i nie zostanie zainstalowany.
 Could not install %s:\n%s	DataTranslations		Nie można zainstalować %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Użyj tego panelu sterowania aby ustawić wartości domyślne dla translatorów, które zostaną wykorzystane, gdy żadne inne ustawienia nie są określane przez aplikację.

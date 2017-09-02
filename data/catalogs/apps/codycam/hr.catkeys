@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-CodyCam	3838477679
+1	croatian	x-vnd.Haiku-CodyCam	2306364532
 Upload…	VideoConsumer.cpp		Pošalji...
 Every 30 seconds	CodyCam		Svakih 30 sekunda
 File name:	CodyCam		Ime datoteke:
@@ -35,6 +35,7 @@ Video settings	CodyCam		Video postavke
 invalid upload client %ld\n	VideoConsumer.cpp		neispravni klijent slanja %ld\n
 Every 15 seconds	CodyCam		Svakih 15 sekundi
 Error writing output file	VideoConsumer.cpp		Greška pri pisanju izlazne datoteke
+image file format expected	CodyCam		očekivani format slikovne datoteke
 Cannot set the time source for the video source	CodyCam		Ne mogu postaviti izvor vremena za izvor videa
 Type:	CodyCam		Tip:
 Cannot set the time source for the video window	CodyCam		Ne mogu povstavit izvor vremena za video prozor

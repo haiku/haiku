@@ -1,6 +1,7 @@
-1	croatian	x-vnd.Be-MAIL	2196240908
+1	croatian	x-vnd.Be-MAIL	3393100503
 View	Mail		Pogled
 %d - Date	Mail		%d - Datum
+Unknown	Mail		Nepoznato
 An error occurred trying to save the attachment.	Mail		Došlo je do greške pri spremanju privitka.
 Copy to new	Mail		Kopiraj u novi
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Ostavi kao 'Novo'
@@ -66,6 +67,7 @@ Title:	Mail		Naslov:
 Find…	Mail		Nađi...
 Accounts…	Mail		Računi...
 Mail preferences	Mail		Osobitosti pošte
+Initial spell check mode:	Mail		Početni način rada provjere pravopisa:
 Revert	Mail		Obrnuto
 File	Mail		Datoteka
 mail	B_USER_DIRECTORY/mail		pošta

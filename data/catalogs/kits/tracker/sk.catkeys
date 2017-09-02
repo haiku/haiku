@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2257933763
+1	slovak	x-vnd.Haiku-libtracker	2559961055
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Doplnky
 Mount settings…	ContainerWindow		Nastavenia pripojenia…
@@ -437,7 +437,6 @@ Handles %type	OpenWithWindow		Pracuje s %type
 ends with	FindPanel		končí
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		Nový
-Name matches wildcard expression:###	SelectionWindow		Názov zodpovedá zástupným znakom:###
 less than	FindPanel		menej ako
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		vývoj

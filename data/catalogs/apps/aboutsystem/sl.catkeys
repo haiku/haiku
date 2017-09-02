@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-About	1014575427
+1	slovenian	x-vnd.Haiku-About	103323823
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (in njegovo jedro NewOS)\n
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ustanovitelj projekta)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB v rabi (%d%%)
@@ -29,7 +29,6 @@ The University of Auckland and Christof Lutteroth\n\n	AboutView		Univerza v Auck
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 %ld MHz	AboutView		%ld MHz
 …and the many people making donations!\n\n	AboutView		… in mnogi, ki so donirali!\n\n
-MIT license. All rights reserved.	AboutView		Licenca MIT. Vse pravice pridržane.
 [Click a license name to read the respective license.]\n\n	AboutView		(Kliknite na ime licence, da jo preberete.)\n\n
 License: 	AboutView		Licenca: 
 Translations:\n	AboutView		Prevodi:\n

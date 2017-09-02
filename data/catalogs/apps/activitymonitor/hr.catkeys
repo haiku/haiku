@@ -1,5 +1,6 @@
-1	croatian	x-vnd.Haiku-ActivityMonitor	2507280942
+1	croatian	x-vnd.Haiku-ActivityMonitor	2555903350
 Always on top	ActivityWindow		Uvijek na vrhu
+Add graph	ActivityWindow		Dodaj grafikon
 Teams	DataSource		Timovi
 MiB	DataSource		MiB
 CPU usage (combined)	DataSource		CPU upotreba (kombinirano)
@@ -14,6 +15,8 @@ Sending	DataSource		Slanje
 Update time interval:	SettingsWindow		Dopuni vremenski interval:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Isključi
+Remove graph	ActivityView		Ukloni grafikon
+%lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU upotreba
 %.1f MiB	DataSource		%.1f MB

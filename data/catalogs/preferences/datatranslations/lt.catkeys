@@ -1,8 +1,7 @@
-1	lithuanian	x-vnd.Haiku-DataTranslations	3820343452
+1	lithuanian	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		Duomenų keitikliai
 Cancel	DataTranslations		Atsisakyti
 Name:	DataTranslations		Vardas:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Vardas: %s \nVersija: %ld.%ld.%ld\n\nInformacija:\n%s\n\nKelias:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Panašu, jog „%name“ nėra keitiklis, tad jis nebus įdiegtas.
 Could not install %s:\n%s	DataTranslations		Nepavyko įdiegti %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Šiame valdymo pulte galite keisti numatytąsias keitiklių nuostatas, naudojamas tais atvejais, kai keitikliai iškviečiami be papildomų parametrų.

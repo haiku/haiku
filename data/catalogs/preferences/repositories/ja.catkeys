@@ -1,6 +1,5 @@
-1	japanese	x-vnd.Haiku-Repositories	4055292887
+1	japanese	x-vnd.Haiku-Repositories	1628484538
 Completed	TaskLooper	Completed task status message	完了
-Enabled	RepositoriesView	Column title	有効
 Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	リポジトリに対してそれぞれ 1 つだけの URL が有効になります。  選択を変更してください。
 Repositories	System name		リポジトリ
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	リポジトリ  %url% を有効にする際にエラーが発生しました。
@@ -22,7 +21,6 @@ Name	RepositoriesView	Column title	名前
 Enable	RepositoriesView	Button label	有効
 Remove All	RepositoriesView	Button label	すべて削除
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% のリポジトリキャッシュの更新時にエラーが発生しました。
-Select repositories to use with Haiku package management:	RepositoriesView	Label text	Haiku パッケージ管理で使用するリポジトリを選択してください:
 Failed	TaskLooper	Failed task status message	失敗
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	タスクをキャンセル

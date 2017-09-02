@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	239582696
+1	belarusian	x-vnd.Haiku-libtracker	541609988
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дапаўненні
 Desktop	Model		Дэсктоп
@@ -382,7 +382,6 @@ Attributes	ContainerWindow		Атрыбуты
 Handles %type	OpenWithWindow		Працуе з %type
 ends with	FindPanel		аканчваецца
 New	ContainerWindow		Новы
-Name matches wildcard expression:###	SelectionWindow		Імя супадае з падстановачным выразам
 less than	FindPanel		менш за
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		распрацоўка

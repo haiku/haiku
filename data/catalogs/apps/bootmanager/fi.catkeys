@@ -30,7 +30,7 @@ The old Master Boot Record could not be saved to %s. You can continue the instal
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Käynnistyslaitteen (%DISK) Master Boot Record palautettiin onnistuneesti tiedostosta %FILE.
 Quit	WizardView	Button	Lopeta
 Write boot menu	BootManagerController	Button	Kirjoita käynnistysvalikko
-The Master Boot Record could not be restored!	BootManagerController		Master Boot Record -tietuetta ei voitu palauttaa!
+The Master Boot Record could not be restored!	BootManagerController		Master Boot Record -tietueen palauttaminen epäonnistui!
 Uninstall	DrivesPage	Button	Poista
 Default Partition	DefaultPartitionPage	Title	Oletusosio
 After five seconds	DefaultPartitionPage		Viiden sekunnin jälkeen

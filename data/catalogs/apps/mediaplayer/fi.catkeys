@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	2711018042
+1	finnish	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Hakee/
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Näyttötila
 Medium	MediaPlayer-SettingsWindow		Keskikokoinen
+Open network stream	MediaPlayer-NetworkStream		Avaa verkon suoratoistovirta
 Close	MediaPlayer-PlaylistWindow		Sulje
 Open…	MediaPlayer-PlaylistWindow		Avaa...
 Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa.
 Undo	MediaPlayer-PlaylistWindow		Peru
+Stream URL:	MediaPlayer-NetworkStream		Suoratoistoverkko-osoite:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Käytä laitteistovideokerrostusta, jos se on käytettävissä
 File info…	MediaPlayer-Main		Tiedostotiedot...
 Pause playback.	MediaPlayer-Main		Tauota toisto.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli.
 Close window after playing video	MediaPlayer-SettingsWindow		Sulje ikkuna videotiedoston soittamisen jälkeen
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaalaa elokuvat pehmeästi (ei-kerrostustila)
 OK	MediaPlayer-RemovePLItemsCmd		Valmis
+Open network stream	MediaPlayer-Main		Avaa verkon suoratoistovirta
 50% scale	MediaPlayer-Main		50 % skaala
 Subtitles	MediaPlayer-Main		Aliotsakkeet
 Prev	MediaPlayer-Main		Edellinen
@@ -114,6 +117,7 @@ Error: 	MediaPlayer-Main		Virhe:
 Large	MediaPlayer-SettingsWindow		Suuri
 Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+Total duration: %s	MediaPlayer-PlaylistWindow		Kokonaiskesto: %s
 Stop	MediaPlayer-Main		Pysäytä
 <unnamed media>	MediaPlayer-InfoWin		<nimeämätön media>
 raw video	MediaPlayer-InfoWin		raakavideo
@@ -125,6 +129,8 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopioi kappale
 none	Subtitles menu		ei mitään
 Move file to Trash	MediaPlayer-PlaylistWindow		Siirrä tiedosto roskakoriin
 URI	MediaPlayer-Main		Internet-resurssin tunnus
+Invalid URL inserted!	MediaPlayer-NetworkStream		Lisätty virheellinen verkko-osoite!
+OK	MediaPlayer-NetworkStream		Valmis
 Mute	MediaPlayer-Main		Mykistä
 Toggle pause/play.	MediaPlayer-Main		Vuorottele tauko/soita -tiloja.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -139,12 +145,14 @@ Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
 Toggle fullscreen.	MediaPlayer-Main		Täysruututila päälle/pois.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Hakee nykyisen soittokappaleen keston mikrosekunteina.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
+Bad URL	MediaPlayer-NetworkStream		Virheellinen verkko-osoite
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanavaa}}
 <unnamed>	PlaylistItem-name		<nimetön>
 OK	MediaPlayer-PlaylistWindow		Valmis
 none	Audio track menu		ei mitään
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hakee/asettaa voimakkuuden (0,0 - 2,0).
 Duration	MediaPlayer-Main		Kesto
+Cancel	MediaPlayer-NetworkStream		Peru
 Playlist…	MediaPlayer-Main		Soittoluettelo...
 <unknown>	PlaylistItem-author		<tuntematon>
 Save as…	MediaPlayer-PlaylistWindow		Tallenna nimellä...

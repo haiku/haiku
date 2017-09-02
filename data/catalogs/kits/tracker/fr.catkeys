@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1597598656
+1	french	x-vnd.Haiku-libtracker	1899625948
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -439,7 +439,6 @@ Handles %type	OpenWithWindow		Support de « %type »
 ends with	FindPanel		fini par
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		Nouveau
-Name matches wildcard expression:###	SelectionWindow		Nom correspondant à l’expression générique : ###
 less than	FindPanel		inférieur à
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		développement

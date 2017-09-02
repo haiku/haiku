@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	3155537444
+1	hungarian	x-vnd.Haiku-Keymap	1855856185
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Váltógomb:
 Revert	Modifier keys window		Visszaállít
@@ -97,6 +97,7 @@ Command:	Modifier keys window	Command key role name	Parancsbillentyű:
 Latin-American	Keyboard Layout View		Latin-amerikai
 Spanish (Dvorak)	Keyboard Layout View		Spanyol (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		Litván (szabványos)
+Russian (Udmurt, Komi, Mari)	Keyboard Layout View		Orosz (Udmurt, Komi, Mari)
 Canadian-French	Keyboard Layout View		Kanadai francia
 Irish	Keyboard Layout View		Ír
 Turkish (Type-F)	Keyboard Layout View		Török (F-típusú)

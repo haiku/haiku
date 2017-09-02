@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1303461434
+1	german	x-vnd.Haiku-libtracker	1605488726
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -434,7 +434,6 @@ Handles %type	OpenWithWindow		Geeignet für %type
 ends with	FindPanel		endet mit
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		Neu
-Name matches wildcard expression:###	SelectionWindow		Name trifft auf Platzhalter-Ausdruck zu:###
 less than	FindPanel		kleiner als
 64 x 64	DeskWindow		64 x 64
 Modified	ContainerWindow		Geändert

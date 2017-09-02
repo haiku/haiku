@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-Expander	2825008254
+1	finnish	x-vnd.Haiku-Expander	130018254
 Expand	ExpanderMenu		Laajenna
+Expanding '%s'…	ExpanderWindow		Laajennetaan ’%s’…
 Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
 Set destination…	ExpanderMenu		Aseta kohde…
 Use:	ExpanderPreferences		Käyttö:
@@ -43,6 +44,7 @@ Expand	ExpanderWindow		Laajenna
 Close	ExpanderMenu		Sulje
 The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
 Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio purkamisen jälkeen
+Creating listing for '%s'…	ExpanderWindow		Luodaan luettelo kohteelle ’%s’…
 Set source…	ExpanderMenu		Aseta lähde…
 Show contents	ExpanderMenu		Näytä sisällöt
 Stop	ExpanderWindow		Pysäytä

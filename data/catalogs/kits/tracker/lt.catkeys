@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	239582696
+1	lithuanian	x-vnd.Haiku-libtracker	541609988
 OK	WidgetAttributeText		Gerai
 Add-ons	FilePanelPriv		Priedai
 Desktop	Model		Darbalaukis
@@ -382,7 +382,6 @@ Attributes	ContainerWindow		Požymiai
 Handles %type	OpenWithWindow		Palaiko %type
 ends with	FindPanel		baigiasi
 New	ContainerWindow		Naujas
-Name matches wildcard expression:###	SelectionWindow		Vardas atitinka šabloną:###
 less than	FindPanel		mažesnis nei
 64 x 64	DeskWindow		64×64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		Programavimas

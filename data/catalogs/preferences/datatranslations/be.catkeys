@@ -1,8 +1,7 @@
-1	belarusian	x-vnd.Haiku-DataTranslations	3820343452
+1	belarusian	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		Канвертары
 Cancel	DataTranslations		Адмена
 Name:	DataTranslations		Імя:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Імя: %s \nВерсія: %ld.%ld.%ld\n\nІнфа:\n%s\n\nПуць:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' не з´яўляецца Канвертарам і таму не можа быць усталяваны.
 Could not install %s:\n%s	DataTranslations		Немагчыма усталяваць %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		З дапамогай гэтай панэлі прызначце стандартныя наладкі якія будуць выкарыстаны канвертарам, які не прызначае адпаведныя наладкі самастойна.

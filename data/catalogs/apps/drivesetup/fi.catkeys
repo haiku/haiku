@@ -51,7 +51,7 @@ Failed to change the parameters of the partition. No changes have been written t
 Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
 Mount	MainWindow		Liitä
 Partition type	PartitionList		Osiotyyppi
-The panel experienced a problem!	MainWindow		Paneelissa oli pulmia!
+The panel experienced a problem!	MainWindow		Paneelissa oli pulma!
 Change parameters…	MainWindow		Vaihda parametreja...
 Device	PartitionList		Laite
 Disk	MainWindow		Levy
@@ -64,7 +64,7 @@ Continue	MainWindow		Jatka
 Cannot delete the selected partition.	MainWindow		Valitun osion poistaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 End: %s	Support		Loppu: %s
-The panel could not return successfully.	MainWindow		Paluu paneelista epäonnistui.
+The panel could not return successfully.	MainWindow		Paneelin paluu epäonnistui.
 Cancel	MainWindow		Peru
 Delete partition	MainWindow		Poista osio
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!

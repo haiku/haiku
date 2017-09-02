@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	872421425
+1	hungarian	x-vnd.Haiku-libtracker	1174448717
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
 Mount settings…	ContainerWindow		Csatolási beállítások…
@@ -410,7 +410,6 @@ Handles %type	OpenWithWindow		Ezt kezeli: %type
 ends with	FindPanel		ezzel végződik:
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		Új
-Name matches wildcard expression:###	SelectionWindow		A név illeszkedik ezekre a helyettesítőkarakterekre:###
 less than	FindPanel		kisebb, mint
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		Fejlesztés

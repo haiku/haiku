@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1564741333
+1	swedish	x-vnd.Haiku-libtracker	1866768625
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
 Mount settings…	ContainerWindow		Monteringsinställningar...
@@ -391,7 +391,6 @@ Attributes	ContainerWindow		Attribut
 Handles %type	OpenWithWindow		Hanterar %type
 ends with	FindPanel		slutar med
 New	ContainerWindow		Ny
-Name matches wildcard expression:###	SelectionWindow		Namn matchar jokertuttryck:###
 less than	FindPanel		mindre än
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		utvecklare

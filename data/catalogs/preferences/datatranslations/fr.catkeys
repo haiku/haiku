@@ -1,8 +1,7 @@
-1	french	x-vnd.Haiku-DataTranslations	3820343452
+1	french	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		TraductionDeDonnées
 Cancel	DataTranslations		Annuler
 Name:	DataTranslations		Nom :
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nom : %s \nVersion : %ld.%ld.%ld\n\nInformations :\n%s\n\nChemin :\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L’élément « %name » ne semble pas être un traducteur et ne sera pas installé.
 Could not install %s:\n%s	DataTranslations		Impossible d’installer %s :\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilisez ce panneau de contrôle pour définir les paramètres par défaut des traducteurs à utiliser quand l’application ne spécifie aucun autre réglage.

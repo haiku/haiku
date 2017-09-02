@@ -1,14 +1,14 @@
-1	finnish	x-vnd.Haiku-SpiderScreensaver	1499771850
-Max. polygon count	Screensaver Spider		Monikulmion enimmäismäärä
-Gray	Screensaver Spider		Harmaa
-Purple	Screensaver Spider		Sinipunainen
-Red	Screensaver Spider		Punainen
-Trail depth	Screensaver Spider		Jälkisyvyys
-Color	Screensaver Spider		Väri
-Blue	Screensaver Spider		Sininen
-for  bonefish	Screensaver Spider		nimimerkille bonefish
-Spider by stippi	Screensaver Spider		Hämähäkki, tekijä: stippi
-Green	Screensaver Spider		Vihreä
-Cyan	Screensaver Spider		sinivihreä
-Max. points per polygon	Screensaver Spider		Monikulmion pisteiden enimmäismäärä
-Yellow	Screensaver Spider		Keltainen
+1	finnish	x-vnd.Haiku-SpiderScreensaver	2004357156
+Blue	SpiderView		Sininen
+Gray	SpiderView		Harmaa
+Max. points per polygon	SpiderView		Monikolmion enimmäispistemäärä
+Max. polygon count	SpiderView		Monikulmioiden enimmäislukumäärä
+for  bonefish	SpiderView		:  bonefish
+Purple	SpiderView		Violetti
+Red	SpiderView		Punainen
+Color	SpiderView		Väri
+Spider by stippi	SpiderView		Hämähäkki: stippi
+Green	SpiderView		Vihreä
+Cyan	SpiderView		Sinivihreä
+Yellow	SpiderView		Keltainen
+Trail depth	SpiderView		Jälkisyvyys

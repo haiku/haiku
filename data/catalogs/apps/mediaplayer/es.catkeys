@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	3805057997
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	4193632759
 raw audio	MediaPlayer-InfoWin		audio bruto
 Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -126,6 +126,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar entrada
 none	Subtitles menu		ninguno
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		Aceptar
 Mute	MediaPlayer-Main		Silenciar
 Toggle pause/play.	MediaPlayer-Main		Pausar/Reproducir
 min	MediaPlayer-InfoWin	Minutes	min
@@ -146,6 +147,7 @@ OK	MediaPlayer-PlaylistWindow		Aceptar
 none	Audio track menu		ninguno
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtener/Configurar el voluman (0.0-2.0)
 Duration	MediaPlayer-Main		Duración
+Cancel	MediaPlayer-NetworkStream		Cancelar
 Playlist…	MediaPlayer-Main		Lista de reproducción...
 <unknown>	PlaylistItem-author		<desconocido>
 Save as…	MediaPlayer-PlaylistWindow		Guardar como...

@@ -1,10 +1,12 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	1090759318
+1	finnish	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Nimi
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
+Repository	FilterView		Tietovarasto
 Close	RatePackageWindow		Sulje
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha-pulma on ratkaistava.
 Changelog	PackageInfoView		Muutosloki
+Repository:	FilterView		Tietovarasto:
 Your rating:	RatePackageWindow		Arvosanasi:
 The passwords do not match.	UserLoginWindow		Salasanat eivät täsmää.
 Log in…	MainWindow		Kirjaudu...
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Arvosanasi päivitys on
 <no info>	PackageInfoView		<ei tietoja>
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
+All repositories	FilterView		Kaikki tietovarastot
 Email address:	UserLoginWindow		Sähköpostiosoite:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen milloin vain antamalla pakkaukselle arvosanan uudelleen.
 Very unstable	RatePackageWindow		Hyvin epävakaa
@@ -102,6 +105,7 @@ Close	MainWindow		Sulje
 Preferred language:	UserLoginWindow		Ensisijainen kieli:
 Failed to rate package	RatePackageWindow		Arvosanan antaminen paketille epäonnistui
 Internet & Network	Model		Internet ja verkko
+Refresh repositories	MainWindow		Virkistä tietovarastoja
 Cancel	MainWindow		Peru
 Quit HaikuDepot	App		Poistu HaikuVarastosta
 Input validation	UserLoginWindow		Syötevalidointi
@@ -137,8 +141,9 @@ Send	RatePackageWindow		Lähetä
 Category:	FilterView		Luokka:
 Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
-Featured packages	MainWindow		Mainostetut pakkaukset
+Featured packages	MainWindow		Pääpakkaukset
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
+Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
 Success	RatePackageWindow		Onnistui
 Business	Model		Yritys
 Audio	Model		Ääni

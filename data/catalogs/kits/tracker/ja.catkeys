@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1597598656
+1	japanese	x-vnd.Haiku-libtracker	1899625948
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		アドオン
 Mount settings…	ContainerWindow		マウント設定…
@@ -439,7 +439,6 @@ Handles %type	OpenWithWindow		%type に対応
 ends with	FindPanel		指定文字列で終わる
 URL	Bookmark Query Columns		URL
 New	ContainerWindow		新規
-Name matches wildcard expression:###	SelectionWindow		ファイル名がワイルドカード表現と一致: ###
 less than	FindPanel		より小さい
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		develop

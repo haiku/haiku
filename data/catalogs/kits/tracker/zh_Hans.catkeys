@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	3168503700
+1	english	x-vnd.Haiku-libtracker	3470530992
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -399,7 +399,6 @@ Attributes	ContainerWindow		属性
 Handles %type	OpenWithWindow		处理 %type
 ends with	FindPanel		结束方式
 New	ContainerWindow		新建
-Name matches wildcard expression:###	SelectionWindow		名称匹配通配符表达式：###
 less than	FindPanel		少于
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		开发

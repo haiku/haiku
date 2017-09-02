@@ -1,6 +1,5 @@
-1	polish	x-vnd.Haiku-Repositories	1893477165
+1	polish	x-vnd.Haiku-Repositories	3761636112
 Completed	TaskLooper	Completed task status message	Zakończono
-Enabled	RepositoriesView	Column title	Włączone
 Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Tylko jeden URL dla każdego repozytorium może być włączony.  Zmień swój wybór.
 Repositories	System name		Repozytoria
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Wystąpił błąd podczas włączania repozytorium %url%
@@ -22,7 +21,6 @@ Name	RepositoriesView	Column title	Nazwa
 Enable	RepositoriesView	Button label	Włącz
 Remove All	RepositoriesView	Button label	Usuń wszystkie
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Wystąpił błąd podczas odświeżania pamięci podręcznej repozytorium %name%
-Select repositories to use with Haiku package management:	RepositoriesView	Label text	Wybierz repozytoria do użycia:
 Failed	TaskLooper	Failed task status message	Wystąpił błąd
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	Anuluj zadanie

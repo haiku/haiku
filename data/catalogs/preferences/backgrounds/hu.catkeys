@@ -1,11 +1,13 @@
-1	hungarian	x-vnd.Haiku-Backgrounds	3513602073
+1	hungarian	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Háttér
 X:	Main View		X:
+Setting the background image failed:	Main View		Nem sikerült a háttérkép beállítása:
 Resolution: 	Image Filepanel		Felbontás: 
 pick one	Main View		válasszon egyet
 Default	Main View		Alapértelmezés
 Center	Main View		Középre
 Manual	Main View		Kézi elhelyezés
+Set background image error	Main View		Háttérkép-beállítási hiba
 Default folder	Main View		Alapértelmezett mappa
 Revert	Main View		Visszaállít
 None	Main View		Nincs
@@ -20,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Sorminta
 Select	Main View		Kiválaszt
 Scale to fit	Main View		Kitöltés
+OK	Main View		Rendben
 Placement:	Main View		Elhelyezkedés:
 Preview	Main View		Előnézet
 Image:	Main View		Kép:

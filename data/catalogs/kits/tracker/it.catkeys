@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	3764913684
+1	italian	x-vnd.Haiku-libtracker	4066940976
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-on
 Mount settings…	ContainerWindow		Impostazioni di mount
@@ -390,7 +390,6 @@ Attributes	ContainerWindow		Attributi
 Handles %type	OpenWithWindow		Gestisce %type
 ends with	FindPanel		finisce con
 New	ContainerWindow		Nuovo
-Name matches wildcard expression:###	SelectionWindow		Il nome combacia con l'espressione wildcard:###
 less than	FindPanel		meno di
 64 x 64	DeskWindow		64 × 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		sviluppo

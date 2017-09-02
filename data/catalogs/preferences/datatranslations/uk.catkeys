@@ -1,8 +1,7 @@
-1	ukrainian	x-vnd.Haiku-DataTranslations	3820343452
+1	ukrainian	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		Перетворення даних
 Cancel	DataTranslations		Скасувати
 Name:	DataTranslations		І’мя:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Ім'я: %s \nВерсія: %ld.%ld.%ld\n\nІнфо:\n%s\n\nШлях:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Ім'я: %s \nВерсія: %ld.%ld.%ld\n\nІнфо:\n%s\n\nШлях:\n%s\n
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Неможливо встановити %s:\n%s

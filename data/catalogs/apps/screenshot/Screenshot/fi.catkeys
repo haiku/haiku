@@ -1,9 +1,10 @@
-1	finnish	x-vnd.haiku-screenshot	3896204963
+1	finnish	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		sekuntia
 Desktop	ScreenshotWindow		Työpöytä
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
 Screenshot	System name		Näytönkaappaus
 Select	ScreenshotWindow		Valitse
+The destination path exists but is not a folder.	ScreenshotWindow		Kohdepolku on oleamassa, mutta se ei ole kansio.
 Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna
 Cancel	ScreenshotWindow		Peru
 Name:	ScreenshotWindow		Nimi:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
 New screenshot	ScreenshotWindow		Uusi näytönkaappaus
 Artwork folder	ScreenshotWindow		Taideteoskansio
 Home folder	ScreenshotWindow		Kotikansio
+Failed to save screenshot	ScreenshotWindow		Näyttökaappauksen tallentaminen epäonnistui
+OK	ScreenshotWindow		Valmis
 Settings…	ScreenshotWindow		Asetukset...
 overwrite	ScreenshotWindow		korvaa
 Delay:	ScreenshotWindow		Viive:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Virhe tallennettaessa \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
 Translator Settings	ScreenshotWindow		Muunninasetukset

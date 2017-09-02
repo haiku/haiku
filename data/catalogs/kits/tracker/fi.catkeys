@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1597598656
+1	finnish	x-vnd.Haiku-libtracker	1899625948
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
 Mount settings…	ContainerWindow		Liittämisasetukset...
@@ -439,7 +439,6 @@ Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 ends with	FindPanel		loppuu kohteella
 URL	Bookmark Query Columns		Verkko-osoite
 New	ContainerWindow		Uusi
-Name matches wildcard expression:###	SelectionWindow		Nimi täsmää jokerimerkkilausekkeeseen:###
 less than	FindPanel		pienempi kuin
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		kehitys

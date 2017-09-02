@@ -1,8 +1,7 @@
-1	german	x-vnd.Haiku-DataTranslations	3820343452
+1	german	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		Datenkonvertierung
 Cancel	DataTranslations		Abbrechen
 Name:	DataTranslations		Name:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPfad:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Das Objekt '%name' scheint kein Translator zu sein und kann daher nicht installiert werden.
 Could not install %s:\n%s	DataTranslations		Kann %s nicht installieren:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Dieses Fenster dient zum Festlegen von Standardwerten für die verschiedenen Translatoren. Sie werden benutzt falls in einer Anwendung keine eigenen Einstellungen vorgenommen wurden.

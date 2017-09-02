@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	3382932957
+1	hungarian	x-vnd.Haiku-About	2090349490
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm és Werner Lemberg.
 Past website & marketing:\n	AboutView		Előző weboldal illetve marketing:\n
@@ -21,6 +21,7 @@ Source Code: 	AboutView		Forráskód:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{# processzor:}}
 Kernel:	AboutView		Kernel:
 BSD (4-clause)	AboutWindow		BSD (4-clause)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google fordító csapata.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		A Haiku kódjának szerzői jogai a Haiku, Inc.-et vagy, ha nevük a forráskódban külön ki van emelve, a kód egyes íróit illetik. A Haiku® és a HAIKU logo® a Haiku, Inc. bejegyzett védjegye.\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nMinden jog fenntartva.
@@ -72,7 +73,6 @@ Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Minden jog fenntartva.
 The BeGeistert team\n	AboutView		A BeGeistert csapatának\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Az Aucklandi Egyetem és Christof Lutteroth\n\n
-Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratórium, Tokiói Egyetem.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Minden jog fenntartva.
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Minden jog fenntartva.
@@ -80,9 +80,9 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH és Thomas Merz. Minden jog fenntartva.\nA PDFlib és a PDFlib a PDFlib GmbH bejegyzett védjegyei.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Minden jog fenntartva.
 …and the many people making donations!\n\n	AboutView		… a rengeteg adományokkal segítő embernek!\n\n
-MIT license. All rights reserved.	AboutView		MIT licenc. Minden jog fenntartva.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kattintson rá a licenc nevére az adott licenc megjelenítéséhez!]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Minden jog fenntartva.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER a Bitstream Inc. regisztrált védjegye
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Minden jog fenntartva.
 License: 	AboutView		Licenc:

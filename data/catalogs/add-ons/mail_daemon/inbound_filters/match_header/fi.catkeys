@@ -1,5 +1,7 @@
-1	finnish	x-vnd.Haiku-MatchHeader	4262558281
+1	finnish	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Valitse toiminto>
+Header field (e.g. Subject, From, ...)	ConfigView		Otsakekenttä (esim.: Aihe, Lähettäjä, ...)
+Account	ConfigView		Tili
 has	ConfigView		on
 Move to	ConfigView		Siirrä kohtaan
 Then	ConfigView		Sitten
@@ -12,3 +14,4 @@ Match header	RuleFilter		Täsmää otsikko
 Reply with	ConfigView		Vastaa
 If	ConfigView		Jos
 Match \"%attribute\" against \"%regex\"	RuleFilter		Täsmää \"%attribute\" säännöllisen lausekkeen \"%regex\" varalta
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokerimerkkiarvot, kuten \"*spam*\".\nKäytä säännöllisissä lausekkeissa etuliitettä \"REGEX:\".

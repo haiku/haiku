@@ -1,8 +1,7 @@
-1	romanian	x-vnd.Haiku-DataTranslations	3820343452
+1	romanian	x-vnd.Haiku-DataTranslations	4156631142
 DataTranslations	System name		TraduceriDate
 Cancel	DataTranslations		Anulează
 Name:	DataTranslations		Nume:
-Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		Nume: %s \nVersiune: %ld.%ld.%ld\n\nDetalii:\n%s\n\nCale:\n%s\n
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Elementul '%name' nu pare a fi un Traducător și nu va fi instalat.
 Could not install %s:\n%s	DataTranslations		Nu s-a putut instala %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Utilizați acest panou de control pentru a configura valorile implicite pentru traducători, pentru a fi utilizate atunci când nu se specifică alte configurări de către o aplicație.

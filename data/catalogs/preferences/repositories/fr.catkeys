@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-Repositories	1893477165
+1	french	x-vnd.Haiku-Repositories	3761636112
 Completed	TaskLooper	Completed task status message	Terminé
-Enabled	RepositoriesView	Column title	Actif
 Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Une seule URL par dépôt peut être activée. Veuillez modifier vos sélections.
 Repositories	System name		Dépôts
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Une erreur s'est produite à l'activation du dépôt %url%
@@ -22,7 +21,6 @@ Name	RepositoriesView	Column title	Nom
 Enable	RepositoriesView	Button label	Activer
 Remove All	RepositoriesView	Button label	Tout retirer
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Une erreur est survenue lors de l'actualisation du cache du dépôt %name%
-Select repositories to use with Haiku package management:	RepositoriesView	Label text	Sélection des dépôts à utiliser pour obtenir les paquets :
 Failed	TaskLooper	Failed task status message	Échec
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	Annuler la tâche

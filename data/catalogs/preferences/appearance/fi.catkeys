@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	727801787
+1	finnish	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Pelkkä kirjasin:
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Shadow	Colors tab		Varjo
 On	AntialiasingSettingsView		Päällä
 Defaults	APRWindow		Oletusasetukset
+Link hover	Colors tab		Linkkileijunta
 Grayscale	AntialiasingSettingsView		Harmaasävy
 Shine	Colors tab		Hohto
 About	DecorSettingsView		Ohjelmasta
 About decorator	DecorSettingsView		Koristeluohjelmasta
 Off	AntialiasingSettingsView		Pois päältä
+Link text	Colors tab		Linkkiteksti
+Link active	Colors tab		Aktiivinen linkki
 Choose Decorator	DecorSettingsView		Valitse koristelu
 Success	Colors tab		Onnistuminen
 Inactive window tab text	Colors tab		Epäaktiivisen ikkunavälilehden tekstin väri
@@ -18,6 +21,7 @@ Failure	Colors tab		Epäonnistuminen
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Scroll bar:	DecorSettingsView		Vierityspalkki:
 Document background	Colors tab		Dokumentin tausta
+Status bar	Colors tab		Tilapalkki
 Revert	APRWindow		Palauta
 Window tab	Colors tab		Ikkunan välilehti
 Tooltip background	Colors tab		Työkaluvinkin tausta
@@ -36,6 +40,7 @@ List background	Colors tab		Luettelotausta
 OK	DecorSettingsView		Valmis
 Control mark	Colors tab		Ohjausmerkki
 Size:	Font Selection view		Koko:
+Link visited	Colors tab		Vierailtu linkki
 Decorator:	DecorSettingsView		Koristelija:
 Selected list item background	Colors tab		Valitun luettelorivin tausta
 Panel background	Colors tab		Paneelin tausta
