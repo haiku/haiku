@@ -147,7 +147,7 @@ RemotePackageRepository HaikuPorts
 	f1spirit-0.rc9.1615-2
 	file-5.25-1
 	file_devel-5.25-1
-	filer-1.1.0-1
+	filer-1.2.0-1
 	filwip-1.0.1-2
 	findutils-4.4.2-3
 	ffmpeg-0.10.16-1
@@ -573,6 +573,7 @@ RemotePackageRepository HaikuPorts
 	sqlite-3.15.2.0-1
 	sqlite_devel-3.15.2.0-1
 	srm-1.2.12-1
+	streamradio-0.0.3_14-1
 	substrate-1.0b-1
 	subversion-1.8.11-8
 	subversion_devel-1.8.11-8
@@ -1696,6 +1697,7 @@ RemotePackageRepository HaikuPorts
 	srm
 	stlink_x86
 	stm32flash_x86
+	streamradio
 	strigi_x86
 	substrate
 	subversion

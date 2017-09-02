@@ -398,6 +398,7 @@ RemotePackageRepository HaikuPorts
 	figlet-222-2
 	file-5.31-1
 	file_devel-5.31-1
+	filer-1.2.0-1
 	filwip-1.0.1-2
 	finance-1.0.0-4
 	findutils-4.4.2-5
@@ -1325,6 +1326,7 @@ RemotePackageRepository HaikuPorts
 	stfl-0.24-2
 	stfl_devel-0.24-2
 	stockfish-8-2
+	streamradio-0.0.3_14-1
 	substrate-1.0b-2
 	subversion-1.9.4-6
 	subversion_devel-1.9.4-6
@@ -1671,6 +1673,7 @@ RemotePackageRepository HaikuPorts
 	fifechan
 	figlet
 	file
+	filer
 	filwip
 	finance
 	findutils
@@ -2253,6 +2256,7 @@ RemotePackageRepository HaikuPorts
 	stegsnow
 	stfl
 	stockfish
+	streamradio
 	substrate
 	subversion
 	superfreecell
