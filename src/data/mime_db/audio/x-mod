@@ -1,0 +1,13 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "audio/x-mod";
+
+resource(2, "META:S:DESC") #'MSDC' "Protracker module";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "mod",
+	"type" = "audio/x-mod"
+};
+
+resource(5, "META:SNIFF_RULE") "0.2 [44] (0x0f00 & 0xf0c0) [74] (0x0f00 & 0xf0c0) [104] (0x0f00 & 0xf0c0)";
