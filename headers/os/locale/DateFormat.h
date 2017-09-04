@@ -84,10 +84,19 @@ public:
 									BDate& output);
 
 private:
+			int					_ConvertDayNumberToICU(int day) const;
+
 			U_ICU_NAMESPACE::DateFormat*	_CreateDateFormatter(
 									const BDateFormatStyle style) const;
 
 };
+
+
+inline int
+BDateFormat::_ConvertDayNumberToICU(int day) const
+{
+	return day == 7 ? 1 : day + 1;
+}
 
 
 #endif	// _B_DATE_FORMAT_H_

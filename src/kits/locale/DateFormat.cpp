@@ -366,7 +366,7 @@ BDateFormat::GetDayName(int day, BString& outName,
 	}
 
 	BStringByteSink stringConverter(&outName);
-	names[day].toUTF8(stringConverter);
+	names[_ConvertDayNumberToICU(day)].toUTF8(stringConverter);
 
 	delete simpleFormat;
 	return B_OK;
