@@ -256,8 +256,9 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
-	--with-sysroot="$sysrootDir" --disable-threads --disable-tls \
-	--disable-libatomic \
+	--enable-__cxa-atexit --enable-threads=posix \
+	--with-default-libstdcxx-abi=gcc4-compatible \
+	--with-sysroot="$sysrootDir" \
 	$gccConfigureArgs \
 	|| exit 1
 
