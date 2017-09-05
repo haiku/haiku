@@ -20,9 +20,4 @@ Note that creating a new format is a costly operation. The idea is that you
 create your format object once and reuse it accross your application to format
 all the stuff that needs it.
 
-Unlike the other kits in Haiku, the Locale kit does not live in libbe. When
-building a localized application, you have to link it to liblocale.so. If you
-want to use the catalog macros, you also have to link each of your images
-(that is, applications, libraries and add-ons) to liblocalestub.a.
-
 */

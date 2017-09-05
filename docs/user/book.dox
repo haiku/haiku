@@ -135,30 +135,8 @@
 	\defgroup locale Locale Kit
 	\brief Collection of classes for localizing applications.
 
-	The Locale Kit provides a set of tools for internationalizing,
-	localizing and translating your software. This includes not only
-	replacing string with their translations at runtime, but also more
-	complex tasks such as formatting numbers, dates, and times in a way
-	that match the locale preferences of the user.
-
-	The main way to access locale data is through the be_locale_roster.
-	This is a global instance of the BLocaleRoster class, storing the data
-	for localizing an application according to the user's preferred settings.
-	The locale roster also acts as a factory to instantiate most of the other
-	classes. However, there are some cases where you will need to instantiate
-	another class by yourself, to use it with custom settings. For example, you
-	may need to format a date with a fixed format in english for including in an
-	e-mail header, as it is the only format accepted there.
-
-	Unlike the other kits in Haiku, the Locale kit does not live in libbe.
-	When building a localized application, you have to link it to
-	liblocale.so. If you want to use the catalog macros, you also have to
-	link each of your images (that is, applications, libraries and add-ons)
-	to liblocalestub.a.
-
 	\defgroup media Media Kit
 	\brief Collection of classes that deal with audio and video.
-
 
 	\defgroup midi1 The old MIDI Kit (libmidi.so)
 	\brief The old MIDI kit.

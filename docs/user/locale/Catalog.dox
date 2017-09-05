@@ -43,6 +43,7 @@
 	  associated with your script.
 
 	\section macros Using the macros
+
 	You don't have to do much in your program to handle catalogs. You must
 	first set the B_TRANSLATION_CONTEXT define to a string that identifies which
 	part of the application the strings you will translate are in. This allows
@@ -54,22 +55,27 @@
 	allow to build the base catalog, the one that you will send to the
 	translator team, from your sourcecode.
 
+	Note that each image (application, library or add-on) using these macros
+	must be linked with liblocalestub.a. This allows the Locale Kit to identify
+	it and locate the matching string catalogs for translation.
+
 	\section chaining Chaining of catalogs
+
 	The catalogs you get from the locale kit are designed to use a fallback
 	system so that the user get strings in the language he's the most fluent
 	with, depending on what catalogs are available.
 
-	For example, if the user sets his language preferences as french(France),
+	For example, if the user sets his language preferences as French(France),
 	spanish, english, when an application loads a catalog, the following rules
 	are used:
-	- Try to load a french(France) catalog. If it is found, this catalog
+	- Try to load a French(France) catalog. If it is found, this catalog
 	  will automatically include strings from the generic french catalog.
 	- Try to load a generic french catalog.
 	- Try to load a generic spanish catalog.
 	- Try to load a generic english catalog.
 	- If all of them failed, use the strings that are in the source code.
 
-	Note that french(France) will failback to french, but then directly to the
+	Note that French(France) will failback to French, but then directly to the
 	language in the source code. This avoids mixing 3 or more languages in the
 	same application if the catalogs are incomplete and avoids confusion.
 
