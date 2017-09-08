@@ -1049,7 +1049,10 @@ atom_op_xor(atom_exec_context *ctx, int *ptr, int arg)
 static void
 atom_op_debug(atom_exec_context *ctx, int *ptr, int arg)
 {
-	TRACE("%s: unimplemented!\n", __func__);
+	#ifdef ATOM_TRACE
+	uint8 val = U8((*ptr)++);
+	TRACE("AtomBIOS DEBUG OP: 0x%02X\n", val);
+	#endif
 }
 
 
