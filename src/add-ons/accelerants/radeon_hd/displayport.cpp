@@ -115,6 +115,7 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 	switch(message->request & ~DP_AUX_I2C_MOT) {
 		case DP_AUX_NATIVE_WRITE:
 		case DP_AUX_I2C_WRITE:
+		case DP_AUX_I2C_WRITE_STATUS_UPDATE:
 			transactionSize += message->size;
 			break;
 	}
@@ -143,6 +144,7 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 		switch(message->request & ~DP_AUX_I2C_MOT) {
 			case DP_AUX_NATIVE_WRITE:
 			case DP_AUX_I2C_WRITE:
+			case DP_AUX_I2C_WRITE_STATUS_UPDATE:
 				memcpy(auxMessage + 4, message->buffer, message->size);
 				result = dp_aux_speak(connectorIndex, auxMessage,
 					transactionSize, NULL, 0, delay, &ack);

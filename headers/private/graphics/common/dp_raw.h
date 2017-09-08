@@ -21,7 +21,7 @@
 // AUX i2c Communications
 #define DP_AUX_I2C_WRITE                       0x0
 #define DP_AUX_I2C_READ                        0x1
-#define DP_AUX_I2C_STATUS                      0x2
+#define DP_AUX_I2C_WRITE_STATUS_UPDATE         0x2
 #define DP_AUX_I2C_MOT                         0x4
 #define DP_AUX_I2C_REPLY_ACK                   (0x0 << 2)
 #define DP_AUX_I2C_REPLY_NACK                  (0x1 << 2)
