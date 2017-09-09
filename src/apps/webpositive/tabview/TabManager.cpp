@@ -566,13 +566,13 @@ void
 WebTabView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
-	if (fController->CloseButtonsAvailable()) {
-		BRect closeRect = _CloseRectFrame(Frame());
-		bool overCloseRect = closeRect.Contains(where);
-		if (overCloseRect != fOverCloseRect) {
-			fOverCloseRect = overCloseRect;
-			ContainerView()->Invalidate(closeRect);
-		}
+	BRect closeRect = _CloseRectFrame(Frame());
+	bool overCloseRect = closeRect.Contains(where);
+
+	if (overCloseRect != fOverCloseRect
+		&& fController->CloseButtonsAvailable()) {
+		fOverCloseRect = overCloseRect;
+		ContainerView()->Invalidate(closeRect);
 	}
 
 	// Set the tool tip
