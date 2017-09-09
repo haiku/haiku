@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Repositories	3761636112
+1	french	x-vnd.Haiku-Repositories	3072072887
 Completed	TaskLooper	Completed task status message	Terminé
 Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Une seule URL par dépôt peut être activée. Veuillez modifier vos sélections.
 Repositories	System name		Dépôts
@@ -14,11 +14,13 @@ Repository URL:	AddRepoWindow	Text box label	URL du dépôt :
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erreur à l'obtention de la configuration du dépôt %name%.
 Details	TaskLooper	Job log details header	Détails
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	La tâche avec le dépôt %name% a abouti.
+Status	RepositoriesView	Column title	État
 Aborted	TaskLooper	Aborted task status message	Abandon
 Remove	RepositoriesView	Button label	Retirer
 Changes completed	RepositoriesView	Status view text	Modifications appliquées
 Name	RepositoriesView	Column title	Nom
-Enable	RepositoriesView	Button label	Activer
+Enable	RepositoriesView	Button label	Actif
+Enable repositories to use with package management:	RepositoriesView	Label text	Activez les dépôts à utiliser pour obtenir les paquets :
 Remove All	RepositoriesView	Button label	Tout retirer
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Une erreur est survenue lors de l'actualisation du cache du dépôt %name%
 Failed	TaskLooper	Failed task status message	Échec

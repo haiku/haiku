@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1899625948
+1	french	x-vnd.Haiku-libtracker	3394192241
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -210,6 +210,7 @@ Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l�
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L’élément sélectionné ne peut pas être envoyé à la Corbeille. Voulez vous le supprimer ? (Cette opération est irrémédiable.)
 Work Phone	Person Query Columns		Téléphone professionnel
 Invert	SelectionWindow		Inverser
+ (broken)	InfoWindow		 (rompu)
 Find	FindPanel		Rechercher
 Get info	ContainerWindow		Informations
 Error creating link to \"%name\".	FSUtils		Erreur à la création du lien vers « %name ».
@@ -345,6 +346,7 @@ link	FSUtils	filename link	lien
 Expression too long.	libtracker		Expression trop longue.
 The specified name is illegal. Please choose another name.	FilePanelPriv		Le nom indiqué n’est pas valide. Veuillez choisir un autre nom.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Vous ne pouvez pas déplacer un dossier dans lui-même ou dans un de ses sous-dossier.
+List view	ContainerWindow		Vue en liste
 ?+* follows nothing.	libtracker		?+* ne faisant suite à rien.
 Handles any file	OpenWithWindow		Manipule n’importe quel fichier
 E-mail	Person Query Columns		Courriel
@@ -433,6 +435,7 @@ Formula %formula	FindPanel	FindResultTitle	Formule %formula
 Kind:	InfoWindow		Nature :
 starts with	FindPanel		commence par
 Increase size	ContainerWindow		Augmenter la taille
+ info	InfoWindow		 informations
 is	FindPanel		est
 Attributes	ContainerWindow		Attributs
 Handles %type	OpenWithWindow		Support de « %type »

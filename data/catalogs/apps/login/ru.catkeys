@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Login	2683778354
+1	russian	x-vnd.Haiku-Login	336867745
 Error: %1	Login App		Ошибка: %1
 Hide password	Login View		Скрыть пароль
 Desktop	Desktop Window		Рабочий стол
@@ -17,3 +17,4 @@ Halt	Login View		Выключение
 Password:	Login View		Пароль:
 OK	Login App		OK
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tНе делать окно модальным\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Для настройки рабочего стола, отображаемого за приложением Вход в систему, перетащите на него репликант.\n\nКогда вы закончите просто завершите приложение (Cmd-Q).

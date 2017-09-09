@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Repositories	1628484538
+1	japanese	x-vnd.Haiku-Repositories	3072072887
 Completed	TaskLooper	Completed task status message	完了
 Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	リポジトリに対してそれぞれ 1 つだけの URL が有効になります。  選択を変更してください。
 Repositories	System name		リポジトリ
@@ -14,11 +14,13 @@ Repository URL:	AddRepoWindow	Text box label	リポジトリの URL:
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	 %name% のリポジトリ設定の取得時にエラーが発生しました。
 Details	TaskLooper	Job log details header	詳細
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	良いニュースです! リポジトリ %name% のタスクが完了しました。
+Status	RepositoriesView	Column title	状況
 Aborted	TaskLooper	Aborted task status message	中断
 Remove	RepositoriesView	Button label	削除
 Changes completed	RepositoriesView	Status view text	変更が完了しました
 Name	RepositoriesView	Column title	名前
 Enable	RepositoriesView	Button label	有効
+Enable repositories to use with package management:	RepositoriesView	Label text	パッケージ管理で使用するリポジトリを有効にしてください:
 Remove All	RepositoriesView	Button label	すべて削除
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% のリポジトリキャッシュの更新時にエラーが発生しました。
 Failed	TaskLooper	Failed task status message	失敗
@@ -28,6 +30,7 @@ Remove these repositories?	RepositoriesView	Removal alert confirmation message	�
 Cancel	Constants	Button label	キャンセル
 Changes pending:	RepositoriesView	Status view text	変更の保留中:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	リポジトリ %name% を無効にする際にエラーが発生しました。
+Remove	Constants	Button label	削除
 Stop and quit	RepositoriesWindow	Button label	停止して終了
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	リポジトリ %name% のタスクは完了まで時間がかかります。
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	一部のタスクがまだ実行中です。これらのタスクを停止して終了しますか?

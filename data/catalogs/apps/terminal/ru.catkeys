@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2580919319
+1	russian	x-vnd.Haiku-Terminal	3977292818
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -90,6 +90,7 @@ Set tab title	Terminal TermWindow		Переименовть вкладку
 Settings…	Terminal TermWindow		Настройки…
 Abort	Terminal Shell		Отменить
 Open link	Terminal TermView		Открыть ссылку
+Solarized Light	Terminal colors scheme		Солнечный свет
 Edit	Terminal TermWindow		Изменить
 Color:	Terminal AppearancePrefView		Цвет:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n

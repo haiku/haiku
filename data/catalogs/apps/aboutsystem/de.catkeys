@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	3676286035
+1	german	x-vnd.Haiku-About	2090349490
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 durch die Autoren von Gutenprint. Alle Rechte vorbehalten.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
 Past website & marketing:\n	AboutView		Ehemaliges Website & Marketing:\n
@@ -21,6 +21,7 @@ Source Code: 	AboutView		Quellcode:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Prozessor:} other{# Prozessoren:}}
 Kernel:	AboutView		Kernel:
 BSD (4-clause)	AboutWindow		BSD (4-Klausel)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization Team.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (Firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle Rechte vorbehalten.
@@ -81,6 +82,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 …and the many people making donations!\n\n	AboutView		...und die vielen Leute, die durch Spenden geholfen haben!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Ein Klick auf einen Lizenznamen zeigt den jeweiligen Lizenztext.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Alle Rechte vorbehalten.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER ist eine registrierte Marke von Bitstream Inc.
 BSD (3-clause)	AboutWindow		BSD (3-Klausel)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Alle Rechte vorbehalten.
 License: 	AboutView		Lizenz: 

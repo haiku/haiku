@@ -81,7 +81,7 @@ Bookmark info	WebPositive Window		Lesezeichen Info
 Size:	Font Selection view		Größe:
 Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
 About	WebPositive Window		Über
-Finish: 	Download Window	Finishing time	Fertig:
+Finish: 	Download Window	Finishing time	Fertig: 
 Fonts	Settings Window		Schriftarten
 OK	Download Window		OK
 Page source error	WebPositive Window		Fehler im Quellcode der Seite
@@ -99,7 +99,7 @@ Find	WebPositive Window		Suchen
 Find previous	WebPositive Window		Vorheriger Treffer
 Settings	WebPositive Window		Einstellungen
 Script console	WebPositive Window		Skript-Konsole
-Name	Cookie Manager		Bezeichnung
+Name	Cookie Manager		Name
 Proxy server address:	Settings Window		Proxy-Serveradresse:
 Proxy server port:	Settings Window		Proxy-Serverport:
 Bookmarks	WebPositive Window		Lesezeichen
@@ -115,13 +115,13 @@ Cancel	Download Window		Abbrechen
 Flags	Cookie Manager		Kennzeichen
 Open search page	Settings Window		Suchmaschine öffnen
 Clear	Console Window		Leeren
-Password:	Authentication Panel		Passwort:
+Password:	Authentication Panel		Kennwort:
 Path	Cookie Manager		Pfad
 Back	WebPositive Window		Zurück
 New browser window	Download Window		Neues Browser-Fenster
 Today	WebPositive Window		Heute
 Over %hours left	Download Window		Noch über %hours Stunden
-Remember username and password for this site	Authentication Panel		Benutzername und Passwort für diese Seite speichern
+Remember username and password for this site	Authentication Panel		Benutzername und Kennwort für diese Seite speichern
 Earlier	WebPositive Window		Früher
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Use proxy server to connect to the internet	Settings Window		Proxy-Server zur Verbindung mit dem Internet nutzen
@@ -150,7 +150,7 @@ Download finished	Download Window		Download abgeschlossen
 Show bookmark bar	WebPositive Window		Lesezeichenleiste einblenden
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Es existiert bereits ein Lesezeichen für diese Seite (%bookmarkName).
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
 Cookies for %s	Cookie Manager		Cookies für %s
 New windows:	Settings Window		Neue Fenster:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url geladen

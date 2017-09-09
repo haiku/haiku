@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	2512967175
+1	japanese	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		固定 IP
 EAP	EAP protected network		EAP
 Services	NetworkWindow		サービス
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		自動選択
 connected	IntefaceView		接続済み
 Ethernet device	InterfaceListItem		イーサネットデバイス
 The netmask defines your local network	IntefaceAddressView		ネットマスクはローカルネットワークを定義します
+Dial-up connection	InterfaceListItem		ダイアルアップ接続
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		ネットワーク
+VPN connection	InterfaceListItem		VPN 接続
 Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状況を表示する
 The method for obtaining an IP address	IntefaceAddressView		IP アドレスを得るための方法
 connected	InterfaceListItem		接続済み
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		送信:
 open	Open network		開く
 IP Address:	IntefaceAddressView		IP アドレス:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		受信:
 Disable	IntefaceView		無効
 <no wireless networks found>	IntefaceView		<無線ネットワークが見つかりません>

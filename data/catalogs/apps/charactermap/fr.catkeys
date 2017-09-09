@@ -1,12 +1,15 @@
-1	french	x-vnd.Haiku-CharacterMap	1534181938
+1	french	x-vnd.Haiku-CharacterMap	1078341685
 Enclosed alphanumerics	UnicodeBlocks		Alphanumériques cerclés
 Basic Latin	UnicodeBlocks		Latin basic
+Cyrillic extended C	UnicodeBlocks		Cyrillique étendu C
 View	CharacterWindow		Vue
+Cherokee supplement	UnicodeBlocks		Supplément Cherokee
 Latin-1 supplement	UnicodeBlocks		Supplément Latin-1
 Hebrew	UnicodeBlocks		Hébreu
 Georgian supplement	UnicodeBlocks		Supplément géorgien
 CJK unified ideographs	UnicodeBlocks		Idéogrammes unifiés CJC
 Modifier tone letters	UnicodeBlocks		Lettres modificatives de ton
+Old Hungarian	UnicodeBlocks		Hongrois ancien
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Zone supplémentaire A à usage privé
 Hanunoo	UnicodeBlocks		Hanounóo
@@ -122,6 +125,7 @@ Ancient Greek numbers	UnicodeBlocks		Nombres grecs anciens
 Vai	UnicodeBlocks		Vaï
 Yi Radicals	UnicodeBlocks		Clés yi
 Cyrillic extended B	UnicodeBlocks		Cyrillique étendu B
+Mongolian supplement	UnicodeBlocks		Supplément Mongol
 Quit	CharacterWindow		Quitter
 Ancient symbols	UnicodeBlocks		Symboles anciens
 Braille patterns	UnicodeBlocks		Combinaisons braille
@@ -161,6 +165,7 @@ Alphabetic presentation forms	UnicodeBlocks		Formes de présentation alphabétiq
 Halfwidth and fullwidth forms	UnicodeBlocks		Formulaires demi-largeur et largeur complète
 Lydian	UnicodeBlocks		Lydien
 Ethiopic supplement	UnicodeBlocks		Supplément éthiopien
+CJK unified ideographs extension E	UnicodeBlocks		Extension E aux idéogrammes unifiés CJC
 Latin extended B	UnicodeBlocks		Latin étendu B
 Box drawing	UnicodeBlocks		Filets
 Mathematical alphanumeric symbols	UnicodeBlocks		Symboles mathématiques alphanumériques

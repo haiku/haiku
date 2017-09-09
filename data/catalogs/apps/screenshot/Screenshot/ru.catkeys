@@ -1,9 +1,10 @@
-1	russian	x-vnd.haiku-screenshot	3896204963
+1	russian	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочий стол
 Include window border	ScreenshotWindow		Включая заголовок окна
 Screenshot	System name		Снимок экрана
 Select	ScreenshotWindow		Выбрать
+The destination path exists but is not a folder.	ScreenshotWindow		Путь назначения существует, но не является папкой.
 Capture active window	ScreenshotWindow		Захватить активное окно
 Cancel	ScreenshotWindow		Отмена
 Name:	ScreenshotWindow		Имя:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	screenshot
 New screenshot	ScreenshotWindow		Новый снимок
 Artwork folder	ScreenshotWindow		Папку artwork
 Home folder	ScreenshotWindow		Домашнюю папку
+Failed to save screenshot	ScreenshotWindow		Не удалось сохранить снимок экрана
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		Настройки…
 overwrite	ScreenshotWindow		Перезаписать
 Delay:	ScreenshotWindow		Задержка:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Ошибка при сохранении \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Включая курсор
 Translator Settings	ScreenshotWindow		Настройки транслятора

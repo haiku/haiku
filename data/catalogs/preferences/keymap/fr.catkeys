@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	3155537444
+1	french	x-vnd.Haiku-Keymap	1855856185
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Majuscule :
 Revert	Modifier keys window		Défaire
@@ -97,6 +97,7 @@ Command:	Modifier keys window	Command key role name	Commande :
 Latin-American	Keyboard Layout View		Latino-américain
 Spanish (Dvorak)	Keyboard Layout View		Espagnol (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		Lituanien (standard)
+Russian (Udmurt, Komi, Mari)	Keyboard Layout View		Russe (Udmurt, Komi, Mari)
 Canadian-French	Keyboard Layout View		Canadien-Français
 Irish	Keyboard Layout View		Irlandais
 Turkish (Type-F)	Keyboard Layout View		Turc (Type-F)

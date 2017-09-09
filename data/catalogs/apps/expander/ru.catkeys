@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-Expander	1655838480
+1	russian	x-vnd.Haiku-Expander	130018254
 Expand	ExpanderMenu		Распаковать
+Expanding '%s'…	ExpanderWindow		Распаковка '%s'…
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Set destination…	ExpanderMenu		Путь назначения для извлечения…
 Use:	ExpanderPreferences		Использовать:

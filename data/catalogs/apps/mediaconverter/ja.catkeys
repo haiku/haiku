@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-MediaConverter	341686525
+1	japanese	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識できませんでした:} other{# 個のファイルがサポートされたメディアファイルとして認識できませんでした:}}
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディファイルとして認識されませんでした:} other{# 個のファイルがサポートされたメディファイルとして認識されませんでした::}}
 Video encoding:	MediaConverter		ビデオエンコーディング:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error creating video.	MediaConverter		ビデオの作成に失敗しました。
 Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取り時にエラーが発生しました
 No audio	Audio codecs list		オーディオ無し
 Error	MediaConverter		エラー
@@ -26,7 +27,9 @@ Conversion completed	MediaConverter		変換が完了しました
 Audio:	MediaConverter-FileInfo		オーディオ:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		秒
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		%strPath% への書き込み時にエラーが発生しました。初期設定の /boot/home を使用します。
 Source files	MediaConverter		ソースファイル
+Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
 Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込み時にエラーが発生しました
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# フレーム} other{# フレーム}}
 Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き出し中にエラーが発生しました
@@ -38,6 +41,7 @@ None available	Video codecs		利用できません
 Conversion cancelled	MediaConverter		変換は中止されました
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
 Select this folder	MediaConverter		このフォルダーを選択
+Error creating track.	MediaConverter		トラックの作成に失敗しました。
 Continue	MediaConverter		続ける
 Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
 Video:	MediaConverter-FileInfo		ビデオ:
@@ -59,6 +63,7 @@ Drop media files onto this window	MediaConverter		メディアファイルをこ
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません
 File	Menu		ファイル
+Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %.1f kHz stereo	MediaFileInfo		%.1f kHz ステレオ
 Convert	MediaConverter		変換
 Writing audio track: %ld%% complete	MediaConverter		オーディオトラックの書き込み: %ld%% 完了

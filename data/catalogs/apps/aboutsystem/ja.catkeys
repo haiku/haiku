@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	3676286035
+1	japanese	x-vnd.Haiku-About	2090349490
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint の著者たち. All rights reserved.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Past website & marketing:\n	AboutView		過去のウェブサイトおよびマーケティング:\n
@@ -21,6 +21,7 @@ Source Code: 	AboutView		ソースコード:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{# プロセッサ:} other{# プロセッサ:}}
 Kernel:	AboutView		カーネル:
 BSD (4-clause)	AboutWindow		BSD (四条項)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku®およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。\n\n
 Marvell (firmware)	AboutWindow		Marvell (ファームウェア)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.
@@ -81,6 +82,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 …and the many people making donations!\n\n	AboutView		…寄付をしていただいた大勢の方々!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		「各ライセンスを表示するには、ライセンス名をクリックしてください。」\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. All rights reserved.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER is a registered trademark of Bitstream Inc.
 BSD (3-clause)	AboutWindow		BSD (三条項)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. All rights reserved.
 License: 	AboutView		ライセンス:

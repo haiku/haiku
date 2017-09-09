@@ -1,11 +1,13 @@
-1	french	x-vnd.Haiku-Backgrounds	3513602073
+1	french	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Fonds d’écran
 X:	Main View		X :
+Setting the background image failed:	Main View		La configuration de l'image de fond a échoué :
 Resolution: 	Image Filepanel		Résolution : 
 pick one	Main View		choisir
 Default	Main View		Défaut
 Center	Main View		Centré
 Manual	Main View		Placement manuel
+Set background image error	Main View		Réglage de l'image d'arrière-plan en erreur
 Default folder	Main View		Dossier par défaut
 Revert	Main View		Rétablir
 None	Main View		Aucun
@@ -20,6 +22,7 @@ Y:	Main View		Y :
 Tile	Main View		Mosaïque
 Select	Main View		Sélectionner
 Scale to fit	Main View		Ajuster
+OK	Main View		OK
 Placement:	Main View		Disposition :
 Preview	Main View		Aperçu
 Image:	Main View		Image :
