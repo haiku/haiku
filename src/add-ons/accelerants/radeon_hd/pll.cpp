@@ -746,8 +746,10 @@ status_t
 pll_set(display_mode* mode, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 	uint32 dp_clock = gConnector[connectorIndex]->dpInfo.linkRate;
+
 	pll->ssEnabled = false;
 
 	pll->pixelClock = mode->timing.pixel_clock;
@@ -762,7 +764,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 	pll->ssRange = 0;
 	pll->ssReferenceDiv = 0;
 
-	switch (display_get_encoder_mode(connectorIndex)) {
+	switch (encoderMode) {
 		case ATOM_ENCODER_MODE_DP_MST:
 		case ATOM_ENCODER_MODE_DP:
 			if (info.dceMajor >= 4)
@@ -820,6 +822,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 		PIXEL_CLOCK_PARAMETERS_V3 v3;
 		PIXEL_CLOCK_PARAMETERS_V5 v5;
 		PIXEL_CLOCK_PARAMETERS_V6 v6;
+		PIXEL_CLOCK_PARAMETERS_V7 v7;
 	};
 	union setPixelClock args;
 	memset(&args, 0, sizeof(args));
@@ -926,6 +929,41 @@ pll_set(display_mode* mode, uint8 crtcID)
 			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
 			args.v6.ucPpll = pll->id;
 			break;
+		case 7:
+			args.v7.ulPixelClock
+				= B_HOST_TO_LENDIAN_INT32(pll->pixelClock / 10);
+			args.v7.ucMiscInfo = 0;
+			if (gConnector[connectorIndex]->type == VIDEO_CONNECTOR_DVID
+				&& pll->pixelClock > 165000) {
+				args.v7.ucMiscInfo |= PIXEL_CLOCK_V7_MISC_DVI_DUALLINK_EN;
+			}
+			args.v7.ucCRTC = crtcID;
+			if (encoderMode == ATOM_ENCODER_MODE_HDMI) {
+				switch (bitsPerColor) {
+					case 8:
+					default:
+						args.v7.ucDeepColorRatio
+							= PIXEL_CLOCK_V7_DEEPCOLOR_RATIO_DIS;
+						break;
+					case 10:
+						args.v7.ucDeepColorRatio
+							= PIXEL_CLOCK_V7_DEEPCOLOR_RATIO_5_4;
+						break;
+					case 12:
+						args.v7.ucDeepColorRatio
+							= PIXEL_CLOCK_V7_DEEPCOLOR_RATIO_3_2;
+						break;
+					case 16:
+						args.v7.ucDeepColorRatio
+							= PIXEL_CLOCK_V7_DEEPCOLOR_RATIO_2_1;
+						break;
+				}
+			}
+			args.v7.ucTransmitterID
+				= gConnector[connectorIndex]->encoder.objectID;
+			args.v7.ucEncoderMode = display_get_encoder_mode(connectorIndex);
+			args.v7.ucPpll = pll->id;
+			break;
 		default:
 			TRACE("%s: ERROR: table version %" B_PRIu8 ".%" B_PRIu8 " TODO\n",
 				__func__, tableMajor, tableMinor);
@@ -946,8 +984,13 @@ pll_set(display_mode* mode, uint8 crtcID)
 }
 
 
+/**
+ * pll_set_external - Sets external default pll via SetPixelClock
+ *
+ * Applies a clock frequency to card's external PLL clock.
+ */
 status_t
-pll_external_set(uint32 clock)
+pll_set_external(uint32 clock)
 {
 	TRACE("%s: set external pll clock to %" B_PRIu32 "\n", __func__, clock);
 
@@ -971,6 +1014,7 @@ pll_external_set(uint32 clock)
 		PIXEL_CLOCK_PARAMETERS_V3 v3;
 		PIXEL_CLOCK_PARAMETERS_V5 v5;
 		PIXEL_CLOCK_PARAMETERS_V6 v6;
+		PIXEL_CLOCK_PARAMETERS_V7 v7;
 	};
 	union setPixelClock args;
 	memset(&args, 0, sizeof(args));
@@ -979,7 +1023,7 @@ pll_external_set(uint32 clock)
 	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
 	switch (tableMajor) {
 		case 1:
-			switch(tableMinor) {
+			switch (tableMinor) {
 				case 5:
 					// If the default DC PLL clock is specified,
 					// SetPixelClock provides the dividers.
@@ -1008,7 +1052,61 @@ pll_external_set(uint32 clock)
 			ERROR("%s: Unknown table version %" B_PRIu8
 						".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
 	}
-	return B_OK;
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
+}
+
+
+/**
+ * pll_set_dce - Sets external default pll via DCE Clock Allocation
+ *
+ * Applies a clock frequency to card's external PLL clock via SetDCEClock
+ * Used on Polaris.
+ */
+status_t
+pll_set_dce(uint32 clock, uint8 clockType, uint8 clockSource)
+{
+	TRACE("%s: set external pll clock to %" B_PRIu32 "\n", __func__, clock);
+
+	if (clock == 0)
+		ERROR("%s: Warning: default display clock is 0?\n", __func__);
+
+	uint8 tableMajor;
+	uint8 tableMinor;
+
+	int index = GetIndexIntoMasterTable(COMMAND, SetDCEClock);
+	atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor);
+
+	TRACE("%s: table %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		tableMajor, tableMinor);
+
+	union setDCEClock {
+	    SET_DCE_CLOCK_PS_ALLOCATION_V1_1 v1;
+	    SET_DCE_CLOCK_PS_ALLOCATION_V2_1 v2;
+	};
+	union setDCEClock args;
+	memset(&args, 0, sizeof(args));
+
+	switch (tableMajor) {
+		case 2:
+			switch (tableMinor) {
+				case 1:
+					args.v2.asParam.ulDCEClkFreq
+						= B_HOST_TO_LENDIAN_INT32(clock / 10);
+					args.v2.asParam.ucDCEClkType = clockType;
+					args.v2.asParam.ucDCEClkSrc = clockSource;
+					break;
+				default:
+					ERROR("%s: Unknown table version %" B_PRIu8
+						".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
+					return B_ERROR;
+			}
+			break;
+		default:
+			ERROR("%s: Unknown table version %" B_PRIu8
+				".%" B_PRIu8 "\n", __func__, tableMajor, tableMinor);
+			return B_ERROR;
+	}
+	return atom_execute_table(gAtomContext, index, (uint32*)&args);
 }
 
 
@@ -1023,8 +1121,13 @@ pll_external_init()
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
-	if (info.dceMajor >= 6) {
-		pll_external_set(gInfo->displayClockFrequency);
+	if (info.dceMajor >= 12) {
+		pll_set_dce(gInfo->displayClockFrequency,
+			DCE_CLOCK_TYPE_DISPCLK, ATOM_GCK_DFS);
+		pll_set_dce(gInfo->displayClockFrequency,
+			DCE_CLOCK_TYPE_DPREFCLK, ATOM_GCK_DFS);
+	} else if (info.dceMajor >= 6) {
+		pll_set_external(gInfo->displayClockFrequency);
 	} else if (info.dceMajor >= 4) {
 		// Create our own pseudo pll
 		pll_info pll;
@@ -1033,7 +1136,7 @@ pll_external_init()
 		pll_asic_ss_probe(&pll, ASIC_INTERNAL_SS_ON_DCPLL);
 		if (pll.ssEnabled)
 			display_crtc_ss(&pll, ATOM_DISABLE);
-		pll_external_set(pll.pixelClock);
+		pll_set_external(pll.pixelClock);
 		if (pll.ssEnabled)
 			display_crtc_ss(&pll, ATOM_ENABLE);
 	}

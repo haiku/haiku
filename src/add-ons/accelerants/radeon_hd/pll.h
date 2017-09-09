@@ -102,7 +102,9 @@ struct pll_info {
 
 
 void pll_external_init();
-status_t pll_external_set(uint32 clock);
+status_t pll_set_external(uint32 clock);
+status_t pll_set_dce(uint32 clock, uint8 clockType, uint8 clockSource);
+
 status_t pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID);
 uint32 pll_usage_mask();
 uint32 pll_usage_count(uint32 pllID);
