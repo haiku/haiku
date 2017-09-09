@@ -771,10 +771,10 @@ fget(int argc, char *argv[])
 }
 
 char *
-onoff(int bool)
+onoff(int value)
 {
 
-	return (bool ? "on" : "off");
+	return (value != 0 ? "on" : "off");
 }
 
 /*
