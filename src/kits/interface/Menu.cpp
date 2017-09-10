@@ -1407,38 +1407,29 @@ BMenu::AddDynamicItem(add_state state)
 void
 BMenu::DrawBackground(BRect updateRect)
 {
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
-		uint32 flags = 0;
-		if (!IsEnabled())
-			flags |= BControlLook::B_DISABLED;
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	if (!IsEnabled())
+		flags |= BControlLook::B_DISABLED;
 
-		if (IsFocus())
-			flags |= BControlLook::B_FOCUSED;
+	if (IsFocus())
+		flags |= BControlLook::B_FOCUSED;
 
-		BRect rect = Bounds();
-		uint32 borders = BControlLook::B_LEFT_BORDER
-			| BControlLook::B_RIGHT_BORDER;
-		if (Window() != NULL && Parent() != NULL) {
-			if (Parent()->Frame().top == Window()->Bounds().top)
-				borders |= BControlLook::B_TOP_BORDER;
+	BRect rect = Bounds();
+	uint32 borders = BControlLook::B_LEFT_BORDER
+		| BControlLook::B_RIGHT_BORDER;
+	if (Window() != NULL && Parent() != NULL) {
+		if (Parent()->Frame().top == Window()->Bounds().top)
+			borders |= BControlLook::B_TOP_BORDER;
 
-			if (Parent()->Frame().bottom == Window()->Bounds().bottom)
-				borders |= BControlLook::B_BOTTOM_BORDER;
-		} else {
-			borders |= BControlLook::B_TOP_BORDER
-				| BControlLook::B_BOTTOM_BORDER;
-		}
-		be_control_look->DrawMenuBackground(this, rect, updateRect, base, 0,
-			borders);
-
-		return;
+		if (Parent()->Frame().bottom == Window()->Bounds().bottom)
+			borders |= BControlLook::B_BOTTOM_BORDER;
+	} else {
+		borders |= BControlLook::B_TOP_BORDER
+			| BControlLook::B_BOTTOM_BORDER;
 	}
-
-	rgb_color oldColor = HighColor();
-	SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
-	FillRect(Bounds() & updateRect, B_SOLID_HIGH);
-	SetHighColor(oldColor);
+	be_control_look->DrawMenuBackground(this, rect, updateRect, base, 0,
+		borders);
 }
 
 

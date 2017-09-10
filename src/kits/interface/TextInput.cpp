@@ -176,24 +176,22 @@ _BTextInput_::AlignTextRect()
 	float hInset = 2;
 	float textFontWidth = TextRect().right;
 
-	if (be_control_look != NULL)  {
-		switch (Alignment()) {
-			case B_ALIGN_LEFT:
-				hInset = be_control_look->DefaultLabelSpacing();
-				break;
+	switch (Alignment()) {
+		case B_ALIGN_LEFT:
+			hInset = be_control_look->DefaultLabelSpacing();
+			break;
 
-			case B_ALIGN_RIGHT:
-				hInset  = textRect.right - textFontWidth;
-				hInset -= be_control_look->DefaultLabelSpacing();
-				break;
+		case B_ALIGN_RIGHT:
+			hInset  = textRect.right - textFontWidth;
+			hInset -= be_control_look->DefaultLabelSpacing();
+			break;
 
-			case B_ALIGN_CENTER:
-				hInset = (textRect.right - textFontWidth) / 2.0;
-				break;
+		case B_ALIGN_CENTER:
+			hInset = (textRect.right - textFontWidth) / 2.0;
+			break;
 
-			default:
-				break;
-		}
+		default:
+			break;
 	}
 
 	textRect.InsetBy(hInset, vInset);

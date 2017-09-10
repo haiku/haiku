@@ -679,13 +679,8 @@ BBox::_DrawPlain(BRect labelBox)
 
 	float lightTint;
 	float shadowTint;
-	if (be_control_look != NULL) {
-		lightTint = B_LIGHTEN_1_TINT;
-		shadowTint = B_DARKEN_1_TINT;
-	} else {
-		lightTint = B_LIGHTEN_MAX_TINT;
-		shadowTint = B_DARKEN_3_TINT;
-	}
+	lightTint = B_LIGHTEN_1_TINT;
+	shadowTint = B_DARKEN_1_TINT;
 
 	if (rect.Height() == 0.0 || rect.Width() == 0.0) {
 		// used as separator
@@ -718,65 +713,18 @@ BBox::_DrawFancy(BRect labelBox)
 	BRect rect = Bounds();
 	rect.top += TopBorderOffset();
 
-	if (be_control_look != NULL) {
-		rgb_color base = ViewColor();
-		if (rect.Height() == 1.0) {
-			// used as horizontal separator
-			be_control_look->DrawGroupFrame(this, rect, rect, base,
-				BControlLook::B_TOP_BORDER);
-		} else if (rect.Width() == 1.0) {
-			// used as vertical separator
-			be_control_look->DrawGroupFrame(this, rect, rect, base,
-				BControlLook::B_LEFT_BORDER);
-		} else {
-			// used as box
-			be_control_look->DrawGroupFrame(this, rect, rect, base);
-		}
-		return;
-	}
-
-	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
-	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
-
+	rgb_color base = ViewColor();
 	if (rect.Height() == 1.0) {
 		// used as horizontal separator
-		BeginLineArray(2);
-			AddLine(BPoint(rect.left, rect.top),
-					BPoint(rect.right, rect.top), shadow);
-			AddLine(BPoint(rect.left, rect.bottom),
-					BPoint(rect.right, rect.bottom), light);
-		EndLineArray();
+		be_control_look->DrawGroupFrame(this, rect, rect, base,
+			BControlLook::B_TOP_BORDER);
 	} else if (rect.Width() == 1.0) {
 		// used as vertical separator
-		BeginLineArray(2);
-			AddLine(BPoint(rect.left, rect.top),
-					BPoint(rect.left, rect.bottom), shadow);
-			AddLine(BPoint(rect.right, rect.top),
-					BPoint(rect.right, rect.bottom), light);
-		EndLineArray();
+		be_control_look->DrawGroupFrame(this, rect, rect, base,
+			BControlLook::B_LEFT_BORDER);
 	} else {
 		// used as box
-		BeginLineArray(8);
-			AddLine(BPoint(rect.left, rect.bottom - 1.0),
-					BPoint(rect.left, rect.top), shadow);
-			AddLine(BPoint(rect.left + 1.0, rect.top),
-					BPoint(rect.right - 1.0, rect.top), shadow);
-			AddLine(BPoint(rect.left, rect.bottom),
-					BPoint(rect.right, rect.bottom), light);
-			AddLine(BPoint(rect.right, rect.bottom - 1.0),
-					BPoint(rect.right, rect.top), light);
-
-			rect.InsetBy(1.0, 1.0);
-
-			AddLine(BPoint(rect.left, rect.bottom - 1.0),
-					BPoint(rect.left, rect.top), light);
-			AddLine(BPoint(rect.left + 1.0, rect.top),
-					BPoint(rect.right - 1.0, rect.top), light);
-			AddLine(BPoint(rect.left, rect.bottom),
-					BPoint(rect.right, rect.bottom), shadow);
-			AddLine(BPoint(rect.right, rect.bottom - 1.0),
-					BPoint(rect.right, rect.top), shadow);
-		EndLineArray();
+		be_control_look->DrawGroupFrame(this, rect, rect, base);
 	}
 }
 

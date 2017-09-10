@@ -430,40 +430,9 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color darken1 = tint_color(base, B_DARKEN_1_TINT);
 
-	if (be_control_look != NULL) {
-		uint32 flags = be_control_look->Flags(this);
-		be_control_look->DrawTextControlBorder(target, rect, updateRect,
-			base, flags);
-	} else {
-		// first bevel
-		rgb_color lighten1 = tint_color(base, B_LIGHTEN_1_TINT);
-		rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
-		target->SetHighColor(enabled ? darken1 : base);
-
-		target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
-		target->StrokeLine(rect.LeftTop(), rect.RightTop());
-		target->SetHighColor(enabled ? lightenmax : lighten1);
-
-		target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom),
-			rect.RightBottom());
-		target->StrokeLine(rect.RightBottom(),
-			BPoint(rect.right, rect.top + 1.0f));
-
-		rect.InsetBy(1.0f, 1.0f);
-
-		// second bevel
-		rgb_color darken2 = tint_color(base, B_DARKEN_2_TINT);
-		rgb_color darken4 = tint_color(base, B_DARKEN_4_TINT);
-		target->SetHighColor(enabled ? darken4 : darken2);
-
-		target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
-		target->StrokeLine(rect.LeftTop(), rect.RightTop());
-		target->SetHighColor(base);
-		target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom),
-			rect.RightBottom());
-		target->StrokeLine(rect.RightBottom(),
-			BPoint(rect.right, rect.top + 1.0f));
-	}
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawTextControlBorder(target, rect, updateRect,
+		base, flags);
 
 	if (fPaletteMode) {
 		int colBegin = max_c(0, -1 + int(updateRect.left) / int(fCellSize));

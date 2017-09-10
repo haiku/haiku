@@ -541,8 +541,7 @@ BScrollView::SetBorderHighlighted(bool highlight)
 		fVerticalScrollBar->SetBorderHighlighted(highlight);
 
 	BRect bounds = Bounds();
-	if (be_control_look != NULL)
-		bounds.InsetBy(1, 1);
+	bounds.InsetBy(1, 1);
 
 	Invalidate(BRect(bounds.left, bounds.top, bounds.right, bounds.top));
 	Invalidate(BRect(bounds.left, bounds.top + 1, bounds.left,
@@ -737,8 +736,7 @@ BScrollView::_Init(bool horizontal, bool vertical)
 	fHighlighted = false;
 	fBorders = BControlLook::B_ALL_BORDERS;
 
-	if (be_control_look != NULL)
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	if (horizontal) {
 		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",

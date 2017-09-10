@@ -349,8 +349,7 @@ _BMCMenuBar_::_Init()
 	bottom--;
 #endif
 
-	if (be_control_look != NULL)
-		left = right = be_control_look->DefaultLabelSpacing();
+	left = right = be_control_look->DefaultLabelSpacing();
 
 	SetItemMargins(left, top,
 		right + fShowPopUpMarker ? kPopUpIndicatorWidth : 0, bottom);

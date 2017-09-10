@@ -345,59 +345,8 @@ BStatusBar::Draw(BRect updateRect)
 
 	rect = outerFrame;
 
-	if (be_control_look != NULL) {
-		be_control_look->DrawStatusBar(this, rect, updateRect,
-			backgroundColor, fBarColor, _BarPosition(barFrame));
-		return;
-	}
-
-	// First bevel
-	SetHighColor(tint_color(backgroundColor, B_DARKEN_1_TINT));
-	StrokeLine(rect.LeftBottom(), rect.LeftTop());
-	StrokeLine(rect.RightTop());
-
-	SetHighColor(tint_color(backgroundColor, B_LIGHTEN_2_TINT));
-	StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
-	StrokeLine(BPoint(rect.right, rect.top + 1));
-
-	rect.InsetBy(1, 1);
-
-	// Second bevel
-	SetHighColor(tint_color(backgroundColor, B_DARKEN_4_TINT));
-	StrokeLine(rect.LeftBottom(), rect.LeftTop());
-	StrokeLine(rect.RightTop());
-
-	SetHighColor(backgroundColor);
-	StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
-	StrokeLine(BPoint(rect.right, rect.top + 1));
-
-	rect = barFrame;
-	rect.right = _BarPosition(barFrame);
-
-	// draw bar itself
-
-	if (rect.right >= rect.left) {
-		// Bevel
-		SetHighColor(tint_color(fBarColor, B_LIGHTEN_2_TINT));
-		StrokeLine(rect.LeftBottom(), rect.LeftTop());
-		StrokeLine(rect.RightTop());
-
-		SetHighColor(tint_color(fBarColor, B_DARKEN_2_TINT));
-		StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
-		StrokeLine(BPoint(rect.right, rect.top + 1));
-
-		// filling
-		SetHighColor(fBarColor);
-		FillRect(rect.InsetByCopy(1, 1));
-	}
-
-	if (rect.right < barFrame.right) {
-		// empty space
-		rect.left = rect.right + 1;
-		rect.right = barFrame.right;
-		SetHighColor(tint_color(backgroundColor, B_LIGHTEN_MAX_TINT));
-		FillRect(rect);
-	}
+	be_control_look->DrawStatusBar(this, rect, updateRect,
+		backgroundColor, fBarColor, _BarPosition(barFrame));
 }
 
 
@@ -595,8 +544,7 @@ BStatusBar::SetTo(float value, const char* text, const char* trailingText)
 	}
 
 	// TODO: Ask the BControlLook in the first place about dirty rect.
-	if (be_control_look != NULL)
-		update.InsetBy(-1, -1);
+	update.InsetBy(-1, -1);
 
 	Invalidate(update);
 }
