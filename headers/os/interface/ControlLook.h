@@ -93,12 +93,11 @@ public:
 	virtual BAlignment			DefaultLabelAlignment() const;
 	virtual float				DefaultLabelSpacing() const;
 
-	// TODO: Make methods virtual before R1 release
-	/*virtual*/	float			DefaultItemSpacing() const;
+	virtual	float				DefaultItemSpacing() const;
 
 	static	float				ComposeSpacing(float spacing);
 
-	/*virtual*/ uint32			Flags(BControl* control) const;
+	virtual uint32				Flags(BControl* control) const;
 
 	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
@@ -106,14 +105,14 @@ public:
 									const rgb_color& background,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
-	/*virtual*/	void			DrawButtonFrame(BView* view, BRect& rect,
+	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									float radius,
 									const rgb_color& base,
 									const rgb_color& background,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
-	/*virtual*/	void			DrawButtonFrame(BView* view, BRect& rect,
+	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									float leftTopRadius,
 									float rightTopRadius,
@@ -130,14 +129,14 @@ public:
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
 									orientation orientation = B_HORIZONTAL);
-	/*virtual*/	void			DrawButtonBackground(BView* view, BRect& rect,
+	virtual	void				DrawButtonBackground(BView* view, BRect& rect,
 									const BRect& updateRect,
 									float radius,
 									const rgb_color& base,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
 									orientation orientation = B_HORIZONTAL);
-	/*virtual*/	void			DrawButtonBackground(BView* view, BRect& rect,
+	virtual	void				DrawButtonBackground(BView* view, BRect& rect,
 									const BRect& updateRect,
 									float leftTopRadius,
 									float rightTopRadius,
@@ -160,14 +159,14 @@ public:
 									const rgb_color& background,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
-	/*virtual*/	void			DrawMenuFieldFrame(BView* view, BRect& rect,
+	virtual	void				DrawMenuFieldFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									float radius,
 									const rgb_color& base,
 									const rgb_color& background,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
-	/*virtual*/	void			DrawMenuFieldFrame(BView* view, BRect& rect,
+	virtual	void				DrawMenuFieldFrame(BView* view, BRect& rect,
 									const BRect& updateRect,
 									float leftTopRadius,
 									float rightTopRadius,
@@ -182,11 +181,11 @@ public:
 									BRect& rect, const BRect& updateRect,
 									const rgb_color& base, bool popupIndicator,
 									uint32 flags = 0);
-	/*virtual*/	void			DrawMenuFieldBackground(BView* view,
+	virtual	void				DrawMenuFieldBackground(BView* view,
 									BRect& rect, const BRect& updateRect,
 									float radius, const rgb_color& base,
 									bool popupIndicator, uint32 flags = 0);
-	/*virtual*/	void			DrawMenuFieldBackground(BView* view,
+	virtual	void				DrawMenuFieldBackground(BView* view,
 									BRect& rect, const BRect& updateRect,
 									float leftTopRadius,
 									float rightTopRadius,
@@ -235,7 +234,7 @@ public:
 									const rgb_color& base, uint32 flags,
 									orientation orientation);
 
-	/*virtual*/	void			DrawScrollViewFrame(BView* view,
+	virtual	void				DrawScrollViewFrame(BView* view,
 									BRect& rect, const BRect& updateRect,
 									BRect verticalScrollBarFrame,
 									BRect horizontalScrollBarFrame,
@@ -244,7 +243,7 @@ public:
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
-	/*virtual*/	void			DrawArrowShape(BView* view,
+	virtual	void				DrawArrowShape(BView* view,
 									BRect& rect, const BRect& updateRect,
 									const rgb_color& base, uint32 direction,
 									uint32 flags = 0,
@@ -269,7 +268,7 @@ public:
 									const rgb_color& base, uint32 flags,
 									orientation orientation);
 
-	/*virtual*/	void			DrawSliderTriangle(BView* view, BRect& rect,
+	virtual	void				DrawSliderTriangle(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
 									orientation orientation);
@@ -297,7 +296,7 @@ public:
 									uint32 borders = B_ALL_BORDERS,
 									uint32 side = B_TOP_BORDER);
 
-	/*virtual*/	void			DrawSplitter(BView* view, BRect& rect,
+	virtual	void				DrawSplitter(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
 									orientation orientation,
@@ -329,7 +328,7 @@ public:
 
 	// aligned labels
 
-	/*virtual*/	void			DrawLabel(BView* view, const char* label,
+	virtual	void				DrawLabel(BView* view, const char* label,
 									BRect rect, const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
 									const rgb_color* textColor = NULL);
@@ -341,7 +340,7 @@ public:
 	// TODO: Would be nice to have a (non-virtual) version of this method
 	// which takes an array of labels and locations. That would save some
 	// setup with the view graphics state.
-	/*virtual*/	void			DrawLabel(BView* view, const char* label,
+	virtual	void				DrawLabel(BView* view, const char* label,
 									const rgb_color& base, uint32 flags,
 									const BPoint& where,
 									const rgb_color* textColor = NULL);
