@@ -1102,7 +1102,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, const char* name)
 	int32 count = fShelf->CountReplicants() - 1;
 	for (int32 repIndex = count; repIndex >= 0; repIndex--) {
 		fShelf->ReplicantAt(repIndex, &view, (uint32*)id);
-		if (view != NULL && *(view->Name()) != '\0'
+		if (view != NULL && view->Name() != NULL
 			&& strcmp(name, view->Name()) == 0) {
 			*index = repIndex;
 
