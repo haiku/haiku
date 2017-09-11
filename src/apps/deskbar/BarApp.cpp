@@ -334,6 +334,12 @@ TBarApp::InitSettings()
 				fDefaultSettings.autoHide);
 		}
 
+		// constrain width setting within limits
+		if (settings.width < gMinimumWindowWidth)
+			settings.width = gMinimumWindowWidth;
+		else if (settings.width > gMaximumWindowWidth)
+			settings.width = gMaximumWindowWidth;
+
 		filePath = dirPath;
 		filePath.Append(clockSettingsFileName);
 		fClockSettingsFile = new BFile(filePath.Path(), O_RDWR);
