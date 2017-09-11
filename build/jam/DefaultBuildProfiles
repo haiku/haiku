@@ -217,6 +217,9 @@ rule DefineDefaultBuildProfiles
 		case "minimum-*" : {
 			Echo Building Haiku Minimum Target ;
 			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+			if $(DEBUG) != 0 {
+				HAIKU_IMAGE_SIZE ?= 450 ;
+			}
 
 			AddHaikuImagePackages
 				;
