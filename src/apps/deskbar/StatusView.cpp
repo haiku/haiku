@@ -841,10 +841,8 @@ TReplicantTray::ItemInfo(const char* name, int32* id)
 
 	int32 index;
 	BView* view = ViewAt(&index, id, name);
-	if (view != NULL)
-		return B_OK;
 
-	return B_ERROR;
+	return view != NULL ? B_OK : B_ERROR;
 }
 
 
@@ -1016,7 +1014,8 @@ TReplicantTray::RemoveIcon(const char* name)
 	if (name == NULL || *name == '\0')
 		return;
 
-	int32 id, index;
+	int32 index;
+	int32 id;
 	BView* view = ViewAt(&index, &id, name);
 	if (view != NULL && index >= 0) {
 		// remove the reference from the item list & shelf
@@ -1219,12 +1218,11 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 BRect
 TReplicantTray::IconFrame(int32 target, bool byIndex)
 {
-	int32 index, id;
+	int32 index;
+	int32 id;
 	BView* view = ViewAt(&index, &id, target, byIndex);
-	if (view != NULL)
-		return view->Frame();
 
-	return BRect(0, 0, 0, 0);
+	return view != NULL ? view->Frame() : BRect(0, 0, 0, 0);
 }
 
 
@@ -1234,12 +1232,11 @@ TReplicantTray::IconFrame(const char* name)
 	if (name == NULL)
 		return BRect(0, 0, 0, 0);
 
-	int32 id, index;
+	int32 index;
+	int32 id;
 	BView* view = ViewAt(&index, &id, name);
-	if (view != NULL)
-		return view->Frame();
 
-	return BRect(0, 0, 0, 0);
+	return view != NULL ? view->Frame() : BRect(0, 0, 0, 0);
 }
 
 
