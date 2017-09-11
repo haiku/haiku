@@ -41,6 +41,7 @@
 #include <DecorInfo.h>
 #include <DefaultColors.h>
 #include <DesktopLink.h>
+#include <HaikuControlLook.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
 #include <InterfacePrivate.h>
@@ -1286,7 +1287,7 @@ _init_interface_kit_()
 		be_clipboard = new BClipboard(NULL);
 
 	// TODO: Could support different themes here in the future.
-	be_control_look = new BControlLook();
+	be_control_look = new HaikuControlLook();
 
 	_init_global_fonts_();
 
