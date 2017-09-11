@@ -1675,6 +1675,10 @@ TResizeControl::Draw(BRect updateRect)
 
 	BRect dragRegion(updateRect);
 
+	int32 height = dragRegion.IntegerHeight();
+	if (height <= 0)
+		return;
+
 	rgb_color menuColor = ViewColor();
 	rgb_color menuHilite = menuColor;
 	if (IsTracking()) {
@@ -1690,7 +1694,7 @@ TResizeControl::Draw(BRect updateRect)
 	rgb_color vdark = tint_color(menuHilite, B_DARKEN_3_TINT);
 	rgb_color light = tint_color(menuHilite, B_LIGHTEN_2_TINT);
 
-	BeginLineArray(dragRegion.IntegerHeight());
+	BeginLineArray(height);
 	BPoint where;
 	where.x = floorf((dragRegion.left + dragRegion.right) / 2 + 0.5) - 1;
 	where.y = dragRegion.top + 2;
