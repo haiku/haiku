@@ -18,7 +18,6 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 
 #include <KernelExport.h>
 #include <Select.h>
@@ -430,7 +429,6 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fSendWindow(0),
 	fSendMaxWindow(0),
 	fSendMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
-	fSendMaxSegments(0),
 	fSendQueue(socket->send.buffer_size),
 	fInitialSendSequence(0),
 	fPreviousHighestAcknowledge(0),
@@ -1432,14 +1430,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 			fFlags &= ~FLAG_OPTION_SACK_PERMITTED;
 	}
 
-	if (fSendMaxSegmentSize > 2190)
-		fCongestionWindow = 2 * fSendMaxSegmentSize;
-	else if (fSendMaxSegmentSize > 1095)
-		fCongestionWindow = 3 * fSendMaxSegmentSize;
-	else
-		fCongestionWindow = 4 * fSendMaxSegmentSize;
-
-	fSendMaxSegments = fCongestionWindow / fSendMaxSegmentSize;
+	fCongestionWindow = 2 * fSendMaxSegmentSize;
 	fSlowStartThreshold = (uint32)segment.advertised_window << fSendWindowShift;
 }
 
@@ -1959,9 +1950,6 @@ inline bool
 TCPEndpoint::_ShouldSendSegment(tcp_segment_header& segment, uint32 length,
 	uint32 segmentMaxSize, uint32 flightSize)
 {
-	if (fState == ESTABLISHED && fSendMaxSegments == 0)
-		return false;
-
 	if (length > 0) {
 		// Avoid the silly window syndrome - we only send a segment in case:
 		// - we have a full segment to send, or
@@ -2198,9 +2186,6 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		fReceiveMaxAdvertised = fReceiveNext
 			+ ((uint32)segment.advertised_window << fReceiveWindowShift);
 
-		if (segmentLength != 0 && fState == ESTABLISHED)
-			--fSendMaxSegments;
-
 		status = next->module->send_routed_data(next, fRoute, buffer);
 		if (status < B_OK) {
 			gBufferModule->free(buffer);
@@ -2298,45 +2283,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 
 	if (fSendUnacknowledged < segment.acknowledge) {
 		fSendQueue.RemoveUntil(segment.acknowledge);
-		uint32 bytesAcknowledged = segment.acknowledge - fSendUnacknowledged.Number();
-		fPreviousHighestAcknowledge = fSendUnacknowledged;
 		fSendUnacknowledged = segment.acknowledge;
-
-		if (fPreviousHighestAcknowledge > fSendUnacknowledged) {
-			// need to update the recover variable upon a sequence wraparound
-			fRecover = segment.acknowledge - 1;
-		}
-
-		// the acknowledgment of the SYN/ACK MUST NOT increase the size of the congestion window
-		if (fSendUnacknowledged != fInitialSendSequence) {
-			if (fCongestionWindow < fSlowStartThreshold)
-				fCongestionWindow += min_c(bytesAcknowledged, fSendMaxSegmentSize);
-			else {
-				uint32 increment = fSendMaxSegmentSize * fSendMaxSegmentSize;
-
-				if (increment < fCongestionWindow)
-					increment = 1;
-				else
-					increment /= fCongestionWindow;
-
-				fCongestionWindow += increment;
-			}
-
-			fSendMaxSegments = UINT32_MAX;
-		}
-
-		if ((fFlags & FLAG_RECOVERY) != 0) {
-			fSendNext = fSendUnacknowledged;
-			_SendQueued();
-			fCongestionWindow -= bytesAcknowledged;
-
-			if (bytesAcknowledged > fSendMaxSegmentSize)
-				fCongestionWindow += fSendMaxSegmentSize;
-
-			fSendNext = fSendMax;
-		} else
-			fDuplicateAcknowledgeCount = 0;
-
 		if (fSendNext < fSendUnacknowledged)
 			fSendNext = fSendUnacknowledged;
 
@@ -2370,6 +2317,20 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 			fSendCondition.NotifyAll();
 			gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Free());
 		}
+
+		if (fCongestionWindow < fSlowStartThreshold)
+			fCongestionWindow += fSendMaxSegmentSize;
+	}
+
+	if (fCongestionWindow >= fSlowStartThreshold) {
+		uint32 increment = fSendMaxSegmentSize * fSendMaxSegmentSize;
+
+		if (increment < fCongestionWindow)
+			increment = 1;
+		else
+			increment /= fCongestionWindow;
+
+		fCongestionWindow += increment;
 	}
 
 	// if there is data left to be sent, send it now
@@ -2381,36 +2342,16 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 void
 TCPEndpoint::_Retransmit()
 {
-	if (fState < ESTABLISHED) {
-		fRetransmitTimeout = TCP_SYN_RETRANSMIT_TIMEOUT;
-		fCongestionWindow = fSendMaxSegmentSize;
-	} else if (fSendUnacknowledged == fSendMax) {
-		TRACE("Ideal timeout");
-		// idle period time out - did not receive any segment for a time equal
-		// to the retransmission timeout
-
-		uint32 initialWindow;
-		if (fSendMaxSegmentSize > 2190)
-			initialWindow = 2 * fSendMaxSegmentSize;
-		else if (fSendMaxSegmentSize > 1095)
-			initialWindow = 3 * fSendMaxSegmentSize;
-		else
-			initialWindow = 4 * fSendMaxSegmentSize;
-
-		fCongestionWindow = min_c(initialWindow, fCongestionWindow);
-		return;
-	} else {
-		_ResetSlowStart();
-		fDuplicateAcknowledgeCount = 0;
-		// Do exponential back off of the retransmit timeout
-		fRetransmitTimeout *= 2;
-		if (fRetransmitTimeout > TCP_MAX_RETRANSMIT_TIMEOUT)
-			fRetransmitTimeout = TCP_MAX_RETRANSMIT_TIMEOUT;
-	}
-
 	TRACE("Retransmit()");
 
+	_ResetSlowStart();
 	fSendNext = fSendUnacknowledged;
+
+	// Do exponential back off of the retransmit timeout
+	fRetransmitTimeout *= 2;
+	if (fRetransmitTimeout > TCP_MAX_RETRANSMIT_TIMEOUT)
+		fRetransmitTimeout = TCP_MAX_RETRANSMIT_TIMEOUT;
+
 	_SendQueued();
 
 	fRecover = fSendNext.Number() - 1;

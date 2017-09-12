@@ -193,8 +193,6 @@ operator==(tcp_sequence a, tcp_sequence b)
 #define TCP_MIN_RETRANSMIT_TIMEOUT		200000		// 200 msecs
 // Maximum retransmit timeout (per RFC6298)
 #define TCP_MAX_RETRANSMIT_TIMEOUT		60000000	// 60 secs
-// New value for timeout in case of lost SYN (RFC 6298)
-#define TCP_SYN_RETRANSMIT_TIMEOUT 		3000000		// 3 secs
 
 struct tcp_sack {
 	uint32 left_edge;

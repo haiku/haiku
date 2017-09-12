@@ -145,7 +145,6 @@ private:
 	uint32			fSendWindow;
 	uint32			fSendMaxWindow;
 	uint32			fSendMaxSegmentSize;
-	uint32			fSendMaxSegments;
 	BufferQueue		fSendQueue;
 	tcp_sequence	fLastAcknowledgeSent;
 	tcp_sequence	fInitialSendSequence;
