@@ -449,19 +449,20 @@ display_get_encoder_mode(uint32 connectorIndex)
 			return ATOM_ENCODER_MODE_DVO;
 	}
 
-	// Find crtc for connector so we can identify source of edid data
-	int32 crtc = -1;
+	// Find display for connector so we can identify source of edid data
+	int32 crtcID = -1;
 	for (int32 id = 0; id < MAX_DISPLAY; id++) {
 		if (gDisplay[id]->connectorIndex == connectorIndex) {
-			crtc = id;
+			crtcID = id;
 			break;
 		}
 	}
 	bool edidDigital = false;
-	if (crtc == -1) {
-		ERROR("%s: BUG: executed on connector without crtc!\n", __func__);
+	if (crtcID == -1) {
+		ERROR("%s: BUG: executed on connector without assigned display!\n",
+			__func__);
 	} else {
-		edid1_info* edid = &gDisplay[crtc]->edidData;
+		edid1_info* edid = &gDisplay[crtcID]->edidData;
 		edidDigital = edid->display.input_type ? true : false;
 	}
 
