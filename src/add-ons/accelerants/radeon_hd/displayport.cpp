@@ -13,6 +13,7 @@
 #include <Debug.h>
 
 #include "accelerant_protos.h"
+#include "atombios-obsolete.h"
 #include "connector.h"
 #include "mode.h"
 #include "edid.h"
@@ -328,6 +329,28 @@ dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 
 
 uint32
+dp_get_encoder_config(uint32 connectorIndex)
+{
+	uint32 result = 0;
+
+	uint32 digEncoderID = encoder_pick_dig(connectorIndex);
+	if (digEncoderID)
+		result |= ATOM_DP_CONFIG_DIG2_ENCODER;
+	else
+		result |= ATOM_DP_CONFIG_DIG1_ENCODER;
+
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
+		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
+	if (linkB)
+		result |= ATOM_DP_CONFIG_LINK_B;
+	else
+		result |= ATOM_DP_CONFIG_LINK_A;
+
+	return result;
+}
+
+
+uint32
 dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
 {
 	// Radeon specific
@@ -541,17 +564,21 @@ dp_clock_equalization_ok(dp_info* dp)
 	uint8 laneAlignment
 		= dp->linkStatus[DP_LANE_ALIGN - DP_LANE_STATUS_0_1];
 
-	if ((laneAlignment & DP_LANE_ALIGN_DONE) == 0)
+	if ((laneAlignment & DP_LANE_ALIGN_DONE) == 0) {
+		TRACE("%s: false. Lane alignment incomplete.\n", __func__);
 		return false;
+	}
 
 	int lane;
 	for (lane = 0; lane < dp->laneCount; lane++) {
 		uint8 laneStatus = dp_get_lane_status(dp, lane);
 		if ((laneStatus & DP_LANE_STATUS_EQUALIZED_A)
 			!= DP_LANE_STATUS_EQUALIZED_A) {
+			TRACE("%s: false. Lanes not yet equalized.\n", __func__);
 			return false;
 		}
 	}
+	TRACE("%s: true. Lanes equalized.\n", __func__);
 	return true;
 }
 
@@ -649,24 +676,39 @@ static void
 dp_set_tp(uint32 connectorIndex, int trainingPattern)
 {
 	TRACE("%s\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	int rawTrainingPattern = 0;
 
-	/* set training pattern on the source */
-	TRACE("%s: Training with encoder...\n", __func__);
-	switch (trainingPattern) {
-		case DP_TRAIN_PATTERN_1:
-			rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
-			break;
-		case DP_TRAIN_PATTERN_2:
-			rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
-			break;
-		case DP_TRAIN_PATTERN_3:
-			rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
-			break;
+	if (info.dceMajor >= 4) {
+		TRACE("%s: Training with encoder...\n", __func__);
+		switch (trainingPattern) {
+			case DP_TRAIN_PATTERN_1:
+				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
+				break;
+			case DP_TRAIN_PATTERN_2:
+				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
+				break;
+			case DP_TRAIN_PATTERN_3:
+				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
+				break;
+		}
+		encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
+	} else {
+		switch (trainingPattern) {
+			case DP_TRAIN_PATTERN_1:
+				rawTrainingPattern = 0;
+				break;
+			case DP_TRAIN_PATTERN_2:
+				rawTrainingPattern = 1;
+				break;
+		}
+		uint32 encoderConfig = dp_get_encoder_config(connectorIndex);
+		dp_encoder_service(ATOM_DP_ACTION_TRAINING_PATTERN_SEL, pll->pixelClock,
+			rawTrainingPattern, encoderConfig);
 	}
-	encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
 
 	// Enable training pattern on the sink
 	dpcd_reg_write(connectorIndex, DP_TRAIN, trainingPattern);
@@ -676,7 +718,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 status_t
 dp_link_train_cr(uint32 connectorIndex)
 {
-	TRACE("%s\n", __func__);
+	TRACE("%s: connector %" B_PRIu32 "\n", __func__, connectorIndex);
 
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
@@ -748,7 +790,7 @@ dp_link_train_cr(uint32 connectorIndex)
 status_t
 dp_link_train_ce(uint32 connectorIndex, bool tp3Support)
 {
-	TRACE("%s\n", __func__);
+	TRACE("%s: connector %" B_PRIu32 "\n", __func__, connectorIndex);
 
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
@@ -853,9 +895,16 @@ dp_link_train(uint8 crtcID)
 	sandbox = dp_encode_link_rate(dp->linkRate);
 	dpcd_reg_write(connectorIndex, DP_LINK_RATE, sandbox);
 
+	uint32 encoderConfig = dp_get_encoder_config(connectorIndex);
+
 	// Start link training on source
-	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
-		ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
+	if (info.dceMajor >= 4) {
+		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
+			ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
+	} else {
+		dp_encoder_service(ATOM_DP_ACTION_TRAINING_START,
+			mode->timing.pixel_clock, 0, encoderConfig);
+	}
 
 	// Disable the training pattern on the sink
 	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
@@ -870,8 +919,13 @@ dp_link_train(uint8 crtcID)
 	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	// Disable the training pattern on the source
-	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
-		ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
+	if (info.dceMajor >= 4) {
+		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
+			ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
+	} else {
+		dp_encoder_service(ATOM_DP_ACTION_TRAINING_COMPLETE,
+			mode->timing.pixel_clock, 0, encoderConfig);
+	}
 
 	return B_OK;
 }
