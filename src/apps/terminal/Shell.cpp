@@ -74,7 +74,7 @@
 
 // TODO: should extract from /etc/passwd instead???
 const char *kDefaultShell = "/bin/sh";
-const char *kTerminalType = "xterm";
+const char *kTerminalType = "xterm-256color";
 
 /*
  * Set environment variable.
