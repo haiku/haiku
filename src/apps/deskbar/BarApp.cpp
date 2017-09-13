@@ -480,8 +480,8 @@ TBarApp::MessageReceived(BMessage* message)
 			break;
 
 		case kAutoRaise:
-			fSettings.autoRaise = fSettings.alwaysOnTop ? false :
-				!fSettings.autoRaise;
+			fSettings.autoRaise = fSettings.alwaysOnTop ? false
+				: !fSettings.autoRaise;
 
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);

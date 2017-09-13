@@ -504,7 +504,6 @@ TExpandoMenuBar::BuildItems()
 
 			if (fFirstBuild && fVertical && settings->expandNewTeams)
 				item->ToggleExpandState(true);
-
 		} else {
 			// existing team, update info and add it
 			TTeamMenuItem* item = iter->second;
