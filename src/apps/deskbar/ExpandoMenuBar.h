@@ -63,6 +63,7 @@ class TExpandoMenuBar : public BMenuBar {
 public:
 							TExpandoMenuBar(TBarView* barView, bool vertical);
 
+	virtual	void			AllAttached();
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();
 
