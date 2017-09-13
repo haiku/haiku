@@ -252,6 +252,7 @@ TBarWindow::FrameResized(float width, float height)
 		if (fBarView->Vertical() && fBarView->ExpandoState())
 			fBarView->ExpandoMenuBar()->SetMaxContentWidth(width);
 
+		fBarView->UpdatePlacement();
 		Unlock();
 	}
 }

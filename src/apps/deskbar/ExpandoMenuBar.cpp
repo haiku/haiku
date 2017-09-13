@@ -114,15 +114,6 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 
 
 void
-TExpandoMenuBar::AllAttached()
-{
-	BMenuBar::AllAttached();
-
-	SizeWindow(0);
-}
-
-
-void
 TExpandoMenuBar::AttachedToWindow()
 {
 	BMenuBar::AttachedToWindow();
