@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2017.07.29
-# Date:    2017-07-29 20:34:07
+# Version: 2017.09.10
+# Date:    2017-09-10 20:34:07
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -18145,6 +18145,9 @@
 	2d50  Kova+ Mouse
 	2d51  Kone+ Mouse
 	30d4  Arvo Keyboard
+1ea7  SHARKOON Technologies GmbH
+	0066  [Mediatrack Edge Mini Keyboard]
+	2007  SHARK ZONE K30 Illuminated Gaming Keyboard
 1ebb  NuCORE Technology, Inc.
 1eda  AirTies Wireless Networks
 	2012  Air2210 54 Mbps Wireless Adapter
