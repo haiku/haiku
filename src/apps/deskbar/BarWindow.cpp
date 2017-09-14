@@ -243,16 +243,18 @@ TBarWindow::FrameResized(float width, float height)
 		else
 			newWidth = width;
 
+		float oldWidth = static_cast<TBarApp*>(be_app)->Settings()->width;
+
 		// update width setting
 		static_cast<TBarApp*>(be_app)->Settings()->width = newWidth;
-	}
 
-	if (Lock()) {
-		fBarView->ResizeTo(width, fBarView->Bounds().Height());
-		if (fBarView->Vertical() && fBarView->ExpandoState())
-			fBarView->ExpandoMenuBar()->SetMaxContentWidth(width);
+		if (oldWidth != newWidth) {
+			fBarView->ResizeTo(width, fBarView->Bounds().Height());
+			if (fBarView->Vertical() && fBarView->ExpandoState())
+				fBarView->ExpandoMenuBar()->SetMaxContentWidth(width);
 
-		Unlock();
+			fBarView->UpdatePlacement();
+		}
 	}
 }
 
