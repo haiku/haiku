@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1427,6 +1427,16 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 	fImageFunctionsView->SetFunction(fActiveFunction);
 
 	locker.Lock();
+
+	// if we already have an active stack frame at the requested
+	// function, we're done. This will be the case if e.g. the function
+	// is being set as a result of a call to _SetActiveStackFrame(), and
+	// would otherwise lead to issues in recursive cases where the wrong
+	// frame might mistakenly be selected.
+	if (fActiveStackFrame != NULL
+			&& fActiveStackFrame->Function() == fActiveFunction) {
+		return;
+	}
 
 	// look if our current stack trace has a frame matching the selected
 	// function. If so, set it to match.
