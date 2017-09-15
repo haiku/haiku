@@ -36,7 +36,7 @@ extern int	dlclose(void *image);
 extern char	*dlerror(void);
 extern void	*dlopen(const char *path, int mode);
 extern void *dlsym(void *image, const char *symbolName);
-extern int dladdr(void *addr, Dl_info *info);
+extern int dladdr(const void *addr, Dl_info *info);
 
 #ifdef __cplusplus
 }

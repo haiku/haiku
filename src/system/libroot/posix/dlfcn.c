@@ -72,7 +72,7 @@ dlerror(void)
 
 
 int
-dladdr(void *address, Dl_info *info)
+dladdr(const void *address, Dl_info *info)
 {
 	image_id image;
 	char* imagePath;
