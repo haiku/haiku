@@ -1,11 +1,13 @@
-1	german	x-vnd.Haiku-Backgrounds	3513602073
+1	german	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Hintergründe
 X:	Main View		X:
+Setting the background image failed:	Main View		Hintergrundbild konnte nicht gesetzt werden:
 Resolution: 	Image Filepanel		Auflösung:
 pick one	Main View		Auswählen
 Default	Main View		Standard
 Center	Main View		Zentriert
 Manual	Main View		Manuell
+Set background image error	Main View		Fehler beim Setzen des Hintergrundbilds
 Default folder	Main View		Vorgabeordner
 Revert	Main View		Anfangswerte
 None	Main View		Kein
@@ -20,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Gekachelt
 Select	Main View		Auswählen
 Scale to fit	Main View		Passend skaliert
+OK	Main View		OK
 Placement:	Main View		Platzierung:
 Preview	Main View		Vorschau
 Image:	Main View		Bild:

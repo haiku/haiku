@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Repositories	3761636112
+1	german	x-vnd.Haiku-Repositories	3072072887
 Completed	TaskLooper	Completed task status message	Fertig
 Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Für jede Paketquelle kann nur eine URL aktiv sein.  Bitte Auswahl ändern.
 Repositories	System name		Paketquellen
@@ -14,11 +14,13 @@ Repository URL:	AddRepoWindow	Text box label	Paketquellen URL:
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Ermitteln der Paketquellen Konfiguration für %name% fehlgeschlagen.
 Details	TaskLooper	Job log details header	Details
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Gute Nachricht! Der Auftrag für die Paketquelle %name% wurde abgeschlossen.
+Status	RepositoriesView	Column title	Status
 Aborted	TaskLooper	Aborted task status message	Abgebrochen
 Remove	RepositoriesView	Button label	Entfernen
 Changes completed	RepositoriesView	Status view text	Änderungen abgeschlossen
 Name	RepositoriesView	Column title	Name
 Enable	RepositoriesView	Button label	Aktivieren
+Enable repositories to use with package management:	RepositoriesView	Label text	Paketquellen für das Paketmanagement aktivieren:
 Remove All	RepositoriesView	Button label	Alle entfernen
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Aktualisieren des Paketquellen Cache für %name% fehlgeschlagen
 Failed	TaskLooper	Failed task status message	Fehlgeschlagen

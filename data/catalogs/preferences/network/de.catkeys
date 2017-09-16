@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	2512967175
+1	german	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Statisch
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Dienste
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Automatisch wählen
 connected	IntefaceView		verbunden
 Ethernet device	InterfaceListItem		Ethernet-Gerät
 The netmask defines your local network	IntefaceAddressView		Die Netzmaske definiert das lokale Netzwerk
+Dial-up connection	InterfaceListItem		Einwählverbindung
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Netzwerk
+VPN connection	InterfaceListItem		VPN Verbindung
 Show network status in Deskbar	NetworkWindow		NetworkStatus in der Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Die Art wie IP Adressen bezogen werden
 connected	InterfaceListItem		verbunden
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Gesendet:
 open	Open network		frei
 IP Address:	IntefaceAddressView		IP-Adresse:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Empfangen:
 Disable	IntefaceView		Deaktivieren
 <no wireless networks found>	IntefaceView		<keine Funknetzwerke gefunden>

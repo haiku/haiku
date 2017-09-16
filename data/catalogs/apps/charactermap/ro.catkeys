@@ -1,12 +1,16 @@
-1	romanian	x-vnd.Haiku-CharacterMap	1534181938
+1	romanian	x-vnd.Haiku-CharacterMap	1052258827
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Basic Latin	UnicodeBlocks		Latină de bază
+Cyrillic extended C	UnicodeBlocks		Chirilic extins C
 View	CharacterWindow		Vizualizare
+Cherokee supplement	UnicodeBlocks		Supliment Cherokee
 Latin-1 supplement	UnicodeBlocks		Supliment latină-1
 Hebrew	UnicodeBlocks		Ebraică
 Georgian supplement	UnicodeBlocks		Supliment georgian
+Multani	UnicodeBlocks		Multani
 CJK unified ideographs	UnicodeBlocks		Ideografuri unificate CJK
 Modifier tone letters	UnicodeBlocks		Litere de modificare a tonului
+Old Hungarian	UnicodeBlocks		Maghiară Veche
 Khmer	UnicodeBlocks		Khmer
 Supplementary private use area A	UnicodeBlocks		Zonă suplimentară A pentru utilizare personală
 Hanunoo	UnicodeBlocks		Hanunoo
@@ -26,6 +30,7 @@ Arabic	UnicodeBlocks		Arabic
 Ethiopic extended	UnicodeBlocks		Etiopic extins
 Arrows	UnicodeBlocks		Săgeți
 Font	CharacterWindow		Font
+Hatran	UnicodeBlocks		Hatran
 Variation selectors supplement	UnicodeBlocks		Supliment selectori de variație
 Gujarati	UnicodeBlocks		Gujarati
 Cuneiform	UnicodeBlocks		Cuneiform
@@ -33,6 +38,7 @@ CJK radicals supplement	UnicodeBlocks		Supliment radicali CJK
 Balinese	UnicodeBlocks		Balineză
 Cham	UnicodeBlocks		Cham
 Specials	UnicodeBlocks		Speciale
+Ahom	UnicodeBlocks		Ahom
 CJK compatibility ideographs	UnicodeBlocks		Ideografuri de compatibilitate CJK
 Phonetic extensions	UnicodeBlocks		Extensii fonetice
 Khmer symbols	UnicodeBlocks		Simboluri khmer
@@ -100,6 +106,7 @@ Combining diacritical marks	UnicodeBlocks		Combinare semne diacritice
 Supplement punctuation	UnicodeBlocks		Supliment de punctuație
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Silabe aborigene canadiene unificate
 Ugaritic	UnicodeBlocks		Ugaritic
+Tangut	UnicodeBlocks		Tangut
 CJK symbols and punctuation	UnicodeBlocks		Simboluri și punctuație CJK
 File	CharacterWindow		Fișier
 Number forms	UnicodeBlocks		Forme de numere
@@ -108,6 +115,7 @@ Tags	UnicodeBlocks		Etichete
 Cypriot syllabary	UnicodeBlocks		Silabar cipriot
 Counting rod numerals	UnicodeBlocks		Numărare cu bețișoare
 Latin extended A	UnicodeBlocks		Latină extinsă A
+Tangut components	UnicodeBlocks		Componente Tangut
 Miscellaneous symbols	UnicodeBlocks		Simboluri diverse
 Saurashtra	UnicodeBlocks		Saurashtra
 Optical character recognition	UnicodeBlocks		Recunoaștere caractere optice
@@ -122,8 +130,11 @@ Ancient Greek numbers	UnicodeBlocks		Numere greacă veche
 Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Radicali Yi
 Cyrillic extended B	UnicodeBlocks		Chirilic extins B
+Mongolian supplement	UnicodeBlocks		Supliment mongol
 Quit	CharacterWindow		Închidere
 Ancient symbols	UnicodeBlocks		Simboluri antice
+Newa	UnicodeBlocks		Newa
+Adlam	UnicodeBlocks		Adlam
 Braille patterns	UnicodeBlocks		Modele Braille
 New Tai Lue	UnicodeBlocks		Tai Lue nou
 Runic	UnicodeBlocks		Runic
@@ -140,6 +151,7 @@ Buhid	UnicodeBlocks		Buhid
 Telugu	UnicodeBlocks		Telugu
 Superscripts and subscripts	UnicodeBlocks		Superscripturi și subscripturi
 Thai	UnicodeBlocks		Thailandeză
+Osage	UnicodeBlocks		Osage
 Deseret	UnicodeBlocks		Deseret
 Tifinagh	UnicodeBlocks		Tifinagh
 Gurmukhi	UnicodeBlocks		Gurmukhi
@@ -161,6 +173,7 @@ Alphabetic presentation forms	UnicodeBlocks		Forme de prezentare alfabetică
 Halfwidth and fullwidth forms	UnicodeBlocks		Forme înjumătățite și întregi
 Lydian	UnicodeBlocks		Lydian
 Ethiopic supplement	UnicodeBlocks		Supliment etiopic
+Glagolitic supplement	UnicodeBlocks		Supliment Glagolitic
 Latin extended B	UnicodeBlocks		Latină extinsă B
 Box drawing	UnicodeBlocks		Casetă de desenare
 Mathematical alphanumeric symbols	UnicodeBlocks		Simboluri alfanumerice matematice

@@ -18,7 +18,7 @@ Error opening downloads folder	Download Window		ダウンロードフォルダ�
 Paste	WebPositive Window		貼り付け
 Expiration	Cookie Manager		有効期限
 Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックかミドルクリックで新規タブを開く。
-Proxy username:	Settings Window		プロキシのユーザー名:
+Proxy username:	Settings Window		ユーザー名:
 Save page as…	WebPositive Window		名前を付けてページを保存…
 Over %days left	Download Window		残り %days 以上
 Settings	Settings Window		設定
@@ -31,7 +31,7 @@ Loading %url	WebPositive Window		%url を読み込み中
 Download aborted	Download Window		ダウンロードが中断されました
 Value	Cookie Manager		値
 Page source	WebPositive Window		ページのソース
-Next	WebPositive Window		次へ進む
+Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
 Download folder:	Settings Window		ダウンロードフォルダー:
 Edit	WebPositive Window		編集
@@ -66,7 +66,7 @@ Cut	WebPositive Window		切り取り
 Bookmark this page	WebPositive Window		このページをブックマーク
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークフォルダーを表示する際にエラーが発生しました。\n\nエラー: %error
 Open downloads folder	Download Window		ダウンロードフォルダーを表示
-Proxy password:	Settings Window		プロキシパスワード:
+Proxy password:	Settings Window		パスワード:
 Number of days to keep links in History menu:	Settings Window		履歴メニューにリンクを保存する日数:
 Hide	Download Window		隠す
 Reset size	WebPositive Window		サイズをリセット
@@ -89,7 +89,7 @@ Open blank page	Settings Window		空白のページを表示
 New tabs:	Settings Window		新規タブ:
 Cancel	WebPositive Window		キャンセル
 Open all	WebPositive Window		すべてを開く
-Proxy server requires authentication	Settings Window		プロキシサーバーは認証が必要です
+Proxy server requires authentication	Settings Window		プロキシサーバーは認証を要求する
 Clear	URL Bar		クリア
 Cut	URL Bar		切り取り
 Clear	WebPositive Window		クリア
@@ -100,8 +100,8 @@ Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
 Script console	WebPositive Window		スクリプトコンソール
 Name	Cookie Manager		名前
-Proxy server address:	Settings Window		プロキシサーバーのアドレス:
-Proxy server port:	Settings Window		プロキシサーバーのポート:
+Proxy server address:	Settings Window		アドレス:
+Proxy server port:	Settings Window		ポート:
 Bookmarks	WebPositive Window		ブックマーク
 Paste	URL Bar		貼り付け
 Cookie manager	WebPositive Window		Cookie マネージャー
@@ -117,14 +117,14 @@ Open search page	Settings Window		検索ページを開く
 Clear	Console Window		クリア
 Password:	Authentication Panel		パスワード:
 Path	Cookie Manager		パス
-Back	WebPositive Window		前に戻る
+Back	WebPositive Window		戻る
 New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
 Over %hours left	Download Window		残り %hours 以上
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを保存する
 Earlier	WebPositive Window		前
 Authentication required	Authentication Panel		認証が必要です
-Use proxy server to connect to the internet	Settings Window		インターネットへの接続は、プロキシサーバーを使用してください
+Use proxy server to connect to the internet	Settings Window		インターネット接続に、プロキシサーバーを使用する
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		まだダウンロードが進行中です。本当に WebPositive をすぐに終了しますか?
 Auto-hide interface in full screen mode	Settings Window		全画面表示で自動的にインターフェースを隠す
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
@@ -134,7 +134,7 @@ Downloads in progress	WebPositive		ダウンロードが進行中です
 Style:	Font Selection view		スタイル:
 General	Settings Window		一般
 View	WebPositive Window		表示
-Previous	WebPositive Window		前へ戻る
+Previous	WebPositive Window		前へ
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークファイルの作成時にエラーが発生しました。\n\nエラー: %error
 Bookmark error	WebPositive Window		ブックマークエラー
 Do you really want to clear the browsing history?	WebPositive Window		閲覧履歴を本当に消去しますか?
