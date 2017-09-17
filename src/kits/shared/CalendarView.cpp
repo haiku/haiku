@@ -1110,28 +1110,35 @@ BCalendarView::_DrawItem(BView* owner, BRect frame, const char* text,
 	rgb_color highColor = HighColor();
 
 	rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	rgb_color bgColor = ui_color(B_LIST_BACKGROUND_COLOR);
 	float tintDisabled = B_LIGHTEN_2_TINT;
+	float tintHighlight = B_LIGHTEN_1_TINT;
 
 	if (textColor.red + textColor.green + textColor.blue > 125 * 3)
 		tintDisabled  = B_DARKEN_2_TINT;
 
+	if (bgColor.red + bgColor.green + bgColor.blue > 125 * 3)
+		tintHighlight = B_DARKEN_1_TINT;
+
 	if (isSelected) {
 		SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 		textColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
-	} else
-		SetHighColor(ui_color(B_LIST_BACKGROUND_COLOR));
-
-	if (isHighlight) {
-		textColor = keyboard_navigation_color();
-	}
+	} else if (isHighlight)
+		SetHighColor(tint_color(bgColor, tintHighlight));
+	else
+		SetHighColor(bgColor);
 
 	SetLowColor(HighColor());
 
 	FillRect(frame.InsetByCopy(1.0, 1.0));
 
 	if (focus) {
-		SetHighColor(keyboard_navigation_color());
+		rgb_color focusColor = keyboard_navigation_color();
+		SetHighColor(focusColor);
 		StrokeRect(frame.InsetByCopy(1.0, 1.0));
+
+		if (!isSelected)
+			textColor = focusColor;
 	}
 
 	SetHighColor(textColor);
@@ -1140,6 +1147,13 @@ BCalendarView::_DrawItem(BView* owner, BRect frame, const char* text,
 
 	float offsetH = frame.Width() / 2.0;
 	float offsetV = frame.Height() / 2.0 + FontHeight(owner) / 2.0 - 2.0;
+
+	BFont font(be_plain_font);
+	if (isHighlight)
+		font.SetFace(B_BOLD_FACE);
+	else
+		font.SetFace(B_REGULAR_FACE);
+	SetFont(&font);
 
 	DrawString(text, BPoint(frame.right - offsetH - StringWidth(text) / 2.0,
 			frame.top + offsetV));
