@@ -246,7 +246,11 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 		if (entry.IsSymLink())
 			continue;
 
+
 		if (entry.IsFile()) {
+			entry_ref ref;
+			if ((entry.GetRef(&ref) == B_OK) && (ref.device != Device()))
+				continue;
 			FileInfo *child = new FileInfo;
 			entry.GetRef(&child->ref);
 			entry.GetSize(&child->size);
