@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.09.01
-#	Date:    2017-09-01 03:15:02
+#	Version: 2017.09.17
+#	Date:    2017-09-17 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1635,12 +1635,13 @@
 		1462 2938  Radeon R9 360 OEM
 		1462 3271  Radeon R9 360 OEM
 		1682 7360  Radeon R7 360
-	6660  Sun XT [Radeon HD 8670A/8670M/8690M / R5 M330 / M430]
+	6660  Sun XT [Radeon HD 8670A/8670M/8690M / R5 M330 / M430 / R7 M520]
 		1028 05ea  Radeon HD 8670M
 		1028 06bf  Radeon R5 M335
 		103c 1970  Radeon HD 8670M
 		103c 80be  Radeon R5 M330
 		103c 8136  Radeon R5 M330
+		103c 8329  Radeon R7 M520
 		17aa 3804  Radeon R5 M330
 		17aa 3809  Radeon R5 M330
 		17aa 381a  Radeon R5 M430
@@ -2162,6 +2163,7 @@
 # GV-R928XOC-3GD
 		1458 3001  Tahiti XTL [Radeon R9 280X OC]
 		1462 2774  MSI R7970 TF 3GD5/OC BE
+		1682 3001  Tahiti XTL [Radeon R9 280X]
 		1682 3211  Double D HD 7970 Black Edition
 # FX-797A-TNBC
 		1682 3213  HD 7970 Black Edition
@@ -2269,7 +2271,13 @@
 	67e8  Baffin [Polaris11]
 	67e9  Baffin [Polaris11]
 	67eb  Baffin [Polaris11]
-	67ef  Baffin [Radeon RX 460]
+	67ef  Baffin [Radeon RX 460/560D / Pro 450/455/460/560]
+		106b 0160  Radeon Pro 460
+		106b 0166  Radeon Pro 455
+		106b 0167  Radeon Pro 450
+		106b 0179  Radeon Pro 560
+		1642 1727  Polaris 21 XL [Radeon RX 560D]
+		1682 956d  Polaris 21 XL [Radeon RX 560D]
 	67ff  Baffin [Radeon RX 560]
 	6800  Wimbledon XT [Radeon HD 7970M]
 		1002 0124  Radeon HD 7970M
@@ -4002,8 +4010,19 @@
 	1437  Liverpool I/O Memory Management Unit
 	1438  Liverpool Processor Root Port
 	1439  Family 16h Processor Functions 5:1
+	1450  Family 17h (Models 00h-0fh) Root Complex
+	1452  Family 17h (Models 00h-0fh) PCIe Dummy Host Bridge
+	1454  Family 17h (Models 00h-0fh) Internal PCIe GPP Bridge 0 to Bus B
 	145b  Zeppelin Non-Transparent Bridge
 	145c  USB3 Host Controller
+	1460  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 0
+	1461  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 1
+	1462  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 2
+	1463  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 3
+	1464  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 4
+	1465  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 5
+	1466  Family 17h (Models 00h-0fh) Data Fabric Device 18h Function 6
+	1467  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 7
 	1510  Family 14h Processor Root Complex
 		174b 1001  PURE Fusion Mini
 	1512  Family 14h Processor Root Port
@@ -4543,6 +4562,7 @@
 	0533  MGA G200EH
 		103c 3381  iLO4
 	0534  G200eR2
+	0536  Integrated Matrox G200eW3 Graphics Controller
 	0538  G200eH
 		1590 00e4  iLO5 VGA
 	0540  M91XX
@@ -9934,7 +9954,7 @@
 	0dc0  GF106 [GeForce GT 440]
 	0dc4  GF106 [GeForce GTS 450]
 	0dc5  GF106 [GeForce GTS 450 OEM]
-	0dc6  GF106 [GeForce GTS 450]
+	0dc6  GF106 [GeForce GTS 450 OEM]
 	0dcd  GF106M [GeForce GT 555M]
 	0dce  GF106M [GeForce GT 555M]
 	0dd1  GF106M [GeForce GTX 460M]
@@ -10175,7 +10195,7 @@
 	1086  GF110 [GeForce GTX 570 Rev. 2]
 	1087  GF110 [GeForce GTX 560 Ti 448 Cores]
 	1088  GF110 [GeForce GTX 590]
-	1089  GF110 [GeForce GTX 580]
+	1089  GF110 [GeForce GTX 580 Rev. 2]
 	108b  GF110 [GeForce GTX 580]
 	108e  GF110GL [Tesla C2090]
 	1091  GF110GL [Tesla M2090]
@@ -10690,6 +10710,7 @@
 	1349  GM108M [GeForce 930M]
 	134b  GM108M [GeForce 940MX]
 	134d  GM108M [GeForce 940MX]
+		17aa 2248  ThinkPad T570
 	134e  GM108M [GeForce 930MX]
 	134f  GM108M [GeForce 920MX]
 	137a  GM108GLM [Quadro K620M / Quadro M500M]
@@ -18281,6 +18302,7 @@
 		117c 0091  FastFrame NQ42
 		117c 0092  FastFrame NQ11
 		117c 0093  FastFrame NQ12
+		15b3 0006  Mellanox Technologies ConnectX-3 Pro Stand-up dual-port 40GbE MCX314A-BCCT
 		15b3 0078  ConnectX-3 Pro 10 GbE Dual Port KR Mezzanine Card
 		15b3 0079  ConnectX-3 Pro 40 GbE Dual Port QSFP+ Adapter
 		15b3 0080  ConnectX-3 Pro 10 GbE Dual Port SFP+ Adapter
@@ -18295,6 +18317,8 @@
 	1011  MT27600 [Connect-IB]
 	1012  MT27600 Family [Connect-IB Virtual Function]
 	1013  MT27700 Family [ConnectX-4]
+		15b3 0003  Mellanox Technologies ConnectX-4 Stand-up single-port 40GbE MCX413A-BCAT
+		15b3 0005  Mellanox Technologies ConnectX-4 Stand-up single-port 40GbE MCX415A-BCAT
 		15b3 0006  MCX416A-BCAT, ConnectX-4 EN, 40/56GbE 2P, PCIe3.0 x16
 		15b3 0008  ConnectX-4 Stand-up dual-port 100GbE MCX416A-CCAT
 		15b3 0033  ConnectX-4 VPI IB EDR/100 GbE Single Port QSFP28 Adapter
@@ -18302,6 +18326,7 @@
 		15b3 0050  ConnectX-4 100 GbE Dual Port QSFP28 Adapter
 	1014  MT27700 Family [ConnectX-4 Virtual Function]
 	1015  MT27710 Family [ConnectX-4 Lx]
+		15b3 0005  Mellanox Technologies ConnectX-4 Lx Stand-up single-port 40GbE MCX4131A-BCAT
 		15b3 0016  ConnectX-4 Lx 25 GbE Dual Port SFP28 Adapter
 		15b3 0020  MCX4411A-ACQN, ConnectX-4 Lx EN OCP, 1x25Gb
 		15b3 0021  MCX4421A-ACQN ConnectX-4 Lx EN OCP,2x25G
@@ -19890,7 +19915,7 @@
 		1924 8012  SFN8522-R1 8000 Series 10G Adapter
 		1924 8013  SFN8042-R1 8000 Series 10/40G Adapter
 		1924 8014  SFN8542-R1 8000 Series 10/40G Adapter
-		1924 8016  SFN8022-R2 8000 Series 10G Adapte
+		1924 8016  SFN8022-R2 8000 Series 10G Adapter
 		1924 8017  SFN8522-R2 8000 Series 10G Adapter
 		1924 8018  SFN8042-R2 8000 Series 10/40G Adapter
 		1924 8019  SFN8542-R2 8000 Series 10/40G Adapter
@@ -20363,7 +20388,7 @@
 	3003  ioMemory Mezzanine
 1aee  Caustic Graphics Inc.
 # nee Qumranet, Inc.
-1af4  Red Hat, Inc
+1af4  Red Hat, Inc.
 	1000  Virtio network device
 	1001  Virtio block device
 	1002  Virtio memory balloon
@@ -23267,7 +23292,7 @@
 		8086 011a  Ethernet Converged Network Adapter X520-4
 		8086 011b  Ethernet Converged Network Adapter X520-4
 		8086 011c  Ethernet Converged Network Adapter X520-4
-	154c  XL710/X710 Virtual Function
+	154c  Ethernet Virtual Function 700 Series
 	154d  Ethernet 10G 2P X520 Adapter
 		8086 7b11  10GbE 2P X520 Adapter
 	1557  82599 10 Gigabit Network Connection
@@ -23310,7 +23335,7 @@
 	156d  DSL5520 Thunderbolt 2 Bridge [Falcon Ridge 4C 2013]
 	156f  Ethernet Connection I219-LM
 	1570  Ethernet Connection I219-V
-	1571  XL710/X710 Virtual Function
+	1571  Ethernet Virtual Function 700 Series
 	1572  Ethernet Controller X710 for 10GbE SFP+
 		1028 0000  Ethernet 10G X710 rNDC
 		1028 1f99  Ethernet 10G 4P X710/I350 rNDC
@@ -23401,6 +23426,7 @@
 		8086 00a0  Ethernet Converged Network Adapter X710-T4
 		8086 1003  Ethernet Converged Network Adapter X710-T
 	158a  Ethernet Controller XXV710 for 25GbE backplane
+		8086 000a  Ethernet 25G 2P XXV710 Mezz
 	158b  Ethernet Controller XXV710 for 25GbE SFP28
 		8086 0000  Ethernet Network Adapter XXV710
 		8086 0001  Ethernet Network Adapter XXV710-2
@@ -23411,6 +23437,7 @@
 		8086 0006  Ethernet Network Adapter OCP XXV710-2
 		8086 0007  Ethernet Network Adapter OCP XXV710-1
 		8086 0008  Ethernet Network Adapter OCP XXV710-1
+		8086 0009  Ethernet 25G 2P XXV710 Adapter
 		8086 4001  Ethernet Network Adapter XXV710-2
 	15a0  Ethernet Connection (2) I218-LM
 	15a1  Ethernet Connection (2) I218-V
@@ -23462,6 +23489,7 @@
 	15d6  Ethernet Connection (5) I219-V
 	15d7  Ethernet Connection (4) I219-LM
 	15d8  Ethernet Connection (4) I219-V
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 	15d9  JHL6340 Thunderbolt 3 NHI (C step) [Alpine Ridge 2C 2016]
 	15da  JHL6340 Thunderbolt 3 Bridge (C step) [Alpine Ridge 2C 2016]
@@ -23527,6 +23555,7 @@
 	190f  Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor Host Bridge/DRAM Registers
 	1910  Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor Host Bridge/DRAM Registers
 	1911  Xeon E3-1200 v5/v6 / E3-1500 v5 / 6th/7th Gen Core Processor Gaussian Mixture Model
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 	1912  HD Graphics 530
 	1916  HD Graphics 520
@@ -24015,6 +24044,7 @@
 	2018  Sky Lake-E M2PCI Registers
 	201a  Sky Lake-E Non-Transparent Bridge Registers
 	201c  Sky Lake-E Non-Transparent Bridge Registers
+	2020  Sky Lake-E DMI3 Registers
 	2021  Sky Lake-E CBDMA Registers
 	2024  Sky Lake-E MM/Vt-d Configuration Registers
 	2030  Sky Lake-E PCI Express Root Port A
@@ -26912,7 +26942,7 @@
 	372b  Xeon C5500/C3500 Core
 	372c  Xeon C5500/C3500 Reserved
 	373f  Xeon C5500/C3500 IOxAPIC
-	37cd  X722 Virtual Function
+	37cd  Ethernet Virtual Function 700 Series
 	37ce  Ethernet Connection X722 for 10GbE backplane
 		1590 0215  Ethernet 10Gb 2-port 568i Adapter
 		17aa 4023  Intel Ethernet Connection X722 for 10GbE backplane
@@ -27477,11 +27507,13 @@
 		1af4 1100  QEMU Virtual Machine
 	5902  HD Graphics 610
 	5904  Xeon E3-1200 v6/7th Gen Core Processor Host Bridge/DRAM Registers
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 	590f  Xeon E3-1200 v6/7th Gen Core Processor Host Bridge/DRAM Registers
 	5910  Xeon E3-1200 v6/7th Gen Core Processor Host Bridge/DRAM Registers
 	5912  HD Graphics 630
 	5916  HD Graphics 620
+		17aa 2248  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 	591d  HD Graphics P630
 	591f  Intel Kaby Lake Host Bridge
@@ -28178,6 +28210,7 @@
 		17aa 382a  B51-80 Laptop
 	9d23  Sunrise Point-LP SMBus
 		1028 06f3  Latitude 3570
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 		17aa 382a  B51-80 Laptop
 	9d27  Sunrise Point-LP Serial IO UART Controller #0
@@ -28187,14 +28220,17 @@
 	9d2d  Sunrise Point-LP Secure Digital IO Controller
 	9d2f  Sunrise Point-LP USB 3.0 xHCI Controller
 		1028 06f3  Latitude 3570
+		17aa 2247  ThinkPad T570
 		17aa 382a  B51-80 Laptop
 	9d31  Sunrise Point-LP Thermal subsystem
 		1028 06f3  Latitude 3570
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 		17aa 382a  B51-80 Laptop
 	9d35  Sunrise Point-LP Integrated Sensor Hub
 	9d3a  Sunrise Point-LP CSME HECI #1
 		1028 06f3  Latitude 3570
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 		17aa 382a  B51-80 Laptop
 	9d43  Sunrise Point-LP LPC Controller
@@ -28203,6 +28239,7 @@
 		1028 06f3  Latitude 3570
 	9d56  Sunrise Point-LP LPC Controller
 	9d58  Sunrise Point-LP LPC Controller
+		17aa 2247  ThinkPad T570
 		17aa 224f  ThinkPad X1 Carbon 5th Gen
 	9d60  Sunrise Point-LP Serial IO I2C Controller #0
 		1028 06f3  Latitude 3570
@@ -28341,6 +28378,7 @@
 	a1a3  Lewisburg SMBus
 	a1a4  Lewisburg SPI Controller
 	a1af  Lewisburg USB 3.0 xHCI Controller
+	a1b1  Lewisburg Thermal Subsystem
 	a1ba  Lewisburg CSME: HECI #1
 	a1bb  Lewisburg CSME: HECI #2
 	a1bc  Lewisburg CSME: IDE-r
