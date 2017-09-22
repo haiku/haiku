@@ -179,6 +179,7 @@ const struct supported_device {
 	{0x675f, 4, 0, RADEON_REDWOOD, CHIP_STD, "Radeon HD 5570"},
 	{0x68b9, 4, 0, RADEON_REDWOOD, CHIP_STD, "Radeon HD 5600"},
 	{0x68c1, 4, 0, RADEON_REDWOOD, CHIP_STD, "Radeon HD 5650"},
+	{0x68c8, 4, 0, RADEON_REDWOOD, CHIP_STD, "FirePro V4800"},
 	{0x68d8, 4, 0, RADEON_REDWOOD, CHIP_STD, "Radeon HD 5670"},
 	//  Juniper
 	{0x68be, 4, 0, RADEON_JUNIPER, CHIP_STD, "Radeon HD 5700"},
@@ -242,10 +243,10 @@ const struct supported_device {
 	{0x6743, 5, 0, RADEON_TURKS, CHIP_DISCREET, "Radeon HD E6760"},
 	{0x6744, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD Turks"},
 	{0x6745, 5, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD Turks"},
-	{0x6746, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD Turks"},
-	{0x6747, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD Turks"},
-	{0x6748, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD Turks"},
-	{0x6749, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro v4900"},
+	{0x6746, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro V???? (turks)"},
+	{0x6747, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro V???? (turks)"},
+	{0x6748, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro V???? (turks)"},
+	{0x6749, 5, 0, RADEON_TURKS, CHIP_STD, "FirePro V4900"},
 	{0x6750, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6500"},
 	{0x6758, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6670"},
 	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570/7570"},
@@ -261,9 +262,9 @@ const struct supported_device {
 	{0x6701, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
 	{0x6702, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
 	{0x6703, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
-	{0x6704, 5, 0, RADEON_CAYMAN, CHIP_STD, "FirePro v????"},
+	{0x6704, 5, 0, RADEON_CAYMAN, CHIP_STD, "FirePro V7900"},
 	{0x6705, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
-	{0x6706, 5, 0, RADEON_CAYMAN, CHIP_STD, "FirePro v????"},
+	{0x6706, 5, 0, RADEON_CAYMAN, CHIP_STD, "FirePro V???? (cayman)"},
 	{0x6707, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
 	{0x6708, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
 	{0x6709, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
@@ -505,7 +506,13 @@ const struct supported_device {
 	// Codename: Artic Islands / Polaris
 	// Process: 14 nm
 	{0x67ef, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 460"},
-	{0x67df, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 470/480"}
+	{0x67df, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 470/480"},
+	{0x67ff, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 560"},
+
+	// Introduced: 2017
+	// Codename: Vega
+	// Process: 14nm
+	{0x687F, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega"}
 };
 
 

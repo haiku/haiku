@@ -112,7 +112,8 @@ enum radeon_chipset {
 	RADEON_TOPAZ,		//Volcanic Islands, NO DCE
 	RADEON_TONGA,		// DCE 10.0
 	RADEON_CARRIZO,		// DCE 11.0
-	RADEON_POLARIS		//Artic Islands, DCE 12.0
+	RADEON_POLARIS,		//Artic Islands, DCE 12.0*
+	RADEON_VEGA,		// DCE 13.0*
 };
 
 // !! Must match chipset families above
