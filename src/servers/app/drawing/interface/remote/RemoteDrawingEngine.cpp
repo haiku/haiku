@@ -22,7 +22,7 @@ RemoteDrawingEngine::RemoteDrawingEngine(RemoteHWInterface* interface)
 	:
 	DrawingEngine(interface),
 	fHWInterface(interface),
-	fToken((uint32)this), // TODO: need to redo that for 64 bit
+	fToken((addr_t)this),
 	fExtendWidth(0),
 	fCallbackAdded(false),
 	fResultNotify(-1),

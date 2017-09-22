@@ -162,7 +162,7 @@ private:
 									UtilityBitmap**& bitmaps);
 
 			HTML5HWInterface*	fHWInterface;
-			uint32				fToken;
+			addr_t				fToken;
 
 			DrawState			fState;
 			BRegion				fClippingRegion;

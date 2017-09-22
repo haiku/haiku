@@ -53,11 +53,6 @@ if [ FIsBuildFeatureEnabled fontconfig ] {
 	: [ BuildFeatureAttribute freetype : headers ] ;
 }
 
-local BROKEN_64 = ;
-if $(TARGET_ARCH) != x86_64 {
-    BROKEN_64 = "" ;
-}
-
 Server app_server :
 	Angle.cpp
 	AppServer.cpp
@@ -112,7 +107,7 @@ Server app_server :
 	# libraries
 	:
 	libtranslation.so libbe.so libbnetapi.so
-	libaslocal.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a
+	libaslocal.a libasremote.a libashtml5.a
 	libasdrawing.a libpainter.a libagg.a
 	[ BuildFeatureAttribute freetype : library ]
 	[ BuildFeatureAttribute fontconfig : library ]

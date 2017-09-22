@@ -78,7 +78,7 @@ HTML5HWInterface::HTML5HWInterface(const char* target)
 	if (portStart != NULL) {
 		portStart[0] = 0;
 		portStart++;
-		if (sscanf(portStart, "%lu", &fRemotePort) != 1) {
+		if (sscanf(portStart, "%" B_PRIu32, &fRemotePort) != 1) {
 			fInitStatus = B_BAD_VALUE;
 			return;
 		}
@@ -304,7 +304,8 @@ HTML5HWInterface::_EventThread()
 			return result;
 		}
 
-		TRACE("got message code %u with %lu bytes\n", code, message.DataLeft());
+		TRACE("got message code %" B_PRIu16 " with %" B_PRIu32 " bytes\n", code,
+			message.DataLeft());
 
 		if (code >= RP_MOUSE_MOVED && code <= RP_MODIFIERS_CHANGED) {
 			// an input event, dispatch to the event stream

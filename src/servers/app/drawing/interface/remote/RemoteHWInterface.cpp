@@ -63,7 +63,7 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	if (portStart != NULL) {
 		portStart[0] = 0;
 		portStart++;
-		if (sscanf(portStart, "%lu", &fRemotePort) != 1) {
+		if (sscanf(portStart, "%" B_PRIu32, &fRemotePort) != 1) {
 			fInitStatus = B_BAD_VALUE;
 			return;
 		}
@@ -300,11 +300,11 @@ RemoteHWInterface::_EventThread()
 status_t
 RemoteHWInterface::_Connect()
 {
-	TRACE("connecting to host \"%s\" port %lu\n", fRemoteHost, fRemotePort);
+	TRACE("connecting to host \"%s\" port %" B_PRIu32 "\n", fRemoteHost, fRemotePort);
 	status_t result = fSendEndpoint->Connect(fRemoteHost, (uint16)fRemotePort);
 	if (result != B_OK) {
-		TRACE_ERROR("failed to connect to host \"%s\" port %lu\n", fRemoteHost,
-			fRemotePort);
+		TRACE_ERROR("failed to connect to host \"%s\" port %" B_PRIu32 "\n",
+			fRemoteHost, fRemotePort);
 		return result;
 	}
 

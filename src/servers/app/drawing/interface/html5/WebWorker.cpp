@@ -115,7 +115,7 @@ WebWorker::_Work()
 			readSize = io->Read(buffer, sizeof(buffer));
 		else if (rb)
 			readSize = rb->Read(buffer, sizeof(buffer));
-		TRACE("readSize %ld\n", readSize);
+		TRACE("readSize %" B_PRId32 "\n", readSize);
 
 		if (readSize < 0) {
 			TRACE_ERROR("read failed, closing connection: %s\n",
@@ -140,7 +140,7 @@ WebWorker::_Work()
 
 		errorCount = 0;
 		result = fEndpoint->Send(buffer, readSize);
-TRACE("writeSize %ld\n", result);
+//		TRACE("writeSize %ld\n", result);
 		if (result < readSize) {
 			TRACE_ERROR("writing to peer failed: %s\n",
 				strerror(result));
