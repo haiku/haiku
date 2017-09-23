@@ -1518,7 +1518,7 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 				// colors can be in "idx1:name1;...;idxN:nameN;" sequence too!
 				uint32 count = 0;
 				char* p = strtok((char*)params, ";");
-				do {
+				while (p != NULL && count < kTermColorCount) {
 					indexes[count] = atoi(p);
 
 					if (!reset) {
@@ -1532,7 +1532,7 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 						count++;
 
 					p = strtok(NULL, ";");
-				} while (p != NULL && count < kTermColorCount);
+				};
 
 				if (count > 0) {
 					if (!reset)
