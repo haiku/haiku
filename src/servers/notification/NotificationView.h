@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
  * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
  * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
@@ -18,16 +18,16 @@ class BBitmap;
 class BMessageRunner;
 class BNotification;
 
-class NotificationWindow;
-
 const uint32 kRemoveView = 'ReVi';
+const float kExpandSize				= 8;
+const float kPenSize				= 1;
 
 
 class NotificationView : public BView {
 public:
-								NotificationView(NotificationWindow* win,
-									BNotification* notification,
-									bigtime_t timeout = -1);
+								NotificationView(BNotification* notification,
+									bigtime_t timeout, float iconSize,
+									bool disableTimeout = false);
 	virtual						~NotificationView();
 
 	virtual	void 				AttachedToWindow();
@@ -47,6 +47,7 @@ public:
 	virtual	status_t			GetSupportedSuites(BMessage* msg);
 
 			void 				SetText(float newMaxWidth = -1);
+			void				SetPreviewModeOn(bool enabled);
 
 			const char*			MessageID() const;
 
@@ -62,9 +63,10 @@ private:
 
 			typedef std::list<LineInfo*> LineInfoList;
 
-			NotificationWindow*	fParent;
 			BNotification*		fNotification;
 			bigtime_t			fTimeout;
+			float				fIconSize;
+			bool				fDisableTimeout;
 
 			BMessageRunner*		fRunner;
 
@@ -73,6 +75,7 @@ private:
 			float				fHeight;
 			rgb_color			fStripeColor;
 			bool				fCloseClicked;
+			bool				fPreviewModeOn;
 };
 
 #endif	// _NOTIFICATION_VIEW_H

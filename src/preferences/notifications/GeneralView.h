@@ -1,16 +1,24 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2009, Pier Luigi Fiorini.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _GENERAL_VIEW_H
 #define _GENERAL_VIEW_H
 
+
+#include <Button.h>
+#include <CheckBox.h>
+#include <Menu.h>
+#include <MenuField.h>
+#include <Mime.h>
+#include <RadioButton.h>
+#include <Slider.h>
+#include <StringView.h>
+#include <TextControl.h>
+
 #include "SettingsPane.h"
 
-class BCheckBox;
-class BStringView;
-class BTextControl;
 
 class GeneralView : public SettingsPane {
 public:
@@ -23,14 +31,23 @@ public:
 			status_t		Load(BMessage&);
 			status_t		Save(BMessage&);
 			status_t		Revert();
+			bool			RevertPossible();
+			status_t		Defaults();
+			bool			DefaultsPossible();
+			bool			UseDefaultRevertButtons();
 
 private:
 		BCheckBox*			fNotificationBox;
-		BCheckBox*			fAutoStart;
-		BTextControl*		fTimeout;
-		BCheckBox*			fHideAll;
+		BSlider*			fDurationSlider;
+		BSlider*			fWidthSlider;
+		
+		int32				fOriginalTimeout;
+		float				fOriginalWidth;
+		icon_size			fOriginalIconSize;
 
-		bool				_CanFindServer(entry_ref* ref);
+		void				_EnableControls();
+		void				_SetWidthLabel(int32 value);
+		void				_SetTimeoutLabel(int32 value);
 		bool				_IsServerRunning();
 };
 

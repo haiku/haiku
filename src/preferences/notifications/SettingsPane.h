@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2009, Pier Luigi Fiorini.
  * Distributed under the terms of the MIT License.
  */
@@ -12,17 +12,20 @@ class BNode;
 
 class SettingsHost;
 
-const int32 kSettingChanged = '_STC';
 
 class SettingsPane : public BView {
 public:
 							SettingsPane(const char* name, SettingsHost* host);
 
-	virtual	void			MessageReceived(BMessage* msg);
+	void					SettingsChanged(bool showExample);
 
 	virtual status_t		Load(BMessage&) = 0;
 	virtual	status_t		Save(BMessage&) = 0;
 	virtual	status_t		Revert() = 0;
+	virtual bool			RevertPossible() = 0;
+	virtual status_t		Defaults() = 0;
+	virtual bool			DefaultsPossible() = 0;
+	virtual bool			UseDefaultRevertButtons() = 0;
 
 protected:
 			SettingsHost*	fHost;

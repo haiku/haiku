@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
  * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
  * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
@@ -17,16 +17,13 @@
 #include <String.h>
 
 class BMessage;
-class NotificationReceived;
-
-typedef std::map<BString, NotificationReceived*> notification_t;
 
 class AppUsage : public BFlattenable {
 public:
 										AppUsage();
 										AppUsage(const char* name,
+											const char* signature,
 											bool allow = true);
-										~AppUsage();
 
 	virtual	bool						AllowsTypeCode(type_code code) const;
 	virtual	status_t					Flatten(void* buffer, ssize_t numBytes) const;
@@ -36,17 +33,15 @@ public:
 	virtual	status_t					Unflatten(type_code code, const void* buffer,
 											ssize_t numBytes);
 
-			const char*					Name();
-			bool						Allowed(const char* title, notification_type type);
+			const char*					AppName();
+			const char*					Signature();
 			bool						Allowed();
-			NotificationReceived*		NotificationAt(int32 index);
-			int32						Notifications();
-			void						AddNotification(NotificationReceived* notification);
+			void						SetAllowed(bool allow);
 
 private:
-			BString						fName;
+			BString						fAppName;
+			BString						fSignature;
 			bool						fAllow;
-			notification_t				fNotifications;
 };
 
 #endif	// _APP_USAGE_H

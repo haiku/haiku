@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
  * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
  * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
@@ -9,6 +9,7 @@
  *		Michael Davidson, slaad@bong.com.au
  *		Mikael Eiman, mikael@eiman.tv
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
+ *		Brian Hill, supernova@tycho.email
  */
 
 #include <algorithm>
@@ -22,21 +23,24 @@
 #include "NotificationWindow.h"
 #include "NotificationView.h"
 
+const float kCloseSize				= 6;
+const float kEdgePadding			= 2;
 
-static const int kHeaderSize = 23;
 
-
-AppGroupView::AppGroupView(NotificationWindow* win, const char* label)
+AppGroupView::AppGroupView(const BMessenger& messenger, const char* label)
 	:
 	BGroupView("appGroup", B_VERTICAL, 0),
 	fLabel(label),
-	fParent(win),
+	fMessenger(messenger),
 	fCollapsed(false),
-	fCloseClicked(false)
+	fCloseClicked(false),
+	fPreviewModeOn(false)
 {
 	SetFlags(Flags() | B_WILL_DRAW);
 
-	static_cast<BGroupLayout*>(GetLayout())->SetInsets(0, kHeaderSize, 0, 0);
+	fHeaderSize = be_plain_font->Size()
+		+ be_control_look->ComposeSpacing(B_USE_ITEM_SPACING);
+	static_cast<BGroupLayout*>(GetLayout())->SetInsets(0, fHeaderSize, 0, 0);
 }
 
 
@@ -47,7 +51,7 @@ AppGroupView::Draw(BRect updateRect)
 	BRect bounds = Bounds();
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
-	bounds.bottom = bounds.top + kHeaderSize;
+	bounds.bottom = bounds.top + fHeaderSize;
 
 	// Draw the header background
 	SetHighColor(tint_color(menuColor, 1.22));
@@ -55,18 +59,17 @@ AppGroupView::Draw(BRect updateRect)
 	StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
 	uint32 borders = BControlLook::B_TOP_BORDER
 		| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
-
 	be_control_look->DrawButtonBackground(this, bounds, bounds, menuColor,
 		0, borders);
 
 	// Draw the buttons
-	fCollapseRect.top = (kHeaderSize - kExpandSize) / 2;
+	fCollapseRect.top = (fHeaderSize - kExpandSize) / 2;
 	fCollapseRect.left = kEdgePadding * 3;
 	fCollapseRect.right = fCollapseRect.left + 1.5 * kExpandSize;
 	fCollapseRect.bottom = fCollapseRect.top + kExpandSize;
 
 	fCloseRect = bounds;
-	fCloseRect.top = (kHeaderSize - kCloseSize) / 2;
+	fCloseRect.top = (fHeaderSize - kCloseSize) / 2;
 	// Take off the 1 to line this up with the close button on the
 	// notification view
 	fCloseRect.right -= kEdgePadding * 3 - 1;
@@ -89,7 +92,9 @@ AppGroupView::Draw(BRect updateRect)
 	if (fCollapsed)
 		label << " (" << fInfo.size() << ")";
 
-	SetFont(be_bold_font);
+	BFont boldFont(be_plain_font);
+	boldFont.SetFace(B_BOLD_FACE);
+	SetFont(&boldFont);
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
@@ -132,6 +137,10 @@ AppGroupView::_DrawCloseButton(const BRect& updateRect)
 void
 AppGroupView::MouseDown(BPoint point)
 {
+	// Preview Mode ignores any mouse clicks
+	if (fPreviewModeOn)
+		return;
+
 	if (BRect(fCloseRect).InsetBySelf(-5, -5).Contains(point)) {
 		int32 children = fInfo.size();
 		for (int32 i = 0; i < children; i++) {
@@ -144,7 +153,7 @@ AppGroupView::MouseDown(BPoint point)
 		// Remove ourselves from the parent view
 		BMessage message(kRemoveGroupView);
 		message.AddPointer("view", this);
-		fParent->PostMessage(&message);
+		fMessenger.SendMessage(&message);
 	} else if (BRect(fCollapseRect).InsetBySelf(-5, -5).Contains(point)) {
 		fCollapsed = !fCollapsed;
 		int32 children = fInfo.size();
@@ -186,13 +195,13 @@ AppGroupView::MessageReceived(BMessage* msg)
 			view->RemoveSelf();
 			delete view;
 
-			fParent->PostMessage(msg);
+			fMessenger.SendMessage(msg);
 
 			if (!this->HasChildren()) {
 				Hide();
 				BMessage removeSelfMessage(kRemoveGroupView);
 				removeSelfMessage.AddPointer("view", this);
-				fParent->PostMessage(&removeSelfMessage);
+				fMessenger.SendMessage(&removeSelfMessage);
 			}
 			
 			break;
@@ -211,17 +220,13 @@ AppGroupView::AddInfo(NotificationView* view)
 
 	if (id.Length() > 0) {
 		int32 children = fInfo.size();
-
 		for (int32 i = 0; i < children; i++) {
 			if (id == fInfo[i]->MessageID()) {
 				NotificationView* oldView = fInfo[i];
-				fParent->NotificationViewSwapped(oldView, view);
 				oldView->RemoveSelf();
 				delete oldView;
-				
 				fInfo[i] = view;
 				found = true;
-				
 				break;
 			}
 		}
@@ -246,10 +251,25 @@ AppGroupView::AddInfo(NotificationView* view)
 }
 
 
+void
+AppGroupView::SetPreviewModeOn(bool enabled)
+{
+	fPreviewModeOn = enabled;
+}
+
+
 const BString&
 AppGroupView::Group() const
 {
 	return fLabel;
+}
+
+
+void
+AppGroupView::SetGroup(const char* group)
+{
+	fLabel.SetTo(group);
+	Invalidate();
 }
 
 

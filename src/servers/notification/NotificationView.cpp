@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
  * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
  * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
@@ -11,6 +11,7 @@
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ *		Brian Hill, supernova@tycho.email
  */
 
 
@@ -35,7 +36,10 @@
 #include "NotificationWindow.h"
 
 
-static const int kIconStripeWidth = 32;
+const int kIconStripeWidth			= 32;
+const float kCloseSize				= 6;
+const float kEdgePadding			= 2;
+const float kSmallPadding			= 2;
 
 property_info message_prop_list[] = {
 	{ "type", {B_GET_PROPERTY, B_SET_PROPERTY, 0},
@@ -54,22 +58,21 @@ property_info message_prop_list[] = {
 };
 
 
-NotificationView::NotificationView(NotificationWindow* win,
-	BNotification* notification, bigtime_t timeout)
+NotificationView::NotificationView(BNotification* notification, bigtime_t timeout,
+	float iconSize, bool disableTimeout)
 	:
 	BView("NotificationView", B_WILL_DRAW),
-	fParent(win),
 	fNotification(notification),
 	fTimeout(timeout),
+	fIconSize(iconSize),
+	fDisableTimeout(disableTimeout),
 	fRunner(NULL),
 	fBitmap(NULL),
-	fCloseClicked(false)
+	fCloseClicked(false),
+	fPreviewModeOn(false)
 {
 	if (fNotification->Icon() != NULL)
 		fBitmap = new BBitmap(fNotification->Icon());
-
-	if (fTimeout <= 0)
-		fTimeout = fParent->Timeout() * 1000000;
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
@@ -122,11 +125,12 @@ void
 NotificationView::AttachedToWindow()
 {
 	SetText();
-
-	BMessage msg(kRemoveView);
-	msg.AddPointer("view", this);
-
-	fRunner = new BMessageRunner(BMessenger(Parent()), &msg, fTimeout, 1);
+	
+	if (!fDisableTimeout) {
+		BMessage msg(kRemoveView);
+		msg.AddPointer("view", this);
+		fRunner = new BMessageRunner(BMessenger(Parent()), &msg, fTimeout, 1);
+	}
 }
 
 
@@ -238,9 +242,6 @@ NotificationView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
-	// Icon size
-	float iconSize = (float)fParent->IconSize();
-
 	BRect stripeRect = Bounds();
 	stripeRect.right = kIconStripeWidth;
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -258,7 +259,7 @@ NotificationView::Draw(BRect updateRect)
 	// Draw icon
 	if (fBitmap) {
 		float ix = 18;
-		float iy = (Bounds().Height() - iconSize) / 4.0;
+		float iy = (Bounds().Height() - fIconSize) / 4.0;
 			// Icon is vertically centered in view
 
 		if (fNotification->Type() == B_PROGRESS_NOTIFICATION)
@@ -267,7 +268,7 @@ NotificationView::Draw(BRect updateRect)
 			iy -= (progRect.Height() + kEdgePadding);
 		}
 
-		iconRect.Set(ix, iy, ix + iconSize - 1.0, iy + iconSize - 1.0);
+		iconRect.Set(ix, iy, ix + fIconSize - 1.0, iy + fIconSize - 1.0);
 		DrawBitmapAsync(fBitmap, fBitmap->Bounds(), iconRect);
 	}
 
@@ -279,9 +280,10 @@ NotificationView::Draw(BRect updateRect)
 		SetFont(&l->font);
 		// Truncate the string. We have already line-wrapped the text but if
 		// there is a very long 'word' we can only truncate it.
-		TruncateString(&(l->text), B_TRUNCATE_END,
+		BString text(l->text);
+		TruncateString(&text, B_TRUNCATE_END,
 			Bounds().Width() - l->location.x);
-		DrawString(l->text.String(), l->text.Length(), l->location);
+		DrawString(text.String(), text.Length(), l->location);
 	}
 
 	AppGroupView* groupView = dynamic_cast<AppGroupView*>(Parent());
@@ -333,6 +335,10 @@ NotificationView::_DrawCloseButton(const BRect& updateRect)
 void
 NotificationView::MouseDown(BPoint point)
 {
+	// Preview Mode ignores any mouse clicks
+	if (fPreviewModeOn)
+		return;
+
 	int32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
 
@@ -447,20 +453,22 @@ NotificationView::SetText(float newMaxWidth)
 
 	float iconRight = kIconStripeWidth;
 	if (fBitmap != NULL)
-		iconRight += fParent->IconSize();
+		iconRight += fIconSize;
 	else
 		iconRight += 32;
 
+	BFont boldFont(be_plain_font);
+	boldFont.SetFace(B_BOLD_FACE);
 	font_height fh;
-	be_bold_font->GetHeight(&fh);
+	boldFont.GetHeight(&fh);
 	float fontHeight = ceilf(fh.leading) + ceilf(fh.descent)
 		+ ceilf(fh.ascent);
-	float y = 2 * fontHeight;
+	float y = fontHeight + kEdgePadding * 2;
 
 	// Title
 	LineInfo* titleLine = new LineInfo;
 	titleLine->text = fNotification->Title();
-	titleLine->font = *be_bold_font;
+	titleLine->font = boldFont;
 
 	titleLine->location = BPoint(iconRight + kEdgePadding, y);
 
@@ -545,6 +553,13 @@ NotificationView::SetText(float newMaxWidth)
 		fHeight, 8, 8);
 
 	_CalculateSize();
+}
+
+
+void
+NotificationView::SetPreviewModeOn(bool enabled)
+{
+	fPreviewModeOn = enabled;
 }
 
 

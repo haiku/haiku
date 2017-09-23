@@ -1,10 +1,11 @@
 /*
- * Copyright 2010-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2009, Pier Luigi Fiorini.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
+ *		Brian Hill, supernova@tycho.email
  */
 
 #include <stdio.h>
@@ -13,9 +14,9 @@
 #include <vector>
 
 #include <Alert.h>
+#include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <CheckBox.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -26,70 +27,87 @@
 #include <Query.h>
 #include <Roster.h>
 #include <String.h>
-#include <StringView.h>
 #include <SymLink.h>
-#include <TextControl.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
 #include <notification/Notifications.h>
 
 #include "GeneralView.h"
+#include "NotificationsConstants.h"
 #include "SettingsHost.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "GeneralView"
-const int32 kToggleNotifications = '_TSR';
+
+const uint32 kToggleNotifications = '_TSR';
+const uint32 kWidthChanged = '_WIC';
+const uint32 kTimeoutChanged = '_TIC';
+const uint32 kServerChangeTriggered = '_SCT';
+const BString kSampleMessageID("NotificationsSample");
+
 
 GeneralView::GeneralView(SettingsHost* host)
 	:
 	SettingsPane("general", host)
 {
-	// Notifications
+	// Notification server
 	fNotificationBox = new BCheckBox("server",
 		B_TRANSLATE("Enable notifications"),
 		new BMessage(kToggleNotifications));
+	BBox* box = new BBox("box");
+	box->SetLabel(fNotificationBox);
 
-	// Autostart
-	fAutoStart = new BCheckBox("autostart",
-		B_TRANSLATE("Enable notifications at startup"),
-		new BMessage(kSettingChanged));
+	// Window width
+	int32 minWidth = int32(kMinimumWidth / kWidthStep);
+	int32 maxWidth = int32(kMaximumWidth / kWidthStep);
+	fWidthSlider = new BSlider("width", B_TRANSLATE("Window width:"),
+		new BMessage(kWidthChanged), minWidth, maxWidth, B_HORIZONTAL);
+	fWidthSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fWidthSlider->SetHashMarkCount(maxWidth - minWidth + 1);
+	BString minWidthLabel;
+	minWidthLabel << int32(kMinimumWidth);
+	BString maxWidthLabel;
+	maxWidthLabel << int32(kMaximumWidth);
+	fWidthSlider->SetLimitLabels(
+		B_TRANSLATE_COMMENT(minWidthLabel.String(), "Slider low text"),
+		B_TRANSLATE_COMMENT(maxWidthLabel.String(), "Slider high text"));
 
 	// Display time
-	fTimeout = new BTextControl(B_TRANSLATE("Hide notifications from screen"
-		" after"), NULL, new BMessage(kSettingChanged));
-	BStringView* displayTimeLabel = new BStringView("dt_label",
-		B_TRANSLATE("seconds of inactivity"));
+	fDurationSlider = new BSlider("duration", B_TRANSLATE("Duration:"),
+		new BMessage(kTimeoutChanged), kMinimumTimeout, kMaximumTimeout,
+		B_HORIZONTAL);
+	fDurationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fDurationSlider->SetHashMarkCount(kMaximumTimeout - kMinimumTimeout + 1);
+	BString minLabel;
+	minLabel << kMinimumTimeout;
+	BString maxLabel;
+	maxLabel << kMaximumTimeout;
+	fDurationSlider->SetLimitLabels(
+		B_TRANSLATE_COMMENT(minLabel.String(), "Slider low text"),
+		B_TRANSLATE_COMMENT(maxLabel.String(), "Slider high text"));
 
-	// Default position
-	// TODO: Here will come a screen representation with the four corners
-	// clickable
-
+	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fWidthSlider)
+		.Add(fDurationSlider)
+		.AddGlue()
+		.View());
+	
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.AddGroup(B_HORIZONTAL, B_USE_WINDOW_SPACING)
-			.Add(fNotificationBox)
-			.AddGlue()
-		.End()
-		.AddGroup(B_VERTICAL, B_USE_WINDOW_SPACING)
-			.Add(fAutoStart)
-			.AddGroup(B_HORIZONTAL)
-				.AddGroup(B_HORIZONTAL, 2)
-					.Add(fTimeout)
-					.Add(displayTimeLabel)
-				.End()
-			.End()
-		.End()
 		.SetInsets(B_USE_WINDOW_SPACING)
-		.AddGlue();
+		.Add(box)
+	.End();
 }
 
 
 void
 GeneralView::AttachedToWindow()
 {
+	BView::AttachedToWindow();
 	fNotificationBox->SetTarget(this);
-	fAutoStart->SetTarget(this);
-	fTimeout->SetTarget(this);
+	fWidthSlider->SetTarget(this);
+	fDurationSlider->SetTarget(this);
 }
 
 
@@ -99,70 +117,23 @@ GeneralView::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case kToggleNotifications:
 		{
-			entry_ref ref;
-
-			// Check if server is available
-			if (!_CanFindServer(&ref)) {
-				BAlert* alert = new BAlert(B_TRANSLATE("Notifications"),
-					B_TRANSLATE("The notifications server cannot be"
-					" found, this means your InfoPopper installation was"
-					" not successfully completed."), B_TRANSLATE("OK"),
-					NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-				(void)alert->Go();
-				return;
-			}
-
-			if (fNotificationBox->Value() == B_CONTROL_OFF) {
-				// Server team
-				team_id team = be_roster->TeamFor(kNotificationServerSignature);
-
-				// Establish a connection to infopopper_server
-				status_t ret = B_ERROR;
-				BMessenger messenger(kNotificationServerSignature, team, &ret);
-				if (ret != B_OK) {
-					BAlert* alert = new BAlert(B_TRANSLATE(
-						"Notifications"), B_TRANSLATE("Notifications "
-						"cannot be stopped, because the server can't be"
-						" reached."), B_TRANSLATE("OK"), NULL, NULL,
-						B_WIDTH_AS_USUAL, B_STOP_ALERT);
-					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-					(void)alert->Go();
-					return;
-				}
-
-				// Send quit message
-				if (messenger.SendMessage(B_QUIT_REQUESTED) != B_OK) {
-					BAlert* alert = new BAlert(B_TRANSLATE(
-						"Notifications"), B_TRANSLATE("Cannot disable"
-						" notifications because the server can't be "
-						"reached."), B_TRANSLATE("OK"),
-						NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-					(void)alert->Go();
-					return;
-				}
-			} else if (!_IsServerRunning()) {
-				// Start server
-				status_t err = be_roster->Launch(kNotificationServerSignature);
-				if (err != B_OK) {
-					BAlert* alert = new BAlert(B_TRANSLATE(
-						"Notifications"), B_TRANSLATE("Cannot enable"
-						" notifications because the server cannot be "
-						"found.\nThis means your InfoPopper installation"
-						" was not successfully completed."),
-						B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-						B_STOP_ALERT);
-					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-					(void)alert->Go();
-					return;
-				}
-			}
+			SettingsPane::SettingsChanged(false);
+			_EnableControls();
 			break;
 		}
-		case kSettingChanged:
-			SettingsPane::MessageReceived(msg);
+		case kWidthChanged: {
+			int32 value = fWidthSlider->Value() * 50;
+			_SetWidthLabel(value);
+			SettingsPane::SettingsChanged(true);
 			break;
+		}
+		case kTimeoutChanged:
+		{
+			int32 value = fDurationSlider->Value();
+			_SetTimeoutLabel(value);
+			SettingsPane::SettingsChanged(true);
+			break;
+		}
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -173,33 +144,45 @@ GeneralView::MessageReceived(BMessage* msg)
 status_t
 GeneralView::Load(BMessage& settings)
 {
-	char buffer[255];
+	bool autoStart = settings.GetBool(kAutoStartName, true);
+	fNotificationBox->SetValue(autoStart ? B_CONTROL_ON : B_CONTROL_OFF);
 
-	fNotificationBox->SetValue(_IsServerRunning() ? B_CONTROL_ON : B_CONTROL_OFF);
+	if (settings.FindFloat(kWidthName, &fOriginalWidth) != B_OK
+		|| fOriginalWidth > kMaximumWidth
+		|| fOriginalWidth < kMinimumWidth)
+		fOriginalWidth = kDefaultWidth;
 
-	bool autoStart;
-	if (settings.FindBool(kAutoStartName, &autoStart) != B_OK)
-		autoStart = kDefaultAutoStart;
-	fAutoStart->SetValue(autoStart ? B_CONTROL_ON : B_CONTROL_OFF);
+	if (settings.FindInt32(kTimeoutName, &fOriginalTimeout) != B_OK
+		|| fOriginalTimeout > kMaximumTimeout
+		|| fOriginalTimeout < kMinimumTimeout)
+		fOriginalTimeout = kDefaultTimeout;
+// TODO need to save again if values outside of expected range
+	int32 setting;
+	if (settings.FindInt32(kIconSizeName, &setting) != B_OK)
+		fOriginalIconSize = kDefaultIconSize;
+	else
+		fOriginalIconSize = (icon_size)setting;
 
-	int32 timeout;
-	if (settings.FindInt32(kTimeoutName, &timeout) != B_OK)
-		timeout = kDefaultTimeout;
-	(void)sprintf(buffer, "%" B_PRId32, timeout);
-	fTimeout->SetText(buffer);
-
-	return B_OK;
+	_EnableControls();
+	
+	return Revert();
 }
 
 
 status_t
 GeneralView::Save(BMessage& settings)
 {
-	bool autoStart = (fAutoStart->Value() == B_CONTROL_ON);
+	bool autoStart = (fNotificationBox->Value() == B_CONTROL_ON);
 	settings.AddBool(kAutoStartName, autoStart);
 
-	int32 timeout = atol(fTimeout->Text());
+	int32 timeout = fDurationSlider->Value();
 	settings.AddInt32(kTimeoutName, timeout);
+
+	float width = fWidthSlider->Value() * 50;
+	settings.AddFloat(kWidthName, width);
+
+	icon_size iconSize = B_LARGE_ICON;
+	settings.AddInt32(kIconSizeName, (int32)iconSize);
 
 	return B_OK;
 }
@@ -208,41 +191,94 @@ GeneralView::Save(BMessage& settings)
 status_t
 GeneralView::Revert()
 {
-	return B_ERROR;
+	fDurationSlider->SetValue(fOriginalTimeout);
+	_SetTimeoutLabel(fOriginalTimeout);
+	
+	fWidthSlider->SetValue(fOriginalWidth / 50);
+	_SetWidthLabel(fOriginalWidth);
+	
+	return B_OK;
 }
 
 
 bool
-GeneralView::_CanFindServer(entry_ref* ref)
+GeneralView::RevertPossible()
 {
-	// Try searching with be_roster
-	if (be_roster->FindApp(kNotificationServerSignature, ref) == B_OK)
+	int32 timeout = fDurationSlider->Value();
+	if (fOriginalTimeout != timeout)
+		return true;
+	
+	int32 width = fWidthSlider->Value() * 50;
+	if (fOriginalWidth != width)
 		return true;
 
-	// Try with a query and take the first result
-	BVolumeRoster vroster;
-	BVolume volume;
-	char volName[B_FILE_NAME_LENGTH];
-
-	vroster.Rewind();
-
-	while (vroster.GetNextVolume(&volume) == B_OK) {
-		if ((volume.InitCheck() != B_OK) || !volume.KnowsQuery())
-			continue;
-
-		volume.GetName(volName);
-
-		BQuery *query = new BQuery();
-		query->SetPredicate("(BEOS:APP_SIG==\"" kNotificationServerSignature
-			"\")");
-		query->SetVolume(&volume);
-		query->Fetch();
-
-		if (query->GetNextRef(ref) == B_OK)
-			return true;
-	}
-
 	return false;
+}
+
+
+status_t
+GeneralView::Defaults()
+{
+	fDurationSlider->SetValue(kDefaultTimeout);
+	_SetTimeoutLabel(kDefaultTimeout);
+
+	fWidthSlider->SetValue(kDefaultWidth / 50);
+	_SetWidthLabel(kDefaultWidth);
+
+	return B_OK;
+}
+
+
+bool
+GeneralView::DefaultsPossible()
+{
+	int32 timeout = fDurationSlider->Value();
+	if (kDefaultTimeout != timeout)
+		return true;
+
+	int32 width = fWidthSlider->Value() * 50;
+	if (kDefaultWidth != width)
+		return true;
+	
+	return false;
+}
+
+
+bool
+GeneralView::UseDefaultRevertButtons()
+{
+	return true;
+}
+
+
+void
+GeneralView::_EnableControls()
+{
+	bool enabled = fNotificationBox->Value() == B_CONTROL_ON;
+	fWidthSlider->SetEnabled(enabled);
+	fDurationSlider->SetEnabled(enabled);
+}
+
+
+void
+GeneralView::_SetTimeoutLabel(int32 value)
+{
+	BString label(B_TRANSLATE("Timeout:"));
+	label.Append(" ");
+	label << value;
+	label.Append(" ").Append(B_TRANSLATE("seconds"));
+	fDurationSlider->SetLabel(label.String());
+}
+
+
+void
+GeneralView::_SetWidthLabel(int32 value)
+{
+	BString label(B_TRANSLATE("Width:"));
+	label.Append(" ");
+	label << value;
+	label.Append(" ").Append(B_TRANSLATE("pixels"));
+	fWidthSlider->SetLabel(label.String());
 }
 
 

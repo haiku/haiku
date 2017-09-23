@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,9 +11,11 @@
 
 #include <stdlib.h>
 
+#include <Alert.h>
 #include <Beep.h>
 #include <Notifications.h>
 #include <PropertyInfo.h>
+#include <Roster.h>
 
 #include "NotificationWindow.h"
 
@@ -56,9 +58,8 @@ NotificationServer::MessageReceived(BMessage* message)
 			if (!fWindow)
 				return;
 
-			int32 type = 0;
-
 			// Emit a sound for this event
+			int32 type = 0;
 			if (message->FindInt32("type", &type) == B_OK) {
 				if (type < (int32)(sizeof(kSoundNames) / sizeof(const char*)))
 					system_beep(kSoundNames[type]);

@@ -1,18 +1,20 @@
 SubDir HAIKU_TOP src preferences notifications ;
 
-UsePrivateHeaders shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers notification ] : true ;
 
-UsePrivateHeaders interface ;
+UsePrivateHeaders interface notification ;
 
 Application Notifications :
+	AppRefFilter.cpp
 	Notifications.cpp
 	PrefletWin.cpp
 	PrefletView.cpp
 	SettingsPane.cpp
 	GeneralView.cpp
-	DisplayView.cpp
 	NotificationsView.cpp
-	: be translation libcolumnlistview.a libnotification.a [ TargetLibstdc++ ] localestub
+	../../servers/notification/NotificationView.cpp
+	../../servers/notification/AppGroupView.cpp
+	: be translation tracker libcolumnlistview.a libnotification.a [ TargetLibstdc++ ] localestub
 	: Notifications.rdef
 ;
 
@@ -22,7 +24,6 @@ Depends Notifications : libnotification.a ;
 DoCatalogs Notifications :
 	x-vnd.Haiku-Notifications
 	:
-	DisplayView.cpp
 	GeneralView.cpp
 	PrefletWin.cpp
 	PrefletView.cpp

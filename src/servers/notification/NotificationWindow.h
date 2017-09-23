@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
  * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
  * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
@@ -13,6 +13,7 @@
 #include <map>
 
 #include <AppFileInfo.h>
+#include <Path.h>
 #include <String.h>
 #include <Window.h>
 
@@ -26,13 +27,6 @@ struct property_info;
 
 typedef std::map<BString, AppGroupView*> appview_t;
 typedef std::map<BString, AppUsage*> appfilter_t;
-typedef std::vector<NotificationView*> views_t;
-
-extern const float kEdgePadding;
-extern const float kSmallPadding;
-extern const float kCloseSize;
-extern const float kExpandSize;
-extern const float kPenSize;
 
 const uint32 kRemoveGroupView = 'RGVi';
 
@@ -47,8 +41,6 @@ public:
 	virtual	void					WorkspaceActivated(int32, bool);
 	virtual	void					FrameResized(float width, float height);
 	virtual	void					ScreenChanged(BRect frame, color_space mode);
-	virtual	BHandler*				ResolveSpecifier(BMessage*, int32, BMessage*,
-										int32, const char*);
 										
 			icon_size				IconSize();
 			int32					Timeout();
@@ -59,27 +51,20 @@ public:
 private:
 	friend class AppGroupView;
 
-			void					NotificationViewSwapped(
-										NotificationView* stale,
-										NotificationView* fresh);
-
 			void					SetPosition();
 			void					_LoadSettings(bool startMonitor = false);
 			void					_LoadAppFilters(BMessage& settings);
 			void					_LoadGeneralSettings(BMessage& settings);
 			void					_LoadDisplaySettings(BMessage& settings);
 
-			views_t					fViews;
 			appview_t				fAppViews;
-
-			BString					fStatusText;
-			BString					fMessageText;
+			appfilter_t				fAppFilters;
 
 			float					fWidth;
 			icon_size				fIconSize;
 			int32					fTimeout;
-
-			appfilter_t				fAppFilters;
+			bool					fShouldRun;
+			BPath					fCachePath;
 };
 
 extern property_info main_prop_list[];

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NOTIFICATION_H
@@ -33,6 +33,9 @@ public:
 
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive, bool deep = true) const;
+
+			const char*			SourceSignature() const;
+			const char*			SourceName() const;
 
 			notification_type	Type() const;
 
@@ -73,6 +76,8 @@ public:
 private:
 			status_t			fInitStatus;
 
+			BString				fSourceSignature;
+			BString				fSourceName;
 			notification_type	fType;
 			BString				fGroup;
 			BString				fTitle;

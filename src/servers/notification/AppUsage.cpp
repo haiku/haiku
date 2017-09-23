@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Copyright 2008-2009, Pier Luigi Fiorini. All Rights Reserved.
  * Copyright 2004-2008, Michael Davidson. All Rights Reserved.
  * Copyright 2004-2007, Mikael Eiman. All Rights Reserved.
@@ -9,6 +9,7 @@
  *		Michael Davidson, slaad@bong.com.au
  *		Mikael Eiman, mikael@eiman.tv
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
+ *		Brian Hill, supernova@tycho.email
  */
 
 #include <Message.h>
@@ -21,25 +22,19 @@ const type_code kTypeCode = 'ipau';
 
 AppUsage::AppUsage()
 	:
-	fName(""),
+	fAppName(""),
+	fSignature(""),
 	fAllow(true)
 {
 }
 
 
-AppUsage::AppUsage(const char* name, bool allow)
+AppUsage::AppUsage(const char* name, const char* signature, bool allow)
 	:
-	fName(name),
+	fAppName(name),
+	fSignature(signature),
 	fAllow(allow)
 {	
-}
-
-
-AppUsage::~AppUsage()
-{
-	notification_t::iterator nIt;
-	for (nIt = fNotifications.begin(); nIt != fNotifications.end(); nIt++)
-		delete nIt->second;
 }
 
 
@@ -54,12 +49,9 @@ status_t
 AppUsage::Flatten(void* buffer, ssize_t numBytes) const
 {
 	BMessage msg;
-	msg.AddString("signature", fName);
+	msg.AddString("name", fAppName);
+	msg.AddString("signature", fSignature);
 	msg.AddBool("allow", fAllow);
-
-	notification_t::const_iterator nIt;
-	for (nIt = fNotifications.begin(); nIt != fNotifications.end(); nIt++)
-		msg.AddFlat("notification", nIt->second);
 
 	if (numBytes < msg.FlattenedSize())
 		return B_ERROR;
@@ -72,12 +64,9 @@ ssize_t
 AppUsage::FlattenedSize() const
 {
 	BMessage msg;
-	msg.AddString("signature", fName);
+	msg.AddString("name", fAppName);
+	msg.AddString("signature", fSignature);
 	msg.AddBool("allow", fAllow);
-
-	notification_t::const_iterator nIt;
-	for (nIt = fNotifications.begin(); nIt != fNotifications.end(); nIt++)
-		msg.AddFlat("notification", nIt->second);
 
 	return msg.FlattenedSize();
 }
@@ -110,23 +99,9 @@ AppUsage::Unflatten(type_code code, const void* buffer,
 	status = msg.Unflatten((const char*)buffer);
 
 	if (status == B_OK) {
-		msg.FindString("signature", &fName);
+		msg.FindString("name", &fAppName);
+		msg.FindString("signature", &fSignature);
 		msg.FindBool("allow", &fAllow);
-
-		type_code type;
-		int32 count = 0;
-
-		status = msg.GetInfo("notification", &type, &count);
-		if (status != B_OK)
-			return status;
-
-		for (int32 i = 0; i < count; i++) {
-			NotificationReceived *notification = new NotificationReceived();
-			msg.FindFlat("notification", i, notification);
-			fNotifications[notification->Title()] = notification;
-		}
-
-		status = B_OK;
 	}
 	
 	return status;
@@ -134,30 +109,16 @@ AppUsage::Unflatten(type_code code, const void* buffer,
 
 						
 const char*
-AppUsage::Name()
+AppUsage::AppName()
 {
-	return fName.String();
+	return fAppName.String();
 }
 
 
-bool
-AppUsage::Allowed(const char* title, notification_type type)
+const char*
+AppUsage::Signature()
 {
-	bool allowed = fAllow;
-
-	if (allowed) {
-		notification_t::iterator nIt = fNotifications.find(title);
-		if (nIt == fNotifications.end()) {
-			allowed = true;		
-			fNotifications[title] = new NotificationReceived(title, type);
-		} else {
-			allowed = nIt->second->Allowed();
-			nIt->second->UpdateTimeStamp();
-			nIt->second->SetType(type);
-		}
-	}
-
-	return allowed;
+	return fSignature.String();
 }
 
 
@@ -168,26 +129,8 @@ AppUsage::Allowed()
 }
 
 
-NotificationReceived*
-AppUsage::NotificationAt(int32 index)
-{
-	notification_t::iterator nIt = fNotifications.begin();
-	for (int32 i = 0; i < index; i++)
-		nIt++;
-
-	return nIt->second;
-}
-
-
-int32
-AppUsage::Notifications()
-{
-	return fNotifications.size();
-}
-
-
 void
-AppUsage::AddNotification(NotificationReceived* notification)
+AppUsage::SetAllowed(bool allow)
 {
-	fNotifications[notification->Title()] = notification;
+	fAllow = allow;
 }
