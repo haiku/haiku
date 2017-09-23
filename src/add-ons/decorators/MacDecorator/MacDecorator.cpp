@@ -349,20 +349,60 @@ MacDecorator::_DrawFrame(BRect invalid)
 				fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
 
 				// Draw the top side of the frame that is not in the tab
-				offset = r.RightTop();
-				pt2 = r.RightBottom();
+				if (fTopTab->look == B_MODAL_WINDOW_LOOK) {
+					offset = r.LeftTop();
+					pt2 = r.RightTop();
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
+					offset.x++;
+					offset.y++;
+					pt2.x--;
+					pt2.y++;
 
-				fDrawingEngine->StrokeLine(topleftpt, toprightpt, fFrameLowerColor);
-				topleftpt.y--;
-				toprightpt.x++;
-				toprightpt.y--;
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameHighColor);
+					offset.x++;
+					offset.y++;
+					pt2.x--;
+					pt2.y++;
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameMidColor);
+					offset.x++;
+					offset.y++;
+					pt2.x--;
+					pt2.y++;
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameMidColor);
+					offset.x++;
+					offset.y++;
+					pt2.x--;
+					pt2.y++;
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowColor);
+					offset.x++;
+					offset.y++;
+					pt2.x--;
+					pt2.y++;
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
+				} else {
+					// Some odd stuff here where the title bar is melded into the
+					// window border so that the sides are drawn into the title
+					// so we draw this bottom up 
+					offset = topleftpt;
+					pt2 = toprightpt;
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
+					offset.y--;
+					offset.x++;
+					pt2.y--;
+					
+					fDrawingEngine->StrokeLine(offset, pt2, fFrameLowColor);
+				}
 
-				fDrawingEngine->StrokeLine(topleftpt, toprightpt, fFrameLowColor);
-
+				// Draw the bottom side of the frame
 				offset = r.LeftBottom();
 				pt2 = r.RightBottom();
 
-				// Draw the bottom side of the frame
 				fDrawingEngine->StrokeLine(offset, pt2, fFrameLowerColor);
 				offset.x++;
 				offset.y--;
