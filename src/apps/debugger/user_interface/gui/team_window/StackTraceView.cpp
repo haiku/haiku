@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,8 +13,6 @@
 
 #include <ControlLook.h>
 #include <Window.h>
-
-#include <AutoDeleter.h>
 
 #include "table/TableColumns.h"
 
@@ -101,86 +99,6 @@ private:
 };
 
 
-// #pragma mark - StackTraceKey
-
-
-struct StackTraceView::StackTraceKey {
-	StackTrace*			stackTrace;
-
-	StackTraceKey(StackTrace* stackTrace)
-		:
-		stackTrace(stackTrace)
-	{
-	}
-
-	uint32 HashValue() const
-	{
-		return *(uint32*)stackTrace;
-	}
-
-	bool operator==(const StackTraceKey& other) const
-	{
-		return stackTrace == other.stackTrace;
-	}
-};
-
-
-// #pragma mark - StackTraceSelectionEntry
-
-
-struct StackTraceView::StackTraceSelectionEntry : StackTraceKey {
-	StackTraceSelectionEntry* next;
-	int32 selectedFrameIndex;
-
-	StackTraceSelectionEntry(StackTrace* stackTrace)
-		:
-		StackTraceKey(stackTrace),
-		selectedFrameIndex(0)
-	{
-	}
-
-	inline int32 SelectedFrameIndex() const
-	{
-		return selectedFrameIndex;
-	}
-
-	void SetSelectedFrameIndex(int32 index)
-	{
-		selectedFrameIndex = index;
-	}
-};
-
-
-// #pragma mark - StackTraceSelectionEntryHashDefinition
-
-
-struct StackTraceView::StackTraceSelectionEntryHashDefinition {
-	typedef StackTraceKey				KeyType;
-	typedef	StackTraceSelectionEntry	ValueType;
-
-	size_t HashKey(const StackTraceKey& key) const
-	{
-		return key.HashValue();
-	}
-
-	size_t Hash(const StackTraceSelectionEntry* value) const
-	{
-		return value->HashValue();
-	}
-
-	bool Compare(const StackTraceKey& key,
-		const StackTraceSelectionEntry* value) const
-	{
-		return key == *value;
-	}
-
-	StackTraceSelectionEntry*& GetLink(StackTraceSelectionEntry* value) const
-	{
-		return value->next;
-	}
-};
-
-
 // #pragma mark - StackTraceView
 
 
@@ -191,7 +109,6 @@ StackTraceView::StackTraceView(Listener* listener)
 	fFramesTable(NULL),
 	fFramesTableModel(NULL),
 	fTraceClearPending(false),
-	fSelectionInfoTable(NULL),
 	fListener(listener)
 {
 	SetName("Stack Trace");
@@ -203,7 +120,6 @@ StackTraceView::~StackTraceView()
 	SetStackTrace(NULL);
 	fFramesTable->SetTableModel(NULL);
 	delete fFramesTableModel;
-	delete fSelectionInfoTable;
 }
 
 
@@ -253,24 +169,11 @@ void
 StackTraceView::SetStackFrame(StackFrame* stackFrame)
 {
 	if (fStackTrace != NULL && stackFrame != NULL) {
-		int32 selectedIndex = -1;
-		StackTraceSelectionEntry* entry = fSelectionInfoTable->Lookup(
-			fStackTrace);
-		if (entry != NULL)
-			selectedIndex = entry->SelectedFrameIndex();
-		else {
-			for (int32 i = 0; StackFrame* other = fStackTrace->FrameAt(i);
-				i++) {
-				if (stackFrame == other) {
-					selectedIndex = i;
-					break;
-				}
+		for (int32 i = 0; StackFrame* other = fStackTrace->FrameAt(i); i++) {
+			if (stackFrame == other) {
+				fFramesTable->SelectRow(i, false);
+				return;
 			}
-		}
-
-		if (selectedIndex >= 0) {
-			fFramesTable->SelectRow(selectedIndex, false);
-			return;
 		}
 	}
 
@@ -308,11 +211,6 @@ void
 StackTraceView::SetStackTraceClearPending()
 {
 	fTraceClearPending = true;
-	StackTraceSelectionEntry* entry = fSelectionInfoTable->Lookup(fStackTrace);
-	if (entry != NULL) {
-		fSelectionInfoTable->Remove(entry);
-		delete entry;
-	}
 }
 
 
@@ -322,23 +220,8 @@ StackTraceView::TableSelectionChanged(Table* table)
 	if (fListener == NULL || fTraceClearPending)
 		return;
 
-	int32 selectedIndex = table->SelectionModel()->RowAt(0);
-	StackFrame* frame = fFramesTableModel->FrameAt(selectedIndex);
-
-	StackTraceSelectionEntry* entry = fSelectionInfoTable->Lookup(fStackTrace);
-	if (entry == NULL) {
-		entry = new(std::nothrow) StackTraceSelectionEntry(fStackTrace);
-		if (entry == NULL)
-			return;
-
-		ObjectDeleter<StackTraceSelectionEntry> entryDeleter(entry);
-		if (fSelectionInfoTable->Insert(entry) != B_OK)
-			return;
-
-		entryDeleter.Detach();
-	}
-
-	entry->SetSelectedFrameIndex(selectedIndex);
+	StackFrame* frame
+		= fFramesTableModel->FrameAt(table->SelectionModel()->RowAt(0));
 
 	fListener->StackFrameSelectionChanged(frame);
 }
@@ -347,13 +230,6 @@ StackTraceView::TableSelectionChanged(Table* table)
 void
 StackTraceView::_Init()
 {
-	fSelectionInfoTable = new StackTraceSelectionInfoTable;
-	if (fSelectionInfoTable->Init() != B_OK) {
-		delete fSelectionInfoTable;
-		fSelectionInfoTable = NULL;
-		throw std::bad_alloc();
-	}
-
 	fFramesTable = new Table("stack trace", 0, B_FANCY_BORDER);
 	AddChild(fFramesTable->ToView());
 	fFramesTable->SetSortingEnabled(false);
