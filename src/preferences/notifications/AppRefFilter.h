@@ -2,8 +2,8 @@
  * Copyright 2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef EP_APPREFFILTER_H
-#define EP_APPREFFILTER_H
+#ifndef _APP_REF_FILTER_H
+#define _APP_REF_FILTER_H
 
 #include <FilePanel.h>
 #include <NodeInfo.h>
@@ -18,4 +18,4 @@ public:
 							const char *filetype);
 };
 
-#endif
+#endif // _APP_REF_FILTER_H

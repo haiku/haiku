@@ -457,10 +457,8 @@ NotificationView::SetText(float newMaxWidth)
 	else
 		iconRight += 32;
 
-	BFont boldFont(be_plain_font);
-	boldFont.SetFace(B_BOLD_FACE);
 	font_height fh;
-	boldFont.GetHeight(&fh);
+	be_bold_font->GetHeight(&fh);
 	float fontHeight = ceilf(fh.leading) + ceilf(fh.descent)
 		+ ceilf(fh.ascent);
 	float y = fontHeight + kEdgePadding * 2;
@@ -468,7 +466,7 @@ NotificationView::SetText(float newMaxWidth)
 	// Title
 	LineInfo* titleLine = new LineInfo;
 	titleLine->text = fNotification->Title();
-	titleLine->font = boldFont;
+	titleLine->font = *be_bold_font;
 
 	titleLine->location = BPoint(iconRight + kEdgePadding, y);
 

@@ -38,7 +38,7 @@ AppGroupView::AppGroupView(const BMessenger& messenger, const char* label)
 {
 	SetFlags(Flags() | B_WILL_DRAW);
 
-	fHeaderSize = be_plain_font->Size()
+	fHeaderSize = be_bold_font->Size()
 		+ be_control_look->ComposeSpacing(B_USE_ITEM_SPACING);
 	static_cast<BGroupLayout*>(GetLayout())->SetInsets(0, fHeaderSize, 0, 0);
 }
@@ -92,9 +92,7 @@ AppGroupView::Draw(BRect updateRect)
 	if (fCollapsed)
 		label << " (" << fInfo.size() << ")";
 
-	BFont boldFont(be_plain_font);
-	boldFont.SetFace(B_BOLD_FACE);
-	SetFont(&boldFont);
+	SetFont(be_bold_font);
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
