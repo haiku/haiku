@@ -29,7 +29,7 @@ switch $(HOST_PLATFORM) {
 	case haiku_host :
 		DEFINES += HAVE_FOPENCOOKIE ;
 	case freebsd :
-		DEFINES += HAVE_FUNOPEN ;
+		DEFINES += HAVE_STRCHRNUL HAVE_FUNOPEN ;
 	case darwin :
 		DEFINES += HAVE_FUNOPEN HAVE_QSORT_R ;
 	case * :
