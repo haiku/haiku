@@ -35,15 +35,15 @@ static const BString kTitleUrl = B_TRANSLATE_COMMENT("URL", "Column title");
 static const BString kLabelRemove =
 	B_TRANSLATE_COMMENT("Remove", "Button label");
 static const BString kLabelRemoveAll =
-	B_TRANSLATE_COMMENT("Remove All", "Button label");
+	B_TRANSLATE_COMMENT("Remove all", "Button label");
 static const BString kLabelEnable =
 	B_TRANSLATE_COMMENT("Enable", "Button label");
 static const BString kLabelEnableAll =
-	B_TRANSLATE_COMMENT("Enable All", "Button label");
+	B_TRANSLATE_COMMENT("Enable all", "Button label");
 static const BString kLabelDisable =
 	B_TRANSLATE_COMMENT("Disable", "Button label");
 static const BString kLabelDisableAll =
-	B_TRANSLATE_COMMENT("Disable All", "Button label");
+	B_TRANSLATE_COMMENT("Disable all", "Button label");
 static const BString kStatusViewText =
 	B_TRANSLATE_COMMENT("Changes pending:", "Status view text");
 static const BString kStatusCompletedText =
@@ -304,7 +304,7 @@ RepositoriesView::MessageReceived(BMessage* message)
 					&& kNewRepoDefaultName.Compare(rowItem->Name()) != 0) {
 					(new BAlert("duplicate",
 						B_TRANSLATE_COMMENT("Only one URL for each repository can "
-							"be enabled.  Please change your selections.",
+							"be enabled. Please change your selections.",
 							"Error message"),
 						kOKLabel, NULL, NULL,
 						B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go(NULL);
