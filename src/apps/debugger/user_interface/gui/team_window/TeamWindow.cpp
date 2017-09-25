@@ -82,6 +82,97 @@ enum {
 };
 
 
+// #pragma mark - ThreadStackFrameSelectionKey
+
+
+struct TeamWindow::ThreadStackFrameSelectionKey {
+	::Thread*	thread;
+
+	ThreadStackFrameSelectionKey(::Thread* thread)
+		:
+		thread(thread)
+	{
+		thread->AcquireReference();
+	}
+
+	~ThreadStackFrameSelectionKey()
+	{
+		thread->ReleaseReference();
+	}
+
+	uint32 HashValue() const
+	{
+		return (uint32)thread->ID();
+	}
+
+	bool operator==(const ThreadStackFrameSelectionKey& other) const
+	{
+		return thread == other.thread;
+	}
+};
+
+
+// #pragma mark - ThreadStackFrameSelectionEntry
+
+
+struct TeamWindow::ThreadStackFrameSelectionEntry
+	: ThreadStackFrameSelectionKey {
+	ThreadStackFrameSelectionEntry* next;
+	StackFrame* selectedFrame;
+
+	ThreadStackFrameSelectionEntry(::Thread* thread, StackFrame* frame)
+		:
+		ThreadStackFrameSelectionKey(thread),
+		selectedFrame(frame)
+	{
+	}
+
+	inline StackFrame* SelectedFrame() const
+	{
+		return selectedFrame;
+	}
+
+	void SetSelectedFrame(StackFrame* frame)
+	{
+		selectedFrame = frame;
+	}
+};
+
+
+// #pragma mark - ThreadStackFrameSelectionEntryHashDefinition
+
+
+struct TeamWindow::ThreadStackFrameSelectionEntryHashDefinition {
+	typedef ThreadStackFrameSelectionKey 	KeyType;
+	typedef ThreadStackFrameSelectionEntry	ValueType;
+
+	size_t HashKey(const ThreadStackFrameSelectionKey& key) const
+	{
+		return key.HashValue();
+	}
+
+	size_t Hash(const ThreadStackFrameSelectionKey* value) const
+	{
+		return value->HashValue();
+	}
+
+	bool Compare(const ThreadStackFrameSelectionKey& key,
+		const ThreadStackFrameSelectionKey* value) const
+	{
+		return key == *value;
+	}
+
+	ThreadStackFrameSelectionEntry*& GetLink(
+		ThreadStackFrameSelectionEntry* value) const
+	{
+		return value->next;
+	}
+};
+
+
+// #pragma mark - PathViewMessageFilter
+
+
 class PathViewMessageFilter : public BMessageFilter {
 public:
 		PathViewMessageFilter(BMessenger teamWindow)
@@ -115,6 +206,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fActiveImage(NULL),
 	fActiveStackTrace(NULL),
 	fActiveStackFrame(NULL),
+	fThreadSelectionInfoTable(NULL),
 	fActiveBreakpoint(NULL),
 	fActiveFunction(NULL),
 	fActiveSourceCode(NULL),
@@ -190,6 +282,7 @@ TeamWindow::~TeamWindow()
 	_SetActiveThread(NULL);
 
 	delete fFilePanel;
+	delete fThreadSelectionInfoTable;
 
 	if (fActiveSourceWorker > 0)
 		wait_for_thread(fActiveSourceWorker, NULL);
@@ -990,6 +1083,13 @@ TeamWindow::FunctionSourceCodeChanged(Function* function)
 void
 TeamWindow::_Init()
 {
+	fThreadSelectionInfoTable = new ThreadStackFrameSelectionInfoTable;
+	if (fThreadSelectionInfoTable->Init() != B_OK) {
+		delete fThreadSelectionInfoTable;
+		fThreadSelectionInfoTable = NULL;
+		throw std::bad_alloc();
+	}
+
 	BScrollView* sourceScrollView;
 
 	const float splitSpacing = 3.0f;
@@ -1293,10 +1393,17 @@ TeamWindow::_SetActiveStackTrace(StackTrace* stackTrace)
 	fStackTraceView->SetStackTrace(fActiveStackTrace);
 	fSourceView->SetStackTrace(fActiveStackTrace, fActiveThread);
 
-	if (fActiveStackTrace != NULL)
-		_SetActiveStackFrame(fActiveStackTrace->FrameAt(0));
-	else
-		_SetActiveStackFrame(NULL);
+	StackFrame* frame = NULL;
+	if (fActiveStackTrace != NULL) {
+		ThreadStackFrameSelectionEntry* entry
+			= fThreadSelectionInfoTable->Lookup(fActiveThread);
+		if (entry != NULL)
+			frame = entry->SelectedFrame();
+		else
+			frame = fActiveStackTrace->FrameAt(0);
+	}
+
+	_SetActiveStackFrame(frame);
 }
 
 
@@ -1325,7 +1432,21 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 
 		fActiveSourceObject = ACTIVE_SOURCE_STACK_FRAME;
 
-		_SetActiveFunction(fActiveStackFrame->Function());
+		ThreadStackFrameSelectionEntry* entry
+			= fThreadSelectionInfoTable->Lookup(fActiveThread);
+		if (entry == NULL) {
+			entry = new(std::nothrow) ThreadStackFrameSelectionEntry(
+				fActiveThread, fActiveStackFrame);
+			if (entry == NULL)
+				return;
+
+			ObjectDeleter<ThreadStackFrameSelectionEntry> entryDeleter(entry);
+			if (fThreadSelectionInfoTable->Insert(entry) == B_OK)
+				entryDeleter.Detach();
+		} else
+			entry->SetSelectedFrame(fActiveStackFrame);
+
+		_SetActiveFunction(fActiveStackFrame->Function(), false);
 	}
 
 	_UpdateCpuState();
@@ -1377,7 +1498,8 @@ TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
 
 
 void
-TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
+TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance,
+	bool searchForFrame)
 {
 	if (functionInstance == fActiveFunction)
 		return;
@@ -1428,29 +1550,20 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 
 	locker.Lock();
 
-	// if we already have an active stack frame at the requested
-	// function, we're done. This will be the case if e.g. the function
-	// is being set as a result of a call to _SetActiveStackFrame(), and
-	// would otherwise lead to issues in recursive cases where the wrong
-	// frame might mistakenly be selected.
-	if (fActiveStackFrame != NULL
-			&& fActiveStackFrame->Function() == fActiveFunction) {
+	if (!searchForFrame || fActiveStackTrace == NULL)
 		return;
-	}
 
 	// look if our current stack trace has a frame matching the selected
 	// function. If so, set it to match.
 	StackFrame* matchingFrame = NULL;
 	BReference<StackFrame> frameRef;
 
-	if (fActiveStackTrace != NULL) {
-		for (int32 i = 0; i < fActiveStackTrace->CountFrames(); i++) {
-			StackFrame* frame = fActiveStackTrace->FrameAt(i);
-			if (frame->Function() == fActiveFunction) {
-				matchingFrame = frame;
-				frameRef.SetTo(frame);
-				break;
-			}
+	for (int32 i = 0; i < fActiveStackTrace->CountFrames(); i++) {
+		StackFrame* frame = fActiveStackTrace->FrameAt(i);
+		if (frame->Function() == fActiveFunction) {
+			matchingFrame = frame;
+			frameRef.SetTo(frame);
+			break;
 		}
 	}
 
@@ -1626,6 +1739,15 @@ TeamWindow::_HandleThreadStateChanged(thread_id threadID)
 	::Thread* thread = fTeam->ThreadByID(threadID);
 	if (thread == NULL)
 		return;
+
+	if (thread->State() != THREAD_STATE_STOPPED) {
+		ThreadStackFrameSelectionEntry* entry
+			= fThreadSelectionInfoTable->Lookup(thread);
+		if (entry != NULL) {
+			fThreadSelectionInfoTable->Remove(entry);
+			delete entry;
+		}
+	}
 
 	// If the thread has been stopped and we don't have an active thread yet
 	// (or it isn't stopped), switch to this thread. Otherwise ignore the event.
