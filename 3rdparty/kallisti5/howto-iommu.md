@@ -22,26 +22,7 @@ need to enable IOMMU within the bios of your motherboard before proceeding.
 Linux Setup
 -----------------------
 Now that you have an IOMMU enabled system, you will need to tell Linux to
-fully utilize IOMMU. To do this, you will need to add a few kernel boot
-parameters. Depending on how your system is configured, there may be a few
-places to do this. Here are some example config files:
-
- * `/etc/default/grub` (`GRUB_CMDLINE_LINUX_DEFAULT`)
- * `/boot/grub/grub.cfg`
- * `/boot/grub/menu.lst`
- * `/boot/refind_linux.conf`
-
-Enabling OS support IOMMU for IOMMU involves adding one of the following
-kernel boot parameters:
-
-**AMD:**
-```
-iommu=pt iommu=1
-```
-**Intel:**
-```
-intel_iommu=on
-```
+fully utilize IOMMU and reserve the PCI cards for IOMMU use.
 
 Now, all we need to do is to reserve the PCI device. We want to make sure
 no host drivers attempt to attach to the PCI device in question.
@@ -51,77 +32,91 @@ this through lcpci. Running lspci shows a bunch of devices. I've identified
 this device as my target:
 
 ```
-07:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Cedar [Radeon HD 5000]
+$ lspci -nn | egrep "VGA|Audio"
+28:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 470/480/570/580] [1002:67df] (rev c7)
+28:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 580] [1002:aaf0]
+
+29:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Redwood XT GL [FirePro V4800] [1002:68c8]
+29:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Redwood HDMI Audio [Radeon HD 5000 Series] [1002:aa60]
+
+2b:00.3 Audio device [0403]: Advanced Micro Devices, Inc. [AMD] Device [1022:1457]
 ```
 
-Now, to get the PCI ID, I run lspci again with the -n flag (lspci -n). We find
-the matching BUS ID and we get our PCI ID:
+Now that we have our target PCI IDs (in this case, `1002:68c8,1002:aa60`), we can bind this device to
+the vfio-pci driver.
+
+**vfio-pci module**
+
+If your distro ships vfio-pci as a module, you will need to add the vfio drivers to the initial ramdisk
+to leverage them as early as possible in the boot process.
+
+Below is an example on Fedora:
 
 ```
-07:00.0 0300: 1002:68f9
+echo 'add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"' > /etc/dracut.conf.d/vfio.conf
+dracut -f --kver `uname -r`
 ```
 
-Now that we have our target PCI ID (`1002:68f9`), we can bind this device to
-a special pci-stub driver.
+**vfio reservation**
 
-We will create two files for this graphics card:
+Now that the requirements are met, we can attach the target GPU to the vfio driver using the information
+we have collected so far.
 
-**`/lib/modprobe.d/pci-stub.conf`:**
+Below, i've leveraged the PCI ID's collected above, and provided them to the vfio-pci driver via the kernel
+parameters at boot.
+
+> Be sure to replace <CPU> with amd or intel depending on your system.
+
 ```
-options pci-stub ids=1002:68f9
+rd.driver.pre=vfio-pci vfio-pci.ids=1002:68c8,1002:aa60 <CPU>_iommu=on
 ```
 
-**`/lib/modprobe.d/drm.conf`:**
-```
-softdep drm pre: pci-stub
-```
+> YMMV: These steps differ a lot between distros
 
-The first line tells the pci-stub driver to bind to the device in question.
-The second line tells DRM (graphics driver stack) that it should make sure
-pci-stub loads before DRM (ensuring the device is stubbed and not loaded by
-DRM).
+On my EFI Fedora 26 system, I appended the line above to my /etc/sysconfig/grub config under GRUB_CMDLINE_LINUX.
+Then, regenerated my grub.cfg via ```grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg```
+
+
+Attach GPU to VM
+-----------------
 
 Now we reboot and cross our fingers.
+
+> If displays attached to the card are now black, then things are working as designed. If you see your
+> desktop on the target GPU, the vfio driver didn't properly bind to your card and something was done
+> incorrectly.
 
 On my AMD Linux system, we can see that IOMMU is active and functional:
 
 ```
-kallisti5@eris ~ $ dmesg | grep AMD-Vi
-[    0.119400] [Firmware Bug]: AMD-Vi: IOAPIC[9] not in IVRS table
-[    0.119406] [Firmware Bug]: AMD-Vi: IOAPIC[10] not in IVRS table
-[    0.119409] [Firmware Bug]: AMD-Vi: No southbridge IOAPIC found
-[    0.119412] AMD-Vi: Disabling interrupt remapping
-[    1.823122] AMD-Vi: Found IOMMU at 0000:00:00.2 cap 0x40
-[    1.823253] AMD-Vi: Initialized for Passthrough Mode
+kallisti5@eris ~ $ dmesg | egrep "IOMMU|AMD-Vi"
+[    0.650138] AMD-Vi: IOMMU performance counters supported
+[    0.652201] AMD-Vi: Found IOMMU at 0000:00:00.2 cap 0x40
+[    0.652201] AMD-Vi: Extended features (0xf77ef22294ada):
+[    0.652204] AMD-Vi: Interrupt remapping enabled
+[    0.652204] AMD-Vi: virtual APIC enabled
+[    0.652312] AMD-Vi: Lazy IO/TLB flushing enabled
+[    0.653841] perf/amd_iommu: Detected AMD IOMMU #0 (2 banks, 4 counters/bank).
+[    4.114847] AMD IOMMUv2 driver by Joerg Roedel <jroedel@suse.de>
+
 ```
 
-And checking for pci-stub we can see it successfully took over my graphics card:
+And checking for vfio we can see it successfully took over my graphics card:
 ```
-kallisti5@eris ~ $ dmesg | grep pci-stub
-[    3.685970] pci-stub: add 1002:68F9 sub=FFFFFFFF:FFFFFFFF cls=00000000/00000000
-[    3.686002] pci-stub 0000:07:00.0: claimed by stub
+kallisti5@eris ~ $ dmesg | grep vfio
+[    3.928695] vfio-pci 0000:29:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=io+mem:owns=none
+[    3.940222] vfio_pci: add [1002:68c8[ffff:ffff]] class 0x000000/00000000
+[    3.952302] vfio_pci: add [1002:aa60[ffff:ffff]] class 0x000000/00000000
+[   35.629861] vfio-pci 0000:29:00.0: enabling device (0000 -> 0003)
 ```
 
 On every boot, the device will be available for attachment to VM's
 Now, we simply attach the device to a VM:
 
 ```
-sudo qemu-system-x86_64 --enable-kvm -hda haiku-nightly-anyboot.image -m 2048 -device pci-assign,host=07:00.0
-```
-
-If you experience any problems, try looking at kvm messages:
-```
-kallisti5@eris ~ $ dmesg | grep kvm
+sudo qemu-system-x86_64 --enable-kvm -hda haiku-nightly-anyboot.image -m 2048 -device pci-assign,host=29:00.0
 ```
 
 If you're doing this for a graphics card generally the qemu window will
 lock up at the bootsplash and the video will appear on the second window.
 Click the qemu window to control the Haiku machine.
-
-If things go well you will see:
-```
-[ 1966.132176] kvm: Nested Virtualization enabled
-[ 1966.132185] kvm: Nested Paging enabled
-[ 1972.212231] pci-stub 0000:07:00.0: kvm assign device
-[ 1974.186382] kvm: zapping shadow pages for mmio generation wraparound
-```
