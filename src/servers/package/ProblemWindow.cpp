@@ -142,6 +142,9 @@ ProblemWindow::Go(BSolver* solver, const SolverPackageSet& packagesAddedByUser,
 	}
 
 	locker.Lock();
+
+	Hide();
+
 	if (!locker.IsLocked() || !fAccepted || !_AnySolutionSelected())
 		return false;
 
