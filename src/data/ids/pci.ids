@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.09.17
-#	Date:    2017-09-17 03:15:01
+#	Version: 2017.09.26
+#	Date:    2017-09-26 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -612,6 +612,9 @@
 	00d0  SAS3716 Fusion-MPT Tri-Mode RAID Controller Chip (ROC)
 	00d1  SAS3616 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 	00d3  MegaRAID Tri-Mode SAS3716W
+	02b0  Virtual Endpoint on PCIe Switch
+		1d49 0001  ThinkSystem 1610-4P NVMe Switch Adapter
+		1d49 0002  ThinkSystem 810-4P NVMe Switch Adapter
 	0407  MegaRAID
 		1000 0530  MegaRAID 530 SCSI 320-0X RAID Controller
 		1000 0531  MegaRAID 531 SCSI 320-4X RAID Controller
@@ -4015,6 +4018,7 @@
 	1454  Family 17h (Models 00h-0fh) Internal PCIe GPP Bridge 0 to Bus B
 	145b  Zeppelin Non-Transparent Bridge
 	145c  USB3 Host Controller
+	145f  USB 3.0 Host controller
 	1460  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 0
 	1461  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 1
 	1462  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 2
@@ -9974,7 +9978,7 @@
 	0de5  GF108 [GeForce GT 530]
 	0de7  GF108 [GeForce GT 610]
 	0de8  GF108M [GeForce GT 620M]
-	0de9  GF108M [GeForce GT 630M]
+	0de9  GF108M [GeForce GT 620M/630M/635M/640M LE]
 		1025 0692  GeForce GT 620M
 		1025 0725  GeForce GT 620M
 		1025 0728  GeForce GT 620M
@@ -10319,12 +10323,31 @@
 		1028 065e  GeForce 820M
 		1028 0662  GeForce 820M
 		1028 068d  GeForce 820M
+		1028 06ad  GeForce 820M
+		1028 06ae  GeForce 820M
+		1028 06af  GeForce 820M
+		1028 06b0  GeForce 820M
+		1028 06c0  GeForce 820M
 		1028 06c1  GeForce 820M
 		103c 18ef  GeForce GT 630M
 		103c 18f9  GeForce GT 630M
 		103c 18fb  GeForce GT 630M
 		103c 18fd  GeForce GT 630M
 		103c 18ff  GeForce GT 630M
+		103c 218a  GeForce 820M
+		103c 21bb  GeForce 820M
+		103c 21bc  GeForce 820M
+		103c 220e  GeForce 820M
+		103c 2210  GeForce 820M
+		103c 2212  GeForce 820M
+		103c 2214  GeForce 820M
+		103c 2218  GeForce 820M
+		103c 225b  GeForce 820M
+		103c 225d  GeForce 820M
+		103c 226d  GeForce 820M
+		103c 226f  GeForce 820M
+		103c 22d2  GeForce 820M
+		103c 22d9  GeForce 820M
 		103c 2335  GeForce 820M
 		103c 2337  GeForce 820M
 		103c 2aef  GeForce GT 720A
@@ -10362,6 +10385,7 @@
 		1043 228a  GeForce 820M
 		1043 232a  GeForce 820M
 		1043 233a  GeForce 820M
+		1043 235a  GeForce 820M
 		1043 236a  GeForce 820M
 		1043 238a  GeForce 820M
 		1043 8595  GeForce GT 720M
@@ -10377,6 +10401,8 @@
 		1043 8643  GeForce 820M
 		1043 864c  GeForce 820M
 		1043 8652  GeForce 820M
+		1043 8660  GeForce 820M
+		1043 8661  GeForce 820M
 		105b 0dac  GeForce GT 720M
 		105b 0dad  GeForce GT 720M
 		105b 0ef3  GeForce GT 720M
@@ -10451,8 +10477,10 @@
 		17aa 309c  GeForce GT 720A
 		17aa 30b4  GeForce 820A
 		17aa 30b7  GeForce 720A
+		17aa 30e4  GeForce 820A
 		17aa 361b  GeForce 820A
 		17aa 361c  GeForce 820A
+		17aa 361d  GeForce 820A
 		17aa 3656  GeForce GT 620M
 		17aa 365a  GeForce 705M
 		17aa 365e  GeForce 800M
@@ -10760,7 +10788,7 @@
 	13d7  GM204M [GeForce GTX 980M]
 	13d8  GM204M [GeForce GTX 970M]
 	13d9  GM204M [GeForce GTX 965M]
-	13da  GM204M [GeForce GTX 980]
+	13da  GM204M [GeForce GTX 980 Mobile]
 	13e7  GM204 [GeForce GTX 980 Engineering Sample]
 	13f0  GM204GL [Quadro M5000]
 	13f1  GM204GL [Quadro M4000]
@@ -10813,14 +10841,21 @@
 	1b87  GP104 [P104-100]
 	1ba0  GP104M [GeForce GTX 1080 Mobile]
 	1ba1  GP104M [GeForce GTX 1070 Mobile]
+		1458 1651  GeForce GTX 1070 Max-Q
+		1462 11e8  GeForce GTX 1070 Max-Q
+		1462 11e9  GeForce GTX 1070 Max-Q
+		1558 9501  GeForce GTX 1070 Max-Q
 	1bb0  GP104GL [Quadro P5000]
 	1bb1  GP104GL [Quadro P4000]
 	1bb3  GP104GL [Tesla P4]
 	1bb4  GP104GL
 	1bb6  GP104GLM [Quadro P5000 Mobile]
 	1bb7  GP104GLM [Quadro P4000 Mobile]
+		1462 11e9  Quadro P4000 Max-Q
 	1bb8  GP104GLM [Quadro P3000 Mobile]
 	1be0  GP104M [GeForce GTX 1080 Mobile]
+		1028 07c0  GeForce GTX 1080 Max-Q
+		1458 355b  GeForce GTX 1080 Max-Q
 	1be1  GP104M [GeForce GTX 1070 Mobile]
 	1c00  GP106
 	1c01  GP106
@@ -10828,10 +10863,14 @@
 	1c03  GP106 [GeForce GTX 1060 6GB]
 	1c07  GP106 [P106-100]
 	1c09  GP106 [P106-090]
-	1c20  GP106M [GeForce GTX 1060 Mobile]
+	1c20  GP106M [GeForce GTX 1060 Mobile 3GB]
+		17aa 39b9  GeForce GTX 1060 Max-Q 3GB
+	1c21  GP106M [GeForce GTX 1050 Ti Mobile]
+	1c22  GP106M [GeForce GTX 1050 Mobile]
 	1c30  GP106GL [Quadro P2000]
 	1c35  GP106
-	1c60  GP106M [GeForce GTX 1060 Mobile]
+	1c60  GP106M [GeForce GTX 1060 Mobile 6GB]
+		103c 8390  GeForce GTX 1060 Max-Q 6GB
 	1c61  GP106M [GeForce GTX 1050 Ti Mobile]
 	1c62  GP106M [GeForce GTX 1050 Mobile]
 	1c70  GP106GL
@@ -16195,6 +16234,11 @@
 	50a2  T580-50A2 Unified Wire Ethernet Controller
 	50a3  T580-50A3 Unified Wire Ethernet Controller
 	50a4  T540-50A4 Unified Wire Ethernet Controller
+	50a5  T522-50A5 Unified Wire Ethernet Controller
+	50a6  T522-50A6 Unified Wire Ethernet Controller
+	50a7  T580-50A7 Unified Wire Ethernet Controller
+	50a8  T580-50A8 Unified Wire Ethernet Controller
+	50a9  T580-50A9 Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -16250,6 +16294,11 @@
 	54a2  T580-50A2 Unified Wire Ethernet Controller
 	54a3  T580-50A3 Unified Wire Ethernet Controller
 	54a4  T540-50A4 Unified Wire Ethernet Controller
+	54a5  T522-50A5 Unified Wire Ethernet Controller
+	54a6  T522-50A6 Unified Wire Ethernet Controller
+	54a7  T580-50A7 Unified Wire Ethernet Controller
+	54a8  T580-50A8 Unified Wire Ethernet Controller
+	54a9  T580-50A9 Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -16305,6 +16354,11 @@
 	55a2  T580-50A2 Unified Wire Storage Controller
 	55a3  T580-50A3 Unified Wire Storage Controller
 	55a4  T540-50A4 Unified Wire Storage Controller
+	55a5  T522-50A5 Unified Wire Storage Controller
+	55a6  T522-50A6 Unified Wire Storage Controller
+	55a7  T580-50A7 Unified Wire Storage Controller
+	55a8  T580-50A8 Unified Wire Storage Controller
+	55a9  T580-50A9 Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -16360,6 +16414,11 @@
 	56a2  T580-50A2 Unified Wire Storage Controller
 	56a3  T580-50A3 Unified Wire Storage Controller
 	56a4  T540-50A4 Unified Wire Storage Controller
+	56a5  T522-50A5 Unified Wire Storage Controller
+	56a6  T522-50A6 Unified Wire Storage Controller
+	56a7  T580-50A7 Unified Wire Storage Controller
+	56a8  T580-50A8 Unified Wire Storage Controller
+	56a9  T580-50A9 Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -16454,6 +16513,11 @@
 	58a2  T580-50A2 Unified Wire Ethernet Controller [VF]
 	58a3  T580-50A3 Unified Wire Ethernet Controller [VF]
 	58a4  T540-50A4 Unified Wire Ethernet Controller [VF]
+	58a5  T522-50A5 Unified Wire Ethernet Controller [VF]
+	58a6  T522-50A6 Unified Wire Ethernet Controller [VF]
+	58a7  T580-50A7 Unified Wire Ethernet Controller [VF]
+	58a8  T580-50A8 Unified Wire Ethernet Controller [VF]
+	58a9  T580-50A9 Unified Wire Ethernet Controller [VF]
 	6001  T6225-CR Unified Wire Ethernet Controller
 	6002  T6225-SO-CR Unified Wire Ethernet Controller
 	6003  T6425-CR Unified Wire Ethernet Controller
@@ -17515,6 +17579,7 @@
 		106b 0093  AirPort Extreme
 		106b 00d1  AirPort Extreme
 		106b 00e9  AirPort Extreme
+		14e4 04d8  Pegatron UPWL6024
 	4357  BCM43225 802.11b/g/n
 		105b e021  T77H103.00 Wireless Half-size Mini PCIe Card
 	4358  BCM43227 802.11b/g/n
@@ -20682,6 +20747,7 @@
 	0005  ExaNIC X40
 	0006  ExaNIC X10-HPT
 	0007  ExaNIC X40
+	0008  ExaNIC V5P
 1cf7  Subspace Dynamics
 1d00  Pure Storage
 1d0f  Amazon.com, Inc.
@@ -22158,6 +22224,8 @@
 	0a2a  Haswell-ULT Integrated Graphics Controller
 	0a2e  Haswell-ULT Integrated Graphics Controller
 	0a53  DC P3520 SSD
+	0a54  Express Flash NVMe P4500
+	0a55  Express Flash NVMe P4600
 	0be0  Atom Processor D2xxx/N2xxx Integrated Graphics Controller
 	0be1  Atom Processor D2xxx/N2xxx Integrated Graphics Controller
 		105b 0d7c  D270S/D250S Motherboard
@@ -26956,9 +27024,9 @@
 		1590 0216  Ethernet 1Gb 2-port 368i Adapter
 		1590 0217  Ethernet 1Gb 2-port 368FLR-MMT Adapter
 		1590 0247  Ethernet 1Gb 4-port 369i Adapter
-		17aa 4020  Intel Ethernet Connection X722 for 1GbE
-		17aa 4021  Intel Ethernet Connection X722 for 1GbE
-		17aa 4022  Intel Ethernet Connection X722 for 1GbE
+		17aa 4020  Ethernet Connection X722 for 1GbE
+		17aa 4021  Ethernet Connection X722 for 1GbE
+		17aa 4022  Ethernet Connection X722 for 1GbE
 	37d2  Ethernet Connection X722 for 10GBASE-T
 		14cd 0030  Ethernet OCP 2x10G RJ45 Phy Card [USI-X557-10GbaseT]
 		1590 0218  Ethernet 10Gb 2-port 568FLR-MMT Adapter
