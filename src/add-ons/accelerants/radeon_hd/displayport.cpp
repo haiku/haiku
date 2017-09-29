@@ -353,9 +353,6 @@ dp_get_encoder_config(uint32 connectorIndex)
 uint32
 dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
 {
-	// Radeon specific
-	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
-
 	size_t pixelChunk;
 	size_t pixelsPerChunk;
 	status_t result = dp_get_pixel_size_for((color_space)mode->space,
@@ -368,8 +365,10 @@ dp_get_lane_count(uint32 connectorIndex, display_mode* mode)
 
 	uint32 bitsPerPixel = (pixelChunk / pixelsPerChunk) * 8;
 
-	uint32 dpMaxLinkRate = dp_get_link_rate_max(dpInfo);
-	uint32 dpMaxLaneCount = dp_get_lane_count_max(dpInfo);
+	uint32 dpMaxLinkRate
+		= dp_decode_link_rate(dpcd_reg_read(connectorIndex, DP_MAX_LINK_RATE));
+	uint32 dpMaxLaneCount = dpcd_reg_read(connectorIndex,
+			DP_MAX_LANE_COUNT) & DP_MAX_LANE_COUNT_MASK;
 
 	uint32 lane;
 	// don't go below 2 lanes or display is jittery
@@ -393,9 +392,6 @@ dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 	if (encoderID == ENCODER_OBJECT_ID_NUTMEG)
 		return 270000;
 
-	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
-	uint32 laneCount = dp_get_lane_count(connectorIndex, mode);
-
 	size_t pixelChunk;
 	size_t pixelsPerChunk;
 	status_t result = dp_get_pixel_size_for((color_space)mode->space,
@@ -407,6 +403,7 @@ dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 	}
 
 	uint32 bitsPerPixel = (pixelChunk / pixelsPerChunk) * 8;
+	uint32 laneCount = dp_get_lane_count(connectorIndex, mode);
 
 	uint32 maxPixelClock
 		= dp_get_pixel_clock_max(162000, laneCount, bitsPerPixel);
@@ -426,7 +423,7 @@ dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 	}
 	#endif
 
-	return dp_get_link_rate_max(dpInfo);
+	return dp_decode_link_rate(dpcd_reg_read(connectorIndex, DP_MAX_LINK_RATE));
 }
 
 
@@ -464,46 +461,18 @@ dp_setup_connectors()
 
 	for (uint32 index = 0; index < ATOM_MAX_SUPPORTED_DEVICE; index++) {
 		dp_info* dpInfo = &gConnector[index]->dpInfo;
-		dpInfo->valid = false;
+		// Validate connector is actually display port
 		if (gConnector[index]->valid == false
 			|| connector_is_dp(index) == false) {
-			dpInfo->config[0] = 0;
+			dpInfo->valid = false;
 			continue;
 		}
 
-		TRACE("%s: found dp connector on index %" B_PRIu32 "\n",
-			__func__, index);
+		// Configure communication pins.
 		uint32 i2cPinIndex = gConnector[index]->i2cPinIndex;
-
 		uint32 auxPin = gGPIOInfo[i2cPinIndex]->hwPin;
 		dpInfo->auxPin = auxPin;
-
-		dp_aux_msg message;
-		memset(&message, 0, sizeof(message));
-
-		message.address = DP_DPCD_REV;
-		message.request = DP_AUX_NATIVE_READ;
-			// TODO: validate
-		message.size = DP_DPCD_SIZE;
-		message.buffer = dpInfo->config;
-
-		status_t result = dp_aux_transaction(index, &message);
-
-		if (result == B_OK) {
-			dpInfo->valid = true;
-			TRACE("%s: connector(%" B_PRIu32 "): successful read of DPCD\n",
-				__func__, index);
-		} else {
-			TRACE("%s: connector(%" B_PRIu32 "): failed read of DPCD\n",
-				__func__, index);
-		}
-		/*
-		TRACE("%s: DPCD is ", __func__);
-		uint32 position;
-		for (position = 0; position < message.size; position++)
-			_sPrintf("%02x ", message.buffer + position);
-		_sPrintf("\n");
-		*/
+		dpInfo->valid = true;
 	}
 }
 
@@ -858,6 +827,7 @@ dp_link_train(uint8 crtcID)
 		return B_ERROR;
 	}
 
+	dp->revision = dpcd_reg_read(connectorIndex, DP_DPCD_REV);
 	dp->trainingReadInterval
 		= dpcd_reg_read(connectorIndex, DP_TRAINING_AUX_RD_INTERVAL);
 
@@ -871,11 +841,11 @@ dp_link_train(uint8 crtcID)
 	// *** DisplayPort link training initialization
 
 	// Power up the DP sink
-	if (dp->config[0] >= DP_DPCD_REV_11)
+	if (dp->revision >= DP_DPCD_REV_11)
 		dpcd_reg_write(connectorIndex, DP_SET_POWER, DP_SET_POWER_D0);
 
 	// Possibly enable downspread on the sink
-	if ((dp->config[3] & 0x1) != 0) {
+	if ((dpcd_reg_read(connectorIndex, DP_MAX_DOWNSPREAD) & 0x1) != 0) {
 		dpcd_reg_write(connectorIndex, DP_DOWNSPREAD_CTRL,
 			DP_DOWNSPREAD_CTRL_AMP_EN);
 	} else
@@ -884,11 +854,13 @@ dp_link_train(uint8 crtcID)
 	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
 
-	// TODO: Doesn't this overwrite important dpcd info?
-	sandbox = dp->laneCount;
-	if ((dp->config[0] >= DP_DPCD_REV_11)
-		&& (dp->config[2] & DP_ENHANCED_FRAME_CAP_EN))
+	// Enable enhanced frame if supported
+	sandbox = dpcd_reg_read(connectorIndex, DP_LANE_COUNT);
+	if (dp->revision >= DP_DPCD_REV_11
+		&& (dpcd_reg_read(connectorIndex, DP_MAX_LANE_COUNT)
+			& DP_ENHANCED_FRAME_CAP_EN)) {
 		sandbox |= DP_ENHANCED_FRAME_EN;
+	}
 	dpcd_reg_write(connectorIndex, DP_LANE_COUNT, sandbox);
 
 	// Set the link rate on the DP sink
@@ -1012,6 +984,8 @@ dp_is_dp12_capable(uint32 connectorIndex)
 
 	uint32 capabilities = gConnector[connectorIndex]->encoder.capabilities;
 
+	// DP_DPCD_REV_12 as well?
+
 	if (info.dceMajor >= 5
 		&& gInfo->dpExternalClock >= 539000
 		&& (capabilities & ATOM_ENCODER_CAP_RECORD_HBR2) != 0) {
@@ -1036,17 +1010,17 @@ debug_dp_info()
 				continue;
 			ERROR(" + DP Config Data\n");
 			ERROR("   - max lane count:          %d\n",
-				dp->config[DP_MAX_LANE_COUNT] & DP_MAX_LANE_COUNT_MASK);
+				dpcd_reg_read(id, DP_MAX_LANE_COUNT) & DP_MAX_LANE_COUNT_MASK);
 			ERROR("   - max link rate:           %d\n",
-				dp->config[DP_MAX_LINK_RATE]);
+				dpcd_reg_read(id, DP_MAX_LINK_RATE));
 			ERROR("   - receiver port count:     %d\n",
-				dp->config[DP_NORP] & DP_NORP_MASK);
+				dpcd_reg_read(id, DP_NORP) & DP_NORP_MASK);
 			ERROR("   - downstream port present: %s\n",
-				(dp->config[DP_DOWNSTREAMPORT] & DP_DOWNSTREAMPORT_EN)
-				? "yes" : "no");
+				dpcd_reg_read(id, DP_DOWNSTREAMPORT) & DP_DOWNSTREAMPORT_EN
+					? "yes" : "no");
 			ERROR("   - downstream port count:   %d\n",
-				dp->config[DP_DOWNSTREAMPORT_COUNT]
-				& DP_DOWNSTREAMPORT_COUNT_MASK);
+				dpcd_reg_read(id, DP_DOWNSTREAMPORT_COUNT)
+					& DP_DOWNSTREAMPORT_COUNT_MASK);
 			ERROR(" + Training\n");
 			ERROR("   - attempts:                %" B_PRIu8 "\n",
 				dp->trainingAttempts);

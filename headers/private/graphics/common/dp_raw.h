@@ -42,6 +42,7 @@
 #define DP_DPCD_REV_MAJOR_MASK				(15 << 4)	// Int
 #define DP_DPCD_REV_10						0x0010		// Value
 #define DP_DPCD_REV_11						0x0011		// Value
+#define DP_DPCD_REV_12						0x0012		// Value
 // DP Maximum Link Rate (0x1)
 #define DP_MAX_LINK_RATE					0x0001		// Reg
 // Use DP_LINK_RATE_* for speed.

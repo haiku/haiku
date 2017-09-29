@@ -19,10 +19,9 @@ typedef struct {
 	// Required configuration
 	bool	valid;			// Is valid DP information
 	uint32	auxPin;			// Normally GPIO pin on GPU
+	uint8	revision;		// DP Revision from DPCD
 
-	uint8	config[DP_DPCD_SIZE]; // DP Configuration Data
 	int		laneCount;
-
 	uint32	linkRate;		// DP Link Speed 162000, 270000, 540000
 
 	// Internal State information
@@ -44,9 +43,6 @@ typedef struct {
 
 uint32 dp_encode_link_rate(uint32 linkRate);
 uint32 dp_decode_link_rate(uint32 rawLinkRate);
-
-uint32 dp_get_lane_count_max(dp_info* dpInfo);
-uint32 dp_get_link_rate_max(dp_info* dpInfo);
 
 uint32 dp_get_pixel_clock_max(int linkRate, int laneCount, int bpp);
 

@@ -64,17 +64,3 @@ dp_get_pixel_clock_max(int linkRate, int laneCount, int bpp)
 {
 	return (linkRate * laneCount * 8) / bpp;
 }
-
-
-uint32
-dp_get_link_rate_max(dp_info* dpInfo)
-{
-	return dp_decode_link_rate(dpInfo->config[DP_MAX_LINK_RATE]);
-}
-
-
-uint32
-dp_get_lane_count_max(dp_info* dpInfo)
-{
-	return dpInfo->config[DP_MAX_LANE_COUNT] & DP_MAX_LANE_COUNT_MASK;
-}
