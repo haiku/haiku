@@ -74,6 +74,15 @@ public:
 			status_t			Send(bigtime_t timeout = -1);
 
 private:
+	virtual	void _ReservedNotification1();
+	virtual	void _ReservedNotification2();
+	virtual	void _ReservedNotification3();
+	virtual	void _ReservedNotification4();
+	virtual	void _ReservedNotification5();
+	virtual	void _ReservedNotification6();
+	virtual	void _ReservedNotification7();
+	virtual	void _ReservedNotification8();
+
 			status_t			fInitStatus;
 
 			BString				fSourceSignature;
@@ -90,6 +99,8 @@ private:
 			BList				fRefs;
 			BList				fArgv;
 			BBitmap*			fBitmap;
+
+			uint32				_reserved[8];
 };
 
 

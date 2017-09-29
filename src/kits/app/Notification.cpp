@@ -566,3 +566,13 @@ BNotification::Send(bigtime_t timeout)
 
 	return ret;
 }
+
+
+void BNotification::_ReservedNotification1() {}
+void BNotification::_ReservedNotification2() {}
+void BNotification::_ReservedNotification3() {}
+void BNotification::_ReservedNotification4() {}
+void BNotification::_ReservedNotification5() {}
+void BNotification::_ReservedNotification6() {}
+void BNotification::_ReservedNotification7() {}
+void BNotification::_ReservedNotification8() {}
