@@ -1,0 +1,14 @@
+1	russian	x-vnd.haiku-package_daemon	2547139247
+Package problems	PackageProblem	Window title	Проблемы пакетов
+Package changes	PackageResult	Window title	Изменения пакетов
+uninstall package %s\n	PackageResult	Don't change '%s' variable	удалить пакет %s\n
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	установить пакет %s из репозитория %s\n
+Apply changes	PackageResult		Применить изменения
+solution %d:	PackageProblem	Don't change the %d variable	решение %d:
+Retry	PackageProblem		Повторить
+The following additional package changes have to be made:	PackageResult		Следующие изменения должны быть сделаны:
+ignore problem for now	PackageProblem		пока игнорировать
+Cancel	PackageProblem		Отмена
+don't activate package %source%	PackageProblem	don't change '%source%	не активировать пакет %source%
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Были обнаружены следующие проблемы. Пожалуйста выберите решение для каждой:
+Cancel	PackageResult		Отмена

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Network	2512967175
+1	russian	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Статический
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Службы
@@ -7,9 +7,11 @@ WPA2	WPA2 protected network		WPA2
 Choose automatically	IntefaceView		Выбрать автоматически
 connected	IntefaceView		подключено
 Ethernet device	InterfaceListItem		Ethernet устройство
-The netmask defines your local network	IntefaceAddressView		Маска подсети определяет вашу локальную сеть 
+The netmask defines your local network	IntefaceAddressView		Маска подсети определяет вашу локальную сеть
+Dial-up connection	InterfaceListItem		Коммутируемый доступ
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Сеть
+VPN connection	InterfaceListItem		VPN соединение
 Show network status in Deskbar	NetworkWindow		Отображать статус интерфейсов в Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Метод получения IP-адреса
 connected	InterfaceListItem		подключено
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Отправлено:
 open	Open network		открытая
 IP Address:	IntefaceAddressView		IP-адрес:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Получено:
 Disable	IntefaceView		Отключить
 <no wireless networks found>	IntefaceView		<беспроводные сети не найдены>

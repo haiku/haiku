@@ -1,8 +1,9 @@
-1	russian	x-vnd.Haiku-MediaConverter	341686525
+1	russian	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не был распознан как поддерживаемый медиафайл:} few{# файла не были распознаны как поддерживаемые медиафайлы:} other{# файлов не было распознано как поддерживаемые медиафайлы:}}
 Video encoding:	MediaConverter		Кодирование видео:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fкадр/с
+Error creating video.	MediaConverter		Ошибка создания видео.
 Error read audio frame %lld	MediaConverter		Ошибка чтения аудио кадра %lld
 No audio	Audio codecs list		Без аудио
 Error	MediaConverter		Ошибка
@@ -26,7 +27,9 @@ Conversion completed	MediaConverter		Конвертация завершена
 Audio:	MediaConverter-FileInfo		Аудио:
 OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секунд
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ошибка записи в папку %strPath%. Записываем в папку по умолчанию: /boot/home
 Source files	MediaConverter		Исходные файлы
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранная папка не найдена. Выбираем по умолчанию /boot/home
 Error writing video frame %lld	MediaConverter		Ошибка записи видеокадра %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} few{# кадра} other{# кадров}}
 Error writing audio frame %lld	MediaConverter		Ошибка записи аудио кадра %lld
@@ -38,6 +41,7 @@ None available	Video codecs		Не доступно
 Conversion cancelled	MediaConverter		Конвертация отменена
 No file selected	MediaConverter-FileInfo		Файл не выбран
 Select this folder	MediaConverter		Выбрать эту папку
+Error creating track.	MediaConverter		Ошибка создания трека.
 Continue	MediaConverter		Продолжить
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
 Video:	MediaConverter-FileInfo		Видео:
@@ -59,6 +63,7 @@ Drop media files onto this window	MediaConverter		Перенесите меди�
 Audio encoding:	MediaConverter		Кодирование звука:
 Audio quality not supported	MediaConverter		Качество звука не поддерживается
 File	Menu		Файл
+Input file not recognized as Audio or Video	MediaConverter		Входной файл не распознан как аудио или видео
 %.1f kHz stereo	MediaFileInfo		%.1f кГц стерео
 Convert	MediaConverter		Конвертировать
 Writing audio track: %ld%% complete	MediaConverter		Запись аудио дорожки: %ld%% завершено

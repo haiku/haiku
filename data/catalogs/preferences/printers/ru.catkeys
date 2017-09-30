@@ -1,13 +1,16 @@
-1	russian	x-vnd.Be-PRNT	4242582634
+1	russian	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Ожидание
 Print test page	PrintersWindow		Пробная страница
+ pending jobs	PrinterListView		 заданий в очереди
 page	JobListView		страница
 Cancel	AddPrinterDialog		Отмена
+Test page	PrintersWindow		Тестовая страница
 Add printer	AddPrinterDialog		Добавить принтер
 Green	TestPageView		Зеленый
 Printers	PrintersWindow		Принтеры
 Add…	PrintersWindow		Добавить…
+No pending jobs	PrinterListView		Нет заданий в очереди
 Default Printer	PrinterListView		Принтер по умолчанию
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
 pages	JobListView		страниц
@@ -35,5 +38,7 @@ No printer found!	TransportMenu		Принтер не найден!
 Print jobs: No printer selected	PrintersWindow		Принтер не выбран
 Cyan	TestPageView		Циан
 Unknown status	JobListView		Состояние неизвестно
+1 pending job	PrinterListView		1 задание в очереди
 Connected to:	AddPrinterDialog		Подключен к:
 Printer type:	AddPrinterDialog		Тип принтера:
+Test page	TestPageView		Тестовая страница

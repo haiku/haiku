@@ -25,7 +25,7 @@ Settings	Settings Window		設定
 Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
 Cookie manager	Cookie Manager		Cookie マネージャー
-Decrease size	WebPositive Window		サイズを縮小
+Decrease size	WebPositive Window		縮小
 Serif font:	Settings Window		セリフフォント:
 Loading %url	WebPositive Window		%url を読み込み中
 Download aborted	Download Window		ダウンロードが中断されました
@@ -69,9 +69,9 @@ Open downloads folder	Download Window		ダウンロードフォルダーを表�
 Proxy password:	Settings Window		パスワード:
 Number of days to keep links in History menu:	Settings Window		履歴メニューにリンクを保存する日数:
 Hide	Download Window		隠す
-Reset size	WebPositive Window		サイズをリセット
+Reset size	WebPositive Window		リセット
 Find:	WebPositive Window		検索:
-Increase size	WebPositive Window		サイズを拡大
+Increase size	WebPositive Window		拡大
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。.\n\nエラー: %error
 Downloads	WebPositive Window		ダウンロード
 Requesting %url	WebPositive Window		%url を要求中
@@ -89,7 +89,7 @@ Open blank page	Settings Window		空白のページを表示
 New tabs:	Settings Window		新規タブ:
 Cancel	WebPositive Window		キャンセル
 Open all	WebPositive Window		すべてを開く
-Proxy server requires authentication	Settings Window		プロキシサーバーは認証を要求する
+Proxy server requires authentication	Settings Window		プロキシサーバーは認証を必要とする
 Clear	URL Bar		クリア
 Cut	URL Bar		切り取り
 Clear	WebPositive Window		クリア

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	3676286035
+1	russian	x-vnd.Haiku-About	2090349490
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 авторы Gutenprint.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Все права защищены © 1996-2002, 2006 David Turner, Robert Wilhelm и Werner Lemberg.
 Past website & marketing:\n	AboutView		Старый вебсайт и маркетинг:\n
@@ -21,6 +21,7 @@ Source Code: 	AboutView		Исходный код:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Процессор:} few{# процессора:} other{# процессоров:}}
 Kernel:	AboutView		Ядро:
 BSD (4-clause)	AboutWindow		BSD (4-х пунктная)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Все права защищены © 2012-2016 команда интернационализации Google.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (прошивка)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Все права защищены © 1987-1988 Digital Equipment Corporation, Мейнард, Массачусетс.
@@ -81,6 +82,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		В
 …and the many people making donations!\n\n	AboutView		…и многим другим людям, делающим пожертвования!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Щелкните левой кнопкой мыши на название лицензии для её прочтения.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Все права защищены © 2007 Ralink Technology Corporation.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER это зарегистрированная торговая марка Bitstream Inc.
 BSD (3-clause)	AboutWindow		BSD (3-х пунктная)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Все права защищены © 1990-2002 Info-ZIP.
 License: 	AboutView		Лицензия: 

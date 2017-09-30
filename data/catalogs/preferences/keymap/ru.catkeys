@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	3155537444
+1	russian	x-vnd.Haiku-Keymap	1855856185
 Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
@@ -97,6 +97,7 @@ Command:	Modifier keys window	Command key role name	Command:
 Latin-American	Keyboard Layout View		Латиноамериканская
 Spanish (Dvorak)	Keyboard Layout View		Испанская (Дворак)
 Lithuanian (Standard)	Keyboard Layout View		Литовская (стандартная)
+Russian (Udmurt, Komi, Mari)	Keyboard Layout View		Русская (Удмуртия, Коми, Мари Эл)
 Canadian-French	Keyboard Layout View		Канадо-Французская
 Irish	Keyboard Layout View		Ирландская
 Turkish (Type-F)	Keyboard Layout View		Турецкая (тип-F)

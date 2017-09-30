@@ -1,12 +1,16 @@
-1	russian	x-vnd.Haiku-CharacterMap	1534181938
+1	russian	x-vnd.Haiku-CharacterMap	3562632406
 Enclosed alphanumerics	UnicodeBlocks		Вложенные буквы и цифры
 Basic Latin	UnicodeBlocks		Основная латиница
+Cyrillic extended C	UnicodeBlocks		Кириллица расширенная A
 View	CharacterWindow		Вид
+Cherokee supplement	UnicodeBlocks		Дополнения чероки
 Latin-1 supplement	UnicodeBlocks		Дополнение латиницы 1
 Hebrew	UnicodeBlocks		Иврит
 Georgian supplement	UnicodeBlocks		Грузинские дополнения
+Multani	UnicodeBlocks		Мултани
 CJK unified ideographs	UnicodeBlocks		Унифицированные иероглифы CJK
 Modifier tone letters	UnicodeBlocks		Модификаторы тона
+Old Hungarian	UnicodeBlocks		Старый венгерский
 Khmer	UnicodeBlocks		Кхмерский
 Supplementary private use area A	UnicodeBlocks		Дополнительная область-A для частного использования
 Hanunoo	UnicodeBlocks		Хануноо

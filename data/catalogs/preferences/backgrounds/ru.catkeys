@@ -1,11 +1,13 @@
-1	russian	x-vnd.Haiku-Backgrounds	3513602073
+1	russian	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Фон
 X:	Main View		X:
+Setting the background image failed:	Main View		Не удалось установить фоновое изображение:
 Resolution: 	Image Filepanel		Разрешение: 
 pick one	Main View		Выбрать
 Default	Main View		По умолчанию
 Center	Main View		По центру
 Manual	Main View		Вручную
+Set background image error	Main View		Ошибка установки фона
 Default folder	Main View		Папка по умолчанию
 Revert	Main View		Вернуть
 None	Main View		Не выбрано
@@ -20,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Плиткой
 Select	Main View		Выбрать
 Scale to fit	Main View		Растянуть
+OK	Main View		OK
 Placement:	Main View		Расположить:
 Preview	Main View		Предпросмотр
 Image:	Main View		Изображение:

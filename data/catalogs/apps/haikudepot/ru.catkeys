@@ -1,10 +1,12 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1090759318
+1	russian	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
+Repository	FilterView		Репозиторий
 Close	RatePackageWindow		Закрыть
 The captcha puzzle needs to be solved.	UserLoginWindow		Капча должна быть решена.
 Changelog	PackageInfoView		История изменений
+Repository:	FilterView		Репозиторий:
 Your rating:	RatePackageWindow		Ваш рейтинг:
 The passwords do not match.	UserLoginWindow		Пароли не совпадают.
 Log in…	MainWindow		Войти…
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Ваш рейтинг �
 <no info>	PackageInfoView		<нет информации>
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
+All repositories	FilterView		Все репозитории
 Email address:	UserLoginWindow		Email адрес:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваш рейтинг был успешно отправлен. Вы можете изменить или удалить его в любой момент оценив пакет еще раз.
 Very unstable	RatePackageWindow		Очень нестабилен 
@@ -102,6 +105,7 @@ Close	MainWindow		Закрыть
 Preferred language:	UserLoginWindow		Предпочитаемый язык:
 Failed to rate package	RatePackageWindow		Не удалось оценить пакет
 Internet & Network	Model		Интернет и сеть
+Refresh repositories	MainWindow		Обновить репозитории
 Cancel	MainWindow		Отменить
 Quit HaikuDepot	App		Закрыть HaikuDepot
 Input validation	UserLoginWindow		Проверка ввода
@@ -139,6 +143,7 @@ Failed to create account	UserLoginWindow		Не удалось создать у�
 There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n
 Featured packages	MainWindow		Популярные пакеты
 Start package daemon	App		Запустить пакетный демон
+Manage repositories…	MainWindow		Управление репозиториями…
 Success	RatePackageWindow		Выполнено успешно
 Business	Model		Бизнес
 Audio	Model		Аудио
