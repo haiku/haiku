@@ -216,6 +216,101 @@ div.headertitle div.title {
 
 /* Navigation Tabs */
 
+.sm-dox {
+	background: #e0e0e0; /* alto */
+	padding: 0;
+}
+
+@media (min-width: 768px) {
+	.sm-dox > li > a, .sm-dox > li > a:hover, .sm-dox > li > a:visited,
+	.sm-dox > li > a:link, .sm-dox > li > a:active {
+		padding: 0 12px 0 0;
+	}
+
+	.sm-dox > li > a.has-submenu {
+		padding-right: 24px;
+	}
+}
+
+.sm-dox a, .sm-dox ul a, .sm-dox a:visited, .sm-dox ul a:visited,
+.sm-dox a:link, .sm-dox ul a:link {
+	background-image: none;
+	color: #dc3c01; /* grenadier */
+	text-shadow: none;
+}
+
+.sm-dox a:hover, .sm-dox ul a:hover {
+	background-color: #e0e0e0; /* alto */
+	background-image: none;
+	color: #ff4500; /* vermilion */
+	text-decoration: underline;
+	text-shadow: none;
+}
+
+.sm-dox a:active, .sm-dox ul a:active {
+	color: #0c3762; /* madison */
+	text-decoration: none;
+	text-shadow: none;
+}
+
+.sm-dox a:focus, .sm-dox ul a:focus,
+.sm-dox a.highlighted, .sm-dox ul a.highlighted {
+	background-image: none;
+	color: #ff4500; /* vermilion */
+	text-shadow: none;
+}
+
+@media (min-width: 768px) {
+	.sm-dox a span.sub-arrow {
+		border-top-color: #dc3c01; /* grenadier */
+	}
+
+	.sm-dox ul a span.sub-arrow {
+		border-left-color: #dc3c01; /* grenadier */
+	}
+}
+
+.sm-dox span.scroll-up-arrow {
+	border-bottom-color: #dc3c01; /* grenadier */
+}
+
+.sm-dox span.scroll-down-arrow {
+	border-top-color: #dc3c01; /* grenadier */
+}
+
+@media (min-width: 768px) {
+	.sm-dox a:hover span.sub-arrow {
+		border-top-color: #ff4500; /* vermilion */
+	}
+
+	.sm-dox ul a:hover span.sub-arrow {
+		border-left-color: #ff4500; /* vermilion */
+	}
+}
+
+.sm-dox span.scroll-up-arrow {
+	border-bottom-color: #ff4500; /* vermilion */
+}
+
+.sm-dox span.scroll-down-arrow {
+	border-top-color: #ff4500; /* vermilion */
+}
+
+div#main-nav {
+	position: relative;
+	left: 0;
+	top: 0;
+	background: #e0e0e0; /* alto */
+	margin: 0;
+	padding: 0;
+}
+
+div#main-nav ul#main-menu {
+	margin: 0 auto;
+	list-style: none;
+	max-width: 70em;
+}
+
 div.tabs, div.tabs2, div.tabs3 {
 	position: relative;
 	left: 0;
