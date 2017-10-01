@@ -9,7 +9,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers graphics intel_extreme ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics matrox ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics neomagic ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
-SubInclude HAIKU_TOP src add-ons kernel drivers graphics nvidia_gpgpu ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics radeon ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics radeon_hd ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics s3 ;

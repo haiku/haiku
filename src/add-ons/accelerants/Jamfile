@@ -8,7 +8,6 @@ SubInclude HAIKU_TOP src add-ons accelerants intel_810 ;
 SubInclude HAIKU_TOP src add-ons accelerants intel_extreme ;
 SubInclude HAIKU_TOP src add-ons accelerants matrox ;
 SubInclude HAIKU_TOP src add-ons accelerants neomagic ;
-SubInclude HAIKU_TOP src add-ons accelerants nvidia_gpgpu ;
 SubInclude HAIKU_TOP src add-ons accelerants nvidia ;
 SubInclude HAIKU_TOP src add-ons accelerants radeon ;
 SubInclude HAIKU_TOP src add-ons accelerants radeon_hd ;
