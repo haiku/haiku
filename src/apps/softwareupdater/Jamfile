@@ -20,3 +20,14 @@ Application SoftwareUpdater :
 	: be localestub package translation libbnetapi.so [ TargetLibsupc++ ]
 	: SoftwareUpdater.rdef
 ;
+
+DoCatalogs SoftwareUpdater :
+    x-vnd.haiku-softwareupdater
+    :
+	CheckAction.cpp
+	CheckManager.cpp
+	SoftwareUpdaterApp.cpp
+	SoftwareUpdaterWindow.cpp
+	UpdateAction.cpp
+	UpdateManager.cpp
+;
