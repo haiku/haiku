@@ -312,7 +312,6 @@ static const Translation kTranslations[] = {
 #define kNumberOfTranslations (sizeof(kTranslations) / sizeof(Translation))
 
 #define kCurrentMaintainers \
-	"Ithamar R. Adema\n" \
 	"Stephan Aßmus\n" \
 	"Dario Casalinuovo\n" \
 	"Augustin Cavalier\n" \
@@ -320,18 +319,15 @@ static const Translation kTranslations[] = {
 	"Adrien Destugues\n" \
 	"Axel Dörfler\n" \
 	"Jérôme Duval\n" \
-	"Pawel Dziepak\n" \
 	"René Gollent\n" \
-	"Colin Günther\n" \
 	"Jessica Hamilton\n" \
 	"Julian Harnath\n" \
 	"Brian Hill\n" \
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
-	"Ryan Leavengood\n" \
+	"Kacper Kasper\n" \
 	"Andrew Lindesay\n" \
 	"Michael Lotz\n" \
-	"Scott McCreary\n" \
 	"Puck Meerburg\n" \
 	"Fredrik Modéen\n" \
 	"Hamish Morrison\n" \
@@ -340,15 +336,13 @@ static const Translation kTranslations[] = {
 	"Philippe Saint-Pierre\n" \
 	"Jonathan Schleifer\n" \
 	"John Scipione\n" \
-	"Alex Smith\n" \
-	"Oliver Tappe\n" \
 	"Gerasim Troeglazov\n" \
 	"Alexander von Gluck IV\n" \
 	"Ingo Weinhold\n" \
-	"Clemens Zeidler\n" \
 	"\n"
 
 #define kPastMaintainers \
+	"Ithamar R. Adema\n" \
 	"Bruno G. Albuquerque\n" \
 	"Andrew Bachmann\n" \
 	"Salvatore Benedetto\n" \
@@ -356,9 +350,11 @@ static const Translation kTranslations[] = {
 	"Tyler Dauwalder\n" \
 	"Alexandre Deckner\n" \
 	"Oliver Ruiz Dorantes\n" \
+	"Pawel Dziepak\n" \
 	"Daniel Furrer\n" \
 	"Andre Alves Garzia\n" \
 	"Bryce Groff\n" \
+	"Colin Günther\n" \
 	"Karsten Heimrich\n" \
 	"Erik Jaesler\n" \
 	"Maurice Kalinowski\n" \
@@ -366,8 +362,10 @@ static const Translation kTranslations[] = {
 	"Marcin Konicki\n" \
 	"Waldemar Kornewald\n" \
 	"Thomas Kurschel\n" \
+	"Ryan Leavengood\n" \
 	"Brecht Machiels\n" \
 	"Matt Madia\n" \
+	"Scott McCreary\n" \
 	"David McPaul\n" \
 	"Wim van der Meer\n" \
 	"Michael Pfeiffer\n" \
@@ -378,15 +376,18 @@ static const Translation kTranslations[] = {
 	"Niels Sascha Reedijk\n" \
 	"David Reid\n" \
 	"Hugo Santos\n" \
+	"Alex Smith\n" \
 	"Alexander G. M. Smith\n" \
 	"Andrej Spielmann\n" \
 	"Jonas Sundström\n" \
+	"Oliver Tappe\n" \
 	"Bryan Varner\n" \
 	"Nathan Whitehorn\n" \
 	"Michael Wilber\n" \
 	"Alex Wilson\n" \
 	"Artur Wyszyński\n" \
 	"Jonathan Yoder\n" \
+	"Clemens Zeidler\n" \
 	"Siarzhuk Zharski\n" \
 	"\n"
 
@@ -423,7 +424,6 @@ static const Translation kTranslations[] = {
 	"Lucian Adrian Grijincu\n" \
 	"Sean Healy\n" \
 	"Andreas Henriksson\n" \
-	"Brian Hill\n" \
 	"Markus Himmel\n" \
 	"Matthijs Hollemans\n" \
 	"Mathew Hounsell\n" \
@@ -504,8 +504,7 @@ static const Translation kTranslations[] = {
 	"Zhao Shuai\n"
 
 #define kWebsiteTeam  \
-	"Urias McCullough\n" \
-	"Richie Nyhus\n" \
+	"Augustin Cavalier\n" \
 	"Niels Sascha Reedijk\n" \
 	"Joachim Seemer (Humdinger)\n" \
 	"\n"
@@ -513,6 +512,8 @@ static const Translation kTranslations[] = {
 #define kPastWebsiteTeam  \
 	"Phil Greenway\n" \
 	"Gavin James\n" \
+	"Urias McCullough\n" \
+	"Richie Nyhus\n" \
 	"Jonathan Yoder\n" \
 	"\n"
 
