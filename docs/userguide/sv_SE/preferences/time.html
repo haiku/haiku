@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="sv-SE" xml:lang="sv-SE">
 <head>
 <!-- 
  *
- * Copyright 2008-20015, Haiku. All rights reserved.
+ * Copyright 2008-20017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>Time</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -96,7 +97,8 @@ To the right you'll find the time of the currently set time zone and the preview
 <img src="../images/prefs-images/time-network.png" alt="time-network.png" />
 <p>With the <span class="button">+</span>/<span class="button">-</span> buttons you can add/remove <acronym title="Network Time Protocol">NTP</acronym>-servers to/from the list.</p>
 <p>The checkboxes below tell the system to <span class="menu">Try all servers</span> when synchronizing, not only the currently selected one, and to <span class="menu">Synchronize at boot</span>, so you can be sure you're clock always shows the correct time.</p>
-<p>You can <span class="button">Reset to default server list</span> if you accidentally deleted working NTP-servers and <span class="button">Synchronize</span> your clock manually.</p>
+<p>You can <span class="button">Reset to default server list</span> if you accidentally deleted working NTP-servers and <span class="button">Synchronize</span> your clock manually. The synchronization can be achived from the command line (or a script) as well:</p>
+<pre class="terminal">Time --update</pre>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

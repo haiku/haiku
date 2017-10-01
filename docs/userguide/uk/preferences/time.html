@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="uk" xml:lang="uk">
 <head>
 <!-- 
  *
- * Copyright 2008-20015, Haiku. All rights reserved.
+ * Copyright 2008-20017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>Час (Time)</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -56,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 <h2><img src="../../images/prefs-images/time-icon_64.png" alt="time-icon_64.png" width="64" height="64" />Час (Time)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -95,7 +97,8 @@
 <img src="../images/prefs-images/time-network.png" alt="time-network.png" />
 <p>За допомогою кнопок <span class="button">+</span>/<span class="button">-</span> Ви можете додати/видалити <acronym title="Network Time Protocol">NTP</acronym>- сервери до/з списку.</p>
 <p>Прапорці нижче вкажуть системі  <span class="menu">Спробувати всі сервери (Try all servers)</span> при синхронізації, а не тільки той що обраний у меню <span class="menu">Синхронізувати при завантаженні (Synchronize at boot)</span>, так що ви можете бути впевнені, що Ваш годинник завжди показуватиме точний час.</p>
-<p> Ви можете натиснути кнопку <span class="button">Скинути список до типового сервера (Reset to default server list)</span> якщо випадково видалили робочі NTP-сервери та <span class="button">Синхронізувати (Synchronize)</span> ваш годинник вручну.</p>
+<p>You can <span class="button">Reset to default server list</span> if you accidentally deleted working NTP-servers and <span class="button">Synchronize</span> your clock manually. The synchronization can be achived from the command line (or a script) as well:</p>
+<pre class="terminal">Time --update</pre>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

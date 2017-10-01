@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
 <head>
 <!-- 
  *
@@ -19,6 +19,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>Boot Loader</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -59,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h1>Boot Loader</h1>
 
@@ -75,30 +75,29 @@
 </td><td> </td><td>Es gibt mehrere Möglichkeiten Haiku bei hardware-bezogenen Problemen zum Booten zu bringen, oder falls das System durch ein installiertes Add-On instabil wurde, indem man verschiedene Komponenten deaktiviert. Wird über die Pfeiltasten eine Option auswählt, wird am unteren Bildschirmrand eine kurze Erklärung angezeigt.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+		Versetzt das System in einen abgesicherten Modus. Diese Einstellung kann unabhängig von den anderen Optionen aktiviert werden.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+		Verhindert das Laden jeglicher vom Benutzer installierten Add-Ons. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+		Deaktiviert IDE DMA, erhöht die IDE-Kompatibilität auf Kosten der Performance.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
-</p>
+		Ignoriert den Speicher über dem 4 GiB Adresslimit, setzt die Einstellung in der 'kernel' Datei außer Kraft.</p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+		Aktiviert den VESA-Mode, es wird nicht versucht einen speziellen Grafiktreiber zu benutzen.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+		Deaktiviert den IO APIC für das Interrupt-Routing und erzwingt stattdessen die Benutzung von "Legacy PIC".</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Disables using the local APIC, also disables SMP.</p>
+		Deaktiviert den lokalen APIC und auch SMP (Multiprozessor).</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Disables all but one CPU core.</p>
+		Deaktiviert alle CPU Cores bis auf einen.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Stops the system from calling BIOS functions.</p>
+		Es werden keine BIOS-Funktionen aufgerufen.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+		Deaktiviert Advanced Power Management Hardware-Unterstützung, setzt APM-Einstellungen in der 'kernel' Datei außer Kraft.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+		Deaktiviert Advanced Configuration and Power Interface Hardware-Unterstützung, setzt ACPI-Einstellungen in der 'kernel' Datei außer Kraft.</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
+		Ermöglicht die Auswahl von Systemdateien, die ignoriert werden sollen. Nützlich, um beispielsweise Treiber vorübergehend zu deaktivieren. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen <a href="../../welcome/de/bugreports.html">Bugreport</a> zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.</td></tr>
 <tr><td></td><td></td><td>
@@ -121,7 +120,7 @@
 		Zeigt das Syslog der letzten Haiku Sitzung an.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		Speichert das Syslog der letzten Haiku Sitzung auf FAT32 formatiertes Laufwerk, z. B. USB-Stick.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Hiermit lässt sich eine bestimmte Bildschirmauflösung und Farbtiefe erzwingen.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

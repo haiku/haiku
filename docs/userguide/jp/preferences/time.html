@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="jp" xml:lang="jp">
 <head>
 <!-- 
  *
- * Copyright 2008-20015, Haiku. All rights reserved.
+ * Copyright 2008-20017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>日付と時間</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -95,7 +96,8 @@
 <img src="../images/prefs-images/time-network.png" alt="time-network.png" />
 <p> <span class="button">+</span>/<span class="button">-</span> ボタンでリストに <acronym title="Network Time Protocol">NTP</acronym> サーバーを追加または削除することができます。</p>
 <p>下のチェックボックスは、システムに時刻の同期時に現在選択されているサーバーだけではなく、<span class="menu">すべてのサーバーを試す (Try all servers)</span> ように伝えます。また、常に正しい時刻を示していることを確認するため、<span class="menu">起動時に同期 (Synchronize at boot)</span> するようにも伝えます。</p>
-<p>誤って稼働中の NTP サーバーを削除した場合、<span class="button">デフォルトのサーバーリストにリセット (Reset to default server list)</span> することができ、また、手動で時計を<span class="button">同期 (Synchronize)</span> することもできます。</p>
+<p>誤って稼働中の NTP サーバーを削除した場合、<span class="button">デフォルトのサーバーリストにリセット (Reset to default server list)</span> でき、また、手動で時計を<span class="button">同期 (Synchronize)</span> することも可能です。また、同期はコマンドライン (またはスクリプト) からも実現できます。</p>
+<pre class="terminal">Time --update</pre>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

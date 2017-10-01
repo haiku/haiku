@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Braden Ewing <brewin@gmail.com>
  *		Humdinger <humdingerb@gmail.com>
  *		Vincent Duvert <vincent.duvert@free.fr>
+ *		Augustin Cavalier <waddlesplash>
  */
 
 html {
@@ -26,18 +27,18 @@ body {
 
 /* link colors and text decoration */
 
-a:link { 
-	font-weight: bold; 
-	text-decoration: none; 
+a:link {
+	font-weight: bold;
+	text-decoration: none;
 	color: #dc3c01;
 }
-a:visited { 
-	font-weight: bold; 
-	text-decoration: none; 
+a:visited {
+	font-weight: bold;
+	text-decoration: none;
 	color: #892601;
 }
-a:hover, a:active { 
-	text-decoration: underline; 
+a:hover, a:active {
+	text-decoration: underline;
 	color: #ff4500;
 }
 
@@ -67,16 +68,22 @@ h5 a:hover, a:active {
 	left: 0;
 	top: 0;
 	height: 84px;
-	min-width: 59em;
 	background: #eeeeee;
 }
 
 #banner div {
 	background: transparent url(images/logo.png) no-repeat scroll 10px 0;
-	min-width: 59em;
-	max-width: 70em;
 	height: 100%;
 	margin: 0 auto;
+}
+@media (min-width:768px) {
+	#banner {
+		min-width: 59em;
+	}
+	#banner div {
+		min-width: 59em;
+		max-width: 70em;
+	}
 }
 
 #banner span {
@@ -88,25 +95,33 @@ h5 a:hover, a:active {
 	letter-spacing: 3px;
 	font-family: Myriad Pro,Myriad Web Pro Regular,Lucida Grande,Geneva,Trebuchet MS,sans-serif;
 	font-weight: normal;
-	font-size: 16px;	
+	font-size: 16px;
 }
 
 div.nav {
 	position: relative;
-	min-width: 59em;
 	left: 0;
 	top: 0;
 	background: #e0e0e0;
 	padding: 0;
 }
+@media (min-width:768px) {
+	div.nav {
+		min-width: 59em;
+	}
+}
 
 div.nav div.inner {
-	min-width: 59em;
-	max-width: 70em;
 	height: 100%;
 	margin: 0 auto;
 	text-align: right;
 	padding: 0;
+}
+@media (min-width:768px) {
+	div.nav div.inner {
+		min-width: 59em;
+		max-width: 70em;
+	}
 }
 
 div.nav div.inner span {
@@ -114,8 +129,8 @@ div.nav div.inner span {
 	font-size: 0.8em;
 }
 
-div.nav div.inner span a.uplink { 
-	font-weight: normal; 
+div.nav div.inner span a.uplink {
+	font-weight: normal;
 }
 
 /* Language selection menu */
@@ -136,7 +151,6 @@ ul.lang-menu img {
 
 ul.lang-menu li {
 	margin-left: 10px;
-	padding: 2px 5px 2px 5px;
 	background: #e0e0e0;
 	display: none;
 }
@@ -159,21 +173,38 @@ ul.lang-menu li a {
 	color: black;
 	text-decoration: none;
 	font-weight: normal;
+	display: block;
+	padding: 2px 5px 2px 5px;
 }
 
 /* main content */
 #content {
-	min-width: 59em;
-	max-width: 70em;
 	margin: 0 auto;
+}
+#content img {
+	max-width: 100%;
+}
+@media (min-width:768px) {
+	#content {
+		min-width: 59em;
+		max-width: 70em;
+	}
 }
 
 #content > div {
-	margin-top: 30px;
-	margin-left: 40px;
-	margin-right: 40px;
-	margin-bottom: 50px;
+	margin-top: 10px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 25px;
 	font-size: 0.9em;
+}
+@media (min-width:768px) {
+	#content > div {
+		margin-top: 30px;
+		margin-left: 40px;
+		margin-right: 40px;
+		margin-bottom: 50px;
+	}
 }
 
 /* contents box */
@@ -199,13 +230,13 @@ table.index td {
 	padding: 5px 20px;
 }
 
-table.index a:link, table.index a:visited { 
-	font-weight: normal; 
-	text-decoration: none; 
+table.index a:link, table.index a:visited {
+	font-weight: normal;
+	text-decoration: none;
 	color: #dc3c01;
 }
-table.index a:hover, table.index a:active { 
-	text-decoration: underline; 
+table.index a:hover, table.index a:active {
+	text-decoration: underline;
 	color: #ff4500;
 }
 
@@ -216,7 +247,7 @@ table.index a:hover, table.index a:active {
 /* Common declarations */
 .box-info, .box-stop, .box-warning {
 	-webkit-border-radius: 10px;
-	-khtml-border-radius: 10px;	
+	-khtml-border-radius: 10px;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 	border-style: dotted;
@@ -252,7 +283,12 @@ h2 {
 	font-weight: normal;
 	color: #0c3762;
 	border-bottom: dotted thin #e0e0e0;
-	margin-top: 35px;
+	margin-top: 18px;
+}
+@media (min-width:768px) {
+	h2 {
+		margin-top: 35px;
+	}
 }
 h3 {
 	font-size: 1.2em;
@@ -344,7 +380,7 @@ pre.terminal {			/* Terminal output*/
 }
 .key {				/* Shortcut (separate with   */
 	-webkit-border-radius: 3px;
-	-khtml-border-radius: 3px;	
+	-khtml-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	border-color: #c7c7c7;
@@ -368,11 +404,11 @@ pre.terminal {			/* Terminal output*/
 	#banner {
 		display:none;
 	}
-	
+
 	div.nav {
 		display:none;
 	}
-	
+
 	/* some links we want to print the url along with (CSS2) */
 	a.printurl:after {
 		content: " &lt;" attr(href) "&gt;";

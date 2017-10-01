@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
 <!-- 
  *
- * Copyright 2008-20015, Haiku. All rights reserved.
+ * Copyright 2008-20017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
 	<title>Fecha y hora</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -58,6 +59,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h2><img src="../../images/prefs-images/time-icon_64.png" alt="time-icon_64.png" width="64" height="64" />Time</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -96,7 +98,8 @@ A la derecha encontrará la hora de la zona horaria establecida actualmente y un
 <img src="../images/prefs-images/time-network.png" alt="time-network.png" />
 <p>Con los botones <span class="button">+</span>/<span class="button">-</span> puede añadir/quitar servidores <acronym title="Network Time Protocol">NTP</acronym>-servers del listado.</p>
 <p>Las casillas de selección siguientes le dicen al sistema que debe <span class="menu">Intentar con todos los servidores</span> cuando esté sincronizando, y no sólo el seleccionado, y <span class="menu">Sincronizar al arranque</span>, para que pueda estar seguro que su reloj siempre mostrará la hora correcta.</p>
-<p>Puede <span class="button">Restablecer la lista de servidores predeterminados</span> si accidentalmente eliminó los servidores NTP funcionales y <span class="button">Sincronizar</span> su reloj manualmente.</p>
+<p>You can <span class="button">Reset to default server list</span> if you accidentally deleted working NTP-servers and <span class="button">Synchronize</span> your clock manually. The synchronization can be achived from the command line (or a script) as well:</p>
+<pre class="terminal">Time --update</pre>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
