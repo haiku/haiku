@@ -32,7 +32,7 @@
 
 	This flag was added because BFS doesn't support sparse files. It will be
 	phased out, when it does.
-/*
+*/
 
 
 ///// FS_WRITE_FSINFO_NAME /////

@@ -367,6 +367,9 @@ div.contents, footer {
 	min-width: 59em;
 	max-width: 70em;
 }
+footer {
+	font-size: 90%;
+}
 
 div.contents ul, div.contents ol {
 	line-height: 1.3;
