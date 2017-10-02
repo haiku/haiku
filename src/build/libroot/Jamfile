@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
-UsePrivateBuildHeaders kernel system ;
+UsePrivateBuildHeaders kernel libroot system ;
 
 {
 	local defines = [ FDefines
@@ -29,7 +29,6 @@ UsePrivateBuildHeaders kernel system ;
 
 	defines = [ FDefines KMESSAGE_CONTAINER_ONLY=1 ] ;
 	ObjectC++Flags KMessage.cpp : $(defines) ;
-
 }
 
 # locate the library
@@ -65,6 +64,7 @@ local librootSources =
 	misc.cpp
 	sem.cpp
 	thread.cpp
+	SHA256.cpp
 
 	$(hostPlatformSources)
 
@@ -100,5 +100,7 @@ SEARCH on [ FGristFiles driver_settings.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 SEARCH on [ FGristFiles $(strlSources) strnlen.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles SHA256.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix crypt ] ;
 SEARCH on [ FGristFiles KMessage.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;

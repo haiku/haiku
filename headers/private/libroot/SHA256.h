@@ -2,14 +2,16 @@
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef SHA_256_H
-#define SHA_256_H
+#ifndef _SHA_256_H
+#define _SHA_256_H
 
 
 #include <SupportDefs.h>
 
 
 #define SHA_DIGEST_LENGTH	32
+
+namespace BPrivate {
 
 
 class SHA256 {
@@ -36,4 +38,9 @@ private:
 };
 
 
-#endif	// SHA_256_H
+} // namespace BPrivate
+
+using BPrivate::SHA256;
+
+
+#endif	// _SHA_256_H

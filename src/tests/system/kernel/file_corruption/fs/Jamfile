@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests system kernel file_corruption fs ;
 
 
 UsePrivateKernelHeaders ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders libroot ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
@@ -36,7 +36,7 @@ KernelAddon checksumfs :
 	# from packagefs
 	DebugSupport.cpp
 
-	# from src/kits/shared
+	# from src/system/libroot/posix/crypt
 	SHA256.cpp
 ;
 
@@ -44,6 +44,6 @@ KernelAddon checksumfs :
 SEARCH on [ FGristFiles DebugSupport.cpp ]
 	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems packagefs ] ;
 SEARCH on [ FGristFiles SHA256.cpp ]
-	= [ FDirName $(HAIKU_TOP) src kits shared ] ;
+	= [ FDirName $(HAIKU_TOP) src system libroot posix crypt ] ;
 
 HaikuSubInclude userland ;

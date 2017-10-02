@@ -12,6 +12,9 @@
 #include <ByteOrder.h>
 
 
+namespace BPrivate {
+
+
 static const uint32 kChunkSize = 64;	// 64 bytes == 512 bits
 
 static const uint32 kRounds[64] = {
@@ -188,3 +191,6 @@ SHA256::_ProcessChunk()
 	fHash[6] += g;
 	fHash[7] += h;
 }
+
+
+} // namespace BPrivate

@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src tests system kernel file_corruption driver ;
 
 SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
 UsePrivateKernelHeaders ;
+UsePrivateHeaders libroot ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
@@ -19,4 +20,4 @@ KernelAddon checksum_device :
 
 
 SEARCH on [ FGristFiles SHA256.cpp ]
-	= [ FDirName $(HAIKU_TOP) src kits shared ] ;
+	= [ FDirName $(HAIKU_TOP) src system libroot posix crypt ] ;

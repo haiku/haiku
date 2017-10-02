@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src build libpackage ;
 
-UsePrivateBuildHeaders kernel package shared storage support ;
+UsePrivateBuildHeaders kernel package shared libroot storage support ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers os net ] : true ;
 

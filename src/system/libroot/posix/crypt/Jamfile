@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix crypt ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders libroot ;
 UsePrivateSystemHeaders ;
 
 local architectureObject ;
@@ -20,6 +20,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			crypto_scrypt.cpp
 			crypt.cpp
 			pbkdf2.cpp
+			SHA256.cpp
 			;
 	}
 }

@@ -4,6 +4,7 @@ UsePrivateHeaders
 	app
 	kernel
 	shared
+	libroot
 	storage
 	support
 	;
