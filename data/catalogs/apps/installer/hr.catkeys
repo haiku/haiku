@@ -1,8 +1,9 @@
-1	croatian	x-vnd.Haiku-Installer	1874916923
+1	croatian	x-vnd.Haiku-Installer	938407832
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Upravitelj podizanja sustava, program koji konfigurira Haiku izbornik podizanja, ne može se pokrenuti.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju i ponovno pokrenuti sustav?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tnapisali Jérôme Duval i Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Ovdje morate zakomentirati redak \"GRUB_HIDDEN_TIMEOUT=0\" stavljjući \"#\" na početak da biste prikazali izbornik podizanja sustava.\n\n
 Quit	InstallerApp		Isključi
 Additional disk space required: 0.0 KiB	InstallerWindow		Potreban dodatni prostor na disku: 0.0 KiB
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
@@ -42,6 +43,7 @@ The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Show optional packages	InstallerWindow		Pokaži neobavezne pakete
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nije pronađena ijedna particija pogodna za instalaciju.Molim uredite particije i inicirajte barem jednu sa Be File sustavom.
+Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Dodatno morate urediti još jednu datoteku da biste prikazali izbornik podizanja sustava:\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Iz pop-up izbornika izaberite disk na koji žekite instalirati.Zatim kliknite \"Počni\".
 Unknown Type	InstallProgress	Partition content type	Nepoznata vrsta
 <none>	InstallerWindow	No partition available	<nijedan>
@@ -65,6 +67,7 @@ OK	InstallProgress		U redu
 Please choose target	InstallerWindow		Molim izaberite metu
 ???	InstallerWindow	Unknown partition name	???
 Begin	InstallerWindow		Počni
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Konačno, morate ažurirati izbornik podizanja sustava unoseći:\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Ako još niste napravili particije, jednostavno ponovno podignite sustav, napravite particiju koristeći alat sa kojim se najugodnije osjećate, i ponovno podignite Haiku za nastavak instalacije. Možete, na primjer, koristiti Gparted Live-CD, on može također promjeniti veličinu postojećih particija da napravi mjesta.\n\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Ako koristite GRUB 2 prva logička particija uvijek ima broj \"5\", bez obzira na broj primarnih particija,\n\n
 Write boot sector	InstallerWindow		Zapiši boot sektor

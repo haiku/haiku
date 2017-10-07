@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-PEPL	3707731335
+1	croatian	x-vnd.Be-PEPL	2766498195
 Edit	People		Uredi
 Error	People		Greška
 City	People		Grad
@@ -21,6 +21,7 @@ Nickname	People		Nadimak
 Quit	People		Isključi
 Name	People		Ime
 Revert	People		Obrni
+Don't save	People		Nemoj spremiti
 Undo	People		Poništi
 E-mail	People		E-mail
 Load image…	People		Učitaj sliku...
@@ -29,6 +30,7 @@ Remove image	People		Ukloni sliku
 Home phone	People		Kućni telefon
 Save as…	People		Spremi kao...
 Redo	People		Ponovi vraćeno
+Save changes before closing?	People		Spremiti izmjene prije zatvaranja?
 Paste	People		Zalijepi
 Drop an image here,\nor use the contextual menu.	People		Spusti sliku ovdije, \nili koristi kontekstualni izbornik.
 Save	People		Spremi
