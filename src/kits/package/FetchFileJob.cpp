@@ -120,11 +120,41 @@ FetchFileJob::Execute()
 
 	result = curl_easy_perform(handle);
 	curl_easy_cleanup(handle);
-	if (result != CURLE_OK) {
-		// TODO: map more curl error codes to ours for more
-		// precise error reporting
-		return B_ERROR;
+
+	switch (result) {
+		case CURLE_OK:
+			return B_OK;
+		case CURLE_UNSUPPORTED_PROTOCOL:
+			return EPROTONOSUPPORT;
+		case CURLE_FAILED_INIT:
+			return B_NO_INIT;
+		case CURLE_URL_MALFORMAT:
+			return B_BAD_VALUE;
+		case CURLE_NOT_BUILT_IN:
+			return B_NOT_SUPPORTED;
+		case CURLE_COULDNT_RESOLVE_PROXY:
+		case CURLE_COULDNT_RESOLVE_HOST:
+			return B_NAME_NOT_FOUND;
+		case CURLE_COULDNT_CONNECT:
+			return ECONNREFUSED;
+		case CURLE_FTP_WEIRD_SERVER_REPLY:
+			return B_BAD_DATA;
+		case CURLE_REMOTE_ACCESS_DENIED:
+			return B_NOT_ALLOWED;
+		case CURLE_PARTIAL_FILE:
+			return B_PARTIAL_READ;
+		case CURLE_OUT_OF_MEMORY:
+			return B_NO_MEMORY;
+		case CURLE_OPERATION_TIMEDOUT:
+			return B_TIMED_OUT;
+		case CURLE_SSL_CONNECT_ERROR:
+			return B_BAD_REPLY;
+		default:
+			// TODO: map more curl error codes to ours for more
+			// precise error reporting
+			return B_ERROR;
 	}
+
 	#endif /* !HAIKU_BOOTSTRAP_BUILD */
 
 	return B_OK;
