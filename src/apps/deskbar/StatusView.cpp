@@ -1160,7 +1160,7 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 	if (fBarView->Vertical() && !fBarView->Left())
 		loc.x += kDragWidth;
 	else if (!fBarView->Vertical())
-		loc.x += 2;
+		loc.x += kGutter;
 
 	if (fMultiRowMode) {
 		// try to find free space in every row

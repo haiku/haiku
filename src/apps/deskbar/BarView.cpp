@@ -469,6 +469,9 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		} else {
 			if (!fResizeControl->IsHidden())
 				fResizeControl->Hide();
+			// move right and down to not cover border then resize to fit
+			fReplicantTray->MoveTo(kGutter, kGutter);
+			fReplicantTray->ResizeBy(-kGutter, -kGutter);
 			BRect screenFrame = (BScreen(Window())).Frame();
 			statusLoc.x = screenFrame.right - fDragRegion->Bounds().Width();
 			statusLoc.y = -1;
