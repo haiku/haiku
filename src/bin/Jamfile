@@ -251,7 +251,6 @@ DoCatalogs filepanel
 ;
 
 SubInclude HAIKU_TOP src bin addattr ;
-SubInclude HAIKU_TOP src bin bc ;
 SubInclude HAIKU_TOP src bin bfs_tools ;
 SubInclude HAIKU_TOP src bin cddb_lookup ;
 SubInclude HAIKU_TOP src bin compress ;

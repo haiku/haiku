@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src bin bc ;
-
-SubInclude HAIKU_TOP src bin bc lib ;
-SubInclude HAIKU_TOP src bin bc bc ; 
-SubInclude HAIKU_TOP src bin bc dc ; 

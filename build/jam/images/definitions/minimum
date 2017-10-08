@@ -2,9 +2,9 @@
 
 SYSTEM_BIN = [ FFilterByBuildFeatures
 	addattr alert arp autologin
-	bc beep bfsinfo
+	beep bfsinfo
 	catattr checkfs checkitout chop clear collectcatkeys compress copyattr
-	dc desklink df diskimage draggers
+	desklink df diskimage draggers
 	driveinfo dstcheck dumpcatalog
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
