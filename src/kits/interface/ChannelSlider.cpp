@@ -824,37 +824,10 @@ BChannelSlider::_DrawThumbs()
 				char valueString[32];
 				snprintf(valueString, 32, "%" B_PRId32,
 					ValueFor(fCurrentChannel));
-				float stringWidth = fBackingView->StringWidth(valueString);
-				float width = max_c(10.0, stringWidth);
-				BRect valueRect(0.0, 0.0, width, 10.0);
-
-				BRect thumbFrame(ThumbFrameFor(fCurrentChannel));
-				float thumbDelta(ThumbDeltaFor(fCurrentChannel));
-
-				if (fIsVertical) {
-					valueRect.OffsetTo((thumbFrame.Width() - width) / 2.0
-						+ fCurrentChannel * thumbFrame.Width(),
-						thumbDelta + thumbFrame.Height() + 2.0);
-					if (valueRect.bottom > fBackingView->Frame().bottom)
-						valueRect.OffsetBy(0.0, -(thumbFrame.Height() + 12.0));
-				} else {
-					valueRect.OffsetTo((thumbDelta - (width + 2.0)),
-						thumbFrame.top);
-					if (valueRect.left < fBackingView->Frame().left) {
-						valueRect.OffsetBy(thumbFrame.Width() + width + 2.0,
-							0.0);
-					}
-				}
-
-				rgb_color oldColor = fBackingView->HighColor();
-				fBackingView->SetHighColor(255, 255, 172);
-				fBackingView->FillRect(valueRect);
-				fBackingView->SetHighColor(0, 0, 0);
-				fBackingView->DrawString(valueString, BPoint(valueRect.left
-					+ (valueRect.Width() - stringWidth) / 2.0, valueRect.bottom
-					- 1.0));
-				fBackingView->StrokeRect(valueRect.InsetByCopy(-0.5, -0.5));
-				fBackingView->SetHighColor(oldColor);
+				SetToolTip(valueString);
+				ShowToolTip(ToolTip());
+			} else {
+				HideToolTip();
 			}
 
 			fBackingView->Sync();
