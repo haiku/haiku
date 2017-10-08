@@ -223,7 +223,8 @@ FontStyle::_TranslateStyleToFace(const char* name) const
 	if (string.IFindFirst("condensed") >= 0)
 		face |= B_CONDENSED_FACE;
 
-	if (string.IFindFirst("light") >= 0)
+	if (string.IFindFirst("light") >= 0
+		|| string.IFindFirst("thin") >= 0)
 		face |= B_LIGHT_FACE;
 
 	if (string.IFindFirst("heavy") >= 0
