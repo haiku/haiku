@@ -19,11 +19,9 @@ flags			system_package
 provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha1
 	cmd:arp
-	cmd:bc
 	cmd:chop
 	cmd:clear
 	cmd:compress
-	cmd:dc
 	cmd:df
 	cmd:ftp
 	cmd:ftpd

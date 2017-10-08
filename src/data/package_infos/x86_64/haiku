@@ -18,11 +18,9 @@ licenses {
 provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha4_pm_hrev51198
 	cmd:arp
-	cmd:bc
 	cmd:chop
 	cmd:clear
 	cmd:compress
-	cmd:dc
 	cmd:df
 	cmd:ftp
 	cmd:ftpd
