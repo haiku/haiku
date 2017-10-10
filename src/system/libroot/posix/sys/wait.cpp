@@ -23,13 +23,12 @@ wait(int* _status)
 	return waitpid(-1, _status, 0);
 }
 
-
-pid_t
-waitpid(pid_t pid, int* _status, int options)
+extern "C" pid_t
+_waitpid(pid_t pid, int* _status, int options, team_usage_info *usage_info)
 {
 	// wait
 	siginfo_t info;
-	pid_t child = _kern_wait_for_child(pid, options, &info);
+	pid_t child = _kern_wait_for_child(pid, options, &info, usage_info);
 
 	pthread_testcancel();
 
@@ -84,6 +83,13 @@ waitpid(pid_t pid, int* _status, int options)
 }
 
 
+pid_t
+waitpid(pid_t pid, int* _status, int options)
+{
+	return _waitpid(pid, _status, options, NULL);
+}
+
+
 int
 waitid(idtype_t idType, id_t id, siginfo_t* info, int options)
 {
@@ -111,7 +117,7 @@ waitid(idtype_t idType, id_t id, siginfo_t* info, int options)
 			RETURN_AND_SET_ERRNO_TEST_CANCEL(EINVAL);
 	}
 
-	pid_t child = _kern_wait_for_child(id, options, info);
+	pid_t child = _kern_wait_for_child(id, options, info, NULL);
 	if (child >= 0 || child == B_WOULD_BLOCK)
 		return 0;
 

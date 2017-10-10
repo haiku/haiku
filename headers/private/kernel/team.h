@@ -69,7 +69,8 @@ thread_id _user_load_image(const char* const* flatArgs, size_t flatArgsSize,
 status_t _user_wait_for_team(team_id id, status_t *_returnCode);
 void _user_exit_team(status_t returnValue);
 status_t _user_kill_team(thread_id thread);
-pid_t _user_wait_for_child(thread_id child, uint32 flags, siginfo_t* info);
+pid_t _user_wait_for_child(thread_id child, uint32 flags, siginfo_t* info,
+			team_usage_info* usageInfo);
 status_t _user_exec(const char *path, const char* const* flatArgs,
 			size_t flatArgsSize, int32 argCount, int32 envCount, mode_t umask);
 thread_id _user_fork(void);

@@ -2369,6 +2369,10 @@ job_control_entry::InitDeadState()
 		reason = team->exit.reason;
 		signal = team->exit.signal;
 		signaling_user = team->exit.signaling_user;
+		user_time = team->dead_threads_user_time
+			+ team->dead_children.user_time;
+		kernel_time = team->dead_threads_kernel_time
+			+ team->dead_children.kernel_time;
 
 		team = NULL;
 	}
@@ -2387,6 +2391,8 @@ job_control_entry::operator=(const job_control_entry& other)
 	group_id = other.group_id;
 	status = other.status;
 	reason = other.reason;
+	user_time = other.user_time;
+	kernel_time = other.kernel_time;
 
 	return *this;
 }
@@ -2395,7 +2401,8 @@ job_control_entry::operator=(const job_control_entry& other)
 /*! This is the kernel backend for waitid().
 */
 static thread_id
-wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
+wait_for_child(pid_t child, uint32 flags, siginfo_t& _info,
+	team_usage_info& _usage_info)
 {
 	Thread* thread = thread_get_current_thread();
 	Team* team = thread->team;
@@ -2533,6 +2540,8 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
 			_info.si_code = foundEntry.reason;
 			_info.si_status = foundEntry.reason == CLD_EXITED
 				? foundEntry.status : foundEntry.signal;
+			_usage_info.user_time = foundEntry.user_time;
+			_usage_info.kernel_time = foundEntry.kernel_time;
 			break;
 		case JOB_CONTROL_STATE_STOPPED:
 			_info.si_code = CLD_STOPPED;
@@ -3915,19 +3924,28 @@ _user_fork(void)
 
 
 pid_t
-_user_wait_for_child(thread_id child, uint32 flags, siginfo_t* userInfo)
+_user_wait_for_child(thread_id child, uint32 flags, siginfo_t* userInfo,
+	team_usage_info* usageInfo)
 {
 	if (userInfo != NULL && !IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
+	if (usageInfo != NULL && !IS_USER_ADDRESS(usageInfo))
+		return B_BAD_ADDRESS;
 
 	siginfo_t info;
-	pid_t foundChild = wait_for_child(child, flags, info);
+	team_usage_info usage_info;
+	pid_t foundChild = wait_for_child(child, flags, info, usage_info);
 	if (foundChild < 0)
 		return syscall_restart_handle_post(foundChild);
 
 	// copy info back to userland
 	if (userInfo != NULL && user_memcpy(userInfo, &info, sizeof(info)) != B_OK)
 		return B_BAD_ADDRESS;
+	// copy usage_info back to userland
+	if (usageInfo != NULL && user_memcpy(usageInfo, &usage_info,
+		sizeof(usage_info)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
 
 	return foundChild;
 }

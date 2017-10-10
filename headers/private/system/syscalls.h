@@ -141,7 +141,7 @@ extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
 extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
 extern pid_t		_kern_wait_for_child(thread_id child, uint32 flags,
-						siginfo_t* info);
+						siginfo_t* info, team_usage_info* usageInfo);
 extern status_t		_kern_exec(const char *path, const char* const* flatArgs,
 						size_t flatArgsSize, int32 argCount, int32 envCount,
 						mode_t umask);

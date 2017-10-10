@@ -116,6 +116,8 @@ struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
 	status_t			status;
 	uint16				reason;		// reason for the team's demise, one of the
 									// CLD_* values defined in <signal.h>
+	bigtime_t			user_time;
+	bigtime_t			kernel_time;
 
 	job_control_entry();
 	~job_control_entry();

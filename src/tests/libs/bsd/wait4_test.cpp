@@ -5,6 +5,7 @@
 
 
 #include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/resource.h> 
@@ -55,10 +56,14 @@ main(int argc, char** argv)
 	struct rusage usage;
 	pid_t pid;
 	do {
+		memset(&usage, 0, sizeof(usage));
 		int childStatus = -1;
 		pid = wait4(-1, &childStatus, 0, &usage);
-		printf("wait4() returned %ld (%s), child status %d\n",
-			pid, strerror(errno), childStatus);
+		printf("wait4() returned %" PRId32 " (%s), child status %" PRId32
+			", kernel: %ld.%06" PRId32 " user: %ld.%06" PRId32 "\n",
+			pid, strerror(errno), childStatus, usage.ru_stime.tv_sec,
+			usage.ru_stime.tv_usec, usage.ru_utime.tv_sec,
+			usage.ru_utime.tv_usec);
 	} while (pid >= 0);
 
 	return 0;
