@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	3699161031
+1	french	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Afficher le bouton de la page d’accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l’URL dans le presse-papiers
@@ -9,6 +9,7 @@ The download could not be opened.	Download Window		Impossible d’ouvrir l’obj
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Le dossier de téléchargement n’a pas pu être ouvert.\n\nErreur : %error
 Open location	WebPositive Window		Ouvrir l’emplacement
 Clear history	WebPositive Window		Nettoyer l’historique
+WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Hier
 Default standard font size:	Settings Window		Taille par défaut de la police standard :
 Start page:	Settings Window		Page d'accueil :
@@ -51,6 +52,7 @@ Restart	Download Window		Recommencer
 Proxy server	Settings Window		Serveur mandataire
 Open containing folder	Download Window		Ouvrir le dossier contenant le fichier
 New window	WebPositive Window		Nouvelle fenêtre
+WebPositive	Download Window		WebPositive
 Open	Download Window		Ouvrir
 Reload	WebPositive Window		Recharger
 Downloads	Download Window		Téléchargements
