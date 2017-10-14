@@ -7,9 +7,7 @@
 #	Bluetooth				- experimental Haiku components for Bluetooth
 #	Development				- more complete dev environment (including autotools)
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
-#	DevelopmentJava			- JamVM, a Java Virtual machine, GNU Classpath, ECJ
 #	DevelopmentMin			- development headers, libs, tools, from sources only
-#	DevelopmentPowerPC		- Cross compiling environment for PowerPC
 #	FFMpeg					- audio/video library
 #	FFMpeg-devel			- FFMpeg development files
 #	Git						- the distributed version control system
@@ -26,8 +24,6 @@ OptionalPackageDependencies NetFS : UserlandFS ;
 
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-local hpkgBaseURL = http://haiku-files.org/files/hpkg ;
-local baseSourceURL = http://haiku-files.org/files/sources ;
 
 
 # BeBook
@@ -122,20 +118,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 }
 
 
-# DevelopmentJava
-if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
-# TODO: Build actual packages!
-# 	InstallOptionalHaikuImagePackage
-# 		$(baseURL)/gnu-classpath-0.98-r1a3-x86-gcc4-2011-06-08.zip ;
-# 	InstallOptionalHaikuImagePackage
-# 		$(baseURL)/jamvm-1.5.4-r1a3-x86-gcc4-2011-06-08.zip ;
-# 	AddSymlinkToHaikuImage common bin
-# 		: /boot/common/bin/jamvm : java ;
-# 	InstallOptionalHaikuImagePackage
-# 		$(baseURL)/ecj-3.6.2-haiku-2011-06-08.zip ;
-}
-
-
 # DevelopmentMin
 if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		&& ( $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 ) {
@@ -150,24 +132,14 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 }
 
 
-# DevelopmentPowerPC
-if [ IsOptionalHaikuImagePackageAdded DevelopmentPowerPC ] {
-# TODO: Build actual packages!
-# 	InstallOptionalHaikuImagePackage
-# 		$(baseURL)/gcc-ppc-4.6.2-x86-gcc4-2012-03-17.zip ;
-# 	InstallOptionalHaikuImagePackage
-# 		$(baseURL)/haiku-devlibs-ppc-gcc4-2012-03-18.zip ;
-}
-
-
-# FFMpeg
+# FFmpeg
 if [ IsOptionalHaikuImagePackageAdded FFMpeg ] {
 	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
 	AddHaikuImagePackages $(packages) ;
 }
 
 
-# FFMpeg-devel
+# FFmpeg-devel
 if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
 	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
 	AddHaikuImagePackages $(packages)_devel ;
