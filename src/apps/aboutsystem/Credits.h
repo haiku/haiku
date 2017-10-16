@@ -241,7 +241,6 @@ static const Translation kTranslations[] = {
 		"Vasco Costa (gluon)\n"
 		"Adriano Duarte\n"
 		"Louis de M.\n"
-		"Michael Vinícius de Oliveira (michaelvo)\n"
 		"pedrothegameroficialtm\n"
 		// "taos\n" bugfixes only, no actual translations
 	},
@@ -251,6 +250,7 @@ static const Translation kTranslations[] = {
 		"Wallace Maia\n"
 		"Tiago Matos (tiagoms)\n"
 		"Louis de M.\n"
+		"Michael Vinícius de Oliveira (michaelvo)\n"
 		"Luis Otte\n"
 		"Nadilson Santana (nadilsonsantana)\n"
 		"dsaito\n"
