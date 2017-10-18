@@ -4016,7 +4016,7 @@ BView*
 BWindow::_FindView(BView* view, BPoint point) const
 {
 	// point is assumed to be already in view's coordinates
-	if (!view->IsHidden() && view->Bounds().Contains(point)) {
+	if (!view->IsHidden(view) && view->Bounds().Contains(point)) {
 		if (view->fFirstChild == NULL)
 			return view;
 		else {
