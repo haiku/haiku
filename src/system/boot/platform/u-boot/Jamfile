@@ -182,7 +182,7 @@ actions BuildUBootSDImage1
 	# partition it
 	MTOOLSRC=$(1).mtools mpartition -b$(SDIMAGE_BEGIN) -cI -T 0xc i:
 	# format the image
-	MTOOLSRC=$(1).mtools mformat -L 32 -v "Haiku" i:
+	MTOOLSRC=$(1).mtools mformat -L 32 -v "HAIKU" i:
 
 	# generate u-boot environment variables
 	echo '$(HAIKU_BOARD_SDIMAGE_UBOOT_UENV)' > uEnv.txt
