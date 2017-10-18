@@ -1243,10 +1243,12 @@ BTabView::RemoveTab(int32 index)
 	else if (index <= fSelection)
 		Select(fSelection - 1);
 
-	if (fFocus == CountTabs() - 1 || CountTabs() == 0)
-		SetFocusTab(fFocus, false);
-	else
-		SetFocusTab(fFocus, true);
+	if (fFocus >= 0) {
+		if (fFocus == CountTabs() - 1 || CountTabs() == 0)
+			SetFocusTab(fFocus, false);
+		else
+			SetFocusTab(fFocus, true);
+	}
 
 	return tab;
 }
