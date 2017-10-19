@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.10.12
-#	Date:    2017-10-12 03:15:01
+#	Version: 2017.10.18
+#	Date:    2017-10-18 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -3153,6 +3153,7 @@
 		1179 ff50  Satellite P305D-S8995E
 		17f2 5000  KI690-AM2 Motherboard
 	7911  RS690/RS740 Host Bridge
+		1002 7910  RS690/RS740 Host Bridge
 	7912  RS690/RS740 PCI to PCI Bridge (Internal gfx)
 	7913  RS690 PCI to PCI Bridge (PCI Express Graphics Port 0)
 	7915  RS690 PCI to PCI Bridge (PCI Express Port 1)
@@ -5193,11 +5194,9 @@
 	3308  Integrated Lights-Out Standard MS Watchdog Timer
 		103c 330e  iLO3
 		103c 3381  iLO4
-	402f  PCIe Root Port
 	4030  zx2 System Bus Adapter
 	4031  zx2 I/O Controller
 	4037  PCIe Local Bus Adapter
-	403b  PCIe Root Port
 103e  Solliday Engineering
 103f  Synopsys/Logic Modeling Group
 1040  Accelgraphics Inc.
@@ -5214,7 +5213,6 @@
 		0675 1704  ISDN Adapter (PCI Bus, D, C)
 		0675 1707  ISDN Adapter (PCI Bus, DV, W)
 		10cf 105e  ISDN Adapter (PCI Bus, DV, W)
-	13a0  Transformer Book T101HA-GR030R
 # Should be 1022:9602
 	9602  AMD RS780/RS880 PCI to PCI bridge (int gfx)
 		1043 83a2  M4A785TD Motherboard
@@ -19589,6 +19587,7 @@
 1803  ProdaSafe GmbH
 1805  Euresys S.A.
 1809  Lumanate, Inc.
+180c  IEI Integration Corp
 1813  Ambient Technologies Inc
 	4000  HaM controllerless modem
 		16be 0001  V9x HAM Data Fax Modem
@@ -22271,6 +22270,7 @@
 	0960  80960RP (i960RP) Microprocessor/Bridge
 	0962  80960RM (i960RM) Bridge
 	0964  80960RP (i960RP) Microprocessor/Bridge
+	0a03  Haswell-ULT Thermal Subsystem
 	0a04  Haswell-ULT DRAM Controller
 		17aa 2214  ThinkPad X240
 	0a06  Haswell-ULT Integrated Graphics Controller
@@ -25823,7 +25823,7 @@
 	2822  SATA Controller [RAID mode]
 		1028 020d  Inspiron 530
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 	2823  C610/X99 series chipset sSATA Controller [RAID mode]
 	2824  82801HB (ICH8) 4 port SATA Controller [AHCI mode]
 		1043 81ec  P5B
@@ -26053,14 +26053,14 @@
 		1028 0210  PowerEdge T300 onboard SATA Controller
 		1028 0211  Optiplex 755
 		1028 023c  PowerEdge R200 onboard SATA Controller
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 	2921  82801IB (ICH9) 2 port SATA Controller [IDE mode]
 		1028 0235  PowerEdge R710 SATA IDE Controller
 		1028 0236  PowerEdge R610 SATA IDE Controller
 		1028 0237  PowerEdge T610 SATA IDE Controller
 		1462 7360  G33/P35 Neo
 	2922  82801IR/IO/IH (ICH9R/DO/DH) 6 port SATA Controller [AHCI mode]
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
 	2923  82801IB (ICH9) 4 port SATA Controller [AHCI mode]
@@ -26072,7 +26072,7 @@
 		1028 020f  PowerEdge R300 onboard SATA Controller
 		1028 0210  PowerEdge T300 onboard SATA Controller
 		1028 0211  Optiplex 755
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 	2928  82801IBM/IEM (ICH9M/ICH9M-E) 2 port SATA Controller [IDE mode]
 	2929  82801IBM/IEM (ICH9M/ICH9M-E) 4 port SATA Controller [AHCI mode]
@@ -26086,7 +26086,7 @@
 		1028 0211  Optiplex 755
 		103c 2a6f  Asus IPIBL-LB Motherboard
 		103c 3628  dv6-1190en
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
@@ -26106,7 +26106,7 @@
 		1028 029c  PowerEdge M710 USB UHCI Controller
 		1028 2011  Optiplex 755
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
@@ -26123,7 +26123,7 @@
 		1028 0287  PowerEdge M610 onboard UHCI
 		1028 029c  PowerEdge M710 USB UHCI Controller
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
@@ -26138,7 +26138,7 @@
 		1028 0287  PowerEdge M610 onboard UHCI
 		1028 029c  PowerEdge M710 USB UHCI Controller
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
@@ -26153,7 +26153,7 @@
 		1028 029c  PowerEdge M710 USB UHCI Controller
 		1028 2011  Optiplex 755
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 2937  Optiplex 755
@@ -26169,7 +26169,7 @@
 		1028 0287  PowerEdge M610 onboard UHCI
 		1028 029c  PowerEdge M710 USB UHCI Controller
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 2938  Optiplex 755
@@ -26180,7 +26180,7 @@
 		1028 0210  PowerEdge T300 onboard UHCI
 		1028 0237  PowerEdge T610 USB UHCI Controller
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
@@ -26197,7 +26197,7 @@
 		1028 0287  PowerEdge M610 onboard EHCI
 		1028 029c  PowerEdge M710 USB EHCI Controller
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
@@ -26211,7 +26211,7 @@
 		1028 0287  PowerEdge M610 onboard EHCI
 		1028 029c  PowerEdge M710 USB EHCI Controller
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 293c  Optiplex 755
@@ -26222,7 +26222,7 @@
 		1028 0211  Optiplex 755
 		103c 2a6f  Asus IPIBL-LB Motherboard
 		103c 3628  dv6-1190en
-		1043 829f  P5K PRO Motherboard
+		1043 829f  P5K PRO Motherboard: 82801IR [ICH9R]
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 293e  Optiplex 755
@@ -26232,8 +26232,7 @@
 		1028 020d  Inspiron 530
 		1028 0211  Optiplex 755
 		103c 2a6f  Asus IPIBL-LB Motherboard
-# same ID possibly also on other ASUS boards
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 		8086 2940  Optiplex 755
 	2942  82801I (ICH9 Family) PCI Express Port 2
 		1028 020d  Inspiron 530
@@ -26244,12 +26243,10 @@
 		1028 020d  Inspiron 530
 	2948  82801I (ICH9 Family) PCI Express Port 5
 		1028 020d  Inspiron 530
-# same ID possibly also on other ASUS boards
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 	294a  82801I (ICH9 Family) PCI Express Port 6
 		1028 020d  Inspiron 530
-# same ID possibly also on other ASUS boards
-		1043 8277  P5K PRO Motherboard
+		1043 8277  P5K PRO Motherboard: 82801IR [ICH9R]
 	294c  82566DC-2 Gigabit Network Connection
 		17aa 302e  82566DM-2 Gigabit Network Connection
 	2970  82946GZ/PL/GL Memory Controller Hub
@@ -26303,16 +26300,14 @@
 	29c0  82G33/G31/P35/P31 Express DRAM Controller
 		1028 020d  Inspiron 530
 		103c 2a6f  Asus IPIBL-LB Motherboard
-# same ID possibly also on other ASUS boards
-		1043 8276  P5K PRO Motherboard
+		1043 8276  P5K PRO Motherboard: Intel 82P35 Northbridge
 		1043 82b0  P5KPL-VM Motherboard
 		1462 7360  G33/P35 Neo
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
 	29c1  82G33/G31/P35/P31 Express PCI Express Root Port
 		1028 020d  Inspiron 530
-# same ID possibly also on other ASUS boards
-		1043 8276  P5K PRO Motherboard
+		1043 8276  P5K PRO Motherboard: Intel 82P35 Northbridge
 	29c2  82G33/G31 Express Integrated Graphics Controller
 		1028 020d  Inspiron 530
 		1043 82b0  P5KPL-VM Motherboard
