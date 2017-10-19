@@ -178,13 +178,13 @@ TTimeView::GetPreferredSize(float* width, float* height)
 
 	GetCurrentTime();
 
+	float timeWidth = StringWidth(fCurrentTimeStr);
+
 	// TODO: SetOrientation never gets called, fix that when in vertical mode,
 	// we want to limit the width so that it can't overlap the bevels in the
 	// parent view.
-	*width = fOrientation
-		? std::min(fMaxWidth - kHMargin,
-			kHMargin + StringWidth(fCurrentTimeStr))
-		: kHMargin + StringWidth(fCurrentTimeStr);
+	*width = fOrientation ? std::min(fMaxWidth - kHMargin, timeWidth)
+		: timeWidth;
 }
 
 

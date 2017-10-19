@@ -160,15 +160,21 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fBarMenuBar = new TBarMenuBar(menuFrame, "BarMenuBar", this);
 	AddChild(fBarMenuBar);
 
-	// create and add the status tray
+	// create the status tray
 	fReplicantTray = new TReplicantTray(this, fVertical);
+
+	// create the resize control
+	fResizeControl = new TResizeControl(this);
+
+	// create the drag region and add the resize control
+	// and replicant tray to it
 	fDragRegion = new TDragRegion(this, fReplicantTray);
+	fDragRegion->AddChild(fResizeControl);
 	fDragRegion->AddChild(fReplicantTray);
+
+	// Add the drag region
 	if (fTrayLocation != 0)
 		AddChild(fDragRegion);
-
-	fResizeControl = new TResizeControl(this);
-	fReplicantTray->AddChild(fResizeControl);
 
 	// create and add the application menubar
 	fExpandoMenuBar = new TExpandoMenuBar(this, fVertical);
@@ -455,15 +461,27 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		fReplicantTray->SetMultiRow(fVertical);
 		fReplicantTray->RealignReplicants();
 		fDragRegion->ResizeToPreferred();
+			// also resizes replicant tray
 
-		fResizeControl->ResizeTo(kDragWidth, fDragRegion->Bounds().Height());
+		fResizeControl->ResizeTo(kDragWidth, fDragRegion->Bounds().Height()
+			- 2); // make room for top and bottom border
 
 		if (fVertical) {
 			if (fResizeControl->IsHidden())
 				fResizeControl->Show();
-			// move replicant tray past dragger width on left
-			// also down 1 pixel so that it won't cover the border
-			fReplicantTray->MoveTo(fLeft ? kDragWidth + kGutter : 0, kGutter);
+
+			if (fLeft) {
+				// move replicant tray past dragger width on left
+				// also down 1px so it won't cover the border
+				fReplicantTray->MoveTo(kDragWidth + kGutter, kGutter);
+
+				// shrink width by same amount
+				fReplicantTray->ResizeBy(-(kDragWidth + kGutter), 0);
+			} else {
+				// move replicant tray down 1px so it won't cover the border
+				fReplicantTray->MoveTo(0, kGutter);
+			}
+
 			statusLoc.x = 0;
 			statusLoc.y = fBarMenuBar->Frame().bottom + 1;
 		} else {
@@ -481,9 +499,9 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		fDragRegion->Invalidate();
 
 		if (fVertical && fLeft)
-			fResizeControl->MoveTo(fReplicantTray->Bounds().right - 3, 0);
+			fResizeControl->MoveTo(fDragRegion->Bounds().right - kDragWidth, 1);
 		else
-			fResizeControl->MoveTo(0, 0);
+			fResizeControl->MoveTo(0, 1);
 
 		fResizeControl->Invalidate();
 	}

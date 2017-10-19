@@ -173,11 +173,7 @@ TReplicantTray::AttachedToWindow()
 
 	AddChild(fTime);
 
-	float deltaX = Bounds().right - fTime->Bounds().Width() - 1;
-	if (fBarView->Vertical() && !fBarView->Left())
-		deltaX -= kDragWidth;
-
-	fTime->MoveTo(deltaX, 2);
+	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - kTrayPadding, 2);
 
 	if (!((TBarApp*)be_app)->Settings()->showClock)
 		fTime->Hide();
@@ -234,7 +230,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 				width = fRightBottomReplicant.right + 12
 					+ fTime->Frame().Width();
 			} else
-				width = fRightBottomReplicant.right + 3;
+				width = fRightBottomReplicant.right + kIconGap + kGutter;
 		}
 
 		// this view has a fixed minimum width
@@ -1156,11 +1152,12 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 BPoint
 TReplicantTray::LocationForReplicant(int32 index, float width)
 {
-	BPoint loc(kIconGap + 1, kGutter + 1);
-	if (fBarView->Vertical() && !fBarView->Left())
-		loc.x += kDragWidth;
-	else if (!fBarView->Vertical())
-		loc.x += kGutter;
+	BPoint loc(kTrayPadding, 2);
+	if (fBarView->Vertical()) {
+		if (!fBarView->Left())
+			loc.x += kDragWidth; // move past dragger
+	} else
+		loc.x += 1; // keeps everything lined up nicely
 
 	if (fMultiRowMode) {
 		// try to find free space in every row
@@ -1168,11 +1165,11 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 			// determine free space in this row
 			BRect rect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
-					- kDragRegionWidth - kGutter,
+					- kDragRegionWidth * 2,
 				loc.y + kMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden()) {
-				rect.right -= fTime->Frame().Width() + kDragRegionWidth
-					+ kIconGap + kDragWidth;
+				rowRect.right -= kClockMargin + fTime->Frame().Width()
+					+ kTrayPadding;
 			}
 
 			for (int32 i = 0; i < index; i++) {
@@ -1347,7 +1344,7 @@ TDragRegion::GetPreferredSize(float* width, float* height)
 
 
 void
-TDragRegion::Draw(BRect)
+TDragRegion::Draw(BRect updateRect)
 {
 	rgb_color menuColor = ViewColor();
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
