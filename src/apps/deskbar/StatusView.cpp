@@ -90,6 +90,7 @@ const char* const kReplicantPathField = "replicant_path";
 float gMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 float gMaximumWindowWidth = gMinimumWindowWidth * 2;
 
+
 static void
 DumpItem(DeskbarItemInfo* item)
 {
@@ -271,7 +272,6 @@ TReplicantTray::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_LOCALE_CHANGED:
-		{
 			if (fTime == NULL)
 				return;
 
@@ -281,7 +281,6 @@ TReplicantTray::MessageReceived(BMessage* message)
 			RealignReplicants();
 			AdjustPlacement();
 			break;
-		}
 
 		case kShowHideTime:
 			// from context menu in clock and in this view

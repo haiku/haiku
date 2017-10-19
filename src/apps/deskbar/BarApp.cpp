@@ -475,7 +475,8 @@ TBarApp::MessageReceived(BMessage* message)
 			if (fPreferencesWindow != NULL)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
 
-			fBarWindow->SetFeel(fSettings.alwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL
+			fBarWindow->SetFeel(fSettings.alwaysOnTop
+				? B_FLOATING_ALL_WINDOW_FEEL
 				: B_NORMAL_WINDOW_FEEL);
 			break;
 
