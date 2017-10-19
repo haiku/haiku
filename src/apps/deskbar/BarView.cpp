@@ -251,6 +251,7 @@ TBarView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_LOCALE_CHANGED:
+		case kRealignReplicants:
 		case kShowHideTime:
 		case kShowSeconds:
 		case kShowDayOfWeek:

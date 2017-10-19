@@ -660,6 +660,7 @@ TBarApp::MessageReceived(BMessage* message)
 		}
 		// fall-through
 
+		case kRealignReplicants:
 		case kShowHideTime:
 		case kShowSeconds:
 		case kShowDayOfWeek:

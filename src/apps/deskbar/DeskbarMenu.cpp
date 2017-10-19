@@ -379,6 +379,7 @@ TDeskbarMenu::ResetTargets()
 				case kRebootSystem:
 				case kSuspendSystem:
 				case kShutdownSystem:
+				case kRealignReplicants:
 				case kShowHideTime:
 				case kShowSeconds:
 				case kShowDayOfWeek:

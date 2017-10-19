@@ -76,6 +76,9 @@ const int32 kIconCacheCount = (kMaximumIconSize - kMinimumIconSize)
 // update preferences message constant
 const uint32 kUpdatePreferences = 'Pref';
 
+// realign replicants message constant
+const uint32 kRealignReplicants = 'Algn';
+
 /* --------------------------------------------- */
 
 class BBitmap;

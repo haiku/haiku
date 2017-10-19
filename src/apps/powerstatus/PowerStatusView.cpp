@@ -440,8 +440,20 @@ PowerStatusView::Update(bool force)
 			width = 8;
 		}
 
-		if (width != Bounds().Width())
+		if (width != Bounds().Width()) {
 			ResizeTo(width, Bounds().Height());
+
+			// inform Deskbar that it needs to realign its replicants
+			BWindow* window = Window();
+			if (window != NULL) {
+				BView* view = window->FindView("Status");
+				if (view != NULL) {
+					BMessenger target((BHandler*)view);
+					BMessage realignReplicants('Algn');
+					target.SendMessage(&realignReplicants);
+				}
+			}
+		}
 	}
 
 	if (force || wasOnline != fOnline

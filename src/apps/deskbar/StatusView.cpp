@@ -276,11 +276,8 @@ TReplicantTray::MessageReceived(BMessage* message)
 				return;
 
 			fTime->Update();
-
 			// time string reformat -> realign
-			RealignReplicants();
-			AdjustPlacement();
-			break;
+			goto realignReplicants;
 
 		case kShowHideTime:
 			// from context menu in clock and in this view
@@ -294,9 +291,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 			fTime->SetShowSeconds(!fTime->ShowSeconds());
 
 			// time string reformat -> realign
-			RealignReplicants();
-			AdjustPlacement();
-			break;
+			goto realignReplicants;
 
 		case kShowDayOfWeek:
 			if (fTime == NULL)
@@ -305,9 +300,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 			fTime->SetShowDayOfWeek(!fTime->ShowDayOfWeek());
 
 			// time string reformat -> realign
-			RealignReplicants();
-			AdjustPlacement();
-			break;
+			goto realignReplicants;
 
 		case kShowTimeZone:
 			if (fTime == NULL)
@@ -316,9 +309,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 			fTime->SetShowTimeZone(!fTime->ShowTimeZone());
 
 			// time string reformat -> realign
-			RealignReplicants();
-			AdjustPlacement();
-			break;
+			goto realignReplicants;
 
 		case kGetClockSettings:
 		{
@@ -344,6 +335,12 @@ TReplicantTray::MessageReceived(BMessage* message)
 			HandleEntryUpdate(message);
 			break;
 #endif
+
+		case kRealignReplicants:
+realignReplicants:
+			RealignReplicants();
+			AdjustPlacement();
+			break;
 
 		default:
 			BView::MessageReceived(message);
