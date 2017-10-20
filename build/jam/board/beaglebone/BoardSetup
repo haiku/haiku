@@ -1,7 +1,7 @@
 # BeagleBone board-specific definitions
 
 HAIKU_BOARD_DESCRIPTION = "BeagleBone" ;
-HAIKU_BOARD_FDT_NAME = "beaglebone-black" ;
+HAIKU_BOARD_FDT_NAME = "boneblack" ;
 
 # Not that many in the wild
 #HAIKU_BOARD_FDT_NAME = "beaglebone" ;

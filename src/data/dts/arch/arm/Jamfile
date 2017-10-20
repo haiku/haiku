@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src data dts arch arm ;
 
 # Our packaged device trees for this architecture
-local target_boards = rpi2 beaglebone-black verdex omap3-overo-tobi omap3-beagle-xm ;
+local target_boards = rpi2 boneblack verdex omap3-overo-tobi omap3-beagle-xm ;
 TARGET_DEVICE_TREES = ;
 
 for device in $(target_boards) {
