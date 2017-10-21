@@ -529,19 +529,12 @@ TBarView::PlaceApplicationBar()
 	BRect expandoFrame(0, 0, 0, 0);
 	if (fVertical) {
 		// left or right
-		if (fTrayLocation != 0) {
-			expandoFrame.left = fDragRegion->Frame().left;
-			expandoFrame.top = fDragRegion->Frame().bottom + 1;
-		} else {
-			expandoFrame.left = fDragRegion->Frame().left;
-			expandoFrame.top = fBarMenuBar->Frame().bottom + 1;
-		}
-
-		expandoFrame.right = expandoFrame.left + (Window() != NULL
-			? Window()->Frame().Width() : fBarApp->Settings()->width);
-		expandoFrame.bottom = fState == kFullState
-			? screenFrame.bottom
-			: expandoFrame.top;
+		expandoFrame.left = fDragRegion->Frame().left;
+		expandoFrame.top = fTrayLocation != 0 ? fDragRegion->Frame().bottom + 1
+			: fBarMenuBar->Frame().bottom + 1;
+		expandoFrame.right = fBarMenuBar->Frame().right;
+		expandoFrame.bottom = fState == kFullState ? screenFrame.bottom
+			: Frame().bottom;
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
