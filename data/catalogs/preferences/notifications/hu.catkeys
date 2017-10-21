@@ -1,39 +1,10 @@
-1	hungarian	x-vnd.Haiku-Notifications	746652830
+1	hungarian	x-vnd.Haiku-Notifications	984257918
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
-Notifications	GeneralView		Értesítések
-seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
 Revert	PrefletWin		Visszaállít
-Mini icon	DisplayView		Mini ikon
 Enable notifications	GeneralView		Értesítések engedélyezése
-Error	NotificationView		Hiba
-OK	GeneralView		Rendben
 OK	PrefletWin		Rendben
-Type	NotificationView		Típus
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nem lehet leállítani az értesítéseket, mert nem sikerült elérni a kiszolgálót.\nEbből következően az InfoPopper telepítése sem volt sikeres.
-Important	NotificationView		Fontos
-Cannot disable notifications because the server can't be reached.	GeneralView		Nem lehet letiltani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
-Progress	NotificationView		Folyamat
 General	PrefletView		Általános
-Apply	PrefletWin		Alkalmaz
-Display	PrefletView		Kijelző
-Search:	NotificationView		Keresés:
 Allowed	NotificationView		Engedélyezve
-Yes	NotificationView		Igen
-Last received	NotificationView		Legutóbbi fogadott
-Large icon	DisplayView		Nagy ikon
-Icon size:	DisplayView		Ikonok mérete:
-Hide notifications from screen after	GeneralView		Értesítések elrejtése
 Notifications	System name		Értesítések
-Notifications	NotificationView		Értesítések
-No	NotificationView		Nem
-Title	NotificationView		Cím
-Information	NotificationView		Információ
-Window width:	DisplayView		Ablakszélesség:
 Application	NotificationView		Program
-Enabled	NotificationView		Engedélyezve
-Unknown	NotificationView		Ismeretlen
-Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor
-Notifications	PrefletView		Értesítések
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Nem sikerült elérni a kiszolgálót, és ebből következően az InfoPopper telepítése sem volt sikeres.
 Applications	NotificationView		Programok

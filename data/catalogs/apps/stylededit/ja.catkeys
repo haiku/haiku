@@ -1,6 +1,6 @@
-1	japanese	x-vnd.Haiku-StyledEdit	2588854353
+1	japanese	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		StyledEdit
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか?
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更をドキュメント\"%s\"に保存しますか?
 Paste	Menus		貼り付け
 OK	LoadAlert		OK
 File	Menus		ファイル
@@ -17,9 +17,10 @@ Page setup…	Menus		ページ設定…
 Print…	Menus		印刷…
 Can't undo	Menus		元に戻せません
 Save	Menus		保存
+Default	Menus		デフォルト
 Replace with:	FindandReplaceWindow		置換:
 Cancel	SaveAlert		中止
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		ファイル \"%s\" が存在しないため、元に戻せません。
 Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
 Reload	NodeMonitorAlerts		再読み込み
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
@@ -40,7 +41,7 @@ Default	Open_and_SaveAsPanel		デフォルト
 Replace next	Menus		次を置換
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" に保存されていない変更があります。\n保存された版まで戻しますか? 
 Cancel	FindandReplaceWindow		中止
-Text encoding	Menus		テキストエンコーディング
+Text encoding	Menus		文字コード
 Close	Menus		閉じる
 Save	SaveAlert		保存
 Words:	Statistics		単語数:

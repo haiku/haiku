@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (アメリカ)
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Stream settings	MediaPlayer-Main		ストリーム設定
 <unknown>	PlaylistItem-album		<不明>
@@ -12,7 +12,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
 <no media>	MediaPlayer-InfoWin		<メディアはありません>
 (not supported)	MediaPlayer-InfoWin		(サポートされていません)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました。\n\nエラー:
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		新規プレーヤー…
 100% scale	MediaPlayer-Main		100% 表示
@@ -122,7 +122,7 @@ Stop	MediaPlayer-Main		停止
 <unnamed media>	MediaPlayer-InfoWin		<名前の無いメディア>
 raw video	MediaPlayer-InfoWin		raw ビデオ
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリー不足)。プレイリストの保存に失敗しました。
 Hide interface	MediaPlayer-Main		インターフェイスを隠す
 Open clips	MediaPlayer-Main		クリップを開く
 Copy Entry	MediaPlayer-CopyPLItemsCmd		項目をコピー

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	1866768625
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	3470530992
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Adicionais
 Mount settings…	ContainerWindow		Configurações de montagem...
@@ -17,6 +17,7 @@ Permissions	InfoWindow		Permissões
 Recent documents	FavoritesMenu		Documentos recentes
 Modified	QueryPoseView		Modificado
 Created	ContainerWindow		Criado
+Move	FSUtils	button label	Mover
 Error %error loading add-On %name.	ContainerWindow		Erro %error carregando adicional %name.
 Skip all	FSUtils		Pula tudo
 contains	SelectionWindow		contém
@@ -27,6 +28,7 @@ Name	OpenWithWindow		Nome
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Não foi possível abrir \"%document\" porque o aplicativo \"%app\" está na Lixeira.
 File	ContainerWindow		Arquivo
 Handles any %type	OpenWithWindow		Lidar com qualquer %tipo
+Name	Person Query Columns		Nome
 Delete	ContainerWindow		Deletar
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de boot \"%name\".
@@ -100,6 +102,7 @@ Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
 Invert selection	ContainerWindow		Inverter seleção
 Increase size	DeskWindow		Aumentar tamanho
 Resize to fit	ContainerWindow		Reduzir para caber
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Em %func \nfind_directory() falhou. \nRazão: %error
 Add printer…	ContainerWindow		Adicionar impressora...
 New folder	ContainerWindow		Nova pasta
 Kind	ContainerWindow		Espécie
@@ -107,6 +110,7 @@ home	B_USER_DIRECTORY		home
 Select…	ContainerWindow		Selecionar....
 Copy to	ContainerWindow		Copiar para
 Move to Trash	ContainerWindow		Mover para Lixeira
+Modified	Default Query Columns		Modificado
 Move to	ContainerWindow		Mover para
 Create %s clipping	PoseView		Criar %s recorte
 Set new link target	InfoWindow		Selecione o destino do atalho
@@ -217,6 +221,7 @@ Save query as template…	FindPanel		Salvar consulta como modelo…
 Show folder location in title tab	SettingsView		Mostrar local da pasta na barra de títulos
 Proceed	FSUtils		Prosseguir
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alguns itens já existem nesta pasta com os mesmos nomes dos itens que você quer %verb.\n \nVocê gostaria de substituí-los com aqueles que você vai %verb ou ser perguntado em cada um?
+Rename	FSUtils	button label	Renomear
 The mount server could not be contacted.	AutoMounterSettings		O servidor de montagem não pode ser contactado
 Error deleting items	FSUtils		Erro deletando itens
 Create relative link here	ContainerWindow		Criar atalho aqui
@@ -244,6 +249,7 @@ Reverse order	ContainerWindow		Inverter ordem
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, um{# item} outros{# itens}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Adicionar a pasta atual
+Name	Default Query Columns		Nome
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Símbolo faltando: %symbol). \n
 The target disk does not support creating links.	FSUtils		O disco de destino não suporta a criação de atalhos
 starts with	SelectionWindow		começa com
@@ -331,6 +337,7 @@ Size:	InfoWindow		Tamanho:
 Empty folder	SlowContextPopup		Pasta vazia
 Open selection with:	OpenWithWindow		Abrir seleção com:
 Preparing to create links…	StatusWindow		Preparando para criar vínculos...
+Size	Default Query Columns		Tamanho
 Show navigator	SettingsView		Mostrar navegador
 Desktop	B_DESKTOP_DIRECTORY		Área de Trabalho
 List folders first	SettingsView		Listar pastas primeiro
@@ -338,6 +345,7 @@ Name	SelectionWindow		Nome
 Trash	Model		Lixeira
 Favorites	FilePanelPriv		Favoritos
 Name	QueryPoseView		Nome
+OK	Email Query Columns		OK
 Delete	FSUtils		Excluir
 Modified	FindPanel		Modificado
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erro ao mover \"%name\" para a Lixeira. (%error)

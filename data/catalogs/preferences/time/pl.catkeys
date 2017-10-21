@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Time	3180389660
+1	polish	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		GMT (kompatybilne z UNIX-em)
 OK	Time		OK
 Asia	Time		Azja
@@ -6,7 +6,6 @@ Asia	Time		Azja
 Africa	Time		Afryka
 Reset to default server list	Time		Przywróć domyślną listę serwerów
 Stop	Time		Stop
-Could not contact server	Time		Nie udało się skontaktować z serwerem
 Australia	Time		Australia
 Preview time:	Time		Podgląd czasu:
 Synchronize	Time		Synchronizuj

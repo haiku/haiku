@@ -1,39 +1,29 @@
-1	finnish	x-vnd.Haiku-Notifications	746652830
+1	finnish	x-vnd.Haiku-Notifications	1544806248
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Asetuksia tallennettaessa tapahtui virhe.\nLevytila on mahdollisesti lopussa.
-Notifications	GeneralView		Ilmoitukset
-seconds of inactivity	GeneralView		joutilaisuussekunnit
+Add…	NotificationView		Lisää...
+Status	NotificationView		Tila
 Revert	PrefletWin		Palauta
-Mini icon	DisplayView		Minikuvake
 Enable notifications	GeneralView		Ota käyttöön ilmoitukset
-Error	NotificationView		Virhe
-OK	GeneralView		Valmis
+Window width:	GeneralView		Ikkunaleveys:
+This is a test notification message	PrefletWin		Tämä on testi-ilmoitusviesti
 OK	PrefletWin		Valmis
-Type	NotificationView		Tyyppi
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoitusten pysäyttäminen epäonnistui, koska palvelinta ei tavoiteta.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoitusten käyttöönotto epäonnistui, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
-Important	NotificationView		Tärkeä
-Cannot disable notifications because the server can't be reached.	GeneralView		Ilmoitusten ottaminen pois käytöstä epäonnistui, koska palvelinta ei tavoiteta.
-Progress	NotificationView		Edistyminen
+Duration:	GeneralView		Kesto:
+OK	NotificationView		Valmis
+Application does not have a valid signature	NotificationView	Alert message	Sovelluksella ei ole kelvollista allekirjoitusta
+Notifications	PrefletWin		Ilmoitukset
+Timeout:	GeneralView		Aikavalvonta:
+Muted	NotificationView		Mykistetty
 General	PrefletView		Yleistä
-Apply	PrefletWin		Käytä
-Display	PrefletView		Näyttö
-Search:	NotificationView		Etsintä:
 Allowed	NotificationView		Sallittu
-Yes	NotificationView		Kyllä
-Last received	NotificationView		Viimeksi vastaanotettu
-Large icon	DisplayView		Suuri kuvake
-Icon size:	DisplayView		Kuvakekoko:
-Hide notifications from screen after	GeneralView		Piilota ilmoitukset näytöltä ajassa
+Remove	NotificationView		Poista
+Notifications preflet sample	PrefletWin		Ilmoitusasetusmalli
 Notifications	System name		Ilmoitusasetukset
-Notifications	NotificationView		Ilmoitusasetukset
-No	NotificationView		Ei
-Title	NotificationView		Otsikko
-Information	NotificationView		Tiedot
-Window width:	DisplayView		Ikkunaleveys:
+Applications	PrefletView		Sovellukset
+Defaults	PrefletWin		Oletukset
+pixels	GeneralView		pikseliä
 Application	NotificationView		Sovellus
-Enabled	NotificationView		Otettu käyttöön
-Unknown	NotificationView		Tuntematon
-Enable notifications at startup	GeneralView		Ota käyttöön ilmoitukset käynnistymisen yhteydessä
-Notifications	PrefletView		Ilmoitusasetukset
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoituspalvelinta ei löytynyt. Tämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
+Width:	GeneralView		Leveys:
+seconds	GeneralView		sekuntia
+Mute notifications from this application	NotificationView		Mykistä ilmoitukset tästä sovelluksesta
+ is already listed	NotificationView	Alert message	 on jo lueteltu
 Applications	NotificationView		Sovellukset

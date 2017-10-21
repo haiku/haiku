@@ -32,7 +32,7 @@ Show contents	ExpanderWindow		内容を表示
 Automatically show contents listing	ExpanderPreferences		内容リストを自動的に表示
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		パスを空にしておく
-Failed to create the destination folder.	ExpanderWindow		展開先のフォルダーを作成できませんでした:
+Failed to create the destination folder.	ExpanderWindow		展開先のフォルダーを作成できませんでした。
 Select '%s'…	DirectoryFilePanel		'%s' を選択…
 Create	ExpanderWindow		作成
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダーが移動されたか、名前が変更されたか、\nサポートされていません。

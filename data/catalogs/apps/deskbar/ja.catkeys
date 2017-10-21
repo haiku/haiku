@@ -7,7 +7,7 @@ Applications	PreferencesWindow		アプリケーション
 Time preferences…	TimeView		日付と時刻の設定…
 About Haiku	DeskbarMenu		Haiku について
 Edit in Tracker…	PreferencesWindow		Tracker 中で編集…
-Recent documents:	PreferencesWindow		最近使ったドキュメント
+Recent documents:	PreferencesWindow		最近使ったドキュメント:
 Recent applications	DeskbarMenu		最近使ったアプリケーション
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
 Find…	DeskbarMenu		検索…
@@ -25,14 +25,14 @@ Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		再起動
 Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		マウスオーバーで手前に
-Recent folders:	PreferencesWindow		最近開いたフォルダー
+Recent folders:	PreferencesWindow		最近開いたフォルダー:
 Show application expander	PreferencesWindow		エキスパンダーを表示
 Close all	WindowMenu		すべて閉じる
 Deskbar preferences	PreferencesWindow		Deskbar の設定
 Mount	DeskbarMenu		マウント
 Revert	PreferencesWindow		取り消し
 Small	PreferencesWindow		小
-Recent applications:	PreferencesWindow		最近使ったアプリケーション
+Recent applications:	PreferencesWindow		最近使ったアプリケーション:
 Shutdown…	DeskbarMenu		シャットダウン…
 Tracker always first	PreferencesWindow		Tracker を常時先頭に表示
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		環境設定

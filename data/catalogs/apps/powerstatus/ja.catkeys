@@ -5,7 +5,7 @@ Design capacity: 	PowerStatus		設計容量:
  mW	PowerStatus		 mW
 The battery level is getting low, please plug in the device.	PowerStatus		バッテリー 残量が低下してきたので、デバイスを電源につないでください。
 Battery low	PowerStatus		バッテリー残量低下
-Type: 	PowerStatus		バッテリー残量低下
+Type: 	PowerStatus		タイプ: 
 non-rechargeable	PowerStatus		再充電不能
 Empty battery slot	PowerStatus		バッテリースロットが空です
  mV	PowerStatus		 mV
@@ -31,7 +31,7 @@ Battery discharging	PowerStatus		放電中
 Serial number: 	PowerStatus		シリアルナンバー:
 Battery critical	PowerStatus		バッテリー残量が空に近い
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
-OEM info: 	PowerStatus		OEM情報:
+OEM info: 	PowerStatus		OEM 情報:
 Design voltage: 	PowerStatus		設計電圧:
 Battery charging	PowerStatus		充電中
 The battery level is critical, please plug in the device immediately.	PowerStatus		バッテリー残量が空に近いので、すぐにデバイスを電源につないでください。

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	3465126027
+1	romanian	x-vnd.Haiku-WebPositive	3364097490
 Show home button	Settings Window		Afișează buton acasă
 Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
@@ -10,7 +10,6 @@ Paste	WebPositive Window		Lipire
 Expiration	Cookie Manager		Expirare
 Proxy username:	Settings Window		Nume utilizator proxy:
 Save page as…	WebPositive Window		Salvează pagina ca...
-Over %days left	Download Window		Peste %days rămase
 Settings	Settings Window		Configurări
 Confirmation	WebPositive Window		Confirmare
 Window	WebPositive Window		Fereastră
@@ -30,7 +29,6 @@ Reload	WebPositive Window		Reîncarcă
 Downloads	Download Window		Descărcări
 Open downloads folder	Download Window		Deschide dosarul de descărcări
 Proxy password:	Settings Window		Parolă proxy:
-Hide	Download Window		Ascunde
 Find:	WebPositive Window		Caută:
 Increase size	WebPositive Window		Mărește dimensiunea
 About	WebPositive Window		Despre

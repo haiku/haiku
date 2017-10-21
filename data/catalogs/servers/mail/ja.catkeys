@@ -10,7 +10,7 @@ New Messages	MailDaemon		新着メッセージ
 Mail status	MailDaemon		メールの状況
 Shutdown mail services	DeskbarView		終了
 Sending mail for %name	Notifier		%name へのメールを送信中
-Create new message…	DeskbarView		新規メッセージ作成
+Create new message…	DeskbarView		新規メッセージ作成…
 No new messages	MailDaemon		新着メッセージはありません
 Check for mail now	DeskbarView		今すぐメールをチェック
 No new messages	DeskbarView		新着メッセージはありません

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	2512967175
+1	finnish	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Staattinen
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Palvelut
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Valitse automaattisesti
 connected	IntefaceView		yhdistetty
 Ethernet device	InterfaceListItem		Ethernet-laite
 The netmask defines your local network	IntefaceAddressView		Verkkopeite määrittää paikallisen verkkosi
+Dial-up connection	InterfaceListItem		Valintayhteys
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%nimi% (%authenticationMode%)
 Network	NetworkWindow		Verkko
+VPN connection	InterfaceListItem		VPN-yhteys
 Show network status in Deskbar	NetworkWindow		Näytä verkkotila Työkalupalkissa
 The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
 connected	InterfaceListItem		yhdistetty
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Lähetetty:
 open	Open network		avaa
 IP Address:	IntefaceAddressView		IP-osoite:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Vastaanotettu:
 Disable	IntefaceView		Poista käytöstä
 <no wireless networks found>	IntefaceView		<langatonta verkkoa ei löytynyt>

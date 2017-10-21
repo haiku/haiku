@@ -1,39 +1,10 @@
-1	romanian	x-vnd.Haiku-Notifications	746652830
+1	romanian	x-vnd.Haiku-Notifications	984257918
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil că rămâneți fără spațiu pe hard disc.
-Notifications	GeneralView		Înștiințări
-seconds of inactivity	GeneralView		secunde de inactivitate
 Revert	PrefletWin		Revenire
-Mini icon	DisplayView		Mini pictogramă
 Enable notifications	GeneralView		Activează înștiințări
-Error	NotificationView		Eroare
-OK	GeneralView		OK
 OK	PrefletWin		OK
-Type	NotificationView		Tip
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Înștiințările nu pot fi oprite, deoarece serverul nu poate fi contactat.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nu se pot activa înștiințările deoarece serverul nu poate fi găsit.\nÎnseamnă că instalarea InfoPopper nu a fost completată cu succes.
-Important	NotificationView		Important
-Cannot disable notifications because the server can't be reached.	GeneralView		Nu se pot dezactiva înștiințările deoarece serverul nu poate fi contactat.
-Progress	NotificationView		Progres
 General	PrefletView		General
-Apply	PrefletWin		Aplică
-Display	PrefletView		Afișare
-Search:	NotificationView		Caută:
 Allowed	NotificationView		Permis
-Yes	NotificationView		Da
-Last received	NotificationView		Ultima primită
-Large icon	DisplayView		Pictogramă largă
-Icon size:	DisplayView		Dimensiune pictogramă:
-Hide notifications from screen after	GeneralView		Ascunde înștiințările de pe ecran după
 Notifications	System name		Înștiințări
-Notifications	NotificationView		Înștiințări
-No	NotificationView		Nu
-Title	NotificationView		Titlu
-Information	NotificationView		Informații
-Window width:	DisplayView		Lățime fereastră:
 Application	NotificationView		Aplicație
-Enabled	NotificationView		Activat
-Unknown	NotificationView		Necunoscut
-Enable notifications at startup	GeneralView		Activează înștiințări la pornire
-Notifications	PrefletView		Înștiințări
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serverul de înștiințări nu poate fi găsit, înseamnă că instalarea dumneavoastră InfoPopper nu a fost completată cu succes.
 Applications	NotificationView		Aplicații

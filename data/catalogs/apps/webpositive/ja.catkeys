@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	1282126593
+1	japanese	x-vnd.Haiku-WebPositive	2763299522
 Show home button	Settings Window		ホームボタンを表示
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -7,6 +7,7 @@ Close window	WebPositive Window		ウィンドウを閉じる
 Quit	WebPositive		終了
 The download could not be opened.	Download Window		ダウンロードファイルを開けませんでした。
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンフォードフォルダーを開けませんでした。\n\nエラー: %error
+Close	Download Window		閉じる
 Open location	WebPositive Window		場所を開く
 Clear history	WebPositive Window		履歴を消去
 WebPositive	System name		WebPositive
@@ -20,7 +21,6 @@ Expiration	Cookie Manager		有効期限
 Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックかミドルクリックで新規タブを開く。
 Proxy username:	Settings Window		ユーザー名:
 Save page as…	WebPositive Window		名前を付けてページを保存…
-Over %days left	Download Window		残り %days 以上
 Settings	Settings Window		設定
 Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
@@ -68,11 +68,10 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Open downloads folder	Download Window		ダウンロードフォルダーを表示
 Proxy password:	Settings Window		パスワード:
 Number of days to keep links in History menu:	Settings Window		履歴メニューにリンクを保存する日数:
-Hide	Download Window		隠す
 Reset size	WebPositive Window		リセット
 Find:	WebPositive Window		検索:
 Increase size	WebPositive Window		拡大
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。.\n\nエラー: %error
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	ブックマークフォルダーの取得時にエラーが発生しました。\n\nエラー: %error
 Downloads	WebPositive Window		ダウンロード
 Requesting %url	WebPositive Window		%url を要求中
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	検索語の次の項目を検索
@@ -81,7 +80,6 @@ Bookmark info	WebPositive Window		ブックマーク情報
 Size:	Font Selection view		サイズ:
 Show tabs if only one page is open	Settings Window		ページがひとつだけでもタブを表示
 About	WebPositive Window		このソフトウェアについて
-Finish: 	Download Window	Finishing time	完了: 
 Fonts	Settings Window		フォント
 OK	Download Window		OK
 Page source error	WebPositive Window		ページソースエラー
@@ -98,6 +96,7 @@ Remove	Download Window		除去
 Find	WebPositive Window		検索
 Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
+(Finish: %date)	Download Window		(完了: %日)
 Script console	WebPositive Window		スクリプトコンソール
 Name	Cookie Manager		名前
 Proxy server address:	Settings Window		アドレス:
@@ -108,7 +107,6 @@ Cookie manager	WebPositive Window		Cookie マネージャー
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		パスワードを隠す
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
-Over 1 minute left	Download Window		残り1分以上
 Open start page	Settings Window		スタートページを開く
 Continue downloads	WebPositive		ダウンロードを続ける
 Cancel	Download Window		キャンセル
@@ -120,7 +118,6 @@ Path	Cookie Manager		パス
 Back	WebPositive Window		戻る
 New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
-Over %hours left	Download Window		残り %hours 以上
 Remember username and password for this site	Authentication Panel		このサイトのユーザー名とパスワードを保存する
 Earlier	WebPositive Window		前
 Authentication required	Authentication Panel		認証が必要です
@@ -128,14 +125,15 @@ Use proxy server to connect to the internet	Settings Window		インターネッ�
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		まだダウンロードが進行中です。本当に WebPositive をすぐに終了しますか?
 Auto-hide interface in full screen mode	Settings Window		全画面表示で自動的にインターフェースを隠す
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
-%seconds left	Download Window		残り %seconds 
 New tab	WebPositive Window		新規タブ
 Downloads in progress	WebPositive		ダウンロードが進行中です
+(Finish: %date - %duration left)	Download Window		(完了: %日 - 残り %時間)
 Style:	Font Selection view		スタイル:
 General	Settings Window		一般
 View	WebPositive Window		表示
 Previous	WebPositive Window		前へ
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークファイルの作成時にエラーが発生しました。\n\nエラー: %error
+(Finish: %date - Over %duration left)	Download Window		(完了: %日 - 残り %時間以上)
 Bookmark error	WebPositive Window		ブックマークエラー
 Do you really want to clear the browsing history?	WebPositive Window		閲覧履歴を本当に消去しますか?
 Copy	WebPositive Window		コピー

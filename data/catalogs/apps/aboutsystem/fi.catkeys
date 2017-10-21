@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	3676286035
+1	finnish	x-vnd.Haiku-About	1230888146
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint-tekijät. Kaikki oikeudet pidätetty.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm ja Werner Lemberg.
 Past website & marketing:\n	AboutView		Entinen webbisivu & markkinointi:\n
@@ -21,6 +21,7 @@ Source Code: 	AboutView		Lähdekoodi:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{prosessori:} other{# prosessoria:}}
 Kernel:	AboutView		Ydin:
 BSD (4-clause)	AboutWindow		BSD (4-ehto)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google-kansainvälistäminenryhmä.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai vastaavien lähdekoodissa nimenomaisesti ilmaistujen tekijöiden omaisuutta. Haiku® ja HAIKU logo® ovat Haiku, Inc.-yrityksen rekisteröityjä tavaramerkkejä.\n\n
 Marvell (firmware)	AboutWindow		Marvell (laiteohjelmisto)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nKaikki oikeudet pidätetty.
@@ -76,11 +77,11 @@ Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright �
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Kaikki oikeudet pidätetty.
 %ld MHz	AboutView		%ld MHz
-Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH ja Thomas Merz. Kaikki oikeudet pidätetty.\nPDFlib ja PDFlib logo ovat PDFlib GmbH -yrityksen rekisteröityjä tavaramerkkejä.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Kaikki oikeudet pidätetty.
 …and the many people making donations!\n\n	AboutView		...ja monet lahjoituksia tehneet ihmiset!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Napsauta lisenssinimeä vastaavan lisenssin lukemiseksi.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Kaikki oikeudet pidätetty.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER on Bitstream Inc-yrityksen rekisteröity tavaramerkki.
 BSD (3-clause)	AboutWindow		BSD (3-ehto)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Kaikki oikeudet pidätetty.
 License: 	AboutView		Lisenssi: 

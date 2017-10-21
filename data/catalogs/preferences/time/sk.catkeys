@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Time	3180389660
+1	slovak	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
 OK	Time		OK
 Asia	Time		Ázia
@@ -6,7 +6,6 @@ Asia	Time		Ázia
 Africa	Time		Afrika
 Reset to default server list	Time		Obnoviť predvolený zoznam serverov
 Stop	Time		Zastaviť
-Could not contact server	Time		Nepodarilo sa kontaktovať server
 Australia	Time		Austrália
 Preview time:	Time		Náhľad času:
 Synchronize	Time		Synchronizovať

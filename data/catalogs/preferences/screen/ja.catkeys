@@ -1,9 +1,9 @@
 1	japanese	x-vnd.Haiku-Screen	4090394050
 yes	Screen		はい
 Use laptop panel:	Screen		ラップトップパネルを使用:
-15 bits/pixel, 32768 colors	Screen		15ビット/画素, 32768色
+15 bits/pixel, 32768 colors	Screen		15ビット/ピクセル, 32768色
 /other…	Screen		その他…
-16 bits/pixel, 65536 colors	Screen		16ビット/画素, 65536色
+16 bits/pixel, 65536 colors	Screen		16ビット/ピクセル, 65536色
 Revert	Screen		元に戻す
 Swap displays:	Screen		ディスプレイを交換:
 Combine displays:	Screen		ディスプレイを一体化:
@@ -28,14 +28,14 @@ disable	Screen		無効
 Columns:	Screen		列:
 All workspaces	Screen		すべてのワークスペース
 always	Screen		常に
-32 bits/pixel, 16 Million colors	Screen		32ビット/画素, 1600万色
+32 bits/pixel, 16 Million colors	Screen		32ビット/ピクセル, 1600万色
 Current workspace	Screen		現在のワークスペース
 About	Screen		約
-24 bits/pixel, 16 Million colors	Screen		24ビット/画素, 1600万色
+24 bits/pixel, 16 Million colors	Screen		24ビット/ピクセル, 1600万色
 horizontally	Screen		水平に
 Other…	Screen		その他…
 Cancel	Screen		取り消し
-bits/pixel	Screen		ビット/画素
+bits/pixel	Screen		ビット/ピクセル
 Refresh rate:	Screen		リフレッシュレート:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		これらの設定を保存しますか?
@@ -45,7 +45,7 @@ vertically	Screen		垂直に
 Resolution:	Screen		解像度:
 Screen	Screen		画面
 %.1f Hz	Screen		%.1f Hz
-8 bits/pixel, 256 colors	Screen		8ビット/画素, 256色
+8 bits/pixel, 256 colors	Screen		8ビット/ピクセル, 256色
 Apply	Screen		適用
 Refresh rate	Screen		リフレッシュレート
 %sSerial no.: %s	Screen		%sシリアルナンバー: %s

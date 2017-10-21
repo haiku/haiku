@@ -1,39 +1,29 @@
-1	german	x-vnd.Haiku-Notifications	746652830
+1	german	x-vnd.Haiku-Notifications	1544806248
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Das Speichern der Einstellungen ist fehlgeschlagen.\nMöglicherweise steht nicht genügend Speicherplatz zur Verfügung.
-Notifications	GeneralView		Notifications - Benachrichtigungen
-seconds of inactivity	GeneralView		Sekunden Leerlauf.
+Add…	NotificationView		Hinzu…
+Status	NotificationView		Status
 Revert	PrefletWin		Anfangswerte
-Mini icon	DisplayView		Kleines Icon
 Enable notifications	GeneralView		Benachrichtigungen aktivieren
-Error	NotificationView		Fehler
-OK	GeneralView		OK
+Window width:	GeneralView		Fensterbreite:
+This is a test notification message	PrefletWin		Dies ist eine Testbenachrichtigung
 OK	PrefletWin		OK
-Type	NotificationView		Typ
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Benachrichtigungen können nicht angehalten werden, weil der Server nicht erreicht werden kann.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Benachrichtigungen können nicht aktiviert werden, weil der Server nicht gefunden wurde.\nDas bedeutet, dass die InfoPopper Installation nicht erfolgreich war.
-Important	NotificationView		Wichtig
-Cannot disable notifications because the server can't be reached.	GeneralView		Benachrichtigungen können nicht deaktiviert werden, weil der Server nicht erreicht werden kann.
-Progress	NotificationView		Fortschritt
+Duration:	GeneralView		Dauer:
+OK	NotificationView		OK
+Application does not have a valid signature	NotificationView	Alert message	Die Anwendung besitzt keine gültige Signatur
+Notifications	PrefletWin		Notifications - Benachrichtigungen
+Timeout:	GeneralView		Anzeigezeit:
+Muted	NotificationView		Stumm
 General	PrefletView		Allgemein
-Apply	PrefletWin		Anwenden
-Display	PrefletView		Darstellung
-Search:	NotificationView		Suchen:
 Allowed	NotificationView		Erlaubt
-Yes	NotificationView		Ja
-Last received	NotificationView		Zuletzt empfangen
-Large icon	DisplayView		Großes Icon
-Icon size:	DisplayView		Icon Größe:
-Hide notifications from screen after	GeneralView		Benachrichtigungen ausblenden nach 
+Remove	NotificationView		Entfernen
+Notifications preflet sample	PrefletWin		Benachrichtigungsbeispiel
 Notifications	System name		Benachrichtigungen
-Notifications	NotificationView		Notifications
-No	NotificationView		Nein
-Title	NotificationView		Titel
-Information	NotificationView		Information
-Window width:	DisplayView		Fensterbreite:
+Applications	PrefletView		Anwendungen
+Defaults	PrefletWin		Standardwerte
+pixels	GeneralView		Pixel
 Application	NotificationView		Anwendung
-Enabled	NotificationView		Aktiviert
-Unknown	NotificationView		Unbekannt
-Enable notifications at startup	GeneralView		Benachrichtigungen beim Systemstart aktivieren
-Notifications	PrefletView		Benachrichtigungen
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Der Benachrichtiguns-Server wurde nicht gefunden.\nWahrscheinlich war die Installation nicht erfolgreich.
+Width:	GeneralView		Breite:
+seconds	GeneralView		Sekunden
+Mute notifications from this application	NotificationView		Benachrichtigungen dieser Anwendung stummschalten
+ is already listed	NotificationView	Alert message	 wurde bereits hinzugefügt.
 Applications	NotificationView		Anwendungen

@@ -82,7 +82,7 @@ There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		ウェブサービスはパッケージを見つけられませんでした。これは、おそらくここで追跡されていないデポからのパッケージであることを意味します。残念ながら、このようなパッケージの評価はサポートされていません。
 Create account	UserLoginWindow		アカウントの作成
 Productivity	Model		ビジネス
-No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します:
+No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します
 Authentication failed	UserLoginWindow		認証に失敗しました
 Logged in as %User%	MainWindow		%User% としてログイン
 9999.99 KiB	PackageListView		9999.99 KiB

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Time	3180389660
+1	russian	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
 OK	Time		ОК
 Asia	Time		Азия
@@ -6,7 +6,6 @@ Asia	Time		Азия
 Africa	Time		Африка
 Reset to default server list	Time		Восстановить список серверов по умолчанию
 Stop	Time		Остановить
-Could not contact server	Time		Ну удалось связаться с сервером
 Australia	Time		Австралия
 Preview time:	Time		Предварительное время:
 Synchronize	Time		Синхронизировать

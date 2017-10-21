@@ -18,5 +18,5 @@ Address	NetworkStatusView		アドレス
 OK	NetworkStatusView		OK
 NetworkStatus	System name		ネットワーク状況
 Open network preferences…	NetworkStatusView		ネットワーク設定を開く...
-Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できませんでした。
+Could not join wireless network:\n	NetworkStatusView		無線ネットワークに参加できませんでした:
 Quit	NetworkStatusView		終了

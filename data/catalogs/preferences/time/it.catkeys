@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Time	3180389660
+1	italian	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		GMT (UNIX compatibile)
 OK	Time		OK
 Asia	Time		Asia
@@ -6,7 +6,6 @@ Asia	Time		Asia
 Africa	Time		Africa
 Reset to default server list	Time		Reimposta alla configurazione predefinita
 Stop	Time		Interrompi
-Could not contact server	Time		Non è stato possibile contattare il server
 Australia	Time		Australia
 Preview time:	Time		Durata dell'anteprima:
 Synchronize	Time		Sincronizza

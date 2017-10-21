@@ -9,7 +9,7 @@ Remote host has closed the connection.\n	FtpClient		Das Gegenüber hat die Vebin
 Login:	CodyCam		Login:
 Format:	CodyCam		Format:
 Every 2 hours	CodyCam		Alle 2 Stunden
-Closing the window\n	VideoConsumer.cpp		Fenster wird geschlossen
+Closing the window\n	VideoConsumer.cpp		Fenster wird geschlossen\n
 login ID expected	CodyCam		Login-ID erwartet
 Rate:	CodyCam		Intervall:
 JPEG image	CodyCam		JPEG-Bild

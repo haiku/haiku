@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-Repositories	3072072887
+1	russian	x-vnd.Haiku-Repositories	4031066397
 Completed	TaskLooper	Completed task status message	Завершено
-Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Можно подключить только 1 URL-адрес для каждого репозитория. Пожалуйста сделайте выбор.
 Repositories	System name		Репозиториии
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Ошибка при подключении репозитория %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Удалить этот репозиторий
@@ -21,7 +20,6 @@ Changes completed	RepositoriesView	Status view text	Изменения заве�
 Name	RepositoriesView	Column title	Имя
 Enable	RepositoriesView	Button label	Включить
 Enable repositories to use with package management:	RepositoriesView	Label text	Включить репозитории для работы с пакетным менеджером:
-Remove All	RepositoriesView	Button label	Удалить все
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Произошла ошибка обновления кеша репозитория для %name%
 Failed	TaskLooper	Failed task status message	Ошибка
 OK	Constants	Button label	OK
@@ -36,6 +34,4 @@ The task for repository %name% is taking a long time to complete.	TaskTimer	Aler
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Некоторые задачи еще выполняются. Остановить их и выйти?
 This repository URL already exists.	RepositoriesView	Error message	URL-адрес этого репозитория уже существует.
 Disable	RepositoriesView	Button label	Отключить
-Enable All	RepositoriesView	Button label	Включить все
 Unknown	Constants	Unknown repository name	Неизвестно
-Disable All	RepositoriesView	Button label	Отключить все

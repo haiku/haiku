@@ -48,9 +48,9 @@ File logging	PoorMan		ファイルログ
 Select web folder	PoorMan		選択
 Logging view	PoorMan		ログビュー
 Logging	PoorMan		ログ
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		デフォルトの web フォルダーが \"/boot/home/public_html.\" に作成されました。\nフォルダー中に \"index.html\" という HTML ファイルがあることを確認してください。
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		デフォルトの web フォルダーが \"/boot/home/public_html\" に作成されました。\nフォルダー中に \"index.html\" という HTML ファイルがあることを確認してください。
 Clear log file	PoorMan		ログファイルを消去
-Log file name:	PoorMan		状況: 実行中
+Log file name:	PoorMan		ログファイル名:
 Directory: 	PoorMan		ディレクトリ:
 Log To File	PoorMan		ファイルにログを出力
 Done	PoorMan		完了

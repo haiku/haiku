@@ -50,7 +50,7 @@ Could not unmount partition %s.	MainWindow		パーティション %s をマウ�
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されていません。
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Mount	MainWindow		マウント
-Partition type	PartitionList		パーティション種別 :
+Partition type	PartitionList		パーティション種別 
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
 Change parameters…	MainWindow		パラメーターを変更…
 Device	PartitionList		デバイス

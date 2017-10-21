@@ -2,7 +2,7 @@
 Invalid argument: %s\n	Workspaces		無効な引数: %s\n
 Quit	Workspaces		終了
 Workspaces	System name		ワークスペース
-Change workspace count…	Workspaces		ワークスペースの数を変更…
+Change workspace count…	Workspaces		ワークスペース数を変更…
 Remove replicant	Workspaces		レプリカントを削除
 Show window border	Workspaces		ウィンドウ枠を表示
 Auto-raise	Workspaces		自動的に表示

@@ -284,7 +284,7 @@ There was an error writing the attribute.	WidgetAttributeText		属性の書き�
 Recalculate folder size	InfoWindow		フォルダーサイズを再計算
 Unknown	WidgetAttributeText		不明
 I know what I'm doing	FSUtils	button label	私はなにをするか理解しています
-Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol がありません)。\n
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol が見つかりません)。\n
 by name	FindPanel		名前で検索
 Creating links: 	StatusWindow		作成中リンク:
 Paused: click to resume or stop	StatusWindow		一時停止中: クリックで動作の再開また中断をしてください 
@@ -421,7 +421,7 @@ Paste layout	ContainerWindow		レイアウトを貼り付ける
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target の名前を変更すると、%osName は正しく動作しないかもしれません!\n\n名称を変更しますか?
 Select	InfoWindow		選択
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\"の権限を更新できませんでした。%error
-Select…	FilePanelPriv		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションをリコンパイルしてください。
+Select…	FilePanelPriv		選択…
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションを再コンパイルしてください。
 There was an error resolving the link.	Tracker		リンクの解釈に失敗しました。
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒

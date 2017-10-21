@@ -61,7 +61,7 @@ Redo	Mail		やり直し
 Add enclosure…	Mail		添付ファイルを追加…
 Mail	System name		メール
 Print…	Mail		印刷…
-Warn unencodable:	Mail		文字コード不一致通知:
+Warn unencodable:	Mail		文字コード不一致警告:
 Quit	Mail		終了
 %n - Full name	Mail		%n - 名前
  Read 	Mail		既読
@@ -147,7 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		送信済みメール
 Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリテンプレートをこのフォルダーに入れてください。
 Spam	Mail		スパム
 Reply	Mail		返信
-Encoding	Mail		エンコーディング
+Encoding	Mail		文字コード
 From:	Mail		差出人:
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
 Open draft	Mail		下書きを開く

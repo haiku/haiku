@@ -2,7 +2,7 @@
 Manufacturer	DeviceSCSI		製造元
 Order by:	DevicesView		並び順:
 ACPI controller	Device		ACPI コントローラー
-Memory controller	Device		メモリコントローラー
+Memory controller	Device		メモリーコントローラー
 Driver used	DevicePCI		使用されているデバイス
 CD-ROM	DeviceSCSI		CD-ROM
 ISA bus	Device		ISA バス

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Time	3180389660
+1	english	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		GMT（UNIX 兼容）
 OK	Time		确定
 Asia	Time		亚洲
@@ -6,7 +6,6 @@ Asia	Time		亚洲
 Africa	Time		非洲
 Reset to default server list	Time		重置为默认服务器列表
 Stop	Time		停止
-Could not contact server	Time		无法连接服务器
 Australia	Time		澳大利亚
 Preview time:	Time		时间预览：
 Synchronize	Time		同步

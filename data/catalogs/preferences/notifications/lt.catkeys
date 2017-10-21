@@ -1,36 +1,8 @@
-1	lithuanian	x-vnd.Haiku-Notifications	3235747343
-Notifications	GeneralView		Pranešimai
-seconds of inactivity	GeneralView		sek. pasyvumo
+1	lithuanian	x-vnd.Haiku-Notifications	1104132499
 Revert	PrefletWin		Atšaukti pakeitimus
-Mini icon	DisplayView		mažos piktogramos
 Enable notifications	GeneralView		Įjungti pranešimus
-Error	NotificationView		Klaida
-OK	GeneralView		Gerai
-Type	NotificationView		Tipas
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Pranešimų tarnybos sustabdyti nepavyko, nes ji nepasiekiama.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nepavyko įgalinti pranešimų, nes pranešimų tarnyba nerasta.\nTai reiškia, jog pranešimų tarnyba nebuvo sėkmingai įdiegta.
-Important	NotificationView		Svarbu
-Cannot disable notifications because the server can't be reached.	GeneralView		Pranešimų išjungti nepavyko, nes pranešimų tarnyba nepasiekiama.
-Progress	NotificationView		Eiga
 General	PrefletView		Bendrosios
-Apply	PrefletWin		Taikyti
-Display	PrefletView		Išvaizda
-Search:	NotificationView		Ieškoti:
 Allowed	NotificationView		Leidžiama
-Yes	NotificationView		Taip
-Large icon	DisplayView		didelės piktogramos
-Icon size:	DisplayView		Piktogramų dydis:
-Hide notifications from screen after	GeneralView		Pašalinti pranešimus iš ekrano po
 Notifications	System name		Pranešimai
-Notifications	NotificationView		Pranešimai
-No	NotificationView		Ne
-Title	NotificationView		Antraštė
-Information	NotificationView		Informacija
-Window width:	DisplayView		Lango plotis:
 Application	NotificationView		Programa
-Enabled	NotificationView		Įjungta
-Unknown	NotificationView		Nežinoma
-Enable notifications at startup	GeneralView		Įjungti pranešimus sistemos paleisties metu
-Notifications	PrefletView		Pranešimai
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Pranešimų tarnyba nerasta. Tai reiškia, jog ji nebuvo sėkmingai įdiegta.
 Applications	NotificationView		Programos

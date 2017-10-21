@@ -13,7 +13,7 @@ Dial-up connection	InterfaceListItem		ダイアルアップ接続
 Network	NetworkWindow		ネットワーク
 VPN connection	InterfaceListItem		VPN 接続
 Show network status in Deskbar	NetworkWindow		Deskbar にネットワークの状況を表示する
-The method for obtaining an IP address	IntefaceAddressView		IP アドレスを得るための方法
+The method for obtaining an IP address	IntefaceAddressView		IP アドレスの取得方法
 connected	InterfaceListItem		接続済み
 disabled	InterfaceListItem		無効
 Dial Up	NetworkWindow		ダイアルアップ

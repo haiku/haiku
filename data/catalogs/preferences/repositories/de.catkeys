@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-Repositories	3072072887
+1	german	x-vnd.Haiku-Repositories	2658607939
 Completed	TaskLooper	Completed task status message	Fertig
-Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Für jede Paketquelle kann nur eine URL aktiv sein.  Bitte Auswahl ändern.
 Repositories	System name		Paketquellen
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Beim Aktivieren der Paketquelle %url% ist ein Fehler aufgetreten
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Soll diese Paketquelle entfernt werden?
@@ -16,13 +15,14 @@ Details	TaskLooper	Job log details header	Details
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Gute Nachricht! Der Auftrag für die Paketquelle %name% wurde abgeschlossen.
 Status	RepositoriesView	Column title	Status
 Aborted	TaskLooper	Aborted task status message	Abgebrochen
+Remove all	RepositoriesView	Button label	Alle entfernen
 Remove	RepositoriesView	Button label	Entfernen
 Changes completed	RepositoriesView	Status view text	Änderungen abgeschlossen
 Name	RepositoriesView	Column title	Name
 Enable	RepositoriesView	Button label	Aktivieren
 Enable repositories to use with package management:	RepositoriesView	Label text	Paketquellen für das Paketmanagement aktivieren:
-Remove All	RepositoriesView	Button label	Alle entfernen
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Aktualisieren des Paketquellen Cache für %name% fehlgeschlagen
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Jedes Repository kann nur mit einer einzigen URL aktiviert werden. Bitte die getroffene Auswahl überprüfen.
 Failed	TaskLooper	Failed task status message	Fehlgeschlagen
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	Auftrag abbrechen
@@ -31,11 +31,11 @@ Cancel	Constants	Button label	Abbrechen
 Changes pending:	RepositoriesView	Status view text	Anstehende Änderungen:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Deaktivieren der Paketquelle %name% fehlgeschlagen
 Remove	Constants	Button label	Entfernen
+Enable all	RepositoriesView	Button label	Alle aktivieren
 Stop and quit	RepositoriesWindow	Button label	Anhalten und beenden
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Der Auftrag für die Paketquelle %name% dauert ungewöhnlich lange.
+Disable all	RepositoriesView	Button label	Alle deaktivieren
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Einige Aufträge werden noch bearbeitet. Sollen diese Auftäge abgebrochen und beendet werden?
 This repository URL already exists.	RepositoriesView	Error message	Eine Paketquelle mit dieser URL existiert bereits.
 Disable	RepositoriesView	Button label	Deaktivieren
-Enable All	RepositoriesView	Button label	Alle aktivieren
 Unknown	Constants	Unknown repository name	Unbekannt
-Disable All	RepositoriesView	Button label	Alle deaktivieren

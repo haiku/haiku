@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Time	3180389660
+1	ukrainian	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		GMT (сумісний з UNIX)
 OK	Time		Гаразд
 Asia	Time		Азія
@@ -6,7 +6,6 @@ Asia	Time		Азія
 Africa	Time		Африка
 Reset to default server list	Time		Скинути до типового списку сервера
 Stop	Time		Зупинити
-Could not contact server	Time		Неможливо з'єднатися з сервером
 Australia	Time		Австралія
 Preview time:	Time		Попередній час:
 Synchronize	Time		Синхронізувати

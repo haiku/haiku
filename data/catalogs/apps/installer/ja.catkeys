@@ -25,7 +25,7 @@ Failed to launch Boot Manager	InstallerWindow		ブートマネージャーの起
 Install from:	InstallerWindow		インストール元:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		Haikuをインストールする前の注意\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUBの命名規則は' (hdN,n) です。\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUBの命名規則は (hdN,n) です。\n\n
 Continue	InstallerWindow	In alert after pressing Stop	続ける
 Write boot sector to '%s'	InstallerWindow		ブートセクターを '%s' に書き込む
 Collecting copy information.	InstallProgress		コピー元の情報を集めています…
@@ -54,7 +54,7 @@ Launch the DriveSetup utility to partition\navailable hard drives and other medi
 Show optional packages	InstallerWindow		オプショナルパッケージを表示
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		インストール可能なパーティションが見つかりません。DriveSetupを使って、パーティションを作成し、最低一つのパーティションを Beファイルシステムで初期化してください。
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		実際にブートメニューを表示させるには、もうひとつのファイルを編集する必要があります。\n\n
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		インストール先を選択してから、"開始" ボタンをクリックしてください。
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		インストール先を選択してから、 \"開始\" ボタンをクリックしてください。
 Unknown Type	InstallProgress	Partition content type	パーティション種別不明
 <none>	InstallerWindow	No partition available	<無し>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n

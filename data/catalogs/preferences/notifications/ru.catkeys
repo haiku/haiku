@@ -1,39 +1,10 @@
-1	russian	x-vnd.Haiku-Notifications	746652830
+1	russian	x-vnd.Haiku-Notifications	984257918
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Произошла ошибка при сохранении настроек.\nВозможно кончилось место на диске.
-Notifications	GeneralView		Уведомления
-seconds of inactivity	GeneralView		секунд бездействия
 Revert	PrefletWin		Вернуть
-Mini icon	DisplayView		Мелкие значки
 Enable notifications	GeneralView		Включить уведомления
-Error	NotificationView		Ошибка
-OK	GeneralView		ОК
 OK	PrefletWin		ОК
-Type	NotificationView		Тип
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Невозможно остановить уведомления, потому что сервер уведомлений недоступен.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Невозможно включить уведомления, потому что сервер уведомлений не найден.\nЭто означает, что сервер уведомлений может быть поврежден.
-Important	NotificationView		Важно
-Cannot disable notifications because the server can't be reached.	GeneralView		Невозможно отключить уведомления, потому что сервер уведомлений недоступен.
-Progress	NotificationView		Прогресс
 General	PrefletView		Основные
-Apply	PrefletWin		Применить
-Display	PrefletView		Отображение
-Search:	NotificationView		Поиск:
 Allowed	NotificationView		Разрешено
-Yes	NotificationView		Да
-Last received	NotificationView		Последнее полученное
-Large icon	DisplayView		Большие значки
-Icon size:	DisplayView		Размер значков:
-Hide notifications from screen after	GeneralView		Скрывать уведомления после
 Notifications	System name		Уведомления
-Notifications	NotificationView		Уведомления
-No	NotificationView		Нет
-Title	NotificationView		Заголовок
-Information	NotificationView		Информация
-Window width:	DisplayView		Ширина окна:
 Application	NotificationView		Приложение
-Enabled	NotificationView		Включено
-Unknown	NotificationView		Неизвестно
-Enable notifications at startup	GeneralView		Добавить уведомления в автозагрузку
-Notifications	PrefletView		Уведомления
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер уведомлений не найден.
 Applications	NotificationView		Приложения

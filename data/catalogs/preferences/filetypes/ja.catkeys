@@ -25,7 +25,7 @@ Select same preferred application as	FileTypes Window		このタイプと同じ�
 Save	Application Type Window		保存
 Could not retrieve application signature	Preferred App Menu		アプリケーションの署名を読みだせませんでした。
 Add	Extension Window		追加
-Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ:
+Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ
 Cancel	Attribute Window		中止
 Icon	Application Type Window		アイコン
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		ファイルタイプの削除は撤回できません。\nそれでも削除を実行しますか?

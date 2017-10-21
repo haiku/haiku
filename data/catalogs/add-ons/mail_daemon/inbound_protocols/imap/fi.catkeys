@@ -1,9 +1,11 @@
-1	finnish	x-vnd.Haiku-IMAP	354143849
+1	finnish	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Kohde:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		Valmis
 status	IMAPFolderConfig		tila
 Configure IMAP Folders	imap_config		Aseta IMAP-kansiot
 Cancel	IMAPFolderConfig		Peru
+No encryption	imap_config		Ei salausta
 Apply	IMAPFolderConfig		Sovella
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Noudetaan IMAP-kansioita, ole kärsivällinen...
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Yhdistäminen palvelimelle \"%server%\" epäonnistui:\n%error%

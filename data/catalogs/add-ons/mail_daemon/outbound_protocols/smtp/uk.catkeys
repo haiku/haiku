@@ -1,6 +1,5 @@
-1	ukrainian	x-vnd.Haiku-SMTP	2740407895
+1	ukrainian	x-vnd.Haiku-SMTP	815985329
 SMTP server:	ConfigView		SMTP-сервер:
-STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Помилка при авторизації на %serv
 Unencrypted	ConfigView		Без шифрування
 . The server says:\n	smtp		. Сервер відповідає:\n
@@ -9,7 +8,6 @@ Connecting to server…	smtp		З'єднання з сервером…
 Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
 POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
 Destination:	ConfigView		Призначення:
-: Connection refused or host not found.	smtp		: Погане з'єднання або хост не знайдено.
 None	ConfigView		Жодного
 POP3 before SMTP	ConfigView		POP3 перед SMTP
 SSL	ConfigView		SSL

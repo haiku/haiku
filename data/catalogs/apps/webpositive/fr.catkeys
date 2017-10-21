@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1282126593
+1	french	x-vnd.Haiku-WebPositive	1593161601
 Show home button	Settings Window		Afficher le bouton de la page d’accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l’URL dans le presse-papiers
@@ -20,7 +20,6 @@ Expiration	Cookie Manager		Expiration
 Double-click or middle-click to open new tab.	Tab Manager		Double-cliquez ou cliquez au milieu pour ouvrir un nouvel onglet.
 Proxy username:	Settings Window		Nom d'utilisateur du serveur mandataire :
 Save page as…	WebPositive Window		Enregistrer la page sous…
-Over %days left	Download Window		Plus de %days restant(s)
 Settings	Settings Window		Réglages
 Confirmation	WebPositive Window		Confirmation
 Window	WebPositive Window		Fenêtre
@@ -68,7 +67,6 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Open downloads folder	Download Window		Ouvrir le dossier des téléchargements
 Proxy password:	Settings Window		Mot de passe du serveur mandataire :
 Number of days to keep links in History menu:	Settings Window		Nombre de jours de conservation des liens dans le menu Historique :
-Hide	Download Window		Cacher
 Reset size	WebPositive Window		Réinitialiser la taille
 Find:	WebPositive Window		Rechercher :
 Increase size	WebPositive Window		Augmenter la taille
@@ -81,7 +79,6 @@ Bookmark info	WebPositive Window		Informations du signet
 Size:	Font Selection view		Taille :
 Show tabs if only one page is open	Settings Window		Afficher les onglets même s’il n’y a qu’une page ouverte
 About	WebPositive Window		À propos
-Finish: 	Download Window	Finishing time	Fin : 
 Fonts	Settings Window		Polices
 OK	Download Window		OK
 Page source error	WebPositive Window		Erreur dans la page source
@@ -108,7 +105,6 @@ Cookie manager	WebPositive Window		Gestionnaire de cookies
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Camoufler le mot de passe
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Voix ambiguë d’un cœur qui au zéphyr préfère les jattes de kiwis.
-Over 1 minute left	Download Window		Plus d’une minute restante
 Open start page	Settings Window		Ouvrir la page d'accueil
 Continue downloads	WebPositive		Continuer les téléchargements
 Cancel	Download Window		Annuler
@@ -120,7 +116,6 @@ Path	Cookie Manager		Emplacement
 Back	WebPositive Window		Précédent
 New browser window	Download Window		Nouvelle fenêtre de navigation
 Today	WebPositive Window		Aujourd’hui
-Over %hours left	Download Window		Plus de %hours restante(s)
 Remember username and password for this site	Authentication Panel		Mémoriser l’utilisateur et son mot de passe pour ce site
 Earlier	WebPositive Window		Avant
 Authentication required	Authentication Panel		Authentification requise
@@ -128,7 +123,6 @@ Use proxy server to connect to the internet	Settings Window		Utiliser un serveur
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Il y a encore des téléchargements en cours. Voulez vous vraiment quitter WebPositive maintenant ?
 Auto-hide interface in full screen mode	Settings Window		Cacher automatiquement l’interface en mode plein écran
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a échoué
-%seconds left	Download Window		%seconds restante(s)
 New tab	WebPositive Window		Nouvel onglet
 Downloads in progress	WebPositive		Téléchargement en cours
 Style:	Font Selection view		Style :

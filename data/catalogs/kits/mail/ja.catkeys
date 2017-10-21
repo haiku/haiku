@@ -7,5 +7,5 @@ Select…	MailKit		選択…
 Connection type:	ProtocolConfigView		接続タイプ:
 KB	ProtocolConfigView	kilo byte	KB
 Leave mail on server	ProtocolConfigView		受信後もサーバーにメールを保存する
-Username:	ProtocolConfigView		ユーザーID:
+Username:	ProtocolConfigView		ユーザー名:
 Login type:	ProtocolConfigView		認証方法:

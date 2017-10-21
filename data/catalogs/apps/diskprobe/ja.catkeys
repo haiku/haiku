@@ -67,7 +67,7 @@ Page setup…	ProbeView		ページ設定…
 New…	FileWindow		新規…
 DiskProbe request	AttributeWindow		DiskProbe リクエスト
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	イメージを読み込めませんでした
-Save changes before closing?	ProbeView		閉じる前に保存しますか?
+Save changes before closing?	ProbeView		閉じる前に変更を保存しますか?
 Type editor	AttributeWindow		タイプエディター
 Native: 0x%0*Lx	ProbeView		ネイティブ: 0x%0*Lx
 Raw editor	AttributeWindow		Raw エディター
@@ -122,7 +122,7 @@ Redo	ProbeView		やり直し
 File: 	ProbeView		ファイル:
 32 bit unsigned pointer:	TypeEditors		符号無し 32 ビットポインタ:
 of 	ProbeView		/
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		ファイルの書き込みに失敗しました:\n%s\n\nすべての変更は終了時に失われます。
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		ファイルへの書き込みに失敗しました:\n%s\n\nすべての変更は終了時に失われます。
 32 bit	TypeEditors		32 ビット
 Cancel	ProbeView		中止
 Swapped: 0x%0*Lx	ProbeView		スワップ: 0x%0*Lx

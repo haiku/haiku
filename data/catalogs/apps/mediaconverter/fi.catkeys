@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-MediaConverter	341686525
+1	finnish	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Tiedostoa ei tunnistettu tuettuna mediatiedostona:} other{# tiedostoa ei tunnistettu tuettuina mediatiedostoina:}}
 Video encoding:	MediaConverter		Videokoodaus:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f kehystä sekunnissa
+Error creating video.	MediaConverter		Videon luominen epäonnistui.
 Error read audio frame %lld	MediaConverter		Virhe luettaessa äänikehystä %lld
 No audio	Audio codecs list		Ei ääntä
 Error	MediaConverter		Virhe
@@ -26,7 +27,9 @@ Conversion completed	MediaConverter		Muunnos valmis
 Audio:	MediaConverter-FileInfo		Ääni:
 OK	MediaConverter-FileInfo		Valmis
  seconds	MediaFileInfo		 sekuntia
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Virhe kirjoitettaessa sijaintiin: %strPath%. Muutetaan oletussijainniksi: /boot/home
 Source files	MediaConverter		Lähdetiedostot
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Vallittua hakemistoa ei löytynyt. Muutetaan oletukseksi /boot/home
 Error writing video frame %lld	MediaConverter		Virhe kirjoitettaessa videokehystä %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# kehys} other{# kehystä}}
 Error writing audio frame %lld	MediaConverter		Virhe kirjoitettaessa äänikehystä %lld
@@ -38,6 +41,7 @@ None available	Video codecs		Ei mitään saatavilla
 Conversion cancelled	MediaConverter		Muunnos peruttu
 No file selected	MediaConverter-FileInfo		Ei tiedostoa valittuna
 Select this folder	MediaConverter		Valitse tämä kansio
+Error creating track.	MediaConverter		Uran luomisessa virhe.
 Continue	MediaConverter		Jatka
 Encoder parameters	MediaConverter-EncoderWindow		Koodausparametrit
 Video:	MediaConverter-FileInfo		Video:
@@ -59,6 +63,7 @@ Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän 
 Audio encoding:	MediaConverter		Äänikoodaus:
 Audio quality not supported	MediaConverter		Äänen laatua ei tueta
 File	Menu		Tiedosto
+Input file not recognized as Audio or Video	MediaConverter		Syötetiedostoa ei tunnistettu audioksi tai videoksi
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Muunna
 Writing audio track: %ld%% complete	MediaConverter		Kirjoitetaan äänitiedostoa: %ld %% valmiina

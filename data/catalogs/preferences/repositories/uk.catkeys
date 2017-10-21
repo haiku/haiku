@@ -1,6 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Repositories	3761636112
+1	ukrainian	x-vnd.Haiku-Repositories	425662326
 Completed	TaskLooper	Completed task status message	Завершено
-Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Може бути підключена тільки одна URL адреса для кожного схоасвища. Будь-ласка змініть вибір.
 Repositories	System name		Сховища
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Сталася помилка при підключенні сховища %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Видалити це сховище?
@@ -19,7 +18,6 @@ Remove	RepositoriesView	Button label	Видалити
 Changes completed	RepositoriesView	Status view text	Зміни проведені
 Name	RepositoriesView	Column title	Ім'я
 Enable	RepositoriesView	Button label	Під'єднати
-Remove All	RepositoriesView	Button label	Видалити усі
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка при відновленні кеша сховища для %name%
 Failed	TaskLooper	Failed task status message	Призупинено
 OK	Constants	Button label	Гаразд
@@ -34,6 +32,4 @@ The task for repository %name% is taking a long time to complete.	TaskTimer	Aler
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Деякі завдання надалі виконуються. Зупинити їх та вийти?
 This repository URL already exists.	RepositoriesView	Error message	URL адреса цього сховища повністю присутня.
 Disable	RepositoriesView	Button label	Відімкнути
-Enable All	RepositoriesView	Button label	Під'єднати всі
 Unknown	Constants	Unknown repository name	Невідомо
-Disable All	RepositoriesView	Button label	Від'єднати усі

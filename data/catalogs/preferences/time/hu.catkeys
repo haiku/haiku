@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	3180389660
+1	hungarian	x-vnd.Haiku-Time	3566599171
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
 OK	Time		Rendben
 Asia	Time		Ázsia
@@ -6,7 +6,6 @@ Asia	Time		Ázsia
 Africa	Time		Afrika
 Reset to default server list	Time		Eredeti kiszolgálólista visszaállìtása
 Stop	Time		Leállítás
-Could not contact server	Time		Nem sikerült kapcsolatba lépni a kiszolgálóval
 Australia	Time		Ausztrália
 Preview time:	Time		Idő előnézete:
 Synchronize	Time		Szinkronizálás

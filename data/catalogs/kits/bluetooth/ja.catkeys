@@ -49,7 +49,7 @@ Object transfer	DeviceClass		オブジェクト転送
 Gaming/Toy	DeviceClass		ゲーム/玩具
 Audio	DeviceClass		音声
 Robot	DeviceClass		ロボット
-Camcorder	DeviceClass		ビデオカメラ
+Camcorder	DeviceClass		カムコーダー
 Digitizer tablet	DeviceClass		タブレット
 Loudspeaker	DeviceClass		拡声器
 Joystick	DeviceClass		ジョイスティック

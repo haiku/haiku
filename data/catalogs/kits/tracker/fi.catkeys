@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1899625948
+1	finnish	x-vnd.Haiku-libtracker	3394192241
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
 Mount settings…	ContainerWindow		Liittämisasetukset...
@@ -210,6 +210,7 @@ Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovel
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Valittua kohdetta ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voida palauttaa.)
 Work Phone	Person Query Columns		Työpuhelin
 Invert	SelectionWindow		Käänteinen
+ (broken)	InfoWindow		 (rikkinäinen)
 Find	FindPanel		Haku
 Get info	ContainerWindow		Hae tiedot
 Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen ”%name”.
@@ -345,6 +346,7 @@ link	FSUtils	filename link	linkki
 Expression too long.	libtracker		Lauseke on liian pitkä.
 The specified name is illegal. Please choose another name.	FilePanelPriv		Määritelty nimi on virheellinen. Valitse toinen nimi.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Et voi siirtää kansiota itseensä tai mihinkään sen omista alikansioista.
+List view	ContainerWindow		Luettelonäkymä
 ?+* follows nothing.	libtracker		?+* seuraavat ei mitään.
 Handles any file	OpenWithWindow		Käsittelee kaikkia tiedostoja
 E-mail	Person Query Columns		Sähköposti
@@ -433,6 +435,7 @@ Formula %formula	FindPanel	FindResultTitle	Kaava %formula
 Kind:	InfoWindow		Tyyppi:
 starts with	FindPanel		alkaa kohteella
 Increase size	ContainerWindow		#document
+ info	InfoWindow		 tiedot
 is	FindPanel		on
 Attributes	ContainerWindow		Attribuutit
 Handles %type	OpenWithWindow		Käsittelee tyyppiä %type

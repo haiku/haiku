@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-Repositories	3761636112
+1	finnish	x-vnd.Haiku-Repositories	2658607939
 Completed	TaskLooper	Completed task status message	Valmis
-Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Jokaiselle tietovarastolle voidaan ottaa käyttöön vain yksi verkko-osoite.  Vaihda valintojasi.
 Repositories	System name		Tietovarastot
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Tietovaraston verkko-osoitteen %url% käyttöönotossa tapahtui virhe
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Poistetaanko tämä tietovarasto?
@@ -14,13 +13,16 @@ Repository URL:	AddRepoWindow	Text box label	Tietovarastoverkko-osoite:
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Tietovarastosta saadaan asetusvirheilmoitus kohteesta %name%.
 Details	TaskLooper	Job log details header	Lisätiedot
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Hyviä uutisia! Tietovarasto %name&%:n tehtävä on valmis.
+Status	RepositoriesView	Column title	Tila
 Aborted	TaskLooper	Aborted task status message	Keskeytetty
+Remove all	RepositoriesView	Button label	Poista kaikki
 Remove	RepositoriesView	Button label	Poista
 Changes completed	RepositoriesView	Status view text	Muutokset valmiina
 Name	RepositoriesView	Column title	Nimi
 Enable	RepositoriesView	Button label	Ota käyttöön
-Remove All	RepositoriesView	Button label	Poista kaikki
+Enable repositories to use with package management:	RepositoriesView	Label text	Ota tietovarastot pakkaushallinnan käyttöön:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Tietovarastokohteen %name% välimuistin verestämisessä tapahtui virhe
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Kullekin tietovarastolle voidaan ottaa käyttöön vain yksi verkko-osoite. Muuta valintojasi.
 Failed	TaskLooper	Failed task status message	Epäonnistui
 OK	Constants	Button label	Valmis
 Cancel task	TaskTimer	Button label	Peru tehtävä
@@ -29,11 +31,11 @@ Cancel	Constants	Button label	Peru
 Changes pending:	RepositoriesView	Status view text	Odottamassa olevat muutokset:
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Tietovarasto %name%:n ottamisessa pois käytöstä tapahtui virhe
 Remove	Constants	Button label	Poista
+Enable all	RepositoriesView	Button label	Ota kaikki käyttöön
 Stop and quit	RepositoriesWindow	Button label	Pysäytä ja poistu
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Tehtävän tekeminen tietovarastolle %name% kestää kauan.
+Disable all	RepositoriesView	Button label	Ota kaikki pois käytöstä
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Jotkut tehtävät ovat yhä käynnissä. Pysäytetäänkö nämä tehtävät ja poistutaan?
 This repository URL already exists.	RepositoriesView	Error message	Tämä tietovarastoverkko-osoite on jo olemassa.
 Disable	RepositoriesView	Button label	Ota pois käytöstä
-Enable All	RepositoriesView	Button label	Ota kaikki käyttöön
 Unknown	Constants	Unknown repository name	Tuntematon
-Disable All	RepositoriesView	Button label	Ota kaikki pois käytöstä

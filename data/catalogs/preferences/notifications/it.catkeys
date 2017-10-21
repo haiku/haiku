@@ -1,38 +1,10 @@
-1	italian	x-vnd.Haiku-Notifications	3115872762
+1	italian	x-vnd.Haiku-Notifications	984257918
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Si è verificato un errore durante il salvataggio delle preferenze.\nE' possibile che lo spazio disponibile sia in esaurimento.
-Notifications	GeneralView		Notifiche
-seconds of inactivity	GeneralView		secondi di inattività
 Revert	PrefletWin		Ripristina
-Mini icon	DisplayView		Icone piccole
 Enable notifications	GeneralView		Abilita le notifiche
-Error	NotificationView		Errore
-OK	GeneralView		OK
 OK	PrefletWin		OK
-Type	NotificationView		Tipo
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Le notifiche non possono essere fermate, perché non è stato possibile raggiungere il server.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Non è possibile abilitare le notifiche perché non è stato possibile trovare il server.\nQuesto significa che l'installazione di InfoPopper non è stata completata con successo.
-Important	NotificationView		Importante
-Cannot disable notifications because the server can't be reached.	GeneralView		Non è possibile disabilitare le notifiche perché non è stato possibile raggiungere il server.
-Progress	NotificationView		Progresso
 General	PrefletView		Generale
-Apply	PrefletWin		Applica
-Display	PrefletView		Visualizzazione
-Search:	NotificationView		Cerca:
 Allowed	NotificationView		Permesso
-Yes	NotificationView		Sì
-Large icon	DisplayView		Icone grandi
-Icon size:	DisplayView		Dimensione icone:
-Hide notifications from screen after	GeneralView		Nascondi le notifiche dallo schermo dopo
 Notifications	System name		Notifiche
-Notifications	NotificationView		Notifiche
-No	NotificationView		No
-Title	NotificationView		Titolo
-Information	NotificationView		Informazione
-Window width:	DisplayView		Larghezza finestra:
 Application	NotificationView		Applicazione
-Enabled	NotificationView		Abilita
-Unknown	NotificationView		Sconosciuto
-Enable notifications at startup	GeneralView		Abilita le notifiche all'avvio
-Notifications	PrefletView		Notifiche
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Non è possibile trovare il server delle notifiche, questo significa che l'installazione di InfoPopper non è stata completata con successo.
 Applications	NotificationView		Applicazioni

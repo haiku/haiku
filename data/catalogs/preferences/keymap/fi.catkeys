@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	3155537444
+1	finnish	x-vnd.Haiku-Keymap	1855856185
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
 Revert	Modifier keys window		Palauta
@@ -97,6 +97,7 @@ Command:	Modifier keys window	Command key role name	Komento:
 Latin-American	Keyboard Layout View		latinalaisamerikkalainen
 Spanish (Dvorak)	Keyboard Layout View		espanjalainen (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		liettualainen (vakio)
+Russian (Udmurt, Komi, Mari)	Keyboard Layout View		venäjä (udmurtti, komi, mari)
 Canadian-French	Keyboard Layout View		kanadalaisranskalainen
 Irish	Keyboard Layout View		irlantilainen
 Turkish (Type-F)	Keyboard Layout View		turkkilainen (Type-F)

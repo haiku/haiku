@@ -1,6 +1,5 @@
-1	polish	x-vnd.Haiku-Repositories	3761636112
+1	polish	x-vnd.Haiku-Repositories	425662326
 Completed	TaskLooper	Completed task status message	Zakończono
-Only one URL for each repository can be enabled.  Please change your selections.	RepositoriesView	Error message	Tylko jeden URL dla każdego repozytorium może być włączony.  Zmień swój wybór.
 Repositories	System name		Repozytoria
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Wystąpił błąd podczas włączania repozytorium %url%
 Remove this repository?	RepositoriesView	Removal alert confirmation message	Usunąć to repozytorium?
@@ -19,7 +18,6 @@ Remove	RepositoriesView	Button label	Usuń
 Changes completed	RepositoriesView	Status view text	Zmiany zakończone
 Name	RepositoriesView	Column title	Nazwa
 Enable	RepositoriesView	Button label	Włącz
-Remove All	RepositoriesView	Button label	Usuń wszystkie
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Wystąpił błąd podczas odświeżania pamięci podręcznej repozytorium %name%
 Failed	TaskLooper	Failed task status message	Wystąpił błąd
 OK	Constants	Button label	OK
@@ -34,6 +32,4 @@ The task for repository %name% is taking a long time to complete.	TaskTimer	Aler
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Niektóre zadania nie są skończone. Zatrzymać je i zakończyć aplikację?
 This repository URL already exists.	RepositoriesView	Error message	Ten URL repozytorium już istnieje.
 Disable	RepositoriesView	Button label	Wyłącz
-Enable All	RepositoriesView	Button label	Włącz wszystkie
 Unknown	Constants	Unknown repository name	Nieznana
-Disable All	RepositoriesView	Button label	Wyłącz wszystkie

@@ -2,7 +2,7 @@
 OK	PrefsWindow		Ok
 Quit	DeskbarPulseView		終了
 Mini mode	DeskbarPulseView		ミニモード
-Remove replicant	CPUButton		レプリカントを外す
+Remove replicant	CPUButton		レプリカントを削除
 Active color	ConfigView		アクティブ色
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usage: [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Fade colors	ConfigView		フェード色
