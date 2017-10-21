@@ -91,6 +91,7 @@ rule HaikuImageGetSystemLibs
 			libdebugger.so@primary
 			libdevice.so
 			libgnu.so
+			libmedia.so
 			libnetwork.so
 			libpackage.so
 			libtextencoding.so libtracker.so libtranslation.so
