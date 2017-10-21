@@ -13,11 +13,11 @@ Application ActivityMonitor :
 	: be tracker media libbnetapi.so shared [ TargetLibstdc++ ]
 		$(TARGET_NETWORK_LIBS) localestub
 	: ActivityMonitor.rdef
-	;
+;
 
 DoCatalogs ActivityMonitor :
-    x-vnd.Haiku-ActivityMonitor
-    :
+	x-vnd.Haiku-ActivityMonitor
+	:
 	ActivityMonitor.cpp
 	ActivityView.cpp
 	ActivityWindow.cpp
