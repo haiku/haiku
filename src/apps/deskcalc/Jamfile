@@ -12,8 +12,7 @@ Application DeskCalc :
 	DeskCalc.cpp
 	ExpressionTextView.cpp
 	InputTextView.cpp
-	: be [ TargetLibstdc++ ] localestub media libexpression_parser.a
-		libmapm.a shared
+	: be [ TargetLibstdc++ ] localestub libexpression_parser.a libmapm.a shared
 	: DeskCalc.rdef
 ;
 
