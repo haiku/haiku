@@ -916,8 +916,8 @@ RemotePackageRepository HaikuPorts
 	libpcre2_x86_devel-10.23-1
 	libpng_x86-1.5.25-2
 	libpng_x86_devel-1.5.25-2
-	libpng16_x86-1.6.20-2
-	libpng16_x86_devel-1.6.20-2
+	libpng16_x86-1.6.34-1
+	libpng16_x86_devel-1.6.34-1
 	libqt4_x86-4.8.7-6
 	libqt4_x86_devel-4.8.7-6
 	librecad_x86-2.0.7-1
@@ -973,8 +973,8 @@ RemotePackageRepository HaikuPorts
 	libwebp6_x86_devel-0.5.2-1
 	libxml2_x86-2.9.3-2
 	libxml2_x86_devel-2.9.3-2
-	libxslt_x86-1.1.28-6
-	libxslt_x86_devel-1.1.28-6
+	libxslt_x86-1.1.31-1
+	libxslt_x86_devel-1.1.31-1
 	libzip_x86-0.11.2-1
 	libzip_x86_devel-0.11.2-1
 	live555_x86-2016.01.29-3
@@ -1450,7 +1450,7 @@ RemotePackageRepository HaikuPorts
 	libpcre2_x86
 	libpng
 	libpng_x86
-	libpng16
+#	libpng16
 	libpng16_x86
 	libpthread_stubs
 	libqt4_x86
