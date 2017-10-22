@@ -161,11 +161,12 @@ RemotePackageRepository HaikuPorts
 	fluidsynth-1.1.6-2
 	fluidsynth_devel-1.1.6-2
 	fontboy-0.9.7-3
-	fontconfig-2.12.1-2
-	fontconfig_devel-2.12.1-2
+	fontconfig-2.12.6-1
+	fontconfig_devel-2.12.6-1
 	fossil-1.37-1
-	freetype-2.7-1
-	freetype_devel-2.7-1
+	freetype-2.8.1-1
+	freetype_debuginfo-2.8.1-1
+	freetype_devel-2.8.1-1
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	friss-0.8.1-1
@@ -655,7 +656,7 @@ RemotePackageRepository HaikuPorts
 	avr_binutils_x86-2.26.1_2016_07_22-1
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.3-1
-	bepdf_x86-2.0.1~beta1-2
+	bepdf-2.0.2-2
 	beshare_x86-2.31-1
 	binutils_x86-2.28.1_2017_08_05-1
 	bison_x86-3.0.4-3
@@ -735,8 +736,8 @@ RemotePackageRepository HaikuPorts
 	fluidlite_x86_devel-1.0.0-1
 	fluidsynth_x86-1.1.6-4
 	fluidsynth_x86_devel-1.1.6-4
-	fontconfig_x86-2.12.1-2
-	fontconfig_x86_devel-2.12.1-2
+	fontconfig_x86-2.12.6-1
+	fontconfig_x86_devel-2.12.6-1
 	freeciv_x86-2.5.6-2
 	freedroidrpg_x86-0.16.1-1
 	freetype_x86-2.7-1
@@ -1187,7 +1188,7 @@ RemotePackageRepository HaikuPorts
 	beget
 	belife
 	bemines
-	bepdf_x86
+	bepdf
 	bepodder
 	bescreencapture
 	beshare_x86
@@ -1283,6 +1284,7 @@ RemotePackageRepository HaikuPorts
 	fluidsynth_x86
 	fontboy
 	fontconfig
+	fontconfig_x86
 	fossil
 	freeciv_x86
 	freedroidrpg_x86
