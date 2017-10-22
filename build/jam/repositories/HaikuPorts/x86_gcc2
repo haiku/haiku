@@ -335,8 +335,8 @@ RemotePackageRepository HaikuPorts
 	libpcre2_devel-10.30-1
 	libpng-1.5.25-2
 	libpng_devel-1.5.25-2
-	libpng16-1.6.20-2
-	libpng16_devel-1.6.20-2
+	libpng16-1.6.34-1
+	libpng16_devel-1.6.34-1
 	libpthread_stubs-0.3-2
 	libreplaygain-r475-1
 	libreplaygain_devel-r475-1
