@@ -633,8 +633,8 @@ RemotePackageRepository HaikuPorts
 	xproto-7.0.26-3
 	xrick-021212-2
 	xtrans-1.3.5-2
-	yab-1.7.5.3-4
-	yab_ide-2.2.7-2
+	yab-1.7.5.5-1
+	yab_ide-2.2.8a-2
 	yasm-1.3.0-3
 	zip-3.0-3
 	zlib-1.2.11-2
