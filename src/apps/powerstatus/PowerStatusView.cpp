@@ -241,12 +241,12 @@ PowerStatusView::_DrawBattery(BRect rect)
 		SetScale(std::min(Bounds().Width(), Bounds().Height()) / 16);
 
 		static const BPoint points[] = {
-			BPoint(2, 13),
-			BPoint(9, 5),
-			BPoint(9, 7),
-			BPoint(16, 2),
-			BPoint(8, 11),
-			BPoint(8, 9)
+			BPoint(3, 14),
+			BPoint(10, 6),
+			BPoint(10, 8),
+			BPoint(17, 3),
+			BPoint(9, 12),
+			BPoint(9, 10)
 		};
 		FillPolygon(points, 6);
 
@@ -286,9 +286,9 @@ PowerStatusView::Draw(BRect updateRect)
 		iconRect = Bounds();
 		if (showLabel) {
 			if (below)
-				iconRect.bottom -= textHeight + 4;
+				iconRect.bottom -= textHeight + 2;
 			else
-				iconRect.right -= textWidth + 4;
+				iconRect.right -= textWidth + 2;
 		}
 
 		// make a square
@@ -395,15 +395,15 @@ PowerStatusView::Update(bool force)
 	}
 
 	if (fInDeskbar) {
-		// make sure the tray icon is large enough
-		float width = fShowStatusIcon ? kMinIconWidth + 2 : 0;
+		// make sure the tray icon is (just) large enough
+		float width = fShowStatusIcon ? kMinIconWidth - 1 : 0;
 
 		if (fShowLabel) {
 			char text[64];
 			_SetLabel(text, sizeof(text));
 
 			if (text[0])
-				width += ceilf(StringWidth(text)) + 4;
+				width += ceilf(StringWidth(text)) + 2;
 		} else {
 			char text[256];
 			const char* open = "";
@@ -435,7 +435,7 @@ PowerStatusView::Update(bool force)
 				strcpy(text, B_TRANSLATE("no battery"));
 			SetToolTip(text);
 		}
-		if (width == 0) {
+		if (width < 8) {
 			// make sure we're not going away completely
 			width = 8;
 		}
