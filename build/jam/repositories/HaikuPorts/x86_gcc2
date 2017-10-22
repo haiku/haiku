@@ -93,16 +93,16 @@ RemotePackageRepository HaikuPorts
 	bzip2_devel-1.0.6-5
 	bzr-2.6.0-2
 	canna-1.0.1-1
-	capitalbe-1.0-2
-	catkeyseditor-0.1.2-1
-	caya-0.0.3-3
+	capitalbe-1.1-5
+	catkeyseditor-0.1.2-3
+	caya-0.0.3-6
 	ccache-3.1.9-1
 	cdrtools-3.02~a07-1
 	cdrtools_devel-3.02~a07-1
 	chat-20100903-3
 	check-0.10.0-2
 	check_devel-0.10.0-2
-	clipdinger-1.0-1
+	clipdinger-1.0-4
 	clockwerk-git-3
 	confuse-2.7-3
 	confuse_devel-2.7-3
