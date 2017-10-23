@@ -1212,9 +1212,9 @@ RemotePackageRepository HaikuPorts
 	mdds-1.2.3-1
 	mdds_devel-1.2.3-1
 	mercurial-3.2.1-4
-	mesa-17.1.7-3
-	mesa_devel-17.1.7-3
-	mesa_swpipe-17.1.7-3
+	mesa-17.1.7-5
+	mesa_devel-17.1.7-5
+	mesa_swpipe-17.1.7-5
 	mgba-0.6.0-1
 	microbe-20130728-2
 	midikeyboard-1.0.0-5
@@ -1244,7 +1244,7 @@ RemotePackageRepository HaikuPorts
 	mpg123-1.25.7-1
 	mpg123_devel-1.25.7-1
 	mplayer-1.3.0-3
-	mpv-0.25.0-1
+	mpv-0.27.0-3
 	mrpeeps-1.2-3
 	msgpack_c_cpp-2.1.2-1
 	msgpack_c_cpp_devel-2.1.2-1
