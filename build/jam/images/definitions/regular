@@ -16,6 +16,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_APPS += [ FFilterByBuildFeatures
+	ActivityMonitor
 	CodyCam
 	GLInfo@mesa
 	HaikuDepot
@@ -28,6 +29,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 ] ;
 
 DESKBAR_APPLICATIONS +=
+	ActivityMonitor
 	CodyCam
 	HaikuDepot
 	Icon-O-Matic Installer
