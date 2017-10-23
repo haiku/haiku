@@ -34,7 +34,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
-	AboutSystem ActivityMonitor
+	AboutSystem
 	BootManager@x86,x86_64
 	CharacterMap
 	Debugger@libedit DeskCalc Devices DiskProbe DiskUsage DriveSetup
@@ -47,7 +47,6 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 ] ;
 
 DESKBAR_APPLICATIONS =
-	ActivityMonitor
 	CharacterMap
 	DeskCalc Devices DiskProbe DiskUsage DriveSetup
 	Expander
@@ -91,7 +90,6 @@ rule HaikuImageGetSystemLibs
 			libdebugger.so@primary
 			libdevice.so
 			libgnu.so
-			libmedia.so
 			libnetwork.so
 			libpackage.so
 			libtextencoding.so libtracker.so libtranslation.so
