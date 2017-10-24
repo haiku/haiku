@@ -54,6 +54,7 @@ const int32 kIconGap = 2;
 const int32 kGutter = 1;
 const int32 kDragRegionWidth = 6;
 const int32 kTrayPadding = 3;
+const int32 kClockMargin = 12;
 
 // 1 pixel for left gutter
 // space for replicant tray (6 items)

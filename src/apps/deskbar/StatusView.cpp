@@ -229,9 +229,9 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
-			if (!fTime->IsHidden()
-				&& fTime->Frame().left < fRightBottomReplicant.right + 12) {
-				width = fRightBottomReplicant.right + 12
+			if (!fTime->IsHidden() && fTime->Frame().left
+					< fRightBottomReplicant.right + kClockMargin) {
+				width = fRightBottomReplicant.right + kClockMargin
 					+ fTime->Frame().Width();
 			} else
 				width = fRightBottomReplicant.right + kIconGap + kGutter;
@@ -1167,7 +1167,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
-					- kDragRegionWidth * 2,
+					- kClockMargin,
 				loc.y + kMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden()) {
 				rowRect.right -= kClockMargin + fTime->Frame().Width()
