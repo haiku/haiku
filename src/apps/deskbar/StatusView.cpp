@@ -215,14 +215,17 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	if (fMultiRowMode) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
 			- kDragWidth - kGutter;
-		if (ReplicantCount() > 0)
+		if (fRightBottomReplicant.IsValid())
 			height = fRightBottomReplicant.bottom;
-		// the height will be uniform for the number of rows necessary to show
-		// all the reps + any gutters necessary for spacing
-		int32 rowCount = (int32)(height / kMaxReplicantHeight);
-		height = kGutter + (rowCount * kMaxReplicantHeight)
-			+ ((rowCount - 1) * kIconGap) + kGutter;
-		height = std::max(kMinimumTrayHeight, height);
+		else if (ReplicantCount() > 0) {
+			// The height will be uniform for the number of rows necessary
+			// to show all the replicants and gutters.
+			int32 rowCount = (int32)(height / kMaxReplicantHeight);
+			height = kGutter + (rowCount * kMaxReplicantHeight)
+				+ ((rowCount - 1) * kIconGap) + kGutter;
+			height = std::max(kMinimumTrayHeight, height);
+		} else
+			height = kMinimumTrayHeight;
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
@@ -1155,11 +1158,14 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 	} else
 		loc.x += 1; // keeps everything lined up nicely
 
+	if (index <= 0)
+		return loc;
+
 	if (fMultiRowMode) {
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
-			BRect rect(loc.x, loc.y,
+			BRect rowRect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
 					- kDragRegionWidth * 2,
 				loc.y + kMaxReplicantHeight);
@@ -1168,38 +1174,38 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 					+ kTrayPadding;
 			}
 
+			BRect replicantRect = rowRect;
 			for (int32 i = 0; i < index; i++) {
 				BView* view = NULL;
 				fShelf->ReplicantAt(i, &view);
-				if (view == NULL || view->Frame().top != rect.top)
+				if (view == NULL || view->Frame().top != rowRect.top)
 					continue;
 
-				rect.left = view->Frame().right + kIconGap + 1;
+				// push this replicant placement past the last one
+				replicantRect.left = view->Frame().right + kIconGap + 1;
 			}
 
-			if (rect.Width() >= width) {
+			if (replicantRect.Width() >= replicantWidth) {
 				// the icon fits in this row
-				loc = rect.LeftTop();
+				loc = replicantRect.LeftTop();
 				break;
 			}
 		}
 	} else {
-		if (index > 0) {
-			// get the last replicant added for placement reference
-			BView* view = NULL;
-			fShelf->ReplicantAt(index - 1, &view);
-			if (view != NULL) {
-				// push this rep placement past the last one
-				loc.x = view->Frame().right + kIconGap + 1;
-				loc.y = view->Frame().top;
-			}
+		// get the last replicant added for placement reference
+		BView* view = NULL;
+		fShelf->ReplicantAt(index - 1, &view);
+		if (view != NULL) {
+			// push this replicant placement past the last one
+			loc.x = view->Frame().right + kIconGap + 1;
+			loc.y = view->Frame().top;
 		}
 	}
 
 	if (loc.y > fRightBottomReplicant.top
 		|| (loc.y == fRightBottomReplicant.top
 			&& loc.x > fRightBottomReplicant.left)) {
-		fRightBottomReplicant.Set(loc.x, loc.y, loc.x + width,
+		fRightBottomReplicant.Set(loc.x, loc.y, loc.x + replicantWidth,
 			loc.y + kMaxReplicantHeight);
 		fLastReplicant = index;
 	}
@@ -1251,13 +1257,15 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 		fRightBottomReplicant.Set(0, 0, 0, 0);
 
 	BView* view = NULL;
-	for (int32 i = startIndex; i < count; i++) {
-		fShelf->ReplicantAt(i, &view);
-		if (view != NULL) {
-			BPoint loc = LocationForReplicant(i, view->Frame().Width());
-			if (view->Frame().LeftTop() != loc)
-				view->MoveTo(loc);
-		}
+	for (int32 index = startIndex; index < replicantCount; index++) {
+		fShelf->ReplicantAt(index, &view);
+		if (view == NULL)
+			continue;
+
+		float replicantWidth = view->Frame().Width();
+		BPoint loc = LocationForReplicant(index, replicantWidth);
+		if (view->Frame().LeftTop() != loc)
+			view->MoveTo(loc);
 	}
 }
 
