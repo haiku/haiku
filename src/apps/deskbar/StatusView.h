@@ -107,7 +107,7 @@ public:
 				bool				IconExists(int32 target, bool byIndex = false);
 				bool				IconExists(const char* name);
 
-				int32				IconCount() const;
+				int32				ReplicantCount() const;
 
 				status_t			AddIcon(BMessage*, int32* id,
 										const entry_ref* = NULL);
@@ -160,7 +160,7 @@ private:
 #endif
 
 				BPoint				LocationForReplicant(int32 index,
-										float width);
+										float replicantWidth);
 				BShelf*				Shelf() const;
 
 				status_t			_SaveSettings();
@@ -196,7 +196,7 @@ enum {
 
 class TDragRegion : public BControl {
 public:
-	TDragRegion(TBarView* barView, BView* child);
+	TDragRegion(TBarView* barView, BView* replicantTray);
 
 	virtual void AttachedToWindow();
 	virtual void GetPreferredSize(float*, float*);
@@ -218,7 +218,7 @@ public:
 
 private:
 	TBarView* fBarView;
-	BView* fChild;
+	BView* fReplicantTray;
 	BPoint fPreviousPosition;
 	int32 fDragLocation;
 };

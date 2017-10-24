@@ -215,7 +215,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	if (fMultiRowMode) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
 			- kDragWidth - kGutter;
-		if (fShelf->CountReplicants() > 0)
+		if (ReplicantCount() > 0)
 			height = fRightBottomReplicant.bottom;
 		// the height will be uniform for the number of rows necessary to show
 		// all the reps + any gutters necessary for spacing
@@ -225,7 +225,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 		height = std::max(kMinimumTrayHeight, height);
 	} else {
 		// if last replicant overruns clock then resize to accomodate
-		if (fShelf->CountReplicants() > 0) {
+		if (ReplicantCount() > 0) {
 			if (!fTime->IsHidden()
 				&& fTime->Frame().left < fRightBottomReplicant.right + 12) {
 				width = fRightBottomReplicant.right + 12
@@ -889,7 +889,7 @@ TReplicantTray::IconExists(const char* name)
 
 
 int32
-TReplicantTray::IconCount() const
+TReplicantTray::ReplicantCount() const
 {
 	return fShelf->CountReplicants();
 }
@@ -955,7 +955,7 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 	if (status != B_OK)
 		return status;
 
-	int32 count = fShelf->CountReplicants();
+	int32 count = ReplicantCount();
 	BView* view;
 	fShelf->ReplicantAt(count - 1, &view, (uint32*)id, NULL);
 
@@ -1062,7 +1062,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 			}
 		}
 	} else {
-		int32 count = fShelf->CountReplicants() - 1;
+		int32 count = ReplicantCount() - 1;
 		int32 localid;
 		for (int32 repIndex = count; repIndex >= 0; repIndex--) {
 			fShelf->ReplicantAt(repIndex, &view, (uint32*)&localid);
@@ -1090,7 +1090,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, const char* name)
 	*id = -1;
 
 	BView* view;
-	int32 count = fShelf->CountReplicants() - 1;
+	int32 count = ReplicantCount() - 1;
 	for (int32 repIndex = count; repIndex >= 0; repIndex--) {
 		fShelf->ReplicantAt(repIndex, &view, (uint32*)id);
 		if (view != NULL && view->Name() != NULL
@@ -1132,7 +1132,7 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 	else
 		align = B_ALIGN_LEFT;
 
-	BPoint loc = LocationForReplicant(fShelf->CountReplicants(),
+	BPoint loc = LocationForReplicant(ReplicantCount(),
 		replicantFrame.Width());
 	message->AddPoint("_pjp_loc", loc);
 
@@ -1146,7 +1146,7 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
  */
 
 BPoint
-TReplicantTray::LocationForReplicant(int32 index, float width)
+TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 {
 	BPoint loc(kTrayPadding, 2);
 	if (fBarView->Vertical()) {
@@ -1243,8 +1243,8 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 	if (startIndex < 0)
 		startIndex = 0;
 
-	int32 count = fShelf->CountReplicants();
-	if (count <= 0)
+	int32 replicantCount = ReplicantCount();
+	if (replicantCount <= 0)
 		return;
 
 	if (startIndex == 0)
@@ -1298,12 +1298,12 @@ TReplicantTray::SaveTimeSettings()
 /*! Draggable region that is asynchronous so that dragging does not block
 	other activities.
 */
-TDragRegion::TDragRegion(TBarView* parent, BView* child)
+TDragRegion::TDragRegion(TBarView* parent, BView* replicantTray)
 	:
 	BControl(BRect(0, 0, 0, 0), "", "", NULL, B_FOLLOW_NONE,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fBarView(parent),
-	fChild(child),
+	fReplicantTray(replicantTray),
 	fDragLocation(kAutoPlaceDragRegion)
 {
 }
@@ -1326,9 +1326,9 @@ TDragRegion::AttachedToWindow()
 void
 TDragRegion::GetPreferredSize(float* width, float* height)
 {
-	fChild->ResizeToPreferred();
-	*width = fChild->Bounds().Width();
-	*height = fChild->Bounds().Height();
+	fReplicantTray->ResizeToPreferred();
+	*width = fReplicantTray->Bounds().Width();
+	*height = fReplicantTray->Bounds().Height();
 
 	if (fDragLocation != kNoDragRegion)
 		*width += kDragWidth + kGutter;

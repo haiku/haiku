@@ -488,6 +488,7 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		} else {
 			if (!fResizeControl->IsHidden())
 				fResizeControl->Hide();
+
 			// move right and down to not cover border then resize to fit
 			fReplicantTray->MoveTo(kGutter, kGutter);
 			fReplicantTray->ResizeBy(-kGutter, -kGutter);
@@ -1111,7 +1112,7 @@ TBarView::ItemExists(const char* name, DeskbarShelf)
 int32
 TBarView::CountItems(DeskbarShelf)
 {
-	return fReplicantTray->IconCount();
+	return fReplicantTray->ReplicantCount();
 }
 
 
