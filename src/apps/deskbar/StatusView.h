@@ -171,15 +171,15 @@ private:
 				TBarView*			fBarView;
 				TReplicantShelf*	fShelf;
 				BRect				fRightBottomReplicant;
-	int32 fLastReplicant;
+				int32				fLastReplicant;
 
-	bool fMultiRowMode;
-	float fMinimumTrayWidth;
+				bool				fMultiRowMode;
+				float				fMinimumTrayWidth;
 
-	bool fAlignmentSupport;
+				bool				fAlignmentSupport;
 #ifdef DB_ADDONS
-	BList* fItemList;
-	BMessage fAddOnSettings;
+				BList*				fItemList;
+				BMessage			fAddOnSettings;
 #endif
 
 };
