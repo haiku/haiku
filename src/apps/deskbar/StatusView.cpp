@@ -229,10 +229,11 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
-			if (!fTime->IsHidden() && fTime->Frame().left
+			if (!fTime->IsHidden() && Bounds().right - kTrayPadding - 2
+						- fTime->Frame().Width() - kClockMargin
 					< fRightBottomReplicant.right + kClockMargin) {
 				width = fRightBottomReplicant.right + kClockMargin
-					+ fTime->Frame().Width();
+					+ fTime->Frame().Width() + kTrayPadding + 2;
 			} else
 				width = fRightBottomReplicant.right + kIconGap + kGutter;
 		}
