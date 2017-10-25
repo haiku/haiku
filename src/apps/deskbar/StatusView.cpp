@@ -1673,7 +1673,7 @@ TResizeControl::Draw(BRect updateRect)
 	if (!fBarView->Vertical())
 		return;
 
-	BRect dragRegion(updateRect);
+	BRect dragRegion(Bounds());
 
 	int32 height = dragRegion.IntegerHeight();
 	if (height <= 0)
