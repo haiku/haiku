@@ -24,6 +24,7 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Deskbar.h>
 #include <DirectMessageTarget.h>
 #include <FindDirectory.h>
 #include <InputServerTypes.h>
@@ -1690,44 +1691,77 @@ BWindow::Zoom()
 	// The dimensions that non-virtual Zoom() passes to hook Zoom() are deduced
 	// from the smallest of three rectangles:
 
+	// 1) the rectangle defined by SetZoomLimits() and,
+	// 2) the rectangle defined by SetSizeLimits()
+	float maxZoomWidth = std::min(fMaxZoomWidth, fMaxWidth);
+	float maxZoomHeight = std::min(fMaxZoomHeight, fMaxHeight);
+
+	// 3) the screen rectangle
+	BRect screenFrame = (BScreen(this)).Frame();
+	maxZoomWidth = std::min(maxZoomWidth, screenFrame.Width());
+	maxZoomHeight = std::min(maxZoomHeight, screenFrame.Height());
+
+	BRect zoomArea = screenFrame; // starts at screen size
+
+	// remove area taken up by Deskbar
+	BDeskbar deskbar;
+	BRect deskbarFrame = deskbar.Frame();
+	switch (deskbar.Location()) {
+		case B_DESKBAR_TOP:
+			zoomArea.top = deskbarFrame.bottom + 2;
+			break;
+
+		case B_DESKBAR_BOTTOM:
+			zoomArea.bottom = deskbarFrame.top - 2;
+			break;
+
+		case B_DESKBAR_LEFT_TOP:
+		case B_DESKBAR_LEFT_BOTTOM:
+			zoomArea.left = deskbarFrame.right + 2;
+			break;
+
+		default:
+		case B_DESKBAR_RIGHT_TOP:
+		case B_DESKBAR_RIGHT_BOTTOM:
+			zoomArea.right = deskbarFrame.left - 2;
+			break;
+	}
+
+	// TODO: Broken for tab on left side windows...
 	float borderWidth;
 	float tabHeight;
 	_GetDecoratorSize(&borderWidth, &tabHeight);
 
-	// 1) the rectangle defined by SetZoomLimits(),
-	float zoomedWidth = fMaxZoomWidth;
-	float zoomedHeight = fMaxZoomHeight;
+	// remove the area taken up by the tab and border
+	zoomArea.left += borderWidth;
+	zoomArea.top += borderWidth + tabHeight;
+	zoomArea.right -= borderWidth;
+	zoomArea.bottom -= borderWidth;
 
-	// 2) the rectangle defined by SetSizeLimits()
-	if (fMaxWidth < zoomedWidth)
-		zoomedWidth = fMaxWidth;
-	if (fMaxHeight < zoomedHeight)
-		zoomedHeight = fMaxHeight;
+	// inset towards center vertically first to see if there will be room
+	// above or below Deskbar
+	if (zoomArea.Height() > maxZoomHeight)
+		zoomArea.InsetBy(0, roundf((zoomArea.Height() - maxZoomHeight) / 2));
 
-	// 3) the screen rectangle
-	BScreen screen(this);
-	// TODO: Broken for tab on left side windows...
-	float screenWidth = screen.Frame().Width() - 2 * borderWidth;
-	float screenHeight = screen.Frame().Height() - (2 * borderWidth + tabHeight);
-	if (screenWidth < zoomedWidth)
-		zoomedWidth = screenWidth;
-	if (screenHeight < zoomedHeight)
-		zoomedHeight = screenHeight;
+	if (zoomArea.top > deskbarFrame.bottom
+		|| zoomArea.bottom < deskbarFrame.top) {
+		// there is room above or below Deskbar, start from screen width
+		// minus borders instead of desktop width minus borders
+		zoomArea.left = screenFrame.left + borderWidth;
+		zoomArea.right = screenFrame.right - borderWidth;
+	}
 
-	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth,
-		tabHeight + borderWidth);
-	// Center if window cannot be made full screen
-	if (screenWidth > zoomedWidth)
-		zoomedLeftTop.x += (screenWidth - zoomedWidth) / 2;
-	if (screenHeight > zoomedHeight)
-		zoomedLeftTop.y += (screenHeight - zoomedHeight) / 2;
+	// inset towards center
+	if (zoomArea.Width() > maxZoomWidth)
+		zoomArea.InsetBy(roundf((zoomArea.Width() - maxZoomWidth) / 2), 0);
 
 	// Un-Zoom
 
 	if (fPreviousFrame.IsValid()
-		// NOTE: don't check for fFrame.LeftTop() == zoomedLeftTop
+		// NOTE: don't check for fFrame.LeftTop() == zoomArea.LeftTop()
 		// -> makes it easier on the user to get a window back into place
-		&& fFrame.Width() == zoomedWidth && fFrame.Height() == zoomedHeight) {
+		&& fFrame.Width() == zoomArea.Width()
+		&& fFrame.Height() == zoomArea.Height()) {
 		// already zoomed!
 		Zoom(fPreviousFrame.LeftTop(), fPreviousFrame.Width(),
 			fPreviousFrame.Height());
@@ -1739,7 +1773,7 @@ BWindow::Zoom()
 	// remember fFrame for later "unzooming"
 	fPreviousFrame = fFrame;
 
-	Zoom(zoomedLeftTop, zoomedWidth, zoomedHeight);
+	Zoom(zoomArea.LeftTop(), zoomArea.Width(), zoomArea.Height());
 }
 
 
