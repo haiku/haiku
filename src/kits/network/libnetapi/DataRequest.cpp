@@ -60,8 +60,7 @@ BDataRequest::_ProtocolLoop()
 		data.Remove(0, separatorPosition + 1);
 
 		int pos = 0;
-		while (meta.Length() > 0)
-		{
+		while (meta.Length() > 0) {
 			// Extract next parameter
 			pos = meta.FindFirst(';', pos);
 

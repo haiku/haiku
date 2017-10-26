@@ -77,14 +77,13 @@ BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
 
 BNetworkCookieJar::~BNetworkCookieJar()
 {
-	for (Iterator it = GetIterator(); it.Next() != NULL;) {
+	for (Iterator it = GetIterator(); it.Next() != NULL;)
 		delete it.Remove();
-	}
 
 	fCookieHashMap->Lock();
 
 	PrivateHashMap::Iterator it = fCookieHashMap->GetIterator();
-	while(it.HasNext()) {
+	while (it.HasNext()) {
 		BNetworkCookieList* list = *it.NextValue();
 		it.Remove();
 		list->LockForWriting();
@@ -603,7 +602,8 @@ BNetworkCookieJar::Iterator::NextDomain()
 		fList = *fIterator->fCookieMapIterator.NextValue();
 		fList->LockForReading();
 
-		while (fList->CountItems() == 0 && fIterator->fCookieMapIterator.HasNext()) {
+		while (fList->CountItems() == 0
+			&& fIterator->fCookieMapIterator.HasNext()) {
 			// Empty list. Skip it
 			fList->Unlock();
 			fList = *fIterator->fCookieMapIterator.NextValue();
@@ -632,8 +632,7 @@ BNetworkCookieJar::Iterator::Remove()
 			// We are on the first item of fList, so we need to remove the
 			// last of fLastList
 			fLastList->Unlock();
-			if (fLastList->LockForWriting() == B_OK)
-			{
+			if (fLastList->LockForWriting() == B_OK) {
 				fLastList->RemoveItemAt(fLastList->CountItems() - 1);
 				// TODO if the list became empty, we could remove it from the
 				// map, but this can be a problem if other iterators are still
@@ -650,8 +649,7 @@ BNetworkCookieJar::Iterator::Remove()
 		if (fCookieJar->fCookieHashMap->Lock()) {
 			// Switch to a write lock
 			fList->Unlock();
-			if (fList->LockForWriting() == B_OK)
-			{
+			if (fList->LockForWriting() == B_OK) {
 				fList->RemoveItemAt(fIndex);
 				fList->Unlock();
 			}
@@ -693,7 +691,8 @@ BNetworkCookieJar::Iterator::_FindNext()
 		fList = *(fIterator->fCookieMapIterator.NextValue());
 		fList->LockForReading();
 
-		while (fList->CountItems() == 0 && fIterator->fCookieMapIterator.HasNext()) {
+		while (fList->CountItems() == 0
+			&& fIterator->fCookieMapIterator.HasNext()) {
 			// Empty list. Skip it
 			fList->Unlock();
 			fList = *fIterator->fCookieMapIterator.NextValue();
@@ -784,8 +783,7 @@ BNetworkCookieJar::UrlIterator::Remove()
 
 	if (fCookieJar->fCookieHashMap->Lock()) {
 		fLastList->Unlock();
-		if (fLastList->LockForWriting() == B_OK)
-		{
+		if (fLastList->LockForWriting() == B_OK) {
 			fLastList->RemoveItemAt(fLastIndex);
 
 			if (fLastList->CountItems() == 0) {

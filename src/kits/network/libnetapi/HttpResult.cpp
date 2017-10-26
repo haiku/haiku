@@ -162,9 +162,7 @@ BHttpResult::Archive(BMessage* target, bool deep) const
 BHttpResult::Instantiate(BMessage* archive)
 {
 	if (!validate_instantiation(archive, "BHttpResult"))
-	{
 		return NULL;
-	}
 
 	return new BHttpResult(archive);
 }

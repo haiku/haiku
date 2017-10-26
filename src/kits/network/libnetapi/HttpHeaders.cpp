@@ -255,7 +255,7 @@ BHttpHeaders::PopulateFromArchive(BMessage* archive)
 
 	int32 index = 0;
 	char* nameFound;
-	for(;;) {
+	for (;;) {
 		if (archive->GetInfo(B_STRING_TYPE, index, &nameFound, NULL) != B_OK)
 			return;
 
@@ -271,10 +271,8 @@ void
 BHttpHeaders::Archive(BMessage* message) const
 {
 	int32 count = CountHeaders();
-	int32 i;
 
-	for (i = 0; i < count; i++)
-	{
+	for (int32 i = 0; i < count; i++) {
 		BHttpHeader& header = HeaderAt(i);
 		message->AddString(header.Name(), header.Value());
 	}

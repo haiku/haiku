@@ -42,8 +42,7 @@ BNetworkCookie::BNetworkCookie(const char* name, const char* value,
 
 	SetDomain(url.Host());
 
-	if (url.Protocol() == "file" && url.Host().Length() == 0)
-	{
+	if (url.Protocol() == "file" && url.Host().Length() == 0) {
 		SetDomain("localhost");
 			// make sure cookies set from a file:// URL are stored somewhere.
 	}
@@ -110,8 +109,7 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 	SetPath(_DefaultPathForUrl(url));
 	SetDomain(url.Host());
 	fHostOnly = true;
-	if (url.Protocol() == "file" && url.Host().Length() == 0)
-	{
+	if (url.Protocol() == "file" && url.Host().Length() == 0) {
 		fDomain = "localhost";
 			// make sure cookies set from a file:// URL are stored somewhere.
 			// not going through SetDomain as it requires at least one '.'
