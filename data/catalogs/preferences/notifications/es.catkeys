@@ -1,9 +1,13 @@
-1	spanish; castilian	x-vnd.Haiku-Notifications	525245920
+1	spanish; castilian	x-vnd.Haiku-Notifications	213548865
 Revert	PrefletWin		revertir
 Enable notifications	GeneralView		Permitir notificaciones
+Window width:	GeneralView		Ancho de ventana:
 OK	PrefletWin		Aceptar
+OK	NotificationView		Aceptar
+Notifications	PrefletWin		Notificaciones
 General	PrefletView		General
 Allowed	NotificationView		Permitido
 Notifications	System name		Notificaciones
+Applications	PrefletView		Applicaciones
 Application	NotificationView		Aplicación
 Applications	NotificationView		Applicaciones
