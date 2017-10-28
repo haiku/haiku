@@ -249,11 +249,31 @@ FTDIDevice::SetHardwareFlowControl(bool enable)
 void
 FTDIDevice::OnRead(char **buffer, size_t *numBytes)
 {
-	fStatusMSR = FTDI_GET_MSR(*buffer);
-	fStatusLSR = FTDI_GET_LSR(*buffer);
-	TRACE("FTDIDevice::OnRead(): MSR: 0x%02x LSR: 0x%02x\n", fStatusMSR, fStatusLSR);
-	*buffer += 2;
-	*numBytes -= 2;
+	/* The input consists of 64-byte packets, in which the first two bytes
+	 * give the status (16C550 like) of the UART. A single buffer may have
+	 * several of these packets in it.
+	 */
+
+	size_t i = 0;
+	size_t j = 0;
+
+	while (i < *numBytes) {
+		if ((i % 64) == 0) {
+			fStatusMSR = FTDI_GET_MSR(*buffer + i);
+			fStatusLSR = FTDI_GET_LSR(*buffer + i);
+			TRACE("FTDIDevice::OnRead(): MSR: 0x%02x LSR: 0x%02x\n",
+				fStatusMSR, fStatusLSR);
+
+			// Skip over the buffer header
+			i += 2;
+		} else {
+			// Group normal bytes towards the start of the buffer
+			(*buffer)[j++] = (*buffer)[i++];
+		}
+	}
+
+	// Tell the caller about the number of "real" bytes remaining in the buffer
+	*numBytes = j;
 }
 
 
