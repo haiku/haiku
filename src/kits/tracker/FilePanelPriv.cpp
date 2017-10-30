@@ -1740,12 +1740,12 @@ BFilePanelPoseView::StopWatching()
 bool
 BFilePanelPoseView::FSNotification(const BMessage* message)
 {
-	if (IsDesktopView()) {
-		// Pretty much copied straight from DesktopPoseView.
-		// Would be better if the code could be shared somehow.
-		switch (message->FindInt32("opcode")) {
-			case B_DEVICE_MOUNTED:
-			{
+	switch (message->FindInt32("opcode")) {
+		case B_DEVICE_MOUNTED:
+		{
+			if (IsDesktopView()) {
+				// Pretty much copied straight from DesktopPoseView.
+				// Would be better if the code could be shared somehow.
 				dev_t device;
 				if (message->FindInt32("new device", &device) != B_OK)
 					break;
@@ -1762,6 +1762,21 @@ BFilePanelPoseView::FSNotification(const BMessage* message)
 						|| settings.MountSharedVolumesOntoDesktop())) {
 					// place an icon for the volume onto the desktop
 					CreateVolumePose(&volume, true);
+				}
+			}
+			break;
+		}
+
+		case B_DEVICE_UNMOUNTED:
+		{
+			dev_t device;
+			if (message->FindInt32("device", &device) == B_OK) {
+				if (TargetModel() != NULL
+					&& TargetModel()->NodeRef()->device == device) {
+					// Volume currently shown in this file panel
+					// disappeared, reset location to home directory
+					BMessage message(kSwitchToHome);
+					MessageReceived(&message);
 				}
 			}
 			break;
