@@ -72,6 +72,10 @@ private:
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
 			bool				fInteractive;
+
+			off_t				fLastBytes;
+			bigtime_t			fLastRateCalcTime;
+			float				fDownloadRate;
 };
 
 

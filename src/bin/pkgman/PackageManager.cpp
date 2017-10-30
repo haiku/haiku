@@ -9,6 +9,10 @@
  */
 
 
+#include <StringForSize.h>
+#include <StringForRate.h>
+	// Must be first, or the BPrivate namespaces are confused
+
 #include "PackageManager.h"
 
 #include <sys/ioctl.h>
@@ -174,7 +178,9 @@ PackageManager::Warn(status_t error, const char* format, ...)
 void
 PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 {
-	printf("Downloading %s...\n", packageName);
+	fLastBytes = 0;
+	fLastRateCalcTime = system_time();
+	fDownloadRate = 0;
 }
 
 
@@ -182,50 +188,46 @@ void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	float completionPercentage, off_t bytes, off_t totalBytes)
 {
+	if (bytes == totalBytes)
+		fLastBytes = totalBytes;
 	if (!fInteractive)
 		return;
 
-	static const char* progressChars[] = {
-		"\xE2\x96\x8F",
-		"\xE2\x96\x8E",
-		"\xE2\x96\x8D",
-		"\xE2\x96\x8C",
-		"\xE2\x96\x8B",
-		"\xE2\x96\x8A",
-		"\xE2\x96\x89",
-		"\xE2\x96\x88",
-	};
+	// Erase the line and return to the start
+	printf("\33[2K\r");
 
-	int width = 70;
+	if (bytes >= fLastBytes && (system_time() - fLastRateCalcTime) >= 1000000) {
+		const bigtime_t time = system_time();
+		fDownloadRate = (bytes - fLastBytes) / ((time - fLastRateCalcTime) / 1000000);
+		fLastRateCalcTime = time;
+		fLastBytes = bytes;
+	}
 
+	// Build the current file progress percentage and size string
+	BString str;
+	char byteBuffer[32];
+	char totalBuffer[32];
+	char rateBuffer[32];
+	str.SetToFormat("%3d%% %s\t  %s/%s\t  %s",
+		(int)(completionPercentage * 100),
+		packageName,
+		string_for_size(bytes, byteBuffer, sizeof(byteBuffer)),
+		string_for_size(totalBytes, totalBuffer, sizeof(totalBuffer)),
+		fDownloadRate == 0 ? "--.-" :
+			string_for_rate(fDownloadRate, rateBuffer, sizeof(rateBuffer)));
+
+	int width = std::max(str.Length(), (int32)80);
 	struct winsize winSize;
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
-		&& winSize.ws_col < 77) {
-		// We need 7 characters for the percent display
-		width = winSize.ws_col - 7;
+			&& winSize.ws_col < width) {
+		width = winSize.ws_col;
 	}
 
-	int position;
-	int ipart = (int)(completionPercentage * width);
-	int fpart = (int)(((completionPercentage * width) - ipart) * 8);
-
-	printf("\r"); // return to the beginning of the line
-
-	for (position = 0; position < width; position++) {
-		if (position < ipart) {
-			// This part is fully downloaded, show a full block
-			printf(progressChars[7]);
-		} else if (position > ipart) {
-			// This part is not downloaded, show a space
-			printf(" ");
-		} else {
-			// This part is partially downloaded
-			printf(progressChars[fpart]);
-		}
-	}
-
-	// Also print the progress percentage
-	printf(" %3d%%", (int)(completionPercentage * 100));
+	// Set bg to green, fg to white, and print progress bar
+	const int progChars = (int)(width * completionPercentage);
+	printf("\x1B[42m\x1B[37m%.*s", progChars, str.String());
+	// Reset colors and print rest of text
+	printf("\x1B[0m%s", str.String() + progChars);
 
 	fflush(stdout);
 }
@@ -235,16 +237,13 @@ void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
 	if (fInteractive) {
-		// Overwrite the progress bar with whitespace
-		printf("\r");
-		struct winsize w;
-		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-		for (int i = 0; i < (w.ws_col); i++)
-			printf(" ");
-		printf("\r\x1b[1A"); // Go to previous line.
+		// Erase the line, return to the start, and reset colors
+		printf("\33[2K\r\x1B[0m");
 	}
 
-	printf("Downloading %s...done.\n", packageName);
+	char byteBuffer[32];
+	printf("100%% %s [%s]\n", packageName,
+		string_for_size(fLastBytes, byteBuffer, sizeof(byteBuffer)));
 }
 
 
