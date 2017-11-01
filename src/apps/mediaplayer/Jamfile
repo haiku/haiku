@@ -5,120 +5,124 @@ UsePublicHeaders [ FDirName be_apps Tracker ] ;
 UsePrivateHeaders interface shared ;
 UseLibraryHeaders agg ;
 
-# source directories
-local sourceDirs =
-	interface
-	media_node_framework
-	media_node_framework/audio
-	media_node_framework/video
-	playlist
-	supplier
-	support
-	settings
-;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		# source directories
+		local sourceDirs =
+			interface
+			media_node_framework
+			media_node_framework/audio
+			media_node_framework/video
+			playlist
+			supplier
+			support
+			settings
+		;
 
-local sourceDir ;
-for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps mediaplayer $(sourceDir) ] ;
+		local sourceDir ;
+		for sourceDir in $(sourceDirs) {
+			SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps mediaplayer $(sourceDir) ] ;
+		}
+
+		Application [ MultiArchDefaultGristFiles MediaPlayer ] :
+			# interface
+			DurationView.cpp
+			PeakView.cpp
+			PlayPauseButton.cpp
+			PositionToolTip.cpp
+			SeekSlider.cpp
+			SubtitleBitmap.cpp
+			SymbolButton.cpp
+			TransportControlGroup.cpp
+			VolumeSlider.cpp
+
+			# media_node_framework
+			NodeManager.cpp
+			PlaybackListener.cpp
+			PlaybackLOAdapter.cpp
+			PlaybackManager.cpp
+
+			# media_node_framework/audio
+			AudioAdapter.cpp
+			AudioChannelConverter.cpp
+			AudioFormatConverter.cpp
+			AudioProducer.cpp
+			AudioReader.cpp
+			AudioResampler.cpp
+			AudioSupplier.cpp
+			AudioVolumeConverter.cpp
+
+			# media_node_framework/video
+			VideoConsumer.cpp
+			VideoProducer.cpp
+			VideoSupplier.cpp
+			VideoTarget.cpp
+
+			# plylist
+			CopyPLItemsCommand.cpp
+			FilePlaylistItem.cpp
+			ImportPLItemsCommand.cpp
+			ListViews.cpp
+			MovePLItemsCommand.cpp
+			Playlist.cpp
+			PlaylistItem.cpp
+			PlaylistListView.cpp
+			PlaylistObserver.cpp
+			PlaylistWindow.cpp
+			PLItemsCommand.cpp
+			RandomizePLItemsCommand.cpp
+			RemovePLItemsCommand.cpp
+			UrlPlaylistItem.cpp
+
+			# settings
+			Settings.cpp
+			SettingsWindow.cpp
+
+			# supplier
+			AudioTrackSupplier.cpp
+			ImageTrackVideoSupplier.cpp
+			MediaFileTrackSupplier.cpp
+			MediaTrackAudioSupplier.cpp
+			MediaTrackVideoSupplier.cpp
+			ProxyAudioSupplier.cpp
+			ProxyVideoSupplier.cpp
+			TrackSupplier.cpp
+			SubTitles.cpp
+			SubTitlesSRT.cpp
+			VideoTrackSupplier.cpp
+
+			# support
+			AbstractLOAdapter.cpp
+			ColorSpaceToString.cpp
+			Command.cpp
+			CommandStack.cpp
+			DurationToString.cpp
+			Event.cpp
+			EventQueue.cpp
+			FileReadWrite.cpp
+			Listener.cpp
+			ListenerAdapter.cpp
+			MessageEvent.cpp
+			Notifier.cpp
+			SettingsMessage.cpp
+			StackBlurFilter.cpp
+
+			# .
+			Controller.cpp
+			ControllerObserver.cpp
+			ControllerView.cpp
+			InfoWin.cpp
+			MainApp.cpp
+			MainWin.cpp
+			NetworkStreamWin.cpp
+			VideoView.cpp
+
+			: be game media tracker translation textencoding [ TargetLibstdc++ ]
+			  localestub shared bnetapi
+			: MediaPlayer.rdef
+		;
+	}
 }
-
-Application MediaPlayer :
-	# interface
-	DurationView.cpp
-	PeakView.cpp
-	PlayPauseButton.cpp
-	PositionToolTip.cpp
-	SeekSlider.cpp
-	SubtitleBitmap.cpp
-	SymbolButton.cpp
-	TransportControlGroup.cpp
-	VolumeSlider.cpp
-
-	# media_node_framework
-	NodeManager.cpp
-	PlaybackListener.cpp
-	PlaybackLOAdapter.cpp
-	PlaybackManager.cpp
-
-	# media_node_framework/audio
-	AudioAdapter.cpp
-	AudioChannelConverter.cpp
-	AudioFormatConverter.cpp
-	AudioProducer.cpp
-	AudioReader.cpp
-	AudioResampler.cpp
-	AudioSupplier.cpp
-	AudioVolumeConverter.cpp
-
-	# media_node_framework/video
-	VideoConsumer.cpp
-	VideoProducer.cpp
-	VideoSupplier.cpp
-	VideoTarget.cpp
-
-	# playlist
-	CopyPLItemsCommand.cpp
-	FilePlaylistItem.cpp
-	ImportPLItemsCommand.cpp
-	ListViews.cpp
-	MovePLItemsCommand.cpp
-	Playlist.cpp
-	PlaylistItem.cpp
-	PlaylistListView.cpp
-	PlaylistObserver.cpp
-	PlaylistWindow.cpp
-	PLItemsCommand.cpp
-	RandomizePLItemsCommand.cpp
-	RemovePLItemsCommand.cpp
-	UrlPlaylistItem.cpp
-
-	# settings
-	Settings.cpp
-	SettingsWindow.cpp
-
-	# supplier
-	AudioTrackSupplier.cpp
-	ImageTrackVideoSupplier.cpp
-	MediaFileTrackSupplier.cpp
-	MediaTrackAudioSupplier.cpp
-	MediaTrackVideoSupplier.cpp
-	ProxyAudioSupplier.cpp
-	ProxyVideoSupplier.cpp
-	TrackSupplier.cpp
-	SubTitles.cpp
-	SubTitlesSRT.cpp
-	VideoTrackSupplier.cpp
-
-	# support
-	AbstractLOAdapter.cpp
-	ColorSpaceToString.cpp
-	Command.cpp
-	CommandStack.cpp
-	DurationToString.cpp
-	Event.cpp
-	EventQueue.cpp
-	FileReadWrite.cpp
-	Listener.cpp
-	ListenerAdapter.cpp
-	MessageEvent.cpp
-	Notifier.cpp
-	SettingsMessage.cpp
-	StackBlurFilter.cpp
-
-	# .
-	Controller.cpp
-	ControllerObserver.cpp
-	ControllerView.cpp
-	InfoWin.cpp
-	MainApp.cpp
-	MainWin.cpp
-	NetworkStreamWin.cpp
-	VideoView.cpp
-
-	: be game media tracker translation textencoding [ TargetLibstdc++ ]
-		localestub shared bnetapi
-	: MediaPlayer.rdef
-;
 
 DoCatalogs MediaPlayer :
 	x-vnd.Haiku-MediaPlayer
