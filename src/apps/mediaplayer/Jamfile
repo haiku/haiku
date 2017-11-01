@@ -121,23 +121,23 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			  localestub shared bnetapi
 			: MediaPlayer.rdef
 		;
+
+		DoCatalogs MediaPlayer :
+			x-vnd.Haiku-MediaPlayer
+			:
+			CopyPLItemsCommand.cpp
+			ImportPLItemsCommand.cpp
+			InfoWin.cpp
+			MainApp.cpp
+			MainWin.cpp
+			MovePLItemsCommand.cpp
+			NetworkStreamWin.cpp
+			PeakView.cpp
+			PlaylistItem.cpp
+			PlaylistWindow.cpp
+			RandomizePLItemsCommand.cpp
+			RemovePLItemsCommand.cpp
+			SettingsWindow.cpp
+		;
 	}
 }
-
-DoCatalogs MediaPlayer :
-	x-vnd.Haiku-MediaPlayer
-	:
-	CopyPLItemsCommand.cpp
-	ImportPLItemsCommand.cpp
-	InfoWin.cpp
-	MainApp.cpp
-	MainWin.cpp
-	MovePLItemsCommand.cpp
-	NetworkStreamWin.cpp
-	PeakView.cpp
-	PlaylistItem.cpp
-	PlaylistWindow.cpp
-	RandomizePLItemsCommand.cpp
-	RemovePLItemsCommand.cpp
-	SettingsWindow.cpp
-;
