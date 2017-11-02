@@ -60,6 +60,33 @@ static const uint32 kMsgToggleSwitchOnWheel = 'tgWh';
 
 extern "C" _EXPORT BView* instantiate_deskbar_item();
 
+
+static status_t
+OpenSettingsFile(BFile& file, int mode)
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		status = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	status = path.Append(kSettingsFile);
+	if (status != B_OK)
+		return status;
+
+	status = file.SetTo(path.Path(), mode);
+	if (mode == B_READ_ONLY && status == B_ENTRY_NOT_FOUND) {
+		if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path) == B_OK
+			&& path.Append(kSettingsFile) == B_OK) {
+			status = file.SetTo(path.Path(), mode);
+		}
+	}
+
+	return status;
+}
+
+
 class WorkspacesSettings {
 	public:
 		WorkspacesSettings();
@@ -72,7 +99,6 @@ class WorkspacesSettings {
 		bool AlwaysOnTop() const { return fAlwaysOnTop; }
 		bool HasTitle() const { return fHasTitle; }
 		bool HasBorder() const { return fHasBorder; }
-		bool SwitchOnWheel() const { return fSwitchOnWheel; }
 		bool SettingsLoaded() const { return fLoaded; }
 
 		void UpdateFramesForScreen(BRect screenFrame);
@@ -83,18 +109,14 @@ class WorkspacesSettings {
 		void SetAlwaysOnTop(bool enable) { fAlwaysOnTop = enable; }
 		void SetHasTitle(bool enable) { fHasTitle = enable; }
 		void SetHasBorder(bool enable) { fHasBorder = enable; }
-		void SetSwitchOnWheel(bool enable) { fSwitchOnWheel = enable; }
 
 	private:
-		status_t _Open(BFile& file, int mode);
-
 		BRect	fWindowFrame;
 		BRect	fScreenFrame;
 		bool	fAutoRaising;
 		bool	fAlwaysOnTop;
 		bool	fHasTitle;
 		bool	fHasBorder;
-		bool	fSwitchOnWheel;
 		bool	fLoaded;
 };
 
@@ -116,6 +138,9 @@ class WorkspacesView : public BView {
 			const BMessage* dragMessage);
 		virtual void MouseDown(BPoint where);
 
+		bool SwitchOnWheel() const { return fSwitchOnWheel; }
+		void SetSwitchOnWheel(bool enable);
+
 	private:
 		void _AboutRequested();
 
@@ -123,8 +148,12 @@ class WorkspacesView : public BView {
 		void _ExcludeFromParentClipping();
 		void _CleanupParentClipping();
 
+		void _LoadSettings();
+		void _SaveSettings();
+
 		BView*	fParentWhichDrawsOnChildren;
 		BRect	fCurrentFrame;
+		bool	fSwitchOnWheel;
 };
 
 class WorkspacesWindow : public BWindow {
@@ -142,8 +171,6 @@ class WorkspacesWindow : public BWindow {
 
 		void SetAutoRaise(bool enable);
 		bool IsAutoRaising() const { return fSettings->AutoRaising(); }
-		void SetSwitchOnWheel(bool enable);
-		bool SwitchOnWheel() const { return fSwitchOnWheel; }
 
 		float GetTabHeight() { return fSettings->HasTitle() ? fTabHeight : 0; }
 		float GetBorderWidth() { return fBorderWidth; }
@@ -151,7 +178,7 @@ class WorkspacesWindow : public BWindow {
 
 	private:
 		WorkspacesSettings *fSettings;
-		bool	fSwitchOnWheel;
+		WorkspacesView *fWorkspacesView;
 		float	fTabHeight;
 		float	fBorderWidth;
 };
@@ -172,13 +199,15 @@ class WorkspacesApp : public BApplication {
 };
 
 
+//	#pragma mark - WorkspacesSettings
+
+
 WorkspacesSettings::WorkspacesSettings()
 	:
 	fAutoRaising(false),
 	fAlwaysOnTop(false),
 	fHasTitle(true),
 	fHasBorder(true),
-	fSwitchOnWheel(false),
 	fLoaded(false)
 {
 	UpdateScreenFrame();
@@ -186,22 +215,17 @@ WorkspacesSettings::WorkspacesSettings()
 	BScreen screen;
 
 	BFile file;
-	if (_Open(file, B_READ_ONLY) == B_OK) {
+	if (OpenSettingsFile(file, B_READ_ONLY) == B_OK) {
 		BMessage settings;
 		if (settings.Unflatten(&file) == B_OK) {
-			if (settings.FindRect("window", &fWindowFrame) == B_OK
-				&& settings.FindRect("screen", &fScreenFrame) == B_OK)
-				fLoaded = true;
-
+			fLoaded = settings.FindRect("window", &fWindowFrame) == B_OK
+				&& settings.FindRect("screen", &fScreenFrame) == B_OK;
 			settings.FindBool("auto-raise", &fAutoRaising);
 			settings.FindBool("always on top", &fAlwaysOnTop);
-
 			if (settings.FindBool("has title", &fHasTitle) != B_OK)
 				fHasTitle = true;
 			if (settings.FindBool("has border", &fHasBorder) != B_OK)
 				fHasBorder = true;
-			if (settings.FindBool("switch on wheel", &fSwitchOnWheel) != B_OK)
-				fSwitchOnWheel = false;
 		}
 	} else {
 		// try reading BeOS compatible settings
@@ -235,45 +259,30 @@ WorkspacesSettings::WorkspacesSettings()
 
 WorkspacesSettings::~WorkspacesSettings()
 {
-	// write settings file
 	BFile file;
-	if (_Open(file, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) != B_OK)
+
+	// read switch on wheel setting from file
+	bool switchOnWheel = false;
+	if (OpenSettingsFile(file, B_READ_ONLY) == B_OK) {
+		BMessage settings;
+		if (settings.Unflatten(&file) == B_OK)
+			settings.FindBool("switch on wheel", &switchOnWheel);
+	}
+
+	// write settings file
+	if (OpenSettingsFile(file, B_WRITE_ONLY | B_CREATE_FILE) != B_OK)
 		return;
 
 	BMessage settings('wksp');
-
 	if (settings.AddRect("window", fWindowFrame) == B_OK
 		&& settings.AddRect("screen", fScreenFrame) == B_OK
 		&& settings.AddBool("auto-raise", fAutoRaising) == B_OK
 		&& settings.AddBool("always on top", fAlwaysOnTop) == B_OK
 		&& settings.AddBool("has title", fHasTitle) == B_OK
 		&& settings.AddBool("has border", fHasBorder) == B_OK
-		&& settings.AddBool("switch on wheel", fSwitchOnWheel) == B_OK)
+		&& settings.AddBool("switch on wheel", switchOnWheel) == B_OK) {
 		settings.Flatten(&file);
-}
-
-
-status_t
-WorkspacesSettings::_Open(BFile& file, int mode)
-{
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status != B_OK)
-		status = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path);
-	if (status != B_OK)
-		return status;
-
-	path.Append(kSettingsFile);
-
-	status = file.SetTo(path.Path(), mode);
-	if (mode == B_READ_ONLY && status == B_ENTRY_NOT_FOUND) {
-		if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path) == B_OK) {
-			path.Append(kSettingsFile);
-			status = file.SetTo(path.Path(), mode);
-		}
 	}
-
-	return status;
 }
 
 
@@ -315,16 +324,19 @@ WorkspacesSettings::SetWindowFrame(BRect frame)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - WorkspacesView
 
 
-WorkspacesView::WorkspacesView(BRect frame, bool showDragger=true)
+WorkspacesView::WorkspacesView(BRect frame, bool showDragger = true)
 	:
 	BView(frame, kDeskbarItemName, B_FOLLOW_ALL,
 		kWorkspacesViewFlag | B_FRAME_EVENTS),
 	fParentWhichDrawsOnChildren(NULL),
-	fCurrentFrame(frame)
+	fCurrentFrame(frame),
+	fSwitchOnWheel(false)
 {
+	_LoadSettings();
+
 	if (showDragger) {
 		frame.OffsetTo(B_ORIGIN);
 		frame.top = frame.bottom - 7;
@@ -340,8 +352,11 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 	:
 	BView(archive),
 	fParentWhichDrawsOnChildren(NULL),
-	fCurrentFrame(Frame())
+	fCurrentFrame(Frame()),
+	fSwitchOnWheel(false)
 {
+	_LoadSettings();
+
 	// Just in case we are instantiated from an older archive...
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	// Make sure the auto-raise feature didn't leave any artifacts - this is
@@ -353,6 +368,7 @@ WorkspacesView::WorkspacesView(BMessage* archive)
 
 WorkspacesView::~WorkspacesView()
 {
+	_SaveSettings();
 }
 
 
@@ -480,6 +496,32 @@ WorkspacesView::_CleanupParentClipping()
 
 
 void
+WorkspacesView::_LoadSettings()
+{
+	BFile file;
+	if (OpenSettingsFile(file, B_READ_ONLY) == B_OK) {
+		BMessage settings;
+		if (settings.Unflatten(&file) == B_OK)
+			settings.FindBool("switch on wheel", &fSwitchOnWheel);
+	}
+}
+
+
+void
+WorkspacesView::_SaveSettings()
+{
+	BFile file;
+	if (OpenSettingsFile(file, B_READ_WRITE | B_CREATE_FILE) != B_OK)
+		return;
+
+	BMessage settings('wksp');
+	settings.Unflatten(&file);
+	if (settings.AddBool("switch on wheel", fSwitchOnWheel) == B_OK)
+		settings.Flatten(&file);
+}
+
+
+void
 WorkspacesView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -489,9 +531,7 @@ WorkspacesView::MessageReceived(BMessage* message)
 
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			WorkspacesWindow* window
-				= dynamic_cast<WorkspacesWindow*>(Window());
-			if (window == NULL || !window->SwitchOnWheel())
+			if (!fSwitchOnWheel)
 				break;
 
 			float deltaY = message->FindFloat("be:wheel_delta_y");
@@ -512,7 +552,13 @@ WorkspacesView::MessageReceived(BMessage* message)
 			// since HasItem() locks up we just remove directly.
 			BDeskbar deskbar;
 			// we shouldn't do this here actually, but it works for now...
-			deskbar.RemoveItem (kDeskbarItemName);
+			deskbar.RemoveItem(kDeskbarItemName);
+			break;
+		}
+
+		case kMsgToggleSwitchOnWheel:
+		{
+			fSwitchOnWheel = !fSwitchOnWheel;
 			break;
 		}
 
@@ -578,15 +624,15 @@ WorkspacesView::MouseDown(BPoint where)
 		B_UTF8_ELLIPSIS), new BMessage(kMsgChangeCount));
 	menu->AddItem(changeItem);
 
-	WorkspacesWindow* window = dynamic_cast<WorkspacesWindow*>(Window());
+	BMenuItem* switchItem = new BMenuItem(B_TRANSLATE("Switch on mouse wheel"),
+		new BMessage(kMsgToggleSwitchOnWheel));
+	menu->AddItem(switchItem);
+	switchItem->SetMarked(fSwitchOnWheel);
+
+	WorkspacesWindow *window = dynamic_cast<WorkspacesWindow*>(Window());
 	if (window != NULL) {
 		// inside Workspaces app
 		BMenuItem* item;
-
-		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Switch on mouse wheel"),
-			new BMessage(kMsgToggleSwitchOnWheel)));
-		item->SetMarked(window->SwitchOnWheel());
 
 		menu->AddSeparatorItem();
 		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window tab"),
@@ -596,8 +642,9 @@ WorkspacesView::MouseDown(BPoint where)
 		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window border"),
 			new BMessage(kMsgToggleBorder)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK
-			|| window->Look() == B_MODAL_WINDOW_LOOK)
+			|| window->Look() == B_MODAL_WINDOW_LOOK) {
 			item->SetMarked(true);
+		}
 
 		menu->AddSeparatorItem();
 		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Always on top"),
@@ -642,12 +689,24 @@ WorkspacesView::MouseDown(BPoint where)
 	}
 
 	changeItem->SetTarget(this);
+	switchItem->SetTarget(this);
+
 	ConvertToScreen(&where);
 	menu->Go(where, true, true, true);
 }
 
 
-//	#pragma mark -
+void
+WorkspacesView::SetSwitchOnWheel(bool enable)
+{
+	if (enable == fSwitchOnWheel)
+		return;
+
+	fSwitchOnWheel = enable;
+}
+
+
+//	#pragma mark - WorkspacesWindow
 
 
 WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
@@ -657,7 +716,7 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 		B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK | B_CLOSE_ON_ESCAPE,
 		B_ALL_WORKSPACES),
 	fSettings(settings),
-	fSwitchOnWheel(false)
+	fWorkspacesView(NULL)
 {
 	// Turn window decor on to grab decor widths.
 	BMessage windowSettings;
@@ -720,14 +779,13 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 	else if (!fSettings->HasTitle())
 		SetLook(B_MODAL_WINDOW_LOOK);
 
-	AddChild(new WorkspacesView(Bounds()));
+	fWorkspacesView = new WorkspacesView(Bounds());
+	AddChild(fWorkspacesView);
 
 	if (fSettings->AlwaysOnTop())
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	else
 		SetAutoRaise(fSettings->AutoRaising());
-
-	SetSwitchOnWheel(fSettings->SwitchOnWheel());
 }
 
 
@@ -894,8 +952,8 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 		case kMsgToggleLiveInDeskbar:
 		{
 			BDeskbar deskbar;
-			if (deskbar.HasItem (kDeskbarItemName))
-				deskbar.RemoveItem (kDeskbarItemName);
+			if (deskbar.HasItem(kDeskbarItemName))
+				deskbar.RemoveItem(kDeskbarItemName);
 			else {
 				entry_ref ref;
 				be_roster->FindApp(kSignature, &ref);
@@ -903,10 +961,6 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			}
 			break;
 		}
-
-		case kMsgToggleSwitchOnWheel:
-			SetSwitchOnWheel(!SwitchOnWheel());
-			break;
 
 		default:
 			BWindow::MessageReceived(message);
@@ -935,18 +989,7 @@ WorkspacesWindow::SetAutoRaise(bool enable)
 }
 
 
-void
-WorkspacesWindow::SetSwitchOnWheel(bool enable)
-{
-	if (enable == fSwitchOnWheel)
-		return;
-
-	fSwitchOnWheel = enable;
-	fSettings->SetSwitchOnWheel(enable);
-}
-
-
-//	#pragma mark -
+//	#pragma mark - WorkspacesApp
 
 
 WorkspacesApp::WorkspacesApp()
