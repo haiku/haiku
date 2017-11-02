@@ -137,18 +137,16 @@ WebPTranslator::DerivedIdentify(BPositionIO* stream,
 	if (outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 
-	// Check RIFF and 'WEBPVP8 ' signatures...
-	uint32 buf[4];
-	ssize_t size = 16;
+	// Read header and first chunck bytes...
+	uint32 buf[64];
+	ssize_t size = sizeof(buf);
 	if (stream->Read(buf, size) != size)
 		return B_IO_ERROR;
-
-	const uint32 kRIFFMagic = B_HOST_TO_BENDIAN_INT32('RIFF');
-	const uint32 kWEBPMagic = B_HOST_TO_BENDIAN_INT32('WEBP');
-	const uint32 kVP8Magic  = B_HOST_TO_BENDIAN_INT32('VP8 ');
-	if (buf[0] != kRIFFMagic || buf[2] != kWEBPMagic || buf[3] != kVP8Magic)
+		
+	// Check it's a valid WebP format
+	if (!WebPGetInfo((const uint8_t*)buf, size, NULL, NULL))
 		return B_ILLEGAL_DATA;
-
+		
 	info->type = WEBP_IMAGE_FORMAT;
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = WEBP_IN_QUALITY;

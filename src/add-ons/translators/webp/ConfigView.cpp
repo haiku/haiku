@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2010-2017, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -74,11 +74,20 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 
 	BString copyrightsText;
 	BStringView *copyrightView = new BStringView("Copyright",
-		B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2011 Haiku Inc."));
+		B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2017 Haiku Inc."));
+
+	BString libwebpInfo = B_TRANSLATE(
+		"Based on libwebp %version%");
+	int v = WebPGetEncoderVersion();
+	char libwebpVersion[32];
+	snprintf(libwebpVersion, sizeof(libwebpVersion),
+		"%d.%d.%d", v >> 16, (v>>8)&255, v&255);
+	libwebpInfo.ReplaceAll("%version%", libwebpVersion);
+	
 	BStringView *copyright2View = new BStringView("Copyright2",
-		B_TRANSLATE("Based on libwebp v0.1,"));
+		libwebpInfo.String());
 	BStringView *copyright3View = new BStringView("Copyright3",
-		B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2011 Google Inc."));
+		B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2017 Google Inc."));
 
 	// output parameters
 

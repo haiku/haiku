@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku. All rights reserved.
+ * Copyright 2010-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,7 +21,7 @@
 
 #include "BaseTranslator.h"
 
-#define WEBP_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0,2,0)
+#define WEBP_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0,6,0)
 #define WEBP_IMAGE_FORMAT	'WebP'
 
 #define WEBP_SETTING_QUALITY		"quality"
