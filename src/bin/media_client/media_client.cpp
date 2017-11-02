@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
 			ret = media_play(argv[2]);
 	} else if (strcmp(argv[1], "test") == 0)
 		media_test();
+	else
+		print_usage();
 
 	return ret;
 }
