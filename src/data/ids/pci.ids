@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.10.18
-#	Date:    2017-10-18 03:15:02
+#	Version: 2017.10.21
+#	Date:    2017-10-21 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1598,6 +1598,7 @@
 		103c 8006  FirePro M4170
 		17aa 3643  Radeon R7 A360
 	6605  Opal PRO [Radeon R7 M260]
+		103c 2259  FirePro M4150
 	6606  Mars XTX [Radeon HD 8790M]
 		1028 0684  FirePro W4170M
 	6607  Mars LE [Radeon HD 8530M / R5 M240]
@@ -4040,10 +4041,13 @@
 	1438  Liverpool Processor Root Port
 	1439  Family 16h Processor Functions 5:1
 	1450  Family 17h (Models 00h-0fh) Root Complex
+	1451  Family 17h (Models 00h-0fh) I/O Memory Management Unit
 	1452  Family 17h (Models 00h-0fh) PCIe Dummy Host Bridge
 	1454  Family 17h (Models 00h-0fh) Internal PCIe GPP Bridge 0 to Bus B
+	1456  Family 17h (Models 00h-0fh) Platform Security Processor
+	1457  Family 17h (Models 00h-0fh) HD Audio Controller
 	145b  Zeppelin Non-Transparent Bridge
-	145c  USB3 Host Controller
+	145c  Family 17h (Models 00h-0fh) USB 3.0 Host Controller
 	145f  USB 3.0 Host controller
 	1460  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 0
 	1461  Family 17h (Models 00h-0fh) Data Fabric: Device 18h; Function 1
@@ -4137,7 +4141,9 @@
 	43a1  Hudson PCI to PCI bridge (PCIE port 1)
 	43a2  Hudson PCI to PCI bridge (PCIE port 2)
 	43a3  Hudson PCI to PCI bridge (PCIE port 3)
-	43bb  USB 3.1 XHCI Controller
+	43b4  300 Series Chipset PCIe Port
+	43b7  300 Series Chipset SATA Controller
+	43bb  300 Series Chipset USB 3.1 xHCI Controller
 	7006  AMD-751 [Irongate] System Controller
 	7007  AMD-751 [Irongate] AGP Bridge
 	700a  AMD-IGR4 AGP Host to PCI Bridge
@@ -10826,7 +10832,7 @@
 	13fb  GM204GLM [Quadro M5500]
 	1401  GM206 [GeForce GTX 960]
 	1402  GM206 [GeForce GTX 950]
-	1406  GM206 [GeForce GTX 960]
+	1406  GM206 [GeForce GTX 960 OEM]
 	1407  GM206 [GeForce GTX 750 v2]
 	1427  GM206M [GeForce GTX 965M]
 	1430  GM206GL [Quadro M2000]
@@ -19173,12 +19179,14 @@
 	7016  AP470 48-Channel TTL Level Digital Input/Output Module
 	7017  AP323 16-bit, 20 or 40 Channel Analog Input Module
 	7018  AP408: 32-Channel Digital I/O Module
+	7019  AP341 14-bit, 16-Channel Simultaneous Conversion Analog Input Module
 	701a  AP220-16 12-Bit, 16-Channel Analog Output Module
 	701b  AP231-16 16-Bit, 16-Channel Analog Output Module
 	7021  APA7-201 Reconfigurable Artix-7 FPGA module 48 TTL channels
 	7022  APA7-202 Reconfigurable Artix-7 FPGA module 24 RS485 channels
 	7023  APA7-203 Reconfigurable Artix-7 FPGA module 24 TTL & 12 RS485 channels
 	7024  APA7-204 Reconfigurable Artix-7 FPGA module 24 LVDS channels
+	7027  AP418 16-Channel High Voltage Digital Input/Output Module
 	7042  AP482 Counter Timer Module with TTL Level Input/Output
 	7043  AP483 Counter Timer Module with TTL Level and RS422 Input/Output
 	7044  AP484 Counter Timer Module with RS422 Input/Output
