@@ -139,6 +139,13 @@ x86_unexpected_exception(iframe* frame)
 			signalAddress = frame->ip;
 			break;
 
+		case 12: 	// Stack Fault (#SS)
+			type = B_STACK_FAULT;
+			signalNumber = SIGBUS;
+			signalCode = BUS_ADRERR;
+			signalAddress = frame->ip;
+			break;
+
 		case 13: 	// General Protection Exception (#GP)
 			type = B_GENERAL_PROTECTION_FAULT;
 			signalNumber = SIGILL;

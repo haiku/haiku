@@ -329,6 +329,15 @@ x86_64_general_protection_fault(iframe* frame)
 }
 
 
+static void
+x86_64_stack_fault_exception(iframe* frame)
+{
+	// Non-canonical address accesses which reference the stack cause a stack
+	// fault exception instead of GPF. However, we can treat it like a GPF.
+	x86_64_general_protection_fault(frame);
+}
+
+
 // #pragma mark -
 
 
@@ -381,7 +390,7 @@ x86_descriptors_init(kernel_args* args)
 	table[9]  = x86_fatal_exception;		// Coprocessor Segment Overrun
 	table[10] = x86_fatal_exception;		// Invalid TSS Exception (#TS)
 	table[11] = x86_fatal_exception;		// Segment Not Present (#NP)
-	table[12] = x86_fatal_exception;		// Stack Fault Exception (#SS)
+	table[12] = x86_64_stack_fault_exception;    // Stack Fault Exception (#SS)
 	table[13] = x86_64_general_protection_fault; // General Protection Exception (#GP)
 	table[14] = x86_page_fault_exception;	// Page-Fault Exception (#PF)
 	table[16] = x86_unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
