@@ -1337,6 +1337,7 @@ RemotePackageRepository HaikuPorts
 	pciutils-3.5.5-1
 	pciutils_devel-3.5.5-1
 	pdflib-5.0.3-3
+	pdftranslator-1.0.2-2
 	pdfwriter-1.0-3
 	pe-2.4.5-6
 	perl-5.26.1-1
@@ -2423,6 +2424,7 @@ RemotePackageRepository HaikuPorts
 	pathtools
 	pciutils
 	pdflib
+	pdftranslator
 	pdfwriter
 	pe
 	perl
