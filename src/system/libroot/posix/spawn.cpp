@@ -387,6 +387,7 @@ process_file_actions(const posix_spawn_file_actions_t *_actions, int *errfd)
 			if (newfd == -1)
 				return errno;
 			close(action->fd);
+			fcntl(newfd, F_SETFD, FD_CLOEXEC);
 			*errfd = newfd;
 		}
 
@@ -443,6 +444,7 @@ do_posix_spawn(pid_t *_pid, const char *path,
 		read(fds[0], &err, sizeof(err));
 		if (err != 0)
 			waitpid(pid, NULL, WNOHANG);
+		close(fds[0]);
 		return err;
 	}
 
