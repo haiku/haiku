@@ -685,8 +685,8 @@ RemotePackageRepository HaikuPorts
 	gyp-20160504~git-5
 	gzip-1.8-2
 	haikutwitter-1.0_git-3
-	haikuwebkit-1.6.2-1
-	haikuwebkit_devel-1.6.2-1
+	haikuwebkit-1.6.2-3
+	haikuwebkit_devel-1.6.2-3
 	hamlib-3.1-1
 	hamlib_devel-3.1-1
 	handbrake-1.0.7-1
