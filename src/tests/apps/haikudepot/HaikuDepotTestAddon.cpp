@@ -7,7 +7,7 @@
 #include <TestSuiteAddon.h>
 
 #include "StandardMetaDataJsonEventListenerTest.h"
-
+#include "DumpExportRepositoryJsonListenerTest.h"
 
 BTestSuite*
 getTestSuite()
@@ -15,6 +15,7 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("HaikuDepot");
 
 	StandardMetaDataJsonEventListenerTest::AddTests(*suite);
+	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
 
 	return suite;
 }

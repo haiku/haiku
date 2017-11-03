@@ -6,6 +6,7 @@
  */
 
 #include "Model.h"
+#include "RepositoryDataUpdateProcess.h"
 #include "StorageUtils.h"
 
 #include <ctime>
@@ -834,59 +835,47 @@ Model::SetAuthorization(const BString& username, const BString& password,
 
 // #pragma mark - private
 
+/*! When bulk repository data comes down from the server, it will
+    arrive as a json.gz payload.  This is stored locally as a cache
+    and this method will provide the on-disk storage location for
+    this file.
+*/
 
-void
-Model::PopulateWebAppRepositoryCode(DepotInfo& depotInfo)
+status_t
+Model::_DumpExportRepositoryDataPath(BPath& path) const
 {
-	if (depotInfo.BaseURL().Length() > 0) {
+	BPath repoDataPath;
 
-		BMessage repositoriesEnvelope;
-		BMessage result;
-		double total;
-		StringList repositorySourceBaseURLs;
-
-		repositorySourceBaseURLs.Add(depotInfo.BaseURL());
-
-		// TODO; better API call handling around errors.
-
-		if (fWebAppInterface.RetrieveRepositoriesForSourceBaseURLs(
-			repositorySourceBaseURLs, repositoriesEnvelope) == B_OK
-			&& repositoriesEnvelope.FindMessage("result", &result) == B_OK
-			&& result.FindDouble("total", &total) == B_OK) {
-
-			if ((int64)total > 0) {
-				BMessage repositories;
-				BMessage repository;
-				BString repositoryCode;
-
-				if (result.FindMessage("items", &repositories) == B_OK
-					&& repositories.FindMessage("0", &repository) == B_OK
-					&& repository.FindString("code", &repositoryCode) == B_OK) {
-
-					depotInfo.SetWebAppRepositoryCode(repositoryCode);
-
-					printf("did assign web app repository code '%s' to local "
-						"depot '%s'\n",
-						depotInfo.WebAppRepositoryCode().String(),
-						depotInfo.Name().String());
-				} else {
-					printf("unable to find the 'code' in the api response for "
-						"local depot '%s'\n",
-						depotInfo.Name().String());
-				}
-			} else {
-				printf("unable to find a repository code for '%s'\n",
-					depotInfo.BaseURL().String());
-			}
-		} else {
-			printf("unexpected result obtaining repository code for '%s'\n",
-				depotInfo.BaseURL().String());
-		}
-	} else {
-		printf("missing base url for depot info %s --> will not obtain web app "
-			"repository code\n",
-			depotInfo.Name().String());
+	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
+		&& repoDataPath.Append("HaikuDepot") == B_OK
+		&& create_directory(repoDataPath.Path(), 0777) == B_OK
+		&& repoDataPath.Append("repository-all_en.json.gz") == B_OK) {
+		path.SetTo(repoDataPath.Path());
+		return B_OK;
 	}
+
+	path.Unset();
+	fprintf(stdout, "unable to find the user cache file for repositories'"
+		" data");
+	return B_ERROR;
+}
+
+
+status_t
+Model::PopulateWebAppRepositoryCodes()
+{
+	status_t result = B_OK;
+	BPath dataPath;
+
+	result = _DumpExportRepositoryDataPath(dataPath);
+
+	if (result != B_OK)
+		return result;
+
+	RepositoryDataUpdateProcess process(dataPath, &fDepots);
+	result = process.Run();
+
+	return result;
 }
 
 

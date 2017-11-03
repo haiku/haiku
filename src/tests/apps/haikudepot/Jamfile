@@ -3,12 +3,19 @@ SubDir HAIKU_TOP src tests apps haikudepot ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;
 
 UsePrivateHeaders shared ;
 
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
+
+	DumpExportRepositorySource.cpp
+	DumpExportRepository.cpp
+	DumpExportRepositoryJsonListener.cpp
+	DumpExportRepositoryJsonListenerTest.cpp
 
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp
@@ -19,3 +26,6 @@ UnitTestLib haikudepottest.so :
 
 SEARCH on [ FGristFiles StandardMetaData.cpp StandardMetaDataJsonEventListener.cpp ]
 	= [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
+
+SEARCH on [ FGristFiles DumpExportRepositorySource.cpp DumpExportRepository.cpp DumpExportRepositoryJsonListener.cpp ]
+	= [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;

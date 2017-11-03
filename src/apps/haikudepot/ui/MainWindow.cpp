@@ -851,12 +851,6 @@ MainWindow::_RefreshPackageList(bool force)
 
 		if (getRepositoryConfigStatus == B_OK) {
 			depotInfo.SetBaseURL(repoConfig.BaseURL());
-
-			// it would be nice if this could be more logically located such as
-			// when the repository is added to the model, but that is probably
-			// a bigger change.
-
-			fModel.PopulateWebAppRepositoryCode(depotInfo);
 		} else {
 			printf("unable to obtain the repository config for local "
 				"repository '%s'; %s\n",
@@ -999,6 +993,8 @@ MainWindow::_RefreshPackageList(bool force)
 		else
 			fModel.AddDepot(it->second);
 	}
+
+	fModel.PopulateWebAppRepositoryCodes();
 
 	// start retrieving package icons and average ratings
 	if (force || wasEmpty)

@@ -118,8 +118,7 @@ public:
 			bool				ShowDevelopPackages() const
 									{ return fShowDevelopPackages; }
 
-			void				PopulateWebAppRepositoryCode(
-									DepotInfo& depotInfo);
+			status_t			PopulateWebAppRepositoryCodes();
 
 			// Retrieve package information
 	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;
@@ -152,6 +151,8 @@ public:
 
 
 private:
+			status_t			_DumpExportRepositoryDataPath(
+									BPath& path) const;
 			void				_UpdateIsFeaturedFilter();
 
 	static	int32				_PopulateAllPackagesEntry(void* cookie);

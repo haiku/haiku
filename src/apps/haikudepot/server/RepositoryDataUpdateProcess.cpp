@@ -177,7 +177,7 @@ RepositoryDataUpdateProcess::Run()
 
 		// TODO: add language ISO code to the path; just 'en' for now.
 	status_t result = DownloadToLocalFile(fLocalFilePath,
-		ServerSettings::CreateFullUrl("/__repository/all_en.json.gz"),
+		ServerSettings::CreateFullUrl("/__repository/all-en.json.gz"),
 		0, 0);
 
 	if (result == B_OK) {
