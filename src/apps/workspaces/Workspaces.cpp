@@ -148,6 +148,8 @@ class WorkspacesView : public BView {
 		void _ExcludeFromParentClipping();
 		void _CleanupParentClipping();
 
+		friend class WorkspacesWindow;
+
 		void _LoadSettings();
 		void _SaveSettings();
 
@@ -260,18 +262,12 @@ WorkspacesSettings::WorkspacesSettings()
 WorkspacesSettings::~WorkspacesSettings()
 {
 	BFile file;
-
-	// read switch on wheel setting from file
-	bool switchOnWheel = false;
-	if (OpenSettingsFile(file, B_READ_ONLY) == B_OK) {
-		BMessage settings;
-		if (settings.Unflatten(&file) == B_OK)
-			settings.FindBool("switch on wheel", &switchOnWheel);
+	if (OpenSettingsFile(file, B_WRITE_ONLY | B_ERASE_FILE | B_CREATE_FILE)
+			!= B_OK) {
+		return;
 	}
 
-	// write settings file
-	if (OpenSettingsFile(file, B_WRITE_ONLY | B_CREATE_FILE) != B_OK)
-		return;
+	// switch on wheel saved by view later on
 
 	BMessage settings('wksp');
 	if (settings.AddRect("window", fWindowFrame) == B_OK
@@ -279,8 +275,7 @@ WorkspacesSettings::~WorkspacesSettings()
 		&& settings.AddBool("auto-raise", fAutoRaising) == B_OK
 		&& settings.AddBool("always on top", fAlwaysOnTop) == B_OK
 		&& settings.AddBool("has title", fHasTitle) == B_OK
-		&& settings.AddBool("has border", fHasBorder) == B_OK
-		&& settings.AddBool("switch on wheel", switchOnWheel) == B_OK) {
+		&& settings.AddBool("has border", fHasBorder) == B_OK) {
 		settings.Flatten(&file);
 	}
 }
@@ -511,13 +506,19 @@ void
 WorkspacesView::_SaveSettings()
 {
 	BFile file;
-	if (OpenSettingsFile(file, B_READ_WRITE | B_CREATE_FILE) != B_OK)
+	if (OpenSettingsFile(file, B_READ_ONLY | B_CREATE_FILE) != B_OK)
 		return;
 
 	BMessage settings('wksp');
 	settings.Unflatten(&file);
-	if (settings.AddBool("switch on wheel", fSwitchOnWheel) == B_OK)
-		settings.Flatten(&file);
+
+	if (OpenSettingsFile(file, B_WRITE_ONLY | B_ERASE_FILE) != B_OK)
+		return;
+
+	if (settings.ReplaceBool("switch on wheel", fSwitchOnWheel) != B_OK)
+		settings.AddBool("switch on wheel", fSwitchOnWheel);
+
+	settings.Flatten(&file);
 }
 
 
@@ -955,6 +956,8 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			if (deskbar.HasItem(kDeskbarItemName))
 				deskbar.RemoveItem(kDeskbarItemName);
 			else {
+				fWorkspacesView->_SaveSettings();
+					// save "switch on wheel" setting for replicant to load
 				entry_ref ref;
 				be_roster->FindApp(kSignature, &ref);
 				deskbar.AddItem(&ref);
