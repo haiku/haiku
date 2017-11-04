@@ -1,9 +1,11 @@
-1	ukrainian	x-vnd.Haiku-IMAP	354143849
+1	ukrainian	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Призначення:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		Гаразд
 status	IMAPFolderConfig		стан
 Configure IMAP Folders	imap_config		Зконфігурувати теки IMAP
 Cancel	IMAPFolderConfig		Скасувати
+No encryption	imap_config		Без шифрування
 Apply	IMAPFolderConfig		Застосувати
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Отримання тек IMAP, зачекайте…
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Неможливо під'єднатися до сервера \"%server%\":\n%error%
