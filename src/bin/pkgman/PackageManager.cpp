@@ -181,6 +181,7 @@ PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 	fLastBytes = 0;
 	fLastRateCalcTime = system_time();
 	fDownloadRate = 0;
+	printf("  0%%");
 }
 
 
@@ -194,7 +195,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 		return;
 
 	// Erase the line and return to the start
-	printf("\33[2K\r");
+	printf("\r\33[2K\r");
 
 	if (bytes >= fLastBytes && (system_time() - fLastRateCalcTime) >= 1000000) {
 		const bigtime_t time = system_time();
@@ -216,16 +217,22 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 		fDownloadRate == 0 ? "--.-" :
 			string_for_rate(fDownloadRate, rateBuffer, sizeof(rateBuffer)));
 
-	int width = std::max(str.Length(), (int32)80);
+	int32 width = std::max(str.CountChars(), (int32)50);
 	struct winsize winSize;
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
 			&& winSize.ws_col < width) {
-		width = winSize.ws_col;
+		width = winSize.ws_col - 2;
+		str.ReplaceAll("\t  ", "  ");
+		str.ReplaceFirst(".hpkg", "");
+		str.SetToFormat("%.*s\xE2\x80\xA6%s",
+			(int)str.CountBytes(0, width / 2 - 1), str.String(),
+			str.String() + str.CountBytes(0, str.CountChars() - width / 2 - 1));
 	}
+	str.Append(' ', width - str.CountChars());
 
 	// Set bg to green, fg to white, and print progress bar
-	const int progChars = (int)(width * completionPercentage);
-	printf("\x1B[42m\x1B[37m%.*s", progChars, str.String());
+	const int progChars = str.CountBytes(0, (int)(width * completionPercentage));
+	printf("\x1B[42;37m%.*s", progChars, str.String());
 	// Reset colors and print rest of text
 	printf("\x1B[0m%s", str.String() + progChars);
 
@@ -238,12 +245,13 @@ PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
 	if (fInteractive) {
 		// Erase the line, return to the start, and reset colors
-		printf("\33[2K\r\x1B[0m");
+		printf("\r\33[2K\r\x1B[0m");
 	}
 
 	char byteBuffer[32];
 	printf("100%% %s [%s]\n", packageName,
 		string_for_size(fLastBytes, byteBuffer, sizeof(byteBuffer)));
+	fflush(stdout);
 }
 
 
