@@ -13,6 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <signal_defs.h>
 #include <syscalls.h>
 
 
@@ -345,7 +346,7 @@ process_spawnattr(const posix_spawnattr_t *_attr)
 		action.sa_flags = 0;
 		action.sa_userdata = NULL;
 		sigemptyset(&action.sa_mask);
-		for (int i = 1; i <= NSIG; i++) {
+		for (int i = 1; i <= MAX_SIGNAL_NUMBER; i++) {
 			if (sigismember(&attr->sigdefault, i) == 1
 				&& sigaction(i, &action, NULL) != 0) {
 				return errno;
