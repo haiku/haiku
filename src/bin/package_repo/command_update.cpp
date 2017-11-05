@@ -15,6 +15,7 @@
 
 #include <Entry.h>
 #include <ObjectList.h>
+#include <Path.h>
 #include <String.h>
 
 #include <package/hpkg/HPKGDefs.h>
@@ -312,6 +313,9 @@ command_update(int argc, const char* const* argv)
 		return 1;
 	}
 
+	BEntry tempRepositoryFile(tempRepositoryFileName.String());
+	BPath targetRepositoryFilePath(targetRepositoryFileName);
+
 	BObjectList<BString> packageNames(100, true);
 	if ((result = parsePackageListFile(packageListFileName, &packageNames))
 			!= B_OK) {
@@ -378,8 +382,7 @@ command_update(int argc, const char* const* argv)
 	if (result != B_OK)
 		return 1;
 
-	result = BEntry(tempRepositoryFileName.String()).Rename(
-		targetRepositoryFileName, true);
+	result = tempRepositoryFile.Rename(targetRepositoryFilePath.Leaf(), true);
 	if (result != B_OK) {
 		printf("Error: unable to rename repository %s to %s - %s\n",
 			tempRepositoryFileName.String(), targetRepositoryFileName,
