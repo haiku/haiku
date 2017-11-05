@@ -421,10 +421,16 @@ public:
 			const BString&		WebAppRepositoryCode() const
 									{ return fWebAppRepositoryCode; }
 
+			void				SetWebAppRepositorySourceCode(
+									const BString& code);
+			const BString&		WebAppRepositorySourceCode() const
+									{ return fWebAppRepositorySourceCode; }
+
 private:
 			BString				fName;
 			PackageList			fPackages;
 			BString				fWebAppRepositoryCode;
+			BString				fWebAppRepositorySourceCode;
 			BString				fBaseURL;
 };
 

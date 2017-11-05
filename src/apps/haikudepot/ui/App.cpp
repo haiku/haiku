@@ -5,7 +5,6 @@
 
 
 #include "App.h"
-#include "ServerSettings.h"
 
 #include <stdio.h>
 
@@ -22,7 +21,9 @@
 #include "support.h"
 
 #include "FeaturedPackagesView.h"
+#include "Logger.h"
 #include "MainWindow.h"
+#include "ServerSettings.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -123,7 +124,7 @@ enum arg_switch {
 	NOT_SWITCH,
 	HELP_SWITCH,
 	WEB_APP_BASE_URL_SWITCH,
-	URL_CONNECTION_TRACE_LOGGING_SWITCH,
+	VERBOSITY_SWITCH,
 };
 
 
@@ -132,8 +133,12 @@ app_print_help()
 {
 	fprintf(stdout, "HaikuDepot ");
 	fprintf(stdout, "[-u|--webappbaseurl <web-app-base-url>] ");
-	fprintf(stdout, "[-h] ");
-	fprintf(stdout, "[-t|--urlconnectiontracelogging]\n");
+	fprintf(stdout, "[-v|--verbosity [off|info|debug|trace] ");
+	fprintf(stdout, "[-h|--help]\n\n");
+	fprintf(stdout, "'-h' : causes this help text to be printed out.\n");
+	fprintf(stdout, "'-v' : allows for the verbosity level to be set.\n");
+	fprintf(stdout, "'-u' : allows for the haiku depot server to be\n");
+	fprintf(stdout, "   configured.");
 }
 
 
@@ -151,8 +156,8 @@ app_resolve_switch(char *arg)
 			if (0 == strcmp(&arg[2], "help"))
 				return HELP_SWITCH;
 
-			if (0 == strcmp(&arg[2], "urlconnectiontracelogging"))
-				return URL_CONNECTION_TRACE_LOGGING_SWITCH;
+			if (0 == strcmp(&arg[2], "verbosity"))
+				return VERBOSITY_SWITCH;
 		} else {
 			if (arglen == 2) { // short form
 				switch (arg[1]) {
@@ -162,8 +167,8 @@ app_resolve_switch(char *arg)
 					case 'h':
 						return HELP_SWITCH;
 
-					case 't':
-						return URL_CONNECTION_TRACE_LOGGING_SWITCH;
+					case 'v':
+						return VERBOSITY_SWITCH;
 				}
 			}
 		}
@@ -179,10 +184,35 @@ void
 App::ArgvReceived(int32 argc, char* argv[])
 {
 	for (int i = 1; i < argc;) {
+
+			// check to make sure that if there is a value for the switch,
+			// that the value is in fact supplied.
+
+		switch (app_resolve_switch(argv[i])) {
+			case VERBOSITY_SWITCH:
+			case WEB_APP_BASE_URL_SWITCH:
+				if (i == argc-1) {
+					fprintf(stdout, "unexpected end of arguments; missing "
+						"value for switch [%s]\n", argv[i]);
+					Quit();
+					return;
+				}
+				break;
+
+			default:
+				break;
+		}
+
+			// now process each switch.
+
 		switch (app_resolve_switch(argv[i])) {
 
-			case URL_CONNECTION_TRACE_LOGGING_SWITCH:
-				ServerSettings::EnableUrlConnectionTraceLogging();
+			case VERBOSITY_SWITCH:
+				if (!Logger::SetLevelByName(argv[i+1])) {
+					fprintf(stdout, "unknown log level [%s]\n", argv[i + 1]);
+					Quit();
+				}
+				i++; // also move past the log level value
 				break;
 
 			case HELP_SWITCH:
@@ -191,12 +221,6 @@ App::ArgvReceived(int32 argc, char* argv[])
 				break;
 
 			case WEB_APP_BASE_URL_SWITCH:
-				if (i == argc-1) {
-					fprintf(stdout, "unexpected end of arguments; missing "
-						"web-app base url\n");
-					Quit();
-				}
-
 				if (ServerSettings::SetBaseUrl(BUrl(argv[i + 1])) != B_OK) {
 					fprintf(stdout, "malformed web app base url; %s\n",
 						argv[i + 1]);

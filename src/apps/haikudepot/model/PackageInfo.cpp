@@ -1098,3 +1098,10 @@ DepotInfo::SetWebAppRepositoryCode(const BString& code)
 {
 	fWebAppRepositoryCode = code;
 }
+
+
+void
+DepotInfo::SetWebAppRepositorySourceCode(const BString& code)
+{
+	fWebAppRepositorySourceCode = code;
+}

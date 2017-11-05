@@ -24,6 +24,7 @@
 
 #include "AutoLocker.h"
 #include "List.h"
+#include "Logger.h"
 #include "PackageInfo.h"
 #include "ServerSettings.h"
 
@@ -522,8 +523,7 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 
 	bool isSecure = url.Protocol() == "https";
 
-	ProtocolListener listener(
-		ServerSettings::UrlConnectionTraceLoggingEnabled());
+	ProtocolListener listener(Logger::IsTraceEnabled());
 	listener.SetDownloadIO(stream);
 
 	BHttpHeaders headers;
@@ -626,14 +626,13 @@ status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	uint32 flags, BMessage& reply) const
 {
-	if (ServerSettings::UrlConnectionTraceLoggingEnabled())
+	if (Logger::IsTraceEnabled())
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
 	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
 	bool isSecure = url.Protocol() == "https";
 
-	ProtocolListener listener(
-		ServerSettings::UrlConnectionTraceLoggingEnabled());
+	ProtocolListener listener(Logger::IsTraceEnabled());
 	BUrlContext context;
 
 	BHttpHeaders headers;
@@ -680,8 +679,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 		return B_ERROR;
 
 	status_t status = BJson::Parse(jsonString, reply);
-	if (ServerSettings::UrlConnectionTraceLoggingEnabled() &&
-		status == B_BAD_DATA) {
+	if (Logger::IsTraceEnabled() && status == B_BAD_DATA) {
 		printf("Parser choked on JSON:\n%s\n", jsonString.String());
 	}
 	return status;

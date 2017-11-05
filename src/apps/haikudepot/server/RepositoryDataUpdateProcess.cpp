@@ -125,11 +125,13 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 			DepotInfo modifiedDepotInfo(fDepotList->ItemAt(depotIndex));
 			modifiedDepotInfo.SetWebAppRepositoryCode(
 				BString(*(repository->Code())));
+			modifiedDepotInfo.SetWebAppRepositorySourceCode(
+				BString(*(repositorySource->Code())));
 			fDepotList->Replace(depotIndex, modifiedDepotInfo);
 
-			fprintf(stderr, "associated depot [%s] with haiku depot server"
-				" repository [%s]\n", modifiedDepotInfo.Name().String(),
-				repository->Code()->String());
+			printf("associated depot [%s] with haiku depot server"
+				" repository source [%s]\n", modifiedDepotInfo.Name().String(),
+				repositorySource->Code()->String());
 		}
 	}
 }
@@ -144,12 +146,12 @@ DepotMatchingRepositoryListener::Complete()
 		const DepotInfo& depot = fDepotList->ItemAt(i);
 
 		if (depot.WebAppRepositoryCode().Length() == 0) {
-			fprintf(stderr, "depot [%s]", depot.Name().String());
+			printf("depot [%s]", depot.Name().String());
 
 			if (depot.BaseURL().Length() > 0)
-				fprintf(stderr, " (%s)", depot.BaseURL().String());
+				printf(" (%s)", depot.BaseURL().String());
 
-			fprintf(stderr, " correlates with no repository in the haiku"
+			printf(" correlates with no repository in the haiku"
 				"depot server system\n");
 		}
 	}
@@ -173,7 +175,7 @@ RepositoryDataUpdateProcess::~RepositoryDataUpdateProcess()
 status_t
 RepositoryDataUpdateProcess::Run()
 {
-	fprintf(stdout, "will fetch repositories data\n");
+	printf("will fetch repositories data\n");
 
 		// TODO: add language ISO code to the path; just 'en' for now.
 	status_t result = DownloadToLocalFile(fLocalFilePath,
@@ -181,13 +183,13 @@ RepositoryDataUpdateProcess::Run()
 		0, 0);
 
 	if (result == B_OK) {
-		fprintf(stdout, "did fetch repositories data\n");
+		printf("did fetch repositories data\n");
 
 			// now load the data in and process it.
 
-		fprintf(stderr, "will process repository data and match to depots\n");
+		printf("will process repository data and match to depots\n");
 		result = PopulateDataToDepots();
-		fprintf(stderr, "did process repository data and match to depots\n");
+		printf("did process repository data and match to depots\n");
 	}
 
 	return result;

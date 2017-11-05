@@ -19,8 +19,6 @@ public:
 		static void						AugmentHeaders(BHttpHeaders& headers);
 		static BUrl						CreateFullUrl(
 											const BString urlPathComponents);
-		static void						EnableUrlConnectionTraceLogging();
-		static bool						UrlConnectionTraceLoggingEnabled();
 
 private:
 		static void						_InitUserAgent();
@@ -29,7 +27,6 @@ private:
 		static BUrl						sBaseUrl;
 		static BString					sUserAgent;
 		static pthread_once_t			sUserAgentInitOnce;
-		static bool						sUrlConnectionTraceLogging;
 };
 
 #endif // SERVER_SETTINGS_H

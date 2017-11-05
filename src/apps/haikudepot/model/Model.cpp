@@ -6,8 +6,6 @@
  */
 
 #include "Model.h"
-#include "RepositoryDataUpdateProcess.h"
-#include "StorageUtils.h"
 
 #include <ctime>
 #include <stdarg.h>
@@ -23,6 +21,10 @@
 #include <LocaleRoster.h>
 #include <Message.h>
 #include <Path.h>
+
+#include "Logger.h"
+#include "RepositoryDataUpdateProcess.h"
+#include "StorageUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -930,10 +932,12 @@ Model::_PopulateAllPackagesIcons()
 			depotIndex++;
 		} else {
 			package = packages.ItemAt(packageIndex);
-#ifdef DEBUG
-			fprintf(stdout, "will populate package icon for [%s]\n",
-				package->Name().String());
-#endif
+
+			if (Logger::IsDebugEnabled()) {
+				fprintf(stdout, "will populate package icon for [%s]\n",
+					package->Name().String());
+			}
+
 			if (_PopulatePackageIcon(package) == B_OK)
 				countIconsSet++;
 
@@ -1162,10 +1166,19 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly)
 	}
 
 	if (packages.CountItems() > 0) {
+		uint32 count = 0;
+		bool debug_enabled = Logger::IsDebugEnabled();
+
 		for (int i = 0; i < packages.CountItems(); i++) {
 			const PackageInfoRef& package = packages.ItemAtFast(i);
-			printf("No package info for %s\n", package->Name().String());
+			count++;
+
+			if (debug_enabled) {
+				printf("No package info for %s\n", package->Name().String());
+			}
 		}
+
+		printf("No package info for %" B_PRIu32 " packages\n", count);
 	}
 }
 
@@ -1220,6 +1233,7 @@ append_word_list(BString& words, const char* word)
 void
 Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 {
+	bool debug_enabled = Logger::IsDebugEnabled();
 	BAutolock locker(&fLock);
 
 	BString foundInfo;
@@ -1238,22 +1252,30 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			BString title;
 			if (version.FindString("title", &title) == B_OK) {
 				package->SetTitle(title);
-				append_word_list(foundInfo, "title");
+
+				if (debug_enabled)
+					append_word_list(foundInfo, "title");
 			}
 			BString summary;
 			if (version.FindString("summary", &summary) == B_OK) {
 				package->SetShortDescription(summary);
-				append_word_list(foundInfo, "summary");
+
+				if (debug_enabled)
+					append_word_list(foundInfo, "summary");
 			}
 			BString description;
 			if (version.FindString("description", &description) == B_OK) {
 				package->SetFullDescription(description);
-				append_word_list(foundInfo, "description");
+
+				if (debug_enabled)
+					append_word_list(foundInfo, "description");
 			}
 			double payloadLength;
 			if (version.FindDouble("payloadLength", &payloadLength) == B_OK) {
 				package->SetSize((int64)payloadLength);
-				append_word_list(foundInfo, "size");
+
+				if (debug_enabled)
+					append_word_list(foundInfo, "size");
 			}
 			break;
 		}
@@ -1280,7 +1302,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 				}
 			}
 		}
-		if (foundCategory)
+		if (debug_enabled && foundCategory)
 			append_word_list(foundInfo, "categories");
 	}
 
@@ -1290,21 +1312,24 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		summary.averageRating = derivedRating;
 		package->SetRatingSummary(summary);
 
-		append_word_list(foundInfo, "rating");
+		if (debug_enabled)
+			append_word_list(foundInfo, "rating");
 	}
 
 	double prominenceOrdering;
 	if (data.FindDouble("prominenceOrdering", &prominenceOrdering) == B_OK) {
 		package->SetProminence(prominenceOrdering);
 
-		append_word_list(foundInfo, "prominence");
+		if (debug_enabled)
+			append_word_list(foundInfo, "prominence");
 	}
 
 	BString changelog;
 	if (data.FindString("pkgChangelogContent", &changelog) == B_OK) {
 		package->SetChangelog(changelog);
 
-		append_word_list(foundInfo, "changelog");
+		if (debug_enabled)
+			append_word_list(foundInfo, "changelog");
 	}
 
 	BMessage screenshots;
@@ -1333,11 +1358,11 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 				foundScreenshot = true;
 			}
 		}
-		if (foundScreenshot)
+		if (debug_enabled && foundScreenshot)
 			append_word_list(foundInfo, "screenshots");
 	}
 
-	if (foundInfo.Length() > 0) {
+	if (debug_enabled && foundInfo.Length() > 0) {
 		printf("Populated package info for %s: %s\n",
 			package->Name().String(), foundInfo.String());
 	}
@@ -1363,18 +1388,18 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package)
 		BAutolock locker(&fLock);
 		package->SetIcon(bitmapRef);
 
-#ifdef DEBUG
-		fprintf(stdout, "have set the package icon for [%s] from [%s]\n",
-			package->Name().String(), bestIconPath.Path());
-#endif
+		if (Logger::IsDebugEnabled()) {
+			fprintf(stdout, "have set the package icon for [%s] from [%s]\n",
+				package->Name().String(), bestIconPath.Path());
+		}
 
 		return B_OK;
 	}
 
-#ifdef DEBUG
-	fprintf(stdout, "did not set the package icon for [%s]; no data\n",
-		package->Name().String());
-#endif
+	if (Logger::IsDebugEnabled()) {
+		fprintf(stdout, "did not set the package icon for [%s]; no data\n",
+			package->Name().String());
+	}
 
 	return B_FILE_NOT_FOUND;
 }

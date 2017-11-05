@@ -4,13 +4,15 @@
  */
 
 #include "TarArchiveService.h"
-#include "StorageUtils.h"
 
 #include <stdio.h>
 
 #include <Directory.h>
 #include <File.h>
 #include <StringList.h>
+
+#include "Logger.h"
+#include "StorageUtils.h"
 
 
 #define LENGTH_BLOCK 512
@@ -106,8 +108,10 @@ TarArchiveService::_UnpackItem(BDataIO& tarDataIo,
 	BString entryFileName = header.GetFileName();
 	uint32 entryLength = header.GetLength();
 
-	fprintf(stdout, "will unpack item [%s] length [%" B_PRIu32 "]b\n",
-		entryFileName.String(), entryLength);
+	if (Logger::IsDebugEnabled()) {
+		fprintf(stdout, "will unpack item [%s] length [%" B_PRIu32 "]b\n",
+			entryFileName.String(), entryLength);
+	}
 
 	// if the path ends in "/" then it is a directory and there's no need to
 	// unpack it although if there is a length, it will need to be skipped.

@@ -37,7 +37,7 @@ ServerIconExportUpdateProcess::Run()
 	BPath tarGzFilePath(tmpnam(NULL));
 	status_t result = B_OK;
 
-	fprintf(stdout, "will start fetching icons\n");
+	printf("will start fetching icons\n");
 
 	result = Download(tarGzFilePath);
 
@@ -45,7 +45,7 @@ ServerIconExportUpdateProcess::Run()
 		if (result != B_OK)
 			return result;
 
-		fprintf(stdout, "delete any existing stored data\n");
+		printf("delete any existing stored data\n");
 		StorageUtils::RemoveDirectoryContents(fLocalStorageDirectoryPath);
 
 		BFile *tarGzFile = new BFile(tarGzFilePath.Path(), O_RDONLY);
@@ -73,7 +73,7 @@ ServerIconExportUpdateProcess::Run()
 		delete tarGzFile;
 	}
 
-	fprintf(stdout, "did complete fetching icons\n");
+	printf("did complete fetching icons\n");
 
 	return result;
 }

@@ -21,7 +21,6 @@
 BUrl ServerSettings::sBaseUrl = BUrl(BASEURL_DEFAULT);
 BString ServerSettings::sUserAgent = BString();
 pthread_once_t ServerSettings::sUserAgentInitOnce = PTHREAD_ONCE_INIT;
-bool ServerSettings::sUrlConnectionTraceLogging = false;
 
 
 status_t
@@ -65,17 +64,6 @@ ServerSettings::_InitUserAgent()
 {
 	sUserAgent.SetTo("HaikuDepot/");
 	sUserAgent.Append(_GetUserAgentVersionString());
-}
-
-
-void
-ServerSettings::EnableUrlConnectionTraceLogging() {
-	sUrlConnectionTraceLogging = true;
-}
-
-bool
-ServerSettings::UrlConnectionTraceLoggingEnabled() {
-	return sUrlConnectionTraceLogging;
 }
 
 

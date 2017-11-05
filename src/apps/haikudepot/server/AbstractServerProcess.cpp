@@ -15,6 +15,7 @@
 
 #include <support/ZlibCompressionAlgorithm.h>
 
+#include "Logger.h"
 #include "ServerSettings.h"
 #include "StandardMetaDataJsonEventListener.h"
 #include "ToFileUrlProtocolListener.h"
@@ -180,7 +181,7 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		targetFilePath.Path());
 
 	ToFileUrlProtocolListener listener(targetFilePath, LoggingName(),
-		ServerSettings::UrlConnectionTraceLoggingEnabled());
+		Logger::IsTraceEnabled());
 
 	BHttpHeaders headers;
 	ServerSettings::AugmentHeaders(headers);

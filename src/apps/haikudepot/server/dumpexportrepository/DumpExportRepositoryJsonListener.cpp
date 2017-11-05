@@ -767,7 +767,7 @@ AbstractMainDumpExportRepositoryJsonListener::~AbstractMainDumpExportRepositoryJ
 void
 AbstractMainDumpExportRepositoryJsonListener::HandleError(status_t status, int32 line, const char* message)
 {
-    fprintf(stderr, "an error has arisen processing json for 'DumpExportRepository'; %s", message);
+    printf("an error has arisen processing json for 'DumpExportRepository'; %s", message);
     fErrorStatus = status;
 }
 

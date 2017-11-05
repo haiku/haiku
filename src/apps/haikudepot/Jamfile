@@ -53,6 +53,7 @@ Application HaikuDepot :
 	JobStateListener.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp
+	Logger.cpp
 	main.cpp
 	MainWindow.cpp
 	MarkupTextView.cpp
