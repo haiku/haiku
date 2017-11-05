@@ -195,7 +195,7 @@ static property_info sPropList[] = {
 		"current specifier off the stack."
 	},
 
-	{}
+	{ 0 }
 };
 
 

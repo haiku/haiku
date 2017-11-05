@@ -251,6 +251,7 @@ static property_info sPropertyList[] = {
 			"BTextView.", 0,
 		{ B_RAW_TYPE, 0 },
 	},
+
 	{ 0 }
 };
 

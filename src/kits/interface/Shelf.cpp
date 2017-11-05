@@ -115,7 +115,7 @@ static property_info sShelfPropertyList[] = {
 		"... of Replicant {index | name | id} of ...", 0,
 	},
 
-	{ 0, { 0 }, { 0 }, 0, 0 }
+	{ 0 }
 };
 
 static property_info sReplicantPropertyList[] = {
@@ -154,7 +154,7 @@ static property_info sReplicantPropertyList[] = {
 		NULL, 0,
 	},
 
-	{ 0, { 0 }, { 0 }, 0, 0 }
+	{ 0 }
 };
 
 

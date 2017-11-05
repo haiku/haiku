@@ -78,6 +78,8 @@ static property_info sProperties[] = {
 		"Select or deselect all items in the selection. Boolean field \"data\" "
 		"chooses selection or deselection.", 0, { B_BOOL_TYPE }
 	},
+
+	{ 0 }
 };
 
 

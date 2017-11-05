@@ -183,7 +183,7 @@ static property_info sWindowPropInfo[] = {
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_RECT_TYPE }
 	},
 
-	{}
+	{ 0 }
 };
 
 static value_info sWindowValueInfo[] = {
@@ -207,7 +207,7 @@ static value_info sWindowValueInfo[] = {
 		"Resize by the offsets in the BPoint data"
 	},
 
-	{}
+	{ 0 }
 };
 
 

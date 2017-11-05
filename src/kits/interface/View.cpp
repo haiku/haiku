@@ -99,7 +99,7 @@ static property_info sViewPropInfo[] = {
 		"Directs the scripting message to the specified view.", 0
 	},
 
-	{ 0, { 0 }, { 0 }, 0, 0 }
+	{ 0 }
 };
 
 

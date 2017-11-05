@@ -43,7 +43,8 @@ static property_info sPropertyList[] = {
 		NULL, 0,
 		{ B_INT32_TYPE }
 	},
-	{}
+
+	{ 0 }
 };
 
 

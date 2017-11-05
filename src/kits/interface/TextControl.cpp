@@ -61,7 +61,8 @@ static property_info sPropertyList[] = {
 		NULL, 0,
 		{ B_STRING_TYPE }
 	},
-	{}
+
+	{ 0 }
 };
 
 
