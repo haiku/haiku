@@ -93,16 +93,8 @@ const property_info kTrackerPropertyList[] = {
 		{},
 		{}
 	},
-	{
-		NULL,
-		{},
-		{},
-		NULL,
-		0,
-		{},
-		{},
-		{}
-	}
+
+	{ 0 }
 };
 
 

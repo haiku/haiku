@@ -183,14 +183,8 @@ const property_info kPosesPropertyList[] = {
 		{},
 		{}
 	},
-	{	NULL,
-		{},
-		{},
-		NULL, 0,
-		{},
-		{},
-		{}
-	}
+
+	{ 0 }
 };
 
 

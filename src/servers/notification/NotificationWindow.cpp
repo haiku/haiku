@@ -45,7 +45,8 @@ property_info main_prop_list[] = {
 		"create a message"},
 	{"message", {B_SET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0},
 		"modify a message"},
-	{0}
+
+	{ 0 }
 };
 
 

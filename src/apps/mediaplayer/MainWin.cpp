@@ -180,7 +180,8 @@ static property_info sPropertyInfo[] = {
 		B_TRANSLATE("Seek by the specified amounts of microseconds."), 0,
 		{ B_INT64_TYPE }
 	},
-	{ 0, { 0 }, { 0 }, 0, 0 }
+
+	{ 0 }
 };
 
 

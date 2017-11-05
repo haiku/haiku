@@ -851,7 +851,8 @@ static struct property_info g_ScriptingPropertyList [] =
     {B_DIRECT_SPECIFIER, 0}, "Gets the method used for combining the "
     "individual word ratios into an overall score.", PN_SCORING_MODE,
     {}, {}, {}},
-  {0, {0}, {0}, 0, 0, {}, {}, {}} /* End of list of property commands. */
+
+  { 0 }
 };
 
 

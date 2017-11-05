@@ -83,7 +83,8 @@ static property_info sHandlerPropInfo[] = {
 			{},
 			{}
 	},
-	{}
+
+	{ 0 }
 };
 
 bool FilterDeleter(void* filter);

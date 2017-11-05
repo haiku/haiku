@@ -34,6 +34,7 @@ static property_info prop_list[] = {
 		B_TRANSLATE_MARK("Get name of the printer add-on used for this printer") },
 	{ "Comments", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Get comments about this printer") },
+
 	{ 0 } // terminate list
 };
 

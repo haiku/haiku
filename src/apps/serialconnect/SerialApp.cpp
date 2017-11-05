@@ -56,7 +56,7 @@ static property_info sProperties[] = {
 		"get or set the port device",
 		0, { B_STRING_TYPE }
 	},
-	{ NULL }
+	{ 0 }
 };
 
 const BPropertyInfo SerialApp::kScriptingProperties(sProperties);

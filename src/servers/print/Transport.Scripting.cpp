@@ -26,6 +26,7 @@ static property_info prop_list[] = {
 		B_TRANSLATE_MARK("Get name of transport") },
 	{ "Ports", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Get currently available ports/devices") },
+
 	{ 0 } // terminate list
 };
 

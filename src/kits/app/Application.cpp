@@ -165,7 +165,8 @@ static property_info sPropertyInfo[] = {
 		{},
 		{}
 	},
-	{}
+
+	{ 0 }
 };
 
 

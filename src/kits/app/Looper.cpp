@@ -94,7 +94,8 @@ static property_info sLooperPropInfo[] = {
 			{},
 			{}
 	},
-	{}
+
+	{ 0 }
 };
 
 struct _loop_data_ {

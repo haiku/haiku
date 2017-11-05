@@ -54,7 +54,8 @@ property_info message_prop_list[] = {
 		{B_DIRECT_SPECIFIER, 0}, "get icon as an archived bitmap"},
 	{ "progress", {B_GET_PROPERTY, B_SET_PROPERTY, 0},
 		{B_DIRECT_SPECIFIER, 0}, "get the progress (between 0.0 and 1.0)"},
-	{ NULL }
+
+	{ 0 }
 };
 
 

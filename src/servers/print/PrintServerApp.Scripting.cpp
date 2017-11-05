@@ -45,6 +45,7 @@ static property_info prop_list[] = {
 	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Show configuration window") },
+
 	{ 0 } // terminate list
 };
 
