@@ -35,7 +35,7 @@ Model::Model()
 	fRecurseLinks(false),
 	fSkipDotDirs(true),
 	fCaseSensitive(false),
-	fEscapeText(true),
+	fRegularExpression(false),
 	fTextOnly(true),
 	fInvokePe(false),
 
@@ -91,8 +91,8 @@ Model::LoadPrefs()
 			sizeof(int32)) > 0)
 		fCaseSensitive = (value != 0);
 
-	if (file.ReadAttr("EscapeText", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
-		fEscapeText = (value != 0);
+	if (file.ReadAttr("RegularExpression", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
+		fRegularExpression = (value != 0);
 
 	if (file.ReadAttr("TextOnly", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fTextOnly = (value != 0);
@@ -147,8 +147,8 @@ Model::SavePrefs()
 	value = fCaseSensitive ? 1 : 0;
 	file.WriteAttr("CaseSensitive", B_INT32_TYPE, 0, &value, sizeof(int32));
 
-	value = fEscapeText ? 1 : 0;
-	file.WriteAttr("EscapeText", B_INT32_TYPE, 0, &value, sizeof(int32));
+	value = fRegularExpression ? 1 : 0;
+	file.WriteAttr("RegularExpression", B_INT32_TYPE, 0, &value, sizeof(int32));
 
 	value = fTextOnly ? 1 : 0;
 	file.WriteAttr("TextOnly", B_INT32_TYPE, 0, &value, sizeof(int32));

@@ -90,7 +90,7 @@ GrepWindow::GrepWindow(BMessage* message)
 	fRecurseDirs(NULL),
 	fSkipDotDirs(NULL),
 	fCaseSensitive(NULL),
-	fEscapeText(NULL),
+	fRegularExpression(NULL),
 	fTextOnly(NULL),
 	fInvokePe(NULL),
 	fHistoryMenu(NULL),
@@ -211,8 +211,8 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnCaseSensitive();
 			break;
 
-		case MSG_ESCAPE_TEXT:
-			_OnEscapeText();
+		case MSG_REGULAR_EXPRESSION:
+			_OnRegularExpression();
 			break;
 
 		case MSG_TEXT_ONLY:
@@ -452,8 +452,8 @@ GrepWindow::_CreateMenus()
 	fCaseSensitive = new BMenuItem(
 		B_TRANSLATE("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
 
-	fEscapeText = new BMenuItem(
-		B_TRANSLATE("Escape search text"), new BMessage(MSG_ESCAPE_TEXT));
+	fRegularExpression = new BMenuItem(
+		B_TRANSLATE("Regular expression"), new BMessage(MSG_REGULAR_EXPRESSION));
 
 	fTextOnly = new BMenuItem(
 		B_TRANSLATE("Text files only"), new BMessage(MSG_TEXT_ONLY));
@@ -486,7 +486,7 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddItem(fRecurseDirs);
 	fPreferencesMenu->AddItem(fSkipDotDirs);
 	fPreferencesMenu->AddItem(fCaseSensitive);
-	fPreferencesMenu->AddItem(fEscapeText);
+	fPreferencesMenu->AddItem(fRegularExpression);
 	fPreferencesMenu->AddItem(fTextOnly);
 	fPreferencesMenu->AddItem(fInvokePe);
 
@@ -607,7 +607,7 @@ GrepWindow::_LoadPrefs()
 	fRecurseLinks->SetMarked(fModel->fRecurseLinks);
 	fSkipDotDirs->SetMarked(fModel->fSkipDotDirs);
 	fCaseSensitive->SetMarked(fModel->fCaseSensitive);
-	fEscapeText->SetMarked(fModel->fEscapeText);
+	fRegularExpression->SetMarked(fModel->fRegularExpression);
 	fTextOnly->SetMarked(fModel->fTextOnly);
 	fInvokePe->SetMarked(fModel->fInvokePe);
 
@@ -865,12 +865,14 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 				if (entry.GetRef(&ref) == B_OK) {
 					int32 index;
 					ResultItem* item = fSearchResults->FindItem(ref, &index);
-					item->SetText(path.String());
-					// take care of invalidation, the index is currently
-					// the full list index, but needs to be the visible
-					// items index for this
-					index = fSearchResults->IndexOf(item);
-					fSearchResults->InvalidateItem(index);
+					if (item) {
+						item->SetText(path.String());
+						// take care of invalidation, the index is currently
+						// the full list index, but needs to be the visible
+						// items index for this
+						index = fSearchResults->IndexOf(item);
+						fSearchResults->InvalidateItem(index);
+					}
 				}
 			}
 			break;
@@ -969,7 +971,6 @@ void
 GrepWindow::_OnReportResult(BMessage* message)
 {
 	CALLED();
-
 	entry_ref ref;
 	if (message->FindRef("ref", &ref) != B_OK)
 		return;
@@ -1056,10 +1057,10 @@ GrepWindow::_OnSkipDotDirs()
 
 
 void
-GrepWindow::_OnEscapeText()
+GrepWindow::_OnRegularExpression()
 {
-	fModel->fEscapeText = !fModel->fEscapeText;
-	fEscapeText->SetMarked(fModel->fEscapeText);
+	fModel->fRegularExpression = !fModel->fRegularExpression;
+	fRegularExpression->SetMarked(fModel->fRegularExpression);
 	_ModelChanged();
 }
 

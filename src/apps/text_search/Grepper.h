@@ -24,11 +24,13 @@ public:
 			void				Cancel();
 
 private:
-	// Spawns the real grepper thread.
-	static	int32				_SpawnThread(void* cookie);
+	// Spawns the real grepper threads.
+	static	int32				_SpawnRunnerThread(void* cookie);
+	static	int32				_SpawnWriterThread(void* cookie);
 
-	// The thread function that does the actual grepping.
-			int32				_GrepperThread();
+	// The threads functions that does the actual grepping.
+			int32				_RunnerThread();
+			int32				_WriterThread();
 
 	// Remembers, and possibly escapes, the search pattern.
 			void				_SetPattern(const char* source);
@@ -37,13 +39,14 @@ private:
 	// to prevent the shell from misinterpreting them.
 			bool				_EscapeSpecialChars(char* buffer,
 									ssize_t bufferSize);
+
 	private:
 	// The (escaped) search pattern.
 			char*				fPattern;
 
 	// The settings from the model.
 			BMessenger			fTarget;
-			bool				fEscapeText : 1;
+			bool				fRegularExpression : 1;
 			bool				fCaseSensitive : 1;
 			uint32				fEncoding;
 
@@ -51,7 +54,9 @@ private:
 			FileIterator*		fIterator;
 
 	// Our thread's ID.
-			thread_id			fThreadId;
+			thread_id			fRunnerThreadId;
+	// xargs input pipe
+			int					fXargsInput;
 
 	// Whether our thread must quit.
 	volatile bool				fMustQuit;
