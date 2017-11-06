@@ -469,9 +469,10 @@ TExpandoMenuBar::BuildItems()
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
 
 	float itemWidth = -1.0f;
-	if (fVertical)
+	if (fVertical) {
 		itemWidth = Frame().Width();
-	else {
+		SetMaxContentWidth(itemWidth);
+	} else {
 		itemWidth = iconSize;
 		if (!settings->hideLabels)
 			itemWidth += gMinimumWindowWidth - kMinimumIconSize;
