@@ -249,7 +249,7 @@ Grepper::_RunnerThread()
 	char cpuCount[8];
 	system_info sys_info;
 	get_system_info(&sys_info);
-	snprintf(cpuCount, sizeof(cpuCount), "%d", sys_info.cpu_count);
+	snprintf(cpuCount, sizeof(cpuCount), "%" B_PRIu32, sys_info.cpu_count);
 	argv[argc++] = "-P";
 	argv[argc++] = cpuCount;
 
