@@ -172,6 +172,16 @@
 
 	\param height The height to set the list item to.
 
+	\note Unlike BeOS, if you change the height then you need to force
+	      the BListView to recalculate the cached tops of the item
+	      selection boxes, otherwise selection highlights will be drawn
+	      in the wrong places and mouse clicks will be misinterpreted.
+	      You can do this by adding and removing a dummy BListItem at
+	      the top of the list, or after hrev50780 by calling
+	      BListView::FrameResized() with the current Frame rectangle
+	      (though the FrameResized() method will additionally call
+	      BListItem::Update() for all items).
+
 	\since BeOS R3
 */
 
