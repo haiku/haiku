@@ -45,6 +45,7 @@ Model::Model()
 
 	fFilePanelPath(""),
 
+	fShowLines(true),
 	fEncoding(0)
 {
 	BPath path;
@@ -110,6 +111,10 @@ Model::LoadPrefs()
 
 	file.ReadAttr("WindowFrame", B_RECT_TYPE, 0, &fFrame, sizeof(BRect));
 
+	if (file.ReadAttr("ShowLines", B_INT32_TYPE, 0, &value,
+			sizeof(int32)) > 0)
+		fShowLines = (value != 0);
+
 	if (file.ReadAttr("Encoding", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fEncoding = value;
 
@@ -160,6 +165,9 @@ Model::SavePrefs()
 
 	file.WriteAttr("FilePanelPath", B_STRING_TYPE, 0, fFilePanelPath.String(),
 		fFilePanelPath.Length() + 1);
+
+	value = fShowLines ? 1 : 0;
+	file.WriteAttr("ShowLines", B_INT32_TYPE, 0, &value, sizeof(int32));
 
 	file.WriteAttr("Encoding", B_INT32_TYPE, 0, &fEncoding, sizeof(int32));
 

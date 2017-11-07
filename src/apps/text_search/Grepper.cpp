@@ -11,16 +11,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/select.h>
+#include <sys/time.h>
 #include <errno.h>
-
-#include <OS.h>
-#include <image.h>
 
 #include <Catalog.h>
 #include <Directory.h>
+#include <image.h>
 #include <List.h>
 #include <Locale.h>
 #include <NodeInfo.h>
+#include <OS.h>
 #include <Path.h>
 #include <UTF8.h>
 
@@ -301,12 +301,6 @@ Grepper::_RunnerThread()
 	}
 	set_thread_priority(xargsThread, B_LOW_PRIORITY);
 
-	thread_id writerThread = spawn_thread(_SpawnWriterThread,
-		"Grep writer", B_LOW_PRIORITY, this);
-	// let's go!
-	resume_thread(xargsThread);
-	resume_thread(writerThread);
-
 	// Listen on xargs's stdout and stderr via select()
 	printf("Running: ");
 	for (int i = 0; i < argc; i++) {
@@ -322,6 +316,7 @@ Grepper::_RunnerThread()
 	}
 
 	fd_set readSet;
+    struct timeval timeout = { 0, 100000 };
 	char line[B_PATH_NAME_LENGTH * 2];
 
 	FILE* output = fdopen(out, "r");
@@ -331,6 +326,13 @@ Grepper::_RunnerThread()
 	currentFileName[0] = '\0';
 	bool canReadOutput, canReadErrors;
 	canReadOutput = canReadErrors = true;
+
+	thread_id writerThread = spawn_thread(_SpawnWriterThread,
+		"Grep writer", B_LOW_PRIORITY, this);
+	// let's go!
+	resume_thread(xargsThread);
+	resume_thread(writerThread);
+
 	while (!fMustQuit && (canReadOutput || canReadErrors)) {
 		FD_ZERO(&readSet);
 		if (canReadOutput) {
@@ -340,9 +342,15 @@ Grepper::_RunnerThread()
 			FD_SET(err, &readSet);
 		}
 
-		int result = select(maxfd + 1, &readSet, NULL, NULL, NULL);
+		int result = select(maxfd + 1, &readSet, NULL, NULL, &timeout);
+		if (result == -1 && errno == EINTR)
+			continue;
+		if (result == 0) {
+			// timeout, but meanwhile fMustQuit was changed maybe...
+			continue;
+		}
 		if (result < 0) {
-			printf("select(): %d (%s)\n", result, strerror(errno));
+			perror("select():");
 			break;
 		}
 
@@ -372,7 +380,7 @@ Grepper::_RunnerThread()
 					}
 
 					char* text = &line[strlen(fileName)+1];
-					printf("[%s] %s", fileName, text);
+					// printf("[%s] %s", fileName, text);
 					if (fEncoding > 0) {
 						char* tempdup = strdup_to_utf8(fEncoding, text,
 							strlen(text));

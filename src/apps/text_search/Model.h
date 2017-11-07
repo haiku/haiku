@@ -105,6 +105,9 @@ public:
 			// Current directory of the filepanel
 			BString				fFilePanelPath;
 
+			// Show lines ?
+			bool				fShowLines;
+
 			// Grep string encoding ?
 			uint32				fEncoding;
 

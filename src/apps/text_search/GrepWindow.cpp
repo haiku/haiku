@@ -128,7 +128,6 @@ GrepWindow::GrepWindow(BMessage* message)
 	_LoadPrefs();
 	_TileIfMultipleWindows();
 
-	fSearchBoxWidth = fSearchText->Bounds().Width();
 	Show();
 }
 
@@ -611,6 +610,8 @@ GrepWindow::_LoadPrefs()
 	fTextOnly->SetMarked(fModel->fTextOnly);
 	fInvokePe->SetMarked(fModel->fInvokePe);
 
+	fShowLinesCheckbox->SetValue(fModel->fShowLines);
+
 	switch (fModel->fEncoding) {
 		case 0:
 			fUTF8->SetMarked(true);
@@ -960,7 +961,7 @@ GrepWindow::_OnReportFileName(BMessage* message)
 	if (fModel->fState != STATE_UPDATE) {
 		BString name = message->FindString("filename");
 		fSearchText->TruncateString(&name, B_TRUNCATE_MIDDLE,
-			fSearchBoxWidth - 10);
+			fSearchText->Bounds().Width() - 10);
 
 		fSearchText->SetText(name);
 	}
@@ -1121,11 +1122,13 @@ GrepWindow::_OnCheckboxShowLines()
 	// I think it's the least bad of what's possible on BeOS R5,
 	// but perhaps someone comes along with a patch of magic.
 
+	fModel->fShowLines = (fShowLinesCheckbox->Value() == 1);
+
 	int32 numItems = fSearchResults->FullListCountItems();
 	for (int32 x = 0; x < numItems; ++x) {
 		BListItem* listItem = fSearchResults->FullListItemAt(x);
 		if (listItem->OutlineLevel() == 0) {
-			if (fShowLinesCheckbox->Value() == 1) {
+			if (fModel->fShowLines) {
 				if (!fSearchResults->IsExpanded(x))
 					fSearchResults->Expand(listItem);
 			} else {
@@ -1173,13 +1176,17 @@ GrepWindow::_OnInvokeItem()
 
 		ResultItem* entry = dynamic_cast<ResultItem*>(item);
 		if (entry != NULL) {
-			bool done = false;
+			if (fModel->fInvokePe && _OpenInPe(entry->ref, lineNum))
+				return;
 
-			if (fModel->fInvokePe)
-				done = _OpenInPe(entry->ref, lineNum);
-
-			if (!done)
-				be_roster->Launch(&entry->ref);
+			// ask tracker to open it for us
+			BMessenger target(TRACKER_SIGNATURE);
+			BMessage message(B_REFS_RECEIVED);
+			message.AddRef("refs", &entry->ref);
+			if (lineNum > -1) {
+				message.AddInt32("be:line", lineNum);
+			}
+			target.SendMessage(&message);
 		}
 	}
 }
