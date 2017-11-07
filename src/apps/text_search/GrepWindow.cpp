@@ -814,10 +814,10 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 				: "B_ENTRY_REMOVED");
 			BString path;
 			if (message->FindString("path", &path) == B_OK) {
-				if (opCode == B_ENTRY_CREATED)
+				if (opCode == B_ENTRY_CREATED) {
 					if (fChangesIterator)
 						fChangesIterator->EntryAdded(path.String());
-				else {
+				} else {
 					// in order to remove temporary files
 					if (fChangesIterator)
 						fChangesIterator->EntryRemoved(path.String());
