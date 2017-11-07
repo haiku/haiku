@@ -815,10 +815,12 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			BString path;
 			if (message->FindString("path", &path) == B_OK) {
 				if (opCode == B_ENTRY_CREATED)
-					fChangesIterator->EntryAdded(path.String());
+					if (fChangesIterator)
+						fChangesIterator->EntryAdded(path.String());
 				else {
 					// in order to remove temporary files
-					fChangesIterator->EntryRemoved(path.String());
+					if (fChangesIterator)
+						fChangesIterator->EntryRemoved(path.String());
 					// remove from the list view already
 					BEntry entry(path.String());
 					entry_ref ref;
@@ -889,7 +891,8 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			// file.
 			BString path;
 			if (message->FindString("path", &path) == B_OK) {
-				fChangesIterator->EntryChanged(path.String());
+				if (fChangesIterator)
+					fChangesIterator->EntryChanged(path.String());
 			} else {
 				#ifdef TRACE_NODE_MONITORING
 					printf("incompatible message:\n");
