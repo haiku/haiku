@@ -25,7 +25,7 @@ using std::nothrow;
 
 InitialIterator::InitialIterator(const Model* model)
 	: FileIterator(),
-	  fDirectories(10),
+	  fDirectories(32),
 	  fCurrentDir(new (nothrow) BDirectory(&model->fDirectory)),
 	  fCurrentRef(0),
 

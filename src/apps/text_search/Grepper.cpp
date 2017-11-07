@@ -1,18 +1,23 @@
 /*
  * Copyright (c) 1998-2007 Matthijs Hollemans
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright (c) 2008-2017, Haiku Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *      Matthijs Holleman
+ *      Stephan Aßmus <superstippi@gmx.de>
+ *      Philippe Houdoin
  */
-
 
 #include "Grepper.h"
 
+#include <errno.h>
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/select.h>
 #include <sys/time.h>
-#include <errno.h>
 
 #include <Catalog.h>
 #include <Directory.h>
@@ -173,7 +178,6 @@ Grepper::_WriterThread()
 		message.MakeEmpty();
 		message.what = MSG_REPORT_FILE_NAME;
 		message.AddString("filename", fileName);
-//		fTarget.SendMessage(&message);
 
 		BEntry entry(fileName);
 		entry_ref ref;
@@ -187,7 +191,7 @@ Grepper::_WriterThread()
 			continue;
 		}
 
-		if (!_EscapeSpecialChars(fileName, B_PATH_NAME_LENGTH)) {
+		if (!_EscapeSpecialChars(fileName, sizeof(fileName))) {
 			char tempString[B_PATH_NAME_LENGTH + 32];
 			sprintf(tempString, B_TRANSLATE("%s: Not enough room to escape "
 				"the filename."), fileName);
@@ -272,26 +276,65 @@ Grepper::_RunnerThread()
 	oldStdErr = dup(STDERR_FILENO);
 
 	int fds[2];
-	pipe(fds); dup2(fds[0], STDIN_FILENO); close(fds[0]);
+	if (pipe(fds) != 0) {
+		message.MakeEmpty();
+		message.what = MSG_REPORT_ERROR;
+		message.AddString("error",
+			B_TRANSLATE("Failed to open input pipe!"));
+		fTarget.SendMessage(&message);
+		return 0;
+	}
+	dup2(fds[0], STDIN_FILENO);
+	close(fds[0]);
 	fXargsInput = fds[1];	// write to in, appears on command's stdin
 
-	pipe(fds); dup2(fds[1], STDOUT_FILENO);	close(fds[1]);
+	if (pipe(fds) != 0) {
+		close(fXargsInput);
+		message.MakeEmpty();
+		message.what = MSG_REPORT_ERROR;
+		message.AddString("error",
+			B_TRANSLATE("Failed to open output pipe!"));
+		fTarget.SendMessage(&message);
+		return 0;
+	}
+	dup2(fds[1], STDOUT_FILENO);
+	close(fds[1]);
 	int out = fds[0]; // read from out, taken from command's stdout
 
-	pipe(fds);dup2(fds[1], STDERR_FILENO); close(fds[1]);
+	if (pipe(fds) != 0) {
+		close(fXargsInput);
+		close(out);
+		message.MakeEmpty();
+		message.what = MSG_REPORT_ERROR;
+		message.AddString("error",
+			B_TRANSLATE("Failed to open errors pipe!"));
+		fTarget.SendMessage(&message);
+		return 0;
+	}
+	dup2(fds[1], STDERR_FILENO);
+	close(fds[1]);
 	int err = fds[0]; // read from err, taken from command's stderr
 
-	// "load" command
+	// "load" xargs tool
 	thread_id xargsThread = load_image(argc, argv,
 		const_cast<const char**>(environ));
 	// xargsThread is suspended after loading
 
 	// restore our previous stdin, stdout and stderr
-	close(STDIN_FILENO); dup(oldStdIn);	close(oldStdIn);
-	close(STDOUT_FILENO); dup(oldStdOut); close(oldStdOut);
-	close(STDERR_FILENO); dup(oldStdErr); close(oldStdErr);
+	close(STDIN_FILENO);
+	dup(oldStdIn);
+	close(oldStdIn);
+	close(STDOUT_FILENO);
+	dup(oldStdOut);
+	close(oldStdOut);
+	close(STDERR_FILENO);
+	dup(oldStdErr);
+	close(oldStdErr);
 
 	if (xargsThread < B_OK) {
+		close(fXargsInput);
+		close(out);
+		close(err);
 		message.MakeEmpty();
 		message.what = MSG_REPORT_ERROR;
 		message.AddString("error",
@@ -299,7 +342,6 @@ Grepper::_RunnerThread()
 		fTarget.SendMessage(&message);
 		return 0;
 	}
-	set_thread_priority(xargsThread, B_LOW_PRIORITY);
 
 	// Listen on xargs's stdout and stderr via select()
 	printf("Running: ");
@@ -329,7 +371,9 @@ Grepper::_RunnerThread()
 
 	thread_id writerThread = spawn_thread(_SpawnWriterThread,
 		"Grep writer", B_LOW_PRIORITY, this);
-	// let's go!
+	set_thread_priority(xargsThread, B_LOW_PRIORITY);
+
+	// we're ready, let's go!
 	resume_thread(xargsThread);
 	resume_thread(writerThread);
 
@@ -351,6 +395,10 @@ Grepper::_RunnerThread()
 		}
 		if (result < 0) {
 			perror("select():");
+			message.MakeEmpty();
+			message.what = MSG_REPORT_ERROR;
+			message.AddString("error", strerror(errno));
+			fTarget.SendMessage(&message);
 			break;
 		}
 
@@ -397,7 +445,7 @@ Grepper::_RunnerThread()
 		}
 		if (canReadErrors && FD_ISSET(err, &readSet)) {
 			if (fgets(line, sizeof(line), errors) != NULL) {
-
+				// printf("ERROR: %s", line);
 				if (message.HasString("text"))
 					fTarget.SendMessage(&message);
 				currentFileName[0] = '\0';
@@ -428,10 +476,6 @@ Grepper::_RunnerThread()
 	wait_for_thread(xargsThread, &exitValue);
 	wait_for_thread(writerThread, &exitValue);
 
-	// We wait with removing the temporary file until after the
-	// entire search has finished, to prevent a lot of flickering
-	// if the Tracker window for /tmp/ might be open.
-
 	message.MakeEmpty();
 	message.what = MSG_SEARCH_FINISHED;
 	fTarget.SendMessage(&message);
@@ -458,7 +502,9 @@ Grepper::_EscapeSpecialChars(char* buffer, ssize_t bufferSize)
 	uint32 len = strlen(copy);
 	bool result = true;
 	for (uint32 count = 0; count < len; ++count) {
-		if (copy[count] == ' ')
+		if (copy[count] == '\'' || copy[count] == '\\'
+			|| copy[count] == ' ' || copy[count] == '\n'
+			|| copy[count] == '"')
 			*buffer++ = '\\';
 		if (buffer - start == bufferSize - 1) {
 			result = false;

@@ -815,11 +815,11 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			BString path;
 			if (message->FindString("path", &path) == B_OK) {
 				if (opCode == B_ENTRY_CREATED) {
-					if (fChangesIterator)
+					if (fChangesIterator != NULL)
 						fChangesIterator->EntryAdded(path.String());
 				} else {
 					// in order to remove temporary files
-					if (fChangesIterator)
+					if (fChangesIterator != NULL)
 						fChangesIterator->EntryRemoved(path.String());
 					// remove from the list view already
 					BEntry entry(path.String());
@@ -868,7 +868,7 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 				if (entry.GetRef(&ref) == B_OK) {
 					int32 index;
 					ResultItem* item = fSearchResults->FindItem(ref, &index);
-					if (item) {
+					if (item != NULL) {
 						item->SetText(path.String());
 						// take care of invalidation, the index is currently
 						// the full list index, but needs to be the visible
@@ -891,7 +891,7 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			// file.
 			BString path;
 			if (message->FindString("path", &path) == B_OK) {
-				if (fChangesIterator)
+				if (fChangesIterator != NULL)
 					fChangesIterator->EntryChanged(path.String());
 			} else {
 				#ifdef TRACE_NODE_MONITORING
