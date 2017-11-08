@@ -2066,7 +2066,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			TRACE("HandleTransferComplete td %p offset %" B_PRId64 " %"
 				B_PRIxADDR "\n", td_chain, offset, source);
 			offset = offset / sizeof(xhci_trb) + 1;
-			if (offset <= td_chain->trb_count && offset >= 0) {
+			if (offset <= td_chain->trb_count && offset >= 1) {
 				TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found "
 					"\n", td_chain, offset);
 				// is it the last trb?
