@@ -608,6 +608,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 	// set SetupStage
 	uint8 index = 0;
+	setupDescriptor->trbs[index].qwtrb0 = 0;
 	setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0) | TRB_2_BYTES(8);
 	setupDescriptor->trbs[index].dwtrb3
 		= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_SETUP_STAGE)
