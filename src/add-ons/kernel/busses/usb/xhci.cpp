@@ -516,6 +516,19 @@ XHCI::Start()
 
 	dmaAddress += sizeof(xhci_erst_element) + XHCI_MAX_EVENTS
 		* sizeof(xhci_trb);
+
+	// Make sure the Command Ring is stopped
+	if ((ReadOpReg(XHCI_CRCR_LO) & CRCR_CRR) != 0) {
+		TRACE_ALWAYS("Command Ring is running, send stop/cancel\n");
+		WriteOpReg(XHCI_CRCR_LO, CRCR_CS);
+		WriteOpReg(XHCI_CRCR_HI, 0);
+		WriteOpReg(XHCI_CRCR_LO, CRCR_CA);
+		WriteOpReg(XHCI_CRCR_HI, 0);
+		snooze(1000);
+		if ((ReadOpReg(XHCI_CRCR_LO) & CRCR_CRR) != 0) {
+			TRACE_ERROR("Command Ring still running after stop/cancel\n");
+		}
+	}
 	TRACE("setting CRCR addr = 0x%" B_PRIxPHYSADDR "\n", dmaAddress);
 	WriteOpReg(XHCI_CRCR_LO, (uint32)dmaAddress | CRCR_RCS);
 	WriteOpReg(XHCI_CRCR_HI, /*(uint32)(dmaAddress >> 32)*/0);

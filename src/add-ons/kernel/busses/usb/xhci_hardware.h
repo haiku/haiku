@@ -91,6 +91,9 @@
 #define XHCI_CRCR_LO		0x18
 #define XHCI_CRCR_HI		0x1C
 #define CRCR_RCS			(1<<0)
+#define CRCR_CS				(1<<1)
+#define CRCR_CA				(1<<2)
+#define CRCR_CRR			(1<<3)
 // Section 5.4.6
 #define XHCI_DCBAAP_LO		0x30
 #define XHCI_DCBAAP_HI		0x34
