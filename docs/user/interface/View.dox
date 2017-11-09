@@ -3542,11 +3542,11 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::AddLine(BPoint start, BPoint end, rgb_color color);
-	\brief Add a line to the line array from point \a pt0 to point \a pt1.
+	\brief Add a line to the line array drawn from \a start to \a end.
 
 	\param start The \a start point of the line.
 	\param end The \a end point of the line.
-	\param color The line \a color.
+	\param color The \a color to draw the line.
 
 	\since BeOS R3
 */
