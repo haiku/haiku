@@ -36,7 +36,7 @@
 	by the bounds set by the divider position and \a frame rectangle.
 
 	A variable-size menu field's menu bar is only as wide as it needs to
-	be in order to fit the currently selected menu item, and it's height
+	be in order to fit the currently selected menu item, and its height
 	depends on the user's menu font size preference. The height of the
 	frame rectangle is ignored.
 

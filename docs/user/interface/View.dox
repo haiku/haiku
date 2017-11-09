@@ -266,7 +266,7 @@
 
 /*!
 	\var B_WILL_DRAW
-	\brief Indicates that the view will do it's own drawing.
+	\brief Indicates that the view will do its own drawing.
 
 	\since BeOS R3
 */
@@ -548,7 +548,7 @@
 
 	To create a subclass of BView you generally override one or more of BView's
 	hook methods to respond to user events such as MouseDown() or FrameMoved().
-	By default a BView does nothing in it's hook methods unless otherwise stated,
+	By default a BView does nothing in its hook methods unless otherwise stated,
 	it's up to you to define what happens. To override the look of a BView you
 	should override the Draw() or DrawAfterChildren() methods. See the section on
 	Hook Methods below for more details.
@@ -589,9 +589,9 @@ if (Window()->LockLooper()) {
 	focus view. The color can be queried using the keyboard_navigation_color()
 	function in InterfaceDefs.h
 
-	Each view has it's own coordinate system with the origin point (0.0, 0.0)
+	Each view has its own coordinate system with the origin point (0.0, 0.0)
 	located at the top left corner. You can convert a BPoint or BRect to or from
-	the view's coordinate system to the coordinate system of it's parent, or
+	the view's coordinate system to the coordinate system of its parent, or
 	of the screen's coordinate system. See the section on Coordinate Conversion
 	Methods for more details.
 
@@ -639,7 +639,7 @@ SetViewColor(Parent()->ViewColor());
 	\param name The name of the view, can be \c NULL.
 	\param flags The view flags, a mask of one or more of the following:
 	       - \c B_FULL_UPDATE_ON_RESIZE Redraw the entire view on resize.
-	       - \c B_WILL_DRAW Indicates that the view will do it's own drawing.
+	       - \c B_WILL_DRAW Indicates that the view will do its own drawing.
 	       - \c B_PULSE_NEEDED The view accepts Pulse() messages.
 	       - \c B_NAVIGABLE_JUMP Default for keyboard navigation.
 	       - \c B_FRAME_EVENTS Responds to move and resize events.
@@ -704,7 +704,7 @@ SetViewColor(Parent()->ViewColor());
 	            \c B_FOLLOW_LEFT_RIGHT | \c B_FOLLOW_TOP_BOTTOM.
 	\param flags The view flags, a mask of one or more of the following:
 	       - \c B_FULL_UPDATE_ON_RESIZE Redraw the entire view on resize.
-	       - \c B_WILL_DRAW Indicates that the view will do it's own drawing.
+	       - \c B_WILL_DRAW Indicates that the view will do its own drawing.
 	       - \c B_PULSE_NEEDED The view accepts Pulse() messages.
 	       - \c B_NAVIGABLE_JUMP Default for keyboard navigation.
 	       - \c B_FRAME_EVENTS Responds to move and resize events.
@@ -1313,8 +1313,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns whether or not the view is hidden from the perspective of
 	       \a lookingFrom.
 
-	A view is considered hidden if it, any of it's parent views, or the window
-	it is attached to has had the Hide() method called on it. This method
+	A view is considered hidden if it, any of its parent views, or the window
+	it's attached to has had the Hide() method called on it. This method
 	allows you to determine the hidden status of a view from a different point
 	on the view hierarchy.
 
@@ -2564,9 +2564,9 @@ SetViewColor(Parent()->ViewColor());
 	DrawString()
 
 	The \a string is drawn in the view's current font and is modified by
-	the other parameters of the font such as it's direction (left-to-right or
+	the other parameters of the font such as its direction (left-to-right or
 	right-to-left), rotation, spacing, shear, etc. The \a string is always drawn
-	left to right even if it's text direction is set to right-to-left mode.
+	left to right even if its text direction is set to right-to-left mode.
 
 	Drawing a string is fastest in \c B_OP_COPY mode and anti-aliasing can
 	produce undesirable effects when a string is draw in other modes, especially
@@ -3580,7 +3580,7 @@ SetViewColor(Parent()->ViewColor());
 	The view doesn't display anything to the screen while it's recording to \a
 	picture. Use the DrawPicture() method to render the \a picture.
 
-	Only drawing instructions performed directly on the view, not it's child views
+	Only drawing instructions performed directly on the view, not its child views
 	are send to the BPicture object and BPicture captures only primitive graphics
 	operations. The view must be attached to a window for the drawing instruction
 	to be recorded. Drawing instructions are recorded even if the view is hidden or

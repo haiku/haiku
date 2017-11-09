@@ -68,7 +68,7 @@
 	format from a BNode attribute into the preallocated BBitmap \a result.
 	The colorspace of result needs to be B_RGBA32 or at
 	least B_RGB32 (though that makes less sense). The icon
-	will be scaled from it's "native" size of 64x64 to the
+	will be scaled from its "native" size of 64x64 to the
 	size of the bitmap.
 
 	\note The scale is derived from the bitmap width, the bitmap should have
@@ -88,7 +88,7 @@
 	format from the given \a buffer into the preallocated BBitmap \a result.
 	The colorspace of result needs to be B_RGBA32 or at
 	least B_RGB32 (though that makes less sense). The icon
-	will be scaled from it's "native" size of 64x64 to the
+	will be scaled from its "native" size of 64x64 to the
 	size of the bitmap.
 
 	\note The scale is derived from the bitmap width, the bitmap should have

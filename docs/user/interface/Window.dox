@@ -368,7 +368,7 @@
 /*!
 	\var B_OUTLINE_RESIZE
 
-	Window draws only it's outline as it's resized and doesn't draw its
+	Window draws only its outline as it's resized and doesn't draw its
 	contents.
 
 	\since BeOS R3
@@ -624,7 +624,7 @@
 	       - \c B_AVOID_FOCUS cannot receive keyboard focus
 	       - \c B_WILL_ACCEPT_FIRST_CLICK The first click is processed by the
 	            window.
-	       - \c B_OUTLINE_RESIZE draws only it's outline as it's resized and
+	       - \c B_OUTLINE_RESIZE draws only its outline as it's resized and
 	            doesn't draw its contents.
 	       - \c B_NO_WORKSPACE_ACTIVATION Causes the current workspace to stay
 	            active when activated on another workspace.
@@ -696,7 +696,7 @@
 	       - \c B_AVOID_FOCUS cannot receive keyboard focus
 	       - \c B_WILL_ACCEPT_FIRST_CLICK The first click is processed by the
 	            window.
-	       - \c B_OUTLINE_RESIZE draws only it's outline as it's resized and
+	       - \c B_OUTLINE_RESIZE draws only its outline as it's resized and
 	            doesn't draw its contents.
 	       - \c B_NO_WORKSPACE_ACTIVATION Causes the current workspace to stay
 	            active when activated on another workspace.

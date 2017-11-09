@@ -53,7 +53,7 @@
 	\brief Construct a check box in the \a frame with a \a name, \a label,
 		model \a message, \a resizingMode, and creation \a flags.
 
-	\note This constructor will resize the control to it's minimum height if needed
+	\note This constructor will resize the control to its minimum height if needed
 	      for compatibility with BeOS R5.
 
 	The initial value of the check box is 0 (\c B_CONTROL_OFF).

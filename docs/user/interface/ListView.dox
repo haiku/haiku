@@ -373,7 +373,7 @@
 
 /*!
 	\fn void BListView::ResizeToPreferred()
-	\brief Resize the view to it's preferred size.
+	\brief Resize the view to its preferred size.
 
 	\see BView::ResizeToPreferred()
 

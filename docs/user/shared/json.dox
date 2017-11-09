@@ -176,7 +176,7 @@ A primary-listener is employed called \c ColorGradientsListener.  The
 primary-listener accepts Json parse events and will relay them to a
 sub-listener.  The sub-listener is implemented to specifically deal with one
 tier of the inbound data.  The sub-listeners are structured in a stack where
-the sub-listener at the head of the stack has a pointer to it's parent.  The
+the sub-listener at the head of the stack has a pointer to its parent.  The
 primary-listener maintains a pointer to the current head of the stack and will
 direct events to that sub-listener.
 

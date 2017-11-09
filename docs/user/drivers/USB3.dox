@@ -605,7 +605,7 @@
 	\brief Convenience function for standard usb status requests. 
 
 	\param[in] handle The object you want to query.
-	\param[out] status A variable in which the device can store it's status.
+	\param[out] status A variable in which the device can store its status.
 	\return \c B_OK is returned in case the request succeeded and the device
 	 responded positively, or an error code is returned in case it failed.
 */

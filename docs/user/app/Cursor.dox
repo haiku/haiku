@@ -317,7 +317,7 @@
 
 /*!
 	\fn BCursor::~BCursor()
-	\brief Destroy the cursor and free it's memory.
+	\brief Destroy the cursor and free its memory.
 
 	\since BeOS R5
 */

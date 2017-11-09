@@ -280,7 +280,7 @@
 	was called.
 
 	If you care whether Invoke() or InvokeNotify() was originally called,
-	you can use a bool pointer and set it's value to \c true if InvokeNotify()
+	you can use a bool pointer and set its value to \c true if InvokeNotify()
 	was called, or \c false if Invoke() was called. This lets you fetch the
 	InvokeNotify() arguments from Invoke() without breaking binary compatibility
 	with older applications.

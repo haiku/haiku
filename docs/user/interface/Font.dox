@@ -867,7 +867,7 @@
 	\class BFont
 	\ingroup interface
 	\ingroup libbe
-	\brief Represents a typeface including it's family, style and size.
+	\brief Represents a typeface including its family, style and size.
 
 	The Interface Kit provides three prebuilt BFont objects which can be used
 	but not modified.
@@ -875,7 +875,7 @@
 	- \c const BFont* \c be_bold_font A bold font used by titles.
 	- \c const BFont* \c be_fixed_font A fixed-width font.
 
-	A BFont object does nothing on it's own but is used in combination with
+	A BFont object does nothing on its own but is used in combination with
 	a view or control. Here is an example of creating a BFont object from a
 	system font and assigning it to a view:
 
@@ -1054,7 +1054,7 @@
 
 	- \c B_CHAR_SPACING Position each character without adjustment. Best mode
 		for printing. Characters may collide or overlap at small font sizes.
-	- \c B_STRING_SPACING Optimizes the position of each character within it's
+	- \c B_STRING_SPACING Optimizes the position of each character within its
 		space. Collisions are unlikely but characters may touch each other.
 		Best mode to use when the screen needs to match what appears on the
 		printed page. Adding new characters requires the entire string to

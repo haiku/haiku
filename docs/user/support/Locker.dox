@@ -40,7 +40,7 @@
 	semaphore. You can imagine that in many cases where you protect
 	of data that \em might be accessed by two or more concurrent threads, but
 	the chances of it happening being very small, the benaphore benefits the
-	most from it's speed.
+	most from its speed.
 
 	The other feature of BLocker that improves basic semaphore handling is that
 	it allows for recursive locks. The following piece of code works with a
@@ -127,7 +127,7 @@ Flower::Water(int amount)
 	\param benaphoreStyle If you pass \c true, the locker will be in benaphore
 	       style (which is the default option for other constructors). If you
 	       pass \c false, the object will completely rely on semaphores for
-	       it's functioning.
+	       its functioning.
 
 	\see BLocker(const char* name, bool benaphoreStyle) if you also want
 	     to set a name.

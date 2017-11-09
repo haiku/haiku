@@ -31,7 +31,7 @@
 	the host controller and the devices, and how devices should transfer data,
 	but it does not prescribe a standard environment that Operating Systems
 	should provide to the driver interfaces. As such, every operating system has
-	it's own interface for drivers, and so does Haiku.
+	its own interface for drivers, and so does Haiku.
 
 	This document will point driver developers to relevant parts of the USB
 	module API and give a general impression of the workings of the USB stack.
@@ -135,7 +135,7 @@ init_driver(void)
 	to provide the stack with information on which devices you support, and the
 	number of support descriptors you provided. The stack is very flexible with
 	what patterns it accepts, so even the most complex driver will be able to
-	pass it's credentials. Have a look at the \c usb_support_descriptor struct
+	pass its credentials. Have a look at the \c usb_support_descriptor struct
 	and the \c usb_module_info::register_driver() call for all the details.
 
 	The last step in initialization is to provide the stack with notification

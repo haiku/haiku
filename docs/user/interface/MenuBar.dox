@@ -75,7 +75,7 @@
 	BWindow::SetKeyMenuBar() method.
 
 	When either the \key{Menu} key or \key{Command}+\key{Esc} keys are pressed
-	the key menu bar opens and focuses it's first menu item, typically a BMenu.
+	the key menu bar opens and focuses its first menu item, typically a BMenu.
 	Once the menu bar is open the user can navigate around the attached menus
 	and menu items using the arrow keys.
 

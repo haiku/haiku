@@ -43,7 +43,7 @@
 	picture = view->EndPicture();
 \endcode
 
-	Only drawing instructions performed directly on the view, not it's child
+	Only drawing instructions performed directly on the view, not its child
 	views are send to the BPicture object and BPicture captures only primitive
 	graphics operations. The view must be attached to a window for the drawing
 	instruction to be recorded. Drawing instructions are recorded even if the
