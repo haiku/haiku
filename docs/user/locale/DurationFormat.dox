@@ -111,18 +111,17 @@
 
 
 /*!
-	\fn status_t BDurationFormat::Format(bigtime_t startValue,
-		bigtime_t stopValue, BString* buffer, time_unit_style style) const
+	\fn status_t BDurationFormat::Format(BString& buffer, bigtime_t startValue,
+		bigtime_t stopValue) const
 	\brief Formats a duration defined by its start and end values.
 
 	The start and end values are in milliseconds. The result is appended to
 	the buffer. The full time style uses full words (hours, minutes, seconds),
 	while the short one uses units (h, m, s).
 
+	\param buffer The buffer to fill out.
 	\param startValue The start value in milliseconds.
 	\param stopValue The stop value in milliseconds.
-	\param buffer The buffer to fill out.
-	\param style The time unit style to use.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.

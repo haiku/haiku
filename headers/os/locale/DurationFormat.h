@@ -40,8 +40,7 @@ public:
 
 			status_t			Format(BString& buffer,
 									const bigtime_t startValue,
-									const bigtime_t stopValue
-									) const;
+									const bigtime_t stopValue) const;
 
 private:
 			BString				fSeparator;
