@@ -50,7 +50,7 @@
 
 /*!
 	\fn ssize_t BNumberFormat::Format(char* string, size_t maxSize,
-		const double value) const
+		const double value)
 	\brief Format the \c double \a value as a string and put the result
 	       into \a string up to \a maxSize bytes in the current locale.
 
@@ -74,8 +74,7 @@
 
 
 /*!
-	\fn status_t BNumberFormat::Format(BString& string,
-		const double value) const
+	\fn status_t BNumberFormat::Format(BString& string, const double value)
 	\brief \brief Format the \c double \a value as a string and put the
 	       result into \a string in the current locale.
 
@@ -98,7 +97,7 @@
 
 /*!
 	\fn ssize_t BNumberFormat::Format(char* string, size_t maxSize,
-		const int32 value) const
+		const int32 value)
 	\brief Format the \c int32 \a value as a string and put the result
 	       into \a string up to \a maxSize bytes in the current locale.
 
@@ -122,8 +121,7 @@
 
 
 /*!
-	\fn status_t BNumberFormat::Format(BString& string,
-		const int32 value) const
+	\fn status_t BNumberFormat::Format(BString& string, const int32 value)
 	\brief Format the \c int32 \a value as a string and put the result
 	       into \a string in the current locale.
 
@@ -146,7 +144,7 @@
 
 /*!
 	\fn ssize_t BNumberFormat::FormatMonetary(char* string, size_t maxSize,
-		const double value) const
+		const double value)
 	\brief Format the \c double \a value as a monetary string and put the
 	       result into \a string up to \a maxSize bytes in the current locale.
 
@@ -172,7 +170,7 @@
 
 /*!
 	\fn status_t BNumberFormat::FormatMonetary(BString& string,
-		const double value) const
+		const double value)
 	\brief Format the \c double \a value as a monetary string and put
 	       the result into \a string in the current locale.
 
