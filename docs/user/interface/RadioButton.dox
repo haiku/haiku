@@ -344,7 +344,7 @@
 
 /*!
 	\fn status_t BRadioButton::GetSupportedSuites(BMessage* message)
-	\copydoc BControl::GetSupportedSuites();
+	\copydoc BControl::GetSupportedSuites()
 */
 
 

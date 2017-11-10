@@ -352,7 +352,7 @@
 	\fn status_t BButton::GetSupportedSuites(BMessage* message)
 	\brief Report the suites of messages this control understands.
 
-	\copydetails BControl::GetSupportedSuites();
+	\copydetails BControl::GetSupportedSuites()
 */
 
 

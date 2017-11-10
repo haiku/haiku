@@ -460,7 +460,7 @@
 
 	Adds the string "suite/vnd.Be-control" to the message.
 
-	\copydetails BHandler::GetSupportedSuites();
+	\copydetails BHandler::GetSupportedSuites()
 */
 
 
