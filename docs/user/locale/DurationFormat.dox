@@ -35,13 +35,33 @@
 
 
 /*!
-	\fn BDurationFormat::BDurationFormat(const BString& separator)
+	\fn BDurationFormat::BDurationFormat(const BLanguage& language,
+		const BFormattingConventions& conventions, const BString& separator,
+		const time_unit_style style)
+	\brief Constructor.
+
+	\warning Creating a BDurationFormat is a costly operation. Most of the
+	         time want to use the default one through the BLocale class.
+
+	\param language The language to use.
+	\param conventions The formatting conventions to use.
+	\param separator String appended between the duration elements.
+	\param style The time unit style to use.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDurationFormat::BDurationFormat(const BString& separator,
+		const time_unit_style style)
 	\brief Constructor.
 
 	\warning Creating a BDurationFormat is a costly operation. Most of the
 	         time want to use the default one through the BLocale class.
 
 	\param separator String appended between the duration elements.
+	\param style The time unit style to use.
 
 	\since Haiku R1
 */
