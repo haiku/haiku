@@ -100,6 +100,11 @@
 	\brief Add a BView to the BGridLayout this builder represents.
 
 	\param view The BView to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span over.
+	\param rowCount The number of rows to span over.
+
 	\see BGridLayout::AddView(BView*)
 
 	\since Haiku R1
@@ -113,6 +118,10 @@
 	\brief Add a BLayoutItem to the BGridLayout this builder represents.
 
 	\param item The BLayoutItem to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param columnCount The number of columns to span over.
+	\param rowCount The number of rows to span over.
 
 	\see BGridLayout::AddItem(BLayoutItem*)
 
@@ -124,9 +133,21 @@
 	\fn ThisBuilder& BLayoutBuilder::Grid<ParentBuilder>::AddMenuField(
 		BMenuField* item, int32 column, int32 row, alignment labelAlignment,
 		int32 labelColumnCount, int32 fieldColumnCount, int32 rowCount)
-	\brief Add a BMenuField to the layout
+	\brief Add a BMenuField to the layout.
 
 	\param item The BMenuField to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param labelAlignment The alignment of the label to use. Choices include:
+	       - \c B_ALIGN_LEFT
+	       - \c B_ALIGN_RIGHT
+	       - \c B_ALIGN_CENTER
+	       - \c B_ALIGN_HORIZONTAL_CENTER
+	       - \c B_ALIGN_HORIZONTAL_UNSET
+	       - \c B_ALIGN_USE_FULL_WIDTH
+	\param labelColumnCount The number of columns the label will span over.
+	\param fieldColumnCount The number of columns the menu field will span over.
+	\param rowCount The number of rows to span over.
 
 	A BMenuField is composed of a label and a menu. This method allows to
 	lay the sub-components in separate grid cells, allowing easy alignment
@@ -143,6 +164,18 @@
 	\brief Add a BMenuField to the layout
 
 	\param item The BMenuField to be added.
+	\param column The column number (zero-index) to use.
+	\param row The row number (zero-index) to use.
+	\param labelAlignment The alignment of the label to use. Choices include:
+	       - \c B_ALIGN_LEFT
+	       - \c B_ALIGN_RIGHT
+	       - \c B_ALIGN_CENTER
+	       - \c B_ALIGN_HORIZONTAL_CENTER
+	       - \c B_ALIGN_HORIZONTAL_UNSET
+	       - \c B_ALIGN_USE_FULL_WIDTH
+	\param labelColumnCount The number of columns the label will span over.
+	\param textColumnCount The number of columns the text field will span over.
+	\param rowCount The number of rows to span over.
 
 	A BTextControl is composed of a label and a text area. This method allows to
 	lay the sub-components in separate grid cells, allowing easy alignment
