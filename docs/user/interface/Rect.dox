@@ -690,8 +690,8 @@ BRect(0, 0, width - 1, height -1);
 
 /*!
 	\fn BRect BRect::operator&(BRect other) const
-	\brief Returns a new BRect that is the intersection of the BRect and
-	       \a other.
+	\brief Creates and returns a new BRect that is the intersection of the
+	       BRect and \a other.
 
 	The intersection of two rectangles is the area that they both share.
 

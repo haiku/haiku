@@ -474,8 +474,8 @@
 
 /*!
 	\fn unicode_block unicode_block::operator&(const unicode_block& block) const
-	\brief Creates a new \c unicode_block object that is the intersection of
-		\a block and the \c unicode_block object.
+	\brief Creates and returns a new \c unicode_block object that is the
+	       intersection of \a block and the \c unicode_block object.
 
 	\param block The Unicode block to intersect with.
 
@@ -487,8 +487,8 @@
 
 /*!
 	\fn unicode_block unicode_block::operator|(const unicode_block& block) const
-	\brief Creates a new \c unicode_block object that is the union of \a block
-		and the \c unicode_block object.
+	\brief Creates and returns a new \c unicode_block object that is the union
+	       of \a block and the \c unicode_block object.
 
 	\param block The Unicode block to form a union with.
 
