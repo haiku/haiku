@@ -25,7 +25,7 @@
 	<a href="https://www.access-company.com/">Access Co.</a>, the current
 	owners of Be's intellectual property.
 
-	\section kits Kits and Servers
+	\section book_kits Kits and Servers
 
 	The API is split into several kits and servers each detailing a different
 	aspect of the operating system.
@@ -57,7 +57,7 @@
 		- The \ref translation provides a framework for converting data streams
 			between media formats.
 
-	\section special_topics Special Topics
+	\section book_special_topics Special Topics
 
 	- \ref drivers
 	- \ref keyboard
@@ -152,7 +152,7 @@
 	an overview. If you would like to see all the components, please look
 	at \link midi2 the list with classes \endlink.
 
-	\section midi2twokits A Tale of Two MIDI Kits
+	\section book_midi2twokits A Tale of Two MIDI Kits
 
 	BeOS comes with two different, but compatible Midi Kits. This
 	documentation focuses on the "new" Midi Kit, or midi2 as we like to
@@ -178,7 +178,7 @@
 		- Channels are numbered 0&ndash;15, not 1&ndash;16
 		- Timing is now specified in microseconds rather than milliseconds.
 
-	\section midi2concepts Midi Kit Concepts
+	\section book_midi2concepts Midi Kit Concepts
 
 	A brief overview of the elements that comprise the Midi Kit:
 		- \b Endpoints. This is what the Midi Kit is all about: sending MIDI
@@ -213,7 +213,7 @@
 
 	\image html midi2concepts.png
 
-	\section midi2mediakit Midi Kit != Media Kit
+	\section book_midi2mediakit Midi Kit != Media Kit
 
 	Be chose not to integrate the Midi Kit into the Media Kit as another media
 	type, mainly because MIDI doesn't require any of the format negotiation that
@@ -247,7 +247,7 @@
 	via the MediaRoster, the new kit makes the connections directly via the
 	BMidiProducer object.
 
-	\section midi2remotelocal Remote vs. Local Objects
+	\section book_midi2remotelocal Remote vs. Local Objects
 
 	The Midi Kit makes a distinction between remote and local MIDI objects.
 	You can  only create local MIDI endpoints, which derive from either
@@ -266,7 +266,7 @@
 	BMidiProducer, and BMidiEndpoint will let you do. You can connect
 	objects, get the properties of these objects -- and that's about it.
 
-	\section midi2lifespan Creating and Destroying Objects
+	\section book_midi2lifespan Creating and Destroying Objects
 
 	The constructors and destructors of most midi2 classes are private,
 	which means that you cannot directly create them using the C++
@@ -276,7 +276,7 @@
 	and BMidiLocalProducer. These two objects may be directly created and
 	subclassed by developers.
 
-	\section midi2refcount Reference Counting
+	\section book_midi2refcount Reference Counting
 
 	Each MIDI endpoint has a reference count associated with it, so that
 	the Midi Roster can do proper bookkeeping. When you construct a
@@ -299,7 +299,7 @@
 	This is true  for both local and remote objects. Repeat after me:
 	Release() when you're done.
 
-	\section midi2events MIDI Events
+	\section book_midi2events MIDI Events
 
 	To make some actual music, you need to
 	\link BMidiProducer::Connect() Connect() \endlink your consumers to
@@ -325,7 +325,7 @@
 	also tap into the \link BMidiLocalConsumer::Data() Data() \endlink hook and
 	get your hands dirty with the raw MIDI data.
 
-	\section midi2time Time
+	\section book_midi2time Time
 
 	The spray and hook functions accept a bigtime_t parameter named "time". This
 	indicates when the MIDI event should be performed. The time is given in
@@ -370,7 +370,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	Note that a typical producer sends out its events as soon as it can;
 	unlike a consumer, it does not have to snooze.
 
-	\section midi2ports Other Timing Issues
+	\section book_midi2ports Other Timing Issues
 
 	Each consumer object uses a Kernel Kit port to receive MIDI events from
 	connected producers. The queue for this port is only 1 message deep.
@@ -396,7 +396,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	Newsletter 36</A> describes this problem in more detail, and provides a
 	solution. Go read it now!
 
-	\section midi2filters Writing a Filter
+	\section book_midi2filters Writing a Filter
 
 	A typical filter contains a consumer and a producer endpoint. It receives
 	events from the consumer, processes them, and sends them out again using the
@@ -415,7 +415,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	process the  event as quickly as possible and be done with it. Do not
 	<CODE>snooze_until()</CODE> in the consumer endpoint of a filter!
 
-	\section midi2apidiffs API Differences
+	\section book_midi2apidiffs API Differences
 
 	As far as the end user is concerned, the Haiku Midi Kit is mostly the same
 	as the BeOS R5 kits, although there are a few small differences in the API
@@ -427,7 +427,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 		- If creating a local endpoint fails, you can still Release() the object
 		  without crashing into the debugger.
 
-	\section midi2seealso See also
+	\section book_midi2seealso See also
 
 	More about the Midi Kit:
 		- \ref Midi2Defs.h
@@ -521,7 +521,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	look at the overview, or go straight to the complete
 	\link support list of components \endlink of this kit.
 
-	\section Overview
+	\section book_overview Overview
 		- Thread Safety:
 			- BLocker provides a semaphore-like locking mechanism allowing for
 				recursive locks.
