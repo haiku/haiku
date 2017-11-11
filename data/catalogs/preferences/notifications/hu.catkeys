@@ -1,10 +1,29 @@
-1	hungarian	x-vnd.Haiku-Notifications	984257918
+1	hungarian	x-vnd.Haiku-Notifications	1544806248
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
+Add…	NotificationView		Új…
+Status	NotificationView		Állapot
 Revert	PrefletWin		Visszaállít
 Enable notifications	GeneralView		Értesítések engedélyezése
+Window width:	GeneralView		Ablakszélesség:
+This is a test notification message	PrefletWin		Ez egy próba értesítés
 OK	PrefletWin		Rendben
+Duration:	GeneralView		Időtartam:
+OK	NotificationView		Rendben
+Application does not have a valid signature	NotificationView	Alert message	Az alkalmazásnak nincs érvényes azonosítója
+Notifications	PrefletWin		Értesítések
+Timeout:	GeneralView		Kikapcsolás:
+Muted	NotificationView		Némítva
 General	PrefletView		Általános
 Allowed	NotificationView		Engedélyezve
+Remove	NotificationView		Eltávolítás
+Notifications preflet sample	PrefletWin		Próba értesítés
 Notifications	System name		Értesítések
+Applications	PrefletView		Programok
+Defaults	PrefletWin		Alapértékek
+pixels	GeneralView		képpont
 Application	NotificationView		Program
+Width:	GeneralView		Szélesség:
+seconds	GeneralView		másodperc
+Mute notifications from this application	NotificationView		Az alkalmazás értesítéseinek némítása
+ is already listed	NotificationView	Alert message	már szerepel a listában
 Applications	NotificationView		Programok

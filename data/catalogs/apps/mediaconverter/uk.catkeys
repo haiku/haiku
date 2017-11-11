@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	341686525
+1	ukrainian	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		Відео використовує параметри з налаштувань
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не був розпізнаний як підтримуваний медіафайл:} other{# Файли не були розпізнані як підтримувані медіафайли:}}
 Video encoding:	MediaConverter		Кодування відео:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error creating video.	MediaConverter		Помилка при створенні відео
 Error read audio frame %lld	MediaConverter		Помилка читання аудіокадру %lld
 No audio	Audio codecs list		без звуку
 Error	MediaConverter		Помилка
@@ -26,7 +27,9 @@ Conversion completed	MediaConverter		Конвертація завершена
 Audio:	MediaConverter-FileInfo		Аудіо:
 OK	MediaConverter-FileInfo		Гаразд
  seconds	MediaFileInfo		 секунд
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Помилка призаписі до: %strPath%. По замовчуванню: /boot/home
 Source files	MediaConverter		Файли джерела
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Вибраний коталог не знайдено. Позамовчуванню: /boot/home
 Error writing video frame %lld	MediaConverter		Помилка запису відеокадру %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} other{# кадрів}}
 Error writing audio frame %lld	MediaConverter		Помилка запису аудіокадру %lld
@@ -38,6 +41,7 @@ None available	Video codecs		Недоступний
 Conversion cancelled	MediaConverter		Конверсію відмінено
 No file selected	MediaConverter-FileInfo		Файлу не вибрано
 Select this folder	MediaConverter		Вибрати цю теку
+Error creating track.	MediaConverter		Помилка при створенні трека
 Continue	MediaConverter		Продовжити
 Encoder parameters	MediaConverter-EncoderWindow		Параметри декодера
 Video:	MediaConverter-FileInfo		Відео:
@@ -59,6 +63,7 @@ Drop media files onto this window	MediaConverter		Помістити медіа�
 Audio encoding:	MediaConverter		Декодування звуку:
 Audio quality not supported	MediaConverter		Якість звуку не підтримується
 File	Menu		Файл
+Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 %.1f kHz stereo	MediaFileInfo		%.1f kHz стерео
 Convert	MediaConverter		Перетворити
 Writing audio track: %ld%% complete	MediaConverter		Запис звукового треку: %ld%% завершено

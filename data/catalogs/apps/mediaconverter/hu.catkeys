@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	341686525
+1	hungarian	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		Videó a beállítások paramétereivel
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{A fájl nem felismerhető média formátumú:} other{# fájl nem felismerhető média formátumú:}}
 Video encoding:	MediaConverter		Videó kódolása:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error creating video.	MediaConverter		Nem sikerült létrehozni a videót.
 Error read audio frame %lld	MediaConverter		Hiba történt a %lld. hang olvasása közben
 No audio	Audio codecs list		Nincs hang
 Error	MediaConverter		Hiba
@@ -26,7 +27,9 @@ Conversion completed	MediaConverter		Átalakítás kész
 Audio:	MediaConverter-FileInfo		Hang:
 OK	MediaConverter-FileInfo		Rendben
  seconds	MediaFileInfo		 másodperc
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Nem sikerült írni a megadott útvonalra: %strPath%. Használom az alapértelmezettet: /boot/home
 Source files	MediaConverter		Forrásfájlok
+Selected directory not found. Defaulting to /boot/home	MediaConverter		A választott mappa nem található. Használom az alapértelmezettet: /boot/home
 Error writing video frame %lld	MediaConverter		Hiba történt a %lld. képkocka írása közben
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# képkocka} other{# képkocka}}
 Error writing audio frame %lld	MediaConverter		Hiba történt a %lld. hang írása közben
@@ -38,6 +41,7 @@ None available	Video codecs		Nincs elérhető
 Conversion cancelled	MediaConverter		Konvertálás megszakítva
 No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
 Select this folder	MediaConverter		E mappa kijelölése
+Error creating track.	MediaConverter		Nem sikerült létrehozni a sávot.
 Continue	MediaConverter		Folytatás
 Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
 Video:	MediaConverter-FileInfo		Videó:
@@ -59,6 +63,7 @@ Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre a
 Audio encoding:	MediaConverter		Audió kódolása:
 Audio quality not supported	MediaConverter		Ez a hangminőség nem támogatott
 File	Menu		Fájl
+Input file not recognized as Audio or Video	MediaConverter		A bemeneti fájl nem azonosítható hang- vagy videóként
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Átalakítás
 Writing audio track: %ld%% complete	MediaConverter		Audiósáv írása: %ld%% kész
