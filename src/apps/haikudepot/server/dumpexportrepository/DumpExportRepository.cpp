@@ -1,7 +1,7 @@
 /*
  * Generated Model Object
  * source json-schema : dumpexport.json
- * generated at : 2017-10-12T21:34:32.334310
+ * generated at : 2017-11-11T13:59:22.553529
  */
 #include "DumpExportRepository.h"
 
@@ -59,6 +59,16 @@ DumpExportRepository::SetInformationUrl(BString* value)
 }
 
 
+void
+DumpExportRepository::SetInformationUrlNull()
+{
+    if (!InformationUrlIsNull()) {
+        delete fInformationUrl;
+        fInformationUrl = NULL;
+    }
+}
+
+
 bool
 DumpExportRepository::InformationUrlIsNull()
 {
@@ -77,6 +87,16 @@ void
 DumpExportRepository::SetCode(BString* value)
 {
     fCode = value;
+}
+
+
+void
+DumpExportRepository::SetCodeNull()
+{
+    if (!CodeIsNull()) {
+        delete fCode;
+        fCode = NULL;
+    }
 }
 
 
@@ -140,6 +160,16 @@ DumpExportRepository::SetName(BString* value)
 }
 
 
+void
+DumpExportRepository::SetNameNull()
+{
+    if (!NameIsNull()) {
+        delete fName;
+        fName = NULL;
+    }
+}
+
+
 bool
 DumpExportRepository::NameIsNull()
 {
@@ -158,6 +188,16 @@ void
 DumpExportRepository::SetDescription(BString* value)
 {
     fDescription = value;
+}
+
+
+void
+DumpExportRepository::SetDescriptionNull()
+{
+    if (!DescriptionIsNull()) {
+        delete fDescription;
+        fDescription = NULL;
+    }
 }
 
 

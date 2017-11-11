@@ -1,7 +1,7 @@
 /*
  * Generated Model Object
  * source json-schema : dumpexport.json
- * generated at : 2017-10-12T21:34:32.333203
+ * generated at : 2017-11-11T13:59:22.550365
  */
 
 #ifndef GEN_JSON_SCHEMA_MODEL__DUMPEXPORTREPOSITORY_H
@@ -19,10 +19,12 @@ public:
     
     BString* InformationUrl();
     void SetInformationUrl(BString* value);
+    void SetInformationUrlNull();
     bool InformationUrlIsNull();
 
     BString* Code();
     void SetCode(BString* value);
+    void SetCodeNull();
     bool CodeIsNull();
 
     void AddToRepositorySources(DumpExportRepositorySource* value);
@@ -33,10 +35,12 @@ public:
 
     BString* Name();
     void SetName(BString* value);
+    void SetNameNull();
     bool NameIsNull();
 
     BString* Description();
     void SetDescription(BString* value);
+    void SetDescriptionNull();
     bool DescriptionIsNull();
 
 private:

@@ -4,7 +4,16 @@ UsePrivateHeaders interface shared storage package support net ;
 
 # source directories
 local sourceDirs =
-	edits_generic model textview ui ui_generic server server/dumpexportrepository tar util
+	edits_generic
+	model
+	textview
+	ui
+	ui_generic
+	server
+	server/dumpexportrepository
+	server/dumpexportpkg
+	tar
+	util
 ;
 
 local sourceDir ;
@@ -76,6 +85,11 @@ Application HaikuDepot :
 	UserLoginWindow.cpp
 	
 	# network + server - model
+	DumpExportPkg.cpp
+	DumpExportPkgCategory.cpp
+	DumpExportPkgJsonListener.cpp
+	DumpExportPkgScreenshot.cpp
+	DumpExportPkgVersion.cpp
 	DumpExportRepository.cpp
 	DumpExportRepositorySource.cpp
 	DumpExportRepositoryJsonListener.cpp
@@ -84,6 +98,7 @@ Application HaikuDepot :
 	AbstractServerProcess.cpp
 	ServerSettings.cpp
 	WebAppInterface.cpp
+	PkgDataUpdateProcess.cpp
 	RepositoryDataUpdateProcess.cpp
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp

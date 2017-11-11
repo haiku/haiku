@@ -1000,7 +1000,8 @@ DepotInfo::DepotInfo(const BString& name)
 	:
 	fName(name),
 	fPackages(),
-	fWebAppRepositoryCode()
+	fWebAppRepositoryCode(),
+	fWebAppRepositorySourceCode()
 {
 }
 
@@ -1010,6 +1011,7 @@ DepotInfo::DepotInfo(const DepotInfo& other)
 	fName(other.fName),
 	fPackages(other.fPackages),
 	fWebAppRepositoryCode(other.fWebAppRepositoryCode),
+	fWebAppRepositorySourceCode(other.fWebAppRepositorySourceCode),
 	fBaseURL(other.fBaseURL)
 {
 }
@@ -1022,6 +1024,7 @@ DepotInfo::operator=(const DepotInfo& other)
 	fPackages = other.fPackages;
 	fBaseURL = other.fBaseURL;
 	fWebAppRepositoryCode = other.fWebAppRepositoryCode;
+	fWebAppRepositorySourceCode = other.fWebAppRepositorySourceCode;
 	return *this;
 }
 

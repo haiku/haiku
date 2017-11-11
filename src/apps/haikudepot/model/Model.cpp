@@ -23,6 +23,7 @@
 #include <Path.h>
 
 #include "Logger.h"
+#include "PkgDataUpdateProcess.h"
 #include "RepositoryDataUpdateProcess.h"
 #include "StorageUtils.h"
 
@@ -864,6 +865,30 @@ Model::_DumpExportRepositoryDataPath(BPath& path) const
 
 
 status_t
+Model::_DumpExportPkgDataPath(BPath& path,
+	const BString& repositorySourceCode) const
+{
+	BPath repoDataPath;
+	BString leafName;
+
+	leafName.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
+		fPreferredLanguage.String());
+
+	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
+		&& repoDataPath.Append("HaikuDepot") == B_OK
+		&& create_directory(repoDataPath.Path(), 0777) == B_OK
+		&& repoDataPath.Append(leafName.String()) == B_OK) {
+		path.SetTo(repoDataPath.Path());
+		return B_OK;
+	}
+
+	path.Unset();
+	fprintf(stdout, "unable to find the user cache file for pkgs' data");
+	return B_ERROR;
+}
+
+
+status_t
 Model::PopulateWebAppRepositoryCodes()
 {
 	status_t result = B_OK;
@@ -895,8 +920,7 @@ int32
 Model::_PopulateAllPackagesEntry(void* cookie)
 {
 	Model* model = static_cast<Model*>(cookie);
-	model->_PopulateAllPackagesThread(true);
-	model->_PopulateAllPackagesThread(false);
+	model->_PopulateAllPackagesThread();
 	model->_PopulateAllPackagesIcons();
 	return 0;
 }
@@ -948,430 +972,52 @@ Model::_PopulateAllPackagesIcons()
 
 
 void
-Model::_PopulateAllPackagesThread(bool fromCacheOnly)
+Model::_PopulatePackagesForDepot(const DepotInfo& depotInfo)
+{
+	BString repositorySourceCode = depotInfo.WebAppRepositorySourceCode();
+	BPath repositorySourcePkgDataPath;
+
+	if (B_OK != _DumpExportPkgDataPath(repositorySourcePkgDataPath,
+		repositorySourceCode)) {
+		printf("unable to obtain the path for storing data for [%s]\n",
+			repositorySourceCode.String());
+	} else {
+
+		printf("will fetch and process data for repository source [%s]\n",
+			repositorySourceCode.String());
+
+		PkgDataUpdateProcess process(
+			repositorySourcePkgDataPath,
+			fLock, repositorySourceCode, fPreferredLanguage,
+			depotInfo.Packages(),
+			fCategories);
+
+		process.Run();
+
+		printf("did fetch and process data for repository source [%s]\n",
+			repositorySourceCode.String());
+	}
+}
+
+
+void
+Model::_PopulateAllPackagesThread()
 {
 	int32 depotIndex = 0;
-	int32 packageIndex = 0;
-	PackageList bulkPackageList;
+	int32 count = 0;
 
-	while (!fStopPopulatingAllPackages) {
-		// Obtain PackageInfoRef while keeping the depot and package lists
-		// locked.
-		PackageInfoRef package;
-		{
-			BAutolock locker(&fLock);
+	for (depotIndex = 0;
+		depotIndex < fDepots.CountItems() && !fStopPopulatingAllPackages;
+		depotIndex++) {
+		const DepotInfo& depot = fDepots.ItemAt(depotIndex);
 
-			if (depotIndex >= fDepots.CountItems())
-				break;
-			const DepotInfo& depot = fDepots.ItemAt(depotIndex);
-
-			const PackageList& packages = depot.Packages();
-			if (packageIndex >= packages.CountItems()) {
-				// Need the next depot
-				packageIndex = 0;
-				depotIndex++;
-				continue;
-			}
-
-			package = packages.ItemAt(packageIndex);
-			packageIndex++;
-		}
-
-		if (package.Get() == NULL)
-			continue;
-
-		//_PopulatePackageInfo(package, fromCacheOnly);
-		bulkPackageList.Add(package);
-		if (bulkPackageList.CountItems() == 50) {
-			_PopulatePackageInfos(bulkPackageList, fromCacheOnly);
-			bulkPackageList.Clear();
-		}
-		// TODO: Average user rating. It needs to be shown in the
-		// list view, so without the user clicking the package.
-	}
-
-	if (bulkPackageList.CountItems() > 0) {
-		_PopulatePackageInfos(bulkPackageList, fromCacheOnly);
-	}
-}
-
-
-bool
-Model::_GetCacheFile(BPath& path, BFile& file, directory_which directory,
-	const char* relativeLocation, const char* fileName, uint32 openMode) const
-{
-	if (find_directory(directory, &path) == B_OK
-		&& path.Append(relativeLocation) == B_OK
-		&& create_directory(path.Path(), 0777) == B_OK
-		&& path.Append(fileName) == B_OK) {
-		// Try opening the file which will fail if its
-		// not a file or does not exist.
-		return file.SetTo(path.Path(), openMode) == B_OK;
-	}
-	return false;
-}
-
-
-bool
-Model::_GetCacheFile(BPath& path, BFile& file, directory_which directory,
-	const char* relativeLocation, const char* fileName,
-	bool ignoreAge, time_t maxAge) const
-{
-	if (!_GetCacheFile(path, file, directory, relativeLocation, fileName,
-			B_READ_ONLY)) {
-		return false;
-	}
-
-	if (ignoreAge)
-		return true;
-
-	time_t modifiedTime;
-	file.GetModificationTime(&modifiedTime);
-	time_t now;
-	time(&now);
-	return now - modifiedTime < maxAge;
-}
-
-
-void
-Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly)
-{
-	if (fStopPopulatingAllPackages)
-		return;
-
-	// See if there are cached info files
-	for (int i = packages.CountItems() - 1; i >= 0; i--) {
-		if (fStopPopulatingAllPackages)
-			return;
-
-		const PackageInfoRef& package = packages.ItemAtFast(i);
-
-		BFile file;
-		BPath path;
-		BString name(package->Name());
-		name << ".info";
-		if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
-			"HaikuDepot", name, fromCacheOnly, 60 * 60)) {
-			// Cache file is recent enough, just use it and return.
-			BMessage pkgInfo;
-			if (pkgInfo.Unflatten(&file) == B_OK) {
-				_PopulatePackageInfo(package, pkgInfo);
-				packages.Remove(i);
-			}
-		}
-	}
-
-	if (fromCacheOnly || packages.IsEmpty())
-		return;
-
-	// Retrieve info from web-app
-	BMessage info;
-
-	StringList packageNames;
-	StringList packageArchitectures;
-	StringList repositoryCodes;
-
-	for (int i = 0; i < packages.CountItems(); i++) {
-		const PackageInfoRef& package = packages.ItemAtFast(i);
-		packageNames.Add(package->Name());
-
-		if (!packageArchitectures.Contains(package->Architecture()))
-			packageArchitectures.Add(package->Architecture());
-
-		const DepotInfo *depot = DepotForName(package->DepotName());
-
-		if (depot != NULL) {
-			BString repositoryCode = depot->WebAppRepositoryCode();
-
-			if (repositoryCode.Length() != 0
-				&& !repositoryCodes.Contains(repositoryCode)) {
-				repositoryCodes.Add(repositoryCode);
-			}
-		}
-	}
-
-	if (repositoryCodes.CountItems() != 0) {
-		status_t status = fWebAppInterface.RetrieveBulkPackageInfo(packageNames,
-			packageArchitectures, repositoryCodes, info);
-
-		if (status == B_OK) {
-			// Parse message
-			BMessage result;
-			BMessage pkgs;
-			if (info.FindMessage("result", &result) == B_OK
-				&& result.FindMessage("pkgs", &pkgs) == B_OK) {
-				int32 index = 0;
-				while (true) {
-					if (fStopPopulatingAllPackages)
-						return;
-					BString name;
-					name << index++;
-					BMessage pkgInfo;
-					if (pkgs.FindMessage(name, &pkgInfo) != B_OK)
-						break;
-
-					BString pkgName;
-					if (pkgInfo.FindString("name", &pkgName) != B_OK)
-						continue;
-
-					// Find the PackageInfoRef
-					bool found = false;
-					for (int i = 0; i < packages.CountItems(); i++) {
-						const PackageInfoRef& package = packages.ItemAtFast(i);
-						if (pkgName == package->Name()) {
-							_PopulatePackageInfo(package, pkgInfo);
-
-							// Store in cache
-							BFile file;
-							BPath path;
-							BString fileName(package->Name());
-							fileName << ".info";
-							if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
-									"HaikuDepot", fileName,
-									B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)) {
-								pkgInfo.Flatten(&file);
-							}
-
-							packages.Remove(i);
-							found = true;
-							break;
-						}
-					}
-					if (!found)
-						printf("No matching package for %s\n", pkgName.String());
-				}
-			}
-		} else {
-			printf("Error sending request: %s\n", strerror(status));
-			int count = packages.CountItems();
-			if (count >= 4) {
-				// Retry in smaller chunks
-				PackageList firstHalf;
-				PackageList secondHalf;
-				for (int i = 0; i < count / 2; i++)
-					firstHalf.Add(packages.ItemAtFast(i));
-				for (int i = count / 2; i < count; i++)
-					secondHalf.Add(packages.ItemAtFast(i));
-				packages.Clear();
-				_PopulatePackageInfos(firstHalf, fromCacheOnly);
-				_PopulatePackageInfos(secondHalf, fromCacheOnly);
-			} else {
-				while (packages.CountItems() > 0) {
-					const PackageInfoRef& package = packages.ItemAtFast(0);
-					_PopulatePackageInfo(package, fromCacheOnly);
-					packages.Remove(0);
-				}
-			}
-		}
-	}
-
-	if (packages.CountItems() > 0) {
-		uint32 count = 0;
-		bool debug_enabled = Logger::IsDebugEnabled();
-
-		for (int i = 0; i < packages.CountItems(); i++) {
-			const PackageInfoRef& package = packages.ItemAtFast(i);
+		if (depot.WebAppRepositorySourceCode().Length() > 0) {
+			_PopulatePackagesForDepot(depot);
 			count++;
-
-			if (debug_enabled) {
-				printf("No package info for %s\n", package->Name().String());
-			}
-		}
-
-		printf("No package info for %" B_PRIu32 " packages\n", count);
-	}
-}
-
-
-void
-Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
-{
-	if (fromCacheOnly)
-		return;
-
-	BString repositoryCode;
-	const DepotInfo* depot = DepotForName(package->DepotName());
-
-	if (depot != NULL) {
-		repositoryCode = depot->WebAppRepositoryCode();
-
-		if (repositoryCode.Length() > 0) {
-			// Retrieve info from web-app
-			BMessage info;
-
-			status_t status = fWebAppInterface.RetrievePackageInfo(
-				package->Name(), package->Architecture(), repositoryCode,
-				info);
-
-			if (status == B_OK) {
-				// Parse message
-		//		info.PrintToStream();
-				BMessage result;
-				if (info.FindMessage("result", &result) == B_OK)
-					_PopulatePackageInfo(package, result);
-			}
-		} else {
-			printf("unable to find the web app repository code for depot; %s\n",
-				package->DepotName().String());
-		}
-	} else {
-		printf("no depot for name; %s\n",
-			package->DepotName().String());
-	}
-}
-
-
-static void
-append_word_list(BString& words, const char* word)
-{
-	if (words.Length() > 0)
-		words << ", ";
-	words << word;
-}
-
-
-void
-Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
-{
-	bool debug_enabled = Logger::IsDebugEnabled();
-	BAutolock locker(&fLock);
-
-	BString foundInfo;
-
-	BMessage versions;
-	if (data.FindMessage("versions", &versions) == B_OK) {
-		// Search a summary and description in the preferred language
-		int32 index = 0;
-		while (true) {
-			BString name;
-			name << index++;
-			BMessage version;
-			if (versions.FindMessage(name, &version) != B_OK)
-				break;
-
-			BString title;
-			if (version.FindString("title", &title) == B_OK) {
-				package->SetTitle(title);
-
-				if (debug_enabled)
-					append_word_list(foundInfo, "title");
-			}
-			BString summary;
-			if (version.FindString("summary", &summary) == B_OK) {
-				package->SetShortDescription(summary);
-
-				if (debug_enabled)
-					append_word_list(foundInfo, "summary");
-			}
-			BString description;
-			if (version.FindString("description", &description) == B_OK) {
-				package->SetFullDescription(description);
-
-				if (debug_enabled)
-					append_word_list(foundInfo, "description");
-			}
-			double payloadLength;
-			if (version.FindDouble("payloadLength", &payloadLength) == B_OK) {
-				package->SetSize((int64)payloadLength);
-
-				if (debug_enabled)
-					append_word_list(foundInfo, "size");
-			}
-			break;
 		}
 	}
 
-	BMessage categories;
-	if (data.FindMessage("pkgCategoryCodes", &categories) == B_OK) {
-		bool foundCategory = false;
-		int32 index = 0;
-		while (true) {
-			BString name;
-			name << index++;
-			BString category;
-			if (categories.FindString(name, &category) != B_OK)
-				break;
-
-			package->ClearCategories();
-			for (int i = fCategories.CountItems() - 1; i >= 0; i--) {
-				const CategoryRef& categoryRef = fCategories.ItemAtFast(i);
-				if (categoryRef->Name() == category) {
-					package->AddCategory(categoryRef);
-					foundCategory = true;
-					break;
-				}
-			}
-		}
-		if (debug_enabled && foundCategory)
-			append_word_list(foundInfo, "categories");
-	}
-
-	double derivedRating;
-	if (data.FindDouble("derivedRating", &derivedRating) == B_OK) {
-		RatingSummary summary;
-		summary.averageRating = derivedRating;
-		package->SetRatingSummary(summary);
-
-		if (debug_enabled)
-			append_word_list(foundInfo, "rating");
-	}
-
-	double prominenceOrdering;
-	if (data.FindDouble("prominenceOrdering", &prominenceOrdering) == B_OK) {
-		package->SetProminence(prominenceOrdering);
-
-		if (debug_enabled)
-			append_word_list(foundInfo, "prominence");
-	}
-
-	BString changelog;
-	if (data.FindString("pkgChangelogContent", &changelog) == B_OK) {
-		package->SetChangelog(changelog);
-
-		if (debug_enabled)
-			append_word_list(foundInfo, "changelog");
-	}
-
-	BMessage screenshots;
-	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
-		package->ClearScreenshotInfos();
-		bool foundScreenshot = false;
-		int32 index = 0;
-		while (true) {
-			BString name;
-			name << index++;
-
-			BMessage screenshot;
-			if (screenshots.FindMessage(name, &screenshot) != B_OK)
-				break;
-
-			BString code;
-			double width;
-			double height;
-			double dataSize;
-			if (screenshot.FindString("code", &code) == B_OK
-				&& screenshot.FindDouble("width", &width) == B_OK
-				&& screenshot.FindDouble("height", &height) == B_OK
-				&& screenshot.FindDouble("length", &dataSize) == B_OK) {
-				package->AddScreenshotInfo(ScreenshotInfo(code, (int32)width,
-					(int32)height, (int32)dataSize));
-				foundScreenshot = true;
-			}
-		}
-		if (debug_enabled && foundScreenshot)
-			append_word_list(foundInfo, "screenshots");
-	}
-
-	if (debug_enabled && foundInfo.Length() > 0) {
-		printf("Populated package info for %s: %s\n",
-			package->Name().String(), foundInfo.String());
-	}
-
-	// If the user already clicked this package, remove it from the
-	// list of populated packages, so that clicking it again will
-	// populate any additional information.
-	// TODO: Trigger re-populating if the package is currently showing.
-	fPopulatedPackages.Remove(package);
+	printf("did populate package data for %" B_PRIi32 " depots\n", count);
 }
 
 

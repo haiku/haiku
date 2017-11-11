@@ -10,6 +10,7 @@
 #include <Directory.h>
 #include <FindDirectory.h>
 
+#include "Logger.h"
 #include "ServerIconExportUpdateProcess.h"
 #include "StorageUtils.h"
 
@@ -73,6 +74,10 @@ LocalIconStore::UpdateFromServerIfNecessary() const
 		BPath iconStoragePath(fIconStoragePath);
 		ServerIconExportUpdateProcess service(iconStoragePath);
 		service.Run();
+
+		if (Logger::IsDebugEnabled()) {
+			printf("did update the icons from server\n");
+		}
 	}
 }
 

@@ -153,10 +153,14 @@ public:
 private:
 			status_t			_DumpExportRepositoryDataPath(
 									BPath& path) const;
+			status_t			_DumpExportPkgDataPath(BPath& path,
+									const BString& repositorySourceCode) const;
 			void				_UpdateIsFeaturedFilter();
 
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
-			void				_PopulateAllPackagesThread(bool fromCacheOnly);
+			void				_PopulateAllPackagesThread();
+			void				_PopulatePackagesForDepot(
+									const DepotInfo& depotInfo);
 
 			void				_PopulateAllPackagesIcons();
 
@@ -171,15 +175,6 @@ private:
 									const char* fileName,
 									bool ignoreAge, time_t maxAge) const;
 
-			void				_PopulatePackageInfos(
-									PackageList& packages,
-									bool fromCacheOnly);
-			void				_PopulatePackageInfo(
-									const PackageInfoRef& package,
-									bool fromCacheOnly);
-			void				_PopulatePackageInfo(
-									const PackageInfoRef& package,
-									const BMessage& data);
 			status_t			_PopulatePackageIcon(
 									const PackageInfoRef& package);
 			void				_PopulatePackageScreenshot(

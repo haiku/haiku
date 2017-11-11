@@ -3,8 +3,8 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#ifndef REPOSITORY_DATA_UPDATE_PROCESS_H
-#define REPOSITORY_DATA_UPDATE_PROCESS_H
+#ifndef PACKAGE_DATA_UPDATE_PROCESS_H
+#define PACKAGE_DATA_UPDATE_PROCESS_H
 
 
 #include "AbstractServerProcess.h"
@@ -17,13 +17,16 @@
 #include <Url.h>
 
 
-class RepositoryDataUpdateProcess : public AbstractServerProcess {
+class PkgDataUpdateProcess : public AbstractServerProcess {
 public:
-
-								RepositoryDataUpdateProcess(
+								PkgDataUpdateProcess(
 									const BPath& localFilePath,
-									DepotList* depotList);
-	virtual						~RepositoryDataUpdateProcess();
+									BLocker& lock,
+									BString naturalLanguageCode,
+									BString repositorySourceCode,
+									const PackageList& packages,
+									const CategoryList& categories);
+	virtual						~PkgDataUpdateProcess();
 
 			status_t			Run();
 
@@ -37,8 +40,12 @@ private:
 			status_t			PopulateDataToDepots();
 
 			BPath				fLocalFilePath;
-			DepotList*			fDepotList;
+			BString				fNaturalLanguageCode;
+			BString				fRepositorySourceCode;
+	const	PackageList&		fPackages;
+	const 	CategoryList&		fCategories;
+			BLocker&			fLock;
 
 };
 
-#endif // REPOSITORY_DATA_UPDATE_PROCESS_H
+#endif // PACKAGE_DATA_UPDATE_PROCESS_H

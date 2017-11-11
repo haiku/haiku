@@ -1,7 +1,7 @@
 /*
  * Generated Listener Object
  * source json-schema : dumpexport.json
- * generated at : 2017-10-02T22:02:18.621800
+ * generated at : 2017-11-11T14:08:39.276778
  */
 #include "DumpExportRepositoryJsonListener.h"
 #include "List.h"
@@ -386,16 +386,16 @@ DumpExportRepository_StackedDumpExportRepositoryJsonListener::Handle(const BJson
         {
 
             if (fNextItemName == "informationUrl")
-                fTarget->SetInformationUrl(NULL);
+                fTarget->SetInformationUrlNull();
         
             if (fNextItemName == "code")
-                fTarget->SetCode(NULL);
+                fTarget->SetCodeNull();
         
             if (fNextItemName == "name")
-                fTarget->SetName(NULL);
+                fTarget->SetNameNull();
         
             if (fNextItemName == "description")
-                fTarget->SetDescription(NULL);
+                fTarget->SetDescriptionNull();
                     fNextItemName.SetTo("");
             break;
         }
@@ -542,10 +542,10 @@ DumpExportRepositorySource_StackedDumpExportRepositoryJsonListener::Handle(const
         {
 
             if (fNextItemName == "url")
-                fTarget->SetUrl(NULL);
+                fTarget->SetUrlNull();
         
             if (fNextItemName == "code")
-                fTarget->SetCode(NULL);
+                fTarget->SetCodeNull();
                     fNextItemName.SetTo("");
             break;
         }
@@ -767,7 +767,11 @@ AbstractMainDumpExportRepositoryJsonListener::~AbstractMainDumpExportRepositoryJ
 void
 AbstractMainDumpExportRepositoryJsonListener::HandleError(status_t status, int32 line, const char* message)
 {
-    printf("an error has arisen processing json for 'DumpExportRepository'; %s", message);
+    if (message != NULL) {
+        fprintf(stderr, "an error has arisen processing json for 'DumpExportRepository'; %s\n", message);
+    } else {
+        fprintf(stderr, "an error has arisen processing json for 'DumpExportRepository'\n");
+    }
     fErrorStatus = status;
 }
 

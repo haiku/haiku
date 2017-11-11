@@ -1,7 +1,7 @@
 /*
  * Generated Model Object
  * source json-schema : dumpexport.json
- * generated at : 2017-10-12T21:34:32.334783
+ * generated at : 2017-11-11T13:59:22.559632
  */
 #include "DumpExportRepositorySource.h"
 
@@ -39,6 +39,16 @@ DumpExportRepositorySource::SetUrl(BString* value)
 }
 
 
+void
+DumpExportRepositorySource::SetUrlNull()
+{
+    if (!UrlIsNull()) {
+        delete fUrl;
+        fUrl = NULL;
+    }
+}
+
+
 bool
 DumpExportRepositorySource::UrlIsNull()
 {
@@ -57,6 +67,16 @@ void
 DumpExportRepositorySource::SetCode(BString* value)
 {
     fCode = value;
+}
+
+
+void
+DumpExportRepositorySource::SetCodeNull()
+{
+    if (!CodeIsNull()) {
+        delete fCode;
+        fCode = NULL;
+    }
 }
 
 

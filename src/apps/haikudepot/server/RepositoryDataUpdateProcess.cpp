@@ -78,7 +78,7 @@ DepotMatchingRepositoryListener::IsUnassociatedDepotByUrl(
 	const DepotInfo& depotInfo, const BString& urlStr) const
 {
 	if (depotInfo.BaseURL().Length() > 0
-		&& depotInfo.WebAppRepositoryCode().Length() == 0) {
+		&& depotInfo.WebAppRepositorySourceCode().Length() == 0) {
 		BUrl depotInfoBaseUrl(depotInfo.BaseURL());
 		BUrl url(urlStr);
 
@@ -129,7 +129,7 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 				BString(*(repositorySource->Code())));
 			fDepotList->Replace(depotIndex, modifiedDepotInfo);
 
-			printf("associated depot [%s] with haiku depot server"
+			printf("associated depot [%s] with server"
 				" repository source [%s]\n", modifiedDepotInfo.Name().String(),
 				repositorySource->Code()->String());
 		}
@@ -182,7 +182,7 @@ RepositoryDataUpdateProcess::Run()
 		ServerSettings::CreateFullUrl("/__repository/all-en.json.gz"),
 		0, 0);
 
-	if (result == B_OK) {
+	if (result == B_OK || result == APP_ERR_NOT_MODIFIED) {
 		printf("did fetch repositories data\n");
 
 			// now load the data in and process it.
@@ -190,6 +190,8 @@ RepositoryDataUpdateProcess::Run()
 		printf("will process repository data and match to depots\n");
 		result = PopulateDataToDepots();
 		printf("did process repository data and match to depots\n");
+	} else {
+		printf("an error has arisen downloading the repositories' data\n");
 	}
 
 	return result;
