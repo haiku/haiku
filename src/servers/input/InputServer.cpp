@@ -1306,44 +1306,6 @@ InputServer::ControlDevices(const char* name, input_device_type type,
 
 
 bool
-InputServer::DoMouseAcceleration(int32* _x, int32* _y)
-{
-	CALLED();
-	int32 speed = fMouseSettings.MouseSpeed() >> 15;
-
-	// ToDo: implement mouse acceleration
-	(void)speed;
-	//*_y = *_x * speed;
-	PRINT(("DoMouse : %ld %ld %ld %ld\n", *_x, *_y, speed, fMouseSettings.MouseSpeed()));
-	return true;
-}
-
-
-bool
-InputServer::SetMousePos(long *, long *, long, long)
-{
-	CALLED();
-	return true;
-}
-
-
-bool
-InputServer::SetMousePos(long *, long *, BPoint)
-{
-	CALLED();
-	return true;
-}
-
-
-bool
-InputServer::SetMousePos(long *, long *, float, float)
-{
-	CALLED();
-	return true;
-}
-
-
-bool
 InputServer::SafeMode()
 {
 	char parameter[32];
@@ -1872,5 +1834,3 @@ main(int /*argc*/, char** /*argv*/)
 
 	return 0;
 }
-
-

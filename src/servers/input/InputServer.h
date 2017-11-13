@@ -166,11 +166,6 @@ class InputServer : public BApplication {
 		status_t ControlDevices(const char *name, input_device_type type,
 					uint32 code, BMessage* message);
 
-		bool DoMouseAcceleration(int32*, int32*);
-		bool SetMousePos(long*, long*, long, long);
-		bool SetMousePos(long*, long*, BPoint);
-		bool SetMousePos(long*, long*, float, float);
-
 		bool SafeMode();
 
 		::AddOnManager* AddOnManager() { return fAddOnManager; }
