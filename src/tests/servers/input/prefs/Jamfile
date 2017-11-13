@@ -7,10 +7,6 @@ UsePrivateHeaders [ FDirName servers app ] ;
 
 AddResources KeymapTest : Keymap.rdef ;
 
-if $(COMPILE_FOR_R5) {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
-}
-
 SimpleTest KeymapTest :
 	KeymapApplication.cpp
 	KeymapWindow.cpp
@@ -33,31 +29,31 @@ SEARCH on [ FGristFiles
 
 AddResources KeyboardTest : Keyboard.rdef ;
 
-SimpleTest KeyboardTest : 
-	Keyboard.cpp 
-	KeyboardSettings.cpp 
-	KeyboardView.cpp 
-	KeyboardWindow.cpp 
+SimpleTest KeyboardTest :
+	Keyboard.cpp
+	KeyboardSettings.cpp
+	KeyboardView.cpp
+	KeyboardWindow.cpp
 
 	InterfaceDefs.cpp
 	Input.cpp
 	: translation be ;
 
 SEARCH on [ FGristFiles
-	Keyboard.cpp 
-	KeyboardSettings.cpp 
-	KeyboardView.cpp 
-	KeyboardWindow.cpp 
+	Keyboard.cpp
+	KeyboardSettings.cpp
+	KeyboardView.cpp
+	KeyboardWindow.cpp
 	Keyboard.rdef ]
 	= [ FDirName $(HAIKU_TOP) src preferences keyboard ] ;
 
 AddResources MouseTest : Mouse.rdef ;
 
-SimpleTest MouseTest : 
-	Mouse.cpp 
-	MouseSettings.cpp 
+SimpleTest MouseTest :
+	Mouse.cpp
+	MouseSettings.cpp
 	MouseWindow.cpp
-	MouseView.cpp 
+	MouseView.cpp
 	SettingsView.cpp
 
 	InterfaceDefs.cpp
@@ -66,10 +62,10 @@ SimpleTest MouseTest :
 	;
 
 SEARCH on [ FGristFiles
-	Mouse.cpp 
-	MouseSettings.cpp 
+	Mouse.cpp
+	MouseSettings.cpp
 	MouseWindow.cpp
-	MouseView.cpp 
+	MouseView.cpp
 	SettingsView.cpp
 	Mouse.rdef
 	]
@@ -89,6 +85,6 @@ SEARCH on [ FGristFiles
 	]
 	= [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 
-SEARCH on [ FGristFiles InterfaceDefs.cpp Input.cpp ] 
+SEARCH on [ FGristFiles InterfaceDefs.cpp Input.cpp ]
 	= [ FDirName $(HAIKU_TOP) src kits interface ] ;
 

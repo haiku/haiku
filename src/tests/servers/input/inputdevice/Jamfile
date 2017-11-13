@@ -1,9 +1,5 @@
 SubDir HAIKU_TOP src tests servers input inputdevice ;
 
-if $(COMPILE_FOR_R5) {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
-}
-
 UsePrivateHeaders input ;
 
 SimpleTest input_device_test :
@@ -14,5 +10,5 @@ SimpleTest input_device_test :
 	 ;
 
 
-SEARCH on [ FGristFiles Input.cpp ] 
+SEARCH on [ FGristFiles Input.cpp ]
 	= [ FDirName $(HAIKU_TOP) src kits interface ] ;

@@ -4,10 +4,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers input ] ;
 UsePrivateHeaders input ;
 AddResources ReplicantTest : replicant.rdef ;
 
-if $(COMPILE_FOR_R5) {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
-}
-
 SimpleTest ReplicantTest :
 	MethodReplicant.cpp
 	MethodMenuItem.cpp

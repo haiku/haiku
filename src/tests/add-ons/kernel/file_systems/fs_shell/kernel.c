@@ -4,8 +4,8 @@
   requests from the test program (fsh and tstfs) to the actual file system
   routines.  It provides a rather posix-like interface generally with
   the routines preceded by a "sys_" prefix.
-  
-  THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED 
+
+  THIS CODE COPYRIGHT DOMINIC GIAMPAOLO.  NO WARRANTY IS EXPRESSED
   OR IMPLIED.  YOU MAY USE THIS CODE AND FREELY DISTRIBUTE IT FOR
   NON-COMMERCIAL USE AS LONG AS THIS NOTICE REMAINS ATTACHED.
 
@@ -231,7 +231,7 @@ static void
 PANIC(char *s, ...)
 {
 	va_list list;
-	
+
 	va_start(list, s);
 	vfprintf(stdout, s, list);
 	va_end(list);
@@ -253,7 +253,7 @@ dump_fsystem(int argc, char **argv)
     }
 
     fs = (struct fsystem *)strtoul(argv[1], NULL, 0);
-    
+
     kprintf("fs @ 0x%x name %s rcnt %d ops @ 0x%x\n", fs, fs->name,
             fs->rcnt, &fs->ops);
 }
@@ -269,7 +269,7 @@ dump_ioctx(int argc, char **argv)
     }
 
     ioctx = (struct ioctx *)strtoul(argv[1], NULL, 0);
-    
+
     kprintf("ioctx @ 0x%x, kerrno %d, cwd 0x%x, fdarray 0x%x\n", ioctx,
             ioctx->kerrno, ioctx->cwd, ioctx->fds);
 }
@@ -286,7 +286,7 @@ dump_vnode(int argc, char **argv)
     }
 
     vn = (vnode *)strtoul(argv[1], NULL, 0);
-    
+
     kprintf("vnode @ 0x%x vnid 0x%x ns 0x%x mounted 0x%x\n", vn, vn->vnid,
             vn->ns, vn->mounted);
     kprintf("remove %d busy %d inlist %d\n", vn->remove, vn->busy, vn->inlist);
@@ -307,7 +307,7 @@ dump_fdarray(int argc, char **argv)
     }
 
     fds = (struct fdarray *)strtoul(argv[1], NULL, 0);
-    
+
     kprintf("fdarray @ 0x%x  rcnt %d lock %d num %d\n", fds, fds->rcnt,
             fds->num);
     kprintf("alloc 0x%x coes 0x%x\n", fds->alloc, fds->coes);
@@ -328,7 +328,7 @@ dump_ofile(int argc, char **argv)
     }
 
     ofile = (struct ofile *)strtoul(argv[1], NULL, 0);
-    
+
     kprintf("ofile @ 0x%x type %d flags %d vn 0x%x cookie 0x%x\n",
             ofile, ofile->type, ofile->flags, ofile->vn, ofile->cookie);
     kprintf("rcnt %d ocnt %d pos 0x%x omode 0x%x\n", ofile->rcnt, ofile->ocnt,
@@ -346,7 +346,7 @@ dump_nspace(int argc, char **argv)
     }
 
     ns = (struct nspace *)strtoul(argv[1], NULL, 0);
-    
+
     kprintf("ns @ 0x%x nsid %d vnlist @ 0x%x data 0x%x\n", ns, ns->nsid,
             &ns->vnodes, ns->data);
     kprintf("root 0x%x mount 0x%x prev 0x%x next 0x%x\n", ns->root, ns->mount,
@@ -364,7 +364,7 @@ do_dump_io_info(thread_rec *thr)
         kprintf("thread: %d (%s)\n  No io info?!?\n", thr->thid, thr->name);
         return;
     }
-        
+
     kprintf("thread: %d (%s)\n", thr->thid, thr->name);
     fds = thr->ioctx->fds;
 
@@ -389,7 +389,7 @@ dump_io_info(int argc, char **argv)
 
     if (strcmp(argv[1], "-n") == 0) {
         int len;
-        
+
         /* hunt for the name in argv[2] */
         if (argv[2] == NULL) {
             kprintf("thread: the `-name' option requires an argument\n");
@@ -398,7 +398,7 @@ dump_io_info(int argc, char **argv)
 
         len = strlen(argv[2]);
         for(i=0; i < nthreads; i++) {
-            if (thread_tab[i] == NULL) 
+            if (thread_tab[i] == NULL)
                 continue;
 
             if (mystrstr(thread_tab[i]->name, argv[2]) != NULL) {
@@ -415,7 +415,7 @@ dump_io_info(int argc, char **argv)
             thr = thread_tab[thidtoslot(num)];
         else
             thr = (thread_rec *)num;
-        
+
         if (thr == 0)
             return 0;
 
@@ -479,7 +479,7 @@ init_vnode_layer(void)
     /*
     compute vnnum based on memsize. 256 vnodes with 8MB.
     compute usdvnnum based on vnnum. only 1/4 of total vnodes should
-    remain unlocked. 
+    remain unlocked.
     */
 
     vnnum = memsize >> 15;
@@ -508,7 +508,7 @@ init_vnode_layer(void)
     lists[LOCKED_LIST].head = NULL;
     lists[LOCKED_LIST].tail = NULL;
     lists[LOCKED_LIST].num = 0;
-    
+
     skiplist = NewSL(&compare_vnode, NULL, NO_DUPLICATES);
 
     /*
@@ -621,11 +621,11 @@ get_cur_ioctx(void)
     if (init == 0) {
 		int error;
         memset(&io, 0, sizeof(io));
-		
+
 		error = new_lock(&io.lock, "IO context");
 		if (error < 0)
 			PANIC("Failed to init IO context lock: %s\n", fs_strerror(error));
-    
+
 		init = 1;
 	}
 
@@ -667,7 +667,7 @@ sys_chdir(int kernel, int fd, const char *path)
     io->cwd = vn;
     UNLOCK(io->lock);
 
-    return 0;   
+    return 0;
 
 error2:
     dec_vnode(vn, FALSE);
@@ -930,11 +930,11 @@ sys_readdir(int kernel, int fd, struct my_dirent *buf, size_t bufsize,
     if (err)
         goto error1;
 
-		
+
 	// set d_pdev and d_pino
 	buf->d_pdev = vn->ns->nsid;
 	buf->d_pino = vn->vnid;
-    
+
 	/*
     patch the mount points and the root.
     */
@@ -1187,7 +1187,7 @@ sys_lseek(int kernel, int fd, fs_off_t pos, int whence)
     struct my_stat   st;
     vnode           *vn;
     op_rstat        *op;
-    
+
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
         err = FS_EBADF;
@@ -1292,7 +1292,7 @@ sys_read(int kernel, int fd, void *buf, size_t len)
     return sz;
 
 error2:
-    put_fd(f);  
+    put_fd(f);
 error1:
     return err;
 }
@@ -1337,7 +1337,7 @@ sys_write(int kernel, int fd, const void *buf, size_t len)
     return sz;
 
 error2:
-    put_fd(f);  
+    put_fd(f);
 error1:
     return err;
 }
@@ -1391,7 +1391,7 @@ sys_link(int kernel, int ofd, const char *oldpath, int nfd,
     vnode           *vn, *dvn;
     char            filename[FILE_NAME_LENGTH];
     op_link         *op;
-    
+
     err = get_file_fd(kernel, ofd, oldpath, TRUE, &vn);
     if (err)
         goto error1;
@@ -1435,7 +1435,7 @@ sys_unlink(int kernel, int fd, const char *path)
     vnode           *dvn;
     char            filename[FILE_NAME_LENGTH];
     op_unlink       *op;
-    
+
     err = get_dir_fd(kernel, fd, path, filename, &dvn);
     if (err)
         goto error1;
@@ -1470,7 +1470,7 @@ sys_rmdir(int kernel, int fd, const char *path)
     vnode           *dvn;
     char            filename[FILE_NAME_LENGTH];
     op_unlink       *op;
-    
+
     err = get_dir_fd(kernel, fd, path, filename, &dvn);
     if (err)
         goto error1;
@@ -1512,7 +1512,7 @@ sys_rename(int kernel, int ofd, const char *oldpath,
     err = get_dir_fd(kernel, nfd, newpath, newname, &ndvn);
     if (err)
         goto error2;
-    
+
     if (odvn->ns != ndvn->ns) {
         err = FS_EXDEV;
         goto error2;
@@ -1617,12 +1617,12 @@ kill_device_vnodes(dev_t id)
 	LOCK(vnlock);
 
 	ns = nsidtons(id);
-	
+
 	if (!ns) {
 		UNLOCK(vnlock);
 		return;
 	}
-	
+
 	fs = ns->fs;
 
 	while (ns->vnodes.head) {
@@ -1652,7 +1652,7 @@ remove_nspace(nspace *ns)
 	ns->shutdown = TRUE;
 	for (vn = ns->vnodes.head; vn; vn = vn->nspace.next)
 		vn->busy = TRUE;
-        
+
 	while (ns->vnodes.head) {
 		int err;
 
@@ -1807,7 +1807,7 @@ sys_read_attr(int kernel, int fd, const char *name, int type, void *buffer, size
     return sz;
 
 error2:
-    put_fd(f);  
+    put_fd(f);
 error1:
     return err;
 }
@@ -1838,7 +1838,7 @@ sys_write_attr(int kernel, int fd, const char *name,int type,
     return sz;
 
 error2:
-    put_fd(f);  
+    put_fd(f);
 error1:
     return err;
 }
@@ -1867,7 +1867,7 @@ sys_remove_attr(int kernel, int fd, const char *name)
     return 0;
 
 error2:
-    put_fd(f);  
+    put_fd(f);
 error1:
     return err;
 }
@@ -1979,11 +1979,11 @@ sys_mount(int kernel, const char *filesystem, int fd, const char *where,
     err = (*fs->ops.mount)(ns->nsid, device, flags, parms, len, &data, &vnid);
     if (err)
         goto error5;
-        
+
     LOCK(vnlock);
     ns->root = lookup_vnode(ns->nsid, vnid);
     ns->data = data;
-    
+
     if ((mount == rootvn) || (mount->mounted)) {
         err = FS_EBUSY;
         goto error6;
@@ -2024,7 +2024,7 @@ sys_unmount(int kernel, int fd, const char *where)
     nspace          *ns;
     fsystem         *fs;
     vnode           *root, *vn, *mount;
-    
+
     err = get_file_fd(TRUE, fd, where, TRUE, &root);
     if (err)
         goto error1;
@@ -2194,7 +2194,7 @@ sys_close_query(int kernel, int fd, const char *path, void *cookie)
 		dec_vnode(root, FALSE);
 		return FS_EPERM;
 	}
-	
+
 	err = (*fs->ops.close_query)(ns->data, cookie);
 	(*fs->ops.free_querycookie)(ns->data, NULL, cookie);
 
@@ -2266,7 +2266,7 @@ get_dir_fd(int kernel, int fd, const char *path, char *filename, vnode **dvn)
         goto error2;
     free_path(p);
     return 0;
-    
+
 error2:
     free_path(p);
 error1:
@@ -2287,7 +2287,7 @@ get_file_fd(int kernel, int fd, const char *path, int eatsymlink, vnode **vn)
         goto error2;
     free_path(p);
     return 0;
-    
+
 error2:
     free_path(p);
 error1:
@@ -2309,7 +2309,7 @@ get_file_vn(nspace_id nsid, vnode_id vnid, const char *path, int eatsymlink,
         goto error2;
     free_path(p);
     return 0;
-    
+
 error2:
     free_path(p);
 error1:
@@ -2416,7 +2416,7 @@ parse_path(vnode *bvn, char **pstart, char *path, int eatsymlink, vnode **vnp)
             while (*np == '/');
         } else
             np = strchr(p+1, '\0');
-        
+
     /*
     filter '..' if at the root of a namespace
     */
@@ -2950,7 +2950,7 @@ new_path(const char *path, char **copy)
 
     /* ### do real checking: MAXPATHLEN, max file name len, buffer address... */
 
-    strcpy(p, path);    
+    strcpy(p, path);
     if (p[l-1] == '/') {
         p[l] = '.';
         p[l+1] = '\0';
@@ -2980,7 +2980,7 @@ cat_paths(char *a, char *b)
     return p;
 }
 
-/* 
+/*
  * mount point management functions
  */
 
@@ -2996,7 +2996,7 @@ is_mount_vnode(vnode *mount, vnode **root)
         ns->root->rcnt++;
     }
     UNLOCK(vnlock);
-    return (ns != NULL);        
+    return (ns != NULL);
 }
 
 static int
@@ -3031,7 +3031,7 @@ is_root(vnode *root, vnode **mount)
 /*
  * file descriptor management functions
  */
- 
+
 static ofile *
 get_fd(int kernel, int fd, int type)
 {
@@ -3327,7 +3327,7 @@ nsidtons(nspace_id nsid)
 
 	if (nsid < 0)
 		return NULL;
-	
+
     ns = nstab[nsid % nns];
     if (!ns || (ns->nsid != nsid) || ns->shutdown)
         return NULL;
@@ -3599,7 +3599,7 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 	message.parentNode = vnida;
 	message.targetNode = vnidb;
 	message.node = vnidc;
-	
+
 	if (name != NULL) {
 		strcpy(message.name, name);
 			// name is 256 character at maximum
@@ -3612,16 +3612,8 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 #endif
 }
 
-#ifdef COMPILE_FOR_R5
-void
-notify_select_event(selectsync *sync, uint32 ref)
-{
-}
-#else
 status_t
 notify_select_event(selectsync *sync, uint32 ref, uint8 event)
 {
 	return FS_UNSUPPORTED;
 }
-#endif
-

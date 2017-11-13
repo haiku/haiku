@@ -27,11 +27,9 @@ class BRect;
 #define B_UTF8_TRADEMARK	"\xE2\x84\xA2"
 #define B_UTF8_SMILING_FACE	"\xE2\x98\xBB"
 #define B_UTF8_HIROSHI		"\xE5\xBC\x98"
-#ifdef COMPILE_FOR_R5
-	#define B_MAX_MOUSE_BUTTONS 3
-#else
-	#define B_MAX_MOUSE_BUTTONS 16
-#endif
+
+
+#define B_MAX_MOUSE_BUTTONS 16
 
 
 // Key definitions
