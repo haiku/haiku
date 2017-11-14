@@ -107,6 +107,7 @@ bus_dma_tag_t bus_get_dma_tag(device_t dev);
 int bus_setup_intr(device_t dev, struct resource *r, int flags,
 	driver_filter_t filter, driver_intr_t handler, void *arg, void **_cookie);
 int bus_teardown_intr(device_t dev, struct resource *r, void *cookie);
+int bus_bind_intr(device_t dev, struct resource *r, int cpu);
 
 const char *device_get_name(device_t dev);
 const char *device_get_nameunit(device_t dev);

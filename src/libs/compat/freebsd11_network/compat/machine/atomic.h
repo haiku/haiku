@@ -24,4 +24,9 @@
 #define atomic_readandclear_int(ptr) \
 	atomic_set((int32 *)(ptr), 0)
 
+
+#define mb()    memory_full_barrier()
+#define wmb()   memory_write_barrier_inline()
+#define rmb()   memory_read_barrier()
+
 #endif	/* _FBSD_COMPAT_MACHINE_ATOMIC_H_ */

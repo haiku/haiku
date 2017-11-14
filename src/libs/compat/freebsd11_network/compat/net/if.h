@@ -62,31 +62,31 @@
  */
 struct if_data {
 	/* generic interface information */
-	u_char	ifi_type;			/* ethernet, tokenring, etc */
-	u_char	ifi_physical;		/* e.g., AUI, Thinnet, 10base-T, etc */
-	u_char	ifi_addrlen;		/* media address length */
-	u_char	ifi_hdrlen;			/* media header length */
-	u_char	ifi_link_state;		/* current link state */
-	u_char	ifi_recvquota;		/* polling quota for receive intrs */
-	u_char	ifi_xmitquota;		/* polling quota for xmit intrs */
-	u_char	ifi_datalen;		/* length of this data struct */
-	u_long	ifi_mtu;			/* maximum transmission unit */
-	u_long	ifi_metric;			/* routing metric (external only) */
-	u_long	ifi_baudrate;		/* linespeed */
+	uint8_t	ifi_type;			/* ethernet, tokenring, etc */
+	uint8_t	ifi_physical;		/* e.g., AUI, Thinnet, 10base-T, etc */
+	uint8_t	ifi_addrlen;		/* media address length */
+	uint8_t	ifi_hdrlen;			/* media header length */
+	uint8_t	ifi_link_state;		/* current link state */
+	uint8_t	ifi_recvquota;		/* polling quota for receive intrs */
+	uint8_t	ifi_xmitquota;		/* polling quota for xmit intrs */
+	uint16_t	ifi_datalen;		/* length of this data struct */
+	uint32_t	ifi_mtu;			/* maximum transmission unit */
+	uint32_t	ifi_metric;			/* routing metric (external only) */
+	uint32_t	ifi_baudrate;		/* linespeed */
 	/* volatile statistics */
-	u_long	ifi_ipackets;		/* packets received on interface */
-	u_long	ifi_ierrors;		/* input errors on interface */
-	u_long	ifi_opackets;		/* packets sent on interface */
-	u_long	ifi_oerrors;		/* output errors on interface */
-	u_long	ifi_collisions;		/* collisions on csma interfaces */
-	u_long	ifi_ibytes;			/* total number of octets received */
-	u_long	ifi_obytes;			/* total number of octets sent */
-	u_long	ifi_imcasts;		/* packets received via multicast */
-	u_long	ifi_omcasts;		/* packets sent via multicast */
-	u_long	ifi_iqdrops;		/* dropped on input, this interface */
-	u_long	ifi_oqdrops;		/* dropped on output, this interface */
-	u_long	ifi_noproto;		/* destined for unsupported protocol */
-	u_long	ifi_hwassist;		/* HW offload capabilities */
+	uint64_t	ifi_ipackets;		/* packets received on interface */
+	uint64_t	ifi_ierrors;		/* input errors on interface */
+	uint64_t	ifi_opackets;		/* packets sent on interface */
+	uint64_t	ifi_oerrors;		/* output errors on interface */
+	uint64_t	ifi_collisions;		/* collisions on csma interfaces */
+	uint64_t	ifi_ibytes;			/* total number of octets received */
+	uint64_t	ifi_obytes;			/* total number of octets sent */
+	uint64_t	ifi_imcasts;		/* packets received via multicast */
+	uint64_t	ifi_omcasts;		/* packets sent via multicast */
+	uint64_t	ifi_iqdrops;		/* dropped on input, this interface */
+	uint64_t	ifi_oqdrops;		/* dropped on output, this interface */
+	uint64_t	ifi_noproto;		/* destined for unsupported protocol */
+	uint64_t	ifi_hwassist;		/* HW offload capabilities */
 	time_t	ifi_epoch;			/* uptime at attach or stat reset */
 #ifdef __alpha__
 	u_int	ifi_timepad;		/* time_t is int, not long on alpha */

@@ -437,6 +437,16 @@ bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 }
 
 
+int
+bus_bind_intr(device_t dev, struct resource *res, int cpu)
+{
+	if (dev->parent == NULL)
+		return EINVAL;
+
+	// TODO
+	return 0;
+}
+
 //	#pragma mark - bus functions
 
 

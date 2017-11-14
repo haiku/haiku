@@ -46,6 +46,6 @@ struct __system_init {
 #define TUNABLE_INT(path, var)
 #define TUNABLE_INT_FETCH(path, var)
 
-extern int ticks;
+extern int32 ticks;
 
 #endif

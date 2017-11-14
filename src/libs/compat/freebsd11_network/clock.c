@@ -9,7 +9,7 @@
 #include <compat/sys/kernel.h>
 
 
-int ticks;
+int32 ticks;
 static timer sHardClockTimer;
 
 
@@ -19,7 +19,7 @@ static timer sHardClockTimer;
 static status_t
 hardClock(timer* hardClockTimer)
 {
-	atomic_add((vint32*)&ticks, 1);
+	atomic_add(&ticks, 1);
 	return B_OK;
 }
 
