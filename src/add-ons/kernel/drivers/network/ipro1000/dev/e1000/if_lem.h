@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2011, Intel Corporation 
+  Copyright (c) 2001-2015, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -238,10 +238,8 @@
 #define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) printf(S "\n", A)
 #define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) printf(S "\n", A, B)
 
-#define EM_MAX_SCATTER		64
+#define EM_MAX_SCATTER		40
 #define EM_VFTA_SIZE		128
-#define EM_TSO_SIZE		(65535 + sizeof(struct ether_vlan_header))
-#define EM_TSO_SEG_SIZE		4096	/* Max dma segment size */
 #define EM_MSIX_MASK		0x01F00000 /* For 82574 use */
 #define ETH_ZLEN		60
 #define ETH_ADDR_LEN		6
@@ -267,6 +265,13 @@
 #define PICOSECS_PER_TICK	20833
 #define TSYNC_PORT		319 /* UDP port for the protocol */
 
+#ifdef NIC_PARAVIRT
+#define	E1000_PARA_SUBDEV	0x1101		/* special id */
+#define	E1000_CSBAL		0x02830		/* csb phys. addr. low */
+#define	E1000_CSBAH		0x02834		/* csb phys. addr. hi */
+#include <net/paravirt.h>
+#endif /* NIC_PARAVIRT */
+
 /*
  * Bus dma allocation structure used by
  * e1000_dma_malloc and e1000_dma_free.
@@ -290,10 +295,7 @@ struct em_int_delay_info {
 
 /* Our adapter structure */
 struct adapter {
-	struct ifnet	*ifp;
-#if __FreeBSD_version >= 800000
-	struct buf_ring	*br;
-#endif
+	if_t		ifp;
 	struct e1000_hw	hw;
 
 	/* FreeBSD operating-system-specific structures. */
@@ -415,17 +417,17 @@ struct adapter {
 
 	/* Misc stats maintained by the driver */
 	unsigned long	dropped_pkts;
-	unsigned long	mbuf_alloc_failed;
+	unsigned long	link_irq;
 	unsigned long	mbuf_cluster_failed;
+	unsigned long	mbuf_defrag_failed;
 	unsigned long	no_tx_desc_avail1;
 	unsigned long	no_tx_desc_avail2;
+	unsigned long	no_tx_dma_setup;
 	unsigned long	no_tx_map_avail;
-        unsigned long	no_tx_dma_setup;
 	unsigned long	watchdog_events;
-	unsigned long	rx_overruns;
 	unsigned long	rx_irq;
+	unsigned long	rx_overruns;
 	unsigned long	tx_irq;
-	unsigned long	link_irq;
 
 	/* 82547 workaround */
 	uint32_t	tx_fifo_size;
@@ -439,6 +441,26 @@ struct adapter {
 	boolean_t       pcix_82544;
 	boolean_t       in_detach;
 
+#ifdef NIC_SEND_COMBINING
+	/* 0 = idle; 1xxxx int-pending; 3xxxx int + d pending + tdt */
+#define MIT_PENDING_INT	0x10000	/* pending interrupt */
+#define MIT_PENDING_TDT	0x30000	/* both intr and tdt write are pending */
+	uint32_t shadow_tdt;
+	uint32_t sc_enable;
+#endif /* NIC_SEND_COMBINING */
+#ifdef BATCH_DISPATCH
+	uint32_t batch_enable;
+#endif /* BATCH_DISPATCH */
+
+#ifdef NIC_PARAVIRT
+	struct em_dma_alloc	csb_mem;	/* phys address */
+	struct paravirt_csb	*csb;		/* virtual addr */
+	uint32_t rx_retries;	/* optimize rx loop */
+	uint32_t		tdt_csb_count;// XXX stat
+	uint32_t		tdt_reg_count;// XXX stat
+	uint32_t		tdt_int_count;// XXX stat
+	uint32_t		guest_need_kick_count;// XXX stat
+#endif /* NIC_PARAVIRT */
 
 	struct e1000_hw_stats stats;
 };

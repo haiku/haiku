@@ -1,6 +1,6 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2011, Intel Corporation 
+  Copyright (c) 2001-2015, Intel Corporation 
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without 
@@ -32,11 +32,70 @@
 ******************************************************************************/
 /*$FreeBSD$*/
 
-#ifndef _IGB_H_DEFINED_
-#define _IGB_H_DEFINED_
+#ifndef _IF_IGB_H_
+#define _IF_IGB_H_
+
+#ifdef ALTQ
+#define IGB_LEGACY_TX
+#endif
+
+#include <sys/param.h>
+#include <sys/systm.h>
+#ifndef IGB_LEGACY_TX
+#include <sys/buf_ring.h>
+#endif
+#include <sys/bus.h>
+#include <sys/endian.h>
+#include <sys/kernel.h>
+#include <sys/kthread.h>
+#include <sys/malloc.h>
+#include <sys/mbuf.h>
+#include <sys/module.h>
+#include <sys/rman.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <sys/sysctl.h>
+#include <sys/taskqueue.h>
+#include <sys/eventhandler.h>
+#include <sys/pcpu.h>
+#include <sys/smp.h>
+#include <machine/smp.h>
+#include <machine/bus.h>
+#include <machine/resource.h>
+
+#include <net/bpf.h>
+#include <net/ethernet.h>
+#include <net/if.h>
+#include <net/if_var.h>
+#include <net/if_arp.h>
+#include <net/if_dl.h>
+#include <net/if_media.h>
+#ifdef	RSS
+#include <net/rss_config.h>
+#include <netinet/in_rss.h>
+#endif
+
+#include <net/if_types.h>
+#include <net/if_vlan_var.h>
+
+#include <netinet/in_systm.h>
+#include <netinet/in.h>
+#include <netinet/if_ether.h>
+#include <netinet/ip.h>
+#include <netinet/ip6.h>
+#include <netinet/tcp.h>
+#include <netinet/tcp_lro.h>
+#include <netinet/udp.h>
+
+#include <machine/in_cksum.h>
+#include <dev/led/led.h>
+#include <dev/pci/pcivar.h>
+#include <dev/pci/pcireg.h>
+
+#include "e1000_api.h"
+#include "e1000_82575.h"
 
 /* Tunables */
-
 /*
  * IGB_TXD: Maximum number of Transmit Descriptors
  *
@@ -162,10 +221,13 @@
 /* PHY master/slave setting */
 #define IGB_MASTER_SLAVE		e1000_ms_hw_default
 
+/* Support AutoMediaDetect for Marvell M88 PHY in i354 */
+#define IGB_MEDIA_RESET			(1 << 0)
+
 /*
  * Micellaneous constants
  */
-#define IGB_VENDOR_ID			0x8086
+#define IGB_INTEL_VENDOR_ID			0x8086
 
 #define IGB_JUMBO_PBA			0x00000028
 #define IGB_DEFAULT_PBA			0x00000030
@@ -173,11 +235,13 @@
 #define IGB_SMARTSPEED_MAX		15
 #define IGB_MAX_LOOP			10
 
-#define IGB_RX_PTHRESH			(hw->mac.type <= e1000_82576 ? 16 : 8)
+#define IGB_RX_PTHRESH			((hw->mac.type == e1000_i354) ? 12 : \
+					  ((hw->mac.type <= e1000_82576) ? 16 : 8))
 #define IGB_RX_HTHRESH			8
-#define IGB_RX_WTHRESH			1
+#define IGB_RX_WTHRESH			((hw->mac.type == e1000_82576 && \
+					  adapter->msix_mem) ? 1 : 4)
 
-#define IGB_TX_PTHRESH			8
+#define IGB_TX_PTHRESH			((hw->mac.type == e1000_i354) ? 20 : 8)
 #define IGB_TX_HTHRESH			1
 #define IGB_TX_WTHRESH			((hw->mac.type != e1000_82575 && \
                                           adapter->msix_mem) ? 1 : 16)
@@ -190,11 +254,6 @@
 #define IGB_EEPROM_APME			0x400;
 /* Queue minimum free for use */
 #define IGB_QUEUE_THRESHOLD		(adapter->num_tx_desc / 8)
-/* Queue bit defines */
-#define IGB_QUEUE_IDLE			1
-#define IGB_QUEUE_WORKING		2
-#define IGB_QUEUE_HUNG			4
-#define IGB_QUEUE_DEPLETED		8
 
 /*
  * TDBA/RDBA should be aligned on 16 byte boundary. But TDLEN/RDLEN should be
@@ -223,18 +282,24 @@
 #define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) printf(S "\n", A)
 #define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) printf(S "\n", A, B)
 
-#define IGB_MAX_SCATTER		64
+#define IGB_MAX_SCATTER		40
 #define IGB_VFTA_SIZE		128
 #define IGB_BR_SIZE		4096	/* ring buf size */
 #define IGB_TSO_SIZE		(65535 + sizeof(struct ether_vlan_header))
 #define IGB_TSO_SEG_SIZE	4096	/* Max dma segment size */
+#define IGB_TXPBSIZE		20408
 #define IGB_HDR_BUF		128
 #define IGB_PKTTYPE_MASK	0x0000FFF0
+#define IGB_DMCTLX_DCFLUSH_DIS	0x80000000  /* Disable DMA Coalesce Flush */
 #define ETH_ZLEN		60
 #define ETH_ADDR_LEN		6
 
 /* Offload bits in mbuf flag */
-#if __FreeBSD_version >= 800000
+#if __FreeBSD_version >= 1000000
+#define CSUM_OFFLOAD_IPV4       (CSUM_IP|CSUM_IP_TCP|CSUM_IP_UDP|CSUM_IP_SCTP)
+#define CSUM_OFFLOAD_IPV6       (CSUM_IP6_TCP|CSUM_IP6_UDP|CSUM_IP6_SCTP)
+#define CSUM_OFFLOAD            (CSUM_OFFLOAD_IPV4|CSUM_OFFLOAD_IPV6)
+#elif __FreeBSD_version >= 800000
 #define CSUM_OFFLOAD		(CSUM_IP|CSUM_TCP|CSUM_UDP|CSUM_SCTP)
 #else
 #define CSUM_OFFLOAD		(CSUM_IP|CSUM_TCP|CSUM_UDP)
@@ -245,6 +310,7 @@
 #define IGB_DEFAULT_ITR         ((1000000/IGB_INTS_PER_SEC) << 2)
 
 #define IGB_LINK_ITR            2000
+#define I210_LINK_DELAY		1000
 
 /* Precision Time Sync (IEEE 1588) defines */
 #define ETHERTYPE_IEEE1588	0x88F7
@@ -284,34 +350,41 @@ struct igb_queue {
 };
 
 /*
- * Transmit ring: one per queue
+ * The transmit ring, one per queue
  */
 struct tx_ring {
-	struct adapter		*adapter;
-	u32			me;
+        struct adapter		*adapter;
 	struct mtx		tx_mtx;
-	char			mtx_name[16];
+	u32			me;
+	int			watchdog_time;
+	union e1000_adv_tx_desc	*tx_base;
+	struct igb_tx_buf	*tx_buffers;
 	struct igb_dma_alloc	txdma;
-	struct e1000_tx_desc	*tx_base;
-	u32			next_avail_desc;
-	u32			next_to_clean;
 	volatile u16		tx_avail;
-	struct igb_tx_buffer	*tx_buffers;
+	u16			next_avail_desc;
+	u16			next_to_clean;
+	u16			num_desc;
+	enum {
+	    IGB_QUEUE_IDLE = 1,
+	    IGB_QUEUE_WORKING = 2,
+	    IGB_QUEUE_HUNG = 4,
+	    IGB_QUEUE_DEPLETED = 8,
+	}			queue_status;
+	u32			txd_cmd;
+	bus_dma_tag_t		txtag;
+	char			mtx_name[16];
 #ifndef IGB_LEGACY_TX
 	struct buf_ring		*br;
 	struct task		txq_task;
 #endif
-	bus_dma_tag_t		txtag;
-
-	u32			bytes;
+	u32			bytes;  /* used for AIM */
 	u32			packets;
-
-	int			queue_status;
-	int			watchdog_time;
-	int			tdt;
-	int			tdh;
+	/* Soft Stats */
+	unsigned long   	tso_tx;
+	unsigned long   	no_tx_map_avail;
+	unsigned long   	no_tx_dma_setup;
 	u64			no_desc_avail;
-	u64			tx_packets;
+	u64			total_packets;
 };
 
 /*
@@ -325,7 +398,6 @@ struct rx_ring {
 	struct lro_ctrl		lro;
 	bool			lro_enabled;
 	bool			hdr_split;
-	bool			discard;
 	struct mtx		rx_mtx;
 	char			mtx_name[16];
 	u32			next_to_refresh;
@@ -353,43 +425,38 @@ struct rx_ring {
 };
 
 struct adapter {
-	struct ifnet	*ifp;
-	struct e1000_hw	hw;
+	struct ifnet		*ifp;
+	struct e1000_hw		hw;
 
-	struct e1000_osdep osdep;
-	struct device	*dev;
-	struct cdev	*led_dev;
+	struct e1000_osdep	osdep;
+	struct device		*dev;
+	struct cdev		*led_dev;
 
-	struct resource *pci_mem;
-	struct resource *msix_mem;
-	struct resource	*res;
-	void		*tag;
-	u32		que_mask;
+	struct resource		*pci_mem;
+	struct resource		*msix_mem;
+	int			memrid;
 
-	int		linkvec;
-	int		link_mask;
-	struct task	link_task;
-	int		link_irq;
+	/*
+	 * Interrupt resources: this set is
+	 * either used for legacy, or for Link
+	 * when doing MSIX
+	 */
+	void			*tag;
+	struct resource 	*res;
 
-	struct ifmedia	media;
-	struct callout	timer;
-	int		msix;	/* total vectors allocated */
-	int		if_flags;
-	int		max_frame_size;
-	int		min_frame_size;
-	int		pause_frames;
-	struct mtx	core_mtx;
-	int		igb_insert_vlan_header;
-        u16		num_queues;
-	u16		vf_ifp;  /* a VF interface */
+	struct ifmedia		media;
+	struct callout		timer;
+	int			msix;
+	int			if_flags;
+	int			pause_frames;
 
-	eventhandler_tag vlan_attach;
-	eventhandler_tag vlan_detach;
-	u32		num_vlans;
+	struct mtx		core_mtx;
 
-	/* Management and WOL features */
-	int		wol;
-	int		has_manage;
+	eventhandler_tag 	vlan_attach;
+	eventhandler_tag 	vlan_detach;
+
+	u16			num_vlans;
+	u16			num_queues;
 
 	/*
 	** Shadow VFTA table, this is needed because
@@ -397,66 +464,86 @@ struct adapter {
 	** a soft reset and the driver needs to be able
 	** to repopulate it.
 	*/
-	u32		shadow_vfta[IGB_VFTA_SIZE];
+	u32			shadow_vfta[IGB_VFTA_SIZE];
 
 	/* Info about the interface */
-	u16		link_active;
-	u16		fc;
-	u16		link_speed;
-	u16		link_duplex;
-	u32		smartspeed;
-	u32		dmac;
-	int		enable_aim;
+	u32			optics;
+	u32			fc; /* local flow ctrl setting */
+	int			advertise;  /* link speeds */
+	bool			link_active;
+	u16			max_frame_size;
+	u16			num_segs;
+	u16			link_speed;
+	bool			link_up;
+	u32 			linkvec;
+	u16			link_duplex;
+	u32			dmac;
+	int			link_mask;
 
-	/* Interface queues */
+	/* Flags */
+	u32			flags;
+
+	/* Mbuf cluster size */
+	u32			rx_mbuf_sz;
+
+	/* Support for pluggable optics */
+	bool			sfp_probe;
+	struct task     	link_task;  /* Link tasklet */
+	struct task     	mod_task;   /* SFP tasklet */
+	struct task     	msf_task;   /* Multispeed Fiber */
+	struct taskqueue	*tq;
+
+	/*
+	** Queues: 
+	**   This is the irq holder, it has
+	**   and RX/TX pair or rings associated
+	**   with it.
+	*/
 	struct igb_queue	*queues;
 
 	/*
-	 * Transmit rings
+	 * Transmit rings:
+	 *	Allocated at run time, an array of rings.
 	 */
 	struct tx_ring		*tx_rings;
-        u16			num_tx_desc;
+	u32			num_tx_desc;
 
-	/* Multicast array pointer */
-	u8			*mta;
-
-	/* 
-	 * Receive rings
+	/*
+	 * Receive rings:
+	 *	Allocated at run time, an array of rings.
 	 */
 	struct rx_ring		*rx_rings;
-	bool			rx_hdr_split;
-        u16			num_rx_desc;
-	int			rx_process_limit;
-	u32			rx_mbuf_sz;
-	u32			rx_mask;
+	u64			que_mask;
+	u32			num_rx_desc;
+
+	/* Multicast array memory */
+	u8			*mta;
 
 	/* Misc stats maintained by the driver */
-	unsigned long	dropped_pkts;
-	unsigned long	mbuf_defrag_failed;
-	unsigned long	mbuf_header_failed;
-	unsigned long	mbuf_packet_failed;
-	unsigned long	no_tx_map_avail;
-        unsigned long	no_tx_dma_setup;
-	unsigned long	watchdog_events;
-	unsigned long	rx_overruns;
-	unsigned long	device_control;
-	unsigned long	rx_control;
-	unsigned long	int_mask;
-	unsigned long	eint_mask;
-	unsigned long	packet_buf_alloc_rx;
-	unsigned long	packet_buf_alloc_tx;
+	unsigned long		device_control;
+	unsigned long   	dropped_pkts;
+	unsigned long		eint_mask;
+	unsigned long		int_mask;
+	unsigned long		link_irq;
+	unsigned long   	mbuf_defrag_failed;
+	unsigned long		no_tx_dma_setup;
+	unsigned long		packet_buf_alloc_rx;
+	unsigned long		packet_buf_alloc_tx;
+	unsigned long		rx_control;
+	unsigned long		rx_overruns;
+	unsigned long   	watchdog_events;
 
-	boolean_t       in_detach;
+	/* Used in pf and vf */
+	void			*stats;
 
-#ifdef IGB_IEEE1588
-	/* IEEE 1588 precision time support */
-	struct cyclecounter     cycles;
-	struct nettimer         clock;
-	struct nettime_compare  compare;
-	struct hwtstamp_ctrl    hwtstamp;
-#endif
+	int			enable_aim;
+	int			has_manage;
+	int			wol;
+	int			rx_process_limit;
+	int			tx_process_limit;
+	u16			vf_ifp;  /* a VF interface */
+	bool			in_detach; /* Used only in igb_ioctl */
 
-	void 			*stats;
 };
 
 /* ******************************************************************************
@@ -474,11 +561,10 @@ typedef struct _igb_vendor_info_t {
 	unsigned int index;
 } igb_vendor_info_t;
 
-
-struct igb_tx_buffer {
-	int		next_eop;  /* Index of the desc to watch */
-        struct mbuf    *m_head;
-        bus_dmamap_t    map;         /* bus_dma map for packet */
+struct igb_tx_buf {
+	union e1000_adv_tx_desc	*eop;
+	struct mbuf	*m_head;
+	bus_dmamap_t	map;
 };
 
 struct igb_rx_buf {
@@ -543,6 +629,6 @@ drbr_needs_enqueue(struct ifnet *ifp, struct buf_ring *br)
 }
 #endif
 
-#endif /* _IGB_H_DEFINED_ */
+#endif /* _IF_IGB_H_ */
 
 
