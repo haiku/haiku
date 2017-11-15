@@ -189,7 +189,16 @@ RepositoryDataUpdateProcess::Run()
 
 		printf("will process repository data and match to depots\n");
 		result = PopulateDataToDepots();
-		printf("did process repository data and match to depots\n");
+
+		switch (result) {
+			case B_OK:
+				printf("did process repository data and match to depots\n");
+				break;
+			default:
+				MoveDamagedFileAside(fLocalFilePath);
+				break;
+		}
+
 	} else {
 		printf("an error has arisen downloading the repositories' data\n");
 	}
@@ -204,10 +213,15 @@ RepositoryDataUpdateProcess::PopulateDataToDepots()
 	DepotMatchingRepositoryListener* itemListener =
 		new DepotMatchingRepositoryListener(fDepotList);
 
-	BJsonEventListener* listener =
+	BulkContainerDumpExportRepositoryJsonListener* listener =
 		new BulkContainerDumpExportRepositoryJsonListener(itemListener);
 
-	return ParseJsonFromFileWithListener(listener, fLocalFilePath);
+	status_t result = ParseJsonFromFileWithListener(listener, fLocalFilePath);
+
+	if (B_OK != result)
+		return result;
+
+	return listener->ErrorStatus();
 }
 
 

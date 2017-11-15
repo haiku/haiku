@@ -225,7 +225,8 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 			BUrl location(result.Url(), locationValue);
 			fprintf(stdout, "will redirect to; %s\n",
 				location.UrlString().String());
-				return DownloadToLocalFile(targetFilePath, location, redirects + 1, 0);
+				return DownloadToLocalFile(targetFilePath, location,
+					redirects + 1, 0);
 		}
 
 		fprintf(stdout, "unable to find 'Location' header for redirect\n");
@@ -234,11 +235,41 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		if (statusCode == 0 || (statusCode / 100) == 5) {
 			fprintf(stdout, "error response from server; %" B_PRId32 " --> "
 				"retry...\n", statusCode);
-			return DownloadToLocalFile(targetFilePath, url, redirects, failures + 1);
+			return DownloadToLocalFile(targetFilePath, url, redirects,
+				failures + 1);
 		}
 
 		fprintf(stdout, "unexpected response from server; %" B_PRId32 "\n",
 			statusCode);
 		return B_IO_ERROR;
 	}
+}
+
+
+/*!	When a file is damaged or corrupted in some way, the file should be 'moved
+    aside' so that it is not involved in the next update.  This method will
+    create such an alternative 'damaged' file location and move this file to
+    that location.
+*/
+
+status_t
+AbstractServerProcess::MoveDamagedFileAside(const BPath& currentFilePath)
+{
+	BPath damagedFilePath;
+	BString damagedLeaf;
+
+	damagedLeaf.SetToFormat("%s__damaged", currentFilePath.Leaf());
+	currentFilePath.GetParent(&damagedFilePath);
+	damagedFilePath.Append(damagedLeaf.String());
+
+	if (0 != rename(currentFilePath.Path(), damagedFilePath.Path())) {
+		printf("unable to move damaged file [%s] aside to [%s]\n",
+			currentFilePath.Path(), damagedFilePath.Path());
+		return B_IO_ERROR;
+	}
+
+	printf("did move damaged file [%s] aside to [%s]\n",
+		currentFilePath.Path(), damagedFilePath.Path());
+
+	return B_OK;
 }

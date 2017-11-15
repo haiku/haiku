@@ -233,7 +233,15 @@ PkgDataUpdateProcess::Run()
 
 		printf("will process packages' data\n");
 		result = PopulateDataToDepots();
-		printf("did process packages' data\n");
+
+		switch (result) {
+			case B_OK:
+				printf("did process packages' data\n");
+				break;
+			default:
+				MoveDamagedFileAside(fLocalFilePath);
+				break;
+		}
 	}
 
 	return result;
@@ -246,10 +254,15 @@ PkgDataUpdateProcess::PopulateDataToDepots()
 	PackageFillingPkgListener* itemListener =
 		new PackageFillingPkgListener(fPackages, fCategories, fLock);
 
-	BJsonEventListener* listener =
+	BulkContainerDumpExportPkgJsonListener* listener =
 		new BulkContainerDumpExportPkgJsonListener(itemListener);
 
-	return ParseJsonFromFileWithListener(listener, fLocalFilePath);
+	status_t result = ParseJsonFromFileWithListener(listener, fLocalFilePath);
+
+	if (B_OK != result)
+		return result;
+
+	return listener->ErrorStatus();
 }
 
 

@@ -48,6 +48,9 @@ protected:
 									const BUrl& url,
 									uint32 redirects, uint32 failures);
 
+			status_t			MoveDamagedFileAside(
+									const BPath& currentFilePath);
+
 private:
 			bool				LooksLikeGzip(const char *pathStr) const;
 
