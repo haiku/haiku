@@ -60,7 +60,7 @@ real_time_clock_usecs(void)
 
 
 void
-set_real_time_clock(uint32 secs)
+set_real_time_clock(uint64 secs)
 {
 	_kern_set_real_time_clock((bigtime_t)secs * 1000000);
 }

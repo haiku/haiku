@@ -123,7 +123,7 @@ set_real_time_clock_usecs(bigtime_t currentTime)
 
 
 void
-set_real_time_clock(uint32 currentTime)
+set_real_time_clock(uint64 currentTime)
 {
 	set_real_time_clock_usecs((bigtime_t)currentTime * 1000000);
 }
