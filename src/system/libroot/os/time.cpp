@@ -74,7 +74,7 @@ set_timezone(const char* /*timezone*/)
 	 *
 	 * TODO: should we keep this around for compatibility or get rid of it?
 	 */
-	return B_OK;
+	return B_DONT_DO_THAT;
 }
 
 
