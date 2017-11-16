@@ -44,7 +44,6 @@ extern int	setitimer(int which, const struct itimerval *value, struct itimerval 
 extern int	gettimeofday(struct timeval *tv, void *tz);
 
 extern int	utimes(const char *path, const struct timeval times[2]);
-extern int	lutimes(const char *path, const struct timeval times[2]);
 	/* legacy */
 
 #ifdef __cplusplus

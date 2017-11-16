@@ -16,6 +16,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			fgetln.c
 			getpass.c
 			issetugid.c
+			lutimes.c
 			progname.c
 			pty.cpp
 			signal.c
