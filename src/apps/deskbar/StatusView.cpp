@@ -1159,21 +1159,16 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 	} else
 		loc.x += 1; // keeps everything lined up nicely
 
-	if (index <= 0)
-		return loc;
-
 	if (fMultiRowMode) {
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
-					- kClockMargin,
+					- kTrayPadding - kDragWidth - kGutter,
 				loc.y + kMaxReplicantHeight);
-			if (row == 0 && !fTime->IsHidden()) {
-				rowRect.right -= kClockMargin + fTime->Frame().Width()
-					+ kTrayPadding;
-			}
+			if (row == 0 && !fTime->IsHidden())
+				rowRect.right -= kClockMargin + fTime->Frame().Width();
 
 			BRect replicantRect = rowRect;
 			for (int32 i = 0; i < index; i++) {
@@ -1186,13 +1181,19 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 				replicantRect.left = view->Frame().right + kIconGap + 1;
 			}
 
-			if (replicantRect.Width() >= replicantWidth) {
-				// the icon fits in this row
+			// calculated left position, add replicantWidth to get right position
+			replicantRect.right = replicantRect.left + replicantWidth;
+
+			// check if replicant fits in this row
+			if (replicantRect.right < rowRect.right) {
+				// replicant fits in this row
 				loc = replicantRect.LeftTop();
 				break;
 			}
+
+			// check next row
 		}
-	} else {
+	} else if (index > 0) {
 		// get the last replicant added for placement reference
 		BView* view = NULL;
 		fShelf->ReplicantAt(index - 1, &view);
