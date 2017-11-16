@@ -44,7 +44,7 @@ __get_system_time_offset()
 //	#pragma mark - public API
 
 
-uint32
+unsigned long
 real_time_clock(void)
 {
 	return (__arch_get_system_time_offset(sRealTimeData) + system_time())
@@ -60,7 +60,7 @@ real_time_clock_usecs(void)
 
 
 void
-set_real_time_clock(uint64 secs)
+set_real_time_clock(unsigned long secs)
 {
 	_kern_set_real_time_clock((bigtime_t)secs * 1000000);
 }
@@ -74,7 +74,7 @@ set_timezone(const char* /*timezone*/)
 	 *
 	 * TODO: should we keep this around for compatibility or get rid of it?
 	 */
-	return B_DONT_DO_THAT;
+	return ENOSYS;
 }
 
 

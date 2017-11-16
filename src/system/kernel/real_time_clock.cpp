@@ -123,13 +123,13 @@ set_real_time_clock_usecs(bigtime_t currentTime)
 
 
 void
-set_real_time_clock(uint64 currentTime)
+set_real_time_clock(unsigned long currentTime)
 {
 	set_real_time_clock_usecs((bigtime_t)currentTime * 1000000);
 }
 
 
-uint32
+unsigned long
 real_time_clock(void)
 {
 	return (arch_rtc_get_system_time_offset(sRealTimeData) + system_time())
