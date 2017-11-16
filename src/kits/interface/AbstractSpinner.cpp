@@ -432,8 +432,8 @@ SpinnerButton::Draw(BRect updateRect)
 				BPoint(rect.right, rect.top + halfHeight));
 			if (fSpinnerDirection == SPINNER_INCREMENT) {
 				float halfWidth = floorf(rect.Width() / 2);
-				StrokeLine(BPoint(rect.left + halfWidth, rect.top),
-					BPoint(rect.left + halfWidth, rect.bottom));
+				StrokeLine(BPoint(rect.left + halfWidth, rect.top + 1),
+					BPoint(rect.left + halfWidth, rect.bottom - 1));
 			}
 		}
 	}
