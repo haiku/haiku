@@ -716,6 +716,7 @@ RemotePackageRepository HaikuPorts
 	dosbox_x86-0.74-3
 	doxygen_x86-1.8.10-2
 	dtc_x86-1.4.1-1
+	dvda_author_x86-05.07-1
 	enca_x86-1.18-1
 	enca_x86_devel-1.18-1
 	expat_x86-2.2.0-1
@@ -1256,6 +1257,7 @@ RemotePackageRepository HaikuPorts
 	doxygen_x86
 	dtc_x86
 	ducksaver
+	dvda_author_x86
 	ed
 	einsteinium
 	enca
