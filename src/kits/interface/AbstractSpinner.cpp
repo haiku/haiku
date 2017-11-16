@@ -379,11 +379,13 @@ SpinnerButton::Draw(BRect updateRect)
 	else
 		borders |= be_control_look->B_LEFT_BORDER;
 
+	uint32 flags = fIsMouseDown ? BControlLook::B_ACTIVATED : 0;
+
 	// draw the button
 	be_control_look->DrawButtonFrame(this, rect, updateRect,
-		tint_color(bgColor, frameTint), bgColor, 0, borders);
+		tint_color(bgColor, frameTint), bgColor, flags, borders);
 	be_control_look->DrawButtonBackground(this, rect, updateRect,
-		tint_color(bgColor, bgTint), 0, borders);
+		tint_color(bgColor, bgTint), flags, borders);
 
 	switch (fParent->ButtonStyle()) {
 		case SPINNER_BUTTON_HORIZONTAL_ARROWS:
