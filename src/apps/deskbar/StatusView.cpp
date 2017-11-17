@@ -1165,7 +1165,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
-					- kTrayPadding - kDragWidth - kGutter,
+					- (kTrayPadding + kDragWidth + kGutter) * 2,
 				loc.y + kMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden())
 				rowRect.right -= kClockMargin + fTime->Frame().Width();
