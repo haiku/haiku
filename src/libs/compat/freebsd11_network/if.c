@@ -18,6 +18,7 @@
 #include <compat/sys/kernel.h>
 #include <compat/sys/taskqueue.h>
 
+#include <compat/net/bpf.h>
 #include <compat/net/ethernet.h>
 #include <compat/net/if.h>
 #include <compat/net/if_arp.h>
@@ -1310,6 +1311,13 @@ if_gethandle(u_char type)
 	return (if_alloc(type));
 }
 
+void
+if_bpfmtap(if_t ifh, struct mbuf *m)
+{
+	struct ifnet *ifp = (struct ifnet *)ifh;
+
+	BPF_MTAP(ifp, m);
+}
 
 void
 if_etherbpfmtap(if_t ifh, struct mbuf *m)
