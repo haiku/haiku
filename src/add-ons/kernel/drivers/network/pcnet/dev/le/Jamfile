@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network pcnet dev le ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ] : true ;
 
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -15,5 +15,5 @@ KernelAddon pcnet :
 	if_le_pci.c
 	lance.c
 	glue.c
-	: libfreebsd_network.a pcnet_pcn.a pcnet_mii.a
+	: pcnet_pcn.a pcnet_mii.a libfreebsd11_network.a
 	;

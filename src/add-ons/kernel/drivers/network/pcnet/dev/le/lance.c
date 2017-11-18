@@ -72,6 +72,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/endian.h>
 #include <sys/lock.h>
 #include <sys/kernel.h>
+#include <sys/malloc.h>
 #include <sys/mbuf.h>
 #include <sys/mutex.h>
 #include <sys/socket.h>
@@ -79,6 +80,7 @@ __FBSDID("$FreeBSD$");
 
 #include <net/ethernet.h>
 #include <net/if.h>
+#include <net/if_var.h>
 #include <net/if_arp.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
@@ -195,7 +197,7 @@ lance_attach(struct lance_softc *sc)
 	ether_ifattach(ifp, sc->sc_enaddr);
 
 	/* Claim 802.1q capability. */
-	ifp->if_data.ifi_hdrlen = sizeof(struct ether_vlan_header);
+	ifp->if_hdrlen = sizeof(struct ether_vlan_header);
 	ifp->if_capabilities |= IFCAP_VLAN_MTU;
 	ifp->if_capenable |= IFCAP_VLAN_MTU;
 }
@@ -397,8 +399,7 @@ lance_get(struct lance_softc *sc, int boff, int totlen)
 
 	while (totlen > 0) {
 		if (totlen >= MINCLSIZE) {
-			MCLGET(m, M_NOWAIT);
-			if ((m->m_flags & M_EXT) == 0)
+			if (!(MCLGET(m, M_NOWAIT)))
 				goto bad;
 			len = MCLBYTES;
 		}
@@ -417,7 +418,7 @@ lance_get(struct lance_softc *sc, int boff, int totlen)
 		totlen -= len;
 		if (totlen > 0) {
 			MGET(newm, M_NOWAIT, MT_DATA);
-			if (newm == 0)
+			if (newm == NULL)
 				goto bad;
 			len = MLEN;
 			m = m->m_next = newm;
@@ -445,7 +446,7 @@ lance_watchdog(void *xsc)
 	}
 
 	if_printf(ifp, "device timeout\n");
-	++ifp->if_oerrors;
+	if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 	lance_init_locked(sc);
 }
 
