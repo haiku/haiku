@@ -6,7 +6,6 @@ extern driver_t *DRIVER_MODULE_NAME(lem, pci);
 
 HAIKU_FBSD_DRIVERS_GLUE(ipro1000);
 
-NO_HAIKU_CHECK_DISABLE_INTERRUPTS();
 NO_HAIKU_REENABLE_INTERRUPTS();
 NO_HAIKU_FBSD_MII_DRIVER();
 
@@ -20,6 +19,14 @@ __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[]))
 		NULL
 	};
 	return (*handler)(drivers);
+}
+
+
+int
+HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
+{
+	// only MSI interrupts, legacy uses fast intr
+	return 1;
 }
 
 
