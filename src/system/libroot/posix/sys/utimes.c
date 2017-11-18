@@ -19,7 +19,8 @@
 int
 _utimes(const char* path, const struct timeval times[2], bool traverseLink);
 
-extern int
+
+int
 _utimes(const char* path, const struct timeval times[2], bool traverseLink)
 {
 	struct stat stat;
