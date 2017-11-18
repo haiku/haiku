@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network rtl81xx dev mii ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 	: true ;
 
 UsePrivateHeaders net system ;
@@ -19,6 +19,6 @@ SEARCH on [ FGristFiles rlphy.c ] = [ FDirName $(HAIKU_TOP) src add-ons kernel
 
 ObjectHdrs [ FGristFiles rgephy$(SUFOBJ) rlphy$(SUFOBJ) ]
 	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
-		compat freebsd_network ] ;
+		compat freebsd11_network ] ;
 Includes [ FGristFiles rgephy.c rlphy.c ]
-	: <src!libs!compat!freebsd_network>miidevs.h ;
+	: <src!libs!compat!freebsd11_network>miidevs.h ;

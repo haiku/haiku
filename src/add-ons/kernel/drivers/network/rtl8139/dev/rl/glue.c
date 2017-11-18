@@ -5,7 +5,7 @@
 
 #include <machine/bus.h>
 
-#include <pci/if_rlreg.h>
+#include <dev/rl/if_rlreg.h>
 
 HAIKU_FBSD_DRIVER_GLUE(rtl8139, rl, pci);
 HAIKU_FBSD_MII_DRIVER(rlphy);

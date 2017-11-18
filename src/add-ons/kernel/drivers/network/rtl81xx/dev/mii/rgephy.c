@@ -42,9 +42,11 @@ __FBSDID("$FreeBSD$");
 #include <sys/kernel.h>
 #include <sys/module.h>
 #include <sys/socket.h>
+#include <sys/taskqueue.h>
 #include <sys/bus.h>
 
 #include <net/if.h>
+#include <net/if_var.h>
 #include <net/if_arp.h>
 #include <net/if_media.h>
 
@@ -57,7 +59,7 @@ __FBSDID("$FreeBSD$");
 #include "miibus_if.h"
 
 #include <machine/bus.h>
-#include <pci/if_rlreg.h>
+#include <dev/rl/if_rlreg.h>
 
 static int rgephy_probe(device_t);
 static int rgephy_attach(device_t);
@@ -85,8 +87,10 @@ static int	rgephy_service(struct mii_softc *, struct mii_data *, int);
 static void	rgephy_status(struct mii_softc *);
 static int	rgephy_mii_phy_auto(struct mii_softc *, int);
 static void	rgephy_reset(struct mii_softc *);
+static int	rgephy_linkup(struct mii_softc *);
 static void	rgephy_loop(struct mii_softc *);
 static void	rgephy_load_dspcode(struct mii_softc *);
+static void	rgephy_disable_eee(struct mii_softc *);
 
 static const struct mii_phydesc rgephys[] = {
 	MII_PHY_DESC(REALTEK, RTL8169S),
@@ -111,13 +115,11 @@ static int
 rgephy_attach(device_t dev)
 {
 	struct mii_softc *sc;
-	struct mii_attach_args *ma;
 	u_int flags;
 
 	sc = device_get_softc(dev);
-	ma = device_get_ivars(dev);
 	flags = 0;
-	if (strcmp(ma->mii_data->mii_ifp->if_dname, "re") == 0)
+	if (mii_dev_mac_match(dev, "re"))
 		flags |= MIIF_PHYPRIV0;
 	mii_phy_dev_attach(dev, flags, &rgephy_funcs, 0);
 
@@ -147,19 +149,13 @@ static int
 rgephy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 {
 	struct ifmedia_entry *ife = mii->mii_media.ifm_cur;
-	int reg, speed, gig, anar;
+	int speed, gig, anar;
 
 	switch (cmd) {
 	case MII_POLLSTAT:
 		break;
 
 	case MII_MEDIACHG:
-		/*
-		 * If the interface is not up, don't do anything.
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			break;
-
 		PHY_RESET(sc);	/* XXX hardware bug work-around */
 
 		anar = PHY_READ(sc, RGEPHY_MII_ANAR);
@@ -232,12 +228,6 @@ setit:
 
 	case MII_TICK:
 		/*
-		 * Is the interface even up?
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			return (0);
-
-		/*
 		 * Only used for autonegotiation.
 		 */
 		if (IFM_SUBTYPE(ife->ifm_media) != IFM_AUTO) {
@@ -249,20 +239,9 @@ setit:
 		 * Check to see if we have link.  If we do, we don't
 		 * need to restart the autonegotiation process.
 		 */
-		if ((sc->mii_flags & MIIF_PHYPRIV0) == 0 &&
-		    sc->mii_mpd_rev >= 2) {
-			/* RTL8211B(L) */
-			reg = PHY_READ(sc, RGEPHY_MII_SSR);
-			if (reg & RGEPHY_SSR_LINK) {
-				sc->mii_ticks = 0;
-				break;
-			}
-		} else {
-			reg = PHY_READ(sc, RL_GMEDIASTAT);
-			if (reg & RL_GMEDIASTAT_LINK) {
-				sc->mii_ticks = 0;
-				break;
-			}
+		if (rgephy_linkup(sc) != 0) {
+			sc->mii_ticks = 0;
+			break;
 		}
 
 		/* Announce link loss right after it happens. */
@@ -295,6 +274,33 @@ setit:
 	return (0);
 }
 
+static int
+rgephy_linkup(struct mii_softc *sc)
+{
+	int linkup;
+	uint16_t reg;
+
+	linkup = 0;
+	if ((sc->mii_flags & MIIF_PHYPRIV0) == 0 &&
+	    sc->mii_mpd_rev >= RGEPHY_8211B) {
+		if (sc->mii_mpd_rev == RGEPHY_8211F) {
+			reg = PHY_READ(sc, RGEPHY_F_MII_SSR);
+			if (reg & RGEPHY_F_SSR_LINK)
+				linkup++;
+		} else {
+			reg = PHY_READ(sc, RGEPHY_MII_SSR);
+			if (reg & RGEPHY_SSR_LINK)
+				linkup++;
+		}
+	} else {
+		reg = PHY_READ(sc, RL_GMEDIASTAT);
+		if (reg & RL_GMEDIASTAT_LINK)
+			linkup++;
+	}
+
+	return (linkup);
+}
+
 static void
 rgephy_status(struct mii_softc *sc)
 {
@@ -305,18 +311,10 @@ rgephy_status(struct mii_softc *sc)
 	mii->mii_media_status = IFM_AVALID;
 	mii->mii_media_active = IFM_ETHER;
 
-	if ((sc->mii_flags & MIIF_PHYPRIV0) == 0 && sc->mii_mpd_rev >= 2) {
-		ssr = PHY_READ(sc, RGEPHY_MII_SSR);
-		if (ssr & RGEPHY_SSR_LINK)
-			mii->mii_media_status |= IFM_ACTIVE;
-	} else {
-		bmsr = PHY_READ(sc, RL_GMEDIASTAT);
-		if (bmsr & RL_GMEDIASTAT_LINK)
-			mii->mii_media_status |= IFM_ACTIVE;
-	}
+	if (rgephy_linkup(sc) != 0)
+		mii->mii_media_status |= IFM_ACTIVE;
 
 	bmsr = PHY_READ(sc, RGEPHY_MII_BMSR);
-
 	bmcr = PHY_READ(sc, RGEPHY_MII_BMCR);
 	if (bmcr & RGEPHY_BMCR_ISO) {
 		mii->mii_media_active |= IFM_NONE;
@@ -335,26 +333,50 @@ rgephy_status(struct mii_softc *sc)
 		}
 	}
 
-	if ((sc->mii_flags & MIIF_PHYPRIV0) == 0 && sc->mii_mpd_rev >= 2) {
-		ssr = PHY_READ(sc, RGEPHY_MII_SSR);
-		switch (ssr & RGEPHY_SSR_SPD_MASK) {
-		case RGEPHY_SSR_S1000:
-			mii->mii_media_active |= IFM_1000_T;
-			break;
-		case RGEPHY_SSR_S100:
-			mii->mii_media_active |= IFM_100_TX;
-			break;
-		case RGEPHY_SSR_S10:
-			mii->mii_media_active |= IFM_10_T;
-			break;
-		default:
-			mii->mii_media_active |= IFM_NONE;
-			break;
+	if ((sc->mii_flags & MIIF_PHYPRIV0) == 0 &&
+	    sc->mii_mpd_rev >= RGEPHY_8211B) {
+		if (sc->mii_mpd_rev == RGEPHY_8211F) {
+			ssr = PHY_READ(sc, RGEPHY_F_MII_SSR);
+			switch (ssr & RGEPHY_F_SSR_SPD_MASK) {
+			case RGEPHY_F_SSR_S1000:
+				mii->mii_media_active |= IFM_1000_T;
+				break;
+			case RGEPHY_F_SSR_S100:
+				mii->mii_media_active |= IFM_100_TX;
+				break;
+			case RGEPHY_F_SSR_S10:
+				mii->mii_media_active |= IFM_10_T;
+				break;
+			default:
+				mii->mii_media_active |= IFM_NONE;
+				break;
+			}
+			if (ssr & RGEPHY_F_SSR_FDX)
+				mii->mii_media_active |= IFM_FDX;
+			else
+				mii->mii_media_active |= IFM_HDX;
+
+		} else {
+			ssr = PHY_READ(sc, RGEPHY_MII_SSR);
+			switch (ssr & RGEPHY_SSR_SPD_MASK) {
+			case RGEPHY_SSR_S1000:
+				mii->mii_media_active |= IFM_1000_T;
+				break;
+			case RGEPHY_SSR_S100:
+				mii->mii_media_active |= IFM_100_TX;
+				break;
+			case RGEPHY_SSR_S10:
+				mii->mii_media_active |= IFM_10_T;
+				break;
+			default:
+				mii->mii_media_active |= IFM_NONE;
+				break;
+			}
+			if (ssr & RGEPHY_SSR_FDX)
+				mii->mii_media_active |= IFM_FDX;
+			else
+				mii->mii_media_active |= IFM_HDX;
 		}
-		if (ssr & RGEPHY_SSR_FDX)
-			mii->mii_media_active |= IFM_FDX;
-		else
-			mii->mii_media_active |= IFM_HDX;
 	} else {
 		bmsr = PHY_READ(sc, RL_GMEDIASTAT);
 		if (bmsr & RL_GMEDIASTAT_1000MBPS)
@@ -408,7 +430,7 @@ rgephy_loop(struct mii_softc *sc)
 	int i;
 
 	if (sc->mii_mpd_model != MII_MODEL_REALTEK_RTL8251 &&
-	    sc->mii_mpd_rev < 2) {
+	    sc->mii_mpd_rev < RGEPHY_8211B) {
 		PHY_WRITE(sc, RGEPHY_MII_BMCR, RGEPHY_BMCR_PDOWN);
 		DELAY(1000);
 	}
@@ -442,7 +464,7 @@ rgephy_load_dspcode(struct mii_softc *sc)
 	int val;
 
 	if (sc->mii_mpd_model == MII_MODEL_REALTEK_RTL8251 ||
-	    sc->mii_mpd_rev >= 2)
+	    sc->mii_mpd_rev >= RGEPHY_8211B)
 		return;
 
 	PHY_WRITE(sc, 31, 0x0001);
@@ -493,25 +515,62 @@ rgephy_reset(struct mii_softc *sc)
 {
 	uint16_t pcr, ssr;
 
-	if ((sc->mii_flags & MIIF_PHYPRIV0) == 0 && sc->mii_mpd_rev == 3) {
-		/* RTL8211C(L) */
-		ssr = PHY_READ(sc, RGEPHY_MII_SSR);
-		if ((ssr & RGEPHY_SSR_ALDPS) != 0) {
-			ssr &= ~RGEPHY_SSR_ALDPS;
-			PHY_WRITE(sc, RGEPHY_MII_SSR, ssr);
+	switch (sc->mii_mpd_rev) {
+	case RGEPHY_8211F:
+		pcr = PHY_READ(sc, RGEPHY_F_MII_PCR1);
+		pcr &= ~(RGEPHY_F_PCR1_MDI_MM | RGEPHY_F_PCR1_ALDPS_EN);
+		PHY_WRITE(sc, RGEPHY_F_MII_PCR1, pcr);
+		rgephy_disable_eee(sc);
+		break;
+	case RGEPHY_8211C:
+		if ((sc->mii_flags & MIIF_PHYPRIV0) == 0) {
+			/* RTL8211C(L) */
+			ssr = PHY_READ(sc, RGEPHY_MII_SSR);
+			if ((ssr & RGEPHY_SSR_ALDPS) != 0) {
+				ssr &= ~RGEPHY_SSR_ALDPS;
+				PHY_WRITE(sc, RGEPHY_MII_SSR, ssr);
+			}
 		}
-	}
-
-	if (sc->mii_mpd_rev >= 2) {
-		pcr = PHY_READ(sc, RGEPHY_MII_PCR);
-		if ((pcr & RGEPHY_PCR_MDIX_AUTO) == 0) {
-			pcr &= ~RGEPHY_PCR_MDI_MASK;
-			pcr |= RGEPHY_PCR_MDIX_AUTO;
-			PHY_WRITE(sc, RGEPHY_MII_PCR, pcr);
+		/* FALLTHROUGH */
+	default:
+		if (sc->mii_mpd_rev >= RGEPHY_8211B) {
+			pcr = PHY_READ(sc, RGEPHY_MII_PCR);
+			if ((pcr & RGEPHY_PCR_MDIX_AUTO) == 0) {
+				pcr &= ~RGEPHY_PCR_MDI_MASK;
+				pcr |= RGEPHY_PCR_MDIX_AUTO;
+				PHY_WRITE(sc, RGEPHY_MII_PCR, pcr);
+			}
 		}
+		break;
 	}
 
 	mii_phy_reset(sc);
 	DELAY(1000);
 	rgephy_load_dspcode(sc);
+}
+
+static void
+rgephy_disable_eee(struct mii_softc *sc)
+{
+	uint16_t anar;
+
+	PHY_WRITE(sc, RGEPHY_F_EPAGSR, 0x0000);
+	PHY_WRITE(sc, MII_MMDACR, MMDACR_FN_ADDRESS |
+	    (MMDACR_DADDRMASK & RGEPHY_F_MMD_DEV_7));
+	PHY_WRITE(sc, MII_MMDAADR, RGEPHY_F_MMD_EEEAR);
+	PHY_WRITE(sc, MII_MMDACR, MMDACR_FN_DATANPI |
+	    (MMDACR_DADDRMASK & RGEPHY_F_MMD_DEV_7));
+	PHY_WRITE(sc, MII_MMDAADR, 0x0000);
+	PHY_WRITE(sc, MII_MMDACR, 0x0000);
+	/*
+	 * XXX
+	 * Restart auto-negotiation to take changes effect.
+	 * This may result in link establishment.
+	 */
+	anar = BMSR_MEDIA_TO_ANAR(sc->mii_capabilities) | ANAR_CSMA;
+	PHY_WRITE(sc, RGEPHY_MII_ANAR, anar);
+	PHY_WRITE(sc, RGEPHY_MII_1000CTL, RGEPHY_1000CTL_AHD |
+	    RGEPHY_1000CTL_AFD);
+	PHY_WRITE(sc, RGEPHY_MII_BMCR, RGEPHY_BMCR_RESET |
+	    RGEPHY_BMCR_AUTOEN | RGEPHY_BMCR_STARTNEG);
 }

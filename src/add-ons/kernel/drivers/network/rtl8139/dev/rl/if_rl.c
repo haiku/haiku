@@ -99,6 +99,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/sysctl.h>
 
 #include <net/if.h>
+#include <net/if_var.h>
 #include <net/if_arp.h>
 #include <net/ethernet.h>
 #include <net/if_dl.h>
@@ -126,12 +127,12 @@ MODULE_DEPEND(rl, miibus, 1, 1, 1);
 /* "device miibus" required.  See GENERIC if you get errors here. */
 #include "miibus_if.h"
 
-#include <pci/if_rlreg.h>
+#include <dev/rl/if_rlreg.h>
 
 /*
  * Various supported device vendors/types and their names.
  */
-static const struct rl_type const rl_devs[] = {
+static const struct rl_type rl_devs[] = {
 	{ RT_VENDORID, RT_DEVICEID_8129, RL_8129,
 		"RealTek 8129 10/100BaseTX" },
 	{ RT_VENDORID, RT_DEVICEID_8139, RL_8139,
@@ -148,6 +149,8 @@ static const struct rl_type const rl_devs[] = {
 		"Delta Electronics 8139 10/100BaseTX" },
 	{ ADDTRON_VENDORID, ADDTRON_DEVICEID_8139, RL_8139,
 		"Addtron Technology 8139 10/100BaseTX" },
+	{ DLINK_VENDORID, DLINK_DEVICEID_520TX_REVC1, RL_8139,
+		"D-Link DFE-520TX (rev. C1) 10/100BaseTX" },
 	{ DLINK_VENDORID, DLINK_DEVICEID_530TXPLUS, RL_8139,
 		"D-Link DFE-530TX+ 10/100BaseTX" },
 	{ DLINK_VENDORID, DLINK_DEVICEID_690TXD, RL_8139,
@@ -595,7 +598,7 @@ rl_probe(device_t dev)
 		}
 	}
 	t = rl_devs;
-	for (i = 0; i < sizeof(rl_devs) / sizeof(rl_devs[0]); i++, t++) {
+	for (i = 0; i < nitems(rl_devs); i++, t++) {
 		if (vendor == t->rl_vid && devid == t->rl_did) {
 			device_set_desc(dev, t->rl_name);
 			return (BUS_PROBE_DEFAULT);
@@ -1015,17 +1018,16 @@ rl_dma_free(struct rl_softc *sc)
 
 	/* Rx memory block. */
 	if (sc->rl_cdata.rl_rx_tag != NULL) {
-		if (sc->rl_cdata.rl_rx_dmamap != NULL)
+		if (sc->rl_cdata.rl_rx_buf_paddr != 0)
 			bus_dmamap_unload(sc->rl_cdata.rl_rx_tag,
 			    sc->rl_cdata.rl_rx_dmamap);
-		if (sc->rl_cdata.rl_rx_dmamap != NULL &&
-		    sc->rl_cdata.rl_rx_buf_ptr != NULL)
+		if (sc->rl_cdata.rl_rx_buf_ptr != NULL)
 			bus_dmamem_free(sc->rl_cdata.rl_rx_tag,
 			    sc->rl_cdata.rl_rx_buf_ptr,
 			    sc->rl_cdata.rl_rx_dmamap);
 		sc->rl_cdata.rl_rx_buf_ptr = NULL;
 		sc->rl_cdata.rl_rx_buf = NULL;
-		sc->rl_cdata.rl_rx_dmamap = NULL;
+		sc->rl_cdata.rl_rx_buf_paddr = 0;
 		bus_dma_tag_destroy(sc->rl_cdata.rl_rx_tag);
 		sc->rl_cdata.rl_tx_tag = NULL;
 	}
@@ -1164,7 +1166,7 @@ rl_rxeof(struct rl_softc *sc)
 		if (!(rxstat & RL_RXSTAT_RXOK) ||
 		    total_len < ETHER_MIN_LEN ||
 		    total_len > ETHER_MAX_LEN + ETHER_VLAN_ENCAP_LEN) {
-			ifp->if_ierrors++;
+			if_inc_counter(ifp, IFCOUNTER_IERRORS, 1);
 			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			rl_init_locked(sc);
 			return (rx_npkts);
@@ -1213,11 +1215,11 @@ rl_rxeof(struct rl_softc *sc)
 		CSR_WRITE_2(sc, RL_CURRXADDR, cur_rx - 16);
 
 		if (m == NULL) {
-			ifp->if_iqdrops++;
+			if_inc_counter(ifp, IFCOUNTER_IQDROPS, 1);
 			continue;
 		}
 
-		ifp->if_ipackets++;
+		if_inc_counter(ifp, IFCOUNTER_IPACKETS, 1);
 		RL_UNLOCK(sc);
 		(*ifp->if_input)(ifp, m);
 		RL_LOCK(sc);
@@ -1252,7 +1254,7 @@ rl_txeof(struct rl_softc *sc)
 		    RL_TXSTAT_TX_UNDERRUN|RL_TXSTAT_TXABRT)))
 			break;
 
-		ifp->if_collisions += (txstat & RL_TXSTAT_COLLCNT) >> 24;
+		if_inc_counter(ifp, IFCOUNTER_COLLISIONS, (txstat & RL_TXSTAT_COLLCNT) >> 24);
 
 		bus_dmamap_sync(sc->rl_cdata.rl_tx_tag, RL_LAST_DMAMAP(sc),
 		    BUS_DMASYNC_POSTWRITE);
@@ -1268,10 +1270,10 @@ rl_txeof(struct rl_softc *sc)
 		    (sc->rl_txthresh < 2016))
 			sc->rl_txthresh += 32;
 		if (txstat & RL_TXSTAT_TX_OK)
-			ifp->if_opackets++;
+			if_inc_counter(ifp, IFCOUNTER_OPACKETS, 1);
 		else {
 			int			oldthresh;
-			ifp->if_oerrors++;
+			if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 			if ((txstat & RL_TXSTAT_TXABRT) ||
 			    (txstat & RL_TXSTAT_OUTOFWIN))
 				CSR_WRITE_4(sc, RL_TXCFG, RL_TXCFG_CONFIG);
@@ -1565,7 +1567,7 @@ rl_encap(struct rl_softc *sc, struct mbuf **m_head)
 	 */
 	if (m->m_next != NULL || (mtod(m, uintptr_t) & 3) != 0 ||
 	    (padlen > 0 && M_TRAILINGSPACE(m) < padlen)) {
-		m = m_defrag(*m_head, M_DONTWAIT);
+		m = m_defrag(*m_head, M_NOWAIT);
 		if (m == NULL) {
 			m_freem(*m_head);
 			*m_head = NULL;
@@ -1895,7 +1897,7 @@ rl_watchdog(struct rl_softc *sc)
 		return;
 
 	device_printf(sc->rl_dev, "watchdog timeout\n");
-	sc->rl_ifp->if_oerrors++;
+	if_inc_counter(sc->rl_ifp, IFCOUNTER_OERRORS, 1);
 
 	rl_txeof(sc);
 	rl_rxeof(sc);
@@ -1936,15 +1938,13 @@ rl_stop(struct rl_softc *sc)
 	 */
 	for (i = 0; i < RL_TX_LIST_CNT; i++) {
 		if (sc->rl_cdata.rl_tx_chain[i] != NULL) {
-			if (sc->rl_cdata.rl_tx_chain[i] != NULL) {
-				bus_dmamap_sync(sc->rl_cdata.rl_tx_tag,
-				    sc->rl_cdata.rl_tx_dmamap[i],
-				    BUS_DMASYNC_POSTWRITE);
-				bus_dmamap_unload(sc->rl_cdata.rl_tx_tag,
-				    sc->rl_cdata.rl_tx_dmamap[i]);
-				m_freem(sc->rl_cdata.rl_tx_chain[i]);
-				sc->rl_cdata.rl_tx_chain[i] = NULL;
-			}
+			bus_dmamap_sync(sc->rl_cdata.rl_tx_tag,
+			    sc->rl_cdata.rl_tx_dmamap[i],
+			    BUS_DMASYNC_POSTWRITE);
+			bus_dmamap_unload(sc->rl_cdata.rl_tx_tag,
+			    sc->rl_cdata.rl_tx_dmamap[i]);
+			m_freem(sc->rl_cdata.rl_tx_chain[i]);
+			sc->rl_cdata.rl_tx_chain[i] = NULL;
 			CSR_WRITE_4(sc, RL_TXADDR0 + (i * sizeof(uint32_t)),
 			    0x0000000);
 		}

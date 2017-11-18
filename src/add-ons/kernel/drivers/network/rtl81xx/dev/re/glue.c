@@ -11,7 +11,7 @@
 
 #include <machine/bus.h>
 
-#include <pci/if_rlreg.h>
+#include <dev/rl/if_rlreg.h>
 
 
 extern driver_t *DRIVER_MODULE_NAME(rgephy, miibus);
