@@ -34,6 +34,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
+#include <Roster.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
 
@@ -76,8 +77,14 @@ PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
 
 
 PowerStatusView::PowerStatusView(BMessage* archive)
-	: BView(archive)
+	:
+	BView(archive),
+	fInDeskbar(false)
 {
+	app_info info;
+	if (be_app->GetAppInfo(&info) == B_OK
+		&& !strcasecmp(info.signature, kDeskbarSignature))
+		fInDeskbar = true;
 	_Init();
 	FromMessage(archive);
 }
@@ -102,8 +109,6 @@ PowerStatusView::Archive(BMessage* archive, bool deep) const
 void
 PowerStatusView::_Init()
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-
 	fShowLabel = true;
 	fShowTime = false;
 	fShowStatusIcon = true;
@@ -118,15 +123,18 @@ void
 PowerStatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	AdoptParentColors();
+	if (Parent() != NULL) {
+		if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
+			SetViewColor(B_TRANSPARENT_COLOR);
+		else
+			AdoptParentColors();
+	} else
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	float tint = B_NO_TINT;
-	color_which which = ViewUIColor(&tint);
-
-	if (which == B_NO_COLOR)
-		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+	if (ViewUIColor() != B_NO_COLOR)
+		SetLowUIColor(ViewUIColor());
 	else
-		SetLowUIColor(which, tint);
+		SetLowColor(ViewColor());
 
 	Update();
 }
@@ -263,8 +271,6 @@ PowerStatusView::Draw(BRect updateRect)
 {
 	bool drawBackground = Parent() == NULL
 		|| (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0;
-	if (drawBackground)
-		FillRect(updateRect, B_SOLID_LOW);
 
 	float aspect = Bounds().Width() / Bounds().Height();
 	bool below = aspect <= 1.0f;
@@ -371,7 +377,6 @@ PowerStatusView::Update(bool force)
 	time_t previousTimeLeft = fTimeLeft;
 	bool wasOnline = fOnline;
 	bool hadBattery = fHasBattery;
-
 	_GetBatteryInfo(fBatteryID, &fBatteryInfo);
 	fHasBattery = fBatteryInfo.full_capacity > 0;
 

@@ -11,6 +11,6 @@
 
 extern const char* kSignature;
 extern const char* kDeskbarItemName;
-
+extern const char* kDeskbarSignature;
 
 #endif	// POWER_STATUS_H
