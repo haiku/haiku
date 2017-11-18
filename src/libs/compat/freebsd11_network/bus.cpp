@@ -522,6 +522,16 @@ bus_child_present(device_t child)
 }
 
 
+void
+bus_enumerate_hinted_children(device_t bus)
+{
+#if 0
+	UNIMPLEMENTED();
+#endif
+}
+
+
+
 //	#pragma mark - PCI functions
 
 

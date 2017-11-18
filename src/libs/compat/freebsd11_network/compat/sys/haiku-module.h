@@ -13,6 +13,8 @@
 #include <kernel/lock.h>
 #include <net_stack.h>
 
+#undef __unused
+#define __unused
 
 #undef ASSERT
 	/* private/kernel/debug.h sets it */
@@ -27,6 +29,21 @@ typedef int device_attach_t(device_t dev);
 typedef int device_detach_t(device_t dev);
 typedef int device_resume_t(device_t dev);
 typedef int device_suspend_t(device_t dev);
+
+typedef int bus_child_location_str_t(device_t dev __unused, device_t child,
+	char *buf, size_t buflen);
+typedef int bus_child_pnpinfo_str_t(device_t dev __unused, device_t child,
+	char *buf, size_t buflen);
+typedef void bus_hinted_child_t(device_t dev, const char *name, int unit);
+typedef int bus_print_child_t(device_t dev, device_t child);
+typedef int bus_read_ivar_t(device_t dev, device_t child __unused, int which,
+    uintptr_t *result);
+
+typedef int miibus_readreg_t(device_t dev, int phy, int reg);
+typedef int miibus_writereg_t(device_t dev, int phy, int reg, int data);
+typedef void miibus_statchg_t(device_t dev);
+typedef void miibus_linkchg_t(device_t dev);
+typedef void miibus_mediainit_t(device_t dev);
 
 struct device_method {
 	const char *name;

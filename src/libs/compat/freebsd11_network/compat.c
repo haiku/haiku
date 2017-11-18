@@ -99,6 +99,9 @@ resolve_method(driver_t *driver, const char *name)
 			method = driver->methods[i].method;
 	}
 
+	if (method == NULL)
+		panic("resolve_method: method%s not found\n", name);
+
 	return method;
 }
 
@@ -304,6 +307,19 @@ device_set_driver(device_t dev, driver_t *driver)
 			dev->methods.miibus_linkchg = (void *)mth->method;
 		else if (!strcmp(mth->name, "miibus_mediainit"))
 			dev->methods.miibus_mediainit = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_child_location_str"))
+			dev->methods.bus_child_location_str = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_child_pnpinfo_str"))
+			dev->methods.bus_child_pnpinfo_str = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_hinted_child"))
+			dev->methods.bus_hinted_child = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_print_child"))
+			dev->methods.bus_print_child = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_read_ivar"))
+			dev->methods.bus_read_ivar = (void *)mth->method;
+		else
+			panic("device_set_driver: method %s not found\n", mth->name);
+
 	}
 
 	return 0;

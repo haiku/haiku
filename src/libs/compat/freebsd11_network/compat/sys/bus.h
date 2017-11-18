@@ -95,6 +95,7 @@ void bus_release_resources(device_t dev,
 	const struct resource_spec *resourceSpec, struct resource **resources);
 
 int	bus_child_present(device_t child);
+void	bus_enumerate_hinted_children(device_t bus);
 
 static inline struct resource *
 bus_alloc_resource_any(device_t dev, int type, int *rid, uint32 flags)

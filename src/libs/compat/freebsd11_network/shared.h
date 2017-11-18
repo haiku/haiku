@@ -43,6 +43,15 @@ struct device {
 		void (*miibus_statchg)(device_t);
 		void (*miibus_linkchg)(device_t);
 		void (*miibus_mediainit)(device_t);
+
+		int (*bus_child_location_str)(device_t dev __unused, device_t child,
+			char *buf, size_t buflen);
+		int (*bus_child_pnpinfo_str)(device_t dev __unused, device_t child,
+			char *buf, size_t buflen);
+		void (*bus_hinted_child)(device_t dev, const char *name, int unit);
+		int (*bus_print_child)(device_t dev, device_t child);
+		int (*bus_read_ivar)(device_t dev, device_t child __unused, int which,
+		    uintptr_t *result);
 	} methods;
 
 	struct list_link link;
