@@ -471,7 +471,7 @@
 			interrupts = <65>;
 			interrupt-parent = <&intc>;
 
-			clock-frequency = <3000000>;	/* Set by VideoCore */
+			clock-frequency = <48000000>;   /* Set by VideoCore */
 			reg-shift = <2>;
 		};
 
