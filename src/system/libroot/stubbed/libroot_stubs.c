@@ -71,6 +71,7 @@ int _ufc_sb3;
 int argv_save;
 int daylight;
 int environ;
+int insecure_memzero_ptr;
 int obstack_alloc_failed_handler;
 int obstack_exit_failure;
 int optarg;
@@ -280,9 +281,17 @@ void _IO_wstr_overflow() {}
 void _IO_wstr_pbackfail() {}
 void _IO_wstr_seekoff() {}
 void _IO_wstr_underflow() {}
+void _Z13PBKDF2_SHA256PKhmS0_mmPhm() {}
+void _Z13crypto_scryptPKhmS0_mmjjPhm() {}
+void _Z16HMAC_SHA256_InitP15HMAC_SHA256_CTXPKvm() {}
+void _Z17HMAC_SHA256_FinalPhP15HMAC_SHA256_CTX() {}
+void _Z17__init_after_forkv() {}
+void _Z18HMAC_SHA256_UpdateP15HMAC_SHA256_CTXPKvm() {}
+void _Z18crypto_scrypt_smixPhmmPvS0_() {}
 void _Z22internal_path_for_pathPcmPKcS1_19path_base_directoryS1_jS_m() {}
 void _Z26get_driver_settings_stringPvPcPlb() {}
 void _Z5exectPKcPKPc() {}
+void _Z6fcryptPKcS0_() {}
 void _ZN10__cxxabiv111__terminateEPFvvE() {}
 void _ZN10__cxxabiv112__unexpectedEPFvvE() {}
 void _ZN10__cxxabiv115__forced_unwindD0Ev() {}
@@ -346,6 +355,14 @@ void _ZN8BPrivate29send_request_to_launch_daemonERNS_8KMessageES1_() {}
 void _ZN8BPrivate33get_registrar_authentication_portEv() {}
 void _ZN8BPrivate33set_registrar_authentication_portEi() {}
 void _ZN8BPrivate40send_authentication_request_to_registrarERNS_8KMessageES1_() {}
+void _ZN8BPrivate6SHA25613_ProcessChunkEv() {}
+void _ZN8BPrivate6SHA2564InitEv() {}
+void _ZN8BPrivate6SHA2566DigestEv() {}
+void _ZN8BPrivate6SHA2566UpdateEPKvm() {}
+void _ZN8BPrivate6SHA256C1Ev() {}
+void _ZN8BPrivate6SHA256C2Ev() {}
+void _ZN8BPrivate6SHA256D1Ev() {}
+void _ZN8BPrivate6SHA256D2Ev() {}
 void _ZN8BPrivate7Libroot13LocaleBackend11LoadBackendEv() {}
 void _ZN8BPrivate7Libroot13LocaleBackendC1Ev() {}
 void _ZN8BPrivate7Libroot13LocaleBackendC2Ev() {}
@@ -496,13 +513,17 @@ void _ZNSt9type_infoD1Ev() {}
 void _ZNSt9type_infoD2Ev() {}
 void _ZSt10unexpectedv() {}
 void _ZSt13__adjust_heapIPN17EnvironmentFilter5EntryElS1_N9__gnu_cxx5__ops15_Iter_less_iterEEvT_T0_S7_T1_T2_() {}
+void _ZSt13__heap_selectIPN17EnvironmentFilter5EntryEN9__gnu_cxx5__ops15_Iter_less_iterEEvT_S6_S6_T0_() {}
 void _ZSt13get_terminatev() {}
 void _ZSt13set_terminatePFvvE() {}
 void _ZSt14get_unexpectedv() {}
 void _ZSt14set_unexpectedPFvvE() {}
 void _ZSt15get_new_handlerv() {}
 void _ZSt15set_new_handlerPFvvE() {}
+void _ZSt16__insertion_sortIPN17EnvironmentFilter5EntryEN9__gnu_cxx5__ops15_Iter_less_iterEEvT_S6_T0_() {}
+void _ZSt16__introsort_loopIPN17EnvironmentFilter5EntryElN9__gnu_cxx5__ops15_Iter_less_iterEEvT_S6_T0_T1_() {}
 void _ZSt18uncaught_exceptionv() {}
+void _ZSt25__unguarded_linear_insertIPN17EnvironmentFilter5EntryEN9__gnu_cxx5__ops14_Val_less_iterEEvT_T0_() {}
 void _ZSt7nothrow() {}
 void _ZSt9terminatev() {}
 void _ZTIN10__cxxabiv115__forced_unwindE() {}
@@ -824,6 +845,9 @@ void __guess_secondary_architecture_from_path() {}
 void __gxx_personality_v0() {}
 void __halfulp() {}
 void __hdestroy() {}
+void __heap_after_fork_child() {}
+void __heap_after_fork_parent() {}
+void __heap_before_fork() {}
 void __heap_terminate_after() {}
 void __hypot() {}
 void __hypotf() {}
@@ -1640,6 +1664,8 @@ void _to_negative_error() {}
 void _to_positive_error() {}
 void _ufc_dofinalperm() {}
 void _ufc_doit() {}
+void _utimes() {}
+void _waitpid() {}
 void _xdebugPrintf() {}
 void a64l() {}
 void abort() {}
@@ -1809,6 +1835,7 @@ void create_port() {}
 void create_sem() {}
 void crypt() {}
 void crypt16() {}
+void crypt_legacy() {}
 void csin() {}
 void csinf() {}
 void csinh() {}
@@ -1903,7 +1930,6 @@ void fchownat() {}
 void fclose() {}
 void fcloseall() {}
 void fcntl() {}
-void fcrypt() {}
 void fcvt() {}
 void fcvt_r() {}
 void fdim() {}
@@ -2362,6 +2388,23 @@ void port_count() {}
 void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}
+void posix_spawn() {}
+void posix_spawn_file_actions_addclose() {}
+void posix_spawn_file_actions_adddup2() {}
+void posix_spawn_file_actions_addopen() {}
+void posix_spawn_file_actions_destroy() {}
+void posix_spawn_file_actions_init() {}
+void posix_spawnattr_destroy() {}
+void posix_spawnattr_getflags() {}
+void posix_spawnattr_getpgroup() {}
+void posix_spawnattr_getsigdefault() {}
+void posix_spawnattr_getsigmask() {}
+void posix_spawnattr_init() {}
+void posix_spawnattr_setflags() {}
+void posix_spawnattr_setpgroup() {}
+void posix_spawnattr_setsigdefault() {}
+void posix_spawnattr_setsigmask() {}
+void posix_spawnp() {}
 void pow() {}
 void pow10() {}
 void pow10f() {}
@@ -2387,6 +2430,13 @@ void pthread_attr_setguardsize() {}
 void pthread_attr_setschedparam() {}
 void pthread_attr_setscope() {}
 void pthread_attr_setstacksize() {}
+void pthread_barrier_destroy() {}
+void pthread_barrier_init() {}
+void pthread_barrier_wait() {}
+void pthread_barrierattr_destroy() {}
+void pthread_barrierattr_getpshared() {}
+void pthread_barrierattr_init() {}
+void pthread_barrierattr_setpshared() {}
 void pthread_cancel() {}
 void pthread_cond_broadcast() {}
 void pthread_cond_destroy() {}

@@ -97,6 +97,7 @@ int _ufc_sb3;
 int argv_save;
 int daylight;
 int environ;
+int insecure_memzero_ptr;
 int obstack_alloc_failed_handler;
 int obstack_exit_failure;
 int optarg;
@@ -123,6 +124,7 @@ void BufferCapacity__CQ28BPrivate8KMessage() {}
 void Buffer__CQ28BPrivate8KMessage() {}
 void ContentSize__CQ28BPrivate8KMessage() {}
 void CountElements__CQ28BPrivate13KMessageField() {}
+void Digest__Q28BPrivate6SHA256() {}
 void Dump__CQ28BPrivate8KMessagePFPCce_v() {}
 void ElementAt__CQ28BPrivate13KMessageFieldlPl() {}
 void ElementSize__CQ28BPrivate13KMessageField() {}
@@ -134,15 +136,20 @@ void FindInt32__CQ28BPrivate8KMessagePCclPl() {}
 void FindString__CQ28BPrivate8KMessagePCclPPCc() {}
 void Flag__C8DateMaskUc() {}
 void GetNextField__CQ28BPrivate8KMessagePQ28BPrivate13KMessageField() {}
+void HMAC_SHA256_Final__FPUcP15HMAC_SHA256_CTX() {}
+void HMAC_SHA256_Init__FP15HMAC_SHA256_CTXPCvUl() {}
+void HMAC_SHA256_Update__FP15HMAC_SHA256_CTXPCvUl() {}
 void HasFixedElementSize__CQ28BPrivate13KMessageField() {}
 void HasTime__8DateMask() {}
 void Init__17EnvironmentFilterPCcPCPCcUl() {}
+void Init__Q28BPrivate6SHA256() {}
 void IsComplete__8DateMask() {}
 void IsEmpty__CQ28BPrivate8KMessage() {}
 void LoadBackend__Q38BPrivate7Libroot13LocaleBackend() {}
 void Lock__Q211LocalRWLock7LockingP11LocalRWLock() {}
 void Message__CQ28BPrivate13KMessageField() {}
 void Name__CQ28BPrivate13KMessageField() {}
+void PBKDF2_SHA256__FPCUcUlT0UlUxPUcUl() {}
 void ReceiveFrom__Q28BPrivate8KMessagelxP17port_message_info() {}
 void ReplyPort__CQ28BPrivate8KMessage() {}
 void ReplyToken__CQ28BPrivate8KMessage() {}
@@ -165,6 +172,7 @@ void TypeCode__CQ28BPrivate13KMessageField() {}
 void Unlock__Q211LocalRWLock7LockingP11LocalRWLock() {}
 void Unset__Q28BPrivate13KMessageField() {}
 void Unset__Q28BPrivate8KMessage() {}
+void Update__Q28BPrivate6SHA256PCvUl() {}
 void What__CQ28BPrivate8KMessage() {}
 void _AddFieldData__Q28BPrivate8KMessagePQ28BPrivate13KMessageFieldPCvll() {}
 void _AddField__Q28BPrivate8KMessagePCcUllPQ28BPrivate13KMessageField() {}
@@ -375,6 +383,7 @@ void _InitBuffer__Q28BPrivate8KMessageUl() {}
 void _InitFromBuffer__Q28BPrivate8KMessageb() {}
 void _Init__17EnvironmentFilteriPCcUlPCPCcUl() {}
 void _LastFieldHeader__CQ28BPrivate8KMessage() {}
+void _ProcessChunk__Q28BPrivate6SHA256() {}
 void _Unblock__11LocalRWLock() {}
 void _Wait__11LocalRWLockbx() {}
 void __10bad_typeid() {}
@@ -389,6 +398,7 @@ void __Q28BPrivate10superblockiiPQ28BPrivate9hoardHeap() {}
 void __Q28BPrivate10threadHeap() {}
 void __Q28BPrivate11processHeap() {}
 void __Q28BPrivate13KMessageField() {}
+void __Q28BPrivate6SHA256() {}
 void __Q28BPrivate8KMessage() {}
 void __Q28BPrivate8KMessageUl() {}
 void __Q28BPrivate9hoardHeap() {}
@@ -690,6 +700,9 @@ void __guess_architecture_for_path() {}
 void __guess_grouping() {}
 void __guess_secondary_architecture_from_path() {}
 void __hdestroy() {}
+void __heap_after_fork_child() {}
+void __heap_after_fork_parent() {}
+void __heap_before_fork() {}
 void __heap_terminate_after() {}
 void __hypot() {}
 void __hypotf() {}
@@ -773,6 +786,7 @@ void __ieee754_ynf() {}
 void __ilogb() {}
 void __ilogbf() {}
 void __ilogbl() {}
+void __init_after_fork__Fv() {}
 void __init_env() {}
 void __init_env_post_heap() {}
 void __init_heap() {}
@@ -1571,6 +1585,8 @@ void _to_negative_error() {}
 void _to_positive_error() {}
 void _ufc_dofinalperm() {}
 void _ufc_doit() {}
+void _utimes() {}
+void _waitpid() {}
 void _xdebugPrintf() {}
 void a64l() {}
 void abort() {}
@@ -1749,6 +1765,9 @@ void create_port() {}
 void create_sem() {}
 void crypt() {}
 void crypt16() {}
+void crypt_legacy() {}
+void crypto_scrypt__FPCUcUlT0UlUxUiUiPUcUl() {}
+void crypto_scrypt_smix__FPUcUlUxPvT3() {}
 void csin() {}
 void csinf() {}
 void csinh() {}
@@ -1846,7 +1865,7 @@ void fchownat() {}
 void fclose() {}
 void fcloseall() {}
 void fcntl() {}
-void fcrypt() {}
+void fcrypt__FPCcT0() {}
 void fcvt() {}
 void fcvt_r() {}
 void fdim() {}
@@ -2017,6 +2036,7 @@ void get_launch_daemon_port__8BPrivatev() {}
 void get_launch_data__8BPrivatePCcRQ28BPrivate8KMessage() {}
 void get_memory_properties() {}
 void get_nth_image_symbol() {}
+void get_nth_pci_info() {}
 void get_path_for_dirent() {}
 void get_primary_architecture() {}
 void get_pthread_thread_id() {}
@@ -2330,6 +2350,23 @@ void port_count() {}
 void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}
+void posix_spawn() {}
+void posix_spawn_file_actions_addclose() {}
+void posix_spawn_file_actions_adddup2() {}
+void posix_spawn_file_actions_addopen() {}
+void posix_spawn_file_actions_destroy() {}
+void posix_spawn_file_actions_init() {}
+void posix_spawnattr_destroy() {}
+void posix_spawnattr_getflags() {}
+void posix_spawnattr_getpgroup() {}
+void posix_spawnattr_getsigdefault() {}
+void posix_spawnattr_getsigmask() {}
+void posix_spawnattr_init() {}
+void posix_spawnattr_setflags() {}
+void posix_spawnattr_setpgroup() {}
+void posix_spawnattr_setsigdefault() {}
+void posix_spawnattr_setsigmask() {}
+void posix_spawnp() {}
 void pow() {}
 void pow10() {}
 void pow10f() {}
@@ -2355,6 +2392,13 @@ void pthread_attr_setguardsize() {}
 void pthread_attr_setschedparam() {}
 void pthread_attr_setscope() {}
 void pthread_attr_setstacksize() {}
+void pthread_barrier_destroy() {}
+void pthread_barrier_init() {}
+void pthread_barrier_wait() {}
+void pthread_barrierattr_destroy() {}
+void pthread_barrierattr_getpshared() {}
+void pthread_barrierattr_init() {}
+void pthread_barrierattr_setpshared() {}
 void pthread_cancel() {}
 void pthread_cond_broadcast() {}
 void pthread_cond_destroy() {}
