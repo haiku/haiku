@@ -177,12 +177,13 @@ m_getjcl(int how, short type, int flags, int size)
 }
 
 
-void
+int
 m_clget(struct mbuf *memoryBuffer, int how)
 {
 	memoryBuffer->m_ext.ext_buf = NULL;
 	/* called checks for errors by looking for M_EXT */
 	construct_ext_mbuf(memoryBuffer, how);
+	return memoryBuffer->m_flags & M_EXT;
 }
 
 
