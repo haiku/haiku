@@ -45,6 +45,8 @@ All rights reserved.
 #include <PopUpMenu.h>
 #include <Window.h>
 
+#include <algorithm>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -55,6 +57,12 @@ All rights reserved.
 
 
 #define APP_SERVER_CLEARS_BACKGROUND 1
+
+
+static const float kMinFontSize = 8.0f;
+static const float kMinTitleHeight = 13.0f;
+static const float kTitleSpacing = 1.4f;
+
 
 static void
 _DrawLine(BPoseView* view, BPoint from, BPoint to)
@@ -108,13 +116,15 @@ BTitleView::BTitleView(BPoseView* view)
 	SetViewColor(B_TRANSPARENT_COLOR);
 #endif
 
+	float fontSize = std::max(kMinFontSize,
+		floorf(be_plain_font->Size() * 0.75f));
+
 	BFont font(be_plain_font);
-	font.SetSize(floorf(be_plain_font->Size() * 0.75f));
+	font.SetSize(fontSize);
 	SetFont(&font);
 
-	font_height height;
-	GetFontHeight(&height);
-	fPreferredHeight = ceilf(height.ascent + height.descent) + 2;
+	fPreferredHeight = std::max(kMinTitleHeight,
+		ceilf(fontSize * kTitleSpacing));
 
 	Reset();
 }
@@ -467,9 +477,13 @@ BColumnTitle::Draw(BView* view, bool pressed)
 {
 	BRect bounds(Bounds());
 
-	font_height height;
-	view->GetFontHeight(&height);
-	BPoint loc(0, bounds.top + ceilf(height.ascent) + 2);
+	font_height fontHeight;
+	view->GetFontHeight(&fontHeight);
+
+	float baseline = floor(bounds.top + fontHeight.ascent
+		+ (bounds.Height() + 1 - (fontHeight.ascent + fontHeight.descent)) / 2);
+	BPoint titleLocation(0, baseline);
+
 	rgb_color baseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	if (pressed) {
@@ -490,22 +504,23 @@ BColumnTitle::Draw(BView* view, bool pressed)
 	switch (fColumn->Alignment()) {
 		case B_ALIGN_LEFT:
 		default:
-			loc.x = bounds.left + 1 + kTitleColumnLeftExtraMargin;
+			titleLocation.x = bounds.left + 1 + kTitleColumnLeftExtraMargin;
 			break;
 
 		case B_ALIGN_CENTER:
-			loc.x = bounds.left + (bounds.Width() / 2) - (resultingWidth / 2);
+			titleLocation.x = bounds.left + (bounds.Width() / 2)
+				- (resultingWidth / 2);
 			break;
 
 		case B_ALIGN_RIGHT:
-			loc.x = bounds.right - resultingWidth
+			titleLocation.x = bounds.right - resultingWidth
 				- kTitleColumnRightExtraMargin;
 			break;
 	}
 
 	view->SetHighUIColor(B_PANEL_TEXT_COLOR, pressed ? B_DARKEN_1_TINT : 1.0f);
 	view->SetLowColor(baseColor);
-	view->DrawString(titleString.String(), loc);
+	view->DrawString(titleString.String(), titleLocation);
 
 	// show sort columns
 	bool secondary
@@ -513,7 +528,8 @@ BColumnTitle::Draw(BView* view, bool pressed)
 	if (secondary
 		|| (fColumn->AttrHash() == fParent->PoseView()->PrimarySort())) {
 
-		BPoint center(loc.x - 6, roundf((bounds.top + bounds.bottom) / 2.0));
+		BPoint center(titleLocation.x - 6,
+			roundf((bounds.top + bounds.bottom) / 2.0));
 		BPoint triangle[3];
 		if (fParent->PoseView()->ReverseSort()) {
 			triangle[0] = center + BPoint(-3.5, 1.5);
