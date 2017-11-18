@@ -15,6 +15,6 @@ Use boot volume	SettingsWindow		Використати завантажувал�
 Load defaults	SettingsWindow		Завантажити типові
 OK	VirtualMemoryApp		Гаразд
 Changes will take effect upon reboot.	SettingsWindow		Зміни вступлять в силу після перезавантаження.
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Віртуальна пам'ять\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\nПереклад: Віктор Чумак aka 386sx\n
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Віртуальна пам'ять\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Розділ, вказаний в файлі налаштувань не знайдено. Ви можете використати завантажувальний розділ або вийти.
 Enable virtual memory	SettingsWindow		Увімкнути віртуальну пам'ять

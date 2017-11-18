@@ -17,4 +17,4 @@ Halt	Login View		Зупинити
 Password:	Login View		Гасло:
 OK	Login App		Гаразд
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tНе робити вікно модальним\n
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		ви можете налаштувати робочий стіл позаду програми Авторизація, скинувши на нього репліканти.\n\n Коли Ви завершите просто вийдіть з додатку (Cmd-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Ви можете налаштувати робочий стіл позаду програми Авторизація, скинувши на нього репліканти.\n\n Коли Ви завершите просто вийдіть з додатку (Cmd-Q).

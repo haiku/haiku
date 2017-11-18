@@ -20,8 +20,8 @@ Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс зай
 None	MainWin		Нічого
 force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення екрану 4:3
 DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне ТБ
-force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення екрану 4:3
+force 544 x 576, display aspect 4:3	MainWin		примусово 544 x 576, співвідношення екрану 4:3
 pixel aspect ratio	MainWin		піксельна пропрорція
 No menu	MainWin		Немає меню
 Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу не вдалось:\n\n
-force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення екрану 4:3
+force 720 x 576, display aspect 4:3	MainWin		примусово 720 x 576, співвідношення екрану 4:3

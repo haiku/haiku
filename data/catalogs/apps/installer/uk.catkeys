@@ -9,7 +9,7 @@ Quit	InstallerApp		Завершити
 Additional disk space required: 0.0 KiB	InstallerWindow		Необхідно додатковий дисковий простір: 0.0 KiB
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Зупинити
-Install progress:  	InstallerWindow		Хід встановлення: 
+Install progress:  	InstallerWindow		Хід встановлення:  
 Starting Installation.	InstallProgress		Початок встановлення.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Це лише альфа-версія, тому є ризик втрати важливих даних. Частіше робіть резервне копіювання! Будьмо уважні!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Ви дійсно бажаєте відмінити встановлення?
@@ -50,7 +50,7 @@ Scanning for disks…	InstallerWindow		Сканування дисків…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск неможливо підмонтувати. Виберіть інший.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту Розмітка диску для розбиття\nдоступних вінчестерів і пристроїв.\nРозділи будуть зініціалізовані у \nBe File System необхідній для завантаження розділу з Haiku\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту Розмітка диску для розбиття\nдоступних вінчестерів і пристроїв.\nРозділи будуть зініціалізовані у \nBe File System необхідній для завантаження \nрозділу з Haiku.
 Show optional packages	InstallerWindow		Показати необовя’зкові пакети
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Не знайдено жодного розділу, що підходить для встановлення. Налаштуйте розділи або зініціалізуйте один з них в Be File System.
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Додатково доведеться змінити ще один файл, щоб з’явилося меню завантаження:\n\n

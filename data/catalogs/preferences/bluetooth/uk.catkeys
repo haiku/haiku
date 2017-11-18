@@ -2,7 +2,7 @@
 About Bluetooth…	Window		Про Блютуз…
 Handheld	Settings view		Переносний
 Default inquiry time:	Settings view		Час запиту типовий:
-Manufacturer: 	Device View		Виробник:
+Manufacturer: 	Device View		Виробник: 
 Add device to list	Inquiry panel		Додати прилад до списку
 Starting scan...	Inquiry panel		Початок сканування…
 Smart phone	Settings view		Смартфон
@@ -40,7 +40,7 @@ Revert	Window		Повернути
 Remote devices	Window		Віддалені прилади
 Laptop	Settings view		Ноутбук
 Discoverable	Extended local device view		Видимий
-Service classes: 	Device View		Класи сервісу:
+Service classes: 	Device View		Класи сервісу: 
 Settings	Window		Налаштування
 Only from trusted devices	Settings view		Тільки для перевірених приладів
 Scanning progress	Inquiry panel		Хід сканування

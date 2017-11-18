@@ -5,7 +5,7 @@ ACPI controller	Device		Контроллер ACPI
 Memory controller	Device		Контроллер пам’яті
 Driver used	DevicePCI		Використовує драйвер
 CD-ROM	DeviceSCSI		CD-ROM
-ISA bus	Device		шина ISA
+ISA bus	Device		Шина ISA
 ACPI bus	Device		Шина ACPI
 ISA bus	DevicesView		Шина ISA
 Docking station	Device		Док-станція

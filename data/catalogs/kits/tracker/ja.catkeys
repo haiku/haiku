@@ -129,7 +129,7 @@ Save as Query template:	FindPanel		クエリ雛型として保存する:
 preferences	B_PREFERENCES_DIRECTORY		設定
 Unmatched parenthesis.	libtracker		括弧が不一致です。
 Cancel	FSUtils		中止
-Edit name	ContainerWindow		名前を編集
+Edit name	ContainerWindow		名前の変更
 Nested *?+.	libtracker		*?+ が入れ子になっています。
 Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示する
 KiB	WidgetAttributeText		KiB
@@ -249,7 +249,7 @@ Error deleting items	FSUtils		ファイル削除中にエラーが発生しま�
 Create relative link here	ContainerWindow		ここに相対リンクを作成
 trash	B_TRASH_DIRECTORY		ごみ箱
 matches regular expression	SelectionWindow		正規表現と一致
-Edit name	InfoWindow		名前を編集
+Edit name	InfoWindow		名前の変更
 Could not open \"%name\" (%error). 	FSUtils		\"%name\"を開けませんでした (%error)。
 Paste	ContainerWindow		貼り付け
 Modified:	InfoWindow		更新日時:
@@ -367,7 +367,7 @@ Don't automount	AutoMounterSettings		自動マウントを使わない
 Save	FilePanelPriv		保存
 To: %dir	StatusWindow		%dir
 Window	FilePanelPriv		ウィンドウ
-Edit name	FilePanelPriv		名前の編集
+Edit name	FilePanelPriv		名前の変更
 Size:	InfoWindow		サイズ:
 Empty folder	SlowContextPopup		空フォルダー
 Open selection with:	OpenWithWindow		選択ファイルをアプリケーションで開く:

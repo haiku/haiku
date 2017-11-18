@@ -78,13 +78,13 @@ Flattened bitmap	TypeEditors		Зведене растрове зображенн
 Open file…	FileWindow		Відкрити файл…
 Next	ProbeView		Наступне
 Close	FileWindow		Закрити
-Attribute: 	ProbeView		Атрибут:
+Attribute: 	ProbeView		Атрибут: 
 Remove from file	AttributeWindow		Видалити з файла
 Don't save	ProbeView		Не зберігати
 Previous	ProbeView		Попереднє
 64 bit signed value:	TypeEditors		64-х бітна знакова величина:
 Icon	TypeEditors		Іконка
-Block: 	ProbeView		Блок:
+Block: 	ProbeView		Блок: 
 Examine device:	OpenWindow		Перевірка пристрою:
 Offset: 	ProbeView		Зміщення: 
 OK	ProbeView		Гаразд
@@ -121,7 +121,7 @@ View	ProbeView	This is the last menubar item 'File Edit Block View'	Перегл
 Redo	ProbeView		Відмінити відміну
 File: 	ProbeView		Файл: 
 32 bit unsigned pointer:	TypeEditors		32-х бітний беззнаковий вказівник:
-of 	ProbeView		з
+of 	ProbeView		з 
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Запис до файлу зупинено:\n%s\n\nВсі зміни будуть втрачені при виході.
 32 bit	TypeEditors		32 біти
 Cancel	ProbeView		Відмінити

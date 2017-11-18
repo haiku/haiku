@@ -54,7 +54,7 @@ Stop video	CodyCam		ビデオを停止
 Locking the window\n	VideoConsumer.cpp		ウィンドウを固定中\n
 File %s; Line %ld # %s	SettingsHandler		ファイル %s; 行 %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		要求されたディレクトリがサーバー上にみつかりませんでした
-Renaming…	VideoConsumer.cpp		名前を変更中…
+Renaming…	VideoConsumer.cpp		名前の変更中…
 Local	CodyCam		ローカル
 Error setting type of output file	VideoConsumer.cpp		出力ファイルの形式の設定に失敗
 upload client name expected	CodyCam		アップロードクライアントの名前を入力してください

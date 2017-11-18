@@ -20,7 +20,7 @@ Destination folder	ExpanderPreferences		Папка призначення
 Other	ExpanderPreferences		Інше
 Cancel	ExpanderPreferences		Відмінити
 Expansion	ExpanderPreferences		Розширення
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпаковка елементів може бути неповною.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього\nархіва? Розпаковка елементів може бути неповною.
 Select	DirectoryFilePanel		Вибрати
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка призначення не існує. Створити її?
 Same directory as source (archive) file	ExpanderPreferences		Та ж папка що і джерела (архіву)

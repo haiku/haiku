@@ -11,11 +11,11 @@ Stepping policy	CPU Frequency View		Правила крокування
 Dynamic performance	Status view		Динамічна продуктивність
 Step up by CPU usage	Color Step View		Крок вгору продуктивності процесора
 Dynamic stepping	CPU Frequency View		Динамічне крокування
-Stepping policy: 	CPU Frequency View		Правила крокування :
-Integration time [ms]: 	CPU Frequency View		Час інтеграції [мс]:
+Stepping policy: 	CPU Frequency View		Правила крокування: 
+Integration time [ms]: 	CPU Frequency View		Час інтеграції [мс]: 
 Open Speedstep preferences…	Status view		Налаштування Open Speedstep…
 Revert	Pref Window		Повернути
 Low energy	Status view		Мале споживання
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Запуск префлету Частота процесора призупинено.\n\nПомилка: 
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Частота процесора\n\Автор Клеменс Зейдлер\n\tАвторські права 2009, Haiku, Inc.\n
-CPUFrequency	System name		Частота процесора
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Запуск префлету CPUFrequency призупинено.\n\nПомилка: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\Автор Клеменс Зейдлер\n\tАвторські права 2009, Haiku, Inc.\n
+CPUFrequency	System name		CPUFrequency

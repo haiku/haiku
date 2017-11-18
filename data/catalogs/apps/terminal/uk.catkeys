@@ -27,13 +27,13 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Невідома опц
 Blue	Terminal colors scheme		Синій
 Custom	Terminal colors scheme		Вибірка
 Encoding:	Terminal AppearancePrefView		Кодування:
-%app% settings	Terminal PrefWindow	window title	налаштування %app%
+%app% settings	Terminal PrefWindow	window title	%app% налаштування
 Cancel	Terminal SetTitleWindow		Відмінити
 Increase	Terminal TermWindow		Збільшити
 Settings	Terminal TermWindow		Налаштування
 Window size	Terminal TermWindow		Розмір вікна
 Selected text	Terminal AppearancePrefView		Вибрати текст
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча тека активного процесу в біжучій вкладці\n\t\t\tЗа бажанням можна вказати максимальну кількість компонентів \n\t\t\tшляху. наприклад '% 2d' для більш ніж з двох компонентів.\n\t%T\t-\tІм'я додатку Terminal для даної місцевості.\n\t%e\t-\tКодування поточної вкладки. Не показувати для UTF-8.\n\t%i\t-\tіндекс вікна\n\t%p\t-\tНазва активного процесу в поточній вкладці.\n\t%t\t-\tНазва поточної вкладки.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча тека активного процесу в біжучій вкладці\n\t\t\tЗа бажанням можна вказати максимальну кількість компонентів \n\t\t\tшляху. Наприклад '% 2d' для більш ніж з двох компонентів.\n\t%T\t-\tІм'я додатку Terminal для даної місцевості.\n\t%e\t-\tКодування поточної вкладки. Не показувати для UTF-8.\n\t%i\t-\tІндекс вікна\n\t%p\t-\tНазва активного процесу в поточній вкладці.\n\t%t\t-\tНазва поточної вкладки.
 Find	Terminal FindWindow		Знайти
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон із зазначенням назви вікна. Можна використати\nнаступні наповнювачі:
 Appearance	Terminal PrefWindow		Вигляд
@@ -108,7 +108,7 @@ Copy link location	Terminal TermView		Скопіювати адресу поси
 Tab title:	Terminal TermWindow		Ім'я вкладки:
 Find next	Terminal TermWindow		Знайти наступне
 Close active tab	Terminal TermWindow		Закрити активну вкладку
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tПочаток секції буде показано тільки у випадку коли\n\t\t\tзаповнювач після нього не буде порожній.\n\t%>\t-\Початок секції буде показано тільки у випадку коли\n\t\t\tзавповнювач між попередньою %< секцією і цією не є порожнім.\n\t%-\t-\tКінець %< or %> секції.\n\nБудь-який не букво-цифровий символ між '%' і буквою формату буде просто додавати пробіл\nЯкщо значення заповнювача не є порожнє, то воно додається до %< секції.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tПочаток секції буде показано тільки у випадку коли\n\t\t\tзаповнювач після нього не буде порожній.\n\t%>\t-\Початок секції буде показано тільки у випадку коли\n\t\t\tзаповнювач між попередньою %< секцією і цією не є порожнім.\n\t%-\t-\tКінець %< or %> секції.\n\nБудь-який не букво-цифровий символ між '%' і буквою формату буде просто додавати пробіл\nЯкщо значення заповнювача не є порожнє, то воно додається до %< section.
 Paste	Terminal TermWindow		Вставити
 Solarized Dark	Terminal colors scheme		Сяюча темнота
 Shell 	Terminal TermWindow		Оболонка 

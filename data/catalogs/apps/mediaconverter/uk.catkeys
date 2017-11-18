@@ -5,7 +5,7 @@ Video encoding:	MediaConverter		Кодування відео:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error creating video.	MediaConverter		Помилка при створенні відео
 Error read audio frame %lld	MediaConverter		Помилка читання аудіокадру %lld
-No audio	Audio codecs list		без звуку
+No audio	Audio codecs list		Без звуку
 Error	MediaConverter		Помилка
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# біт} other{# бітів}}
 Error loading a file	MediaConverter		Помилка завантаження файлу

@@ -54,7 +54,7 @@ bad news	Icon-O-Matic-Exporter		погані новини
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого, для скасування>
 Off	Icon-O-Matic-Menu-Settings		Вимкнути
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Вимкнути
-PNG Set	Icon-O-Matic-SavePanel		Встановити PNG 
+PNG Set	Icon-O-Matic-SavePanel		Встановити PNG
 Joins	Icon-O-Matic-PropertyNames		З'єднання
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Видалити стиль
 Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
@@ -154,7 +154,7 @@ Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
 Add	Icon-O-Matic-PathsList		Додати
 Add Shapes	Icon-O-Matic-AddShapesCmd		Додати фігури
 Move Style	Icon-O-Matic-MoveStylesCmd		Перемістити стиль
-Bummer	Cancel button - error alert		облом
+Bummer	Cancel button - error alert		Облом
 Snap to grid	Icon-O-Matic-Menu-Settings		Прив'язати до сітки
 Remove	Icon-O-Matic-ShapesList		Видалити
 Yes	Icon-O-Matic-StyledTextImport		Так

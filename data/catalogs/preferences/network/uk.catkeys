@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Network	2512967175
+1	ukrainian	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Статичний
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Вибрати автоматично
 connected	IntefaceView		під'єднано
 Ethernet device	InterfaceListItem		Мережева карта
 The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
+Dial-up connection	InterfaceListItem		Під'єднання Dial-up
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Мережа
+VPN connection	InterfaceListItem		Під'єднання VPN
 Show network status in Deskbar	NetworkWindow		Показати стан мережі у Deskbar'і
 The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
 connected	InterfaceListItem		під'єднання
@@ -23,7 +25,7 @@ Disabled	IntefaceAddressView		Заборонити
 Renegotiate	IntefaceView		Переукласти
 Ok	NetworkWindow		Гаразд
 Network:	IntefaceView		Мережа:
-launch error	NetworkWindow		Помилка з'єднання
+launch error	NetworkWindow		помилка з'єднання
 Other	NetworkWindow		Інший
 Automatic	IntefaceAddressView		Автоматично
 Gateway:	IntefaceAddressView		Шлюз:
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Відправити:
 open	Open network		відкрити
 IP Address:	IntefaceAddressView		IP адреса:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Отримати:
 Disable	IntefaceView		Заборонити
 <no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>

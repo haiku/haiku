@@ -82,7 +82,7 @@ Quit	FileTypes Window		Вийти
 Select preferred application	FileType Window		Вибрати бажану програму
 Single launch	Application Type Window		Одноразовий запуск
 Golden master	Application Types Window		Золотий майстер
-%s file type	FileType Window		Золотий майстер
+%s file type	FileType Window		%s тип файлу
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Програма \"%s\" Не підтримує цей тип файлів.\nВи дійсно бажаєте встановити його?
 Type:	Attribute Window		Тип:
 Removing uninstalled application types	Application Types Window		Видалення типів для невстановлених програм
@@ -143,7 +143,7 @@ Right	Attribute Window	Attribute column alignment in Tracker	Вправо
 Default application	FileType Window		Додаток по замовчуванню
 Long description:	Application Type Window		Довгий опис:
 FileTypes request	FileTypes Window		Запит Типів файлів
-Version info	Application Type Window		інформація про версію
+Version info	Application Type Window		Інформація про версію
 (from super type)	FileTypes Window		(від супер типу)
 Version:	Application Types Window		Версія:
 Preferred application	FileTypes Window		Бажана програма

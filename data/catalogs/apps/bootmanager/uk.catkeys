@@ -7,8 +7,8 @@ Restore MBR	BootManagerController	Button	Відновлення MBR
 Hard Drive	DrivesPage	Default disk name	Жорсткий диск
 USB Drive	DrivesPage	Default disk name	Пристрій USB
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Основний завантажувальний запис (MBR) завантажувального пристрою:\n\t%s\nзараз буде збережено на диск. Виберіть файл для збереження MBR.\n\nКоли під час встановлення щось піде не так або Ви бажатимете видалити бутменю просто запустіть Завантажувач і виберіть опцію 'Деінсталювати'.
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Про відновлення MBR  %disk з %file. Ви дійсно бажаєте продовжити?
-First partition starts too early	BootManagerController	Title	Перший розділ починається занадто рано 
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Про відновлення MBR %disk з %file. Ви дійсно бажаєте продовжити?
+First partition starts too early	BootManagerController	Title	Перший розділ починається занадто рано
 An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Сталася помилка при спробі запису завантажувального меню. MBR міг пошкодитись, Ви можете спробувати відновити його зараз!
 Partitions	PartitionsPage	Title	Розділи
 Timeout: %s	DefaultPartitionPage		Затримка: %s

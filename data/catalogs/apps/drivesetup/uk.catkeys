@@ -25,7 +25,7 @@ The partition %s is already unmounted.	MainWindow		Розділ %s повніс�
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
 Initialize	MainWindow		Ініціалізація
-Error: 	MainWindow	in any error alert	Помилка:
+Error: 	MainWindow	in any error alert	Помилка: 
 Partition %ld	DiskView		Розділ %ld
 <empty>	DiskView		<пусто>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Ініціалізація розділу %s призупинена. (Нічого не було записано на диск.)

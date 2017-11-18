@@ -1,10 +1,29 @@
-1	ukrainian	x-vnd.Haiku-Notifications	984257918
+1	ukrainian	x-vnd.Haiku-Notifications	1544806248
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Сталася помилка при збереженні налаштувань.\nМожливо бракує дискового простору.
+Add…	NotificationView		Додати…
+Status	NotificationView		Стан
 Revert	PrefletWin		Повернути
 Enable notifications	GeneralView		Включити оповіщення
+Window width:	GeneralView		Ширина вікна:
+This is a test notification message	PrefletWin		Це тестове повідомлення
 OK	PrefletWin		Гаразд
+Duration:	GeneralView		Тривалість:
+OK	NotificationView		Гаразд
+Application does not have a valid signature	NotificationView	Alert message	Додаток не має діючого підпису
+Notifications	PrefletWin		Оповіщення
+Timeout:	GeneralView		Таймаут:
+Muted	NotificationView		Приглушити
 General	PrefletView		Основні
 Allowed	NotificationView		Дозволити
+Remove	NotificationView		Видалити
+Notifications preflet sample	PrefletWin		Зразок префлета повідомлень
 Notifications	System name		Оповіщення
+Applications	PrefletView		Програми
+Defaults	PrefletWin		Типове
+pixels	GeneralView		пікселі
 Application	NotificationView		Програма
+Width:	GeneralView		Ширина:
+seconds	GeneralView		секунд
+Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
+ is already listed	NotificationView	Alert message	 вже перелічено
 Applications	NotificationView		Програми

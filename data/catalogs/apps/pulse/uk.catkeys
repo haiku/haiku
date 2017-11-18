@@ -27,12 +27,12 @@ Info	CPUButton		Інформація
 OK	PulseView		Гаразд
 Deskbar menu	CPUButton		Меню Deskbar'a
 About Pulse…	PulseView		Про Pulse…
-Deskbar mode	MiniPulseView		Deskbar режим 
+Deskbar mode	MiniPulseView		Deskbar режим
 Quit	MiniPulseView		Вийти
 Pulse	System name		Pulse
 Pulse	NormalPulseView		Pulse
 %ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Deskbar режим 
+Deskbar mode	NormalPulseView		Deskbar режим
 Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		Ширина іконки:
 You can't disable the last active CPU.	CPUButton		Неможливо усунути останній активний процесор.

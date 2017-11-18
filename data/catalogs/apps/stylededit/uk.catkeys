@@ -39,7 +39,7 @@ Replace all	FindandReplaceWindow		Замінити все
 Statistics…	Menus		Статистика…
 Default	Open_and_SaveAsPanel		По замовчуванню
 Replace next	Menus		Замінити наступний
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nПовернути його до останньої збереженої версії?
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nПовернути його до останньої збереженої версії? 
 Cancel	FindandReplaceWindow		Відмінити
 Text encoding	Menus		Кодування
 Close	Menus		Закрити

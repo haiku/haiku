@@ -57,7 +57,7 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 Gets the URI of the currently playing item.	MediaPlayer-Main		Отримати URL файлу, що відтворюєтся в даний момент.
 400% scale	MediaPlayer-Main		Масштаб 400%
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено:\n\nПомилка:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено:\n\nПомилка: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
 Audio	MediaPlayer-Main		Аудіо
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
@@ -143,7 +143,7 @@ Edit	MediaPlayer-PlaylistWindow		Редагувати
 Start media server	MediaPlayer-Main		Запустити Медіа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Перемкнути у повноекранний режим.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Отримати тривалість фрагменту, що відтворюється в мілісекундах. 
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Отримати тривалість фрагменту, що відтворюється в мілісекундах.
 ToggleFullscreen	MediaPlayer-Main		Перемкнути у повноекранний режим
 Bad URL	MediaPlayer-NetworkStream		Невірний URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} other{# Канали}}

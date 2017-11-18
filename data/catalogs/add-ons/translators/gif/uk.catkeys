@@ -2,7 +2,7 @@
 Websafe	GIFView		Придатний для Web
 Write interlaced images	GIFView		Записати зображення, що переплітаються
 Optimal	GIFView		Оптимальний
-Greyscale	GIFView		 Відтінки сірого
+Greyscale	GIFView		Відтінки сірого
 Colors:	GIFView		Кольори:
 GIF image translator	GIFTranslator		Транслятор GIFзображень
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Формат Be Bitmap (Перетворювач GIF)
