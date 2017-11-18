@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -115,6 +115,7 @@
 #define PL011_DCDMIM	(1 << 2) // DCD interrupt mask
 #define PL011_CTSMIM	(1 << 1) // CTS interrupt mask
 #define PL011_RIMIM		(1 << 0) // RI interrupt mask
+#define PL011_MSKIM		0x7ff	 // Mask all interrupts
 
 #define PL011_OEIS		(1 << 10) // overrun error interrupt state
 #define PL011_BEIS		(1 << 9) // break error interrupt state
@@ -179,7 +180,7 @@ ArchUARTPL011::ArchUARTPL011(addr_t base, int64 clock)
 		| PL011_PEIS | PL011_FEIS);
 
 	// ** Disable interrupts
-	Out32(PL011_IMSC, 0);
+	Out32(PL011_IMSC, In32(PL011_IMSC) & ~PL011_MSKIM);
 }
 
 
@@ -226,7 +227,11 @@ ArchUARTPL011::InitPort(uint32 baud)
 	Out32(PL011_FBRD, baudFractional);
 
 	// Set LCR 8n1, enable fifo
-	Out32(PL011_LCRH, PL01x_LCRH_WLEN_8 | PL01x_LCRH_FEN);
+	Out32(PL011_LCRH, (In32(PL011_LCRH) & ~0xff)
+		| PL01x_LCRH_WLEN_8 | PL01x_LCRH_FEN);
+
+	// Set FIFO levels
+	Out32(PL011_IFLS, PL011_IFLS_RX4_8 | PL011_IFLS_TX4_8);
 
 	// Enable UART
 	Enable();
