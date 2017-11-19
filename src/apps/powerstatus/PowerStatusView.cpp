@@ -163,6 +163,7 @@ PowerStatusView::MessageReceived(BMessage *message)
 void
 PowerStatusView::_DrawBattery(BRect rect)
 {
+	BRect lightningRect = rect;
 	float quarter = floorf((rect.Height() + 1) / 4);
 	rect.top += quarter;
 	rect.bottom -= quarter;
@@ -246,7 +247,7 @@ PowerStatusView::_DrawBattery(BRect rect)
 		// When charging, draw a lightning symbol over the battery.
 		SetHighColor(255, 255, 0, 180);
 		SetDrawingMode(B_OP_ALPHA);
-		SetScale(std::min(Bounds().Width(), Bounds().Height()) / 16);
+		SetScale(std::min(lightningRect.Width(), lightningRect.Height()) / 16);
 
 		static const BPoint points[] = {
 			BPoint(3, 14),

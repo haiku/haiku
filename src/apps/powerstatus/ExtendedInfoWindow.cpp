@@ -279,11 +279,12 @@ ExtPowerStatusView::ExtPowerStatusView(PowerStatusDriverInterface* interface,
 void
 ExtPowerStatusView::Draw(BRect updateRect)
 {
-	if (fSelected)
+	if (fSelected) {
+		rgb_color lowColor = LowColor();
 		SetLowColor(102, 152, 203);
-	else
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
+		FillRect(updateRect, B_SOLID_LOW);
+		SetLowColor(lowColor);
+	}
 	PowerStatusView::Draw(updateRect);
 }
 
