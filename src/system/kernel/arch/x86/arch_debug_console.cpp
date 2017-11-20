@@ -59,7 +59,7 @@ enum keycodes {
 };
 
 
-static const uint32 kSerialBaudRate = 115200;
+static uint32 sSerialBaudRate = 115200;
 static uint16 sSerialBasePort = 0x3f8;
 	// COM1 is the default debug output port
 
@@ -72,6 +72,7 @@ static void
 init_serial_port(uint16 basePort, uint32 baudRate)
 {
 	sSerialBasePort = basePort;
+	sSerialBaudRate = baudRate;
 
 	uint16 divisor = (uint16)(115200 / baudRate);
 
@@ -425,7 +426,7 @@ arch_debug_console_init(kernel_args *args)
 	if (args != NULL && args->platform_args.serial_base_ports[0] != 0)
 		sSerialBasePort = args->platform_args.serial_base_ports[0];
 
-	init_serial_port(sSerialBasePort, kSerialBaudRate);
+	init_serial_port(sSerialBasePort, sSerialBaudRate);
 
 	return B_OK;
 }
@@ -434,7 +435,7 @@ arch_debug_console_init(kernel_args *args)
 status_t
 arch_debug_console_init_settings(kernel_args *args)
 {
-	uint32 baudRate = kSerialBaudRate;
+	uint32 baudRate = sSerialBaudRate;
 	uint16 basePort = sSerialBasePort;
 	void *handle;
 
@@ -474,10 +475,10 @@ arch_debug_console_init_settings(kernel_args *args)
 		unload_driver_settings(handle);
 	}
 
-	if (sSerialBasePort == basePort && baudRate == kSerialBaudRate)
+	if (sSerialBasePort == basePort && baudRate == sSerialBaudRate)
 		return B_OK;
 
-	init_serial_port(sSerialBasePort, kSerialBaudRate);
+	init_serial_port(basePort, baudRate);
 
 	return B_OK;
 }
