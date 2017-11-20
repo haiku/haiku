@@ -275,6 +275,6 @@ get_attribute_form_name(uint32 form)
 DebugInfoEntrySetter
 get_attribute_name_setter(uint32 name)
 {
-	return name < kAttributeNameInfoCount
+	return (name < kAttributeNameInfoCount)
 		? sAttributeNameInfos[name].setter : NULL;
 }
