@@ -1701,7 +1701,6 @@ debug_init_post_vm(kernel_args* args)
 	debug_heap_init();
 	debug_variables_init();
 	frame_buffer_console_init(args);
-	arch_debug_console_init_settings(args);
 	tracing_init();
 }
 
@@ -1727,6 +1726,7 @@ debug_init_post_settings(struct kernel_args* args)
 	if (sDebugScreenEnabled)
 		blue_screen_enter(true);
 
+	arch_debug_console_init_settings(args);
 	syslog_init_post_vm(args);
 }
 
