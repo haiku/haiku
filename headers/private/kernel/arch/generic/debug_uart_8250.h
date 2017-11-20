@@ -34,6 +34,7 @@ public:
 
 
 extern DebugUART8250 *arch_get_uart_8250(addr_t base, int64 clock);
+extern DebugUART8250 *arch_get_uart_8250_omap(addr_t base, int64 clock);
 
 
 #endif /* _KERNEL_ARCH_DEBUG_UART_8250_H */

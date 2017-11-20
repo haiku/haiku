@@ -25,8 +25,11 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	arch_asm.S
+
+	# Serial UART and drivers
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
+	arch_uart_8250_omap.cpp
 	arch_uart_pl011.cpp
 
 	arch_atomic64.cpp

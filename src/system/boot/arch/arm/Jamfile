@@ -30,15 +30,22 @@ local kernelDebugSources =
 ;
 
 BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
+	# Serial UART Drivers
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
+	arch_uart_8250_omap.cpp
 	arch_uart_pl011.cpp
-	arch_elf.cpp
+
+	# Framebuffer Drivers
 	arch_framebuffer_920.cpp
 	arch_framebuffer_bcm2835.cpp
 	arch_framebuffer_pxa.cpp
 	arch_framebuffer_omap3.cpp
+
+	# Mailbox drivers
 	arch_mailbox_bcm2835.cpp
+
+	arch_elf.cpp
 	arch_cpu.cpp
 	arch_mmu.cpp
 	arch_start_kernel.S

@@ -102,6 +102,11 @@ debug_uart_from_fdt(const void *fdt)
 		TRACE(("serial: Found 8250 serial UART!\n"));
 		uart = arch_get_uart_8250(regs, clock);
 	#ifdef __ARM__
+	} else if (fdt_node_check_compatible(fdt, node, "ti,omap3-uart") == 0
+		|| fdt_node_check_compatible(fdt, node, "ti,omap4-uart") == 0
+		|| fdt_node_check_compatible(fdt, node, "ti,omap5-uart") == 0) {
+		TRACE(("serial: Found omap 8250 serial UART!\n"));
+		uart = arch_get_uart_8250_omap(regs, clock);
 	} else if (fdt_node_check_compatible(fdt, node, "arm,pl011") == 0
 		|| fdt_node_check_compatible(fdt, node, "arm,primecell") == 0) {
 		TRACE(("serial: Found pl011 serial UART!\n"));
