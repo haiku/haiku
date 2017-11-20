@@ -15,6 +15,7 @@
 #include <ScrollBar.h>
 
 #include "SerialApp.h"
+#include "libvterm/src/vterm_internal.h"
 
 
 struct ScrollBufferItem {
@@ -72,68 +73,101 @@ TermView::Draw(BRect updateRect)
 			+ kBorderSpacing;
 		MovePenTo(x, y);
 
+		BString string;
+		VTermScreenCell cell;
+		int width = 0;
+		bool isCursor = false;
+		
+		pos.col = updatedChars.start_col;
+		_GetCell(pos, cell);
+
 		for (pos.col = updatedChars.start_col;
 				pos.col <= updatedChars.end_col;) {
-			VTermScreenCell cell;
 
-			_GetCell(pos, cell);
+			VTermScreenCell newCell;
+			_GetCell(pos, newCell);
 
-			rgb_color foreground, background;
-			foreground.red = cell.fg.red;
-			foreground.green = cell.fg.green;
-			foreground.blue = cell.fg.blue;
-			foreground.alpha = 255;
-			background.red = cell.bg.red;
-			background.green = cell.bg.green;
-			background.blue = cell.bg.blue;
-			background.alpha = 255;
+			// We need to start a new extent if:
+			// - The attributes change
+			// - The colors change
+			// - The end of line is reached
+			// - The current cell is under the cursor
+			// - The current cell is right of the cursor
+			if (*(uint32_t*)&cell.attrs != *(uint32_t*)&newCell.attrs
+				|| !vterm_color_equal(cell.fg, newCell.fg)
+				|| !vterm_color_equal(cell.bg, newCell.bg)
+				|| pos.col >= updatedChars.end_col
+				|| (pos.col == cursorPos.col && pos.row == cursorPos.row)
+				|| (pos.col == cursorPos.col + 1 && pos.row == cursorPos.row)) {
+				
+				rgb_color foreground, background;
+				foreground.red = cell.fg.red;
+				foreground.green = cell.fg.green;
+				foreground.blue = cell.fg.blue;
+				foreground.alpha = 255;
+				background.red = cell.bg.red;
+				background.green = cell.bg.green;
+				background.blue = cell.bg.blue;
+				background.alpha = 255;
 
-			// Draw the cursor by swapping foreground and background colors
-			if ((pos.col == cursorPos.col && pos.row == cursorPos.row)) {
-				SetLowColor(foreground);
-				SetViewColor(foreground);
-				SetHighColor(background);
-			} else {
-				SetLowColor(background);
-				SetViewColor(background);
-				SetHighColor(foreground);
+				// Draw the cursor by swapping foreground and background colors
+				if (isCursor) {
+					SetLowColor(foreground);
+					SetViewColor(foreground);
+					SetHighColor(background);
+				} else {
+					SetLowColor(background);
+					SetViewColor(background);
+					SetHighColor(foreground);
+				}
+
+				FillRect(BRect(x, y - ceil(height.ascent) + 1,
+					x + width * fFontWidth - 1,
+					y + ceil(height.descent) + ceil(height.leading)),
+					B_SOLID_LOW);
+
+				BFont font = be_fixed_font;
+				if (cell.attrs.bold)
+					font.SetFace(B_BOLD_FACE);
+				if (cell.attrs.underline)
+					font.SetFace(B_UNDERSCORE_FACE);
+				if (cell.attrs.italic)
+					font.SetFace(B_ITALIC_FACE);
+				if (cell.attrs.blink) // FIXME make it actually blink
+					font.SetFace(B_OUTLINED_FACE);
+				if (cell.attrs.reverse)
+					font.SetFace(B_NEGATIVE_FACE);
+				if (cell.attrs.strike)
+					font.SetFace(B_STRIKEOUT_FACE);
+
+				// TODO handle "font" (alternate fonts), dwl and dhl (double size)
+
+				SetFont(&font);
+				DrawString(string);
+				x += width * fFontWidth;
+
+				// Prepare for next cell
+				cell = newCell;
+				string = "";
+				width = 0;
 			}
 
-			FillRect(BRect(x, y - ceil(height.ascent) + 1,
-				x + cell.width * fFontWidth - 1,
-				y + ceil(height.descent) + ceil(height.leading)),
-				B_SOLID_LOW);
-
-			BFont font = be_fixed_font;
-			if (cell.attrs.bold)
-				font.SetFace(B_BOLD_FACE);
-			if (cell.attrs.underline)
-				font.SetFace(B_UNDERSCORE_FACE);
-			if (cell.attrs.italic)
-				font.SetFace(B_ITALIC_FACE);
-			if (cell.attrs.blink) // FIXME make it actually blink
-				font.SetFace(B_OUTLINED_FACE);
-			if (cell.attrs.reverse)
-				font.SetFace(B_NEGATIVE_FACE);
-			if (cell.attrs.strike)
-				font.SetFace(B_STRIKEOUT_FACE);
-
-			// TODO handle "font" (alternate fonts), dwl and dhl (double size)
-
-			SetFont(&font);
-
-			if (cell.chars[0] == 0) {
-				DrawString(" ");
+			if (pos.col == cursorPos.col && pos.row == cursorPos.row)
+				isCursor = true;
+			else
+				isCursor = false;
+			
+			if (newCell.chars[0] == 0) {
+				string += " ";
 				pos.col ++;
-				x += fFontWidth;
+				width += 1;
 			} else {
 				char buffer[VTERM_MAX_CHARS_PER_CELL];
-				wcstombs(buffer, (wchar_t*)cell.chars,
-						VTERM_MAX_CHARS_PER_CELL);
-
-				DrawString(buffer);
-				x += (int)ceil(StringWidth(buffer));
-				pos.col += cell.width;
+				wcstombs(buffer, (wchar_t*)newCell.chars,
+					VTERM_MAX_CHARS_PER_CELL);
+				string += buffer;
+				width += newCell.width;
+				pos.col += newCell.width;
 			}
 		}
 	}
@@ -374,16 +408,19 @@ void
 TermView::_MoveCursor(VTermPos pos, VTermPos oldPos, int visible)
 {
 	VTermRect r;
-	r.start_row = pos.row;
-	r.start_col = pos.col;
-	r.end_col = pos.col + 1;
-	r.end_row = pos.row + 1;
-	Invalidate(_GlyphsToPixels(r));
 
+	// We need to erase the cursor from its old position
 	r.start_row = oldPos.row;
 	r.start_col = oldPos.col;
 	r.end_col = oldPos.col + 1;
 	r.end_row = oldPos.row + 1;
+	Invalidate(_GlyphsToPixels(r));
+
+	// And we need to draw it at the new one
+	r.start_row = pos.row;
+	r.start_col = pos.col;
+	r.end_col = pos.col + 1;
+	r.end_row = pos.row + 1;
 	Invalidate(_GlyphsToPixels(r));
 }
 
