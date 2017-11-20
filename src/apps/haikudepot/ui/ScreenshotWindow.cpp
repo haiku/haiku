@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -20,6 +21,11 @@
 #define B_TRANSLATION_CONTEXT "ScreenshotWindow"
 
 
+static const rgb_color kBackgroundColor = { 51, 102, 152, 255 };
+	// Drawn as a border around the screenshots and also what's behind their
+	// transparent regions
+
+
 ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE("Screenshot"),
@@ -35,8 +41,7 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 	BGroupView* groupView = new BGroupView(B_VERTICAL);
-	groupView->SetViewColor(0, 0, 0);
-	fScreenshotView->SetLowColor(0, 0, 0);
+	groupView->SetViewColor(kBackgroundColor);
 
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -45,6 +50,10 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 			.SetInsets(B_USE_WINDOW_INSETS)
 		.End()
 	;
+
+	fScreenshotView->SetLowColor(kBackgroundColor);
+		// Set after attaching all views to prevent it from being overriden
+		// again by BitmapView::AllAttached()
 
 	CenterOnScreen();
 }
