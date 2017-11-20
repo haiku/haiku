@@ -1,4 +1,5 @@
 /*
+ * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>.
@@ -149,6 +150,7 @@ public:
 			void				UpdateState();
 			void				UpdateRating();
 			void				UpdateSize();
+			void				UpdateRepository();
 
 private:
 			PackageInfoRef		fPackage;
@@ -523,6 +525,7 @@ enum {
 	kDescriptionColumn,
 	kSizeColumn,
 	kStatusColumn,
+	kRepositoryColumn
 };
 
 
@@ -553,6 +556,9 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Status
 	UpdateState();
+
+	// Repository
+	UpdateRepository();
 
 	package.AddListener(fPackageListener);
 }
@@ -615,6 +621,16 @@ PackageRow::UpdateSize()
 		return;
 
 	SetField(new SizeField(fPackage->Size()), kSizeColumn);
+}
+
+
+void
+PackageRow::UpdateRepository()
+{
+	if (fPackage.Get() == NULL)
+		return;
+
+	SetField(new BStringField(fPackage->DepotName()), kRepositoryColumn);
 }
 
 
@@ -728,6 +744,11 @@ PackageListView::PackageListView(BLocker* modelLock)
 		spacing + StringWidth(B_TRANSLATE("Available")), 60 * scale,
 		140 * scale, B_TRUNCATE_END), kStatusColumn);
 
+	AddColumn(new PackageColumn(B_TRANSLATE("Repository"), 120 * scale,
+		50 * scale, 200 * scale, B_TRUNCATE_MIDDLE), kRepositoryColumn);
+	SetColumnVisible(kRepositoryColumn, false);
+		// invisible by default
+
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
 }
@@ -787,6 +808,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateSize();
 				if ((changes & PKG_CHANGED_ICON) != 0)
 					row->UpdateTitle();
+				if ((changes & PKG_CHANGED_DEPOT) != 0)
+					row->UpdateRepository();
 			}
 			break;
 		}

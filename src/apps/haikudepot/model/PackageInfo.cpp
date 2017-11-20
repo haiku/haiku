@@ -935,7 +935,10 @@ PackageInfo::SetSize(int64 size)
 void
 PackageInfo::SetDepotName(const BString& depotName)
 {
-	fDepotName = depotName;
+	if (fDepotName != depotName) {
+		fDepotName = depotName;
+		_NotifyListeners(PKG_CHANGED_DEPOT);
+	}
 }
 
 
