@@ -104,7 +104,11 @@ debug_uart_from_fdt(const void *fdt)
 	#ifdef __ARM__
 	} else if (fdt_node_check_compatible(fdt, node, "ti,omap3-uart") == 0
 		|| fdt_node_check_compatible(fdt, node, "ti,omap4-uart") == 0
-		|| fdt_node_check_compatible(fdt, node, "ti,omap5-uart") == 0) {
+		|| fdt_node_check_compatible(fdt, node, "ti,omap5-uart") == 0
+		|| fdt_node_check_compatible(fdt, node, "ti,am3352-uart") == 0
+		|| fdt_node_check_compatible(fdt, node, "ti,am4372-uart") == 0
+		|| fdt_node_check_compatible(fdt, node, "ti,dra742-uart") == 0) {
+		// TODO: ti,am* and ti,dr* have some special quirks.
 		TRACE(("serial: Found omap 8250 serial UART!\n"));
 		uart = arch_get_uart_8250_omap(regs, clock);
 	} else if (fdt_node_check_compatible(fdt, node, "arm,pl011") == 0
