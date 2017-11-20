@@ -35,6 +35,7 @@ StdBinCommands
 	fortune.c
 	finddir.c
 	fstrim.cpp
+	get_driver_settings.cpp
 	hd.c
 	listarea.c
 	listimage.c
