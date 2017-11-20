@@ -332,24 +332,10 @@ BSecureSocket::Private::_CreateContext()
 	SSL_CTX_set_mode(sContext, SSL_MODE_AUTO_RETRY);
 
 	// Setup cipher suites.
-	// These suites are mostly the same ones used by Firefox 47 and Chrome 50.
-	SSL_CTX_set_cipher_list(sContext,
-		"ECDHE-ECDSA-AES128-GCM-SHA256:"
-		"ECDHE-RSA-AES128-GCM-SHA256:"
-		"ECDHE-ECDSA-AES256-GCM-SHA384:"
-		"ECDHE-RSA-AES256-GCM-SHA384:"
-		"ECDHE-ECDSA-CHACHA20-POLY1305-SHA256:"
-		"ECDHE-RSA-CHACHA20-POLY1305-SHA256:"
-		"ECDHE-ECDSA-AES256-SHA:"
-		"ECDHE-ECDSA-AES128-SHA:"
-		"ECDHE-RSA-AES128-SHA:"
-		"ECDHE-RSA-AES256-SHA:"
-		"DHE-RSA-AES128-SHA:"
-		"DHE-RSA-AES256-SHA:"
-		"AES128-SHA:"
-		"AES256-SHA");
+	// Only accept reasonably secure ones ("HIGH") and disable some known
+	// broken stuff (https://wiki.openssl.org/index.php/SSL/TLS_Client)
+	SSL_CTX_set_cipher_list(sContext, "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4");
 
-	// Let OpenSSL choose the most appropriate D-H curve for us
 	SSL_CTX_set_ecdh_auto(sContext, 1);
 
 	// Setup certificate verification
