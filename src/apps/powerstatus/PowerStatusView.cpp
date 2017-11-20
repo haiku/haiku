@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
  *		Alexander von Gluck, kallisti5@unixzen.com
+ *		Kacper Kasper, kacperkasper@gmail.com
  */
 
 
@@ -161,7 +162,7 @@ PowerStatusView::MessageReceived(BMessage *message)
 
 
 void
-PowerStatusView::_DrawBattery(BRect rect)
+PowerStatusView::_DrawBattery(BView* view, BRect rect)
 {
 	BRect lightningRect = rect;
 	float quarter = floorf((rect.Height() + 1) / 4);
@@ -172,31 +173,33 @@ PowerStatusView::_DrawBattery(BRect rect)
 
 	float left = rect.left;
 	rect.left += rect.Width() / 11;
+	lightningRect.left = rect.left;
+	lightningRect.InsetBy(0.0f, 5.0f * rect.Height() / 16);
 
-	if (LowColor().Brightness() > 100)
-		SetHighColor(0, 0, 0);
+	if (view->LowColor().Brightness() > 100)
+		view->SetHighColor(0, 0, 0);
 	else
-		SetHighColor(128, 128, 128);
+		view->SetHighColor(128, 128, 128);
 
 	float gap = 1;
 	if (rect.Height() > 8) {
 		gap = ceilf((rect.left - left) / 2);
 
 		// left
-		FillRect(BRect(rect.left, rect.top, rect.left + gap - 1, rect.bottom));
+		view->FillRect(BRect(rect.left, rect.top, rect.left + gap - 1, rect.bottom));
 		// right
-		FillRect(BRect(rect.right - gap + 1, rect.top, rect.right,
+		view->FillRect(BRect(rect.right - gap + 1, rect.top, rect.right,
 			rect.bottom));
 		// top
-		FillRect(BRect(rect.left + gap, rect.top, rect.right - gap,
+		view->FillRect(BRect(rect.left + gap, rect.top, rect.right - gap,
 			rect.top + gap - 1));
 		// bottom
-		FillRect(BRect(rect.left + gap, rect.bottom + 1 - gap,
+		view->FillRect(BRect(rect.left + gap, rect.bottom + 1 - gap,
 			rect.right - gap, rect.bottom));
 	} else
-		StrokeRect(rect);
+		view->StrokeRect(rect);
 
-	FillRect(BRect(left, floorf(rect.top + rect.Height() / 4) + 1,
+	view->FillRect(BRect(left, floorf(rect.top + rect.Height() / 4) + 1,
 		rect.left - 1, floorf(rect.bottom - rect.Height() / 4)));
 
 	int32 percent = fPercent;
@@ -208,7 +211,7 @@ PowerStatusView::_DrawBattery(BRect rect)
 	if (percent > 0) {
 		rect.InsetBy(gap, gap);
 		rgb_color base = (rgb_color){84, 84, 84, 255};
-		if (LowColor().Brightness() < 128)
+		if (view->LowColor().Brightness() < 128)
 			base = (rgb_color){172, 172, 172, 255};
 
 		if (be_control_look != NULL) {
@@ -216,7 +219,7 @@ PowerStatusView::_DrawBattery(BRect rect)
 			if (fHasBattery && percent > 0)
 				empty.left += empty.Width() * percent / 100.0;
 
-			be_control_look->DrawButtonBackground(this, empty, empty, base,
+			be_control_look->DrawButtonBackground(view, empty, empty, base,
 				fHasBattery
 					? BControlLook::B_ACTIVATED : BControlLook::B_DISABLED,
 				fHasBattery && percent > 0
@@ -236,18 +239,17 @@ PowerStatusView::_DrawBattery(BRect rect)
 			rect.right = rect.left + rect.Width() * percent / 100.0;
 
 			if (be_control_look != NULL) {
-				be_control_look->DrawButtonBackground(this, rect, rect, base,
+				be_control_look->DrawButtonBackground(view, rect, rect, base,
 					fHasBattery ? 0 : BControlLook::B_DISABLED);
 			} else
-				FillRect(rect);
+				view->FillRect(rect);
 		}
 	}
 
 	if (fOnline) {
 		// When charging, draw a lightning symbol over the battery.
-		SetHighColor(255, 255, 0, 180);
-		SetDrawingMode(B_OP_ALPHA);
-		SetScale(std::min(lightningRect.Width(), lightningRect.Height()) / 16);
+		view->SetHighColor(255, 255, 0, 180);
+		view->SetDrawingMode(B_OP_ALPHA);
 
 		static const BPoint points[] = {
 			BPoint(3, 14),
@@ -257,54 +259,49 @@ PowerStatusView::_DrawBattery(BRect rect)
 			BPoint(9, 12),
 			BPoint(9, 10)
 		};
-		FillPolygon(points, 6);
+		view->FillPolygon(points, 6, lightningRect);
 
-		SetScale(1);
-		SetDrawingMode(B_OP_OVER);
+		view->SetDrawingMode(B_OP_OVER);
 	}
 
-	SetHighColor(0, 0, 0);
+	view->SetHighColor(0, 0, 0);
 }
 
 
 void
 PowerStatusView::Draw(BRect updateRect)
 {
-	bool drawBackground = Parent() == NULL
-		|| (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0;
+	DrawTo(this, Bounds());
+}
 
-	float aspect = Bounds().Width() / Bounds().Height();
-	bool below = aspect <= 1.0f;
+void
+PowerStatusView::DrawTo(BView* view, BRect rect)
+{
+	bool inside = rect.Width() >= 50.0f && rect.Height() >= 40.0f;
 
 	font_height fontHeight;
-	GetFontHeight(&fontHeight);
+	view->GetFontHeight(&fontHeight);
 	float baseLine = ceilf(fontHeight.ascent);
 
 	char text[64];
 	_SetLabel(text, sizeof(text));
 
 	float textHeight = ceilf(fontHeight.descent + fontHeight.ascent);
-	float textWidth = StringWidth(text);
+	float textWidth = view->StringWidth(text);
 	bool showLabel = fShowLabel && text[0];
 
 	BRect iconRect;
 
 	if (fShowStatusIcon) {
-		iconRect = Bounds();
+		iconRect = rect;
 		if (showLabel) {
-			if (below)
-				iconRect.bottom -= textHeight + 2;
-			else
+			if (inside == false)
 				iconRect.right -= textWidth + 2;
 		}
 
-		// make a square
-		iconRect.bottom = min_c(iconRect.bottom, iconRect.right);
-		iconRect.right = iconRect.bottom;
-
 		if (iconRect.Width() + 1 >= kMinIconWidth
 			&& iconRect.Height() + 1 >= kMinIconHeight) {
-			_DrawBattery(iconRect);
+			_DrawBattery(view, iconRect);
 		} else {
 			// there is not enough space for the icon
 			iconRect.Set(0, 0, -1, -1);
@@ -312,32 +309,30 @@ PowerStatusView::Draw(BRect updateRect)
 	}
 
 	if (showLabel) {
-		BPoint point(0, baseLine);
+		BPoint point(0, baseLine + rect.top);
 
 		if (iconRect.IsValid()) {
-			if (below) {
-				point.x = (iconRect.Width() - textWidth) / 2;
-				point.y += iconRect.Height() + 2;
+			if (inside == true) {
+				point.x = rect.left + (iconRect.Width() - textWidth) / 2 +
+					iconRect.Width() / 20;
+				point.y += (iconRect.Height() - textHeight) / 2;
 			} else {
-				point.x = iconRect.Width() + 2;
+				point.x = rect.left + iconRect.Width() + 2;
 				point.y += (iconRect.Height() - textHeight) / 2;
 			}
 		} else {
-			point.x = (Bounds().Width() - textWidth) / 2;
+			point.x = rect.left + (Bounds().Width() - textWidth) / 2;
 			point.y += (Bounds().Height() - textHeight) / 2;
 		}
 
-		if (drawBackground)
-			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-		else {
-			SetDrawingMode(B_OP_OVER);
-			if (LowColor().Brightness() > 100)
-				SetHighColor(0, 0, 0);
-			else
-				SetHighColor(255, 255, 255);
+		view->SetDrawingMode(B_OP_OVER);
+		if (fInDeskbar == false || inside == true) {
+			view->SetHighUIColor(B_CONTROL_BACKGROUND_COLOR);
+			view->DrawString(text, BPoint(point.x + 1, point.y + 1));
 		}
+		view->SetHighUIColor(B_CONTROL_TEXT_COLOR);
 
-		DrawString(text, point);
+		view->DrawString(text, point);
 	}
 }
 

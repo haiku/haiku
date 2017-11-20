@@ -1,9 +1,10 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
+ *		Kacper Kasper, kacperkasper@gmail.com
  */
 
 #ifndef EXTENDED_INFO_WINDOW_H
@@ -13,6 +14,7 @@
 #include <ObjectList.h>
 #include <String.h>
 #include <StringView.h>
+#include <TabView.h>
 #include <View.h>
 #include <Window.h>
 
@@ -40,16 +42,16 @@ private:
 
 
 class ExtendedInfoWindow;
+class BatteryTabView;
 
 class ExtPowerStatusView : public PowerStatusView {
 public:
 								ExtPowerStatusView(
 									PowerStatusDriverInterface* interface,
 									BRect frame, int32 resizingMode,
-									int batteryID, ExtendedInfoWindow* window);
-
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				MouseDown(BPoint where);
+									int batteryID,
+									BatteryInfoView* batteryInfoView,
+									ExtendedInfoWindow* window);
 
 	virtual void				Select(bool select = true);
 
@@ -62,8 +64,33 @@ protected:
 private:
 			ExtendedInfoWindow*	fExtendedInfoWindow;
 			BatteryInfoView*	fBatteryInfoView;
+			BatteryTabView*		fBatteryTabView;
 
 			bool				fSelected;
+};
+
+
+class BatteryTab : public BTab {
+public:
+						BatteryTab(BatteryInfoView* target,
+							ExtPowerStatusView* view);
+						~BatteryTab();
+
+	virtual	void		Select(BView* owner);
+
+	virtual	void		DrawFocusMark(BView* owner, BRect frame);
+	virtual	void		DrawLabel(BView* owner, BRect frame);
+private:
+	ExtPowerStatusView*	fBatteryView;
+};
+
+
+class BatteryTabView : public BTabView {
+public:
+					BatteryTabView(const char* name);
+					~BatteryTabView();
+
+	virtual	BRect	TabFrame(int32 index) const;
 };
 
 
@@ -73,15 +100,13 @@ public:
 		ExtendedInfoWindow(PowerStatusDriverInterface* interface);
 		~ExtendedInfoWindow();
 
-	BatteryInfoView*			GetExtendedBatteryInfoView();
-
-	void						BatterySelected(ExtPowerStatusView* view);
+	BatteryTabView*				GetBatteryTabView();
 
 private:
 	PowerStatusDriverInterface* 		fDriverInterface;
 	BObjectList<ExtPowerStatusView>		fBatteryViewList;
 
-	BatteryInfoView*					fBatteryInfoView;
+	BatteryTabView*						fBatteryTabView;
 
 	ExtPowerStatusView*					fSelectedView;
 };
