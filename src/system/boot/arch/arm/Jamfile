@@ -29,12 +29,21 @@ local kernelDebugSources =
 	frame_buffer_console.cpp
 ;
 
-BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
+local kernelArchDriverSources =
 	# Serial UART Drivers
-	debug_uart_8250.cpp
 	arch_uart_8250.cpp
 	arch_uart_8250_omap.cpp
 	arch_uart_pl011.cpp
+;
+
+local kernelGenericDriverSources =
+	debug_uart_8250.cpp
+;
+
+BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
+	# Kernel Drivers (src/system/kernel)
+	$(kernelGenericDriverSources)
+	$(kernelArchDriverSources)
 
 	# Framebuffer Drivers
 	arch_framebuffer_920.cpp
@@ -60,10 +69,10 @@ BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	$(kernelLibArchObjects)
 ;
 
-SEARCH on [ FGristFiles arch_elf.cpp uart.cpp arch_uart_8250.cpp arch_uart_pl011.cpp ]
+SEARCH on [ FGristFiles arch_elf.cpp $(kernelArchDriverSources) ]
 	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
-SEARCH on [ FGristFiles debug_uart_8250.cpp ]
+SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 	= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
 
 SEARCH on [ FGristFiles $(librootArchObjects) ]
