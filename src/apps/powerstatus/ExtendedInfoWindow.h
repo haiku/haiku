@@ -12,20 +12,12 @@
 
 #include <ObjectList.h>
 #include <String.h>
+#include <StringView.h>
 #include <View.h>
 #include <Window.h>
 
 #include "DriverInterface.h"
 #include "PowerStatusView.h"
-
-
-class FontString {
-public:
-					FontString();
-
-	const BFont*	font;
-	BString			string;
-};
 
 
 class BatteryInfoView : public BView {
@@ -35,23 +27,15 @@ public:
 
 	virtual void			Update(battery_info& info,
 								acpi_extended_battery_info& extInfo);
-	virtual	void			Draw(BRect updateRect);
-	virtual void			GetPreferredSize(float* width, float* height);
 	virtual void			AttachedToWindow();
 
 private:
-			BSize			_MeasureString(const BString& string);
-			void			_FillStringList();
-			void			_AddToStringList(FontString* fontString);
-			void			_ClearStringList();
+			BString			_GetTextForLine(size_t line);
 
 			battery_info				fBatteryInfo;
 			acpi_extended_battery_info	fBatteryExtendedInfo;
 
-			BSize						fPreferredSize;
-
-			BObjectList<FontString>		fStringList;
-			BSize						fMaxStringSize;
+			BObjectList<BStringView>	fStringList;
 };
 
 

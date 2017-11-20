@@ -1,9 +1,10 @@
 /*
- * Copyright 2009-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
+ *		Kacper Kasper, kacperkasper@gmail.com
  */
 
 
@@ -19,13 +20,7 @@
 #define B_TRANSLATION_CONTEXT "PowerStatus"
 
 
-const int kLineSpacing = 5;
-
-
-FontString::FontString()
-{
-	font = be_plain_font;
-}
+const size_t kLinesCount = 16;
 
 
 //	#pragma mark -
@@ -33,17 +28,26 @@ FontString::FontString()
 
 BatteryInfoView::BatteryInfoView()
 	:
-	BView("battery info view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fPreferredSize(200, 200),
-	fMaxStringSize(0, 0)
+	BView("battery info view", B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
+	SetLayout(new BGroupLayout(B_VERTICAL, B_USE_ITEM_SPACING));
+
+	for (size_t i = 0; i < kLinesCount; i++) {
+		BStringView* view = new BStringView("info", "");
+		AddChild(view);
+		fStringList.AddItem(view);
+	}
+	fStringList.ItemAt(0)->SetFont(be_bold_font);
+	AddChild(BSpaceLayoutItem::CreateGlue());
 }
 
 
 BatteryInfoView::~BatteryInfoView()
 {
-	_ClearStringList();
+	for (int32 i = 0; i < fStringList.CountItems(); i++)
+		delete fStringList.ItemAt(i);
 }
 
 
@@ -53,33 +57,9 @@ BatteryInfoView::Update(battery_info& info, acpi_extended_battery_info& extInfo)
 	fBatteryInfo = info;
 	fBatteryExtendedInfo = extInfo;
 
-	_FillStringList();
-}
-
-
-void
-BatteryInfoView::Draw(BRect updateRect)
-{
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BPoint point(10, 10);
-
-	float space = _MeasureString("").height + kLineSpacing;
-
-	for (int i = 0; i < fStringList.CountItems(); i++) {
-		FontString* fontString = fStringList.ItemAt(i);
-		SetFont(fontString->font);
-		DrawString(fontString->string.String(), point);
-		point.y += space;
+	for (size_t i = 0; i < kLinesCount; i++) {
+		fStringList.ItemAt(i)->SetText(_GetTextForLine(i));
 	}
-}
-
-
-void
-BatteryInfoView::GetPreferredSize(float* width, float* height)
-{
-	*width = fPreferredSize.width;
-	*height = fPreferredSize.height;
 }
 
 
@@ -90,28 +70,9 @@ BatteryInfoView::AttachedToWindow()
 }
 
 
-BSize
-BatteryInfoView::_MeasureString(const BString& string)
+BString
+BatteryInfoView::_GetTextForLine(size_t line)
 {
-	BFont font;
-	GetFont(&font);
-	BSize size;
-
-	size.width = font.StringWidth(string);
-
-	font_height height;
-	font.GetHeight(&height);
-	size.height = height.ascent + height.descent;
-
-	return size;
-}
-
-
-void
-BatteryInfoView::_FillStringList()
-{
-	_ClearStringList();
-
 	BString powerUnit;
 	BString rateUnit;
 	switch (fBatteryExtendedInfo.power_unit) {
@@ -126,138 +87,101 @@ BatteryInfoView::_FillStringList()
 			break;
 	}
 
-	FontString* fontString;
-
-	fontString = new FontString;
-	fStringList.AddItem(fontString);
-	fontString->font = be_bold_font;
-
-	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
-		fontString->string = B_TRANSLATE("Battery charging");
-	else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
-		fontString->string = B_TRANSLATE("Battery discharging");
-	else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0
-		&& fBatteryExtendedInfo.model_number[0] == '\0'
-		&& fBatteryExtendedInfo.serial_number[0] == '\0'
-		&& fBatteryExtendedInfo.type[0] == '\0'
-		&& fBatteryExtendedInfo.oem_info[0] == '\0')
-		fontString->string = B_TRANSLATE("Empty battery slot");
-	else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0)
-		fontString->string = B_TRANSLATE("Damaged battery");
-	else
-		fontString->string = B_TRANSLATE("Battery unused");
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Capacity: ");
-	fontString->string << fBatteryInfo.capacity;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Last full charge: ");
-	fontString->string << fBatteryInfo.full_capacity;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Current rate: ");
-	fontString->string << fBatteryInfo.current_rate;
-	fontString->string << rateUnit;
-	_AddToStringList(fontString);
-
-	// empty line
-	fontString = new FontString;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Design capacity: ");
-	fontString->string << fBatteryExtendedInfo.design_capacity;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Technology: ");
-	if (fBatteryExtendedInfo.technology == 0)
-		fontString->string << B_TRANSLATE("non-rechargeable");
-	else if (fBatteryExtendedInfo.technology == 1)
-		fontString->string << B_TRANSLATE("rechargeable");
-	else
-		fontString->string << "?";
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Design voltage: ");
-	fontString->string << fBatteryExtendedInfo.design_voltage;
-	fontString->string << B_TRANSLATE(" mV");
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Design capacity warning: ");
-	fontString->string << fBatteryExtendedInfo.design_capacity_warning;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Design capacity low warning: ");
-	fontString->string << fBatteryExtendedInfo.design_capacity_low;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Capacity granularity 1: ");
-	fontString->string << fBatteryExtendedInfo.capacity_granularity_1;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Capacity granularity 2: ");
-	fontString->string << fBatteryExtendedInfo.capacity_granularity_2;
-	fontString->string << powerUnit;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Model number: ");
-	fontString->string << fBatteryExtendedInfo.model_number;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Serial number: ");
-	fontString->string << fBatteryExtendedInfo.serial_number;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("Type: ");
-	fontString->string += fBatteryExtendedInfo.type;
-	_AddToStringList(fontString);
-
-	fontString = new FontString;
-	fontString->string = B_TRANSLATE("OEM info: ");
-	fontString->string += fBatteryExtendedInfo.oem_info;
-	_AddToStringList(fontString);
-
-	fPreferredSize.width = fMaxStringSize.width + 10;
-	fPreferredSize.height = (fMaxStringSize.height + kLineSpacing) *
-		fStringList.CountItems();
-}
-
-
-void
-BatteryInfoView::_AddToStringList(FontString* fontString)
-{
-	fStringList.AddItem(fontString);
-	BSize stringSize = _MeasureString(fontString->string);
-	if (fMaxStringSize.width < stringSize.width)
-		fMaxStringSize = stringSize;
-}
-
-
-void
-BatteryInfoView::_ClearStringList()
-{
-	for (int i = 0; i < fStringList.CountItems(); i ++)
-		delete fStringList.ItemAt(i);
-	fStringList.MakeEmpty();
-	fMaxStringSize = BSize(0, 0);
+	BString string;
+	switch (line) {
+		case 0: {
+			if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
+				string = B_TRANSLATE("Battery charging");
+			else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
+				string = B_TRANSLATE("Battery discharging");
+			else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0
+				&& fBatteryExtendedInfo.model_number[0] == '\0'
+				&& fBatteryExtendedInfo.serial_number[0] == '\0'
+				&& fBatteryExtendedInfo.type[0] == '\0'
+				&& fBatteryExtendedInfo.oem_info[0] == '\0')
+				string = B_TRANSLATE("Empty battery slot");
+			else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0)
+				string = B_TRANSLATE("Damaged battery");
+			else
+				string = B_TRANSLATE("Battery unused");
+			break;
+		}
+		case 1:
+			string = B_TRANSLATE("Capacity: ");
+			string << fBatteryInfo.capacity;
+			string << powerUnit;
+			break;
+		case 2:
+			string = B_TRANSLATE("Last full charge: ");
+			string << fBatteryInfo.full_capacity;
+			string << powerUnit;
+			break;
+		case 3:
+			string = B_TRANSLATE("Current rate: ");
+			string << fBatteryInfo.current_rate;
+			string << rateUnit;
+			break;
+		// case 4 missed intentionally
+		case 5:
+			string = B_TRANSLATE("Design capacity: ");
+			string << fBatteryExtendedInfo.design_capacity;
+			string << powerUnit;
+			break;
+		case 6:
+			string = B_TRANSLATE("Technology: ");
+			if (fBatteryExtendedInfo.technology == 0)
+				string << B_TRANSLATE("non-rechargeable");
+			else if (fBatteryExtendedInfo.technology == 1)
+				string << B_TRANSLATE("rechargeable");
+			else
+				string << "?";
+			break;
+		case 7:
+			string = B_TRANSLATE("Design voltage: ");
+			string << fBatteryExtendedInfo.design_voltage;
+			string << B_TRANSLATE(" mV");
+			break;
+		case 8:
+			string = B_TRANSLATE("Design capacity warning: ");
+			string << fBatteryExtendedInfo.design_capacity_warning;
+			string << powerUnit;
+			break;
+		case 9:
+			string = B_TRANSLATE("Design capacity low warning: ");
+			string << fBatteryExtendedInfo.design_capacity_low;
+			string << powerUnit;
+			break;
+		case 10:
+			string = B_TRANSLATE("Capacity granularity 1: ");
+			string << fBatteryExtendedInfo.capacity_granularity_1;
+			string << powerUnit;
+			break;
+		case 11:
+			string = B_TRANSLATE("Capacity granularity 2: ");
+			string << fBatteryExtendedInfo.capacity_granularity_2;
+			string << powerUnit;
+			break;
+		case 12:
+			string = B_TRANSLATE("Model number: ");
+			string << fBatteryExtendedInfo.model_number;
+			break;
+		case 13:
+			string = B_TRANSLATE("Serial number: ");
+			string << fBatteryExtendedInfo.serial_number;
+			break;
+		case 14:
+			string = B_TRANSLATE("Type: ");
+			string += fBatteryExtendedInfo.type;
+			break;
+		case 15:
+			string = B_TRANSLATE("OEM info: ");
+			string += fBatteryExtendedInfo.oem_info;
+			break;
+		default:
+			string = "";
+			break;
+	}
+	return string;
 }
 
 
