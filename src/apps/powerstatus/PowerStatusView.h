@@ -94,6 +94,7 @@ private:
 			void			_SaveSettings();
 
 			void			_OpenExtendedWindow();
+			bool			fReplicated;
 
 private:
 			BWindow*		fExtendedWindow;

@@ -580,7 +580,8 @@ PowerStatusView::_NotifyLowBattery()
 PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
 	bool inDeskbar)
 	:
-	PowerStatusView(NULL, frame, resizingMode, -1, inDeskbar)
+	PowerStatusView(NULL, frame, resizingMode, -1, inDeskbar),
+	fReplicated(false)
 {
 	_Init();
 	_LoadSettings();
@@ -600,7 +601,8 @@ PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
 
 PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
 	:
-	PowerStatusView(archive)
+	PowerStatusView(archive),
+	fReplicated(true)
 {
 	_Init();
 	_LoadSettings();
@@ -612,7 +614,7 @@ PowerStatusReplicant::~PowerStatusReplicant()
 	if (fMessengerExist)
 		delete fExtWindowMessenger;
 
-	if (fExtendedWindow && fExtendedWindow->Lock()) {
+	if (fExtendedWindow != NULL && fExtendedWindow->Lock()) {
 			fExtendedWindow->Quit();
 			fExtendedWindow = NULL;
 	}
@@ -781,6 +783,12 @@ PowerStatusReplicant::_Quit()
 	if (fInDeskbar) {
 		BDeskbar deskbar;
 		deskbar.RemoveItem(kDeskbarItemName);
+	} else if (fReplicated) {
+		BDragger *dragger = dynamic_cast<BDragger*>(ChildAt(0));
+		if (dragger != NULL) {
+			BMessenger messenger(dragger);
+			messenger.SendMessage(new BMessage(B_TRASH_TARGET));
+		}
 	} else
 		be_app->PostMessage(B_QUIT_REQUESTED);
 }
