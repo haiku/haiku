@@ -239,7 +239,7 @@ RemoteMessage::Start(uint16 code)
 inline status_t
 RemoteMessage::Flush()
 {
-	if (fWriteIndex == 0)
+	if (fWriteIndex == 0 || fTarget == NULL)
 		return B_NO_INIT;
 
 	uint32 length = fWriteIndex;
@@ -303,6 +303,9 @@ RemoteMessage::Read(T& value)
 {
 	if (fDataLeft < sizeof(T))
 		return B_ERROR;
+
+	if (fSource == NULL)
+		return B_NO_INIT;
 
 	int32 readSize = fSource->Read(&value, sizeof(T));
 	if (readSize < 0)

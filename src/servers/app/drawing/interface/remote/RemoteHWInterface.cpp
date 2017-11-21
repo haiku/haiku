@@ -228,7 +228,7 @@ RemoteHWInterface::_EventThreadEntry(void* data)
 status_t
 RemoteHWInterface::_EventThread()
 {
-	RemoteMessage message(fReceiveBuffer, fSendBuffer);
+	RemoteMessage message(fReceiveBuffer, NULL);
 	while (true) {
 		uint16 code;
 		status_t result = message.NextMessage(code);
