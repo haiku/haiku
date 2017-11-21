@@ -42,10 +42,10 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		B_UTF8_COPYRIGHT "2012 Gerasim Troeglazov <3dEyes@gmail.com>.");
 
 	BStringView *infoView = new BStringView("support_sizes",
-		"Valid sizes: 16, 32, 48, 128, 256, 512, 1024");
+		B_TRANSLATE("Valid sizes: 16, 32, 48, 128, 256, 512, 1024"));
 
 	BStringView *info2View  = new BStringView("support_colors",
-		"Valid colors: RGB32, RGBA32");
+		B_TRANSLATE("Valid colors: RGB32, RGBA32"));
 	
 	BStringView *copyright3View  = new BStringView("copyright3",
 		"libicns v0.8.1\n");
