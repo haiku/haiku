@@ -496,7 +496,7 @@ RemoteHWInterface::SetCursor(ServerCursor* cursor)
 	HWInterface::SetCursor(cursor);
 	RemoteMessage message(NULL, fSendBuffer);
 	message.Start(RP_SET_CURSOR);
-	message.AddCursor(Cursor().Get());
+	message.AddCursor(CursorAndDragBitmap().Get());
 }
 
 
