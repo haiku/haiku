@@ -280,7 +280,7 @@ OpenToolTipWindow(BScreen& screen, BRect rect, const char* name,
 BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	LockingList<BWindow>* list)
 	:
-	BWindow(BInfoWindow::InfoWindowRect(false),
+	BWindow(BInfoWindow::InfoWindowRect(),
 		"InfoWindow", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE),
 	fModel(model),
@@ -319,7 +319,7 @@ BInfoWindow::~BInfoWindow()
 
 
 BRect
-BInfoWindow::InfoWindowRect(bool)
+BInfoWindow::InfoWindowRect()
 {
 	// starting size of window
 	return BRect(70, 50, 385, 240);
@@ -381,8 +381,7 @@ BInfoWindow::Show()
 	AddChild(fAttributeView);
 
 	// position window appropriately based on index
-	BRect windRect(InfoWindowRect(TargetModel()->IsSymLink()
-		|| TargetModel()->IsFile()));
+	BRect windRect(InfoWindowRect());
 	if ((fIndex + 2) % 2 == 1) {
 		windRect.OffsetBy(320, 0);
 		fIndex--;

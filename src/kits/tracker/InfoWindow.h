@@ -74,7 +74,7 @@ protected:
 	virtual void Show();
 
 private:
-	static BRect InfoWindowRect(bool displayingSymlink);
+	static BRect InfoWindowRect();
 	static int32 CalcSize(void*);
 
 	Model* fModel;
