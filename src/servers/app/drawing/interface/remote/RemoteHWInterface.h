@@ -36,6 +36,7 @@ virtual	EventStream*				CreateEventStream();
 
 virtual	status_t					SetMode(const display_mode& mode);
 virtual	void						GetMode(display_mode* mode);
+virtual	status_t					GetPreferredMode(display_mode* mode);
 
 virtual status_t					GetDeviceInfo(accelerant_device_info* info);
 virtual status_t					GetFrameBufferConfig(
@@ -103,13 +104,16 @@ static	status_t					_NewConnectionCallback(void *cookie,
 
 		void						_Disconnect();
 
+		void						_FillDisplayModeTiming(display_mode &mode);
 
 		const char*					fTarget;
 		status_t					fInitStatus;
 		bool						fIsConnected;
 		uint32						fProtocolVersion;
 		uint32						fConnectionSpeed;
-		display_mode				fDisplayMode;
+		display_mode				fFallbackMode;
+		display_mode				fCurrentMode;
+		display_mode				fClientMode;
 		uint16						fListenPort;
 
 		BNetEndpoint*				fListenEndpoint;

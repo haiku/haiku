@@ -51,11 +51,13 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	fEventStream(NULL),
 	fCallbackLocker("callback locker")
 {
-	fDisplayMode.virtual_width = 640;
-	fDisplayMode.virtual_height = 480;
-	fDisplayMode.space = B_RGB32;
+	memset(&fFallbackMode, 0, sizeof(fFallbackMode));
+	fFallbackMode.virtual_width = 640;
+	fFallbackMode.virtual_height = 480;
+	fFallbackMode.space = B_RGB32;
+	_FillDisplayModeTiming(fFallbackMode);
 
-
+	fCurrentMode = fClientMode = fFallbackMode;
 
 	if (sscanf(fTarget, "%" B_SCNu16, &fListenPort) != 1) {
 		fInitStatus = B_BAD_VALUE;
@@ -265,8 +267,11 @@ RemoteHWInterface::_EventThread()
 				}
 
 				fIsConnected = true;
-				fDisplayMode.virtual_width = width;
-				fDisplayMode.virtual_height = height;
+				fClientMode.virtual_width = width;
+				fClientMode.virtual_height = height;
+				_FillDisplayModeTiming(fClientMode);
+				_NotifyScreenChanged();
+				break;
 				break;
 			}
 
@@ -336,9 +341,10 @@ RemoteHWInterface::_Disconnect()
 status_t
 RemoteHWInterface::SetMode(const display_mode& mode)
 {
-	// The display mode depends on the screen resolution of the client, we
-	// don't allow to change it.
-	return B_UNSUPPORTED;
+	TRACE("set mode: %" B_PRIu16 " %" B_PRIu16 "\n", mode.virtual_width,
+		mode.virtual_height);
+	fCurrentMode = mode;
+	return B_OK;
 }
 
 
@@ -348,8 +354,19 @@ RemoteHWInterface::GetMode(display_mode* mode)
 	if (mode == NULL || !ReadLock())
 		return;
 
-	*mode = fDisplayMode;
+	*mode = fCurrentMode;
 	ReadUnlock();
+
+	TRACE("get mode: %" B_PRIu16 " %" B_PRIu16 "\n", mode->virtual_width,
+		mode->virtual_height);
+}
+
+
+status_t
+RemoteHWInterface::GetPreferredMode(display_mode* mode)
+{
+	*mode = fClientMode;
+	return B_OK;
 }
 
 
@@ -384,13 +401,15 @@ RemoteHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 {
 	AutoReadLocker _(this);
 
-	display_mode* modes = new(std::nothrow) display_mode[1];
+	display_mode* modes = new(std::nothrow) display_mode[2];
 	if (modes == NULL)
 		return B_NO_MEMORY;
 
-	modes[0] = fDisplayMode;
+	modes[0] = fFallbackMode;
+	modes[1] = fClientMode;
 	*_modes = modes;
-	*_count = 1;
+	*_count = 2;
+
 	return B_OK;
 }
 
@@ -399,6 +418,7 @@ status_t
 RemoteHWInterface::GetPixelClockLimits(display_mode* mode, uint32* low,
 	uint32* high)
 {
+	TRACE("get pixel clock limits unsupported\n");
 	return B_UNSUPPORTED;
 }
 
@@ -406,6 +426,7 @@ RemoteHWInterface::GetPixelClockLimits(display_mode* mode, uint32* low,
 status_t
 RemoteHWInterface::GetTimingConstraints(display_timing_constraints* constraints)
 {
+	TRACE("get timing constraints unsupported\n");
 	return B_UNSUPPORTED;
 }
 
@@ -414,7 +435,9 @@ status_t
 RemoteHWInterface::ProposeMode(display_mode* candidate, const display_mode* low,
 	const display_mode* high)
 {
-	return B_UNSUPPORTED;
+	TRACE("propose mode: %" B_PRIu16 " %" B_PRIu16 "\n",
+		candidate->virtual_width, candidate->virtual_height);
+	return B_OK;
 }
 
 
@@ -554,4 +577,16 @@ status_t
 RemoteHWInterface::CopyBackToFront(const BRect& frame)
 {
 	return B_OK;
+}
+
+
+void
+RemoteHWInterface::_FillDisplayModeTiming(display_mode &mode)
+{
+	mode.timing.pixel_clock
+		= (uint64_t)mode.virtual_width * mode.virtual_height * 60 / 1000;
+	mode.timing.h_display = mode.timing.h_sync_start = mode.timing.h_sync_end
+		= mode.timing.h_total = mode.virtual_width;
+	mode.timing.v_display = mode.timing.v_sync_start = mode.timing.v_sync_end
+		= mode.timing.v_total = mode.virtual_height;
 }
