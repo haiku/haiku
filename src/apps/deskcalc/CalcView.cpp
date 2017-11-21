@@ -764,7 +764,25 @@ CalcView::Copy()
 void
 CalcView::Paste(BMessage* message)
 {
-	// handle color drops first
+	// handle files first
+	int32 count;
+	if (message->GetInfo("refs", NULL, &count) == B_OK) {
+		entry_ref ref;
+		ssize_t read;
+		BFile file;
+		char buffer[256];
+		for (int32 i = 0; i < count; i++) {
+			if (message->FindRef("refs", i, &ref) == B_OK) {
+				if (file.SetTo(&ref, B_READ_ONLY) == B_OK) {
+					read = file.Read(buffer, 255);
+					buffer[read] = 0;
+					fExpressionTextView->Insert(buffer);
+				}
+			}
+		}
+		return;
+	}
+	// handle color drops
 	// read incoming color
 	const rgb_color* dropColor = NULL;
 	ssize_t dataSize;
