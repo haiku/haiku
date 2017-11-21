@@ -267,7 +267,7 @@ RemoteMessage::Add(const T& value)
 inline void
 RemoteMessage::AddString(const char* string, size_t length)
 {
-	Add(length);
+	Add((uint32)length);
 	if (length > fAvailable && !_MakeSpace(length))
 		return;
 

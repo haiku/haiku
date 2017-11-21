@@ -114,7 +114,7 @@ RemoteMessage::AddBitmap(const ServerBitmap& bitmap, bool minimal)
 void
 RemoteMessage::AddFont(const ServerFont& font)
 {
-	Add(font.Direction());
+	Add((uint8)font.Direction());
 	Add((uint8)font.Encoding());
 	Add(font.Flags());
 	Add((uint8)font.Spacing());
@@ -176,7 +176,7 @@ RemoteMessage::AddBitmap(const BBitmap& bitmap)
 	Add(bounds.IntegerWidth() + 1);
 	Add(bounds.IntegerHeight() + 1);
 	Add(bitmap.BytesPerRow());
-	Add(bitmap.ColorSpace());
+	Add((uint32)bitmap.ColorSpace());
 	Add(bitmap.Flags());
 
 	uint32 bitsLength = bitmap.BitsLength();
@@ -195,7 +195,7 @@ RemoteMessage::AddBitmap(const BBitmap& bitmap)
 void
 RemoteMessage::AddGradient(const BGradient& gradient)
 {
-	Add(gradient.GetType());
+	Add((uint32)gradient.GetType());
 
 	switch (gradient.GetType()) {
 		case BGradient::TYPE_NONE:
