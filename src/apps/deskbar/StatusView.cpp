@@ -279,6 +279,7 @@ TReplicantTray::MessageReceived(BMessage* message)
 			if (fTime == NULL)
 				return;
 
+			fTime->UpdateTimeFormat();
 			fTime->Update();
 			// time string reformat -> realign
 			goto realignReplicants;
