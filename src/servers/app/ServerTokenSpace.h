@@ -17,6 +17,7 @@ using BPrivate::BTokenSpace;
 const int32 kCursorToken = 3;
 const int32 kBitmapToken = 4;
 const int32 kPictureToken = 5;
+const int32 kRemoteDrawingEngineToken = 6;
 
 
 extern BTokenSpace gTokenSpace;

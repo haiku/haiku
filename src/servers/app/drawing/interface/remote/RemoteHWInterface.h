@@ -97,13 +97,14 @@ static	int							_CallbackCompare(const uint32* key,
 static	int32						_EventThreadEntry(void* data);
 		status_t					_EventThread();
 
-		status_t					_Connect();
+static	status_t					_NewConnectionCallback(void *cookie,
+										BNetEndpoint &endpoint);
+		status_t					_NewConnection(BNetEndpoint &endpoint);
+
 		void						_Disconnect();
 
-		const char*					fTarget;
-		char*						fRemoteHost;
-		uint32						fRemotePort;
 
+		const char*					fTarget;
 		status_t					fInitStatus;
 		bool						fIsConnected;
 		uint32						fProtocolVersion;
@@ -111,9 +112,7 @@ static	int32						_EventThreadEntry(void* data);
 		display_mode				fDisplayMode;
 		uint16						fListenPort;
 
-		BNetEndpoint*				fSendEndpoint;
-		BNetEndpoint*				fReceiveEndpoint;
-
+		BNetEndpoint*				fListenEndpoint;
 		StreamingRingBuffer*		fSendBuffer;
 		StreamingRingBuffer*		fReceiveBuffer;
 

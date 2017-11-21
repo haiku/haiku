@@ -36,8 +36,9 @@ NetSender::NetSender(BNetEndpoint *endpoint, StreamingRingBuffer *source)
 NetSender::~NetSender()
 {
 	fStopThread = true;
-	int32 result;
-	wait_for_thread(fSenderThread, &result);
+
+	suspend_thread(fSenderThread);
+	resume_thread(fSenderThread);
 }
 
 

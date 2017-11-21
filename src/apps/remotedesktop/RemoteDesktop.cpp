@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014, Haiku, Inc.
+ * Copyright 2009-2017, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,16 +25,20 @@
 void
 print_usage(const char *app)
 {
-	printf("usage:\t%s --listenOnly [-p <listenPort>]\n", app);
-	printf("\t%s <user@host> [-p <listenPort>] [-s <sshPort>] [-c <command>]\n",
-		app);
+	printf("usage:\t%s <host> [-p <port>] [-w <width>] [-h <height>]\n", app);
+	printf("usage:\t%s <user@host> -s [<sshPort>] [-p <port>] [-w <width>]"
+		" [-h <height>] [-c <command>]\n", app);
 	printf("\t%s --help\n\n", app);
 
 	printf("Connect to & run applications from a different computer\n\n");
 	printf("Arguments available for use:\n\n");
-	printf("\t-p\t\tspecify the port to communicate on\n");
-	printf("\t-c\t\tsend a command to the other computer\n");
-	printf("\t-s\t\tuse ssh & specify the ssh port to communicate on\n");
+	printf("\t-p\t\tspecify the port to communicate on (default 10900)\n");
+	printf("\t-c\t\tsend a command to the other computer (default Terminal)\n");
+	printf("\t-s\t\tuse SSH, optionally specify the SSH port to use (22)\n");
+	printf("\t-w\t\tmake the virtual desktop use the specified width\n");
+	printf("\t-h\t\tmake the virtual desktop use the specified height\n");
+	printf("\nIf no width and height are specified, the window is opened with"
+		" the size of the the local screen.\n");
 }
 
 
@@ -46,14 +50,17 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	bool listenOnly = false;
-	uint32 listenPort = 10900;
-	uint32 sshPort = 22;
-	const char* command = NULL;
+	uint16 port = 10900;
+	uint16 sshPort = 22;
+	int32 width = -1;
+	int32 height = -1;
+	bool useSSH = false;
+	const char *command = NULL;
+	const char *host = argv[1];
 
 	for (int32 i = 2; i < argc; i++) {
 		if (strcmp(argv[i], "-p") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_PRIu32, &listenPort)
+			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_SCNu16, &port)
 				!= 1) {
 				print_usage(argv[0]);
 				return 2;
@@ -63,14 +70,35 @@ main(int argc, char *argv[])
 			continue;
 		}
 
-		if (strcmp(argv[i], "-s") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_PRIu32, &sshPort)
-				!= 1) {
+		if (strcmp(argv[i], "-w") == 0) {
+			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_SCNd32, &width) != 1)
+			{
 				print_usage(argv[0]);
 				return 2;
 			}
 
 			i++;
+			continue;
+		}
+
+		if (strcmp(argv[i], "-h") == 0) {
+			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_SCNd32, &height) != 1)
+			{
+				print_usage(argv[0]);
+				return 2;
+			}
+
+			i++;
+			continue;
+		}
+
+		if (strcmp(argv[i], "-s") == 0) {
+			if (argc >= i + 1
+				&& sscanf(argv[i + 1], "%" B_SCNu16, &sshPort) == 1) {
+				i++;
+			}
+
+			useSSH = true;
 			continue;
 		}
 
@@ -85,17 +113,17 @@ main(int argc, char *argv[])
 			continue;
 		}
 
-		if (strcmp(argv[i], "--listenOnly") == 0) {
-			listenOnly = true;
-			continue;
-		}
+		print_usage(argv[0]);
+		return 2;
+	}
 
+	if (command != NULL && !useSSH) {
 		print_usage(argv[0]);
 		return 2;
 	}
 
 	pid_t sshPID = -1;
-	if (!listenOnly) {
+	if (useSSH) {
 		BPath terminalPath;
 		if (command == NULL) {
 			if (find_directory(B_SYSTEM_APPS_DIRECTORY, &terminalPath)
@@ -112,8 +140,8 @@ main(int argc, char *argv[])
 
 		char shellCommand[4096];
 		snprintf(shellCommand, sizeof(shellCommand),
-			"echo connected; export TARGET_SCREEN=localhost:%" B_PRIu32
-			"; %s\n", listenPort, command);
+			"echo connected; export TARGET_SCREEN=%" B_PRIu16 "; %s\n", port,
+			command);
 
 		int pipes[4];
 		if (pipe(&pipes[0]) != 0 || pipe(&pipes[2]) != 0) {
@@ -138,18 +166,14 @@ main(int argc, char *argv[])
 				close(pipes[i]);
 
 			char localRedirect[50];
-			sprintf(localRedirect, "localhost:%" B_PRIu32 ":localhost:%"
-				B_PRIu32, listenPort + 1, listenPort + 1);
-
-			char remoteRedirect[50];
-			sprintf(remoteRedirect, "localhost:%" B_PRIu32 ":localhost:%"
-				B_PRIu32, listenPort, listenPort);
+			sprintf(localRedirect, "localhost:%" B_PRIu16 ":localhost:%"
+				B_PRIu16, port, port);
 
 			char portNumber[10];
-			sprintf(portNumber, "%" B_PRIu32, sshPort);
+			sprintf(portNumber, "%" B_PRIu16, sshPort);
 
 			int result = execl("ssh", "-C", "-L", localRedirect,
-				"-R", remoteRedirect, "-p", portNumber, argv[1],
+				"-p", portNumber, "-o", "ExitOnForwardFailure=yes", host,
 				shellCommand, NULL);
 
 			// we don't get here unless there was an error in executing
@@ -162,12 +186,19 @@ main(int argc, char *argv[])
 			char buffer[10];
 			read(pipes[0], buffer, sizeof(buffer));
 				// block until connected/error message from ssh
+
+			host = "localhost";
 		}
 	}
 
 	BApplication app("application/x-vnd.Haiku-RemoteDesktop");
-	BScreen screen;
-	BWindow *window = new(std::nothrow) BWindow(screen.Frame(), "RemoteDesktop",
+	BRect windowFrame = BRect(0, 0, width - 1, height - 1);
+	if (!windowFrame.IsValid()) {
+		BScreen screen;
+		windowFrame = screen.Frame();
+	}
+
+	BWindow *window = new(std::nothrow) BWindow(windowFrame, "RemoteDesktop",
 		B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE);
 
 	if (window == NULL) {
@@ -175,8 +206,8 @@ main(int argc, char *argv[])
 		return 4;
 	}
 
-	RemoteView *view = new(std::nothrow) RemoteView(window->Bounds(),
-		listenPort);
+	RemoteView *view = new(std::nothrow) RemoteView(window->Bounds(), host,
+		port);
 	if (view == NULL) {
 		printf("no memory to allocate remote view\n");
 		return 4;
@@ -195,7 +226,7 @@ main(int argc, char *argv[])
 	app.Run();
 
 	if (sshPID >= 0)
-		kill(sshPID, SIGINT);
+		kill(sshPID, SIGHUP);
 
 	return 0;
 }

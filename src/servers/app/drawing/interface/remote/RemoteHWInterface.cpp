@@ -38,14 +38,11 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	:
 	HWInterface(),
 	fTarget(target),
-	fRemoteHost(NULL),
-	fRemotePort(10900),
 	fIsConnected(false),
 	fProtocolVersion(100),
 	fConnectionSpeed(0),
 	fListenPort(10901),
-	fSendEndpoint(NULL),
-	fReceiveEndpoint(NULL),
+	fListenEndpoint(NULL),
 	fSendBuffer(NULL),
 	fReceiveBuffer(NULL),
 	fSender(NULL),
@@ -58,32 +55,20 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGB32;
 
-	fRemoteHost = strdup(fTarget);
-	char *portStart = strchr(fRemoteHost, ':');
-	if (portStart != NULL) {
-		portStart[0] = 0;
-		portStart++;
-		if (sscanf(portStart, "%" B_PRIu32, &fRemotePort) != 1) {
-			fInitStatus = B_BAD_VALUE;
-			return;
-		}
 
-		fListenPort = fRemotePort + 1;
+
+	if (sscanf(fTarget, "%" B_SCNu16, &fListenPort) != 1) {
+		fInitStatus = B_BAD_VALUE;
+		return;
 	}
 
-	fSendEndpoint = new(std::nothrow) BNetEndpoint();
-	if (fSendEndpoint == NULL) {
+	fListenEndpoint = new(std::nothrow) BNetEndpoint();
+	if (fListenEndpoint == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
 
-	fReceiveEndpoint = new(std::nothrow) BNetEndpoint();
-	if (fReceiveEndpoint == NULL) {
-		fInitStatus = B_NO_MEMORY;
-		return;
-	}
-
-	fInitStatus = fReceiveEndpoint->Bind(fListenPort);
+	fInitStatus = fListenEndpoint->Bind(fListenPort);
 	if (fInitStatus != B_OK)
 		return;
 
@@ -107,13 +92,8 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 	if (fInitStatus != B_OK)
 		return;
 
-	fSender = new(std::nothrow) NetSender(fSendEndpoint, fSendBuffer);
-	if (fSender == NULL) {
-		fInitStatus = B_NO_MEMORY;
-		return;
-	}
-
-	fReceiver = new(std::nothrow) NetReceiver(fReceiveEndpoint, fReceiveBuffer);
+	fReceiver = new(std::nothrow) NetReceiver(fListenEndpoint, fReceiveBuffer,
+		_NewConnectionCallback, this);
 	if (fReceiver == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		return;
@@ -124,11 +104,6 @@ RemoteHWInterface::RemoteHWInterface(const char* target)
 		fInitStatus = B_NO_MEMORY;
 		return;
 	}
-
-	fSendEndpoint->SetTimeout(3 * 1000 * 1000);
-	fInitStatus = _Connect();
-	if (fInitStatus != B_OK)
-		return;
 
 	fEventThread = spawn_thread(_EventThreadEntry, "remote event thread",
 		B_NORMAL_PRIORITY, this);
@@ -149,12 +124,9 @@ RemoteHWInterface::~RemoteHWInterface()
 	delete fSendBuffer;
 	delete fSender;
 
-	delete fReceiveEndpoint;
-	delete fSendEndpoint;
+	delete fListenEndpoint;
 
 	delete fEventStream;
-
-	free(fRemoteHost);
 }
 
 
@@ -273,10 +245,28 @@ RemoteHWInterface::_EventThread()
 		}
 
 		switch (code) {
+			case RP_INIT_CONNECTION:
+			{
+				RemoteMessage reply(NULL, fSendBuffer);
+				reply.Start(RP_INIT_CONNECTION);
+				status_t result = reply.Flush();
+				TRACE("init connection result: %s\n", strerror(result));
+				break;
+			}
+
 			case RP_UPDATE_DISPLAY_MODE:
 			{
-				// TODO: implement, we only handle it in the context of the
-				// initial mode setup on connect
+				int32 width, height;
+				message.Read(width);
+				result = message.Read(height);
+				if (result != B_OK) {
+					TRACE_ERROR("failed to read display mode\n");
+					break;
+				}
+
+				fIsConnected = true;
+				fDisplayMode.virtual_width = width;
+				fDisplayMode.virtual_height = height;
 				break;
 			}
 
@@ -298,49 +288,32 @@ RemoteHWInterface::_EventThread()
 
 
 status_t
-RemoteHWInterface::_Connect()
+RemoteHWInterface::_NewConnectionCallback(void *cookie, BNetEndpoint &endpoint)
 {
-	TRACE("connecting to host \"%s\" port %" B_PRIu32 "\n", fRemoteHost, fRemotePort);
-	status_t result = fSendEndpoint->Connect(fRemoteHost, (uint16)fRemotePort);
-	if (result != B_OK) {
-		TRACE_ERROR("failed to connect to host \"%s\" port %" B_PRIu32 "\n",
-			fRemoteHost, fRemotePort);
-		return result;
+	return ((RemoteHWInterface *)cookie)->_NewConnection(endpoint);
+}
+
+
+status_t
+RemoteHWInterface::_NewConnection(BNetEndpoint &endpoint)
+{
+	if (fSender != NULL) {
+		delete fSender;
+		fSender = NULL;
 	}
 
-	RemoteMessage message(fReceiveBuffer, fSendBuffer);
-	message.Start(RP_INIT_CONNECTION);
-	message.Add(fListenPort);
-	result = message.Flush();
-	if (result != B_OK) {
-		TRACE_ERROR("failed to send init connection message\n");
-		return result;
+	fSendBuffer->MakeEmpty();
+
+	BNetEndpoint *sendEndpoint = new(std::nothrow) BNetEndpoint(endpoint);
+	if (sendEndpoint == NULL)
+		return B_NO_MEMORY;
+
+	fSender = new(std::nothrow) NetSender(sendEndpoint, fSendBuffer);
+	if (fSender == NULL) {
+		delete sendEndpoint;
+		return B_NO_MEMORY;
 	}
 
-	uint16 code;
-	result = message.NextMessage(code);
-	if (result != B_OK) {
-		TRACE_ERROR("failed to read message from receiver: %s\n",
-			strerror(result));
-		return result;
-	}
-
-	TRACE("code %u with %lu bytes of data\n", code, message.DataLeft());
-	if (code != RP_UPDATE_DISPLAY_MODE) {
-		TRACE_ERROR("invalid connection init code %u\n", code);
-		return B_ERROR;
-	}
-
-	int32 width, height;
-	message.Read(width);
-	result = message.Read(height);
-	if (result != B_OK) {
-		TRACE_ERROR("failed to get initial display mode\n");
-		return result;
-	}
-
-	fDisplayMode.virtual_width = width;
-	fDisplayMode.virtual_height = height;
 	return B_OK;
 }
 
@@ -355,10 +328,8 @@ RemoteHWInterface::_Disconnect()
 		fIsConnected = false;
 	}
 
-	if (fSendEndpoint != NULL)
-		fSendEndpoint->Close();
-	if (fReceiveEndpoint != NULL)
-		fReceiveEndpoint->Close();
+	if (fListenEndpoint != NULL)
+		fListenEndpoint->Close();
 }
 
 

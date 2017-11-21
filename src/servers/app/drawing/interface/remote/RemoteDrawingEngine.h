@@ -161,7 +161,7 @@ private:
 									UtilityBitmap**& bitmaps);
 
 			RemoteHWInterface*	fHWInterface;
-			addr_t				fToken;
+			int32				fToken;
 
 			DrawState			fState;
 			BRegion				fClippingRegion;

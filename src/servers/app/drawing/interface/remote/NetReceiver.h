@@ -14,23 +14,32 @@
 class BNetEndpoint;
 class StreamingRingBuffer;
 
+typedef status_t (*NewConnectionCallback)(void *cookie, BNetEndpoint &endpoint);
+
+
 class NetReceiver {
 public:
-								NetReceiver(BNetEndpoint *listener,
-									StreamingRingBuffer *target);
+								NetReceiver(BNetEndpoint *endpoint,
+									StreamingRingBuffer *target,
+									NewConnectionCallback callback = NULL,
+									void *newConnectionCookie = NULL);
 								~NetReceiver();
 
 		BNetEndpoint *			Endpoint() { return fEndpoint; }
 
 private:
 static	int32					_NetworkReceiverEntry(void *data);
-		status_t				_NetworkReceiver();
+		status_t				_Listen();
+		status_t				_Transfer();
 
 		BNetEndpoint *			fListener;
 		StreamingRingBuffer *	fTarget;
 
 		thread_id				fReceiverThread;
 		bool					fStopThread;
+
+		NewConnectionCallback	fNewConnectionCallback;
+		void *					fNewConnectionCookie;
 
 		BNetEndpoint *			fEndpoint;
 };

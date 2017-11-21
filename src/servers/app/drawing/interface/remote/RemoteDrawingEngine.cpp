@@ -11,6 +11,7 @@
 
 #include "BitmapDrawingEngine.h"
 #include "DrawState.h"
+#include "ServerTokenSpace.h"
 
 #include <Bitmap.h>
 #include <utf8_functions.h>
@@ -18,11 +19,16 @@
 #include <new>
 
 
+#define TRACE(x...)				/*debug_printf("RemoteDrawingEngine: " x)*/
+#define TRACE_ALWAYS(x...)		debug_printf("RemoteDrawingEngine: " x)
+#define TRACE_ERROR(x...)		debug_printf("RemoteDrawingEngine: " x)
+
+
 RemoteDrawingEngine::RemoteDrawingEngine(RemoteHWInterface* interface)
 	:
 	DrawingEngine(interface),
 	fHWInterface(interface),
-	fToken((addr_t)this),
+	fToken(gTokenSpace.NewToken(kRemoteDrawingEngineToken, this)),
 	fExtendWidth(0),
 	fCallbackAdded(false),
 	fResultNotify(-1),

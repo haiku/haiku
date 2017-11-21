@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc.
+ * Copyright 2009, 2017, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,14 +14,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRACE(x...)			/*debug_printf("StreamingRingBuffer: "x)*/
-#define TRACE_ERROR(x...)	debug_printf("StreamingRingBuffer: "x)
+
+#ifdef CLIENT_COMPILE
+#define TRACE_ALWAYS(x...)		printf("StreamingRingBuffer: " x)
+#else
+#define TRACE_ALWAYS(x...)		debug_printf("StreamingRingBuffer: " x)
+#endif
+
+#define TRACE(x...)				/*TRACE_ALWAYS(x)*/
+#define TRACE_ERROR(x...)		TRACE_ALWAYS(x)
 
 
 StreamingRingBuffer::StreamingRingBuffer(size_t bufferSize)
 	:
 	fReaderWaiting(false),
 	fWriterWaiting(false),
+	fCancelRead(false),
+	fCancelWrite(false),
 	fReaderNotifier(-1),
 	fWriterNotifier(-1),
 	fReaderLocker("StreamingRingBuffer reader"),
@@ -91,14 +100,23 @@ StreamingRingBuffer::Read(void *buffer, size_t length, bool onlyBlockOnNoData)
 			do {
 				TRACE("waiting in reader\n");
 				result = acquire_sem(fReaderNotifier);
-				TRACE("done waiting in reader with status: 0x%08lx\n", result);
+				TRACE("done waiting in reader with status: %#" B_PRIx32 "\n",
+					result);
 			} while (result == B_INTERRUPTED);
 
 			if (result != B_OK)
 				return result;
 
-			if (!dataLock.Lock())
+			if (!dataLock.Lock()) {
+				TRACE_ERROR("failed to acquire data lock\n");
 				return B_ERROR;
+			}
+
+			if (fCancelRead) {
+				TRACE("read canceled\n");
+				fCancelRead = false;
+				return B_CANCELED;
+			}
 
 			continue;
 		}
@@ -147,14 +165,23 @@ StreamingRingBuffer::Write(const void *buffer, size_t length)
 			do {
 				TRACE("waiting in writer\n");
 				result = acquire_sem(fWriterNotifier);
-				TRACE("done waiting in writer with status: 0x%08lx\n", result);
+				TRACE("done waiting in writer with status: %#" B_PRIx32 "\n",
+					result);
 			} while (result == B_INTERRUPTED);
 
 			if (result != B_OK)
 				return result;
 
-			if (!dataLock.Lock())
+			if (!dataLock.Lock()) {
+				TRACE_ERROR("failed to acquire data lock\n");
 				return B_ERROR;
+			}
+
+			if (fCancelWrite) {
+				TRACE("write canceled\n");
+				fCancelWrite = false;
+				return B_CANCELED;
+			}
 
 			continue;
 		}
@@ -173,4 +200,28 @@ StreamingRingBuffer::Write(const void *buffer, size_t length)
 	}
 
 	return B_OK;
+}
+
+
+void
+StreamingRingBuffer::MakeEmpty()
+{
+	BAutolock dataLock(fDataLocker);
+	if (!dataLock.IsLocked())
+		return;
+
+	fReadPosition = fWritePosition = 0;
+	fReadable = 0;
+
+	if (fWriterWaiting) {
+		release_sem_etc(fWriterNotifier, 1, 0);
+		fWriterWaiting = false;
+		fCancelWrite = true;
+	}
+
+	if (fReaderWaiting) {
+		release_sem_etc(fReaderNotifier, 1, 0);
+		fReaderWaiting = false;
+		fCancelRead = true;
+	}
 }

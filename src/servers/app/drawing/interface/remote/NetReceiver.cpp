@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc.
+ * Copyright 2009, 2017, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,13 +21,16 @@
 #define TRACE_ERROR(x...)	debug_printf("NetReceiver: " x)
 
 
-NetReceiver::NetReceiver(BNetEndpoint *listener, StreamingRingBuffer *target)
+NetReceiver::NetReceiver(BNetEndpoint *listener, StreamingRingBuffer *target,
+	NewConnectionCallback newConnectionCallback, void *newConnectionCookie)
 	:
 	fListener(listener),
 	fTarget(target),
 	fReceiverThread(-1),
 	fStopThread(false),
-	fEndpoint(NULL)
+	fNewConnectionCallback(newConnectionCallback),
+	fNewConnectionCookie(newConnectionCookie),
+	fEndpoint(newConnectionCallback == NULL ? listener : NULL)
 {
 	fReceiverThread = spawn_thread(_NetworkReceiverEntry, "network receiver",
 		B_NORMAL_PRIORITY, this);
@@ -38,79 +41,94 @@ NetReceiver::NetReceiver(BNetEndpoint *listener, StreamingRingBuffer *target)
 NetReceiver::~NetReceiver()
 {
 	fStopThread = true;
+	delete fEndpoint;
 
-	if (fEndpoint != NULL)
-		fEndpoint->Close();
-
-	//int32 result;
-	//wait_for_thread(fReceiverThread, &result);
-		// TODO: find out why closing the endpoint doesn't notify the waiter
-
-	kill_thread(fReceiverThread);
+	suspend_thread(fReceiverThread);
+	resume_thread(fReceiverThread);
 }
 
 
 int32
 NetReceiver::_NetworkReceiverEntry(void *data)
 {
-	return ((NetReceiver *)data)->_NetworkReceiver();
+	NetReceiver *receiver = (NetReceiver *)data;
+	if (receiver->fNewConnectionCallback)
+		return receiver->_Listen();
+	else
+		return receiver->_Transfer();
 }
 
 
 status_t
-NetReceiver::_NetworkReceiver()
+NetReceiver::_Listen()
 {
-	static const uint16_t shutdown_message[] = { RP_CLOSE_CONNECTION, 0, 0 };
-
 	status_t result = fListener->Listen();
 	if (result != B_OK) {
 		TRACE_ERROR("failed to listen on port: %s\n", strerror(result));
-		fTarget->Write(shutdown_message, sizeof(shutdown_message));
 		return result;
 	}
 
 	while (!fStopThread) {
-		fEndpoint = fListener->Accept(5000);
-		if (fEndpoint == NULL) {
-			fTarget->Write(shutdown_message, sizeof(shutdown_message));
-			return B_ERROR;
+		if (fEndpoint != NULL) {
+			TRACE("closing previous connection\n");
+			delete fEndpoint;
+			fEndpoint = NULL;
 		}
 
-		int32 errorCount = 0;
+		fEndpoint = fListener->Accept(5000);
+		if (fEndpoint == NULL) {
+			TRACE("got NULL endpoint from accept\n");
+			continue;
+		}
+
 		TRACE("new endpoint connection: %p\n", fEndpoint);
-		while (!fStopThread) {
-			uint8 buffer[4096];
-			int32 readSize = fEndpoint->Receive(buffer, sizeof(buffer));
-			if (readSize < 0) {
-				TRACE_ERROR("read failed, closing connection: %s\n",
-					strerror(readSize));
-				BNetEndpoint *endpoint = fEndpoint;
-				fEndpoint = NULL;
-				delete endpoint;
-				fTarget->Write(shutdown_message, sizeof(shutdown_message));
-				return readSize;
+
+		if (fNewConnectionCallback != NULL
+			&& fNewConnectionCallback(fNewConnectionCookie, *fEndpoint) != B_OK)
+		{
+			TRACE("connection callback rejected connection\n");
+			continue;
+		}
+
+		_Transfer();
+	}
+
+	return B_OK;
+}
+
+
+status_t
+NetReceiver::_Transfer()
+{
+	int32 errorCount = 0;
+
+	while (!fStopThread) {
+		uint8 buffer[4096];
+		int32 readSize = fEndpoint->Receive(buffer, sizeof(buffer));
+		if (readSize < 0) {
+			TRACE_ERROR("read failed, closing connection: %s\n",
+				strerror(readSize));
+			return readSize;
+		}
+
+		if (readSize == 0) {
+			TRACE("read 0 bytes, retrying\n");
+			snooze(100 * 1000);
+			errorCount++;
+			if (errorCount == 5) {
+				TRACE_ERROR("failed to read, assuming disconnect\n");
+				return B_ERROR;
 			}
 
-			if (readSize == 0) {
-				TRACE("read 0 bytes, retrying\n");
-				snooze(100 * 1000);
-				errorCount++;
-				if (errorCount == 5) {
-					TRACE_ERROR("failed to read, assuming disconnect\n");
-					break;
-				}
+			continue;
+		}
 
-				continue;
-			}
-
-			errorCount = 0;
-			status_t result = fTarget->Write(buffer, readSize);
-			if (result != B_OK) {
-				TRACE_ERROR("writing to ring buffer failed: %s\n",
-					strerror(result));
-				fTarget->Write(shutdown_message, sizeof(shutdown_message));
-				return result;
-			}
+		errorCount = 0;
+		status_t result = fTarget->Write(buffer, readSize);
+		if (result != B_OK) {
+			TRACE_ERROR("writing to ring buffer failed: %s\n",
+				strerror(result));
+			return result;
 		}
 	}
 

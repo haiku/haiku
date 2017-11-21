@@ -24,12 +24,13 @@ public:
 									bool onlyBlockOnNoData = false);
 		status_t				Write(const void *buffer, size_t length);
 
-private:
-		bool					_Lock();
-		void					_Unlock();
+		void					MakeEmpty();
 
+private:
 		bool					fReaderWaiting;
 		bool					fWriterWaiting;
+		bool					fCancelRead;
+		bool					fCancelWrite;
 		sem_id					fReaderNotifier;
 		sem_id					fWriterNotifier;
 

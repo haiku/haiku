@@ -54,15 +54,14 @@ typedef struct engine_state {
 } engine_state;
 
 
-RemoteView::RemoteView(BRect frame, uint16 listenPort)
+RemoteView::RemoteView(BRect frame, const char *remoteHost, uint16 remotePort)
 	:
 	BView(frame, "RemoteView", B_FOLLOW_NONE, B_WILL_DRAW),
 	fInitStatus(B_NO_INIT),
 	fIsConnected(false),
 	fReceiveBuffer(NULL),
 	fSendBuffer(NULL),
-	fReceiveEndpoint(NULL),
-	fSendEndpoint(NULL),
+	fEndpoint(NULL),
 	fReceiver(NULL),
 	fSender(NULL),
 	fStopThread(false),
@@ -94,33 +93,29 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 	if (fInitStatus != B_OK)
 		return;
 
-	fReceiveEndpoint = new(std::nothrow) BNetEndpoint();
-	if (fReceiveEndpoint == NULL) {
+	fEndpoint = new(std::nothrow) BNetEndpoint();
+	if (fEndpoint == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
-	fInitStatus = fReceiveEndpoint->Bind(listenPort);
-	if (fInitStatus != B_OK)
-		return;
-
-	fReceiver = new(std::nothrow) NetReceiver(fReceiveEndpoint, fReceiveBuffer);
-	if (fReceiver == NULL) {
-		fInitStatus = B_NO_MEMORY;
-		TRACE_ERROR("no memory available\n");
+	fInitStatus = fEndpoint->Connect(remoteHost, remotePort);
+	if (fInitStatus != B_OK) {
+		TRACE_ERROR("failed to connect to %s:%" B_PRIu16 "\n",
+			remoteHost, remotePort);
 		return;
 	}
 
-	fSendEndpoint = new(std::nothrow) BNetEndpoint();
-	if (fSendEndpoint == NULL) {
-		fInitStatus = B_NO_MEMORY;
-		TRACE_ERROR("no memory available\n");
-		return;
-	}
-
-	fSender = new(std::nothrow) NetSender(fSendEndpoint, fSendBuffer);
+	fSender = new(std::nothrow) NetSender(fEndpoint, fSendBuffer);
 	if (fSender == NULL) {
+		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
+		return;
+	}
+
+	fReceiver = new(std::nothrow) NetReceiver(fEndpoint, fReceiveBuffer);
+	if (fReceiver == NULL) {
 		fInitStatus = B_NO_MEMORY;
 		TRACE_ERROR("no memory available\n");
 		return;
@@ -171,8 +166,7 @@ RemoteView::~RemoteView()
 	delete fSendBuffer;
 	delete fSender;
 
-	delete fReceiveEndpoint;
-	delete fSendEndpoint;
+	delete fEndpoint;
 
 	delete fOffscreenBitmap;
 	delete fCursorBitmap;
@@ -447,6 +441,9 @@ RemoteView::_DrawThread()
 	// cursor
 	BPoint cursorHotSpot(0, 0);
 
+	reply.Start(RP_INIT_CONNECTION);
+	reply.Flush();
+
 	while (!fStopThread) {
 		uint16 code;
 		status_t status = message.NextMessage(code);
@@ -470,34 +467,6 @@ RemoteView::_DrawThread()
 		switch (code) {
 			case RP_INIT_CONNECTION:
 			{
-				uint16 port;
-				status_t result = message.Read(port);
-				if (result != B_OK) {
-					TRACE_ERROR("failed to read remote port\n");
-					continue;
-				}
-
-				BNetEndpoint *endpoint = fReceiver->Endpoint();
-				if (endpoint == NULL) {
-					TRACE_ERROR("receiver not connected anymore\n");
-					continue;
-				}
-
-				in_addr remoteHost;
-				char hostName[MAXHOSTNAMELEN + 1];
-				BNetAddress address(endpoint->RemoteAddr());
-				address.GetAddr(remoteHost);
-				address.GetAddr(hostName, NULL);
-				address.SetTo(remoteHost, port);
-
-				TRACE("connecting to host \"%s\" port %u\n", hostName, port);
-				result = fSendEndpoint->Connect(address);
-				if (result != B_OK) {
-					TRACE_ERROR("failed to connect to host \"%s\" port %u\n",
-						hostName, port);
-					continue;
-				}
-
 				BRect bounds = fOffscreenBitmap->Bounds();
 				reply.Start(RP_UPDATE_DISPLAY_MODE);
 				reply.Add(bounds.IntegerWidth() + 1);
