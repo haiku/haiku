@@ -15,6 +15,7 @@
 
 #include "StreamingRingBuffer.h"
 
+#include <AffineTransform.h>
 #include <GraphicsDefs.h>
 #include <Region.h>
 
@@ -55,6 +56,7 @@ enum {
 	RP_SET_PATTERN,
 	RP_SET_DRAWING_MODE,
 	RP_SET_FONT,
+	RP_SET_TRANSFORM,
 
 	RP_CONSTRAIN_CLIPPING_REGION = 60,
 	RP_COPY_RECT_NO_CLIPPING,
@@ -145,6 +147,7 @@ public:
 		void					AddString(const char* string, size_t length);
 		void					AddRegion(const BRegion& region);
 		void					AddGradient(const BGradient& gradient);
+		void					AddTransform(const BAffineTransform& transform);
 
 #ifndef CLIENT_COMPILE
 		void					AddBitmap(const ServerBitmap& bitmap,
@@ -176,6 +179,7 @@ public:
 									color_space colorSpace = B_RGB32,
 									uint32 flags = 0);
 		status_t				ReadGradient(BGradient** _gradient);
+		status_t				ReadTransform(BAffineTransform& transform);
 		status_t				ReadArrayLine(BPoint& startPoint,
 									BPoint& endPoint, rgb_color& color);
 

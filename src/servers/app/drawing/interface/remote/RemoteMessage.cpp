@@ -254,6 +254,24 @@ RemoteMessage::AddGradient(const BGradient& gradient)
 }
 
 
+void
+RemoteMessage::AddTransform(const BAffineTransform& transform)
+{
+	bool isIdentity = transform.IsIdentity();
+	Add(isIdentity);
+
+	if (isIdentity)
+		return;
+
+	Add(transform.sx);
+	Add(transform.shy);
+	Add(transform.shx);
+	Add(transform.sy);
+	Add(transform.tx);
+	Add(transform.ty);
+}
+
+
 status_t
 RemoteMessage::ReadString(char** _string, size_t& _length)
 {
@@ -512,6 +530,28 @@ RemoteMessage::ReadGradient(BGradient** _gradient)
 
 	*_gradient = gradient;
 	return B_OK;
+}
+
+
+status_t
+RemoteMessage::ReadTransform(BAffineTransform& transform)
+{
+	bool isIdentity;
+	status_t result = Read(isIdentity);
+	if (result != B_OK)
+		return result;
+
+	if (isIdentity) {
+		transform = BAffineTransform();
+		return B_OK;
+	}
+
+	Read(transform.sx);
+	Read(transform.shy);
+	Read(transform.shx);
+	Read(transform.sy);
+	Read(transform.tx);
+	return Read(transform.ty);
 }
 
 

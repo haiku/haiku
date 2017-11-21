@@ -699,6 +699,16 @@ RemoteView::_DrawThread()
 				break;
 			}
 
+			case RP_SET_TRANSFORM:
+			{
+				BAffineTransform transform;
+				if (message.ReadTransform(transform) != B_OK)
+					continue;
+
+				offscreen->SetTransform(transform);
+				break;
+			}
+
 			case RP_SET_PATTERN:
 			{
 				if (message.Read(pattern) != B_OK)

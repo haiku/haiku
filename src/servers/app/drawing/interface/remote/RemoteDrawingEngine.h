@@ -55,6 +55,7 @@ public:
 									alpha_function alphaFunc);
 	virtual	void				SetFont(const ServerFont& font);
 	virtual	void				SetFont(const DrawState* state);
+	virtual	void				SetTransform(const BAffineTransform& transform);
 
 	// drawing functions
 	virtual	void				InvertRect(BRect rect);
