@@ -111,6 +111,8 @@ const struct supported_device {
 	{0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 
+//	{0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
+
 	{0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x1906, INTEL_MODEL_SKYM, "Skylake GT1"},
 	{0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
@@ -194,6 +196,7 @@ detect_intel_pch()
 				ERROR("%s: Found PantherPoint PCH\n", __func__);
 				return INTEL_PCH_CPT;
 			case INTEL_PCH_LPT_DEVICE_ID:
+			case INTEL_PCH_LPT_LP_DEVICE_ID:
 				ERROR("%s: Found LynxPoint PCH\n", __func__);
 				return INTEL_PCH_LPT;
 			case INTEL_PCH_SPT_DEVICE_ID:
