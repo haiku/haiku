@@ -1,11 +1,12 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NETWORK_ADDRESS_RESOLVER_H
 #define _NETWORK_ADDRESS_RESOLVER_H
 
 
+#include <Locker.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
 #include <String.h>
@@ -103,6 +104,7 @@ private:
 		BReference<const BNetworkAddressResolver> fResolver;
 	};
 
+	static	BLocker					sCacheLock;
 	static	BObjectList<CacheEntry> sCacheMap;
 };
 

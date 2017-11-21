@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2017, Adrien Destugues, pulkomandy@pulkomandy.tk.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +10,7 @@
 #include <errno.h>
 #include <netdb.h>
 
+#include <Autolock.h>
 #include <NetworkAddress.h>
 
 
@@ -296,6 +298,8 @@ BNetworkAddressResolver::Resolve(int family, const char* address,
 BNetworkAddressResolver::Resolve(int family, const char* address,
 	const char* service, uint32 flags)
 {
+	BAutolock locker(&sCacheLock);
+
 	// TODO it may be faster to use an hash map to have faster lookup of the
 	// cache. However, we also need to access the cache by LRU, and for that
 	// a doubly-linked list is better. We should have these two share the same
@@ -312,17 +316,23 @@ BNetworkAddressResolver::Resolve(int family, const char* address,
 		}
 	}
 
+	// Cache miss! Unlock the cache while we perform the costly address
+	// resolution
+	locker.Unlock();
+
 	BNetworkAddressResolver* resolver = new(std::nothrow)
 		BNetworkAddressResolver(family, address, service, flags);
 
 	if (resolver != NULL && resolver->InitCheck() == B_OK) {
+		CacheEntry* entry = new(std::nothrow) CacheEntry(family, address,
+			service, flags, resolver);
+
+		locker.Lock();
 		// TODO adjust capacity. Chrome uses 256 entries with a timeout of
 		// 1 minute, IE uses 1000 entries with a timeout of 30 seconds.
 		if (sCacheMap.CountItems() > 255)
 			delete sCacheMap.RemoveItemAt(0);
 
-		CacheEntry* entry = new(std::nothrow) CacheEntry(family, address,
-			service, flags, resolver);
 		if (entry)
 			sCacheMap.AddItem(entry, sCacheMap.CountItems());
 	}
@@ -330,6 +340,6 @@ BNetworkAddressResolver::Resolve(int family, const char* address,
 	return BReference<const BNetworkAddressResolver>(resolver, true);
 }
 
-
+BLocker BNetworkAddressResolver::sCacheLock("DNS cache");
 BObjectList<BNetworkAddressResolver::CacheEntry>
 	BNetworkAddressResolver::sCacheMap;
