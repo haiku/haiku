@@ -51,7 +51,7 @@ private:
 
 static	int							_StateCompareByKey(const uint32 *key,
 										const engine_state *state);
-		void						_CreateState(uint32 token);
+		engine_state *				_CreateState(uint32 token);
 		void						_DeleteState(uint32 token);
 		engine_state *				_FindState(uint32 token);
 

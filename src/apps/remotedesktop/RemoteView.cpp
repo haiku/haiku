@@ -363,19 +363,19 @@ RemoteView::_StateCompareByKey(const uint32 *key, const engine_state *state)
 }
 
 
-void
+engine_state *
 RemoteView::_CreateState(uint32 token)
 {
 	int32 index = fStates.BinarySearchIndexByKey(token, &_StateCompareByKey);
 	if (index >= 0) {
 		TRACE_ERROR("state for token %" B_PRIu32 " already in list\n", token);
-		return;
+		return NULL;
 	}
 
 	engine_state *state = new(std::nothrow) engine_state;
 	if (state == NULL) {
 		TRACE_ERROR("failed to allocate engine state\n");
-		return;
+		return NULL;
 	}
 
 	fOffscreenBitmap->Lock();
@@ -385,7 +385,7 @@ RemoteView::_CreateState(uint32 token)
 		TRACE_ERROR("failed to allocate offscreen view\n");
 		fOffscreenBitmap->Unlock();
 		delete state;
-		return;
+		return NULL;
 	}
 
 	fOffscreenBitmap->AddChild(offscreen);
@@ -399,6 +399,7 @@ RemoteView::_CreateState(uint32 token)
 	state->sync_drawing = true;
 
 	fStates.AddItem(state, -index - 1);
+	return state;
 }
 
 
@@ -606,7 +607,11 @@ RemoteView::_DrawThread()
 		engine_state *state = _FindState(token);
 		if (state == NULL) {
 			TRACE_ERROR("didn't find state for token %" B_PRIu32 "\n", token);
-			continue;
+			state = _CreateState(token);
+			if (state == NULL) {
+				TRACE_ERROR("failed to create state for unknown token\n");
+				continue;
+			}
 		}
 
 		BView *offscreen = state->view;
