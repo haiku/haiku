@@ -1011,19 +1011,40 @@ RemoteDrawingEngine::_DrawingEngineResult(void* cookie, RemoteMessage& message)
 
 	switch (message.Code()) {
 		case RP_DRAW_STRING_RESULT:
-			if (message.Read(engine->fDrawStringResult) != B_OK)
+		{
+			status_t result = message.Read(engine->fDrawStringResult);
+			if (result != B_OK) {
+				TRACE_ERROR("failed to read draw string result: %s\n",
+					strerror(result));
 				return false;
+			}
+
 			break;
+		}
 
 		case RP_STRING_WIDTH_RESULT:
-			if (message.Read(engine->fStringWidthResult) != B_OK)
+		{
+			status_t result = message.Read(engine->fStringWidthResult);
+			if (result != B_OK) {
+				TRACE_ERROR("failed to read string width result: %s\n",
+					strerror(result));
 				return false;
+			}
+
 			break;
+		}
 
 		case RP_READ_BITMAP_RESULT:
-			if (message.ReadBitmap(&engine->fReadBitmapResult) != B_OK)
+		{
+			status_t result = message.ReadBitmap(&engine->fReadBitmapResult);
+			if (result != B_OK) {
+				TRACE_ERROR("failed to read bitmap of read bitmap result: %s\n",
+					strerror(result));
 				return false;
+			}
+
 			break;
+		}
 
 		default:
 			return false;

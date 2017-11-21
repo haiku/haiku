@@ -28,27 +28,49 @@
 #include <new>
 
 
+#ifdef CLIENT_COMPILE
+#define TRACE_ALWAYS(x...)		printf("RemoteMessage: " x)
+#else
+#define TRACE_ALWAYS(x...)		debug_printf("RemoteMessage: " x)
+#endif
+
+#define TRACE(x...)				/*TRACE_ALWAYS(x)*/
+#define TRACE_ERROR(x...)		TRACE_ALWAYS(x)
+
+
 status_t
 RemoteMessage::NextMessage(uint16& code)
 {
 	if (fDataLeft > 0) {
 		// discard remainder of message
 		int32 readSize = fSource->Read(NULL, fDataLeft);
-		if (readSize < 0)
+		if (readSize < 0) {
+			TRACE_ERROR("failed to read from source: %s\n", strerror(readSize));
 			return readSize;
+		}
 	}
 
 	static const uint32 kHeaderSize = sizeof(uint16) + sizeof(uint32);
 
 	fDataLeft = kHeaderSize;
-	Read(code);
-	uint32 dataLeft;
-	status_t result = Read(dataLeft);
-	if (result != B_OK)
+	status_t result = Read(code);
+	if (result != B_OK) {
+		TRACE_ERROR("failed to read message code: %s\n", strerror(result));
 		return result;
+	}
 
-	if (dataLeft < kHeaderSize)
+	uint32 dataLeft;
+	result = Read(dataLeft);
+	if (result != B_OK) {
+		TRACE_ERROR("failed to read message length: %s\n", strerror(result));
+		return result;
+	}
+
+	if (dataLeft < kHeaderSize) {
+		TRACE_ERROR("message claims %" B_PRIu32 " bytes, needed at least %"
+			B_PRIu32 " for the header\n", dataLeft, kHeaderSize);
 		return B_ERROR;
+	}
 
 	fDataLeft = dataLeft - kHeaderSize;
 	fCode = code;
