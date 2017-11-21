@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Haiku Remote Desktop</title>
+		<script src="HaikuRemoteDesktop.js"></script>
+		<style type="text/css">
+			html, body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+
+			body, #connectForm {
+				display: flex;
+			}
+
+			body {
+				font-family: sans;
+				align-items: flex-start;
+				justify-content: center;
+			}
+
+			#connectForm {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			#connectForm div {
+				display: flex;
+				justify-content: space-between;
+				align-items: baseline;
+				width: 100%;
+			}
+
+			input, button {
+				margin: 1em;
+			}
+
+			input[type=number] {
+				width: 5em;
+			}
+
+			button {
+				align-self: flex-end;
+			}
+
+			.session {
+				display: none;
+			}
+
+			body.connect .session {
+				display: initial;
+			}
+
+			body.connect #connectForm {
+				display: none;
+			}
+		</style>
+	</head>
+	<body onload="init();">
+		<div id="connectForm">
+			<div>
+				<label for="targetAddress">Remote Host</label>
+				<input type="text" id="targetAddress"
+					value="ws://localhost:5000" />
+			</div>
+			<div>
+				<label for="width">Width</label>
+				<input type="number" id="width" value="800" />
+				<label for="height">Height</label>
+				<input type="number" id="height" value="600" />
+			</div>
+			<button id="connectButton" autofocus>Connect</button>
+		</div>
+	</body>
+</html>
