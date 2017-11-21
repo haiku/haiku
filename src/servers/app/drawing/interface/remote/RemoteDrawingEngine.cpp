@@ -963,7 +963,7 @@ RemoteDrawingEngine::ReadBitmap(ServerBitmap* bitmap, bool drawCursor,
 	status_t result;
 	do {
 		result = acquire_sem_etc(fResultNotify, 1, B_RELATIVE_TIMEOUT,
-			100 * 1000 * 1000);
+			10 * 1000 * 1000);
 	} while (result == B_INTERRUPTED);
 
 	if (result != B_OK)
