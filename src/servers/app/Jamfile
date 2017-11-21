@@ -7,7 +7,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface local ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface remote ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing interface html5 ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app stackandtile ] ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app decorator ] ;
@@ -107,7 +106,7 @@ Server app_server :
 	# libraries
 	:
 	libtranslation.so libbe.so libbnetapi.so
-	libaslocal.a libasremote.a libashtml5.a
+	libaslocal.a libasremote.a
 	libasdrawing.a libpainter.a libagg.a
 	[ BuildFeatureAttribute freetype : library ]
 	[ BuildFeatureAttribute fontconfig : library ]

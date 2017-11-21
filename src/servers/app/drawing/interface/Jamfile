@@ -1,5 +1,4 @@
 SubDir HAIKU_TOP src servers app drawing interface ;
 
-SubInclude HAIKU_TOP src servers app drawing interface html5 ;
 SubInclude HAIKU_TOP src servers app drawing interface local ;
 SubInclude HAIKU_TOP src servers app drawing interface remote ;
