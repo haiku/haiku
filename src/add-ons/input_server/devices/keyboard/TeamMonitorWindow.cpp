@@ -18,6 +18,7 @@
 #include <Catalog.h>
 #include <GroupLayoutBuilder.h>
 #include <IconView.h>
+#include <LayoutBuilder.h>
 #include <LocaleRoster.h>
 #include <Message.h>
 #include <MessageRunner.h>
@@ -107,15 +108,6 @@ FilterKeyDown(BMessage* message, BHandler** target,
 }
 
 
-class AllShowingTextView : public BTextView {
-public:
-							AllShowingTextView(const char* name);
-	virtual	bool			HasHeightForWidth();
-	virtual	void			GetHeightForWidth(float width, float* min,
-								float* max, float* preferred);
-};
-
-
 class TeamDescriptionView : public BView {
 public:
 							TeamDescriptionView();
@@ -135,7 +127,7 @@ private:
 			IconView*		fIconView;
 	const	char*			fInfoString;
 			BCardLayout*	fLayout;
-			AllShowingTextView*		fInfoTextView;
+			BTextView*		fInfoTextView;
 
 			BStringView*	fTeamName;
 			BStringView*	fSysComponent;
@@ -203,12 +195,14 @@ TeamMonitorWindow::TeamMonitorWindow()
 	BGroupLayoutBuilder(layout)
 		.Add(scrollView)
 		.AddGroup(B_HORIZONTAL)
+			.SetInsets(0, 0, 0, 0)
 			.Add(fKillButton)
 			.Add(fQuitButton)
 			.AddGlue()
 			.End()
 		.Add(fDescriptionView)
 		.AddGroup(B_HORIZONTAL)
+			.SetInsets(0, 0, 0, 0)
 			.Add(forceReboot)
 			.AddGlue()
 			.Add(fRestartButton)
@@ -589,15 +583,19 @@ TeamDescriptionView::TeamDescriptionView()
 		"Hold CONTROL+ALT+DELETE for %ld seconds to reboot.");
 
 	fTeamName = new BStringView("team name", "team name");
+	fTeamName->SetTruncation(B_TRUNCATE_BEGINNING);
+	fTeamName->SetExplicitSize(BSize(StringWidth("x") * 60, B_SIZE_UNSET));
 	fSysComponent = new BStringView("system component", B_TRANSLATE(
 		"(This team is a system component)"));
 	fQuitOverdue = new BStringView("quit overdue", B_TRANSLATE(
 		"If the application will not quit you may have to kill it."));
 	fQuitOverdue->SetFont(be_bold_font);
 
-	fInfoTextView = new AllShowingTextView("info text");
-	BGroupView* group = new BGroupView(B_VERTICAL);
-	BGroupLayoutBuilder(group)
+	fInfoTextView = new BTextView("info text");
+	fInfoTextView->SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+	fInfoTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	BGroupView* infoGroup = new BGroupView(B_VERTICAL);
+	BGroupLayoutBuilder(infoGroup)
 		.Add(fInfoTextView)
 		.AddGlue();
 
@@ -607,21 +605,31 @@ TeamDescriptionView::TeamDescriptionView()
 
 	BView* teamPropertiesView = new BView("team properties", B_WILL_DRAW);
 	teamPropertiesView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
+	BGridLayout* layout = new BGridLayout();
 	teamPropertiesView->SetLayout(layout);
-	BGroupLayoutBuilder(layout)
-		.Add(fIconView)
-		.AddGroup(B_VERTICAL)
-			.Add(fTeamName)
-			.Add(fSysComponent)
-			.Add(fQuitOverdue)
-		.End()
-		.AddGlue();
+
+
+	BLayoutBuilder::Grid<>(layout)
+		.SetInsets(0)
+		.SetSpacing(B_USE_ITEM_SPACING, 0)
+		.AddGlue(0, 0)
+		.Add(fIconView, 0, 1, 1, 3)
+		.AddGlue(1, 0)
+		.Add(fTeamName, 1, 2)
+		.Add(fSysComponent, 1, 3)
+		.Add(fQuitOverdue, 1, 4)
+		.AddGlue(0, 5)
+		.AddGlue(2, 1);
 
 	fLayout = new BCardLayout();
 	SetLayout(fLayout);
-	fLayout->AddView(group);
+	fLayout->AddView(infoGroup);
 	fLayout->AddView(teamPropertiesView);
+
+	infoGroup->SetExplicitMinSize(BSize(StringWidth("x") * 70, B_SIZE_UNSET));
+	fInfoTextView->SetExplicitSize(BSize(B_SIZE_UNSET, be_plain_font->Size() * 7.2));
+	fInfoTextView->MakeEditable(false);
+	fInfoTextView->MakeSelectable(false);
 
 	SetItem(NULL);
 }
@@ -729,32 +737,3 @@ TeamDescriptionView::SetItem(TeamListItem* item)
 }
 
 
-//	#pragma mark -
-
-
-AllShowingTextView::AllShowingTextView(const char* name)
-	:
-	BTextView(name, B_WILL_DRAW)
-{
-	MakeEditable(false);
-	MakeSelectable(false);
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-}
-
-
-bool
-AllShowingTextView::HasHeightForWidth()
-{
-	return true;
-}
-
-
-void
-AllShowingTextView::GetHeightForWidth(float width, float* min, float* max,
-	float* preferred)
-{
-	BTextView::GetHeightForWidth(width, min, max, preferred);
-	float minHeight = TextHeight(0, CountLines() - 1);
-	if (min)
-		*min = minHeight;
-}
