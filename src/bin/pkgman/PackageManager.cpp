@@ -15,6 +15,8 @@
 
 #include "PackageManager.h"
 
+#include <InterfaceDefs.h>
+
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -194,48 +196,68 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	if (!fInteractive)
 		return;
 
-	// Erase the line and return to the start
-	printf("\r\33[2K\r");
+	// Do not update if nothing changed in the last 500ms
+	if (bytes <= fLastBytes || (system_time() - fLastRateCalcTime) < 500000)
+		return;
 
-	if (bytes >= fLastBytes && (system_time() - fLastRateCalcTime) >= 1000000) {
-		const bigtime_t time = system_time();
-		fDownloadRate = (bytes - fLastBytes) / ((time - fLastRateCalcTime) / 1000000);
-		fLastRateCalcTime = time;
-		fLastBytes = bytes;
+	const bigtime_t time = system_time();
+	if (time != fLastRateCalcTime) {
+		fDownloadRate = (bytes - fLastBytes) * 1000000
+			/ (time - fLastRateCalcTime);
 	}
+	fLastRateCalcTime = time;
+	fLastBytes = bytes;
 
 	// Build the current file progress percentage and size string
-	BString str;
-	char byteBuffer[32];
-	char totalBuffer[32];
-	char rateBuffer[32];
-	str.SetToFormat("%3d%% %s\t  %s/%s\t  %s",
-		(int)(completionPercentage * 100),
-		packageName,
-		string_for_size(bytes, byteBuffer, sizeof(byteBuffer)),
-		string_for_size(totalBytes, totalBuffer, sizeof(totalBuffer)),
-		fDownloadRate == 0 ? "--.-" :
-			string_for_rate(fDownloadRate, rateBuffer, sizeof(rateBuffer)));
+	BString leftStr;
+	BString rightStr;
 
-	int32 width = std::max(str.CountChars(), (int32)50);
+	int width = 70;
 	struct winsize winSize;
-	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
-			&& winSize.ws_col < width) {
-		width = winSize.ws_col - 2;
-		str.ReplaceAll("\t  ", "  ");
-		str.ReplaceFirst(".hpkg", "");
-		str.SetToFormat("%.*s\xE2\x80\xA6%s",
-			(int)str.CountBytes(0, width / 2 - 1), str.String(),
-			str.String() + str.CountBytes(0, str.CountChars() - width / 2 - 1));
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0)
+		width = std::min(winSize.ws_col - 2, 78);
+
+	if (width < 30) {
+		// Not much space for anything, just draw a percentage
+		leftStr.SetToFormat("%3d%%", (int)(completionPercentage * 100));
+	} else {
+		leftStr.SetToFormat("%3d%% %s", (int)(completionPercentage * 100),
+				packageName);
+
+		char byteBuffer[32];
+		char totalBuffer[32];
+		char rateBuffer[32];
+		rightStr.SetToFormat("%s/%s  %s ",
+				string_for_size(bytes, byteBuffer, sizeof(byteBuffer)),
+				string_for_size(totalBytes, totalBuffer, sizeof(totalBuffer)),
+				fDownloadRate == 0 ? "--.-" :
+				string_for_rate(fDownloadRate, rateBuffer, sizeof(rateBuffer)));
+
+		if (leftStr.CountChars() + rightStr.CountChars() >= width)
+		{
+			// The full string does not fit! Try to make a shorter one.
+			leftStr.ReplaceLast(".hpkg", "");
+			leftStr.TruncateChars(width - rightStr.CountChars() - 2);
+			leftStr.Append(B_UTF8_ELLIPSIS " ");
+		}
+
+		int extraSpace = width - leftStr.CountChars() - rightStr.CountChars();
+
+		leftStr.Append(' ', extraSpace);
+		leftStr.Append(rightStr);
 	}
-	str.Append(' ', width - str.CountChars());
 
-	// Set bg to green, fg to white, and print progress bar
-	const int progChars = str.CountBytes(0, (int)(width * completionPercentage));
-	printf("\x1B[42;37m%.*s", progChars, str.String());
-	// Reset colors and print rest of text
-	printf("\x1B[0m%s", str.String() + progChars);
+	const int progChars = leftStr.CountBytes(0,
+		(int)(width * completionPercentage));
 
+	// Set bg to green, fg to white, and print progress bar.
+	// Then reset colors and print rest of text
+	// And finally remove any stray chars at the end of the line
+	printf("\r\x1B[42;37m%.*s\x1B[0m%s\x1B[K", progChars, leftStr.String(),
+		leftStr.String() + progChars);
+
+	// Force terminal to update when the line is complete, to avoid flickering
+	// because of updates at random times
 	fflush(stdout);
 }
 
