@@ -255,6 +255,7 @@ RemoteHWInterface::_EventThread()
 				RemoteMessage reply(NULL, fSendBuffer);
 				reply.Start(RP_INIT_CONNECTION);
 				status_t result = reply.Flush();
+				(void)result;
 				TRACE("init connection result: %s\n", strerror(result));
 				break;
 			}
