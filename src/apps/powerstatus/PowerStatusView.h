@@ -94,12 +94,12 @@ private:
 			void			_SaveSettings();
 
 			void			_OpenExtendedWindow();
-			bool			fReplicated;
 
 private:
 			BWindow*		fExtendedWindow;
 			bool			fMessengerExist;
 			BMessenger*		fExtWindowMessenger;
+			bool			fReplicated;
 };
 
 
