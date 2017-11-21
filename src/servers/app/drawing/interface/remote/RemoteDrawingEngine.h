@@ -113,7 +113,7 @@ public:
 									const BPoint& viewToScreenOffset,
 									float viewScale);
 	virtual	void				FillShape(const BRect& bounds,
-							 		int32 opCount, const uint32* opList,
+									int32 opCount, const uint32* opList,
 									int32 pointCount, const BPoint* pointList,
 									const BGradient& gradient,
 									const BPoint& viewToScreenOffset,
@@ -137,7 +137,7 @@ public:
 	virtual	BPoint				DrawString(const char* string, int32 length,
 									const BPoint& point,
 									escapement_delta* delta = NULL);
-virtual	BPoint					DrawString(const char* string, int32 length,
+	virtual	BPoint				DrawString(const char* string, int32 length,
 									const BPoint* offsets);
 
 	virtual	float				StringWidth(const char* string, int32 length,
@@ -155,7 +155,7 @@ private:
 									RemoteMessage& message);
 
 			BRect				_BuildBounds(BPoint* points, int32 pointCount);
-		status_t				_ExtractBitmapRegions(ServerBitmap& bitmap,
+			status_t			_ExtractBitmapRegions(ServerBitmap& bitmap,
 									uint32 options, const BRect& bitmapRect,
 									const BRect& viewRect, double xScale,
 									double yScale, BRegion& region,
@@ -174,7 +174,8 @@ private:
 			float				fStringWidthResult;
 			BBitmap*			fReadBitmapResult;
 
-		BitmapDrawingEngine*	fBitmapDrawingEngine;
+			BitmapDrawingEngine*
+								fBitmapDrawingEngine;
 };
 
 #endif // REMOTE_DRAWING_ENGINE_H

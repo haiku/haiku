@@ -802,9 +802,7 @@ RemoteDrawingEngine::FillTriangle(BPoint* points, const BRect& bounds,
 	RemoteMessage message(NULL, fHWInterface->SendBuffer());
 	message.Start(RP_FILL_TRIANGLE_GRADIENT);
 	message.Add(fToken);
-	message.Add(points[0]);
-	message.Add(points[1]);
-	message.Add(points[2]);
+	message.AddList(points, 3);
 	message.Add(bounds);
 	message.AddGradient(gradient);
 }
