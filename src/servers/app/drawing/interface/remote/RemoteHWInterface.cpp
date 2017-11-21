@@ -15,6 +15,8 @@
 #include "NetSender.h"
 #include "StreamingRingBuffer.h"
 
+#include "SystemPalette.h"
+
 #include <Autolock.h>
 #include <NetEndpoint.h>
 
@@ -273,6 +275,25 @@ RemoteHWInterface::_EventThread()
 				_FillDisplayModeTiming(fClientMode);
 				_NotifyScreenChanged();
 				break;
+			}
+
+			case RP_GET_SYSTEM_PALETTE:
+			{
+				RemoteMessage reply(NULL, fSendBuffer);
+				reply.Start(RP_GET_SYSTEM_PALETTE_RESULT);
+
+				const color_map *map = SystemColorMap();
+				uint32 count = (uint32)B_COUNT_OF(map->color_list);
+
+				reply.Add(count);
+				for (size_t i = 0; i < count; i++) {
+					const rgb_color &color = map->color_list[i];
+					reply.Add(color.red);
+					reply.Add(color.green);
+					reply.Add(color.blue);
+					reply.Add(color.alpha);
+				}
+
 				break;
 			}
 
