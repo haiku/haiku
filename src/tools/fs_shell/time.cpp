@@ -21,7 +21,7 @@
 #if 0
 
 void
-fssh_set_real_time_clock(uint32_t secs_since_jan1_1970)
+fssh_set_real_time_clock(unsigned long secs_since_jan1_1970)
 {
 }
 
@@ -33,7 +33,7 @@ fssh_set_timezone(char *timezone)
 
 #endif // 0
 
-uint32_t
+unsigned long
 fssh_real_time_clock(void)
 {
 	timeval tv;

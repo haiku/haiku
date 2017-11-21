@@ -11,7 +11,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 
 /*-------------------------------------------------------------*/
@@ -195,8 +195,8 @@ extern fssh_status_t	_fssh_get_next_thread_info(fssh_team_id team,
 /*-------------------------------------------------------------*/
 /* Time */
 
-extern uint32_t			fssh_real_time_clock(void);
-extern void				fssh_set_real_time_clock(uint32_t secs_since_jan1_1970);
+extern unsigned long	fssh_real_time_clock(void);
+extern void				fssh_set_real_time_clock(unsigned long secs_since_jan1_1970);
 extern fssh_bigtime_t	fssh_real_time_clock_usecs(void);
 extern fssh_status_t	fssh_set_timezone(char *timezone);
 extern fssh_bigtime_t	fssh_system_time(void);     /* time since booting in microseconds */
