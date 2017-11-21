@@ -82,8 +82,8 @@ public:
 			uint32				DPMSState();
 			uint32				DPMSCapabilites();
 
-			status_t			GetBrightness(float*);
-			status_t			SetBrightness(float);
+			status_t			GetBrightness(float* brightness);
+			status_t			SetBrightness(float brightness);
 
 private:
 	// Forbidden and deprecated methods
