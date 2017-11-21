@@ -150,7 +150,8 @@ compare_void_menu_items(const void* _a, const void* _b)
 BootPromptWindow::BootPromptWindow()
 	:
 	BWindow(BRect(0, 0, 530, 400), "",
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE,
+		B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_RESIZABLE,
 		B_ALL_WORKSPACES),
 	fDefaultKeymapItem(NULL)
 {
@@ -166,11 +167,8 @@ BootPromptWindow::BootPromptWindow()
 	// Carefully designed to not exceed the 640x480 resolution with a 12pt font.
 	float width = fInfoTextView->StringWidth("Thank you for trying out Haiku,"
 		" We hope you like it!") * 1.5;
-	float height = be_plain_font->Size() * 36;
 
-	BRect newFrame(0, 0, width, height);
-	newFrame = newFrame & BScreen().Frame();
-	ResizeTo(newFrame.Width(), newFrame.Height());
+	fInfoTextView->SetExplicitSize(BSize(width, B_SIZE_UNSET));
 
 	fDesktopButton = new BButton("", new BMessage(MSG_BOOT_DESKTOP));
 	fDesktopButton->SetTarget(be_app);
@@ -192,6 +190,13 @@ BootPromptWindow::BootPromptWindow()
 	BScrollView* languagesScrollView = new BScrollView("languagesScroll",
 		fLanguagesListView, B_WILL_DRAW, false, true);
 
+	// Make sure the language list view is always wide enough to show the
+	// largest language, with some extra space
+	float height = be_plain_font->Size() * 23;
+	fLanguagesListView->SetExplicitSize(
+		BSize(fLanguagesListView->StringWidth("Portuguese (Brazil)") + 32,
+		height));
+
 	fKeymapsMenuField = new BMenuField("", "", new BMenu(""));
 	fKeymapsMenuField->Menu()->SetLabelFromMarked(true);
 
@@ -201,18 +206,22 @@ BootPromptWindow::BootPromptWindow()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(B_HORIZONTAL)
-			.AddGroup(B_VERTICAL)
-				.AddGroup(B_VERTICAL)
-					.Add(fLanguagesLabelView)
-					.Add(languagesScrollView)
-				.End()
-				.AddGrid(0.f)
-					.AddMenuField(fKeymapsMenuField, 0, 0)
-				.End()
-			.End()
-			.Add(fInfoTextView)
+			.Add(fLanguagesLabelView)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(languagesScrollView)
+			.AddGroup(B_VERTICAL)
+				.Add(fInfoTextView)
+				.AddGlue()
+			.End()
+			.SetInsets(B_USE_WINDOW_SPACING, 0)
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(fKeymapsMenuField)
+			.AddGlue()
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 		.End()
 		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL)
@@ -318,6 +327,8 @@ BootPromptWindow::_UpdateStrings()
 	fKeymapsMenuField->SetLabel(B_TRANSLATE("Keymap"));
 	if (fKeymapsMenuField->Menu()->FindMarked() == NULL)
 		fKeymapsMenuField->MenuItem()->SetLabel(B_TRANSLATE("Custom"));
+
+	ResizeToPreferred();
 }
 
 
