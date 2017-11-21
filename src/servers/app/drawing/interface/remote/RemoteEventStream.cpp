@@ -169,6 +169,9 @@ RemoteEventStream::EventReceived(RemoteMessage& message)
 			if (message.Read(numBytes) != B_OK)
 				break;
 
+			if (numBytes > 1000)
+				break;
+
 			char* bytes = (char*)malloc(numBytes + 1);
 			if (bytes == NULL)
 				break;
