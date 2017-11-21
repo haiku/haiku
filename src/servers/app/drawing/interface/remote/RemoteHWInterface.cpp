@@ -22,8 +22,8 @@
 #include <string.h>
 
 
-#define TRACE(x...)				/*debug_printf("RemoteHWInterface: "x)*/
-#define TRACE_ALWAYS(x...)		debug_printf("RemoteHWInterface: "x)
+#define TRACE(x...)				/*debug_printf("RemoteHWInterface: " x)*/
+#define TRACE_ALWAYS(x...)		debug_printf("RemoteHWInterface: " x)
 #define TRACE_ERROR(x...)		debug_printf("RemoteHWInterface: " x)
 
 
@@ -238,7 +238,8 @@ RemoteHWInterface::_EventThread()
 			return result;
 		}
 
-		TRACE("got message code %u with %lu bytes\n", code, message.DataLeft());
+		TRACE("got message code %" B_PRIu16 " with %" B_PRIu32 " bytes\n", code,
+			message.DataLeft());
 
 		if (code >= RP_MOUSE_MOVED && code <= RP_MODIFIERS_CHANGED) {
 			// an input event, dispatch to the event stream
