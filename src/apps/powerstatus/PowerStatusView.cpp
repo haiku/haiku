@@ -612,6 +612,11 @@ PowerStatusReplicant::~PowerStatusReplicant()
 	if (fMessengerExist)
 		delete fExtWindowMessenger;
 
+	if (fExtendedWindow && fExtendedWindow->Lock()) {
+			fExtendedWindow->Quit();
+			fExtendedWindow = NULL;
+	}
+
 	fDriverInterface->StopWatching(this);
 	fDriverInterface->Disconnect();
 	fDriverInterface->ReleaseReference();
