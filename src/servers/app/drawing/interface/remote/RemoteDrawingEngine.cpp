@@ -910,7 +910,35 @@ float
 RemoteDrawingEngine::StringWidth(const char* string, int32 length,
 	escapement_delta* delta)
 {
-	// TODO: decide if really needed and use callback if so
+	// TODO: Decide if really needed.
+
+	while (true) {
+		if (_AddCallback() != B_OK)
+			break;
+
+		RemoteMessage message(NULL, fHWInterface->SendBuffer());
+
+		message.Start(RP_STRING_WIDTH);
+		message.Add(fToken);
+		message.AddString(string, length);
+			// TODO: Support escapement delta.
+
+		if (message.Flush() != B_OK)
+			break;
+
+		status_t result;
+		do {
+			result = acquire_sem_etc(fResultNotify, 1, B_RELATIVE_TIMEOUT,
+				1 * 1000 * 1000);
+		} while (result == B_INTERRUPTED);
+
+		if (result != B_OK)
+			break;
+
+		return fStringWidthResult;
+	}
+
+	// Fall back to local calculation.
 	return fState.Font().StringWidth(string, length, delta);
 }
 
