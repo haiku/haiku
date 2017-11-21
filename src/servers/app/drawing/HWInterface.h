@@ -44,7 +44,11 @@ public:
 								HWInterfaceListener();
 	virtual						~HWInterfaceListener();
 
-	virtual	void				FrameBufferChanged() = 0;
+	virtual	void				FrameBufferChanged() {};
+		// Informs a downstream DrawingEngine of a changed framebuffer.
+
+	virtual	void				ScreenChanged(HWInterface* interface) {};
+		// Informs an upstream client of a changed screen configuration.
 };
 
 
@@ -207,6 +211,7 @@ protected:
 									const BPoint& offset);
 
 			void				_NotifyFrameBufferChanged();
+			void				_NotifyScreenChanged();
 
 	static	bool				_IsValidMode(const display_mode& mode);
 

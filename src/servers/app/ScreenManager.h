@@ -12,10 +12,12 @@
 #include <Looper.h>
 #include <ObjectList.h>
 
+
 class BMessage;
 
 class DrawingEngine;
 class HWInterface;
+class HWInterfaceListener;
 class Screen;
 
 
@@ -27,6 +29,7 @@ class ScreenOwner {
 		virtual ~ScreenOwner() {};
 		virtual void	ScreenRemoved(Screen* screen) = 0;
 		virtual void	ScreenAdded(Screen* screen) = 0;
+		virtual void	ScreenChanged(Screen* screen) = 0;
 
 		virtual bool	ReleaseScreen(Screen* screen) = 0;
 };
@@ -45,12 +48,15 @@ class ScreenManager : public BLooper {
 							ScreenList& list);
 		void			ReleaseScreens(ScreenList& list);
 
+		void			ScreenChanged(Screen* screen);
+
 		virtual void	MessageReceived(BMessage* message);
 
 	private:
 		struct screen_item {
-			Screen*			screen;
-			ScreenOwner*	owner;
+			Screen*					screen;
+			ScreenOwner*			owner;
+			HWInterfaceListener*	listener;
 		};
 
 		void			_ScanDrivers();

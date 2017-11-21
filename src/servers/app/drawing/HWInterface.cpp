@@ -1096,6 +1096,19 @@ HWInterface::_NotifyFrameBufferChanged()
 }
 
 
+void
+HWInterface::_NotifyScreenChanged()
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		HWInterfaceListener* listener
+			= (HWInterfaceListener*)listeners.ItemAtFast(i);
+		listener->ScreenChanged(this);
+	}
+}
+
+
 /*static*/ bool
 HWInterface::_IsValidMode(const display_mode& mode)
 {

@@ -37,6 +37,35 @@ using std::nothrow;
 ScreenManager* gScreenManager;
 
 
+class ScreenChangeListener : public HWInterfaceListener {
+public:
+								ScreenChangeListener(ScreenManager& manager,
+									Screen* screen);
+
+private:
+virtual	void					ScreenChanged(HWInterface* interface);
+
+			ScreenManager&		fManager;
+			Screen*				fScreen;
+};
+
+
+ScreenChangeListener::ScreenChangeListener(ScreenManager& manager,
+	Screen* screen)
+	:
+	fManager(manager),
+	fScreen(screen)
+{
+}
+
+
+void
+ScreenChangeListener::ScreenChanged(HWInterface* interface)
+{
+	fManager.ScreenChanged(fScreen);
+}
+
+
 ScreenManager::ScreenManager()
 	:
 	BLooper("screen manager"),
@@ -58,6 +87,7 @@ ScreenManager::~ScreenManager()
 		screen_item* item = fScreenList.ItemAt(i);
 
 		delete item->screen;
+		delete item->listener;
 		delete item;
 	}
 }
@@ -152,6 +182,19 @@ ScreenManager::ReleaseScreens(ScreenList& list)
 
 
 void
+ScreenManager::ScreenChanged(Screen* screen)
+{
+	BAutolock locker(this);
+
+	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
+		screen_item* item = fScreenList.ItemAt(i);
+		if (item->screen == screen)
+			item->owner->ScreenChanged(screen);
+	}
+}
+
+
+void
 ScreenManager::_ScanDrivers()
 {
 	HWInterface* interface = NULL;
@@ -193,12 +236,20 @@ ScreenManager::_AddHWInterface(HWInterface* interface)
 
 	if (screen->Initialize() >= B_OK) {
 		screen_item* item = new(nothrow) screen_item;
+
 		if (item != NULL) {
 			item->screen = screen;
 			item->owner = NULL;
-			if (fScreenList.AddItem(item))
-				return item;
+			item->listener = new(nothrow) ScreenChangeListener(*this, screen);
+			if (item->listener != NULL
+				&& interface->AddListener(item->listener)) {
+				if (fScreenList.AddItem(item))
+					return item;
 
+				interface->RemoveListener(item->listener);
+			}
+
+			delete item->listener;
 			delete item;
 		}
 	}
