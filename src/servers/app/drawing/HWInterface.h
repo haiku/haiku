@@ -105,6 +105,9 @@ public:
 	virtual uint32				DPMSMode() = 0;
 	virtual uint32				DPMSCapabilities() = 0;
 
+	virtual status_t			SetBrightness(float) = 0;
+	virtual status_t			GetBrightness(float*) = 0;
+
 	virtual status_t			GetAccelerantPath(BString& path);
 	virtual status_t			GetDriverPath(BString& path);
 

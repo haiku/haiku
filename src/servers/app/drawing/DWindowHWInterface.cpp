@@ -912,6 +912,24 @@ DWindowHWInterface::DPMSCapabilities()
 }
 
 
+status_t
+DWindowHWInterface::SetBrightness(float brightness)
+{
+	AutoReadLocker _(this);
+
+	return BScreen().SetBrightness(brightness);
+}
+
+
+status_t
+DWindowHWInterface::GetBrightness(float* brightness)
+{
+	AutoReadLocker _(this);
+
+	return BScreen().GetBrightness(brightness);
+}
+
+
 uint32
 DWindowHWInterface::AvailableHWAcceleration() const
 {

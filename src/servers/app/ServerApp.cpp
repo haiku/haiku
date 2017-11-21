@@ -3050,6 +3050,37 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_SCREEN_SET_BRIGHTNESS:
+		{
+			STRACE(("ServerApp %s: AS_SCREEN_SET_BRIGHTNESS\n", Signature()));
+			int32 id;
+			link.Read<int32>(&id);
+
+			float brightness;
+			link.Read<float>(&brightness);
+
+			status_t status = fDesktop->HWInterface()->SetBrightness(brightness);
+			fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
+		case AS_SCREEN_GET_BRIGHTNESS:
+		{
+			STRACE(("ServerApp %s: AS_SCREEN_GET_BRIGHTNESS\n", Signature()));
+			int32 id;
+			link.Read<int32>(&id);
+
+			float brightness;
+			status_t result = fDesktop->HWInterface()->GetBrightness(&brightness);
+			fLink.StartMessage(result);
+			if (result == B_OK)
+				fLink.Attach<float>(brightness);
+			fLink.Flush();
+			break;
+		}
+
 		case AS_READ_BITMAP:
 		{
 			STRACE(("ServerApp %s: AS_READ_BITMAP\n", Signature()));

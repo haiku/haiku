@@ -21,6 +21,7 @@
 class BBox;
 class BPopUpMenu;
 class BMenuField;
+class BSlider;
 class BSpinner;
 class BStringView;
 
@@ -95,6 +96,8 @@ private:
 			BPopUpMenu*		fTVStandardMenu;
 			BMenuField*		fTVStandardField;
 
+			BSlider*		fBrightnessSlider;
+
 			BButton*		fDefaultsButton;
 			BButton*		fApplyButton;
 			BButton*		fRevertButton;
@@ -110,6 +113,7 @@ private:
 
 			uint32			fOriginalWorkspacesColumns;
 			uint32			fOriginalWorkspacesRows;
+			float			fOriginalBrightness;
 			bool			fModified;
 };
 

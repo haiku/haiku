@@ -468,6 +468,20 @@ RemoteHWInterface::DPMSCapabilities()
 }
 
 
+status_t
+RemoteHWInterface::SetBrightness(float)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+RemoteHWInterface::GetBrightness(float*)
+{
+	return B_UNSUPPORTED;
+}
+
+
 sem_id
 RemoteHWInterface::RetraceSemaphore()
 {

@@ -133,6 +133,10 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fAccDPMSMode(NULL),
 	fAccSetDPMSMode(NULL),
 
+	// brightness hooks
+	fAccSetBrightness(NULL),
+	fAccGetBrightness(NULL),
+
 	// overlay hooks
 	fAccOverlayCount(NULL),
 	fAccOverlaySupportedSpaces(NULL),
@@ -400,6 +404,10 @@ AccelerantHWInterface::_SetupDefaultHooks()
 		= (dpms_capabilities)fAccelerantHook(B_DPMS_CAPABILITIES, NULL);
 	fAccDPMSMode = (dpms_mode)fAccelerantHook(B_DPMS_MODE, NULL);
 	fAccSetDPMSMode = (set_dpms_mode)fAccelerantHook(B_SET_DPMS_MODE, NULL);
+
+	// brightness
+	fAccGetBrightness = (get_brightness)fAccelerantHook(B_GET_BRIGHTNESS, NULL);
+	fAccSetBrightness = (set_brightness)fAccelerantHook(B_SET_BRIGHTNESS, NULL);
 
 	return B_OK;
 }
@@ -1110,6 +1118,30 @@ AccelerantHWInterface::DPMSCapabilities()
 		return B_UNSUPPORTED;
 
 	return fAccDPMSCapabilities();
+}
+
+
+status_t
+AccelerantHWInterface::SetBrightness(float brightness)
+{
+	AutoReadLocker _(this);
+
+	if (!fAccSetBrightness)
+		return B_UNSUPPORTED;
+
+	return fAccSetBrightness(brightness);
+}
+
+
+status_t
+AccelerantHWInterface::GetBrightness(float* brightness)
+{
+	AutoReadLocker _(this);
+
+	if (!fAccGetBrightness)
+		return B_UNSUPPORTED;
+
+	return fAccGetBrightness(brightness);
 }
 
 

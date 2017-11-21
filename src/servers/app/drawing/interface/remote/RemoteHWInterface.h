@@ -59,6 +59,9 @@ virtual status_t					SetDPMSMode(uint32 state);
 virtual uint32						DPMSMode();
 virtual uint32						DPMSCapabilities();
 
+virtual status_t			SetBrightness(float);
+virtual status_t			GetBrightness(float*);
+
 		// cursor handling
 virtual	void						SetCursor(ServerCursor* cursor);
 virtual	void						SetCursorVisible(bool visible);

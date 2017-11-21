@@ -678,6 +678,39 @@ BPrivateScreen::DPMSCapabilites()
 }
 
 
+status_t
+BPrivateScreen::GetBrightness(float* brightness)
+{
+	if (brightness == NULL)
+		return B_BAD_VALUE;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SCREEN_GET_BRIGHTNESS);
+	link.Attach<int32>(ID());
+
+	status_t status;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
+		link.Read<float>(brightness);
+
+	return status;
+}
+
+
+status_t
+BPrivateScreen::SetBrightness(float brightness)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SCREEN_SET_BRIGHTNESS);
+	link.Attach<int32>(ID());
+	link.Attach<float>(brightness);
+
+	status_t status = B_ERROR;
+	link.FlushWithReply(status);
+
+	return status;
+}
+
+
 void *
 BPrivateScreen::BaseAddress()
 {

@@ -506,6 +506,22 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			.Add(fTVStandardField->CreateMenuBarLayoutItem(), 1, 6)
 		.End();
 
+	fBrightnessSlider = new BSlider("brightness", "Brightness",
+		NULL, 0, 255, B_HORIZONTAL);
+
+	status_t result = screen.GetBrightness(&fOriginalBrightness);
+	if (result == B_OK) {
+		fBrightnessSlider->SetModificationMessage(
+			new BMessage(SLIDER_BRIGHTNESS_MSG));
+		fBrightnessSlider->SetValue(fOriginalBrightness * 255);
+	} else {
+		// The driver does not support changing the brightness,
+		// so hide the slider
+		fBrightnessSlider->Hide();
+
+		fOriginalBrightness = -1;
+	}
+
 	// TODO: we don't support getting the screen's preferred settings
 	/* fDefaultsButton = new BButton(buttonRect, "DefaultsButton", "Defaults",
 		new BMessage(BUTTON_DEFAULTS_MSG));*/
@@ -529,7 +545,10 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 				.AddStrut(floorf(controlsBox->TopBorderOffset()) - 1)
 				.Add(screenBox)
 				.End()
-			.Add(controlsBox, 2)
+			.AddGroup(B_VERTICAL, 0, 1)
+				.Add(controlsBox, 2)
+				.Add(fBrightnessSlider)
+				.End()
 			.End()
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)
@@ -1118,6 +1137,10 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 			fScreenMode.Revert();
 			_UpdateActiveMode();
+
+			BScreen screen(this);
+			screen.SetBrightness(fOriginalBrightness);
+			fBrightnessSlider->SetValue(fOriginalBrightness * 255);
 			break;
 		}
 
@@ -1134,6 +1157,14 @@ ScreenWindow::MessageReceived(BMessage* message)
 		case UPDATE_DESKTOP_COLOR_MSG:
 			PostMessage(message, fMonitorView);
 			break;
+
+		case SLIDER_BRIGHTNESS_MSG:
+		{
+			BScreen screen(this);
+			screen.SetBrightness(message->FindInt32("be:value") / 255.f);
+			_CheckApplyEnabled();
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -1214,8 +1245,13 @@ ScreenWindow::_CheckApplyEnabled()
 	uint32 rows;
 	BPrivate::get_workspaces_layout(&columns, &rows);
 
+	BScreen screen(this);
+	float brightness = -1;
+	screen.GetBrightness(&brightness);
+
 	fRevertButton->SetEnabled(columns != fOriginalWorkspacesColumns
 		|| rows != fOriginalWorkspacesRows
+		|| brightness != fOriginalBrightness
 		|| fSelected != fOriginal);
 }
 

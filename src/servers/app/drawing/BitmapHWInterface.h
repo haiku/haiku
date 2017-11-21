@@ -51,6 +51,9 @@ public:
 	virtual uint32				DPMSMode();
 	virtual uint32				DPMSCapabilities();
 
+	virtual status_t			SetBrightness(float);
+	virtual status_t			GetBrightness(float*);
+
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const;
 	virtual	RenderingBuffer*	BackBuffer() const;

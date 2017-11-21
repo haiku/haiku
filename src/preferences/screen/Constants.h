@@ -36,6 +36,7 @@ static const uint32 POP_TV_STANDARD_MSG = 'ptvs';
 static const uint32 UPDATE_DESKTOP_MSG = 'udsk';
 static const uint32 SLIDER_MODIFICATION_MSG = 'sldm';
 static const uint32 SLIDER_INVOKE_MSG = 'sldi';
+static const uint32 SLIDER_BRIGHTNESS_MSG = 'brig';
 static const uint32 SET_CUSTOM_REFRESH_MSG = 'scrf';
 static const uint32 DIM_COUNT_MSG = 'scrf';
 static const uint32 MAKE_INITIAL_MSG = 'mkin';

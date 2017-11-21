@@ -82,6 +82,9 @@ public:
 			uint32				DPMSState();
 			uint32				DPMSCapabilites();
 
+			status_t			GetBrightness(float*);
+			status_t			SetBrightness(float);
+
 			void*				BaseAddress();
 			uint32				BytesPerRow();
 

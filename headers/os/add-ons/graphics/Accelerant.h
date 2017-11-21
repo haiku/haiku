@@ -52,6 +52,8 @@ enum {
 	B_GET_PREFERRED_DISPLAY_MODE,		/* optional */
 	B_GET_MONITOR_INFO,					/* optional */
 	B_GET_EDID_INFO,					/* optional */
+	B_SET_BRIGHTNESS,                   /* optional */
+	B_GET_BRIGHTNESS,                   /* optional */
 
 	/* cursor managment */
 	B_MOVE_CURSOR = 0x200,				/* optional */
@@ -305,6 +307,9 @@ typedef status_t (*set_dpms_mode)(uint32 dpms_flags);
 typedef status_t (*get_preferred_display_mode)(display_mode* preferredMode);
 typedef status_t (*get_monitor_info)(monitor_info* info);
 typedef status_t (*get_edid_info)(void* info, uint32 size, uint32* _version);
+typedef status_t (*set_brightness)(float brightness);
+typedef status_t (*get_brightness)(float* brightness);
+
 typedef sem_id (*accelerant_retrace_semaphore)(void);
 
 typedef status_t (*set_cursor_shape)(uint16 width, uint16 height,

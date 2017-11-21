@@ -809,6 +809,11 @@ struct intel_free_graphics_memory {
 #define PANEL_DIVISOR_POW_CYCLE_DLY_MASK 0x1f
 #define PANEL_DIVISOR_POW_CYCLE_DLY_SHIFT 0x1f
 
+// Backlight control registers
+#define INTEL_BLC_PWM_CTL2              (0x8250 | REGS_NORTH_SHARED)
+#define INTEL_BLC_PWM_CTL               (0x8254 | REGS_NORTH_SHARED)
+#define INTEL_SBLC_PWM_CTL2             (0x8254 | REGS_SOUTH_SHARED)
+
 // ring buffer commands
 
 #define COMMAND_NOOP					0x00

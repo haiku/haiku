@@ -36,6 +36,8 @@ status_t intel_propose_display_mode(display_mode* target,
 status_t intel_set_display_mode(display_mode* mode);
 status_t intel_get_display_mode(display_mode* currentMode);
 status_t intel_get_edid_info(void* info, size_t size, uint32* _version);
+status_t intel_set_brightness(float brightness);
+status_t intel_get_brightness(float* brightness);
 status_t intel_get_frame_buffer_config(frame_buffer_config* config);
 status_t intel_get_pixel_clock_limits(display_mode* mode, uint32* low,
 	uint32* high);

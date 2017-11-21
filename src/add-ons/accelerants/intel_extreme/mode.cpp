@@ -660,6 +660,37 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 
 
 status_t
+intel_set_brightness(float brightness)
+{
+	CALLED();
+
+	if (brightness < 0 || brightness > 1)
+		return B_BAD_VALUE;
+
+	uint16_t sblc = read32(INTEL_SBLC_PWM_CTL2) >> 16;
+	write32(INTEL_BLC_PWM_CTL, (uint32_t)(sblc * brightness));
+
+	return B_OK;
+}
+
+
+status_t
+intel_get_brightness(float* brightness)
+{
+	CALLED();
+
+	if (brightness == NULL)
+		return B_BAD_VALUE;
+
+	uint16_t sblc = read32(INTEL_SBLC_PWM_CTL2) >> 16;
+	uint16_t  blc = read32( INTEL_BLC_PWM_CTL );
+	*brightness = (float)blc / sblc;
+
+	return B_OK;
+}
+
+
+status_t
 intel_get_frame_buffer_config(frame_buffer_config* config)
 {
 	CALLED();

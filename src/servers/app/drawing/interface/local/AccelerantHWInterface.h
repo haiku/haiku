@@ -56,6 +56,9 @@ public:
 	virtual uint32				DPMSMode();
 	virtual uint32				DPMSCapabilities();
 
+	virtual status_t			SetBrightness(float);
+	virtual status_t			GetBrightness(float*);
+
 	virtual status_t			GetAccelerantPath(BString& path);
 	virtual status_t			GetDriverPath(BString& path);
 
@@ -158,6 +161,10 @@ private:
 			dpms_capabilities	fAccDPMSCapabilities;
 			dpms_mode			fAccDPMSMode;
 			set_dpms_mode		fAccSetDPMSMode;
+
+			// brightness hooks
+			set_brightness		fAccSetBrightness;
+			get_brightness		fAccGetBrightness;
 
 			// overlay hooks
 			overlay_count				fAccOverlayCount;

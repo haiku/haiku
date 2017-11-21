@@ -56,6 +56,9 @@ public:
 	virtual uint32				DPMSMode();
 	virtual uint32				DPMSCapabilities();
 
+	virtual status_t			SetBrightness(float);
+	virtual status_t			GetBrightness(float*);
+
 	// query for available hardware accleration and perform it
 	virtual	uint32				AvailableHWAcceleration() const;
 

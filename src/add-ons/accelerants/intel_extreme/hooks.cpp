@@ -45,6 +45,10 @@ get_accelerant_hook(uint32 feature, void* data)
 #ifdef __HAIKU__
 		case B_GET_EDID_INFO:
 			return (void*)intel_get_edid_info;
+		case B_SET_BRIGHTNESS:
+			return (void*)intel_set_brightness;
+		case B_GET_BRIGHTNESS:
+			return (void*)intel_get_brightness;
 #endif
 		case B_GET_FRAME_BUFFER_CONFIG:
 			return (void*)intel_get_frame_buffer_config;

@@ -517,6 +517,20 @@ HTML5HWInterface::RetraceSemaphore()
 
 
 status_t
+HTML5HWInterface::SetBrightness(float)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+HTML5HWInterface::GetBrightness(float*)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
 HTML5HWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	return B_UNSUPPORTED;

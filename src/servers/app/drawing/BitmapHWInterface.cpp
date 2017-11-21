@@ -176,6 +176,20 @@ BitmapHWInterface::DPMSCapabilities()
 }
 
 
+status_t
+BitmapHWInterface::SetBrightness(float)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BitmapHWInterface::GetBrightness(float*)
+{
+	return B_UNSUPPORTED;
+}
+
+
 RenderingBuffer*
 BitmapHWInterface::FrontBuffer() const
 {

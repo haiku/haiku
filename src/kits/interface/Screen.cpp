@@ -333,6 +333,24 @@ BScreen::DPMSCapabilites()
 }
 
 
+status_t
+BScreen::GetBrightness(float* brightness)
+{
+	if (fScreen != NULL)
+		return fScreen->GetBrightness(brightness);
+	return B_ERROR;
+}
+
+
+status_t
+BScreen::SetBrightness(float brightness)
+{
+	if (fScreen != NULL)
+		return fScreen->SetBrightness(brightness);
+	return B_ERROR;
+}
+
+
 //	#pragma mark - Deprecated methods
 
 
