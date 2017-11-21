@@ -1301,8 +1301,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 					&dev->info.u.h0.base_register_sizes[i],
 					&dev->info.u.h0.base_register_flags[i],
 					i < 5 ? &dev->info.u.h0.base_registers_pci[i + 1] : NULL);
-				dev->info.u.h0.base_registers[i] = (addr_t)pci_ram_address(
-					(void *)(addr_t)dev->info.u.h0.base_registers_pci[i]);
+				dev->info.u.h0.base_registers[i] = (uint32)pci_ram_address(
+					dev->info.u.h0.base_registers_pci[i]);
 				i += barSize;
 			}
 
@@ -1310,8 +1310,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_command, 2, pcicmd);
 
-			dev->info.u.h0.rom_base = (addr_t)pci_ram_address(
-				(void *)(addr_t)dev->info.u.h0.rom_base_pci);
+			dev->info.u.h0.rom_base = (uint32)pci_ram_address(
+				dev->info.u.h0.rom_base_pci);
 
 			dev->info.u.h0.cardbus_cis = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_cardbus_cis, 4);
@@ -1347,8 +1347,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 					&dev->info.u.h1.base_register_sizes[i],
 					&dev->info.u.h1.base_register_flags[i],
 					i < 5 ? &dev->info.u.h1.base_registers_pci[i + 1] : NULL);
-				dev->info.u.h1.base_registers[i] = (addr_t)pci_ram_address(
-					(void *)(addr_t)dev->info.u.h1.base_registers_pci[i]);
+				dev->info.u.h1.base_registers[i] = (uint32)pci_ram_address(
+					dev->info.u.h1.base_registers_pci[i]);
 				i += barSize;
 			}
 
@@ -1356,8 +1356,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 			WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
 				PCI_command, 2, pcicmd);
 
-			dev->info.u.h1.rom_base = (addr_t)pci_ram_address(
-				(void *)(addr_t)dev->info.u.h1.rom_base_pci);
+			dev->info.u.h1.rom_base = (uint32)pci_ram_address(
+				dev->info.u.h1.rom_base_pci);
 
 			dev->info.u.h1.primary_bus = ReadConfig(dev->domain, dev->bus,
 				dev->device, dev->function, PCI_primary_bus, 1);

@@ -44,8 +44,8 @@ pci_controller_init(void)
 }
 
 
-void *
-pci_ram_address(const void *physical_address_in_system_memory)
+phys_addr_t
+pci_ram_address(phys_addr_t physical_address_in_system_memory)
 {
-	return (void *)physical_address_in_system_memory;
+	return physical_address_in_system_memory;
 }

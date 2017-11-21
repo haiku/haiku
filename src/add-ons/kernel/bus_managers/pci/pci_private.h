@@ -44,7 +44,7 @@ extern pci_device_module_info gPCIDeviceModule;
 extern "C" {
 #endif
 
-void *		pci_ram_address(const void *physical_address_in_system_memory);
+phys_addr_t		pci_ram_address(phys_addr_t physical_address_in_system_memory);
 
 status_t 	pci_find_capability(uint8 bus, uint8 device, uint8 function,
 	uint8 cap_id, uint8 *offset);

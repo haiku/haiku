@@ -146,7 +146,7 @@ struct pci_module_info {
 						uint32	value		/* value to write */
 					);
 
-	void *			(*ram_address) (const void *physical_address_in_system_memory);
+	phys_addr_t		(*ram_address) (phys_addr_t physical_address_in_system_memory);
 
 	status_t		(*find_pci_capability) (
 						uchar	bus,

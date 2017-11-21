@@ -80,8 +80,8 @@ pci_device_write_pci_config(pci_device* device, uint16 offset, uint8 size,
 }
 
 
-static void*
-pci_device_ram_address(pci_device* device, const void* physicalAddress)
+static phys_addr_t
+pci_device_ram_address(pci_device* device, phys_addr_t physicalAddress)
 {
 	return pci_ram_address(physicalAddress);
 }
