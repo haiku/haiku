@@ -70,11 +70,11 @@ arch_isa_write_io_32(int mapped_io_addr, uint32 value)
 }
 
 
-void *
-arch_isa_ram_address(const void *physical_address_in_system_memory)
+phys_addr_t
+arch_isa_ram_address(phys_addr_t physical_address_in_system_memory)
 {
 	// this is what the BeOS kernel does
-	return (void *)physical_address_in_system_memory;
+	return physical_address_in_system_memory;
 }
 
 

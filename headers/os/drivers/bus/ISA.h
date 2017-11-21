@@ -46,7 +46,7 @@ typedef struct isa2_module_info {
 	void (*write_io_32)(int mapped_io_addr, uint32 value);
 
 	// don't know what it's for, remains for compatibility
-	void *(*ram_address)(const void *physical_address_in_system_memory);
+	phys_addr_t (*ram_address)(phys_addr_t physical_address_in_system_memory);
 
 	// start dma transfer (scattered DMA is not supported as it's EISA specific)
 	status_t (*start_isa_dma)(

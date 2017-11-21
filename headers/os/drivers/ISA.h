@@ -48,7 +48,7 @@ typedef struct isa_module_info {
 	uint32			(*read_io_32) (int mapped_io_addr);
 	void			(*write_io_32) (int mapped_io_addr, uint32 value);
 
-	void *			(*ram_address) (const void *physical_address_in_system_memory);
+	phys_addr_t		(*ram_address) (phys_addr_t physical_address_in_system_memory);
 
 	long			(*make_isa_dma_table) (
 							const void		*buffer,		/* buffer to make a table for */

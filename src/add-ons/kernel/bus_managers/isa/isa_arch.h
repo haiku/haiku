@@ -24,7 +24,7 @@ extern uint16 arch_isa_read_io_16(int mapped_io_addr);
 extern void arch_isa_write_io_16(int mapped_io_addr, uint16 value);
 extern uint32 arch_isa_read_io_32(int mapped_io_addr);
 extern void arch_isa_write_io_32(int mapped_io_addr, uint32 value);
-extern void *arch_isa_ram_address(const void *);
+extern phys_addr_t arch_isa_ram_address(phys_addr_t);
 extern status_t arch_start_isa_dma(long channel, void *buf,
 								   long transfer_count,
 								   uchar mode, uchar e_mode);
