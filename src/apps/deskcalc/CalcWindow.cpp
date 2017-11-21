@@ -45,7 +45,7 @@ CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 		kMinimumHeightBasic, kMaximumHeightBasic);
 
 	frame.OffsetTo(B_ORIGIN);
-	fCalcView = new CalcView(frame, baseColor, settings);
+	fCalcView = new CalcView(Frame(), baseColor, settings);
 
 	// create replicant dragger
 	BRect replicantFrame(frame);
