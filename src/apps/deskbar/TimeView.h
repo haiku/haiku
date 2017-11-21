@@ -114,6 +114,7 @@ private:
 
 				void			GetCurrentTime();
 				void			GetCurrentDate();
+				void			UpdateTimeFormat();
 				void			CalculateTextPlacement();
 				void			ShowTimeOptions(BPoint);
 				void			Update();
@@ -149,7 +150,8 @@ private:
 				BMessenger		fCalendarWindow;
 
 				// For date and time localization purposes
-				BLocale			fLocale;
+				BDateTimeFormat* fTimeFormat;
+				BDateFormat*	fDateFormat;
 };
 
 

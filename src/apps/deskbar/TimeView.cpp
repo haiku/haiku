@@ -74,7 +74,9 @@ TTimeView::TTimeView(float maxWidth, float height)
 	fShowLevel(0),
 	fShowSeconds(false),
 	fShowDayOfWeek(false),
-	fShowTimeZone(false)
+	fShowTimeZone(false),
+	fTimeFormat(NULL),
+	fDateFormat(NULL)
 {
 	fCurrentTime = fLastTime = time(NULL);
 	fSeconds = fMinute = fHour = 0;
@@ -83,24 +85,28 @@ TTimeView::TTimeView(float maxWidth, float height)
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
-	fLocale = *BLocale::Default();
+	UpdateTimeFormat();
 }
 
 
 #ifdef AS_REPLICANT
 TTimeView::TTimeView(BMessage* data)
-	: BView(data)
+	: BView(data),
+	fTimeFormat(NULL),
+	fDateFormat(NULL)
 {
 	fCurrentTime = fLastTime = time(NULL);
 	data->FindBool("seconds", &fShowSeconds);
 
-	fLocale = *BLocale::Default();
+	UpdateTimeFormat();
 }
 #endif
 
 
 TTimeView::~TTimeView()
 {
+	delete fTimeFormat;
+	delete fDateFormat;
 }
 
 
@@ -322,6 +328,7 @@ void
 TTimeView::SetShowSeconds(bool show)
 {
 	fShowSeconds = show;
+	UpdateTimeFormat();
 	Update();
 }
 
@@ -337,6 +344,7 @@ void
 TTimeView::SetShowDayOfWeek(bool show)
 {
 	fShowDayOfWeek = show;
+	UpdateTimeFormat();
 	Update();
 }
 
@@ -352,6 +360,7 @@ void
 TTimeView::SetShowTimeZone(bool show)
 {
 	fShowTimeZone = show;
+	UpdateTimeFormat();
 	Update();
 }
 
@@ -386,7 +395,7 @@ TTimeView::ShowCalendar(BPoint where)
 
 
 void
-TTimeView::GetCurrentTime()
+TTimeView::UpdateTimeFormat()
 {
 	int32 fields = B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE;
 	if (fShowSeconds)
@@ -396,10 +405,18 @@ TTimeView::GetCurrentTime()
 	if (fShowTimeZone)
 		fields |= B_DATE_ELEMENT_TIMEZONE;
 
-	BDateTimeFormat format(&fLocale);
-	format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
+	delete fTimeFormat;
+	fTimeFormat = new BDateTimeFormat(BLocale::Default());
+	fTimeFormat->SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
 
-	format.Format(fCurrentTimeStr, sizeof(fCurrentTimeStr), fCurrentTime,
+	delete fDateFormat;
+	fDateFormat = new BDateFormat(BLocale::Default());
+}
+
+void
+TTimeView::GetCurrentTime()
+{
+	fTimeFormat->Format(fCurrentTimeStr, sizeof(fCurrentTimeStr), fCurrentTime,
 		B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT);
 }
 
@@ -409,8 +426,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[sizeof(fCurrentDateStr)];
 
-	BDateFormat format(&fLocale);
-	format.Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
+	fDateFormat->Format(tmp, sizeof(fCurrentDateStr), fCurrentTime,
 		B_FULL_DATE_FORMAT);
 
 	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
@@ -476,8 +492,6 @@ TTimeView::ShowTimeOptions(BPoint point)
 void
 TTimeView::Update()
 {
-	fLocale = *BLocale::Default();
-
 	GetCurrentTime();
 	GetCurrentDate();
 	SetToolTip(fCurrentDateStr);
