@@ -3,1773 +3,317 @@ RemotePackageRepository HaikuPorts
 	: http://packages.haiku-os.org/haikuports/master/repo/x86_gcc2
 	:
 	# architecture "any" packages
-	avr_libc_x86-1.8.0-2
 	be_book-2008_10_26-1
-	ca_root_certificates-2017_01_18-1
-	caladea-20130214-3
-	carlito-20130920-1
-	check_common-0.10.0-2
-	colormake-0.9.20140503-1
-	dejavu-2.37-1
-	docbook_xml_dtd-4.5-2
-	docbook_xsl_stylesheets-1.78.1-1
-	droid-113-2
-	flare_x86_data-0.19-3
-	fontawesome-4.6.3-1
-	freedroidrpg_x86_data-0.16.1-1
-	gnuefi-3.0.4-1
-	gws-0.1.8-2
+	gnu_efi_kernel-3.0.4-1
 	haikuporter-1.2.0-1
-	hub-1.12.4-3
-	mako_python-1.0.3-1
-	mako_python3-1.0.3-1
-	meson-0.40.1-1
-	netsurf_buildsystem-1.5-2
 	noto-20170202-6
-	noto_chroscore-20170202-4
-	noto_regional-20170202-4
-	noto_sans_cjk_kr-1.004-2
 	noto_sans_cjk_jp-1.004-2
-	noto_sans_cjk_sc-1.004-2
-	noto_sans_cjk_tc-1.004-2
-	openttd_gfx-0.4.7-1
-	openttd_msx-0.3.1-2
-	openttd_sfx-0.2.3-1
-	setuptools_python-28.8.0-2
-	setuptools_python3-28.8.0-2
-	texi2html-1.82-2
 	timgmsoundfont-fixed-5
-	unknown_horizons-2014.1-1
-	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-4
-	youtube_dl-2017.04.28-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
-	2cdt-2016.10.16-1
-	a_book-1.1-4
-	a52dec-0.7.4-2
-	a52dec_devel-0.7.4-2
-	acr-0.9.9_git-1
-	album-0.9.4-4
-	ale-0.9.1-2
-	app2png-1.0.0-1
-	apr-1.5.2-2
-	apr_devel-1.5.2-2
-	apr_util-1.5.4-2
-	apr_util_devel-1.5.4-2
-	armyknife-5.1.0-4
-	artpaint-2.1.2-2
-	asciidoc-8.6.8-2
-	aspell-0.60.6.1-2
-	aspell_devel-0.60.6.1-2
 	autoconf-2.69-6
-	automake113-1.13.1-1
 	automake-1.15.0-1
-	avra-1.3.0-1
 	bash-4.3.42-4
-	bc-1.07.1-2
-	beae-1.2-3
-	beam-1.2-2
-	becasso-2.0-3
-	becjk-1.0.1-2
-	beezer-0.99-1
-	befar-4.2_beta-3
-	beget-1.2.3-4
-	belife-1.0.0-2
-	bemines-1.0b2-1
-	bepodder-1.3.0-3
-	bescreencapture-2.2.1-1
-	bescreencapture_inputfilter-2.2.1-1
-	bevexed-20141224-2
-	bezilla-2.0.0.22-1
+	bepdf-2.0.1~beta1-2
 	binutils-2.17_2016_07_24-2
 	bison-3.0.4-3
-	blogpositive-0.4.0-2
-	bonnie++-1.03e-1
-	bookmarkconverter-0.4.3-1
-	buildbot_slave-0.8.8-4
-	burnitnow-1.1-3
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	bzr-2.6.0-2
-	canna-1.0.1-1
-	capitalbe-1.1-5
-	catkeyseditor-0.1.2-3
-	caya-0.0.3-6
-	ccache-3.1.9-1
 	cdrtools-3.02~a07-1
 	cdrtools_devel-3.02~a07-1
-	chat-20100903-3
-	check-0.10.0-2
-	check_devel-0.10.0-2
-	clipdinger-1.0-4
-	clockwerk-git-3
-	confuse-2.7-3
-	confuse_devel-2.7-3
-	cpctools-0.3.0-6
-	cpio-2.12-1
-	cppunit-1.12.1-2
-	cppunit_devel-1.12.1-2
-	criticalmass-2.2-1
 	ctags-5.8-4
-	colors-2.3-2
 	coreutils-8.24-1
 	curl-7.45.0-2
 	curl_devel-7.45.0-2
-	cython-0.23.4-1
 	cvs-1.12.13.1-7
-	d52-3.4.1-1
-	desknotes-1.1-4
-	dfu_util-0.8-1
 	diffutils-3.3-4
-	distcc-3.1-3
-	djvulibre-3.5.25-2
-	djvulibre_devel-3.5.25-2
-	djvutranslator-1.0.1-3
-	djvuviewer-1.2.1-2
-	dmidecode-2.12-2
-	dockbert-1.0.2b1-5
-	dos2unix-7.3.1-1
-	doxygen-1.7.6.1-1
-	ducksaver-1.1.0-2
-	ed-1.7-1
-	einsteinium-1.4.1a-1
-	enca-1.15-1
-	enca_devel-1.15-1
-	exomizer-2.0.9-1
 	expat-2.2.0-1
 	expat_devel-2.2.0-1
-	faac-1.28-3
-	faac_devel-1.28-3
-	faad2-2.7-1
-	faad2_devel-2.7-1
-	fasm-1.71.39-1
-	f1spirit-0.rc9.1615-2
-	file-5.25-1
-	file_devel-5.25-1
-	filer-1.2.0-1
-	filwip-1.0.1-2
 	findutils-4.4.2-3
 	ffmpeg-0.10.16-1
 	ffmpeg_devel-0.10.16-1
-	fftw-3.3.4-6
-	fftw_devel-3.3.4-6
-	flac-1.3.1-1
-	flac_devel-1.3.1-1
 	flex-2.5.39-2
 	fluidlite_devel-1.0.0-1
-	fluidsynth-1.1.6-2
-	fluidsynth_devel-1.1.6-2
-	fontboy-0.9.7-3
-	fontconfig-2.12.6-1
-	fontconfig_devel-2.12.6-1
-	fossil-1.37-1
-	freetype-2.8.1-1
-	freetype_debuginfo-2.8.1-1
-	freetype_devel-2.8.1-1
-	fribidi-0.19.6-2
-	fribidi_devel-0.19.6-2
-	friss-0.8.1-1
-	fuse-1.1.1-1
-	fusesmb_haiku-0.9-1
+	fontconfig-2.12.1-2
+	fontconfig_devel-2.12.1-2
+	freetype-2.7-1
+	freetype_devel-2.7-1
 	gawk-4.1.3-1
-	gcal-3.6.3-1
 	gcc-2.95.3_2017_07_20-1
 	gcc_syslibs_devel-2.95.3_2017_07_20-1
-	genesis_commander-0.42-2
-	getconf-0.5-1
-	getopt-1.1.6-1
-	gettext-0.19.8.1-4
-	gettext_libintl-0.19.8.1-4
-	gdb-6.3-1
-	giddy3-1.5-2
 	giflib-5.1.2-1
 	giflib_devel-5.1.2-1
-	giflib6-5.0.5-2
-	giflib6_devel-5.0.5-2
 	git-2.7.0-3
 	git_arch-2.7.0-3
 	git_cvs-2.7.0-3
 	git_daemon-2.7.0-3
 	git_email-2.7.0-3
 	git_svn-2.7.0-3
-	glew-1.13.0-2
-	glew_devel-1.13.0-2
-	glew_util-1.13.0-2
-	glib2-2.46.2-1
-	glib2_devel-2.46.2-1
 	glu-9.0.0-4
 	glu_devel-9.0.0-4
-	gmp-6.0.0-1
-	gmp_devel-6.0.0-1
-	gnupg-1.4.21-1
-	gnutls-2.8.6-1
-	gnutls_devel-2.8.6-1
-	gperf-3.0.4-1
-	gpgme-1.6.0-1
-	gpgme_devel-1.6.0-1
-	grafx2-2.5-2
 	grep-2.24-1
-	groff-1.20.1-3
-	gtk_doc-1.20-1
-	guilib-1.2.1-1
-	guilib_devel-1.2.1-1
 	gutenprint-5.2.12-2
 	gutenprint_devel-5.2.12-2
-	gyp-git-2
 	gzip-1.6-2
-	hdialog-0.2-2
-	help2man-1.46.6-1
-	hexvexed-1.0.0-2
-	htmldoc-1.8.29-1
-	html_parser-3.71-2
-	icebreaker-1.9.7-1
 	icu-57.1-1
 	icu_devel-57.1-1
-	icu_tools-57.1-1
-	icu55-55.1-1
-	icu55_devel-55.1-1
-	icu56-56.1-1
-	icu56_devel-56.1-1
-	imagemagick-6.9.6.3-1
-	imagemagick_devel-6.9.6.3-1
-	inputproto-2.3.1-1
-	intltool-0.40.6-4
-	itstool-2.0.2-1
-	jabber4haiku-1.2.1-3
 	jam-2.5_2012_10_12-4
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
-	jasper_tools-1.900.1-4
-	jbig2dec-0.11-2
-	jbig2dec_devel-0.11-2
 	jpeg-9b-2
 	jpeg_devel-9b-2
-	jpeg_tools-9b-2
-	kbproto-1.0.7-1
 	keymapswitcher-1.2.7.11-2
-	lame-3.99.5-7
-	lame_devel-3.99.5-7
-	lbreakout2-2.6.5-3
-	lcms-2.5-3
-	lcms_devel-2.5-3
-	leptonica-1.73-4
-	leptonica_devel-1.73-4
-	leptonica_tools-1.73-4
 	less-481-1
-	lha-1.14i-2
-	libao-1.2.0-1
-	libao_devel-1.2.0-1
-	libart_lgpl-2.3.21-1
-	libart_lgpl_devel-2.3.21-1
-	libasr-1.0.2-2
-	libasr_devel-1.0.2-2
-	libassuan-2.4.3-1
-	libassuan_devel-2.4.3-1
-	libcddb-1.3.2-2
-	libcddb_devel-1.3.2-2
-	libcdio-0.93-3
-	libcdio_devel-0.93-3
-	libcuefile-r475-1
-	libcuefile_devel-r475-1
-	libdca-0.0.5-3
-	libdca_devel-0.0.5-3
-	libdsk-1.5.4-2
-	libdsk_devel-1.5.4-2
-	libdsk_tools-1.5.4-2
-	libdvbpsi-1.2.0-1
-	libdvbpsi_devel-1.2.0-1
-	libdvdcss-1.3.0-1
-	libdvdcss_devel-1.3.0-1
-	libdvdnav-5.0.3-3
-	libdvdnav_devel-5.0.3-3
-	libdvdread-5.0.3-2
-	libdvdread_devel-5.0.3-2
-	libebml-1.3.1-2
-	libebml_devel-1.3.1-2
 	libedit-2015_03_21_3.1-5
 	libedit_devel-2015_03_21_3.1-5
-	libffi-3.0.13-2
-	libffi_devel-3.0.13-2
-	libgcrypt-1.7.2-2
-	libgcrypt_devel-1.7.2-2
-	libgpg_error-1.27-2
-	libgpg_error_devel-1.27-2
 	libicns-0.8.1-3
 	libicns_devel-0.8.1-3
-	libiconv-1.13.1-9
-	libiconv_devel-1.13.1-9
-	libid3tag-0.15.1b-1
-	libid3tag_devel-0.15.1b-1
-	libidl-0.8.14-1
-	libidl_devel-0.8.14-1
-	libidn-1.32-1
-	libidn_devel-1.32-1
-	libiodbc-3.52.9-1
-	libiodbc_devel-3.52.9-1
-	libiptcdata-1.0.4-1
-	libiptcdata_devel-1.0.4-1
-	liblayout-1.4.1-1
-	liblayout_devel-1.4.1-1
-	libmad-0.15.1b-2
-	libmad_devel-0.15.1b-2
-	libmatroska-1.4.2-1
-	libmatroska_devel-1.4.2-1
-	libmikmod-3.3.7-1
-	libmikmod_devel-3.3.7-1
-	libmkv-0.6.5.1-3
-	libmkv_devel-0.6.5.1-3
-	libmodplug-0.8.8.5-3
-	libmodplug_devel-0.8.8.5-3
-	libmpeg2-0.5.1-3
-	libmpeg2_devel-0.5.1-3
 	libogg-1.3.2-2
 	libogg_devel-1.3.2-2
-	libpaper-1.1.24-1
-	libpaper_devel-1.1.24-1
 	libpcap-1.7.4-1
 	libpcap_devel-1.7.4-1
-	libpcre-8.41-1
-	libpcre_devel-8.41-1
-	libpcre0-8.21-7
-	libpcre2-10.30-1
-	libpcre2_devel-10.30-1
-	libpng-1.5.25-2
-	libpng_devel-1.5.25-2
-	libpng16-1.6.34-1
-	libpng16_devel-1.6.34-1
-	libpthread_stubs-0.3-2
-	libreplaygain-r475-1
-	libreplaygain_devel-r475-1
-	libsanta-3.0.1-1
-	libsanta_devel-3.0.1-1
-	libsdl-1.2.15-9
-	libsdl_devel-1.2.15-9
-	libsdl2-2.0.5-4
-	libsdl2_devel-2.0.5-4
-	libsigc++-1.2.7-1
-	libsigc++_devel-1.2.7-1
-	libsndfile-1.0.25-3
-	libsndfile_devel-1.0.25-3
+	libpng16-1.6.20-2
+	libpng16_devel-1.6.20-2
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
-	libspectrum-1.1.1-2
-	libspectrum_devel-1.1.1-2
-	libssh2-1.5.0-2
-	libssh2_devel-1.5.0-2
-	libtasn1-4.12-1
-	libtasn1_devel-4.12-1
 	libtheora-1.1.1-3
 	libtheora_devel-1.1.1-3
 	libtool-2.4.2-1
-	libtool_libltdl-2.4.2-1
-	libunistring-0.9.6-1
-	libunistring_devel-0.9.6-1
-	libusb-1.0.20-2
-	libusb_devel-1.0.20-2
-	libusb_compat-0.1.5-4
-	libusb_compat_devel-0.1.5-4
-	libutf8proc-1.3.1~2-1
-	libutf8proc_devel-1.3.1~2-1
-	libuuid-1.0.3-3
-	libuuid_devel-1.0.3-3
 	libvorbis-1.3.5-2
 	libvorbis_devel-1.3.5-2
-	libvpx-1.0.0-2
-	libvpx_devel-1.0.0-2
 	libwebp-0.6.0-1
 	libwebp_devel-0.6.0-1
-	libwebp5-0.4.4-1
-	libwebp5_devel-0.4.4-1
-	libwebp6-0.5.2-2
-	libwebp6_devel-0.5.2-2
-	libx11-1.6.3-2
-	libx11_devel-1.6.3-2
-	libxau-1.0.8-2
-	libxcb-1.6-2
-	libxml2-2.9.3-2
-	libxml2_devel-2.9.3-2
-	libxml2_python-2.9.3-2
-	libxpm-3.5.11-3
-	libxpm_devel-3.5.11-3
-	libxslt-1.1.28-6
-	libxslt_devel-1.1.28-6
-	libzip-0.11.2-1
-	libzip_devel-0.11.2-1
-	lighttpd-1.4.35-3
-	lighttpd_devel-1.4.35-3
-	links-2.8-3
 	live555-2016.01.29-3
 	live555_devel-2016.01.29-3
-	lmarbles-1.0.8-2
-	lnlauncher-1.1.2-6
-	ltris-1.0.19-1
-	lua-5.2.3-2
-	lua_devel-5.2.3-2
-	lynx-2.8.9dev.11-1
-	lz4-r131-1
-	lz4_devel-r131-1
-	lzo-2.09-1
-	lzo_devel-2.09-1
 	m4-1.4.17-3
-	mailnews-2.0.0.25-1
 	make-4.1-1
 	man-1.6g-4
-	mc-4.8.15-2
-	mda_vst-20100214-1
 	mercurial-2.9.2-1
 	mesa-7.9.2-10
 	mesa_devel-7.9.2-10
 	mesa_swrast-7.9.2-10
-	mev-0.9.0-3
-	milkytracker-0.90.86-2
-	mirrormagic-2.0.2-1
 	mkdepend-1.7-3
-	mksh-r50c-1
-	moe-1.1.2-2
-	mog-0.63.1548-1
-	most-pre5.1_15-1
-	mpg123-1.22.4-1
-	mpg123_devel-1.22.4-1
-	mtr-0.73-1
-	multitalk-1.4-1
-	mupdf-1.7-1
-	mupdf_devel-1.7-1
-	musepack_tools-r475-1
-	musepack_tools_devel-r475-1
-	musicbrainz-5.1.0-2
-	musicbrainz_devel-5.1.0-2
 	nano-2.5.3-1
-	nanosvgtranslator-1.0.1-1
 	nasm-2.11.08-1
-	ncurses-5.9-11
-	ncurses_devel-5.9-11
 	ncurses6-6.0-2
 	ncurses6_devel-6.0-2
-	neon-0.30.1-2
-	neon_devel-0.30.1-2
-	neonlights-0.2-1
 	netcat-1.10-2
-	netpulse-0.2.3-7
-	ocaml-4.02.1-1
-	openjpeg-2.1.2-2
-	openjpeg_devel-2.1.2-2
-	opensound-4.2_git-2
 	openssh-7.4p1-2
 	openssl-1.0.2g-1
 	openssl_devel-1.0.2g-1
-	optipng-0.7.6-2
-	opus-1.1.3-1
-	opus_devel-1.1.3-1
-	opusfile-0.6-1
-	opusfile_devel-0.6-1
-	opus_tools-0.1.9-1
 	p7zip-9.20.1-6
-	padblocker-1.0-1
-	paladin-1.4~git-3
-	paragui-1.1.8-3
-	paragui_devel-1.1.8-3
 	patch-2.7.5-1
-	pciutils-3.2.1-1
-	pciutils_devel-3.2.1-1
-	pdflib-5.0.3-3
-	pdftranslator-1.0.2-2
 	pdfwriter-1.0-2
-	pe-2.4.5-7
-	pecorename-1.5-5
+	pe-2.4.5-5
 	perl-5.18.2-2
-	photograbber-2.2-2
-	php-5.6.4-5
-	physfs-2.0.3-2
-	physfs_devel-2.0.3-2
-	pipepanic-0.1.3-5
 	pkgconfig-0.29-2
-	ponpokodiff-0.2.0-3
-	popt-1.16-1
-	popt_devel-1.16-1
-	postgresql-9.3.5-2
-	postgresql_devel-9.3.5-2
-	psiconv-0.9.8-1
-	psiconv_devel-0.9.8-1
-	psqlodbc-09.03.0400-2
-	psqlodbc_devel-09.03.0400-2
-	pyenet-20141025-1
 	python-2.7.12-1
-	python_dateutil-1.5-2
-	python_httplib2-0.9.2-1
-	python_imaging-1.1.7-2
-	python_lxml-3.3.5-2
-	python_mako-1.0.1-1
-	python_mechanize-0.2.5-2
-	python_requests-2.3.0-2
-	python_sip-4.18-1
-	python_twisted-13.2.0-2
-	python_zope.interface-4.1.1-3
-	python3_sip-4.18-1
-	pyyaml-3.11-1
-	q-1.1-1
-	qemacs-0.4.0dev-1
-	qrencode-3.4.4-1
-	qrencode_devel-3.4.4-1
-	# the non-devel package isn't useful
-	qrencode_kdl_devel-3.4.4-1
-	qsystray-0.1-3
-	quickres-20011026-3
-	rdesktop-1.8.0-3
-	readline-6.3.8-3
-	readline_devel-6.3.8-3
-	roadfighter-1.0.1269-1
-	rsync-3.1.0-2
-	sane_backends-1.0.25-3
-	sane_backends_devel-1.0.25-3
-	sanity-0.6-3
-	samba-3.6.25-1
-	samba_devel-3.6.25-1
-	sawteeth-1.3-4
 	scons-2.3.1-4
-	sdl_gfx-2.0.25-2
-	sdl_gfx_devel-2.0.25-2
-	sdl_image-1.2.12-6
-	sdl_image_devel-1.2.12-6
-	sdl_mixer-1.2.12-6
-	sdl_mixer_devel-1.2.12-6
-	sdl_net-1.2.8-5
-	sdl_net_devel-1.2.8-5
-	sdl_sound-1.0.3-5
-	sdl_sound_devel-1.0.3-5
-	sdl_ttf-2.0.11-5
-	sdl_ttf_devel-2.0.11-5
-	sdl2_gfx-1.0.3-2
-	sdl2_gfx_devel-1.0.3-2
-	sdl2_image-2.0.1-4
-	sdl2_image_devel-2.0.1-4
-	sdl2_mixer-2.0.1-3
-	sdl2_mixer_devel-2.0.1-3
-	sdl2_net-2.0.1-2
-	sdl2_net_devel-2.0.1-2
-	sdl2_ttf-2.0.14-6
-	sdl2_ttf_devel-2.0.14-6
-	sdllopan-10-3
 	sed-4.2.1-6
-	seeker-1.0-4
-	sequitur-2.1.3-3
-	sequitur_devices-2.1.3-3
-	serf-1.3.8-2
-	serf_devel-1.3.8-2
-	sge-030809-3
-	sge_devel-030809-3
 	sharutils-4.15.2-2
-	slang-2.2.4-1
-	slang_devel-2.2.4-1
-	slayer-0.9-4
-	slimevolley-2.4.2-4
-	smjpeg-0.2.1-1
-	smjpeg_devel-0.2.1-1
-	smpeg-0.4.5-4
-	smpeg_devel-0.4.5-4
-	smpeg2-2.0.0-3
-	smpeg2_devel-2.0.0-3
 	speex-1.2~rc2-2
 	speex_devel-1.2~rc2-2
-	sqlite-3.15.2.0-1
-	sqlite_devel-3.15.2.0-1
-	srm-1.2.12-1
-	streamradio-0.0.3_14-1
-	substrate-1.0b-1
 	subversion-1.8.11-8
 	subversion_devel-1.8.11-8
-	sum_it-0.2beta-5
-	super_transball-2.1.5-2
-	swig-3.0.11-1
-	sync_modular-2.2.1b-3
 	taglib-1.7.2-2
 	taglib_devel-1.7.2-2
-	takenotes-1.0.0-5
 	tar-1.28-1
-	taskmanager-0.1.7-3
-	tcl-8.5.18-4
-	tcl_devel-8.5.18-4
 	tcpdump-4.7.4-2
 	texinfo-6.1-1
-	texinfo4-4.13a-1
-	thememanager-1.0_git-3
-	tiff-3.9.6-2
-	tiff_devel-3.9.6-2
-	tiff_tools-3.9.6-2
 	tiff4-4.0.6-3
 	tiff4_devel-4.0.6-3
-	tiff4_tools-4.0.6-3
-	timetracker-0.2-1
-	tinyxml-2.6.2-3
-	tinyxml_devel-2.6.2-3
-	tnftp-20151004-1
-	twolame-0.3.13-3
-	twolame_devel-0.3.13-3
-	ubertuber-0.9.11-4
-	unrar-5.3.4-1
 	unzip-6.0-3
-	util_macros-1.19.0-2
-	vasm-1.8a-1
-	vcdimager-0.7.24-3
-	vcdimager_devel-0.7.24-3
-	vim-7.4-5
-	virtualbox_guest_additions-4.3.53_svn-7
-	vision-0.10.2-1
-	vlc-0.8.6i-1
-	vlc_devel-0.8.6i-1
-	vlink-0.16a-1
-	vmware_addons-1.1.1-6
-	vncserver-1.27-1
-	weather-0.1.1_git-7
+	vision-0.10.1-1
 	wget-1.18-2
-	whereismymouse-1.0-1
 	which-2.21-3
 	wonderbrush-2.1.2-5
 	wpa_supplicant-2.0-4
-	xcb_proto-1.6-2
-	xextproto-7.3.0-1
-	xmlto-0.0.26-1
-	xml_parser-2.36-1
-	xproto-7.0.26-3
-	xrick-021212-2
-	xtrans-1.3.5-2
-	yab-1.7.5.5-2
-	yab_ide-2.2.8a-3
-	yasm-1.3.0-3
 	zip-3.0-3
 	zlib-1.2.11-2
 	zlib_devel-1.2.11-2
-	zsh-5.0.7-2
-
 	# secondary architecture (x86)
-	a52dec_x86-0.7.4-2
-	a52dec_x86_devel-0.7.4-2
-	advancemame_x86-3.5-1
-	arduino_x86-1.7.7-1
-	arm_none_eabi_binutils_x86-2.26.1_2016_07_22-1
-	arm_none_eabi_gcc_x86-4.8.4-1
-	arm_none_eabi_gdb_x86-7.7-1
-	arm_none_eabi_newlib_x86-2.1.0-2
-	aspell_x86-0.60.6.1-2
-	aspell_x86_devel-0.60.6.1-2
-	automoc_x86-0.9.88-3
-	avr_binutils_x86-2.26.1_2016_07_22-1
-	avr_gcc_x86-4.8.2_2014_03_20-1
-	avrdude_x86-6.3-1
-	bepdf-2.0.2-2
-	beshare_x86-2.31-1
 	binutils_x86-2.28.1_2017_08_05-1
 	bison_x86-3.0.4-3
-	boost_x86-1.57.0-1
-	boost_x86_atomic-1.57.0-1
-	boost_x86_chrono-1.57.0-1
-	boost_x86_container-1.57.0-1
-	boost_x86_context-1.57.0-1
-	boost_x86_coroutine-1.57.0-1
-	boost_x86_date_time-1.57.0-1
-	boost_x86_devel-1.57.0-1
-	boost_x86_filesystem-1.57.0-1
-	boost_x86_graph-1.57.0-1
-	boost_x86_iostreams-1.57.0-1
-	boost_x86_locale-1.57.0-1
-	boost_x86_log-1.57.0-1
-	boost_x86_math-1.57.0-1
-	boost_x86_program_options-1.57.0-1
-	boost_x86_random-1.57.0-1
-	boost_x86_regex-1.57.0-1
-	boost_x86_serialization-1.57.0-1
-	boost_x86_signals-1.57.0-1
-	boost_x86_system-1.57.0-1
-	boost_x86_test-1.57.0-1
-	boost_x86_thread-1.57.0-1
-	boost_x86_timer-1.57.0-1
-	boost_x86_unit_test_framework-1.57.0-1
-	boost_x86_wave-1.57.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
-	cairo_x86-1.12.18-3
-	cairo_x86_devel-1.12.18-3
-	capstone_x86-3.0.4-1
-	capstone_x86_devel-3.0.4-1
 	cdrtools_x86-3.02~a07-2
 	cdrtools_x86_devel-3.02~a07-2
-	check_x86-0.10.0-2
-	check_x86_devel-0.10.0-2
-	cmake_x86-3.5.2-1
-	confuse_x86-2.7-3
-	confuse_x86_devel-2.7-3
-	copynametoclipboard-1.0.1-2
-	cppunit_x86-1.12.1-2
-	cppunit_x86_devel-1.12.1-2
 	curl_x86-7.45.0-2
 	curl_x86_devel-7.45.0-2
-	cvsps_x86-2.2b1-1
-	dbus_x86-1.8.6-1
-	dbus_x86_devel-1.8.6-1
-	ddrescue_x86-1.19-1
-	devil_x86-1.7.8-2
-	devil_x86_devel-1.7.8-2
-	djvulibre_x86-3.5.25-1
-	djvulibre_x86_devel-3.5.25-1
-	documentviewer_x86-0.3_git-8
-	dosbox_x86-0.74-3
-	doxygen_x86-1.8.10-2
-	dtc_x86-1.4.1-1
-	dvda_author_x86-05.07-1
-	enca_x86-1.18-1
-	enca_x86_devel-1.18-1
 	expat_x86-2.2.0-1
 	expat_x86_devel-2.2.0-1
-	faac_x86-1.28-4
-	faac_x86_devel-1.28-4
-	faad2_x86-2.7-1
-	faad2_x86_devel-2.7-1
-	file_x86-5.25-1
-	file_x86_devel-5.25-1
-	fish_x86-2.2.0-2
 	ffmpeg_x86-3.2.2-1
 	ffmpeg_x86_devel-3.2.2-1
-	fftw_x86-3.3.4-6
-	fftw_x86_devel-3.3.4-6
-	flac_x86-1.3.1-1
-	flac_x86_devel-1.3.1-1
-	flare_x86-0.19-3
 	fluidlite_x86_devel-1.0.0-1
-	fluidsynth_x86-1.1.6-4
-	fluidsynth_x86_devel-1.1.6-4
-	fontconfig_x86-2.12.6-1
-	fontconfig_x86_devel-2.12.6-1
-	freeciv_x86-2.5.6-2
-	freedroidrpg_x86-0.16.1-1
+	fontconfig_x86-2.12.1-2
+	fontconfig_x86_devel-2.12.1-2
 	freetype_x86-2.7-1
 	freetype_x86_devel-2.7-1
-	fribidi_x86-0.19.6-2
-	fribidi_x86_devel-0.19.6-2
 	gcc_x86-5.4.0_2016_06_04-1
 	gcc_x86_syslibs-5.4.0_2016_06_04-1
 	gcc_x86_syslibs_devel-5.4.0_2016_06_04-1
-	gcc6809_x86-4.6.4-1
-	gdk_pixbuf_x86-2.31.5-1
-	gdk_pixbuf_x86_devel-2.31.5-1
-	gettext_x86-0.19.8.1-4
-	gettext_x86_libintl-0.19.8.1-4
 	giflib_x86-5.1.2-1
 	giflib_x86_devel-5.1.2-1
-	giflib6_x86-5.0.5-4
-	giflib6_x86_devel-5.0.5-4
-	glew_x86-1.11.0-1
-	glew_x86_devel-1.11.0-1
-	glew_x86_util-1.11.0-1
-	glib2_x86-2.46.2-1
-	glib2_x86_devel-2.46.2-1
 	glu_x86-9.0.0-4
 	glu_x86_devel-9.0.0-4
-	gmp_x86-6.1.0-1
-	gmp_x86_devel-6.1.0-1
-	gnuplot_x86-5.0.6-2
-	gnutls_x86-3.4.10-1
-	gnutls_x86_devel-3.4.10-1
-	golang_x86-1.3-2
-	goonies_x86-1.4.1528-3
-	gpgme_x86-1.6.0-1
-	gpgme_x86_devel-1.6.0-1
-	gphoto2_x86-2.5.9-2
-	graphite2_x86-1.3.8-1
-	graphite2_x86_devel-1.3.8-1
-	guilib_x86-1.2.1-1
-	guilib_x86_devel-1.2.1-1
 	haikuwebkit_x86-1.6.2-2
 	haikuwebkit_x86_devel-1.6.2-2
-	handbrake_x86-0.10.5-1
-	harfbuzz_x86-1.3.0-1
-	harfbuzz_x86_devel-1.3.0-1
-	hubbub_x86-0.3.3-2
-	hubbub_x86_devel-0.3.3-2
-	hxcfloppyemulator_cmdline_x86-2.0.0.0-1
 	icu_x86-57.1-1
 	icu_x86_devel-57.1-1
-	icu55_x86-55.1-1
-	icu55_x86_devel-55.1-1
-	icu56_x86-56.1-1
-	icu56_x86_devel-56.1-1
-	ilmbase_x86-2.2.0-1
-	ilmbase_x86_devel-2.2.0-1
 	jasper_x86-1.900.1-4
 	jasper_x86_devel-1.900.1-4
-	jbig2dec_x86-0.11-1
-	jbig2dec_x86_devel-0.11-1
 	jpeg_x86-9b-2
 	jpeg_x86_devel-9b-2
-	lame_x86-3.99.5-7
-	lame_x86_devel-3.99.5-7
-	lcms_x86-2.8-1
-	lcms_x86_devel-2.8-1
-	lensfun_x86-0.3.2-1
-	lensfun_x86_devel-0.3.2-1
-	leptonica_x86-1.73-4
-	leptonica_x86_devel-1.73-4
-	leptonica_x86_tools-1.73-4
-	libaacs_x86-0.8.1-1
-	libaacs_x86_devel-0.8.1-1
-	libao_x86-1.2.0-1
-	libao_x86_devel-1.2.0-1
-	libart_lgpl_x86-2.3.21-1
-	libart_lgpl_x86_devel-2.3.21-1
-	libasr_x86-1.0.2-2
-	libasr_x86_devel-1.0.2-2
-	libass_x86-0.13.0-1
-	libass_x86_devel-0.13.0-1
-	libassuan_x86-2.4.3-1
-	libassuan_x86_devel-2.4.3-1
-	libattica_x86-0.4.2-1
-	libattica_x86_devel-0.4.2-1
-	libbluray_x86-0.9.3-2
-	libbluray_x86_devel-0.9.3-2
-	libcddb_x86-1.3.2-2
-	libcddb_x86_devel-1.3.2-2
-	libcdio_x86-0.93-3
-	libcdio_x86_devel-0.93-3
-	libcss_x86-0.6.1-2
-	libcss_x86_devel-0.6.1-2
-	libdbusmenu_qt_x86-0.9.2-1
-	libdbusmenu_qt_x86_devel-0.9.2-1
-	libdca_x86-0.0.5-3
-	libdca_x86_devel-0.0.5-3
-	libdom_x86-0.3.1-2
-	libdom_x86_devel-0.3.1-2
-	libdsk_x86-1.5.0-1
-	libdsk_x86_devel-1.5.0-1
-	libdv_x86-1.0.0-2
-	libdv_x86_devel-1.0.0-2
-	libdvdcss_x86-1.3.0-1
-	libdvdcss_x86_devel-1.3.0-1
-	libdvdnav_x86-5.0.3-3
-	libdvdnav_x86_devel-5.0.3-3
-	libdvdread_x86-5.0.3-2
-	libdvdread_x86_devel-5.0.3-2
 	libedit_x86-2015_03_21_3.1-5
 	libedit_x86_devel-2015_03_21_3.1-5
-	libelf_x86-0.8.13-1
-	libelf_x86_devel-0.8.13-1
-	libepoxy_x86-1.4.3-2
-	libepoxy_x86_devel-1.4.3-2
-	libevent_x86-2.0.21-11
-	libevent_x86_devel-2.0.21-11
-	libexecinfo_x86-1.1-1
-	libexecinfo_x86_devel-1.1-1
-	libffi_x86-3.2.1-3
-	libffi_x86_devel-3.2.1-3
-	libftdi_x86-1.0-3
-	libftdi_x86_devel-1.0-3
-	libgcrypt_x86-1.7.2-2
-	libgcrypt_x86_devel-1.7.2-2
-	libgpg_error_x86-1.27-2
-	libgpg_error_x86_devel-1.27-2
-	libgphoto2_x86-2.5.9-1
-	libgphoto2_x86_devel-2.5.9-1
-	libgsasl_x86-1.8.0-1
-	libgsasl_x86_devel-1.8.0-1
-	libhxcfe_x86-2.4.6.0-1
-	libhxcfe_x86_devel-2.4.6.0-1
 	libicns_x86-0.8.1-3
 	libicns_x86_devel-0.8.1-3
-	libiconv_x86-1.13.1-9
-	libiconv_x86_devel-1.13.1-9
-	libid3tag_x86-0.15.1b-1
-	libid3tag_x86_devel-0.15.1b-1
-	libidl_x86-0.8.14-1
-	libidl_x86_devel-0.8.14-1
-	libidn_x86-1.32-1
-	libidn_x86_devel-1.32-1
-	libmad_x86-0.15.1b-2
-	libmad_x86_devel-0.15.1b-2
-	libmikmod_x86-3.3.7-1
-	libmikmod_x86_devel-3.3.7-1
-	libmkv_x86-0.6.5.1-3
-	libmkv_x86_devel-0.6.5.1-3
-	libmng_x86-2.0.2-1
-	libmng_x86_devel-2.0.2-1
-	libmodplug_x86-0.8.8.5-3
-	libmodplug_x86_devel-0.8.8.5-3
-	libmp4v2_x86-2.0.0-2
-	libmp4v2_x86_devel-2.0.0-2
-	libmpdclient_x86-2.11_git-1
-	libmpdclient_x86_devel-2.11_git-1
-	libmpeg2_x86-0.5.1-3
-	libmpeg2_x86_devel-0.5.1-3
-	libnsbmp_x86-0.1.4-1
-	libnsbmp_x86_devel-0.1.4-1
-	libnsgif_x86-0.1.4-1
-	libnsgif_x86_devel-0.1.4-1
-	libnsutils_x86-0.0.3-1
-	libnsutils_x86_devel-0.0.3-1
 	libogg_x86-1.3.2-2
 	libogg_x86_devel-1.3.2-2
-	libotr_x86-4.1.0-2
-	libotr_x86_devel-4.1.0-2
-	libpaper_x86-1.1.24-1
-	libpaper_x86_devel-1.1.24-1
-	libparserutils_x86-0.2.3-1
-	libparserutils_x86_devel-0.2.3-1
-	libpcre_x86-8.41-1
-	libpcre_x86_devel-8.41-1
-	libpcre0_x86-8.21-7
-	libpcre2_x86-10.30-1
-	libpcre2_x86_devel-10.30-1
-	libpng_x86-1.5.25-2
-	libpng_x86_devel-1.5.25-2
-	libpng16_x86-1.6.34-1
-	libpng16_x86_devel-1.6.34-1
-	libqt4_x86-4.8.7-6
-	libqt4_x86_devel-4.8.7-6
-	librecad_x86-2.0.7-1
-	librevenge_x86-0.0.1-1
-	librevenge_x86_devel-0.0.1-1
-	libsamplerate_x86-0.1.8-3
-	libsamplerate_x86_devel-0.1.8-3
-	libsanta_x86-3.0.1-1
-	libsanta_x86_devel-3.0.1-1
-	libsigc++_x86-2.4.1-1
-	libsigc++_x86_devel-2.4.1-1
-	libsdl_x86-1.2.15-9
-	libsdl_x86_devel-1.2.15-9
-	libsdl2_x86-2.0.5-4
-	libsdl2_x86_devel-2.0.5-4
-	libsndfile_x86-1.0.27-1
-	libsndfile_x86_devel-1.0.27-1
+	libpng16_x86-1.6.20-2
+	libpng16_x86_devel-1.6.20-2
 	libsolv_x86-0.3.0_haiku_2014_12_22-1
 	libsolv_x86_devel-0.3.0_haiku_2014_12_22-1
-	libsvgtiny_x86-0.1.5-1
-	libsvgtiny_x86_devel-0.1.5-1
-	libtasn1_x86-4.12-1
-	libtasn1_x86_devel-4.12-1
 	libtheora_x86-1.1.1-3
 	libtheora_x86_devel-1.1.1-3
 	libtool_x86-2.4.2-1
 	libtool_x86_libltdl-2.4.2-1
-	libtorrent_rasterbar_x86-1.0.9-1
-	libtorrent_rasterbar_x86_devel-1.0.9-1
-	libusb_x86-1.0.20-2
-	libusb_x86_devel-1.0.20-2
-	libusb_compat_x86-0.1.5-4
-	libusb_compat_x86_devel-0.1.5-4
-	libusbhxcfe_x86-2.0.0.4-1
-	libusbhxcfe_x86_devel-2.0.0.4-1
-	libutf8proc_x86-1.3.1~2-1
-	libutf8proc_x86_devel-1.3.1~2-1
-	libuuid_x86-1.0.3-3
-	libuuid_x86_devel-1.0.3-3
 	libvorbis_x86-1.3.5-2
 	libvorbis_x86_devel-1.3.5-2
-	libvpx_x86-1.0.0-2
-	libvpx_x86_devel-1.0.0-2
 	libvpx3_x86-1.5.0-1
 	libvpx3_x86_devel-1.5.0-1
-	libwapcaplet_x86-0.4.0-2
-	libwapcaplet_x86_devel-0.4.0-2
 	libwebp_x86-0.6.0-1
 	libwebp_x86_devel-0.6.0-1
-	libwebp5_x86-0.4.4-1
-	libwebp5_x86_devel-0.4.4-1
-	libwebp6_x86-0.5.2-1
-	libwebp6_x86_devel-0.5.2-1
-	libxml2_x86-2.9.3-2
-	libxml2_x86_devel-2.9.3-2
-	libxslt_x86-1.1.31-1
-	libxslt_x86_devel-1.1.31-1
-	libzip_x86-0.11.2-1
-	libzip_x86_devel-0.11.2-1
 	live555_x86-2016.01.29-3
 	live555_x86_devel-2016.01.29-3
 	llvm_x86-4.0.1-1
 	llvm_x86_clang-4.0.1-1
 	llvm_x86_clang_analysis-4.0.1-1
 	llvm_x86_libs-4.0.1-1
-	lmms_x86-1.2.0_git-1
-	lua_x86-5.2.3-2
-	lua_x86_devel-5.2.3-2
-	luajit_x86-2.0.2-2
-	luajit_x86_devel-2.0.2-2
-	lwtools_x86-4.10-2
-	lyx_x86-2.2.2-3
-	lzip_x86-1.16-1
-	lzo_x86-2.09-1
-	lzo_x86_devel-2.09-1
-	marble_x86-1.9.2-1
 	mesa_x86-17.1.4-1
 	mesa_x86_devel-17.1.4-1
 	mesa_x86_swpipe-17.1.4-1
-	mosh_x86-1.2.4-2
-	mpc_x86-1.0.3-1
-	mpc_x86_devel-1.0.3-1
-	mpd_x86-0.19.17-1
-	mpfr_x86-3.1.4-1
-	mpfr_x86_devel-3.1.4-1
-	mpg123_x86-1.22.4-1
-	mpg123_x86_devel-1.22.4-1
-	mplayer_x86-1.1.1-3
-	mupdf_x86-1.7-1
-	mupdf_x86_devel-1.7-1
-	muscle_x86-6.00-2
-	muscle_x86_devel-6.00-2
-	musicbrainz_x86-5.1.0-2
-	musicbrainz_x86_devel-5.1.0-2
-	musicpc_x86-0.26-1
-	ncurses_x86-5.9-11
-	ncurses_x86_devel-5.9-11
 	ncurses6_x86-6.0-2
 	ncurses6_x86_devel-6.0-2
-	netsurf_x86-3.6-4
-	nettle_x86-3.2-1
-	nettle_x86_devel-3.2-1
-	ninja_x86-1.6.0-1
-	nsgenbind_x86-0.4-1
-	nspr_x86-4.10.9-1
-	nspr_x86_devel-4.10.9-1
-	nss_x86-3.20-1
-	nss_x86_devel-3.20-1
-	ocp_x86-0.1.21_git-1
-	openal_x86-1.13.0-2
-	openal_x86_devel-1.13.0-2
-	openexr_x86-2.2.0-1
-	openexr_x86_devel-2.2.0-1
-	openjdk_x86-1.7.u80_b32-3
-	openjdk_x86_devel-1.7.u80_b32-3
-	openjpeg_x86-2.1.2-3
-	openjpeg_x86_devel-2.1.2-3
 	openssl_x86-1.0.2g-1
 	openssl_x86_devel-1.0.2g-1
-	openttd_x86-1.6.1-1
-	opus_x86-1.1.3-1
-	opus_x86_devel-1.1.3-1
-	opusfile_x86-0.6-1
-	opusfile_x86_devel-0.6-1
-	pango_x86-1.40.3-2
-	pango_x86_devel-1.40.3-2
-	pciutils_x86-3.2.1-1
-	pciutils_x86_devel-3.2.1-1
-	physfs_x86-2.0.3-1
-	physfs_x86_devel-2.0.3-1
-	pixman_x86-0.32.6-1
-	pixman_x86_devel-0.32.6-1
 	pkgconfig_x86-0.29-2
-	protobuf_x86-2.4.1-1
-	protobuf_x86_devel-2.4.1-1
-	protrekkr_x86-2.5.4-2
-	popt_x86-1.16-1
-	popt_x86_devel-1.16-1
-	python3_x86-3.6.1-4
-	python3_cython_x86-0.25.2-2
-	qbittorrent_x86-3.2.3-2
-	qemu_x86-2.1.2-2
-	qca2_x86-2.0.3-1
-	qca2_x86_devel-2.0.3-1
-	qjson_x86-0.8.1-1
-	qjson_x86_devel-0.8.1-1
-	qmplay2_x86-15.05.30-2
-	qt5_x86-5.6.1-1
-	qt5_x86_devel-5.6.1-1
-	qt5_x86_docs-5.6.1-1
-	quassel_x86-0.10.0-3
-	quicklaunch-1.2-3
-	qupzilla_x86-1.8.6-1
-	qutim_x86-0.3.3-1
-	radare2_x86-0.9.9-1
-	radare2_x86_devel-0.9.9-1
-	rcs_x86-5.9.3-2
-	readline_x86-6.3.8-3
-	readline_x86_devel-6.3.8-3
-	rocksndiamonds_x86-3.3.1.2-2
-	ruby_x86-2.2.2-5
-	ruby_x86_devel-2.2.2-5
-	scummvm_x86-1.9.0-2
-	sdcc_x86-3.6.0-1
-	sdl_gfx_x86-2.0.25-2
-	sdl_gfx_x86_devel-2.0.25-2
-	sdl_image_x86-1.2.12-7
-	sdl_image_x86_devel-1.2.12-7
-	sdl_net_x86-1.2.8-5
-	sdl_net_x86_devel-1.2.8-5
-	sdl_mixer_x86-1.2.12-6
-	sdl_mixer_x86_devel-1.2.12-6
-	sdl_sound_x86-1.0.3-5
-	sdl_sound_x86_devel-1.0.3-5
-	sdl_ttf_x86-2.0.11-5
-	sdl_ttf_x86_devel-2.0.11-5
-	sge_x86-030809-3
-	sge_x86_devel-030809-3
-	shared_mime_info_x86-1.3-2
 	sharutils_x86-4.15.2-2
-	simh_x86-4.0.0_git-3
-	smjpeg_x86-0.2.1-1
-	smjpeg_x86_devel-0.2.1-1
-	smpeg_x86-0.4.5-3
-	smpeg_x86_devel-0.4.5-3
-	smpeg2_x86-2.0.0-3
-	smpeg2_x86_devel-2.0.0-3
-	smplayer_x86-15.9.0-1
-	smtube_x86-15.5.10-1
-	snappy_x86-1.1.3-1
-	snappy_x86_devel-1.1.3-1
-	sox_x86-14.4.2-1
-	sox_x86_devel-14.4.2-1
 	speex_x86-1.2~rc2-2
 	speex_x86_devel-1.2~rc2-2
-	sqlite_x86-3.8.11.1-1
-	sqlite_x86_devel-3.8.11.1-1
-	stlink_x86-1.0.0-2
-	stm32flash_x86-0.3-1
-	strigi_x86-0.7.5-2
-	strigi_x86_devel-0.7.5-2
-	swig_x86-2.0.11-2
 	taglib_x86-1.11.1-1
 	taglib_x86_devel-1.11.1-1
-	texlive_x86-2014-1
-	texlive_x86_devel-2014-1
-	tiff_x86-3.9.6-2
-	tiff_x86_devel-3.9.6-2
 	tiff4_x86-4.0.6-1
 	tiff4_x86_devel-4.0.6-1
-	tinyxml_x86-2.6.2-3
-	tinyxml_x86_devel-2.6.2-3
-	tig_x86-2.1-1
-	transmission_x86-2.92-2
-	twolame_x86-0.3.13-3
-	twolame_x86_devel-0.3.13-3
-	util_macros_x86-1.19.0-3
-	vacuum_x86-1.2.5-1
-	vcmi_x86-0.94-1
-	wizznic_x86-0.9.9-2
-	x264_x86-20160712-2
-	x264_x86_devel-20160712-2
-	xmlroff_x86-0.6.2-2
-	xmlroff_x86_devel-0.6.2-2
 	xz_utils_x86-5.2.2-1
 	xz_utils_x86_devel-5.2.2-1
 	zlib_x86-1.2.11-2
 	zlib_x86_devel-1.2.11-2
 	:
 	# source packages
-	2cdt
-	a_book
-	a52dec
-	a52dec_x86
-	acr
-	advancemame_x86
-	album
-	ale
-	app2png
-	apr
-	apr_util
-	arm_none_eabi_binutils_x86
-	arm_none_eabi_gcc_x86
-	arm_none_eabi_gdb_x86
-	arm_none_eabi_newlib_x86
-	armyknife
-	artpaint
-	asciidoc
-	aspell
-	aspell_x86
 	autoconf
-	automake113
 	automake
-	automoc_x86
-	avr_binutils_x86
-	avr_gcc_x86
-	avr_libc_x86
-	avra
-	avrdude_x86
 	bash
-	bc
-	beae
-	beam
-	becasso
-	becjk
-	beezer
-	befar
-	beget
-	belife
-	bemines
-	bepdf
-	bepodder
-	bescreencapture
-	beshare_x86
-	bevexed
-	blogpositive
+	bepdf_x86
 	binutils
 	binutils_x86
 	bison
 	bison_x86
-	bonnie++
-	bookmarkconverter
-	boost_x86
-	buildbot_slave
-	burnitnow
 	bzip2
-	bzr
-	cairo_x86
-	canna
-	capitalbe
-	capstone_x86
-	catkeyseditor
-	caya
-	ccache
 	cdrtools
 	cdrtools_x86
-	chat
-	check
-	clipdinger
-	clockwerk
-	cmake_x86
-	colors
-	confuse
-	confuse_x86
-	copynametoclipboard
 	coreutils
-	cpctools
-	cpio
-	cppunit
-	criticalmass
 	ctags
 	curl
 	cvs
-	cvsps_x86
-	cython
-	d52
-	dbus_x86
-	ddrescue_x86
-	desknotes
-	devil_x86
-	dfu_util
-	djvulibre
-	djvulibre_x86
-	djvutranslator
-	djvuviewer
 	diffutils
-	distcc
-	dmidecode
-	dockbert
-	documentviewer_x86
-	dos2unix
-	dosbox_x86
-	doxygen
-	doxygen_x86
-	dtc_x86
-	ducksaver
-	dvda_author_x86
-	ed
-	einsteinium
-	enca
-	enca_x86
-	exomizer
 	expat
-	faac
-	faac_x86
-	faad2
-	faad2_x86
-	fasm
-	f1spirit
-	file
-	file_x86
-	filer
-	filwip
 	findutils
-	fish_x86
 	ffmpeg
 	ffmpeg_x86
-	fftw
-	fftw_x86
-	flac
-	flare_x86
 	flex
 	fluidlite
-	fluidsynth
-	fluidsynth_x86
-	fontboy
 	fontconfig
-	fontconfig_x86
-	fossil
-	freeciv_x86
-	freedroidrpg_x86
 	freetype
-	fribidi
-	fribidi_x86
-	friss
-	fuse
 	gawk
-	gcal
 	gcc
 	gcc_x86
-	gcc6809_x86
-	getconf
-	getopt
-	gettext
-	gettext_x86
-	gdb
-	gdk_pixbuf_x86
-	giddy3
 	giflib
-	giflib6
-	giflib6_x86
 	git
-	glew
-	glib2
-	glib2_x86
 	glu
-	gmp
-	gmp_x86
-	gnupg
-	gnuplot_x86
-	gnutls
-	gnutls_x86
-	golang_x86
-	goonies_x86
-	gperf
-	gpgme
-	gpgme_x86
-	gphoto2_x86
-	grafx2
-	graphite2_x86
 	grep
-	groff
-	gtk_doc
-	guilib
 	gutenprint
-	gyp
 	gzip
 	haikuporter
 	haikuwebkit_x86
-	handbrake_x86
-	harfbuzz_x86
-	hdialog
-	help2man
-	hexvexed
-	htmldoc
-	html_parser
-	hub
-	hubbub_x86
-	hxcfloppyemulator_cmdline_x86
-	icebreaker
 	icu
-	icu55
-	icu56
-	ilmbase_x86
-	imagemagick
-	inputproto
-	intltool
-	itstool
-	jabber4haiku
 	jam
 	jasper
-	jbig2dec
-	jbig2dec_x86
 	jpeg
-	kbproto
 	keymapswitcher
-	lame
-	lame_x86
-	lbreakout2
-	lcms
-	lcms_x86
-	leptonica
-	leptonica_x86
-	lensfun_x86
 	less
-	lha
-	libaacs_x86
-	libao
-	libart_lgpl
-	libasr
-	libass_x86
-	libassuan
-	libassuan_x86
-	libattica_x86
-	libbluray_x86
-	libcddb
-	libcddb_x86
-	libcdio
-	libcdio_x86
-	libcss_x86
-	libcuefile
-	libdbusmenu_qt_x86
-	libdca
-	libdca_x86
-	libdom_x86
-	libdsk
-	libdsk_x86
-	libdv_x86
-	libdvbpsi
-	libdvdcss
-	libdvdcss_x86
-	libdvdnav
-	libdvdnav_x86
-	libdvdread
-	libdvdread_x86
-	libebml
 	libedit
 	libedit_x86
-	libelf_x86
-	libepoxy_x86
-	libevent_x86
-	libexecinfo_x86
-	libffi
-	libffi_x86
-	libftdi_x86
-	libgcrypt
-	libgcrypt_x86
-	libgpg_error
-	libgphoto2_x86
-	libgsasl_x86
-	libhxcfe_x86
 	libicns
-	libiconv
-	libid3tag
-	libidl
-	libidn
-	libiodbc
-	libiptcdata
-	libmad
-	libmatroska
-	libmikmod
-	libmkv
-	libmng_x86
-	libmodplug
-	libmp4v2_x86
-	libmpdclient_x86
-	libmpeg2
-	libmpeg2_x86
-	libnsbmp_x86
-	libnsgif_x86
-	libnsutils_x86
 	libogg
 	libogg_x86
-	libotr_x86
-	libpaper
-	libparserutils_x86
 	libpcap
-	libpcre
-	libpcre_x86
-	libpcre0
-	libpcre0_x86
-	libpcre2
-	libpcre2_x86
-	libpng
-	libpng_x86
-#	libpng16
+	libpng16
 	libpng16_x86
-	libpthread_stubs
-	libqt4_x86
-	librecad_x86
-	libreplaygain
-	librevenge_x86
-	libsanta
-	libsanta_x86
-	libsamplerate_x86
-	libsdl
-	libsdl_x86
-	libsdl2
-	libsdl2_x86
-	libsigc++
-	libsigc++_x86
-	libsndfile
-	libsndfile_x86
 	libsolv
-	libspectrum
-	libssh2
-	libsvgtiny_x86
-	libtasn1
-	libtasn1_x86
 	libtheora
 	libtheora_x86
 	libtool
 	libtool_x86
-	libtorrent_rasterbar_x86
-	libunistring
-	libusb
-	libusb_x86
-	libusb_compat
-	libusb_compat_x86
-	libusbhxcfe_x86
-	libutf8proc
-	libutf8proc_x86
-	libuuid
-	libuuid_x86
 	libvorbis
 	libvorbis_x86
-	libvpx
 	libvpx3_x86
-	libwapcaplet_x86
 	libwebp
-	libwebp5
-	libwebp6
-	libx11
-	libxau
-	libxcb
-	libxml2
-	libxml2_x86
-	libxpm
-	libxslt
-	libxslt_x86
-	libzip
-	libzip_x86
-	lighttpd
-	links
 	live555
 	llvm_x86
-	lmms_x86
-	lmarbles
-	lnlauncher
-	ltris
-	luajit_x86
-	lua
-	lua_x86
-	lwtools_x86
-	lynx
-	lyx_x86
-	lz4
-	lzip_x86
-	lzo
 	m4
 	make
-	mako
 	man
-	marble_x86
-	mc
 	mercurial
 	mesa
 	mesa_x86
-	meson
-	mev
-	milkytracker
-	mirrormagic
 	mkdepend
-	mksh
-	moe
-	mog
-	mosh_x86
-	most
-	mpc_x86
-	mpd_x86
-	mpfr_x86
-	mpg123
-	mplayer_x86
-	mtr
-	multitalk
-	mupdf
-	mupdf_x86
-	muscle_x86
-	musepack_tools
-	musicbrainz
-	musicpc_x86
 	nano
 	nasm
-	ncurses
-	ncurses_x86
 	ncurses6
 	ncurses6_x86
-	neon
-	neonlights
 	netcat
-	netpulse
-	netsurf_x86
-	nettle_x86
-	ninja_x86
-	nsgenbind_x86
-	nspr_x86
-	nss_x86
-	ocaml
-	ocp_x86
-	openal_x86
-	openexr_x86
-	openjpeg
-	openjpeg_x86
-	opensound
 	openssh
 	openssl
-	openttd_x86
-	optipng
-	opus
-	opusfile
-	opus_tools
 	p7zip
-	padblocker
-	paladin
-	pango_x86
-	paragui
 	patch
-	pciutils
-	pdflib
-	pdftranslator
 	pdfwriter
 	pe
-	pecorename
 	perl
-	photograbber
-	php
-	physfs
-	pipepanic
-	pixman_x86
 	pkgconfig
 	pkgconfig_x86
-	ponpokodiff
-	popt
-	popt_x86
-	postgresql
-	protobuf_x86
-	protrekkr_x86
-	psiconv
-	psqlodbc
-	pyenet
 	python
-	python_dateutil
-	python_httplib2
-	python_mako
-	python_imaging
-	python_lxml
-	python_mechanize
-	python_requests
-	python_setuptools
-	python_sip
-	python_twisted
-	python_zope.interface
-	python3_cython_x86
-	python3_x86
-	python3_sip
-	pyyaml
-	q
-	qbittorrent_x86
-	qemacs
-	qemu_x86
-	qca2_x86
-	qjson_x86
-	qmplay2_x86
-	qrencode
-	qt5_x86
-	quassel_x86
-	quicklaunch
-	qupzilla_x86
-	qutim_x86
-	radare2_x86
-	rcs_x86
-	rdesktop
-	readline
-	readline_x86
-	roadfighter
-	rocksndiamonds_x86
-	rsync
-	ruby_x86
-	sane_backends
-	sanity
-	sawteeth
 	scons
-	scummvm_x86
-	sdcc_x86
-	sdl_gfx
-	sdl_image
-	sdl_mixer
-	sdl_net
-	sdl_sound
-	sdl_ttf
-	sdl2_gfx
-	sdl2_image
-	sdl2_mixer
-	sdl2_net
-	sdl2_ttf
-	sdllopan
-	seeker
 	sed
-	sequitur
-	serf
-	setuptools
-	sge
-	shared_mime_info_x86
 	sharutils
-	simh_x86
-	slang
-	slayer
-	slimevolley
-	smjpeg
-	smpeg
-	smpeg2
-	smpeg2_x86
-	smplayer_x86
-	smtube_x86
-	snappy_x86
-	sox_x86
 	speex
-	sqlite
-	sqlite_x86
-	srm
-	stlink_x86
-	stm32flash_x86
-	streamradio
-	strigi_x86
-	substrate
 	subversion
-	sum_it
-	super_transball
-	swig
-	swig_x86
 	taglib
 	taglib_x86
-	takenotes
 	tar
-	taskmanager
-	tcl
 	tcpdump
-	texi2html
 	texinfo
-	texinfo4
-	thememanager
-	tiff
 	tiff4
-	tig_x86
-	timetracker
-	tinyxml
-	tnftp
-	transmission_x86
-	twolame
-	twolame_x86
-	ubertuber
-	unknown_horizons
-	unrar
-	util_macros_x86
 	unzip
-	util_macros
-	weather
-	vacuum_x86
-	vasm
-	vcdimager
-	vcmi_x86
-	vim
 	vision
-	vlc
-	vlink
-	vmware_addons
-	vncserver
 	wget
-	whereismymouse
 	which
-	wizznic_x86
 	wpa_supplicant
-	yab
-	yab_ide
-	yasm
-	youtube_dl
-	x264_x86
-	xcb_proto
-	xextproto
-	xmlroff_x86
-	xmlto
-	xml_parser
-	xproto
-	xrick
-	xtrans
 	xz_utils_x86
 	zip
 	zlib
-	zsh
 	:
 	# debuginfo packages
 	bison
@@ -1782,10 +326,7 @@ RemotePackageRepository HaikuPorts
 	glu
 	grep
 	m4
-	readline
-	readline_x86
 	sed
 	tar
 	which
-	yasm
 	;
