@@ -112,6 +112,8 @@ ECMDevice::Open()
 	config = gUSBModule->get_configuration(fDevice);
 	gUSBModule->set_alt_interface(fDevice,
 		&config->interface[fDataInterfaceIndex].alt[1]);
+	gUSBModule->set_alt_interface(fDevice,
+		&config->interface[fControlInterfaceIndex].alt[0]);
 
 	// update again
 	config = gUSBModule->get_configuration(fDevice);
@@ -136,6 +138,14 @@ ECMDevice::Open()
 		return B_ERROR;
 	}
 
+	if (gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
+		fNotifyBufferLength, _NotifyCallback, this) != B_OK) {
+		// we cannot use notifications - hardcode to active connection
+		fHasConnection = true;
+		fDownstreamSpeed = 1000 * 1000 * 10; // 10Mbps
+		fUpstreamSpeed = 1000 * 1000 * 10; // 10Mbps
+	}
+
 	// the device should now be ready
 	fOpen = true;
 	return B_OK;
@@ -150,6 +160,7 @@ ECMDevice::Close()
 		return B_OK;
 	}
 
+	gUSBModule->cancel_queued_transfers(fNotifyEndpoint);
 	gUSBModule->cancel_queued_transfers(fReadEndpoint);
 	gUSBModule->cancel_queued_transfers(fWriteEndpoint);
 
@@ -367,11 +378,11 @@ ECMDevice::CompareAndReattach(usb_device device)
 status_t
 ECMDevice::_SetupDevice()
 {
-	const usb_configuration_info *config
-		= gUSBModule->get_configuration(fDevice);
+	const usb_device_descriptor *deviceDescriptor
+                = gUSBModule->get_device_descriptor(fDevice);
 
-	if (config == NULL) {
-		TRACE_ALWAYS("failed to get device configuration\n");
+	if (deviceDescriptor == NULL) {
+		TRACE_ALWAYS("failed to get device descriptor\n");
 		return B_ERROR;
 	}
 
@@ -379,18 +390,27 @@ ECMDevice::_SetupDevice()
 	uint8 dataIndex = 0;
 	bool foundUnionDescriptor = false;
 	bool foundEthernetDescriptor = false;
-	for (size_t i = 0; i < config->interface_count
-		&& (!foundUnionDescriptor || !foundEthernetDescriptor); i++) {
-		usb_interface_info *interface = config->interface[i].active;
-		usb_interface_descriptor *descriptor = interface->descr;
-		if (descriptor->interface_class == USB_INTERFACE_CLASS_CDC
-			&& descriptor->interface_subclass == USB_INTERFACE_SUBCLASS_ECM
-			&& interface->generic_count > 0) {
+	bool found = false;
+	const usb_configuration_info *config = NULL;
+	for (int i = 0; i < deviceDescriptor->num_configurations && !found; i++) {
+		config = gUSBModule->get_nth_configuration(fDevice, i);
+		if (config == NULL)
+			continue;
+
+		for (size_t j = 0; j < config->interface_count && !found; j++) {
+			const usb_interface_info *interface = config->interface[j].active;
+			usb_interface_descriptor *descriptor = interface->descr;
+			if (descriptor->interface_class != USB_INTERFACE_CLASS_CDC
+				|| descriptor->interface_subclass != USB_INTERFACE_SUBCLASS_ECM
+				|| interface->generic_count == 0) {
+				continue;
+			}
+
 			// try to find and interpret the union and ethernet functional
 			// descriptors
 			foundUnionDescriptor = foundEthernetDescriptor = false;
-			for (size_t j = 0; j < interface->generic_count; j++) {
-				usb_generic_descriptor *generic = &interface->generic[j]->generic;
+			for (size_t k = 0; k < interface->generic_count; k++) {
+				usb_generic_descriptor *generic = &interface->generic[k]->generic;
 				if (generic->length >= 5
 					&& generic->data[0] == FUNCTIONAL_SUBTYPE_UNION) {
 					controlIndex = generic->data[1];
@@ -405,8 +425,10 @@ ECMDevice::_SetupDevice()
 					foundEthernetDescriptor = true;
 				}
 
-				if (foundUnionDescriptor && foundEthernetDescriptor)
+				if (foundUnionDescriptor && foundEthernetDescriptor) {
+					found = true;
 					break;
+				}
 			}
 		}
 	}
@@ -421,6 +443,8 @@ ECMDevice::_SetupDevice()
 		return B_ERROR;
 	}
 
+	// set the current configuration
+	gUSBModule->set_configuration(fDevice, config);
 	if (controlIndex >= config->interface_count) {
 		TRACE_ALWAYS("control interface index invalid\n");
 		return B_ERROR;
@@ -438,13 +462,7 @@ ECMDevice::_SetupDevice()
 
 	fControlInterfaceIndex = controlIndex;
 	fNotifyEndpoint = interface->endpoint[0].handle;
-	if (gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
-		fNotifyBufferLength, _NotifyCallback, this) != B_OK) {
-		// we cannot use notifications - hardcode to active connection
-		fHasConnection = true;
-		fDownstreamSpeed = 1000 * 1000 * 10; // 10Mbps
-		fUpstreamSpeed = 1000 * 1000 * 10; // 10Mbps
-	}
+	fNotifyBufferLength = interface->endpoint[0].descr->max_packet_size;
 
 	if (dataIndex >= config->interface_count) {
 		TRACE_ALWAYS("data interface index invalid\n");
