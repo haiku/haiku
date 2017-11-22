@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -139,8 +140,13 @@ public:
 				break;
 
 			case MSG_UPDATE_PACKAGE:
-				SetPackage(fPackageListener->Package());
+			{
+				uint32 changes = 0;
+				if (message->FindUInt32("changes", &changes) != B_OK)
+					break;
+				UpdatePackage(changes, fPackageListener->Package());
 				break;
+			}
 
 			case B_COLORS_UPDATED:
 			{
@@ -169,16 +175,8 @@ public:
 	{
 		fPackageListener->SetPackage(package);
 
-		if (package->Icon().Get() != NULL) {
-			fIconView->SetBitmap(package->Icon(), SharedBitmap::SIZE_64);
-		} else
-			fIconView->UnsetBitmap();
-
-		if (package->State() == ACTIVATED) {
-			fInstalledIconView->SetBitmap(sInstalledIcon,
-				SharedBitmap::SIZE_16);
-		} else
-			fInstalledIconView->UnsetBitmap();
+		_SetIcon(package->Icon());
+		_SetInstalled(package->State() == ACTIVATED);
 
 		fTitleView->SetText(package->Title());
 
@@ -188,29 +186,24 @@ public:
 		BString summary = package->ShortDescription();
 		fSummaryView->SetText(summary);
 
-		RatingSummary ratingSummary = package->CalculateRatingSummary();
-
-		fRatingView->SetRating(ratingSummary.averageRating);
-
-		if (ratingSummary.ratingCount > 0) {
-			BString avgRating;
-			avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
-			fAvgRating->SetText(avgRating);
-
-			BString votes;
-			votes.SetToFormat("%d", ratingSummary.ratingCount);
-
-			BString voteInfo(B_TRANSLATE("(%Votes%)"));
-			voteInfo.ReplaceAll("%Votes%", votes);
-
-			fVoteInfo->SetText(voteInfo);
-		} else {
-			fAvgRating->SetText("");
-			fVoteInfo->SetText("");
-		}
+		_SetRating(package->CalculateRatingSummary());
 
 		InvalidateLayout();
 		Invalidate();
+	}
+
+	void UpdatePackage(uint32 changeMask, const PackageInfoRef& package)
+	{
+		if ((changeMask & PKG_CHANGED_TITLE) != 0)
+			fTitleView->SetText(package->Title());
+		if ((changeMask & PKG_CHANGED_SUMMARY) != 0)
+			fSummaryView->SetText(package->ShortDescription());
+		if ((changeMask & PKG_CHANGED_RATINGS) != 0)
+			_SetRating(package->CalculateRatingSummary());
+		if ((changeMask & PKG_CHANGED_STATE) != 0)
+			_SetInstalled(package->State() == ACTIVATED);
+		if ((changeMask & PKG_CHANGED_ICON) != 0)
+			_SetIcon(package->Icon());
 	}
 
 	void Clear()
@@ -283,6 +276,45 @@ public:
 		BFont font(be_plain_font);
 		rgb_color color = HighColor();
 		fSummaryView->SetFontAndColor(&font, B_FONT_ALL, &color);
+	}
+
+	void _SetRating(const RatingSummary& ratingSummary)
+	{
+		fRatingView->SetRating(ratingSummary.averageRating);
+
+		if (ratingSummary.ratingCount > 0) {
+			BString avgRating;
+			avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
+			fAvgRating->SetText(avgRating);
+
+			BString votes;
+			votes.SetToFormat("%d", ratingSummary.ratingCount);
+
+			BString voteInfo(B_TRANSLATE("(%Votes%)"));
+			voteInfo.ReplaceAll("%Votes%", votes);
+
+			fVoteInfo->SetText(voteInfo);
+		} else {
+			fAvgRating->SetText("");
+			fVoteInfo->SetText("");
+		}
+	}
+
+	void _SetInstalled(bool installed)
+	{
+		if (installed) {
+			fInstalledIconView->SetBitmap(sInstalledIcon,
+				SharedBitmap::SIZE_16);
+		} else
+			fInstalledIconView->UnsetBitmap();
+	}
+
+	void _SetIcon(const BitmapRef& icon)
+	{
+		if (icon.Get() != NULL) {
+			fIconView->SetBitmap(icon, SharedBitmap::SIZE_64);
+		} else
+			fIconView->UnsetBitmap();
 	}
 
 private:
