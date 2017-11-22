@@ -735,20 +735,20 @@ ViewHWInterface::DPMSCapabilities()
 
 
 status_t
-ViewHWInterface::SetBrightness(float)
+ViewHWInterface::SetBrightness(float brightness)
 {
 	AutoReadLocker _(this);
 
-	return BScreen().SetBrightness(float);
+	return BScreen().SetBrightness(brightness);
 }
 
 
 status_t
-ViewHWInterface::GetBrightness(float*)
+ViewHWInterface::GetBrightness(float* brightness)
 {
 	AutoReadLocker _(this);
 
-	return BScreen().GetBrightness(float);
+	return BScreen().GetBrightness(brightness);
 }
 
 
