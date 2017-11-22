@@ -570,9 +570,10 @@ load_image(char const* name, image_type type, const char* rpath,
 	analyze_image_haiku_version_and_abi(fd, image, eheader, sheaderSize,
 		pheaderBuffer, sizeof(pheaderBuffer));
 
-	// If this is the executable image, we init the search path
-	// subdir, if the compiler version doesn't match ours.
-	if (type == B_APP_IMAGE) {
+	// If sSearchPathSubDir is unset (meaning, this is the first image we're
+	// loading) we init the search path subdir if the compiler version doesn't
+	// match ours.
+	if (sSearchPathSubDir == NULL) {
 		#if __GNUC__ == 2
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
 				sSearchPathSubDir = "x86";
