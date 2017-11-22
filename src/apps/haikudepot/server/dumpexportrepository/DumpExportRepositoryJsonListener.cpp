@@ -5,16 +5,15 @@
  */
 #include "DumpExportRepositoryJsonListener.h"
 #include "List.h"
-
 #include <stdio.h>
 
 // #pragma mark - private interfaces for the stacked listeners
 
-        
+
 /*! This class is the top level of the stacked listeners.  The stack structure
     is maintained in a linked list and sub-classes implement specific behaviors
     depending where in the parse tree the stacked listener is working at.
-*/        
+*/
 class AbstractStackedDumpExportRepositoryJsonListener : public BJsonEventListener {
 public:
     AbstractStackedDumpExportRepositoryJsonListener(
@@ -36,7 +35,7 @@ protected:
 
     void Pop();
     void Push(AbstractStackedDumpExportRepositoryJsonListener* stackedListener);
-    
+
 private:
     AbstractStackedDumpExportRepositoryJsonListener* fParent;
 };
@@ -47,7 +46,7 @@ public:
         AbstractMainDumpExportRepositoryJsonListener* mainListener,
         AbstractStackedDumpExportRepositoryJsonListener* parent);
     ~GeneralArrayStackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
 };
 
@@ -57,7 +56,7 @@ public:
         AbstractMainDumpExportRepositoryJsonListener* mainListener,
         AbstractStackedDumpExportRepositoryJsonListener* parent);
     ~GeneralObjectStackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
 };
 
@@ -67,11 +66,11 @@ public:
         AbstractMainDumpExportRepositoryJsonListener* mainListener,
         AbstractStackedDumpExportRepositoryJsonListener* parent);
     ~DumpExportRepository_StackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
-    
+
     DumpExportRepository* Target();
-    
+
 protected:
     DumpExportRepository* fTarget;
     BString fNextItemName;
@@ -83,11 +82,11 @@ public:
         AbstractMainDumpExportRepositoryJsonListener* mainListener,
         AbstractStackedDumpExportRepositoryJsonListener* parent);
     ~DumpExportRepository_List_StackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
-    
+
     List<DumpExportRepository*, true>* Target(); // list of %s pointers
-    
+
 private:
     List<DumpExportRepository*, true>* fTarget;
 };
@@ -98,11 +97,11 @@ public:
         AbstractMainDumpExportRepositoryJsonListener* mainListener,
         AbstractStackedDumpExportRepositoryJsonListener* parent);
     ~DumpExportRepositorySource_StackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
-    
+
     DumpExportRepositorySource* Target();
-    
+
 protected:
     DumpExportRepositorySource* fTarget;
     BString fNextItemName;
@@ -114,11 +113,11 @@ public:
         AbstractMainDumpExportRepositoryJsonListener* mainListener,
         AbstractStackedDumpExportRepositoryJsonListener* parent);
     ~DumpExportRepositorySource_List_StackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
-    
+
     List<DumpExportRepositorySource*, true>* Target(); // list of %s pointers
-    
+
 private:
     List<DumpExportRepositorySource*, true>* fTarget;
 };
@@ -130,9 +129,9 @@ public:
         AbstractStackedDumpExportRepositoryJsonListener* parent,
         DumpExportRepositoryListener* itemListener);
     ~ItemEmittingStackedDumpExportRepositoryJsonListener();
-    
+
     void WillPop();
-        
+
 private:
     DumpExportRepositoryListener* fItemListener;
 };
@@ -145,9 +144,9 @@ public:
         AbstractStackedDumpExportRepositoryJsonListener* parent,
         DumpExportRepositoryListener* itemListener);
     ~BulkContainerStackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
-        
+
 private:
     BString fNextItemName;
     DumpExportRepositoryListener* fItemListener;
@@ -161,10 +160,10 @@ public:
         AbstractStackedDumpExportRepositoryJsonListener* parent,
         DumpExportRepositoryListener* itemListener);
     ~BulkContainerItemsStackedDumpExportRepositoryJsonListener();
-    
+
     bool Handle(const BJsonEvent& event);
     void WillPop();
-        
+
 private:
     DumpExportRepositoryListener* fItemListener;
 };
@@ -250,26 +249,28 @@ GeneralObjectStackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& e
         case B_JSON_NULL:
             // ignore
             break;
-            
+
         case B_JSON_OBJECT_START:
             Push(new GeneralObjectStackedDumpExportRepositoryJsonListener(fMainListener, this));
             break;
-            
+
         case B_JSON_ARRAY_START:
             Push(new GeneralArrayStackedDumpExportRepositoryJsonListener(fMainListener, this));
             break;
-            
+
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of array");
             break;
-            
+
         case B_JSON_OBJECT_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;
-        
+            return status;
+        }
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -298,26 +299,28 @@ GeneralArrayStackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& ev
         case B_JSON_NULL:
             // ignore
             break;
-            
+
         case B_JSON_OBJECT_START:
             Push(new GeneralObjectStackedDumpExportRepositoryJsonListener(fMainListener, this));
             break;
-            
+
         case B_JSON_ARRAY_START:
             Push(new GeneralArrayStackedDumpExportRepositoryJsonListener(fMainListener, this));
             break;
-            
+
         case B_JSON_OBJECT_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of object");
             break;
-            
+
         case B_JSON_ARRAY_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;
-        
+            return status;
+        }
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -347,31 +350,34 @@ bool
 DumpExportRepository_StackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-        
+
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
             break;
-        
+
         case B_JSON_OBJECT_NAME:
             fNextItemName = event.Content();
             break;
-            
+
         case B_JSON_OBJECT_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;
+            return status;
+        }
 
         case B_JSON_STRING:
 
             if (fNextItemName == "informationUrl")
                 fTarget->SetInformationUrl(new BString(event.Content()));
-        
+
             if (fNextItemName == "code")
                 fTarget->SetCode(new BString(event.Content()));
-        
+
             if (fNextItemName == "name")
                 fTarget->SetName(new BString(event.Content()));
-        
+
             if (fNextItemName == "description")
                 fTarget->SetDescription(new BString(event.Content()));
                     fNextItemName.SetTo("");
@@ -387,13 +393,13 @@ DumpExportRepository_StackedDumpExportRepositoryJsonListener::Handle(const BJson
 
             if (fNextItemName == "informationUrl")
                 fTarget->SetInformationUrlNull();
-        
+
             if (fNextItemName == "code")
                 fTarget->SetCodeNull();
-        
+
             if (fNextItemName == "name")
                 fTarget->SetNameNull();
-        
+
             if (fNextItemName == "description")
                 fTarget->SetDescriptionNull();
                     fNextItemName.SetTo("");
@@ -429,7 +435,7 @@ DumpExportRepository_StackedDumpExportRepositoryJsonListener::Handle(const BJson
         }
 
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -459,12 +465,15 @@ bool
 DumpExportRepository_List_StackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-        
+
         case B_JSON_ARRAY_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;   
-        
+            return status;
+        }
+
         case B_JSON_OBJECT_START:
         {
             DumpExportRepository_StackedDumpExportRepositoryJsonListener* nextListener =
@@ -473,13 +482,13 @@ DumpExportRepository_List_StackedDumpExportRepositoryJsonListener::Handle(const 
             Push(nextListener);
             break;
         }
-            
+
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing an array of DumpExportRepository");
             break;
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -509,25 +518,28 @@ bool
 DumpExportRepositorySource_StackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-        
+
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
             break;
-        
+
         case B_JSON_OBJECT_NAME:
             fNextItemName = event.Content();
             break;
-            
+
         case B_JSON_OBJECT_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;
+            return status;
+        }
 
         case B_JSON_STRING:
 
             if (fNextItemName == "url")
                 fTarget->SetUrl(new BString(event.Content()));
-        
+
             if (fNextItemName == "code")
                 fTarget->SetCode(new BString(event.Content()));
                     fNextItemName.SetTo("");
@@ -543,7 +555,7 @@ DumpExportRepositorySource_StackedDumpExportRepositoryJsonListener::Handle(const
 
             if (fNextItemName == "url")
                 fTarget->SetUrlNull();
-        
+
             if (fNextItemName == "code")
                 fTarget->SetCodeNull();
                     fNextItemName.SetTo("");
@@ -574,7 +586,7 @@ DumpExportRepositorySource_StackedDumpExportRepositoryJsonListener::Handle(const
         }
 
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -604,12 +616,15 @@ bool
 DumpExportRepositorySource_List_StackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-        
+
         case B_JSON_ARRAY_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;   
-        
+            return status;
+        }
+
         case B_JSON_OBJECT_START:
         {
             DumpExportRepositorySource_StackedDumpExportRepositoryJsonListener* nextListener =
@@ -618,13 +633,13 @@ DumpExportRepositorySource_List_StackedDumpExportRepositoryJsonListener::Handle(
             Push(nextListener);
             break;
         }
-            
+
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing an array of DumpExportRepositorySource");
             break;
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -670,36 +685,39 @@ bool
 BulkContainerStackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-        
+
         case B_JSON_ARRAY_END:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
             break;
-        
+
         case B_JSON_OBJECT_NAME:
             fNextItemName = event.Content();
             break;
-            
+
         case B_JSON_OBJECT_START:
             Push(new GeneralObjectStackedDumpExportRepositoryJsonListener(fMainListener, this));
             break;
-            
+
         case B_JSON_ARRAY_START:
             if (fNextItemName == "items")
                 Push(new BulkContainerItemsStackedDumpExportRepositoryJsonListener(fMainListener, this, fItemListener));
             else
                 Push(new GeneralArrayStackedDumpExportRepositoryJsonListener(fMainListener, this));
             break;
-            
+
         case B_JSON_OBJECT_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;
-            
+            return status;
+        }
+
         default:
                 // ignore
             break;
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -723,21 +741,24 @@ bool
 BulkContainerItemsStackedDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     switch (event.EventType()) {
-        
+
         case B_JSON_OBJECT_START:
             Push(new ItemEmittingStackedDumpExportRepositoryJsonListener(fMainListener, this, fItemListener));
             break;
-            
+
         case B_JSON_ARRAY_END:
+        {
             Pop();
+            bool status = (ErrorStatus() == B_OK);
             delete this;
-            break;
-            
+            return status;
+        }
+
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected json event");
             break;
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -814,12 +835,12 @@ SingleDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     if (fErrorStatus != B_OK)
        return false;
-       
+
     if (fStackedListener != NULL)
         return fStackedListener->Handle(event);
-    
+
     switch (event.EventType()) {
-        
+
         case B_JSON_OBJECT_START:
         {
             DumpExportRepository_StackedDumpExportRepositoryJsonListener* nextListener = new DumpExportRepository_StackedDumpExportRepositoryJsonListener(
@@ -828,13 +849,13 @@ SingleDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
             SetStackedListener(nextListener);
             break;
         }
-              
+
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing top level for DumpExportRepository");
             break;
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
@@ -863,28 +884,29 @@ BulkContainerDumpExportRepositoryJsonListener::Handle(const BJsonEvent& event)
 {
     if (fErrorStatus != B_OK)
        return false;
-       
+
     if (fStackedListener != NULL)
         return fStackedListener->Handle(event);
-    
+
     switch (event.EventType()) {
-        
+
         case B_JSON_OBJECT_START:
         {
             BulkContainerStackedDumpExportRepositoryJsonListener* nextListener =
                 new BulkContainerStackedDumpExportRepositoryJsonListener(
                     this, NULL, fItemListener);
+
             SetStackedListener(nextListener);
             return true;
             break;
         }
-              
+
         default:
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE,
                 "illegal state - unexpected json event parsing top level for BulkContainerDumpExportRepositoryJsonListener");
             break;
     }
-    
+
     return ErrorStatus() == B_OK;
 }
 
