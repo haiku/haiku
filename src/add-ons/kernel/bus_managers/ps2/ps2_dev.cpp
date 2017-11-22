@@ -95,7 +95,7 @@ ps2_dev_detect_pointing(ps2_dev* dev, device_hooks** hooks)
 		goto dev_found;
 	}
 
-	// reset the mouse for the case that the previous probes leaf the mouse in
+	// reset the mouse for the case that the previous probes left the mouse in
 	// a undefined state
 	status = ps2_reset_mouse(dev);
 	if (status != B_OK) {
