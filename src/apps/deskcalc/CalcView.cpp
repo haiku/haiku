@@ -771,12 +771,20 @@ CalcView::Paste(BMessage* message)
 		ssize_t read;
 		BFile file;
 		char buffer[256];
+		memset(buffer, 0, sizeof(buffer));
 		for (int32 i = 0; i < count; i++) {
 			if (message->FindRef("refs", i, &ref) == B_OK) {
 				if (file.SetTo(&ref, B_READ_ONLY) == B_OK) {
 					read = file.Read(buffer, 255);
-					buffer[read] = 0;
-					fExpressionTextView->Insert(buffer);
+					if (read <= 0)
+						continue;
+					BString expression(buffer);
+					while (expression.Length() > 0
+						&& expression[expression.Length() - 1] == '\n') {
+						expression.RemoveLast("\n");
+					}
+					if (expression.Length() > 0)
+						fExpressionTextView->Insert(expression.String());
 				}
 			}
 		}
