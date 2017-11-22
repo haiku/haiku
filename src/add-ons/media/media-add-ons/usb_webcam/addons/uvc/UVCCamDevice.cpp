@@ -83,9 +83,13 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon& _addon, BUSBDevice* _device)
 
 	for (uint32 i = 0; i < _device->CountConfigurations(); i++) {
 		config = _device->ConfigurationAt(i);
+		if (config == NULL)
+			continue;
 		_device->SetConfiguration(config);
 		for (uint32 j = 0; j < config->CountInterfaces(); j++) {
 			interface = config->InterfaceAt(j);
+			if (interface == NULL)
+				continue;
 
 			if (interface->Class() == CC_VIDEO && interface->Subclass()
 				== SC_VIDEOCONTROL) {
@@ -696,6 +700,8 @@ UVCCamDevice::_SelectBestAlternate()
 	printf("UVCCamDevice::_SelectBestAlternate()\n");
 	const BUSBConfiguration* config = fDevice->ActiveConfiguration();
 	const BUSBInterface* streaming = config->InterfaceAt(fStreamingIndex);
+	if (streaming == NULL)
+		return B_BAD_INDEX;
 
 	uint32 bestBandwidth = 0;
 	uint32 alternateIndex = 0;
@@ -743,6 +749,8 @@ UVCCamDevice::_SelectIdleAlternate()
 	printf("UVCCamDevice::_SelectIdleAlternate()\n");
 	const BUSBConfiguration* config = fDevice->ActiveConfiguration();
 	const BUSBInterface* streaming = config->InterfaceAt(fStreamingIndex);
+	if (streaming == NULL)
+		return B_BAD_INDEX;
 	if (((BUSBInterface*)streaming)->SetAlternate(0) != B_OK) {
 		fprintf(stderr, "UVCCamDevice::_SelectIdleAlternate()"
 			" selecting alternate failed\n");
@@ -957,9 +965,13 @@ UVCCamDevice::AddParameters(BParameterGroup* group, int32& index)
 
 	for (uint32 i = 0; i < fDevice->CountConfigurations(); i++) {
 		config = fDevice->ConfigurationAt(i);
+		if (config == NULL)
+			continue;
 		fDevice->SetConfiguration(config);
 		for (uint32 j = 0; j < config->CountInterfaces(); j++) {
 			interface = config->InterfaceAt(j);
+			if (interface == NULL)
+				continue;
 			if (interface->Class() != CC_VIDEO || interface->Subclass()
 				!= SC_VIDEOCONTROL)
 				continue;
