@@ -220,10 +220,12 @@ SystemProfiler::_MaybeNotifyProfilerThreadLocked()
 		int cpu = smp_get_current_cpu();
 		fReentered[cpu] = true;
 
-		SpinLocker _(fWaitingProfilerThread->scheduler_lock);
-		thread_unblock_locked(fWaitingProfilerThread, B_OK);
-
+		Thread* profilerThread = fWaitingProfilerThread;
 		fWaitingProfilerThread = NULL;
+
+		SpinLocker _(profilerThread->scheduler_lock);
+		thread_unblock_locked(profilerThread, B_OK);
+
 		fReentered[cpu] = false;
 	}
 }
