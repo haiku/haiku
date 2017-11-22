@@ -924,14 +924,14 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	}
 
 	_RestoreCursorArea();
-	BRect cursorFrame = _CursorFrame();
+	BRect oldCursorFrame = _CursorFrame();
 
 	if (fCursorAndDragBitmap && fCursorAndDragBitmap != fCursor) {
 		delete fCursorAndDragBitmap;
 		fCursorAndDragBitmap = NULL;
 	}
 
-	if (bitmap != NULL) {
+	if (bitmap != NULL && bitmap->Bounds().Width() > 0 && bitmap->Bounds().Height() > 0) {
 		BRect bitmapFrame = bitmap->Bounds();
 		if (fCursor) {
 			// put bitmap frame and cursor frame into the same
@@ -953,97 +953,104 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 			cursorFrame.OffsetBy(shift);
 			bitmapFrame.OffsetBy(shift);
 
-			fCursorAndDragBitmap = new ServerCursor(combindedBounds,
+			fCursorAndDragBitmap = new(std::nothrow) ServerCursor(combindedBounds,
 				bitmap->ColorSpace(), 0, shift);
 
-			// clear the combined buffer
-			uint8* dst = (uint8*)fCursorAndDragBitmap->Bits();
-			uint32 dstBPR = fCursorAndDragBitmap->BytesPerRow();
+			uint8* dst = fCursorAndDragBitmap ? (uint8*)fCursorAndDragBitmap->Bits() : NULL;
+			if (dst == NULL) {
+				// Oops, we could not allocate memory for the drag bitmap.
+				// Let's show the cursor only.
+				delete fCursorAndDragBitmap;
+				fCursorAndDragBitmap = fCursor;
+			} else {
+				// clear the combined buffer
+				uint32 dstBPR = fCursorAndDragBitmap->BytesPerRow();
 
-			memset(dst, 0, fCursorAndDragBitmap->BitsLength());
+				memset(dst, 0, fCursorAndDragBitmap->BitsLength());
 
-			// put drag bitmap into combined buffer
-			uint8* src = (uint8*)bitmap->Bits();
-			uint32 srcBPR = bitmap->BytesPerRow();
+				// put drag bitmap into combined buffer
+				uint8* src = (uint8*)bitmap->Bits();
+				uint32 srcBPR = bitmap->BytesPerRow();
 
-			dst += (int32)bitmapFrame.top * dstBPR
-				+ (int32)bitmapFrame.left * 4;
+				dst += (int32)bitmapFrame.top * dstBPR
+					+ (int32)bitmapFrame.left * 4;
 
-			uint32 width = bitmapFrame.IntegerWidth() + 1;
-			uint32 height = bitmapFrame.IntegerHeight() + 1;
+				uint32 width = bitmapFrame.IntegerWidth() + 1;
+				uint32 height = bitmapFrame.IntegerHeight() + 1;
 
-			for (uint32 y = 0; y < height; y++) {
-				memcpy(dst, src, srcBPR);
-				dst += dstBPR;
-				src += srcBPR;
-			}
+				for (uint32 y = 0; y < height; y++) {
+					memcpy(dst, src, srcBPR);
+					dst += dstBPR;
+					src += srcBPR;
+				}
 
-			// compose cursor into combined buffer
-			dst = (uint8*)fCursorAndDragBitmap->Bits();
-			dst += (int32)cursorFrame.top * dstBPR
-				+ (int32)cursorFrame.left * 4;
+				// compose cursor into combined buffer
+				dst = (uint8*)fCursorAndDragBitmap->Bits();
+				dst += (int32)cursorFrame.top * dstBPR
+					+ (int32)cursorFrame.left * 4;
 
-			src = (uint8*)fCursor->Bits();
-			srcBPR = fCursor->BytesPerRow();
+				src = (uint8*)fCursor->Bits();
+				srcBPR = fCursor->BytesPerRow();
 
-			width = cursorFrame.IntegerWidth() + 1;
-			height = cursorFrame.IntegerHeight() + 1;
+				width = cursorFrame.IntegerWidth() + 1;
+				height = cursorFrame.IntegerHeight() + 1;
 
-			for (uint32 y = 0; y < height; y++) {
-				uint8* d = dst;
-				uint8* s = src;
-				for (uint32 x = 0; x < width; x++) {
-					// takes two semi-transparent pixels
-					// with unassociated alpha (not pre-multiplied)
-					// and stays within non-premultiplied color space
-					if (s[3] > 0) {
-						if (s[3] == 255) {
-							d[0] = s[0];
-							d[1] = s[1];
-							d[2] = s[2];
-							d[3] = 255;
-						} else {
-							uint8 alphaRest = 255 - s[3];
-							uint32 alphaTemp
-								= (65025 - alphaRest * (255 - d[3]));
-							uint32 alphaDest = d[3] * alphaRest;
-							uint32 alphaSrc = 255 * s[3];
-							d[0] = (d[0] * alphaDest + s[0] * alphaSrc)
-								/ alphaTemp;
-							d[1] = (d[1] * alphaDest + s[1] * alphaSrc)
-								/ alphaTemp;
-							d[2] = (d[2] * alphaDest + s[2] * alphaSrc)
-								/ alphaTemp;
-							d[3] = alphaTemp / 255;
+				for (uint32 y = 0; y < height; y++) {
+					uint8* d = dst;
+					uint8* s = src;
+					for (uint32 x = 0; x < width; x++) {
+						// takes two semi-transparent pixels
+						// with unassociated alpha (not pre-multiplied)
+						// and stays within non-premultiplied color space
+						if (s[3] > 0) {
+							if (s[3] == 255) {
+								d[0] = s[0];
+								d[1] = s[1];
+								d[2] = s[2];
+								d[3] = 255;
+							} else {
+								uint8 alphaRest = 255 - s[3];
+								uint32 alphaTemp
+									= (65025 - alphaRest * (255 - d[3]));
+								uint32 alphaDest = d[3] * alphaRest;
+								uint32 alphaSrc = 255 * s[3];
+								d[0] = (d[0] * alphaDest + s[0] * alphaSrc)
+									/ alphaTemp;
+								d[1] = (d[1] * alphaDest + s[1] * alphaSrc)
+									/ alphaTemp;
+								d[2] = (d[2] * alphaDest + s[2] * alphaSrc)
+									/ alphaTemp;
+								d[3] = alphaTemp / 255;
+							}
 						}
+						// TODO: make sure the alpha is always upside down,
+						// then it doesn't need to be done when drawing the cursor
+						// (see _DrawCursor())
+						//					d[3] = 255 - d[3];
+						d += 4;
+						s += 4;
 					}
-					// TODO: make sure the alpha is always upside down,
-					// then it doesn't need to be done when drawing the cursor
-					// (see _DrawCursor())
-//					d[3] = 255 - d[3];
-					d += 4;
-					s += 4;
+					dst += dstBPR;
+					src += srcBPR;
 				}
-				dst += dstBPR;
-				src += srcBPR;
-			}
 
-			// handle pre-multiplication with alpha
-			// for faster compositing during cursor drawing
-			width = combindedBounds.IntegerWidth() + 1;
-			height = combindedBounds.IntegerHeight() + 1;
+				// handle pre-multiplication with alpha
+				// for faster compositing during cursor drawing
+				width = combindedBounds.IntegerWidth() + 1;
+				height = combindedBounds.IntegerHeight() + 1;
 
-			dst = (uint8*)fCursorAndDragBitmap->Bits();
+				dst = (uint8*)fCursorAndDragBitmap->Bits();
 
-			for (uint32 y = 0; y < height; y++) {
-				uint8* d = dst;
-				for (uint32 x = 0; x < width; x++) {
-					d[0] = (d[0] * d[3]) >> 8;
-					d[1] = (d[1] * d[3]) >> 8;
-					d[2] = (d[2] * d[3]) >> 8;
-					d += 4;
+				for (uint32 y = 0; y < height; y++) {
+					uint8* d = dst;
+					for (uint32 x = 0; x < width; x++) {
+						d[0] = (d[0] * d[3]) >> 8;
+						d[1] = (d[1] * d[3]) >> 8;
+						d[2] = (d[2] * d[3]) >> 8;
+						d += 4;
+					}
+					dst += dstBPR;
 				}
-				dst += dstBPR;
 			}
 		} else {
 			fCursorAndDragBitmap = new ServerCursor(bitmap->Bits(),
@@ -1055,7 +1062,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 		fCursorAndDragBitmap = fCursor;
 	}
 
-	Invalidate(cursorFrame);
+	Invalidate(oldCursorFrame);
 
 // NOTE: the EventDispatcher does the reference counting stuff for us
 // TODO: You can not simply call Release() on a ServerBitmap like you
