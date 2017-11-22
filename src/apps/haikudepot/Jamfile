@@ -53,6 +53,7 @@ local textDocumentSources =
 
 Application HaikuDepot :
 	App.cpp
+	BarberPole.cpp
 	BitmapButton.cpp
 	BitmapView.cpp
 	DecisionProvider.cpp
@@ -103,15 +104,15 @@ Application HaikuDepot :
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaData.cpp
-	
+
 	# tar
 	TarArchiveHeader.cpp
 	TarArchiveService.cpp
-	
+
 	#util
 	ToFileUrlProtocolListener.cpp
 	StorageUtils.cpp
-	
+
 	# package_daemon
 	ProblemWindow.cpp
 	ResultWindow.cpp
