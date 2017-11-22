@@ -150,8 +150,8 @@ compare_void_menu_items(const void* _a, const void* _b)
 BootPromptWindow::BootPromptWindow()
 	:
 	BWindow(BRect(0, 0, 530, 400), "",
-		B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_RESIZABLE,
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
+			| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
 	fDefaultKeymapItem(NULL)
 {
@@ -163,12 +163,14 @@ BootPromptWindow::BootPromptWindow()
 	fInfoTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 	fInfoTextView->MakeEditable(false);
 	fInfoTextView->MakeSelectable(false);
+	fInfoTextView->MakeResizable(false);
 
 	// Carefully designed to not exceed the 640x480 resolution with a 12pt font.
 	float width = fInfoTextView->StringWidth("Thank you for trying out Haiku,"
 		" We hope you like it!") * 1.5;
+	float height = be_plain_font->Size() * 23;
 
-	fInfoTextView->SetExplicitSize(BSize(width, B_SIZE_UNSET));
+	fInfoTextView->SetExplicitMinSize(BSize(width, height));
 
 	fDesktopButton = new BButton("", new BMessage(MSG_BOOT_DESKTOP));
 	fDesktopButton->SetTarget(be_app);
@@ -192,7 +194,6 @@ BootPromptWindow::BootPromptWindow()
 
 	// Make sure the language list view is always wide enough to show the
 	// largest language, with some extra space
-	float height = be_plain_font->Size() * 23;
 	fLanguagesListView->SetExplicitSize(
 		BSize(fLanguagesListView->StringWidth("Portuguese (Brazil)") + 32,
 		height));
@@ -212,10 +213,7 @@ BootPromptWindow::BootPromptWindow()
 		.End()
 		.AddGroup(B_HORIZONTAL)
 			.Add(languagesScrollView)
-			.AddGroup(B_VERTICAL)
-				.Add(fInfoTextView)
-				.AddGlue()
-			.End()
+			.Add(fInfoTextView)
 			.SetInsets(B_USE_WINDOW_SPACING, 0)
 		.End()
 		.AddGroup(B_HORIZONTAL)
@@ -233,6 +231,10 @@ BootPromptWindow::BootPromptWindow()
 		.End();
 
 	fLanguagesListView->MakeFocus();
+
+	// Force the info text view to use a reasonable size
+	fInfoTextView->SetText("x\n\n\n\n\n\n\n\n\n\n\n\n\n\nx");
+	ResizeToPreferred();
 
 	_UpdateStrings();
 	CenterOnScreen();
@@ -327,8 +329,6 @@ BootPromptWindow::_UpdateStrings()
 	fKeymapsMenuField->SetLabel(B_TRANSLATE("Keymap"));
 	if (fKeymapsMenuField->Menu()->FindMarked() == NULL)
 		fKeymapsMenuField->MenuItem()->SetLabel(B_TRANSLATE("Custom"));
-
-	ResizeToPreferred();
 }
 
 
