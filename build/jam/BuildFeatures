@@ -677,5 +677,28 @@ if $(TARGET_PACKAGING_ARCH) = x86_64 {
 	}
 }
 
+
+# zstd
+if [ IsPackageAvailable zstd_devel ] {
+	ExtractBuildFeatureArchives zstd :
+		file: base zstd
+			runtime: lib
+		file: devel zstd_devel
+			depends: base
+			library: $(developLibDir)/libzstd.so
+			headers: $(developHeadersDir)
+		# sources are required for the primary architecture only
+		primary @{
+			file: source zstd_source
+				sources: develop/sources/%portRevisionedName%/sources
+		}@
+		;
+
+	EnableBuildFeatures zstd ;
+} else {
+	Echo "zstd support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # ATA Drivers + Bus
 EnableBuildFeatures ata ;

@@ -13,6 +13,7 @@
 #include <File.h>
 
 #include <ZlibCompressionAlgorithm.h>
+#include <ZstdCompressionAlgorithm.h>
 
 
 extern const char* __progname;
@@ -22,6 +23,7 @@ const char* kCommandName = __progname;
 enum CompressionType {
 	ZlibCompression,
 	GzipCompression,
+	ZstdCompression,
 };
 
 
@@ -36,7 +38,8 @@ static const char* kUsage =
 	"  -d, --decompress\n"
 	"      Decompress the input file (default is compress).\n"
 	"  -f <format>\n"
-	"      Specify the compression format: \"zlib\" (default), or \"gzip\"\n"
+	"      Specify the compression format: \"zlib\" (default), \"gzip\"\n"
+	"      or \"zstd\".\n"
 	"  -h, --help\n"
 	"      Print this usage info.\n"
 	"  -i, --input-stream\n"
@@ -55,9 +58,9 @@ print_usage_and_exit(bool error)
 int
 main(int argc, const char* const* argv)
 {
-	int compressionLevel = B_ZLIB_COMPRESSION_DEFAULT;
+	int compressionLevel = -1;
 	bool compress = true;
-	bool useInputStream = true;
+	bool useInputStream = false;
 	CompressionType compressionType = ZlibCompression;
 
 	while (true) {
@@ -101,6 +104,8 @@ main(int argc, const char* const* argv)
 					compressionType = ZlibCompression;
 				} else if (strcmp(optarg, "gzip") == 0) {
 					compressionType = GzipCompression;
+				} else if (strcmp(optarg, "zstd") == 0) {
+					compressionType = ZstdCompression;
 				} else {
 					fprintf(stderr, "Error: Unsupported compression type "
 						"\"%s\"\n", optarg);
@@ -152,6 +157,8 @@ main(int argc, const char* const* argv)
 		case ZlibCompression:
 		case GzipCompression:
 		{
+			if (compressionLevel < 0)
+				compressionLevel = B_ZLIB_COMPRESSION_DEFAULT;
 			compressionAlgorithm = new BZlibCompressionAlgorithm;
 			BZlibCompressionParameters* zlibCompressionParameters
 				= new BZlibCompressionParameters(compressionLevel);
@@ -159,6 +166,16 @@ main(int argc, const char* const* argv)
 				compressionType == GzipCompression);
 			compressionParameters = zlibCompressionParameters;
 			decompressionParameters = new BZlibDecompressionParameters;
+			break;
+		}
+		case ZstdCompression:
+		{
+			if (compressionLevel < 0)
+				compressionLevel = B_ZSTD_COMPRESSION_DEFAULT;
+			compressionAlgorithm = new BZstdCompressionAlgorithm;
+			compressionParameters
+				= new BZstdCompressionParameters(compressionLevel);
+			decompressionParameters = new BZstdDecompressionParameters;
 			break;
 		}
 	}

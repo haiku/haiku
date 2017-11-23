@@ -14,6 +14,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
 
+		if [ FIsBuildFeatureEnabled zstd ] {
+			SubDirC++Flags -DZSTD_ENABLED ;
+			UseBuildFeatureHeaders zstd ;
+			Includes [ FGristFiles ZstdCompressionAlgorithm.cpp ]
+				: [ BuildFeatureAttribute zstd : headers ] ;
+			SetupFeatureObjectsDir zstd ;
+		}
+
 		# BUrl uses ICU to perform IDNA conversions (unicode domain names)
 		UseBuildFeatureHeaders icu ;
 		Includes [ FGristFiles Url.cpp ]
@@ -46,6 +54,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Url.cpp
 			Uuid.cpp
 			ZlibCompressionAlgorithm.cpp
+			ZstdCompressionAlgorithm.cpp
 			;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libreferenceable.a ]

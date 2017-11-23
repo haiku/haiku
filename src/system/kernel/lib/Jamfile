@@ -141,3 +141,6 @@ KernelMergeObject kernel_misc.o :
 
 HaikuSubInclude arch $(TARGET_ARCH) ;
 HaikuSubInclude zlib ;
+if [ FIsBuildFeatureEnabled zstd ] {
+	HaikuSubInclude zstd ;
+}

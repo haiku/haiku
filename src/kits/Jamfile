@@ -48,6 +48,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetLibstdc++ ]
 			[ BuildFeatureAttribute icu : libraries ]
 			[ BuildFeatureAttribute zlib : library ]
+			[ BuildFeatureAttribute zstd : library ]
 			;
 	}
 }
