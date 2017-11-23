@@ -37,8 +37,10 @@ read_midi_settings(struct midi_settings* settings)
 
 	const char* soundfont = get_driver_parameter(handle, "soundfont", NULL,
 		NULL);
-	if (soundfont == NULL)
+	if (soundfont == NULL) {
+		unload_driver_settings(handle);
 		return B_ERROR;
+	}
 	strlcpy(settings->soundfont_file, soundfont,
 		sizeof(settings->soundfont_file));
 
