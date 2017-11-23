@@ -659,6 +659,19 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 }
 
 
+static int32_t
+intel_get_backlight_register(bool read)
+{
+	if (gInfo->shared_info->pch_info == INTEL_PCH_NONE)
+		return MCH_BLC_PWM_CTL;
+	
+	if (read)
+		return PCH_SBLC_PWM_CTL2;
+	else
+		return PCH_BLC_PWM_CTL;
+}
+
+
 status_t
 intel_set_brightness(float brightness)
 {
@@ -667,8 +680,10 @@ intel_set_brightness(float brightness)
 	if (brightness < 0 || brightness > 1)
 		return B_BAD_VALUE;
 
-	uint16_t sblc = read32(INTEL_SBLC_PWM_CTL2) >> 16;
-	write32(INTEL_BLC_PWM_CTL, (uint32_t)(sblc * brightness));
+	uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
+	uint32_t duty = (uint32_t)(period * brightness) & 0xfffe;
+		/* Setting the low bit seems to give strange results on some Atom machines */
+	write32(intel_get_backlight_register(false), duty | (period << 16));
 
 	return B_OK;
 }
@@ -682,9 +697,9 @@ intel_get_brightness(float* brightness)
 	if (brightness == NULL)
 		return B_BAD_VALUE;
 
-	uint16_t sblc = read32(INTEL_SBLC_PWM_CTL2) >> 16;
-	uint16_t  blc = read32( INTEL_BLC_PWM_CTL );
-	*brightness = (float)blc / sblc;
+	uint16_t period = read32(intel_get_backlight_register(true)) >> 16;
+	uint16_t   duty = read32(intel_get_backlight_register(false)) & 0xffff;
+	*brightness = (float)duty / period;
 
 	return B_OK;
 }
