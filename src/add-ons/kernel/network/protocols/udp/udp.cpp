@@ -681,6 +681,8 @@ UdpEndpointManager::DumpEndpoints(int argc, char *argv[])
 {
 	UdpDomainList::Iterator it = sUdpEndpointManager->fDomains.GetIterator();
 
+	kprintf("===== UDP domain manager %p =====\n", sUdpEndpointManager);
+
 	while (it.HasNext())
 		it.Next()->DumpEndpoints();
 
@@ -704,8 +706,10 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	}
 
 	status_t status = Deframe(buffer);
-	if (status != B_OK)
+	if (status != B_OK) {
+		sUdpEndpointManager->FreeEndpoint(domainSupport);
 		return status;
+	}
 
 	status = domainSupport->DemuxIncomingBuffer(buffer);
 	if (status != B_OK) {
@@ -713,10 +717,12 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 		// Send port unreachable error
 		domainSupport->Domain()->module->error_reply(NULL, buffer,
 			B_NET_ERROR_UNREACH_PORT, NULL);
+		sUdpEndpointManager->FreeEndpoint(domainSupport);
 		return B_ERROR;
 	}
 
 	gBufferModule->free(buffer);
+	sUdpEndpointManager->FreeEndpoint(domainSupport);
 	return B_OK;
 }
 
@@ -742,8 +748,10 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	// original packet
 	udp_header header;
 	if (gBufferModule->read(buffer, 0, &header,
-			std::min((size_t)buffer->size, sizeof(udp_header))) != B_OK)
+			std::min((size_t)buffer->size, sizeof(udp_header))) != B_OK) {
+		sUdpEndpointManager->FreeEndpoint(domainSupport);
 		return B_BAD_VALUE;
+	}
 
 	net_domain* domain = buffer->interface_address->domain;
 	net_address_module_info* addressModule = domain->address_module;
@@ -754,7 +762,9 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	source.SetPort(header.source_port);
 	destination.SetPort(header.destination_port);
 
-	return domainSupport->DeliverError(error, buffer);
+	error = domainSupport->DeliverError(error, buffer);
+	sUdpEndpointManager->FreeEndpoint(domainSupport);
+	return error;
 }
 
 
@@ -896,11 +906,10 @@ UdpEndpointManager::_GetDomainSupport(net_buffer* buffer)
 {
 	MutexLocker _(fLock);
 
-	return _GetDomainSupport(_GetDomain(buffer), false);
-		// TODO: we don't want to hold to the manager's lock during the
-		// whole RX path, we may not hold an endpoint's lock with the
-		// manager lock held.
-		// But we should increase the domain's refcount here.
+	UdpDomainSupport* support = _GetDomainSupport(_GetDomain(buffer), false);
+	if (support)
+		support->Ref();
+	return support;
 }
 
 
