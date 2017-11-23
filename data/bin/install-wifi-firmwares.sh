@@ -382,7 +382,6 @@ provides {
 	wifi_firmwares = 2013_10_06
 }
 requires {
-	haiku >= R1~alpha4
 }
 
 EOF
