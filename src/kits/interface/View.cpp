@@ -409,7 +409,7 @@ BView::BView(const char* name, uint32 flags, BLayout* layout)
 	:
 	BHandler(name)
 {
-	_InitData(BRect(0, 0, 0, 0), name, B_FOLLOW_NONE,
+	_InitData(BRect(0, 0, -1, -1), name, B_FOLLOW_NONE,
 		flags | B_SUPPORTS_LAYOUT);
 	SetLayout(layout);
 }
