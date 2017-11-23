@@ -963,6 +963,7 @@ BNetworkAddress::ResolveForDestination(const BNetworkAddress& destination)
 	memcpy(&fAddress, route->source, sizeof(sockaddr_storage));
 	SetPort(port);
 
+	close(socket);
 	return B_OK;
 }
 
@@ -1293,7 +1294,7 @@ BNetworkAddress::_ParseLinkAddress(const char* address)
 
 		address += 3;
 	}
-	
+
 	fHostName = address;
 
 	SetToLinkLevel(linkAddress, length);
