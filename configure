@@ -84,8 +84,8 @@ options:
                               ones the secondary architectures.
   --update                    re-runs last configure invocation [must be given
                               as first option!]
-  --use-clang                 Build with host Clang instead of GCC cross
-                              compiler
+  --use-clang <arch>          Build with host Clang instead of GCC cross
+                              compiler, targeting <arch>
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
   --use-gcc-graphite          Build with GCC Graphite engine for loop
@@ -354,7 +354,13 @@ get_build_tool_path()
 {
 	local var="HAIKU_$1"
 	local cmd=$2
-	local path=${2%% *}
+
+	if [ ! -z "${!var}" ]; then
+		# this variable is already set (probably by user) so grab its contents
+		cmd=${!var}
+	fi
+
+	local path=${cmd%% *}
 
 	if [ -f "$path" ]; then
 		# get absolute path
@@ -364,7 +370,7 @@ get_build_tool_path()
 		cd $oldPwd
 	else
 		which "$path" > /dev/null 2>&1 || {
-			echo "Build tool \"$path\" not found." >&2
+			echo "Build tool \"$path\" not found (maybe specify it in $var?)" >&2
 			exit 1
 		}
 	fi
@@ -599,7 +605,22 @@ while [ $# -gt 0 ] ; do
 			)
 			haikuTargetArchs="$haikuTargetArchs $targetArch"
 			;;
-		--use-clang) useClang=1; shift 1;;
+		--use-clang)
+			assertparam "$1" $#
+			targetArch=$2
+			useClang=1
+			case "$targetArch" in
+				x86)		targetMachine=i586-pc-haiku;;
+				x86_64)		targetMachine=x86_64-unknown-haiku;;
+				*)
+					echo "Unsupported target architecture: $2" >&2
+					exit 1
+					;;
+			esac
+			targetArchs="$targetArchs $targetArch"
+			HAIKU_PACKAGING_ARCHS=
+			shift 2
+			;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
 		--use-gcc-graphite)	useGccGraphiteDefault=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
@@ -774,14 +795,11 @@ else
 
 		# prepare gcc settings and get the actual target architecture
 		if [ $useClang = 1 ]; then
-			target=${crossToolsPrefix##*/}
-			target=${target%-}
-			gcc="clang -target ${target} -no-integrated-as"
+			gcc="clang -target ${targetMachine} -no-integrated-as"
+		elif [ -z "${crossToolsPrefix}" ]; then
+			gcc=`get_variable HAIKU_CC_$targetArch`
 		else
 			gcc="${crossToolsPrefix}gcc"
-		fi
-		if [ -z "${crossToolsPrefix}" ]; then
-			gcc=`get_variable HAIKU_CC_$targetArch`
 		fi
 		standard_gcc_settings "$gcc"
 		targetArch=$standard_gcc_settings_targetArch
@@ -930,3 +948,5 @@ HAIKU_OUTPUT_DIR	= ${outputDir} ;
 include [ FDirName \$(HAIKU_TOP) Jamfile ] ;
 
 EOF
+
+echo "Configured successfully!"
