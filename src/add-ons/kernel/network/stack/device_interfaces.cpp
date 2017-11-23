@@ -463,8 +463,10 @@ get_device_interface(const char* name, bool create)
 			status_t status = module->init_device(name, &device);
 			if (status == B_OK) {
 				interface = allocate_device_interface(device, module);
-				if (interface != NULL)
+				if (interface != NULL) {
+					close_module_list(cookie);
 					return interface;
+				}
 
 				module->uninit_device(device);
 			}
