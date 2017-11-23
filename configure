@@ -353,11 +353,12 @@ set_default_value()
 get_build_tool_path()
 {
 	local var="HAIKU_$1"
+	local varval=`get_variable $var`
 	local cmd=$2
 
-	if [ ! -z "${!var}" ]; then
+	if [ ! -z "$varval" ]; then
 		# this variable is already set (probably by user) so grab its contents
-		cmd=${!var}
+		cmd=$varval
 	fi
 
 	local path=${cmd%% *}
