@@ -775,14 +775,14 @@ CalcView::Paste(BMessage* message)
 		for (int32 i = 0; i < count; i++) {
 			if (message->FindRef("refs", i, &ref) == B_OK) {
 				if (file.SetTo(&ref, B_READ_ONLY) == B_OK) {
-					read = file.Read(buffer, 255);
+					read = file.Read(buffer, sizeof(buffer) - 1);
 					if (read <= 0)
 						continue;
 					BString expression(buffer);
-					while (expression.Length() > 0
-						&& expression[expression.Length() - 1] == '\n') {
-						expression.RemoveLast("\n");
-					}
+					int32 j = expression.Length();
+					while (j > 0 && expression[j - 1] == '\n')
+						j--;
+					expression.Truncate(j);
 					if (expression.Length() > 0)
 						fExpressionTextView->Insert(expression.String());
 				}
