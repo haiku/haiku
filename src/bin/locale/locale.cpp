@@ -73,11 +73,12 @@ print_time_conventions()
 void
 usage(int status)
 {
-	printf("Usage: %s [-lfmt]\n"
+	printf("Usage: %s [-lftcm]\n"
 		"  -l, --language\tPrint the currently set preferred language\n"
 		"  -f, --format\t\tPrint the formatting-related locale\n"
-		"  -m, --message\t\tPrint the message-related locale\n"
 		"  -t, --time\t\tPrint the time-related locale\n"
+		"  -c, --message\t\tPrint the message-related locale\n"
+		"  -m, --charmap\t\tList available character maps\n"
 		"  -h, --help\t\tDisplay this help and exit\n",
 		kProgramName);
 
@@ -91,8 +92,9 @@ main(int argc, char **argv)
 	static struct option const longopts[] = {
 		{"language", no_argument, 0, 'l'},
 		{"format", no_argument, 0, 'f'},
-		{"message", no_argument, 0, 'm'},
 		{"time", no_argument, 0, 't'},
+		{"message", no_argument, 0, 'c'},
+		{"charmap", no_argument, 0, 'm'},
 		{"help", no_argument, 0, 'h'},
 		{NULL}
 	};
@@ -109,12 +111,16 @@ main(int argc, char **argv)
 			case 'c':	// for compatibility, we used to use 'c' for ctype
 				printf("%s.UTF-8\n", preferred_language().String());
 				break;
-			case 'm':
-				puts("UTF-8");
-				break;
 			case 't':
 				print_time_conventions();
 				break;
+
+			// POSIX mandatory options
+			case 'm':
+				puts("UTF-8");
+				break;
+			// TODO 'a', 'c', 'k'
+
 			case 'h':
 				usage(0);
 				break;
