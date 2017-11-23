@@ -569,7 +569,7 @@ ScheduledMessage::SendMessage()
 	for (int32 index = 0; index < fData->Targets().CountItems(); ++index) {
 		port_id port = *(fData->Targets().ItemAt(index));
 		status_t error = SendMessageToPort(port);
-		
+
 		if (error == B_OK) {
 			++sent;
 			continue;
@@ -706,8 +706,10 @@ DelayedMessageSender::ScheduleMessage(DelayedMessage& message)
 	if (scheduled == NULL)
 		return B_NO_MEMORY;
 
-	if (!scheduled->IsValid())
+	if (!scheduled->IsValid()) {
+		delete scheduled;
 		return B_BAD_DATA;
+	}
 
 	if (fMessages.AddItem(scheduled)) {
 		fMessages.SortItems(&CompareMessages);
