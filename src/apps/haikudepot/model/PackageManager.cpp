@@ -1,11 +1,12 @@
 /*
- * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  * 		Stephan Aßmus <superstippi@gmx.de>
  * 		Rene Gollent <rene@gollent.com>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 
@@ -82,6 +83,13 @@ PackageProgressListener::DownloadProgressChanged(const char* packageName,
 
 void
 PackageProgressListener::DownloadProgressComplete(const char* packageName)
+{
+}
+
+
+void
+PackageProgressListener::ConfirmedChanges(
+	BPackageManager::InstalledRepository& repository)
 {
 }
 
@@ -206,6 +214,20 @@ public:
 		if (ref.Get() != NULL) {
 			ref->SetDownloadProgress(1.0);
 			fDownloadedPackages.insert(ref);
+		}
+	}
+
+	virtual	void ConfirmedChanges(BPackageManager::InstalledRepository&
+		repository)
+	{
+		BPackageManager::InstalledRepository::PackageList& activationList =
+			repository.PackagesToActivate();
+
+		BSolverPackage* package = NULL;
+		for (int32 i = 0; (package = activationList.ItemAt(i)); i++) {
+			PackageInfoRef ref(FindPackageByName(package->Info().Name()));
+			if (ref.Get() != NULL)
+				ref->SetState(PENDING);
 		}
 	}
 
@@ -690,6 +712,7 @@ PackageManager::ConfirmChanges(bool fromMostSpecific)
 
 	bool hasOtherChanges = false;
 	int32 count = fInstalledRepositories.CountItems();
+
 	if (fromMostSpecific) {
 		for (int32 i = count - 1; i >= 0; i--)
 			hasOtherChanges
@@ -700,12 +723,16 @@ PackageManager::ConfirmChanges(bool fromMostSpecific)
 				|= _AddResults(*fInstalledRepositories.ItemAt(i), window);
 	}
 
-	if (!hasOtherChanges)
+	if (!hasOtherChanges) {
+		_NotifyChangesConfirmed();
 		return;
+	}
 
 	// show the window
 	if (windowDeleter.Detach()->Go() == 0)
 		throw BAbortedByUserException();
+
+	_NotifyChangesConfirmed();
 }
 
 
@@ -810,6 +837,19 @@ PackageManager::_AddResults(InstalledRepository& repository,
 	return window->AddLocationChanges(repository.Name(),
 		repository.PackagesToActivate(), installPackages,
 		repository.PackagesToDeactivate(), uninstallPackages);
+}
+
+
+void
+PackageManager::_NotifyChangesConfirmed()
+{
+	int32 count = fInstalledRepositories.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		for (int32 j = 0; j < fPackageProgressListeners.CountItems(); j++) {
+			fPackageProgressListeners.ItemAt(j)->ConfirmedChanges(
+				*fInstalledRepositories.ItemAt(i));
+		}
+	}
 }
 
 

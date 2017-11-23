@@ -2,6 +2,7 @@
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2011, Ingo Weinhold, <ingo_weinhold@gmx.de>
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
+ * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -46,6 +47,10 @@ class PackageProgressListener {
 									float progress);
 	virtual	void				DownloadProgressComplete(
 									const char* packageName);
+
+	virtual	void				ConfirmedChanges(
+									BPackageManager::InstalledRepository&
+										repository);
 
 	virtual	void				StartApplyingChanges(
 									BPackageManager::InstalledRepository&
@@ -119,6 +124,7 @@ private:
 									BPackageManager::InstalledRepository&
 										repository,
 									ResultWindow* window);
+			void				_NotifyChangesConfirmed();
 
 			BPackageKit::BSolverPackage*
 								_GetSolverPackage(PackageInfoRef package);
