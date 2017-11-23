@@ -174,7 +174,7 @@ _BTextInput_::AlignTextRect()
 	float vInset = max_c(1,
 			floorf((textRect.Height() - LineHeight(0)) / 2.0));
 	float hInset = 2;
-	float textFontWidth = TextRect().right;
+	float textFontWidth = TextRect().Width();
 
 	switch (Alignment()) {
 		case B_ALIGN_LEFT:
