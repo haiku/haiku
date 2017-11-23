@@ -16,6 +16,8 @@
 
 class PackageRow;
 class PackageListener;
+class WorkStatusView;
+
 
 class PackageListView : public BColumnListView {
 public:
@@ -35,6 +37,8 @@ public:
 
 			void				SelectPackage(const PackageInfoRef& package);
 
+			void				AttachWorkStatusView(WorkStatusView* view);
+
 private:
 			PackageRow*			_FindRow(const PackageInfoRef& package,
 									PackageRow* parent = NULL);
@@ -47,6 +51,8 @@ private:
 			BLocker*			fModelLock;
 			ItemCountView*		fItemCountView;
 			PackageListener*	fPackageListener;
+
+			WorkStatusView*		fWorkStatusView;
 };
 
 #endif // PACKAGE_LIST_VIEW_H

@@ -4,6 +4,7 @@
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -56,6 +57,7 @@
 #include "support.h"
 #include "ScreenshotWindow.h"
 #include "UserLoginWindow.h"
+#include "WorkStatusView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -162,6 +164,9 @@ MainWindow::MainWindow(const BMessage& settings)
 		.Add(fFeaturedPackagesView)
 	;
 
+	fWorkStatusView = new WorkStatusView("work status");
+	fPackageListView->AttachWorkStatusView(fWorkStatusView);
+
 	BView* listArea = new BView("list area", 0);
 	fListLayout = new BCardLayout();
 	listArea->SetLayout(fListLayout);
@@ -183,6 +188,7 @@ MainWindow::MainWindow(const BMessage& settings)
 			.End()
 			.Add(fPackageInfoView)
 		.End()
+		.Add(fWorkStatusView)
 	;
 
 	fSplitView->SetCollapsible(0, false);
@@ -305,6 +311,7 @@ MainWindow::MessageReceived(BMessage* message)
 			fModelWorker = B_BAD_THREAD_ID;
 			_AdoptModel();
 			fFilterView->AdoptModel(fModel);
+			fWorkStatusView->SetIdle();
 			break;
 		}
 		case B_SIMPLE_DATA:
@@ -498,6 +505,20 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_SHOW_SCREENSHOT:
 			_ShowScreenshot();
+			break;
+
+		case MSG_PACKAGE_WORKER_BUSY:
+		{
+			BString reason;
+			status_t status = message->FindString("reason", &reason);
+			if (status != B_OK)
+				break;
+			fWorkStatusView->SetBusy(reason);
+			break;
+		}
+
+		case MSG_PACKAGE_WORKER_IDLE:
+			fWorkStatusView->SetIdle();
 			break;
 
 		default:
@@ -1093,6 +1114,8 @@ MainWindow::_StartRefreshWorker(bool force)
 	if (parameters == NULL)
 		return;
 
+	fWorkStatusView->SetBusy(B_TRANSLATE("Refreshing..."));
+
 	ObjectDeleter<RefreshWorkerParameters> deleter(parameters);
 	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
 		B_LOW_PRIORITY, parameters);
@@ -1142,7 +1165,15 @@ MainWindow::_PackageActionWorker(void* arg)
 			window->fPendingActions.Remove(0);
 		}
 
+		BMessenger messenger(window);
+		BMessage busyMessage(MSG_PACKAGE_WORKER_BUSY);
+		BString text(ref->Label());
+		text << "...";
+		busyMessage.AddString("reason", text);
+
+		messenger.SendMessage(&busyMessage);
 		ref->Perform();
+		messenger.SendMessage(MSG_PACKAGE_WORKER_IDLE);
 	}
 
 	return 0;

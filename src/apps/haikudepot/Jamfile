@@ -84,7 +84,8 @@ Application HaikuDepot :
 	ScrollableGroupView.cpp
 	SharedBitmap.cpp
 	UserLoginWindow.cpp
-	
+	WorkStatusView.cpp
+
 	# network + server - model
 	DumpExportPkg.cpp
 	DumpExportPkgCategory.cpp

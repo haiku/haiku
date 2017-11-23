@@ -1,6 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
+ * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -24,11 +25,14 @@ class PackageActionsView;
 class PackageInfoView;
 class PackageListView;
 class ScreenshotWindow;
+class WorkStatusView;
 
 
 enum {
 	MSG_MAIN_WINDOW_CLOSED		= 'mwcl',
 	MSG_PACKAGE_SELECTED		= 'pkgs',
+	MSG_PACKAGE_WORKER_BUSY		= 'pkwb',
+	MSG_PACKAGE_WORKER_IDLE		= 'pkwi',
 };
 
 
@@ -95,6 +99,7 @@ private:
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
 			BSplitView*			fSplitView;
+			WorkStatusView*		fWorkStatusView;
 
 			ScreenshotWindow*	fScreenshotWindow;
 

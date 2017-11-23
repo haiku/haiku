@@ -20,6 +20,7 @@
 #include <Window.h>
 
 #include "MainWindow.h"
+#include "WorkStatusView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -723,7 +724,8 @@ PackageListView::PackageListView(BLocker* modelLock)
 	:
 	BColumnListView("package list view", 0, B_FANCY_BORDER, true),
 	fModelLock(modelLock),
-	fPackageListener(new(std::nothrow) PackageListener(this))
+	fPackageListener(new(std::nothrow) PackageListener(this)),
+	fWorkStatusView(NULL)
 {
 	float scale = be_plain_font->Size() / 12.f;
 	float spacing = be_control_look->DefaultItemSpacing() * 2;
@@ -802,8 +804,13 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateSummary();
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
 					row->UpdateRating();
-				if ((changes & PKG_CHANGED_STATE) != 0)
+				if ((changes & PKG_CHANGED_STATE) != 0) {
 					row->UpdateState();
+					if (fWorkStatusView != NULL) {
+						fWorkStatusView->PackageStatusChanged(
+							row->Package());
+					}
+				}
 				if ((changes & PKG_CHANGED_SIZE) != 0)
 					row->UpdateSize();
 				if ((changes & PKG_CHANGED_ICON) != 0)
@@ -894,6 +901,13 @@ PackageListView::SelectPackage(const PackageInfoRef& package)
 		SetFocusRow(row, false);
 		ScrollTo(row);
 	}
+}
+
+
+void
+PackageListView::AttachWorkStatusView(WorkStatusView* view)
+{
+	fWorkStatusView = view;
 }
 
 
