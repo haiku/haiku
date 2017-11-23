@@ -335,6 +335,7 @@ ElfFile::CreateSymbolLookupSource(uint64 fileOffset, uint64 fileLength,
 	SymbolLookupSource* source = new(std::nothrow) SymbolLookupSource(fFD);
 	if (source == NULL
 			|| !source->AddSegment(fileOffset, fileLength, memoryAddress)) {
+		delete source;
 		return NULL;
 	}
 
