@@ -47,7 +47,7 @@ BProxySecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 	if (status != B_OK)
 		return status;
 
-	BSocket::Connect(fProxyAddress, timeout);
+	status = BSocket::Connect(fProxyAddress, timeout);
 	if (status != B_OK)
 		return status;
 
@@ -63,7 +63,7 @@ BProxySecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 
 	buffer[length] = '\0';
 	int httpStatus = 0;
-	int matches = scanf(buffer, "HTTP/1.0 %d %*[^\r\n]\r\n\r\n", httpStatus);
+	int matches = sscanf(buffer, "HTTP/1.0 %d %*[^\r\n]\r\n\r\n", &httpStatus);
 	if (matches != 2)
 		return B_BAD_DATA;
 
