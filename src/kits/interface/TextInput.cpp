@@ -182,12 +182,12 @@ _BTextInput_::AlignTextRect()
 			break;
 
 		case B_ALIGN_RIGHT:
-			hInset  = textRect.right - textFontWidth;
+			hInset  = textRect.Width() - textFontWidth;
 			hInset -= be_control_look->DefaultLabelSpacing();
 			break;
 
 		case B_ALIGN_CENTER:
-			hInset = (textRect.right - textFontWidth) / 2.0;
+			hInset = (textRect.Width() - textFontWidth) / 2.0;
 			break;
 
 		default:
