@@ -13,6 +13,7 @@
 
 
 class BGroupLayout;
+class ScrollableGroupView;
 
 
 class FeaturedPackagesView : public BView {
@@ -24,12 +25,14 @@ public:
 			void				RemovePackage(const PackageInfoRef& package);
 			void				Clear();
 
-			void				SelectPackage(const PackageInfoRef& package);
+			void				SelectPackage(const PackageInfoRef& package,
+									bool scrollToEntry = false);
 
 	static	void				CleanupIcons();
 
 private:
 			BGroupLayout*		fPackageListLayout;
+			ScrollableGroupView* fContainerView;
 };
 
 

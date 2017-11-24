@@ -33,6 +33,8 @@ enum {
 	MSG_PACKAGE_SELECTED		= 'pkgs',
 	MSG_PACKAGE_WORKER_BUSY		= 'pkwb',
 	MSG_PACKAGE_WORKER_IDLE		= 'pkwi',
+	MSG_ADD_VISIBLE_PACKAGES	= 'avpk',
+	MSG_UPDATE_SELECTED_PACKAGE	= 'uspk',
 };
 
 
@@ -82,6 +84,7 @@ private:
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PackageActionWorker(void* arg);
 	static	status_t			_PopulatePackageWorker(void* arg);
+	static	status_t			_PackagesToShowWorker(void* arg);
 
 			void				_NotifyUser(const char* title,
 									const char* message);
@@ -130,6 +133,14 @@ private:
 			PackageInfoRef		fPackageToPopulate;
 			BLocker				fPackageToPopulateLock;
 			sem_id				fPackageToPopulateSem;
+
+			thread_id			fShowPackagesWorker;
+			PackageList			fPackagesToShowList;
+			int32				fPackagesToShowListID;
+				// atomic, counted up whenever fPackagesToShowList is refilled
+			BLocker				fPackagesToShowListLock;
+			sem_id				fNewPackagesToShowSem;
+			sem_id				fShowPackagesAcknowledgeSem;
 };
 
 #endif // MAIN_WINDOW_H

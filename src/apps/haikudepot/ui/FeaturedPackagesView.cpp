@@ -348,12 +348,12 @@ FeaturedPackagesView::FeaturedPackagesView()
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 
-	ScrollableGroupView* containerView = new ScrollableGroupView();
-	containerView->SetViewUIColor(B_LIST_BACKGROUND_COLOR);
-	fPackageListLayout = containerView->GroupLayout();
+	fContainerView = new ScrollableGroupView();
+	fContainerView->SetViewUIColor(B_LIST_BACKGROUND_COLOR);
+	fPackageListLayout = fContainerView->GroupLayout();
 
 	BScrollView* scrollView = new BScrollView(
-		"featured packages scroll view", containerView,
+		"featured packages scroll view", fContainerView,
 		0, false, true, B_FANCY_BORDER);
 
 	BScrollBar* scrollBar = scrollView->ScrollBar(B_VERTICAL);
@@ -433,7 +433,8 @@ FeaturedPackagesView::Clear()
 
 
 void
-FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
+FeaturedPackagesView::SelectPackage(const PackageInfoRef& package,
+	bool scrollToEntry)
 {
 	BString selectedName;
 	if (package.Get() != NULL)
@@ -445,7 +446,16 @@ FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
 			break;
 
 		BString name = view->PackageName();
-		view->SetSelected(name == selectedName);
+		bool match = (name == selectedName);
+		view->SetSelected(match);
+
+		if (match && scrollToEntry) {
+			// Scroll the view so that the package entry shows up in the middle
+			fContainerView->ScrollTo(0,
+				view->Frame().top
+				- fContainerView->Bounds().Height() / 2
+				+ view->Bounds().Height() / 2);
+		}
 	}
 }
 

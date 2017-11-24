@@ -221,6 +221,8 @@ MainWindow::MainWindow(const BMessage& settings)
 	_RestoreUserName(settings);
 	_RestoreWindowFrame(settings);
 
+	atomic_set(&fPackagesToShowListID, 0);
+
 	// start worker threads
 	BPackageRoster().StartWatching(this,
 		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
@@ -281,6 +283,11 @@ MainWindow::~MainWindow()
 	delete_sem(fPackageToPopulateSem);
 	if (fPopulatePackageWorker >= 0)
 		wait_for_thread(fPopulatePackageWorker, NULL);
+
+	delete_sem(fNewPackagesToShowSem);
+	delete_sem(fShowPackagesAcknowledgeSem);
+	if (fShowPackagesWorker >= 0)
+		wait_for_thread(fShowPackagesWorker, NULL);
 
 	if (fScreenshotWindow != NULL && fScreenshotWindow->Lock())
 		fScreenshotWindow->Quit();
@@ -521,6 +528,66 @@ MainWindow::MessageReceived(BMessage* message)
 			fWorkStatusView->SetIdle();
 			break;
 
+		case MSG_ADD_VISIBLE_PACKAGES:
+		{
+			struct SemaphoreReleaser {
+				SemaphoreReleaser(sem_id semaphore)
+					:
+					fSemaphore(semaphore)
+				{ }
+
+				~SemaphoreReleaser() { release_sem(fSemaphore); }
+
+				sem_id fSemaphore;
+			};
+
+			// Make sure acknowledge semaphore is released even on error,
+			// so the worker thread won't be blocked
+			SemaphoreReleaser acknowledger(fShowPackagesAcknowledgeSem);
+
+			int32 numPackages = 0;
+			type_code unused;
+			status_t status = message->GetInfo("package_ref", &unused,
+				&numPackages);
+			if (status != B_OK || numPackages == 0)
+				break;
+
+			int32 listID = 0;
+			status = message->FindInt32("list_id", &listID);
+			if (status != B_OK)
+				break;
+			if (listID != atomic_get(&fPackagesToShowListID)) {
+				// list is outdated, ignore
+				break;
+			}
+
+			for (int i = 0; i < numPackages; i++) {
+				PackageInfo* packageRaw = NULL;
+				status = message->FindPointer("package_ref", i,
+					(void**)&packageRaw);
+				if (status != B_OK)
+					break;
+				PackageInfoRef package(packageRaw, true);
+
+				fPackageListView->AddPackage(package);
+				if (package->IsProminent())
+					fFeaturedPackagesView->AddPackage(package);
+			}
+			break;
+		}
+
+		case MSG_UPDATE_SELECTED_PACKAGE:
+		{
+			const PackageInfoRef& selectedPackage = fPackageInfoView->Package();
+			fFeaturedPackagesView->SelectPackage(selectedPackage, true);
+			fPackageListView->SelectPackage(selectedPackage);
+
+			AutoLocker<BLocker> modelLocker(fModel.Lock());
+			if (!fVisiblePackages.Contains(fPackageInfoView->Package()))
+				fPackageInfoView->Clear();
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -727,6 +794,16 @@ MainWindow::_InitWorkerThreads()
 			resume_thread(fPopulatePackageWorker);
 	} else
 		fPopulatePackageWorker = -1;
+
+	fNewPackagesToShowSem = create_sem(0, "ShowPackages");
+	fShowPackagesAcknowledgeSem = create_sem(0, "ShowPackagesAck");
+	if (fNewPackagesToShowSem >= 0 && fShowPackagesAcknowledgeSem >= 0) {
+		fShowPackagesWorker = spawn_thread(&_PackagesToShowWorker,
+			"Good news everyone", B_NORMAL_PRIORITY, this);
+		if (fShowPackagesWorker >= 0)
+			resume_thread(fShowPackagesWorker);
+	} else
+		fShowPackagesWorker = -1;
 }
 
 
@@ -735,17 +812,17 @@ MainWindow::_AdoptModel()
 {
 	fVisiblePackages = fModel.CreatePackageList();
 
+	{
+		AutoLocker<BLocker> modelLocker(fModel.Lock());
+		AutoLocker<BLocker> listLocker(fPackagesToShowListLock);
+		fPackagesToShowList = fVisiblePackages;
+		atomic_add(&fPackagesToShowListID, 1);
+	}
+
 	fFeaturedPackagesView->Clear();
 	fPackageListView->Clear();
-	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
-		BAutolock locker(fModel.Lock());
 
-		const PackageInfoRef& package = fVisiblePackages.ItemAtFast(i);
-		fPackageListView->AddPackage(package);
-
-		if (package->IsProminent())
-			fFeaturedPackagesView->AddPackage(package);
-	}
+	release_sem(fNewPackagesToShowSem);
 
 	BAutolock locker(fModel.Lock());
 	fShowFeaturedPackagesItem->SetMarked(fModel.ShowFeaturedPackages());
@@ -759,14 +836,6 @@ MainWindow::_AdoptModel()
 		fListLayout->SetVisibleItem((int32)0);
 	else
 		fListLayout->SetVisibleItem((int32)1);
-
-	// Maintain selection
-	const PackageInfoRef& selectedPackage = fPackageInfoView->Package();
-	fFeaturedPackagesView->SelectPackage(selectedPackage);
-	fPackageListView->SelectPackage(selectedPackage);
-
-	if (!fVisiblePackages.Contains(fPackageInfoView->Package()))
-		fPackageInfoView->Clear();
 }
 
 
@@ -1197,6 +1266,78 @@ MainWindow::_PopulatePackageWorker(void* arg)
 				Model::POPULATE_USER_RATINGS | Model::POPULATE_SCREEN_SHOTS
 					| Model::POPULATE_CHANGELOG);
 		}
+	}
+
+	return 0;
+}
+
+
+/* static */ status_t
+MainWindow::_PackagesToShowWorker(void* arg)
+{
+	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
+
+	while (acquire_sem(window->fNewPackagesToShowSem) == B_OK) {
+		PackageList packageList;
+		int32 listID = 0;
+		{
+			AutoLocker<BLocker> lock(&window->fPackagesToShowListLock);
+			packageList = window->fPackagesToShowList;
+			listID = atomic_get(&window->fPackagesToShowListID);
+			window->fPackagesToShowList.Clear();
+		}
+
+		// Add packages to list views in batches of kPackagesPerUpdate so we
+		// don't block the window thread for long with each iteration
+		enum {
+			kPackagesPerUpdate = 20
+		};
+		uint32 packagesInMessage = 0;
+		BMessage message(MSG_ADD_VISIBLE_PACKAGES);
+		BMessenger messenger(window);
+		bool listIsOutdated = false;
+
+		for (int i = 0; i < packageList.CountItems(); i++) {
+			const PackageInfoRef& package = packageList.ItemAtFast(i);
+
+			if (packagesInMessage >= kPackagesPerUpdate) {
+				if (listID != atomic_get(&window->fPackagesToShowListID)) {
+					// The model was changed again in the meantime, and thus
+					// our package list isn't current anymore. Send no further
+					// messags based on this list and go back to start.
+					listIsOutdated = true;
+					break;
+				}
+
+				message.AddInt32("list_id", listID);
+				messenger.SendMessage(&message);
+				message.MakeEmpty();
+				packagesInMessage = 0;
+
+				// Don't spam the window's message queue, which would make it
+				// unresponsive (i.e. allows UI messages to get in between our
+				// messages). When it has processed the message we just sent,
+				// it will let us know by releasing the semaphore.
+				acquire_sem(window->fShowPackagesAcknowledgeSem);
+			}
+			package->AcquireReference();
+			message.AddPointer("package_ref", package.Get());
+			packagesInMessage++;
+		}
+
+		if (listIsOutdated)
+			continue;
+
+		// Send remaining package infos, if any, which didn't make it into
+		// the last message (count < kPackagesPerUpdate)
+		if (packagesInMessage > 0) {
+			message.AddInt32("list_id", listID);
+			messenger.SendMessage(&message);
+			acquire_sem(window->fShowPackagesAcknowledgeSem);
+		}
+
+		// Update selected package in list views
+		messenger.SendMessage(MSG_UPDATE_SELECTED_PACKAGE);
 	}
 
 	return 0;
