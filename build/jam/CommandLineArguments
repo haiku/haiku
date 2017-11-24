@@ -74,13 +74,6 @@ rule ProcessCommandLineArguments
 				Echo "  mount                - Mount the Haiku image in the"
 					" bfs_shell." ;
 				Echo ;
-				Echo "Package upload to (git.haiku-os.org/hpkg-upload):" ;
-				Echo "  jam upload-packages <packages ...> " ;
-				Echo ;
-				Echo "Remote repository creation (for testing a set of"
-					" packages):" ;
-				Echo "  jam build-remote-test-repository <packages ...> " ;
-				Echo ;
 				Echo "For more details on how to customize Haiku builds read" ;
 				Echo "build/jam/UserBuildConfig.ReadMe." ;
 				Exit ;
@@ -95,27 +88,6 @@ rule ProcessCommandLineArguments
 				} else {
 					Exit "\"jam run\" requires parameters!" ;
 				}
-			}
-
-			# Copy the given set of local package files to the git repository
-			# server, where they will be used for creating a new repository
-			# during the push hook.
-			case upload-packages : {
-				UploadPackages $(JAM_TARGETS[1]) : $(JAM_TARGETS[2-]) ;
-				JAM_TARGETS = $(JAM_TARGETS[1]) ;
-				NotFile $(JAM_TARGETS) ;
-				Always $(JAM_TARGETS) ;
-			}
-
-			# Copy the given set of local package files to the remote repository
-			# and create a new version of that remote repository (useful for
-			# testing the package repository before pushing).
-			case build-remote-test-repository : {
-				BuildRemoteHaikuPortsRepository $(JAM_TARGETS[1])
-					: $(JAM_TARGETS[2-]) ;
-				JAM_TARGETS = $(JAM_TARGETS[1]) ;
-				NotFile $(JAM_TARGETS) ;
-				Always $(JAM_TARGETS) ;
 			}
 
 			# A target starting with "@" is a build profile.
