@@ -10,6 +10,7 @@
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
 #include <Locker.h>
+#include <util/OpenHashTable.h>
 
 #include "PackageInfo.h"
 
@@ -40,17 +41,18 @@ public:
 			void				AttachWorkStatusView(WorkStatusView* view);
 
 private:
-			PackageRow*			_FindRow(const PackageInfoRef& package,
-									PackageRow* parent = NULL);
-			PackageRow*			_FindRow(const BString& packageName,
-									PackageRow* parent = NULL);
+			PackageRow*			_FindRow(const PackageInfoRef& package);
+			PackageRow*			_FindRow(const BString& packageName);
 
 private:
 			class ItemCountView;
+			struct RowByNameHashDefinition;
+			typedef BOpenHashTable<RowByNameHashDefinition> RowByNameTable;
 
 			BLocker*			fModelLock;
 			ItemCountView*		fItemCountView;
 			PackageListener*	fPackageListener;
+			RowByNameTable*		fRowByNameTable;
 
 			WorkStatusView*		fWorkStatusView;
 };

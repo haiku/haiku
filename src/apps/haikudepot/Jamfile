@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps haikudepot ;
 
-UsePrivateHeaders interface shared storage package support net ;
+UsePrivateHeaders interface kernel net package shared storage support ;
 
 # source directories
 local sourceDirs =

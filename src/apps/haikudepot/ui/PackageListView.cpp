@@ -17,6 +17,7 @@
 #include <MessageFormat.h>
 #include <ScrollBar.h>
 #include <StringForSize.h>
+#include <package/hpkg/Strings.h>
 #include <Window.h>
 
 #include "MainWindow.h"
@@ -153,9 +154,15 @@ public:
 			void				UpdateSize();
 			void				UpdateRepository();
 
+			PackageRow*&		NextInHash()
+									{ return fNextInHash; }
+
 private:
 			PackageInfoRef		fPackage;
 			PackageInfoListenerRef fPackageListener;
+
+			PackageRow*			fNextInHash;
+				// link for BOpenHashTable
 };
 
 
@@ -535,7 +542,8 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	:
 	Inherited(ceilf(be_plain_font->Size() * 1.8f)),
 	fPackage(packageRef),
-	fPackageListener(packageListener)
+	fPackageListener(packageListener),
+	fNextInHash(NULL)
 {
 	if (packageRef.Get() == NULL)
 		return;
@@ -717,6 +725,36 @@ private:
 };
 
 
+// #pragma mark - PackageListView::RowByNameHashDefinition
+
+
+struct PackageListView::RowByNameHashDefinition {
+	typedef const char*	KeyType;
+	typedef	PackageRow	ValueType;
+
+	size_t HashKey(const char* key) const
+	{
+		return BPackageKit::BHPKG::BPrivate::hash_string(key);
+	}
+
+	size_t Hash(PackageRow* value) const
+	{
+		return BPackageKit::BHPKG::BPrivate::hash_string(
+			value->Package()->Name().String());
+	}
+
+	bool Compare(const char* key, PackageRow* value) const
+	{
+		return value->Package()->Name() == key;
+	}
+
+	ValueType*& GetLink(PackageRow* value) const
+	{
+		return value->NextInHash();
+	}
+};
+
+
 // #pragma mark - PackageListView
 
 
@@ -725,6 +763,7 @@ PackageListView::PackageListView(BLocker* modelLock)
 	BColumnListView("package list view", 0, B_FANCY_BORDER, true),
 	fModelLock(modelLock),
 	fPackageListener(new(std::nothrow) PackageListener(this)),
+	fRowByNameTable(new RowByNameTable()),
 	fWorkStatusView(NULL)
 {
 	float scale = be_plain_font->Size() / 12.f;
@@ -848,6 +887,7 @@ PackageListView::Clear()
 {
 	fItemCountView->SetItemCount(0);
 	BColumnListView::Clear();
+	fRowByNameTable->Clear();
 }
 
 
@@ -868,6 +908,9 @@ PackageListView::AddPackage(const PackageInfoRef& package)
 	// add the row, parent may be NULL (add at top level)
 	AddRow(packageRow);
 
+	// add to hash table for quick lookup of row by package name
+	fRowByNameTable->Insert(packageRow);
+
 	// make sure the row is initially expanded
 	ExpandOrCollapse(packageRow, true);
 
@@ -881,6 +924,8 @@ PackageListView::RemovePackage(const PackageInfoRef& package)
 	PackageRow* packageRow = _FindRow(package);
 	if (packageRow == NULL)
 		return;
+
+	fRowByNameTable->Remove(packageRow);
 
 	RemoveRow(packageRow);
 	delete packageRow;
@@ -912,41 +957,16 @@ PackageListView::AttachWorkStatusView(WorkStatusView* view)
 
 
 PackageRow*
-PackageListView::_FindRow(const PackageInfoRef& package, PackageRow* parent)
+PackageListView::_FindRow(const PackageInfoRef& package)
 {
-	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
-		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));
-		if (row != NULL && row->Package() == package)
-			return row;
-		if (CountRows(row) > 0) {
-			// recurse into child rows
-			row = _FindRow(package, row);
-			if (row != NULL)
-				return row;
-		}
-	}
-
-	return NULL;
+	if (package.Get() == NULL)
+		return NULL;
+	return fRowByNameTable->Lookup(package->Name().String());
 }
 
 
 PackageRow*
-PackageListView::_FindRow(const BString& packageName, PackageRow* parent)
+PackageListView::_FindRow(const BString& packageName)
 {
-	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
-		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));
-		if (row != NULL && row->Package().Get() != NULL
-			&& row->Package()->Name() == packageName) {
-			return row;
-		}
-		if (CountRows(row) > 0) {
-			// recurse into child rows
-			row = _FindRow(packageName, row);
-			if (row != NULL)
-				return row;
-		}
-	}
-
-	return NULL;
+	return fRowByNameTable->Lookup(packageName.String());
 }
-
