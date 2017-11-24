@@ -304,7 +304,8 @@ static inline bool
 is_develop_package(const PackageInfoRef& package)
 {
 	const BString& packageName = package->Name();
-	return packageName.EndsWith("_devel");
+	return packageName.EndsWith("_devel")
+		|| packageName.EndsWith("_debuginfo");
 }
 
 
