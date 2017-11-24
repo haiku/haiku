@@ -277,7 +277,7 @@ PowerStatusView::Draw(BRect updateRect)
 void
 PowerStatusView::DrawTo(BView* view, BRect rect)
 {
-	bool inside = rect.Width() >= 50.0f && rect.Height() >= 40.0f;
+	bool inside = rect.Width() >= 40.0f && rect.Height() >= 40.0f;
 
 	font_height fontHeight;
 	view->GetFontHeight(&fontHeight);

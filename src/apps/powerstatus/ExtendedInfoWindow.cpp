@@ -343,15 +343,17 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 {
 	fDriverInterface->AcquireReference();
 
+	float scale = be_plain_font->Size() / 12.0f;
+	float tabHeight = 70.0f * scale;
+	BRect batteryRect(0, 0, 50 * scale, 50 * scale);
 	fBatteryTabView = new BatteryTabView("tabview");
 	fBatteryTabView->SetBorder(B_NO_BORDER);
-	fBatteryTabView->SetTabHeight(70.0f);
+	fBatteryTabView->SetTabHeight(tabHeight);
 	fBatteryTabView->SetTabSide(BTabView::kLeftSide);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
 		.Add(fBatteryTabView);
 
-	BRect batteryRect(0, 0, 50, 30);
 	for (int i = 0; i < interface->GetBatteryCount(); i++) {
 		BatteryInfoView* batteryInfoView = new BatteryInfoView();
 		ExtPowerStatusView* view = new ExtPowerStatusView(interface,
