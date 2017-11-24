@@ -12,7 +12,9 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <StringView.h>
 
+#include "BarberPole.h"
 #include "BitmapView.h"
 #include "WebAppInterface.h"
 
@@ -31,10 +33,30 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	BWindow(frame, B_TRANSLATE("Screenshot"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fNumScreenshots(0),
 	fDownloadPending(false),
 	fWorkerThread(-1)
 {
 	AddToSubset(parent);
+
+	atomic_set(&fCurrentScreenshotIndex, 0);
+
+	fBarberPole = new BarberPole("barber pole");
+	fBarberPole->SetExplicitMaxSize(BSize(200, B_SIZE_UNLIMITED));
+
+	fIndexView = new BStringView("screenshot index", NULL);
+
+	fToolBar = new BToolBar();
+	fToolBar->AddAction(MSG_PREVIOUS_SCREENSHOT, this, NULL /* todo: icon */,
+		B_TRANSLATE("Show previous screenshot"),
+		B_TRANSLATE("Previous"));
+	fToolBar->AddAction(MSG_NEXT_SCREENSHOT, this, NULL /* todo: icon */,
+		B_TRANSLATE("Show next screenshot"),
+		B_TRANSLATE("Next"));
+	fToolBar->AddGlue();
+	fToolBar->AddView(fIndexView);
+	fToolBar->AddGlue();
+	fToolBar->AddView(fBarberPole);
 
 	fScreenshotView = new BitmapView("screenshot view");
 	fScreenshotView->SetExplicitMaxSize(
@@ -44,7 +66,10 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	groupView->SetViewColor(kBackgroundColor);
 
 	// Build layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, 5, 0, 0)
+		.Add(fToolBar)
+		.AddStrut(5)
 		.AddGroup(groupView)
 			.Add(fScreenshotView)
 			.SetInsets(B_USE_WINDOW_INSETS)
@@ -83,6 +108,28 @@ void
 ScreenshotWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_NEXT_SCREENSHOT:
+		{
+			atomic_add(&fCurrentScreenshotIndex, 1);
+			_UpdateToolBar();
+			_DownloadScreenshot();
+			break;
+		}
+
+		case MSG_PREVIOUS_SCREENSHOT:
+			atomic_add(&fCurrentScreenshotIndex, -1);
+			_UpdateToolBar();
+			_DownloadScreenshot();
+			break;
+
+		case MSG_DOWNLOAD_START:
+			fBarberPole->Start();
+			break;
+
+		case MSG_DOWNLOAD_STOP:
+			fBarberPole->Stop();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -113,6 +160,11 @@ ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 		_DownloadScreenshot();
 	}
 	SetTitle(title);
+
+	atomic_set(&fCurrentScreenshotIndex, 0);
+	fNumScreenshots = fPackage->ScreenshotInfos().CountItems();
+
+	_UpdateToolBar();
 }
 
 
@@ -200,14 +252,21 @@ ScreenshotWindow::_DownloadThread()
 	// Obtain the correct code for the screenshot to display
 	// TODO: Once navigation buttons are added, we could use the
 	// ScreenshotInfo at the "current" index.
-	const ScreenshotInfo& info = screenshotInfos.ItemAtFast(0);
+	const ScreenshotInfo& info = screenshotInfos.ItemAtFast(
+		atomic_get(&fCurrentScreenshotIndex));
 
 	BMallocIO buffer;
 	WebAppInterface interface;
 
+	BMessenger messenger(this);
+	messenger.SendMessage(MSG_DOWNLOAD_START);
+
 	// Retrieve screenshot from web-app
 	status_t status = interface.RetrieveScreenshot(info.Code(),
 		info.Width(), info.Height(), &buffer);
+
+	messenger.SendMessage(MSG_DOWNLOAD_STOP);
+
 	if (status == B_OK && Lock()) {
 		printf("got screenshot");
 		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
@@ -228,4 +287,21 @@ ScreenshotWindow::_ResizeToFitAndCenter()
 	GetSizeLimits(&minWidth, NULL, &minHeight, NULL);
 	ResizeTo(minWidth, minHeight);
 	CenterOnScreen();
+}
+
+
+void
+ScreenshotWindow::_UpdateToolBar()
+{
+	int32 currentIndex = atomic_get(&fCurrentScreenshotIndex);
+	fToolBar->SetActionEnabled(MSG_PREVIOUS_SCREENSHOT,
+		currentIndex > 0);
+	fToolBar->SetActionEnabled(MSG_NEXT_SCREENSHOT,
+		currentIndex < fNumScreenshots - 2);
+
+	BString text;
+	text << currentIndex + 1;
+	text << " / ";
+	text << fNumScreenshots;
+	fIndexView->SetText(text);
 }

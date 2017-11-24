@@ -7,12 +7,23 @@
 
 #include <Locker.h>
 #include <Messenger.h>
+#include <ToolBar.h>
 #include <Window.h>
 
 #include "PackageInfo.h"
 
 
+class BarberPole;
 class BitmapView;
+class BStringView;
+
+
+enum {
+	MSG_NEXT_SCREENSHOT     = 'nscr',
+	MSG_PREVIOUS_SCREENSHOT = 'pscr',
+	MSG_DOWNLOAD_START      = 'dlst',
+	MSG_DOWNLOAD_STOP       = 'dlsp',
+};
 
 
 class ScreenshotWindow : public BWindow {
@@ -39,13 +50,21 @@ private:
 			void				_DownloadThread();
 
 			void				_ResizeToFitAndCenter();
+			void				_UpdateToolBar();
 
 private:
 			BMessenger			fOnCloseTarget;
 			BMessage			fOnCloseMessage;
 
+			BToolBar*			fToolBar;
+			BarberPole*			fBarberPole;
+			BStringView*		fIndexView;
+
 			BitmapRef			fScreenshot;
 			BitmapView*			fScreenshotView;
+
+			int32				fNumScreenshots;
+			int32				fCurrentScreenshotIndex; // atomic
 
 			PackageInfoRef		fPackage;
 			bool				fDownloadPending;
