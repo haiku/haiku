@@ -148,7 +148,8 @@ PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 				printf("unable to find the category for [%s]\n",
 					categoryCode->String());
 			} else {
-				packageInfo->AddCategory(fCategories.ItemAtFast(i));
+				packageInfo->AddCategory(
+					fCategories.ItemAtFast(categoryIndex));
 			}
 		}
 
