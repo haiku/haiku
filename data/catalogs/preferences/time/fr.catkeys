@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-Time	3566599171
+1	french	x-vnd.Haiku-Time	3755504714
 GMT (UNIX compatible)	Time		GMT (compatible UNIX)
 OK	Time		OK
 Asia	Time		Asie
 \nNow: 	Time		\nMaintenant, il est : 
 Africa	Time		Afrique
 Reset to default server list	Time		Restaurer la liste de serveurs par défaut
+Could not resolve server address	Time		Impossible de résoudre l'adresse du serveur
 Stop	Time		Arrêter
 Australia	Time		Australie
 Preview time:	Time		Aperçu de l’heure :

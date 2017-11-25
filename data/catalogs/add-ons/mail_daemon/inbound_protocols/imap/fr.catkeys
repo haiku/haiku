@@ -1,9 +1,11 @@
-1	french	x-vnd.Haiku-IMAP	354143849
+1	french	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Destination :
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		Valider
 status	IMAPFolderConfig		état
 Configure IMAP Folders	imap_config		Configurer les dossiers IMAP
 Cancel	IMAPFolderConfig		Annuler
+No encryption	imap_config		Aucun chiffrage
 Apply	IMAPFolderConfig		Appliquer
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Récupération des dossiers IMAP. Merci de patienter…
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Impossible de se connecter au serveur « %server% » :\n%error%

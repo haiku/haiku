@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1593161601
+1	french	x-vnd.Haiku-WebPositive	2763299522
 Show home button	Settings Window		Afficher le bouton de la page d’accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l’URL dans le presse-papiers
@@ -7,6 +7,7 @@ Close window	WebPositive Window		Fermer la fenêtre
 Quit	WebPositive		Quitter
 The download could not be opened.	Download Window		Impossible d’ouvrir l’objet téléchargé.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Le dossier de téléchargement n’a pas pu être ouvert.\n\nErreur : %error
+Close	Download Window		Fermer
 Open location	WebPositive Window		Ouvrir l’emplacement
 Clear history	WebPositive Window		Nettoyer l’historique
 WebPositive	System name		WebPositive
@@ -95,6 +96,7 @@ Remove	Download Window		Enlever
 Find	WebPositive Window		Rechercher
 Find previous	WebPositive Window		Rechercher le précédent
 Settings	WebPositive Window		Réglages
+(Finish: %date)	Download Window		(Fin : %date)
 Script console	WebPositive Window		Console de script
 Name	Cookie Manager		Nom
 Proxy server address:	Settings Window		Adresse du serveur mandataire :
@@ -125,11 +127,13 @@ Auto-hide interface in full screen mode	Settings Window		Cacher automatiquement 
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a échoué
 New tab	WebPositive Window		Nouvel onglet
 Downloads in progress	WebPositive		Téléchargement en cours
+(Finish: %date - %duration left)	Download Window		(Fin : %date - il reste %duration)
 Style:	Font Selection view		Style :
 General	Settings Window		Général
 View	WebPositive Window		Vue
 Previous	WebPositive Window		Précédent
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Une erreur est survenue en créant le fichier de signet.\n\nErreur : %error
+(Finish: %date - Over %duration left)	Download Window		(Fin : %date - il reste plus de %duration)
 Bookmark error	WebPositive Window		Erreur de signet
 Do you really want to clear the browsing history?	WebPositive Window		Souhaitez-vous vraiment effacer l’historique de navigation ?
 Copy	WebPositive Window		Copier
