@@ -342,8 +342,8 @@ FontManager::_LoadRecentFontMappings()
 		_AddDefaultMapping("Noto Sans", "Bold", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
-		veraFontPath.Append("NotoMono-Regular.ttf");
-		_AddDefaultMapping("Noto Mono", "Regular", veraFontPath.Path());
+		veraFontPath.Append("NotoSansMono-Regular.ttf");
+		_AddDefaultMapping("Noto Sans Mono", "Regular", veraFontPath.Path());
 
 		return true;
 	}
