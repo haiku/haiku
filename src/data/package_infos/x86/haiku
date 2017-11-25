@@ -114,6 +114,9 @@ requires {
 	lib:libswscale >= 4
 	lib:libswresample >= 2
 #endif
+#ifdef HAIKU_BUILD_FEATURE_X86_ZSTD_ENABLED
+	lib:libzstd >= 1
+#endif
 #endif
 	lib:libsolv
 	lib:libsolvext

@@ -104,6 +104,9 @@ requires {
 	lib:libssl >= 1.0.0
 	lib:libcrypto >= 1.0.0
 #endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_ZSTD_ENABLED
+	lib:libzstd >= 1
+#endif
 #endif
 	lib:libsolv
 	lib:libsolvext
