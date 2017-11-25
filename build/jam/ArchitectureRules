@@ -602,7 +602,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons translators hvif ;
 	EnableWerror src add-ons translators ico ;
 	EnableWerror src add-ons translators jpeg ;
-	EnableWerror src add-ons translators jpeg2000 ;
+#	EnableWerror src add-ons translators jpeg2000 ;
 	EnableWerror src add-ons translators pcx ;
 	EnableWerror src add-ons translators png ;
 	EnableWerror src add-ons translators ppm ;

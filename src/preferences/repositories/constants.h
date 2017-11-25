@@ -38,7 +38,7 @@ typedef struct {
 static const Repository kDefaultRepos[] = {
 	{ "Haiku", "https://packages.haiku-os.org/haiku/master/" B_HAIKU_ABI_NAME
 		"/current"},
-	{ "HaikuPorts", "https://packages.haiku-os.org/haikuports/master/repo/"
+	{ "HaikuPorts", "https://eu.hpkg.haiku-os.org/haikuports/master/repository/"
 		B_HAIKU_ABI_NAME "/current" }
 };
 

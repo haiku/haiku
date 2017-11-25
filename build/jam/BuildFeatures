@@ -440,25 +440,15 @@ if [ IsPackageAvailable libicns_devel ] {
 
 # Jasper
 if [ IsPackageAvailable jasper_devel ] {
-	if $(HAIKU_PACKAGING_ARCH) = x86_64 {
-		ExtractBuildFeatureArchives jasper :
-			file: base jasper
-				runtime: lib
-			file: devel jasper_devel
-				depends: base
-				library: $(developLibDir)/libjasper.so.4
-				headers: $(developHeadersDir) $(developHeadersDir)/jasper
-			;
-	} else {
-		ExtractBuildFeatureArchives jasper :
-			file: base jasper
-				runtime: lib
-			file: devel jasper_devel
-				depends: base
-				library: $(developLibDir)/libjasper.so.1
-				headers: $(developHeadersDir) $(developHeadersDir)/jasper
-			;
-	}
+	ExtractBuildFeatureArchives jasper :
+		file: base jasper
+			runtime: lib
+		file: devel jasper_devel
+			depends: base
+			library: $(developLibDir)/libjasper.so.4
+			headers: $(developHeadersDir) $(developHeadersDir)/jasper
+		;
+
 	EnableBuildFeatures jasper ;
 } else {
 	Echo "Jasper support not available on $(TARGET_PACKAGING_ARCH)" ;

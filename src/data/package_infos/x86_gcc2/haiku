@@ -93,7 +93,6 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_X86_GCC2_LIBPNG_ENABLED
 	lib:libpng16 >= 16.0
 #endif
-	lib:libqrencode
 #ifdef HAIKU_BUILD_FEATURE_X86_GCC2_TIFF_ENABLED
 	lib:libtiff >= 5.2
 #endif

@@ -4,7 +4,6 @@ SubInclude HAIKU_TOP src libs agg ;
 SubInclude HAIKU_TOP src libs alm ;
 SubInclude HAIKU_TOP src libs bsd ;
 SubInclude HAIKU_TOP src libs compat ;
-SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs glut ;
 SubInclude HAIKU_TOP src libs gnu ;
 SubInclude HAIKU_TOP src libs icon ;
@@ -20,4 +19,3 @@ SubInclude HAIKU_TOP src libs termcap ;
 SubInclude HAIKU_TOP src libs udis86 ;
 SubInclude HAIKU_TOP src libs uuid ;
 SubInclude HAIKU_TOP src libs util ;
-

@@ -90,7 +90,6 @@ rule HaikuImageGetPrivateSystemLibs
 {
 	return [ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
 		libalm.so
-		libfluidsynth.so@gcc2
 		libilmimf.so
 		libpackage-add-on-libsolv.so
 		libroot-addon-icu.so

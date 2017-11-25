@@ -160,9 +160,12 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 	# build package list checksum file
 	local packagesChecksumFile
 		= $(repository:G=repository-package-checksum)-checksum ;
+	local thisPackageRepositoryFile = [ Glob [ FDirName
+		$(HAIKU_BUILD_RULES_DIR) repositories HaikuPorts ] :
+			$(HAIKU_PACKAGING_ARCH) ] ;
 	MakeLocate $(packagesChecksumFile) : $(repositoriesDir) ;
-	Depends $(packagesChecksumFile) : $(packageListFile) ;
-	ChecksumFileSHA256 $(packagesChecksumFile) : $(packageListFile) ;
+	Depends $(packagesChecksumFile) : $(thisPackageRepositoryFile) ;
+	ChecksumFileSHA256 $(packagesChecksumFile) : $(thisPackageRepositoryFile) ;
 
 	local repositoryInfo = $(repository:G=repository-info)-info ;
 	local repositoryFile = $(repository:G=repository-cache) ;
@@ -260,7 +263,7 @@ actions RepositoryConfig1
 		version=`cat "$(2[3]:E)"`
 	fi
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) $(HAIKU_REPOSITORY_URL) $(2[2]) $(1)
+	$(2[1]) $(2[2]) $(1)
 }
 
 
