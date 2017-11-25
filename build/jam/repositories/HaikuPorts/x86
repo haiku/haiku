@@ -1214,9 +1214,9 @@ RemotePackageRepository HaikuPorts
 	zlib_devel-1.2.11-2
 	zopfli-1.0.1-1
 	zsh-5.3.1-1
-	zstd-1.1.2-1
-	zstd_bin-1.1.2-1
-	zstd_devel-1.1.2-1
+	zstd-1.3.1-1
+	zstd_bin-1.3.1-1
+	zstd_devel-1.3.1-1
 
 	# secondary architecture (x86_gcc2)
 	binutils_x86_gcc2-2.17_2013_04_21-2
