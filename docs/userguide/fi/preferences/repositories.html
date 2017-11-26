@@ -9,19 +9,21 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Karvjorm
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Repositories</title>
+	<title>Tietovarastot</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Käyttäjäopas</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -56,24 +58,23 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
-<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Repositories</h2>
+<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Tietovarastot</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
+<tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
+<tr><td>Sijainti:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
+<tr><td>Asetukset:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
 </table>
-<p>Repositories are collections of software packages. Set up by default, there's the <i>Haiku</i> repo with all of the operating system's packages and <i>HaikuPorts</i>, which provides a large number of ported and native Haiku software. There are several more repositories, curated by members of the Haiku community. Checkout <a href="https://www.haiku-os.org/community/software">Software Sites</a> on the website.</p>
-<p>This is the preference panel to manage your respositories (you can open it also from <a href="../applications/haikudepot.html">HaikuDepot's</a> <span class="menu">Tools</span> menu):</p>
+<p>Tietovarastot ovat ohjelmistopakkausten kokoelmia. Oletuksena asetetaan <i>Haiku</i>-tietovarasto kaikille käyttöjärjestelmäpakkauksille ja <i>HaikuPorts</i>, joka tarjoaa laajan määrän sovitettuja ja kotoperäisiä Haiku-ohjelmia. Haiku-yhteistön jäsenten toimiessa kuraattoreina tarjolla on useita muita tietovarastoja. Tarkista <a href="https://www.haiku-os.org/community/software">Software Sites</a> webbisivustolla.</p>
+<p>Tämä on asetuspaneeli tietovarastojesi hallintaan (voit avata sen myös <a href="../applications/haikudepot.html">HaikuVarasto</a>n <span class="menu">Työkalut</span>-valikosta):</p>
 <img src="../images/prefs-images/repositories.png" alt="repositories.png" />
-<p>The first column in the list of known repositories shows if a repo is currently enabled. If it doesn't have a checkmark, it will not be queried by HaikuDepot or <span class="cli">pkgman</span> from the command line. Use the buttons to <span class="button">Enable</span> or <span class="button">Disable</span> the selected repositories, or double-click a repo to toggle the status.</p>
-<p>Depending on the size of the repository and the speed of the internet connection, enabling a repository may take a few seconds. If it takes longer, you're informed of pending tasks in the little text box above the <span class="button">+/-</span> buttons. If it takes unusually long, you'll be asked to either cancel or retry.</p>
-<p>To be able to remove a repository completely with the "<span class="button">-</span>" button, it has to be disabled.<br />
-You add a new repository with the "<span class="button"> </span>" button, which will open this panel:</p>
+<p>Tunnettujen tietovarastojen luettelon ensimmäisessä sarakkeessa näytetään, että onko varasto tällä hetkellä käytössä. Jos sitä ei ole merkitty, HaikuVarasto kyselee sitä tai <span class="cli">pkgman</span>-sovellus komentoriviltä. Käytä valitun tietovaraston painikkeita <span class="button">Ota käyttöön</span> tai <span class="button">Poista käytöstä</span>, tai kaksoisnapsauta varastoa sen tilan vaihtamiseksi.</p>
+<p>Tietovaraston käyttöönotto voi kestää muutamia sekuntia riippuen tietovaraston koosta ja internet-yhteyden nopeudesta. Jos se kestää kauemmin, sinulle kerrotaan avoimena olevasta tehtävästä pienessä teksti-ikkunassa painikkeiden <span class="button">+/-</span> yläpuolella. Jos se kestää epätavallisen kauan, sinua pyydetään perumaan tai yrittämään uudelleen.</p>
+<p>Kykenet e tietovaraston kokonaan painikkeella  "<span class="button">-</span>", se on otettava pois käytöstä.<br />
+Voit lisätä uuden tietovaraston "<span class="button"> </span>"-painikkeella, joka avaa tämän paneelin:</p>
 <img src="../images/prefs-images/repositories_add.png" alt="repositories_add.png" />
-<p>To add a new repository, just paste its URL into the text field. It'll be named "Unknown" until you enable it.</p>
-<div class="box-warning">It goes without saying that adding a repository and downloading and installing software from it is a matter of trust. Don't carelessly just add any URL you happen upon on the internets.</div>
+<p>Uuden tietovaraston lisäämiseksi liitä vain sen verkko-osoite tekstikenttään. Se nimetään "Tuntematon"-nimellä, kunnes otat sen käyttöön.</p>
+<div class="box-warning">Sanomattakin on selvää, että tietovaraston lisääminen ja lataaminen sekä ohjelmien asentaminen siitä on luottamusasia. Älä lisää tietovarastoihin huolettomasti mitä tahansa verkko-osoitetta, jonka satut löytämään internetistä.</div>
 </div>
 </div>
 

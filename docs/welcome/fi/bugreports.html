@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>Käyttäjäopas</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -57,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -90,7 +89,7 @@ Varmista sen jälkeen kun olet esitellyt ainutlaatuisen vian, että tietosi ovat
 <ul>
 	<li><p>Yritä toistaa havaitsemasi vika nykyisessä Haikun korjausversiossa. Esirakennetut tiedostovedokset testaustarkoituksiin löytyvät <a href="http://haiku-files.org/">täältä</a>.</p></li>
 	<li><p>Sisällytä mukaan perustietoa siitä, kuinka testaat Haikua (todellisessa tietokoneessa, VMWare-ympäristössä, QEMU-emulaattorissa, jne.).</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
+	<li><p>Mainitse, mitä korjausversiota käytät. Löydät tämän tiedon Työpöytäpalkin valikosta <span class="menu">Haikusta...</span>. Mainitse myös, että minkälaisella rakennusjärjestelmällä (gcc2, gcc4, gcc2hybrid, gcc4hybrid) testaamasi järjestelmä on rakennettu. Ladattavat tiedostovedokset on nimetty niiden mukaan. Itse rakennetuissa tiedostovedoksissa tiedät itse, kuinka se on rakennettu.</p></li>
 	<li><p>Kuvaile kokemasi pulma. Yritä olla niin tarkka kuin voit: kuvaile todellinen käyttäytyminen, ja se käyttäytyminen, jota odotit.</p></li>
 	<li><p>Kuvaile, mitä vaiheita pitää suorittaa vian paljastumiseksi. Tämä auttaa kehittäjiä toistamaan vian.</p></li>
 	<li><p>Liitä mukaan niin paljon tietoja, kuin sinulla on. Jos kyseessä on graafisen käyttöliittymän vika, tai vika yhdessä sovelluksessa, yritä tehdä näytönkaappaus painamalla <span class="key">PRINT SCREEN</span>-näppäintä.</p></li>
@@ -102,9 +101,9 @@ Varmista sen jälkeen kun olet esitellyt ainutlaatuisen vian, että tietosi ovat
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Palvelinviat</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
-Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+<p>Kun elintärkeät palvelimet, kuten app-, registrar- tai input-palvelin kaatuvat, et näe tavallista kaatumishälytystä. Sen sijaan koko näyttö muuttuu valkoiseksi ja gdb-istunto käynnistyy ja sen tuloste ilmaantuu näytölle. Todennäköisesti pystyt yhä liikuttamaan hiiren kohdistinta, mikä ylikirjoittaa valkoisen ja gdb-tulosteen näytöllä. Yhä vielä toimivat sovellukset (kuten Prosessivalvonta tai Työpöytäpalkin kello) saattavat myös kirjoittaa vikajäljittimen tulosteen päälle näytölle.<br />
+Paitsi että kaikki on rumempaa ja epämukavampaa, sama koskee myös sovellusvikoja. Tärkeintä on hankkia paluujälki (<span class="cli">bt</span>-komento). Sinun on ehkä otettava valokuva näytöstä digitaalikameralla, koska et voi kopioida tekstiä mihinkään.<br />
+Riippuen siitä mikä kaatui voit yrittää tallentaa kaatumisilmoituksen Työpöydälle <span class="cli">save-report</span>-komentorivisovelluksella ja painaa virtapainiketta kerran, mikä sulkee järjestelmän puhtaasti.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Käyttöjärjestelmäydinviat</a></h2>

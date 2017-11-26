@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Käyttäjäopas</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -57,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-kohtaiset komentorivisovellukset</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -127,13 +126,13 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 		<td valign="top"><p><span class="cli">diskimage</span> sallii sinun rekisteröidä tavallisen tiedoston levylaitteena. Voit esimerkiksi rekisteröidä Haiku anyboot-levyvedoksen, liittää se Seuraajassa ja kopoida, muokata tai poistaa siitä tiedostoja käyttäen sitä Asennusohjelman lähteenä.</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it. Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
-For example, this will stop the re-launching of the Deskbar:</p>
+		<td valign="top"><p>Taustaprosessi launch_daemon käynnistää kaiken tyyppisiä palveluita ja sovelluksia järjestelmän käynnistyessä. Jotkut niistä se on käskytetty käynnistämään uudelleen, jos ne sulkeutuvat. Jos et halua sitä – ehkä haluat esimerkiksi testata muokattua Seuraajaa – käytä <span class="cli">launch_roster</span>-sovellusta <tt>pysäyttämään</tt> sovelluksen uudelleenkäynnistyminen ennen siitä poistumista. Samalla tavalla voit <tt>käynnistää</tt> sen uudestaan tai hakea <tt>tietoja</tt> siitä. Ilman parametriä, <span class="cli">launch_roster</span> luettelee kaikki sovellukset/palvelut, jotka ovat sen hallinnassa.<br />
+Esimerkiksi, tämä pysäyttää Työpöytäpalkin uudelleenkäynnistymisen:</p>
 <pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
 </td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
-<p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>
+		<td valign="top"><p>Monien mielestä <span class="cli">mountvolume</span> on paras liittämään paikalliset levyosiot ja levyasemat, koska sen käyttö on helppoa: kutsu sitä vain levyosion nimellä ja kaikki on tehty. Hae lisätietoja <tt>--help</tt> valitsimella.</p>
+<p><span class="cli">mount</span> voi lisäksi liittää etälevyasemia käyttäen verkkotiedostojärjestelmiä, kuten NFS4. Voit määritellä käytettävän tiedostojärjestelmän <tt>-t</tt> -parametrilla ja etäsijainnin <tt>-p</tt> -parametrilla. Tiedostojärjestelmäparametrina voit käyttää mitä tahansa, mitä löydät kohteesta <span class="path">/system/add-ons/kernel/file_system</span> (ja tietysti vastaavista tiedostohierarkioista hakemiston <span class="path">~/config</span> tai "<span class="path">non-packaged</span>" alta). Sinun on myös luotava kansio liitäntäpisteeksi. Tässä on esimerkki:</p>
 <pre class="terminal">mkdir -p /DiskStation
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
