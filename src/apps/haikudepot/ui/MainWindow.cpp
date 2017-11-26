@@ -238,6 +238,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	BWindow(BRect(50, 50, 650, 350), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fWorkStatusView(NULL),
 	fScreenshotWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
@@ -520,12 +521,14 @@ MainWindow::MessageReceived(BMessage* message)
 			status_t status = message->FindString("reason", &reason);
 			if (status != B_OK)
 				break;
-			fWorkStatusView->SetBusy(reason);
+			if (!fSinglePackageMode)
+				fWorkStatusView->SetBusy(reason);
 			break;
 		}
 
 		case MSG_PACKAGE_WORKER_IDLE:
-			fWorkStatusView->SetIdle();
+			if (!fSinglePackageMode)
+				fWorkStatusView->SetIdle();
 			break;
 
 		case MSG_ADD_VISIBLE_PACKAGES:
