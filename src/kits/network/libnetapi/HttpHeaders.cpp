@@ -296,6 +296,9 @@ BHttpHeaders::Clear()
 BHttpHeaders&
 BHttpHeaders::operator=(const BHttpHeaders& other)
 {
+	if (&other == this)
+		return;
+
 	Clear();
 
 	for (int32 i = 0; i < other.CountHeaders(); i++)

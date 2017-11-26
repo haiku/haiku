@@ -26,10 +26,11 @@ BHttpResult::BHttpResult(const BUrl& url)
 
 BHttpResult::BHttpResult(BMessage* archive)
 	:
-	BUrlResult(archive)
+	BUrlResult(archive),
+	fUrl(archive->FindString("http:url")),
+	fHeaders(),
+	fStatusCode(archive->FindInt32("http:statusCode"))
 {
-	fUrl = archive->FindString("http:url");
-	fStatusCode = archive->FindInt32("http:statusCode");
 	fStatusString = archive->FindString("http:statusString");
 
 	BMessage headers;

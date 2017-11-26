@@ -611,10 +611,6 @@ BHttpRequest::_MakeRequest()
 			if (fRequestStatus >= kRequestHeadersReceived) {
 				_ResultHeaders() = fHeaders;
 
-				//! ProtocolHook:HeadersReceived
-				if (fListener != NULL)
-					fListener->HeadersReceived(this, fResult);
-
 				// Parse received cookies
 				if (fContext != NULL) {
 					for (int32 i = 0;  i < fHeaders.CountHeaders(); i++) {
@@ -624,6 +620,11 @@ BHttpRequest::_MakeRequest()
 						}
 					}
 				}
+
+				//! ProtocolHook:HeadersReceived
+				if (fListener != NULL)
+					fListener->HeadersReceived(this, fResult);
+
 
 				if (BString(fHeaders["Transfer-Encoding"]) == "chunked")
 					readByChunks = true;
