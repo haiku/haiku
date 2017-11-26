@@ -36,11 +36,14 @@ WorkStatusView::WorkStatusView(const char* name)
 	fProgressLayout->AddView(fProgressBar);
 
 	fProgressBar->SetMaxValue(1.0f);
+	fProgressBar->SetBarHeight(16);
+
+	fStatusText->SetFontSize(be_plain_font->Size() * 0.9f);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(new BSeparatorView())
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(5, 5, 5, 5)
+			.SetInsets(5, 2, 5, 2)
 			.Add(fProgressLayout, 0.2f)
 			.Add(fStatusText)
 			.AddGlue()
