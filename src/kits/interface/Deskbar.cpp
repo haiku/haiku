@@ -33,6 +33,13 @@
 
 static const char* kDeskbarSignature = "application/x-vnd.Be-TSKB";
 
+static const uint32 kMsgIsAlwaysOnTop = 'gtop';
+static const uint32 kMsgAlwaysOnTop = 'stop';
+static const uint32 kMsgIsAutoRaise = 'grse';
+static const uint32 kMsgAutoRaise = 'srse';
+static const uint32 kMsgIsAutoHide = 'ghid';
+static const uint32 kMsgAutoHide = 'shid';
+
 static const uint32 kMsgAddView = 'icon';
 static const uint32 kMsgAddAddOn = 'adon';
 static const uint32 kMsgHasItem = 'exst';
@@ -149,12 +156,10 @@ BDeskbar::IsExpanded() const
 {
 	BMessage request(kMsgIsExpanded);
 	BMessage reply;
-	bool isExpanded;
+	bool isExpanded = true;
 
-	if (fMessenger->SendMessage(&request, &reply) != B_OK
-		|| reply.FindBool("expanded", &isExpanded) != B_OK) {
-		isExpanded = true;
-	}
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindBool("expanded", &isExpanded);
 
 	return isExpanded;
 }
@@ -165,6 +170,78 @@ BDeskbar::Expand(bool expand)
 {
 	BMessage request(kMsgExpand);
 	request.AddBool("expand", expand);
+
+	return fMessenger->SendMessage(&request);
+}
+
+
+bool
+BDeskbar::IsAlwaysOnTop() const
+{
+	BMessage request(kMsgIsAlwaysOnTop);
+	BMessage reply;
+	bool isAlwaysOnTop = false;
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindBool("always on top", &isAlwaysOnTop);
+
+	return isAlwaysOnTop;
+}
+
+
+status_t
+BDeskbar::SetAlwaysOnTop(bool alwaysOnTop)
+{
+	BMessage request(kMsgAlwaysOnTop);
+	request.AddBool("always on top", alwaysOnTop);
+
+	return fMessenger->SendMessage(&request);
+}
+
+
+bool
+BDeskbar::IsAutoRaise() const
+{
+	BMessage request(kMsgIsAutoRaise);
+	BMessage reply;
+	bool isAutoRaise = false;
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindBool("auto raise", &isAutoRaise);
+
+	return isAutoRaise;
+}
+
+
+status_t
+BDeskbar::SetAutoRaise(bool autoRaise)
+{
+	BMessage request(kMsgAutoRaise);
+	request.AddBool("auto raise", autoRaise);
+
+	return fMessenger->SendMessage(&request);
+}
+
+
+bool
+BDeskbar::IsAutoHide() const
+{
+	BMessage request(kMsgIsAutoHide);
+	BMessage reply;
+	bool isAutoHidden;
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindBool("auto hide", &isAutoHidden);
+
+	return isAutoHidden;
+}
+
+
+status_t
+BDeskbar::SetAutoHide(bool autoHide)
+{
+	BMessage request(kMsgAutoHide);
+	request.AddBool("auto hide", autoHide);
 
 	return fMessenger->SendMessage(&request);
 }
@@ -249,7 +326,7 @@ BDeskbar::HasItem(const char* name) const
 
 
 uint32
-BDeskbar::CountItems(void) const
+BDeskbar::CountItems() const
 {
 	BMessage request(kMsgCountItems);	
 	BMessage reply;

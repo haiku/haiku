@@ -41,6 +41,15 @@ public:
 			bool				IsExpanded() const;
 			status_t			Expand(bool expand);
 
+			bool				IsAlwaysOnTop() const;
+			status_t			SetAlwaysOnTop(bool alwaysOnTop);
+
+			bool				IsAutoRaise() const;
+			status_t			SetAutoRaise(bool autoRaise);
+
+			bool				IsAutoHide() const;
+			status_t			SetAutoHide(bool autoHide);
+
 	// Item querying methods
 			status_t			GetItemInfo(int32 id, const char** _name) const;
 			status_t			GetItemInfo(const char* name, int32* _id) const;

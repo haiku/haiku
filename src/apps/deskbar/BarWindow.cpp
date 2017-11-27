@@ -168,40 +168,40 @@ TBarWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case 'gloc':
+		case kMsgLocation:
 			GetLocation(message);
 			break;
 
-		case 'sloc':
+		case kMsgSetLocation:
 			SetLocation(message);
 			break;
 
-		case 'gexp':
+		case kMsgIsExpanded:
 			IsExpanded(message);
 			break;
 
-		case 'sexp':
+		case kMsgExpand:
 			Expand(message);
 			break;
 
-		case 'info':
+		case kMsgGetItemInfo:
 			ItemInfo(message);
 			break;
 
-		case 'exst':
+		case kMsgHasItem:
 			ItemExists(message);
 			break;
 
-		case 'cwnt':
+		case kMsgCountItems:
 			CountItems(message);
 			break;
 
-		case 'adon':
-		case 'icon':
+		case kMsgAddAddOn:
+		case kMsgAddView:
 			AddItem(message);
 			break;
 
-		case 'remv':
+		case kMsgRemoveItem:
 			RemoveItem(message);
 			break;
 

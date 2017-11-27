@@ -366,17 +366,41 @@ void
 TBarApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case 'gloc':
-		case 'sloc':
-		case 'gexp':
-		case 'sexp':
-		case 'info':
-		case 'exst':
-		case 'cwnt':
-		case 'icon':
-		case 'remv':
-		case 'adon':
-			// pass any BDeskbar originating messages on to the window
+		// BDeskbar originating messages we can handle
+		case kMsgIsAlwaysOnTop:
+		{
+			BMessage reply('rply');
+			reply.AddBool("always on top", fSettings.alwaysOnTop);
+			message->SendReply(&reply);
+			break;
+		}
+		case kMsgIsAutoRaise:
+		{
+			BMessage reply('rply');
+			reply.AddBool("auto raise", fSettings.autoRaise);
+			message->SendReply(&reply);
+			break;
+		}
+		case kMsgIsAutoHide:
+		{
+			BMessage reply('rply');
+			reply.AddBool("auto hide", fSettings.autoHide);
+			message->SendReply(&reply);
+			break;
+		}
+
+		// pass rest of BDeskbar originating messages onto the window
+		// (except for setters handled below)
+		case kMsgLocation:
+		case kMsgSetLocation:
+		case kMsgIsExpanded:
+		case kMsgExpand:
+		case kMsgGetItemInfo:
+		case kMsgHasItem:
+		case kMsgCountItems:
+		case kMsgAddView:
+		case kMsgRemoveItem:
+		case kMsgAddAddOn:
 			fBarWindow->PostMessage(message);
 			break;
 
@@ -469,6 +493,7 @@ TBarApp::MessageReceived(BMessage* message)
 				BDragger::ShowAllDraggers();
 			break;
 
+		case kMsgAlwaysOnTop: // from BDeskbar
 		case kAlwaysTop:
 			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
 
@@ -480,6 +505,7 @@ TBarApp::MessageReceived(BMessage* message)
 				: B_NORMAL_WINDOW_FEEL);
 			break;
 
+		case kMsgAutoRaise: // from BDeskbar
 		case kAutoRaise:
 			fSettings.autoRaise = fSettings.alwaysOnTop ? false
 				: !fSettings.autoRaise;
@@ -488,6 +514,7 @@ TBarApp::MessageReceived(BMessage* message)
 				fPreferencesWindow->PostMessage(kUpdatePreferences);
 			break;
 
+		case kMsgAutoHide: // from BDeskbar
 		case kAutoHide:
 			fSettings.autoHide = !fSettings.autoHide;
 
