@@ -297,7 +297,7 @@ ScreenshotWindow::_UpdateToolBar()
 	fToolBar->SetActionEnabled(MSG_PREVIOUS_SCREENSHOT,
 		currentIndex > 0);
 	fToolBar->SetActionEnabled(MSG_NEXT_SCREENSHOT,
-		currentIndex < fNumScreenshots - 2);
+		currentIndex < fNumScreenshots - 1);
 
 	BString text;
 	text << currentIndex + 1;
