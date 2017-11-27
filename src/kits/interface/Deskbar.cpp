@@ -228,7 +228,7 @@ BDeskbar::IsAutoHide() const
 {
 	BMessage request(kMsgIsAutoHide);
 	BMessage reply;
-	bool isAutoHidden;
+	bool isAutoHidden = false;
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
 		reply.FindBool("auto hide", &isAutoHidden);
