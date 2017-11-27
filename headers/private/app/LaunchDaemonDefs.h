@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Haiku, Inc. All Rights Reserved.
+ * Copyright 2015-2017, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,8 +18,13 @@
 
 namespace BPrivate {
 
+
 #define kLaunchDaemonSignature "application/x-vnd.Haiku-launch_daemon"
-#define B_LAUNCH_DAEMON_PORT_NAME "system:launch_daemon"
+#ifdef TEST_MODE
+#	define B_LAUNCH_DAEMON_PORT_NAME "test:launch_daemon"
+#else
+#	define B_LAUNCH_DAEMON_PORT_NAME "system:launch_daemon"
+#endif
 
 
 // Message constants

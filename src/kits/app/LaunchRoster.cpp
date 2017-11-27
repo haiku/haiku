@@ -341,8 +341,12 @@ BLaunchRoster::GetJobInfo(const char* name, BMessage& info)
 void
 BLaunchRoster::_InitMessenger()
 {
+#ifdef TEST_MODE
+	port_id daemonPort = find_port(B_LAUNCH_DAEMON_PORT_NAME);
+#else
 	// find the launch_daemon port
 	port_id daemonPort = BPrivate::get_launch_daemon_port();
+#endif
 	port_info info;
 	if (daemonPort >= 0 && get_port_info(daemonPort, &info) == B_OK) {
 		BMessenger::Private(fMessenger).SetTo(info.team, daemonPort,

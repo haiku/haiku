@@ -59,8 +59,10 @@ using namespace BSupportKit;
 using BSupportKit::BPrivate::JobQueue;
 
 
+#ifndef TEST_MODE
 static const char* kLaunchDirectory = "launch";
 static const char* kUserLaunchDirectory = "user_launch";
+#endif
 
 
 enum launch_options {
@@ -328,7 +330,11 @@ LaunchDaemon::LaunchDaemon(bool userMode, const EventMap& events,
 			userMode ? "AppPort" : B_LAUNCH_DAEMON_PORT_NAME), false, &error),
 	fEvents(events),
 	fInitTarget(userMode ? NULL : new Target("init")),
+#ifdef TEST_MODE
+	fUserMode(true)
+#else
 	fUserMode(userMode)
+#endif
 {
 	mutex_init(&fTeamsLock, "teams lock");
 
@@ -437,12 +443,17 @@ LaunchDaemon::ReadyToRun()
 		Utility::BlockMedia("/boot", true);
 
 	if (fUserMode) {
+#ifndef TEST_MODE
 		BLaunchRoster roster;
 		BLaunchRoster::Private(roster).RegisterSessionDaemon(this);
+#endif	// TEST_MODE
 	} else
 		_InitSystem();
 
 	BStringList paths;
+#ifdef TEST_MODE
+	paths.Add("/boot/home/test_launch");
+#else
 	if (fUserMode) {
 		// System-wide user specific jobs
 		BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY, kUserLaunchDirectory,
@@ -462,6 +473,7 @@ LaunchDaemon::ReadyToRun()
 
 	BPathFinder::FindPaths(B_FIND_PATH_SETTINGS_DIRECTORY, kLaunchDirectory,
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
+#endif	// TEST_MODE
 	_ReadPaths(paths);
 
 	BMessenger target(this);
@@ -1905,9 +1917,11 @@ LaunchDaemon::_SetupEnvironment()
 void
 LaunchDaemon::_InitSystem()
 {
+#ifndef TEST_MODE
 	_AddInitJob(new InitRealTimeClockJob());
 	_AddInitJob(new InitSharedMemoryDirectoryJob());
 	_AddInitJob(new InitTemporaryDirectoryJob());
+#endif
 
 	fJobQueue.AddJob(fInitTarget);
 }
@@ -1922,6 +1936,9 @@ LaunchDaemon::_AddInitJob(BJob* job)
 
 
 // #pragma mark -
+
+
+#ifndef TEST_MODE
 
 
 static void
@@ -1939,6 +1956,9 @@ open_stdio(int targetFD, int openMode)
 }
 
 
+#endif	// TEST_MODE
+
+
 int
 main()
 {
@@ -1947,10 +1967,12 @@ main()
 		return EXIT_FAILURE;
 	}
 
+#ifndef TEST_MODE
 	// Make stdin/out/err available
 	open_stdio(STDIN_FILENO, O_RDONLY);
 	open_stdio(STDOUT_FILENO, O_WRONLY);
 	dup2(STDOUT_FILENO, STDERR_FILENO);
+#endif
 
 	EventMap events;
 	status_t status;

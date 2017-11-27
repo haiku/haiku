@@ -2,9 +2,14 @@ SubDir HAIKU_TOP src tests servers launch ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app shared storage support ;
+UsePrivateHeaders app libroot shared storage support ;
+UsePrivateSystemHeaders ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers launch ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits app ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin ] ;
 
 UnitTestLib liblaunch_daemontest.so :
 	LaunchDaemonTestAddon.cpp
@@ -20,4 +25,35 @@ UnitTestLib liblaunch_daemontest.so :
 	Utility.cpp
 
 	: be network bnetapi shared [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+;
+
+local defines = [ FDefines TEST_MODE=1 ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
+Server test_launch_daemon :
+	LaunchDaemon.cpp
+
+	BaseJob.cpp
+	Conditions.cpp
+	Events.cpp
+	Job.cpp
+	NetworkWatcher.cpp
+	SettingsParser.cpp
+	Target.cpp
+	Utility.cpp
+	VolumeWatcher.cpp
+	Worker.cpp
+	:
+	be network bnetapi shared libmultiuser_utils.a [ TargetLibstdc++ ]
+	:
+	LaunchDaemon.rdef
+;
+
+BinCommand test_launch_roster :
+	LaunchRoster.cpp
+	launch_roster.cpp
+	:
+	be
 ;
