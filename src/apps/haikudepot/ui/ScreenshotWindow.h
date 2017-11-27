@@ -71,7 +71,6 @@ private:
 			BitmapRef			fScreenshot;
 			BitmapView*			fScreenshotView;
 
-			int32				fNumScreenshots;
 			int32				fCurrentScreenshotIndex; // atomic
 
 			PackageInfoRef		fPackage;

@@ -40,7 +40,6 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fBarberPoleShown(false),
-	fNumScreenshots(0),
 	fDownloadPending(false),
 	fWorkerThread(-1)
 {
@@ -68,6 +67,7 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	fScreenshotView = new BitmapView("screenshot view");
 	fScreenshotView->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	fScreenshotView->SetScaleBitmap(false);
 
 	BGroupView* groupView = new BGroupView(B_VERTICAL);
 	groupView->SetViewColor(kBackgroundColor);
@@ -177,7 +177,6 @@ ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 	SetTitle(title);
 
 	atomic_set(&fCurrentScreenshotIndex, 0);
-	fNumScreenshots = fPackage->ScreenshotInfos().CountItems();
 
 	_UpdateToolBar();
 }
@@ -309,6 +308,30 @@ ScreenshotWindow::_DownloadThread()
 void
 ScreenshotWindow::_ResizeToFitAndCenter()
 {
+	// Find out dimensions of the largest screenshot of this package
+	ScreenshotInfoList screenshotInfos;
+	if (fPackage.Get() != NULL)
+		screenshotInfos = fPackage->ScreenshotInfos();
+
+	int32 largestScreenshotWidth = 0;
+	int32 largestScreenshotHeight = 0;
+
+	const uint32 numScreenshots = fPackage->ScreenshotInfos().CountItems();
+	for (uint32 i = 0; i < numScreenshots; i++) {
+		const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
+		if (info.Width() > largestScreenshotWidth)
+			largestScreenshotWidth = info.Width();
+		if (info.Height() > largestScreenshotHeight)
+			largestScreenshotHeight = info.Height();
+	}
+
+	fScreenshotView->SetExplicitMinSize(
+		BSize(largestScreenshotWidth, largestScreenshotHeight));
+	Layout(false);
+
+	// TODO: Limit window size to screen size (with a little margin),
+	//       the image should then become scrollable.
+
 	float minWidth;
 	float minHeight;
 	GetSizeLimits(&minWidth, NULL, &minHeight, NULL);
@@ -320,15 +343,17 @@ ScreenshotWindow::_ResizeToFitAndCenter()
 void
 ScreenshotWindow::_UpdateToolBar()
 {
-	int32 currentIndex = atomic_get(&fCurrentScreenshotIndex);
+	const int32 numScreenshots = fPackage->ScreenshotInfos().CountItems();
+	const int32 currentIndex = atomic_get(&fCurrentScreenshotIndex);
+
 	fToolBar->SetActionEnabled(MSG_PREVIOUS_SCREENSHOT,
 		currentIndex > 0);
 	fToolBar->SetActionEnabled(MSG_NEXT_SCREENSHOT,
-		currentIndex < fNumScreenshots - 1);
+		currentIndex < numScreenshots - 1);
 
 	BString text;
 	text << currentIndex + 1;
 	text << " / ";
-	text << fNumScreenshots;
+	text << numScreenshots;
 	fIndexView->SetText(text);
 }
