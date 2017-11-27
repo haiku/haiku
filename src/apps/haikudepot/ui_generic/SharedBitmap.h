@@ -21,8 +21,9 @@ public:
 		enum Size {
 			SIZE_ANY = -1,
 			SIZE_16 = 0,
-			SIZE_32 = 1,
-			SIZE_64 = 2
+			SIZE_22 = 1,
+			SIZE_32 = 2,
+			SIZE_64 = 3
 		};
 
 								SharedBitmap(BBitmap* bitmap);
@@ -52,7 +53,7 @@ private:
 			uint8*				fBuffer;
 			off_t				fSize;
 			BString				fMimeType;
-			BBitmap*			fBitmap[3];
+			BBitmap*			fBitmap[4];
 };
 
 

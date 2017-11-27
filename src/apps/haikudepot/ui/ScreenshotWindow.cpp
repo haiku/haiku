@@ -27,6 +27,11 @@ static const rgb_color kBackgroundColor = { 51, 102, 152, 255 };
 	// Drawn as a border around the screenshots and also what's behind their
 	// transparent regions
 
+static BitmapRef sNextButtonIcon(
+	new(std::nothrow) SharedBitmap(505), true);
+static BitmapRef sPreviousButtonIcon(
+	new(std::nothrow) SharedBitmap(506), true);
+
 
 ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	:
@@ -47,13 +52,12 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	fIndexView = new BStringView("screenshot index", NULL);
 
 	fToolBar = new BToolBar();
-	fToolBar->AddAction(MSG_PREVIOUS_SCREENSHOT, this, NULL /* todo: icon */,
-		B_TRANSLATE("Show previous screenshot"),
-		B_TRANSLATE("Previous"));
-	fToolBar->AddAction(MSG_NEXT_SCREENSHOT, this, NULL /* todo: icon */,
-		B_TRANSLATE("Show next screenshot"),
-		B_TRANSLATE("Next"));
-	fToolBar->AddGlue();
+	fToolBar->AddAction(MSG_PREVIOUS_SCREENSHOT, this,
+		sNextButtonIcon->Bitmap(SharedBitmap::SIZE_22),
+		NULL, NULL);
+	fToolBar->AddAction(MSG_NEXT_SCREENSHOT, this,
+		sPreviousButtonIcon->Bitmap(SharedBitmap::SIZE_22),
+		NULL, NULL);
 	fToolBar->AddView(fIndexView);
 	fToolBar->AddGlue();
 	fToolBar->AddView(fBarberPole);
@@ -67,9 +71,9 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 
 	// Build layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetInsets(0, 5, 0, 0)
+		.SetInsets(0, 3, 0, 0)
 		.Add(fToolBar)
-		.AddStrut(5)
+		.AddStrut(3)
 		.AddGroup(groupView)
 			.Add(fScreenshotView)
 			.SetInsets(B_USE_WINDOW_INSETS)
@@ -165,6 +169,14 @@ ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 	fNumScreenshots = fPackage->ScreenshotInfos().CountItems();
 
 	_UpdateToolBar();
+}
+
+
+/* static */ void
+ScreenshotWindow::CleanupIcons()
+{
+	sNextButtonIcon.Unset();
+	sPreviousButtonIcon.Unset();
 }
 
 

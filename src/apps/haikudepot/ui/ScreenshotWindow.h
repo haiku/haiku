@@ -41,6 +41,8 @@ public:
 
 			void				SetPackage(const PackageInfoRef& package);
 
+	static	void				CleanupIcons();
+
 private:
 			void				_DownloadScreenshot();
 

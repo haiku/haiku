@@ -31,6 +31,7 @@ SharedBitmap::SharedBitmap(BBitmap* bitmap)
 	fBitmap[0] = bitmap;
 	fBitmap[1] = NULL;
 	fBitmap[2] = NULL;
+	fBitmap[3] = NULL;
 }
 
 
@@ -45,6 +46,7 @@ SharedBitmap::SharedBitmap(int32 resourceID)
 	fBitmap[0] = NULL;
 	fBitmap[1] = NULL;
 	fBitmap[2] = NULL;
+	fBitmap[3] = NULL;
 }
 
 
@@ -59,6 +61,7 @@ SharedBitmap::SharedBitmap(const char* mimeType)
 	fBitmap[0] = NULL;
 	fBitmap[1] = NULL;
 	fBitmap[2] = NULL;
+	fBitmap[3] = NULL;
 }
 
 
@@ -102,6 +105,7 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 	fBitmap[0] = NULL;
 	fBitmap[1] = NULL;
 	fBitmap[2] = NULL;
+	fBitmap[3] = NULL;
 }
 
 
@@ -110,6 +114,7 @@ SharedBitmap::~SharedBitmap()
 	delete fBitmap[0];
 	delete fBitmap[1];
 	delete fBitmap[2];
+	delete fBitmap[3];
 	delete[] fBuffer;
 }
 
@@ -128,12 +133,18 @@ SharedBitmap::Bitmap(Size which)
 		case SIZE_16:
 			break;
 
-		case SIZE_32:
+		case SIZE_22:
 			index = 1;
+			size = 22;
+			break;
+
+		case SIZE_32:
+			index = 2;
 			size = 32;
 			break;
+
 		case SIZE_64:
-			index = 2;
+			index = 3;
 			size = 64;
 			break;
 	}

@@ -24,6 +24,7 @@
 #include "Logger.h"
 #include "MainWindow.h"
 #include "ServerSettings.h"
+#include "ScreenshotWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -48,6 +49,7 @@ App::~App()
 	// around. That's why we do it here.
 	PackageInfo::CleanupDefaultIcon();
 	FeaturedPackagesView::CleanupIcons();
+	ScreenshotWindow::CleanupIcons();
 }
 
 
