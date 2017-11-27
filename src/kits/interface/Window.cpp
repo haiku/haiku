@@ -1703,28 +1703,33 @@ BWindow::Zoom()
 
 	BRect zoomArea = screenFrame; // starts at screen size
 
-	// remove area taken up by Deskbar
 	BDeskbar deskbar;
 	BRect deskbarFrame = deskbar.Frame();
-	switch (deskbar.Location()) {
-		case B_DESKBAR_TOP:
-			zoomArea.top = deskbarFrame.bottom + 2;
-			break;
+	if (!deskbar.IsAutoHide()) {
+		// remove area taken up by Deskbar (if not auto-hidden)
+		switch (deskbar.Location()) {
+			case B_DESKBAR_TOP:
+				zoomArea.top = deskbarFrame.bottom + 2;
+				break;
 
-		case B_DESKBAR_BOTTOM:
-			zoomArea.bottom = deskbarFrame.top - 2;
-			break;
+			case B_DESKBAR_BOTTOM:
+				zoomArea.bottom = deskbarFrame.top - 2;
+				break;
 
-		case B_DESKBAR_LEFT_TOP:
-		case B_DESKBAR_LEFT_BOTTOM:
-			zoomArea.left = deskbarFrame.right + 2;
-			break;
+			// in vertical mode, only if not always on top and not auto-raise
+			case B_DESKBAR_LEFT_TOP:
+			case B_DESKBAR_LEFT_BOTTOM:
+				if (!deskbar.IsAlwaysOnTop() && !deskbar.IsAutoRaise())
+					zoomArea.left = deskbarFrame.right + 2;
+				break;
 
-		default:
-		case B_DESKBAR_RIGHT_TOP:
-		case B_DESKBAR_RIGHT_BOTTOM:
-			zoomArea.right = deskbarFrame.left - 2;
-			break;
+			default:
+			case B_DESKBAR_RIGHT_TOP:
+			case B_DESKBAR_RIGHT_BOTTOM:
+				if (!deskbar.IsAlwaysOnTop() && !deskbar.IsAutoRaise())
+					zoomArea.right = deskbarFrame.left - 2;
+				break;
+		}
 	}
 
 	// TODO: Broken for tab on left side windows...
