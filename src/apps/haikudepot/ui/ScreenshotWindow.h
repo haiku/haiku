@@ -55,11 +55,17 @@ private:
 			void				_UpdateToolBar();
 
 private:
+	enum {
+		kProgressIndicatorDelay = 200000 // us
+	};
+
+private:
 			BMessenger			fOnCloseTarget;
 			BMessage			fOnCloseMessage;
 
 			BToolBar*			fToolBar;
 			BarberPole*			fBarberPole;
+			bool				fBarberPoleShown;
 			BStringView*		fIndexView;
 
 			BitmapRef			fScreenshot;

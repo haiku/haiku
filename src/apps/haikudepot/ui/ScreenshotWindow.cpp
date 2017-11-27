@@ -12,6 +12,7 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <MessageRunner.h>
 #include <StringView.h>
 
 #include "BarberPole.h"
@@ -38,6 +39,7 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	BWindow(frame, B_TRANSLATE("Screenshot"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fBarberPoleShown(false),
 	fNumScreenshots(0),
 	fDownloadPending(false),
 	fWorkerThread(-1)
@@ -47,7 +49,8 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 	atomic_set(&fCurrentScreenshotIndex, 0);
 
 	fBarberPole = new BarberPole("barber pole");
-	fBarberPole->SetExplicitMaxSize(BSize(200, B_SIZE_UNLIMITED));
+	fBarberPole->SetExplicitMaxSize(BSize(100, B_SIZE_UNLIMITED));
+	fBarberPole->Hide();
 
 	fIndexView = new BStringView("screenshot index", NULL);
 
@@ -127,11 +130,19 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_DOWNLOAD_START:
-			fBarberPole->Start();
+			if (!fBarberPoleShown) {
+				fBarberPole->Start();
+				fBarberPole->Show();
+				fBarberPoleShown = true;
+			}
 			break;
 
 		case MSG_DOWNLOAD_STOP:
-			fBarberPole->Stop();
+			if (fBarberPoleShown) {
+				fBarberPole->Hide();
+				fBarberPole->Stop();
+				fBarberPoleShown = true;
+			}
 			break;
 
 		default:
@@ -270,13 +281,17 @@ ScreenshotWindow::_DownloadThread()
 	BMallocIO buffer;
 	WebAppInterface interface;
 
+	// Only indicate being busy with the download if it takes a little while
 	BMessenger messenger(this);
-	messenger.SendMessage(MSG_DOWNLOAD_START);
+	BMessageRunner delayedMessenger(messenger,
+		new BMessage(MSG_DOWNLOAD_START),
+		kProgressIndicatorDelay, 1);
 
 	// Retrieve screenshot from web-app
 	status_t status = interface.RetrieveScreenshot(info.Code(),
 		info.Width(), info.Height(), &buffer);
 
+	delayedMessenger.SetCount(0);
 	messenger.SendMessage(MSG_DOWNLOAD_STOP);
 
 	if (status == B_OK && Lock()) {
