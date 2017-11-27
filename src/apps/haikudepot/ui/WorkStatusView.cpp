@@ -36,7 +36,7 @@ WorkStatusView::WorkStatusView(const char* name)
 	fProgressLayout->AddView(fProgressBar);
 
 	fProgressBar->SetMaxValue(1.0f);
-	fProgressBar->SetBarHeight(16);
+	fProgressBar->SetBarHeight(20);
 
 	fStatusText->SetFontSize(be_plain_font->Size() * 0.9f);
 

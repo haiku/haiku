@@ -150,8 +150,10 @@ BarberPole::BarberPole(const char* name)
 {
 	// Default colors, chosen from system color scheme
 	rgb_color defaultColors[2];
-	defaultColors[0] = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
-	defaultColors[1] = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color otherColor = tint_color(ui_color(B_STATUS_BAR_COLOR), 1.3);
+	otherColor.alpha = 50;
+	defaultColors[0] = otherColor;
+	defaultColors[1] = B_TRANSPARENT_COLOR;
 	SetColors(defaultColors, 2);
 }
 
@@ -181,13 +183,19 @@ BarberPole::MessageReceived(BMessage* message)
 void
 BarberPole::Draw(BRect updateRect)
 {
+
 	if (fIsSpinning) {
 		// Draw color stripes
 		float position = -fStripeWidth * (fNumColors + 0.5) + fScrollOffset;
 			// Starting position: beginning of the second color cycle
 			// The + 0.5 is so we start out without a partially visible stripe
 			// on the left side (makes it simpler to loop)
-
+		BRect bounds = Bounds();
+		bounds.InsetBy(-2, -2);
+		be_control_look->DrawStatusBar(this, bounds, updateRect,
+			ui_color(B_PANEL_BACKGROUND_COLOR), ui_color(B_STATUS_BAR_COLOR),
+			bounds.Width());
+		SetDrawingMode(B_OP_ALPHA);
 		uint32 colorIndex = 0;
 		for (uint32 i = 0; i < fNumStripes; i++) {
 			SetHighColor(fColors[colorIndex]);
@@ -202,8 +210,8 @@ BarberPole::Draw(BRect updateRect)
 
 			position += fStripeWidth;
 		}
+		SetDrawingMode(B_OP_COPY);
 	}
-
 	// Draw box around it
 	BRect bounds = Bounds();
 	be_control_look->DrawBorder(this, bounds, updateRect,
