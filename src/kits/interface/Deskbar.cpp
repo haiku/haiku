@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2017 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jeremy Rand (jrand@magma.ca)
  *		Jérôme Duval
  *		Axel Dörfler
+ *		Jeremy Rand, jrand@magma.ca
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -19,6 +20,7 @@
 
 #include <string.h>
 
+
 // ToDo: in case the BDeskbar methods are called from a Deskbar add-on,
 //	they will currently deadlock most of the time (only those that do
 //	not need a reply will work).
@@ -28,7 +30,8 @@
 // The API in this file should be considered as part of OpenTracker - but
 // should work with all versions of Tracker available for Haiku.
 
-static const char *kDeskbarSignature = "application/x-vnd.Be-TSKB";
+
+static const char* kDeskbarSignature = "application/x-vnd.Be-TSKB";
 
 static const uint32 kMsgAddView = 'icon';
 static const uint32 kMsgAddAddOn = 'adon';
@@ -43,7 +46,7 @@ static const uint32 kMsgExpand = 'sexp';
 
 
 status_t
-get_deskbar_frame(BRect *frame)
+get_deskbar_frame(BRect* frame)
 {
 	BMessenger deskbar(kDeskbarSignature);
 
@@ -56,17 +59,18 @@ get_deskbar_frame(BRect *frame)
 	BMessage reply;
 	result = deskbar.SendMessage(&request, &reply);
 	if (result == B_OK)
-   		result = reply.FindRect("result", frame);
+		result = reply.FindRect("result", frame);
 
 	return result;
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BDeskbar
 
 
 BDeskbar::BDeskbar()
-	: fMessenger(new BMessenger(kDeskbarSignature))
+	:
+	fMessenger(new BMessenger(kDeskbarSignature))
 {
 }
 
@@ -84,6 +88,9 @@ BDeskbar::IsRunning() const
 }
 
 
+//	#pragma mark - Item querying methods
+
+
 BRect
 BDeskbar::Frame() const
 {
@@ -95,7 +102,7 @@ BDeskbar::Frame() const
 
 
 deskbar_location
-BDeskbar::Location(bool *_isExpanded) const
+BDeskbar::Location(bool* _isExpanded) const
 {
 	deskbar_location location = B_DESKBAR_RIGHT_TOP;
 	BMessage request(kMsgLocation);
@@ -115,8 +122,7 @@ BDeskbar::Location(bool *_isExpanded) const
 		if (reply.FindInt32("location", &value) == B_OK)
 			location = static_cast<deskbar_location>(value);
 
-		if (_isExpanded
-			&& reply.FindBool("expanded", _isExpanded) != B_OK)
+		if (_isExpanded && reply.FindBool("expanded", _isExpanded) != B_OK)
 			*_isExpanded = true;
 	}
 
@@ -135,16 +141,20 @@ BDeskbar::SetLocation(deskbar_location location, bool expanded)
 }
 
 
+//	#pragma mark - Other state methods
+
+
 bool
-BDeskbar::IsExpanded(void) const
+BDeskbar::IsExpanded() const
 {
 	BMessage request(kMsgIsExpanded);
 	BMessage reply;
 	bool isExpanded;
 
 	if (fMessenger->SendMessage(&request, &reply) != B_OK
-		|| reply.FindBool("expanded", &isExpanded) != B_OK)
+		|| reply.FindBool("expanded", &isExpanded) != B_OK) {
 		isExpanded = true;
+	}
 
 	return isExpanded;
 }
@@ -160,8 +170,11 @@ BDeskbar::Expand(bool expand)
 }
 
 
+//	#pragma mark - Item querying methods
+
+
 status_t
-BDeskbar::GetItemInfo(int32 id, const char **_name) const
+BDeskbar::GetItemInfo(int32 id, const char** _name) const
 {
 	if (_name == NULL)
 		return B_BAD_VALUE;
@@ -176,7 +189,7 @@ BDeskbar::GetItemInfo(int32 id, const char **_name) const
 	BMessage reply;
 	status_t result = fMessenger->SendMessage(&request, &reply);
 	if (result == B_OK) {
-		const char *name;
+		const char* name;
 		result = reply.FindString("name", &name);
 		if (result == B_OK) {
 			*_name = strdup(name);
@@ -184,12 +197,13 @@ BDeskbar::GetItemInfo(int32 id, const char **_name) const
 				result = B_NO_MEMORY;
 		}
 	}
+
 	return result;
 }
 
 
 status_t
-BDeskbar::GetItemInfo(const char *name, int32 *_id) const
+BDeskbar::GetItemInfo(const char* name, int32* _id) const
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
@@ -221,7 +235,7 @@ BDeskbar::HasItem(int32 id) const
 
 
 bool
-BDeskbar::HasItem(const char *name) const
+BDeskbar::HasItem(const char* name) const
 {
 	BMessage request(kMsgHasItem);
 	request.AddString("name", name);
@@ -247,8 +261,11 @@ BDeskbar::CountItems(void) const
 }
 
 
+//	#pragma mark - Item querying methods
+
+
 status_t
-BDeskbar::AddItem(BView *view, int32 *_id)
+BDeskbar::AddItem(BView* view, int32* _id)
 {
 	BMessage archive;
 	status_t result = view->Archive(&archive);
@@ -272,7 +289,7 @@ BDeskbar::AddItem(BView *view, int32 *_id)
 
 
 status_t
-BDeskbar::AddItem(entry_ref *addon, int32 *_id)
+BDeskbar::AddItem(entry_ref* addon, int32* _id)
 {
 	BMessage request(kMsgAddAddOn);
 	request.AddRef("addon", addon);
@@ -305,7 +322,7 @@ BDeskbar::RemoveItem(int32 id)
 
 
 status_t
-BDeskbar::RemoveItem(const char *name)
+BDeskbar::RemoveItem(const char* name)
 {
 	BMessage request(kMsgRemoveItem);
 	request.AddString("name", name);
@@ -315,6 +332,4 @@ BDeskbar::RemoveItem(const char *name)
 	// message was sent to the Deskbar
 
 	return fMessenger->SendMessage(&request);
-	
 }
-
