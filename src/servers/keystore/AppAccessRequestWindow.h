@@ -5,10 +5,12 @@
 #ifndef _APP_ACCESS_REQUEST_WINDOW_H
 #define _APP_ACCESS_REQUEST_WINDOW_H
 
-
+#include <Bitmap.h>
+#include <Button.h>
 #include <Message.h>
 #include <Window.h>
 
+#include "StripeView.h"
 
 class AppAccessRequestView;
 
@@ -27,11 +29,16 @@ virtual	bool						QuitRequested();
 virtual	void						MessageReceived(BMessage* message);
 
 		status_t					RequestAppAccess(bool& allowAlways);
-
+		BBitmap						GetIcon(int32 iconSize);
 private:
 		AppAccessRequestView*		fRequestView;
 		sem_id						fDoneSem;
 		uint32						fResult;
+		BButton* 					fDisallowButton;
+		BButton* 					fOnceButton;
+		BButton* 					fAlwaysButton;
+		StripeView*					fStripeView;
+
 };
 
 

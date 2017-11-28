@@ -7,7 +7,7 @@ Server keystore_server :
 	KeyRequestWindow.cpp
 	Keyring.cpp
 	KeyStoreServer.cpp
-
+	StripeView.cpp
 	: be localestub [ TargetLibstdc++ ]
 	: keystore_server.rdef
 ;
