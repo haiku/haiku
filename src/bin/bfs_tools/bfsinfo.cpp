@@ -12,10 +12,15 @@
 #include "Inode.h"
 #include "dump.h"
 
+#include <StringForSize.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+
+
+using namespace BPrivate;
 
 
 void
@@ -172,7 +177,7 @@ list_bplustree(Disk& disk, Directory* directory, off_t size)
 		count++;
 	}
 
-	printf("--\n%lld items.\n", count);
+	printf("--\n%" B_PRId64 " items.\n", count);
 }
 
 
@@ -187,7 +192,7 @@ count_bplustree(Disk& disk, Directory* directory, off_t size)
 	while (directory->GetNextEntry(name, &run) == B_OK)
 		count++;
 
-	printf("%lld items.\n", count);
+	printf("%" B_PRId64 " items.\n", count);
 }
 
 
@@ -210,8 +215,6 @@ parseBlockRun(Disk &disk, char *first, char *last)
 int
 main(int argc, char **argv)
 {
-	puts("Copyright (c) 2001-2010 pinc Software.");
-
 	if (argc < 2 || !strcmp(argv[1], "--help")) {
 		char *filename = strrchr(argv[0],'/');
 		fprintf(stderr,"usage: %s [-srib] <device> [allocation_group start]\n"
@@ -288,32 +291,36 @@ main(int argc, char **argv)
 
 	if (!dumpSuperBlock && !dumpRootNode && !dumpInode && !dumpBTree
 		&& !dumpHex && !listBTree && !countBTree) {
+		char buffer[16];
 		printf("  Name:\t\t\t\"%s\"\n", disk.SuperBlock()->name);
-		printf("    (disk is %s)\n\n",
-			disk.ValidateSuperBlock() == B_OK ? "valid" : "invalid!!");
-		printf("  Block Size:\t\t%" B_PRIu32 " bytes\n", disk.BlockSize());
-		printf("  Number of Blocks:\t%12" B_PRIdOFF "\t%10g MB\n",
-			disk.NumBlocks(), disk.NumBlocks() * disk.BlockSize()
-				/ (1024.0*1024));
+		printf("  SuperBlock:\t\t%s\n\n",
+			disk.ValidateSuperBlock() == B_OK ? "valid" : "invalid!");
+		printf("  Block Size:%*" B_PRIu32 " bytes\n", 23, disk.BlockSize());
+		string_for_size(disk.NumBlocks() * disk.BlockSize(), buffer,
+			sizeof(buffer));
+		printf("  Number of Blocks:%*" B_PRIdOFF "\t%*s\n", 17, disk.NumBlocks(),
+			16, buffer);
 		if (disk.BlockBitmap() != NULL) {
-			printf("  Used Blocks:\t\t%12" B_PRIdOFF "\t%10g MB\n",
-				disk.BlockBitmap()->UsedBlocks(),
-				disk.BlockBitmap()->UsedBlocks() * disk.BlockSize()
-					/ (1024.0*1024));
-			printf("  Free Blocks:\t\t%12" B_PRIdOFF "\t%10g MB\n",
-				disk.BlockBitmap()->FreeBlocks(),
-				disk.BlockBitmap()->FreeBlocks() * disk.BlockSize()
-					/ (1024.0*1024));
+			string_for_size(disk.BlockBitmap()->UsedBlocks() * disk.BlockSize(),
+				buffer, sizeof(buffer));
+			printf("  Used Blocks:%*" B_PRIdOFF "\t%*s\n", 22,
+				disk.BlockBitmap()->UsedBlocks(), 16, buffer);
+
+			string_for_size(disk.BlockBitmap()->FreeBlocks() * disk.BlockSize(),
+				buffer, sizeof(buffer));
+			printf("  Free Blocks:%*" B_PRIdOFF "\t%*s\n", 22,
+				disk.BlockBitmap()->FreeBlocks(), 16, buffer);
 		}
 		int32 size
 			= (disk.AllocationGroups() * disk.SuperBlock()->blocks_per_ag);
-		printf("  Bitmap Size:\t\t%" B_PRIu32 " bytes (%" B_PRId32 " blocks, %"
-			B_PRId32 " per allocation group)\n", disk.BlockSize() * size, size,
+		string_for_size(disk.BlockSize() * size, buffer, sizeof(buffer));
+		printf("  Bitmap Blocks:%*" B_PRId32 "\t%*s\n", 20, size, 16, buffer);
+		printf("  Allocation Group Size:%*" B_PRId32 " blocks\n", 12,
 			disk.SuperBlock()->blocks_per_ag);
-		printf("  Allocation Groups:\t%" B_PRIu32 "\n\n",
+		printf("  Allocation Groups:%*" B_PRIu32 "\n\n", 16,
 			disk.AllocationGroups());
 		dump_block_run("  Log:\t\t\t", disk.Log());
-		printf("    (was %s)\n\n", disk.SuperBlock()->flags == SUPER_BLOCK_CLEAN
+		printf("\t\t\t%s\n\n", disk.SuperBlock()->flags == SUPER_BLOCK_CLEAN
 			? "cleanly unmounted" : "not unmounted cleanly!");
 		dump_block_run("  Root Directory:\t", disk.Root());
 		putchar('\n');

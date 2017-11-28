@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src bin bfs_tools ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs $(HAIKU_TOP) src bin bfs_tools lib ;
+UsePrivateHeaders [ FDirName shared ] ;
 
 StdBinCommands
 	bfsinfo.cpp
@@ -10,7 +11,7 @@ StdBinCommands
 	bfswhich.cpp
 	recover.cpp
 
-	: libbfs_tools.a be [ TargetLibstdc++ ] : $(haiku-utils_rsrc)
+	: libbfs_tools.a be shared [ TargetLibstdc++ ] : $(haiku-utils_rsrc)
 ;
 
 SubInclude HAIKU_TOP src bin bfs_tools lib ;
