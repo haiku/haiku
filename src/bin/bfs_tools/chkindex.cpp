@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2001-2008 pinc Software. All Rights Reserved.
+ * Released under the terms of the MIT license.
  */
 
 //!	sanity and completeness check for indices

@@ -3,6 +3,7 @@
 /* BPlusTree - BFS B+Tree implementation
 **
 ** Copyright 2001 pinc Software. All Rights Reserved.
+** Released under the terms of the MIT license.
 */
 
 #include <List.h>

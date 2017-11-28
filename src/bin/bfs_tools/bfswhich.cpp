@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2002-2009 pinc Software. All Rights Reserved.
+ * Released under the terms of the MIT license.
  */
 
 //!	Finds out to which file(s) a particular block belongs

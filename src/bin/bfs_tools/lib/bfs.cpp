@@ -1,6 +1,7 @@
 /* bfs - BFS definitions and helper functions
 **
 ** Copyright 2001, pinc Software. All Rights Reserved.
+** Released under the terms of the MIT license.
 */
 
 

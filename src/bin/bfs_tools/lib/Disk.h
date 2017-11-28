@@ -3,6 +3,7 @@
 /* Disk - handles BFS superblock, disk access etc.
 **
 ** Copyright (c) 2001-2003 pinc Software. All Rights Reserved.
+** Released under the terms of the MIT license.
 */
 
 

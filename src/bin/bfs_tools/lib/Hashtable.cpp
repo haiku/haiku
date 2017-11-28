@@ -1,6 +1,7 @@
 /* Hashtable - a general purpose hash table
 **
 ** Copyright 2001 pinc Software. All Rights Reserved.
+** Released under the terms of the MIT license.
 */
 
 

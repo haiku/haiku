@@ -3,6 +3,7 @@
 /* Stack - a template stack class
 **
 ** Copyright 2001 pinc Software. All Rights Reserved.
+** Released under the terms of the MIT license.
 */
 
 
