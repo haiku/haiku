@@ -9,10 +9,7 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	be_book-2008_10_26-1
 	ca_root_certificates-2015_02_25-1
-	dejavu-2.34-1
-	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-4
-	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-3
 	:
 	# repository architecture packages
