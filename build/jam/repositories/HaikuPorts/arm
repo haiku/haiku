@@ -1,6 +1,10 @@
+#
+# The remote repository URL depends on the sha256sum of this file.
+#
+
 RemotePackageRepository HaikuPorts
 	: arm
-	: http://packages.haiku-os.org/haikuports/master/repo/arm
+	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages/packages
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
