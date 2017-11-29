@@ -1,6 +1,6 @@
 RemotePackageRepository HaikuPorts
 	: arm
-	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages/packages
+	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
