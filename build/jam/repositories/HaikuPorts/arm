@@ -1,16 +1,12 @@
-#
-# The remote repository URL depends on the sha256sum of this file.
-#
-
 RemotePackageRepository HaikuPorts
 	: arm
 	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages/packages
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
-	ca_root_certificates-2015_02_25-1
-	timgmsoundfont-2004_01_24-4
-	wqy_microhei-0.2.0~beta-3
+	ca_root_certificates-2017_01_18-1
+	timgmsoundfont-fixed-5
+	wqy_microhei-0.2.0~beta-4
 	:
 	# repository architecture packages
 	# primary architecture (arm)
@@ -28,7 +24,6 @@ RemotePackageRepository HaikuPorts
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 	:
-
 	# source packages
 	apr
 	autoconf
