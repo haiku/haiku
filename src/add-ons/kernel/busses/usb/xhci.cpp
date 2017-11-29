@@ -1349,7 +1349,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		size_t actualLength = 0;
 		usb_hub_descriptor hubDescriptor;
 		pipe.SendRequest(
-			USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
+			USB_REQTYPE_DEVICE_IN | USB_REQTYPE_CLASS,			// type
 			USB_REQUEST_GET_DESCRIPTOR,							// request
 			USB_DESCRIPTOR_HUB << 8,							// value
 			0,													// index
