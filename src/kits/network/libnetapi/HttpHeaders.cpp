@@ -297,7 +297,7 @@ BHttpHeaders&
 BHttpHeaders::operator=(const BHttpHeaders& other)
 {
 	if (&other == this)
-		return;
+		return *this;
 
 	Clear();
 
