@@ -106,15 +106,15 @@ options:
 
 environment variables:
   CC                          The host compiler. Defaults to "gcc".
-  HAIKU_AR_x86_gcc2           The static library archiver for x86_gcc2.
+  HAIKU_AR_<arch>             The static library archiver for <arch>.
                               Defaults to "ar".
-  HAIKU_CC_x86_gcc2           The x86_gcc2 compiler. Defaults to "gcc".
-  HAIKU_LD_x86_gcc2           The x86_gcc2 linker. Defaults to "ld".
-  HAIKU_OBJCOPY_x86_gcc2      The x86_gcc2 objcopy to be used. Defaults to
+  HAIKU_CC_<arch>             The compiler for <arch>. Defaults to "gcc".
+  HAIKU_LD_<arch>             The <arch> linker. Defaults to "ld".
+  HAIKU_OBJCOPY_<arch>        The <arch> objcopy to be used. Defaults to
                               "objcopy".
-  HAIKU_RANLIB_x86_gcc2       The static library indexer for x86_gcc2. Defaults
+  HAIKU_RANLIB_<arch>         The static library indexer for <arch>. Defaults
                               to "ranlib".
-  HAIKU_STRIP_x86_gcc2        The x86_gcc2 strip command. Defaults to "strip".
+  HAIKU_STRIP_<arch>          The <arch> strip command. Defaults to "strip".
   HAIKU_NASM                  The nasm assembler (x86 and x86_64 only).
   HAIKU_CPPFLAGS_<arch>       The preprocessor flags for target architecture
                               <arch>. Defaults to "".
@@ -224,7 +224,7 @@ real_path()
 #
 standard_gcc_settings()
 {
-	local gcc=$1
+	local gcc="$1"
 
 	if which greadlink > /dev/null 2>&1; then
 		readlink="greadlink -e"
@@ -353,8 +353,8 @@ set_default_value()
 get_build_tool_path()
 {
 	local var="HAIKU_$1"
-	local varval=`get_variable $var`
-	local cmd=$2
+	local varval="`get_variable $var`"
+	local cmd="$2"
 
 	if [ ! -z "$varval" ]; then
 		# this variable is already set (probably by user) so grab its contents
@@ -364,7 +364,7 @@ get_build_tool_path()
 	local path=${cmd%% *}
 
 	if [ -f "$path" ]; then
-		# get absolute path
+		# get absolute path from relative path
 		local oldPwd="`pwd`"
 		cd "`dirname "$path"`"
 		path="`pwd`/`basename "$path"`"
@@ -376,7 +376,14 @@ get_build_tool_path()
 		}
 	fi
 
-	eval "$var=\"$path ${cmd#${2%% *}}\""
+	if test "${cmd#* }" != "$cmd"; then
+		# $cmd contains arguments, so preserve them (and only them)
+		cmd=${cmd#* }
+	else
+		# $cmd does not contain arguments, so unset it
+		cmd=
+	fi
+	eval "$var=\"$path $cmd\""
 }
 
 is_in_list()
@@ -618,6 +625,10 @@ while [ $# -gt 0 ] ; do
 					exit 1
 					;;
 			esac
+			get_build_tool_path clang clang
+			if [ -n "crossToolsPrefix_$targetArch" ]; then
+				set_variable crossToolsPrefix_$targetArch llvm-
+			fi
 			targetArchs="$targetArchs $targetArch"
 			HAIKU_PACKAGING_ARCHS=
 			shift 2
@@ -796,7 +807,7 @@ else
 
 		# prepare gcc settings and get the actual target architecture
 		if [ $useClang = 1 ]; then
-			gcc="clang -target ${targetMachine} -no-integrated-as"
+			gcc="$HAIKU_clang -target ${targetMachine} -no-integrated-as"
 		elif [ -z "${crossToolsPrefix}" ]; then
 			gcc=`get_variable HAIKU_CC_$targetArch`
 		else

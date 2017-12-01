@@ -34,6 +34,10 @@ rule ArchitectureSetup architecture
 		}
 	}
 
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		gccBaseFlags += -fno-builtin-vfork ;
+	}
+
 	# disable array bounds warnings on gcc 4.6 or newer since they trigger
 	# too many false positives. Coverity does a better job of this kind of
 	# analysis anyways.
@@ -130,6 +134,10 @@ rule ArchitectureSetup architecture
 
 		# TODO: remove the -Wno-unused-but-set-variable option
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unused-but-set-variable ;
+	}
+
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		gccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field ;
 	}
 
 	# debug flags
