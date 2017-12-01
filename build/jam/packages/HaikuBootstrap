@@ -31,7 +31,7 @@ AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToPackage add-ons kernel busses agp_gart : <agp_gart>intel@x86,x86_64 ;
 
 AddFilesToPackage add-ons kernel busses ata
-	: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
+	: generic_ide_pci it8211 legacy_sata silicon_image_3112 highpoint_ide_pci ide_isa@x86 ;
 
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
@@ -168,6 +168,7 @@ AddBootModuleSymlinksToPackage
 	openpic@ppc
 	ata_adapter@ata locked_pool scsi_periph
 	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
+	highpoint_ide_pci
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
 	scsi_cd scsi_disk usb_disk
