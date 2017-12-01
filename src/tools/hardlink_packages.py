@@ -11,7 +11,7 @@ import sys, os, re, hashlib
 
 if len(sys.argv) < 5:
 	print("usage: hardlink_packages.py [arch] [jam RemotePackageRepository file] "
-		+ "[source directory] [target directory]")
+		+ "[prebuilt packages directory] [destination root directory]")
 	print("note that the [jam RemotePackageRepository file] will be modified.")
 	print("note that [target directory] is assumed to have a 'packages' subdirectory, "
 		+ " and a repo.info.template file (using $ARCH$)")
