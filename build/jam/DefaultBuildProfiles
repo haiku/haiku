@@ -87,7 +87,7 @@ rule DefineDefaultBuildProfiles
 				pdfwriter
 				pe
 				python
-				subversion
+#				subversion
 				timgmsoundfont
 				vision
 				wpa_supplicant
