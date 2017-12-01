@@ -328,16 +328,27 @@ calloc(size_t nelem, size_t elsize)
 {
 	static processHeap *pHeap = getAllocator();
 	size_t size = nelem * elsize;
+	void *ptr = NULL;
+
+	if ((nelem > 0) && ((size/nelem) != elsize))
+		goto nomem;
 
 #if HEAP_WALL
 	size += 2 * HEAP_WALL_SIZE;
+
+	if (nelem == 0 || elsize == 0)
+		goto ok;
+	if (size < (nelem * size)&& size < (elsize * size))
+		goto nomem;
 #endif
 
+ok:
 	defer_signals();
 
-	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
+	ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (ptr == NULL) {
 		undefer_signals();
+	nomem:
 		__set_errno(B_NO_MEMORY);
 		KTRACE("calloc(%lu, %lu) -> NULL", nelem, elsize);
 		return NULL;
