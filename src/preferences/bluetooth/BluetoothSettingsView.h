@@ -14,7 +14,6 @@
 
 class BluetoothSettings;
 class ExtendedLocalDeviceView;
-class LocalDevice;
 
 class BBox;
 class BMenuField;

@@ -16,18 +16,20 @@ class BButton;
 class BTextView;
 class BListView;
 class BScrollView;
+namespace Bluetooth {
 class LocalDevice;
 class DiscoveryAgent;
 class DiscoveryListener;
+}
 
-class InquiryPanel : public BWindow 
+class InquiryPanel : public BWindow
 {
 public:
-			InquiryPanel(BRect frame, LocalDevice* lDevice = NULL); 
+			InquiryPanel(BRect frame, LocalDevice* lDevice = NULL);
 	bool	QuitRequested(void);
 	void	MessageReceived(BMessage *message);
-	
-private:		
+
+private:
 	BStatusBar*				fScanProgress;
 	BButton*				fAddButton;
 	BButton*				fInquiryButton;
@@ -37,12 +39,12 @@ private:
 	BMessage*				fRetrieveMessage;
 	BMessage*				fSecondsMessage;
 	BMessenger				fMessenger;
-	
+
 	bool					fScanning;
 	bool					fRetrieving;
-	LocalDevice*			fLocalDevice;
-	DiscoveryAgent*			fDiscoveryAgent;
-	DiscoveryListener*		fDiscoveryListener;
+	Bluetooth::LocalDevice*	fLocalDevice;
+	Bluetooth::DiscoveryAgent* fDiscoveryAgent;
+	Bluetooth::DiscoveryListener* fDiscoveryListener;
 
 	void UpdateListStatus(void);
 

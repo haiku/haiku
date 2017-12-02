@@ -11,8 +11,6 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DeviceClass.h>
 
-class BluetoothDevice;
-
 namespace Bluetooth {
 
 class DeviceListItem : public BListItem
