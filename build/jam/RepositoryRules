@@ -209,7 +209,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 
 	# build repository config file
 	RepositoryConfig $(repositoryConfig) : $(repositoryInfo)
-		: $(repositoryUrl)/$version : $(packagesChecksumFile) ;
+		: $(packagesChecksumFile) ;
 
 	HAIKU_REPOSITORY_CACHE_FILE on $(repository) = $(repositoryFile) ;
 	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
@@ -246,13 +246,12 @@ actions GeneratedRepositoryPackageList1
 }
 
 
-rule RepositoryConfig repoConfig : repoInfo : url : versionFile
+rule RepositoryConfig repoConfig : repoInfo : checksumFile
 {
-	HAIKU_REPOSITORY_URL on $(repoConfig) = $(url) ;
 	Depends $(repoConfig)
-		: <build>create_repository_config $(repoInfo) $(versionFile) ;
+		: <build>create_repository_config $(repoInfo) $(checksumFile) ;
 	RepositoryConfig1 $(repoConfig)
-		: <build>create_repository_config $(repoInfo) $(versionFile) ;
+		: <build>create_repository_config $(repoInfo) $(checksumFile) ;
 }
 
 
