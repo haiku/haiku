@@ -81,10 +81,11 @@ struct avformat_codec_context {
 
 // profiling related globals
 #define DO_PROFILING 0
-
+#if DO_PROFILING
 static bigtime_t decodingTime = 0;
 static bigtime_t conversionTime = 0;
 static long profileCounter = 0;
+#endif
 
 
 AVCodecDecoder::AVCodecDecoder()
@@ -1616,7 +1617,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	for correct operation
 
 	You should only call this function when you	got a new picture decoded by
-	the video decoder. 
+	the video decoder.
 
 	When this function finishes the postprocessed video frame will be available
 	in fPostProcessedDecodedPicture and fDecodedData (fDecodedDataSizeInBytes

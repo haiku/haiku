@@ -18,7 +18,7 @@
 #endif
 
 
-struct media_node;
+class media_node;
 
 #define B_MEDIA_NAME_LENGTH 64
 
@@ -401,7 +401,7 @@ struct media_video_header {
 	uint32      display_line_width; // Number of pixels per display_line
 	uint32      display_line_count;	// Sum of all interlace fields lines
 	uint32      bytes_per_row;		// Number of bytes in a display_line
-									// (padding bytes excluded)	
+									// (padding bytes excluded)
 	uint16      pixel_width_aspect;	// 1:1 has 1 here, 4:3 has 4 here
 									// 16:9 has 16 here!
 	uint16      pixel_height_aspect;// 1:1 has 1 here, 4:3 has 3 here

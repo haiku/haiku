@@ -361,7 +361,7 @@ private:
 private:
 			friend class TreeIterator;
 			friend class CachedNode;
-			friend class TreeCheck;
+			friend struct TreeCheck;
 
 			Inode*				fStream;
 			bplustree_header	fHeader;
