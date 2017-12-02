@@ -31,8 +31,8 @@
 namespace Scheduler {
 
 
-struct CPUEntry;
-struct CoreEntry;
+class CPUEntry;
+class CoreEntry;
 
 const int kLowLoad = kMaxLoad * 20 / 100;
 const int kTargetLoad = kMaxLoad * 55 / 100;

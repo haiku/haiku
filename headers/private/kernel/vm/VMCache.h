@@ -20,7 +20,7 @@
 
 
 struct kernel_args;
-class ObjectCache;
+struct ObjectCache;
 
 
 enum {

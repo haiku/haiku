@@ -94,7 +94,7 @@ private:
 				Area*			GetArea() const;
 			};
 
-			friend class MetaChunk;
+			friend struct MetaChunk;
 			typedef DoublyLinkedList<MetaChunk> MetaChunkList;
 
 			struct Area : DoublyLinkedListLinkImpl<Area> {

@@ -18,7 +18,6 @@
 #include "slab_debug.h"
 
 
-class AllocationTrackingInfo;
 struct ResizeRequest;
 
 

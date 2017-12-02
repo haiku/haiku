@@ -93,7 +93,7 @@ private:
 			typedef BOpenHashTable<Definition, false, false,
 				InternalAllocator> HashTable;
 
-			friend class Definition;
+			friend struct Definition;
 
 private:
 			void				_ResizeHashTableIfNeeded(uint32 flags);
