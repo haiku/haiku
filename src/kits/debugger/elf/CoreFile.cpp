@@ -525,6 +525,13 @@ CoreFile::_ReadAreasNote(const void* data, uint32 dataSize)
 
 		// create and add area
 		ElfSegment* segment = _FindAreaSegment(baseAddress);
+		if (segment == NULL) {
+			WARNING("No matching segment found for area %" B_PRIu64 " (ID %#"
+				B_PRIx32 " @ %#" B_PRIx64 ", name: '%s')", i, id, baseAddress,
+				name);
+			continue;
+		}
+
 		CoreFileAreaInfo* area = new(std::nothrow) CoreFileAreaInfo(segment, id,
 			baseAddress, size, ramSize, lock, protection, copiedName);
 		if (area == NULL || !fAreaInfos.AddItem(area)) {
