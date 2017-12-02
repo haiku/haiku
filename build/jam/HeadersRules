@@ -456,6 +456,10 @@ rule FStandardHeaders architecture
 
 	local headers = ;
 
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		headers += [ FDirName $(HAIKU_OUTPUT_DIR) clang_headers ] ;
+	}
+
 	# The c++ headers.
 	headers += [ C++HeaderDirectories $(architecture) ] ;
 
