@@ -148,6 +148,11 @@ static property_info sPropertyInfo[] = {
 		"Gets the URI of the currently playing item.", 0,
 		{ B_STRING_TYPE }
 	},
+	{ "TrackNumber", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the number of the current track playing.", 0,
+		{ B_INT32_TYPE }
+	},
 	{ "ToggleFullscreen", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
 		"Toggle fullscreen.", 0
@@ -564,10 +569,25 @@ MainWin::MessageReceived(BMessage* msg)
 				}
 
 				case 9:
+				{
+					if (msg->what == B_GET_PROPERTY) {
+						BAutolock _(fPlaylist);
+						const PlaylistItem* item = fController->Item();
+						if (item == NULL) {
+							result = B_NO_INIT;
+							break;
+						}
+
+						result = reply.AddInt32("result", item->TrackNumber());
+					}
+					break;
+				}
+
+				case 10:
 					PostMessage(M_TOGGLE_FULLSCREEN);
 					break;
 
-				case 10:
+				case 11:
 					if (msg->what != B_GET_PROPERTY)
 						break;
 
@@ -575,7 +595,7 @@ MainWin::MessageReceived(BMessage* msg)
 						fController->TimeDuration());
 					break;
 
-				case 11:
+				case 12:
 				{
 					if (msg->what == B_GET_PROPERTY) {
 						result = reply.AddInt64("result",
@@ -590,7 +610,7 @@ MainWin::MessageReceived(BMessage* msg)
 					break;
 				}
 
-				case 12:
+				case 13:
 				{
 					if (msg->what != B_SET_PROPERTY)
 						break;
@@ -604,11 +624,11 @@ MainWin::MessageReceived(BMessage* msg)
 					break;
 				}
 
-				case 13:
+				case 14:
 					result = reply.AddInt16("result", fPlaylist->CountItems());
 					break;
 
-				case 14:
+				case 15:
 				{
 					int32 i = specifier.GetInt32("index", 0);
 					if (i >= fPlaylist->CountItems()) {
