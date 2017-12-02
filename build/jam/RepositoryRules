@@ -189,6 +189,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 			: $(packageFiles) ;
 	} else {
 		# download repository file
+		local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
 		DownloadLocatedFile $(repositoryFile)
 			: "$(repoUrl)/`cat $source`/repo"
 			: $(packagesChecksumFile) ;
