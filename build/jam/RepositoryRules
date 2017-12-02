@@ -175,13 +175,6 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 	# Use a locally created dummy repository if downloads have been disabled.
 	# This is useful when trying to build everything locally from source.
 	if $(HAIKU_NO_DOWNLOADS) = 1 {
-		# build the dummy repository info file
-		local repositoryInfoTemplate = <repository-info-template>haikuports ;
-		SEARCH on $(repositoryInfoTemplate)
-			= $(HAIKU_TOP)/src/data/repository_infos ;
-		PreprocessPackageOrRepositoryInfo $(repositoryInfo)
-			: $(repositoryInfoTemplate) : $(architecture) ;
-
 		# build repository file
 		local packageFileNames = [
 			on $(packageListFile) return $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES)
@@ -195,17 +188,18 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 		RepositoryCache $(repositoryFile) : $(repositoryInfo)
 			: $(packageFiles) ;
 	} else {
-		# download repository info file
-		local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
-		DownloadLocatedFile $(repositoryInfo)
-			: "$(repoUrl)/`cat $source`/repo.info"
-			: $(packagesChecksumFile) ;
-
 		# download repository file
 		DownloadLocatedFile $(repositoryFile)
 			: "$(repoUrl)/`cat $source`/repo"
 			: $(packagesChecksumFile) ;
 	}
+
+	# build the repository info file
+	local repositoryInfoTemplate = <repository-info-template>haikuports ;
+	SEARCH on $(repositoryInfoTemplate)
+		= $(HAIKU_TOP)/src/data/repository_infos ;
+	PreprocessPackageOrRepositoryInfo $(repositoryInfo)
+		: $(repositoryInfoTemplate) : $(architecture) ;
 
 	# build repository config file
 	RepositoryConfig $(repositoryConfig) : $(repositoryInfo)
