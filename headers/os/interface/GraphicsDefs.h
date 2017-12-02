@@ -19,11 +19,9 @@ typedef struct pattern {
 inline bool
 operator==(const pattern& a, const pattern& b)
 {
-	for (int i = 0; i < 8; i++) {
-		if (a.data[i] != b.data[i])
-			return false;
-	}
-	return true;
+	uint64* pa = (uint64*)a.data;
+	uint64* pb = (uint64*)b.data;
+	return (*pa == *pb);
 }
 
 
@@ -64,16 +62,13 @@ typedef struct rgb_color {
 	inline bool
 	operator==(const rgb_color& other) const
 	{
-		return red == other.red
-			&& green == other.green
-			&& blue == other.blue
-			&& alpha == other.alpha;
+		return *(const uint32 *)this == *(const uint32 *)&other;
 	}
 
 	inline bool
 	operator!=(const rgb_color& other) const
 	{
-		return !(*this == other);
+		return *(const uint32 *)this != *(const uint32 *)&other;
 	}
 
 	inline rgb_color&
