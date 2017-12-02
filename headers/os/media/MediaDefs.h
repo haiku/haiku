@@ -15,10 +15,11 @@
 #if defined(__cplusplus)
 #	include <GraphicsDefs.h>
 #	include <Looper.h>
+class media_node;
+#else
+struct media_node;
 #endif
 
-
-class media_node;
 
 #define B_MEDIA_NAME_LENGTH 64
 
