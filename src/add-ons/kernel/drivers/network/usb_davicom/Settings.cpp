@@ -63,7 +63,7 @@ load_settings()
 	gAddTimeStamp = get_driver_boolean_parameter(handle,
 				"add_timestamp", gAddTimeStamp, true);
 	const char * logFilePath = get_driver_parameter(handle,
-				"logfile", NULL, "/var/log/"DRIVER_NAME".log");
+				"logfile", NULL, "/var/log/" DRIVER_NAME ".log");
 	if (logFilePath != NULL) {
 		gLogFilePath = strdup(logFilePath);
 	}
@@ -91,7 +91,7 @@ void usb_davicom_trace(bool force, const char* func, const char *fmt, ...)
 	}
 
 	va_list arg_list;
-	static const char *prefix = "\33[33m"DRIVER_NAME":\33[0m";
+	static const char *prefix = "\33[33m" DRIVER_NAME ":\33[0m";
 	static char buffer[1024];
 	char *buf_ptr = buffer;
 	if (gLogFilePath == NULL) {

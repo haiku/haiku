@@ -592,7 +592,7 @@ init_driver(void)
 			)) {
 
 			if (num_cards == NUM_CARDS) {
-				PRINT(("Too many "DRIVER_NAME" cards installed!\n"));
+				PRINT(("Too many " DRIVER_NAME " cards installed!\n"));
 				break;
 			}
 			memset(&cards[num_cards], 0, sizeof(echo_dev));
@@ -608,7 +608,7 @@ init_driver(void)
 			}
 #endif
 			if (echo_setup(&cards[num_cards])) {
-				PRINT(("Setup of "DRIVER_NAME" %ld failed\n", num_cards + 1));
+				PRINT(("Setup of " DRIVER_NAME " %ld failed\n", num_cards + 1));
 #ifdef __HAIKU__
 				(*pci->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &cards[num_cards]);
@@ -636,10 +636,10 @@ static void
 make_device_names(echo_dev * card)
 {
 #ifdef MIDI_SUPPORT
-	sprintf(card->midi.name, "midi/"DRIVER_NAME"/%ld", card-cards + 1);
+	sprintf(card->midi.name, "midi/" DRIVER_NAME "/%ld", card-cards + 1);
 	names[num_names++] = card->midi.name;
 #endif
-	sprintf(card->name, "audio/hmulti/"DRIVER_NAME"/%ld", card-cards + 1);
+	sprintf(card->name, "audio/hmulti/" DRIVER_NAME "/%ld", card-cards + 1);
 	names[num_names++] = card->name;
 
 	names[num_names] = NULL;
@@ -807,7 +807,7 @@ echo_setup(echo_dev * card)
 			break;
 #endif
 		default:
-			PRINT(("card type 0x%x not supported by "DRIVER_NAME"\n",
+			PRINT(("card type 0x%x not supported by " DRIVER_NAME "\n",
 				card->type));
 	}
 

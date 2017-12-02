@@ -62,7 +62,7 @@ void load_settings()
 			handle, "add_timestamp", gAddTimeStamp, true);
 
 	const char * logFilePath = get_driver_parameter(
-			handle, "logfile", NULL, "/var/log/"DRIVER_NAME".log");
+			handle, "logfile", NULL, "/var/log/" DRIVER_NAME ".log");
 	if (logFilePath != NULL) {
 		gLogFilePath = strdup(logFilePath);
 	}
@@ -146,7 +146,7 @@ Statistics::PutStatus(uint32 status)
 	fInterrupts++;
 	if (status & (INT_TXDONE /*| INT_TXIDLE*/)) fTxInterrupts++;
 	if (status & (INT_RXDONE /*| INT_RXIDLE*/)) fRxInterrupts++;
-	
+
 	if (status & INT_TXHALT)	fTxHalt++;
 	if (status & INT_RXHALT)	fRxHalt++;
 	if (status & INT_TXDONE)	fTxDone++;
@@ -197,15 +197,15 @@ void Statistics::Trace()
 {
 	TRACE("Ints:%d;Lnk:%d;WkUps:%d;Mgic:%d;Pause:%d;Tmr:%d;Sft:%d\n",
 			fInterrupts, fLink, fWakeUp, fMagic, fPause, fTimer, fSoft);
-	
+
 	TRACE("TX:Ints:%d;Bts:%llu;Drop:%d;Hlts:%d;Done:%d;Idle:%d;"
 		"Colls:%d;Carr:%d;FIFO:%d;Abrt:%d;Wndw:%d;\n",
-			fTxInterrupts, fTransmitted, fDropped, fTxHalt, fTxDone, 
+			fTxInterrupts, fTransmitted, fDropped, fTxHalt, fTxDone,
 			fTxIdle, fCollisions, fCarrier, fFIFO, fTxAbort, fWindow);
 
 	TRACE("RX:Ints:%d;Bts:%llu;Hlts:%d;Done:%d;Idle:%d;CRC:%d;Cln:%d;"
 		"Nibon:%d;Ovrrn:%d;MIIErr:%d;Lmt:%d;Shrt:%d;Abrt:%d\n",
-			fRxInterrupts, fReceived, fRxHalt, fRxDone, fRxIdle, fCRC, fColon, 
+			fRxInterrupts, fReceived, fRxHalt, fRxDone, fRxIdle, fCRC, fColon,
 			fNibon, fOverrun, fMIIError, fLimit, fShort, fRxAbort);
 }
 
