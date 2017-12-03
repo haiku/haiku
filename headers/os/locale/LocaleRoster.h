@@ -25,7 +25,7 @@ class BTimeZone;
 
 
 namespace BPrivate {
-	class LocaleRosterData;
+	struct LocaleRosterData;
 }
 
 
