@@ -125,10 +125,18 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		:
 		haiku_devel.hpkg
 		haiku_$(TARGET_PACKAGING_ARCHS[2-])_devel.hpkg
-		makefile_engine.hpkg
 		:
 		nameFromMetaInfo
 		;
+
+	if $(HAIKU_IS_BOOTSTRAP) != 1 {
+		AddPackageFilesToHaikuImage system
+			:
+			makefile_engine.hpkg
+			:
+			nameFromMetaInfo
+			;
+	}
 }
 
 
