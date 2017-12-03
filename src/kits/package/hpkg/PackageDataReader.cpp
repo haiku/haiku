@@ -80,7 +80,7 @@ class PackageDataInlineReader : public BBufferDataReader {
 public:
 	PackageDataInlineReader(const BPackageData& data)
 		:
-		BBufferDataReader(fData.InlineData(), data.Size()),
+		BBufferDataReader(data.InlineData(), data.Size()),
 		fData(data)
 	{
 	}

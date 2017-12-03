@@ -403,7 +403,7 @@ class PackageDataInlineReader : public BBufferDataReader {
 public:
 	PackageDataInlineReader(const BPackageData& data)
 		:
-		BBufferDataReader(fData.InlineData(), data.UncompressedSize()),
+		BBufferDataReader(data.InlineData(), data.UncompressedSize()),
 		fData(data)
 	{
 	}
