@@ -56,7 +56,7 @@ struct net_socket_module_info {
 					size_t vecCount, size_t* _length);
 	status_t	(*writev)(net_socket* socket, const iovec* vecs,
 					size_t vecCount, size_t* _length);
-	status_t	(*control)(net_socket* socket, int32 op, void* data,
+	status_t	(*control)(net_socket* socket, uint32 op, void* data,
 					size_t length);
 
 	ssize_t		(*read_avail)(net_socket* socket);

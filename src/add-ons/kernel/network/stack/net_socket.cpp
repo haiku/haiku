@@ -529,7 +529,7 @@ socket_writev(net_socket* socket, const iovec* vecs, size_t vecCount,
 
 
 status_t
-socket_control(net_socket* socket, int32 op, void* data, size_t length)
+socket_control(net_socket* socket, uint32 op, void* data, size_t length)
 {
 	switch (op) {
 		case FIONBIO:
