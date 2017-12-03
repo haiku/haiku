@@ -107,9 +107,6 @@ IOBuffer::Create(uint32 count, bool vip)
 void
 IOBuffer::Delete()
 {
-	if (this == NULL)
-		return;
-
 	free_etc(this, fVIP ? HEAP_PRIORITY_VIP : 0);
 }
 
@@ -715,7 +712,8 @@ IORequest::~IORequest()
 {
 	mutex_lock(&fLock);
 	DeleteSubRequests();
-	fBuffer->Delete();
+	if (fBuffer != NULL)
+		fBuffer->Delete();
 	mutex_destroy(&fLock);
 }
 
