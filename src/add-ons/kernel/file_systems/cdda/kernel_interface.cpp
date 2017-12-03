@@ -1508,7 +1508,7 @@ cdda_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 static status_t
 cdda_unmount(fs_volume* _volume)
 {
-	struct Volume* volume = (struct Volume*)_volume->private_volume;
+	Volume* volume = (Volume*)_volume->private_volume;
 
 	TRACE(("cdda_unmount: entry fs = %p\n", _volume));
 	delete volume;

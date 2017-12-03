@@ -12,7 +12,7 @@
 
 
 class AttributeIndex;
-class AttributeIndexTreeValue;
+struct AttributeIndexTreeValue;
 class IndexedAttributeOwner;
 
 

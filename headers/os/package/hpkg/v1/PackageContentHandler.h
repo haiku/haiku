@@ -16,13 +16,13 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-class BPackageInfoAttributeValue;
+struct BPackageInfoAttributeValue;
 
 
 namespace V1 {
 
 
-class BPackageAttributeValue;
+struct BPackageAttributeValue;
 class BPackageEntry;
 class BPackageEntryAttribute;
 

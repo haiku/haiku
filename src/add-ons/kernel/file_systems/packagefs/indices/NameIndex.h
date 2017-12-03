@@ -38,7 +38,7 @@ private:
 			struct IteratorPolicy;
 			struct Iterator;
 
-			friend class IteratorPolicy;
+			friend struct IteratorPolicy;
 
 			void				_UpdateLiveQueries(Node* entry,
 									const char* oldName, const char* newName);

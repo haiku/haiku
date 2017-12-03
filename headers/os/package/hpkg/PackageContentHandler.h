@@ -16,10 +16,10 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-class BPackageAttributeValue;
+struct BPackageAttributeValue;
 class BPackageEntry;
 class BPackageEntryAttribute;
-class BPackageInfoAttributeValue;
+struct BPackageInfoAttributeValue;
 
 
 class BLowLevelPackageContentHandler {

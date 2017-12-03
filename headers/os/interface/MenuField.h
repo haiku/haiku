@@ -111,7 +111,7 @@ private:
 	friend class _BMCMenuBar_;
 	friend class LabelLayoutItem;
 	friend class MenuBarLayoutItem;
-	friend class LayoutData;
+	friend struct LayoutData;
 
 								BMenuField(const char* name,
 									const char* label, BMenu* menu,

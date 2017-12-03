@@ -34,7 +34,7 @@ struct FileHandle {
 	inline	bool		operator<(const FileHandle& handle) const;
 };
 
-class InodeNames;
+struct InodeNames;
 
 struct InodeName : public SinglyLinkedListLinkImpl<InodeName> {
 				InodeName(InodeNames* parent, const char* name);
