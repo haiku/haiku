@@ -27,12 +27,12 @@ public:
 
 	virtual	int32				GuardSize()	{ return fGuardedSize; }
 
-	virtual	status_t			Read(off_t offset, const iovec* vecs,
-									size_t count, uint32 flags,
-						 			size_t* _numBytes);
-	virtual	status_t			Write(off_t offset, const iovec* vecs,
-									size_t count, uint32 flags,
-						  			size_t* _numBytes);
+	virtual	status_t			Read(off_t offset, const generic_io_vec *vecs,
+									 size_t count,uint32 flags,
+									 generic_size_t *_numBytes);
+	virtual	status_t			Write(off_t offset, const generic_io_vec *vecs,
+									  size_t count, uint32 flags,
+									  generic_size_t *_numBytes);
 
 	virtual	status_t			Fault(struct VMAddressSpace* aspace,
 									off_t offset);

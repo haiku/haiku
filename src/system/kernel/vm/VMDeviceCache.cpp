@@ -21,8 +21,8 @@ VMDeviceCache::Init(addr_t baseAddress, uint32 allocationFlags)
 
 
 status_t
-VMDeviceCache::Read(off_t offset, const iovec* vecs, size_t count,
-	uint32 flags, size_t* _numBytes)
+VMDeviceCache::Read(off_t offset, const generic_io_vec *vecs, size_t count,
+	uint32 flags, generic_size_t *_numBytes)
 {
 	panic("device_store: read called. Invalid!\n");
 	return B_ERROR;
@@ -30,8 +30,8 @@ VMDeviceCache::Read(off_t offset, const iovec* vecs, size_t count,
 
 
 status_t
-VMDeviceCache::Write(off_t offset, const iovec* vecs, size_t count,
-	uint32 flags, size_t* _numBytes)
+VMDeviceCache::Write(off_t offset, const generic_io_vec* vecs, size_t count,
+	uint32 flags, generic_size_t* _numBytes)
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return B_OK;
