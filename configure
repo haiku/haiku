@@ -51,7 +51,6 @@ options:
                               official -- the official Haiku distribution.
                               compatible -- a Haiku Compatible (tm) distro.
                               default -- any other distro (default value).
-  --enable-multiuser          Enable experimental multiuser support.
   --help                      Prints out this help.
   --host-only                 Configure for building tools for the build host
                               only. Haiku cannot be built when configured like
@@ -442,7 +441,6 @@ HOST_GCC_MACHINE=`$CC -dumpmachine`
 HAIKU_INCLUDE_PATENTED_CODE=0
 HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
-HAIKU_ENABLE_MULTIUSER=0
 HAIKU_DISTRO_COMPATIBILITY=default
 TARGET_PLATFORM=haiku
 HAIKU_USE_GCC_PIPE=0
@@ -591,7 +589,6 @@ while [ $# -gt 0 ] ; do
 			esac
 			shift 2
 			;;
-		--enable-multiuser)	HAIKU_ENABLE_MULTIUSER=1; shift 1;;
 		--host-only)	HAIKU_HOST_BUILD_ONLY=1; shift 1;;
 		--include-patented-code)	HAIKU_INCLUDE_PATENTED_CODE=1; shift 1;;
 		--include-sources)	HAIKU_INCLUDE_SOURCES=1; shift 1;;
@@ -877,7 +874,6 @@ HOST_PLATFORM				?= "${HOST_PLATFORM}" ;
 HAIKU_INCLUDE_PATENTED_CODE			?= "${HAIKU_INCLUDE_PATENTED_CODE}" ;
 HAIKU_INCLUDE_SOURCES				?= "${HAIKU_INCLUDE_SOURCES}" ;
 HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
-HAIKU_ENABLE_MULTIUSER				?= "${HAIKU_ENABLE_MULTIUSER}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
 HAIKU_USE_GCC_PIPE					?= "${HAIKU_USE_GCC_PIPE}" ;
 HAIKU_HOST_USE_32BIT				?= "${HAIKU_HOST_USE_32BIT}" ;
