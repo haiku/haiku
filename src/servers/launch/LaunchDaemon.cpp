@@ -125,7 +125,7 @@ typedef std::map<team_id, Job*> TeamMap;
 
 
 class LaunchDaemon : public BServer, public Finder, public ConditionContext,
-	public EventRegistrator, public TeamRegistrator {
+	public EventRegistrator, public TeamListener {
 public:
 								LaunchDaemon(bool userMode,
 									const EventMap& events, status_t& error);
@@ -146,8 +146,8 @@ public:
 	virtual	void				UnregisterExternalEvent(Event* event,
 									const char* name);
 
-	// TeamRegistrator
-	virtual	void				RegisterTeam(Job* job);
+	// TeamListener
+	virtual	void				TeamListener(Job* job);
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
@@ -1412,7 +1412,7 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		if (job == NULL)
 			return;
 
-		job->SetTeamRegistrator(this);
+		job->SetTeamListener(this);
 		job->SetService(service);
 		job->SetCreateDefaultPort(service);
 		job->SetTarget(target);

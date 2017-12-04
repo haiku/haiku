@@ -32,9 +32,9 @@ struct entry_ref;
 typedef std::map<BString, BMessage> PortMap;
 
 
-class TeamRegistrator {
+class TeamListener {
 public:
-	virtual	void				RegisterTeam(Job* job) = 0;
+	virtual	void				TeamLaunched(Job* job) = 0;
 };
 
 
@@ -44,9 +44,8 @@ public:
 								Job(const Job& other);
 	virtual						~Job();
 
-			::TeamRegistrator*	TeamRegistrator() const;
-			void				SetTeamRegistrator(
-									::TeamRegistrator* registrator);
+			::TeamListener*		TeamListener() const;
+			void				SetTeamListener(::TeamListener* listener);
 
 			bool				IsEnabled() const;
 			void				SetEnabled(bool enable);
@@ -144,7 +143,7 @@ private:
 			BStringList			fPendingJobs;
 			BObjectList<BMessage>
 								fPendingLaunchDataReplies;
-			::TeamRegistrator*	fTeamRegistrator;
+			::TeamListener*		fTeamListener;
 };
 
 

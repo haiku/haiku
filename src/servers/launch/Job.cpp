@@ -87,17 +87,17 @@ Job::~Job()
 }
 
 
-::TeamRegistrator*
-Job::TeamRegistrator() const
+::TeamListener*
+Job::TeamListener() const
 {
-	return fTeamRegistrator;
+	return fTeamListener;
 }
 
 
 void
-Job::SetTeamRegistrator(::TeamRegistrator* registrator)
+Job::SetTeamListener(::TeamListener* listener)
 {
-	fTeamRegistrator = registrator;
+	fTeamListener = listener;
 }
 
 
@@ -693,8 +693,8 @@ Job::_Launch(const char* signature, entry_ref* ref, int argCount,
 		if (result == B_OK) {
 			resume_thread(mainThread);
 
-			if (fTeamRegistrator != NULL)
-				fTeamRegistrator->RegisterTeam(this);
+			if (fTeamListener != NULL)
+				fTeamListener->TeamLaunched(this);
 		} else
 			kill_thread(mainThread);
 	}
