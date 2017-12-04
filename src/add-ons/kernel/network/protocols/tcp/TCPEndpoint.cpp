@@ -445,6 +445,7 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fSmoothedRoundTripTime(0),
 	fRoundTripVariation(0),
 	fSendTime(0),
+	fRoundTripStartSequence(0),
 	fRetransmitTimeout(TCP_INITIAL_RTT),
 	fReceivedTimestamp(0),
 	fCongestionWindow(0),
@@ -2035,6 +2036,10 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	}
 
 	size_t availableBytes = fReceiveQueue.Free();
+	// window size must remain same for duplicate acknowledgements
+	if (!fReceiveQueue.IsContiguous())
+		availableBytes = (fReceiveMaxAdvertised - fReceiveNext).Number();
+
 	if (fFlags & FLAG_OPTION_WINDOW_SCALE)
 		segment.advertised_window = availableBytes >> fReceiveWindowShift;
 	else
@@ -2189,8 +2194,11 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
-		if (fSendTime == 0 && (segmentLength != 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE ) == 1))
+		if (fSendTime == 0 && !retransmit
+			&& (segmentLength != 0 || (segment.flags & TCP_FLAG_SYNCHRONIZE) !=0)) {
 			fSendTime = tcp_now();
+			fRoundTripStartSequence = segment.sequence;
+		}
 
 		if (shouldStartRetransmitTimer && size > 0) {
 			TRACE("starting initial retransmit timer of: %" B_PRIdBIGTIME,
@@ -2280,6 +2288,8 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		uint32 bytesAcknowledged = segment.acknowledge - fSendUnacknowledged.Number();
 		fPreviousHighestAcknowledge = fSendUnacknowledged;
 		fSendUnacknowledged = segment.acknowledge;
+		uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
+		int32 expectedSamples = flightSize / (fSendMaxSegmentSize << 1);
 
 		if (fPreviousHighestAcknowledge > fSendUnacknowledged) {
 			// need to update the recover variable upon a sequence wraparound
@@ -2320,22 +2330,17 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 			fSendNext = fSendUnacknowledged;
 
 		if (fFlags & FLAG_OPTION_TIMESTAMP) {
-			uint32 flightSize = (fSendMax - fSendUnacknowledged).Number();
 			_UpdateRoundTripTime(tcp_diff_timestamp(segment.timestamp_reply),
-				1 + ((flightSize - 1) / (fSendMaxSegmentSize << 1)));
-		}
-
-		// Karn's algorithm: RTT measurement must not be made using segments that were retransmitted
-		else if (fSendTime > 1 && fSendNext == fSendMax) {
+				expectedSamples > 0 ? expectedSamples : 1);
+		} else if (fSendTime != 0 && fRoundTripStartSequence < segment.acknowledge) {
 			_UpdateRoundTripTime(tcp_diff_timestamp(fSendTime), 1);
-			fSendTime = 1;
+			fSendTime = 0;
 		}
 
 		if (fSendUnacknowledged == fSendMax) {
 			TRACE("all acknowledged, cancelling retransmission timer.");
 			gStackModule->cancel_timer(&fRetransmitTimer);
 			T(TimerSet(this, "retransmit", -1));
-			fSendTime = 0;
 		} else {
 			TRACE("data acknowledged, resetting retransmission timer to: %"
 				B_PRIdBIGTIME, fRetransmitTimeout);
@@ -2383,22 +2388,25 @@ TCPEndpoint::_Retransmit()
 
 
 void
-TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime, uint32 expectedSamples)
+TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime, int32 expectedSamples)
 {
 	if(fSmoothedRoundTripTime == 0) {
 		fSmoothedRoundTripTime = roundTripTime;
-		fRoundTripVariation = roundTripTime >> 1;
-		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation << 2))
+		fRoundTripVariation = roundTripTime / 2;
+		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation * 4))
 				* kTimestampFactor;
 	} else {
 		int32 delta = fSmoothedRoundTripTime - roundTripTime;
 		if (delta < 0)
 			delta = -delta;
-		fRoundTripVariation += ((delta - fRoundTripVariation) >> 2) / expectedSamples;
-		fSmoothedRoundTripTime += ((roundTripTime - fSmoothedRoundTripTime) >> 3) / expectedSamples;
-		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation << 2))
+		fRoundTripVariation += (delta - fRoundTripVariation) / (expectedSamples * 4);
+		fSmoothedRoundTripTime += (roundTripTime - fSmoothedRoundTripTime) / (expectedSamples * 8);
+		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation * 4))
 			* kTimestampFactor;
 	}
+
+	if (fRetransmitTimeout > TCP_MAX_RETRANSMIT_TIMEOUT)
+		fRetransmitTimeout = TCP_MAX_RETRANSMIT_TIMEOUT;
 
 	if (fRetransmitTimeout < TCP_MIN_RETRANSMIT_TIMEOUT)
 		fRetransmitTimeout = TCP_MIN_RETRANSMIT_TIMEOUT;

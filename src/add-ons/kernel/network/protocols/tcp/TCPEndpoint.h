@@ -106,7 +106,7 @@ private:
 			status_t	_PrepareSendPath(const sockaddr* peer);
 			void		_Acknowledged(tcp_segment_header& segment);
 			void		_Retransmit();
-			void		_UpdateRoundTripTime(int32 roundTripTime, uint32 expectedSamples);
+			void		_UpdateRoundTripTime(int32 roundTripTime, int32 expectedSamples);
 			void		_ResetSlowStart();
 			void		_DuplicateAcknowledge(tcp_segment_header& segment);
 
@@ -171,6 +171,7 @@ private:
 	int32			fSmoothedRoundTripTime;
 	int32			fRoundTripVariation;
 	uint32			fSendTime;
+	tcp_sequence	fRoundTripStartSequence;
 	bigtime_t		fRetransmitTimeout;
 
 	uint32			fReceivedTimestamp;
