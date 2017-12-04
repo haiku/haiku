@@ -3,6 +3,7 @@ BootstrapPackageRepository HaikuPortsCross
 	:
 	# architecture "any" packages
 	haikuporter-0-1
+	noto-20170202-7
 	:
 	# repository architecture packages (stage 0)
 	gcc_bootstrap-5.4.0_2016_06_04-1
