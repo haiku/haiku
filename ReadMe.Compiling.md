@@ -1,16 +1,16 @@
 Building Haiku
 ==========================
 This is a overview into the process of building HAIKU from source.
-An online version is available at <https://haiku-os.org/guides/building/>.
+An online version is available at <https://www.haiku-os.org/guides/building/>.
 
-Official releases of Haiku are at <https://haiku-os.org/get-haiku>.
+Official releases of Haiku are at <https://www.haiku-os.org/get-haiku>.
 The (unstable) nightly builds are available at <https://download.haiku-os.org/>.
 
 We currently support the following platforms:
  * Haiku
  * Linux
  * FreeBSD
- * Mac OS X
+ * macOS
 
 Required Software
 ----------------------------
@@ -20,18 +20,17 @@ Tools provided within Haiku's repositories:
 
 The tools to compile Haiku will vary, depending on the platform that you are
 using to build Haiku. When building from Haiku, all of the necessary
-development tools are included in official releases (e.g. R1 alpha4) and in the
+development tools are included in official releases (e.g. R1/alpha4) and in the
 nightly builds.
 
  * `git`
- * `ssh` (for developers with commit access)
  * `gcc`/`g++` and binutils (`as`, `ld`, etc., required by GCC)
  * (GNU) `make`
  * `bison` (2.4 or better)
  * `flex` and `lex` (usually a mini shell script invoking `flex`)
  * `makeinfo` (part of `texinfo`, only needed for building GCC 4)
  * `autoheader` (part of `autoconf`, needed for building GCC)
- * `automake`
+ * `automake` (needed for building GCC)
  * `gawk`
  * `nasm`
  * `wget`
@@ -52,7 +51,7 @@ If you want to compile Haiku for ARM, you will also need:
  * `mkimage` (<http://www.denx.de/wiki/U-Boot/WebHome>)
  * Mtools (<https://gnu.org/software/mtools/intro.html>)
 
-### On Mac OS X
+### On macOS
 
 Disk Utility can create a case-sensitive disk image of at least 3 GiB in size.
 The following ports need to be installed:
@@ -119,32 +118,38 @@ update the source tree very frequently, you may want to execute `configure`
 after each update just to be on the safe side.
 
 Depending on your goal, there are several different ways to configure Haiku.
-You can either call configure from within your Haiku trunk folder. That will
-prepare a folder named 'generated', which will contain the compiled objects.
+The first way is to call configure from within your Haiku checkout's root. That
+will prepare a folder named 'generated', which will contain the compiled objects.
 Another option is to manually created one or more `generated.*` folders and run
 configure from within them. For example, imagine the following directory setup:
 ```
-buildtools-trunk/
-haiku-trunk/
-haiku-trunk/generated.x86gcc2
+buildtools/
+haiku/
+haiku/generated.x86gcc2
 ```
 
-### Configure a GCC 2.95 Hybrid, from a non-Haiku platform
+### Configure a GCC 2.95/GCC 5 Hybrid, from a non-Haiku platform
 ```bash
-cd haiku-trunk/generated.x86gcc2
-../configure --use-xattr-ref \
+cd haiku/generated.x86gcc2
+../configure \
 	--build-cross-tools x86_gcc2 ../../buildtools/ \
 	--build-cross-tools x86
 ```
 
-### Configure a GCC 2.95 Hybrid, from Haiku
+### Configure an x86_64 (GCC 5) build, from a non-Haiku platform
 ```
-cd haiku-trunk/generated.x86gcc2
+cd haiku/generated.x86_64
+../configure --build-cross-tools x86_64 ../../buildtools/
+```
+
+### Configure a GCC 2.95/GCC 5 Hybrid, from Haiku
+```
+cd haiku/generated.x86gcc2
 ../configure --target-arch x86_gcc2 --target-arch x86
 ```
 
 Additional information about GCC Hybrids can be found on the website,
-<https://haiku-os.org/guides/building/gcc-hybrid>.
+<https://www.haiku-os.org/guides/building/gcc-hybrid>.
 
 ### Configure options
 The various runtime options for configure are documented in its onscreen help
@@ -231,7 +236,7 @@ BootManager
 ```
 
 ### On Emulated Hardware
-For emulated hardware you should build disk image (see above). How to set up
+For emulated hardware you should build a disk image (see above). How to set up
 this image depends on your emulator. If you use QEMU, you can usually just
 provide the path to the image as command line argument to the `qemu`
 executable.
