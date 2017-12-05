@@ -88,17 +88,14 @@ options:
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
   --use-gcc-graphite          Build with GCC Graphite engine for loop
-                              optimizations. Only for gcc 4.
+                              optimizations. (Only for GCC 4+.)
   --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
-  --use-xattr                 Use Linux xattr respectively *BSD extattr support
-                              for BeOS attribute emulation. Warning: Make sure
-                              your file system supports sufficient attribute
-                              sizes (4 KB per file for all attributes won't
-                              suffice).
-  --use-xattr-ref             Use the generic BeOS attribute emulation, but use
-                              Linux xattr respectively *BSD extattr support to
-                              make it more robust (i.e. attribute mix-ups become
-                              less likely).
+  --use-xattr                 Use Linux/*BSD's native extended file attributes
+                              for Haiku extended attributes.
+  --use-xattr-ref             Use the generic Haiku attribute emulation, but use
+                              Linux/*BSD's native extended attributes to make it
+                              more robust (i.e. attribute mix-ups become
+                              less likely.)
   --with-gdb <gdb sources dir>
                               specify the path to a GDB source dir, to build
                               GDB for each arch we build the cross-tools for.
@@ -383,6 +380,68 @@ get_build_tool_path()
 		cmd=
 	fi
 	eval "$var=\"$path $cmd\""
+}
+
+# check_native_xattrs
+#
+# Checks the host platform's support for extended attributes.
+# 0: no support, 1: only enough for xattr-ref, 2: full support
+#
+check_native_xattrs()
+{
+	local xattr_set=
+	local xattr_set_args=
+	local xattr_get=
+	local xattr_get_args=
+	case $HOST_PLATFORM in
+		darwin)
+			xattr_set="xattr"; xattr_set_args="-w \$NAME \"\$VALUE\""
+			xattr_get="xattr"; xattr_get_args="-p \$NAME"
+			;;
+		freebsd)
+			xattr_set="setextattr"; xattr_set_args="user \$NAME \"\$VALUE\""
+			xattr_get="getextattr"; xattr_get_args="user \$NAME"
+			;;
+		linux)
+			xattr_set="setfattr"; xattr_set_args="-n user.\$NAME -v \"\$VALUE\""
+			xattr_get="getfattr"; xattr_get_args="-n user.\$NAME"
+			;;
+		*)
+			return 0
+			;;
+	esac
+	if ! type $xattr_set >/dev/null 2>&1; then
+		echo "$0: could not find $xattr_set, assuming host has no extended attributes"
+		return 0
+	elif ! type $xattr_get >/dev/null 2>&1; then
+		echo "$0: could not find $xattr_get, assuming host has no extended attributes"
+		return 0
+	fi
+
+	echo "xattr test file" >"$outputDir/xattrtest"
+	local i=0
+	# on round 0, we test if we can set 3 attrs of 1K each (enough for xattr-ref)
+	# on round 1, we test if we can set 3 attrs of 45K each (enough for full xattr)
+	while [ $i -lt 2 ]; do
+		local j=0
+		while [ $j -lt 3 ]; do
+			NAME=attr$j
+			VALUE=`printf '%*s' $((1024 + $i * 45056)) "" | tr ' ' x`
+			if [ `echo -n $VALUE | wc -c` -lt $((1024 + $i * 45056)) ]; then
+				echo "$0: warning: could not generate test data for extended attributes"
+				rm "$outputDir/xattrtest"
+				return $i
+			elif ! $xattr_set `eval echo \"$xattr_set_args\"` \
+					"$outputDir/xattrtest" >/dev/null 2>&1 ; then
+				rm "$outputDir/xattrtest"
+				return $i
+			fi
+			j=$((j+1))
+		done
+		i=$((i+1))
+	done
+	rm "$outputDir/xattrtest"
+	return 2
 }
 
 is_in_list()
@@ -682,6 +741,29 @@ if [ $caseInsensitive != 0 ]; then
 		echo "You can create a case-sensitive disk image using Disk Utility."
 	fi
 	exit 1
+fi
+
+# check xattr support
+if [ $HOST_PLATFORM != "haiku_host" ] && [ $HAIKU_HOST_USE_XATTR != 0 ] \
+		|| [ $HAIKU_HOST_USE_XATTR_REF != 0 ]; then
+	if [ $HAIKU_HOST_USE_XATTR != 0 ] && [ $HAIKU_HOST_USE_XATTR_REF != 0 ]; then
+		echo "$0: error: both --use-xattr and --use-xattr-ref cannot be specified."
+		exit 1
+	fi
+	check_native_xattrs
+	attrSupport=$?
+	if [ $attrSupport = 2 ]; then
+		0; # all is well, we don't need to do anything
+	elif [ $attrSupport = 1 ]; then
+		if [ $HAIKU_HOST_USE_XATTR != 0 ]; then
+			echo "$0: error: full extended attributes requested but host" \
+				"only has support for xattr-ref."
+			exit 1
+		fi
+	else
+		echo "$0: error: host platform has no support for extended attributes."
+		exit 1
+	fi
 fi
 
 # determine how to invoke sed with extended regexp support for non-GNU sed
