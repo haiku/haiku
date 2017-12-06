@@ -90,7 +90,7 @@ main(int argc, const char* const* argv)
 			installedRepositoryBuilder.AddPackage(packages[i]);
 		installedRepositoryBuilder.AddToSolver(solver, true);
 	} catch (BFatalErrorException e) {
-		DIE(B_OK, "%s", e.Details().String());
+		DIE(e.Error(), "%s %s", e.Message().String(), e.Details().String());
 	}
 
 	// add external repositories
