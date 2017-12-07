@@ -7,6 +7,10 @@ SimpleTest mediaFormats :
 	mediaFormats.cpp
 	: media ;
 
+SimpleTest VideoDecoder :
+	VideoDecoder.cpp
+	: media be ;
+
 UnitTestLib libmediatest.so :
 	MediaKitTestAddon.cpp
 
