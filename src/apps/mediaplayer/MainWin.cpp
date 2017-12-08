@@ -110,63 +110,73 @@ enum {
 
 
 static property_info sPropertyInfo[] = {
-	{ B_TRANSLATE("Next"), { B_EXECUTE_PROPERTY },
+	{ "Next", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Skip to the next track."), 0
+		"Skip to the next track.", 0
 	},
-	{ B_TRANSLATE("Prev"), { B_EXECUTE_PROPERTY },
+	{ "Prev", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Skip to the previous track."), 0
+		"Skip to the previous track.", 0
 	},
-	{ B_TRANSLATE("Play"), { B_EXECUTE_PROPERTY },
+	{ "Play", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Start playing."), 0
+		"Start playing.", 0
 	},
-	{ B_TRANSLATE("Stop"), { B_EXECUTE_PROPERTY },
+	{ "Stop", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Stop playing."), 0
+		"Stop playing.", 0
 	},
-	{ B_TRANSLATE("Pause"), { B_EXECUTE_PROPERTY },
+	{ "Pause", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Pause playback."), 0
+		"Pause playback.", 0
 	},
-	{ B_TRANSLATE("TogglePlaying"), { B_EXECUTE_PROPERTY },
+	{ "TogglePlaying", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Toggle pause/play."), 0
+		"Toggle pause/play.", 0
 	},
-	{ B_TRANSLATE("Mute"), { B_EXECUTE_PROPERTY },
+	{ "Mute", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Toggle mute."), 0
+		"Toggle mute.", 0
 	},
-	{ B_TRANSLATE("Volume"), { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ "Volume", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Gets/sets the volume (0.0-2.0)."), 0,
+		"Gets/sets the volume (0.0-2.0).", 0,
 		{ B_FLOAT_TYPE }
 	},
-	{ B_TRANSLATE("URI"), { B_GET_PROPERTY, 0 },
+	{ "URI", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Gets the URI of the currently playing item."), 0,
+		"Gets the URI of the currently playing item.", 0,
 		{ B_STRING_TYPE }
 	},
-	{ B_TRANSLATE("ToggleFullscreen"), { B_EXECUTE_PROPERTY },
+	{ "ToggleFullscreen", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Toggle fullscreen."), 0
+		"Toggle fullscreen.", 0
 	},
-	{ B_TRANSLATE("Duration"), { B_GET_PROPERTY, 0 },
+	{ "Duration", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Gets the duration of the currently playing item "
-			"in microseconds."), 0,
+		"Gets the duration of the currently playing item "
+			"in microseconds.", 0,
 		{ B_INT64_TYPE }
 	},
-	{ B_TRANSLATE("Position"), { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ "Position", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Gets/sets the current playing position in microseconds."),
+		"Gets/sets the current playing position in microseconds.",
 		0, { B_INT64_TYPE }
 	},
-	{ B_TRANSLATE("Seek"), { B_SET_PROPERTY },
+	{ "Seek", { B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		B_TRANSLATE("Seek by the specified amounts of microseconds."), 0,
+		"Seek by the specified amounts of microseconds.", 0,
 		{ B_INT64_TYPE }
+	},
+	{ "PlaylistTrackCount", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the number of tracks in Playlist.", 0,
+		{ B_INT16_TYPE }
+	},
+	{ "PlaylistTrackTitle", { B_GET_PROPERTY, 0 },
+		{ B_INDEX_SPECIFIER, 0 },
+		"Gets the title of the nth track in Playlist.", 0,
+		{ B_STRING_TYPE }
 	},
 
 	{ 0 }
@@ -591,6 +601,25 @@ MainWin::MessageReceived(BMessage* msg)
 						break;
 
 					_Wind(seekBy, 0);
+					break;
+				}
+
+				case 13:
+					result = reply.AddInt16("result", fPlaylist->CountItems());
+					break;
+
+				case 14:
+				{
+					int32 i = specifier.GetInt32("index", 0);
+					if (i >= fPlaylist->CountItems()) {
+						result = B_NO_INIT;
+						break;
+					}
+
+					BAutolock _(fPlaylist);
+					const PlaylistItem* item = fPlaylist->ItemAt(i);
+					result = item == NULL ? B_NO_INIT
+						: reply.AddString("result", item->Title());
 					break;
 				}
 
@@ -1288,22 +1317,9 @@ MainWin::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 	int32 what, const char* property)
 {
 	BPropertyInfo propertyInfo(sPropertyInfo);
-	switch (propertyInfo.FindMatch(message, index, specifier, what, property)) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-			return this;
-	}
+	if (propertyInfo.FindMatch(message, index, specifier, what, property)
+		< propertyInfo.CountProperties())
+		return this;
 
 	return BWindow::ResolveSpecifier(message, index, specifier, what, property);
 }
