@@ -29,6 +29,7 @@ class ReplaceWindow : public BWindow {
 
 		virtual void	MessageReceived(BMessage* message);
 		virtual void	DispatchMessage(BMessage* message, BHandler* handler);
+		virtual	bool	QuitRequested();
 		virtual void	Show();
 
 	private:

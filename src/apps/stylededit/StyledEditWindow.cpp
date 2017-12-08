@@ -263,6 +263,11 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			fFindWindow = NULL;
 			break;
 		}
+		case MSG_REPLACE_WINDOW_QUIT:
+		{
+			fReplaceWindow = NULL;
+			break;
+		}
 		case MSG_SEARCH:
 			message->FindString("findtext", &fStringToFind);
 			fFindAgainItem->SetEnabled(true);

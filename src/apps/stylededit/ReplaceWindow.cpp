@@ -157,6 +157,16 @@ ReplaceWindow::DispatchMessage(BMessage* message, BHandler* handler)
 }
 
 
+bool
+ReplaceWindow::QuitRequested()
+{
+	BMessenger messenger(fHandler);
+	messenger.SendMessage(MSG_REPLACE_WINDOW_QUIT);
+
+	return true;
+}
+
+
 void
 ReplaceWindow::Show()
 {
