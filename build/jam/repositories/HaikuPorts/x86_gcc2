@@ -7,7 +7,7 @@ RemotePackageRepository HaikuPorts
 	ca_root_certificates-2017_01_18-1
 	gnu_efi_kernel-3.0.4-2
 	haikuporter-1.2.1-1
-	noto-20170920-2
+	noto-20170920-3
 	noto_sans_cjk_jp-1.004-2
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
@@ -70,7 +70,7 @@ RemotePackageRepository HaikuPorts
 	jasper_devel-2.0.14-1
 	jpeg-9b-5
 	jpeg_devel-9b-5
-	keymapswitcher-1.2.7.11-3
+	keymapswitcher-1.2.7.11-4
 	less-487-1
 	libedit-2015_03_21_3.1-8
 	libedit_devel-2015_03_21_3.1-8
@@ -96,8 +96,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis-1.3.5-5
 	libvorbis_devel-1.3.5-5
 	libvpx-1.0.0-2
-	libwebp-0.6.0-2
-	libwebp_devel-0.6.0-2
+	libwebp-0.6.1-1
+	libwebp_devel-0.6.1-1
 	libxml2-2.9.3-5
 	libxml2_devel-2.9.3-5
 	live555-2016.06.22-5
@@ -116,8 +116,8 @@ RemotePackageRepository HaikuPorts
 	ncurses6_devel-6.0-3
 	netcat-1.10-4
 	openssh-7.2p2-2
-	openssl-1.0.2m-2
-	openssl_devel-1.0.2m-2
+	openssl-1.0.2m-3
+	openssl_devel-1.0.2m-3
 	p7zip-9.20.1-7
 	patch-2.7.5-2
 	pdflib-5.0.3-3
@@ -217,8 +217,8 @@ RemotePackageRepository HaikuPorts
 	libvpx3_x86-1.5.0-2
 	libvpx3_x86_devel-1.5.0-2
 	libwebp5_x86-0.4.4-2
-	libwebp_x86-0.6.0-2
-	libwebp_x86_devel-0.6.0-2
+	libwebp_x86-0.6.1-1
+	libwebp_x86_devel-0.6.1-1
 	libxml2_x86-2.9.3-5
 	libxml2_x86_devel-2.9.3-5
 	libxslt_x86-1.1.32-1
@@ -236,8 +236,8 @@ RemotePackageRepository HaikuPorts
 	mpc_x86-1.0.3-3
 	mpfr_x86-3.1.6-2
 	nettle_x86-3.4-1
-	openssl_x86-1.0.2m-2
-	openssl_x86_devel-1.0.2m-2
+	openssl_x86-1.0.2m-3
+	openssl_x86_devel-1.0.2m-3
 	pkgconfig_x86-0.29.2-3
 	sharutils_x86-4.15.2-3
 	speex_x86-1.2.0-2
