@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src tests system glue ;
+
+SimpleTest StackAlign :
+	StackAlign.cpp
+;
