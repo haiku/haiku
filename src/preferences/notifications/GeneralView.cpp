@@ -43,8 +43,25 @@
 const uint32 kToggleNotifications = '_TSR';
 const uint32 kWidthChanged = '_WIC';
 const uint32 kTimeoutChanged = '_TIC';
+const uint32 kPositionChanged = '_NPC';
 const uint32 kServerChangeTriggered = '_SCT';
 const BString kSampleMessageID("NotificationsSample");
+
+
+static int32
+notification_position_to_index(uint32 notification_position) {
+	if (notification_position == B_FOLLOW_NONE)
+		return 0;
+	else if (notification_position == (B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM))
+		return 1;
+	else if (notification_position == (B_FOLLOW_LEFT | B_FOLLOW_BOTTOM))
+		return 2;
+	else if (notification_position == (B_FOLLOW_RIGHT | B_FOLLOW_TOP))
+		return 3;
+	else if (notification_position == (B_FOLLOW_LEFT | B_FOLLOW_TOP))
+		return 4;
+	return 0;
+}
 
 
 GeneralView::GeneralView(SettingsHost* host)
@@ -87,10 +104,37 @@ GeneralView::GeneralView(SettingsHost* host)
 		B_TRANSLATE_COMMENT(minLabel.String(), "Slider low text"),
 		B_TRANSLATE_COMMENT(maxLabel.String(), "Slider high text"));
 
+	// Notification Position
+	fPositionMenu = new BPopUpMenu(B_TRANSLATE("Follow Deskbar"));
+	const char* positionLabels[] = {
+		B_TRANSLATE_MARK("Follow Deskbar"),
+		B_TRANSLATE_MARK("Lower right"),
+		B_TRANSLATE_MARK("Lower left"),
+		B_TRANSLATE_MARK("Upper right"),
+		B_TRANSLATE_MARK("Upper left")
+	};
+	const uint32 positions[] = {
+		B_FOLLOW_DESKBAR,                   // Follow Deskbar
+		B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,   // Lower right
+		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT,    // Lower left
+		B_FOLLOW_TOP    | B_FOLLOW_RIGHT,   // Upper right
+		B_FOLLOW_TOP    | B_FOLLOW_LEFT     // Upper left
+	};
+	for (int i=0; i < 5; i++) {
+		BMessage* message = new BMessage(kPositionChanged);
+		message->AddInt32(kNotificationPositionName, positions[i]);
+
+		fPositionMenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(
+			positionLabels[i]), message));
+	}
+	BMenuField* positionField = new BMenuField(B_TRANSLATE("Position:"), 
+		fPositionMenu);
+
 	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fWidthSlider)
 		.Add(fDurationSlider)
+		.Add(positionField)
 		.AddGlue()
 		.View());
 	
@@ -108,6 +152,7 @@ GeneralView::AttachedToWindow()
 	fNotificationBox->SetTarget(this);
 	fWidthSlider->SetTarget(this);
 	fDurationSlider->SetTarget(this);
+	fPositionMenu->SetTargetForItems(this);
 }
 
 
@@ -132,6 +177,15 @@ GeneralView::MessageReceived(BMessage* msg)
 			int32 value = fDurationSlider->Value();
 			_SetTimeoutLabel(value);
 			SettingsPane::SettingsChanged(true);
+			break;
+		}
+		case kPositionChanged:
+		{
+			int32 position;
+			if (msg->FindInt32(kNotificationPositionName, &position) == B_OK) {
+				fNewPosition = position;
+				SettingsPane::SettingsChanged(true);
+			}
 			break;
 		}
 		default:
@@ -163,6 +217,12 @@ GeneralView::Load(BMessage& settings)
 	else
 		fOriginalIconSize = (icon_size)setting;
 
+	int32 position;
+	if (settings.FindInt32(kNotificationPositionName, &position) != B_OK)
+		fOriginalPosition = kDefaultNotificationPosition;
+	else
+		fOriginalPosition = position;
+
 	_EnableControls();
 	
 	return Revert();
@@ -184,6 +244,8 @@ GeneralView::Save(BMessage& settings)
 	icon_size iconSize = B_LARGE_ICON;
 	settings.AddInt32(kIconSizeName, (int32)iconSize);
 
+	settings.AddInt32(kNotificationPositionName, (int32)fNewPosition);
+
 	return B_OK;
 }
 
@@ -196,6 +258,12 @@ GeneralView::Revert()
 	
 	fWidthSlider->SetValue(fOriginalWidth / 50);
 	_SetWidthLabel(fOriginalWidth);
+
+	fNewPosition = fOriginalPosition;
+	BMenuItem* item = fPositionMenu->ItemAt(
+		notification_position_to_index(fNewPosition));
+	if (item != NULL)
+		item->SetMarked(true);
 	
 	return B_OK;
 }
@@ -212,6 +280,9 @@ GeneralView::RevertPossible()
 	if (fOriginalWidth != width)
 		return true;
 
+	if (fOriginalPosition != fNewPosition)
+		return true;
+
 	return false;
 }
 
@@ -224,6 +295,12 @@ GeneralView::Defaults()
 
 	fWidthSlider->SetValue(kDefaultWidth / 50);
 	_SetWidthLabel(kDefaultWidth);
+
+	fNewPosition = kDefaultNotificationPosition;
+	BMenuItem* item = fPositionMenu->ItemAt(
+		notification_position_to_index(fNewPosition));
+	if (item != NULL)
+		item->SetMarked(true);
 
 	return B_OK;
 }
@@ -238,6 +315,9 @@ GeneralView::DefaultsPossible()
 
 	int32 width = fWidthSlider->Value() * 50;
 	if (kDefaultWidth != width)
+		return true;
+
+	if (kDefaultNotificationPosition != fNewPosition)
 		return true;
 	
 	return false;
@@ -257,6 +337,10 @@ GeneralView::_EnableControls()
 	bool enabled = fNotificationBox->Value() == B_CONTROL_ON;
 	fWidthSlider->SetEnabled(enabled);
 	fDurationSlider->SetEnabled(enabled);
+	BMenuItem* item = fPositionMenu->ItemAt(
+		notification_position_to_index(fOriginalPosition));
+	if (item != NULL)
+		item->SetMarked(true);
 }
 
 

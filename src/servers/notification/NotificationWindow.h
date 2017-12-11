@@ -63,6 +63,7 @@ private:
 			float					fWidth;
 			icon_size				fIconSize;
 			int32					fTimeout;
+			uint32					fPosition;
 			bool					fShouldRun;
 			BPath					fCachePath;
 };

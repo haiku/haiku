@@ -26,7 +26,9 @@
 #include <NodeMonitor.h>
 #include <Notifications.h>
 #include <Path.h>
+#include <Point.h>
 #include <PropertyInfo.h>
+#include <Screen.h>
 
 #include "AppGroupView.h"
 #include "AppUsage.h"
@@ -50,6 +52,37 @@ property_info main_prop_list[] = {
 };
 
 
+/**
+ * Checks if notification position overlaps with 
+ * deskbar position
+ */
+static bool
+is_overlapping(deskbar_location deskbar, 
+		uint32 notification) {
+	if (deskbar == B_DESKBAR_RIGHT_TOP 
+			&& notification == (B_FOLLOW_RIGHT | B_FOLLOW_TOP))
+		return true;
+	if (deskbar == B_DESKBAR_RIGHT_BOTTOM 
+			&& notification == (B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM))
+		return true;
+	if (deskbar == B_DESKBAR_LEFT_TOP 
+			&& notification == (B_FOLLOW_LEFT | B_FOLLOW_TOP))
+		return true;
+	if (deskbar == B_DESKBAR_LEFT_BOTTOM 
+			&& notification == (B_FOLLOW_LEFT | B_FOLLOW_BOTTOM))
+		return true;
+	if (deskbar == B_DESKBAR_TOP
+			&& (notification == (B_FOLLOW_LEFT | B_FOLLOW_TOP) 
+			|| notification == (B_FOLLOW_RIGHT | B_FOLLOW_TOP)))
+		return true;
+	if (deskbar == B_DESKBAR_BOTTOM
+			&& (notification == (B_FOLLOW_LEFT | B_FOLLOW_BOTTOM) 
+			|| notification == (B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM)))
+		return true;
+	return false;
+}
+
+
 NotificationWindow::NotificationWindow()
 	:
 	BWindow(BRect(0, 0, -1, -1), B_TRANSLATE_MARK("Notification"), 
@@ -63,7 +96,7 @@ NotificationWindow::NotificationWindow()
 	fCachePath.Append("Notifications");
 	BDirectory cacheDir;
 	result = cacheDir.SetTo(fCachePath.Path());
-	if(result == B_ENTRY_NOT_FOUND)
+	if (result == B_ENTRY_NOT_FOUND)
 		cacheDir.CreateDirectory(fCachePath.Path(), NULL);
 	
 	SetLayout(new BGroupLayout(B_VERTICAL, 0));
@@ -146,8 +179,8 @@ NotificationWindow::MessageReceived(BMessage* message)
 				BString sourceName(notification->SourceName());
 
 				bool allow = false;
-				appfilter_t::iterator it =
-					fAppFilters.find(sourceSignature.String());
+				appfilter_t::iterator it = fAppFilters
+					.find(sourceSignature.String());
 				
 				AppUsage* appUsage = NULL;
 				if (it == fAppFilters.end()) {
@@ -275,43 +308,70 @@ NotificationWindow::SetPosition()
 	
 	float x = Frame().left;
 	float y = Frame().top;
-		// If we can't guess, don't move...
+		// If we cant guess, don't move...
+	BPoint location(x, y);
 
 	BDeskbar deskbar;
-	BRect frame = deskbar.Frame();
 
-	switch (deskbar.Location()) {
-		case B_DESKBAR_TOP:
-			// Put it just under, top right corner
-			y = frame.bottom + topOffset;
-			x = frame.right - width + rightOffset;
-			break;
-		case B_DESKBAR_BOTTOM:
-			// Put it just above, lower left corner
-			y = frame.top - height - bottomOffset;
-			x = frame.right - width + rightOffset;
-			break;
-		case B_DESKBAR_RIGHT_TOP:
-			x = frame.left - width - rightOffset;
-			y = frame.top - topOffset + 1;
-			break;
-		case B_DESKBAR_LEFT_TOP:
-			x = frame.right + leftOffset;
-			y = frame.top - topOffset + 1;
-			break;
-		case B_DESKBAR_RIGHT_BOTTOM:
-			y = frame.bottom - height + bottomOffset;
-			x = frame.left - width - rightOffset;
-			break;
-		case B_DESKBAR_LEFT_BOTTOM:
-			y = frame.bottom - height + bottomOffset;
-			x = frame.right + leftOffset;
-			break;
-		default:
-			break;
+	// If notification and deskbar position are same
+	// then follow deskbar position
+	uint32 position = (is_overlapping(deskbar.Location(), fPosition))
+			? B_FOLLOW_DESKBAR
+			: fPosition;
+
+
+	if (position == B_FOLLOW_DESKBAR)
+	{
+		BRect frame = deskbar.Frame();
+		switch (deskbar.Location()) {
+			case B_DESKBAR_TOP:
+				// In case of overlapping here or for bottom
+				// use user's notification position
+				y = frame.bottom + topOffset;
+				x = (fPosition == B_FOLLOW_LEFT | B_FOLLOW_TOP)
+					? frame.left + rightOffset
+					: frame.right - width + rightOffset;
+				break;
+			case B_DESKBAR_BOTTOM:
+				y = frame.top - height - bottomOffset;
+				x = (fPosition == B_FOLLOW_LEFT | B_FOLLOW_BOTTOM)
+					? frame.left + rightOffset
+					: frame.right - width + rightOffset;
+				break;
+			case B_DESKBAR_RIGHT_TOP:
+				y = frame.top - topOffset + 1;
+				x = frame.left - width - rightOffset;
+				break;
+			case B_DESKBAR_LEFT_TOP:
+				y = frame.top - topOffset + 1;
+				x = frame.right + leftOffset;
+				break;
+			case B_DESKBAR_RIGHT_BOTTOM:
+				y = frame.bottom - height + bottomOffset;
+				x = frame.left - width - rightOffset;
+				break;
+			case B_DESKBAR_LEFT_BOTTOM:
+				y = frame.bottom - height + bottomOffset;
+				x = frame.right + leftOffset;
+				break;
+			default:
+				break;
+		}
+		location = BPoint(x, y);
+	} else if (position == (B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM)) {
+		location = BScreen().Frame().RightBottom();
+		location -= BPoint(width, height);
+	} else if (position == (B_FOLLOW_LEFT | B_FOLLOW_BOTTOM)) {
+		location = BScreen().Frame().LeftBottom();
+		location -= BPoint(0, height);
+	} else if (position == (B_FOLLOW_RIGHT | B_FOLLOW_TOP)) {
+		location = BScreen().Frame().RightTop();
+		location -= BPoint(width, 0);
+	} else if (position == (B_FOLLOW_LEFT | B_FOLLOW_TOP)) {
+		location = BScreen().Frame().LeftTop();
 	}
 
-	MoveTo(x, y);
+	MoveTo(location);
 }
 
 
@@ -401,6 +461,12 @@ NotificationWindow::_LoadDisplaySettings(BMessage& settings)
 		fIconSize = kDefaultIconSize;
 	else
 		fIconSize = (icon_size)setting;
+
+	int32 position;
+	if (settings.FindInt32(kNotificationPositionName, &position) != B_OK)
+		fPosition = kDefaultNotificationPosition;
+	else
+		fPosition = position;
 
 	// Notify the views about the change
 	appview_t::iterator aIt;

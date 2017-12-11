@@ -12,6 +12,7 @@
 #include <Menu.h>
 #include <MenuField.h>
 #include <Mime.h>
+#include <PopUpMenu.h>
 #include <RadioButton.h>
 #include <Slider.h>
 #include <StringView.h>
@@ -40,10 +41,14 @@ private:
 		BCheckBox*			fNotificationBox;
 		BSlider*			fDurationSlider;
 		BSlider*			fWidthSlider;
+		BPopUpMenu*			fPositionMenu;
+
 		
 		int32				fOriginalTimeout;
 		float				fOriginalWidth;
 		icon_size			fOriginalIconSize;
+		uint32				fOriginalPosition;
+		uint32				fNewPosition;
 
 		void				_EnableControls();
 		void				_SetWidthLabel(int32 value);

@@ -17,3 +17,4 @@ const char* kTimeoutName = "timeout";
 // Display settings
 const char* kWidthName = "width";
 const char* kIconSizeName = "icon size";
+const char* kNotificationPositionName = "notification position";
