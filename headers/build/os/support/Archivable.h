@@ -49,7 +49,7 @@ class BMessage;
 class BArchivable {
 public:
 						BArchivable();
-	virtual				~BArchivable();	
+	virtual				~BArchivable();
 
 						BArchivable(BMessage* from);
 	virtual	status_t	Archive(BMessage* into, bool deep = true) const;
@@ -70,9 +70,9 @@ private:
 
 // Global Functions ------------------------------------------------------------
 
-typedef BArchivable* (*instantiation_func) (BMessage *); 
+typedef BArchivable* (*instantiation_func) (BMessage *);
 
-_IMPEXP_BE bool				validate_instantiation(BMessage* from, 
+bool				validate_instantiation(BMessage* from,
 												   const char* class_name);
 
 
@@ -80,11 +80,3 @@ _IMPEXP_BE bool				validate_instantiation(BMessage* from,
 
 
 #endif	// _ARCHIVABLE_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-

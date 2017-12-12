@@ -26,7 +26,7 @@ public:
 
 // Global Objects
 
-extern _IMPEXP_BE BApplication*	be_app;
-extern _IMPEXP_BE BMessenger be_app_messenger;
+extern BApplication*	be_app;
+extern BMessenger be_app_messenger;
 
 #endif	// _APPLICATION_H

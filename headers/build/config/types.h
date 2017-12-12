@@ -6,7 +6,7 @@
 #define _CONFIG_BUILD_TYPES_H
 
 
-#include <config_build/HaikuConfig.h>
+#include <config/HaikuConfig.h>
 
 #include <inttypes.h>
 

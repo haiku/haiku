@@ -1,2 +1,2 @@
-#include <config_build/types.h>
+#include <config/types.h>
 #include <../os/support/SupportDefs.h>
