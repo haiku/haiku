@@ -2,7 +2,9 @@
  * Copyright 2009-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _CONFIG_BUILD_TYPES_H
+#ifdef HAIKU_HOST_PLATFORM_HAIKU
+#include_next <config/types.h>
+#elif !defined(_CONFIG_BUILD_TYPES_H)
 #define _CONFIG_BUILD_TYPES_H
 
 
