@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2005-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -461,6 +461,10 @@ public:
 									rgb_color defaultValue) const;
 			rgb_color			GetColor(const char* name, int32 index,
 									rgb_color defaultValue) const;
+			const void*			GetPointer(const char* name, int32 index,
+									const void* defaultValue = NULL) const;
+			const void*			GetPointer(const char* name,
+									const void* defaultValue = NULL) const;
 			const char*			GetString(const char* name,
 									const char* defaultValue = NULL) const;
 			const char*			GetString(const char* name, int32 index,

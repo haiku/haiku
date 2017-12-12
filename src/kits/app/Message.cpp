@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2005-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -741,7 +741,7 @@ BMessage::_PrintToStream(const char* indent) const
 					rgb_color* color = (rgb_color*)pointer;
 					printf("rgb_color(%u, %u, %u, %u)\n", color->red,
 						color->green, color->blue, color->alpha);
-					break;	
+					break;
 				}
 
 				default:
@@ -2590,6 +2590,32 @@ DEFINE_SET_GET_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
 DEFINE_SET_GET_FUNCTIONS(rgb_color, Color, B_RGB_32_BIT_TYPE);
 
 #undef DEFINE_SET_GET_FUNCTION
+
+
+const void*
+BMessage::GetPointer(const char* name, const void* defaultValue) const
+{
+	return GetPointer(name, 0, defaultValue);
+}
+
+
+const void*
+BMessage::GetPointer(const char* name, int32 index,
+	const void* defaultValue) const
+{
+	void* value;
+	if (FindPointer(name, index, &value) == B_OK)
+		return value;
+
+	return defaultValue;
+}
+
+
+status_t
+BMessage::SetPointer(const char* name, const void* value)
+{
+	return SetData(name, B_POINTER_TYPE, &value, sizeof(void*));
+}
 
 
 #define DEFINE_SET_GET_BY_REFERENCE_FUNCTIONS(type, typeName, typeCode)		\
