@@ -19,6 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			lutimes.c
 			progname.c
 			pty.cpp
+			readpassphrase.c
 			signal.c
 			string.cpp
 			stringlist.c
