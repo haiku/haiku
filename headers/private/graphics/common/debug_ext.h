@@ -3,7 +3,7 @@
 
 
 	Part of Radeon driver
-		
+
 	Extended debugging functions
 */
 
@@ -18,7 +18,7 @@
 //  info: tells things that are important but not an error
 //  error: used if something has gone wrong
 //
-// common usage is 
+// common usage is
 //  SHOW_{FLOW,INFO,ERROR}( seriousness, format string, parameters... );
 //  SHOW_{FLOW,INFO,ERROR}0( seriousness, string );
 //
@@ -29,7 +29,7 @@
 // to specify the module that created the message you have
 // to define a string called
 //  DEBUG_MSG_PREFIX
-// you dynamically speficify the maximum seriousness level by defining 
+// you dynamically speficify the maximum seriousness level by defining
 // the following variables/macros
 //  debug_level_flow
 //  debug_level_info
@@ -40,7 +40,7 @@
 //  DEBUG_MAX_LEVEL_INFO
 //  DEBUG_MAX_LEVEL_ERRROR
 //
-// you _can_ ask to delay execution after each printed message 
+// you _can_ ask to delay execution after each printed message
 // by defining the duration (in ms) via
 //  DEBUG_WAIT_ON_MSG (for flow and info)
 //  DEBUG_WAIT_ON_ERROR (for error)
@@ -48,7 +48,7 @@
 #ifdef DEBUG_WAIT_ON_MSG
 #define DEBUG_WAIT snooze( DEBUG_WAIT_ON_MSG );
 #else
-#define DEBUG_WAIT 
+#define DEBUG_WAIT
 #endif
 
 #ifdef DEBUG_WAIT_ON_ERROR
@@ -77,32 +77,32 @@
 
 #define SHOW_FLOW(seriousness, format, param...) \
 	do { if( seriousness <= debug_level_flow && seriousness <= DEBUG_MAX_LEVEL_FLOW ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME, param ); DEBUG_WAIT \
+		dprintf( "%s%s: " format "\n", FUNC_NAME, param ); DEBUG_WAIT \
 	}} while( 0 )
 
 #define SHOW_FLOW0(seriousness, format) \
 	do { if( seriousness <= debug_level_flow && seriousness <= DEBUG_MAX_LEVEL_FLOW ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT \
+		dprintf( "%s%s: " format "\n", FUNC_NAME); DEBUG_WAIT \
 	}} while( 0 )
 
 #define SHOW_INFO(seriousness, format, param...) \
 	do { if( seriousness <= debug_level_info && seriousness <= DEBUG_MAX_LEVEL_INFO ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME, param ); DEBUG_WAIT \
+		dprintf( "%s%s: " format "\n", FUNC_NAME, param ); DEBUG_WAIT \
 	}} while( 0 )
 
 #define SHOW_INFO0(seriousness, format) \
 	do { if( seriousness <= debug_level_info && seriousness <= DEBUG_MAX_LEVEL_INFO ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT \
+		dprintf( "%s%s: " format "\n", FUNC_NAME); DEBUG_WAIT \
 	}} while( 0 )
 
 #define SHOW_ERROR(seriousness, format, param...) \
 	do { if( seriousness <= debug_level_error && seriousness <= DEBUG_MAX_LEVEL_ERROR ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME, param ); DEBUG_WAIT_ERROR \
+		dprintf( "%s%s: " format "\n", FUNC_NAME, param ); DEBUG_WAIT_ERROR \
 	}} while( 0 )
 
 #define SHOW_ERROR0(seriousness, format) \
 	do { if( seriousness <= debug_level_error && seriousness <= DEBUG_MAX_LEVEL_ERROR ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT_ERROR \
+		dprintf( "%s%s: " format "\n", FUNC_NAME); DEBUG_WAIT_ERROR \
 	}} while( 0 )
 
 #endif

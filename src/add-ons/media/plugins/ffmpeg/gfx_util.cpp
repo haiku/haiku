@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
-#define AVPixelFormat PixelFormat 
+#define AVPixelFormat PixelFormat
 #define AV_PIX_FMT_NONE PIX_FMT_NONE
 #define AV_PIX_FMT_YUV410P PIX_FMT_YUV410P
 #define AV_PIX_FMT_YUV411P PIX_FMT_YUV411P
@@ -291,8 +291,8 @@ colorspace_to_pixfmt(color_space format)
 void
 dump_ffframe_audio(AVFrame* frame, const char* name)
 {
-	printf(BEGIN_TAG"AVFrame(%s) [ pkt_dts:%-10lld #samples:%-5d %s"
-		" ]\n"END_TAG,
+	printf(BEGIN_TAG "AVFrame(%s) [ pkt_dts:%-10lld #samples:%-5d %s"
+		" ]\n" END_TAG,
 		name,
 		frame->pkt_dts,
 		frame->nb_samples,
@@ -305,8 +305,8 @@ dump_ffframe_video(AVFrame* frame, const char* name)
 {
 	const char* picttypes[] = {"no pict type", "intra", "predicted",
 		"bidir pre", "s(gmc)-vop"};
-	printf(BEGIN_TAG"AVFrame(%s) [ pkt_dts:%-10lld cnum:%-5d dnum:%-5d %s%s"
-		" ]\n"END_TAG,
+	printf(BEGIN_TAG "AVFrame(%s) [ pkt_dts:%-10lld cnum:%-5d dnum:%-5d %s%s"
+		" ]\n" END_TAG,
 		name,
 		frame->pkt_dts,
 		frame->coded_picture_number,
