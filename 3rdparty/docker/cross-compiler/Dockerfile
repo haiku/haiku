@@ -1,4 +1,7 @@
-FROM ubuntu:16.04
+FROM ubuntu:17.04
+
+# docker build --no-cache --tag docker.io/haiku/cross-compiler:x86_64 .
+# docker push docker.io/haiku/cross-compiler:x86_64
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   autoconf \
@@ -17,7 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libssl-dev \
   make \
   nasm \
+  ninja-build \
+  python \
   texinfo \
+  vim \
   wget \
   xz-utils \
   zlib1g-dev
@@ -29,6 +35,7 @@ ARG SECONDARY_ARCHITECTURE=
 # Build Haiku cross-compiler toolchain, and haiku package tool
 WORKDIR /tmp
 COPY build-toolchain.sh /tmp/
+RUN chmod 755 /tmp/build-toolchain.sh
 RUN /tmp/build-toolchain.sh $ARCHITECTURE $SECONDARY_ARCHITECTURE
 
 WORKDIR /
