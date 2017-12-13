@@ -699,10 +699,14 @@ while [ $# -gt 0 ] ; do
 					;;
 			esac
 			get_build_tool_path clang clang
-			if [ -n "crossToolsPrefix_$targetArch" ]; then
+			if [ -z `get_variable "crossToolsPrefix_$targetArch"` ] \
+					&& [ -z `get_variable buildCrossToolsMachine_$targetArch` ]; then
 				set_variable crossToolsPrefix_$targetArch llvm-
 			fi
-			targetArchs="$targetArchs $targetArch"
+			if ! test "${targetArchs#*$targetArch}" != "$targetArchs"; then
+				# we have not already added this arch to targetArchs, so add it now
+				targetArchs="$targetArchs $targetArch"
+			fi
 			HAIKU_PACKAGING_ARCHS=
 			shift 2
 			;;
