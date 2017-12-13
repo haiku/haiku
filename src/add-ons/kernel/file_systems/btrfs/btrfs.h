@@ -356,8 +356,8 @@ struct btrfs_dir_entry {
 	uint16	data_length;
 	uint16	name_length;
 	uint8	type;
-	uint8	name[];
-	uint8	data[];		// attribute data
+	uint8*	name;
+	uint8*	data;		// attribute data
 	uint16 DataLength() const { return B_LENDIAN_TO_HOST_INT16(data_length); }
 	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
 	ino_t InodeID() const { return location.ObjectID(); }
