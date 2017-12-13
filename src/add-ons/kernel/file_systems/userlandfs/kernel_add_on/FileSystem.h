@@ -22,7 +22,8 @@
 
 
 struct IOCtlInfo;
-class KMessage;
+namespace BPrivate { class KMessage; }
+using BPrivate::KMessage;
 class Settings;
 class Volume;
 
