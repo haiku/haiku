@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 char* strsep(char** string, const char* delimiters);
+void explicit_bzero(void *buf, size_t len);
 
 #ifdef __cplusplus
 }
