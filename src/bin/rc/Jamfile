@@ -6,27 +6,10 @@ GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
 SubDirC++Flags -Wno-sign-compare -Wno-unused ;
 
-local r5Compatibility = [ FDirName $(SUBDIR) R5Compatibility.h ] ;
-SubDirCcFlags -include $(r5Compatibility) ;
-SubDirC++Flags -include $(r5Compatibility) ;
-
 StaticLibrary librdef.a :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
-# On BeOS incompatible platforms we implicitly link against libroot_build.so,
-# which does already include the strl*() routines.
-local strlSources ;
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	strlSources = strlcpy.c strlcat.c ;
-}
-
 BinCommand rc :
 	rc.cpp
-
-	# these two are needed for R5 only
-	$(strlSources)
 	: librdef.a [ TargetLibstdc++ ] be
 ;
-
-SEARCH on [ FGristFiles $(strlSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;

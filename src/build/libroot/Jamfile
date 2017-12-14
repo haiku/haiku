@@ -36,7 +36,7 @@ MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
 # darwin already has strlcpy and strlcat in libSystem
 local strlSources ;
-if $(HOST_PLATFORM) != darwin {
+if $(HOST_PLATFORM) != darwin && $(HOST_PLATFORM) != haiku_host {
 	strlSources = strlcpy.c strlcat.c ;
 }
 

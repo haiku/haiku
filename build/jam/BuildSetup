@@ -417,6 +417,10 @@ HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
 # also removes the attributes.
 HOST_RM_ATTRS_TARGET = ;
 
+HOST_LIBROOT = libroot_build_function_remapper.a libroot_build.so ;
+HOST_STATIC_LIBROOT = libroot_build_function_remapper.a libroot_build.a ;
+HOST_LIBBE = libbe_build.so ;
+
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# the C++ standard and support libraries
 	if $(HOST_GCC_VERSION[1]) < 3 {
@@ -427,9 +431,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBSUPC++ = supc++ ;
 	}
 
-	HOST_LIBROOT = root ;
-	HOST_STATIC_LIBROOT = $(HOST_LIBROOT) ;
-	HOST_LIBBE = libbe_build.so ;
 	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
 		= "export LIBRARY_PATH=$LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
 	HOST_PTHREAD_LINKFLAGS = ;
@@ -440,15 +441,9 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HaikuBuildCompatibility.h ] ;
 	HOST_CCFLAGS += $(compatibilityHeader) ;
 	HOST_C++FLAGS += $(compatibilityHeader) ;
-
-	# compatibility library
-	HOST_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
 } else {
 	HOST_LINKFLAGS += -lm ;
 	HOST_LIBSTDC++ = stdc++ ;
-	HOST_LIBROOT = libroot_build_function_remapper.a libroot_build.so ;
-	HOST_STATIC_LIBROOT = libroot_build_function_remapper.a libroot_build.a ;
-	HOST_LIBBE = libbe_build.so ;
 	if $(HOST_PLATFORM) = cygwin {
 		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
 			= "export PATH=$PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;

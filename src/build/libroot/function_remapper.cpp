@@ -5,6 +5,7 @@
 
 
 #include <stdarg.h>
+#include <fcntl.h>
 
 #include "remapped_functions.h"
 
@@ -210,7 +211,7 @@ mknodat(int fd, const char* name, mode_t mode, dev_t dev)
 extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
 creat(const char* path, mode_t mode)
 {
-	HIDDEN_FUNCTION(RESOLVE(creat));
+	HIDDEN_FUNCTION(creat);
 
 	return _haiku_build_creat(path, mode);
 }

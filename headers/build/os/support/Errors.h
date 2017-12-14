@@ -2,8 +2,8 @@
  * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ERRORS_H
-#define _ERRORS_H
+#ifndef _BUILD_ERRORS_H
+#define _BUILD_ERRORS_H
 
 
 #include <errno.h> /* build-specific overrides errno */
@@ -493,7 +493,8 @@
 
 	#undef errno
 	#define errno (*_haiku_build_errno())
-
+#elif defined(HAIKU_HOST_PLATFORM_HAIKU)
+#	include <../os/support/Errors.h>
 #endif	// ! BUILDING_HAIKU_ERROR_MAPPER
 
 #ifdef __cplusplus
@@ -508,4 +509,4 @@ extern int _haiku_to_host_error(int error);
 #endif
 
 
-#endif	/* _ERRORS_H */
+#endif	/* _BUILD_ERRORS_H */
