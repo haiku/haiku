@@ -18,6 +18,7 @@ using namespace FSShell;
 
 #if (!defined(__BEOS__) && !defined(__HAIKU__))
 	// The _kern_open() defined in libroot_build.so.
+#	define _kern_open	_kernbuild_open
 	extern "C"  int _kern_open(int fd, const char *path, int openMode,
 		int perms);
 #endif

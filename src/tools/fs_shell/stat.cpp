@@ -23,6 +23,7 @@ using FSShell::to_platform_mode;
 
 #if (!defined(__BEOS__) && !defined(__HAIKU__))
 	// The _kern_read_stat() defined in libroot_build.so.
+#	define _kern_read_stat	_kernbuild_read_stat
 	extern "C" status_t _kern_read_stat(int fd, const char *path,
 		bool traverseLink, struct stat *st, size_t statSize);
 #endif
@@ -47,7 +48,7 @@ FSShell::unrestricted_stat(const char *path, struct fssh_stat *fsshStat)
 #endif
 
 	from_platform_stat(&st, fsshStat);
-	
+
 	return 0;
 }
 
@@ -71,7 +72,7 @@ FSShell::unrestricted_fstat(int fd, struct fssh_stat *fsshStat)
 #endif
 
 	from_platform_stat(&st, fsshStat);
-	
+
 	return 0;
 }
 
@@ -95,7 +96,7 @@ FSShell::unrestricted_lstat(const char *path, struct fssh_stat *fsshStat)
 #endif
 
 	from_platform_stat(&st, fsshStat);
-	
+
 	return 0;
 }
 
@@ -125,7 +126,7 @@ fssh_fstat(int fd, struct fssh_stat *fsshStat)
 {
 	if (FSShell::unrestricted_fstat(fd, fsshStat) < 0)
 		return -1;
-	
+
 	FSShell::restricted_file_restrict_stat(fsshStat);
 
 	return 0;
@@ -137,7 +138,7 @@ fssh_lstat(const char *path, struct fssh_stat *fsshStat)
 {
 	if (FSShell::unrestricted_lstat(path, fsshStat) < 0)
 		return -1;
-	
+
 	FSShell::restricted_file_restrict_stat(fsshStat);
 
 	return 0;

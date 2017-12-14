@@ -30,6 +30,7 @@
 #  endif
 
 #  define HAIKU_USE_KERN_OPEN 1
+#	define _kern_open	_kernbuild_open
 extern int _kern_open(int fd, const char *path, int openMode, int perms);
 
 #endif	// !__BEOS__
