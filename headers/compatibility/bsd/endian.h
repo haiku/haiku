@@ -13,6 +13,7 @@
 
 #include <config/HaikuConfig.h>
 #include <support/ByteOrder.h>
+#include <support/SupportDefs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +59,44 @@ extern "C" {
 #define	le32toh(x)	bswap32((x))
 #define	le64toh(x)	bswap64((x))
 #endif /* BYTE_ORDER == LITTLE_ENDIAN */
+
+/* Alignment-agnostic encode/decode bytestream to/from little/big endian. */
+
+static __inline uint32_t
+be32dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return (((unsigned)p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]);
+}
+
+static __inline uint64_t
+be64dec(const void *pp)
+{
+	uint8_t const *p = (uint8_t const *)pp;
+
+	return (((uint64_t)be32dec(p) << 32) | be32dec(p + 4));
+}
+
+static __inline void
+be32enc(void *pp, uint32_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	p[0] = (u >> 24) & 0xff;
+	p[1] = (u >> 16) & 0xff;
+	p[2] = (u >> 8) & 0xff;
+	p[3] = u & 0xff;
+}
+
+static __inline void
+be64enc(void *pp, uint64_t u)
+{
+	uint8_t *p = (uint8_t *)pp;
+
+	be32enc(p, (uint32_t)(u >> 32));
+	be32enc(p + 4, (uint32_t)(u & 0xffffffffU));
+}
 
 #ifdef __cplusplus
 }
