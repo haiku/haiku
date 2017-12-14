@@ -1001,7 +1001,7 @@ status_t
 TreeIterator::_GetEntry(btree_traversing type, void** _value, uint32* _size,
 	uint32* _offset)
 {
-	status_t status;
+	status_t status = B_OK;
 	if (fIteratorStatus == B_NO_INIT) {
 		status = _Traverse(type);
 		if (status != B_OK)
