@@ -125,19 +125,15 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
 	//     m-1        m        m+1
 	//           k          		: comp < 0
 	//                     k		: comp > 0
-	if (type == BTREE_BACKWARD) {
-		*slot = mid - 1;
-		if (comp > 0)
-			*slot = mid;
-	} else if (type == BTREE_FORWARD) {
-		*slot = mid;
-		if (comp > 0)
-			*slot = mid + 1;
-	}
+	if (type == BTREE_BACKWARD && comp < 0)
+		mid--;
+	else if (type == BTREE_FORWARD && comp > 0)
+		mid++;
 
-	if (type == BTREE_EXACT || *slot < 0)
+	if (type == BTREE_EXACT || mid < 0)
 		return B_ENTRY_NOT_FOUND;
 
+	*slot = mid;
 	TRACE("SearchSlot() found slot %" B_PRId32 " comp %" B_PRId32 "\n",
 		*slot, comp);
 	return B_OK;
