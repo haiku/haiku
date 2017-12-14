@@ -11,6 +11,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			libbsd_versions ;
 
 		SharedLibrary [ MultiArchDefaultGristFiles libbsd.so ] :
+			arc4random.c
+			arc4random_uniform.c
 			daemon.c
 			dl_iterate_phdr.c
 			err.c
