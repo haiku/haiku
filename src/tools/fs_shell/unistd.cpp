@@ -43,9 +43,7 @@
 
 
 #if (!defined(__BEOS__) && !defined(__HAIKU__))
-	// Defined in libroot_build.so.
-	extern "C" int _kern_dup(int fd);
-	extern "C" status_t _kern_close(int fd);
+#	include "syscalls.h"
 #endif
 
 
