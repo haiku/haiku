@@ -356,8 +356,8 @@ struct btrfs_dir_entry {
 	uint16	data_length;
 	uint16	name_length;
 	uint8	type;
-	uint8*	name;
-	uint8*	data;		// attribute data
+	uint8	name[];
+	// if attribute data exists, it goes here
 	uint16 DataLength() const { return B_LENDIAN_TO_HOST_INT16(data_length); }
 	uint16 NameLength() const { return B_LENDIAN_TO_HOST_INT16(name_length); }
 	ino_t InodeID() const { return location.ObjectID(); }
@@ -369,7 +369,7 @@ struct btrfs_dir_entry {
 	{
 		data_length = B_HOST_TO_LENDIAN_INT16(dataLength);
 		if (data != NULL)
-			memcpy(this->data, data, dataLength);
+			memcpy(&name[name_length], data, dataLength);
 	}
 	void SetName(const char* name, uint16 nameLength)
 	{
