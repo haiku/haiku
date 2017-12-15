@@ -395,6 +395,10 @@ check_native_xattrs()
 	local xattr_get=
 	local xattr_get_args=
 	case $HOST_PLATFORM in
+		haiku_host)
+			xattr_set="addattr"; xattr_set_args="\$NAME \"\$VALUE\""
+			xattr_get="catattr"; xattr_get_args="\$NAME"
+			;;
 		darwin)
 			xattr_set="xattr"; xattr_set_args="-w \$NAME \"\$VALUE\""
 			xattr_get="xattr"; xattr_get_args="-p \$NAME"
@@ -751,7 +755,7 @@ if [ $caseInsensitive != 0 ]; then
 fi
 
 # check xattr support
-if [ $HOST_PLATFORM != "haiku_host" ] && [ -z $HAIKU_HOST_USE_XATTR_REF ]; then
+if [ -z $HAIKU_HOST_USE_XATTR_REF ]; then
 	check_native_xattrs
 	attrSupport=$?
 	if [ $attrSupport = 2 ] && [ -z $HAIKU_HOST_USE_XATTR ]; then
