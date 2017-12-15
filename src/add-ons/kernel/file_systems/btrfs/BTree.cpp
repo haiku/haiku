@@ -681,8 +681,13 @@ BTree::_Find(Path* path, btrfs_key& wanted, void** _value, uint32* _size,
 	if (status != B_OK)
 		return status;
 
-	if (found.Type() != wanted.Type() && wanted.Type() != BTRFS_KEY_TYPE_ANY)
+	if (found.Type() != wanted.Type() && wanted.Type() != BTRFS_KEY_TYPE_ANY) {
+		ERROR("Find() not found wanted: %" B_PRIu64 " %" B_PRIu8 " %"
+			B_PRIu64 " found: %" B_PRIu64 " %" B_PRIu8 " %" B_PRIu64 "\n",
+			wanted.ObjectID(), wanted.Type(), wanted.Offset(), found.ObjectID(),
+			found.Type(), found.Offset());
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	wanted = found;
 	return B_OK;
