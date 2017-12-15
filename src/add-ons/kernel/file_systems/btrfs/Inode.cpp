@@ -440,55 +440,66 @@ Inode::MakeReference(Transaction& transaction, BTree::Path* path,
 	BTree* tree = fVolume->FSTree();
 	uint16 nameLength = strlen(name);
 	uint64 index = parent->FindNextIndex(path);
-	void* data[1];
 
 	// insert inode_ref
+	btrfs_inode_ref* inodeRef = (btrfs_inode_ref*)malloc(sizeof(btrfs_inode_ref)
+		+ nameLength);
+	if (inodeRef == NULL)
+		return B_NO_MEMORY;
+	inodeRef->index = index;
+	inodeRef->SetName(name, nameLength);
+
 	btrfs_entry entry;
-	btrfs_inode_ref inodeRef;
-
-	inodeRef.index = index;
-	inodeRef.SetName(name, nameLength);
-	data[0] = (void*)&inodeRef;
-
 	entry.key.SetObjectID(fID);
 	entry.key.SetType(BTRFS_KEY_TYPE_INODE_REF);
 	entry.key.SetOffset(parent->ID());
-	entry.SetSize(inodeRef.Length());
+	entry.SetSize(inodeRef->Length());
 
-	status_t status = tree->InsertEntries(transaction, path, &entry, data, 1);
+	status_t status = tree->InsertEntries(transaction, path, &entry,
+		(void**)&inodeRef, 1);
+	free(inodeRef);
 	if (status != B_OK)
 		return status;
 
 	// insert dir_entry
 	uint32 hash = calculate_crc((uint32)~1, (uint8*)name, nameLength);
-	btrfs_dir_entry directoryEntry;
-	directoryEntry.location.SetObjectID(fID);
-	directoryEntry.location.SetType(BTRFS_KEY_TYPE_INODE_ITEM);
-	directoryEntry.location.SetOffset(0);
-	directoryEntry.SetTransactionID(transaction.SystemID());
+	btrfs_dir_entry* directoryEntry =
+		(btrfs_dir_entry*)malloc(sizeof(btrfs_dir_entry) + nameLength);
+	if (directoryEntry == NULL)
+		return B_NO_MEMORY;
+	directoryEntry->location.SetObjectID(fID);
+	directoryEntry->location.SetType(BTRFS_KEY_TYPE_INODE_ITEM);
+	directoryEntry->location.SetOffset(0);
+	directoryEntry->SetTransactionID(transaction.SystemID());
 	// TODO: xattribute, 0 for standard directory
-	directoryEntry.SetAttributeData(NULL, 0);
-	directoryEntry.SetName(name, nameLength);
-	directoryEntry.type = get_filetype(mode);
-	data[0] = (void*)&directoryEntry;
+	directoryEntry->SetName(name, nameLength);
+	directoryEntry->SetAttributeData(NULL, 0);
+	directoryEntry->type = get_filetype(mode);
 
 	entry.key.SetObjectID(parent->ID());
 	entry.key.SetType(BTRFS_KEY_TYPE_DIR_ITEM);
 	entry.key.SetOffset(hash);
-	entry.SetSize(directoryEntry.Length());
+	entry.SetSize(directoryEntry->Length());
 
-	status = tree->InsertEntries(transaction, path, &entry, data, 1);
-	if (status != B_OK)
+	status = tree->InsertEntries(transaction, path, &entry,
+		(void**)&directoryEntry, 1);
+	if (status != B_OK) {
+		free(directoryEntry);
 		return status;
+	}
 
 	// insert dir_index (has same data with dir_entry)
 	entry.key.SetType(BTRFS_KEY_TYPE_DIR_INDEX);
 	entry.key.SetOffset(index);
 
-	status = tree->InsertEntries(transaction, path, &entry, data, 1);
-	if (status != B_OK)
+	status = tree->InsertEntries(transaction, path, &entry,
+		(void**)&directoryEntry, 1);
+	if (status != B_OK) {
+		free(directoryEntry);
 		return status;
+	}
 
+	free(directoryEntry);
 	return B_OK;
 }
 
