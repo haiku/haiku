@@ -905,7 +905,8 @@ BTree::SetRoot(off_t logical, fsblock_t* block)
 		fRootBlock = *block;
 	} else {
 		if (fVolume->FindBlock(logical, fRootBlock) != B_OK) {
-			ERROR("Find() unmapped block %" B_PRId64 "\n", fRootBlock);
+			ERROR("SetRoot() unmapped block %" B_PRId64 " %" B_PRId64 "\n",
+				logical, fRootBlock);
 			return B_ERROR;
 		}
 	}
