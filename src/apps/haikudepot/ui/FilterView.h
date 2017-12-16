@@ -8,6 +8,7 @@
 #include <GroupView.h>
 
 
+class BCheckBox;
 class BMenuField;
 class BTextControl;
 class Model;
@@ -17,6 +18,7 @@ enum {
 	MSG_CATEGORY_SELECTED		= 'ctsl',
 	MSG_DEPOT_SELECTED			= 'dpsl',
 	MSG_SEARCH_TERMS_MODIFIED	= 'stmd',
+	MSG_SHOW_FEATURED_PACKAGES	= 'sofp',
 };
 
 
@@ -32,7 +34,7 @@ public:
 
 private:
 			BMenuField*			fShowField;
-			BMenuField*			fRepositoryField;
+			BCheckBox*			fShowFeaturedPackages;
 			BTextControl*		fSearchTermsText;
 };
 

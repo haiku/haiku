@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -41,14 +42,13 @@ FilterView::FilterView()
 	:
 	BGroupView("filter view", B_VERTICAL)
 {
-	// Contruct category popup
+	// Construct category popup
 	BPopUpMenu* showMenu = new BPopUpMenu(B_TRANSLATE("Category"));
 	fShowField = new BMenuField("category", B_TRANSLATE("Category:"), showMenu);
 
-	// Construct repository popup
-	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Repository"));
-	fRepositoryField = new BMenuField("repository", B_TRANSLATE("Repository:"),
-		repositoryMenu);
+	fShowFeaturedPackages = new BCheckBox("showonlyfeatured",
+		B_TRANSLATE("Show only featured packages"),
+		new BMessage(MSG_SHOW_FEATURED_PACKAGES));
 
 	// Construct search terms field
 	fSearchTermsText = new BTextControl("search terms",
@@ -71,7 +71,7 @@ FilterView::FilterView()
 		.AddGroup(B_HORIZONTAL)
 			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1.2f)
 				.Add(fShowField, 0.0f)
-				.Add(fRepositoryField, 0.0f)
+				.Add(fShowFeaturedPackages, 0.0f)
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.5f)
@@ -92,7 +92,7 @@ void
 FilterView::AttachedToWindow()
 {
 	fShowField->Menu()->SetTargetForItems(Window());
-	fRepositoryField->Menu()->SetTargetForItems(Window());
+	fShowFeaturedPackages->SetTarget(Window());
 	fSearchTermsText->SetTarget(this);
 
 	fSearchTermsText->MakeFocus();
@@ -121,32 +121,7 @@ FilterView::MessageReceived(BMessage* message)
 void
 FilterView::AdoptModel(const Model& model)
 {
-	// Adopt depots
-	BMenu* repositoryMenu = fRepositoryField->Menu();
-		repositoryMenu->RemoveItems(0, repositoryMenu->CountItems(), true);
-
-	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All repositories"),
-		new BMessage(MSG_DEPOT_SELECTED)));
-
-	repositoryMenu->AddItem(new BSeparatorItem());
-
-	bool foundSelectedDepot = false;
-	const DepotList& depots = model.Depots();
-	for (int i = 0; i < depots.CountItems(); i++) {
-		const DepotInfo& depot = depots.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
-		message->AddString("name", depot.Name());
-		BMenuItem* item = new BMenuItem(depot.Name(), message);
-		repositoryMenu->AddItem(item);
-
-		if (depot.Name() == model.Depot()) {
-			item->SetMarked(true);
-			foundSelectedDepot = true;
-		}
-	}
-
-	if (!foundSelectedDepot)
-		repositoryMenu->ItemAt(0)->SetMarked(true);
+	fShowFeaturedPackages->SetValue(model.ShowFeaturedPackages());
 
 	// Adopt categories
 	BMenu* showMenu = fShowField->Menu();

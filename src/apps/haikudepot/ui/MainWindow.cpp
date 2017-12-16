@@ -74,7 +74,6 @@ enum {
 	MSG_AUTHORIZATION_CHANGED	= 'athc',
 	MSG_PACKAGE_CHANGED			= 'pchd',
 
-	MSG_SHOW_FEATURED_PACKAGES	= 'sofp',
 	MSG_SHOW_AVAILABLE_PACKAGES	= 'savl',
 	MSG_SHOW_INSTALLED_PACKAGES	= 'sins',
 	MSG_SHOW_SOURCE_PACKAGES	= 'ssrc',
@@ -153,26 +152,13 @@ MainWindow::MainWindow(const BMessage& settings)
 
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 
-	BGroupView* featuredPackagesGroup = new BGroupView(B_VERTICAL);
-	BStringView* featuredPackagesTitle = new BStringView(
-		"featured packages title", B_TRANSLATE("Featured packages"));
-	BFont font(be_bold_font);
-	font.SetSize(font.Size() * 1.3f);
-	featuredPackagesTitle->SetFont(&font);
-	featuredPackagesGroup->SetExplicitMaxSize(
-		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	BLayoutBuilder::Group<>(featuredPackagesGroup)
-		.Add(featuredPackagesTitle)
-		.Add(fFeaturedPackagesView)
-	;
-
 	fWorkStatusView = new WorkStatusView("work status");
 	fPackageListView->AttachWorkStatusView(fWorkStatusView);
 
 	BView* listArea = new BView("list area", 0);
 	fListLayout = new BCardLayout();
 	listArea->SetLayout(fListLayout);
-	listArea->AddChild(featuredPackagesGroup);
+	listArea->AddChild(fFeaturedPackagesView);
 	listArea->AddChild(fPackageListView);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
@@ -321,7 +307,7 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			fModelWorker = B_BAD_THREAD_ID;
 			_AdoptModel();
-			fFilterView->AdoptModel(fModel);
+			_UpdateAvailableRepositories();
 			fWorkStatusView->SetIdle();
 			break;
 		}
@@ -447,6 +433,7 @@ MainWindow::MessageReceived(BMessage* message)
 				fModel.SetDepot(name);
 			}
 			_AdoptModel();
+			_UpdateAvailableRepositories();
 			break;
 		}
 
@@ -682,14 +669,10 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 
 	menuBar->AddItem(menu);
 
+	fRepositoryMenu = new BMenu(B_TRANSLATE("Repositories"));
+	menuBar->AddItem(fRepositoryMenu);
+
 	menu = new BMenu(B_TRANSLATE("Show"));
-
-	fShowFeaturedPackagesItem = new BMenuItem(
-		B_TRANSLATE("Only featured packages"),
-		new BMessage(MSG_SHOW_FEATURED_PACKAGES));
-	menu->AddItem(fShowFeaturedPackagesItem);
-
-	menu->AddSeparatorItem();
 
 	fShowAvailablePackagesItem = new BMenuItem(
 		B_TRANSLATE("Available packages"),
@@ -839,17 +822,17 @@ MainWindow::_AdoptModel()
 	release_sem(fNewPackagesToShowSem);
 
 	BAutolock locker(fModel.Lock());
-	fShowFeaturedPackagesItem->SetMarked(fModel.ShowFeaturedPackages());
-	fShowFeaturedPackagesItem->SetEnabled(fModel.SearchTerms() == "");
 	fShowAvailablePackagesItem->SetMarked(fModel.ShowAvailablePackages());
 	fShowInstalledPackagesItem->SetMarked(fModel.ShowInstalledPackages());
 	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
 	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
 
-	if (fModel.ShowFeaturedPackages() && fModel.SearchTerms() == "")
+	if (fModel.ShowFeaturedPackages())
 		fListLayout->SetVisibleItem((int32)0);
 	else
 		fListLayout->SetVisibleItem((int32)1);
+
+	fFilterView->AdoptModel(fModel);
 }
 
 
@@ -1406,6 +1389,36 @@ MainWindow::_UpdateAuthorization()
 		}
 		fUserMenu->Superitem()->SetLabel(label);
 	}
+}
+
+
+void
+MainWindow::_UpdateAvailableRepositories()
+{
+	fRepositoryMenu->RemoveItems(0, fRepositoryMenu->CountItems(), true);
+
+	fRepositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All repositories"),
+		new BMessage(MSG_DEPOT_SELECTED)));
+
+	fRepositoryMenu->AddItem(new BSeparatorItem());
+
+	bool foundSelectedDepot = false;
+	const DepotList& depots = fModel.Depots();
+	for (int i = 0; i < depots.CountItems(); i++) {
+		const DepotInfo& depot = depots.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
+		message->AddString("name", depot.Name());
+		BMenuItem* item = new BMenuItem(depot.Name(), message);
+		fRepositoryMenu->AddItem(item);
+
+		if (depot.Name() == fModel.Depot()) {
+			item->SetMarked(true);
+			foundSelectedDepot = true;
+		}
+	}
+
+	if (!foundSelectedDepot)
+		fRepositoryMenu->ItemAt(0)->SetMarked(true);
 }
 
 
