@@ -22,17 +22,6 @@ RepositoriesSettings::RepositoriesSettings()
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &fFilePath);
 	if (status == B_OK)
 		status = fFilePath.Append(settingsFilename);
-	BEntry fileEntry(fFilePath.Path());
-	if (!fileEntry.Exists()) {
-		// Create default repos
-		BStringList nameList, urlList;
-		int32 count = (sizeof(kDefaultRepos) / sizeof(Repository));
-		for (int16 index = 0; index < count; index++) {
-			nameList.Add(kDefaultRepos[index].name);
-			urlList.Add(kDefaultRepos[index].url);
-		}
-		SetRepositories(nameList, urlList);
-	}
 	fInitStatus = status;
 }
 

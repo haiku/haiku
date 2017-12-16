@@ -35,14 +35,6 @@ typedef struct {
 } Repository;
 
 
-static const Repository kDefaultRepos[] = {
-	{ "Haiku", "https://packages.haiku-os.org/haiku/master/" B_HAIKU_ABI_NAME
-		"/current"},
-	{ "HaikuPorts", "https://eu.hpkg.haiku-os.org/haikuports/master/repository/"
-		B_HAIKU_ABI_NAME "/current" }
-};
-
-
 // Message keys
 #define key_frame "frame"
 #define key_name "repo_name"
