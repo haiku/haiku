@@ -1,11 +1,13 @@
-1	english	x-vnd.Haiku-Backgrounds	3513602073
+1	english	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		背景
 X:	Main View		X:
+Setting the background image failed:	Main View		设置背景图片失败：
 Resolution: 	Image Filepanel		分辨率：
 pick one	Main View		选择其中之一
 Default	Main View		默认
 Center	Main View		居中
 Manual	Main View		自定义
+Set background image error	Main View		设置背景图像出错
 Default folder	Main View		默认文件夹
 Revert	Main View		恢复
 None	Main View		无
@@ -20,6 +22,7 @@ Y:	Main View		Y：
 Tile	Main View		主题
 Select	Main View		选择
 Scale to fit	Main View		拉伸
+OK	Main View		确定
 Placement:	Main View		定位：
 Preview	Main View		预览
 Image:	Main View		图像：

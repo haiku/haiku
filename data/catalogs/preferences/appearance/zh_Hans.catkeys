@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	727801787
+1	english	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		常规字体：
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
 Shadow	Colors tab		阴影效果
 On	AntialiasingSettingsView		开启
 Defaults	APRWindow		默认
+Link hover	Colors tab		链接未知
 Grayscale	AntialiasingSettingsView		灰度
 Shine	Colors tab		亮度
 About	DecorSettingsView		关于
 About decorator	DecorSettingsView		关于主题
 Off	AntialiasingSettingsView		关闭
+Link text	Colors tab		链接文本
+Link active	Colors tab		链接有效
 Choose Decorator	DecorSettingsView		选择装饰
 Success	Colors tab		成功
 Inactive window tab text	Colors tab		激活窗口标签
@@ -18,6 +21,7 @@ Failure	Colors tab		失败
 Hinting menu	AntialiasingSettingsView		提示菜单
 Scroll bar:	DecorSettingsView		滚动栏：
 Document background	Colors tab		文档背景
+Status bar	Colors tab		状态栏
 Revert	APRWindow		取消
 Window tab	Colors tab		窗口选项
 Tooltip background	Colors tab		工具提示背景
@@ -36,6 +40,7 @@ List background	Colors tab		列表背景
 OK	DecorSettingsView		确定
 Control mark	Colors tab		控件标记
 Size:	Font Selection view		大小：
+Link visited	Colors tab		链接已访问
 Decorator:	DecorSettingsView		主题库：
 Selected list item background	Colors tab		选中列表项背景
 Panel background	Colors tab		面板背景

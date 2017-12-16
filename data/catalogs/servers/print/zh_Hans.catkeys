@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PSRV	2930356711
+1	english	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		未定义
 Return the number of available transports	PrintServerApp Scripting		返回可用的传输协议脚本编号
 Return the number of available printers	PrintServerApp Scripting		返回可用打印机编号
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		是
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
 Would you like to set one up now?	PrintServerApp		是否进行设置?
+Print job setup:	ConfigWindow		打印任务设置：
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		类型
 All pages	ConfigWindow		所有页面
