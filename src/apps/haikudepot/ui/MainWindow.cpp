@@ -68,6 +68,7 @@ enum {
 	MSG_MODEL_WORKER_DONE		= 'mmwd',
 	MSG_REFRESH_REPOS			= 'mrrp',
 	MSG_MANAGE_REPOS			= 'mmrp',
+	MSG_SOFTWARE_UPDATER		= 'mswu',
 	MSG_LOG_IN					= 'lgin',
 	MSG_LOG_OUT					= 'lgot',
 	MSG_AUTHORIZATION_CHANGED	= 'athc',
@@ -339,6 +340,10 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_MANAGE_REPOS:
 			be_roster->Launch("application/x-vnd.Haiku-Repositories");
+			break;
+
+		case MSG_SOFTWARE_UPDATER:
+			be_roster->Launch("application/x-vnd.haiku-softwareupdater");
 			break;
 
 		case MSG_LOG_IN:
@@ -668,6 +673,8 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 		new BMessage(MSG_REFRESH_REPOS)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage repositories"
 		B_UTF8_ELLIPSIS), new BMessage(MSG_MANAGE_REPOS)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Check for updates"
+		B_UTF8_ELLIPSIS), new BMessage(MSG_SOFTWARE_UPDATER)));
 
 	menuBar->AddItem(menu);
 
