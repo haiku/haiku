@@ -69,6 +69,8 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_devel-1.6.3-1
 	icu-57.1-2
 	icu_devel-57.1-2
+	ilmbase-2.2.0-5
+	ilmbase_devel-2.2.0-5
 	jam-2.5_2012_10_12-5
 	jasper1-1.900.5-1
 	jasper-2.0.14-1
@@ -131,6 +133,8 @@ RemotePackageRepository HaikuPorts
 	ncurses6_devel-6.0-3
 	netcat-1.10-4
 	nettle-3.4-1
+	openexr-2.2.0-5
+	openexr_devel-2.2.0-5
 	openssh-7.6p1-1
 	openssl-1.0.2m-3
 	openssl_devel-1.0.2m-3
@@ -207,6 +211,7 @@ RemotePackageRepository HaikuPorts
 	gzip
 	haikuporter
 	icu
+	ilmbase
 	jam
 	jasper
 	jpeg
@@ -249,6 +254,7 @@ RemotePackageRepository HaikuPorts
 	ncurses6
 	netcat
 	nettle
+	openexr
 	openssh
 	openssl
 	p7zip
