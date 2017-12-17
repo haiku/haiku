@@ -1,0 +1,12 @@
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/x-exr";
+
+resource(2, "META:SNIFF_RULE") "0.7 (\"\\166\\057\\061\\001\")";
+
+resource(3, "META:S:DESC") #'MSDC' "EXR image";
+
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "exr",
+	"type" = "image/x-exr"
+};
