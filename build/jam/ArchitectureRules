@@ -604,7 +604,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons screen_savers ;
 	EnableWerror src add-ons tracker ;
 	EnableWerror src add-ons translators bmp ;
-#	EnableWerror src add-ons translators exr ;
+	EnableWerror src add-ons translators exr ;
 	EnableWerror src add-ons translators gif ;
 #	EnableWerror src add-ons translators hpgs ;
 	EnableWerror src add-ons translators hvif ;
