@@ -1930,10 +1930,15 @@ disconnect_mount_or_vnode_fds(struct fs_mount* mount,
 	TeamListIterator teamIterator;
 	while (Team* team = teamIterator.Next()) {
 		BReference<Team> teamReference(team, true);
+		TeamLocker teamLocker(team);
 
 		// lock the I/O context
 		io_context* context = team->io_context;
+		if (context == NULL)
+			continue;
 		MutexLocker contextLocker(context->io_mutex);
+
+		teamLocker.Unlock();
 
 		replace_vnode_if_disconnected(mount, vnodeToDisconnect, context->root,
 			sRoot, true);
