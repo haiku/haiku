@@ -208,9 +208,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		ralinkwifi
 		wavelanwifi
 	}@ # x86,x86_64
-
-	# WWAN drivers
-	#usb_beceemwmx@gpl
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures
