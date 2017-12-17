@@ -16,7 +16,8 @@
 	{"MIT" => ["MIT License", "MIT Licence", "Haiku License", "X11 license"]},
 	{"BSD" => ["express or implied warranties", "provided by the author ``AS IS''", "the software is provided \"AS IS\"", "BSD license", "provided by the author \"as is\""]},
 	{"BeOS Sample Code" => ["be sample code license"]},
-	{"GPL" => ["terms of the GNU General Public License", "GNU L-GPL license", "GPL license", "Free Software Foundation"]},
+	{"LGPL" => ["GNU Lesser", "GNU L-GPL license"]},
+	{"GPL" => ["terms of the GNU General Public License", "GPL license", "Free Software Foundation"]},
 ]
 
 def check_license(filename)
