@@ -1,10 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators exr ;
 
-SubDirSysHdrs [ FDirName $(SUBDIR) openexr half ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) openexr iex ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) openexr ilmimf ] ;
-SubDirSysHdrs [ FDirName $(SUBDIR) openexr imath ] ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources EXRTranslator : EXRTranslator.rdef ;
@@ -12,6 +7,13 @@ AddResources EXRTranslator : EXRTranslator.rdef ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UseBuildFeatureHeaders openexr ;
+		UseBuildFeatureHeaders ilmbase ;
+		Includes [ FGristFiles ConfigView.cpp EXRTranslator.cpp EXRGamma.cpp
+			IStreamWrapper.cpp ]
+			: [ BuildFeatureAttribute openexr : headers ]
+			  [ BuildFeatureAttribute ilmbase : headers ] ;
+
 		Translator [ MultiArchDefaultGristFiles EXRTranslator ] :
 			main.cpp
 			ConfigView.cpp
@@ -19,7 +21,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			EXRTranslator.cpp
 			IStreamWrapper.cpp
 			: be translation textencoding [ TargetLibstdc++ ] 
-			[ MultiArchDefaultGristFiles libtranslatorsutils.a  libilmimf.so ]
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			[ BuildFeatureAttribute ilmbase : libraries ]
+			[ BuildFeatureAttribute openexr : libraries ]
 			localestub
 			: true
 		;
@@ -33,6 +37,3 @@ DoCatalogs EXRTranslator :
 	EXRTranslator.cpp
 	main.cpp
 ;
-
-SubInclude HAIKU_TOP src add-ons translators exr openexr ;
-

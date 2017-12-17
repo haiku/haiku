@@ -566,6 +566,48 @@ if [ IsPackageAvailable tiff4_devel ] {
 }
 
 
+# openexr
+if [ IsPackageAvailable openexr_devel ]
+	&& [ IsPackageAvailable ilmbase_devel ] {
+	ExtractBuildFeatureArchives openexr :
+		file: base openexr
+			runtime: lib
+		file: devel openexr_devel
+			depends: base
+			libraries:
+				$(developLibDir)/libIlmImf.so
+				$(developLibDir)/libIlmImfUtil.so
+			headers: $(developHeadersDir) $(developHeadersDir)/OpenEXR
+		;
+
+	EnableBuildFeatures openexr ;
+} else {
+	Echo "OpenEXR support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
+# ilmbase
+if [ IsPackageAvailable ilmbase_devel ] {
+	ExtractBuildFeatureArchives ilmbase :
+		file: base ilmbase
+			runtime: lib
+		file: devel ilmbase_devel
+			depends: base
+			libraries:
+				$(developLibDir)/libHalf.so
+				$(developLibDir)/libIex.so
+				$(developLibDir)/libIexMath.so
+				$(developLibDir)/libIlmThread.so
+				$(developLibDir)/libImath.so
+			headers: $(developHeadersDir) $(developHeadersDir)/OpenEXR
+		;
+
+	EnableBuildFeatures ilmbase ;
+} else {
+	Echo "IlmBase support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # libwebp
 if [ IsPackageAvailable libwebp_devel ] {
 	if $(HAIKU_PACKAGING_ARCH) = x86 && $(TARGET_PACKAGING_ARCH) = x86_gcc2 {

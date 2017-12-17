@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src add-ons translators exr openexr ;
-
-SubInclude HAIKU_TOP src add-ons translators exr openexr half ;
-SubInclude HAIKU_TOP src add-ons translators exr openexr iex ;
-SubInclude HAIKU_TOP src add-ons translators exr openexr ilmimf ;
-SubInclude HAIKU_TOP src add-ons translators exr openexr ilmthread ;
-SubInclude HAIKU_TOP src add-ons translators exr openexr imath ;
-

@@ -14,6 +14,8 @@
 #include <LayoutBuilder.h>
 #include <StringView.h>
 
+#include <OpenEXRConfig.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -41,19 +43,21 @@ ConfigView::ConfigView(uint32 flags)
 	BStringView *copyrightView = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2008 Haiku Inc.");
 
+	BString openExrInfo = B_TRANSLATE("Based on OpenEXR %version%");
+	openExrInfo.ReplaceAll("%version%", OPENEXR_VERSION_STRING);
 	BStringView *copyrightView2 = new BStringView("copyright2",
-		B_TRANSLATE("Based on OpenEXR (http://www.openexr.com)"));
+		openExrInfo.String());
 
 	BStringView *copyrightView3 = new BStringView("copyright3",
-		B_UTF8_COPYRIGHT "2006, Industrial Light & Magic,");
+		B_UTF8_COPYRIGHT "2002-2014 Industrial Light & Magic,");
 
 	BStringView *copyrightView4 = new BStringView("copyright4",
 		B_TRANSLATE("a division of Lucasfilm Entertainment Company Ltd"));
 
 	// Build the layout
-    BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)
-        .Add(titleView)
+		.Add(titleView)
 		.Add(versionView)
 		.Add(copyrightView)
 		.AddGlue()

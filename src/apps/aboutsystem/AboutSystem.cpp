@@ -1233,7 +1233,7 @@ AboutView::_CreateCreditsView()
 
 	// OpenEXR copyrights
 	_AddPackageCredit(PackageCredit("OpenEXR")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2005 Industrial "
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2014 Industrial "
 			"Light & Magic, a division of Lucas Digital Ltd. LLC."))
 		.SetLicense(kBSDThreeClause)
 		.SetURL("http://www.openexr.com"));
