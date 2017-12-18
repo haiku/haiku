@@ -32,7 +32,7 @@ private:
 	// but never used (see BHttpForm::operator[] which does the necessary
 	// check up)
 								BHttpFormData();
-#if __GNUC__ >= 6
+#if (__GNUC__ >= 6) || defined(__clang__)
 	friend class std::pair<const BString, BHttpFormData>;
 #else
 	friend class std::map<BString, BHttpFormData>;
