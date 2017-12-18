@@ -61,7 +61,7 @@ BuildPlatformMain <build>btrfs_shell
 	command_cat.cpp
 	:
 	<build>btrfs.o
-	<build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
 

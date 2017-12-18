@@ -22,11 +22,6 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;
 }
 
-local libHaikuCompat ;
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) && ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
-	libHaikuCompat = libhaikucompat_build.a ;
-}
-
 # platform specific libraries
 local fsShellCommandLibs ;
 if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
@@ -69,7 +64,7 @@ BuildPlatformMain <build>bfs_shell
 	command_checkfs.cpp
 	:
 	<build>bfs.o
-	<build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
 
@@ -78,7 +73,7 @@ BuildPlatformMain <build>bfs_fuse
 	:
 	<build>bfs.o
 	<build>fuse_module.a
-	$(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_STATIC_LIBROOT) $(fsShellCommandLibs) fuse
 ;
 

@@ -12,11 +12,6 @@ SEARCH_SOURCE
 	SubDirC++Flags $(defines) -fno-exceptions ;
 }
 
-local libHaikuCompat ;
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) && ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
-	libHaikuCompat = libhaikucompat_build.a ;
-}
-
 # platform specific libraries
 local fsShellCommandLibs ;
 if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
@@ -29,6 +24,6 @@ BuildPlatformMain iso9660_shell
 	iso9660_identify.cpp
 	kernel_interface.cpp
 
-	: <build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	: <build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	  $(HOST_LIBROOT) $(fsShellCommandLibs)
 ;

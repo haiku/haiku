@@ -26,16 +26,6 @@ USES_BE_API on $(localetools) = true ;
 
 UseLibraryHeaders icu ;
 
-# TODO: temporary kludge
-local libHaikuCompat ;
-if $(HOST_PLATFORM) in r5 bone dano {
-	ObjectC++Flags database_support.cpp UpdateMimeInfoThread.cpp
-		MimeUpdateThread.cpp
-		: -include [ FDirName $(HAIKU_TOP) headers build
-			HaikuBuildCompatibility.h ] ;
-	libHaikuCompat = libhaikucompat_build.a ;
-}
-
 BuildPlatformMain <build>collectcatkeys :
 	collectcatkeys.cpp
 	PlainTextCatalog.cpp
