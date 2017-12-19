@@ -46,7 +46,7 @@ BulkLoadStateMachine::ServerProcessExited()
 }
 
 
-static char* bulk_load_state_name(bulk_load_state state) {
+static const char* bulk_load_state_name(bulk_load_state state) {
 	switch(state) {
 		case BULK_LOAD_INITIAL:
 			return "BULK_LOAD_INITIAL";
