@@ -201,6 +201,11 @@ class TWindow : public BWindow {
 		virtual void	MessageReceived(BMessage* message);
 		virtual bool	QuitRequested();
 
+		status_t		GetSupportedSuites(BMessage* msg);
+		BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
+							BMessage* specifier, int32 what,
+							const char* property);
+
 		void			GetPrefs(int32 pixelCount = -1);
 		void			SetPrefs();
 

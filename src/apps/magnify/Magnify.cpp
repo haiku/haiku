@@ -26,6 +26,7 @@
 #include <NodeInfo.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <PropertyInfo.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <TextView.h>
@@ -96,6 +97,40 @@ const int32 kDefaultPixelSize = 8;
 // top-bottom: 5 fontheight 5 fontheight 5
 // left-right: 10 minwindowwidth 10
 const int32 kBorderSize = 10;
+
+
+static property_info sProperties[] = {
+	{ "Info", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Show/hide info.", 0,
+		{ B_BOOL_TYPE }
+	},
+	{ "Grid", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Show/hide grid.", 0,
+		{ B_BOOL_TYPE }
+	},
+	{ "MakeSquare", { B_EXECUTE_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Make the view square.", 0,
+	},
+	{ "Zoom", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets/sets the zoom factor (1-16).", 0,
+		{ B_INT32_TYPE }
+	},
+	{ "Stick", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Stick/unstick coordinates.", 0,
+		{ B_BOOL_TYPE }
+	},
+	{ "CopyImage", { B_EXECUTE_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Copy image to clipboard.", 0,
+	},
+
+	{ 0 }
+};
 
 
 static float
@@ -304,12 +339,126 @@ TWindow::~TWindow()
 }
 
 
+status_t
+TWindow::GetSupportedSuites(BMessage* msg)
+{
+	msg->AddString("suites", "suite/x-vnd.Haiku-Magnify");
+
+	BPropertyInfo propertyInfo(sProperties);
+	msg->AddFlat("messages", &propertyInfo);
+
+	return BHandler::GetSupportedSuites(msg);
+}
+
+
+BHandler*
+TWindow::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
+	int32 what, const char* property)
+{
+	BPropertyInfo propertyInfo(sProperties);
+	if (propertyInfo.FindMatch(msg, index, specifier, what, property) >= 0)
+		return this;
+
+	return BHandler::ResolveSpecifier(msg, index, specifier, what, property);
+}
+
+
 void
 TWindow::MessageReceived(BMessage* m)
 {
 	bool active = fFatBits->Active();
 
 	switch (m->what) {
+		case B_EXECUTE_PROPERTY:
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY:
+		{
+			int32 index;
+			BMessage specifier;
+			int32 what;
+			const char* property;
+			if (m->GetCurrentSpecifier(&index, &specifier, &what, &property)
+				!= B_OK)
+				return BWindow::MessageReceived(m);
+
+			status_t result = B_OK;
+			BMessage reply(B_REPLY);
+
+			BPropertyInfo propertyInfo(sProperties);
+			switch (propertyInfo.FindMatch(m, index, &specifier, what,
+						property)) {
+				case 0:
+					if (m->what == B_GET_PROPERTY)
+						result = reply.AddBool("result", fInfoBarState);
+					else if (m->what == B_SET_PROPERTY) {
+						bool showInfo;
+						result = m->FindBool("data", &showInfo);
+						if (result == B_OK) {
+							fInfoBarState = showInfo;
+							ShowInfo(fInfoBarState);
+						}
+					}
+					break;
+
+				case 1:
+					if (m->what == B_GET_PROPERTY)
+						result = reply.AddBool("result", fShowGrid);
+					else if (m->what == B_SET_PROPERTY) {
+						bool showGrid;
+						result = m->FindBool("data", &showGrid);
+						if (result == B_OK)
+							SetGrid(showGrid);
+					}
+					break;
+
+				case 2:
+					if (fHPixelCount != fVPixelCount) {
+						int32 big = fHPixelCount > fVPixelCount ? fHPixelCount
+										: fVPixelCount;
+						ResizeWindow(big, big);
+					}
+					break;
+
+				case 3:
+					if (m->what == B_GET_PROPERTY)
+						result = reply.AddInt32("result", fPixelSize);
+					else if (m->what == B_SET_PROPERTY) {
+						int32 zoom;
+						result = m->FindInt32("data", &zoom);
+						if (result == B_OK)
+							SetPixelSize(zoom);
+					}
+					break;
+
+				case 4:
+					if (m->what == B_GET_PROPERTY)
+						result = reply.AddBool("result", fFatBits->Sticked());
+					else if (m->what == B_SET_PROPERTY) {
+						bool stick;
+						result = m->FindBool("data", &stick);
+						if (result == B_OK)
+							fFatBits->MakeSticked(stick);
+					}
+					break;
+
+				case 5:
+					fFatBits->CopyImage();
+					break;
+
+				default:
+					return BWindow::MessageReceived(m);
+			}
+
+			if (result != B_OK) {
+				reply.what = B_MESSAGE_NOT_UNDERSTOOD;
+				reply.AddString("message", strerror(result));
+				reply.AddInt32("error", result);
+			}
+
+			m->SendReply(&reply);
+			break;
+		}
+
 		case msg_show_info:
 			if (active) {
 				fInfoBarState = !fInfoBarState;
@@ -783,6 +932,11 @@ TWindow::PixelCount(int32* h, int32 *v)
 void
 TWindow::SetPixelSize(int32 s)
 {
+	if (s > 100)
+		s = 100;
+	else if (s < 1)
+		s = 1;
+
 	if (s == fPixelSize)
 		return;
 
@@ -790,24 +944,6 @@ TWindow::SetPixelSize(int32 s)
 	// resize window
 	// tell info that size has changed
 	// tell mag that size has changed
-
-	CalcViewablePixels();
-	ResizeWindow(fHPixelCount, fVPixelCount);
-}
-
-
-void
-TWindow::SetPixelSize(bool d)
-{
-	if (d) {		// grow
-		fPixelSize++;
-		if (fPixelSize > 16)
-			fPixelSize = 16;
-	} else {
-		fPixelSize--;
-		if (fPixelSize < 1)
-			fPixelSize = 1;
-	}
 
 	float w = Bounds().Width();
 	float h = Bounds().Height();
@@ -818,6 +954,30 @@ TWindow::SetPixelSize(bool d)
 	//	in that case force the buffers to the new dimension
 	if (w == Bounds().Width() && h == Bounds().Height())
 		fFatBits->InitBuffers(fHPixelCount, fVPixelCount, fPixelSize, ShowGrid());
+}
+
+
+void
+TWindow::SetPixelSize(bool plus)
+{
+	int32 pixelSize;
+
+	if (plus) {
+		if (fPixelSize >= 16)
+			return;
+
+		pixelSize = fPixelSize + 1;
+	} else {
+		pixelSize = fPixelSize / 2;
+
+		if (pixelSize < 16)
+			if (fPixelSize > 16)
+				pixelSize = (fPixelSize + 16) / 2;
+			else
+				pixelSize = fPixelSize - 1;
+	}
+
+	SetPixelSize(pixelSize);
 }
 
 
