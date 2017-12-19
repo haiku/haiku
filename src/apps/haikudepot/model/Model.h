@@ -9,7 +9,9 @@
 #include <FindDirectory.h>
 #include <Locker.h>
 
+#include "AbstractServerProcess.h"
 #include "LocalIconStore.h"
+#include "BulkLoadContext.h"
 #include "PackageInfo.h"
 #include "WebAppInterface.h"
 
@@ -36,6 +38,22 @@ public:
 
 	virtual	void				AuthorizationChanged() = 0;
 };
+
+
+class DepotMapper {
+public:
+	virtual DepotInfo			MapDepot(const DepotInfo& depot,
+									void* context) = 0;
+};
+
+
+class PackageConsumer {
+public:
+	virtual	bool				ConsumePackage(
+									const PackageInfoRef& packageInfoRef,
+									void* context) = 0;
+};
+
 
 typedef BReference<ModelListener> ModelListenerRef;
 typedef List<ModelListenerRef, false> ModelListenerList;
@@ -118,8 +136,6 @@ public:
 			bool				ShowDevelopPackages() const
 									{ return fShowDevelopPackages; }
 
-			status_t			PopulateWebAppRepositoryCodes();
-
 			// Retrieve package information
 	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;
 	static	const uint32		POPULATE_CACHED_ICON	= 1 << 1;
@@ -131,8 +147,6 @@ public:
 
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);
-			void				PopulateAllPackages();
-			void				StopPopulatingAllPackages();
 
 			const StringList&	SupportedLanguages() const
 									{ return fSupportedLanguages; }
@@ -149,20 +163,41 @@ public:
 			const WebAppInterface& GetWebAppInterface() const
 									{ return fWebAppInterface; }
 
+			void				ReplaceDepotByUrl(
+									const BString& url,
+									DepotMapper* depotMapper,
+									void* context);
+
+			void				ForAllDepots(
+									void (*func)(const DepotInfo& depot,
+										void* context),
+									void* context);
+
+			void				ForAllPackages(PackageConsumer* packageConsumer,
+									void* context);
+
+			void				ForPackageByNameInDepot(
+									const BString& depotName,
+									const BString& packageName,
+									PackageConsumer* packageConsumer,
+									void* context);
+
+			status_t			IconStoragePath(BPath& path) const;
+			status_t			DumpExportRepositoryDataPath(BPath& path) const;
+			status_t			DumpExportPkgDataPath(BPath& path,
+									const BString& repositorySourceCode) const;
+
+			void				LogDepotsWithNoWebAppRepositoryCode() const;
 
 private:
-			status_t			_DumpExportRepositoryDataPath(
-									BPath& path) const;
-			status_t			_DumpExportPkgDataPath(BPath& path,
-									const BString& repositorySourceCode) const;
 			void				_UpdateIsFeaturedFilter();
 
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
-			void				_PopulateAllPackagesThread();
-			void				_PopulatePackagesForDepot(
-									const DepotInfo& depotInfo);
 
-			void				_PopulateAllPackagesIcons();
+			void				_PopulatePackageScreenshot(
+									const PackageInfoRef& package,
+									const ScreenshotInfo& info,
+									int32 scaledWidth, bool fromCacheOnly);
 
 			bool				_GetCacheFile(BPath& path, BFile& file,
 									directory_which directory,
@@ -175,22 +210,12 @@ private:
 									const char* fileName,
 									bool ignoreAge, time_t maxAge) const;
 
-			status_t			_PopulatePackageIcon(
-									const PackageInfoRef& package);
-			void				_PopulatePackageScreenshot(
-									const PackageInfoRef& package,
-									const ScreenshotInfo& info,
-									int32 scaledWidth,
-									bool fromCacheOnly);
-
 			void				_NotifyAuthorizationChanged();
 
 private:
 			BLocker				fLock;
 
 			DepotList			fDepots;
-
-			LocalIconStore		fLocalIconStore;
 
 			CategoryRef			fCategoryAudio;
 			CategoryRef			fCategoryBusiness;
@@ -224,9 +249,6 @@ private:
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;
 			bool				fShowDevelopPackages;
-
-			thread_id			fPopulateAllPackagesThread;
-	volatile bool				fStopPopulatingAllPackages;
 
 			StringList			fSupportedLanguages;
 			BString				fPreferredLanguage;

@@ -11,6 +11,7 @@
 
 #include <Autolock.h>
 #include <FileIO.h>
+#include <support/StopWatch.h>
 #include <Url.h>
 
 #include "Logger.h"
@@ -27,16 +28,19 @@
     packages as they are parsed and processing them.
 */
 
-class PackageFillingPkgListener : public DumpExportPkgListener {
+class PackageFillingPkgListener :
+	public DumpExportPkgListener, public PackageConsumer {
 public:
-								PackageFillingPkgListener(
-									const PackageList& packages,
-									const CategoryList& categories,
-									BLocker& lock);
+								PackageFillingPkgListener(Model *model,
+									BString& depotName, Stoppable* stoppable);
 	virtual						~PackageFillingPkgListener();
 
-	virtual	void				Handle(DumpExportPkg* item);
+	virtual bool				ConsumePackage(const PackageInfoRef& package,
+									void *context);
+	virtual	bool				Handle(DumpExportPkg* item);
 	virtual	void				Complete();
+
+			uint32				Count();
 
 private:
 			int32				IndexOfPackageByName(const BString& name) const;
@@ -44,22 +48,26 @@ private:
 									const BString& name) const;
 			int32				IndexOfCategoryByCode(
 									const BString& code) const;
-	const	PackageList&		fPackages;
-	const	CategoryList&		fCategories;
-			BLocker&			fLock;
 
-
+			BString				fDepotName;
+			Model*				fModel;
+			CategoryList		fCategories;
+			Stoppable*			fStoppable;
+			uint32				fCount;
+			bool				fDebugEnabled;
 };
 
 
-PackageFillingPkgListener::PackageFillingPkgListener(
-	const PackageList& packages, const CategoryList& categories,
-	BLocker& lock)
+PackageFillingPkgListener::PackageFillingPkgListener(Model* model,
+	BString& depotName, Stoppable* stoppable)
 	:
-	fPackages(packages),
-	fCategories(categories),
-	fLock(lock)
+	fDepotName(depotName),
+	fModel(model),
+	fStoppable(stoppable),
+	fCount(0),
+	fDebugEnabled(Logger::IsDebugEnabled())
 {
+	fCategories = model->Categories();
 }
 
 
@@ -70,32 +78,14 @@ PackageFillingPkgListener::~PackageFillingPkgListener()
 
 	// TODO; performance could be improved by not needing the linear search
 
-int32
-PackageFillingPkgListener::IndexOfPackageByName(
-	const BString& name) const
-{
-	int32 i;
-
-	for (i = 0; i < fPackages.CountItems(); i++) {
-		const PackageInfoRef& packageInfo = fPackages.ItemAt(i);
-
-		if (packageInfo->Name() == name)
-			return i;
-	}
-
-	return -1;
-}
-
-
-	// TODO; performance could be improved by not needing the linear search
-
-int32
+inline int32
 PackageFillingPkgListener::IndexOfCategoryByName(
 	const BString& name) const
 {
 	int32 i;
+	int32 categoryCount = fCategories.CountItems();
 
-	for (i = 0; i < fCategories.CountItems(); i++) {
+	for (i = 0; i < categoryCount; i++) {
 		const CategoryRef categoryRef = fCategories.ItemAtFast(i);
 
 		if (categoryRef->Name() == name)
@@ -106,81 +96,95 @@ PackageFillingPkgListener::IndexOfCategoryByName(
 }
 
 
-void
-PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
+bool
+PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
+	void *context)
 {
-	BAutolock locker(fLock); // lock from the model.
-	int32 packageIndex = IndexOfPackageByName(*(pkg->Name()));
+	DumpExportPkg* pkg = static_cast<DumpExportPkg*>(context);
+	int32 i;
 
-	if (packageIndex == -1) {
-		printf("unable to find package data for pkg name [%s]\n",
-			pkg->Name()->String());
-	} else {
-		int32 i;
-		const PackageInfoRef& packageInfo = fPackages.ItemAt(packageIndex);
+	if (0 != pkg->CountPkgVersions()) {
 
-		if (0 != pkg->CountPkgVersions()) {
+			// this makes the assumption that the only version will be the
+			// latest one.
 
-				// this makes the assumption that the only version will be the
-				// latest one.
+		DumpExportPkgVersion* pkgVersion = pkg->PkgVersionsItemAt(0);
 
-			DumpExportPkgVersion* pkgVersion = pkg->PkgVersionsItemAt(0);
+		if (!pkgVersion->TitleIsNull())
+			package->SetTitle(*(pkgVersion->Title()));
 
-			if (!pkgVersion->TitleIsNull())
-				packageInfo->SetTitle(*(pkgVersion->Title()));
+		if (!pkgVersion->SummaryIsNull())
+			package->SetShortDescription(*(pkgVersion->Summary()));
 
-			if (!pkgVersion->SummaryIsNull())
-				packageInfo->SetShortDescription(*(pkgVersion->Summary()));
+		if (!pkgVersion->DescriptionIsNull())
+			package->SetFullDescription(*(pkgVersion->Description()));
 
-			if (!pkgVersion->DescriptionIsNull()) {
-				packageInfo->SetFullDescription(*(pkgVersion->Description()));
-			}
+		if (!pkgVersion->PayloadLengthIsNull())
+			package->SetSize(pkgVersion->PayloadLength());
+	}
 
-			if (!pkgVersion->PayloadLengthIsNull())
-				packageInfo->SetSize(pkgVersion->PayloadLength());
-		}
+	int32 countPkgCategories = pkg->CountPkgCategories();
 
-		for (i = 0; i < pkg->CountPkgCategories(); i++) {
-			BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
-			int categoryIndex = IndexOfCategoryByName(*(categoryCode));
+	for (i = 0; i < countPkgCategories; i++) {
+		BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
+		int categoryIndex = IndexOfCategoryByName(*(categoryCode));
 
-			if (categoryIndex == -1) {
-				printf("unable to find the category for [%s]\n",
-					categoryCode->String());
-			} else {
-				packageInfo->AddCategory(
-					fCategories.ItemAtFast(categoryIndex));
-			}
-		}
-
-		if (!pkg->DerivedRatingIsNull()) {
-			RatingSummary summary;
-			summary.averageRating = pkg->DerivedRating();
-			packageInfo->SetRatingSummary(summary);
-		}
-
-		if (!pkg->ProminenceOrderingIsNull()) {
-			packageInfo->SetProminence(pkg->ProminenceOrdering());
-		}
-
-		if (!pkg->PkgChangelogContentIsNull()) {
-			packageInfo->SetChangelog(*(pkg->PkgChangelogContent()));
-		}
-
-		for (i = 0; i < pkg->CountPkgScreenshots(); i++) {
-			DumpExportPkgScreenshot* screenshot = pkg->PkgScreenshotsItemAt(i);
-			packageInfo->AddScreenshotInfo(ScreenshotInfo(
-				*(screenshot->Code()),
-				static_cast<int32>(screenshot->Width()),
-				static_cast<int32>(screenshot->Height()),
-				static_cast<int32>(screenshot->Length())
-			));
-		}
-
-		if (Logger::IsDebugEnabled()) {
-			printf("did populate data for [%s]\n", pkg->Name()->String());
+		if (categoryIndex == -1) {
+			printf("unable to find the category for [%s]\n",
+				categoryCode->String());
+		} else {
+			package->AddCategory(
+				fCategories.ItemAtFast(categoryIndex));
 		}
 	}
+
+	if (!pkg->DerivedRatingIsNull()) {
+		RatingSummary summary;
+		summary.averageRating = pkg->DerivedRating();
+		package->SetRatingSummary(summary);
+	}
+
+	if (!pkg->ProminenceOrderingIsNull())
+		package->SetProminence(pkg->ProminenceOrdering());
+
+	if (!pkg->PkgChangelogContentIsNull())
+		package->SetChangelog(*(pkg->PkgChangelogContent()));
+
+	int32 countPkgScreenshots = pkg->CountPkgScreenshots();
+
+	for (i = 0; i < countPkgScreenshots; i++) {
+		DumpExportPkgScreenshot* screenshot = pkg->PkgScreenshotsItemAt(i);
+		package->AddScreenshotInfo(ScreenshotInfo(
+			*(screenshot->Code()),
+			static_cast<int32>(screenshot->Width()),
+			static_cast<int32>(screenshot->Height()),
+			static_cast<int32>(screenshot->Length())
+		));
+	}
+
+	if (fDebugEnabled) {
+		printf("did populate data for [%s] (%s)\n", pkg->Name()->String(),
+			fDepotName.String());
+	}
+
+	fCount++;
+
+	return !fStoppable->WasStopped();
+}
+
+
+uint32
+PackageFillingPkgListener::Count()
+{
+	return fCount;
+}
+
+
+bool
+PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
+{
+	fModel->ForPackageByNameInDepot(fDepotName, *(pkg->Name()), this, pkg);
+	return !fStoppable->WasStopped();
 }
 
 
@@ -191,20 +195,22 @@ PackageFillingPkgListener::Complete()
 
 
 PkgDataUpdateProcess::PkgDataUpdateProcess(
+	AbstractServerProcessListener* listener,
 	const BPath& localFilePath,
-	BLocker& lock,
-	BString repositorySourceCode,
 	BString naturalLanguageCode,
-	const PackageList& packages,
-	const CategoryList& categories)
+	BString repositorySourceCode,
+	BString depotName,
+	Model *model,
+	uint32 options)
 	:
+	AbstractSingleFileServerProcess(listener, options),
 	fLocalFilePath(localFilePath),
 	fNaturalLanguageCode(naturalLanguageCode),
 	fRepositorySourceCode(repositorySourceCode),
-	fPackages(packages),
-	fCategories(categories),
-	fLock(lock)
+	fModel(model),
+	fDepotName(depotName)
 {
+	fName.SetToFormat("PkgDataUpdateProcess<%s>", depotName.String());
 }
 
 
@@ -213,52 +219,49 @@ PkgDataUpdateProcess::~PkgDataUpdateProcess()
 }
 
 
-status_t
-PkgDataUpdateProcess::Run()
+const char*
+PkgDataUpdateProcess::Name()
 {
-	printf("will fetch packages' data\n");
+	return fName.String();
+}
 
+
+BString
+PkgDataUpdateProcess::UrlPathComponent()
+{
 	BString urlPath;
 	urlPath.SetToFormat("/__pkg/all-%s-%s.json.gz",
 		fRepositorySourceCode.String(),
 		fNaturalLanguageCode.String());
+	return urlPath;
+}
 
-	status_t result = DownloadToLocalFile(fLocalFilePath,
-		ServerSettings::CreateFullUrl(urlPath),
-		0, 0);
 
-	if (result == B_OK || result == APP_ERR_NOT_MODIFIED) {
-		printf("did fetch packages' data\n");
-
-			// now load the data in and process it.
-
-		printf("will process packages' data\n");
-		result = PopulateDataToDepots();
-
-		switch (result) {
-			case B_OK:
-				printf("did process packages' data\n");
-				break;
-			default:
-				MoveDamagedFileAside(fLocalFilePath);
-				break;
-		}
-	}
-
-	return result;
+BPath&
+PkgDataUpdateProcess::LocalPath()
+{
+	return fLocalFilePath;
 }
 
 
 status_t
-PkgDataUpdateProcess::PopulateDataToDepots()
+PkgDataUpdateProcess::ProcessLocalData()
 {
+	BStopWatch watch("PkgDataUpdateProcess::ProcessLocalData", true);
+
 	PackageFillingPkgListener* itemListener =
-		new PackageFillingPkgListener(fPackages, fCategories, fLock);
+		new PackageFillingPkgListener(fModel, fDepotName, this);
 
 	BulkContainerDumpExportPkgJsonListener* listener =
 		new BulkContainerDumpExportPkgJsonListener(itemListener);
 
 	status_t result = ParseJsonFromFileWithListener(listener, fLocalFilePath);
+
+	if (Logger::IsInfoEnabled()) {
+		double secs = watch.ElapsedTime() / 1000000.0;
+		fprintf(stdout, "[%s] did process %" B_PRIi32 " packages' data "
+			"in  (%6.3g secs)\n", Name(), itemListener->Count(), secs);
+	}
 
 	if (B_OK != result)
 		return result;
@@ -279,11 +282,4 @@ PkgDataUpdateProcess::GetStandardMetaDataJsonPath(
 	BString& jsonPath) const
 {
 	jsonPath.SetTo("$.info");
-}
-
-
-const char*
-PkgDataUpdateProcess::LoggingName() const
-{
-	return "pkg-data-update";
 }

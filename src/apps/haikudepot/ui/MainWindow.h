@@ -2,6 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
+ * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -9,6 +10,7 @@
 
 #include <Window.h>
 
+#include "BulkLoadStateMachine.h"
 #include "Model.h"
 #include "PackageAction.h"
 #include "PackageActionHandler.h"
@@ -119,6 +121,8 @@ private:
 			Model				fModel;
 			ModelListenerRef	fModelListener;
 			PackageList			fVisiblePackages;
+			BulkLoadStateMachine
+								fBulkLoadStateMachine;
 
 			bool				fTerminating;
 			bool				fSinglePackageMode;

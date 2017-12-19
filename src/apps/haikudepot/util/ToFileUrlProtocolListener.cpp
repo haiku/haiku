@@ -18,6 +18,7 @@ ToFileUrlProtocolListener::ToFileUrlProtocolListener(BPath path,
 	fTraceLoggingIdentifier = traceLoggingIdentifier;
 	fTraceLogging = traceLogging;
 	fShouldDownload = true;
+	fContentLength = 0;
 }
 
 
@@ -70,6 +71,8 @@ void
 ToFileUrlProtocolListener::DataReceived(BUrlRequest* caller, const char* data,
 	off_t position, ssize_t size)
 {
+	fContentLength += size;
+
 	if (fShouldDownload && fDownloadIO != NULL && size > 0) {
 		size_t remaining = size;
 		size_t written = 0;
@@ -116,3 +119,9 @@ ToFileUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 	}
 }
 
+
+ssize_t
+ToFileUrlProtocolListener::ContentLength()
+{
+	return fContentLength;
+}

@@ -21,6 +21,9 @@
 BUrl ServerSettings::sBaseUrl = BUrl(BASEURL_DEFAULT);
 BString ServerSettings::sUserAgent = BString();
 pthread_once_t ServerSettings::sUserAgentInitOnce = PTHREAD_ONCE_INIT;
+bool ServerSettings::sPreferCache = false;
+bool ServerSettings::sDropCache = false;
+bool ServerSettings::sForceNoNetwork = false;
 
 
 status_t
@@ -102,6 +105,7 @@ ServerSettings::_GetUserAgentVersionString()
 	return result;
 }
 
+
 void
 ServerSettings::AugmentHeaders(BHttpHeaders& headers)
 {
@@ -109,3 +113,43 @@ ServerSettings::AugmentHeaders(BHttpHeaders& headers)
 }
 
 
+bool
+ServerSettings::PreferCache()
+{
+	return sPreferCache;
+}
+
+
+void
+ServerSettings::SetPreferCache(bool value)
+{
+	sPreferCache = value;
+}
+
+
+bool
+ServerSettings::DropCache()
+{
+	return sDropCache;
+}
+
+
+void
+ServerSettings::SetDropCache(bool value)
+{
+	sDropCache = value;
+}
+
+
+bool
+ServerSettings::ForceNoNetwork()
+{
+	return sForceNoNetwork;
+}
+
+
+void
+ServerSettings::SetForceNoNetwork(bool value)
+{
+	sForceNoNetwork = value;
+}

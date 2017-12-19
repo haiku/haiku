@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -127,6 +128,9 @@ enum arg_switch {
 	HELP_SWITCH,
 	WEB_APP_BASE_URL_SWITCH,
 	VERBOSITY_SWITCH,
+	FORCE_NO_NETWORKING_SWITCH,
+	PREFER_CACHE_SWITCH,
+	DROP_CACHE_SWITCH
 };
 
 
@@ -134,13 +138,24 @@ static void
 app_print_help()
 {
 	fprintf(stdout, "HaikuDepot ");
-	fprintf(stdout, "[-u|--webappbaseurl <web-app-base-url>] ");
-	fprintf(stdout, "[-v|--verbosity [off|info|debug|trace] ");
-	fprintf(stdout, "[-h|--help]\n\n");
+	fprintf(stdout, "[-u|--webappbaseurl <web-app-base-url>]\n");
+	fprintf(stdout, "[-v|--verbosity [off|info|debug|trace]\n");
+	fprintf(stdout, "[--nonetworking]\n");
+	fprintf(stdout, "[--prefercache]\n");
+	fprintf(stdout, "[--dropcache]\n");
+	fprintf(stdout, "[-h|--help]\n");
+	fprintf(stdout, "\n");
 	fprintf(stdout, "'-h' : causes this help text to be printed out.\n");
 	fprintf(stdout, "'-v' : allows for the verbosity level to be set.\n");
-	fprintf(stdout, "'-u' : allows for the haiku depot server to be\n");
-	fprintf(stdout, "   configured.");
+	fprintf(stdout, "'-u' : allows for the haiku depot server url to be\n");
+	fprintf(stdout, "   configured.\n");
+	fprintf(stdout, "'--nonetworking' : prevents network access.**\n");
+	fprintf(stdout, "'--prefercache' : prefer to get data from cache rather\n");
+	fprintf(stdout, "  then obtain data from the network.**\n");
+	fprintf(stdout, "'--dropcache' : drop cached data before performing\n");
+	fprintf(stdout, "  bulk operations.**\n");
+	fprintf(stdout, "\n");
+	fprintf(stdout, "** = only applies to bulk operations.\n");
 }
 
 
@@ -160,6 +175,15 @@ app_resolve_switch(char *arg)
 
 			if (0 == strcmp(&arg[2], "verbosity"))
 				return VERBOSITY_SWITCH;
+
+			if (0 == strcmp(&arg[2], "nonetworking"))
+				return FORCE_NO_NETWORKING_SWITCH;
+
+			if (0 == strcmp(&arg[2], "prefercache"))
+				return PREFER_CACHE_SWITCH;
+
+			if (0 == strcmp(&arg[2], "dropcache"))
+				return DROP_CACHE_SWITCH;
 		} else {
 			if (arglen == 2) { // short form
 				switch (arg[1]) {
@@ -235,6 +259,18 @@ App::ArgvReceived(int32 argc, char* argv[])
 
 				i++; // also move past the url value
 
+				break;
+
+			case FORCE_NO_NETWORKING_SWITCH:
+				ServerSettings::SetForceNoNetwork(true);
+				break;
+
+			case PREFER_CACHE_SWITCH:
+				ServerSettings::SetPreferCache(true);
+				break;
+
+			case DROP_CACHE_SWITCH:
+				ServerSettings::SetDropCache(true);
 				break;
 
 			case NOT_SWITCH:

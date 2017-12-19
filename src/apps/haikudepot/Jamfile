@@ -69,6 +69,8 @@ Application HaikuDepot :
 	MarkupTextView.cpp
 	MessagePackageListener.cpp
 	Model.cpp
+	BulkLoadContext.cpp
+	BulkLoadStateMachine.cpp
 	PackageAction.cpp
 	PackageActionHandler.cpp
 	PackageContentsView.cpp
@@ -98,6 +100,7 @@ Application HaikuDepot :
 
 	# network + server
 	AbstractServerProcess.cpp
+	AbstractSingleFileServerProcess.cpp
 	ServerSettings.cpp
 	WebAppInterface.cpp
 	PkgDataUpdateProcess.cpp

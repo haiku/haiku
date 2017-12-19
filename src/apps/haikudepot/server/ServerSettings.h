@@ -20,6 +20,13 @@ public:
 		static BUrl						CreateFullUrl(
 											const BString urlPathComponents);
 
+		static bool						PreferCache();
+		static void						SetPreferCache(bool value);
+		static bool						DropCache();
+		static void						SetDropCache(bool value);
+		static bool						ForceNoNetwork();
+		static void						SetForceNoNetwork(bool value);
+
 private:
 		static void						_InitUserAgent();
 		static const BString			_GetUserAgentVersionString();
@@ -27,6 +34,9 @@ private:
 		static BUrl						sBaseUrl;
 		static BString					sUserAgent;
 		static pthread_once_t			sUserAgentInitOnce;
+		static bool						sPreferCache;
+		static bool						sDropCache;
+		static bool						sForceNoNetwork;
 };
 
 #endif // SERVER_SETTINGS_H

@@ -1,7 +1,7 @@
 /*
  * Generated Listener Object
  * source json-schema : dumpexport.json
- * generated at : 2017-11-11T14:09:03.498089
+ * generated at : 2017-12-17T20:45:25.514143
  */
 
 #ifndef GEN_JSON_SCHEMA_PARSER__SINGLEDUMPEXPORTPKGJSONLISTENER_H
@@ -60,7 +60,7 @@ private:
 */         
 class DumpExportPkgListener {
 public:
-    virtual void Handle(DumpExportPkg* item) = 0;
+    virtual bool Handle(DumpExportPkg* item) = 0;
     virtual void Complete() = 0;
 };
 

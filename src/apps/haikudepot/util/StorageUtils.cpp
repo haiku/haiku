@@ -5,13 +5,15 @@
 
 #include "StorageUtils.h"
 
+#include <stdio.h>
+#include <errno.h>
+
 #include <Directory.h>
 #include <File.h>
 #include <Entry.h>
 #include <String.h>
 
-#include <stdio.h>
-#include <errno.h>
+#include "Logger.h"
 
 #define FILE_TO_STRING_BUFFER_LEN 64
 
@@ -51,23 +53,27 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
 
 		bool exists = false;
 		bool isDirectory = false;
-		BPath directroyEntryPath;
+		BPath directoryEntryPath;
 
-		result = directoryEntry.GetPath(&directroyEntryPath);
+		result = directoryEntry.GetPath(&directoryEntryPath);
 
-		if (result == B_OK)
-			result = ExistsDirectory(directroyEntryPath, &exists, &isDirectory);
+		if (result == B_OK) {
+			result = ExistsObject(directoryEntryPath, &exists, &isDirectory,
+				NULL);
+		}
 
 		if (result == B_OK) {
 			if (isDirectory)
-				RemoveDirectoryContents(directroyEntryPath);
+				RemoveDirectoryContents(directoryEntryPath);
 
-			if (remove(directroyEntryPath.Path()) == 0) {
-				fprintf(stdout, "did delete [%s]\n",
-					directroyEntryPath.Path());
+			if (remove(directoryEntryPath.Path()) == 0) {
+				if (Logger::IsDebugEnabled()) {
+					fprintf(stdout, "did delete [%s]\n",
+						directoryEntryPath.Path());
+				}
 			} else {
 				fprintf(stderr, "unable to delete [%s]\n",
-					directroyEntryPath.Path());
+					directoryEntryPath.Path());
 				result = B_ERROR;
 			}
 		}
@@ -84,21 +90,34 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
  */
 
 status_t
-StorageUtils::ExistsDirectory(BPath& directory,
+StorageUtils::ExistsObject(BPath& path,
 	bool* exists,
-	bool* isDirectory)
+	bool* isDirectory,
+	off_t* size)
 {
 	struct stat s;
 
-	*exists = false;
-	*isDirectory = false;
+	if (exists != NULL)
+		*exists = false;
 
-	if (-1 == stat(directory.Path(), &s)) {
+	if (isDirectory != NULL)
+		*isDirectory = false;
+
+	if (size != NULL)
+		*size = 0;
+
+	if (-1 == stat(path.Path(), &s)) {
 		if (ENOENT != errno)
 			 return B_ERROR;
 	} else {
-		*exists = true;
-		*isDirectory = S_ISDIR(s.st_mode);
+		if (exists != NULL)
+			*exists = true;
+
+		if (isDirectory != NULL)
+			*isDirectory = S_ISDIR(s.st_mode);
+
+		if (size != NULL)
+			*size = s.st_size;
 	}
 
 	return B_OK;

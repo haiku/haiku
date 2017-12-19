@@ -122,7 +122,7 @@ public:
 							TestBulkContainerItemListener();
 		virtual				~TestBulkContainerItemListener();
 
-			void			Handle(DumpExportRepository* item);
+			bool			Handle(DumpExportRepository* item);
 			void			Complete();
 
 			BString			ConcatenatedCodes();
@@ -261,7 +261,7 @@ TestBulkContainerItemListener::~TestBulkContainerItemListener()
     for this.
 */
 
-void
+bool
 TestBulkContainerItemListener::Handle(DumpExportRepository* item)
 {
 	int32 i;
@@ -278,6 +278,8 @@ TestBulkContainerItemListener::Handle(DumpExportRepository* item)
 		fConcatenatedSourcesUrl.Append(
 			item->RepositorySourcesItemAt(i)->Url()->String());
 	}
+
+	return true;
 }
 
 

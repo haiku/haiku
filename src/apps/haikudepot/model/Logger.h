@@ -2,8 +2,6 @@
  * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #ifndef LOGGER_H
 #define LOGGER_H
 

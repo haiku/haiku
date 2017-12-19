@@ -132,6 +132,7 @@ MainWindow::MainWindow(const BMessage& settings)
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fModelListener(new MessageModelListener(BMessenger(this)), true),
+	fBulkLoadStateMachine(&fModel),
 	fTerminating(false),
 	fSinglePackageMode(false),
 	fModelWorker(B_BAD_THREAD_ID)
@@ -245,6 +246,7 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fModelListener(new MessageModelListener(BMessenger(this)), true),
+	fBulkLoadStateMachine(&fModel),
 	fTerminating(false),
 	fSinglePackageMode(true),
 	fModelWorker(B_BAD_THREAD_ID)
@@ -1062,7 +1064,7 @@ MainWindow::_RefreshPackageList(bool force)
 
 	bool wasEmpty = fModel.Depots().IsEmpty();
 	if (force || wasEmpty)
-		fModel.StopPopulatingAllPackages();
+		fBulkLoadStateMachine.Stop();
 
 	BAutolock lock(fModel.Lock());
 
@@ -1094,11 +1096,10 @@ MainWindow::_RefreshPackageList(bool force)
 			fModel.AddDepot(it->second);
 	}
 
-	fModel.PopulateWebAppRepositoryCodes();
-
 	// start retrieving package icons and average ratings
-	if (force || wasEmpty)
-		fModel.PopulateAllPackages();
+	if (force || wasEmpty) {
+			fBulkLoadStateMachine.Start();
+	}
 
 	// compute the OS package dependencies
 	try {

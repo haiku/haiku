@@ -23,8 +23,6 @@
 #include <Path.h>
 
 #include "Logger.h"
-#include "PkgDataUpdateProcess.h"
-#include "RepositoryDataUpdateProcess.h"
 #include "StorageUtils.h"
 
 
@@ -359,10 +357,7 @@ Model::Model()
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
 	fShowSourcePackages(false),
-	fShowDevelopPackages(false),
-
-	fPopulateAllPackagesThread(-1),
-	fStopPopulatingAllPackages(false)
+	fShowDevelopPackages(false)
 {
 	_UpdateIsFeaturedFilter();
 
@@ -417,7 +412,6 @@ Model::Model()
 
 Model::~Model()
 {
-	StopPopulatingAllPackages();
 }
 
 
@@ -701,7 +695,6 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					BMessage item;
 					if (items.FindMessage(name, &item) != B_OK)
 						break;
-//					item.PrintToStream();
 
 					BString user;
 					BMessage userInfo;
@@ -769,32 +762,6 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 
 
 void
-Model::PopulateAllPackages()
-{
-	StopPopulatingAllPackages();
-
-	fStopPopulatingAllPackages = false;
-
-	fPopulateAllPackagesThread = spawn_thread(&_PopulateAllPackagesEntry,
-		"Package populator", B_NORMAL_PRIORITY, this);
-	if (fPopulateAllPackagesThread >= 0)
-		resume_thread(fPopulateAllPackagesThread);
-}
-
-
-void
-Model::StopPopulatingAllPackages()
-{
-	if (fPopulateAllPackagesThread < 0)
-		return;
-
-	fStopPopulatingAllPackages = true;
-	wait_for_thread(fPopulateAllPackagesThread, NULL);
-	fPopulateAllPackagesThread = -1;
-}
-
-
-void
 Model::SetUsername(BString username)
 {
 	BString password;
@@ -837,8 +804,6 @@ Model::SetAuthorization(const BString& username, const BString& password,
 }
 
 
-// #pragma mark - private
-
 /*! When bulk repository data comes down from the server, it will
     arrive as a json.gz payload.  This is stored locally as a cache
     and this method will provide the on-disk storage location for
@@ -846,7 +811,7 @@ Model::SetAuthorization(const BString& username, const BString& password,
 */
 
 status_t
-Model::_DumpExportRepositoryDataPath(BPath& path) const
+Model::DumpExportRepositoryDataPath(BPath& path) const
 {
 	BPath repoDataPath;
 
@@ -866,7 +831,26 @@ Model::_DumpExportRepositoryDataPath(BPath& path) const
 
 
 status_t
-Model::_DumpExportPkgDataPath(BPath& path,
+Model::IconStoragePath(BPath& path) const
+{
+	BPath iconStoragePath;
+
+	if (find_directory(B_USER_CACHE_DIRECTORY, &iconStoragePath) == B_OK
+		&& iconStoragePath.Append("HaikuDepot") == B_OK
+		&& iconStoragePath.Append("__allicons") == B_OK
+		&& create_directory(iconStoragePath.Path(), 0777) == B_OK) {
+		path.SetTo(iconStoragePath.Path());
+		return B_OK;
+	}
+
+	path.Unset();
+	fprintf(stdout, "unable to find the user cache directory for icons");
+	return B_ERROR;
+}
+
+
+status_t
+Model::DumpExportPkgDataPath(BPath& path,
 	const BString& repositorySourceCode) const
 {
 	BPath repoDataPath;
@@ -889,24 +873,6 @@ Model::_DumpExportPkgDataPath(BPath& path,
 }
 
 
-status_t
-Model::PopulateWebAppRepositoryCodes()
-{
-	status_t result = B_OK;
-	BPath dataPath;
-
-	result = _DumpExportRepositoryDataPath(dataPath);
-
-	if (result != B_OK)
-		return result;
-
-	RepositoryDataUpdateProcess process(dataPath, &fDepots);
-	result = process.Run();
-
-	return result;
-}
-
-
 void
 Model::_UpdateIsFeaturedFilter()
 {
@@ -914,141 +880,6 @@ Model::_UpdateIsFeaturedFilter()
 		fIsFeaturedFilter = PackageFilterRef(new IsFeaturedFilter(), true);
 	else
 		fIsFeaturedFilter = PackageFilterRef(new AnyFilter(), true);
-}
-
-
-int32
-Model::_PopulateAllPackagesEntry(void* cookie)
-{
-	Model* model = static_cast<Model*>(cookie);
-	model->_PopulateAllPackagesThread();
-	model->_PopulateAllPackagesIcons();
-	return 0;
-}
-
-
-void
-Model::_PopulateAllPackagesIcons()
-{
-	fLocalIconStore.UpdateFromServerIfNecessary();
-
-	int32 depotIndex = 0;
-	int32 packageIndex = 0;
-	int32 countIconsSet = 0;
-
-	fprintf(stdout, "will populate all packages' icons\n");
-
-	while (true) {
-		PackageInfoRef package;
-		BAutolock locker(&fLock);
-
-		if (depotIndex > fDepots.CountItems()) {
-			fprintf(stdout, "did populate %" B_PRId32 " packages' icons\n",
-				countIconsSet);
-			return;
-		}
-
-		const DepotInfo& depot = fDepots.ItemAt(depotIndex);
-		const PackageList& packages = depot.Packages();
-
-		if (packageIndex >= packages.CountItems()) {
-			// Need the next depot
-			packageIndex = 0;
-			depotIndex++;
-		} else {
-			package = packages.ItemAt(packageIndex);
-
-			if (Logger::IsDebugEnabled()) {
-				fprintf(stdout, "will populate package icon for [%s]\n",
-					package->Name().String());
-			}
-
-			if (_PopulatePackageIcon(package) == B_OK)
-				countIconsSet++;
-
-			packageIndex++;
-		}
-	}
-}
-
-
-void
-Model::_PopulatePackagesForDepot(const DepotInfo& depotInfo)
-{
-	BString repositorySourceCode = depotInfo.WebAppRepositorySourceCode();
-	BPath repositorySourcePkgDataPath;
-
-	if (B_OK != _DumpExportPkgDataPath(repositorySourcePkgDataPath,
-		repositorySourceCode)) {
-		printf("unable to obtain the path for storing data for [%s]\n",
-			repositorySourceCode.String());
-	} else {
-
-		printf("will fetch and process data for repository source [%s]\n",
-			repositorySourceCode.String());
-
-		PkgDataUpdateProcess process(
-			repositorySourcePkgDataPath,
-			fLock, repositorySourceCode, fPreferredLanguage,
-			depotInfo.Packages(),
-			fCategories);
-
-		process.Run();
-
-		printf("did fetch and process data for repository source [%s]\n",
-			repositorySourceCode.String());
-	}
-}
-
-
-void
-Model::_PopulateAllPackagesThread()
-{
-	int32 depotIndex = 0;
-	int32 count = 0;
-
-	for (depotIndex = 0;
-		depotIndex < fDepots.CountItems() && !fStopPopulatingAllPackages;
-		depotIndex++) {
-		const DepotInfo& depot = fDepots.ItemAt(depotIndex);
-
-		if (depot.WebAppRepositorySourceCode().Length() > 0) {
-			_PopulatePackagesForDepot(depot);
-			count++;
-		}
-	}
-
-	printf("did populate package data for %" B_PRIi32 " depots\n", count);
-}
-
-
-status_t
-Model::_PopulatePackageIcon(const PackageInfoRef& package)
-{
-	BPath bestIconPath;
-
-	if ( fLocalIconStore.TryFindIconPath(
-		package->Name(), bestIconPath) == B_OK) {
-
-		BFile bestIconFile(bestIconPath.Path(), O_RDONLY);
-		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(bestIconFile), true);
-		BAutolock locker(&fLock);
-		package->SetIcon(bitmapRef);
-
-		if (Logger::IsDebugEnabled()) {
-			fprintf(stdout, "have set the package icon for [%s] from [%s]\n",
-				package->Name().String(), bestIconPath.Path());
-		}
-
-		return B_OK;
-	}
-
-	if (Logger::IsDebugEnabled()) {
-		fprintf(stdout, "did not set the package icon for [%s]; no data\n",
-			package->Name().String());
-	}
-
-	return B_FILE_NOT_FOUND;
 }
 
 
@@ -1126,5 +957,121 @@ Model::_NotifyAuthorizationChanged()
 		const ModelListenerRef& listener = fListeners.ItemAtFast(i);
 		if (listener.Get() != NULL)
 			listener->AuthorizationChanged();
+	}
+}
+
+
+// temporary - should not be required once the repo info url is used.
+static void
+normalize_repository_base_url(BUrl& url)
+{
+	if (url.Protocol() == "https")
+		url.SetProtocol("http");
+
+	BString path(url.Path());
+
+	if (path.EndsWith("/"))
+		url.SetPath(path.Truncate(path.Length() - 1));
+}
+
+
+void
+Model::ForAllDepots(void (*func)(const DepotInfo& depot, void* context),
+	void* context)
+{
+	for (int32 i = 0; i < fDepots.CountItems(); i++) {
+		DepotInfo depotInfo = fDepots.ItemAtFast(i);
+		func(depotInfo, context);
+	}
+}
+
+
+// TODO; should use the repo.info url and not the base url.
+
+void
+Model::ReplaceDepotByUrl(const BString& url,
+	DepotMapper* depotMapper, void* context)
+{
+	for (int32 i = 0; i < fDepots.CountItems(); i++) {
+		DepotInfo depotInfo = fDepots.ItemAtFast(i);
+
+		BUrl url(url);
+		BUrl depotUrlNormalized(depotInfo.BaseURL());
+
+		normalize_repository_base_url(url);
+		normalize_repository_base_url(depotUrlNormalized);
+
+		if (url == depotUrlNormalized) {
+			BAutolock locker(&fLock);
+			fDepots.Replace(i, depotMapper->MapDepot(depotInfo, context));
+		}
+	}
+}
+
+
+void
+Model::ForAllPackages(PackageConsumer* packageConsumer, void* context)
+{
+	for (int32 i = 0; i < fDepots.CountItems(); i++) {
+		DepotInfo depotInfo = fDepots.ItemAtFast(i);
+		PackageList packages = depotInfo.Packages();
+		for(int32 j = 0; j < packages.CountItems(); j++) {
+			const PackageInfoRef& packageInfoRef = packages.ItemAtFast(j);
+
+			if (packageInfoRef != NULL) {
+				BAutolock locker(&fLock);
+				if (!packageConsumer->ConsumePackage(packageInfoRef, context))
+					return;
+			}
+		}
+	}
+}
+
+
+void
+Model::ForPackageByNameInDepot(const BString& depotName,
+	const BString& packageName, PackageConsumer* packageConsumer, void* context)
+{
+	int32 depotCount = fDepots.CountItems();
+
+	for (int32 i = 0; i < depotCount; i++) {
+		DepotInfo depotInfo = fDepots.ItemAtFast(i);
+
+		if (depotInfo.Name() == depotName) {
+			int32 packageIndex = depotInfo.PackageIndexByName(packageName);
+
+			if (-1 != packageIndex) {
+				PackageList packages = depotInfo.Packages();
+				const PackageInfoRef& packageInfoRef =
+					packages.ItemAtFast(packageIndex);
+
+				BAutolock locker(&fLock);
+				packageConsumer->ConsumePackage(packageInfoRef,
+					context);
+			}
+
+			return;
+		}
+	}
+}
+
+
+void
+Model::LogDepotsWithNoWebAppRepositoryCode() const
+{
+	int32 i;
+
+	for (i = 0; i < fDepots.CountItems(); i++) {
+		const DepotInfo& depot = fDepots.ItemAt(i);
+
+		if (depot.WebAppRepositoryCode().Length() == 0) {
+			printf("depot [%s]", depot.Name().String());
+
+			if (depot.BaseURL().Length() > 0)
+				printf(" (%s)", depot.BaseURL().String());
+
+			printf(" correlates with no repository in the haiku"
+				"depot server system\n");
+		}
 	}
 }

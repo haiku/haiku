@@ -15,10 +15,9 @@
 #include "StorageUtils.h"
 
 
-LocalIconStore::LocalIconStore()
+LocalIconStore::LocalIconStore(const BPath& path)
 {
-	if (_EnsureIconStoragePath(fIconStoragePath) != B_OK)
-		fprintf(stdout, "unable to setup icon storage\n");
+	fIconStoragePath = path;
 }
 
 
@@ -42,62 +41,26 @@ LocalIconStore::_HasIconStoragePath() const
 status_t
 LocalIconStore::TryFindIconPath(const BString& pkgName, BPath& path) const
 {
-	if (_HasIconStoragePath()) {
-		BPath bestIconPath;
-		BPath iconPkgPath(fIconStoragePath);
-		bool exists;
-		bool isDir;
+	BPath bestIconPath;
+	BPath iconPkgPath(fIconStoragePath);
+	bool exists;
+	bool isDir;
 
-		if ( (iconPkgPath.Append("hicn") == B_OK)
-			&& (iconPkgPath.Append(pkgName) == B_OK)
-			&& (StorageUtils::ExistsDirectory(iconPkgPath, &exists, &isDir)
-				== B_OK)
-			&& exists
-			&& isDir
-			&& (_IdentifyBestIconFileAtDirectory(iconPkgPath, bestIconPath)
-				== B_OK)
-		) {
-			path = bestIconPath;
-			return B_OK;
-		}
-	}
-
-	path.Unset();
-	return B_FILE_NOT_FOUND;
-}
-
-
-void
-LocalIconStore::UpdateFromServerIfNecessary() const
-{
-	if (_HasIconStoragePath()) {
-		BPath iconStoragePath(fIconStoragePath);
-		ServerIconExportUpdateProcess service(iconStoragePath);
-		service.Run();
-
-		if (Logger::IsDebugEnabled()) {
-			printf("did update the icons from server\n");
-		}
-	}
-}
-
-
-status_t
-LocalIconStore::_EnsureIconStoragePath(BPath& path) const
-{
-	BPath iconStoragePath;
-
-	if (find_directory(B_USER_CACHE_DIRECTORY, &iconStoragePath) == B_OK
-		&& iconStoragePath.Append("HaikuDepot") == B_OK
-		&& iconStoragePath.Append("__allicons") == B_OK
-		&& create_directory(iconStoragePath.Path(), 0777) == B_OK) {
-		path.SetTo(iconStoragePath.Path());
+	if ( (iconPkgPath.Append("hicn") == B_OK)
+		&& (iconPkgPath.Append(pkgName) == B_OK)
+		&& (StorageUtils::ExistsObject(iconPkgPath, &exists, &isDir, NULL)
+			== B_OK)
+		&& exists
+		&& isDir
+		&& (_IdentifyBestIconFileAtDirectory(iconPkgPath, bestIconPath)
+			== B_OK)
+	) {
+		path = bestIconPath;
 		return B_OK;
 	}
 
 	path.Unset();
-	fprintf(stdout, "unable to find the user cache directory for icons");
-	return B_ERROR;
+	return B_FILE_NOT_FOUND;
 }
 
 
@@ -121,8 +84,8 @@ LocalIconStore::_IdentifyBestIconFileAtDirectory(const BPath& directory,
 		bool isDir;
 
 		if ( (workingPath.Append(iconLeafname) == B_OK
-			&& StorageUtils::ExistsDirectory(
-				workingPath, &exists, &isDir) == B_OK)
+			&& StorageUtils::ExistsObject(
+				workingPath, &exists, &isDir, NULL) == B_OK)
 			&& exists
 			&& !isDir) {
 			bestIconPath.SetTo(workingPath.Path());

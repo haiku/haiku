@@ -13,6 +13,9 @@
 #include <SupportDefs.h>
 
 
+#define BINARY_SEARCH_LINEAR_THRESHOLD 4
+
+
 template <typename ItemType, bool PlainOldData, uint32 BlockSize = 8>
 class List {
 	typedef List<ItemType, PlainOldData, BlockSize> SelfType;
@@ -108,6 +111,30 @@ public:
 	inline int32 CountItems() const
 	{
 		return fCount;
+	}
+
+/*! Note that the use of this method will depend on the list being ordered.
+*/
+
+	inline int32 BinarySearch(const void* context,
+		int32 (*compareFunc)(const void* context, const ItemType& item))
+	{
+		if (fCount == 0)
+			return -1;
+
+		return _BinarySearchBounded(context, compareFunc, 0, fCount - 1);
+	}
+
+	inline bool AddOrdered(const ItemType& copyFrom,
+		int32 (*compareFunc)(const ItemType& one, const ItemType& two))
+	{
+		// special case
+		if (fCount == 0
+			|| compareFunc(copyFrom, ItemAtFast(fCount - 1)) > 0) {
+			return Add(copyFrom);
+		}
+
+		return _AddOrderedBounded(copyFrom, compareFunc, 0, fCount - 1);
 	}
 
 	inline bool Add(const ItemType& copyFrom)
@@ -229,6 +256,71 @@ public:
 	}
 
 private:
+	inline int32 _BinarySearchLinearBounded(
+		const void* context,
+		int32 (*compareFunc)(const void* context, const ItemType& item),
+		int32 start, int32 end)
+	{
+		for(int32 i = start; i <= end; i++) {
+			if (compareFunc(context, ItemAtFast(i)) == 0)
+				return i;
+		}
+
+		return -1;
+	}
+
+	inline int32 _BinarySearchBounded(
+		const void* context,
+		int32 (*compareFunc)(const void* context, const ItemType& item),
+		int32 start, int32 end)
+	{
+		if (end - start < BINARY_SEARCH_LINEAR_THRESHOLD)
+			return _BinarySearchLinearBounded(context, compareFunc, start, end);
+
+		int32 mid = start + (end - start);
+
+		if (compareFunc(context, ItemAtFast(mid)) >= 0)
+			return _BinarySearchBounded(context, compareFunc, mid, end);
+		return _BinarySearchBounded(context, compareFunc, start, mid - 1);
+	}
+
+	inline bool _AddOrderedLinearBounded(
+		const ItemType& copyFrom,
+		int32 (*compareFunc)(const ItemType& one, const ItemType& two),
+		int32 start, int32 end)
+	{
+		for(int32 i = start; i <= (end + 1); i++) {
+			bool greaterBefore = (i == start)
+				|| (compareFunc(copyFrom, ItemAtFast(i - 1)) > 0);
+
+			if (greaterBefore) {
+				bool lessAfter = (i == end + 1)
+					|| (compareFunc(copyFrom, ItemAtFast(i)) <= 0);
+
+				if (lessAfter)
+					return Add(copyFrom, i);
+			}
+		}
+
+		printf("illegal state; unable to insert item into list\n");
+		exit(EXIT_FAILURE);
+	}
+
+	inline bool _AddOrderedBounded(
+		const ItemType& copyFrom,
+		int32 (*compareFunc)(const ItemType& one, const ItemType& two),
+		int32 start, int32 end)
+	{
+		if(end - start < BINARY_SEARCH_LINEAR_THRESHOLD)
+			return _AddOrderedLinearBounded(copyFrom, compareFunc, start, end);
+
+		int32 mid = start + (end - start);
+
+		if (compareFunc(copyFrom, ItemAtFast(mid)) >= 0)
+			return _AddOrderedBounded(copyFrom, compareFunc, mid, end);
+		return _AddOrderedBounded(copyFrom, compareFunc, start, mid - 1);
+	}
+
 	inline bool _Resize(uint32 count)
 	{
 		if (count > fAllocatedCount) {

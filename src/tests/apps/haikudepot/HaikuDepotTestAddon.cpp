@@ -8,6 +8,7 @@
 
 #include "StandardMetaDataJsonEventListenerTest.h"
 #include "DumpExportRepositoryJsonListenerTest.h"
+#include "ListTest.h"
 
 BTestSuite*
 getTestSuite()
@@ -16,6 +17,7 @@ getTestSuite()
 
 	StandardMetaDataJsonEventListenerTest::AddTests(*suite);
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
+	ListTest::AddTests(*suite);
 
 	return suite;
 }

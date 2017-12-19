@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -410,6 +410,8 @@ public:
 									{ return fPackages; }
 
 			bool				AddPackage(const PackageInfoRef& package);
+
+			int32				PackageIndexByName(const BString& packageName);
 
 			void				SyncPackages(const PackageList& packages);
 

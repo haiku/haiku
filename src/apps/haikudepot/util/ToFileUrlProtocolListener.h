@@ -13,6 +13,8 @@ public:
 									bool traceLogging);
 			virtual				~ToFileUrlProtocolListener();
 
+			ssize_t				ContentLength();
+
 			void				ConnectionOpened(BUrlRequest* caller);
 			void				HostnameResolved(BUrlRequest* caller,
 									const char* ip);
@@ -37,6 +39,7 @@ private:
 			bool				fTraceLogging;
 			BString				fTraceLoggingIdentifier;
 			BPositionIO*		fDownloadIO;
+			ssize_t				fContentLength;
 
 
 };

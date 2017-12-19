@@ -14,6 +14,7 @@
 
 #include "ServerSettings.h"
 #include "StorageUtils.h"
+#include "Logger.h"
 #include "DumpExportRepository.h"
 #include "DumpExportRepositorySource.h"
 #include "DumpExportRepositoryJsonListener.h"
@@ -25,13 +26,15 @@
     from the server with the data about the depot.
 */
 
-class DepotMatchingRepositoryListener : public DumpExportRepositoryListener {
+class DepotMatchingRepositoryListener :
+	public DumpExportRepositoryListener, public DepotMapper {
 public:
-								DepotMatchingRepositoryListener(
-									DepotList* depotList);
+								DepotMatchingRepositoryListener(Model* model,
+									Stoppable* stoppable);
 	virtual						~DepotMatchingRepositoryListener();
 
-	virtual	void				Handle(DumpExportRepository* item);
+	virtual DepotInfo			MapDepot(const DepotInfo& depot, void *context);
+	virtual	bool				Handle(DumpExportRepository* item);
 	virtual	void				Complete();
 
 private:
@@ -43,15 +46,17 @@ private:
 			int32				IndexOfUnassociatedDepotByUrl(
 									const BString& url) const;
 
-			DepotList*			fDepotList;
-
+			Model*				fModel;
+			Stoppable*			fStoppable;
 };
 
 
 DepotMatchingRepositoryListener::DepotMatchingRepositoryListener(
-	DepotList* depotList)
+	Model* model, Stoppable* stoppable)
+	:
+	fModel(model),
+	fStoppable(stoppable)
 {
-	fDepotList = depotList;
 }
 
 
@@ -60,110 +65,86 @@ DepotMatchingRepositoryListener::~DepotMatchingRepositoryListener()
 }
 
 
-void
-DepotMatchingRepositoryListener::NormalizeUrl(BUrl& url) const
+struct repository_and_repository_source {
+	DumpExportRepository* repository;
+	DumpExportRepositorySource* repositorySource;
+};
+
+
+/*! This is invoked as a result of logic in 'Handle(..)' that requests that the
+    model call this method with the requested DepotInfo instance.
+*/
+
+DepotInfo
+DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 {
-	if (url.Protocol() == "https")
-		url.SetProtocol("http");
+	repository_and_repository_source* repositoryAndRepositorySource =
+		(repository_and_repository_source*) context;
+	BString* repositoryCode =
+		repositoryAndRepositorySource->repository->Code();
+	BString* repositorySourceCode =
+		repositoryAndRepositorySource->repositorySource->Code();
 
-	BString path(url.Path());
+	DepotInfo modifiedDepotInfo(depot);
+	modifiedDepotInfo.SetWebAppRepositoryCode(BString(*repositoryCode));
+	modifiedDepotInfo.SetWebAppRepositorySourceCode(
+		BString(*repositorySourceCode));
 
-	if (path.EndsWith("/"))
-		url.SetPath(path.Truncate(path.Length() - 1));
+	if (Logger::IsDebugEnabled()) {
+		printf("associated dept [%s] (%s) with server repository "
+			"source [%s] (%s)\n", modifiedDepotInfo.Name().String(),
+			modifiedDepotInfo.BaseURL().String(),
+			repositorySourceCode->String(),
+			repositoryAndRepositorySource->repositorySource->Url()->String());
+	} else {
+		printf("associated depot [%s] with server repository source [%s]\n",
+			modifiedDepotInfo.Name().String(), repositorySourceCode->String());
+	}
+
+	return modifiedDepotInfo;
 }
 
 
 bool
-DepotMatchingRepositoryListener::IsUnassociatedDepotByUrl(
-	const DepotInfo& depotInfo, const BString& urlStr) const
-{
-	if (depotInfo.BaseURL().Length() > 0
-		&& depotInfo.WebAppRepositorySourceCode().Length() == 0) {
-		BUrl depotInfoBaseUrl(depotInfo.BaseURL());
-		BUrl url(urlStr);
-
-		NormalizeUrl(depotInfoBaseUrl);
-		NormalizeUrl(url);
-
-		if (depotInfoBaseUrl == url)
-			return true;
-	}
-
-	return false;
-}
-
-
-int32
-DepotMatchingRepositoryListener::IndexOfUnassociatedDepotByUrl(
-	const BString& url) const
-{
-	int32 i;
-
-	for (i = 0; i < fDepotList->CountItems(); i++) {
-		const DepotInfo& depot = fDepotList->ItemAt(i);
-
-		if (IsUnassociatedDepotByUrl(depot, url))
-			return i;
-	}
-
-	return -1;
-}
-
-
-void
 DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 {
 	int32 i;
 
 	for (i = 0; i < repository->CountRepositorySources(); i++) {
-		DumpExportRepositorySource *repositorySource =
+		repository_and_repository_source repositoryAndRepositorySource;
+		repositoryAndRepositorySource.repository = repository;
+		repositoryAndRepositorySource.repositorySource =
 			repository->RepositorySourcesItemAt(i);
-		int32 depotIndex = IndexOfUnassociatedDepotByUrl(
-			*(repositorySource->Url()));
 
-		if (depotIndex >= 0) {
-			DepotInfo modifiedDepotInfo(fDepotList->ItemAt(depotIndex));
-			modifiedDepotInfo.SetWebAppRepositoryCode(
-				BString(*(repository->Code())));
-			modifiedDepotInfo.SetWebAppRepositorySourceCode(
-				BString(*(repositorySource->Code())));
-			fDepotList->Replace(depotIndex, modifiedDepotInfo);
+		// TODO; replace with the repo info url
+		BString* url = repositoryAndRepositorySource.repositorySource->Url();
 
-			printf("associated depot [%s] with server"
-				" repository source [%s]\n", modifiedDepotInfo.Name().String(),
-				repositorySource->Code()->String());
+		if (url->Length() > 0) {
+			fModel->ReplaceDepotByUrl(*url, this,
+				&repositoryAndRepositorySource);
 		}
 	}
+
+	return !fStoppable->WasStopped();
 }
 
 
 void
 DepotMatchingRepositoryListener::Complete()
 {
-	int32 i;
-
-	for (i = 0; i < fDepotList->CountItems(); i++) {
-		const DepotInfo& depot = fDepotList->ItemAt(i);
-
-		if (depot.WebAppRepositoryCode().Length() == 0) {
-			printf("depot [%s]", depot.Name().String());
-
-			if (depot.BaseURL().Length() > 0)
-				printf(" (%s)", depot.BaseURL().String());
-
-			printf(" correlates with no repository in the haiku"
-				"depot server system\n");
-		}
-	}
 }
 
 
 RepositoryDataUpdateProcess::RepositoryDataUpdateProcess(
+	AbstractServerProcessListener* listener,
 	const BPath& localFilePath,
-	DepotList* depotList)
+	Model* model,
+	uint32 options)
+	:
+	AbstractSingleFileServerProcess(listener, options),
+	fLocalFilePath(localFilePath),
+	fModel(model)
 {
-	fLocalFilePath = localFilePath;
-	fDepotList = depotList;
 }
 
 
@@ -172,46 +153,32 @@ RepositoryDataUpdateProcess::~RepositoryDataUpdateProcess()
 }
 
 
-status_t
-RepositoryDataUpdateProcess::Run()
+const char*
+RepositoryDataUpdateProcess::Name()
 {
-	printf("will fetch repositories data\n");
+	return "RepositoryDataUpdateProcess";
+}
 
-		// TODO: add language ISO code to the path; just 'en' for now.
-	status_t result = DownloadToLocalFile(fLocalFilePath,
-		ServerSettings::CreateFullUrl("/__repository/all-en.json.gz"),
-		0, 0);
 
-	if (result == B_OK || result == APP_ERR_NOT_MODIFIED) {
-		printf("did fetch repositories data\n");
+BString
+RepositoryDataUpdateProcess::UrlPathComponent()
+{
+	return BString("/__repository/all-en.json.gz");
+}
 
-			// now load the data in and process it.
 
-		printf("will process repository data and match to depots\n");
-		result = PopulateDataToDepots();
-
-		switch (result) {
-			case B_OK:
-				printf("did process repository data and match to depots\n");
-				break;
-			default:
-				MoveDamagedFileAside(fLocalFilePath);
-				break;
-		}
-
-	} else {
-		printf("an error has arisen downloading the repositories' data\n");
-	}
-
-	return result;
+BPath&
+RepositoryDataUpdateProcess::LocalPath()
+{
+	return fLocalFilePath;
 }
 
 
 status_t
-RepositoryDataUpdateProcess::PopulateDataToDepots()
+RepositoryDataUpdateProcess::ProcessLocalData()
 {
 	DepotMatchingRepositoryListener* itemListener =
-		new DepotMatchingRepositoryListener(fDepotList);
+		new DepotMatchingRepositoryListener(fModel, this);
 
 	BulkContainerDumpExportRepositoryJsonListener* listener =
 		new BulkContainerDumpExportRepositoryJsonListener(itemListener);
@@ -237,11 +204,4 @@ RepositoryDataUpdateProcess::GetStandardMetaDataJsonPath(
 	BString& jsonPath) const
 {
 	jsonPath.SetTo("$.info");
-}
-
-
-const char*
-RepositoryDataUpdateProcess::LoggingName() const
-{
-	return "repo-data-update";
 }

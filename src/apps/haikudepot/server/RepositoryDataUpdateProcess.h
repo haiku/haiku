@@ -7,8 +7,9 @@
 #define REPOSITORY_DATA_UPDATE_PROCESS_H
 
 
-#include "AbstractServerProcess.h"
+#include "AbstractSingleFileServerProcess.h"
 
+#include "Model.h"
 #include "PackageInfo.h"
 
 #include <File.h>
@@ -17,27 +18,29 @@
 #include <Url.h>
 
 
-class RepositoryDataUpdateProcess : public AbstractServerProcess {
+class RepositoryDataUpdateProcess : public AbstractSingleFileServerProcess {
 public:
 
 								RepositoryDataUpdateProcess(
+									AbstractServerProcessListener* listener,
 									const BPath& localFilePath,
-									DepotList* depotList);
+									Model* model, uint32 options);
 	virtual						~RepositoryDataUpdateProcess();
 
-			status_t			Run();
+			const char*				Name();
 
 protected:
 			void				GetStandardMetaDataPath(BPath& path) const;
 			void				GetStandardMetaDataJsonPath(
 									BString& jsonPath) const;
-			const char*			LoggingName() const;
+
+			BString				UrlPathComponent();
+			status_t			ProcessLocalData();
+			BPath&				LocalPath();
 
 private:
-			status_t			PopulateDataToDepots();
-
 			BPath				fLocalFilePath;
-			DepotList*			fDepotList;
+			Model*				fModel;
 
 };
 

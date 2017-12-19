@@ -1,7 +1,7 @@
 /*
  * Generated Model Object
  * source json-schema : dumpexport.json
- * generated at : 2017-11-11T13:59:22.559632
+ * generated at : 2017-12-07T23:22:33.022114
  */
 #include "DumpExportRepositorySource.h"
 
@@ -9,6 +9,7 @@
 DumpExportRepositorySource::DumpExportRepositorySource()
 {
     fUrl = NULL;
+    fRepoInfoUrl = NULL;
     fCode = NULL;
 }
 
@@ -17,6 +18,10 @@ DumpExportRepositorySource::~DumpExportRepositorySource()
 {
     if (fUrl != NULL) {
         delete fUrl;
+    }
+
+    if (fRepoInfoUrl != NULL) {
+        delete fRepoInfoUrl;
     }
 
     if (fCode != NULL) {
@@ -53,6 +58,37 @@ bool
 DumpExportRepositorySource::UrlIsNull()
 {
     return fUrl == NULL;
+}
+
+
+BString*
+DumpExportRepositorySource::RepoInfoUrl()
+{
+    return fRepoInfoUrl;
+}
+
+
+void
+DumpExportRepositorySource::SetRepoInfoUrl(BString* value)
+{
+    fRepoInfoUrl = value;
+}
+
+
+void
+DumpExportRepositorySource::SetRepoInfoUrlNull()
+{
+    if (!RepoInfoUrlIsNull()) {
+        delete fRepoInfoUrl;
+        fRepoInfoUrl = NULL;
+    }
+}
+
+
+bool
+DumpExportRepositorySource::RepoInfoUrlIsNull()
+{
+    return fRepoInfoUrl == NULL;
 }
 
 

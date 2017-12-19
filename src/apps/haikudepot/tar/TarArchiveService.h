@@ -7,6 +7,7 @@
 #define TAR_ARCHIVE_SERVICE_H
 
 #include "AbstractServerProcess.h"
+#include "Stoppable.h"
 #include "TarArchiveHeader.h"
 
 #include <String.h>
@@ -16,7 +17,8 @@
 class TarArchiveService {
 public:
 		static status_t			Unpack(BDataIO& tarDataIo,
-									BPath& targetDirectoryPath);
+									BPath& targetDirectoryPath,
+									Stoppable* stoppable);
 
 private:
 		static status_t			_EnsurePathToTarItemFile(

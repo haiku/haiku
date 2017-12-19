@@ -19,7 +19,8 @@
 
 
 status_t
-TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory)
+TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
+	Stoppable* stoppable)
 {
 	uint8 buffer[LENGTH_BLOCK];
 	uint8 zero_buffer[LENGTH_BLOCK];
@@ -30,8 +31,9 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory)
 
 	memset(zero_buffer, 0, sizeof zero_buffer);
 
-	while (B_OK == result && B_OK == (result = tarDataIo.ReadExactly(buffer,
-		LENGTH_BLOCK))) {
+	while (B_OK == result
+		&& (NULL == stoppable || !stoppable->WasStopped())
+		&& B_OK == (result = tarDataIo.ReadExactly(buffer, LENGTH_BLOCK))) {
 
 		count_items_read++;
 

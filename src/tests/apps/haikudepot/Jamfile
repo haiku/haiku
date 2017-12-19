@@ -9,6 +9,16 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportreposito
 
 UsePrivateHeaders shared ;
 
+local sourceDirs =
+	server
+	server/dumpexportrepository
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
+}
+
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
 
@@ -17,15 +27,11 @@ UnitTestLib haikudepottest.so :
 	DumpExportRepositoryJsonListener.cpp
 	DumpExportRepositoryJsonListenerTest.cpp
 
+	ListTest.cpp
+
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaDataJsonEventListenerTest.cpp
 
-	: be shared bnetapi [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be shared bnetapi package [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
-
-SEARCH on [ FGristFiles StandardMetaData.cpp StandardMetaDataJsonEventListener.cpp ]
-	= [ FDirName $(HAIKU_TOP) src apps haikudepot server ] ;
-
-SEARCH on [ FGristFiles DumpExportRepositorySource.cpp DumpExportRepository.cpp DumpExportRepositoryJsonListener.cpp ]
-	= [ FDirName $(HAIKU_TOP) src apps haikudepot server dumpexportrepository ] ;

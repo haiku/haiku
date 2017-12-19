@@ -7,8 +7,9 @@
 #define PACKAGE_DATA_UPDATE_PROCESS_H
 
 
-#include "AbstractServerProcess.h"
+#include "AbstractSingleFileServerProcess.h"
 
+#include "Model.h"
 #include "PackageInfo.h"
 
 #include <File.h>
@@ -17,34 +18,37 @@
 #include <Url.h>
 
 
-class PkgDataUpdateProcess : public AbstractServerProcess {
+class PkgDataUpdateProcess : public AbstractSingleFileServerProcess {
 public:
 								PkgDataUpdateProcess(
+									AbstractServerProcessListener* listener,
 									const BPath& localFilePath,
-									BLocker& lock,
 									BString naturalLanguageCode,
 									BString repositorySourceCode,
-									const PackageList& packages,
-									const CategoryList& categories);
+									BString depotName,
+									Model *model,
+									uint32 options);
 	virtual						~PkgDataUpdateProcess();
 
-			status_t			Run();
+			const char*				Name();
 
 protected:
 			void				GetStandardMetaDataPath(BPath& path) const;
 			void				GetStandardMetaDataJsonPath(
 									BString& jsonPath) const;
-			const char*			LoggingName() const;
+
+			BString				UrlPathComponent();
+			status_t			ProcessLocalData();
+			BPath&				LocalPath();
 
 private:
-			status_t			PopulateDataToDepots();
 
 			BPath				fLocalFilePath;
 			BString				fNaturalLanguageCode;
 			BString				fRepositorySourceCode;
-	const	PackageList&		fPackages;
-	const 	CategoryList&		fCategories;
-			BLocker&			fLock;
+			Model*				fModel;
+			BString				fDepotName;
+			BString				fName;
 
 };
 

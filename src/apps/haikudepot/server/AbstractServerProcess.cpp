@@ -4,13 +4,15 @@
  */
 #include "AbstractServerProcess.h"
 
+#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 
 #include <AutoDeleter.h>
+#include <Autolock.h>
 #include <FileIO.h>
-#include <HttpRequest.h>
 #include <HttpTime.h>
+#include <Locker.h>
 #include <UrlProtocolRoster.h>
 
 #include <support/ZlibCompressionAlgorithm.h>
@@ -18,6 +20,7 @@
 #include "Logger.h"
 #include "ServerSettings.h"
 #include "StandardMetaDataJsonEventListener.h"
+#include "StorageUtils.h"
 #include "ToFileUrlProtocolListener.h"
 
 
@@ -29,6 +32,140 @@
 
 // 30 seconds
 #define TIMEOUT_MICROSECONDS 3e+7
+
+
+AbstractServerProcess::AbstractServerProcess(
+	AbstractServerProcessListener* listener, uint32 options)
+	:
+	fLock(),
+	fListener(listener),
+	fWasStopped(false),
+	fProcessState(SERVER_PROCESS_INITIAL),
+	fErrorStatus(B_OK),
+	fOptions(options),
+	fRequest(NULL)
+{
+}
+
+
+AbstractServerProcess::~AbstractServerProcess()
+{
+}
+
+
+bool
+AbstractServerProcess::HasOption(uint32 flag)
+{
+	return (fOptions & flag) == flag;
+}
+
+
+bool
+AbstractServerProcess::ShouldAttemptNetworkDownload(bool hasDataAlready)
+{
+	return
+		!HasOption(SERVER_PROCESS_NO_NETWORKING)
+		&& !(HasOption(SERVER_PROCESS_PREFER_CACHE) && hasDataAlready);
+}
+
+
+status_t
+AbstractServerProcess::Run()
+{
+	{
+		BAutolock locker(&fLock);
+
+		if (ProcessState() != SERVER_PROCESS_INITIAL) {
+			printf("cannot start server process as it is not idle");
+			return B_NOT_ALLOWED;
+		}
+
+		fProcessState = SERVER_PROCESS_RUNNING;
+	}
+
+	SetErrorStatus(RunInternal());
+
+	SetProcessState(SERVER_PROCESS_COMPLETE);
+
+		// this process may be part of a larger bulk-load process and
+		// if so, the process orchestration needs to know when this
+		// process has completed.
+
+	if (fListener != NULL)
+		fListener->ServerProcessExited();
+
+	return ErrorStatus();
+}
+
+
+bool
+AbstractServerProcess::WasStopped()
+{
+	BAutolock locker(&fLock);
+	return fWasStopped;
+}
+
+
+status_t
+AbstractServerProcess::ErrorStatus()
+{
+	BAutolock locker(&fLock);
+	return fErrorStatus;
+}
+
+
+status_t
+AbstractServerProcess::Stop()
+{
+	BAutolock locker(&fLock);
+	fWasStopped = true;
+	return StopInternal();
+}
+
+
+status_t
+AbstractServerProcess::StopInternal()
+{
+	if (fRequest != NULL) {
+		return fRequest->Stop();
+	}
+
+	return B_NOT_ALLOWED;
+}
+
+
+bool
+AbstractServerProcess::IsRunning()
+{
+	return ProcessState() == SERVER_PROCESS_RUNNING;
+}
+
+
+void
+AbstractServerProcess::SetErrorStatus(status_t value)
+{
+	BAutolock locker(&fLock);
+
+	if (fErrorStatus == B_OK) {
+		fErrorStatus = value;
+	}
+}
+
+
+void
+AbstractServerProcess::SetProcessState(process_state value)
+{
+	BAutolock locker(&fLock);
+	fProcessState = value;
+}
+
+
+process_state
+AbstractServerProcess::ProcessState()
+{
+	BAutolock locker(&fLock);
+	return fProcessState;
+}
 
 
 status_t
@@ -74,8 +211,9 @@ AbstractServerProcess::IfModifiedSinceHeaderValue(BString& headerValue,
 		headerValue.SetTo(modifiedHttpTime
 			.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
 	} else {
-		fprintf(stderr, "unable to parse the meta-data date and time -"
-			" cannot set the 'If-Modified-Since' header\n");
+		fprintf(stderr, "unable to parse the meta-data date and time from [%s]"
+			" - cannot set the 'If-Modified-Since' header\n",
+			metaDataPath.Path());
 	}
 
 	return result;
@@ -163,10 +301,52 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 }
 
 
+/*! In order to reduce the chance of failure half way through downloading a
+    large file, this method will download the file to a temporary file and
+    then it can rename the file to the final target file.
+*/
+
+status_t
+AbstractServerProcess::DownloadToLocalFileAtomically(
+	const BPath& targetFilePath,
+	const BUrl& url)
+{
+	BPath temporaryFilePath(tmpnam(NULL), NULL, true);
+	status_t result = DownloadToLocalFile(
+		temporaryFilePath, url, 0, 0);
+
+		// not copying if the data has not changed because the data will be
+		// zero length.  This is if the result is APP_ERR_NOT_MODIFIED.
+	if (result == B_OK) {
+
+			// if the file is zero length then assume that something has
+			// gone wrong.
+		off_t size;
+		bool hasFile;
+
+		result = StorageUtils::ExistsObject(temporaryFilePath, &hasFile, NULL,
+			&size);
+
+		if (result == B_OK && hasFile && size > 0) {
+			if (rename(temporaryFilePath.Path(), targetFilePath.Path()) != 0) {
+				printf("[%s] did rename [%s] --> [%s]\n",
+					Name(), temporaryFilePath.Path(), targetFilePath.Path());
+				result = B_IO_ERROR;
+			}
+		}
+	}
+
+	return result;
+}
+
+
 status_t
 AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 	const BUrl& url, uint32 redirects, uint32 failures)
 {
+	if (WasStopped())
+		return B_CANCELED;
+
 	if (redirects > MAX_REDIRECTS) {
 		fprintf(stdout, "exceeded %d redirects --> failure\n", MAX_REDIRECTS);
 		return B_IO_ERROR;
@@ -177,10 +357,10 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		return B_IO_ERROR;
 	}
 
-	fprintf(stdout, "will stream '%s' to [%s]\n", url.UrlString().String(),
-		targetFilePath.Path());
+	fprintf(stdout, "[%s] will stream '%s' to [%s]\n",
+		Name(), url.UrlString().String(), targetFilePath.Path());
 
-	ToFileUrlProtocolListener listener(targetFilePath, LoggingName(),
+	ToFileUrlProtocolListener listener(targetFilePath, Name(),
 		Logger::IsTraceEnabled());
 
 	BHttpHeaders headers;
@@ -195,54 +375,74 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		headers.AddHeader("If-Modified-Since", ifModifiedSinceHeader);
 	}
 
-	BHttpRequest *request = dynamic_cast<BHttpRequest *>(
-		BUrlProtocolRoster::MakeRequest(url, &listener));
-	ObjectDeleter<BHttpRequest> requestDeleter(request);
-	request->SetHeaders(headers);
-	request->SetMaxRedirections(0);
-	request->SetTimeout(TIMEOUT_MICROSECONDS);
+	thread_id thread;
 
-	thread_id thread = request->Run();
+	{
+		fRequest = dynamic_cast<BHttpRequest *>(
+			BUrlProtocolRoster::MakeRequest(url, &listener));
+		fRequest->SetHeaders(headers);
+		fRequest->SetMaxRedirections(0);
+		fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
+		thread = fRequest->Run();
+	}
+
 	wait_for_thread(thread, NULL);
 
 	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request->Result());
-
+		fRequest->Result());
 	int32 statusCode = result.StatusCode();
+	const BHttpHeaders responseHeaders = result.Headers();
+	const char *locationC = responseHeaders["Location"];
+	BString location;
+
+	if (locationC != NULL)
+		location.SetTo(locationC);
+
+	delete fRequest;
+	fRequest = NULL;
 
 	if (BHttpRequest::IsSuccessStatusCode(statusCode)) {
-		fprintf(stdout, "did complete streaming data\n");
+		fprintf(stdout, "[%s] did complete streaming data [%"
+			B_PRIdSSIZE " bytes]\n", Name(), listener.ContentLength());
 		return B_OK;
 	} else if (statusCode == HTTP_STATUS_NOT_MODIFIED) {
-		fprintf(stdout, "remote data has not changed since [%s]\n",
-			ifModifiedSinceHeader.String());
+		fprintf(stdout, "[%s] remote data has not changed since [%s]\n",
+			Name(), ifModifiedSinceHeader.String());
 		return APP_ERR_NOT_MODIFIED;
 	} else if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
-		const BHttpHeaders responseHeaders = result.Headers();
-		const char *locationValue = responseHeaders["Location"];
-
-		if (locationValue != NULL && strlen(locationValue) != 0) {
-			BUrl location(result.Url(), locationValue);
-			fprintf(stdout, "will redirect to; %s\n",
-				location.UrlString().String());
-				return DownloadToLocalFile(targetFilePath, location,
-					redirects + 1, 0);
+		if (location.Length() != 0) {
+			BUrl location(result.Url(), location);
+			fprintf(stdout, "[%s] will redirect to; %s\n",
+				Name(), location.UrlString().String());
+			return DownloadToLocalFile(targetFilePath, location,
+				redirects + 1, 0);
 		}
 
-		fprintf(stdout, "unable to find 'Location' header for redirect\n");
+		fprintf(stdout, "[%s] unable to find 'Location' header for redirect\n",
+			Name());
 		return B_IO_ERROR;
 	} else {
 		if (statusCode == 0 || (statusCode / 100) == 5) {
-			fprintf(stdout, "error response from server; %" B_PRId32 " --> "
+			fprintf(stdout, "error response from server [%" B_PRId32 "] --> "
 				"retry...\n", statusCode);
 			return DownloadToLocalFile(targetFilePath, url, redirects,
 				failures + 1);
 		}
 
-		fprintf(stdout, "unexpected response from server; %" B_PRId32 "\n",
-			statusCode);
+		fprintf(stdout, "[%s] unexpected response from server [%" B_PRId32 "]\n",
+			Name(), statusCode);
 		return B_IO_ERROR;
 	}
+}
+
+
+status_t
+AbstractServerProcess::DeleteLocalFile(const BPath& currentFilePath)
+{
+	if (0 == remove(currentFilePath.Path()))
+		return B_OK;
+
+	return B_IO_ERROR;
 }
 
 
@@ -263,13 +463,19 @@ AbstractServerProcess::MoveDamagedFileAside(const BPath& currentFilePath)
 	damagedFilePath.Append(damagedLeaf.String());
 
 	if (0 != rename(currentFilePath.Path(), damagedFilePath.Path())) {
-		printf("unable to move damaged file [%s] aside to [%s]\n",
-			currentFilePath.Path(), damagedFilePath.Path());
+		printf("[%s] unable to move damaged file [%s] aside to [%s]\n",
+			Name(), currentFilePath.Path(), damagedFilePath.Path());
 		return B_IO_ERROR;
 	}
 
-	printf("did move damaged file [%s] aside to [%s]\n",
-		currentFilePath.Path(), damagedFilePath.Path());
+	printf("[%s] did move damaged file [%s] aside to [%s]\n",
+		Name(), currentFilePath.Path(), damagedFilePath.Path());
 
 	return B_OK;
+}
+
+
+bool
+AbstractServerProcess::IsSuccess(status_t e) {
+	return e == B_OK || e == APP_ERR_NOT_MODIFIED;
 }

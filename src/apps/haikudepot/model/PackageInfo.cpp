@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -1047,10 +1047,35 @@ DepotInfo::operator!=(const DepotInfo& other) const
 }
 
 
+static int32 PackageCompare(const PackageInfoRef& p1, const PackageInfoRef& p2)
+{
+	return p1->Name().Compare(p2->Name());
+}
+
+
+/*! This method will insert the package into the list of packages
+    in order so that the list of packages remains in order.
+ */
+
 bool
 DepotInfo::AddPackage(const PackageInfoRef& package)
 {
-	return fPackages.Add(package);
+	return fPackages.AddOrdered(package, &PackageCompare);
+}
+
+
+static int32 PackageFixedNameCompare(const void* context,
+	const PackageInfoRef& package)
+{
+	const BString* packageName = static_cast<BString*>(context);
+	return packageName->Compare(package->Name());
+}
+
+
+int32
+DepotInfo::PackageIndexByName(const BString& packageName)
+{
+	return fPackages.BinarySearch(&packageName, &PackageFixedNameCompare);
 }
 
 
