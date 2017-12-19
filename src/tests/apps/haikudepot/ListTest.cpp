@@ -33,7 +33,7 @@ static int32 CompareStrings(const BString& a, const BString& b)
 
 static int32 CompareWithContextString(const void* context, const BString& str)
 {
-	const char* contextString = static_cast<char*>(context);
+	const char* contextString = static_cast<const char*>(context);
 	return -1 * str.Compare(contextString);
 }
 
