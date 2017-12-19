@@ -411,10 +411,10 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		return APP_ERR_NOT_MODIFIED;
 	} else if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
 		if (location.Length() != 0) {
-			BUrl location(result.Url(), location);
+			BUrl redirectUrl(result.Url(), location);
 			fprintf(stdout, "[%s] will redirect to; %s\n",
-				Name(), location.UrlString().String());
-			return DownloadToLocalFile(targetFilePath, location,
+				Name(), redirectUrl.UrlString().String());
+			return DownloadToLocalFile(targetFilePath, redirectUrl,
 				redirects + 1, 0);
 		}
 

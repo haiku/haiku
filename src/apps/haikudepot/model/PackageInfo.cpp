@@ -1067,7 +1067,7 @@ DepotInfo::AddPackage(const PackageInfoRef& package)
 static int32 PackageFixedNameCompare(const void* context,
 	const PackageInfoRef& package)
 {
-	const BString* packageName = static_cast<BString*>(context);
+	const BString* packageName = static_cast<const BString*>(context);
 	return packageName->Compare(package->Name());
 }
 
