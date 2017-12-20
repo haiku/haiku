@@ -1681,8 +1681,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	status_t status;
 	struct team_arg* teamArgs;
 	struct team_loading_info loadingInfo;
-	io_context* parentIOContext = NULL, *ourIOContext = NULL;
+	io_context* parentIOContext = NULL;
 	team_id teamID;
+	bool teamLimitReached = false;
 
 	if (flatArgs == NULL || argCount == 0)
 		return B_BAD_VALUE;
@@ -1731,18 +1732,6 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	// inherit the parent's user/group
 	inherit_parent_user_and_group(team, parent);
 
- 	InterruptsSpinLocker teamsLocker(sTeamHashLock);
-
-	sTeamHash.Insert(team);
-	bool teamLimitReached = sUsedTeams >= sMaxTeams;
-	if (!teamLimitReached)
-		sUsedTeams++;
-
-	teamsLocker.Unlock();
-
-	insert_team_into_parent(parent, team);
-	insert_team_into_group(parent->group, team);
-
 	// get a reference to the parent's I/O context -- we need it to create ours
 	parentIOContext = parent->io_context;
 	vfs_get_io_context(parentIOContext);
@@ -1750,16 +1739,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	team->Unlock();
 	parent->UnlockTeamAndProcessGroup();
 
-	// notify team listeners
-	sNotificationService.Notify(TEAM_ADDED, team);
-
 	// check the executable's set-user/group-id permission
 	update_set_id_user_and_group(team, path);
-
-	if (teamLimitReached) {
-		status = B_NO_MORE_TEAMS;
-		goto err1;
-	}
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
 		envCount, (mode_t)-1, errorPort, errorToken);
@@ -1770,10 +1751,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// args are owned by the team_arg structure now
 
 	// create a new io_context for this team
-	ourIOContext = vfs_new_io_context(parentIOContext, true);
-	team->Lock();
-	team->io_context = ourIOContext;
-	team->Unlock();
+	team->io_context = vfs_new_io_context(parentIOContext, true);
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
 		goto err2;
@@ -1800,6 +1778,33 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	if (status != B_OK)
 		goto err4;
 
+	// insert the team into its parent and the teams hash
+	parent->LockTeamAndProcessGroup();
+	team->Lock();
+
+	{
+		InterruptsSpinLocker teamsLocker(sTeamHashLock);
+
+		sTeamHash.Insert(team);
+		teamLimitReached = sUsedTeams >= sMaxTeams;
+		if (!teamLimitReached)
+			sUsedTeams++;
+	}
+
+	insert_team_into_parent(parent, team);
+	insert_team_into_group(parent->group, team);
+
+	team->Unlock();
+	parent->UnlockTeamAndProcessGroup();
+
+	// notify team listeners
+	sNotificationService.Notify(TEAM_ADDED, team);
+
+	if (teamLimitReached) {
+		status = B_NO_MORE_TEAMS;
+		goto err6;
+	}
+
 	// In case we start the main thread, we shouldn't access the team object
 	// afterwards, so cache the team's ID.
 	teamID = team->id;
@@ -1814,7 +1819,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		thread = thread_create_thread(threadAttributes, false);
 		if (thread < 0) {
 			status = thread;
-			goto err5;
+			goto err6;
 		}
 	}
 
@@ -1846,16 +1851,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	return thread;
 
-err5:
-	delete_team_user_data(team);
-err4:
-	team->address_space->Put();
-err2:
-	free_team_arg(teamArgs);
-err1:
-	if (parentIOContext != NULL)
-		vfs_put_io_context(parentIOContext);
-
+err6:
 	// Remove the team structure from the process group, the parent team, and
 	// the team hash table and delete the team structure.
 	parent->LockTeamAndProcessGroup();
@@ -1867,13 +1863,23 @@ err1:
 	team->Unlock();
 	parent->UnlockTeamAndProcessGroup();
 
-	teamsLocker.Lock();
-	sTeamHash.Remove(team);
-	if (!teamLimitReached)
-		sUsedTeams--;
-	teamsLocker.Unlock();
+	{
+		InterruptsSpinLocker teamsLocker(sTeamHashLock);
+		sTeamHash.Remove(team);
+		if (!teamLimitReached)
+			sUsedTeams--;
+	}
 
 	sNotificationService.Notify(TEAM_REMOVED, team);
+
+	delete_team_user_data(team);
+err4:
+	team->address_space->Put();
+err2:
+	free_team_arg(teamArgs);
+err1:
+	if (parentIOContext != NULL)
+		vfs_put_io_context(parentIOContext);
 
 	return status;
 }
@@ -2038,7 +2044,7 @@ fork_team(void)
 	thread_id threadID;
 	status_t status;
 	ssize_t areaCookie;
-	io_context* ourIOContext = NULL;
+	bool teamLimitReached = false;
 
 	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
@@ -2075,32 +2081,12 @@ fork_team(void)
 	// inherit signal handlers
 	team->InheritSignalActions(parentTeam);
 
-	InterruptsSpinLocker teamsLocker(sTeamHashLock);
-
-	sTeamHash.Insert(team);
-	bool teamLimitReached = sUsedTeams >= sMaxTeams;
-	if (!teamLimitReached)
-		sUsedTeams++;
-
-	teamsLocker.Unlock();
-
-	insert_team_into_parent(parentTeam, team);
-	insert_team_into_group(parentTeam->group, team);
-
 	team->Unlock();
 	parentTeam->UnlockTeamAndProcessGroup();
-
-	// notify team listeners
-	sNotificationService.Notify(TEAM_ADDED, team);
 
 	// inherit some team debug flags
 	team->debug_info.flags |= atomic_get(&parentTeam->debug_info.flags)
 		& B_TEAM_DEBUG_INHERITED_FLAGS;
-
-	if (teamLimitReached) {
-		status = B_NO_MORE_TEAMS;
-		goto err1;
-	}
 
 	forkArgs = (arch_fork_arg*)malloc(sizeof(arch_fork_arg));
 	if (forkArgs == NULL) {
@@ -2109,10 +2095,7 @@ fork_team(void)
 	}
 
 	// create a new io_context for this team
-	ourIOContext = vfs_new_io_context(parentTeam->io_context, false);
-	team->Lock();
-	team->io_context = ourIOContext;
-	team->Unlock();
+	team->io_context = vfs_new_io_context(parentTeam->io_context, false);
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
 		goto err2;
@@ -2187,6 +2170,33 @@ fork_team(void)
 	if (copy_images(parentTeam->id, team) != B_OK)
 		goto err5;
 
+	// insert the team into its parent and the teams hash
+	parentTeam->LockTeamAndProcessGroup();
+	team->Lock();
+
+	{
+		InterruptsSpinLocker teamsLocker(sTeamHashLock);
+
+		sTeamHash.Insert(team);
+		teamLimitReached = sUsedTeams >= sMaxTeams;
+		if (!teamLimitReached)
+			sUsedTeams++;
+	}
+
+	insert_team_into_parent(parentTeam, team);
+	insert_team_into_group(parentTeam->group, team);
+
+	team->Unlock();
+	parentTeam->UnlockTeamAndProcessGroup();
+
+	// notify team listeners
+	sNotificationService.Notify(TEAM_ADDED, team);
+
+	if (teamLimitReached) {
+		status = B_NO_MORE_TEAMS;
+		goto err6;
+	}
+
 	// create the main thread
 	{
 		ThreadCreationAttributes threadCreationAttributes(NULL,
@@ -2196,7 +2206,7 @@ fork_team(void)
 		threadID = thread_create_thread(threadCreationAttributes, false);
 		if (threadID < 0) {
 			status = threadID;
-			goto err5;
+			goto err6;
 		}
 	}
 
@@ -2208,15 +2218,7 @@ fork_team(void)
 	resume_thread(threadID);
 	return threadID;
 
-err5:
-	remove_images(team);
-err4:
-	team->address_space->RemoveAndPut();
-err3:
-	delete_realtime_sem_context(team->realtime_sem_context);
-err2:
-	free(forkArgs);
-err1:
+err6:
 	// Remove the team structure from the process group, the parent team, and
 	// the team hash table and delete the team structure.
 	parentTeam->LockTeamAndProcessGroup();
@@ -2228,14 +2230,23 @@ err1:
 	team->Unlock();
 	parentTeam->UnlockTeamAndProcessGroup();
 
-	teamsLocker.Lock();
-	sTeamHash.Remove(team);
-	if (!teamLimitReached)
-		sUsedTeams--;
-	teamsLocker.Unlock();
+	{
+		InterruptsSpinLocker teamsLocker(sTeamHashLock);
+		sTeamHash.Remove(team);
+		if (!teamLimitReached)
+			sUsedTeams--;
+	}
 
 	sNotificationService.Notify(TEAM_REMOVED, team);
-
+err5:
+	remove_images(team);
+err4:
+	team->address_space->RemoveAndPut();
+err3:
+	delete_realtime_sem_context(team->realtime_sem_context);
+err2:
+	free(forkArgs);
+err1:
 	team->ReleaseReference();
 
 	return status;
