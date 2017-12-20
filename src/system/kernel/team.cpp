@@ -1681,7 +1681,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	status_t status;
 	struct team_arg* teamArgs;
 	struct team_loading_info loadingInfo;
-	io_context* parentIOContext = NULL;
+	io_context* parentIOContext = NULL, *ourIOContext = NULL;
 	team_id teamID;
 
 	if (flatArgs == NULL || argCount == 0)
@@ -1770,8 +1770,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// args are owned by the team_arg structure now
 
 	// create a new io_context for this team
+	ourIOContext = vfs_new_io_context(parentIOContext, true);
 	team->Lock();
-	team->io_context = vfs_new_io_context(parentIOContext, true);
+	team->io_context = ourIOContext;
 	team->Unlock();
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
@@ -2037,6 +2038,7 @@ fork_team(void)
 	thread_id threadID;
 	status_t status;
 	ssize_t areaCookie;
+	io_context* ourIOContext = NULL;
 
 	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
@@ -2107,8 +2109,9 @@ fork_team(void)
 	}
 
 	// create a new io_context for this team
+	ourIOContext = vfs_new_io_context(parentTeam->io_context, false);
 	team->Lock();
-	team->io_context = vfs_new_io_context(parentTeam->io_context, false);
+	team->io_context = ourIOContext;
 	team->Unlock();
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
