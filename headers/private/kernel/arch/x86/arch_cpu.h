@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
@@ -206,6 +207,62 @@
 #define IA32_FEATURE_APERFMPERF	(1 << 0) //IA32_APERF, IA32_MPERF
 #define IA32_FEATURE_EPB	(1 << 3) //IA32_ENERGY_PERF_BIAS
 
+// x86 features from cpuid eax 7, ebx register
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 3-8)
+#define IA32_FEATURE_TSC_ADJUST	(1 << 1) // IA32_TSC_ADJUST MSR supported
+#define IA32_FEATURE_SGX		(1 << 2) // Software Guard Extensions
+#define IA32_FEATURE_BMI1		(1 << 3) // Bit Manipulation Instruction Set 1
+#define IA32_FEATURE_HLE		(1 << 4) // Hardware Lock Elision
+#define IA32_FEATURE_AVX2		(1 << 5) // Advanced Vector Extensions 2
+#define IA32_FEATURE_SMEP		(1 << 7) // Supervisor-Mode Execution Prevention
+#define IA32_FEATURE_BMI2		(1 << 8) // Bit Manipulation Instruction Set 2
+#define IA32_FEATURE_ERMS		(1 << 9) // Enhanced REP MOVSB/STOSB
+#define IA32_FEATURE_INVPCID	(1 << 10) // INVPCID instruction
+#define IA32_FEATURE_RTM		(1 << 11) // Transactional Synchronization Extensions
+#define IA32_FEATURE_CQM		(1 << 12) // Platform Quality of Service Monitoring
+#define IA32_FEATURE_MPX		(1 << 14) // Memory Protection Extensions
+#define IA32_FEATURE_RDT_A		(1 << 15) // Resource Director Technology Allocation
+#define IA32_FEATURE_AVX512F	(1 << 16) // AVX-512 Foundation
+#define IA32_FEATURE_AVX512DQ	(1 << 17) // AVX-512 Doubleword and Quadword Instructions
+#define IA32_FEATURE_RDSEED		(1 << 18) // RDSEED instruction
+#define IA32_FEATURE_ADX		(1 << 19) // ADX (Multi-Precision Add-Carry Instruction Extensions)
+#define IA32_FEATURE_SMAP		(1 << 20) // Supervisor Mode Access Prevention
+#define IA32_FEATURE_AVX512IFMA	(1 << 21) // AVX-512 Integer Fused Multiply-Add Instructions
+#define IA32_FEATURE_PCOMMIT	(1 << 22) // PCOMMIT instruction
+#define IA32_FEATURE_CLFLUSHOPT	(1 << 23) // CLFLUSHOPT instruction
+#define IA32_FEATURE_CLWB		(1 << 24) // CLWB instruction
+#define IA32_FEATURE_INTEL_PT	(1 << 25) // Intel Processor Trace
+#define IA32_FEATURE_AVX512PF	(1 << 26) // AVX-512 Prefetch Instructions
+#define IA32_FEATURE_AVX512ER	(1 << 27) // AVX-512 Exponential and Reciprocal Instructions
+#define IA32_FEATURE_AVX512CD	(1 << 28) // AVX-512 Conflict Detection Instructions
+#define IA32_FEATURE_SHA_NI		(1 << 29) // SHA extensions
+#define IA32_FEATURE_AVX512BW	(1 << 30) // AVX-512 Byte and Word Instructions
+#define IA32_FEATURE_AVX512VI	(1 << 31) // AVX-512 Vector Length Extensions
+
+// x86 features from cpuid eax 7, ecx register
+// reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 3-8)
+// https://en.wikipedia.org/wiki/CPUID#EAX=7,_ECX=0:_Extended_Features
+#define IA32_FEATURE_AVX512VMBI		(1 << 1) // AVX-512 Vector Bit Manipulation Instructions
+#define IA32_FEATURE_UMIP			(1 << 2) // User-mode Instruction Prevention
+#define IA32_FEATURE_PKU			(1 << 3) // Memory Protection Keys for User-mode pages
+#define IA32_FEATURE_OSPKE			(1 << 4) // PKU enabled by OS
+#define IA32_FEATURE_AVX512VMBI2	(1 << 6) // AVX-512 Vector Bit Manipulation Instructions 2
+#define IA32_FEATURE_GFNI			(1 << 8) // Galois Field instructions
+#define IA32_FEATURE_VAES			(1 << 9) // AES instruction set (VEX-256/EVEX)
+#define IA32_FEATURE_VPCLMULQDQ		(1 << 10) // CLMUL instruction set (VEX-256/EVEX)
+#define IA32_FEATURE_AVX512_VNNI	(1 << 11) // AVX-512 Vector Neural Network Instructions
+#define IA32_FEATURE_AVX512_BITALG	(1 << 12) // AVX-512 BITALG instructions
+#define IA32_FEATURE_AVX512_VPOPCNTDQ (1 << 14) // AVX-512 Vector Population Count D/Q
+#define IA32_FEATURE_LA57			(1 << 16) // 5-level page tables
+#define IA32_FEATURE_RDPID			(1 << 22) // RDPID Instruction
+#define IA32_FEATURE_SGX_LC			(1 << 30) // SGX Launch Configuration
+
+// x86 features from cpuid eax 7, edx register
+// https://en.wikipedia.org/wiki/CPUID#EAX=7,_ECX=0:_Extended_Features
+#define IA32_FEATURE_AVX512_4VNNIW	(1 << 2) // AVX-512 4-register Neural Network Instructions
+#define IA32_FEATURE_AVX512_4FMAPS	(1 << 3) // AVX-512 4-register Multiply Accumulation Single precision
+
+
 // x86 defined features from cpuid eax 0x80000007, edx register
 #define IA32_FEATURE_INVARIANT_TSC		(1 << 8)
 
@@ -294,6 +351,9 @@ enum x86_feature_type {
 	FEATURE_5_ECX,			// cpuid eax=5, ecx register
 	FEATURE_6_EAX,          // cpuid eax=6, eax registers
 	FEATURE_6_ECX,          // cpuid eax=6, ecx registers
+	FEATURE_7_EBX,          // cpuid eax=7, ebx registers
+	FEATURE_7_ECX,          // cpuid eax=7, ecx registers
+	FEATURE_7_EDX,          // cpuid eax=7, edx registers
 	FEATURE_EXT_7_EDX,		// cpuid eax=0x80000007, edx register
 
 	FEATURE_NUM

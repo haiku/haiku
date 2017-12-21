@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
@@ -326,7 +327,7 @@ x86_init_fpu(void)
 static void
 dump_feature_string(int currentCPU, cpu_ent* cpu)
 {
-	char features[384];
+	char features[512];
 	features[0] = 0;
 
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
@@ -477,6 +478,64 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "aperfmperf ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_EPB)
 		strlcat(features, "epb ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_TSC_ADJUST)
+		strlcat(features, "tsc_adjust ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SGX)
+		strlcat(features, "sgx ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_BMI1)
+		strlcat(features, "bmi1 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_HLE)
+		strlcat(features, "hle ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX2)
+		strlcat(features, "avx2 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SMEP)
+		strlcat(features, "smep ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_BMI2)
+		strlcat(features, "bmi2 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_ERMS)
+		strlcat(features, "erms ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_INVPCID)
+		strlcat(features, "invpcid ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_RTM)
+		strlcat(features, "rtm ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_CQM)
+		strlcat(features, "cqm ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_MPX)
+		strlcat(features, "mpx ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_RDT_A)
+		strlcat(features, "rdt_a ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512F)
+		strlcat(features, "avx512f ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512DQ)
+		strlcat(features, "avx512dq ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_RDSEED)
+		strlcat(features, "rdseed ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_ADX)
+		strlcat(features, "adx ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SMAP)
+		strlcat(features, "smap ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512IFMA)
+		strlcat(features, "avx512ifma ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_PCOMMIT)
+		strlcat(features, "pcommit ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_CLFLUSHOPT)
+		strlcat(features, "cflushopt ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_CLWB)
+		strlcat(features, "clwb ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_INTEL_PT)
+		strlcat(features, "intel_pt ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512PF)
+		strlcat(features, "avx512pf ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512ER)
+		strlcat(features, "avx512er ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512CD)
+		strlcat(features, "avx512cd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SHA_NI)
+		strlcat(features, "sha_ni ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512BW)
+		strlcat(features, "avx512bw ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512VI)
+		strlcat(features, "avx512vi ", sizeof(features));
 
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
@@ -806,6 +865,9 @@ detect_cpu(int currentCPU)
 	cpu->arch.feature[FEATURE_COMMON] = 0;
 	cpu->arch.feature[FEATURE_EXT] = 0;
 	cpu->arch.feature[FEATURE_EXT_AMD] = 0;
+	cpu->arch.feature[FEATURE_7_EBX] = 0;
+	cpu->arch.feature[FEATURE_7_ECX] = 0;
+	cpu->arch.feature[FEATURE_7_EDX] = 0;
 	cpu->arch.model_name[0] = 0;
 
 	// print some fun data
@@ -913,6 +975,13 @@ detect_cpu(int currentCPU)
 		get_current_cpuid(&cpuid, 6, 0);
 		cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
 		cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
+	}
+
+	if (maxBasicLeaf >= 7) {
+		get_current_cpuid(&cpuid, 7, 0);
+		cpu->arch.feature[FEATURE_7_EBX] = cpuid.regs.ebx;
+		cpu->arch.feature[FEATURE_7_ECX] = cpuid.regs.ecx;
+		cpu->arch.feature[FEATURE_7_EDX] = cpuid.regs.edx;
 	}
 
 	if (maxExtendedLeaf >= 0x80000007) {
