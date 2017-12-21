@@ -144,7 +144,7 @@ CookieWindow::CookieWindow(BRect frame, BNetworkCookieJar& jar)
 		.Add(fCookies)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.SetInsets(5, 5, 5, 5)
-#if 0
+#if DEBUG
 			.Add(new BButton("import", B_TRANSLATE("Import" B_UTF8_ELLIPSIS),
 				NULL))
 			.Add(new BButton("export", B_TRANSLATE("Export" B_UTF8_ELLIPSIS),
@@ -303,7 +303,7 @@ CookieWindow::_AddDomain(BString domain, bool fake)
 		}
 	}
 
-#if 0
+#if DEBUG
 	puts("==============================");
 	for (i = 0; i < fDomains->FullListCountItems(); i++) {
 		BStringItem* t = (BStringItem*)fDomains->FullListItemAt(i);
@@ -373,19 +373,40 @@ CookieWindow::_ShowCookiesForDomain(BString domain)
 void
 CookieWindow::_DeleteCookies()
 {
-	// TODO shall we handle multiple selection here?
-	CookieRow* row = (CookieRow*)fCookies->CurrentSelection();
-	if (row == NULL) {
-		// TODO see if a domain is selected in the domain list, and delete all
-		// cookies for that domain
-		return;
+	CookieRow* row;
+	CookieRow* prevRow;
+
+	for (prevRow = NULL; ; prevRow = row) {
+		row = (CookieRow*)fCookies->CurrentSelection(prevRow);
+
+		if (prevRow != NULL) {
+			fCookies->RemoveRow(prevRow);
+			delete prevRow;
+		}
+
+		if (row == NULL)
+			break;
+
+		// delete this cookie
+		BNetworkCookie& cookie = row->Cookie();
+		cookie.SetExpirationDate(0);
+		fCookieJar.AddCookie(cookie);
 	}
 
-	fCookies->RemoveRow(row);
+	// A domain was selected in the domain list
+	if (prevRow == NULL) {
+		while (true) {
+			// Clear the first cookie continuously
+			row = (CookieRow*)fCookies->RowAt(0);
 
-	BNetworkCookie& cookie = row->Cookie();
-	cookie.SetExpirationDate(0);
-	fCookieJar.AddCookie(cookie);
+			if (row == NULL)
+				break;
 
-	delete row;
+			BNetworkCookie& cookie = row->Cookie();
+			cookie.SetExpirationDate(0);
+			fCookieJar.AddCookie(cookie);
+			fCookies->RemoveRow(row);
+			delete row;
+		}
+	}
 }
