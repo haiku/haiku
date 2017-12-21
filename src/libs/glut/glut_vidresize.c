@@ -2,6 +2,8 @@
  * Copyright 1994-1997 Mark Kilgard, All rights reserved.
  * Distributed under the terms of the MIT License.
  *
+ * GPL licensing not permitted.
+ *
  * Authors:
  *      Mark Kilgard
  */
