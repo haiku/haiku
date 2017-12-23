@@ -1,12 +1,16 @@
-1	slovak	x-vnd.Haiku-CharacterMap	1534181938
+1	slovak	x-vnd.Haiku-CharacterMap	4040565762
 Enclosed alphanumerics	UnicodeBlocks		Uzavreté alfanumerické znaky
 Basic Latin	UnicodeBlocks		Latinka - základné znaky
+Cyrillic extended C	UnicodeBlocks		Cyrillika, rozšírená C
 View	CharacterWindow		Zobraziť
+Cherokee supplement	UnicodeBlocks		Čerokí, dodatok
 Latin-1 supplement	UnicodeBlocks		Latinka-1, dodatok
 Hebrew	UnicodeBlocks		Hebrejčina
 Georgian supplement	UnicodeBlocks		Gruzínčina, dodatok
+Multani	UnicodeBlocks		Multani
 CJK unified ideographs	UnicodeBlocks		Zjednotené ideogramy pre ČJK
 Modifier tone letters	UnicodeBlocks		Písmená modifikátorov tónu
+Old Hungarian	UnicodeBlocks		Stará maďarčina
 Khmer	UnicodeBlocks		Khmérčina
 Supplementary private use area A	UnicodeBlocks		Doplnková oblasť A pre súkromné použitie
 Hanunoo	UnicodeBlocks		Hanunóo
@@ -91,12 +95,14 @@ Code	CharacterWindow		Kód
 Lepcha	UnicodeBlocks		Lepcha
 Sinhala	UnicodeBlocks		Sinhalčina
 Ancient Greek musical notation	UnicodeBlocks		Starogrécky hudobný zápis
+Early Dynastic Cuneiform	UnicodeBlocks		Klinové písmo raných dynastií
 Geometric shapes	UnicodeBlocks		Geometrické tvary
 Letterlike symbols	UnicodeBlocks		Symboly podpobné písmenám
 Hangul Jamo	UnicodeBlocks		Znaky jamo abecedy hangul
 Tamil	UnicodeBlocks		Tamilčina
 Currency symbols	UnicodeBlocks		Symboly mien
 Combining diacritical marks	UnicodeBlocks		Kombinujúce diakritické značky
+Anatolian hieroglyphs	UnicodeBlocks		Anatólske hieroglyfy
 Supplement punctuation	UnicodeBlocks		Doplnková intepunkcia
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Zjednotené slabikotvorné hlásky kanadských pôvodných obyvateľov
 Ugaritic	UnicodeBlocks		Ugaritské
@@ -107,6 +113,7 @@ Cherokee	UnicodeBlocks		Cherokee
 Tags	UnicodeBlocks		Značky
 Cypriot syllabary	UnicodeBlocks		Cyperské slabičné písmo
 Counting rod numerals	UnicodeBlocks		Tyčové číslovky
+Ideographic symbols and punctuation	UnicodeBlocks		Ideografické symboly a diakritika
 Latin extended A	UnicodeBlocks		Rozšírená latinka A
 Miscellaneous symbols	UnicodeBlocks		Rozličné symboly
 Saurashtra	UnicodeBlocks		Saurashtra
@@ -122,6 +129,8 @@ Ancient Greek numbers	UnicodeBlocks		Starogrécke čísla
 Vai	UnicodeBlocks		Vai
 Yi Radicals	UnicodeBlocks		Yi - radikály
 Cyrillic extended B	UnicodeBlocks		Cyrillika, rozšírená A
+Mongolian supplement	UnicodeBlocks		Mongolčina, dodatok
+Supplemental Symbols and Pictographs	UnicodeBlocks		Doplnkové symboly a piktogramy
 Quit	CharacterWindow		Ukončiť
 Ancient symbols	UnicodeBlocks		Staré symboly
 Braille patterns	UnicodeBlocks		Braillove vzory
@@ -140,6 +149,7 @@ Buhid	UnicodeBlocks		Buhidčina
 Telugu	UnicodeBlocks		Telugčina
 Superscripts and subscripts	UnicodeBlocks		Horné a dolné indexy
 Thai	UnicodeBlocks		Thajčina
+Osage	UnicodeBlocks		Osagčina
 Deseret	UnicodeBlocks		Deseret
 Tifinagh	UnicodeBlocks		Tifinagh
 Gurmukhi	UnicodeBlocks		Gurumukhí
@@ -161,6 +171,8 @@ Alphabetic presentation forms	UnicodeBlocks		Varianty abecedných znakov
 Halfwidth and fullwidth forms	UnicodeBlocks		Znaky s polovičnou a plnou šírkou
 Lydian	UnicodeBlocks		Lydian
 Ethiopic supplement	UnicodeBlocks		Etiópčina, dodatok
+Glagolitic supplement	UnicodeBlocks		Hlaholika, doplnok
+CJK unified ideographs extension E	UnicodeBlocks		Zjednotené ideogramy pre ČJK, rozšírenie E
 Latin extended B	UnicodeBlocks		Rozšírená latinka B
 Box drawing	UnicodeBlocks		Kreslenie rámčekov
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematické alfanumerické symboly
@@ -177,4 +189,4 @@ Kannada	UnicodeBlocks		Kannadčina
 Copy as escaped byte string	CharacterView		Kopírovať ako reťazec bajtov s únikovými klauzulami
 Phonetic extensions supplement	UnicodeBlocks		Fonetické rozšírenia, doplnok
 Domino tiles	UnicodeBlocks		Kocky domino
-Katakana phonetic extensions	UnicodeBlocks		Katakana - fonetické rozšírenia
+Katakana phonetic extensions	UnicodeBlocks		Katakana, fonetické rozšírenia

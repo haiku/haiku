@@ -1,10 +1,12 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1090759318
+1	slovak	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Názov
 Available packages	MainWindow		Dostupné balíky
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
+Repository	FilterView		Zdroj softvéru
 Close	RatePackageWindow		Zatvoriť
 The captcha puzzle needs to be solved.	UserLoginWindow		Je potrebné vyriešiť captcha.
 Changelog	PackageInfoView		Záznam zmien
+Repository:	FilterView		Zdroj softvéru:
 Your rating:	RatePackageWindow		Vaše hodnotenie:
 The passwords do not match.	UserLoginWindow		Heslá sa nezhodujú.
 Log in…	MainWindow		Prihlásiť sa…
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Vaše hodnotenie bolo �
 <no info>	PackageInfoView		<žiadne info>
 Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Vyskytla sa chyba pri inicializovaní správcu balíkov: %message%
+All repositories	FilterView		Všetky zdroje softvéru
 Email address:	UserLoginWindow		Emailová adresa:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Vaše hodnotenie bolo úspešne nahrané. Môžete ho kedykoľvek aktualizovať alebo odstrániť tým, že balík znova ohodnotíte.
 Very unstable	RatePackageWindow		Veľmi nestabilný
@@ -102,6 +105,7 @@ Close	MainWindow		Zatvoriť
 Preferred language:	UserLoginWindow		Preferovaný jazyk:
 Failed to rate package	RatePackageWindow		Nepodarilo sa ohodnotiť balík
 Internet & Network	Model		Internet a siete
+Refresh repositories	MainWindow		Obnoviť zdroje softvéru
 Cancel	MainWindow		Zrušiť
 Quit HaikuDepot	App		Ukončiť HaikuDepot
 Input validation	UserLoginWindow		Overenie platnosti vstupu
@@ -109,7 +113,7 @@ Update	RatePackageWindow		Aktualizovať
 Video	Model		Video
 All categories	FilterView		Všetky kategórie
 Contents	PackageInfoView		Obsah
-An error occurred while refreshing the repository: %error%	MainWindow		Vyskytla sa chyba pri obnovovaní repozitára: %error%
+An error occurred while refreshing the repository: %error%	MainWindow		Vyskytla sa chyba pri obnovovaní zdroja softvéru: %error%
 Try again	App		Skúsiť znova
 Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
 Pending…	PackageListView		Čaká sa…
@@ -139,6 +143,7 @@ Failed to create account	UserLoginWindow		Nepodarilo sa vytvoriť účet
 There are problems with the data you entered:\n\n	UserLoginWindow		Vyskytli sa problémy v údajoch, ktoré ste zadali:\n\n
 Featured packages	MainWindow		Odporúčané balíky
 Start package daemon	App		Spustiť démona balíkov
+Manage repositories…	MainWindow		Spravovať zdroje softvéru…
 Success	RatePackageWindow		Úspešné
 Business	Model		Obchod
 Audio	Model		Zvuk

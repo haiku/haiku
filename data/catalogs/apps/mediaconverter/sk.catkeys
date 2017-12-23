@@ -1,8 +1,9 @@
-1	slovak	x-vnd.Haiku-MediaConverter	341686525
+1	slovak	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Súbor nebol rozpoznaný ako podporovaný multimediálny súbor:} few{# súbory neboli rozpoznané ako podporované multimediálne súbory:} other{# súborov nebolo rozpoznaných ako podporované multimediálne súbory:}}
 Video encoding:	MediaConverter		Kódovanie videa:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error creating video.	MediaConverter		Chyba pri vytváraní videa.
 Error read audio frame %lld	MediaConverter		Chyba čítania zvukového rámca %lld
 No audio	Audio codecs list		Bez zvuku
 Error	MediaConverter		Chyba
@@ -26,7 +27,9 @@ Conversion completed	MediaConverter		Konverzia dokončená
 Audio:	MediaConverter-FileInfo		Zvuk:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 sekúnd
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Chyba pri zapisovaní: %strPath%. Predvolené umiestnenie: /boot/home
 Source files	MediaConverter		Zdrojové súbory
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Zvolený adresár nebol nájdený. Používa sa predvolený adresár /boot/home
 Error writing video frame %lld	MediaConverter		Chyba zápisu video rámca %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# rámec} few{# rámce} other{# rámcov}}
 Error writing audio frame %lld	MediaConverter		Chyba zápisu zvukového rámca %lld
@@ -38,6 +41,7 @@ None available	Video codecs		Žiadny nie je dostupný
 Conversion cancelled	MediaConverter		Konverzia zrušená
 No file selected	MediaConverter-FileInfo		Žiadny súbor nie je vybraný
 Select this folder	MediaConverter		Vybrať tento priečinok
+Error creating track.	MediaConverter		Chyba pri vytváraní stopy.
 Continue	MediaConverter		Poračovať
 Encoder parameters	MediaConverter-EncoderWindow		Parametre kódovania
 Video:	MediaConverter-FileInfo		Video:
@@ -59,6 +63,7 @@ Drop media files onto this window	MediaConverter		Pretiahnite súbory do tohto o
 Audio encoding:	MediaConverter		Kódovanie zvuku:
 Audio quality not supported	MediaConverter		Kvalita zvuku nie je podporovaná
 File	Menu		Súbor
+Input file not recognized as Audio or Video	MediaConverter		Vstupný súbor nebol rozpoznaný ako zvuk alebo video
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Konvertovať
 Writing audio track: %ld%% complete	MediaConverter		Zápis zvukovej stopy: %ld%% hotovo

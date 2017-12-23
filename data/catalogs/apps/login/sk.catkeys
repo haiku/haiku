@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Login	2683778354
+1	slovak	x-vnd.Haiku-Login	336867745
 Error: %1	Login App		Chyba: %1
 Hide password	Login View		Skryť heslo
 Desktop	Desktop Window		Plocha
@@ -17,3 +17,4 @@ Halt	Login View		Vypnúť
 Password:	Login View		Heslo:
 OK	Login App		OK
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Nevytvárať okno ako modálne\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Pracovnú plochu zobrazenú za aplikáciou Prihlásenie môžete upraviť tým, že na ňu pretiahnete replikantov.\nPo skončení stačí ukončiť aplikáciu (Cmd-Q).

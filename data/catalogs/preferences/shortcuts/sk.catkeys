@@ -9,7 +9,7 @@ Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves…
 Error, NULL state description?	ShortcutsSpec		Chyba, NULL popis stavu?
 Revert to saved	ShortcutsWindow		Vrátiť spať uložené
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-*InsertString \"Your Text Here\"	ShortcutsWindow		*VložiťReťazec \"Váš text sem\"
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Váš text sem\"
 *MouseUp	ShortcutsWindow		*MyšHore
 (Choose application with file requester)	ShortcutsWindow		(Vyberte aplikáciu pomocou žiadača súboru)
 *LaunchHandler text/html	ShortcutsWindow		*SpustiťObsluhu text/html

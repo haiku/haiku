@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Network	2512967175
+1	slovak	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Statická
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Služby
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Vybrať automaticky
 connected	IntefaceView		pripojené
 Ethernet device	InterfaceListItem		Ethernetové zariadenie
 The netmask defines your local network	IntefaceAddressView		Sieťová maska definuje vašu lokálnu sieť
+Dial-up connection	InterfaceListItem		Vytáčané pripojenie
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Sieť
+VPN connection	InterfaceListItem		Pripojenie VPN
 Show network status in Deskbar	NetworkWindow		Zobraziť stav siete v Paneli
 The method for obtaining an IP address	IntefaceAddressView		Spôsob získania adresy IP
 connected	InterfaceListItem		pripojené
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Odoslaných:
 open	Open network		otvorená
 IP Address:	IntefaceAddressView		Adresa IP:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Prijatých:
 Disable	IntefaceView		Zakázať
 <no wireless networks found>	IntefaceView		<neboli nájdené žiadne bezdrôtové siete>

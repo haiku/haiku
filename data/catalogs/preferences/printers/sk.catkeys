@@ -1,13 +1,16 @@
-1	slovak	x-vnd.Be-PRNT	4242582634
+1	slovak	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tlačiareň: %printer_name%\nOvládač:  %driver%\n
 Waiting	JobListView		Čaká sa
 Print test page	PrintersWindow		Vytlačiť testovaciu stránku
+ pending jobs	PrinterListView		 čakajúcich úloh
 page	JobListView		strana
 Cancel	AddPrinterDialog		Zrušiť
+Test page	PrintersWindow		Testovacia stránka
 Add printer	AddPrinterDialog		Pridať tlačiareň
 Green	TestPageView		Zelená
 Printers	PrintersWindow		Tlačiarne
 Add…	PrintersWindow		Pridať…
+No pending jobs	PrinterListView		Žiadne čakajúce úlohy.
 Default Printer	PrinterListView		Predvolená tlačiareň
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 pages	JobListView		strany
@@ -35,5 +38,7 @@ No printer found!	TransportMenu		Nebola nájdená žiadna tlačiareň!
 Print jobs: No printer selected	PrintersWindow		Tlačové úlohy: Žiadna tlačiareň nie je vybraná
 Cyan	TestPageView		Azúrová
 Unknown status	JobListView		Neznámy stav
+1 pending job	PrinterListView		1 čakajúca úloha
 Connected to:	AddPrinterDialog		Pripojené na:
 Printer type:	AddPrinterDialog		Typ tlačiarne:
+Test page	TestPageView		Testovacia stránka

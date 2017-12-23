@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CodyCam	1888169680
+1	slovak	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Nahrať…
 Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok…
 Every 30 seconds	CodyCam		Každých 30 sekúnd
@@ -76,6 +76,7 @@ cmd: '%s'\n	FtpClient		príkaz: „%s“\n
 Never	CodyCam		Nikdy
 Cannot create a video window	CodyCam		Nebolo možné vytvoriť okno s videom
 Every 10 minutes	CodyCam		Každých 10 minút
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nepodarilo sa nájsť zdroj videa.\nAby ste mohli používať CodyCam, potrebujete webovú kameru.
 Cannot start the video source	CodyCam		Nebolo možné spustiť zdroj videa
 Cannot start the video window	CodyCam		Nebolo možné spustiť okno s videom
 password expected	CodyCam		očakávalo sa heslo

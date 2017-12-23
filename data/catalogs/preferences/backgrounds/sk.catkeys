@@ -1,11 +1,13 @@
-1	slovak	x-vnd.Haiku-Backgrounds	3513602073
+1	slovak	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Pozadia
 X:	Main View		X:
+Setting the background image failed:	Main View		Nastavovanie obrázka na pozadí zlyhalo:
 Resolution: 	Image Filepanel		Rozlíšenie: 
 pick one	Main View		vyberte jedno
 Default	Main View		Predvolené
 Center	Main View		Stred
 Manual	Main View		Ručne
+Set background image error	Main View		Chyba nastavenia obrázka na pozadí
 Default folder	Main View		Predvolený priečinok
 Revert	Main View		Vrátiť
 None	Main View		Žiadne
@@ -20,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Dlaždice
 Select	Main View		Vybrať
 Scale to fit	Main View		Zmeniť veľkosť, aby zodpovedala
+OK	Main View		OK
 Placement:	Main View		Umiestnenie:
 Preview	Main View		Náhľad
 Image:	Main View		Obrázok:

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-PSRV	2930356711
+1	slovak	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Nedefinované
 Return the number of available transports	PrintServerApp Scripting		Vrátiť počet dostupných transportov
 Return the number of available printers	PrintServerApp Scripting		Vrátiť počet dostupných tlačiarní
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Áno
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)
 Would you like to set one up now?	PrintServerApp		Chcete ju teraz nastaviť?
+Print job setup:	ConfigWindow		Nastavenie tlačovej úlohy:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Portrét
 All pages	ConfigWindow		Všetky stránky

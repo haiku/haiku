@@ -1,9 +1,10 @@
-1	slovak	x-vnd.haiku-screenshot	3896204963
+1	slovak	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		sekúnd
 Desktop	ScreenshotWindow		Plocha
 Include window border	ScreenshotWindow		Vrátane okraja okna
 Screenshot	System name		Snímka obrazovky
 Select	ScreenshotWindow		Vybrať
+The destination path exists but is not a folder.	ScreenshotWindow		Cieľová cesta existuje, ale nie je to priečinok.
 Capture active window	ScreenshotWindow		Zachytiť aktívne okno
 Cancel	ScreenshotWindow		Zrušiť
 Name:	ScreenshotWindow		Názov:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	snímka obrazovky
 New screenshot	ScreenshotWindow		Nová snímka obrazovky
 Artwork folder	ScreenshotWindow		Priečinok s výtvarnými dielami
 Home folder	ScreenshotWindow		Domovský priečinok
+Failed to save screenshot	ScreenshotWindow		Nepodarilo sa uložiť snímku obrazovky
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		Nastavenia…
 overwrite	ScreenshotWindow		prepísať
 Delay:	ScreenshotWindow		Oneskorenie:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Chyba pri ukladaní „%s“:\n\t%s
 Include mouse pointer	ScreenshotWindow		Vrátane kurzora myši
 Translator Settings	ScreenshotWindow		Nastavenia prekladača

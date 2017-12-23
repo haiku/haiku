@@ -1,5 +1,5 @@
 1	slovak	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Voľby aplikácie StavSiete:\n\t--deskbar\tautomaticky pridať replikanta na Panel\n\t--help\t\tvypísať tieto informácie a skončiť\n
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Voľby aplikácie Stav siete:\n\t--deskbar\tautomaticky pridať replikanta na Panel\n\t--help\t\tvypísať tieto informácie a skončiť\n
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		StavSiete môžete spustiť buď v okne alebo ho nainštalovať do Panelu.
 <no wireless networks found>	NetworkStatusView		<nenájdené žiadne bezdrôtové siete>
 Run in window	NetworkStatus		Spustiť v okne
