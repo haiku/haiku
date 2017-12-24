@@ -5,23 +5,14 @@
 #define STRINGMATCHER_H
 
 #include <sys/types.h>
-
-#if (defined(__BEOS__) || defined(__HAIKU__))
-# if __POWERPC__
-#  include "regex.h"  // use included regex if system doesn't provide one
-# else
-#  include <regex.h>
-# endif
-#else
-# include <regex.h>
-#endif
+#include <regex.h>
 
 class BString;
 #define PortableString BString
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// NOTE:  This class is based on the psStringMatcher v1.3 class 
+// NOTE:  This class is based on the psStringMatcher v1.3 class
 //        developed by Lars Jørgen Aas <larsa@tihlde.hist.no> for the
 //        Prodigal Software File Requester.  Used by permission.
 //
@@ -29,7 +20,7 @@ class BString;
 
 
 /** A utility class for doing globbing or regular expression matching.  (A thin wrapper around the C regex calls) */
-class StringMatcher 
+class StringMatcher
 {
 public:
     /** Default Constructor. */
@@ -39,29 +30,29 @@ public:
      *  @param matchString the wildcard pattern or regular expression to match with
      */
     StringMatcher(const char * matchString);
-    
+
     /** Destructor */
     ~StringMatcher();
 
-    /** 
+    /**
      * Set a new wildcard pattern or regular expression for this StringMatcher to use in future Match() calls.
      * @param expression The new globbing pattern or regular expression to match with.
-     * @param isSimpleFormat If you wish to use the formal regex syntax, 
+     * @param isSimpleFormat If you wish to use the formal regex syntax,
      *                       instead of the simple syntax, set isSimpleFormat to false.
      * @return True on success, false on error (e.g. expression wasn't parsable, or out of memory)
      */
     bool SetPattern(const char * const expression, bool isSimpleFormat=true);
-    
+
     /** Returns true iff (string) is matched by the current expression.
      * @param string a string to match against using our current expression.
      * @return true iff (string) matches, false otherwise.
      */
     bool Match(const char *string) const;
-    
+
 private:
     bool _regExpValid;
     regex_t _regExp;
-}; 
+};
 
 // Some regular expression utility functions
 
