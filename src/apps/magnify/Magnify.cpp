@@ -970,11 +970,12 @@ TWindow::SetPixelSize(bool plus)
 	} else {
 		pixelSize = fPixelSize / 2;
 
-		if (pixelSize < 16)
+		if (pixelSize < 16) {
 			if (fPixelSize > 16)
 				pixelSize = (fPixelSize + 16) / 2;
 			else
 				pixelSize = fPixelSize - 1;
+		}
 	}
 
 	SetPixelSize(pixelSize);
