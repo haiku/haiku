@@ -43,6 +43,8 @@
 		- The \ref locale includes classes to localize your application to
 			different languages, timezones, number formatting conventions and
 			much more.
+		- The \ref mail includes classes to work with e-mail files, folders,
+			protocols, and filters, as part of Haiku's unique mail handling system.
 		- The \ref media provides a unified and consistent interface for media
 			streams and applications to intercommunicate.
 		- The \ref midi2 describes an interface to generating, processing,
@@ -134,6 +136,9 @@
 
 	\defgroup locale Locale Kit
 	\brief Collection of classes for localizing applications.
+
+	\defgroup mail Mail Kit
+	\brief API for working with e-mail messages and protocols.
 
 	\defgroup media Media Kit
 	\brief Collection of classes that deal with audio and video.
@@ -453,9 +458,9 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 	The Haiku Network Kit consists of:
 	- A modular, add-ons based network stack
-	- Two shared libraries, libnet.so and libnetapi.so
+	- Two shared libraries, libnetwork.so and libnetapi.so
 	- A stack driver, acting as interface between the network stack and
-	  libnet.so
+	  libnetwork.so
 	- Basic network apps
 	- A modular GUI preflet
 

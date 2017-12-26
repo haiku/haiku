@@ -1,0 +1,287 @@
+/*
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Augustin Cavalier <waddlesplash>
+ *		Nathan Whitehorn
+ *
+ * Corresponds to:
+ *		headers/os/mail/MailComponent.h	 hrev51708
+ *		src/kits/mail/MailComponent.cpp	 hrev51708
+ */
+
+
+/*!
+	\file MailComponent.h
+	\ingroup mail
+	\brief Provides the BMailComponent and BTextMailComponent classes.
+*/
+
+
+/*!
+	\enum component_type
+	\ingroup mail
+
+	Possible component types
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var component_type B_MAIL_PLAIN_TEXT_BODY
+
+	The plain text body of a message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var component_type B_MAIL_SIMPLE_ATTACHMENT
+
+	Any other kind of multipart component.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var component_type B_MAIL_ATTRIBUTED_ATTACHMENT
+
+	An attachment that contains BeOS attributes.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var component_type B_MAIL_MULTIPART_CONTAINER
+
+	A multipart container attachment.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BMailComponent
+	\ingroup mail
+	\brief The base class for most of the Mail Kit.
+
+	Note that BMailComponent is not abstract, and is useful
+	by itself. A BMailComponent has the important quality of
+	being able to read the headers of a message or component without
+	instantiating whatever massive quantity of data might lie therein.
+	This is useful primarily to determine the kind of data you are dealing
+	with, so that the user can make a decision as to whether it should be shown.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMailComponent::BMailComponent(uint32 defaultCharSet = B_MAIL_NULL_CONVERSION)
+	\brief Initializes a new BMailComponent with the specified character set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMailComponent::~BMailComponent()
+	\brief Destructor.
+*/
+
+
+/*!
+	\fn uint32 BMailComponent::ComponentType()
+	\brief Returns the \c component_type of this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMailComponent* BMailComponent::WhatIsThis()
+	\brief Employs simple heuristics such as the MIME type to present you with
+		an instance of a useful subclass.
+
+	You can then use any of BMailComponent's hook functions or RTTI calls to
+	get more information. Bear in mind that the returned component is not set
+	to any data. You must still Instantiate() it from whatever data this object
+	was instantiated from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BMailComponent::IsAttachment()
+	\brief Employs simple heuristics such as the MIME type and the Content-Disposition: header
+		to determine whether this component is an attachment.
+
+	\returns true if it is an attachment, false if not.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BMailComponent::SetHeaderField(const char *key, const char *value,
+		uint32 charset = B_MAIL_NULL_CONVERSION, mail_encoding encoding = null_encoding,
+		bool replace_existing = true)
+	\brief Adds the specified header of type \a key and with the \a value
+		to the component.
+
+	Converts any 8 bit-data in \a value to
+	\a charset and encodes it into 7-bit data using \a encoding. If
+	\a replace_existing is true, replaces any existing header of this type with
+	this one, otherwise	adds a second one.
+
+	Thus, to set the header To: of some BMailComponent \a component to
+	foo@example.com, we would do this:
+
+\code
+component->SetHeaderField("To","foo@example.com");
+\endcode
+
+	If you want to delete a header, pass in a zero length or NULL string
+	for the value field, or use \ref BMailComponent::RemoveHeader.
+
+	\since Haiku R1
+*/
+
+/*!
+	\fn void BMailComponent::SetHeaderField(const char *key,
+		BMessage *structured_header, bool replace_existing = true)
+	\brief Adds a structured header of type \a key to the component.
+
+	Structured headers are in the format unlabeled; key=value; key=value. The most common
+	instance of this is the Content-Type header, where the MIME type is
+	unlabeled, and various other information, such as character set, is
+	specified in the key/value pairs. The format for structured_header is
+	relatively simple: simply use BMessage::AddString(key,value) for each
+	key/value pair. The only exception to this rule is the unlabeled data.
+	For this, simply use the key unlabeled. Please note that the charset and
+	encoding arguments defined for the text version of SetHeaderField is not
+	provided here because structured headers cannot be encoded.
+
+	Thus, a relatively standard Content-Type header would be specified as
+	follows:
+
+\code
+BMessage structured;
+structured.AddString("unlabeled","text/plain");
+structured.AddString("charset","iso-8859-1");
+component->SetHeaderField("To",&structured);
+\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BMailComponent::HeaderAt(int32 index) const
+	\brief Returns the key of the \c header at index.
+
+	Useful for iterating through all the headers. If index is out of range,
+	HeaderAt() returns NULL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BMailComponent::HeaderField(const char *key, int32 index = 0) const
+	\brief Returns the header \a key.
+
+	If there is more than one header key, use \a index to iterate through them.
+	In the event that the specified header does not exist, HeaderField()
+	returns \c NULL. Thus, to retrieve the contents of the <code>Subject:</code>
+	field, you would do this:
+
+\code
+const char *subject = component->HeaderField("Subject");
+\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailComponent::HeaderField(const char *key,
+		BMessage *structured_header, int32 index = 0) const
+	\brief Returns the header \a key.
+
+	Decodes whatever
+	structured header may exist in \a key and places it in \a structured_header
+	according to the format laid out in SetHeaderField(). Returns
+	\c B_NAME_NOT_FOUND if the header key does not exist. If it does exist,
+	but is not structured, no error is returned; the entire contents of the
+	header are placed in <code>unlabeled</code>.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailComponent::RemoveHeader(const char *key) const
+	\brief Removes all headers with the key \a key.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailComponent::GetDecodedData(BPositionIO *data)
+	\brief Retrieves the data contained in this component in canonical format
+		and places it into \a data.
+
+	The various attachments subclasses implement this function to return
+	decoded data, and \c BPlainTextBodyComponent returns UTF8 text. \c BMailComponent
+	implements this function to do nothing and return \c B_OK.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailComponent::SetDecodedData(BPositionIO *data)
+	\brief Sets the content of this component to the canonical format data
+		contained in data.
+
+	Thus, an attachment subclass would accept a file here and encode it into
+	the specified encoding. BMailComponent implements this function to do
+	nothing and return \c B_OK.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailComponent::SetToRFC822(BPositionIO *data,
+			size_t length, bool parse_now = false)
+	\brief Sets this object from a component in RFC-822 format.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailComponent::RenderToRFC822(BPositionIO *data)
+	\brief Renders the component into RFC-822 format.
+
+	It places the result in data, starting at data->Position().
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailComponent::MIMEType(BMimeType *mime)
+	\brief Places the MIME type of the data into mime.
+
+	\since Haiku R1
+*/

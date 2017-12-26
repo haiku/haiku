@@ -1,9 +1,10 @@
-#ifndef ZOIDBERG_MAIL_COMPONENT_H
-#define ZOIDBERG_MAIL_COMPONENT_H
-/* (Text)Component - message component base class and plain text
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2004-2017, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _MAIL_COMPONENT_H
+#define _MAIL_COMPONENT_H
 
 
 #include <UTF8.h>
@@ -12,10 +13,11 @@
 
 #include <mail_encoding.h>
 
+
 class BMimeType;
 
-extern const char *kHeaderCharsetString;
-extern const char *kHeaderEncodingString;
+extern const char* kHeaderCharsetString;
+extern const char* kHeaderEncodingString;
 // Special field names in the headers which specify the character set (int32)
 // and encoding (int8) to use when converting the headers from UTF-8 to the
 // output e-mail format (rfc2047).  For use with SetHeaderField when you pass
@@ -29,48 +31,45 @@ enum component_type {
 	B_MAIL_MULTIPART_CONTAINER
 };
 
+
 class BMailComponent {
-	public:
-		BMailComponent(uint32 defaultCharSet = B_MAIL_NULL_CONVERSION);
-		virtual ~BMailComponent();
+public:
+								BMailComponent(
+									uint32 defaultCharSet = B_MAIL_NULL_CONVERSION);
+	virtual						~BMailComponent();
 
-		//------Info on this component
-		uint32 ComponentType();
-		BMailComponent *WhatIsThis();
-			// Takes any generic MailComponent, and returns an instance
-			// of a MailComponent subclass that applies to this case,
-			// ready for instantiation. Note that you still have to
-			// Instantiate() it yourself.
-		bool IsAttachment();
-			// Returns true if this component is an attachment, false
-			// otherwise
+			uint32				ComponentType();
+			BMailComponent*		WhatIsThis();
+			bool				IsAttachment();
 
-		void SetHeaderField(
-			const char *key, const char *value,
-			uint32 charset = B_MAIL_NULL_CONVERSION,
-			mail_encoding encoding = null_encoding,
-			bool replace_existing = true);
-			// If you want to delete a header, pass in a zero length or NULL
-			// string for the value field, or use RemoveHeader.
-		void SetHeaderField(
-			const char *key, BMessage *structured_header,
-			bool replace_existing = true);
+			void				SetHeaderField(const char *key,
+									const char *value,
+									uint32 charset = B_MAIL_NULL_CONVERSION,
+									mail_encoding encoding = null_encoding,
+									bool replace_existing = true);
+			void				SetHeaderField(const char *key,
+									BMessage *structured_header,
+									bool replace_existing = true);
 
-		const char *HeaderAt(int32 index) const;
-		const char *HeaderField(const char *key, int32 index = 0) const;
-		status_t	HeaderField(const char *key, BMessage *structured_header, int32 index = 0) const;
+			const char* 		HeaderAt(int32 index) const;
+			const char*			HeaderField(const char *key,
+									int32 index = 0) const;
+			status_t			HeaderField(const char *key,
+									BMessage *structured_header,
+									int32 index = 0) const;
 
-		status_t	RemoveHeader(const char *key);
+			status_t			RemoveHeader(const char *key);
 
-		virtual status_t GetDecodedData(BPositionIO *data);
-		virtual status_t SetDecodedData(BPositionIO *data);
+	virtual status_t 			GetDecodedData(BPositionIO *data);
+	virtual status_t 			SetDecodedData(BPositionIO *data);
 
-		virtual status_t SetToRFC822(BPositionIO *data, size_t length, bool parse_now = false);
-		virtual status_t RenderToRFC822(BPositionIO *render_to);
+	virtual status_t 			SetToRFC822(BPositionIO *data, size_t length,
+									bool parse_now = false);
+	virtual status_t 			RenderToRFC822(BPositionIO *render_to);
 
-		virtual status_t MIMEType(BMimeType *mime);
+	virtual status_t 			MIMEType(BMimeType *mime);
 
-	protected:
+protected:
 		uint32 _charSetForTextDecoding;
 			// This is the character set to be used for decoding text
 			// components, or if it is B_MAIL_NULL_CONVERSION then the character
@@ -81,7 +80,7 @@ class BMailComponent {
 			// Container, Message, MIME, Text) child components and ends up
 			// being used in the text components.
 
-	private:
+private:
 		virtual void _ReservedComponent1();
 		virtual void _ReservedComponent2();
 		virtual void _ReservedComponent3();
@@ -137,4 +136,4 @@ class BTextMailComponent : public BMailComponent {
 		uint32 _reserved[5];
 };
 
-#endif	/* ZOIDBERG_MAIL_COMPONENT_H */
+#endif // _MAIL_COMPONENT_H

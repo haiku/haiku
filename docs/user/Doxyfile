@@ -788,6 +788,7 @@ INPUT                  = . \
                          interface \
                          keyboard \
                          locale \
+                         mail \
                          media \
                          midi \
                          midi2 \
@@ -807,6 +808,7 @@ INPUT                  = . \
                          ../../headers/os/interface \
                          ../../headers/private/interface \
                          ../../headers/os/locale \
+                         ../../headers/os/mail \
                          ../../headers/os/media \
                          ../../headers/os/midi2 \
                          ../../headers/os/net \
