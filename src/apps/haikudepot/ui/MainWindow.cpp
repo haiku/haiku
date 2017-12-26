@@ -487,8 +487,7 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					// The package didn't get a chance yet to be in the
 					// visible package list
-					PackageList visiblePackages = fModel.CreatePackageList();
-					isVisible = visiblePackages.Contains(ref);
+					isVisible = fModel.MatchesFilter(ref);
 
 					// Transfer this single package, otherwise we miss
 					// other packages if they appear or disappear along

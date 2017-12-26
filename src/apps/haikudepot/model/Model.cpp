@@ -439,19 +439,25 @@ Model::CreatePackageList() const
 
 		for (int32 j = 0; j < packages.CountItems(); j++) {
 			const PackageInfoRef& package = packages.ItemAtFast(j);
-			if (fCategoryFilter->AcceptsPackage(package)
-				&& fSearchTermsFilter->AcceptsPackage(package)
-				&& fIsFeaturedFilter->AcceptsPackage(package)
-				&& (fShowAvailablePackages || package->State() != NONE)
-				&& (fShowInstalledPackages || package->State() != ACTIVATED)
-				&& (fShowSourcePackages || !is_source_package(package))
-				&& (fShowDevelopPackages || !is_develop_package(package))) {
+			if (MatchesFilter(package))
 				resultList.Add(package);
-			}
 		}
 	}
 
 	return resultList;
+}
+
+
+bool
+Model::MatchesFilter(const PackageInfoRef& package) const
+{
+	return fCategoryFilter->AcceptsPackage(package)
+			&& fSearchTermsFilter->AcceptsPackage(package)
+			&& fIsFeaturedFilter->AcceptsPackage(package)
+			&& (fShowAvailablePackages || package->State() != NONE)
+			&& (fShowInstalledPackages || package->State() != ACTIVATED)
+			&& (fShowSourcePackages || !is_source_package(package))
+			&& (fShowDevelopPackages || !is_develop_package(package));
 }
 
 

@@ -72,6 +72,9 @@ public:
 			// !Returns new PackageInfoList from current parameters
 			PackageList			CreatePackageList() const;
 
+			bool				MatchesFilter(
+									const PackageInfoRef& package) const;
+
 			bool				AddDepot(const DepotInfo& depot);
 			bool				HasDepot(const BString& name) const;
 			const DepotList&	Depots() const
