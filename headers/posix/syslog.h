@@ -27,12 +27,12 @@
 #define LOG_MAIL		(2 << 3)
 #define LOG_DAEMON		(3 << 3)
 #define LOG_AUTH		(4 << 3)
-#define LOG_SYSLOG		(5 << 3)
+#define LOG_SYSLOG		(5 << 3)	/* messages generated internally by syslogd */
 #define LOG_LPR			(6 << 3)
 #define LOG_NEWS		(7 << 3)
 #define LOG_UUCP		(8 << 3)
 #define LOG_CRON		(9 << 3)
-#define LOG_AUTHPRIV	(10 << 3)
+#define LOG_AUTHPRIV	(10 << 3)	/* security/authorization messages (private) */
 #define LOG_FTP			(11 << 3)
 
 /* these are for local use: */
@@ -45,6 +45,9 @@
 #define LOG_LOCAL6		(22 << 3)
 #define LOG_LOCAL7		(23 << 3)
 
+#define	LOG_NFACILITIES	(24)		/* current number of facilities */
+#define	LOG_FACMASK		(0x03f8)	/* mask to extract facility part */
+#define	LOG_FAC(p)		(((p) & LOG_FACMASK) >> 3)
 
 /* priorities */
 
