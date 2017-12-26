@@ -240,7 +240,7 @@ const char *subject = component->HeaderField("Subject");
 		and places it into \a data.
 
 	The various attachments subclasses implement this function to return
-	decoded data, and \c BPlainTextBodyComponent returns UTF8 text. \c BMailComponent
+	decoded data, and BTextMailComponent returns UTF8 text. \c BMailComponent
 	implements this function to do nothing and return \c B_OK.
 
 	\since Haiku R1

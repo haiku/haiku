@@ -1,0 +1,154 @@
+/*
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Augustin Cavalier <waddlesplash>
+ *		Nathan Whitehorn
+ *
+ * Corresponds to:
+ *		headers/os/mail/MailComponent.h	 hrev51708
+ *		src/kits/mail/MailComponent.cpp	 hrev51708
+ */
+
+
+/*!
+	\class BTextMailComponent
+	\ingroup mail
+	\brief A component that stores plain text.
+
+	It uses UTF8 text as its canonical format and reads and writes
+	<a href="https://www.ietf.org/rfc/rfc2047.txt">RFC-2047</a> style text. As such,
+	it handles accents and other 8 bit characters with ease. If you want to
+	send text, this is the way to go.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTextMailComponent::BTextMailComponent(const char *text = NULL,
+		uint32 defaultCharSet = B_MAIL_NULL_CONVERSION)
+	\brief Initializes the component and sets its content to \a text.
+
+	\a text can be \c NULL. The argument is a UTF-8 null-terminated string.
+	Encoding defaults to quoted_printable with the ISO-15 charset.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BTextMailComponent::~BTextMailComponent()
+	\brief Destructor.
+*/
+
+
+/*!
+	\fn void BTextMailComponent::SetEncoding(mail_encoding encoding,
+		int32 charset)
+	\brief Sets the \a encoding and \a charset used by Render().
+
+	Use the conversion constants from UTF8.h for \a charset. We strongly
+	reccomend that you always use the defaults (and strongly recommend
+	against using base64) for the reasons outlined in RFC 2047.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextMailComponent::SetText(const char *text)
+	\brief Sets the contents of this component to the UTF8 string \a text.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextMailComponent::AppendText(const char *text)
+	\brief Appends the UTF8 string \a text to the current contents of this
+		component.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BTextMailComponent::Text()
+	\brief Returns the contents of this component as a UTF8 string.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString* BTextMailComponent::BStringText()
+	\brief Returns the internal UTF8 format BString used by this component.
+
+	As such, you can do raw text operations on the content of the message.
+	The use of this function is not reccomended.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BTextMailComponent::Quote(const char *message = NULL,
+		const char *quote_style = "> ")
+	\brief Quotes the contents of this component.
+
+	Inserts \a quote_style at the start of every line, and prefaces the content
+	with \a message, if it is not \c NULL. \a message should be something like
+	<code>"On September 30, 2001, John Smith said:"</code>, or something in that vein.
+	Note that the new line after \a message is supplied for you, so you do not
+	need to add it.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BTextMailComponent::GetDecodedData(BPositionIO *data)
+	\brief Retrieves the data contained in this component as a UTF8 string
+		into \a data.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BTextMailComponent::SetDecodedData(BPositionIO *data)
+	\brief Sets the contents of this component to the UTF8 format \a data.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BTextMailComponent::SetToRFC822(BPositionIO *data,
+			size_t length, bool parse_now = false)
+	\brief Sets this object from a component in RFC-822 format.
+
+	Initializes this component to the RFC 822 format data in \a data,
+	starting at <code>data->Position()</code>, for up to \a length bytes.
+	Handles encoded data according to RFC 2047.
+
+	If \a parse_now is \c false, then the \a data will not be parsed
+	until RenderToRFC822 is called.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BTextMailComponent::RenderToRFC822(BPositionIO* render_to)
+	\brief Renders the component into RFC-822 format.
+
+	It places the result in data, starting at data->Position().
+	Encodes and translates charsets according to the arguments passed to
+	SetEncoding(), or the defaults set in BTextMailComponent::BTextMailComponent()
+	otherwise.
+
+	\since Haiku R1
+*/
