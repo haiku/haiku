@@ -509,6 +509,9 @@ MainWindow::MessageReceived(BMessage* message)
 							fFeaturedPackagesView->AddPackage(ref);
 					}
 				}
+
+				if (!fSinglePackageMode && (changes & PKG_CHANGED_STATE) != 0)
+					fWorkStatusView->PackageStatusChanged(ref);
 			}
 			break;
 		}

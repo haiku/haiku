@@ -843,13 +843,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateSummary();
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
 					row->UpdateRating();
-				if ((changes & PKG_CHANGED_STATE) != 0) {
+				if ((changes & PKG_CHANGED_STATE) != 0)
 					row->UpdateState();
-					if (fWorkStatusView != NULL) {
-						fWorkStatusView->PackageStatusChanged(
-							row->Package());
-					}
-				}
 				if ((changes & PKG_CHANGED_SIZE) != 0)
 					row->UpdateSize();
 				if ((changes & PKG_CHANGED_ICON) != 0)
