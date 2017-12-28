@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1532,7 +1532,7 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 	bool handled = false;
 
 	ThreadHandler* handler = _GetThreadHandler(event->Thread());
-	BReference<ThreadHandler> handlerReference(handler);
+	BReference<ThreadHandler> handlerReference(handler, true);
 
 	switch (event->EventType()) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
@@ -1976,7 +1976,7 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 			ObjectDeleter<ImageInfoPendingThread> threadDeleter(thread);
 			locker.Lock();
 			ThreadHandler* handler = _GetThreadHandler(thread->ThreadID());
-			BReference<ThreadHandler> handlerReference(handler);
+			BReference<ThreadHandler> handlerReference(handler, true);
 			if (fTeam->StopOnImageLoad()) {
 
 				bool stop = true;
