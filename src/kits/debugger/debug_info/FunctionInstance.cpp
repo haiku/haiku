@@ -32,6 +32,7 @@ FunctionInstance::FunctionInstance(ImageDebugInfo* imageDebugInfo,
 FunctionInstance::~FunctionInstance()
 {
 	SetFunction(NULL);
+	SetSourceCode(NULL, FUNCTION_SOURCE_NOT_LOADED);
 	fFunctionDebugInfo->ReleaseReference();
 }
 

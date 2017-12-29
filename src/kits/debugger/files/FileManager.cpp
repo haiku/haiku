@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -118,6 +118,12 @@ public:
 
 	~Domain()
 	{
+		LocatableEntry* entry = fEntries.Clear(true);
+		while (entry != NULL) {
+			LocatableEntry* next = entry->fNext;
+			entry->ReleaseReference();
+			entry = next;
+		}
 	}
 
 	status_t Init()
@@ -555,6 +561,13 @@ FileManager::~FileManager()
 {
 	delete fTargetDomain;
 	delete fSourceDomain;
+
+	SourceFileEntry* entry = fSourceFiles->Clear();
+	while (entry != NULL) {
+		SourceFileEntry* next = entry->next;
+		delete entry;
+		next = entry;
+	}
 	delete fSourceFiles;
 }
 

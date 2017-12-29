@@ -282,6 +282,16 @@ TeamWindow::~TeamWindow()
 	_SetActiveThread(NULL);
 
 	delete fFilePanel;
+
+	ThreadStackFrameSelectionEntry* entry
+		= fThreadSelectionInfoTable->Clear(true);
+
+	while (entry != NULL) {
+		ThreadStackFrameSelectionEntry* next = entry->next;
+		delete entry;
+		entry = next;
+	}
+
 	delete fThreadSelectionInfoTable;
 
 	if (fActiveSourceWorker > 0)

@@ -366,7 +366,7 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 		fFileManager);
 	if (teamDebugInfo == NULL)
 		return B_NO_MEMORY;
-	BReference<TeamDebugInfo> teamDebugInfoReference(teamDebugInfo);
+	BReference<TeamDebugInfo> teamDebugInfoReference(teamDebugInfo, true);
 
 	error = teamDebugInfo->Init();
 	if (error != B_OK)

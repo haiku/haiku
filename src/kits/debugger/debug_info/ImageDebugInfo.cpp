@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,12 +27,18 @@ ImageDebugInfo::~ImageDebugInfo()
 {
 	for (int32 i = 0; FunctionInstance* function = fFunctions.ItemAt(i); i++)
 		function->ReleaseReference();
+
+	for (int32 i = 0; SpecificImageDebugInfo* info = fSpecificInfos.ItemAt(i);
+			i++) {
+		info->ReleaseReference();
+	}
 }
 
 
 bool
 ImageDebugInfo::AddSpecificInfo(SpecificImageDebugInfo* info)
 {
+	// NB: on success we take over the caller's reference to the info object
 	return fSpecificInfos.AddItem(info);
 }
 

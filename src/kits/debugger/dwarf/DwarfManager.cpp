@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,6 +25,8 @@ DwarfManager::DwarfManager(uint8 addressSize)
 
 DwarfManager::~DwarfManager()
 {
+	while (DwarfFile* file = fFiles.RemoveHead())
+		file->ReleaseReference();
 }
 
 
