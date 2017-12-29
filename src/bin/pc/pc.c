@@ -134,7 +134,7 @@ ULONG term(char **str);              /* multiplication/division *,%,/ */
 ULONG factor(char **str);            /* negation, logical not ~, ! */
 ULONG get_value(char **str);
 int   get_var(char *name, ULONG *val); /* external interfaces to vars */
-ULONG set_var(char *name, ULONG val);
+void  set_var(char *name, ULONG val);
 
 void  do_input(void);                /* reads stdin and calls parser */
 char *skipwhite(char *str);          /* skip over input white space */
@@ -1018,7 +1018,7 @@ add_var(char *name, ULONG value)
    This routine and the companion get_var() are external
    interfaces to the variable manipulation routines.
 */   
-ULONG
+void
 set_var(char *name, ULONG val)
 {
   variable *v;
