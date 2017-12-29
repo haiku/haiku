@@ -3,7 +3,7 @@
 SYSTEM_BIN = [ FFilterByBuildFeatures
 	addattr alert arp autologin
 	beep bfsinfo
-	catattr checkfs checkitout chop clear collectcatkeys compress copyattr
+	catattr checkfs checkitout chop clear collectcatkeys copyattr
 	desklink df diskimage draggers
 	driveinfo dstcheck dumpcatalog
 	eject error
