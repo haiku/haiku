@@ -111,4 +111,6 @@ int media_play(const char* uri)
 
 	delete player;
 	delete playFile;
+
+	return 0;
 }
