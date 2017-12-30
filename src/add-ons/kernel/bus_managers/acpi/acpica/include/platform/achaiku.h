@@ -181,6 +181,11 @@ struct mutex;
 #define ACPI_MACHINE_WIDTH          64
 #else
 #define ACPI_MACHINE_WIDTH          32
+/* TODO: Temporary fix for #12377
+    DO NOT REMOVE as otherwise we get address overflows
+    Use 32 bit addresses to match addr_t for now.
+*/
+#define ACPI_32BIT_PHYSICAL_ADDRESS
 #endif
 
 
@@ -191,6 +196,21 @@ struct mutex;
 #define ACPI_USE_LOCAL_CACHE
 
 #define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
+
+/* Based on FreeBSD's due to lack of documentation
+   DO NOT REMOVE, the fallback is no ops, which means
+   HW <-> OS sync is not done => garbled data..
+*/
+extern int AcpiOsAcquireGlobalLock(uint32 *lock);
+extern int AcpiOsReleaseGlobalLock(uint32 *lock);
+
+#define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq)    do {                \
+        (Acq) = AcpiOsAcquireGlobalLock((uint32 *)&((GLptr)->GlobalLock));    \
+} while (0)
+
+#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq)    do {                \
+        (Acq) = AcpiOsReleaseGlobalLock((uint32 *)&((GLptr)->GlobalLock));    \
+} while (0)
 
 #else /* _KERNEL_MODE */
 /* Host-dependent types and defines for user-space ACPICA */
