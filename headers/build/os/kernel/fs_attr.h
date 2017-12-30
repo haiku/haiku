@@ -23,6 +23,7 @@ extern "C" {
 
 /* Since libroot_build is also used on Haiku and linked against the real
  * libroot which also has the fs*attr functions, these must be shadowed. */
+#ifndef BUILDING_FS_ATTR_HAIKU
 #define fs_read_attr		build_fs_read_attr
 #define fs_write_attr		build_fs_write_attr
 #define fs_remove_attr		build_fs_remove_attr
@@ -35,6 +36,7 @@ extern "C" {
 #define fs_close_attr_dir	build_fs_close_attr_dir
 #define fs_read_attr_dir	build_fs_read_attr_dir
 #define fs_rewind_attr_dir	build_fs_rewind_attr_dir
+#endif
 
 
 extern ssize_t	fs_read_attr(int fd, const char *attribute, uint32 type,
