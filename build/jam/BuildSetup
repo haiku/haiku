@@ -502,29 +502,27 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# request 64 bit off_t support explicitely.
 	HOST_DEFINES += _GNU_SOURCE _FILE_OFFSET_BITS=64 __STDC_FORMAT_MACROS
 		__STDC_LIMIT_MACROS ;
+}
 
-	# On Linux with xattr support we can use it for our attribute emulation,
-	# which is somewhat more robust.
-	if $(HAIKU_HOST_USE_XATTR) = 1 {
-		HOST_DEFINES += HAIKU_HOST_USE_XATTR ;
-	} else {
-		# Otherwise the generic attribute emulation is used, which uses a
-		# directory per file to store its attribute. We need to redefine RM so
-		# that the attributes are removed as well. We use a wrapper script,
-		# which invokes a build tool. If the build tool hasn't been built yet,
-		# the normal "rm" is used and the attributes are leaked (likely there
-		# aren't any yet).
-		RM = $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ";"
-			[ FDirName $(HAIKU_TOP) build scripts rm_attrs ]
-			[ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) $(HOST_ARCH) release
-				tools rm_attrs ] -f ;
-			# assumes that rm_attrs is built with debugging disabled
-		HOST_RM_ATTRS_TARGET = <build>rm_attrs ;
+if $(HAIKU_HOST_USE_XATTR) = 1 {
+	HOST_DEFINES += HAIKU_HOST_USE_XATTR ;
+} else {
+	# Otherwise the generic attribute emulation is used, which uses a
+	# directory per file to store its attribute. We need to redefine RM so
+	# that the attributes are removed as well. We use a wrapper script,
+	# which invokes a build tool. If the build tool hasn't been built yet,
+	# the normal "rm" is used and the attributes are leaked (likely there
+	# aren't any yet).
+	RM = $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ";"
+		[ FDirName $(HAIKU_TOP) build scripts rm_attrs ]
+		[ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) $(HOST_ARCH) release
+			tools rm_attrs ] -f ;
+		# assumes that rm_attrs is built with debugging disabled
+	HOST_RM_ATTRS_TARGET = <build>rm_attrs ;
 
-		# If specified, use xattr support to tag files with unique IDs.
-		if $(HAIKU_HOST_USE_XATTR_REF) = 1 {
-			HOST_DEFINES += HAIKU_HOST_USE_XATTR_REF ;
-		}
+	# If specified, use xattr support to tag files with unique IDs.
+	if $(HAIKU_HOST_USE_XATTR_REF) = 1 {
+		HOST_DEFINES += HAIKU_HOST_USE_XATTR_REF ;
 	}
 }
 

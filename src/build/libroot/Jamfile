@@ -78,10 +78,15 @@ local librootSources =
 
 USES_BE_API on [ FGristFiles $(librootSources:S=$(SUFOBJ)) ] = true ;
 
+local extraLibs ;
+if $(HOST_PLATFORM) = haiku_host {
+	extraLibs = gnu ;
+}
+
 BuildPlatformSharedLibrary libroot_build.so :
 	$(librootSources)
 	:
-	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++) $(extraLibs)
 ;
 
 # TODO: This doesn't work with the function remapping.

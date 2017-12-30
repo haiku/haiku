@@ -20,6 +20,23 @@ typedef struct attr_info {
 extern "C" {
 #endif
 
+
+/* Since libroot_build is also used on Haiku and linked against the real
+ * libroot which also has the fs*attr functions, these must be shadowed. */
+#define fs_read_attr		build_fs_read_attr
+#define fs_write_attr		build_fs_write_attr
+#define fs_remove_attr		build_fs_remove_attr
+#define fs_stat_attr		build_fs_stat_attr
+#define fs_open_attr		build_fs_open_attr
+#define fs_fopen_attr		build_fs_fopen_attr
+#define fs_close_attr		build_fs_close_attr
+#define fs_open_attr_dir	build_fs_open_attr_dir
+#define fs_fopen_attr_dir	build_fs_fopen_attr_dir
+#define fs_close_attr_dir	build_fs_close_attr_dir
+#define fs_read_attr_dir	build_fs_read_attr_dir
+#define fs_rewind_attr_dir	build_fs_rewind_attr_dir
+
+
 extern ssize_t	fs_read_attr(int fd, const char *attribute, uint32 type,
 					off_t pos, void *buffer, size_t readBytes);
 extern ssize_t	fs_write_attr(int fd, const char *attribute, uint32 type,
