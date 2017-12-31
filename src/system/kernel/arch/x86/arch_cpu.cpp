@@ -122,15 +122,6 @@ acpi_shutdown(bool rebootSystem)
 	if (rebootSystem) {
 		status = acpi->reboot();
 	} else {
-		// Make sure we run on the boot CPU (apparently needed for some ACPI
-		// implementations)
-		_user_set_cpu_enabled(0, true);
-		for (int32 cpu = 1; cpu < smp_get_num_cpus(); cpu++) {
-			_user_set_cpu_enabled(cpu, false);
-		}
-		// TODO: must not be called from the idle thread!
-		thread_yield();
-
 		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 		if (status == B_OK) {
 			//cpu_status state = disable_interrupts();
