@@ -29,6 +29,8 @@ BaseUnit::BaseUnit(off_t headerOffset, off_t contentOffset,
 
 BaseUnit::~BaseUnit()
 {
+	for (int32 i = 0; i < fEntries.Count(); i++)
+		delete fEntries[i];
 }
 
 

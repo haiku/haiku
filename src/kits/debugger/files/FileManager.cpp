@@ -124,6 +124,9 @@ public:
 			entry->ReleaseReference();
 			entry = next;
 		}
+
+		while ((entry = fDeadEntries.RemoveHead()) != NULL)
+			entry->ReleaseReference();
 	}
 
 	status_t Init()
@@ -208,6 +211,12 @@ private:
 				}
 			}
 		}
+
+		LocatableDirectory* parent = entry->Parent();
+		if (parent != NULL)
+			parent->RemoveEntry(entry);
+
+		delete entry;
 	}
 
 	bool _LocateDirectory(LocatableDirectory* directory,

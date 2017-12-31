@@ -267,7 +267,7 @@ struct DwarfImageDebugInfo::TypeNameEntry : TypeNameKey {
 	TypeNameEntry(const BString& name)
 		:
 		TypeNameKey(name),
-		types(10, false)
+		types(10, true)
 	{
 	}
 
@@ -362,6 +362,12 @@ DwarfImageDebugInfo::~DwarfImageDebugInfo()
 	fFile->ReleaseReference();
 	fTypeCache->ReleaseReference();
 
+	TypeNameEntry* entry = fTypeNameTable->Clear(true);
+	while (entry != NULL) {
+		TypeNameEntry* next = entry->next;
+		delete entry;
+		entry = next;
+	}
 	delete fTypeNameTable;
 }
 

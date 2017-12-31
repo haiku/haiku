@@ -19,6 +19,12 @@ CfaRuleSet::CfaRuleSet()
 }
 
 
+CfaRuleSet::~CfaRuleSet()
+{
+	delete[] fRegisterRules;
+}
+
+
 status_t
 CfaRuleSet::Init(uint32 registerCount)
 {

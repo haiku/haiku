@@ -12,6 +12,7 @@
 class CfaRuleSet {
 public:
 								CfaRuleSet();
+								~CfaRuleSet();
 
 			status_t			Init(uint32 registerCount);
 			CfaRuleSet*			Clone() const;
