@@ -17,12 +17,6 @@ SubDirC++Flags
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
-		local vectorIconLibs ;
-		if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM)
-				!= libbe_test {
-			vectorIconLibs = [ MultiArchDefaultGristFiles libicon.a libagg.a ] ;
-		}
-
 		local libtracker = [ MultiArchDefaultGristFiles libtracker.so ] ;
 		AddResources $(libtracker) : TrackerIcons.rdef libtracker.rdef ;
 
@@ -101,7 +95,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			WidgetAttributeText.cpp
 
 			:
-			be localestub shared translation $(vectorIconLibs)
+			be localestub shared translation
 			[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 			[ MultiArchDefaultGristFiles libshortcuts_shared.a ]
 			;

@@ -5,27 +5,10 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders net kernel bluetooth ;
 UsePrivateKernelHeaders ;
 
-local r5_src =  ;
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os bluetooth ] : true ;
-	# HACKs HACKs HACKs...
-	# for <bluetooth/*> ...
-        UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
-	# for <net/*> hmmm...
-	UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
-	# for USB_spec.h from Haiku
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
-	r5_src = list.c ;
-}
-
 KernelAddon h2generic :
 	h2generic.cpp
 	h2transactions.cpp
 	h2upper.cpp
 	h2util.cpp
 	snet_buffer.cpp
-	$(r5_src)
 	;
-	
-SEARCH on [ FGristFiles $(r5_src)
-        ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

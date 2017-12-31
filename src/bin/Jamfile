@@ -56,7 +56,6 @@ StdBinCommands
 
 # Commands which don't need another library that depend on
 # Haiku-specific code
-if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	boot_process_done.cpp
 	fdinfo.cpp
@@ -66,7 +65,6 @@ StdBinCommands
 	safemode.c
 	unmount.c
 	: : $(haiku-utils_rsrc) ;
-}
 
 # standard commands that need libncurses.a
 Includes [ FGristFiles top.cpp watch.c ]
@@ -152,12 +150,10 @@ StdBinCommands
 	: be [ TargetLibsupc++ ] localestub : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so
-if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	isvolume.cpp
 	shutdown.cpp
 	: be : $(haiku-utils_rsrc) ;
-}
 
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
@@ -167,11 +163,9 @@ StdBinCommands
 	: be [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so, libstdc++.so
-if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	mountvolume.cpp
 	: be [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
-}
 
 # commands that need libstdc++ only
 StdBinCommands

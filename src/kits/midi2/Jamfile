@@ -2,11 +2,6 @@ SubDir HAIKU_TOP src kits midi2 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os midi2 ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-}
-
 UsePrivateHeaders midi ;
 
 local architectureObject ;

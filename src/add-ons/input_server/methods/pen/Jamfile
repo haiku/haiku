@@ -3,17 +3,13 @@ SubDir HAIKU_TOP src add-ons input_server methods pen ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface ;
-
-#SubDirSysHdrs $(SUBDIR) ;
-if $(TARGET_PLATFORM) != dano {
-	SubDirSysHdrs [ FDirName $(SUBDIR) compat ] ;
-}
+SubDirSysHdrs [ FDirName $(SUBDIR) compat ] ;
 
 if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon pen : 
+Addon pen :
 	PenInputServerMethod.cpp
 	PenInputLooper.cpp
 	PenInputInkWindow.cpp

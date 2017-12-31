@@ -2,11 +2,9 @@ SubDir HAIKU_TOP src add-ons kernel drivers ports pc_serial ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UsePrivateHeaders libroot ;
-	UsePrivateKernelHeaders ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers tty ] : true ;
-}
+UsePrivateHeaders libroot ;
+UsePrivateKernelHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers tty ] : true ;
 
 SubDirC++Flags -fno-rtti ;
 

@@ -10,13 +10,6 @@ SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
 SubDirHdrs $(HAIKU_TOP) src system boot loader file_systems tarfs ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders drivers ;	# disk_device_manager.h
-	UsePublicHeaders storage ;	# DiskDeviceDefs.h
-
-	ObjectDefines tarfs.cpp : B_BUFFER_OVERFLOW=B_BAD_VALUE ;
-}
-
 ObjectDefines
 	tarfs.cpp
 	:

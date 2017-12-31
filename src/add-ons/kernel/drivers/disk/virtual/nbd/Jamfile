@@ -2,15 +2,8 @@ SubDir HAIKU_TOP src add-ons kernel drivers disk virtual nbd ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# not Haiku-specific, ksocket.h also works in BONE.
 UsePrivateHeaders drivers ;
-
-if $(TARGET_PLATFORM) = haiku {
-	# lock.h wants debug.h and others.
-	#UsePrivateHeaders kernel ;
-	#UsePublicHeaders kernel ;
-	UsePrivateKernelHeaders ;
-}
+UsePrivateKernelHeaders ;
 
 KernelAddon nbd :
 	nbd.c

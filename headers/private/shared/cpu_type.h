@@ -513,15 +513,8 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer,
 	if (model == NULL)
 		model = "Unknown";
 
-#ifdef R5_COMPATIBLE
-	strncpy(vendorBuffer, vendor, vendorSize - 1);
-	vendorBuffer[vendorSize - 1] = '\0';
-	strncpy(modelBuffer, model, modelSize - 1);
-	modelBuffer[modelSize - 1] = '\0';
-#else
 	strlcpy(vendorBuffer, vendor, vendorSize);
 	strlcpy(modelBuffer, model, modelSize);
-#endif
 }
 
 

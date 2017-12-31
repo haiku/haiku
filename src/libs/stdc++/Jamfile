@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src libs stdc++ ;
 
-if $(TARGET_PLATFORM) = haiku {
-	if x86_gcc2 in $(TARGET_PACKAGING_ARCHS) {
-		HaikuSubInclude legacy ;
-	}
+if x86_gcc2 in $(TARGET_PACKAGING_ARCHS) {
+	HaikuSubInclude legacy ;
 }

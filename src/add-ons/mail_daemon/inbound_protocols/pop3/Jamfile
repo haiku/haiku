@@ -1,9 +1,5 @@
 SubDir HAIKU_TOP src add-ons mail_daemon inbound_protocols pop3 ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders mail ;
-}
-
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail shared ;
 

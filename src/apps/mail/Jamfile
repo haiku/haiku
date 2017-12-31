@@ -1,9 +1,5 @@
 SubDir HAIKU_TOP src apps mail ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders mail ;
-}
-
 UsePrivateHeaders interface ;
 UsePrivateHeaders mail ;
 UsePrivateHeaders textencoding ;

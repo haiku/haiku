@@ -2,11 +2,6 @@ SubDir HAIKU_TOP src kits media ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os media ] : true ;
-		# We need the public media headers also when not compiling for Haiku.
-}
-
 UsePrivateHeaders app media shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 

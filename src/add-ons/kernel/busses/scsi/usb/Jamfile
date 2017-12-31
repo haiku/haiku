@@ -2,10 +2,6 @@ SubDir HAIKU_TOP src add-ons kernel busses scsi usb ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders [ FDirName drivers ] ;
-}
-
 UsePrivateHeaders drivers ;
 
 KernelAddon usb_scsi :

@@ -2,13 +2,6 @@ SubDir HAIKU_TOP src apps pulse ;
 
 UsePrivateSystemHeaders ;
 UsePrivateHeaders shared interface app ;
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
-}
-
-if $(TARGET_PLATFORM) = r5 {
-	SubDirC++Flags -DR5_COMPATIBLE ;
-}
 
 Application Pulse :
 	ConfigView.cpp

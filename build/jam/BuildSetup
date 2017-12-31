@@ -402,8 +402,7 @@ HOST_PRIVATE_KERNEL_HEADERS = ;
 HOST_PRIVATE_SYSTEM_HEADERS = ;
 
 # under BeOS use copyattr instead of cp
-if $(HOST_PLATFORM_BEOS_COMPATIBLE)
-{
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	CP = copyattr --data ;
 }
 
@@ -531,14 +530,6 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_NETWORK_LIBS = network ;
 	HOST_NETAPI_LIB = bnetapi ;
 	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
-} else if $(HOST_PLATFORM_BONE_COMPATIBLE) {
-	HOST_NETWORK_LIBS = socket bind ;
-	HOST_NETAPI_LIB = bnetapi ;
-	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
-} else if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	HOST_NETWORK_LIBS = net ;
-	HOST_NETAPI_LIB = netapi ;
-	HOST_SELECT_UNAME_ETC_LIB = net ;
 } else if $(HOST_PLATFORM) = "sunos" {
 	HOST_NETWORK_LIBS = xnet ;
 	HOST_NETAPI_LIB = ;
@@ -601,7 +592,7 @@ HOST_BE_API_HEADERS =
 	[ FDirName $(HAIKU_TOP) headers build os support ]
 	[ FDirName $(HAIKU_TOP) headers build private ]
 ;
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
 	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 }
@@ -612,15 +603,6 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 # check the target platform compatibility
 SetPlatformCompatibilityFlagVariables TARGET_PLATFORM : TARGET : target ;
-
-# check the compatibility between host and target platform
-if $(TARGET_PLATFORM) != haiku {
-	if ! $(HOST_PLATFORM_($(TARGET_PLATFORM))_COMPATIBLE) {
-		Exit ERROR: The host platform is not compatible with target platform
-			$(TARGET_PLATFORM). ;
-	}
-}
-
 
 # Haiku architecture is undefined on host-only builds
 # set here to host arch to prevent recusive loops.
@@ -680,68 +662,36 @@ local archDependentBuildVars =
 	DEBUG_$(HAIKU_DEBUG_LEVELS)_OBJECT_DIR
 	;
 
-if $(TARGET_PLATFORM) = haiku {
-	local var ;
-	for var in $(buildVars) {
-		TARGET_$(var) = $(HAIKU_$(var)) ;
-	}
+# target platform setup
+local var ;
+for var in $(buildVars) {
+	TARGET_$(var) = $(HAIKU_$(var)) ;
+}
 
-	for var in $(archDependentBuildVars)_$(TARGET_PACKAGING_ARCHS) {
-		TARGET_$(var) = $(HAIKU_$(var)) ;
-	}
+for var in $(archDependentBuildVars)_$(TARGET_PACKAGING_ARCHS) {
+	TARGET_$(var) = $(HAIKU_$(var)) ;
+}
 
-	TARGET_BOOT_LIBGCC		= $(HAIKU_BOOT_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
-	TARGET_BOOT_LIBSUPC++	= $(HAIKU_BOOT_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
+TARGET_BOOT_LIBGCC		= $(HAIKU_BOOT_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
+TARGET_BOOT_LIBSUPC++	= $(HAIKU_BOOT_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
 
-	TARGET_BOOT_PLATFORM	?= $(HAIKU_BOOT_PLATFORM) ;
+TARGET_BOOT_PLATFORM	?= $(HAIKU_BOOT_PLATFORM) ;
 
-	local architecture ;
-	for architecture in $(TARGET_PACKAGING_ARCHS) {
-		TARGET_DEFINES_$(architecture) = $(HAIKU_DEFINES_$(architecture)) ;
-		TARGET_LIBRARY_NAME_MAP_$(architecture)
-			= HAIKU_LIBRARY_NAME_MAP_$(architecture) ;
-	}
-} else {
-	local var ;
-	for var in $(buildVars) {
-		TARGET_$(var) = $(HOST_$(var)) ;
-	}
-
-	for var in $(archDependentBuildVars) {
-		TARGET_$(var)_$(TARGET_PACKAGING_ARCH) = $(HOST_$(var)) ;
-	}
-
-	TARGET_BOOT_LIBGCC			= ;
-	TARGET_BOOT_LIBSUPC++		= ;
-
-	TARGET_BOOT_PLATFORM		= ;
-
-	TARGET_DEFINES_$(TARGET_PACKAGING_ARCH) = ;
-		# all flags are in TARGET_DEFINES
-
-	TARGET_LIBRARY_NAME_MAP_$(TARGET_PACKAGING_ARCH) = HOST_LIBRARY_NAME_MAP ;
+local architecture ;
+for architecture in $(TARGET_PACKAGING_ARCHS) {
+	TARGET_DEFINES_$(architecture) = $(HAIKU_DEFINES_$(architecture)) ;
+	TARGET_LIBRARY_NAME_MAP_$(architecture)
+		= HAIKU_LIBRARY_NAME_MAP_$(architecture) ;
 }
 
 # define macro, for identifying the platform
 switch $(TARGET_PLATFORM) {
-	case r5			: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BEOS ;
-	case bone		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BONE ;
-	case dano		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DANO ;
-	case haiku_host	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
 	case haiku		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
-	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
-	case freebsd	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_FREEBSD ;
-	case darwin		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DARWIN ;
-	case cygwin		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_CYGWIN ;
-	case sunos		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_SUNOS ;
 	case libbe_test	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LIBBE_TEST ;
 }
 
 # define macro, for identifying the host platform
 switch $(HOST_PLATFORM) {
-	case r5			: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_BEOS ;
-	case bone		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_BONE ;
-	case dano		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DANO ;
 	case haiku_host	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
@@ -760,21 +710,6 @@ HOST_DEFINES += HAIKU_PACKAGING_ARCH=\\\"$(HAIKU_PACKAGING_ARCH)\\\" ;
 
 
 #pragma mark -
-
-# In case we build for a BeOS compatible platform, but not for Haiku, we
-# include the HaikuBuildCompatibility.h header and link against
-# libhaikucompat.a.
-
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
-	# headers and flags
-	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
-		HaikuBuildCompatibility.h ] ;
-	TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH) += $(compatibilityHeader) ;
-	TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH) += $(compatibilityHeader) ;
-
-	# compatibility library
-	TARGET_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
-}
 
 # special target libbe_test
 
