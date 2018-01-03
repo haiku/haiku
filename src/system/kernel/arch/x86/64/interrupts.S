@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
@@ -9,6 +10,7 @@
 #include <thread_types.h>
 
 #include <arch/x86/descriptors.h>
+#include <arch/x86/arch_altcodepatch.h>
 #include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_kernel.h>
 
@@ -143,6 +145,7 @@
 // Interrupt with no error code, pushes a 0 error code.
 #define DEFINE_ISR(nr)					\
 	.align 16;							\
+	ASM_CLAC							\
 	push	$0;							\
 	push	$nr;						\
 	jmp		int_bottom;
@@ -150,6 +153,7 @@
 // Interrupt with an error code.
 #define DEFINE_ISR_E(nr)				\
 	.align 16;							\
+	ASM_CLAC							\
 	push	$nr;						\
 	jmp		int_bottom;
 
@@ -546,10 +550,13 @@ FUNCTION(x86_64_syscall_entry):
 	// Set a fault handler.
 	movq	$.Lbad_syscall_args, THREAD_fault_handler(%r12)
 
+	ASM_STAC
+
 	// Copy them by quadwords.
 	shrq	$3, %rcx
 	rep
 	movsq
+	ASM_CLAC
 	movq	$0, THREAD_fault_handler(%r12)
 
 	// Perform the call.

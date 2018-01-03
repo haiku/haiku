@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -648,12 +649,14 @@ enter_userspace(Thread* thread, UserThreadEntryArguments* args)
 
 	// init the thread's user_thread
 	user_thread* userThread = thread->user_thread;
+	set_ac();
 	userThread->pthread = args->pthread;
 	userThread->flags = 0;
 	userThread->wait_status = B_OK;
 	userThread->defer_signals
 		= (args->flags & THREAD_CREATION_FLAG_DEFER_SIGNALS) != 0 ? 1 : 0;
 	userThread->pending_signals = 0;
+	clear_ac();
 
 	if (args->forkArgs != NULL) {
 		// This is a fork()ed thread. Copy the fork args onto the stack and

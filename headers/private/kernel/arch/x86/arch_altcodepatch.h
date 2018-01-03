@@ -20,6 +20,10 @@
 #define ASM_NOP9	.byte 0x66, 0x0f, 0x1f, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00
 
 
+#define ALTCODEPATCH_TAG_STAC		1
+#define ALTCODEPATCH_TAG_CLAC		2
+
+
 #ifdef _ASSEMBLER
 
 #define CODEPATCH_START	990:
@@ -29,6 +33,14 @@
 	.short			(991b - 990b)		;	\
 	.short			tag				;	\
 	.popsection
+
+#define ASM_STAC	CODEPATCH_START \
+					ASM_NOP3	;	 \
+					CODEPATCH_END(ALTCODEPATCH_TAG_STAC)
+
+#define ASM_CLAC	CODEPATCH_START \
+					ASM_NOP3	;	\
+					CODEPATCH_END(ALTCODEPATCH_TAG_CLAC)
 
 #else
 
@@ -42,6 +54,15 @@
 	".short			(991b - 990b)		\n" \
 	".short			" STRINGIFY(tag)	"	\n" \
 	".popsection"
+
+#define ASM_STAC	CODEPATCH_START \
+					STRINGIFY(ASM_NOP3)	"\n" \
+					CODEPATCH_END(ALTCODEPATCH_TAG_STAC)
+
+#define ASM_CLAC	CODEPATCH_START \
+					STRINGIFY(ASM_NOP3)	"\n"\
+					CODEPATCH_END(ALTCODEPATCH_TAG_CLAC)
+
 
 void arch_altcodepatch_replace(uint16 tag, void* newcodepatch, size_t length);
 

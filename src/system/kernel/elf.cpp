@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -1963,7 +1964,9 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 			size_t amount = fileUpperBound
 				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				- (programHeaders[i].p_filesz);
+			set_ac();
 			memset((void *)start, 0, amount);
+			clear_ac();
 
 			// Check if we need extra storage for the bss - we have to do this if
 			// the above region doesn't already comprise the memory size, too.
@@ -2025,6 +2028,7 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 	// modify the dynamic ptr by the delta of the regions
 	image->dynamic_section += image->text_region.delta;
 
+	set_ac();
 	status = elf_parse_dynamic_section(image);
 	if (status != B_OK)
 		goto error2;
@@ -2032,6 +2036,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 	status = elf_relocate(image, image);
 	if (status != B_OK)
 		goto error2;
+
+	clear_ac();
 
 	// set correct area protection
 	for (i = 0; i < elfHeader.e_phnum; i++) {

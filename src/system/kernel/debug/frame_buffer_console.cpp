@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -133,6 +134,7 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 		uint8* color = get_palette_entry(foreground_color(attr));
 		uint8* backgroundColor = get_palette_entry(background_color(attr));
 
+		set_ac();
 		for (y = 0; y < CHAR_HEIGHT; y++) {
 			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
 			for (x = 0; x < CHAR_WIDTH; x++) {
@@ -149,6 +151,8 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 
 			base += sConsole.bytes_per_row;
 		}
+		clear_ac();
+
 	} else {
 		// VGA mode will be treated as monochrome
 		// (ie. only the first plane will be used)
@@ -157,6 +161,7 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 			+ sConsole.bytes_per_row * y * CHAR_HEIGHT + x * CHAR_WIDTH / 8);
 		uint8 baseOffset =  (x * CHAR_WIDTH) & 0x7;
 
+		set_ac();
 		for (y = 0; y < CHAR_HEIGHT; y++) {
 			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
 			uint8 offset = baseOffset;
@@ -179,6 +184,7 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 
 			base += sConsole.bytes_per_row;
 		}
+		clear_ac();
 	}
 }
 
@@ -200,12 +206,14 @@ draw_cursor(int32 x, int32 y)
 		endY /= 8;
 	}
 
+	set_ac();
 	for (; y < endY; y++) {
 		for (int32 x2 = x; x2 < endX; x2++)
 			base[x2] = ~base[x2];
 
 		base += sConsole.bytes_per_row;
 	}
+	clear_ac();
 }
 
 
@@ -290,12 +298,14 @@ console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx,
 		destx = destx * CHAR_WIDTH / 8;
 	}
 
+	set_ac();
 	for (int32 y = 0; y < height; y++) {
 		memmove((void*)(sConsole.frame_buffer + (desty + y)
 				* sConsole.bytes_per_row + destx),
 			(void*)(sConsole.frame_buffer + (srcy + y) * sConsole.bytes_per_row
 				+ srcx), width);
 	}
+	clear_ac();
 }
 
 
@@ -305,6 +315,7 @@ console_clear(uint8 attr)
 	if (!frame_buffer_console_available())
 		return;
 
+	set_ac();
 	switch (sConsole.bytes_per_pixel) {
 		case 1:
 			if (sConsole.depth >= 8) {
@@ -334,6 +345,7 @@ console_clear(uint8 attr)
 		}
 	}
 
+	clear_ac();
 	sConsole.cursor_x = -1;
 	sConsole.cursor_y = -1;
 }

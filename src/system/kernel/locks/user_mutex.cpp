@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2015, Hamish Morrison, hamishm53@gmail.com.
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
@@ -139,13 +140,17 @@ user_mutex_lock_locked(int32* mutex, addr_t physicalAddress,
 	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
 {
 	// mark the mutex locked + waiting
+	set_ac();
 	int32 oldValue = atomic_or(mutex,
 		B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING);
+	clear_ac();
 
 	if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
 			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
 		// clear the waiting flag and be done
+		set_ac();
 		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+		clear_ac();
 		return B_OK;
 	}
 
@@ -153,8 +158,11 @@ user_mutex_lock_locked(int32* mutex, addr_t physicalAddress,
 	status_t error = user_mutex_wait_locked(mutex, physicalAddress, name,
 		flags, timeout, locker, lastWaiter);
 
-	if (lastWaiter)
+	if (lastWaiter) {
+		set_ac();
 		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+		clear_ac();
+	}
 
 	return error;
 }
@@ -166,14 +174,18 @@ user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
 	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
 	if (entry == NULL) {
 		// no one is waiting -- clear locked flag
+		set_ac();
 		atomic_and(mutex, ~(int32)B_USER_MUTEX_LOCKED);
+		clear_ac();
 		return;
 	}
 
 	// Someone is waiting -- set the locked flag. It might still be set,
 	// but when using userland atomic operations, the caller will usually
 	// have cleared it already.
+	set_ac();
 	int32 oldValue = atomic_or(mutex, B_USER_MUTEX_LOCKED);
+	clear_ac();
 
 	// unblock the first thread
 	entry->locked = true;
@@ -189,11 +201,16 @@ user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
 
 		// dequeue the first thread and mark the mutex uncontended
 		sUserMutexTable.Remove(entry);
+		set_ac();
 		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+		clear_ac();
 	} else {
 		bool otherWaiters = remove_user_mutex_entry(entry);
-		if (!otherWaiters)
+		if (!otherWaiters) {
+			set_ac();
 			atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+			clear_ac();
+		}
 	}
 }
 
@@ -204,9 +221,13 @@ user_mutex_sem_acquire_locked(int32* sem, addr_t physicalAddress,
 {
 	// The semaphore may have been released in the meantime, and we also
 	// need to mark it as contended if it isn't already.
+	set_ac();
 	int32 oldValue = atomic_get(sem);
+	clear_ac();
 	while (oldValue > -1) {
+		set_ac();
 		int32 value = atomic_test_and_set(sem, oldValue - 1, oldValue);
+		clear_ac();
 		if (value == oldValue && value > 0)
 			return B_OK;
 		oldValue = value;
@@ -216,8 +237,11 @@ user_mutex_sem_acquire_locked(int32* sem, addr_t physicalAddress,
 	status_t error = user_mutex_wait_locked(sem, physicalAddress, name, flags,
 		timeout, locker, lastWaiter);
 
-	if (lastWaiter)
+	if (lastWaiter) {
+		set_ac();
 		atomic_test_and_set(sem, 0, -1);
+		clear_ac();
+	}
 
 	return error;
 }
@@ -229,10 +253,14 @@ user_mutex_sem_release_locked(int32* sem, addr_t physicalAddress)
 	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
 	if (!entry) {
 		// no waiters - mark as uncontended and release
+		set_ac();
 		int32 oldValue = atomic_get(sem);
+		clear_ac();
 		while (true) {
 			int32 inc = oldValue < 0 ? 2 : 1;
+			set_ac();
 			int32 value = atomic_test_and_set(sem, oldValue + inc, oldValue);
+			clear_ac();
 			if (value == oldValue)
 				return;
 			oldValue = value;
@@ -246,7 +274,9 @@ user_mutex_sem_release_locked(int32* sem, addr_t physicalAddress)
 
 	if (!otherWaiters) {
 		// mark the semaphore uncontended
+		set_ac();
 		atomic_test_and_set(sem, 0, -1);
+		clear_ac();
 	}
 }
 

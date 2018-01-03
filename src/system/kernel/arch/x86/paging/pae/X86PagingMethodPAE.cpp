@@ -155,7 +155,7 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		// enable PAE on all CPUs
 		call_all_cpus_sync(&_EnablePAE, (void*)(addr_t)physicalPDPT);
 
-		// if availalbe enable NX-bit (No eXecute)
+		// if available enable NX-bit (No eXecute)
 		if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD))
 			call_all_cpus_sync(&_EnableExecutionDisable, NULL);
 

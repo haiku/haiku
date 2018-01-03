@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
@@ -25,7 +26,8 @@ init_syscall_registers(void* dummy, int cpuNum)
 
 	// Flags to clear upon entry. Want interrupts disabled and the direction
 	// flag cleared.
-	x86_write_msr(IA32_MSR_FMASK, X86_EFLAGS_INTERRUPT | X86_EFLAGS_DIRECTION);
+	x86_write_msr(IA32_MSR_FMASK, X86_EFLAGS_INTERRUPT | X86_EFLAGS_DIRECTION
+		| X86_EFLAGS_ALIGNMENT_CHECK);
 
 	// Entry point address.
 	x86_write_msr(IA32_MSR_LSTAR, (addr_t)x86_64_syscall_entry);

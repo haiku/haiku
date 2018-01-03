@@ -59,7 +59,7 @@ X86PagingMethod64Bit::Init(kernel_args* args,
 	fKernelPhysicalPML4 = args->arch_args.phys_pgdir;
 	fKernelVirtualPML4 = (uint64*)(addr_t)args->arch_args.vir_pgdir;
 
-	// if availalbe enable NX-bit (No eXecute)
+	// if available enable NX-bit (No eXecute)
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD))
 		call_all_cpus_sync(&_EnableExecutionDisable, NULL);
 

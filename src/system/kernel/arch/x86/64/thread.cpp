@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -223,8 +224,10 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	// entry function returns to the top of the stack to act as the return
 	// address. The stub is inside commpage.
 	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+	set_ac();
 	codeAddr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
 		+ commPageAddress;
+	clear_ac();
 	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
 			!= B_OK)
 		return B_BAD_ADDRESS;
@@ -343,8 +346,10 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// stack. First argument points to the frame data.
 	addr_t* commPageAddress = (addr_t*)thread->team->commpage_address;
 	frame->user_sp = (addr_t)userStack;
+	set_ac();
 	frame->ip = commPageAddress[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER]
 		+ (addr_t)commPageAddress;
+	clear_ac();
 	frame->di = (addr_t)userSignalFrameData;
 
 	return B_OK;

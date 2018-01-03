@@ -409,6 +409,16 @@ smp_add_safemode_menus(Menu *menu)
 			item->SetHelpText("Enables using X2APIC.");
 #endif
 		}
+
+		if (get_current_cpuid(&info, 7, 0) == B_OK
+				&& ((info.regs.ebx & (IA32_FEATURE_SMEP
+					| IA32_FEATURE_SMAP) != 0) {
+			menu->AddItem(item = new(nothrow) MenuItem(
+				"Disable SMEP and SMAP"));
+			item->SetType(MENU_ITEM_MARKABLE);
+			item->SetData(B_SAFEMODE_DISABLE_SMEP_SMAP);
+			item->SetHelpText("Disables using SMEP and SMAP.");
+		}
 	}
 
 	if (gKernelArgs.num_cpus < 2)

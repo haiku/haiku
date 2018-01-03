@@ -24,6 +24,7 @@
 #include <commpage.h>
 #include <debug.h>
 #include <elf.h>
+#include <safemode.h>
 #include <smp.h>
 #include <util/BitUtils.h>
 #include <vm/vm.h>
@@ -78,6 +79,11 @@ struct set_mtrrs_parameter {
 	uint8					defaultType;
 };
 
+
+#ifdef __x86_64__
+extern addr_t _stac;
+extern addr_t _clac;
+#endif
 
 extern "C" void x86_reboot(void);
 	// from arch.S
@@ -1159,6 +1165,20 @@ arch_cpu_init(kernel_args* args)
 }
 
 
+static void
+enable_smap(void* dummy, int cpu)
+{
+	x86_write_cr4(x86_read_cr4() | IA32_CR4_SMAP);
+}
+
+
+static void
+enable_smep(void* dummy, int cpu)
+{
+	x86_write_cr4(x86_read_cr4() | IA32_CR4_SMEP);
+}
+
+
 status_t
 arch_cpu_init_post_vm(kernel_args* args)
 {
@@ -1187,6 +1207,29 @@ arch_cpu_init_post_vm(kernel_args* args)
 	if (!apic_available())
 		x86_init_fpu();
 	// else fpu gets set up in smp code
+
+#ifdef __x86_64__
+	// if available enable SMEP (Supervisor Memory Execution Protection)
+	if (x86_check_feature(IA32_FEATURE_SMEP, FEATURE_7_EBX)) {
+		if (!get_safemode_boolean(B_SAFEMODE_DISABLE_SMEP_SMAP, false)) {
+			dprintf("enable SMEP\n");
+			call_all_cpus_sync(&enable_smep, NULL);
+		} else
+			dprintf("SMEP disabled per safemode setting\n");
+	}
+
+	// if available enable SMAP (Supervisor Memory Access Protection)
+	if (x86_check_feature(IA32_FEATURE_SMAP, FEATURE_7_EBX)) {
+		if (!get_safemode_boolean(B_SAFEMODE_DISABLE_SMEP_SMAP, false)) {
+			dprintf("enable SMAP\n");
+			call_all_cpus_sync(&enable_smap, NULL);
+
+			arch_altcodepatch_replace(ALTCODEPATCH_TAG_STAC, &_stac, 3);
+			arch_altcodepatch_replace(ALTCODEPATCH_TAG_CLAC, &_clac, 3);
+		} else
+			dprintf("SMAP disabled per safemode setting\n");
+	}
+#endif
 
 	return B_OK;
 }

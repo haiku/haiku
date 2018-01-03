@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Distributed under the terms of the MIT License.
  */
@@ -50,7 +51,9 @@ bool user_access(Function function)
 	// destructor.
 	auto fail = setjmp(thread_get_current_thread()->fault_handler_state);
 	if (fail == 0) {
+		set_ac();
 		function();
+		clear_ac();
 		return true;
 	}
 	return false;

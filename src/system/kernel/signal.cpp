@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2011-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
@@ -928,14 +929,17 @@ handle_signals(Thread* thread)
 	sigset_t nonBlockedMask = ~thread->sig_block_mask;
 	sigset_t signalMask = thread->AllPendingSignals() & nonBlockedMask;
 
+	set_ac();
 	if (thread->user_thread->defer_signals > 0
 		&& (signalMask & NON_DEFERRABLE_SIGNALS) == 0
 		&& thread->sigsuspend_original_unblocked_mask == 0) {
 		thread->user_thread->pending_signals = signalMask;
+		clear_ac();
 		return;
 	}
 
 	thread->user_thread->pending_signals = 0;
+	clear_ac();
 
 	// determine syscall restart behavior
 	uint32 restartFlags = atomic_and(&thread->flags,

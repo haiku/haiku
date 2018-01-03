@@ -17,6 +17,7 @@
 
 #include <arch_thread_types.h>
 
+#include <arch/x86/arch_altcodepatch.h>
 #include <arch/x86/descriptors.h>
 
 #ifdef __x86_64__
@@ -272,10 +273,6 @@
 #define IA32_FEATURE_AMD_EXT_IBPB	(1 << 12)	/* IBPB Support only (no IBRS) */
 
 
-// cr4 flags
-#define IA32_CR4_PAE					(1UL << 5)
-#define IA32_CR4_GLOBAL_PAGES			(1UL << 7)
-
 // Memory type ranges
 #define IA32_MTR_UNCACHED				0
 #define IA32_MTR_WRITE_COMBINING		1
@@ -299,7 +296,7 @@
 #define X86_EFLAGS_NESTED_TASK					0x00004000
 #define X86_EFLAGS_RESUME						0x00010000
 #define X86_EFLAGS_V86_MODE						0x00020000
-#define X86_EFLAGS_ALIGNMENT_CHECK				0x00040000
+#define X86_EFLAGS_ALIGNMENT_CHECK				0x00040000	// also SMAP status
 #define X86_EFLAGS_VIRTUAL_INTERRUPT			0x00080000
 #define X86_EFLAGS_VIRTUAL_INTERRUPT_PENDING	0x00100000
 #define X86_EFLAGS_ID							0x00200000
@@ -313,9 +310,20 @@
 #define CR0_FPU_EMULATION		(1UL << 2)
 #define CR0_MONITOR_FPU			(1UL << 1)
 
+// cr4 flags
+#define IA32_CR4_PAE			(1UL << 5)
+#define IA32_CR4_GLOBAL_PAGES	(1UL << 7)
 #define CR4_OS_FXSR				(1UL << 9)
 #define CR4_OS_XMM_EXCEPTION	(1UL << 10)
+#define IA32_CR4_SMEP			(1UL << 20)
+#define IA32_CR4_SMAP			(1UL << 21)
 
+// page fault error codes (http://wiki.osdev.org/Page_Fault)
+#define PGFAULT_P						0x01	// Protection violation
+#define PGFAULT_W						0x02	// Write
+#define PGFAULT_U						0x04	// Usermode
+#define PGFAULT_RSVD					0x08	// Reserved bits
+#define PGFAULT_I						0x10	// Instruction fetch
 
 // iframe types
 #define IFRAME_TYPE_SYSCALL				0x1
@@ -460,6 +468,12 @@ typedef struct arch_cpu_info {
 
 #define wbinvd() \
 	__asm__("wbinvd")
+
+#define set_ac() \
+	__asm__ volatile (ASM_STAC : : : "memory")
+
+#define clear_ac() \
+	__asm__ volatile (ASM_CLAC : : : "memory")
 
 #define out8(value,port) \
 	__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))
