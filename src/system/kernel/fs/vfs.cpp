@@ -8710,6 +8710,9 @@ _user_mount(const char* userPath, const char* userDevice,
 		return B_BAD_ADDRESS;
 
 	if (userArgs != NULL && argsLength > 0) {
+		if (!IS_USER_ADDRESS(userArgs))
+			return B_BAD_ADDRESS;
+
 		// this is a safety restriction
 		if (argsLength >= 65536)
 			return B_NAME_TOO_LONG;
@@ -8739,6 +8742,10 @@ status_t
 _user_unmount(const char* userPath, uint32 flags)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+
+	if (!IS_USER_ADDRESS(userPath))
+		return B_BAD_ADDRESS;
+
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
@@ -9863,6 +9870,9 @@ _user_open_query(dev_t device, const char* userQuery, size_t queryLength,
 
 	if (device < 0 || userQuery == NULL || queryLength == 0)
 		return B_BAD_VALUE;
+
+	if (!IS_USER_ADDRESS(userQuery))
+		return B_BAD_ADDRESS;
 
 	// this is a safety restriction
 	if (queryLength >= 65536)
