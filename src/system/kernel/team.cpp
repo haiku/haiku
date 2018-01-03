@@ -2322,8 +2322,8 @@ get_job_control_entry(team_job_control_children& children, pid_t id)
 	\param id The match criterion.
 	\param flags Specifies which children shall be considered. Dead children
 		always are. Stopped children are considered when \a flags is ORed
-		bitwise with \c WUNTRACED, continued children when \a flags is ORed
-		bitwise with \c WCONTINUED.
+		bitwise with \c WUNTRACED or \c WSTOPPED, continued children when
+		\a flags is ORed bitwise with \c WCONTINUED.
 	\return The first matching entry or \c NULL, if none matches.
 */
 static job_control_entry*
@@ -2334,7 +2334,7 @@ get_job_control_entry(Team* team, pid_t id, uint32 flags)
 	if (entry == NULL && (flags & WCONTINUED) != 0)
 		entry = get_job_control_entry(team->continued_children, id);
 
-	if (entry == NULL && (flags & WUNTRACED) != 0)
+	if (entry == NULL && (flags & (WUNTRACED | WSTOPPED)) != 0)
 		entry = get_job_control_entry(team->stopped_children, id);
 
 	return entry;
