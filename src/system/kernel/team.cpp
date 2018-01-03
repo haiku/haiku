@@ -2459,7 +2459,7 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info,
 				childrenExist = team->children != NULL;
 			} else if (child < -1) {
 				childrenExist = has_children_in_group(team, -child);
-			} else {
+			} else if (child != team->id) {
 				if (Team* childTeam = Team::Get(child)) {
 					BReference<Team> childTeamReference(childTeam, true);
 					TeamLocker childTeamLocker(childTeam);
