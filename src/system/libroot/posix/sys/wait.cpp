@@ -28,7 +28,8 @@ _waitpid(pid_t pid, int* _status, int options, team_usage_info *usage_info)
 {
 	// wait
 	siginfo_t info;
-	pid_t child = _kern_wait_for_child(pid, options, &info, usage_info);
+	pid_t child = _kern_wait_for_child(pid, options | WEXITED, &info,
+		usage_info);
 
 	pthread_testcancel();
 
