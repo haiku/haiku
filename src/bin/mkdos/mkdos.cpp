@@ -467,6 +467,11 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	// avoid doing 512 byte writes here, they are slow
 	printf("Writing FAT\n");
 	char * zerobuffer = (char *)malloc(65536);
+	if (zerobuffer == NULL) {
+		fprintf(stderr,"Error: out of memory\n");
+		close(fd);
+		return B_ERROR;
+	}
 	memset(zerobuffer,0,65536);
 	int64 bytes_to_write = 512LL * (reservedSectorCount + (numFATs * FATSize) + rootDirSectors);
 	int64 pos = 0;
@@ -476,6 +481,7 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		if (written != writesize) {
 			fprintf(stderr,"Error: write error near sector %Ld\n",pos / 512);
 			close(fd);
+			free(zerobuffer);
 			return B_ERROR;
 		}
 		bytes_to_write -= writesize;
@@ -592,6 +598,11 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 	} else if (fatbits == 32) {
 		int size = 512 * sectorPerCluster;
 		uint8 *cluster = (uint8*)malloc(size);
+		if (cluster == NULL) {
+			fprintf(stderr,"Error: out of memory\n");
+			close(fd);
+			return B_ERROR;
+		}
 		memset(cluster, 0, size);
 		CreateVolumeLabel(cluster, label);
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize) + rootDirSectors;

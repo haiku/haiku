@@ -432,6 +432,7 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		written = write_pos(fd, pos, zerobuffer, writesize);
 		if (written != writesize) {
 			dprintf("dosfs Error: write error near sector %Ld\n",pos / 512);
+			free(zerobuffer);
 			return B_ERROR;
 		}
 		bytes_to_write -= writesize;
