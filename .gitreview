@@ -1,0 +1,5 @@
+[gerrit]
+host=git.haiku-os.org
+port=22
+project=haiku.git
+defaultbranch=master
