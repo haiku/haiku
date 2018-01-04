@@ -51,6 +51,8 @@ All rights reserved.
 #include <Screen.h>
 #include <Window.h>
 
+#include "BarApp.h"
+#include "StatusView.h"
 #include "CalendarMenuWindow.h"
 
 
@@ -149,8 +151,8 @@ TTimeView::AttachedToWindow()
 	} else
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	CalculateTextPlacement();
 	ResizeToPreferred();
+	CalculateTextPlacement();
 }
 
 
@@ -182,15 +184,14 @@ TTimeView::GetPreferredSize(float* width, float* height)
 {
 	*height = fHeight;
 
-	GetCurrentTime();
-
 	float timeWidth = StringWidth(fCurrentTimeStr);
 
-	// TODO: SetOrientation never gets called, fix that when in vertical mode,
-	// we want to limit the width so that it can't overlap the bevels in the
-	// parent view.
-	*width = fOrientation ? std::min(fMaxWidth - kHMargin, timeWidth)
-		: timeWidth;
+	if (fOrientation) {
+		float appWidth = static_cast<TBarApp*>(be_app)->Settings()->width;
+		*width = fMaxWidth
+			= std::min(appWidth - (kDragRegionWidth + kHMargin) * 2, timeWidth);
+	} else
+		*width = fMaxWidth = timeWidth;
 }
 
 
@@ -312,6 +313,7 @@ void
 TTimeView::SetOrientation(bool orientation)
 {
 	fOrientation = orientation;
+	ResizeToPreferred();
 	CalculateTextPlacement();
 	Invalidate();
 }
@@ -459,6 +461,17 @@ TTimeView::CalculateTextPlacement()
 
 	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height()
 		- rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
+
+	if (fOrientation) {
+		float timeWidth = StringWidth(fCurrentTimeStr);
+		if (timeWidth > fMaxWidth) {
+			// time does not fit, push it over to truncate the left side
+			// to see the entire time string you must make the window wider
+			float difference = timeWidth - fMaxWidth;
+			fDateLocation.x -= difference;
+			fTimeLocation.x -= difference;
+		}
+	}
 }
 
 
@@ -496,8 +509,8 @@ TTimeView::Update()
 	GetCurrentDate();
 	SetToolTip(fCurrentDateStr);
 
-	CalculateTextPlacement();
 	ResizeToPreferred();
+	CalculateTextPlacement();
 
 	if (fParent != NULL)
 		fParent->Invalidate();

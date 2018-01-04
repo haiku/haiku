@@ -175,6 +175,7 @@ TReplicantTray::AttachedToWindow()
 	AddChild(fTime);
 
 	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - kTrayPadding, 2);
+	fTime->SetOrientation(fMultiRowMode);
 
 	if (!((TBarApp*)be_app)->Settings()->showClock)
 		fTime->Hide();

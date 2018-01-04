@@ -733,15 +733,18 @@ TBarView::_ChangeState(BMessage* message)
 			// Send a message to the preferences window to let it know to
 			// enable or disable preference items.
 
-		if (vertSwap && fExpandoMenuBar != NULL) {
-			if (fVertical) {
-				fInlineScrollView->SetOrientation(B_VERTICAL);
-				fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_COLUMN);
-				fExpandoMenuBar->StartMonitoringWindows();
-			} else {
-				fInlineScrollView->SetOrientation(B_HORIZONTAL);
-				fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_ROW);
-				fExpandoMenuBar->StopMonitoringWindows();
+		if (vertSwap) {
+			fReplicantTray->fTime->SetOrientation(fVertical);
+			if (fExpandoMenuBar != NULL) {
+				if (fVertical) {
+					fInlineScrollView->SetOrientation(B_VERTICAL);
+					fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_COLUMN);
+					fExpandoMenuBar->StartMonitoringWindows();
+				} else {
+					fInlineScrollView->SetOrientation(B_HORIZONTAL);
+					fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_ROW);
+					fExpandoMenuBar->StopMonitoringWindows();
+				}
 			}
 		}
 	}

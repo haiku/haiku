@@ -167,6 +167,7 @@ private:
 				status_t			_SaveSettings();
 
 	friend class TReplicantShelf;
+	friend class TBarView;
 
 				TTimeView*			fTime;
 				TBarView*			fBarView;
