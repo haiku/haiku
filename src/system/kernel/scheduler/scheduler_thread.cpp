@@ -170,7 +170,7 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 			if (fCore != NULL)
 				fCore->RemoveLoad(fNeededLoad, true);
 			targetCore->AddLoad(fNeededLoad, fLoadMeasurementEpoch, true);
-		}	
+		}
 	}
 
 	fCore = targetCore;
