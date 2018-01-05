@@ -73,7 +73,7 @@ public:
 	virtual const char* Name() const;
 
 private:
-	uint8				fPriority;
+	int32				fPriority;
 };
 
 
@@ -114,7 +114,7 @@ private:
 	thread_id			fPreviousID;
 	int32				fCPU;
 	char*				fName;
-	uint8				fPriority;
+	int32				fPriority;
 	uint8				fPreviousState;
 	uint16				fPreviousWaitObjectType;
 	union {

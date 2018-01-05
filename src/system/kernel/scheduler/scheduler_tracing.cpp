@@ -19,8 +19,9 @@ namespace SchedulerTracing {
 void
 EnqueueThread::AddDump(TraceOutput& out)
 {
-	out.Print("scheduler enqueue %ld \"%s\", effective priority %d, "
-		"real priority %d", fID, fName, fEffectivePriority, fPriority);
+	out.Print("scheduler enqueue %" B_PRId32 " \"%s\", effective priority %"
+		B_PRId32 ", real priority %" B_PRId32, fID, fName, fEffectivePriority,
+		fPriority);
 }
 
 
@@ -37,7 +38,8 @@ EnqueueThread::Name() const
 void
 RemoveThread::AddDump(TraceOutput& out)
 {
-	out.Print("scheduler remove %ld, priority %d", fID, fPriority);
+	out.Print("scheduler remove %" B_PRId32 ", priority %" B_PRId32, fID,
+		fPriority);
 }
 
 const char*
@@ -53,12 +55,14 @@ RemoveThread::Name() const
 void
 ScheduleThread::AddDump(TraceOutput& out)
 {
-	out.Print("schedule %ld \"%s\", priority %d, CPU %ld, "
-		"previous thread: %ld (", fID, fName, fPriority, fCPU, fPreviousID);
+	out.Print("schedule %" B_PRId32 " \"%s\", priority %" B_PRId32 ", CPU %"
+		B_PRId32 ", previous thread: %" B_PRId32 " (", fID, fName, fPriority,
+		fCPU, fPreviousID);
 	if (fPreviousState == B_THREAD_WAITING) {
 		switch (fPreviousWaitObjectType) {
 			case THREAD_BLOCK_TYPE_SEMAPHORE:
-				out.Print("sem %ld", (sem_id)(addr_t)fPreviousWaitObject);
+				out.Print("sem %" B_PRId32,
+					(sem_id)(addr_t)fPreviousWaitObject);
 				break;
 			case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
 				out.Print("cvar %p", fPreviousWaitObject);
@@ -120,7 +124,7 @@ cmd_scheduler(int argc, char** argv)
 	}
 
 	if (threadID <= 0) {
-		kprintf("Invalid thread ID: %lld\n", threadID);
+		kprintf("Invalid thread ID: %" B_PRId64 "\n", threadID);
 		return 0;
 	}
 
@@ -260,43 +264,43 @@ cmd_scheduler(int argc, char** argv)
 
 	// print results
 	if (runs == 0) {
-		kprintf("thread %lld never ran.\n", threadID);
+		kprintf("thread %" B_PRId64 " never ran.\n", threadID);
 		return 0;
 	}
 
-	kprintf("scheduling statistics for thread %lld:\n", threadID);
+	kprintf("scheduling statistics for thread %" B_PRId64 ":\n", threadID);
 	kprintf("runs:\n");
-	kprintf("  total #: %lld\n", runs);
-	kprintf("  total:   %lld us\n", totalRunTime);
+	kprintf("  total #: %" B_PRId64 "\n", runs);
+	kprintf("  total:   %" B_PRIdBIGTIME " us\n", totalRunTime);
 	kprintf("  average: %#.2f us\n", (double)totalRunTime / runs);
-	kprintf("  min:     %lld us\n", minRunTime);
-	kprintf("  max:     %lld us\n", maxRunTime);
+	kprintf("  min:     %" B_PRIdBIGTIME " us\n", minRunTime);
+	kprintf("  max:     %" B_PRIdBIGTIME " us\n", maxRunTime);
 
 	if (latencies > 0) {
 		kprintf("scheduling latency after wake up:\n");
-		kprintf("  total #: %lld\n", latencies);
-		kprintf("  total:   %lld us\n", totalLatency);
+		kprintf("  total #: %" B_PRIdBIGTIME "\n", latencies);
+		kprintf("  total:   %" B_PRIdBIGTIME " us\n", totalLatency);
 		kprintf("  average: %#.2f us\n", (double)totalLatency / latencies);
-		kprintf("  min:     %lld us\n", minLatency);
-		kprintf("  max:     %lld us\n", maxLatency);
-		kprintf("  max:     %lld us (at tracing entry %ld)\n", maxLatency,
-			maxLatencyEntry);
+		kprintf("  min:     %" B_PRIdBIGTIME " us\n", minLatency);
+		kprintf("  max:     %" B_PRIdBIGTIME " us\n", maxLatency);
+		kprintf("  max:     %" B_PRIdBIGTIME " us (at tracing entry %" B_PRId32
+			")\n", maxLatency, maxLatencyEntry);
 	} else
 		kprintf("thread was never run after having been woken up\n");
 
 	if (reruns > 0) {
 		kprintf("scheduling latency after preemption:\n");
-		kprintf("  total #: %lld\n", reruns);
-		kprintf("  total:   %lld us\n", totalRerunTime);
+		kprintf("  total #: %" B_PRId64 "\n", reruns);
+		kprintf("  total:   %" B_PRIdBIGTIME " us\n", totalRerunTime);
 		kprintf("  average: %#.2f us\n", (double)totalRerunTime / reruns);
-		kprintf("  min:     %lld us\n", minRerunTime);
-		kprintf("  max:     %lld us (at tracing entry %ld)\n", maxRerunTime,
-			maxRerunEntry);
+		kprintf("  min:     %" B_PRIdBIGTIME " us\n", minRerunTime);
+		kprintf("  max:     %" B_PRIdBIGTIME " us (at tracing entry %" B_PRId32
+			")\n", maxRerunTime, maxRerunEntry);
 	} else
 		kprintf("thread was never rerun after preemption\n");
 
 	if (preemptions > 0)
-		kprintf("thread was preempted %lld times\n", preemptions);
+		kprintf("thread was preempted %" B_PRId64 " times\n", preemptions);
 	else
 		kprintf("thread was never preempted\n");
 
