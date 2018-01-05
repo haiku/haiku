@@ -39,7 +39,7 @@ compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int32& load,
 	measureTime = now;
 
 	deltaTime += kIntervalInaccuracy;
-	int n = deltaTime / kLoadMeasureInterval;
+	bigtime_t n = deltaTime / kLoadMeasureInterval;
 	ASSERT(n > 0);
 
 	if (n > 10)
