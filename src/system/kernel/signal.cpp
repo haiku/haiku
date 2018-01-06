@@ -2267,9 +2267,10 @@ _user_set_signal_mask(int how, const sigset_t *userSet, sigset_t *userOldSet)
 	sigset_t set, oldSet;
 	status_t status;
 
-	if ((userSet != NULL && user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK)
-		|| (userOldSet != NULL && user_memcpy(&oldSet, userOldSet,
-				sizeof(sigset_t)) < B_OK))
+	if ((userSet != NULL && (!IS_USER_ADDRESS(userSet)
+			|| user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK))
+		|| (userOldSet != NULL && (!IS_USER_ADDRESS(userOldSet)
+			|| user_memcpy(&oldSet, userOldSet, sizeof(sigset_t)) < B_OK)))
 		return B_BAD_ADDRESS;
 
 	status = sigprocmask_internal(how, userSet ? &set : NULL,
@@ -2291,10 +2292,11 @@ _user_sigaction(int signal, const struct sigaction *userAction,
 	struct sigaction act, oact;
 	status_t status;
 
-	if ((userAction != NULL && user_memcpy(&act, userAction,
-				sizeof(struct sigaction)) < B_OK)
-		|| (userOldAction != NULL && user_memcpy(&oact, userOldAction,
-				sizeof(struct sigaction)) < B_OK))
+	if ((userAction != NULL && (!IS_USER_ADDRESS(userAction)
+			|| user_memcpy(&act, userAction, sizeof(struct sigaction)) < B_OK))
+		|| (userOldAction != NULL && (!IS_USER_ADDRESS(userOldAction)
+			|| user_memcpy(&oact, userOldAction, sizeof(struct sigaction))
+				< B_OK)))
 		return B_BAD_ADDRESS;
 
 	status = sigaction_internal(signal, userAction ? &act : NULL,
@@ -2351,8 +2353,10 @@ _user_sigsuspend(const sigset_t *userMask)
 
 	if (userMask == NULL)
 		return B_BAD_VALUE;
-	if (user_memcpy(&mask, userMask, sizeof(sigset_t)) < B_OK)
+	if (!IS_USER_ADDRESS(userMask)
+		|| user_memcpy(&mask, userMask, sizeof(sigset_t)) < B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
 	return sigsuspend_internal(&mask);
 }
@@ -2385,10 +2389,10 @@ _user_set_signal_stack(const stack_t* newUserStack, stack_t* oldUserStack)
 	struct stack_t newStack, oldStack;
 	bool onStack = false;
 
-	if ((newUserStack != NULL && user_memcpy(&newStack, newUserStack,
-				sizeof(stack_t)) < B_OK)
-		|| (oldUserStack != NULL && user_memcpy(&oldStack, oldUserStack,
-				sizeof(stack_t)) < B_OK))
+	if ((newUserStack != NULL && (!IS_USER_ADDRESS(newUserStack)
+			|| user_memcpy(&newStack, newUserStack, sizeof(stack_t)) < B_OK))
+		|| (oldUserStack != NULL && (!IS_USER_ADDRESS(oldUserStack)
+			|| user_memcpy(&oldStack, oldUserStack, sizeof(stack_t)) < B_OK)))
 		return B_BAD_ADDRESS;
 
 	if (thread->signal_stack_enabled) {
