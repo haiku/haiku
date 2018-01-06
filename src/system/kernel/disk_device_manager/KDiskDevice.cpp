@@ -322,7 +322,7 @@ KDiskDevice::DeviceData() const
 void
 KDiskDevice::WriteUserData(UserDataWriter& writer, user_partition_data* data)
 {
-	return KPartition::WriteUserData(writer, data);
+	KPartition::WriteUserData(writer, data);
 }
 
 
