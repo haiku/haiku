@@ -595,7 +595,7 @@ _user_get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 
 	if (topologyInfos == NULL)
 		return user_memcpy(topologyInfoCount, &count, sizeof(uint32));
-	else if (!IS_USER_ADDRESS(topologyInfoCount))
+	else if (!IS_USER_ADDRESS(topologyInfos))
 		return B_BAD_ADDRESS;
 
 	uint32 userCount;
