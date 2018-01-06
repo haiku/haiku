@@ -160,8 +160,8 @@ pthread_create(pthread_t* _thread, const pthread_attr_t* attr,
 	}
 
 	__set_stack_protection();
-	resume_thread(thread->id);
 	*_thread = thread;
+	resume_thread(thread->id);
 
 	return 0;
 }
