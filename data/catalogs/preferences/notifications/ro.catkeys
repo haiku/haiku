@@ -1,10 +1,21 @@
-1	romanian	x-vnd.Haiku-Notifications	984257918
+1	romanian	x-vnd.Haiku-Notifications	822548200
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		A apărut o eroare la salvarea preferințelor.\nEste posibil că rămâneți fără spațiu pe hard disc.
+Add…	NotificationView		Adaugă…
+Status	NotificationView		Stare
 Revert	PrefletWin		Revenire
 Enable notifications	GeneralView		Activează înștiințări
+Window width:	GeneralView		Lățime fereastră:
 OK	PrefletWin		OK
+Duration:	GeneralView		Durată:
+OK	NotificationView		OK
+Notifications	PrefletWin		Înștiințări
 General	PrefletView		General
 Allowed	NotificationView		Permis
+Remove	NotificationView		Elimină
 Notifications	System name		Înștiințări
+Applications	PrefletView		Aplicații
+Defaults	PrefletWin		Implicite
+pixels	GeneralView		pixeli
 Application	NotificationView		Aplicație
+seconds	GeneralView		secunde
 Applications	NotificationView		Aplicații

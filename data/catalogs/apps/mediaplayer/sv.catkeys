@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	845580420
+1	swedish	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -129,6 +129,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiera post
 none	Subtitles menu		ingen
 Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		Ogiltig URL angiven!
 OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Tyst läge
 Toggle pause/play.	MediaPlayer-Main		Aktivera pause/play.
@@ -144,6 +145,7 @@ Start media server	MediaPlayer-Main		Starta mediaserver
 Toggle fullscreen.	MediaPlayer-Main		Växla helskärmsläge.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Få varaktigheten på det som spelas nu i mikrosekunder.
 ToggleFullscreen	MediaPlayer-Main		Växla helskärmsläge
+Bad URL	MediaPlayer-NetworkStream		Felaktig URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
 <unnamed>	PlaylistItem-name		<odöpt>
 OK	MediaPlayer-PlaylistWindow		OK

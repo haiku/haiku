@@ -1,12 +1,16 @@
-1	polish	x-vnd.Haiku-CharacterMap	1534181938
+1	polish	x-vnd.Haiku-CharacterMap	974135376
 Enclosed alphanumerics	UnicodeBlocks		Otoczone symbole alfanumeryczne
 Basic Latin	UnicodeBlocks		Podstawowy łaciński
+Cyrillic extended C	UnicodeBlocks		Rozszerzona cyrylica C
 View	CharacterWindow		Widok
+Cherokee supplement	UnicodeBlocks		Uzupełnienie czirokeskiego
 Latin-1 supplement	UnicodeBlocks		Uzupełnienie Latin-1
 Hebrew	UnicodeBlocks		Hebrajski
 Georgian supplement	UnicodeBlocks		Uzupełnienie gruzińskiego
+Multani	UnicodeBlocks		Multani
 CJK unified ideographs	UnicodeBlocks		Ujednolicone ideogramy CJK
 Modifier tone letters	UnicodeBlocks		Modyfikujące litery tonów
+Old Hungarian	UnicodeBlocks		Starowęgierski
 Khmer	UnicodeBlocks		Khmerski
 Supplementary private use area A	UnicodeBlocks		Dodatkowy obszar prywatnego użytku A
 Hanunoo	UnicodeBlocks		Hanunoo
@@ -25,7 +29,9 @@ Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Arabski
 Ethiopic extended	UnicodeBlocks		Rozszerzony etiopski
 Arrows	UnicodeBlocks		Strzałki
+Sutton SignWriting	UnicodeBlocks		SignWriting
 Font	CharacterWindow		Font
+Hatran	UnicodeBlocks		Hatran
 Variation selectors supplement	UnicodeBlocks		Dodatkowe przełączniki wariantów glifów
 Gujarati	UnicodeBlocks		Gudżarati
 Cuneiform	UnicodeBlocks		Pismo klinowe
@@ -33,6 +39,7 @@ CJK radicals supplement	UnicodeBlocks		Radykały CJK
 Balinese	UnicodeBlocks		Balijski
 Cham	UnicodeBlocks		Czamski
 Specials	UnicodeBlocks		Specjalne
+Ahom	UnicodeBlocks		Ahom
 CJK compatibility ideographs	UnicodeBlocks		Ideogramy zgodności CJK
 Phonetic extensions	UnicodeBlocks		Rozszerzenia fonetyczne
 Khmer symbols	UnicodeBlocks		Symbole khmerskie
@@ -91,6 +98,7 @@ Code	CharacterWindow		Kod
 Lepcha	UnicodeBlocks		Lepczowski
 Sinhala	UnicodeBlocks		Sinhala
 Ancient Greek musical notation	UnicodeBlocks		Starożytna grecka notacja muzyczna
+Early Dynastic Cuneiform	UnicodeBlocks		Pismo klinowe z okresu wczesnodynastycznego
 Geometric shapes	UnicodeBlocks		Kształty geometryczne
 Letterlike symbols	UnicodeBlocks		Symbole literopodobne
 Hangul Jamo	UnicodeBlocks		Dzamo hangyl
@@ -122,6 +130,7 @@ Ancient Greek numbers	UnicodeBlocks		Starożytne liczby greckie
 Vai	UnicodeBlocks		Wai
 Yi Radicals	UnicodeBlocks		Radykały Yi
 Cyrillic extended B	UnicodeBlocks		Rozszerzona cyrylica B
+Mongolian supplement	UnicodeBlocks		Uzupełnienie mongolskiego
 Quit	CharacterWindow		Zakończ
 Ancient symbols	UnicodeBlocks		Symbole starożytne
 Braille patterns	UnicodeBlocks		Pismo Braille’a
@@ -161,6 +170,7 @@ Alphabetic presentation forms	UnicodeBlocks		Alfabetyczne formy prezentacyjne
 Halfwidth and fullwidth forms	UnicodeBlocks		Formy połowy i pełnej szerokości
 Lydian	UnicodeBlocks		Lidyjski
 Ethiopic supplement	UnicodeBlocks		Uzupełnienie etiopskiego
+CJK unified ideographs extension E	UnicodeBlocks		Rozszerzenie E ujednoliconych ideogramów CJK
 Latin extended B	UnicodeBlocks		Rozszerzony łaciński B
 Box drawing	UnicodeBlocks		Rysowanie ramek
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematyczne symbole alfanumeryczne
@@ -174,7 +184,7 @@ CJK compatibility	UnicodeBlocks		Znaki zgodności CJK
 Malayalam	UnicodeBlocks		Malajalam
 N'Ko	UnicodeBlocks		N'Ko
 Kannada	UnicodeBlocks		Kannada
-Copy as escaped byte string	CharacterView		Kopiuj jako zaeskejpowany łańcuch bajtów
+Copy as escaped byte string	CharacterView		Kopiuj bajty jako sekwencje zmodyfikowane
 Phonetic extensions supplement	UnicodeBlocks		Uzupełnienie rozszerzeń fonetycznych
 Domino tiles	UnicodeBlocks		Klocki domina
 Katakana phonetic extensions	UnicodeBlocks		Rozszerzenia fonetyczne katakana

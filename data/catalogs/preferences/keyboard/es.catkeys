@@ -9,6 +9,6 @@ Keyboard	System name		Teclado
 OK	KeyboardApplication		Aceptar
 Fast	KeyboardView		Rápido
 Slow	KeyboardView		Lento
-Something has gone wrong!	KeyboardApplication		¡Algo estuvo mal!
+Something has gone wrong!	KeyboardApplication		¡Algo salió mal!
 Long	KeyboardView		Largo
 Short	KeyboardView		Corto

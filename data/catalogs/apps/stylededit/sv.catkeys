@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	2588854353
+1	swedish	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		SkrivStiligt
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet \"%s\"?  
 Paste	Menus		Klistra in
@@ -17,9 +17,10 @@ Page setup…	Menus		Sidinställningar...
 Print…	Menus		Skriv ut...
 Can't undo	Menus		Kan inte ångra
 Save	Menus		Spara
+Default	Menus		Standard
 Replace with:	FindandReplaceWindow		Ersätt med:
 Cancel	SaveAlert		Avbryt
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: "%s".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: \"%s\".
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
 Reload	NodeMonitorAlerts		Uppdatera
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
@@ -30,7 +31,7 @@ Document statistics	Statistics		Dokumentstatistik
 Cancel	RevertToSavedAlert		Avbryt
 Autodetect	Menus		Identifiera automatiskt
 Document	Menus		Dokument
-Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet "%s"? 
+Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet \"%s\"? 
 Edit	Menus		Redigera
 Revert	RevertToSavedAlert		Återställ
 Font	Menus		Font
@@ -44,7 +45,7 @@ Text encoding	Menus		Textkodning
 Close	Menus		Stäng
 Save	SaveAlert		Spara
 Words:	Statistics		Ord:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fel vid inläsning "%s":\n\tFormatet stöds ej
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fel vid inläsning \"%s\:\n\tFormatet stöds inte
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Spara inte
 Align	Menus		Justera
@@ -60,7 +61,7 @@ Wrap-around search	FindandReplaceWindow		Fortsätt sökning vid andra änden
 Bold	Menus		Fet
 Find selection	Menus		Sök efter markerad text
 Find:	FindandReplaceWindow		Sök:
-Error saving \"%s\":\n%s	SaveAlert		Kunde inte spara "%s":\n%s
+Error saving \"%s\":\n%s	SaveAlert		Kunde inte spara \"%s\":\n%s
 Copy	Menus		Kopiera
 Cut	Menus		Klipp ut
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" blev modifierad av ett annat program. Vill du laddaom programmet?
@@ -71,7 +72,7 @@ Find…	Menus		Sök…
 Select all	Menus		Markera allt
 Don't save	SaveAlert		Spara inte
 Recover	NodeMonitorAlerts		Återskapa
-Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning "%s":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ignorera
 Read-only	StatusView		Skrivskyddad
 Undo typing	QuitAlert		Ångra inmatning

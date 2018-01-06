@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1899625948
+1	romanian	x-vnd.Haiku-libtracker	701613805
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare…
@@ -345,6 +345,7 @@ link	FSUtils	filename link	legătură
 Expression too long.	libtracker		Expresie prea lungă.
 The specified name is illegal. Please choose another name.	FilePanelPriv		Numele specificat nu e legal. Alegeți altul.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nu puteți muta un dosar în el însuși sau în subdosarele acestuia.
+List view	ContainerWindow		Vizualizare listă
 ?+* follows nothing.	libtracker		?+* nu urmează nimic.
 Handles any file	OpenWithWindow		Gestionează orice fișier
 E-mail	Person Query Columns		E-mail

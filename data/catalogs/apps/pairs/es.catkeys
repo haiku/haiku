@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Pairs	385899755
+1	spanish; castilian	x-vnd.Haiku-Pairs	818003250
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs no ha encontrado suficientes iconos vectoriales para arrancar; necesita al menos %zu, se encontraron %zu.\n
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tescrito por Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		Experto (8x8)
@@ -15,3 +15,4 @@ Intermediate (6x6)	PairsWindow		Intermedio (6x6)
 Quit	PairsWindow		Salir
 Pairs	System name		Pares
 New game	PairsWindow		Nueva partida
+Medium	PairsWindow		Medio

@@ -73,7 +73,7 @@ Undo	Icon-O-Matic-Main		Ångra
 Click on a shape above	Empty transformers list - 1st line		Klicka på en figur ovan
 Add Shape	Icon-O-Matic-AddShapesCmd		Lägg till figur
 Contour	Transformation		Kontur
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Spara ändringarna till ikonen "%s" innan det stängs?
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Spara ändringarna till ikonen innan stängning?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<inget att göra om>
 Perspective	Transformation		Perspektiv
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Förflyttningsomvandlare

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	1282126593
+1	polish	x-vnd.Haiku-WebPositive	1360232678
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -7,6 +7,7 @@ Close window	WebPositive Window		Zamknij okno
 Quit	WebPositive		Zakończ
 The download could not be opened.	Download Window		Pobrania nie można otworzyć.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Nie można otworzyć katalogu pobierania.\n\nError: %error
+Close	Download Window		Zamknij
 Open location	WebPositive Window		Otwórz położenie
 Clear history	WebPositive Window		Wyczyść historię
 WebPositive	System name		WebPositive
@@ -20,7 +21,6 @@ Expiration	Cookie Manager		Data ważności
 Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnięcie środkowego przycisku myszy spowoduje otworzenie nowej karty.
 Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Save page as…	WebPositive Window		Zapisz stronę jako…
-Over %days left	Download Window		Zostało ponad %days
 Settings	Settings Window		Ustawienia
 Confirmation	WebPositive Window		Potwierdzenie
 Window	WebPositive Window		Okno
@@ -68,7 +68,6 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Open downloads folder	Download Window		Otwórz katalog pobierania
 Proxy password:	Settings Window		Hasło serwera proxy:
 Number of days to keep links in History menu:	Settings Window		Liczba dni przechowywania odnośników w historii:
-Hide	Download Window		Ukryj
 Reset size	WebPositive Window		Resetuj rozmiar
 Find:	WebPositive Window		Znajdź:
 Increase size	WebPositive Window		Zwiększ rozmiar
@@ -81,7 +80,6 @@ Bookmark info	WebPositive Window		Informacje o zakładkach
 Size:	Font Selection view		Rozmiar:
 Show tabs if only one page is open	Settings Window		Pokaż karty, nawet jeśli tylko jedna strona jest otwarta
 About	WebPositive Window		O programie
-Finish: 	Download Window	Finishing time	Do zakończenia: 
 Fonts	Settings Window		Fonty
 OK	Download Window		OK
 Page source error	WebPositive Window		Błąd strony źródłowej
@@ -108,7 +106,6 @@ Cookie manager	WebPositive Window		Menedżer ciasteczek
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ukryj tekst hasła
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pchnąć w tę łódź jeża lub ośm skrzyń fig.
-Over 1 minute left	Download Window		Została ponad 1 minuta
 Open start page	Settings Window		Otwórz stronę startową
 Continue downloads	WebPositive		Kontynuowanie pobierania
 Cancel	Download Window		Anuluj
@@ -120,7 +117,6 @@ Path	Cookie Manager		Ścieżka
 Back	WebPositive Window		Wstecz
 New browser window	Download Window		Nowe okno
 Today	WebPositive Window		Dzisiaj
-Over %hours left	Download Window		Zostało ponad %hours
 Remember username and password for this site	Authentication Panel		Pamiętaj nazwę użytkownika i hasło dla tej strony
 Earlier	WebPositive Window		Wcześniej
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
@@ -128,7 +124,6 @@ Use proxy server to connect to the internet	Settings Window		Użyj serwera proxy
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		W toku jest pobieranie, czy na pewno chcesz teraz zamknąć WebPositive?
 Auto-hide interface in full screen mode	Settings Window		Automatyczne ukrywanie interfejsu w trybie pełnoekranowym 
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url nie załadował się
-%seconds left	Download Window		Zostało %seconds
 New tab	WebPositive Window		Nowa karta
 Downloads in progress	WebPositive		Pobieranie jest w toku
 Style:	Font Selection view		Styl:

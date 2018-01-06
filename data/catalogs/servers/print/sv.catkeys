@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-PSRV	2930356711
+1	swedish	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Odefinierad
 Return the number of available transports	PrintServerApp Scripting		Visa antalet tillgängliga åtkomstmetoder
 Return the number of available printers	PrintServerApp Scripting		Visa antal tillgängliga skrivare
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Ja
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Liggare
 Would you like to set one up now?	PrintServerApp		Vill du ställa in en nu?
+Print job setup:	ConfigWindow		Utskriftsjobbinställning:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Porträtt
 All pages	ConfigWindow		Alla sidor

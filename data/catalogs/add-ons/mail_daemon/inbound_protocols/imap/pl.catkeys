@@ -1,9 +1,11 @@
-1	polish	x-vnd.Haiku-IMAP	354143849
+1	polish	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Katalog docelowy:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		status
 Configure IMAP Folders	imap_config		Skonfiguruj katalogi IMAP
 Cancel	IMAPFolderConfig		Anuluj
+No encryption	imap_config		Brak szyfrowania
 Apply	IMAPFolderConfig		Zastosuj
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Pobieranie katalogów IMAP, cierpliwości...
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nie można połączyć z serwerem „%server%”:\n%error%

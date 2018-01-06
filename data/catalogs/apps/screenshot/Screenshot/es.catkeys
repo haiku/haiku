@@ -1,9 +1,10 @@
-1	spanish; castilian	x-vnd.haiku-screenshot	3896204963
+1	spanish; castilian	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		segundos
 Desktop	ScreenshotWindow		Escritorio
 Include window border	ScreenshotWindow		Incuir el borde de la ventana
 Screenshot	System name		Captura de pantallia
 Select	ScreenshotWindow		Seleccionar
+The destination path exists but is not a folder.	ScreenshotWindow		La ruta de destino existe, pero no es una carpeta.
 Capture active window	ScreenshotWindow		Capturar la ventana actual
 Cancel	ScreenshotWindow		Cancelar
 Name:	ScreenshotWindow		Nombre:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	Captura
 New screenshot	ScreenshotWindow		Nueva captura
 Artwork folder	ScreenshotWindow		Carpeta de Artwork
 Home folder	ScreenshotWindow		Carpeta home
+Failed to save screenshot	ScreenshotWindow		Error al guardar captura de pantalla
+OK	ScreenshotWindow		Aceptar
 Settings…	ScreenshotWindow		Ajustes...
 overwrite	ScreenshotWindow		Sobreescribir
 Delay:	ScreenshotWindow		Espera:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Error guardando \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Incluir el puntero del ratón
 Translator Settings	ScreenshotWindow		Ajustes de traducción

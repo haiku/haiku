@@ -1,11 +1,13 @@
-1	swedish	x-vnd.Haiku-Backgrounds	3513602073
+1	swedish	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Bakgrunder
 X:	Main View		X:
+Setting the background image failed:	Main View		Appliceringen av bakgrundsbilden misslyckades:
 Resolution: 	Image Filepanel		Upplösning:
 pick one	Main View		Välj en
 Default	Main View		Standard
 Center	Main View		Centrera
 Manual	Main View		Manuell
+Set background image error	Main View		Fel vid applicering av bakgrundsbilden
 Default folder	Main View		Standardmappen
 Revert	Main View		Återställ
 None	Main View		Ingen
@@ -20,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Upprepa
 Select	Main View		Välj
 Scale to fit	Main View		Anpassa
+OK	Main View		OK
 Placement:	Main View		Placering:
 Preview	Main View		Förhandsvisning
 Image:	Main View		Bild:

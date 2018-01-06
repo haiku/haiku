@@ -1,13 +1,16 @@
-1	swedish	x-vnd.Be-PRNT	4242582634
+1	swedish	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
 Waiting	JobListView		Väntar
 Print test page	PrintersWindow		Skriv ut testsida
+ pending jobs	PrinterListView		 utskrifter i kön
 page	JobListView		sida
 Cancel	AddPrinterDialog		Avbryt
+Test page	PrintersWindow		Testsida
 Add printer	AddPrinterDialog		Lägg till skrivare
 Green	TestPageView		Grön
 Printers	PrintersWindow		Skrivare
 Add…	PrintersWindow		Lägg till...
+No pending jobs	PrinterListView		Inga utskrifter i kön
 Default Printer	PrinterListView		Standardskrivare
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 pages	JobListView		sidor
@@ -35,5 +38,7 @@ No printer found!	TransportMenu		Ingen skrivare funnen!
 Print jobs: No printer selected	PrintersWindow		Utskrifter: Ingen skrivare vald
 Cyan	TestPageView		Cyan
 Unknown status	JobListView		Okänd status
+1 pending job	PrinterListView		1 utskrift i kön
 Connected to:	AddPrinterDialog		Ansluten till:
 Printer type:	AddPrinterDialog		Skrivartyp:
+Test page	TestPageView		Testsida

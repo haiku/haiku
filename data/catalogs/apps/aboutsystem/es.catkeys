@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-About	3350795616
+1	spanish; castilian	x-vnd.Haiku-About	1230888146
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 por los autores de Gutenprint. Todos los derechos reservados.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm y Werner Lemberg.
 Past website & marketing:\n	AboutView		Antiguo sitio web y marketing:\n
@@ -13,6 +13,7 @@ AboutSystem	System name		Acerca del sistema
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe y otros.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Todos los derechos reservados.
 Revision	AboutView		Revisión
+Copyright © 2009 Colin Percival	AboutView		Todos los derechos reservados © 2009 Colin Percival
 Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, una división de Lucas Digital Ltd. LLC.
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		¡Be Inc. y su equipo de desarrollo, por haber creado BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Todos los derechos reservados.
@@ -20,6 +21,7 @@ Source Code: 	AboutView		Código fuente:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesador:} other{# Procesadores:}}
 Kernel:	AboutView		Núcleo:
 BSD (4-clause)	AboutWindow		BSD (4 cláusulas)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Todos los derechos reservados © 2012-2016 Equipo de internacionalización de Google.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		El copyright del código de Haiku es propiedad de Haiku, Inc o de sus respectivos autores si está escrito expresamente en el código fuente. Haiku® y el logo de HAIKU® son marcas registradas de Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTodos los derechos reservados.
@@ -60,6 +62,7 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		El equipo de Haikuware y su programa de recompensas\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Todos los derechos reservados.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Todos los derechos reservados.
+Website & marketing:\n	AboutView		Sitio web y mercadotecnia:\n
 About this system	AboutWindow		Acerca de este sistema
 Version:	AboutView		Versión:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Todos los derechos reservados.
@@ -78,6 +81,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 …and the many people making donations!\n\n	AboutView		y a la mucha gente que hizo donaciones!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Haga clic en un nombre para leer la licencia respectiva.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Todos los derechos reservados.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER es una marca registrada de Bitstream Inc.
 BSD (3-clause)	AboutWindow		BSD (3 cláusulas)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Todos los derechos reservados.
 License: 	AboutView		Licencia: 

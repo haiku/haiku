@@ -1,9 +1,11 @@
-1	spanish; castilian	x-vnd.Haiku-Time	2676925183
+1	spanish; castilian	x-vnd.Haiku-Time	3755504714
 GMT (UNIX compatible)	Time		UTC (Tiempo Universal Coordinado, compatible UNIX)
 OK	Time		Aceptar
 Asia	Time		Asia
 \nNow: 	Time		\nAhora:
 Africa	Time		África
+Reset to default server list	Time		Reestablecer a la lista de servidores por defecto
+Could not resolve server address	Time		No se pudo ubicar la dirección del servidor
 Stop	Time		Parar
 Australia	Time		Australia
 Preview time:	Time		Vista previa de hora:

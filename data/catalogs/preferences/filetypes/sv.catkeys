@@ -15,7 +15,7 @@ Choose type	Type List Window		Välj typ
 New file type	New File Type Window		Ny filtyp
 Rule:	FileTypes Window		Regel:
 Add icon…	Icon View		Lägg till ikon…
-Multiple files from \"%s\" file type	FileType Window		Flera filer från \"%s" filtypen
+Multiple files from \"%s\" file type	FileType Window		Flera filer från filtypen \"%s\"
 File type	FileType Window		Filtyp
 Could not change attributes	Attribute Window		Kan inte ändra attribut
 Could not retrieve preferred application of this file	Preferred App Menu		Kunde inte hämta förinställt program för denna fil
@@ -99,7 +99,7 @@ New resource file…	FileTypes Window		Ny resursfil...
 Cancel	New File Type Window		Avbryt
 Icon	FileTypes Window		Ikon
 Extension:	Extension Window		Tillägg:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Borttagning av huvudtyp kan inte ångras.\Alla filtyper som hör till huvudtypen kommer att gå förlorade!\n\nÄr du säker på att du vill fortsätta? För att ta bort en hel grupp, håll nere shift-tangenten och tryck på \"Ta bort\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Borttagning av huvudtyp kan inte ångras.\nAlla filtyper som hör till huvudtypen kommer att gå förlorade!\n\nÄr du säker på att du vill fortsätta? För att ta bort en hel grupp, håll nere shift-tangenten och tryck på \"Ta bort\".
 Internal name:	FileTypes Window		Internt namn:
 Add	Attribute Window		Lägg till
 Close	Application Type Window		Stäng

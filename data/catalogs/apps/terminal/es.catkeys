@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	1851594193
+1	spanish; castilian	x-vnd.Haiku-Terminal	3050479328
 Not found.	Terminal TermWindow		No encontrado.
 Switch Terminals	Terminal TermWindow		Intercambiar Terminales
 Change directory	Terminal TermView		Cambiar directorio 
@@ -79,8 +79,10 @@ Close	Terminal TermWindow		Cerrar
 Text	Terminal AppearancePrefView		Texto
 Clear all	Terminal TermWindow		Limpiar todo
 Text encoding	Terminal TermWindow		Codificación de texto
+Allow bold text	Terminal AppearancePrefView		Permitir texto en negrita
 Close window	Terminal TermWindow		Cerrar ventana
 Copy absolute path	Terminal TermView		Copiar ruta absoluta
+Save as default	Terminal TermWindow		Guardar como predeterminado
 Set tab title	Terminal TermWindow		Fijar el título de la ventana
 Settings…	Terminal TermWindow		Ajustes...
 Abort	Terminal Shell		Cancelar

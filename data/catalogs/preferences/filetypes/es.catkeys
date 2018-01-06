@@ -7,31 +7,31 @@ Add group	New File Type Window		Añadir grupo
 Remove	Application Type Window		Eliminar
 Select same type as	FileType Window		Elegir el mismo tipo que
 Remove icon	Icon View		Eliminar icono
-Supported types	Application Type Window		Tipos soportados
+Supported types	Application Type Window		Tipos admitidos
 Show icons in list	FileTypes Window		Mostrar iconos en la lista
 Type name:	FileTypes Window		Escriba el nombre:
 Internal name:	New File Type Window		Nombre interno:
-Choose type	Type List Window		Escoja el tipo
+Choose type	Type List Window		Escoge el tipo
 New file type	New File Type Window		Nuevo tipo de archivo
 Rule:	FileTypes Window		Regla:
-Add icon…	Icon View		Añadir icono...
-Multiple files from \"%s\" file type	FileType Window		Archivos múltiples desde \"%s\" tipo de archivo
+Add icon…	Icon View		Añadir ícono...
+Multiple files from \"%s\" file type	FileType Window		Archivos múltiples desde tipo de archivo \"%s\"
 File type	FileType Window		Tipo de archivo
 Could not change attributes	Attribute Window		No se pudieron cambiar los atributos
-Could not retrieve preferred application of this file	Preferred App Menu		No se pudo recuperar aplicación preferida de este archivo
+Could not retrieve preferred application of this file	Preferred App Menu		No se pudo recuperar la aplicación preferida de este archivo
 Beta	Application Types Window		Beta
 Extensions:	FileTypes Window		Extensiones:
-Select same preferred application as	FileTypes Window		Seleccione misma aplicación preferida que
+Select same preferred application as	FileTypes Window		Selecciona la misma aplicación preferida que
 Save	Application Type Window		Guardar
 Could not retrieve application signature	Preferred App Menu		No se ha podido recuperar la firma de aplicación
-Add	Extension Window		Agregar
+Add	Extension Window		Añadir
 Select same preferred application as	FileType Window		Seleccionar la misma aplicación preferida que
 Cancel	Attribute Window		Cancelar
 Icon	Application Type Window		Icono
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		La eliminación de un tipo de archivo no se puede revertir.\n¿Está seguro de querer continuar?
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		La eliminación de un tipo de archivo no se puede revertir.\n¿Estás seguro de querer continuar?
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificable
 Multiple launch	Application Type Window		Ejecución múltiple
-(from application)	FileTypes Window		(De aplicación)
+(from application)	FileTypes Window		(de aplicación)
 Could not set preferred application	FileTypes Window		No se pudo establecer la aplicación preferida
 Group:	New File Type Window		Grupo:
 %1 application type	Application Type Window		Tipo de aplicación %1
@@ -83,7 +83,7 @@ Select preferred application	FileType Window		Seleccione la aplicación preferid
 Single launch	Application Type Window		Ejecución simple
 Golden master	Application Types Window		Maestro dorado
 %s file type	FileType Window		Tipo de archivo %s
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplicación \"%s\" no soporta este tipo de archivo.\n¿Desea elegirla de todos modos?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		La aplicación \"%s\" no soporta este tipo de archivo.\n¿Deseas elegirla de todos modos?
 Type:	Attribute Window		Tipo:
 Removing uninstalled application types	Application Types Window		Quitando tipos de aplicación desinstalados
 Done	Attribute Window		Listo
@@ -99,16 +99,16 @@ New resource file…	FileTypes Window		Nuevo archivo de recursos...
 Cancel	New File Type Window		Cancelar
 Icon	FileTypes Window		Icono
 Extension:	Extension Window		Extensión:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La eliminación de un supertipo no se puede revertir.\n¡Se perderán todos los tipos de archivo que pertenecen a este supertipo!\n\n¿Está seguro querer hacer esto? Para eliminar todo el grupo, mantenga presionada la tecla Shift y presione \"Eliminar\". 
-Internal name:	FileTypes Window		Nombre interno
-Add	Attribute Window		Agregar
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La eliminación de un supertipo no se puede revertir.\n¡Se perderán todos los tipos de archivo que pertenecen a este supertipo!\n\n¿Estás seguro querer hacer esto? Para eliminar todo el grupo, mantén presionada la tecla Shift y presiona \"Eliminar\". 
+Internal name:	FileTypes Window		Nombre interno:
+Add	Attribute Window		Añadir
 Close	Application Type Window		Cerrar
 File recognition	FileTypes Window		Reconocimiento de archivo
 Remove uninstalled	Application Types Window		Eliminar desinstalados
 Center	Attribute Window	Attribute column alignment in Tracker	Centrar
 Golden master	Application Type Window		Maestro dorado
 Could not open \"%s\":\n%s	FileTypes		No se pudo abrir \"%s\":\n%s
-Alignment:	Attribute Window		Alineación
+Alignment:	Attribute Window		Alineación:
 Left	Attribute Window	Attribute column alignment in Tracker	Izquierda
 Cancel	Extension Window		Cancelar
 Path:	Application Types Window		Ruta:

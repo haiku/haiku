@@ -32,7 +32,7 @@ Edit	PoorMan		Redigera
 Create Log File	PoorMan		Skapa loggfil
 Log to console	PoorMan		Skriv logg till konsol
 Directory: (none)	PoorMan		Katalog: (ingen)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp eller välja en egen map.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp\neller välja en egen map.
 Log To Console	PoorMan		Skriv logg till konsol
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# koppling} other{# kopplingar}}
 Connections	PoorMan		Anslutningar

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	4193632759
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		audio bruto
 Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obtien
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Modo de visualización
 Medium	MediaPlayer-SettingsWindow		Mediano
+Open network stream	MediaPlayer-NetworkStream		Abrir transmisión de red
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Open…	MediaPlayer-PlaylistWindow		Abrir...
 Toggle mute.	MediaPlayer-Main		Silenciar.
 Undo	MediaPlayer-PlaylistWindow		Deshacer
+Stream URL:	MediaPlayer-NetworkStream		URL de transmisión:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usar capas de hardware de video si es posible.
 File info…	MediaPlayer-Main		Información del archivo...
 Pause playback.	MediaPlayer-Main		Pausar reproducción.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Ir a la pista anterior.
 Close window after playing video	MediaPlayer-SettingsWindow		Cerrar ventana después de reproducir video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escalar las películas suavemente (en modo non-overlay)
 OK	MediaPlayer-RemovePLItemsCmd		Aceptar
+Open network stream	MediaPlayer-Main		Abrir transmisión de red
 50% scale	MediaPlayer-Main		Escala al 50%
 Subtitles	MediaPlayer-Main		Subtítulos
 Prev	MediaPlayer-Main		Anterior
@@ -126,6 +129,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar entrada
 none	Subtitles menu		ninguno
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		La URL no es válida.
 OK	MediaPlayer-NetworkStream		Aceptar
 Mute	MediaPlayer-Main		Silenciar
 Toggle pause/play.	MediaPlayer-Main		Pausar/Reproducir
@@ -141,6 +145,7 @@ Start media server	MediaPlayer-Main		Empezar servidor de medios
 Toggle fullscreen.	MediaPlayer-Main		Alternar la vista de pantalla completa.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtiene la duración del elemento reproduciéndose actualmente en microsegundos.
 ToggleFullscreen	MediaPlayer-Main		Cambiar a pantalla completa
+Bad URL	MediaPlayer-NetworkStream		URL incorrecta
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} other{# Canales}}
 <unnamed>	PlaylistItem-name		<sin nombre>
 OK	MediaPlayer-PlaylistWindow		Aceptar

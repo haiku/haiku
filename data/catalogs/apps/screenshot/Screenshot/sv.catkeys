@@ -1,9 +1,10 @@
-1	swedish	x-vnd.haiku-screenshot	3896204963
+1	swedish	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		sekunder
 Desktop	ScreenshotWindow		Skrivbord
 Include window border	ScreenshotWindow		Inkludera fönsterkant
 Screenshot	System name		Skärmdump
 Select	ScreenshotWindow		Markera
+The destination path exists but is not a folder.	ScreenshotWindow		Målsökvägen existerar men är inte en katalog.
 Capture active window	ScreenshotWindow		Fånga aktivt fönster
 Cancel	ScreenshotWindow		Avbryt
 Name:	ScreenshotWindow		Namn:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	skärmdump
 New screenshot	ScreenshotWindow		Ny skärmdump
 Artwork folder	ScreenshotWindow		Illustrationsmapp
 Home folder	ScreenshotWindow		Hemmapp
+Failed to save screenshot	ScreenshotWindow		Misslyckades med att spara skärmdump
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		Inställningar...
 overwrite	ScreenshotWindow		skriv över
 Delay:	ScreenshotWindow		Fördröjning:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Misslyckades med att spara \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Inkludera muspekare
 Translator Settings	ScreenshotWindow		Översättningsinställningar

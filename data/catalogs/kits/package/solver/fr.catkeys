@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-libsolvsolver	2018019818
+1	french	x-vnd.Haiku-libsolvsolver	3515443848
 %dependency% is provided by the system	SolverProblem		%dependency% est fourni par le système
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		le paquet %source% est en conflit avec %dependency% fourni par %target%
+nothing provides requested %dependency%	SolverProblem		Rien ne satisfait à la demande de %dependency%
 unspecified problem	SolverProblem		problème indéterminé
 keep %source% despite its inferior architecture	SolverProblemSolution		conserver %source% malgré son architecture moins bien adaptée
 do not deinstall \"%selection%\"	SolverProblemSolution		ne pas désinstaller « %selection% »
@@ -28,6 +29,7 @@ allow architecture change of %source% to %target%	SolverProblemSolution		permett
 allow name change of %source% to %target%	SolverProblemSolution		autoriser le renommage de %source% en %target%
 allow replacement of %source% with %target%	SolverProblemSolution		autoriser le remplacement de %source% par %target%
 allow deinstallation of %source%	SolverProblemSolution		autoriser la désinstallation de %source%
+%source% does not belong to a distupgrade repository	SolverProblem		%source% n'appartient pas à un dépôt de mise à jour
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		le paquet %source% rend obsolète %dependency% fourni par %target%
 package %source% is not installable	SolverProblem		le paquet %source% n'est pas installable
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		le paquet %source% installé rend obsolète %dependency% fourni par %target%

@@ -1,10 +1,12 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2744062848
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Nombre
 Available packages	MainWindow		Paquetes disponibles
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
+Repository	FilterView		Repositorio
 Close	RatePackageWindow		Cerrar
 The captcha puzzle needs to be solved.	UserLoginWindow		El acertijo de captcha debe ser resuelto.
 Changelog	PackageInfoView		Registro de cambios
+Repository:	FilterView		Repositorio:
 Your rating:	RatePackageWindow		Su puntuación:
 The passwords do not match.	UserLoginWindow		Las contraseñas no coinciden.
 Log in…	MainWindow		Iniciar sesión…
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Su puntuación fue envi
 <no info>	PackageInfoView		<no hay información>
 Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio de paquete:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ocurrió un error al iniciar el administrador de paquetes: %message%
+All repositories	FilterView		Todos los repositorios
 Email address:	UserLoginWindow		Dirección de correo electrónico:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Su puntuación fue enviada exitosamente. Puede actualizarla o borrarla en cualquier momento puntuado el paquete otra vez.
 Very unstable	RatePackageWindow		Muy inestable
@@ -102,6 +105,7 @@ Close	MainWindow		Cerrar
 Preferred language:	UserLoginWindow		Idioma preferido:
 Failed to rate package	RatePackageWindow		Fallo al valorar el paquete
 Internet & Network	Model		Internet y red
+Refresh repositories	MainWindow		Actualizar repositorios
 Cancel	MainWindow		Cancelar
 Quit HaikuDepot	App		Salir de HaikuDepot
 Input validation	UserLoginWindow		Validación de entrada
@@ -124,6 +128,7 @@ Pass phrase:	UserLoginWindow		Frase de paso:
 Screenshot	ScreenshotWindow		Captura de pantalla
 Not specified	RatePackageWindow		Sin especificar
 Available	PackageListView		Disponible
+Develop packages	MainWindow		Paquetes de desarrollo
 n/a	PackageInfoView		n/d
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si no proporciona una dirección de correo, no será capaz de restablecer su conraseña si la olvida.
  It responded with: 	UserLoginWindow		 Respondió con: 
@@ -138,6 +143,7 @@ Failed to create account	UserLoginWindow		Fallo al registrar la cuenta
 There are problems with the data you entered:\n\n	UserLoginWindow		Hubo problemas con la información que se ingresó:\n\n
 Featured packages	MainWindow		Paquetes destacados
 Start package daemon	App		Arrancar demonio de paquetes
+Manage repositories…	MainWindow		Administrar repositorios…
 Success	RatePackageWindow		Éxito
 Business	Model		Trabajo
 Audio	Model		Audio

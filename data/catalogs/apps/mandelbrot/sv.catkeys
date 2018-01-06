@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Mandelbrot	1781779654
+1	swedish	x-vnd.Haiku-Mandelbrot	157023036
 About	MandelbrotWindow		Om
 Julia	MandelbrotWindow		Julia
 Grassland	MandelbrotWindow		Grässlätt
@@ -9,6 +9,7 @@ Royal	MandelbrotWindow		Kunglig
 File	MandelbrotWindow		Arkiv
 Lightning	MandelbrotWindow		Blixten
 Midnight	MandelbrotWindow		Midnatt
+kerwizzy (original FractalEngine author)	MandelbrotWindow		kerwizzy (FractalEngines ursprungliga upphovsman)
 Palette	MandelbrotWindow		Palett
 Mandelbrot	MandelbrotWindow		Mandelbrot
 Burning Ship	MandelbrotWindow		Brinnande skepp

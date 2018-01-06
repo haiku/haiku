@@ -5,15 +5,15 @@ Max. clipping planes:	Capabilities		Nº máx. de planos de corte:
 GL version:	InfoView		Versión de GL:
 Max. texture units:	Capabilities		Nº máx. de unidades de textura:
 Renderer name:	InfoView		Nombre del renderizador:
-Vendor name:	InfoView		Nombre del suministrador:
+Vendor name:	InfoView		Nombre del fabricante:
 Attributes stack size:	Capabilities		Tamaño de pila de atributos:
 Name stack size:	Capabilities		Tamaño de pila de nombre:
-Auxiliary buffer(s):	Capabilities		Búfer(es) auxiliares:
+Auxiliary buffer(s):	Capabilities		Búfer(es) auxiliar(es):
 Max. recommended vertex elements:	Capabilities		Nº máx. recomendado de vértices:
 GLU version:	InfoView		Versión de GLU:
 Model stack size:	Capabilities		Tamaño de pila de modelo:
 Projection stack size:	Capabilities		Tamaño de pila de proyección:
-Max. lights:	Capabilities		Nº máx. Luces:
+Max. lights:	Capabilities		Nº máx. luces:
 Max. 2D texture size:	Capabilities		Tamaño máx. texturas 2D:
 Max. convolution:	Capabilities		Nº máx. convoluciones:
 GLUT API version:	InfoView		Versión de API de GLUT:

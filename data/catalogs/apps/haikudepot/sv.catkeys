@@ -1,10 +1,12 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1090759318
+1	swedish	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
+Repository	FilterView		Repositorium
 Close	RatePackageWindow		Stäng
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
 Changelog	PackageInfoView		Ändringslogg
+Repository:	FilterView		Repositorium:
 Your rating:	RatePackageWindow		Dina betyg:
 The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 Log in…	MainWindow		Logga in...
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Ditt betyg har uppdater
 <no info>	PackageInfoView		<Ingen information>
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
+All repositories	FilterView		Alla repositorium
 Email address:	UserLoginWindow		E-postadress:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Din betygsättning laddadesupp ok. Du kan närsomhelst uppdatera eller tabort ditt betyg för paketet genom att ge ett nytt betyg.
 Very unstable	RatePackageWindow		Mycket ostabil
@@ -72,7 +75,7 @@ Search terms:	FilterView		Sökvillkor
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 Failed to update rating	RatePackageWindow		Misslyckades uppdatera betyg
 Does not start	RatePackageWindow		Starta inte
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när repositoriet uppdaterades: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Det gick inte att få kontakt med webb servicen.
 Only featured packages	MainWindow		Bara framhävda paket
 There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
@@ -102,6 +105,7 @@ Close	MainWindow		Stäng
 Preferred language:	UserLoginWindow		Föredraget språk:
 Failed to rate package	RatePackageWindow		Misslyckades gradera paketet
 Internet & Network	Model		Internet & Nätverk
+Refresh repositories	MainWindow		Ladda om repositorium
 Cancel	MainWindow		Avbryt
 Quit HaikuDepot	App		Avsluta HaikuDepot
 Input validation	UserLoginWindow		Ogiltigt indata
@@ -109,7 +113,7 @@ Update	RatePackageWindow		Uppdatera
 Video	Model		Video
 All categories	FilterView		Alla kategorier
 Contents	PackageInfoView		Innehåll
-An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error%
+An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när repositoriet uppdaterades: %error%
 Try again	App		Försök igen
 Login or Create account	MainWindow		Logga in eller skapa konto
 Pending…	PackageListView		Väntar...
@@ -139,6 +143,7 @@ Failed to create account	UserLoginWindow		Misslyckades skapa konto
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
 Featured packages	MainWindow		Framhävda paket
 Start package daemon	App		Starta paket-servicen
+Manage repositories…	MainWindow		Hantera repositorier...
 Success	RatePackageWindow		Klar
 Business	Model		Företag
 Audio	Model		Ljud

@@ -21,7 +21,7 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 Info	ProcessController		Information
 Quit application	ProcessController		Avsluta program
 Low priority	ProcessController		Låg prioritet
-What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden "%s"?
+What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden \"%s\"?
 Gone teams…	ProcessController		Avslutade processer...
 Lowest active priority	ProcessController		Lägsta aktiva prioritet
 Restart Tracker	ProcessController		Starta om Tracker

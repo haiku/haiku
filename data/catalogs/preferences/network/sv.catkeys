@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	2512967175
+1	swedish	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Statisk
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjänster
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Välj automatiskt
 connected	IntefaceView		ansluten
 Ethernet device	InterfaceListItem		Ethernetenhet
 The netmask defines your local network	IntefaceAddressView		Netmasken definierar ditt lokala nätverk
+Dial-up connection	InterfaceListItem		Uppringd anslutning
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Nätverk
+VPN connection	InterfaceListItem		VPN-uppkoppling
 Show network status in Deskbar	NetworkWindow		Visa nätverksstatus i Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
 connected	InterfaceListItem		ansluten
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Skickat:
 open	Open network		öppna
 IP Address:	IntefaceAddressView		IP-adress:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Mottaget:
 Disable	IntefaceView		Inaktivera
 <no wireless networks found>	IntefaceView		<Inget nätverk hittades>

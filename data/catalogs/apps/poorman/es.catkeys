@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PoorMan	3296382959
+1	spanish; castilian	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Posición del sitio web
 Error Server	PoorMan		Error de servidor
 Settings…	PoorMan		Configuración...
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Configuración de Hombre Pobre
 Clear hit counter	PoorMan		Despejar ficha de golpes
 Copy	PoorMan		Copiar
 Max. simultaneous connections:	PoorMan		Máxima conexiones simultáneas:
+Create public_html	PoorMan		Crear public_html
 Start page:	PoorMan		Página de inicio:
 done.\n	PoorMan		terminado.\n
 Create	PoorMan		Crear
@@ -33,6 +34,7 @@ Log to console	PoorMan		Registrar a consola
 Directory: (none)	PoorMan		Directorio: (ninguno)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, seleccione la carpeta para publicar en la web. \ n \ nHombre Pobre puede crear un defecto \ "public_html \" en la carpeta de inicio. \ nO se selecciona una de sus propias carpetas en su lugar.
 Log To Console	PoorMan		Registrar a consola
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# conexión} other{# conexiones}}
 Connections	PoorMan		Conexiones
 Status: Running	PoorMan		Estado: Ejecutando
 Controls	PoorMan		Controles

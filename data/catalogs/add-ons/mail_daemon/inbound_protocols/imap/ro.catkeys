@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-IMAP	354143849
+1	romanian	x-vnd.Haiku-IMAP	1555489346
 Destination:	imap_config		Destinație:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		Ok
 status	IMAPFolderConfig		stare
 Configure IMAP Folders	imap_config		Configurează dosare IMAP

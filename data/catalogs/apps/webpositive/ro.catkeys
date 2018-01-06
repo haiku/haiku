@@ -1,11 +1,15 @@
-1	romanian	x-vnd.Haiku-WebPositive	3364097490
+1	romanian	x-vnd.Haiku-WebPositive	261240811
 Show home button	Settings Window		Afișează buton acasă
 Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
 Cancel	Settings Window		Anulează
 Close window	WebPositive Window		Închide fereastra
 Quit	WebPositive		Ieșire
+Close	Download Window		Închide
 Open location	WebPositive Window		Deschide locația
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Ieri
+History	WebPositive Window		Istoric
 Paste	WebPositive Window		Lipire
 Expiration	Cookie Manager		Expirare
 Proxy username:	Settings Window		Nume utilizator proxy:
@@ -13,12 +17,15 @@ Save page as…	WebPositive Window		Salvează pagina ca...
 Settings	Settings Window		Configurări
 Confirmation	WebPositive Window		Confirmare
 Window	WebPositive Window		Fereastră
+Value	Cookie Manager		Valoare
 Next	WebPositive Window		Următorul
 Find next	WebPositive Window		Găsește următorul
 Download folder:	Settings Window		Dosar descărcări:
 Edit	WebPositive Window		Editare
 Cancel	Authentication Panel		Anulează
 Search page:	Settings Window		Caută pagină:
+Quit	WebPositive Window		Ieșire
+Full screen	WebPositive Window		Ecran complet
 Restart	Download Window		Repornire
 Proxy server	Settings Window		Server proxy
 Open containing folder	Download Window		Deschide dosarul conținător
@@ -27,10 +34,15 @@ WebPositive	Download Window		WebPositive
 Open	Download Window		Deschide
 Reload	WebPositive Window		Reîncarcă
 Downloads	Download Window		Descărcări
+Delete	Cookie Manager		Șterge
+Forward	WebPositive Window		Înainte
 Open downloads folder	Download Window		Deschide dosarul de descărcări
 Proxy password:	Settings Window		Parolă proxy:
 Find:	WebPositive Window		Caută:
 Increase size	WebPositive Window		Mărește dimensiunea
+Downloads	WebPositive Window		Descărcări
+Apply	Settings Window		Aplică
+Size:	Font Selection view		Dimensiune:
 About	WebPositive Window		Despre
 Fonts	Settings Window		Fonturi
 OK	Download Window		OK
@@ -39,3 +51,17 @@ New tabs:	Settings Window		Taburi noi:
 Cancel	WebPositive Window		Anulează
 Remove	Download Window		Elimină
 Find	WebPositive Window		Caută
+Settings	WebPositive Window		Configurări
+Name	Cookie Manager		Nume
+Paste	URL Bar		Lipire
+/s)	Download Window	...as in 'per second'	/s)
+Cancel	Download Window		Anulează
+Password:	Authentication Panel		Parolă:
+Path	Cookie Manager		Cale
+Back	WebPositive Window		Înapoi
+Style:	Font Selection view		Stil:
+General	Settings Window		General
+View	WebPositive Window		Vizualizare
+OK	Authentication Panel		OK
+OK	WebPositive Window		OK
+New windows:	Settings Window		Ferestre noi:

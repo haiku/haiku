@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	1384628839
+1	swedish	x-vnd.Haiku-Terminal	1269023683
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -42,7 +42,7 @@ OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Bakgrund
 Use selection	Terminal FindWindow		Använd markering
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger fliken kommer processen att termineras.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan inte utföra "%command":\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan inte utföra \"%command\:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               visa denna hjälp\n  -t,     --title             sätt tittel på fönstret\n  -f,     --fullscreen         starta i fullskärm\n
 Window title…	Terminal TermWindow		Fönstertitel...
 Full screen	Terminal TermWindow		Helskärm
@@ -82,6 +82,7 @@ Close	Terminal TermWindow		Stäng
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Rensa allt
 Text encoding	Terminal TermWindow		Teckenuppsättning
+Allow bold text	Terminal AppearancePrefView		Tillåt fetstil
 Close window	Terminal TermWindow		Stäng fönster
 Copy absolute path	Terminal TermView		Kopiera absolut sökväg
 Save as default	Terminal TermWindow		Spara som standard

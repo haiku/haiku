@@ -1,9 +1,11 @@
-1	spanish; castilian	x-vnd.Haiku-IMAP	354143849
+1	spanish; castilian	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Destino:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		Aceptar
 status	IMAPFolderConfig		estado
 Configure IMAP Folders	imap_config		Configurar carpetas IMAP
 Cancel	IMAPFolderConfig		Cancelar
+No encryption	imap_config		Sin cifrado
 Apply	IMAPFolderConfig		Aplicar
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Recopilando carpetas IMAP, tenga paciencia...
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		No se pudo conectar al servidor \"%server%\":\n%error%

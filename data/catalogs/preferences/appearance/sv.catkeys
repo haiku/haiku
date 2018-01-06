@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	1140137500
+1	swedish	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Vanlig font:
 Control highlight	Colors tab		Framhävd kontroll
 Control border	Colors tab		Kontrollkant
@@ -21,6 +21,7 @@ Failure	Colors tab		Misslyckande
 Hinting menu	AntialiasingSettingsView		Betoningsmeny
 Scroll bar:	DecorSettingsView		Rullningslist:
 Document background	Colors tab		Dokument bakgrund
+Status bar	Colors tab		Statusrad
 Revert	APRWindow		Återgå
 Window tab	Colors tab		Fösterflik
 Tooltip background	Colors tab		Hjälprutsbakgrund

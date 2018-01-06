@@ -1,9 +1,11 @@
-1	swedish	x-vnd.Haiku-IMAP	354143849
+1	swedish	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Mål:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		status
 Configure IMAP Folders	imap_config		Konfigurera IMAP Mappar
 Cancel	IMAPFolderConfig		Avsluta
+No encryption	imap_config		Ingen kryptering
 Apply	IMAPFolderConfig		Använd
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Hämtar IMAP mappar, vänligen vänta...
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kunde inte koppla till server \"%server%\":\n%error%

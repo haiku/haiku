@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	1514658026
+1	swedish	x-vnd.Haiku-BluetoothPrefs	145165464
 About Bluetooth…	Window		Om Bluetooth…
 Handheld	Settings view		Handhållen
 Default inquiry time:	Settings view		Förvald frågotid:
@@ -6,8 +6,10 @@ Manufacturer: 	Device View		Tillverkare:
 Add device to list	Inquiry panel		Lägg till enhet till istan
 Starting scan...	Inquiry panel		Startar avsökning...
 Smart phone	Settings view		Telefon
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Med stöd från:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nTack till individerna som hjälpt till med...\n\nAtt sända och skänka hårdvara:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomi:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nMed patchning:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTestning:\n- Petter H. Juliussen\nSom gav mig all kunskap:\n- yellowTAB -teamet
 Server	Settings view		Server
 Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
+The Bluetooth services are not currently running on this system.	main		Bluetoothtjänsten körs för närvarande inte på detta system.
 Identify host as:	Settings view		Identifiera värd som:
 Refresh…	Remote devices		Uppdatera…
 Pair…	Remote devices		Par…
@@ -18,6 +20,7 @@ Local devices found on system:	Settings view		Lokala enheter funna på systemet:
 Remaining %1 seconds	Inquiry panel		Återstår %1 sekunder
 Server	Window		Server
 Scanning completed.	Inquiry panel		Avsökning klar.
+Launch now	main		Starta nu
 Remove	Remote devices		Ta bort
 Quit	main		Avsluta
 15 secs	Settings view		15 s
@@ -45,6 +48,7 @@ Always ask	Settings view		Fråga alltid
 Retrieving name of %1	Inquiry panel		Hämtar namn från %1
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifiera att bluetoot här aktiverat på din enhet. Klicka på Fråga för att söka. Tidsåtgång för åtgärden är okänd, men bör inte ta mer än tre sekunder per enhet. Efter detta kommer du att kunna lägga till dem till din huvudlista, där du kan para ihop dem i förfrågan-panelen.
 Authenticate	Extended local device view		Autentisera
+Refresh local devices…	Window		Uppdatera lokala enheter…
 Pick device...	Settings view		Välj enhet...
 Retrieving names...	Inquiry panel		Hämtar namn...
 Help	Window		Hjälp

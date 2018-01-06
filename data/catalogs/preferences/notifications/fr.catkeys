@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	983251611
+1	french	x-vnd.Haiku-Notifications	1544806248
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Une erreur est survenue à la sauvegarde des préférences.\nIl est possible que vous manquiez d’espace disque.
 Add…	NotificationView		Ajouter…
 Status	NotificationView		État
@@ -16,6 +16,7 @@ Muted	NotificationView		Silencieux
 General	PrefletView		Général
 Allowed	NotificationView		Autorisé
 Remove	NotificationView		Retirer
+Notifications preflet sample	PrefletWin		Exemple de notification d'un preflet
 Notifications	System name		Notifications
 Applications	PrefletView		Applications
 Defaults	PrefletWin		Défauts

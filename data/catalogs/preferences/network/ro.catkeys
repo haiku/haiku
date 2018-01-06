@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Network	2512967175
+1	romanian	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Static
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servicii
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Alege automat
 connected	IntefaceView		conectat
 Ethernet device	InterfaceListItem		Dispozitiv Ethernet
 The netmask defines your local network	IntefaceAddressView		Masca de rețea definește rețeaua locală
+Dial-up connection	InterfaceListItem		Conexiune Dial-up
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Rețea
+VPN connection	InterfaceListItem		Conexiune VPN
 Show network status in Deskbar	NetworkWindow		Afișează starea rețelei în Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Metoda de obținere a unei adrese IP
 connected	InterfaceListItem		conectat
@@ -40,6 +42,7 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Trimis:
 open	Open network		deschide
 IP Address:	IntefaceAddressView		Adresă IP:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Primit:
 Disable	IntefaceView		Dezactivare
 <no wireless networks found>	IntefaceView		<nu s-au găsit rețele wireless>

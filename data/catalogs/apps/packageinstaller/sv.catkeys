@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	1943664225
+1	swedish	x-vnd.Haiku-PackageInstaller	252728737
 Install to:	PackageView		Installera till:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptera
@@ -10,6 +10,7 @@ Image not loaded correctly	PackageImageViewer		Avbilden kunde inte läsas in kor
 No package selected.	PackageInfo		Inga paket valda.
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Det angivna paketet verkar redan vara installerat på ditt system. Vill du avinstallera det befintliga paketet och sedan fortsätta med installationen?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Vill du komma ihåg detta beslut under resten av denna installation?\n
+Installed packages	UninstallWindow		Installerade paket
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Storleken på paketet överensstämmer inte med kontrollsumman. Paketet kan vara korrupt eller kan ha ändrats efter att det skapades. Vill du ändå fortsätta?
 Error while installing the package\n	PackageView		Ett fel uppstod under paketinstallationen\n
 Disclaimer	PackageTextViewer		Ansvarsfriskrivning
@@ -26,6 +27,7 @@ Other…	PackageView		Annan...
 No installation type selected	PackageView		Ingen installationstyp vald
 Installing files and folders	PackageInstall		Installerar filer och mappar
 Package installer	PackageView		Paket intallerare
+Install…	UninstallView		Installera...
 Skip all	PackageView		Hoppa över alla
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Filen '%s' finns redan på det aktuella stället.\nVill du ersätta den med en ur paketet eller vill du hoppa över?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Ett skript med namnet '%s' finns redan på det aktuella stället.\nVill du ersätta det med ett ur paketet eller vill du hoppa över?
@@ -33,19 +35,21 @@ Running post-installation scripts	PackageInstall		Kör efter-installationsskript
 Skip	PackageView		Hoppa över
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Mappen '%s' finns redan.\nVill du ersätta den med innehållet ur detta paket eller hoppa över mappen?
 The package you requested has been successfully installed on your system.	PackageView		Paketet som du begärde har installerats på ditt system.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fel! "%s" är inte en giltig sökväg.\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fel! \"%s\" är inte en giltig sökväg.\n
 Installation type:	PackageView		Installationstyp:
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Fel (%s)! Kunde inte öppna %s.\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Fel (%s)! Kunde inte öppna \"%s\".\n
 Finishing installation	PackageInstall		Slutför installation
 Installing package	PackageStatus		Installerar paket
 Ask again	PackageView		Fråga igen
 Abort	PackageView		Avbryt
 Replace all	PackageView		Ersätt alla
+Package description	UninstallView		Paketbeskrivning
 Decline	PackageTextViewer		Acceptera inte
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Filen '%s' finns redan i den angivna sökvägen.\nSkall filen skrivas över av filer i detta paket, eller skall den lämnas kvar?
 All existing files will be skipped?	PackageView		Hoppa över alla befintliga filer?
 Continue	PackageInfo		Fortsätt
 %index% of %total%	PackageInstall		%index% av %total%
+The package you selected has been successfully removed from your system.	UninstallView		Det valda paketet har framgångsrikt tagits bort från systemet.
 Abort	PackageInfo		Avbryt
 PackageInstaller	System name		PaketInstallerare
 Abort	PackageInstall		Avbryt
@@ -54,6 +58,7 @@ Continue	PackageTextViewer		Fortsätt
 Begin	PackageView		Börja
 OK	UninstallView		OK
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symboliska länken '%s' finns redan.\nErsätt länken med den från detta paket eller avbryt?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Det valda paketet kunde inte tas bort. Den angivna paketinformationen kan vara skadad. 
 Replace	PackageView		Ersätt
 Installation progress	PackageView		Installationsförlopp
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketfilen är inte läsbar.\nEn möjlig anledning är att den begärda filen inte är ett giltigt BeOS paket.

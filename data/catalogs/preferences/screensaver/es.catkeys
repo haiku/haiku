@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ScreenSaver	1801423325
+1	spanish; castilian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		No podemos activar salvapantallas
 30 seconds	ScreenSaver		30 segundos
 Start screensaver	ScreenSaver		Iniciar salvapantallas
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Oscuridad
 Use custom password	ScreenSaver		Usar contraseña personalizada
 Done	ScreenSaver		Completa
 Confirm password:	ScreenSaver		Confirmar contraseña:
+No preview available	PreviewView		Vista previa no disponible
 Use network password	ScreenSaver		Usar contraseña de la red

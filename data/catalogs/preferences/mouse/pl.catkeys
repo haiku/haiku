@@ -5,18 +5,18 @@ Warp	SettingsView		Przeniesienie
 Double-click test area	SettingsView		Strefa testowania podw. kliknięcia
 Revert	MouseWindow		Cofnij
 ...by Andrew Edward McCall	MouseApplication		...autorstwa Andrew Edwarda McCalla
-Mouse acceleration	SettingsView		Przyspieszenie wskaźnika
-Click to focus	SettingsView		Kliknij aby zaznaczyć
-Click to focus and raise	SettingsView		Kliknij aby zaznaczyć i podnieść
+Mouse acceleration	SettingsView		Wspomaganie wskaźnika
+Click to focus	SettingsView		Kliknij aby aktywować
+Click to focus and raise	SettingsView		Kliknij aby aktywować i przesunąć na wierzch
 3-Button	SettingsView		Trójprzyciskowa
-Mouse speed	SettingsView		Prędkość wskaźnika
-Focus mode:	SettingsView		Tryb zaznaczania:
+Mouse speed	SettingsView		Szybkość wskaźnika
+Focus mode:	SettingsView		Tryb aktywowania:
 Instant warp	SettingsView		Natychmiastowe przeniesienie
 Dig Deal	MouseApplication		Dig Deal
 1-Button	SettingsView		Jednoprzyciskowa
-Double-click speed	SettingsView		Prędkość dwukrotnego kliknięcia
+Double-click speed	SettingsView		Szybkość dwukrotnego kliknięcia
 Defaults	MouseWindow		Przywróć domyślne
-Focus follows mouse	SettingsView		Podążaj za wskaźnikiem myszy
+Focus follows mouse	SettingsView		Podąża za wskaźnikiem
 Accept first click	SettingsView		Akceptuj pierwsze kliknięcie
 Normal	SettingsView		Normalna
 Mouse	System name		Mysz

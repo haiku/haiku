@@ -1,11 +1,13 @@
-1	spanish; castilian	x-vnd.Haiku-Backgrounds	3513602073
+1	spanish; castilian	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Fondos
 X:	Main View		X:
+Setting the background image failed:	Main View		Error al establecer el fondo de pantalla:
 Resolution: 	Image Filepanel		Resolución:
 pick one	Main View		seleccione una
 Default	Main View		Predeterminada
 Center	Main View		Centrar
 Manual	Main View		Manual
+Set background image error	Main View		Error al establecer una imagen de fondo
 Default folder	Main View		Carpeta predeterminada
 Revert	Main View		Revertir
 None	Main View		Ninguna
@@ -20,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		Mosaico
 Select	Main View		Seleccionar
 Scale to fit	Main View		Ajustar al tamaño de la pantalla
+OK	Main View		Aceptar
 Placement:	Main View		Posición:
 Preview	Main View		Vista preliminar
 Image:	Main View		Imagen:

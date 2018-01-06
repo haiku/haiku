@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Screen	2339556848
+1	spanish; castilian	x-vnd.Haiku-Screen	4090394050
 yes	Screen		si
 Use laptop panel:	Screen		utiliza panel del portátil
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colores
@@ -39,6 +39,7 @@ bits/pixel	Screen		bits/píxel
 Refresh rate:	Screen		Velocidad de actualización:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		¿Desea guardar esta configuración?
+Confirm changes	Screen		Confirmar cambios
 Rows:	Screen		Filas:
 vertically	Screen		verticalmente
 Resolution:	Screen		Resolución:

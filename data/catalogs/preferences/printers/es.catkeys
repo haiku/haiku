@@ -1,13 +1,16 @@
-1	spanish; castilian	x-vnd.Be-PRNT	4242582634
+1	spanish; castilian	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impresora: %printer_name%\nControlador: %driver%\n
 Waiting	JobListView		Espera
 Print test page	PrintersWindow		Página de impresión de prueba
+ pending jobs	PrinterListView		  tareas pendientes
 page	JobListView		página
 Cancel	AddPrinterDialog		Cancelar
+Test page	PrintersWindow		Página de prueba
 Add printer	AddPrinterDialog		Añadir impresora
 Green	TestPageView		Verde
 Printers	PrintersWindow		Impresoras
 Add…	PrintersWindow		Añadir…
+No pending jobs	PrinterListView		No hay tareas pendientes
 Default Printer	PrinterListView		Impresora por defecto
 Transport: %transport% %transport_address%	PrinterListView		Medio: %transport% %transport_address%
 pages	JobListView		páginas
@@ -15,7 +18,7 @@ Printers	System name		Impresoras
 Processing	JobListView		Procesando
 Red	TestPageView		Rojo
 Printer name:	AddPrinterDialog		Nombre de la impresora:
-Driver: %driver%	PrinterListView		Controldor: %driver%
+Driver: %driver%	PrinterListView		Controlador: %driver%
 Black	TestPageView		Negro
 Restart job	PrintersWindow		Continuar el trabajo
 Add	AddPrinterDialog		Añadir
@@ -27,13 +30,15 @@ Blue	TestPageView		Azul
 Remove	PrintersWindow		Eliminar
 <pick one>	AddPrinterDialog		<elegir uno >
 Print jobs for 	PrintersWindow		Trabajos de impresión para
-Failed	JobListView		Fallado
+Failed	JobListView		Falló
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		Magenta
 Completed	JobListView		Terminado
-No printer found!	TransportMenu		Impresora no encontrada!
+No printer found!	TransportMenu		No se encontró la impresora.
 Print jobs: No printer selected	PrintersWindow		Trabajos de impresión: ninguna impresora seleccionada
 Cyan	TestPageView		Cian
 Unknown status	JobListView		Estado desconocido
+1 pending job	PrinterListView		Una tarea pendiente
 Connected to:	AddPrinterDialog		Conectado a:
 Printer type:	AddPrinterDialog		Tipo de impresión:
+Test page	TestPageView		Página de prueba
