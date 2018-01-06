@@ -38,9 +38,6 @@ using namespace BPrivate::DiskDevice;
 #define DUMMY_JOB_ID	0
 
 
-// TODO: Add user address checks and check return values of user_memcpy()!
-
-
 /*! \brief Wrapper around user_strlcpy() that returns a status_t
 	indicating appropriate success or failure.
 
@@ -65,7 +62,7 @@ template<typename Type>
 static inline status_t
 copy_from_user_value(Type& value, const Type* userValue)
 {
-	if (!userValue)
+	if (userValue == NULL)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userValue))
@@ -79,7 +76,7 @@ template<typename Type>
 static inline status_t
 copy_to_user_value(Type* userValue, const Type& value)
 {
-	if (!userValue)
+	if (userValue == NULL)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userValue))
@@ -181,10 +178,10 @@ move_descendants_contents(KPartition *partition)
 partition_id
 _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 {
-	if (!_cookie)
-		return B_BAD_VALUE;
 	int32 cookie;
-	user_memcpy(&cookie, _cookie, sizeof(cookie));
+	status_t error = copy_from_user_value(cookie, _cookie);
+	if (error != B_OK)
+		return error;
 
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -192,7 +189,7 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 	if (KDiskDevice *device = manager->RegisterNextDevice(&cookie)) {
 		PartitionRegistrar _(device, true);
 		id = device->ID();
-		if (neededSize) {
+		if (neededSize != NULL) {
 			if (DeviceReadLocker locker = device) {
 				// get the needed size
 				UserDataWriter writer;
@@ -201,12 +198,14 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 					writer.AllocatedSize());
 				if (status != B_OK)
 					return status;
-			} else {
+			} else
 				id = B_ERROR;
-			}
 		}
 	}
-	user_memcpy(_cookie, &cookie, sizeof(cookie));
+
+	error = copy_to_user_value(_cookie, cookie);
+	if (error != B_OK)
+		return error;
 	return id;
 }
 
@@ -225,7 +224,7 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 	if (KDiskDevice *device = manager->RegisterDevice(filename)) {
 		PartitionRegistrar _(device, true);
 		id = device->ID();
-		if (neededSize) {
+		if (neededSize != NULL) {
 			if (DeviceReadLocker locker = device) {
 				// get the needed size
 				UserDataWriter writer;
@@ -249,29 +248,28 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 	if (error != B_OK)
 		return error;
 
-	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// find the partition
-	if (KPartition *partition = manager->RegisterPartition(filename)) {
-		PartitionRegistrar _(partition, true);
-		id = partition->ID();
-		if (neededSize) {
-			// get and lock the partition's device
-			KDiskDevice *device = manager->RegisterDevice(partition->ID(),
-				false);
-			if (!device)
-				return B_ENTRY_NOT_FOUND;
-			PartitionRegistrar _2(device, true);
-			if (DeviceReadLocker locker = device) {
-				// get the needed size
-				UserDataWriter writer;
-				device->WriteUserData(writer);
-				error = copy_to_user_value(neededSize, writer.AllocatedSize());
-				if (error != B_OK)
-					return error;
-			} else
-				return B_ERROR;
-		}
+	KPartition *partition = manager->RegisterPartition(filename);
+	if (partition == NULL)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar _(partition, true);
+	partition_id id = partition->ID();
+	if (neededSize != NULL) {
+		// get and lock the partition's device
+		KDiskDevice *device = manager->RegisterDevice(partition->ID(), false);
+		if (device == NULL)
+			return B_ENTRY_NOT_FOUND;
+		PartitionRegistrar _2(device, true);
+		if (DeviceReadLocker locker = device) {
+			// get the needed size
+			UserDataWriter writer;
+			device->WriteUserData(writer);
+			error = copy_to_user_value(neededSize, writer.AllocatedSize());
+			if (error != B_OK)
+				return error;
+		} else
+			return B_ERROR;
 	}
 	return id;
 }
@@ -287,23 +285,23 @@ _user_find_file_disk_device(const char *_filename, size_t *neededSize)
 
 	KPath path(filename, KPath::NORMALIZE);
 
-	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// find the device
-	if (KFileDiskDevice* device = manager->RegisterFileDevice(path.Path())) {
-		PartitionRegistrar _(device, true);
-		id = device->ID();
-		if (neededSize) {
-			if (DeviceReadLocker locker = device) {
-				// get the needed size
-				UserDataWriter writer;
-				device->WriteUserData(writer);
-				error = copy_to_user_value(neededSize, writer.AllocatedSize());
-				if (error != B_OK)
-					return error;
-			} else
-				return B_ERROR;
-		}
+	KFileDiskDevice* device = manager->RegisterFileDevice(path.Path());
+	if (device == NULL)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar _(device, true);
+	partition_id id = device->ID();
+	if (neededSize != NULL) {
+		if (DeviceReadLocker locker = device) {
+			// get the needed size
+			UserDataWriter writer;
+			device->WriteUserData(writer);
+			error = copy_to_user_value(neededSize, writer.AllocatedSize());
+			if (error != B_OK)
+				return error;
+		} else
+			return B_ERROR;
 	}
 	return id;
 }
@@ -351,52 +349,54 @@ status_t
 _user_get_disk_device_data(partition_id id, bool deviceOnly,
 	user_disk_device_data *buffer, size_t bufferSize, size_t *_neededSize)
 {
-	if (!buffer && bufferSize > 0)
+	if (buffer == NULL && bufferSize > 0)
 		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
-	if (KDiskDevice *device = manager->RegisterDevice(id, deviceOnly)) {
-		PartitionRegistrar _(device, true);
-		if (DeviceReadLocker locker = device) {
-			// do a dry run first to get the needed size
-			UserDataWriter writer;
-			device->WriteUserData(writer);
-			size_t neededSize = writer.AllocatedSize();
-			if (_neededSize) {
-				status_t error = copy_ref_var_to_user(neededSize, _neededSize);
-				if (error != B_OK)
-					return error;
-			}
-			// if no buffer has been supplied or the buffer is too small,
-			// then we're done
-			if (!buffer || bufferSize < neededSize)
-				return B_BUFFER_OVERFLOW;
-			// otherwise allocate a kernel buffer
-			user_disk_device_data *kernelBuffer
-				= static_cast<user_disk_device_data*>(malloc(neededSize));
-			if (!kernelBuffer)
-				return B_NO_MEMORY;
-			MemoryDeleter deleter(kernelBuffer);
-			// write the device data into the buffer
-			writer.SetTo(kernelBuffer, bufferSize);
-			device->WriteUserData(writer);
-			// sanity check
-			if (writer.AllocatedSize() != neededSize) {
-				ERROR(("Size of written disk device user data changed from "
-					   "%lu to %lu while device was locked!\n"));
-				return B_ERROR;
-			}
-			// relocate
-			status_t error = writer.Relocate(buffer);
+	KDiskDevice *device = manager->RegisterDevice(id, deviceOnly);
+	if (device == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	PartitionRegistrar _(device, true);
+	if (DeviceReadLocker locker = device) {
+		// do a dry run first to get the needed size
+		UserDataWriter writer;
+		device->WriteUserData(writer);
+		size_t neededSize = writer.AllocatedSize();
+		if (_neededSize != NULL) {
+			status_t error = copy_ref_var_to_user(neededSize, _neededSize);
 			if (error != B_OK)
 				return error;
-			// copy out
-			if (buffer)
-				return user_memcpy(buffer, kernelBuffer, neededSize);
-		} else
+		}
+		// if no buffer has been supplied or the buffer is too small,
+		// then we're done
+		if (buffer == NULL || bufferSize < neededSize)
+			return B_BUFFER_OVERFLOW;
+		if (!IS_USER_ADDRESS(buffer))
+			return B_BAD_ADDRESS;
+		// otherwise allocate a kernel buffer
+		user_disk_device_data *kernelBuffer
+			= static_cast<user_disk_device_data*>(malloc(neededSize));
+		if (kernelBuffer == NULL)
+			return B_NO_MEMORY;
+		MemoryDeleter deleter(kernelBuffer);
+		// write the device data into the buffer
+		writer.SetTo(kernelBuffer, bufferSize);
+		device->WriteUserData(writer);
+		// sanity check
+		if (writer.AllocatedSize() != neededSize) {
+			ERROR(("Size of written disk device user data changed from "
+				   "%lu to %lu while device was locked!\n"));
 			return B_ERROR;
-	}
-	return B_ENTRY_NOT_FOUND;
+		}
+		// relocate
+		status_t error = writer.Relocate(buffer);
+		if (error != B_OK)
+			return error;
+		// copy out
+		return user_memcpy(buffer, kernelBuffer, neededSize);
+	} else
+		return B_ERROR;
 }
 
 
@@ -412,7 +412,8 @@ _user_register_file_device(const char *_filename)
 
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KFileDiskDevice *device = manager->FindFileDevice(path.Path()))
+		KFileDiskDevice *device = manager->FindFileDevice(path.Path());
+		if (device != NULL)
 			return device->ID();
 		return manager->CreateFileDevice(path.Path());
 	}
@@ -423,19 +424,18 @@ _user_register_file_device(const char *_filename)
 status_t
 _user_unregister_file_device(partition_id deviceID, const char *_filename)
 {
-	if (deviceID < 0 && !_filename)
+	if (deviceID < 0 && _filename == NULL)
 		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (deviceID >= 0) {
+	if (deviceID >= 0)
 		return manager->DeleteFileDevice(deviceID);
-	} else {
-		UserStringParameter<false> filename;
-		status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
-		if (error != B_OK)
-			return error;
 
-		return manager->DeleteFileDevice(filename);
-	}
+	UserStringParameter<false> filename;
+	status_t error = filename.Init(_filename, B_PATH_NAME_LENGTH);
+	if (error != B_OK)
+		return error;
+
+	return manager->DeleteFileDevice(filename);
 }
 
 
@@ -445,10 +445,12 @@ _user_get_file_disk_device_path(partition_id id, char* buffer,
 {
 	if (id < 0 || buffer == NULL || bufferSize == 0)
 		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-
-	if (KDiskDevice *device = manager->RegisterDevice(id, true)) {
+	KDiskDevice *device = manager->RegisterDevice(id, true);
+	if (device != NULL) {
 		PartitionRegistrar _(device, true);
 		if (DeviceReadLocker locker = device) {
 			KFileDiskDevice* fileDevice
@@ -471,15 +473,15 @@ _user_get_file_disk_device_path(partition_id id, char* buffer,
 status_t
 _user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 {
-	if (!_info)
+	if (_info == NULL)
 		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KDiskSystem *diskSystem = manager->FindDiskSystem(id)) {
+		KDiskSystem *diskSystem = manager->FindDiskSystem(id);
+		if (diskSystem != NULL) {
 			user_disk_system_info info;
 			diskSystem->GetInfo(&info);
-			user_memcpy(_info, &info, sizeof(info));
-			return B_OK;
+			return copy_to_user_value(_info, info);
 		}
 	}
 	return B_ENTRY_NOT_FOUND;
@@ -489,21 +491,27 @@ _user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 status_t
 _user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 {
-	if (!_cookie || !_info)
+	if (_info == NULL)
 		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(_info))
+		return B_BAD_ADDRESS;
 	int32 cookie;
-	user_memcpy(&cookie, _cookie, sizeof(cookie));
-	status_t result = B_ENTRY_NOT_FOUND;
+	status_t result = copy_from_user_value(cookie, _cookie);
+	if (result != B_OK)
+		return result;
+	result = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KDiskSystem *diskSystem = manager->NextDiskSystem(&cookie)) {
+		KDiskSystem *diskSystem = manager->NextDiskSystem(&cookie);
+		if (diskSystem != NULL) {
 			user_disk_system_info info;
 			diskSystem->GetInfo(&info);
-			user_memcpy(_info, &info, sizeof(info));
-			result = B_OK;
+			result = copy_to_user_value(_info, info);
 		}
 	}
-	user_memcpy(_cookie, &cookie, sizeof(cookie));
+	status_t error = copy_to_user_value(_cookie, cookie);
+	if (error != B_OK)
+		result = error;
 	return result;
 }
 
@@ -511,19 +519,21 @@ _user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 status_t
 _user_find_disk_system(const char *_name, user_disk_system_info *_info)
 {
-	if (!_name || !_info)
+	if (_name == NULL || _info == NULL)
 		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(_name) || !IS_USER_ADDRESS(_info))
+		return B_BAD_ADDRESS;
 	char name[B_DISK_SYSTEM_NAME_LENGTH];
 	status_t error = ddm_strlcpy(name, _name, B_DISK_SYSTEM_NAME_LENGTH);
-	if (error)
+	if (error != B_OK)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KDiskSystem *diskSystem = manager->FindDiskSystem(name)) {
+		KDiskSystem *diskSystem = manager->FindDiskSystem(name);
+		if (diskSystem != NULL) {
 			user_disk_system_info info;
 			diskSystem->GetInfo(&info);
-			user_memcpy(_info, &info, sizeof(info));
-			return B_OK;
+			return copy_to_user_value(_info, info);
 		}
 	}
 	return B_ENTRY_NOT_FOUND;
@@ -536,14 +546,14 @@ _user_defragment_partition(partition_id partitionID, int32* _changeCounter)
 	// copy parameters in
 	int32 changeCounter;
 
-	status_t error;
-	if ((error = copy_from_user_value(changeCounter, _changeCounter)) != B_OK)
+	status_t error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error != B_OK)
 		return error;
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -556,7 +566,7 @@ _user_defragment_partition(partition_id partitionID, int32* _changeCounter)
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// mark the partition busy and unlock
@@ -575,12 +585,7 @@ _user_defragment_partition(partition_id partitionID, int32* _changeCounter)
 		return error;
 
 	// return change counter
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	return copy_to_user_value(_changeCounter, partition->ChangeCounter());
 }
 
 
@@ -591,14 +596,14 @@ _user_repair_partition(partition_id partitionID, int32* _changeCounter,
 	// copy parameters in
 	int32 changeCounter;
 
-	status_t error;
-	if ((error = copy_from_user_value(changeCounter, _changeCounter)) != B_OK)
+	status_t error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error != B_OK)
 		return error;
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -611,7 +616,7 @@ _user_repair_partition(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// mark the partition busy and unlock
@@ -630,12 +635,7 @@ _user_repair_partition(partition_id partitionID, int32* _changeCounter,
 		return error;
 
 	// return change counter
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	return copy_to_user_value(_changeCounter, partition->ChangeCounter());
 }
 
 
@@ -648,17 +648,16 @@ _user_resize_partition(partition_id partitionID, int32* _changeCounter,
 	int32 changeCounter;
 	int32 childChangeCounter;
 
-	status_t error;
-	if ((error = copy_from_user_value(changeCounter, _changeCounter)) != B_OK
-		|| (error = copy_from_user_value(childChangeCounter,
-			_childChangeCounter)) != B_OK) {
+	status_t error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error == B_OK)
+		error = copy_from_user_value(childChangeCounter, _childChangeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -667,7 +666,7 @@ _user_resize_partition(partition_id partitionID, int32* _changeCounter,
 
 	// register child
 	KPartition* child = manager->RegisterPartition(childID);
-	if (!child)
+	if (child == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar3(child, true);
@@ -680,7 +679,7 @@ _user_resize_partition(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// child must indeed be a child of partition
@@ -723,14 +722,10 @@ _user_resize_partition(partition_id partitionID, int32* _changeCounter,
 		return error;
 
 	// return change counters
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK
-		|| (error = copy_to_user_value(_childChangeCounter,
-			child->ChangeCounter())) != B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
+	if (error == B_OK)
+		error = copy_to_user_value(_childChangeCounter, child->ChangeCounter());
+	return error;
 }
 
 
@@ -784,19 +779,18 @@ _user_set_partition_name(partition_id partitionID, int32* _changeCounter,
 	int32 changeCounter;
 	int32 childChangeCounter;
 
-	status_t error;
-	if ((error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH)) != B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK
-		|| (error = copy_from_user_value(childChangeCounter,
-			_childChangeCounter)) != B_OK) {
+	status_t error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH);
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error == B_OK)
+		error = copy_from_user_value(childChangeCounter, _childChangeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -805,7 +799,7 @@ _user_set_partition_name(partition_id partitionID, int32* _changeCounter,
 
 	// register child
 	KPartition* child = manager->RegisterPartition(childID);
-	if (!child)
+	if (child == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar3(child, true);
@@ -818,7 +812,7 @@ _user_set_partition_name(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// child must indeed be a child of partition
@@ -844,14 +838,10 @@ _user_set_partition_name(partition_id partitionID, int32* _changeCounter,
 		return error;
 
 	// return change counters
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK
-		|| (error = copy_to_user_value(_childChangeCounter,
-			child->ChangeCounter())) != B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
+	if (error == B_OK)
+		error = copy_to_user_value(_childChangeCounter, child->ChangeCounter());
+	return error;
 }
 
 
@@ -863,17 +853,16 @@ _user_set_partition_content_name(partition_id partitionID,
 	UserStringParameter<true> name;
 	int32 changeCounter;
 
-	status_t error;
-	if ((error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH)) != B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK) {
+	status_t error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH);
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -886,7 +875,7 @@ _user_set_partition_content_name(partition_id partitionID,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// mark the partition busy and unlock
@@ -905,12 +894,7 @@ _user_set_partition_content_name(partition_id partitionID,
 		return error;
 
 	// return change counter
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	return copy_to_user_value(_changeCounter, partition->ChangeCounter());
 }
 
 
@@ -923,19 +907,19 @@ _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 	int32 changeCounter;
 	int32 childChangeCounter;
 
-	status_t error;
-	if ((error = type.Init(_type, B_DISK_DEVICE_TYPE_LENGTH)) != B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK
-		|| (error = copy_from_user_value(childChangeCounter,
-			_childChangeCounter)) != B_OK) {
+	status_t error = type.Init(_type, B_DISK_DEVICE_TYPE_LENGTH);
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error == B_OK)
+		error = copy_from_user_value(childChangeCounter, _childChangeCounter);
+	if (error != B_OK)
 		return error;
-	}
+
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -944,7 +928,7 @@ _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 
 	// register child
 	KPartition* child = manager->RegisterPartition(childID);
-	if (!child)
+	if (child == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar3(child, true);
@@ -957,7 +941,7 @@ _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// child must indeed be a child of partition
@@ -983,14 +967,10 @@ _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 		return error;
 
 	// return change counters
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK
-		|| (error = copy_to_user_value(_childChangeCounter,
-			child->ChangeCounter())) != B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
+	if (error == B_OK)
+		error = copy_to_user_value(_childChangeCounter, child->ChangeCounter());
+	return error;
 }
 
 
@@ -1003,20 +983,19 @@ _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 	int32 changeCounter;
 	int32 childChangeCounter;
 
-	status_t error;
-	if ((error = parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE))
-			!= B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK
-		|| (error = copy_from_user_value(childChangeCounter,
-			_childChangeCounter)) != B_OK) {
+	status_t error
+		= parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE);
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error == B_OK)
+		error = copy_from_user_value(childChangeCounter, _childChangeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -1025,7 +1004,7 @@ _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 
 	// register child
 	KPartition* child = manager->RegisterPartition(childID);
-	if (!child)
+	if (child == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar3(child, true);
@@ -1038,7 +1017,7 @@ _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// child must indeed be a child of partition
@@ -1064,14 +1043,10 @@ _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 		return error;
 
 	// return change counters
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK
-		|| (error = copy_to_user_value(_childChangeCounter,
-			child->ChangeCounter())) != B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
+	if (error == B_OK)
+		error = copy_to_user_value(_childChangeCounter, child->ChangeCounter());
+	return error;
 }
 
 
@@ -1085,15 +1060,15 @@ _user_set_partition_content_parameters(partition_id partitionID,
 
 	status_t error
 		= parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE);
-	if (error != B_OK || (error = copy_from_user_value(changeCounter,
-			_changeCounter)) != B_OK) {
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -1106,7 +1081,7 @@ _user_set_partition_content_parameters(partition_id partitionID,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// mark the partition busy and unlock
@@ -1126,12 +1101,7 @@ _user_set_partition_content_parameters(partition_id partitionID,
 		return error;
 
 	// return change counter
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	return copy_to_user_value(_changeCounter, partition->ChangeCounter());
 }
 
 
@@ -1145,21 +1115,21 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 	UserStringParameter<true> parameters;
 	int32 changeCounter;
 
-	status_t error;
-	if ((error = diskSystemName.Init(_diskSystemName,
-			B_DISK_SYSTEM_NAME_LENGTH)) != B_OK
-		|| (error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH)) != B_OK
-		|| (error = parameters.Init(_parameters,
-				B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-				!= B_OK) {
+	status_t error
+		= diskSystemName.Init(_diskSystemName, B_DISK_SYSTEM_NAME_LENGTH);
+	if (error == B_OK)
+		error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH);
+	if (error == B_OK)
+		error = parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE);
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -1171,13 +1141,13 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 		return B_BAD_VALUE;
 
 	// the partition must be uninitialized
-	if (partition->DiskSystem())
+	if (partition->DiskSystem() != NULL)
 		return B_BAD_VALUE;
 
 	// load the new disk system
 	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName.value,
 		true);
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_ENTRY_NOT_FOUND;
 	DiskSystemLoader loader(diskSystem, true);
 
@@ -1209,11 +1179,7 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 		partition->SetDiskSystem(diskSystem);
 
 	// return change counter
-	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
-	if (error != B_OK)
-		return error;
-
-	return B_OK;
+	return copy_to_user_value(_changeCounter, partition->ChangeCounter());
 }
 
 
@@ -1226,17 +1192,16 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter,
 	int32 parentChangeCounter;
 	bool haveParent = parentID >= 0;
 
-	status_t error;
-	if ((error = copy_from_user_value(changeCounter, _changeCounter)) != B_OK)
-		return error;
-	if (haveParent && (error = copy_from_user_value(parentChangeCounter,
-			_parentChangeCounter)) != B_OK)
+	status_t error = copy_from_user_value(changeCounter, _changeCounter);
+	if (haveParent && error == B_OK)
+		error = copy_from_user_value(parentChangeCounter, _parentChangeCounter);
+	if (error != B_OK)
 		return error;
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -1257,7 +1222,7 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter,
 		return B_BAD_VALUE;
 
 	// the partition must be initialized
-	if (!partition->DiskSystem())
+	if (partition->DiskSystem() == NULL)
 		return B_BAD_VALUE;
 
 	// check busy
@@ -1288,13 +1253,9 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter,
 
 	// return change counter
 	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
-	if (error != B_OK)
-		return error;
-	if (haveParent && (error = copy_to_user_value(_parentChangeCounter,
-			parent->ChangeCounter())) != B_OK)
-		return error;
-
-	return B_OK;
+	if (haveParent && error == B_OK)
+		error = copy_to_user_value(_parentChangeCounter, parent->ChangeCounter());
+	return error;
 }
 
 
@@ -1309,20 +1270,20 @@ _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 	UserStringParameter<true> parameters;
 	int32 changeCounter;
 
-	status_t error;
-	if ((error = type.Init(_type, B_DISK_DEVICE_TYPE_LENGTH)) != B_OK
-		|| (error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH)) != B_OK
-		|| (error = parameters.Init(_parameters,
-				B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-				!= B_OK) {
+	status_t error = type.Init(_type, B_DISK_DEVICE_TYPE_LENGTH);
+	if (error == B_OK)
+		error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH);
+	if (error == B_OK)
+		error = parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE);
+	if (error == B_OK)
+		error = copy_from_user_value(changeCounter, _changeCounter);
+	if (error != B_OK)
 		return error;
-	}
 
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -1335,7 +1296,7 @@ _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// mark the partition busy and unlock
@@ -1361,13 +1322,10 @@ _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 	child->UnmarkBusy(true);
 
 	// return change counter and child ID
-	if ((error = copy_to_user_value(_changeCounter, partition->ChangeCounter()))
-			!= B_OK
-		|| (error = copy_to_user_value(childID, child->ID())) != B_OK) {
-		return error;
-	}
-
-	return B_OK;
+	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
+	if (error == B_OK)
+		error = copy_to_user_value(childID, child->ID());
+	return error;
 }
 
 
@@ -1385,7 +1343,7 @@ _user_delete_child_partition(partition_id partitionID, int32* _changeCounter,
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
-	if (!partition)
+	if (partition == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar1(partition, true);
@@ -1394,7 +1352,7 @@ _user_delete_child_partition(partition_id partitionID, int32* _changeCounter,
 
 	// register child
 	KPartition* child = manager->RegisterPartition(childID);
-	if (!child)
+	if (child == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	PartitionRegistrar registrar3(child, true);
@@ -1407,7 +1365,7 @@ _user_delete_child_partition(partition_id partitionID, int32* _changeCounter,
 
 	// the partition must be initialized
 	KDiskSystem* diskSystem = partition->DiskSystem();
-	if (!diskSystem)
+	if (diskSystem == NULL)
 		return B_BAD_VALUE;
 
 	// child must indeed be a child of partition
