@@ -30,9 +30,9 @@ APMDriverInterface::Connect()
 	status_t status = _kern_generic_syscall(APM_SYSCALLS, B_SYSCALL_INFO,
 		&version, sizeof(version));
 	if (status == B_OK) {
-		battery_info info;
+		apm_battery_info info;
 		status = _kern_generic_syscall(APM_SYSCALLS, APM_GET_BATTERY_INFO,
-			&info, sizeof(battery_info));
+			&info, sizeof(apm_battery_info));
 	}
 
 	return status;
