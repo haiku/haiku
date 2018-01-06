@@ -9,6 +9,7 @@
 #include <apm.h>
 #include <descriptors.h>
 #include <generic_syscall.h>
+#include <kernel.h>
 #include <safemode.h>
 #include <boot/kernel_args.h>
 
@@ -245,6 +246,8 @@ apm_control(const char *subsystem, uint32 function,
 			if (status < B_OK)
 				return status;
 
+			if (buffer == NULL || !IS_USER_ADDRESS(buffer))
+				return B_BAD_ADDRESS;
 			return user_memcpy(buffer, &info, sizeof(struct apm_battery_info));
 	}
 
