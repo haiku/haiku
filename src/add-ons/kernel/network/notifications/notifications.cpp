@@ -100,7 +100,7 @@ net_notifications_control(const char *subsystem, uint32 function, void *buffer,
 	if (bufferSize != sizeof(struct net_notifications_control)
 		|| function != NET_NOTIFICATIONS_CONTROL_WATCHING)
 		return B_BAD_VALUE;
-	if (user_memcpy(&control, buffer,
+	if (!IS_USER_ADDRESS(buffer) || user_memcpy(&control, buffer,
 			sizeof(struct net_notifications_control)) < B_OK)
 		return B_BAD_ADDRESS;
 
