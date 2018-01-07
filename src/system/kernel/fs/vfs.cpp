@@ -9578,9 +9578,18 @@ _user_open_attr_dir(int fd, const char* userPath, bool traverseLeafLink)
 
 
 ssize_t
-_user_read_attr(int fd, const char* attribute, off_t pos, void* userBuffer,
+_user_read_attr(int fd, const char* userAttribute, off_t pos, void* userBuffer,
 	size_t readBytes)
 {
+	char attribute[B_FILE_NAME_LENGTH];
+
+	if (userAttribute == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userAttribute)
+		|| user_strlcpy(attribute, userAttribute, sizeof(attribute)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
 	int attr = attr_open(fd, NULL, attribute, O_RDONLY, false);
 	if (attr < 0)
 		return attr;
@@ -9593,9 +9602,18 @@ _user_read_attr(int fd, const char* attribute, off_t pos, void* userBuffer,
 
 
 ssize_t
-_user_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
+_user_write_attr(int fd, const char* userAttribute, uint32 type, off_t pos,
 	const void* buffer, size_t writeBytes)
 {
+	char attribute[B_FILE_NAME_LENGTH];
+
+	if (userAttribute == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userAttribute)
+		|| user_strlcpy(attribute, userAttribute, sizeof(attribute)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
 	// Try to support the BeOS typical truncation as well as the position
 	// argument
 	int attr = attr_create(fd, NULL, attribute, type,
@@ -9611,8 +9629,18 @@ _user_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
 
 
 status_t
-_user_stat_attr(int fd, const char* attribute, struct attr_info* userAttrInfo)
+_user_stat_attr(int fd, const char* userAttribute,
+	struct attr_info* userAttrInfo)
 {
+	char attribute[B_FILE_NAME_LENGTH];
+
+	if (userAttribute == NULL || userAttrInfo == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userAttribute) || !IS_USER_ADDRESS(userAttrInfo)
+		|| user_strlcpy(attribute, userAttribute, sizeof(attribute)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
 	int attr = attr_open(fd, NULL, attribute, O_RDONLY, false);
 	if (attr < 0)
 		return attr;
