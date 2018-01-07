@@ -538,17 +538,22 @@ _user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo,
 {
 	image_info info;
 	status_t status;
+	int32 cookie;
 
 	if (size > sizeof(image_info))
 		return B_BAD_VALUE;
 
-	if (!IS_USER_ADDRESS(userInfo) || !IS_USER_ADDRESS(_cookie))
+	if (!IS_USER_ADDRESS(userInfo) || !IS_USER_ADDRESS(_cookie)
+		|| user_memcpy(&cookie, _cookie, sizeof(int32)) < B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
-	status = _get_next_image_info(team, _cookie, &info, sizeof(image_info));
+	status = _get_next_image_info(team, &cookie, &info, sizeof(image_info));
 
-	if (user_memcpy(userInfo, &info, size) < B_OK)
+	if (user_memcpy(userInfo, &info, size) < B_OK
+		|| user_memcpy(_cookie, &cookie, sizeof(int32)) < B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
 	return status;
 }
