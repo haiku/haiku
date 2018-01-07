@@ -1563,6 +1563,8 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 	if (bufferSize > PORT_MAX_MESSAGE_SIZE)
 		return B_BAD_VALUE;
 
+	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) != 0;
+
 	// mask irrelevant flags (for acquire_sem() usage)
 	flags &= B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT | B_RELATIVE_TIMEOUT
 		| B_ABSOLUTE_TIMEOUT;
@@ -1573,8 +1575,6 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 		flags = (flags & ~B_RELATIVE_TIMEOUT) | B_ABSOLUTE_TIMEOUT;
 		timeout += system_time();
 	}
-
-	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) > 0;
 
 	status_t status;
 	port_message* message = NULL;
