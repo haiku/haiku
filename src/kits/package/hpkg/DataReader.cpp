@@ -10,6 +10,10 @@
 
 #include <string.h>
 
+#if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
+#include <arch/user_memory.h>
+#endif
+
 
 namespace BPackageKit {
 
@@ -63,6 +67,12 @@ BBufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
 	if (size > fSize || offset > (off_t)fSize - (off_t)size)
 		return B_ERROR;
 
+#if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
+	if (IS_USER_ADDRESS(buffer)) {
+		if (user_memcpy(buffer, (const uint8*)fData + offset, size) != B_OK)
+			return B_BAD_ADDRESS;
+	} else
+#endif
 	memcpy(buffer, (const uint8*)fData + offset, size);
 	return B_OK;
 }
