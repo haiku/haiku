@@ -53,8 +53,10 @@ public:
 		if (offset + (off_t)toCopy > size)
 			toCopy = size - offset;
 
-		if (toCopy > 0)
-			memcpy(buffer, (const uint8*)value + offset, toCopy);
+		if (toCopy > 0 && user_memcpy(buffer, (const uint8*)value + offset,
+			toCopy) < B_OK) {
+			return B_BAD_ADDRESS;
+		}
 
 		*bufferSize = toCopy;
 		return B_OK;
