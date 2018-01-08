@@ -284,6 +284,7 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	serial_enable();
 
 	sBootOptions = console_check_boot_keys();
+	sBootOptions |= BOOT_OPTION_MENU;
 
 	// disable apm in case we ever load a 32-bit kernel...
 	gKernelArgs.platform_args.apm.version = 0;
