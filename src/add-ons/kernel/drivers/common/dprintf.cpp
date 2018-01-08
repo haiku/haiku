@@ -11,6 +11,7 @@
 
 
 #include <debug.h>
+#include <kernel.h>
 
 #include <Drivers.h>
 #include <KernelExport.h>
@@ -70,11 +71,19 @@ dprintf_read(void *cookie, off_t pos, void *buffer, size_t *length)
 static status_t
 dprintf_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
+	if (!IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 	const char *str = (const char*)buffer;
 
 	int bytesLeft = *_length;
 	while (bytesLeft > 0) {
-		int chunkSize = strnlen(str, bytesLeft);
+		ssize_t size = user_strlcpy(NULL, str, 0);
+			// there's no user_strnlen()
+		if (size < 0)
+			return 0;
+		int chunkSize = min_c(bytesLeft, (int)size);
+		// int chunkSize = strnlen(str, bytesLeft);
+
 		if (chunkSize == 0) {
 			// null bytes -- skip
 			str++;
@@ -91,7 +100,7 @@ dprintf_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 				char localBuffer[512];
 				if (bytesLeft > (int)sizeof(localBuffer) - 1)
 					chunkSize = (int)sizeof(localBuffer) - 1;
-				memcpy(localBuffer, str, chunkSize);
+				user_memcpy(localBuffer, str, chunkSize);
 				localBuffer[chunkSize] = '\0';
 
 				debug_puts(localBuffer, chunkSize);
