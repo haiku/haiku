@@ -799,7 +799,8 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 				// Fill gap with zeros
 				memset(item->Data() + oldDataSize, 0, pos - oldDataSize);
 			}
-			memcpy(item->Data() + pos, data, length);
+			if (user_memcpy(item->Data() + pos, data, length) < B_OK)
+				return B_BAD_ADDRESS;
 			item->Data()[pos + length] = '\0';
 
 			return B_OK;
@@ -833,7 +834,8 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 	item->name_size = HOST_ENDIAN_TO_BFS_INT16(nameLength);
 	item->data_size = HOST_ENDIAN_TO_BFS_INT16(length);
 	strcpy(item->Name(), name);
-	memcpy(item->Data() + pos, data, length);
+	if (user_memcpy(item->Data() + pos, data, length) < B_OK)
+		return B_BAD_ADDRESS;
 
 	// correctly terminate the small_data section
 	item = item->Next();
@@ -1051,9 +1053,10 @@ Inode::ReadAttribute(const char* name, int32 type, off_t pos, uint8* buffer,
 			if (length + pos > smallData->DataSize())
 				length = smallData->DataSize() - pos;
 
-			memcpy(buffer, smallData->Data() + pos, length);
+			status_t error = user_memcpy(buffer, smallData->Data() + pos,
+				length);
 			*_length = length;
-			return B_OK;
+			return error;
 		}
 	}
 
@@ -1220,12 +1223,16 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 		if (length > MAX_INDEX_KEY_LENGTH)
 			length = MAX_INDEX_KEY_LENGTH;
 
+		uint8 indexBuffer[MAX_INDEX_KEY_LENGTH];
+		// _AddSmallData() already read the buffer
+		user_memcpy(indexBuffer, buffer, length);
+
 		// Update index. Note, Index::Update() may be called even if
 		// initializing the index failed - it will just update the live
 		// queries in this case
 		if (pos < length || (uint64)pos < (uint64)oldLength) {
-			index.Update(transaction, name, type, oldData, oldLength, buffer,
-				length, this);
+			index.Update(transaction, name, type, oldData, oldLength,
+				indexBuffer, length, this);
 		}
 	}
 
