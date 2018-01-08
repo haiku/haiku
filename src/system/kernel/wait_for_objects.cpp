@@ -963,8 +963,11 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 		}
 	}
 
-	if (userSigMask != NULL)
-		sigMask = *userSigMask;
+	if (userSigMask != NULL
+		&& user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) < B_OK) {
+		result = B_BAD_ADDRESS;
+		goto err;
+	}
 
 	result = common_select(numFDs, readSet, writeSet, errorSet, timeout,
 		userSigMask ? &sigMask : NULL, false);
