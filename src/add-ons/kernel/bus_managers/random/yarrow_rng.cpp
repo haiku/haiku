@@ -292,6 +292,9 @@ kill_chrand(ch_randgen *randgen)
 static status_t
 yarrow_rng_read(void* cookie, void *_buffer, size_t *_numBytes)
 {
+	if (!IS_USER_ADDRESS(_buffer))
+		return B_BAD_ADDRESS;
+
 	sRandomCount += *_numBytes;
 
 	/* Reseed if we have or are gonna use up > 1/16th the entropy around */
@@ -305,23 +308,35 @@ yarrow_rng_read(void* cookie, void *_buffer, size_t *_numBytes)
 	 */
 	int32 *buffer = (int32 *)_buffer;
 	uint32 i;
-	for (i = 0; i < *_numBytes / 4; i++)
-		buffer[i] = chrand32(sRandomEnv);
+	for (i = 0; i < *_numBytes / 4; i++) {
+		int32 data = chrand32(sRandomEnv);
+		if (user_memcpy(&buffer[i], &data, sizeof(data)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
 	uint8 *buffer8 = (uint8 *)_buffer;
-	for (uint32 j = 0; j < *_numBytes % 4; j++)
-		buffer8[(i * 4) + j] = chrand8(sRandomEnv);
-
+	for (uint32 j = 0; j < *_numBytes % 4; j++) {
+		int8 data = chrand8(sRandomEnv);
+		if (user_memcpy(&buffer8[(i * 4) + j], &data, sizeof(data)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
 	return B_OK;
 }
 
 
 static status_t
-yarrow_rng_write(void* cookie, const void *buffer, size_t *_numBytes)
+yarrow_rng_write(void* cookie, const void *_buffer, size_t *_numBytes)
 {
-	OCTET* data = (OCTET*)buffer;
+	OCTET *buffer = (OCTET*)_buffer;
+
+	if (!IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
+
 	for (size_t i = 0; i < *_numBytes / sizeof(OCTET); i++) {
-		chseed(sRandomEnv, data->Q[0]);
-		data++;
+		OCTET data;
+		if (user_memcpy(&data, buffer, sizeof(data)) < B_OK)
+			return B_BAD_ADDRESS;
+		chseed(sRandomEnv, data.Q[0]);
+		buffer++;
 	}
 	return B_OK;
 }
