@@ -1318,7 +1318,7 @@ MainWin::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 {
 	BPropertyInfo propertyInfo(sPropertyInfo);
 	if (propertyInfo.FindMatch(message, index, specifier, what, property)
-		< propertyInfo.CountProperties())
+			!= B_ERROR)
 		return this;
 
 	return BWindow::ResolveSpecifier(message, index, specifier, what, property);
