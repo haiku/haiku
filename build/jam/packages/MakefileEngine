@@ -11,6 +11,6 @@ AddFilesToPackage develop etc : $(makefileEngineFiles) ;
 
 # docs
 AddFilesToPackage develop documentation :
-	[ FDirName $(HAIKU_TOP) docs develop makefile-engine.html ] : makefile-engine.html ;
+	[ FDirName $(HAIKU_TOP) docs misc makefile-engine.html ] : makefile-engine.html ;
 
 BuildHaikuPackage $(makefileEnginePackage) : makefile_engine ;
