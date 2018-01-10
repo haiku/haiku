@@ -1,5 +1,3 @@
-
-[[PageOutline(2-3, Contents)]]
 == Haiku Package File Format ==
 
 This document specifies the Haiku Package (HPKG) file format, which was designed for efficient use by Haiku's package file system. It is somewhat inspired by the [http://code.google.com/p/xar/ XAR format] (separate TOC and data heap), but aims for greater compactness (no XML for the TOC).
@@ -214,21 +212,15 @@ A value of each of the data types can be encoded in different ways, which is def
 !0
 !B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT
 !int8/uint8
-|}
-
-{| border=1 class="simple"
+|-
 !1
 !B_HPKG_ATTRIBUTE_ENCODING_INT_16_BIT
 !int16/uint16
-|}
-
-{| border=1 class="simple"
+|-
 !2
 !B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT
 !int32/uint32
-|}
-
-{| border=1 class="simple"
+|-
 !3
 !B_HPKG_ATTRIBUTE_ENCODING_INT_64_BIT
 !int64/uint64
@@ -241,9 +233,7 @@ A value of each of the data types can be encoded in different ways, which is def
 !0
 !B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE
 !null-terminated UTF-8 string
-|}
-
-{| border=1 class="simple"
+|-
 !1
 !B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE
 !unsigned LEB128: index into string table
@@ -256,9 +246,7 @@ A value of each of the data types can be encoded in different ways, which is def
 !0
 !B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE
 !unsigned LEB128: size; followed by raw bytes
-|}
-
-{| border=1 class="simple"
+|-
 !1
 !B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP
 !unsigned LEB128: size; unsigned LEB128: offset into the uncompressed heap
@@ -307,10 +295,10 @@ could be represented by this attribute tree:
 The following attribute IDs are specified by the archive format. Any other attributes will be ignored.
 
 ==== B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY ("dir:entry") ====
- - '''Type:''' string
- - '''Value:''' File name of the entry.
- - '''Allowed Values:''' Any valid file (not path!) name, save "." and "..".
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' File name of the entry.
+* '''Allowed Values:''' Any valid file (not path!) name, save "." and "..".
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_FILE_TYPE: The file type of the entry.
    - B_HPKG_ATTRIBUTE_ID_FILE_PERMISSIONS: The file permissions of the entry.
    - B_HPKG_ATTRIBUTE_ID_FILE_USER: The owning user of the entry.
@@ -324,9 +312,9 @@ The following attribute IDs are specified by the archive format. Any other attri
    - B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY: Only if the entry is a directory: A child entry in that directory.
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_TYPE ("file:type") ====
- - '''Type:''' uint
- - '''Value:''' Type of the entry.
- - '''Allowed Values:'''
+* '''Type:''' uint
+* '''Value:''' Type of the entry.
+* '''Allowed Values:'''
 
 {| border=1 class="simple"
 !0
@@ -346,97 +334,97 @@ The following attribute IDs are specified by the archive format. Any other attri
 !symlink
 |}
 
- - '''Default Value:''' B_HPKG_FILE_TYPE_FILE
- - '''Child Attributes:''' none
+* '''Default Value:''' B_HPKG_FILE_TYPE_FILE
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_PERMISSIONS ("file:permissions") ====
- - '''Type:''' uint
- - '''Value:''' File permissions.
- - '''Allowed Values:''' Any valid permission mask.
- - '''Default Value:'''
+* '''Type:''' uint
+* '''Value:''' File permissions.
+* '''Allowed Values:''' Any valid permission mask.
+* '''Default Value:'''
    - For files: 0644 (octal).
    - For directories: 0755 (octal).
    - For symlinks: 0777 (octal).
- - '''Child Attributes:''' none
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_USER ("file:user") ====
- - '''Type:''' string
- - '''Value:''' Name of the user owning the file.
- - '''Allowed Values:''' Any non-empty string.
- - '''Default Value:''' The user owning the installation location where the package is activated.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of the user owning the file.
+* '''Allowed Values:''' Any non-empty string.
+* '''Default Value:''' The user owning the installation location where the package is activated.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_GROUP ("file:group") ====
- - '''Type:''' string
- - '''Value:''' Name of the group owning the file.
- - '''Allowed Values:''' Any non-empty string.
- - '''Default Value:''' The group owning the installation location where the package is activated.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of the group owning the file.
+* '''Allowed Values:''' Any non-empty string.
+* '''Default Value:''' The group owning the installation location where the package is activated.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_ATIME ("file:atime") ====
- - '''Type:''' uint
- - '''Value:''' File access time (seconds since the Epoch).
- - '''Allowed Values:''' Any value.
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' File access time (seconds since the Epoch).
+* '''Allowed Values:''' Any value.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_ATIME_NANOS ("file:mtime:nanos") ====
- - '''Type:''' uint
- - '''Value:''' The nano seconds fraction of the file access time.
- - '''Allowed Values:''' Any value in [0, 999999999].
- - '''Default Value:''' 0
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' The nano seconds fraction of the file access time.
+* '''Allowed Values:''' Any value in [0, 999999999].
+* '''Default Value:''' 0
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_MTIME ("file:mtime") ====
- - '''Type:''' uint
- - '''Value:''' File modified time (seconds since the Epoch).
- - '''Allowed Values:''' Any value.
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' File modified time (seconds since the Epoch).
+* '''Allowed Values:''' Any value.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_MTIME_NANOS ("file:mtime:nanos") ====
- - '''Type:''' uint
- - '''Value:''' The nano seconds fraction of the file modified time.
- - '''Allowed Values:''' Any value in [0, 999999999].
- - '''Default Value:''' 0
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' The nano seconds fraction of the file modified time.
+* '''Allowed Values:''' Any value in [0, 999999999].
+* '''Default Value:''' 0
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_CRTIME ("file:crtime") ====
- - '''Type:''' uint
- - '''Value:''' File creation time (seconds since the Epoch).
- - '''Allowed Values:''' Any value.
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' File creation time (seconds since the Epoch).
+* '''Allowed Values:''' Any value.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_CRTIM_NANOS ("file:crtime:nanos") ====
- - '''Type:''' uint
- - '''Value:''' The nano seconds fraction of the file creation time.
- - '''Allowed Values:''' Any value in [0, 999999999].
- - '''Default Value:''' 0
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' The nano seconds fraction of the file creation time.
+* '''Allowed Values:''' Any value in [0, 999999999].
+* '''Default Value:''' 0
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE ("file:attribute") ====
- - '''Type:''' string
- - '''Value:''' Name of the extended file attribute.
- - '''Allowed Values:''' Any valid attribute name.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of the extended file attribute.
+* '''Allowed Values:''' Any valid attribute name.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE_TYPE: The type of the file attribute.
    - B_HPKG_ATTRIBUTE_ID_DATA: The file attribute data.
 
 ==== B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE_TYPE ("file:attribute:type") ====
- - '''Type:''' uint
- - '''Value:''' Type of the file attribute.
- - '''Allowed Values:''' Any value in [0, 0xffffffff].
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' Type of the file attribute.
+* '''Allowed Values:''' Any value in [0, 0xffffffff].
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_DATA ("data") ====
- - '''Type:''' data
- - '''Value:''' Raw data of a file or attribute.
- - '''Allowed Values:''' Any value.
+* '''Type:''' data
+* '''Value:''' Raw data of a file or attribute.
+* '''Allowed Values:''' Any value.
 
 ==== B_HPKG_ATTRIBUTE_ID_SYMLINK_PATH ("symlink:path") ====
- - '''Type:''' string
- - '''Value:''' The path the symlink refers to.
- - '''Allowed Values:''': Any valid symlink path.
- - '''Default Value:''': Empty string.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' The path the symlink refers to.
+* '''Allowed Values:''': Any valid symlink path.
+* '''Default Value:''': Empty string.
+* '''Child Attributes:''' none
 
 
 ==== TOC Attributes ====
@@ -497,204 +485,188 @@ could be represented by this attribute tree:
 The following attribute IDs are specified by the package format. Any other attributes will be rejected.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME ("package:name") ====
- - '''Type:''' string
- - '''Value:''' Name of the package.
- - '''Allowed Values:''' Any string matching <entity_name_char>+, with <entity_name_char> being any character but '-', '/', '=', '!', '<', '>', or whitespace.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of the package.
+* '''Allowed Values:''' Any string matching <entity_name_char>+, with <entity_name_char> being any character but '-', '/', '=', '!', '<', '>', or whitespace.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY ("package:summary") ====
- - '''Type:''' string
- - '''Value:''' Short description of the package.
- - '''Allowed Values:''' Any single-lined string.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Short description of the package.
+* '''Allowed Values:''' Any single-lined string.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION ("package:description") ====
- - '''Type:''' string
- - '''Value:''' Long description of the package.
- - '''Allowed Values:''' Any string (may contain multiple lines).
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Long description of the package.
+* '''Allowed Values:''' Any string (may contain multiple lines).
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR ("package:vendor") ====
- - '''Type:''' string
- - '''Value:''' Name of the person/organization that is publishing this package.
- - '''Allowed Values:''' Any single-lined string.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of the person/organization that is publishing this package.
+* '''Allowed Values:''' Any single-lined string.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER ("package:packager") ====
- - '''Type:''' string
- - '''Value:''' E-Mail address of person that created this package.
- - '''Allowed Values:''' Any single-lined string, but e-mail preferred.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' E-Mail address of person that created this package.
+* '''Allowed Values:''' Any single-lined string, but e-mail preferred.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_BASE_PACKAGE ("package:base-package") ====
- - '''Type:''' string
- - '''Value:''' Name of the package that is the base package for this package. The base package must also be listed as a requirement for this package (cf. B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES). The package manager shall ensure that this package is installed in the same installation location as its base package.
- - '''Allowed Values:''' Valid package names.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of the package that is the base package for this package. The base package must also be listed as a requirement for this package (cf. B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES). The package manager shall ensure that this package is installed in the same installation location as its base package.
+* '''Allowed Values:''' Valid package names.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_FLAGS ("package:flags") ====
- - '''Type:''' uint
- - '''Value:''' Set of boolean flags applying to package.
- - '''Allowed Values:''' Any combination of the following.
+* '''Type:''' uint
+* '''Value:''' Set of boolean flags applying to package.
+* '''Allowed Values:''' Any combination of the following.
 
 {| border=1 class="simple"
 !1
 !B_PACKAGE_FLAG_APPROVE_LICENSE
 !this package's license requires approval (i.e. must be shown to and acknowledged by user before installation)
-|}
-
-{| border=1 class="simple"
+|-
 !2
 !B_PACKAGE_FLAG_SYSTEM_PACKAGE
 !this is a system package (i.e. lives under /boot/system)
 |}
 
- - '''Default Value:''' 0.
- - '''Child Attributes:''' none
+* '''Default Value:''' 0.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_ARCHITECTURE ("package:architecture") ====
- - '''Type:''' uint
- - '''Value:''' System architecture this package was built for.
- - '''Allowed Values:'''
+* '''Type:''' uint
+* '''Value:''' System architecture this package was built for.
+* '''Allowed Values:'''
 
 {| border=1 class="simple"
 !0
 !B_PACKAGE_ARCHITECTURE_ANY
 !this package doesn't depend on the system architecture
-|}
-
-{| border=1 class="simple"
+|-
 !1
 !B_PACKAGE_ARCHITECTURE_X86
 !x86, 32-bit, built with gcc4
-|}
-
-{| border=1 class="simple"
+|-
 !2
 !B_PACKAGE_ARCHITECTURE_X86_GCC2
 !x86, 32-bit, built with gcc2
-|}
-
-{| border=1 class="simple"
+|-
 !3
 !B_PACKAGE_ARCHITECTURE_SOURCE
 !source code, doesn't depend on the system architecture
-|}
-
-{| border=1 class="simple"
+|-
 !4
 !B_PACKAGE_ARCHITECTURE_X86_64
 !x86-64
-|}
-
-{| border=1 class="simple"
+|-
 !5
 !B_PACKAGE_ARCHITECTURE_PPC
 !PowerPC
-|}
-
-{| border=1 class="simple"
+|-
 !6
 !B_PACKAGE_ARCHITECTURE_ARM
 !ARM
-|}
-
-{| border=1 class="simple"
+|-
 !7
 !B_PACKAGE_ARCHITECTURE_M68K
 !m68k
 |}
 
- - '''Child Attributes:''' none
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR ("package:version.major") ====
- - '''Type:''' string
- - '''Value:''' Major (first) part of package version.
- - '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline>
- - '''Child Attributes:'''
+*'''Type:''' string
+* '''Value:''' Major (first) part of package version.
+* '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline>
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR: The minor part of the package version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO: The micro part of the package version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE: The pre-release part of the package version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_REVISION: The revision part of the package version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR ("package:version.minor") ====
- - '''Type:''' string
- - '''Value:''' Minor (second) part of package version.
- - '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline>.
- - '''Child Attributes:''' none
+*'''Type:''' string
+*'''Value:''' Minor (second) part of package version.
+*'''Allowed Values:''' Any single-lined string, composed of <alphanum_underline>.
+*'''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO ("package:version.micro") ====
- - '''Type:''' string
- - '''Value:''' Micro (third) part of package version.
- - '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline_dot>.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Micro (third) part of package version.
+* '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline_dot>.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE ("package:version.prerelease") ====
- - '''Type:''' string
- - '''Value:''' Pre-release (fourth) part of package version. Typically something like "alpha1", "beta2", "rc3".
- - '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline_dot>.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Pre-release (fourth) part of package version. Typically something like "alpha1", "beta2", "rc3".
+* '''Allowed Values:''' Any single-lined string, composed of <alphanum_underline_dot>.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_REVISION ("package:version.revision") ====
- - '''Type:''' uint
- - '''Value:''' Revision (fifth) part of package version.
- - '''Allowed Values:''' Any integer greater than 0.
- - '''Child Attributes:''' none
+* '''Type:''' uint
+* '''Value:''' Revision (fifth) part of package version.
+* '''Allowed Values:''' Any integer greater than 0.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT ("package:copyright") ====
- - '''Type:''' string
- - '''Value:''' Copyright applying to the software contained in this package.
- - '''Allowed Values:''' Any (preferably single-lined) string.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Copyright applying to the software contained in this package.
+* '''Allowed Values:''' Any (preferably single-lined) string.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE ("package:license") ====
- - '''Type:''' string
- - '''Value:''' Name of license applying to the software contained in this package.
- - '''Allowed Values:''' Any single-lined string.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of license applying to the software contained in this package.
+* '''Allowed Values:''' Any single-lined string.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_URL ("package:url") ====
- - '''Type:''' string
- - '''Value:''' URL of the packaged software's project home page.
- - '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <http://foo.example.com>").
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' URL of the packaged software's project home page.
+* '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <http://foo.example.com>").
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL ("package:source-url") ====
- - '''Type:''' string
- - '''Value:''' URL of the packaged software's source code or build instructions.
- - '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <http://foo.example.com>").
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' URL of the packaged software's source code or build instructions.
+* '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <http://foo.example.com>").
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES ("package:provides") ====
- - '''Type:''' string
- - '''Value:''' Name of a (optionally typed) entity that is being provided by this package.
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of a (optionally typed) entity that is being provided by this package.
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:''' none
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR: The major part of the resolvable version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE: The major part of the resolvable compatible version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_COMPATIBLE ("package:provides.compatible") ====
- - '''Type:''' string
- - '''Value:''' Major (first) part of the resolvable compatible version, structurally identical to B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR.
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Major (first) part of the resolvable compatible version, structurally identical to B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR.
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR: The minor part of the resolvable compatible version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO: The micro part of the resolvable compatible version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE: The pre-release part of the resolvable compatible version.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_REVISION: The revision part of the resolvable compatible version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES ("package:requires") ====
- - '''Type:''' string
- - '''Value:''' Name of an entity that is required by this package (and hopefully being provided by another).
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of an entity that is required by this package (and hopefully being provided by another).
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR: The resolvable operator as int.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR: The major part of the resolvable version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR ("package:resolvable.operator") ====
- - '''Type:''' uint
- - '''Value:''' Comparison operator for versions.
- - '''Allowed Values:'''
+* '''Type:''' uint
+* '''Value:''' Comparison operator for versions.
+* '''Allowed Values:'''
 
 {| border=1 class="simple"
 !0
@@ -732,64 +704,64 @@ The following attribute IDs are specified by the package format. Any other attri
 !greater than or equal to the specified version
 |}
 
- - '''Child Attributes:''' none
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SUPPLEMENTS ("package:supplements") ====
- - '''Type:''' string
- - '''Value:''' Name of an entity that is supplemented by this package (i.e. this package will automatically be selected for installation if the supplemented resolvables are already installed).
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of an entity that is supplemented by this package (i.e. this package will automatically be selected for installation if the supplemented resolvables are already installed).
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR: The resolvable operator as int.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR: The major part of the resolvable version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_CONFLICTS ("package:conflicts") ====
- - '''Type:''' string
- - '''Value:''' Name of an entity that this package conflicts with (i.e. only one of both can be installed at any time).
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of an entity that this package conflicts with (i.e. only one of both can be installed at any time).
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR: The resolvable operator as int.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR: The major part of the resolvable version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS ("package:freshens") ====
- - '''Type:''' string
- - '''Value:''' Name of an entity that is being freshened by this package (i.e. this package will patch one or more files of the package that provide this resolvable).
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of an entity that is being freshened by this package (i.e. this package will patch one or more files of the package that provide this resolvable).
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR: The resolvable operator as int.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR: The major part of the resolvable version.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES ("package:replaces") ====
- - '''Type:''' string
- - '''Value:''' Name of an entity that is being replaced by this package (used if the name of a package changes, or if a package has been split).
- - '''Allowed Values:''' Any string matching <entity_name_char>+.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of an entity that is being replaced by this package (used if the name of a package changes, or if a package has been split).
+* '''Allowed Values:''' Any string matching <entity_name_char>+.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM ("package:checksum") ====
- - '''Type:''' string
- - '''Value:''' SHA256-chechsum of this package, in hexdump format. N.B.: this attribute can only be found in package repository files, not in package files.
- - '''Allowed Values:''' 64-bytes of hexdump.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' SHA256-chechsum of this package, in hexdump format. N.B.: this attribute can only be found in package repository files, not in package files.
+* '''Allowed Values:''' 64-bytes of hexdump.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_WRITABLE_FILE ("package:global-writable-file") ====
- - '''Type:''' string
- - '''Value:''' Relative path of a global writable file either included in the package or created by the included software. If the file is included in the package, it will be installed upon activation. In this case the attribute must contain a B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE child attribute. The file may actually be a directory, which is indicated by the B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY child attribute.
- - '''Allowed Values:''' Installation location relative path (e.g. "settings/...").
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Relative path of a global writable file either included in the package or created by the included software. If the file is included in the package, it will be installed upon activation. In this case the attribute must contain a B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE child attribute. The file may actually be a directory, which is indicated by the B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY child attribute.
+* '''Allowed Values:''' Installation location relative path (e.g. "settings/...").
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE: Specifies what to do with the writable file on package update.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY: Specifies whether the file is actually a directory.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE ("package:user-settings-file") ====
- - '''Type:''' string
- - '''Value:''' Relative path of a user settings file created by the included software or required by the software to be created by the user. The file may actually be a directory, which is indicated by the B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY child attribute.
- - '''Allowed Values:''' Installation location relative path (i.e. "settings/...").
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Relative path of a user settings file created by the included software or required by the software to be created by the user. The file may actually be a directory, which is indicated by the B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY child attribute.
+* '''Allowed Values:''' Installation location relative path (i.e. "settings/...").
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE: A template for the settings file.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY: Specifies whether the file is actually a directory.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE ("package:writable-file-update-type") ====
- - '''Type:''' uint
- - '''Value:''' Specifies what to do on package update when the writable file provided by the package has been changed by the user.
- - '''Allowed Values:'''
+* '''Type:''' uint
+* '''Value:''' Specifies what to do on package update when the writable file provided by the package has been changed by the user.
+* '''Allowed Values:'''
 
 {| border=1 class="simple"
 !0
@@ -809,12 +781,12 @@ The following attribute IDs are specified by the package format. Any other attri
 !an automatic three-way merge shall be attempted
 |}
 
- - '''Child Attributes:''' none
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY ("package:is-writable-directory") ====
- - '''Type:''' uint
- - '''Value:''' Specifies whether the parent global writable file or user settings file attribute actually refers to a directory.
- - '''Allowed Values:'''
+* '''Type:''' uint
+* '''Value:''' Specifies whether the parent global writable file or user settings file attribute actually refers to a directory.
+* '''Allowed Values:'''
 
 {| border=1 class="simple"
 !0
@@ -826,62 +798,62 @@ The following attribute IDs are specified by the package format. Any other attri
 !The parent attribute refers to a directory.
 |}
 
- - '''Child Attributes:''' none
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE ("package:settings-file-template") ====
- - '''Type:''' string
- - '''Value:''' Relative path of an included template file for the user settings file.
- - '''Allowed Values:''' Installation location relative path of a file included in the package.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Relative path of an included template file for the user settings file.
+* '''Allowed Values:''' Installation location relative path of a file included in the package.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_USER ("package:user") ====
- - '''Type:''' string
- - '''Value:''' Name of a user required by the package. Upon package activation the user will be created, if necessary.
- - '''Allowed Values:''' Any valid user name, i.e. must be non-empty composed of <alphanum_underline>.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of a user required by the package. Upon package activation the user will be created, if necessary.
+* '''Allowed Values:''' Any valid user name, i.e. must be non-empty composed of <alphanum_underline>.
+* '''Child Attributes:'''
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_REAL_NAME: The user's real name.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_HOME: The user's home directory.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SHELL: The user's shell.
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP: The user's group(s).
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_REAL_NAME ("package:user.real-name") ====
- - '''Type:''' string
- - '''Value:''' The real name of the user.
- - '''Allowed Values:''' Any string.
- - '''Default Value:''' The user name.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' The real name of the user.
+* '''Allowed Values:''' Any string.
+* '''Default Value:''' The user name.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_HOME ("package:user.home") ====
- - '''Type:''' string
- - '''Value:''' The path to the home directory of the user.
- - '''Allowed Values:''' Any valid path.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' The path to the home directory of the user.
+* '''Allowed Values:''' Any valid path.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SHELL ("package:user.shell") ====
- - '''Type:''' string
- - '''Value:''' The path to the shell to be used for the user.
- - '''Allowed Values:''' Any valid path.
- - '''Default Value:''' "/bin/bash".
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' The path to the shell to be used for the user.
+* '''Allowed Values:''' Any valid path.
+* '''Default Value:''' "/bin/bash".
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP ("package:user.group") ====
- - '''Type:''' string
- - '''Value:''' A group the user belongs to. At least one must be specified.
- - '''Allowed Values:''' Any valid group name, i.e. must be non-empty composed of <alphanum_underline>.
- - '''Default Value:''' The default group for users.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' A group the user belongs to. At least one must be specified.
+* '''Allowed Values:''' Any valid group name, i.e. must be non-empty composed of <alphanum_underline>.
+* '''Default Value:''' The default group for users.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_GROUP ("package:group") ====
- - '''Type:''' string
- - '''Value:''' Name of a group required by the package. Upon package activation the group will be created, if necessary.
- - '''Allowed Values:''' Any valid group name, i.e. must be non-empty composed of <alphanum_underline>.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Name of a group required by the package. Upon package activation the group will be created, if necessary.
+* '''Allowed Values:''' Any valid group name, i.e. must be non-empty composed of <alphanum_underline>.
+* '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT ("package:post-install-script") ====
- - '''Type:''' string
- - '''Value:''' Relative path of a script that shall be executed after package activation.
- - '''Allowed Values:''' Installation location relative path of a file included in the package.
- - '''Child Attributes:''' none
+* '''Type:''' string
+* '''Value:''' Relative path of a script that shall be executed after package activation.
+* '''Allowed Values:''' Installation location relative path of a file included in the package.
+* '''Child Attributes:''' none
 
 
 === Haiku Package Repository Format ===
@@ -980,8 +952,8 @@ struct hpkg_repo_header {
 The package repository format defines only the top-level attribute ID B_HPKG_ATTRIBUTE_ID_PACKAGE. An attribute with that ID represents a package. Its child attributes specify the various meta information for the package as defined in the [#AttributeIDs1 Package Format Attribute IDs] section.
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE ("package") ====
- - '''Type:''' string
- - '''Value:''' Name of the package. The value is duplicated by the B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME child attribute.
- - '''Allowed Values:''' Any string matching <entity_name_char>+, with <entity_name_char> being any character but '-', '/', '=', '!', '<', '>', or whitespace.
- - '''Child Attributes:'''
+* '''Type:''' string
+* '''Value:''' Name of the package. The value is duplicated by the B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME child attribute.
+* '''Allowed Values:''' Any string matching <entity_name_char>+, with <entity_name_char> being any character but '-', '/', '=', '!', '<', '>', or whitespace.
+* '''Child Attributes:'''
    - Any B_HPKG_ATTRIBUTE_ID_PACKAGE_* top level attribute defined in the [#AttributeIDs1 Package Format Attribute IDs] section.
