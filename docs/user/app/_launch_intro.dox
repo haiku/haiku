@@ -1,0 +1,176 @@
+/*
+ * Copyright 2017 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+
+/*!
+	\page launch_intro Introduction to the Launch Daemon
+
+In general, you should name your jobs/services after the application signature
+(if possible), and name the configuration files accordingly (in each case
+without the "application/" prefix). Alternatively, you may use the name of your
+package as file name. If you do so, you may want to include the version, too,
+but do not add the version to the name of a job.
+
+A "service" is re-started automatically by the launch_daemon as soon as it's
+quit (or has crashed). Use a "job" instead, if you don't want this behavior.
+
+Let's start with a simple example:
+<code>
+service x-vnd.MyGreatServer {
+}
+</code>
+This will register a service named MyGreatServer, and assumes it uses a BServer
+based application object. It will automatically launch the server either
+during system boot (when you place your configuration file in
+<code>/system/data/launch/</code>), or after user login (when it's in
+<code>~/config/data/launch/</code>) via its signature (which it constructs
+using the job's name). Furthermore, it will create a port for the server, so
+that it can be immediately be talked to.
+
+Unfortunately, BServer is private as of now, and you didn't want to make a
+great effort to subclass it. In this case, you have to notify the launch_daemon
+of this fact by adding a "legacy" to that configuration:
+\code
+service x-vnd.MyGreatServer {
+	legacy
+}
+\endcode
+If you want to save the cycles for querying for your server, you can also
+directly specify the file that should be launched; in this case, the job name
+is just a name. This could look like this:
+\code
+service x-vnd.MyGreatServer {
+	launch /path/to/my/great/server
+	legacy
+}
+\endcode
+This method also allows you to add additional launch arguments like this:
+\code
+service x-vnd.MyGreatServer {
+	launch /path/to/my/great/server --debug-mode
+	legacy
+}
+\endcode
+If you do not want to enable the service by default, but only provide a
+template or basic configuration for the user, you can disable it like this:
+\code
+service x-vnd.MyGreatServer {
+	launch /path/to/my/great/server --debug-mode
+	legacy
+	disabled
+}
+\endcode
+You can then override this in the settings by redefining the service, and
+overwrite the parts you want to change. In this case, it might just be:
+\code
+service x-vnd.MyGreatServer {
+	disabled false
+}
+\endcode
+The rest of the configuration will stay intact.
+
+If you only want to launch your application depending on the current
+environment, you can define conditions which must be met to launch your
+application at all, and events which will trigger launching your application.
+
+In the configuration file, this could look like this:
+\code
+service x-vnd.MyGreatServer {
+	launch /path/to/my/great/server
+	if {
+		not safemode
+		file_exists /path/to/license/file
+	}
+	on {
+		demand
+	}
+}
+\endcode
+Alternatively, there are shortcuts for two of the above items, and you could
+also write it like this:
+\code
+service x-vnd.MyGreatServer {
+	launch /path/to/my/great/server
+	if {
+		file_exists /path/to/license/file
+	}
+	not_safemode
+	on_demand
+}
+\endcode
+If you have only single line conditions/events, you may also omit the curly
+braces completely:
+\code
+service x-vnd.MyGreatServer {
+	launch /path/to/my/great/server
+	if file_exists /path/to/license/file
+	not_safemode
+	on demand
+}
+\endcode
+Note, the "on demand" does not use the "on_demand" shortcut, but just saves the
+curly braces of "on { demand }".
+
+You can also use operators like "and", "or", and "not" in conditions. If you
+put more than one condition into an "if" they must all be true in order to meet
+the condition. Conditions will be evaluated every time the launch_daemon has a
+reason to start your application -- the outcome of the condition may change
+over time.
+
+Likewise, if you put more than one event into an "on" only one of them needs to
+be triggered in order to launch your job. While the event processing is already
+prepared to allow for an "and" operator, this is not yet available.
+
+You can also specify the environment variables for your application. They can
+be either specified directly, or you can let a shell script define them for you:
+\code
+service  x-vnd.MyGreatServer {
+	env {
+		from_script /path/to/my/script.sh
+		LC_TYPE C.UTF-8
+	}
+	launch /path/to/my/great/server
+}
+\endcode
+If you want to move the job into a specific target, you can write it like this:
+\code
+target my-target {
+	service  x-vnd.MyGreatServer {
+		launch /path/to/my/great/server
+	}
+}
+\endcode
+You will be able to move jobs into targets around in the configuration files,
+but this has not been implemented at the time of this writing.
+
+Like jobs, and services, targets can use conditions, events, and environment
+variables. If you do not specify an event for your target, it will not launch
+automatically unless it's requested by name. Furthermore, jobs within your
+target will not be available unless the target has been launched either
+manually or by event.
+
+You can also let the launch_daemon create resources for your application, like
+additional named ports. These ports will be available to other applications
+without having to launch your application, and will belong to the launch_daemon
+throughout their lifetime.
+
+Finally, there is a "run" directive that you can use to launch targets
+unconditionally. The "run" directive also allows to use conditions, but adds
+the additional keywords "then", and "else" like this:
+\code
+run {
+	if read_only
+	then installer
+	else desktop
+}
+\endcode
+You can also use curly braces if you like or want to run more than one job.
+
+It's a good idea to look at the existing configuration files to get an idea how
+this is all supposed to work.
+*/
