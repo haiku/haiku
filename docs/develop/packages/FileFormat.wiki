@@ -1,5 +1,6 @@
+
 [[PageOutline(2-3, Contents)]]
-= Haiku Package File Format =
+== Haiku Package File Format ==
 
 This document specifies the Haiku Package (HPKG) file format, which was designed for efficient use by Haiku's package file system. It is somewhat inspired by the [http://code.google.com/p/xar/ XAR format] (separate TOC and data heap), but aims for greater compactness (no XML for the TOC).
 
@@ -10,7 +11,7 @@ Three stacked format layers can be identified:
 
 
 
-== The Data Container Format ==
+=== The Data Container Format ===
 
 A HPKG file consists of four sections:
  Header::
@@ -30,11 +31,11 @@ The TOC and Package Attributes sections aren't really separate sections, as they
 All numbers in the HPKG are stored in big endian format or [http://en.wikipedia.org/wiki/LEB128 LEB128] encoding.
 
 
-=== Header ===
+==== Header ====
 
 The header has the following structure:
 
-{{{
+<pre>
 struct hpkg_header {
 	uint32	magic;
 	uint16	header_size;
@@ -56,7 +57,7 @@ struct hpkg_header {
 	uint64	toc_strings_length;
 	uint64	toc_strings_count;
 };
-}}}
+</pre>
 
  magic::
    The string 'hpkg' (B_HPKG_MAGIC).
@@ -101,21 +102,29 @@ struct hpkg_header {
    The number of entries in the strings subsection of the TOC section.
 
 
-=== Heap ===
+==== Heap ====
 
-The heap provides storage for arbitrary data. Data from various sources are concatenated without padding or separator, forming the uncompressed heap. A specific section of data is usually referenced (e.g. in the TOC and attributes sections) by an offset and the number of bytes. These references always point into the uncompressed heap, even if the heap is actually stored in a compressed format. The `heap_compression` field in the header specifies which format is used. The following values are defined:
+The heap provides storage for arbitrary data. Data from various sources are concatenated without padding or separator, forming the uncompressed heap. A specific section of data is usually referenced (e.g. in the TOC and attributes sections) by an offset and the number of bytes. These references always point into the uncompressed heap, even if the heap is actually stored in a compressed format. The <tt>heap_compression</tt> field in the header specifies which format is used. The following values are defined:
 
-||0||B_HPKG_COMPRESSION_NONE||no compression||
-||1||B_HPKG_COMPRESSION_ZLIB||zlib (LZ77) compression||
+{| border=1 class="simple"
+!0
+!B_HPKG_COMPRESSION_NONE
+!no compression
+|-
+| 1
+| B_HPKG_COMPRESSION_ZLIB
+| zlib (LZ77) compression
+|}
+
 
 The uncompressed heap data are divided into equally sized chunks (64 KiB). The last chunk in the heap may have a different uncompressed length from the preceding chunks. The uncompressed length of the last chunk can be derived. Each individual chunk may be stored compressed or not.
 
 Unless B_HPKG_COMPRESSION_NONE is specified, a uint16 array at the end of the heap contains the actual in-file (compressed) size of each chunk (minus 1 -- 0 means 1 byte), save for the last one, which is omitted since it is implied. A chunk is only stored compressed, if compression actually saves space. That is if the chunk's compressed size equals its uncompressed size, the data aren't compressed. If B_HPKG_COMPRESSION_NONE is specified, the chunk size table is omitted entirely.
 
-The TOC and the package attributes sections are stored (in this order) at the end of the uncompressed heap. The offset of the package attributes section data is therefore `heap_size_uncompressed - attributes_length` and the offset of the TOC section data `heap_size_uncompressed - attributes_length - toc_length`.
+The TOC and the package attributes sections are stored (in this order) at the end of the uncompressed heap. The offset of the package attributes section data is therefore <tt>heap_size_uncompressed - attributes_length</tt> and the offset of the TOC section data <tt>heap_size_uncompressed - attributes_length - toc_length</tt>.
 
 
-=== TOC ===
+==== TOC ====
 
 The TOC section contains a list of attribute trees. An attribute has an ID, a data type, and a value, and can have child attributes. E.g.:
  - ATTRIBUTE_ID_SHOPPING_LIST : string : "bakery"
@@ -143,11 +152,28 @@ Hence the TOC section consists of two subsections:
 ==== Attribute Data Types ====
 
 These are the specified data type values for attributes:
-||0||B_HPKG_ATTRIBUTE_TYPE_INVALID||invalid||
-||1||B_HPKG_ATTRIBUTE_TYPE_INT||signed integer||
-||2||B_HPKG_ATTRIBUTE_TYPE_UINT||unsigned integer||
-||3||B_HPKG_ATTRIBUTE_TYPE_STRING||UTF-8 string||
-||4||B_HPKG_ATTRIBUTE_TYPE_RAW||raw data||
+{| border=1 class="simple"
+!0
+!B_HPKG_ATTRIBUTE_TYPE_INVALID
+!invalid
+|-
+| 1
+| B_HPKG_ATTRIBUTE_TYPE_INT
+| signed integer
+|-
+| 2
+| B_HPKG_ATTRIBUTE_TYPE_UINT
+| unsigned integer
+|-
+| 3
+| B_HPKG_ATTRIBUTE_TYPE_STRING
+| UTF-8 string
+|-
+| 4
+| B_HPKG_ATTRIBUTE_TYPE_RAW
+| raw data
+|}
+
 
 ==== Strings ====
 
@@ -167,7 +193,7 @@ The main TOC subsection consists of a list of attribute entries terminated by a 
    entries terminated by a 0 byte.
 
 The attribute tag encodes four pieces of information:
-  {{{(encoding << 11) + (hasChildren << 10) + (dataType << 7) + id + 1}}}
+  <tt>(encoding << 11) + (hasChildren << 10) + (dataType << 7) + id + 1</tt>
 
  encoding::
    Specifies the encoding of the attribute value as described below.
@@ -184,38 +210,78 @@ A value of each of the data types can be encoded in different ways, which is def
 
  - B_HPKG_ATTRIBUTE_TYPE_INT and B_HPKG_ATTRIBUTE_TYPE_UINT:
 
-   ||0||B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT||int8/uint8||
-   ||1||B_HPKG_ATTRIBUTE_ENCODING_INT_16_BIT||int16/uint16||
-   ||2||B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT||int32/uint32||
-   ||3||B_HPKG_ATTRIBUTE_ENCODING_INT_64_BIT||int64/uint64||
+{| border=1 class="simple"
+!0
+!B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT
+!int8/uint8
+|}
+
+{| border=1 class="simple"
+!1
+!B_HPKG_ATTRIBUTE_ENCODING_INT_16_BIT
+!int16/uint16
+|}
+
+{| border=1 class="simple"
+!2
+!B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT
+!int32/uint32
+|}
+
+{| border=1 class="simple"
+!3
+!B_HPKG_ATTRIBUTE_ENCODING_INT_64_BIT
+!int64/uint64
+|}
+
 
  - B_HPKG_ATTRIBUTE_TYPE_STRING:
 
-   ||0||B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE||null-terminated UTF-8 string||
-   ||1||B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE||unsigned LEB128: index into string table||
+{| border=1 class="simple"
+!0
+!B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE
+!null-terminated UTF-8 string
+|}
+
+{| border=1 class="simple"
+!1
+!B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE
+!unsigned LEB128: index into string table
+|}
+
 
  - B_HPKG_ATTRIBUTE_TYPE_RAW
 
-   ||0||B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE||unsigned LEB128: size; followed by raw bytes||
-   ||1||B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP||unsigned LEB128: size; unsigned LEB128: offset into the uncompressed heap||
+{| border=1 class="simple"
+!0
+!B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE
+!unsigned LEB128: size; followed by raw bytes
+|}
+
+{| border=1 class="simple"
+!1
+!B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP
+!unsigned LEB128: size; unsigned LEB128: offset into the uncompressed heap
+|}
 
 
-=== Package Attributes ===
+
+==== Package Attributes ====
 
 The package attributes section contains a list of attribute trees, just like
 the TOC section. The structure of this section follows the TOC, i.e. there's a subsection for shared strings and a subsection that stores a list of attribute entries terminated by a 0 byte. An entry has the same format as the ones in the TOC (only using different attribute IDs).
 
 
-== The Archive Format ==
+=== The Archive Format ===
 
 This section specifies how file system objects (files, directories, symlinks) are stored in a HPKG file. It builds on top of the container format, defining the types of attributes, their order, and allowed values.
 
 E.g. a "bin" directory, containing a symlink and a file:
-{{{
+<pre>
 bin           0  2009-11-13 12:12:09  drwxr-xr-x
   awk         0  2009-11-13 12:11:16  lrwxrwxrwx  -> gawk
   gawk   301699  2009-11-13 12:11:16  -rwxr-xr-x
-}}}
+</pre>
 could be represented by this attribute tree:
  - B_HPKG_ATTRIBUTE_ID_DIR_ENTRY : string : "bin"
   - B_HPKG_ATTRIBUTE_ID_FILE_TYPE : uint : 1 (0x1)
@@ -236,7 +302,7 @@ could be represented by this attribute tree:
       - B_HPKG_ATTRIBUTE_ID_DATA : raw : size: 35, offset: 302379
 
 
-=== Attribute IDs ===
+==== Attribute IDs ====
 
 The following attribute IDs are specified by the archive format. Any other attributes will be ignored.
 
@@ -262,9 +328,24 @@ The following attribute IDs are specified by the archive format. Any other attri
  - '''Value:''' Type of the entry.
  - '''Allowed Values:'''
 
-   ||0||B_HPKG_FILE_TYPE_FILE||file||
-   ||1||B_HPKG_FILE_TYPE_DIRECTORY||directory||
-   ||2||B_HPKG_FILE_TYPE_SYMLINK||symlink||
+{| border=1 class="simple"
+!0
+!B_HPKG_FILE_TYPE_FILE
+!file
+|}
+
+{| border=1 class="simple"
+!1
+!B_HPKG_FILE_TYPE_DIRECTORY
+!directory
+|}
+
+{| border=1 class="simple"
+!2
+!B_HPKG_FILE_TYPE_SYMLINK
+!symlink
+|}
+
  - '''Default Value:''' B_HPKG_FILE_TYPE_FILE
  - '''Child Attributes:''' none
 
@@ -358,17 +439,17 @@ The following attribute IDs are specified by the archive format. Any other attri
  - '''Child Attributes:''' none
 
 
-=== TOC Attributes ===
+==== TOC Attributes ====
 
 The TOC can directly contain any number of attributes of the B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY type, which in turn contain descendant attributes as specified in the previous section. Any other attributes are ignored.
 
 
-== The Package Format ==
+=== The Package Format ===
 
 This section specifies how informative package attributes (package-name, version, provides, requires, ...) are stored in a HPKG file. It builds on top of the container format, defining the types of attributes, their order, and allowed values.
 
 E.g. a ".PackageInfo" file, containing a package description that is being converted into a package file:
-{{{
+<pre>
 name		mypackage
 version		0.7.2-1
 architecture	x86
@@ -386,7 +467,7 @@ requires {
 	haiku >= r1
 	wget
 }
-}}}
+</pre>
 could be represented by this attribute tree:
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME : string : "mypackage"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR : string : "0"
@@ -397,7 +478,7 @@ could be represented by this attribute tree:
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY : string : "is a very nice package"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION : string : "has lots of cool features\nand is written in MyC++"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR : string : "Me, Myself & I, Inc."
- - B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER : string : "!me@test.com"
+ - B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER : string : "me@test.com"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT : string : "(C) 2009-2011, Me, Myself & I, Inc."
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE : string : "Me, Myself & I Commercial License"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE : string : "MIT"
@@ -407,11 +488,11 @@ could be represented by this attribute tree:
      - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR : string : "7"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES : string : "haiku"
    - B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR : uint : 4
-   - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR : string : "!r1"
+   - B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR : string : "r1"
  - B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES : string : "wget"
 
 
-=== Attribute IDs ===
+==== Attribute IDs ====
 
 The following attribute IDs are specified by the package format. Any other attributes will be rejected.
 
@@ -456,8 +537,18 @@ The following attribute IDs are specified by the package format. Any other attri
  - '''Value:''' Set of boolean flags applying to package.
  - '''Allowed Values:''' Any combination of the following.
 
-   ||1||B_PACKAGE_FLAG_APPROVE_LICENSE||this package's license requires approval (i.e. must be shown to and acknowledged by user before installation)||
-   ||2||B_PACKAGE_FLAG_SYSTEM_PACKAGE||this is a system package (i.e. lives under /boot/system)||
+{| border=1 class="simple"
+!1
+!B_PACKAGE_FLAG_APPROVE_LICENSE
+!this package's license requires approval (i.e. must be shown to and acknowledged by user before installation)
+|}
+
+{| border=1 class="simple"
+!2
+!B_PACKAGE_FLAG_SYSTEM_PACKAGE
+!this is a system package (i.e. lives under /boot/system)
+|}
+
  - '''Default Value:''' 0.
  - '''Child Attributes:''' none
 
@@ -466,14 +557,54 @@ The following attribute IDs are specified by the package format. Any other attri
  - '''Value:''' System architecture this package was built for.
  - '''Allowed Values:'''
 
-   ||0||B_PACKAGE_ARCHITECTURE_ANY||this package doesn't depend on the system architecture||
-   ||1||B_PACKAGE_ARCHITECTURE_X86||x86, 32-bit, built with gcc4||
-   ||2||B_PACKAGE_ARCHITECTURE_X86_GCC2||x86, 32-bit, built with gcc2||
-   ||3||B_PACKAGE_ARCHITECTURE_SOURCE||source code, doesn't depend on the system architecture||
-   ||4||B_PACKAGE_ARCHITECTURE_X86_64||x86-64||
-   ||5||B_PACKAGE_ARCHITECTURE_PPC||PowerPC||
-   ||6||B_PACKAGE_ARCHITECTURE_ARM||ARM||
-   ||7||B_PACKAGE_ARCHITECTURE_M68K||m68k||
+{| border=1 class="simple"
+!0
+!B_PACKAGE_ARCHITECTURE_ANY
+!this package doesn't depend on the system architecture
+|}
+
+{| border=1 class="simple"
+!1
+!B_PACKAGE_ARCHITECTURE_X86
+!x86, 32-bit, built with gcc4
+|}
+
+{| border=1 class="simple"
+!2
+!B_PACKAGE_ARCHITECTURE_X86_GCC2
+!x86, 32-bit, built with gcc2
+|}
+
+{| border=1 class="simple"
+!3
+!B_PACKAGE_ARCHITECTURE_SOURCE
+!source code, doesn't depend on the system architecture
+|}
+
+{| border=1 class="simple"
+!4
+!B_PACKAGE_ARCHITECTURE_X86_64
+!x86-64
+|}
+
+{| border=1 class="simple"
+!5
+!B_PACKAGE_ARCHITECTURE_PPC
+!PowerPC
+|}
+
+{| border=1 class="simple"
+!6
+!B_PACKAGE_ARCHITECTURE_ARM
+!ARM
+|}
+
+{| border=1 class="simple"
+!7
+!B_PACKAGE_ARCHITECTURE_M68K
+!m68k
+|}
+
  - '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR ("package:version.major") ====
@@ -525,13 +656,13 @@ The following attribute IDs are specified by the package format. Any other attri
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_URL ("package:url") ====
  - '''Type:''' string
  - '''Value:''' URL of the packaged software's project home page.
- - '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <!http://foo.example.com>").
+ - '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <http://foo.example.com>").
  - '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL ("package:source-url") ====
  - '''Type:''' string
  - '''Value:''' URL of the packaged software's source code or build instructions.
- - '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <!http://foo.example.com>").
+ - '''Allowed Values:''' A regular URL or an email-like named URL (e.g. "Project Foo <http://foo.example.com>").
  - '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES ("package:provides") ====
@@ -565,12 +696,42 @@ The following attribute IDs are specified by the package format. Any other attri
  - '''Value:''' Comparison operator for versions.
  - '''Allowed Values:'''
 
-   ||0||B_PACKAGE_RESOLVABLE_OP_LESS||less than the specified version||
-   ||1||B_PACKAGE_RESOLVABLE_OP_LESS_EQUAL||less than or equal to the specified version||
-   ||2||B_PACKAGE_RESOLVABLE_OP_EQUAL||equal to the specified version||
-   ||3||B_PACKAGE_RESOLVABLE_OP_NOT_EQUAL||not equal to the specified version||
-   ||4||B_PACKAGE_RESOLVABLE_OP_GREATER_EQUAL||greater than the specified version||
-   ||5||B_PACKAGE_RESOLVABLE_OP_GREATER||greater than or equal to the specified version||
+{| border=1 class="simple"
+!0
+!B_PACKAGE_RESOLVABLE_OP_LESS
+!less than the specified version
+|}
+
+{| border=1 class="simple"
+!1
+!B_PACKAGE_RESOLVABLE_OP_LESS_EQUAL
+!less than or equal to the specified version
+|}
+
+{| border=1 class="simple"
+!2
+!B_PACKAGE_RESOLVABLE_OP_EQUAL
+!equal to the specified version
+|}
+
+{| border=1 class="simple"
+!3
+!B_PACKAGE_RESOLVABLE_OP_NOT_EQUAL
+!not equal to the specified version
+|}
+
+{| border=1 class="simple"
+!4
+!B_PACKAGE_RESOLVABLE_OP_GREATER_EQUAL
+!greater than the specified version
+|}
+
+{| border=1 class="simple"
+!5
+!B_PACKAGE_RESOLVABLE_OP_GREATER
+!greater than or equal to the specified version
+|}
+
  - '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SUPPLEMENTS ("package:supplements") ====
@@ -630,9 +791,24 @@ The following attribute IDs are specified by the package format. Any other attri
  - '''Value:''' Specifies what to do on package update when the writable file provided by the package has been changed by the user.
  - '''Allowed Values:'''
 
-   ||0||B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD||the old file shall be kept||
-   ||1||B_WRITABLE_FILE_UPDATE_TYPE_MANUAL||the old file needs to be updated manually||
-   ||2||B_WRITABLE_FILE_UPDATE_TYPE_AUTO_MERGE||an automatic three-way merge shall be attempted||
+{| border=1 class="simple"
+!0
+!B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD
+!the old file shall be kept
+|}
+
+{| border=1 class="simple"
+!1
+!B_WRITABLE_FILE_UPDATE_TYPE_MANUAL
+!the old file needs to be updated manually
+|}
+
+{| border=1 class="simple"
+!2
+!B_WRITABLE_FILE_UPDATE_TYPE_AUTO_MERGE
+!an automatic three-way merge shall be attempted
+|}
+
  - '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY ("package:is-writable-directory") ====
@@ -640,8 +816,16 @@ The following attribute IDs are specified by the package format. Any other attri
  - '''Value:''' Specifies whether the parent global writable file or user settings file attribute actually refers to a directory.
  - '''Allowed Values:'''
 
-   ||0||The parent attribute refers to a file.||
-   ||1||The parent attribute refers to a directory.||
+{| border=1 class="simple"
+!0
+!The parent attribute refers to a file.
+|}
+
+{| border=1 class="simple"
+!1
+!The parent attribute refers to a directory.
+|}
+
  - '''Child Attributes:''' none
 
 ==== B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE ("package:settings-file-template") ====
@@ -700,7 +884,7 @@ The following attribute IDs are specified by the package format. Any other attri
  - '''Child Attributes:''' none
 
 
-== Haiku Package Repository Format ==
+=== Haiku Package Repository Format ===
 
 Very similar to the package format, there's a Haiku Package Repository (HPKR) file format. Such a file contains informative attributes about the package repository and package attributes for all packages contained in the repository. However, this format does not contain any files.
 
@@ -709,7 +893,7 @@ Two stacked format layers can be identified:
  - A package format, extending the archive format with attributes for package management.
 
 
-=== The Data Container Format ===
+==== The Data Container Format ====
 
 A HPKR file consists of three sections:
  Header::
@@ -727,7 +911,7 @@ The Repository Info and Package Attributes sections aren't really separate secti
 
 The header has the following structure:
 
-{{{
+<pre>
 struct hpkg_repo_header {
 	uint32	magic;
 	uint16	header_size;
@@ -750,7 +934,7 @@ struct hpkg_repo_header {
 	uint64	packages_strings_length;
 	uint64	packages_strings_count;
 };
-}}}
+</pre>
 
  magic::
    The string 'hpkr' (B_HPKG_REPO_MAGIC).
@@ -791,7 +975,7 @@ struct hpkg_repo_header {
    The number of entries in the strings subsection of the package attributes section.
 
 
-=== Attribute IDs ===
+==== Attribute IDs ====
 
 The package repository format defines only the top-level attribute ID B_HPKG_ATTRIBUTE_ID_PACKAGE. An attribute with that ID represents a package. Its child attributes specify the various meta information for the package as defined in the [#AttributeIDs1 Package Format Attribute IDs] section.
 
