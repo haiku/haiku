@@ -261,4 +261,5 @@ VariablesViewState::_Cleanup()
 	}
 
 	SetValues(NULL);
+	SetExpressionValues(NULL);
 }

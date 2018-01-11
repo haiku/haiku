@@ -124,9 +124,6 @@ public:
 			entry->ReleaseReference();
 			entry = next;
 		}
-
-		while ((entry = fDeadEntries.RemoveHead()) != NULL)
-			entry->ReleaseReference();
 	}
 
 	status_t Init()
@@ -202,21 +199,10 @@ private:
 		AutoLocker<FileManager> lock(fManager);
 		if (fEntries.Lookup(EntryPath(entry)) == entry)
 			fEntries.Remove(entry);
-		else {
-			DeadEntryList::Iterator iterator = fDeadEntries.GetIterator();
-			while (iterator.HasNext()) {
-				if (iterator.Next() == entry) {
-					fDeadEntries.Remove(entry);
-					break;
-				}
-			}
-		}
 
 		LocatableDirectory* parent = entry->Parent();
 		if (parent != NULL)
 			parent->RemoveEntry(entry);
-
-		delete entry;
 	}
 
 	bool _LocateDirectory(LocatableDirectory* directory,
@@ -306,23 +292,23 @@ private:
 
 	LocatableFile* _GetFile(const BString& directoryPath, const BString& name)
 	{
+		BString normalizedDirPath;
+		_NormalizePath(directoryPath, normalizedDirPath);
+
 		// if already known return the file
-		LocatableEntry* entry = _LookupEntry(EntryPath(directoryPath, name));
+		LocatableEntry* entry = _LookupEntry(EntryPath(normalizedDirPath, name));
 		if (entry != NULL) {
 			LocatableFile* file = dynamic_cast<LocatableFile*>(entry);
 			if (file == NULL)
 				return NULL;
 
-			if (file->AcquireReference() == 0) {
+			if (file->AcquireReference() == 0)
 				fEntries.Remove(file);
-				fDeadEntries.Insert(file);
-			} else
+			else
 				return file;
 		}
 
 		// no such file yet -- create it
-		BString normalizedDirPath;
-		_NormalizePath(directoryPath, normalizedDirPath);
 		LocatableDirectory* directory = _GetDirectory(normalizedDirPath);
 		if (directory == NULL)
 			return NULL;
@@ -337,6 +323,7 @@ private:
 		directory->AddEntry(file);
 
 		fEntries.Insert(file);
+
 		return file;
 	}
 
@@ -488,7 +475,6 @@ private:
 private:
 	FileManager*		fManager;
 	LocatableEntryTable	fEntries;
-	DeadEntryList		fDeadEntries;
 	bool				fIsLocal;
 };
 

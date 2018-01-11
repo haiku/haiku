@@ -54,6 +54,12 @@ StackFrame::~StackFrame()
 
 	fDebugInfo->ReleaseReference();
 	fCpuState->ReleaseReference();
+
+	if (fValues != NULL)
+		fValues->ReleaseReference();
+
+	if (fValueInfos != NULL)
+		fValueInfos->ReleaseReference();
 }
 
 

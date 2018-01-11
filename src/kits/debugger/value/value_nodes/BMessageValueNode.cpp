@@ -164,9 +164,6 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	// load the value data
 
 	status_t error = B_OK;
-	_location = location;
-	_value = NULL;
-
 	ValueLocation* memberLocation = NULL;
 
 	BVariant headerAddress;
@@ -317,6 +314,10 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	error = fMessage.Unflatten((const char*)messageBuffer);
 	if (error != B_OK)
 		return error;
+
+	location->AcquireReference();
+	_location = location;
+	_value = NULL;
 
 	return B_OK;
 }

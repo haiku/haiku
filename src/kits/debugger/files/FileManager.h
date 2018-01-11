@@ -65,7 +65,6 @@ private:
 			struct SourceFileHashDefinition;
 
 			typedef BOpenHashTable<EntryHashDefinition> LocatableEntryTable;
-			typedef DoublyLinkedList<LocatableEntry> DeadEntryList;
 			typedef BOpenHashTable<SourceFileHashDefinition> SourceFileTable;
 			typedef std::map<BString, BString> LocatedFileMap;
 
@@ -83,7 +82,6 @@ private:
 			Domain*				fTargetDomain;
 			Domain*				fSourceDomain;
 			SourceFileTable*	fSourceFiles;
-
 			LocatedFileMap		fSourceLocationMappings;
 };
 

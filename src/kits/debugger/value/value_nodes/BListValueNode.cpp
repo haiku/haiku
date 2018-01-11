@@ -213,8 +213,6 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	// load the value data
 
 	status_t error = B_OK;
-	_location = location;
-	_value = NULL;
 
 	ValueLocation* memberLocation = NULL;
 	CompoundType* baseType = dynamic_cast<CompoundType*>(fType);
@@ -289,6 +287,10 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		}
 		memberLocation = NULL;
 	}
+
+	location->AcquireReference();
+	_location = location;
+	_value = NULL;
 
 	return B_OK;
 }

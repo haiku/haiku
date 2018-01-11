@@ -21,6 +21,12 @@ AbbreviationTable::AbbreviationTable(off_t offset)
 
 AbbreviationTable::~AbbreviationTable()
 {
+	AbbreviationTableEntry* entry = fEntryTable.Clear(true);
+	while (entry != NULL) {
+		AbbreviationTableEntry* next = entry->next;
+		delete entry;
+		entry = next;
+	}
 }
 
 

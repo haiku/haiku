@@ -44,4 +44,5 @@ void
 LocatableEntry::LastReferenceReleased()
 {
 	fOwner->LocatableEntryUnused(this);
+	delete this;
 }

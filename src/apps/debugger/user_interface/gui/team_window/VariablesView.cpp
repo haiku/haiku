@@ -1324,6 +1324,7 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 	if (error != B_OK)
 		return;
 
+	BReference<TableCellValueRenderer> rendererReference(renderer, true);
 	// set value/handler/renderer
 	modelNode->SetValue(value);
 	modelNode->SetValueHandler(valueHandler);
@@ -1336,8 +1337,6 @@ VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
 		if (settings != NULL)
 			settings->RestoreValues(modelNode->GetLastRendererSettings());
 	}
-
-
 
 	// notify table model listeners
 	NotifyNodeChanged(modelNode);
@@ -1803,6 +1802,17 @@ VariablesView::~VariablesView()
 
 	if (fTemporaryExpression != NULL)
 		fTemporaryExpression->ReleaseReference();
+
+	if (fExpressions != NULL) {
+		ExpressionInfoEntry* entry = fExpressions->Clear();
+		while (entry != NULL) {
+			ExpressionInfoEntry* next = entry->next;
+			delete entry;
+			entry = next;
+		}
+	}
+
+	delete fExpressions;
 }
 
 
@@ -2246,6 +2256,7 @@ VariablesView::MessageReceived(BMessage* message)
 		{
 			ModelNode* node;
 			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ModelNode> nodeReference(node, true);
 				TreeTablePath path;
 				if (fVariableTableModel->GetTreePath(node, path)) {
 					FunctionID* functionID = fStackFrame->Function()

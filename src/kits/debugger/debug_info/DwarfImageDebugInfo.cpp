@@ -1111,7 +1111,7 @@ DwarfImageDebugInfo::_GetSourceFileIndex(CompilationUnit* unit,
 	for (int32 i = 0; const char* fileName = unit->FileAt(i, &directory); i++) {
 		LocatableFile* file = fFileManager->GetSourceFile(directory, fileName);
 		if (file != NULL) {
-			file->ReleaseReference();
+			BReference<LocatableFile> fileReference(file, true);
 			if (file == sourceFile) {
 				return i + 1;
 					// indices are one-based

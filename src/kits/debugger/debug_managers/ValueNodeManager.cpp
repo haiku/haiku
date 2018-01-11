@@ -52,6 +52,9 @@ ValueNodeManager::SetStackFrame(Thread* thread,
 	fStackFrame = stackFrame;
 	fThread = thread;
 
+	if (fStackFrame == NULL)
+		return B_OK;
+
 	fContainer = new(std::nothrow) ValueNodeContainer;
 	if (fContainer == NULL)
 		return B_NO_MEMORY;

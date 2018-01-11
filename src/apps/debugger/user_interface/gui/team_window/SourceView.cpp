@@ -2175,7 +2175,7 @@ SourceView::SetStackTrace(StackTrace* stackTrace, Thread* activeThread)
 {
 	TRACE_GUI("SourceView::SetStackTrace(%p)\n", stackTrace);
 
-	if (stackTrace == fStackTrace)
+	if (stackTrace == fStackTrace && activeThread == fActiveThread)
 		return;
 
 	if (fActiveThread != NULL)

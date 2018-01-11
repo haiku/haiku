@@ -44,6 +44,8 @@ TeamSettings::TeamSettings(const TeamSettings& other)
 TeamSettings::~TeamSettings()
 {
 	_Unset();
+	delete fFileManagerSettings;
+	delete fSignalSettings;
 }
 
 

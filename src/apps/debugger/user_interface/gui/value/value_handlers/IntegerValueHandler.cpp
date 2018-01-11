@@ -343,10 +343,9 @@ IntegerValueHandler::AddIntegerFormatOption(OptionsSettingImpl* setting,
 	const char* id, const char* name, integer_format format)
 {
 	FormatOption* option = new(std::nothrow) FormatOption(id, name, format);
-	if (option == NULL || !setting->AddOption(option)) {
-		delete option;
+	BReference<FormatOption> optionReference(option, true);
+	if (option == NULL || !setting->AddOption(option))
 		return B_NO_MEMORY;
-	}
 
 	return B_OK;
 }
