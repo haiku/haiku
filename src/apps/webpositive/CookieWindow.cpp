@@ -144,7 +144,7 @@ CookieWindow::CookieWindow(BRect frame, BNetworkCookieJar& jar)
 		.Add(fCookies)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.SetInsets(5, 5, 5, 5)
-#if DEBUG
+#if 0
 			.Add(new BButton("import", B_TRANSLATE("Import" B_UTF8_ELLIPSIS),
 				NULL))
 			.Add(new BButton("export", B_TRANSLATE("Export" B_UTF8_ELLIPSIS),
@@ -303,7 +303,7 @@ CookieWindow::_AddDomain(BString domain, bool fake)
 		}
 	}
 
-#if DEBUG
+#if 0
 	puts("==============================");
 	for (i = 0; i < fDomains->FullListCountItems(); i++) {
 		BStringItem* t = (BStringItem*)fDomains->FullListItemAt(i);
