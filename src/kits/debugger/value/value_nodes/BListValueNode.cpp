@@ -274,7 +274,7 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 			fItemCountLocation = memberLocation->PieceAt(0).address;
 
 			BVariant listSize;
-			error = valueLoader->LoadValue(memberLocation, valueType,
+			error = valueLoader->LoadValue(memberLocation, B_INT32_TYPE,
 				false, listSize);
 			if (error != B_OK)
 				return error;
