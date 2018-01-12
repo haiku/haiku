@@ -23,13 +23,18 @@
 
 ImageDebugLoadingStateHandlerRoster::ImageDebugLoadingStateHandlerRoster()
 	:
-	fLock("type handler roster")
+	fLock("loading state handler roster"),
+	fStateHandlers(20, false)
 {
 }
 
 
 ImageDebugLoadingStateHandlerRoster::~ImageDebugLoadingStateHandlerRoster()
 {
+	for (int32 i = 0; ImageDebugLoadingStateHandler* handler
+			= fStateHandlers.ItemAt(i); i++) {
+		handler->ReleaseReference();
+	}
 }
 
 

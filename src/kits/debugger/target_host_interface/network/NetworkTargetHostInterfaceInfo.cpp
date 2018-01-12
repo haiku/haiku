@@ -26,7 +26,8 @@ NetworkTargetHostInterfaceInfo::NetworkTargetHostInterfaceInfo()
 
 NetworkTargetHostInterfaceInfo::~NetworkTargetHostInterfaceInfo()
 {
-	delete fDescription;
+	if (fDescription != NULL)
+		fDescription->ReleaseReference();
 }
 
 
@@ -39,21 +40,20 @@ NetworkTargetHostInterfaceInfo::Init()
 
 	Setting* setting = new(std::nothrow) StringSettingImpl(kHostnameSetting,
 		"Hostname", "");
+	BReference<Setting> settingsReference(setting, true);
 	if (setting == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<Setting> settingDeleter(setting);
 	if (!fDescription->AddSetting(setting))
 		return B_NO_MEMORY;
 
-	settingDeleter.Detach();
 	setting = new(std::nothrow) BoundedSettingImpl(kPortSetting, "Port",
 		(uint16)1, (uint16)65535, (uint16)8305);
 	if (setting == NULL)
 		return B_NO_MEMORY;
-	if (!fDescription->AddSetting(setting)) {
-		delete setting;
+
+	settingsReference.SetTo(setting, true);
+	if (!fDescription->AddSetting(setting))
 		return B_NO_MEMORY;
-	}
 
 	return B_OK;
 }

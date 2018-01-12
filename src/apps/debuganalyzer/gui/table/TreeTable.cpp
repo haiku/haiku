@@ -688,6 +688,7 @@ TreeTable::TreeTable(TreeTableModel* model, const char* name, uint32 flags,
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
 	fModel(NULL),
+	fToolTipProvider(NULL),
 	fRootNode(NULL),
 	fSelectionModel(this),
 	fIgnoreSelectionChange(0)
@@ -699,9 +700,6 @@ TreeTable::TreeTable(TreeTableModel* model, const char* name, uint32 flags,
 TreeTable::~TreeTable()
 {
 	SetTreeTableModel(NULL);
-
-	for (int32 i = CountColumns() - 1; i >= 0; i--)
-		RemoveColumn(ColumnAt(i));
 }
 
 

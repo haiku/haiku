@@ -402,9 +402,6 @@ Table::Table(TableModel* model, const char* name, uint32 flags,
 
 Table::~Table()
 {
-	for (int32 i = CountColumns() - 1; i >= 0; i--)
-		RemoveColumn(ColumnAt(i));
-
 	// rows are deleted by the BColumnListView destructor automatically
 }
 

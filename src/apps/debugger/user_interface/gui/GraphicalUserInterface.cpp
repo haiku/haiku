@@ -138,6 +138,7 @@ GraphicalUserInterface::~GraphicalUserInterface()
 {
 	delete fTeamWindowMessenger;
 	delete fFilePanel;
+	delete fFilePanelHandler;
 }
 
 

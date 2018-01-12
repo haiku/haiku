@@ -114,6 +114,9 @@ GlobalTypeCache::~GlobalTypeCache()
 			entry = nextEntry;
 		}
 	}
+
+	delete fTypesByName;
+	delete fTypesByID;
 }
 
 

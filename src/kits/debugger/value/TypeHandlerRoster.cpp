@@ -73,6 +73,8 @@ TypeHandlerRoster::TypeHandlerRoster()
 
 TypeHandlerRoster::~TypeHandlerRoster()
 {
+	for (int32 i = 0; TypeHandler* handler = fTypeHandlers.ItemAt(i); i++)
+		handler->ReleaseReference();
 }
 
 /*static*/ TypeHandlerRoster*

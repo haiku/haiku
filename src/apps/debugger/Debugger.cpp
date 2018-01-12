@@ -433,8 +433,7 @@ Debugger::MessageReceived(BMessage* message)
 			status_t error = interface->StartTeamDebugger(options);
 			if (error != B_OK) {
 				// TODO: notify user.
-			} else
-				uiReference.Detach();
+			}
 			break;
 		}
 		case MSG_START_NEW_TEAM:
@@ -605,7 +604,6 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	status_t error = interface->StartTeamDebugger(options);
 	if (error == B_OK) {
 		deleter.Detach();
-		uiReference.Detach();
 	}
 
 	return error;
@@ -624,11 +622,7 @@ Debugger::_HandleOptions(const Options& options)
 	BReference<UserInterface> uiReference(debuggerOptions.userInterface, true);
 	TargetHostInterface* hostInterface
 		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
-	status_t error = hostInterface->StartTeamDebugger(debuggerOptions);
-	if (error == B_OK)
-		uiReference.Detach();
-
-	return error;
+	return hostInterface->StartTeamDebugger(debuggerOptions);
 }
 
 

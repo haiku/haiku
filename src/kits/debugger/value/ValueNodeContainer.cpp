@@ -16,7 +16,9 @@
 
 ValueNodeContainer::ValueNodeContainer()
 	:
-	fLock("value node container")
+	fLock("value node container"),
+	fChildren(20, false),
+	fListeners(20, false)
 {
 }
 
@@ -24,6 +26,7 @@ ValueNodeContainer::ValueNodeContainer()
 ValueNodeContainer::~ValueNodeContainer()
 {
 	RemoveAllChildren();
+	fListeners.MakeEmpty();
 }
 
 

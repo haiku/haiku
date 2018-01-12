@@ -109,7 +109,7 @@ AbstractTable::AbstractTable(const char* name, uint32 flags,
 	border_style borderStyle, bool showHorizontalScrollbar)
 	:
 	BColumnListView(name, flags, borderStyle, showHorizontalScrollbar),
-	fColumns(20, true)
+	fColumns(20, false)
 {
 }
 

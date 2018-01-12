@@ -24,13 +24,16 @@
 
 ValueHandlerRoster::ValueHandlerRoster()
 	:
-	fLock("value handler roster")
+	fLock("value handler roster"),
+	fValueHandlers(20, false)
 {
 }
 
 
 ValueHandlerRoster::~ValueHandlerRoster()
 {
+	for(int32 i = 0; ValueHandler* handler = fValueHandlers.ItemAt(i); i++)
+		handler->ReleaseReference();
 }
 
 /*static*/ ValueHandlerRoster*

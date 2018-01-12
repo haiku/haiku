@@ -32,6 +32,16 @@ TargetHostInterfaceRoster::TargetHostInterfaceRoster()
 
 TargetHostInterfaceRoster::~TargetHostInterfaceRoster()
 {
+	for (int32 i = 0; TargetHostInterfaceInfo* info
+			= fInterfaceInfos.ItemAt(i); i++) {
+		info->ReleaseReference();
+	}
+
+	for (int32 i = 0; TargetHostInterface* interface
+			= fActiveInterfaces.ItemAt(i); i++) {
+		if (interface->Lock())
+			interface->Quit();
+	}
 }
 
 
@@ -185,6 +195,7 @@ TargetHostInterfaceRoster::TargetHostInterfaceQuit(
 {
 	AutoLocker<TargetHostInterfaceRoster> locker(this);
 	fActiveInterfaces.RemoveItem(interface);
+
 }
 
 

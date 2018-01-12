@@ -2034,6 +2034,7 @@ SourceView::SourceView(Team* team, Listener* listener)
 	fStackTrace(NULL),
 	fStackFrame(NULL),
 	fSourceCode(NULL),
+	fMarkerManager(NULL),
 	fMarkerView(NULL),
 	fTextView(NULL),
 	fListener(listener),
@@ -2052,6 +2053,8 @@ SourceView::~SourceView()
 	SetStackFrame(NULL);
 	SetStackTrace(NULL, NULL);
 	SetSourceCode(NULL);
+
+	delete fMarkerManager;
 }
 
 
