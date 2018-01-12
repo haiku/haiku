@@ -39,6 +39,11 @@ SECTIONS
 
 	.rodata : { *(.rodata) }
 
+	. = ALIGN(0x4);
+	altcodepatch_begin = .;
+	.altcodepatch : { *(.altcodepatch) }
+	altcodepatch_end = .;
+
 	/* writable data  */
 	. = ALIGN(0x1000);
 	__data_start = .;

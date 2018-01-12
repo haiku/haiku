@@ -72,6 +72,7 @@ if $(TARGET_ARCH) = x86_64 {
 }
 
 local archGenericSources =
+	arch_altcodepatch.cpp
 	arch_cpu.cpp
 	arch_commpage.cpp
 	arch_debug.cpp
