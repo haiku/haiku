@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2016, Haiku Inc. All rights reserved.
+ * Copyright 2009-2018, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -120,6 +120,7 @@ private:
 
 private:
 			TargetHostInterface* fInterface;
+			TargetHost*			fHost;
 };
 
 

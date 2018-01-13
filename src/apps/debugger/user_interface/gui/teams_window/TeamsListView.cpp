@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -277,7 +277,8 @@ TeamsListView::TeamsListView(const char* name)
 	Inherited(name, B_NAVIGABLE, B_PLAIN_BORDER),
 	TargetHost::Listener(),
 	TeamsWindow::Listener(),
-	fInterface(NULL)
+	fInterface(NULL),
+	fHost(NULL)
 {
 	AddColumn(new TeamsColumn("Name", 400, 100, 600,
 		B_TRUNCATE_BEGINNING), kNameColumn);
@@ -289,6 +290,8 @@ TeamsListView::TeamsListView(const char* name)
 
 TeamsListView::~TeamsListView()
 {
+	if (fHost != NULL)
+		fHost->ReleaseReference();
 }
 
 
@@ -435,10 +438,8 @@ TeamsListView::SelectedInterfaceChanged(TargetHostInterface* interface)
 void
 TeamsListView::_InitList()
 {
-	TargetHost* host = fInterface->GetTargetHost();
-	AutoLocker<TargetHost> hostLocker(host);
-	for (int32 i = 0; i < host->CountTeams(); i++) {
-		TeamInfo* info = host->TeamInfoAt(i);
+	AutoLocker<TargetHost> hostLocker(fHost);
+	for (int32 i = 0; TeamInfo* info = fHost->TeamInfoAt(i); i++) {
 		BRow* row = new TeamRow(info);
 		AddRow(row);
 	}
@@ -453,13 +454,17 @@ TeamsListView::_SetInterface(TargetHostInterface* interface)
 
 	if (fInterface != NULL) {
 		Clear();
-		fInterface->GetTargetHost()->RemoveListener(this);
+		fHost->RemoveListener(this);
+		fHost->ReleaseReference();
+		fHost = NULL;
 	}
 
 	fInterface = interface;
 	if (fInterface == NULL)
 		return;
 
-	fInterface->GetTargetHost()->AddListener(this);
+	fHost = fInterface->GetTargetHost();
+	fHost->AcquireReference();
+	fHost->AddListener(this);
 	_InitList();
 }
