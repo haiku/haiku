@@ -26,6 +26,8 @@
 #ifndef _UDINT_H_
 #define _UDINT_H_
 
+#include "types.h"
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif /* HAVE_CONFIG_H */
@@ -84,6 +86,14 @@
 # else 
 #  define FMT64 "ll"
 # endif /* !x64 */
+#endif
+
+/* define an inline macro */
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+# define UD_INLINE __inline /* MS Visual Studio requires __inline
+                               instead of inline for C code */
+#else
+# define UD_INLINE inline
 #endif
 
 #endif /* _UDINT_H_ */

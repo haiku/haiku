@@ -214,7 +214,7 @@ ud_insn_len(const struct ud* u)
 const struct ud_operand*
 ud_insn_opr(const struct ud *u, unsigned int n)
 {
-  if (n > 2 || u->operand[n].type == UD_NONE) {
+  if (n > 3 || u->operand[n].type == UD_NONE) {
     return NULL; 
   } else {
     return &u->operand[n];
@@ -355,6 +355,7 @@ ud_inp_init(struct ud *u)
   u->inp_curr      = 0;
   u->inp_ctr       = 0;
   u->inp_end       = 0;
+  u->inp_peek      = UD_EOI;
   UD_NON_STANDALONE(u->inp_file = NULL);
 }
 
