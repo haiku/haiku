@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -61,7 +61,7 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(comp_dir),				AC_STRING },
 	{ ENTRY(const_value),			AC_BLOCK | AC_CONSTANT | AC_STRING },
 	{ ENTRY(containing_type),		AC_REFERENCE },
-	{ ENTRY(default_value),			AC_REFERENCE },
+	{ ENTRY(default_value),			AC_REFERENCE | AC_CONSTANT | AC_FLAG },
 	{ ENTRY(inline),				AC_CONSTANT },
 	{ ENTRY(is_optional),			AC_FLAG },
 	{ ENTRY(lower_bound),			AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
@@ -213,7 +213,7 @@ static struct InitAttributeInfos {
 uint16
 get_attribute_name_classes(uint32 name)
 {
-	if (name < DW_AT_linkage_name)
+	if (name <= DW_AT_linkage_name)
 		return sAttributeNameInfos[name].classes;
 	else if (name >= DW_AT_call_site_value
 		&& name <= DW_AT_all_source_call_sites) {
@@ -252,7 +252,7 @@ get_attribute_class(uint32 name, uint32 form)
 const char*
 get_attribute_name_name(uint32 name)
 {
-	if (name < DW_AT_linkage_name)
+	if (name <= DW_AT_linkage_name)
 		return sAttributeNameInfos[name].name;
 	else if (name >= DW_AT_call_site_value
 		&& name <= DW_AT_all_source_call_sites) {

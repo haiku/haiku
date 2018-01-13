@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
@@ -131,6 +131,8 @@ private:
 									const;
 
 			status_t			_BuildTypeNameTable();
+			status_t			_RecursiveAddTypeNames(DIEType* type,
+									CompilationUnit* unit);
 
 private:
 			BLocker				fLock;

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -554,9 +554,33 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 			continue;
 		}
 
+		int32 registerCount = fArchitecture->CountRegisters();
+		const Register* registers = fArchitecture->Registers();
+
+		// get the DWARF <-> architecture register maps
+		RegisterMap* toDwarfMap;
+		RegisterMap* fromDwarfMap;
+		status_t error = fArchitecture->GetDwarfRegisterMaps(&toDwarfMap,
+			&fromDwarfMap);
+		if (error != B_OK)
+			return error;
+
+		BReference<RegisterMap> toDwarfMapReference(toDwarfMap, true);
+		BReference<RegisterMap> fromDwarfMapReference(fromDwarfMap, true);
+
+		// create the target interface
+		BasicTargetInterface* targetInterface
+			= new(std::nothrow) BasicTargetInterface(registers, registerCount,
+				fromDwarfMap, fArchitecture, fDebuggerInterface);
+		if (targetInterface == NULL)
+			return B_NO_MEMORY;
+
+		BReference<BasicTargetInterface> targetInterfaceReference(
+			targetInterface, true);
+
 		DwarfTypeContext* typeContext = new(std::nothrow)
 			DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
-				info->unit, NULL, 0, 0, fRelocationDelta, NULL, NULL);
+				info->unit, NULL, 0, 0, fRelocationDelta, targetInterface, NULL);
 		if (typeContext == NULL)
 			return B_NO_MEMORY;
 		BReference<DwarfTypeContext> typeContextReference(typeContext, true);
@@ -564,7 +588,7 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 		// create the type
 		DwarfType* type;
 		DwarfTypeFactory typeFactory(typeContext, fTypeLookup, cache);
-		status_t error = typeFactory.CreateType(typeEntry, type);
+		error = typeFactory.CreateType(typeEntry, type);
 		if (error != B_OK)
 			continue;
 
@@ -1378,32 +1402,54 @@ DwarfImageDebugInfo::_BuildTypeNameTable()
 		for (DebugInfoEntryList::ConstIterator it
 				= unit->UnitEntry()->Types().GetIterator();
 			DIEType* typeEntry = dynamic_cast<DIEType*>(it.Next());) {
-			if (typeEntry->IsDeclaration())
-				continue;
 
-			BString typeEntryName;
-			DwarfUtils::GetFullyQualifiedDIEName(typeEntry, typeEntryName);
-
-			TypeNameEntry* entry = fTypeNameTable->Lookup(typeEntryName);
-			if (entry == NULL) {
-				entry = new(std::nothrow) TypeNameEntry(typeEntryName);
-				if (entry == NULL)
-					return B_NO_MEMORY;
-
-				error = fTypeNameTable->Insert(entry);
-				if (error != B_OK)
-					return error;
-			}
-
-			TypeEntryInfo* info = new(std::nothrow) TypeEntryInfo(typeEntry,
-				unit);
-			if (info == NULL)
+			if (_RecursiveAddTypeNames(typeEntry, unit) != B_OK)
 				return B_NO_MEMORY;
+		}
+	}
 
-			if (!entry->types.AddItem(info)) {
-				delete info;
-				return B_NO_MEMORY;
-			}
+	return B_OK;
+}
+
+
+status_t
+DwarfImageDebugInfo::_RecursiveAddTypeNames(DIEType* type, CompilationUnit* unit)
+{
+	if (type->IsDeclaration())
+		return B_OK;
+
+	BString typeEntryName;
+	DwarfUtils::GetFullyQualifiedDIEName(type, typeEntryName);
+
+	status_t error = B_OK;
+	TypeNameEntry* entry = fTypeNameTable->Lookup(typeEntryName);
+	if (entry == NULL) {
+		entry = new(std::nothrow) TypeNameEntry(typeEntryName);
+		if (entry == NULL)
+			return B_NO_MEMORY;
+
+		error = fTypeNameTable->Insert(entry);
+		if (error != B_OK)
+			return error;
+	}
+
+	TypeEntryInfo* info = new(std::nothrow) TypeEntryInfo(type,	unit);
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	if (!entry->types.AddItem(info)) {
+		delete info;
+		return B_NO_MEMORY;
+	}
+
+	DIEClassBaseType* classType = dynamic_cast<DIEClassBaseType*>(type);
+	if (classType != NULL) {
+		for (DebugInfoEntryList::ConstIterator it
+				= classType->InnerTypes().GetIterator();
+			DIEType* innerType = dynamic_cast<DIEType*>(it.Next());) {
+			error = _RecursiveAddTypeNames(innerType, unit);
+			if (error != B_OK)
+				return error;
 		}
 	}
 
