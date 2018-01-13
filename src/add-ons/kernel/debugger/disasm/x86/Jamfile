@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_ARCH) ;
+SubDir HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_KERNEL_ARCH) ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 UseHeaders [ LibraryHeaders udis86 ] ;

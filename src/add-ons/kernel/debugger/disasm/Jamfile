@@ -7,4 +7,4 @@ KernelAddon <kdebug>disasm :
 	: disasm_arch.a
 	;
 
-SubInclude HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_ARCH) ;
+SubInclude HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_KERNEL_ARCH) ;

@@ -63,7 +63,11 @@ setup_disassembler(addr_t where)
 {
 	ud_set_input_hook(&sUDState, &read_next_byte);
 	sCurrentReadAddress	= where;
+#ifdef __x86_64__
+	ud_set_mode(&sUDState, 64);
+#else
 	ud_set_mode(&sUDState, 32);
+#endif
 	ud_set_pc(&sUDState, (uint64_t)where);
 	ud_set_syntax(&sUDState, sSyntax);
 	ud_set_vendor(&sUDState, sVendor);
