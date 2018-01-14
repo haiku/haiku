@@ -721,15 +721,16 @@ BListItem*
 BOutlineListView::EachItemUnder(BListItem* superItem, bool oneLevelOnly,
 	BListItem* (*eachFunc)(BListItem* item, void* arg), void* arg)
 {
-	int32 i = IndexOf(superItem);
+	int32 i = FullListIndexOf(superItem);
 	if (i == -1)
 		return NULL;
 
+	i++; // skip the superitem
 	while (i < FullListCountItems()) {
 		BListItem* item = FullListItemAt(i);
 
 		// If we jump out of the subtree, return NULL
-		if (item->fLevel < superItem->OutlineLevel())
+		if (item->fLevel <= superItem->OutlineLevel())
 			return NULL;
 
 		// If the level matches, check the index
