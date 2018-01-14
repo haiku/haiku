@@ -207,7 +207,7 @@ compare(
 				strcpy(tm.args, "(unknown)");
 			} else {
 				if ((p = strrchr(tm.args, '/'))) {
-					strcpy(tm.args, p + 1);
+					strlcpy(tm.args, p + 1, sizeof(tm.args));
 				}
 			}
 		}

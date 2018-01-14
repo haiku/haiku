@@ -244,12 +244,11 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 
 	// check for EA first... TODO: WRITEME
 
-
 	// check for a named stream
 	if (true) {
 		char ntfs_attr_name[MAX_PATH] = {0};
-		strcat(ntfs_attr_name, kHaikuAttrPrefix);
-		strcat(ntfs_attr_name,name);
+		strlcpy(ntfs_attr_name, kHaikuAttrPrefix, sizeof(ntfs_attr_name));
+		strlcat(ntfs_attr_name, name, sizeof(ntfs_attr_name));
 
 		uname = ntfs_calloc(MAX_PATH);
 		ulen = ntfs_mbstoucs(ntfs_attr_name, &uname);
@@ -350,12 +349,11 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 
 	// check for EA first... TODO: WRITEME
 
-
 	// check for a named stream
 	if (true) {
 		char ntfs_attr_name[MAX_PATH] = {0};
-		strcat(ntfs_attr_name, kHaikuAttrPrefix);
-		strcat(ntfs_attr_name, name);
+		strlcpy(ntfs_attr_name, kHaikuAttrPrefix, sizeof(ntfs_attr_name));
+		strlcat(ntfs_attr_name, name, sizeof(ntfs_attr_name));
 
 		uname = ntfs_calloc(MAX_PATH);
 		ulen = ntfs_mbstoucs(ntfs_attr_name, &uname);
@@ -693,8 +691,8 @@ fs_remove_attrib(fs_volume *_vol, fs_vnode *_node, const char* name)
 		goto exit;
 	}
 
-	strcat(ntfs_attr_name, kHaikuAttrPrefix);
-	strcat(ntfs_attr_name, name);
+	strlcpy(ntfs_attr_name, kHaikuAttrPrefix, sizeof(ntfs_attr_name));
+	strlcat(ntfs_attr_name, name, sizeof(ntfs_attr_name));
 
 	uname = ntfs_calloc(MAX_PATH);
 	ulen = ntfs_mbstoucs(ntfs_attr_name, &uname);

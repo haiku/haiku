@@ -23,7 +23,7 @@ void Usage( )
 
 int main( int argc, char* argv[] )
 {
-   char            buf[255];
+   char            buf[255] = {0};
    const char*     day_strings[] = { "day", "days" };
    const char*     hour_strings[] = { "hour", "hours" };
    const char*     minute_strings[] = { "minute", "minutes" };
@@ -75,9 +75,12 @@ int main( int argc, char* argv[] )
 
    if( !print_uptime_only )
    {
-      strcpy( buf, ctime( &current_time ) );
-
-      buf[strlen( buf ) - 1] = '\0';
+      if (ctime_r(&current_time, buf) != NULL) {
+        // ctime_r returns the date string with a trailing \n
+        // https://linux.die.net/man/3/ctime_r
+        // but we don't need that, so we clear it
+        buf[strlen( buf ) - 1] = '\0';
+      }
    }
 
    day_string = (uptime_days == 1) ? day_strings[0] : day_strings[1];

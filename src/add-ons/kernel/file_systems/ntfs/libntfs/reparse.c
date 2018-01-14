@@ -401,8 +401,8 @@ static int ntfs_drive_letter(ntfs_volume *vol, ntfschar letter)
 		strcpy(defines,mappingdir);
 		if ((*drive >= 'a') && (*drive <= 'z'))
 			*drive += 'A' - 'a';
-		strcat(defines,drive);
-		strcat(defines,":");
+		strlcat(defines, drive, sizeof(defines));
+		strlcat(defines, ":", sizeof(defines));
 		olderrno = errno;
 		ni = ntfs_pathname_to_inode(vol, NULL, defines);
 		if (ni && !ntfs_inode_close(ni))

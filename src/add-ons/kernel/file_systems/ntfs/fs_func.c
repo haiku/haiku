@@ -365,7 +365,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		.flags = 0
 	};
 
-	strcpy(ns->devicePath,device);
+	strlcpy(ns->devicePath, device, sizeof(ns->devicePath));
 
 	sprintf(lockname, "ntfs_lock %lx", ns->id);
 	recursive_lock_init_etc(&(ns->vlock), lockname, MUTEX_FLAG_CLONE_NAME);
