@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -237,8 +237,12 @@ put_fd(struct file_descriptor* descriptor)
 	its close hook when appropriate.
 */
 void
-close_fd(struct file_descriptor* descriptor)
+close_fd(struct io_context* context, struct file_descriptor* descriptor)
 {
+	// POSIX advisory locks need to be released when any file descriptor closes
+	if (descriptor->type == FDTYPE_FILE)
+		vfs_release_posix_lock(context, descriptor);
+
 	if (atomic_add(&descriptor->open_count, -1) == 1) {
 		vfs_unlock_vnode_if_locked(descriptor);
 
@@ -256,7 +260,7 @@ close_fd_index(struct io_context* context, int fd)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	close_fd(descriptor);
+	close_fd(context, descriptor);
 	put_fd(descriptor);
 		// the reference associated with the slot
 
@@ -452,7 +456,7 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	// Say bye bye to the evicted fd
 	if (evicted) {
 		deselect_select_infos(evicted, selectInfos, true);
-		close_fd(evicted);
+		close_fd(context, evicted);
 		put_fd(evicted);
 	}
 
@@ -605,7 +609,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 		deselect_select_infos(descriptor, info, false);
 
 		// Release our open reference of the descriptor.
-		close_fd(descriptor);
+		close_fd(context, descriptor);
 		return B_FILE_ERROR;
 	}
 

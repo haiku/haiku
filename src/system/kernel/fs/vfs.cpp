@@ -172,6 +172,7 @@ namespace {
 
 struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
 	list_link		link;
+	void*			bound_to;
 	team_id			team;
 	pid_t			session;
 	off_t			start;
@@ -1628,17 +1629,14 @@ test_advisory_lock(struct vnode* vnode, struct flock* flock)
 	if \a flock is NULL.
 */
 static status_t
-release_advisory_lock(struct vnode* vnode, struct flock* flock)
+release_advisory_lock(struct vnode* vnode, struct io_context* context,
+	struct file_descriptor* descriptor, struct flock* flock)
 {
 	FUNCTION(("release_advisory_lock(vnode = %p, flock = %p)\n", vnode, flock));
 
 	struct advisory_locking* locking = get_advisory_locking(vnode);
 	if (locking == NULL)
 		return B_OK;
-
-	// TODO: use the thread ID instead??
-	team_id team = team_get_current_team_id();
-	pid_t session = thread_get_current_thread()->team->session_id;
 
 	// find matching lock entries
 
@@ -1647,9 +1645,12 @@ release_advisory_lock(struct vnode* vnode, struct flock* flock)
 		struct advisory_lock* lock = iterator.Next();
 		bool removeLock = false;
 
-		if (lock->session == session)
+		if (descriptor != NULL && lock->bound_to == descriptor) {
+			// Remove flock() locks
 			removeLock = true;
-		else if (lock->team == team && advisory_lock_intersects(lock, flock)) {
+		} else if (lock->bound_to == context
+				&& advisory_lock_intersects(lock, flock)) {
+			// Remove POSIX locks
 			bool endsBeyond = false;
 			bool startsBefore = false;
 			if (flock != NULL) {
@@ -1678,6 +1679,7 @@ release_advisory_lock(struct vnode* vnode, struct flock* flock)
 
 				lock->end = flock->l_start - 1;
 
+				secondLock->bound_to = context;
 				secondLock->team = lock->team;
 				secondLock->session = lock->session;
 				// values must already be normalized when getting here
@@ -1735,19 +1737,22 @@ release_advisory_lock(struct vnode* vnode, struct flock* flock)
 	will wait for the lock to become available, if there are any collisions
 	(it will return B_PERMISSION_DENIED in this case if \a wait is \c false).
 
-	If \a session is -1, POSIX semantics are used for this lock. Otherwise,
+	If \a descriptor is NULL, POSIX semantics are used for this lock. Otherwise,
 	BSD flock() semantics are used, that is, all children can unlock the file
 	in question (we even allow parents to remove the lock, though, but that
 	seems to be in line to what the BSD's are doing).
 */
 static status_t
-acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
-	bool wait)
+acquire_advisory_lock(struct vnode* vnode, io_context* context,
+	struct file_descriptor* descriptor, struct flock* flock, bool wait)
 {
 	FUNCTION(("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
 		vnode, flock, wait ? "yes" : "no"));
+	dprintf("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
+		vnode, flock, wait ? "yes" : "no");
 
 	bool shared = flock->l_type == F_RDLCK;
+	void* boundTo = descriptor != NULL ? (void*)descriptor : (void*)context;
 	status_t status = B_OK;
 
 	// TODO: do deadlock detection!
@@ -1771,7 +1776,8 @@ acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
 			struct advisory_lock* lock = iterator.Next();
 
 			// TODO: locks from the same team might be joinable!
-			if (lock->team != team && advisory_lock_intersects(lock, flock)) {
+			if ((lock->team != team || lock->bound_to != boundTo)
+					&& advisory_lock_intersects(lock, flock)) {
 				// locks do overlap
 				if (!shared || !lock->shared) {
 					// we need to wait
@@ -1788,7 +1794,7 @@ acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
 
 		if (!wait) {
 			put_advisory_locking(locking);
-			return session != -1 ? B_WOULD_BLOCK : B_PERMISSION_DENIED;
+			return descriptor != NULL ? B_WOULD_BLOCK : B_PERMISSION_DENIED;
 		}
 
 		status = switch_sem_etc(locking->lock, waitForLock, 1,
@@ -1809,8 +1815,9 @@ acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
 		return B_NO_MEMORY;
 	}
 
+	lock->bound_to = boundTo;
 	lock->team = team_get_current_team_id();
-	lock->session = session;
+	lock->session = thread_get_current_thread()->team->session_id;
 	// values must already be normalized when getting here
 	lock->start = flock->l_start;
 	lock->end = flock->l_start - 1 + flock->l_len;
@@ -3645,7 +3652,7 @@ free_io_context(io_context* context)
 
 	for (i = 0; i < context->table_size; i++) {
 		if (struct file_descriptor* descriptor = context->fds[i]) {
-			close_fd(descriptor);
+			close_fd(context, descriptor);
 			put_fd(descriptor);
 		}
 	}
@@ -4877,6 +4884,19 @@ vfs_unlock_vnode_if_locked(struct file_descriptor* descriptor)
 }
 
 
+/*!	Releases any POSIX locks on the file descriptor. */
+status_t
+vfs_release_posix_lock(io_context* context, struct file_descriptor* descriptor)
+{
+	struct vnode* vnode = descriptor->u.vnode;
+
+	if (HAS_FS_CALL(vnode, release_lock))
+		return FS_CALL(vnode, release_lock, descriptor->cookie, NULL);
+
+	return release_advisory_lock(vnode, context, NULL, NULL);
+}
+
+
 /*!	Closes all file descriptors of the specified I/O context that
 	have the O_CLOEXEC flag set.
 */
@@ -4901,7 +4921,7 @@ vfs_exec_io_context(io_context* context)
 		mutex_unlock(&context->io_mutex);
 
 		if (remove) {
-			close_fd(descriptor);
+			close_fd(context, descriptor);
 			put_fd(descriptor);
 		}
 	}
@@ -5634,7 +5654,7 @@ file_close(struct file_descriptor* descriptor)
 		if (HAS_FS_CALL(vnode, release_lock))
 			status = FS_CALL(vnode, release_lock, descriptor->cookie, NULL);
 		else
-			status = release_advisory_lock(vnode, NULL);
+			status = release_advisory_lock(vnode, NULL, descriptor, NULL);
 	}
 	return status;
 }
@@ -6083,8 +6103,9 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 	FUNCTION(("common_fcntl(fd = %d, op = %d, argument = %lx, %s)\n",
 		fd, op, argument, kernel ? "kernel" : "user"));
 
-	struct file_descriptor* descriptor = get_fd(get_current_io_context(kernel),
-		fd);
+	struct io_context* context = get_current_io_context(kernel);
+
+	struct file_descriptor* descriptor = get_fd(context, fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
@@ -6108,7 +6129,6 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 	switch (op) {
 		case F_SETFD:
 		{
-			struct io_context* context = get_current_io_context(kernel);
 			// Set file descriptor flags
 
 			// O_CLOEXEC is the only flag available at this time
@@ -6122,8 +6142,6 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 
 		case F_GETFD:
 		{
-			struct io_context* context = get_current_io_context(kernel);
-
 			// Get file descriptor flags
 			mutex_lock(&context->io_mutex);
 			status = fd_close_on_exec(context, fd) ? FD_CLOEXEC : 0;
@@ -6160,8 +6178,6 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		case F_DUPFD:
 		case F_DUPFD_CLOEXEC:
 		{
-			struct io_context* context = get_current_io_context(kernel);
-
 			status = new_fd_etc(context, descriptor, (int)argument);
 			if (status >= 0) {
 				mutex_lock(&context->io_mutex);
@@ -6220,8 +6236,10 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 				if (HAS_FS_CALL(vnode, release_lock)) {
 					status = FS_CALL(vnode, release_lock, descriptor->cookie,
 						&flock);
-				} else
-					status = release_advisory_lock(vnode, &flock);
+				} else {
+					status = release_advisory_lock(vnode, context, NULL,
+						&flock);
+				}
 			} else {
 				// the open mode must match the lock type
 				if (((descriptor->open_mode & O_RWMASK) == O_RDONLY
@@ -6234,7 +6252,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 						status = FS_CALL(vnode, acquire_lock,
 							descriptor->cookie, &flock, op == F_SETLKW);
 					} else {
-						status = acquire_advisory_lock(vnode, -1,
+						status = acquire_advisory_lock(vnode, context, NULL,
 							&flock, op == F_SETLKW);
 					}
 				}
@@ -9131,14 +9149,13 @@ _user_flock(int fd, int operation)
 		if (HAS_FS_CALL(vnode, release_lock))
 			status = FS_CALL(vnode, release_lock, descriptor->cookie, &flock);
 		else
-			status = release_advisory_lock(vnode, &flock);
+			status = release_advisory_lock(vnode, NULL, descriptor, &flock);
 	} else {
 		if (HAS_FS_CALL(vnode, acquire_lock)) {
 			status = FS_CALL(vnode, acquire_lock, descriptor->cookie, &flock,
 				(operation & LOCK_NB) == 0);
 		} else {
-			status = acquire_advisory_lock(vnode,
-				thread_get_current_thread()->team->session_id, &flock,
+			status = acquire_advisory_lock(vnode, NULL, descriptor, &flock,
 				(operation & LOCK_NB) == 0);
 		}
 	}
