@@ -3186,6 +3186,14 @@ BView::DrawString(const char* string, int32 length, BPoint location,
 	fOwner->fLink->Attach(string, length);
 
 	_FlushIfNotInTransaction();
+	
+	if (fCurrentPicture != NULL)
+    {
+            // The app server does not know how to update the pen location when
+            // drawing to a picture, so do it ourselves.
+            // FIXME handle the escapement deltas
+            MovePenBy(StringWidth(string, length), 0);
+    }
 
 	// this modifies our pen location, so we invalidate the flag.
 	fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
