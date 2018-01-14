@@ -173,7 +173,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	fRegisterArea = map_physical_memory("XHCI memory mapped registers",
 		physicalAddressAligned, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&fCapabilityRegisters);
 	if (fRegisterArea < B_OK) {
 		TRACE("failed to map register memory\n");

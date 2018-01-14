@@ -108,7 +108,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	TRACE_ALWAYS("iospace offset: 0x%" B_PRIx32 "\n", offset);
 	fRegisterArea = map_physical_memory("OHCI memory mapped registers",
 		offset,	B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&fOperationalRegisters);
 	if (fRegisterArea < B_OK) {
 		TRACE_ERROR("failed to map register memory\n");
