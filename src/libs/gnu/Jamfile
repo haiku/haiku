@@ -3,10 +3,14 @@ SubDir HAIKU_TOP src libs gnu ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility gnu ] : true ;
 UsePrivateHeaders shared ;
 
+SubDirCcFlags [ FDefines _GNU_SOURCE=1 ] ;
+SubDirC++Flags [ FDefines _GNU_SOURCE=1 ] ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		SharedLibrary [ MultiArchDefaultGristFiles libgnu.so ] :
+			memmem.c
 			xattr.cpp
 			;
 	}
