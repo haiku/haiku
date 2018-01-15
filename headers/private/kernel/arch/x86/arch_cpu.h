@@ -261,10 +261,16 @@
 // https://en.wikipedia.org/wiki/CPUID#EAX=7,_ECX=0:_Extended_Features
 #define IA32_FEATURE_AVX512_4VNNIW	(1 << 2) // AVX-512 4-register Neural Network Instructions
 #define IA32_FEATURE_AVX512_4FMAPS	(1 << 3) // AVX-512 4-register Multiply Accumulation Single precision
+#define IA32_FEATURE_IBRS			(1 << 26)	// IBRS / IBPB Speculation Control
+#define IA32_FEATURE_STIBP			(1 << 27)	// STIBP Speculation Control
 
 
 // x86 defined features from cpuid eax 0x80000007, edx register
 #define IA32_FEATURE_INVARIANT_TSC		(1 << 8)
+
+// x86 defined features from cpuid eax 0x80000008, ebx register
+#define IA32_FEATURE_AMD_EXT_IBPB	(1 << 12)	/* IBPB Support only (no IBRS) */
+
 
 // cr4 flags
 #define IA32_CR4_PAE					(1UL << 5)
@@ -355,6 +361,7 @@ enum x86_feature_type {
 	FEATURE_7_ECX,          // cpuid eax=7, ecx registers
 	FEATURE_7_EDX,          // cpuid eax=7, edx registers
 	FEATURE_EXT_7_EDX,		// cpuid eax=0x80000007, edx register
+	FEATURE_EXT_8_EBX,		// cpuid eax=0x80000008, ebx register
 
 	FEATURE_NUM
 };

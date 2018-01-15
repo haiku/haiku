@@ -536,7 +536,12 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "avx512bw ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512VI)
 		strlcat(features, "avx512vi ", sizeof(features));
-
+	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_IBRS)
+		strlcat(features, "ibrs ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_STIBP)
+		strlcat(features, "stibp ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_EXT_IBPB)
+		strlcat(features, "ibpb ", sizeof(features));
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
 #endif	// DUMP_FEATURE_STRING
@@ -987,6 +992,11 @@ detect_cpu(int currentCPU)
 	if (maxExtendedLeaf >= 0x80000007) {
 		get_current_cpuid(&cpuid, 0x80000007, 0);
 		cpu->arch.feature[FEATURE_EXT_7_EDX] = cpuid.regs.edx;
+	}
+
+	if (maxExtendedLeaf >= 0x80000008) {
+		get_current_cpuid(&cpuid, 0x80000008, 0);
+			cpu->arch.feature[FEATURE_EXT_8_EBX] = cpuid.regs.ebx;
 	}
 
 	detect_cpu_topology(currentCPU, cpu, maxBasicLeaf, maxExtendedLeaf);
