@@ -64,18 +64,22 @@ round_to_pagesize(uint32 size)
 
 
 area_id
-alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
+alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name, bool user)
 {
 	physical_entry pe;
 	void * logadr;
 	area_id area;
 	status_t rv;
+	uint32 protection;
 
 	LOG(("allocating %d bytes for %s\n",size,name));
 
+	protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+	if (user)
+		protection = B_READ_AREA | B_WRITE_AREA;
 	size = round_to_pagesize(size);
 	area = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		B_32_BIT_CONTIGUOUS, protection);
 		// TODO: The rest of the code doesn't deal correctly with physical
 		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (area < B_OK) {
@@ -88,7 +92,10 @@ alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 		PRINT(("couldn't map %s\n",name));
 		return B_ERROR;
 	}
-	memset(logadr, 0, size);
+	if (user)
+		user_memset(logadr, 0, size);
+	else
+		memset(logadr, 0, size);
 	if (log)
 		*log = logadr;
 	if (phy)
@@ -113,7 +120,7 @@ map_mem(void **log, phys_addr_t phy, size_t size, const char *name)
 	phyadr = phy - offset;
 	size = round_to_pagesize(size + offset);
 	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_ADDRESS,
-		0, &mapadr);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &mapadr);
 	*log = mapadr + offset;
 
 	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",

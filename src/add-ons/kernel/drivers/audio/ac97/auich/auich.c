@@ -102,7 +102,8 @@ auich_mem_new(auich_dev *card, size_t size)
 	if ((mem = malloc(sizeof(*mem))) == NULL)
 		return (NULL);
 
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "auich buffer");
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "auich buffer",
+		true);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);
@@ -345,7 +346,7 @@ auich_stream_new(auich_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 
 	/* allocate memory for our dma ops */
 	stream->dmaops_area = alloc_mem(&stream->dmaops_phy_base, &stream->dmaops_log_base,
-		sizeof(auich_dmalist) * AUICH_DMALIST_MAX, "auich dmaops");
+		sizeof(auich_dmalist) * AUICH_DMALIST_MAX, "auich dmaops", false);
 
 	if (stream->dmaops_area < B_OK) {
 		PRINT(("couldn't allocate memory\n"));

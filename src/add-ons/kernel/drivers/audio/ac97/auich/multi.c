@@ -32,7 +32,11 @@
 #include <driver_settings.h>
 #include <OS.h>
 #include <MediaDefs.h>
+#include <string.h>
 #include <strings.h>
+
+#include <kernel.h>
+
 #include "hmulti_audio.h"
 #include "multi.h"
 #include "ac97.h"
@@ -727,17 +731,6 @@ auich_get_enabled_channels(auich_dev *card, multi_channel_enable *data)
 
 
 static status_t
-auich_set_enabled_channels(auich_dev *card, multi_channel_enable *data)
-{
-	PRINT(("set_enabled_channels 0 : %s\n", B_TEST_CHANNEL(data->enable_bits, 0) ? "enabled": "disabled"));
-	PRINT(("set_enabled_channels 1 : %s\n", B_TEST_CHANNEL(data->enable_bits, 1) ? "enabled": "disabled"));
-	PRINT(("set_enabled_channels 2 : %s\n", B_TEST_CHANNEL(data->enable_bits, 2) ? "enabled": "disabled"));
-	PRINT(("set_enabled_channels 3 : %s\n", B_TEST_CHANNEL(data->enable_bits, 3) ? "enabled": "disabled"));
-	return B_OK;
-}
-
-
-static status_t
 auich_get_global_format(auich_dev *card, multi_format_info *data)
 {
 	data->output_latency = 0;
@@ -754,6 +747,14 @@ auich_get_global_format(auich_dev *card, multi_format_info *data)
 			break;
 	}
 	data->input.format = data->output.format = B_FMT_16BIT;
+	return B_OK;
+}
+
+
+static status_t
+auich_set_global_format(auich_dev *card, multi_format_info* data)
+{
+	// TODO: it looks like we're not supposed to fail; fix this!
 	return B_OK;
 }
 
@@ -794,12 +795,18 @@ auich_get_buffers(auich_dev *card, multi_buffer_list *data)
 	if (bufcount > data->request_playback_buffers)
 		bufcount = data->request_playback_buffers;
 
-	for (i = 0; i < bufcount; i++)
+	for (i = 0; i < bufcount; i++) {
+		struct buffer_desc descs[data->return_playback_channels];
 		for (j=0; j<pchannels; j++)
 			auich_stream_get_nth_buffer(card->pstream, j, i,
-				&data->playback_buffers[i][j].base,
-				&data->playback_buffers[i][j].stride);
-
+				&descs[j].base,
+				&descs[j].stride);
+		if (!IS_USER_ADDRESS(data->playback_buffers[i])
+			|| user_memcpy(data->playback_buffers[i], descs, sizeof(descs))
+			< B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
 	data->return_record_buffers = current_settings.buffer_count;
 	data->return_record_channels = rchannels;
 	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
@@ -808,12 +815,18 @@ auich_get_buffers(auich_dev *card, multi_buffer_list *data)
 	if (bufcount > data->request_record_buffers)
 		bufcount = data->request_record_buffers;
 
-	for (i = 0; i < bufcount; i++)
+	for (i = 0; i < bufcount; i++) {
+		struct buffer_desc descs[data->return_record_channels];
 		for (j=0; j<rchannels; j++)
 			auich_stream_get_nth_buffer(card->rstream, j, i,
-				&data->record_buffers[i][j].base,
-				&data->record_buffers[i][j].stride);
-
+				&descs[j].base,
+				&descs[j].stride);
+		if (!IS_USER_ADDRESS(data->record_buffers[i])
+			|| user_memcpy(data->record_buffers[i], descs, sizeof(descs))
+			< B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
 	return B_OK;
 }
 
@@ -947,77 +960,28 @@ auich_buffer_force_stop(auich_dev *card)
 }
 
 
+#define cookie_type auich_dev
+#define get_description auich_get_description
+#define get_enabled_channels auich_get_enabled_channels
+#define get_global_format auich_get_global_format
+#define set_global_format auich_set_global_format
+#define list_mix_channels auich_list_mix_channels
+#define list_mix_controls auich_list_mix_controls
+#define list_mix_connections auich_list_mix_connections
+#define get_mix auich_get_mix
+#define set_mix auich_set_mix
+#define get_buffers auich_get_buffers
+#define buffer_exchange auich_buffer_exchange
+#define buffer_force_stop auich_buffer_force_stop
+#include "../generic/multi.c"
+
+
 static status_t
-auich_multi_control(void *cookie, uint32 op, void *data, size_t length)
+auich_multi_control(void *cookie, uint32 op, void *arg, size_t length)
 {
 	auich_dev *card = (auich_dev *)cookie;
 
-    switch (op) {
-		case B_MULTI_GET_DESCRIPTION:
-			LOG(("B_MULTI_GET_DESCRIPTION\n"));
-			return auich_get_description(card, (multi_description *)data);
-		case B_MULTI_GET_EVENT_INFO:
-			LOG(("B_MULTI_GET_EVENT_INFO\n"));
-			return B_ERROR;
-		case B_MULTI_SET_EVENT_INFO:
-			LOG(("B_MULTI_SET_EVENT_INFO\n"));
-			return B_ERROR;
-		case B_MULTI_GET_EVENT:
-			LOG(("B_MULTI_GET_EVENT\n"));
-			return B_ERROR;
-		case B_MULTI_GET_ENABLED_CHANNELS:
-			LOG(("B_MULTI_GET_ENABLED_CHANNELS\n"));
-			return auich_get_enabled_channels(card, (multi_channel_enable *)data);
-		case B_MULTI_SET_ENABLED_CHANNELS:
-			LOG(("B_MULTI_SET_ENABLED_CHANNELS\n"));
-			return auich_set_enabled_channels(card, (multi_channel_enable *)data);
-		case B_MULTI_GET_GLOBAL_FORMAT:
-			LOG(("B_MULTI_GET_GLOBAL_FORMAT\n"));
-			return auich_get_global_format(card, (multi_format_info *)data);
-		case B_MULTI_SET_GLOBAL_FORMAT:
-			LOG(("B_MULTI_SET_GLOBAL_FORMAT\n"));
-			return B_OK; /* XXX BUG! we *MUST* return B_OK, returning B_ERROR will prevent
-						  * BeOS to accept the format returned in B_MULTI_GET_GLOBAL_FORMAT
-						  */
-		case B_MULTI_GET_CHANNEL_FORMATS:
-			LOG(("B_MULTI_GET_CHANNEL_FORMATS\n"));
-			return B_ERROR;
-		case B_MULTI_SET_CHANNEL_FORMATS:	/* only implemented if possible */
-			LOG(("B_MULTI_SET_CHANNEL_FORMATS\n"));
-			return B_ERROR;
-		case B_MULTI_GET_MIX:
-			LOG(("B_MULTI_GET_MIX\n"));
-			return auich_get_mix(card, (multi_mix_value_info *)data);
-		case B_MULTI_SET_MIX:
-			LOG(("B_MULTI_SET_MIX\n"));
-			return auich_set_mix(card, (multi_mix_value_info *)data);
-		case B_MULTI_LIST_MIX_CHANNELS:
-			LOG(("B_MULTI_LIST_MIX_CHANNELS\n"));
-			return auich_list_mix_channels(card, (multi_mix_channel_info *)data);
-		case B_MULTI_LIST_MIX_CONTROLS:
-			LOG(("B_MULTI_LIST_MIX_CONTROLS\n"));
-			return auich_list_mix_controls(card, (multi_mix_control_info *)data);
-		case B_MULTI_LIST_MIX_CONNECTIONS:
-			LOG(("B_MULTI_LIST_MIX_CONNECTIONS\n"));
-			return auich_list_mix_connections(card, (multi_mix_connection_info *)data);
-		case B_MULTI_GET_BUFFERS:			/* Fill out the struct for the first time; doesn't start anything. */
-			LOG(("B_MULTI_GET_BUFFERS\n"));
-			return auich_get_buffers(card, data);
-		case B_MULTI_SET_BUFFERS:			/* Set what buffers to use, if the driver supports soft buffers. */
-			LOG(("B_MULTI_SET_BUFFERS\n"));
-			return B_ERROR; /* we do not support soft buffers */
-		case B_MULTI_SET_START_TIME:			/* When to actually start */
-			LOG(("B_MULTI_SET_START_TIME\n"));
-			return B_ERROR;
-		case B_MULTI_BUFFER_EXCHANGE:		/* stop and go are derived from this being called */
-			//TRACE(("B_MULTI_BUFFER_EXCHANGE\n"));
-			return auich_buffer_exchange(card, (multi_buffer_info *)data);
-		case B_MULTI_BUFFER_FORCE_STOP:		/* force stop of playback, nothing in data */
-			LOG(("B_MULTI_BUFFER_FORCE_STOP\n"));
-			return auich_buffer_force_stop(card);
-	}
-	LOG(("ERROR: unknown multi_control %#x\n",op));
-	return B_ERROR;
+	return multi_audio_control_generic(card, op, arg, length);
 }
 
 static status_t auich_open(const char *name, uint32 flags, void** cookie);
