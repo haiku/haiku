@@ -10,7 +10,9 @@
 
 
 #ifndef _ASSEMBLER
+#ifdef __cplusplus
 #	include <arch/cpu.h>
+#endif
 #endif
 
 
