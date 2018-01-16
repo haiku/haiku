@@ -11,6 +11,8 @@
 #include "hmulti_audio.h"
 #include "driver.h"
 
+#include <kernel.h>
+
 
 #ifdef TRACE
 #	undef TRACE
@@ -140,11 +142,20 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 static status_t
 get_enabled_channels(hda_audio_group* audioGroup, multi_channel_enable* data)
 {
-	B_SET_CHANNEL(data->enable_bits, 0, true);
-	B_SET_CHANNEL(data->enable_bits, 1, true);
-	B_SET_CHANNEL(data->enable_bits, 2, true);
-	B_SET_CHANNEL(data->enable_bits, 3, true);
 	data->lock_source = B_MULTI_LOCK_INTERNAL;
+
+	int32 inChannels = 0;
+	if (audioGroup->record_stream != NULL)
+		inChannels = 2;
+
+	int32 outChannels = 0;
+	if (audioGroup->playback_stream != NULL)
+		outChannels = 2;
+
+	uint32 enable_bits = 0;
+	uint32 maxChannels = min_c(32, inChannels + outChannels);
+	for (uint32 i = 0; i < maxChannels; i++)
+		B_SET_CHANNEL(&enable_bits, i, true);
 
 	return B_OK;
 }
@@ -947,13 +958,18 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		uint32 playbackSampleSize = audioGroup->playback_stream->sample_size;
 
 		for (int32 i = 0; i < data->return_playback_buffers; i++) {
+			struct buffer_desc descs[data->return_playback_channels];
 			for (int32 channelIndex = 0;
 					channelIndex < data->return_playback_channels; channelIndex++) {
-				data->playback_buffers[i][channelIndex].base
-					= (char*)audioGroup->playback_stream->buffers[i]
-						+ playbackSampleSize * channelIndex;
-				data->playback_buffers[i][channelIndex].stride
-					= playbackSampleSize * data->return_playback_channels;
+				descs[channelIndex].base = (char*)audioGroup->playback_stream->buffers[i]
+					+ playbackSampleSize * channelIndex;
+				descs[channelIndex].stride = playbackSampleSize
+					* data->return_playback_channels;
+			}
+			if (!IS_USER_ADDRESS(data->playback_buffers[i])
+				|| user_memcpy(data->playback_buffers[i], descs, sizeof(descs))
+				< B_OK) {
+				return B_BAD_ADDRESS;
 			}
 		}
 	}
@@ -962,13 +978,18 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		uint32 recordSampleSize = audioGroup->record_stream->sample_size;
 
 		for (int32 i = 0; i < data->return_record_buffers; i++) {
+			struct buffer_desc descs[data->return_record_channels];
 			for (int32 channelIndex = 0;
 					channelIndex < data->return_record_channels; channelIndex++) {
-				data->record_buffers[i][channelIndex].base
-					= (char*)audioGroup->record_stream->buffers[i]
-						+ recordSampleSize * channelIndex;
-				data->record_buffers[i][channelIndex].stride
-					= recordSampleSize * data->return_record_channels;
+				descs[channelIndex].base = (char*)audioGroup->record_stream->buffers[i]
+					+ recordSampleSize * channelIndex;
+				descs[channelIndex].stride = recordSampleSize
+					* data->return_record_channels;
+			}
+			if (!IS_USER_ADDRESS(data->record_buffers[i])
+				|| user_memcpy(data->record_buffers[i], descs, sizeof(descs))
+				< B_OK) {
+				return B_BAD_ADDRESS;
 			}
 		}
 	}
@@ -1071,6 +1092,10 @@ buffer_force_stop(hda_audio_group* audioGroup)
 }
 
 
+#define cookie_type hda_audio_group
+#include "../generic/multi.c"
+
+
 status_t
 multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 {
@@ -1083,79 +1108,5 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 
 	audioGroup = codec->audio_groups[0];
 
-	// TODO: make userland-safe when built for Haiku!
-
-	switch (op) {
-		case B_MULTI_GET_DESCRIPTION:
-		{
-#ifdef __HAIKU__
-			multi_description description;
-			multi_channel_info channels[16];
-			multi_channel_info* originalChannels;
-
-			if (user_memcpy(&description, arg, sizeof(multi_description))
-					!= B_OK)
-				return B_BAD_ADDRESS;
-
-			originalChannels = description.channels;
-			description.channels = channels;
-			if (description.request_channel_count > 16)
-				description.request_channel_count = 16;
-
-			status_t status = get_description(audioGroup, &description);
-			if (status != B_OK)
-				return status;
-
-			description.channels = originalChannels;
-			if (user_memcpy(arg, &description, sizeof(multi_description))
-					!= B_OK)
-				return B_BAD_ADDRESS;
-			return user_memcpy(originalChannels, channels,
-				sizeof(multi_channel_info) * description.request_channel_count);
-#else
-			return get_description(audioGroup, (multi_description*)arg);
-#endif
-		}
-
-		case B_MULTI_GET_ENABLED_CHANNELS:
-			return get_enabled_channels(audioGroup, (multi_channel_enable*)arg);
-		case B_MULTI_SET_ENABLED_CHANNELS:
-			return B_OK;
-
-		case B_MULTI_GET_GLOBAL_FORMAT:
-			return get_global_format(audioGroup, (multi_format_info*)arg);
-		case B_MULTI_SET_GLOBAL_FORMAT:
-			return set_global_format(audioGroup, (multi_format_info*)arg);
-
-		case B_MULTI_LIST_MIX_CHANNELS:
-			return list_mix_channels(audioGroup, (multi_mix_channel_info*)arg);
-		case B_MULTI_LIST_MIX_CONTROLS:
-			return list_mix_controls(audioGroup, (multi_mix_control_info*)arg);
-		case B_MULTI_LIST_MIX_CONNECTIONS:
-			return list_mix_connections(audioGroup,
-				(multi_mix_connection_info*)arg);
-		case B_MULTI_GET_MIX:
-			return get_mix(audioGroup, (multi_mix_value_info *)arg);
-		case B_MULTI_SET_MIX:
-			return set_mix(audioGroup, (multi_mix_value_info *)arg);
-
-		case B_MULTI_GET_BUFFERS:
-			return get_buffers(audioGroup, (multi_buffer_list*)arg);
-
-		case B_MULTI_BUFFER_EXCHANGE:
-			return buffer_exchange(audioGroup, (multi_buffer_info*)arg);
-		case B_MULTI_BUFFER_FORCE_STOP:
-			return buffer_force_stop(audioGroup);
-
-		case B_MULTI_GET_EVENT_INFO:
-		case B_MULTI_SET_EVENT_INFO:
-		case B_MULTI_GET_EVENT:
-		case B_MULTI_GET_CHANNEL_FORMATS:
-		case B_MULTI_SET_CHANNEL_FORMATS:
-		case B_MULTI_SET_BUFFERS:
-		case B_MULTI_SET_START_TIME:
-			return B_ERROR;
-	}
-
-	return B_BAD_VALUE;
+	return multi_audio_control_generic(audioGroup, op, arg, len);
 }
