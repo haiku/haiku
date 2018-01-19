@@ -127,6 +127,7 @@ local sources =
 	StackTraceView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
+	TypeHandlerMenuItem.cpp
 	VariablesView.cpp
 
 	# user_interface/gui/team_settings_window

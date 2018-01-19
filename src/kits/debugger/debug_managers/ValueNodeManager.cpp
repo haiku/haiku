@@ -112,9 +112,8 @@ ValueNodeManager::ValueNodeChanged(ValueNodeChild* nodeChild,
 	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--)
 		fListeners.ItemAt(i)->ValueNodeChanged(nodeChild, oldNode, newNode);
 
-	if (oldNode != NULL)
+	if (oldNode != NULL && !newNode->ChildCreationNeedsValue())
 		newNode->CreateChildren(fThread->GetTeam()->GetTeamTypeInformation());
-
 }
 
 
@@ -201,7 +200,7 @@ ValueNodeManager::_CreateValueNode(ValueNodeChild* nodeChild)
 		error = nodeChild->CreateInternalNode(valueNode);
 	} else {
 		error = TypeHandlerRoster::Default()->CreateValueNode(nodeChild,
-			nodeChild->GetType(), valueNode);
+			nodeChild->GetType(), NULL, valueNode);
 	}
 
 	if (error != B_OK)

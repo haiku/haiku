@@ -104,6 +104,10 @@ private:
 			status_t			_AddContextAction(const char* action,
 									uint32 what, ContextActionList* actions,
 									BMessage*& _message);
+			status_t			_CreateContextAction(const char* action,
+									uint32 what, ActionMenuItem*& _item);
+			status_t			_AddTypeHandlerMenuIfNeeded(ModelNode* node,
+									ContextActionList* actions);
 			void				_FinishContextMenu(bool force);
 			void				_SaveViewState(bool updateValues) const;
 			void				_RestoreViewState();

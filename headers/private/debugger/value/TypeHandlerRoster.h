@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TYPE_HANDLER_ROSTER_H
@@ -31,11 +32,18 @@ public:
 			status_t			Init();
 			status_t			RegisterDefaultHandlers();
 
-			status_t			FindTypeHandler(ValueNodeChild* nodeChild,
+			int32				CountTypeHandlers(Type* type);
+			status_t			FindBestTypeHandler(ValueNodeChild* nodeChild,
 									Type* type, TypeHandler*& _handler);
 									// returns a reference
+			status_t			FindTypeHandlers(ValueNodeChild* nodeChild,
+									Type* type, TypeHandlerList*& _handlers);
+									// returns list of references
 			status_t			CreateValueNode(ValueNodeChild* nodeChild,
-									Type* type, ValueNode*& _node);
+									Type* type, TypeHandler* handler,
+									ValueNode*& _node);
+									// handler can be null if automatic
+									// search is desired.
 									// returns a reference
 
 			bool				RegisterHandler(TypeHandler* handler);

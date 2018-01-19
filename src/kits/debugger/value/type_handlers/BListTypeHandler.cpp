@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,8 +17,15 @@ BListTypeHandler::~BListTypeHandler()
 }
 
 
+const char*
+BListTypeHandler::Name() const
+{
+	return "List content";
+}
+
+
 float
-BListTypeHandler::SupportsType(Type* type)
+BListTypeHandler::SupportsType(Type* type) const
 {
 	if (dynamic_cast<CompoundType*>(type) != NULL
 		&& (type->Name() == "BList"

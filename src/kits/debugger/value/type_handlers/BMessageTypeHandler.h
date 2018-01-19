@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BMESSAGE_TYPE_HANDLER_H
@@ -13,7 +13,8 @@ class BMessageTypeHandler : public TypeHandler {
 public:
 	virtual					~BMessageTypeHandler();
 
-	virtual float			SupportsType(Type* type);
+	virtual	const char*		Name() const;
+	virtual float			SupportsType(Type* type) const;
 	virtual status_t		CreateValueNode(ValueNodeChild* nodeChild,
 								Type* type, ValueNode*& _node);
 };

@@ -1782,7 +1782,7 @@ CLanguageExpressionEvaluator::_ParseAtom()
 
 		ValueNode* newNode = NULL;
 		status_t error = TypeHandlerRoster::Default()->CreateValueNode(child,
-			castType, newNode);
+			castType, NULL, newNode);
 		if (error != B_OK) {
 			throw ParseException("Unable to create value node for typecast"
 				" operation.", token.position);

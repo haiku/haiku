@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Rene Gollent, rene@gollent.com
+ * Copyright 2010-2018, Rene Gollent, rene@gollent.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,8 +19,15 @@ CStringTypeHandler::~CStringTypeHandler()
 }
 
 
+const char*
+CStringTypeHandler::Name() const
+{
+	return "String";
+}
+
+
 float
-CStringTypeHandler::SupportsType(Type* type)
+CStringTypeHandler::SupportsType(Type* type) const
 {
 	AddressType* addressType = dynamic_cast<AddressType*>(type);
 	ArrayType* arrayType = dynamic_cast<ArrayType*>(type);

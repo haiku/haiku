@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2018, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -14,6 +14,7 @@
 #include "StackFrameValues.h"
 #include "Type.h"
 #include "TypeComponentPath.h"
+#include "TypeHandler.h"
 
 
 // #pragma mark - VariablesViewNodeInfo
@@ -23,6 +24,7 @@ VariablesViewNodeInfo::VariablesViewNodeInfo()
 	:
 	fNodeExpanded(false),
 	fCastedType(NULL),
+	fTypeHandler(NULL),
 	fRendererSettings()
 {
 }
@@ -32,6 +34,7 @@ VariablesViewNodeInfo::VariablesViewNodeInfo(const VariablesViewNodeInfo& other)
 	:
 	fNodeExpanded(other.fNodeExpanded),
 	fCastedType(other.fCastedType),
+	fTypeHandler(other.fTypeHandler),
 	fRendererSettings(other.fRendererSettings)
 {
 	if (fCastedType != NULL)
@@ -43,6 +46,9 @@ VariablesViewNodeInfo::~VariablesViewNodeInfo()
 {
 	if (fCastedType != NULL)
 		fCastedType->ReleaseReference();
+
+	if (fTypeHandler != NULL)
+		fTypeHandler->ReleaseReference();
 }
 
 
@@ -51,6 +57,7 @@ VariablesViewNodeInfo::operator=(const VariablesViewNodeInfo& other)
 {
 	fNodeExpanded = other.fNodeExpanded;
 	SetCastedType(other.fCastedType);
+	SetTypeHandler(other.fTypeHandler);
 	fRendererSettings = other.fRendererSettings;
 
 	return *this;
@@ -73,6 +80,18 @@ VariablesViewNodeInfo::SetCastedType(Type* type)
 	fCastedType = type;
 	if (fCastedType != NULL)
 		fCastedType->AcquireReference();
+}
+
+
+void
+VariablesViewNodeInfo::SetTypeHandler(TypeHandler* handler)
+{
+	if (fTypeHandler != NULL)
+		fTypeHandler->ReleaseReference();
+
+	fTypeHandler = handler;
+	if (fTypeHandler != NULL)
+		fTypeHandler->AcquireReference();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BLIST_TYPE_HANDLER_H
@@ -13,7 +13,8 @@ class BListTypeHandler : public TypeHandler {
 public:
 	virtual					~BListTypeHandler();
 
-	virtual float			SupportsType(Type* type);
+	virtual	const char*		Name() const;
+	virtual float			SupportsType(Type* type) const;
 	virtual status_t		CreateValueNode(ValueNodeChild* nodeChild,
 								Type* type, ValueNode*& _node);
 };

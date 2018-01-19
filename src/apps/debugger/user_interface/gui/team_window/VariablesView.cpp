@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -51,6 +51,8 @@
 #include "Thread.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
+#include "TypeHandler.h"
+#include "TypeHandlerMenuItem.h"
 #include "TypeHandlerRoster.h"
 #include "TypeLookupConstraints.h"
 #include "UiUtils.h"
@@ -77,7 +79,9 @@ enum {
 	MSG_VALUE_NODE_NEEDS_VALUE		= 'mvnv',
 	MSG_RESTORE_PARTIAL_VIEW_STATE	= 'mpvs',
 	MSG_ADD_WATCH_EXPRESSION		= 'awex',
-	MSG_REMOVE_WATCH_EXPRESSION		= 'rwex'
+	MSG_REMOVE_WATCH_EXPRESSION		= 'rwex',
+	MSG_USE_AUTOMATIC_HANDLER		= 'uaha',
+	MSG_USE_EXPLICIT_HANDLER		= 'ueha'
 };
 
 
@@ -267,6 +271,7 @@ public:
 		fTableCellRenderer(NULL),
 		fLastRendererSettings(),
 		fCastedType(NULL),
+		fTypeHandler(NULL),
 		fComponentPath(NULL),
 		fIsPresentationNode(isPresentationNode),
 		fHidden(false),
@@ -294,6 +299,9 @@ public:
 
 		if (fCastedType != NULL)
 			fCastedType->ReleaseReference();
+
+		if (fTypeHandler != NULL)
+			fTypeHandler->ReleaseReference();
 	}
 
 	status_t Init()
@@ -395,6 +403,22 @@ public:
 		if (type != NULL)
 			fCastedType->AcquireReference();
 	}
+
+	TypeHandler* GetTypeHandler() const
+	{
+		return fTypeHandler;
+	}
+
+	void SetTypeHandler(TypeHandler* handler)
+	{
+		if (fTypeHandler != NULL)
+			fTypeHandler->ReleaseReference();
+
+		fTypeHandler = handler;
+		if (fTypeHandler != NULL)
+			fTypeHandler->AcquireReference();
+	}
+
 
 	const BMessage& GetLastRendererSettings() const
 	{
@@ -544,6 +568,7 @@ private:
 	TableCellValueRenderer*	fTableCellRenderer;
 	BMessage				fLastRendererSettings;
 	Type*					fCastedType;
+	TypeHandler*			fTypeHandler;
 	ChildList				fChildren;
 	TypeComponentPath*		fComponentPath;
 	bool					fIsPresentationNode;
@@ -1599,7 +1624,7 @@ VariablesView::VariableTableModel::AddSyntheticNode(Variable* variable,
 			error = _child->CreateInternalNode(valueNode);
 		else {
 			error = TypeHandlerRoster::Default()->CreateValueNode(_child,
-				_child->GetType(), valueNode);
+				_child->GetType(), NULL, valueNode);
 		}
 
 		if (error != B_OK)
@@ -2025,7 +2050,7 @@ VariablesView::MessageReceived(BMessage* message)
 			typeRef.SetTo(addressType, true);
 			ValueNode* valueNode = NULL;
 			if (TypeHandlerRoster::Default()->CreateValueNode(
-					node->NodeChild(), addressType, valueNode) != B_OK) {
+					node->NodeChild(), addressType, NULL, valueNode) != B_OK) {
 				break;
 			}
 
@@ -2202,6 +2227,34 @@ VariablesView::MessageReceived(BMessage* message)
 				}
 			}
 
+			break;
+		}
+		case MSG_USE_AUTOMATIC_HANDLER:
+		case MSG_USE_EXPLICIT_HANDLER:
+		{
+			TypeHandler* handler = NULL;
+			ModelNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
+					!= B_OK) {
+				break;
+			}
+
+			if (message->what == MSG_USE_EXPLICIT_HANDLER
+				&& message->FindPointer("handler", reinterpret_cast<void**>(
+						&handler)) != B_OK) {
+				break;
+			}
+
+			ValueNode* newNode;
+			ValueNodeChild* child = node->NodeChild();
+			if (TypeHandlerRoster::Default()->CreateValueNode(child,
+					child->GetType(), handler, newNode) != B_OK) {
+				return;
+			}
+
+			node->SetTypeHandler(handler);
+			child->SetNode(newNode);
+			_RequestNodeValue(node);
 			break;
 		}
 		case MSG_VALUE_NODE_CHANGED:
@@ -2607,7 +2660,12 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 			message->AddUInt64("address", location->PieceAt(0).address);
 		}
 
-		ValueNode* valueNode = node->NodeChild()->Node();
+		ValueNodeChild* child = node->NodeChild();
+		ValueNode* valueNode = child->Node();
+
+		result = _AddTypeHandlerMenuIfNeeded(node, _preActions);
+		if (result != B_OK)
+			return result;
 
 		if (valueNode != NULL) {
 			Value* value = valueNode->GetValue();
@@ -2699,23 +2757,142 @@ status_t
 VariablesView::_AddContextAction(const char* action, uint32 what,
 	ContextActionList* actions, BMessage*& _message)
 {
-	_message = new(std::nothrow) BMessage(what);
-	if (_message == NULL)
-		return B_NO_MEMORY;
+	ActionMenuItem* item = NULL;
+	status_t result = _CreateContextAction(action, what, item);
+	if (result != B_OK)
+		return result;
 
-	ObjectDeleter<BMessage> messageDeleter(_message);
-
-	ActionMenuItem* item = new(std::nothrow) ActionMenuItem(action,
-		_message);
-	if (item == NULL)
-		return B_NO_MEMORY;
-
-	messageDeleter.Detach();
 	ObjectDeleter<ActionMenuItem> actionDeleter(item);
 	if (!actions->AddItem(item))
 		return B_NO_MEMORY;
 
 	actionDeleter.Detach();
+	_message = item->Message();
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::_CreateContextAction(const char* action, uint32 what,
+	ActionMenuItem*& _item)
+{
+	BMessage* message = new(std::nothrow) BMessage(what);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(message);
+
+	_item = new(std::nothrow) ActionMenuItem(action,
+		message);
+	if (_item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::_AddTypeHandlerMenuIfNeeded(ModelNode* node,
+	ContextActionList* actions)
+{
+	ValueNodeChild* child = node->NodeChild();
+
+	Type* type = child->GetType();
+	if (node->CountChildren() == 1 && node->ChildAt(0)->IsHidden()) {
+		node = node->ChildAt(0);
+		child = node->NodeChild();
+		type = child->GetType();
+	}
+
+	int32 handlerCount = TypeHandlerRoster::Default()->CountTypeHandlers(
+		child->GetType());
+	if (handlerCount > 1) {
+		TypeHandler* lastHandler = node->GetTypeHandler();
+		BMenu* handlerMenu = new(std::nothrow) BMenu("Show as");
+		if (handlerMenu == NULL)
+			return B_NO_MEMORY;
+
+		ObjectDeleter<BMenu> menuDeleter(handlerMenu);
+		ActionMenuItem* menuItem = new(std::nothrow) ActionMenuItem(
+			handlerMenu);
+		if (menuItem == NULL)
+			return B_NO_MEMORY;
+		ObjectDeleter<ActionMenuItem> menuItemDeleter(menuItem);
+		menuDeleter.Detach();
+
+		ActionMenuItem* item = NULL;
+		status_t result = _CreateContextAction("Automatic",
+			MSG_USE_AUTOMATIC_HANDLER, item);
+		if (item == NULL)
+			return B_NO_MEMORY;
+		item->Message()->AddPointer("node", node);
+
+		ObjectDeleter<ActionMenuItem> itemDeleter(item);
+		if (!handlerMenu->AddItem(item) || !handlerMenu->AddSeparatorItem())
+			return B_NO_MEMORY;
+
+		itemDeleter.Detach();
+		if (lastHandler == NULL)
+			item->SetMarked(true);
+
+		TypeHandlerList* handlers = NULL;
+		result = TypeHandlerRoster::Default()->FindTypeHandlers(child,
+			child->GetType(), handlers);
+		if (result != B_OK)
+			return result;
+
+		ObjectDeleter<TypeHandlerList> listDeleter(handlers);
+		while (handlers->CountItems() > 0) {
+			TypeHandler* handler = handlers->ItemAt(0);
+			BMessage* message = new(std::nothrow) BMessage(
+				MSG_USE_EXPLICIT_HANDLER);
+			if (message == NULL) {
+				result = B_NO_MEMORY;
+				break;
+			}
+			message->AddPointer("node", node);
+
+			TypeHandlerMenuItem* typeItem
+				= new(std::nothrow) TypeHandlerMenuItem(handler->Name(),
+					message);
+			if (typeItem == NULL) {
+				result = B_NO_MEMORY;
+				break;
+			}
+			ObjectDeleter<TypeHandlerMenuItem> typeItemDeleter(typeItem);
+
+			result = typeItem->SetTypeHandler(handler);
+			if (result != B_OK)
+				break;
+			handlers->RemoveItemAt(0);
+			if (!handlerMenu->AddItem(typeItem)) {
+				result = B_NO_MEMORY;
+				break;
+			}
+
+			typeItemDeleter.Detach();
+			if (handler == lastHandler)
+				typeItem->SetMarked(true);
+		}
+
+		if (result != B_OK) {
+			for (int32 i = 0; TypeHandler* handler = handlers->ItemAt(i);
+				i++) {
+				handler->ReleaseReference();
+			}
+
+			return result;
+		}
+
+		if (!actions->AddItem(menuItem))
+			return B_NO_MEMORY;
+
+		handlerMenu->SetTargetForItems(this);
+		menuItemDeleter.Detach();
+	}
 
 	return B_OK;
 }
@@ -2843,9 +3020,14 @@ status_t
 VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 	void* parent, TreeTablePath& path, bool updateValues) const
 {
-	int32 childCount = fVariableTableModel->CountChildren(parent);
+	bool isRoot = parent == fVariableTableModel->Root();
+	int32 childCount = isRoot ? fVariableTableModel->CountChildren(parent)
+			: ((ModelNode*)parent)->CountChildren();
 	for (int32 i = 0; i < childCount; i++) {
-		ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(parent, i);
+		ModelNode* node = (ModelNode*)(isRoot ? fVariableTableModel->ChildAt(
+					parent, i)
+				: ((ModelNode*)parent)->ChildAt(i));
+
 		if (!path.AddComponent(i))
 			return B_NO_MEMORY;
 
@@ -2853,6 +3035,7 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 		VariablesViewNodeInfo nodeInfo;
 		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
 		nodeInfo.SetCastedType(node->GetCastedType());
+		nodeInfo.SetTypeHandler(node->GetTypeHandler());
 		TableCellValueRenderer* renderer = node->TableCellRenderer();
 		if (renderer != NULL) {
 			Settings* settings = renderer->GetSettings();
@@ -2895,9 +3078,13 @@ status_t
 VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 	void* parent, TreeTablePath& path)
 {
-	int32 childCount = fVariableTableModel->CountChildren(parent);
+	bool isRoot = parent == fVariableTableModel->Root();
+	int32 childCount = isRoot ? fVariableTableModel->CountChildren(parent)
+			: ((ModelNode*)parent)->CountChildren();
 	for (int32 i = 0; i < childCount; i++) {
-		ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(parent, i);
+		ModelNode* node = (ModelNode*)(isRoot ? fVariableTableModel->ChildAt(
+					parent, i)
+				: ((ModelNode*)parent)->ChildAt(i));
 		if (!path.AddComponent(i))
 			return B_NO_MEMORY;
 
@@ -2912,12 +3099,16 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 			// before any other view state restoration, since it
 			// potentially changes the child hierarchy under that node.
 			Type* type = nodeInfo->GetCastedType();
-			if (type != NULL) {
+			TypeHandler* handler = nodeInfo->GetTypeHandler();
+			node->SetCastedType(type);
+			node->SetTypeHandler(handler);
+			if (type != NULL || handler != NULL) {
+				if (type == NULL)
+					type = node->GetType();
 				ValueNode* valueNode = NULL;
 				if (TypeHandlerRoster::Default()->CreateValueNode(
-					node->NodeChild(), type, valueNode) == B_OK) {
+					node->NodeChild(), type, handler, valueNode) == B_OK) {
 					node->NodeChild()->SetNode(valueNode);
-					node->SetCastedType(type);
 				}
 			}
 
@@ -3209,7 +3400,7 @@ VariablesView::_HandleTypecastResult(status_t result, ExpressionResult* value)
 	ValueNode* valueNode = NULL;
 	ModelNode* node = fPendingTypecastInfo->TargetNode();
 	if (TypeHandlerRoster::Default()->CreateValueNode(node->NodeChild(), type,
-			valueNode) != B_OK) {
+			NULL, valueNode) != B_OK) {
 		return;
 	}
 

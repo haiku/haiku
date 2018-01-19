@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,8 +17,15 @@ BMessageTypeHandler::~BMessageTypeHandler()
 }
 
 
+const char*
+BMessageTypeHandler::Name() const
+{
+	return "Message content";
+}
+
+
 float
-BMessageTypeHandler::SupportsType(Type* type)
+BMessageTypeHandler::SupportsType(Type* type) const
 {
 	if (dynamic_cast<CompoundType*>(type) != NULL
 		&& type->Name() == "BMessage")

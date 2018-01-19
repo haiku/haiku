@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2018, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -17,6 +17,7 @@ class ObjectID;
 class StackFrameValues;
 class Type;
 class TypeComponentPath;
+class TypeHandler;
 
 
 class VariablesViewNodeInfo {
@@ -37,6 +38,11 @@ public:
 									{ return fCastedType; }
 			void				SetCastedType(Type* type);
 
+			TypeHandler*		GetTypeHandler() const
+									{ return fTypeHandler; }
+			void				SetTypeHandler(TypeHandler* handler);
+
+
 			const BMessage&		GetRendererSettings() const
 									{ return fRendererSettings; }
 
@@ -45,6 +51,7 @@ public:
 private:
 			bool				fNodeExpanded;
 			Type*				fCastedType;
+			TypeHandler*		fTypeHandler;
 			BMessage			fRendererSettings;
 };
 

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2018, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +25,14 @@
 #include "TypeHandler.h"
 
 
+static int CompareTypeHandlers(const TypeHandler* a, const TypeHandler* b,
+	void* state)
+{
+	Type* type = (Type*)state;
+	return a->SupportsType(type) > b->SupportsType(type) ? 1 : -1;
+}
+
+
 // #pragma mark - BasicTypeHandler
 
 
@@ -33,7 +42,12 @@ namespace {
 template<typename TypeClass, typename NodeClass>
 class BasicTypeHandler : public TypeHandler {
 public:
-	virtual float SupportsType(Type* type)
+	virtual const char* Name() const
+	{
+		return "Raw";
+	}
+
+	virtual float SupportsType(Type* type) const
 	{
 		return dynamic_cast<TypeClass*>(type) != NULL ? 0.5f : 0;
 	}
@@ -161,8 +175,23 @@ TypeHandlerRoster::RegisterDefaultHandlers()
 }
 
 
+int32
+TypeHandlerRoster::CountTypeHandlers(Type* type)
+{
+	AutoLocker<BLocker>  locker(fLock);
+
+	int32 count = 0;
+	for (int32 i = 0; TypeHandler* handler = fTypeHandlers.ItemAt(i); i++) {
+		if (handler->SupportsType(type) > 0)
+			++count;
+	}
+
+	return count;
+}
+
+
 status_t
-TypeHandlerRoster::FindTypeHandler(ValueNodeChild* nodeChild, Type* type,
+TypeHandlerRoster::FindBestTypeHandler(ValueNodeChild* nodeChild, Type* type,
 	TypeHandler*& _handler)
 {
 	// find the best-supporting handler
@@ -189,26 +218,66 @@ TypeHandlerRoster::FindTypeHandler(ValueNodeChild* nodeChild, Type* type,
 
 
 status_t
-TypeHandlerRoster::CreateValueNode(ValueNodeChild* nodeChild, Type* type,
-	ValueNode*& _node)
+TypeHandlerRoster::FindTypeHandlers(ValueNodeChild* nodeChild, Type* type,
+	TypeHandlerList*& _handlers)
 {
 	// find the best-supporting handler
-	while (true) {
-		TypeHandler* handler;
-		status_t error = FindTypeHandler(nodeChild, type, handler);
-		if (error == B_OK) {
-			// let the handler create the node
-			BReference<TypeHandler> handlerReference(handler, true);
-			return handler->CreateValueNode(nodeChild, type, _node);
+	AutoLocker<BLocker> locker(fLock);
+
+	TypeHandlerList* handlers = new(std::nothrow) TypeHandlerList(10, false);
+	ObjectDeleter<TypeHandlerList> listDeleter(handlers);
+	if (handlers == NULL)
+		return B_NO_MEMORY;
+
+	for (int32 i = 0; TypeHandler* handler = fTypeHandlers.ItemAt(i); i++) {
+		if (handler->SupportsType(type) > 0) {
+			if (!handlers->AddItem(handler))
+				return B_NO_MEMORY;
 		}
-
-		// not found yet -- try to strip a modifier/typedef from the type
-		Type* nextType = type->ResolveRawType(true);
-		if (nextType == NULL || nextType == type)
-			return B_UNSUPPORTED;
-
-		type = nextType;
 	}
+
+	if (handlers->CountItems() == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	for (int32 i = 0; TypeHandler* handler = handlers->ItemAt(i); i++)
+		handler->AcquireReference();
+
+	handlers->SortItems(CompareTypeHandlers, type);
+
+	_handlers = handlers;
+	listDeleter.Detach();
+
+	return B_OK;
+}
+
+
+status_t
+TypeHandlerRoster::CreateValueNode(ValueNodeChild* nodeChild, Type* type,
+	TypeHandler* handler, ValueNode*& _node)
+{
+	BReference<TypeHandler> handlerReference;
+
+	// if the caller doesn't supply us with a handler to use, try to find
+	// the best match.
+	if (handler == NULL) {
+		// find the best-supporting handler
+		while (true) {
+			status_t error = FindBestTypeHandler(nodeChild, type, handler);
+			if (error == B_OK) {
+				handlerReference.SetTo(handler, true);
+				break;
+			}
+
+			// not found yet -- try to strip a modifier/typedef from the type
+			Type* nextType = type->ResolveRawType(true);
+			if (nextType == NULL || nextType == type)
+				return B_UNSUPPORTED;
+
+			type = nextType;
+		}
+	}
+
+	return handler->CreateValueNode(nodeChild, type, _node);
 }
 
 
