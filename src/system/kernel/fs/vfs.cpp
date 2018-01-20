@@ -52,6 +52,7 @@
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/VMCache.h>
+#include <wait_for_objects.h>
 
 #include "EntryCache.h"
 #include "fifo.h"
@@ -5773,8 +5774,12 @@ file_select(struct file_descriptor* descriptor, uint8 event,
 	struct vnode* vnode = descriptor->u.vnode;
 
 	// If the FS has no select() hook, notify select() now.
-	if (!HAS_FS_CALL(vnode, select))
-		return notify_select_event(sync, event);
+	if (!HAS_FS_CALL(vnode, select)) {
+		if (!SELECT_TYPE_IS_OUTPUT_ONLY(event))
+			return notify_select_event(sync, event);
+		else
+			return B_OK;
+	}
 
 	return FS_CALL(vnode, select, descriptor->cookie, event, sync);
 }
