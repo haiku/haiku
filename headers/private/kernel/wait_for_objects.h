@@ -30,6 +30,12 @@ typedef struct select_sync {
 
 #define SELECT_FLAG(type) (1L << (type - 1))
 
+#define SELECT_OUTPUT_ONLY_FLAGS \
+	(B_EVENT_ERROR | B_EVENT_DISCONNECTED | B_EVENT_INVALID)
+
+#define SELECT_TYPE_IS_OUTPUT_ONLY(type) \
+	((SELECT_FLAG(type) & SELECT_OUTPUT_ONLY_FLAGS) != 0)
+
 
 #ifdef __cplusplus
 extern "C" {
