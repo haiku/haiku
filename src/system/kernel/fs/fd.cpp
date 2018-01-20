@@ -566,10 +566,14 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 
 	uint16 eventsToSelect = info->selected_events & ~B_EVENT_INVALID;
 
-	if (descriptor->ops->fd_select == NULL && eventsToSelect != 0) {
+	if (descriptor->ops->fd_select == NULL) {
 		// if the I/O subsystem doesn't support select(), we will
 		// immediately notify the select call
-		return notify_select_events(info, eventsToSelect);
+		eventsToSelect &= ~SELECT_OUTPUT_ONLY_FLAGS;
+		if (eventsToSelect != 0)
+			return notify_select_events(info, eventsToSelect);
+		else
+			return B_OK;
 	}
 
 	// We need the FD to stay open while we're doing this, so no select()/
