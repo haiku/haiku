@@ -35,6 +35,7 @@
 #include <util/AutoLock.h>
 #include <vfs.h>
 #include <vm/vm.h>
+#include <wait_for_objects.h>
 
 #include "BaseDevice.h"
 #include "FileDevice.h"
@@ -1552,8 +1553,12 @@ devfs_select(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 		return B_NOT_ALLOWED;
 
 	// If the device has no select() hook, notify select() now.
-	if (!vnode->stream.u.dev.device->HasSelect())
-		return notify_select_event((selectsync*)sync, event);
+	if (!vnode->stream.u.dev.device->HasSelect()) {
+		if (!SELECT_TYPE_IS_OUTPUT_ONLY(event))
+			return notify_select_event((selectsync*)sync, event);
+		else
+			return B_OK;
+	}
 
 	return vnode->stream.u.dev.device->Select(cookie->device_cookie, event,
 		(selectsync*)sync);
