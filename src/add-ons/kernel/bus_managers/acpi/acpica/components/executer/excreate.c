@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,6 +112,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
@@ -167,65 +203,40 @@ AcpiExCreateAlias (
         TargetNode = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, TargetNode->Object);
     }
 
-    /*
-     * For objects that can never change (i.e., the NS node will
-     * permanently point to the same object), we can simply attach
-     * the object to the new NS node. For other objects (such as
-     * Integers, buffers, etc.), we have to point the Alias node
-     * to the original Node.
-     */
+    /* Ensure that the target node is valid */
+
+    if (!TargetNode)
+    {
+        return_ACPI_STATUS (AE_NULL_OBJECT);
+    }
+
+    /* Construct the alias object (a namespace node) */
+
     switch (TargetNode->Type)
     {
-
-    /* For these types, the sub-object can change dynamically via a Store */
-
-    case ACPI_TYPE_INTEGER:
-    case ACPI_TYPE_STRING:
-    case ACPI_TYPE_BUFFER:
-    case ACPI_TYPE_PACKAGE:
-    case ACPI_TYPE_BUFFER_FIELD:
-    /*
-     * These types open a new scope, so we need the NS node in order to access
-     * any children.
-     */
-    case ACPI_TYPE_DEVICE:
-    case ACPI_TYPE_POWER:
-    case ACPI_TYPE_PROCESSOR:
-    case ACPI_TYPE_THERMAL:
-    case ACPI_TYPE_LOCAL_SCOPE:
+    case ACPI_TYPE_METHOD:
         /*
+         * Control method aliases need to be differentiated with
+         * a special type
+         */
+        AliasNode->Type = ACPI_TYPE_LOCAL_METHOD_ALIAS;
+        break;
+
+    default:
+        /*
+         * All other object types.
+         *
          * The new alias has the type ALIAS and points to the original
          * NS node, not the object itself.
          */
         AliasNode->Type = ACPI_TYPE_LOCAL_ALIAS;
         AliasNode->Object = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, TargetNode);
         break;
-
-    case ACPI_TYPE_METHOD:
-        /*
-         * Control method aliases need to be differentiated
-         */
-        AliasNode->Type = ACPI_TYPE_LOCAL_METHOD_ALIAS;
-        AliasNode->Object = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, TargetNode);
-        break;
-
-    default:
-
-        /* Attach the original source object to the new Alias Node */
-
-        /*
-         * The new alias assumes the type of the target, and it points
-         * to the same object. The reference count of the object has an
-         * additional reference to prevent deletion out from under either the
-         * target node or the alias Node
-         */
-        Status = AcpiNsAttachObject (AliasNode,
-            AcpiNsGetAttachedObject (TargetNode), TargetNode->Type);
-        break;
     }
 
     /* Since both operands are Nodes, we don't need to delete them */
 
+    AliasNode->Object = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, TargetNode);
     return_ACPI_STATUS (Status);
 }
 

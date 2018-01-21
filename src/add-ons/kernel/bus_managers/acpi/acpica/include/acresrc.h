@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -228,7 +264,9 @@ typedef enum
     ACPI_RSD_UINT16,
     ACPI_RSD_UINT32,
     ACPI_RSD_UINT64,
-    ACPI_RSD_WORDLIST
+    ACPI_RSD_WORDLIST,
+    ACPI_RSD_LABEL,
+    ACPI_RSD_SOURCE_LABEL,
 
 } ACPI_RSDUMP_OPCODES;
 
@@ -460,6 +498,11 @@ extern ACPI_RSCONVERT_INFO      AcpiRsConvertFixedDma[];
 extern ACPI_RSCONVERT_INFO      AcpiRsConvertI2cSerialBus[];
 extern ACPI_RSCONVERT_INFO      AcpiRsConvertSpiSerialBus[];
 extern ACPI_RSCONVERT_INFO      AcpiRsConvertUartSerialBus[];
+extern ACPI_RSCONVERT_INFO      AcpiRsConvertPinFunction[];
+extern ACPI_RSCONVERT_INFO      AcpiRsConvertPinConfig[];
+extern ACPI_RSCONVERT_INFO      AcpiRsConvertPinGroup[];
+extern ACPI_RSCONVERT_INFO      AcpiRsConvertPinGroupFunction[];
+extern ACPI_RSCONVERT_INFO      AcpiRsConvertPinGroupConfig[];
 
 /* These resources require separate get/set tables */
 
@@ -504,12 +547,17 @@ extern ACPI_RSDUMP_INFO         AcpiRsDumpExtAddress64[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpExtIrq[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpGenericReg[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpGpio[];
+extern ACPI_RSDUMP_INFO         AcpiRsDumpPinFunction[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpFixedDma[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpCommonSerialBus[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpI2cSerialBus[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpSpiSerialBus[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpUartSerialBus[];
 extern ACPI_RSDUMP_INFO         AcpiRsDumpGeneralFlags[];
+extern ACPI_RSDUMP_INFO         AcpiRsDumpPinConfig[];
+extern ACPI_RSDUMP_INFO         AcpiRsDumpPinGroup[];
+extern ACPI_RSDUMP_INFO         AcpiRsDumpPinGroupFunction[];
+extern ACPI_RSDUMP_INFO         AcpiRsDumpPinGroupConfig[];
 #endif
 
 #endif  /* __ACRESRC_H__ */

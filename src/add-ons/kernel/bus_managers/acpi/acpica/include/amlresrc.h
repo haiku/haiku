@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 /* acpisrc:StructDefs -- for acpisrc conversion */
@@ -138,6 +174,7 @@
 #define ACPI_RESTAG_DRIVESTRENGTH               "_DRS"
 #define ACPI_RESTAG_ENDIANNESS                  "_END"
 #define ACPI_RESTAG_FLOWCONTROL                 "_FLC"
+#define ACPI_RESTAG_FUNCTION                    "_FUN"
 #define ACPI_RESTAG_GRANULARITY                 "_GRA"
 #define ACPI_RESTAG_INTERRUPT                   "_INT"
 #define ACPI_RESTAG_INTERRUPTLEVEL              "_LL_"  /* ActiveLo(1), ActiveHi(0) */
@@ -157,6 +194,8 @@
 #define ACPI_RESTAG_PHASE                       "_PHA"
 #define ACPI_RESTAG_PIN                         "_PIN"
 #define ACPI_RESTAG_PINCONFIG                   "_PPI"
+#define ACPI_RESTAG_PINCONFIG_TYPE              "_TYP"
+#define ACPI_RESTAG_PINCONFIG_VALUE             "_VAL"
 #define ACPI_RESTAG_POLARITY                    "_POL"
 #define ACPI_RESTAG_REGISTERBITOFFSET           "_RBO"
 #define ACPI_RESTAG_REGISTERBITWIDTH            "_RBW"
@@ -600,6 +639,116 @@ typedef struct aml_resource_uart_serialbus
 #define AML_RESOURCE_UART_TYPE_REVISION         1       /* ACPI 5.0 */
 #define AML_RESOURCE_UART_MIN_DATA_LEN          10
 
+typedef struct aml_resource_pin_function
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           RevisionId;
+    UINT16                          Flags;
+    UINT8                           PinConfig;
+    UINT16                          FunctionNumber;
+    UINT16                          PinTableOffset;
+    UINT8                           ResSourceIndex;
+    UINT16                          ResSourceOffset;
+    UINT16                          VendorOffset;
+    UINT16                          VendorLength;
+    /*
+     * Optional fields follow immediately:
+     * 1) PIN list (Words)
+     * 2) Resource Source String
+     * 3) Vendor Data bytes
+     */
+
+} AML_RESOURCE_PIN_FUNCTION;
+
+#define AML_RESOURCE_PIN_FUNCTION_REVISION      1       /* ACPI 6.2 */
+
+typedef struct aml_resource_pin_config
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           RevisionId;
+    UINT16                          Flags;
+    UINT8                           PinConfigType;
+    UINT32                          PinConfigValue;
+    UINT16                          PinTableOffset;
+    UINT8                           ResSourceIndex;
+    UINT16                          ResSourceOffset;
+    UINT16                          VendorOffset;
+    UINT16                          VendorLength;
+    /*
+     * Optional fields follow immediately:
+     * 1) PIN list (Words)
+     * 2) Resource Source String
+     * 3) Vendor Data bytes
+     */
+
+} AML_RESOURCE_PIN_CONFIG;
+
+#define AML_RESOURCE_PIN_CONFIG_REVISION      1       /* ACPI 6.2 */
+
+typedef struct aml_resource_pin_group
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           RevisionId;
+    UINT16                          Flags;
+    UINT16                          PinTableOffset;
+    UINT16                          LabelOffset;
+    UINT16                          VendorOffset;
+    UINT16                          VendorLength;
+    /*
+     * Optional fields follow immediately:
+     * 1) PIN list (Words)
+     * 2) Resource Label String
+     * 3) Vendor Data bytes
+     */
+
+} AML_RESOURCE_PIN_GROUP;
+
+#define AML_RESOURCE_PIN_GROUP_REVISION      1       /* ACPI 6.2 */
+
+typedef struct aml_resource_pin_group_function
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           RevisionId;
+    UINT16                          Flags;
+    UINT16                          FunctionNumber;
+    UINT8                           ResSourceIndex;
+    UINT16                          ResSourceOffset;
+    UINT16                          ResSourceLabelOffset;
+    UINT16                          VendorOffset;
+    UINT16                          VendorLength;
+    /*
+     * Optional fields follow immediately:
+     * 1) Resource Source String
+     * 2) Resource Source Label String
+     * 3) Vendor Data bytes
+     */
+
+} AML_RESOURCE_PIN_GROUP_FUNCTION;
+
+#define AML_RESOURCE_PIN_GROUP_FUNCTION_REVISION    1       /* ACPI 6.2 */
+
+typedef struct aml_resource_pin_group_config
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           RevisionId;
+    UINT16                          Flags;
+    UINT8                           PinConfigType;
+    UINT32                          PinConfigValue;
+    UINT8                           ResSourceIndex;
+    UINT16                          ResSourceOffset;
+    UINT16                          ResSourceLabelOffset;
+    UINT16                          VendorOffset;
+    UINT16                          VendorLength;
+    /*
+     * Optional fields follow immediately:
+     * 1) Resource Source String
+     * 2) Resource Source Label String
+     * 3) Vendor Data bytes
+     */
+
+} AML_RESOURCE_PIN_GROUP_CONFIG;
+
+#define AML_RESOURCE_PIN_GROUP_CONFIG_REVISION    1       /* ACPI 6.2 */
 
 /* restore default alignment */
 
@@ -644,6 +793,11 @@ typedef union aml_resource
     AML_RESOURCE_SPI_SERIALBUS              SpiSerialBus;
     AML_RESOURCE_UART_SERIALBUS             UartSerialBus;
     AML_RESOURCE_COMMON_SERIALBUS           CommonSerialBus;
+    AML_RESOURCE_PIN_FUNCTION               PinFunction;
+    AML_RESOURCE_PIN_CONFIG                 PinConfig;
+    AML_RESOURCE_PIN_GROUP                  PinGroup;
+    AML_RESOURCE_PIN_GROUP_FUNCTION         PinGroupFunction;
+    AML_RESOURCE_PIN_GROUP_CONFIG           PinGroupConfig;
 
     /* Utility overlays */
 

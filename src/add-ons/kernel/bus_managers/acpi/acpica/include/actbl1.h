@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #ifndef __ACTBL1_H__
@@ -139,10 +175,14 @@
 #define ACPI_SIG_ECDT           "ECDT"      /* Embedded Controller Boot Resources Table */
 #define ACPI_SIG_EINJ           "EINJ"      /* Error Injection table */
 #define ACPI_SIG_ERST           "ERST"      /* Error Record Serialization Table */
+#define ACPI_SIG_HMAT           "HMAT"      /* Heterogeneous Memory Attributes Table */
 #define ACPI_SIG_HEST           "HEST"      /* Hardware Error Source Table */
 #define ACPI_SIG_MADT           "APIC"      /* Multiple APIC Description Table */
 #define ACPI_SIG_MSCT           "MSCT"      /* Maximum System Characteristics Table */
+#define ACPI_SIG_PDTT           "PDTT"      /* Platform Debug Trigger Table */
+#define ACPI_SIG_PPTT           "PPTT"      /* Processor Properties Topology Table */
 #define ACPI_SIG_SBST           "SBST"      /* Smart Battery Specification Table */
+#define ACPI_SIG_SDEV           "SDEV"      /* Secure Devices table */
 #define ACPI_SIG_SLIT           "SLIT"      /* System Locality Distance Information Table */
 #define ACPI_SIG_SRAT           "SRAT"      /* System Resource Affinity Table */
 #define ACPI_SIG_NFIT           "NFIT"      /* NVDIMM Firmware Interface Table */
@@ -564,7 +604,8 @@ enum AcpiHestTypes
     ACPI_HEST_TYPE_AER_BRIDGE           = 8,
     ACPI_HEST_TYPE_GENERIC_ERROR        = 9,
     ACPI_HEST_TYPE_GENERIC_ERROR_V2     = 10,
-    ACPI_HEST_TYPE_RESERVED             = 11    /* 11 and greater are reserved */
+    ACPI_HEST_TYPE_IA32_DEFERRED_CHECK  = 11,
+    ACPI_HEST_TYPE_RESERVED             = 12    /* 12 and greater are reserved */
 };
 
 
@@ -616,6 +657,7 @@ typedef struct acpi_hest_aer_common
 
 #define ACPI_HEST_FIRMWARE_FIRST        (1)
 #define ACPI_HEST_GLOBAL                (1<<1)
+#define ACPI_HEST_GHES_ASSIST           (1<<2)
 
 /*
  * Macros to access the bus/segment numbers in Bus field above:
@@ -646,18 +688,19 @@ typedef struct acpi_hest_notify
 
 enum AcpiHestNotifyTypes
 {
-    ACPI_HEST_NOTIFY_POLLED     = 0,
-    ACPI_HEST_NOTIFY_EXTERNAL   = 1,
-    ACPI_HEST_NOTIFY_LOCAL      = 2,
-    ACPI_HEST_NOTIFY_SCI        = 3,
-    ACPI_HEST_NOTIFY_NMI        = 4,
-    ACPI_HEST_NOTIFY_CMCI       = 5,    /* ACPI 5.0 */
-    ACPI_HEST_NOTIFY_MCE        = 6,    /* ACPI 5.0 */
-    ACPI_HEST_NOTIFY_GPIO       = 7,    /* ACPI 6.0 */
-    ACPI_HEST_NOTIFY_SEA        = 8,    /* ACPI 6.1 */
-    ACPI_HEST_NOTIFY_SEI        = 9,    /* ACPI 6.1 */
-    ACPI_HEST_NOTIFY_GSIV       = 10,   /* ACPI 6.1 */
-    ACPI_HEST_NOTIFY_RESERVED   = 11    /* 11 and greater are reserved */
+    ACPI_HEST_NOTIFY_POLLED             = 0,
+    ACPI_HEST_NOTIFY_EXTERNAL           = 1,
+    ACPI_HEST_NOTIFY_LOCAL              = 2,
+    ACPI_HEST_NOTIFY_SCI                = 3,
+    ACPI_HEST_NOTIFY_NMI                = 4,
+    ACPI_HEST_NOTIFY_CMCI               = 5,    /* ACPI 5.0 */
+    ACPI_HEST_NOTIFY_MCE                = 6,    /* ACPI 5.0 */
+    ACPI_HEST_NOTIFY_GPIO               = 7,    /* ACPI 6.0 */
+    ACPI_HEST_NOTIFY_SEA                = 8,    /* ACPI 6.1 */
+    ACPI_HEST_NOTIFY_SEI                = 9,    /* ACPI 6.1 */
+    ACPI_HEST_NOTIFY_GSIV               = 10,   /* ACPI 6.1 */
+    ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED = 11,   /* ACPI 6.2 */
+    ACPI_HEST_NOTIFY_RESERVED           = 12    /* 12 and greater are reserved */
 };
 
 /* Values for ConfigWriteEnable bitfield above */
@@ -680,7 +723,7 @@ typedef struct acpi_hest_ia_machine_check
 {
     ACPI_HEST_HEADER        Header;
     UINT16                  Reserved1;
-    UINT8                   Flags;
+    UINT8                   Flags;              /* See flags ACPI_HEST_GLOBAL, etc. above */
     UINT8                   Enabled;
     UINT32                  RecordsToPreallocate;
     UINT32                  MaxSectionsPerRecord;
@@ -698,7 +741,7 @@ typedef struct acpi_hest_ia_corrected
 {
     ACPI_HEST_HEADER        Header;
     UINT16                  Reserved1;
-    UINT8                   Flags;
+    UINT8                   Flags;              /* See flags ACPI_HEST_GLOBAL, etc. above */
     UINT8                   Enabled;
     UINT32                  RecordsToPreallocate;
     UINT32                  MaxSectionsPerRecord;
@@ -863,6 +906,155 @@ typedef struct acpi_hest_generic_data_v300
 #define ACPI_HEST_GEN_VALID_TIMESTAMP       (1<<2)
 
 
+/* 11: IA32 Deferred Machine Check Exception (ACPI 6.2) */
+
+typedef struct acpi_hest_ia_deferred_check
+{
+    ACPI_HEST_HEADER        Header;
+    UINT16                  Reserved1;
+    UINT8                   Flags;              /* See flags ACPI_HEST_GLOBAL, etc. above */
+    UINT8                   Enabled;
+    UINT32                  RecordsToPreallocate;
+    UINT32                  MaxSectionsPerRecord;
+    ACPI_HEST_NOTIFY        Notify;
+    UINT8                   NumHardwareBanks;
+    UINT8                   Reserved2[3];
+
+} ACPI_HEST_IA_DEFERRED_CHECK;
+
+
+/*******************************************************************************
+ *
+ * HMAT - Heterogeneous Memory Attributes Table (ACPI 6.2)
+ *        Version 1
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_hmat
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+    UINT32                  Reserved;
+
+} ACPI_TABLE_HMAT;
+
+
+/* Values for HMAT structure types */
+
+enum AcpiHmatType
+{
+    ACPI_HMAT_TYPE_ADDRESS_RANGE        = 0,   /* Memory subystem address range */
+    ACPI_HMAT_TYPE_LOCALITY             = 1,   /* System locality latency and bandwidth information */
+    ACPI_HMAT_TYPE_CACHE                = 2,   /* Memory side cache information */
+    ACPI_HMAT_TYPE_RESERVED             = 3    /* 3 and greater are reserved */
+};
+
+typedef struct acpi_hmat_structure
+{
+    UINT16                  Type;
+    UINT16                  Reserved;
+    UINT32                  Length;
+
+} ACPI_HMAT_STRUCTURE;
+
+
+/*
+ * HMAT Structures, correspond to Type in ACPI_HMAT_STRUCTURE
+ */
+
+/* 0: Memory subystem address range */
+
+typedef struct acpi_hmat_address_range
+{
+    ACPI_HMAT_STRUCTURE     Header;
+    UINT16                  Flags;
+    UINT16                  Reserved1;
+    UINT32                  ProcessorPD;            /* Processor proximity domain */
+    UINT32                  MemoryPD;               /* Memory proximity domain */
+    UINT32                  Reserved2;
+    UINT64                  PhysicalAddressBase;    /* Physical address range base */
+    UINT64                  PhysicalAddressLength;  /* Physical address range length */
+
+} ACPI_HMAT_ADDRESS_RANGE;
+
+/* Masks for Flags field above */
+
+#define ACPI_HMAT_PROCESSOR_PD_VALID    (1)     /* 1: ProcessorPD field is valid */
+#define ACPI_HMAT_MEMORY_PD_VALID       (1<<1)  /* 1: MemoryPD field is valid */
+#define ACPI_HMAT_RESERVATION_HINT      (1<<2)  /* 1: Reservation hint */
+
+
+/* 1: System locality latency and bandwidth information */
+
+typedef struct acpi_hmat_locality
+{
+    ACPI_HMAT_STRUCTURE     Header;
+    UINT8                   Flags;
+    UINT8                   DataType;
+    UINT16                  Reserved1;
+    UINT32                  NumberOfInitiatorPDs;
+    UINT32                  NumberOfTargetPDs;
+    UINT32                  Reserved2;
+    UINT64                  EntryBaseUnit;
+
+} ACPI_HMAT_LOCALITY;
+
+/* Masks for Flags field above */
+
+#define ACPI_HMAT_MEMORY_HIERARCHY  (0x0F)
+
+/* Values for Memory Hierarchy flag */
+
+#define ACPI_HMAT_MEMORY            0
+#define ACPI_HMAT_LAST_LEVEL_CACHE  1
+#define ACPI_HMAT_1ST_LEVEL_CACHE   2
+#define ACPI_HMAT_2ND_LEVEL_CACHE   3
+#define ACPI_HMAT_3RD_LEVEL_CACHE   4
+
+/* Values for DataType field above */
+
+#define ACPI_HMAT_ACCESS_LATENCY    0
+#define ACPI_HMAT_READ_LATENCY      1
+#define ACPI_HMAT_WRITE_LATENCY     2
+#define ACPI_HMAT_ACCESS_BANDWIDTH  3
+#define ACPI_HMAT_READ_BANDWIDTH    4
+#define ACPI_HMAT_WRITE_BANDWIDTH   5
+
+
+/* 2: Memory side cache information */
+
+typedef struct acpi_hmat_cache
+{
+    ACPI_HMAT_STRUCTURE     Header;
+    UINT32                  MemoryPD;
+    UINT32                  Reserved1;
+    UINT64                  CacheSize;
+    UINT32                  CacheAttributes;
+    UINT16                  Reserved2;
+    UINT16                  NumberOfSMBIOSHandles;
+
+} ACPI_HMAT_CACHE;
+
+/* Masks for CacheAttributes field above */
+
+#define ACPI_HMAT_TOTAL_CACHE_LEVEL     (0x0000000F)
+#define ACPI_HMAT_CACHE_LEVEL           (0x000000F0)
+#define ACPI_HMAT_CACHE_ASSOCIATIVITY   (0x00000F00)
+#define ACPI_HMAT_WRITE_POLICY          (0x0000F000)
+#define ACPI_HMAT_CACHE_LINE_SIZE       (0xFFFF0000)
+
+/* Values for cache associativity flag */
+
+#define ACPI_HMAT_CA_NONE                     (0)
+#define ACPI_HMAT_CA_DIRECT_MAPPED            (1)
+#define ACPI_HMAT_CA_COMPLEX_CACHE_INDEXING   (2)
+
+/* Values for write policy flag */
+
+#define ACPI_HMAT_CP_NONE   (0)
+#define ACPI_HMAT_CP_WB     (1)
+#define ACPI_HMAT_CP_WT     (2)
+
+
 /*******************************************************************************
  *
  * MADT - Multiple APIC Description Table
@@ -884,8 +1076,8 @@ typedef struct acpi_table_madt
 
 /* Values for PCATCompat flag */
 
-#define ACPI_MADT_DUAL_PIC          0
-#define ACPI_MADT_MULTIPLE_APIC     1
+#define ACPI_MADT_DUAL_PIC          1
+#define ACPI_MADT_MULTIPLE_APIC     0
 
 
 /* Values for MADT subtable type in ACPI_SUBTABLE_HEADER */
@@ -1257,7 +1449,8 @@ enum AcpiNfitType
     ACPI_NFIT_TYPE_CONTROL_REGION       = 4,
     ACPI_NFIT_TYPE_DATA_REGION          = 5,
     ACPI_NFIT_TYPE_FLUSH_ADDRESS        = 6,
-    ACPI_NFIT_TYPE_RESERVED             = 7     /* 7 and greater are reserved */
+    ACPI_NFIT_TYPE_CAPABILITIES         = 7,
+    ACPI_NFIT_TYPE_RESERVED             = 8     /* 8 and greater are reserved */
 };
 
 /*
@@ -1271,7 +1464,7 @@ typedef struct acpi_nfit_system_address
     ACPI_NFIT_HEADER        Header;
     UINT16                  RangeIndex;
     UINT16                  Flags;
-    UINT32                  Reserved;           /* Reseved, must be zero */
+    UINT32                  Reserved;           /* Reserved, must be zero */
     UINT32                  ProximityDomain;
     UINT8                   RangeGuid[16];
     UINT64                  Address;
@@ -1410,6 +1603,215 @@ typedef struct acpi_nfit_flush_address
 } ACPI_NFIT_FLUSH_ADDRESS;
 
 
+/* 7: Platform Capabilities Structure */
+
+typedef struct acpi_nfit_capabilities
+{
+    ACPI_NFIT_HEADER        Header;
+    UINT8                   HighestCapability;
+    UINT8                   Reserved[3];       /* Reserved, must be zero */
+    UINT32                  Capabilities;
+    UINT32                  Reserved2;
+
+} ACPI_NFIT_CAPABILITIES;
+
+/* Capabilities Flags */
+
+#define ACPI_NFIT_CAPABILITY_CACHE_FLUSH       (1)     /* 00: Cache Flush to NVDIMM capable */
+#define ACPI_NFIT_CAPABILITY_MEM_FLUSH         (1<<1)  /* 01: Memory Flush to NVDIMM capable */
+#define ACPI_NFIT_CAPABILITY_MEM_MIRRORING     (1<<2)  /* 02: Memory Mirroring capable */
+
+
+/*
+ * NFIT/DVDIMM device handle support - used as the _ADR for each NVDIMM
+ */
+typedef struct nfit_device_handle
+{
+    UINT32                  Handle;
+
+} NFIT_DEVICE_HANDLE;
+
+/* Device handle construction and extraction macros */
+
+#define ACPI_NFIT_DIMM_NUMBER_MASK              0x0000000F
+#define ACPI_NFIT_CHANNEL_NUMBER_MASK           0x000000F0
+#define ACPI_NFIT_MEMORY_ID_MASK                0x00000F00
+#define ACPI_NFIT_SOCKET_ID_MASK                0x0000F000
+#define ACPI_NFIT_NODE_ID_MASK                  0x0FFF0000
+
+#define ACPI_NFIT_DIMM_NUMBER_OFFSET            0
+#define ACPI_NFIT_CHANNEL_NUMBER_OFFSET         4
+#define ACPI_NFIT_MEMORY_ID_OFFSET              8
+#define ACPI_NFIT_SOCKET_ID_OFFSET              12
+#define ACPI_NFIT_NODE_ID_OFFSET                16
+
+/* Macro to construct a NFIT/NVDIMM device handle */
+
+#define ACPI_NFIT_BUILD_DEVICE_HANDLE(dimm, channel, memory, socket, node) \
+    ((dimm)                                         | \
+    ((channel) << ACPI_NFIT_CHANNEL_NUMBER_OFFSET)  | \
+    ((memory)  << ACPI_NFIT_MEMORY_ID_OFFSET)       | \
+    ((socket)  << ACPI_NFIT_SOCKET_ID_OFFSET)       | \
+    ((node)    << ACPI_NFIT_NODE_ID_OFFSET))
+
+/* Macros to extract individual fields from a NFIT/NVDIMM device handle */
+
+#define ACPI_NFIT_GET_DIMM_NUMBER(handle) \
+    ((handle) & ACPI_NFIT_DIMM_NUMBER_MASK)
+
+#define ACPI_NFIT_GET_CHANNEL_NUMBER(handle) \
+    (((handle) & ACPI_NFIT_CHANNEL_NUMBER_MASK) >> ACPI_NFIT_CHANNEL_NUMBER_OFFSET)
+
+#define ACPI_NFIT_GET_MEMORY_ID(handle) \
+    (((handle) & ACPI_NFIT_MEMORY_ID_MASK)      >> ACPI_NFIT_MEMORY_ID_OFFSET)
+
+#define ACPI_NFIT_GET_SOCKET_ID(handle) \
+    (((handle) & ACPI_NFIT_SOCKET_ID_MASK)      >> ACPI_NFIT_SOCKET_ID_OFFSET)
+
+#define ACPI_NFIT_GET_NODE_ID(handle) \
+    (((handle) & ACPI_NFIT_NODE_ID_MASK)        >> ACPI_NFIT_NODE_ID_OFFSET)
+
+
+/*******************************************************************************
+ *
+ * PDTT - Platform Debug Trigger Table (ACPI 6.2)
+ *        Version 0
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_pdtt
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+    UINT8                   TriggerCount;
+    UINT8                   Reserved[3];
+    UINT32                  ArrayOffset;
+
+} ACPI_TABLE_PDTT;
+
+
+/*
+ * PDTT Communication Channel Identifier Structure.
+ * The number of these structures is defined by TriggerCount above,
+ * starting at ArrayOffset.
+ */
+typedef struct acpi_pdtt_channel
+{
+    UINT8                   SubchannelId;
+    UINT8                   Flags;
+
+} ACPI_PDTT_CHANNEL;
+
+/* Flags for above */
+
+#define ACPI_PDTT_RUNTIME_TRIGGER           (1)
+#define ACPI_PDTT_WAIT_COMPLETION           (1<<1)
+
+
+/*******************************************************************************
+ *
+ * PPTT - Processor Properties Topology Table (ACPI 6.2)
+ *        Version 1
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_pptt
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+
+} ACPI_TABLE_PPTT;
+
+/* Values for Type field above */
+
+enum AcpiPpttType
+{
+    ACPI_PPTT_TYPE_PROCESSOR            = 0,
+    ACPI_PPTT_TYPE_CACHE                = 1,
+    ACPI_PPTT_TYPE_ID                   = 2,
+    ACPI_PPTT_TYPE_RESERVED             = 3
+};
+
+
+/* 0: Processor Hierarchy Node Structure */
+
+typedef struct acpi_pptt_processor
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT16                  Reserved;
+    UINT32                  Flags;
+    UINT32                  Parent;
+    UINT32                  AcpiProcessorId;
+    UINT32                  NumberOfPrivResources;
+
+} ACPI_PPTT_PROCESSOR;
+
+/* Flags */
+
+#define ACPI_PPTT_PHYSICAL_PACKAGE          (1)     /* Physical package */
+#define ACPI_PPTT_ACPI_PROCESSOR_ID_VALID   (2)     /* ACPI Processor ID valid */
+
+
+/* 1: Cache Type Structure */
+
+typedef struct acpi_pptt_cache
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT16                  Reserved;
+    UINT32                  Flags;
+    UINT32                  NextLevelOfCache;
+    UINT32                  Size;
+    UINT32                  NumberOfSets;
+    UINT8                   Associativity;
+    UINT8                   Attributes;
+    UINT16                  LineSize;
+
+} ACPI_PPTT_CACHE;
+
+/* Flags */
+
+#define ACPI_PPTT_SIZE_PROPERTY_VALID       (1)     /* Physical property valid */
+#define ACPI_PPTT_NUMBER_OF_SETS_VALID      (1<<1)  /* Number of sets valid */
+#define ACPI_PPTT_ASSOCIATIVITY_VALID       (1<<2)  /* Associativity valid */
+#define ACPI_PPTT_ALLOCATION_TYPE_VALID     (1<<3)  /* Allocation type valid */
+#define ACPI_PPTT_CACHE_TYPE_VALID          (1<<4)  /* Cache type valid */
+#define ACPI_PPTT_WRITE_POLICY_VALID        (1<<5)  /* Write policy valid */
+#define ACPI_PPTT_LINE_SIZE_VALID           (1<<6)  /* Line size valid */
+
+/* Masks for Attributes */
+
+#define ACPI_PPTT_MASK_ALLOCATION_TYPE      (0x03)  /* Allocation type */
+#define ACPI_PPTT_MASK_CACHE_TYPE           (0x0C)  /* Cache type */
+#define ACPI_PPTT_MASK_WRITE_POLICY         (0x10)  /* Write policy */
+
+/* Attributes describing cache */
+#define ACPI_PPTT_CACHE_READ_ALLOCATE       (0x0)   /* Cache line is allocated on read */
+#define ACPI_PPTT_CACHE_WRITE_ALLOCATE      (0x01)  /* Cache line is allocated on write */
+#define ACPI_PPTT_CACHE_RW_ALLOCATE         (0x02)  /* Cache line is allocated on read and write */
+#define ACPI_PPTT_CACHE_RW_ALLOCATE_ALT     (0x03)  /* Alternate representation of above */
+
+#define ACPI_PPTT_CACHE_TYPE_DATA           (0x0)   /* Data cache */
+#define ACPI_PPTT_CACHE_TYPE_INSTR          (1<<2)  /* Instruction cache */
+#define ACPI_PPTT_CACHE_TYPE_UNIFIED        (2<<2)  /* Unified I & D cache */
+#define ACPI_PPTT_CACHE_TYPE_UNIFIED_ALT    (3<<2)  /* Alternate representation of above */
+
+#define ACPI_PPTT_CACHE_POLICY_WB           (0x0)   /* Cache is write back */
+#define ACPI_PPTT_CACHE_POLICY_WT           (1<<4)  /* Cache is write through */
+
+/* 2: ID Structure */
+
+typedef struct acpi_pptt_id
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT16                  Reserved;
+    UINT32                  VendorId;
+    UINT64                  Level1Id;
+    UINT64                  Level2Id;
+    UINT16                  MajorRev;
+    UINT16                  MinorRev;
+    UINT16                  SpinRev;
+
+} ACPI_PPTT_ID;
+
+
 /*******************************************************************************
  *
  * SBST - Smart Battery Specification Table
@@ -1425,6 +1827,82 @@ typedef struct acpi_table_sbst
     UINT32                  CriticalLevel;
 
 } ACPI_TABLE_SBST;
+
+
+/*******************************************************************************
+ *
+ * SDEV - Secure Devices Table (ACPI 6.2)
+ *        Version 1
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_sdev
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+
+} ACPI_TABLE_SDEV;
+
+
+typedef struct acpi_sdev_header
+{
+    UINT8                   Type;
+    UINT8                   Flags;
+    UINT16                  Length;
+
+} ACPI_SDEV_HEADER;
+
+
+/* Values for subtable type above */
+
+enum AcpiSdevType
+{
+    ACPI_SDEV_TYPE_NAMESPACE_DEVICE     = 0,
+    ACPI_SDEV_TYPE_PCIE_ENDPOINT_DEVICE = 1,
+    ACPI_SDEV_TYPE_RESERVED             = 2     /* 2 and greater are reserved */
+};
+
+/* Values for flags above */
+
+#define ACPI_SDEV_HANDOFF_TO_UNSECURE_OS    (1)
+
+/*
+ * SDEV subtables
+ */
+
+/* 0: Namespace Device Based Secure Device Structure */
+
+typedef struct acpi_sdev_namespace
+{
+    ACPI_SDEV_HEADER        Header;
+    UINT16                  DeviceIdOffset;
+    UINT16                  DeviceIdLength;
+    UINT16                  VendorDataOffset;
+    UINT16                  VendorDataLength;
+
+} ACPI_SDEV_NAMESPACE;
+
+/* 1: PCIe Endpoint Device Based Device Structure */
+
+typedef struct acpi_sdev_pcie
+{
+    ACPI_SDEV_HEADER        Header;
+    UINT16                  Segment;
+    UINT16                  StartBus;
+    UINT16                  PathOffset;
+    UINT16                  PathLength;
+    UINT16                  VendorDataOffset;
+    UINT16                  VendorDataLength;
+
+} ACPI_SDEV_PCIE;
+
+/* 1a: PCIe Endpoint path entry */
+
+typedef struct acpi_sdev_pcie_path
+{
+    UINT8                   Device;
+    UINT8                   Function;
+
+} ACPI_SDEV_PCIE_PATH;
 
 
 /*******************************************************************************
@@ -1466,7 +1944,8 @@ enum AcpiSratType
     ACPI_SRAT_TYPE_MEMORY_AFFINITY      = 1,
     ACPI_SRAT_TYPE_X2APIC_CPU_AFFINITY  = 2,
     ACPI_SRAT_TYPE_GICC_AFFINITY        = 3,
-    ACPI_SRAT_TYPE_RESERVED             = 4     /* 4 and greater are reserved */
+    ACPI_SRAT_TYPE_GIC_ITS_AFFINITY     = 4,    /* ACPI 6.2 */
+    ACPI_SRAT_TYPE_RESERVED             = 5     /* 5 and greater are reserved */
 };
 
 /*
@@ -1548,6 +2027,18 @@ typedef struct acpi_srat_gicc_affinity
 /* Flags for ACPI_SRAT_GICC_AFFINITY */
 
 #define ACPI_SRAT_GICC_ENABLED     (1)         /* 00: Use affinity structure */
+
+
+/* 4: GCC ITS Affinity (ACPI 6.2) */
+
+typedef struct acpi_srat_gic_its_affinity
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT32                  ProximityDomain;
+    UINT16                  Reserved;
+    UINT32                  ItsId;
+
+} ACPI_SRAT_GIC_ITS_AFFINITY;
 
 
 /* Reset to default packing */

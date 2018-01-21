@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
@@ -179,7 +215,7 @@ static const ACPI_PORT_INFO     AcpiProtectedPorts[] =
     {"PCI",     0x0CF8, 0x0CFF, ACPI_OSI_WIN_XP}
 };
 
-#define ACPI_PORT_INFO_ENTRIES  ACPI_ARRAY_LENGTH (AcpiProtectedPorts)
+#define ACPI_PORT_INFO_ENTRIES      ACPI_ARRAY_LENGTH (AcpiProtectedPorts)
 
 
 /******************************************************************************
@@ -220,14 +256,15 @@ AcpiHwValidateIoRequest (
     {
         ACPI_ERROR ((AE_INFO,
             "Bad BitWidth parameter: %8.8X", BitWidth));
-        return (AE_BAD_PARAMETER);
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
     PortInfo = AcpiProtectedPorts;
     ByteWidth = ACPI_DIV_8 (BitWidth);
     LastAddress = Address + ByteWidth - 1;
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_IO, "Address %8.8X%8.8X LastAddress %8.8X%8.8X Length %X",
+    ACPI_DEBUG_PRINT ((ACPI_DB_IO,
+        "Address %8.8X%8.8X LastAddress %8.8X%8.8X Length %X",
         ACPI_FORMAT_UINT64 (Address), ACPI_FORMAT_UINT64 (LastAddress),
         ByteWidth));
 
@@ -254,7 +291,7 @@ AcpiHwValidateIoRequest (
     {
         /*
          * Check if the requested address range will write to a reserved
-         * port. Four cases to consider:
+         * port. There are four cases to consider:
          *
          * 1) Address range is contained completely in the port address range
          * 2) Address range overlaps port range at the port range start
@@ -267,8 +304,8 @@ AcpiHwValidateIoRequest (
 
             if (AcpiGbl_OsiData >= PortInfo->OsiDependency)
             {
-                ACPI_DEBUG_PRINT ((ACPI_DB_IO,
-                    "Denied AML access to port 0x%8.8X%8.8X/%X (%s 0x%.4X-0x%.4X)",
+                ACPI_DEBUG_PRINT ((ACPI_DB_VALUES,
+                    "Denied AML access to port 0x%8.8X%8.8X/%X (%s 0x%.4X-0x%.4X)\n",
                     ACPI_FORMAT_UINT64 (Address), ByteWidth, PortInfo->Name,
                     PortInfo->Start, PortInfo->End));
 
@@ -293,7 +330,7 @@ AcpiHwValidateIoRequest (
  * FUNCTION:    AcpiHwReadPort
  *
  * PARAMETERS:  Address             Address of I/O port/register to read
- *              Value               Where value is placed
+ *              Value               Where value (data) is returned
  *              Width               Number of bits
  *
  * RETURN:      Status and value read from port
@@ -339,7 +376,7 @@ AcpiHwReadPort (
     /*
      * There has been a protection violation within the request. Fall
      * back to byte granularity port I/O and ignore the failing bytes.
-     * This provides Windows compatibility.
+     * This provides compatibility with other ACPI implementations.
      */
     for (i = 0, *Value = 0; i < Width; i += 8)
     {
@@ -413,7 +450,7 @@ AcpiHwWritePort (
     /*
      * There has been a protection violation within the request. Fall
      * back to byte granularity port I/O and ignore the failing bytes.
-     * This provides Windows compatibility.
+     * This provides compatibility with other ACPI implementations.
      */
     for (i = 0; i < Width; i += 8)
     {

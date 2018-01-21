@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #ifndef __ACGLOBAL_H__
@@ -119,7 +155,7 @@
 
 /*****************************************************************************
  *
- * Globals related to the ACPI tables
+ * Globals related to the incoming ACPI tables
  *
  ****************************************************************************/
 
@@ -161,7 +197,7 @@ ACPI_GLOBAL (UINT8,                     AcpiGbl_IntegerNybbleWidth);
 
 /*****************************************************************************
  *
- * Mutual exclusion within ACPICA subsystem
+ * Mutual exclusion within the ACPICA subsystem
  *
  ****************************************************************************/
 
@@ -242,7 +278,7 @@ ACPI_GLOBAL (UINT8,                     AcpiGbl_NextOwnerIdOffset);
 
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_NamespaceInitialized, FALSE);
 
-/* Misc */
+/* Miscellaneous */
 
 ACPI_GLOBAL (UINT32,                    AcpiGbl_OriginalMode);
 ACPI_GLOBAL (UINT32,                    AcpiGbl_NsLookupCount);
@@ -265,11 +301,9 @@ extern const char                       AcpiGbl_LowerHexDigits[];
 extern const char                       AcpiGbl_UpperHexDigits[];
 extern const ACPI_OPCODE_INFO           AcpiGbl_AmlOpInfo[AML_NUM_OPCODES];
 
-
-#ifdef ACPI_DBG_TRACK_ALLOCATIONS
-
 /* Lists for tracking memory allocations (debug only) */
 
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
 ACPI_GLOBAL (ACPI_MEMORY_LIST *,        AcpiGbl_GlobalList);
 ACPI_GLOBAL (ACPI_MEMORY_LIST *,        AcpiGbl_NsNodeList);
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DisplayFinalMemStats);
@@ -279,7 +313,7 @@ ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DisableMemTracking);
 
 /*****************************************************************************
  *
- * Namespace globals
+ * ACPI Namespace
  *
  ****************************************************************************/
 
@@ -293,7 +327,6 @@ ACPI_GLOBAL (ACPI_NAMESPACE_NODE,       AcpiGbl_RootNodeStruct);
 ACPI_GLOBAL (ACPI_NAMESPACE_NODE *,     AcpiGbl_RootNode);
 ACPI_GLOBAL (ACPI_NAMESPACE_NODE *,     AcpiGbl_FadtGpeDevice);
 ACPI_GLOBAL (ACPI_OPERAND_OBJECT *,     AcpiGbl_ModuleCodeList);
-
 
 extern const UINT8                      AcpiGbl_NsProperties [ACPI_NUM_NS_TYPES];
 extern const ACPI_PREDEFINED_NAMES      AcpiGbl_PreDefinedNames [NUM_PREDEFINED_NAMES];
@@ -311,19 +344,20 @@ ACPI_INIT_GLOBAL (UINT32,               AcpiGbl_NestingLevel, 0);
 
 /*****************************************************************************
  *
- * Interpreter globals
+ * Interpreter/Parser globals
  *
  ****************************************************************************/
-
-ACPI_GLOBAL (ACPI_THREAD_STATE *,       AcpiGbl_CurrentWalkList);
-
-/* Maximum number of While() loop iterations before forced abort */
-
-ACPI_GLOBAL (UINT16,                    AcpiGbl_MaxLoopIterations);
 
 /* Control method single step flag */
 
 ACPI_GLOBAL (UINT8,                     AcpiGbl_CmSingleStep);
+ACPI_GLOBAL (ACPI_THREAD_STATE *,       AcpiGbl_CurrentWalkList);
+ACPI_INIT_GLOBAL (ACPI_PARSE_OBJECT,   *AcpiGbl_CurrentScope, NULL);
+
+/* ASL/ASL+ converter */
+
+ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_CaptureComments, FALSE);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_LastListHead, NULL);
 
 
 /*****************************************************************************
@@ -333,7 +367,6 @@ ACPI_GLOBAL (UINT8,                     AcpiGbl_CmSingleStep);
  ****************************************************************************/
 
 extern ACPI_BIT_REGISTER_INFO           AcpiGbl_BitRegisterInfo[ACPI_NUM_BITREG];
-
 ACPI_GLOBAL (UINT8,                     AcpiGbl_SleepTypeA);
 ACPI_GLOBAL (UINT8,                     AcpiGbl_SleepTypeB);
 
@@ -345,17 +378,15 @@ ACPI_GLOBAL (UINT8,                     AcpiGbl_SleepTypeB);
  ****************************************************************************/
 
 #if (!ACPI_REDUCED_HARDWARE)
-
 ACPI_GLOBAL (UINT8,                     AcpiGbl_AllGpesInitialized);
 ACPI_GLOBAL (ACPI_GPE_XRUPT_INFO *,     AcpiGbl_GpeXruptListHead);
 ACPI_GLOBAL (ACPI_GPE_BLOCK_INFO *,     AcpiGbl_GpeFadtBlocks[ACPI_MAX_GPE_BLOCKS]);
 ACPI_GLOBAL (ACPI_GBL_EVENT_HANDLER,    AcpiGbl_GlobalEventHandler);
 ACPI_GLOBAL (void *,                    AcpiGbl_GlobalEventHandlerContext);
 ACPI_GLOBAL (ACPI_FIXED_EVENT_HANDLER,  AcpiGbl_FixedEventHandlers[ACPI_NUM_FIXED_EVENTS]);
-
 extern ACPI_FIXED_EVENT_INFO            AcpiGbl_FixedEventInfo[ACPI_NUM_FIXED_EVENTS];
-
 #endif /* !ACPI_REDUCED_HARDWARE */
+
 
 /*****************************************************************************
  *
@@ -370,7 +401,7 @@ ACPI_GLOBAL (UINT32,                    AcpiGpeCount);
 ACPI_GLOBAL (UINT32,                    AcpiSciCount);
 ACPI_GLOBAL (UINT32,                    AcpiFixedEventCount[ACPI_NUM_FIXED_EVENTS]);
 
-/* Support for dynamic control method tracing mechanism */
+/* Dynamic control method tracing mechanism */
 
 ACPI_GLOBAL (UINT32,                    AcpiGbl_OriginalDbgLevel);
 ACPI_GLOBAL (UINT32,                    AcpiGbl_OriginalDbgLayer);
@@ -378,11 +409,12 @@ ACPI_GLOBAL (UINT32,                    AcpiGbl_OriginalDbgLayer);
 
 /*****************************************************************************
  *
- * Debugger and Disassembler globals
+ * Debugger and Disassembler
  *
  ****************************************************************************/
 
 ACPI_INIT_GLOBAL (UINT8,                AcpiGbl_DbOutputFlags, ACPI_DB_CONSOLE_OUTPUT);
+
 
 #ifdef ACPI_DISASSEMBLER
 
@@ -394,6 +426,8 @@ ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_CstyleDisassembly, TRUE);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_ForceAmlDisassembly, FALSE);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DmOpt_Verbose, TRUE);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DmEmitExternalOpcodes, FALSE);
+ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DoDisassemblerOptimizations, TRUE);
+ACPI_INIT_GLOBAL (ACPI_PARSE_OBJECT_LIST, *AcpiGbl_TempListHead, NULL);
 
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DmOpt_Disasm);
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DmOpt_Listing);
@@ -404,9 +438,7 @@ ACPI_GLOBAL (ACPI_EXTERNAL_FILE *,      AcpiGbl_ExternalFileList);
 #endif
 
 #ifdef ACPI_DEBUGGER
-
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_AbortMethod, FALSE);
-ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_MethodExecuting, FALSE);
 ACPI_INIT_GLOBAL (ACPI_THREAD_ID,       AcpiGbl_DbThreadId, ACPI_INVALID_THREAD_ID);
 
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DbOpt_NoIniMethods);
@@ -419,49 +451,75 @@ ACPI_GLOBAL (UINT32,                    AcpiGbl_DbConsoleDebugLevel);
 ACPI_GLOBAL (ACPI_NAMESPACE_NODE *,     AcpiGbl_DbScopeNode);
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DbTerminateLoop);
 ACPI_GLOBAL (BOOLEAN,                   AcpiGbl_DbThreadsTerminated);
-
 ACPI_GLOBAL (char *,                    AcpiGbl_DbArgs[ACPI_DEBUGGER_MAX_ARGS]);
 ACPI_GLOBAL (ACPI_OBJECT_TYPE,          AcpiGbl_DbArgTypes[ACPI_DEBUGGER_MAX_ARGS]);
 
 /* These buffers should all be the same size */
 
-ACPI_GLOBAL (char,                      AcpiGbl_DbLineBuf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL (char,                      AcpiGbl_DbParsedBuf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL (char,                      AcpiGbl_DbScopeBuf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL (char,                      AcpiGbl_DbDebugFilename[ACPI_DB_LINE_BUFFER_SIZE]);
 
-/*
- * Statistic globals
- */
+/* Statistics globals */
+
 ACPI_GLOBAL (UINT16,                    AcpiGbl_ObjTypeCount[ACPI_TOTAL_TYPES]);
 ACPI_GLOBAL (UINT16,                    AcpiGbl_NodeTypeCount[ACPI_TOTAL_TYPES]);
 ACPI_GLOBAL (UINT16,                    AcpiGbl_ObjTypeCountMisc);
 ACPI_GLOBAL (UINT16,                    AcpiGbl_NodeTypeCountMisc);
 ACPI_GLOBAL (UINT32,                    AcpiGbl_NumNodes);
 ACPI_GLOBAL (UINT32,                    AcpiGbl_NumObjects);
-
-ACPI_GLOBAL (ACPI_MUTEX,                AcpiGbl_DbCommandReady);
-ACPI_GLOBAL (ACPI_MUTEX,                AcpiGbl_DbCommandComplete);
-
 #endif /* ACPI_DEBUGGER */
 
 #if defined (ACPI_DISASSEMBLER) || defined (ACPI_ASL_COMPILER)
-
-ACPI_GLOBAL (const char,                *AcpiGbl_PldPanelList[]);
-ACPI_GLOBAL (const char,                *AcpiGbl_PldVerticalPositionList[]);
-ACPI_GLOBAL (const char,                *AcpiGbl_PldHorizontalPositionList[]);
-ACPI_GLOBAL (const char,                *AcpiGbl_PldShapeList[]);
-
+ACPI_GLOBAL (const char,               *AcpiGbl_PldPanelList[]);
+ACPI_GLOBAL (const char,               *AcpiGbl_PldVerticalPositionList[]);
+ACPI_GLOBAL (const char,               *AcpiGbl_PldHorizontalPositionList[]);
+ACPI_GLOBAL (const char,               *AcpiGbl_PldShapeList[]);
+ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DisasmFlag, FALSE);
 #endif
+
 
 /*****************************************************************************
  *
- * Application globals
+ * ACPICA application-specific globals
  *
  ****************************************************************************/
 
-#ifdef ACPI_APPLICATION
+/* ASL-to-ASL+ conversion utility (implemented within the iASL compiler) */
 
+#ifdef ACPI_ASL_COMPILER
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentInlineComment, NULL);
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentEndNodeComment, NULL);
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentOpenBraceComment, NULL);
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentCloseBraceComment, NULL);
+
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_RootFilename, NULL);
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentFilename, NULL);
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentParentFilename, NULL);
+ACPI_INIT_GLOBAL (char *,               AcpiGbl_CurrentIncludeFilename, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_DefBlkCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_DefBlkCommentListTail, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_RegCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_RegCommentListTail, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_IncCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_IncCommentListTail, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_EndBlkCommentListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_COMMENT_NODE,   *AcpiGbl_EndBlkCommentListTail, NULL);
+
+ACPI_INIT_GLOBAL (ACPI_COMMENT_ADDR_NODE, *AcpiGbl_CommentAddrListHead, NULL);
+ACPI_INIT_GLOBAL (ACPI_FILE_NODE,      *AcpiGbl_FileTreeRoot, NULL);
+
+ACPI_GLOBAL (ACPI_CACHE_T *,            AcpiGbl_RegCommentCache);
+ACPI_GLOBAL (ACPI_CACHE_T *,            AcpiGbl_CommentAddrCache);
+ACPI_GLOBAL (ACPI_CACHE_T *,            AcpiGbl_FileCache);
+
+ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DebugAslConversion, FALSE);
+ACPI_INIT_GLOBAL (ACPI_FILE,            AcpiGbl_ConvDebugFile, NULL);
+ACPI_GLOBAL (char,                      AcpiGbl_TableSig[4]);
+#endif
+
+#ifdef ACPI_APPLICATION
 ACPI_INIT_GLOBAL (ACPI_FILE,            AcpiGbl_DebugFile, NULL);
 ACPI_INIT_GLOBAL (ACPI_FILE,            AcpiGbl_OutputFile, NULL);
 ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DebugTimeout, FALSE);
@@ -470,18 +528,6 @@ ACPI_INIT_GLOBAL (BOOLEAN,              AcpiGbl_DebugTimeout, FALSE);
 
 ACPI_GLOBAL (ACPI_SPINLOCK,             AcpiGbl_PrintLock);     /* For print buffer */
 ACPI_GLOBAL (char,                      AcpiGbl_PrintBuffer[1024]);
-
 #endif /* ACPI_APPLICATION */
-
-
-/*****************************************************************************
- *
- * Info/help support
- *
- ****************************************************************************/
-
-extern const AH_PREDEFINED_NAME         AslPredefinedInfo[];
-extern const AH_DEVICE_ID               AslDeviceIds[];
-
 
 #endif /* __ACGLOBAL_H__ */

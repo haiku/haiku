@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -110,6 +110,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -435,6 +471,15 @@ AcpiRsGetAmlLength (
 
             break;
 
+        case ACPI_RESOURCE_TYPE_PIN_FUNCTION:
+
+            TotalSize = (ACPI_RS_LENGTH) (TotalSize +
+                (Resource->Data.PinFunction.PinTableLength * 2) +
+                Resource->Data.PinFunction.ResourceSource.StringLength +
+                Resource->Data.PinFunction.VendorLength);
+
+            break;
+
 
         case ACPI_RESOURCE_TYPE_SERIAL_BUS:
 
@@ -444,6 +489,42 @@ AcpiRsGetAmlLength (
             TotalSize = (ACPI_RS_LENGTH) (TotalSize +
                 Resource->Data.I2cSerialBus.ResourceSource.StringLength +
                 Resource->Data.I2cSerialBus.VendorLength);
+
+            break;
+
+        case ACPI_RESOURCE_TYPE_PIN_CONFIG:
+
+            TotalSize = (ACPI_RS_LENGTH) (TotalSize +
+                (Resource->Data.PinConfig.PinTableLength * 2) +
+                Resource->Data.PinConfig.ResourceSource.StringLength +
+                Resource->Data.PinConfig.VendorLength);
+
+            break;
+
+        case ACPI_RESOURCE_TYPE_PIN_GROUP:
+
+            TotalSize = (ACPI_RS_LENGTH) (TotalSize +
+                (Resource->Data.PinGroup.PinTableLength * 2) +
+                Resource->Data.PinGroup.ResourceLabel.StringLength +
+                Resource->Data.PinGroup.VendorLength);
+
+            break;
+
+        case ACPI_RESOURCE_TYPE_PIN_GROUP_FUNCTION:
+
+            TotalSize = (ACPI_RS_LENGTH) (TotalSize +
+                Resource->Data.PinGroupFunction.ResourceSource.StringLength +
+                Resource->Data.PinGroupFunction.ResourceSourceLabel.StringLength +
+                Resource->Data.PinGroupFunction.VendorLength);
+
+            break;
+
+        case ACPI_RESOURCE_TYPE_PIN_GROUP_CONFIG:
+
+            TotalSize = (ACPI_RS_LENGTH) (TotalSize +
+                Resource->Data.PinGroupConfig.ResourceSource.StringLength +
+                Resource->Data.PinGroupConfig.ResourceSourceLabel.StringLength +
+                Resource->Data.PinGroupConfig.VendorLength);
 
             break;
 
@@ -632,6 +713,26 @@ AcpiRsGetListLength (
             }
             break;
 
+        case ACPI_RESOURCE_NAME_PIN_FUNCTION:
+
+            /* Vendor data is optional */
+
+            if (AmlResource->PinFunction.VendorLength)
+            {
+                ExtraStructBytes +=
+                    AmlResource->PinFunction.VendorOffset -
+                    AmlResource->PinFunction.PinTableOffset +
+                    AmlResource->PinFunction.VendorLength;
+            }
+            else
+            {
+                ExtraStructBytes +=
+                    AmlResource->LargeHeader.ResourceLength +
+                    sizeof (AML_RESOURCE_LARGE_HEADER) -
+                    AmlResource->PinFunction.PinTableOffset;
+            }
+            break;
+
         case ACPI_RESOURCE_NAME_SERIAL_BUS:
 
             MinimumAmlResourceLength = AcpiGbl_ResourceAmlSerialBusSizes[
@@ -639,6 +740,53 @@ AcpiRsGetListLength (
             ExtraStructBytes +=
                 AmlResource->CommonSerialBus.ResourceLength -
                 MinimumAmlResourceLength;
+            break;
+
+        case ACPI_RESOURCE_NAME_PIN_CONFIG:
+
+            /* Vendor data is optional */
+
+            if (AmlResource->PinConfig.VendorLength)
+            {
+                ExtraStructBytes +=
+                    AmlResource->PinConfig.VendorOffset -
+                    AmlResource->PinConfig.PinTableOffset +
+                    AmlResource->PinConfig.VendorLength;
+            }
+            else
+            {
+                ExtraStructBytes +=
+                    AmlResource->LargeHeader.ResourceLength +
+                    sizeof (AML_RESOURCE_LARGE_HEADER) -
+                    AmlResource->PinConfig.PinTableOffset;
+            }
+            break;
+
+        case ACPI_RESOURCE_NAME_PIN_GROUP:
+
+            ExtraStructBytes +=
+                AmlResource->PinGroup.VendorOffset -
+                AmlResource->PinGroup.PinTableOffset +
+                AmlResource->PinGroup.VendorLength;
+
+            break;
+
+        case ACPI_RESOURCE_NAME_PIN_GROUP_FUNCTION:
+
+            ExtraStructBytes +=
+                AmlResource->PinGroupFunction.VendorOffset -
+                AmlResource->PinGroupFunction.ResSourceOffset +
+                AmlResource->PinGroupFunction.VendorLength;
+
+            break;
+
+        case ACPI_RESOURCE_NAME_PIN_GROUP_CONFIG:
+
+            ExtraStructBytes +=
+                AmlResource->PinGroupConfig.VendorOffset -
+                AmlResource->PinGroupConfig.ResSourceOffset +
+                AmlResource->PinGroupConfig.VendorLength;
+
             break;
 
         default:

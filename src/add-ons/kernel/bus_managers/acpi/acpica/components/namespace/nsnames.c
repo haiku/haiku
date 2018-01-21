@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
@@ -121,6 +157,12 @@
 
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nsnames")
+
+/* Local Prototypes */
+
+static void
+AcpiNsNormalizePathname (
+    char                    *OriginalPath);
 
 
 /*******************************************************************************
@@ -172,11 +214,70 @@ AcpiNsGetPathnameLength (
     ACPI_SIZE               Size;
 
 
-    ACPI_FUNCTION_ENTRY ();
+    /* Validate the Node */
 
+    if (ACPI_GET_DESCRIPTOR_TYPE (Node) != ACPI_DESC_TYPE_NAMED)
+    {
+        ACPI_ERROR ((AE_INFO,
+            "Invalid/cached reference target node: %p, descriptor type %d",
+            Node, ACPI_GET_DESCRIPTOR_TYPE (Node)));
+        return (0);
+    }
 
     Size = AcpiNsBuildNormalizedPath (Node, NULL, 0, FALSE);
     return (Size);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiNsHandleToName
+ *
+ * PARAMETERS:  TargetHandle            - Handle of named object whose name is
+ *                                        to be found
+ *              Buffer                  - Where the name is returned
+ *
+ * RETURN:      Status, Buffer is filled with name if status is AE_OK
+ *
+ * DESCRIPTION: Build and return a full namespace name
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiNsHandleToName (
+    ACPI_HANDLE             TargetHandle,
+    ACPI_BUFFER             *Buffer)
+{
+    ACPI_STATUS             Status;
+    ACPI_NAMESPACE_NODE     *Node;
+    const char              *NodeName;
+
+
+    ACPI_FUNCTION_TRACE_PTR (NsHandleToName, TargetHandle);
+
+
+    Node = AcpiNsValidateHandle (TargetHandle);
+    if (!Node)
+    {
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
+    }
+
+    /* Validate/Allocate/Clear caller buffer */
+
+    Status = AcpiUtInitializeBuffer (Buffer, ACPI_PATH_SEGMENT_LENGTH);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    /* Just copy the ACPI name from the Node and zero terminate it */
+
+    NodeName = AcpiUtGetNodeName (Node);
+    ACPI_MOVE_NAME (Buffer->Pointer, NodeName);
+    ((char *) Buffer->Pointer) [ACPI_NAME_SIZE] = 0;
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%4.4s\n", (char *) Buffer->Pointer));
+    return_ACPI_STATUS (AE_OK);
 }
 
 
@@ -236,10 +337,6 @@ AcpiNsHandleToPathname (
 
     (void) AcpiNsBuildNormalizedPath (Node, Buffer->Pointer,
         RequiredSize, NoTrailing);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%s [%X]\n",
         (char *) Buffer->Pointer, (UINT32) RequiredSize));
@@ -415,4 +512,170 @@ AcpiNsGetNormalizedPathname (
     (void) AcpiNsBuildNormalizedPath (Node, NameBuffer, Size, NoTrailing);
 
     return_PTR (NameBuffer);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiNsBuildPrefixedPathname
+ *
+ * PARAMETERS:  PrefixScope         - Scope/Path that prefixes the internal path
+ *              InternalPath        - Name or path of the namespace node
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Construct a fully qualified pathname from a concatenation of:
+ *              1) Path associated with the PrefixScope namespace node
+ *              2) External path representation of the Internal path
+ *
+ ******************************************************************************/
+
+char *
+AcpiNsBuildPrefixedPathname (
+    ACPI_GENERIC_STATE      *PrefixScope,
+    const char              *InternalPath)
+{
+    ACPI_STATUS             Status;
+    char                    *FullPath = NULL;
+    char                    *ExternalPath = NULL;
+    char                    *PrefixPath = NULL;
+    UINT32                  PrefixPathLength = 0;
+
+
+    /* If there is a prefix, get the pathname to it */
+
+    if (PrefixScope && PrefixScope->Scope.Node)
+    {
+        PrefixPath = AcpiNsGetNormalizedPathname (PrefixScope->Scope.Node, TRUE);
+        if (PrefixPath)
+        {
+            PrefixPathLength = strlen (PrefixPath);
+        }
+    }
+
+    Status = AcpiNsExternalizeName (ACPI_UINT32_MAX, InternalPath,
+        NULL, &ExternalPath);
+    if (ACPI_FAILURE (Status))
+    {
+        goto Cleanup;
+    }
+
+    /* Merge the prefix path and the path. 2 is for one dot and trailing null */
+
+    FullPath = ACPI_ALLOCATE_ZEROED (
+        PrefixPathLength + strlen (ExternalPath) + 2);
+    if (!FullPath)
+    {
+        goto Cleanup;
+    }
+
+    /* Don't merge if the External path is already fully qualified */
+
+    if (PrefixPath &&
+        (*ExternalPath != '\\') &&
+        (*ExternalPath != '^'))
+    {
+        strcat (FullPath, PrefixPath);
+        if (PrefixPath[1])
+        {
+            strcat (FullPath, ".");
+        }
+    }
+
+    AcpiNsNormalizePathname (ExternalPath);
+    strcat (FullPath, ExternalPath);
+
+Cleanup:
+    if (PrefixPath)
+    {
+        ACPI_FREE (PrefixPath);
+    }
+    if (ExternalPath)
+    {
+        ACPI_FREE (ExternalPath);
+    }
+
+    return (FullPath);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiNsNormalizePathname
+ *
+ * PARAMETERS:  OriginalPath        - Path to be normalized, in External format
+ *
+ * RETURN:      The original path is processed in-place
+ *
+ * DESCRIPTION: Remove trailing underscores from each element of a path.
+ *
+ *              For example:  \A___.B___.C___ becomes \A.B.C
+ *
+ ******************************************************************************/
+
+static void
+AcpiNsNormalizePathname (
+    char                    *OriginalPath)
+{
+    char                    *InputPath = OriginalPath;
+    char                    *NewPathBuffer;
+    char                    *NewPath;
+    UINT32                  i;
+
+
+    /* Allocate a temp buffer in which to construct the new path */
+
+    NewPathBuffer = ACPI_ALLOCATE_ZEROED (strlen (InputPath) + 1);
+    NewPath = NewPathBuffer;
+    if (!NewPathBuffer)
+    {
+        return;
+    }
+
+    /* Special characters may appear at the beginning of the path */
+
+    if (*InputPath == '\\')
+    {
+        *NewPath = *InputPath;
+        NewPath++;
+        InputPath++;
+    }
+
+    while (*InputPath == '^')
+    {
+        *NewPath = *InputPath;
+        NewPath++;
+        InputPath++;
+    }
+
+    /* Remainder of the path */
+
+    while (*InputPath)
+    {
+        /* Do one nameseg at a time */
+
+        for (i = 0; (i < ACPI_NAME_SIZE) && *InputPath; i++)
+        {
+            if ((i == 0) || (*InputPath != '_')) /* First char is allowed to be underscore */
+            {
+                *NewPath = *InputPath;
+                NewPath++;
+            }
+
+            InputPath++;
+        }
+
+        /* Dot means that there are more namesegs to come */
+
+        if (*InputPath == '.')
+        {
+            *NewPath = *InputPath;
+            NewPath++;
+            InputPath++;
+        }
+    }
+
+    *NewPath = 0;
+    strcpy (OriginalPath, NewPathBuffer);
+    ACPI_FREE (NewPathBuffer);
 }

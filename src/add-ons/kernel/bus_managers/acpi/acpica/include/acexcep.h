@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #ifndef __ACEXCEP_H__
@@ -201,8 +237,13 @@ typedef struct acpi_exception_info
 #define AE_NOT_CONFIGURED               EXCEP_ENV (0x001C)
 #define AE_ACCESS                       EXCEP_ENV (0x001D)
 #define AE_IO_ERROR                     EXCEP_ENV (0x001E)
+#define AE_NUMERIC_OVERFLOW             EXCEP_ENV (0x001F)
+#define AE_HEX_OVERFLOW                 EXCEP_ENV (0x0020)
+#define AE_DECIMAL_OVERFLOW             EXCEP_ENV (0x0021)
+#define AE_OCTAL_OVERFLOW               EXCEP_ENV (0x0022)
+#define AE_END_OF_TABLE                 EXCEP_ENV (0x0023)
 
-#define AE_CODE_ENV_MAX                 0x001E
+#define AE_CODE_ENV_MAX                 0x0023
 
 
 /*
@@ -269,7 +310,7 @@ typedef struct acpi_exception_info
 #define AE_AML_CIRCULAR_REFERENCE       EXCEP_AML (0x001E)
 #define AE_AML_BAD_RESOURCE_LENGTH      EXCEP_AML (0x001F)
 #define AE_AML_ILLEGAL_ADDRESS          EXCEP_AML (0x0020)
-#define AE_AML_INFINITE_LOOP            EXCEP_AML (0x0021)
+#define AE_AML_LOOP_TIMEOUT             EXCEP_AML (0x0021)
 #define AE_AML_UNINITIALIZED_NODE       EXCEP_AML (0x0022)
 #define AE_AML_TARGET_TYPE              EXCEP_AML (0x0023)
 
@@ -289,11 +330,10 @@ typedef struct acpi_exception_info
 #define AE_CTRL_TRANSFER                EXCEP_CTL (0x0008)
 #define AE_CTRL_BREAK                   EXCEP_CTL (0x0009)
 #define AE_CTRL_CONTINUE                EXCEP_CTL (0x000A)
-#define AE_CTRL_SKIP                    EXCEP_CTL (0x000B)
-#define AE_CTRL_PARSE_CONTINUE          EXCEP_CTL (0x000C)
-#define AE_CTRL_PARSE_PENDING           EXCEP_CTL (0x000D)
+#define AE_CTRL_PARSE_CONTINUE          EXCEP_CTL (0x000B)
+#define AE_CTRL_PARSE_PENDING           EXCEP_CTL (0x000C)
 
-#define AE_CODE_CTRL_MAX                0x000D
+#define AE_CODE_CTRL_MAX                0x000C
 
 
 /* Exception strings for AcpiFormatException */
@@ -336,7 +376,12 @@ static const ACPI_EXCEPTION_INFO    AcpiGbl_ExceptionNames_Env[] =
     EXCEP_TXT ("AE_OWNER_ID_LIMIT",             "There are no more Owner IDs available for ACPI tables or control methods"),
     EXCEP_TXT ("AE_NOT_CONFIGURED",             "The interface is not part of the current subsystem configuration"),
     EXCEP_TXT ("AE_ACCESS",                     "Permission denied for the requested operation"),
-    EXCEP_TXT ("AE_IO_ERROR",                   "An I/O error occurred")
+    EXCEP_TXT ("AE_IO_ERROR",                   "An I/O error occurred"),
+    EXCEP_TXT ("AE_NUMERIC_OVERFLOW",           "Overflow during string-to-integer conversion"),
+    EXCEP_TXT ("AE_HEX_OVERFLOW",               "Overflow during ASCII hex-to-binary conversion"),
+    EXCEP_TXT ("AE_DECIMAL_OVERFLOW",           "Overflow during ASCII decimal-to-binary conversion"),
+    EXCEP_TXT ("AE_OCTAL_OVERFLOW",             "Overflow during ASCII octal-to-binary conversion"),
+    EXCEP_TXT ("AE_END_OF_TABLE",               "Reached the end of table")
 };
 
 static const ACPI_EXCEPTION_INFO    AcpiGbl_ExceptionNames_Pgm[] =
@@ -398,7 +443,7 @@ static const ACPI_EXCEPTION_INFO    AcpiGbl_ExceptionNames_Aml[] =
     EXCEP_TXT ("AE_AML_CIRCULAR_REFERENCE",     "Two references refer to each other"),
     EXCEP_TXT ("AE_AML_BAD_RESOURCE_LENGTH",    "The length of a Resource Descriptor in the AML is incorrect"),
     EXCEP_TXT ("AE_AML_ILLEGAL_ADDRESS",        "A memory, I/O, or PCI configuration address is invalid"),
-    EXCEP_TXT ("AE_AML_INFINITE_LOOP",          "An apparent infinite AML While loop, method was aborted"),
+    EXCEP_TXT ("AE_AML_LOOP_TIMEOUT",           "An AML While loop exceeded the maximum execution time"),
     EXCEP_TXT ("AE_AML_UNINITIALIZED_NODE",     "A namespace node is uninitialized or unresolved"),
     EXCEP_TXT ("AE_AML_TARGET_TYPE",            "A target operand of an incorrect type was encountered")
 };
@@ -416,7 +461,6 @@ static const ACPI_EXCEPTION_INFO    AcpiGbl_ExceptionNames_Ctrl[] =
     EXCEP_TXT ("AE_CTRL_TRANSFER",              "Transfer control to called method"),
     EXCEP_TXT ("AE_CTRL_BREAK",                 "A Break has been executed"),
     EXCEP_TXT ("AE_CTRL_CONTINUE",              "A Continue has been executed"),
-    EXCEP_TXT ("AE_CTRL_SKIP",                  "Not currently used"),
     EXCEP_TXT ("AE_CTRL_PARSE_CONTINUE",        "Used to skip over bad opcodes"),
     EXCEP_TXT ("AE_CTRL_PARSE_PENDING",         "Used to implement AML While loops")
 };

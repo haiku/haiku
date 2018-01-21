@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #include "acpi.h"
@@ -136,10 +172,10 @@ AcpiExConvertToAscii (
  *
  * FUNCTION:    AcpiExConvertToInteger
  *
- * PARAMETERS:  ObjDesc         - Object to be converted. Must be an
- *                                Integer, Buffer, or String
- *              ResultDesc      - Where the new Integer object is returned
- *              Flags           - Used for string conversion
+ * PARAMETERS:  ObjDesc             - Object to be converted. Must be an
+ *                                    Integer, Buffer, or String
+ *              ResultDesc          - Where the new Integer object is returned
+ *              ImplicitConversion  - Used for string conversion
  *
  * RETURN:      Status
  *
@@ -151,14 +187,13 @@ ACPI_STATUS
 AcpiExConvertToInteger (
     ACPI_OPERAND_OBJECT     *ObjDesc,
     ACPI_OPERAND_OBJECT     **ResultDesc,
-    UINT32                  Flags)
+    UINT32                  ImplicitConversion)
 {
     ACPI_OPERAND_OBJECT     *ReturnDesc;
     UINT8                   *Pointer;
     UINT64                  Result;
     UINT32                  i;
     UINT32                  Count;
-    ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_TRACE_PTR (ExConvertToInteger, ObjDesc);
@@ -208,12 +243,17 @@ AcpiExConvertToInteger (
          * hexadecimal as per the ACPI specification. The only exception (as
          * of ACPI 3.0) is that the ToInteger() operator allows both decimal
          * and hexadecimal strings (hex prefixed with "0x").
+         *
+         * Explicit conversion is used only by ToInteger.
+         * All other string-to-integer conversions are implicit conversions.
          */
-        Status = AcpiUtStrtoul64 ((char *) Pointer, Flags,
-            AcpiGbl_IntegerByteWidth, &Result);
-        if (ACPI_FAILURE (Status))
+        if (ImplicitConversion)
         {
-            return_ACPI_STATUS (Status);
+            Result = AcpiUtImplicitStrtoul64 (ACPI_CAST_PTR (char, Pointer));
+        }
+        else
+        {
+            Result = AcpiUtExplicitStrtoul64 (ACPI_CAST_PTR (char, Pointer));
         }
         break;
 
@@ -717,7 +757,6 @@ AcpiExConvertToTargetType (
     switch (GET_CURRENT_ARG_TYPE (WalkState->OpInfo->RuntimeArgs))
     {
     case ARGI_SIMPLE_TARGET:
-    case ARGI_FIXED_TARGET:
     case ARGI_INTEGER_REF:      /* Handles Increment, Decrement cases */
 
         switch (DestinationType)
@@ -756,7 +795,8 @@ AcpiExConvertToTargetType (
              * These types require an Integer operand. We can convert
              * a Buffer or a String to an Integer if necessary.
              */
-            Status = AcpiExConvertToInteger (SourceDesc, ResultDesc, 16);
+            Status = AcpiExConvertToInteger (SourceDesc, ResultDesc,
+                ACPI_IMPLICIT_CONVERSION);
             break;
 
         case ACPI_TYPE_STRING:

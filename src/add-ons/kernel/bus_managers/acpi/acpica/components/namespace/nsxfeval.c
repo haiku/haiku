@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,6 +112,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #define EXPORT_ACPI_INTERFACES
@@ -138,11 +174,11 @@ AcpiNsResolveReferences (
  *
  * PARAMETERS:  Handle              - Object handle (optional)
  *              Pathname            - Object pathname (optional)
- *              ExternalParams      - List of parameters to pass to method,
+ *              ExternalParams      - List of parameters to pass to a method,
  *                                    terminated by NULL. May be NULL
  *                                    if no parameters are being passed.
- *              ReturnBuffer        - Where to put method's return value (if
- *                                    any). If NULL, no value is returned.
+ *              ReturnBuffer        - Where to put the object return value (if
+ *                                    any). Required.
  *              ReturnType          - Expected type of return object
  *
  * RETURN:      Status
@@ -163,6 +199,8 @@ AcpiEvaluateObjectTyped (
 {
     ACPI_STATUS             Status;
     BOOLEAN                 FreeBufferOnError = FALSE;
+    ACPI_HANDLE             TargetHandle;
+    char                    *FullPathname;
 
 
     ACPI_FUNCTION_TRACE (AcpiEvaluateObjectTyped);
@@ -180,41 +218,62 @@ AcpiEvaluateObjectTyped (
         FreeBufferOnError = TRUE;
     }
 
-    /* Evaluate the object */
+    /* Get a handle here, in order to build an error message if needed */
 
-    Status = AcpiEvaluateObject (Handle, Pathname,
-        ExternalParams, ReturnBuffer);
-    if (ACPI_FAILURE (Status))
+    TargetHandle = Handle;
+    if (Pathname)
     {
-        return_ACPI_STATUS (Status);
+        Status = AcpiGetHandle (Handle, Pathname, &TargetHandle);
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
     }
 
-    /* Type ANY means "don't care" */
+    FullPathname = AcpiNsGetExternalPathname (TargetHandle);
+    if (!FullPathname)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    /* Evaluate the object */
+
+    Status = AcpiEvaluateObject (TargetHandle, NULL, ExternalParams,
+        ReturnBuffer);
+    if (ACPI_FAILURE (Status))
+    {
+        goto Exit;
+    }
+
+    /* Type ANY means "don't care about return value type" */
 
     if (ReturnType == ACPI_TYPE_ANY)
     {
-        return_ACPI_STATUS (AE_OK);
+        goto Exit;
     }
 
     if (ReturnBuffer->Length == 0)
     {
         /* Error because caller specifically asked for a return value */
 
-        ACPI_ERROR ((AE_INFO, "No return value"));
-        return_ACPI_STATUS (AE_NULL_OBJECT);
+        ACPI_ERROR ((AE_INFO, "%s did not return any object",
+            FullPathname));
+        Status = AE_NULL_OBJECT;
+        goto Exit;
     }
 
     /* Examine the object type returned from EvaluateObject */
 
     if (((ACPI_OBJECT *) ReturnBuffer->Pointer)->Type == ReturnType)
     {
-        return_ACPI_STATUS (AE_OK);
+        goto Exit;
     }
 
     /* Return object type does not match requested type */
 
     ACPI_ERROR ((AE_INFO,
-        "Incorrect return type [%s] requested [%s]",
+        "Incorrect return type from %s - received [%s], requested [%s]",
+        FullPathname,
         AcpiUtGetTypeName (((ACPI_OBJECT *) ReturnBuffer->Pointer)->Type),
         AcpiUtGetTypeName (ReturnType)));
 
@@ -232,7 +291,11 @@ AcpiEvaluateObjectTyped (
     }
 
     ReturnBuffer->Length = 0;
-    return_ACPI_STATUS (AE_TYPE);
+    Status = AE_TYPE;
+
+Exit:
+    ACPI_FREE (FullPathname);
+    return_ACPI_STATUS (Status);
 }
 
 ACPI_EXPORT_SYMBOL (AcpiEvaluateObjectTyped)

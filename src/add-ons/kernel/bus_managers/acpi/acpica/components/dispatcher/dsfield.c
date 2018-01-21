@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -110,6 +110,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -277,6 +313,8 @@ AcpiDsCreateBufferField (
 
         if (!(WalkState->ParseFlags & ACPI_PARSE_EXECUTE))
         {
+            ACPI_ERROR ((AE_INFO,
+                "Parse execute mode is not set"));
             return_ACPI_STATUS (AE_AML_INTERNAL);
         }
 
@@ -302,7 +340,8 @@ AcpiDsCreateBufferField (
             ACPI_IMODE_LOAD_PASS1, Flags, WalkState, &Node);
         if (ACPI_FAILURE (Status))
         {
-            ACPI_ERROR_NAMESPACE (Arg->Common.Value.String, Status);
+            ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+                Arg->Common.Value.String, Status);
             return_ACPI_STATUS (Status);
         }
     }
@@ -486,7 +525,8 @@ AcpiDsGetFieldNames (
                     WalkState, &Info->ConnectionNode);
                 if (ACPI_FAILURE (Status))
                 {
-                    ACPI_ERROR_NAMESPACE (Child->Common.Value.Name, Status);
+                    ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+                        Child->Common.Value.Name, Status);
                     return_ACPI_STATUS (Status);
                 }
             }
@@ -502,7 +542,8 @@ AcpiDsGetFieldNames (
                 WalkState, &Info->FieldNode);
             if (ACPI_FAILURE (Status))
             {
-                ACPI_ERROR_NAMESPACE ((char *) &Arg->Named.Name, Status);
+                ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+                    (char *) &Arg->Named.Name, Status);
                 return_ACPI_STATUS (Status);
             }
             else
@@ -601,7 +642,8 @@ AcpiDsCreateField (
 #endif
         if (ACPI_FAILURE (Status))
         {
-            ACPI_ERROR_NAMESPACE (Arg->Common.Value.Name, Status);
+            ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+                Arg->Common.Value.Name, Status);
             return_ACPI_STATUS (Status);
         }
     }
@@ -665,6 +707,8 @@ AcpiDsInitFieldObjects (
             return_ACPI_STATUS (AE_OK);
         }
 
+        ACPI_ERROR ((AE_INFO,
+            "Parse deferred mode is not set"));
         return_ACPI_STATUS (AE_AML_INTERNAL);
     }
 
@@ -729,7 +773,8 @@ AcpiDsInitFieldObjects (
                 Flags, WalkState, &Node);
             if (ACPI_FAILURE (Status))
             {
-                ACPI_ERROR_NAMESPACE ((char *) &Arg->Named.Name, Status);
+                ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+                    (char *) &Arg->Named.Name, Status);
                 if (Status != AE_ALREADY_EXISTS)
                 {
                     return_ACPI_STATUS (Status);
@@ -794,7 +839,8 @@ AcpiDsCreateBankField (
 #endif
         if (ACPI_FAILURE (Status))
         {
-            ACPI_ERROR_NAMESPACE (Arg->Common.Value.Name, Status);
+            ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+                Arg->Common.Value.Name, Status);
             return_ACPI_STATUS (Status);
         }
     }
@@ -807,7 +853,8 @@ AcpiDsCreateBankField (
         ACPI_NS_SEARCH_PARENT, WalkState, &Info.RegisterNode);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_ERROR_NAMESPACE (Arg->Common.Value.String, Status);
+        ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+            Arg->Common.Value.String, Status);
         return_ACPI_STATUS (Status);
     }
 
@@ -880,7 +927,8 @@ AcpiDsCreateIndexField (
         ACPI_NS_SEARCH_PARENT, WalkState, &Info.RegisterNode);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_ERROR_NAMESPACE (Arg->Common.Value.String, Status);
+        ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+            Arg->Common.Value.String, Status);
         return_ACPI_STATUS (Status);
     }
 
@@ -892,7 +940,8 @@ AcpiDsCreateIndexField (
         ACPI_NS_SEARCH_PARENT, WalkState, &Info.DataRegisterNode);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_ERROR_NAMESPACE (Arg->Common.Value.String, Status);
+        ACPI_ERROR_NAMESPACE (WalkState->ScopeInfo,
+            Arg->Common.Value.String, Status);
         return_ACPI_STATUS (Status);
     }
 

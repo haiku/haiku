@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #define EXPORT_ACPI_INTERFACES
@@ -211,84 +247,14 @@ AcpiRead (
     UINT64                  *ReturnValue,
     ACPI_GENERIC_ADDRESS    *Reg)
 {
-    UINT32                  ValueLo;
-    UINT32                  ValueHi;
-    UINT32                  Width;
-    UINT64                  Address;
     ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_NAME (AcpiRead);
 
 
-    if (!ReturnValue)
-    {
-        return (AE_BAD_PARAMETER);
-    }
-
-    /* Validate contents of the GAS register. Allow 64-bit transfers */
-
-    Status = AcpiHwValidateRegister (Reg, 64, &Address);
-    if (ACPI_FAILURE (Status))
-    {
-        return (Status);
-    }
-
-    /*
-     * Two address spaces supported: Memory or I/O. PCI_Config is
-     * not supported here because the GAS structure is insufficient
-     */
-    if (Reg->SpaceId == ACPI_ADR_SPACE_SYSTEM_MEMORY)
-    {
-        Status = AcpiOsReadMemory ((ACPI_PHYSICAL_ADDRESS)
-            Address, ReturnValue, Reg->BitWidth);
-        if (ACPI_FAILURE (Status))
-        {
-            return (Status);
-        }
-    }
-    else /* ACPI_ADR_SPACE_SYSTEM_IO, validated earlier */
-    {
-        ValueLo = 0;
-        ValueHi = 0;
-
-        Width = Reg->BitWidth;
-        if (Width == 64)
-        {
-            Width = 32; /* Break into two 32-bit transfers */
-        }
-
-        Status = AcpiHwReadPort ((ACPI_IO_ADDRESS)
-            Address, &ValueLo, Width);
-        if (ACPI_FAILURE (Status))
-        {
-            return (Status);
-        }
-
-        if (Reg->BitWidth == 64)
-        {
-            /* Read the top 32 bits */
-
-            Status = AcpiHwReadPort ((ACPI_IO_ADDRESS)
-                (Address + 4), &ValueHi, 32);
-            if (ACPI_FAILURE (Status))
-            {
-                return (Status);
-            }
-        }
-
-        /* Set the return value only if status is AE_OK */
-
-        *ReturnValue = (ValueLo | ((UINT64) ValueHi << 32));
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_IO,
-        "Read:  %8.8X%8.8X width %2d from %8.8X%8.8X (%s)\n",
-        ACPI_FORMAT_UINT64 (*ReturnValue), Reg->BitWidth,
-        ACPI_FORMAT_UINT64 (Address),
-        AcpiUtGetRegionName (Reg->SpaceId)));
-
-    return (AE_OK);
+    Status = AcpiHwRead (ReturnValue, Reg);
+    return (Status);
 }
 
 ACPI_EXPORT_SYMBOL (AcpiRead)
@@ -312,67 +278,13 @@ AcpiWrite (
     UINT64                  Value,
     ACPI_GENERIC_ADDRESS    *Reg)
 {
-    UINT32                  Width;
-    UINT64                  Address;
     ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_NAME (AcpiWrite);
 
 
-    /* Validate contents of the GAS register. Allow 64-bit transfers */
-
-    Status = AcpiHwValidateRegister (Reg, 64, &Address);
-    if (ACPI_FAILURE (Status))
-    {
-        return (Status);
-    }
-
-    /*
-     * Two address spaces supported: Memory or IO. PCI_Config is
-     * not supported here because the GAS structure is insufficient
-     */
-    if (Reg->SpaceId == ACPI_ADR_SPACE_SYSTEM_MEMORY)
-    {
-        Status = AcpiOsWriteMemory ((ACPI_PHYSICAL_ADDRESS)
-            Address, Value, Reg->BitWidth);
-        if (ACPI_FAILURE (Status))
-        {
-            return (Status);
-        }
-    }
-    else /* ACPI_ADR_SPACE_SYSTEM_IO, validated earlier */
-    {
-        Width = Reg->BitWidth;
-        if (Width == 64)
-        {
-            Width = 32; /* Break into two 32-bit transfers */
-        }
-
-        Status = AcpiHwWritePort ((ACPI_IO_ADDRESS)
-            Address, ACPI_LODWORD (Value), Width);
-        if (ACPI_FAILURE (Status))
-        {
-            return (Status);
-        }
-
-        if (Reg->BitWidth == 64)
-        {
-            Status = AcpiHwWritePort ((ACPI_IO_ADDRESS)
-                (Address + 4), ACPI_HIDWORD (Value), 32);
-            if (ACPI_FAILURE (Status))
-            {
-                return (Status);
-            }
-        }
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_IO,
-        "Wrote: %8.8X%8.8X width %2d   to %8.8X%8.8X (%s)\n",
-        ACPI_FORMAT_UINT64 (Value), Reg->BitWidth,
-        ACPI_FORMAT_UINT64 (Address),
-        AcpiUtGetRegionName (Reg->SpaceId)));
-
+    Status = AcpiHwWrite (Value, Reg);
     return (Status);
 }
 

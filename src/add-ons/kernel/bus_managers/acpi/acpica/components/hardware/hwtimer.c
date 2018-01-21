@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -111,6 +111,42 @@
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
  *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
  *****************************************************************************/
 
 #define EXPORT_ACPI_INTERFACES
@@ -179,6 +215,7 @@ AcpiGetTimer (
     UINT32                  *Ticks)
 {
     ACPI_STATUS             Status;
+    UINT64                  TimerValue;
 
 
     ACPI_FUNCTION_TRACE (AcpiGetTimer);
@@ -196,7 +233,14 @@ AcpiGetTimer (
         return_ACPI_STATUS (AE_SUPPORT);
     }
 
-    Status = AcpiHwRead (Ticks, &AcpiGbl_FADT.XPmTimerBlock);
+    Status = AcpiHwRead (&TimerValue, &AcpiGbl_FADT.XPmTimerBlock);
+    if (ACPI_SUCCESS (Status))
+    {
+        /* ACPI PM Timer is defined to be 32 bits (PM_TMR_LEN) */
+
+        *Ticks = (UINT32) TimerValue;
+    }
+
     return_ACPI_STATUS (Status);
 }
 
@@ -239,7 +283,7 @@ AcpiGetTimerDuration (
     UINT32                  *TimeElapsed)
 {
     ACPI_STATUS             Status;
-    UINT32                  DeltaTicks;
+    UINT64                  DeltaTicks;
     UINT64                  Quotient;
 
 
@@ -258,34 +302,33 @@ AcpiGetTimerDuration (
         return_ACPI_STATUS (AE_SUPPORT);
     }
 
+    if (StartTicks == EndTicks)
+    {
+        *TimeElapsed = 0;
+        return_ACPI_STATUS (AE_OK);
+    }
+
     /*
      * Compute Tick Delta:
      * Handle (max one) timer rollovers on 24-bit versus 32-bit timers.
      */
-    if (StartTicks < EndTicks)
-    {
-        DeltaTicks = EndTicks - StartTicks;
-    }
-    else if (StartTicks > EndTicks)
+    DeltaTicks = EndTicks;
+    if (StartTicks > EndTicks)
     {
         if ((AcpiGbl_FADT.Flags & ACPI_FADT_32BIT_TIMER) == 0)
         {
             /* 24-bit Timer */
 
-            DeltaTicks = (((0x00FFFFFF - StartTicks) + EndTicks) & 0x00FFFFFF);
+            DeltaTicks |= (UINT64) 1 << 24;
         }
         else
         {
             /* 32-bit Timer */
 
-            DeltaTicks = (0xFFFFFFFF - StartTicks) + EndTicks;
+            DeltaTicks |= (UINT64) 1 << 32;
         }
     }
-    else /* StartTicks == EndTicks */
-    {
-        *TimeElapsed = 0;
-        return_ACPI_STATUS (AE_OK);
-    }
+    DeltaTicks -= StartTicks;
 
     /*
      * Compute Duration (Requires a 64-bit multiply and divide):
@@ -293,7 +336,7 @@ AcpiGetTimerDuration (
      * TimeElapsed (microseconds) =
      *  (DeltaTicks * ACPI_USEC_PER_SEC) / ACPI_PM_TIMER_FREQUENCY;
      */
-    Status = AcpiUtShortDivide (((UINT64) DeltaTicks) * ACPI_USEC_PER_SEC,
+    Status = AcpiUtShortDivide (DeltaTicks * ACPI_USEC_PER_SEC,
                 ACPI_PM_TIMER_FREQUENCY, &Quotient, NULL);
 
     *TimeElapsed = (UINT32) Quotient;

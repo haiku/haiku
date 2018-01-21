@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -110,6 +110,42 @@
  * United States government or any agency thereof requires an export license,
  * other governmental approval, or letter of assurance, without first obtaining
  * such license, approval or letter.
+ *
+ *****************************************************************************
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * following license:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions, and the following disclaimer,
+ *    without modification.
+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
+ *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    ("Disclaimer") and any redistribution must be conditioned upon
+ *    including a substantially similar Disclaimer requirement for further
+ *    binary redistribution.
+ * 3. Neither the names of the above-listed copyright holders nor the names
+ *    of any contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Alternatively, you may choose to be licensed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
  *
  *****************************************************************************/
 
@@ -398,6 +434,13 @@ typedef union acpi_resource_attribute
     UINT8                           TypeSpecific;
 
 } ACPI_RESOURCE_ATTRIBUTE;
+
+typedef struct acpi_resource_label
+{
+    UINT16                          StringLength;
+    char                            *StringPtr;
+
+} ACPI_RESOURCE_LABEL;
 
 typedef struct acpi_resource_source
 {
@@ -689,6 +732,90 @@ typedef struct acpi_resource_uart_serialbus
 #define ACPI_UART_CLEAR_TO_SEND                 (1<<6)
 #define ACPI_UART_REQUEST_TO_SEND               (1<<7)
 
+typedef struct acpi_resource_pin_function
+{
+    UINT8                           RevisionId;
+    UINT8                           PinConfig;
+    UINT8                           Sharable;           /* For values, see Interrupt Attributes above */
+    UINT16                          FunctionNumber;
+    UINT16                          PinTableLength;
+    UINT16                          VendorLength;
+    ACPI_RESOURCE_SOURCE            ResourceSource;
+    UINT16                          *PinTable;
+    UINT8                           *VendorData;
+
+} ACPI_RESOURCE_PIN_FUNCTION;
+
+typedef struct acpi_resource_pin_config
+{
+    UINT8                           RevisionId;
+    UINT8                           ProducerConsumer;   /* For values, see Producer/Consumer above */
+    UINT8                           Sharable;           /* For values, see Interrupt Attributes above */
+    UINT8                           PinConfigType;
+    UINT32                          PinConfigValue;
+    UINT16                          PinTableLength;
+    UINT16                          VendorLength;
+    ACPI_RESOURCE_SOURCE            ResourceSource;
+    UINT16                          *PinTable;
+    UINT8                           *VendorData;
+
+} ACPI_RESOURCE_PIN_CONFIG;
+
+/* Values for PinConfigType field above */
+
+#define ACPI_PIN_CONFIG_DEFAULT                 0
+#define ACPI_PIN_CONFIG_BIAS_PULL_UP            1
+#define ACPI_PIN_CONFIG_BIAS_PULL_DOWN          2
+#define ACPI_PIN_CONFIG_BIAS_DEFAULT            3
+#define ACPI_PIN_CONFIG_BIAS_DISABLE            4
+#define ACPI_PIN_CONFIG_BIAS_HIGH_IMPEDANCE     5
+#define ACPI_PIN_CONFIG_BIAS_BUS_HOLD           6
+#define ACPI_PIN_CONFIG_DRIVE_OPEN_DRAIN        7
+#define ACPI_PIN_CONFIG_DRIVE_OPEN_SOURCE       8
+#define ACPI_PIN_CONFIG_DRIVE_PUSH_PULL         9
+#define ACPI_PIN_CONFIG_DRIVE_STRENGTH          10
+#define ACPI_PIN_CONFIG_SLEW_RATE               11
+#define ACPI_PIN_CONFIG_INPUT_DEBOUNCE          12
+#define ACPI_PIN_CONFIG_INPUT_SCHMITT_TRIGGER   13
+
+typedef struct acpi_resource_pin_group
+{
+    UINT8                           RevisionId;
+    UINT8                           ProducerConsumer;   /* For values, see Producer/Consumer above */
+    UINT16                          PinTableLength;
+    UINT16                          VendorLength;
+    UINT16                          *PinTable;
+    ACPI_RESOURCE_LABEL             ResourceLabel;
+    UINT8                           *VendorData;
+
+} ACPI_RESOURCE_PIN_GROUP;
+
+typedef struct acpi_resource_pin_group_function
+{
+    UINT8                           RevisionId;
+    UINT8                           ProducerConsumer;   /* For values, see Producer/Consumer above */
+    UINT8                           Sharable;           /* For values, see Interrupt Attributes above */
+    UINT16                          FunctionNumber;
+    UINT16                          VendorLength;
+    ACPI_RESOURCE_SOURCE            ResourceSource;
+    ACPI_RESOURCE_LABEL             ResourceSourceLabel;
+    UINT8                           *VendorData;
+
+} ACPI_RESOURCE_PIN_GROUP_FUNCTION;
+
+typedef struct acpi_resource_pin_group_config
+{
+    UINT8                           RevisionId;
+    UINT8                           ProducerConsumer;   /* For values, see Producer/Consumer above */
+    UINT8                           Sharable;           /* For values, see Interrupt Attributes above */
+    UINT8                           PinConfigType;      /* For values, see PinConfigType above */
+    UINT32                          PinConfigValue;
+    UINT16                          VendorLength;
+    ACPI_RESOURCE_SOURCE            ResourceSource;
+    ACPI_RESOURCE_LABEL             ResourceSourceLabel;
+    UINT8                           *VendorData;
+
+} ACPI_RESOURCE_PIN_GROUP_CONFIG;
 
 /* ACPI_RESOURCE_TYPEs */
 
@@ -712,7 +839,12 @@ typedef struct acpi_resource_uart_serialbus
 #define ACPI_RESOURCE_TYPE_GPIO                 17  /* ACPI 5.0 */
 #define ACPI_RESOURCE_TYPE_FIXED_DMA            18  /* ACPI 5.0 */
 #define ACPI_RESOURCE_TYPE_SERIAL_BUS           19  /* ACPI 5.0 */
-#define ACPI_RESOURCE_TYPE_MAX                  19
+#define ACPI_RESOURCE_TYPE_PIN_FUNCTION         20  /* ACPI 6.2 */
+#define ACPI_RESOURCE_TYPE_PIN_CONFIG           21  /* ACPI 6.2 */
+#define ACPI_RESOURCE_TYPE_PIN_GROUP            22  /* ACPI 6.2 */
+#define ACPI_RESOURCE_TYPE_PIN_GROUP_FUNCTION   23  /* ACPI 6.2 */
+#define ACPI_RESOURCE_TYPE_PIN_GROUP_CONFIG     24  /* ACPI 6.2 */
+#define ACPI_RESOURCE_TYPE_MAX                  24
 
 /* Master union for resource descriptors */
 
@@ -741,6 +873,11 @@ typedef union acpi_resource_data
     ACPI_RESOURCE_SPI_SERIALBUS             SpiSerialBus;
     ACPI_RESOURCE_UART_SERIALBUS            UartSerialBus;
     ACPI_RESOURCE_COMMON_SERIALBUS          CommonSerialBus;
+    ACPI_RESOURCE_PIN_FUNCTION              PinFunction;
+    ACPI_RESOURCE_PIN_CONFIG                PinConfig;
+    ACPI_RESOURCE_PIN_GROUP                 PinGroup;
+    ACPI_RESOURCE_PIN_GROUP_FUNCTION        PinGroupFunction;
+    ACPI_RESOURCE_PIN_GROUP_CONFIG          PinGroupConfig;
 
     /* Common fields */
 

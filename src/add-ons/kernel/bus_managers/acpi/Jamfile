@@ -17,6 +17,7 @@ local dispatcher_src =
 	dsmthdat.c
 	dsobject.c
 	dsopcode.c
+	dspkginit.c
 	dsutils.c
 	dswexec.c
 	dswload.c
@@ -180,6 +181,8 @@ local utilities_src =
 	utresrc.c
 	utstate.c
 	utstring.c
+	utstrsuppt.c
+	utstrtoul64.c
 	uttrack.c
 	utuuid.c
 	utxface.c
