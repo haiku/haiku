@@ -51,6 +51,8 @@ SimpleTest port_wakeup_test_9 : port_wakeup_test_9.cpp ;
 
 SimpleTest mmap_resize_test : mmap_resize_test.cpp ;
 
+SimpleTest null_poll_test : null_poll_test.cpp ;
+
 SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
 
 SimpleTest select_check : select_check.cpp ;
