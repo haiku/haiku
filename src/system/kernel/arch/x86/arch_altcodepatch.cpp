@@ -11,7 +11,9 @@
 
 #include <KernelExport.h>
 
+#include <elf.h>
 #include <kernel.h>
+#include <vm_defs.h>
 
 
 
@@ -29,18 +31,27 @@ extern altcodepatch altcodepatch_end;
 void
 arch_altcodepatch_replace(uint16 tag, void* newcodepatch, size_t length)
 {
-	uint32	count = 0;
+	uint32 count = 0;
+
+	// we need to write to the text area
+	struct elf_image_info* info = elf_get_kernel_image();
+	uint32 kernelProtection =  B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA;
+	set_area_protection(info->text_region.id, kernelProtection | B_KERNEL_WRITE_AREA);
 
 	for (altcodepatch *patch = &altcodepatch_begin; patch < &altcodepatch_end;
 		patch++) {
 		if (patch->tag != tag)
 			continue;
-		addr_t address = KERNEL_LOAD_BASE + patch->kernel_offset;
+		void* address = (void*)(KERNEL_LOAD_BASE + patch->kernel_offset);
 		if (patch->length < length)
 			panic("can't copy patch: new code is too long\n");
-		memcpy((void*)address, newcodepatch, length);
+		memcpy(address, newcodepatch, length);
 		count++;
 	}
+
+	// disable write after patch
+	set_area_protection(info->text_region.id, kernelProtection);
+
 	dprintf("arch_altcodepatch_replace found %d altcodepatches\n", count);
 }
 
