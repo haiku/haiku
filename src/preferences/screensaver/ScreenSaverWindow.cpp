@@ -5,6 +5,7 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Filip Maryjański, widelec@morphos.pl
  *		Puck Meerburg, puck@puckipedia.nl
  *		Michael Phipps
  *		John Scipione, jscipione@gmail.com
@@ -34,6 +35,7 @@
 #include <LayoutBuilder.h>
 #include <ListItem.h>
 #include <ListView.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <Rect.h>
 #include <Roster.h>
@@ -171,6 +173,9 @@ private:
 
 			void				_CloseSaver();
 			void				_OpenSaver();
+			void				_AddNewScreenSaverToList(const char* name,
+								BPath* path);
+			void				_RemoveScreenSaverFromList(const char* name);
 
 private:
 		ScreenSaverSettings&	fSettings;
@@ -599,6 +604,8 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 
 ModulesView::~ModulesView()
 {
+	stop_watching(this);
+
 	delete fTestButton;
 	delete fSettingsBox;
 	delete fPreviewView;
@@ -691,6 +698,46 @@ ModulesView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_NODE_MONITOR:
+		{
+			switch (message->GetInt32("opcode", 0)) {
+				case B_ENTRY_CREATED:
+				{
+					const char* name;
+					node_ref nodeRef;
+
+					message->FindString("name", &name);
+					message->FindInt32("device", &nodeRef.device);
+					message->FindInt64("directory", &nodeRef.node);
+
+					BDirectory dir(&nodeRef);
+
+					if (dir.InitCheck() == B_OK) {
+						BPath path(&dir);
+						_AddNewScreenSaverToList(name, &path);
+					}
+					break;
+				}
+
+
+				case B_ENTRY_MOVED:
+				case B_ENTRY_REMOVED:
+				{
+					const char* name;
+
+					message->FindString("name", &name);
+					_RemoveScreenSaverFromList(name);
+
+					break;
+				}
+
+				default:
+					// ignore any other operations
+					break;
+			}
+			break;
+		}
+
 		case B_SOME_APP_QUIT:
 		{
 			team_id team;
@@ -757,6 +804,11 @@ ModulesView::PopulateScreenSaverList()
 
 		BDirectory dir(basePath.Path());
 		BEntry entry;
+		node_ref nodeRef;
+
+		dir.GetNodeRef(&nodeRef);
+		watch_node(&nodeRef, B_WATCH_DIRECTORY, this);
+
 		while (dir.GetNextEntry(&entry, true) == B_OK) {
 			char name[B_FILE_NAME_LENGTH];
 			if (entry.GetName(name) != B_OK)
@@ -879,6 +931,59 @@ ModulesView::_OpenSaver()
 					? B_TRANSLATE("No options available")
 					: B_TRANSLATE("Could not load screen saver"));
 	}
+}
+
+
+void
+ModulesView::_AddNewScreenSaverToList(const char* name, BPath* path)
+{
+	int32 oldSelected = fScreenSaversListView->CurrentSelection();
+	ScreenSaverItem* selectedItem = (ScreenSaverItem*)fScreenSaversListView->ItemAt(
+		oldSelected);
+
+	path->Append(name);
+	fScreenSaversListView->AddItem(new ScreenSaverItem(name, path->Path()));
+	fScreenSaversListView->SortItems(_CompareScreenSaverItems);
+
+	if (selectedItem != NULL) {
+		fScreenSaversListView->Select(fScreenSaversListView->IndexOf(
+			selectedItem));
+		fScreenSaversListView->ScrollToSelection();
+	}
+}
+
+
+void
+ModulesView::_RemoveScreenSaverFromList(const char* name)
+{
+	int32 oldSelected = fScreenSaversListView->CurrentSelection();
+	ScreenSaverItem* selectedItem = (ScreenSaverItem*)fScreenSaversListView->ItemAt(
+		oldSelected);
+
+	if (strcasecmp(selectedItem->Text(), name) == 0) {
+		fScreenSaversListView->RemoveItem(selectedItem);
+		fScreenSaversListView->SortItems(_CompareScreenSaverItems);
+		fScreenSaversListView->Select(0);
+		fScreenSaversListView->ScrollToSelection();
+		return;
+	}
+
+	for (int i = 0, max = fScreenSaversListView->CountItems(); i < max; i++) {
+		ScreenSaverItem* item = (ScreenSaverItem*)fScreenSaversListView->ItemAt(
+			i);
+
+		if (strcasecmp(item->Text(), name) == 0) {
+			fScreenSaversListView->RemoveItem(item);
+			delete item;
+			break;
+		}
+	}
+
+	fScreenSaversListView->SortItems(_CompareScreenSaverItems);
+
+	oldSelected = fScreenSaversListView->IndexOf(selectedItem);
+	fScreenSaversListView->Select(oldSelected);
+	fScreenSaversListView->ScrollToSelection();
 }
 
 
