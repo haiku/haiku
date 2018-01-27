@@ -6402,7 +6402,7 @@ _user_map_file(const char* userName, void** userAddress, uint32 addressSpec,
 			return B_BAD_VALUE;
 		}
 		if (!IS_USER_ADDRESS(address)
-				|| !IS_USER_ADDRESS((addr_t)address + size)) {
+				|| !IS_USER_ADDRESS((addr_t)address + size - 1)) {
 			return B_BAD_ADDRESS;
 		}
 	}
