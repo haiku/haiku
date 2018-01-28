@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -669,6 +669,10 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 			fPopulatedPackages.Add(package);
 	}
 
+	if ((flags & POPULATE_CHANGELOG) != 0) {
+		_PopulatePackageChangelog(package);
+	}
+
 	if ((flags & POPULATE_USER_RATINGS) != 0) {
 		// Retrieve info from web-app
 		BMessage info;
@@ -746,8 +750,8 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 							comment, languageCode, versionString, 0, 0)
 					);
 				}
-			} else if (info.FindMessage("error", &result) == B_OK) {
-				result.PrintToStream();
+			} else {
+				_MaybeLogJsonRpcError(info, "retrieve user ratings");
 			}
 		}
 	}
@@ -763,6 +767,48 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 			const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
 			_PopulatePackageScreenshot(package, info, 320, false);
 		}
+	}
+}
+
+
+void
+Model::_PopulatePackageChangelog(const PackageInfoRef& package)
+{
+	BMessage info;
+	BString packageName;
+
+	{
+		BAutolock locker(&fLock);
+		packageName = package->Name();
+	}
+
+	status_t status = fWebAppInterface.GetChangelog(packageName, info);
+
+	if (status == B_OK) {
+		// Parse message
+		BMessage result;
+		BString content;
+		if (info.FindMessage("result", &result) == B_OK) {
+			if (result.FindString("content", &content) == B_OK
+				&& 0 != content.Length()) {
+				BAutolock locker(&fLock);
+				package->SetChangelog(content);
+				if (Logger::IsDebugEnabled()) {
+					fprintf(stdout, "changelog populated for [%s]\n",
+						packageName.String());
+				}
+			} else {
+				if (Logger::IsDebugEnabled()) {
+					fprintf(stdout, "no changelog present for [%s]\n",
+						packageName.String());
+				}
+			}
+		} else {
+			_MaybeLogJsonRpcError(info, "populate package changelog");
+		}
+	} else {
+		fprintf(stdout, "unable to obtain the changelog for the package"
+			"[%s]\n", packageName.String());
 	}
 }
 
@@ -1079,5 +1125,25 @@ Model::LogDepotsWithNoWebAppRepositoryCode() const
 			printf(" correlates with no repository in the haiku"
 				"depot server system\n");
 		}
+	}
+}
+
+
+void
+Model::_MaybeLogJsonRpcError(const BMessage &responsePayload,
+	const char *sourceDescription) const
+{
+	BMessage error;
+	BString errorMessage;
+	double errorCode;
+
+	if (responsePayload.FindMessage("error", &error) == B_OK
+		&& error.FindString("message", &errorMessage) == B_OK
+		&& error.FindDouble("code", &errorCode) == B_OK) {
+		printf("[%s] --> error : [%s] (%f)\n", sourceDescription,
+			errorMessage.String(), errorCode);
+
+	} else {
+		printf("[%s] --> an undefined error has occurred\n", sourceDescription);
 	}
 }

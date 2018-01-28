@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -193,9 +193,16 @@ public:
 			void				LogDepotsWithNoWebAppRepositoryCode() const;
 
 private:
+			void				_MaybeLogJsonRpcError(
+									const BMessage &responsePayload,
+									const char *sourceDescription) const;
+
 			void				_UpdateIsFeaturedFilter();
 
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
+
+			void				_PopulatePackageChangelog(
+									const PackageInfoRef& package);
 
 			void				_PopulatePackageScreenshot(
 									const PackageInfoRef& package,

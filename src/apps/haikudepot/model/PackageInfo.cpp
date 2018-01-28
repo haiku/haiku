@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -1064,7 +1064,8 @@ DepotInfo::AddPackage(const PackageInfoRef& package)
 }
 
 
-static int32 PackageFixedNameCompare(const void* context,
+static int32
+PackageFixedNameCompare(const void* context,
 	const PackageInfoRef& package)
 {
 	const BString* packageName = static_cast<const BString*>(context);

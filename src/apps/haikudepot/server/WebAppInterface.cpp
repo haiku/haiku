@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -315,81 +315,15 @@ WebAppInterface::SetPreferredLanguage(const BString& language)
 
 
 status_t
-WebAppInterface::RetrieveRepositoriesForSourceBaseURLs(
-	const StringList& repositorySourceBaseURLs,
-	BMessage& message)
+WebAppInterface::GetChangelog(const BString& packageName, BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
 		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "searchRepositories")
+		.AddValue("method", "getPkgChangelog")
 		.AddArray("params")
 			.AddObject()
-				.AddArray("repositorySourceSearchUrls")
-					.AddStrings(repositorySourceBaseURLs)
-				.EndArray()
-				.AddValue("offset", 0)
-				.AddValue("limit", 1000) // effectively a safety limit
-			.EndObject()
-		.EndArray()
-	.End();
-
-	return _SendJsonRequest("repository", jsonString, 0, message);
-}
-
-
-status_t
-WebAppInterface::RetrievePackageInfo(const BString& packageName,
-	const BString& architecture, const BString& repositoryCode,
-	BMessage& message)
-{
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "getPkg")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("name", packageName)
-				.AddValue("architectureCode", architecture)
-				.AddValue("naturalLanguageCode", fLanguage)
-				.AddValue("repositoryCode", repositoryCode)
-				.AddValue("versionType", "NONE")
-			.EndObject()
-		.EndArray()
-	.End();
-
-	return _SendJsonRequest("pkg", jsonString, 0, message);
-}
-
-
-status_t
-WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
-	const StringList& packageArchitectures,
-	const StringList& repositoryCodes, BMessage& message)
-{
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "getBulkPkg")
-		.AddArray("params")
-			.AddObject()
-				.AddArray("pkgNames")
-					.AddStrings(packageNames)
-				.EndArray()
-				.AddArray("architectureCodes")
-					.AddStrings(packageArchitectures)
-				.EndArray()
-				.AddArray("repositoryCodes")
-					.AddStrings(repositoryCodes)
-				.EndArray()
-				.AddValue("naturalLanguageCode", fLanguage)
-				.AddValue("versionType", "LATEST")
-				.AddArray("filter")
-					.AddItem("PKGCATEGORIES")
-					.AddItem("PKGSCREENSHOTS")
-					.AddItem("PKGVERSIONLOCALIZATIONDESCRIPTIONS")
-					.AddItem("PKGCHANGELOG")
-				.EndArray()
+				.AddValue("pkgName", packageName)
 			.EndObject()
 		.EndArray()
 	.End();
