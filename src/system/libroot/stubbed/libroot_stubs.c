@@ -1244,6 +1244,7 @@ void __tgammal() {}
 void __times() {}
 void __times_beos() {}
 void __tls_get_addr() {}
+void ___tls_get_addr() {}
 void __trunc() {}
 void __truncf() {}
 void __truncl() {}
