@@ -133,5 +133,7 @@ requires {
 	lib:libsupc++
 	lib:libz
 	noto
+#ifdef HAIKU_REGULAR_BUILD
 	noto_sans_cjk_jp
+#endif
 }
