@@ -20,6 +20,8 @@ BootstrapPackageRepository HaikuPortsCross
 	binutils_bootstrap-2.17_2013_04_21-3
 	bison_bootstrap-2.4.3-1
 	coreutils_bootstrap-8.22-1
+	curl_bootstrap-7.40.0-1
+	curl_bootstrap_devel-7.40.0-1
 	expat_bootstrap-2.1.0-1
 	expat_bootstrap_devel-2.1.0-1
 	findutils_bootstrap-4.6.0-1
@@ -30,6 +32,7 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap-2.14-1
 	icu_bootstrap-57.1-2
 	icu_bootstrap_devel-57.1-2
+	less_bootstrap-451-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-4.1-2
 	ncurses6_bootstrap-6.0-1
@@ -68,6 +71,7 @@ BootstrapPackageRepository HaikuPortsCross
 	binutils_bootstrap
 	bison_bootstrap
 	coreutils_bootstrap
+	curl_bootstrap
 	expat_bootstrap
 	findutils_bootstrap
 	flex_bootstrap
@@ -75,6 +79,7 @@ BootstrapPackageRepository HaikuPortsCross
 	gawk_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
+	less_bootstrap
 	libsolv_bootstrap
 	m4_bootstrap
 	make_bootstrap
