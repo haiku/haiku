@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src system glue ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
 		UsePrivateSystemHeaders ;
 
 		local sources =
@@ -10,11 +12,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			start_dyn.c
 			haiku_version_glue.c
 			;
-		Objects $(sources) ;
+		MergeObject <$(architecture)>glue_common.o : $(sources) ;
 
 		if $(HAIKU_BUILD_TYPE) = bootstrap {
 			# build a version for stage0 of the bootstrap process
-			BootstrapStage0PlatformObjects $(sources) : true ;
+			BootstrapStage0PlatformObjects [ FGristFiles $(sources) ] : true ;
 		}
 	}
 }

@@ -3,17 +3,19 @@ SubDir HAIKU_TOP src system glue arch m68k ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup m68k ] {
 	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
 		UsePrivateSystemHeaders ;
 
 		local sources =
 			crti.S
 			crtn.S
 			;
-		Objects $(sources) ;
+		MergeObject <$(architecture)>glue_arch_$(TARGET_ARCH).o : $(sources) ;
 
 		if $(HAIKU_BUILD_TYPE) = bootstrap {
 			# build a version for stage0 of the bootstrap process
-			BootstrapStage0PlatformObjects $(sources) : true ;
+			BootstrapStage0PlatformObjects [ FGristFiles $(sources) ] : true ;
 		}
 	}
 }
