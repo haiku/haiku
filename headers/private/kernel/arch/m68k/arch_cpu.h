@@ -18,6 +18,10 @@
 #define CACHE_LINE_SIZE		16
 
 
+#define set_ac()
+#define clear_ac()
+
+
 #define SR_IP_MASK 0x0700
 #define SR_S 0x2000
 #define M68K_SR_S 13

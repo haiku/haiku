@@ -16,6 +16,10 @@
 	// 128 Byte lines on PPC970
 
 
+#define set_ac()
+#define clear_ac()
+
+
 struct iframe {
 	uint32 vector;
 	uint32 srr0;

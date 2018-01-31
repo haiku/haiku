@@ -11,6 +11,10 @@
 	// TODO: Could be 32-bits sometimes?
 
 
+#define set_ac()
+#define clear_ac()
+
+
 #ifndef _ASSEMBLER
 
 #include <arch/arm/arch_thread_types.h>
