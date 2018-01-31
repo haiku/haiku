@@ -168,20 +168,20 @@ rule ArchitectureSetup architecture
 	# library and executable glue code
 	local commonGlueCode =
 		<src!system!glue!$(architecture)>init_term_dyn.o
-		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
-		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
+		<src!system!glue!arch!$(cpu)!$(architecture)>crti.o
+		<src!system!glue!arch!$(cpu)!$(architecture)>crtn.o
 		;
 	HAIKU_LIBRARY_BEGIN_GLUE_CODE_$(architecture) =
-		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
+		<src!system!glue!arch!$(cpu)!$(architecture)>crti.o
 		<$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
 		;
 	HAIKU_LIBRARY_END_GLUE_CODE_$(architecture) =
 		<$(architecture)>crtendS.o
-		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
+		<src!system!glue!arch!$(cpu)!$(architecture)>crtn.o
 		;
 	HAIKU_EXECUTABLE_BEGIN_GLUE_CODE_$(architecture) =
-		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
+		<src!system!glue!arch!$(cpu)!$(architecture)>crti.o
 		<$(architecture)>crtbeginS.o
 		<src!system!glue!$(architecture)>start_dyn.o
 		<src!system!glue!$(architecture)>init_term_dyn.o
