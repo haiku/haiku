@@ -265,23 +265,19 @@ apic_init(kernel_args *args)
 	if (args->arch_args.apic == NULL)
 		return B_NO_INIT;
 
-	if (x86_check_feature(IA32_FEATURE_EXT_X2APIC, FEATURE_EXT)) {
+	uint64 apic_base = x86_read_msr(IA32_MSR_APIC_BASE);
+
+	if (x86_check_feature(IA32_FEATURE_EXT_X2APIC, FEATURE_EXT)
+		&& (x86_check_feature(IA32_FEATURE_EXT_HYPERVISOR, FEATURE_EXT)
+			|| ((apic_base & IA32_MSR_APIC_BASE_X2APIC) != 0))) {
 		dprintf("found x2apic\n");
-#if 0
-		if (!get_safemode_boolean(B_SAFEMODE_DISABLE_X2APIC, false)) {
+
+		if (get_safemode_boolean(B_SAFEMODE_DISABLE_X2APIC, false)) {
+			dprintf("x2apic disabled per safemode setting\n");
+		} else {
 			sX2APIC = true;
 			return B_OK;
 		}
-
-		dprintf("x2apic disabled per safemode setting\n");
-#else
-		if (get_safemode_boolean(B_SAFEMODE_ENABLE_X2APIC, false)) {
-			sX2APIC = true;
-
-			dprintf("x2apic enabled per safemode setting\n");
-			return B_OK;
-		}
-#endif
 	}
 
 	sLocalAPIC = args->arch_args.apic;

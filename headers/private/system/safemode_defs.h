@@ -11,7 +11,7 @@
 #define B_SAFEMODE_DISABLE_IOAPIC			"disable_ioapic"
 #define B_SAFEMODE_DISABLE_ACPI				"disable_acpi"
 #define B_SAFEMODE_DISABLE_APIC				"disable_apic"
-#define B_SAFEMODE_ENABLE_X2APIC			"enable_x2apic"
+#define B_SAFEMODE_DISABLE_X2APIC			"disable_x2apic"
 #define B_SAFEMODE_DISABLE_SMEP_SMAP		"disable_smep_smap"
 #define B_SAFEMODE_DISABLE_APM				"disable_apm"
 #define B_SAFEMODE_DISABLE_SMP				"disable_smp"

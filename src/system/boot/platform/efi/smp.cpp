@@ -397,17 +397,10 @@ smp_add_safemode_menus(Menu *menu)
 		cpuid_info info;
 		if (get_current_cpuid(&info, 1, 0) == B_OK
 				&& (info.regs.ecx & IA32_FEATURE_EXT_X2APIC) != 0) {
-#if 0
 			menu->AddItem(item = new(nothrow) MenuItem("Disable X2APIC"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			item->SetData(B_SAFEMODE_DISABLE_X2APIC);
 			item->SetHelpText("Disables using X2APIC.");
-#else
-			menu->AddItem(item = new(nothrow) MenuItem("Enable X2APIC"));
-			item->SetType(MENU_ITEM_MARKABLE);
-			item->SetData(B_SAFEMODE_ENABLE_X2APIC);
-			item->SetHelpText("Enables using X2APIC.");
-#endif
 		}
 
 		if (get_current_cpuid(&info, 7, 0) == B_OK
