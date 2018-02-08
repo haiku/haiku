@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <kernel.h>
+
+
 //#define TRACE_USB_RAW
 #ifdef TRACE_USB_RAW
 #define TRACE(x)	dprintf x
@@ -267,94 +270,107 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 	if (device->device == 0)
 		return B_DEV_NOT_READY;
 
-	usb_raw_command *command = (usb_raw_command *)buffer;
-	if (length < sizeof(command->version.status))
+	usb_raw_command command;
+	if (length < sizeof(command.version.status))
 		return B_BUFFER_OVERFLOW;
+	if (!IS_USER_ADDRESS(buffer)
+		|| user_memcpy(&command, buffer, min_c(length, sizeof(command)))
+			!= B_OK) {
+		return B_BAD_ADDRESS;
+	}
 
-	command->version.status = B_USB_RAW_STATUS_ABORTED;
+	command.version.status = B_USB_RAW_STATUS_ABORTED;
+	status_t status = B_DEV_INVALID_IOCTL;
 
 	switch (op) {
 		case B_USB_RAW_COMMAND_GET_VERSION:
 		{
-			command->version.status = B_USB_RAW_PROTOCOL_VERSION;
-			return B_OK;
+			command.version.status = B_USB_RAW_PROTOCOL_VERSION;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_DEVICE_DESCRIPTOR:
 		{
-			if (length < sizeof(command->device))
+			if (length < sizeof(command.device))
 				return B_BUFFER_OVERFLOW;
 
 			const usb_device_descriptor *deviceDescriptor =
 				gUSBModule->get_device_descriptor(device->device);
-			if (!deviceDescriptor)
+			if (deviceDescriptor == NULL)
 				return B_OK;
 
-			if (user_memcpy(command->device.descriptor, deviceDescriptor,
+			if (!IS_USER_ADDRESS(command.device.descriptor)
+				|| user_memcpy(command.device.descriptor, deviceDescriptor,
 					sizeof(usb_device_descriptor)) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
-			command->device.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.device.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR:
 		{
-			if (length < sizeof(command->config))
+			if (length < sizeof(command.config))
 				return B_BUFFER_OVERFLOW;
 
 			const usb_configuration_info *configurationInfo =
-				usb_raw_get_configuration(device, command->config.config_index,
-					&command->config.status);
+				usb_raw_get_configuration(device, command.config.config_index,
+					&command.config.status);
 			if (configurationInfo == NULL)
 				return B_OK;
 
-			if (user_memcpy(command->config.descriptor,
+			if (!IS_USER_ADDRESS(command.config.descriptor)
+				|| user_memcpy(command.config.descriptor,
 					configurationInfo->descr,
 					sizeof(usb_configuration_descriptor)) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
-			command->config.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.config.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT:
 		case B_USB_RAW_COMMAND_GET_ACTIVE_ALT_INTERFACE_INDEX:
 		{
-			if (length < sizeof(command->alternate))
+			if (length < sizeof(command.alternate))
 				return B_BUFFER_OVERFLOW;
 
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device,
-					command->alternate.config_index,
-					&command->alternate.status);
+					command.alternate.config_index,
+					&command.alternate.status);
 			if (configurationInfo == NULL)
 				return B_OK;
 
-			if (command->alternate.interface_index
+			if (command.alternate.interface_index
 				>= configurationInfo->interface_count) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
+				command.alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+				status = B_OK;
+				break;
 			}
 
 			const usb_interface_list *interfaceList
 				= &configurationInfo->interface[
-					command->alternate.interface_index];
+					command.alternate.interface_index];
 			if (op == B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT) {
-				command->alternate.alternate_info = interfaceList->alt_count;
+				command.alternate.alternate_info = interfaceList->alt_count;
 			} else {
 				for (size_t i = 0; i < interfaceList->alt_count; i++) {
 					if (&interfaceList->alt[i] == interfaceList->active) {
-						command->alternate.alternate_info = i;
+						command.alternate.alternate_info = i;
 						break;
 					}
 				}
 			}
 
-			command->alternate.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.alternate.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR:
@@ -362,35 +378,37 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		{
 			const usb_interface_info *interfaceInfo = NULL;
 			if (op == B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR) {
-				if (length < sizeof(command->interface))
+				if (length < sizeof(command.interface))
 					return B_BUFFER_OVERFLOW;
 
 				interfaceInfo = usb_raw_get_interface(device,
-					command->interface.config_index,
-					command->interface.interface_index,
+					command.interface.config_index,
+					command.interface.interface_index,
 					B_USB_RAW_ACTIVE_ALTERNATE,
-					&command->interface.status);
+					&command.interface.status);
 			} else {
-				if (length < sizeof(command->interface_etc))
+				if (length < sizeof(command.interface_etc))
 					return B_BUFFER_OVERFLOW;
 
 				interfaceInfo = usb_raw_get_interface(device,
-					command->interface_etc.config_index,
-					command->interface_etc.interface_index,
-					command->interface_etc.alternate_index,
-					&command->interface_etc.status);
+					command.interface_etc.config_index,
+					command.interface_etc.interface_index,
+					command.interface_etc.alternate_index,
+					&command.interface_etc.status);
 			}
 
 			if (interfaceInfo == NULL)
 				return B_OK;
 
-			if (user_memcpy(command->interface.descriptor, interfaceInfo->descr,
+			if (!IS_USER_ADDRESS(command.interface.descriptor)
+				|| user_memcpy(command.interface.descriptor, interfaceInfo->descr,
 					sizeof(usb_interface_descriptor)) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
-			command->interface.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.interface.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR:
@@ -399,43 +417,46 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			uint32 endpointIndex = 0;
 			const usb_interface_info *interfaceInfo = NULL;
 			if (op == B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR) {
-				if (length < sizeof(command->endpoint))
+				if (length < sizeof(command.endpoint))
 					return B_BUFFER_OVERFLOW;
 
 				interfaceInfo = usb_raw_get_interface(device,
-					command->endpoint.config_index,
-					command->endpoint.interface_index,
+					command.endpoint.config_index,
+					command.endpoint.interface_index,
 					B_USB_RAW_ACTIVE_ALTERNATE,
-					&command->endpoint.status);
-				endpointIndex = command->endpoint.endpoint_index;
+					&command.endpoint.status);
+				endpointIndex = command.endpoint.endpoint_index;
 			} else {
-				if (length < sizeof(command->endpoint_etc))
+				if (length < sizeof(command.endpoint_etc))
 					return B_BUFFER_OVERFLOW;
 
 				interfaceInfo = usb_raw_get_interface(device,
-					command->endpoint_etc.config_index,
-					command->endpoint_etc.interface_index,
-					command->endpoint_etc.alternate_index,
-					&command->endpoint_etc.status);
-				endpointIndex = command->endpoint_etc.endpoint_index;
+					command.endpoint_etc.config_index,
+					command.endpoint_etc.interface_index,
+					command.endpoint_etc.alternate_index,
+					&command.endpoint_etc.status);
+				endpointIndex = command.endpoint_etc.endpoint_index;
 			}
 
-			if (!interfaceInfo)
+			if (interfaceInfo == NULL)
 				return B_OK;
 
 			if (endpointIndex >= interfaceInfo->endpoint_count) {
-				command->endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				return B_OK;
+				command.endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
+				status = B_OK;
+				break;
 			}
 
-			if (user_memcpy(command->endpoint.descriptor,
+			if (!IS_USER_ADDRESS(command.endpoint.descriptor)
+				|| user_memcpy(command.endpoint.descriptor,
 					interfaceInfo->endpoint[endpointIndex].descr,
 					sizeof(usb_endpoint_descriptor)) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
-			command->endpoint.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.endpoint.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR:
@@ -445,287 +466,352 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			size_t genericLength = 0;
 			const usb_interface_info *interfaceInfo = NULL;
 			if (op == B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR) {
-				if (length < sizeof(command->generic))
+				if (length < sizeof(command.generic))
 					return B_BUFFER_OVERFLOW;
 
 				interfaceInfo = usb_raw_get_interface(device,
-					command->generic.config_index,
-					command->generic.interface_index,
+					command.generic.config_index,
+					command.generic.interface_index,
 					B_USB_RAW_ACTIVE_ALTERNATE,
-					&command->generic.status);
-				genericIndex = command->generic.generic_index;
-				genericLength = command->generic.length;
+					&command.generic.status);
+				genericIndex = command.generic.generic_index;
+				genericLength = command.generic.length;
 			} else {
-				if (length < sizeof(command->generic_etc))
+				if (length < sizeof(command.generic_etc))
 					return B_BUFFER_OVERFLOW;
 
 				interfaceInfo = usb_raw_get_interface(device,
-					command->generic_etc.config_index,
-					command->generic_etc.interface_index,
-					command->generic_etc.alternate_index,
-					&command->generic_etc.status);
-				genericIndex = command->generic_etc.generic_index;
-				genericLength = command->generic_etc.length;
+					command.generic_etc.config_index,
+					command.generic_etc.interface_index,
+					command.generic_etc.alternate_index,
+					&command.generic_etc.status);
+				genericIndex = command.generic_etc.generic_index;
+				genericLength = command.generic_etc.length;
 			}
 
-			if (!interfaceInfo)
+			if (interfaceInfo == NULL)
 				return B_OK;
 
 			if (genericIndex >= interfaceInfo->generic_count) {
-				command->endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				return B_OK;
+				command.endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
+				status = B_OK;
+				break;
 			}
 
 			usb_descriptor *descriptor = interfaceInfo->generic[genericIndex];
-			if (!descriptor)
+			if (descriptor == NULL)
 				return B_OK;
 
-			if (user_memcpy(command->generic.descriptor, descriptor,
+			if (!IS_USER_ADDRESS(command.generic.descriptor)
+				|| user_memcpy(command.generic.descriptor, descriptor,
 					min_c(genericLength, descriptor->generic.length)) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
 			if (descriptor->generic.length > genericLength)
-				command->generic.status = B_USB_RAW_STATUS_NO_MEMORY;
+				command.generic.status = B_USB_RAW_STATUS_NO_MEMORY;
 			else
-				command->generic.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+				command.generic.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_STRING_DESCRIPTOR:
 		{
-			if (length < sizeof(command->string))
+			if (length < sizeof(command.string))
 				return B_BUFFER_OVERFLOW;
 
 			size_t actualLength = 0;
 			uint8 firstTwoBytes[2];
 
 			if (gUSBModule->get_descriptor(device->device,
-				USB_DESCRIPTOR_STRING, command->string.string_index, 0,
+				USB_DESCRIPTOR_STRING, command.string.string_index, 0,
 				firstTwoBytes, 2, &actualLength) < B_OK
 				|| actualLength != 2
 				|| firstTwoBytes[1] != USB_DESCRIPTOR_STRING) {
-				command->string.status = B_USB_RAW_STATUS_ABORTED;
-				command->string.length = 0;
+				command.string.status = B_USB_RAW_STATUS_ABORTED;
+				command.string.length = 0;
 				return B_OK;
 			}
 
-			uint8 stringLength = MIN(firstTwoBytes[0], command->string.length);
+			uint8 stringLength = MIN(firstTwoBytes[0], command.string.length);
 			char *string = (char *)malloc(stringLength);
-			if (!string) {
-				command->string.status = B_USB_RAW_STATUS_ABORTED;
-				command->string.length = 0;
+			if (string == NULL) {
+				command.string.status = B_USB_RAW_STATUS_ABORTED;
+				command.string.length = 0;
 				return B_NO_MEMORY;
 			}
 
 			if (gUSBModule->get_descriptor(device->device,
-				USB_DESCRIPTOR_STRING, command->string.string_index, 0,
+				USB_DESCRIPTOR_STRING, command.string.string_index, 0,
 				string, stringLength, &actualLength) < B_OK
 				|| actualLength != stringLength) {
-				command->string.status = B_USB_RAW_STATUS_ABORTED;
-				command->string.length = 0;
+				command.string.status = B_USB_RAW_STATUS_ABORTED;
+				command.string.length = 0;
 				free(string);
-				return B_OK;
+				status = B_OK;
+				break;
 			}
 
-			if (user_memcpy(command->string.descriptor, string,
+			if (!IS_USER_ADDRESS(command.string.descriptor)
+				|| user_memcpy(command.string.descriptor, string,
 					stringLength) != B_OK) {
+				free(string);
 				return B_BAD_ADDRESS;
 			}
 
-			command->string.status = B_USB_RAW_STATUS_SUCCESS;
-			command->string.length = stringLength;
+			command.string.status = B_USB_RAW_STATUS_SUCCESS;
+			command.string.length = stringLength;
 			free(string);
-			return B_OK;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_GET_DESCRIPTOR:
 		{
-			if (length < sizeof(command->descriptor))
+			if (length < sizeof(command.descriptor))
 				return B_BUFFER_OVERFLOW;
 
 			size_t actualLength = 0;
 			uint8 firstTwoBytes[2];
 
 			if (gUSBModule->get_descriptor(device->device,
-				command->descriptor.type, command->descriptor.index,
-				command->descriptor.language_id, firstTwoBytes, 2,
+				command.descriptor.type, command.descriptor.index,
+				command.descriptor.language_id, firstTwoBytes, 2,
 				&actualLength) < B_OK
 				|| actualLength != 2
-				|| firstTwoBytes[1] != command->descriptor.type) {
-				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
-				command->descriptor.length = 0;
-				return B_OK;
+				|| firstTwoBytes[1] != command.descriptor.type) {
+				command.descriptor.status = B_USB_RAW_STATUS_ABORTED;
+				command.descriptor.length = 0;
+				status = B_OK;
+				break;
 			}
 
 			uint8 descriptorLength = MIN(firstTwoBytes[0],
-				command->descriptor.length);
+				command.descriptor.length);
 			uint8 *descriptorBuffer = (uint8 *)malloc(descriptorLength);
 			if (descriptorBuffer == NULL) {
-				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
-				command->descriptor.length = 0;
-				return B_NO_MEMORY;
+				command.descriptor.status = B_USB_RAW_STATUS_ABORTED;
+				command.descriptor.length = 0;
+				status = B_NO_MEMORY;
+				break;
 			}
 
 			if (gUSBModule->get_descriptor(device->device,
-				command->descriptor.type, command->descriptor.index,
-				command->descriptor.language_id, descriptorBuffer,
+				command.descriptor.type, command.descriptor.index,
+				command.descriptor.language_id, descriptorBuffer,
 				descriptorLength, &actualLength) < B_OK
 				|| actualLength != descriptorLength) {
-				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
-				command->descriptor.length = 0;
+				command.descriptor.status = B_USB_RAW_STATUS_ABORTED;
+				command.descriptor.length = 0;
 				free(descriptorBuffer);
-				return B_OK;
+				status = B_OK;
+				break;
 			}
 
-			if (user_memcpy(command->descriptor.data, descriptorBuffer,
+			if (!IS_USER_ADDRESS(command.descriptor.data)
+				|| user_memcpy(command.descriptor.data, descriptorBuffer,
 					descriptorLength) != B_OK) {
+				free(descriptorBuffer);
 				return B_BAD_ADDRESS;
 			}
 
-			command->descriptor.status = B_USB_RAW_STATUS_SUCCESS;
-			command->descriptor.length = descriptorLength;
+			command.descriptor.status = B_USB_RAW_STATUS_SUCCESS;
+			command.descriptor.length = descriptorLength;
 			free(descriptorBuffer);
-			return B_OK;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_SET_CONFIGURATION:
 		{
-			if (length < sizeof(command->config))
+			if (length < sizeof(command.config))
 				return B_BUFFER_OVERFLOW;
 
 			const usb_configuration_info *configurationInfo =
-				usb_raw_get_configuration(device, command->config.config_index,
-					&command->config.status);
+				usb_raw_get_configuration(device, command.config.config_index,
+					&command.config.status);
 			if (configurationInfo == NULL)
 				return B_OK;
 
 			if (gUSBModule->set_configuration(device->device,
 				configurationInfo) < B_OK) {
-				command->config.status = B_USB_RAW_STATUS_FAILED;
-				return B_OK;
+				command.config.status = B_USB_RAW_STATUS_FAILED;
+				status = B_OK;
+				break;
 			}
 
-			command->config.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.config.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_SET_ALT_INTERFACE:
 		{
-			if (length < sizeof(command->alternate))
+			if (length < sizeof(command.alternate))
 				return B_BUFFER_OVERFLOW;
 
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device,
-					command->alternate.config_index,
-					&command->alternate.status);
+					command.alternate.config_index,
+					&command.alternate.status);
 			if (configurationInfo == NULL)
 				return B_OK;
 
-			if (command->alternate.interface_index
+			if (command.alternate.interface_index
 				>= configurationInfo->interface_count) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
+				command.alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+				status = B_OK;
+				break;
 			}
 
 			const usb_interface_list *interfaceList =
-				&configurationInfo->interface[command->alternate.interface_index];
-			if (command->alternate.alternate_info >= interfaceList->alt_count) {
-				command->alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
+				&configurationInfo->interface[command.alternate.interface_index];
+			if (command.alternate.alternate_info >= interfaceList->alt_count) {
+				command.alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+				status = B_OK;
+				break;
 			}
 
 			if (gUSBModule->set_alt_interface(device->device,
-				&interfaceList->alt[command->alternate.alternate_info]) < B_OK) {
-				command->alternate.status = B_USB_RAW_STATUS_FAILED;
-				return B_OK;
+				&interfaceList->alt[command.alternate.alternate_info]) < B_OK) {
+				command.alternate.status = B_USB_RAW_STATUS_FAILED;
+				status = B_OK;
+				break;
 			}
 
-			command->alternate.status = B_USB_RAW_STATUS_SUCCESS;
-			return B_OK;
+			command.alternate.status = B_USB_RAW_STATUS_SUCCESS;
+			status = B_OK;
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_CONTROL_TRANSFER:
 		{
-			if (length < sizeof(command->control))
+			if (length < sizeof(command.control))
 				return B_BUFFER_OVERFLOW;
+
+			void *controlData = malloc(command.control.length);
+			bool inTransfer = (command.control.request_type
+				& USB_ENDPOINT_ADDR_DIR_IN) != 0;
+			if (!IS_USER_ADDRESS(command.control.data)
+				|| (!inTransfer && user_memcpy(controlData,
+					command.control.data, command.control.length) != B_OK)) {
+				return B_BAD_ADDRESS;
+			}
 
 			mutex_lock(&device->lock);
 			if (gUSBModule->queue_request(device->device,
-				command->control.request_type, command->control.request,
-				command->control.value, command->control.index,
-				command->control.length, command->control.data,
+				command.control.request_type, command.control.request,
+				command.control.value, command.control.index,
+				command.control.length, controlData,
 				usb_raw_callback, device) < B_OK) {
-				command->control.status = B_USB_RAW_STATUS_FAILED;
-				command->control.length = 0;
+				command.control.status = B_USB_RAW_STATUS_FAILED;
+				command.control.length = 0;
 				mutex_unlock(&device->lock);
-				return B_OK;
+				free(controlData);
+				status = B_OK;
+				break;
 			}
 
 			acquire_sem(device->notify);
-			command->control.status = device->status;
-			command->control.length = device->actual_length;
+			command.control.status = device->status;
+			command.control.length = device->actual_length;
 			mutex_unlock(&device->lock);
-			return B_OK;
+
+			status = B_OK;
+			if (inTransfer && user_memcpy(command.control.data, controlData,
+				command.control.length) != B_OK) {
+				status = B_BAD_ADDRESS;
+			}
+
+			free(controlData);
+			break;
 		}
 
 		case B_USB_RAW_COMMAND_INTERRUPT_TRANSFER:
 		case B_USB_RAW_COMMAND_BULK_TRANSFER:
 		case B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER:
 		{
-			if (length < sizeof(command->transfer))
+			if (length < sizeof(command.transfer))
 				return B_BUFFER_OVERFLOW;
 
 			const usb_configuration_info *configurationInfo =
 				gUSBModule->get_configuration(device->device);
-			if (!configurationInfo) {
-				command->transfer.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
-				return B_OK;
+			if (configurationInfo == NULL) {
+				command.transfer.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
+				status = B_OK;
+				break;
 			}
 
-			if (command->transfer.interface >= configurationInfo->interface_count) {
-				command->transfer.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				return B_OK;
+			if (command.transfer.interface >= configurationInfo->interface_count) {
+				command.transfer.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
+				status = B_OK;
+				break;
 			}
 
 			const usb_interface_info *interfaceInfo =
-				configurationInfo->interface[command->transfer.interface].active;
-			if (!interfaceInfo) {
-				command->transfer.status = B_USB_RAW_STATUS_ABORTED;
-				return B_OK;
+				configurationInfo->interface[command.transfer.interface].active;
+			if (interfaceInfo == NULL) {
+				command.transfer.status = B_USB_RAW_STATUS_ABORTED;
+				status = B_OK;
+				break;
 			}
 
-			if (command->transfer.endpoint >= interfaceInfo->endpoint_count) {
-				command->transfer.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				return B_OK;
+			if (command.transfer.endpoint >= interfaceInfo->endpoint_count) {
+				command.transfer.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
+				status = B_OK;
+				break;
 			}
 
 			const usb_endpoint_info *endpointInfo =
-				&interfaceInfo->endpoint[command->transfer.endpoint];
+				&interfaceInfo->endpoint[command.transfer.endpoint];
 			if (!endpointInfo->handle) {
-				command->transfer.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				return B_OK;
+				command.transfer.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
+				status = B_OK;
+				break;
 			}
 
 			size_t descriptorsSize = 0;
 			usb_iso_packet_descriptor *packetDescriptors = NULL;
+			void *transferData = NULL;
+			bool inTransfer = (endpointInfo->descr->endpoint_address
+				& USB_ENDPOINT_ADDR_DIR_IN) != 0;
 			if (op == B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER) {
-				if (length < sizeof(command->isochronous))
+				if (length < sizeof(command.isochronous))
 					return B_BUFFER_OVERFLOW;
 
 				descriptorsSize = sizeof(usb_iso_packet_descriptor)
-					* command->isochronous.packet_count;
+					* command.isochronous.packet_count;
 				packetDescriptors
 					= (usb_iso_packet_descriptor *)malloc(descriptorsSize);
-				if (!packetDescriptors) {
-					command->transfer.status = B_USB_RAW_STATUS_NO_MEMORY;
-					command->transfer.length = 0;
-					return B_OK;
+				if (packetDescriptors == NULL) {
+					command.transfer.status = B_USB_RAW_STATUS_NO_MEMORY;
+					command.transfer.length = 0;
+					status = B_OK;
+					break;
 				}
 
-				if (user_memcpy(packetDescriptors,
-						command->isochronous.packet_descriptors,
+				if (!IS_USER_ADDRESS(command.isochronous.data)
+					|| !IS_USER_ADDRESS(command.isochronous.packet_descriptors)
+					|| user_memcpy(packetDescriptors,
+						command.isochronous.packet_descriptors,
 						descriptorsSize) != B_OK) {
+					free(packetDescriptors);
+					return B_BAD_ADDRESS;
+				}
+			} else {
+				transferData = malloc(command.transfer.length);
+				if (transferData == NULL) {
+					command.transfer.status = B_USB_RAW_STATUS_NO_MEMORY;
+					command.transfer.length = 0;
+					status = B_OK;
+					break;
+				}
+
+				if (!IS_USER_ADDRESS(command.transfer.data) || (!inTransfer
+						&& user_memcpy(transferData, command.transfer.data,
+							command.transfer.length) != B_OK)) {
+					free(transferData);
 					return B_BAD_ADDRESS;
 				}
 			}
@@ -734,46 +820,58 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			mutex_lock(&device->lock);
 			if (op == B_USB_RAW_COMMAND_INTERRUPT_TRANSFER) {
 				status = gUSBModule->queue_interrupt(endpointInfo->handle,
-					command->transfer.data, command->transfer.length,
+					transferData, command.transfer.length,
 					usb_raw_callback, device);
 			} else if (op == B_USB_RAW_COMMAND_BULK_TRANSFER) {
 				status = gUSBModule->queue_bulk(endpointInfo->handle,
-					command->transfer.data, command->transfer.length,
+					transferData, command.transfer.length,
 					usb_raw_callback, device);
 			} else {
 				status = gUSBModule->queue_isochronous(endpointInfo->handle,
-					command->isochronous.data, command->isochronous.length,
-					packetDescriptors, command->isochronous.packet_count, NULL,
+					command.isochronous.data, command.isochronous.length,
+					packetDescriptors, command.isochronous.packet_count, NULL,
 					0, usb_raw_callback, device);
 			}
 
 			if (status < B_OK) {
-				command->transfer.status = B_USB_RAW_STATUS_FAILED;
-				command->transfer.length = 0;
+				command.transfer.status = B_USB_RAW_STATUS_FAILED;
+				command.transfer.length = 0;
 				free(packetDescriptors);
+				free(transferData);
 				mutex_unlock(&device->lock);
-				return B_OK;
+				status = B_OK;
+				break;
 			}
 
 			acquire_sem(device->notify);
-			command->transfer.status = device->status;
-			command->transfer.length = device->actual_length;
+			command.transfer.status = device->status;
+			command.transfer.length = device->actual_length;
 			mutex_unlock(&device->lock);
 
+			status = B_OK;
 			if (op == B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER) {
-				if (user_memcpy(command->isochronous.packet_descriptors,
+				if (user_memcpy(command.isochronous.packet_descriptors,
 						packetDescriptors, descriptorsSize) != B_OK) {
-					return B_BAD_ADDRESS;
+					status = B_BAD_ADDRESS;
 				}
 
 				free(packetDescriptors);
+			} else {
+				if (inTransfer && user_memcpy(command.transfer.data,
+					transferData, command.transfer.length) != B_OK) {
+					status = B_BAD_ADDRESS;
+				}
+				free(transferData);
 			}
 
-			return B_OK;
+			break;
 		}
 	}
 
-	return B_DEV_INVALID_IOCTL;
+	if (user_memcpy(buffer, &command, min_c(length, sizeof(command))) != B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
@@ -869,7 +967,7 @@ publish_devices()
 
 	int32 index = 0;
 	gDeviceNames = (char **)malloc(sizeof(char *) * (gDeviceCount + 2));
-	if (!gDeviceNames)
+	if (gDeviceNames == NULL)
 		return NULL;
 
 	gDeviceNames[index++] = strdup(DEVICE_NAME);
