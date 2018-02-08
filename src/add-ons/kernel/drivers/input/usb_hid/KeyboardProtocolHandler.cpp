@@ -369,6 +369,9 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					continue;
 				}
 
+				if (!IS_USER_ADDRESS(buffer))
+					return B_BAD_ADDRESS;
+
 				// process what is in the ring_buffer, it could be written
 				// there because we handled an interrupt transfer or because
 				// we wrote the current repeat key
@@ -379,16 +382,21 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 		case KB_SET_LEDS:
 		{
 			uint8 ledData[4];
-			if (user_memcpy(ledData, buffer, sizeof(ledData)) != B_OK)
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(ledData, buffer, sizeof(ledData)) != B_OK) {
 				return B_BAD_ADDRESS;
+			}
 			return _SetLEDs(ledData);
 		}
 
 		case KB_SET_KEY_REPEAT_RATE:
 		{
 			int32 repeatRate;
-			if (user_memcpy(&repeatRate, buffer, sizeof(repeatRate)) != B_OK)
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&repeatRate, buffer, sizeof(repeatRate))
+					!= B_OK) {
 				return B_BAD_ADDRESS;
+			}
 
 			if (repeatRate == 0 || repeatRate > 1000000)
 				return B_BAD_VALUE;
@@ -400,21 +408,28 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 		case KB_GET_KEY_REPEAT_RATE:
 		{
 			int32 repeatRate = 10000000 / fRepeatRate;
-			if (user_memcpy(buffer, &repeatRate, sizeof(repeatRate)) != B_OK)
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(buffer, &repeatRate, sizeof(repeatRate))
+					!= B_OK) {
 				return B_BAD_ADDRESS;
+			}
 			return B_OK;
 		}
 
 		case KB_SET_KEY_REPEAT_DELAY:
-			if (user_memcpy(&fRepeatDelay, buffer, sizeof(fRepeatDelay))
-					!= B_OK)
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&fRepeatDelay, buffer, sizeof(fRepeatDelay))
+					!= B_OK) {
 				return B_BAD_ADDRESS;
+			}
 			return B_OK;
 
 		case KB_GET_KEY_REPEAT_DELAY:
-			if (user_memcpy(buffer, &fRepeatDelay, sizeof(fRepeatDelay))
-					!= B_OK)
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(buffer, &fRepeatDelay, sizeof(fRepeatDelay))
+					!= B_OK) {
 				return B_BAD_ADDRESS;
+			}
 			return B_OK;
 
 		case KB_SET_DEBUG_READER:

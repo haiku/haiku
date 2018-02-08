@@ -19,6 +19,7 @@
 #include <string.h>
 #include <usb/USB_hid.h>
 
+#include <kernel.h>
 #include <keyboard_mouse_driver.h>
 
 
@@ -132,9 +133,18 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 				return B_BUFFER_OVERFLOW;
 
 			while (true) {
-				status_t result = _ReadReport(buffer, cookie);
-				if (result != B_INTERRUPTED)
-					return result;
+				mouse_movement movement;
+				status_t result = _ReadReport(&movement, cookie);
+				if (result == B_INTERRUPTED)
+					continue;
+
+				if (!IS_USER_ADDRESS(buffer)
+					|| user_memcpy(buffer, &movement, sizeof(movement))
+						!= B_OK) {
+					return B_BAD_ADDRESS;
+				}
+
+				return result;
 			}
 		}
 
@@ -148,12 +158,13 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 		}
 
 		case MS_SET_CLICKSPEED:
-#ifdef __HAIKU__
-				return user_memcpy(&fClickSpeed, buffer, sizeof(bigtime_t));
-#else
-				fClickSpeed = *(bigtime_t *)buffer;
-				return B_OK;
-#endif
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&fClickSpeed, buffer, sizeof(bigtime_t))
+					!= B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			return B_OK;
 	}
 
 	return B_ERROR;
