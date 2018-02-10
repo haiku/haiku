@@ -2308,7 +2308,7 @@ get_job_control_entry(team_job_control_children& children, pid_t id)
 
 
 /*!	Returns the first job control entry from one of team's dead, continued, or
-    stopped children which matches \a id.
+	stopped children which matches \a id.
 	\a id can be:
 	- \code > 0 \endcode: Matching an entry with that team ID.
 	- \code == -1 \endcode: Matching any entry.

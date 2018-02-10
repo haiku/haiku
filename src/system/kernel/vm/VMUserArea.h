@@ -34,17 +34,17 @@ private:
 
 
 struct VMUserAreaGetLink {
-    inline DoublyLinkedListLink<VMUserArea>* operator()(
+	inline DoublyLinkedListLink<VMUserArea>* operator()(
 		VMUserArea* area) const
-    {
-        return &area->AddressSpaceLink();
-    }
+	{
+		return &area->AddressSpaceLink();
+	}
 
-    inline const DoublyLinkedListLink<VMUserArea>* operator()(
+	inline const DoublyLinkedListLink<VMUserArea>* operator()(
 		const VMUserArea* area) const
-    {
-        return &area->AddressSpaceLink();
-    }
+	{
+		return &area->AddressSpaceLink();
+	}
 };
 
 typedef DoublyLinkedList<VMUserArea, VMUserAreaGetLink> VMUserAreaList;

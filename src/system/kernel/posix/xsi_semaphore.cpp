@@ -1102,7 +1102,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 		TRACE_ERROR(("xsi_semop: failed to allocate sembuf struct\n"));
 		return B_NO_MEMORY;
 	}
-       MemoryDeleter operationsDeleter(operations);
+	MemoryDeleter operationsDeleter(operations);
 
 	if (user_memcpy(operations, ops,
 		(sizeof(struct sembuf) * numOps)) < B_OK) {
@@ -1172,7 +1172,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 				if (operation != 0)
 					semaphore->Revert(operation);
 			}
-                       if (result != 0)
+			if (result != 0)
 				return result;
 
 			// We have to wait: first enqueue the thread

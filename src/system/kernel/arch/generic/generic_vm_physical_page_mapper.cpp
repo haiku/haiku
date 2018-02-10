@@ -38,7 +38,7 @@ typedef struct paddr_chunk_descriptor {
 #endif
 } paddr_chunk_desc;
 
-static paddr_chunk_desc *paddr_desc;         // will be one per physical chunk
+static paddr_chunk_desc *paddr_desc;	// will be one per physical chunk
 static paddr_chunk_desc **virtual_pmappings; // will be one ptr per virtual chunk in iospace
 static int first_free_vmapping;
 static int num_virtual_chunks;

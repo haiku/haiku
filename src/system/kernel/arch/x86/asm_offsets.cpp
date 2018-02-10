@@ -21,10 +21,10 @@
 #define DEFINE_MACRO(macro, value) DEFINE_COMPUTED_ASM_MACRO(macro, value)
 
 #define DEFINE_OFFSET_MACRO(prefix, structure, member) \
-    DEFINE_MACRO(prefix##_##member, offsetof(struct structure, member));
+	DEFINE_MACRO(prefix##_##member, offsetof(struct structure, member));
 
 #define DEFINE_SIZEOF_MACRO(prefix, structure) \
-    DEFINE_MACRO(prefix##_sizeof, sizeof(struct structure));
+	DEFINE_MACRO(prefix##_sizeof, sizeof(struct structure));
 
 
 void

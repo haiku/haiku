@@ -14,7 +14,7 @@
 
 
 #define DEFINE_SIZE_MACRO(name) \
-    DEFINE_COMPUTED_ASM_MACRO(_KERNEL_CPP_STRUCT_SIZE_##name, sizeof(name));
+	DEFINE_COMPUTED_ASM_MACRO(_KERNEL_CPP_STRUCT_SIZE_##name, sizeof(name));
 
 
 void

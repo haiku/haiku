@@ -2061,8 +2061,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 
 	// register the loaded image
 	imageInfo.basic_info.type = B_LIBRARY_IMAGE;
-    imageInfo.basic_info.device = st.st_dev;
-    imageInfo.basic_info.node = st.st_ino;
+	imageInfo.basic_info.device = st.st_dev;
+	imageInfo.basic_info.node = st.st_ino;
 	strlcpy(imageInfo.basic_info.name, path, sizeof(imageInfo.basic_info.name));
 
 	imageInfo.basic_info.api_version = B_HAIKU_VERSION;

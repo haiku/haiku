@@ -687,13 +687,13 @@ FUNCTION_END(handle_syscall)
 				| THREAD_FLAGS_SYSCALL_RESTARTED), THREAD_flags(%edi)
 	jz		2f
   1:
-    movl	THREAD_flags(%edi), %eax
+	movl	THREAD_flags(%edi), %eax
 	movl	%eax, %edx
-    andl	$~(THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
+	andl	$~(THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
 				| THREAD_FLAGS_SYSCALL_RESTARTED), %edx
-    lock
-    cmpxchgl	%edx, THREAD_flags(%edi)
-    jnz		1b
+	lock
+	cmpxchgl	%edx, THREAD_flags(%edi)
+	jnz		1b
   2:
 
 	// post syscall debugging

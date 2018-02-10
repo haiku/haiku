@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Jérôme Duval, korli@users.sourceforge.net.
- *      Michael Pfeiffer, laplace@users.sourceforge.net
+ *		Jérôme Duval, jerome.duval@gmail.com
+ *		Michael Pfeiffer, laplace@users.sourceforge.net
  */
 
 

@@ -327,13 +327,13 @@ FileDevice::Control(void* _cookie, int32 op, void* buffer, size_t length)
 
 			device_geometry geometry;
 			geometry.bytes_per_sector = kBlockSize;
-		    geometry.sectors_per_track = 1;
-		    geometry.cylinder_count = blocks / heads;
-		    geometry.head_count = heads;
-		    geometry.device_type = B_DISK;
-		    geometry.removable = false;
-		    geometry.read_only = false;
-		    geometry.write_once = false;
+			geometry.sectors_per_track = 1;
+			geometry.cylinder_count = blocks / heads;
+			geometry.head_count = heads;
+			geometry.device_type = B_DISK;
+			geometry.removable = false;
+			geometry.read_only = false;
+			geometry.write_once = false;
 
 			return set_ioctl_result(geometry, buffer, length);
 		}

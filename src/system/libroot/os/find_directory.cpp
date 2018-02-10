@@ -518,7 +518,7 @@ DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory_alpha4",
 	"find_directory@", "BASE");
 
 DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory", "find_directory@@",
-    "1_ALPHA5");
+	"1_ALPHA5");
 #else // _LOADER_MODE
 status_t
 __find_directory(directory_which which, dev_t device, bool createIt,

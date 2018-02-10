@@ -66,7 +66,7 @@ public:
 									uint64* _droppedEvents);
 
 private:
-    virtual	void				EventOccurred(NotificationService& service,
+	virtual	void				EventOccurred(NotificationService& service,
 									const KMessage* event);
 
 	virtual	void				ThreadEnqueuedInRunQueue(Thread* thread);

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *      Hugo Santos, hugosantos@gmail.com
+ *		Hugo Santos, hugosantos@gmail.com
  */
 #ifndef SLAB_PRIVATE_H
 #define SLAB_PRIVATE_H

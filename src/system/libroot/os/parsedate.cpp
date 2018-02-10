@@ -230,7 +230,7 @@ static const known_identifier kIdentifiers[] = {
 	{"GMT",		NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 0},
 	{"UTC",		NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 0},
 	// the following list has been generated from info found at
-	//     http://www.timegenie.com/timezones
+	// http://www.timegenie.com/timezones
 	{"ACDT",	NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 1050 * 36},
 	{"ACIT",	NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 800 * 36},
 	{"ACST",	NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 950 * 36},

@@ -418,12 +418,12 @@ FUNCTION(x86_64_syscall_entry):
 	testl	$THREAD_FLAGS_SYSCALL_RESTARTED, THREAD_flags(%r12)
 	jz		2f
 1:
-    movl	THREAD_flags(%r12), %eax
+	movl	THREAD_flags(%r12), %eax
 	movl	%eax, %edx
-    andl	$~THREAD_FLAGS_SYSCALL_RESTARTED, %edx
-    lock
-    cmpxchgl	%edx, THREAD_flags(%r12)
-    jnz		1b
+	andl	$~THREAD_FLAGS_SYSCALL_RESTARTED, %edx
+	lock
+	cmpxchgl	%edx, THREAD_flags(%r12)
+	jnz		1b
 2:
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
