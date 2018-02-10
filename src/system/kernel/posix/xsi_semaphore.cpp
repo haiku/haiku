@@ -1011,7 +1011,7 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 			if (!semaphoreSet->HasPermission()) {
 				TRACE_ERROR(("xsi_semctl: calling process has not "
 					"permission on semaphore %d, key %d\n",
-					semaphoreSet->ID(),	(int)semaphoreSet->IpcKey()));
+					semaphoreSet->ID(), (int)semaphoreSet->IpcKey()));
 				result = EACCES;
 			} else {
 				struct semid_ds sem;
@@ -1034,7 +1034,7 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 			if (!semaphoreSet->HasPermission()) {
 				TRACE_ERROR(("xsi_semctl: calling process has not "
 					"permission on semaphore %d, key %d\n",
-					semaphoreSet->ID(),	(int)semaphoreSet->IpcKey()));
+					semaphoreSet->ID(), (int)semaphoreSet->IpcKey()));
 				return EACCES;
 			}
 			key_t key = semaphoreSet->IpcKey();

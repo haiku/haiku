@@ -450,7 +450,7 @@ public:
 private:
 	bool		fPrintStackTrace;
 	addr_t		fAddressFilter;
-	team_id		fTeamFilter; 
+	team_id		fTeamFilter;
 	thread_id	fThreadFilter;
 };
 

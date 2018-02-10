@@ -233,7 +233,7 @@ _sPrintf(const char *fmt, ...)
 	va_end(ap);
 
 	if (ret >= 0)
-		_kern_debug_output(buffer);	
+		_kern_debug_output(buffer);
 
 	return ret;
 }

@@ -80,7 +80,7 @@ load_cpufreq_module()
 				} else
 					put_module(name);
 			} else
-				sCPUPerformanceModule = current; 
+				sCPUPerformanceModule = current;
 		}
 	}
 
@@ -114,7 +114,7 @@ load_cpuidle_module()
 				} else
 					put_module(name);
 			} else
-				sCPUIdleModule = current; 
+				sCPUIdleModule = current;
 		}
 	}
 

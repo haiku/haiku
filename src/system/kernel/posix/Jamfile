@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system kernel posix ;
 
 UsePrivateHeaders shared ;
 
-KernelMergeObject kernel_posix.o : 
+KernelMergeObject kernel_posix.o :
 	realtime_sem.cpp
 	xsi_message_queue.cpp
 	xsi_semaphore.cpp

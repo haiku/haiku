@@ -343,7 +343,7 @@ apm_init(kernel_args *args)
 			// use the BIOS data segment as data segment for APM
 
 			if (info.data_segment_length == 0) {
-				args->platform_args.apm.data_segment_length = B_PAGE_SIZE 
+				args->platform_args.apm.data_segment_length = B_PAGE_SIZE
 					- info.data_segment_base;
 			}
 

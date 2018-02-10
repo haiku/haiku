@@ -15,7 +15,7 @@ find_thread(const char *name)
 	// in BeOS R5 OS.h as inline function. Do not change storage of thread id.
 	if (!name) {
 		thread_id thread;
-		__asm__ __volatile__ ( 
+		__asm__ __volatile__ (
 			"movl	%%fs:4, %%eax \n\t"
 			: "=a" (thread));
 		return thread;

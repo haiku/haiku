@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ */
 
 
 #include <SupportDefs.h>

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the MIT License.
 //---------------------------------------------------------------------
 
@@ -275,7 +275,7 @@ partition_session(int deviceFD, int32 sessionIndex, const char *identifier,
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
 status_t
-initialize_volume(const char *where, const char *fileSystem, 
+initialize_volume(const char *where, const char *fileSystem,
 				  const char *volumeName, const char *parameters)
 {
 	// not yet implemented

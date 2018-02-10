@@ -165,7 +165,7 @@ unnamed_sem_timedwait(sem_t* semaphore, const struct timespec* timeout) {
 	if (result == 0)
 		return 0;
 
-	return _kern_mutex_sem_acquire(sem,	NULL,
+	return _kern_mutex_sem_acquire(sem, NULL,
 		timeoutMicros == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_REAL_TIME_TIMEOUT,
 		timeoutMicros);
 }

@@ -394,7 +394,7 @@ remove_check_set(ParanoiaCheckSet* set)
 }
 
 
-static ParanoiaCheckSet* 
+static ParanoiaCheckSet*
 lookup_check_set(const void* object)
 {
 	int slot = (addr_t)object % PARANOIA_HASH_SIZE;

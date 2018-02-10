@@ -28,7 +28,7 @@ int _kstatfs_(dev_t device, void *whatever, int fd, const char *path, fs_info *i
 int mount(const char *filesystem, const char *where, const char *device, ulong flags,
 	void *parms, int len);
 int unmount(const char *path);
-long get_nth_pci_info(long index, pci_info *info); 
+long get_nth_pci_info(long index, pci_info *info);
 
 
 int
