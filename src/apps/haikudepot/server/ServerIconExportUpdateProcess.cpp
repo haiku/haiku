@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,7 @@
 #include <support/StopWatch.h>
 #include <support/ZlibCompressionAlgorithm.h>
 
+#include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
@@ -71,7 +72,7 @@ ServerIconExportUpdateProcess::RunInternal()
 			status_t hasDataResult = HasLocalData(&hasData);
 
 			if (IsSuccess(hasDataResult) && !hasData)
-				result = APP_ERR_NO_DATA;
+				result = HD_ERR_NO_DATA;
 		}
 	}
 
@@ -150,10 +151,7 @@ ServerIconExportUpdateProcess::DownloadAndUnpack()
 
 	result = Download(tarGzFilePath);
 
-	if (result != APP_ERR_NOT_MODIFIED) {
-		if (result != B_OK)
-			return result;
-
+	if (result == B_OK) {
 		printf("delete any existing stored data\n");
 		StorageUtils::RemoveDirectoryContents(fLocalStorageDirectoryPath);
 
@@ -185,9 +183,9 @@ ServerIconExportUpdateProcess::DownloadAndUnpack()
 		}
 
 		delete tarGzFile;
-	}
 
-	printf("did complete fetching icons\n");
+		printf("did complete fetching icons\n");
+	}
 
 	return result;
 }
@@ -227,3 +225,6 @@ ServerIconExportUpdateProcess::Download(BPath& tarGzFilePath)
 	return DownloadToLocalFileAtomically(tarGzFilePath,
 		ServerSettings::CreateFullUrl("/__pkgicon/all.tar.gz"));
 }
+
+
+

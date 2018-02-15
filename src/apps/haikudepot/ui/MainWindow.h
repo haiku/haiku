@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -15,6 +15,7 @@
 #include "PackageAction.h"
 #include "PackageActionHandler.h"
 #include "PackageInfoListener.h"
+#include "HaikuDepotConstants.h"
 
 
 class BCardLayout;
@@ -28,16 +29,6 @@ class PackageInfoView;
 class PackageListView;
 class ScreenshotWindow;
 class WorkStatusView;
-
-
-enum {
-	MSG_MAIN_WINDOW_CLOSED		= 'mwcl',
-	MSG_PACKAGE_SELECTED		= 'pkgs',
-	MSG_PACKAGE_WORKER_BUSY		= 'pkwb',
-	MSG_PACKAGE_WORKER_IDLE		= 'pkwi',
-	MSG_ADD_VISIBLE_PACKAGES	= 'avpk',
-	MSG_UPDATE_SELECTED_PACKAGE	= 'uspk',
-};
 
 
 class MainWindow : public BWindow, private PackageInfoListener,

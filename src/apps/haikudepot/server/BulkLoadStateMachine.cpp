@@ -1,18 +1,17 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "BulkLoadStateMachine.h"
 
 #include <Autolock.h>
-#include <NetworkInterface.h>
-#include <NetworkRoster.h>
 
 #include "Logger.h"
 #include "PkgDataUpdateProcess.h"
 #include "RepositoryDataUpdateProcess.h"
 #include "ServerIconExportUpdateProcess.h"
 #include "ServerSettings.h"
+#include "ServerHelper.h"
 
 
 BulkLoadStateMachine::BulkLoadStateMachine(Model* model)
@@ -186,9 +185,17 @@ BulkLoadStateMachine::Start()
 		if (!IsRunning()) {
 			fBulkLoadContext = new BulkLoadContext();
 
-			if (ServerSettings::ForceNoNetwork() || !HasNetwork())
+			if (ServerSettings::IsClientTooOld()) {
+				printf("bulk load proceeding without network communications "
+					"because the client is too old\n");
 				fBulkLoadContext->AddProcessOption(
 					SERVER_PROCESS_NO_NETWORKING);
+			}
+
+			if (!ServerHelper::IsNetworkAvailable()) {
+				fBulkLoadContext->AddProcessOption(
+					SERVER_PROCESS_NO_NETWORKING);
+			}
 
 			if (ServerSettings::PreferCache())
 				fBulkLoadContext->AddProcessOption(SERVER_PROCESS_PREFER_CACHE);
@@ -348,22 +355,4 @@ BulkLoadStateMachine::InitiateBulkPopulatePackagesForAllDepots()
 
 	if (0 == fBulkLoadContext->CountPkgProcesses())
 		ContextPoll();
-}
-
-
-bool
-BulkLoadStateMachine::HasNetwork()
-{
-	BNetworkRoster& roster = BNetworkRoster::Default();
-	BNetworkInterface interface;
-	uint32 cookie = 0;
-	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
-		uint32 flags = interface.Flags();
-		if ((flags & IFF_LOOPBACK) == 0
-			&& (flags & (IFF_UP | IFF_LINK)) == (IFF_UP | IFF_LINK)) {
-			return true;
-		}
-	}
-
-	return false;
 }

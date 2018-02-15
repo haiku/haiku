@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -13,10 +13,6 @@
 
 #include "StandardMetaData.h"
 #include "Stoppable.h"
-
-
-#define APP_ERR_NOT_MODIFIED		(B_APP_ERROR_BASE + 452)
-#define APP_ERR_NO_DATA				(B_APP_ERROR_BASE + 453)
 
 
 typedef enum process_options {
@@ -87,10 +83,8 @@ protected:
 									const BPath& targetFilePath,
 									const BUrl& url);
 
-			status_t			DeleteLocalFile(const BPath& currentFilePath);
-
-			status_t			MoveDamagedFileAside(
-									const BPath& currentFilePath);
+			status_t			DeleteLocalFile(const BPath& filePath);
+			status_t			MoveDamagedFileAside(const BPath& filePath);
 
 			bool				HasOption(uint32 flag);
 			bool				ShouldAttemptNetworkDownload(

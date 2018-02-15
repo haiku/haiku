@@ -23,10 +23,12 @@
 #include <UrlProtocolRoster.h>
 
 #include "AutoLocker.h"
+#include "HaikuDepotConstants.h"
 #include "List.h"
 #include "Logger.h"
 #include "PackageInfo.h"
 #include "ServerSettings.h"
+#include "ServerHelper.h"
 
 
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
@@ -560,6 +562,12 @@ status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	uint32 flags, BMessage& reply) const
 {
+	if (!ServerHelper::IsNetworkAvailable())
+		return HD_NETWORK_INACCESSIBLE;
+
+	if (!ServerSettings::IsClientTooOld())
+		return HD_CLIENT_TOO_OLD;
+
 	if (Logger::IsTraceEnabled())
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
@@ -602,9 +610,19 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 		request.Result());
 
 	int32 statusCode = result.StatusCode();
-	if (statusCode != 200) {
-		printf("Response code: %" B_PRId32 "\n", statusCode);
-		return B_ERROR;
+
+	switch (statusCode) {
+		case B_HTTP_STATUS_OK:
+			break;
+
+		case B_HTTP_STATUS_PRECONDITION_FAILED:
+			ServerHelper::NotifyClientTooOld(result.Headers());
+			return HD_CLIENT_TOO_OLD;
+
+		default:
+			printf("json-rpc request to endpoint [.../%s] failed with http "
+				"status [%" B_PRId32 "]\n", domain, statusCode);
+			return B_ERROR;
 	}
 
 	jsonString.SetTo(static_cast<const char*>(replyData.Buffer()),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "AbstractServerProcess.h"
@@ -17,7 +17,9 @@
 
 #include <support/ZlibCompressionAlgorithm.h>
 
+#include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "ServerHelper.h"
 #include "ServerSettings.h"
 #include "StandardMetaDataJsonEventListener.h"
 #include "StorageUtils.h"
@@ -27,8 +29,6 @@
 #define MAX_REDIRECTS 3
 #define MAX_FAILURES 2
 
-#define HTTP_STATUS_FOUND 302
-#define HTTP_STATUS_NOT_MODIFIED 304
 
 // 30 seconds
 #define TIMEOUT_MICROSECONDS 3e+7
@@ -405,10 +405,13 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		fprintf(stdout, "[%s] did complete streaming data [%"
 			B_PRIdSSIZE " bytes]\n", Name(), listener.ContentLength());
 		return B_OK;
-	} else if (statusCode == HTTP_STATUS_NOT_MODIFIED) {
+	} else if (statusCode == B_HTTP_STATUS_NOT_MODIFIED) {
 		fprintf(stdout, "[%s] remote data has not changed since [%s]\n",
 			Name(), ifModifiedSinceHeader.String());
-		return APP_ERR_NOT_MODIFIED;
+		return HD_ERR_NOT_MODIFIED;
+	} else if (statusCode == B_HTTP_STATUS_PRECONDITION_FAILED) {
+		ServerHelper::NotifyClientTooOld(responseHeaders);
+		return HD_CLIENT_TOO_OLD;
 	} else if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
 		if (location.Length() != 0) {
 			BUrl redirectUrl(result.Url(), location);
@@ -477,5 +480,5 @@ AbstractServerProcess::MoveDamagedFileAside(const BPath& currentFilePath)
 
 bool
 AbstractServerProcess::IsSuccess(status_t e) {
-	return e == B_OK || e == APP_ERR_NOT_MODIFIED;
+	return e == B_OK || e == HD_ERR_NOT_MODIFIED;
 }

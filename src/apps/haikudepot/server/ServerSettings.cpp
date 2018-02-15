@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,9 @@
 
 #include <AppFileInfo.h>
 #include <Application.h>
+#include <Autolock.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <Roster.h>
 #include <Url.h>
 
@@ -24,6 +27,8 @@ pthread_once_t ServerSettings::sUserAgentInitOnce = PTHREAD_ONCE_INIT;
 bool ServerSettings::sPreferCache = false;
 bool ServerSettings::sDropCache = false;
 bool ServerSettings::sForceNoNetwork = false;
+bool ServerSettings::sClientTooOld = false;
+BLocker ServerSettings::sLock;
 
 
 status_t
@@ -152,4 +157,20 @@ void
 ServerSettings::SetForceNoNetwork(bool value)
 {
 	sForceNoNetwork = value;
+}
+
+
+bool
+ServerSettings::IsClientTooOld()
+{
+	BAutolock locker(&sLock);
+	return sClientTooOld;
+}
+
+
+void
+ServerSettings::SetClientTooOld()
+{
+	BAutolock locker(&sLock);
+	sClientTooOld = true;
 }

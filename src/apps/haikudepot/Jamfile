@@ -101,6 +101,7 @@ Application HaikuDepot :
 	# network + server
 	AbstractServerProcess.cpp
 	AbstractSingleFileServerProcess.cpp
+	ServerHelper.cpp
 	ServerSettings.cpp
 	WebAppInterface.cpp
 	PkgDataUpdateProcess.cpp

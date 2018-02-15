@@ -1,9 +1,10 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "AbstractSingleFileServerProcess.h"
 
+#include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
@@ -49,18 +50,17 @@ AbstractSingleFileServerProcess::RunInternal()
 			ServerSettings::CreateFullUrl(urlPathComponent));
 	}
 
-	if (IsSuccess(result) || result == APP_ERR_NOT_MODIFIED) {
+	if (IsSuccess(result)) {
 		status_t hasDataResult = StorageUtils::ExistsObject(
 			localPath, &hasData, NULL, &size);
 
 		hasData = hasData && size > 0;
 
 		if (hasDataResult == B_OK && !hasData)
-			result = APP_ERR_NO_DATA;
+			result = HD_ERR_NO_DATA;
 	}
 
-	if (IsSuccess(result) || result == APP_ERR_NOT_MODIFIED) {
-
+	if (IsSuccess(result)) {
 		if (Logger::IsInfoEnabled())
 			printf("[%s] did fetch data\n", Name());
 

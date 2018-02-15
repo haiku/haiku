@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef BULK_LOAD_STATE_MACHINE_H
@@ -31,7 +31,6 @@ private:
 			void				ContextPoll();
 			void				SetContextState(bulk_load_state state);
 			void				StopAllProcesses();
-			bool				HasNetwork();
 
 			bool				CanTransitionTo(
 									bulk_load_state targetState);

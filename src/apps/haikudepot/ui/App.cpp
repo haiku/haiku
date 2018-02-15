@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@
 #include "FeaturedPackagesView.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include "ServerHelper.h"
 #include "ServerSettings.h"
 #include "ScreenshotWindow.h"
 
@@ -103,6 +104,10 @@ App::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_CLIENT_TOO_OLD:
+			ServerHelper::AlertClientTooOld(message);
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
 			break;
@@ -149,7 +154,7 @@ app_print_help()
 	fprintf(stdout, "'-v' : allows for the verbosity level to be set.\n");
 	fprintf(stdout, "'-u' : allows for the haiku depot server url to be\n");
 	fprintf(stdout, "   configured.\n");
-	fprintf(stdout, "'--nonetworking' : prevents network access.**\n");
+	fprintf(stdout, "'--nonetworking' : prevents network access.\n");
 	fprintf(stdout, "'--prefercache' : prefer to get data from cache rather\n");
 	fprintf(stdout, "  then obtain data from the network.**\n");
 	fprintf(stdout, "'--dropcache' : drop cached data before performing\n");

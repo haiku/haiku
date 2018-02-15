@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 
 #include <File.h>
 #include <HttpHeaders.h>
+#include <Locker.h>
 #include <String.h>
 #include <Url.h>
 
@@ -26,17 +27,21 @@ public:
 		static void						SetDropCache(bool value);
 		static bool						ForceNoNetwork();
 		static void						SetForceNoNetwork(bool value);
+		static bool						IsClientTooOld();
+		static void						SetClientTooOld();
 
 private:
 		static void						_InitUserAgent();
 		static const BString			_GetUserAgentVersionString();
 
+		static BLocker			sLock;
 		static BUrl						sBaseUrl;
 		static BString					sUserAgent;
 		static pthread_once_t			sUserAgentInitOnce;
 		static bool						sPreferCache;
 		static bool						sDropCache;
 		static bool						sForceNoNetwork;
+		static bool						sClientTooOld;
 };
 
 #endif // SERVER_SETTINGS_H
