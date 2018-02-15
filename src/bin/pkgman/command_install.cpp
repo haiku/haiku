@@ -8,6 +8,11 @@
 
 
 #include <getopt.h>
+#include <package/manager/Exceptions.h>
+#include <ObjectList.h>
+#include <package/solver/SolverPackage.h>
+#include <package/solver/SolverPackageSpecifier.h>
+#include <package/solver/SolverPackageSpecifierList.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,6 +26,7 @@
 
 using namespace BPackageKit;
 using namespace BPackageKit::BPrivate;
+using namespace BPackageKit::BManager::BPrivate;
 
 
 static const char* const kShortUsage =
@@ -102,7 +108,35 @@ InstallCommand::Execute(int argc, const char* const* argv)
 	// perform the installation
 	PackageManager packageManager(location, interactive);
 	packageManager.SetDebugLevel(fCommonOptions.DebugLevel());
-	packageManager.Install(packages, packageCount);
+	try {
+		packageManager.Install(packages, packageCount);
+	} catch (BNothingToDoException&) {
+		// Output already installed packages
+		BSolverPackageSpecifierList packagesToInstall;
+		if (!packagesToInstall.AppendSpecifiers(packages, packageCount))
+			throw std::bad_alloc();
+		// Find the installed packages that match the specification
+		const BSolverPackageSpecifier* unmatchedSpecifier;
+		BObjectList<BSolverPackage> installedPackages;
+		packageManager.Solver()->FindPackages(packagesToInstall,
+			BSolver::B_FIND_INSTALLED_ONLY,
+			installedPackages, &unmatchedSpecifier);
+
+		for (int32 i = 0; BSolverPackage* package = installedPackages.ItemAt(i);
+			i++) {
+			BString repository;
+			if (dynamic_cast<PackageManager::MiscLocalRepository*>(
+					package->Repository()) != NULL)
+				repository = "local file";
+			else
+				repository.SetToFormat(
+					"repository %s", package->Repository()->Name().String());
+			fprintf(stderr, "%s from %s is already installed.\n",
+				package->VersionedName().String(),
+				repository.String());
+		}
+		throw;
+	}
 
 	return 0;
 }
