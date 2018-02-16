@@ -352,8 +352,12 @@ public:
 
 	static	void				CleanupDefaultIcon();
 
+			void				StartCollatingChanges();
+			void				EndCollatingChanges();
+
 private:
 			void				_NotifyListeners(uint32 changes);
+			void				_NotifyListenersImmediate(uint32 changes);
 
 private:
 			BitmapRef			fIcon;
@@ -382,6 +386,9 @@ private:
 			BString				fFileName;
 			int64				fSize;
 			BString				fDepotName;
+
+			bool				fIsCollatingChanges;
+			uint32				fCollatedChanges;
 
 	static	BitmapRef			sDefaultIcon;
 };

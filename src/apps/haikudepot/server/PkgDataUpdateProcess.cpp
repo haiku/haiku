@@ -103,6 +103,13 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	DumpExportPkg* pkg = static_cast<DumpExportPkg*>(context);
 	int32 i;
 
+		// Collects all of the changes here into one set of notifications to
+		// the package's listeners.  This way the quantity of BMessages
+		// communicated back to listeners is considerably reduced.  See stop
+		// invocation later in this method.
+
+	package->StartCollatingChanges();
+
 	if (0 != pkg->CountPkgVersions()) {
 
 			// this makes the assumption that the only version will be the
@@ -168,6 +175,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	}
 
 	fCount++;
+
+	package->EndCollatingChanges();
 
 	return !fStoppable->WasStopped();
 }
