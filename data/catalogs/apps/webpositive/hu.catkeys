@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	4236286345
+1	hungarian	x-vnd.Haiku-WebPositive	2763299522
 Show home button	Settings Window		Kezdőlap gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		URL vágólapra másolása
@@ -39,11 +39,15 @@ Cancel	Authentication Panel		Mégsem
 Match case	WebPositive Window		Egyező betűméret
 Search page:	Settings Window		Keresőoldal:
 Zoom text only	WebPositive Window		Csak a szöveg nagyítása
+Default fixed font size:	Settings Window		Alapértelmezett betűméret:
 Close tab	WebPositive Window		Fül bezárása
 Auto-hide mouse pointer	Settings Window		Egerkurzor automatikus elrejtése
 Quit	WebPositive Window		Kilépés
 Full screen	WebPositive Window		Teljes képernyő
+Open download error	Download Window		Nem sikerült megnyitni a letöltést
 The cookie jar is empty!	Cookie Manager		A sütisdoboz üres!
+Standard font:	Settings Window		Általános betű:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Előző találat
 Restart	Download Window		Újrakezdés
 Proxy server	Settings Window		Proxy kiszolgáló
 Open containing folder	Download Window		Tartalmazó mappa megnyitása
@@ -52,25 +56,33 @@ WebPositive	Download Window		WebPositive
 Open	Download Window		Megnyitás
 Reload	WebPositive Window		Újratöltés
 Downloads	Download Window		Letöltések
+Sans serif font:	Settings Window		Sans serif betű:
 Delete	Cookie Manager		Töröl
 Forward	WebPositive Window		Előre
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		Visszaállít
+Fixed font:	Settings Window		Rögzített szélességű betű:
 Cut	WebPositive Window		Kivág
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 Open downloads folder	Download Window		Letöltések megnyitása
 Proxy password:	Settings Window		Proxy jelszó:
+Number of days to keep links in History menu:	Settings Window		Napok száma az előzmények megőrzéséhez:
 Reset size	WebPositive Window		Méret visszaállítása
 Find:	WebPositive Window		Keres:
 Increase size	WebPositive Window		Méret növelése
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 Downloads	WebPositive Window		Letöltések
 Requesting %url	WebPositive Window		%url lekérése
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Következő találat
 Apply	Settings Window		Alkalmaz
 Bookmark info	WebPositive Window		Könyvjelző információi
 Size:	Font Selection view		Méret:
+Show tabs if only one page is open	Settings Window		Fülek megjelenítése egy oldal esetén is
 About	WebPositive Window		Névjegy
 Fonts	Settings Window		Betűtípusok
+OK	Download Window		Rendben
+Page source error	WebPositive Window		Hibás az oldal forrása
 Open blank page	Settings Window		Üres oldal
 New tabs:	Settings Window		Új fülek:
 Cancel	WebPositive Window		Mégsem
@@ -98,6 +110,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Open start page	Settings Window		Kezdőoldal megnyitása
 Continue downloads	WebPositive		Letöltések folytatása
 Cancel	Download Window		Mágsem
+Flags	Cookie Manager		Zászlók
 Open search page	Settings Window		Keresőoldal megnyitása
 Clear	Console Window		Töröl
 Password:	Authentication Panel		Jelszó:
@@ -119,3 +132,24 @@ Style:	Font Selection view		Stílus:
 General	Settings Window		Általános
 View	WebPositive Window		Nézet
 Previous	WebPositive Window		Előző
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
+(Finish: %date - Over %duration left)	Download Window		(Elkészül: %date - %duration van hátra)
+Bookmark error	WebPositive Window		Könyvjelző hiba
+Do you really want to clear the browsing history?	WebPositive Window		Biztosan törölni akarod az előzményekez?
+Copy	WebPositive Window		Másolás
+Open bookmarks confirmation	WebPositive Window		Könyvjelzők megnyitásának megerősítése
+Remove missing	Download Window		Hiányzók eltávolítása
+Clone current page	Settings Window		Jelenlegi oldal megkettőzése
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg szeretnél nyitni %addedCount könyvjelzőt?
+Session cookie	Cookie Manager		Folyamat-süti
+OK	Authentication Panel		Rendben
+Copy	URL Bar		Másolás
+Download finished	Download Window		Elkészült a letöltés
+Show bookmark bar	WebPositive Window		Könyvjelzősáv megjelenítése
+OK	WebPositive Window		Rendben
+Manage bookmarks	WebPositive Window		Könyvjelzők kezelése
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Egy könyvjelző (%bookmarkName) már létezik az oldalhoz.
+Cookies for %s	Cookie Manager		%s sütik
+New windows:	Settings Window		Új ablak:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url kész
+Remove finished	Download Window		Elkészültek eltávolítása
