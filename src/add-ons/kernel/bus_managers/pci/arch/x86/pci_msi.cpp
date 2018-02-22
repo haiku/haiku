@@ -364,7 +364,8 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 	area_id area = map_physical_memory("msi table map",
 		device->info.u.h0.base_registers[info->table_bar],
 		tableSize + info->table_offset,
-		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (void**)&address);
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		(void**)&address);
 	if (area < 0)
 		return area;
 	info->table_area_id = area;
@@ -375,7 +376,7 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 		area = map_physical_memory("msi pba map",
 			device->info.u.h0.base_registers[info->pba_bar],
 			tableSize + info->pba_offset,
-			B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			(void**)&address);
 		if (area < 0) {
 			delete_area(info->table_area_id);
