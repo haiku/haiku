@@ -55,3 +55,6 @@ See [wiki:i18n](https://dev.haiku-os.org/wiki/i18n).
 
 ### Contributing software ports
 See [HaikuPorts](https://github.com/haikuports/haikuports/).
+
+### Contributing to our infrastructure
+See [Infrastructure](https://github.com/haiku/infrastructure/).
