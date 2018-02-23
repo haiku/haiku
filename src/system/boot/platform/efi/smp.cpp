@@ -405,7 +405,7 @@ smp_add_safemode_menus(Menu *menu)
 
 		if (get_current_cpuid(&info, 7, 0) == B_OK
 				&& ((info.regs.ebx & (IA32_FEATURE_SMEP
-					| IA32_FEATURE_SMAP) != 0) {
+					| IA32_FEATURE_SMAP)) != 0)) {
 			menu->AddItem(item = new(nothrow) MenuItem(
 				"Disable SMEP and SMAP"));
 			item->SetType(MENU_ITEM_MARKABLE);
