@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	2560219298
+1	lithuanian	x-vnd.Haiku-Terminal	1118559455
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -44,6 +44,7 @@ Window title…	Terminal TermWindow		Lango antraštė…
 Full screen	Terminal TermWindow		Visame ekrane
 Page setup…	Terminal TermWindow		Puslapio nuostatos…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Šios užduotys dar vykdomos:\n\n\t%1\n\nUžvėrus langą, jų darbas bus nutraktas.
+Custom	Terminal AppearancePrefView	Window size	Pasirinktinė
 Insert path	Terminal TermView		Įterpti kelią
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		„Haiku“ terminalas\n© 2001–2009 Haiku, Inc.\n© 1999 Kazuho Okui ir Takashi Murai.\n\nNaudojimas: %s [ARGUMENTAS] [APVALKALAS]\n
 No search string was entered.	Terminal TermWindow		Neįvestas ieškotinas tekstas.

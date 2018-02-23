@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-StyledEdit	2891685263
+1	esperanto	x-vnd.Haiku-StyledEdit	1030296151
 OK	LoadAlert		Bone
 ???	LoadAlert		???
 Left	Menus		Maldekstren
@@ -7,6 +7,7 @@ Size	Menus		Grandeco
 Save	QuitAlert		Konservi
 Can't undo	Menus		Nemalfarebla
 Save	Menus		Konservi
+Default	Menus		Apriora
 Replace with:	FindandReplaceWindow		Anstataŭigi kun:
 Cancel	SaveAlert		Nuligi
 Case-sensitive	FindandReplaceWindow		Usklecodistinga

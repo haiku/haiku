@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libbe	3991560463
+1	dutch; flemish	x-vnd.Haiku-libbe	484001623
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Door:
 About %app%	AboutMenuItem		Over %app%
@@ -7,10 +7,12 @@ Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		K
 Copy	TextView		Kopiëren
 %3.2f KiB	StringForSize		%3.2f KiB
 Error	PrintJob		Fout
+About %app%	AboutWindow		Over %app%
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Groen:
 Remove replicant	Dragger		Replica verwijderen
+OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Print Server antwoordt niet.
 Paste	TextView		Plakken

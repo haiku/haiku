@@ -1,6 +1,7 @@
-1	lithuanian	x-vnd.Haiku-libtracker	541609988
+1	lithuanian	x-vnd.Haiku-libtracker	3310629453
 OK	WidgetAttributeText		Gerai
 Add-ons	FilePanelPriv		Priedai
+Mount settings…	ContainerWindow		Tomų prijungimo nuostatos…
 Desktop	Model		Darbalaukis
 Identify	ContainerWindow		Atpažinti
 Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
@@ -16,6 +17,7 @@ Permissions	InfoWindow		Leidimai
 Recent documents	FavoritesMenu		Paskiausi dokumentai
 Modified	QueryPoseView		Modifikavimo data
 Created	ContainerWindow		Sukūrimo data
+Move	FSUtils	button label	Perkelti
 Error %error loading add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
 contains	SelectionWindow		savyje turi
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Apgailestaujame, tačiau į šakninį failų sistemos aplanką nieko rašyti neleidžiama.
@@ -25,6 +27,7 @@ Name	OpenWithWindow		Pavadinimas
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Failo „%document“ nepavyko atverti, nes programa „%app“ yra Šiukšlinėje.
 File	ContainerWindow		Failas
 Handles any %type	OpenWithWindow		Paliko bet kurį %type
+Name	Person Query Columns		Pavadinimas
 Delete	ContainerWindow		Šalinti
 32 x 32	ContainerWindow		32×32
 Cannot unmount the boot volume \"%name\".	FSUtils		Paleidimo tomo „%name“ atjungti negalima.
@@ -98,6 +101,7 @@ Show space bars on volumes	SettingsView		Rodyti tomų užpildymo indikatorius
 Invert selection	ContainerWindow		Invertuoti žymėjimą
 Increase size	DeskWindow		Padidinti
 Resize to fit	ContainerWindow		Pritaikyti dydį prie turinio
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ties %func \nnepavyko įvykdyti find_directory(). \nPriežastis: %error
 Add printer…	ContainerWindow		Pridėti spausdintuvą…
 New folder	ContainerWindow		Naujas aplankas
 Kind	ContainerWindow		Tipas
@@ -105,6 +109,7 @@ home	B_USER_DIRECTORY		Namai
 Select…	ContainerWindow		Pažymėti…
 Copy to	ContainerWindow		Kopijuoti į
 Move to Trash	ContainerWindow		Išmesti Šiukšlinėn
+Modified	Default Query Columns		Modifikavimo data
 Move to	ContainerWindow		Perkelti į
 Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
 Set new link target	InfoWindow		Keisti nuorodos paskirtį
@@ -211,6 +216,7 @@ Save query as template…	FindPanel		Įrašyti užklausą kaip šabloną…
 Show folder location in title tab	SettingsView		Rodyti pilną aplanko kelią lango antraštėje
 Proceed	FSUtils		Vykdyti
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Šiame aplanke, jau yra objektų, kurių vardai sutampa su objektų, kuriuos %verb, pavadinimais.\n\nAr norite visus konfliktinius objektus pakeisti tais, kuriuos %verb, ar geriau Jūsų atsiklausti dėl kiekvieno atskirai?
+Rename	FSUtils	button label	Pervardinti
 The mount server could not be contacted.	AutoMounterSettings		Nepavyko susisiekti su tomų prijungimo tarnyba.
 Error deleting items	FSUtils		Klaida šalinant objektus
 Create relative link here	ContainerWindow		Sukurti santykinę nuorodą čia
@@ -237,6 +243,7 @@ Reverse order	ContainerWindow		Rikiuoti atvirkščiai
 48 x 48	DeskWindow		48×48
 OK	OpenWithWindow		Gerai
 Add current folder	FilePanelPriv		Įtraukti šį aplanką
+Name	Default Query Columns		Pavadinimas
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (truksta simbolio: %symbol).\n
 The target disk does not support creating links.	FSUtils		Paskirties tome nuorodos nepalaikomos.
 starts with	SelectionWindow		prasideda
@@ -322,6 +329,7 @@ Size:	InfoWindow		Dydis:
 Empty folder	SlowContextPopup		Tuščias aplankas
 Open selection with:	OpenWithWindow		Atverti pažymėtus naudojant:
 Preparing to create links…	StatusWindow		Rengiamasi kurti nuorodas…
+Size	Default Query Columns		Dydis
 Show navigator	SettingsView		Rodyti naršymo juostą
 Desktop	B_DESKTOP_DIRECTORY		Darbalaukis
 List folders first	SettingsView		Aplankus rikiuoti pirmiau
@@ -329,6 +337,7 @@ Name	SelectionWindow		Vardas
 Trash	Model		Šiukšlinė
 Favorites	FilePanelPriv		Parankiniai
 Name	QueryPoseView		Vardas
+OK	Email Query Columns		Gerai
 Delete	FSUtils		Šalinti
 Modified	FindPanel		Modifikavimo data
 Error moving \"%name\" to Trash. (%error)	FSUtils		Klaida perkeliant „%name“ į Šiukšlinę (%error)

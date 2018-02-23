@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	3896051137
+1	dutch; flemish	x-vnd.Haiku-libtracker	1583022416
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Invoegtoepassingen
+Mount settings…	ContainerWindow		Instellingen voor betrekken...
 Desktop	Model		Bureaublad
 Identify	ContainerWindow		Identificeren
 Warning space color	SettingsView		Waarschuwende ruimte-kleur
@@ -16,6 +17,7 @@ Permissions	InfoWindow		Machtigingen
 Recent documents	FavoritesMenu		Recente documenten
 Modified	QueryPoseView		Gewijzigd
 Created	ContainerWindow		Gemaakt
+Move	FSUtils	button label	Verplaatsen
 Error %error loading add-On %name.	ContainerWindow		Fout %error bij het laden van invoegtoepassing %name.
 contains	SelectionWindow		bevat
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Sorry, u kunt geen zaken opslaan in de root van uw systeem.
@@ -25,6 +27,7 @@ Name	OpenWithWindow		Naam
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%document\" kon niet geopend worden omdat \"%app\" zich in de prullenbak bevindt.
 File	ContainerWindow		Bestand
 Handles any %type	OpenWithWindow		Behandelt elk %type
+Name	Person Query Columns		Naam
 Delete	ContainerWindow		Verwijderen
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Kan het opstartvolume \"%name\" niet ontkoppelen.
@@ -96,6 +99,7 @@ Show space bars on volumes	SettingsView		Toon ruimte-indicator op gegevensdrager
 Invert selection	ContainerWindow		Selectie omkeren
 Increase size	DeskWindow		Vermeerder grootte
 Resize to fit	ContainerWindow		Grootte passend maken
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in %func is mislukt. \nReden: %error
 Add printer…	ContainerWindow		Printer toevoegen...
 New folder	ContainerWindow		Nieuwe map
 Kind	ContainerWindow		Soort
@@ -103,6 +107,7 @@ home	B_USER_DIRECTORY		home
 Select…	ContainerWindow		Selecteren...
 Copy to	ContainerWindow		Kopiëren naar
 Move to Trash	ContainerWindow		Verplaatsen naar prullenbak
+Modified	Default Query Columns		Gewijzigd
 Move to	ContainerWindow		Verplaatsen naar
 Create %s clipping	PoseView		Maak %s clipping
 Set new link target	InfoWindow		Nieuw linkdoel instellen
@@ -207,6 +212,7 @@ Preparing to copy items…	StatusWindow		Kopiëren van items wordt voorbereid...
 Show folder location in title tab	SettingsView		Toon de maplocatie in de titel-tab
 Proceed	FSUtils		Verdergaan
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Enkele items met dezelfde namen als de items die u %verb bestaan al in deze map.\n \nWilt u deze vervangen door de items die u %verb of wilt u voor elk bestand afzonderlijk beslissen?
+Rename	FSUtils	button label	Naam wijzigen
 The mount server could not be contacted.	AutoMounterSettings		Er kon geen verbinding gemaakt worden met de betrek-server.
 Error deleting items	FSUtils		Fout bij het verwijderen van items
 Create relative link here	ContainerWindow		Maak een hier relatieve koppeling
@@ -233,6 +239,7 @@ Reverse order	ContainerWindow		Omgekeerde volgorde
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		Oké
 Add current folder	FilePanelPriv		Voeg huidige map toe
+Name	Default Query Columns		Naam
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" kon niet geopend worden met \"%app\" toepassing (Ontbrekend symbool: %symbol). \n
 The target disk does not support creating links.	FSUtils		De doelschijf ondersteunt het maken van koppelingen niet.
 starts with	SelectionWindow		begint met
@@ -317,6 +324,7 @@ Size:	InfoWindow		Grootte:
 Empty folder	SlowContextPopup		Lege map
 Open selection with:	OpenWithWindow		Selectie openen met:
 Preparing to create links…	StatusWindow		Voorbereiden om koppelingen te maken...
+Size	Default Query Columns		Grootte
 Show navigator	SettingsView		Toon de navigator
 Desktop	B_DESKTOP_DIRECTORY		Bureaublad
 List folders first	SettingsView		Toon mappen eerst
@@ -324,6 +332,7 @@ Name	SelectionWindow		Naam
 Trash	Model		Prullenbak
 Favorites	FilePanelPriv		Favorieten
 Name	QueryPoseView		Naam
+OK	Email Query Columns		OK
 Delete	FSUtils		Verwijderen
 Modified	FindPanel		Gewijzigd
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fout bij het verplaatsen van \"%name\" naar de prullenbak. (%error)
@@ -378,6 +387,7 @@ ends with	FindPanel		eindigt met
 New	ContainerWindow		Nieuw
 less than	FindPanel		minder dan
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
 Modified	ContainerWindow		Gewijzigd
 Edit Query template	FindPanel		Zoekopdracht-sjabloon aanpassen
 Prompt	FSUtils		Bevestigen

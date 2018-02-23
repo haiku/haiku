@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-StyledEdit	2588854353
+1	polish	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
 Paste	Menus		Wklej
@@ -17,6 +17,7 @@ Page setup…	Menus		Ustawienia strony…
 Print…	Menus		Drukuj…
 Can't undo	Menus		Nie można cofnąć
 Save	Menus		Zapisz
+Default	Menus		Domyślne
 Replace with:	FindandReplaceWindow		Zamień na:
 Cancel	SaveAlert		Anuluj
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: „%s”.

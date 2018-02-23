@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-MediaPlayer	2716727182
+1	croatian	x-vnd.Haiku-MediaPlayer	3105301944
 Location	MediaPlayer-InfoWin		Lokacija
 %d kHz	MediaPlayer-InfoWin		%d kHz
 <unknown>	PlaylistItem-album		<nepoznato>
@@ -79,6 +79,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiraj unos
 none	Subtitles menu		nijedan
 Move file to Trash	MediaPlayer-PlaylistWindow		Premjesti datoteku u smeće
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		U redu
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Malen
 Edit	MediaPlayer-PlaylistWindow		Uredi
@@ -88,6 +89,7 @@ Start media server	MediaPlayer-Main		Pokreni medijski poslužitelj
 OK	MediaPlayer-PlaylistWindow		U redu
 none	Audio track menu		nijedan
 Duration	MediaPlayer-Main		Trajanje
+Cancel	MediaPlayer-NetworkStream		Otkaži
 Playlist…	MediaPlayer-Main		Lista izvođenja...
 <unknown>	PlaylistItem-author		<nepoznato>
 Save as…	MediaPlayer-PlaylistWindow		Spremi kao...

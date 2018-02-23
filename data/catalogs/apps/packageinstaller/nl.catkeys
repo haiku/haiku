@@ -1,7 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	172019075
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	181118085
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
+No package selected.	UninstallView		Geen pakket geselecteerd.
 Continue	PackageInstall		Doorgaan
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Het gevraagde pakket kon nog worden geïnstalleerd op uw systeem. Dit zou een probleem met het doelpakket kunnen zijn. Gelieve dit probleem te controleren met de distributeur.
 Image not loaded correctly	PackageImageViewer		De afbeelding werd niet correct geladen
@@ -45,6 +46,7 @@ Abort	PackageInfo		Afbreken
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Afbreken
 Continue	PackageTextViewer		Doorgaan
+OK	UninstallView		OK
 Replace	PackageView		Vervangen
 Installation progress	PackageView		Voortgang van de installatie
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Het pakket is niet leesbaar.\nEen van de mogelijke redenen is dat het gevraagde pakket geen geldig BeOS .pkg-pakket is.

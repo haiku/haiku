@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	1149772289
+1	lithuanian	x-vnd.Haiku-MediaPlayer	3423318797
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Automatiškai pradėti a
 Track	Video Track Menu		Takelis
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vidinė klaida (nepavyko blokavimas). Grojaraščio įrašyti nepavyko.
 View options	MediaPlayer-SettingsWindow		Rodymo parinktys
+none	MediaPlayer-Main		nėra
 Play mode	MediaPlayer-SettingsWindow		Atkūrimo parinktys
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Pašalinti įrašus
 Video track	MediaPlayer-Main		Vaizdo takelis
@@ -123,6 +124,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopijuoti įrašą
 none	Subtitles menu		nėra
 Move file to Trash	MediaPlayer-PlaylistWindow		Išmesti failą Šiukšlinėn
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		Gerai
 Mute	MediaPlayer-Main		Nutildyti
 Toggle pause/play.	MediaPlayer-Main		Leisti / pristabdyti.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -142,6 +144,7 @@ OK	MediaPlayer-PlaylistWindow		Gerai
 none	Audio track menu		nėra
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Gauna / nustato garsumą (0.0-2.0).
 Duration	MediaPlayer-Main		Trukmė
+Cancel	MediaPlayer-NetworkStream		Atsisakyti
 Playlist…	MediaPlayer-Main		Grojaraštis…
 <unknown>	PlaylistItem-author		<nežinomas>
 Save as…	MediaPlayer-PlaylistWindow		Įrašyti kaip…

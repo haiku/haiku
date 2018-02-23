@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	2390862402
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	2971507978
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -88,6 +88,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Automatisch beginnen met
 Track	Video Track Menu		Track
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (vastzetten is mislukt). Opslaan van de afspeellijst is mislukt.
 View options	MediaPlayer-SettingsWindow		Weergave-opties
+none	MediaPlayer-Main		geen
 Play mode	MediaPlayer-SettingsWindow		Afspeelmodus
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen
 Video track	MediaPlayer-Main		Videotrack
@@ -119,6 +120,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Onderdeel kopiëren
 none	Subtitles menu		geen
 Move file to Trash	MediaPlayer-PlaylistWindow		Bestand naar de prullenbak verplaatsen
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		Oké
 Mute	MediaPlayer-Main		Geen geluid
 Toggle pause/play.	MediaPlayer-Main		Schakelen tussen pauzeren/afspelen.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -136,6 +138,8 @@ ToggleFullscreen	MediaPlayer-Main		Volledig scherm in-/uitschakelen
 OK	MediaPlayer-PlaylistWindow		Oké
 none	Audio track menu		geen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Volume (0.0-2.0) ophalen/instellen
+Duration	MediaPlayer-Main		Duur
+Cancel	MediaPlayer-NetworkStream		Annuleren
 Playlist…	MediaPlayer-Main		Afspeellijst...
 <unknown>	PlaylistItem-author		<onbekend>
 Save as…	MediaPlayer-PlaylistWindow		Opslaan als...

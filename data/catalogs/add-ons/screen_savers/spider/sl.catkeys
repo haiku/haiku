@@ -1,11 +1,11 @@
-1	slovenian	x-vnd.Haiku-SpiderScreensaver	1542952490
-Max. polygon count	Screensaver Spider		Največje število večkotnikov
-Gray	Screensaver Spider		Siva
-Purple	Screensaver Spider		Vijolična
-Red	Screensaver Spider		Rdeča
-Color	Screensaver Spider		Barva
-Blue	Screensaver Spider		Modra
-for  bonefish	Screensaver Spider		za  bonefish
-Green	Screensaver Spider		Zelena
-Max. points per polygon	Screensaver Spider		Največje število točk na večkotnik
-Yellow	Screensaver Spider		Rumena
+1	slovenian	x-vnd.Haiku-SpiderScreensaver	2020550014
+Blue	SpiderView		Modra
+Gray	SpiderView		Siva
+Max. points per polygon	SpiderView		Največje število točk na večkotnik
+Max. polygon count	SpiderView		Največje število večkotnikov
+for  bonefish	SpiderView		za  bonefish
+Purple	SpiderView		Vijolična
+Red	SpiderView		Rdeča
+Color	SpiderView		Barva
+Green	SpiderView		Zelena
+Yellow	SpiderView		Rumena

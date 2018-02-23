@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	2588854353
+1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Estilo de Edição
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações para o documento \"%s\"?
 Paste	Menus		Colar
@@ -17,6 +17,7 @@ Page setup…	Menus		Configurar página…
 Print…	Menus		Imprimir…
 Can't undo	Menus		Impossível desfazer
 Save	Menus		Salvar
+Default	Menus		Padrões
 Replace with:	FindandReplaceWindow		Substituir com:
 Cancel	SaveAlert		Cancelar
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".

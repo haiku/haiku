@@ -1,7 +1,8 @@
-1	belarusian	x-vnd.Haiku-PackageInstaller	1413270297
+1	belarusian	x-vnd.Haiku-PackageInstaller	1422369307
 Install to:	PackageView		Усталяваць у:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Прыняць
+No package selected.	UninstallView		Няма абраных пакункаў.
 Continue	PackageInstall		Працягваць
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не ўдалося усталяваць абраны пакунак у сістэму. Магчыма праблема з файлам пакунка. Кансультуйцеся, калі ласка, з распрацоўшчыкам пакунка.
 Image not loaded correctly	PackageImageViewer		Вобраз не загружаны
@@ -50,6 +51,7 @@ Abort	PackageInstall		Перарваць
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Працягваць
 Begin	PackageView		Пачаць
+OK	UninstallView		ОК
 Replace	PackageView		Замяніць
 Installation progress	PackageView		Прагрэс усталёўкі
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунку не можа быць прачытаны.\nМагчымая прычына такой памылкі можа быць тое, што ён не з´яўляецца карэктным BeOS .pkg файлам.

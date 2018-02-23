@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-libbe	3992586972
+1	slovenian	x-vnd.Haiku-libbe	2896436356
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -13,6 +13,8 @@ All Rights Reserved.	AboutWindow		Vse pravice pridržane.
 About %app%	AboutWindow		O %app%
 OK	Dragger		V redu
 OK	PrintJob		V redu
+OK	AboutWindow		V redu
+OK	ZombieReplicantView		V redu
 Special Thanks:	AboutWindow		Posebna zahvala:
 %.2f TiB	StringForSize		%.2f TiB
 Redo	TextView		Ponovno uveljavi

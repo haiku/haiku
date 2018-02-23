@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-MediaPlayer	1123957233
+1	slovenian	x-vnd.Haiku-MediaPlayer	3750573376
 Location	MediaPlayer-InfoWin		Lokacija
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (ameriško)
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -12,6 +12,7 @@ Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Shranjevanje 
 New player…	MediaPlayer-Main		Nov predvajalnik…
 100% scale	MediaPlayer-Main		100% velikost
 Subtitle placement:	MediaPlayer-SettingsWindow		Položaj podnapisov:
+Close	MediaPlayer-Main		Zapri
 Open	MediaPlayer-Main		Odpri
 OK	MediaPlayer-SettingsWindow		V redu
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
@@ -22,6 +23,7 @@ Drop files to play	MediaPlayer-Main		Povlecite datoteke za predvajanje
 Cancel	MediaPlayer-SettingsWindow		Prekliči
 Loop audio	MediaPlayer-SettingsWindow		Ponavljaj audio
 Nothing to Play	MediaPlayer-Main		Ničesar ni za predvajati
+Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Za ta format ni nameščenega dekoderja ali pa ima dekoder težave s specifično verzijo formata.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Uvozi vnos
 400% scale	MediaPlayer-Main		400% velikost
@@ -29,11 +31,13 @@ Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Shranjevanje 
 Move Entries	MediaPlayer-MovePLItemsCmd		Premakni vnose
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Odpri seznam predvajanja
+OK	MediaPlayer-Main		V redu
 Move Entry	MediaPlayer-MovePLItemsCmd		Premakni vnos
 Open	MediaPlayer-PlaylistWindow		Odpri
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Datoteke "%filename" ni bilo mogoče odpreti.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Napaka: 
 Audio	MediaPlayer-InfoWin		Audio
+OK	MediaPlayer-RemovePLItemsCmd		V redu
 Volume	MediaPlayer-Main		Glasnost
 Import Entries	MediaPlayer-ImportPLItemsCmd		Uvozi vnose
 Pause	MediaPlayer-Main		Premor
@@ -42,20 +46,25 @@ Automatically start playing	MediaPlayer-SettingsWindow		Začni predvajati samode
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Vseh datotek ni bilo mogoče premakniti v koš.
 unknown format	MediaPlayer-InfoWin		neznan format
 Play	MediaPlayer-Main		Predvajaj
+Duration	MediaPlayer-InfoWin		Trajanje
+Error: 	MediaPlayer-Main		Napaka: 
 Bottom of video	MediaPlayer-SettingsWindow		Na dnu videa
 Stop	MediaPlayer-Main		Ustavi
 Volume of background clips	MediaPlayer-SettingsWindow		Glasnost posnetkov, ki se predvajajo v ozadju
 Hide interface	MediaPlayer-Main		Skrij vmesnik
 Move file to Trash	MediaPlayer-PlaylistWindow		Premakni datoteko v koš
+OK	MediaPlayer-NetworkStream		V redu
 Mute	MediaPlayer-Main		Nemo
 min	MediaPlayer-InfoWin	Minutes	min
 OK	MediaPlayer-PlaylistWindow		V redu
 Duration	MediaPlayer-Main		Trajanje
+Cancel	MediaPlayer-NetworkStream		Prekliči
 Save as…	MediaPlayer-PlaylistWindow		Shrani kot…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiraj vnose
 Always on top	MediaPlayer-Main		Vedno na vrhu
 Save	MediaPlayer-Main		Shrani
 File info	MediaPlayer-InfoWin		Informacije o datoteki
+Save	MediaPlayer-PlaylistWindow		Shrani
 Full screen	MediaPlayer-Main		Cel zaslon
 Open file…	MediaPlayer-Main		Odpri datoteko…
 300% scale	MediaPlayer-Main		300% velikost

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	2588854353
+1	french	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Éditeur stylé
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
 Paste	Menus		Coller
@@ -17,6 +17,7 @@ Page setup…	Menus		Mise en page…
 Print…	Menus		Imprimer…
 Can't undo	Menus		Impossible d’annuler
 Save	Menus		Sauvegarder
+Default	Menus		Défaut
 Replace with:	FindandReplaceWindow		Remplacer par :
 Cancel	SaveAlert		Annuler
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».

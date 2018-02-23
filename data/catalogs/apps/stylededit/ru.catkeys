@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	2588854353
+1	russian	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Стильный редактор
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Paste	Menus		Вставить
@@ -17,6 +17,7 @@ Page setup…	Menus		Настройка печати…
 Print…	Menus		Печать…
 Can't undo	Menus		Невозможно отменить
 Save	Menus		Сохранить
+Default	Menus		По умолчанию
 Replace with:	FindandReplaceWindow		Заменить на:
 Cancel	SaveAlert		Отмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".

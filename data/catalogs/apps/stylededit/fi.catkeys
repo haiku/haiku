@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	2588854353
+1	finnish	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Tyylitetty editori
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \”%s\”? 
 Paste	Menus		Liitä
@@ -17,6 +17,7 @@ Page setup…	Menus		Sivuasetus...
 Print…	Menus		Tulosta...
 Can't undo	Menus		Ei voi perua
 Save	Menus		Tallenna
+Default	Menus		Oletus
 Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.

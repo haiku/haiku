@@ -1,12 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-NewMailNotification	583443025
-Keyboard LEDs	ConfigView		Toetsenbords LED's
-Log window	ConfigView		Logvenster
-Central beep	ConfigView		Centraal geluidssignaal
-Beep	ConfigView		Geluidssignaal
-Method:	ConfigView		Methode:
-Central alert	ConfigView		Centraal signaal
-Alert	ConfigView		Signaal
-none	ConfigView		geen
-New messages	filter		Nieuwe bericht
-New mails notification	ConfigView		Nieuwe e-mails notificatie
-OK	filter		OK
+1	dutch; flemish	x-vnd.Haiku-NewMailNotification	2338542986
+none	NotifierConfigView		geen
+Method:	NotifierConfigView		Methode:
+Beep	NotifierConfigView		Geluidssignaal
+New mails notification	NotifierFilter		Nieuwe e-mails notificatie
+Central alert	NotifierConfigView		Centraal signaal
+OK	NotifierFilter		OK
+New messages	NotifierFilter		Nieuwe bericht
+Log window	NotifierConfigView		Logvenster
+Keyboard LEDs	NotifierConfigView		Toetsenbords LED's
+Central beep	NotifierConfigView		Centraal geluidssignaal
+Alert	NotifierConfigView		Signaal

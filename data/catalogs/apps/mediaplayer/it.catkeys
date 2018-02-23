@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	111690979
+1	italian	x-vnd.Haiku-MediaPlayer	1225497372
 raw audio	MediaPlayer-InfoWin		audio grezzo
 Location	MediaPlayer-InfoWin		Luogo
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -89,6 +89,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Comincia a riprodurre au
 Track	Video Track Menu		Traccia
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (errore nel lock). Fallito il salvataggio della playlist.
 View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione
+none	MediaPlayer-Main		nessuno
 Play mode	MediaPlayer-SettingsWindow		Modalità di riproduzione
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Rimuovi elementi
 Video track	MediaPlayer-Main		Traccia video
@@ -105,6 +106,7 @@ Play	MediaPlayer-Main		Riproduci
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elementi nel Cestino
 200% scale	MediaPlayer-Main		Scala 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembra che il media server non sia in esecuzione.\nAvviarlo?
+Duration	MediaPlayer-InfoWin		Durata
 Aspect ratio	MediaPlayer-Main		Proporzioni
 Error: 	MediaPlayer-Main		Errore: 
 Large	MediaPlayer-SettingsWindow		Grande
@@ -119,6 +121,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia elemento
 none	Subtitles menu		nessuno
 Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Disattiva audio
 Toggle pause/play.	MediaPlayer-Main		Pausa/Riproduci
 min	MediaPlayer-InfoWin	Minutes	min
@@ -135,6 +138,7 @@ OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nessuno
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Rileva/Imposta il volume (0.0-2.0).
 Duration	MediaPlayer-Main		Durata
+Cancel	MediaPlayer-NetworkStream		Annulla
 Playlist…	MediaPlayer-Main		Elenco di riproduzione…
 <unknown>	PlaylistItem-author		<sconosciuto>
 Save as…	MediaPlayer-PlaylistWindow		Salva come…

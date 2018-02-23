@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	1304853728
+1	esperanto	x-vnd.Haiku-libtracker	1978690076
 OK	WidgetAttributeText		Bone
 Add-ons	FilePanelPriv		Aldonaĵoj
 Desktop	Model		Labortablo
@@ -15,6 +15,7 @@ OK	OpenWithWindow		Bone
 OK	PoseView		Bone
 Identify	InfoWindow		Identigi
 Desktop	B_DESKTOP_DIRECTORY		Labortablo
+OK	Email Query Columns		Bone
 Add-ons	DeskWindow		Aldonaĵoj
 Icon view	DeskWindow		Bildeta vido
 Close	ContainerWindow		Fermi

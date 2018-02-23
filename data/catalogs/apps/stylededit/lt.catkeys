@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	2588854353
+1	lithuanian	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Rašyklė
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
 Paste	Menus		Įdėti
@@ -17,6 +17,7 @@ Page setup…	Menus		Puslapio nuostatos…
 Print…	Menus		Spausdinti…
 Can't undo	Menus		Atšaukti negalima
 Save	Menus		Įrašyti
+Default	Menus		Numatytai
 Replace with:	FindandReplaceWindow		Keisti į:
 Cancel	SaveAlert		Atsisakyti
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.

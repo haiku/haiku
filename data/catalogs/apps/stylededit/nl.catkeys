@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	2399086022
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	537696910
 StyledEdit	System name		StyledEdit
 Paste	Menus		Plakken
 OK	LoadAlert		Oké
@@ -14,6 +14,7 @@ Page setup…	Menus		Pagina-configuratie...
 Print…	Menus		Afdrukken...
 Can't undo	Menus		Kan niet ongedaan maken
 Save	Menus		Opslaan
+Default	Menus		Standaard
 Replace with:	FindandReplaceWindow		Vervangen door:
 Cancel	SaveAlert		Annuleren
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.

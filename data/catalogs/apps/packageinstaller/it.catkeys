@@ -1,7 +1,8 @@
-1	italian	x-vnd.Haiku-PackageInstaller	441945624
+1	italian	x-vnd.Haiku-PackageInstaller	451044634
 Install to:	PackageView		Installare su:
 OK	PackageView		Ok
 Accept	PackageTextViewer		Accetta
+No package selected.	UninstallView		Nessun pacchetto selezionato.
 Continue	PackageInstall		Prosegui
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		È fallita l'installazione del pacchetto richiesto sul vostro sistema. Questo potrebbe essere dovuto ad un problema relativo al file pacchetto di destinazione. Consultate il fornitore del pacchetto riguardo questo inconveniente.
 Image not loaded correctly	PackageImageViewer		Immagine non caricata correttamente
@@ -42,6 +43,7 @@ Abort	PackageInfo		Annulla
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Annulla
 Continue	PackageTextViewer		Prosegui
+OK	UninstallView		Ok
 Replace	PackageView		Sostituisci
 Installation progress	PackageView		Avanzamento dell'installazione
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Il pacchetto è illeggibile.\nUna probabile causa è che il file .pkg sottoposto non è un pacchetto valido per BeOS.

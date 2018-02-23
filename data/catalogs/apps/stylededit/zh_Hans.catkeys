@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-StyledEdit	2588854353
+1	english	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		文件标记为只读。是否将修改保存到文档 \"%s\" ?
 Paste	Menus		粘贴
@@ -17,6 +17,7 @@ Page setup…	Menus		页面设置…
 Print…	Menus		打印…
 Can't undo	Menus		无法撤销
 Save	Menus		保存
+Default	Menus		默认
 Replace with:	FindandReplaceWindow		替换为：
 Cancel	SaveAlert		取消
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。

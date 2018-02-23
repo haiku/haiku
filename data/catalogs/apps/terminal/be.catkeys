@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	2560219298
+1	belarusian	x-vnd.Haiku-Terminal	1118559455
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -44,6 +44,7 @@ Window title…	Terminal TermWindow		Загаловак вакна…
 Full screen	Terminal TermWindow		Поўны экран
 Page setup…	Terminal TermWindow		Наладкі старонкі…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступныя працэсы яшчэ актыўныя:\n\n\t%1\n\nКалі вы закрыеце Тэрмінал, працэсы будуць забітыя.
+Custom	Terminal AppearancePrefView	Window size	Спецыяльнае
 Insert path	Terminal TermView		Уставіць пуць
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Тэрмінал Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui, Takashi Murai.\n\nКарыстанне: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Страка для пошуку не ўведзена.

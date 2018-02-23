@@ -1,8 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-GIFTranslator	2250422222
+1	dutch; flemish	x-vnd.Haiku-GIFTranslator	3208722872
 Websafe	GIFView		Websafe
 Write interlaced images	GIFView		Schrijf interlaced afbeelding
 Optimal	GIFView		Optimaal
 Greyscale	GIFView		Grijswaarde
+GIF image translator	GIFTranslator		GIF afbeelding translator
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formaat (GIFVertaler)
 GIF image translator	GIFView		GIF afbeelding translator
 GIF image	GIFTranslator		GIF afbeelding

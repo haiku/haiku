@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Keymap	2121827252
+1	slovenian	x-vnd.Haiku-Keymap	2132833390
 Dvorak	Keyboard Layout View		Dvorakova
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Povrni
@@ -48,6 +48,7 @@ French (Bépo)	Keyboard Layout View		Francoska (Bépo)
 US-International	Keyboard Layout View		ZDA mednarodna
 Swiss-German	Keyboard Layout View		Švicarska nemška
 Layout	Keymap window		Razpored
+Revert	Keymap window		Povrni
 Irish	Keyboard Layout View		Irska
 Turkish (Type-F)	Keyboard Layout View		Turška (Type-F)
 Slovene	Keyboard Layout View		Slovenska

@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Terminal	1791675638
+1	slovenian	x-vnd.Haiku-Terminal	788230226
 Not found.	Terminal TermWindow		Ni mogoče najti.
 Change directory	Terminal TermView		Zamenjaj imenik
 Cursor	Terminal AppearancePrefView		Kurzor
@@ -15,6 +15,7 @@ Select all	Terminal TermWindow		Izberi vse
 Close tab	Terminal TermWindow		Zapri jeziček
 Save to file…	Terminal PrefWindow		Shrani v datoteko…
 Window title:	Terminal AppearancePrefView		Naslov okna:
+Window title:	Terminal TermWindow		Naslov okna:
 Custom	Terminal colors scheme		Po meri
 %app% settings	Terminal PrefWindow	window title	Nastavitve za %app%
 Cancel	Terminal SetTitleWindow		Prekliči
@@ -23,8 +24,11 @@ Settings	Terminal TermWindow		Nastavitve
 Selected text	Terminal AppearancePrefView		Izbrano besedilo
 Find	Terminal FindWindow		Poišči
 Appearance	Terminal PrefWindow		Izgled
+Tab title:	Terminal AppearancePrefView		Naslov jezička:
+OK	Terminal SetTitleWindow		V redu
 Window title…	Terminal TermWindow		Naslov okna…
 Page setup…	Terminal TermWindow		Postavitev strani…
+Custom	Terminal AppearancePrefView	Window size	Po meri
 Insert path	Terminal TermView		Vstavi pot
 No search string was entered.	Terminal TermWindow		Izkalni niz ni določen.
 Font size	Terminal TermWindow		Velikost pisave
@@ -42,6 +46,8 @@ Copy absolute path	Terminal TermView		Kopiraj absolutno pot
 Set tab title	Terminal TermWindow		Nastavi naslov jezička
 Settings…	Terminal TermWindow		Nastavitve…
 Abort	Terminal Shell		Prekini
+Cancel	Terminal TermWindow		Prekliči
+OK	Terminal TermApp		V redu
 Find failed	Terminal TermWindow		Iskanje ni uspelo
 Search forward	Terminal FindWindow		Išči naprej
 Edit tab title…	Terminal TermWindow		Uredi naslov jezička…

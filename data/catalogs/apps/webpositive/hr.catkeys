@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-WebPositive	1296165589
+1	croatian	x-vnd.Haiku-WebPositive	3382113145
 Username:	Authentication Panel		Korisničko ime:
 Copy URL to clipboard	Download Window		Kopiraj URL u međuspremnik
 Cancel	Settings Window		Otkaži
@@ -16,6 +16,7 @@ History	WebPositive Window		Povijest
 Error opening downloads folder	Download Window		Greška pri otvaranju mape preuzimanja
 Paste	WebPositive Window		Zalijepi
 Expiration	Cookie Manager		Istjecanje
+Settings	Settings Window		Postavke
 Serif font:	Settings Window		Serif font:
 Loading %url	WebPositive Window		Učitavam %url
 Download aborted	Download Window		Preuzimaje prekinuto
@@ -24,11 +25,14 @@ Next	WebPositive Window		Slijedeće
 Find next	WebPositive Window		Nađi slijedeće
 Download folder:	Settings Window		Mapa preuzimanja:
 Edit	WebPositive Window		Uredi
+Cancel	Authentication Panel		Otkaži
+Quit	WebPositive Window		Isključi
 Standard font:	Settings Window		Standardni font:
 Restart	Download Window		Ponovno pokreni
 Proxy server	Settings Window		Proxy poslužitelj
 New window	WebPositive Window		Novi prozor
 WebPositive	Download Window		WebPositive
+Downloads	Download Window		Preuzimanja
 Cut	WebPositive Window		Izreži
 Bookmark this page	WebPositive Window		Zabilježi ovu stranicu
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Došlo je do greške kod prikaza mape zabilješki.\n\nGreška: %greška
@@ -80,3 +84,6 @@ Previous	WebPositive Window		Prethodno
 Bookmark error	WebPositive Window		Greška zabilješke
 Do you really want to clear the browsing history?	WebPositive Window		Želite li doista očistiti povijest pregledavanja?
 Copy	WebPositive Window		Kopiraj
+OK	Authentication Panel		U redu
+Copy	URL Bar		Kopiraj
+OK	WebPositive Window		U redu

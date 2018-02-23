@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-InterfacesAddOn	864589889
+1	slovenian	x-vnd.Haiku-InterfacesAddOn	3301939617
 Interface	InterfaceWindow		Vmesnik
 Configure…	InterfacesListView		Nastavi…
 IP:	InterfacesListView	IPv4 address label	IP:
@@ -14,6 +14,8 @@ Revert	InterfaceWindow		Povrni
 connected	IntefaceHardwareView		povezan
 Gateway:	IntefaceAddressView		Prehod:
 Disable	InterfacesListView		Onemogoči
+Disable	InterfacesAddOn		Onemogoči
+Configure…	InterfacesAddOn		Nastavi…
 Your netmask	IntefaceAddressView		Vaša omrežna maska
 IP Address:	IntefaceAddressView		Naslov IP:
 Off	IntefaceAddressView		Izključeno

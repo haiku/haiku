@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	2588854353
+1	belarusian	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Стыльны Рэдактар
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
 Paste	Menus		Уставіць
@@ -17,6 +17,7 @@ Page setup…	Menus		Наладкі старонкі…
 Print…	Menus		Друкаваць…
 Can't undo	Menus		Немагчыма адмяніць
 Save	Menus		Захаваць
+Default	Menus		Прадвызначаны
 Replace with:	FindandReplaceWindow		Змяніць на:
 Cancel	SaveAlert		Адмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Немагчыма вярнуцца, файл \"%s\" ня знойдзены.

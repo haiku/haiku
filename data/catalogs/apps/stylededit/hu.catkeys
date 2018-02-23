@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	2588854353
+1	hungarian	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti dokumentum (%s) változtatásait? 
 Paste	Menus		Beillesztés
@@ -17,6 +17,7 @@ Page setup…	Menus		Oldalbeállítás…
 Print…	Menus		Nyomtatás…
 Can't undo	Menus		Nem vonható vissza
 Save	Menus		Mentés
+Default	Menus		Alapértelmett
 Replace with:	FindandReplaceWindow		Csere erre:
 Cancel	SaveAlert		Mégse
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl (%s) nem található.

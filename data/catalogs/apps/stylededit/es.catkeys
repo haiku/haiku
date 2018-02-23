@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-StyledEdit	2588854353
+1	spanish; castilian	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		Edición con Estilo
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este archivo está marcado como solo lectura. ¿Guardar cambios al documento \"%s\"? 
 Paste	Menus		Pegar
@@ -17,6 +17,7 @@ Page setup…	Menus		Configuarción de pagina...
 Print…	Menus		Imprimir...
 Can't undo	Menus		No se puede deshacer
 Save	Menus		Guardar
+Default	Menus		Predeterminado
 Replace with:	FindandReplaceWindow		Reemplazar con:
 Cancel	SaveAlert		Cancelar
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir, archivo no encontrado: \"%s\".

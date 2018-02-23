@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	541609988
+1	belarusian	x-vnd.Haiku-libtracker	1132010768
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дапаўненні
 Desktop	Model		Дэсктоп
@@ -16,6 +16,7 @@ Permissions	InfoWindow		Дазволы
 Recent documents	FavoritesMenu		Нядаўнія дакменты
 Modified	QueryPoseView		Зменены
 Created	ContainerWindow		Створаны
+Move	FSUtils	button label	Перамясціць
 Error %error loading add-On %name.	ContainerWindow		Памылка %error пры загрузцы add-On %name.
 contains	SelectionWindow		месціць
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Прабачце, вы не можаце захоўваць нешта ў карнявым каталозе сістэмы.
@@ -25,6 +26,7 @@ Name	OpenWithWindow		Імя
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Нельга адкрыць \"%document\", бо \"%app\" - у Сметніцы. 
 File	ContainerWindow		Файл
 Handles any %type	OpenWithWindow		Працые з любым %type
+Name	Person Query Columns		Імя
 Delete	ContainerWindow		Выдаліць
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Немагчыма размантаваць загрузачны том \"%name\".
@@ -105,6 +107,7 @@ home	B_USER_DIRECTORY		хатні
 Select…	ContainerWindow		Выбраць…
 Copy to	ContainerWindow		Капіяваць у
 Move to Trash	ContainerWindow		Перамясціць у Сметніцу
+Modified	Default Query Columns		Зменены
 Move to	ContainerWindow		Перамясціць у
 Create %s clipping	PoseView		Стварыць %s выразку
 Set new link target	InfoWindow		Пазначыць новы адрас спасылкі
@@ -237,6 +240,7 @@ Reverse order	ContainerWindow		Адваротны парадак
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Дадаць цякучы каталог
+Name	Default Query Columns		Імя
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Не ўдалося адкрыць \"%document\" праграмай \"%app\" (Не хапае сімвала: %symbol). \n
 The target disk does not support creating links.	FSUtils		Дыск прызначэння не падтрымлівае стварэнне спасылак.
 starts with	SelectionWindow		пачынаецца з
@@ -322,6 +326,7 @@ Size:	InfoWindow		Памер:
 Empty folder	SlowContextPopup		Пусты каталог
 Open selection with:	OpenWithWindow		Адкрыць выдзеленае за дапамогай:
 Preparing to create links…	StatusWindow		Падрыхтоўка да стварэння спасылак…
+Size	Default Query Columns		Памер
 Show navigator	SettingsView		Паказваць навігатар
 Desktop	B_DESKTOP_DIRECTORY		Працоўны стол
 List folders first	SettingsView		Спачатку паказваць спіс каталогаў
@@ -329,6 +334,7 @@ Name	SelectionWindow		Імя
 Trash	Model		Сметніца
 Favorites	FilePanelPriv		Выбранае
 Name	QueryPoseView		Імя
+OK	Email Query Columns		ОК
 Delete	FSUtils		Выдаліць
 Modified	FindPanel		Зменены
 Error moving \"%name\" to Trash. (%error)	FSUtils		Памылка пры адпраўцы \"%name\" да Сметніцы. (%error)

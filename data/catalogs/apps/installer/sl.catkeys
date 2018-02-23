@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Installer	191055945
+1	slovenian	x-vnd.Haiku-Installer	1693207016
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ali ste prepričani, da želite prekiniti namestitev in ponovno zagnati sistem?
 \t}\n\n	InstallerApp		\t}\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tukaj morate odkomentirati vrstico \"GRUB_HIDDEN_TIMEOUT=0\". To storite tako, da vstavite \"#\" na začetek, da se bo zagonski meni dejansko prikazal.
@@ -12,6 +12,8 @@ Starting Installation.	InstallProgress		Namestitev se začenja.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ta programska oprema je še v razvoju! To pomeni, da obstaja možnost izgube podatkov. Pogosto delajte varnostne kopije! Opozorili smo vas.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Ali ste prepričani, da želite prekiniti namestitev?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ali ste prepričani, da želite nameščati na trenutni zagonski disk? Če nadaljujete, bo moral namestitveni program ponovno zagnati vaš računalnik.
+Stop	InstallerWindow		Ustavi
+OK	InstallerApp		V redu
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld od %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		POMEMBNE INFORMACIJE PRED NAMESTITVIJO\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Nadaljuj
@@ -37,6 +39,7 @@ OK	InstallerWindow		V redu
 Set up partitions…	InstallerWindow		Postavi particije...
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Particije ni mogoče priklopiti. Prosim, izberite drugo particijo.
 Install anyway	InstallProgress		Vseeno namesti
+OK	InstallProgress		V redu
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Namestitveni program bo poskrbel, da se bo dalo zagnati s Haikujeve particije, vendar ne bo nikakor dodal Haikuja v obstoječ zagonski meni. Če imate nameščen GRUB, lahko dodate Haiku na njegov zagonski meni. Kako to storite, je odvisno od verzije GRUB-a.\n\n\n
 Begin	InstallerWindow		Začni
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Na koncu morate posodobiti zagonski meni tako, da vnesete:\n\n
@@ -44,6 +47,7 @@ If you have not created a partition yet, simply reboot, create the partition usi
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Pri GRUB-u 2 ima prva logična particija vedno številko \"5\", ne glede na število primarnih particij.\n\n
 Write boot sector	InstallerWindow		Zapiši zagonski sektor
 Cancel	InstallerWindow		Prekliči
+Continue	InstallerApp		Nadaljuj
 Cancel	InstallProgress		Prekliči
 Try installing anyway	InstallProgress		Vseeno poskusi z nameščanjem
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Pod glavo, ki se je ne sme urejati, dodajte nekaj podobnega tem vrsticam:\n\n

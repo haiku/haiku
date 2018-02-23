@@ -1,5 +1,6 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	1722047333
+1	belarusian	x-vnd.Haiku-HaikuDepot	3127821216
 Name	PackageListView		Імя
+Close	RatePackageWindow		Закрыць
 Changelog	PackageInfoView		Гісторыя зменаў
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
 for %Version%	PackageInfoView		для %Version%
@@ -8,6 +9,7 @@ Description	PackageListView		Апісанне
 Install	PackageManager		Усталяваць
 Tools	MainWindow		Прылады
 HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Закрыць
 Rate package…	PackageInfoView		Ацаніць пакунак…
 Uninstall	PackageManager		Выдаліць
 <no info>	PackageInfoView		<няма інфармацыі>
@@ -28,6 +30,7 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 Productivity	Model		Прадукцыйнасць
 Games	Model		Гульні
 Rating	PackageListView		Рэйтынг
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 Graphics	Model		Графіка
 Local	MainWindow		Лакальныя
 Close	MainWindow		Закрыць

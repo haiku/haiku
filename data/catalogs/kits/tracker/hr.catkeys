@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	57535563
+1	croatian	x-vnd.Haiku-libtracker	647936343
 OK	WidgetAttributeText		U redu
 Add-ons	FilePanelPriv		Dodaci
 Mount settings…	ContainerWindow		Postavke za montiranje...
@@ -17,12 +17,14 @@ Permissions	InfoWindow		Dozvole
 Recent documents	FavoritesMenu		Nedavni dokumenti
 Modified	QueryPoseView		Izmjenjeno
 Created	ContainerWindow		Napravljeno
+Move	FSUtils	button label	Premjesti
 Error %error loading add-On %name.	ContainerWindow		Greška %greška pri učitavanju dodatka %imena.
 contains	SelectionWindow		sadrži
 Paste links	ContainerWindow		Zalijepi poveznice
 Name	OpenWithWindow		Ime
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Ne mogu otvoriti \"%document\" jer je program \"%app\" u smeću. 
 File	ContainerWindow		Datoteka
+Name	Person Query Columns		Ime
 Delete	ContainerWindow		Izbriši
 32 x 32	ContainerWindow		32 x 32
 Open with…	ContainerWindow		Otvori pomoću...
@@ -92,6 +94,7 @@ home	B_USER_DIRECTORY		osobna mapa
 Select…	ContainerWindow		Odaberi...
 Copy to	ContainerWindow		Kopiraj u
 Move to Trash	ContainerWindow		Premjesti u smeće
+Modified	Default Query Columns		Izmjenjeno
 Move to	ContainerWindow		Premjesti u
 Create %s clipping	PoseView		Napravi %s isječak
 preferences	B_PREFERENCES_DIRECTORY		osobitosti
@@ -203,6 +206,7 @@ Reverse order	ContainerWindow		Preokreni red
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		U redu
 Add current folder	FilePanelPriv		Dodaj trenutnu mapu
+Name	Default Query Columns		Ime
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nemože se otvoriti \"%document\" sa programom \"%app\" (Nedostaje simbol: %symbol). \n
 The target disk does not support creating links.	FSUtils		Željeni disk ne podržava kreiranje poveznica.
 starts with	SelectionWindow		počinje sa
@@ -279,6 +283,7 @@ Size:	InfoWindow		Veličina:
 Empty folder	SlowContextPopup		Prazna mapa
 Open selection with:	OpenWithWindow		Otvori odabir pomoću:
 Preparing to create links…	StatusWindow		Priprema za stvaranje  poveznica...
+Size	Default Query Columns		Veličina
 Show navigator	SettingsView		Prikaži navigator
 Desktop	B_DESKTOP_DIRECTORY		Radna površina
 List folders first	SettingsView		Najprije izlistaj mape
@@ -286,6 +291,7 @@ Name	SelectionWindow		Ime
 Trash	Model		Smeće
 Favorites	FilePanelPriv		Favoriti
 Name	QueryPoseView		Ime
+OK	Email Query Columns		U redu
 Delete	FSUtils		Izbriši
 Modified	FindPanel		Izmjenjeno
 Error moving \"%name\" to Trash. (%error)	FSUtils		Greška pri pomicanju\"%name\" u Smeće. (%error)

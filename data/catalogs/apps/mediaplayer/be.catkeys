@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	1149772289
+1	belarusian	x-vnd.Haiku-MediaPlayer	3423318797
 raw audio	MediaPlayer-InfoWin		нефарматаване аўдыё
 Location	MediaPlayer-InfoWin		Месцазнаходжанне
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Пачынаць пра�
 Track	Video Track Menu		Дарожка
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Унутраная памылка (блакаванне не атрымалася). Плэйліст не захаваны.
 View options	MediaPlayer-SettingsWindow		Опцыі віду
+none	MediaPlayer-Main		няма
 Play mode	MediaPlayer-SettingsWindow		Рэжым прайграння
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Убраць Элементы
 Video track	MediaPlayer-Main		Відэа дарожка
@@ -123,6 +124,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Капіяваць элемент
 none	Subtitles menu		няма
 Move file to Trash	MediaPlayer-PlaylistWindow		Перасунуць файл у Сметніцу
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		ОК
 Mute	MediaPlayer-Main		Выкл. гук
 Toggle pause/play.	MediaPlayer-Main		Прыпыніць/працягваць.
 min	MediaPlayer-InfoWin	Minutes	хв
@@ -142,6 +144,7 @@ OK	MediaPlayer-PlaylistWindow		ОК
 none	Audio track menu		няма
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Вызначае/прызначае гучнасць (0.0-2.0).
 Duration	MediaPlayer-Main		Працягласць
+Cancel	MediaPlayer-NetworkStream		Адмена
 Playlist…	MediaPlayer-Main		Плэйліст…
 <unknown>	PlaylistItem-author		<невядомы>
 Save as…	MediaPlayer-PlaylistWindow		Захаваць як…

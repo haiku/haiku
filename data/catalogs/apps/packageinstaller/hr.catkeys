@@ -1,7 +1,8 @@
-1	croatian	x-vnd.Haiku-PackageInstaller	172019075
+1	croatian	x-vnd.Haiku-PackageInstaller	181118085
 Install to:	PackageView		Instaliraj u:
 OK	PackageView		U redu
 Accept	PackageTextViewer		Prihvati
+No package selected.	UninstallView		Nijedan paket nije izabran.
 Continue	PackageInstall		Nastavi
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Neuspjelo instaliranje traženog paketa u vaš sustav.Možda je problem sa ciljanom datotekom paketa.Savjetujte se sa distributerom paketa.
 Image not loaded correctly	PackageImageViewer		Slika nije ispravno učitana
@@ -45,6 +46,7 @@ Abort	PackageInfo		Prekini
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Prekini
 Continue	PackageTextViewer		Nastavi
+OK	UninstallView		U redu
 Replace	PackageView		Zamijeni
 Installation progress	PackageView		Napredak instalacije
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paket nije čitljiv\nJedan od mogućih razloga može biti da tražena datoteka nije valjani BeOS .pkg paket

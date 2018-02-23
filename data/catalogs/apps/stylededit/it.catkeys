@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-StyledEdit	2597535460
+1	italian	x-vnd.Haiku-StyledEdit	736146348
 StyledEdit	System name		StyledEdit
 Paste	Menus		Incolla
 OK	LoadAlert		OK
@@ -14,6 +14,7 @@ Page setup…	Menus		Imposta pagina…
 Print…	Menus		Stampa…
 Can't undo	Menus		Impossibile annullare
 Save	Menus		Salva
+Default	Menus		Predefinito
 Replace with:	FindandReplaceWindow		Sostituisci con:
 Cancel	SaveAlert		Annulla
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%s\".

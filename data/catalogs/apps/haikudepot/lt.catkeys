@@ -1,5 +1,6 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	1722047333
+1	lithuanian	x-vnd.Haiku-HaikuDepot	3127821216
 Name	PackageListView		Pavadinimas
+Close	RatePackageWindow		Užverti
 Changelog	PackageInfoView		Pakeitimų žurnalas
 Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
 for %Version%	PackageInfoView		versijai %Version%
@@ -8,6 +9,7 @@ Description	PackageListView		Aprašas
 Install	PackageManager		Įdiegti
 Tools	MainWindow		Priemonės
 HaikuDepot	System name		Paketų tvarkytuvė
+Close	UserLoginWindow		Užverti
 Rate package…	PackageInfoView		Įvertinti paketą…
 Uninstall	PackageManager		Išdiegti
 <no info>	PackageInfoView		<informacijos nėra>
@@ -28,6 +30,7 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 Productivity	Model		Raštinė
 Games	Model		Žaidimai
 Rating	PackageListView		Įvertinimas
+(%Votes%)	FeaturedPackagesView		(%Votes%)
 Graphics	Model		Grafika
 Local	MainWindow		Vietinis
 Close	MainWindow		Užverti

@@ -1,7 +1,8 @@
-1	lithuanian	x-vnd.Haiku-PackageInstaller	1413270297
+1	lithuanian	x-vnd.Haiku-PackageInstaller	1422369307
 Install to:	PackageView		Diegti į:
 OK	PackageView		Gerai
 Accept	PackageTextViewer		Priimti
+No package selected.	UninstallView		Nepasirinktas nė vienas paketas.
 Continue	PackageInstall		Tęsti
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pasirinktojo paketo į sistemą įdiegti nepavyko. Tai gali būti paties paketo problema. Siūlome dėl jos susisiekti su paketo tiekėju.
 Image not loaded correctly	PackageImageViewer		Paveikslo įkelti nepavyko
@@ -50,6 +51,7 @@ Abort	PackageInstall		Nutraukti
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Tęsti
 Begin	PackageView		Pradėti
+OK	UninstallView		Gerai
 Replace	PackageView		Pakeisti
 Installation progress	PackageView		Diegimo eiga
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketo failo nepavyko perskaityti.\nGali būti, jog nurodytas failas nėra BeOS .pkg paketas arba yra pažeistas.
