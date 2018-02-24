@@ -15,6 +15,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <kernel.h>
+#include <syscall_restart.h>
+
 
 static status_t
 inquiry(scsi_periph_device_info *device, scsi_inquiry *inquiry)
@@ -26,7 +29,17 @@ inquiry(scsi_periph_device_info *device, scsi_inquiry *inquiry)
 			(const void **)&device_inquiry, &inquiryLength, true) != B_OK)
 		return B_ERROR;
 
-	memcpy(inquiry, device_inquiry, min_c(inquiryLength, sizeof(scsi_inquiry)));
+	if (IS_USER_ADDRESS(inquiry)) {
+		if (user_memcpy(&inquiry, device_inquiry,
+			min_c(inquiryLength, sizeof(scsi_inquiry))) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	} else if (is_called_via_syscall()) {
+		return B_BAD_ADDRESS;
+	} else {
+		memcpy(&inquiry, device_inquiry,
+			min_c(inquiryLength, sizeof(scsi_inquiry)));
+	}
 	return B_OK;
 }
 
@@ -345,7 +358,13 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 
 			SHOW_FLOW(2, "%s", strerror(status));
 
-			*(status_t *)buffer = status;
+			if (IS_USER_ADDRESS(buffer)) {
+				if (user_memcpy(buffer, &status, sizeof(status_t)) != B_OK)
+					return B_BAD_ADDRESS;
+			} else if (is_called_via_syscall()) {
+				return B_BAD_ADDRESS;
+			} else
+				*(status_t *)buffer = status;
 			return B_OK;
 		}
 
@@ -384,7 +403,16 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 			return inquiry(handle->device, (scsi_inquiry *)buffer);
 
 		case B_SCSI_PREVENT_ALLOW:
-			return prevent_allow(handle->device, *(bool *)buffer);
+			bool result;
+			if (IS_USER_ADDRESS(buffer)) {
+				if (user_memcpy(&result, buffer, sizeof(result)) != B_OK)
+					return B_BAD_ADDRESS;
+			} else if (is_called_via_syscall()) {
+				return B_BAD_ADDRESS;
+			} else
+				result = *(bool*)buffer;
+
+			return prevent_allow(handle->device, result);
 
 		case B_RAW_DEVICE_COMMAND:
 			return raw_command(handle->device, (raw_device_command*)buffer);
