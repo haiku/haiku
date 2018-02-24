@@ -211,11 +211,11 @@ BarberPole::Draw(BRect updateRect)
 			position += fStripeWidth;
 		}
 		SetDrawingMode(B_OP_COPY);
+		// Draw box around it
+		bounds = Bounds();
+		be_control_look->DrawBorder(this, bounds, updateRect,
+			ui_color(B_PANEL_BACKGROUND_COLOR), B_PLAIN_BORDER);
 	}
-	// Draw box around it
-	BRect bounds = Bounds();
-	be_control_look->DrawBorder(this, bounds, updateRect,
-		ui_color(B_PANEL_BACKGROUND_COLOR), B_PLAIN_BORDER);
 }
 
 
