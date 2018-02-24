@@ -39,6 +39,10 @@ public:
 
 	bool							IsConnected() const;
 
+	// If the connection is connected get the other endpoint,
+	// return media_connection::null otherwise.
+	media_connection				Endpoint();
+
 	// This allow to specify a format that will be used while
 	// connecting to another node.
 	void							SetAcceptedFormat(
