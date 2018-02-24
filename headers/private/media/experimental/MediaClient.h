@@ -56,7 +56,6 @@ public:
 			status_t				InitCheck() const;
 
 	// TODO: Should allow BControllable capabilities
-	// TODO: Add file interface
 	// TODO: Offline mode is still missing
 
 	// When those functions return, the BMediaConnection is added to the
