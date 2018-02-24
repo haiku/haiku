@@ -269,7 +269,7 @@ BMediaOutput::~BMediaOutput()
 
 
 bool
-BMediaOutput::IsEnabled() const
+BMediaOutput::_IsEnabled() const
 {
 	CALLED();
 
@@ -278,7 +278,7 @@ BMediaOutput::IsEnabled() const
 
 
 void
-BMediaOutput::SetEnabled(bool enabled)
+BMediaOutput::_SetEnabled(bool enabled)
 {
 	fEnabled = enabled;
 }

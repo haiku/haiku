@@ -479,7 +479,7 @@ BMediaClientNode::EnableOutput(const media_source& source,
 
 	BMediaOutput* conn = fOwner->_FindOutput(source);
 	if (conn != NULL)
-		conn->SetEnabled(enabled);
+		conn->_SetEnabled(enabled);
 }
 
 
@@ -623,7 +623,7 @@ BMediaClientNode::_ProduceNewBuffer(const media_timed_event* event,
 	if (output == NULL)
 		return;
 
-	if (output->IsEnabled()) {
+	if (output->_IsEnabled()) {
 		BBuffer* buffer = _GetNextBuffer(output, event->event_time);
 
 		if (buffer != NULL) {

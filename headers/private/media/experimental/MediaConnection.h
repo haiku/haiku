@@ -115,10 +115,8 @@ private:
 
 
 class BMediaInput : public virtual BMediaConnection {
-public:
-									BMediaInput();
-
 protected:
+									BMediaInput();
 	virtual							~BMediaInput();
 
 	// Callbacks
@@ -147,13 +145,8 @@ private:
 
 
 class BMediaOutput : public virtual BMediaConnection {
-public:
-									BMediaOutput();
-
-	void							SetEnabled(bool enabled);
-	bool							IsEnabled() const;
-
 protected:
+									BMediaOutput();
 	virtual							~BMediaOutput();
 
 	// Callbacks
@@ -171,6 +164,10 @@ protected:
 
 private:
 	media_output					_MediaOutput() const;
+
+	// TODO: possibly unneeded.
+	void							_SetEnabled(bool enabled);
+	bool							_IsEnabled() const;
 
 	bool							fEnabled;
 	size_t							fFramesSent;
