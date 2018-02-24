@@ -385,24 +385,6 @@ BMediaClient::SyncTo(bigtime_t performanceTime, bigtime_t timeout)
 }
 
 
-BMediaNode::run_mode
-BMediaClient::RunMode() const
-{
-	CALLED();
-
-	return fNode->RunMode();
-}
-
-
-status_t
-BMediaClient::SetRunMode(BMediaNode::run_mode mode)
-{
-	CALLED();
-
-	return BMediaRoster::CurrentRoster()->SetRunModeNode(fNode->Node(), mode);
-}
-
-
 bigtime_t
 BMediaClient::CurrentTime() const
 {

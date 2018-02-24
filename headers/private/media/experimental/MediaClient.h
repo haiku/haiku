@@ -128,10 +128,6 @@ public:
 			status_t				SyncTo(bigtime_t performanceTime,
 										bigtime_t timeout = -1);
 
-	// It will be B_INCREASE_LATENCY by default
-			BMediaNode::run_mode	RunMode() const;
-			status_t				SetRunMode(BMediaNode::run_mode mode);
-
 	// Return the current performance time handled by the object when
 	// run_mode != B_OFFLINE. Otherwise returns the current offline time.
 			bigtime_t				CurrentTime() const;
