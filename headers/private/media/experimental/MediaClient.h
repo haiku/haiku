@@ -6,13 +6,11 @@
 #ifndef _MEDIA_CLIENT_H
 #define _MEDIA_CLIENT_H
 
-#include <ObjectList.h>
 #include <Buffer.h>
-
 #include <MediaAddOn.h>
 #include <MediaClientDefs.h>
 #include <MediaDefs.h>
-#include <MediaNode.h>
+#include <ObjectList.h>
 
 
 namespace BPrivate { namespace media {
@@ -56,7 +54,6 @@ public:
 			status_t				InitCheck() const;
 
 	// TODO: Should allow BControllable capabilities
-	// TODO: Offline mode is still missing
 
 	// When those functions return, the BMediaConnection is added to the
 	// list and is visible to other nodes as not connected. Any input/output
