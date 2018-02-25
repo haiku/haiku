@@ -153,6 +153,8 @@ protected:
 	virtual status_t				PrepareToConnect(media_format* format);
 
 	virtual status_t				FormatProposal(media_format* format);
+
+	// TODO: Do we really want this?
 	virtual status_t				FormatChangeRequested(media_format* format);
 
 	// When a connection is not binded with another, and you really don't want
