@@ -394,6 +394,12 @@ rule KernelArchitectureSetup architecture
 				HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
 				HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
 			}
+
+			if x86 in $(HAIKU_ARCHS[2-]) || x86_gcc2 in $(HAIKU_ARCHS[2-]) {
+				Echo "Enable kernel ia32 compatibility" ;
+				HAIKU_KERNEL_DEFINES += _COMPAT_MODE ;
+				HAIKU_KERNEL_COMPAT_MODE = 1 ;
+			}
 	}
 
 	if $(HAIKU_BOOT_PLATFORM) = efi {
