@@ -150,6 +150,20 @@ BSimpleMediaConnection::Cookie() const
 }
 
 
+size_t
+BSimpleMediaConnection::BufferSize() const
+{
+	return fBufferSize;
+}
+
+
+void
+BSimpleMediaConnection::SetBufferSize(size_t bufferSize)
+{
+	fBufferSize = bufferSize;
+}
+
+
 BSimpleMediaInput::BSimpleMediaInput()
 	:
 	BMediaConnection(B_MEDIA_INPUT),

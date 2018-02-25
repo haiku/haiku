@@ -51,7 +51,7 @@ public:
 
 	// Represents the buffer size, depends on the format set or negotiated
 	// for this connection.
-	size_t							BufferSize() const;
+	virtual size_t					BufferSize() const = 0;
 
 	// Disconnect this connection. When a connection is disconnected,
 	// it can be reused as brand new.

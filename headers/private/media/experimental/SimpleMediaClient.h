@@ -114,6 +114,9 @@ public:
 
 			void*					Cookie() const;
 
+	virtual size_t					BufferSize() const;
+	virtual void					SetBufferSize(size_t bufferSize);
+
 protected:
 									BSimpleMediaConnection(
 										media_connection_kinds kinds);
@@ -122,6 +125,8 @@ protected:
 			process_hook			fProcessHook;
 			notify_hook				fNotifyHook;
 			void*					fBufferCookie;
+
+			size_t					fBufferSize;
 };
 
 

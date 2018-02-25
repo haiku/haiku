@@ -120,25 +120,6 @@ BMediaConnection::Release()
 }
 
 
-size_t
-BMediaConnection::BufferSize() const
-{
-	CALLED();
-
-	switch (fConnection.format.type) {
-		case B_MEDIA_RAW_AUDIO:
-			return fConnection.format.u.raw_audio.buffer_size;
-
-		case B_MEDIA_RAW_VIDEO:
-			return fConnection.format.u.raw_video.display.bytes_per_row *
-				fConnection.format.u.raw_video.display.line_count;
-
-		default:
-			return 0;
-	}
-}
-
-
 void
 BMediaConnection::Connected(const media_format& format)
 {
