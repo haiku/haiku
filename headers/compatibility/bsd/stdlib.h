@@ -20,6 +20,8 @@ int			daemon(int noChangeDir, int noClose);
 const char	*getprogname(void);
 void		setprogname(const char *programName);
 
+int			mkstemps(char *templat, int slen);
+
 #ifdef __cplusplus
 }
 #endif

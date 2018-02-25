@@ -51,14 +51,12 @@ static int _gettemp(char *, int *, int, int);
 static const char padchar[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 
-#if 0
 int
 mkstemps(char *path, int slen)
 {
 	int fd;
 	return _gettemp(path, &fd, 0, slen) ? fd : -1;
 }
-#endif
 
 
 int
