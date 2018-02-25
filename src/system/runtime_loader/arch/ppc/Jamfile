@@ -1,18 +1,23 @@
 SubDir HAIKU_TOP src system runtime_loader arch ppc ;
 
-local architecture = $(TARGET_PACKAGING_ARCH) ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ppc ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-UsePrivateHeaders runtime_loader ;
-UsePrivateSystemHeaders ;
+		UsePrivateHeaders runtime_loader ;
+		UsePrivateSystemHeaders ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+		SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
-StaticLibrary libruntime_loader_$(TARGET_ARCH).a :
-	arch_relocate.cpp
-	:
-	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>atomic.o
-	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
+		StaticLibrary <$(architecture)>libruntime_loader_$(TARGET_ARCH).a :
+			arch_relocate.cpp
+			:
+			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>atomic.o
+			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
 
-	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
-	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
-	;
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
+			;
+	}
+}

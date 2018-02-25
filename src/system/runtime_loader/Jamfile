@@ -1,109 +1,119 @@
 SubDir HAIKU_TOP src system runtime_loader ;
 
-local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-UsePrivateHeaders libroot runtime_loader shared ;
-UsePrivateHeaders kernel ;
-	# for <util/KMessage.h>
-UsePrivateHeaders libroot os ;
-	# for "PathBuffer.h"
-UsePrivateSystemHeaders ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-ObjectHdrs find_directory.cpp : $(HAIKU_TOP)/src/system/libroot/os ;
+		UsePrivateHeaders libroot runtime_loader shared ;
+		UsePrivateHeaders kernel ;
+			# for <util/KMessage.h>
+		UsePrivateHeaders libroot os ;
+			# for "PathBuffer.h"
+		UsePrivateSystemHeaders ;
 
-# Don't let gcc inject built-in function code. This will cause dependencies
-# to libroot, which we don't link against.
-SubDirCcFlags -fno-builtin ;
-SubDirC++Flags -fno-builtin -fno-exceptions ;
+		ObjectHdrs find_directory.cpp : $(HAIKU_TOP)/src/system/libroot/os ;
 
-DEFINES +=
-	KMESSAGE_CONTAINER_ONLY
-	_LOADER_MODE
-	USING_LIBGCC=1
-;
+		# Don't let gcc inject built-in function code. This will cause
+		# dependencies to libroot, which we don't link against.
+		SubDirCcFlags -fno-builtin ;
+		SubDirC++Flags -fno-builtin -fno-exceptions ;
 
-AddResources runtime_loader : runtime_loader.rdef ;
+		DEFINES +=
+			KMESSAGE_CONTAINER_ONLY
+			_LOADER_MODE
+			USING_LIBGCC=1
+		;
 
-# needed for "runtime_loader" only
-StaticLibrary libruntime_loader.a :
-	kernel_vsprintf.cpp
-	kernel_cpp.cpp
-	KMessage.cpp
-	find_directory.cpp
-	:
-	<src!system!libroot!os!$(architecture)>mutex.o
-	<src!system!libroot!os!$(architecture)>recursive_lock.o
-	<src!system!libroot!os!$(architecture)>syscalls.o
-	<src!system!libroot!os!$(architecture)>sem.o
-	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>tls.o
+		AddResources [ MultiArchDefaultGristFiles runtime_loader ]
+			: runtime_loader.rdef ;
 
-	<src!system!libroot!posix!$(architecture)>errno.o
-  	<src!system!libroot!posix!$(architecture)>fcntl.o
+		# needed for "runtime_loader" only
+		StaticLibrary <$(architecture)>libruntime_loader.a :
+			kernel_vsprintf.cpp
+			kernel_cpp.cpp
+			KMessage.cpp
+			find_directory.cpp
+			:
+			<src!system!libroot!os!$(architecture)>mutex.o
+			<src!system!libroot!os!$(architecture)>recursive_lock.o
+			<src!system!libroot!os!$(architecture)>syscalls.o
+			<src!system!libroot!os!$(architecture)>sem.o
+			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>tls.o
 
-	<src!system!libroot!posix!locale!$(architecture)>ctype.o
-	<src!system!libroot!posix!locale!$(architecture)>LocaleData.o
+			<src!system!libroot!posix!$(architecture)>errno.o
+			<src!system!libroot!posix!$(architecture)>fcntl.o
 
-	<src!system!libroot!posix!string!$(architecture)>memchr.o
-	<src!system!libroot!posix!string!$(architecture)>memcmp.o
-	<src!system!libroot!posix!string!$(architecture)>memmove.o
-	<src!system!libroot!posix!string!$(architecture)>strcasecmp.o
-	<src!system!libroot!posix!string!$(architecture)>strcat.o
-	<src!system!libroot!posix!string!$(architecture)>strchr.o
-	<src!system!libroot!posix!string!$(architecture)>strcmp.o
-	<src!system!libroot!posix!string!$(architecture)>strcpy.o
-	<src!system!libroot!posix!string!$(architecture)>strcspn.o
-	<src!system!libroot!posix!string!$(architecture)>strdup.o
-	<src!system!libroot!posix!string!$(architecture)>strerror.o
-	<src!system!libroot!posix!string!$(architecture)>strlcat.o
-	<src!system!libroot!posix!string!$(architecture)>strlcpy.o
-	<src!system!kernel!lib>strlen.o
-	<src!system!libroot!posix!string!$(architecture)>strncmp.o
-	<src!system!libroot!posix!string!$(architecture)>strnlen.o
-	<src!system!libroot!posix!string!$(architecture)>strpbrk.o
-	<src!system!libroot!posix!string!$(architecture)>strrchr.o
-	<src!system!libroot!posix!string!$(architecture)>strspn.o
-	<src!system!libroot!posix!string!$(architecture)>strstr.o
+			<src!system!libroot!posix!locale!$(architecture)>ctype.o
+			<src!system!libroot!posix!locale!$(architecture)>LocaleData.o
 
-	[ FGristFiles kernel_vsprintf.o ]
-;
+			<src!system!libroot!posix!string!$(architecture)>memchr.o
+			<src!system!libroot!posix!string!$(architecture)>memcmp.o
+			<src!system!libroot!posix!string!$(architecture)>memmove.o
+			<src!system!libroot!posix!string!$(architecture)>strcasecmp.o
+			<src!system!libroot!posix!string!$(architecture)>strcat.o
+			<src!system!libroot!posix!string!$(architecture)>strchr.o
+			<src!system!libroot!posix!string!$(architecture)>strcmp.o
+			<src!system!libroot!posix!string!$(architecture)>strcpy.o
+			<src!system!libroot!posix!string!$(architecture)>strcspn.o
+			<src!system!libroot!posix!string!$(architecture)>strdup.o
+			<src!system!libroot!posix!string!$(architecture)>strerror.o
+			<src!system!libroot!posix!string!$(architecture)>strlcat.o
+			<src!system!libroot!posix!string!$(architecture)>strlcpy.o
+			<src!system!libroot!posix!string!$(architecture)>strlen.o
+			<src!system!libroot!posix!string!$(architecture)>strncmp.o
+			<src!system!libroot!posix!string!$(architecture)>strnlen.o
+			<src!system!libroot!posix!string!$(architecture)>strpbrk.o
+			<src!system!libroot!posix!string!$(architecture)>strrchr.o
+			<src!system!libroot!posix!string!$(architecture)>strspn.o
+			<src!system!libroot!posix!string!$(architecture)>strstr.o
+		;
 
-SEARCH on [ FGristFiles kernel_cpp.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles kernel_vsprintf.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
-SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
-SEARCH on [ FGristFiles find_directory.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+		SEARCH on [ FGristFiles kernel_cpp.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+		SEARCH on [ FGristFiles kernel_vsprintf.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
+		SEARCH on [ FGristFiles KMessage.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
+		SEARCH on [ FGristFiles find_directory.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
-local sources =
-	add_ons.cpp
-	elf.cpp
-	elf_haiku_version.cpp
-	elf_load_image.cpp
-	elf_symbol_lookup.cpp
-	elf_tls.cpp
-	elf_versioning.cpp
-	pe.cpp
-	errors.cpp
-	export.cpp
-	heap.cpp
-	images.cpp
-	runtime_loader.cpp
-	utility.cpp
-;
+		local sources =
+			add_ons.cpp
+			elf.cpp
+			elf_haiku_version.cpp
+			elf_load_image.cpp
+			elf_symbol_lookup.cpp
+			elf_tls.cpp
+			elf_versioning.cpp
+			pe.cpp
+			errors.cpp
+			export.cpp
+			heap.cpp
+			images.cpp
+			runtime_loader.cpp
+			utility.cpp
+		;
 
-Objects $(sources) ;
+		Objects $(sources) ;
 
-Ld runtime_loader :
-	[ FGristFiles $(sources:S=$(SUFOBJ)) ]
-	libruntime_loader.a
-	libruntime_loader_$(TARGET_ARCH).a
-	[ TargetKernelLibsupc++ ]
-	[ TargetKernelLibgcc ]
-	[ TargetKernelLibgcceh ]
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
-	: --no-undefined -shared -soname=runtime_loader
-;
+		Ld [ MultiArchDefaultGristFiles runtime_loader ] :
+			[ FGristFiles $(sources:S=$(SUFOBJ)) ]
+			<$(architecture)>libruntime_loader.a
+			<$(architecture)>libruntime_loader_$(TARGET_ARCH).a
+			[ TargetKernelLibsupc++ ]
+			[ TargetKernelLibgcc ]
+			[ TargetKernelLibgcceh ]
+			: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
+			: --no-undefined -shared -soname=runtime_loader
+		;
+	}
+}
 
-HaikuSubInclude arch $(TARGET_ARCH) ;
+
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	HaikuSubInclude arch $(arch) ;
+}
+

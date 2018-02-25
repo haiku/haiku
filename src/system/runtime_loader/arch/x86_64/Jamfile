@@ -1,15 +1,20 @@
 SubDir HAIKU_TOP src system runtime_loader arch x86_64 ;
 
-local architecture = $(TARGET_PACKAGING_ARCH) ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-UsePrivateHeaders runtime_loader ;
-UsePrivateSystemHeaders ;
+		UsePrivateHeaders runtime_loader ;
+		UsePrivateSystemHeaders ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+		SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
-StaticLibrary libruntime_loader_$(TARGET_ARCH).a :
-	arch_relocate.cpp
-	:
-	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
-	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
-	;
+		StaticLibrary <$(architecture)>libruntime_loader_$(TARGET_ARCH).a :
+			arch_relocate.cpp
+			:
+			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
+			;
+	}
+}
