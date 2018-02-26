@@ -1,8 +1,0 @@
-1	croatian	x-vnd.Haiku-InstalledPackages	4131220089
-No package selected.	UninstallView		NIje izabran nijedan paket.
-Remove	UninstallView		Ukloni
-Package description	UninstallView		Opis paketa
-InstalledPackages	System name		Instaliranipaketi
-The package you selected has been successfully removed from your system.	UninstallView		Izabrani paket je uspješno uklonjen iz vašeg sustava.
-OK	UninstallView		U redu
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Izabrani paket nije uklonjen iz vašeg sustava.Datoteka s informacijama o instaliranim paketima je možda korumpirana.

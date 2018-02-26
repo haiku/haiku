@@ -1,7 +1,0 @@
-1	czech	x-vnd.Haiku-InstalledPackages	148986533
-No package selected.	UninstallView		Nevybrány žádné balíčky.
-OK	UninstallView		OK
-Package description	UninstallView		Popis balíčku
-Remove	UninstallView		Odebrat
-The package you selected has been successfully removed from your system.	UninstallView		Vybraný balíček byl úspěšně odebrán z Vašeho systému.
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Vybraný balíček nebyl odebrán z Vašeho systému. Informační soubor zvoleného instalovaného balíčku je možná poškozen.

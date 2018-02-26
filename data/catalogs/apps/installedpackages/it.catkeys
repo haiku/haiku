@@ -1,8 +1,0 @@
-1	italian	x-vnd.Haiku-InstalledPackages	4131220089
-No package selected.	UninstallView		Nessun pacchetto selezionato.
-Remove	UninstallView		Rimuovi
-Package description	UninstallView		Descrizione del pacchetto
-InstalledPackages	System name		InstalledPackages
-The package you selected has been successfully removed from your system.	UninstallView		Il pacchetto selezionato è stato rimosso con successo dal sistema.
-OK	UninstallView		OK
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Il pacchetto selezionato non è stato rimosso dal sistema, il file di informazioni installato dal pacchetto potrebbe essere corrotto.
