@@ -776,8 +776,8 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 			if (ioRequest != NULL) {
 				ioRequest->CopyData(source, ioRequest->Offset()
 					+ ((addr_t)pointer - (addr_t)buffer), copyLength);
-			} else
-				memcpy(pointer, source, copyLength);
+			} else if (user_memcpy(pointer, source, copyLength) < B_OK)
+				return B_BAD_ADDRESS;
 
 			bytesLeft -= copyLength;
 			position += copyLength;
@@ -838,8 +838,8 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 				void *target = other->buffer + (newPosition - other->position);
 				if (ioRequest != NULL)
 					ioRequest->CopyData(ioRequest->Offset(), target, length);
-				else
-					memcpy(target, buffer, length);
+				else if (user_memcpy(target, buffer, length) < B_OK)
+					return B_BAD_ADDRESS;
 
 				fStat.st_mtime = time(NULL);
 				if (fIsAttribute) {
@@ -897,8 +897,8 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	void *target = element->buffer + (position - newPosition);
 	if (ioRequest != NULL)
 		ioRequest->CopyData(0, target, length);
-	else
-		memcpy(target, buffer, length);
+	else if (user_memcpy(target, buffer, length) < B_OK)
+		return B_BAD_ADDRESS;
 
 	fStat.st_mtime = time(NULL);
 
