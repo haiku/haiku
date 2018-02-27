@@ -49,9 +49,17 @@ public:
 										const media_format& format);
 	const media_format&				AcceptedFormat() const;
 
-	// Represents the buffer size, depends on the format set or negotiated
-	// for this connection.
+	// Represents the buffer size, implement it to return the buffer size
+	// you decided for this connection.
+	// TODO: Do we want this (and ChainSize) moved on the output side?
+	// Or perhaps provide an implementation based on the buffer group
+	// for the consumer?
+	// Problem is: the consumer has not easy access to the buffer group,
+	// so we way want to add a special messaging between clients after
+	// connection, so that inputs know the buffer size and chain size.
 	virtual size_t					BufferSize() const = 0;
+	// Implement it to specify the size of your chain of buffers.
+	//virtual int32					ChainSize() const = 0;
 
 	// Disconnect this connection. When a connection is disconnected,
 	// it can be reused as brand new.
