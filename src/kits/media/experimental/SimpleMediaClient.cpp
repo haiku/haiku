@@ -195,7 +195,7 @@ BSimpleMediaInput::Disconnected()
 	if (fNotifyHook != NULL)
 		(*fNotifyHook)(this, BSimpleMediaConnection::B_INPUT_DISCONNECTED);
 
-	BMediaConnection::Disconnected();
+	BMediaInput::Disconnected();
 }
 
 
@@ -242,7 +242,7 @@ BSimpleMediaOutput::Connected(const media_format& format)
 	if (fNotifyHook != NULL)
 		(*fNotifyHook)(this, BSimpleMediaConnection::B_OUTPUT_CONNECTED);
 
-	BSimpleMediaConnection::Connected(format);
+	BMediaOutput::Connected(format);
 }
 
 
@@ -252,5 +252,5 @@ BSimpleMediaOutput::Disconnected()
 	if (fNotifyHook != NULL)
 		(*fNotifyHook)(this, BSimpleMediaConnection::B_OUTPUT_DISCONNECTED);
 
-	BSimpleMediaConnection::Disconnected();
+	BMediaOutput::Disconnected();
 }

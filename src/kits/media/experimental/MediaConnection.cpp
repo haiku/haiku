@@ -204,7 +204,20 @@ void
 BMediaInput::HandleBuffer(BBuffer* buffer)
 {
 	CALLED();
+}
 
+
+void
+BMediaInput::Connected(const media_format& format)
+{
+	BMediaConnection::Connected(format);
+}
+
+
+void
+BMediaInput::Disconnected()
+{
+	BMediaConnection::Disconnected();
 }
 
 
@@ -294,6 +307,13 @@ BMediaOutput::SendBuffer(BBuffer* buffer)
 		return B_ERROR;
 
 	return fOwner->fNode->SendBuffer(buffer, this);
+}
+
+
+void
+BMediaOutput::Connected(const media_format& format)
+{
+	BMediaConnection::Connected(format);
 }
 
 

@@ -122,6 +122,7 @@ protected:
 										media_connection_kinds kinds);
 	virtual							~BSimpleMediaConnection();
 
+			// TODO: move those to private and introduce protected methods
 			process_hook			fProcessHook;
 			notify_hook				fNotifyHook;
 			void*					fBufferCookie;

@@ -68,11 +68,10 @@ protected:
 										media_connection_kinds kinds);
 	virtual							~BMediaConnection();
 
+private:
 	// Those callbacks are shared between BMediaInput and BMediaOutput
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
-
-private:
 
 			void					_ConnectionRegistered(BMediaClient* owner,
 										media_connection_id id);
@@ -122,6 +121,9 @@ protected:
 
 	virtual void					HandleBuffer(BBuffer* buffer);
 
+	virtual void					Connected(const media_format& format);
+	virtual void					Disconnected();
+
 private:
 	media_input						_MediaInput() const;
 
@@ -162,6 +164,7 @@ protected:
 	// you are doing.
 	virtual	status_t				SendBuffer(BBuffer* buffer);
 
+	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
 private:
