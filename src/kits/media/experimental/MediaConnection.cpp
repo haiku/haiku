@@ -13,8 +13,7 @@
 BMediaConnection::BMediaConnection(media_connection_kinds kinds)
 	:
 	fOwner(NULL),
-	fBind(NULL),
-	fBufferGroup(NULL)
+	fBind(NULL)
 {
 	CALLED();
 
@@ -95,14 +94,7 @@ BMediaConnection::Disconnect()
 {
 	CALLED();
 
-	status_t ret = fOwner->_DisconnectConnection(this);
-	if (ret != B_OK)
-		return ret;
-
-	delete fBufferGroup;
-	fBufferGroup = NULL;
-
-	return ret;
+	return fOwner->_DisconnectConnection(this);
 }
 
 
@@ -238,7 +230,8 @@ void BMediaInput::_ReservedMediaInput10() {}
 
 BMediaOutput::BMediaOutput()
 	:
-	BMediaConnection(B_MEDIA_OUTPUT)
+	BMediaConnection(B_MEDIA_OUTPUT),
+	fBufferGroup(NULL)
 {
 }
 
@@ -301,6 +294,16 @@ BMediaOutput::SendBuffer(BBuffer* buffer)
 		return B_ERROR;
 
 	return fOwner->fNode->SendBuffer(buffer, this);
+}
+
+
+void
+BMediaOutput::Disconnected()
+{
+	delete fBufferGroup;
+	fBufferGroup = NULL;
+
+	BMediaConnection::Disconnected();
 }
 
 

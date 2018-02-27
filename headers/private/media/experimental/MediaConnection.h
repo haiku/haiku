@@ -89,8 +89,6 @@ private:
 	// see BMediaClient::Bind.
 	BMediaConnection*				fBind;
 
-	BBufferGroup*					fBufferGroup;
-
 	bool							fConnected;
 
 	virtual	void					_ReservedMediaConnection0();
@@ -164,6 +162,8 @@ protected:
 	// you are doing.
 	virtual	status_t				SendBuffer(BBuffer* buffer);
 
+	virtual void					Disconnected();
+
 private:
 	media_output					_MediaOutput() const;
 
@@ -173,6 +173,8 @@ private:
 
 	bool							fEnabled;
 	size_t							fFramesSent;
+
+	BBufferGroup*					fBufferGroup;
 
 	virtual	void					_ReservedMediaOutput0();
 	virtual	void					_ReservedMediaOutput1();
