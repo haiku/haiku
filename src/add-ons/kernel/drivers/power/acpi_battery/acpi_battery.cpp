@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <kernel.h>
+
 #include "device/power_managment.h"
 
 
@@ -321,43 +323,46 @@ acpi_battery_read(void* _cookie, off_t position, void *buffer, size_t* numBytes)
 	ReadBatteryInfo(device->driver_cookie, &batteryInfo);
 
 	if (position == 0) {
-		size_t max_len = *numBytes;
-		char *str = (char *)buffer;
-
+		char string[512];
+		char *str = string;
+		size_t max_len = sizeof(string);
 		snprintf(str, max_len, "Battery Status:\n");
-		max_len-= strlen(str);
+		max_len -= strlen(str);
 		str += strlen(str);
 
 		snprintf(str, max_len, " State %i, Current Rate %i, Capacity %i, "
 			"Voltage %i\n", batteryStatus.state, batteryStatus.current_rate,
 			batteryStatus.capacity,	batteryStatus.voltage);
-		max_len-= strlen(str);
+		max_len -= strlen(str);
 		str += strlen(str);
 
 		snprintf(str, max_len, "\nBattery Info:\n");
-		max_len-= strlen(str);
+		max_len -= strlen(str);
 		str += strlen(str);
 
 		snprintf(str, max_len, " Power Unit %i, Design Capacity %i, "
 			"Last Full Charge %i, Technology %i\n", batteryInfo.power_unit,
 			batteryInfo.design_capacity, batteryInfo.last_full_charge,
 			batteryInfo.technology);
-		max_len-= strlen(str);
+		max_len -= strlen(str);
 		str += strlen(str);
 		snprintf(str, max_len, " Design Voltage %i, Design Capacity Warning %i, "
 			"Design Capacity Low %i, Capacity Granularity1 %i, "
 			"Capacity Granularity1 %i\n", batteryInfo.design_voltage,
 			batteryInfo.design_capacity_warning, batteryInfo.design_capacity_low,
 			batteryInfo.capacity_granularity_1, batteryInfo.capacity_granularity_1);
-		max_len-= strlen(str);
+		max_len -= strlen(str);
 		str += strlen(str);
 		snprintf(str, max_len, " Model Number %s, Serial Number %s, "
 			"Type %s, OEM Info %s\n", batteryInfo.model_number,
 			batteryInfo.serial_number, batteryInfo.type, batteryInfo.oem_info);
-		max_len-= strlen(str);
+		max_len -= strlen(str);
 		str += strlen(str);
 
-		*numBytes = strlen((char *)buffer);
+		max_len = user_strlcpy((char*)buffer, string, *numBytes);
+		if (max_len < B_OK)
+			return B_BAD_ADDRESS;
+		*numBytes = max_len;
 	} else
 		*numBytes = 0;
 
@@ -384,7 +389,11 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 				return B_BAD_VALUE;
 
 			uint32 magicId = kMagicACPIBatteryID;
-			return user_memcpy(arg, &magicId, sizeof(magicId));
+			if (!IS_USER_ADDRESS(arg)
+				|| user_memcpy(arg, &magicId, sizeof(magicId)) < B_OK) {
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
 		}
 
 		case GET_BATTERY_INFO: {
@@ -395,7 +404,12 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 			err = ReadBatteryStatus(device->driver_cookie, &batteryInfo);
 			if (err != B_OK)
 				return err;
-			return user_memcpy(arg, &batteryInfo, sizeof(batteryInfo));
+			if (!IS_USER_ADDRESS(arg)
+				|| user_memcpy(arg, &batteryInfo, sizeof(batteryInfo))
+					< B_OK) {
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
 		}
 
 		case GET_EXTENDED_BATTERY_INFO: {
@@ -406,7 +420,12 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 			err = ReadBatteryInfo(device->driver_cookie, &extBatteryInfo);
 			if (err != B_OK)
 				return err;
-			return user_memcpy(arg, &extBatteryInfo, sizeof(extBatteryInfo));
+			if (!IS_USER_ADDRESS(arg)
+				|| user_memcpy(arg, &extBatteryInfo, sizeof(extBatteryInfo))
+					< B_OK) {
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
 		}
 
 		case WATCH_BATTERY:

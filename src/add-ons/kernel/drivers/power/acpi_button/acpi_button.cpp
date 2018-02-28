@@ -210,7 +210,7 @@ acpi_button_select(void *_cookie, uint8 event, selectsync *sync)
 	status_t error = add_select_sync_pool_entry(&device->select_pool, sync,
 		event);
 	if (error != B_OK) {
-		ERROR("add_select_sync_pool_entry() failed: %" B_PRId32 "\n", error);
+		ERROR("add_select_sync_pool_entry() failed: %" B_PRIx32 "\n", error);
 		return error;
 	}
 
