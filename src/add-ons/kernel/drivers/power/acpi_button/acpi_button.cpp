@@ -168,13 +168,14 @@ acpi_button_open(void *_cookie, const char *path, int flags, void** cookie)
 
 
 static status_t
-acpi_button_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
+acpi_button_read(void* _cookie, off_t position, void *buffer, size_t* num_bytes)
 {
 	acpi_button_device_info* device = (acpi_button_device_info*)_cookie;
-	if (*num_bytes < 1)
+	if (*num_bytes < sizeof(uint8))
 		return B_IO_ERROR;
 
-	*((uint8 *)(buf)) = device->last_status;
+	if (user_memcpy(buffer, &device->last_status, sizeof(uint8)) < B_OK)
+		return B_BAD_ADDRESS;
 	device->last_status = 0;
 
 	*num_bytes = 1;
@@ -209,7 +210,7 @@ acpi_button_select(void *_cookie, uint8 event, selectsync *sync)
 	status_t error = add_select_sync_pool_entry(&device->select_pool, sync,
 		event);
 	if (error != B_OK) {
-		ERROR("add_select_sync_pool_entry() failed: %#lx\n", error);
+		ERROR("add_select_sync_pool_entry() failed: %" B_PRId32 "\n", error);
 		return error;
 	}
 
