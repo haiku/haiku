@@ -1414,9 +1414,6 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kLGPLv21)
 		.SetURL("http://fukuchi.org/works/qrencode/"));
 
-	_AddCopyrightsFromAttribute();
-	_AddPackageCreditEntries();
-
 	// scrypt
 	_AddPackageCredit(PackageCredit("scrypt")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2009 Colin Percival"))
