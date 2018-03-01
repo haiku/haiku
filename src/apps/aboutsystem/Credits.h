@@ -336,6 +336,7 @@ static const Translation kTranslations[] = {
 	{ "sv",
 		"Patrik Gissberg\n"
 		"Johan Holmberg\n"
+		"Theo Knez\n"
 		"Fredrik Modéen\n"
 		"Jimmy Olsson (phalax)\n"
 		"Jonas Sundström\n"
