@@ -242,10 +242,8 @@ BMediaClientNode::Disconnected(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (conn->_Source() == source) {
-		conn->Disconnect();
+	if (conn->_Source() == source)
 		conn->Disconnected();
-	}
 }
 
 
@@ -419,11 +417,9 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 	if (conn == NULL)
 		return;
 
-	// Reset the connection to reuse it
-	if (status != B_OK) {
-		conn->Disconnect();
+	// Connection failed, return.
+	if (status != B_OK)
 		return;
-	}
 
 	conn->fConnection.destination = dest;
 	conn->fConnection.format = format;
@@ -451,10 +447,9 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (conn->_Destination() == dest) {
-		conn->Disconnect();
+	if (conn->_Destination() == dest)
 		conn->Disconnected();
-	}
+
 }
 
 
