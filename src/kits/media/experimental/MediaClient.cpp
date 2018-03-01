@@ -366,25 +366,6 @@ BMediaClient::Roll(bigtime_t start, bigtime_t stop, bigtime_t seek)
 }
 
 
-status_t
-BMediaClient::Preroll()
-{
-	CALLED();
-
-	return BMediaRoster::CurrentRoster()->PrerollNode(fNode->Node());
-}
-
-
-status_t
-BMediaClient::SyncTo(bigtime_t performanceTime, bigtime_t timeout)
-{
-	CALLED();
-
-	return BMediaRoster::CurrentRoster()->SyncToNode(fNode->Node(),
-		performanceTime, timeout);
-}
-
-
 bigtime_t
 BMediaClient::CurrentTime() const
 {

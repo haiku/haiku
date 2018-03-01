@@ -119,14 +119,6 @@ public:
 			status_t				Roll(bigtime_t start, bigtime_t stop,
 										bigtime_t seek);
 
-	// TODO: We really want to expose Preroll and SyncTo?
-	// Preroll the client to buffer startup latency
-			status_t				Preroll();
-
-	// This function return when the client reach the specified performanceTime
-			status_t				SyncTo(bigtime_t performanceTime,
-										bigtime_t timeout = -1);
-
 	// Return the current performance time handled by the client.
 			bigtime_t				CurrentTime() const;
 
