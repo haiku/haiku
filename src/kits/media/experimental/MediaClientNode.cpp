@@ -470,9 +470,7 @@ BMediaClientNode::GetLatency(bigtime_t* outLatency)
 {
 	CALLED();
 
-	// TODO: finish latency handling
-	*outLatency = 1000;
-	return B_OK;
+	return BBufferProducer::GetLatency(outLatency);
 }
 
 
