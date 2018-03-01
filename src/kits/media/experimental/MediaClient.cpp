@@ -513,13 +513,24 @@ BMediaClient::_ConnectInput(BMediaOutput* output,
 	if (input._Destination() == media_destination::null)
 		return B_MEDIA_BAD_DESTINATION;
 
-	media_output ourOutput = output->Connection()._MediaOutput();
-	media_input theirInput = input._MediaInput();
-	media_format format = output->AcceptedFormat();
+	media_output ourOutput = output->Connection()._BuildMediaOutput();
+	media_input theirInput = input._BuildMediaInput();
+	media_format format;
 
-	return BMediaRoster::CurrentRoster()->Connect(ourOutput.source,
+	// NOTE: We want to set this data in the callbacks if possible.
+	// The correct format should have been set in BMediaConnection::Connected.
+	// TODO: Perhaps add some check assert?
+
+	status_t ret = BMediaRoster::CurrentRoster()->Connect(ourOutput.source,
 		theirInput.destination, &format, &ourOutput, &theirInput,
 		BMediaRoster::B_CONNECT_MUTED);
+
+#if 0
+	if (ret == B_OK)
+		output->fConnection.format = format;
+#endif
+
+	return ret;
 }
 
 
@@ -532,13 +543,24 @@ BMediaClient::_ConnectOutput(BMediaInput* input,
 	if (output._Source() == media_source::null)
 		return B_MEDIA_BAD_SOURCE;
 
-	media_input ourInput = input->Connection()._MediaInput();
-	media_output theirOutput = output._MediaOutput();
-	media_format format = input->AcceptedFormat();
+	media_input ourInput = input->Connection()._BuildMediaInput();
+	media_output theirOutput = output._BuildMediaOutput();
+	media_format format;
 
-	return BMediaRoster::CurrentRoster()->Connect(theirOutput.source,
+	// NOTE: We want to set this data in the callbacks if possible.
+	// The correct format should have been set in BMediaConnection::Connected.
+	// TODO: Perhaps add some check assert?
+
+	status_t ret = BMediaRoster::CurrentRoster()->Connect(theirOutput.source,
 		ourInput.destination, &format, &theirOutput, &ourInput,
 		BMediaRoster::B_CONNECT_MUTED);
+
+#if 0
+	if (ret == B_OK)
+		input->fConnection.format = format;
+#endif
+
+	return ret;
 }
 
 

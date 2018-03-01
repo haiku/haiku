@@ -62,24 +62,6 @@ BMediaConnection::Binding() const
 }
 
 
-void
-BMediaConnection::SetAcceptedFormat(const media_format& format)
-{
-	CALLED();
-
-	fConnection.format = format;
-}
-
-
-const media_format&
-BMediaConnection::AcceptedFormat() const
-{
-	CALLED();
-
-	return fConnection.format;
-}
-
-
 bool
 BMediaConnection::IsConnected() const
 {
@@ -115,6 +97,9 @@ BMediaConnection::Release()
 void
 BMediaConnection::Connected(const media_format& format)
 {
+	// Update the status of our connection format.
+	fConnection.format = format;
+
 	fConnected = true;
 }
 
@@ -209,13 +194,6 @@ BMediaInput::Disconnected()
 }
 
 
-media_input
-BMediaInput::_MediaInput() const
-{
-	return Connection()._MediaInput();
-}
-
-
 void BMediaInput::_ReservedMediaInput0() {}
 void BMediaInput::_ReservedMediaInput1() {}
 void BMediaInput::_ReservedMediaInput2() {}
@@ -240,42 +218,6 @@ BMediaOutput::BMediaOutput()
 BMediaOutput::~BMediaOutput()
 {
 	CALLED();
-}
-
-
-bool
-BMediaOutput::_IsEnabled() const
-{
-	CALLED();
-
-	return fEnabled;
-}
-
-
-void
-BMediaOutput::_SetEnabled(bool enabled)
-{
-	fEnabled = enabled;
-}
-
-
-status_t
-BMediaOutput::PrepareToConnect(media_format* format)
-{
-	if (!format_is_compatible(AcceptedFormat(), *format))
-		return B_ERROR;
-
-	SetAcceptedFormat(*format);
-
-	return B_OK;
-}
-
-
-status_t
-BMediaOutput::FormatProposal(media_format* format)
-{
-	*format = AcceptedFormat();
-	return B_OK;
 }
 
 
@@ -308,10 +250,19 @@ BMediaOutput::Disconnected()
 }
 
 
-media_output
-BMediaOutput::_MediaOutput() const
+bool
+BMediaOutput::_IsEnabled() const
 {
-	return Connection()._MediaOutput();
+	CALLED();
+
+	return fEnabled;
+}
+
+
+void
+BMediaOutput::_SetEnabled(bool enabled)
+{
+	fEnabled = enabled;
 }
 
 

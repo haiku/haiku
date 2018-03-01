@@ -149,12 +149,7 @@ BMediaClientNode::AcceptFormat(const media_destination& dest,
 	if (conn == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
-	if (format_is_compatible(*format, conn->AcceptedFormat()))
-		return B_OK;
-
-	*format = conn->AcceptedFormat();
-
-	return B_MEDIA_BAD_FORMAT;
+	return conn->AcceptFormat(format);
 }
 
 
@@ -173,7 +168,7 @@ BMediaClientNode::GetNextInput(int32* cookie,
 	} else {
 		BMediaInput* conn = fOwner->InputAt(*cookie);
 		if (conn != NULL) {
-			*input = conn->_MediaInput();
+			*input = conn->fConnection._BuildMediaInput();
 			*cookie += 1;
 			return B_OK;
 		}
@@ -228,11 +223,11 @@ BMediaClientNode::Connected(const media_source& source,
 		return B_MEDIA_BAD_DESTINATION;
 
 	conn->fConnection.source = source;
-	conn->SetAcceptedFormat(format);
+	conn->fConnection.format = format;
 
 	conn->Connected(format);
 
-	*outInput = conn->_MediaInput();
+	*outInput = conn->fConnection._BuildMediaInput();
 	return B_OK;
 }
 
@@ -336,7 +331,7 @@ BMediaClientNode::GetNextOutput(int32* cookie, media_output* output)
 	} else {
 		BMediaOutput* conn = fOwner->OutputAt(*cookie);
 		if (conn != NULL) {
-			*output = conn->_MediaOutput();
+			*output = conn->fConnection._BuildMediaOutput();
 			*cookie += 1;
 			return B_OK;
 		}
@@ -431,7 +426,8 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 	}
 
 	conn->fConnection.destination = dest;
-	conn->SetAcceptedFormat(format);
+	conn->fConnection.format = format;
+
 	strcpy(name, Name());
 
 	// TODO: add correct latency estimate
@@ -627,7 +623,7 @@ BMediaClientNode::_ProduceNewBuffer(const media_timed_event* event,
 	}
 
 	bigtime_t time = 0;
-	media_format format = output->AcceptedFormat();
+	media_format format = output->fConnection.format;
 	if (format.IsAudio()) {
 		size_t nFrames = format.u.raw_audio.buffer_size
 			/ ((format.u.raw_audio.format
@@ -656,7 +652,7 @@ BMediaClientNode::_GetNextBuffer(BMediaOutput* output, bigtime_t eventTime)
 	}
 
 	media_header* header = buffer->Header();
-	header->type = output->AcceptedFormat().type;
+	header->type = output->fConnection.format.type;
 	header->size_used = output->BufferSize();
 	header->time_source = TimeSource()->ID();
 	header->start_time = eventTime;

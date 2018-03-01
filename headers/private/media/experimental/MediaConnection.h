@@ -43,12 +43,6 @@ public:
 	// return media_connection::null otherwise.
 	media_connection				Endpoint();
 
-	// This allow to specify a format that will be used while
-	// connecting to another node.
-	void							SetAcceptedFormat(
-										const media_format& format);
-	const media_format&				AcceptedFormat() const;
-
 	// Represents the buffer size, implement it to return the buffer size
 	// you decided for this connection.
 	// TODO: Do we want this (and ChainSize) moved on the output side?
@@ -125,13 +119,14 @@ protected:
 	virtual							~BMediaInput();
 
 	// Callbacks
+	virtual status_t				AcceptFormat(media_format* format) = 0;
+
 	virtual void					HandleBuffer(BBuffer* buffer);
 
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
 private:
-	media_input						_MediaInput() const;
 
 	virtual	void					_ReservedMediaInput0();
 	virtual	void					_ReservedMediaInput1();
@@ -156,8 +151,8 @@ protected:
 	virtual							~BMediaOutput();
 
 	// Callbacks
-	virtual status_t				PrepareToConnect(media_format* format);
-	virtual status_t				FormatProposal(media_format* format);
+	virtual status_t				PrepareToConnect(media_format* format) = 0;
+	virtual status_t				FormatProposal(media_format* format) = 0;
 
 	// When a connection is not binded with another, and you really don't want
 	// to use BMediaGraph it's your job to send the buffer to the connection
@@ -170,7 +165,6 @@ protected:
 	virtual void					Disconnected();
 
 private:
-	media_output					_MediaOutput() const;
 
 	// TODO: possibly unneeded.
 	void							_SetEnabled(bool enabled);

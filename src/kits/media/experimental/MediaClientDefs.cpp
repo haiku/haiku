@@ -59,7 +59,7 @@ media_connection::IsOutput() const
 
 
 media_input
-media_connection::_MediaInput() const
+media_connection::_BuildMediaInput() const
 {
 	media_input input;
 	input.node = client.node;
@@ -71,7 +71,7 @@ media_connection::_MediaInput() const
 
 
 media_output
-media_connection::_MediaOutput() const
+media_connection::_BuildMediaOutput() const
 {
 	media_output output;
 	output.node = client.node;

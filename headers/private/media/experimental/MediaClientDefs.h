@@ -67,8 +67,12 @@ typedef struct media_connection {
 	BMessage*					ToMessage() const;
 
 private:
-	media_input					_MediaInput() const;
-	media_output				_MediaOutput() const;
+	// NOTE: We are doing this on purpose to avoid redundancy we
+	// want to build the input/output on the fly. In pratice, the
+	// only thing that can change is the format which is kept updated
+	// to reflect the current status of this connection.
+	media_input					_BuildMediaInput() const;
+	media_output				_BuildMediaOutput() const;
 
 	const media_source&			_Source() const;
 	const media_destination&	_Destination() const;
@@ -84,6 +88,9 @@ private:
 
     media_source				source;
     media_destination			destination;
+
+    // This format always reflect the most updated format depending
+    // on the connection phase.
     media_format				format;
     char						name[B_MEDIA_NAME_LENGTH];
 

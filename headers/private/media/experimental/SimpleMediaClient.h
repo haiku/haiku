@@ -117,6 +117,12 @@ public:
 	virtual size_t					BufferSize() const;
 	virtual void					SetBufferSize(size_t bufferSize);
 
+			// This allow to specify a format that will be used while
+			// connecting to another node.
+			void					SetAcceptedFormat(
+										const media_format& format);
+			const media_format&		AcceptedFormat() const;
+
 protected:
 									BSimpleMediaConnection(
 										media_connection_kinds kinds);
@@ -128,6 +134,8 @@ protected:
 			void*					fBufferCookie;
 
 			size_t					fBufferSize;
+
+			media_format			fAcceptedFormat;
 };
 
 
@@ -138,10 +146,12 @@ public:
 protected:
 	virtual							~BSimpleMediaInput();
 
-	virtual void					Connected(const media_format& format);
-	virtual void					Disconnected();
+	virtual status_t				AcceptFormat(media_format* format);
 
 	virtual void					HandleBuffer(BBuffer* buffer);
+
+	virtual void					Connected(const media_format& format);
+	virtual void					Disconnected();
 };
 
 
@@ -152,10 +162,11 @@ public:
 protected:
 	virtual							~BSimpleMediaOutput();
 
+	virtual status_t				PrepareToConnect(media_format* format);
+	virtual status_t				FormatProposal(media_format* format);
+
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
-
-	virtual status_t				FormatProposal(media_format* format);
 };
 
 
