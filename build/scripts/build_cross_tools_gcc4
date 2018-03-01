@@ -62,6 +62,10 @@ powerpc-*)
 	binutilsTargets="$binutilsTargets,powerpc-apple-linux,powerpc-apple-freebsd,powerpc-apple-vxworks"
 	gdbConfigureArgs="--disable-multilib --disable-werror"
 	gdbTarget="powerpc-unknown-elf"
+
+	# TODO: Disable building with TLS support for PPC until implemented.
+	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
+	gccConfigureArgs="$gccConfigureArgs --disable-tls"
 	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
