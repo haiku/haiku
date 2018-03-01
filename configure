@@ -212,6 +212,27 @@ real_path()
 	perl -MCwd=realpath -e'print realpath($ARGV[0]), "\n"' "$1"
 }
 
+# valid_toolchain
+#
+# check if toolchain is valid
+#
+valid_toolchain()
+{
+	TRIPLET="$1"
+	BASE="$2"
+	if [ ! -d "$BASE" ]; then
+		return 1;
+	fi
+	if [ -f "$BASE/bin/$TRIPLET-gcc" ]; then
+		return 0;
+	fi
+	# TODO: Check this!
+	if [ -f "$BASE/bin/$TRIPLET-clang" ]; then
+		return 0;
+	fi
+	return 1;
+}
+
 # standard_gcc_settings
 #
 # Sets the variables for a GCC platform.
@@ -884,7 +905,7 @@ else
 				*)					MAKE=make;;
 			esac
 
-			if [ ! -d "$crossToolsDir" ]; then
+			if ! valid_toolchain "${targetMachine}" "${crossToolsDir}"; then
 				MAKE=$MAKE \
 				SECONDARY_ARCH=$secondaryArch \
 				HAIKU_USE_GCC_GRAPHITE=`get_variable \
