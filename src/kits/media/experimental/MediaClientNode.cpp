@@ -260,12 +260,7 @@ BMediaClientNode::FormatChanged(const media_source& source,
 	int32 tag, const media_format& format)
 {
 	CALLED();
-
-	BMediaInput* conn = fOwner->_FindInput(dest);
-	if (conn == NULL)
-		return B_MEDIA_BAD_DESTINATION;
-
-	return conn->FormatChanged(format);
+	return B_ERROR;
 }
 
 
@@ -314,11 +309,7 @@ BMediaClientNode::FormatChangeRequested(const media_source& source,
 {
 	CALLED();
 
-	BMediaOutput* conn = fOwner->_FindOutput(source);
-	if (conn == NULL)
-		return B_MEDIA_BAD_DESTINATION;
-
-	return conn->FormatChangeRequested(format);
+	return B_ERROR;
 }
 
 

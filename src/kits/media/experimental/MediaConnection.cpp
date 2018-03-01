@@ -188,18 +188,6 @@ BMediaInput::~BMediaInput()
 }
 
 
-status_t
-BMediaInput::FormatChanged(const media_format& format)
-{
-	if (!format_is_compatible(format, AcceptedFormat()))
-		return B_MEDIA_BAD_FORMAT;
-
-	SetAcceptedFormat(format);
-
-	return B_OK;
-}
-
-
 void
 BMediaInput::HandleBuffer(BBuffer* buffer)
 {
@@ -288,13 +276,6 @@ BMediaOutput::FormatProposal(media_format* format)
 {
 	*format = AcceptedFormat();
 	return B_OK;
-}
-
-
-status_t
-BMediaOutput::FormatChangeRequested(media_format* format)
-{
-	return B_ERROR;
 }
 
 
