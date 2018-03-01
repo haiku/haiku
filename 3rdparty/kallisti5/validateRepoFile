@@ -1,0 +1,46 @@
+#!/bin/bash
+# Check if a Jam repository file is valid with our requirements
+# Ex: validateRepo build/jam/repositories/HaikuPorts/arm
+
+if [ $# -ne 1 ]; then
+	echo "usage: validate <repo_file>"
+	exit 1
+fi
+
+if [ ! -f "$1" ]; then
+	echo "Error: Unable to read repo_file '$1'!"
+	exit 1
+fi
+
+remote_file_exists() {
+	HTTP_STATUS=$(curl -s -I -L "$1" | head -n1 | awk '{ print $2 }')
+	echo "Check $HTTP_STATUS - $1"
+	if [ "$HTTP_STATUS" != "200" ]; then
+		return 0;
+	fi
+	return 1;
+}
+
+REPO_FILE="$1"
+SHA256=$(sha256sum $REPO_FILE | awk '{ print $1 }')
+ARCHITECTURE=$(cat $REPO_FILE | tr '\n' ' ' | awk '{ print $4 } ')
+REPO_URL=$(cat $REPO_FILE | tr '\n' ' ' | awk '{ print $6 } ')
+REPO_EXPECT=$(cat $REPO_FILE | grep -v "#" | tr '\n' ' ' | cut -d':' -f6)
+
+if remote_file_exists "$REPO_URL/$SHA256/package.list" ; then
+	echo "Remote repository doesn't exist!"
+	exit 1
+fi
+
+PACKAGES=""
+for i in $(curl -s -L $REPO_URL/$SHA256/package.list | tr '\n' ' '); do
+	PACKAGES="$PACKAGES $(basename $(echo "$i" | cut -d'-' -f1,2,3))"
+done
+
+for i in $REPO_EXPECT; do
+	if [[ $PACKAGES = *$i* ]]; then
+		echo "OK $i"
+	else
+		echo "WARN $i"
+	fi
+done
