@@ -74,11 +74,7 @@ private:
 	media_input					_BuildMediaInput() const;
 	media_output				_BuildMediaOutput() const;
 
-	const media_source&			_Source() const;
-	const media_destination&	_Destination() const;
-
 	media_node					_Node() const;
-	media_node					_RemoteNode() const;
 
 	media_connection_id			id;
 

@@ -289,7 +289,7 @@ BMediaClient::FindInput(const media_connection& input) const
 	if (!input.IsInput())
 		return NULL;
 
-	return _FindInput(input._Destination());
+	return _FindInput(input.destination);
 }
 
 
@@ -301,7 +301,7 @@ BMediaClient::FindOutput(const media_connection& output) const
 	if (!output.IsOutput())
 		return NULL;
 
-	return _FindOutput(output._Source());
+	return _FindOutput(output.source);
 }
 
 
@@ -321,7 +321,7 @@ BMediaClient::Start()
 
 	status_t err = B_OK;
 	for (int32 i = 0; i < CountOutputs(); i++) {
-		media_node remoteNode = OutputAt(i)->Connection()._RemoteNode();
+		media_node remoteNode = OutputAt(i)->Connection().remote_node;
 		if (remoteNode.kind & B_TIME_SOURCE)
 			err = BMediaRoster::CurrentRoster()->StartTimeSource(
 				remoteNode, BTimeSource::RealTime());
@@ -491,7 +491,7 @@ BMediaClient::_ConnectInput(BMediaOutput* output,
 {
 	CALLED();
 
-	if (input._Destination() == media_destination::null)
+	if (input.destination == media_destination::null)
 		return B_MEDIA_BAD_DESTINATION;
 
 	media_output ourOutput = output->Connection()._BuildMediaOutput();
@@ -521,7 +521,7 @@ BMediaClient::_ConnectOutput(BMediaInput* input,
 {
 	CALLED();
 
-	if (output._Source() == media_source::null)
+	if (output.source == media_source::null)
 		return B_MEDIA_BAD_SOURCE;
 
 	media_input ourInput = input->Connection()._BuildMediaInput();
@@ -554,12 +554,12 @@ BMediaClient::_DisconnectConnection(BMediaConnection* conn)
 	const media_connection& handle = conn->Connection();
 	if (handle.IsInput()) {
 		return BMediaRoster::CurrentRoster()->Disconnect(
-			handle._RemoteNode().node, handle._Source(),
-			handle._Node().node, handle._Destination());
+			handle.remote_node.node, handle.source,
+			handle._Node().node, handle.destination);
 	} else {
 		return BMediaRoster::CurrentRoster()->Disconnect(
-			handle._Node().node, handle._Source(),
-			handle._RemoteNode().node, handle._Destination());
+			handle._Node().node, handle.source,
+			handle.remote_node.node, handle.destination);
 	}
 
 	return B_ERROR;

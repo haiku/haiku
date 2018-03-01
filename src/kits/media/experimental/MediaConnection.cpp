@@ -136,14 +136,14 @@ BMediaConnection::_ConnectionRegistered(BMediaClient* owner,
 const media_source&
 BMediaConnection::_Source() const
 {
-	return fConnection._Source();
+	return fConnection.source;
 }
 
 
 const media_destination&
 BMediaConnection::_Destination() const
 {
-	return fConnection._Destination();
+	return fConnection.destination;
 }
 
 

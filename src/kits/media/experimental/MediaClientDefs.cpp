@@ -82,27 +82,6 @@ media_connection::_BuildMediaOutput() const
 }
 
 
-const media_source&
-media_connection::_Source() const
-{
-	return source;
-}
-
-
-const media_destination&
-media_connection::_Destination() const
-{
-	return destination;
-}
-
-
-media_node
-media_connection::_RemoteNode() const
-{
-	return remote_node;
-}
-
-
 media_node
 media_connection::_Node() const
 {
