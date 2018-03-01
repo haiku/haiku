@@ -221,6 +221,51 @@ You can also force the rebuild of a component by using the `-a` parameter:
 jam -qa Debugger
 ```
 
+Bootstrap Build
+----------------
+New architectures (and occasionally existing ones) will require a bootstrap
+build to compile *build packages*. (Catch-22 software packages which are needed
+to compile Haiku, but need to be initially compiled under Haiku)
+
+### Pre-requirements
+  * All of the standard tools in the Required Software section above.
+  * The following repositories on disk in the same general location
+    * haiku (https://git.haiku-os.org/haiku)
+    * buildtools (https://git.haiku-os.org/buildtools)
+    * haikuporter (https://github.com/haikuports/haikuporter.git)
+    * haikuports.cross (https://github.com/haikuports/haikuports.cross.git)
+    * haikuports (https://github.com/haikuports/haikuports.git)
+
+### Setting Up a Bootstrap build
+Create a clean build directory under the haiku repo.
+```
+mkdir generated.myarch && cd generated.myarch
+```
+
+Configure Haiku's build system for a bootstrap build specifying the location
+of all of the repositories above.
+```
+../configure -j4 \
+  --build-cross-tools myarch ../../buildtools \
+  --bootstrap ../../haikuporter/haikuporter ../../haikuports.cross ../../haikuports
+```
+
+Once the build system is configured for bootstrap, we now can begin building
+the bootstrap image.
+
+```
+jam -q @bootstrap-raw
+```
+
+If you are bootstrapping for an architecture Haiku already boots on, the generated
+disk image can be used to compile *build packages* needed for the standard
+Haiku build.
+
+If you are bootstrapping for a new architecture which doesn't build yet, you will
+need to leverage the ```unbootstrap.sh``` script to hack the generated bootstrap
+packages into non-bootstrap packages which can be temporarily used as
+*build packages*.
+
 Running
 ----------------
 Generally there are two ways of running Haiku: on real hardware using a
