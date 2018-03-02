@@ -66,6 +66,7 @@ media_connection::_BuildMediaInput() const
 	input.source = source;
 	input.destination = destination;
 	input.format = format;
+	strcpy(input.name, name);
 	return input;
 }
 
@@ -78,6 +79,7 @@ media_connection::_BuildMediaOutput() const
 	output.source = source;
 	output.destination = destination;
 	output.format = format;
+	strcpy(output.name, name);
 	return output;
 }
 

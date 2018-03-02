@@ -10,7 +10,8 @@
 #include "debug.h"
 
 
-BMediaConnection::BMediaConnection(media_connection_kinds kinds)
+BMediaConnection::BMediaConnection(media_connection_kinds kinds,
+	const char* name)
 	:
 	fOwner(NULL),
 	fBind(NULL)
@@ -20,6 +21,8 @@ BMediaConnection::BMediaConnection(media_connection_kinds kinds)
 	fConnection.kinds = kinds;
 	fConnection.id = -1;
 	//fConnection.client = media_client::null;
+	if (name != NULL)
+		strcpy(fConnection.name, name);
 }
 
 
@@ -41,6 +44,13 @@ BMediaClient*
 BMediaConnection::Client() const
 {
 	return fOwner;
+}
+
+
+const char*
+BMediaConnection::Name() const
+{
+	return fConnection.name;
 }
 
 
@@ -160,9 +170,9 @@ void BMediaConnection::_ReservedMediaConnection9() {}
 void BMediaConnection::_ReservedMediaConnection10() {}
 
 
-BMediaInput::BMediaInput()
+BMediaInput::BMediaInput(const char* name)
 	:
-	BMediaConnection(B_MEDIA_INPUT)
+	BMediaConnection(B_MEDIA_INPUT, name)
 {
 }
 
@@ -207,9 +217,9 @@ void BMediaInput::_ReservedMediaInput9() {}
 void BMediaInput::_ReservedMediaInput10() {}
 
 
-BMediaOutput::BMediaOutput()
+BMediaOutput::BMediaOutput(const char* name)
 	:
-	BMediaConnection(B_MEDIA_OUTPUT),
+	BMediaConnection(B_MEDIA_OUTPUT, name),
 	fBufferGroup(NULL)
 {
 }

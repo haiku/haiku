@@ -400,7 +400,7 @@ BMediaClientNode::PrepareToConnect(const media_source& source,
 		return err;
 
 	*out_source = conn->_Source();
-	strcpy(name, Name());
+	strcpy(name, conn->Name());
 
 	return B_OK;
 }

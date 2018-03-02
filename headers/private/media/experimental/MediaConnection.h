@@ -67,7 +67,8 @@ public:
 
 protected:
 									BMediaConnection(
-										media_connection_kinds kinds);
+										media_connection_kinds kinds,
+										const char* name = NULL);
 	virtual							~BMediaConnection();
 
 private:
@@ -115,7 +116,7 @@ private:
 
 class BMediaInput : public virtual BMediaConnection {
 protected:
-									BMediaInput();
+									BMediaInput(const char* name = NULL);
 	virtual							~BMediaInput();
 
 	// Callbacks
@@ -147,7 +148,7 @@ private:
 
 class BMediaOutput : public virtual BMediaConnection {
 protected:
-									BMediaOutput();
+									BMediaOutput(const char* name = NULL);
 	virtual							~BMediaOutput();
 
 	// Callbacks
