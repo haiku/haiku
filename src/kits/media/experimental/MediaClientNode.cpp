@@ -59,6 +59,8 @@ BMediaClientNode::NodeRegistered()
 {
 	CALLED();
 
+	fOwner->ClientRegistered();
+
 	Run();
 }
 

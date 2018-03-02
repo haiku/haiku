@@ -53,6 +53,9 @@ public:
 
 			status_t				InitCheck() const;
 
+	// Called when the node is correctly registered to the media services.
+	virtual void					ClientRegistered();
+
 	// TODO: Should allow BControllable capabilities
 
 	// When those functions return, the BMediaConnection is added to the

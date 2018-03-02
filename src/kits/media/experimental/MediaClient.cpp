@@ -314,6 +314,13 @@ BMediaClient::IsRunning() const
 }
 
 
+void
+BMediaClient::ClientRegistered()
+{
+	CALLED();
+}
+
+
 status_t
 BMediaClient::Start()
 {
