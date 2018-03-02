@@ -107,9 +107,7 @@ public:
 			BMediaOutput*			FindOutput(
 										const media_connection& output) const;
 
-			bool					IsRunning() const;
-	// Called when the node is correctly registered to the media services.
-	//virtual void					ReadyToRun() const;
+			bool					IsStarted() const;
 
 	// NOTE: The following functions aren't provided to be inherited,
 	// always use the protected HandleSomething version. This is because

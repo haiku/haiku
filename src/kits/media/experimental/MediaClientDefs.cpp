@@ -6,6 +6,8 @@
 #include <MediaClient.h>
 #include <MediaConnection.h>
 
+#include <string.h>
+
 #include "debug.h"
 
 

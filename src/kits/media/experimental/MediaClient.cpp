@@ -306,7 +306,7 @@ BMediaClient::FindOutput(const media_connection& output) const
 
 
 bool
-BMediaClient::IsRunning() const
+BMediaClient::IsStarted() const
 {
 	CALLED();
 
@@ -435,7 +435,7 @@ BMediaClient::_Deinit()
 {
 	CALLED();
 
-	if (IsRunning())
+	if (IsStarted())
 		Stop();
 
 	Disconnect();
