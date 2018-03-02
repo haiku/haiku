@@ -7,6 +7,7 @@
 
 #include <MediaClient.h>
 #include <MediaConnection.h>
+#include <MediaRoster.h>
 #include <scheduler.h>
 #include <TimeSource.h>
 
@@ -227,6 +228,14 @@ BMediaClientNode::Connected(const media_source& source,
 	conn->fConnection.source = source;
 	conn->fConnection.format = format;
 
+	// Retrieve the node without using GetNodeFor that's pretty inefficient.
+	// Unfortunately we don't have an alternative which doesn't require us
+	// to release the cloned node.
+	// However, our node will not have flags set. Keep in mind this.
+	conn->fConnection.remote_node.node
+		= BMediaRoster::CurrentRoster()->NodeIDFor(source.port);
+	conn->fConnection.remote_node.port = source.port;
+
 	conn->Connected(format);
 
 	*outInput = conn->fConnection._BuildMediaInput();
@@ -426,7 +435,15 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 	conn->fConnection.destination = dest;
 	conn->fConnection.format = format;
 
-	strcpy(name, Name());
+	// Retrieve the node without using GetNodeFor that's pretty inefficient.
+	// Unfortunately we don't have an alternative which doesn't require us
+	// to release the cloned node.
+	// However, our node will not have flags set. Keep in mind this.
+	conn->fConnection.remote_node.node
+		= BMediaRoster::CurrentRoster()->NodeIDFor(dest.port);
+	conn->fConnection.remote_node.port = dest.port;
+
+	strcpy(name, conn->Name());
 
 	// TODO: add correct latency estimate
 	SetEventLatency(1000);
