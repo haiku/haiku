@@ -12,6 +12,8 @@
 
 #include "MediaClientNode.h"
 
+#define DEBUG 3
+
 #include "debug.h"
 
 
@@ -555,6 +557,8 @@ BMediaClient::_ConnectOutput(BMediaInput* input,
 status_t
 BMediaClient::_DisconnectConnection(BMediaConnection* conn)
 {
+	CALLED();
+
 	if (conn->Client() != this)
 		return B_ERROR;
 

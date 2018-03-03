@@ -13,6 +13,8 @@
 
 #include <string.h>
 
+#define DEBUG 3
+
 #include "debug.h"
 
 #define B_NEW_BUFFER (BTimedEventQueue::B_USER_EVENT + 1)
@@ -253,8 +255,16 @@ BMediaClientNode::Disconnected(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (conn->_Source() == source)
+	if (conn->_Source() == source) {
+		// Cleanup the connection
+		conn->fConnection.source = media_source::null;
+		conn->fConnection.format = media_format();
+
+		conn->fConnection.remote_node.node = -1;
+		conn->fConnection.remote_node.port = -1;
+
 		conn->Disconnected();
+	}
 }
 
 
@@ -337,11 +347,13 @@ BMediaClientNode::GetNextOutput(int32* cookie, media_output* output)
 	if (*cookie < 0 || *cookie >= fOwner->CountOutputs()) {
 		*cookie = -1;
 		output = NULL;
+		printf("cookie %ld\n", *cookie);
 	} else {
 		BMediaOutput* conn = fOwner->OutputAt(*cookie);
 		if (conn != NULL) {
 			*output = conn->fConnection._BuildMediaOutput();
 			*cookie += 1;
+			printf("OK cookie %ld\n", *cookie);
 			return B_OK;
 		}
 	}
@@ -466,9 +478,19 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (conn->_Destination() == dest)
-		conn->Disconnected();
+	if (conn->_Destination() == dest) {
+		// Cleanup the connection
+		delete conn->fBufferGroup;
+		conn->fBufferGroup = NULL;
 
+		conn->fConnection.destination = media_destination::null;
+		conn->fConnection.format = media_format();
+
+		conn->fConnection.remote_node.node = -1;
+		conn->fConnection.remote_node.port = -1;
+
+		conn->Disconnected();
+	}
 }
 
 

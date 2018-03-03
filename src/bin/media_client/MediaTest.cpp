@@ -75,9 +75,9 @@ _ConsumerProducerTest()
 	snooze(SNOOZE_FOR);
 	#endif
 
-	assert(sConsumer->Disconnect() == B_OK);
+	assert(input->Disconnect() == B_OK);
 
-	_DeleteClients();
+	//_DeleteClients();
 }
 
 
@@ -131,10 +131,10 @@ media_test()
 {
 	printf("Testing Simple (1:1) Producer-Consumer configuration: ");
 	_ConsumerProducerTest();
-	_ProducerConsumerTest();
-	printf("OK\n");
+	//_ProducerConsumerTest();
+	//printf("OK\n");
 
-	printf("Testing Simple (1:1:1) Producer-Filter-Consumer configuration: ");
-	_ProducerFilterConsumerTest();
+	//printf("Testing Simple (1:1:1) Producer-Filter-Consumer configuration: ");
+	//_ProducerFilterConsumerTest();
 	printf("OK\n");
 }

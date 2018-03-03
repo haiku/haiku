@@ -9,6 +9,8 @@
 
 #include "MediaClientNode.h"
 
+#define DEBUG 3
+
 #include "debug.h"
 
 
@@ -119,6 +121,8 @@ BMediaConnection::Connected(const media_format& format)
 void
 BMediaConnection::Disconnected()
 {
+	CALLED();
+
 	fConnected = false;
 }
 
@@ -255,9 +259,6 @@ BMediaOutput::Connected(const media_format& format)
 void
 BMediaOutput::Disconnected()
 {
-	delete fBufferGroup;
-	fBufferGroup = NULL;
-
 	BMediaConnection::Disconnected();
 }
 
