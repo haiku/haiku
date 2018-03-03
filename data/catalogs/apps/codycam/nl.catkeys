@@ -50,7 +50,7 @@ Cannot set the time source for the video source	CodyCam		Kan de tijdsbron voor d
 Type:	CodyCam		Type:
 Cannot set the time source for the video window	CodyCam		Kan de tijdsbron voor het videovenster niet instellen
 Stop video	CodyCam		Stop video
-Locking the window\n	VideoConsumer.cpp		Venster afsluiten
+Locking the window\n	VideoConsumer.cpp		Het venster afsluiten\n
 File %s; Line %ld # %s	SettingsHandler		Bestand %s; Regel %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		Kan opgegeven map op server niet vinden
 Renaming…	VideoConsumer.cpp		Hernoemen...

@@ -3,7 +3,7 @@ Boot Manager, the application to configure the Haiku boot menu, could not be lau
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		ここで、ブートメニューを実際に表示するために、\"GRUB_HIDDEN_TIMEOUT=0\"の行の先頭に \"#\"を追加して、コメントアウトする必要があります。
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		ここで、ブートメニューを実際に表示するために、\"GRUB_HIDDEN_TIMEOUT=0\"の行の先頭に \"#\"を追加して、コメントアウトする必要があります。\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが '%s' に書き込まれました。終了ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
 Quit	InstallerApp		終了
 Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量: 0.0 KiB
@@ -85,7 +85,7 @@ Please choose target	InstallerWindow		インストール先を選択
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Haikuを(エミュレータでなく)実機にインストールする場合は、ハードディスクのパーティションを先に用意しておくことが望ましいです。インストーラーおよびDriveSetupツールには、Haikuファイルシステムによる既存のパーティションの初期化機能があります。しかし、パーティションを作成、変更するオプションは充分な多種多様のコンピューターの構成でテストされていないため、使用を勧めません。\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) インストーラーは、Haikuのパーティションを起動可能にします。しかし、Haikuを既存のブートメニューに結合する機能はありません。すでにGRUBがインストールされている場合、ブートメニューにHaikuを追加できます。追加作業は、使用しているGRUBのバージョンによって異なります。\n\n\n
 Begin	InstallerWindow		開始
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		最後に、次のように入力して、ブートメニューをアップデートする必要があります。
+Finally, you have to update the boot menu by entering:\n\n	InstallerApp		最後に、次のように入力して、ブートメニューをアップデートする必要があります。\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		まだパーティションを作成していなければ、再起動して、もっとも安心と思うツールでパーティションを作成してください。それから、Haikuで再起動して、インストールを続けてください。たとえば、GParted LiveCDを使えるでしょう。このツールでは既存のパーティションをリサイズして空きを作ることもできます。\n\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		GRUB2では、プライマリーパーティションの数にかかわらず、最初の論理パーティションはいつも\"5\"という数字が付きます。\n\n
 Write boot sector	InstallerWindow		ブートセクターを書き込む

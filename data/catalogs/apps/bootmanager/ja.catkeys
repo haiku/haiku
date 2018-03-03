@@ -54,7 +54,7 @@ Old Master Boot Record backup failure	BootManagerController	Title	旧マスタ�
 Boot Manager is unable to read the partition table!	BootManagerController		ブートマネージャーはパーティションテーブルを読み込めません。
 Error reading partition table	BootManagerController	Title	パーティションテーブルの読み込み中にエラー発生
 Installation of boot menu failed	BootManagerController	Title	ブートメニューのインストールに失敗しました
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		一番目のハードディスクのパーティションテーブルがブートマネージャーに対応していません。ブートマネージャーは、IBM PC MBR だけ扱います。
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		一番目のハードディスクのパーティションテーブルがブートマネージャーに対応していません。\nブートマネージャーは、IBM PC MBR のみ扱います。
 Backup Master Boot Record	BootManagerController	Title	マスターブートレコードのバックアップ
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		ブートメニューをディスクに書き込みます。続けますか?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		古いマスターブートレコードは%sに正常に保存されました。

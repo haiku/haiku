@@ -5,7 +5,7 @@ Every 30 seconds	CodyCam		30 秒ごと
 File name:	CodyCam		ファイル名:
 Last Capture: 	VideoConsumer.cpp		最後のキャプチャ:
 Server login failed	VideoConsumer.cpp		サーバーへのログインに失敗しました
-Remote host has closed the connection.\n	FtpClient		リモートホストが接続を切断しました
+Remote host has closed the connection.\n	FtpClient		リモートホストが接続を切断しました。\n
 Login:	CodyCam		ログイン:
 Format:	CodyCam		形式:
 Every 2 hours	CodyCam		2 時間ごと
@@ -60,7 +60,7 @@ Error setting type of output file	VideoConsumer.cpp		出力ファイルの形式
 upload client name expected	CodyCam		アップロードクライアントの名前を入力してください
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		接続しました…
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (パスワードを送信しました)
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (パスワードを送信しました)\n
 File upload failed	VideoConsumer.cpp		ファイルのアップロードに失敗しました
 Every 5 minutes	CodyCam		5 分ごと
 read: %d\n	SftpClient		読み込み: %d \n

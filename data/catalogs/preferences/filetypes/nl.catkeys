@@ -130,7 +130,7 @@ Same as…	FileTypes Window		Zelfde als...
 Exclusive launch	Application Type Window		Exclusieve lancering
 FileTypes	System name		BestandsTypen
 Application types	Application Types Window		Applicatietypes...
-Could not remove file type: %s\n	FileTypes Window		Kon bestandstype %s\n niet verwijderen.
+Could not remove file type: %s\n	FileTypes Window		Kon bestandstype %s niet verwijderen.\n
 Signature:	Application Types Window		Onderschrift:
 Gamma	Application Type Window		Gamma
 Cancel	Preferred App Menu		Annuleren

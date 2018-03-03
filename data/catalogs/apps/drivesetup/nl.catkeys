@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	973049051
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	4204093483
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		Annuleren
 Delete	MainWindow		Verwijderen
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Rescan	MainWindow		Opnieuw afzoeken
 OK	MainWindow		Oké
 There's no space on the partition where a child partition could be created.	MainWindow		De partitie heeft geen ruimte waarin een onderliggende partitie kan worden gemaakt.
+Could not unmount partition	MainWindow		Kon partitie niet onttrekken.
 Initialize	InitializeParametersPanel		Initialiseren
 OK	AbstractParametersPanel		Oké
 <empty>	PartitionList		<leeg>
@@ -38,7 +39,7 @@ Are you sure you want to format the partition? You will be asked again before ch
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\n&U zult alle gegevens op de %s schijf onherroepelijk kwijt zijn als u dit doet!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de geselecteerde partitie wilt verwijderen?\n\nU zult alle gegevens op de partitie onherroepelijk kwijt zijn als u dit doet!
 Create…	MainWindow		Maken…
-The disk has been successfully initialized.\n	MainWindow		De schijf %s werd met succes geïnitialiseerd.\n
+The disk has been successfully initialized.\n	MainWindow		De schijf werd met succes geïnitialiseerd.\n
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
 Mount	MainWindow		Betrekken

@@ -9,7 +9,7 @@ Capture active window	ScreenshotWindow		Zachytiť aktívne okno
 Cancel	ScreenshotWindow		Zrušiť
 Name:	ScreenshotWindow		Názov:
 Choose folder…	ScreenshotWindow		Vyberte priečinok…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Súbor %1 už existuje.\n Ste si istý, že ho chcete prepísať?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Tento súbor už existuje.\n Ste si istý, že ho chcete prepísať?
 Choose folder	ScreenshotWindow		Vyberte priečinok
 Save	ScreenshotWindow		Uložiť
 Overwrite	ScreenshotWindow		Prepísať

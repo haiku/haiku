@@ -58,7 +58,7 @@ config	B_USER_CONFIG_DIRECTORY		config
 apps	B_APPS_DIRECTORY		apps
 Icon view	ContainerWindow		Icoonweergave
 Size	QueryPoseView		Grootte
-Emptying Trash… 	StatusWindow		Leegmaken van prullenbak...
+Emptying Trash… 	StatusWindow		Leegmaken van de prullenbak…
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nieuwe Sjablonen
 Close all in workspace	ContainerWindow		Alles sluiten in deze werkplek
 Empty Trash	ContainerWindow		Prullenbak leegmaken
@@ -99,7 +99,7 @@ Show space bars on volumes	SettingsView		Toon ruimte-indicator op gegevensdrager
 Invert selection	ContainerWindow		Selectie omkeren
 Increase size	DeskWindow		Vermeerder grootte
 Resize to fit	ContainerWindow		Grootte passend maken
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in %func is mislukt. \nReden: %error
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in \n%func is mislukt. \nReden: %error
 Add printer…	ContainerWindow		Printer toevoegen...
 New folder	ContainerWindow		Nieuwe map
 Kind	ContainerWindow		Soort
@@ -145,7 +145,7 @@ Unmount	InfoWindow		Onttrekken
 no supporting apps	OpenWithWindow		geen ondersteunde toepassingen
 That name is already taken. Please type another one.	InfoWindow		Deze naam is al in gebruik. Typ altublieft een andere in.
 Sorry, you can't create links in the Trash.	PoseView		Sorry, in de prullenbak kunt u geen links maken.
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Er bestaat al een item met de naam \"%name\" in deze map, en deze kan items bevatten met dezelfde namen. Wilt u die vervangen door de items in de map die u %verb?
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Er bestaat al een item met de naam \"%name\" in deze map, en deze kan\n items bevatten met dezelfde namen. Wilt u die vervangen door de items in de map die u %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Link \"%name\" naar:
 All disks	FindPanel		Alle schijven
 Revert	TrackerSettingsWindow		Herstellen
@@ -307,7 +307,7 @@ Handles any file	OpenWithWindow		Behandelt elk bestand
 Get info	FilePanelPriv		Informatie ophalen
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Annuleren
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		De toepassing \"%appname\" ondersteunt niet het type document dat u zodadelijk gaat openen.\nWeet u zeker dat u door wilt gaan?n\nAls u zeker weet dat de toepassing dit bestandstype ondersteunt, dan zou u contact met de ontwikkelaar op kunnen nemen om hen te vragen de lijst van ondersteunde bestanden voor hun toepassing bij te werken.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		De toepassing \"%appname\" ondersteunt niet het type document dat u zodadelijk gaat openen.\nWeet u zeker dat u door wilt gaan?\n\nAls u zeker weet dat de toepassing dit bestandstype ondersteunt, dan zou u contact met de ontwikkelaar op kunnen nemen om hen te vragen de lijst van ondersteunde bestanden voor hun toepassing bij te werken.
 Disks	DirMenu		Schijven
 New folder %ld	FSUtils		Nieuwe map %ld
 Used space color	SettingsView		Kleur voor gebruikte ruimte

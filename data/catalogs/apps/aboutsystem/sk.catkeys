@@ -58,7 +58,7 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Čas behu:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Obsahuje softvér, ktorý vyvinula NetBSD Foundation, Inc. a jej prispievatelia:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Všetky práva vyhradené.
 GNU GPL v2	AboutWindow		GNU GPL v2
-Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google a ich programy Google Summer of Code a Google Code-in
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google a ich programy Google Summer of Code a Google Code-in\n
 The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Všetky práva vyhradené.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Všetky práva vyhradené.

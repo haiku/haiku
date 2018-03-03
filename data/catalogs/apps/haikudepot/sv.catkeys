@@ -33,7 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Ditt betyg har uppdater
 <no info>	PackageInfoView		<Ingen information>
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
-All repositories	FilterView		Alla repositorium
+All repositories	FilterView		Alla repositorier
 Email address:	UserLoginWindow		E-postadress:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Din betygsättning laddadesupp ok. Du kan närsomhelst uppdatera eller tabort ditt betyg för paketet genom att ge ett nytt betyg.
 Very unstable	RatePackageWindow		Mycket ostabil
@@ -105,7 +105,7 @@ Close	MainWindow		Stäng
 Preferred language:	UserLoginWindow		Föredraget språk:
 Failed to rate package	RatePackageWindow		Misslyckades gradera paketet
 Internet & Network	Model		Internet & Nätverk
-Refresh repositories	MainWindow		Ladda om repositorium
+Refresh repositories	MainWindow		Ladda om repositorier
 Cancel	MainWindow		Avbryt
 Quit HaikuDepot	App		Avsluta HaikuDepot
 Input validation	UserLoginWindow		Ogiltigt indata

@@ -1,37 +1,9 @@
-1	belarusian	x-vnd.Haiku-Notifications	2656860764
-Notifications	GeneralView		Паведамленні
-seconds of inactivity	GeneralView		секунд прастою
+1	belarusian	x-vnd.Haiku-Notifications	525245920
 Revert	PrefletWin		Вярнуць
-Mini icon	DisplayView		Міні-іконка
 Enable notifications	GeneralView		Уключыць паведамленні
-Error	NotificationView		Памылка
-OK	GeneralView		ОК
 OK	PrefletWin		ОК
-Type	NotificationView		Тып
-Notifications cannot be stopped, because the server can't be reached.	GeneralView		Немагчыма спыніць Notifications, бо сервер недаступны.
-Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Немагчыма уключыць паедамленні, бо сервер не знойдзены.\nГэта сведчыць аб няўдалай усталёўцы InfoPopper.
-Important	NotificationView		Важна
-Cannot disable notifications because the server can't be reached.	GeneralView		Немагчыма выключыць паведамленні, бо сервер недаступны.
-Progress	NotificationView		Прагрэс
 General	PrefletView		Агульныя
-Apply	PrefletWin		Ужыць
-Display	PrefletView		Экран
-Search:	NotificationView		Пошук:
 Allowed	NotificationView		Дазволена
-Yes	NotificationView		Так
-Large icon	DisplayView		Вялікая іконка
-Icon size:	DisplayView		Памер іконкі:
-Hide notifications from screen after	GeneralView		Схаваць паведамленні праз
 Notifications	System name		Паведамленні
-Notifications	NotificationView		Паведамленні
-No	NotificationView		Не
-Title	NotificationView		Загаловак
-Information	NotificationView		Інфармацыя
-Window width:	DisplayView		Шырыня вакна:
 Application	NotificationView		Праграма
-Enabled	NotificationView		Уключаны
-Unknown	NotificationView		Невядомы
-Enable notifications at startup	GeneralView		Уключыць паведамленні пры запуску
-Notifications	PrefletView		Абвесткі
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер паведамленняў не знойдзены, гэта сведчыць аб няўдалай усталёўцы InfoPopper.
 Applications	NotificationView		Праграмы

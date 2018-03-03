@@ -1,7 +1,7 @@
 1	dutch; flemish	x-vnd.Haiku-VirtualMemory	4238590117
 Quit	SettingsWindow		Afsluiten
 Turn off	SettingsWindow		Zet uit
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Uitzetten van het virtueel geheugen zal ongewenste effecten hebben op de stabiliteit van het systeem zodra het geheugen is verbruikt.\nHet virtueel geheugen tast de systeemprestatie niet aan totdat dit\n punt is bereikt.\n\nBent u volkomen zeker dat u het wilt uitzetten?
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Uitzetten van het virtueel geheugen zal ongewenste effecten hebben op de stabiliteit van het systeem zodra het geheugen is verbruikt.\nHet virtueel geheugen tast de systeemprestatie niet aan totdat dit punt is bereikt.\n\nBent u volkomen zeker dat u het wilt uitzetten?
 Requested swap file size:	SettingsWindow		Gewenste grootte wisselbestand:
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		De instellingen in het instellingenbestand zijn ongeldig. U kan de standaardinstellingen laden of afsluiten.
 Defaults	SettingsWindow		Standaardwaarden

@@ -22,7 +22,7 @@ Applications	PrefletView		Applications
 Defaults	PrefletWin		Défauts
 pixels	GeneralView		pixels
 Application	NotificationView		Application
-Width:	GeneralView		Largeur
+Width:	GeneralView		Largeur :
 seconds	GeneralView		secondes
 Mute notifications from this application	NotificationView		Ignorer les notifications de cette application
  is already listed	NotificationView	Alert message	 est déjà listé

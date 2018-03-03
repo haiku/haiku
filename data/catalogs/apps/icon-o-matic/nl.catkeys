@@ -1,7 +1,7 @@
 1	dutch; flemish	x-vnd.haiku-icon_o_matic	2373738110
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
-Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
+Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		Toevoegen
 Move Shape	Icon-O-Matic-MoveShapesCommand		Vorm verplaatsen
 Opening the document failed!	Icon-O-Matic-Main		Openen van het document is mislukt!

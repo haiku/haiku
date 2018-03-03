@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	1755582132
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	1237826966
 OK	ShortcutsWindow		Oké
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
 Cancel	ShortcutsWindow		Annuleren
@@ -6,6 +6,7 @@ Append KeySet…	ShortcutsWindow		Toevoegen toetsencombinatie...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Toets
 Open KeySet…	ShortcutsWindow		Openen toetsencombinatie...
+Error, NULL state description?	ShortcutsSpec		Fout, NULL-statusbeschrijving?
 Revert to saved	ShortcutsWindow		Herstellen naar opgeslagen data
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VoegTekstIn \"Uw Tekst Hier\"

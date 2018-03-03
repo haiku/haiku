@@ -28,7 +28,7 @@ Auto-raise	PreferencesWindow		Höj vid närkontakt
 Recent folders:	PreferencesWindow		Senaste mappar:
 Show application expander	PreferencesWindow		Visa program-expanderare
 Close all	WindowMenu		Stäng alla
-Deskbar preferences	PreferencesWindow		Deskbar inställningar
+Deskbar preferences	PreferencesWindow		Inställningar för Deskbar
 Mount	DeskbarMenu		Montera
 Revert	PreferencesWindow		Återgå
 Small	PreferencesWindow		Liten
@@ -39,9 +39,9 @@ Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
 Recent folders	DeskbarMenu		Senaste mappar
 About this system	DeskbarMenu		Om detta system
 Show calendar…	TimeView		Visa kalender...
-Deskbar preferences…	DeskbarMenu		Deskbar inställningar...
+Deskbar preferences…	DeskbarMenu		Inställningar för Deskbar...
 Expand new applications	PreferencesWindow		Expandera nya program
-Show replicants	DeskbarMenu		Visa replicants
+Show replicants	DeskbarMenu		Visa replikanter
 Hide application names	PreferencesWindow		Göm applikation namnen
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
 Icon size	PreferencesWindow		Ikonstorlek

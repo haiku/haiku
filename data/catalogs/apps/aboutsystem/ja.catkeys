@@ -15,7 +15,7 @@ Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright �
 Revision	AboutView		リビジョン
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
-Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. およびその開発チーム: 彼らは BeOS を創造してくれました!
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. およびその開発チーム: 彼らは BeOS を創造してくれました!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. All rights reserved.
 Source Code: 	AboutView		ソースコード:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{プロセッサ:} other{# プロセッサ:}}

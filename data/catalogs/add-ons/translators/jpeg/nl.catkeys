@@ -2,7 +2,7 @@
 Output quality	JPEGTranslator		Uitvoerkwaliteit
 JPEG images	JPEGTranslator		JPEG afbeeldingen
 Prevent colors 'washing out'	JPEGTranslator		Voorkom kleuren 'uitwassen'
-JPEG Library Error: %s\n	be_jerror		JPEG Bibliotheek fout: %\n
+JPEG Library Error: %s\n	be_jerror		JPEG Bibliotheek fout: %s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Gebruik CMYK code met 0 voor 100% ink cover
 About	JPEGTranslator		Over
 ©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nGebaseerd op IJG library ©   1994-2009, Thomas G. Lane, Guido Vollbeding.\n\t http://www.ijg.org/files/\n\nmet \"lossless\" encoderingsondersteuning door Ken Murchison\n\t http://www.oceana.com/ftp/ljpeg/\n\nMet sommige colorspace omzetting routines door Magnus Hellman\n\t http://www.bebits.com/app/802\n

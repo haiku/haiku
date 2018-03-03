@@ -1,8 +1,9 @@
-1	romanian	x-vnd.Haiku-MediaConverter	341686525
+1	romanian	x-vnd.Haiku-MediaConverter	502184724
 Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Fișierul nu a fost recunoscut ca fișier media suportat:} other{# fișiere nu au fost recunoscute ca fișiere media suportate:}}
 Video encoding:	MediaConverter		Codare video:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error creating video.	MediaConverter		Eroare la crearea videoului.
 Error read audio frame %lld	MediaConverter		Eroare la citirea cadrului audio %lld
 No audio	Audio codecs list		Fără audio
 Error	MediaConverter		Eroare

@@ -6,8 +6,8 @@ Append KeySet…	ShortcutsWindow		Anexar conjunto de claves ...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tecla
 Open KeySet…	ShortcutsWindow		Abrir el conjunto de claves
-Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?\n
-Revert to saved	ShortcutsWindow		Volver  guardar
+Error, NULL state description?	ShortcutsSpec		Error, ¿descripción de estado nula?
+Revert to saved	ShortcutsWindow		Volver guardar
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tu texto aquí\"
 *MouseUp	ShortcutsWindow		*Ratón arriba

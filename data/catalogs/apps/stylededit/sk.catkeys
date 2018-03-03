@@ -39,7 +39,7 @@ Replace all	FindandReplaceWindow		Nahradiť všetky
 Statistics…	Menus		Štatistika…
 Default	Open_and_SaveAsPanel		Predvolené
 Replace next	Menus		Nahradiť ďalší
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s“ má neuložené zmeny.\nChcete vrátiť späť jeho poslednú uloženú verziu?
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		„%s“ má neuložené zmeny.\nChcete vrátiť späť jeho poslednú uloženú verziu? 
 Cancel	FindandReplaceWindow		Zrušiť
 Text encoding	Menus		Kódovanie textu
 Close	Menus		Zatvoriť

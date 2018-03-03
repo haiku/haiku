@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	1052258827
+1	romanian	x-vnd.Haiku-CharacterMap	2147658527
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Basic Latin	UnicodeBlocks		Latină de bază
 Cyrillic extended C	UnicodeBlocks		Chirilic extins C
@@ -103,6 +103,7 @@ Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Tamil	UnicodeBlocks		Tamil
 Currency symbols	UnicodeBlocks		Simboluri valutare
 Combining diacritical marks	UnicodeBlocks		Combinare semne diacritice
+Anatolian hieroglyphs	UnicodeBlocks		Hieroglife anatoliene
 Supplement punctuation	UnicodeBlocks		Supliment de punctuație
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Silabe aborigene canadiene unificate
 Ugaritic	UnicodeBlocks		Ugaritic
@@ -190,4 +191,5 @@ Kannada	UnicodeBlocks		Kannada
 Copy as escaped byte string	CharacterView		Copiază ca șir de octete escapat
 Phonetic extensions supplement	UnicodeBlocks		Supliment extensii fonetice
 Domino tiles	UnicodeBlocks		Mozaic Domino
+Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Katakana phonetic extensions	UnicodeBlocks		Extensii fonetice Katakana

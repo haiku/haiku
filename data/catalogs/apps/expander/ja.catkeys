@@ -20,7 +20,7 @@ Destination folder	ExpanderPreferences		解凍先フォルダー
 Other	ExpanderPreferences		その他
 Cancel	ExpanderPreferences		中止
 Expansion	ExpanderPreferences		解凍
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		書庫ファイルの解凍はまだ完了していません。それでも中止しますか? 解凍されたファイルは完全でない可能性があります。
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		書庫ファイルの解凍はまだ完了していません。それでも中止しますか?\n解凍されたファイルは完全でない可能性があります。
 Select	DirectoryFilePanel		選択
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		展開先のフォルダーがありません。作成してもよろしいですか?
 Same directory as source (archive) file	ExpanderPreferences		元ファイル (アーカイブ) と同じ

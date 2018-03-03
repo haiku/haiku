@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-IMAP	1555489346
+1	romanian	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Destinație:
 SSL	imap_config		SSL
 Ok	IMAPFolderConfig		Ok
 status	IMAPFolderConfig		stare
 Configure IMAP Folders	imap_config		Configurează dosare IMAP
 Cancel	IMAPFolderConfig		Anulează
+No encryption	imap_config		Fără criptare
 Apply	IMAPFolderConfig		Aplică
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Se aduc dosarele IMAP, aveți răbdare...
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Nu s-a putut conecta la server \"%server%\":\n%error%
