@@ -13,8 +13,6 @@
 
 #include <string.h>
 
-#define DEBUG 3
-
 #include "debug.h"
 
 #define B_NEW_BUFFER (BTimedEventQueue::B_USER_EVENT + 1)
@@ -347,13 +345,11 @@ BMediaClientNode::GetNextOutput(int32* cookie, media_output* output)
 	if (*cookie < 0 || *cookie >= fOwner->CountOutputs()) {
 		*cookie = -1;
 		output = NULL;
-		printf("cookie %ld\n", *cookie);
 	} else {
 		BMediaOutput* conn = fOwner->OutputAt(*cookie);
 		if (conn != NULL) {
 			*output = conn->fConnection._BuildMediaOutput();
 			*cookie += 1;
-			printf("OK cookie %ld\n", *cookie);
 			return B_OK;
 		}
 	}

@@ -9,8 +9,6 @@
 
 #include "MediaClientNode.h"
 
-#define DEBUG 3
-
 #include "debug.h"
 
 
