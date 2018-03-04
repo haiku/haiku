@@ -125,6 +125,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local gensyscallinfos = gensyscallinfos_$(architecture) ;
 		SourceHdrs gensyscallinfos.cpp
 			: [ FDirName $(SUBDIR) arch $(TARGET_ARCH_$(architecture)) ] ;
+		MakeLocate [ FGristFiles gensyscallinfos$(SUFOBJ) ]
+			: [ FDirName $(HOST_DEBUG_$(DEBUG)_LOCATE_TARGET) $(architecture) ] ;
 		BuildPlatformMain $(gensyscallinfos)
 			: gensyscallinfos.cpp
 			: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
@@ -159,6 +161,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# build gensyscalls
 
 		local gensyscalls = gensyscalls_$(architecture) ;
+		MakeLocate [ FGristFiles gensyscalls$(SUFOBJ) gensyscalls_infos$(SUFOBJ) ]
+			: [ FDirName $(HOST_DEBUG_$(DEBUG)_LOCATE_TARGET) $(architecture) ] ;
 		BuildPlatformMain $(gensyscalls)
 			: gensyscalls.cpp $(syscallInfos) ;
 		LinkAgainst $(gensyscalls) : $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
