@@ -1044,16 +1044,15 @@ void
 Model::ReplaceDepotByUrl(const BString& url,
 	DepotMapper* depotMapper, void* context)
 {
+	BUrl filterUrl(url);
+	normalize_repository_base_url(filterUrl);
+
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
 		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-
-		BUrl url(url);
 		BUrl depotUrlNormalized(depotInfo.BaseURL());
-
-		normalize_repository_base_url(url);
 		normalize_repository_base_url(depotUrlNormalized);
 
-		if (url == depotUrlNormalized) {
+		if (filterUrl == depotUrlNormalized) {
 			BAutolock locker(&fLock);
 			fDepots.Replace(i, depotMapper->MapDepot(depotInfo, context));
 		}

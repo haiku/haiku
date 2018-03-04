@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -50,6 +50,7 @@
 #include "FeaturedPackagesView.h"
 #include "FilterView.h"
 #include "JobStateListener.h"
+#include "Logger.h"
 #include "PackageInfoView.h"
 #include "PackageListView.h"
 #include "PackageManager.h"
@@ -1025,7 +1026,16 @@ MainWindow::_RefreshPackageList(bool force)
 		BSolverRepository* repository = package->Repository();
 		if (dynamic_cast<BPackageManager::RemoteRepository*>(repository)
 				!= NULL) {
-			depots[repository->Name()].AddPackage(modelInfo);
+			if (depots.count(repositoryName) == 0) {
+				if (Logger::IsDebugEnabled()) {
+					printf("pkg [%s] is in an unknown repository [%s] so will "
+						"be excluded from the list of managed packages\n",
+						modelInfo->Name().String(), repositoryName.String());
+				}
+			} else {
+				depots[repositoryName].AddPackage(modelInfo);
+			}
+
 			remotePackages[modelInfo->Name()] = modelInfo;
 		} else {
 			if (repository == static_cast<const BSolverRepository*>(
@@ -1406,14 +1416,17 @@ MainWindow::_UpdateAvailableRepositories()
 	const DepotList& depots = fModel.Depots();
 	for (int i = 0; i < depots.CountItems(); i++) {
 		const DepotInfo& depot = depots.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
-		message->AddString("name", depot.Name());
-		BMenuItem* item = new BMenuItem(depot.Name(), message);
-		fRepositoryMenu->AddItem(item);
 
-		if (depot.Name() == fModel.Depot()) {
-			item->SetMarked(true);
-			foundSelectedDepot = true;
+		if (depot.Name().Length() != 0) {
+			BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
+			message->AddString("name", depot.Name());
+			BMenuItem* item = new BMenuItem(depot.Name(), message);
+			fRepositoryMenu->AddItem(item);
+
+			if (depot.Name() == fModel.Depot()) {
+				item->SetMarked(true);
+				foundSelectedDepot = true;
+			}
 		}
 	}
 
