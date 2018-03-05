@@ -108,9 +108,9 @@ StripeView::StripeView(BBitmap* icon)
 
 	float width = 0.0f;
 	if (icon != NULL)
-		width += icon->Bounds().Width() + 32.0f;
+		width += icon->Bounds().Width() + 24.0f;
 
-	SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	SetExplicitSize(BSize(width, B_SIZE_UNSET));
 	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
 }
 
@@ -150,9 +150,9 @@ StripeView::SetIcon(BBitmap* icon)
 
 	float width = 0.0f;
 	if (icon != NULL)
-		width += icon->Bounds().Width() + 32.0f;
+		width += icon->Bounds().Width() + 24.0f;
 
-	SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	SetExplicitSize(BSize(width, B_SIZE_UNSET));
 	SetExplicitPreferredSize(BSize(width, B_SIZE_UNLIMITED));
 };
 
@@ -172,9 +172,11 @@ AboutView::AboutView(const char* appName, const char* signature)
 	font.SetSize(font.Size() * 2.0);
 	fNameView->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
 		| B_FONT_FLAGS);
+	fNameView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fVersionView = new BStringView("version",
 		_GetVersionFromSignature(signature));
+	fVersionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	rgb_color documentColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	fInfoView = new BTextView("info", NULL, &documentColor, B_WILL_DRAW);
@@ -198,20 +200,21 @@ AboutView::AboutView(const char* appName, const char* signature)
 	GroupLayout()->SetSpacing(0);
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
 		.Add(fStripeView)
-		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+		.AddGroup(B_VERTICAL)
 			.SetInsets(0, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			.Add(fNameView)
-			.Add(fVersionView)
-			.Add(infoViewScroller)
+			.AddGroup(B_VERTICAL, 0)
+				.Add(fNameView)
+				.Add(fVersionView)
+				.AddStrut(B_USE_SMALL_SPACING)
+				.Add(infoViewScroller)
+				.End()
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGlue()
 				.Add(closeButton)
 				.End()
 			.End()
-		.AddGlue()
 		.View()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-
 }
 
 
@@ -308,8 +311,8 @@ AboutView::_GetIconFromSignature(const char* signature)
 	if (appMime.InitCheck() != B_OK)
 		return NULL;
 
-	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, 127.0, 127.0), B_RGBA32);
-	if (appMime.GetIcon(icon, (icon_size)128) == B_OK)
+	BBitmap* icon = new BBitmap(BRect(0.0, 0.0, 63.0, 63.0), B_RGBA32);
+	if (appMime.GetIcon(icon, (icon_size)64) == B_OK)
 		return icon;
 
 	delete icon;
@@ -381,8 +384,8 @@ AboutView::SetVersion(const char* version)
 
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	:
-	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_MODAL_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+	BWindow(BRect(0.0, 0.0, 400.0, 200.0), appName, B_MODAL_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
