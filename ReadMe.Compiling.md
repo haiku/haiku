@@ -59,7 +59,6 @@ The following ports need to be installed:
  * `gawk`
  * `gettext`
  * `libiconv`
- * `gnuregex`
  * `gsed`
  * `cdrtools`
  * `nasm`

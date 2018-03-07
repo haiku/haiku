@@ -484,15 +484,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		}
 	}
 
-	# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
-	if $(HOST_PLATFORM) = freebsd {
-		HOST_LIBROOT += /usr/lib/libgnuregex.so ;
-		HOST_STATIC_LIBROOT += /usr/lib/libgnuregex.so ;
-	} else if $(HOST_PLATFORM) = darwin {
-		HOST_LIBROOT += libgnuregex_build.so ;
-		HOST_STATIC_LIBROOT += libgnuregex_build.so ;
-	}
-
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
 	# build platform we need to make sure, this is also defined.
 	if $(HOST_CPU) = x86 {
