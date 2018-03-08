@@ -6,6 +6,7 @@ RemotePackageRepository HaikuPorts
 	be_book-2008_10_26-1
 	ca_root_certificates-2018_01_17-2
 	timgmsoundfont-fixed-5
+	noto-20170920-3
 	wqy_microhei-0.2.0~beta-4
 	:
 	# repository architecture packages
@@ -14,6 +15,8 @@ RemotePackageRepository HaikuPorts
 	coreutils-8.22-1
 	curl-7.40.0-1
 	curl_devel-7.40.0-1
+	expat-2.1.0-1
+	expat_devel-2.1.0-1
 	freetype-2.6.3-1
 	freetype_devel-2.6.3-1
 	mawk-1.3.4-1
