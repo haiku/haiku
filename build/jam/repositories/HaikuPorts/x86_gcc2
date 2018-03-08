@@ -77,7 +77,7 @@ RemotePackageRepository HaikuPorts
 	libedit-20170329_3.1-1
 	libedit_devel-20170329_3.1-1
 	libffi-3.0.13-2
-	libiconv-1.13.1-9
+	libiconv-1.15-4
 	libicns-0.8.1-6
 	libicns_devel-0.8.1-6
 	liblayout-1.4.1-3
@@ -94,7 +94,7 @@ RemotePackageRepository HaikuPorts
 	libsolv_devel-0.3.0_haiku_2014_12_22-2
 	libtheora-1.1.1-6
 	libtheora_devel-1.1.1-6
-	libtool-2.4.2-3
+	libtool-2.4.6-1
 	libvorbis-1.3.5-5
 	libvorbis_devel-1.3.5-5
 	libvpx-1.0.0-2
@@ -117,8 +117,8 @@ RemotePackageRepository HaikuPorts
 	ncurses6-6.0-3
 	ncurses6_devel-6.0-3
 	netcat-1.10-4
-	openexr-2.2.1-1
-	openexr_devel-2.2.1-1
+	openexr-2.2.1-2
+	openexr_devel-2.2.1-2
 	openssh-7.2p2-2
 	openssl-1.0.2n-1
 	openssl_devel-1.0.2n-1
@@ -215,8 +215,8 @@ RemotePackageRepository HaikuPorts
 	libtasn1_x86-4.13-1
 	libtheora_x86-1.1.1-6
 	libtheora_x86_devel-1.1.1-6
-	libtool_x86-2.4.2-3
-	libtool_x86_libltdl-2.4.2-3
+	libtool_x86-2.4.6-1
+	libtool_x86_libltdl-2.4.6-1
 	libunistring_x86-0.9.9-1
 	libvorbis_x86-1.3.5-5
 	libvorbis_x86_devel-1.3.5-5
@@ -242,8 +242,8 @@ RemotePackageRepository HaikuPorts
 	mpc_x86-1.1.0-1
 	mpfr_x86-3.1.6-2
 	nettle_x86-3.4-1
-	openexr_x86-2.2.1-1
-	openexr_x86_devel-2.2.1-1
+	openexr_x86-2.2.1-2
+	openexr_x86_devel-2.2.1-2
 	openssl_x86-1.0.2n-1
 	openssl_x86_devel-1.0.2n-1
 	pkgconfig_x86-0.29.2-3

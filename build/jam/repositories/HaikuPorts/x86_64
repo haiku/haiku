@@ -85,7 +85,7 @@ RemotePackageRepository HaikuPorts
 	libffi-3.2.1-4
 	libgcrypt-1.8.2-2
 	libgpg_error-1.27-4
-	libiconv-1.15-2
+	libiconv-1.15-4
 	libicns-0.8.1-6
 	libicns_devel-0.8.1-6
 	libmodplug-0.8.9.0-1
@@ -133,8 +133,8 @@ RemotePackageRepository HaikuPorts
 	ncurses6_devel-6.0-3
 	netcat-1.10-4
 	nettle-3.4-1
-	openexr-2.2.1-1
-	openexr_devel-2.2.1-1
+	openexr-2.2.1-2
+	openexr_devel-2.2.1-2
 	openssh-7.6p1-1
 	openssl-1.0.2n-1
 	openssl_devel-1.0.2n-1
