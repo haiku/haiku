@@ -88,6 +88,7 @@ RemotePackageRepository HaikuPorts
 	libiconv-1.15-4
 	libicns-0.8.1-6
 	libicns_devel-0.8.1-6
+	libidn2-2.0.4-1
 	libmodplug-0.8.9.0-1
 	libogg-1.3.3-1
 	libogg_devel-1.3.3-1
@@ -224,6 +225,7 @@ RemotePackageRepository HaikuPorts
 	libgpg_error
 	libiconv
 	libicns
+	libidn2
 	libogg
 	libpcap
 	libpcre
