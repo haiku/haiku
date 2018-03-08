@@ -60,7 +60,9 @@ requires {
 	cmd:unzip
 #endif
 	lib:libfreetype
+#ifdef HAIKU_BUILD_FEATURE_PPC_FONTCONFIG_ENABLED
 	lib:libfontconfig
+#endif
 	lib:libgcc_s
 	lib:libicudata
 	lib:libicui18n
