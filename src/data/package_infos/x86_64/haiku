@@ -115,7 +115,6 @@ requires {
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_FFMPEG_ENABLED
 	lib:libavcodec >= 57
-	lib:libavdevice >= 57
 	lib:libavfilter >= 6
 	lib:libavformat >= 57
 	lib:libavresample >= 3
