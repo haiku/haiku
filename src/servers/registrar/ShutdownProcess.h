@@ -88,8 +88,6 @@ private:
 			void				_DisplayAbortingApp(team_id team);
 			void				_WaitForDebuggedTeams();
 
-			status_t			_GetUserAndSystemAppList();
-
 private:
 	class TimeoutEvent;
 	class InternalEvent;

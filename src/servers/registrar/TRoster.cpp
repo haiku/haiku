@@ -1487,6 +1487,30 @@ TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
 
 
 status_t
+TRoster::AddAppInfo(AppInfoList& apps, team_id team)
+{
+	BAutolock _(fLock);
+
+	for (AppInfoList::Iterator it(fRegisteredApps.It());
+			RosterAppInfo* info = *it; ++it) {
+		if (info->team == team) {
+			RosterAppInfo* clonedInfo = info->Clone();
+			status_t error = B_NO_MEMORY;
+			if (clonedInfo != NULL) {
+				if (!apps.AddInfo(clonedInfo))
+					delete clonedInfo;
+				else
+					error = B_OK;
+			}
+			return error;
+		}
+	}
+
+	return B_BAD_TEAM_ID;
+}
+
+
+status_t
 TRoster::AddWatcher(Watcher* watcher)
 {
 	BAutolock _(fLock);

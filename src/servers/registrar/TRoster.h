@@ -78,6 +78,7 @@ public:
 								AppInfoList& systemApps,
 								AppInfoList& backgroundApps,
 								hash_set<team_id>& vitalSystemApps);
+			status_t		AddAppInfo(AppInfoList& apps, team_id team);
 
 			status_t		AddWatcher(Watcher* watcher);
 			void			RemoveWatcher(Watcher* watcher);
