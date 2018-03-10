@@ -43,7 +43,7 @@ make_mode(nspace *volume, vnode *node)
 		result &= ~S_IFREG;
 		result |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
 	}
-	if ((volume->flags & B_FS_IS_READONLY) || (node->mode & FAT_READ_ONLY))
+	if ((node->mode & FAT_READ_ONLY) != 0)
 		result &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
 	return result;
@@ -405,6 +405,11 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	int result = B_OK;
 
 	LOCK_VOL(vol);
+
+	if ((vol->flags & B_FS_IS_READONLY) != 0) {
+		UNLOCK_VOL(vol);
+		return EROFS;
+	}
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_write called on subdirectory %" B_PRIdINO "\n",
@@ -1283,6 +1288,11 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		return B_BAD_VALUE;
 
 	LOCK_VOL(vol);
+
+	if ((vol->flags & B_FS_IS_READONLY) != 0) {
+		UNLOCK_VOL(vol);
+		return EROFS;
+	}
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
