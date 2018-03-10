@@ -367,7 +367,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 
 	strlcpy(ns->devicePath, device, sizeof(ns->devicePath));
 
-	sprintf(lockname, "ntfs_lock %lx", ns->id);
+	sprintf(lockname, "ntfs_lock %" B_PRIx32, ns->id);
 	recursive_lock_init_etc(&(ns->vlock), lockname, MUTEX_FLAG_CLONE_NAME);
 
 	handle = load_driver_settings("ntfs");
@@ -848,9 +848,6 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 		stbuf->st_mode |= 0666;
 	}
 
-	if (ns->flags & B_FS_IS_READONLY)
-		stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
-
 	stbuf->st_uid = 0;
 	stbuf->st_gid = 0;
 	stbuf->st_ino = MREF(ni->mft_no);
@@ -879,6 +876,11 @@ fs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask)
 	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
+
+	if ((ns->flags & B_FS_IS_READONLY) != 0) {
+		UNLOCK_VOL(ns);
+		return B_READ_ONLY_DEVICE;
+	}
 
 	TRACE("fs_wstat: ENTER\n");
 
