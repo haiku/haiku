@@ -237,7 +237,6 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	info.drawingMode = drawing_mode;
 	info.origin = origin;
 	info.scale = scale;
-	info.transform = transform;
 	info.lineJoin = line_join;
 	info.lineCap = line_cap;
 	info.miterLimit = miter_limit;
@@ -246,6 +245,12 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	info.alphaFunctionMode = alpha_function_mode;
 	info.fontAntialiasing = font_aliasing;
 	link.Attach<ViewSetStateInfo>(info);
+
+	// BAffineTransform is transmitted as a double array
+	double _transform[6];
+	if (transform.Flatten(_transform, sizeof(_transform)) != B_OK)
+		return;
+	link.Attach<double[6]>(_transform);
 
 	// we send the 'local' clipping region... if we have one...
 	// TODO: Could be optimized, but is low prio, since most views won't
@@ -302,7 +307,6 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	drawing_mode = info.viewStateInfo.drawingMode;
 	origin = info.viewStateInfo.origin;
 	scale = info.viewStateInfo.scale;
-	transform = info.viewStateInfo.transform;
 	line_join = info.viewStateInfo.lineJoin;
 	line_cap = info.viewStateInfo.lineCap;
 	miter_limit = info.viewStateInfo.miterLimit;
@@ -310,6 +314,14 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	alpha_source_mode = info.viewStateInfo.alphaSourceMode;
 	alpha_function_mode = info.viewStateInfo.alphaFunctionMode;
 	font_aliasing = info.viewStateInfo.fontAntialiasing;
+
+	// BAffineTransform is transmitted as a double array
+	double _transform[6];
+	link.Read<double[6]>(&_transform);
+	if (transform.Unflatten(B_AFFINE_TRANSFORM_TYPE, _transform,
+		sizeof(_transform)) != B_OK) {
+		return;
+	}
 
 	// read the user clipping
 	// (that's NOT the current View visible clipping but the additional

@@ -26,7 +26,6 @@ struct ViewSetStateInfo {
 	drawing_mode				drawingMode;
 	BPoint						origin;
 	float						scale;
-	BAffineTransform			transform;
 	join_mode					lineJoin;
 	cap_mode					lineCap;
 	float						miterLimit;

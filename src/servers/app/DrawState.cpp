@@ -223,6 +223,14 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 
 	link.Read<ViewSetStateInfo>(&info);
 
+	// BAffineTransform is transmitted as a double array
+	double transform[6];
+	link.Read<double[6]>(&transform);
+	if (fTransform.Unflatten(B_AFFINE_TRANSFORM_TYPE, transform,
+		sizeof(transform)) != B_OK) {
+		return;
+	}
+
 	fPenLocation = info.penLocation;
 	fPenSize = info.penSize;
 	fHighColor = info.highColor;
@@ -235,7 +243,6 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	fDrawingMode = info.drawingMode;
 	fOrigin = info.origin;
 	fScale = info.scale;
-	fTransform = info.transform;
 	fLineJoinMode = info.lineJoin;
 	fLineCapMode = info.lineCap;
 	fMiterLimit = info.miterLimit;
@@ -304,7 +311,6 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	info.viewStateInfo.drawingMode = fDrawingMode;
 	info.viewStateInfo.origin = fOrigin;
 	info.viewStateInfo.scale = fScale;
-	info.viewStateInfo.transform = fTransform;
 	info.viewStateInfo.lineJoin = fLineJoinMode;
 	info.viewStateInfo.lineCap = fLineCapMode;
 	info.viewStateInfo.miterLimit = fMiterLimit;
@@ -316,6 +322,11 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 
 	link.Attach<ViewGetStateInfo>(info);
 
+	// BAffineTransform is transmitted as a double array
+	double transform[6];
+	if (fTransform.Flatten(transform, sizeof(transform)) != B_OK)
+		return;
+	link.Attach<double[6]>(transform);
 
 	// TODO: Could be optimized, but is low prio, since most views do not
 	// use a custom clipping region...
