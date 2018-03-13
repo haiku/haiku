@@ -31,7 +31,7 @@ ATAPIDevice::SendPacket(ATARequest *request)
 	// crucial for the SCSI protocol)
 	// special offer: let READ_CD commands use DMA too
 	uint8 command = fPacket[0];
-	request->SetUseDMA(UseDMA()
+	request->SetUseDMA(UseDMA() && request->CCB()->sg_list != NULL
 		&& (command == SCSI_OP_READ_6 || command == SCSI_OP_WRITE_6
 		|| command == SCSI_OP_READ_10 || command == SCSI_OP_WRITE_10
 		|| command == SCSI_OP_READ_12 || command == SCSI_OP_WRITE_12
