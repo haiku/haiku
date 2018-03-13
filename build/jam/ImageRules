@@ -1636,7 +1636,7 @@ actions BuildCDBootPPCImage1 bind MAPS
 	genisoimage -v -hfs -part -map $(MAPS) -no-desktop -hfs-volid bootimg \
 		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -prep-boot \
 		boot/haikuloader.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
-	$(RM) -R $(HAIKU_OUTPUT_DIR)/cd
+	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
 }
 
 
