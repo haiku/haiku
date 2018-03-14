@@ -759,6 +759,7 @@ arch_mmu_init(void)
 
 	// can we just keep the page table?
 	size_t suggestedTableSize = suggested_page_table_size(total);
+	dprintf("current page table size = %" B_PRIuSIZE "\n", tableSize);
 	dprintf("suggested page table size = %" B_PRIuSIZE "\n",
 		suggestedTableSize);
 	if (tableSize < suggestedTableSize) {
@@ -788,13 +789,14 @@ arch_mmu_init(void)
 			table = (page_table_entry_group *)tableBase;
 		}
 
-		dprintf("new table at: %p\n", table);
+		dprintf("OpenFirmware gave us a new page table at: %p\n", table);
 		sPageTable = table;
 		tableSize = suggestedTableSize;
 	} else {
 		// ToDo: we could check if the page table is much too large
 		//	and create a smaller one in this case (in order to save
 		//	memory).
+		dprintf("using original OpenFirmware page table at: %p\n", table);
 		sPageTable = table;
 	}
 
@@ -885,7 +887,7 @@ arch_mmu_init(void)
 
 	// set up new page table and turn on translation again
 
-	for (int32 i = 0; i < 16; i++) {
+	for (uint32 i = 0; i < 16; i++) {
 		ppc_set_segment_register((void *)(i * 0x10000000), sSegments[i]);
 			// one segment describes 256 MB of memory
 	}
