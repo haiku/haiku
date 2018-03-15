@@ -22,11 +22,11 @@ Always on top	PreferencesWindow		Alltid överst
 Show all	WindowMenu		Visa alla
 No windows	WindowMenu		Saknar fönster
 Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Starta om systemet
+Restart system	DeskbarMenu		Starta om
 Large	PreferencesWindow		Stor
 Auto-raise	PreferencesWindow		Höj vid närkontakt
 Recent folders:	PreferencesWindow		Senaste mappar:
-Show application expander	PreferencesWindow		Visa program-expanderare
+Show application expander	PreferencesWindow		Visa programexpanderare
 Close all	WindowMenu		Stäng alla
 Deskbar preferences	PreferencesWindow		Inställningar för Deskbar
 Mount	DeskbarMenu		Montera
@@ -42,7 +42,7 @@ Show calendar…	TimeView		Visa kalender...
 Deskbar preferences…	DeskbarMenu		Inställningar för Deskbar...
 Expand new applications	PreferencesWindow		Expandera nya program
 Show replicants	DeskbarMenu		Visa replikanter
-Hide application names	PreferencesWindow		Göm applikation namnen
+Hide application names	PreferencesWindow		Göm programnamnen
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
 Icon size	PreferencesWindow		Ikonstorlek
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram

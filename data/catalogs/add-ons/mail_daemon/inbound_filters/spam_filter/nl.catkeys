@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-SpamFilter	160316705
+1	dutch; flemish	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		of een lege e-mail
 Genuine below and uncertain above:	SpamFilterConfig		Echte e-mail beneden en onzeker boven:
 Spam above:	SpamFilterConfig		Spam boven:
 Add spam rating to start of subject	SpamFilterConfig		Spamwaarde toevoegen aan het begin van het onderwerp
+Bayesian Spam Filter	SpamFilter		Bayesiaanse spamfilter
 Learn from all incoming e-mail	SpamFilterConfig		Leer van alle inkomende e-mails

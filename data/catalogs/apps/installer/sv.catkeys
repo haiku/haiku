@@ -1,6 +1,6 @@
 1	swedish	x-vnd.Haiku-Installer	3421507633
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, den applikation man använder för att konfigurera Haiku boot meny kunde inte startas.
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Här måste du kommentera bort raden \"GRUB_HIDDEN_TIMEOUT=0\" genom att sätta en \"#\" framför den för att verkligen visa startmenyn.\n\n
@@ -88,14 +88,14 @@ Begin	InstallerWindow		Börja
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Äntligen, dumåste updatera boot menyn genom att skriva:\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Om du inte har skapat en partition än, bara bota om, skapa en partition med en ditt favorit partitions program, boota up i Haiku igen och fortsätt med installationen. Du skulle tex kunna använda GParted Live-CD, den kan också användas för att ändra storlekar på partitioner.\n\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Med GRUB 2 har den första logiska partitionen alltid nummer \"5\", oavsätt antalet primära partitioner.\n\n
-Write boot sector	InstallerWindow		Skriv boot sektor
+Write boot sector	InstallerWindow		Skriv bootsektor
 Cancel	InstallerWindow		Avbryt
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Den tänkta volumen är inte tom. Är du säker att du villinstallera ändå?\n\nNotering: Systemfoldern kommer att vara en kopia från källans systemfolder men kommer att behålla inställningsfoldern, alla anda foldrar kommer att mergas. De filer och länkar som finns på båda ställena kommer att skrivas över med de nyare.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
 All hard disks start with \"hd\".\n	InstallerApp		Alla hårdiskar startar med \"hd\".\n
 Continue	InstallerApp		Fortsätt
-Boot sector not written because of an internal error.	InstallProgress		Gick inte att skriva till bootsektorn på grund av ett internt fel.
+Boot sector not written because of an internal error.	InstallProgress		Det gick inte att skriva till bootsektorn på grund av ett internt fel.
 Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
 Cancel	InstallProgress		Avbryt
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Kör Boot Manager och DriveSetup…\n\nStäng båda programmen för att fortsätta med installationen.

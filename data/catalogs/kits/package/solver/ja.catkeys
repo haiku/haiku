@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-libsolvsolver	3404387783
 %dependency% is provided by the system	SolverProblem		%dependency% はシステムが提供する
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% と競合する
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		パッケージ %source% は、%target% が提供する %dependency% と競合します
 nothing provides requested %dependency%	SolverProblem		要求された %dependency% を提供するものがない
 unspecified problem	SolverProblem		詳細不明の問題
 keep %source% despite its inferior architecture	SolverProblemSolution		下位のアーキテクチャですが、%source% を保持する

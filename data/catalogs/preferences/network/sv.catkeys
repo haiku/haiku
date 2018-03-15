@@ -7,7 +7,7 @@ WPA2	WPA2 protected network		WPA2
 Choose automatically	IntefaceView		Välj automatiskt
 connected	IntefaceView		ansluten
 Ethernet device	InterfaceListItem		Ethernetenhet
-The netmask defines your local network	IntefaceAddressView		Netmasken definierar ditt lokala nätverk
+The netmask defines your local network	IntefaceAddressView		Nätmasken definierar ditt lokala nätverk
 Dial-up connection	InterfaceListItem		Uppringd anslutning
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Nätverk
@@ -18,8 +18,8 @@ connected	InterfaceListItem		ansluten
 disabled	InterfaceListItem		inaktiverad
 Dial Up	NetworkWindow		Uppringd
 Apply	IntefaceAddressView		Använd
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatera NetworkStatus i Deskbaren misslyckades: %s
-MAC address:	IntefaceView		MAC-adress
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatera NätverksStatus i Deskbar misslyckades: %s
+MAC address:	IntefaceView		MAC-adress:
 Wireless device	InterfaceListItem		Trådlös enhet
 Disabled	IntefaceAddressView		Inaktiverad
 Renegotiate	IntefaceView		Omförhandla

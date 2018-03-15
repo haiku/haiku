@@ -1,0 +1,11 @@
+1	dutch; flemish	x-vnd.Haiku-libsolvsolver	64832192
+%dependency% is provided by the system	SolverProblem		%dependency% wordt door het systeem aangeboden
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		pakket %source% is in conflict met %dependency% aangeboden door %target%
+nothing provides requested %dependency%	SolverProblem		nergens wordt de gevraagde %dependency% aangeboden
+unspecified problem	SolverProblem		ongespecificeerd probleem
+keep %source% despite its inferior architecture	SolverProblemSolution		%source% ondanks zijn inferieure architectuur bewaren
+do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection\" niet verwijderen
+%source% has inferior architecture	SolverProblem		%source% heeft een inferieure architectuur
+dependency problem	SolverProblem		afhankelijkheidsprobleem
+do not keep %source% installed	SolverProblemSolution		houd %source% niet geïnstalleerd
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakket %source% maakt %dependency% aangeboden door %target% impliciet overbodig

@@ -6,7 +6,7 @@ Always on top	ActivityWindow		Alltid överst
 Add graph	ActivityWindow		Lägg till graf
 Teams	DataSource		Processer
 MiB	DataSource		MiB
-Network send	DataSource		Nätverk sändning
+Network send	DataSource		Nätverkssändning
 CPU usage (combined)	DataSource		CPU användning (kombinerad)
 CPU	DataSource		CPU
 Used memory	DataSource		Minnesanvändning
@@ -42,6 +42,6 @@ Swap	DataSource		Växling
 File	ActivityWindow		Arkiv
 usage	DataSource		användning
 Additional items	ActivityView		Ytterligare mätvärden
-Network receive	DataSource		Nätverksmotagning
+Network receive	DataSource		Nätverksmottagning
 Memory	DataSource		Minne
 RX	DataSource	Shorter version for Receiving.	RX

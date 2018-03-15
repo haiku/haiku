@@ -37,7 +37,7 @@ All repositories	FilterView		すべてのリポジトリ
 Email address:	UserLoginWindow		メールアドレス:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		評価の更新に成功しました。もう一度パッケージを評価すれば、いつでも評価を更新または削除できます。
 Very unstable	RatePackageWindow		非常に不安定
-<Package contents not available for remote packages>	PackageContentsView		<パッケージの内容がリモートパッケージに対して利用できません>
+<Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
 The username is already taken. Please choose another.	UserLoginWindow		ユーザー名はすでに使われています。他の名前を選んでください。
 Close	PackageManager		閉じる
 Not logged in	MainWindow		ログインしていません
@@ -72,7 +72,7 @@ Log out	MainWindow		ログアウト
 Education	Model		教育
 Search terms:	FilterView		検索:
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		ユーザー評価がありません。
+No user ratings available.	PackageInfoView		ユーザー評価はありません。
 Failed to update rating	RatePackageWindow		評価の更新に失敗しました
 Does not start	RatePackageWindow		開始しない
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
