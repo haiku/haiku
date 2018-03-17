@@ -20,6 +20,7 @@
 class Architecture;
 class CompilationUnit;
 class DebuggerInterface;
+class DIENamespace;
 class DIEType;
 class DwarfFunctionDebugInfo;
 class DwarfStackFrameDebugInfo;
@@ -132,6 +133,9 @@ private:
 
 			status_t			_BuildTypeNameTable();
 			status_t			_RecursiveAddTypeNames(DIEType* type,
+									CompilationUnit* unit);
+			status_t			_RecursiveTraverseNamespaceForTypes(
+									DIENamespace* nsEntry,
 									CompilationUnit* unit);
 
 private:

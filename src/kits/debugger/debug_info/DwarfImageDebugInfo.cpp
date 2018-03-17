@@ -1397,7 +1397,6 @@ DwarfImageDebugInfo::_BuildTypeNameTable()
 	// iterate through all compilation units
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
 		i++) {
-
 		// iterate through all types of the compilation unit
 		for (DebugInfoEntryList::ConstIterator it
 				= unit->UnitEntry()->Types().GetIterator();
@@ -1405,6 +1404,19 @@ DwarfImageDebugInfo::_BuildTypeNameTable()
 
 			if (_RecursiveAddTypeNames(typeEntry, unit) != B_OK)
 				return B_NO_MEMORY;
+		}
+
+		for (DebugInfoEntryList::ConstIterator it
+			= unit->UnitEntry()->OtherChildren().GetIterator();
+			DebugInfoEntry* child = it.Next();) {
+			if (child->Tag() != DW_TAG_namespace)
+				continue;
+
+			DIENamespace* namespaceEntry = dynamic_cast<DIENamespace*>(child);
+			if (_RecursiveTraverseNamespaceForTypes(namespaceEntry, unit)
+					!= B_OK) {
+				return B_NO_MEMORY;
+			}
 		}
 	}
 
@@ -1451,6 +1463,33 @@ DwarfImageDebugInfo::_RecursiveAddTypeNames(DIEType* type, CompilationUnit* unit
 			if (error != B_OK)
 				return error;
 		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfImageDebugInfo::_RecursiveTraverseNamespaceForTypes(DIENamespace* nsEntry,
+	CompilationUnit* unit)
+{
+	for (DebugInfoEntryList::ConstIterator it
+				= nsEntry->Children().GetIterator();
+			DebugInfoEntry* child = it.Next();) {
+		if (child->Tag() == DW_TAG_namespace) {
+			DIENamespace* entry = dynamic_cast<DIENamespace*>(child);
+			status_t error = _RecursiveTraverseNamespaceForTypes(entry, unit);
+			if (error != B_OK)
+				return error;
+			continue;
+		}
+
+		if (!child->IsType())
+			continue;
+
+		DIEType* type = dynamic_cast<DIEType*>(child);
+		if (_RecursiveAddTypeNames(type, unit) != B_OK)
+			return B_NO_MEMORY;
 	}
 
 	return B_OK;
