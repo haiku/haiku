@@ -12,7 +12,7 @@ No remote repositories are available	UpdateManager	Error message	リモートの
 No updates available	UpdateAction		アップデートはありません
 Downloading packages	UpdateManager		パッケージをダウンロード中
 Attempting to cancel the updates...	SoftwareUpdaterWindow		アップデートのキャンセルを試みています...
-from repository	SoftwareUpdaterWindow	List item text	リポジトリから
+from repository	SoftwareUpdaterWindow	List item text	以下のリポジトリから
 Cancel	SoftwareUpdaterWindow	Alert button label	キャンセル
 Click here to install updates.	CheckManager		クリックしてアップデートをインストール
 The following changes will be made:	SoftwareUpdaterWindow		以下の変更が適用されます:
@@ -44,7 +44,7 @@ Quit	SoftwareUpdaterWindow	Button label	終了
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		クリックしてソフトウェアの更新を起動してください。いくつかのアップデートは選択すべき問題の解決策を必要とするでしょう。
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		ソフトウェアリポジトリに連絡を取り、パッケージの更新を確認します。
 Unrecognized argument	SoftwareUpdaterApp	Error message	認識されない引数
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		以下のアップデートオプションから選択してください:\n\nUpdate:\n\tすべてのインストール済パッケージを更新します。\nFull sync:\n\tインストール済パッケージをリポジトリと同期します。
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		以下のオプションから選択してください:\n\nUpdate:\n\tすべてのインストール済パッケージを更新します。\nFull sync:\n\tインストール済パッケージをリポジトリと同期します。
 Exception occurred while checking for updates: %s\n	CheckAction		アップデートの確認中に例外が発生しました: %s\n
 Exception occurred while updating packages : %s\n	UpdateAction		パッケージのアップデート中に例外が発生しました : %s\n
 Update	SoftwareUpdaterWindow	Alert button label	更新
