@@ -101,8 +101,14 @@ find_message_app_info(BMessage* message, app_info* info)
 	// unflatten the flat info
 	if (error == B_OK) {
 		if (size == sizeof(flat_app_info)) {
-			memcpy(info, &flatInfo->info, sizeof(app_info));
+			info->thread = flatInfo->thread;
+			info->team = flatInfo->team;
+			info->port = flatInfo->port;
+			info->flags = flatInfo->flags;
+			info->ref.device = flatInfo->ref_device;
+			info->ref.directory = flatInfo->ref_directory;
 			info->ref.name = NULL;
+			memcpy(info->signature, flatInfo->signature, B_MIME_TYPE_LENGTH);
 			if (strlen(flatInfo->ref_name) > 0)
 				info->ref.set_name(flatInfo->ref_name);
 		} else

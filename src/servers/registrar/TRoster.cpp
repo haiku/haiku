@@ -1629,10 +1629,15 @@ TRoster::_AddMessageAppInfo(BMessage* message, const app_info* info)
 	// An app_info is not completely flat. The entry_ref contains a string
 	// pointer. Therefore we flatten the info.
 	flat_app_info flatInfo;
-	flatInfo.info = *info;
+	flatInfo.thread = info->thread;
+	flatInfo.team = info->team;
+	flatInfo.port = info->port;
+	flatInfo.flags = info->flags;
+	flatInfo.ref_device = info->ref.device;
+	flatInfo.ref_directory = info->ref.directory;
+	memcpy(flatInfo.signature, info->signature, B_MIME_TYPE_LENGTH);
 
 	// set the ref name to NULL and copy it into the flat structure
-	flatInfo.info.ref.name = NULL;
 	flatInfo.ref_name[0] = '\0';
 	if (info->ref.name)
 		strcpy(flatInfo.ref_name, info->ref.name);

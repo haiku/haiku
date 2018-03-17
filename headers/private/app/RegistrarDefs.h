@@ -180,9 +180,15 @@ enum {
 
 // a flat app_info -- to be found in B_REG_APP_INFO_TYPE message fields
 struct flat_app_info {
-	app_info	info;
+	thread_id	thread;
+	team_id		team;
+	port_id		port;
+	uint32		flags;
+	dev_t		ref_device;
+	ino_t		ref_directory;
+	char		signature[B_MIME_TYPE_LENGTH];
 	char		ref_name[B_FILE_NAME_LENGTH + 1];
-};
+} _PACKED;
 
 
 }	// namespace BPrivate
