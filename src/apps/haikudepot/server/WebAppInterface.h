@@ -96,7 +96,11 @@ private:
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, uint32 flags,
 									BMessage& reply) const;
-
+			status_t			_SendJsonRequest(const char* domain,
+									BDataIO* requestData,
+									size_t requestDataSize, uint32 flags,
+									BMessage& reply) const;
+	
 private:
 			BString				fUsername;
 			BString				fPassword;

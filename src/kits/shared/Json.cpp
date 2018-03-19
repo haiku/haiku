@@ -126,9 +126,9 @@ BJson::Parse(const BString& JSON, BMessage& message)
 
 
 status_t
-BJson::Parse(const char* JSON, BMessage& message)
+BJson::Parse(const char* JSON, size_t length, BMessage& message)
 {
-	BMemoryIO* input = new BMemoryIO(JSON, strlen(JSON));
+	BMemoryIO* input = new BMemoryIO(JSON, length);
 	ObjectDeleter<BMemoryIO> inputDeleter(input);
 	BJsonMessageWriter* writer = new BJsonMessageWriter(message);
 	ObjectDeleter<BJsonMessageWriter> writerDeleter(writer);
@@ -137,6 +137,13 @@ BJson::Parse(const char* JSON, BMessage& message)
 	status_t result = writer->ErrorStatus();
 
 	return result;
+}
+
+
+status_t
+BJson::Parse(const char* JSON, BMessage& message)
+{
+	return Parse(JSON, strlen(JSON), message);
 }
 
 

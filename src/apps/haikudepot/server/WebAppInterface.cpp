@@ -559,20 +559,32 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
-	uint32 flags, BMessage& reply) const
+WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
+	size_t requestDataSize, uint32 flags, BMessage& reply) const
 {
-	if (!ServerHelper::IsNetworkAvailable())
+	if (!ServerHelper::IsNetworkAvailable()) {
+		if (Logger::IsDebugEnabled()) {
+			printf("dropping json-rpc request to ...[%s] as network is not "
+				"available\n", domain);
+		}
 		return HD_NETWORK_INACCESSIBLE;
+	}
 
-	if (!ServerSettings::IsClientTooOld())
+	if (ServerSettings::IsClientTooOld()) {
+		if (Logger::IsDebugEnabled()) {
+			printf("dropping json-rpc request to ...[%s] as client is too "
+				"old\n", domain);
+		}
 		return HD_CLIENT_TOO_OLD;
-
-	if (Logger::IsTraceEnabled())
-		printf("_SendJsonRequest(%s)\n", jsonString.String());
+	}
 
 	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
 	bool isSecure = url.Protocol() == "https";
+
+	if (Logger::IsDebugEnabled()) {
+		printf("will make json-rpc request to [%s]\n",
+			url.UrlString().String());
+	}
 
 	ProtocolListener listener(Logger::IsTraceEnabled());
 	BUrlContext context;
@@ -595,10 +607,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 		context.AddAuthentication(url, authentication);
 	}
 
-	BMemoryIO* data = new BMemoryIO(
-		jsonString.String(), jsonString.Length() - 1);
-
-	request.AdoptInputData(data, jsonString.Length() - 1);
+	request.AdoptInputData(requestData, requestDataSize);
 
 	BMallocIO replyData;
 	listener.SetDownloadIO(&replyData);
@@ -610,6 +619,11 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 		request.Result());
 
 	int32 statusCode = result.StatusCode();
+
+	if (Logger::IsDebugEnabled()) {
+		printf("did receive json-rpc response http status [%" B_PRId32 "] "
+			"from [%s]\n", statusCode, url.UrlString().String());
+	}
 
 	switch (statusCode) {
 		case B_HTTP_STATUS_OK:
@@ -625,14 +639,29 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 			return B_ERROR;
 	}
 
-	jsonString.SetTo(static_cast<const char*>(replyData.Buffer()),
-		replyData.BufferLength());
-	if (jsonString.Length() == 0)
-		return B_ERROR;
-
-	status_t status = BJson::Parse(jsonString, reply);
+	status_t status = BJson::Parse(
+		static_cast<const char *>(replyData.Buffer()), replyData.BufferLength(),
+		reply);
 	if (Logger::IsTraceEnabled() && status == B_BAD_DATA) {
-		printf("Parser choked on JSON:\n%s\n", jsonString.String());
+		BString resultString(static_cast<const char *>(replyData.Buffer()),
+			replyData.BufferLength());
+		printf("Parser choked on JSON:\n%s\n", resultString.String());
 	}
 	return status;
 }
+
+
+status_t
+WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
+	uint32 flags, BMessage& reply) const
+{
+	if (Logger::IsTraceEnabled())
+		printf("_SendJsonRequest(%s)\n", jsonString.String());
+
+	BMemoryIO* data = new BMemoryIO(
+		jsonString.String(), jsonString.Length() - 1);
+
+	return _SendJsonRequest(domain, data, jsonString.Length() - 1, flags,
+		reply);
+}
+

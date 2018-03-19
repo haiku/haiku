@@ -21,6 +21,8 @@ class BJson {
 
 public:
 	static	status_t			Parse(const char* JSON, BMessage& message);
+	static	status_t			Parse(const char* JSON, size_t length,
+									BMessage& message);
 	static	status_t			Parse(const BString& JSON, BMessage& message);
 	static	void				Parse(BDataIO* data,
 									BJsonEventListener* listener);
