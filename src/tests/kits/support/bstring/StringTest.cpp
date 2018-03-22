@@ -16,6 +16,7 @@
 #include "StringCharAccessTest.h"
 #include "StringReplaceTest.h"
 #include "StringSearchTest.h"
+#include "StringSplitTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -36,6 +37,7 @@ CppUnit::Test *StringTestSuite()
 	testSuite->addTest(StringCharAccessTest::suite());
 	testSuite->addTest(StringReplaceTest::suite());
 	testSuite->addTest(StringSearchTest::suite());
+	testSuite->addTest(StringSplitTest::suite());
 	
 	return(testSuite);
 }

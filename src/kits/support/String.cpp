@@ -525,7 +525,7 @@ BString::Split(const char* separator, bool noEmptyStrings,
 		if (endIndex == length)
 			break;
 
-		index = endIndex + 1;
+		index = endIndex + separatorLength;
 	}
 
 	return true;

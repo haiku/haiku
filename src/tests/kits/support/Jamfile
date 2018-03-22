@@ -74,6 +74,7 @@ UnitTestLib libsupporttest.so
 		StringCharAccessTest.cpp
 		StringSearchTest.cpp
 		StringReplaceTest.cpp
+		StringSplitTest.cpp
 
 		#BBlockCache
 		BlockCacheTest.cpp
