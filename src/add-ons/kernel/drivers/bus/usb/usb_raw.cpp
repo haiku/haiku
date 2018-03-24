@@ -295,6 +295,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (length < sizeof(command.device))
 				return B_BUFFER_OVERFLOW;
 
+			status = B_OK;
 			const usb_device_descriptor *deviceDescriptor =
 				gUSBModule->get_device_descriptor(device->device);
 			if (deviceDescriptor == NULL)
@@ -307,7 +308,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			command.device.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -316,11 +316,12 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (length < sizeof(command.config))
 				return B_BUFFER_OVERFLOW;
 
+			status = B_OK;
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device, command.config.config_index,
 					&command.config.status);
 			if (configurationInfo == NULL)
-				return B_OK;
+				break;
 
 			if (!IS_USER_ADDRESS(command.config.descriptor)
 				|| user_memcpy(command.config.descriptor,
@@ -330,7 +331,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			command.config.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -340,17 +340,17 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (length < sizeof(command.alternate))
 				return B_BUFFER_OVERFLOW;
 
+			status = B_OK;
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device,
 					command.alternate.config_index,
 					&command.alternate.status);
 			if (configurationInfo == NULL)
-				return B_OK;
+				break;
 
 			if (command.alternate.interface_index
 				>= configurationInfo->interface_count) {
 				command.alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				status = B_OK;
 				break;
 			}
 
@@ -369,7 +369,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			command.alternate.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -377,6 +376,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR_ETC:
 		{
 			const usb_interface_info *interfaceInfo = NULL;
+			status = B_OK;
 			if (op == B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR) {
 				if (length < sizeof(command.interface))
 					return B_BUFFER_OVERFLOW;
@@ -398,7 +398,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			if (interfaceInfo == NULL)
-				return B_OK;
+				break;
 
 			if (!IS_USER_ADDRESS(command.interface.descriptor)
 				|| user_memcpy(command.interface.descriptor, interfaceInfo->descr,
@@ -407,7 +407,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			command.interface.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -416,6 +415,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		{
 			uint32 endpointIndex = 0;
 			const usb_interface_info *interfaceInfo = NULL;
+			status = B_OK;
 			if (op == B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR) {
 				if (length < sizeof(command.endpoint))
 					return B_BUFFER_OVERFLOW;
@@ -439,11 +439,10 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			if (interfaceInfo == NULL)
-				return B_OK;
+				break;
 
 			if (endpointIndex >= interfaceInfo->endpoint_count) {
 				command.endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				status = B_OK;
 				break;
 			}
 
@@ -455,7 +454,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			command.endpoint.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -465,6 +463,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			uint32 genericIndex = 0;
 			size_t genericLength = 0;
 			const usb_interface_info *interfaceInfo = NULL;
+			status = B_OK;
 			if (op == B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR) {
 				if (length < sizeof(command.generic))
 					return B_BUFFER_OVERFLOW;
@@ -490,17 +489,16 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			if (interfaceInfo == NULL)
-				return B_OK;
+				break;
 
 			if (genericIndex >= interfaceInfo->generic_count) {
 				command.endpoint.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				status = B_OK;
 				break;
 			}
 
 			usb_descriptor *descriptor = interfaceInfo->generic[genericIndex];
 			if (descriptor == NULL)
-				return B_OK;
+				break;
 
 			if (!IS_USER_ADDRESS(command.generic.descriptor)
 				|| user_memcpy(command.generic.descriptor, descriptor,
@@ -512,7 +510,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				command.generic.status = B_USB_RAW_STATUS_NO_MEMORY;
 			else
 				command.generic.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -523,6 +520,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 			size_t actualLength = 0;
 			uint8 firstTwoBytes[2];
+			status = B_OK;
 
 			if (gUSBModule->get_descriptor(device->device,
 				USB_DESCRIPTOR_STRING, command.string.string_index, 0,
@@ -531,7 +529,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				|| firstTwoBytes[1] != USB_DESCRIPTOR_STRING) {
 				command.string.status = B_USB_RAW_STATUS_ABORTED;
 				command.string.length = 0;
-				return B_OK;
+				break;
 			}
 
 			uint8 stringLength = MIN(firstTwoBytes[0], command.string.length);
@@ -539,7 +537,8 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (string == NULL) {
 				command.string.status = B_USB_RAW_STATUS_ABORTED;
 				command.string.length = 0;
-				return B_NO_MEMORY;
+				status = B_NO_MEMORY;
+				break;
 			}
 
 			if (gUSBModule->get_descriptor(device->device,
@@ -549,7 +548,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				command.string.status = B_USB_RAW_STATUS_ABORTED;
 				command.string.length = 0;
 				free(string);
-				status = B_OK;
 				break;
 			}
 
@@ -563,7 +561,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			command.string.status = B_USB_RAW_STATUS_SUCCESS;
 			command.string.length = stringLength;
 			free(string);
-			status = B_OK;
 			break;
 		}
 
@@ -574,6 +571,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 			size_t actualLength = 0;
 			uint8 firstTwoBytes[2];
+			status = B_OK;
 
 			if (gUSBModule->get_descriptor(device->device,
 				command.descriptor.type, command.descriptor.index,
@@ -583,7 +581,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				|| firstTwoBytes[1] != command.descriptor.type) {
 				command.descriptor.status = B_USB_RAW_STATUS_ABORTED;
 				command.descriptor.length = 0;
-				status = B_OK;
 				break;
 			}
 
@@ -605,7 +602,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				command.descriptor.status = B_USB_RAW_STATUS_ABORTED;
 				command.descriptor.length = 0;
 				free(descriptorBuffer);
-				status = B_OK;
 				break;
 			}
 
@@ -619,7 +615,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			command.descriptor.status = B_USB_RAW_STATUS_SUCCESS;
 			command.descriptor.length = descriptorLength;
 			free(descriptorBuffer);
-			status = B_OK;
 			break;
 		}
 
@@ -628,21 +623,20 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (length < sizeof(command.config))
 				return B_BUFFER_OVERFLOW;
 
+			status = B_OK;
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device, command.config.config_index,
 					&command.config.status);
 			if (configurationInfo == NULL)
-				return B_OK;
+				break;
 
 			if (gUSBModule->set_configuration(device->device,
 				configurationInfo) < B_OK) {
 				command.config.status = B_USB_RAW_STATUS_FAILED;
-				status = B_OK;
 				break;
 			}
 
 			command.config.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -651,17 +645,17 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (length < sizeof(command.alternate))
 				return B_BUFFER_OVERFLOW;
 
+			status = B_OK;
 			const usb_configuration_info *configurationInfo =
 				usb_raw_get_configuration(device,
 					command.alternate.config_index,
 					&command.alternate.status);
 			if (configurationInfo == NULL)
-				return B_OK;
+				break;
 
 			if (command.alternate.interface_index
 				>= configurationInfo->interface_count) {
 				command.alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				status = B_OK;
 				break;
 			}
 
@@ -669,19 +663,16 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				&configurationInfo->interface[command.alternate.interface_index];
 			if (command.alternate.alternate_info >= interfaceList->alt_count) {
 				command.alternate.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				status = B_OK;
 				break;
 			}
 
 			if (gUSBModule->set_alt_interface(device->device,
 				&interfaceList->alt[command.alternate.alternate_info]) < B_OK) {
 				command.alternate.status = B_USB_RAW_STATUS_FAILED;
-				status = B_OK;
 				break;
 			}
 
 			command.alternate.status = B_USB_RAW_STATUS_SUCCESS;
-			status = B_OK;
 			break;
 		}
 
@@ -735,17 +726,16 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (length < sizeof(command.transfer))
 				return B_BUFFER_OVERFLOW;
 
+			status = B_OK;
 			const usb_configuration_info *configurationInfo =
 				gUSBModule->get_configuration(device->device);
 			if (configurationInfo == NULL) {
 				command.transfer.status = B_USB_RAW_STATUS_INVALID_CONFIGURATION;
-				status = B_OK;
 				break;
 			}
 
 			if (command.transfer.interface >= configurationInfo->interface_count) {
 				command.transfer.status = B_USB_RAW_STATUS_INVALID_INTERFACE;
-				status = B_OK;
 				break;
 			}
 
@@ -753,13 +743,11 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				configurationInfo->interface[command.transfer.interface].active;
 			if (interfaceInfo == NULL) {
 				command.transfer.status = B_USB_RAW_STATUS_ABORTED;
-				status = B_OK;
 				break;
 			}
 
 			if (command.transfer.endpoint >= interfaceInfo->endpoint_count) {
 				command.transfer.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				status = B_OK;
 				break;
 			}
 
@@ -767,7 +755,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				&interfaceInfo->endpoint[command.transfer.endpoint];
 			if (!endpointInfo->handle) {
 				command.transfer.status = B_USB_RAW_STATUS_INVALID_ENDPOINT;
-				status = B_OK;
 				break;
 			}
 
@@ -787,7 +774,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				if (packetDescriptors == NULL) {
 					command.transfer.status = B_USB_RAW_STATUS_NO_MEMORY;
 					command.transfer.length = 0;
-					status = B_OK;
 					break;
 				}
 
@@ -804,7 +790,6 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				if (transferData == NULL) {
 					command.transfer.status = B_USB_RAW_STATUS_NO_MEMORY;
 					command.transfer.length = 0;
-					status = B_OK;
 					break;
 				}
 
