@@ -99,6 +99,8 @@ public:
 			fIgnorePaths.insert("haiku-boot-floppy.image");
 			fIgnorePaths.insert("system/var/swap");
 			fIgnorePaths.insert("system/var/shared_memory");
+			fIgnorePaths.insert("system/var/log/syslog");
+			fIgnorePaths.insert("system/var/log/syslog.old");
 
 			fPackageFSRootPaths.insert("system");
 			fPackageFSRootPaths.insert("home/config");
