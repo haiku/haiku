@@ -185,10 +185,10 @@ public:
 	{
 		Inode *inode;
 		if ((inode = gLogged.Get(run)) != NULL)
-			return inode;
+			return Inode::Factory(&fDisk, inode, false);
 
 		if ((inode = gMissing.Get(run)) != NULL)
-			return inode;
+			return Inode::Factory(&fDisk, inode, false);
 
 		if (gMainInodes.find(run) == gMainInodes.end())
 			return NULL;
