@@ -2,12 +2,12 @@
 #include "cppunit/TestCaller.h"
 #include <String.h>
 
-StringCaseTest::StringCaseTest(std::string name) :
-		BTestCase(name)
+
+StringCaseTest::StringCaseTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringCaseTest::~StringCaseTest()
 {
@@ -19,7 +19,7 @@ StringCaseTest::PerformTest(void)
 {
 	BString *string;
 	
-	//Capitalize
+	// Capitalize
 	NextSubTest();
 	string = new BString("this is a sentence");
 	string->Capitalize();
@@ -38,7 +38,7 @@ StringCaseTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "") == 0);
 	delete string;
 	
-	//ToLower
+	// ToLower
 	NextSubTest();
 	string = new BString("1a2B3c4d5e6f7G");
 	string->ToLower();
@@ -51,7 +51,7 @@ StringCaseTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "") == 0);
 	delete string;
 	
-	//ToUpper
+	// ToUpper
 	NextSubTest();
 	string = new BString("1a2b3c4d5E6f7g");
 	string->ToUpper();
@@ -64,7 +64,7 @@ StringCaseTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "") == 0);
 	delete string;
 	
-	//CapitalizeEachWord
+	// CapitalizeEachWord
 	NextSubTest();
 	string = new BString("each wOrd 3will_be >capiTalized");
 	string->CapitalizeEachWord();
@@ -84,5 +84,6 @@ CppUnit::Test *StringCaseTest::suite(void)
 	typedef CppUnit::TestCaller<StringCaseTest>
 		StringCaseTestCaller;
 		
-	return(new StringCaseTestCaller("BString::Case Test", &StringCaseTest::PerformTest));
+	return(new StringCaseTestCaller("BString::Case Test",
+		&StringCaseTest::PerformTest));
 }

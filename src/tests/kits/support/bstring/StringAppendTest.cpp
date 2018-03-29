@@ -2,13 +2,13 @@
 #include "cppunit/TestCaller.h"
 #include <String.h>
 
-StringAppendTest::StringAppendTest(std::string name) :
-		BTestCase(name)
+
+StringAppendTest::StringAppendTest(std::string name)
+		: BTestCase(name)
 {
 }
 
  
-
 StringAppendTest::~StringAppendTest()
 {
 }
@@ -19,7 +19,7 @@ StringAppendTest::PerformTest(void)
 {
 	BString *str1, *str2;
 	
-	//+=(BString&)
+	// +=(BString&)
 	NextSubTest();
 	str1 = new BString("BASE");
 	str2 = new BString("APPENDED");
@@ -28,7 +28,7 @@ StringAppendTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
-	//+=(const char *)
+	// +=(const char *)
 	NextSubTest();
 	str1 = new BString("Base");
 	*str1 += "APPENDED";
@@ -41,7 +41,7 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "APPENDEDTONOTHING") == 0);
 	delete str1;
 	
-	//char pointer is NULL
+	// char pointer is NULL
 	NextSubTest();
 	char *tmp = NULL;
 	str1 = new BString("Base");
@@ -49,14 +49,14 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "Base") == 0);
 	delete str1;
 	
-	//+=(char)
+	// +=(char)
 	NextSubTest();
 	str1 = new BString("Base");
 	*str1 += 'C';
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BaseC") == 0);
 	delete str1;
 	
-	//Append(BString&)
+	// Append(BString&)
 	NextSubTest();
 	str1 = new BString("BASE");
 	str2 = new BString("APPENDED");
@@ -65,7 +65,7 @@ StringAppendTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
-	//Append(const char*)
+	// Append(const char*)
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append("APPENDED");
@@ -78,14 +78,14 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "APPENDEDTONOTHING") == 0);
 	delete str1;
 	
-	//char ptr is NULL
+	// char ptr is NULL
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append(tmp);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "Base") == 0);
 	delete str1;
 	
-	//Append(BString&, int32)
+	// Append(BString&, int32)
 	NextSubTest();
 	str1 = new BString("BASE");
 	str2 = new BString("APPENDED");
@@ -94,7 +94,7 @@ StringAppendTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
-	//Append(const char*, int32)
+	// Append(const char*, int32)
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append("APPENDED", 40);
@@ -102,14 +102,14 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(str1->Length() == (int32)strlen("BaseAPPENDED"));
 	delete str1;
 	
-	//char ptr is NULL
+	// char ptr is NULL
 	NextSubTest();
 	str1 = new BString("BLABLA");
 	str1->Append(tmp, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BLABLA") == 0);
 	delete str1;
 	
-	//Append(char, int32)
+	// Append(char, int32)
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append('C', 5);
@@ -118,8 +118,8 @@ StringAppendTest::PerformTest(void)
 
 	
 #ifndef TEST_R5
-	const int32 OUT_OF_MEM_VAL = 2*1000*1000*1000;
-	//Append(char, int32) with excessive length:
+	const int32 OUT_OF_MEM_VAL = 2 * 1000 * 1000 * 1000;
+	// Append(char, int32) with excessive length:
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append('C', OUT_OF_MEM_VAL);
@@ -128,7 +128,7 @@ StringAppendTest::PerformTest(void)
 #endif
 
 #ifndef TEST_R5
-	//Append(char*, int32) with excessive length:
+	// Append(char*, int32) with excessive length:
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append("some more text", OUT_OF_MEM_VAL);
@@ -143,5 +143,6 @@ CppUnit::Test *StringAppendTest::suite(void)
 	typedef CppUnit::TestCaller<StringAppendTest>
 		StringAppendTestCaller;
 		
-	return(new StringAppendTestCaller("BString::Append Test", &StringAppendTest::PerformTest));
+	return(new StringAppendTestCaller("BString::Append Test",
+		&StringAppendTest::PerformTest));
 }

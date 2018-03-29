@@ -4,12 +4,12 @@
 #include <String.h>
 #include <UTF8.h>
 
-StringAccessTest::StringAccessTest(std::string name) :
-		BTestCase(name)
+
+StringAccessTest::StringAccessTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringAccessTest::~StringAccessTest()
 {
@@ -19,7 +19,7 @@ StringAccessTest::~StringAccessTest()
 void 
 StringAccessTest::PerformTest(void)
 {
-	//CountChars(), Length(), String()
+	// CountChars(), Length(), String()
 	NextSubTest();
 	BString string("Something" B_UTF8_ELLIPSIS);
 	CPPUNIT_ASSERT(string.CountChars() == 10);
@@ -38,21 +38,21 @@ StringAccessTest::PerformTest(void)
 	CPPUNIT_ASSERT(string3.CountChars() == 2);	
 	CPPUNIT_ASSERT((unsigned)string3.Length() == strlen(string3.String()));
 	
-	//An empty string
+	// An empty string
 	NextSubTest();
 	BString empty;
 	CPPUNIT_ASSERT(strcmp(empty.String(), "") == 0);
 	CPPUNIT_ASSERT(empty.Length() == 0);
 	CPPUNIT_ASSERT(empty.CountChars() == 0);
 
-	//Truncate the string at end so we are left with an invalid
-	//UTF8 character
+	// Truncate the string at end so we are left with an invalid
+	// UTF8 character
 	NextSubTest();
 	BString invalid("some text with utf8 characters" B_UTF8_ELLIPSIS);
 	invalid.Truncate(invalid.Length() -1);
 	CPPUNIT_ASSERT(invalid.CountChars() == 31);
 
-	//LockBuffer(int32) and UnlockBuffer(int32)
+	// LockBuffer(int32) and UnlockBuffer(int32)
 	NextSubTest();
 	BString locked("a string");
 	char *ptrstr = locked.LockBuffer(20);
@@ -93,5 +93,6 @@ CppUnit::Test *StringAccessTest::suite(void)
 	typedef CppUnit::TestCaller<StringAccessTest>
 		StringAccessTestCaller;
 		
-	return(new StringAccessTestCaller("BString::Access Test", &StringAccessTest::PerformTest));
+	return(new StringAccessTestCaller("BString::Access Test",
+		&StringAccessTest::PerformTest));
 }

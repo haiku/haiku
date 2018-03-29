@@ -2,12 +2,12 @@
 #include "cppunit/TestCaller.h"
 #include <String.h>
 
-StringFormatAppendTest::StringFormatAppendTest(std::string name) :
-		BTestCase(name)
+
+StringFormatAppendTest::StringFormatAppendTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringFormatAppendTest::~StringFormatAppendTest()
 {
@@ -19,7 +19,7 @@ StringFormatAppendTest::PerformTest(void)
 {
 	BString *string, *string2;
 	
-	//operator<<(const char *);
+	// operator<<(const char *);
 	NextSubTest();
 	string = new BString("some");
 	*string << " ";
@@ -27,7 +27,7 @@ StringFormatAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "some text") == 0);
 	delete string;
 	
-	//operator<<(const BString &);
+	// operator<<(const BString &);
 	NextSubTest();
 	string = new BString("some ");
 	string2 = new BString("text");
@@ -36,14 +36,14 @@ StringFormatAppendTest::PerformTest(void)
 	delete string;
 	delete string2;
 	
-	//operator<<(char);
+	// operator<<(char);
 	NextSubTest();
 	string = new BString("str");
 	*string << 'i' << 'n' << 'g';
 	CPPUNIT_ASSERT(strcmp(string->String(), "string") == 0);
 	delete string;
 		
-	//operator<<(int);
+	// operator<<(int);
 	NextSubTest();
 	string = new BString("level ");
 	*string << (int)42;
@@ -56,21 +56,21 @@ StringFormatAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "error -1") == 0);
 	delete string;
 	
-	//operator<<(unsigned int);
+	// operator<<(unsigned int);
 	NextSubTest();
 	string = new BString("number ");
 	*string << (unsigned int)296;
 	CPPUNIT_ASSERT(strcmp(string->String(), "number 296") == 0);
 	delete string;
 	
-	//operator<<(uint32);
+	// operator<<(uint32);
 	NextSubTest();
 	string = new BString;
 	*string << (uint32)102456;
 	CPPUNIT_ASSERT(strcmp(string->String(), "102456") == 0);
 	delete string;
 
-	//operator<<(int32);
+	// operator<<(int32);
 	NextSubTest();
 	string = new BString;
 	*string << (int32)112456;
@@ -83,14 +83,14 @@ StringFormatAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "-112475") == 0);
 	delete string;
 
-	//operator<<(uint64);
+	// operator<<(uint64);
 	NextSubTest();
 	string = new BString;
 	*string << (uint64)1145267987;
 	CPPUNIT_ASSERT(strcmp(string->String(), "1145267987") == 0);
 	delete string;
 
-	//operator<<(int64);
+	// operator<<(int64);
 	NextSubTest();
 	string = new BString;
 	*string << (int64)112456;
@@ -103,17 +103,18 @@ StringFormatAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string->String(), "-112475") == 0);
 	delete string;
 
-	//operator<<(float);
+	// operator<<(float);
 	NextSubTest();
 	string = new BString;
 	*string << (float)34.542;
 	CPPUNIT_ASSERT(strcmp(string->String(), "34.54") == 0);
 	delete string;
 	
-	//Misc test
+	// Misc test
 	NextSubTest();
 	BString s;
-	s << "This" << ' ' << "is" << ' ' << 'a' << ' ' << "test" << ' ' << "sentence";		
+	s << "This" << ' ' << "is" << ' ' << 'a' << ' ' << "test" 
+		<< ' ' << "sentence";		
 	CPPUNIT_ASSERT(strcmp(s.String(), "This is a test sentence") == 0);
 }
 
@@ -123,5 +124,6 @@ CppUnit::Test *StringFormatAppendTest::suite(void)
 	typedef CppUnit::TestCaller<StringFormatAppendTest>
 		StringFormatAppendTestCaller;
 		
-	return(new StringFormatAppendTestCaller("BString::FormatAppend Test", &StringFormatAppendTest::PerformTest));
+	return(new StringFormatAppendTestCaller("BString::FormatAppend Test",
+		&StringFormatAppendTest::PerformTest));
 }

@@ -3,12 +3,12 @@
 #include <String.h>
 #include <stdio.h>
 
-StringSubCopyTest::StringSubCopyTest(std::string name) :
-		BTestCase(name)
+
+StringSubCopyTest::StringSubCopyTest(std::string name) 
+		: BTestCase(name)
 {
 }
 
- 
 
 StringSubCopyTest::~StringSubCopyTest()
 {
@@ -20,7 +20,7 @@ StringSubCopyTest::PerformTest(void)
 {
 	BString *string1, *string2;
 	
-	//CopyInto(BString&, int32, int32)
+	// CopyInto(BString&, int32, int32)
 	NextSubTest();
 	string1 = new BString;
 	string2 = new BString("Something");
@@ -29,7 +29,7 @@ StringSubCopyTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//CopyInto(const char*, int32, int32)
+	// CopyInto(const char*, int32, int32)
 	NextSubTest();
 	char tmp[10];
 	memset(tmp, 0, 10);
@@ -46,5 +46,6 @@ CppUnit::Test *StringSubCopyTest::suite(void)
 	typedef CppUnit::TestCaller<StringSubCopyTest>
 		StringSubCopyTestCaller;
 		
-	return(new StringSubCopyTestCaller("BString::SubCopy Test", &StringSubCopyTest::PerformTest));
+	return(new StringSubCopyTestCaller("BString::SubCopy Test",
+		&StringSubCopyTest::PerformTest));
 }

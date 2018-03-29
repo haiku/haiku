@@ -3,12 +3,11 @@
 #include <String.h>
 
 
-StringCharAccessTest::StringCharAccessTest(std::string name) :
-		BTestCase(name)
+StringCharAccessTest::StringCharAccessTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringCharAccessTest::~StringCharAccessTest()
 {
@@ -20,17 +19,17 @@ StringCharAccessTest::PerformTest(void)
 {
 	BString string("A simple string");
 	
-	//operator[]
+	// operator[]
 	NextSubTest();
 	CPPUNIT_ASSERT(string[0] == 'A');
 	CPPUNIT_ASSERT(string[1] == ' ');
 
-	//&operator[]
+	// &operator[]
 	NextSubTest();
 	string.SetByteAt(0, 'a');
 	CPPUNIT_ASSERT(strcmp(string.String(), "a simple string") == 0);
 	
-	//ByteAt(int32)
+	// ByteAt(int32)
 	NextSubTest();
 	CPPUNIT_ASSERT(string.ByteAt(-10) == 0);
 	CPPUNIT_ASSERT(string.ByteAt(200) == 0);
@@ -44,5 +43,6 @@ CppUnit::Test *StringCharAccessTest::suite(void)
 	typedef CppUnit::TestCaller<StringCharAccessTest>
 		StringCharAccessTestCaller;
 		
-	return(new StringCharAccessTestCaller("BString::CharAccess Test", &StringCharAccessTest::PerformTest));
+	return(new StringCharAccessTestCaller("BString::CharAccess Test",
+		&StringCharAccessTest::PerformTest));
 }

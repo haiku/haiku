@@ -3,12 +3,12 @@
 #include <String.h>
 #include <UTF8.h>
 
-StringPrependTest::StringPrependTest(std::string name) :
-		BTestCase(name)
+
+StringPrependTest::StringPrependTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringPrependTest::~StringPrependTest()
 {
@@ -20,7 +20,7 @@ StringPrependTest::PerformTest(void)
 {
 	BString *str1, *str2;
 	
-	//Prepend(BString&)
+	// Prepend(BString&)
 	NextSubTest();
 	str1 = new BString("a String");
 	str2 = new BString("PREPENDED");
@@ -29,28 +29,28 @@ StringPrependTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
-	//Prepend(const char*)
+	// Prepend(const char*)
 	NextSubTest();
 	str1 = new BString("String");
 	str1->Prepend("PREPEND");
 	CPPUNIT_ASSERT(strcmp(str1->String(), "PREPENDString") == 0);
 	delete str1;
 	
-	//Prepend(const char*) (NULL)
+	// Prepend(const char*) (NULL)
 	NextSubTest();
 	str1 = new BString("String");
 	str1->Prepend((char*)NULL);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "String") == 0);
 	delete str1;
 	
-	//Prepend(const char*, int32
+	// Prepend(const char*, int32
 	NextSubTest();
 	str1 = new BString("String");
 	str1->Prepend("PREPENDED", 3);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "PREString") == 0);
 	delete str1;
 	
-	//Prepend(BString&, int32)
+	// Prepend(BString&, int32)
 	NextSubTest();
 	str1 = new BString("String");
 	str2 = new BString("PREPEND", 4);
@@ -59,14 +59,14 @@ StringPrependTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
-	//Prepend(char, int32)
+	// Prepend(char, int32)
 	NextSubTest();
 	str1 = new BString("aString");
 	str1->Prepend('c', 4);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "ccccaString") == 0);
 	delete str1;
 	
-	//String was empty
+	// String was empty
 	NextSubTest();
 	str1 = new BString;
 	str1->Prepend("PREPENDED");
@@ -81,5 +81,6 @@ CppUnit::Test *StringPrependTest::suite(void)
 	typedef CppUnit::TestCaller<StringPrependTest>
 		StringPrependTestCaller;
 		
-	return(new StringPrependTestCaller("BString::Prepend Test", &StringPrependTest::PerformTest));
+	return(new StringPrependTestCaller("BString::Prepend Test",
+		&StringPrependTest::PerformTest));
 }

@@ -3,12 +3,11 @@
 #include <String.h>
 
 
-StringConstructionTest::StringConstructionTest(std::string name) :
-		BTestCase(name)
+StringConstructionTest::StringConstructionTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringConstructionTest::~StringConstructionTest()
 {
@@ -21,28 +20,28 @@ StringConstructionTest::PerformTest(void)
 	BString *string;
 	const char *str = "Something";
 	
-	//BString()
+	// BString()
 	NextSubTest();
 	string = new BString;
 	CPPUNIT_ASSERT(strcmp(string->String(), "") == 0);
 	CPPUNIT_ASSERT(string->Length() == 0);
 	delete string;
 	
-	//BString(const char*)
+	// BString(const char*)
 	NextSubTest();
 	string = new BString(str);
 	CPPUNIT_ASSERT(strcmp(string->String(), str) == 0);
 	CPPUNIT_ASSERT((unsigned)string->Length() == strlen(str));
 	delete string;
 	
-	//BString(NULL)
+	// BString(NULL)
 	NextSubTest();
 	string = new BString(NULL);
 	CPPUNIT_ASSERT(strcmp(string->String(), "") == 0);
 	CPPUNIT_ASSERT(string->Length() == 0);
 	delete string;
 	
-	//BString(BString&)
+	// BString(BString&)
 	NextSubTest();
 	BString anotherString("Something Else");
 	string = new BString(anotherString);
@@ -50,7 +49,7 @@ StringConstructionTest::PerformTest(void)
 	CPPUNIT_ASSERT(string->Length() == anotherString.Length());
 	delete string;
 	
-	//BString(const char*, int32)
+	// BString(const char*, int32)
 	NextSubTest();
 	string = new BString(str, 5);
 	CPPUNIT_ASSERT(strcmp(string->String(), str) != 0);
@@ -71,5 +70,6 @@ CppUnit::Test *StringConstructionTest::suite(void)
 	typedef CppUnit::TestCaller<StringConstructionTest>
 		StringConstructionTestCaller;
 		
-	return(new StringConstructionTestCaller("BString::Construction Test", &StringConstructionTest::PerformTest));
+	return(new StringConstructionTestCaller("BString::Construction Test",
+		&StringConstructionTest::PerformTest));
 }

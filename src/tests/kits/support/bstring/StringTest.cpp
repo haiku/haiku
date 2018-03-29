@@ -18,6 +18,7 @@
 #include "StringSearchTest.h"
 #include "StringSplitTest.h"
 
+
 CppUnit::Test *StringTestSuite()
 {
 	CppUnit::TestSuite *testSuite = new CppUnit::TestSuite();

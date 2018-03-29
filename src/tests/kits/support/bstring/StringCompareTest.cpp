@@ -2,12 +2,12 @@
 #include "cppunit/TestCaller.h"
 #include <String.h>
 
-StringCompareTest::StringCompareTest(std::string name) :
-		BTestCase(name)
+
+StringCompareTest::StringCompareTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringCompareTest::~StringCompareTest()
 {
@@ -19,7 +19,7 @@ StringCompareTest::PerformTest(void)
 {
 	BString *string1, *string2;
 	
-	//operator<(const BString &) const;
+	// operator<(const BString &) const;
 	NextSubTest();
 	string1 = new BString("11111_a");
 	string2 = new BString("22222_b");
@@ -27,7 +27,7 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//operator<=(const BString &) const;
+	// operator<=(const BString &) const;
 	NextSubTest();
 	string1 = new BString("11111_a");
 	string2 = new BString("22222_b");
@@ -42,7 +42,7 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//operator==(const BString &) const;
+	// operator==(const BString &) const;
 	NextSubTest();
 	string1 = new BString("string");
 	string2 = new BString("string");
@@ -57,7 +57,7 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//operator>=(const BString &) const;
+	// operator>=(const BString &) const;
 	NextSubTest();
 	string1 = new BString("BBBBB");
 	string2 = new BString("AAAAA");
@@ -72,7 +72,7 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//operator>(const BString &) const;
+	// operator>(const BString &) const;
 	NextSubTest();
 	string1 = new BString("BBBBB");
 	string2 = new BString("AAAAA");
@@ -80,7 +80,7 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//operator!=(const BString &) const;
+	// operator!=(const BString &) const;
 	NextSubTest();
 	string1 = new BString("string");
 	string2 = new BString("string");
@@ -95,20 +95,20 @@ StringCompareTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//operator<(const char *) const;
+	// operator<(const char *) const;
 	NextSubTest();
 	string1 = new BString("AAAAA");
 	CPPUNIT_ASSERT(*string1 < "BBBBB");
 	delete string1;
 	
-	//operator<=(const char *) const;
+	// operator<=(const char *) const;
 	NextSubTest();
 	string1 = new BString("AAAAA");
 	CPPUNIT_ASSERT(*string1 <= "BBBBB");
 	CPPUNIT_ASSERT(*string1 <= "AAAAA");
 	delete string1;
 	
-	//operator==(const char *) const;
+	// operator==(const char *) const;
 	NextSubTest();
 	string1 = new BString("AAAAA");
 	CPPUNIT_ASSERT(*string1 == "AAAAA");
@@ -119,20 +119,20 @@ StringCompareTest::PerformTest(void)
 	CPPUNIT_ASSERT((*string1 == "BBBB") == false);
 	delete string1;
 	
-	//operator>=(const char *) const;
+	// operator>=(const char *) const;
 	NextSubTest();
 	string1 = new BString("BBBBB");
 	CPPUNIT_ASSERT(*string1 >= "AAAAA");
 	CPPUNIT_ASSERT(*string1 >= "BBBBB");
 	delete string1;
 	
-	//operator>(const char *) const;
+	// operator>(const char *) const;
 	NextSubTest();
 	string1 = new BString("BBBBB");
 	CPPUNIT_ASSERT(*string1 > "AAAAA");
 	delete string1;
 	
-	//operator!=(const char *) const;
+	// operator!=(const char *) const;
 	NextSubTest();
 	string1 = new BString("AAAAA");
 	CPPUNIT_ASSERT((*string1 != "AAAAA") == false);
@@ -150,5 +150,6 @@ CppUnit::Test *StringCompareTest::suite(void)
 	typedef CppUnit::TestCaller<StringCompareTest>
 		StringCompareTestCaller;
 		
-	return(new StringCompareTestCaller("BString::Compare Test", &StringCompareTest::PerformTest));
+	return(new StringCompareTestCaller("BString::Compare Test",
+		&StringCompareTest::PerformTest));
 }

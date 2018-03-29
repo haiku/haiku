@@ -3,12 +3,12 @@
 #include <String.h>
 #include <stdio.h>
 
-StringRemoveTest::StringRemoveTest(std::string name) :
-		BTestCase(name)
+
+StringRemoveTest::StringRemoveTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringRemoveTest::~StringRemoveTest()
 {
@@ -20,8 +20,8 @@ StringRemoveTest::PerformTest(void)
 {
 	BString *string1, *string2;
 	
-	//Truncate(int32 newLength, bool lazy);
-	//lazy = true
+	// Truncate(int32 newLength, bool lazy);
+	// lazy = true
 	NextSubTest();
 	string1 = new BString("This is a long string");
 	string1->Truncate(14, true);
@@ -29,7 +29,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(string1->Length() == 14);
 	delete string1;
 	
-	//lazy = false
+	// lazy = false
 	NextSubTest();
 	string1 = new BString("This is a long string");
 	string1->Truncate(14, false);
@@ -38,9 +38,9 @@ StringRemoveTest::PerformTest(void)
 	delete string1;
 
 #ifndef TEST_R5	
-	//new length is < 0
-	//it crashes r5 implementation, but ours works fine here,
-	//in this case, we just truncate to 0
+	// new length is < 0
+	// it crashes r5 implementation, but ours works fine here,
+	// in this case, we just truncate to 0
 	NextSubTest();
 	string1 = new BString("This is a long string");
 	string1->Truncate(-3);
@@ -49,7 +49,7 @@ StringRemoveTest::PerformTest(void)
 	delete string1;	
 #endif
 	
-	//new length is > old length
+	// new length is > old length
 	NextSubTest();
 	string1 = new BString("This is a long string");
 	string1->Truncate(45);
@@ -57,7 +57,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(string1->Length() == 21);
 	delete string1;
 	
-	//String was empty
+	// String was empty
 	NextSubTest();
 	string1 = new BString;
 	string1->Truncate(0);
@@ -65,28 +65,28 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(string1->Length() == 0);
 	delete string1;
 	
-	//Remove(int32 from, int32 length)
+	// Remove(int32 from, int32 length)
 	NextSubTest();
 	string1 = new BString("a String");
 	string1->Remove(2, 2);
 	CPPUNIT_ASSERT(strcmp(string1->String(), "a ring") == 0);
 	delete string1;
 	
-	//String was empty
+	// String was empty
 	NextSubTest();
 	string1 = new BString;
 	string1->Remove(2, 1);
 	CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
 	delete string1;
 	
-	//from is beyond the end of the string
+	// from is beyond the end of the string
 	NextSubTest();
 	string1 = new BString("a String");
 	string1->Remove(20, 2);
 	CPPUNIT_ASSERT(strcmp(string1->String(), "a String") == 0);
 	delete string1;
 	
-	//from + length exceeds Length() (R5 fails)
+	// from + length exceeds Length() (R5 fails)
 	NextSubTest();
 	string1 = new BString("a String");
 	string1->Remove(4, 30);
@@ -99,7 +99,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "ing") == 0);
 	delete string1;
 	
-	//RemoveFirst(BString&)
+	// RemoveFirst(BString&)
 	NextSubTest();
 	string1 = new BString("first second first");
 	string2 = new BString("first");
@@ -116,7 +116,7 @@ StringRemoveTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//RemoveLast(Bstring&)
+	// RemoveLast(Bstring&)
 	NextSubTest();
 	string1 = new BString("first second first");
 	string2 = new BString("first");
@@ -133,7 +133,7 @@ StringRemoveTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//RemoveAll(BString&)
+	// RemoveAll(BString&)
 	NextSubTest();
 	string1 = new BString("first second first");
 	string2 = new BString("first");
@@ -150,7 +150,7 @@ StringRemoveTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//RemoveFirst(const char*)
+	// RemoveFirst(const char*)
 	NextSubTest();
 	string1 = new BString("first second first");
 	string1->RemoveFirst("first");
@@ -169,7 +169,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
 	delete string1;
 	
-	//RemoveLast(const char*)
+	// RemoveLast(const char*)
 	NextSubTest();
 	string1 = new BString("first second first");
 	string1->RemoveLast("first");
@@ -182,7 +182,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
 	delete string1;
 	
-	//RemoveAll(const char*)
+	// RemoveAll(const char*)
 	NextSubTest();
 	string1 = new BString("first second first");
 	string1->RemoveAll("first");
@@ -195,7 +195,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
 	delete string1;
 	
-	//RemoveSet(const char*)
+	// RemoveSet(const char*)
 	NextSubTest();
 	string1 = new BString("a sentence with (3) (642) numbers (2) in it");
 	string1->RemoveSet("()3624 ");
@@ -208,7 +208,7 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "a string") == 0);
 	delete string1;
 	
-	//MoveInto(BString &into, int32, int32)
+	// MoveInto(BString &into, int32, int32)
 	NextSubTest();
 	string1 = new BString("some text");
 	string2 = new BString("string");
@@ -227,7 +227,7 @@ StringRemoveTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
-	//MoveInto(char *, int32, int32)
+	// MoveInto(char *, int32, int32)
 	NextSubTest();
 	char dest[100];
 	memset(dest, 0, 100);
@@ -252,5 +252,6 @@ CppUnit::Test *StringRemoveTest::suite(void)
 	typedef CppUnit::TestCaller<StringRemoveTest>
 		StringRemoveTestCaller;
 		
-	return(new StringRemoveTestCaller("BString::Remove Test", &StringRemoveTest::PerformTest));
+	return(new StringRemoveTestCaller("BString::Remove Test",
+		&StringRemoveTest::PerformTest));
 }

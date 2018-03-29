@@ -2,12 +2,12 @@
 #include "cppunit/TestCaller.h"
 #include <String.h>
 
-StringInsertTest::StringInsertTest(std::string name) :
-		BTestCase(name)
+
+StringInsertTest::StringInsertTest(std::string name)
+		: BTestCase(name)
 {
 }
 
- 
 
 StringInsertTest::~StringInsertTest()
 {
@@ -19,7 +19,7 @@ StringInsertTest::PerformTest(void)
 {
 	BString *str1, *str2;
 	
-	//&Insert(const char *, int32 pos);
+	// &Insert(const char *, int32 pos);
 	NextSubTest();
 	str1 = new BString("String");
 	str1->Insert("INSERTED", 3);
@@ -51,7 +51,7 @@ StringInsertTest::PerformTest(void)
 	delete str1;
 #endif
 	
-	//&Insert(const char *, int32 length, int32 pos);
+	// &Insert(const char *, int32 length, int32 pos);
 	NextSubTest();
 	str1 = new BString("string");
 	str1->Insert("INSERTED", 2, 2);
@@ -74,28 +74,28 @@ StringInsertTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "stINSERTEDring") == 0);
 	delete str1;
 	
-	//&Insert(const char *, int32 fromOffset, int32 length, int32 pos);
+	// &Insert(const char *, int32 fromOffset, int32 length, int32 pos);
 	NextSubTest();
 	str1 = new BString("string");
 	str1->Insert("INSERTED", 4, 30, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "stRTEDring") == 0);
 	delete str1;
 	
-	//Insert(char c, int32 count, int32 pos)
+	// Insert(char c, int32 count, int32 pos)
 	NextSubTest();
 	str1 = new BString("string");
 	str1->Insert('P', 5, 3);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "strPPPPPing") == 0);
 	delete str1;
 	
-	//Insert(char c, int32 count, int32 pos)
+	// Insert(char c, int32 count, int32 pos)
 	NextSubTest();
 	str1 = new BString("string");
 	str1->Insert('P', 5, -2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "PPPstring") == 0);
 	delete str1;
 	
-	//Insert(BString&)
+	// Insert(BString&)
 	NextSubTest();
 	str1 = new BString("string");
 	str2 = new BString("INSERTED");
@@ -118,7 +118,7 @@ StringInsertTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
-	//&Insert(BString &, int32 length, int32 pos);
+	// &Insert(BString &, int32 length, int32 pos);
 	NextSubTest();
 	str1 = new BString("string");
 	str2 = new BString("INSERTED");
@@ -127,7 +127,7 @@ StringInsertTest::PerformTest(void)
 	delete str1;
 	delete str2;
 		
-	//&Insert(BString&, int32 fromOffset, int32 length, int32 pos);
+	// &Insert(BString&, int32 fromOffset, int32 length, int32 pos);
 	NextSubTest();
 	str1 = new BString("string");
 	str2 = new BString("INSERTED");
@@ -143,5 +143,6 @@ CppUnit::Test *StringInsertTest::suite(void)
 	typedef CppUnit::TestCaller<StringInsertTest>
 		StringInsertTestCaller;
 		
-	return(new StringInsertTestCaller("BString::Insert Test", &StringInsertTest::PerformTest));
+	return(new StringInsertTestCaller("BString::Insert Test",
+		&StringInsertTest::PerformTest));
 }
