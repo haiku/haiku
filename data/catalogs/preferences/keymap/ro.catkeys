@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Keymap	3155537444
+1	romanian	x-vnd.Haiku-Keymap	1855856185
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Deplasare:
 Revert	Modifier keys window		Revenire
@@ -97,6 +97,7 @@ Command:	Modifier keys window	Command key role name	Comandă:
 Latin-American	Keyboard Layout View		Latino-Americană
 Spanish (Dvorak)	Keyboard Layout View		Spanionlă (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		Lituaniană (Standard)
+Russian (Udmurt, Komi, Mari)	Keyboard Layout View		Rusă (Udmurt, Komi, Mari)
 Canadian-French	Keyboard Layout View		Franceză canadiană
 Irish	Keyboard Layout View		Irlandeză
 Turkish (Type-F)	Keyboard Layout View		Turcă (Type-F)

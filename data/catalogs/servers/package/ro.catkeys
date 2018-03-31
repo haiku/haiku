@@ -1,8 +1,15 @@
-1	romanian	x-vnd.haiku-package_daemon	2413090643
+1	romanian	x-vnd.haiku-package_daemon	2545676245
+Package problems	PackageProblem	Window title	Probleme de pachet
+Package changes	PackageResult	Window title	Modificări de pachet
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalează pachetul %s de la depozitul %s\n
 Apply changes	PackageResult		Aplică modificările
 solution %d:	PackageProblem	Don't change the %d variable	soluție %d:
+Warning	PackageManager		Avertisment
 Retry	PackageProblem		Reîncearcă
+The following additional package changes have to be made:	PackageResult		Următoarele modificări de pachet adiționale trebuie să fie făcute:
 ignore problem for now	PackageProblem		ignoră problema deocamdată
 Cancel	PackageProblem		Anulează
 don't activate package %source%	PackageProblem	don't change '%source%	nu activa pachetul %source%
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Au apărut următoarele probleme. Selectați o soluție pentru fiecare:
+Package daemon	PackageManager		Serviciu pachet
 Cancel	PackageResult		Anulează

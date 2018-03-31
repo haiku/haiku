@@ -1,13 +1,31 @@
-1	romanian	x-vnd.Haiku-Repositories	2727824787
+1	romanian	x-vnd.Haiku-Repositories	346515317
 Completed	TaskLooper	Completed task status message	Completat
+Repositories	System name		Depozite
 Description	TaskLooper	Failed task error description	Descriere
 Add	AddRepoWindow	Button label	Adaugă
 URL	RepositoriesView	Column title	URL
+Keep trying	TaskTimer	Button label	Continuă să încerci
+This is not a valid URL.	AddRepoWindow	Add URL error message	Acesta nu este un URL valid.
+Repository URL:	AddRepoWindow	Text box label	URL Depozit:
 Details	TaskLooper	Job log details header	Detalii
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Vești bune! Sarcina pentru depozitul %name% este terminată.
 Status	RepositoriesView	Column title	Stare
+Aborted	TaskLooper	Aborted task status message	Anulat
+Remove all	RepositoriesView	Button label	Elimină tot
 Remove	RepositoriesView	Button label	Elimină
+Changes completed	RepositoriesView	Status view text	Modificări completate
 Name	RepositoriesView	Column title	Nume
+Enable	RepositoriesView	Button label	Activează
+Failed	TaskLooper	Failed task status message	Eșuat
 OK	Constants	Button label	OK
+Cancel task	TaskTimer	Button label	Anulează sarcina
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Elimină aceste depozite?
 Cancel	Constants	Button label	Anulează
+Changes pending:	RepositoriesView	Status view text	Modificări în așteptare:
 Remove	Constants	Button label	Elimină
+Enable all	RepositoriesView	Button label	Activează toate
+Stop and quit	RepositoriesWindow	Button label	Oprire și ieșire
+Disable all	RepositoriesView	Button label	Dezactivează toate
+This repository URL already exists.	RepositoriesView	Error message	Acest URL de depozit există deja.
+Disable	RepositoriesView	Button label	Dezactivează
 Unknown	Constants	Unknown repository name	Necunoscut

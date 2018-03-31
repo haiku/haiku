@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	1342768432
+1	romanian	x-vnd.Haiku-WebPositive	2048725335
 Show home button	Settings Window		Afișează buton acasă
 Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
@@ -9,6 +9,7 @@ Close	Download Window		Închide
 Open location	WebPositive Window		Deschide locația
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Ieri
+Start page:	Settings Window		Pagină de start:
 History	WebPositive Window		Istoric
 Paste	WebPositive Window		Lipire
 Expiration	Cookie Manager		Expirare
@@ -17,13 +18,17 @@ Save page as…	WebPositive Window		Salvează pagina ca...
 Settings	Settings Window		Configurări
 Confirmation	WebPositive Window		Confirmare
 Window	WebPositive Window		Fereastră
+Loading %url	WebPositive Window		Se încarcă %url
+Download aborted	Download Window		Descărcare anulată
 Value	Cookie Manager		Valoare
+Page source	WebPositive Window		Sursa paginii
 Next	WebPositive Window		Următorul
 Find next	WebPositive Window		Găsește următorul
 Download folder:	Settings Window		Dosar descărcări:
 Edit	WebPositive Window		Editare
 Cancel	Authentication Panel		Anulează
 Search page:	Settings Window		Caută pagină:
+Close tab	WebPositive Window		Închide tabul
 Quit	WebPositive Window		Ieșire
 Full screen	WebPositive Window		Ecran complet
 Standard font:	Settings Window		Font standard:
@@ -37,7 +42,10 @@ Reload	WebPositive Window		Reîncarcă
 Downloads	Download Window		Descărcări
 Delete	Cookie Manager		Șterge
 Forward	WebPositive Window		Înainte
+of	Download Window	...as in '12kB of 256kB'	din
+Revert	Settings Window		Revenire
 Fixed font:	Settings Window		Font fixat:
+Cut	WebPositive Window		Tăiere
 Open downloads folder	Download Window		Deschide dosarul de descărcări
 Proxy password:	Settings Window		Parolă proxy:
 Find:	WebPositive Window		Caută:
@@ -51,13 +59,20 @@ OK	Download Window		OK
 Open blank page	Settings Window		Deschide pagină vidă
 New tabs:	Settings Window		Taburi noi:
 Cancel	WebPositive Window		Anulează
+Open all	WebPositive Window		Deschide tot
+Clear	URL Bar		Eliberare
+Cut	URL Bar		Tăiere
+Clear	WebPositive Window		Eliberare
+Script console	Console Window		Consola de script
 Remove	Download Window		Elimină
 Find	WebPositive Window		Caută
 Settings	WebPositive Window		Configurări
 Name	Cookie Manager		Nume
+Bookmarks	WebPositive Window		Favorite
 Paste	URL Bar		Lipire
 /s)	Download Window	...as in 'per second'	/s)
 Cancel	Download Window		Anulează
+Clear	Console Window		Eliberare
 Password:	Authentication Panel		Parolă:
 Path	Cookie Manager		Cale
 Back	WebPositive Window		Înapoi
@@ -71,5 +86,8 @@ View	WebPositive Window		Vizualizare
 Copy	WebPositive Window		Copiază
 OK	Authentication Panel		OK
 Copy	URL Bar		Copiază
+Show bookmark bar	WebPositive Window		Afișează bara de favorite
 OK	WebPositive Window		OK
 New windows:	Settings Window		Ferestre noi:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminat
+Remove finished	Download Window		Elimină terminate

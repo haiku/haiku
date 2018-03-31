@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	701613805
+1	romanian	x-vnd.Haiku-libtracker	3394192241
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare…
@@ -210,6 +210,7 @@ Could not find application \"%appname\"	OpenWithWindow		Nu s-a putut găsi aplic
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Elementul selectat nu poate fi mutat la gunoi. Doriți să îl ștergeți în schimb? (Această operație nu poate fi inversată.)
 Work Phone	Person Query Columns		Telefon de serviciu
 Invert	SelectionWindow		Inversează
+ (broken)	InfoWindow		 (deteriorat)
 Find	FindPanel		Găsește
 Get info	ContainerWindow		Obține info
 Error creating link to \"%name\".	FSUtils		Eroare la crearea legăturii la \"%name\".
@@ -434,6 +435,7 @@ Formula %formula	FindPanel	FindResultTitle	Formula %formula
 Kind:	InfoWindow		Fel:
 starts with	FindPanel		începe cu
 Increase size	ContainerWindow		Mărește dimensiune
+ info	InfoWindow		 info
 is	FindPanel		este
 Attributes	ContainerWindow		Atribute
 Handles %type	OpenWithWindow		Gestionează %type

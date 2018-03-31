@@ -1,4 +1,33 @@
-1	romanian	x-vnd.haiku-softwareupdater	3217327427
+1	romanian	x-vnd.haiku-softwareupdater	2217488996
 Cancel	SoftwareUpdaterWindow		Anulează
+Update now	SoftwareUpdaterWindow		Actualizează acum
+Updates did not complete	UpdateAction		Actualizările nu au fost completate
+Checking for updates	CheckManager		Se verifică pentru actualizări
 SoftwareUpdater	System name		SoftwareUpdater
+No updates available	UpdateAction		Nu există actualizări disponibile
+Downloading packages	UpdateManager		Se descarcă pachete
+from repository	SoftwareUpdaterWindow	List item text	din depozitul
 Cancel	SoftwareUpdaterWindow	Alert button label	Anulează
+Click here to install updates.	CheckManager		Dați clic aici pentru a instala actualizările.
+The following changes will be made:	SoftwareUpdaterWindow		Următoarele modificări vor fi efectuate:
+Checking for updates	SoftwareUpdaterWindow		Se verifică pentru actualizări
+Quit	SoftwareUpdaterWindow	Alert button label	Ieșire
+Updating version	SoftwareUpdaterWindow	List item text	Se actualizează versiunea
+Applying changes	UpdateManager		Se aplică modificările
+Quit	SoftwareUpdaterWindow		Ieșire
+Updates completed	UpdateManager		Actualizări completate
+%i of %i	UpdateManager	Do not translate %i	%i din %i
+Updates found	SoftwareUpdaterWindow		Actualizări găsite
+to	SoftwareUpdaterWindow	List item text	la
+No updates available	CheckManager		Nu există actualizări disponibile
+Don't quit	SoftwareUpdaterWindow		Nu ieși
+Quit	SoftwareUpdaterWindow	Button label	Ieșire
+Unrecognized argument	SoftwareUpdaterApp	Error message	Argument nerecunoscut
+Update	SoftwareUpdaterWindow	Alert button label	Actualizează
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Pachete noi de instalat
+OK	UpdateManager		OK
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
+Show more details	SoftwareUpdaterWindow		Afișează mai multe detalii
+Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizare completă
+OK	SoftwareUpdaterWindow		OK
+There were no updates found.	CheckManager		Nu au fost găsite actualizări.

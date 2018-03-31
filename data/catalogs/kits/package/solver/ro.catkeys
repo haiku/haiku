@@ -1,0 +1,6 @@
+1	romanian	x-vnd.Haiku-libsolvsolver	2856378802
+unspecified problem	SolverProblem		problemă nespecificată
+dependency problem	SolverProblem		problemă de dependențe
+do not keep %source% installed	SolverProblemSolution		nu păstra %source% instalat
+do something	SolverProblemSolution		face ceva
+problem with installed package %source%	SolverProblem		problemă la instalarea pachetului %source%
