@@ -47,12 +47,12 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	BStringView *versionView =  new BStringView("version", version);
 
 	BStringView *copyrightView =  new BStringView(
-		"Copyright", B_UTF8_COPYRIGHT "2003-2006 Haiku Inc.");
+		"Copyright", B_UTF8_COPYRIGHT "2003-2018 Haiku Inc.");
 
 	// setup PNG interlace options
 
 	fInterlaceMenu = new BPopUpMenu(B_TRANSLATE("Interlace Option"));
-	BMenuItem* item = new BMenuItem(B_TRANSLATE("None"), 
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("None"),
 		_InterlaceMessage(PNG_INTERLACE_NONE));
 	if (fSettings->SetGetInt32(PNG_SETTING_INTERLACE) == PNG_INTERLACE_NONE)
 		item->SetMarked(true);
@@ -89,17 +89,6 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 			.End()
 		.AddGlue()
 		.Add(fCopyrightView);
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 390) / 12,
-		(font.Size() * 180) / 12));
-
-	// TODO: remove this workaround for ticket #4217
-	fCopyrightView->SetExplicitPreferredSize(
-		BSize(fCopyrightView->LineWidth(4), fCopyrightView->TextHeight(0, 80)));
-	fCopyrightView->SetExplicitMaxSize(fCopyrightView->ExplicitPreferredSize());
-	fCopyrightView->SetExplicitMinSize(fCopyrightView->ExplicitPreferredSize());
 }
 
 
