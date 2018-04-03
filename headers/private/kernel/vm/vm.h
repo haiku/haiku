@@ -76,7 +76,7 @@ void permit_page_faults(void);
 void forbid_page_faults(void);
 
 // private kernel only extension (should be moved somewhere else):
-area_id create_area_etc(team_id team, const char *name, uint32 size,
+area_id create_area_etc(team_id team, const char *name, size_t size,
 			uint32 lock, uint32 protection, uint32 flags, uint32 guardSize,
 			const virtual_address_restrictions* virtualAddressRestrictions,
 			const physical_address_restrictions* physicalAddressRestrictions,

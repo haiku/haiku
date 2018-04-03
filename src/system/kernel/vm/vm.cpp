@@ -6079,7 +6079,7 @@ clone_area(const char* name, void** _address, uint32 addressSpec,
 
 
 area_id
-create_area_etc(team_id team, const char* name, uint32 size, uint32 lock,
+create_area_etc(team_id team, const char* name, size_t size, uint32 lock,
 	uint32 protection, uint32 flags, uint32 guardSize,
 	const virtual_address_restrictions* virtualAddressRestrictions,
 	const physical_address_restrictions* physicalAddressRestrictions,
