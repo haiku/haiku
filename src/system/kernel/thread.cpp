@@ -2965,10 +2965,13 @@ user_unblock_thread(thread_id threadID, status_t status)
 
 	InterruptsSpinLocker locker(thread->scheduler_lock);
 
+	set_ac();
 	if (thread->user_thread->wait_status > 0) {
 		thread->user_thread->wait_status = status;
+		clear_ac();
 		thread_unblock_locked(thread, status);
-	}
+	} else
+		clear_ac();
 
 	return B_OK;
 }
@@ -3626,8 +3629,13 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	ThreadLocker threadLocker(thread);
 
 	// check, if already done
-	if (thread->user_thread->wait_status <= 0)
-		return thread->user_thread->wait_status;
+	set_ac();
+	if (thread->user_thread->wait_status <= 0) {
+		status_t status = thread->user_thread->wait_status;
+		clear_ac();
+		return status;
+	}
+	clear_ac();
 
 	// nope, so wait
 	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_OTHER, "user");
@@ -3641,11 +3649,15 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	// Interruptions or timeouts can race with other threads unblocking us.
 	// Favor a wake-up by another thread, i.e. if someone changed the wait
 	// status, use that.
+	set_ac();
 	status_t oldStatus = thread->user_thread->wait_status;
-	if (oldStatus > 0)
+	if (oldStatus > 0) {
 		thread->user_thread->wait_status = status;
-	else
+		clear_ac();
+	} else {
+		clear_ac();
 		status = oldStatus;
+	}
 
 	threadLocker.Unlock();
 
