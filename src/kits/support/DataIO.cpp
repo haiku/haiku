@@ -16,7 +16,10 @@
 #include <Errors.h>
 
 #if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
-#include <arch/user_memory.h>
+// for user_memcpy() and IS_USER_ADDRESS()
+#include <KernelExport.h>
+
+#include <kernel.h>
 #endif
 
 
