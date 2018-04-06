@@ -19,10 +19,14 @@
 #define SNOOZE_FOR 10000000
 #endif
 
+#define MAX_MULTI_CLIENTS 3
 
 static BSimpleMediaClient* sProducer = NULL;
 static BSimpleMediaClient* sConsumer = NULL;
 static BSimpleMediaClient* sFilter = NULL;
+
+static BSimpleMediaClient* sProducers[MAX_MULTI_CLIENTS];
+static BSimpleMediaClient* sConsumers[MAX_MULTI_CLIENTS];
 
 
 void
@@ -39,10 +43,47 @@ _InitClients(bool hasFilter)
 
 
 void
+_InitClientsMulti(bool isMixer)
+{
+	if (!isMixer) {
+		for (int i = 0; i < MAX_MULTI_CLIENTS; i++) {
+			sConsumers[i] = new BSimpleMediaClient("Test Consumer");
+		}
+		sProducer = new BSimpleMediaClient("MediaClientProducer");
+	} else {
+		for (int i = 0; i < MAX_MULTI_CLIENTS; i++) {
+			sProducers[i] = new BSimpleMediaClient("Test Producer");
+		}
+		sConsumer = new BSimpleMediaClient("MediaClientConsumer");
+	}
+
+	sFilter = new BSimpleMediaClient("MediaClientFilter");
+}
+
+
+void
 _DeleteClients()
 {
 	delete sProducer;
 	delete sConsumer;
+	delete sFilter;
+}
+
+
+void
+_DeleteClientsMulti(bool isMixer)
+{
+	if (!isMixer) {
+		for (int i = 0; i < MAX_MULTI_CLIENTS; i++) {
+			delete sConsumers[i];
+		}
+		delete sProducer;
+	} else {
+		for (int i = 0; i < MAX_MULTI_CLIENTS; i++) {
+			delete sProducers[i];
+		}
+		delete sConsumer;
+	}
 	delete sFilter;
 }
 
@@ -127,6 +168,48 @@ _ProducerFilterConsumerTest()
 
 
 void
+_SplitterConfigurationTest()
+{
+	_InitClientsMulti(false);
+
+	for (int i = 0; i < MAX_MULTI_CLIENTS; i++) {
+		BMediaOutput* output = sFilter->BeginOutput();
+		assert(sFilter->Connect(output, sConsumers[i]->BeginInput()) == B_OK);
+	}
+
+	assert(sProducer->Connect(sProducer->BeginOutput(),
+		sFilter->BeginInput()) == B_OK);
+
+	#ifdef DELAYED_MODE
+	snooze(SNOOZE_FOR);
+	#endif
+
+	_DeleteClientsMulti(false);
+}
+
+
+void
+_MixerConfigurationTest()
+{
+	_InitClientsMulti(true);
+
+	for (int i = 0; i < MAX_MULTI_CLIENTS; i++) {
+		BMediaInput* input = sFilter->BeginInput();
+		assert(sFilter->Connect(input, sConsumers[i]->BeginInput()) == B_OK);
+	}
+
+	assert(sConsumer->Connect(sConsumer->BeginInput(),
+		sFilter->BeginOutput()) == B_OK);
+
+	#ifdef DELAYED_MODE
+	snooze(SNOOZE_FOR);
+	#endif
+
+	_DeleteClientsMulti(true);
+}
+
+
+void
 media_test()
 {
 	printf("Testing Simple (1:1) Producer-Consumer configuration: ");
@@ -136,5 +219,13 @@ media_test()
 
 	printf("Testing Simple (1:1:1) Producer-Filter-Consumer configuration: ");
 	_ProducerFilterConsumerTest();
+	printf("OK\n");
+
+	printf("Testing Splitter Configuration (N:1:1): ");
+	_SplitterConfigurationTest();
+	printf("OK\n");
+
+	printf("Testing Mixer Configuration (N:1:1): ");
+	_SplitterConfigurationTest();
 	printf("OK\n");
 }
