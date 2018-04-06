@@ -349,7 +349,7 @@ x86_page_fault_exception(struct iframe* frame)
 	vm_page_fault(cr2, frame->ip,
 		(frame->error_code & PGFAULT_W) != 0,		// write access
 		(frame->error_code & PGFAULT_I) != 0,		// instruction fetch
-		(frame->error_code & PGFAULT_U) != 0,		// userland
+		IFRAME_IS_USER(frame),						// userland
 		&newip);
 	if (newip != 0) {
 		// the page fault handler wants us to modify the iframe to set the
