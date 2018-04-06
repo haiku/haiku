@@ -274,7 +274,7 @@ x86_page_fault_exception(struct iframe* frame)
 			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
 			if (cpu->fault_handler != 0) {
 				debug_set_page_fault_info(cr2, frame->ip,
-					(frame->error_code & 0x2) != 0
+					(frame->error_code & PGFAULT_W) != 0
 						? DEBUG_PAGE_FAULT_WRITE : 0);
 				frame->ip = cpu->fault_handler;
 				frame->bp = cpu->fault_handler_stack_pointer;
@@ -285,7 +285,7 @@ x86_page_fault_exception(struct iframe* frame)
 				kprintf("ERROR: thread::fault_handler used in kernel "
 					"debugger!\n");
 				debug_set_page_fault_info(cr2, frame->ip,
-					(frame->error_code & 0x2) != 0
+					(frame->error_code & PGFAULT_W) != 0
 						? DEBUG_PAGE_FAULT_WRITE : 0);
 				frame->ip = reinterpret_cast<uintptr_t>(thread->fault_handler);
 				return;
@@ -328,26 +328,26 @@ x86_page_fault_exception(struct iframe* frame)
 			"%p from ip %p\n", (void*)cr2, (void*)frame->ip);
 		return;
 	} else if ((frame->error_code & PGFAULT_U) == 0
-		&& (frame->error_code & PGFAULT_I) == PGFAULT_I
+		&& (frame->error_code & PGFAULT_I) != 0
 		&& (x86_read_cr4() & IA32_CR4_SMEP) != 0) {
-		// check that: 	1. come not from userland,
+		// check that: 1. come not from userland,
 		// 2. is an instruction fetch, 3. smep is enabled
 		panic("SMEP violation user-mapped address %p touched from kernel %p\n",
-			 (void*)cr2, (void*)frame->ip);
+			(void*)cr2, (void*)frame->ip);
 	} else if ((frame->flags & X86_EFLAGS_ALIGNMENT_CHECK) == 0
 		&& (frame->error_code & PGFAULT_U) == 0
-		&& (frame->error_code & PGFAULT_P) == PGFAULT_P
+		&& (frame->error_code & PGFAULT_P) != 0
 		&& (x86_read_cr4() & IA32_CR4_SMAP) != 0) {
-		// check that: 	1. AC flag is not set, 2. come not from userland,
+		// check that: 1. AC flag is not set, 2. come not from userland,
 		// 3. is a page-protection violation, 4. smap is enabled
 		panic("SMAP violation user-mapped address %p touched from kernel %p\n",
-			 (void*)cr2, (void*)frame->ip);
+			(void*)cr2, (void*)frame->ip);
 	}
 
 	enable_interrupts();
 
 	vm_page_fault(cr2, frame->ip,
-		(frame->error_code & PGFAULT_W)!= 0,		// write access
+		(frame->error_code & PGFAULT_W) != 0,		// write access
 		(frame->error_code & PGFAULT_I) != 0,		// instruction fetch
 		(frame->error_code & PGFAULT_U) != 0,		// userland
 		&newip);
