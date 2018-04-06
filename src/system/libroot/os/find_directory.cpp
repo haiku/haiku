@@ -19,6 +19,7 @@
 #include <directories.h>
 #include <FindDirectory.h>
 #include <fs_info.h>
+#include <StackOrHeapArray.h>
 
 #include <errno.h>
 #include <pwd.h>
@@ -195,12 +196,13 @@ static const char *kUserDirectories[] = {
 static int
 create_path(const char *path, mode_t mode)
 {
-	char buffer[B_PATH_NAME_LENGTH + 1];
 	int pathLength;
 	int i = 0;
 
 	if (path == NULL || ((pathLength = strlen(path)) > B_PATH_NAME_LENGTH))
 		return EINVAL;
+
+	BStackOrHeapArray<char, 128> buffer(pathLength + 1);
 
 	while (++i < pathLength) {
 		char *slash = strchr(&path[i], '/');
