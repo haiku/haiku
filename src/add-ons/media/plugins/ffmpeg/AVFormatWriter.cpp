@@ -142,6 +142,10 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		// frame rate
 		fStream->codec->time_base.den = (int)format->u.raw_video.field_rate;
 		fStream->codec->time_base.num = 1;
+
+		fStream->time_base.den = (int)format->u.raw_video.field_rate;
+		fStream->time_base.num = 1;
+
 		// video size
 		fStream->codec->width = format->u.raw_video.display.line_width;
 		fStream->codec->height = format->u.raw_video.display.line_count;
