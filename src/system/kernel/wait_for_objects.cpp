@@ -1063,7 +1063,6 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 {
 	syscall_restart_handle_timeout_pre(flags, timeout);
 
-	bigtime_t start = system_time();
 	if (numInfos < 0 || !check_max_fds(numInfos - sem_max_sems()
 			- port_max_ports() - thread_max_threads())) {
 		return B_BAD_VALUE;
