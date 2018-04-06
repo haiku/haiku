@@ -909,9 +909,12 @@ _kern_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 static bool
 check_max_fds(int numFDs)
 {
+	if (numFDs <= 0)
+		return true;
+
 	struct io_context *context = get_current_io_context(false);
 	MutexLocker(&context->io_mutex);
-	return numFDs <= context->table_size;
+	return (size_t)numFDs <= context->table_size;
 }
 
 
@@ -1060,8 +1063,11 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 {
 	syscall_restart_handle_timeout_pre(flags, timeout);
 
-	if (numInfos < 0)
+	bigtime_t start = system_time();
+	if (numInfos < 0 || !check_max_fds(numInfos - sem_max_sems()
+			- port_max_ports() - thread_max_threads())) {
 		return B_BAD_VALUE;
+	}
 
 	if (numInfos == 0) {
 		// special case: no infos
