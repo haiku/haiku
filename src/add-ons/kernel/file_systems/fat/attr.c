@@ -233,8 +233,10 @@ dosfs_read_attr(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		return EINVAL;
 	}
 
-	strncpy(buffer, node->mime + pos, *_length - 1);
-	((char *)buffer)[*_length - 1] = 0;
+	if (user_strlcpy(buffer, node->mime + pos, *_length) < B_OK) {
+		UNLOCK_VOL(vol);
+		return B_BAD_ADDRESS;
+	}
 	*_length = strlen(buffer) + 1;
 
 	UNLOCK_VOL(vol);
