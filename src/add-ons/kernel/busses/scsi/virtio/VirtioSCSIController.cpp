@@ -6,6 +6,8 @@
 
 #include "VirtioSCSIPrivate.h"
 
+#include <StackOrHeapArray.h>
+
 #include <new>
 #include <stdlib.h>
 #include <strings.h>
@@ -207,7 +209,7 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 
 	uint32 inCount = (isIn ? ccb->sg_count : 0) + 1;
 	uint32 outCount = (isOut ? ccb->sg_count : 0) + 1;
-	physical_entry entries[inCount + outCount];
+	BStackOrHeapArray<physical_entry, 16> entries(inCount + outCount);
 	fRequest->FillRequest(inCount, outCount, entries);
 
 	{
