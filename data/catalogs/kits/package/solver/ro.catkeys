@@ -1,6 +1,12 @@
-1	romanian	x-vnd.Haiku-libsolvsolver	2856378802
+1	romanian	x-vnd.Haiku-libsolvsolver	959039750
+%dependency% is provided by the system	SolverProblem		%dependency% este furnizat de către sistem
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		pachetul %source% este în conficlt cu %dependency% furnizat de %target%
 unspecified problem	SolverProblem		problemă nespecificată
+keep %source% despite its inferior architecture	SolverProblemSolution		păstrează %source% în ciuda arhitecturii inferioare
+do not deinstall \"%selection%\"	SolverProblemSolution		nu dezinstala \„%selection%\”
+%source% has inferior architecture	SolverProblem		%source% are o arhitectură inferioară
 dependency problem	SolverProblem		problemă de dependențe
 do not keep %source% installed	SolverProblemSolution		nu păstra %source% instalat
+do not install \"%selection%\"	SolverProblemSolution		nu instala \„%selection%\”
 do something	SolverProblemSolution		face ceva
 problem with installed package %source%	SolverProblem		problemă la instalarea pachetului %source%

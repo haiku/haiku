@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaConverter	502184724
+1	romanian	x-vnd.Haiku-MediaConverter	2816184527
 Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Fișierul nu a fost recunoscut ca fișier media suportat:} other{# fișiere nu au fost recunoscute ca fișiere media suportate:}}
 Video encoding:	MediaConverter		Codare video:
@@ -27,7 +27,9 @@ Conversion completed	MediaConverter		Conversie completă
 Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 secunde
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eroare la scrierea la locația: %strPath%. Se întoarce implicit la locația: /boot/home
 Source files	MediaConverter		Fișiere sursă
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Nu s-a putut găsi dosarul selectat. Se întoarce implicit la /boot/home
 Error writing video frame %lld	MediaConverter		Eroare la scrierea cadrului video %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# cadru} other{# cadre}}
 Error writing audio frame %lld	MediaConverter		Eroare la scrierea cadrului audio %lld
@@ -39,6 +41,7 @@ None available	Video codecs		Nimic disponibil
 Conversion cancelled	MediaConverter		Conversie anulată
 No file selected	MediaConverter-FileInfo		Niciun fișier selectat
 Select this folder	MediaConverter		Selectează acest dosar
+Error creating track.	MediaConverter		Eroare la crearea pistei.
 Continue	MediaConverter		Continuă
 Encoder parameters	MediaConverter-EncoderWindow		Parametri de codor
 Video:	MediaConverter-FileInfo		Video:
@@ -60,6 +63,7 @@ Drop media files onto this window	MediaConverter		Plasează fișiere media în a
 Audio encoding:	MediaConverter		Codare audio:
 Audio quality not supported	MediaConverter		Calitate audio nesuportată
 File	Menu		Fișier
+Input file not recognized as Audio or Video	MediaConverter		Fișierul de intrare nu este recunoscut ca audio sau video
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Convertește
 Writing audio track: %ld%% complete	MediaConverter		Scriere pistă audio: %ld%% complet

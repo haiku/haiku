@@ -12,7 +12,7 @@ No remote repositories are available	UpdateManager	Error message	リモートの
 No updates available	UpdateAction		更新はありません
 Downloading packages	UpdateManager		パッケージをダウンロード中
 Attempting to cancel the updates...	SoftwareUpdaterWindow		更新のキャンセルを試みています...
-from repository	SoftwareUpdaterWindow	List item text	以下のリポジトリから
+from repository	SoftwareUpdaterWindow	List item text	入手先リポジトリ:
 Cancel	SoftwareUpdaterWindow	Alert button label	キャンセル
 Click here to install updates.	CheckManager		クリックして更新をインストール。
 The following changes will be made:	SoftwareUpdaterWindow		以下の変更が適用されます:
@@ -20,14 +20,14 @@ Available updates found	CheckManager		利用可能な更新が見つかりまし
 Checking for updates	SoftwareUpdaterWindow		更新を確認しています
 Quit	SoftwareUpdaterWindow	Alert button label	終了
 Cancelling updates	SoftwareUpdaterWindow		更新をキャンセルしています
-Updating version	SoftwareUpdaterWindow	List item text	更新されるバージョン
+Updating version	SoftwareUpdaterWindow	List item text	更新中のバージョン:
 Applying changes	UpdateManager		変更の適用中
 Quit	SoftwareUpdaterWindow		終了
 No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	リモートのリボジトリは利用できません。リポジトリ プレファレンスか 'pkgman' コマンドを使って、リポジトリが有効になっているかか確認してください。
 There were no updates found.	UpdateAction		更新はありません。
-Uninstalling version	SoftwareUpdaterWindow	List item text	アンインストールされるバージョン
+Uninstalling version	SoftwareUpdaterWindow	List item text	アンインストール中のバージョン:
 Packages to be updated	SoftwareUpdaterWindow	List super item label	更新されるパッケージ
-Installing version	SoftwareUpdaterWindow	List item text	インストールされるバージョン
+Installing version	SoftwareUpdaterWindow	List item text	インストール中のバージョン:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		引数の値はもはや受け入れられない\n
 Updates completed	UpdateManager		更新が完了しました
 Invalid update type, cannot continue with updates	UpdateAction		無効な更新タイプです、更新を継続できません
@@ -42,7 +42,7 @@ No updates available	CheckManager		更新はありません
 Don't quit	SoftwareUpdaterWindow		終了しない
 Quit	SoftwareUpdaterWindow	Button label	終了
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		クリックしてソフトウェアの更新を起動してください。いくつかの更新は選択すべき問題の解決策を必要とするでしょう。
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		ソフトウェアリポジトリに連絡を取り、パッケージの更新を確認します。
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
 Unrecognized argument	SoftwareUpdaterApp	Error message	認識されない引数
 Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		以下のオプションから選択してください:\n\nUpdate:\n\tすべてのインストール済パッケージを更新します。\nFull sync:\n\tインストール済パッケージをリポジトリと同期します。
 Exception occurred while checking for updates: %s\n	CheckAction		更新の確認中に例外が発生しました: %s\n
@@ -53,7 +53,7 @@ OK	UpdateManager		OK
 A reboot may be necessary to complete some updates.	UpdateManager		いくつかの更新を完了するには再起動が必要かもしれません。
 Open Repositories	SoftwareUpdaterWindow	Alert button label	リポジトリを開く
 Show more details	SoftwareUpdaterWindow		詳細を表示する
-Contacting software repositories to check for package updates.	CheckManager		ソフトウェアリポジトリに連絡を取り、パッケージの更新を確認します。
+Contacting software repositories to check for package updates.	CheckManager		パッケージの更新確認のため、ソフトウェアリポジトリに接続しています。
 Full sync	SoftwareUpdaterWindow	Alert button label	完全同期
 No active network connection was found.\n	CheckManager		有効なネットワーク接続が見つからなかった。\n
 OK	SoftwareUpdaterWindow		OK

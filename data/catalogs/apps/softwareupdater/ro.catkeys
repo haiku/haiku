@@ -1,33 +1,58 @@
-1	romanian	x-vnd.haiku-softwareupdater	2217488996
+1	romanian	x-vnd.haiku-softwareupdater	256495760
+No active network connection was found	UpdateManager	Error message	Nu s-a găsit o conexiune la rețea activă
 Cancel	SoftwareUpdaterWindow		Anulează
+Packages are being updated	UpdateManager		Se actualizează pachetele
 Update now	SoftwareUpdaterWindow		Actualizează acum
 Updates did not complete	UpdateAction		Actualizările nu au fost completate
 Checking for updates	CheckManager		Se verifică pentru actualizări
+%count% packages have available updates	CheckManager		%count% pachete au actualizări disponibile
 SoftwareUpdater	System name		SoftwareUpdater
+Fatal error while checking for updates: %s\n	CheckAction		Eroare fatală la verificarea pentru actualizări: %s\n
+No remote repositories are available	UpdateManager	Error message	Nu există depozite disponibile la distanță
 No updates available	UpdateAction		Nu există actualizări disponibile
 Downloading packages	UpdateManager		Se descarcă pachete
+Attempting to cancel the updates...	SoftwareUpdaterWindow		Se încearcă anularea actualizărilor…
 from repository	SoftwareUpdaterWindow	List item text	din depozitul
 Cancel	SoftwareUpdaterWindow	Alert button label	Anulează
 Click here to install updates.	CheckManager		Dați clic aici pentru a instala actualizările.
 The following changes will be made:	SoftwareUpdaterWindow		Următoarele modificări vor fi efectuate:
+Available updates found	CheckManager		S-au găsit actualizări disponibile
 Checking for updates	SoftwareUpdaterWindow		Se verifică pentru actualizări
 Quit	SoftwareUpdaterWindow	Alert button label	Ieșire
+Cancelling updates	SoftwareUpdaterWindow		Se anulează actualizările
 Updating version	SoftwareUpdaterWindow	List item text	Se actualizează versiunea
 Applying changes	UpdateManager		Se aplică modificările
 Quit	SoftwareUpdaterWindow		Ieșire
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nu sunt disponibile depozite la distanță. Verificați dacă unele depozite sunt activate utilizând preferințele Depozite sau comanda „pkgman”.
+There were no updates found.	UpdateAction		Nu s-au găsit actualizări
+Uninstalling version	SoftwareUpdaterWindow	List item text	Se dezinstalează versiunea
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Pachete de actualizat
+Installing version	SoftwareUpdaterWindow	List item text	Se instalează versiunea
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabilele de argumente nu mai sunt acceptate\n
 Updates completed	UpdateManager		Actualizări completate
+Invalid update type, cannot continue with updates	UpdateAction		Tip de actualizare nevalid, nu se poate continua cu actualizările
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachetele de dezinstalat
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost completate, sigur doriți să ieșiți?
+There were no updates found.	CheckAction		Nu s-au găsit actualizări.
 %i of %i	UpdateManager	Do not translate %i	%i din %i
 Updates found	SoftwareUpdaterWindow		Actualizări găsite
 to	SoftwareUpdaterWindow	List item text	la
 No updates available	CheckManager		Nu există actualizări disponibile
 Don't quit	SoftwareUpdaterWindow		Nu ieși
 Quit	SoftwareUpdaterWindow	Button label	Ieșire
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Apăsați clic aici pentru a rula SoftwareUpdater. Unele actualizări vor necesita selectarea unei soluții pentru problemă.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Se contactează depozitele de programe pentru a verifica dacă sunt actualizări de pachete.
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument nerecunoscut
+Exception occurred while checking for updates: %s\n	CheckAction		A apărut o excepție în timpul verificării pentru actualizări: %s\n
+Exception occurred while updating packages : %s\n	UpdateAction		A apărut o excepție în timpul încărcării pachetelor: %s\n
 Update	SoftwareUpdaterWindow	Alert button label	Actualizează
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Pachete noi de instalat
 OK	UpdateManager		OK
+A reboot may be necessary to complete some updates.	UpdateManager		Este posibil să fie necesară o repornire pentru a completa unele actualizări.
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Deschide depozitele
 Show more details	SoftwareUpdaterWindow		Afișează mai multe detalii
+Contacting software repositories to check for package updates.	CheckManager		Se contactează depozitele de programe pentru a verifica dacă sunt actualizări de pachete.
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizare completă
+No active network connection was found.\n	CheckManager		Nu s-a găsit o conexiune de rețea activă.\n
 OK	SoftwareUpdaterWindow		OK
 There were no updates found.	CheckManager		Nu au fost găsite actualizări.
