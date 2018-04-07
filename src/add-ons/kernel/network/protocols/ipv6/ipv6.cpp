@@ -22,6 +22,7 @@
 
 #include <ByteOrder.h>
 #include <KernelExport.h>
+#include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
 #include <util/DoublyLinkedList.h>
@@ -636,7 +637,7 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 	if (status != B_OK)
 		return status;
 
-	uint8 data[bytesLeft];
+	BStackOrHeapArray<uint8, 128> data(bytesLeft);
 	status = gBufferModule->read(buffer, headersLength, data, bytesLeft);
 	if (status != B_OK)
 		return status;
