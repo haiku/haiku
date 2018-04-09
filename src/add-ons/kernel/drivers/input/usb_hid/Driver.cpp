@@ -35,6 +35,22 @@ static mutex sDriverLock;
 static usb_support_descriptor *sSupportDescriptors;
 
 
+usb_support_descriptor gBlackListedDevices[] = {
+	{
+		// temperature sensor which declares itself as a usb hid device
+		0, 0, 0, 0x0c45, 0x7401
+	},
+	{
+		// wacom devices are handled by the dedicated wacom driver
+		0, 0, 0, USB_VENDOR_WACOM, 0
+	}
+
+};
+
+int32 gBlackListedDeviceCount
+	= sizeof(gBlackListedDevices) / sizeof(gBlackListedDevices[0]);
+
+
 // #pragma mark - notify hooks
 
 
@@ -48,9 +64,17 @@ usb_hid_device_added(usb_device device, void **cookie)
 	TRACE("vendor id: 0x%04x; product id: 0x%04x\n",
 		deviceDescriptor->vendor_id, deviceDescriptor->product_id);
 
-	// wacom devices are handled by the dedicated wacom driver
-	if (deviceDescriptor->vendor_id == USB_VENDOR_WACOM)
+	for (int32 i = 0; i < gBlackListedDeviceCount; i++) {
+		usb_support_descriptor &entry = gBlackListedDevices[i];
+		if ((entry.vendor != 0
+				&& deviceDescriptor->vendor_id != entry.vendor)
+			|| (entry.product != 0
+				&& deviceDescriptor->product_id != entry.product)) {
+			continue;
+		}
+
 		return B_ERROR;
+	}
 
 	const usb_configuration_info *config
 		= gUSBModule->get_nth_configuration(device, USB_DEFAULT_CONFIGURATION);
