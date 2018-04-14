@@ -13,7 +13,7 @@ Network Status	NetworkStatusView		Netzwerkstatus
 Ready	NetworkStatusView		Bereit
 No stateful configuration	NetworkStatusView		Statusloser Zustand
 %ifaceName information:\n	NetworkStatusView		%ifaceName-Information:\n
-Configuring	NetworkStatusView		Konfigurierung läuft
+Configuring	NetworkStatusView		Konfiguration läuft
 Address	NetworkStatusView		Adresse
 OK	NetworkStatusView		OK
 NetworkStatus	System name		Netzwerkstatus

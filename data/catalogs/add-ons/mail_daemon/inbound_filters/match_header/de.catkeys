@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Aktion wählen>
 Header field (e.g. Subject, From, ...)	ConfigView		Kopfdaten (z.B. Betreff, Ansender, ...)
-Account	ConfigView		Email-Konto
+Account	ConfigView		E-Mail-Konto
 has	ConfigView		enthält
 Move to	ConfigView		Verschieben nach
 Then	ConfigView		Dann

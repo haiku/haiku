@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Playground	3841053224
+1	german	x-vnd.Haiku-Playground	4128683144
 Line	Playground		Linie
 Fill	Playground		Füllen
 Quit	Playground		Beenden
@@ -17,5 +17,6 @@ New object	Playground		Neues Objekt
 Test	Playground		Test
 Playground	System name		Spielwiese
 File	Playground		Datei
+Subtract	Playground		Subtrahieren
 <pick>	Playground		<auswählen>
 Ellipse	Playground		Ellipse

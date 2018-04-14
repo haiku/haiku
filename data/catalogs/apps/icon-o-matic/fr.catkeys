@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	1313597739
+1	french	x-vnd.haiku-icon_o_matic	3587255161
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -46,6 +46,7 @@ Style	Icon-O-Matic-Menus		Style
 <modify path>	Icon-O-Matic-PathCmd		<modifier le chemin>
 Opening the icon failed!	Icon-O-Matic-Main		L’ouverture de l’icône a échoué !
 Error: 	Icon-O-Matic-Main		Erreur : 
+Rotate indices backwards	Icon-O-Matic-PathsList		Permuter les indices en arrière
 Name	Icon-O-Matic-PropertyNames		Nom
 bad news	Icon-O-Matic-Exporter		mauvaises nouvelles
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
@@ -97,6 +98,7 @@ Pick a color	Icon-O-Matic-ColorPicker		Choisissez une couleur
 Quit	Icon-O-Matic-Menu-File		Quitter
 Export	Icon-O-Matic-Menu-File		Exporter
 No	Icon-O-Matic-StyledTextImport		Non
+Rotate indices forwards	Icon-O-Matic-PathsList		Permuter les indices vers l'avant
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Révoquer le chemin
 load error	Icon-O-Matic-SVGImport		erreur de chargement
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Déplacer les formes

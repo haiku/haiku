@@ -1,0 +1,15 @@
+1	french	x-vnd.haiku-softwareupdater	2902352226
+Cancel	SoftwareUpdaterWindow		Annuler
+No updates available	UpdateAction		Aucune mise à jour disponible
+Downloading packages	UpdateManager		Téléchargement des paquets
+Cancel	SoftwareUpdaterWindow	Alert button label	Annuler
+Updates found	SoftwareUpdaterWindow		Des mises à jour sont disponibles
+No updates available	CheckManager		Aucune mise à jour disponible
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Interrogation des dépôts de logiciels pour détecter la disponibilité des mises à jour.
+Update	SoftwareUpdaterWindow	Alert button label	Mettre à jour
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nouveaux paquets à installer
+OK	UpdateManager		Valider
+Show more details	SoftwareUpdaterWindow		Afficher plus de détails
+No active network connection was found.\n	CheckManager		Aucune connexion réseau active.\n
+OK	SoftwareUpdaterWindow		Valider
+There were no updates found.	CheckManager		Aucune mise à jour disponible.

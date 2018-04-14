@@ -3,7 +3,7 @@ DriveSetup	System name		Gestionnaire de disque
 Could not acquire partitioning information.	MainWindow		Impossible de récupérer les informations sur les partitions.
 Cancel	AbstractParametersPanel		Annuler
 Delete	MainWindow		Supprimer
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les modifications sur le disque ?\n\nToutes les données de la partition sélectionnée seront irrémédiablement perdues si vous le faites !
 Rescan	MainWindow		Analyser
 OK	MainWindow		OK
 There's no space on the partition where a child partition could be created.	MainWindow		Il n’y a pas de place dans cette partition pour créer une partition fille.
@@ -29,12 +29,12 @@ Error: 	MainWindow	in any error alert	Erreur :
 Partition %ld	DiskView		Partition %ld
 <empty>	DiskView		<vide>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L’initialisation de la partition %s a échoué. (Aucune modification n’a été apportée au disque.)
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les changements sur le disque ?\n\nToutes les données de la partition seront définitivement perdues si vous le faites !
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir enregistrer les modifications sur le disque ?\n\nToutes les données de la partition seront irrémédiablement perdues si vous le faites !
 Mounted at	PartitionList		Montée en
 There was an error acquiring the partition row.	MainWindow		Erreur de lecture des informations de la partition.
 You need to select a partition entry from the list.	MainWindow		Sélectionnez d’abord une entrée de la table des partitions.
 The currently selected partition does not have a parent partition.	MainWindow		La partition sélectionnée n’a pas de partition parente.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir écrire les changements sur le disque ?\n\nToutes les données du disque seront définitivement perdues si vous le faites !
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Êtes-vous sur de vouloir écrire les modifications sur le disque ?\n\nToutes les données du disque seront irrémédiablement perdues si vous le faites !
 Write changes	MainWindow		Écrire les modifications
 There was an error preparing the disk for modifications.	MainWindow		Une erreur est survenue pendant la préparation des modifications du disque.
 The partition %s is already mounted.	MainWindow		La partition %s est déjà montée.
@@ -82,7 +82,7 @@ Wipe (not implemented)	MainWindow		Effacer (non implémenté)
 Validation of the given initialization parameters failed.	MainWindow		Le contrôle des paramètres d’initialisation donnés a échoué.
 The selected partition does not contain a partitioning system.	MainWindow		La partition sélectionnée ne contient pas de système de partitionnement.
 Offset: %s	Support		Offset : %s
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications sur le disque maintenant ?\n\nToutes les données sur la partition %s seront définitivement perdues si vous le faites !
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir enregistrer les modifications sur le disque maintenant ?\n\nToutes les données sur la partition %s seront irrémédiablement perdues si vous le faites !
 The partition %s is currently mounted.	MainWindow		La partition %s est actuellement montée.
 Surface test (not implemented)	MainWindow		Test de surface (non implémenté)
 Format	MainWindow		Formater
