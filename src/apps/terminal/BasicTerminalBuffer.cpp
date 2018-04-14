@@ -539,6 +539,8 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 
 	// convert pattern to UTF8Char array
 	BStackOrHeapArray<UTF8Char, 64> pattern(patternByteLen);
+	if (!pattern.IsValid())
+		return false;
 	int32 patternLen = 0;
 	while (*_pattern != '\0') {
 		int32 charLen = UTF8Char::ByteCount(*_pattern);

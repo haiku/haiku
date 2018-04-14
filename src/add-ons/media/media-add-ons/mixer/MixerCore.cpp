@@ -524,6 +524,10 @@ MixerCore::_MixThread()
 	chan_info_list inputChanInfos[MAX_CHANNEL_TYPES];
 	BStackOrHeapArray<chan_info_list, 16> mixChanInfos(fMixBufferChannelCount);
 		// TODO: this does not support changing output channel count
+	if (!mixChanInfos.IsValid()) {
+		ERROR("MixerCore::_MixThread mixChanInfos allocation failed\n");
+		return;
+	}
 
 	fEventTime = timeBase;
 	int64 framePos = 0;

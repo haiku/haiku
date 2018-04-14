@@ -210,6 +210,11 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 	uint32 inCount = (isIn ? ccb->sg_count : 0) + 1;
 	uint32 outCount = (isOut ? ccb->sg_count : 0) + 1;
 	BStackOrHeapArray<physical_entry, 16> entries(inCount + outCount);
+	if (!entries.IsValid()) {
+		fRequest->SetStatus(SCSI_REQ_INVALID);
+		fRequest->Finish(false);
+		return B_NO_MEMORY;
+	}
 	fRequest->FillRequest(inCount, outCount, entries);
 
 	{

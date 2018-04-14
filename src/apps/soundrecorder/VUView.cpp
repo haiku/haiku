@@ -110,6 +110,8 @@ void
 VUView::_RenderLoop()
 {
 	BStackOrHeapArray<rgb_color[2], 64> levels(fLevelCount);
+	if (!levels.IsValid())
+		return;
 	
 	for (int32 i = 0; i < fLevelCount; i++) {
 		levels[i][0] = levels[i][1] = back_color;	

@@ -203,6 +203,8 @@ create_path(const char *path, mode_t mode)
 		return EINVAL;
 
 	BStackOrHeapArray<char, 128> buffer(pathLength + 1);
+	if (!buffer.IsValid())
+		return B_NO_MEMORY;
 
 	while (++i < pathLength) {
 		char *slash = strchr(&path[i], '/');

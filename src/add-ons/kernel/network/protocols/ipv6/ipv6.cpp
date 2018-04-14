@@ -638,6 +638,8 @@ send_fragments(ipv6_protocol* protocol, struct net_route* route,
 		return status;
 
 	BStackOrHeapArray<uint8, 128> data(bytesLeft);
+	if (!data.IsValid())
+		return B_NO_MEMORY;
 	status = gBufferModule->read(buffer, headersLength, data, bytesLeft);
 	if (status != B_OK)
 		return status;
