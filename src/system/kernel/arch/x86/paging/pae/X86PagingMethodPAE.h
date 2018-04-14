@@ -74,18 +74,15 @@ public:
 									phys_addr_t physicalAddress,
 									uint32 attributes, uint32 memoryType,
 									bool globalPage);
-	static	pae_page_table_entry SetPageTableEntry(pae_page_table_entry* entry,
-									pae_page_table_entry newEntry);
-	static	pae_page_table_entry SetPageTableEntryFlags(
-									pae_page_table_entry* entry, uint64 flags);
-	static	pae_page_table_entry TestAndSetPageTableEntry(
-									pae_page_table_entry* entry,
-									pae_page_table_entry newEntry,
-									pae_page_table_entry oldEntry);
-	static	pae_page_table_entry ClearPageTableEntry(
-									pae_page_table_entry* entry);
-	static	pae_page_table_entry ClearPageTableEntryFlags(
-									pae_page_table_entry* entry, uint64 flags);
+	static	uint64_t			SetTableEntry(uint64_t* entry,
+									uint64_t newEntry);
+	static	uint64_t			SetTableEntryFlags(uint64_t* entry,
+									uint64_t flags);
+	static	uint64_t			TestAndSetTableEntry(uint64_t* entry,
+									uint64_t newEntry, uint64_t oldEntry);
+	static	uint64_t			ClearTableEntry(uint64_t* entry);
+	static	uint64_t			ClearTableEntryFlags(uint64_t* entry,
+									uint64_t flags);
 
 	static	pae_page_directory_entry* PageDirEntryForAddress(
 									pae_page_directory_entry* const* pdpt,
@@ -156,40 +153,37 @@ X86PagingMethodPAE::PageDirEntryForAddress(
 }
 
 
-/*static*/ inline pae_page_table_entry
-X86PagingMethodPAE::SetPageTableEntry(pae_page_table_entry* entry,
-	pae_page_table_entry newEntry)
+/*static*/ inline uint64_t
+X86PagingMethodPAE::SetTableEntry(uint64_t* entry, uint64_t newEntry)
 {
 	return atomic_get_and_set64((int64*)entry, newEntry);
 }
 
 
-/*static*/ inline pae_page_table_entry
-X86PagingMethodPAE::SetPageTableEntryFlags(pae_page_table_entry* entry,
-	uint64 flags)
+/*static*/ inline uint64_t
+X86PagingMethodPAE::SetTableEntryFlags(uint64_t* entry, uint64_t flags)
 {
 	return atomic_or64((int64*)entry, flags);
 }
 
 
-/*static*/ inline pae_page_table_entry
-X86PagingMethodPAE::TestAndSetPageTableEntry(pae_page_table_entry* entry,
-	pae_page_table_entry newEntry, pae_page_table_entry oldEntry)
+/*static*/ inline uint64_t
+X86PagingMethodPAE::TestAndSetTableEntry(uint64_t* entry,
+	uint64_t newEntry, uint64_t oldEntry)
 {
 	return atomic_test_and_set64((int64*)entry, newEntry, oldEntry);
 }
 
 
-/*static*/ inline pae_page_table_entry
-X86PagingMethodPAE::ClearPageTableEntry(pae_page_table_entry* entry)
+/*static*/ inline uint64_t
+X86PagingMethodPAE::ClearTableEntry(uint64_t* entry)
 {
-	return SetPageTableEntry(entry, 0);
+	return SetTableEntry(entry, 0);
 }
 
 
-/*static*/ inline pae_page_table_entry
-X86PagingMethodPAE::ClearPageTableEntryFlags(pae_page_table_entry* entry,
-	uint64 flags)
+/*static*/ inline uint64_t
+X86PagingMethodPAE::ClearTableEntryFlags(uint64_t* entry, uint64_t flags)
 {
 	return atomic_and64((int64*)entry, ~flags);
 }

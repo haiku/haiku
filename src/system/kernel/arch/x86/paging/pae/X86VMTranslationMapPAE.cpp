@@ -477,7 +477,7 @@ X86VMTranslationMapPAE::Unmap(addr_t start, addr_t end)
 				B_PRIxADDR "\n", start);
 
 			pae_page_table_entry oldEntry
-				= X86PagingMethodPAE::ClearPageTableEntryFlags(
+				= X86PagingMethodPAE::ClearTableEntryFlags(
 					&pageTable[index], X86_PAE_PTE_PRESENT);
 
 			T(Unmap(this, start, oldEntry));
@@ -531,14 +531,14 @@ X86VMTranslationMapPAE::DebugMarkRangePresent(addr_t start, addr_t end,
 				if (!markPresent)
 					continue;
 
-				X86PagingMethodPAE::SetPageTableEntryFlags(
+				X86PagingMethodPAE::SetTableEntryFlags(
 					&pageTable[index], X86_PAE_PTE_PRESENT);
 			} else {
 				if (markPresent)
 					continue;
 
 				pae_page_table_entry oldEntry
-					= X86PagingMethodPAE::ClearPageTableEntryFlags(
+					= X86PagingMethodPAE::ClearTableEntryFlags(
 						&pageTable[index], X86_PAE_PTE_PRESENT);
 
 				if ((oldEntry & X86_PAE_PTE_ACCESSED) != 0) {
@@ -581,7 +581,7 @@ X86VMTranslationMapPAE::UnmapPage(VMArea* area, addr_t address,
 		= (pae_page_table_entry*)fPageMapper->GetPageTableAt(
 			*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
 
-	pae_page_table_entry oldEntry = X86PagingMethodPAE::ClearPageTableEntry(
+	pae_page_table_entry oldEntry = X86PagingMethodPAE::ClearTableEntry(
 		&pageTable[address / B_PAGE_SIZE % kPAEPageTableEntryCount]);
 
 	T(Unmap(this, address, oldEntry));
@@ -665,7 +665,7 @@ X86VMTranslationMapPAE::UnmapPages(VMArea* area, addr_t base, size_t size,
 		for (; index < kPAEPageTableEntryCount && start < end;
 				index++, start += B_PAGE_SIZE) {
 			pae_page_table_entry oldEntry
-				= X86PagingMethodPAE::ClearPageTableEntry(&pageTable[index]);
+				= X86PagingMethodPAE::ClearTableEntry(&pageTable[index]);
 			if ((oldEntry & X86_PAE_PTE_PRESENT) == 0)
 				continue;
 
@@ -799,7 +799,7 @@ X86VMTranslationMapPAE::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				= (pae_page_table_entry*)fPageMapper->GetPageTableAt(
 					*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
 			pae_page_table_entry oldEntry
-				= X86PagingMethodPAE::ClearPageTableEntry(
+				= X86PagingMethodPAE::ClearTableEntry(
 					&pageTable[address / B_PAGE_SIZE
 						% kPAEPageTableEntryCount]);
 
@@ -1039,7 +1039,7 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 			// without changing the accessed or dirty flag
 			pae_page_table_entry oldEntry;
 			while (true) {
-				oldEntry = X86PagingMethodPAE::TestAndSetPageTableEntry(
+				oldEntry = X86PagingMethodPAE::TestAndSetTableEntry(
 					&pageTable[index],
 					(entry & ~(X86_PAE_PTE_PROTECTION_MASK
 							| X86_PAE_PTE_MEMORY_TYPE_MASK))
@@ -1092,7 +1092,7 @@ X86VMTranslationMapPAE::ClearFlags(addr_t address, uint32 flags)
 
 	// clear out the flags we've been requested to clear
 	pae_page_table_entry oldEntry
-		= X86PagingMethodPAE::ClearPageTableEntryFlags(entry, flagsToClear);
+		= X86PagingMethodPAE::ClearTableEntryFlags(entry, flagsToClear);
 
 	pinner.Unlock();
 
@@ -1143,7 +1143,7 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 			if (oldEntry & X86_PAE_PTE_ACCESSED) {
 				// page was accessed -- just clear the flags
-				oldEntry = X86PagingMethodPAE::ClearPageTableEntryFlags(entry,
+				oldEntry = X86PagingMethodPAE::ClearTableEntryFlags(entry,
 					X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY);
 				T(ClearFlags(this, address, oldEntry,
 					X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY));
@@ -1151,7 +1151,7 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 			}
 
 			// page hasn't been accessed -- unmap it
-			if (X86PagingMethodPAE::TestAndSetPageTableEntry(entry, 0, oldEntry)
+			if (X86PagingMethodPAE::TestAndSetTableEntry(entry, 0, oldEntry)
 					== oldEntry) {
 				T(ClearFlagsUnmap(this, address, oldEntry));
 				break;
@@ -1160,7 +1160,7 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 			// something changed -- check again
 		}
 	} else {
-		oldEntry = X86PagingMethodPAE::ClearPageTableEntryFlags(entry,
+		oldEntry = X86PagingMethodPAE::ClearTableEntryFlags(entry,
 			X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY);
 		T(ClearFlags(this, address, oldEntry,
 			X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY));
