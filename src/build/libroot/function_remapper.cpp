@@ -276,3 +276,121 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 
 	return _haiku_build_renameat(fromFD, from, toFD, to);
 }
+
+
+#if defined(HAIKU_HOST_USE_XATTR) && defined(HAIKU_HOST_PLATFORM_HAIKU)
+// fs_attr_* functions only need to be remapped on Haiku
+
+
+extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+fs_open_attr_dir(const char *path)
+{
+	HIDDEN_FUNCTION(fs_open_attr_dir);
+
+	return _haiku_build_fs_open_attr_dir(path);
+}
+
+
+extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+fs_lopen_attr_dir(const char *path)
+{
+	HIDDEN_FUNCTION(fs_lopen_attr_dir);
+
+	return _haiku_build_fs_lopen_attr_dir(path);
+}
+
+
+extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+fs_fopen_attr_dir(int fd)
+{
+	HIDDEN_FUNCTION(fs_fopen_attr_dir);
+
+	return _haiku_build_fs_fopen_attr_dir(fd);
+}
+
+
+extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
+fs_close_attr_dir(void *dir)
+{
+	HIDDEN_FUNCTION(fs_close_attr_dir);
+
+	return _haiku_build_fs_close_attr_dir(dir);
+}
+
+
+extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+fs_read_attr_dir(void *dir)
+{
+	HIDDEN_FUNCTION(fs_read_attr_dir);
+
+	return _haiku_build_fs_read_attr_dir(dir);
+}
+
+
+extern "C" void HIDDEN_FUNCTION_ATTRIBUTE
+fs_rewind_attr_dir(void *dir)
+{
+	HIDDEN_FUNCTION(fs_rewind_attr_dir);
+
+	_haiku_build_fs_rewind_attr_dir(dir);
+}
+
+
+extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
+fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
+{
+	HIDDEN_FUNCTION(fs_fopen_attr);
+
+	return _haiku_build_fs_fopen_attr(fd, attribute, type, openMode);
+}
+
+
+extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
+fs_close_attr(int fd)
+{
+	HIDDEN_FUNCTION(fs_close_attr);
+
+	return _haiku_build_fs_close_attr(fd);
+}
+
+
+extern "C" ssize_t HIDDEN_FUNCTION_ATTRIBUTE
+fs_read_attr(int fd, const char* attribute, uint32 type, off_t pos,
+	void *buffer, size_t readBytes)
+{
+	HIDDEN_FUNCTION(fs_read_attr);
+
+	return _haiku_build_fs_read_attr(fd, attribute, type, pos, buffer,
+		readBytes);
+}
+
+
+extern "C" ssize_t HIDDEN_FUNCTION_ATTRIBUTE
+fs_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
+	const void *buffer, size_t writeBytes)
+{
+	HIDDEN_FUNCTION(fs_write_attr);
+
+	return _haiku_build_fs_write_attr(fd, attribute, type, pos, buffer,
+		writeBytes);
+}
+
+
+extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
+fs_remove_attr(int fd, const char* attribute)
+{
+	HIDDEN_FUNCTION(fs_remove_attr);
+
+	return _haiku_build_fs_remove_attr(fd, attribute);
+}
+
+
+extern "C" int HIDDEN_FUNCTION_ATTRIBUTE
+fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
+{
+	HIDDEN_FUNCTION(fs_stat_attr);
+
+	return _haiku_build_fs_stat_attr(fd, attribute, attrInfo);
+}
+
+#endif // defined(HAIKU_HOST_USE_XATTR) && defined(HAIKU_HOST_PLATFORM_HAIKU)

@@ -46,6 +46,31 @@ int		_haiku_build_fcntl(int fd, int op, int argument);
 int		_haiku_build_renameat(int fromFD, const char* from, int toFD,
 			const char* to);
 
+#ifdef HAIKU_HOST_PLATFORM_HAIKU
+
+ssize_t	_haiku_build_fs_read_attr(int fd, const char *attribute, uint32 type,
+					off_t pos, void *buffer, size_t readBytes);
+ssize_t	_haiku_build_fs_write_attr(int fd, const char *attribute, uint32 type,
+					off_t pos, const void *buffer, size_t readBytes);
+int		_haiku_build_fs_remove_attr(int fd, const char *attribute);
+int		_haiku_build_fs_stat_attr(int fd, const char *attribute,
+					struct attr_info *attrInfo);
+
+int		_haiku_build_fs_open_attr(const char *path, const char *attribute,
+					uint32 type, int openMode);
+int		_haiku_build_fs_fopen_attr(int fd, const char *attribute, uint32 type,
+					int openMode);
+int		_haiku_build_fs_close_attr(int fd);
+
+void	*_haiku_build_fs_open_attr_dir(const char *path);
+void	*_haiku_build_fs_lopen_attr_dir(const char *path);
+void	*_haiku_build_fs_fopen_attr_dir(int fd);
+int		_haiku_build_fs_close_attr_dir(void *dir);
+void	*_haiku_build_fs_read_attr_dir(void *dir);
+void	_haiku_build_fs_rewind_attr_dir(void *dir);
+
+#endif
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

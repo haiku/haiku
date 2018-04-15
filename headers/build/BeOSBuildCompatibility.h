@@ -179,6 +179,22 @@ int		_haiku_build_renameat(int fromFD, const char* from, int toFD,
 #	define fcntl(fd, op...)				_haiku_build_fcntl(fd, op)
 #	define renameat(fromFD, from, toFD, to) \
 		_haiku_build_renameat(fromFD, from, toFD, to)
+
+#	if defined(HAIKU_HOST_USE_XATTR) && defined(HAIKU_HOST_PLATFORM_HAIKU)
+#		define fs_read_attr			_haiku_build_fs_read_attr
+#		define fs_write_attr		_haiku_build_fs_write_attr
+#		define fs_remove_attr		_haiku_build_fs_remove_attr
+#		define fs_stat_attr			_haiku_build_fs_stat_attr
+#		define fs_open_attr			_haiku_build_fs_open_attr
+#		define fs_fopen_attr		_haiku_build_fs_fopen_attr
+#		define fs_close_attr		_haiku_build_fs_close_attr
+#		define fs_open_attr_dir		_haiku_build_fs_open_attr_dir
+#		define fs_fopen_attr_dir	_haiku_build_fs_fopen_attr_dir
+#		define fs_close_attr_dir	_haiku_build_fs_close_attr_dir
+#		define fs_read_attr_dir		_haiku_build_fs_read_attr_dir
+#		define fs_rewind_attr_dir	_haiku_build_fs_rewind_attr_dir
+#	endif
+
 #endif	// _HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS
 
 

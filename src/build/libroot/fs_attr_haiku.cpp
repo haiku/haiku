@@ -5,9 +5,6 @@
 
 /*!	Shim over the host Haiku fs_attr API */
 
-#define BUILDING_FS_ATTR_HAIKU
-	// so build fs_attr.h will not shadow the fs*attr functions
-
 
 #ifdef BUILDING_FS_SHELL
 #	include "compat.h"
@@ -55,15 +52,21 @@ namespace {
 
 // fs_open_attr_dir
 extern "C" DIR *
-build_fs_open_attr_dir(const char *path)
+_haiku_build_fs_open_attr_dir(const char *path)
 {
 	return fs_open_attr_dir(path);
 }
 
-// fs_fopen_attr_dir
-extern "C" DIR* fs_lopen_attr_dir(const char *path);
+// fs_lopen_attr_dir
 extern "C" DIR*
-build_fs_fopen_attr_dir(int fd)
+_haiku_build_fs_lopen_attr_dir(const char *path)
+{
+	return fs_lopen_attr_dir(path);
+}
+
+// fs_fopen_attr_dir
+extern "C" DIR*
+_haiku_build_fs_fopen_attr_dir(int fd)
 {
 	LocalFD localFD;
 	status_t error = localFD.Init(fd);
@@ -81,28 +84,28 @@ build_fs_fopen_attr_dir(int fd)
 
 // fs_close_attr_dir
 extern "C" int
-build_fs_close_attr_dir(DIR *dir)
+_haiku_build_fs_close_attr_dir(DIR *dir)
 {
 	return fs_close_attr_dir(dir);
 }
 
 // fs_read_attr_dir
 extern "C" struct dirent *
-build_fs_read_attr_dir(DIR *dir)
+_haiku_build_fs_read_attr_dir(DIR *dir)
 {
 	return fs_read_attr_dir(dir);
 }
 
 // fs_rewind_attr_dir
 extern "C" void
-build_fs_rewind_attr_dir(DIR *dir)
+_haiku_build_fs_rewind_attr_dir(DIR *dir)
 {
 	return fs_rewind_attr_dir(dir);
 }
 
 // fs_fopen_attr
 extern "C" int
-build_fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
+_haiku_build_fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
 {
 	if (fd < 0) {
 		errno = B_BAD_VALUE;
@@ -126,14 +129,14 @@ build_fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
 
 // fs_close_attr
 extern "C" int
-build_fs_close_attr(int fd)
+_haiku_build_fs_close_attr(int fd)
 {
 	return fs_close_attr(fd);
 }
 
 // fs_read_attr
 extern "C" ssize_t
-build_fs_read_attr(int fd, const char* attribute, uint32 type, off_t pos,
+_haiku_build_fs_read_attr(int fd, const char* attribute, uint32 type, off_t pos,
 	void *buffer, size_t readBytes)
 {
 	LocalFD localFD;
@@ -166,7 +169,7 @@ build_fs_read_attr(int fd, const char* attribute, uint32 type, off_t pos,
 
 // fs_write_attr
 extern "C" ssize_t
-build_fs_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
+_haiku_build_fs_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
 	const void *buffer, size_t writeBytes)
 {
 	LocalFD localFD;
@@ -192,7 +195,7 @@ build_fs_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
 
 // fs_remove_attr
 extern "C" int
-build_fs_remove_attr(int fd, const char* attribute)
+_haiku_build_fs_remove_attr(int fd, const char* attribute)
 {
 	LocalFD localFD;
 	status_t error = localFD.Init(fd);
@@ -223,7 +226,7 @@ build_fs_remove_attr(int fd, const char* attribute)
 
 // fs_stat_attr
 extern "C" int
-build_fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
+_haiku_build_fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 {
 	if (!attribute || !attrInfo) {
 		errno = B_BAD_VALUE;
@@ -277,9 +280,9 @@ _kern_open_attr_dir(int fd, const char *path)
 		if (error != B_OK)
 			return error;
 
-		dir = build_fs_open_attr_dir(realPath.c_str());
+		dir = _haiku_build_fs_open_attr_dir(realPath.c_str());
 	} else
-		dir = build_fs_fopen_attr_dir(fd);
+		dir = _haiku_build_fs_fopen_attr_dir(fd);
 
 	if (!dir)
 		return errno;
@@ -305,7 +308,7 @@ _kern_remove_attr(int fd, const char *name)
 	if (!name)
 		return B_BAD_VALUE;
 
-	if (build_fs_remove_attr(fd, name) < 0)
+	if (_haiku_build_fs_remove_attr(fd, name) < 0)
 		return errno;
 	return B_OK;
 }
