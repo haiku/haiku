@@ -441,6 +441,7 @@ check_native_xattrs()
 		return 0
 	fi
 
+	mkdir -p "$outputDir"
 	echo "xattr test file" >"$outputDir/xattrtest"
 	local i=0
 	# on round 0, we test if we can set 3 attrs of 1K each (enough for xattr-ref)
