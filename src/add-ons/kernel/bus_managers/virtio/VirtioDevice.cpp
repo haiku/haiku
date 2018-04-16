@@ -101,7 +101,7 @@ VirtioDevice::InitCheck()
 
 
 status_t
-VirtioDevice::NegociateFeatures(uint32 supported, uint32* negociated,
+VirtioDevice::NegotiateFeatures(uint32 supported, uint32* negotiated,
 	const char* (*get_feature_name)(uint32))
 {
 	fFeatures = 0;
@@ -117,9 +117,9 @@ VirtioDevice::NegociateFeatures(uint32 supported, uint32* negociated,
 	fFeatures &= (VIRTIO_FEATURE_TRANSPORT_MASK
 		| VIRTIO_FEATURE_RING_INDIRECT_DESC | VIRTIO_FEATURE_RING_EVENT_IDX);
 
-	*negociated = fFeatures;
+	*negotiated = fFeatures;
 
-	DumpFeatures("negociated features", fFeatures, get_feature_name);
+	DumpFeatures("negotiated features", fFeatures, get_feature_name);
 
 	return fController->write_guest_features(fCookie, fFeatures);
 }

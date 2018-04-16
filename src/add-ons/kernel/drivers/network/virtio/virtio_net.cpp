@@ -78,6 +78,10 @@ typedef struct {
 static device_manager_info* sDeviceManager;
 
 
+static void virtio_net_rx_done(void* driverCookie, void* cookie);
+static void virtio_net_tx_done(void* driverCookie, void* cookie);
+
+
 const char *
 get_feature_name(uint32 feature)
 {
@@ -143,7 +147,7 @@ virtio_net_init_device(void* _info, void** _cookie)
 		(void **)&info->virtio_device);
 	sDeviceManager->put_node(parent);
 
-	info->virtio->negociate_features(info->virtio_device,
+	info->virtio->negotiate_features(info->virtio_device,
 		VIRTIO_NET_F_STATUS | VIRTIO_NET_F_MAC
 		/* VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_MQ */,
 		 &info->features, &get_feature_name);
@@ -199,6 +203,29 @@ virtio_net_init_device(void* _info, void** _cookie)
 	if (status != B_OK) {
 		ERROR("interrupt setup failed (%s)\n", strerror(status));
 		return status;
+	}
+
+	status = info->virtio->queue_setup_interrupt(info->rx_queues[0],
+		virtio_net_rx_done, info);
+	if (status != B_OK) {
+		ERROR("queue interrupt setup failed (%s)\n", strerror(status));
+		return status;
+	}
+
+	status = info->virtio->queue_setup_interrupt(info->tx_queues[0],
+		virtio_net_tx_done, info);
+	if (status != B_OK) {
+		ERROR("queue interrupt setup failed (%s)\n", strerror(status));
+		return status;
+	}
+
+	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0) {
+		status = info->virtio->queue_setup_interrupt(info->ctrl_queue,
+			NULL, info);
+		if (status != B_OK) {
+			ERROR("queue interrupt setup failed (%s)\n", strerror(status));
+			return status;
+		}
 	}
 
 	*_cookie = info;
@@ -271,7 +298,9 @@ virtio_net_rx_done(void* driverCookie, void* cookie)
 {
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)cookie;
-	release_sem_etc(info->rx_done, 1, B_DO_NOT_RESCHEDULE);
+
+	while (info->virtio->queue_dequeue(info->rx_queues[0], NULL) != NULL)
+		release_sem_etc(info->rx_done, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -292,7 +321,7 @@ virtio_net_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 
 	// queue the rx buffer
 	status_t status = info->virtio->queue_request_v(info->rx_queues[0],
-		entries, 0, 2, virtio_net_rx_done, info);
+		entries, 0, 2, info);
 	if (status != B_OK) {
 		ERROR("rx queueing on queue %d failed (%s)\n", 0, strerror(status));
 		return status;
@@ -316,7 +345,9 @@ virtio_net_tx_done(void* driverCookie, void* cookie)
 {
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)cookie;
-	release_sem_etc(info->tx_done, 1, B_DO_NOT_RESCHEDULE);
+
+	while (info->virtio->queue_dequeue(info->tx_queues[0], NULL) != NULL)
+		release_sem_etc(info->tx_done, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -343,14 +374,14 @@ virtio_net_write(void* cookie, off_t pos, const void* buffer,
 
 	// queue the virtio_net_hdr + buffer data
 	status_t status = info->virtio->queue_request_v(info->tx_queues[0],
-		entries, 2, 0, virtio_net_tx_done, info);
+		entries, 2, 0, info);
 	if (status != B_OK) {
 		ERROR("tx queueing on queue %d failed (%s)\n", 0, strerror(status));
 		return status;
 	}
 
 	// wait for transmission done signal
-	status = acquire_sem_etc(info->tx_done, 1, B_RELATIVE_TIMEOUT, 10000);
+	status = acquire_sem_etc(info->tx_done, 1, B_RELATIVE_TIMEOUT, 100000);
 	if (status != B_OK) {
 		ERROR("acquire_sem(tx_done) failed (%s)\n", strerror(status));
 		return status;

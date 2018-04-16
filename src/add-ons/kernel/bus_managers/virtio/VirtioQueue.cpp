@@ -56,11 +56,9 @@ public:
 
 			status_t			InitCheck() { return fStatus; }
 
-			void				Callback();
 			uint16				Size() { return fDescriptorCount; }
-			void				SetTo(uint16 size,
-									virtio_callback_func callback,
-									void *callbackCookie);
+			void				SetTo(uint16 size, void *cookie);
+			void*				Cookie() { return fCookie; }
 			void				Unset();
 			struct vring_desc*	Indirect() { return fIndirect; }
 			phys_addr_t			PhysAddr() { return fPhysAddr; }
@@ -68,7 +66,6 @@ private:
 			status_t			fStatus;
 			VirtioQueue*		fQueue;
 			void*				fCookie;
-			virtio_callback_func fCallback;
 
 			struct vring_desc* 	fIndirect;
 			size_t 				fAreaSize;
@@ -81,7 +78,6 @@ private:
 TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 indirectMaxSize)
 	: fQueue(queue),
 	fCookie(NULL),
-	fCallback(NULL),
 	fIndirect(NULL),
 	fAreaSize(0),
 	fArea(-1),
@@ -119,19 +115,9 @@ TransferDescriptor::~TransferDescriptor()
 
 
 void
-TransferDescriptor::Callback()
+TransferDescriptor::SetTo(uint16 size, void *cookie)
 {
-	if (fCallback != NULL)
-		fCallback(fQueue->Device()->DriverCookie(), fCookie);
-}
-
-
-void
-TransferDescriptor::SetTo(uint16 size, virtio_callback_func callback,
-	void *callbackCookie)
-{
-	fCookie = callbackCookie;
-	fCallback = callback;
+	fCookie = cookie;
 	fDescriptorCount = size;
 }
 
@@ -140,7 +126,6 @@ void
 TransferDescriptor::Unset()
 {
 	fCookie = NULL;
-	fCallback = NULL;
 	fDescriptorCount = 0;
 }
 
@@ -158,7 +143,9 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 	fRingHeadIndex(0),
 	fRingUsedIndex(0),
 	fStatus(B_OK),
-	fIndirectMaxSize(0)
+	fIndirectMaxSize(0),
+	fCallback(NULL),
+	fCookie(NULL)
 {
 	fDescriptors = new(std::nothrow) TransferDescriptor*[fRingSize];
 	if (fDescriptors == NULL) {
@@ -209,19 +196,30 @@ VirtioQueue::~VirtioQueue()
 }
 
 
+status_t
+VirtioQueue::SetupInterrupt(virtio_callback_func handler, void *cookie)
+{
+	fCallback = handler;
+	fCookie = cookie;
+
+	return B_OK;
+}
+
+
+
 void
 VirtioQueue::DisableInterrupt()
 {
-	/*if ((fDevice->Features() & VIRTIO_FEATURE_RING_EVENT_IDX) == 0)
-		fRing.avail->flags |= VRING_AVAIL_F_NO_INTERRUPT;*/
+	if ((fDevice->Features() & VIRTIO_FEATURE_RING_EVENT_IDX) == 0)
+		fRing.avail->flags |= VRING_AVAIL_F_NO_INTERRUPT;
 }
 
 
 void
 VirtioQueue::EnableInterrupt()
 {
-	/*if ((fDevice->Features() & VIRTIO_FEATURE_RING_EVENT_IDX) == 0)
-		fRing.avail->flags &= ~VRING_AVAIL_F_NO_INTERRUPT;*/
+	if ((fDevice->Features() & VIRTIO_FEATURE_RING_EVENT_IDX) == 0)
+		fRing.avail->flags &= ~VRING_AVAIL_F_NO_INTERRUPT;
 }
 
 
@@ -236,52 +234,63 @@ status_t
 VirtioQueue::Interrupt()
 {
 	CALLED();
+
 	DisableInterrupt();
 
-	while (fRingUsedIndex != fRing.used->idx)
-		Finish();
+	if (fCallback != NULL)
+		fCallback(Device()->DriverCookie(), fCookie);
 
 	EnableInterrupt();
 	return B_OK;
 }
 
 
-void
-VirtioQueue::Finish()
+void*
+VirtioQueue::Dequeue(uint16 *_size)
 {
-	TRACE("Finish() fRingUsedIndex: %u\n", fRingUsedIndex);
+	TRACE("Dequeue() fRingUsedIndex: %u\n", fRingUsedIndex);
+
+	if (fRingUsedIndex == fRing.used->idx)
+		return NULL;
 
 	uint16 usedIndex = fRingUsedIndex++ & (fRingSize - 1);
-	TRACE("Finish() usedIndex: %u\n", usedIndex);
+	TRACE("Dequeue() usedIndex: %u\n", usedIndex);
 	struct vring_used_elem *element = &fRing.used->ring[usedIndex];
 	uint16 descriptorIndex = element->id;
 		// uint32 length = element->len;
 
-	fDescriptors[descriptorIndex]->Callback();
+	void* cookie = fDescriptors[descriptorIndex]->Cookie();
 	uint16 size = fDescriptors[descriptorIndex]->Size();
+	if (_size != NULL)
+		*_size = size;
+	if (size == 0)
+		panic("VirtioQueue::Dequeue() size is zero\n");
 	fDescriptors[descriptorIndex]->Unset();
 	fRingFree += size;
 	size--;
 
 	uint16 index = descriptorIndex;
-	while ((fRing.desc[index].flags & VRING_DESC_F_NEXT) != 0) {
-		index = fRing.desc[index].next;
-		size--;
+	if ((fRing.desc[index].flags & VRING_DESC_F_INDIRECT) == 0) {
+		while ((fRing.desc[index].flags & VRING_DESC_F_NEXT) != 0) {
+			index = fRing.desc[index].next;
+			size--;
+		}
 	}
 
 	if (size > 0)
-		panic("VirtioQueue::Finish() descriptors left %d\n", size);
+		panic("VirtioQueue::Dequeue() descriptors left %d\n", size);
 
 	fRing.desc[index].next = fRingHeadIndex;
 	fRingHeadIndex = descriptorIndex;
-	TRACE("Finish() fRingHeadIndex: %u\n", fRingHeadIndex);
+	TRACE("Dequeue() fRingHeadIndex: %u\n", fRingHeadIndex);
+
+	return cookie;
 }
 
 
 status_t
 VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
-	size_t writtenVectorCount, virtio_callback_func callback,
-	void *callbackCookie)
+	size_t writtenVectorCount, void *cookie)
 {
 	CALLED();
 	size_t count = readVectorCount + writtenVectorCount;
@@ -289,15 +298,14 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 		return B_BAD_VALUE;
 	if ((fDevice->Features() & VIRTIO_FEATURE_RING_INDIRECT_DESC) != 0) {
 		return QueueRequestIndirect(vector, readVectorCount,
-			writtenVectorCount, callback, callbackCookie);
+			writtenVectorCount, cookie);
 	}
 
 	if (count > fRingFree)
 		return B_BUSY;
 
 	uint16 insertIndex = fRingHeadIndex;
-	fDescriptors[insertIndex]->SetTo(count, callback,
-		callbackCookie);
+	fDescriptors[insertIndex]->SetTo(count, cookie);
 
 	// enqueue
 	uint16 index = QueueVector(insertIndex, fRing.desc, vector,
@@ -317,7 +325,7 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 status_t
 VirtioQueue::QueueRequestIndirect(const physical_entry* vector,
 	size_t readVectorCount,	size_t writtenVectorCount,
-	virtio_callback_func callback, void *callbackCookie)
+	void *cookie)
 {
 	CALLED();
 	size_t count = readVectorCount + writtenVectorCount;
@@ -325,8 +333,7 @@ VirtioQueue::QueueRequestIndirect(const physical_entry* vector,
 		return B_BUSY;
 
 	uint16 insertIndex = fRingHeadIndex;
-	fDescriptors[insertIndex]->SetTo(1, callback,
-		callbackCookie);
+	fDescriptors[insertIndex]->SetTo(1, cookie);
 
 	// enqueue
 	uint16 index = QueueVector(0, fDescriptors[insertIndex]->Indirect(),
@@ -364,15 +371,14 @@ VirtioQueue::QueueVector(uint16 insertIndex, struct vring_desc *desc,
 	CALLED();
 	uint16 index = insertIndex;
 	size_t total = readVectorCount + writtenVectorCount;
-	for (size_t i = 0; i < total; i++) {
+	for (size_t i = 0; i < total; i++, index = desc[index].next) {
 		desc[index].addr = vector[i].address;
 		desc[index].len =  vector[i].size;
 		desc[index].flags = 0;
-		if (i >= readVectorCount)
-			desc[index].flags |= VRING_DESC_F_WRITE;
 		if (i < total - 1)
 			desc[index].flags |= VRING_DESC_F_NEXT;
-		index = desc[index].next;
+		if (i >= readVectorCount)
+			desc[index].flags |= VRING_DESC_F_WRITE;
 	}
 
 	return index;

@@ -188,6 +188,10 @@ virtio_block_callback(void* driverCookie, void* cookie)
 {
 	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
 
+	// consume all queued elements
+	while (info->virtio->queue_dequeue(info->virtio_queue, NULL) != NULL)
+		;
+
 	release_sem_etc(info->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
 
@@ -224,7 +228,7 @@ do_io(void* cookie, IOOperation* operation)
 	info->virtio->queue_request_v(info->virtio_queue, entries,
 		1 + (operation->IsWrite() ? operation->VecCount() : 0 ),
 		1 + (operation->IsWrite() ? 0 : operation->VecCount()),
-		virtio_block_callback, info);
+		info);
 
 	acquire_sem(info->sem_cb);
 
@@ -294,6 +298,11 @@ virtio_block_init_device(void* _info, void** _cookie)
 	}
 	status = info->virtio->setup_interrupt(info->virtio_device,
 		virtio_block_config_callback, info);
+
+	if (status == B_OK) {
+		status = info->virtio->queue_setup_interrupt(info->virtio_queue,
+			virtio_block_callback, info);
+	}
 
 	*_cookie = info;
 	return status;

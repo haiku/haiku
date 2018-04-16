@@ -14,7 +14,7 @@ device_manager_info *gDeviceManager = NULL;
 
 
 static status_t
-virtio_device_init(device_node *node, void **cookie)
+virtio_device_init(device_node *node, void **_device)
 {
 	CALLED();
 	VirtioDevice *device = new(std::nothrow) VirtioDevice(node);
@@ -27,25 +27,25 @@ virtio_device_init(device_node *node, void **cookie)
 		return result;
 	}
 
-	*cookie = device;
+	*_device = device;
 	return B_OK;
 }
 
 
 static void
-virtio_device_uninit(void *cookie)
+virtio_device_uninit(void *_device)
 {
 	CALLED();
-	VirtioDevice *device = (VirtioDevice *)cookie;
+	VirtioDevice *device = (VirtioDevice *)_device;
 	delete device;
 }
 
 
 static void
-virtio_device_removed(void *cookie)
+virtio_device_removed(void *_device)
 {
 	CALLED();
-	//VirtioDevice *device = (VirtioDevice *)cookie;
+	//VirtioDevice *device = (VirtioDevice *)_device;
 }
 
 
@@ -53,73 +53,81 @@ virtio_device_removed(void *cookie)
 
 
 status_t
-virtio_negociate_features(void* cookie, uint32 supported,
-		uint32* negociated, const char* (*get_feature_name)(uint32))
+virtio_negotiate_features(void* _device, uint32 supported,
+		uint32* negotiated, const char* (*get_feature_name)(uint32))
 {
 	CALLED();
-	VirtioDevice *device = (VirtioDevice *)cookie;
+	VirtioDevice *device = (VirtioDevice *)_device;
 
-	return device->NegociateFeatures(supported, negociated, get_feature_name);
+	return device->NegotiateFeatures(supported, negotiated, get_feature_name);
 }
 
 
 status_t
-virtio_read_device_config(void* cookie, uint8 offset, void* buffer,
+virtio_read_device_config(void* _device, uint8 offset, void* buffer,
 		size_t bufferSize)
 {
 	CALLED();
-	VirtioDevice *device = (VirtioDevice *)cookie;
+	VirtioDevice *device = (VirtioDevice *)_device;
 
 	return device->ReadDeviceConfig(offset, buffer, bufferSize);
 }
 
 
 status_t
-virtio_write_device_config(void* cookie, uint8 offset,
+virtio_write_device_config(void* _device, uint8 offset,
 		const void* buffer, size_t bufferSize)
 {
 	CALLED();
-	VirtioDevice *device = (VirtioDevice *)cookie;
+	VirtioDevice *device = (VirtioDevice *)_device;
 
 	return device->WriteDeviceConfig(offset, buffer, bufferSize);
 }
 
 
 status_t
-virtio_alloc_queues(virtio_device cookie, size_t count, virtio_queue *queues)
+virtio_alloc_queues(virtio_device _device, size_t count, virtio_queue *queues)
 {
 	CALLED();
-	VirtioDevice *device = (VirtioDevice *)cookie;
+	VirtioDevice *device = (VirtioDevice *)_device;
 	return device->AllocateQueues(count, queues);
 }
 
 
 status_t
-virtio_setup_interrupt(virtio_device cookie, virtio_intr_func config_handler,
+virtio_setup_interrupt(virtio_device _device, virtio_intr_func config_handler,
 	void *driverCookie)
 {
 	CALLED();
-	VirtioDevice *device = (VirtioDevice *)cookie;
+	VirtioDevice *device = (VirtioDevice *)_device;
 	return device->SetupInterrupt(config_handler, driverCookie);
 }
 
 
 status_t
-virtio_queue_request_v(virtio_queue cookie, const physical_entry* vector,
-		size_t readVectorCount, size_t writtenVectorCount,
-		virtio_callback_func callback, void *callbackCookie)
+virtio_queue_setup_interrupt(virtio_queue _queue, virtio_callback_func handler,
+	void *cookie)
 {
 	CALLED();
-	VirtioQueue *queue = (VirtioQueue *)cookie;
-	return queue->QueueRequest(vector, readVectorCount, writtenVectorCount,
-		callback, callbackCookie);
+	VirtioQueue *queue = (VirtioQueue *)_queue;
+	return queue->SetupInterrupt(handler, cookie);
 }
 
 
 status_t
-virtio_queue_request(virtio_queue cookie, const physical_entry *readEntry,
-		const physical_entry *writtenEntry, virtio_callback_func callback,
-		void *callbackCookie)
+virtio_queue_request_v(virtio_queue _queue, const physical_entry* vector,
+		size_t readVectorCount, size_t writtenVectorCount, void *cookie)
+{
+	CALLED();
+	VirtioQueue *queue = (VirtioQueue *)_queue;
+	return queue->QueueRequest(vector, readVectorCount, writtenVectorCount,
+		cookie);
+}
+
+
+status_t
+virtio_queue_request(virtio_queue _queue, const physical_entry *readEntry,
+		const physical_entry *writtenEntry, void *cookie)
 {
 	physical_entry entries[2];
 	if (readEntry != NULL) {
@@ -129,34 +137,41 @@ virtio_queue_request(virtio_queue cookie, const physical_entry *readEntry,
 	} else if (writtenEntry != NULL)
 		entries[0] = *writtenEntry;
 
-	return virtio_queue_request_v(cookie, entries, readEntry != NULL ? 1 : 0,
-		writtenEntry != NULL? 1 : 0, callback, callbackCookie);
+	return virtio_queue_request_v(_queue, entries, readEntry != NULL ? 1 : 0,
+		writtenEntry != NULL? 1 : 0, cookie);
 }
 
 
 bool
-virtio_queue_is_full(virtio_queue cookie)
+virtio_queue_is_full(virtio_queue _queue)
 {
-	VirtioQueue *queue = (VirtioQueue *)cookie;
+	VirtioQueue *queue = (VirtioQueue *)_queue;
 	return queue->IsFull();
 }
 
 
 bool
-virtio_queue_is_empty(virtio_queue cookie)
+virtio_queue_is_empty(virtio_queue _queue)
 {
-	VirtioQueue *queue = (VirtioQueue *)cookie;
+	VirtioQueue *queue = (VirtioQueue *)_queue;
 	return queue->IsEmpty();
 }
 
 
 uint16
-virtio_queue_size(virtio_queue cookie)
+virtio_queue_size(virtio_queue _queue)
 {
-	VirtioQueue *queue = (VirtioQueue *)cookie;
+	VirtioQueue *queue = (VirtioQueue *)_queue;
 	return queue->Size();
 }
 
+
+void*
+virtio_queue_dequeue(virtio_queue _queue, uint16* _size)
+{
+	VirtioQueue *queue = (VirtioQueue *)_queue;
+	return queue->Dequeue(_size);
+}
 
 
 //	#pragma mark -
@@ -241,16 +256,18 @@ virtio_device_interface virtio_device_module = {
 		NULL, // resume
 	},
 
-	virtio_negociate_features,
+	virtio_negotiate_features,
 	virtio_read_device_config,
 	virtio_write_device_config,
 	virtio_alloc_queues,
 	virtio_setup_interrupt,
+	virtio_queue_setup_interrupt,
 	virtio_queue_request,
 	virtio_queue_request_v,
 	virtio_queue_is_full,
 	virtio_queue_is_empty,
-	virtio_queue_size
+	virtio_queue_size,
+	virtio_queue_dequeue
 };
 
 virtio_for_controller_interface virtio_for_controller_module = {

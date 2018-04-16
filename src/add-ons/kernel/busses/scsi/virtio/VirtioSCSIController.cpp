@@ -56,7 +56,7 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 		(void **)&fVirtioDevice);
 	gDeviceManager->put_node(virtioParent);
 
-	fVirtio->negociate_features(fVirtioDevice,
+	fVirtio->negotiate_features(fVirtioDevice,
 		VIRTIO_SCSI_F_CHANGE /*VIRTIO_SCSI_F_HOTPLUG*/,
 		&fFeatures, &get_feature_name);
 
@@ -101,7 +101,21 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 		return;
 	}
 
+	fStatus = fVirtio->queue_setup_interrupt(fControlVirtioQueue,
+		NULL, NULL);
+	if (fStatus == B_OK) {
+		fStatus = fVirtio->queue_setup_interrupt(fEventVirtioQueue,
+			VirtioSCSIController::_EventCallback, this);
+	}
+	if (fStatus == B_OK) {
+		fStatus = fVirtio->queue_setup_interrupt(fRequestVirtioQueue,
+			VirtioSCSIController::_RequestCallback, this);
+	}
 
+	if (fStatus != B_OK) {
+		ERROR("queue interrupt setup failed (%s)\n", strerror(fStatus));
+		return;
+	}
 }
 
 
@@ -224,7 +238,7 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 	}
 
 	fVirtio->queue_request_v(fRequestVirtioQueue, entries,
-		outCount, inCount, VirtioSCSIController::_RequestCallback, NULL);
+		outCount, inCount, NULL);
 
 	result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
 		fRequest->Timeout());
@@ -269,6 +283,11 @@ VirtioSCSIController::_RequestCallback(void* driverCookie, void* cookie)
 {
 	CALLED();
 	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
+
+	while (controller->fVirtio->queue_dequeue(
+			controller->fRequestVirtioQueue, NULL) != NULL) {
+	}
+
 	controller->_RequestInterrupt();
 }
 
@@ -287,8 +306,15 @@ VirtioSCSIController::_EventCallback(void* driverCookie, void* cookie)
 {
 	CALLED();
 	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
-	struct virtio_scsi_event* event = (struct virtio_scsi_event*)cookie;
-	controller->_EventInterrupt(event);
+
+	while (true) {
+		virtio_scsi_event* event = (virtio_scsi_event*)
+			controller->fVirtio->queue_dequeue(controller->fEventVirtioQueue,
+				NULL);
+		if (event == NULL)
+			break;
+		controller->_EventInterrupt(event);
+	}
 }
 
 
@@ -336,7 +362,7 @@ VirtioSCSIController::_SubmitEvent(uint32 eventNumber)
 	get_memory_map(event, sizeof(struct virtio_scsi_event), &entry, 1);
 
 	fVirtio->queue_request_v(fEventVirtioQueue, &entry,
-		0, 1, VirtioSCSIController::_EventCallback, event);
+		0, 1, event);
 }
 
 
