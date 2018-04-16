@@ -82,8 +82,13 @@ private:
 			bool				fFocus;
 			BView*				fView;
 			BTabView*			fTabView;
+			BString				fLabel;
 
-			uint32				_reserved[11];
+#ifdef B_HAIKU_64_BIT
+			uint32				_reserved[9];
+#else
+			uint32				_reserved[10];
+#endif
 };
 
 

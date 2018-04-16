@@ -140,6 +140,8 @@
 /*!
 	\fn const char* BTab::Label() const
 	\brief Returns the tab's label (the target view's name).
+	\warning In BeOS, the tab label is determined from the view name. In Haiku, they can be
+		different if SetLabel() was used.
 
 	\since BeOS R3
 */
@@ -147,7 +149,9 @@
 
 /*!
 	\fn void BTab::SetLabel(const char* label)
-	\brief Sets the target view's name, and updates the BTab accordingly.
+	\brief Sets the tab label.
+	\warning In BeOS, setting the tab label also renamed the view attached to the tab. In Haiku,
+		this is not the case anymore, the label and view name are independant.
 
 	\since BeOS R3
 */
@@ -220,6 +224,9 @@
 /*!
 	\fn void BTab::SetView(BView* view)
 	\brief Sets the view to be displayed for this tab.
+
+	This also resets the tab label to match the view name (to preserve BeOS behavior).
+	If you need to use a different label, SetLabel must be called after SetView.
 */
 
 
