@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2017, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -997,6 +997,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 {
 	ASSERT_PRINT(vnode->ref_count == 0 && vnode->IsBusy(), "vnode: %p\n",
 		vnode);
+	ASSERT_PRINT(vnode->advisory_locking == NULL, "vnode: %p\n", vnode);
 
 	// write back any changes in this vnode's cache -- but only
 	// if the vnode won't be deleted, in which case the changes
@@ -9126,12 +9127,20 @@ _user_flock(int fd, int operation)
 	flock.l_type = (operation & LOCK_SH) != 0 ? F_RDLCK : F_WRLCK;
 
 	status_t status;
-	if ((operation & LOCK_UN) != 0)
-		status = release_advisory_lock(vnode, &flock);
-	else {
-		status = acquire_advisory_lock(vnode,
-			thread_get_current_thread()->team->session_id, &flock,
-			(operation & LOCK_NB) == 0);
+	if ((operation & LOCK_UN) != 0) {
+		if (HAS_FS_CALL(vnode, release_lock))
+			status = FS_CALL(vnode, release_lock, descriptor->cookie, &flock);
+		else
+			status = release_advisory_lock(vnode, &flock);
+	} else {
+		if (HAS_FS_CALL(vnode, acquire_lock)) {
+			status = FS_CALL(vnode, acquire_lock, descriptor->cookie, &flock,
+				(operation & LOCK_NB) == 0);
+		} else {
+			status = acquire_advisory_lock(vnode,
+				thread_get_current_thread()->team->session_id, &flock,
+				(operation & LOCK_NB) == 0);
+		}
 	}
 
 	syscall_restart_handle_post(status);
