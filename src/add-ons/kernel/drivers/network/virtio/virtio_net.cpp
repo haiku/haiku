@@ -1,18 +1,22 @@
 /*
- * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
+ * Copyright 2017, Philippe Houdoin, philippe.houdoin@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <ethernet.h>
-#include <virtio.h>
-
 #include <net/if_media.h>
 #include <new>
+
+#include <ethernet.h>
+#include <lock.h>
+#include <util/DoublyLinkedList.h>
+#include <virtio.h>
 
 #include "ether_driver.h"
 #define ETHER_ADDR_LEN	ETHER_ADDRESS_LENGTH
 #include "virtio_net.h"
+
 
 #define VIRTIO_NET_DRIVER_MODULE_NAME "drivers/network/virtio_net/driver_v1"
 #define VIRTIO_NET_DEVICE_MODULE_NAME "drivers/network/virtio_net/device_v1"
@@ -22,6 +26,32 @@
 // #define MAX_FRAME_SIZE	(BUFFER_SIZE - sizeof(virtio_net_hdr))
 #define MAX_FRAME_SIZE 1536
 
+
+struct virtio_net_rx_hdr {
+	struct virtio_net_hdr	hdr;
+	uint8					pad[4];
+} _PACKED;
+
+
+struct virtio_net_tx_hdr {
+	union {
+		struct virtio_net_hdr			hdr;
+		struct virtio_net_hdr_mrg_rxbuf mhdr;
+	};
+} _PACKED;
+
+
+struct BufInfo : DoublyLinkedListLinkImpl<BufInfo> {
+	char*					buffer;
+	struct virtio_net_hdr*	hdr;
+	physical_entry			entry;
+	physical_entry			hdrEntry;
+};
+
+
+typedef DoublyLinkedList<BufInfo> BufInfoList;
+
+
 typedef struct {
 	device_node*			node;
 	::virtio_device			virtio_device;
@@ -29,22 +59,27 @@ typedef struct {
 
 	uint32 					features;
 
-	uint32					pairs_count;
+	uint32					pairsCount;
 
-	virtio_net_hdr			hdr;
-	physical_entry			hdr_entry;
+	::virtio_queue*			rxQueues;
+	uint16*					rxSizes;
 
-	::virtio_queue*			rx_queues;
-	uint8					rx_buffer[2048];
-	physical_entry			rx_entry;
-	sem_id 					rx_done;
+	BufInfo**				rxBufInfos;
+	sem_id					rxDone;
+	area_id					rxArea;
+	BufInfoList				rxFullList;
+	mutex					rxLock;
 
-	::virtio_queue*			tx_queues;
-	uint8					tx_buffer[2048];
-	physical_entry			tx_entry;
-	sem_id 					tx_done;
+	::virtio_queue*			txQueues;
+	uint16*					txSizes;
 
-	::virtio_queue			ctrl_queue;
+	BufInfo**				txBufInfos;
+	sem_id					txDone;
+	area_id					txArea;
+	BufInfoList				txFreeList;
+	mutex					txLock;
+
+	::virtio_queue			ctrlQueue;
 
 	bool					nonblocking;
 	uint32					maxframesize;
@@ -78,11 +113,11 @@ typedef struct {
 static device_manager_info* sDeviceManager;
 
 
-static void virtio_net_rx_done(void* driverCookie, void* cookie);
-static void virtio_net_tx_done(void* driverCookie, void* cookie);
+static void virtio_net_rxDone(void* driverCookie, void* cookie);
+static void virtio_net_txDone(void* driverCookie, void* cookie);
 
 
-const char *
+const char*
 get_feature_name(uint32 feature)
 {
 	switch (feature) {
@@ -133,6 +168,58 @@ get_feature_name(uint32 feature)
 }
 
 
+static status_t
+virtio_net_drain_queues(virtio_net_driver_info* info)
+{
+	while (true) {
+		BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
+			info->txQueues[0], NULL);
+		if (buf == NULL)
+			break;
+		info->txFreeList.Add(buf);
+	}
+
+	while (true) {
+		BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
+			info->rxQueues[0], NULL);
+		if (buf == NULL)
+			break;
+	}
+
+	while (true) {
+		BufInfo* buf = info->rxFullList.RemoveHead();
+		if (buf == NULL)
+			break;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+virtio_net_rx_enqueue_buf(virtio_net_driver_info* info, BufInfo* buf)
+{
+	physical_entry entries[2];
+	entries[0] = buf->hdrEntry;
+	entries[1] = buf->entry;
+
+	memset(buf->hdr, 0, sizeof(struct virtio_net_hdr));
+
+	// queue the rx buffer
+	status_t status = info->virtio->queue_request_v(info->rxQueues[0],
+		entries, 0, 2, buf);
+	if (status != B_OK) {
+		ERROR("rx queueing on queue %d failed (%s)\n", 0, strerror(status));
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+#define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
+
+
 //	#pragma mark - device module API
 
 
@@ -143,8 +230,8 @@ virtio_net_init_device(void* _info, void** _cookie)
 	virtio_net_driver_info* info = (virtio_net_driver_info*)_info;
 
 	device_node* parent = sDeviceManager->get_parent_node(info->node);
-	sDeviceManager->get_driver(parent, (driver_module_info **)&info->virtio,
-		(void **)&info->virtio_device);
+	sDeviceManager->get_driver(parent, (driver_module_info**)&info->virtio,
+		(void**)&info->virtio_device);
 	sDeviceManager->put_node(parent);
 
 	info->virtio->negotiate_features(info->virtio_device,
@@ -156,19 +243,19 @@ virtio_net_init_device(void* _info, void** _cookie)
 			&& (info->features & VIRTIO_NET_F_CTRL_VQ) != 0
 			&& info->virtio->read_device_config(info->virtio_device,
 				offsetof(struct virtio_net_config, max_virtqueue_pairs),
-				&info->pairs_count, sizeof(info->pairs_count)) == B_OK) {
+				&info->pairsCount, sizeof(info->pairsCount)) == B_OK) {
 		system_info sysinfo;
 		if (get_system_info(&sysinfo) == B_OK
-			&& info->pairs_count > sysinfo.cpu_count) {
-			info->pairs_count = sysinfo.cpu_count;
+			&& info->pairsCount > sysinfo.cpu_count) {
+			info->pairsCount = sysinfo.cpu_count;
 		}
 	} else
-		info->pairs_count = 1;
+		info->pairsCount = 1;
 
 	// TODO read config
 
 	// Setup queues
-	uint32 queueCount = info->pairs_count * 2;
+	uint32 queueCount = info->pairsCount * 2;
 	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0)
 		queueCount++;
 	::virtio_queue virtioQueues[queueCount];
@@ -179,57 +266,146 @@ virtio_net_init_device(void* _info, void** _cookie)
 		return status;
 	}
 
-	info->rx_queues = new(std::nothrow) virtio_queue[info->pairs_count];
-	info->tx_queues = new(std::nothrow) virtio_queue[info->pairs_count];
-	if (info->rx_queues == NULL || info->tx_queues == NULL)
-		return B_NO_MEMORY;
-	for (uint32 i = 0; i < info->pairs_count; i++) {
-		info->rx_queues[i] = virtioQueues[i * 2];
-		info->tx_queues[i] = virtioQueues[i * 2 + 1];
+	char* rxBuffer;
+	char* txBuffer;
+	const size_t rxBufferSize = BUFFER_SIZE + sizeof(virtio_net_rx_hdr);
+	const size_t txBufferSize = BUFFER_SIZE + sizeof(virtio_net_tx_hdr);
+
+	info->rxQueues = new(std::nothrow) virtio_queue[info->pairsCount];
+	info->txQueues = new(std::nothrow) virtio_queue[info->pairsCount];
+	info->rxSizes = new(std::nothrow) uint16[info->pairsCount];
+	info->txSizes = new(std::nothrow) uint16[info->pairsCount];
+	if (info->rxQueues == NULL || info->txQueues == NULL
+		|| info->rxSizes == NULL || info->txSizes == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
+	for (uint32 i = 0; i < info->pairsCount; i++) {
+		info->rxQueues[i] = virtioQueues[i * 2];
+		info->txQueues[i] = virtioQueues[i * 2 + 1];
+		info->rxSizes[i] = info->virtio->queue_size(info->rxQueues[i]) / 2;
+		info->txSizes[i] = info->virtio->queue_size(info->txQueues[i]) / 2;
 	}
 	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0)
-		info->ctrl_queue = virtioQueues[info->pairs_count * 2];
+		info->ctrlQueue = virtioQueues[info->pairsCount * 2];
 
-	// Setup buffers
-	get_memory_map(&info->rx_buffer, sizeof(info->tx_buffer), &info->rx_entry, 1);
-	get_memory_map(&info->tx_buffer, sizeof(info->tx_buffer), &info->tx_entry, 1);
-	get_memory_map(&info->hdr, sizeof(info->hdr), &info->hdr_entry, 1);
+	info->rxBufInfos = new(std::nothrow) BufInfo*[info->rxSizes[0]];
+	info->txBufInfos = new(std::nothrow) BufInfo*[info->txSizes[0]];
+	if (info->rxBufInfos == NULL || info->txBufInfos == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+	memset(info->rxBufInfos, 0, sizeof(info->rxBufInfos));
+	memset(info->txBufInfos, 0, sizeof(info->txBufInfos));
+
+	// create receive buffer area
+	info->rxArea = create_area("virtionet rx buffer", (void**)&rxBuffer,
+		B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(
+			rxBufferSize * info->rxSizes[0]),
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (info->rxArea < B_OK) {
+		status = info->rxArea;
+		goto err3;
+	}
+
+	// initialize receive buffer descriptors
+	for (int i = 0; i < info->rxSizes[0]; i++) {
+		BufInfo* buf = new(std::nothrow) BufInfo;
+		if (buf == NULL) {
+			status = B_NO_MEMORY;
+			goto err4;
+		}
+		info->rxBufInfos[i] = buf;
+		buf->hdr = (struct virtio_net_hdr*)((addr_t)rxBuffer
+			+ i * rxBufferSize);
+		buf->buffer = (char*)((addr_t)buf->hdr + sizeof(virtio_net_rx_hdr));
+		get_memory_map(buf->buffer, BUFFER_SIZE, &buf->entry, 1);
+		get_memory_map(buf->hdr, sizeof(struct virtio_net_hdr),
+			&buf->hdrEntry, 1);
+	}
+
+	// create transmit buffer area
+	info->txArea = create_area("virtionet tx buffer", (void**)&txBuffer,
+		B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(
+			txBufferSize * info->txSizes[0]),
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (info->txArea < B_OK) {
+		status = info->txArea;
+		goto err5;
+	}
+
+	// initialize transmit buffer descriptors
+	for (int i = 0; i < info->txSizes[0]; i++) {
+		BufInfo* buf = new(std::nothrow) BufInfo;
+		if (buf == NULL) {
+			status = B_NO_MEMORY;
+			goto err6;
+		}
+		info->txBufInfos[i] = buf;
+		buf->hdr = (struct virtio_net_hdr*)((addr_t)txBuffer
+			+ i * txBufferSize);
+		buf->buffer = (char*)((addr_t)buf->hdr + sizeof(virtio_net_tx_hdr));
+		get_memory_map(buf->buffer, BUFFER_SIZE, &buf->entry, 1);
+		get_memory_map(buf->hdr, sizeof(struct virtio_net_hdr),
+			&buf->hdrEntry, 1);
+		info->txFreeList.Add(buf);
+	}
+
+	mutex_init(&info->rxLock, "virtionet rx lock");
+	mutex_init(&info->txLock, "virtionet tx lock");
 
 	// Setup interrupt
-	info->rx_done = create_sem(0, "virtio_net_rx");
-	info->tx_done = create_sem(0, "virtio_net_tx");
-
 	status = info->virtio->setup_interrupt(info->virtio_device, NULL, info);
 	if (status != B_OK) {
 		ERROR("interrupt setup failed (%s)\n", strerror(status));
-		return status;
+		goto err6;
 	}
 
-	status = info->virtio->queue_setup_interrupt(info->rx_queues[0],
-		virtio_net_rx_done, info);
+	status = info->virtio->queue_setup_interrupt(info->rxQueues[0],
+		virtio_net_rxDone, info);
 	if (status != B_OK) {
 		ERROR("queue interrupt setup failed (%s)\n", strerror(status));
-		return status;
+		goto err6;
 	}
 
-	status = info->virtio->queue_setup_interrupt(info->tx_queues[0],
-		virtio_net_tx_done, info);
+	status = info->virtio->queue_setup_interrupt(info->txQueues[0],
+		virtio_net_txDone, info);
 	if (status != B_OK) {
 		ERROR("queue interrupt setup failed (%s)\n", strerror(status));
-		return status;
+		goto err6;
 	}
 
 	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0) {
-		status = info->virtio->queue_setup_interrupt(info->ctrl_queue,
+		status = info->virtio->queue_setup_interrupt(info->ctrlQueue,
 			NULL, info);
 		if (status != B_OK) {
 			ERROR("queue interrupt setup failed (%s)\n", strerror(status));
-			return status;
+			goto err6;
 		}
 	}
 
 	*_cookie = info;
 	return B_OK;
+
+err6:
+	for (int i = 0; i < info->txSizes[0]; i++)
+		delete info->txBufInfos[i];
+err5:
+	delete_area(info->txArea);
+err4:
+	for (int i = 0; i < info->rxSizes[0]; i++)
+		delete info->rxBufInfos[i];
+err3:
+	delete_area(info->rxArea);
+err2:
+	delete[] info->rxBufInfos;
+	delete[] info->txBufInfos;
+err1:
+	delete[] info->rxQueues;
+	delete[] info->txQueues;
+	delete[] info->rxSizes;
+	delete[] info->txSizes;
+	return status;
 }
 
 
@@ -239,10 +415,33 @@ virtio_net_uninit_device(void* _cookie)
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)_cookie;
 
-	delete_sem(info->rx_done);
-	delete_sem(info->tx_done);
-	delete[] info->rx_queues;
-	delete[] info->tx_queues;
+	info->virtio->free_interrupts(info->virtio_device);
+
+	mutex_destroy(&info->rxLock);
+	mutex_destroy(&info->txLock);
+
+	while (true) {
+		BufInfo* buf = info->txFreeList.RemoveHead();
+		if (buf == NULL)
+			break;
+	}
+
+	for (int i = 0; i < info->rxSizes[0]; i++) {
+		delete info->rxBufInfos[i];
+	}
+	for (int i = 0; i < info->txSizes[0]; i++) {
+		delete info->txBufInfos[i];
+	}
+	delete_area(info->rxArea);
+	delete_area(info->txArea);
+	delete[] info->rxBufInfos;
+	delete[] info->txBufInfos;
+	delete[] info->rxSizes;
+	delete[] info->txSizes;
+	delete[] info->rxQueues;
+	delete[] info->txQueues;
+
+	info->virtio->free_queues(info->virtio_device);
 }
 
 
@@ -259,6 +458,10 @@ virtio_net_open(void* _info, const char* path, int openMode, void** _cookie)
 
 	info->nonblocking = (openMode & O_NONBLOCK) != 0;
 	info->maxframesize = MAX_FRAME_SIZE;
+	info->rxDone = create_sem(0, "virtio_net_rx");
+	info->txDone = create_sem(1, "virtio_net_tx");
+	if (info->rxDone < B_OK || info->txDone < B_OK)
+		goto error;
 	handle->info = info;
 
 	if ((info->features & VIRTIO_NET_F_MAC) != 0) {
@@ -267,16 +470,31 @@ virtio_net_open(void* _info, const char* path, int openMode, void** _cookie)
 			&info->macaddr, sizeof(info->macaddr));
 	}
 
+	for (int i = 0; i < info->rxSizes[0]; i++)
+		virtio_net_rx_enqueue_buf(info, info->rxBufInfos[i]);
+
 	*_cookie = handle;
 	return B_OK;
+
+error:
+	delete_sem(info->rxDone);
+	delete_sem(info->txDone);
+	info->rxDone = info->txDone = -1;
+	free(handle);
+	return B_ERROR;
 }
 
 
 static status_t
 virtio_net_close(void* cookie)
 {
-	//virtio_net_handle* handle = (virtio_net_handle*)cookie;
+	virtio_net_handle* handle = (virtio_net_handle*)cookie;
 	CALLED();
+
+	virtio_net_driver_info* info = handle->info;
+	delete_sem(info->rxDone);
+	delete_sem(info->txDone);
+	info->rxDone = info->txDone = -1;
 
 	return B_OK;
 }
@@ -288,19 +506,20 @@ virtio_net_free(void* cookie)
 	CALLED();
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
 
+	virtio_net_driver_info* info = handle->info;
+	virtio_net_drain_queues(info);
 	free(handle);
 	return B_OK;
 }
 
 
 static void
-virtio_net_rx_done(void* driverCookie, void* cookie)
+virtio_net_rxDone(void* driverCookie, void* cookie)
 {
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)cookie;
 
-	while (info->virtio->queue_dequeue(info->rx_queues[0], NULL) != NULL)
-		release_sem_etc(info->rx_done, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(info->rxDone, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -311,43 +530,50 @@ virtio_net_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
 	virtio_net_driver_info* info = handle->info;
 
-	// return B_ERROR;
+	mutex_lock(&info->rxLock);
+	while (info->rxFullList.Head() == NULL) {
+		mutex_unlock(&info->rxLock);
 
-	physical_entry entries[2];
-	entries[0] = info->hdr_entry;
-	entries[1] = info->rx_entry;
+		if (info->nonblocking)
+			return B_WOULD_BLOCK;
+		TRACE("virtio_net_read: waiting\n");
+		status_t status = acquire_sem(info->rxDone);
+		if (status != B_OK) {
+			ERROR("acquire_sem(rxDone) failed (%s)\n", strerror(status));
+			return status;
+		}
+		int32 semCount = 0;
+		get_sem_count(info->rxDone, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(info->rxDone, semCount, B_RELATIVE_TIMEOUT, 0);
 
-	memset(&info->hdr, 0, sizeof(info->hdr));
-
-	// queue the rx buffer
-	status_t status = info->virtio->queue_request_v(info->rx_queues[0],
-		entries, 0, 2, info);
-	if (status != B_OK) {
-		ERROR("rx queueing on queue %d failed (%s)\n", 0, strerror(status));
-		return status;
+		mutex_lock(&info->rxLock);
+		while (info->rxDone != -1) {
+			BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
+				info->rxQueues[0], NULL);
+			if (buf == NULL)
+				break;
+			info->rxFullList.Add(buf);
+		}
+		TRACE("virtio_net_read: finished waiting\n");
 	}
 
-	// wait for reception
-	status = acquire_sem(info->rx_done);
-	if (status != B_OK) {
-		ERROR("acquire_sem(rx_done) failed (%s)\n", strerror(status));
-		return status;
-	}
-
-	*_length = MIN(entries[1].size, *_length);
-	user_memcpy(buffer, &info->rx_buffer, *_length);
+	BufInfo* buf = info->rxFullList.RemoveHead();
+	*_length = MIN(buf->entry.size, *_length);
+	memcpy(buffer, buf->buffer, *_length);
+	virtio_net_rx_enqueue_buf(info, buf);
+	mutex_unlock(&info->rxLock);
 	return B_OK;
 }
 
 
 static void
-virtio_net_tx_done(void* driverCookie, void* cookie)
+virtio_net_txDone(void* driverCookie, void* cookie)
 {
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)cookie;
 
-	while (info->virtio->queue_dequeue(info->tx_queues[0], NULL) != NULL)
-		release_sem_etc(info->tx_done, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(info->txDone, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -359,31 +585,50 @@ virtio_net_write(void* cookie, off_t pos, const void* buffer,
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
 	virtio_net_driver_info* info = handle->info;
 
-	// legacy interface: one descriptor for all
-	// so we have no choice but to concat a virtio_net_hdr with buffer data
-	// together...
+	mutex_lock(&info->txLock);
+	while (info->txFreeList.Head() == NULL) {
+		mutex_unlock(&info->txLock);
+		if (info->nonblocking)
+			return B_WOULD_BLOCK;
+
+		status_t status = acquire_sem(info->txDone);
+		if (status != B_OK) {
+			ERROR("acquire_sem(txDone) failed (%s)\n", strerror(status));
+			return status;
+		}
+
+		int32 semCount = 0;
+		get_sem_count(info->txDone, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(info->txDone, semCount, B_RELATIVE_TIMEOUT, 0);
+
+		mutex_lock(&info->txLock);
+		while (info->txDone != -1) {
+			BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
+				info->txQueues[0], NULL);
+			if (buf == NULL)
+				break;
+			info->txFreeList.Add(buf);
+		}
+	}
+	BufInfo* buf = info->txFreeList.RemoveHead();
+
+	TRACE("virtio_net_write: copying %lu\n", MIN(MAX_FRAME_SIZE, *_length));
+	memcpy(buf->buffer, buffer, MIN(MAX_FRAME_SIZE, *_length));
+	memset(buf->hdr, 0, sizeof(virtio_net_hdr));
 
 	physical_entry entries[2];
-	entries[0] = info->hdr_entry;
+	entries[0] = buf->hdrEntry;
 	entries[0].size = sizeof(virtio_net_hdr);
-	entries[1] = info->tx_entry;
+	entries[1] = buf->entry;
 	entries[1].size = MIN(MAX_FRAME_SIZE, *_length);
 
-	memset(&info->hdr, 0, sizeof(info->hdr));
-	user_memcpy(&info->tx_buffer, buffer, MIN(MAX_FRAME_SIZE, *_length));
-
 	// queue the virtio_net_hdr + buffer data
-	status_t status = info->virtio->queue_request_v(info->tx_queues[0],
-		entries, 2, 0, info);
+	status_t status = info->virtio->queue_request_v(info->txQueues[0],
+		entries, 2, 0, buf);
+	mutex_unlock(&info->txLock);
 	if (status != B_OK) {
 		ERROR("tx queueing on queue %d failed (%s)\n", 0, strerror(status));
-		return status;
-	}
-
-	// wait for transmission done signal
-	status = acquire_sem_etc(info->tx_done, 1, B_RELATIVE_TIMEOUT, 100000);
-	if (status != B_OK) {
-		ERROR("acquire_sem(tx_done) failed (%s)\n", strerror(status));
 		return status;
 	}
 
@@ -420,7 +665,7 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			break;
 
 		case ETHER_NONBLOCK:
-			info->nonblocking = *(int32 *)buffer == 0;
+			info->nonblocking = *(int32*)buffer == 0;
 			TRACE("ioctl: non blocking ? %s\n", info->nonblocking ? "yes" : "no");
 			return B_OK;
 
@@ -464,10 +709,10 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 
 static float
-virtio_net_supports_device(device_node *parent)
+virtio_net_supports_device(device_node* parent)
 {
 	CALLED();
-	const char *bus;
+	const char* bus;
 	uint16 deviceType;
 
 	// make sure parent is really the Virtio bus manager
@@ -489,7 +734,7 @@ virtio_net_supports_device(device_node *parent)
 
 
 static status_t
-virtio_net_register_device(device_node *node)
+virtio_net_register_device(device_node* node)
 {
 	CALLED();
 
@@ -504,7 +749,7 @@ virtio_net_register_device(device_node *node)
 
 
 static status_t
-virtio_net_init_driver(device_node *node, void **cookie)
+virtio_net_init_driver(device_node* node, void** cookie)
 {
 	CALLED();
 
@@ -523,7 +768,7 @@ virtio_net_init_driver(device_node *node, void **cookie)
 
 
 static void
-virtio_net_uninit_driver(void *_cookie)
+virtio_net_uninit_driver(void* _cookie)
 {
 	CALLED();
 	virtio_net_driver_info* info = (virtio_net_driver_info*)_cookie;
