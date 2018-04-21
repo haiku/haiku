@@ -67,6 +67,6 @@ PanelFitter::_Enable(bool enable)
 {
 	uint32 targetRegister = fBaseRegister + PCH_PANEL_FITTER_CONTROL;
 	write32(targetRegister, read32(targetRegister) & ~PANEL_FITTER_ENABLED
-		| (enable ? PANEL_FITTER_ENABLED | 0));
+		| (enable ? PANEL_FITTER_ENABLED : 0));
 	read32(targetRegister);
 }
