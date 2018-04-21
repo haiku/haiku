@@ -263,6 +263,7 @@ struct ModelLoader::ExtendedThreadSchedulingState
 			if (modelRequest == NULL) {
 				for (size_t i = 0; i < index; i++)
 					requests[i]->Delete();
+				delete requests;
 				return false;
 			}
 
