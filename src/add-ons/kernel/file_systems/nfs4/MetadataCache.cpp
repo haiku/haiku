@@ -166,19 +166,19 @@ MetadataCache::NotifyChanges(const struct stat* oldStat,
 		flags |= B_STAT_GID;
 
 	if (memcmp(&oldStat->st_atim, &newStat->st_atim,
-		sizeof(struct timespec) == 0))
+		sizeof(struct timespec)) == 0)
 		flags |= B_STAT_ACCESS_TIME;
 
 	if (memcmp(&oldStat->st_ctim, &newStat->st_ctim,
-		sizeof(struct timespec) == 0))
+		sizeof(struct timespec)) == 0)
 		flags |= B_STAT_CHANGE_TIME;
 
 	if (memcmp(&oldStat->st_crtim, &newStat->st_crtim,
-		sizeof(struct timespec) == 0))
+		sizeof(struct timespec)) == 0)
 		flags |= B_STAT_CREATION_TIME;
 
 	if (memcmp(&oldStat->st_mtim, &newStat->st_mtim,
-		sizeof(struct timespec) == 0))
+		sizeof(struct timespec)) == 0)
 		flags |= B_STAT_MODIFICATION_TIME;
 
 	notify_stat_changed(fInode->GetFileSystem()->DevId(), -1, fInode->ID(),
