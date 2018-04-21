@@ -272,24 +272,24 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 
 	if (object->object_type != ACPI_TYPE_PACKAGE) {
 		dprintf("invalid _CST object\n");
-		return B_ERROR;
+		goto error;
 	}
 
 	if (object->data.package.count != 4) {
 		dprintf("invalid _CST number\n");
-		return B_ERROR;
+		goto error;
 	}
 
 	// type
 	acpi_object_type * pointer = &object->data.package.objects[1];
 	if (pointer->object_type != ACPI_TYPE_INTEGER) {
 		dprintf("invalid _CST elem type\n");
-		return B_ERROR;
+		goto error;
 	}
 	uint32 n = pointer->data.integer;
 	if (n < 1 || n > 3) {
 		dprintf("invalid _CST elem value\n");
-		return B_ERROR;
+		goto error;
 	}
 	ci->type = n;
 	dprintf("C%" B_PRId32 "\n", n);
@@ -299,7 +299,7 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 	pointer = &object->data.package.objects[2];
 	if (pointer->object_type != ACPI_TYPE_INTEGER) {
 		dprintf("invalid _CST elem type\n");
-		return B_ERROR;
+		goto error;
 	}
 	n = pointer->data.integer;
 	cState->latency = n;
@@ -309,7 +309,7 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 	pointer = &object->data.package.objects[3];
 	if (pointer->object_type != ACPI_TYPE_INTEGER) {
 		dprintf("invalid _CST elem type\n");
-		return B_ERROR;
+		goto error;
 	}
 	n = pointer->data.integer;
 	dprintf("power: %" B_PRId32 "\n", n);
@@ -318,11 +318,11 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 	pointer = &object->data.package.objects[0];
 	if (pointer->object_type != ACPI_TYPE_BUFFER) {
 		dprintf("invalid _CST elem type\n");
-		return B_ERROR;
+		goto error;
 	}
 	if (pointer->data.buffer.length < 15) {
 		dprintf("invalid _CST elem length\n");
-		return B_ERROR;
+		goto error;
 	}
 
 	struct acpicpu_reg *reg = (struct acpicpu_reg *)pointer->data.buffer.buffer;
@@ -331,11 +331,11 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 			dprintf("IO method\n");
 			if (reg->reg_addr == 0) {
 				dprintf("illegal address\n");
-				return B_ERROR;
+				goto error;
 			}
 			if (reg->reg_bitwidth != 8) {
 				dprintf("invalid source length\n");
-				return B_ERROR;
+				goto error;
 			}
 			ci->address = reg->reg_addr;
 			ci->method = ACPI_CSTATE_SYSIO;
@@ -361,6 +361,9 @@ acpi_cstate_add(acpi_object_type *object, CpuidleCstate *cState)
 	cState->EnterIdle = acpi_cstate_idle;
 
 	return B_OK;
+error:
+	free(ci);
+	return B_ERROR;
 }
 
 
