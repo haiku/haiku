@@ -85,6 +85,7 @@ typedef struct {
 	uint16	(*get_queue_ring_size)(void* cookie, uint16 queue);
 	status_t (*setup_queue)(void* cookie, uint16 queue, phys_addr_t phy);
 	status_t (*setup_interrupt)(void* cookie, uint16 queueCount);
+	status_t (*free_interrupt)(void* cookie);
 	void	(*notify_queue)(void* cookie, uint16 queue);
 } virtio_sim_interface;
 
@@ -104,8 +105,12 @@ typedef struct {
 	status_t (*alloc_queues)(virtio_device cookie, size_t count,
 		virtio_queue* queues);
 
+	void (*free_queues)(virtio_device cookie);
+
 	status_t (*setup_interrupt)(virtio_device cookie,
 		virtio_intr_func config_handler, void* driverCookie);
+
+	status_t (*free_interrupts)(virtio_device cookie);
 
 	status_t (*queue_setup_interrupt)(virtio_queue queue,
 		virtio_callback_func handler, void* cookie);

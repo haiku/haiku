@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -63,6 +63,7 @@ VirtioDevice::VirtioDevice(device_node *node)
 	fConfigHandler(NULL),
 	fDriverCookie(NULL)
 {
+	CALLED();
 	device_node *parent = gDeviceManager->get_parent_node(node);
 	fStatus = gDeviceManager->get_driver(parent,
 		(driver_module_info **)&fController, &fCookie);
@@ -86,10 +87,10 @@ VirtioDevice::VirtioDevice(device_node *node)
 
 VirtioDevice::~VirtioDevice()
 {
-	for (size_t index = 0; index < fQueueCount; index++) {
-		delete fQueues[index];
+	if (fQueues != NULL) {
+		_DestroyQueues(fQueueCount);
 	}
-	delete fQueues;
+	fController->set_status(fCookie, VIRTIO_CONFIG_STATUS_RESET);
 }
 
 
@@ -109,7 +110,7 @@ VirtioDevice::NegotiateFeatures(uint32 supported, uint32* negotiated,
 	if (status != B_OK)
 		return status;
 
-	DumpFeatures("read features", fFeatures, get_feature_name);
+	_DumpFeatures("read features", fFeatures, get_feature_name);
 
 	fFeatures &= supported;
 
@@ -119,7 +120,7 @@ VirtioDevice::NegotiateFeatures(uint32 supported, uint32* negotiated,
 
 	*negotiated = fFeatures;
 
-	DumpFeatures("negotiated features", fFeatures, get_feature_name);
+	_DumpFeatures("negotiated features", fFeatures, get_feature_name);
 
 	return fController->write_guest_features(fCookie, fFeatures);
 }
@@ -148,13 +149,11 @@ VirtioDevice::AllocateQueues(size_t count, virtio_queue *queues)
 	if (count > VIRTIO_VIRTQUEUES_MAX_COUNT || queues == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = B_OK;
 	fQueues = new(std::nothrow) VirtioQueue*[count];
-	if (fQueues == NULL) {
-		status = B_NO_MEMORY;
-		goto err;
-	}
+	if (fQueues == NULL)
+		return B_NO_MEMORY;
 
+	status_t status = B_OK;
 	fQueueCount = count;
 	for (size_t index = 0; index < count; index++) {
 		uint16 size = fController->get_queue_ring_size(fCookie, index);
@@ -163,14 +162,24 @@ VirtioDevice::AllocateQueues(size_t count, virtio_queue *queues)
 		status = B_NO_MEMORY;
 		if (fQueues[index] != NULL)
 			status = fQueues[index]->InitCheck();
-		if (status != B_OK)
-			goto err;
+		if (status != B_OK) {
+			_DestroyQueues(index + 1);
+			return status;
+		}
 	}
 
 	return B_OK;
+}
 
-err:
-	return status;
+
+void
+VirtioDevice::FreeQueues()
+{
+	if (fQueues != NULL)
+		_DestroyQueues(fQueueCount);
+
+	fController->set_status(fCookie, VIRTIO_CONFIG_STATUS_RESET);
+	fController->set_status(fCookie, VIRTIO_CONFIG_STATUS_DRIVER);
 }
 
 
@@ -189,6 +198,18 @@ VirtioDevice::SetupInterrupt(virtio_intr_func configHandler, void *driverCookie)
 	for (size_t index = 0; index < fQueueCount; index++)
 		fQueues[index]->EnableInterrupt();
 	return B_OK;
+}
+
+
+status_t
+VirtioDevice::FreeInterrupts()
+{
+	for (size_t index = 0; index < fQueueCount; index++)
+		fQueues[index]->DisableInterrupt();
+
+	fController->set_status(fCookie, VIRTIO_CONFIG_STATUS_DRIVER);
+
+	return fController->free_interrupt(fCookie);
 }
 
 
@@ -236,7 +257,18 @@ VirtioDevice::ConfigInterrupt()
 
 
 void
-VirtioDevice::DumpFeatures(const char* title, uint32 features,
+VirtioDevice::_DestroyQueues(size_t count)
+{
+	for (size_t i = 0; i < count; i++) {
+		delete fQueues[i];
+	}
+	delete[] fQueues;
+	fQueues = NULL;
+}
+
+
+void
+VirtioDevice::_DumpFeatures(const char* title, uint32 features,
 	const char* (*get_feature_name)(uint32))
 {
 	char features_string[512] = "";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -94,6 +94,15 @@ virtio_alloc_queues(virtio_device _device, size_t count, virtio_queue *queues)
 }
 
 
+void
+virtio_free_queues(virtio_device _device)
+{
+	CALLED();
+	VirtioDevice *device = (VirtioDevice *)_device;
+	device->FreeQueues();
+}
+
+
 status_t
 virtio_setup_interrupt(virtio_device _device, virtio_intr_func config_handler,
 	void *driverCookie)
@@ -101,6 +110,15 @@ virtio_setup_interrupt(virtio_device _device, virtio_intr_func config_handler,
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)_device;
 	return device->SetupInterrupt(config_handler, driverCookie);
+}
+
+
+status_t
+virtio_free_interrupts(virtio_device _device)
+{
+	CALLED();
+	VirtioDevice *device = (VirtioDevice *)_device;
+	return device->FreeInterrupts();
 }
 
 
@@ -260,7 +278,9 @@ virtio_device_interface virtio_device_module = {
 	virtio_read_device_config,
 	virtio_write_device_config,
 	virtio_alloc_queues,
+	virtio_free_queues,
 	virtio_setup_interrupt,
+	virtio_free_interrupts,
 	virtio_queue_setup_interrupt,
 	virtio_queue_request,
 	virtio_queue_request_v,

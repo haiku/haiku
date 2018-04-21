@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -390,6 +390,36 @@ setup_interrupt(void* cookie, uint16 queueCount)
 }
 
 
+status_t
+free_interrupt(void* cookie)
+{
+	CALLED();
+	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
+	pci_info *pciInfo = &bus->info;
+
+	if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
+		remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
+			bus);
+		int32 irq = bus->irq + 1;
+		for (int32 queue = 0; queue < bus->queue_count; queue++, irq++) {
+			remove_io_interrupt_handler(irq, virtio_pci_queue_interrupt,
+				&bus->cookies[queue]);
+		}
+		delete[] bus->cookies;
+
+	} else
+		remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
+
+	if (sPCIx86Module != NULL && bus->irq_type != VIRTIO_IRQ_LEGACY) {
+		sPCIx86Module->disable_msi(pciInfo->bus, pciInfo->device,
+			pciInfo->function);
+		sPCIx86Module->unconfigure_msi(pciInfo->bus, pciInfo->device,
+			pciInfo->function);
+	}
+	return B_OK;
+}
+
+
 void
 notify_queue(void* cookie, uint16 queue)
 {
@@ -640,6 +670,7 @@ static virtio_sim_interface gVirtioPCIDeviceModule = {
 	get_queue_ring_size,
 	setup_queue,
 	setup_interrupt,
+	free_interrupt,
 	notify_queue
 };
 

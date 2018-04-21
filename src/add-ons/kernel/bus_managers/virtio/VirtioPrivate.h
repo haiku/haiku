@@ -56,8 +56,10 @@ public:
 
 			status_t			AllocateQueues(size_t count,
 									virtio_queue *queues);
+			void				FreeQueues();
 			status_t			SetupInterrupt(virtio_intr_func config_handler,
 									void *driverCookie);
+			status_t			FreeInterrupts();
 
 			uint16				Alignment() const { return fAlignment; }
 			uint32				Features() const { return fFeatures; }
@@ -72,9 +74,11 @@ public:
 			status_t			ConfigInterrupt();
 
 private:
-			void				DumpFeatures(const char* title,
+			void				_DumpFeatures(const char* title,
 									uint32 features,
 									const char* (*get_feature_name)(uint32));
+			void				_DestroyQueues(size_t count);
+
 
 
 			device_node *		fNode;

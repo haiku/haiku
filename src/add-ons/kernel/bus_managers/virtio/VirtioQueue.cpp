@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
