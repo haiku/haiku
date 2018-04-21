@@ -727,7 +727,7 @@ uninit()
 	}
 
 	struct rules *rules = sRulesHash->Clear(true);
-	while ((rules != NULL) {
+	while (rules != NULL) {
 		Rule *rule = rules->first;
 		while (rule) {
 			Rule *next = rule->Next();
