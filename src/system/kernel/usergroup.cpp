@@ -218,7 +218,7 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 			if (!IS_USER_ADDRESS(groupList)
 				|| user_memcpy(newGroups, groupList,
 					sizeof(gid_t) * groupCount) != B_OK) {
-				free(newGroups);
+				malloc_referenced_release(newGroups);
 				return B_BAD_ADDRESS;
 			}
 		}
