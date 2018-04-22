@@ -272,7 +272,6 @@ device_get_flags(device_t dev)
 int
 device_set_driver(device_t dev, driver_t *driver)
 {
-	device_method_signature_t method = NULL;
 	int i;
 
 	dev->softc = malloc(driver->softc_size);
@@ -282,7 +281,7 @@ device_set_driver(device_t dev, driver_t *driver)
 	memset(dev->softc, 0, driver->softc_size);
 	dev->driver = driver;
 
-	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+	for (i = 0; driver->methods[i].name != NULL; i++) {
 		device_method_t *mth = &driver->methods[i];
 
 		if (strcmp(mth->name, "device_probe") == 0)
@@ -464,9 +463,7 @@ device_detach(device_t device)
 
 	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
 		&& device->methods.detach != NULL) {
-		int result = B_OK;
-
-		result = stop_wlan(device);
+		int result = stop_wlan(device);
 		if (result != 0) {
 			atomic_or(&device->flags, DEVICE_ATTACHED);
 			return result;
