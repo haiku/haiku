@@ -71,7 +71,7 @@ read_fdset(Context &context, void *data)
 	for (int i = 0; i < count && added < 8; i++) {
 		for (int j = 0;
 			 j < (int)(sizeof(unsigned long) * 8) && added < 8; j++) {
-			if (tmp[i] & (1 << j)) {
+			if (tmp[i] & (1UL << j)) {
 				if (added > 0)
 					r += " ";
 				unsigned int fd = i * sizeof(unsigned long) * 8 + j;
