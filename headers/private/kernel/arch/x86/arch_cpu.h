@@ -35,11 +35,13 @@
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_TSC					0x10
 #define IA32_MSR_APIC_BASE				0x1b
-
+#define IA32_MSR_SPEC_CTRL				0x48
+#define IA32_MSR_PRED_CMD				0x49
 #define IA32_MSR_PLATFORM_INFO			0xce
 #define IA32_MSR_MPERF					0xe7
 #define IA32_MSR_APERF					0xe8
 #define IA32_MSR_MTRR_CAPABILITIES		0xfe
+#define IA32_MSR_ARCH_CAPABILITIES		0x10a
 #define IA32_MSR_SYSENTER_CS			0x174
 #define IA32_MSR_SYSENTER_ESP			0x175
 #define IA32_MSR_SYSENTER_EIP			0x176
@@ -51,6 +53,12 @@
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
+// MSR SPEC CTRL bits
+#define IA32_MSR_SPEC_CTRL_IBRS			(1 << 0)
+#define IA32_MSR_SPEC_CTRL_STIBP		(1 << 1)
+
+// MSR PRED CMD bits
+#define IA32_MSR_PRED_CMD_IBPB			(1 << 0)
 
 // MSR APIC BASE bits
 #define IA32_MSR_APIC_BASE_BSP			0x00000100
@@ -62,6 +70,10 @@
 // reference
 #define IA32_MSR_EFER_SYSCALL			(1 << 0)
 #define IA32_MSR_EFER_NX				(1 << 11)
+
+// MSR ARCH CAPABILITIES bits
+#define IA32_MSR_ARCH_CAP_RDCL_NO		(1 << 0)
+#define IA32_MSR_ARCH_CAP_IBRS_ALL		(1 << 1)
 
 // X2APIC MSRs.
 #define IA32_MSR_APIC_ID					0x00000802
@@ -196,17 +208,17 @@
 
 // x86 defined features from cpuid eax 6, eax register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
-#define IA32_FEATURE_DTS	(1 << 0) //Digital Thermal Sensor
-#define IA32_FEATURE_ITB	(1 << 1) //Intel Turbo Boost Technology
-#define IA32_FEATURE_ARAT	(1 << 2) //Always running APIC Timer
-#define IA32_FEATURE_PLN	(1 << 4) //Power Limit Notification
-#define IA32_FEATURE_ECMD	(1 << 5) //Extended Clock Modulation Duty
-#define IA32_FEATURE_PTM	(1 << 6) //Package Thermal Management
+#define IA32_FEATURE_DTS	(1 << 0) // Digital Thermal Sensor
+#define IA32_FEATURE_ITB	(1 << 1) // Intel Turbo Boost Technology
+#define IA32_FEATURE_ARAT	(1 << 2) // Always running APIC Timer
+#define IA32_FEATURE_PLN	(1 << 4) // Power Limit Notification
+#define IA32_FEATURE_ECMD	(1 << 5) // Extended Clock Modulation Duty
+#define IA32_FEATURE_PTM	(1 << 6) // Package Thermal Management
 
 // x86 defined features from cpuid eax 6, ecx register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
-#define IA32_FEATURE_APERFMPERF	(1 << 0) //IA32_APERF, IA32_MPERF
-#define IA32_FEATURE_EPB	(1 << 3) //IA32_ENERGY_PERF_BIAS
+#define IA32_FEATURE_APERFMPERF	(1 << 0) // IA32_APERF, IA32_MPERF
+#define IA32_FEATURE_EPB	(1 << 3) // IA32_ENERGY_PERF_BIAS
 
 // x86 features from cpuid eax 7, ebx register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 3-8)
@@ -264,6 +276,7 @@
 #define IA32_FEATURE_AVX512_4FMAPS	(1 << 3) // AVX-512 4-register Multiply Accumulation Single precision
 #define IA32_FEATURE_IBRS			(1 << 26)	// IBRS / IBPB Speculation Control
 #define IA32_FEATURE_STIBP			(1 << 27)	// STIBP Speculation Control
+#define IA32_FEATURE_ARCH_CAPABILITIES	(1 << 29)	// IA32_ARCH_CAPABILITIES MSR
 
 
 // x86 defined features from cpuid eax 0x80000007, edx register
