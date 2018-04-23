@@ -241,7 +241,7 @@ struct BAbstractLayout::ViewProxy : Proxy {
 	bool IsVisible(bool ancestorsVisible) const
 	{
 		int16 showLevel = BView::Private(view).ShowLevel();
-		return (showLevel - (ancestorsVisible) ? 0 : 1) <= 0;
+		return (showLevel - (ancestorsVisible ? 0 : 1)) <= 0;
 	}
 
 	void SetVisible(bool visible)
