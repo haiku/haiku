@@ -315,9 +315,16 @@ module_dependency module_dependencies[] = {
 	{}
 };
 
+
+extern struct driver_module_info sVirtioBalloonDriver;
+extern struct driver_module_info sVirtioBalloonDeviceInterface;
+
+
 module_info *modules[] = {
 	(module_info *)&virtio_for_controller_module,
 	(module_info *)&virtio_device_module,
+	(module_info *)&sVirtioBalloonDriver,
+	(module_info *)&sVirtioBalloonDeviceInterface,
 	NULL
 };
 

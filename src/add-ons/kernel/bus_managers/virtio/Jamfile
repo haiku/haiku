@@ -7,4 +7,6 @@ KernelAddon virtio :
 	VirtioDevice.cpp
 	VirtioModule.cpp
 	VirtioQueue.cpp
+	VirtioBalloonDevice.cpp
+	virtio_balloon.cpp
 	;
