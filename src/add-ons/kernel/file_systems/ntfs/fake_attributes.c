@@ -274,6 +274,7 @@ fake_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	vnode *node = (vnode *)_node->private_node;
 
 	int	result = B_NO_ERROR;
+	ssize_t length;
 
 	LOCK_VOL(ns);
 
@@ -294,9 +295,13 @@ fake_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		goto	exit;
 	}
 
-	strncpy(buffer, node->mime + pos, *_length - 1);
-	((char *)buffer)[*_length - 1] = 0;
-	*_length = strlen(buffer) + 1;
+	length = user_strlcpy(buffer, node->mime + pos, *_length);
+	if (length < B_OK) {
+		result = B_BAD_ADDRESS;
+		goto exit;
+	}
+	if (length < *_length)
+		*_length = length + 1;
 
 exit:
 
