@@ -1514,7 +1514,7 @@ SendMessageCommandActuator::SendMessageCommandActuator(int32 argc, char** argv)
 		type_code tc = B_BOOL_TYPE;// default type when no value is present
 		const char* arg = argv[i];
 		BString argString(arg);
-		const char* equals = strchr(arg, ' = ');
+		const char* equals = strchr(arg, '=');
 		const char* value = "true";// default if no value is present
 
 		if (equals) {
