@@ -720,7 +720,7 @@ uninit()
 	// free all sessions from the hashes
 
 	team_rules *teamRules = sTeamHash->Clear(true);
-	while ((teamRules != NULL) {
+	while (teamRules != NULL) {
 		team_rules *next = teamRules->next;
 		delete teamRules;
 		teamRules = next;
