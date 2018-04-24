@@ -32,7 +32,7 @@ struct MountConfiguration {
 class FileSystem : public DoublyLinkedListLinkImpl<FileSystem> {
 public:
 	static	status_t			Mount(FileSystem** pfs, RPC::Server* serv,
-									const char* path, const char* serverName,
+									const char* serverName, const char* path,
 									dev_t id,
 									const MountConfiguration& configuration);
 								~FileSystem();
