@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2015-2018 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LAUNCH_ROSTER_H
@@ -56,6 +56,9 @@ public:
 			status_t			GetJobs(const char* target, BStringList& jobs);
 			status_t			GetJobInfo(const char* name, BMessage& info);
 
+			status_t			GetLog(BMessage& info);
+			status_t			GetLog(const BMessage& filter, BMessage& info);
+
 	class Private;
 
 private:
@@ -70,6 +73,7 @@ private:
 									uint32 flags = 0);
 			status_t			_GetInfo(uint32 what, const char* name,
 									BMessage& info);
+			status_t			_GetLog(const BMessage* filter, BMessage& info);
 
 private:
 			BMessenger			fMessenger;

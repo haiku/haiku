@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers launch ;
 
-UsePrivateHeaders app libroot shared storage support ;
+UsePrivateHeaders app kernel libroot shared storage support ;
 UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
@@ -13,6 +13,7 @@ Server launch_daemon
 	Conditions.cpp
 	Events.cpp
 	Job.cpp
+	Log.cpp
 	NetworkWatcher.cpp
 	SettingsParser.cpp
 	Target.cpp

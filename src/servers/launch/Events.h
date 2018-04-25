@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef EVENTS_H
@@ -35,7 +35,7 @@ public:
 									EventRegistrator& registrator) = 0;
 
 			bool				Triggered() const;
-	virtual	void				Trigger();
+	virtual	void				Trigger(Event* origin);
 	virtual	void				ResetTrigger();
 
 	virtual	BaseJob*			Owner() const;

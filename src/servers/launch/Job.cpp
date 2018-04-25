@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,7 +34,8 @@ Job::Job(const char* name)
 	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(NULL),
-	fPendingLaunchDataReplies(0, false)
+	fPendingLaunchDataReplies(0, false),
+	fTeamListener(NULL)
 {
 	mutex_init(&fLaunchStatusLock, "launch status lock");
 }
@@ -694,7 +695,7 @@ Job::_Launch(const char* signature, entry_ref* ref, int argCount,
 			resume_thread(mainThread);
 
 			if (fTeamListener != NULL)
-				fTeamListener->TeamLaunched(this);
+				fTeamListener->TeamLaunched(this, result);
 		} else
 			kill_thread(mainThread);
 	}

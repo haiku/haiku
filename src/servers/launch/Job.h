@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef JOB_H
@@ -34,7 +34,7 @@ typedef std::map<BString, BMessage> PortMap;
 
 class TeamListener {
 public:
-	virtual	void				TeamLaunched(Job* job) = 0;
+	virtual	void				TeamLaunched(Job* job, status_t status) = 0;
 };
 
 

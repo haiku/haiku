@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2015-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -338,6 +338,20 @@ BLaunchRoster::GetJobInfo(const char* name, BMessage& info)
 }
 
 
+status_t
+BLaunchRoster::GetLog(BMessage& info)
+{
+	return _GetLog(NULL, info);
+}
+
+
+status_t
+BLaunchRoster::GetLog(const BMessage& filter, BMessage& info)
+{
+	return _GetLog(&filter, info);
+}
+
+
 void
 BLaunchRoster::_InitMessenger()
 {
@@ -409,6 +423,20 @@ BLaunchRoster::_GetInfo(uint32 what, const char* name, BMessage& info)
 	status_t status = request.AddInt32("user", getuid());
 	if (status == B_OK)
 		status = request.AddString("name", name);
+	if (status != B_OK)
+		return status;
+
+	return _SendRequest(request, info);
+}
+
+
+status_t
+BLaunchRoster::_GetLog(const BMessage* filter, BMessage& info)
+{
+	BMessage request(B_GET_LAUNCH_LOG);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK && filter != NULL)
+		status = request.AddMessage("filter", filter);
 	if (status != B_OK)
 		return status;
 

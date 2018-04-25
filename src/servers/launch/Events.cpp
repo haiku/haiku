@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,7 +39,7 @@ public:
 	virtual	status_t			Register(EventRegistrator& registrator);
 	virtual	void				Unregister(EventRegistrator& registrator);
 
-	virtual	void				Trigger();
+	virtual	void				Trigger(Event* origin);
 
 	virtual	BaseJob*			Owner() const;
 	virtual	void				SetOwner(BaseJob* owner);
@@ -205,11 +205,11 @@ Event::Triggered() const
 
 
 void
-Event::Trigger()
+Event::Trigger(Event* origin)
 {
 	fTriggered = true;
 	if (fParent != NULL)
-		fParent->Trigger();
+		fParent->Trigger(origin);
 }
 
 
@@ -336,12 +336,13 @@ EventContainer::Unregister(EventRegistrator& registrator)
 
 
 void
-EventContainer::Trigger()
+EventContainer::Trigger(Event* origin)
 {
-	Event::Trigger();
+	Event::Trigger(origin);
 
 	if (Parent() == NULL && Owner() != NULL) {
 		BMessage message(kMsgEventTriggered);
+		message.AddPointer("event", origin);
 		message.AddString("owner", Owner()->Name());
 		fTarget.SendMessage(&message);
 	}
@@ -620,7 +621,7 @@ VolumeMountedEvent::ToString() const
 void
 VolumeMountedEvent::VolumeMounted(dev_t device)
 {
-	Trigger();
+	Trigger(this);
 }
 
 
@@ -667,7 +668,7 @@ void
 NetworkAvailableEvent::NetworkAvailabilityChanged(bool available)
 {
 	if (available)
-		Trigger();
+		Trigger(this);
 	else
 		ResetSticky();
 }
@@ -737,7 +738,7 @@ Events::TriggerExternalEvent(Event* event, const char* name)
 			Event* event = container->Events().ItemAt(index);
 			if (ExternalEvent* external = dynamic_cast<ExternalEvent*>(event)) {
 				if (external->Name() == name) {
-					external->Trigger();
+					external->Trigger(container);
 					return;
 				}
 			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
@@ -794,7 +795,7 @@ Events::TriggerDemand(Event* event, bool testOnly)
 				if (testOnly)
 					return true;
 
-				childEvent->Trigger();
+				childEvent->Trigger(childEvent);
 				break;
 			}
 			if (dynamic_cast<EventContainer*>(childEvent) != NULL) {

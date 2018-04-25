@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017, Haiku, Inc. All Rights Reserved.
+ * Copyright 2015-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,7 @@ enum {
 	B_GET_LAUNCH_JOBS			= 'lngj',
 	B_GET_LAUNCH_TARGET_INFO	= 'lntI',
 	B_GET_LAUNCH_JOB_INFO		= 'lnjI',
+	B_GET_LAUNCH_LOG			= 'lnLL',
 };
 
 
