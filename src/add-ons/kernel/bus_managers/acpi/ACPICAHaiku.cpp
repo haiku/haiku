@@ -1117,7 +1117,7 @@ AcpiOsReadable(void *pointer, ACPI_SIZE length)
 	if (id == B_ERROR) return false;
 	if (get_area_info(id, &info) != B_OK) return false;
 	return (info.protection & B_READ_AREA) != 0 &&
-			pointer + length <= info.address + info.ram_size;
+			((char *)pointer) + length <= info.address + info.ram_size;
 #endif
 }
 
@@ -1150,7 +1150,7 @@ AcpiOsWritable(void *pointer, ACPI_SIZE length)
 	if (get_area_info(id, &info) != B_OK) return false;
 	return (info.protection & B_READ_AREA) != 0 &&
 			(info.protection & B_WRITE_AREA) != 0 &&
-			pointer + length <= info.address + info.ram_size;
+			((char *)pointer) + length <= info.address + info.ram_size;
 #endif
 }
 
