@@ -462,6 +462,9 @@ Job::HandleGetLaunchData(BMessage* message)
 	if (IsLaunched())
 		return _SendLaunchDataReply(message);
 
+	if (!IsEnabled())
+		return B_NOT_ALLOWED;
+
 	return fPendingLaunchDataReplies.AddItem(message) ? B_OK : B_NO_MEMORY;
 }
 
