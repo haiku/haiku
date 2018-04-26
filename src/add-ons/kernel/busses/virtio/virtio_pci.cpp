@@ -238,15 +238,15 @@ write_device_config(void* cookie, uint8 _offset, const void* _buffer,
 		uint8 size = 4;
 		if (bufferSize == 1) {
 			size = 1;
-			bus->pci->write_pci_config(bus->device,
-			offset, size, *buffer);
+			bus->pci->write_io_8(bus->device,
+				offset, *buffer);
 		} else if (bufferSize <= 3) {
 			size = 2;
-			bus->pci->write_pci_config(bus->device,
-			offset, size, *(const uint16*)buffer);
+			bus->pci->write_io_16(bus->device,
+				offset, *(const uint16*)buffer);
 		} else {
-			bus->pci->write_pci_config(bus->device,
-				offset, size, *(const uint32*)buffer);
+			bus->pci->write_io_32(bus->device,
+				offset, *(const uint32*)buffer);
 		}
 		buffer += size;
 		bufferSize -= size;
