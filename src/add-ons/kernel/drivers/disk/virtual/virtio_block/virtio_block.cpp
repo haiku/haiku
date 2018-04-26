@@ -266,7 +266,7 @@ virtio_block_init_device(void* _info, void** _cookie)
 		(void **)&info->virtio_device);
 	sDeviceManager->put_node(parent);
 
-	info->virtio->negociate_features(info->virtio_device,
+	info->virtio->negotiate_features(info->virtio_device,
 		VIRTIO_BLK_F_BARRIER | VIRTIO_BLK_F_SIZE_MAX
 			| VIRTIO_BLK_F_SEG_MAX | VIRTIO_BLK_F_GEOMETRY
 			| VIRTIO_BLK_F_RO | VIRTIO_BLK_F_BLK_SIZE
