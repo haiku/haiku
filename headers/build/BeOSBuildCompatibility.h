@@ -7,9 +7,16 @@
 #	endif
 #endif
 
-#if defined(HAIKU_HOST_PLATFORM_CYGWIN) || defined(HAIKU_HOST_PLATFORM_SUNOS)
+// DEFFILEMODE is not available on Cygwin, SunOS and when building with musl c
+#if defined(HAIKU_HOST_PLATFORM_CYGWIN) || defined(HAIKU_HOST_PLATFORM_SUNOS) \
+	|| !defined(DEFFILEMODE)
 #ifndef DEFFILEMODE
 #define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
+#endif
+
+// There's no ALLPERMS when building with musl c
+#ifndef ALLPERMS
+#	define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)
 #endif
 
 #ifndef S_IUMSK
