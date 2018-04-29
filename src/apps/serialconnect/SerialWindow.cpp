@@ -187,7 +187,7 @@ SerialWindow::SerialWindow()
 	fStopbitsMenu->SetTargetForItems(be_app);
 
 	// Loop backwards to add fastest rates at top of menu
-	for (int i = sizeof(kBaudrates) / sizeof(kBaudrates[0]); --i >= 0;)
+	for (int i = std::size(kBaudrates); --i >= 0;)
 	{
 		message = new BMessage(kMsgSettings);
 		message->AddInt32("baudrate", kBaudrateConstants[i]);
