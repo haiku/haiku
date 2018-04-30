@@ -4,6 +4,7 @@ local architecture = $(TARGET_PACKAGING_ARCH) ;
 local haikuPackage = haiku_$(architecture).hpkg ;
 HaikuPackage $(haikuPackage) ;
 
+AddFilesToPackage $(architecture) : <$(architecture)>runtime_loader ;
 
 # libs
 AddLibrariesToPackage lib $(architecture)

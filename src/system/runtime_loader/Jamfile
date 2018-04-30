@@ -96,7 +96,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			utility.cpp
 		;
 
-		Objects $(sources) ;
+		Objects [ FGristFiles $(sources) ] ;
 
 		Ld [ MultiArchDefaultGristFiles runtime_loader ] :
 			[ FGristFiles $(sources:S=$(SUFOBJ)) ]
