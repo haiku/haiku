@@ -7,8 +7,12 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 
 		UsePrivateSystemHeaders ;
 
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
 		MergeObject <$(architecture)>posix_string_arch_$(TARGET_ARCH).o :
-			arch_string.S
+			[ MultiArchIfPrimary memcpy.c memset.c :
+				arch_string.S : x86_64 ]
 			;
+
 	}
 }
