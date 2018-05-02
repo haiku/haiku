@@ -242,7 +242,7 @@ FUNCTION_END(int_bottom)
 
 // Handler for an interrupt that occurred in user-mode.
 STATIC_FUNCTION(int_bottom_user):
-	// Load the kerrnel GS segment base.
+	// Load the kernel GS segment base.
 	swapgs
 
 	// Push the rest of the interrupt frame to the stack.
