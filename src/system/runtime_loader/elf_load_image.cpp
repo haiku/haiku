@@ -421,6 +421,61 @@ parse_elf_header(elf_ehdr* eheader, int32* _pheaderSize,
 }
 
 
+#if defined(_COMPAT_MODE)
+#if defined(__x86_64__)
+status_t
+parse_elf32_header(Elf32_Ehdr* eheader, int32* _pheaderSize,
+	int32* _sheaderSize)
+{
+	if (memcmp(eheader->e_ident, ELFMAG, 4) != 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	if (eheader->e_ident[4] != ELFCLASS32)
+		return B_NOT_AN_EXECUTABLE;
+
+	if (eheader->e_phoff == 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	if (eheader->e_phentsize < sizeof(Elf32_Phdr))
+		return B_NOT_AN_EXECUTABLE;
+
+	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
+	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
+
+	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	return B_OK;
+}
+#else
+status_t
+parse_elf64_header(Elf64_Ehdr* eheader, int32* _pheaderSize,
+	int32* _sheaderSize)
+{
+	if (memcmp(eheader->e_ident, ELFMAG, 4) != 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	if (eheader->e_ident[4] != ELFCLASS64)
+		return B_NOT_AN_EXECUTABLE;
+
+	if (eheader->e_phoff == 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	if (eheader->e_phentsize < sizeof(Elf64_Phdr))
+		return B_NOT_AN_EXECUTABLE;
+
+	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
+	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
+
+	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	return B_OK;
+}
+#endif	// __x86_64__
+#endif	// _COMPAT_MODE
+
+
 status_t
 load_image(char const* name, image_type type, const char* rpath,
 	const char* requestingObjectPath, image_t** _image)
@@ -574,6 +629,9 @@ load_image(char const* name, image_type type, const char* rpath,
 	// loading) we init the search path subdir if the compiler version doesn't
 	// match ours.
 	if (sSearchPathSubDir == NULL) {
+#if defined(_COMPAT_MODE) && !defined(__x86_64__)
+		sSearchPathSubDir = "x86";
+#else
 		#if __GNUC__ == 2
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
 				sSearchPathSubDir = "x86";
@@ -581,6 +639,7 @@ load_image(char const* name, image_type type, const char* rpath,
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2)
 				sSearchPathSubDir = "x86_gcc2";
 		#endif
+#endif
 	}
 
 	set_abi_version(image->abi);

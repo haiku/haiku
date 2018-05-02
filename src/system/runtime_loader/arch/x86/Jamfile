@@ -16,7 +16,12 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>atomic.o
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
 
-			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
+			[ MultiArchIfPrimary
+				<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
+				<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
+				:
+				<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
+				: x86_64 ]
 			;
 	}
 }

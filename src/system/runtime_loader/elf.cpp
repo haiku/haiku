@@ -1012,6 +1012,33 @@ elf_verify_header(void *header, size_t length)
 }
 
 
+#ifdef _COMPAT_MODE
+#ifdef __x86_64__
+status_t
+elf32_verify_header(void *header, size_t length)
+{
+	int32 programSize, sectionSize;
+
+	if (length < sizeof(Elf32_Ehdr))
+		return B_NOT_AN_EXECUTABLE;
+
+	return parse_elf32_header((Elf32_Ehdr *)header, &programSize, &sectionSize);
+}
+#else
+status_t
+elf64_verify_header(void *header, size_t length)
+{
+	int32 programSize, sectionSize;
+
+	if (length < sizeof(Elf64_Ehdr))
+		return B_NOT_AN_EXECUTABLE;
+
+	return parse_elf64_header((Elf64_Ehdr *)header, &programSize, &sectionSize);
+}
+#endif	// __x86_64__
+#endif	// _COMPAT_MODE
+
+
 void
 terminate_program(void)
 {

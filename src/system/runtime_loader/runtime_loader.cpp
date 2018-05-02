@@ -416,6 +416,15 @@ test_executable(const char *name, char *invoker)
 	}
 
 	status = elf_verify_header(buffer, length);
+#ifdef _COMPAT_MODE
+#ifdef __x86_64__
+	if (status == B_NOT_AN_EXECUTABLE)
+		status = elf32_verify_header(buffer, length);
+#else
+	if (status == B_NOT_AN_EXECUTABLE)
+		status = elf64_verify_header(buffer, length);
+#endif	// __x86_64__
+#endif	// _COMPAT_MODE
 	if (status == B_NOT_AN_EXECUTABLE) {
 		if (!strncmp(buffer, "#!", 2)) {
 			// test for shell scripts

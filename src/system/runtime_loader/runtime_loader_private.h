@@ -30,12 +30,17 @@
 #	define KTRACE(x...)
 #endif	// RUNTIME_LOADER_TRACING
 
-
+#if defined(_COMPAT_MODE) && !defined(__x86_64__)
+#define RLD_PREFIX "runtime_loader_compat: "
+#endif
+#ifndef RLD_PREFIX
+#define RLD_PREFIX "runtime_loader: "
+#endif
 #define FATAL(x...)							\
 	do {									\
-		dprintf("runtime_loader: " x);		\
+		dprintf(RLD_PREFIX x);		\
 		if (!gProgramLoaded)				\
-			printf("runtime_loader: " x);	\
+			printf(RLD_PREFIX x);	\
 	} while (false)
 
 
@@ -81,6 +86,13 @@ int resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 
 
 status_t elf_verify_header(void* header, size_t length);
+#ifdef _COMPAT_MODE
+#ifdef __x86_64__
+status_t elf32_verify_header(void *header, size_t length);
+#else
+status_t elf64_verify_header(void *header, size_t length);
+#endif	// __x86_64__
+#endif	// _COMPAT_MODE
 void rldelf_init(void);
 void rldexport_init(void);
 void set_abi_version(int abi_version);

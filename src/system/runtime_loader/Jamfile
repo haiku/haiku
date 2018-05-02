@@ -1,6 +1,11 @@
 SubDir HAIKU_TOP src system runtime_loader ;
 
 
+if $(TARGET_ARCH) = x86_64
+	&& ( x86 in $(HAIKU_ARCHS[2-]) || x86_gcc2 in $(HAIKU_ARCHS[2-]) ) {
+	DEFINES += _COMPAT_MODE ;
+}
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
