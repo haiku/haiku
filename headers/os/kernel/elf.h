@@ -152,7 +152,6 @@ typedef struct {
 #define EM_TINYJ		61 /* Advanced Logic Corp. TinyJ embedded processor */
 #define EM_X86_64		62 /* Advanced Micro Devices X86-64 processor */
 #define EM_PDSP			63 /* Sony DSP Processor */
-
 #define EM_FX66			66 /* Siemens FX66 microcontroller */
 #define EM_ST9PLUS		67 /* STMicroelectronics ST9+ 8/16 mc */
 #define EM_ST7			68 /* STmicroelectronics ST7 8 bit mc */
@@ -182,7 +181,20 @@ typedef struct {
 #define EM_OPENRISC		92 /* OpenRISC 32-bit embedded processor */
 #define EM_ARC_A5		93 /* ARC Cores Tangent-A5 */
 #define EM_XTENSA		94 /* Tensilica Xtensa Architecture */
-#define EM_NUM			95
+#define EM_VIDCORE		95 /* Alphamosaic VideoCore */
+#define EM_CR			103 /* Nat. Semi. CompactRISC microprocessor */
+#define EM_BLACKFIN		106 /* Analog Devices Blackfin (DSP) processor */
+#define EM_ARCA			109 /* Arca RISC Microprocessor */
+#define EM_VIDCORE3		137 /* Broadcom VideoCore III */
+#define EM_AARCH64		183 /* ARM 64 bit */
+#define EM_AVR32		185 /* AVR-32 */
+#define EM_STM8			186 /* ST STM8S */
+#define EM_CUDA			190 /* Nvidia CUDA */
+#define EM_VIDCORE5		198 /* Broadcom VideoCore V */
+#define EM_NORC			218 /* Nanoradio Optimized RISC */
+#define EM_AMDGPU		224 /* AMD GPU */
+#define EM_RISCV		243 /* RISC-V */
+#define EM_BPF			247 /* Linux kernel bpf virtual machine */
 
 /* architecture class (EI_CLASS) */
 #define ELFCLASSNONE	0

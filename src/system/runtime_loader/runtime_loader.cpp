@@ -658,8 +658,14 @@ get_executable_architecture(int fd, const char** _architecture)
 		case EM_ARM:
 			architecture = "arm";
 			break;
+		case EM_AARCH64:
+			architecture = "aarch64";
+			break;
 		case EM_X86_64:
 			architecture = "x86_64";
+			break;
+		case EM_RISCV:
+			architecture = "riscv";
 			break;
 	}
 
