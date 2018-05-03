@@ -383,8 +383,12 @@ get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
 					return "Core 2 Extreme";
 				return "Core 2";
 			}
-			if (model == 0x25)
+			if (model == 0x25) {
+				get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "i3") != NULL)
+					return "Core i3";
 				return "Core i5";
+			}
 			if (model == 0x1a || model == 0x1e) {
 				get_cpuid_model_string(cpuidName);
 				if (strcasestr(cpuidName, "Xeon") != NULL)
