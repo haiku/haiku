@@ -42,10 +42,10 @@ init_syscall_registers(void* dummy, int cpuNum)
 	// From this we get:
 	//  - Entry CS  = KERNEL_CODE_SELECTOR
 	//  - Entry SS  = KERNEL_CODE_SELECTOR + 8  = KERNEL_DATA_SELECTOR
-	//  - Return CS = KERNEL_DATA_SELECTOR + 16 = USER_CODE_SELECTOR
-	//  - Return SS = KERNEL_DATA_SELECTOR + 8  = USER_DATA_SLECTORG
-	x86_write_msr(IA32_MSR_STAR, ((uint64)(KERNEL_DATA_SELECTOR | 3) << 48)
-		| ((uint64)KERNEL_CODE_SELECTOR << 32));
+	//  - Return CS = USER32_CODE_SELECTOR + 16 = USER_CODE_SELECTOR
+	//  - Return SS = USER32_CODE_SELECTOR + 8  = USER_DATA_SELECTOR
+	x86_write_msr(IA32_MSR_STAR, ((uint64)(USER32_CODE_SELECTOR) << 48)
+		| ((uint64)(KERNEL_CODE_SELECTOR) << 32));
 }
 
 

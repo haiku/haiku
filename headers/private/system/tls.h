@@ -10,6 +10,7 @@
 
 
 #define TLS_SIZE (TLS_MAX_KEYS * sizeof(void *))
+#define TLS_COMPAT_SIZE (TLS_MAX_KEYS * sizeof(uint32))
 
 enum {
 	TLS_BASE_ADDRESS_SLOT = 0,

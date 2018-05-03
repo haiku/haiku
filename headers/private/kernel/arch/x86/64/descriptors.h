@@ -10,16 +10,18 @@
 // Note that the ordering of these is important to SYSCALL/SYSRET.
 #define KERNEL_CODE_SEGMENT		1
 #define KERNEL_DATA_SEGMENT		2
-#define USER_DATA_SEGMENT		3
-#define USER_CODE_SEGMENT		4
+#define USER32_CODE_SEGMENT		3
+#define USER_DATA_SEGMENT		4
+#define USER_CODE_SEGMENT		5
 
 #define BOOT_GDT_SEGMENT_COUNT	(USER_CODE_SEGMENT + 1)
 
 #define KERNEL_CODE_SELECTOR	((KERNEL_CODE_SEGMENT << 3) | DPL_KERNEL)
 #define KERNEL_DATA_SELECTOR	((KERNEL_DATA_SEGMENT << 3) | DPL_KERNEL)
 
-#define USER_CODE_SELECTOR	((USER_CODE_SEGMENT << 3) | DPL_USER)
-#define USER_DATA_SELECTOR	((USER_DATA_SEGMENT << 3) | DPL_USER)
+#define USER32_CODE_SELECTOR	((USER32_CODE_SEGMENT << 3) | DPL_USER)
+#define USER_CODE_SELECTOR		((USER_CODE_SEGMENT << 3) | DPL_USER)
+#define USER_DATA_SELECTOR		((USER_DATA_SEGMENT << 3) | DPL_USER)
 
 
 #ifndef _ASSEMBLER
@@ -88,6 +90,9 @@ set_segment_descriptor(segment_descriptor* desc, uint8 type, uint8 dpl)
 	desc->long_mode = (type & DT_CODE_EXECUTE_ONLY) ? 1 : 0;
 		// Must be set to 1 for code segments only.
 }
+
+
+unsigned x86_64_set_user_tls_segment_base(int cpu, addr_t base);
 
 
 #endif	/* _ASSEMBLER */
