@@ -189,7 +189,11 @@ public:
 
 	// add-on iteration
 	void EachAddon(bool (*)(const Model*, const char*, uint32 shortcut,
-		uint32 modifiers, bool primary, void*), void*, BStringList&);
+			uint32 modifiers, bool primary, void*, BContainerWindow*, BMenu*),
+		void*, BStringList&, BMenu*);
+
+	BMessage* AddOnMessage(int32);
+	entry_ref GetCurrentDirRef();
 
 	BPopUpMenu* ContextMenu();
 
@@ -342,6 +346,7 @@ private:
 
 	void _UpdateSelectionMIMEInfo();
 	void _AddFolderIcon();
+	void _PassMessageToAddOn(BMessage*);
 };
 
 

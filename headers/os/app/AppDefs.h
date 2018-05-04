@@ -69,6 +69,7 @@ enum {
 	B_ZOOM						= '_WZM',
 	B_COLORS_UPDATED			= '_CLU',
 	B_FONTS_UPDATED				= '_FNU',
+	B_TRACKER_ADDON_MESSAGE		= '_TAM',
 	_APP_MENU_					= '_AMN',
 	_BROWSER_MENUS_				= '_BRM',
 	_MENU_EVENT_				= '_MEV',
