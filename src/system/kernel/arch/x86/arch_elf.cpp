@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2018, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -37,7 +37,8 @@ is_in_image(struct elf_image_info *image, addr_t address)
 #endif	// !_BOOT_MODE
 
 
-#if !defined(__x86_64__) || (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
+#if !defined(__x86_64__) || defined(ELF32_COMPAT)	\
+	 || (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
 
 
 #ifdef TRACE_ARCH_ELF
@@ -67,11 +68,11 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 	struct elf_image_info *resolveImage, Elf32_Rel *rel, int relLength)
 #endif
 {
-	addr_t S;
-	addr_t A;
-	addr_t P;
-	addr_t finalAddress;
-	addr_t *resolveAddress;
+	elf_addr S;
+	uint32 A;
+	uint32 P;
+	uint32 finalAddress;
+	uint32 *resolveAddress;
 	int i;
 
 	S = A = P = 0;
@@ -112,7 +113,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			case R_386_RELATIVE:
 			case R_386_GOTOFF:
 			case R_386_GOTPC:
-				A = *(addr_t *)(image->text_region.delta + rel[i].r_offset);
+				A = *(uint32 *)(image->text_region.delta + rel[i].r_offset);
 				TRACE(("A %p\n", (void *)A));
 				break;
 		}
@@ -151,7 +152,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 				return B_BAD_DATA;
 		}
 
-		resolveAddress = (addr_t *)(image->text_region.delta + rel[i].r_offset);
+		resolveAddress = (uint32 *)(image->text_region.delta + rel[i].r_offset);
 #ifndef _BOOT_MODE
 		if (!is_in_image(image, (addr_t)resolveAddress)) {
 			dprintf("arch_elf_relocate_rel: invalid offset %#lx\n",
@@ -160,8 +161,8 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 		}
 #endif
 		*resolveAddress = finalAddress;
-		TRACE(("-> offset %#lx = %#lx\n",
-			(image->text_region.delta + rel[i].r_offset), finalAddress));
+		TRACE(("-> offset %#lx (%#lx) = %#lx\n",
+			(image->text_region.delta + rel[i].r_offset), rel[i].r_offset, finalAddress));
 	}
 
 	return B_NO_ERROR;
@@ -183,10 +184,10 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// !__x86_64__ || (_BOOT_MODE && _BOOT_PLATFORM != efi)
+#endif	// !__x86_64__ || defined(ELF32_COMPAT) ||  (_BOOT_MODE && _BOOT_PLATFORM != efi)
 
 
-#if defined(__x86_64__) || defined(_BOOT_MODE)
+#if (defined(__x86_64__) && !defined(ELF32_COMPAT)) || defined(_BOOT_MODE)
 
 
 #ifdef _BOOT_MODE
@@ -276,4 +277,4 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// __x86_64__ || _BOOT_MODE
+#endif	// (defined(__x86_64__) && !defined(ELF32_COMPAT)) || defined(_BOOT_MODE)

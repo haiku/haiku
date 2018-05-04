@@ -47,7 +47,7 @@
 #define R_X86_64_IRELATIVE			37	/* Adjust indirectly by program base. */
 
 
-#ifdef _BOOT_MODE
+#if defined(_BOOT_MODE) || defined(ELF32_COMPAT)
 # include "../x86/arch_elf.h"
 #endif
 

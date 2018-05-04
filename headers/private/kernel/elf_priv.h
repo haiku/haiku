@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2018, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -81,7 +81,7 @@ extern "C" {
 
 extern status_t elf_resolve_symbol(struct elf_image_info* image,
 	elf_sym* symbol, struct elf_image_info* sharedImage,
-	addr_t* _symbolAddress);
+	elf_addr* _symbolAddress);
 
 #ifdef __cplusplus
 }

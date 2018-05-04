@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2018 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -27,8 +27,13 @@ struct elf_symbol_info {
 extern "C" {
 #endif
 
-status_t elf_load_user_image(const char *path, Team *team, int flags,
+status_t elf_load_user_image(const char *path, Team *team, uint32 flags,
 	addr_t *_entry);
+#ifdef _COMPAT_MODE
+#define	ELF_LOAD_USER_IMAGE_TEST_EXECUTABLE		0x1
+status_t elf32_load_user_image(const char *path, Team *team, uint32 flags,
+	addr_t *_entry);
+#endif
 
 // these two might get public one day:
 image_id load_kernel_add_on(const char *path);

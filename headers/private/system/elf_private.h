@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2018 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001 Travis Geiselbrecht. All rights reserved.
@@ -18,7 +18,7 @@
 
 // Determine the correct ELF types to use for the architecture
 
-#if B_HAIKU_64_BIT
+#if defined(B_HAIKU_64_BIT) && !defined(ELF32_COMPAT)
 #	define _ELF_TYPE(type)	Elf64_##type
 #else
 #	define _ELF_TYPE(type)	Elf32_##type
@@ -26,6 +26,7 @@
 #define DEFINE_ELF_TYPE(type, name) \
 	typedef _ELF_TYPE(type) name
 
+DEFINE_ELF_TYPE(Addr, elf_addr);
 DEFINE_ELF_TYPE(Ehdr, elf_ehdr);
 DEFINE_ELF_TYPE(Phdr, elf_phdr);
 DEFINE_ELF_TYPE(Shdr, elf_shdr);
@@ -48,7 +49,7 @@ DEFINE_ELF_TYPE(Note_Thread_Entry, elf_note_thread_entry);
 
 typedef uint16 elf_versym;
 
-#if B_HAIKU_64_BIT
+#if defined(B_HAIKU_64_BIT) && !defined(ELF32_COMPAT)
 #	define ELF_CLASS	ELFCLASS64
 #else
 #	define ELF_CLASS	ELFCLASS32
