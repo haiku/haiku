@@ -467,7 +467,7 @@ PackageWriterImpl::Init(const char* fileName,
 		return _Init(NULL, false, fileName, parameters);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -482,7 +482,7 @@ PackageWriterImpl::Init(BPositionIO* file, bool keepFile,
 		return _Init(file, keepFile, NULL, parameters);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -574,7 +574,7 @@ PackageWriterImpl::AddEntry(const char* fileName, int fd)
 		return _RegisterEntry(fileName, fd);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -614,7 +614,7 @@ PackageWriterImpl::Finish()
 		return _Finish();
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -631,7 +631,7 @@ PackageWriterImpl::Recompress(BPositionIO* inputFile)
 		return _Recompress(inputFile);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}

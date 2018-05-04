@@ -245,7 +245,7 @@ ArchitectureX86::Init()
 				sizeof(x86_xmm_register));
 		}
 
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 

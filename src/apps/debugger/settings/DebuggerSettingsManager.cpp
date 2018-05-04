@@ -78,7 +78,7 @@ DebuggerSettingsManager::LoadTeamSettings(const char* teamName, TeamSettings& se
 	try {
 		settings = *fRecentTeamSettings.ItemAt(index);
 		return B_OK;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 }
@@ -112,7 +112,7 @@ DebuggerSettingsManager::SaveTeamSettings(const TeamSettings& _settings)
 		settingsDeleter.Detach();
 
 		return _SaveSettings();
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 }

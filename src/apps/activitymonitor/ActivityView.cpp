@@ -1423,7 +1423,7 @@ ActivityView::_DrawHistory(bool drawBackground)
 				prev.Set(x, y);
 			}
 
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc&) {
 			// Not enough memory to allocate the line array.
 			// TODO we could try to draw using the slower but less memory
 			// consuming solution using StrokeLine.

@@ -94,7 +94,7 @@ ShapePainter::IterateMoveTo(BPoint* point)
 	try {
 		fOpStack.push(OP_MOVETO);
 		fPtStack.push(*point);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 
@@ -109,7 +109,7 @@ ShapePainter::IterateLineTo(int32 lineCount, BPoint* linePts)
 		fOpStack.push(OP_LINETO | lineCount);
 		for (int32 i = 0; i < lineCount; i++)
 			fPtStack.push(linePts[i]);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 
@@ -125,7 +125,7 @@ ShapePainter::IterateBezierTo(int32 bezierCount, BPoint* bezierPts)
 		fOpStack.push(OP_BEZIERTO | bezierCount);
 		for (int32 i = 0; i < bezierCount; i++)
 			fPtStack.push(bezierPts[i]);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 
@@ -155,7 +155,7 @@ ShapePainter::IterateArcTo(float& rx, float& ry,
 		fPtStack.push(BPoint(rx, ry));
 		fPtStack.push(BPoint(angle, 0));
 		fPtStack.push(point);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 
@@ -168,7 +168,7 @@ ShapePainter::IterateClose()
 {
 	try {
 		fOpStack.push(OP_CLOSE);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 

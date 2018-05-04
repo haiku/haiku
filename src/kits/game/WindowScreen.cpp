@@ -623,7 +623,7 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		fWorkState = true;
 
 		status = B_OK;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		status = B_NO_MEMORY;
 	} catch (status_t error) {
 		status = error;

@@ -273,7 +273,7 @@ ArchitectureX8664::Init()
 		_AddSIMDRegister(X86_64_REGISTER_XMM15, "xmm15",
 			sizeof(x86_64_xmm_register));
 
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 

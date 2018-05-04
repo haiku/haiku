@@ -272,7 +272,7 @@ split_path(const char *fullPath, char **path, char **leaf)
 			memcpy(*leaf, fullPath + leafStart, len);
 			(*leaf)[len] = 0;
 		}
-	} catch (std::bad_alloc exception) {
+	} catch (std::bad_alloc& exception) {
 		if (path)
 			delete[] *path;
 		if (leaf)

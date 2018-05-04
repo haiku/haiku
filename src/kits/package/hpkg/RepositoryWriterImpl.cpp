@@ -212,7 +212,7 @@ RepositoryWriterImpl::Init(const char* fileName)
 		return _Init(fileName);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -226,7 +226,7 @@ RepositoryWriterImpl::AddPackage(const BEntry& packageEntry)
 		return _AddPackage(packageEntry);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -240,7 +240,7 @@ RepositoryWriterImpl::AddPackageInfo(const BPackageInfo& packageInfo)
 		return _AddPackageInfo(packageInfo);
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
@@ -254,7 +254,7 @@ RepositoryWriterImpl::Finish()
 		return _Finish();
 	} catch (status_t error) {
 		return error;
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}

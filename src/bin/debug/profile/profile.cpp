@@ -477,7 +477,7 @@ private:
 
 		try {
 			fImages[sharedImage->Name()] = sharedImage;
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc&) {
 			return B_NO_MEMORY;
 		}
 

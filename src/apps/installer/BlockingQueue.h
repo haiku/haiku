@@ -118,7 +118,7 @@ BlockingQueue<Element>::Push(Element* element)
 		return B_NO_INIT;
 	try {
 		fElements.push_back(element);
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		return B_NO_MEMORY;
 	}
 	status_t error = release_sem(fElementSemaphore);

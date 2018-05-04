@@ -302,7 +302,7 @@ PartitionMapHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 		|| type == B_PROPERTIES_PARAMETER_EDITOR) {
 		try {
 			*editor = new PrimaryPartitionEditor();
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc&) {
 			return B_NO_MEMORY;
 		}
 		return B_OK;

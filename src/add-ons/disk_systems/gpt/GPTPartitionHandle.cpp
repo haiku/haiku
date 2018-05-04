@@ -155,7 +155,7 @@ GPTPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	if (type == B_CREATE_PARAMETER_EDITOR) {
 		try {
 			*editor = new BPartitionParameterEditor();
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc&) {
 			return B_NO_MEMORY;
 		}
 		return B_OK;

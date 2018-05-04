@@ -380,7 +380,7 @@ InstalledTypes::_BuildInstalledTypesList()
 	try {
 		fCachedMessage = new BMessage();
 		fCachedSupertypesMessage = new BMessage();
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		err = B_NO_MEMORY;
 	}
 
@@ -479,7 +479,7 @@ InstalledTypes::_CreateMessageWithTypes(BMessage **_result) const
 	// Alloc the message
 	try {
 		*_result = new BMessage();
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		err = B_NO_MEMORY;
 	}
 
@@ -511,7 +511,7 @@ InstalledTypes::_CreateMessageWithSupertypes(BMessage **_result) const
 	// Alloc the message
 	try {
 		*_result = new BMessage();
-	} catch (std::bad_alloc) {
+	} catch (std::bad_alloc&) {
 		err = B_NO_MEMORY;
 	}
 

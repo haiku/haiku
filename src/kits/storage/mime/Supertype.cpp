@@ -153,7 +153,7 @@ Supertype::CreateMessageWithTypes(BMessage **result) const
 	if (!err) {
 		try {
 			*result = new BMessage();
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc&) {
 			err = B_NO_MEMORY;
 		}
 	}
