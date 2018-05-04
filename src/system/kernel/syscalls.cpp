@@ -77,6 +77,11 @@ static mutex sGenericSyscallLock = MUTEX_INITIALIZER("generic syscall");
 static GenericSyscallList sGenericSyscalls;
 
 
+status_t _user_generic_syscall(const char* userSubsystem, uint32 function,
+	void* buffer, size_t bufferSize);
+int _user_is_computer_on(void);
+
+
 #if SYSCALL_TRACING
 static int dump_syscall_tracing(int argc, char** argv);
 #endif
@@ -104,7 +109,7 @@ find_generic_syscall(const char* subsystem)
 	the subsystem does not support the requested function.
 	All other return codes are depending on the generic syscall implementation.
 */
-static inline status_t
+status_t
 _user_generic_syscall(const char* userSubsystem, uint32 function,
 	void* buffer, size_t bufferSize)
 {
@@ -175,7 +180,7 @@ _user_generic_syscall(const char* userSubsystem, uint32 function,
 }
 
 
-static inline int
+int
 _user_is_computer_on(void)
 {
 	return 1;
