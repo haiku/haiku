@@ -80,6 +80,18 @@ dummy()
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, function);
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, parameter_size);
 
+	// struct extended_syscall_info
+	DEFINE_SIZEOF_MACRO(EXTENDED_SYSCALL_INFO, extended_syscall_info);
+	DEFINE_OFFSET_MACRO(EXTENDED_SYSCALL_INFO, extended_syscall_info,
+		parameter_count);
+	DEFINE_OFFSET_MACRO(EXTENDED_SYSCALL_INFO, extended_syscall_info,
+		parameters);
+
+	// struct syscall_parameter_info
+	DEFINE_SIZEOF_MACRO(SYSCALL_PARAMETER_INFO, syscall_parameter_info);
+	DEFINE_OFFSET_MACRO(SYSCALL_PARAMETER_INFO, syscall_parameter_info,
+		used_size);
+
 	// struct signal_frame_data
 	DEFINE_SIZEOF_MACRO(SIGNAL_FRAME_DATA, signal_frame_data);
 	DEFINE_OFFSET_MACRO(SIGNAL_FRAME_DATA, signal_frame_data, info);
