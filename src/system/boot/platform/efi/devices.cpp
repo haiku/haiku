@@ -488,8 +488,10 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 	NodeIterator iterator = partitions->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition*)iterator.Next()) != NULL) {
-		if (device_contains_partition((EfiDevice*)bootDevice, partition))
+		if (device_contains_partition((EfiDevice*)bootDevice, partition)) {
+			iterator.Remove();
 			bootPartitions->Insert(partition);
+		}
 	}
 
 	return bootPartitions->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
