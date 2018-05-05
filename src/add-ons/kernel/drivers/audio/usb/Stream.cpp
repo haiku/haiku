@@ -8,6 +8,7 @@
 
 #include "Stream.h"
 
+#include <kernel.h>
 #include <usb/USB_audio.h>
 
 #include "Device.h"
@@ -176,7 +177,7 @@ Stream::_SetupBuffers()
 		fArea = create_area( (fIsInput) ? DRIVER_NAME "_record_area"
 			: DRIVER_NAME "_playback_area", (void**)&fDescriptors,
 			B_ANY_KERNEL_ADDRESS, fAreaSize, B_CONTIGUOUS,
-			B_READ_AREA | B_WRITE_AREA);
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 		if (fArea < 0) {
 			TRACE(ERR, "Error of creating %#x - "
@@ -480,24 +481,29 @@ Stream::GetBuffers(multi_buffer_list* List)
 	for (size_t buffer = 0; buffer < kSamplesBufferCount; buffer++) {
 		TRACE(DTA, "%s buffer #%d:\n", fIsInput ? "input" : "output", buffer + 1);
 
+		struct buffer_desc descs[format->fNumChannels];
 		for (size_t channel = startChannel;
 				channel < format->fNumChannels; channel++) {
 			// init stride to the same for all buffers
 			uint32 stride = format->fSubframeSize * format->fNumChannels;
-			Buffers[buffer][channel].stride = stride;
+			descs[channel].stride = stride;
 
 			// init to buffers area begin
-			Buffers[buffer][channel].base
+			descs[channel].base
 				= (char*)(fDescriptors + fDescriptorsCount);
 			// shift for whole buffer if required
 			size_t bufferSize = fPacketSize/*endpoint->fMaxPacketSize*/
 				* (fDescriptorsCount / kSamplesBufferCount);
-			Buffers[buffer][channel].base += buffer * bufferSize;
+			descs[channel].base += buffer * bufferSize;
 			// shift for channel if required
-			Buffers[buffer][channel].base += channel * format->fSubframeSize;
+			descs[channel].base += channel * format->fSubframeSize;
 
 			TRACE(DTA, "%d:%d: base:%#010x; stride:%#010x\n", buffer, channel,
-				Buffers[buffer][channel].base, Buffers[buffer][channel].stride);
+				descs[channel].base, descs[channel].stride);
+		}
+		if (!IS_USER_ADDRESS(Buffers[buffer])
+			|| user_memcpy(Buffers[buffer], descs, sizeof(descs)) < B_OK) {
+			return B_BAD_ADDRESS;
 		}
 	}
 

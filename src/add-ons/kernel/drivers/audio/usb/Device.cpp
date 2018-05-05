@@ -8,6 +8,7 @@
 
 #include "Device.h"
 
+#include <kernel.h>
 #include <usb/USB_audio.h>
 
 #include "Driver.h"
@@ -128,8 +129,31 @@ Device::Control(uint32 op, void* buffer, size_t length)
 {
 	switch (op) {
 		case B_MULTI_GET_DESCRIPTION:
-			return _MultiGetDescription((multi_description*)buffer);
+		{
+			multi_description description;
+			multi_channel_info channels[16];
+			multi_channel_info* originalChannels;
 
+			if (user_memcpy(&description, buffer, sizeof(multi_description))
+					!= B_OK)
+				return B_BAD_ADDRESS;
+
+			originalChannels = description.channels;
+			description.channels = channels;
+			if (description.request_channel_count > 16)
+				description.request_channel_count = 16;
+
+			status_t status = _MultiGetDescription(&description);
+			if (status != B_OK)
+				return status;
+
+			description.channels = originalChannels;
+			if (user_memcpy(buffer, &description, sizeof(multi_description))
+					!= B_OK)
+				return B_BAD_ADDRESS;
+			return user_memcpy(originalChannels, channels,
+				sizeof(multi_channel_info) * description.request_channel_count);
+		}
 		case B_MULTI_GET_EVENT_INFO:
 			TRACE(ERR, "B_MULTI_GET_EVENT_INFO n/i\n");
 			return B_ERROR;
@@ -143,17 +167,84 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return B_ERROR;
 
 		case B_MULTI_GET_ENABLED_CHANNELS:
-			return _MultiGetEnabledChannels((multi_channel_enable*)buffer);
+		{
+			multi_channel_enable* data = (multi_channel_enable*)buffer;
+			multi_channel_enable enable;
+			uint32 enable_bits;
+			uchar* orig_enable_bits;
 
+			if (user_memcpy(&enable, data, sizeof(enable)) != B_OK
+				|| !IS_USER_ADDRESS(enable.enable_bits)) {
+				return B_BAD_ADDRESS;
+			}
+
+			orig_enable_bits = enable.enable_bits;
+			enable.enable_bits = (uchar*)&enable_bits;
+			status_t status = _MultiGetEnabledChannels(&enable);
+			if (status != B_OK)
+				return status;
+
+			enable.enable_bits = orig_enable_bits;
+			if (user_memcpy(enable.enable_bits, &enable_bits,
+					sizeof(enable_bits)) != B_OK
+				|| user_memcpy(buffer, &enable,
+					sizeof(multi_channel_enable)) != B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			return B_OK;
+		}
 		case B_MULTI_SET_ENABLED_CHANNELS:
-			return _MultiSetEnabledChannels((multi_channel_enable*)buffer);
+		{
+			multi_channel_enable enable;
+			uint32 enable_bits;
+			uchar* orig_enable_bits;
 
+			if (user_memcpy(&enable, buffer, sizeof(enable)) != B_OK
+				|| !IS_USER_ADDRESS(enable.enable_bits)) {
+				return B_BAD_ADDRESS;
+			}
+
+			orig_enable_bits = enable.enable_bits;
+			enable.enable_bits = (uchar*)&enable_bits;
+			status_t status = _MultiSetEnabledChannels(&enable);
+			if (status != B_OK)
+				return status;
+
+			enable.enable_bits = orig_enable_bits;
+			if (user_memcpy(enable.enable_bits, &enable_bits,
+					sizeof(enable_bits)) < B_OK
+				|| user_memcpy(buffer, &enable, sizeof(multi_channel_enable))
+					< B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			return B_OK;
+		}
 		case B_MULTI_GET_GLOBAL_FORMAT:
-			return _MultiGetGlobalFormat((multi_format_info*)buffer);
+		{
+			multi_format_info info;
+			if (user_memcpy(&info, buffer, sizeof(multi_format_info)) != B_OK)
+				return B_BAD_ADDRESS;
 
+			status_t status = _MultiGetGlobalFormat(&info);
+			if (status != B_OK)
+				return B_OK;
+			if (user_memcpy(buffer, &info, sizeof(multi_format_info)) != B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
 		case B_MULTI_SET_GLOBAL_FORMAT:
-			return _MultiSetGlobalFormat((multi_format_info*)buffer);
+		{
+			multi_format_info info;
+			if (user_memcpy(&info, buffer, sizeof(multi_format_info)) != B_OK)
+				return B_BAD_ADDRESS;
 
+			status_t status = _MultiSetGlobalFormat(&info);
+			if (status != B_OK)
+				return B_OK;
+			return user_memcpy(buffer, &info, sizeof(multi_format_info));
+		}
 		case B_MULTI_GET_CHANNEL_FORMATS:
 			TRACE(ERR, "B_MULTI_GET_CHANNEL_FORMATS n/i\n");
 			return B_ERROR;
@@ -173,15 +264,95 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return B_ERROR;
 
 		case B_MULTI_LIST_MIX_CONTROLS:
-			return _MultiListMixControls((multi_mix_control_info*)buffer);
+		{
+			multi_mix_control_info info;
+			multi_mix_control* original_controls;
+			size_t allocSize;
+			multi_mix_control *controls;
 
+			if (user_memcpy(&info, buffer, sizeof(multi_mix_control_info))
+				!= B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			original_controls = info.controls;
+			allocSize = sizeof(multi_mix_control) * info.control_count;
+			controls = (multi_mix_control *)malloc(allocSize);
+			if (controls == NULL)
+				return B_NO_MEMORY;
+
+			if (!IS_USER_ADDRESS(info.controls)
+				|| user_memcpy(controls, info.controls, allocSize) < B_OK) {
+				free(controls);
+				return B_BAD_ADDRESS;
+			}
+			info.controls = controls;
+
+			status_t status = _MultiListMixControls(&info);
+			if (status != B_OK) {
+				free(controls);
+				return status;
+			}
+
+			info.controls = original_controls;
+			status = user_memcpy(info.controls, controls, allocSize);
+			if (status == B_OK) {
+				status = user_memcpy(buffer, &info,
+					sizeof(multi_mix_control_info));
+			}
+			if (status != B_OK)
+				status = B_BAD_ADDRESS;
+			free(controls);
+			return status;
+		}
 		case B_MULTI_LIST_MIX_CONNECTIONS:
 			TRACE(ERR, "B_MULTI_LIST_MIX_CONNECTIONS n/i\n");
 			return B_ERROR;
 
 		case B_MULTI_GET_BUFFERS:
 			// Fill out the struct for the first time; doesn't start anything.
-			return _MultiGetBuffers((multi_buffer_list*)buffer);
+		{
+			multi_buffer_list list;
+			if (user_memcpy(&list, buffer, sizeof(multi_buffer_list)) != B_OK)
+				return B_BAD_ADDRESS;
+			buffer_desc **original_playback_descs = list.playback_buffers;
+			buffer_desc **original_record_descs = list.record_buffers;
+
+			buffer_desc *playback_descs[list.request_playback_buffers];
+			buffer_desc *record_descs[list.request_record_buffers];
+
+			if (!IS_USER_ADDRESS(list.playback_buffers)
+				|| user_memcpy(playback_descs, list.playback_buffers,
+					sizeof(buffer_desc*) * list.request_playback_buffers)
+					< B_OK
+				|| !IS_USER_ADDRESS(list.record_buffers)
+				|| user_memcpy(record_descs, list.record_buffers,
+					sizeof(buffer_desc*) * list.request_record_buffers)
+					< B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			list.playback_buffers = playback_descs;
+			list.record_buffers = record_descs;
+			status_t status = _MultiGetBuffers(&list);
+			if (status != B_OK)
+				return status;
+
+			list.playback_buffers = original_playback_descs;
+			list.record_buffers = original_record_descs;
+
+			if (user_memcpy(buffer, &list, sizeof(multi_buffer_list)) < B_OK
+				|| user_memcpy(original_playback_descs, playback_descs,
+					sizeof(buffer_desc*) * list.request_playback_buffers)
+					< B_OK
+				|| user_memcpy(original_record_descs, record_descs,
+					sizeof(buffer_desc*) * list.request_record_buffers)
+					< B_OK) {
+				status = B_BAD_ADDRESS;
+			}
+
+			return status;
+		}
 
 		case B_MULTI_SET_BUFFERS:
 			// Set what buffers to use, if the driver supports soft buffers.
@@ -488,6 +659,7 @@ Device::_MultiGetBuffers(multi_buffer_list* List)
 		List->return_record_channels,
 		List->return_record_buffer_size);
 
+#if 0
 	TRACE(API, "playback buffers\n");
 	for (int32_t b = 0; b <  List->return_playback_buffers; b++)
 		for (int32 c = 0; c < List->return_playback_channels; c++)
@@ -499,7 +671,7 @@ Device::_MultiGetBuffers(multi_buffer_list* List)
 		for (int32 c = 0; c < List->return_record_channels; c++)
 			TRACE(API, "%d:%d %08x:%d\n", b, c, List->record_buffers[b][c].base,
 				List->record_buffers[b][c].stride);
-
+#endif
 	return B_OK;
 }
 
@@ -508,8 +680,10 @@ status_t
 Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 {
 	multi_buffer_info Info;
-	if (user_memcpy(&Info, multiInfo, sizeof(multi_buffer_info)) != B_OK)
+	if (!IS_USER_ADDRESS(multiInfo)
+		|| user_memcpy(&Info, multiInfo, sizeof(multi_buffer_info)) != B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
 	for (int i = 0; i < fStreams.Count(); i++)
 		if (!fStreams[i]->IsRunning())
