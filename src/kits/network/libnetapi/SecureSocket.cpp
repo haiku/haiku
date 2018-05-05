@@ -207,12 +207,39 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 			// Probably no certificate
 			return B_NOT_ALLOWED;
 
+		case SSL_ERROR_SYSCALL:
+		{
+			unsigned long error2;
+			// Check for extra errors in the error stack...
+			for(;;) {
+				error2 = ERR_get_error();
+				if (error2 == 0)
+					break;
+				fprintf(stderr, "SSL ERR %s\n", ERR_error_string(error2, NULL));
+			}
+
+			if (returnValue == 0)
+			{
+				// unexpected EOF, the remote host closed the socket without
+				// telling us why.
+				return ECONNREFUSED;
+			}
+
+			if (returnValue == -1)
+			{
+				fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
+				return errno;
+			}
+
+			fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
+			return B_ERROR;
+		}
+
 		case SSL_ERROR_WANT_READ:
 		case SSL_ERROR_WANT_WRITE:
 		case SSL_ERROR_WANT_CONNECT:
 		case SSL_ERROR_WANT_ACCEPT:
 		case SSL_ERROR_WANT_X509_LOOKUP:
-		case SSL_ERROR_SYSCALL:
 		default:
 			// TODO: translate SSL error codes!
 			fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
@@ -334,7 +361,7 @@ BSecureSocket::Private::_CreateContext()
 	// Setup cipher suites.
 	// Only accept reasonably secure ones ("HIGH") and disable some known
 	// broken stuff (https://wiki.openssl.org/index.php/SSL/TLS_Client)
-	SSL_CTX_set_cipher_list(sContext, "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4");
+	SSL_CTX_set_cipher_list(sContext, "HIGH:!aNULL:!PSK:!SRP:!MD5:!RC4");
 
 	SSL_CTX_set_ecdh_auto(sContext, 1);
 
