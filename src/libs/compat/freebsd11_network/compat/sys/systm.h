@@ -99,5 +99,6 @@ void free_unr(struct unrhdr *, u_int);
 
 extern char *getenv(const char *name);
 extern void    freeenv(char *env);
+extern char *kern_getenv(const char *name);
 
 #endif	/* _FBSD_COMPAT_SYS_SYSTM_H_ */

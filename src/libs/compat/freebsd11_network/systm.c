@@ -18,3 +18,11 @@ getenv(const char *name)
 {
 	return NULL;
 }
+
+
+char *
+kern_getenv(const char *name)
+{
+	return NULL;
+}
+
