@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -20,6 +21,9 @@
 #include <boot_item.h>
 #include <boot_splash.h>
 #include <commpage.h>
+#ifdef _COMPAT_MODE
+#	include <commpage_compat.h>
+#endif
 #include <condition_variable.h>
 #include <cpu.h>
 #include <debug.h>
@@ -163,6 +167,9 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
 		commpage_init();
+#ifdef _COMPAT_MODE
+		commpage_compat_init();
+#endif
 		call_all_cpus_sync(non_boot_cpu_init, &sKernelArgs);
 
 		TRACE("init system info\n");
@@ -285,6 +292,9 @@ main2(void* /*unused*/)
 	boot_splash_init(sKernelArgs.boot_splash);
 
 	commpage_init_post_cpus();
+#ifdef _COMPAT_MODE
+	commpage_compat_init_post_cpus();
+#endif
 
 	TRACE("init ports\n");
 	port_init(&sKernelArgs);

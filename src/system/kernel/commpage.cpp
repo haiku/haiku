@@ -1,9 +1,15 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2007, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
+
+#ifdef COMMPAGE_COMPAT
+#include <commpage_compat.h>
+#else
 #include <commpage.h>
+#endif
 
 #include <string.h>
 
@@ -13,9 +19,12 @@
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 
+#ifndef ADDRESS_TYPE
+#define ADDRESS_TYPE addr_t
+#endif
 
 static area_id	sCommPageArea;
-static addr_t*	sCommPageAddress;
+static ADDRESS_TYPE*	sCommPageAddress;
 static void*	sFreeCommPageSpace;
 static image_id	sCommPageImage;
 
@@ -54,7 +63,8 @@ get_commpage_image()
 area_id
 clone_commpage_area(team_id team, void** address)
 {
-	*address = (void*)KERNEL_USER_DATA_BASE;
+	if (*address == NULL)
+		*address = (void*)KERNEL_USER_DATA_BASE;
 	return vm_clone_area(team, "commpage", address,
 		B_RANDOMIZED_BASE_ADDRESS, B_READ_AREA | B_EXECUTE_AREA | B_KERNEL_AREA,
 		REGION_PRIVATE_MAP, sCommPageArea, true);

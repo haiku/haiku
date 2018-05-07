@@ -10,6 +10,9 @@
 
 #include <arch/real_time_clock.h>
 #include <commpage.h>
+#ifdef _COMPAT_MODE
+#	include <commpage_compat.h>
+#endif
 #include <real_time_clock.h>
 #include <real_time_data.h>
 #include <syscalls.h>
@@ -30,6 +33,9 @@
 	// January 1st, 1970
 
 static struct real_time_data *sRealTimeData;
+#ifdef _COMPAT_MODE
+static struct real_time_data *sRealTimeDataCompat;
+#endif
 static bool sIsGMT = false;
 static bigtime_t sTimezoneOffset = 0;
 static char sTimezoneName[B_FILE_NAME_LENGTH] = "GMT";
@@ -101,8 +107,15 @@ rtc_init(kernel_args *args)
 {
 	sRealTimeData = (struct real_time_data*)allocate_commpage_entry(
 		COMMPAGE_ENTRY_REAL_TIME_DATA, sizeof(struct real_time_data));
-
 	arch_rtc_init(args, sRealTimeData);
+
+#ifdef _COMPAT_MODE
+	sRealTimeDataCompat = (struct real_time_data*)
+		allocate_commpage_compat_entry(COMMPAGE_ENTRY_REAL_TIME_DATA,
+		sizeof(struct real_time_data));
+	arch_rtc_init(args, sRealTimeDataCompat);
+#endif
+
 	rtc_hw_to_system();
 
 	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
@@ -116,7 +129,12 @@ rtc_init(kernel_args *args)
 void
 set_real_time_clock_usecs(bigtime_t currentTime)
 {
-	arch_rtc_set_system_time_offset(sRealTimeData, currentTime - system_time());
+	arch_rtc_set_system_time_offset(sRealTimeData, currentTime
+		- system_time());
+#ifdef _COMPAT_MODE
+	arch_rtc_set_system_time_offset(sRealTimeDataCompat, currentTime
+		- system_time());
+#endif
 	rtc_system_to_hw();
 	real_time_clock_changed();
 }
@@ -257,6 +275,11 @@ _user_set_timezone(int32 timezoneOffset, const char *name, size_t nameLength)
 		arch_rtc_set_system_time_offset(sRealTimeData,
 			arch_rtc_get_system_time_offset(sRealTimeData) + sTimezoneOffset
 				- offset);
+#ifdef _COMPAT_MODE
+		arch_rtc_set_system_time_offset(sRealTimeDataCompat,
+			arch_rtc_get_system_time_offset(sRealTimeDataCompat)
+				+ sTimezoneOffset - offset);
+#endif
 		real_time_clock_changed();
 	}
 
@@ -302,6 +325,11 @@ _user_set_real_time_clock_is_gmt(bool isGMT)
 		arch_rtc_set_system_time_offset(sRealTimeData,
 			arch_rtc_get_system_time_offset(sRealTimeData)
 				+ (sIsGMT ? 1 : -1) * sTimezoneOffset);
+#ifdef _COMPAT_MODE
+		arch_rtc_set_system_time_offset(sRealTimeDataCompat,
+			arch_rtc_get_system_time_offset(sRealTimeDataCompat)
+				+ (sIsGMT ? 1 : -1) * sTimezoneOffset);
+#endif
 		real_time_clock_changed();
 	}
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018 Haiku Inc. All Rights Reserved.
  * Copyright 2007, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -19,6 +20,10 @@
 #define COMMPAGE_SIGNATURE 'COMM'
 #define COMMPAGE_VERSION 1
 
+#ifdef COMMPAGE_COMPAT
+#include <arch/x86/arch_commpage_defs.h>
+#else
 #include <arch_commpage_defs.h>
+#endif
 
 #endif	/* _SYSTEM_COMMPAGE_DEFS_H */
