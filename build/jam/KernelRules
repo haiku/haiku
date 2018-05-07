@@ -51,7 +51,7 @@ rule KernelLd
 		libs += [ TargetKernelLibsupc++ true ] ;
 		Depends $(1) : [ TargetKernelLibsupc++ ] ;
 	}
-	LINKLIBS on $(1) =  $(libs) [ TargetKernelLibgcc true ] ;
+	LINKLIBS on $(1) = $(libs) [ TargetKernelLibgcc true ] ;
 	Depends $(1) : [ TargetKernelLibgcc ] ;
 
 	HAIKU_TARGET_IS_EXECUTABLE on $(1) = 1 ;
@@ -164,7 +164,7 @@ rule KernelMergeObject
 
 rule KernelStaticLibrary
 {
-	# Usage KernelStaticLibrary <name> : <sources> : <extra cc flags>  ;
+	# Usage KernelStaticLibrary <name> : <sources> : <extra cc flags> ;
 	# This is designed to take a set of sources and libraries and create
 	# a static library.
 

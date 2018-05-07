@@ -364,6 +364,5 @@ rule InheritPlatform
 
 rule SubDirAsFlags
 {
-        SUBDIRASFLAGS += $(<) ;
+	SUBDIRASFLAGS += $(<) ;
 }
-

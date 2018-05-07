@@ -424,7 +424,7 @@ rule AddWifiFirmwareToContainer container : driver : package : archive : extract
 		ExtractArchiveToContainer $(container) : $(dirTokens)
 			: $(firmwareArchive) : : $(package) ;
 	} else {
-		AddFilesToContainer $(container) : $(dirTokens) : $(firmwareArchive)  ;
+		AddFilesToContainer $(container) : $(dirTokens) : $(firmwareArchive) ;
 	}
 }
 
@@ -886,7 +886,7 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 	AddVariableToScript $(script) : updateAllPackages
 		: $(HAIKU_UPDATE_ALL_PACKAGES) ;
 
-	# Add variable "systemPackages"  with the packages copied/updated.
+	# Add variable "systemPackages" with the packages copied/updated.
 	local allPackages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
 	if $(updateOnly) && ! [ IncludeAllTargetsInContainer $(container) ] {
 		allPackages = [ FilterContainerUpdateTargets $(allPackages)
@@ -1182,7 +1182,7 @@ rule InstallSourceArchive file : url
 rule InstallOptionalHaikuImagePackage url : dirTokens : flags
 {
 	# TODO: Remove the non-hpkg cases!
-	# Currently the semantics differs depending on whether the  cdPackage flag
+	# Currently the semantics differs depending on whether the cdPackage flag
 	# has been specified and the type of the package file:
 	# * For a hpkg <dirTokens> is ignored. The package will be copied into the
 	#   system/packages directory.
@@ -1415,7 +1415,7 @@ rule CreateNetBootArchiveCopyFilesScript script
 
 rule BuildNetBootArchive archive : scripts
 {
-	# BuildNetBootArchive <archive> : <scripts>  ;
+	# BuildNetBootArchive <archive> : <scripts> ;
 
 	local mainScript = build_archive ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
@@ -1506,7 +1506,7 @@ rule CreateFloppyBootArchiveCopyFilesScript script
 
 rule BuildFloppyBootArchive archive : scripts
 {
-	# BuildHFloppyBootArchive <archive> : <scripts>  ;
+	# BuildHFloppyBootArchive <archive> : <scripts> ;
 
 	local mainScript = build_archive ;
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
@@ -1595,7 +1595,7 @@ actions BuildCDBootImage1
 {
 	$(RM) $(<)
 	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-]) \
-		|| genisoimage  -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
+		|| genisoimage -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
 }
 
 
@@ -1638,5 +1638,3 @@ actions BuildCDBootPPCImage1 bind MAPS
 		boot/haikuloader.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
 }
-
-

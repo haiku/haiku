@@ -158,7 +158,7 @@ HAIKU_IMAGE_EARLY_USER_SCRIPTS	= $(HAIKU_TOP)/../early-image-script.sh ;
 HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
 
 # Set name and real name of the root user. Defaults to "baron" and "Root User".
-HAIKU_ROOT_USER_NAME = bond  ;
+HAIKU_ROOT_USER_NAME = bond ;
 HAIKU_ROOT_USER_REAL_NAME = "James Bond" ;
 
 # Set host name to "mybox". By default the installation doesn't have a host

@@ -49,7 +49,7 @@ if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
 			;
 
 		EnableBuildFeatures gcc_syslibs ;
-	} else  {
+	} else {
 		Echo "gcc_syslibs not available for $(TARGET_PACKAGING_ARCH)" ;
 	}
 }
@@ -85,7 +85,7 @@ if [ IsPackageAvailable gcc_syslibs_devel ] {
 	}
 
 	EnableBuildFeatures gcc_syslibs_devel ;
-} else  {
+} else {
 	Echo "gcc_syslibs_devel not available for $(TARGET_PACKAGING_ARCH)" ;
 }
 
@@ -110,7 +110,7 @@ if [ IsPackageAvailable icu_devel ] {
 		;
 
 	EnableBuildFeatures icu ;
-} else  {
+} else {
 	Echo "ICU not available for $(TARGET_PACKAGING_ARCH)" ;
 }
 
@@ -128,7 +128,7 @@ if [ IsPackageAvailable curl_devel ] {
 		;
 
 	EnableBuildFeatures curl ;
-} else  {
+} else {
 	Echo "Curl not available for $(TARGET_PACKAGING_ARCH)" ;
 }
 
@@ -665,7 +665,7 @@ if [ IsPackageAvailable live555_devel ] {
 				$(developHeadersDir)/UsageEnvironment
 		;
 	EnableBuildFeatures live555 ;
-} else  {
+} else {
 	Echo "live555 not available for $(TARGET_PACKAGING_ARCH)" ;
 }
 

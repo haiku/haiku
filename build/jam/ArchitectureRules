@@ -355,8 +355,8 @@ rule KernelArchitectureSetup architecture
 			# Workaround for ld using 32k for alignment despite forcing it in the config...
 			# should definitely not be needed!
 			HAIKU_KERNEL_LINKFLAGS +=
-			    -Wl,-z -Wl,max-page-size=0x1000
-			    -Wl,-z -Wl,common-page-size=0x1000 ;
+				-Wl,-z -Wl,max-page-size=0x1000
+				-Wl,-z -Wl,common-page-size=0x1000 ;
 
 		case ppc :
 			# Build a position independent PPC kernel. We need to be able to

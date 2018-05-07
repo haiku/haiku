@@ -135,7 +135,7 @@ HAIKU_DEFERRED_SUB_INCLUDES = ;
 
 rule DeferredSubInclude params : jamfile : scope
 {
-	# DeferredSubInclude <subdir tokens> [ : <jamfile name>  [ : <scope> ] ] ;
+	# DeferredSubInclude <subdir tokens> [ : <jamfile name> [ : <scope> ] ] ;
 	#
 	# Takes the same directory tokens parameter as SubInclude plus an optional
 	# alternative Jamfile name. The the subdirectory referred to by
@@ -237,7 +237,7 @@ rule RunCommandLine commandLine
 
 	local targetVarName = target ;
 	local i ;
-	for i in $(commandLine)  {
+	for i in $(commandLine) {
 		# targets are marked by the ":" prefix
 		local target = [ Match ^:(.*) : $(i) ] ;
 		if $(target) {

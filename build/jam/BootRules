@@ -25,7 +25,7 @@ rule SetupBoot
 		ObjectCcFlags $(object) : $(TARGET_BOOT_CCFLAGS) $(2) ;
 		ObjectC++Flags $(object) : $(TARGET_BOOT_C++FLAGS) $(2) ;
 		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
-        ASFLAGS on $(object) = $(TARGET_BOOT_CCFLAGS) ;
+		ASFLAGS on $(object) = $(TARGET_BOOT_CCFLAGS) ;
 
 		# override warning flags
 		TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
@@ -57,7 +57,7 @@ rule BootLd
 		libs += [ TargetBootLibsupc++ true ] ;
 		Depends $(1) : [ TargetBootLibsupc++ ] ;
 	}
-	LINKLIBS on $(1) =  $(libs) [ TargetBootLibgcc true ] ;
+	LINKLIBS on $(1) = $(libs) [ TargetBootLibgcc true ] ;
 	Depends $(1) : [ TargetBootLibgcc ] ;
 
 	# TODO: Do we really want to invoke SetupBoot here? The objects should
@@ -104,7 +104,7 @@ rule BootMergeObject
 
 rule BootStaticLibrary
 {
-	# Usage BootStaticLibrary <name> : <sources> : <extra cc flags>  ;
+	# Usage BootStaticLibrary <name> : <sources> : <extra cc flags> ;
 	# This is designed to take a set of sources and libraries and create
 	# a file called lib<name>.a
 

@@ -128,14 +128,14 @@ rule Object
 	# handle #includes for source: Jam scans for headers with
 	# the regexp pattern $(HDRSCAN) and then invokes $(HDRRULE)
 	# with the scanned file as the target and the found headers
-	# as the sources.  HDRSEARCH is the value of SEARCH used for
-	# the found header files.  Finally, if jam must deal with
+	# as the sources. HDRSEARCH is the value of SEARCH used for
+	# the found header files. Finally, if jam must deal with
 	# header files of the same name in different directories,
 	# they can be distinguished with HDRGRIST.
 
 	# $(SEARCH_SOURCE:E) is where cc first looks for #include
-	# "foo.h" files.  If the source file is in a distant directory,
-	# look there.  Else, look in "" (the current directory).
+	# "foo.h" files. If the source file is in a distant directory,
+	# look there. Else, look in "" (the current directory).
 
 	HDRRULE on $(>) = HdrRule ;
 	HDRSCAN on $(>) = $(HDRPATTERN) ;
@@ -150,35 +150,35 @@ rule Object
 
 	switch $(>:S)
 	{
-	    case .asm : As $(<) : $(>) ;
-	    case .nasm : AssembleNasm $(<) : $(>) ;
-	    case .c :	Cc $(<) : $(>) ;
-	    case .C :	C++ $(<) : $(>) ;
-	    case .cc :	C++ $(<) : $(>) ;
-	    case .cpp : C++ $(<) : $(>) ;
-	    case .f :	Fortran $(<) : $(>) ;
-	    case .l :	if [ on $(2) return $(GENERATE_C++) ] {
-	    				InheritPlatform $(<:S=.cpp) : $(1) ;
+		case .asm : As $(<) : $(>) ;
+		case .nasm : AssembleNasm $(<) : $(>) ;
+		case .c :	Cc $(<) : $(>) ;
+		case .C :	C++ $(<) : $(>) ;
+		case .cc :	C++ $(<) : $(>) ;
+		case .cpp : C++ $(<) : $(>) ;
+		case .f :	Fortran $(<) : $(>) ;
+		case .l :	if [ on $(2) return $(GENERATE_C++) ] {
+						InheritPlatform $(<:S=.cpp) : $(1) ;
 						C++ $(<) : $(<:S=.cpp) ;
 						Lex $(<:S=.cpp) : $(>) ;
 					} else {
-	    				InheritPlatform $(<:S=.c) : $(1) ;
+						InheritPlatform $(<:S=.c) : $(1) ;
 						Cc $(<) : $(<:S=.c) ;
 						Lex $(<:S=.c) : $(>) ;
 					}
 		case *.o :	return ;
-	    case .s :	As $(<) : $(>) ;
-	    case .S :	As $(<) : $(>) ;
-	    case .y :	if [ on $(2) return $(GENERATE_C++) ] {
-	    				InheritPlatform $(1:S=.cpp) $(1:S=.hpp) : $(1) ;
+		case .s :	As $(<) : $(>) ;
+		case .S :	As $(<) : $(>) ;
+		case .y :	if [ on $(2) return $(GENERATE_C++) ] {
+						InheritPlatform $(1:S=.cpp) $(1:S=.hpp) : $(1) ;
 						C++ $(1) : $(1:S=.cpp) ;
 						Yacc $(1:S=.cpp) $(1:S=.hpp) : $(2) ;
 					} else {
-	    				InheritPlatform $(1:S=.c) $(1:S=.h) : $(1) ;
+						InheritPlatform $(1:S=.c) $(1:S=.h) : $(1) ;
 						Cc $(1) : $(1:S=.c) ;
 						Yacc $(1:S=.c) $(1:S=.h) : $(2) ;
 					}
-	    case * :	UserObject $(<) : $(>) ;
+		case * :	UserObject $(<) : $(>) ;
 	}
 }
 
@@ -469,7 +469,7 @@ rule LibraryFromObjects
 
 		LocalDepends lib : $(_l) ;
 
-		# Set LOCATE for the library and its contents.  The bound
+		# Set LOCATE for the library and its contents. The bound
 		# value shows up as $(NEEDLIBS) on the Link actions.
 		# For compatibility, we only do this if the library doesn't
 		# already have a path.
@@ -551,8 +551,8 @@ rule MainFromObjects
 
 	if $(_t) != $(<)
 	{
-	    Depends $(<) : $(_t) ;
-	    NotFile $(<) ;
+		Depends $(<) : $(_t) ;
+		NotFile $(<) ;
 	}
 
 	# make compiled sources a dependency of target
@@ -582,10 +582,10 @@ rule MakeLocate
 		local target ;
 		for target in $(1) {
 			# don't relocate once located
-		    LOCATE on $(target) += $(dir:G=) ;
+			LOCATE on $(target) += $(dir:G=) ;
 			if [ on $(target) return $(LOCATE) ] = $(dir:G=) {
-			    Depends $(target) : $(dir) ;
-		    	MkDir $(dir) ;
+				Depends $(target) : $(dir) ;
+				MkDir $(dir) ;
 			}
 		}
 	}
@@ -717,7 +717,7 @@ rule SubInclude
 
 	if ! $($(<[1]))
 	{
-	    Exit SubInclude $(<[1]) without prior SubDir $(<[1]) ;
+		Exit SubInclude $(<[1]) without prior SubDir $(<[1]) ;
 	}
 
 	# Set up the config variables for the subdirectory.
