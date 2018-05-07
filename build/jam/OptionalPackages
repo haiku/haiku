@@ -156,7 +156,7 @@ if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
 
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
-	AddHaikuImagePackages git git_arch git_daemon git_email git_svn ;
+	AddHaikuImagePackages git git_arch git_daemon git_email ;
 }
 
 
