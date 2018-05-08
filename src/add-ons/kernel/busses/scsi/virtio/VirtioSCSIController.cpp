@@ -72,7 +72,7 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 		offsetof(struct virtio_scsi_config, sense_size), &fConfig.sense_size,
 		sizeof(fConfig.sense_size));
 	fVirtio->write_device_config(fVirtioDevice,
-		offsetof(struct virtio_scsi_config, cdb_size), &fConfig.sense_size,
+		offsetof(struct virtio_scsi_config, cdb_size), &fConfig.cdb_size,
 		sizeof(fConfig.cdb_size));
 
 	fRequest = new(std::nothrow) VirtioSCSIRequest(true);
