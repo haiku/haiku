@@ -21,7 +21,12 @@ namespace {
 struct FaultHandlerGuard {
 	FaultHandlerGuard()
 	{
-		ASSERT(thread_get_current_thread()->fault_handler == nullptr);
+		old_handler = thread_get_current_thread()->fault_handler;
+		if (old_handler != nullptr) {
+			memcpy(old_handler_state,
+				thread_get_current_thread()->fault_handler_state,
+				sizeof(jmp_buf));
+		}
 		thread_get_current_thread()->fault_handler = HandleFault;
 		std::atomic_signal_fence(std::memory_order_acq_rel);
 	}
@@ -30,7 +35,13 @@ struct FaultHandlerGuard {
 	~FaultHandlerGuard()
 	{
 		std::atomic_signal_fence(std::memory_order_acq_rel);
-		thread_get_current_thread()->fault_handler = nullptr;
+		thread_get_current_thread()->fault_handler = old_handler;
+		if (old_handler != nullptr) {
+			memcpy(thread_get_current_thread()->fault_handler_state,
+				old_handler_state,
+				sizeof(jmp_buf));
+		}
+
 	}
 
 
@@ -38,6 +49,9 @@ struct FaultHandlerGuard {
 	{
 		longjmp(thread_get_current_thread()->fault_handler_state, 1);
 	}
+
+	void 		(*old_handler)(void);
+	jmp_buf		old_handler_state;
 };
 
 
