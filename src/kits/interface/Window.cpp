@@ -3018,9 +3018,9 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 		// Redirect our link to the new window connection
 		fLink->SetSenderPort(sendPort);
+		STRACE(("Server says that our send port is %ld\n", sendPort));
 	}
 
-	STRACE(("Server says that our send port is %ld\n", sendPort));
 	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
 	_CreateTopView();
