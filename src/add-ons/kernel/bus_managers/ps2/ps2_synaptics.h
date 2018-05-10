@@ -49,6 +49,8 @@ typedef struct {
 	bool capMultiFinger;
 	bool capPalmDetection;
 	bool capPassThrough;
+
+	uint8 nExtendedButtons;
 } touchpad_info;
 
 
