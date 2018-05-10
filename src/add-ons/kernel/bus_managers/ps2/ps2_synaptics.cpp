@@ -29,6 +29,21 @@
 #define REAL_MAX_PRESSURE		100
 #define MAX_PRESSURE			200
 
+enum {
+	kIdentify = 0x00,
+	kReadModes = 0x01,
+	kReadCapabilities = 0x02,
+	kReadModelId = 0x03,
+	kReadSerialNumberPrefix = 0x06,
+	kReadSerialModelSuffix = 0x07,
+	kReadResolutions = 0x08,
+	kExtendedModelId = 0x09,
+	kContinuedCapabilities = 0x0C,
+	kMaximumCoordinates = 0x0D,
+	kDeluxeLedInfo = 0x0E,
+	kMinimumCoordinates = 0x0F,
+	kTrackpointQuirk = 0x10
+};
 
 static hardware_specs gHardwareSpecs;
 
@@ -84,6 +99,26 @@ set_touchpad_mode(ps2_dev *dev, uint8 mode)
 
 
 static status_t
+get_information_query(ps2_dev *dev, uint8 extendedQueries, uint8 query,
+	uint8 val[3])
+{
+	if (query == kTrackpointQuirk) {
+		// Special case: this information query is not reported in the
+		// "extended queries", but is still supported when the touchpad has
+		// a pass-through port.
+		if (!sTouchpadInfo.capPassThrough)
+			return B_NOT_SUPPORTED;
+	} else if (query > extendedQueries + 8)
+		return B_NOT_SUPPORTED;
+
+	status_t error = send_touchpad_arg(dev, query);
+	if (error != B_OK)
+		return error;
+	return ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
+}
+
+
+static status_t
 get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 {
 	status_t status;
@@ -128,35 +163,31 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 		if (sTouchpadInfo.capMiddleButton || sTouchpadInfo.capFourButtons)
 			event.buttons |= ((event_buffer[0] ^ event_buffer[3]) & 0x01) << 2;
 
-		if (sTouchpadInfo.nExtendedButtons > 0
-				&& ((event_buffer[0] ^ event_buffer[3]) & 0x02) != 0) {
-			int nextButton = 2;
-			if (sTouchpadInfo.capMiddleButton)
-				nextButton = 3;
-			if (sTouchpadInfo.capFourButtons)
-				nextButton = 4;
+		if (sTouchpadInfo.nExtendedButtons > 0)
+		{
+			if (((event_buffer[0] ^ event_buffer[3]) & 0x02) != 0) {
+				// This packet includes extended buttons state. The state is
+				// only reported once when one of the buttons is pressed or
+				// released, so we must keep track of the buttons state.
 
-			// The touchpad supports extended buttons and one of them is
-			// currently being pressed. They replace the lowest bits of X and Y.
-			int button = 0;
-			bool pressed;
-			while (button < sTouchpadInfo.nExtendedButtons) {
-				// Odd buttons are in the X byte
-				pressed = event_buffer[4] >> (button / 2) & 0x1;
+				// The values replace the lowest bits of the X and Y coordinates
+				// in the packet, we need to extract them from there.
 
-				if (pressed)
-					event.buttons |= 1 << (button + nextButton);
-
-				button++;
-
-				// Even buttons are in the Y byte
-				pressed = event_buffer[5] >> (button / 2) & 0x1;
-
-				if (pressed)
-					event.buttons |= 1 << (button + nextButton);
-
-				button++;
+				bool pressed;
+				for (int button = 0; button < sTouchpadInfo.nExtendedButtons;
+						button++) {
+					// Even buttons are in the X byte
+					pressed = event_buffer[4 + button % 2] >> button / 2 & 0x1;
+					if (pressed) {
+						sTouchpadInfo.extendedButtonsState |= 1 << button;
+					} else {
+						sTouchpadInfo.extendedButtonsState &= ~(1 << button);
+					}
+				}
 			}
+
+			event.buttons |= sTouchpadInfo.extendedButtonsState
+				<< sTouchpadInfo.firstExtendedButton;
 		}
  	} else {
  		bool finger = event_buffer[0] >> 5 & 1;
@@ -190,9 +221,9 @@ static void
 query_capability(ps2_dev *dev)
 {
 	uint8 val[3];
-	uint8 nExtendedQueries;
-	send_touchpad_arg(dev, 0x02);
-	ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
+	uint8 nExtendedQueries = 0;
+
+	get_information_query(dev, nExtendedQueries, kReadCapabilities, val);
 
 	TRACE("SYNAPTICS: extended mode %2x\n", val[0] >> 7 & 1);
 	sTouchpadInfo.capExtended = val[0] >> 7 & 1;
@@ -212,17 +243,37 @@ query_capability(ps2_dev *dev)
 	TRACE("SYNAPTICS: pass through %2x\n", val[2] >> 7 & 1);
 	sTouchpadInfo.capPassThrough = val[2] >> 7 & 1;
 
-	if (nExtendedQueries >= 1) {
-		// This touchpad supports the "extended model ID" command, and can
-		// report extra buttons.
-		send_touchpad_arg(dev, 0x09);
-		ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
-
-		TRACE("SYNAPTICS: extended buttons %2x\n", val[1] >> 4 & 15);
-		sTouchpadInfo.nExtendedButtons = val[1] >> 4 & 15;
-	} else {
+	if (get_information_query(dev, nExtendedQueries, kExtendedModelId, val)
+			!= B_OK) {
+		// "Extended Model ID" is not supported, so there cannot be extra
+		// buttons.
 		sTouchpadInfo.nExtendedButtons = 0;
+		sTouchpadInfo.firstExtendedButton = 0;
+		return;
 	}
+
+	TRACE("SYNAPTICS: extended buttons %2x\n", val[1] >> 4 & 15);
+	sTouchpadInfo.nExtendedButtons = val[1] >> 4 & 15;
+	sTouchpadInfo.extendedButtonsState = 0;
+
+	if (sTouchpadInfo.capMiddleButton)
+		sTouchpadInfo.firstExtendedButton = 3;
+	else
+		sTouchpadInfo.firstExtendedButton = 2;
+
+	// Capability 0x10 is not documented in the Synaptics Touchpad interfacing
+	// guide (at least the versions I could find), but we got the information
+	// from Linux patches: https://lkml.org/lkml/2015/2/6/621
+	if (get_information_query(dev, nExtendedQueries, kTrackpointQuirk, val)
+			!= B_OK)
+		return;
+
+	// Workaround for Thinkpad use of the extended buttons: they are
+	// used as buttons for the trackpoint, so they should be reported
+	// as buttons 0, 1, 2 rather than 3, 4, 5.
+	TRACE("SYNAPTICS: alternate buttons %2x\n", val[0] >> 0 & 1);
+	if (val[0] >> 0 & 1)
+		sTouchpadInfo.firstExtendedButton = 0;
 }
 
 
@@ -337,12 +388,7 @@ probe_synaptics(ps2_dev *dev)
 
 	// Request "Identify touchpad"
 	// The touchpad will delay this, until it's ready and calibrated.
-	status = send_touchpad_arg(dev, 0x00);
-	if (status != B_OK)
-		return status;
-
-	// "Status request" (executes "Identify touchpad")
-	status = ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
+	status = get_information_query(dev, 0, kIdentify, val);
 	if (status != B_OK)
 		return status;
 
