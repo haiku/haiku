@@ -124,7 +124,7 @@ ps2_service_thread(void *arg)
 					break;
 
 				default:
-					TRACE("ps2: PS2_SERVICE: unknown id %lu\n", cmd.id);
+					TRACE("ps2: PS2_SERVICE: unknown id %" B_PRIu32 "\n", cmd.id);
 					break;
 			}
 		} else {

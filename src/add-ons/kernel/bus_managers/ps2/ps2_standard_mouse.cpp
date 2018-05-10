@@ -144,7 +144,7 @@ ps2_packet_to_movement(standard_mouse_cookie* cookie, uint8 packet[],
 		pos->wheel_xdelta = xDeltaWheel;
 
 		TRACE("ps2: ps2_packet_to_movement xdelta: %d, ydelta: %d, buttons %x, "
-			"clicks: %d, timestamp %Ld\n",
+			"clicks: %d, timestamp %" B_PRIdBIGTIME "\n",
 			xDelta, yDelta, buttons, cookie->click_count, currentTime);
 	}
 }
@@ -493,7 +493,7 @@ standard_mouse_ioctl(void* _cookie, uint32 op, void* buffer, size_t length)
 			return user_memcpy(&cookie->click_speed, buffer, sizeof(bigtime_t));
 
 		default:
-			TRACE("ps2: ioctl unknown mouse opcode: %ld\n", op);
+			TRACE("ps2: ioctl unknown mouse opcode: %" B_PRIu32 "\n", op);
 			return B_DEV_INVALID_IOCTL;
 	}
 }

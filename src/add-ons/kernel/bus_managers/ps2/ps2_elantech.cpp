@@ -168,8 +168,8 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 			event.xPosition = ((event_buffer[1] & 0xf) << 8) | event_buffer[2];
 			event.yPosition = (((event_buffer[4] & 0xf) << 8)
 				| event_buffer[5]);
-			TRACE("ELANTECH: buttons 0x%x x %ld y %ld z %d\n",
-				event.buttons, event.xPosition, event.yPosition,
+			TRACE("ELANTECH: buttons 0x%x x %" B_PRIu32 " y %" B_PRIu32
+				" z %d\n", event.buttons, event.xPosition, event.yPosition,
 				event.zPressure);
 			break;
 		case 2:
@@ -566,8 +566,8 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 				goto err4;
 		}
 	}
-	TRACE("ELANTECH: version 0x%lx (0x%lx)\n", cookie->version,
-		cookie->fwVersion);
+	TRACE("ELANTECH: version 0x%" B_PRIu32 " (0x%" B_PRIu32 ")\n",
+		cookie->version, cookie->fwVersion);
 
 	if (cookie->version >= 3)
 		cookie->send_command = &elantech_dev_send_command;
@@ -593,8 +593,8 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		goto err4;
 	}
 
-	TRACE("ELANTECH: range x %ld-%ld y %ld-%ld (%ld)\n", x_min, x_max,
-		y_min, y_max, width);
+	TRACE("ELANTECH: range x %" B_PRIu32 "-%" B_PRIu32 " y %" B_PRIu32
+		"-%" B_PRIu32 " (%" B_PRIu32 ")\n", x_min, x_max, y_min, y_max, width);
 
 	uint32 x_res, y_res;
 	if (get_resolution_v4(cookie, &x_res, &y_res) != B_OK) {
@@ -602,7 +602,8 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		goto err4;
 	}
 
-	TRACE("ELANTECH: resolution x %ld y %ld (dpi)\n", x_res, y_res);
+	TRACE("ELANTECH: resolution x %" B_PRIu32 " y %" B_PRIu32 " (dpi)\n",
+		x_res, y_res);
 
 	gHardwareSpecs.edgeMotionWidth = EDGE_MOTION_WIDTH;
 
@@ -707,7 +708,7 @@ elantech_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 				sizeof(bigtime_t));
 
 		default:
-			TRACE("ELANTECH: unknown opcode: %ld\n", op);
+			TRACE("ELANTECH: unknown opcode: %" B_PRIu32 "\n", op);
 			return B_BAD_VALUE;
 	}
 }
