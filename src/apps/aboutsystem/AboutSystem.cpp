@@ -1581,7 +1581,7 @@ MemSizeToString(char string[], size_t size, system_info* info)
 
 		snprintf(string, size, "%d", inaccessibleMemory);
 		message.ReplaceFirst("%inaccessible", string);
-		strncpy(string, message.String(), size);
+		strlcpy(string, message.String(), size);
 	} else {
 		snprintf(string, size, B_TRANSLATE("%d MiB total"),
 			int(info->max_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f));
