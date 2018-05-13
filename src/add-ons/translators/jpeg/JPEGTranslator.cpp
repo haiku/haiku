@@ -1281,7 +1281,7 @@ JPEGTranslator::PopulateInfoFromFormat(translator_info* info,
 			BString str1(formats[i].name);
 			str1.ReplaceFirst("Be Bitmap Format (JPEGTranslator)", 
 				B_TRANSLATE("Be Bitmap Format (JPEGTranslator)"));
-			strncpy(info->name, str1.String(), sizeof(info->name));
+			strlcpy(info->name, str1.String(), sizeof(info->name));
 			strcpy(info->MIME,  formats[i].MIME);
 			return B_OK;
 		}
