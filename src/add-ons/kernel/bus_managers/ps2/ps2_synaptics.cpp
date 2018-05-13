@@ -160,6 +160,11 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 	 	event.wValue = wValue;
 	 	event.gesture = false;
 
+		// Clickpad pretends that all clicks on the touchpad are middle clicks.
+		// Pass them to userspace as left clicks instead.
+		if (sTouchpadInfo.capClickPad)
+			event.buttons |= ((event_buffer[0] ^ event_buffer[3]) & 0x01);
+
 		if (sTouchpadInfo.capMiddleButton || sTouchpadInfo.capFourButtons)
 			event.buttons |= ((event_buffer[0] ^ event_buffer[3]) & 0x01) << 2;
 
@@ -249,8 +254,12 @@ query_capability(ps2_dev *dev)
 		// buttons.
 		sTouchpadInfo.nExtendedButtons = 0;
 		sTouchpadInfo.firstExtendedButton = 0;
+		sTouchpadInfo.capClickPad = false;
 		return;
 	}
+
+	sTouchpadInfo.capClickPad = (val[0] >> 5 & 1) | (val[1] >> 0 & 1);
+	TRACE("SYNAPTICS: clickpad %x\n", sTouchpadInfo.capClickPad);
 
 	TRACE("SYNAPTICS: extended buttons %2x\n", val[1] >> 4 & 15);
 	sTouchpadInfo.nExtendedButtons = val[1] >> 4 & 15;
