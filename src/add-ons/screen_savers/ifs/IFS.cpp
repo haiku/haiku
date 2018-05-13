@@ -33,7 +33,6 @@
 
 #define HALF 0
 #define random() ya_random()
-#define RAND_MAX 0xFFFFFFFF
 
 #define FLOAT_TO_INT(x) (int32)((float)(UNIT)*(x))
 
