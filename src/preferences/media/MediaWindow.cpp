@@ -586,7 +586,7 @@ MediaWindow::_FindNodes(media_type type, uint64 kind, NodeList& into)
 			(int)nodeInfo[i].flavor_id));
 
 		dormant_node_info* info = new dormant_node_info();
-		strncpy(info->name, nodeInfo[i].name, B_MEDIA_NAME_LENGTH);
+		strlcpy(info->name, nodeInfo[i].name, B_MEDIA_NAME_LENGTH);
 		info->flavor_id = nodeInfo[i].flavor_id;
 		info->addon = nodeInfo[i].addon;
 		into.AddItem(info);
