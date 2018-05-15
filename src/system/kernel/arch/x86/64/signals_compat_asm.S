@@ -1,0 +1,49 @@
+/*
+ * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Dump of x86_signal_frame_function() in arch/x86/32/signals.cpp
+ */
+
+
+#include <asm_defs.h>
+
+
+// TODO: build from arch/x86/32/signals.cpp with the x86 compiler
+FUNCTION(x86_64_signal_handler_compat):
+	.byte	0x55						// push   %ebp
+	.byte	0x89,0xe5					// mov    %esp,%ebp
+	.byte	0x83,0xec,0x14				// sub    $0x14,%esp
+	.byte	0x53						// push   %ebx
+	.byte	0x8b,0x5d,0x08				// mov    0x8(%ebp),%ebx
+	.byte	0x80,0xbb,0x74,0x2,0x0,0x0,0x0	// cmpb   $0x0,0x274(%ebx)
+	.byte	0x74,0x19					// je     <x86_64_signal_frame_function_compat+0x2c>
+	.byte	0x8b,0x93,0x70,0x2,0x0,0x0	// mov    0x270(%ebx),%edx
+	.byte	0x8b,0x83,0x6c,0x2,0x0,0x0	// mov    0x26c(%ebx),%eax
+	.byte	0x50						// push   %eax
+	.byte	0x8d,0x43,0x24				// lea    0x24(%ebx),%eax
+	.byte	0x50						// push   %eax
+	.byte	0x53						// push   %ebx
+	.byte	0x8b,0x3					// mov    (%ebx),%eax
+	.byte	0x50						// push   %eax
+	.byte	0xff,0xd2					// call   *%edx
+	.byte	0xeb,0x19					// jmp    <x86_64_signal_frame_function_compat+0x45>
+	.byte	0x8b,0x93,0x70,0x2,0x0,0x0	// mov    0x270(%ebx),%edx
+	.byte	0x83,0xc4,0xfc				// add    $0xfffffffc,%esp
+	.byte	0x8d,0x43,0x3c				// lea    0x3c(%ebx),%eax
+	.byte	0x50						// push   %eax
+	.byte	0x8b,0x83,0x6c,0x2,0x0,0x0	// mov    0x26c(%ebx),%eax
+	.byte	0x50						// push   %eax
+	.byte	0x8b,0x03					// mov    (%ebx),%eax
+	.byte	0x50						// push   %eax
+	.byte	0xff,0xd2					// call   *%edx
+	.byte	0x53						// push   %ebx
+	.byte	0x6a,0x0					// push   $0
+	.byte	0xb8,0x3f,0x0,0x0,0x0		// movl $ TO_STRING_LITERAL(SYSCALL_RESTORE_SIGNAL_FRAME) , %%eax;
+	.byte	0xcd,0x63					// int    $99
+	.byte	0x8b,0x5d,0xe8				// mov    -0x18(%ebp),%ebx
+	.byte	0x89,0xec					// mov    %ebp,%esp
+	.byte	0x5d						// pop    %ebp
+	.byte	0xc3						// ret
+FUNCTION_END(x86_64_signal_handler_compat)
+SYMBOL(x86_64_signal_handler_compat_end):
