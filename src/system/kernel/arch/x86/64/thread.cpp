@@ -18,6 +18,9 @@
 #include <debug.h>
 #include <kernel.h>
 #include <ksignal.h>
+#ifdef _COMPAT_MODE
+#	include <compat/ksignal_compat.h>
+#endif
 #include <int.h>
 #include <team.h>
 #include <thread.h>
@@ -88,11 +91,33 @@ x86_restart_syscall(iframe* frame)
 }
 
 
+#ifdef _COMPAT_MODE
+
+
+static inline void
+set_fs_register(uint32 segment)
+{
+	asm("movl %0,%%fs" :: "r" (segment));
+}
+
+
+#endif // _COMPAT_MODE
+
+
 void
 x86_set_tls_context(Thread* thread)
 {
-	// Set FS segment base address to the TLS segment.
-	x86_write_msr(IA32_MSR_FS_BASE, thread->user_local_storage);
+#ifdef _COMPAT_MODE
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+		unsigned index = x86_64_set_user_tls_segment_base(
+			smp_get_current_cpu(), thread->user_local_storage);
+		set_fs_register((index << 3) | DPL_USER);
+	} else
+#endif
+	{
+		// Set FS segment base address to the TLS segment.
+		x86_write_msr(IA32_MSR_FS_BASE, thread->user_local_storage);
+	}
 }
 
 
@@ -107,6 +132,24 @@ arch_randomize_stack_pointer(addr_t value)
 		// when a function is entered for the stack to be considered aligned to
 		// 16 byte.
 }
+
+
+#ifdef _COMPAT_MODE
+
+
+static addr_t
+arch_compat_randomize_stack_pointer(addr_t value)
+{
+	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
+	value -= random_value() & (B_PAGE_SIZE - 1);
+	return (value & ~addr_t(0xf)) - 4;
+		// This means, result % 16 == 12, which is what esp should adhere to
+		// when a function is entered for the stack to be considered aligned to
+		// 16 byte.
+}
+
+
+#endif // _COMPAT_MODE
 
 
 static uint8*
@@ -218,27 +261,55 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	TRACE("arch_thread_enter_userspace: entry %#lx, args %p %p, "
 		"stackTop %#lx\n", entry, args1, args2, stackTop);
 
-	stackTop = arch_randomize_stack_pointer(stackTop - sizeof(codeAddr));
-
 	// Copy the address of the stub that calls exit_thread() when the thread
 	// entry function returns to the top of the stack to act as the return
 	// address. The stub is inside commpage.
 	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
-	set_ac();
-	codeAddr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
-		+ commPageAddress;
-	clear_ac();
-	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
+
+#ifdef _COMPAT_MODE
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+		uint32 args[3];
+		stackTop = arch_compat_randomize_stack_pointer(stackTop - sizeof(args));
+
+		set_ac();
+		args[0] = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
+			+ commPageAddress;
+		clear_ac();
+		args[1] = (uint32)(addr_t)args1;
+		args[2] = (uint32)(addr_t)args2;
+		if (user_memcpy((void *)stackTop, args, sizeof(args)) < B_OK)
+			return B_BAD_ADDRESS;
+
+	} else
+#endif
+	{
+		stackTop = arch_randomize_stack_pointer(stackTop - sizeof(codeAddr));
+
+		set_ac();
+		codeAddr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
+			+ commPageAddress;
+		clear_ac();
+		if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
 			!= B_OK)
-		return B_BAD_ADDRESS;
+			return B_BAD_ADDRESS;
+	}
 
 	// Prepare the user iframe.
 	iframe frame = {};
 	frame.type = IFRAME_TYPE_SYSCALL;
-	frame.si = (uint64)args2;
-	frame.di = (uint64)args1;
 	frame.ip = entry;
-	frame.cs = USER_CODE_SELECTOR;
+#ifdef _COMPAT_MODE
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+		frame.cs = USER32_CODE_SELECTOR;
+		arch_thread_set_ds(USER_DATA_SELECTOR);
+		arch_thread_set_es(USER_DATA_SELECTOR);
+	} else
+#endif
+	{
+		frame.si = (uint64)args2;
+		frame.di = (uint64)args1;
+		frame.cs = USER_CODE_SELECTOR;
+	}
 	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
 		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
 	frame.sp = stackTop;
@@ -394,3 +465,120 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 	// restored.
 	return frame->ax;
 }
+
+
+#ifdef _COMPAT_MODE
+
+status_t
+arch_setup_compat_signal_frame(Thread* thread, struct sigaction* action,
+	struct compat_signal_frame_data* signalFrameData)
+{
+	iframe* frame = x86_get_current_iframe();
+	if (!IFRAME_IS_USER(frame)) {
+		panic("arch_setup_compat_signal_frame(): No user iframe!");
+		return B_BAD_VALUE;
+	}
+
+	// Store the register state.
+	signalFrameData->context.uc_mcontext.eax = frame->ax;
+	signalFrameData->context.uc_mcontext.ebx = frame->bx;
+	signalFrameData->context.uc_mcontext.ecx = frame->cx;
+	signalFrameData->context.uc_mcontext.edx = frame->dx;
+	signalFrameData->context.uc_mcontext.edi = frame->di;
+	signalFrameData->context.uc_mcontext.esi = frame->si;
+	signalFrameData->context.uc_mcontext.ebp = frame->bp;
+	signalFrameData->context.uc_mcontext.esp = frame->user_sp;
+	signalFrameData->context.uc_mcontext.eip = frame->ip;
+	signalFrameData->context.uc_mcontext.eflags = frame->flags;
+	x86_fnsave((void *)(&signalFrameData->context.uc_mcontext.xregs));
+
+	// Fill in signalFrameData->context.uc_stack.
+	stack_t stack;
+	signal_get_user_stack(frame->user_sp, &stack);
+	signalFrameData->context.uc_stack.ss_sp = (addr_t)stack.ss_sp;
+	signalFrameData->context.uc_stack.ss_size = stack.ss_size;
+	signalFrameData->context.uc_stack.ss_flags = stack.ss_flags;
+
+	// Store syscall_restart_return_value.
+	signalFrameData->syscall_restart_return_value = frame->orig_rax;
+
+	// Get the stack to use and copy the frame data to it.
+	uint32 stackFrame[2];
+	uint8* userStack = get_signal_stack(thread, frame, action,
+		sizeof(*signalFrameData) + sizeof(stackFrame));
+
+	compat_signal_frame_data* userSignalFrameData
+		= (compat_signal_frame_data*)(userStack + sizeof(stackFrame));
+
+	if (user_memcpy(userSignalFrameData, signalFrameData,
+			sizeof(*signalFrameData)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	// prepare the user stack frame for a function call to the signal handler
+	// wrapper function
+	stackFrame[0] = frame->ip;
+	stackFrame[1] = (addr_t)userSignalFrameData;
+		// parameter: pointer to signal frame data
+
+	if (user_memcpy(userStack, stackFrame, sizeof(stackFrame)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	// Update Thread::user_signal_context, now that everything seems to have
+	// gone fine.
+	thread->user_signal_context = (ucontext_t*)&userSignalFrameData->context;
+
+	// Set up the iframe to execute the signal handler wrapper on our prepared
+	// stack. First argument points to the frame data.
+	addr_t* commPageAddress = (addr_t*)thread->team->commpage_address;
+	frame->user_sp = (addr_t)userStack;
+	set_ac();
+
+	// from x86/arch_commpage_defs.h
+#define COMPAT_COMMPAGE_ENTRY_X86_SIGNAL_HANDLER \
+	(COMMPAGE_ENTRY_FIRST_ARCH_SPECIFIC + 3)
+	frame->ip = commPageAddress[COMPAT_COMMPAGE_ENTRY_X86_SIGNAL_HANDLER]
+		+ (addr_t)commPageAddress;
+	clear_ac();
+
+	return B_OK;
+}
+
+
+int64
+arch_restore_compat_signal_frame(struct compat_signal_frame_data* signalFrameData)
+{
+	iframe* frame = x86_get_current_iframe();
+
+	frame->orig_rax = signalFrameData->syscall_restart_return_value;
+	frame->ax = signalFrameData->context.uc_mcontext.eax;
+	frame->bx = signalFrameData->context.uc_mcontext.ebx;
+	frame->cx = signalFrameData->context.uc_mcontext.ecx;
+	frame->dx = signalFrameData->context.uc_mcontext.edx;
+	frame->di = signalFrameData->context.uc_mcontext.edi;
+	frame->si = signalFrameData->context.uc_mcontext.esi;
+	frame->bp = signalFrameData->context.uc_mcontext.ebp;
+	frame->user_sp = signalFrameData->context.uc_mcontext.esp;
+	frame->ip = signalFrameData->context.uc_mcontext.eip;
+	frame->flags = (frame->flags & ~(uint64)X86_EFLAGS_USER_FLAGS)
+		| (signalFrameData->context.uc_mcontext.eflags & X86_EFLAGS_USER_FLAGS);
+
+	x86_frstor((void*)(&signalFrameData->context.uc_mcontext.xregs));
+
+	// The syscall return code overwrites frame->ax with the return value of
+	// the syscall, need to return it here to ensure the correct value is
+	// restored.
+	return frame->ax;
+}
+
+
+void
+arch_syscall_64_bit_return_value(void)
+{
+	Thread* thread = thread_get_current_thread();
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0)
+		atomic_or(&thread->flags, THREAD_FLAGS_64_BIT_SYSCALL_RETURN);
+}
+
+#endif // _COMPAT_MODE
+

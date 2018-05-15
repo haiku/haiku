@@ -31,6 +31,12 @@ bool arch_on_signal_stack(Thread *thread);
 status_t arch_setup_signal_frame(Thread *thread, struct sigaction *action,
 	struct signal_frame_data *signalFrameData);
 int64 arch_restore_signal_frame(struct signal_frame_data* signalFrameData);
+#ifdef _COMPAT_MODE
+status_t arch_setup_compat_signal_frame(Thread *thread,
+	struct sigaction *action, struct compat_signal_frame_data *signalFrameData);
+int64 arch_restore_compat_signal_frame(
+	struct compat_signal_frame_data* signalFrameData);
+#endif
 
 void arch_store_fork_frame(struct arch_fork_arg *arg);
 void arch_restore_fork_frame(struct arch_fork_arg *arg);

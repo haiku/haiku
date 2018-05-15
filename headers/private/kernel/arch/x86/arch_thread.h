@@ -51,6 +51,30 @@ arch_thread_set_current_thread(Thread* t)
 }
 
 
+#ifdef _COMPAT_MODE
+
+
+static inline void
+arch_thread_set_ds(unsigned short ds)
+{
+	asm volatile("mov %0, %%ds" : : "r" (ds) : "memory");
+}
+
+
+static inline void
+arch_thread_set_es(unsigned short es)
+{
+	asm volatile("mov %0, %%es" : : "r" (es) : "memory");
+}
+
+// override empty macro
+#undef arch_syscall_64_bit_return_value
+void arch_syscall_64_bit_return_value(void);
+
+
+#endif // _COMPAT_MODE
+
+
 #else	// __x86_64__
 
 

@@ -13,6 +13,9 @@
 
 
 #include <ksignal.h>
+#ifdef _COMPAT_MODE
+#	include <compat/ksignal.h>
+#endif
 
 #include <errno.h>
 #include <stddef.h>
@@ -908,6 +911,61 @@ setup_signal_frame(Thread* thread, struct sigaction* action, Signal* signal,
 }
 
 
+#ifdef _COMPAT_MODE
+
+static status_t
+setup_compat_signal_frame(Thread* thread, struct sigaction* action, Signal* signal,
+	sigset_t signalMask)
+{
+	// prepare the data, we need to copy onto the user stack
+	struct compat_signal_frame_data frameData;
+
+	// signal info
+	frameData.info.si_signo = signal->Number();
+	frameData.info.si_code = signal->SignalCode();
+	frameData.info.si_errno = signal->ErrorCode();
+	frameData.info.si_pid = signal->SendingProcess();
+	frameData.info.si_uid = signal->SendingUser();
+	frameData.info.si_addr = (addr_t)signal->Address();
+	frameData.info.si_status = signal->Status();
+	frameData.info.si_band = signal->PollBand();
+	frameData.info.si_value.sival_ptr = (addr_t)signal->UserValue().sival_ptr;
+
+	// context
+	frameData.context.uc_link = (addr_t)thread->user_signal_context;
+	frameData.context.uc_sigmask = signalMask;
+	// uc_stack and uc_mcontext are filled in by the architecture specific code.
+
+	// user data
+	frameData.user_data = (addr_t)action->sa_userdata;
+
+	// handler function
+	frameData.siginfo_handler = (action->sa_flags & SA_SIGINFO) != 0;
+	frameData.handler = frameData.siginfo_handler
+		? (addr_t)action->sa_sigaction : (addr_t)action->sa_handler;
+
+	// thread flags -- save the and clear the thread's syscall restart related
+	// flags
+	frameData.thread_flags = atomic_and(&thread->flags,
+		~(THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
+
+	// syscall restart related fields
+	memcpy(frameData.syscall_restart_parameters,
+		thread->syscall_restart.parameters,
+		sizeof(frameData.syscall_restart_parameters));
+
+	// commpage address
+	frameData.commpage_address = (addr_t)thread->team->commpage_address;
+
+	// syscall_restart_return_value is filled in by the architecture specific
+	// code.
+
+	return arch_setup_compat_signal_frame(thread, action, &frameData);
+}
+
+#endif // _COMPAT_MODE
+
+
 /*! Actually handles pending signals -- i.e. the thread will exit, a custom
 	signal handler is prepared, or whatever the signal demands.
 	The function will not return, when a deadly signal is encountered. The
@@ -1258,6 +1316,11 @@ handle_signals(Thread* thread)
 
 		locker.Unlock();
 
+#ifdef _COMPAT_MODE
+		if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0)
+			setup_compat_signal_frame(thread, &handler, signal, oldBlockMask);
+		else
+#endif
 		setup_signal_frame(thread, &handler, signal, oldBlockMask);
 
 		// Reset sigsuspend_original_unblocked_mask. It would have been set by
