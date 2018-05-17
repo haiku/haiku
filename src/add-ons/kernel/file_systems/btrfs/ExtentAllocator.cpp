@@ -411,7 +411,7 @@ BlockGroup::Initialize(uint64 flag)
 	fKey.SetOffset(0);
 	status_t status;
 
-	while(true) {
+	while (true) {
 		status = fCurrentExtentTree->FindNext(&path, fKey, (void**)&fItem);
 		if ((Flags() & flag) == flag || status != B_OK)
 			break;
@@ -451,7 +451,7 @@ BlockGroup::LoadExtent(CachedExtentTree* tree, bool inverse)
 
 	TreeIterator iterator(fCurrentExtentTree, key);
 	status_t status;
-	while(true) {
+	while (true) {
 		status = iterator.GetNextEntry(&data);
 		key = iterator.Key();
 		if (status != B_OK) {
@@ -614,7 +614,7 @@ ExtentAllocator::_Allocate(uint64& found, uint64 start, uint64 size,
 		B_PRIu64 "\n", start, size, type);
 	CachedExtent* chosen;
 	status_t status;
-	while(true) {
+	while (true) {
 		status = fTree->FindNext(&chosen, start, size, type);
 		if (status != B_OK)
 			return status;

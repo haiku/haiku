@@ -80,8 +80,7 @@ struct Volume::VNode {
 protected:	// should be private, but gcc 2.95.3 issues a warning
 	~VNode()
 	{
-		if (fileCache != NULL)
-		{
+		if (fileCache != NULL) {
 			ERROR(("VNode %" B_PRId64 " still has a file cache!\n", id));
 			file_cache_delete(fileCache);
 		}
@@ -4518,7 +4517,7 @@ PRINT(("Volume::_PutAllPendingVNodes()\n"));
 
 	MutexLocker locker(fLock);
 
-	if (!fVNodeCountingEnabled)	{
+	if (!fVNodeCountingEnabled) {
 		PRINT(("Volume::_PutAllPendingVNodes() failed: vnode counting "
 			"disabled\n"));
 		return USERLAND_IOCTL_VNODE_COUNTING_DISABLED;

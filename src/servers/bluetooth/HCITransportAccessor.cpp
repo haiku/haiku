@@ -31,8 +31,7 @@ HCITransportAccessor::HCITransportAccessor(BPath* path) : HCIDelegate(path)
 
 HCITransportAccessor::~HCITransportAccessor()
 {
-	if (fDescriptor  > 0)
-	{
+	if (fDescriptor > 0) {
 		close(fDescriptor);
 		fDescriptor = -1;
 		fIdentifier = B_ERROR;

@@ -637,8 +637,7 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 					return B_ERROR;
 
 				ppp_control_info *controlInfo = (ppp_control_info*) control->data;
-				if (controlInfo->index != 0 || !Device())
-				{
+				if (controlInfo->index != 0 || !Device()) {
 					dprintf("index is 0 or no Device\n");
 					return B_BAD_INDEX;
 				}

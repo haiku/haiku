@@ -168,8 +168,7 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 		if (sTouchpadInfo.capMiddleButton || sTouchpadInfo.capFourButtons)
 			event.buttons |= ((event_buffer[0] ^ event_buffer[3]) & 0x01) << 2;
 
-		if (sTouchpadInfo.nExtendedButtons > 0)
-		{
+		if (sTouchpadInfo.nExtendedButtons > 0) {
 			if (((event_buffer[0] ^ event_buffer[3]) & 0x02) != 0) {
 				// This packet includes extended buttons state. The state is
 				// only reported once when one of the buttons is pressed or

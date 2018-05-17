@@ -339,20 +339,17 @@ setPalette()
 					// << 16 | (uint8)(i * 6/10) << 8;
 					// | (uint8)(i * 3 / 10);
 
-			for (i = 128;i < 256;i++)
-			{
+			for (i = 128;i < 256; i++) {
 				uint8 r = i;
 				uint8 c = (uint8)((cos((i - 256) / 42.0) * 0.5 + 0.5) * 225);
 
 				gPalette[i] = ((r << 16) | (c << 8) | c);
 			}
-/*			for (i = 192; i < 224; i++)
-			{
+/*			for (i = 192; i < 224; i++) {
 				uint8 c = (i - 192);
 				gPalette[i] = gPalette[i] & 0xff0000 | c << 8 | c;
 			}
-			for (i = 224; i < 256; i++)
-			{
+			for (i = 224; i < 256; i++) {
 				uint8 c = (i-224) / 2;
 				c = 32 + c * c * 6 / 10;
 				gPalette[i] = gPalette[i] & 0xff0000 | c << 8 | c;
@@ -401,8 +398,7 @@ setPalette()
 			}
 			break;
 	}
-/*	for (i = 0;i < 256;i++)
-	{
+/*	for (i = 0;i < 256; i++) {
 		uint8 r = (i);
 		uint8 g = (i * i >> 8); //(i * 8 / 10);
 		uint8 b = 0; //(i * 2 / 10);
@@ -730,8 +726,7 @@ Nebula::StartSaver(BView* view, bool preview)
 	}
 
 	// uniforme cubique
-/*	for (i = 0;i < GMAX;i++)
-	{
+/*	for (i = 0;i < GMAX; i++) {
 		gal[i].x = 1 * ((rand()&1023) - 512);
 		gal[i].y = 1 * ((rand()&1023) - 512);
 		gal[i].z = 1 * ((rand()&1023) - 512);

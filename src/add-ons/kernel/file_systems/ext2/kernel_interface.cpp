@@ -644,7 +644,7 @@ ext2_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		off_t oldSize = inode->Size();
 
 		status_t status = inode->Resize(transaction, stat->st_size);
-		if(status != B_OK)
+		if (status != B_OK)
 			return status;
 
 		if ((mask & B_STAT_SIZE_INSECURE) == 0) {

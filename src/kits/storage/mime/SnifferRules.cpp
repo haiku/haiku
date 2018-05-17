@@ -131,9 +131,7 @@ SnifferRules::SnifferRules(DatabaseLocation* databaseLocation,
 SnifferRules::~SnifferRules()
 {
 	for (std::list<sniffer_rule>::iterator i = fRuleList.begin();
-		   i != fRuleList.end();
-		     i++)
-	{
+		   i != fRuleList.end(); i++) {
 		delete i->rule;
 		i->rule = NULL;
 	}
@@ -262,8 +260,7 @@ SnifferRules::SetSnifferRule(const char *type, const char *rule)
 	// operator<(sniffer_rule&, sniffer_rule&))
 	if (!err) {
 		std::list<sniffer_rule>::iterator i;
-		for (i = fRuleList.begin(); i != fRuleList.end(); i++)
-		{
+		for (i = fRuleList.begin(); i != fRuleList.end(); i++) {
 			 if (item < (*i)) {
 			 	fRuleList.insert(i, item);
 			 	break;
@@ -292,9 +289,7 @@ SnifferRules::DeleteSnifferRule(const char *type)
 
 	// Find the rule in the list and remove it
 	for (std::list<sniffer_rule>::iterator i = fRuleList.begin();
-		   i != fRuleList.end();
-		     i++)
-	{
+		   i != fRuleList.end(); i++) {
 		if (i->type == type) {
 			fRuleList.erase(i);
 			break;
@@ -316,9 +311,7 @@ SnifferRules::PrintToStream() const
 
 	if (fHaveDoneFullBuild) {
 		for (std::list<sniffer_rule>::const_iterator i = fRuleList.begin();
-			   i != fRuleList.end();
-			     i++)
-		{
+			   i != fRuleList.end(); i++) {
 			printf("%s: '%s'\n", i->type.c_str(), i->rule_string.c_str());
 		}
 	} else {
@@ -357,8 +350,7 @@ SnifferRules::BuildRuleList()
 				char supertype[B_PATH_NAME_LENGTH];
 				if (entry.IsDirectory()
 				      && entry.GetName(supertype) == B_OK
-				         && BMimeType::IsValid(supertype))
-				{
+				         && BMimeType::IsValid(supertype)) {
 					// Make sure the supertype string is all lowercase
 					BPrivate::Storage::to_lower(supertype);
 
@@ -468,9 +460,7 @@ SnifferRules::GuessMimeType(BFile* file, const void *buffer, int32 length,
 		// descreasing priority, and see if one of the rules sniffs
 		// out a match
 		for (std::list<sniffer_rule>::const_iterator i = fRuleList.begin();
-			   i != fRuleList.end();
-			     i++)
-		{
+			   i != fRuleList.end(); i++) {
 			if (i->rule) {
 				// If an add-on identified the type with a priority at least
 				// as great as the remaining rules, we can stop further

@@ -204,8 +204,7 @@ connection_thread(void*)
 
 	// TODO: Keep this a static var
 	port_id fPort = find_port(BLUETOOTH_CONNECTION_SCHED_PORT);
-	if (fPort == B_NAME_NOT_FOUND)
-	{
+	if (fPort == B_NAME_NOT_FOUND) {
 		panic("BT Connection port has been deleted");
 	}
 

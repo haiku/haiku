@@ -315,8 +315,7 @@ IPCP::ReceiveIPPacket(net_buffer *packet, uint16 protocolNumber)
 
 	// TODO: add VJC support (the packet would be decoded here)
 
-	if (packet)
-	{
+	if (packet) {
 #if DEBUG
 		dump_packet(packet, "incoming");
 #endif

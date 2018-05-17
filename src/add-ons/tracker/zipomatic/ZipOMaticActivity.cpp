@@ -130,8 +130,7 @@ Activity::Draw(BRect rect)
 void
 Activity::_DrawOnBitmap(bool running)
 {
-	if (fBitmap->Lock())
-	{
+	if (fBitmap->Lock()) {
 		BRect bounds = fBitmap->Bounds();
 
 		fBitmapView->SetDrawingMode(B_OP_COPY);

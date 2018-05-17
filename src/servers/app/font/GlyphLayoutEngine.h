@@ -333,8 +333,7 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	int i = 0;
 
 	// Try to get the glyph from the fallback fonts
-	while(fallbacks[i] != NULL)
-	{
+	while (fallbacks[i] != NULL) {
 		if (gFontManager->Lock()) {
 			FontStyle* fallbackStyle = gFontManager->GetStyleByIndex(
 				fallbacks[i], 0);

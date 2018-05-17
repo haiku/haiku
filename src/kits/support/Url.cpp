@@ -283,57 +283,48 @@ BUrl::SetPath(const BString& path)
 	BString input(path);
 
 	// 2.
-	while(!input.IsEmpty())
-	{
+	while (!input.IsEmpty()) {
 		// 2.A.
-		if (input.StartsWith("./"))
-		{
+		if (input.StartsWith("./")) {
 			input.Remove(0, 2);
 			continue;
 		}
 
-		if (input.StartsWith("../"))
-		{
+		if (input.StartsWith("../")) {
 			input.Remove(0, 3);
 			continue;
 		}
 
 		// 2.B.
-		if (input.StartsWith("/./"))
-		{
+		if (input.StartsWith("/./")) {
 			input.Remove(0, 2);
 			continue;
 		}
 
-		if (input == "/.")
-		{
+		if (input == "/.") {
 			input.Remove(1, 1);
 			continue;
 		}
 
 		// 2.C.
-		if (input.StartsWith("/../"))
-		{
+		if (input.StartsWith("/../")) {
 			input.Remove(0, 3);
 			output.Truncate(output.FindLast('/'));
 			continue;
 		}
 
-		if (input == "/..")
-		{
+		if (input == "/..") {
 			input.Remove(1, 2);
 			output.Truncate(output.FindLast('/'));
 			continue;
 		}
 
 		// 2.D.
-		if (input == "." || input == "..")
-		{
+		if (input == "." || input == "..") {
 			break;
 		}
 
-		if (input == "/.")
-		{
+		if (input == "/.") {
 			input.Remove(1, 1);
 			continue;
 		}
@@ -1100,8 +1091,7 @@ BString
 BUrl::_MergePath(const BString& relative) const
 {
 	// This implements RFC3986, Section 5.2.3.
-	if (HasAuthority() && fPath == "")
-	{
+	if (HasAuthority() && fPath == "") {
 		BString result("/");
 		result << relative;
 		return result;

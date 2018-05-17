@@ -765,7 +765,7 @@ Volume::RemoveOrphan(Transaction& transaction, ino_t id)
 		currentID = inode->NextOrphan();
 		if (currentID == 0)
 			return B_OK;
-	} while(currentID != id);
+	} while (currentID != id);
 
 	CachedBlock cachedRemoved(this);
 

@@ -306,7 +306,7 @@ BTree::Node::MoveEntries(uint32 start, uint32 end, int length) const
 	if (Level() == 0) {
 		// moving item data
 		int num = start - end;
-		for(uint32 i = start; i < ItemCount() + num; ++i)
+		for (uint32 i = start; i < ItemCount() + num; ++i)
 			Item(i)->SetOffset(Item(i)->Offset() - length);
 
 		memmove(ItemData(ItemCount() - 1) - length, ItemData(ItemCount() - 1),
@@ -855,7 +855,7 @@ BTree::PreviousLeaf(Path* path) const
 			return B_NO_MEMORY;
 		slot = node->ItemCount() - 1;
 		level--;
-	} while(level != 0);
+	} while (level != 0);
 
 	return B_OK;
 }
@@ -894,7 +894,7 @@ BTree::NextLeaf(Path* path) const
 			return B_NO_MEMORY;
 		slot = 0;
 		level--;
-	} while(level != 0);
+	} while (level != 0);
 
 	return B_OK;
 }

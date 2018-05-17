@@ -79,15 +79,14 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 	icns_byte_t *dataPtr = (icns_byte_t*)fIconFamily;
 	off_t dataOffset = sizeof(icns_type_t) + sizeof(icns_size_t);
 
-	while ((dataOffset+8) < fIconFamily->resourceSize)
-	{
+	while ((dataOffset+8) < fIconFamily->resourceSize) {
 		icns_element_t	 iconElement;
 		icns_size_t      iconDataSize;
 
 		memcpy(&iconElement, (dataPtr + dataOffset), 8);
 		iconDataSize = iconElement.elementSize - 8;
 
-		if(IS_SPUPPORTED_TYPE(iconElement.elementType)) {
+		if (IS_SPUPPORTED_TYPE(iconElement.elementType)) {
 				icns_type_t* newTypeItem = new icns_type_t;
 				*newTypeItem = iconElement.elementType;
 				fFormatList.AddItem(newTypeItem);

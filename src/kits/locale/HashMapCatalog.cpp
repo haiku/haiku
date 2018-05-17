@@ -265,8 +265,7 @@ HashMapCatalog::ComputeFingerprint() const
 	int32 hash;
 	CatMap::Iterator iter = fCatMap.GetIterator();
 	CatMap::Entry entry;
-	while (iter.HasNext())
-	{
+	while (iter.HasNext()) {
 		entry = iter.Next();
 		hash = B_HOST_TO_LENDIAN_INT32(entry.key.fHashVal);
 		checksum += hash;

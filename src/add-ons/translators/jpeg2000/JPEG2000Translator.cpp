@@ -445,8 +445,7 @@ write_rgba32b(jas_matrix_t** pixels, uchar* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
-	while (x < width)
-	{
+	while (x < width) {
 		jas_matrix_setv(pixels[0], x, scanline[index++]);
 		jas_matrix_setv(pixels[1], x, scanline[index++]);
 		jas_matrix_setv(pixels[2], x, scanline[index++]);

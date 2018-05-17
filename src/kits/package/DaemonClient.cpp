@@ -53,8 +53,7 @@ BDaemonClient::GetInstallationLocationInfo(
 	// Get our filesystem root node. If we are in a chroot this is not the same
 	// as the package_daemon root node, so we must provide it.
 	struct stat st;
-	if (stat("/boot", &st) == 0)
-	{
+	if (stat("/boot", &st) == 0) {
 		error = request.AddInt32("volume", st.st_dev);
 		if (error != B_OK)
 			return error;

@@ -234,7 +234,7 @@ Journal::Lock(Transaction* owner, bool separateSubTransactions)
 		return B_OK;
 	}
 
-	if(separateSubTransactions)
+	if (separateSubTransactions)
 		fSeparateSubTransactions = true;
 
 	if (owner != NULL)
@@ -478,7 +478,7 @@ Journal::_WriteTransactionToLog()
 		TRACE("Journal::_WriteTransactionToLog(): main transaction size: %"
 			B_PRIuSIZE "\n", size);
 
-		if(fHasSubTransaction && size < fMaxTransactionSize) {
+		if (fHasSubTransaction && size < fMaxTransactionSize) {
 			TRACE("Journal::_WriteTransactionToLog(): transaction doesn't fit, "
 				"but it can be separated\n");
 			detached = true;

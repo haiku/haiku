@@ -255,8 +255,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 	uint8 uniquePartitions = 0;
 	status_t error = B_OK;
 	
-	for (uint32 i = 0; i < count; i++)
-	{
+	for (uint32 i = 0; i < count; i++) {
 		off_t block = descriptorSequence.location()+i;
 		off_t address = block << blockShift; 
 		MemoryChunk chunk(blockSize);
@@ -304,8 +303,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 					// Check for a matching implementation id string (note that the
 					// revision version is not checked)
 					if (impUse->tag().init_check(block) == B_OK
-					    && impUse->implementation_id().matches(kLogicalVolumeInfoId201))
-					{
+					    && impUse->implementation_id().matches(kLogicalVolumeInfoId201)) {
 							foundUdfImplementationUseDescriptor = true;
 					}
 					break;
@@ -323,12 +321,10 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 						int num;
 						for (num = 0; num < uniquePartitions; num++) {
 							if (partitionDescriptors[num].partition_number()
-							    == partition->partition_number())
-							{
+							    == partition->partition_number()) {
 								foundDuplicate = true;
 								if (partitionDescriptors[num].vds_number()
-								    < partition->vds_number())
-								{
+								    < partition->vds_number()) {
 									partitionDescriptors[num] = *partition;		
 									PRINT(("Replacing previous partition #%d (vds_number: %ld) with "
 									       "new partition #%d (vds_number: %ld)\n",
@@ -360,8 +356,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								bool foundReplacement = false;
 								for (int j = 0; j < uniquePartitions; j++) {
 									if (partitionDescriptors[j].vds_number()
-									    < partition->vds_number())
-									{
+									    < partition->vds_number()) {
 										foundReplacement = true;
 										partitionDescriptors[j] = *partition;
 										PRINT(("Replacing partition #%d (vds_number: %ld) "
@@ -467,8 +462,7 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 	bool lastDescriptorWasClosed = false;
 	uint16 highestMinimumUDFReadRevision = 0x0000;
 	status_t error = count > 0 ? B_OK : B_ENTRY_NOT_FOUND;
-	for (uint32 i = 0; error == B_OK && i < count; i++)
-	{
+	for (uint32 i = 0; error == B_OK && i < count; i++) {
 		off_t block = descriptorSequence.location()+i;
 		off_t address = block << blockShift; 
 		MemoryChunk chunk(blockSize);

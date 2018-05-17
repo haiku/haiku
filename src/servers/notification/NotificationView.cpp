@@ -263,8 +263,7 @@ NotificationView::Draw(BRect updateRect)
 		float iy = (Bounds().Height() - fIconSize) / 4.0;
 			// Icon is vertically centered in view
 
-		if (fNotification->Type() == B_PROGRESS_NOTIFICATION)
-		{
+		if (fNotification->Type() == B_PROGRESS_NOTIFICATION) {
 			// Move icon up by half progress bar height if it's present
 			iy -= (progRect.Height() + kEdgePadding);
 		}

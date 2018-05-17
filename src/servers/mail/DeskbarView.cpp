@@ -72,8 +72,7 @@ status_t our_image(image_info* image)
 {
 	int32 cookie = 0;
 	status_t ret;
-	while ((ret = get_next_image_info(0,&cookie,image)) == B_OK)
-	{
+	while ((ret = get_next_image_info(0, &cookie,image)) == B_OK) {
 		if ((char*)our_image >= (char*)image->text_part &&
 			(char*)our_image <= (char*)image->text_part + image->text_part_size)
 			break;
