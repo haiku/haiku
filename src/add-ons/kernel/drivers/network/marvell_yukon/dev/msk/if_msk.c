@@ -117,6 +117,7 @@ __FBSDID("$FreeBSD$");
 #include <net/bpf.h>
 #include <net/ethernet.h>
 #include <net/if.h>
+#include <net/if_var.h>
 #include <net/if_arp.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
@@ -961,10 +962,6 @@ msk_jumbo_newbuf(struct msk_if_softc *sc_if, int idx)
 	m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, MJUM9BYTES);
 	if (m == NULL)
 		return (ENOBUFS);
-	if ((m->m_flags & M_EXT) == 0) {
-		m_freem(m);
-		return (ENOBUFS);
-	}
 	m->m_len = m->m_pkthdr.len = MJUM9BYTES;
 	if ((sc_if->msk_flags & MSK_FLAG_RAMBUF) == 0)
 		m_adj(m, ETHER_ALIGN);
@@ -1626,7 +1623,7 @@ msk_attach(device_t dev)
 	callout_init_mtx(&sc_if->msk_tick_ch, &sc_if->msk_softc->msk_mtx, 0);
 	msk_sysctl_node(sc_if);
 
-	if ((error = msk_txrx_dma_alloc(sc_if) != 0))
+	if ((error = msk_txrx_dma_alloc(sc_if)) != 0)
 		goto fail;
 	msk_rx_dma_jalloc(sc_if);
 
@@ -1638,7 +1635,6 @@ msk_attach(device_t dev)
 	}
 	ifp->if_softc = sc_if;
 	if_initname(ifp, device_get_name(dev), device_get_unit(dev));
-	ifp->if_mtu = ETHERMTU;
 	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
 	ifp->if_capabilities = IFCAP_TXCSUM | IFCAP_TSO4;
 	/*
@@ -1710,7 +1706,7 @@ msk_attach(device_t dev)
 	 * Must appear after the call to ether_ifattach() because
 	 * ether_ifattach() sets ifi_hdrlen to the default value.
 	 */
-        ifp->if_data.ifi_hdrlen = sizeof(struct ether_vlan_header);
+        ifp->if_hdrlen = sizeof(struct ether_vlan_header);
 
 	/*
 	 * Do miibus setup.
@@ -2063,11 +2059,11 @@ msk_detach(device_t dev)
 	msk_txrx_dma_free(sc_if);
 	bus_generic_detach(dev);
 
-	if (ifp)
-		if_free(ifp);
 	sc = sc_if->msk_softc;
 	sc->msk_if[sc_if->msk_port] = NULL;
 	MSK_IF_UNLOCK(sc_if);
+	if (ifp)
+		if_free(ifp);
 
 	return (0);
 }
@@ -2159,10 +2155,6 @@ msk_status_dma_alloc(struct msk_softc *sc)
 	 * status updates.
 	 */
 	count = 3 * MSK_RX_RING_CNT + MSK_TX_RING_CNT;
-#ifdef __HAIKU__
-	// TODO check this!
-	#define imin	min
-#endif
 	count = imin(4096, roundup2(count, 1024));
 	sc->msk_stat_count = count;
 	stat_sz = count * sizeof(struct msk_stat_desc);
@@ -2213,14 +2205,14 @@ msk_status_dma_free(struct msk_softc *sc)
 
 	/* Destroy status block. */
 	if (sc->msk_stat_tag) {
-		if (sc->msk_stat_map) {
+		if (sc->msk_stat_ring_paddr) {
 			bus_dmamap_unload(sc->msk_stat_tag, sc->msk_stat_map);
-			if (sc->msk_stat_ring) {
-				bus_dmamem_free(sc->msk_stat_tag,
-				    sc->msk_stat_ring, sc->msk_stat_map);
-				sc->msk_stat_ring = NULL;
-			}
-			sc->msk_stat_map = NULL;
+			sc->msk_stat_ring_paddr = 0;
+		}
+		if (sc->msk_stat_ring) {
+			bus_dmamem_free(sc->msk_stat_tag,
+			    sc->msk_stat_ring, sc->msk_stat_map);
+			sc->msk_stat_ring = NULL;
 		}
 		bus_dma_tag_destroy(sc->msk_stat_tag);
 		sc->msk_stat_tag = NULL;
@@ -2531,31 +2523,29 @@ msk_txrx_dma_free(struct msk_if_softc *sc_if)
 
 	/* Tx ring. */
 	if (sc_if->msk_cdata.msk_tx_ring_tag) {
-		if (sc_if->msk_cdata.msk_tx_ring_map)
+		if (sc_if->msk_rdata.msk_tx_ring_paddr)
 			bus_dmamap_unload(sc_if->msk_cdata.msk_tx_ring_tag,
 			    sc_if->msk_cdata.msk_tx_ring_map);
-		if (sc_if->msk_cdata.msk_tx_ring_map &&
-		    sc_if->msk_rdata.msk_tx_ring)
+		if (sc_if->msk_rdata.msk_tx_ring)
 			bus_dmamem_free(sc_if->msk_cdata.msk_tx_ring_tag,
 			    sc_if->msk_rdata.msk_tx_ring,
 			    sc_if->msk_cdata.msk_tx_ring_map);
 		sc_if->msk_rdata.msk_tx_ring = NULL;
-		sc_if->msk_cdata.msk_tx_ring_map = NULL;
+		sc_if->msk_rdata.msk_tx_ring_paddr = 0;
 		bus_dma_tag_destroy(sc_if->msk_cdata.msk_tx_ring_tag);
 		sc_if->msk_cdata.msk_tx_ring_tag = NULL;
 	}
 	/* Rx ring. */
 	if (sc_if->msk_cdata.msk_rx_ring_tag) {
-		if (sc_if->msk_cdata.msk_rx_ring_map)
+		if (sc_if->msk_rdata.msk_rx_ring_paddr)
 			bus_dmamap_unload(sc_if->msk_cdata.msk_rx_ring_tag,
 			    sc_if->msk_cdata.msk_rx_ring_map);
-		if (sc_if->msk_cdata.msk_rx_ring_map &&
-		    sc_if->msk_rdata.msk_rx_ring)
+		if (sc_if->msk_rdata.msk_rx_ring)
 			bus_dmamem_free(sc_if->msk_cdata.msk_rx_ring_tag,
 			    sc_if->msk_rdata.msk_rx_ring,
 			    sc_if->msk_cdata.msk_rx_ring_map);
 		sc_if->msk_rdata.msk_rx_ring = NULL;
-		sc_if->msk_cdata.msk_rx_ring_map = NULL;
+		sc_if->msk_rdata.msk_rx_ring_paddr = 0;
 		bus_dma_tag_destroy(sc_if->msk_cdata.msk_rx_ring_tag);
 		sc_if->msk_cdata.msk_rx_ring_tag = NULL;
 	}
@@ -2604,16 +2594,15 @@ msk_rx_dma_jfree(struct msk_if_softc *sc_if)
 
 	/* Jumbo Rx ring. */
 	if (sc_if->msk_cdata.msk_jumbo_rx_ring_tag) {
-		if (sc_if->msk_cdata.msk_jumbo_rx_ring_map)
+		if (sc_if->msk_rdata.msk_jumbo_rx_ring_paddr)
 			bus_dmamap_unload(sc_if->msk_cdata.msk_jumbo_rx_ring_tag,
 			    sc_if->msk_cdata.msk_jumbo_rx_ring_map);
-		if (sc_if->msk_cdata.msk_jumbo_rx_ring_map &&
-		    sc_if->msk_rdata.msk_jumbo_rx_ring)
+		if (sc_if->msk_rdata.msk_jumbo_rx_ring)
 			bus_dmamem_free(sc_if->msk_cdata.msk_jumbo_rx_ring_tag,
 			    sc_if->msk_rdata.msk_jumbo_rx_ring,
 			    sc_if->msk_cdata.msk_jumbo_rx_ring_map);
 		sc_if->msk_rdata.msk_jumbo_rx_ring = NULL;
-		sc_if->msk_cdata.msk_jumbo_rx_ring_map = NULL;
+		sc_if->msk_rdata.msk_jumbo_rx_ring_paddr = 0;
 		bus_dma_tag_destroy(sc_if->msk_cdata.msk_jumbo_rx_ring_tag);
 		sc_if->msk_cdata.msk_jumbo_rx_ring_tag = NULL;
 	}
@@ -2994,14 +2983,14 @@ msk_watchdog(struct msk_if_softc *sc_if)
 		if (bootverbose)
 			if_printf(sc_if->msk_ifp, "watchdog timeout "
 			   "(missed link)\n");
-		ifp->if_oerrors++;
+		if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		msk_init_locked(sc_if);
 		return;
 	}
 
 	if_printf(ifp, "watchdog timeout\n");
-	ifp->if_oerrors++;
+	if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	msk_init_locked(sc_if);
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
@@ -3223,7 +3212,7 @@ msk_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 			 * handle this frame.
 			 */
 			if (len > MSK_MAX_FRAMELEN || len < ETHER_HDR_LEN) {
-				ifp->if_ierrors++;
+				if_inc_counter(ifp, IFCOUNTER_IERRORS, 1);
 				msk_discard_rxbuf(sc_if, cons);
 				break;
 			}
@@ -3232,7 +3221,7 @@ msk_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 		    ((status & GMR_FS_RX_OK) == 0) || (rxlen != len)) {
 			/* Don't count flow-control packet as errors. */
 			if ((status & GMR_FS_GOOD_FC) == 0)
-				ifp->if_ierrors++;
+				if_inc_counter(ifp, IFCOUNTER_IERRORS, 1);
 			msk_discard_rxbuf(sc_if, cons);
 			break;
 		}
@@ -3244,7 +3233,7 @@ msk_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 #endif
 		m = rxd->rx_m;
 		if (msk_newbuf(sc_if, cons) != 0) {
-			ifp->if_iqdrops++;
+			if_inc_counter(ifp, IFCOUNTER_IQDROPS, 1);
 			/* Reuse old buffer. */
 			msk_discard_rxbuf(sc_if, cons);
 			break;
@@ -3255,7 +3244,7 @@ msk_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 		if ((sc_if->msk_flags & MSK_FLAG_RAMBUF) != 0)
 			msk_fixup_rx(m);
 #endif
-		ifp->if_ipackets++;
+		if_inc_counter(ifp, IFCOUNTER_IPACKETS, 1);
 		if ((ifp->if_capenable & IFCAP_RXCSUM) != 0)
 			msk_rxcsum(sc_if, control, m);
 		/* Check for VLAN tagged packets. */
@@ -3297,7 +3286,7 @@ msk_jumbo_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 		    ((status & GMR_FS_RX_OK) == 0) || (rxlen != len)) {
 			/* Don't count flow-control packet as errors. */
 			if ((status & GMR_FS_GOOD_FC) == 0)
-				ifp->if_ierrors++;
+				if_inc_counter(ifp, IFCOUNTER_IERRORS, 1);
 			msk_discard_jumbo_rxbuf(sc_if, cons);
 			break;
 		}
@@ -3309,7 +3298,7 @@ msk_jumbo_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 #endif
 		m = jrxd->rx_m;
 		if (msk_jumbo_newbuf(sc_if, cons) != 0) {
-			ifp->if_iqdrops++;
+			if_inc_counter(ifp, IFCOUNTER_IQDROPS, 1);
 			/* Reuse old buffer. */
 			msk_discard_jumbo_rxbuf(sc_if, cons);
 			break;
@@ -3320,7 +3309,7 @@ msk_jumbo_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
 		if ((sc_if->msk_flags & MSK_FLAG_RAMBUF) != 0)
 			msk_fixup_rx(m);
 #endif
-		ifp->if_ipackets++;
+		if_inc_counter(ifp, IFCOUNTER_IPACKETS, 1);
 		if ((ifp->if_capenable & IFCAP_RXCSUM) != 0)
 			msk_rxcsum(sc_if, control, m);
 		/* Check for VLAN tagged packets. */
@@ -3375,7 +3364,7 @@ msk_txeof(struct msk_if_softc *sc_if, int idx)
 		    BUS_DMASYNC_POSTWRITE);
 		bus_dmamap_unload(sc_if->msk_cdata.msk_tx_tag, txd->tx_dmamap);
 
-		ifp->if_opackets++;
+		if_inc_counter(ifp, IFCOUNTER_OPACKETS, 1);
 		KASSERT(txd->tx_m != NULL, ("%s: freeing NULL mbuf!",
 		    __func__));
 		m_freem(txd->tx_m);
@@ -3504,7 +3493,7 @@ msk_intr_hwerr(struct msk_softc *sc)
 		CSR_WRITE_1(sc, GMAC_TI_ST_CTRL, GMT_ST_CLR_IRQ);
 	if ((status & Y2_IS_PCI_NEXP) != 0) {
 		/*
-		 * PCI Express Error occured which is not described in PEX
+		 * PCI Express Error occurred which is not described in PEX
 		 * spec.
 		 * This error is also mapped either to Master Abort(
 		 * Y2_IS_MST_ERR) or Target Abort (Y2_IS_IRQ_STAT) bit and
@@ -3540,7 +3529,7 @@ msk_intr_hwerr(struct msk_softc *sc)
 		 * On PCI Express bus bridges are called root complexes (RC).
 		 * PCI Express errors are recognized by the root complex too,
 		 * which requests the system to handle the problem. After
-		 * error occurence it may be that no access to the adapter
+		 * error occurrence it may be that no access to the adapter
 		 * may be performed any longer.
 		 */
 
