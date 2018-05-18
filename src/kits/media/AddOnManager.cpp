@@ -558,8 +558,8 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 
 	while (true) {
 		memset(&info.codecInfo, 0, sizeof(media_codec_info));
-		memset(&info.intputFormat, 0, sizeof(media_format));
-		memset(&info.outputFormat, 0, sizeof(media_format));
+		info.intputFormat.Clear();
+		info.outputFormat.Clear();
 		if (plugin->RegisterNextEncoder(&cookie,
 			&info.codecInfo, &info.formatFamily, &info.intputFormat,
 			&info.outputFormat) != B_OK) {

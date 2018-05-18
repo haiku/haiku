@@ -3236,7 +3236,7 @@ BMediaRoster::GetFormatFor(const media_input& input, media_format* _format,
 	status_t rv;
 
 	request.dest = input.destination;
-	memset(&request.format, 0, sizeof(request.format)); // wildcard
+	request.format.Clear(); // wildcard
 
 	rv = QueryPort(input.destination.port, CONSUMER_ACCEPT_FORMAT, &request,
 		sizeof(request), &reply, sizeof(reply));

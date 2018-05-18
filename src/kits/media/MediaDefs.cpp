@@ -832,17 +832,34 @@ media_format::MetaDataSize() const
 }
 
 
-media_format::media_format()
+void
+media_format::Unflatten(const char *flatBuffer)
+{
+	// TODO: we should not!!! make flat copies of media_format
+	memcpy(this, flatBuffer, sizeof(*this));
+	meta_data = NULL;
+	meta_data_area = B_BAD_VALUE;
+}
+
+
+void
+media_format::Clear()
 {
 	memset(this, 0x00, sizeof(*this));
+	meta_data = NULL;
 	meta_data_area = B_BAD_VALUE;
+}
+
+
+media_format::media_format()
+{
+	this->Clear();
 }
 
 
 media_format::media_format(const media_format& other)
 {
-	memset(this, 0x00, sizeof(*this));
-	meta_data_area = B_BAD_VALUE;
+	this->Clear();
 	*this = other;
 }
 

@@ -489,7 +489,7 @@ BMediaFormats::GetFormatFor(const media_format_description& description,
 		meta_format::CompareDescriptions);
 	TRACE("meta format == %p\n", metaFormat);
 	if (metaFormat == NULL) {
-		memset(_format, 0, sizeof(*_format)); // clear to widlcard
+		_format->Clear(); // clear to widlcard
 		return B_MEDIA_BAD_FORMAT;
 	}
 

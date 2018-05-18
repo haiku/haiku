@@ -442,11 +442,13 @@ dormant_flavor_info::Unflatten(type_code c, const void *buffer, ssize_t size)
 			if (!in_formats)
 				return B_NO_MEMORY;
 			// TODO: we should not!!! make flat copies of media_format
-			memcpy(const_cast<media_format *>(in_formats), buf,
-				count * sizeof(media_format));
+			for (int32 i = 0; i < count; i++) {
+				const_cast<media_format*>
+					(&in_formats[i])->Unflatten(buf);
+				buf += sizeof(media_format); // TODO: not save
+			}
 			in_format_count = count;
 		}
-		buf += count * sizeof(media_format); // TODO: not save
 	}
 
 	count = *(int32*)buf; buf += sizeof(int32);
@@ -458,11 +460,13 @@ dormant_flavor_info::Unflatten(type_code c, const void *buffer, ssize_t size)
 			if (!out_formats)
 				return B_NO_MEMORY;
 			// TODO: we should not!!! make flat copies of media_format
-			memcpy(const_cast<media_format *>(out_formats), buf,
-				count * sizeof(media_format));
+			for (int32 i = 0; i < count; i++) {
+				const_cast<media_format*>
+					(&out_formats[i])->Unflatten(buf);
+				buf += sizeof(media_format); // TODO: not save
+			}
 			out_format_count = count;
 		}
-		buf += count * sizeof(media_format); // TODO: not save
 	}
 
 	node_info = *(dormant_node_info*)buf; buf += sizeof(dormant_node_info);
