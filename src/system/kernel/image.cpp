@@ -18,6 +18,11 @@
 #include <thread_types.h>
 #include <user_debugger.h>
 #include <util/AutoLock.h>
+#include <util/syscall_args.h>
+
+#ifdef _COMPAT_MODE
+#	include <image_compat.h>
+#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -464,12 +469,9 @@ _user_register_image(extended_image_info *userInfo, size_t size)
 {
 	extended_image_info info;
 
-	if (size != sizeof(info))
-		return B_BAD_VALUE;
-
-	if (!IS_USER_ADDRESS(userInfo)
-		|| user_memcpy(&info, userInfo, size) < B_OK)
-		return B_BAD_ADDRESS;
+	status_t status = copy_ref_var_from_user(userInfo, info, size);
+	if (status != B_OK)
+		return status;
 
 	return register_image(thread_get_current_thread()->team, &info, size);
 }
@@ -525,9 +527,9 @@ _user_get_image_info(image_id id, image_info *userInfo, size_t size)
 
 	status = _get_image_info(id, &info, sizeof(image_info));
 
-	if (user_memcpy(userInfo, &info, size) < B_OK)
-		return B_BAD_ADDRESS;
-
+	status_t err = copy_ref_var_to_user(info, userInfo, size);
+	if (err != B_OK)
+		return err;
 	return status;
 }
 
@@ -540,9 +542,6 @@ _user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo,
 	status_t status;
 	int32 cookie;
 
-	if (size > sizeof(image_info))
-		return B_BAD_VALUE;
-
 	if (!IS_USER_ADDRESS(userInfo) || !IS_USER_ADDRESS(_cookie)
 		|| user_memcpy(&cookie, _cookie, sizeof(int32)) < B_OK) {
 		return B_BAD_ADDRESS;
@@ -550,10 +549,11 @@ _user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo,
 
 	status = _get_next_image_info(team, &cookie, &info, sizeof(image_info));
 
-	if (user_memcpy(userInfo, &info, size) < B_OK
-		|| user_memcpy(_cookie, &cookie, sizeof(int32)) < B_OK) {
+	status_t err = copy_ref_var_to_user(info, userInfo, size);
+	if (err != B_OK)
+		return err;
+	if (user_memcpy(_cookie, &cookie, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
-	}
 
 	return status;
 }
