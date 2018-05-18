@@ -195,7 +195,7 @@ XColorsTable::LookUpColor(const char* name, rgb_color* color)
 	}
 
 	if (fTable[right].hash == hash) {
-		memcpy(color, &fTable[right].color, sizeof(rgb_color));
+		*color = fTable[right].color;
 		return B_OK;
 	}
 

@@ -1088,7 +1088,7 @@ BasicTerminalBuffer::_AllocateLines(int32 width, int32 count)
 			_FreeLines(lines, i);
 			return NULL;
 		}
-		memset(lines[i], 0, size);
+		lines[i]->Clear(0, width);
 	}
 
 	return lines;

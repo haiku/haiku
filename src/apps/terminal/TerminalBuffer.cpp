@@ -61,8 +61,8 @@ TerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 	if (fColorsPalette == NULL)
 		return B_NO_MEMORY;
 
-	memcpy(fColorsPalette, TermApp::DefaultPalette(),
-			sizeof(rgb_color) * kTermColorCount);
+	for (uint i = 0; i < kTermColorCount; i++)
+		fColorsPalette[i] = TermApp::DefaultPalette()[i];
 
 	return BasicTerminalBuffer::Init(width, height, historySize);
 }
