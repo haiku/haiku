@@ -501,10 +501,10 @@ AccelerantHWInterface::_FindBestMode(const display_mode& compareMode,
 			+ abs(mode.timing.h_total * mode.timing.v_total
 					- compareMode.timing.h_total * compareMode.timing.v_total)
 				/ 100
-			+ abs(mode.timing.pixel_clock - compareMode.timing.pixel_clock)
+			+ abs((int)(mode.timing.pixel_clock - compareMode.timing.pixel_clock))
 				/ 100
 			+ (int32)(500 * fabs(aspectRatio - compareAspectRatio))
-			+ 100 * abs(mode.space - compareMode.space);
+			+ 100 * abs((int)(mode.space - compareMode.space));
 
 		if (bestIndex == -1 || diff < bestDiff) {
 			bestDiff = diff;
