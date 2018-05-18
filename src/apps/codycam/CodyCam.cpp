@@ -760,6 +760,7 @@ VideoWindow::ErrorAlert(const char* message, status_t err)
 	fErrorView->MakeEditable(false);
 	fErrorView->MakeSelectable(false);
 	fErrorView->SetWordWrap(true);
+	fErrorView->SetAlignment(B_ALIGN_CENTER);
 	fErrorView->SetExplicitMinSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
 	fErrorView->SetExplicitMaxSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
 	fErrorView->Show();
