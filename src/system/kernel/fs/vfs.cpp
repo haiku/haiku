@@ -49,10 +49,18 @@
 #include <util/atomic.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/syscall_args.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/VMCache.h>
 #include <wait_for_objects.h>
+
+#ifdef _COMPAT_MODE
+#	include <fcntl_compat.h>
+#	include <stat_compat.h>
+#	include <fs_attr_compat.h>
+#	include <fs_info_compat.h>
+#endif
 
 #include "EntryCache.h"
 #include "fifo.h"
@@ -6116,10 +6124,8 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
 		if (descriptor->type != FDTYPE_FILE)
 			status = B_BAD_VALUE;
-		else if (user_memcpy(&flock, (struct flock*)argument,
-				sizeof(struct flock)) != B_OK)
-			status = B_BAD_ADDRESS;
-
+		else
+			status = copy_ref_var_from_user((struct flock*)argument, flock);
 		if (status != B_OK) {
 			put_fd(descriptor);
 			return status;
@@ -8798,10 +8804,7 @@ _user_read_fs_info(dev_t device, struct fs_info* userInfo)
 	if (status != B_OK)
 		return status;
 
-	if (user_memcpy(userInfo, &info, sizeof(struct fs_info)) != B_OK)
-		return B_BAD_ADDRESS;
-
-	return B_OK;
+	return copy_ref_var_to_user(info, userInfo);
 }
 
 
@@ -8813,9 +8816,9 @@ _user_write_fs_info(dev_t device, const struct fs_info* userInfo, int mask)
 	if (userInfo == NULL)
 		return B_BAD_VALUE;
 
-	if (!IS_USER_ADDRESS(userInfo)
-		|| user_memcpy(&info, userInfo, sizeof(struct fs_info)) != B_OK)
-		return B_BAD_ADDRESS;
+	status_t status = copy_ref_var_from_user((struct fs_info*)userInfo, info);
+	if (status != B_OK)
+		return status;
 
 	return fs_write_info(device, &info, mask);
 }
@@ -8861,9 +8864,6 @@ _user_get_next_fd_info(team_id team, uint32* userCookie, fd_info* userInfo,
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	if (infoSize != sizeof(fd_info))
-		return B_BAD_VALUE;
-
 	if (!IS_USER_ADDRESS(userCookie) || !IS_USER_ADDRESS(userInfo)
 		|| user_memcpy(&cookie, userCookie, sizeof(uint32)) != B_OK)
 		return B_BAD_ADDRESS;
@@ -8872,11 +8872,9 @@ _user_get_next_fd_info(team_id team, uint32* userCookie, fd_info* userInfo,
 	if (status != B_OK)
 		return status;
 
-	if (user_memcpy(userCookie, &cookie, sizeof(uint32)) != B_OK
-		|| user_memcpy(userInfo, &info, infoSize) != B_OK)
+	if (user_memcpy(userCookie, &cookie, sizeof(uint32)) != B_OK)
 		return B_BAD_ADDRESS;
-
-	return status;
+	return copy_ref_var_to_user(info, userInfo);
 }
 
 
@@ -9527,7 +9525,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 	if (status != B_OK)
 		return status;
 
-	return user_memcpy(userStat, &stat, statSize);
+	return copy_ref_var_to_user(stat, userStat, statSize);
 }
 
 
@@ -9698,8 +9696,7 @@ _user_stat_attr(int fd, const char* userAttribute,
 		info.type = stat.st_type;
 		info.size = stat.st_size;
 
-		if (user_memcpy(userAttrInfo, &info, sizeof(struct attr_info)) != B_OK)
-			return B_BAD_ADDRESS;
+		status = copy_ref_var_to_user(info, userAttrInfo);
 	}
 
 	return status;
@@ -9808,10 +9805,8 @@ _user_read_index_stat(dev_t device, const char* userName, struct stat* userStat)
 		return B_BAD_ADDRESS;
 
 	status = index_name_read_stat(device, name, &stat, false);
-	if (status == B_OK) {
-		if (user_memcpy(userStat, &stat, sizeof(stat)) != B_OK)
-			return B_BAD_ADDRESS;
-	}
+	if (status == B_OK)
+		status = copy_ref_var_to_user(stat, userStat);
 
 	return status;
 }
