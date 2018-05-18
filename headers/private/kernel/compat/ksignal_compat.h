@@ -39,6 +39,7 @@ typedef struct __compat_siginfo_t {
 	union compat_sigval	si_value;	/* signal value */
 } compat_siginfo_t;
 
+
 struct compat_signal_frame_data {
 	compat_siginfo_t	info;
 	compat_ucontext_t	context;
