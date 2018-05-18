@@ -268,7 +268,7 @@ status_t
 MediaTrackVideoSupplier::_SwitchFormat(color_space format, uint32 bytesPerRow)
 {
 	// get the encoded format
-	memset(&fFormat, 0, sizeof(media_format));
+	fFormat.Clear();
 	status_t ret = fVideoTrack->EncodedFormat(&fFormat);
 	if (ret < B_OK) {
 		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
@@ -349,7 +349,7 @@ MediaTrackVideoSupplier::_SetDecodedFormat(uint32 width, uint32 height,
 {
 	// specifiy the decoded format. we derive this information from
 	// the encoded format (width & height).
-	memset(&fFormat, 0, sizeof(media_format));
+	fFormat.Clear();
 //	fFormat.u.raw_video.last_active = height - 1;
 //	fFormat.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
 //	fFormat.u.raw_video.pixel_width_aspect = 1;

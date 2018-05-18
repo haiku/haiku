@@ -41,7 +41,6 @@ NodeManager::Connection::Connection()
 	:
 	connected(false)
 {
-	memset(&format, 0, sizeof(media_format));
 }
 
 
