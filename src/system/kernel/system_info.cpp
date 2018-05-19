@@ -31,6 +31,9 @@
 #include <lock.h>
 #include <Notifications.h>
 #include <messaging.h>
+#ifdef _COMPAT_MODE
+#	include <OS_compat.h>
+#endif
 #include <port.h>
 #include <real_time_clock.h>
 #include <sem.h>
@@ -38,6 +41,7 @@
 #include <team.h>
 #include <thread.h>
 #include <util/AutoLock.h>
+#include <util/syscall_args.h>
 #include <vm/vm.h>
 #include <vm/vm_page.h>
 
@@ -545,13 +549,8 @@ _user_get_system_info(system_info* userInfo)
 
 	system_info info;
 	status_t status = get_system_info(&info);
-	if (status == B_OK) {
-		if (user_memcpy(userInfo, &info, sizeof(system_info)) < B_OK)
-			return B_BAD_ADDRESS;
-
-		return B_OK;
-	}
-
+	if (status == B_OK)
+		return copy_ref_var_to_user(info, userInfo);
 	return status;
 }
 
