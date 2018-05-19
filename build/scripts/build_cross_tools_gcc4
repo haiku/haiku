@@ -9,6 +9,8 @@ if [ $# -lt 4 ]; then
 	exit 1
 fi
 
+set -e
+
 haikuMachine=$1
 haikuSourceDir=$2
 buildToolsDir=$3
