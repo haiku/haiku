@@ -316,6 +316,8 @@ device_set_driver(device_t dev, driver_t *driver)
 			dev->methods.bus_print_child = (void *)mth->method;
 		else if (!strcmp(mth->name, "bus_read_ivar"))
 			dev->methods.bus_read_ivar = (void *)mth->method;
+		else if (!strcmp(mth->name, "bus_get_dma_tag"))
+			dev->methods.bus_get_dma_tag = (void *)mth->method;
 		else
 			panic("device_set_driver: method %s not found\n", mth->name);
 

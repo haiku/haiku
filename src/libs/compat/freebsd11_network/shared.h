@@ -9,6 +9,9 @@
 #define SHARED_H_
 
 
+#include <sys/bus.h>
+
+
 #define MAX_DEVICES	8
 
 
@@ -52,6 +55,7 @@ struct device {
 		int (*bus_print_child)(device_t dev, device_t child);
 		int (*bus_read_ivar)(device_t dev, device_t child __unused, int which,
 		    uintptr_t *result);
+		bus_dma_tag_t (*bus_get_dma_tag)(device_t dev);
 	} methods;
 
 	struct list_link link;
