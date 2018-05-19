@@ -95,4 +95,183 @@ copy_ref_var_to_user(system_info &info, system_info* userInfo)
 }
 
 
+#define compat_size_t uint32
+#define compat_ptr_t uint32
+typedef struct compat_area_info {
+	area_id		area;
+	char		name[B_OS_NAME_LENGTH];
+	compat_size_t	size;
+	uint32		lock;
+	uint32		protection;
+	team_id		team;
+	uint32		ram_size;
+	uint32		copy_count;
+	uint32		in_count;
+	uint32		out_count;
+	compat_ptr_t	address;
+} _PACKED compat_area_info;
+
+
+static_assert(sizeof(compat_area_info) == 0x48,
+	"size of compat_area_info mismatch");
+
+
+inline status_t
+copy_ref_var_to_user(area_info &info, area_info* userInfo)
+{
+	if (!IS_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		compat_area_info compatInfo;
+		compatInfo.area = info.area;
+		strlcpy(compatInfo.name, info.name, B_OS_NAME_LENGTH);
+		compatInfo.size = info.size;
+		compatInfo.lock = info.lock;
+		compatInfo.protection = info.protection;
+		compatInfo.team = info.team;
+		compatInfo.ram_size = info.ram_size;
+		compatInfo.copy_count = info.copy_count;
+		compatInfo.in_count = info.in_count;
+		compatInfo.out_count = info.out_count;
+		compatInfo.address = (compat_ptr_t)(addr_t)info.address;
+		if (user_memcpy(userInfo, &compatInfo, sizeof(compatInfo)) < B_OK)
+			return B_BAD_ADDRESS;
+	} else if (user_memcpy(userInfo, &info, sizeof(info)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+typedef struct {
+	thread_id		thread;
+	team_id			team;
+	char			name[B_OS_NAME_LENGTH];
+	thread_state	state;
+	int32			priority;
+	sem_id			sem;
+	bigtime_t		user_time;
+	bigtime_t		kernel_time;
+	uint32			stack_base;
+	uint32			stack_end;
+} _PACKED compat_thread_info;
+
+
+static_assert(sizeof(compat_thread_info) == 76,
+	"size of compat_thread_info mismatch");
+
+
+inline status_t
+copy_ref_var_to_user(void* &addr, void** userAddr)
+{
+	if (!IS_USER_ADDRESS(userAddr))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		compat_ptr_t compatAddr = (uint32)(addr_t)addr;
+		if (user_memcpy(userAddr, &compatAddr, sizeof(compatAddr)) < B_OK)
+			return B_BAD_ADDRESS;
+	} else if (user_memcpy(userAddr, &addr, sizeof(addr)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+inline status_t
+copy_ref_var_from_user(void** userAddr, void* &addr)
+{
+	if (!IS_USER_ADDRESS(userAddr))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		compat_ptr_t compatAddr;
+		if (user_memcpy(&compatAddr, userAddr, sizeof(compatAddr)) < B_OK)
+			return B_BAD_ADDRESS;
+		addr = (void*)(addr_t)compatAddr;
+	} else if (user_memcpy(&addr, userAddr, sizeof(addr)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+inline status_t
+copy_ref_var_to_user(addr_t &addr, addr_t* userAddr)
+{
+	if (!IS_USER_ADDRESS(userAddr))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		uint32 compatAddr = (uint32)addr;
+		if (user_memcpy(userAddr, &compatAddr, sizeof(compatAddr)) < B_OK)
+			return B_BAD_ADDRESS;
+	} else if (user_memcpy(userAddr, &addr, sizeof(addr)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+inline status_t
+copy_ref_var_from_user(addr_t* userAddr, addr_t &addr)
+{
+	if (!IS_USER_ADDRESS(userAddr))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		uint32 compatAddr;
+		if (user_memcpy(&compatAddr, userAddr, sizeof(compatAddr)) < B_OK)
+			return B_BAD_ADDRESS;
+		addr = (addr_t)compatAddr;
+	} else if (user_memcpy(&addr, userAddr, sizeof(addr)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+inline status_t
+copy_ref_var_to_user(ssize_t &size, ssize_t* userSize)
+{
+	if (!IS_USER_ADDRESS(userSize))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		int32 compatSize = (int32)size;
+		if (user_memcpy(userSize, &compatSize, sizeof(compatSize)) < B_OK)
+			return B_BAD_ADDRESS;
+	} else if (user_memcpy(userSize, &size, sizeof(size)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+inline status_t
+copy_ref_var_from_user(ssize_t* userSize, ssize_t &size)
+{
+	if (!IS_USER_ADDRESS(userSize))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		int32 compatSize;
+		if (user_memcpy(&compatSize, userSize, sizeof(compatSize)) < B_OK)
+			return B_BAD_ADDRESS;
+		size = (ssize_t)compatSize;
+	} else if (user_memcpy(&size, userSize, sizeof(size)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
 #endif // _KERNEL_COMPAT_OS_H
