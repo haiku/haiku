@@ -195,8 +195,6 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	AddNodeKind(B_PHYSICAL_INPUT);
 
 	// initialize our preferred format objects
-	memset(&fOutputPreferredFormat, 0, sizeof(fOutputPreferredFormat));
-		// set everything to wildcard first
 	fOutputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	fOutputPreferredFormat.u.raw_audio.format
 		= MultiAudio::convert_to_media_format(
@@ -218,8 +216,6 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 			* fOutputPreferredFormat.u.raw_audio.channel_count;
 
 	// initialize our preferred format objects
-	memset(&fInputPreferredFormat, 0, sizeof(fInputPreferredFormat));
-		// set everything to wildcard first
 	fInputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	fInputPreferredFormat.u.raw_audio.format
 		= MultiAudio::convert_to_media_format(
@@ -228,7 +224,8 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		= MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().input.format);
 	fInputPreferredFormat.u.raw_audio.channel_count = 2;
 	fInputPreferredFormat.u.raw_audio.frame_rate
-		= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);		// measured in Hertz
+		= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);
+		// measured in Hertz
 	fInputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
 	// we'll use the consumer's preferred buffer size, if any
