@@ -164,6 +164,34 @@ static_assert(sizeof(compat_thread_info) == 76,
 
 
 inline status_t
+copy_ref_var_to_user(thread_info &info, thread_info* userInfo)
+{
+	if (!IS_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+	Thread* thread = thread_get_current_thread();
+	bool compatMode = (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0;
+	if (compatMode) {
+		compat_thread_info compatInfo;
+		compatInfo.thread = info.thread;
+		compatInfo.team = info.team;
+		strlcpy(compatInfo.name, info.name, sizeof(compatInfo.name));
+		compatInfo.state = info.state;
+		compatInfo.priority = info.priority;
+		compatInfo.sem = info.sem;
+		compatInfo.user_time = info.user_time;
+		compatInfo.kernel_time = info.kernel_time;
+		compatInfo.stack_base = (uint32)(addr_t)info.stack_base;
+		compatInfo.stack_end = (uint32)(addr_t)info.stack_end;
+		if (user_memcpy(userInfo, &compatInfo, sizeof(compatInfo)) < B_OK)
+			return B_BAD_ADDRESS;
+	} else if (user_memcpy(userInfo, &info, sizeof(info)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
+}
+
+
+inline status_t
 copy_ref_var_to_user(void* &addr, void** userAddr)
 {
 	if (!IS_USER_ADDRESS(userAddr))

@@ -18,9 +18,6 @@
 #include <debug.h>
 #include <kernel.h>
 #include <ksignal.h>
-#ifdef _COMPAT_MODE
-#	include <compat/ksignal_compat.h>
-#endif
 #include <int.h>
 #include <team.h>
 #include <thread.h>
@@ -29,6 +26,10 @@
 #include <util/Random.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
+
+#ifdef _COMPAT_MODE
+#	include <compat/ksignal_compat.h>
+#endif
 
 #include "paging/X86PagingStructures.h"
 #include "paging/X86VMTranslationMap.h"
