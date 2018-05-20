@@ -10,6 +10,9 @@ SubDirSysHdrs [ FDirName $(userlandFSIncludes) fuse ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
+# Don't warn on truncation under gcc6+
+SubDirC++Flags -Wno-format-truncation ;
+
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) private ] ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
