@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #include <Bitmap.h>
+#include <String.h>
 
 #include "ColorWhichItem.h"
 
@@ -52,11 +53,11 @@ ColorWhichListView::InitiateDrag(BPoint where, int32 index, bool wasSelected)
 
 	rgb_color color = colorWhichItem->Color();
 
-	char hexString[7];
-	sprintf(hexString, "#%.2X%.2X%.2X", color.red, color.green, color.blue);
+	BString hexStr;
+	hexStr.SetToFormat("#%.2X%.2X%.2X", color.red, color.green, color.blue);
 
 	BMessage message(B_PASTE);
-	message.AddData("text/plain", B_MIME_TYPE, &hexString, sizeof(hexString));
+	message.AddData("text/plain", B_MIME_TYPE, hexStr.String(), hexStr.Length());
 	message.AddData("RGBColor", B_RGB_COLOR_TYPE, &color, sizeof(color));
 
 	float itemHeight = colorWhichItem->Height() - 5;
