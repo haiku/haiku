@@ -35,6 +35,10 @@ public:
 			addr_t				Base() const			{ return fBase; }
 			addr_t				EndAddress() const		{ return fEndAddress; }
 			size_t				Size() const { return fEndAddress - fBase + 1; }
+			void				SetSize(size_t size) {
+									fEndAddress = fBase + (size - 1);
+									fFreeSpace = size; }
+
 			size_t				FreeSpace() const		{ return fFreeSpace; }
 			bool				IsBeingDeleted() const	{ return fDeleting; }
 

@@ -28,6 +28,9 @@
 #include <extended_system_info_defs.h>
 
 #include <commpage.h>
+#ifdef _COMPAT_MODE
+#	include <commpage_compat.h>
+#endif
 #include <boot_device.h>
 #include <elf.h>
 #include <file_cache.h>
@@ -85,6 +88,7 @@ struct team_arg {
 };
 
 #define TEAM_ARGS_FLAG_NO_ASLR	0x01
+#define TEAM_ARGS_FLAG_COMPAT_FLATARGS 0x02
 
 
 namespace {
@@ -1345,7 +1349,8 @@ remove_team_from_group(Team* team)
 
 
 static status_t
-create_team_user_data(Team* team, void* exactAddress = NULL)
+create_team_user_data(Team* team, void* exactAddress = NULL,
+	void* baseAddress = NULL)
 {
 	void* address;
 	uint32 addressSpec;
@@ -1354,7 +1359,8 @@ create_team_user_data(Team* team, void* exactAddress = NULL)
 		address = exactAddress;
 		addressSpec = B_EXACT_ADDRESS;
 	} else {
-		address = (void*)KERNEL_USER_DATA_BASE;
+		address = baseAddress != NULL ? baseAddress
+			: (void*)KERNEL_USER_DATA_BASE;
 		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
 	}
 
@@ -1369,7 +1375,8 @@ create_team_user_data(Team* team, void* exactAddress = NULL)
 			virtualRestrictions.address = address;
 		virtualRestrictions.address_specification = B_EXACT_ADDRESS;
 	} else {
-		virtualRestrictions.address = (void*)KERNEL_USER_DATA_BASE;
+		virtualRestrictions.address = baseAddress != NULL ? baseAddress
+			: (void*)KERNEL_USER_DATA_BASE;
 		virtualRestrictions.address_specification = B_RANDOMIZED_BASE_ADDRESS;
 	}
 
@@ -1513,6 +1520,12 @@ create_team_arg(struct team_arg** _teamArg, const char* path, char** flatArgs,
 		}
 	}
 
+#ifdef _COMPAT_MODE
+	Thread* thread = thread_get_current_thread();
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0)
+		teamArg->flags |= TEAM_ARGS_FLAG_COMPAT_FLATARGS;
+#endif
+
 	*_teamArg = teamArg;
 	return B_OK;
 }
@@ -1563,17 +1576,119 @@ team_create_thread_start_internal(void* args)
 	userEnv = userArgs + argCount + 1;
 	path = teamArgs->path;
 
+	// set team args and update state
+	// TODO: this can't work with a compat flat_args
+	team->Lock();
+	team->SetArgs(path, teamArgs->flat_args + 1, argCount - 1);
+	team->state = TEAM_STATE_NORMAL;
+	team->Unlock();
+
+#ifdef _COMPAT_MODE
+	// in compat mode, userArgs and userEnv should only be uint32
+	if ((teamArgs->flags & TEAM_ARGS_FLAG_COMPAT_FLATARGS) == 0
+		&& (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+		// now make the arrays 32-bits wide
+		addr_t pointerOffset = 4; // sizeof(addr_t) - sizeof(uint32)
+		size_t pointerSize = sizeof(uint32);
+		uint32 *elfArgs = (uint32*)teamArgs->flat_args;
+		addr_t *tempArgs = (addr_t*)teamArgs->flat_args;
+		if (argCount > 0) {
+			for (int i = 0; i < argCount; i++) {
+				*elfArgs = (uint32)*tempArgs;
+				elfArgs++;
+				tempArgs++;
+			}
+		}
+		*elfArgs = NULL;
+		elfArgs++;
+		tempArgs++;
+		userEnv = (char**)elfArgs;
+		if (envCount > 0) {
+			for (int i = 0; i < envCount; i++) {
+				*elfArgs = (uint32)*tempArgs;
+				elfArgs++;
+				tempArgs++;
+			}
+		}
+		*elfArgs = NULL;
+
+		// now move the flat strings
+		size_t stringsOffset = (argCount + envCount + 2) * sizeof(char*);
+		addr_t strings = (addr_t)teamArgs->flat_args + stringsOffset;
+		size_t strings32Offset = (argCount + envCount + 2) * sizeof(uint32);
+		addr_t strings32 = (addr_t)teamArgs->flat_args + strings32Offset;
+		memmove((void*)strings32, (void*)strings,
+			teamArgs->flat_args_size - stringsOffset);
+
+		uint32 user32Args = (uint32)(addr_t)userArgs;
+		uint32 user32Env = user32Args + (argCount + 1) * sizeof(uint32);
+		if (user_strlcpy(programArgs->program_path, path,
+					sizeof(programArgs->program_path)) < B_OK
+			|| user_memcpy(&programArgs->arg_count, &argCount, sizeof(int32))
+					< B_OK
+			|| user_memcpy(&programArgs->env_count, &envCount, sizeof(int32))
+					< B_OK
+			|| user_memcpy(&programArgs->args, &user32Args, sizeof(user32Args))
+					< B_OK
+			|| user_memcpy((void*)(((addr_t)&programArgs->args) + 4),
+					&user32Env, sizeof(user32Env)) < B_OK
+			|| user_memcpy(&programArgs->error_port, &teamArgs->error_port,
+					sizeof(port_id)) < B_OK
+			|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
+					sizeof(uint32)) < B_OK
+			|| user_memcpy(&programArgs->umask, &teamArgs->umask,
+					sizeof(mode_t)) < B_OK
+			|| user_memcpy(userArgs, teamArgs->flat_args,
+					teamArgs->flat_args_size - (stringsOffset -
+					strings32Offset)) < B_OK) {
+			// the team deletion process will clean this mess
+			free_team_arg(teamArgs);
+			return B_BAD_ADDRESS;
+		}
+
+	} else if ((teamArgs->flags & TEAM_ARGS_FLAG_COMPAT_FLATARGS) != 0
+		&& (thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+		uint32 user32Args = (uint32)(addr_t)userArgs;
+		uint32 user32Env = user32Args + (argCount + 1) * sizeof(uint32);
+
+		if (user_strlcpy(programArgs->program_path, path,
+				sizeof(programArgs->program_path)) < B_OK
+			|| user_memcpy(&programArgs->arg_count, &argCount,
+					sizeof(int32)) < B_OK
+			|| user_memcpy(&programArgs->args, &user32Args, sizeof(uint32))
+					< B_OK
+			|| user_memcpy(&programArgs->env_count, &envCount, sizeof(int32))
+					< B_OK
+			|| user_memcpy(&programArgs->env, &user32Env, sizeof(uint32))
+					< B_OK
+			|| user_memcpy(&programArgs->error_port, &teamArgs->error_port,
+					sizeof(port_id)) < B_OK
+			|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
+					sizeof(uint32)) < B_OK
+			|| user_memcpy(&programArgs->umask, &teamArgs->umask,
+					sizeof(mode_t)) < B_OK
+			|| user_memcpy(userArgs, teamArgs->flat_args,
+				teamArgs->flat_args_size) < B_OK) {
+			// the team deletion process will clean this mess
+			free_team_arg(teamArgs);
+			return B_BAD_ADDRESS;
+		}
+	} else
+#endif
 	if (user_strlcpy(programArgs->program_path, path,
 				sizeof(programArgs->program_path)) < B_OK
-		|| user_memcpy(&programArgs->arg_count, &argCount, sizeof(int32)) < B_OK
+		|| user_memcpy(&programArgs->arg_count, &argCount, sizeof(int32))
+				< B_OK
 		|| user_memcpy(&programArgs->args, &userArgs, sizeof(char**)) < B_OK
-		|| user_memcpy(&programArgs->env_count, &envCount, sizeof(int32)) < B_OK
+		|| user_memcpy(&programArgs->env_count, &envCount, sizeof(int32))
+				< B_OK
 		|| user_memcpy(&programArgs->env, &userEnv, sizeof(char**)) < B_OK
 		|| user_memcpy(&programArgs->error_port, &teamArgs->error_port,
 				sizeof(port_id)) < B_OK
 		|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
 				sizeof(uint32)) < B_OK
-		|| user_memcpy(&programArgs->umask, &teamArgs->umask, sizeof(mode_t)) < B_OK
+		|| user_memcpy(&programArgs->umask, &teamArgs->umask, sizeof(mode_t))
+				< B_OK
 		|| user_memcpy(userArgs, teamArgs->flat_args,
 				teamArgs->flat_args_size) < B_OK) {
 		// the team deletion process will clean this mess
@@ -1583,19 +1698,25 @@ team_create_thread_start_internal(void* args)
 
 	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
 
-	// set team args and update state
-	team->Lock();
-	team->SetArgs(path, teamArgs->flat_args + 1, argCount - 1);
-	team->state = TEAM_STATE_NORMAL;
-	team->Unlock();
+	const char* threadName = strrchr(path, '/');
 
 	free_team_arg(teamArgs);
 		// the arguments are already on the user stack, we no longer need
 		// them in this form
 
 	// Clone commpage area
-	area_id commPageArea = clone_commpage_area(team->id,
-		&team->commpage_address);
+	area_id commPageArea = -1;
+#ifdef _COMPAT_MODE
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+		team->commpage_address = (void*)KERNEL_USER32_DATA_BASE;
+		commPageArea = clone_commpage_compat_area(team->id,
+			&team->commpage_address);
+	} else
+#endif
+	{
+		team->commpage_address = (void*)KERNEL_USER_DATA_BASE;
+		commPageArea = clone_commpage_area(team->id, &team->commpage_address);
+	}
 	if (commPageArea  < B_OK) {
 		TRACE(("team_create_thread_start: clone_commpage_area() failed: %s\n",
 			strerror(commPageArea)));
@@ -1636,11 +1757,21 @@ team_create_thread_start_internal(void* args)
 			return err;
 		}
 		runtimeLoaderPath.UnlockBuffer();
-		err = runtimeLoaderPath.Append("runtime_loader");
-
-		if (err == B_OK) {
-			err = elf_load_user_image(runtimeLoaderPath.Path(), team, 0,
-				&entry);
+#ifdef _COMPAT_MODE
+		if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0) {
+			err = runtimeLoaderPath.Append("x86/runtime_loader");
+			if (err == B_OK) {
+				err = elf32_load_user_image(runtimeLoaderPath.Path(), team, 0,
+					&entry);
+			}
+		} else
+#endif
+		{
+			err = runtimeLoaderPath.Append("runtime_loader");
+			if (err == B_OK) {
+				err = elf_load_user_image(runtimeLoaderPath.Path(), team, 0,
+					&entry);
+			}
 		}
 	}
 
@@ -1684,6 +1815,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	io_context* parentIOContext = NULL;
 	team_id teamID;
 	bool teamLimitReached = false;
+	void* kernelUserDataBase = (void*)KERNEL_USER_DATA_BASE;
+	size_t addressSpaceSize = USER_SIZE;
 
 	if (flatArgs == NULL || argCount == 0)
 		return B_BAD_VALUE;
@@ -1700,12 +1833,29 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	else
 		threadName = path;
 
+#ifdef _COMPAT_MODE
+	bool isCompatMode = false;
+	KPath tmpFilePath;
+	if (tmpFilePath.SetTo(path, KPath::NORMALIZE) == B_OK) {
+		isCompatMode = (elf32_load_user_image(tmpFilePath.Path(), NULL,
+			ELF_LOAD_USER_IMAGE_TEST_EXECUTABLE, NULL) == B_OK);
+	}
+#endif
+
 	// create the main thread object
 	Thread* mainThread;
 	status = Thread::Create(threadName, mainThread);
 	if (status != B_OK)
 		return status;
 	BReference<Thread> mainThreadReference(mainThread, true);
+
+#ifdef _COMPAT_MODE
+	if (isCompatMode) {
+		atomic_or(&mainThread->flags, THREAD_FLAGS_COMPAT_MODE);
+		kernelUserDataBase = (void*)KERNEL_USER32_DATA_BASE;
+		addressSpaceSize = USER32_SIZE;
+	}
+#endif
 
 	// create team object
 	Team* team = Team::Create(mainThread->id, path, false);
@@ -1765,7 +1915,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	vfs_exec_io_context(team->io_context);
 
 	// create an address space for this team
-	status = VMAddressSpace::Create(team->id, USER_BASE, USER_SIZE, false,
+	// TODO: check the thread compat mode in an arch specific function
+	status = VMAddressSpace::Create(team->id, USER_BASE,
+		addressSpaceSize, false,
 		&team->address_space);
 	if (status != B_OK)
 		goto err2;
@@ -1774,7 +1926,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		(teamArgs->flags & TEAM_ARGS_FLAG_NO_ASLR) == 0);
 
 	// create the user data area
-	status = create_team_user_data(team);
+	status = create_team_user_data(team, NULL, kernelUserDataBase);
 	if (status != B_OK)
 		goto err4;
 
@@ -1902,6 +2054,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	struct team_arg* teamArgs;
 	const char* threadName;
 	thread_id nubThreadID = -1;
+	void* kernelUserDataBase = (void*)KERNEL_USER_DATA_BASE;
 
 	TRACE(("exec_team(path = \"%s\", argc = %" B_PRId32 ", envCount = %"
 		B_PRId32 "): team %" B_PRId32 "\n", path, argCount, envCount,
@@ -1971,7 +2124,26 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	team->address_space->SetRandomizingEnabled(
 		(teamArgs->flags & TEAM_ARGS_FLAG_NO_ASLR) == 0);
 
-	status = create_team_user_data(team);
+	// cut the path from the team name and rename the main thread, too
+	threadName = strrchr(path, '/');
+	if (threadName != NULL)
+		threadName++;
+	else
+		threadName = path;
+#ifdef _COMPAT_MODE
+	bool isCompatMode = false;
+	KPath tmpFilePath;
+	if (tmpFilePath.SetTo(path, KPath::NORMALIZE) == B_OK) {
+		isCompatMode = (elf32_load_user_image(tmpFilePath.Path(), NULL,
+			ELF_LOAD_USER_IMAGE_TEST_EXECUTABLE, NULL) == B_OK);
+	}
+
+	// user address space shouldn't have user areas left
+	team->address_space->SetSize(isCompatMode ? USER32_SIZE : USER_SIZE);
+	if (isCompatMode)
+		kernelUserDataBase = (void*)KERNEL_USER32_DATA_BASE;
+#endif
+	status = create_team_user_data(team, NULL, kernelUserDataBase);
 	if (status != B_OK) {
 		// creating the user data failed -- we're toast
 		free_team_arg(teamArgs);
@@ -1987,12 +2159,6 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	team->SetName(path);
 	team->Unlock();
 
-	// cut the path from the team name and rename the main thread, too
-	threadName = strrchr(path, '/');
-	if (threadName != NULL)
-		threadName++;
-	else
-		threadName = path;
 	rename_thread(thread_get_current_thread_id(), threadName);
 
 	atomic_or(&team->flags, TEAM_FLAG_EXEC_DONE);
@@ -2011,8 +2177,13 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 		// cannot fail (the allocation for the team would have failed already)
 	ThreadLocker currentThreadLocker(currentThread);
 	currentThread->user_thread = userThread;
+#ifdef _COMPAT_MODE
+	if (isCompatMode)
+		atomic_or(&currentThread->flags, THREAD_FLAGS_COMPAT_MODE);
+	else
+		atomic_and(&currentThread->flags, ~THREAD_FLAGS_COMPAT_MODE);
+#endif
 	currentThreadLocker.Unlock();
-
 	// create the user stack for the thread
 	status = thread_create_user_stack(currentThread->team, currentThread, NULL,
 		0, sizeof(user_space_program_args) + teamArgs->flat_args_size);

@@ -37,6 +37,10 @@ enum {
 #define THREAD_CREATION_FLAG_DEFER_SIGNALS	0x01
 	// create the thread with signals deferred, i.e. with
 	// user_thread::defer_signals set to 1
+#ifdef _COMPAT_MODE
+#	define THREAD_CREATION_FLAG_COMPAT_MODE	0x02
+	// create the thread with a compatibility mode
+#endif
 
 
 struct thread_creation_attributes {
