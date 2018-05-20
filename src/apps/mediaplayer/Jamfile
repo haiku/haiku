@@ -5,6 +5,7 @@ UsePublicHeaders [ FDirName be_apps Tracker ] ;
 UsePrivateHeaders interface shared ;
 UseLibraryHeaders agg ;
 
+local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		# source directories
