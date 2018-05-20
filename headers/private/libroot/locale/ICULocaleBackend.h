@@ -81,7 +81,7 @@ private:
 	static	void 				_DestroyThreadLocalStorageValue(void* value);
 
 			// buffer for locale names (up to one per category)
-			char				fLocaleDescription[512];
+			char				fLocaleDescription[1024];
 
 			// data containers
 			struct lconv 	 	fLocaleConv;
