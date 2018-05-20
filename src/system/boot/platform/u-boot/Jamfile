@@ -34,6 +34,16 @@ local libFDTSources =
 # and we also fake a netbsd loader anyway.
 local uImageFakeOS = "netbsd" ;
 
+# Modern u-boot fill in sane addresses for us.
+# We only need to fill in the FDT dtb
+HAIKU_MMC_UBOOT_SCRIPT = "\
+	test -e mmc 0 uEnv.txt && fatload mmc 0 ${scriptaddr} uEnv.txt && env import -t ${scriptaddr} ${filesize} \
+	fatload mmc 0 ${kernel_addr_r} haiku_loader.ub \
+	fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub \
+	fatload mmc 0 ${fdt_addr_r} ${dtb} \
+	fdt addr ${fdt_addr_r} \
+	bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}" ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 # First build the non arch dependent parts
@@ -242,10 +252,7 @@ BuildUImage haiku_loader.ub : haiku_loader :
 	-a $(HAIKU_BOOT_LOADER_BASE) -e $(HAIKU_BOOT_LOADER_ENTRY_LINUX)
 		-n 'Haiku $(TARGET_KERNEL_ARCH) loader' ;
 
-if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
-	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) :
-		$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT) ;
-}
+BuildUImageScript boot.scr : $(HAIKU_MMC_UBOOT_SCRIPT) ;
 
 # flash image targets
 
@@ -266,7 +273,7 @@ Depends haiku-flash-uimage : haiku-$(TARGET_KERNEL_ARCH)_flash_image_uimage.img 
 
 # SD/mmc image targets
 BuildUBootSDImage haiku-$(TARGET_KERNEL_ARCH).mmc :
-	$(HAIKU_IMAGE) haiku_loader.ub haiku-floppyboot.tgz.ub ;
+	$(HAIKU_IMAGE) haiku_loader.ub haiku-floppyboot.tgz.ub boot.scr ;
 BlessSDImage haiku-$(TARGET_KERNEL_ARCH).mmc ;
 NotFile haiku-mmc-image ;
 Depends haiku-mmc-image : haiku-$(TARGET_KERNEL_ARCH).mmc ;
