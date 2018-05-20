@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src system kernel arch x86 ;
 
-SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
-	system kernel ] ;
-	# for syscall_numbers.h
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers ps2 ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include
@@ -14,6 +11,10 @@ UsePrivateHeaders shared ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
+
+ObjectHdrs interrupts.S signals.cpp signals_asm.S : [ FDirName
+	$(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) system kernel ] ;
+	# for syscall_numbers.h
 
 local archSpecificSources ;
 if $(TARGET_ARCH) = x86_64 {
@@ -28,6 +29,7 @@ if $(TARGET_ARCH) = x86_64 {
 		signals.cpp
 		signals_asm.S
 		syscalls.cpp
+		syscalls_asm.S
 		thread.cpp
 
 		# paging
@@ -38,6 +40,17 @@ if $(TARGET_ARCH) = x86_64 {
 		X86PagingStructures64Bit.cpp
 		X86VMTranslationMap64Bit.cpp
 	;
+
+	if $(HAIKU_KERNEL_COMPAT_MODE) = 1 {
+		archSpecificSources +=
+			arch_commpage_compat.cpp
+			arch_elf_compat.cpp
+			entry_compat.S
+			syscalls_compat.cpp
+			signals_compat_asm.S
+			signals_compat.cpp
+		;
+	}
 } else {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
@@ -119,3 +132,16 @@ Includes [ FGristFiles interrupts.S arch.S signals.cpp signals_asm.S ]
 	: <syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h ;
 Includes [ FGristFiles interrupts.S ]
 	: <syscalls!$(TARGET_PACKAGING_ARCH)>syscall_table.h ;
+
+if $(TARGET_ARCH) = x86_64 && $(HAIKU_KERNEL_COMPAT_MODE) = 1 {
+	ObjectHdrs entry_compat.S syscalls_compat.cpp : [ FDirName
+		$(TARGET_COMMON_DEBUG_OBJECT_DIR_x86) system kernel ] ;
+		# for syscall_numbers.h
+
+	# We need to specify the dependency on the generated syscalls file explicitly.
+	Includes [ FGristFiles entry_compat.S ]
+		: <syscalls!x86>syscall_numbers.h ;
+	Includes [ FGristFiles entry_compat.S syscalls_compat.cpp ]
+		: <syscalls!x86>syscall_table.h ;
+}
+

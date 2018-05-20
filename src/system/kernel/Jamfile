@@ -22,6 +22,12 @@ AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
 SetVersionScript kernel_$(TARGET_ARCH) : kernel_versions ;
 SetVersionScript kernel.so : kernel_versions ;
 
+local compatSources = ;
+if $(HAIKU_KERNEL_COMPAT_MODE) = 1 {
+	UsePrivateHeaders [ FDirName kernel compat ] ;
+	compatSources = commpage_compat.cpp elf_compat.cpp ;
+}
+
 KernelMergeObject kernel_core.o :
 	boot_item.cpp
 	boot_splash.cpp
@@ -72,6 +78,8 @@ KernelMergeObject kernel_core.o :
 	scheduler_tracing.cpp
 	scheduling_analysis.cpp
 
+	# compatibility
+	$(compatSources)
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 

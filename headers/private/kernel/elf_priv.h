@@ -82,6 +82,11 @@ extern "C" {
 extern status_t elf_resolve_symbol(struct elf_image_info* image,
 	elf_sym* symbol, struct elf_image_info* sharedImage,
 	elf_addr* _symbolAddress);
+#ifdef _COMPAT_MODE
+extern status_t elf32_resolve_symbol(struct elf_image_info* image,
+	elf_sym* symbol, struct elf_image_info* sharedImage,
+	elf_addr* _symbolAddress);
+#endif
 
 #ifdef __cplusplus
 }

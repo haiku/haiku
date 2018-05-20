@@ -579,9 +579,6 @@ void x86_write_msr(uint32 registerNumber, uint64 value);
 void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState);
 
-void x86_fnsave(void* fpuState);
-void x86_frstor(const void* fpuState);
-
 void x86_fxsave(void* fpuState);
 void x86_fxrstor(const void* fpuState);
 
@@ -590,6 +587,14 @@ void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
 void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
 
 #endif
+
+
+#if !defined(__x86_64__) || defined(_COMPAT_MODE)
+
+void x86_fnsave(void* fpuState);
+void x86_frstor(const void* fpuState);
+
+#endif // !defined(__x86_64__) || defined(_COMPAT_MODE)
 
 
 static inline void

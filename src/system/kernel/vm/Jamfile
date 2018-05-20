@@ -5,6 +5,9 @@ UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+if $(HAIKU_KERNEL_COMPAT_MODE) = 1 {
+	UsePrivateHeaders [ FDirName kernel compat ] ;
+}
 
 KernelMergeObject kernel_vm.o :
 	PageCacheLocker.cpp

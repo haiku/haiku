@@ -7,6 +7,10 @@ UsePrivateHeaders net shared storage ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
 
+if $(HAIKU_KERNEL_COMPAT_MODE) = 1 {
+	UsePrivateHeaders [ FDirName kernel compat ] ;
+}
+
 KernelMergeObject kernel_fs.o :
 	EntryCache.cpp
 	fd.cpp

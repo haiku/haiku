@@ -119,3 +119,25 @@ FUNCTION_END(_stac)
 FUNCTION(_clac):
 	clac
 FUNCTION_END(_clac)
+
+
+#ifdef _COMPAT_MODE
+
+
+/* void x86_fnsave(void *fpu_state); */
+FUNCTION(x86_fnsave):
+	movq	%rdi, %rax
+	fnsave	(%rax)
+	ret
+FUNCTION_END(x86_fnsave)
+
+/* void x86_frstor(const void *fpu_state); */
+FUNCTION(x86_frstor):
+	movq	%rdi, %rax
+	frstor	(%rax)
+	ret
+FUNCTION_END(x86_frstor)
+
+
+#endif // _COMPAT_MODE
+
