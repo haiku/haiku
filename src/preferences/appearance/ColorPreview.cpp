@@ -17,6 +17,7 @@
 #include <Bitmap.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <String.h>
 #include <View.h>
 #include <Window.h>
 
@@ -227,11 +228,11 @@ ColorPreview::SetMode(bool rectangle)
 void
 ColorPreview::_DragColor(BPoint where)
 {
-	char hexString[7];
-	sprintf(hexString, "#%.2X%.2X%.2X", fColor.red, fColor.green, fColor.blue);
+	BString hexStr;
+	hexStr.SetToFormat("#%.2X%.2X%.2X", fColor.red, fColor.green, fColor.blue);
 
 	BMessage message(B_PASTE);
-	message.AddData("text/plain", B_MIME_TYPE, &hexString, sizeof(hexString));
+	message.AddData("text/plain", B_MIME_TYPE, hexStr.String(), hexStr.Length());
 	message.AddData("RGBColor", B_RGB_COLOR_TYPE, &fColor, sizeof(fColor));
 
 	BRect rect(0.0f, 0.0f, 20.0f, 20.0f);
