@@ -28,7 +28,7 @@ rule ArchitectureSetup architecture
 	#		our gcc4 compiler. See this discussion on some issues:
 	# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 	if $(gccVersion[1]) >= 3 {
-		gccBaseFlags += -fno-strict-aliasing ;
+		gccBaseFlags += -fno-strict-aliasing -fno-builtin-fork ;
 		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 			gccBaseFlags += -fno-tree-vrp ;
 		}
