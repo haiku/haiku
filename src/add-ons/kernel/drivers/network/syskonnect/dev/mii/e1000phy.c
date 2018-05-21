@@ -50,8 +50,8 @@ __FBSDID("$FreeBSD$");
 #include <sys/socket.h>
 #include <sys/bus.h>
 
-
 #include <net/if.h>
+#include <net/if_var.h>
 #include <net/if_media.h>
 
 #include <dev/mii/mii.h>
@@ -106,7 +106,9 @@ static const struct mii_phydesc e1000phys[] = {
 	MII_PHY_DESC(xxMARVELL, E1111),
 	MII_PHY_DESC(xxMARVELL, E1116),
 	MII_PHY_DESC(xxMARVELL, E1116R),
+	MII_PHY_DESC(xxMARVELL, E1116R_29),
 	MII_PHY_DESC(xxMARVELL, E1118),
+	MII_PHY_DESC(xxMARVELL, E1145),
 	MII_PHY_DESC(xxMARVELL, E1149R),
 	MII_PHY_DESC(xxMARVELL, E3016),
 	MII_PHY_DESC(xxMARVELL, PHYG65G),
@@ -130,14 +132,12 @@ static int
 e1000phy_attach(device_t dev)
 {
 	struct mii_softc *sc;
-	struct ifnet *ifp;
 
 	sc = device_get_softc(dev);
 
 	mii_phy_dev_attach(dev, MIIF_NOMANPAUSE, &e1000phy_funcs, 0);
 
-	ifp = sc->mii_pdata->mii_ifp;
-	if (strcmp(ifp->if_dname, "msk") == 0 &&
+	if (mii_dev_mac_match(dev, "msk") &&
 	    (sc->mii_flags & MIIF_MACPRIV0) != 0)
 		sc->mii_flags |= MIIF_PHYPRIV0;
 
@@ -167,8 +167,12 @@ e1000phy_attach(device_t dev)
 	PHY_RESET(sc);
 
 	sc->mii_capabilities = PHY_READ(sc, MII_BMSR) & sc->mii_capmask;
-	if (sc->mii_capabilities & BMSR_EXTSTAT)
+	if (sc->mii_capabilities & BMSR_EXTSTAT) {
 		sc->mii_extcapabilities = PHY_READ(sc, MII_EXTSR);
+		if ((sc->mii_extcapabilities &
+		    (EXTSR_1000TFDX | EXTSR_1000THDX)) != 0)
+			sc->mii_flags |= MIIF_HAVE_GTCR;
+	}
 	device_printf(dev, " ");
 	mii_phy_add_media(sc);
 	printf("\n");
@@ -208,6 +212,7 @@ e1000phy_reset(struct mii_softc *sc)
 		case MII_MODEL_xxMARVELL_E1111:
 		case MII_MODEL_xxMARVELL_E1112:
 		case MII_MODEL_xxMARVELL_E1116:
+		case MII_MODEL_xxMARVELL_E1116R_29:
 		case MII_MODEL_xxMARVELL_E1118:
 		case MII_MODEL_xxMARVELL_E1149:
 		case MII_MODEL_xxMARVELL_E1149R:
@@ -215,7 +220,8 @@ e1000phy_reset(struct mii_softc *sc)
 			/* Disable energy detect mode. */
 			reg &= ~E1000_SCR_EN_DETECT_MASK;
 			reg |= E1000_SCR_AUTO_X_MODE;
-			if (sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1116)
+			if (sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1116 ||
+			    sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1116R_29)
 				reg &= ~E1000_SCR_POWER_DOWN;
 			reg |= E1000_SCR_ASSERT_CRS_ON_TX;
 			break;
@@ -243,6 +249,7 @@ e1000phy_reset(struct mii_softc *sc)
 		PHY_WRITE(sc, E1000_SCR, reg);
 
 		if (sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1116 ||
+		    sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1116R_29 ||
 		    sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1149 ||
 		    sc->mii_mpd_model == MII_MODEL_xxMARVELL_E1149R) {
 			PHY_WRITE(sc, E1000_EADR, 2);
@@ -259,6 +266,7 @@ e1000phy_reset(struct mii_softc *sc)
 	case MII_MODEL_xxMARVELL_E1118:
 		break;
 	case MII_MODEL_xxMARVELL_E1116:
+	case MII_MODEL_xxMARVELL_E1116R_29:
 		page = PHY_READ(sc, E1000_EADR);
 		/* Select page 3, LED control register. */
 		PHY_WRITE(sc, E1000_EADR, 3);
@@ -305,12 +313,6 @@ e1000phy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		break;
 
 	case MII_MEDIACHG:
-		/*
-		 * If the interface is not up, don't do anything.
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			break;
-
 		if (IFM_SUBTYPE(ife->ifm_media) == IFM_AUTO) {
 			e1000phy_mii_phy_auto(sc, ife->ifm_media);
 			break;
@@ -319,8 +321,7 @@ e1000phy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		speed = 0;
 		switch (IFM_SUBTYPE(ife->ifm_media)) {
 		case IFM_1000_T:
-			if ((sc->mii_extcapabilities &
-			    (EXTSR_1000TFDX | EXTSR_1000THDX)) == 0)
+			if ((sc->mii_flags & MIIF_HAVE_GTCR) == 0)
 				return (EINVAL);
 			speed = E1000_CR_SPEED_1000;
 			break;
@@ -357,10 +358,9 @@ e1000phy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 
 		if (IFM_SUBTYPE(ife->ifm_media) == IFM_1000_T) {
 			gig |= E1000_1GCR_MS_ENABLE;
-			if ((ife->ifm_media & IFM_ETH_MASTER) != 0)	
+			if ((ife->ifm_media & IFM_ETH_MASTER) != 0)
 				gig |= E1000_1GCR_MS_VALUE;
-		} else if ((sc->mii_extcapabilities &
-		    (EXTSR_1000TFDX | EXTSR_1000THDX)) != 0)
+		} else if ((sc->mii_flags & MIIF_HAVE_GTCR) != 0)
 			gig = 0;
 		PHY_WRITE(sc, E1000_1GCR, gig);
 		PHY_WRITE(sc, E1000_AR, E1000_AR_SELECTOR_FIELD);
@@ -368,12 +368,6 @@ e1000phy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 done:
 		break;
 	case MII_TICK:
-		/*
-		 * Is the interface even up?
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			return (0);
-
 		/*
 		 * Only used for autonegotiation.
 		 */
@@ -491,9 +485,14 @@ e1000phy_mii_phy_auto(struct mii_softc *sc, int media)
 		PHY_WRITE(sc, E1000_AR, reg | E1000_AR_SELECTOR_FIELD);
 	} else
 		PHY_WRITE(sc, E1000_AR, E1000_FA_1000X_FD | E1000_FA_1000X);
-	if ((sc->mii_extcapabilities & (EXTSR_1000TFDX | EXTSR_1000THDX)) != 0)
-		PHY_WRITE(sc, E1000_1GCR,
-		    E1000_1GCR_1000T_FD | E1000_1GCR_1000T);
+	if ((sc->mii_flags & MIIF_HAVE_GTCR) != 0) {
+		reg = 0;
+		if ((sc->mii_extcapabilities & EXTSR_1000TFDX) != 0)
+			reg |= E1000_1GCR_1000T_FD;
+		if ((sc->mii_extcapabilities & EXTSR_1000THDX) != 0)
+			reg |= E1000_1GCR_1000T;
+		PHY_WRITE(sc, E1000_1GCR, reg);
+	}
 	PHY_WRITE(sc, E1000_CR,
 	    E1000_CR_AUTO_NEG_ENABLE | E1000_CR_RESTART_AUTO_NEG);
 
