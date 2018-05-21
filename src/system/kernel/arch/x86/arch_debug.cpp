@@ -1,4 +1,5 @@
 /*
+ * Copyright 2018, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
@@ -34,6 +35,20 @@ struct stack_frame {
 	stack_frame*	previous;
 	addr_t			return_address;
 };
+
+
+#ifdef _COMPAT_MODE
+
+
+typedef uint32 compat_addr_t;
+struct compat_stack_frame {
+	compat_addr_t	previous;
+	compat_addr_t	return_address;
+};
+
+
+#endif // _COMPAT_MODE
+
 
 #define NUM_PREVIOUS_LOCATIONS 32
 
@@ -98,6 +113,28 @@ get_next_frame_debugger(addr_t bp, addr_t* _next, addr_t* _ip)
 
 	return B_OK;
 }
+
+
+#ifdef _COMPAT_MODE
+
+
+/*!	Safe to be called only from inside the debugger.
+*/
+static status_t
+compat_get_next_frame_debugger(addr_t bp, addr_t* _next, addr_t* _ip)
+{
+	compat_stack_frame frame;
+	if (debug_memcpy(B_CURRENT_TEAM, &frame, (void*)bp, sizeof(frame)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	*_ip = (addr_t)frame.return_address;
+	*_next = (addr_t)frame.previous;
+
+	return B_OK;
+}
+
+
+#endif // _COMPAT_MODE
 
 
 static status_t
@@ -375,7 +412,7 @@ print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
 	const char* image;
 	addr_t baseAddress;
 	bool exactMatch;
-	status_t status;
+	status_t status = B_ERROR;
 	addr_t diff;
 
 	diff = nextBp - bp;
@@ -384,8 +421,18 @@ print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
 	if (diff & ~((addr_t)-1 >> 1))
 		diff = 0;
 
+#ifdef _COMPAT_MODE
+	// only lookup kernel symbols in compatibility mode
+	// TODO: support lookup user symbols in compatibility mode
+	if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) == 0
+		|| IS_KERNEL_ADDRESS(ip)) {
+		status = lookup_symbol(thread, ip, &baseAddress, &symbol, &image,
+			&exactMatch);
+	}
+#else
 	status = lookup_symbol(thread, ip, &baseAddress, &symbol, &image,
 		&exactMatch);
+#endif
 
 	kprintf("%2" B_PRId32 " %0*lx (+%4ld) %0*lx   ", callIndex,
 		B_PRINTF_POINTER_WIDTH, bp, diff, B_PRINTF_POINTER_WIDTH, ip);
@@ -724,6 +771,16 @@ stack_trace(int argc, char** argv)
 		} else {
 			addr_t ip, nextBp;
 
+#ifdef _COMPAT_MODE
+			if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0
+				&& !is_kernel_stack_address(thread, bp)) {
+				if (compat_get_next_frame_debugger(bp, &nextBp, &ip) != B_OK) {
+					kprintf("%0*lx -- read fault\n", B_PRINTF_POINTER_WIDTH,
+						bp);
+					break;
+				}
+			} else
+#endif
 			if (get_next_frame_debugger(bp, &nextBp, &ip) != B_OK) {
 				kprintf("%0*lx -- read fault\n", B_PRINTF_POINTER_WIDTH, bp);
 				break;
