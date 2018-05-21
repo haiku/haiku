@@ -6,16 +6,16 @@
 
 
 #include <OS.h>
-#include <syscalls.h>
+
+#include <cpuid.h>
 
 
 status_t
-get_cpuid(cpuid_info* info, uint32 eaxRegister, uint32 cpuNum)
+get_cpuid(cpuid_info* info, uint32 eax, uint32 cpuNum)
 {
-	__asm__("cpuid"
-		: "=a" (info->regs.eax), "=b" (info->regs.ebx), "=c" (info->regs.ecx),
-			"=d" (info->regs.edx)
-		: "a" (eaxRegister), "c" (0));
+	__cpuid_count(eax, 0, info->regs.eax, info->regs.ebx, info->regs.ecx,
+		info->regs.edx);
+
 	return B_OK;
 }
 

@@ -7,14 +7,14 @@
 
 #include <arch_system_info.h>
 
+#include <cpuid.h>
+
 
 status_t
 get_current_cpuid(cpuid_info* info, uint32 eax, uint32 ecx)
 {
-	__asm__("cpuid"
-		: "=a" (info->regs.eax), "=b" (info->regs.ebx), "=c" (info->regs.ecx),
-			"=d" (info->regs.edx)
-		: "a" (eax), "c" (ecx));
+	__cpuid_count(eax, ecx, info->regs.eax, info->regs.ebx, info->regs.ecx,
+		info->regs.edx);
 	return B_OK;
 }
 
