@@ -2,8 +2,8 @@
  * Copyright 2012, Gerasim Troeglazov (3dEyes**), 3dEyes@gmail.com.
  * All rights reserved.
  * Distributed under the terms of the MIT License.
- */ 
- 
+ */
+
 #ifndef __VST_HOST_H__
 #define __VST_HOST_H__
 
@@ -61,7 +61,7 @@
 struct VSTEffect
 {
 		int 			cookie;
-		int32 			(*dispatcher)(struct VSTEffect*, int32, 
+		int32 			(*dispatcher)(struct VSTEffect*, int32,
 								int32, int32, void*, float);
 		void 			(*process)(struct VSTEffect*, float**,
 								float**, int32);
@@ -87,7 +87,7 @@ struct VSTEffect
 //typedefs
 typedef int32			(*audioMasterCallback)(VSTEffect*, int32, int32, int32, void*, float);
 typedef VSTEffect* 		(*VSTEntryProc)(audioMasterCallback audioMaster);
-inline 	float 			round(float x) {return ceil(x-0.5);}
+inline 	float 			vstround(float x) {return ceil(x-0.5);}
 
 //structure for droplist parameters
 struct  DropListValue {
@@ -130,7 +130,7 @@ private:
 
 //vst plugin interface
 class VSTPlugin {
-public:	
+public:
 						VSTPlugin();
 						~VSTPlugin();
 		int				LoadModule(const char *path);
@@ -150,11 +150,11 @@ public:
 		int				Channels(int mode);
 		int				ReAllocBuffers(void);
 		void			Process(float *buffer, int samples, int channels);
-private:		
+private:
 		VSTEntryProc 	GetMainEntry();
 		VSTEffect*		fEffect;
 		VSTEntryProc	VSTMainProc;
-		bool			fActive;		
+		bool			fActive;
 		image_id 		fModule;
 		BPath			fPath;
 		size_t			fBlockSize;
