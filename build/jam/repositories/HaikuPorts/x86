@@ -1,6 +1,6 @@
 RemotePackageRepository HaikuPorts
 	: x86
-	: http://packages.haiku-os.org/haikuports/master/repo/x86
+	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages
 	:
 	# architecture "any" packages
 	ahem-1.0-2
