@@ -75,6 +75,20 @@ KernelMergeObject kernel_core.o :
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
+if $(HAIKU_GCC_VERSION_$(HAIKU_ARCH)[1]) >= 7 {
+	# With the rtl-stv1 pass on these files, the kernel panics towards the end
+	# of the boot process with a "General Protection Exception", see
+	# https://dev.haiku-os.org/ticket/14160. The pass itself vectorizes
+	# a significant number of otherwise-scalar operations, which may be why
+	# disabling it fixes the problem.
+	#
+	# At time of writing, GCC does not seem to have a way to disable
+	# vectorization as a result of optimization without disabling
+	# FPU usage altogether, which of course is not what we want and
+	# breaks when using libstdc++'s headers anyway.
+	ObjectC++Flags commpage.o signal.o thread.o : -fdisable-rtl-stv1 ;
+}
+
 # Generate the header defining macros for C++ structure sizes.
 local kernelC++StructSizesHeader = [ FGristFiles kernel_c++_struct_sizes.h ] ;
 TARGET_HDRS_$(TARGET_PACKAGING_ARCH) on $(kernelC++StructSizesHeader)
