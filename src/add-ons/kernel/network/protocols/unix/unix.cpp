@@ -47,10 +47,11 @@ destroy_scm_rights_descriptors(const ancillary_data_header* header,
 {
 	int count = header->len / sizeof(file_descriptor*);
 	file_descriptor** descriptors = (file_descriptor**)data;
+	io_context* ioContext = get_current_io_context(!gStackModule->is_syscall());
 
 	for (int i = 0; i < count; i++) {
 		if (descriptors[i] != NULL) {
-			close_fd(descriptors[i]);
+			close_fd(ioContext, descriptors[i]);
 			put_fd(descriptors[i]);
 		}
 	}
@@ -338,7 +339,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 	if (error != B_OK) {
 		for (int i = 0; i < count; i++) {
 			if (descriptors[i] != NULL) {
-				close_fd(descriptors[i]);
+				close_fd(ioContext, descriptors[i]);
 				put_fd(descriptors[i]);
 			}
 		}
