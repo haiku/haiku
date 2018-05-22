@@ -6,6 +6,13 @@
 
 #include <stdint.h>
 
+// disable a warning for GCC 5.4, fixed upstream.
+// will remove the pragmas after a while.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#include <x86intrin.h>
+#pragma GCC diagnostic pop
+
 
 static uint64_t cv_factor;
 static uint64_t cv_factor_nsec;
@@ -19,19 +26,10 @@ __x86_setup_system_time(uint64_t cv, uint64_t cv_nsec)
 }
 
 
-static inline uint64_t
-rdtsc()
-{
-	uint64_t lo, hi;
-	__asm__("rdtsc" : "=a" (lo), "=d" (hi));
-	return lo | (hi << 32);
-}
-
-
 extern "C" [[gnu::optimize("omit-frame-pointer")]] int64_t
 system_time()
 {
-	__uint128_t time = static_cast<__uint128_t>(rdtsc()) * cv_factor;
+	__uint128_t time = static_cast<__uint128_t>(__rdtsc()) * cv_factor;
 	return time >> 64;
 }
 
@@ -39,7 +37,7 @@ system_time()
 extern "C" [[gnu::optimize("omit-frame-pointer")]] int64_t
 system_time_nsecs()
 {
-	__uint128_t t = static_cast<__uint128_t>(rdtsc()) * cv_factor_nsec;
+	__uint128_t t = static_cast<__uint128_t>(__rdtsc()) * cv_factor_nsec;
 	return t >> 32;
 }
 
