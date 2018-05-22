@@ -5,6 +5,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
+SubDirC++Flags -Wno-format-overflow ;
+
 Addon LPR :
 	Lpr.cpp
 	LprSetupDlg.cpp
@@ -14,10 +16,10 @@ Addon LPR :
 	Socket.o
 	SocketStream.o
 	DbgMsg.o
-	: 
-	be 
+	:
+	be
 	libprint.a
-	$(TARGET_NETWORK_LIBS) 
+	$(TARGET_NETWORK_LIBS)
 	[ TargetLibstdc++ ]
 ;
 

@@ -6,7 +6,9 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 UsePrivateHeaders shared print ;
 
-Addon IPP : 
+SubDirC++Flags -Wno-format-overflow ;
+
+Addon IPP :
 	Ipp.cpp
 	IppSetupDlg.cpp
 	IppTransport.cpp
