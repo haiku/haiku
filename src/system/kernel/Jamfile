@@ -75,7 +75,7 @@ KernelMergeObject kernel_core.o :
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-if $(HAIKU_GCC_VERSION_$(HAIKU_ARCH)[1]) >= 7 {
+if $(HAIKU_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) >= 7 {
 	# With the rtl-stv1 pass on these files, the kernel panics towards the end
 	# of the boot process with a "General Protection Exception", see
 	# https://dev.haiku-os.org/ticket/14160. The pass itself vectorizes
