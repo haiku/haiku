@@ -72,7 +72,7 @@ int WriteSafe(CIO * pIO, void * pBuffer, int nBytes)
     return nRetVal;
 }
 
-BOOL FileExists(wchar_t * pFilename)
+BOOL FileExists(char* pFilename)
 {    
     if (0 == wcscmp(pFilename, "-")  ||  0 == wcscmp(pFilename, "/dev/stdin"))
         return TRUE;

@@ -11,7 +11,7 @@ CAPEInfo:
 /*****************************************************************************************
 Construction
 *****************************************************************************************/
-CAPEInfo::CAPEInfo(int * pErrorCode, const wchar_t * pFilename, CAPETag * pTag) 
+CAPEInfo::CAPEInfo(int * pErrorCode, const char* pFilename, CAPETag * pTag) 
 {
     *pErrorCode = ERROR_SUCCESS;
     CloseFile();

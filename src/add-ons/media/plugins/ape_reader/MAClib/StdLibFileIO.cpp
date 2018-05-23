@@ -218,7 +218,7 @@ int CStdLibFileIO::GetName(char * pBuffer)
     return 0;
 }
 
-int CStdLibFileIO::Create(const wchar_t * pName)
+int CStdLibFileIO::Create(const char* pName)
 {
     Close();
 

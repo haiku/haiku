@@ -29,13 +29,13 @@ public:
     int SetEOF();
 
     // creation / destruction
-    int Create(const wchar_t * pName);
+    int Create(const char* pName);
     int Delete();
 
     // attributes
     int GetPosition();
     int GetSize();
-    int GetName(wchar_t * pBuffer);
+    int GetName(char* pBuffer);
     int GetHandle();
 
 private:

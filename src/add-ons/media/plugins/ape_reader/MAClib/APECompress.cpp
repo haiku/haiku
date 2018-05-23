@@ -28,19 +28,19 @@ CAPECompress::~CAPECompress()
     }
 }
 
-int CAPECompress::Start(const wchar_t * pOutputFilename, const WAVEFORMATEX * pwfeInput, int nMaxAudioBytes, int nCompressionLevel, const void * pHeaderData, int nHeaderBytes)
+int CAPECompress::Start(const char* pOutputFilename, const WAVEFORMATEX * pwfeInput, int nMaxAudioBytes, int nCompressionLevel, const void * pHeaderData, int nHeaderBytes)
 {
     m_pioOutput = new IO_CLASS_NAME;
     m_bOwnsOutputIO = TRUE;
-    
+
     if (m_pioOutput->Create(pOutputFilename) != 0)
     {
         return ERROR_INVALID_OUTPUT_FILE;
     }
-        
+
     m_spAPECompressCreate->Start(m_pioOutput, pwfeInput, nMaxAudioBytes, nCompressionLevel,
         pHeaderData, nHeaderBytes);
-    
+
     SAFE_ARRAY_DELETE(m_pBuffer)
     m_nBufferSize = m_spAPECompressCreate->GetFullFrameBytes();
     m_pBuffer = new unsigned char [m_nBufferSize];
@@ -74,31 +74,31 @@ int CAPECompress::UnlockBuffer(int nBytesAdded, BOOL bProcess)
 {
     if (m_bBufferLocked == FALSE)
         return ERROR_UNDEFINED;
-    
+
     m_nBufferTail += nBytesAdded;
     m_bBufferLocked = FALSE;
-    
+
     if (bProcess)
     {
         int nRetVal = ProcessBuffer();
         if (nRetVal != 0) { return nRetVal; }
     }
-    
+
     return ERROR_SUCCESS;
 }
 
 unsigned char * CAPECompress::LockBuffer(int * pBytesAvailable)
 {
     if (m_pBuffer == NULL) { return NULL; }
-    
+
     if (m_bBufferLocked)
         return NULL;
-    
+
     m_bBufferLocked = TRUE;
-    
+
     if (pBytesAvailable)
         *pBytesAvailable = GetBufferBytesAvailable();
-    
+
     return &m_pBuffer[m_nBufferTail];
 }
 
@@ -107,7 +107,7 @@ int CAPECompress::AddData(unsigned char * pData, int nBytes)
     if (m_pBuffer == NULL) return ERROR_INSUFFICIENT_MEMORY;
 
     int nBytesDone = 0;
-    
+
     while (nBytesDone < nBytes)
     {
         // lock the buffer
@@ -115,11 +115,11 @@ int CAPECompress::AddData(unsigned char * pData, int nBytes)
         unsigned char * pBuffer = LockBuffer(&nBytesAvailable);
         if (pBuffer == NULL || nBytesAvailable <= 0)
             return ERROR_UNDEFINED;
-        
+
         // calculate how many bytes to copy and add that much to the buffer
         int nBytesToProcess = min(nBytesAvailable, nBytes - nBytesDone);
         memcpy(pBuffer, &pData[nBytesDone], nBytesToProcess);
-                        
+
         // unlock the buffer (fail if not successful)
         int nRetVal = UnlockBuffer(nBytesToProcess);
         if (nRetVal != ERROR_SUCCESS)
@@ -130,7 +130,7 @@ int CAPECompress::AddData(unsigned char * pData, int nBytes)
     }
 
     return ERROR_SUCCESS;
-} 
+}
 
 int CAPECompress::Finish(unsigned char * pTerminatingData, int nTerminatingBytes, int nWAVTerminatingBytes)
 {
@@ -146,33 +146,33 @@ int CAPECompress::Kill()
 int CAPECompress::ProcessBuffer(BOOL bFinalize)
 {
     if (m_pBuffer == NULL) { return ERROR_UNDEFINED; }
-    
+
     try
     {
         // process as much as possible
         int nThreshold = (bFinalize) ? 0 : m_spAPECompressCreate->GetFullFrameBytes();
-        
+
         while ((m_nBufferTail - m_nBufferHead) >= nThreshold)
         {
             int nFrameBytes = min(m_spAPECompressCreate->GetFullFrameBytes(), m_nBufferTail - m_nBufferHead);
-            
+
             if (nFrameBytes == 0)
                 break;
 
             int nRetVal = m_spAPECompressCreate->EncodeFrame(&m_pBuffer[m_nBufferHead], nFrameBytes);
             if (nRetVal != 0) { return nRetVal; }
-            
+
             m_nBufferHead += nFrameBytes;
         }
-        
+
         // shift the buffer
         if (m_nBufferHead != 0)
         {
             int nBytesLeft = m_nBufferTail - m_nBufferHead;
-            
+
             if (nBytesLeft != 0)
                 memmove(m_pBuffer, &m_pBuffer[m_nBufferHead], nBytesLeft);
-            
+
             m_nBufferTail -= m_nBufferHead;
             m_nBufferHead = 0;
         }
@@ -181,7 +181,7 @@ int CAPECompress::ProcessBuffer(BOOL bFinalize)
     {
         return ERROR_UNDEFINED;
     }
-    
+
     return ERROR_SUCCESS;
 }
 
@@ -192,13 +192,13 @@ int CAPECompress::AddDataFromInputSource(CInputSource * pInputSource, int nMaxBy
 
     // initialize
     if (pBytesAdded) *pBytesAdded = 0;
-        
+
     // lock the buffer
     int nBytesAvailable = 0;
     unsigned char * pBuffer = LockBuffer(&nBytesAvailable);
     if ((pBuffer == NULL) || (nBytesAvailable == 0))
         return ERROR_INSUFFICIENT_MEMORY;
-    
+
     // calculate the 'ideal' number of bytes
     unsigned int nBytesRead = 0;
 
@@ -207,7 +207,7 @@ int CAPECompress::AddDataFromInputSource(CInputSource * pInputSource, int nMaxBy
     {
         // get the data
         int nBytesToAdd = nBytesAvailable;
-        
+
         if (nMaxBytes > 0)
         {
             if (nBytesToAdd > nMaxBytes) nBytesToAdd = nMaxBytes;
@@ -228,19 +228,19 @@ int CAPECompress::AddDataFromInputSource(CInputSource * pInputSource, int nMaxBy
             return ERROR_IO_READ;
         else
             nBytesRead = (nBlocksAdded * m_wfeInput.nBlockAlign);
-        
+
         // store the bytes read
         if (pBytesAdded)
             *pBytesAdded = nBytesRead;
     }
-        
+
     // unlock the data and process
     int nRetVal = UnlockBuffer(nBytesRead, TRUE);
     if (nRetVal != 0)
     {
         return nRetVal;
     }
-    
+
     return ERROR_SUCCESS;
 }
 

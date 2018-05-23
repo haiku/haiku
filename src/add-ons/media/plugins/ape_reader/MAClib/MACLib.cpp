@@ -144,7 +144,7 @@ int __stdcall FillWaveHeader(WAVE_HEADER * pWAVHeader, int nAudioBytes, WAVEFORM
         // format header
         memcpy(pWAVHeader->cDataTypeID, "WAVE", 4);
         memcpy(pWAVHeader->cFormatHeader, "fmt ", 4);
-        
+
         // the format chunk is the first 16 bytes of a waveformatex
         pWAVHeader->nFormatBytes = 16;
         memcpy(&pWAVHeader->nFormatTag, pWaveFormatEx, 16);

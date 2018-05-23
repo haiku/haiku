@@ -9,11 +9,6 @@
 
 #define DECODE_BLOCK_SIZE        4096
 
-#if __GNUC__ != 2
-using std::min;
-using std::max;
-#endif
-
 CAPEDecompress::CAPEDecompress(int * pErrorCode, CAPEInfo * pAPEInfo, int nStartBlock, int nFinishBlock)
 {
     *pErrorCode = ERROR_SUCCESS;

@@ -23,7 +23,7 @@ const uint32 RANGE_TOTAL_1[65] = {0u,14824u,28224u,39348u,47855u,53994u,58171u,
 	65509u,65510u,65511u,65512u,65513u,65514u,65515u,65516u,65517u,65518u,
 	65519u,65520u,65521u,65522u,65523u,65524u,65525u,65526u,65527u,65528u,
 	65529u,65530u,65531u,65532u,65533u,65534u,65535u,65536u};
-	
+
 const uint32 RANGE_WIDTH_1[64] = {14824u,13400u,11124u,8507u,6139u,4177u,2755u,
 	1756u,1104u,677u,415u,248u,150u,89u,54u,31u,19u,11u,7u,4u,2u,1u,1u,1u,1u,1u,
 	1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,1u,
@@ -53,11 +53,6 @@ const uint32 RANGE_WIDTH_2[64] = {19578u,16582u,12257u,7906u,4576u,2366u,1170u,
 #define BOTTOM_VALUE	(TOP_VALUE >> 8)
 
 #define MODEL_ELEMENTS	64
-
-#if __GNUC__ != 2
-using std::min;
-using std::max;
-#endif
 
 
 CUnBitArray::CUnBitArray(CIO * pIO, int nVersion)
@@ -112,7 +107,7 @@ CUnBitArray::RangeDecodeFast(int nShift)
 {
 	while (m_RangeCoderInfo.range <= BOTTOM_VALUE) {
 		m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8)
-			| ((m_pBitArray[m_nCurrentBitIndex >> 5] 
+			| ((m_pBitArray[m_nCurrentBitIndex >> 5]
 			>> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
 		m_nCurrentBitIndex += 8;
 		m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8)
@@ -172,9 +167,9 @@ CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
 			nOverflow++;
 
 		// update
-		m_RangeCoderInfo.low -= m_RangeCoderInfo.range 
+		m_RangeCoderInfo.low -= m_RangeCoderInfo.range
 			* RANGE_TOTAL_2[nOverflow];
-		m_RangeCoderInfo.range = m_RangeCoderInfo.range 
+		m_RangeCoderInfo.range = m_RangeCoderInfo.range
 			* RANGE_WIDTH_2[nOverflow];
 
 		// get the working k
@@ -191,14 +186,14 @@ CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
 			int nPivotValueBits = 0;
 			while ((nPivotValue >> nPivotValueBits) > 0)
 				nPivotValueBits++;
-				
+
 			int nSplitFactor = 1 << (nPivotValueBits - 16);
 			int nPivotValueA = (nPivotValue / nSplitFactor) + 1;
 			int nPivotValueB = nSplitFactor;
 
 			while (m_RangeCoderInfo.range <= BOTTOM_VALUE) {
 				m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8)
-					| ((m_pBitArray[m_nCurrentBitIndex >> 5] 
+					| ((m_pBitArray[m_nCurrentBitIndex >> 5]
 					>> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
 				m_nCurrentBitIndex += 8;
 				m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8)
@@ -211,7 +206,7 @@ CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
 
 			while (m_RangeCoderInfo.range <= BOTTOM_VALUE) {
 				m_RangeCoderInfo.buffer = (m_RangeCoderInfo.buffer << 8)
-					| ((m_pBitArray[m_nCurrentBitIndex >> 5] 
+					| ((m_pBitArray[m_nCurrentBitIndex >> 5]
 					>> (24 - (m_nCurrentBitIndex & 31))) & 0xFF);
 				m_nCurrentBitIndex += 8;
 				m_RangeCoderInfo.low = (m_RangeCoderInfo.low << 8)
@@ -281,7 +276,7 @@ CUnBitArray::DecodeValueRange(UNBIT_ARRAY_STATE & BitArrayState)
 	}
 
 	// update nKSum
-	BitArrayState.nKSum += ((nValue + 1) / 2) 
+	BitArrayState.nKSum += ((nValue + 1) / 2)
 		- ((BitArrayState.nKSum + 16) >> 5);
 
 	// update k

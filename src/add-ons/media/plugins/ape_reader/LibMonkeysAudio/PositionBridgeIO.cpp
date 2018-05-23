@@ -32,7 +32,7 @@ int	TPositionBridgeIO::Close()
 	return B_OK;
 }
 //------------------------------------------------------------------------------
-int	TPositionBridgeIO::Create(const wchar_t* oName)
+int	TPositionBridgeIO::Create(const char* oName)
 {
 	return B_OK;
 }
@@ -42,7 +42,7 @@ int	TPositionBridgeIO::Delete()
 	return B_ERROR;
 }
 //------------------------------------------------------------------------------
-int	TPositionBridgeIO::GetName(wchar_t* oBuffer)
+int	TPositionBridgeIO::GetName(char* oBuffer)
 {
 	strcpy(oBuffer, "<TPositionBridgeIO>");
 	return B_OK;
@@ -68,7 +68,7 @@ int	TPositionBridgeIO::GetSize()
 	return aSize;
 }
 //------------------------------------------------------------------------------
-int	TPositionBridgeIO::Open(const wchar_t* oName)
+int	TPositionBridgeIO::Open(const char* oName)
 {
 	return B_OK;
 }

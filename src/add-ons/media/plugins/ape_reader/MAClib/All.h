@@ -42,6 +42,12 @@ Global includes
 #include <string.h>
 #include "SmartPtr.h"
 
+#if __GNUC__ != 2
+#include <algorithm>
+using std::min;
+using std::max;
+#endif
+
 /*****************************************************************************************
 Global compiler settings (useful for porting)
 *****************************************************************************************/

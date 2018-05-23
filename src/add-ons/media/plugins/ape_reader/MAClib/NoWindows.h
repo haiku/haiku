@@ -19,7 +19,7 @@
 //typedef char                int8;
 typedef char                str_ansi;
 typedef unsigned char        str_utf8;
-typedef wchar_t                str_utf16;
+typedef char                str_utf16;
 
 typedef unsigned long       DWORD;
 typedef int                 BOOL;
@@ -31,8 +31,8 @@ typedef unsigned int        UINT;
 typedef unsigned int        WPARAM;
 typedef long                LPARAM;
 typedef const char *        LPCSTR;
-typedef const wchar_t *     LPCTSTR;	// ?? SHINTA
-typedef const wchar_t *     LPCWSTR;	// ?? SHINTA
+typedef const char*     LPCTSTR;	// ?? SHINTA
+typedef const char*     LPCWSTR;	// ?? SHINTA
 typedef char *                LPSTR;
 typedef long                LRESULT;
 typedef	unsigned char		UCHAR;

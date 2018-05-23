@@ -16,7 +16,7 @@ public:
 	TPositionBridgeIO();
 	virtual	~TPositionBridgeIO();
 
-	virtual int	Open(const wchar_t* oName);
+	virtual int	Open(const char* oName);
 	virtual int	Close();
 
 	virtual int	Read(void* oBuf, unsigned int oBytesToRead, unsigned int* oBytesRead);
@@ -24,14 +24,14 @@ public:
 
 	virtual int	Seek(int oDistance, unsigned int oMoveMode);
 
-	virtual int	Create(const wchar_t* oName);
+	virtual int	Create(const char* oName);
 	virtual int	Delete();
 
 	virtual int	SetEOF();
 
 	virtual int	GetPosition();
 	virtual int	GetSize();
-	virtual int	GetName(wchar_t* oBuffer);
+	virtual int	GetName(char* oBuffer);
 
 	status_t	SetPositionIO(BPositionIO* oPositionIO);
 

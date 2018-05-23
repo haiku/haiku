@@ -23,7 +23,7 @@ public:
     virtual ~CIO() { };
 
     // open / close
-    virtual int Open(const wchar_t * pName) = 0;
+    virtual int Open(const char* pName) = 0;
     virtual int Close() = 0;
     
     // read / write
@@ -34,7 +34,7 @@ public:
     virtual int Seek(int nDistance, unsigned int nMoveMode) = 0;
     
     // creation / destruction
-    virtual int Create(const wchar_t * pName) = 0;
+    virtual int Create(const char* pName) = 0;
     virtual int Delete() = 0;
 
     // other functions
@@ -43,7 +43,7 @@ public:
     // attributes
     virtual int GetPosition() = 0;
     virtual int GetSize() = 0;
-    virtual int GetName(wchar_t * pBuffer) = 0;
+    virtual int GetName(char* pBuffer) = 0;
 };
 
 #endif // #ifndef APE_IO_H

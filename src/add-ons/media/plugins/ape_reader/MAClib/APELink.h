@@ -15,7 +15,7 @@ public:
     BOOL GetIsLinkFile();
     int GetStartBlock();
     int GetFinishBlock();
-    const wchar_t * GetImageFilename();
+    const char* GetImageFilename();
 
 protected:
 

@@ -15,7 +15,7 @@ public:
 
     // construction / destruction
     CInputSource(CIO * pIO, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL) { }
-    CInputSource(const wchar_t * pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL) { }
+    CInputSource(const char* pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL) { }
     virtual ~CInputSource() { }
     
     // get data
@@ -35,7 +35,7 @@ public:
 
     // construction / destruction
     CWAVInputSource(CIO * pIO, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL);
-    CWAVInputSource(const wchar_t * pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL);
+    CWAVInputSource(const char* pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL);
     ~CWAVInputSource();
     
     // get data
@@ -63,7 +63,7 @@ private:
 Input souce creation
 *************************************************************************************/
 extern "C" {	// SHINTA: export
-	DLLEXPORT CInputSource* __stdcall	CreateInputSource(const wchar_t * pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL);
+	DLLEXPORT CInputSource* __stdcall	CreateInputSource(const char* pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode = NULL);
 }
 
 #endif // #ifndef APE_WAVINPUTSOURCE_H

@@ -17,11 +17,6 @@
 
 #define BLOCKS_PER_DECODE               9216
 
-#if __GNUC__ != 2
-using std::min;
-using std::max;
-#endif
-
 int DecompressCore(const str_utf16 * pInputFilename, const str_utf16 * pOutputFilename, int nOutputMode, int nCompressionLevel, int * pPercentageDone, APE_PROGRESS_CALLBACK ProgressCallback, int * pKillFlag);
 
 /*****************************************************************************************

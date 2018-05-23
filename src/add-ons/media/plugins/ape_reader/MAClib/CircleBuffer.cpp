@@ -19,7 +19,7 @@ CCircleBuffer::~CCircleBuffer()
 void CCircleBuffer::CreateBuffer(int nBytes, int nMaxDirectWriteBytes)
 {
     SAFE_ARRAY_DELETE(m_pBuffer)
-    
+
     m_nMaxDirectWriteBytes = nMaxDirectWriteBytes;
     m_nTotal = nBytes + 1 + nMaxDirectWriteBytes;
     m_pBuffer = new unsigned char [m_nTotal];

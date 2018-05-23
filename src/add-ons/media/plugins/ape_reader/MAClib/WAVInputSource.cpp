@@ -32,7 +32,7 @@ struct RIFF_CHUNK_HEADER
 };
 
 
-CInputSource * __stdcall	CreateInputSource(const wchar_t * pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode)
+CInputSource * __stdcall	CreateInputSource(const char* pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode)
 { 
     // error check the parameters
     if ((pSourceName == NULL) || (wcslen(pSourceName) == 0))
@@ -42,7 +42,7 @@ CInputSource * __stdcall	CreateInputSource(const wchar_t * pSourceName, WAVEFORM
     }
 
     // get the extension
-    const wchar_t * pExtension = &pSourceName[wcslen(pSourceName)];
+    const char* pExtension = &pSourceName[wcslen(pSourceName)];
     while ((pExtension > pSourceName) && (*pExtension != '.'))
         pExtension--;
 
@@ -89,7 +89,7 @@ CWAVInputSource::CWAVInputSource(CIO * pIO, WAVEFORMATEX * pwfeSource, int * pTo
     if (pErrorCode) *pErrorCode = nRetVal;
 }
 
-CWAVInputSource::CWAVInputSource(const wchar_t * pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode)
+CWAVInputSource::CWAVInputSource(const char* pSourceName, WAVEFORMATEX * pwfeSource, int * pTotalBlocks, int * pHeaderBytes, int * pTerminatingBytes, int * pErrorCode)
     : CInputSource(pSourceName, pwfeSource, pTotalBlocks, pHeaderBytes, pTerminatingBytes, pErrorCode)
 {
     m_bIsValid = FALSE;
