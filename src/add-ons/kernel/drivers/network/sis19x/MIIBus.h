@@ -113,7 +113,7 @@ public:
 		status_t		Status(uint16 *status);
 		status_t		Select(uint16* status = NULL);
 		status_t		Reset(uint16* status = NULL);
-		uint32			TimerHandler(bool* linkChanged);
+		int32			TimerHandler(bool* linkChanged);
 
 		bool			IsLinkUp();
 		status_t		UpdateLinkState(ether_link_state* state = NULL);

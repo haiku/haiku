@@ -79,7 +79,7 @@ static int32
 generate_event(timer* timer)
 {
 	gEventProducer.InjectEvent();
-	return 0;
+	return B_HANDLED_INTERRUPT;
 }
 
 

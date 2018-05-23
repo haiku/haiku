@@ -16,11 +16,11 @@ static timer sHardClockTimer;
 /*!
  * Implementation of FreeBSD's hardclock timer.
  */
-static status_t
+static int32
 hardClock(timer* hardClockTimer)
 {
 	atomic_add((vint32*)&ticks, 1);
-	return B_OK;
+	return B_HANDLED_INTERRUPT;
 }
 
 

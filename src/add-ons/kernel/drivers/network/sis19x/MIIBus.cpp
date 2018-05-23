@@ -279,7 +279,7 @@ MIIBus::IsLinkUp()
 }
 
 
-uint32
+int32
 MIIBus::TimerHandler(bool* linkChanged)
 {
 	// XXX ?
@@ -332,7 +332,7 @@ MIIBus::TimerHandler(bool* linkChanged)
 	//			(fLinkState.media & IFM_FULL_DUPLEX) ? "full" : "half");
 	//}
 
-	return 0;
+	return B_HANDLED_INTERRUPT;
 }
 
 

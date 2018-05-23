@@ -287,7 +287,7 @@ sis900_timer(timer *t)
 		if (mode)
 			sis900_setMode(info, mode);
 
-		return 0;
+		return B_HANDLED_INTERRUPT;
 	}
 
 	if (info->link)	{	// link lost
@@ -322,7 +322,7 @@ sis900_timer(timer *t)
 //	else
 //		bug("********* set_eq() would be needed! ********\n");
 
-	return 0;
+	return B_HANDLED_INTERRUPT;
 }
 
 

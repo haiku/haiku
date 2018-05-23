@@ -26,11 +26,11 @@ Radeon_DisableIRQ(device_info *di)
  *	handles standard interrupts, i.e. VBI and DMA
  */
 
-static uint32
+static int32
 Radeon_ThreadInterruptWork(vuint8 *regs, device_info *di, uint32 int_status)
 {
 	shared_info *si = di->si;
-	uint32 handled = B_HANDLED_INTERRUPT;
+	int32 handled = B_HANDLED_INTERRUPT;
 
 	if ((int_status & RADEON_CRTC_VBLANK_STAT) != 0
 		&& si->crtc[0].vblank >= 0) {

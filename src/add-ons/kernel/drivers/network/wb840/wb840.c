@@ -289,7 +289,7 @@ wb_tick(timer* arg)
 
 	wb_updateLink(device);
 
-	return B_OK;
+	return B_HANDLED_INTERRUPT;
 }
 
 
