@@ -315,7 +315,7 @@ SwapDataTest::test(void)
 	float arrayFloat[4];
 	TEST(B_FLOAT_TYPE, kArrayFloat, arrayFloat);
 
-	const float kArrayDouble[] = {3.42, 0.0, NAN, HUGE_VAL};
+	const double kArrayDouble[] = {3.42, 0.0, NAN, HUGE_VAL};
 	double arrayDouble[4];
 	TEST(B_DOUBLE_TYPE, kArrayDouble, arrayDouble);
 
