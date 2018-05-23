@@ -214,23 +214,22 @@ real_path()
 
 # valid_toolchain
 #
-# check if toolchain is valid
+# check if a toolchain is valid
 #
 valid_toolchain()
 {
 	TRIPLET="$1"
 	BASE="$2"
+	SOURCE="$3"
 	if [ ! -d "$BASE" ]; then
-		return 1;
+		return 1
 	fi
 	if [ -f "$BASE/bin/$TRIPLET-gcc" ]; then
-		return 0;
+		[ "$BASE/bin/$TRIPLET-gcc" -nt "$SOURCE/legacy/gcc/configure" ] && \
+			[ "$BASE/bin/$TRIPLET-gcc" -nt "$SOURCE/gcc/gcc/configure" ]
+		return $?
 	fi
-	# TODO: Check this!
-	if [ -f "$BASE/bin/$TRIPLET-clang" ]; then
-		return 0;
-	fi
-	return 1;
+	return 1
 }
 
 # standard_gcc_settings
@@ -906,7 +905,7 @@ else
 				*)					MAKE=make;;
 			esac
 
-			if ! valid_toolchain "${targetMachine}" "${crossToolsDir}"; then
+			if ! valid_toolchain "${targetMachine}" "${crossToolsDir}" "${buildCrossTools}"; then
 				MAKE=$MAKE \
 				SECONDARY_ARCH=$secondaryArch \
 				HAIKU_USE_GCC_GRAPHITE=`get_variable \
