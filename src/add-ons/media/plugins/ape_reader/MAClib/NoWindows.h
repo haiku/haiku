@@ -5,8 +5,6 @@
 
 #include <SupportDefs.h>
 
-#define	wchar_t	char
-
 #define FALSE    0
 #define TRUE    1
 
