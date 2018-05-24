@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	3969330583
+1	russian	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Уровень полного разряда: 
 Show percent	PowerStatus		Показать в процентах
 Design capacity: 	PowerStatus		Штатная емкость: 
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Штатное напряжение:
 Battery charging	PowerStatus		Батарея заряжается
 The battery level is critical, please plug in the device immediately.	PowerStatus		Критический уровень заряда батареи, пожалуйста, подключите устройство к сети прямо сейчас.
 Design capacity warning: 	PowerStatus		Уровень низкого заряда: 
-Battery info	PowerStatus		Информация о батарее
 Quit	PowerStatus		Выход
 rechargeable	PowerStatus		перезаряжаемая
 charging	PowerStatus		зарядка
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можете запустить состояние электропитания в окне или установить его в Deskbar.
-Power status box	PowerStatus		Состояние электропитания
 Show status icon	PowerStatus		Показать значок статуса
 Capacity granularity 2: 	PowerStatus		Детализация ёмкости 2: 
 Technology: 	PowerStatus		Технология: 

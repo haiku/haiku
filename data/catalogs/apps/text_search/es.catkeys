@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku.TextSearch	2496563907
+1	spanish; castilian	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s: No hay suficiente espacio para evitar el nombre del archivo
 Trim to selection	GrepWindow		Recortar selección
 Follow symbolic links	GrepWindow		Siga los enlaces simbólicos
@@ -15,7 +15,6 @@ Select all	GrepWindow		Seleccionar todo
 OK	GrepWindow		OK
 Skip folders starting with a dot	GrepWindow		Saltar carpertas con un punto
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME No pudo abrir uno o más archivos
-Escape search text	GrepWindow		Salir de la busqueda de texto
 Search	GrepWindow		Buscar
 Open selection	GrepWindow		Abrir selección
 Look in sub-folders	GrepWindow		Buscar en subcarpetas
@@ -23,7 +22,6 @@ Actions	GrepWindow		Acciones
 File	GrepWindow		Archivo
 Encoding	GrepWindow		Codificación
 History	GrepWindow		Historia
-%s: There was a problem running grep.	Grepper		%s: hubo un problema utilizando grep.
 New window	GrepWindow		Nueva ventana
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecciona los archivos que desea seguir buscado
 TextSearch	GrepWindow		TExtSearch

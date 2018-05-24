@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-MediaPlayer	2336225435
+1	esperanto	x-vnd.Haiku-MediaPlayer	3451842233
 Close	MediaPlayer-Main		Fermi
 Open	MediaPlayer-Main		Malfermi
 OK	MediaPlayer-SettingsWindow		Bone
@@ -13,8 +13,6 @@ Open	MediaPlayer-PlaylistWindow		Malfermi
 Error: 	MediaPlayer-RemovePLItemsCmd		Eraro:
 OK	MediaPlayer-RemovePLItemsCmd		Bone
 Error: 	MediaPlayer-Main		Eraro:
-Stop	MediaPlayer-Main		Halti
-URI	MediaPlayer-Main		URI
 OK	MediaPlayer-NetworkStream		Bone
 OK	MediaPlayer-PlaylistWindow		Bone
 Cancel	MediaPlayer-NetworkStream		Nuligi

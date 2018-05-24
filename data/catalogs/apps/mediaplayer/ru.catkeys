@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	2558878117
+1	russian	x-vnd.Haiku-MediaPlayer	3708050243
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -20,30 +20,24 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Расположение суб�
 Close	MediaPlayer-Main		Закрыть
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Некоторые файлы не могут быть перемещены в Корзину.
 <unknown>	MediaPlayer-InfoWin		<неизвестно>
-Seek	MediaPlayer-Main		Поиск
 Open	MediaPlayer-Main		Открыть
-Next	MediaPlayer-Main		Следующий
 OK	MediaPlayer-SettingsWindow		ОК
 Track %d	MediaPlayer-Main		Дорожка %d
-Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Получает/устанавливает текущую позицию воспроизведения в микросекундах.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Синемаскоп)
 Display mode	MediaPlayer-InfoWin		Режим показа
 Medium	MediaPlayer-SettingsWindow		cредний
 Open network stream	MediaPlayer-NetworkStream		Открыть сетевой поток
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Open…	MediaPlayer-PlaylistWindow		Открыть…
-Toggle mute.	MediaPlayer-Main		Включить/выключить звук.
 Undo	MediaPlayer-PlaylistWindow		Отменить
 Stream URL:	MediaPlayer-NetworkStream		URL потока:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Использовать аппаратный видеооверлей если возможно
 File info…	MediaPlayer-Main		Информация о файле…
-Pause playback.	MediaPlayer-Main		Приостановить проигрывание.
 Overlay	MediaPlayer-InfoWin		Оверлей
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Удалить запись
 Close window after playing audio	MediaPlayer-SettingsWindow		Закрыть окно после проигрывания музыки
 Full volume	MediaPlayer-SettingsWindow		На полной громкости
 Drop files to play	MediaPlayer-Main		Перетащите файлы для проигрывания
-TogglePlaying	MediaPlayer-Main		Переключить воспроизведение
 Copyright	MediaPlayer-InfoWin		Авторские права
 Cancel	MediaPlayer-SettingsWindow		Отмена
 Loop audio	MediaPlayer-SettingsWindow		Зацикливать аудио
@@ -52,10 +46,8 @@ Nothing to Play	MediaPlayer-Main		Нечего проигрывать
 Muted	MediaPlayer-SettingsWindow		Без звука
 Quit	MediaPlayer-Main		Выход
 Video	MediaPlayer-Main		Видео
-Start playing.	MediaPlayer-Main		Начать проигрывание.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не установлен декодер, необходимый для работы с этим форматом файлов или у декодера возникли проблемы с указанной версией этого формата.
 Import Entry	MediaPlayer-ImportPLItemsCmd		импортирование записи
-Gets the URI of the currently playing item.	MediaPlayer-Main		Получает URI текущей проигрываемой записи.
 400% scale	MediaPlayer-Main		Масштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка при сохранени плейлиста:\n\nОшибка: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи
@@ -69,14 +61,11 @@ h	MediaPlayer-InfoWin	Hours	ч
 Select all	MediaPlayer-PlaylistWindow		Выделить все
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
 Open	MediaPlayer-PlaylistWindow		Открыть
-Stop playing.	MediaPlayer-Main		Остановить проигрывание.
-Seek by the specified amounts of microseconds.	MediaPlayer-Main		Seek by the specified amounts of microseconds.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не может быть открыт.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Ошибка: 
 Audio	MediaPlayer-InfoWin		Аудио
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Ошибка перемещения в корзину
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутренняя ошибка (плохо сформированное сообщение). Не удалось сохранить плейлист.
-Skip to the previous track.	MediaPlayer-Main		Прыгнуть к предыдущему треку.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% обнаружил внутреннюю ошибку. Файл не может быть открыт.
 Close window after playing video	MediaPlayer-SettingsWindow		Закрыть окно после проигрывания видео
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштабировать видео плавно (в режиме без оверлея)
@@ -84,11 +73,8 @@ OK	MediaPlayer-RemovePLItemsCmd		OK
 Open network stream	MediaPlayer-Main		Открыть сетевой поток
 50% scale	MediaPlayer-Main		Масштаб 50%
 Subtitles	MediaPlayer-Main		Субтитры
-Prev	MediaPlayer-Main		Предыдущий
-Volume	MediaPlayer-Main		Громкость
 Audio track	MediaPlayer-Main		Аудио дорожка
 Import Entries	MediaPlayer-ImportPLItemsCmd		импортирование записей
-Pause	MediaPlayer-Main		Пауза
 No aspect correction	MediaPlayer-Main		Без коррекции
 Automatically start playing	MediaPlayer-SettingsWindow		Начинать проигрывать файлы автоматически
 Track	Video Track Menu		Дорожка
@@ -104,10 +90,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Все ф
 <untitled>	PlaylistItem-title		<безымянный>
 Track	Audio Track Menu		Дорожка
 unknown format	MediaPlayer-InfoWin		неизвестный формат
-Position	MediaPlayer-Main		Позиция
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нечего возвращать>
-Skip to the next track.	MediaPlayer-Main		Перейти к следующему треку.
-Play	MediaPlayer-Main		Играть
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Удалить записи в корзину
 200% scale	MediaPlayer-Main		Масштаб 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Похоже, что медиа сервер не запущен\nВы хотите его запустить?
@@ -118,7 +101,6 @@ Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Total duration: %s	MediaPlayer-PlaylistWindow		Общая длительность: %s
-Stop	MediaPlayer-Main		Остановить
 <unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
 raw video	MediaPlayer-InfoWin		необработанное видео
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -128,11 +110,8 @@ Open clips	MediaPlayer-Main		Открыть клипы
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копировать запись
 none	Subtitles menu		отсутствуют
 Move file to Trash	MediaPlayer-PlaylistWindow		Переместить в корзину
-URI	MediaPlayer-Main		URI
 Invalid URL inserted!	MediaPlayer-NetworkStream		Указан неверный URL!
 OK	MediaPlayer-NetworkStream		ОК
-Mute	MediaPlayer-Main		Выключить звук
-Toggle pause/play.	MediaPlayer-Main		Переключить паузу/проигрывание.
 min	MediaPlayer-InfoWin	Minutes	мин
 Small	MediaPlayer-SettingsWindow		маленький
 Randomize	MediaPlayer-PlaylistWindow		Перемешать
@@ -142,16 +121,11 @@ Revert	MediaPlayer-SettingsWindow		Вернуть
 Edit	MediaPlayer-PlaylistWindow		Изменить
 Start media server	MediaPlayer-Main		Запустить медиа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
-Toggle fullscreen.	MediaPlayer-Main		Переключить в полноэкранный режим.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Gets the duration of the currently playing item in microseconds.
-ToggleFullscreen	MediaPlayer-Main		Переключить в полноэкранный режим
 Bad URL	MediaPlayer-NetworkStream		Неверный URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} few{# канала} other{# каналов}}
 <unnamed>	PlaylistItem-name		<без названия>
 OK	MediaPlayer-PlaylistWindow		ОК
 none	Audio track menu		пусто
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Получить/установить громкость (0.0-2.0).
-Duration	MediaPlayer-Main		Длительность
 Cancel	MediaPlayer-NetworkStream		Отмена
 Playlist…	MediaPlayer-Main		Плейлист…
 <unknown>	PlaylistItem-author		<неизвестно>

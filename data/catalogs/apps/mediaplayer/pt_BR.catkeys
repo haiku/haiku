@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3099592804
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	4248764930
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -20,28 +20,22 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Colocação de legendas:
 Close	MediaPlayer-Main		Fechar
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alguns arquivos não puderam ser movidos para a Lixeira.
 <unknown>	MediaPlayer-InfoWin		<desconhecido>
-Seek	MediaPlayer-Main		Procurar
 Open	MediaPlayer-Main		Abrir
-Next	MediaPlayer-Main		Próximo
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Faixa %d
-Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obter/definir a posição de execução atual em microssegundos.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascópio)
 Display mode	MediaPlayer-InfoWin		Modo de exibição
 Medium	MediaPlayer-SettingsWindow		Mídia
 Close	MediaPlayer-PlaylistWindow		Fechar
 Open…	MediaPlayer-PlaylistWindow		Abrir…
-Toggle mute.	MediaPlayer-Main		Alternar mudo.
 Undo	MediaPlayer-PlaylistWindow		Desfazer
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Utilizar sobreposições de vídeo por hardware se disponível
 File info…	MediaPlayer-Main		Informações do arquivo…
-Pause playback.	MediaPlayer-Main		Pausar a reprodução.
 Overlay	MediaPlayer-InfoWin		Sobreposição
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Remover Entrada
 Close window after playing audio	MediaPlayer-SettingsWindow		Fechar a janela após reproduzir áudio
 Full volume	MediaPlayer-SettingsWindow		Volume máximo
 Drop files to play	MediaPlayer-Main		Soltar arquivos para reproduzir
-TogglePlaying	MediaPlayer-Main		Alternar Reprodução
 Copyright	MediaPlayer-InfoWin		Direitos autorais
 Cancel	MediaPlayer-SettingsWindow		Cancelar
 Loop audio	MediaPlayer-SettingsWindow		Repetir áudio
@@ -50,10 +44,8 @@ Nothing to Play	MediaPlayer-Main		Nada para Tocar
 Muted	MediaPlayer-SettingsWindow		Mudo
 Quit	MediaPlayer-Main		Sair
 Video	MediaPlayer-Main		Vídeo
-Start playing.	MediaPlayer-Main		Iniciar reprodução.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Não existe decodificador instalado para manipular o formato de arquivo, ou o decodificador tem problema com a versão específica do formato.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importar Entrada
-Gets the URI of the currently playing item.	MediaPlayer-Main		Obtém a URI do item em reprodução no momento.
 400% scale	MediaPlayer-Main		escala de 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Falha ao salvar a lista de reprodução:\n\nErro:
 Move Entries	MediaPlayer-MovePLItemsCmd		Mover Entradas
@@ -67,25 +59,19 @@ h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Selecionar tudo
 Move Entry	MediaPlayer-MovePLItemsCmd		Mover Entrada
 Open	MediaPlayer-PlaylistWindow		Abrir
-Stop playing.	MediaPlayer-Main		Parar a reprodução.
-Seek by the specified amounts of microseconds.	MediaPlayer-Main		Procurar pelas quantidades específicas de microssegundos.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		O arquivo '%filename' não pôde ser aberto.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Erro:
 Audio	MediaPlayer-InfoWin		Áudio
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Erro ao mover para a lixeira
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erro interno (mensagem malformada). Falha ao salvar a lista de reprodução.
-Skip to the previous track.	MediaPlayer-Main		Pula para a faixa anterior.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% encontrou um erro interno. O arquivo não pôde ser aberto.
 Close window after playing video	MediaPlayer-SettingsWindow		Fechar a janela após reproduzir vídeo
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escalar filmes suavemente (modo de não sobreposição)
 OK	MediaPlayer-RemovePLItemsCmd		OK
 50% scale	MediaPlayer-Main		escala de 50%
 Subtitles	MediaPlayer-Main		Legendas
-Prev	MediaPlayer-Main		Anterior
-Volume	MediaPlayer-Main		Volume
 Audio track	MediaPlayer-Main		Faixa de áudio
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importar Entradas
-Pause	MediaPlayer-Main		Pausar
 No aspect correction	MediaPlayer-Main		Nenhuma correção de aspecto
 Automatically start playing	MediaPlayer-SettingsWindow		Iniciar a reprodução automaticamente
 Track	Video Track Menu		Faixa
@@ -101,10 +87,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Todos os 
 <untitled>	PlaylistItem-title		<sem título>
 Track	Audio Track Menu		Faixa
 unknown format	MediaPlayer-InfoWin		formato desconhecido
-Position	MediaPlayer-Main		Posição
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nada para refazer>
-Skip to the next track.	MediaPlayer-Main		Pula para a próxima faixa.
-Play	MediaPlayer-Main		Reproduzir
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Remover Entradas para a Lixeira
 200% scale	MediaPlayer-Main		escala de 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece que o servidor de mídia não está executando.\nGostaria de iniciá-lo?
@@ -114,7 +97,6 @@ Error: 	MediaPlayer-Main		Erro:
 Large	MediaPlayer-SettingsWindow		Grande
 Bottom of video	MediaPlayer-SettingsWindow		Base do vídeo
 DrawBitmap	MediaPlayer-InfoWin		Desenhar Mapa de Bits
-Stop	MediaPlayer-Main		Parar
 <unnamed media>	MediaPlayer-InfoWin		<mídia sem nome>
 raw video	MediaPlayer-InfoWin		vídeo não processado
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clipes em segundo plano
@@ -124,10 +106,7 @@ Open clips	MediaPlayer-Main		Clipes abertos
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar Entrada
 none	Subtitles menu		nenhum
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover o arquivo para a Lixeira
-URI	MediaPlayer-Main		URI
 OK	MediaPlayer-NetworkStream		OK
-Mute	MediaPlayer-Main		Mudo
-Toggle pause/play.	MediaPlayer-Main		Alternar pausa/reprodução.
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pequeno
 Randomize	MediaPlayer-PlaylistWindow		Aleatório
@@ -137,15 +116,10 @@ Revert	MediaPlayer-SettingsWindow		Reverter
 Edit	MediaPlayer-PlaylistWindow		Editar
 Start media server	MediaPlayer-Main		Iniciar o servidor de mídia
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
-Toggle fullscreen.	MediaPlayer-Main		Alternar para tela cheia.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obter a duração do item atualmente em execução em microssegundos.
-ToggleFullscreen	MediaPlayer-Main		Alternar para Tela Cheia
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} outros{# Canais}}
 <unnamed>	PlaylistItem-name		<sem nome>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nenhum
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtém/define o volume (0.0-2.0).
-Duration	MediaPlayer-Main		Duração
 Cancel	MediaPlayer-NetworkStream		Cancelar
 Playlist…	MediaPlayer-Main		Lista de reprodução…
 <unknown>	PlaylistItem-author		<desconhecido>

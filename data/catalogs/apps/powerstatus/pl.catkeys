@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PowerStatus	3969330583
+1	polish	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Ostrzeżenie o niskiej pojemności nominalnej: 
 Show percent	PowerStatus		Pokaż procent
 Design capacity: 	PowerStatus		Pojemność nominalna: 
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Napięcie nominalne:
 Battery charging	PowerStatus		Ładowanie baterii
 The battery level is critical, please plug in the device immediately.	PowerStatus		Poziom naładowania baterii jest krytycznie niski, natychmiast podłącz urządzenie do prądu.
 Design capacity warning: 	PowerStatus		Ostrzeżenie o pojemności nominalnej: 
-Battery info	PowerStatus		Informacje o baterii
 Quit	PowerStatus		Zakończ
 rechargeable	PowerStatus		akumulator
 charging	PowerStatus		ładowanie
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Możesz uruchomić PowerStatus w oknie lub zainstalować go w Deskbarze.
-Power status box	PowerStatus		Pole ze statusem energii
 Show status icon	PowerStatus		Pokaż ikonę statusu
 Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2: 
 Technology: 	PowerStatus		Technologia: 

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	2496563907
+1	ukrainian	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу.
 Trim to selection	GrepWindow		Обрізати для вибору
 Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
@@ -15,7 +15,6 @@ Select all	GrepWindow		Вибрати все
 OK	GrepWindow		Гаразд
 Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з крапки
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не вдалося відкрити одну або більше тек.
-Escape search text	GrepWindow		Відмінити пошук туксту
 Search	GrepWindow		Пошук
 Open selection	GrepWindow		Відкрити вибране
 Look in sub-folders	GrepWindow		Дивитися в підтеках
@@ -23,7 +22,6 @@ Actions	GrepWindow		Дії
 File	GrepWindow		Файл
 Encoding	GrepWindow		Кодування
 History	GrepWindow		Історія
-%s: There was a problem running grep.	Grepper		%s: проблема запуску grep.
 New window	GrepWindow		Нове вікно
 Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли які ви хочете продовжувати шукати.
 TextSearch	GrepWindow		Пошук тексту

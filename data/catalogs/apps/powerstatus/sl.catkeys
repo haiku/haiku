@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-PowerStatus	2248890973
+1	slovenian	x-vnd.Haiku-PowerStatus	2880318498
 Show percent	PowerStatus		Pokaži odstotke
  mW	PowerStatus		 mW
 Type: 	PowerStatus		Vrsta:
@@ -18,7 +18,6 @@ Capacity: 	PowerStatus		Kapaciteta:
 Battery discharging	PowerStatus		Baterija se prazni
 Serial number: 	PowerStatus		Serijska številka:
 Battery charging	PowerStatus		Baterija se polni
-Battery info	PowerStatus		Informacije o bateriji
 Quit	PowerStatus		Izhod
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stanje napajanja lahko teče v oknu ali pa se namesti v Deskbar.
 Show status icon	PowerStatus		Pokaži ikono stanja

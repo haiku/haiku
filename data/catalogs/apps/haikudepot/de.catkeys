@@ -1,12 +1,10 @@
-1	german	x-vnd.Haiku-HaikuDepot	1527149765
+1	german	x-vnd.Haiku-HaikuDepot	2069133245
 Name	PackageListView		Name
 Available packages	MainWindow		Verfügbare Pakete
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
-Repository	FilterView		Paketquelle
 Close	RatePackageWindow		Schließen
 The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Changelog	PackageInfoView		Änderungsprotokoll
-Repository:	FilterView		Paketquelle:
 Your rating:	RatePackageWindow		Eigene Bewertung:
 The passwords do not match.	UserLoginWindow		Die Kennwörter stimmen nicht überein.
 Log in…	MainWindow		Anmelden…
@@ -19,6 +17,7 @@ for %Version%	PackageInfoView		für %Version%
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 Description	PackageListView		Beschreibung
 Install	PackageManager		Installieren
+All repositories	MainWindow		Alle Paketquellen
 Source packages	MainWindow		Quellcode-Pakete
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Anmeldung fehlgeschlagen. Entweder dieses Benutzerkonto existiert nicht oder es wurde ein falsches Kennwort eingegeben.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Benutzerkonto erfolgreich angelegt. Jetzt können Pakete bewertet werden, etc.
@@ -33,7 +32,6 @@ Your rating was updated successfully.	RatePackageWindow		Die Bewertung wurde erf
 <no info>	PackageInfoView		<keine Info>
 Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nicht gestartet werden:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Bei der Initialisierung des Paketmanagers trat ein Fehler auf: %message%
-All repositories	FilterView		Alle Paketquellen
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Sie kann jederzeit durch eine erneute Bewertung aktualisiert oder gelöscht werden.
 Very unstable	RatePackageWindow		Sehr instabil
@@ -48,6 +46,7 @@ Switch account…	MainWindow		Konto wechseln…
 Ignore	UserLoginWindow		Ignorieren
 Language	UserLoginWindow		Sprache
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Das Kennwort ist zu schwach oder ungültig. Es muss mindestens 8 Zeichen lang sein und mindestens 2 Zahlen und 2 Großbuchstaben enthalten.
+Show only featured packages	FilterView		Nur Empfehlungen anzeigen
 Rate package	RatePackageWindow		Paket bewerten
 Development	Model		Entwicklung
 Fatal error	PackageManager		Schwerwiegender Fehler
@@ -69,6 +68,7 @@ Downloading:	PackageInfoView		Aktueller Download:
 Mostly stable	RatePackageWindow		Ziemlich stabil
 There was a puzzling response from the web service.	RatePackageWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
 Log out	MainWindow		Abmelden
+Repository	PackageListView		Paketquelle
 Education	Model		Bildung
 Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%
@@ -77,7 +77,6 @@ Failed to update rating	RatePackageWindow		Die Bewertung konnte nicht aktualisie
 Does not start	RatePackageWindow		Startet nicht
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Der Web-Dienst konnte nicht erreicht werden.
-Only featured packages	MainWindow		Nur Empfehlungen
 There are problems in the form:\n\n	UserLoginWindow		Es gibt Probleme mit dem Format:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Das Paket konnte nicht vom Web-Dienst gefunden werden. Wahrscheinlich stammt das Paket aus einem Depot, das nicht vom Web-Dienst verwaltet wird. Solche Pakete können leider nicht bewertet werden.
 Create account	UserLoginWindow		Benutzerkonto erstellen
@@ -137,11 +136,12 @@ Cancel	RatePackageWindow		Abbrechen
 Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Senden
+Repositories	MainWindow		Paketquellen
 -	no package size		-
 Category:	FilterView		Kategorie:
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
+Check for updates…	MainWindow		Aktualisierungen suchen…
 There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n
-Featured packages	MainWindow		Empfohlene Software-Pakete
 Start package daemon	App		Paket-Daemon starten
 Manage repositories…	MainWindow		Paketquellen verwalten…
 Success	RatePackageWindow		Erfolg
@@ -150,5 +150,6 @@ Audio	Model		Audio
 About	PackageInfoView		Über
 Active	PackageListView		Aktiviert
 It was not possible to contact the web service.	UserLoginWindow		Der Web-Dienst konnte nicht erreicht werden.
+Refreshing...	MainWindow		Wird aktualisiert …
 Failed to create account: %s\n	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden: %s\n
 Cancel	UserLoginWindow		Abbrechen

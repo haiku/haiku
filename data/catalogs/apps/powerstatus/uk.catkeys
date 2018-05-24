@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	3969330583
+1	ukrainian	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності: 
 Show percent	PowerStatus		Показати процент
 Design capacity: 	PowerStatus		Проектна ємність: 
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Проектна напруга:
 Battery charging	PowerStatus		Батарея заряджається
 The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний негайно починайте її зарядку.
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність: 
-Battery info	PowerStatus		Дані батареї
 Quit	PowerStatus		Вийти
 rechargeable	PowerStatus		заряджувана
 charging	PowerStatus		зарядка
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar.
-Power status box	PowerStatus		Вікно стану живлення
 Show status icon	PowerStatus		Показати іконку стану
 Capacity granularity 2: 	PowerStatus		Градація ємності 2: 
 Technology: 	PowerStatus		Технологія: 

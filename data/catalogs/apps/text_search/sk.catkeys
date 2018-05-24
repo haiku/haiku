@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku.TextSearch	2496563907
+1	slovak	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s: nedostatok miesta na vloženie únikových klauzúl do názvu súboru.
 Trim to selection	GrepWindow		Orezať na výber
 Follow symbolic links	GrepWindow		Nasledovať symbolické odkazy
@@ -15,7 +15,6 @@ Select all	GrepWindow		Vybrať všetky
 OK	GrepWindow		OK
 Skip folders starting with a dot	GrepWindow		Preskakovať priečinky začínajce bodkou
 %APP_NAME couldn't open one or more folders.	GrepWindow		Aplikácii %APP_NAME sa nepodarilo otvoriť jeden alebo viac priečinkov.
-Escape search text	GrepWindow		Vložiť únikové klauzuly do hľadaného textu
 Search	GrepWindow		Hľadať
 Open selection	GrepWindow		Otvoriť výber
 Look in sub-folders	GrepWindow		Hľadať v podpriečinkoch
@@ -23,7 +22,6 @@ Actions	GrepWindow		Operácie
 File	GrepWindow		Súbor
 Encoding	GrepWindow		Kódovanie
 History	GrepWindow		História
-%s: There was a problem running grep.	Grepper		%s: Nastal problém pri behu nástroja grep.
 New window	GrepWindow		Nové okno
 Please select the files you wish to keep searching.	GrepWindow		Prosím, vyberte súbory, v ktorých chcete ďalej hľadať.
 TextSearch	GrepWindow		Hľadanie textu

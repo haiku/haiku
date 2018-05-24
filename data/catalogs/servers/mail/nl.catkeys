@@ -1,7 +1,10 @@
-1	dutch; flemish	x-vnd.Be-POST	825141276
+1	dutch; flemish	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		Mail ophalen voor %name
 Check for mails only	DeskbarView		Alleen mails controleren
 Send pending mails	DeskbarView		Mails in wachtrij verzenden
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Eén nieuw bericht} other{# nieuwe berichten}}
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nieuw bericht} other{# nieuwe berichten}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nieuw bericht} other{# nieuwe berichten}} voor %name\n
 New Messages	MailDaemon		Nieuwe berichten
 <no accounts>	DeskbarView		<geen accounts>
 Mail status	MailDaemon		Mailstatus

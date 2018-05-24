@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku.TextSearch	2496563907
+1	romanian	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s: Nu există spațiu suficient pentru a tasta numele de fișier.
 Trim to selection	GrepWindow		Potrivește la selecție
 Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
@@ -15,7 +15,6 @@ Select all	GrepWindow		Selectează tot
 OK	GrepWindow		OK
 Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nu a putut deschide unul sau mai multe dosare.
-Escape search text	GrepWindow		Tastați textul de căutat
 Search	GrepWindow		Caută
 Open selection	GrepWindow		Deschide selecție
 Look in sub-folders	GrepWindow		Caută în subdosare
@@ -23,7 +22,6 @@ Actions	GrepWindow		Acțiuni
 File	GrepWindow		Fișier
 Encoding	GrepWindow		Codare
 History	GrepWindow		Istoric
-%s: There was a problem running grep.	Grepper		%s: A existat o problemă la rularea grep.
 New window	GrepWindow		Fereastră nouă
 Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
 TextSearch	GrepWindow		CăutareText

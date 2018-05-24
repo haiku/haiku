@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-WebPTranslator	3197103165
+1	swedish	x-vnd.Haiku-WebPTranslator	3343078170
 Compression method:	ConfigView		Komprimeringsmetod
 WebP image translator	ConfigView		WebP bildöversättare 
-Based on libwebp v0.1,	ConfigView		Baserat på libwebp v0.1,
 Preset	ConfigView		Förval
 WebP images	WebPTranslator		WebP bilder
 WebPTranslator Settings	ConfigView		WebP översättningsinställningar
@@ -10,7 +9,6 @@ WebP Settings	main		WebP inställningar
 Text	ConfigView		Text
 Slower but better	ConfigView		Långsammare men bättre
 WebP image	WebPTranslator		WebP bild
-©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.
 Output preset:	ConfigView		Utdata:
 Picture	ConfigView		Bild
 Low	ConfigView		Låg
@@ -20,6 +18,5 @@ Default	ConfigView		Förval
 Fast	ConfigView		Snabb
 Photo	ConfigView		Foto
 Preprocessing filter	ConfigView		Förbehandlingsfilter
-©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
 WebP image translator	WebPTranslator		WebP bildöversättare 
 Icon	ConfigView		Ikon

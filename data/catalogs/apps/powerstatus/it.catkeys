@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-PowerStatus	2647539100
+1	italian	x-vnd.Haiku-PowerStatus	1851974203
 Design capacity low warning: 	PowerStatus		Avviso di batteria scarica (di fabbrica):
 Show percent	PowerStatus		Mostra percentuale
 Design capacity: 	PowerStatus		Capacità (in base al costruttore):
@@ -26,12 +26,10 @@ OEM info: 	PowerStatus		Informazioni OEM:
 Design voltage: 	PowerStatus		Voltaggio di progettazione:
 Battery charging	PowerStatus		Batteria in carica
 Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica):
-Battery info	PowerStatus		Informazioni batteria
 Quit	PowerStatus		Esci
 rechargeable	PowerStatus		ricaricabile
 charging	PowerStatus		in carica
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus può essere eseguito in una finestra o installato nella Deskbar.
-Power status box	PowerStatus		Riquadro stato alimentazione
 Show status icon	PowerStatus		Mostra l'icona di stato
 Capacity granularity 2: 	PowerStatus		Granularità della capacità 2:
 Technology: 	PowerStatus		Tecnologia:

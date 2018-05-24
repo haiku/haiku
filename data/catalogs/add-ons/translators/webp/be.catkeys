@@ -1,7 +1,6 @@
-1	belarusian	x-vnd.Haiku-WebPTranslator	3197103165
+1	belarusian	x-vnd.Haiku-WebPTranslator	3343078170
 Compression method:	ConfigView		Метад сціску:
 WebP image translator	ConfigView		Канвертар выяваў WebP
-Based on libwebp v0.1,	ConfigView		Грунтуецца на матэрыялах libwebp v0.1,
 Preset	ConfigView		Прадвызначаныя
 WebP images	WebPTranslator		Выявы WebP
 WebPTranslator Settings	ConfigView		Наладкі канвертара выяваў WebP
@@ -10,7 +9,6 @@ WebP Settings	main		Наладкі WebP
 Text	ConfigView		Тэкст
 Slower but better	ConfigView		Павольней але якасней
 WebP image	WebPTranslator		Выява WebP
-©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.
 Output preset:	ConfigView		Зыходныя прадвызначэнні:
 Picture	ConfigView		Выява
 Low	ConfigView		Нізкі
@@ -20,6 +18,5 @@ Default	ConfigView		Прадвызначаныя
 Fast	ConfigView		Хуткі
 Photo	ConfigView		Фота
 Preprocessing filter	ConfigView		Апрацоўка фільтра
-©2010-2011 Google Inc.	ConfigView		©2010-2011 Google Inc.
 WebP image translator	WebPTranslator		Канвертар выяваў WebP
 Icon	ConfigView		Значак

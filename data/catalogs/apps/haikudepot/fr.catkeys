@@ -1,12 +1,10 @@
-1	french	x-vnd.Haiku-HaikuDepot	1527149765
+1	french	x-vnd.Haiku-HaikuDepot	1195245614
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
-Repository	FilterView		Dépôt
 Close	RatePackageWindow		Fermer
 The captcha puzzle needs to be solved.	UserLoginWindow		Vous devez résoudre l’énigme Captcha.
 Changelog	PackageInfoView		Journal des modifications
-Repository:	FilterView		Dépôt :
 Your rating:	RatePackageWindow		Votre évaluation :
 The passwords do not match.	UserLoginWindow		Les mots de passe ne concordent pas.
 Log in…	MainWindow		Connexion…
@@ -33,7 +31,6 @@ Your rating was updated successfully.	RatePackageWindow		Votre évaluation a ét
 <no info>	PackageInfoView		<pas d’info>
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l’initialisation du gestionnaire de paquet : %message%
-All repositories	FilterView		Tous les dépôts
 Email address:	UserLoginWindow		Adresse e-mail :
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Votre évaluation a été prise en compte. Vous pouvez la mettre à jour ou l’effacer en évaluant de nouveau le paquet.
 Very unstable	RatePackageWindow		Très instable
@@ -77,7 +74,6 @@ Failed to update rating	RatePackageWindow		Impossible de modifier l’évaluatio
 Does not start	RatePackageWindow		Ne démarre pas
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Le service web n’a pas pu être joint.
-Only featured packages	MainWindow		Seulement les paquets significatifs
 There are problems in the form:\n\n	UserLoginWindow		Il y a des problèmes dans le formulaire :\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Le service web n’a pas trouvé le paquet. Ce dernier a probablement été retiré du dépôt duquel il provient. Dans ce cas, il n’est malheureusement plus possible d’évaluer le paquet.
 Create account	UserLoginWindow		Créer un compte
@@ -141,7 +137,6 @@ Send	RatePackageWindow		Envoyer
 Category:	FilterView		Catégorie :
 Failed to create account	UserLoginWindow		La création du compte a échoué
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n
-Featured packages	MainWindow		Paquets sélectionnés
 Start package daemon	App		Démarrer le gestionnaire de paquets
 Manage repositories…	MainWindow		Gérer les dépôts…
 Success	RatePackageWindow		Opération réussie

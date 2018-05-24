@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-MediaPlayer	3750573376
+1	slovenian	x-vnd.Haiku-MediaPlayer	1511648381
 Location	MediaPlayer-InfoWin		Lokacija
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (ameriško)
 %d kHz	MediaPlayer-InfoWin		%d kHz
@@ -38,26 +38,20 @@ The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Datoteke "%filen
 Error: 	MediaPlayer-RemovePLItemsCmd		Napaka: 
 Audio	MediaPlayer-InfoWin		Audio
 OK	MediaPlayer-RemovePLItemsCmd		V redu
-Volume	MediaPlayer-Main		Glasnost
 Import Entries	MediaPlayer-ImportPLItemsCmd		Uvozi vnose
-Pause	MediaPlayer-Main		Premor
 No aspect correction	MediaPlayer-Main		Brez popravljanja razmerja
 Automatically start playing	MediaPlayer-SettingsWindow		Začni predvajati samodejno
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Vseh datotek ni bilo mogoče premakniti v koš.
 unknown format	MediaPlayer-InfoWin		neznan format
-Play	MediaPlayer-Main		Predvajaj
 Duration	MediaPlayer-InfoWin		Trajanje
 Error: 	MediaPlayer-Main		Napaka: 
 Bottom of video	MediaPlayer-SettingsWindow		Na dnu videa
-Stop	MediaPlayer-Main		Ustavi
 Volume of background clips	MediaPlayer-SettingsWindow		Glasnost posnetkov, ki se predvajajo v ozadju
 Hide interface	MediaPlayer-Main		Skrij vmesnik
 Move file to Trash	MediaPlayer-PlaylistWindow		Premakni datoteko v koš
 OK	MediaPlayer-NetworkStream		V redu
-Mute	MediaPlayer-Main		Nemo
 min	MediaPlayer-InfoWin	Minutes	min
 OK	MediaPlayer-PlaylistWindow		V redu
-Duration	MediaPlayer-Main		Trajanje
 Cancel	MediaPlayer-NetworkStream		Prekliči
 Save as…	MediaPlayer-PlaylistWindow		Shrani kot…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiraj vnose

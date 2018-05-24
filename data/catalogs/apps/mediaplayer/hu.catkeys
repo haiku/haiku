@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	2558878117
+1	hungarian	x-vnd.Haiku-MediaPlayer	3708050243
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -20,30 +20,24 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Felirat helye:
 Close	MediaPlayer-Main		Bezárás
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Néhány elemet nem lehetett a Szemetesbe helyezni.
 <unknown>	MediaPlayer-InfoWin		<ismeretlen>
-Seek	MediaPlayer-Main		Keresés
 Open	MediaPlayer-Main		Megnyitás
-Next	MediaPlayer-Main		Következő
 OK	MediaPlayer-SettingsWindow		Rendben
 Track %d	MediaPlayer-Main		Szám %d
-Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Aktuális lejátszási pozíció lekérése/megadása mikroszekundumban.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Megjelenítési mód
 Medium	MediaPlayer-SettingsWindow		Közepes
 Open network stream	MediaPlayer-NetworkStream		Hálózati műsor megnyitása
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Open…	MediaPlayer-PlaylistWindow		Megnyitás…
-Toggle mute.	MediaPlayer-Main		Némítás állítása.
 Undo	MediaPlayer-PlaylistWindow		Visszavonás
 Stream URL:	MediaPlayer-NetworkStream		Műsor címe:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardveres gyorsítás használata ha elérhető
 File info…	MediaPlayer-Main		Információk…
-Pause playback.	MediaPlayer-Main		Lejátszás szüneteltetése.
 Overlay	MediaPlayer-InfoWin		Overlay
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Bejegyzés eltávolítása
 Close window after playing audio	MediaPlayer-SettingsWindow		Hangfájl lejátszása után zárja be az ablakot
 Full volume	MediaPlayer-SettingsWindow		Teljes hangerő
 Drop files to play	MediaPlayer-Main		Húzzon ide fájlokat a lejátszáshoz
-TogglePlaying	MediaPlayer-Main		Lejátszás átállítása
 Copyright	MediaPlayer-InfoWin		Másolásvédett
 Cancel	MediaPlayer-SettingsWindow		Mégse
 Loop audio	MediaPlayer-SettingsWindow		Hangfájl ismétlése
@@ -52,10 +46,8 @@ Nothing to Play	MediaPlayer-Main		Nincs mit lejátszani
 Muted	MediaPlayer-SettingsWindow		Némítva
 Quit	MediaPlayer-Main		Kilépés
 Video	MediaPlayer-Main		Videó
-Start playing.	MediaPlayer-Main		Lejátszás indítása.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nincs olyan dekódoló telepítve ami ezt a formátumot kezelni tudná, vagy ha van, a formátum ezen verzióját hibásan kezeli.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Bejegyzés importálása
-Gets the URI of the currently playing item.	MediaPlayer-Main		A jelenleg játszott elem URI-ját adja meg.
 400% scale	MediaPlayer-Main		400%-os méret
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		A lejátszási lista mentése sikertelen:\n\nHiba:
 Move Entries	MediaPlayer-MovePLItemsCmd		Bejegyzések áthelyezése
@@ -69,14 +61,11 @@ h	MediaPlayer-InfoWin	Hours	ó
 Select all	MediaPlayer-PlaylistWindow		Mind kijelölése
 Move Entry	MediaPlayer-MovePLItemsCmd		Bejegyzés áthelyezése
 Open	MediaPlayer-PlaylistWindow		Megnyitás
-Stop playing.	MediaPlayer-Main		Lejátszás leállítása.
-Seek by the specified amounts of microseconds.	MediaPlayer-Main		Keresés a megadott mikroszekundummal.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		A fájlt (%filename) nem sikerült megnyitni.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Hiba:
 Audio	MediaPlayer-InfoWin		Audió
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Szemetesbe helyezési hiba
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Belső hiba (rossz üzenet). A lejátszási lista mentése sikertelen.
-Skip to the previous track.	MediaPlayer-Main		Ugrás az előző számra.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		A(z) %app% egy belső hibáa ütközött. A fájlt nem sikerült megnyitni.
 Close window after playing video	MediaPlayer-SettingsWindow		Videófájl lejátszása után zárja be az ablakot
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Filmek simított átméretezése
@@ -84,11 +73,8 @@ OK	MediaPlayer-RemovePLItemsCmd		Rendben
 Open network stream	MediaPlayer-Main		Hálózati műsor megnyitása
 50% scale	MediaPlayer-Main		50%-os méret
 Subtitles	MediaPlayer-Main		Feliratok
-Prev	MediaPlayer-Main		Előző
-Volume	MediaPlayer-Main		Hangerő
 Audio track	MediaPlayer-Main		Audiósáv
 Import Entries	MediaPlayer-ImportPLItemsCmd		Bejegyzések importálása
-Pause	MediaPlayer-Main		Szüneteltetés
 No aspect correction	MediaPlayer-Main		Nincs képarányjavítás
 Automatically start playing	MediaPlayer-SettingsWindow		Lejátszás indítása automatikusan
 Track	Video Track Menu		Sáv
@@ -104,10 +90,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nem siker
 <untitled>	PlaylistItem-title		<névtelen>
 Track	Audio Track Menu		Sáv
 unknown format	MediaPlayer-InfoWin		ismeretlen formátum
-Position	MediaPlayer-Main		Pozíció
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nincs mit újra csinálni>
-Skip to the next track.	MediaPlayer-Main		Ugrás a következő számra.
-Play	MediaPlayer-Main		Lejátszás
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzések Szemetesbe helyezése
 200% scale	MediaPlayer-Main		200%-os méret
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Úgy tűnik a médiakiszolgáló nem fut.\nEl kívánja indítani?
@@ -118,7 +101,6 @@ Large	MediaPlayer-SettingsWindow		Nagy
 Bottom of video	MediaPlayer-SettingsWindow		A videó alján
 DrawBitmap	MediaPlayer-InfoWin		BittérképKirajzolás
 Total duration: %s	MediaPlayer-PlaylistWindow		Teljes időtartam: %s
-Stop	MediaPlayer-Main		Leállítás
 <unnamed media>	MediaPlayer-InfoWin		<névtelen>
 raw video	MediaPlayer-InfoWin		nyers videó
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
@@ -128,11 +110,8 @@ Open clips	MediaPlayer-Main		Klippek megnyitása
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Bejegyzés másolása
 none	Subtitles menu		nincs 
 Move file to Trash	MediaPlayer-PlaylistWindow		Fájl Szemetesbe helyezése
-URI	MediaPlayer-Main		URI
 Invalid URL inserted!	MediaPlayer-NetworkStream		A megadott cím érvénytelen.
 OK	MediaPlayer-NetworkStream		Rendben
-Mute	MediaPlayer-Main		Némítás
-Toggle pause/play.	MediaPlayer-Main		Szünetletés/lejátszás közti váltás.
 min	MediaPlayer-InfoWin	Minutes	perc
 Small	MediaPlayer-SettingsWindow		Kicsi
 Randomize	MediaPlayer-PlaylistWindow		Véletlenszerű
@@ -142,16 +121,11 @@ Revert	MediaPlayer-SettingsWindow		Visszaállít
 Edit	MediaPlayer-PlaylistWindow		Szerkesztés
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
-Toggle fullscreen.	MediaPlayer-Main		Teljes képernyő.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		A jelenleg lejátszott elem hossza mikroszekundumban megadva.
-ToggleFullscreen	MediaPlayer-Main		Teljes képernyő
 Bad URL	MediaPlayer-NetworkStream		Hibás cím
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# csatorna}}
 <unnamed>	PlaylistItem-name		<névtelen>
 OK	MediaPlayer-PlaylistWindow		Rendben
 none	Audio track menu		nincs
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Megadja/beállítja a hangerőt (0.0-2.0)
-Duration	MediaPlayer-Main		Időtartam
 Cancel	MediaPlayer-NetworkStream		Mégse
 Playlist…	MediaPlayer-Main		Lejátszási lista…
 <unknown>	PlaylistItem-author		<névtelen>

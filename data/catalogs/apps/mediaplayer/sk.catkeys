@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	2558878117
+1	slovak	x-vnd.Haiku-MediaPlayer	3708050243
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -20,30 +20,24 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Umiestnenie titulkov:
 Close	MediaPlayer-Main		Zatvoriť
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niektoré súbory nebolo možné presunúť do Koša.
 <unknown>	MediaPlayer-InfoWin		<neznámy>
-Seek	MediaPlayer-Main		Posunúť
 Open	MediaPlayer-Main		Otvoriť
-Next	MediaPlayer-Main		Ďalší
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Stopa %d
-Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Zistí/nastaví aktuálnu pozíciu prehrávania v mikrosekundách.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Zobrazovací režim
 Medium	MediaPlayer-SettingsWindow		Stredná
 Open network stream	MediaPlayer-NetworkStream		Otvoriť sieťový tok
 Close	MediaPlayer-PlaylistWindow		Zatvoriť
 Open…	MediaPlayer-PlaylistWindow		Otvoriť…
-Toggle mute.	MediaPlayer-Main		Prepnúť stlmenie.
 Undo	MediaPlayer-PlaylistWindow		Vrátiť
 Stream URL:	MediaPlayer-NetworkStream		URL toku:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Použiť hardvérové vrstvy videa ak sú dostupné
 File info…	MediaPlayer-Main		Info o súbore…
-Pause playback.	MediaPlayer-Main		Pozastaviť prehrávanie.
 Overlay	MediaPlayer-InfoWin		Prekrytie
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Odstrániť položku
 Close window after playing audio	MediaPlayer-SettingsWindow		Zatvoriť okno po prehraní zvuku
 Full volume	MediaPlayer-SettingsWindow		Plná hlasitosť
 Drop files to play	MediaPlayer-Main		Súbory sa prehrajú po pretiahnutí
-TogglePlaying	MediaPlayer-Main		PrepnúťPrehrávanie
 Copyright	MediaPlayer-InfoWin		Autorské práva
 Cancel	MediaPlayer-SettingsWindow		Zrušiť
 Loop audio	MediaPlayer-SettingsWindow		Prehrávať zvuk dokola
@@ -52,10 +46,8 @@ Nothing to Play	MediaPlayer-Main		Niet čo prehrať
 Muted	MediaPlayer-SettingsWindow		Stlmené
 Quit	MediaPlayer-Main		Ukončiť
 Video	MediaPlayer-Main		Video
-Start playing.	MediaPlayer-Main		Spustiť prehrávanie.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Žiaden dekodér na prehranie tohto formátu nie je nainštalovaný alebo dekodér má problém s prehraním konkrétnej verzie formátu.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importovať položku
-Gets the URI of the currently playing item.	MediaPlayer-Main		Získa URI práve prehrávanej položky.
 400% scale	MediaPlayer-Main		400% zmena veľkosti
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Ukladanie zoznamu stôp zlyhalo:\n\nChyba: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Presunúť položky
@@ -69,14 +61,11 @@ h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Vybrať všetky
 Move Entry	MediaPlayer-MovePLItemsCmd		Presunúť položku
 Open	MediaPlayer-PlaylistWindow		Otvoriť
-Stop playing.	MediaPlayer-Main		Zastaviť prehrávanie.
-Seek by the specified amounts of microseconds.	MediaPlayer-Main		Posunie o zadaný počet mikrosekúnd.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Súbor „%filename“ nebolo možné otvoriť.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Chyba: 
 Audio	MediaPlayer-InfoWin		Zvuk
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Chyba pri presúvaní do Koša
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnútorná chyba (chybný tvar správy). Ukladanie zoznamu stôp zlyhalo.
-Skip to the previous track.	MediaPlayer-Main		Preskočiť na predošlú stopu.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		V aplikácii %app% sa vyskytla vnútorná chyba. Súbor nebolo možné otvoriť.
 Close window after playing video	MediaPlayer-SettingsWindow		Zatvoriť okno po prehraní videa
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zmeniť veľkosť filmov hladko (nie v režime vrstiev)
@@ -84,11 +73,8 @@ OK	MediaPlayer-RemovePLItemsCmd		OK
 Open network stream	MediaPlayer-Main		Otvoriť sieťový tok
 50% scale	MediaPlayer-Main		50% zmena veľkosti
 Subtitles	MediaPlayer-Main		Titulky
-Prev	MediaPlayer-Main		Pred
-Volume	MediaPlayer-Main		Hlasitosť
 Audio track	MediaPlayer-Main		Zvuková stopa
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importovať položky
-Pause	MediaPlayer-Main		Pozastaviť
 No aspect correction	MediaPlayer-Main		Bez korekcie pomeru strán
 Automatically start playing	MediaPlayer-SettingsWindow		Automaticky spustiť prehrávanie
 Track	Video Track Menu		Stopa
@@ -104,10 +90,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nie všet
 <untitled>	PlaylistItem-title		<bez názvu>
 Track	Audio Track Menu		Stopa
 unknown format	MediaPlayer-InfoWin		neznámy formát
-Position	MediaPlayer-Main		Pozícia
 <nothing to redo>	MediaPlayer-PlaylistWindow		<niet čo opakovať>
-Skip to the next track.	MediaPlayer-Main		Preskočiť na ďalšiu stopu.
-Play	MediaPlayer-Main		Prehrať
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Odstrániť položky do Koša
 200% scale	MediaPlayer-Main		200% zmena veľkosti
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Zdá sa, že multimediálny server nebeží.\nChcete ho spustiť?
@@ -118,7 +101,6 @@ Large	MediaPlayer-SettingsWindow		Veľká
 Bottom of video	MediaPlayer-SettingsWindow		Spodok videa
 DrawBitmap	MediaPlayer-InfoWin		Nakresliť bitmapu
 Total duration: %s	MediaPlayer-PlaylistWindow		Celkové trvanie: %s
-Stop	MediaPlayer-Main		Zastaviť
 <unnamed media>	MediaPlayer-InfoWin		<médium bez názvu>
 raw video	MediaPlayer-InfoWin		nespracované video
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitosť klipov na pozadí
@@ -128,11 +110,8 @@ Open clips	MediaPlayer-Main		Otvoriť klipy
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopírovať položku
 none	Subtitles menu		žiadne
 Move file to Trash	MediaPlayer-PlaylistWindow		Presunúť súbor do Koša
-URI	MediaPlayer-Main		URI
 Invalid URL inserted!	MediaPlayer-NetworkStream		Vložené neplatné URL!
 OK	MediaPlayer-NetworkStream		OK
-Mute	MediaPlayer-Main		Stlmiť
-Toggle pause/play.	MediaPlayer-Main		Prepnúť pozastavenie/prehrávanie.
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Malá
 Randomize	MediaPlayer-PlaylistWindow		Náhodne
@@ -142,16 +121,11 @@ Revert	MediaPlayer-SettingsWindow		Vrátiť
 Edit	MediaPlayer-PlaylistWindow		Upraviť
 Start media server	MediaPlayer-Main		Spustiť multimediálny server
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
-Toggle fullscreen.	MediaPlayer-Main		Prepnúť celoobrazovkový režim.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Získa trvanie aktuálne prehrávanej položky v mikrosekundách.
-ToggleFullscreen	MediaPlayer-Main		Prepnúť celoobrazovkový režim
 Bad URL	MediaPlayer-NetworkStream		Chybné URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanálov}}
 <unnamed>	PlaylistItem-name		<bez názvu>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		žiadne
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zistí/nastaví hlasitosť (0.0-2.0).
-Duration	MediaPlayer-Main		Trvanie
 Cancel	MediaPlayer-NetworkStream		Zrušiť
 Playlist…	MediaPlayer-Main		Zoznam stôp…
 <unknown>	PlaylistItem-author		<neznámy>

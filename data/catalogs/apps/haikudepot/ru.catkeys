@@ -1,12 +1,10 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1527149765
+1	russian	x-vnd.Haiku-HaikuDepot	1195245614
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
-Repository	FilterView		Репозиторий
 Close	RatePackageWindow		Закрыть
 The captcha puzzle needs to be solved.	UserLoginWindow		Капча должна быть решена.
 Changelog	PackageInfoView		История изменений
-Repository:	FilterView		Репозиторий:
 Your rating:	RatePackageWindow		Ваш рейтинг:
 The passwords do not match.	UserLoginWindow		Пароли не совпадают.
 Log in…	MainWindow		Войти…
@@ -33,7 +31,6 @@ Your rating was updated successfully.	RatePackageWindow		Ваш рейтинг �
 <no info>	PackageInfoView		<нет информации>
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
-All repositories	FilterView		Все репозитории
 Email address:	UserLoginWindow		Email адрес:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваш рейтинг был успешно отправлен. Вы можете изменить или удалить его в любой момент оценив пакет еще раз.
 Very unstable	RatePackageWindow		Очень нестабилен 
@@ -77,7 +74,6 @@ Failed to update rating	RatePackageWindow		Не удалось обновить 
 Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
-Only featured packages	MainWindow		Только популярные пакеты
 There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Пакет не был найден в веб сервисе. Скорее всего это охначает, что он был установлен из склада, который отслеживается в веб сервисе. Оценка таких пакетов, к сожалению, не поддерживается.
 Create account	UserLoginWindow		Создать учётную запись
@@ -141,7 +137,6 @@ Send	RatePackageWindow		Отправить
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
 There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n
-Featured packages	MainWindow		Популярные пакеты
 Start package daemon	App		Запустить пакетный демон
 Manage repositories…	MainWindow		Управление репозиториями…
 Success	RatePackageWindow		Выполнено успешно

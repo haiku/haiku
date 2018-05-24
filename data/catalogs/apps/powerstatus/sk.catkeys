@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PowerStatus	3969330583
+1	slovak	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu: 
 Show percent	PowerStatus		Zobrazovať percentá
 Design capacity: 	PowerStatus		Navrhnutá kapacita: 
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Návrhové napätie:
 Battery charging	PowerStatus		Batéria sa nabíja
 The battery level is critical, please plug in the device immediately.	PowerStatus		Úroveň nabitia batérie je kritická. Prosím, ihneď pripojte zariadenie do elektrickej siete.
 Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity: 
-Battery info	PowerStatus		Info o batérii
 Quit	PowerStatus		Ukončiť
 rechargeable	PowerStatus		dobíjateľná
 charging	PowerStatus		nabíja sa
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stav napájania môžete spúšťať v okne alebo ho nainštalovať do Panelu.
-Power status box	PowerStatus		Okno stavu napájania
 Show status icon	PowerStatus		Zobrazovať stavovú ikonu
 Capacity granularity 2: 	PowerStatus		Granularita kapacity 2: 
 Technology: 	PowerStatus		Technológia: 

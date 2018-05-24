@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PowerStatus	3224068645
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	2428503748
 Design capacity low warning: 	PowerStatus		Waarschuwing lage ontwerpcapaciteit:
 Show percent	PowerStatus		Toon percentage
 Design capacity: 	PowerStatus		Ontwerpcapaciteit
@@ -32,12 +32,10 @@ OEM info: 	PowerStatus		OEM-info:
 Design voltage: 	PowerStatus		Ontwerpvoltage:
 Battery charging	PowerStatus		Accu laadt
 Design capacity warning: 	PowerStatus		Waarschuwing ontwerpcapaciteit:
-Battery info	PowerStatus		Accu-info
 Quit	PowerStatus		Afsluiten
 rechargeable	PowerStatus		oplaadbaar
 charging	PowerStatus		bezig met laden
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
-Power status box	PowerStatus		Stroomstatus-display
 Show status icon	PowerStatus		Toon status-icoon
 Capacity granularity 2: 	PowerStatus		Capaciteit van granulariteit 2:
 Technology: 	PowerStatus		Techniek:

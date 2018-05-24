@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku.TextSearch	2496563907
+1	english	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s：没有足够的空间以消除文件名。
 Trim to selection	GrepWindow		缩减选中内容
 Follow symbolic links	GrepWindow		对符号链接有效
@@ -15,7 +15,6 @@ Select all	GrepWindow		全选
 OK	GrepWindow		确定
 Skip folders starting with a dot	GrepWindow		跳过隐藏文件
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME无法打开一个或多个文件夹。
-Escape search text	GrepWindow		退出文本搜索
 Search	GrepWindow		搜索
 Open selection	GrepWindow		打开
 Look in sub-folders	GrepWindow		在子目录中搜索
@@ -23,7 +22,6 @@ Actions	GrepWindow		操作
 File	GrepWindow		文件
 Encoding	GrepWindow		编码
 History	GrepWindow		历史
-%s: There was a problem running grep.	Grepper		%s：正则表达式运行出现问题。
 New window	GrepWindow		新建窗口
 Please select the files you wish to keep searching.	GrepWindow		请您选择需要进一步搜索的文件。
 TextSearch	GrepWindow		文本搜索

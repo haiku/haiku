@@ -1,7 +1,6 @@
-1	romanian	x-vnd.Haiku-EXRTranslator	106859695
+1	romanian	x-vnd.Haiku-EXRTranslator	2160233532
 Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
 EXR image translator	EXRTranslator		Traducătorul de imagini EXR
-Based on OpenEXR (http://www.openexr.com)	ConfigView		Bazat pe OpenEXR (http://www.openexr.com)
 EXR Settings	main		Configurări EXR
 EXR images	EXRTranslator		Imagini EXR
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		o diviziune a Lucasfilm Entertainment Company Ltd

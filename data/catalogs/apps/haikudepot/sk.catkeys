@@ -1,12 +1,10 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1527149765
+1	slovak	x-vnd.Haiku-HaikuDepot	1195245614
 Name	PackageListView		Názov
 Available packages	MainWindow		Dostupné balíky
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
-Repository	FilterView		Zdroj softvéru
 Close	RatePackageWindow		Zatvoriť
 The captcha puzzle needs to be solved.	UserLoginWindow		Je potrebné vyriešiť captcha.
 Changelog	PackageInfoView		Záznam zmien
-Repository:	FilterView		Zdroj softvéru:
 Your rating:	RatePackageWindow		Vaše hodnotenie:
 The passwords do not match.	UserLoginWindow		Heslá sa nezhodujú.
 Log in…	MainWindow		Prihlásiť sa…
@@ -33,7 +31,6 @@ Your rating was updated successfully.	RatePackageWindow		Vaše hodnotenie bolo �
 <no info>	PackageInfoView		<žiadne info>
 Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Vyskytla sa chyba pri inicializovaní správcu balíkov: %message%
-All repositories	FilterView		Všetky zdroje softvéru
 Email address:	UserLoginWindow		Emailová adresa:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Vaše hodnotenie bolo úspešne nahrané. Môžete ho kedykoľvek aktualizovať alebo odstrániť tým, že balík znova ohodnotíte.
 Very unstable	RatePackageWindow		Veľmi nestabilný
@@ -77,7 +74,6 @@ Failed to update rating	RatePackageWindow		Nepodarilo sa aktualizovať hodnoteni
 Does not start	RatePackageWindow		Nespúšťa sa
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Vyskytla sa chyba pri obnovovaní zdroja: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Nepodarilo sa kontaktovať webovú službu.
-Only featured packages	MainWindow		Iba odporúčané balíky
 There are problems in the form:\n\n	UserLoginWindow		Vyskytli sa problémy s formulárom:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Webová služba nenašla balík. To pravdepodobne znamená, že to pochádza zo zdroja, ktorý tu nie je uvedený. Hodnotenie takých balíkov bohužiaľ nie je podporované.
 Create account	UserLoginWindow		Vytvoriť účet
@@ -141,7 +137,6 @@ Send	RatePackageWindow		Poslať
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nepodarilo sa vytvoriť účet
 There are problems with the data you entered:\n\n	UserLoginWindow		Vyskytli sa problémy v údajoch, ktoré ste zadali:\n\n
-Featured packages	MainWindow		Odporúčané balíky
 Start package daemon	App		Spustiť démona balíkov
 Manage repositories…	MainWindow		Spravovať zdroje softvéru…
 Success	RatePackageWindow		Úspešné

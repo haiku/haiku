@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PowerStatus	3969330583
+1	spanish; castilian	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Advertencia sobre la capacidad baja de diseño:
 Show percent	PowerStatus		Mostrar porcentaje
 Design capacity: 	PowerStatus		Capacidad de diseño:
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Voltaje de diseño:
 Battery charging	PowerStatus		Batería está cambiando
 The battery level is critical, please plug in the device immediately.	PowerStatus		El nivel de batería es crítico, por favor conecte el dispositivo a la corriente inmediatamente.
 Design capacity warning: 	PowerStatus		Advertencia de la capacidad de diseño:
-Battery info	PowerStatus		Información de la batería
 Quit	PowerStatus		Salir
 rechargeable	PowerStatus		recargable
 charging	PowerStatus		cargando
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puede ejecutar Estado de Energía en una ventana o puede instalarlo en barra de escritorio.
-Power status box	PowerStatus		Modulo de estado de energía
 Show status icon	PowerStatus		Mostrar icono de estado
 Capacity granularity 2: 	PowerStatus		Granulación de capacidad 2:
 Technology: 	PowerStatus		Tecnología:

@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-EXRTranslator	106859695
+1	croatian	x-vnd.Haiku-EXRTranslator	2160233532
 Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s
 EXR image translator	EXRTranslator		EXR prevoditelj slika
-Based on OpenEXR (http://www.openexr.com)	ConfigView		Bazirano na OpenEXR-u (http://www.openexr.com)
 EXR Settings	main		EXR postavke
 EXR images	EXRTranslator		EXR slike
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		odjel Lucasfilm Entertainment Company Ltd

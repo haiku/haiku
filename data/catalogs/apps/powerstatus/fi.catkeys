@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	3969330583
+1	finnish	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus: 
 Show percent	PowerStatus		Näytä prosenttiluku
 Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Suunnittelujännite:
 Battery charging	PowerStatus		Akkulataus
 The battery level is critical, please plug in the device immediately.	PowerStatus		Akkutaso on kriittinen, kytke laite heti sähköverkkoon.
 Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus: 
-Battery info	PowerStatus		Akkutiedot
 Quit	PowerStatus		Lopeta
 rechargeable	PowerStatus		uudelleenladattava
 charging	PowerStatus		ladataan
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
-Power status box	PowerStatus		Virtatilalaatikko
 Show status icon	PowerStatus		Näytä tilakuvake
 Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2: 
 Technology: 	PowerStatus		Teknologia: 

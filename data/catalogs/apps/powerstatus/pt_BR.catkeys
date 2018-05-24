@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	3969330583
+1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Aviso de design de baixa capacidade 
 Show percent	PowerStatus		Mostrar porcentagem
 Design capacity: 	PowerStatus		Capacidade de design:
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Design de voltagem:
 Battery charging	PowerStatus		Carregando bateria
 The battery level is critical, please plug in the device immediately.	PowerStatus		O nível de bateria é crítico, por favor conecte no dispositivo imediatamente.
 Design capacity warning: 	PowerStatus		Design de advertência de capacidade:
-Battery info	PowerStatus		Info da bateria
 Quit	PowerStatus		Sair
 rechargeable	PowerStatus		recarregável
 charging	PowerStatus		carregando
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode rodar o Estado de Força numa janela ou instalá-lo na Deskbar
-Power status box	PowerStatus		Caixa de força
 Show status icon	PowerStatus		Mostrar ícone de status
 Capacity granularity 2: 	PowerStatus		Capacidade granularidade 2
 Technology: 	PowerStatus		Tecnologia:

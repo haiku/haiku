@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.TextSearch	2496563907
+1	swedish	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s: Saknar utrymme för att koda om filnamnet.
 Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
 Follow symbolic links	GrepWindow		Följ symboliska länkar
@@ -15,7 +15,6 @@ Select all	GrepWindow		Markera allt
 OK	GrepWindow		OK
 Skip folders starting with a dot	GrepWindow		Hoppa över dolda mappar
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunde inte öppna en eller flera kataloger.
-Escape search text	GrepWindow		Skydda söksträngen med escapesekvenser
 Search	GrepWindow		Sök
 Open selection	GrepWindow		Öppna markering
 Look in sub-folders	GrepWindow		Sök i underkataloger
@@ -23,7 +22,6 @@ Actions	GrepWindow		Kommandon
 File	GrepWindow		Arkiv
 Encoding	GrepWindow		Teckenuppsättning
 History	GrepWindow		Historik
-%s: There was a problem running grep.	Grepper		%s: Det uppstod ett problem när grep kördes.
 New window	GrepWindow		Nytt fönster
 Please select the files you wish to keep searching.	GrepWindow		Var god markera de filer du önskar fortsätta söka i.
 TextSearch	GrepWindow		TextSök

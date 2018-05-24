@@ -1,12 +1,10 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1527149765
+1	swedish	x-vnd.Haiku-HaikuDepot	1195245614
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
-Repository	FilterView		Repositorium
 Close	RatePackageWindow		Stäng
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
 Changelog	PackageInfoView		Ändringslogg
-Repository:	FilterView		Repositorium:
 Your rating:	RatePackageWindow		Dina betyg:
 The passwords do not match.	UserLoginWindow		Lösenorden stämmer inte överens.
 Log in…	MainWindow		Logga in...
@@ -33,7 +31,6 @@ Your rating was updated successfully.	RatePackageWindow		Ditt betyg har uppdater
 <no info>	PackageInfoView		<Ingen information>
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
-All repositories	FilterView		Alla repositorier
 Email address:	UserLoginWindow		E-postadress:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Din betygsättning laddadesupp ok. Du kan närsomhelst uppdatera eller tabort ditt betyg för paketet genom att ge ett nytt betyg.
 Very unstable	RatePackageWindow		Mycket ostabil
@@ -77,7 +74,6 @@ Failed to update rating	RatePackageWindow		Misslyckades uppdatera betyg
 Does not start	RatePackageWindow		Starta inte
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när repositoriet uppdaterades: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Det gick inte att få kontakt med webb servicen.
-Only featured packages	MainWindow		Bara framhävda paket
 There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Paketet hittades inte av webb servicen. Troligen beror det på att paketet kommer från en depå som inte följs. Betygsättning av sådana paket supporteras tvärr inte.
 Create account	UserLoginWindow		Skapa konto
@@ -141,7 +137,6 @@ Send	RatePackageWindow		Skicka
 Category:	FilterView		Kategori:
 Failed to create account	UserLoginWindow		Misslyckades skapa konto
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
-Featured packages	MainWindow		Framhävda paket
 Start package daemon	App		Starta paket-servicen
 Manage repositories…	MainWindow		Hantera repositorier...
 Success	RatePackageWindow		Klar

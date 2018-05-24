@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1090759318
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1919719066
 Name	PackageListView		Nome
 Available packages	MainWindow		Pacotes disponíveis
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -74,7 +74,6 @@ Failed to update rating	RatePackageWindow		Falhou ao atualizar a avaliação
 Does not start	RatePackageWindow		Não iniciar
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Um erro ocorreu ao atualizar o repositório: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Não é possível contatar o serviço web.
-Only featured packages	MainWindow		Apenas pacotes em destaque
 There are problems in the form:\n\n	UserLoginWindow		Existem problemas no formulário:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		O pacote não foi encontrado pelo serviço web. Isto provavelmente significa que veio de um depósito que não foi rastreado lá. Avaliar tais pacotes infelizmente não é suportado.
 Create account	UserLoginWindow		Criar conta
@@ -137,7 +136,6 @@ Send	RatePackageWindow		Enviar
 Category:	FilterView		Categoria:
 Failed to create account	UserLoginWindow		Falhou ao criar conta
 There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
-Featured packages	MainWindow		Pacotes em destaque
 Start package daemon	App		Iniciar daemon de pacote
 Success	RatePackageWindow		Sucesso
 Business	Model		Negócios

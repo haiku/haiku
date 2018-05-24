@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	3969330583
+1	romanian	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model: 
 Show percent	PowerStatus		Afișează procentaj
 Design capacity: 	PowerStatus		Capacitate model: 
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		Voltaj model:
 Battery charging	PowerStatus		Se încarcă bateria
 The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, puneți în priză dispozitivul acum.
 Design capacity warning: 	PowerStatus		Avertisment capacitate model: 
-Battery info	PowerStatus		Info baterie
 Quit	PowerStatus		Închidere
 rechargeable	PowerStatus		reîncărcabilă
 charging	PowerStatus		se încarcă
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
-Power status box	PowerStatus		Casetă stare consum
 Show status icon	PowerStatus		Afișează pictogramă de stare
 Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2: 
 Technology: 	PowerStatus		Tehnologie: 

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	2496563907
+1	hungarian	x-vnd.Haiku.TextSearch	3108411238
 %s: Not enough room to escape the filename.	Grepper		%s: Nincs elég hely kihagyni a fájlnevet.
 Trim to selection	GrepWindow		Kijelölés kivágása
 Follow symbolic links	GrepWindow		Szimbolikus linkek követése
@@ -15,7 +15,6 @@ Select all	GrepWindow		Összes kijelölése
 OK	GrepWindow		Rendben
 Skip folders starting with a dot	GrepWindow		Ponttal kezdődő mappák átugrása
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nem tudott megnyitni egy, vagy több mappát.
-Escape search text	GrepWindow		Keresési szöveg kihagyása
 Search	GrepWindow		Keresés
 Open selection	GrepWindow		Kijelölés megnyitása
 Look in sub-folders	GrepWindow		Keresés almappákban is
@@ -23,7 +22,6 @@ Actions	GrepWindow		Műveletek
 File	GrepWindow		Fájl
 Encoding	GrepWindow		Kódolás
 History	GrepWindow		Előzmények
-%s: There was a problem running grep.	Grepper		%s: Hiba történt a grep futtatása közben.
 New window	GrepWindow		Új ablak
 Please select the files you wish to keep searching.	GrepWindow		Kérjük, válassza ki azokat a fájlokat amelyekben folytatni kívánja a keresést.
 TextSearch	GrepWindow		Szövegkeresés

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PowerStatus	3969330583
+1	japanese	x-vnd.Haiku-PowerStatus	3173765686
 Design capacity low warning: 	PowerStatus		設計容量の低下警告:
 Show percent	PowerStatus		パーセントを表示
 Design capacity: 	PowerStatus		設計容量:
@@ -36,12 +36,10 @@ Design voltage: 	PowerStatus		設計電圧:
 Battery charging	PowerStatus		充電中
 The battery level is critical, please plug in the device immediately.	PowerStatus		バッテリー残量が空に近いので、すぐにデバイスを電源につないでください。
 Design capacity warning: 	PowerStatus		設計容量警告:
-Battery info	PowerStatus		バッテリー情報
 Quit	PowerStatus		終了
 rechargeable	PowerStatus		再充電可能
 charging	PowerStatus		充電中
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus をウィンドウモードで起動することや、 Deskbar 中にインストールすることができます。
-Power status box	PowerStatus		電源ステータスボックス
 Show status icon	PowerStatus		状態アイコンを表示
 Capacity granularity 2: 	PowerStatus		容量精度 2:
 Technology: 	PowerStatus		テクノロジー:

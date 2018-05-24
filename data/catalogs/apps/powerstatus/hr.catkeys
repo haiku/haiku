@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-PowerStatus	9417258
+1	croatian	x-vnd.Haiku-PowerStatus	640844783
 Show percent	PowerStatus		Prikaži prostotke
  mW	PowerStatus		 mW
 Type: 	PowerStatus		Tip: 
@@ -26,7 +26,6 @@ Serial number: 	PowerStatus		Serijski broj:
 Capacity granularity 1: 	PowerStatus		Granulacija kapaciteta 1: 
 OEM info: 	PowerStatus		OEM info: 
 Battery charging	PowerStatus		Baterija se puni
-Battery info	PowerStatus		Informacije o bateriji
 Quit	PowerStatus		Izađi
 rechargeable	PowerStatus		Punjivo
 charging	PowerStatus		punjenje

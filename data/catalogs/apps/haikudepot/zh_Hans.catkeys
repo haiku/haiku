@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	1090759318
+1	english	x-vnd.Haiku-HaikuDepot	1919719066
 Name	PackageListView		名称
 Available packages	MainWindow		可用软件包
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
@@ -74,7 +74,6 @@ Failed to update rating	RatePackageWindow		更新评分失败
 Does not start	RatePackageWindow		未开始
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		刷新软件库出现错误：%error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		无法连接网络服务。
-Only featured packages	MainWindow		仅精选软件包
 There are problems in the form:\n\n	UserLoginWindow		列表中存在问题:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		网络服务中未发现该软件包。可能由于该软件包来源未被跟踪。目前对这些软件包的评分不支持。
 Create account	UserLoginWindow		创建账号
@@ -137,7 +136,6 @@ Send	RatePackageWindow		发送
 Category:	FilterView		分类:
 Failed to create account	UserLoginWindow		账户创建失败
 There are problems with the data you entered:\n\n	UserLoginWindow		您所输入的数据存在问题：\n\n
-Featured packages	MainWindow		精选软件包
 Start package daemon	App		启动软件包管理后台
 Success	RatePackageWindow		成功
 Business	Model		商业

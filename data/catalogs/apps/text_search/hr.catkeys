@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku.TextSearch	2249292548
+1	croatian	x-vnd.Haiku.TextSearch	2861139879
 %s: Not enough room to escape the filename.	Grepper		%s: Nedovoljno prostora za izbjegavanje imena datoteke.
 Trim to selection	GrepWindow		Skrati odabir
 Follow symbolic links	GrepWindow		Slijedi simboličke poveznice
@@ -13,7 +13,6 @@ Select all	GrepWindow		Odaberi sve
 OK	GrepWindow		Uredu
 Skip folders starting with a dot	GrepWindow		Preskoči mape koje počinju sa točkom
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ne može otvoriti jednu iili više mapa.
-Escape search text	GrepWindow		Izbjegni traženje teksta
 Search	GrepWindow		Traži
 Open selection	GrepWindow		Otvori lokaciju
 Look in sub-folders	GrepWindow		Pogledaj u podmape
@@ -21,7 +20,6 @@ Actions	GrepWindow		Akcije
 File	GrepWindow		Datoteka
 Encoding	GrepWindow		Enkodiranje
 History	GrepWindow		Povijest
-%s: There was a problem running grep.	Grepper		%s: Dogodio se problem dok je grep radio.
 New window	GrepWindow		Novi prozor
 Please select the files you wish to keep searching.	GrepWindow		Odaberite datoteke koje želite nastaviti tražiti.
 TextSearch	GrepWindow		TextSearch

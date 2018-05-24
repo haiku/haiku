@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	2558878117
+1	finnish	x-vnd.Haiku-MediaPlayer	3708050243
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -20,30 +20,24 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Tekstityksen sijainti:
 Close	MediaPlayer-Main		Sulje
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joidenkin tiedostojen siirtäminen roskakoriin epäonnistui.
 <unknown>	MediaPlayer-InfoWin		<tuntematon>
-Seek	MediaPlayer-Main		Etsi
 Open	MediaPlayer-Main		Avaa
-Next	MediaPlayer-Main		Seuraava
 OK	MediaPlayer-SettingsWindow		Valmis
 Track %d	MediaPlayer-Main		Kappale %d
-Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Hakee/asettaa nykyisen soittosijainnin mikrosekunneissa.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Näyttötila
 Medium	MediaPlayer-SettingsWindow		Keskikokoinen
 Open network stream	MediaPlayer-NetworkStream		Avaa verkon suoratoistovirta
 Close	MediaPlayer-PlaylistWindow		Sulje
 Open…	MediaPlayer-PlaylistWindow		Avaa...
-Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa.
 Undo	MediaPlayer-PlaylistWindow		Peru
 Stream URL:	MediaPlayer-NetworkStream		Suoratoistoverkko-osoite:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Käytä laitteistovideokerrostusta, jos se on käytettävissä
 File info…	MediaPlayer-Main		Tiedostotiedot...
-Pause playback.	MediaPlayer-Main		Tauota toisto.
 Overlay	MediaPlayer-InfoWin		Kerrostus
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Poista kappale
 Close window after playing audio	MediaPlayer-SettingsWindow		Sulje ikkuna äänitiedoston soittamisen jälkeen
 Full volume	MediaPlayer-SettingsWindow		Täysi äänenvoimakkuus
 Drop files to play	MediaPlayer-Main		Pudota soitettavat tiedostot
-TogglePlaying	MediaPlayer-Main		Vuorottele soittamista
 Copyright	MediaPlayer-InfoWin		Copyright
 Cancel	MediaPlayer-SettingsWindow		Peru
 Loop audio	MediaPlayer-SettingsWindow		Äänitiedostosilmukka
@@ -52,10 +46,8 @@ Nothing to Play	MediaPlayer-Main		Ei mitään soitettavaa
 Muted	MediaPlayer-SettingsWindow		Mykistetty
 Quit	MediaPlayer-Main		Lopeta
 Video	MediaPlayer-Main		Video
-Start playing.	MediaPlayer-Main		Aloita soittaminen.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Tuo kappale
-Gets the URI of the currently playing item.	MediaPlayer-Main		Hakee parhaillaan soitettavan kappaleen Internet-resurssin tunnusosoitetta.
 400% scale	MediaPlayer-Main		400 % skaala
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui:\n\nVirhe: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita
@@ -69,14 +61,11 @@ h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
 Open	MediaPlayer-PlaylistWindow		Avaa
-Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
-Seek by the specified amounts of microseconds.	MediaPlayer-Main		Etsii määritellyn mikrosekuntimäärän.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedoston ’%filename’ avaaminen epäonnistui.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Virhe: 
 Audio	MediaPlayer-InfoWin		Ääni
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Virhe siirrossa roskakoriin
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (vääränmuotoinen viesti). Soittoluettelon tallentaminen epäonnistui.
-Skip to the previous track.	MediaPlayer-Main		Hyppää edellisen kappaleen yli.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedoston avaus epäonnistui.
 Close window after playing video	MediaPlayer-SettingsWindow		Sulje ikkuna videotiedoston soittamisen jälkeen
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skaalaa elokuvat pehmeästi (ei-kerrostustila)
@@ -84,11 +73,8 @@ OK	MediaPlayer-RemovePLItemsCmd		Valmis
 Open network stream	MediaPlayer-Main		Avaa verkon suoratoistovirta
 50% scale	MediaPlayer-Main		50 % skaala
 Subtitles	MediaPlayer-Main		Aliotsakkeet
-Prev	MediaPlayer-Main		Edellinen
-Volume	MediaPlayer-Main		Äänenvoimakkuus
 Audio track	MediaPlayer-Main		Äänikappale
 Import Entries	MediaPlayer-ImportPLItemsCmd		Tuo kappaleita
-Pause	MediaPlayer-Main		Tauko
 No aspect correction	MediaPlayer-Main		Ei muotokorjausta
 Automatically start playing	MediaPlayer-SettingsWindow		Aloita soittaminen automaattisesti
 Track	Video Track Menu		Kappale
@@ -104,10 +90,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kaikkien 
 <untitled>	PlaylistItem-title		<otsikoton>
 Track	Audio Track Menu		Kappale
 unknown format	MediaPlayer-InfoWin		tuntematon muoto
-Position	MediaPlayer-Main		Sijainti
 <nothing to redo>	MediaPlayer-PlaylistWindow		<ei mitään uudelleensuoritettavaa>
-Skip to the next track.	MediaPlayer-Main		Hyppää seuraavan kappaleen yli.
-Play	MediaPlayer-Main		Soita
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Siirrä kappaleita roskakoriin
 200% scale	MediaPlayer-Main		200 % skaala
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnisssä.\nHaluaisitko käynnistää sen ?
@@ -118,7 +101,6 @@ Large	MediaPlayer-SettingsWindow		Suuri
 Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 Total duration: %s	MediaPlayer-PlaylistWindow		Kokonaiskesto: %s
-Stop	MediaPlayer-Main		Pysäytä
 <unnamed media>	MediaPlayer-InfoWin		<nimeämätön media>
 raw video	MediaPlayer-InfoWin		raakavideo
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
@@ -128,11 +110,8 @@ Open clips	MediaPlayer-Main		Avaa videoleikkeet
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopioi kappale
 none	Subtitles menu		ei mitään
 Move file to Trash	MediaPlayer-PlaylistWindow		Siirrä tiedosto roskakoriin
-URI	MediaPlayer-Main		Internet-resurssin tunnus
 Invalid URL inserted!	MediaPlayer-NetworkStream		Lisätty virheellinen verkko-osoite!
 OK	MediaPlayer-NetworkStream		Valmis
-Mute	MediaPlayer-Main		Mykistä
-Toggle pause/play.	MediaPlayer-Main		Vuorottele tauko/soita -tiloja.
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pieni
 Randomize	MediaPlayer-PlaylistWindow		Satunnaista
@@ -142,16 +121,11 @@ Revert	MediaPlayer-SettingsWindow		Käänteinen
 Edit	MediaPlayer-PlaylistWindow		Muokkaa
 Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
-Toggle fullscreen.	MediaPlayer-Main		Täysruututila päälle/pois.
-Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Hakee nykyisen soittokappaleen keston mikrosekunteina.
-ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 Bad URL	MediaPlayer-NetworkStream		Virheellinen verkko-osoite
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanavaa}}
 <unnamed>	PlaylistItem-name		<nimetön>
 OK	MediaPlayer-PlaylistWindow		Valmis
 none	Audio track menu		ei mitään
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hakee/asettaa voimakkuuden (0,0 - 2,0).
-Duration	MediaPlayer-Main		Kesto
 Cancel	MediaPlayer-NetworkStream		Peru
 Playlist…	MediaPlayer-Main		Soittoluettelo...
 <unknown>	PlaylistItem-author		<tuntematon>

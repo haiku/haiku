@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PowerStatus	3224068645
+1	lithuanian	x-vnd.Haiku-PowerStatus	2428503748
 Design capacity low warning: 	PowerStatus		Numatytasis įspėjimas apie sumažėjusią talpą: 
 Show percent	PowerStatus		Rodyti procentais
 Design capacity: 	PowerStatus		Numatytoji talpa: 
@@ -32,12 +32,10 @@ OEM info: 	PowerStatus		OĮG informacija:
 Design voltage: 	PowerStatus		Numatytoji įtampa: 
 Battery charging	PowerStatus		Baterija įkraunama
 Design capacity warning: 	PowerStatus		Numatytasis įspėjimas apie talpą: 
-Battery info	PowerStatus		Baterijos savybės
 Quit	PowerStatus		Baigti darbą
 rechargeable	PowerStatus		įkraunama
 charging	PowerStatus		įkraunama
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
-Power status box	PowerStatus		Maitinimo būsena
 Show status icon	PowerStatus		Rodyti būsenos piktogramą
 Capacity granularity 2: 	PowerStatus		Talpos detalizavimas 2: 
 Technology: 	PowerStatus		Technologija: 

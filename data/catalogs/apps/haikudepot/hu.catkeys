@@ -1,12 +1,10 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1527149765
+1	hungarian	x-vnd.Haiku-HaikuDepot	1195245614
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
-Repository	FilterView		Csomagtároló
 Close	RatePackageWindow		Bezárás
 The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
 Changelog	PackageInfoView		Változásnapló
-Repository:	FilterView		Csomagtároló:
 Your rating:	RatePackageWindow		Saját értékelés:
 The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
 Log in…	MainWindow		Bejelentkezés…
@@ -33,7 +31,6 @@ Your rating was updated successfully.	RatePackageWindow		Az értékelés elküld
 <no info>	PackageInfoView		<nincs információ>
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
-All repositories	FilterView		Minden csomagtár
 Email address:	UserLoginWindow		E-mail cím:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Az értékelés elküldve. A későbbiekben bármikor módosítható, csupán újra értékelni kell a csomagot.
 Very unstable	RatePackageWindow		Nagyon instabil
@@ -77,7 +74,6 @@ Failed to update rating	RatePackageWindow		Az értékelés frissítése meghiús
 Does not start	RatePackageWindow		Nem indul el
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Nem sikerült elérni a webes szolgáltatást.
-Only featured packages	MainWindow		Csak az ajánlott csomagok
 There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		A csomag nem található. Lehetséges, hogy a csomag olyan raktárban van, ami nincs használatban. Az értékelés nem lehetséges.
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
@@ -141,7 +137,6 @@ Send	RatePackageWindow		Küldés
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
-Featured packages	MainWindow		Ajánlott csomagok
 Start package daemon	App		Csomag démon indítása
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
 Success	RatePackageWindow		Sikeres

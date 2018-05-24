@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	1230888146
+1	german	x-vnd.Haiku-About	3317318166
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 durch die Autoren von Gutenprint. Alle Rechte vorbehalten.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
 Past website & marketing:\n	AboutView		Ehemaliges Website & Marketing:\n
@@ -14,12 +14,12 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter H
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Alle Rechte vorbehalten.
 Revision	AboutView		Stand:
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
-Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, eine Abteilung von Lucas Digital Ltd. LLC.
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. und dessen Programmier-Team für die Entwicklung von BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y. Takagi. Alle Rechte vorbehalten.
 Source Code: 	AboutView		Quellcode: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Prozessor:} other{# Prozessoren:}}
 Kernel:	AboutView		Kernel:
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, Teil von Lucas Digital Ltd. LLC.
 BSD (4-clause)	AboutWindow		BSD (4-Klausel)
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization Team.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n

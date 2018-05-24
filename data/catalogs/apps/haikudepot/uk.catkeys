@@ -1,12 +1,10 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1527149765
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1195245614
 Name	PackageListView		Ім'я
 Available packages	MainWindow		Доступні пакети
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
-Repository	FilterView		Репозиторій
 Close	RatePackageWindow		Закрити
 The captcha puzzle needs to be solved.	UserLoginWindow		Розв'язати головоломку captcha
 Changelog	PackageInfoView		Журнал змін
-Repository:	FilterView		Репозиторій:
 Your rating:	RatePackageWindow		Ваш рейтинг:
 The passwords do not match.	UserLoginWindow		Гасла не співпадають
 Log in…	MainWindow		Авторизуватись…
@@ -33,7 +31,6 @@ Your rating was updated successfully.	RatePackageWindow		Ваша оцінка �
 <no info>	PackageInfoView		<немає інформації>
 Starting the package daemon failed:\n\n%Error%	App		Запуск демона пакету призупинено:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Виникла помилка при ініціалізації менеджера пакету: %message%
-All repositories	FilterView		Всі репозиторії
 Email address:	UserLoginWindow		Адреса Email:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваша оцінка завантажена успішно. Ви зможете будь-коли обновити або видалили її при наступній спробі оцінки пакету.
 Very unstable	RatePackageWindow		Дуже нестабільний
@@ -77,7 +74,6 @@ Failed to update rating	RatePackageWindow		Оновлення оцінки пр�
 Does not start	RatePackageWindow		Не починається
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Виникла помилка при оновленні репозиторія: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Неможливо під'єднатись до мережевого сервісу
-Only featured packages	MainWindow		Тільки наступні пакети
 There are problems in the form:\n\n	UserLoginWindow		Існують проблеми у вигляді:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Пакет на мережевому сервісі не знайдено. Це, ймовірно, означає що він розташований у репозиторії котрий нами не відслідковується. Оцінка таких пакетів нажаль не підтримується.
 Create account	UserLoginWindow		Створити обліковий запис
@@ -141,7 +137,6 @@ Send	RatePackageWindow		Надіслати
 Category:	FilterView		Категорія:
 Failed to create account	UserLoginWindow		Створення облікового запису призупинено
 There are problems with the data you entered:\n\n	UserLoginWindow		Сталися проблеми з введеними даними:\n\n
-Featured packages	MainWindow		Наступні пакети
 Start package daemon	App		Запустити демон пакетів
 Manage repositories…	MainWindow		Обробка репозиторіїв…
 Success	RatePackageWindow		Успіх
