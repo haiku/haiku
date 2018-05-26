@@ -1281,6 +1281,16 @@ IORequest::_CopySimple(void* bounceBuffer, generic_addr_t external, size_t size,
 {
 	TRACE("  IORequest::_CopySimple(%p, %#" B_PRIxGENADDR ", %lu, %d)\n",
 		bounceBuffer, external, size, copyIn);
+	if (IS_USER_ADDRESS(external)) {
+		status_t status = B_OK;
+		if (copyIn)
+			status = user_memcpy(bounceBuffer, (void*)(addr_t)external, size);
+		else
+			status = user_memcpy((void*)(addr_t)external, bounceBuffer, size);
+		if (status < B_OK)
+			return status;
+		return B_OK;
+	}
 	if (copyIn)
 		memcpy(bounceBuffer, (void*)(addr_t)external, size);
 	else
