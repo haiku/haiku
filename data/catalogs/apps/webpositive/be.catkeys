@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	2730031660
+1	belarusian	x-vnd.Haiku-WebPositive	2159718606
 Show home button	Settings Window		Паказваць кнопку "Дадому"
 Username:	Authentication Panel		Карыстальнік:
 Copy URL to clipboard	Download Window		Скапіяваць спасылку
@@ -59,7 +59,6 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Open downloads folder	Download Window		Адкрыць папку спамповак
 Proxy password:	Settings Window		Пароль проксі:
 Number of days to keep links in History menu:	Settings Window		Выдаляць спасылкі з гісторыі пасля [дзён]:
-Hide	Download Window		Схаваць
 Reset size	WebPositive Window		Вярнуць памер
 Find:	WebPositive Window		Шукаць:
 Increase size	WebPositive Window		Павялічыць памер
@@ -72,7 +71,6 @@ Bookmark info	WebPositive Window		Інфа пра закладку
 Size:	Font Selection view		Памер:
 Show tabs if only one page is open	Settings Window		Паказваць укладку нават з адной старонкай
 About	WebPositive Window		Пра Праграму
-Finish: 	Download Window	Finishing time	Скончыць: 
 Fonts	Settings Window		Шрыфты
 OK	Download Window		ОК
 Page source error	WebPositive Window		Памылка зыходнага коду старонкі
@@ -97,7 +95,6 @@ Paste	URL Bar		Уставіць
 /s)	Download Window	...as in 'per second'	/с)
 Hide password text	Authentication Panel		Схаваць тэкст паролю
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Я жорстка заб’ю проста ў сэрца гэты расквечаны профіль, што ходзіць ля маёй хаты.
-Over 1 minute left	Download Window		Засталося болей за 1 хвіліну
 Open start page	Settings Window		Адчыніць пачатковую старонку
 Continue downloads	WebPositive		Працягваць спампоўку
 Cancel	Download Window		Скасаваць

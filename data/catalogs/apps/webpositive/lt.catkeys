@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	2730031660
+1	lithuanian	x-vnd.Haiku-WebPositive	2159718606
 Show home button	Settings Window		Rodyti Namų mygtuką
 Username:	Authentication Panel		Naudotojo vardas:
 Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
@@ -59,7 +59,6 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Open downloads folder	Download Window		Atverti parsiuntimų aplanką
 Proxy password:	Settings Window		Įgaliotojo serverio slaptažodis:
 Number of days to keep links in History menu:	Settings Window		Kiek dienų laikyti saitus žurnalo meniu:
-Hide	Download Window		Nerodyti
 Reset size	WebPositive Window		Atstatyti pradinį dydį
 Find:	WebPositive Window		Ieškoti:
 Increase size	WebPositive Window		Padidinti
@@ -72,7 +71,6 @@ Bookmark info	WebPositive Window		Adresyno įrašo savybės
 Size:	Font Selection view		Dydis:
 Show tabs if only one page is open	Settings Window		Rodyti korteles net kai jų tėra viena
 About	WebPositive Window		Apie
-Finish: 	Download Window	Finishing time	Numatoma pabaiga: 
 Fonts	Settings Window		Šriftai
 OK	Download Window		Gerai
 Page source error	WebPositive Window		Tinklapio pirminio teksto klaida
@@ -97,7 +95,6 @@ Paste	URL Bar		Įdėti
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Nerodyti slaptažodžio teksto
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
-Over 1 minute left	Download Window		Liko daugiau nei 1 minutė
 Open start page	Settings Window		Atverti pradžios tinklapį
 Continue downloads	WebPositive		Tęsti parsiuntimus
 Cancel	Download Window		Atsisakyti

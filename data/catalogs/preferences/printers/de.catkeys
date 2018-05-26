@@ -31,7 +31,7 @@ Remove	PrintersWindow		Entfernen
 <pick one>	AddPrinterDialog		<auswählen>
 Print jobs for 	PrintersWindow		Druckaufträge für
 Failed	JobListView		Fehler
-%.2f KB	JobListView		%.2F KiB
+%.2f KB	JobListView		%.2f KiB
 Magenta	TestPageView		Magenta
 Completed	JobListView		Fertig
 No printer found!	TransportMenu		Es wurde kein Drucker gefunden!

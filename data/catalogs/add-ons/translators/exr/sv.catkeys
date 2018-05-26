@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-EXRTranslator	2160233532
+1	swedish	x-vnd.Haiku-EXRTranslator	3596882613
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 EXR image translator	EXRTranslator		EXR bildöversättare
 EXR Settings	main		EXR inställningar
@@ -6,3 +6,4 @@ EXR images	EXRTranslator		EXR bilder
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		en del av Lucasfilm Entertainment Company Ltd
 EXR image	EXRTranslator		EXR bild
 EXR image translator	ConfigView		EXR bildöversättare
+Based on OpenEXR %version%	ConfigView		Baserat på OpenEXR %version%

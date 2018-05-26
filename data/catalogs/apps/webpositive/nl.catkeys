@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	82284269
+1	dutch; flemish	x-vnd.Haiku-WebPositive	3806938511
 Show home button	Settings Window		Thuisknop tonen
 Username:	Authentication Panel		Gebruikersnaam:
 Copy URL to clipboard	Download Window		URL naar klembord kopiëren
@@ -55,7 +55,6 @@ Bookmark this page	WebPositive Window		Bladwijzer van deze pagina maken
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Er was een fout bij het openen van de Bladwijzermap.\n\nFout: %error
 Open downloads folder	Download Window		Downloadmap openen
 Number of days to keep links in History menu:	Settings Window		Aantal dagen dat links in het geschiedenismenu staan:
-Hide	Download Window		Verbergen
 Reset size	WebPositive Window		Grootte opnieuw instellen
 Find:	WebPositive Window		Zoeken:
 Increase size	WebPositive Window		Vergroten
@@ -67,7 +66,6 @@ Bookmark info	WebPositive Window		Bladwijzerinfo
 Size:	Font Selection view		Grootte:
 Show tabs if only one page is open	Settings Window		Tabbladen ook tonen als slechts een pagina open is
 About	WebPositive Window		Over
-Finish: 	Download Window	Finishing time	Voltooien:
 Fonts	Settings Window		Lettertypen
 OK	Download Window		Ok
 Page source error	WebPositive Window		Paginabronfout
@@ -89,7 +87,6 @@ Paste	URL Bar		Plakken
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Wachtwoordtekst verbergen
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa's wijze lynx bezag vroom het fikse aquaduct.
-Over 1 minute left	Download Window		Meer dan 1 minute over
 Open start page	Settings Window		Startpagina openen
 Continue downloads	WebPositive		Downloads hervatten
 Cancel	Download Window		Annuleren

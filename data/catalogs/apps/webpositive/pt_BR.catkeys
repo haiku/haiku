@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3678460971
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3989495979
 Show home button	Settings Window		Exibir botão home
 Username:	Authentication Panel		Nome de Usuário:
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
@@ -19,7 +19,6 @@ Paste	WebPositive Window		Colar
 Double-click or middle-click to open new tab.	Tab Manager		Clique duas vezes ou com o botão do meio do mouse para abrir uma nova guia.
 Proxy username:	Settings Window		Nome de usuário do proxy:
 Save page as…	WebPositive Window		Salvar página como…
-Over %days left	Download Window		Mais de %dias restante
 Settings	Settings Window		Definições
 Confirmation	WebPositive Window		Confirmação
 Window	WebPositive Window		Janela
@@ -63,7 +62,6 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Open downloads folder	Download Window		Abrir pasta de downloads
 Proxy password:	Settings Window		Senha do proxy:
 Number of days to keep links in History menu:	Settings Window		Número de dias para manter vínculos no menu Histórico:
-Hide	Download Window		Ocultar
 Reset size	WebPositive Window		Restaurar tamanho
 Find:	WebPositive Window		Localizar:
 Increase size	WebPositive Window		Aumentar o tamanho
@@ -76,7 +74,6 @@ Bookmark info	WebPositive Window		Informações de marcador
 Size:	Font Selection view		Tamanho:
 Show tabs if only one page is open	Settings Window		Exibir guias se apenas uma página está aberta
 About	WebPositive Window		Sobre
-Finish: 	Download Window	Finishing time	Término:
 Fonts	Settings Window		Fontes
 OK	Download Window		OK
 Page source error	WebPositive Window		Erro de origem da página
@@ -101,7 +98,6 @@ Paste	URL Bar		Colar
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ocultar texto da senha
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Um pequeno jabuti xereta viu dez cegonhas felizes.
-Over 1 minute left	Download Window		Mais de 1 minuto restante
 Open start page	Settings Window		Abrir página inicial
 Continue downloads	WebPositive		Continuar a baixar
 Cancel	Download Window		Cancelar
@@ -111,7 +107,6 @@ Password:	Authentication Panel		Senha:
 Back	WebPositive Window		Voltar
 New browser window	Download Window		Nova janela do navegador
 Today	WebPositive Window		Hoje
-Over %hours left	Download Window		Mais de %horas restante
 Remember username and password for this site	Authentication Panel		Lembrar nome de usuário e senha para este site
 Earlier	WebPositive Window		Mais cedo
 Authentication required	Authentication Panel		Autenticação requerida
@@ -119,7 +114,6 @@ Use proxy server to connect to the internet	Settings Window		Utilize o servidor 
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ainda existem downloads em progresso, deseja realmente sair do WebPositive agora?
 Auto-hide interface in full screen mode	Settings Window		Auto-ocultar interface no modo tela cheia
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falhou
-%seconds left	Download Window		%segundos restante
 New tab	WebPositive Window		Nova guia
 Downloads in progress	WebPositive		Downloads em progresso
 Style:	Font Selection view		Estilo:

@@ -3,7 +3,7 @@ Error: %1	Login App		Fehler: %1
 Hide password	Login View		Passwort verbergen
 Desktop	Desktop Window		Desktop
 Invalid login!	Login View		Ungültige Anmeldung!
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t\tStartet im Shelf-Bearbeitungsmodus, um den Desktop zu individualisieren.\n
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tStartet im Shelf-Bearbeitungsmodus, um den Desktop zu individualisieren.\n
 OK	Login View		OK
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	Fehler %s\n
 Login:	Login View		Anmeldung:

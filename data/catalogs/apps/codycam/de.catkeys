@@ -60,7 +60,7 @@ Error setting type of output file	VideoConsumer.cpp		Fehler beim Setzen des Ausg
 upload client name expected	CodyCam		Name des Upload-Client erwartet
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Verbunden…
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <unterdrückt> (echtes Passwort wurde gesendet)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <unterdrückt>  (echtes Passwort wurde gesendet)\n
 File upload failed	VideoConsumer.cpp		Hochladen der Datei fehlgeschlagen
 Every 5 minutes	CodyCam		Alle 5 Minuten
 read: %d\n	SftpClient		gelesen: %d\n

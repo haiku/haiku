@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	1195245614
+1	swedish	x-vnd.Haiku-HaikuDepot	2069133245
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -17,6 +17,7 @@ for %Version%	PackageInfoView		för %Version%
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
+All repositories	MainWindow		Alla repositorier
 Source packages	MainWindow		Källkodspaket
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentisering misslyckades. Användaren finns inte eller så är fel lösenord angivet.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Kontot lyckades skapas. Du kan nu betygsätta paket och göra andra vettiga saker.
@@ -45,6 +46,7 @@ Switch account…	MainWindow		Byt konto...
 Ignore	UserLoginWindow		Ignorera
 Language	UserLoginWindow		Språk
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
+Show only featured packages	FilterView		Visa bara framhävda paket
 Rate package	RatePackageWindow		Betygsatt paket
 Development	Model		Utveckling
 Fatal error	PackageManager		Allvarligt fel
@@ -66,6 +68,7 @@ Downloading:	PackageInfoView		Mestadels stabil
 Mostly stable	RatePackageWindow		Mestadels stabil
 There was a puzzling response from the web service.	RatePackageWindow		Det kom ett konstigt meddelande från webb servicen.
 Log out	MainWindow		Logga ut
+Repository	PackageListView		Repositorie
 Education	Model		Utbildning
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
@@ -133,9 +136,11 @@ Cancel	RatePackageWindow		Avbryt
 Package action failed	PackageInfoView		Paketåtgärden misslyckades
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Skicka
+Repositories	MainWindow		Repositorier
 -	no package size		-
 Category:	FilterView		Kategori:
 Failed to create account	UserLoginWindow		Misslyckades skapa konto
+Check for updates…	MainWindow		Leta efter uppdateringar…
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
 Start package daemon	App		Starta paket-servicen
 Manage repositories…	MainWindow		Hantera repositorier...
@@ -145,5 +150,6 @@ Audio	Model		Ljud
 About	PackageInfoView		Om
 Active	PackageListView		Aktiv
 It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.
+Refreshing...	MainWindow		Uppdaterar...
 Failed to create account: %s\n	UserLoginWindow		Misslyckades skapa konto: %s\n
 Cancel	UserLoginWindow		Avbryt

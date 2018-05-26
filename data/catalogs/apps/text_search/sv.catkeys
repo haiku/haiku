@@ -1,11 +1,14 @@
-1	swedish	x-vnd.Haiku.TextSearch	3108411238
+1	swedish	x-vnd.Haiku.TextSearch	3622532554
 %s: Not enough room to escape the filename.	Grepper		%s: Saknar utrymme för att koda om filnamnet.
 Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
+Failed to open errors pipe!	Grepper		Misslyckades med att öppna feldataenhet!
 Follow symbolic links	GrepWindow		Följ symboliska länkar
 Close	GrepWindow		Stäng
 Cancel	GrepWindow		Avbryt
 The unselected files will be removed from the list.	GrepWindow		De omarkerade filerna kommer att tas bort från listan.
+Regular expression	GrepWindow		Reguljärt uttryck
 Set target…	GrepWindow		Ange mål...
+Failed to open output pipe!	Grepper		Misslyckades med att öppna utdataenhet!
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
 Open files in Pe	GrepWindow		Öppna filerna i Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
@@ -22,7 +25,9 @@ Actions	GrepWindow		Kommandon
 File	GrepWindow		Arkiv
 Encoding	GrepWindow		Teckenuppsättning
 History	GrepWindow		Historik
+Failed to start xargs program!	Grepper		Misslyckades med att starta xargs-program!
 New window	GrepWindow		Nytt fönster
+Failed to open input pipe!	Grepper		Misslyckades med att öppna indataenhet!
 Please select the files you wish to keep searching.	GrepWindow		Var god markera de filer du önskar fortsätta söka i.
 TextSearch	GrepWindow		TextSök
 Quit	GrepWindow		Avsluta
