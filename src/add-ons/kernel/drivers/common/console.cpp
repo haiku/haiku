@@ -701,7 +701,8 @@ static status_t
 console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	struct console_desc *console = (struct console_desc *)cookie;
-	ssize_t written;
+	ssize_t written = 0;
+	status_t status = B_OK;
 
 #if 0
 {
@@ -720,16 +721,27 @@ console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 	mutex_lock(&console->lock);
 
 	update_cursor(console, -1, -1); // hide it
-	written = _console_write(console, buffer, *_length);
+
+	size_t bytesLeft = *_length;
+	const char *str = (const char*)buffer;
+	while (bytesLeft > 0) {
+		char localBuffer[512];
+		size_t chunkSize = min_c(sizeof(localBuffer), bytesLeft);
+		if (user_memcpy(localBuffer, str, chunkSize) < B_OK) {
+			status = B_BAD_ADDRESS;
+			break;
+		}
+		written += _console_write(console, localBuffer, chunkSize);
+		str += chunkSize;
+		bytesLeft -= chunkSize;
+	}
 	update_cursor(console, console->x, console->y);
 
 	mutex_unlock(&console->lock);
 
-	if (written >= 0) {
+	if (status == B_OK)
 		*_length = written;
-		return B_OK;
-	}
-	return written;
+	return status;
 }
 
 
