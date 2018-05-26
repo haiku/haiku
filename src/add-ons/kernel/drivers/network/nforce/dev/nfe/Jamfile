@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network nforce dev nfe ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ] : true ;
 
 UsePrivateHeaders net ;
 UsePrivateKernelHeaders ;
@@ -12,5 +12,5 @@ KernelAddon nforce :
 	if_nfe.c
 
 	glue.c
-	: libfreebsd_network.a nforce_mii.a
+	: nforce_mii.a libfreebsd11_network.a
 	;
