@@ -220,6 +220,16 @@ memalign_etc(size_t alignment, size_t size, uint32 flags)
 }
 
 
+int
+posix_memalign(void** _pointer, size_t alignment, size_t size)
+{
+	if ((alignment & (sizeof(void*) - 1)) != 0 || _pointer == NULL)
+		return B_BAD_VALUE;
+	*_pointer = block_alloc(size, alignment, 0);
+	return 0;
+}
+
+
 void
 free_etc(void *address, uint32 flags)
 {
