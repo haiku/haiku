@@ -6,12 +6,7 @@
 
 #include <stdint.h>
 
-// disable a warning for GCC 5.4, fixed upstream.
-// will remove the pragmas after a while.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
 #include <x86intrin.h>
-#pragma GCC diagnostic pop
 
 
 static uint64_t cv_factor;

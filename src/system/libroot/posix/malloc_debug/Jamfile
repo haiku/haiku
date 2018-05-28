@@ -7,10 +7,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-		if $(architecture) != x86_gcc2 {
-			SubDirC++Flags -std=gnu++11 ;
-		}
-
 		UsePrivateSystemHeaders ;
 
 		MergeObject <$(architecture)>posix_malloc_debug.o :

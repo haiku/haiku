@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system libroot posix string arch x86_64 ;
 
-SubDirC++Flags -std=gnu++11 ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 	on $(architectureObject) {

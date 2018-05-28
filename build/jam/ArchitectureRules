@@ -331,10 +331,6 @@ rule KernelArchitectureSetup architecture
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
 
-	if $(gccVersion[1]) >= 4 {
-		HAIKU_KERNEL_C++FLAGS += -std=gnu++11 ;
-	}
-
 	if $(gccVersion[1]) >= 6 {
 		HAIKU_KERNEL_C++FLAGS += -fno-delete-null-pointer-checks ;
 		HAIKU_KERNEL_CCFLAGS += -fno-delete-null-pointer-checks ;

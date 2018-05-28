@@ -27,7 +27,6 @@ BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	$(kernelArchSpecificSources)
 	$(kernelLibArchSpecificSources)
 	$(librootOsArchSources)
-	: -std=c++11 # additional flags
 ;
 
 SEARCH on [ FGristFiles $(kernelArchSources) ]
