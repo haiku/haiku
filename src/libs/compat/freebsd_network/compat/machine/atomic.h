@@ -24,4 +24,8 @@
 #define atomic_readandclear_int(ptr) \
 	atomic_set((int32 *)(ptr), 0)
 
+#define atomic_cmpset_int(ptr, old, new) \
+	(atomic_test_and_set((int32 *)(ptr), new, old) == old)
+
+
 #endif	/* _FBSD_COMPAT_MACHINE_ATOMIC_H_ */

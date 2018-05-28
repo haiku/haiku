@@ -454,7 +454,7 @@ ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
 
 /*
  * Decrements the reference-counter and
- * tests whether it became zero.
+ * tests whether it became zero. If so, sets it to one.
  *
  * @return 1 reference-counter became zero
  * @return 0 reference-counter didn't became zero
@@ -462,8 +462,8 @@ ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
 int
 ieee80211_node_dectestref(struct ieee80211_node* ni)
 {
-	// atomic_add returns old value
-	return atomic_add((int32*)&ni->ni_refcnt, -1) == 1;
+	atomic_subtract_int(&ni->ni_refcnt, 1);
+	return atomic_cmpset_int(&ni->ni_refcnt, 0, 1);
 }
 
 
