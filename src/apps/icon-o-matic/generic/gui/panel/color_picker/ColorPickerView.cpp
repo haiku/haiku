@@ -84,7 +84,7 @@ ColorPickerView::AttachedToWindow()
 	fColorSlider->SetExplicitMaxSize(
 		BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED));
 	fColorPreview->SetExplicitMinSize(BSize(B_SIZE_UNSET, 70));
-	
+
 	const char* title[] = { "H", "S", "V", "R", "G", "B" };
 
 	int32 selectedRadioButton = _NumForMode(fSelectedColorMode);
@@ -160,7 +160,7 @@ ColorPickerView::AttachedToWindow()
 				.Add(new BSpaceLayoutItem(separatorSize, separatorSize,
 					separatorSize, separatorAlignment),
 					0, 7, 3)
-				
+
 				.AddGroup(B_HORIZONTAL, 0.0f, 0, 8, 2)
 					.Add(fHexTextControl->CreateLabelLayoutItem())
 					.Add(fHexTextControl->CreateTextViewLayoutItem())
@@ -256,47 +256,39 @@ ColorPickerView::MessageReceived(BMessage *message)
 			int nr = message->what - MSG_TEXTCONTROL;
 			int value = atoi(fTextControl[nr]->Text());
 
-			char string[4];
-
 			switch (nr) {
 				case 0: {
 					value %= 360;
-					sprintf(string, "%d", value);
 					h = (float)value / 60;
 				} break;
 
 				case 1: {
 					value = min_c(value, 100);
-					sprintf(string, "%d", value);
 					s = (float)value / 100;
 				} break;
 
 				case 2: {
 					value = min_c(value, 100);
-					sprintf(string, "%d", value);
 					v = (float)value / 100;
 				} break;
 
 				case 3: {
 					value = min_c(value, 255);
-					sprintf(string, "%d", value);
 					r = (float)value / 255;
 				} break;
 
 				case 4: {
 					value = min_c(value, 255);
-					sprintf(string, "%d", value);
 					g = (float)value / 255;
 				} break;
 
 				case 5: {
 					value = min_c(value, 255);
-					sprintf(string, "%d", value);
 					b = (float)value / 255;
 				} break;
 			}
 
-			if (nr<3) { // hsv-mode
+			if (nr < 3) { // hsv-mode
 				HSV_to_RGB(h, s, v, r, g, b);
 			}
 
