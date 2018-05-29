@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src apps webpositive ;
 
-SubDirC++Flags $(defines) -Wno-error=sequence-point --std=c++11 ;
-SubDirCcFlags $(defines) -Wno-error=sequence-point ;
+SubDirC++Flags $(defines) -Wno-error=sequence-point -Wno-error=format-truncation ;
+SubDirCcFlags $(defines) -Wno-error=sequence-point -Wno-error=format-truncation ;
 
 # source directories
 local sourceDirs =
