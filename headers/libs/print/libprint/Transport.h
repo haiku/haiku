@@ -39,6 +39,8 @@ public:
 
 	void			Write(const void *buffer, size_t size)
 						throw (TransportException);
+	void			Read(void *buffer, size_t size)
+						throw (TransportException);
 	bool			CheckAbort() const;
 	bool			IsPrintToFileCanceled() const;
 	const string&	LastError() const;

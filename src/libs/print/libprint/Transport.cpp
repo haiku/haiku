@@ -147,3 +147,16 @@ Transport::Write(const void* buffer, size_t size) throw(TransportException)
 	}
 	throw TransportException(LastError());
 }
+
+
+void
+Transport::Read(void* buffer, size_t size) throw(TransportException)
+{
+	if (fDataStream) {
+		if (size == (size_t)fDataStream->Read(buffer, size)) {
+			return;
+		}
+		SetLastError("BDataIO::Read failed.");
+	}
+	throw TransportException(LastError());
+}

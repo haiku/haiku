@@ -54,6 +54,11 @@ protected:
 			void	WriteSpoolChar(char c)
 						throw (TransportException);
 
+			void	ReadSpoolData(void* buffer, size_t size)
+						throw (TransportException);
+			int		ReadSpoolChar()
+						throw (TransportException);
+
 	static	void	ConvertToRGB24(const void* src, void* dst, int width,
 						color_space cs);
 	static	void	ConvertToGray(const void* src, void* dst, int width,

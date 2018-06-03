@@ -1,41 +1,22 @@
-/*****************************************************************************/
-// Serial port transport add-on.
-//
-// Author
-//   Michael Pfeiffer
-//
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
-// and are:
-//
-// Copyright (c) 2001-2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2001-2017 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *   Michael Pfeiffer
+ *   Adrien Destugues <pulkomandy@pulkomandy.tk>
+ */
+
 
 #include <unistd.h>
 #include <stdio.h>
+#include <termios.h>
 
 #include <StorageKit.h>
 #include <SupportKit.h>
 
 #include "PrintTransportAddOn.h"
+
 
 class SerialTransport : public BDataIO {
 public:
@@ -51,18 +32,20 @@ private:
 	int fFile;
 };
 
+
 // Impelmentation of SerialTransport
-SerialTransport::SerialTransport(BDirectory* printer, BMessage* msg) 
+SerialTransport::SerialTransport(BDirectory* printer, BMessage* msg)
 	: fFile(-1)
 {
 	char address[80];
 	char device[B_PATH_NAME_LENGTH];
 	bool bidirectional = true;
 
-	unsigned int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
+	unsigned int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0,
+		address, sizeof(address));
 	if (size <= 0 || size >= sizeof(address)) return;
 	address[size] = 0; // make sure string is 0-terminated
-		
+
 	strcat(strcpy(device, "/dev/ports/"), address);
 	fFile = open(device, O_RDWR | O_EXCL, 0);
 	if (fFile < 0) {
@@ -74,9 +57,29 @@ SerialTransport::SerialTransport(BDirectory* printer, BMessage* msg)
 	if (fFile < 0)
 		return;
 
-	if (! msg)
+	int32 baudrate;
+	size = printer->ReadAttr("transport_baudrate", B_INT32_TYPE, 0,
+		&baudrate, sizeof(baudrate));
+
+	struct termios options;
+	tcgetattr(fFile, &options);
+
+	cfmakeraw(&options);
+	options.c_cc[VTIME] = 10; // wait for data at most for 1 second
+	options.c_cc[VMIN] = 0; // allow to return 0 chars
+
+	if (size == sizeof(baudrate)) {
+		// Printer driver asked for a specific baudrate, configure it
+		cfsetispeed(&options, baudrate);
+		cfsetospeed(&options, baudrate);
+	}
+
+	tcsetattr(fFile, TCSANOW, &options);
+
+	if (msg == NULL) {
 		// Caller don't care about transport init message output content...
 		return;
+	}
 
 	msg->what = 'okok';
 	msg->AddBool("bidirectional", bidirectional);
@@ -84,23 +87,30 @@ SerialTransport::SerialTransport(BDirectory* printer, BMessage* msg)
 
 }
 
+
 SerialTransport::~SerialTransport()
 {
 	if (InitCheck() == B_OK)
 		close(fFile);
 }
 
-ssize_t SerialTransport::Read(void* buffer, size_t size)
+
+ssize_t
+SerialTransport::Read(void* buffer, size_t size)
 {
 	return read(fFile, buffer, size);
 }
 
-ssize_t SerialTransport::Write(const void* buffer, size_t size)
+
+ssize_t
+SerialTransport::Write(const void* buffer, size_t size)
 {
 	return write(fFile, buffer, size);
 }
 
-BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg)
+
+BDataIO*
+instantiate_transport(BDirectory* printer, BMessage* msg)
 {
 	SerialTransport* transport = new SerialTransport(printer, msg);
 	if (transport->InitCheck() == B_OK)
@@ -110,7 +120,9 @@ BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg)
 	return NULL;
 }
 
-status_t list_transport_ports(BMessage* msg)
+
+status_t
+list_transport_ports(BMessage* msg)
 {
 	BDirectory dir("/dev/ports");
 	status_t rc;
@@ -122,9 +134,8 @@ status_t list_transport_ports(BMessage* msg)
 		return rc;
 
 	entry_ref ref;
-	while(dir.GetNextRef(&ref) == B_OK)
+	while (dir.GetNextRef(&ref) == B_OK)
 		msg->AddString("port_id", ref.name);
 
 	return B_OK;
 }
-
