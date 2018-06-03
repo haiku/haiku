@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons print drivers lpstyl ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
+
+AddResources Lpstyl : Lpstyl.rdef ;
+
+Addon Lpstyl :
+	Lpstyl.cpp
+	LpstylCap.cpp
+	LpstylData.cpp
+	LpstylEntry.cpp
+	: be libprint.a [ TargetLibstdc++ ]
+;
+
