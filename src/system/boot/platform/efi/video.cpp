@@ -84,7 +84,7 @@ static video_mode*
 closest_video_mode(uint32 width, uint32 height, uint32 depth)
 {
 	video_mode *bestMode = NULL;
-	uint32 bestDiff = 0;
+	int64 bestDiff = 0;
 
 	video_mode *mode = NULL;
 	while ((mode = (video_mode*)list_get_next_item(&sModeList, mode)) != NULL) {
@@ -94,8 +94,9 @@ closest_video_mode(uint32 width, uint32 height, uint32 depth)
 			continue;
 		}
 
-		uint32 diff = 2 * abs(mode->width - width) + abs(mode->height - height)
-			+ abs(mode->bits_per_pixel - depth);
+		int64 diff = 2 * abs((int64)mode->width - width)
+			+ abs((int64)mode->height - height)
+			+ abs((int64)mode->bits_per_pixel - depth);
 
 		if (bestMode == NULL || bestDiff > diff) {
 			bestMode = mode;

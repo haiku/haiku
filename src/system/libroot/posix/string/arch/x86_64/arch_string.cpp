@@ -15,6 +15,15 @@
 namespace {
 
 
+// __m128i resolves to a type with an attribute, which can't get into the
+// template signature, resulting in a warning. Nonetheless the code is what we
+// expect, so we silent the warning.
+#pragma GCC diagnostic push
+#if defined __GNUC__ && __GNUC__ >= 6
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+#endif
+
+
 template<template<size_t N> class Generator, unsigned N, unsigned ...Index>
 struct GenerateTable : GenerateTable<Generator, N - 1,  N - 1, Index...> {
 };
@@ -30,6 +39,9 @@ struct GenerateTable<Generator, 0, Index...>
 	{
 	}
 };
+
+
+#pragma GCC diagnostic pop
 
 
 static inline void memcpy_repmovs(uint8_t* destination, const uint8_t* source,
