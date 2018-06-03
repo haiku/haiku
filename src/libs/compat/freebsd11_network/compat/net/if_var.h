@@ -261,7 +261,7 @@ struct ifnet {
 	struct	task if_linktask;	/* task for link change events */
 	struct	mtx if_addr_mtx;	/* mutex to protect address lists */
 
-	if_qflush_fn_t	if_qflush;	/* flush any queue */	
+	if_qflush_fn_t	if_qflush;	/* flush any queue */
 	if_get_counter_t if_get_counter; /* get counter values */
 	int	(*if_requestencap)	/* make link header from request */
 		(struct ifnet *, struct if_encap_req *);

@@ -120,6 +120,17 @@ struct m_ext {
 };
 
 struct mbuf {
+	union {	/* next buffer in chain */
+		struct mbuf		*m_next;
+		SLIST_ENTRY(mbuf)	m_slist;
+		STAILQ_ENTRY(mbuf)	m_stailq;
+	};
+	union {	/* next chain in queue/record */
+		struct mbuf		*m_nextpkt;
+		SLIST_ENTRY(mbuf)	m_slistpkt;
+		STAILQ_ENTRY(mbuf)	m_stailqpkt;
+	};
+
 	struct m_hdr m_hdr;
 	union {
 		struct {

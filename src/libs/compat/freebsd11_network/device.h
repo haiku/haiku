@@ -81,7 +81,7 @@ void uninit_bounce_pages(void);
 
 void driver_printf(const char *format, ...)
 	__attribute__ ((format (__printf__, 1, 2)));
-void driver_vprintf(const char *format, va_list vl);
+int driver_vprintf(const char *format, va_list vl);
 
 void device_sprintf_name(device_t dev, const char *format, ...)
 	__attribute__ ((format (__printf__, 2, 3)));

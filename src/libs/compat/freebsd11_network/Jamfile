@@ -31,6 +31,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 	fbsd_mii.c
 	fbsd_mii_bitbang.c
 	fbsd_mii_physubr.c
+	fbsd_subr_sbuf.c
 	fbsd_time.c
 	firmware.c
 	if.c

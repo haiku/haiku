@@ -36,6 +36,14 @@ struct __system_init {
 	system_init_func_t func;
 };
 
+typedef void (*ich_func_t)(void *_arg);
+
+struct intr_config_hook {
+	TAILQ_ENTRY(intr_config_hook) ich_links;
+	ich_func_t	ich_func;
+	void		*ich_arg;
+};
+
 /* TODO implement SYSINIT/SYSUNINIT subsystem */
 #define SYSINIT(uniquifier, subsystem, order, func, ident) \
 	struct __system_init __init_##uniquifier = { (system_init_func_t) func }

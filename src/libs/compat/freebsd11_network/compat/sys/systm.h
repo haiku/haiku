@@ -79,7 +79,7 @@ static inline void log(int level, const char *fmt, ...) { }
 int snprintf(char *, size_t, const char *, ...) __printflike(3, 4);
 extern int sprintf(char *buf, const char *, ...);
 
-extern void driver_vprintf(const char *format, va_list vl);
+extern int driver_vprintf(const char *format, va_list vl);
 #define vprintf(fmt, vl) driver_vprintf(fmt, vl)
 
 extern int vsnprintf(char *, size_t, const char *, __va_list)

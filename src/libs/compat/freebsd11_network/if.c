@@ -840,6 +840,7 @@ ether_ifattach(struct ifnet *ifp, const uint8_t *lla)
 	ifp->if_output = ether_output;
 	ifp->if_input = ether_input;
 	ifp->if_resolvemulti = NULL; // done in the stack
+	ifp->if_get_counter = NULL;
 	ifp->if_broadcastaddr = etherbroadcastaddr;
 
 	ifa = ifp->if_addr;
