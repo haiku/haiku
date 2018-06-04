@@ -61,6 +61,8 @@ private:
 	static	bool				_SuggestMountFlags(const BPartition* partition,
 									uint32* _flags);
 
+		friend class MountVisitor;
+
 private:
 			mount_mode			fNormalMode;
 			mount_mode			fRemovableMode;

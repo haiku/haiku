@@ -185,8 +185,7 @@ MountVisitor::Visit(BPartition* partition, int32 level)
 	if (!fInitialRescan) {
 		// Ask the user about mount flags if this is not the
 		// initial scan.
-		// TODO!
-		//if (!_SuggestMountFlags(partition, &mountFlags))
+		if (!AutoMounter::_SuggestMountFlags(partition, &mountFlags))
 			return false;
 	} else {
 		BString mountFlagsKey(path.Path());
