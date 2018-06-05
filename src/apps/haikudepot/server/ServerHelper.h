@@ -7,7 +7,9 @@
 #define SERVER_HELPER_H
 
 #include <HttpHeaders.h>
-#include <Message.h>
+
+
+class BMessage;
 
 
 class ServerHelper {
@@ -19,6 +21,14 @@ public:
 											const BHttpHeaders& responseHeaders
 											);
 		static void						AlertClientTooOld(BMessage* message);
+
+		static void						NotifyTransportError(status_t error);
+		static void						AlertTransportError(BMessage* message);
+
+		static void						NotifyServerJsonRpcError(
+											BMessage& error);
+		static void						AlertServerJsonRpcError(
+											BMessage* message);
 };
 
 #endif // SERVER_HELPER_H

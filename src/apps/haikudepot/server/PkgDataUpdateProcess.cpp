@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +22,7 @@
 #include "DumpExportPkgJsonListener.h"
 #include "DumpExportPkgScreenshot.h"
 #include "DumpExportPkgVersion.h"
+#include "HaikuDepotConstants.h"
 
 
 /*! This package listener (not at the JSON level) is feeding in the
@@ -145,11 +146,13 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		}
 	}
 
-	if (!pkg->DerivedRatingIsNull()) {
-		RatingSummary summary;
+	RatingSummary summary;
+	summary.averageRating = RATING_MISSING;
+
+	if (!pkg->DerivedRatingIsNull())
 		summary.averageRating = pkg->DerivedRating();
-		package->SetRatingSummary(summary);
-	}
+
+	package->SetRatingSummary(summary);
 
 	if (!pkg->ProminenceOrderingIsNull())
 		package->SetProminence(pkg->ProminenceOrdering());

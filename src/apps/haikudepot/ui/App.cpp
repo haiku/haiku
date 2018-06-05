@@ -108,6 +108,18 @@ App::MessageReceived(BMessage* message)
 			ServerHelper::AlertClientTooOld(message);
 			break;
 
+		case MSG_NETWORK_TRANSPORT_ERROR:
+			ServerHelper::AlertTransportError(message);
+			break;
+
+		case MSG_SERVER_ERROR:
+			ServerHelper::AlertServerJsonRpcError(message);
+			break;
+
+		case MSG_SERVER_DATA_CHANGED:
+			fMainWindow->PostMessage(message);
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

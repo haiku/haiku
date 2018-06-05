@@ -17,6 +17,7 @@
 #include <SpaceLayoutItem.h>
 
 #include "BitmapView.h"
+#include "HaikuDepotConstants.h"
 #include "MainWindow.h"
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
@@ -30,7 +31,8 @@
 
 static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
 
-static BitmapRef sInstalledIcon(new(std::nothrow) SharedBitmap(504), true);
+static BitmapRef sInstalledIcon(new(std::nothrow)
+	SharedBitmap(RSRC_INSTALLED), true);
 
 
 // #pragma mark - PackageView

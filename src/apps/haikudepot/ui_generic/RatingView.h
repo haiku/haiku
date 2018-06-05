@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef RATING_VIEW_H
@@ -26,8 +27,12 @@ public:
 			void				SetRating(float rating);
 			float				Rating() const;
 
+protected:
+	virtual const BBitmap*		StarBitmap();
+			SharedBitmap		fStarBlueBitmap;
+			SharedBitmap		fStarGrayBitmap;
+
 private:
-			SharedBitmap		fStarBitmap;
 			float				fRating;
 };
 

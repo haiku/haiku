@@ -8,6 +8,7 @@
 
 
 #include <Application.h>
+#include <JsonWriter.h>
 #include <String.h>
 #include <package/PackageVersion.h>
 
@@ -19,6 +20,18 @@ class BMessage;
 using BPackageKit::BPackageVersion;
 
 typedef List<BString, false>	StringList;
+
+
+/*! These are error codes that are sent back to the client from the server */
+
+#define ERROR_CODE_NONE							0
+#define ERROR_CODE_VALIDATION					-32800
+#define ERROR_CODE_OBJECTNOTFOUND				-32801
+#define ERROR_CODE_CAPTCHABADRESPONSE			-32802
+#define ERROR_CODE_AUTHORIZATIONFAILURE			-32803
+#define ERROR_CODE_BADPKGICON					-32804
+#define ERROR_CODE_LIMITEXCEEDED				-32805
+#define ERROR_CODE_AUTHORIZATIONRULECONFLICT	-32806
 
 
 class WebAppInterface {
@@ -57,6 +70,7 @@ public:
 
 			status_t			CreateUserRating(
 									const BString& packageName,
+									const BPackageVersion& version,
 									const BString& architecture,
 									const BString& repositoryCode,
 									const BString& languageCode,
@@ -92,7 +106,12 @@ public:
 									const BString& passwordClear,
 									BMessage& message);
 
+	static int32				ErrorCodeFromResponse(BMessage& response);
+
 private:
+			void				_WriteStandardJsonRpcEnvelopeValues(
+									BJsonWriter& writer,
+									const char* methodName);
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, uint32 flags,
 									BMessage& reply) const;

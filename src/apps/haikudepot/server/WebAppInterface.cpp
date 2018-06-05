@@ -10,11 +10,13 @@
 
 #include <AppFileInfo.h>
 #include <Application.h>
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <File.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
 #include <Json.h>
+#include <JsonTextWriter.h>
 #include <Message.h>
 #include <Roster.h>
 #include <Url.h>
@@ -363,56 +365,138 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 	const BString &repositoryCode, const BString& username,
 	BMessage& message)
 {
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "getUserRatingByUserAndPkgVersion")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("userNickname", username)
-				.AddValue("pkgName", packageName)
-				.AddValue("pkgVersionArchitectureCode", architecture)
-				.AddValue("pkgVersionMajor", version.Major(), true)
-				.AddValue("pkgVersionMinor", version.Minor(), true)
-				.AddValue("pkgVersionMicro", version.Micro(), true)
-				.AddValue("pkgVersionPreRelease", version.PreRelease(), true)
-				.AddValue("pkgVersionRevision", (int)version.Revision())
-				.AddValue("repositoryCode", repositoryCode)
-			.EndObject()
-		.EndArray()
-	.End();
+		// BHttpRequest later takes ownership of this.
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	return _SendJsonRequest("userrating", jsonString, 0, message);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"getUserRatingByUserAndPkgVersion");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+
+	requestEnvelopeWriter.WriteObjectStart();
+
+	requestEnvelopeWriter.WriteObjectName("userNickname");
+	requestEnvelopeWriter.WriteString(username.String());
+	requestEnvelopeWriter.WriteObjectName("pkgName");
+	requestEnvelopeWriter.WriteString(packageName.String());
+	requestEnvelopeWriter.WriteObjectName("pkgVersionArchitectureCode");
+	requestEnvelopeWriter.WriteString(architecture.String());
+	requestEnvelopeWriter.WriteObjectName("repositoryCode");
+	requestEnvelopeWriter.WriteString(repositoryCode.String());
+
+	if (version.Major().Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionMajor");
+		requestEnvelopeWriter.WriteString(version.Major().String());
+	}
+
+	if (version.Minor().Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionMinor");
+		requestEnvelopeWriter.WriteString(version.Minor().String());
+	}
+
+	if (version.Micro().Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionMicro");
+		requestEnvelopeWriter.WriteString(version.Micro().String());
+	}
+
+	if (version.PreRelease().Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionPreRelease");
+		requestEnvelopeWriter.WriteString(version.PreRelease().String());
+	}
+
+	if (version.Revision() != 0) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionRevision");
+		requestEnvelopeWriter.WriteInteger(version.Revision());
+	}
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("userrating", requestEnvelopeData,
+		requestEnvelopeData->Position(), NEEDS_AUTHORIZATION, message);
 }
 
 
 status_t
 WebAppInterface::CreateUserRating(const BString& packageName,
+	const BPackageVersion& version,
 	const BString& architecture, const BString& repositoryCode,
 	const BString& languageCode, const BString& comment,
 	const BString& stability, int rating, BMessage& message)
 {
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "createUserRating")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("pkgName", packageName)
-				.AddValue("pkgVersionArchitectureCode", architecture)
-				.AddValue("pkgVersionType", "LATEST")
-				.AddValue("userNickname", fUsername)
-				.AddValue("rating", rating)
-				.AddValue("userRatingStabilityCode", stability, true)
-				.AddValue("comment", comment)
-				.AddValue("repositoryCode", repositoryCode)
-				.AddValue("naturalLanguageCode", languageCode)
-			.EndObject()
-		.EndArray()
-	.End();
+		// BHttpRequest later takes ownership of this.
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	return _SendJsonRequest("userrating", jsonString, NEEDS_AUTHORIZATION,
-		message);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"createUserRating");
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+
+	requestEnvelopeWriter.WriteObjectStart();
+	requestEnvelopeWriter.WriteObjectName("pkgName");
+	requestEnvelopeWriter.WriteString(packageName.String());
+	requestEnvelopeWriter.WriteObjectName("pkgVersionArchitectureCode");
+	requestEnvelopeWriter.WriteString(architecture.String());
+	requestEnvelopeWriter.WriteObjectName("repositoryCode");
+	requestEnvelopeWriter.WriteString(repositoryCode.String());
+	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
+	requestEnvelopeWriter.WriteString(languageCode.String());
+	requestEnvelopeWriter.WriteObjectName("pkgVersionType");
+	requestEnvelopeWriter.WriteString("SPECIFIC");
+	requestEnvelopeWriter.WriteObjectName("userNickname");
+	requestEnvelopeWriter.WriteString(fUsername.String());
+
+	if (!version.Major().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionMajor");
+		requestEnvelopeWriter.WriteString(version.Major());
+	}
+
+	if (!version.Minor().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionMinor");
+		requestEnvelopeWriter.WriteString(version.Minor());
+	}
+
+	if (!version.Micro().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionMicro");
+		requestEnvelopeWriter.WriteString(version.Micro());
+	}
+
+	if (!version.PreRelease().IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionPreRelease");
+		requestEnvelopeWriter.WriteString(version.PreRelease());
+	}
+
+	if (version.Revision() != 0) {
+		requestEnvelopeWriter.WriteObjectName("pkgVersionRevision");
+		requestEnvelopeWriter.WriteInteger(version.Revision());
+	}
+
+	if (rating > 0.0f) {
+		requestEnvelopeWriter.WriteObjectName("rating");
+    	requestEnvelopeWriter.WriteInteger(rating);
+	}
+
+	if (stability.Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("userRatingStabilityCode");
+		requestEnvelopeWriter.WriteString(stability);
+	}
+
+	if (comment.Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("comment");
+		requestEnvelopeWriter.WriteString(comment.String());
+	}
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("userrating", requestEnvelopeData,
+		requestEnvelopeData->Position(), NEEDS_AUTHORIZATION, message);
 }
 
 
@@ -421,31 +505,56 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 	const BString& languageCode, const BString& comment,
 	const BString& stability, int rating, bool active, BMessage& message)
 {
-	BString jsonString = JsonBuilder()
-		.AddValue("jsonrpc", "2.0")
-		.AddValue("id", ++fRequestIndex)
-		.AddValue("method", "updateUserRating")
-		.AddArray("params")
-			.AddObject()
-				.AddValue("code", ratingID)
-				.AddValue("rating", rating)
-				.AddValue("userRatingStabilityCode", stability, true)
-				.AddValue("comment", comment)
-				.AddValue("naturalLanguageCode", languageCode)
-				.AddValue("active", active)
-				.AddArray("filter")
-					.AddItem("ACTIVE")
-					.AddItem("NATURALLANGUAGE")
-					.AddItem("USERRATINGSTABILITY")
-					.AddItem("COMMENT")
-					.AddItem("RATING")
-				.EndArray()
-			.EndObject()
-		.EndArray()
-	.End();
+		// BHttpRequest later takes ownership of this.
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
 
-	return _SendJsonRequest("userrating", jsonString, NEEDS_AUTHORIZATION,
-		message);
+	requestEnvelopeWriter.WriteObjectStart();
+	_WriteStandardJsonRpcEnvelopeValues(requestEnvelopeWriter,
+		"updateUserRating");
+
+	requestEnvelopeWriter.WriteObjectName("params");
+	requestEnvelopeWriter.WriteArrayStart();
+
+	requestEnvelopeWriter.WriteObjectStart();
+
+	requestEnvelopeWriter.WriteObjectName("code");
+	requestEnvelopeWriter.WriteString(ratingID.String());
+	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
+	requestEnvelopeWriter.WriteString(languageCode.String());
+	requestEnvelopeWriter.WriteObjectName("active");
+	requestEnvelopeWriter.WriteBoolean(active);
+
+	requestEnvelopeWriter.WriteObjectName("filter");
+	requestEnvelopeWriter.WriteArrayStart();
+	requestEnvelopeWriter.WriteString("ACTIVE");
+	requestEnvelopeWriter.WriteString("NATURALLANGUAGE");
+	requestEnvelopeWriter.WriteString("USERRATINGSTABILITY");
+	requestEnvelopeWriter.WriteString("COMMENT");
+	requestEnvelopeWriter.WriteString("RATING");
+	requestEnvelopeWriter.WriteArrayEnd();
+
+	if (rating >= 0) {
+		requestEnvelopeWriter.WriteObjectName("rating");
+		requestEnvelopeWriter.WriteInteger(rating);
+	}
+
+	if (stability.Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("userRatingStabilityCode");
+		requestEnvelopeWriter.WriteString(stability);
+	}
+
+	if (comment.Length() > 0) {
+		requestEnvelopeWriter.WriteObjectName("comment");
+		requestEnvelopeWriter.WriteString(comment);
+	}
+
+	requestEnvelopeWriter.WriteObjectEnd();
+	requestEnvelopeWriter.WriteArrayEnd();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("userrating", requestEnvelopeData,
+		requestEnvelopeData->Position(), NEEDS_AUTHORIZATION, message);
 }
 
 
@@ -555,7 +664,43 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 }
 
 
+/*! JSON-RPC invocations return a response.  The response may be either
+    a result or it may be an error depending on the response structure.
+    If it is an error then there may be additional detail that is the
+    error code and message.  This method will extract the error code
+    from the response.  This method will return 0 if the payload does
+    not look like an error.
+*/
+
+int32
+WebAppInterface::ErrorCodeFromResponse(BMessage& response)
+{
+	BMessage error;
+	double code;
+
+	if (response.FindMessage("error", &error) == B_OK
+		&& error.FindDouble("code", &code) == B_OK) {
+		return (int32) code;
+	}
+
+	return 0;
+}
+
+
 // #pragma mark - private
+
+
+void
+WebAppInterface::_WriteStandardJsonRpcEnvelopeValues(BJsonWriter& writer,
+	const char* methodName)
+{
+	writer.WriteObjectName("jsonrpc");
+	writer.WriteString("2.0");
+	writer.WriteObjectName("id");
+	writer.WriteInteger(++fRequestIndex);
+	writer.WriteObjectName("method");
+	writer.WriteString(methodName);
+}
 
 
 status_t
@@ -658,10 +803,10 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	if (Logger::IsTraceEnabled())
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
+	// gets 'adopted' by the subsequent http request.
 	BMemoryIO* data = new BMemoryIO(
 		jsonString.String(), jsonString.Length() - 1);
 
 	return _SendJsonRequest(domain, data, jsonString.Length() - 1, flags,
 		reply);
 }
-

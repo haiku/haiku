@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -10,12 +11,15 @@
 
 #include <LayoutUtils.h>
 
+#include "HaikuDepotConstants.h"
+
 
 RatingView::RatingView(const char* name)
 	:
 	BView(name, B_WILL_DRAW),
-	fStarBitmap(501),
-	fRating(-1.0f)
+	fStarBlueBitmap(RSRC_STAR_BLUE),
+	fStarGrayBitmap(RSRC_STAR_GREY),
+	fRating(RATING_MISSING)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(ViewUIColor());
@@ -33,16 +37,26 @@ RatingView::AttachedToWindow()
 	AdoptParentColors();
 }
 
+/*! This method will return a star image that can be used repeatedly in the
+    user interface in order to signify the rating given by a user.  It could
+    be grey if no rating is assigned.
+*/
+
+const BBitmap*
+RatingView::StarBitmap()
+{
+	if (fRating < RATING_MIN)
+		return fStarGrayBitmap.Bitmap(SharedBitmap::SIZE_16);
+	return fStarBlueBitmap.Bitmap(SharedBitmap::SIZE_16);
+}
+
 
 void
 RatingView::Draw(BRect updateRect)
 {
 	FillRect(updateRect, B_SOLID_LOW);
+	const BBitmap* star = StarBitmap();
 
-	if (fRating < 0.0f)
-		return;
-
-	const BBitmap* star = fStarBitmap.Bitmap(SharedBitmap::SIZE_16);
 	if (star == NULL) {
 		fprintf(stderr, "No star icon found in application resources.\n");
 		return;
@@ -56,21 +70,20 @@ RatingView::Draw(BRect updateRect)
 		x += 16 + 2;
 	}
 
-	if (fRating >= 5.0f)
-		return;
+	if (fRating >= RATING_MIN && fRating < 5.0f) {
+		SetDrawingMode(B_OP_OVER);
 
-	SetDrawingMode(B_OP_OVER);
+		BRect rect(Bounds());
+		rect.right = x - 2;
+		rect.left = ceilf(rect.left + (fRating / 5.0f) * rect.Width());
 
-	BRect rect(Bounds());
-	rect.right = x - 2;
-	rect.left = ceilf(rect.left + (fRating / 5.0f) * rect.Width());
+		rgb_color color = LowColor();
+		color.alpha = 190;
+		SetHighColor(color);
 
-	rgb_color color = LowColor();
-	color.alpha = 190;
-	SetHighColor(color);
-
-	SetDrawingMode(B_OP_ALPHA);
-	FillRect(rect, B_SOLID_HIGH);
+		SetDrawingMode(B_OP_ALPHA);
+		FillRect(rect, B_SOLID_HIGH);
+	}
 }
 
 

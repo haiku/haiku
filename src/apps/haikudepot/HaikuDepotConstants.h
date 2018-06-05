@@ -2,7 +2,8 @@
  * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
+#ifndef HAIKU_DEPOT_CONSTANTS_H
+#define HAIKU_DEPOT_CONSTANTS_H
 
 enum {
 	MSG_MAIN_WINDOW_CLOSED		= 'mwcl',
@@ -12,7 +13,16 @@ enum {
 	MSG_ADD_VISIBLE_PACKAGES	= 'avpk',
 	MSG_UPDATE_SELECTED_PACKAGE	= 'uspk',
 	MSG_CLIENT_TOO_OLD			= 'oldc',
+	MSG_NETWORK_TRANSPORT_ERROR	= 'nett',
+	MSG_SERVER_ERROR			= 'svre',
+	MSG_SERVER_DATA_CHANGED		= 'svdc',
+	MSG_DID_ADD_USER_RATING		= 'adur',
+	MSG_DID_UPDATE_USER_RATING	= 'upur'
 };
+
+
+#define RATING_MISSING	-1.0f
+#define RATING_MIN	0.0f
 
 
 #define HD_ERROR_BASE					(B_ERRORS_END + 1)
@@ -20,3 +30,15 @@ enum {
 #define HD_CLIENT_TOO_OLD				(HD_ERROR_BASE + 2)
 #define HD_ERR_NOT_MODIFIED				(HD_ERROR_BASE + 3)
 #define HD_ERR_NO_DATA					(HD_ERROR_BASE + 4)
+
+
+// These constants reference resources in 'HaikuDepot.ref'
+enum {
+	RSRC_STAR_BLUE		= 510,
+	RSRC_STAR_GREY		= 520,
+	RSRC_INSTALLED		= 530,
+	RSRC_ARROW_LEFT		= 540,
+	RSRC_ARROW_RIGHT	= 550,
+};
+
+#endif // HAIKU_DEPOT_CONSTANTS_H

@@ -57,6 +57,8 @@ private:
 	virtual	Model*				GetModel();
 
 private:
+			bool				_SelectedPackageHasWebAppRepositoryCode();
+
 			void				_BuildMenu(BMenuBar* menuBar);
 			void				_BuildUserMenu(BMenuBar* menuBar);
 
@@ -73,6 +75,7 @@ private:
 			void				_RefreshRepositories(bool force);
 			void				_RefreshPackageList(bool force);
 
+			void				_PopulatePackageAsync(bool forcePopulate);
 			void				_StartRefreshWorker(bool force = false);
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PackageActionWorker(void* arg);
@@ -127,6 +130,7 @@ private:
 
 			thread_id			fPopulatePackageWorker;
 			PackageInfoRef		fPackageToPopulate;
+			bool				fForcePopulatePackage;
 			BLocker				fPackageToPopulateLock;
 			sem_id				fPackageToPopulateSem;
 

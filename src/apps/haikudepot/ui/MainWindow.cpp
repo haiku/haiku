@@ -390,6 +390,26 @@ MainWindow::MessageReceived(BMessage* message)
 			_AdoptModel();
 			break;
 
+			// this may be triggered by, for example, a user rating being added
+			// or having been altered.
+		case MSG_SERVER_DATA_CHANGED:
+		{
+			BString name;
+			if (message->FindString("name", &name) == B_OK) {
+				BAutolock locker(fModel.Lock());
+				if (fPackageInfoView->Package()->Name() == name) {
+					_PopulatePackageAsync(true);
+				} else {
+					if (Logger::IsDebugEnabled()) {
+						printf("pkg [%s] is updated on the server, but is "
+							"not selected so will not be updated.\n",
+							name.String());
+					}
+				}
+			}
+        	break;
+        }
+
 		case MSG_PACKAGE_SELECTED:
 		{
 			BString name;
@@ -624,8 +644,8 @@ MainWindow::StoreSettings(BMessage& settings) const
 void
 MainWindow::PackageChanged(const PackageInfoEvent& event)
 {
-	uint32 whatchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_PROMINENCE;
-	if ((event.Changes() & whatchedChanges) != 0) {
+	uint32 watchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_PROMINENCE;
+	if ((event.Changes() & watchedChanges) != 0) {
 		PackageInfoRef ref(event.Package());
 		BMessage message(MSG_PACKAGE_CHANGED);
 		message.AddPointer("package", ref.Get());
@@ -850,12 +870,7 @@ MainWindow::_AdoptPackage(const PackageInfoRef& package)
 			fPackageListView->SelectPackage(package);
 	}
 
-	// Trigger asynchronous package population from the web-app
-	{
-		AutoLocker<BLocker> lock(&fPackageToPopulateLock);
-		fPackageToPopulate = package;
-	}
-	release_sem_etc(fPackageToPopulateSem, 1, 0);
+	_PopulatePackageAsync(false);
 }
 
 
@@ -1255,6 +1270,34 @@ MainWindow::_PackageActionWorker(void* arg)
 }
 
 
+/*! This method will cause the package to have its data refreshed from
+    the server application.  The refresh happens in the background; this method
+    is asynchronous.
+*/
+
+void
+MainWindow::_PopulatePackageAsync(bool forcePopulate)
+{
+		// Trigger asynchronous package population from the web-app
+	{
+		AutoLocker<BLocker> lock(&fPackageToPopulateLock);
+		fPackageToPopulate = fPackageInfoView->Package();
+		fForcePopulatePackage = forcePopulate;
+	}
+	release_sem_etc(fPackageToPopulateSem, 1, 0);
+
+	if (Logger::IsDebugEnabled()) {
+		printf("pkg [%s] will be updated from the server.\n",
+			fPackageToPopulate->Name().String());
+	}
+}
+
+
+/*! This method will run in the background.  The thread will block until there
+    is a package to be updated.  When the thread unblocks, it will update the
+    package with information from the server.
+*/
+
 status_t
 MainWindow::_PopulatePackageWorker(void* arg)
 {
@@ -1262,15 +1305,27 @@ MainWindow::_PopulatePackageWorker(void* arg)
 
 	while (acquire_sem(window->fPackageToPopulateSem) == B_OK) {
 		PackageInfoRef package;
+		bool force;
 		{
 			AutoLocker<BLocker> lock(&window->fPackageToPopulateLock);
 			package = window->fPackageToPopulate;
+			force = window->fForcePopulatePackage;
 		}
 
 		if (package.Get() != NULL) {
-			window->fModel.PopulatePackage(package,
-				Model::POPULATE_USER_RATINGS | Model::POPULATE_SCREEN_SHOTS
-					| Model::POPULATE_CHANGELOG);
+			uint32 populateFlags = Model::POPULATE_USER_RATINGS
+				| Model::POPULATE_SCREEN_SHOTS
+				| Model::POPULATE_CHANGELOG;
+
+			if (force)
+				populateFlags |= Model::POPULATE_FORCE;
+
+			window->fModel.PopulatePackage(package, populateFlags);
+
+			if (Logger::IsDebugEnabled()) {
+				printf("populating package [%s]\n",
+					package->Name().String());
+			}
 		}
 	}
 
@@ -1435,9 +1490,35 @@ MainWindow::_UpdateAvailableRepositories()
 }
 
 
+bool
+MainWindow::_SelectedPackageHasWebAppRepositoryCode()
+{
+	const PackageInfoRef& package = fPackageInfoView->Package();
+	const DepotInfo* depot = fModel.DepotForName(package->DepotName());
+
+	BString repositoryCode;
+
+	if (depot != NULL)
+		repositoryCode = depot->WebAppRepositoryCode();
+
+	return !repositoryCode.IsEmpty();
+}
+
+
 void
 MainWindow::_RatePackage()
 {
+	if (!_SelectedPackageHasWebAppRepositoryCode()) {
+		BAlert* alert = new(std::nothrow) BAlert(
+			B_TRANSLATE("rating_not_possible"),
+			B_TRANSLATE("Because there is no representation for this package "
+				"on the HaikuDepot server system, it is not possible to create "
+				"a new rating or edit an existing rating."),
+			B_TRANSLATE("OK"));
+		alert->Go();
+    	return;
+	}
+
 	if (fModel.Username().IsEmpty()) {
 		BAlert* alert = new(std::nothrow) BAlert(
 			B_TRANSLATE("Not logged in"),

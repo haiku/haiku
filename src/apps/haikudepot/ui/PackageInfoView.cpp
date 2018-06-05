@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +16,7 @@
 #include <CardLayout.h>
 #include <Catalog.h>
 #include <ColumnListView.h>
+#include <DateFormat.h>
 #include <Font.h>
 #include <GridView.h>
 #include <LayoutBuilder.h>
@@ -724,7 +726,6 @@ public:
 		fWebsiteLinkView->SetViewUIColor(ViewUIColor(), kContentTint);
 
 		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
-//			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.AddGroup(leftGroup, 1.0f)
 				.Add(fScreenshotView)
 				.AddGroup(B_HORIZONTAL)
@@ -867,98 +868,71 @@ private:
 
 class RatingItemView : public BGroupView {
 public:
-	RatingItemView(const UserRating& rating, const BitmapRef& voteUpIcon,
-		const BitmapRef& voteDownIcon)
+	RatingItemView(const UserRating& rating)
 		:
 		BGroupView(B_HORIZONTAL, 0.0f)
 	{
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
-		fAvatarView = new BitmapView("avatar view");
-		if (rating.User().Avatar().Get() != NULL) {
-			fAvatarView->SetBitmap(rating.User().Avatar(),
-				SharedBitmap::SIZE_16);
+		BLayoutBuilder::Group<BLayoutBuilder::Group<void*> > verticalGroup =
+			BLayoutBuilder::Group<>(this)
+				.AddGroup(B_VERTICAL, 0.0f);
+
+		{
+			BStringView* userNicknameView = new BStringView("user-nickname",
+				rating.User().NickName());
+			userNicknameView->SetFont(be_bold_font);
+			verticalGroup.Add(userNicknameView);
 		}
-		fAvatarView->SetExplicitMinSize(BSize(16.0f, 16.0f));
 
-		fNameView = new BStringView("user name", rating.User().NickName());
+		BLayoutBuilder::Group<BLayoutBuilder::Group<
+			BLayoutBuilder::Group<void *> > > ratingGroup =
+				verticalGroup.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING);
 
-		BFont nameFont(be_bold_font);
-		nameFont.SetSize(std::max(9.0f, floorf(nameFont.Size() * 0.9f)));
-		fNameView->SetFont(&nameFont);
-		fNameView->SetExplicitMaxSize(
-			BSize(nameFont.StringWidth("xxxxxxxxxxxxxxxxxxxxxx"), B_SIZE_UNSET));
+		if (rating.Rating() >= 0) {
+			RatingView* ratingView = new RatingView("package rating view");
+			ratingView->SetRating(rating.Rating());
+			ratingGroup.Add(ratingView);
+		}
 
-		fRatingView = new RatingView("package rating view");
-		fRatingView->SetRating(rating.Rating());
+		{
+			BDateFormat dateFormat;
+			BString createTimestampPresentation;
 
-		BString ratingLabel;
-		if (rating.Rating() >= 0.0f)
-			ratingLabel.SetToFormat("%.1f", rating.Rating());
-		fRatingLabelView = new BStringView("rating label", ratingLabel);
+			dateFormat.Format(createTimestampPresentation,
+				rating.CreateTimestamp().Date(), B_MEDIUM_DATE_FORMAT);
 
-		BString versionLabel(B_TRANSLATE("for %Version%"));
-		versionLabel.ReplaceAll("%Version%", rating.PackageVersion());
-		fPackageVersionView = new BStringView("package version",
-			versionLabel);
-		BFont versionFont(be_plain_font);
-		versionFont.SetSize(std::max(9.0f, floorf(versionFont.Size() * 0.85f)));
-		fPackageVersionView->SetFont(&versionFont);
+			BString ratingContextDescription(
+				B_TRANSLATE("%hd.timestamp% (version %hd.version%)"));
+			ratingContextDescription.ReplaceAll("%hd.timestamp%",
+				createTimestampPresentation);
+			ratingContextDescription.ReplaceAll("%hd.version%",
+				rating.PackageVersion());
 
-		// TODO: User rating IDs to identify which rating to vote up or down
-//		BMessage* voteUpMessage = new BMessage(MSG_VOTE_UP);
-//		voteUpMessage->AddInt32("rating id", -1);
-//		BMessage* voteDownMessage = new BMessage(MSG_VOTE_DOWN);
-//		voteDownMessage->AddInt32("rating id", -1);
-//
-//		fVoteUpIconView = new BitmapButton("vote up icon", voteUpMessage);
-//		fUpVoteCountView = new BStringView("up vote count", "");
-//		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
-//		fDownVoteCountView = new BStringView("up vote count", "");
-//
-//		fVoteUpIconView->SetBitmap(voteUpIcon, SharedBitmap::SIZE_16);
-//		fVoteDownIconView->SetBitmap(voteDownIcon, SharedBitmap::SIZE_16);
-//
-//		fUpVoteCountView->SetFont(&versionFont);
-//		fUpVoteCountView->SetHighColor(kLightBlack);
-//		fDownVoteCountView->SetFont(&versionFont);
-//		fDownVoteCountView->SetHighColor(kLightBlack);
-//
-//		BString voteCountLabel;
-//		voteCountLabel.SetToFormat("%" B_PRId32, rating.UpVotes());
-//		fUpVoteCountView->SetText(voteCountLabel);
-//		voteCountLabel.SetToFormat("%" B_PRId32, rating.DownVotes());
-//		fDownVoteCountView->SetText(voteCountLabel);
+			BStringView* ratingContextView = new BStringView("rating-context",
+				ratingContextDescription);
+			BFont versionFont(be_plain_font);
+			ratingContextView->SetFont(&versionFont);
+			ratingGroup.Add(ratingContextView);
+		}
 
-		fTextView = new TextView("rating text");
-		ParagraphStyle paragraphStyle(fTextView->ParagraphStyle());
-		paragraphStyle.SetJustify(true);
-		fTextView->SetParagraphStyle(paragraphStyle);
+		ratingGroup.AddGlue();
+		ratingGroup.End();
 
-		fTextView->SetText(rating.Comment());
+		if (rating.Comment() > 0) {
+			TextView* textView = new TextView("rating-text");
+			ParagraphStyle paragraphStyle(textView->ParagraphStyle());
+			paragraphStyle.SetJustify(true);
+			textView->SetParagraphStyle(paragraphStyle);
+			textView->SetText(rating.Comment());
+			verticalGroup.AddStrut(8.0f);
+			verticalGroup.Add(textView);
+			verticalGroup.AddStrut(8.0f);
+		}
 
-		BLayoutBuilder::Group<>(this)
-			.Add(fAvatarView, 0.2f)
-			.AddGroup(B_VERTICAL, 0.0f)
-				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-					.Add(fNameView)
-					.Add(fRatingView)
-					.Add(fRatingLabelView)
-					.AddGlue(0.1f)
-					.Add(fPackageVersionView)
-					.AddGlue(5.0f)
-//					.AddGroup(B_HORIZONTAL, 0.0f, 0.0f)
-//						.Add(fVoteUpIconView)
-//						.Add(fUpVoteCountView)
-//						.AddStrut(B_USE_HALF_ITEM_SPACING)
-//						.Add(fVoteDownIconView)
-//						.Add(fDownVoteCountView)
-//					.End()
-				.End()
-				.Add(fTextView)
+		verticalGroup
 			.End()
-			.SetInsets(B_USE_DEFAULT_SPACING)
-		;
+			.SetInsets(B_USE_DEFAULT_SPACING);
 
 		SetFlags(Flags() | B_WILL_DRAW);
 	}
@@ -976,19 +950,6 @@ public:
 		StrokeLine(Bounds().LeftBottom(), Bounds().RightBottom());
 	}
 
-private:
-	BitmapView*		fAvatarView;
-	BStringView*	fNameView;
-	RatingView*		fRatingView;
-	BStringView*	fRatingLabelView;
-	BStringView*	fPackageVersionView;
-
-//	BitmapView*		fVoteUpIconView;
-//	BStringView*	fUpVoteCountView;
-//	BitmapView*		fVoteDownIconView;
-//	BStringView*	fDownVoteCountView;
-
-	TextView*		fTextView;
 };
 
 
@@ -1062,9 +1023,7 @@ class UserRatingsView : public BGroupView {
 public:
 	UserRatingsView()
 		:
-		BGroupView("package ratings view", B_HORIZONTAL),
-		fThumbsUpIcon(BitmapRef(new SharedBitmap(502), true)),
-		fThumbsDownIcon(BitmapRef(new SharedBitmap(503), true))
+		BGroupView("package ratings view", B_HORIZONTAL)
 	{
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
@@ -1077,6 +1036,8 @@ public:
 
 		BScrollView* scrollView = new RatingsScrollView(
 			"ratings scroll view", ratingsContainerView);
+		scrollView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+			B_SIZE_UNLIMITED));
 
 		BLayoutBuilder::Group<>(this)
 			.AddGroup(B_VERTICAL)
@@ -1084,6 +1045,7 @@ public:
 				.AddGlue()
 				.SetInsets(0.0f, B_USE_DEFAULT_SPACING, 0.0f, 0.0f)
 			.End()
+			.AddStrut(64.0)
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
@@ -1122,15 +1084,10 @@ public:
 		// TODO: Sort by age or usefullness rating
 		for (int i = count - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
-			// Prevent ratings from showing that have a comment which
-			// is in another language
-			if (!rating.Comment().IsEmpty()
-				&& fPreferredLanguages.CountItems() > 0
-				&& !fPreferredLanguages.Contains(rating.Language())) {
-				continue;
-			}
-			RatingItemView* view = new RatingItemView(rating, fThumbsUpIcon,
-				fThumbsDownIcon);
+				// was previously filtering comments just for the current
+				// user's language, but as there are not so many comments at
+				// the moment, just show all of them for now.
+			RatingItemView* view = new RatingItemView(rating);
 			fRatingContainerLayout->AddView(0, view);
 		}
 	}
@@ -1181,8 +1138,6 @@ private:
 private:
 	BGroupLayout*			fRatingContainerLayout;
 	RatingSummaryView*		fRatingSummaryView;
-	BitmapRef				fThumbsUpIcon;
-	BitmapRef				fThumbsDownIcon;
 	StringList				fPreferredLanguages;
 };
 
@@ -1517,4 +1472,3 @@ PackageInfoView::Clear()
 
 	fPackage.Unset();
 }
-

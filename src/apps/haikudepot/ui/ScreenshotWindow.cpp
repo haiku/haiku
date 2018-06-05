@@ -17,6 +17,7 @@
 
 #include "BarberPole.h"
 #include "BitmapView.h"
+#include "HaikuDepotConstants.h"
 #include "WebAppInterface.h"
 
 
@@ -29,9 +30,9 @@ static const rgb_color kBackgroundColor = { 51, 102, 152, 255 };
 	// transparent regions
 
 static BitmapRef sNextButtonIcon(
-	new(std::nothrow) SharedBitmap(505), true);
+	new(std::nothrow) SharedBitmap(RSRC_ARROW_LEFT), true);
 static BitmapRef sPreviousButtonIcon(
-	new(std::nothrow) SharedBitmap(506), true);
+	new(std::nothrow) SharedBitmap(RSRC_ARROW_RIGHT), true);
 
 
 ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)

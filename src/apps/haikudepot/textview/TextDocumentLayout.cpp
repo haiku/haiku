@@ -25,9 +25,9 @@ public:
 
 	virtual	void TextChanged(const TextChangedEvent& event)
 	{
-		printf("TextChanged(%" B_PRIi32 ", %" B_PRIi32 ")\n",
-			event.FirstChangedParagraph(),
-			event.ChangedParagraphCount());
+//		printf("TextChanged(%" B_PRIi32 ", %" B_PRIi32 ")\n",
+//			event.FirstChangedParagraph(),
+//			event.ChangedParagraphCount());
 		// TODO: The event does not contain useful data. Make the event
 		// system work so only the affected paragraphs are updated.
 		// I think we need "first affected", "last affected" (both relative

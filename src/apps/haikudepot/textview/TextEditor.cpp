@@ -257,8 +257,6 @@ TextEditor::Insert(int32 offset, const BString& string)
 
 	if (ret == B_OK) {
 		_SetCaretOffset(offset + string.CountChars(), true, false, true);
-
-		fDocument->PrintToStream();
 	}
 
 	return ret;
@@ -275,8 +273,6 @@ TextEditor::Remove(int32 offset, int32 length)
 
 	if (ret == B_OK) {
 		_SetCaretOffset(offset, true, false, true);
-
-		fDocument->PrintToStream();
 	}
 
 	return ret;
@@ -293,8 +289,6 @@ TextEditor::Replace(int32 offset, int32 length, const BString& string)
 
 	if (ret == B_OK) {
 		_SetCaretOffset(offset + string.CountChars(), true, false, true);
-
-		fDocument->PrintToStream();
 	}
 
 	return ret;
