@@ -130,7 +130,8 @@ protected:
 			void				_UpdatePreview();
 			void				_UpdateButtons();
 			void				_SetDesktop(bool isDesktop);
-			int32				_AddPath(BPath path);
+			void				_AddRecentFolder(BPath path,
+									bool notifyApp = false);
 
 	static	int32				_NotifyThread(void* data);
 
@@ -159,7 +160,7 @@ protected:
 
 			entry_ref			fCurrentRef;
 			int32				fLastImageIndex;
-			int32				fLastWorkspaceIndex;
+			int32				fRecentFoldersLimit;
 			BMessage			fSettings;
 
 			BObjectList<BPath>	fPathList;
