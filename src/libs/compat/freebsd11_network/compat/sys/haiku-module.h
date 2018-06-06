@@ -205,10 +205,13 @@ extern void __haiku_reenable_interrupts(device_t dev);
 extern int __haiku_driver_requirements;
 
 enum {
-	FBSD_TASKQUEUES		= 1 << 0,
-	FBSD_FAST_TASKQUEUE	= 1 << 1,
-	FBSD_SWI_TASKQUEUE	= 1 << 2,
-	FBSD_WLAN			= 1 << 3,
+	FBSD_TASKQUEUES			= 1 << 0,
+	FBSD_FAST_TASKQUEUE		= 1 << 1,
+	FBSD_SWI_TASKQUEUE		= 1 << 2,
+	FBSD_THREAD_TASKQUEUE	= 1 << 3,
+	FBSD_WLAN_FEATURE		= 1 << 4,
+	FBSD_WLAN				= FBSD_WLAN_FEATURE | FBSD_TASKQUEUES
+								| FBSD_THREAD_TASKQUEUE,
 };
 
 #define HAIKU_DRIVER_REQUIREMENTS(flags) \

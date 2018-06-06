@@ -76,8 +76,15 @@ sysctl_ctx_free(struct sysctl_ctx_list *clist)
 }
 
 
+static inline int
+sysctl_wire_old_buffer(struct sysctl_req *req, size_t len)
+{
+	return -1;
+}
+
+
 static inline void *
-sysctl_add_oid(struct sysctl_ctx_list *clist, void *parent, int nbr, 
+sysctl_add_oid(struct sysctl_ctx_list *clist, void *parent, int nbr,
 	const char *name, int kind, void *arg1, int arg2,
 	int (*handler) (SYSCTL_HANDLER_ARGS), const char *fmt, const char *descr)
 {

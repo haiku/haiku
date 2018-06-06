@@ -336,7 +336,25 @@ init_taskqueues()
 			goto err_2;
 	}
 
+	if (HAIKU_DRIVER_REQUIRES(FBSD_THREAD_TASKQUEUE)) {
+		taskqueue_thread = taskqueue_create_fast("thread taskq", 0,
+			taskqueue_thread_enqueue, &taskqueue_thread);
+		if (taskqueue_thread == NULL) {
+			status = B_NO_MEMORY;
+			goto err_2;
+		}
+
+		status = taskqueue_start_threads(&taskqueue_thread, 1,
+			B_REAL_TIME_PRIORITY, "swi taskq");
+		if (status < B_OK)
+			goto err_3;
+	}
+
 	return B_OK;
+
+err_3:
+	if (taskqueue_thread)
+		taskqueue_free(taskqueue_thread);
 
 err_2:
 	if (taskqueue_swi)
@@ -353,6 +371,9 @@ err_1:
 void
 uninit_taskqueues()
 {
+	if (HAIKU_DRIVER_REQUIRES(FBSD_THREAD_TASKQUEUE))
+		taskqueue_free(taskqueue_thread);
+
 	if (HAIKU_DRIVER_REQUIRES(FBSD_SWI_TASKQUEUE))
 		taskqueue_free(taskqueue_swi);
 

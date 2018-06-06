@@ -33,6 +33,7 @@ void taskqueue_thread_enqueue(void *context);
 
 extern struct taskqueue *taskqueue_fast;
 extern struct taskqueue *taskqueue_swi;
+extern struct taskqueue *taskqueue_thread;
 
 int taskqueue_enqueue_fast(struct taskqueue *queue, struct task *task);
 struct taskqueue *taskqueue_create_fast(const char *name, int mflags,

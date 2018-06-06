@@ -39,6 +39,7 @@ extern struct mtx Giant;
 
 
 void mtx_init(struct mtx*, const char*, const char*, int);
+void mtx_sysinit(void *arg);
 void mtx_destroy(struct mtx*);
 
 
@@ -87,6 +88,24 @@ mtx_owned(struct mtx* mutex)
 
 	return 0;
 }
+
+
+struct mtx_args {
+	void		*ma_mtx;
+	const char 	*ma_desc;
+	int		 ma_opts;
+};
+
+#define	MTX_SYSINIT(name, mtx, desc, opts)				\
+	static struct mtx_args name##_args = {				\
+		(mtx),							\
+		(desc),							\
+		(opts)							\
+	};								\
+	SYSINIT(name##_mtx_sysinit, SI_SUB_LOCK, SI_ORDER_MIDDLE,	\
+	    mtx_sysinit, &name##_args);					\
+	SYSUNINIT(name##_mtx_sysuninit, SI_SUB_LOCK, SI_ORDER_MIDDLE,	\
+	    mtx_destroy, __DEVOLATILE(void *, &(mtx)->mtx_lock))
 
 
 #endif	/* _FBSD_COMPAT_SYS_MUTEX_H_ */

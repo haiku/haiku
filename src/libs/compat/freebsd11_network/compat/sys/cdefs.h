@@ -160,7 +160,7 @@
 #define	__offsetof(type, field)	((size_t)(&((type *)0)->field))
 #else
 #define __offsetof(type, field)					\
-  (__offsetof__ (reinterpret_cast <size_t>			\
+  ((reinterpret_cast <size_t>			\
                  (&reinterpret_cast <const volatile char &>	\
                   (static_cast<type *> (0)->field))))
 #endif
@@ -305,6 +305,10 @@
 
 #ifndef	__UNCONST
 #define	__UNCONST(var)	((void*)(uintptr_t)(const void *)(var))
+#endif
+
+#ifndef	__DEVOLATILE
+#define	__DEVOLATILE(type, var)	((type)(__uintptr_t)(volatile void *)(var))
 #endif
 
 #if __GNUC_PREREQ__(4,6) && !defined(__cplusplus)

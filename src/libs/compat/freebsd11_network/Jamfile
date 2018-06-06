@@ -41,6 +41,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 	mutex.c
 	priv.cpp
 	smp.c
+	subr_autoconf.cpp
 	synch.c
 	systm.c
 	taskqueue.c

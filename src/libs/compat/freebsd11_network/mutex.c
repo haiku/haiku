@@ -34,6 +34,16 @@ mtx_init(struct mtx *mutex, const char *name, const char *type,
 
 
 void
+mtx_sysinit(void *arg)
+{
+	struct mtx_args *margs = arg;
+
+	mtx_init((struct mtx *)margs->ma_mtx, margs->ma_desc, NULL,
+	    margs->ma_opts);
+}
+
+
+void
 mtx_destroy(struct mtx *mutex)
 {
 	if ((mutex->type & MTX_RECURSE) != 0)
