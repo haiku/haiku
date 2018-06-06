@@ -120,8 +120,6 @@ const struct supported_device {
 	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
-	{0x1604, 0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
-
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
 	{0x0f00, 0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
 	{0x0f00, 0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
@@ -129,6 +127,8 @@ const struct supported_device {
 	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+
+	{0x1604, 0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
 
 	// XXX: 0x1904 only confirmed on 0x1916
 	{0x1904, 0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
