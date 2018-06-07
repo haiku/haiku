@@ -170,21 +170,19 @@ Grepper::_WriterThread()
 	BMessage message;
 	char fileName[B_PATH_NAME_LENGTH*2];
 	int count = 0;
+	bigtime_t lastProgressReportTime = 0, now;
 
 	printf("paths_writer started.\n");
 
 	while (!fMustQuit && fIterator->GetNextName(fileName)) {
-
-		message.MakeEmpty();
-		message.what = MSG_REPORT_FILE_NAME;
-		message.AddString("filename", fileName);
-
 		BEntry entry(fileName);
 		entry_ref ref;
 		entry.GetRef(&ref);
 		if (!entry.Exists()) {
 			if (fIterator->NotifyNegatives()) {
+				message.MakeEmpty();
 				message.what = MSG_REPORT_RESULT;
+				message.AddString("filename", fileName);
 				message.AddRef("ref", &ref);
 				fTarget.SendMessage(&message);
 			}
@@ -202,14 +200,22 @@ Grepper::_WriterThread()
 			continue;
 		}
 
+		count++;
+
 		// file exists, send it to xargs
 		write(fXargsInput, fileName, strlen(fileName));
 		write(fXargsInput, "\n", 1);
-		// printf(">>>>>> %s\n", fileName);
 
-		fTarget.SendMessage(&message);
-
-		count++;
+		now = system_time();
+		// to avoid message flood,
+		// report progress no more than 20 times per second
+		if (now - lastProgressReportTime > 50000) {
+			message.MakeEmpty();
+			message.what = MSG_REPORT_FILE_NAME;
+			message.AddString("filename", fileName);
+			fTarget.SendMessage(&message);
+			lastProgressReportTime = now;
+		}
 	}
 
 	write(fXargsInput, kEOFTag, strlen(kEOFTag));
