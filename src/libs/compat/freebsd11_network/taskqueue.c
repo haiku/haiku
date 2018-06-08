@@ -38,6 +38,7 @@ struct taskqueue {
 
 struct taskqueue *taskqueue_fast = NULL;
 struct taskqueue *taskqueue_swi = NULL;
+struct taskqueue *taskqueue_thread = NULL;
 
 
 static struct taskqueue *
