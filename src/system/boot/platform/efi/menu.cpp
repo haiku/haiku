@@ -6,9 +6,11 @@
 
 #include <boot/menu.h>
 #include <boot/platform/generic/text_menu.h>
+#include <safemode.h>
 
 #include "efi_platform.h"
 #include "video.h"
+#include "smp.h"
 
 
 void
@@ -26,6 +28,30 @@ platform_add_menus(Menu *menu)
 			}
 
 			break;
+
+		case SAFE_MODE_MENU:
+			item = new(std::nothrow) MenuItem("Use fail-safe graphics driver");
+			if (item != NULL) {
+				menu->AddItem(item);
+				item->SetType(MENU_ITEM_MARKABLE);
+				item->SetData(B_SAFEMODE_FAIL_SAFE_VIDEO_MODE);
+				item->SetHelpText("The system will use VESA mode "
+					"and won't try to use any video graphics drivers.");
+			}
+
+			smp_add_safemode_menus(menu);
+
+			item = new(std::nothrow) MenuItem("Disable ACPI");
+			if (item != NULL) {
+				menu->AddItem(item);
+				item->SetType(MENU_ITEM_MARKABLE);
+				item->SetData(B_SAFEMODE_DISABLE_ACPI);
+				item->SetHelpText("Disables Advanced Configuration and Power "
+					"Interface hardware support, overriding the ACPI setting "
+					"in the kernel settings file.");
+			}
+			break;
+
 		default:
 			break;
 	}
