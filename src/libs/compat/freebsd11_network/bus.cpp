@@ -447,6 +447,15 @@ bus_bind_intr(device_t dev, struct resource *res, int cpu)
 	return 0;
 }
 
+
+int bus_describe_intr(device_t dev, struct resource *irq, void *cookie,
+	const char* fmt, ...)
+{
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
+
+
 //	#pragma mark - bus functions
 
 

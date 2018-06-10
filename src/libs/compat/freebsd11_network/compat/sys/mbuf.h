@@ -26,26 +26,44 @@
 
 #define MT_DATA		1
 
-#define M_EXT		0x00000001
-#define M_PKTHDR	0x00000002
-#define M_RDONLY	0x00000008
-#define M_PROTO1	0x00000010
-#define M_PROTO2	0x00000020
-#define M_PROTO3	0x00000040
-#define M_PROTO4	0x00000080
-#define M_PROTO5	0x00000100
-#define M_BCAST		0x00000200
-#define M_MCAST		0x00000400
-#define M_FRAG		0x00000800
-#define M_FIRSTFRAG	0x00001000
-#define M_LASTFRAG	0x00002000
-#define M_VLANTAG	0x00010000
-#define M_PROTO6	0x00080000
-#define M_PROTO7	0x00100000
-#define M_PROTO8	0x00200000
+/*
+ * mbuf flags of global significance and layer crossing.
+ * Those of only protocol/layer specific significance are to be mapped
+ * to M_PROTO[1-12] and cleared at layer handoff boundaries.
+ * NB: Limited to the lower 24 bits.
+ */
+#define	M_EXT		0x00000001 /* has associated external storage */
+#define	M_PKTHDR	0x00000002 /* start of record */
+#define	M_EOR		0x00000004 /* end of record */
+#define	M_RDONLY	0x00000008 /* associated data is marked read-only */
+#define	M_BCAST		0x00000010 /* send/received as link-level broadcast */
+#define	M_MCAST		0x00000020 /* send/received as link-level multicast */
+#define	M_PROMISC	0x00000040 /* packet was not for us */
+#define	M_VLANTAG	0x00000080 /* ether_vtag is valid */
+#define	M_UNUSED_8	0x00000100 /* --available-- */
+#define	M_NOFREE	0x00000200 /* do not free mbuf, embedded in cluster */
 
-#define M_COPYFLAGS (M_PKTHDR | M_RDONLY | M_BCAST | M_MCAST | M_FRAG \
-	| M_FIRSTFRAG | M_LASTFRAG | M_VLANTAG)
+#define	M_PROTO1	0x00001000 /* protocol-specific */
+#define	M_PROTO2	0x00002000 /* protocol-specific */
+#define	M_PROTO3	0x00004000 /* protocol-specific */
+#define	M_PROTO4	0x00008000 /* protocol-specific */
+#define	M_PROTO5	0x00010000 /* protocol-specific */
+#define	M_PROTO6	0x00020000 /* protocol-specific */
+#define	M_PROTO7	0x00040000 /* protocol-specific */
+#define	M_PROTO8	0x00080000 /* protocol-specific */
+#define	M_PROTO9	0x00100000 /* protocol-specific */
+#define	M_PROTO10	0x00200000 /* protocol-specific */
+#define	M_PROTO11	0x00400000 /* protocol-specific */
+#define	M_PROTO12	0x00800000 /* protocol-specific */
+
+#define	M_PROTOFLAGS \
+	(M_PROTO1|M_PROTO2|M_PROTO3|M_PROTO4|M_PROTO5|M_PROTO6|M_PROTO7|M_PROTO8|\
+	 M_PROTO9|M_PROTO10|M_PROTO11|M_PROTO12)
+	// Flags to purge when crossing layers.
+
+#define M_COPYFLAGS \
+	(M_PKTHDR|M_EOR|M_RDONLY|M_BCAST|M_MCAST|M_PROMISC|M_VLANTAG| \
+	 M_PROTOFLAGS)
 	// Flags preserved when copying m_pkthdr
 
 #define M_MOVE_PKTHDR(to, from)	m_move_pkthdr((to), (from))
@@ -160,6 +178,7 @@ struct mbuf {
 #define m_dat		M_dat.M_databuf
 
 
+void			m_catpkt(struct mbuf *m, struct mbuf *n);
 void			m_adj(struct mbuf*, int);
 void			m_align(struct mbuf*, int);
 int				m_append(struct mbuf*, int, c_caddr_t);
@@ -177,6 +196,9 @@ struct mbuf*	m_devget(char*, int, int, struct ifnet*,
 struct mbuf*	m_dup(struct mbuf*, int);
 int				m_dup_pkthdr(struct mbuf*, struct mbuf*, int);
 
+void			m_demote_pkthdr(struct mbuf *m);
+void			m_demote(struct mbuf *m0, int all, int flags);
+
 void			m_extadd(struct mbuf*, caddr_t, u_int, void(*) (void*, void*),
 	void*, void*, int, int);
 
@@ -184,6 +206,7 @@ u_int			m_fixhdr(struct mbuf*);
 struct mbuf*	m_free(struct mbuf*);
 void			m_freem(struct mbuf*);
 struct mbuf*	m_get(int, short);
+struct mbuf*	m_get2(int size, int how, short type, int flags);
 struct mbuf*	m_gethdr(int, short);
 struct mbuf*	m_getjcl(int, short, int, int);
 u_int			m_length(struct mbuf*, struct mbuf**);

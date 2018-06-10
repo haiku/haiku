@@ -10,11 +10,11 @@
 #include <util/list.h>
 
 
-typedef void (*task_handler_t)(void *context, int pending);
+typedef void (*task_fn_t)(void *context, int pending);
 
 struct task {
 	int ta_priority;
-	task_handler_t ta_handler;
+	task_fn_t ta_handler;
 	void *ta_argument;
 	int ta_pending;
 

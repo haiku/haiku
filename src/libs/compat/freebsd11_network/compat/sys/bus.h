@@ -109,6 +109,8 @@ int bus_setup_intr(device_t dev, struct resource *r, int flags,
 	driver_filter_t filter, driver_intr_t handler, void *arg, void **_cookie);
 int bus_teardown_intr(device_t dev, struct resource *r, void *cookie);
 int bus_bind_intr(device_t dev, struct resource *r, int cpu);
+int bus_describe_intr(device_t dev, struct resource *irq, void *cookie,
+	const char* fmt, ...);
 
 const char *device_get_name(device_t dev);
 const char *device_get_nameunit(device_t dev);

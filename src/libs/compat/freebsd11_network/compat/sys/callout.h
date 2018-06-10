@@ -25,7 +25,8 @@ struct callout {
 };
 
 
-#define CALLOUT_MPSAFE	0x0001
+#define	CALLOUT_MPSAFE			0x0008 /* deprecated */
+#define	CALLOUT_RETURNUNLOCKED	0x0010 /* handler returns with mtx unlocked */
 
 
 void callout_init(struct callout *c, int mpsafe);

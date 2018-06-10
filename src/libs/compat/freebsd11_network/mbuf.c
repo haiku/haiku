@@ -155,6 +155,23 @@ m_get(int how, short type)
 
 
 struct mbuf *
+m_get2(int size, int how, short type, int flags)
+{
+	if (size <= MHLEN || (size <= MLEN && (flags & M_PKTHDR) == 0)) {
+		size = MCLBYTES;
+	} else if (size <= MJUMPAGESIZE) {
+		size = MJUMPAGESIZE;
+	} else if (size <= MJUM9BYTES) {
+		size = MJUM9BYTES;
+	} else /* (size > MJUM9BYTES) */ {
+		return NULL;
+	}
+
+	return m_getjcl(how, type, flags, size);
+}
+
+
+struct mbuf *
 m_gethdr(int how, short type)
 {
 	return _m_get(how, type, M_PKTHDR);

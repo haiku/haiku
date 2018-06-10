@@ -197,6 +197,21 @@ nospace:
 	return (NULL);
 }
 
+/*
+ * Concatenate two pkthdr mbuf chains.
+ */
+void
+m_catpkt(struct mbuf *m, struct mbuf *n)
+{
+	M_ASSERTPKTHDR(m);
+	M_ASSERTPKTHDR(n);
+
+	m->m_pkthdr.len += n->m_pkthdr.len;
+	m_demote(n, 1, 0);
+
+	m_cat(m, n);
+}
+
 void
 m_adj(struct mbuf *mp, int req_len)
 {
@@ -645,6 +660,35 @@ mb_dupcl(struct mbuf *n, struct mbuf *m)
 	n->m_ext.ext_size = m->m_ext.ext_size;
 	n->m_ext.ext_type = m->m_ext.ext_type;
 	n->m_flags |= M_EXT;
+}
+
+void
+m_demote_pkthdr(struct mbuf *m)
+{
+	M_ASSERTPKTHDR(m);
+
+	m_tag_delete_chain(m, NULL);
+	m->m_flags &= ~M_PKTHDR;
+	bzero(&m->m_pkthdr, sizeof(struct pkthdr));
+}
+
+/*
+ * Clean up mbuf (chain) from any tags and packet headers.
+ * If "all" is set then the first mbuf in the chain will be
+ * cleaned too.
+ */
+void
+m_demote(struct mbuf *m0, int all, int flags)
+{
+	struct mbuf *m;
+
+	for (m = all ? m0 : m0->m_next; m != NULL; m = m->m_next) {
+		KASSERT(m->m_nextpkt == NULL, ("%s: m_nextpkt in m %p, m0 %p",
+			__func__, m, m0));
+		if (m->m_flags & M_PKTHDR)
+			m_demote_pkthdr(m);
+		m->m_flags = m->m_flags & (M_EXT | M_RDONLY | M_NOFREE | flags);
+	}
 }
 
 /*
