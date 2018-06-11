@@ -147,10 +147,6 @@ platform_start_kernel(void)
 	if (gKernelArgs.kernel_image->elf_class != ELFCLASS64)
 		panic("32-bit kernels not supported with EFI");
 
-	cpu_init();
-	acpi_init();
-	hpet_init();
-	smp_init();
 	smp_init_other_cpus();
 
 	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
@@ -291,6 +287,11 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	gKernelArgs.num_cpus = 1;
 	gKernelArgs.arch_args.hpet_phys = 0;
 	gKernelArgs.arch_args.hpet = NULL;
+
+	cpu_init();
+	acpi_init();
+	hpet_init();
+	smp_init();
 
 	main(&args);
 
