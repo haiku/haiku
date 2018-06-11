@@ -1,0 +1,65 @@
+SubDir HAIKU_TOP src libs compat freebsd_wlan net80211 ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. freebsd_network ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. .. freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. ] : true ;
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+# Enabling C++ structures in C only code
+Includes [ FGristFiles kernel_c++_structs.h ]
+	: <src!system!kernel>kernel_c++_struct_sizes.h ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
+	-Wno-format -Wno-unused -Wno-uninitialized ;
+SubDirC++Flags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
+	-Wno-format -Wno-unused -Wno-uninitialized ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto rijndael ] ;
+
+KernelStaticLibrary libfreebsd_wlan.a :
+	ieee80211.c
+	ieee80211_action.c
+	ieee80211_adhoc.c
+	ieee80211_ageq.c
+	ieee80211_amrr.c
+	ieee80211_crypto.c
+	ieee80211_crypto_ccmp.c
+	ieee80211_crypto_none.c
+	ieee80211_crypto_tkip.c
+	ieee80211_crypto_wep.c
+	ieee80211_dfs.c
+	ieee80211_haiku.cpp
+	ieee80211_ht.c
+	ieee80211_input.c
+	ieee80211_ioctl.c
+	ieee80211_hostap.c
+	ieee80211_monitor.c
+	ieee80211_node.c
+	ieee80211_output.c
+	ieee80211_phy.c
+	ieee80211_power.c
+	ieee80211_proto.c
+	ieee80211_radiotap.c
+	ieee80211_ratectl.c
+	ieee80211_ratectl_none.c
+	ieee80211_regdomain.c
+	ieee80211_rssadapt.c
+	ieee80211_scan_sta.c
+	ieee80211_scan.c
+	ieee80211_sta.c
+	ieee80211_wds.c
+
+	# Rijndael (aka AES) cryptographic support for crypto_ccmp
+	rijndael-alg-fst.c
+	rijndael-api.c
+
+	# NOT SUPPORTED YET ieee80211_acl.c
+	# NOT SUPPORTED YET ieee80211_ddb.c
+	# NOT SUPPORTED YET ieee80211_hwmp.c
+	# NOT SUPPORTED YET ieee80211_mesh.c
+	# NOT SUPPORTED YET ieee80211_superg.c
+	# NOT SUPPORTED YET ieee80211_tdma.c
+	ieee80211_xauth.c
+;
