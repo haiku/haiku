@@ -1417,7 +1417,7 @@ status_t
 user_timer_create_thread_timers(Team* team, Thread* thread)
 {
 	// create a real time user timer
-	struct sigevent event;
+	struct sigevent event = {0};
 	event.sigev_notify = SIGEV_SIGNAL;
 	event.sigev_signo = SIGALRM;
 
@@ -1439,7 +1439,7 @@ status_t
 user_timer_create_team_timers(Team* team)
 {
 	// create a real time user timer
-	struct sigevent event;
+	struct sigevent event = {0};
 	event.sigev_notify = SIGEV_SIGNAL;
 	event.sigev_signo = SIGALRM;
 
@@ -1692,7 +1692,7 @@ _user_create_timer(clockid_t clockID, thread_id threadID, uint32 flags,
 	const thread_creation_attributes* userThreadAttributes)
 {
 	// copy the sigevent structure from userland
-	struct sigevent event;
+	struct sigevent event = {0};
 	if (userEvent != NULL) {
 		if (!IS_USER_ADDRESS(userEvent)
 			|| user_memcpy(&event, userEvent, sizeof(event)) != B_OK) {
