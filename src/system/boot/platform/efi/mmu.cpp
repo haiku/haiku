@@ -8,6 +8,7 @@
 
 #include <algorithm>
 
+#include <boot/addr_range.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <kernel/arch/x86/arch_kernel.h>
@@ -276,24 +277,8 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 	physicalAddress -= pageOffset;
 	size += pageOffset;
 
-	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
-	allocated_memory_region *region = new(std::nothrow) allocated_memory_region;
-
-	if (!region)
+	if (insert_physical_allocated_range(physicalAddress, ROUNDUP(size, B_PAGE_SIZE)) != B_OK)
 		return B_NO_MEMORY;
-
-	// Addresses above 512GB not supported.
-	// Memory map regions above 512GB can be ignored, but if EFI returns pages above
-	// that there's nothing that can be done to fix it.
-	if (physicalAddress + size > (512ull * 1024 * 1024 * 1024))
-		panic("Can't currently support more than 512GB of RAM!");
-
-	region->next = allocated_memory_regions;
-	allocated_memory_regions = region;
-	region->vaddr = 0;
-	region->paddr = physicalAddress;
-	region->size = aligned_size;
-	region->released = false;
 
 	return physicalAddress + pageOffset;
 }
@@ -331,9 +316,44 @@ get_region(void *address, size_t size)
 }
 
 
+static void
+convert_physical_ranges() {
+	addr_range *range = gKernelArgs.physical_allocated_range;
+	uint32 num_ranges = gKernelArgs.num_physical_allocated_ranges;
+
+	for (uint32 i = 0; i < num_ranges; ++i) {
+		allocated_memory_region *region = new(std::nothrow) allocated_memory_region;
+
+		if (!region)
+			panic("Couldn't add allocated region");
+
+		// Addresses above 512GB not supported.
+		// Memory map regions above 512GB can be ignored, but if EFI returns pages above
+		// that there's nothing that can be done to fix it.
+		if (range[i].start + range[i].size > (512ull * 1024 * 1024 * 1024))
+			panic("Can't currently support more than 512GB of RAM!");
+
+		region->next = allocated_memory_regions;
+		allocated_memory_regions = region;
+		region->vaddr = 0;
+		region->paddr = range[i].start;
+		region->size = range[i].size;
+		region->released = false;
+
+		// Clear out the allocated range
+		range[i].start = 0;
+		range[i].size = 0;
+		gKernelArgs.num_physical_allocated_ranges--;
+	}
+}
+
+
 extern "C" status_t
 platform_bootloader_address_to_kernel_address(void *address, uint64_t *_result)
 {
+	// Convert any physical ranges prior to looking up address
+	convert_physical_ranges();
+
 	uint64_t addr = (uint64_t)address;
 
 	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
