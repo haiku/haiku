@@ -135,7 +135,7 @@ get_bios(void)
 	hence, if panel mode will be set using info from VBT, it will
 	be taken from primary card's VBIOS */
 	vbios.area = map_physical_memory("VBIOS mapping", kVBIOSAddress,
-		kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void**)&vbios.memory);
+		kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void**)&vbios.memory);
 
 	if (vbios.area < 0)
 		return false;
