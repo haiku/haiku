@@ -282,30 +282,30 @@ renameat(int fromFD, const char* from, int toFD, const char* to)
 // fs_attr_* functions only need to be remapped on Haiku
 
 
-extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+extern "C" addr_t HIDDEN_FUNCTION_ATTRIBUTE
 fs_open_attr_dir(const char *path)
 {
 	HIDDEN_FUNCTION(fs_open_attr_dir);
 
-	return _haiku_build_fs_open_attr_dir(path);
+	return (addr_t)_haiku_build_fs_open_attr_dir(path);
 }
 
 
-extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+extern "C" addr_t HIDDEN_FUNCTION_ATTRIBUTE
 fs_lopen_attr_dir(const char *path)
 {
 	HIDDEN_FUNCTION(fs_lopen_attr_dir);
 
-	return _haiku_build_fs_lopen_attr_dir(path);
+	return (addr_t)_haiku_build_fs_lopen_attr_dir(path);
 }
 
 
-extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+extern "C" addr_t HIDDEN_FUNCTION_ATTRIBUTE
 fs_fopen_attr_dir(int fd)
 {
 	HIDDEN_FUNCTION(fs_fopen_attr_dir);
 
-	return _haiku_build_fs_fopen_attr_dir(fd);
+	return (addr_t)_haiku_build_fs_fopen_attr_dir(fd);
 }
 
 
@@ -318,12 +318,12 @@ fs_close_attr_dir(void *dir)
 }
 
 
-extern "C" void* HIDDEN_FUNCTION_ATTRIBUTE
+extern "C" addr_t HIDDEN_FUNCTION_ATTRIBUTE
 fs_read_attr_dir(void *dir)
 {
 	HIDDEN_FUNCTION(fs_read_attr_dir);
 
-	return _haiku_build_fs_read_attr_dir(dir);
+	return (addr_t)_haiku_build_fs_read_attr_dir(dir);
 }
 
 
