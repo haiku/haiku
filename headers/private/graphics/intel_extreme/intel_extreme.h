@@ -90,9 +90,15 @@
 #define INTEL_PCH_CPT_DEVICE_ID		0x1c00
 #define INTEL_PCH_PPT_DEVICE_ID		0x1e00
 #define INTEL_PCH_LPT_DEVICE_ID		0x8c00
-#define INTEL_PCH_LPT_LP_DEVICE_ID	0x9c00 /* Wildcat Point */
+#define INTEL_PCH_LPT_LP_DEVICE_ID	0x9c00
+#define INTEL_PCH_WPT_DEVICE_ID		0x8c80
+#define INTEL_PCH_WPT_LP_DEVICE_ID	0x9c80
 #define INTEL_PCH_SPT_DEVICE_ID		0xa100
 #define INTEL_PCH_SPT_LP_DEVICE_ID	0x9d00
+#define INTEL_PCH_KBP_DEVICE_ID		0xa280
+#define INTEL_PCH_CNP_DEVICE_ID		0xa300
+#define INTEL_PCH_CNP_LP_DEVICE_ID	0x9d80
+#define INTEL_PCH_ICP_DEVICE_ID		0x3480
 #define INTEL_PCH_P2X_DEVICE_ID		0x7100
 #define INTEL_PCH_P3X_DEVICE_ID		0x7000
 
@@ -215,7 +221,10 @@ enum pch_info {
 	INTEL_PCH_IBX,			// Ibexpeak
 	INTEL_PCH_CPT,			// Cougarpoint
 	INTEL_PCH_LPT,			// Lynxpoint
-	INTEL_PCH_SPT,			// Sunrisepoint
+	INTEL_PCH_SPT,			// SunrisePoint
+	INTEL_PCH_KBP,			// KabyLake
+	INTEL_PCH_CNP,			// CannonLake
+	INTEL_PCH_ICP,			// IceLake
 	INTEL_PCH_NOP
 };
 

@@ -197,12 +197,25 @@ detect_intel_pch()
 				return INTEL_PCH_CPT;
 			case INTEL_PCH_LPT_DEVICE_ID:
 			case INTEL_PCH_LPT_LP_DEVICE_ID:
+			case INTEL_PCH_WPT_DEVICE_ID:
+			case INTEL_PCH_WPT_LP_DEVICE_ID:
+				// WildcatPoint is LPT compatible
 				ERROR("%s: Found LynxPoint PCH\n", __func__);
 				return INTEL_PCH_LPT;
 			case INTEL_PCH_SPT_DEVICE_ID:
 			case INTEL_PCH_SPT_LP_DEVICE_ID:
 				ERROR("%s: Found SunrisePoint PCH\n", __func__);
 				return INTEL_PCH_SPT;
+			case INTEL_PCH_KBP_DEVICE_ID:
+				ERROR("%s: Found Kaby Lake PCH\n", __func__);
+				return INTEL_PCH_KBP;
+			case INTEL_PCH_CNP_DEVICE_ID:
+			case INTEL_PCH_CNP_LP_DEVICE_ID:
+				ERROR("%s: Found Cannon Lake PCH\n", __func__);
+				return INTEL_PCH_CNP;
+			case INTEL_PCH_ICP_DEVICE_ID:
+				ERROR("%s: Found Ice Lake PCH\n", __func__);
+				return INTEL_PCH_ICP;
 		}
 	}
 
