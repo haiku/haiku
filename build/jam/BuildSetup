@@ -150,16 +150,6 @@ switch $(HAIKU_DISTRO_COMPATIBILITY) {
 			$(HAIKU_DISTRO_COMPATIBILITY) ;
 }
 
-# If the environment variable HAIKU_INCLUDE_PATENTED_CODE is defined, we define
-# an equally named macro to the variable value. Some components use the macro
-# to allow compilation of code known to implemented patented ideas and/or
-# techniques, for example the Freetype bytecode hinter or sub-pixel rendering as
-# well as some problematic media codecs.
-if $(HAIKU_INCLUDE_PATENTED_CODE) {
-	HAIKU_DEFINES
-		+= HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ;
-}
-
 # network libraries
 HAIKU_NETWORK_LIBS = network ;
 HAIKU_NETAPI_LIB = bnetapi ;

@@ -57,12 +57,6 @@ options:
   --host-only                 Configure for building tools for the build host
                               only. Haiku cannot be built when configured like
                               this.
-  --include-patented-code     Enable code that is known to implemented patented
-                              ideas and techniques. If this option is not
-                              specified, the resulting distribution may still
-                              implement patented ideas and techniques. This
-                              option only enables code that is currently known
-                              to be problematic.
   --include-sources           Includes the source code of projects that require
                               either an offer of source code or a copy of the
                               patched sources. This is preferable when
@@ -531,7 +525,6 @@ fi
 #
 HOST_GCC_RAW_VERSION=`$CC -dumpversion`
 HOST_GCC_MACHINE=`$CC -dumpmachine`
-HAIKU_INCLUDE_PATENTED_CODE=0
 HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
 HAIKU_DISTRO_COMPATIBILITY=default
@@ -688,7 +681,6 @@ while [ $# -gt 0 ] ; do
 			shift 2
 			;;
 		--host-only)	HAIKU_HOST_BUILD_ONLY=1; shift 1;;
-		--include-patented-code)	HAIKU_INCLUDE_PATENTED_CODE=1; shift 1;;
 		--include-sources)	HAIKU_INCLUDE_SOURCES=1; shift 1;;
 		--include-3rdparty)	HAIKU_INCLUDE_3RDPARTY=1; shift 1;;
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
@@ -993,7 +985,6 @@ cat << EOF > "$buildConfigFile"
 TARGET_PLATFORM 			?= "${TARGET_PLATFORM}" ;
 HOST_PLATFORM				?= "${HOST_PLATFORM}" ;
 
-HAIKU_INCLUDE_PATENTED_CODE			?= "${HAIKU_INCLUDE_PATENTED_CODE}" ;
 HAIKU_INCLUDE_SOURCES				?= "${HAIKU_INCLUDE_SOURCES}" ;
 HAIKU_INCLUDE_3RDPARTY				?= "${HAIKU_INCLUDE_3RDPARTY}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${HAIKU_DISTRO_COMPATIBILITY}" ;
