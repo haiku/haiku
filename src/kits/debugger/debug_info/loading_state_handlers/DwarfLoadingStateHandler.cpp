@@ -99,10 +99,8 @@ DwarfLoadingStateHandler::HandleState(
 				choice = interface->SynchronouslyAskUser("Debug info missing",
 					message.String(), "Install", "Locate", "Skip");
 			}
-		} else {
-			choice = requiredPackage.IsEmpty()
-				? USER_CHOICE_SKIP : USER_CHOICE_INSTALL_PACKAGE;
-		}
+		} else
+			choice = USER_CHOICE_SKIP;
 
 		if (choice == USER_CHOICE_INSTALL_PACKAGE) {
 			// TODO: integrate the package installation functionality directly.
