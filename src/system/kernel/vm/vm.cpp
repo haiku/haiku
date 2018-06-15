@@ -47,16 +47,11 @@
 #include <team.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
-#include <util/syscall_args.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
 #include <vm/VMCache.h>
-
-#ifdef _COMPAT_MODE
-#	include <OS_compat.h>
-#endif
 
 #include "VMAddressSpaceLocking.h"
 #include "VMAnonymousCache.h"
@@ -6008,44 +6003,6 @@ _get_next_area_info(team_id team, ssize_t* cookie, area_info* info, size_t size)
 }
 
 
-#ifdef _COMPAT_MODE
-status_t
-_compat_get_next_area_info(team_id team, ssize_t* cookie, area_info* info, size_t size)
-{
-	area_id nextID = *(area_id*)cookie;
-
-	// we're already through the list
-	if (nextID == (area_id)-1)
-		return B_ENTRY_NOT_FOUND;
-
-	if (team == B_CURRENT_TEAM)
-		team = team_get_current_team_id();
-
-	AddressSpaceReadLocker locker(team);
-	if (!locker.IsLocked())
-		return B_BAD_TEAM_ID;
-
-	VMArea* area;
-	for (VMAddressSpace::AreaIterator it
-				= locker.AddressSpace()->GetAreaIterator();
-			(area = it.Next()) != NULL;) {
-		if (area->id > nextID)
-			break;
-	}
-
-	if (area == NULL) {
-		nextID = (area_id)-1;
-		return B_ENTRY_NOT_FOUND;
-	}
-
-	fill_area_info(area, info, size);
-	*cookie = (ssize_t)(area->id);
-
-	return B_OK;
-}
-#endif
-
-
 status_t
 set_area_protection(area_id area, uint32 newProtection)
 {
@@ -6175,22 +6132,23 @@ _user_reserve_address_range(addr_t* userAddress, uint32 addressSpec,
 
 	addr_t address;
 
-	status_t status = copy_ref_var_from_user(userAddress, address);
-	if (status != B_OK)
-		return status;
+	if (!IS_USER_ADDRESS(userAddress)
+		|| user_memcpy(&address, userAddress, sizeof(address)) != B_OK)
+		return B_BAD_ADDRESS;
 
-	status = vm_reserve_address_range(
+	status_t status = vm_reserve_address_range(
 		VMAddressSpace::CurrentID(), (void**)&address, addressSpec, size,
 		RESERVED_AVOID_BASE);
 	if (status != B_OK)
 		return status;
 
-	status = copy_ref_var_to_user(address, userAddress);
-	if (status != B_OK) {
+	if (user_memcpy(userAddress, &address, sizeof(address)) != B_OK) {
 		vm_unreserve_address_range(VMAddressSpace::CurrentID(),
 			(void*)address, size);
+		return B_BAD_ADDRESS;
 	}
-	return status;
+
+	return B_OK;
 }
 
 
@@ -6236,8 +6194,10 @@ _user_get_area_info(area_id area, area_info* userInfo)
 	// TODO: do we want to prevent userland from seeing kernel protections?
 	//info.protection &= B_USER_PROTECTION;
 
-	return copy_ref_var_to_user(info, userInfo);
+	if (user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
+		return B_BAD_ADDRESS;
 
+	return status;
 }
 
 
@@ -6247,28 +6207,21 @@ _user_get_next_area_info(team_id team, ssize_t* userCookie, area_info* userInfo)
 	ssize_t cookie;
 
 	if (!IS_USER_ADDRESS(userCookie)
-		|| !IS_USER_ADDRESS(userInfo))
+		|| !IS_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(ssize_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status_t status = copy_ref_var_from_user(userCookie, cookie);
-	if (status != B_OK)
-		return status;
-
 	area_info info;
-#ifdef _COMPAT_MODE
-	status = _compat_get_next_area_info(team, &cookie, &info,
-#else
-	status = _get_next_area_info(team, &cookie, &info,
-#endif
+	status_t status = _get_next_area_info(team, &cookie, &info,
 		sizeof(area_info));
 	if (status != B_OK)
 		return status;
 
 	//info.protection &= B_USER_PROTECTION;
 
-	status = copy_ref_var_to_user(cookie, userCookie);
-	if (status == B_OK)
-		status = copy_ref_var_to_user(info, userInfo);
+	if (user_memcpy(userCookie, &cookie, sizeof(ssize_t)) < B_OK
+		|| user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return status;
 }
@@ -6306,17 +6259,16 @@ _user_transfer_area(area_id area, void** userAddress, uint32 addressSpec,
 	}
 
 	void* address;
-	status_t status = copy_ref_var_from_user(userAddress, address);
-	if (status != B_OK)
-		return status;
+	if (!IS_USER_ADDRESS(userAddress)
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	area_id newArea = transfer_area(area, &address, addressSpec, target, false);
 	if (newArea < B_OK)
 		return newArea;
 
-	status = copy_ref_var_to_user(address, userAddress);
-	if (status != B_OK)
-		return status;
+	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return newArea;
 }
@@ -6339,12 +6291,10 @@ _user_clone_area(const char* userName, void** userAddress, uint32 addressSpec,
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
+		|| !IS_USER_ADDRESS(userAddress)
+		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status_t status = copy_ref_var_from_user(userAddress, address);
-	if (status != B_OK)
-		return status;
 
 	fix_protection(&protection);
 
@@ -6354,10 +6304,9 @@ _user_clone_area(const char* userName, void** userAddress, uint32 addressSpec,
 	if (clonedArea < B_OK)
 		return clonedArea;
 
-	status = copy_ref_var_to_user(address, userAddress);
-	if (status < B_OK) {
+	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(clonedArea);
-		return status;
+		return B_BAD_ADDRESS;
 	}
 
 	return clonedArea;
@@ -6381,12 +6330,10 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
+		|| !IS_USER_ADDRESS(userAddress)
+		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status_t status = copy_ref_var_from_user(userAddress, address);
-	if (status != B_OK)
-		return status;
 
 	if (addressSpec == B_EXACT_ADDRESS
 		&& IS_KERNEL_ADDRESS(address))
@@ -6407,12 +6354,10 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 		size, lock, protection, 0, 0, &virtualRestrictions,
 		&physicalRestrictions, false, &address);
 
-	if (area >= B_OK) {
-		status = copy_ref_var_to_user(address, userAddress);
-		if (status < B_OK) {
-			delete_area(area);
-			return status;
-		}
+	if (area >= B_OK
+		&& user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
+		delete_area(area);
+		return B_BAD_ADDRESS;
 	}
 
 	return area;
@@ -6446,13 +6391,10 @@ _user_map_file(const char* userName, void** userAddress, uint32 addressSpec,
 
 	fix_protection(&protection);
 
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userName) || !IS_USER_ADDRESS(userAddress)
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status_t status = copy_ref_var_from_user(userAddress, address);
-	if (status != B_OK)
-		return status;
 
 	if (addressSpec == B_EXACT_ADDRESS) {
 		if ((addr_t)address + size < (addr_t)address
@@ -6471,11 +6413,8 @@ _user_map_file(const char* userName, void** userAddress, uint32 addressSpec,
 	if (area < B_OK)
 		return area;
 
-	status = copy_ref_var_to_user(address, userAddress);
-	if (status < B_OK) {
-		delete_area(area);
-		return status;
-	}
+	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return area;
 }
