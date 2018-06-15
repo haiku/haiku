@@ -43,19 +43,12 @@
 #include <syscall_restart.h>
 #include <team.h>
 #include <tls.h>
-#include <util/syscall_args.h>
 #include <user_runtime.h>
 #include <user_thread.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 #include <wait_for_objects.h>
-
-#ifdef _COMPAT_MODE
-#	include <OS_compat.h>
-#	include <resource_compat.h>
-#	include <thread_defs_compat.h>
-#endif
 
 #include "TeamThreadTables.h"
 
@@ -559,14 +552,11 @@ status_t
 ThreadCreationAttributes::InitFromUserAttributes(
 	const thread_creation_attributes* userAttributes, char* nameBuffer)
 {
-	if (userAttributes == NULL)
+	if (userAttributes == NULL || !IS_USER_ADDRESS(userAttributes)
+		|| user_memcpy((thread_creation_attributes*)this, userAttributes,
+				sizeof(thread_creation_attributes)) != B_OK) {
 		return B_BAD_ADDRESS;
-
-	status_t status = copy_ref_var_from_user(
-		(BKernel::ThreadCreationAttributes*)userAttributes,
-		*this);
-	if (status != B_OK)
-		return status;
+	}
 
 	if (stack_size != 0
 		&& (stack_size < MIN_USER_STACK_SIZE
@@ -825,10 +815,6 @@ create_thread_user_stack(Team* team, Thread* thread, void* _stackBase,
 			thread->name, thread->id);
 
 		stackBase = (uint8*)USER_STACK_REGION;
-#ifdef _COMPAT_MODE
-		if ((thread->flags & THREAD_FLAGS_COMPAT_MODE) != 0)
-			stackBase = (uint8*)USER32_STACK_REGION;
-#endif
 
 		virtual_address_restrictions virtualRestrictions = {};
 		virtualRestrictions.address_specification = B_RANDOMIZED_BASE_ADDRESS;
@@ -913,12 +899,6 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	thread->priority = std::min(thread->priority,
 			(int32)THREAD_MAX_SET_PRIORITY);
 	thread->state = B_THREAD_SUSPENDED;
-
-#ifdef _COMPAT_MODE
-	Thread* currentThread = thread_get_current_thread();
-	if ((currentThread->flags & THREAD_FLAGS_COMPAT_MODE) != 0)
-		thread->flags |= THREAD_FLAGS_COMPAT_MODE;
-#endif
 
 	thread->sig_block_mask = attributes.signal_mask;
 
@@ -3530,8 +3510,10 @@ _user_get_thread_info(thread_id id, thread_info *userInfo)
 
 	status = _get_thread_info(id, &info, sizeof(thread_info));
 
-	if (status >= B_OK)
-		status = copy_ref_var_to_user(info, userInfo);
+	if (status >= B_OK
+		&& user_memcpy(userInfo, &info, sizeof(thread_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
 	return status;
 }
 
@@ -3552,9 +3534,11 @@ _user_get_next_thread_info(team_id team, int32 *userCookie,
 	if (status < B_OK)
 		return status;
 
-	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK)
+	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
+		|| user_memcpy(userInfo, &info, sizeof(thread_info)) < B_OK)
 		return B_BAD_ADDRESS;
-	return copy_ref_var_to_user(info, userInfo);
+
+	return status;
 }
 
 
@@ -3736,9 +3720,9 @@ _user_getrlimit(int resource, struct rlimit *urlp)
 	ret = common_getrlimit(resource, &rl);
 
 	if (ret == 0) {
-		status_t status = copy_ref_var_to_user(rl, urlp);
-		if (status != B_OK)
-			return status;
+		ret = user_memcpy(urlp, &rl, sizeof(struct rlimit));
+		if (ret < 0)
+			return ret;
 
 		return 0;
 	}
@@ -3755,10 +3739,10 @@ _user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 	if (userResourceLimit == NULL)
 		return EINVAL;
 
-	status_t status = copy_ref_var_from_user((struct rlimit*)userResourceLimit,
-		resourceLimit);
-	if (status != B_OK)
-		return status;
+	if (!IS_USER_ADDRESS(userResourceLimit)
+		|| user_memcpy(&resourceLimit, userResourceLimit,
+			sizeof(struct rlimit)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return common_setrlimit(resource, &resourceLimit);
 }
