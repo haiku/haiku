@@ -26,6 +26,7 @@ public:
 
 	virtual	void				DispatchMessage(BMessage* message,
 									BHandler* target);
+	virtual void				FrameResized(float newWidth, float newHeight);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 

@@ -224,6 +224,13 @@ DownloadWindow::DispatchMessage(BMessage* message, BHandler* target)
 
 
 void
+DownloadWindow::FrameResized(float newWidth, float newHeight)
+{
+	MoveOnScreen(B_DO_NOT_RESIZE_TO_FIT | B_MOVE_IF_PARTIALLY_OFFSCREEN);
+}
+
+
+void
 DownloadWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
