@@ -32,6 +32,7 @@ _debuggerAssert(const char *file, int line, const char *expression)
 	return 0;
 }
 
+#ifndef HAIKU_HOST_PLATFORM_HAIKU
 // system_time
 bigtime_t
 system_time(void)
@@ -40,6 +41,7 @@ system_time(void)
 	gettimeofday(&tm, NULL);
 	return (int64)tm.tv_sec * 1000000LL + (int64)tm.tv_usec;
 }
+#endif
 
 // snooze
 status_t
