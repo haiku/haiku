@@ -388,27 +388,15 @@ if $(HAIKU_BUILD_FEATURE_TAGLIB) {
 
 # WebKit
 if [ IsPackageAvailable haikuwebkit_devel ] {
-	if $(TARGET_PACKAGING_ARCH) = x86_64 {
-		ExtractBuildFeatureArchives webkit :
-			file: base haikuwebkit
-				runtime: lib
-			file: devel haikuwebkit_devel
-				depends: base
-				libraries:
-					$(developLibDir)/libWebKit.so
-				headers: $(developHeadersDir)
-			;
-	} else {
-		ExtractBuildFeatureArchives webkit :
-			file: base haikuwebkit
-				runtime: lib
-			file: devel haikuwebkit_devel
-				depends: base
-				libraries:
-					$(developLibDir)/libWebKitLegacy.so
-				headers: $(developHeadersDir)
-			;
-	}
+	ExtractBuildFeatureArchives webkit :
+		file: base haikuwebkit
+			runtime: lib
+		file: devel haikuwebkit_devel
+			depends: base
+			libraries:
+				$(developLibDir)/libWebKitLegacy.so
+			headers: $(developHeadersDir)
+		;
 
 	EnableBuildFeatures webkit ;
 } else {
