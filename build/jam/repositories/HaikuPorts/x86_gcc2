@@ -112,7 +112,7 @@ RemotePackageRepository HaikuPorts
 	mesa_devel-7.9.2-11
 	mesa_swrast-7.9.2-11
 	mkdepend-1.7-5
-	nano-2.9.8-1
+	nano-2.9.8-2
 	nasm-2.12.01-4
 	ncurses6-6.0-3
 	ncurses6_devel-6.0-3

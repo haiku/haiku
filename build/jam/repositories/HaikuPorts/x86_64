@@ -128,7 +128,7 @@ RemotePackageRepository HaikuPorts
 	mkdepend-1.7-5
 	mpc-1.1.0-1
 	mpfr-3.1.6-2
-	nano-2.9.8-1
+	nano-2.9.8-2
 	nasm-2.12.01-4
 	ncurses6-6.0-3
 	ncurses6_devel-6.0-3
