@@ -19,30 +19,28 @@ rule ArchitectureSetup architecture
 	}
 
 	# disable strict aliasing on anything newer than gcc 2 as it may lead to
-	# unexpected results. also disable the tree-vrp (value range propagation)
-	# optimization for now as with the current gcc4 version we are using this
-	# results in some broken code.
+	# unexpected results.
 	# TODO: remove the -fno-strict-aliasing option when all code has been
 	#		analyzed/fixed with regard to aliasing.
-	# TODO: retest/remove the -fno-tree-vrp option as soon as we have updated
-	#		our gcc4 compiler. See this discussion on some issues:
-	# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 	if $(gccVersion[1]) >= 3 {
-		gccBaseFlags += -fno-strict-aliasing -fno-builtin-fork ;
-		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
-			gccBaseFlags += -fno-tree-vrp ;
-		}
+		gccBaseFlags += -fno-strict-aliasing ;
 	}
 
-	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		gccBaseFlags += -fno-builtin-vfork ;
+	# Without this flag, GCC deletes many null-pointer checks that are
+	# technically undefined behavior (e.g. passing NULL to strdup, among
+	# others), which breaks both the kernel and various applications. See:
+	#  - https://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
+	#  - https://dev.haiku-os.org/ticket/13285#comment:8 (& subsequent comments)
+	#  - https://dev.haiku-os.org/ticket/10803#comment:4 (& subsequent comments)
+	# Note that the Linux also does the same:
+	#  - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a3ca86aea507904148870946d599e07a340b39bf
+	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
+		gccBaseFlags += -fno-delete-null-pointer-checks ;
 	}
 
-	# disable array bounds warnings on gcc 4.6 or newer since they trigger
-	# too many false positives. Coverity does a better job of this kind of
-	# analysis anyways.
-	if $(gccVersion[1]) >= 4 {
-		gccBaseFlags += -Wno-array-bounds ;
+	# disable some builtins that are incompatible with our definitions
+	if $(gccVersion[1]) >= 3 {
+		gccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
 	}
 
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
@@ -330,11 +328,6 @@ rule KernelArchitectureSetup architecture
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
-
-	if $(gccVersion[1]) >= 6 {
-		HAIKU_KERNEL_C++FLAGS += -fno-delete-null-pointer-checks ;
-		HAIKU_KERNEL_CCFLAGS += -fno-delete-null-pointer-checks ;
-	}
 
 	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
