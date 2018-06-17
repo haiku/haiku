@@ -3,7 +3,7 @@ RemotePackageRepository HaikuPorts
 	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages
 	:
 	# architecture "any" packages
-	be_book-2008_10_26-1
+	be_book-2008_10_26-2
 	ca_root_certificates-2018_01_17-2
 	gnu_efi_kernel-3.0.8-1
 	haikuporter-1.2.2-1
@@ -16,13 +16,13 @@ RemotePackageRepository HaikuPorts
 	# primary architecture (x86_64)
 	autoconf-2.69-8
 	automake-1.15.1-1
-	bash-4.4.019-1
+	bash-4.4.023-1
 	bc-1.07.1-2
 	bepdf-2.1.0-2
-	binutils-2.28.1_2017_08_05-1
-	bison-3.0.4-5
-	bzip2-1.0.6-6
-	bzip2_devel-1.0.6-6
+	binutils-2.28.1_2017_08_05-2
+	bison-3.0.5-1
+	bzip2-1.0.6-7
+	bzip2_devel-1.0.6-7
 	cdrtools-3.02~a09-1
 	cdrtools_devel-3.02~a09-1
 	coreutils-8.29-1
@@ -45,28 +45,28 @@ RemotePackageRepository HaikuPorts
 	freetype_devel-2.9-1
 	gawk-4.2.0-1
 	gettext_libintl-0.19.8.1-5
-	gcc-7.3.0_2018_05_01-1
-	gcc_syslibs-7.3.0_2018_05_01-1
-	gcc_syslibs_devel-7.3.0_2018_05_01-1
-	giflib-5.1.4-1
-	giflib_devel-5.1.4-1
-	git-2.16.2-2
-	git_arch-2.16.2-2
-	git_cvs-2.16.2-2
-	git_daemon-2.16.2-2
-	git_email-2.16.2-2
-	git_svn-2.16.2-2
+	gcc-7.3.0_2018_05_01-2
+	gcc_syslibs-7.3.0_2018_05_01-2
+	gcc_syslibs_devel-7.3.0_2018_05_01-2
+	giflib-5.1.4-2
+	giflib_devel-5.1.4-2
+	git-2.16.4-1
+	git_arch-2.16.4-1
+	git_cvs-2.16.4-1
+	git_daemon-2.16.4-1
+	git_email-2.16.4-1
+	git_svn-2.16.4-1
 	glu-9.0.0-7
 	glu_devel-9.0.0-7
 	gmp-6.1.2-2
 	gnutls36-3.6.2-1
 	grep-3.1-1
 	groff-1.22.3-1
-	gutenprint-5.2.13-2
-	gutenprint_devel-5.2.13-2
+	gutenprint-5.2.14-1
+	gutenprint_devel-5.2.14-1
 	gzip-1.8-2
-	haikuwebkit-1.6.3-1
-	haikuwebkit_devel-1.6.3-1
+	haikuwebkit-1.6.5-1
+	haikuwebkit_devel-1.6.5-1
 	icu-57.1-3
 	icu_devel-57.1-3
 	ilmbase-2.2.1-1
@@ -90,8 +90,8 @@ RemotePackageRepository HaikuPorts
 	libicns_devel-0.8.1-6
 	libidn2-2.0.4-1
 	libmodplug-0.8.9.0-1
-	libogg-1.3.3-1
-	libogg_devel-1.3.3-1
+	libogg-1.3.3-2
+	libogg_devel-1.3.3-2
 	libpcap-1.8.1-3
 	libpcap_devel-1.8.1-3
 	libpcre-8.42-1
@@ -101,10 +101,10 @@ RemotePackageRepository HaikuPorts
 	libsolv-0.3.0_haiku_2014_12_22-2
 	libsolv_devel-0.3.0_haiku_2014_12_22-2
 	libtasn1-4.13-1
-	libtheora-1.1.1-6
-	libtheora_devel-1.1.1-6
+	libtheora-1.1.1-7
+	libtheora_devel-1.1.1-7
 	libtool-2.4.6-1
-	libunistring-0.9.9-2
+	libunistring-0.9.10-1
 	libvorbis-1.3.5-5
 	libvorbis_devel-1.3.5-5
 	libvpx3-1.5.0-3
@@ -116,20 +116,20 @@ RemotePackageRepository HaikuPorts
 	libxslt-1.1.32-1
 	live555-2016.06.22-5
 	live555_devel-2016.06.22-5
-	llvm-5.0.0-2
-	llvm_libs-5.0.0-2
+	llvm-5.0.0-3
+	llvm_libs-5.0.0-3
 	m4-1.4.18-3
 	make-4.1-3
 	man-1.6g-6
-	mercurial-3.2.1-4
-	mesa-17.1.7-7
-	mesa_devel-17.1.7-7
-	mesa_swpipe-17.1.7-7
+	mercurial-3.2.1-5
+	mesa-17.1.7-8
+	mesa_devel-17.1.7-8
+	mesa_swpipe-17.1.7-8
 	mkdepend-1.7-5
 	mpc-1.1.0-1
 	mpfr-3.1.6-2
-	nano-2.9.3-1
-	nasm-2.12.01-3
+	nano-2.9.8-1
+	nasm-2.12.01-4
 	ncurses6-6.0-3
 	ncurses6_devel-6.0-3
 	netcat-1.10-4
@@ -146,19 +146,19 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-8
 	perl-5.26.1-2
 	pkgconfig-0.29.2-3
-	python-2.7.14-1
+	python-2.7.14-2
 	qrencode_kdl_devel-3.4.4-2
-	readline-7.0.3-1
+	readline-7.0.3-2
 	scons-2.5.1-3
 	sed-4.4-3
 	sharutils-4.15.2-3
-	speex-1.2.0-2
-	speex_devel-1.2.0-2
-	sqlite-3.23.1.0-1
+	speex-1.2.0-3
+	speex_devel-1.2.0-3
+	sqlite-3.24.0.0-1
 	subversion-1.9.7-2
 	subversion_devel-1.9.7-2
-	taglib-1.11.1-3
-	taglib_devel-1.11.1-3
+	taglib-1.11.1-4
+	taglib_devel-1.11.1-4
 	tar-1.29-3
 	tcpdump-4.9.2-1
 	texinfo-6.5-1
@@ -169,8 +169,8 @@ RemotePackageRepository HaikuPorts
 	wget-1.19.4-1
 	which-2.21-4
 	wpa_supplicant-2.4-1
-	xz_utils-5.2.4-1
-	xz_utils_devel-5.2.4-1
+	xz_utils-5.2.4-2
+	xz_utils_devel-5.2.4-2
 	zip-3.0-4
 	zlib-1.2.11-3
 	zlib_devel-1.2.11-3
