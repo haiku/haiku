@@ -656,14 +656,12 @@ while [ $# -gt 0 ] ; do
 			esac
 			set_variable buildCrossToolsMachine_$targetArch $targetMachine
 			targetArchs="$targetArchs $targetArch"
-			HAIKU_PACKAGING_ARCHS=
 			;;
 		--cross-tools-prefix)
 			assertparam "$1" $#
 			targetArch=unknown${unknownArchIndex}
 			set_variable crossToolsPrefix_$targetArch "$2"
 			targetArchs="$targetArchs $targetArch"
-			HAIKU_PACKAGING_ARCHS=
 			unknownArchIndex=$(($unknownArchIndex + 1))
 			shift 2
 			;;
@@ -716,11 +714,7 @@ while [ $# -gt 0 ] ; do
 					&& [ -z `get_variable buildCrossToolsMachine_$targetArch` ]; then
 				set_variable crossToolsPrefix_$targetArch llvm-
 			fi
-			if ! test "${targetArchs#*$targetArch}" != "$targetArchs"; then
-				# we have not already added this arch to targetArchs, so add it now
-				targetArchs="$targetArchs $targetArch"
-			fi
-			HAIKU_PACKAGING_ARCHS=
+			targetArchs="$targetArchs $targetArch"
 			shift 2
 			;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
@@ -807,11 +801,6 @@ if [ "$HAIKU_HOST_BUILD_ONLY" = 1 ]; then
 	HAIKU_NASM=$invalidCommand
 	HAIKU_STRIP=$invalidCommand
 else
-	if [ -n "$HAIKU_PACKAGING_ARCHS" ]; then
-		targetArchs="$HAIKU_PACKAGING_ARCHS"
-	fi
-	HAIKU_PACKAGING_ARCHS=
-
 	# On Haiku determine target architectures and tools automatically.
 	if [ -z "$targetArchs" ]; then
 		if [ $HOST_PLATFORM != haiku_host ]; then
@@ -869,9 +858,14 @@ else
 
 	isPrimaryArch=1
 	for targetArch in $targetArchs; do
-		# Note: targetArch is "unknown<n>" at this point, if a cross-tools
+		# Note: targetArch is "unknown<n>" at this point if a cross-tools
 		# prefix was specified. The standard_gcc_settings call below will get
 		# the actual architecture.
+
+		if test "${HAIKU_PACKAGING_ARCHS#*$targetArch}" != "$HAIKU_PACKAGING_ARCHS"; then
+			# somehow we wound up with a duplicate arch; skip this one
+			continue
+		fi
 
 		crossToolsPrefix=`get_variable crossToolsPrefix_$targetArch`
 
