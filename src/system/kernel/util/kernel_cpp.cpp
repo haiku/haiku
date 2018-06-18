@@ -31,7 +31,7 @@
 
 // ... it doesn't seem to work with this symbol at least.
 #ifndef USING_LIBGCC
-#	if __GNUC__ >= 6
+#	if __GNUC__ >= 6 || defined(__clang__)
 const std::nothrow_t std::nothrow = std::nothrow_t{ };
 #	elif __GNUC__ >= 3
 const std::nothrow_t std::nothrow = {};

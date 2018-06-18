@@ -22,7 +22,6 @@ extern const nothrow_t std::nothrow;
 typedef struct {} mynothrow_t;
 extern const mynothrow_t mynothrow;
 
-#ifndef __clang__
 #if __cplusplus >= 201402L
 #define _THROW(x)
 #define _NOEXCEPT noexcept
@@ -38,7 +37,6 @@ extern void* operator new(size_t size, const mynothrow_t &) _NOEXCEPT;
 extern void* operator new[](size_t size, const mynothrow_t &) _NOEXCEPT;
 extern void operator delete(void *ptr) _NOEXCEPT;
 extern void operator delete[](void *ptr) _NOEXCEPT;
-#endif
 
 #if __cplusplus >= 201402L
 

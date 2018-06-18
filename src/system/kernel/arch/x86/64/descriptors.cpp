@@ -117,7 +117,7 @@ public:
 										unsigned ist, bool kernelOnly);
 	constexpr						InterruptDescriptor(uintptr_t isr);
 
-	static constexpr	InterruptDescriptor	Generate(unsigned index);
+	static 		InterruptDescriptor	Generate(unsigned index);
 
 private:
 						uint16_t	fBase0;
@@ -331,7 +331,7 @@ InterruptDescriptorTable::Load() const
 }
 
 
-constexpr InterruptDescriptor
+InterruptDescriptor
 InterruptDescriptor::Generate(unsigned index)
 {
 	return index == 3
