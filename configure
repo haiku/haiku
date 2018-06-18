@@ -915,6 +915,9 @@ else
 		# prepare gcc settings and get the actual target architecture
 		if [ $useClang = 1 ]; then
 			gcc="$HAIKU_clang -target ${targetMachine} -no-integrated-as"
+			if [ ! -z "${crossToolsPrefix}" ]; then
+				gcc="$gcc -B ${crossToolsPrefix}"
+			fi
 
 			# Clang's compiler intrinsics are not compatible with GCC's or even
 			# across versions of Clang, so we must collect them for use in the build.
