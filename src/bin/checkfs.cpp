@@ -98,7 +98,7 @@ main(int argc, char** argv)
 	if (status != B_OK) {
 		fprintf(stderr, "%s: Could not prepare the device for modifications: "
 			"%s\n", kProgramName, strerror(status));
-		return false;
+		return 1;
 	}
 
 	// Check if the partition supports repairing

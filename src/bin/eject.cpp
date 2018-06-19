@@ -59,7 +59,7 @@ private:
 };
 
 
-static int usage(char *prog)
+static int usage(const char *prog)
 {
 	printf("usage: eject [-q|-l|-s|-b|-u] /dev/disk/.../raw\n");
 //	printf("usage: eject [-q|-l|-s|-b|-u] [scsi|ide|/dev/disk/.../raw]\n");

@@ -24,7 +24,7 @@ const char *kProgramName = __progname;
 #endif
 
 
-enum arg_needed { 
+enum arg_needed {
 	switch_needed, major_version, middle_version, minor_version,
 	variety_version, internal_version, long_string, short_string
 };
@@ -103,7 +103,7 @@ errorToString(BString& output, status_t error, const char *appName = NULL)
 		case e_expecting:
 			output = "expecting -short, -long, -app or -system\n";
 			break;
-		case e_long_string: 
+		case e_long_string:
 			output = "expecting long version string\n";
 			break;
 		case e_short_string:
@@ -134,7 +134,7 @@ errorToString(BString& output, status_t error, const char *appName = NULL)
 }
 
 
-static int
+static void
 errorOut(status_t error, const char *appName = NULL, bool showUsage = true)
 {
 	BString output;
@@ -184,12 +184,12 @@ parse(bool &systemModified, bool &appModified, arg_needed &argNeeded,
 					systemModified = true;
 				} else if (strcmp(argv[i], "-long") == 0) {
 					if (mode == no_switch)
-						errorOut(e_app_sys_switch); 
+						errorOut(e_app_sys_switch);
 
 					argNeeded = long_string;
 				} else if (strcmp(argv[i], "-short") == 0) {
 					if (mode == no_switch)
-						errorOut(e_app_sys_switch); 
+						errorOut(e_app_sys_switch);
 
 					argNeeded = short_string;
 				} else if (mode == no_switch)
@@ -197,20 +197,20 @@ parse(bool &systemModified, bool &appModified, arg_needed &argNeeded,
 				else if (strncmp(argv[i], "-", 1) == 0)
 					errorOut(e_parameter);
 				else
-					errorOut(e_expecting); 
+					errorOut(e_expecting);
 				break;
 
 			case major_version:
 				if (isalpha(argv[i][0]))
-					errorOut(e_major_version); 
+					errorOut(e_major_version);
 
 				version.major = atoi(argv[i]);
-				argNeeded = middle_version;	
+				argNeeded = middle_version;
 				break;
 
 			case middle_version:
 				if (isalpha(argv[i][0]))
-					errorOut(e_middle_version); 
+					errorOut(e_middle_version);
 
 				version.middle = atoi(argv[i]);
 				argNeeded = minor_version;
@@ -220,7 +220,7 @@ parse(bool &systemModified, bool &appModified, arg_needed &argNeeded,
 				if (isalpha(argv[i][0]))
 					errorOut(e_minor_version);
 
-				version.minor = atoi(argv[i]);	
+				version.minor = atoi(argv[i]);
 
 				if (i >= argc-1) {
 					argNeeded = switch_needed;
@@ -251,7 +251,7 @@ parse(bool &systemModified, bool &appModified, arg_needed &argNeeded,
 				if (isalpha(argv[i][0]))
 					errorOut(e_expecting);
 
-				version.internal = atoi(argv[i]);	
+				version.internal = atoi(argv[i]);
 				argNeeded = switch_needed;
 				break;
 
@@ -304,9 +304,9 @@ main(int argc, char *argv[])
 {
 	if (argc < 3) {
 		if (argc < 2)
-			return errorOut(e_app_sys_switch);
+			errorOut(e_app_sys_switch);
 
-		return errorOut(e_specify_version);
+		errorOut(e_specify_version);
 	}
 
 	// reset version infos
@@ -355,10 +355,10 @@ main(int argc, char *argv[])
 	}
 
 	if (systemModified) {
-		status = info.SetVersionInfo(&systemVersion, B_SYSTEM_VERSION_KIND);	
+		status = info.SetVersionInfo(&systemVersion, B_SYSTEM_VERSION_KIND);
 		if (status < B_OK)
 			errorOut(status, NULL, false);
-	}	
+	}
 
 	return 0;
 }
