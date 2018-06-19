@@ -16,7 +16,7 @@
 
 
 class Gravity;
-class GravitySource;
+struct GravitySource;
 
 
 class GravityView : public BGLView {

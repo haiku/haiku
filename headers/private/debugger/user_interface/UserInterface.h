@@ -15,7 +15,7 @@
 #include "Types.h"
 
 
-class entry_ref;
+struct entry_ref;
 
 class CpuState;
 class ExpressionInfo;

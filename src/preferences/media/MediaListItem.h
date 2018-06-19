@@ -2,7 +2,7 @@
 //
 //	Copyright (c) 2003, OpenBeOS
 //
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the MIT License.
 //
 //
@@ -10,7 +10,7 @@
 //  Author:      Sikosis, Jérôme Duval
 //  Description: Media Preferences
 //  Created :    June 25, 2003
-// 
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #ifndef __MEDIALISTITEM_H__
 #define __MEDIALISTITEM_H__
@@ -22,7 +22,7 @@
 
 struct dormant_node_info;
 
-class MediaIcons;
+struct MediaIcons;
 class MediaWindow;
 
 class AudioMixerListItem;
@@ -45,10 +45,10 @@ public:
 	virtual	void				Update(BView* owner, const BFont* font);
 	virtual	void				DrawItem(BView* owner, BRect frame,
 									bool complete = false);
-	
+
 	virtual	const char*			Label() = 0;
 
-	
+
 	static	MediaIcons*			Icons() {return sIcons;}
 	static	void				SetIcons(MediaIcons* icons) {sIcons = icons;}
 

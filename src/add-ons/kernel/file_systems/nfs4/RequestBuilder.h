@@ -19,9 +19,9 @@
 #include "XDR.h"
 
 
-class OpenState;
-class LockInfo;
-class LockOwner;
+struct OpenState;
+struct LockInfo;
+struct LockOwner;
 
 class RequestBuilder {
 public:

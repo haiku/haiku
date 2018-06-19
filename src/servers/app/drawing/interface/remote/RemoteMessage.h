@@ -33,7 +33,7 @@ class RemotePainter;
 class ServerBitmap;
 class ServerCursor;
 class ServerFont;
-class ViewLineArrayInfo;
+struct ViewLineArrayInfo;
 
 enum {
 	RP_INIT_CONNECTION = 1,

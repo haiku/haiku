@@ -37,7 +37,7 @@ class BMenuItem;
 class BMessage;
 class BMessageRunner;
 class BPopUpMenu;
-class CalcOptions;
+struct CalcOptions;
 class CalcOptionsWindow;
 class ExpressionTextView;
 

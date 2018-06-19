@@ -14,7 +14,7 @@
 #include "ValueNodeContainer.h"
 
 
-class entry_ref;
+struct entry_ref;
 class Architecture;
 class AreaInfo;
 class BFile;

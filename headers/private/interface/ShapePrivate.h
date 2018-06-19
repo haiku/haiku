@@ -27,7 +27,8 @@
 #define OP_SMALL_ARC_TO_CCW	0x08000000
 
 
-struct shape_data : public BReferenceable {
+class shape_data : public BReferenceable {
+public:
 	uint32*	opList;
 	BPoint*	ptList;
 	int32	opCount;

@@ -18,7 +18,7 @@ enum {
 };
 
 
-class UTF8Char;
+struct UTF8Char;
 
 class TerminalCharClassifier {
 public:

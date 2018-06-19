@@ -9,8 +9,8 @@
 #include "virtio_blk.h"
 
 
-struct DMAResource;
-struct IOScheduler;
+class DMAResource;
+class IOScheduler;
 
 
 static const uint8 kDriveIcon[] = {

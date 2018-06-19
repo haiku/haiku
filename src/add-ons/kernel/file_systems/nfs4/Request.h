@@ -14,7 +14,7 @@
 #include "RPCServer.h"
 
 
-class Cookie;
+struct Cookie;
 class FileSystem;
 
 class Request {

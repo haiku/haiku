@@ -17,7 +17,7 @@
 
 
 class FileSystem;
-class OpenFileCookie;
+struct OpenFileCookie;
 
 class NFS4Server : public RPC::ProgramData {
 public:

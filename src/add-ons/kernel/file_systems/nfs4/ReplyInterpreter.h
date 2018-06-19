@@ -57,7 +57,7 @@ struct DirEntry {
 						~DirEntry();
 };
 
-class LockInfo;
+struct LockInfo;
 
 class ReplyInterpreter {
 public:

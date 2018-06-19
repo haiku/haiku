@@ -14,7 +14,7 @@
 	Used to discriminate between different targets in order to filter
 	multi-clicks. A click on a different target resets the click count.
 */
-struct ClickTarget {
+class ClickTarget {
 public:
 	enum Type {
 		TYPE_INVALID,

@@ -50,8 +50,8 @@
 namespace {
 
 
-struct Directory;
-struct Node;
+class Directory;
+class Node;
 struct WatcherHashDefinition;
 typedef BOpenHashTable<WatcherHashDefinition> WatcherMap;
 

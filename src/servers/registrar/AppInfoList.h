@@ -30,9 +30,9 @@
 #include <List.h>
 #include <OS.h>
 
-class entry_ref;
+struct entry_ref;
 
-class RosterAppInfo;
+struct RosterAppInfo;
 
 // AppInfoList
 class AppInfoList {

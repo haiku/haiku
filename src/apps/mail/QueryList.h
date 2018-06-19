@@ -16,7 +16,7 @@
 #include <Query.h>
 
 
-struct QueryList;
+class QueryList;
 
 
 class QueryListener {

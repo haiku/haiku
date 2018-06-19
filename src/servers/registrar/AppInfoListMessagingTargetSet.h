@@ -12,7 +12,7 @@
 #include "AppInfoList.h"
 #include "MessageDeliverer.h"
 
-class RosterAppInfo;
+struct RosterAppInfo;
 
 class AppInfoListMessagingTargetSet : public MessagingTargetSet {
 public:

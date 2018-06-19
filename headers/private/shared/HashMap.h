@@ -450,7 +450,7 @@ HashMap<Key, Value>::Size() const
 
 // GetIterator
 template<typename Key, typename Value>
-struct HashMap<Key, Value>::Iterator
+class HashMap<Key, Value>::Iterator
 HashMap<Key, Value>::GetIterator() const
 {
 	return Iterator(this);

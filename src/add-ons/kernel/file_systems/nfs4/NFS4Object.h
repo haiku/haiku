@@ -13,8 +13,8 @@
 #include "RPCServer.h"
 
 
-class OpenStateCookie;
-class OpenState;
+struct OpenStateCookie;
+struct OpenState;
 
 class NFS4Object {
 public:

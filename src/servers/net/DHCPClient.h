@@ -17,8 +17,8 @@
 
 
 class BMessageRunner;
-class dhcp_message;
-class socket_timeout;
+struct dhcp_message;
+struct socket_timeout;
 
 
 enum dhcp_state {
