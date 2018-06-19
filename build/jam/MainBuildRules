@@ -353,10 +353,6 @@ rule CreateAsmStructOffsetsHeader header : source
 	flags += -Wno-invalid-offsetof ;
 		# TODO: Rather get rid of the respective offsetof() instances.
 
-	if $(HAIKU_CC_IS_CLANG_$(TARGET_PACKAGING_ARCH)) = 1 {
-		flags += -no-integrated-as ;
-	}
-
 	# locate object, search for source, and set on target variables
 
 	Depends $(header) : $(source) $(PLATFORM) ;

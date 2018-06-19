@@ -43,6 +43,12 @@ rule ArchitectureSetup architecture
 		gccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
 	}
 
+	# disable some Clang warnings that are not very useful
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		gccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field
+			-Wno-cast-align -Wno-gnu-designator ;
+	}
+
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
 	if $(cpu) = arm {
 		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
@@ -106,15 +112,6 @@ rule ArchitectureSetup architecture
 		HAIKU_C++FLAGS_$(architecture) += -Wno-deprecated ;
 	}
 
-	switch $(cpu) {
-		case x86* :
-			# Enable use of the gcc built-in atomic functions instead of
-			# atomic_*(). The former are inlined and have thus less overhead.
-			# They are not available with gcc 2, but the header will take care
-			# of that.
-			HAIKU_DEFINES_$(architecture) += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
-	}
-
 	# warning flags
 	HAIKU_WARNING_CCFLAGS_$(architecture)
 		= -Wall -Wno-trigraphs -Wmissing-prototypes
@@ -132,10 +129,6 @@ rule ArchitectureSetup architecture
 
 		# TODO: remove the -Wno-unused-but-set-variable option
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unused-but-set-variable ;
-	}
-
-	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		gccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field ;
 	}
 
 	# debug flags
