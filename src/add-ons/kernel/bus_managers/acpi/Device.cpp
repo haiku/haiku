@@ -87,7 +87,7 @@ acpi_walk_resources(acpi_device device, char *method,
 static status_t
 acpi_device_init_driver(device_node *node, void **cookie)
 {
-	ACPI_HANDLE handle;
+	ACPI_HANDLE handle = NULL;
 	const char *path = NULL;
 	uint32 type;
 
