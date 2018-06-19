@@ -42,7 +42,7 @@ private:
 			bool				fIsInbound;
 			ErrorLogWindow*		fErrorWindow;
 			BNotification		fNotification;
-			uint32&				fShowMode;
+			uint32				fShowMode;
 
 			uint32				fTotalItems;
 			uint32				fItemsDone;
