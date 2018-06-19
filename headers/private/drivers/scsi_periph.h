@@ -44,8 +44,8 @@ typedef struct err_res {
 } err_res;
 
 #define MK_ERROR( aaction, code ) ({ \
-	err_res res = {error_code: (code), action: (aaction) };	\
-	res;					\
+	err_res _res = {error_code: (code), action: (aaction) };	\
+	_res;					\
 })
 
 // cookie issued by driver to identify itself
