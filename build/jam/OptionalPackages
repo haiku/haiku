@@ -23,9 +23,6 @@ OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies NetFS : UserlandFS ;
 
 
-local baseURL = http://haiku-files.org/files/optional-packages ;
-
-
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	AddHaikuImagePackages be_book ;
@@ -168,9 +165,6 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 			if [ FIsBuildFeatureEnabled webpositive ] {
 				AddPackageFilesToHaikuImage system : webpositive.hpkg
 					: nameFromMetaInfo ;
-				InstallOptionalHaikuImagePackage
-					$(baseURL)/WebPositiveBookmarks-2017-01-08.zip
-					: home config settings WebPositive ;
 				break ;
 			}
 		}
