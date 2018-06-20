@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2018 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NET_IF_DL_H
@@ -19,7 +19,7 @@ struct sockaddr_dl {
 	uint8_t		sdl_nlen;		/* interface name length (not terminated with a null byte) */
 	uint8_t		sdl_alen;		/* link level address length */
 	uint8_t		sdl_slen;		/* link layer selector length */
-	uint8_t		sdl_data[20];	/* minimum work area, can be larger */
+	uint8_t		sdl_data[46];	/* minimum work area, can be larger */
 };
 
 /* Macro to get a pointer to the link level address */
