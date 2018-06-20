@@ -1179,42 +1179,6 @@ rule InstallSourceArchive file : url
 	}
 }
 
-rule InstallOptionalHaikuImagePackage url : dirTokens : flags
-{
-	# TODO: Remove the non-hpkg cases!
-	# Currently the semantics differs depending on whether the cdPackage flag
-	# has been specified and the type of the package file:
-	# * For a hpkg <dirTokens> is ignored. The package will be copied into the
-	#   system/packages directory.
-	# * For a regular archive and cdPackage, <dirTokens> is ignored and
-	#   the package will be copied to the _package_ directory of the CD image.
-	# * For a regular archive and without cdPackage, <dirTokens> specifies the
-	#   directory relative to the image's root directory where the content of
-	#   the archive will be extracted to.
-	#
-	# Supported flags: cdPackage
-
-	local package = $(url:BS) ;
-
-	# download archive file
-	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
-
-	if $(package:S) = .hpkg {
-		if $(HAIKU_UPDATE_ALL_PACKAGES) {
-			HAIKU_INCLUDE_IN_IMAGE on $(archiveFile) = 1 ;
-		}
-		AddPackageFilesToHaikuImage system : $(archiveFile) ;
-	} else if cdPackage in $(flags) && $(HAIKU_CD_NAME) {
-		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
-		# image!
-		# copy onto image
-		AddFilesToHaikuImage _packages_ : $(archiveFile) ;
-	} else {
-		# extract onto image
-		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) : $(flags) ;
-	}
-}
-
 rule AddEntryToHaikuImageUserGroupFile file : entry
 {
 	local allEntries = [ on $(file) return $(HAIKU_IMAGE_USER_GROUP_ENTRIES) ] ;
