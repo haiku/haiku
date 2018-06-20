@@ -594,7 +594,6 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons translators bmp ;
 	EnableWerror src add-ons translators exr ;
 	EnableWerror src add-ons translators gif ;
-#	EnableWerror src add-ons translators hpgs ;
 	EnableWerror src add-ons translators hvif ;
 	EnableWerror src add-ons translators ico ;
 	EnableWerror src add-ons translators jpeg ;
