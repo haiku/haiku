@@ -1,10 +1,3 @@
-/* ++++++++++
-	FILE:	joystick_driver.h
-	REVS:	$Revision: 1.1 $
-	NAME:	herold
-	DATE:	Tue Jun  4 14:57:25 PDT 1996
-+++++ */
-
 /*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.

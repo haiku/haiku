@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio cmedia ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders audio ;
+UsePrivateHeaders audio device ;
 
 KernelAddon cmedia :
 	cm.c
