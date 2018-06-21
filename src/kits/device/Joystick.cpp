@@ -62,8 +62,11 @@ BJoystick::BJoystick()
 	sLogFile = fopen("/var/log/joystick.log", "a");
 #endif
 
-	if (fJoystickInfo != NULL)
-		memset(fJoystickInfo, 0, sizeof(joystick_info));
+	if (fJoystickInfo != NULL) {
+		memset(&fJoystickInfo->module_info, 0, sizeof(joystick_module_info));
+		fJoystickInfo->calibration_enable = false;
+		fJoystickInfo->max_latency = 0;
+	}
 
 	RescanDevices();
 }
