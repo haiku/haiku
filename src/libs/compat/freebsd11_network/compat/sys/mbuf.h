@@ -12,8 +12,10 @@
 #include <vm/uma.h>
 
 
-#define MLEN		((int)(MSIZE - sizeof(struct m_hdr)))
-#define MHLEN		((int)(MLEN - sizeof(struct pkthdr)))
+#define MHSIZE		__offsetof(struct mbuf, m_dat)
+#define MPKTHSIZE	__offsetof(struct mbuf, m_pktdat)
+#define MLEN		((int)(MSIZE - MHSIZE))
+#define MHLEN		((int)(MSIZE - MPKTHSIZE))
 
 #define MINCLSIZE	(MHLEN + 1)
 
@@ -137,10 +139,10 @@ struct mbuf {
 			struct pkthdr	MH_pkthdr;
 			union {
 				struct m_ext	MH_ext;
-				char			MH_databuf[MHLEN];
+				char			MH_databuf[0];
 			} MH_dat;
 		} MH;
-		char M_databuf[MLEN];
+		char M_databuf[0];
 	} M_dat;
 };
 
