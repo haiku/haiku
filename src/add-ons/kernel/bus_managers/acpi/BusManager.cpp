@@ -277,8 +277,8 @@ acpi_std_ops(int32 op,...)
 
 		case B_MODULE_UNINIT:
 		{
-			if (checkAndLogFailure(AcpiTerminate(),
-				"Could not bring system out of ACPI mode. Oh well."));
+			checkAndLogFailure(AcpiTerminate(),
+				"Could not bring system out of ACPI mode. Oh well.");
 
 			gDPC->delete_dpc_queue(gDPCHandle);
 			gDPCHandle = NULL;
