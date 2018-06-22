@@ -36,7 +36,7 @@ AbstractSingleFileServerProcess::RunInternal()
 	if (IsSuccess(result) && HasOption(SERVER_PROCESS_DROP_CACHE))
 		result = DeleteLocalFile(localPath);
 
-	bool hasData;
+	bool hasData = false;
 	off_t size;
 
 	if (IsSuccess(result))
