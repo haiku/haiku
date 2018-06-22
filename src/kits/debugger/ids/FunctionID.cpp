@@ -63,7 +63,7 @@ FunctionID::ComputeHashValue() const
 bool
 FunctionID::IsValid() const
 {
-	return !fPath.Length() == 0 && !fFunctionName.Length() == 0;
+	return fPath.Length() != 0 && fFunctionName.Length() != 0;
 }
 
 
