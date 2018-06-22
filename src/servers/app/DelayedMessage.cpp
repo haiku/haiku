@@ -299,7 +299,7 @@ DelayedMessageData::DelayedMessageData(int32 code, bigtime_t delay,
 	bool isSpecificTime)
 	:
 	fCode(code),
-	fScheduledTime(delay + isSpecificTime ? 0 : system_time()),
+	fScheduledTime(delay + (isSpecificTime ? 0 : system_time())),
 	fValid(false),
 
 	fAttachments(3, true),
