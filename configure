@@ -862,7 +862,7 @@ else
 		# prefix was specified. The standard_gcc_settings call below will get
 		# the actual architecture.
 
-		if test "${HAIKU_PACKAGING_ARCHS#*$targetArch}" != "$HAIKU_PACKAGING_ARCHS"; then
+		if test "${HAIKU_PACKAGING_ARCHS#*$targetArch\b}" != "$HAIKU_PACKAGING_ARCHS"; then
 			# somehow we wound up with a duplicate arch; skip this one
 			continue
 		fi
