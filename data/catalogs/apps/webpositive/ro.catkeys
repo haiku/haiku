@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	670043186
+1	romanian	x-vnd.Haiku-WebPositive	2763299522
 Show home button	Settings Window		Afișează buton acasă
 Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
@@ -71,6 +71,7 @@ Number of days to keep links in History menu:	Settings Window		Numărul de zile 
 Reset size	WebPositive Window		Resetează dimensiunea
 Find:	WebPositive Window		Caută:
 Increase size	WebPositive Window		Mărește dimensiunea
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A apărut o eroare la recuperarea a dosarului de favorite.\n\nEroare: %error
 Downloads	WebPositive Window		Descărcări
 Requesting %url	WebPositive Window		Se solicită %url
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Caută următoarea apariție a termenilor căutării
@@ -105,6 +106,7 @@ Paste	URL Bar		Lipire
 Cookie manager	WebPositive Window		Manager de cookie
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ascunde textul parolei
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Vând muzică de jazz și haine de bun-gust în New-York și Quebec, la preț fix.
 Open start page	Settings Window		Deschide pagina de început
 Continue downloads	WebPositive		Continuă descărcările
 Cancel	Download Window		Anulează
@@ -130,6 +132,7 @@ Style:	Font Selection view		Stil:
 General	Settings Window		General
 View	WebPositive Window		Vizualizare
 Previous	WebPositive Window		Anterior
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	A apărut o eroare la crearea dosarului de favorite.\n\nEroare: %error
 (Finish: %date - Over %duration left)	Download Window		(Terminare: %date - peste %duration rămas)
 Bookmark error	WebPositive Window		Eroare de marcaj
 Do you really want to clear the browsing history?	WebPositive Window		Sigur doriți să ștergeți istoricul de navigare?

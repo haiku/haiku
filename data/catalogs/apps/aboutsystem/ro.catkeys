@@ -1,5 +1,5 @@
-1	romanian	x-vnd.Haiku-About	2396522871
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 de autorii pentru Gutenprint. Toate drepturile rezervate.
+1	romanian	x-vnd.Haiku-About	3317318166
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 de către autorii ai Gutenprint. Toate drepturile rezervate.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm și Werner Lemberg.
 Past website & marketing:\n	AboutView		Site web și marketing anterior:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n
@@ -19,6 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Cod sursă: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesor:} other{# Procesoare:}}
 Kernel:	AboutView		Nucleu:
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Drepturi de autor © 2002-2014 Industrial Light & Magic, o diviziune a Lucas Digital Ltd. LLC.
 BSD (4-clause)	AboutWindow		BSD (clauza 4)
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Drepturi de autor © 2012-2016 Echipa de Internaționalizare Google.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori atunci când este notat explicit în sursă. Haiku® şi logoul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n

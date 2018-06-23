@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	1582810306
+1	croatian	x-vnd.Haiku-HaikuDepot	2141757280
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zatvori
 Changelog	PackageInfoView		Dnevnik promjena
@@ -9,7 +9,6 @@ Stability:	RatePackageWindow		Stabilnost:
 Click a package to view information	PackageInfoView		Klikni na paket da vidiš informacije
 Other users can see this rating	RatePackageWindow		Ostali korisnici mogu vidjeti ovo ocjenjivanje
 Stability	RatePackageWindow		Stabilnost
-for %Version%	PackageInfoView		za %Verziju%
 Description	PackageListView		Opis
 Install	PackageManager		Instaliraj
 Source packages	MainWindow		 Izvorni paketi
@@ -21,11 +20,9 @@ Rate package…	PackageInfoView		Ocijeni paket...
 Category	FilterView		Kategorija
 Uninstall	PackageManager		Deinstaliraj
 An error occurred while obtaining the package list: %message%	MainWindow		Došlo je do greške kod pribavljanja liste paketa: %poruka%
-Your rating was updated successfully.	RatePackageWindow		Ocjena je uspješno poslana.
 <no info>	PackageInfoView		<no info>
 An error occurred while initializing the package manager: %message%	MainWindow		Došlo je do greške pri iniciranju upravitelja paketima: %poruka%
 Email address:	UserLoginWindow		Adresa e-pošte:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Vaše ocjenjivanje je uspješno poslano, Možete ga ažurirati ili ukloniti bilo kada ocjenjujući paket ponovno.
 Very unstable	RatePackageWindow		Vrlo nestabilan
 The username is already taken. Please choose another.	UserLoginWindow		Korisničko ime je već zauzeto. Molim izaberite drugo.
 Close	PackageManager		Zatvori
@@ -53,7 +50,6 @@ Education	Model		Obrazovanje
 Search terms:	FilterView		Pojmovi pretrage:
 %Version%	PackageInfoView		%Verzija%
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Dogodila se greška kod osvježavanja repozitorija:%greška% (%pojedinosti%)
-It was not possible to contact the web service.	RatePackageWindow		Nije bilo moguće kontaktirati web servis.
 Create account	UserLoginWindow		Napravi račun
 Productivity	Model		Produktivnost
 Authentication failed	UserLoginWindow		Neuspjela ovjera
@@ -70,7 +66,6 @@ Graphics	Model		Grafika
 Local	MainWindow		Lokalno
 Close	MainWindow		Zatvori
 Preferred language:	UserLoginWindow		Preferirani jezik:
-Failed to rate package	RatePackageWindow		Neuspjelo ocjenjivanje paketa
 Internet & Network	Model		Internet i mreža
 Cancel	MainWindow		Otkaži
 Update	RatePackageWindow		Ažuriraj
@@ -90,7 +85,6 @@ Send	RatePackageWindow		Pošalji
 Category:	FilterView		Kategorija:
 Failed to create account	UserLoginWindow		Neuspjelo kreiranje računa
 There are problems with the data you entered:\n\n	UserLoginWindow		Ima problema sa podacima koje ste unijeli:\n\n
-Success	RatePackageWindow		Uspjeh
 Business	Model		Posao
 Audio	Model		Audio
 About	PackageInfoView		O programu

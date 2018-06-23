@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2069133245
+1	swedish	x-vnd.Haiku-HaikuDepot	2705096857
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -13,7 +13,6 @@ Stability:	RatePackageWindow		Stabilitet:
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 Other users can see this rating	RatePackageWindow		Andra användare kan se denna bedömning
 Stability	RatePackageWindow		Stabilitet
-for %Version%	PackageInfoView		för %Version%
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
@@ -28,12 +27,10 @@ Rate package…	PackageInfoView		Betygsätt paket...
 Category	FilterView		Kategori
 Uninstall	PackageManager		Avinstallera
 An error occurred while obtaining the package list: %message%	MainWindow		Ett fel inträffade när packet manager hämtade paketlistan: %message%
-Your rating was updated successfully.	RatePackageWindow		Ditt betyg har uppdaterats med lyckat resultat.
 <no info>	PackageInfoView		<Ingen information>
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
 Email address:	UserLoginWindow		E-postadress:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Din betygsättning laddadesupp ok. Du kan närsomhelst uppdatera eller tabort ditt betyg för paketet genom att ge ett nytt betyg.
 Very unstable	RatePackageWindow		Mycket ostabil
 <Package contents not available for remote packages>	PackageContentsView		<Paketinehållet är inte tillgängligt för externa paket>
 The username is already taken. Please choose another.	UserLoginWindow		Användarnamnet används redan. Välj ett annat.
@@ -66,19 +63,15 @@ Success	UserLoginWindow		Klar
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
 Downloading:	PackageInfoView		Mestadels stabil
 Mostly stable	RatePackageWindow		Mestadels stabil
-There was a puzzling response from the web service.	RatePackageWindow		Det kom ett konstigt meddelande från webb servicen.
 Log out	MainWindow		Logga ut
 Repository	PackageListView		Repositorie
 Education	Model		Utbildning
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
-Failed to update rating	RatePackageWindow		Misslyckades uppdatera betyg
 Does not start	RatePackageWindow		Starta inte
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när repositoriet uppdaterades: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Det gick inte att få kontakt med webb servicen.
 There are problems in the form:\n\n	UserLoginWindow		Det finns problem i formuläret:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Paketet hittades inte av webb servicen. Troligen beror det på att paketet kommer från en depå som inte följs. Betygsättning av sådana paket supporteras tvärr inte.
 Create account	UserLoginWindow		Skapa konto
 Productivity	Model		Produktivitet
 No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
@@ -87,9 +80,7 @@ Logged in as %User%	MainWindow		Inloggad som %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Språk
 Size	PackageListView		Storlek
-Failed to create or update rating: %s\n	RatePackageWindow		Gick inte att skapa eller uppdatera betyg: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
- It responded with: 	RatePackageWindow		 Den svarade med: 
 User name:	UserLoginWindow		Användarnamn:
 User Menu	MainWindow		Användarmeny
 Unstable but usable	RatePackageWindow		Ostabil men kan användas
@@ -102,7 +93,6 @@ Graphics	Model		Grafik
 Local	MainWindow		Lokal
 Close	MainWindow		Stäng
 Preferred language:	UserLoginWindow		Föredraget språk:
-Failed to rate package	RatePackageWindow		Misslyckades gradera paketet
 Internet & Network	Model		Internet & Nätverk
 Refresh repositories	MainWindow		Ladda om repositorier
 Cancel	MainWindow		Avbryt
@@ -144,7 +134,6 @@ Check for updates…	MainWindow		Leta efter uppdateringar…
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
 Start package daemon	App		Starta paket-servicen
 Manage repositories…	MainWindow		Hantera repositorier...
-Success	RatePackageWindow		Klar
 Business	Model		Företag
 Audio	Model		Ljud
 About	PackageInfoView		Om

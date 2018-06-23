@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	3676898540
+1	romanian	x-vnd.Haiku-CharacterMap	124574598
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerice încercuite
 Basic Latin	UnicodeBlocks		Latină de bază
 Cyrillic extended C	UnicodeBlocks		Chirilic extins C
@@ -29,6 +29,7 @@ Ol Chiki	UnicodeBlocks		Ol Chiki
 Arabic	UnicodeBlocks		Arabic
 Ethiopic extended	UnicodeBlocks		Etiopic extins
 Arrows	UnicodeBlocks		Săgeți
+Sutton SignWriting	UnicodeBlocks		SignWriting Sutton
 Font	CharacterWindow		Font
 Hatran	UnicodeBlocks		Hatran
 Variation selectors supplement	UnicodeBlocks		Supliment selectori de variație
@@ -97,6 +98,7 @@ Code	CharacterWindow		Cod
 Lepcha	UnicodeBlocks		Lepcha
 Sinhala	UnicodeBlocks		Sinhala
 Ancient Greek musical notation	UnicodeBlocks		Notație muzicală greaca veche
+Early Dynastic Cuneiform	UnicodeBlocks		Cuneiformă dinastică veche
 Geometric shapes	UnicodeBlocks		Forme geometrice
 Letterlike symbols	UnicodeBlocks		Simboluri asemănătoare cu literele
 Hangul Jamo	UnicodeBlocks		Hangul Jamo

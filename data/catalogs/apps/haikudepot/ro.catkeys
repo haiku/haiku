@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1195245614
+1	romanian	x-vnd.Haiku-HaikuDepot	2705096857
 Name	PackageListView		Nume
 Available packages	MainWindow		Pachete disponibile
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
@@ -13,10 +13,10 @@ Stability:	RatePackageWindow		Stabilitate:
 Click a package to view information	PackageInfoView		Clic pe un pachet pentru a vizualiza informații
 Other users can see this rating	RatePackageWindow		Alți utilizatori pot vedea această evaluare
 Stability	RatePackageWindow		Stabilitate
-for %Version%	PackageInfoView		pentru %Version%
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
 Description	PackageListView		Descriere
 Install	PackageManager		Instalare
+All repositories	MainWindow		Toate depozitele
 Source packages	MainWindow		Pachete sursă
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autentificare eșuată. Utilizatorul nu există sau parola incorectă a fost furnizată.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Cont creat cu succes. Acum puteți evalua pachete și face alte lucruri folositoare.
@@ -27,12 +27,10 @@ Rate package…	PackageInfoView		Evaluați pachet…
 Category	FilterView		Categorie
 Uninstall	PackageManager		Dezinstalare
 An error occurred while obtaining the package list: %message%	MainWindow		O eroare s-a întâmplat obținând lista de pachete: %message%
-Your rating was updated successfully.	RatePackageWindow		Evaluarea a fost actualizată cu succes.
 <no info>	PackageInfoView		<no info>
 Starting the package daemon failed:\n\n%Error%	App		Pornirea demonului de pachete a eșuat:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		O eroare s-a întâmplat inițializând managerul de pachete: %message%
 Email address:	UserLoginWindow		Adresă email:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Evaluarea a fost încărcată cu succes. Puteți s-o actualizați sau elimina oricând prin evaluarea din nou a pachetului.
 Very unstable	RatePackageWindow		Foarte instabil
 <Package contents not available for remote packages>	PackageContentsView		<Conținutul pachetelor nu este disponibil pentru pachetele de la distanță>
 The username is already taken. Please choose another.	UserLoginWindow		Acest nume de utilizator este deja folosit. Alegeți altul.
@@ -45,6 +43,7 @@ Switch account…	MainWindow		Schimbare cont…
 Ignore	UserLoginWindow		Ignoră
 Language	UserLoginWindow		Limbă
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
+Show only featured packages	FilterView		Arată doar pachetele recomandate
 Rate package	RatePackageWindow		Evaluați pachet
 Development	Model		Dezvoltare
 Fatal error	PackageManager		Eroare fatală
@@ -64,18 +63,15 @@ Success	UserLoginWindow		Succes
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot are nevoie de serviciul de pachete pentru a functiona și se pare că nu rulează.\nDoriți să-l porniți acum?
 Downloading:	PackageInfoView		Se descarcă:
 Mostly stable	RatePackageWindow		Majoritatea stabile
-There was a puzzling response from the web service.	RatePackageWindow		A apărut un răspuns neobișnuit de la serviciul web.
 Log out	MainWindow		Ieșire
+Repository	PackageListView		Depozit
 Education	Model		Educație
 Search terms:	FilterView		Termeni de căutat:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluări de utilizator.
-Failed to update rating	RatePackageWindow		Nu s-a putut actualiza evaluarea
 Does not start	RatePackageWindow		Nu pornește
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		O eroare s-a întâmplat actualizând depozitul: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Contactarea serviciului web nu a fost posibilă.
 There are problems in the form:\n\n	UserLoginWindow		Sunt probleme de forma:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Pachetul nu a fost găsit de către serviciul web. Asta înseamnă că acesta provine probabil de la un depozit care nu este urmărit acolo. Evaluarea unor asemenea pachete nu este suportată.
 Create account	UserLoginWindow		Creează cont
 Productivity	Model		Productivitate
 No, quit HaikuDepot	App		Nu, închideți HaikuDepot
@@ -84,9 +80,7 @@ Logged in as %User%	MainWindow		Autentificat ca %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Limbă
 Size	PackageListView		Mărime
-Failed to create or update rating: %s\n	RatePackageWindow		Eșec la crearea sau actualizarea evaluării: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.
- It responded with: 	RatePackageWindow		 A răspuns cu: 
 User name:	UserLoginWindow		Nume utilizator:
 User Menu	MainWindow		Meniu utilizator
 Unstable but usable	RatePackageWindow		Instabil dar utilizabil
@@ -99,7 +93,6 @@ Graphics	Model		Grafică
 Local	MainWindow		Local
 Close	MainWindow		Închidere
 Preferred language:	UserLoginWindow		Limbă preferată:
-Failed to rate package	RatePackageWindow		Eșec la evaluarea pachetului
 Internet & Network	Model		Internet & Rețea
 Refresh repositories	MainWindow		Actualizare depozite
 Cancel	MainWindow		Anulează
@@ -133,17 +126,19 @@ Cancel	RatePackageWindow		Anulează
 Package action failed	PackageInfoView		Acțiune pachet eșuată
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Trimitere
+Repositories	MainWindow		Depozite
 -	no package size		-
 Category:	FilterView		Categorie:
 Failed to create account	UserLoginWindow		Eșec la crearea contului
+Check for updates…	MainWindow		Verifică pentru actualizări…
 There are problems with the data you entered:\n\n	UserLoginWindow		Există probleme cu datele pe care le-ați introdus:\n\n
 Start package daemon	App		Pornire demon de pachet
 Manage repositories…	MainWindow		Gestionare depozite...
-Success	RatePackageWindow		Succes
 Business	Model		Afaceri
 Audio	Model		Audio
 About	PackageInfoView		Despre
 Active	PackageListView		Activ
 It was not possible to contact the web service.	UserLoginWindow		Contactarea serviciului web nu a fost posibilă.
+Refreshing...	MainWindow		Se împrospătează...
 Failed to create account: %s\n	UserLoginWindow		Nu s-a putut crea contul: %s\n
 Cancel	UserLoginWindow		Anulează

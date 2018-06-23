@@ -1,11 +1,13 @@
-1	romanian	x-vnd.Haiku-Backgrounds	3336272562
+1	romanian	x-vnd.Haiku-Backgrounds	1458061718
 Backgrounds	System name		Fundaluri
 X:	Main View		X:
+Setting the background image failed:	Main View		Stabilirea imaginii de fundal a eșuat.
 Resolution: 	Image Filepanel		Rezoluție: 
 pick one	Main View		alege una
 Default	Main View		Implicit
 Center	Main View		Centru
 Manual	Main View		Manual
+Set background image error	Main View		Eroare la stabilirea imaginii de fundal
 Default folder	Main View		Dosar implicit
 Revert	Main View		Revenire
 None	Main View		Nimic

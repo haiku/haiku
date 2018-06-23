@@ -1,9 +1,8 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	3127821216
+1	belarusian	x-vnd.Haiku-HaikuDepot	4084227647
 Name	PackageListView		Імя
 Close	RatePackageWindow		Закрыць
 Changelog	PackageInfoView		Гісторыя зменаў
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
-for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		Спіс змен не існуе
 Description	PackageListView		Апісанне
 Install	PackageManager		Усталяваць

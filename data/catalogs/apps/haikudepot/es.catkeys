@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	1195245614
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	1831209226
 Name	PackageListView		Nombre
 Available packages	MainWindow		Paquetes disponibles
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -13,7 +13,6 @@ Stability:	RatePackageWindow		Estabilidad:
 Click a package to view information	PackageInfoView		Haga clic en un paquete para ver su información
 Other users can see this rating	RatePackageWindow		Otros usuarios pueden ver esta puntuación
 Stability	RatePackageWindow		Estabilidad
-for %Version%	PackageInfoView		para %Version%
 No changelog available.	PackageInfoView		No hay registro de cambios disponible.
 Description	PackageListView		Descripción
 Install	PackageManager		Instalar
@@ -27,12 +26,10 @@ Rate package…	PackageInfoView		Puntuar paquete…
 Category	FilterView		Categoría
 Uninstall	PackageManager		Desinstalar
 An error occurred while obtaining the package list: %message%	MainWindow		Ocurrió un error al obtener la lista de paquetes: %message%
-Your rating was updated successfully.	RatePackageWindow		Su puntuación fue enviada exitosamente.
 <no info>	PackageInfoView		<no hay información>
 Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio de paquete:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Ocurrió un error al iniciar el administrador de paquetes: %message%
 Email address:	UserLoginWindow		Dirección de correo electrónico:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Su puntuación fue enviada exitosamente. Puede actualizarla o borrarla en cualquier momento puntuado el paquete otra vez.
 Very unstable	RatePackageWindow		Muy inestable
 <Package contents not available for remote packages>	PackageContentsView		<El contenido del paquete no está disponible para paquetes remotos>
 The username is already taken. Please choose another.	UserLoginWindow		El nombre de usuario ya fue tomado. Por favor elija otro.
@@ -64,18 +61,14 @@ Success	UserLoginWindow		Éxito
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot necesita que el demonio de paquete funcione, y parece no estar corriendo.\n¿Le gustaría iniciarlo ahora?
 Downloading:	PackageInfoView		Descargando:
 Mostly stable	RatePackageWindow		Mayormente estable
-There was a puzzling response from the web service.	RatePackageWindow		Hubo una respuesta misteriosa desde el servicio Web.
 Log out	MainWindow		Cerrar sesión
 Education	Model		Educación
 Search terms:	FilterView		Términos de búsqueda
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		No hay valoraciones de usuario disponibles.
-Failed to update rating	RatePackageWindow		Fallo al actualizar la valoración
 Does not start	RatePackageWindow		No inicia
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ocurrió un error mientras se actualizaba el repositorio: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Fue imposible contactar con el servicio Web.
 There are problems in the form:\n\n	UserLoginWindow		Hay problemas en el formulario:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		El paquete no se encontró por el servicio Web. Esto probablemente signifique que viene de un depósito el cual no se rastrea aquí. Valorar tales paquetes desafortunadamente no está soportado.
 Create account	UserLoginWindow		Crear cuenta
 Productivity	Model		Productividad
 No, quit HaikuDepot	App		No, salir de HaikuDepot
@@ -84,9 +77,7 @@ Logged in as %User%	MainWindow		Sesión iniciada como %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Idioma
 Size	PackageListView		Tamaño
-Failed to create or update rating: %s\n	RatePackageWindow		Fallo al crear o actualizar la valoración: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
- It responded with: 	RatePackageWindow		 Respondió con: 
 User name:	UserLoginWindow		Nombre de usuario:
 User Menu	MainWindow		Menú de usuario
 Unstable but usable	RatePackageWindow		Inestable pero usable
@@ -99,7 +90,6 @@ Graphics	Model		Gráficos
 Local	MainWindow		Local
 Close	MainWindow		Cerrar
 Preferred language:	UserLoginWindow		Idioma preferido:
-Failed to rate package	RatePackageWindow		Fallo al valorar el paquete
 Internet & Network	Model		Internet y red
 Refresh repositories	MainWindow		Actualizar repositorios
 Cancel	MainWindow		Cancelar
@@ -139,7 +129,6 @@ Failed to create account	UserLoginWindow		Fallo al registrar la cuenta
 There are problems with the data you entered:\n\n	UserLoginWindow		Hubo problemas con la información que se ingresó:\n\n
 Start package daemon	App		Arrancar demonio de paquetes
 Manage repositories…	MainWindow		Administrar repositorios…
-Success	RatePackageWindow		Éxito
 Business	Model		Trabajo
 Audio	Model		Audio
 About	PackageInfoView		Acerca de

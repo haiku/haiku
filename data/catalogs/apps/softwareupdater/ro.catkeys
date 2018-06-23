@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-softwareupdater	256495760
+1	romanian	x-vnd.haiku-softwareupdater	3418694338
 No active network connection was found	UpdateManager	Error message	Nu s-a găsit o conexiune la rețea activă
 Cancel	SoftwareUpdaterWindow		Anulează
 Packages are being updated	UpdateManager		Se actualizează pachetele
@@ -33,6 +33,7 @@ Updates completed	UpdateManager		Actualizări completate
 Invalid update type, cannot continue with updates	UpdateAction		Tip de actualizare nevalid, nu se poate continua cu actualizările
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pachetele de dezinstalat
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Actualizările nu au fost completate, sigur doriți să ieșiți?
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Utilizare:  SoftwareUpdater <command> [ <option> ]\nActualizează pachetele instalate.\n\nComenzi:\n  update     - Caută în depozite actualizări pentru toate pachetele.\n  check      - Verifică dacă există actualizări disponibile dar afișează doar o notificare cu rezultatele.\n  full-sync  - Sincronizează pachetele instalate cu depozitele.\n\nOpțiuni:\n  -h or --help       Tipărește acest ajutor de utilizare\n  -v or --verbose    Produce informații detaliate\n
 There were no updates found.	CheckAction		Nu s-au găsit actualizări.
 %i of %i	UpdateManager	Do not translate %i	%i din %i
 Updates found	SoftwareUpdaterWindow		Actualizări găsite
@@ -43,6 +44,7 @@ Quit	SoftwareUpdaterWindow	Button label	Ieșire
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Apăsați clic aici pentru a rula SoftwareUpdater. Unele actualizări vor necesita selectarea unei soluții pentru problemă.
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Se contactează depozitele de programe pentru a verifica dacă sunt actualizări de pachete.
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument nerecunoscut
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Alegeți din aceste opțiuni de actualizare:\n\nActualizare:\n\tActualizează toate pachetele instalate.\nSincronizare completă:\n\tSincronizează pachetele instalate cu depozitele.
 Exception occurred while checking for updates: %s\n	CheckAction		A apărut o excepție în timpul verificării pentru actualizări: %s\n
 Exception occurred while updating packages : %s\n	UpdateAction		A apărut o excepție în timpul încărcării pachetelor: %s\n
 Update	SoftwareUpdaterWindow	Alert button label	Actualizează

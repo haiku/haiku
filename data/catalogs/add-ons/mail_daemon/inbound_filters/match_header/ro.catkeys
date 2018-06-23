@@ -13,5 +13,5 @@ Set as read	ConfigView		Marchează ca citit
 Match header	RuleFilter		Potrivește antet
 Reply with	ConfigView		Răspunde cu
 If	ConfigView		Dacă
-Match \"%attribute\" against \"%regex\"	RuleFilter		Găsește \"%attribute\" în \"%regex\"
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valoare metacaracter ca \"*spam*\".\nPrefixați cu \"REGEX:\" pentru a utiliza expresii regulate.
+Match \"%attribute\" against \"%regex\"	RuleFilter		Potrivește \„%attribute\” peste \„%regex\”
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		O valoare de metacaracter precum \„*spam*\”.\nPrefixați cu \„REGEX:\” pentru a utiliza expresii regulate.

@@ -10,7 +10,7 @@ Phone	DeviceClass		Telefon
 17-33% utilized	DeviceClass		17-33% utilizat
 #ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nume nevalid
 Combo keyboard/pointing device	DeviceClass		Combinație tastatură/dispozitiv de indicare
-Controller	DeviceClass		Controler
+Controller	DeviceClass		Controlor
 No service available	DeviceClass		Niciun serviciu disponibil
 Wearable	DeviceClass	A wearable computer	Portabil
 Handheld	DeviceClass		Calculator de buzunar

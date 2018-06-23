@@ -6,7 +6,7 @@ usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single]
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		utilizare: %s [-h]     [-d dosar]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a model]      [-f model]\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tdeschide la <folder>\n
 %s not a valid option\n	FilePanelApp		%s nu este o opțiune validă\n
-short\tlong\tdescription\n	FilePanelApp		scurtă\tlungă\tdescriere\n
+short\tlong\tdescription\n	FilePanelApp		descriere\tscurtă\tlungă\n
 %s: this option requires a parameter\n	FilePanelApp		%s: această opțiune necesită un parametru\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tutilizează pentru a încărca FilePanel (implicit)\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnu e implementat\n

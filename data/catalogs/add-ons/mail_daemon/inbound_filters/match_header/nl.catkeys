@@ -1,5 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-MatchHeader	1349121828
+1	dutch; flemish	x-vnd.Haiku-MatchHeader	626071694
 <Choose action>	ConfigView		<Kies actie>
+Header field (e.g. Subject, From, ...)	ConfigView		Headerveld (bijv. Onderwerk, Van, …)
+Account	ConfigView		Account
 has	ConfigView		Heeft
 Move to	ConfigView		Verplaats naar
 Then	ConfigView		Dan
@@ -8,5 +10,7 @@ Delete message	ConfigView		Bericht verwijderen
 <Choose account>	ConfigView		<Kies account>
 Set flags to	ConfigView		Markeer als
 Set as read	ConfigView		Als gelezen markeren
+Match header	RuleFilter		Header matchen
 Reply with	ConfigView		Antwoord met
 If	ConfigView		Als
+Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" tegen \"%regex\"

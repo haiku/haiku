@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1195245614
+1	russian	x-vnd.Haiku-HaikuDepot	1831209226
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -13,7 +13,6 @@ Stability:	RatePackageWindow		Стабильность:
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
 Other users can see this rating	RatePackageWindow		Другие пользователи могут видеть этот рейтинг
 Stability	RatePackageWindow		Стабильность
-for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		История изменений недоступна.
 Description	PackageListView		Описание
 Install	PackageManager		Установить
@@ -27,12 +26,10 @@ Rate package…	PackageInfoView		Оценить пакет…
 Category	FilterView		Все категории
 Uninstall	PackageManager		Удалить
 An error occurred while obtaining the package list: %message%	MainWindow		Возникла ошибка при получении списка пакетов: %message%
-Your rating was updated successfully.	RatePackageWindow		Ваш рейтинг был успешно отправлен.
 <no info>	PackageInfoView		<нет информации>
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
 Email address:	UserLoginWindow		Email адрес:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваш рейтинг был успешно отправлен. Вы можете изменить или удалить его в любой момент оценив пакет еще раз.
 Very unstable	RatePackageWindow		Очень нестабилен 
 <Package contents not available for remote packages>	PackageContentsView		<Содержимое пакетов недоступно для нелокальных пакетов>
 The username is already taken. Please choose another.	UserLoginWindow		Такой логин уже занят, выберите другой.
@@ -64,18 +61,14 @@ Success	UserLoginWindow		Выполнено успешно
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot требует для своей работы демон пакетов, который не запущен.\nВы хотите запустить его сейчас?
 Downloading:	PackageInfoView		Загружается:
 Mostly stable	RatePackageWindow		В основном стабилен
-There was a puzzling response from the web service.	RatePackageWindow		Был получен странный ответ от веб сервера.
 Log out	MainWindow		Выход из системы
 Education	Model		Образование
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
-Failed to update rating	RatePackageWindow		Не удалось обновить рейтинг
 Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
 There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Пакет не был найден в веб сервисе. Скорее всего это охначает, что он был установлен из склада, который отслеживается в веб сервисе. Оценка таких пакетов, к сожалению, не поддерживается.
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
 No, quit HaikuDepot	App		Нет, выйти из HaikuDepot
@@ -84,9 +77,7 @@ Logged in as %User%	MainWindow		Выполнен вход под пользов�
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Язык
 Size	PackageListView		Размер
-Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
- It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
 User Menu	MainWindow		Меню пользователя
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
@@ -99,7 +90,6 @@ Graphics	Model		Графика
 Local	MainWindow		Локальный
 Close	MainWindow		Закрыть
 Preferred language:	UserLoginWindow		Предпочитаемый язык:
-Failed to rate package	RatePackageWindow		Не удалось оценить пакет
 Internet & Network	Model		Интернет и сеть
 Refresh repositories	MainWindow		Обновить репозитории
 Cancel	MainWindow		Отменить
@@ -139,7 +129,6 @@ Failed to create account	UserLoginWindow		Не удалось создать у�
 There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n
 Start package daemon	App		Запустить пакетный демон
 Manage repositories…	MainWindow		Управление репозиториями…
-Success	RatePackageWindow		Выполнено успешно
 Business	Model		Бизнес
 Audio	Model		Аудио
 About	PackageInfoView		О программе

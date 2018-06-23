@@ -1,12 +1,16 @@
-1	romanian	x-vnd.Haiku-Repositories	346515317
+1	romanian	x-vnd.Haiku-Repositories	2658607939
 Completed	TaskLooper	Completed task status message	Completat
 Repositories	System name		Depozite
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	A apărut o eroare la activarea depozitului %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Se elimină acest depozit?
 Description	TaskLooper	Failed task error description	Descriere
 Add	AddRepoWindow	Button label	Adaugă
 URL	RepositoriesView	Column title	URL
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Depozite nu a putut recupera numele depozitelor activate curent.
 Keep trying	TaskTimer	Button label	Continuă să încerci
 This is not a valid URL.	AddRepoWindow	Add URL error message	Acesta nu este un URL valid.
 Repository URL:	AddRepoWindow	Text box label	URL Depozit:
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Eroare la obținerea configurației depozitului pentru %name%.
 Details	TaskLooper	Job log details header	Detalii
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Vești bune! Sarcina pentru depozitul %name% este terminată.
 Status	RepositoriesView	Column title	Stare
@@ -16,16 +20,22 @@ Remove	RepositoriesView	Button label	Elimină
 Changes completed	RepositoriesView	Status view text	Modificări completate
 Name	RepositoriesView	Column title	Nume
 Enable	RepositoriesView	Button label	Activează
+Enable repositories to use with package management:	RepositoriesView	Label text	Activați depozitele de utilizat cu administratorul de pachete:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	A apărut o eroare la împrospătarea cache-ului depozitului pentru %name%
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Doar un URL pentru fiecare depozit poate fi activat. Modificați selectările.
 Failed	TaskLooper	Failed task status message	Eșuat
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	Anulează sarcina
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Elimină aceste depozite?
 Cancel	Constants	Button label	Anulează
 Changes pending:	RepositoriesView	Status view text	Modificări în așteptare:
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	A apărut o eroare la dezactivarea depozitului %name%
 Remove	Constants	Button label	Elimină
 Enable all	RepositoriesView	Button label	Activează toate
 Stop and quit	RepositoriesWindow	Button label	Oprire și ieșire
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Sarcina pentru depozitul %name% durează mult timp până la finalizare.
 Disable all	RepositoriesView	Button label	Dezactivează toate
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Unele sarcini rulează încă. Se opresc aceste sarcini și se iese?
 This repository URL already exists.	RepositoriesView	Error message	Acest URL de depozit există deja.
 Disable	RepositoriesView	Button label	Dezactivează
 Unknown	Constants	Unknown repository name	Necunoscut

@@ -1,9 +1,8 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	3127821216
+1	lithuanian	x-vnd.Haiku-HaikuDepot	4084227647
 Name	PackageListView		Pavadinimas
 Close	RatePackageWindow		Užverti
 Changelog	PackageInfoView		Pakeitimų žurnalas
 Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
-for %Version%	PackageInfoView		versijai %Version%
 No changelog available.	PackageInfoView		Pakeitimų žurnalas neprieinamas.
 Description	PackageListView		Aprašas
 Install	PackageManager		Įdiegti

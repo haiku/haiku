@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1195245614
+1	hungarian	x-vnd.Haiku-HaikuDepot	1831209226
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
@@ -13,7 +13,6 @@ Stability:	RatePackageWindow		Stabilitás:
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
 Other users can see this rating	RatePackageWindow		A többi felhasználó számára látható az értékelés
 Stability	RatePackageWindow		Stabilitás
-for %Version%	PackageInfoView		%Version% verzióhoz
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Description	PackageListView		Leírás
 Install	PackageManager		Telepítés
@@ -27,12 +26,10 @@ Rate package…	PackageInfoView		Csomag értékelése…
 Category	FilterView		Kategória
 Uninstall	PackageManager		Eltávolítás
 An error occurred while obtaining the package list: %message%	MainWindow		Hiba történt a csomagok letöltésekor %message%
-Your rating was updated successfully.	RatePackageWindow		Az értékelés elküldése megtörtént.
 <no info>	PackageInfoView		<nincs információ>
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
 Email address:	UserLoginWindow		E-mail cím:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Az értékelés elküldve. A későbbiekben bármikor módosítható, csupán újra értékelni kell a csomagot.
 Very unstable	RatePackageWindow		Nagyon instabil
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
 The username is already taken. Please choose another.	UserLoginWindow		Ez a felhasználónév már foglalt. Válasszon másikat.
@@ -64,18 +61,14 @@ Success	UserLoginWindow		Sikeres
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A Raktárnak szüksége van a csomag démonra a helyes működéshez, de úgy látszik, hogy az nem fut.\nElindíthatom?
 Downloading:	PackageInfoView		Letöltés:
 Mostly stable	RatePackageWindow		Nagyrészt stabil
-There was a puzzling response from the web service.	RatePackageWindow		A webes szolgáltatás rejtélyes választ adott.
 Log out	MainWindow		Kijelentkezés
 Education	Model		Oktatás
 Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
-Failed to update rating	RatePackageWindow		Az értékelés frissítése meghiúsult
 Does not start	RatePackageWindow		Nem indul el
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Nem sikerült elérni a webes szolgáltatást.
 There are problems in the form:\n\n	UserLoginWindow		Az űrlap hibás:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		A csomag nem található. Lehetséges, hogy a csomag olyan raktárban van, ami nincs használatban. Az értékelés nem lehetséges.
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Productivity	Model		Alkalmazások
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
@@ -84,9 +77,7 @@ Logged in as %User%	MainWindow		Bejelentkezett mint %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Nyelv
 Size	PackageListView		Méret
-Failed to create or update rating: %s\n	RatePackageWindow		Az értékelés létrehozása vagy frissítése nem sikerült: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
- It responded with: 	RatePackageWindow		Ezt válaszolta:
 User name:	UserLoginWindow		Felhasználónév:
 User Menu	MainWindow		Felhasználói menü
 Unstable but usable	RatePackageWindow		Instabil, de használható
@@ -99,7 +90,6 @@ Graphics	Model		Grafika
 Local	MainWindow		Helyi
 Close	MainWindow		Bezárás
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
-Failed to rate package	RatePackageWindow		A csomag értékelése sikertelen
 Internet & Network	Model		Internet és hálózat
 Refresh repositories	MainWindow		Tárolók frissítése
 Cancel	MainWindow		Mégse
@@ -139,7 +129,6 @@ Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
 Start package daemon	App		Csomag démon indítása
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
-Success	RatePackageWindow		Sikeres
 Business	Model		Üzleti
 Audio	Model		Audió
 About	PackageInfoView		Névjegy

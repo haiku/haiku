@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-HaikuDepot	1203079461
+1	slovenian	x-vnd.Haiku-HaikuDepot	2257471805
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zapri
 Changelog	PackageInfoView		Zapisnik sprememb
@@ -10,7 +10,6 @@ Stability:	RatePackageWindow		Stabilnost:
 Click a package to view information	PackageInfoView		Kliknite na paket, da vidite informacije o njem
 Other users can see this rating	RatePackageWindow		Ostali uporabniki lahko vidijo to oceno
 Stability	RatePackageWindow		Stabilnost
-for %Version%	PackageInfoView		za %Version%
 No changelog available.	PackageInfoView		Zapisnik sprememb ni na voljo.
 Description	PackageListView		Opis
 Install	PackageManager		Namesti
@@ -23,10 +22,8 @@ Rate package…	PackageInfoView		Oceni paket…
 Category	FilterView		Kategorija
 Uninstall	PackageManager		Odstrani
 An error occurred while obtaining the package list: %message%	MainWindow		Med pridobivanjem seznama paketov je prišlo do napake: %message%
-Your rating was updated successfully.	RatePackageWindow		Vaša ocena je bila uspešno posodobljena.
 An error occurred while initializing the package manager: %message%	MainWindow		Med zagonom upravitelja paketov je prišlo do napake: %message%
 Email address:	UserLoginWindow		Naslov elektronske pošte:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Vaša ocena je bila uspešno oddana. Kadarkoli jo lahko posodobite ali odstranite tako, da paket še enkrat ocenite.
 Close	PackageManager		Zapri
 Language	UserLoginWindow		Jezik
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Geslo je prešibko. Prosimo, uporabite vsaj 8 znakov z vsaj dvema števkama in dvema velikima črkama.
@@ -46,14 +43,10 @@ Education	Model		Izobrazba
 Search terms:	FilterView		Pogoji iskanja:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Ocene uporabnikov niso na voljo.
-Failed to update rating	RatePackageWindow		Ni bilo mogoče posodobiti ocene
 Does not start	RatePackageWindow		Se ne zažene
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Prišlo je do napake med osveževanjem zbirke: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Ni se bilo mogoče povezati s spletno storitvijo.
 Language	RatePackageWindow		Jezik
-Failed to create or update rating: %s\n	RatePackageWindow		Ni bilo mogoče ustvariti ali posodobiti ocene: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Prijaviti se morate v svoj račun, preden lahko ocenjujete pakete.
- It responded with: 	RatePackageWindow		 Odgovoril je: 
 User name:	UserLoginWindow		Uporabniško ime:
 User Menu	MainWindow		Uporabniški meni
 Unstable but usable	RatePackageWindow		Nestabilen, toda ne neuporaben
@@ -82,7 +75,6 @@ Send	RatePackageWindow		Pošlji
 Category:	FilterView		Kategorija:
 Failed to create account	UserLoginWindow		Ni bilo mogoče ustvariti računa
 There are problems with the data you entered:\n\n	UserLoginWindow		S podatki, ki ste jih vnesli, ni vse v redu:\n\n
-Success	RatePackageWindow		Uspeh
 Business	Model		Posel
 Audio	Model		Audio
 Active	PackageListView		Aktiven

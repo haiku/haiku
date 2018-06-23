@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	1919719066
+1	english	x-vnd.Haiku-HaikuDepot	2555682678
 Name	PackageListView		名称
 Available packages	MainWindow		可用软件包
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
@@ -13,7 +13,6 @@ Stability:	RatePackageWindow		稳定性:
 Click a package to view information	PackageInfoView		点击软件包查看信息
 Other users can see this rating	RatePackageWindow		其他用户可以看到该评级
 Stability	RatePackageWindow		稳定性
-for %Version%	PackageInfoView		用于 %Version%
 No changelog available.	PackageInfoView		未发现更新记录。
 Description	PackageListView		描述
 Install	PackageManager		安装
@@ -27,12 +26,10 @@ Rate package…	PackageInfoView		软件包评分…
 Category	FilterView		分类
 Uninstall	PackageManager		卸载
 An error occurred while obtaining the package list: %message%	MainWindow		获取软件包列表出现错误: %message%
-Your rating was updated successfully.	RatePackageWindow		您的评分更新成功。
 <no info>	PackageInfoView		<无信息>
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		软件包管理器初始化出现错误：%message%
 Email address:	UserLoginWindow		邮箱地址：
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		您的评分上传成功。您可以随时对该包的评分进行更新或者删除。
 Very unstable	RatePackageWindow		非常不稳定
 <Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
 The username is already taken. Please choose another.	UserLoginWindow		用户名已经存在。请选择其他用户名。
@@ -64,18 +61,14 @@ Success	UserLoginWindow		成功
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot 需要包管理后台工作，现在它并未运行。\n是否需要进行启动？
 Downloading:	PackageInfoView		下载中：
 Mostly stable	RatePackageWindow		基本稳定
-There was a puzzling response from the web service.	RatePackageWindow		网络服务响应异常。
 Log out	MainWindow		注销
 Education	Model		教育
 Search terms:	FilterView		搜索项目：
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		未发现用户评分。
-Failed to update rating	RatePackageWindow		更新评分失败
 Does not start	RatePackageWindow		未开始
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		刷新软件库出现错误：%error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		无法连接网络服务。
 There are problems in the form:\n\n	UserLoginWindow		列表中存在问题:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		网络服务中未发现该软件包。可能由于该软件包来源未被跟踪。目前对这些软件包的评分不支持。
 Create account	UserLoginWindow		创建账号
 Productivity	Model		生产力
 No, quit HaikuDepot	App		否，强制退出 HaikuDepot
@@ -84,9 +77,7 @@ Logged in as %User%	MainWindow		登录 as %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		语言
 Size	PackageListView		大小
-Failed to create or update rating: %s\n	RatePackageWindow		无法创建或更新评分: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
- It responded with: 	RatePackageWindow		 回复内容为： 
 User name:	UserLoginWindow		用户名:
 User Menu	MainWindow		用户菜单
 Unstable but usable	RatePackageWindow		不稳定，但是可用
@@ -99,7 +90,6 @@ Graphics	Model		图形
 Local	MainWindow		本地
 Close	MainWindow		关闭
 Preferred language:	UserLoginWindow		首选语言:
-Failed to rate package	RatePackageWindow		软件包评级失败
 Internet & Network	Model		互联网和网络
 Cancel	MainWindow		取消
 Quit HaikuDepot	App		退出 HaikuDepot
@@ -137,7 +127,6 @@ Category:	FilterView		分类:
 Failed to create account	UserLoginWindow		账户创建失败
 There are problems with the data you entered:\n\n	UserLoginWindow		您所输入的数据存在问题：\n\n
 Start package daemon	App		启动软件包管理后台
-Success	RatePackageWindow		成功
 Business	Model		商业
 Audio	Model		音频
 About	PackageInfoView		关于

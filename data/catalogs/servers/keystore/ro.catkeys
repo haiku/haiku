@@ -3,7 +3,7 @@ This application hasn't been granted access before.	AppAccessRequestWindow		Aces
 Unlock	KeyRequestWindow		Deblochează
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Această applicație a fost actualizată de când i s-a permis accesul ultima oară.
 Allow always	AppAccessRequestWindow		Permite întotdeauna
-Application keyring access	AppAccessRequestWindow		Acces inel de chei aplicație
+Application keyring access	AppAccessRequestWindow		Accesul la inelul de chei al aplicației
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		pentru a performa următoarea acțiune:\n%accessString%\n\n
 The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplicația:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Această aplicație nu are încă privilegiile necesare.

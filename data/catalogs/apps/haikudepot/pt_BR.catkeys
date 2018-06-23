@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1919719066
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2555682678
 Name	PackageListView		Nome
 Available packages	MainWindow		Pacotes disponíveis
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -13,7 +13,6 @@ Stability:	RatePackageWindow		Estabilidade:
 Click a package to view information	PackageInfoView		Clique em um pacote para visualizar a informação
 Other users can see this rating	RatePackageWindow		Outros usuários podem ver esta avaliação
 Stability	RatePackageWindow		Estabilidade
-for %Version%	PackageInfoView		para %Version%
 No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
 Description	PackageListView		Descrição
 Install	PackageManager		Instalar
@@ -27,12 +26,10 @@ Rate package…	PackageInfoView		Avaliar pacote...
 Category	FilterView		Categoria
 Uninstall	PackageManager		Desinstalar
 An error occurred while obtaining the package list: %message%	MainWindow		Um erro ocorreu ao obter a lista de pacotes: %message%
-Your rating was updated successfully.	RatePackageWindow		Sua avaliação foi atualizada com sucesso.
 <no info>	PackageInfoView		<sem informação>
 Starting the package daemon failed:\n\n%Error%	App		A inicialização do daemon de pacote falhou:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Um erro ocorreu ao inicializar o gerenciador de pacotes: %message%
 Email address:	UserLoginWindow		Endereço de e-mail:
-Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Sua classificação foi enviada com sucesso. Você pode atualizá-la ou removê-la a qualquer tempo para classificar o pacote novamente.
 Very unstable	RatePackageWindow		Muito instável
 <Package contents not available for remote packages>	PackageContentsView		<Conteúdos de pacote não disponíveis para pacotes remotos>
 The username is already taken. Please choose another.	UserLoginWindow		Este nome de usuário já pertence a alguém. Escolha outro, por favor.
@@ -64,18 +61,14 @@ Success	UserLoginWindow		Sucesso
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O Depósito Haiku precisa do daemon de pacote para funcionar e ele parece não estar em execução.\nGostaria de iniciá-lo agora?
 Downloading:	PackageInfoView		Baixando:
 Mostly stable	RatePackageWindow		Na maior parte estável
-There was a puzzling response from the web service.	RatePackageWindow		Houve uma resposta enigmática do serviço web.
 Log out	MainWindow		Sair
 Education	Model		Educação
 Search terms:	FilterView		Termos para pesquisa:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
-Failed to update rating	RatePackageWindow		Falhou ao atualizar a avaliação
 Does not start	RatePackageWindow		Não iniciar
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Um erro ocorreu ao atualizar o repositório: %error% (%details%)
-It was not possible to contact the web service.	RatePackageWindow		Não é possível contatar o serviço web.
 There are problems in the form:\n\n	UserLoginWindow		Existem problemas no formulário:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		O pacote não foi encontrado pelo serviço web. Isto provavelmente significa que veio de um depósito que não foi rastreado lá. Avaliar tais pacotes infelizmente não é suportado.
 Create account	UserLoginWindow		Criar conta
 Productivity	Model		Produtividade
 No, quit HaikuDepot	App		Não, fechar Depósito Haiku
@@ -84,9 +77,7 @@ Logged in as %User%	MainWindow		Autenticado como %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Idioma
 Size	PackageListView		Tamanho
-Failed to create or update rating: %s\n	RatePackageWindow		Falha ao criar ou atualizar classificação: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa estar autenticado em uma conta antes de poder classificar pacotes.
- It responded with: 	RatePackageWindow		 Ele respondeu com: 
 User name:	UserLoginWindow		Nome do usuário:
 User Menu	MainWindow		Menu do Usuário
 Unstable but usable	RatePackageWindow		Instável mas utilizável
@@ -99,7 +90,6 @@ Graphics	Model		Gráficos
 Local	MainWindow		Local
 Close	MainWindow		Fechar
 Preferred language:	UserLoginWindow		Idioma preferido:
-Failed to rate package	RatePackageWindow		Falhou ao avaliar pacote
 Internet & Network	Model		Internet & Rede
 Cancel	MainWindow		Cancelar
 Quit HaikuDepot	App		Fechar o Depósito Haiku
@@ -137,7 +127,6 @@ Category:	FilterView		Categoria:
 Failed to create account	UserLoginWindow		Falhou ao criar conta
 There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
 Start package daemon	App		Iniciar daemon de pacote
-Success	RatePackageWindow		Sucesso
 Business	Model		Negócios
 Audio	Model		Áudio
 About	PackageInfoView		Sobre
