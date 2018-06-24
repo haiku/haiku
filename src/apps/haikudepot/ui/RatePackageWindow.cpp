@@ -365,10 +365,10 @@ RatePackageWindow::MessageReceived(BMessage* message)
 		case MSG_DID_ADD_USER_RATING:
 		{
 			BAlert* alert = new(std::nothrow) BAlert(
-				B_TRANSLATE("user_rating"),
+				B_TRANSLATE("User rating"),
 				B_TRANSLATE("Your rating was uploaded successfully. "
-					"You can update or remove it at any time by visiting the "
-					"server application on the web."),
+					"You can update or remove it at the HaikuDepot Server "
+					"website."),
 				B_TRANSLATE("Close"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->Go();
@@ -379,7 +379,7 @@ RatePackageWindow::MessageReceived(BMessage* message)
 		case MSG_DID_UPDATE_USER_RATING:
 		{
 			BAlert* alert = new(std::nothrow) BAlert(
-				B_TRANSLATE("user_rating"),
+				B_TRANSLATE("User rating"),
 				B_TRANSLATE("Your rating was updated."),
 				B_TRANSLATE("Close"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT);

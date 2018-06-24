@@ -137,10 +137,10 @@ MainWindow::MainWindow(const BMessage& settings)
 	fSinglePackageMode(false),
 	fModelWorker(B_BAD_THREAD_ID)
 {
-	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
+	BMenuBar* menuBar = new BMenuBar("Main Menu");
 	_BuildMenu(menuBar);
 
-	BMenuBar* userMenuBar = new BMenuBar(B_TRANSLATE("User Menu"));
+	BMenuBar* userMenuBar = new BMenuBar("User Menu");
 	_BuildUserMenu(userMenuBar);
 	set_small_font(userMenuBar);
 	userMenuBar->SetExplicitMaxSize(BSize(B_SIZE_UNSET,
@@ -1510,10 +1510,10 @@ MainWindow::_RatePackage()
 {
 	if (!_SelectedPackageHasWebAppRepositoryCode()) {
 		BAlert* alert = new(std::nothrow) BAlert(
-			B_TRANSLATE("rating_not_possible"),
-			B_TRANSLATE("Because there is no representation for this package "
-				"on the HaikuDepot server system, it is not possible to create "
-				"a new rating or edit an existing rating."),
+			B_TRANSLATE("Rating not possible"),
+			B_TRANSLATE("This package doesn't seem to be on the HaikuDepot "
+				"Server, so it's not possible to create a new rating "
+				"or edit an existing rating."),
 			B_TRANSLATE("OK"));
 		alert->Go();
     	return;
