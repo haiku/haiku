@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -204,28 +204,18 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 
 		// needed for cloning
 		case INTEL_GET_DEVICE_NAME:
-#ifdef __HAIKU__
 			if (user_strlcpy((char* )buffer, gDeviceNames[info->id],
 					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
-#else
-			strncpy((char* )buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH);
-			((char* )buffer)[B_PATH_NAME_LENGTH - 1] = '\0';
-#endif
 			return B_OK;
 
 		// graphics mem manager
 		case INTEL_ALLOCATE_GRAPHICS_MEMORY:
 		{
 			intel_allocate_graphics_memory allocMemory;
-#ifdef __HAIKU__
 			if (user_memcpy(&allocMemory, buffer,
 					sizeof(intel_allocate_graphics_memory)) < B_OK)
 				return B_BAD_ADDRESS;
-#else
-			memcpy(&allocMemory, buffer,
-				sizeof(intel_allocate_graphics_memory));
-#endif
 
 			if (allocMemory.magic != INTEL_PRIVATE_DATA_MAGIC)
 				return B_BAD_VALUE;
@@ -235,14 +225,9 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 				&allocMemory.buffer_base);
 			if (status == B_OK) {
 				// copy result
-#ifdef __HAIKU__
 				if (user_memcpy(buffer, &allocMemory,
 						sizeof(intel_allocate_graphics_memory)) < B_OK)
 					return B_BAD_ADDRESS;
-#else
-				memcpy(buffer, &allocMemory,
-					sizeof(intel_allocate_graphics_memory));
-#endif
 			}
 			return status;
 		}
@@ -250,13 +235,9 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 		case INTEL_FREE_GRAPHICS_MEMORY:
 		{
 			intel_free_graphics_memory freeMemory;
-#ifdef __HAIKU__
 			if (user_memcpy(&freeMemory, buffer,
 					sizeof(intel_free_graphics_memory)) < B_OK)
 				return B_BAD_ADDRESS;
-#else
-			memcpy(&freeMemory, buffer, sizeof(intel_free_graphics_memory));
-#endif
 
 			if (freeMemory.magic == INTEL_PRIVATE_DATA_MAGIC)
 				return intel_free_memory(*info, freeMemory.buffer_base);
