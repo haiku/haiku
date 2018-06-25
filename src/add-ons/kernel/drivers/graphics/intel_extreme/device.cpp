@@ -186,18 +186,23 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
-			strcpy((char*)buffer, INTEL_ACCELERANT_NAME);
 			TRACE("accelerant: %s\n", INTEL_ACCELERANT_NAME);
+			if (user_strlcpy((char*)buffer, INTEL_ACCELERANT_NAME,
+					B_FILE_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
 			return B_OK;
 
 		// needed to share data between kernel and accelerant
 		case INTEL_GET_PRIVATE_DATA:
 		{
-			intel_get_private_data* data = (intel_get_private_data* )buffer;
+			intel_get_private_data data;
+			if (user_memcpy(&data, buffer, sizeof(intel_get_private_data)) < B_OK)
+				return B_BAD_ADDRESS;
 
-			if (data->magic == INTEL_PRIVATE_DATA_MAGIC) {
-				data->shared_info_area = info->shared_area;
-				return B_OK;
+			if (data.magic == INTEL_PRIVATE_DATA_MAGIC) {
+				data.shared_info_area = info->shared_area;
+				return user_memcpy(buffer, &data,
+					sizeof(intel_get_private_data));
 			}
 			break;
 		}

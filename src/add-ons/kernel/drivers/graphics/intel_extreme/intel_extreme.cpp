@@ -212,8 +212,8 @@ init_interrupt_handler(intel_info &info)
 
 	// Find the right interrupt vector, using MSIs if available.
 	info.irq = 0xff;
-	info.use_msi = false;	
-	if (info.pci->u.h0.interrupt_pin != 0x00)	
+	info.use_msi = false;
+	if (info.pci->u.h0.interrupt_pin != 0x00)
 		info.irq = info.pci->u.h0.interrupt_line;
 	if (gPCIx86Module != NULL && gPCIx86Module->get_msi_count(info.pci->bus,
 			info.pci->device, info.pci->function) >= 1) {
@@ -316,7 +316,7 @@ intel_extreme_init(intel_info &info)
 	info.shared_area = sharedCreator.Create("intel extreme shared info",
 		(void**)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + 3 * B_PAGE_SIZE,
-		B_FULL_LOCK, 0);
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (info.shared_area < B_OK) {
 		ERROR("error: could not create shared area!\n");
 		gGART->unmap_aperture(info.aperture);
@@ -484,7 +484,7 @@ intel_extreme_init(intel_info &info)
 	status_t status = intel_allocate_memory(info, B_PAGE_SIZE, 0,
 		intel_uses_physical_overlay(*info.shared_info)
 				? B_APERTURE_NEED_PHYSICAL : 0,
-		(addr_t*)&info.overlay_registers, 
+		(addr_t*)&info.overlay_registers,
 		&info.shared_info->physical_overlay_registers);
 	if (status == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
