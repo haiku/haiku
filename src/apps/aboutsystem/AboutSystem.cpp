@@ -1238,22 +1238,15 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDThreeClause)
 		.SetURL("http://www.openexr.com"));
 
-	// Netcat copyrights
-	_AddPackageCredit(PackageCredit("Netcat")
-		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit.")
-		.SetLicense(kPublicDomain)
-		.SetURL("http://nc110.sourceforge.net/"));
-
 	// acpica copyrights
-	_AddPackageCredit(PackageCredit("acpica")
-		.SetCopyright(COPYRIGHT_STRING "1999-2014 Intel Corp.")
+	_AddPackageCredit(PackageCredit("ACPI Common Architecture (ACPICA)")
+		.SetCopyright(COPYRIGHT_STRING "1999-2018 Intel Corp.")
 		.SetLicense("Intel (ACPICA)")
 		.SetURL("https://www.acpica.org"));
 
 	// libpng copyrights
 	_AddPackageCredit(PackageCredit("libpng")
-		.SetCopyright(COPYRIGHT_STRING "2004, 2006-2008 Glenn "
-			"Randers-Pehrson.")
+		.SetCopyright(COPYRIGHT_STRING "1995-2017 libpng authors")
 		.SetLicense("LibPNG")
 		.SetURL("http://www.libpng.org"));
 
