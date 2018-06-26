@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014, Haiku, Inc.
+ * Copyright 2005-2018, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -1291,12 +1291,6 @@ AboutView::_CreateCreditsView()
 			"All rights reserved."), NULL)
 		.SetLicense(kBSDThreeClause)
 		.SetURL("http://www.xiph.org"));
-
-	// The Tcpdump Group
-	_AddPackageCredit(PackageCredit("The Tcpdump Group")
-		.SetCopyright("tcpdump, libpcap")
-		.SetLicense(kBSDThreeClause)
-		.SetURL("http://www.tcpdump.org"));
 
 	// Matroska
 	_AddPackageCredit(PackageCredit("libmatroska")

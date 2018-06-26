@@ -37,7 +37,6 @@ provides {
 	cmd:renice
 	cmd:resattr
 	cmd:su
-	cmd:tcpdump
 	cmd:telnet
 	cmd:telnetd
 	cmd:top
