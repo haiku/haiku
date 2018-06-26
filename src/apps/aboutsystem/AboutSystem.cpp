@@ -99,7 +99,9 @@ static const char* kGPLv2 = B_TRANSLATE_MARK("GNU GPL v2");
 static const char* kGPLv3 = B_TRANSLATE_MARK("GNU GPL v3");
 static const char* kLGPLv2 = B_TRANSLATE_MARK("GNU LGPL v2");
 static const char* kLGPLv21 = B_TRANSLATE_MARK("GNU LGPL v2.1");
+#if 0
 static const char* kPublicDomain = B_TRANSLATE_MARK("Public Domain");
+#endif
 #ifdef __INTEL__
 static const char* kIntel2xxxFirmware = B_TRANSLATE_MARK("Intel (2xxx firmware)");
 static const char* kIntelFirmware = B_TRANSLATE_MARK("Intel (firmware)");
