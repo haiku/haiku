@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Colin Günther, coling@gmx.de.
+ * Copyright 2018, Haiku, Inc.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -96,6 +97,7 @@ get_ifnet(device_t device, int& i)
 status_t
 init_wlan_stack(void)
 {
+	mtx_init(&ic_list_mtx, "ieee80211com list", NULL, MTX_DEF);
 	ieee80211_phy_init();
 	ieee80211_auth_setup();
 	ieee80211_ht_init();
@@ -118,35 +120,22 @@ uninit_wlan_stack(void)
 status_t
 start_wlan(device_t device)
 {
-	int i;
-	struct ifnet* ifp = get_ifnet(device, i);
-	if (ifp == NULL)
+	struct ieee80211com* ic = ieee80211_find_com(device->nameunit);
+	if (ic == NULL)
 		return B_BAD_VALUE;
-
-// TODO: review this and find a cleaner solution!
-	// This ensures that the cloned device gets
-	// the same index assigned as the base device
-	// Resulting in the same device name
-	// e.g.: /dev/net/atheros/0 instead of
-	//       /dev/net/atheros/1
-	gDevices[i] = NULL;
-
-	struct ieee80211com* ic = (ieee80211com*)ifp->if_l2com;
 
 	struct ieee80211vap* vap = ic->ic_vap_create(ic, "wlan",
 		device_get_unit(device),
 		IEEE80211_M_STA,		// mode
 		0,						// flags
 		NULL,					// BSSID
-		IF_LLADDR(ifp));		// MAC address
+		ic->ic_macaddr);		// MAC address
 
-	if (vap == NULL) {
-		gDevices[i] = ifp;
+	if (vap == NULL)
 		return B_ERROR;
-	}
 
 	// ic_vap_create() established that gDevices[i] links to vap->iv_ifp now
-	KASSERT(gDevices[i] == vap->iv_ifp,
+	KASSERT(gDevices[gDeviceCount - 1] == vap->iv_ifp,
 		("start_wlan: gDevices[i] != vap->iv_ifp"));
 
 	vap->iv_ifp->scan_done_sem = create_sem(0, "wlan scan done");
@@ -168,12 +157,6 @@ stop_wlan(device_t device)
 	if (ifp == NULL)
 		return B_BAD_VALUE;
 
-	if (ifp->if_type == IFT_IEEE80211) {
-		// This happens when there was an error in starting the wlan before,
-		// resulting in never creating a clone device
-		return B_OK;
-	}
-
 	delete_sem(ifp->scan_done_sem);
 
 	struct ieee80211vap* vap = (ieee80211vap*)ifp->if_softc;
@@ -183,9 +166,6 @@ stop_wlan(device_t device)
 
 	// ic_vap_delete freed gDevices[i]
 	KASSERT(gDevices[i] == NULL, ("stop_wlan: gDevices[i] != NULL"));
-
-	// assign the base device ifp again
-	gDevices[i] = ic->ic_ifp;
 
 	return B_OK;
 }
@@ -400,19 +380,6 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 }
 
 
-status_t
-wlan_if_l2com_alloc(void* data)
-{
-	struct ifnet* ifp = (struct ifnet*)data;
-
-	ifp->if_l2com = _kernel_malloc(sizeof(struct ieee80211com), M_ZERO);
-	if (ifp->if_l2com == NULL)
-		return B_NO_MEMORY;
-	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
-	return B_OK;
-}
-
-
 void
 get_random_bytes(void* p, size_t n)
 {
@@ -550,6 +517,128 @@ ieee80211_process_callback(struct ieee80211_node* ni, struct mbuf* m,
 		struct ieee80211_cb* cb = (struct ieee80211_cb*)(mtag+1);
 		cb->func(ni, cb->arg, status);
 	}
+}
+
+
+int
+ieee80211_add_xmit_params(struct mbuf *m,
+	const struct ieee80211_bpf_params *params)
+{
+	struct m_tag *mtag;
+	struct ieee80211_tx_params *tx;
+
+	mtag = m_tag_alloc(MTAG_ABI_NET80211, NET80211_TAG_XMIT_PARAMS,
+		sizeof(struct ieee80211_tx_params), M_NOWAIT);
+	if (mtag == NULL)
+		return (0);
+
+	tx = (struct ieee80211_tx_params *)(mtag+1);
+	memcpy(&tx->params, params, sizeof(struct ieee80211_bpf_params));
+	m_tag_prepend(m, mtag);
+	return (1);
+}
+
+
+int
+ieee80211_get_xmit_params(struct mbuf *m,
+	struct ieee80211_bpf_params *params)
+{
+	struct m_tag *mtag;
+	struct ieee80211_tx_params *tx;
+
+	mtag = m_tag_locate(m, MTAG_ABI_NET80211, NET80211_TAG_XMIT_PARAMS,
+		NULL);
+	if (mtag == NULL)
+		return (-1);
+	tx = (struct ieee80211_tx_params *)(mtag + 1);
+	memcpy(params, &tx->params, sizeof(struct ieee80211_bpf_params));
+	return (0);
+}
+
+
+/*
+ * Add RX parameters to the given mbuf.
+ *
+ * Returns 1 if OK, 0 on error.
+ */
+int
+ieee80211_add_rx_params(struct mbuf *m, const struct ieee80211_rx_stats *rxs)
+{
+	struct m_tag *mtag;
+	struct ieee80211_rx_params *rx;
+
+	mtag = m_tag_alloc(MTAG_ABI_NET80211, NET80211_TAG_RECV_PARAMS,
+		sizeof(struct ieee80211_rx_stats), M_NOWAIT);
+	if (mtag == NULL)
+		return (0);
+
+	rx = (struct ieee80211_rx_params *)(mtag + 1);
+	memcpy(&rx->params, rxs, sizeof(*rxs));
+	m_tag_prepend(m, mtag);
+	return (1);
+}
+
+
+int
+ieee80211_get_rx_params(struct mbuf *m, struct ieee80211_rx_stats *rxs)
+{
+	struct m_tag *mtag;
+	struct ieee80211_rx_params *rx;
+
+	mtag = m_tag_locate(m, MTAG_ABI_NET80211, NET80211_TAG_RECV_PARAMS,
+		NULL);
+	if (mtag == NULL)
+		return (-1);
+	rx = (struct ieee80211_rx_params *)(mtag + 1);
+	memcpy(rxs, &rx->params, sizeof(*rxs));
+	return (0);
+}
+
+
+/*
+ * Transmit a frame to the parent interface.
+ */
+int
+ieee80211_parent_xmitpkt(struct ieee80211com *ic, struct mbuf *m)
+{
+	int error;
+
+	/*
+	 * Assert the IC TX lock is held - this enforces the
+	 * processing -> queuing order is maintained
+	 */
+	IEEE80211_TX_LOCK_ASSERT(ic);
+	error = ic->ic_transmit(ic, m);
+	if (error) {
+		struct ieee80211_node *ni;
+
+		ni = (struct ieee80211_node *)m->m_pkthdr.rcvif;
+
+		/* XXX number of fragments */
+		if_inc_counter(ni->ni_vap->iv_ifp, IFCOUNTER_OERRORS, 1);
+		ieee80211_free_node(ni);
+		ieee80211_free_mbuf(m);
+	}
+	return (error);
+}
+
+
+/*
+ * Transmit a frame to the VAP interface.
+ */
+int
+ieee80211_vap_xmitpkt(struct ieee80211vap *vap, struct mbuf *m)
+{
+	struct ifnet *ifp = vap->iv_ifp;
+
+	/*
+	 * When transmitting via the VAP, we shouldn't hold
+	 * any IC TX lock as the VAP TX path will acquire it.
+	 */
+	IEEE80211_TX_UNLOCK_ASSERT(vap->iv_ic);
+
+	return (ifp->if_transmit(ifp, m));
+
 }
 
 
