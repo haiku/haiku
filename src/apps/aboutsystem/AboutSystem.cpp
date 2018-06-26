@@ -1335,33 +1335,17 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDTwoClause)
 		.SetURL("http://udis86.sourceforge.net"));
 
-	// Intel PRO/Wireless 2100 Firmware
-	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2100 Firmware")
+	// Intel PRO/Wireless 2100 & 2200BG firmwares
+	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2100 & 2200BG firmwares")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2003-2006 "
 			"Intel Corporation. All rights reserved."))
 		.SetLicense(kIntel2xxxFirmware)
-		.SetURL("http://ipw2100.sourceforge.net/"));
-
-	// Intel PRO/Wireless 2200BG Firmware
-	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2200BG Firmware")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2004-2005 "
-			"Intel Corporation. All rights reserved."))
-		.SetLicense(kIntel2xxxFirmware)
-		.SetURL("http://ipw2200.sourceforge.net/"));
-
-	// Intel PRO/Wireless 3945ABG/BG Network Connection Adapter Firmware
-	_AddPackageCredit(
-		PackageCredit(
-			"Intel PRO/Wireless 3945ABG/BG Network Connection Adapter Firmware")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2007 "
-			"Intel Corporation. All rights reserved."))
-		.SetLicense(kIntelFirmware)
 		.SetURL("http://www.intellinuxwireless.org/"));
 
-	// Intel Wireless WiFi Link 4965AGN Adapter Firmware
+	// Intel wireless firmwares
 	_AddPackageCredit(
-		PackageCredit("Intel Wireless WiFi Link 4965AGN Adapter Firmware")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2007 "
+		PackageCredit("Intel PRO/Wireless network adapter firmwares")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2015 "
 			"Intel Corporation. All rights reserved."))
 		.SetLicense(kIntelFirmware)
 		.SetURL("http://www.intellinuxwireless.org/"));
