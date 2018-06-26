@@ -617,7 +617,7 @@ scan_start(void *arg, int pending)
 			/* Enable station power save mode */
 			vap->iv_sta_ps(vap, 1);
 			/* Wait until null data frame will be ACK'ed */
-			mtx_sleep(vap, IEEE80211_LOCK_OBJ(ic), PCATCH,
+			msleep(vap, IEEE80211_LOCK_OBJ(ic), PCATCH,
 			    "sta_ps", msecs_to_ticks(10));
 			if (ss_priv->ss_iflags & ISCAN_ABORT) {
 				scan_done(ss, 0);

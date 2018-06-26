@@ -80,6 +80,10 @@ ieee80211_scan_attach(struct ieee80211com *ic)
 		ieee80211_swscan_attach(ic);
 	else
 		ic->ic_scan_methods->sc_attach(ic);
+
+#if defined(__HAIKU__)
+	ieee80211_scan_sta_init();
+#endif
 }
 
 void
@@ -93,6 +97,10 @@ ieee80211_scan_detach(struct ieee80211com *ic)
 	 * I'll do that later.
 	 */
 	ic->ic_scan_methods->sc_detach(ic);
+
+#if defined(__HAIKU__)
+	ieee80211_scan_sta_uninit();
+#endif
 }
 
 static const struct ieee80211_roamparam defroam[IEEE80211_MODE_MAX] = {
@@ -374,6 +382,15 @@ ieee80211_check_scan(struct ieee80211vap *vap, int flags,
 		/* XXX re-use cache contents? e.g. adhoc<->sta */
 		flags |= IEEE80211_SCAN_FLUSH;
 	}
+
+#ifdef __HAIKU__
+	/* We never want to join if not explicitly looking for an SSID */
+	if (nssid == 0 && (flags & IEEE80211_SCAN_NOJOIN) == 0) {
+		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SCAN,
+			"%s: setting nojoin due to no configured ssid\n", __func__);
+		flags |= IEEE80211_SCAN_NOJOIN;
+	}
+#endif
 
 	/*
 	 * XXX TODO: separate things out a bit better.

@@ -545,7 +545,7 @@ mesh_gatemode_cb(void *arg)
 	mesh_gatemode_setup(vap);
 }
 
-static void
+void
 ieee80211_mesh_init(void)
 {
 

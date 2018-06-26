@@ -38,6 +38,8 @@
 #include <net80211/ieee80211_freebsd.h>
 #elif defined(__linux__)
 #include <net80211/ieee80211_linux.h>
+#elif defined(__HAIKU__)
+#include <net80211/ieee80211_haiku.h>
 #else
 #error	"No support for your operating system!"
 #endif

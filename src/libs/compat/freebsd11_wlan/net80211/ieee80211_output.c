@@ -581,8 +581,13 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 	 * Hand to the 802.3 code if not tagged as
 	 * a raw 802.11 frame.
 	 */
+#ifdef __HAIKU__
+	if (!dst || dst->sa_family != AF_IEEE80211)
+		return ieee80211_vap_xmitpkt(vap, m);
+#else
 	if (dst->sa_family != AF_IEEE80211)
 		return vap->iv_output(ifp, m, dst, ro);
+#endif
 #ifdef MAC
 	error = mac_ifnet_check_transmit(ifp, m);
 	if (error)
@@ -629,7 +634,7 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 		 * Permit packets w/ bpf params through regardless
 		 * (see below about sa_len).
 		 */
-		if (dst->sa_len == 0)
+		if (dst && dst->sa_len == 0)
 			senderr(EHOSTUNREACH);
 		ni = ieee80211_ref_node(vap->iv_bss);
 	}
@@ -665,7 +670,7 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m,
 	 * NB: we assume sa_data is suitably aligned to cast.
 	 */
 	ret = ieee80211_raw_output(vap, ni, m,
-	    (const struct ieee80211_bpf_params *)(dst->sa_len ?
+		(const struct ieee80211_bpf_params *)((dst && dst->sa_len) ?
 		dst->sa_data : NULL));
 	IEEE80211_TX_UNLOCK(ic);
 	return (ret);

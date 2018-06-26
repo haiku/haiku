@@ -347,7 +347,7 @@ ieee80211_setup_ratetable(struct ieee80211_rate_table *rt)
 }
 
 /* Setup all rate tables */
-static void
+void
 ieee80211_phy_init(void)
 {
 	static struct ieee80211_rate_table * const ratetables[] = {

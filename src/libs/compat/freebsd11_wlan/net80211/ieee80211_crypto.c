@@ -142,6 +142,11 @@ ieee80211_crypto_attach(struct ieee80211com *ic)
 {
 	/* NB: we assume everything is pre-zero'd */
 	ciphers[IEEE80211_CIPHER_NONE] = &ieee80211_cipher_none;
+#if defined(__HAIKU__)
+	ieee80211_crypto_ccmp_load();
+	ieee80211_crypto_tkip_load();
+	ieee80211_crypto_wep_load();
+#endif
 }
 
 /*
@@ -150,6 +155,11 @@ ieee80211_crypto_attach(struct ieee80211com *ic)
 void
 ieee80211_crypto_detach(struct ieee80211com *ic)
 {
+#if defined(__HAIKU__)
+	ieee80211_crypto_ccmp_unload();
+	ieee80211_crypto_tkip_unload();
+	ieee80211_crypto_wep_unload();
+#endif
 }
 
 /*

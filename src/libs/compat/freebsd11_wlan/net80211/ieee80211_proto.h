@@ -31,6 +31,7 @@
 /*
  * 802.11 protocol implementation definitions.
  */
+void ieee80211_auth_setup(void);
 
 enum ieee80211_state {
 	IEEE80211_S_INIT	= 0,	/* default state */
@@ -165,7 +166,7 @@ void	ieee80211_addbasicrates(struct ieee80211_rateset *,
 static __inline int
 ieee80211_hdrsize(const void *data)
 {
-	const struct ieee80211_frame *wh = data;
+	const struct ieee80211_frame *wh = (struct ieee80211_frame *)data;
 	int size = sizeof(struct ieee80211_frame);
 
 	/* NB: we don't handle control frames */
@@ -184,7 +185,7 @@ ieee80211_hdrsize(const void *data)
 static __inline int
 ieee80211_anyhdrsize(const void *data)
 {
-	const struct ieee80211_frame *wh = data;
+	const struct ieee80211_frame *wh = (struct ieee80211_frame *)data;
 
 	if ((wh->i_fc[0]&IEEE80211_FC0_TYPE_MASK) == IEEE80211_FC0_TYPE_CTL) {
 		switch (wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK) {

@@ -53,6 +53,30 @@ static const char *ratectl_modnames[IEEE80211_RATECTL_MAX] = {
 
 MALLOC_DEFINE(M_80211_RATECTL, "80211ratectl", "802.11 rate control");
 
+#if defined(__HAIKU__)
+/*
+ * Setup ratectl support for a device/shared instance.
+ */
+void
+ieee80211_ratectl_attach(struct ieee80211com *ic)
+{
+	ieee80211_ratectl_none_load();
+	ieee80211_ratectl_amrr_load();
+	ieee80211_ratectl_rssadapt_load();
+}
+
+/*
+ * Teardown ratectl support.
+ */
+void
+ieee80211_ratectl_detach(struct ieee80211com *ic)
+{
+	ieee80211_ratectl_none_unload();
+	ieee80211_ratectl_amrr_unload();
+	ieee80211_ratectl_rssadapt_unload();
+}
+#endif
+
 void
 ieee80211_ratectl_register(int type, const struct ieee80211_ratectl *ratectl)
 {
@@ -90,6 +114,7 @@ ieee80211_ratectl_sysctl_stats(SYSCTL_HANDLER_ARGS)
 	error = sysctl_wire_old_buffer(req, 0);
 	if (error)
 		return (error);
+#ifndef __HAIKU__
 	sbuf_new_for_sysctl(&sb, NULL, 8, req);
 	sbuf_clear_flags(&sb, SBUF_INCLUDENUL);
 
@@ -101,6 +126,7 @@ ieee80211_ratectl_sysctl_stats(SYSCTL_HANDLER_ARGS)
 
 	error = sbuf_finish(&sb);
 	sbuf_delete(&sb);
+#endif
 	return (error);
 }
 

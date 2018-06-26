@@ -1933,3 +1933,19 @@ static const struct ieee80211_scanner mesh_default = {
 };
 IEEE80211_SCANNER_ALG(mesh, IEEE80211_M_MBSS, mesh_default);
 #endif /* IEEE80211_SUPPORT_MESH */
+
+#if defined(__HAIKU__)
+void
+ieee80211_scan_sta_init()
+{
+	ieee80211_scanner_register(IEEE80211_M_STA, &sta_default);
+	ieee80211_scanner_register(IEEE80211_M_IBSS, &adhoc_default);
+}
+
+void
+ieee80211_scan_sta_uninit()
+{
+	ieee80211_scanner_unregister(IEEE80211_M_STA, &sta_default);
+	ieee80211_scanner_unregister(IEEE80211_M_IBSS, &adhoc_default);
+}
+#endif /* __HAIKU__ */

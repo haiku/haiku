@@ -40,6 +40,8 @@
 /*
  * 802.11s Information Elements.
 */
+void ieee80211_mesh_init(void);
+
 /* Mesh Configuration */
 #define IEEE80211_MESH_CONF_SZ		(7)
 struct ieee80211_meshconf_ie {

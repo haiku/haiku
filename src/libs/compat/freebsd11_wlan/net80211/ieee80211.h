@@ -32,6 +32,8 @@
  * 802.11 protocol definitions.
  */
 
+extern struct mtx ic_list_mtx;
+
 #define	IEEE80211_ADDR_LEN	6		/* size of 802.11 address */
 /* is 802.11 address multicast/broadcast? */
 #define	IEEE80211_IS_MULTICAST(_a)	(*(_a) & 0x01)

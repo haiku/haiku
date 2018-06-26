@@ -208,7 +208,7 @@ SYSCTL_PROC(_net_wlan_hwmp, OID_AUTO, inact, CTLTYPE_INT | CTLFLAG_RW,
 	"mesh route inactivity timeout (ms)");
 
 
-static void
+void
 ieee80211_hwmp_init(void)
 {
 	/* Default values as per amendment */

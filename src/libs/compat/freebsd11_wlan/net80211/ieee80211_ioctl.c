@@ -278,8 +278,12 @@ get_scan_result(void *arg, const struct ieee80211_scan_entry *se)
 	sr->isr_len = len;
 	sr->isr_ie_off = sizeof(struct ieee80211req_scan_result);
 	sr->isr_ie_len = ielen;
+#ifdef __HAIKU__
+	memcpy(&sr->isr_chan, se->se_chan, sizeof(sr->isr_chan));
+#else
 	sr->isr_freq = se->se_chan->ic_freq;
 	sr->isr_flags = se->se_chan->ic_flags;
+#endif
 	sr->isr_rssi = se->se_rssi;
 	sr->isr_noise = se->se_noise;
 	sr->isr_intval = se->se_intval;
@@ -397,8 +401,12 @@ get_sta_info(void *arg, struct ieee80211_node *ni)
 	si->isi_len = len;
 	si->isi_ie_off = sizeof(struct ieee80211req_sta_info);
 	si->isi_ie_len = ielen;
+#ifdef __HAIKU__
+	memcpy(&si->isi_chan, ni->ni_chan, sizeof(si->isi_chan));
+#else
 	si->isi_freq = ni->ni_chan->ic_freq;
 	si->isi_flags = ni->ni_chan->ic_flags;
+#endif
 	si->isi_state = ni->ni_flags;
 	si->isi_authmode = ni->ni_authmode;
 	vap->iv_ic->ic_node_getsignal(ni, &si->isi_rssi, &si->isi_noise);
@@ -1599,8 +1607,25 @@ ieee80211_ioctl_setmlme(struct ieee80211vap *vap, struct ieee80211req *ireq)
 		return error;
 	if  (vap->iv_opmode == IEEE80211_M_STA &&
 	    mlme.im_op == IEEE80211_MLME_ASSOC)
+#ifndef __HAIKU__
 		return setmlme_assoc_sta(vap, mlme.im_macaddr,
-		    vap->iv_des_ssid[0].len, vap->iv_des_ssid[0].ssid);
+			vap->iv_des_ssid[0].len, vap->iv_des_ssid[0].ssid);
+#else
+		/*	The wpa_supplicant (rightfully) supplies the SSID with this request.
+			However, with the code above it gets ignored and the desired SSID,
+			as set by IEEE80211_IOC_SSID is used instead. This still works if
+			the wpa_supplicant is the only client in use and IEEE80211_IOC_SSID
+			is never used, as then the mlme.im_macaddr is used as the only
+			identifying element. If we used IEEE80211_IOC_SSID before though,
+			for example because we joined an open network from the net_server
+			directly, there will always be a mismatch between the desired SSID
+			and the one the wpa_supplicant tries to associate with using this
+			MLME request. No association is then possible. As there is no
+			obvious reason why the request supplied SSID shouldn't be used, we
+			simply do so. */
+		return setmlme_assoc_sta(vap, mlme.im_macaddr,
+			mlme.im_ssid_len, mlme.im_ssid);
+#endif
 	else if ((vap->iv_opmode == IEEE80211_M_IBSS || 
 	    vap->iv_opmode == IEEE80211_M_AHDEMO) && 
 	    mlme.im_op == IEEE80211_MLME_ASSOC)
@@ -3351,7 +3376,9 @@ ieee80211_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 			 * 3. In monitor (or adhoc-demo) mode.
 			 */
 			if (ifp->if_bridge == NULL ||
+#ifndef __HAIKU__
 			    (ifp->if_flags & IFF_PPROMISC) != 0 ||
+#endif
 			    vap->iv_opmode == IEEE80211_M_MONITOR ||
 			    (vap->iv_opmode == IEEE80211_M_AHDEMO &&
 			    (vap->iv_caps & IEEE80211_C_TDMA) == 0)) {

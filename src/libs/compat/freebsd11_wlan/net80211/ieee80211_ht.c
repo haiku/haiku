@@ -170,7 +170,7 @@ static	ieee80211_send_action_func ht_send_action_ba_addba;
 static	ieee80211_send_action_func ht_send_action_ba_delba;
 static	ieee80211_send_action_func ht_send_action_ht_txchwidth;
 
-static void
+void
 ieee80211_ht_init(void)
 {
 	/*

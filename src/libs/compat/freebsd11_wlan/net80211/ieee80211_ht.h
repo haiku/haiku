@@ -30,6 +30,7 @@
 /*
  * 802.11n protocol implementation definitions.
  */
+void ieee80211_ht_init(void);
 
 #define	IEEE80211_AGGR_BAWMAX	64	/* max block ack window size */
 /* threshold for aging overlapping non-HT bss */

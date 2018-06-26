@@ -46,6 +46,7 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211.c 300232 2016-05-19 21:08
 #include <net/if_dl.h>
 #include <net/if_media.h>
 #include <net/if_types.h>
+#include <net/vnet.h>
 #include <net/ethernet.h>
 
 #include <net80211/ieee80211_var.h>
@@ -259,7 +260,7 @@ ic_printf(struct ieee80211com *ic, const char * fmt, ...)
 }
 
 static LIST_HEAD(, ieee80211com) ic_head = LIST_HEAD_INITIALIZER(ic_head);
-static struct mtx ic_list_mtx;
+struct mtx ic_list_mtx;
 MTX_SYSINIT(ic_list, &ic_list_mtx, "ieee80211com list", MTX_DEF);
 
 static int
@@ -273,6 +274,7 @@ sysctl_ieee80211coms(SYSCTL_HANDLER_ARGS)
 	error = sysctl_wire_old_buffer(req, 0);
 	if (error)
 		return (error);
+#ifndef __HAIKU__
 	sbuf_new_for_sysctl(&sb, NULL, 8, req);
 	sbuf_clear_flags(&sb, SBUF_INCLUDENUL);
 	sp = "";
@@ -284,6 +286,7 @@ sysctl_ieee80211coms(SYSCTL_HANDLER_ARGS)
 	mtx_unlock(&ic_list_mtx);
 	error = sbuf_finish(&sb);
 	sbuf_delete(&sb);
+#endif
 	return (error);
 }
 
@@ -308,8 +311,10 @@ ieee80211_ifattach(struct ieee80211com *ic)
 	    taskqueue_thread_enqueue, &ic->ic_tq);
 	taskqueue_start_threads(&ic->ic_tq, 1, PI_NET, "%s net80211 taskq",
 	    ic->ic_name);
+#ifndef __HAIKU__
 	ic->ic_ierrors = counter_u64_alloc(M_WAITOK);
 	ic->ic_oerrors = counter_u64_alloc(M_WAITOK);
+#endif
 	/*
 	 * Fill in 802.11 available channel set, mark all
 	 * available channels as active, and pick a default
@@ -337,6 +342,9 @@ ieee80211_ifattach(struct ieee80211com *ic)
 	ieee80211_scan_attach(ic);
 	ieee80211_regdomain_attach(ic);
 	ieee80211_dfs_attach(ic);
+#if defined(__HAIKU__)
+	ieee80211_ratectl_attach(ic);
+#endif
 
 	ieee80211_sysctl_attach(ic);
 
@@ -371,6 +379,9 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 	ieee80211_waitfor_parent(ic);
 
 	ieee80211_sysctl_detach(ic);
+#if defined(__HAIKU__)
+	ieee80211_ratectl_detach(ic);
+#endif
 	ieee80211_dfs_detach(ic);
 	ieee80211_regdomain_detach(ic);
 	ieee80211_scan_detach(ic);
@@ -384,8 +395,10 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 	ieee80211_power_detach(ic);
 	ieee80211_node_detach(ic);
 
+#ifndef __HAIKU__
 	counter_u64_free(ic->ic_ierrors);
 	counter_u64_free(ic->ic_oerrors);
+#endif
 
 	taskqueue_free(ic->ic_tq);
 	IEEE80211_TX_LOCK_DESTROY(ic);
@@ -444,12 +457,14 @@ ieee80211_get_counter(struct ifnet *ifp, ift_counter cnt)
 
 	rv = if_get_counter_default(ifp, cnt);
 	switch (cnt) {
+#ifndef __HAIKU__
 	case IFCOUNTER_OERRORS:
 		rv += counter_u64_fetch(ic->ic_oerrors);
 		break;
 	case IFCOUNTER_IERRORS:
 		rv += counter_u64_fetch(ic->ic_ierrors);
 		break;
+#endif
 	default:
 		break;
 	}
