@@ -339,17 +339,17 @@ PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 			switch (item.ItemKind()) {
 				case P_KIND_SCRIPT:
 					formatString = B_TRANSLATE("The script named \'%s\' "
-						"already exits in the given path.\nReplace the script "
+						"already exists in the given path.\nReplace the script "
 						"with the one from this package or skip it?");
 					break;
 				case P_KIND_FILE:
 					formatString = B_TRANSLATE("The file named \'%s\' already "
-						"exits in the given path.\nReplace the file with the "
+						"exists in the given path.\nReplace the file with the "
 						"one from this package or skip it?");
 					break;
 				case P_KIND_DIRECTORY:
 					formatString = B_TRANSLATE("The directory named \'%s\' "
-						"already exits in the given path.\nReplace the "
+						"already exists in the given path.\nReplace the "
 						"directory with one from this package or skip it?");
 					break;
 				case P_KIND_SYM_LINK:
@@ -359,7 +359,7 @@ PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 					break;
 				default:
 					formatString = B_TRANSLATE("The item named \'%s\' already "
-						"exits in the given path.\nReplace the item with the "
+						"exists in the given path.\nReplace the item with the "
 						"one from this package or skip it?");
 					break;
 			}
