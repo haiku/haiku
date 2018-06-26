@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan iprowifi4965 ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
@@ -20,8 +20,8 @@ KernelAddon iprowifi4965 :
 	if_iwn.c
 	glue.c
 	:
-	libfreebsd_wlan.a
-	libfreebsd_network.a
+	libfreebsd11_wlan.a
+	libfreebsd11_network.a
 	;
 
 HAIKU_WIFI_FIRMWARE_PACKAGES on iprowifi4965 =
@@ -37,4 +37,3 @@ HAIKU_WIFI_FIRMWARE_ARCHIVES on iprowifi4965 =
 	iwlwifi-6000-ucode-9.221.4.1.tgz iwlwifi-6000g2a-ucode-18.168.6.1.tgz
 	iwlwifi-6000g2b-ucode-18.168.6.1.tgz iwlwifi-6050-ucode-41.28.5.1.tgz ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on iprowifi4965 = true ;
-
