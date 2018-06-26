@@ -174,12 +174,6 @@ if_alloc(u_char type)
 			IFP2AC(ifp)->ac_ifp = ifp;
 			break;
 		}
-		case IFT_IEEE80211:
-		{
-			if (wlan_if_l2com_alloc(ifp) != B_OK)
-				goto err2;
-			break;
-		}
 	}
 
 	ifp->link_state_sem = -1;
@@ -210,7 +204,6 @@ if_alloc(u_char type)
 err3:
 	switch (type) {
 		case IFT_ETHER:
-		case IFT_IEEE80211:
 			_kernel_free(ifp->if_l2com);
 			break;
 	}
@@ -239,7 +232,6 @@ if_free(struct ifnet *ifp)
 	IF_ADDR_LOCK_DESTROY(ifp);
 	switch (ifp->if_type) {
 		case IFT_ETHER:
-		case IFT_IEEE80211:
 			_kernel_free(ifp->if_l2com);
 			break;
 	}
@@ -268,16 +260,7 @@ if_initname(struct ifnet *ifp, const char *name, int unit)
 		gDriverName, ifp->if_index);
 
 	driver_printf("%s: /dev/%s\n", gDriverName, ifp->device_name);
-
-	// For wlan devices we only want to see the cloned wlan device
-	// in the list.
-	// Remember: For each wlan device, there is a base device of type
-	//           IFT_IEEE80211. On top of that a clone device is created of
-	//           type IFT_ETHER.
-	//           Haiku shall only see the cloned device as it is the one
-	//           FreeBSD 8 uses for wireless i/o, too.
-	if (ifp->if_type == IFT_ETHER)
-		insert_into_device_name_list(ifp);
+	insert_into_device_name_list(ifp);
 
 	ifp->root_device = find_root_device(unit);
 }
@@ -1008,7 +991,7 @@ if_getcapabilities(if_t ifp)
 	return ((struct ifnet *)ifp)->if_capabilities;
 }
 
-int 
+int
 if_setcapenable(if_t ifp, int capabilities)
 {
 	((struct ifnet *)ifp)->if_capenable = capabilities;
@@ -1157,16 +1140,16 @@ if_getsoftc(if_t ifp)
 	return ((struct ifnet *)ifp)->if_softc;
 }
 
-void 
+void
 if_setrcvif(struct mbuf *m, if_t ifp)
 {
 	m->m_pkthdr.rcvif = (struct ifnet *)ifp;
 }
 
-void 
+void
 if_setvtag(struct mbuf *m, uint16_t tag)
 {
-	m->m_pkthdr.ether_vtag = tag;	
+	m->m_pkthdr.ether_vtag = tag;
 }
 
 uint16_t

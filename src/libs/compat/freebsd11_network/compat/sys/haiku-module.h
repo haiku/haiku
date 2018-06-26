@@ -79,7 +79,6 @@ status_t start_wlan(device_t);
 status_t stop_wlan(device_t);
 status_t wlan_control(void*, uint32, void*, size_t);
 status_t wlan_close(void*);
-status_t wlan_if_l2com_alloc(void*);
 
 /* we define the driver methods with HAIKU_FBSD_DRIVERS_GLUE to
  * force the rest of the stuff to be linked back with the driver.
@@ -118,8 +117,6 @@ status_t wlan_if_l2com_alloc(void*);
 		size_t length)													\
 		{ return B_BAD_VALUE; }											\
 	status_t wlan_close(void* cookie)									\
-		{ return B_OK; }												\
-	status_t wlan_if_l2com_alloc(void* ifp)								\
 		{ return B_OK; }
 
 #define HAIKU_FBSD_DRIVER_GLUE(publicname, name, busname)				\

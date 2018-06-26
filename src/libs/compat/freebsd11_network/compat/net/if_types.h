@@ -9,6 +9,4 @@
 #include <posix/net/if_types.h>
 
 
-#define	IFT_IEEE80211		   0x47
-
 #endif /* _FBSD_COMPAT_NET_IF_TYPES_H_ */
