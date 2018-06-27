@@ -28,7 +28,13 @@ int printf(const char *format, ...) __printflike(1, 2);
 
 #define ovbcopy(f, t, l) bcopy((f), (t), (l))
 
+#if KDEBUG_LEVEL_2
+#define INVARIANTS
+#endif
+
+#if KDEBUG_LEVEL_1
 #define bootverbose 1
+#endif
 
 #ifdef INVARIANTS
 #define KASSERT(cond,msg) do {	\

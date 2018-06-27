@@ -327,7 +327,7 @@ taskqueue_enqueue_timeout(struct taskqueue *queue,
 	cpu_status status;
 
 	tq_lock(queue, &status);
-	KASSERT(timeout_task->q == NULL || timeout_task->q == queue,
+	KASSERT(ttask->q == NULL || ttask->q == queue,
 		("Migrated queue"));
 	ttask->q = queue;
 	res = ttask->t.ta_pending;

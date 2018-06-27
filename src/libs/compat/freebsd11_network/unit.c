@@ -13,6 +13,7 @@
 #include <compat/sys/mutex.h>
 
 #include <stdlib.h>
+#include <util/RadixBitmap.h>
 
 
 extern struct mtx gIdStoreLock;
@@ -50,12 +51,12 @@ new_unrhdr(int low, int high, struct mtx* mutex)
 void
 delete_unrhdr(struct unrhdr* idStore)
 {
-	KASSERT(uh != NULL,
+	KASSERT(idStore != NULL,
 		("ID-Store: %s: NULL pointer as argument.", __func__));
 
 	mtx_lock(idStore->storeMutex);
 
-	KASSERT(uh->idBuffer->root_size == 0,
+	KASSERT(idStore->idBuffer->root_size == 0,
 		("ID-Store: %s: some ids are still in use..", __func__));
 
 	_delete_unrhdr_buffer_locked(idStore);
@@ -71,7 +72,7 @@ alloc_unr(struct unrhdr* idStore)
 {
 	int id;
 
-	KASSERT(uh != NULL,
+	KASSERT(idStore != NULL,
 		("ID-Store: %s: NULL pointer as argument.", __func__));
 
 	mtx_lock(idStore->storeMutex);
@@ -85,13 +86,13 @@ alloc_unr(struct unrhdr* idStore)
 void
 free_unr(struct unrhdr* idStore, u_int identity)
 {
-	KASSERT(uh != NULL,
+	KASSERT(idStore != NULL,
 		("ID-Store: %s: NULL pointer as argument.", __func__));
 
 	mtx_lock(idStore->storeMutex);
 
-	KASSERT((int32)item - uh->idBias >= 0, ("ID-Store: %s(%p, %u): second "
-		+ "parameter is not in interval.", __func__, uh, item));
+	KASSERT((int32)identity - idStore->idBias >= 0, ("ID-Store: %s(%p, %u): second "
+		"parameter is not in interval.", __func__, idStore, identity));
 
 	_free_unr_locked(idStore, identity);
 

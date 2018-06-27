@@ -679,7 +679,7 @@ if_delmulti(struct ifnet *ifp, struct sockaddr *sa)
 {
 	struct ifmultiaddr *ifma;
 	int lastref;
-#ifdef INVARIANTS
+#if 0 /* def INVARIANTS */
 	struct ifnet *oifp;
 
 	IFNET_RLOCK_NOSLEEP();

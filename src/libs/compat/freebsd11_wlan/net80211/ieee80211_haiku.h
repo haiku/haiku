@@ -40,8 +40,6 @@
 extern "C" {
 #	endif
 
-#define INVARIANTS 1
-
 #include <sys/kernel.h>
 #include <sys/mutex.h>
 #include <sys/sysctl.h>
