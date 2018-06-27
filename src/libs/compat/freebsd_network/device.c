@@ -165,17 +165,19 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	//if_printf(ifp, "compat_write(%lld, %p, [%lu])\n", position,
 	//	buffer, *numBytes);
 
-	if (*numBytes > MHLEN)
+	if (*numBytes > MHLEN) {
 		mb = m_getcl(0, MT_DATA, M_PKTHDR);
-	else
+		*numBytes = min_c(*numBytes, (size_t)MCLBYTES);
+	} else {
 		mb = m_gethdr(0, MT_DATA);
+	}
 
 	if (mb == NULL)
 		return ENOBUFS;
 
 	// if we waited, check after if the ifp is still valid
 
-	mb->m_pkthdr.len = mb->m_len = min_c(*numBytes, (size_t)MCLBYTES);
+	mb->m_pkthdr.len = mb->m_len = *numBytes;
 	memcpy(mtod(mb, void *), buffer, mb->m_len);
 
 	return ifp->if_output(ifp, mb, NULL, NULL);
