@@ -208,7 +208,7 @@
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
-	\retval B_ENTRY_NOT_FOUND The file referenced by \a ref couldn't be found.
+	\retval B_ENTRY_NOT_FOUND The file referenced by \a image couldn't be found.
 	\retval B_ERROR Failed to initialize the object.
 
 	\since Haiku R1
