@@ -167,7 +167,8 @@ public:
 									{ return fWebAppInterface; }
 
 			void				ReplaceDepotByUrl(
-									const BString& url,
+									const BString& URL,
+									const BString& baseURL,
 									DepotMapper* depotMapper,
 									void* context);
 

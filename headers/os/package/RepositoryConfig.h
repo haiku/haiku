@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2018, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__REPOSITORY_CONFIG_H_
@@ -28,6 +28,7 @@ public:
 
 			const BString&		Name() const;
 			const BString&		BaseURL() const;
+			const BString&		URL() const;
 			uint8				Priority() const;
 			bool				IsUserSpecific() const;
 
@@ -37,6 +38,7 @@ public:
 
 			void				SetName(const BString& name);
 			void				SetBaseURL(const BString& url);
+			void				SetURL(const BString& url);
 			void				SetPriority(uint8 priority);
 			void				SetIsUserSpecific(bool isUserSpecific);
 
@@ -48,6 +50,11 @@ private:
 
 			BString				fName;
 			BString				fBaseURL;
+				// this URL is the URL that can be used to access the data of
+				// the repository - it points to a single mirror.
+			BString				fURL;
+				// this URL is actually an identifier for the repository
+				// that is consistent across mirrors.
 			uint8				fPriority;
 			bool				fIsUserSpecific;
 

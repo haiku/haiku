@@ -22,7 +22,7 @@ main(int argc, const char** argv)
 
 	BRepositoryInfo repoInfo;
 	repoInfo.SetName(argv[1]);
-	repoInfo.SetOriginalBaseURL(argv[2]);
+	repoInfo.SetURL(argv[2]);
 	repoInfo.SetPriority(atoi(argv[3]));
 
 	BMessage repoInfoArchive;

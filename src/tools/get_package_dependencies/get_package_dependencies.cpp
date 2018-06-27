@@ -1,9 +1,10 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -154,7 +155,7 @@ main(int argc, const char* const* argv)
 				if (package->Repository() != &installedRepository) {
 					const BRepositoryInfo& info
 						= repositoryInfos[package->Repository()];
-					BString url = info.OriginalBaseURL();
+					BString url = info.URL();
 					url << "/packages/" << package->Info().CanonicalFileName();
 					printf("%s\n", url.String());
 				}

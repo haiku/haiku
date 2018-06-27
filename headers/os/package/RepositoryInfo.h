@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2018, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__REPOSITORY_INFO_H_
@@ -33,7 +33,8 @@ public:
 			status_t			InitCheck() const;
 
 			const BString&		Name() const;
-			const BString&		OriginalBaseURL() const;
+			const BString&		BaseURL() const;
+			const BString&		URL() const;
 			const BString&		Vendor() const;
 			const BString&		Summary() const;
 			uint8				Priority() const;
@@ -42,7 +43,8 @@ public:
 			const BStringList&	LicenseTexts() const;
 
 			void				SetName(const BString& name);
-			void				SetOriginalBaseURL(const BString& url);
+			void				SetBaseURL(const BString& url);
+			void				SetURL(const BString& url);
 			void				SetVendor(const BString& vendor);
 			void				SetSummary(const BString& summary);
 			void				SetPriority(uint8 priority);
@@ -59,6 +61,7 @@ public:
 
 	static	const char* const	kNameField;
 	static	const char* const	kURLField;
+	static	const char* const	kBaseURLField;
 	static	const char* const	kVendorField;
 	static	const char*	const	kSummaryField;
 	static	const char*	const	kPriorityField;
@@ -74,7 +77,11 @@ private:
 			status_t			fInitStatus;
 
 			BString				fName;
-			BString				fOriginalBaseURL;
+			BString				fBaseURL;
+				// This is the URL to a single mirror.  This field is optional.
+			BString				fURL;
+				// This is an identifier for the repository that applies
+				// across mirrors.
 			BString				fVendor;
 			BString				fSummary;
 			uint8				fPriority;

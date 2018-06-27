@@ -1,9 +1,10 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -59,11 +60,19 @@ ActivateRepositoryConfigJob::Execute()
 	}
 
 	// create and store the configuration (injecting the BaseURL that was
-	// actually used)
+	// actually used).
 	BRepositoryConfig repoConfig;
 	repoConfig.SetName(repoInfo.Name());
 	repoConfig.SetBaseURL(fRepositoryBaseURL);
+	repoConfig.SetURL(repoInfo.URL());
 	repoConfig.SetPriority(repoInfo.Priority());
+
+	if (fRepositoryBaseURL.IsEmpty()) {
+		repoConfig.SetBaseURL(repoInfo.BaseURL());
+	} else {
+		repoConfig.SetBaseURL(fRepositoryBaseURL);
+	}
+
 	if ((result = repoConfig.Store(fTargetEntry)) != B_OK)
 		return result;
 

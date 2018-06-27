@@ -12,9 +12,9 @@
 #include "MainWindow.h"
 
 #include <map>
+#include <vector>
 
 #include <stdio.h>
-
 #include <Alert.h>
 #include <Autolock.h>
 #include <Application.h>
@@ -55,6 +55,7 @@
 #include "PackageListView.h"
 #include "PackageManager.h"
 #include "RatePackageWindow.h"
+#include "RepositoryUrlUtils.h"
 #include "support.h"
 #include "ScreenshotWindow.h"
 #include "UserLoginWindow.h"
@@ -87,7 +88,6 @@ using namespace BPackageKit::BManager::BPrivate;
 
 
 typedef std::map<BString, PackageInfoRef> PackageInfoMap;
-typedef std::map<BString, DepotInfo> DepotInfoMap;
 
 
 struct RefreshWorkerParameters {
@@ -943,7 +943,7 @@ MainWindow::_RefreshPackageList(bool force)
 	if (result != B_OK)
 		return;
 
-	DepotInfoMap depots;
+	std::vector<DepotInfo> depots(repositoryNames.CountStrings());
 	for (int32 i = 0; i < repositoryNames.CountStrings(); i++) {
 		const BString& repoName = repositoryNames.StringAt(i);
 		DepotInfo depotInfo = DepotInfo(repoName);
@@ -954,13 +954,22 @@ MainWindow::_RefreshPackageList(bool force)
 
 		if (getRepositoryConfigStatus == B_OK) {
 			depotInfo.SetBaseURL(repoConfig.BaseURL());
+			depotInfo.SetURL(repoConfig.URL());
+
+			if (Logger::IsDebugEnabled()) {
+				printf("local repository [%s] info;\n"
+					" * base url [%s]\n"
+					" * url [%s]\n",
+					repoName.String(), repoConfig.BaseURL().String(),
+					repoConfig.URL().String());
+			}
 		} else {
 			printf("unable to obtain the repository config for local "
 				"repository '%s'; %s\n",
 				repoName.String(), strerror(getRepositoryConfigStatus));
 		}
 
-		depots[repoName] = depotInfo;
+		depots[i] = depotInfo;
 	}
 
 	PackageManager manager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
@@ -1039,16 +1048,34 @@ MainWindow::_RefreshPackageList(bool force)
 		modelInfo->AddListener(this);
 
 		BSolverRepository* repository = package->Repository();
-		if (dynamic_cast<BPackageManager::RemoteRepository*>(repository)
-				!= NULL) {
-			if (depots.count(repositoryName) == 0) {
+		BPackageManager::RemoteRepository* remoteRepository =
+			dynamic_cast<BPackageManager::RemoteRepository*>(repository);
+
+		if (remoteRepository != NULL) {
+
+			std::vector<DepotInfo>::iterator it;
+
+			for (it = depots.begin(); it != depots.end(); it++) {
+				if (RepositoryUrlUtils::EqualsOnUrlOrBaseUrl(
+					it->URL(), remoteRepository->Config().URL(),
+					it->BaseURL(), remoteRepository->Config().BaseURL())) {
+					break;
+				}
+			}
+
+			if (it == depots.end()) {
 				if (Logger::IsDebugEnabled()) {
-					printf("pkg [%s] is in an unknown repository [%s] so will "
-						"be excluded from the list of managed packages\n",
+					printf("pkg [%s] repository [%s] not recognized"
+						" --> ignored\n",
 						modelInfo->Name().String(), repositoryName.String());
 				}
 			} else {
-				depots[repositoryName].AddPackage(modelInfo);
+				it->AddPackage(modelInfo);
+
+				if (Logger::IsTraceEnabled()) {
+					printf("pkg [%s] assigned to [%s]\n",
+						modelInfo->Name().String(), repositoryName.String());
+				}
 			}
 
 			remotePackages[modelInfo->Name()] = modelInfo;
@@ -1091,19 +1118,23 @@ MainWindow::_RefreshPackageList(bool force)
 
 	if (!foundPackages.empty()) {
 		BString repoName = B_TRANSLATE("Local");
-		depots[repoName] = DepotInfo(repoName);
-		DepotInfoMap::iterator depot = depots.find(repoName);
+		depots.push_back(DepotInfo(repoName));
+
 		for (PackageInfoMap::iterator it = foundPackages.begin();
 				it != foundPackages.end(); ++it) {
-			depot->second.AddPackage(it->second);
+			depots.back().AddPackage(it->second);
 		}
 	}
 
-	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end(); it++) {
-		if (fModel.HasDepot(it->second.Name()))
-			fModel.SyncDepot(it->second);
-		else
-			fModel.AddDepot(it->second);
+	{
+		std::vector<DepotInfo>::iterator it;
+
+		for (it = depots.begin(); it != depots.end(); it++) {
+			if (fModel.HasDepot(it->Name()))
+				fModel.SyncDepot(*it);
+			else
+				fModel.AddDepot(*it);
+		}
 	}
 
 	// start retrieving package icons and average ratings

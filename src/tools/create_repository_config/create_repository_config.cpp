@@ -1,9 +1,10 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -59,7 +60,7 @@ main(int argc, const char* const* argv)
 	}
 
 	int argi = 1;
-	const char* url = argc == 4 ? argv[argi++] : NULL;
+	const char* baseUrl = argc == 4 ? argv[argi++] : NULL;
 	const char* infoPath = argv[argi++];
 	const char* configPath = argv[argi++];
 
@@ -68,13 +69,18 @@ main(int argc, const char* const* argv)
 	DIE_ON_ERROR(repoInfo.SetTo(infoPath),
 		"failed to read repository info file \"%s\"", infoPath);
 
-	if (url == NULL)
-		url = repoInfo.OriginalBaseURL();
+	if (baseUrl == NULL) {
+		if (repoInfo.BaseURL().IsEmpty())
+			baseUrl = repoInfo.URL();
+		else
+			baseUrl = repoInfo.BaseURL();
+	}
 
 	// init and write the config
 	BPackageKit::BRepositoryConfig repoConfig;
 	repoConfig.SetName(repoInfo.Name());
-	repoConfig.SetBaseURL(url);
+	repoConfig.SetBaseURL(baseUrl);
+	repoConfig.SetURL(repoInfo.URL());
 	repoConfig.SetPriority(repoInfo.Priority());
 	DIE_ON_ERROR(repoConfig.Store(configPath),
 		"failed to write repository config file \"%s\"", configPath);

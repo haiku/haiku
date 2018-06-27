@@ -24,6 +24,7 @@
 
 #include "Logger.h"
 #include "StorageUtils.h"
+#include "RepositoryUrlUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -1057,20 +1058,6 @@ Model::_NotifyAuthorizationChanged()
 }
 
 
-// temporary - should not be required once the repo info url is used.
-static void
-normalize_repository_base_url(BUrl& url)
-{
-	if (url.Protocol() == "https")
-		url.SetProtocol("http");
-
-	BString path(url.Path());
-
-	if (path.EndsWith("/"))
-		url.SetPath(path.Truncate(path.Length() - 1));
-}
-
-
 void
 Model::ForAllDepots(void (*func)(const DepotInfo& depot, void* context),
 	void* context)
@@ -1082,21 +1069,28 @@ Model::ForAllDepots(void (*func)(const DepotInfo& depot, void* context),
 }
 
 
-// TODO; should use the repo.info url and not the base url.
+/*! This method will find the stored 'DepotInfo' that correlates to the
+    supplied 'url' or 'baseUrl' and will invoke the mapper function in
+    order to get a replacement for the 'DepotInfo'.  The two URLs are
+    different.  The 'url' is a unique identifier for the repository that
+    holds across mirrors.  The 'baseUrl' is the URL stem that was used
+    to access the repository data in the first place.  The 'baseUrl' is
+    a legacy construct that exists from a time where the identifying
+    'url' was not being relayed properly.
+*/
 
 void
-Model::ReplaceDepotByUrl(const BString& url,
+Model::ReplaceDepotByUrl(
+	const BString& URL,
+	const BString& baseURL,
+		// deprecated
 	DepotMapper* depotMapper, void* context)
 {
-	BUrl filterUrl(url);
-	normalize_repository_base_url(filterUrl);
-
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
 		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-		BUrl depotUrlNormalized(depotInfo.BaseURL());
-		normalize_repository_base_url(depotUrlNormalized);
 
-		if (filterUrl == depotUrlNormalized) {
+		if (RepositoryUrlUtils::EqualsOnUrlOrBaseUrl(URL, depotInfo.URL(),
+			baseURL, depotInfo.BaseURL())) {
 			BAutolock locker(&fLock);
 			fDepots.Replace(i, depotMapper->MapDepot(depotInfo, context));
 		}

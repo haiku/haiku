@@ -116,6 +116,7 @@ Application HaikuDepot :
 
 	#util
 	DataIOUtils.cpp
+	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
 	ToFileUrlProtocolListener.cpp
 

@@ -1,9 +1,10 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -21,6 +22,15 @@
 
 #include <DriverSettings.h>
 
+
+#define STORAGE_VERSION 2
+
+#define KEY_BASE_URL "baseurl"
+#define KEY_BASE_URL_LEGACY "url"
+	// deprecated
+#define KEY_URL "url"
+#define KEY_PRIORITY "priority"
+#define KEY_CONFIG_VERSION "cfgversion"
 
 namespace BPackageKit {
 
@@ -66,9 +76,21 @@ BRepositoryConfig::Store(const BEntry& entry) const
 		return result;
 
 	BString configString;
-	configString
-		<< "url=" << fBaseURL << "\n"
-		<< "priority=" << fPriority << "\n";
+	configString << KEY_CONFIG_VERSION << "=" << STORAGE_VERSION << "\n";
+	configString << "\n";
+	configString << "# This is the URL where the repository data can be "
+		"accessed.\n";
+	configString << KEY_BASE_URL << "=" << fBaseURL << "\n";
+	configString << "\n";
+	configString << "# This URL is an identifier for the repository that is "
+		"consistent across mirrors\n";
+
+	if (fURL.IsEmpty())
+		configString << "# " << KEY_URL << "=???\n";
+	else
+		configString << KEY_URL << "=" << fURL << "\n";
+	configString << "\n";
+	configString << KEY_PRIORITY << "=" << fPriority << "\n";
 
 	int32 size = configString.Length();
 	if ((result = file.Write(configString.String(), size)) < size)
@@ -101,16 +123,26 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 	if (result != B_OK)
 		return result;
 
-	const char* url = driverSettings.GetParameterValue("url");
-	const char* priorityString = driverSettings.GetParameterValue("priority");
+	const char* url = NULL;
+	const char* version = driverSettings.GetParameterValue(KEY_CONFIG_VERSION);
+	const char *baseUrlKey = KEY_BASE_URL;
 
-	if (url == NULL || *url == '\0')
+	if (version == NULL || atoi(version) < 2)
+		baseUrlKey = KEY_BASE_URL_LEGACY;
+	else
+		url = driverSettings.GetParameterValue(KEY_URL);
+
+	const char* baseUrl = driverSettings.GetParameterValue(baseUrlKey);
+	const char* priorityString = driverSettings.GetParameterValue(KEY_PRIORITY);
+
+	if (baseUrl == NULL || *baseUrl == '\0')
 		return B_BAD_DATA;
 
 	fName = entry.Name();
-	fBaseURL = url;
+	fBaseURL = baseUrl;
 	fPriority = priorityString == NULL
 		? kUnsetPriority : atoi(priorityString);
+	fURL = url == NULL ? "" : url;
 
 	BPath userSettingsPath;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &userSettingsPath) == B_OK) {
@@ -136,6 +168,13 @@ const BString&
 BRepositoryConfig::BaseURL() const
 {
 	return fBaseURL;
+}
+
+
+const BString&
+BRepositoryConfig::URL() const
+{
+	return fURL;
 }
 
 
@@ -180,6 +219,13 @@ void
 BRepositoryConfig::SetBaseURL(const BString& baseURL)
 {
 	fBaseURL = baseURL;
+}
+
+
+void
+BRepositoryConfig::SetURL(const BString& URL)
+{
+	fURL = URL;
 }
 
 
