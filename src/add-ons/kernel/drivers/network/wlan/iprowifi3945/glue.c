@@ -1,6 +1,7 @@
 /*
  * Copyright 2009, Colin Günther, coling@gmx.de.
- * All Rights Reserved. Distributed under the terms of the MIT License.
+ * Copyright 2018, Haiku, Inc.
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
@@ -30,15 +31,24 @@ int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct wpi_softc* sc = (struct wpi_softc*)device_get_softc(dev);
-	uint32 r;
+	uint32 r1, r2;
 
-	if ((r = WPI_READ(sc, WPI_INTR)) == 0 || r == 0xffffffff)
-		return 0;
+	r1 = WPI_READ(sc, WPI_INT);
 
-	atomic_set((int32*)&sc->sc_intr_status, r);
+	if (__predict_false(r1 == 0xffffffff ||
+			(r1 & 0xfffffff0) == 0xa5a5a5a0))
+		return 0;	/* Hardware gone! */
 
-	WPI_WRITE(sc, WPI_MASK, 0);
-		// disable interrupts
+	r2 = WPI_READ(sc, WPI_FH_INT);
+
+	if (r1 == 0 && r2 == 0)
+		return 0;	/* Interrupt not for us. */
+
+	/* Disable interrupts. */
+	WPI_WRITE(sc, WPI_INT_MASK, 0);
+
+	atomic_set((int32*)&sc->sc_intr_status_1, r1);
+	atomic_set((int32*)&sc->sc_intr_status_2, r2);
 
 	return 1;
 }
