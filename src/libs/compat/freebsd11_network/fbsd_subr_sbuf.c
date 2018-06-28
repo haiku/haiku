@@ -56,6 +56,9 @@ __FBSDID("$FreeBSD$");
 //static MALLOC_DEFINE(M_SBUF, "sbuf", "string buffers");
 #define	SBMALLOC(size)		malloc(size)
 #define	SBFREE(buf)		free(buf)
+#if __GNUC__ == 2
+#	define va_copy(to, from)	__va_copy(to, from)
+#endif
 #else /* _KERNEL */
 #define	KASSERT(e, m)
 #define	SBMALLOC(size)		calloc(1, size)
