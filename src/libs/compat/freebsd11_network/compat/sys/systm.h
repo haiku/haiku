@@ -96,6 +96,7 @@ int _pause(const char *, int);
 #define pause(waitMessage, timeout) _pause((waitMessage), (timeout))
 #define tsleep(channel, priority, waitMessage, timeout) \
 	msleep((channel), NULL, (priority), (waitMessage), (timeout))
+#define mtx_sleep msleep
 
 struct unrhdr;
 struct unrhdr *new_unrhdr(int low, int high, struct mtx *mutex);
