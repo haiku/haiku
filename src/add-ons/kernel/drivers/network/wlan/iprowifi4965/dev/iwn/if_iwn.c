@@ -7758,8 +7758,10 @@ iwn5000_post_alive(struct iwn_softc *sc)
 
 	DPRINTF(sc, IWN_DEBUG_TRACE, "->%s begin\n", __func__);
 
+#ifndef __HAIKU__
 	/* Switch to using ICT interrupt mode. */
 	iwn5000_ict_reset(sc);
+#endif
 
 	if ((error = iwn_nic_lock(sc)) != 0){
 		DPRINTF(sc, IWN_DEBUG_TRACE, "->%s end in error\n", __func__);
