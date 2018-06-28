@@ -34,6 +34,8 @@ int printf(const char *format, ...) __printflike(1, 2);
 
 #if KDEBUG_LEVEL_1
 #define bootverbose 1
+#else
+#define bootverbose 0
 #endif
 
 #ifdef INVARIANTS
