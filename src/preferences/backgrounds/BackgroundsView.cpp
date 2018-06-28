@@ -1048,7 +1048,7 @@ FindPath(BPath* currentPath, void* newPath)
 
 
 void
-BackgroundsView::_AddRecentFolder(BPath path, bool notifyApp = false)
+BackgroundsView::_AddRecentFolder(BPath path, bool notifyApp)
 {
 	BPath* currentPath = fPathList.EachElement(FindPath, &path);
 	BMenuItem* item;
