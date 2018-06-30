@@ -39,7 +39,11 @@
 #include <posix/sys/cdefs.h>
 
 
+#if 0
 #define __FBSDID(str)	static const char __fbsdid[] = str
+#else
+#define __FBSDID(str)
+#endif
 
 /*
  * This code has been put in place to help reduce the addition of
