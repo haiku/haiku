@@ -6116,10 +6116,11 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
 		if (descriptor->type != FDTYPE_FILE)
 			status = B_BAD_VALUE;
+		else if (kernel)
+			memcpy(&flock, (struct flock*)argument, sizeof(struct flock));
 		else if (user_memcpy(&flock, (struct flock*)argument,
 				sizeof(struct flock)) != B_OK)
 			status = B_BAD_ADDRESS;
-
 		if (status != B_OK) {
 			put_fd(descriptor);
 			return status;
@@ -6208,16 +6209,26 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 						// no conflicting lock found, copy back the same struct
 						// we were given except change type to F_UNLCK
 						flock.l_type = F_UNLCK;
-						status = user_memcpy((struct flock*)argument, &flock,
-							sizeof(struct flock));
+						if (kernel) {
+							memcpy((struct flock*)argument, &flock,
+								sizeof(struct flock));
+						} else {
+							status = user_memcpy((struct flock*)argument,
+								&flock, sizeof(struct flock));
+						}
 					} else {
 						// a conflicting lock was found, copy back its range and
 						// type
 						if (normalizedLock.l_len == OFF_MAX)
 							normalizedLock.l_len = 0;
 
-						status = user_memcpy((struct flock*)argument,
-							&normalizedLock, sizeof(struct flock));
+						if (kernel) {
+							memcpy((struct flock*)argument,
+								&normalizedLock, sizeof(struct flock));
+						} else {
+							status = user_memcpy((struct flock*)argument,
+								&normalizedLock, sizeof(struct flock));
+						}
 					}
 				}
 			} else
