@@ -311,10 +311,8 @@ ieee80211_ifattach(struct ieee80211com *ic)
 	    taskqueue_thread_enqueue, &ic->ic_tq);
 	taskqueue_start_threads(&ic->ic_tq, 1, PI_NET, "%s net80211 taskq",
 	    ic->ic_name);
-#ifndef __HAIKU__
 	ic->ic_ierrors = counter_u64_alloc(M_WAITOK);
 	ic->ic_oerrors = counter_u64_alloc(M_WAITOK);
-#endif
 	/*
 	 * Fill in 802.11 available channel set, mark all
 	 * available channels as active, and pick a default
@@ -395,10 +393,8 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 	ieee80211_power_detach(ic);
 	ieee80211_node_detach(ic);
 
-#ifndef __HAIKU__
 	counter_u64_free(ic->ic_ierrors);
 	counter_u64_free(ic->ic_oerrors);
-#endif
 
 	taskqueue_free(ic->ic_tq);
 	IEEE80211_TX_LOCK_DESTROY(ic);
@@ -457,14 +453,12 @@ ieee80211_get_counter(struct ifnet *ifp, ift_counter cnt)
 
 	rv = if_get_counter_default(ifp, cnt);
 	switch (cnt) {
-#ifndef __HAIKU__
 	case IFCOUNTER_OERRORS:
 		rv += counter_u64_fetch(ic->ic_oerrors);
 		break;
 	case IFCOUNTER_IERRORS:
 		rv += counter_u64_fetch(ic->ic_ierrors);
 		break;
-#endif
 	default:
 		break;
 	}

@@ -3016,18 +3016,14 @@ iwn_rx_done(struct iwn_softc *sc, struct iwn_rx_desc *desc,
 	if ((flags & IWN_RX_NOERROR) != IWN_RX_NOERROR) {
 		DPRINTF(sc, IWN_DEBUG_RECV, "%s: RX flags error %x\n",
 		    __func__, flags);
-#ifndef __HAIKU__
 		counter_u64_add(ic->ic_ierrors, 1);
-#endif
 		return;
 	}
 	/* Discard frames that are too short. */
 	if (len < sizeof (struct ieee80211_frame_ack)) {
 		DPRINTF(sc, IWN_DEBUG_RECV, "%s: frame too short: %d\n",
 		    __func__, len);
-#ifndef __HAIKU__
 		counter_u64_add(ic->ic_ierrors, 1);
-#endif
 		return;
 	}
 
@@ -3035,9 +3031,7 @@ iwn_rx_done(struct iwn_softc *sc, struct iwn_rx_desc *desc,
 	if (m1 == NULL) {
 		DPRINTF(sc, IWN_DEBUG_ANY, "%s: no mbuf to restock ring\n",
 		    __func__);
-#ifndef __HAIKU__
 		counter_u64_add(ic->ic_ierrors, 1);
-#endif
 		return;
 	}
 	bus_dmamap_unload(ring->data_dmat, data->map);
@@ -3062,9 +3056,7 @@ iwn_rx_done(struct iwn_softc *sc, struct iwn_rx_desc *desc,
 		ring->desc[ring->cur] = htole32(paddr >> 8);
 		bus_dmamap_sync(ring->desc_dma.tag, ring->desc_dma.map,
 		    BUS_DMASYNC_PREWRITE);
-#ifndef __HAIKU__
 		counter_u64_add(ic->ic_ierrors, 1);
-#endif
 		return;
 	}
 

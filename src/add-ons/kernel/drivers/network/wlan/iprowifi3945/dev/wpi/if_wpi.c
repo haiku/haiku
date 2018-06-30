@@ -2036,10 +2036,7 @@ wpi_rx_done(struct wpi_softc *sc, struct wpi_rx_desc *desc,
 fail2:	m_freem(m);
 
 fail1:
-	return;
-#ifndef __HAIKU__
 	counter_u64_add(ic->ic_ierrors, 1);
-#endif
 }
 
 static void
