@@ -119,7 +119,8 @@ private:
 									BDataIO* requestData,
 									size_t requestDataSize, uint32 flags,
 									BMessage& reply) const;
-	
+	static	void				_LogPayload(const char* data, ssize_t size);
+
 private:
 			BString				fUsername;
 			BString				fPassword;

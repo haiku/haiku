@@ -25,6 +25,7 @@
 #include <UrlProtocolRoster.h>
 
 #include "AutoLocker.h"
+#include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
 #include "List.h"
 #include "Logger.h"
@@ -35,6 +36,7 @@
 
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
 #define USERAGENT_FALLBACK_VERSION "0.0.0"
+#define LOG_PAYLOAD_LIMIT 8192
 
 
 class JsonBuilder {
@@ -709,17 +711,19 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 {
 	if (!ServerHelper::IsNetworkAvailable()) {
 		if (Logger::IsDebugEnabled()) {
-			printf("dropping json-rpc request to ...[%s] as network is not "
+			printf("jrpc; dropping request to ...[%s] as network is not "
 				"available\n", domain);
 		}
+		delete requestData;
 		return HD_NETWORK_INACCESSIBLE;
 	}
 
 	if (ServerSettings::IsClientTooOld()) {
 		if (Logger::IsDebugEnabled()) {
-			printf("dropping json-rpc request to ...[%s] as client is too "
+			printf("jrpc; dropping request to ...[%s] as client is too "
 				"old\n", domain);
 		}
+		delete requestData;
 		return HD_CLIENT_TOO_OLD;
 	}
 
@@ -727,8 +731,31 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 	bool isSecure = url.Protocol() == "https";
 
 	if (Logger::IsDebugEnabled()) {
-		printf("will make json-rpc request to [%s]\n",
+		printf("jrpc; will make request to [%s]\n",
 			url.UrlString().String());
+	}
+
+	// If the request payload is logged then it must be copied to local memory
+	// from the stream.  This then requires that the request data is then
+	// delivered from memory.
+
+	if (Logger::IsTraceEnabled()) {
+		BMallocIO *loggedRequestData = new BMallocIO();
+		loggedRequestData->SetSize(requestDataSize);
+		status_t dataCopyResult = DataIOUtils::Copy(loggedRequestData,
+			requestData, requestDataSize);
+		delete requestData;
+		requestData = loggedRequestData;
+
+		if (dataCopyResult != B_OK) {
+			delete requestData;
+			return dataCopyResult;
+		}
+
+		printf("jrpc request; ");
+		_LogPayload(static_cast<const char *>(loggedRequestData->Buffer()),
+			loggedRequestData->BufferLength());
+		printf("\n");
 	}
 
 	ProtocolListener listener(Logger::IsTraceEnabled());
@@ -766,7 +793,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 	int32 statusCode = result.StatusCode();
 
 	if (Logger::IsDebugEnabled()) {
-		printf("did receive json-rpc response http status [%" B_PRId32 "] "
+		printf("jrpc; did receive http-status [%" B_PRId32 "] "
 			"from [%s]\n", statusCode, url.UrlString().String());
 	}
 
@@ -782,6 +809,13 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 			printf("json-rpc request to endpoint [.../%s] failed with http "
 				"status [%" B_PRId32 "]\n", domain, statusCode);
 			return B_ERROR;
+	}
+
+	if (Logger::IsTraceEnabled()) {
+		printf("jrpc response; ");
+		_LogPayload(static_cast<const char *>(replyData.Buffer()),
+			replyData.BufferLength());
+		printf("\n");
 	}
 
 	status_t status = BJson::Parse(
@@ -800,13 +834,31 @@ status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	uint32 flags, BMessage& reply) const
 {
-	if (Logger::IsTraceEnabled())
-		printf("_SendJsonRequest(%s)\n", jsonString.String());
-
 	// gets 'adopted' by the subsequent http request.
 	BMemoryIO* data = new BMemoryIO(
 		jsonString.String(), jsonString.Length() - 1);
 
 	return _SendJsonRequest(domain, data, jsonString.Length() - 1, flags,
 		reply);
+}
+
+
+void
+WebAppInterface::_LogPayload(const char* data, ssize_t size)
+{
+	if (size > LOG_PAYLOAD_LIMIT)
+		size = LOG_PAYLOAD_LIMIT;
+
+	for (int32 i = 0; i < size; i++) {
+		bool esc = data[i] > 126 ||
+			(data[i] < 0x20 && data[i] != 0x0a);
+
+		if (esc)
+			printf("\\u%02x", data[i]);
+		else
+			putchar(data[i]);
+	}
+
+	if (size == LOG_PAYLOAD_LIMIT)
+		printf("...(continues)");
 }
