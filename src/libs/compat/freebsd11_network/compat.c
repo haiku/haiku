@@ -13,6 +13,7 @@
 
 #include <KernelExport.h>
 #include <image.h>
+#include <kernel/heap.h>
 
 #include <util/BitUtils.h>
 
@@ -619,14 +620,13 @@ resource_int_value(const char *name, int unit, const char *resname,
 void *
 _kernel_malloc(size_t size, int flags)
 {
-	// our kernel malloc() is insufficient, must handle M_WAIT
-
 	// According to the FreeBSD kernel malloc man page the allocator is expected
 	// to return power of two aligned addresses for allocations up to one page
 	// size. While it also states that this shouldn't be relied upon, at least
 	// bus_dmamem_alloc expects it and drivers may depend on it as well.
 	void *ptr
-		= memalign(size >= PAGESIZE ? PAGESIZE : next_power_of_2(size), size);
+		= memalign_etc(size >= PAGESIZE ? PAGESIZE : next_power_of_2(size), size,
+			(flags & M_NOWAIT) ? HEAP_DONT_WAIT_FOR_MEMORY : 0);
 	if (ptr == NULL)
 		return NULL;
 
