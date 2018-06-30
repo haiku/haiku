@@ -1241,7 +1241,7 @@ AboutView::_CreateCreditsView()
 		.SetURL("http://www.openexr.com"));
 
 	// acpica copyrights
-	_AddPackageCredit(PackageCredit("ACPI Common Architecture (ACPICA)")
+	_AddPackageCredit(PackageCredit("ACPI Component Architecture (ACPICA)")
 		.SetCopyright(COPYRIGHT_STRING "1999-2018 Intel Corp.")
 		.SetLicense("Intel (ACPICA)")
 		.SetURL("https://www.acpica.org"));
