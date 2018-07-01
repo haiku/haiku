@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# Copyright 2017-2018, Haiku, Inc. All rights reserved.
+# Distributed under the terms of the MIT license.
+#
 
 if [ "$#" -lt 2 ]; then
 	echo "This script creates project files for Qt Creator to develop Haiku with."
