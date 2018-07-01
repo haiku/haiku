@@ -69,9 +69,18 @@ private:
 			ServerBitmap*		_GetBitmapForButton(Decorator::Tab* tab,
 									Component item, bool down, int32 width,
 									int32 height);
+			ServerBitmap* 		_CreateTemporaryBitmap(BRect bounds) const;
 			void				_GetComponentColors(Component component,
 									ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
+
+private:
+			status_t			fCStatus;
+
+			ServerBitmap*		fCloseBitmap;
+			ServerBitmap*		fBigZoomBitmap;
+			ServerBitmap*		fSmallZoomBitmap;
+			ServerBitmap*		fGlintBitmap;
 };
 
 
