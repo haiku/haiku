@@ -485,6 +485,46 @@ ieee80211_flush_ifq(struct ifqueue* ifq, struct ieee80211vap* vap)
 }
 
 
+#ifndef __NO_STRICT_ALIGNMENT
+/*
+ * Re-align the payload in the mbuf.  This is mainly used (right now)
+ * to handle IP header alignment requirements on certain architectures.
+ */
+struct mbuf *
+ieee80211_realign(struct ieee80211vap *vap, struct mbuf *m, size_t align)
+{
+	int pktlen, space;
+	struct mbuf *n;
+
+	pktlen = m->m_pkthdr.len;
+	space = pktlen + align;
+	if (space < MINCLSIZE)
+		n = m_gethdr(M_NOWAIT, MT_DATA);
+	else {
+		n = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR,
+		    space <= MCLBYTES ?     MCLBYTES :
+#if MJUMPAGESIZE != MCLBYTES
+		    space <= MJUMPAGESIZE ? MJUMPAGESIZE :
+#endif
+		    space <= MJUM9BYTES ?   MJUM9BYTES : MJUM16BYTES);
+	}
+	if (__predict_true(n != NULL)) {
+		m_move_pkthdr(n, m);
+		n->m_data = (caddr_t)(ALIGN(n->m_data + align) - align);
+		m_copydata(m, 0, pktlen, mtod(n, caddr_t));
+		n->m_len = pktlen;
+	} else {
+		IEEE80211_DISCARD(vap, IEEE80211_MSG_ANY,
+		    mtod(m, const struct ieee80211_frame *), NULL,
+		    "%s", "no mbuf to realign");
+		vap->iv_stats.is_rx_badalign++;
+	}
+	m_freem(m);
+	return n;
+}
+#endif /* !__NO_STRICT_ALIGNMENT */
+
+
 int
 ieee80211_add_callback(struct mbuf* m,
 	void (*func)(struct ieee80211_node*, void*, int), void* arg)
