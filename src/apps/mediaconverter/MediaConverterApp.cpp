@@ -327,8 +327,6 @@ MediaConverterApp::_RunConvert()
 					}
 					fWin->Unlock();
 				}
-
-
 			} else {
 				srcIndex++;
 				BString error(
@@ -409,8 +407,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 					fWin->Unlock();
 				}
 			} else {
-				fWin->SetStatusMessage(
-					B_TRANSLATE("Error creating track."));
+				SetStatusMessage(B_TRANSLATE("Error creating track."));
 			}
 
 		} else if (inFormat.IsVideo() && (videoCodec != NULL)) {
@@ -486,12 +483,11 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 					fWin->Unlock();
 				}
 			} else {
-				fWin->SetStatusMessage(
-					B_TRANSLATE("Error creating video."));
+				SetStatusMessage(B_TRANSLATE("Error creating video."));
 			}
 		} else {
 			//  didn't do anything with the track
-			fWin->SetStatusMessage(
+			SetStatusMessage(
 				B_TRANSLATE("Input file not recognized as Audio or Video"));
 			inFile->ReleaseTrack(inTrack);
 		}
