@@ -1129,6 +1129,15 @@ rule AddHaikuImagePackages packages
 	}
 }
 
+rule AddHaikuImageSourcePackages packages
+{
+	# AddHaikuImageSourcePackages <packages> ;
+	# Adds the given source packages for <packages> to the image.
+
+	if $(HAIKU_INCLUDE_SOURCES) = 1 {
+		AddHaikuImagePackages $(packages)_source ;
+	}
+}
 
 rule IsHaikuImagePackageAdded package
 {
@@ -1167,17 +1176,6 @@ actions BuildHaikuImagePackageList
 	echo $(HAIKU_IMAGE_PACKAGES) | xargs -n 1 echo | LC_ALL=C sort -u > $(1)
 }
 
-
-rule InstallSourceArchive file : url
-{
-	if $(HAIKU_INCLUDE_SOURCES) = 1 {
-		# download archive file
-		local archiveFile = [ DownloadFile $(file) : $(url) ] ;
-
-		# copy directly into image
-		AddFilesToHaikuImage _sources_ : $(archiveFile) ;
-	}
-}
 
 rule AddEntryToHaikuImageUserGroupFile file : entry
 {

@@ -85,9 +85,11 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 if [ IsOptionalHaikuImagePackageAdded Development ] {
 	# auto tools and perl
 	AddHaikuImagePackages autoconf automake perl texinfo ;
+	AddHaikuImageSourcePackages autoconf automake texinfo ;
 
 	# some other build tools
 	AddHaikuImagePackages pkgconfig scons ;
+	AddHaikuImageSourcePackages pkgconfig ;
 
 	# devel packages for mandatory packages
 	local architectureObject ;
@@ -107,11 +109,13 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
 			AddHaikuImagePackages binutils gcc ;
+			AddHaikuImageSourcePackages binutils gcc ;
 		}
 	}
 
 	# other commonly used tools
 	AddHaikuImagePackages bison cdrtools flex jam m4 make mkdepend nasm patch ;
+	AddHaikuImageSourcePackages bison cdrtools m4 make patch ;
 }
 
 
@@ -141,19 +145,17 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 if [ IsOptionalHaikuImagePackageAdded FFMpeg ] {
 	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
 	AddHaikuImagePackages $(packages) ;
-}
-
-
-# FFmpeg-devel
-if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
-	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
-	AddHaikuImagePackages $(packages)_devel ;
+	AddHaikuImageSourcePackages ffmpeg ;
+	if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
+		AddHaikuImagePackages $(packages)_devel ;
+	}
 }
 
 
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
-	AddHaikuImagePackages git git_arch git_daemon git_email ;
+	AddHaikuImagePackages git git_daemon ;
+	AddHaikuImageSourcePackages git ;
 }
 
 

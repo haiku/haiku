@@ -40,6 +40,17 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 		tar tcpdump unzip wget which zip
 	}@
 ] ;
+AddHaikuImageSourcePackages [ FFilterByBuildFeatures
+	bash bc coreutils
+
+	regular_image @{
+		ctags expat ffmpeg findutils gawk grep gutenprint
+		gzip
+		less libicns
+		sed sharutils
+		tar wget which
+	}@
+] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {
 	AddHaikuImagePackages [ FFilterByBuildFeatures gcc_syslibs ] ;
 }

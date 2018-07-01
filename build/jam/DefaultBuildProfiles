@@ -77,7 +77,6 @@ rule DefineDefaultBuildProfiles
 
 			AddHaikuImagePackages
 				bepdf
-				cvs
 				keymapswitcher
 				llvm
 				man
@@ -90,7 +89,6 @@ rule DefineDefaultBuildProfiles
 				pdfwriter
 				pe
 				python
-#				subversion
 				timgmsoundfont
 				vision
 				wpa_supplicant
@@ -99,6 +97,14 @@ rule DefineDefaultBuildProfiles
 				# primary gcc 4 architectures or gcc 2 hybrids.
 				xz_utils@!gcc2
 				gcc2 @{ xz_utils_x86@secondary_x86 }@
+				;
+			AddHaikuImageSourcePackages
+				bepdf
+				man
+				mercurial
+				nano
+				p7zip
+				gcc
 				;
 
 			local architectureObject ;
@@ -120,6 +126,7 @@ rule DefineDefaultBuildProfiles
 
 		case "alpha-*" : {
 			Echo The alpha-* build profiles have been renamed to release-* ;
+			Exit ;
 		}
 
 		case "nightly-*" : {
@@ -148,6 +155,12 @@ rule DefineDefaultBuildProfiles
 				xz_utils@!gcc2
 				gcc2 @{ xz_utils_x86@secondary_x86 }@
 				;
+			AddHaikuImageSourcePackages
+				man
+				nano
+				p7zip
+				gcc
+				;
 
 			AddOptionalHaikuImagePackages Development Git ;
 
@@ -157,6 +170,17 @@ rule DefineDefaultBuildProfiles
 			} else {
 				Echo "WebPositive not available on $(HAIKU_PACKAGING_ARCHS)" ;
 			}
+		}
+
+		case "minimum-*" : {
+			Echo Building Haiku Minimum Target ;
+			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+			if $(DEBUG) != 0 {
+				HAIKU_IMAGE_SIZE ?= 450 ;
+			}
+
+			AddHaikuImagePackages
+				;
 		}
 
 		case "bootstrap-*" : {
@@ -215,17 +239,6 @@ rule DefineDefaultBuildProfiles
 			}
 
 			AddOptionalHaikuImagePackages DevelopmentMin ;
-		}
-
-		case "minimum-*" : {
-			Echo Building Haiku Minimum Target ;
-			HAIKU_IMAGE_HOST_NAME ?= shredder ;
-			if $(DEBUG) != 0 {
-				HAIKU_IMAGE_SIZE ?= 450 ;
-			}
-
-			AddHaikuImagePackages
-				;
 		}
 	}
 
