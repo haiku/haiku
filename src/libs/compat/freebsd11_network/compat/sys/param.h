@@ -22,7 +22,7 @@
 #define MAXBSIZE	0x10000
 
 #define PAGE_SHIFT	12
-#define PAGE_MASK	(PAGE_SIZE - 1)
+#define PAGE_MASK	(B_PAGE_SIZE - 1)
 
 #define trunc_page(x)	((x) & ~PAGE_MASK)
 
@@ -42,7 +42,7 @@
 
 #define MCLBYTES		(1 << MCLSHIFT)
 
-#define	MJUMPAGESIZE	PAGE_SIZE
+#define	MJUMPAGESIZE	B_PAGE_SIZE
 #define	MJUM9BYTES		(9 * 1024)
 #define	MJUM16BYTES		(16 * 1024)
 
