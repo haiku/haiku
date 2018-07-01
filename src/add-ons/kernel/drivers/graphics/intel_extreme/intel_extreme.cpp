@@ -39,13 +39,17 @@
 
 
 static void
-init_overlay_registers(overlay_registers* registers)
+init_overlay_registers(overlay_registers* _registers)
 {
-	memset(registers, 0, B_PAGE_SIZE);
+	user_memset(_registers, 0, B_PAGE_SIZE);
 
-	registers->contrast_correction = 0x48;
-	registers->saturation_cos_correction = 0x9a;
+	overlay_registers registers;
+	memset(&registers, 0, sizeof(registers));
+	registers.contrast_correction = 0x48;
+	registers.saturation_cos_correction = 0x9a;
 		// this by-passes contrast and saturation correction
+
+	user_memcpy(_registers, &registers, sizeof(overlay_registers));
 }
 
 
@@ -308,7 +312,8 @@ intel_extreme_init(intel_info &info)
 	info.aperture = gGART->map_aperture(info.pci->bus, info.pci->device,
 		info.pci->function, 0, &info.aperture_base);
 	if (info.aperture < B_OK) {
-		ERROR("error: could not map GART aperture! (%s)\n", strerror(info.aperture));
+		ERROR("error: could not map GART aperture! (%s)\n",
+			strerror(info.aperture));
 		return info.aperture;
 	}
 
@@ -316,7 +321,8 @@ intel_extreme_init(intel_info &info)
 	info.shared_area = sharedCreator.Create("intel extreme shared info",
 		(void**)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + 3 * B_PAGE_SIZE,
-		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+		B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (info.shared_area < B_OK) {
 		ERROR("error: could not create shared area!\n");
 		gGART->unmap_aperture(info.aperture);
