@@ -451,6 +451,9 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 	} else
 		free(ns);
 
+	TRACE("fs_mount - EXIT\n");
+	return B_OK;
+
 exit:
 	ERROR("fs_mount - EXIT, result code is %s\n", strerror(result));
 
