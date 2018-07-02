@@ -4,16 +4,12 @@
 
 # Available Optional Packages:
 #	BeOSCompatibility		- creates links within the system to support old apps
-#	Bluetooth				- experimental Haiku components for Bluetooth
 #	Development				- more complete dev environment (including autotools)
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
 #	DevelopmentMin			- development headers, libs, tools, from sources only
-#	FFMpeg					- audio/video library
-#	FFMpeg-devel			- FFMpeg development files
 #	Git						- the distributed version control system
 #	WebPositive				- native, WebKit-based web browser
 #	Welcome					- introductory documentation to Haiku
-#	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 
 
 # dependencies between optional packages
@@ -56,34 +52,9 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 }
 
 
-# Bluetooth stack
-if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
-# TODO: Make this an actual package!
-# 	local bluetoothDrivers = h2generic ;
-# 	AddDriversToHaikuImage bluetooth : $(bluetoothDrivers) ;
-# 	AddFilesToHaikuImage system servers : bluetooth_server ;
-# 	AddFilesToHaikuImage system lib : libbluetooth.so ;
-# 	AddFilesToHaikuImage
-# 		system add-ons kernel network protocols : l2cap ;
-# 	AddFilesToHaikuImage system add-ons kernel bluetooth
-# 		: btCoreData hci ;
-# 	AddFilesToHaikuImage system preferences : Bluetooth ;
-# 	AddFilesToHaikuImage system bin : bt_dev_info bt_discovery ;
-# 	AddSymlinkToHaikuImage home config settings deskbar menu Preferences
-# 		: /boot/system/preferences/Bluetooth ;
-# 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
-# 		&& $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) in 2 4 {
-# 		local arch = $(TARGET_ARCH) ;
-# 		local abi = gcc$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
-# 		AddSymlinkToHaikuImage system develop lib
-# 			: /system/lib libbluetooth.so ;
-# 	}
-}
-
-
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] {
-	# auto tools and perl
+	# autotools and perl
 	AddHaikuImagePackages autoconf automake perl texinfo ;
 	AddHaikuImageSourcePackages autoconf automake texinfo ;
 
@@ -137,17 +108,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 			:
 			nameFromMetaInfo
 			;
-	}
-}
-
-
-# FFmpeg
-if [ IsOptionalHaikuImagePackageAdded FFMpeg ] {
-	local packages = ffmpeg speex libtheora libvorbis libogg libvpx3 ;
-	AddHaikuImagePackages $(packages) ;
-	AddHaikuImageSourcePackages ffmpeg ;
-	if [ IsOptionalHaikuImagePackageAdded FFMpeg-devel ] {
-		AddHaikuImagePackages $(packages)_devel ;
 	}
 }
 
@@ -217,55 +177,4 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 		: Welcome ;
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/userguide
 		: User\ Guide ;
-}
-
-
-# WifiFirmwareScriptData
-# This optional package is for people who build their own images & have wifi
-# hardware that requires install-wifi-firmwares.sh & have no active network
-# connection. This is not to be added to default images.
-if [ IsOptionalHaikuImagePackageAdded WifiFirmwareScriptData ] {
-# TODO: Make this an actual package!
-# 	if $(TARGET_ARCH) != x86 {
-# 		Echo "No optional package WifiFirmwareScriptData available for"
-# 			$(TARGET_ARCH) ;
-# 	} else {
-# 		# broadcom43xx
-# 		# firmware cutter
-# 		local broadcomFWCutterArchive = b43-fwcutter-012.tar.bz2 ;
-# 		local broadcomFWCutterURL =
-# 			http://www.haiku-files.org/files/wifi-firmwares/b43/fwcutter/$(broadcomFWCutterArchive) ;
-# 		local broadcomFWCutterFile = [ DownloadFile $(broadcomFWCutterArchive)
-# 			: $(broadcomFWCutterURL) ] ;
-# 		AddFilesToHaikuImage
-# 			system data firmware broadcom43xx b43-fwcutter
-# 			: $(broadcomFWCutterFile) ;
-#
-# 		# headers needed to compile firmware cutter
-# 		local glibcDir = [ FDirName
-# 			$(HAIKU_TOP) src system libroot posix glibc ] ;
-# 		local byteswapHeader = [ FDirName $(glibcDir) string byteswap.h ] ;
-# 		AddFilesToHaikuImage
-# 			system data firmware broadcom43xx b43-fwcutter
-# 			: $(byteswapHeader) ;
-# 		local bitByteswapHeader = [ FDirName
-# 			$(glibcDir) include arch x86 bits byteswap.h ] ;
-# 		AddFilesToHaikuImage
-# 			system data firmware broadcom43xx b43-fwcutter bits
-# 			: $(bitByteswapHeader) ;
-#
-# 		# file containing firmware
-# 		local broadcom43xxFile ;
-# 		broadcom43xxFile = [ DownloadFile wl_apsta-3.130.20.0.o
-# 			: http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o ] ;
-# 		AddFilesToHaikuImage system data firmware broadcom43xx
-# 			: $(broadcom43xxFile) ;
-#
-# 		# marvell88w8335
-# 		local marvellArchive = malo-firmware-1.4.tgz ;
-# 		local marvellURL = http://www.haiku-files.org/files/wifi-firmwares/marvell/$(marvellArchive) ;
-# 		local marvellFile = [ DownloadFile $(marvellArchive) : $(marvellURL) ] ;
-# 		AddFilesToHaikuImage system data firmware marvell88w8335
-# 			: $(marvellFile) ;
-# 	}
 }
