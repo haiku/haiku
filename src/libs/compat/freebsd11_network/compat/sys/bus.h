@@ -69,7 +69,6 @@ struct resource_spec {
 
 enum intr_type {
 	INTR_TYPE_NET	= 4,
-	INTR_FAST		= 128,
 	INTR_MPSAFE		= 512,
 };
 

@@ -279,18 +279,6 @@ intr_wrapper(void *data)
 
 
 static int32
-intr_fast_wrapper(void *data)
-{
-	struct internal_intr *intr = (struct internal_intr *)data;
-
-	intr->handler(intr->arg);
-
-	// We don't know if the interrupt has been handled.
-	return B_UNHANDLED_INTERRUPT;
-}
-
-
-static int32
 intr_handler(void *data)
 {
 	struct internal_intr *intr = (struct internal_intr *)data;
@@ -352,9 +340,6 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 	if (filter != NULL) {
 		status = install_io_interrupt_handler(intr->irq,
 			(interrupt_handler)intr->filter, intr->arg, 0);
-	} else if ((flags & INTR_FAST) != 0) {
-		status = install_io_interrupt_handler(intr->irq,
-			intr_fast_wrapper, intr, B_NO_HANDLED_INFO);
 	} else {
 		snprintf(semName, sizeof(semName), "%s intr", dev->device_name);
 
@@ -426,8 +411,6 @@ bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 	if (intr->filter != NULL) {
 		remove_io_interrupt_handler(intr->irq, (interrupt_handler)intr->filter,
 			intr->arg);
-	} else if (intr->flags & INTR_FAST) {
-		remove_io_interrupt_handler(intr->irq, intr_fast_wrapper, intr);
 	} else {
 		remove_io_interrupt_handler(intr->irq, intr_wrapper, intr);
 	}
