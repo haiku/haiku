@@ -8,7 +8,9 @@
 
 
 HAIKU_FBSD_DRIVER_GLUE(via_rhine, vr, pci);
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);
+HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE);
+NO_HAIKU_CHECK_DISABLE_INTERRUPTS();
+NO_HAIKU_REENABLE_INTERRUPTS();
 
 
 extern driver_t *DRIVER_MODULE_NAME(ciphy, miibus);
@@ -26,4 +28,3 @@ __haiku_select_miibus_driver(device_t dev)
 
 	return __haiku_probe_miibus(dev, drivers);
 }
-

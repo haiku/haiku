@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/11.1/sys/dev/mii/ciphy.c 277093 2015-01-12 22:27:38Z glebius $");
 
 /*
  * Driver for the Cicada/Vitesse CS/VSC8xxx 10/100/1000 copper PHY.
@@ -91,8 +91,10 @@ static const struct mii_phydesc ciphys[] = {
 	MII_PHY_DESC(xxCICADA, CS8201B),
 	MII_PHY_DESC(xxCICADA, CS8204),
 	MII_PHY_DESC(xxCICADA, VSC8211),
+	MII_PHY_DESC(xxCICADA, VSC8221),
 	MII_PHY_DESC(xxCICADA, CS8244),
 	MII_PHY_DESC(xxVITESSE, VSC8601),
+	MII_PHY_DESC(xxVITESSE, VSC8641),
 	MII_PHY_END
 };
 
@@ -129,12 +131,6 @@ ciphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		break;
 
 	case MII_MEDIACHG:
-		/*
-		 * If the interface is not up, don't do anything.
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			break;
-
 		ciphy_fixup(sc);	/* XXX hardware bug work-around */
 
 		switch (IFM_SUBTYPE(ife->ifm_media)) {
@@ -184,12 +180,6 @@ setit:
 		break;
 
 	case MII_TICK:
-		/*
-		 * Is the interface even up?
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			return (0);
-
 		/*
 		 * Only used for autonegotiation.
 		 */
@@ -313,8 +303,7 @@ ciphy_fixup(struct mii_softc *sc)
 	status = PHY_READ(sc, CIPHY_MII_AUXCSR);
 	speed = status & CIPHY_AUXCSR_SPEED;
 
-	if (strcmp(device_get_name(device_get_parent(sc->mii_dev)),
-	    "nfe") == 0) {
+	if (mii_phy_mac_match(sc, "nfe")) {
 		/* need to set for 2.5V RGMII for NVIDIA adapters */
 		val = PHY_READ(sc, CIPHY_MII_ECTL1);
 		val &= ~(CIPHY_ECTL1_IOVOL | CIPHY_ECTL1_INTSEL);
@@ -368,8 +357,10 @@ ciphy_fixup(struct mii_softc *sc)
 
 		break;
 	case MII_MODEL_xxCICADA_VSC8211:
+	case MII_MODEL_xxCICADA_VSC8221:
 	case MII_MODEL_xxCICADA_CS8244:
 	case MII_MODEL_xxVITESSE_VSC8601:
+	case MII_MODEL_xxVITESSE_VSC8641:
 		break;
 	default:
 		device_printf(sc->mii_dev, "unknown CICADA PHY model %x\n",

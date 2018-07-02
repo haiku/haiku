@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/11.1/sys/dev/vr/if_vr.c 296272 2016-03-01 17:47:32Z jhb $");
 
 /*
  * VIA Rhine fast ethernet PCI NIC driver
@@ -80,6 +80,7 @@ __FBSDID("$FreeBSD$");
 
 #include <net/bpf.h>
 #include <net/if.h>
+#include <net/if_var.h>
 #include <net/ethernet.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
@@ -165,7 +166,8 @@ static void vr_txeof(struct vr_softc *);
 static void vr_tick(void *);
 static int vr_error(struct vr_softc *, uint16_t);
 static void vr_tx_underrun(struct vr_softc *);
-static void vr_intr(void *);
+static int vr_intr(void *);
+static void vr_int_task(void *, int);
 static void vr_start(struct ifnet *);
 static void vr_start_locked(struct ifnet *);
 static int vr_encap(struct vr_softc *, struct mbuf **);
@@ -235,31 +237,6 @@ static devclass_t vr_devclass;
 
 DRIVER_MODULE(vr, pci, vr_driver, vr_devclass, 0, 0);
 DRIVER_MODULE(miibus, vr, miibus_driver, miibus_devclass, 0, 0);
-
-
-#ifdef __HAIKU__
-int
-__haiku_disable_interrupts(device_t dev)
-{
-	struct vr_softc *sc = device_get_softc(dev);
-
-	if (CSR_READ_2(sc, VR_ISR) == 0)
-		return 0;
-
-	CSR_WRITE_2(sc, VR_IMR, 0x0000);
-	return 1;
-}
-
-
-void
-__haiku_reenable_interrupts(device_t dev)
-{
-	struct vr_softc *sc = device_get_softc(dev);
-
-	CSR_WRITE_2(sc, VR_IMR, VR_INTRS);
-}
-#endif	/* __HAIKU__ */
-
 
 static int
 vr_miibus_readreg(device_t dev, int phy, int reg)
@@ -683,6 +660,8 @@ vr_attach(device_t dev)
 	ifp->if_snd.ifq_maxlen = VR_TX_RING_CNT - 1;
 	IFQ_SET_READY(&ifp->if_snd);
 
+	TASK_INIT(&sc->vr_inttask, 0, vr_int_task, sc);
+
 	/* Configure Tx FIFO threshold. */
 	sc->vr_txthresh = VR_TXTHRESH_MIN;
 	if (sc->vr_revid < REV_ID_VT6105_A0) {
@@ -805,11 +784,11 @@ vr_attach(device_t dev)
 	 * Must appear after the call to ether_ifattach() because
 	 * ether_ifattach() sets ifi_hdrlen to the default value.
 	 */
-	ifp->if_data.ifi_hdrlen = sizeof(struct ether_vlan_header);
+	ifp->if_hdrlen = sizeof(struct ether_vlan_header);
 
 	/* Hook interrupt last to avoid having to lock softc. */
 	error = bus_setup_intr(dev, sc->vr_irq, INTR_TYPE_NET | INTR_MPSAFE,
-	    NULL, vr_intr, sc, &sc->vr_intrhand);
+	    vr_intr, NULL, sc, &sc->vr_intrhand);
 
 	if (error) {
 		device_printf(dev, "couldn't set up irq\n");
@@ -851,6 +830,7 @@ vr_detach(device_t dev)
 		vr_stop(sc);
 		VR_UNLOCK(sc);
 		callout_drain(&sc->vr_stat_callout);
+		taskqueue_drain(taskqueue_fast, &sc->vr_inttask);
 		ether_ifdetach(ifp);
 	}
 	if (sc->vr_miibus)
@@ -1080,31 +1060,29 @@ vr_dma_free(struct vr_softc *sc)
 
 	/* Tx ring. */
 	if (sc->vr_cdata.vr_tx_ring_tag) {
-		if (sc->vr_cdata.vr_tx_ring_map)
+		if (sc->vr_rdata.vr_tx_ring_paddr)
 			bus_dmamap_unload(sc->vr_cdata.vr_tx_ring_tag,
 			    sc->vr_cdata.vr_tx_ring_map);
-		if (sc->vr_cdata.vr_tx_ring_map &&
-		    sc->vr_rdata.vr_tx_ring)
+		if (sc->vr_rdata.vr_tx_ring)
 			bus_dmamem_free(sc->vr_cdata.vr_tx_ring_tag,
 			    sc->vr_rdata.vr_tx_ring,
 			    sc->vr_cdata.vr_tx_ring_map);
 		sc->vr_rdata.vr_tx_ring = NULL;
-		sc->vr_cdata.vr_tx_ring_map = NULL;
+		sc->vr_rdata.vr_tx_ring_paddr = 0;
 		bus_dma_tag_destroy(sc->vr_cdata.vr_tx_ring_tag);
 		sc->vr_cdata.vr_tx_ring_tag = NULL;
 	}
 	/* Rx ring. */
 	if (sc->vr_cdata.vr_rx_ring_tag) {
-		if (sc->vr_cdata.vr_rx_ring_map)
+		if (sc->vr_rdata.vr_rx_ring_paddr)
 			bus_dmamap_unload(sc->vr_cdata.vr_rx_ring_tag,
 			    sc->vr_cdata.vr_rx_ring_map);
-		if (sc->vr_cdata.vr_rx_ring_map &&
-		    sc->vr_rdata.vr_rx_ring)
+		if (sc->vr_rdata.vr_rx_ring)
 			bus_dmamem_free(sc->vr_cdata.vr_rx_ring_tag,
 			    sc->vr_rdata.vr_rx_ring,
 			    sc->vr_cdata.vr_rx_ring_map);
 		sc->vr_rdata.vr_rx_ring = NULL;
-		sc->vr_cdata.vr_rx_ring_map = NULL;
+		sc->vr_rdata.vr_rx_ring_paddr = 0;
 		bus_dma_tag_destroy(sc->vr_cdata.vr_rx_ring_tag);
 		sc->vr_cdata.vr_rx_ring_tag = NULL;
 	}
@@ -1347,7 +1325,7 @@ vr_rxeof(struct vr_softc *sc)
 		if ((rxstat & VR_RXSTAT_RX_OK) == 0 ||
 		    (rxstat & (VR_RXSTAT_FIRSTFRAG | VR_RXSTAT_LASTFRAG)) !=
 		    (VR_RXSTAT_FIRSTFRAG | VR_RXSTAT_LASTFRAG)) {
-			ifp->if_ierrors++;
+			if_inc_counter(ifp, IFCOUNTER_IERRORS, 1);
 			sc->vr_stat.rx_errors++;
 			if (rxstat & VR_RXSTAT_CRCERR)
 				sc->vr_stat.rx_crc_errors++;
@@ -1370,7 +1348,7 @@ vr_rxeof(struct vr_softc *sc)
 		}
 
 		if (vr_newbuf(sc, cons) != 0) {
-			ifp->if_iqdrops++;
+			if_inc_counter(ifp, IFCOUNTER_IQDROPS, 1);
 			sc->vr_stat.rx_errors++;
 			sc->vr_stat.rx_no_mbufs++;
 			vr_discard_rxbuf(rxd);
@@ -1398,7 +1376,7 @@ vr_rxeof(struct vr_softc *sc)
 		vr_fixup_rx(m);
 #endif
 		m->m_pkthdr.rcvif = ifp;
-		ifp->if_ipackets++;
+		if_inc_counter(ifp, IFCOUNTER_IPACKETS, 1);
 		sc->vr_stat.rx_ok++;
 		if ((ifp->if_capenable & IFCAP_RXCSUM) != 0 &&
 		    (rxstat & VR_RXSTAT_FRAG) == 0 &&
@@ -1488,7 +1466,7 @@ vr_txeof(struct vr_softc *sc)
 		    __func__));
 
 		if ((txstat & VR_TXSTAT_ERRSUM) != 0) {
-			ifp->if_oerrors++;
+			if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 			sc->vr_stat.tx_errors++;
 			if ((txstat & VR_TXSTAT_ABRT) != 0) {
 				/* Give up and restart Tx. */
@@ -1526,28 +1504,28 @@ vr_txeof(struct vr_softc *sc)
 				return;
 			}
 			if ((txstat & VR_TXSTAT_DEFER) != 0) {
-				ifp->if_collisions++;
+				if_inc_counter(ifp, IFCOUNTER_COLLISIONS, 1);
 				sc->vr_stat.tx_collisions++;
 			}
 			if ((txstat & VR_TXSTAT_LATECOLL) != 0) {
-				ifp->if_collisions++;
+				if_inc_counter(ifp, IFCOUNTER_COLLISIONS, 1);
 				sc->vr_stat.tx_late_collisions++;
 			}
 		} else {
 			sc->vr_stat.tx_ok++;
-			ifp->if_opackets++;
+			if_inc_counter(ifp, IFCOUNTER_OPACKETS, 1);
 		}
 
 		bus_dmamap_sync(sc->vr_cdata.vr_tx_tag, txd->tx_dmamap,
 		    BUS_DMASYNC_POSTWRITE);
 		bus_dmamap_unload(sc->vr_cdata.vr_tx_tag, txd->tx_dmamap);
 		if (sc->vr_revid < REV_ID_VT3071_A) {
-			ifp->if_collisions +=
-			    (txstat & VR_TXSTAT_COLLCNT) >> 3;
+			if_inc_counter(ifp, IFCOUNTER_COLLISIONS,
+			    (txstat & VR_TXSTAT_COLLCNT) >> 3);
 			sc->vr_stat.tx_collisions +=
 			    (txstat & VR_TXSTAT_COLLCNT) >> 3;
 		} else {
-			ifp->if_collisions += (txstat & 0x0f);
+			if_inc_counter(ifp, IFCOUNTER_COLLISIONS, (txstat & 0x0f));
 			sc->vr_stat.tx_collisions += (txstat & 0x0f);
 		}
 		m_freem(txd->tx_m);
@@ -1678,8 +1656,28 @@ vr_tx_underrun(struct vr_softc *sc)
 	vr_tx_start(sc);
 }
 
-static void
+static int
 vr_intr(void *arg)
+{
+	struct vr_softc		*sc;
+	uint16_t		status;
+
+	sc = (struct vr_softc *)arg;
+
+	status = CSR_READ_2(sc, VR_ISR);
+	if (status == 0 || status == 0xffff || (status & VR_INTRS) == 0)
+		return (FILTER_STRAY);
+
+	/* Disable interrupts. */
+	CSR_WRITE_2(sc, VR_IMR, 0x0000);
+
+	taskqueue_enqueue(taskqueue_fast, &sc->vr_inttask);
+
+	return (FILTER_HANDLED);
+}
+
+static void
+vr_int_task(void *arg, int npending)
 {
 	struct vr_softc		*sc;
 	struct ifnet		*ifp;
@@ -1693,9 +1691,6 @@ vr_intr(void *arg)
 		goto done_locked;
 
 	status = CSR_READ_2(sc, VR_ISR);
-	if (status == 0 || status == 0xffff || (status & VR_INTRS) == 0)
-		goto done_locked;
-
 	ifp = sc->vr_ifp;
 #ifdef DEVICE_POLLING
 	if ((ifp->if_capenable & IFCAP_POLLING) != 0)
@@ -1709,9 +1704,6 @@ vr_intr(void *arg)
 		CSR_WRITE_2(sc, VR_ISR, status);
 		goto done_locked;
 	}
-
-	/* Disable interrupts. */
-	CSR_WRITE_2(sc, VR_IMR, 0x0000);
 
 	for (; (status & VR_INTRS) != 0;) {
 		CSR_WRITE_2(sc, VR_ISR, status);
@@ -1732,14 +1724,15 @@ vr_intr(void *arg)
 			vr_rx_start(sc);
 		}
 		vr_txeof(sc);
+
+		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+			vr_start_locked(ifp);
+
 		status = CSR_READ_2(sc, VR_ISR);
 	}
 
 	/* Re-enable interrupts. */
 	CSR_WRITE_2(sc, VR_IMR, VR_INTRS);
-
-	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		vr_start_locked(ifp);
 
 done_locked:
 	VR_UNLOCK(sc);
@@ -2325,13 +2318,13 @@ vr_watchdog(struct vr_softc *sc)
 		if (bootverbose)
 			if_printf(sc->vr_ifp, "watchdog timeout "
 			   "(missed link)\n");
-		ifp->if_oerrors++;
+		if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		vr_init_locked(sc);
 		return;
 	}
 
-	ifp->if_oerrors++;
+	if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
 	if_printf(ifp, "watchdog timeout\n");
 
 	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
