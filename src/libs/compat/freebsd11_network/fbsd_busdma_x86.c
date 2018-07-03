@@ -166,7 +166,7 @@ run_filter(bus_dma_tag_t dmat, bus_addr_t paddr)
 		  || (*dmat->filter)(dmat->filterarg, paddr) != 0))
 			retval = 1;
 
-		dmat = dmat->parent;		
+		dmat = dmat->parent;
 	} while (retval == 0 && dmat != NULL);
 	return (retval);
 }
@@ -313,7 +313,7 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment,
 		/* Performed initial allocation */
 		newtag->flags |= BUS_DMA_MIN_ALLOC_COMP;
 	}
-	
+
 	if (error != 0) {
 		free(newtag, M_DEVBUF);
 	} else {
@@ -501,7 +501,7 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 		}
 	}
 
-	/* 
+	/*
 	 * XXX:
 	 * (dmat->alignment < dmat->maxsize) is just a quick hack; the exact
 	 * alignment guarantees of malloc need to be nailed down, and the
@@ -528,8 +528,9 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 		CTR4(KTR_BUSDMA, "%s: tag %p tag flags 0x%x error %d",
 		    __func__, dmat, dmat->flags, ENOMEM);
 		return (ENOMEM);
-	} else if ((uintptr_t)*vaddr & (dmat->alignment - 1)) {
-		printf("bus_dmamem_alloc failed to align memory properly.\n");
+	} else if (vtophys(*vaddr) & (dmat->alignment - 1)) {
+		printf("bus_dmamem_alloc failed to align memory: wanted %#x, got %#x\n",
+			dmat->alignment, vtophys(vaddr));
 	}
 	CTR4(KTR_BUSDMA, "%s: tag %p tag flags 0x%x error %d",
 	    __func__, dmat, dmat->flags, 0);
@@ -586,7 +587,7 @@ _bus_dmamap_load_buffer(bus_dma_tag_t dmat,
 	if (map == NULL)
 		map = &nobounce_dmamap;
 
-	if ((map != &nobounce_dmamap && map->pagesneeded == 0) 
+	if ((map != &nobounce_dmamap && map->pagesneeded == 0)
 	 && ((dmat->flags & BUS_DMA_COULD_BOUNCE) != 0)) {
 		vm_offset_t	vendaddr;
 
