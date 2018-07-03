@@ -650,7 +650,7 @@ while [ $# -gt 0 ] ; do
 				m68k)		targetMachine=m68k-unknown-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
 				*)
-					echo "Unsupported target architecture: $2" >&2
+					echo "Unsupported target architecture: $targetArch" >&2
 					exit 1
 					;;
 			esac
