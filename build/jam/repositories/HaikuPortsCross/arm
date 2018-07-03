@@ -3,16 +3,17 @@ BootstrapPackageRepository HaikuPortsCross
 	:
 	# architecture "any" packages
 	haikuporter-0-1
+	noto-20170202-7
 	:
 	# repository architecture packages (stage 0)
-	gcc_bootstrap-5.4.0_2016_06_04-1
-	gcc_bootstrap_syslibs-5.4.0_2016_06_04-1
-	gcc_bootstrap_syslibs_devel-5.4.0_2016_06_04-1
+	gcc_bootstrap-7.3.0_2018_05_01-1
+	gcc_bootstrap_syslibs-7.3.0_2018_05_01-1
+	gcc_bootstrap_syslibs_devel-7.3.0_2018_05_01-1
 	:
 	# repository architecture packages (stage 1)
-	bash_bootstrap-4.3.42-1
+	bash_bootstrap-4.4.012-1
 	binutils_bootstrap-2.26.1_2016_02_29-1
-	bison_bootstrap-2.4.3-1
+	bison_bootstrap-3.0.4-5
 	coreutils_bootstrap-8.22-1
 	curl_bootstrap-7.40.0-1
 	curl_bootstrap_devel-7.40.0-1
@@ -22,12 +23,13 @@ BootstrapPackageRepository HaikuPortsCross
 	flex_bootstrap-2.5.35-1
 	freetype_bootstrap-2.6.3-1
 	freetype_bootstrap_devel-2.6.3-1
-	mawk_bootstrap-1.3.4-1
 	grep_bootstrap-2.14-1
-	icu_bootstrap-54.1-1
-	icu_bootstrap_devel-54.1-1
+	icu_bootstrap-57.1-2
+	icu_bootstrap_devel-57.1-2
+	less_bootstrap-451-1
 	m4_bootstrap-1.4.16-1
-	make_bootstrap-3.82-1
+	make_bootstrap-4.1-2
+	mawk_bootstrap-1.3.4-1
 	ncurses6_bootstrap-6.0-1
 	ncurses6_bootstrap_devel-6.0-1
 	python_bootstrap-2.7.6-1
@@ -39,7 +41,6 @@ BootstrapPackageRepository HaikuPortsCross
 	# repository architecture packages (stage 2)
 	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1
 	libsolv_bootstrap_devel-0.3.0_haiku_2014_12_22-1
-
 	:
 	# source packages
 	bash_bootstrap
@@ -54,6 +55,7 @@ BootstrapPackageRepository HaikuPortsCross
 	mawk_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
+	less_bootstrap
 	libsolv_bootstrap
 	m4_bootstrap
 	make_bootstrap
