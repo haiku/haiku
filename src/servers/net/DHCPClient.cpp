@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -460,8 +460,8 @@ socket_timeout::Shift(int socket, bigtime_t stateMaxTime, const char* device)
 		timeout = std::max(remaining, bigtime_t(60));
 	}
 
-	syslog(LOG_DEBUG, "%s: Timeout shift: %lu secs (try %lu)\n",
-		device, timeout, tries);
+	syslog(LOG_DEBUG, "%s: Timeout shift: %lu msecs (try %lu)\n",
+		device, timeout / 1000, tries);
 
 	UpdateSocket(socket);
 	return true;
@@ -746,6 +746,9 @@ DHCPClient::_StateTransition(int socket, dhcp_state& state)
 			|| memcmp(message->mac_address, discover.mac_address,
 				discover.hardware_address_length)) {
 			// this message is not for us
+			syslog(LOG_DEBUG, "%s: Ignoring %s not for us from %s\n",
+				Device(), dhcp_message::TypeToString(message->Type()),
+				_AddressToString(from.sin_addr.s_addr).String());
 			continue;
 		}
 
