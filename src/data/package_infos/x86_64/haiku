@@ -113,13 +113,13 @@ requires {
 	lib:libcrypto >= 1.0.0
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_FFMPEG_ENABLED
-	lib:libavcodec >= 57
-	lib:libavfilter >= 6
-	lib:libavformat >= 57
-	lib:libavresample >= 3
-	lib:libavutil >= 55
-	lib:libswscale >= 4
-	lib:libswresample >= 2
+	lib:libavcodec >= 58
+	lib:libavfilter >= 7
+	lib:libavformat >= 58
+	lib:libavresample >= 4
+	lib:libavutil >= 56
+	lib:libswscale >= 5
+	lib:libswresample >= 3
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_ZSTD_ENABLED
 	lib:libzstd >= 1
