@@ -28,7 +28,7 @@
 #define CRYPT_OUTPUT_BYTES (6 + 64 + 1 + 64 + 1)
 
 static const char* kHexAlphabet = "0123456789abcdef";
-static const char kHexLookup[] = {
+static const int kHexLookup[] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3,
