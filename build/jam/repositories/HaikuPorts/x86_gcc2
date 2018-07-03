@@ -34,8 +34,8 @@ RemotePackageRepository HaikuPorts
 	expat-2.2.1-2
 	expat_devel-2.2.1-2
 	findutils-4.6.0-1
-	ffmpeg-0.10.16-1
-	ffmpeg_devel-0.10.16-1
+	ffmpeg-4.0.1-2
+	ffmpeg_devel-4.0.1-2
 	flex-2.6.4-1
 	fluidlite_devel-1.0.0-3
 	fontconfig-2.12.6-2
@@ -74,8 +74,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9c-2
 	keymapswitcher-1.2.7.11-4
 	less-531-1
-	libedit-20170329_3.1-1
-	libedit_devel-20170329_3.1-1
+	libedit-20180525_3.1-1
+	libedit_devel-20180525_3.1-1
 	libffi-3.0.13-2
 	libiconv-1.15-4
 	libicns-0.8.1-6
@@ -168,8 +168,8 @@ RemotePackageRepository HaikuPorts
 	curl_x86_devel-7.60.0-1
 	expat_x86-2.2.5-1
 	expat_x86_devel-2.2.5-1
-	ffmpeg_x86-3.2.4-2
-	ffmpeg_x86_devel-3.2.4-2
+	ffmpeg_x86-4.0.1-2
+	ffmpeg_x86_devel-4.0.1-2
 	fluidlite_x86_devel-1.0.0-3
 	fontconfig_x86-2.12.6-2
 	fontconfig_x86_devel-2.12.6-2
@@ -197,8 +197,8 @@ RemotePackageRepository HaikuPorts
 	jasper_x86_devel-2.0.14-1
 	jpeg_x86-9c-2
 	jpeg_x86_devel-9c-2
-	libedit_x86-2015_03_21_3.1-8
-	libedit_x86_devel-2015_03_21_3.1-8
+	libedit_x86-20180525_3.1-1
+	libedit_x86_devel-20180525_3.1-1
 	libexecinfo_x86-1.1-4
 	libgcrypt_x86-1.8.2-2
 	libgpg_error_x86-1.31-1

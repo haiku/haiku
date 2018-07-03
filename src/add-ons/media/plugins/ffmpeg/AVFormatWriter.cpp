@@ -213,10 +213,10 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		// Now negociate the actual format with the encoder
 		// First check if the requested format is acceptable
 		AVCodec* codec = avcodec_find_encoder(fStream->codec->codec_id);
-		
+
 		if (codec == NULL)
 			return B_MEDIA_BAD_FORMAT;
-		
+
 		const enum AVSampleFormat *p = codec->sample_fmts;
 		for (; *p != -1; p++) {
 			if (*p == fStream->codec->sample_fmt)
@@ -293,7 +293,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 	// Some formats want stream headers to be separate
 	if ((fContext->oformat->flags & AVFMT_GLOBALHEADER) != 0)
-		fStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+		fStream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
 		fStream->time_base.num, fStream->time_base.den,

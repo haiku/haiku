@@ -468,11 +468,11 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// properties accordingly regardless of the settings here.
 
 	bool codecCanHandleIncompleteFrames
-		= (fCodec->capabilities & CODEC_CAP_TRUNCATED) != 0;
+		= (fCodec->capabilities & AV_CODEC_CAP_TRUNCATED) != 0;
 	if (codecCanHandleIncompleteFrames) {
 		// Expect and handle video frames to be splitted across consecutive
 		// data chunks.
-		fContext->flags |= CODEC_FLAG_TRUNCATED;
+		fContext->flags |= AV_CODEC_FLAG_TRUNCATED;
 	}
 
 	// close any previous instance
@@ -1444,7 +1444,7 @@ AVCodecDecoder::_LoadNextChunkIfNeededAndAssignStartTime()
 	This is needed so that some decoders can read safely a predefined number of
 	bytes at a time for performance optimization purposes.
 
-	The additional memory has a size of FF_INPUT_BUFFER_PADDING_SIZE as defined
+	The additional memory has a size of AV_INPUT_BUFFER_PADDING_SIZE as defined
 	in avcodec.h.
 
 	Ownership of fChunkBuffer memory is with the class so it needs to be freed
@@ -1467,14 +1467,14 @@ AVCodecDecoder::_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
 	size_t chunkSize)
 {
 	fChunkBuffer = static_cast<uint8_t*>(realloc(fChunkBuffer,
-		chunkSize + FF_INPUT_BUFFER_PADDING_SIZE));
+		chunkSize + AV_INPUT_BUFFER_PADDING_SIZE));
 	if (fChunkBuffer == NULL) {
 		fChunkBufferSize = 0;
 		return B_NO_MEMORY;
 	}
 
 	memcpy(fChunkBuffer, chunk, chunkSize);
-	memset(fChunkBuffer + chunkSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+	memset(fChunkBuffer + chunkSize, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 		// Establish safety net, by zero'ing the padding area.
 
 	fChunkBufferSize = chunkSize;

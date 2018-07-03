@@ -18,15 +18,15 @@ local sources =
 	FFmpegPlugin.cpp
 	MuxerTable.cpp
 	CpuCapabilities.cpp
-	
+
 	gfx_conv_c.cpp
 	gfx_conv_c_lookup.cpp
 	gfx_util.cpp
 	;
 
 if $(TARGET_ARCH) != x86_64 {
-	sources += 
-		gfx_conv_mmx.cpp 
+	sources +=
+		gfx_conv_mmx.cpp
 		yuvrgb_sse.nasm
 		yuvrgb_sse2.nasm
 		yuvrgb_ssse3.nasm
@@ -62,5 +62,3 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		;
 	}
 }
-
-

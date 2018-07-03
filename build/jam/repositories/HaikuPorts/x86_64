@@ -33,8 +33,8 @@ RemotePackageRepository HaikuPorts
 	diffutils-3.6-1
 	expat-2.2.5-1
 	expat_devel-2.2.5-1
-	ffmpeg-3.4.2-3
-	ffmpeg_devel-3.4.2-3
+	ffmpeg-4.0.1-2
+	ffmpeg_devel-4.0.1-2
 	findutils-4.6.0-1
 	flex-2.6.4-1
 	fluidlite-1.0.0-3
@@ -79,8 +79,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9c-2
 	keymapswitcher-1.2.7.11-4
 	less-531-1
-	libedit-20170329_3.1-1
-	libedit_devel-20170329_3.1-1
+	libedit-20180525_3.1-1
+	libedit_devel-20180525_3.1-1
 	libexecinfo-1.1-4
 	libffi-3.2.1-4
 	libgcrypt-1.8.2-2
