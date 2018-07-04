@@ -247,6 +247,11 @@ taskqueue_drain(struct taskqueue *taskQueue, struct task *task)
 {
 	cpu_status status;
 
+	if (taskQueue == NULL) {
+		printf("taskqueue_drain called with NULL taskqueue");
+		return;
+	}
+
 	tq_lock(taskQueue, &status);
 	while (task->ta_pending != 0) {
 		tq_unlock(taskQueue, status);

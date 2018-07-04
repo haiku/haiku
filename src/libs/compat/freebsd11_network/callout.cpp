@@ -212,6 +212,11 @@ _callout_stop_safe(struct callout *c, int safe)
 {
 	MutexLocker locker(sLock);
 
+	if (c == NULL) {
+		printf("_callout_stop_safe called with NULL callout");
+		return 0;
+	}
+
 	TRACE("_callout_stop_safe %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
 
 	if (c->due <= 0)
