@@ -1437,9 +1437,8 @@ iwm_nic_rx_init(struct iwm_softc *sc)
 	IWM_WRITE(sc, IWM_FH_MEM_RCSR_CHNL0_CONFIG_REG,
 	    IWM_FH_RCSR_RX_CONFIG_CHNL_EN_ENABLE_VAL		|
 	    IWM_FH_RCSR_CHNL0_RX_IGNORE_RXF_EMPTY		|  /* HW bug */
-#ifdef __HAIKU__ /* We don't support mbuf refcounts, are required for multiframe */
-		IWM_FH_RCSR_CHNL0_RX_CONFIG_SINGLE_FRAME_MSK |
-#endif
+		/* Haiku doesn't support mbuf refcounts, are required for multiframe */
+		/* IWM_FH_RCSR_CHNL0_RX_CONFIG_SINGLE_FRAME_MSK | */
 	    IWM_FH_RCSR_CHNL0_RX_CONFIG_IRQ_DEST_INT_HOST_VAL	|
 	    IWM_FH_RCSR_RX_CONFIG_REG_VAL_RB_SIZE_4K		|
 	    (IWM_RX_RB_TIMEOUT << IWM_FH_RCSR_RX_CONFIG_REG_IRQ_RBTH_POS) |
@@ -5539,7 +5538,7 @@ iwm_handle_rxb(struct iwm_softc *sc, struct mbuf *m)
 			ieee80211_runtask(&sc->sc_ic, &sc->sc_es_task);
  			break;
 		}
- 
+
 		case IWM_SCAN_COMPLETE_UMAC: {
 			struct iwm_umac_scan_complete *notif;
 			notif = (void *)pkt->data;

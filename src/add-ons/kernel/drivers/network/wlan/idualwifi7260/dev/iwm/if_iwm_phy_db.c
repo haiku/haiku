@@ -203,7 +203,7 @@ enum iwm_phy_db_section_type {
 struct iwm_phy_db_cmd {
 	uint16_t type;
 	uint16_t length;
-	uint8_t data[];
+	uint8_t data[0];
 } __packed;
 
 /* for parsing of tx power channel group data that comes from the firmware*/
@@ -218,7 +218,7 @@ struct iwm_phy_db_chg_txp {
 struct iwm_calib_res_notif_phy_db {
 	uint16_t type;
 	uint16_t length;
-	uint8_t data[];
+	uint8_t data[0];
 } __packed;
 
 struct iwm_phy_db *
