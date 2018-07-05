@@ -662,6 +662,77 @@ mb_dupcl(struct mbuf *n, struct mbuf *m)
 	n->m_flags |= M_EXT;
 }
 
+/*
+ * Make a copy of an mbuf chain starting "off0" bytes from the beginning,
+ * continuing for "len" bytes.  If len is M_COPYALL, copy to end of mbuf.
+ * The wait parameter is a choice of M_WAITOK/M_NOWAIT from caller.
+ * Note that the copy is read-only, because clusters are not copied,
+ * only their reference counts are incremented.
+ */
+struct mbuf *
+m_copym(struct mbuf *m, int off0, int len, int wait)
+{
+	struct mbuf *n, **np;
+	int off = off0;
+	struct mbuf *top;
+	int copyhdr = 0;
+
+	KASSERT(off >= 0, ("m_copym, negative off %d", off));
+	KASSERT(len >= 0, ("m_copym, negative len %d", len));
+	MBUF_CHECKSLEEP(wait);
+	if (off == 0 && m->m_flags & M_PKTHDR)
+		copyhdr = 1;
+	while (off > 0) {
+		KASSERT(m != NULL, ("m_copym, offset > size of mbuf chain"));
+		if (off < m->m_len)
+			break;
+		off -= m->m_len;
+		m = m->m_next;
+	}
+	np = &top;
+	top = NULL;
+	while (len > 0) {
+		if (m == NULL) {
+			KASSERT(len == M_COPYALL,
+				("m_copym, length > size of mbuf chain"));
+			break;
+		}
+		if (copyhdr)
+			n = m_gethdr(wait, m->m_type);
+		else
+			n = m_get(wait, m->m_type);
+		*np = n;
+		if (n == NULL)
+			goto nospace;
+		if (copyhdr) {
+			if (!m_dup_pkthdr(n, m, wait))
+				goto nospace;
+			if (len == M_COPYALL)
+				n->m_pkthdr.len -= off0;
+			else
+				n->m_pkthdr.len = len;
+			copyhdr = 0;
+		}
+		n->m_len = min(len, m->m_len - off);
+		if (m->m_flags & M_EXT) {
+			n->m_data = m->m_data + off;
+			mb_dupcl(n, m);
+		} else
+			bcopy(mtod(m, caddr_t)+off, mtod(n, caddr_t),
+				(u_int)n->m_len);
+		if (len != M_COPYALL)
+			len -= n->m_len;
+		off = 0;
+		m = m->m_next;
+		np = &n->m_next;
+	}
+
+	return (top);
+nospace:
+	m_freem(top);
+	return (NULL);
+}
+
 void
 m_demote_pkthdr(struct mbuf *m)
 {

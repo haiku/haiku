@@ -81,6 +81,9 @@
 
 #define MTAG_PERSISTENT	0x800
 
+#define	M_COPYALL	1000000000
+	// Length to m_copy to copy all.
+
 #define EXT_CLUSTER		1		// 2048 bytes
 #define EXT_JUMBOP		4		// Page size
 #define EXT_JUMBO9		5		// 9 * 1024 bytes
@@ -189,6 +192,7 @@ struct mbuf*	m_collapse(struct mbuf*, int, int);
 void			m_copyback(struct mbuf*, int, int, caddr_t);
 void			m_copydata(const struct mbuf*, int, int, caddr_t);
 struct mbuf*	m_copypacket(struct mbuf*, int);
+struct mbuf *	m_copym(struct mbuf *m, int off0, int len, int wait);
 struct mbuf*	m_defrag(struct mbuf*, int);
 struct mbuf*	m_devget(char*, int, int, struct ifnet*,
 	void(*) (char*, caddr_t, u_int));
