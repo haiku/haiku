@@ -55,7 +55,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/11.1/sys/dev/xl/xlphy.c 257184 2013-10-26 18:40:17Z glebius $");
 
 /*
  * driver for 3Com internal PHYs
@@ -152,22 +152,10 @@ xlphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		break;
 
 	case MII_MEDIACHG:
-		/*
-		 * If the interface is not up, don't do anything.
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			break;
-
 		mii_phy_setmedia(sc);
 		break;
 
 	case MII_TICK:
-		/*
-		 * Is the interface even up?
-		 */
-		if ((mii->mii_ifp->if_flags & IFF_UP) == 0)
-			return (0);
-
 		/*
 		 * The 3Com PHY's autonegotiation doesn't need to be
 		 * kicked; it continues in the background.
