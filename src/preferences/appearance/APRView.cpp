@@ -130,19 +130,35 @@ APRView::AttachedToWindow()
 void
 APRView::MessageReceived(BMessage *msg)
 {
-	if (msg->WasDropped()) {
-		rgb_color* color = NULL;
-		ssize_t size = 0;
-
-		if (msg->FindData("RGBColor", (type_code)'RGBC', (const void**)&color,
-				&size) == B_OK) {
-			_SetCurrentColor(*color);
-
-			Window()->PostMessage(kMsgUpdate);
-		}
-	}
-
 	switch (msg->what) {
+		case SET_COLOR:
+		{
+			rgb_color* color;
+			ssize_t size;
+			color_which which;
+
+			if (msg->FindData(kRGBColor, B_RGB_COLOR_TYPE,
+					(const void**)&color, &size) == B_OK
+				&& msg->FindUInt32(kWhich, (uint32*)&which) == B_OK) {
+				_SetColor(which, *color);
+				Window()->PostMessage(kMsgUpdate);
+			}
+			break;
+		}
+
+		case SET_CURRENT_COLOR:
+		{
+			rgb_color* color;
+			ssize_t size;
+
+			if (msg->FindData(kRGBColor, B_RGB_COLOR_TYPE,
+					(const void**)&color, &size) == B_OK) {
+				_SetCurrentColor(*color);
+				Window()->PostMessage(kMsgUpdate);
+			}
+			break;
+		}
+
 		case UPDATE_COLOR:
 		{
 			// Received from the color fPicker when its color changes
@@ -233,10 +249,17 @@ APRView::IsRevertable()
 
 
 void
+APRView::_SetColor(color_which which, rgb_color color)
+{
+	set_ui_color(which, color);
+	fCurrentColors.SetColor(ui_color_name(which), color);
+}
+
+
+void
 APRView::_SetCurrentColor(rgb_color color)
 {
-	set_ui_color(fWhich, color);
-	fCurrentColors.SetColor(ui_color_name(fWhich), color);
+	_SetColor(fWhich, color);
 
 	int32 currentIndex = fAttrList->CurrentSelection();
 	ColorWhichItem* item = (ColorWhichItem*)fAttrList->ItemAt(currentIndex);

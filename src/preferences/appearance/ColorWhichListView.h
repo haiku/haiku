@@ -24,6 +24,8 @@ public:
 
 	virtual	bool				InitiateDrag(BPoint where, int32 index,
 									bool wasSelected);
+	virtual	void				MessageReceived(BMessage* message);
 };
+
 
 #endif	// COLORWHICH_LIST_VIEW_H

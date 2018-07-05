@@ -19,10 +19,13 @@
 
 #define APPEARANCE_APP_SIGNATURE "application/x-vnd.Haiku-Appearance"
 
+// message commands
 #define APPLY_SETTINGS 'aply'
 #define TRY_SETTINGS 'trys'
 
 #define ATTRIBUTE_CHOSEN 'atch'
+#define SET_COLOR 'sclr'
+#define SET_CURRENT_COLOR 'sccl'
 #define UPDATE_COLOR 'upcl'
 #define DECORATOR_CHOSEN 'dcch'
 #define UPDATE_DECORATOR 'updc'
@@ -33,6 +36,10 @@
 
 #define SET_UI_COLORS 'suic'
 #define PREFS_CHOSEN 'prch'
+
+// constants
+static const char* const kRGBColor = "RGBColor";
+static const char* const kWhich = "which";
 
 // user interface
 const uint32 kBorderSpace = 10;
