@@ -592,6 +592,12 @@ BListView::MouseDown(BPoint where)
 void
 BListView::MouseUp(BPoint where)
 {
+	if (fTrack->is_dragging) {
+		// do selection only if a drag was not initiated
+		BView::MouseUp(where);
+		return;
+	}
+
 	int32 modifiers = 0;
 
 	BMessage* message = Looper()->CurrentMessage();
@@ -625,7 +631,7 @@ BListView::MouseUp(BPoint where)
 					Select(index);
 			}
 		} else {
-			// toggle selection state of clicked item
+			// toggle selection state of clicked item (except drag & drop)
 			if ((modifiers & B_COMMAND_KEY) != 0 && ItemAt(index)->IsSelected())
 				Deselect(index);
 			else
