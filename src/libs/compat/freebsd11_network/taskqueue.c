@@ -220,6 +220,11 @@ taskqueue_start_threads(struct taskqueue **taskQueue, int count, int priority,
 void
 taskqueue_free(struct taskqueue *taskQueue)
 {
+	if (taskQueue == NULL) {
+		printf("taskqueue_free called with NULL taskqueue\n");
+		return;
+	}
+
 	/* lock and  drain list? */
 	taskQueue->tq_flags &= ~TQ_FLAGS_ACTIVE;
 	if (!taskQueue->tq_fast)
@@ -248,7 +253,7 @@ taskqueue_drain(struct taskqueue *taskQueue, struct task *task)
 	cpu_status status;
 
 	if (taskQueue == NULL) {
-		printf("taskqueue_drain called with NULL taskqueue");
+		printf("taskqueue_drain called with NULL taskqueue\n");
 		return;
 	}
 
