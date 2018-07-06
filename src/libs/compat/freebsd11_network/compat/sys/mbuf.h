@@ -168,16 +168,24 @@ struct mbuf {
 
 	union {
 		struct {
-			struct pkthdr	m_pkthdr;	/* M_PKTHDR set */
+			struct pkthdr	MH_pkthdr;
 			union {
-				struct m_ext	m_ext;	/* M_EXT set */
-				char		m_pktdat[0];
-			};
-		};
-		char	m_dat[0];			/* !M_PKTHDR, !M_EXT */
-	};
+				struct m_ext	MH_ext;
+				char			MH_databuf[0];
+			} MH_dat;
+		} MH;
+		char M_databuf[0];
+	} M_dat;
 };
 
+/* The reason we use these really nasty macros, instead of naming the
+ * structs and unions properly like FreeBSD does ... is because of a
+ * GCC2 compiler bug. Specifically a parser bug: adding -O0 has no
+ * effect on this problem. */
+#define m_pkthdr	M_dat.MH.MH_pkthdr
+#define m_ext		M_dat.MH.MH_dat.MH_ext
+#define m_pktdat	M_dat.MH.MH_dat.MH_databuf
+#define m_dat		M_dat.M_databuf
 
 void			m_catpkt(struct mbuf *m, struct mbuf *n);
 void			m_adj(struct mbuf*, int);
