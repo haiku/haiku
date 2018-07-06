@@ -1,3 +1,36 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx dev ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev dc ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev de ] ;
+
+KernelAddon dec21xxx :
+	glue.c
+	glue_de.c
+	dcphy.c
+	if_dc.c
+	pnphy.c
+	if_de.c
+	acphy.c
+	amphy.c
+	ukphy.c
+	ukphy_subr.c
+	: libfreebsd11_network.a
+	;
+
+ObjectHdrs [ FGristFiles dcphy$(SUFOBJ)	pnphy$(SUFOBJ) if_de$(SUFOBJ)
+		acphy$(SUFOBJ) amphy$(SUFOBJ) ukphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd11_network ] ;
+Includes [ FGristFiles dcphy.c pnphy.c acphy.c amphy.c ]
+	: <src!libs!compat!freebsd11_network>miidevs.h ;

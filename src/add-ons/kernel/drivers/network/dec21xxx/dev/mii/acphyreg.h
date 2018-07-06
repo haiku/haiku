@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/mii/acphyreg.h 165986 2007-01-12 22:58:04Z marius $
  */
 
 #ifndef _DEV_MII_ACPHYREG_H_
