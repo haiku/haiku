@@ -168,22 +168,15 @@ struct mbuf {
 
 	union {
 		struct {
-			struct pkthdr	MH_pkthdr;
+			struct pkthdr	m_pkthdr;	/* M_PKTHDR set */
 			union {
-				struct m_ext	MH_ext;
-				char			MH_databuf[0];
-			} MH_dat;
-		} MH;
-		char M_databuf[0];
-	} M_dat;
+				struct m_ext	m_ext;	/* M_EXT set */
+				char		m_pktdat[0];
+			};
+		};
+		char	m_dat[0];			/* !M_PKTHDR, !M_EXT */
+	};
 };
-
-
-#define m_act		m_nextpkt
-#define m_pkthdr	M_dat.MH.MH_pkthdr
-#define m_ext		M_dat.MH.MH_dat.MH_ext
-#define m_pktdat	M_dat.MH.MH_dat.MH_databuf
-#define m_dat		M_dat.M_databuf
 
 
 void			m_catpkt(struct mbuf *m, struct mbuf *n);
@@ -193,7 +186,7 @@ void			m_cat(struct mbuf*, struct mbuf*);
 int				m_clget(struct mbuf*, int);
 void*			m_cljget(struct mbuf*, int, int);
 struct mbuf*	m_collapse(struct mbuf*, int, int);
-void			m_copyback(struct mbuf*, int, int, caddr_t);
+void			m_copyback(struct mbuf *m0, int off, int len, c_caddr_t cp);
 void			m_copydata(const struct mbuf*, int, int, caddr_t);
 struct mbuf*	m_copypacket(struct mbuf*, int);
 struct mbuf *	m_copym(struct mbuf *m, int off0, int len, int wait);
@@ -201,8 +194,8 @@ struct mbuf*	m_defrag(struct mbuf*, int);
 struct mbuf*	m_devget(char*, int, int, struct ifnet*,
 	void(*) (char*, caddr_t, u_int));
 
-struct mbuf*	m_dup(struct mbuf*, int);
-int				m_dup_pkthdr(struct mbuf*, struct mbuf*, int);
+struct mbuf*	m_dup(const struct mbuf *m, int how);
+int				m_dup_pkthdr(struct mbuf *to, const struct mbuf *from, int how);
 
 void			m_demote_pkthdr(struct mbuf *m);
 void			m_demote(struct mbuf *m0, int all, int flags);
@@ -232,7 +225,7 @@ void			m_tag_delete_chain(struct mbuf*, struct m_tag*);
 void			m_tag_free_default(struct m_tag*);
 struct m_tag*	m_tag_locate(struct mbuf*, u_int32_t, int, struct m_tag*);
 struct m_tag*	m_tag_copy(struct m_tag*, int);
-int				m_tag_copy_chain(struct mbuf*, struct mbuf*, int);
+int				m_tag_copy_chain(struct mbuf *to, const struct mbuf *from, int how);
 void			m_tag_delete_nonpersistent(struct mbuf*);
 
 

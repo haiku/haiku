@@ -4,7 +4,7 @@
 /*-
  * Copyright (C) 1999 WIDE Project.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -16,7 +16,7 @@
  * 3. Neither the name of the project nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -59,10 +59,15 @@
  *
  *	@(#)uipc_mbuf.c	8.4 (Berkeley) 2/14/95
  */
+
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: stable/11/sys/kern/uipc_mbuf2.c 312441 2017-01-19 23:42:51Z rpokala $");
 
 /*#define PULLDOWN_DEBUG*/
+
+#ifdef __HAIKU__
+#define FBSD_DRIVER
+#endif
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -74,8 +79,8 @@ __FBSDID("$FreeBSD$");
 
 #include <security/mac/mac_framework.h>
 
-#define malloc(size, tag, flags) kernel_malloc(size, tag, flags)
-#define free(pointer, tag) kernel_free(pointer, tag)
+static MALLOC_DEFINE(M_PACKET_TAGS, MBUF_TAG_MEM_NAME,
+    "packet-attached information");
 
 /* can't call it m_dup(), as freebsd[34] uses m_dup() with different arg */
 static struct mbuf *m_dup1(struct mbuf *, int, int, int);
@@ -130,6 +135,8 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	}
 
 	/*
+	 * The following comment is dated but still partially applies:
+	 *
 	 * XXX: This code is flawed because it considers a "writable" mbuf
 	 *      data region to require all of the following:
 	 *	  (i) mbuf _has_ to have M_EXT set; if it is just a regular
@@ -140,16 +147,12 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	 *      Ideally, the requirement should only be (iii).
 	 *
 	 * If we're writable, we're sure we're writable, because the ref. count
-	 * cannot increase from 1, as that would require posession of mbuf
+	 * cannot increase from 1, as that would require possession of mbuf
 	 * n by someone else (which is impossible). However, if we're _not_
 	 * writable, we may eventually become writable )if the ref. count drops
 	 * to 1), but we'll fail to notice it unless we re-evaluate
 	 * M_WRITABLE(). For now, we only evaluate once at the beginning and
 	 * live with this.
-	 */
-	/*
-	 * XXX: This is dumb. If we're just a regular mbuf with no M_EXT,
-	 *      then we're not "writable," according to this code.
 	 */
 	writable = 0;
 	if ((n->m_flags & M_EXT) == 0 ||
@@ -160,7 +163,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	 * the target data is on <n, off>.
 	 * if we got enough data on the mbuf "n", we're done.
 	 */
-	if ((off == 0 || offp) && len <= n->m_len - off && writable)
+	if ((off == 0 || offp) && len <= n->m_len - off)
 		goto ok;
 
 	/*
@@ -170,7 +173,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	 * chop the current mbuf into two pieces, set off to 0.
 	 */
 	if (len <= n->m_len - off) {
-		o = m_dup1(n, off, n->m_len - off, M_DONTWAIT);
+		o = m_dup1(n, off, n->m_len - off, M_NOWAIT);
 		if (o == NULL) {
 			m_freem(m);
 			return NULL;	/* ENOBUFS */
@@ -230,9 +233,9 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	 * on both end.
 	 */
 	if (len > MLEN)
-		o = m_getcl(M_DONTWAIT, m->m_type, 0);
+		o = m_getcl(M_NOWAIT, m->m_type, 0);
 	else
-		o = m_get(M_DONTWAIT, m->m_type);
+		o = m_get(M_NOWAIT, m->m_type);
 	if (!o) {
 		m_freem(m);
 		return NULL;	/* ENOBUFS */
@@ -313,7 +316,7 @@ m_tag_free_default(struct m_tag *t)
 
 /* Get a packet tag structure along with specified data following. */
 struct m_tag *
-m_tag_alloc(u_int32_t cookie, int type, int len, int wait)
+m_tag_alloc(uint32_t cookie, int type, int len, int wait)
 {
 	struct m_tag *t;
 
@@ -375,7 +378,7 @@ m_tag_delete_nonpersistent(struct mbuf *m)
 
 /* Find a tag, starting from a given position. */
 struct m_tag *
-m_tag_locate(struct mbuf *m, u_int32_t cookie, int type, struct m_tag *t)
+m_tag_locate(struct mbuf *m, uint32_t cookie, int type, struct m_tag *t)
 {
 	struct m_tag *p;
 
@@ -428,7 +431,7 @@ m_tag_copy(struct m_tag *t, int how)
  * destination mbuf.
  */
 int
-m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
+m_tag_copy_chain(struct mbuf *to, const struct mbuf *from, int how)
 {
 	struct m_tag *p, *t, *tprev = NULL;
 
