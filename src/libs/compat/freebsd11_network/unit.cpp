@@ -1,19 +1,24 @@
 /*
  * Copyright 2009 Colin Günther, coling@gmx.de
- * All Rights Reserved. Distributed under the terms of the MIT License.
- *
+ * Copyright 2018, Haiku, Inc.
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
 /*! Implementation of a number allocator.*/
 
 
+extern "C" {
 #include "unit.h"
+}
 
 #include <compat/sys/mutex.h>
 
 #include <stdlib.h>
 #include <util/RadixBitmap.h>
+
+
+#define ID_STORE_FULL -1
 
 
 extern struct mtx gIdStoreLock;
@@ -28,11 +33,12 @@ new_unrhdr(int low, int high, struct mtx* mutex)
 	KASSERT(low <= high,
 		("ID-Store: use error: %s(%u, %u)", __func__, low, high));
 
-	idStore = malloc(sizeof *idStore);
+	idStore = (unrhdr*)malloc(sizeof *idStore);
 	if (idStore == NULL)
 		return NULL;
 
-	if (_new_unrhdr_buffer(idStore, maxIdCount) != B_OK) {
+	idStore->idBuffer = radix_bitmap_create(maxIdCount);
+	if (idStore->idBuffer == NULL) {
 		free(idStore);
 		return NULL;
 	}
@@ -59,7 +65,7 @@ delete_unrhdr(struct unrhdr* idStore)
 	KASSERT(idStore->idBuffer->root_size == 0,
 		("ID-Store: %s: some ids are still in use..", __func__));
 
-	_delete_unrhdr_buffer_locked(idStore);
+	radix_bitmap_destroy(idStore->idBuffer);
 	mtx_unlock(idStore->storeMutex);
 
 	free(idStore);
@@ -76,7 +82,14 @@ alloc_unr(struct unrhdr* idStore)
 		("ID-Store: %s: NULL pointer as argument.", __func__));
 
 	mtx_lock(idStore->storeMutex);
-	id = _alloc_unr_locked(idStore);
+
+	radix_slot_t slotIndex;
+	id = ID_STORE_FULL;
+
+	slotIndex = radix_bitmap_alloc(idStore->idBuffer, 1);
+	if (slotIndex != RADIX_SLOT_NONE)
+		id = slotIndex + idStore->idBias;
+
 	mtx_unlock(idStore->storeMutex);
 
 	return id;
@@ -91,10 +104,11 @@ free_unr(struct unrhdr* idStore, u_int identity)
 
 	mtx_lock(idStore->storeMutex);
 
-	KASSERT((int32)identity - idStore->idBias >= 0, ("ID-Store: %s(%p, %u): second "
+	uint32 slotIndex = (int32)identity - idStore->idBias;
+	KASSERT(slotIndex >= 0, ("ID-Store: %s(%p, %u): second "
 		"parameter is not in interval.", __func__, idStore, identity));
 
-	_free_unr_locked(idStore, identity);
+	radix_bitmap_dealloc(idStore->idBuffer, slotIndex, 1);
 
 	mtx_unlock(idStore->storeMutex);
 }

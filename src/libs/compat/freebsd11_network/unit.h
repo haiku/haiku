@@ -5,6 +5,9 @@
 #ifndef UNIT_H_
 #define UNIT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <compat/sys/systm.h>
 
@@ -16,10 +19,6 @@ struct unrhdr {
 	int32					idBias;
 };
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 status_t _new_unrhdr_buffer(struct unrhdr*, uint32);
 void _delete_unrhdr_buffer_locked(struct unrhdr*);

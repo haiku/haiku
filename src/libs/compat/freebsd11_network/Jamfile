@@ -45,8 +45,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 	synch.c
 	systm.c
 	taskqueue.c
-	unit.c
-	Unit.cpp
+	unit.cpp
 	;
 
 rule MIIHeaderGen
