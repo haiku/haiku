@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * Andrew Aldridge, i80and@foxquill.com
+ * 		Andrew Aldridge, i80and@foxquill.com
  */
 
 
@@ -28,7 +28,7 @@
 #define CRYPT_OUTPUT_BYTES (6 + 64 + 1 + 64 + 1)
 
 static const char* kHexAlphabet = "0123456789abcdef";
-static const int kHexLookup[] = {
+static const int8 kHexLookup[] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3,
