@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/jme/if_jmereg.h 298955 2016-05-03 03:41:25Z pfg $
  */
 
 #ifndef	_IF_JMEREG_H
@@ -925,7 +925,7 @@
 #define	TIMER3_TIMEOUT_COUNT_SHIFT	8
 #define	TIMER3_TIMEOUT_VALUE_SHIFT	1
 
-/* Aggresive power mode control. */
+/* Aggressive power mode control. */
 #define	JME_APMC		0x087C
 #define	APMC_PCIE_SDOWN_STAT	0x80000000
 #define	APMC_PCIE_SDOWN_ENB	0x40000000

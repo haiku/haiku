@@ -18,9 +18,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network vlance ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;
 #SubInclude HAIKU_TOP src add-ons kernel drivers network dp83815
 
-# FreeBSD 9.3 drivers
-SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 ;
-
 # FreeBSD 11.1 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network 3com ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ar81xx ;
@@ -32,6 +29,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network dec21xxx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network jmicron2x0 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network nforce ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet ;

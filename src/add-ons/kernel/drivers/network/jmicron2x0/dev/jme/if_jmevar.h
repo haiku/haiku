@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/jme/if_jmevar.h 298955 2016-05-03 03:41:25Z pfg $
  */
 
 #ifndef	_IF_JMEVAR_H
@@ -35,7 +35,7 @@
 #include <sys/taskqueue.h>
 
 /*
- * JMC250 supports upto 1024 descriptors and the number of
+ * JMC250 supports up to 1024 descriptors and the number of
  * descriptors should be multiple of 16.
  */
 #define	JME_TX_RING_CNT		384
