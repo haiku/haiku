@@ -88,11 +88,10 @@ construct_ext_sized_mbuf(struct mbuf *memoryBuffer, int how, int size)
 
 	memoryBuffer->m_data = memoryBuffer->m_ext.ext_buf;
 	memoryBuffer->m_flags |= M_EXT;
-	/* mb->m_ext.ext_free = NULL; */
-	/* mb->m_ext.ext_args = NULL; */
 	memoryBuffer->m_ext.ext_size = size;
 	memoryBuffer->m_ext.ext_type = extType;
-	/* mb->m_ext.ref_cnt = NULL; */
+	memoryBuffer->m_ext.ext_flags = EXT_FLAG_EMBREF;
+	memoryBuffer->m_ext.ext_count = 1;
 
 	return 0;
 }
@@ -227,12 +226,44 @@ m_freem(struct mbuf *memoryBuffer)
 static void
 mb_free_ext(struct mbuf *memoryBuffer)
 {
-	/*
-	if (m->m_ext.ref_count != NULL)
-		panic("unsupported");
-	*/
-
 	object_cache *cache = NULL;
+	volatile u_int *refcnt;
+	struct mbuf *mref;
+	int freembuf;
+
+	KASSERT(memoryBuffer->m_flags & M_EXT, ("%s: M_EXT not set on %p",
+		__func__, memoryBuffer));
+
+	/* See if this is the mbuf that holds the embedded refcount. */
+	if (memoryBuffer->m_ext.ext_flags & EXT_FLAG_EMBREF) {
+		refcnt = &memoryBuffer->m_ext.ext_count;
+		mref = memoryBuffer;
+	} else {
+		KASSERT(memoryBuffer->m_ext.ext_cnt != NULL,
+			("%s: no refcounting pointer on %p", __func__, memoryBuffer));
+		refcnt = memoryBuffer->m_ext.ext_cnt;
+		mref = __containerof(refcnt, struct mbuf, m_ext.ext_count);
+	}
+
+	/*
+	 * Check if the header is embedded in the cluster.  It is
+	 * important that we can't touch any of the mbuf fields
+	 * after we have freed the external storage, since mbuf
+	 * could have been embedded in it.  For now, the mbufs
+	 * embedded into the cluster are always of type EXT_EXTREF,
+	 * and for this type we won't free the mref.
+	 */
+	if (memoryBuffer->m_flags & M_NOFREE) {
+		freembuf = 0;
+		KASSERT(memoryBuffer->m_ext.ext_type == EXT_EXTREF,
+			("%s: no-free mbuf %p has wrong type", __func__, memoryBuffer));
+	} else
+		freembuf = 1;
+
+	/* Free attached storage only if this mbuf is the only reference to it. */
+	if (!(*refcnt == 1 || atomic_add(refcnt, -1) == 1)
+			&& !(freembuf && memoryBuffer != mref))
+		return;
 
 	if (memoryBuffer->m_ext.ext_type == EXT_CLUSTER)
 		cache = sChunkCache;

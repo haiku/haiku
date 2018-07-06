@@ -653,13 +653,29 @@ bad:
 static void
 mb_dupcl(struct mbuf *n, struct mbuf *m)
 {
-	KASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
-	KASSERT((n->m_flags & M_EXT) == 0, ("%s: M_EXT set", __func__));
+	volatile u_int *refcnt;
 
-	n->m_ext.ext_buf = m->m_ext.ext_buf;
-	n->m_ext.ext_size = m->m_ext.ext_size;
-	n->m_ext.ext_type = m->m_ext.ext_type;
+	KASSERT(m->m_flags & M_EXT, ("%s: M_EXT not set on %p", __func__, m));
+	KASSERT(!(n->m_flags & M_EXT), ("%s: M_EXT set on %p", __func__, n));
+
+	n->m_ext = m->m_ext;
 	n->m_flags |= M_EXT;
+	n->m_flags |= m->m_flags & M_RDONLY;
+
+	/* See if this is the mbuf that holds the embedded refcount. */
+	if (m->m_ext.ext_flags & EXT_FLAG_EMBREF) {
+		refcnt = n->m_ext.ext_cnt = &m->m_ext.ext_count;
+		n->m_ext.ext_flags &= ~EXT_FLAG_EMBREF;
+	} else {
+		KASSERT(m->m_ext.ext_cnt != NULL,
+			("%s: no refcounting pointer on %p", __func__, m));
+		refcnt = m->m_ext.ext_cnt;
+	}
+
+	if (*refcnt == 1)
+		*refcnt += 1;
+	else
+		atomic_add_int(refcnt, 1);
 }
 
 /*
@@ -1055,25 +1071,6 @@ m_unshare(struct mbuf *m0, int how)
 		mprev = mfirst;
 	}
 	return (m0);
-}
-
-/*
- * Set the m_data pointer of a newly-allocated mbuf
- * to place an object of the specified size at the
- * end of the mbuf, longword aligned.
- */
-void
-m_align(struct mbuf *m, int len)
-{
-	int adjust;
-
-	if (m->m_flags & M_EXT)
-		adjust = m->m_ext.ext_size - len;
-	else if (m->m_flags & M_PKTHDR)
-		adjust = MHLEN - len;
-	else
-		adjust = MLEN - len;
-	m->m_data += adjust &~ (sizeof(long)-1);
 }
 
 /*

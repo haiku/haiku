@@ -173,6 +173,22 @@
 	(__offsetof(type, end) - __offsetof(type, start))
 
 /*
+ * Given the pointer x to the member m of the struct s, return
+ * a pointer to the containing structure.  When using GCC, we first
+ * assign pointer x to a local variable, to check that its type is
+ * compatible with member m.
+ */
+#if __GNUC_PREREQ__(3, 1)
+#define	__containerof(x, s, m) ({					\
+	const volatile __typeof(((s *)0)->m) *__x = (x);		\
+	__DEQUALIFY(s *, (const volatile char *)__x - __offsetof(s, m));\
+})
+#else
+#define	__containerof(x, s, m)						\
+	__DEQUALIFY(s *, (const volatile char *)(x) - __offsetof(s, m))
+#endif
+
+/*
  * Compiler-dependent macros to help declare dead (non-returning) and
  * pure (no side effects) functions, and unused variables.  They are
  * null except for versions of gcc that are known to support the features
@@ -312,7 +328,11 @@
 #endif
 
 #ifndef	__DEVOLATILE
-#define	__DEVOLATILE(type, var)	((type)(__uintptr_t)(volatile void *)(var))
+#define	__DEVOLATILE(type, var)	((type)(uintptr_t)(volatile void *)(var))
+#endif
+
+#ifndef	__DEQUALIFY
+#define	__DEQUALIFY(type, var)	((type)(uintptr_t)(const volatile void *)(var))
 #endif
 
 #if __GNUC_PREREQ__(4,6) && !defined(__cplusplus)

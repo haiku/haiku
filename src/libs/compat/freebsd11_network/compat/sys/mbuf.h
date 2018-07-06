@@ -89,6 +89,15 @@
 #define EXT_JUMBO9		5		// 9 * 1024 bytes
 #define EXT_NET_DRV		100		// custom ext_buf provided by net driver
 
+#define EXT_EXTREF		255		// has externally maintained ext_cnt ptr
+
+/*
+ * Flags for external mbuf buffer types.
+ * NB: limited to the lower 24 bits.
+ */
+#define EXT_FLAG_EMBREF		0x000001	/* embedded ext_count */
+#define EXT_FLAG_EXTREF		0x000002	/* external ext_cnt, notyet */
+
 #define CSUM_IP			0x0001
 #define CSUM_TCP		0x0002
 #define CSUM_UDP		0x0004
@@ -109,15 +118,6 @@ extern int max_hdr;
 extern int max_datalen;		// MHLEN - max_hdr
 
 
-struct m_hdr {
-	struct mbuf*	mh_next;
-	struct mbuf*	mh_nextpkt;
-	caddr_t			mh_data;
-	int				mh_len;
-	int				mh_flags;
-	short			mh_type;
-};
-
 struct pkthdr {
 	struct ifnet*					rcvif;
 	int								len;
@@ -137,9 +137,14 @@ struct m_tag {
 };
 
 struct m_ext {
-	caddr_t			ext_buf;
-	unsigned int	ext_size;
-	int				ext_type;
+	union {
+		volatile u_int	 ext_count;	/* value of ref count info */
+		volatile u_int	*ext_cnt;	/* pointer to ref count info */
+	};
+	caddr_t		 ext_buf;	 /* start of buffer */
+	uint32_t	 ext_size;	 /* size of buffer, for ext_free */
+	uint32_t	 ext_type:8, /* type of external storage */
+			 ext_flags:24;	 /* external storage mbuf flags */
 };
 
 struct mbuf {
@@ -153,8 +158,14 @@ struct mbuf {
 		SLIST_ENTRY(mbuf)	m_slistpkt;
 		STAILQ_ENTRY(mbuf)	m_stailqpkt;
 	};
+	caddr_t		 m_data;	/* location of data */
+	int32_t		 m_len;		/* amount of data in this mbuf */
+	uint32_t	 m_type:8,	/* type of data in this mbuf */
+			 m_flags:24;
+#if !defined(__LP64__)
+	uint32_t	 m_pad;		/* pad for 64bit alignment */
+#endif
 
-	struct m_hdr m_hdr;
 	union {
 		struct {
 			struct pkthdr	MH_pkthdr;
@@ -168,12 +179,6 @@ struct mbuf {
 };
 
 
-#define m_next		m_hdr.mh_next
-#define m_len		m_hdr.mh_len
-#define m_data		m_hdr.mh_data
-#define m_type		m_hdr.mh_type
-#define m_flags		m_hdr.mh_flags
-#define m_nextpkt	m_hdr.mh_nextpkt
 #define m_act		m_nextpkt
 #define m_pkthdr	M_dat.MH.MH_pkthdr
 #define m_ext		M_dat.MH.MH_dat.MH_ext
@@ -183,7 +188,6 @@ struct mbuf {
 
 void			m_catpkt(struct mbuf *m, struct mbuf *n);
 void			m_adj(struct mbuf*, int);
-void			m_align(struct mbuf*, int);
 int				m_append(struct mbuf*, int, c_caddr_t);
 void			m_cat(struct mbuf*, struct mbuf*);
 int				m_clget(struct mbuf*, int);
