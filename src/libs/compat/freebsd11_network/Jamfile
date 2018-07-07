@@ -26,6 +26,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 	fbsd_busdma_x86.c
 	fbsd_ether.c
 	fbsd_if_media.c
+	fbsd_kern_mbuf.c
 	fbsd_uipc_mbuf.c
 	fbsd_uipc_mbuf2.c
 	fbsd_mii.c

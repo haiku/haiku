@@ -70,6 +70,8 @@
 #define MGET(m, how, type)		((m) = m_get((how), (type)))
 #define MGETHDR(m, how, type)	((m) = m_gethdr((how), (type)))
 #define MCLGET(m, how)			m_clget((m), (how))
+#define m_getm(m, len, how, type)					\
+    m_getm2((m), (len), (how), (type), M_PKTHDR)
 
 #define mtod(m, type)	((type)((m)->m_data))
 
@@ -216,6 +218,7 @@ struct mbuf*	m_free(struct mbuf*);
 void			m_freem(struct mbuf*);
 struct mbuf*	m_get(int, short);
 struct mbuf*	m_get2(int size, int how, short type, int flags);
+struct mbuf *	m_getm2(struct mbuf *m, int len, int how, short type, int flags);
 struct mbuf*	m_gethdr(int, short);
 struct mbuf*	m_getjcl(int, short, int, int);
 u_int			m_length(struct mbuf*, struct mbuf**);

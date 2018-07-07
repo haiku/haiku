@@ -9,6 +9,8 @@
 #include <posix/errno.h>
 
 
+#define EDOOFUS 		EINVAL
+
 /* pseudo-errors returned inside freebsd compat layer to modify return to process */
 #define	ERESTART		(B_ERRORS_END + 1)		/* restart syscall */
 #define EJUSTRETURN		(B_ERRORS_END + 2)		/* don't modify regs, just return */
