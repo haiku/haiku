@@ -71,14 +71,8 @@ usb_support_descriptor supported_devices[] = {
 };
 
 /* add a device to the list of connected devices */
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static bt_usb_dev*
 spawn_device(usb_device usb_dev)
-#else
-static bt_usb_dev*
-spawn_device(usb_device* usb_dev)
-#endif
-
 {
 	CALLED();
 
@@ -209,12 +203,8 @@ fetch_device(bt_usb_dev* dev, hci_id hid)
 #endif
 
 // called by USB Manager when device is added to the USB
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 static status_t
 device_added(usb_device dev, void** cookie)
-#else
-device_added(usb_device* dev, void** cookie)
-#endif
 {
 	const usb_interface_info* 		interface;
 	const usb_device_descriptor* 	desc;

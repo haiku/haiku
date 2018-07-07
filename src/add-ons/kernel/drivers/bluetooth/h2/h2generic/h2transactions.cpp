@@ -25,17 +25,10 @@
 
 /* Forward declaration */
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-void acl_tx_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
-void acl_rx_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
-void command_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
-void event_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
-#else
 void acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void command_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void event_complete(void* cookie, status_t status, void* data, size_t actual_len);
-#endif
 
 
 static status_t
@@ -53,11 +46,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 #endif
 
 void
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-event_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
-#else
 event_complete(void* cookie, status_t status, void* data, size_t actual_len)
-#endif
 {
 	bt_usb_dev* bdev = (bt_usb_dev*)cookie;
 	// bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer / slower option
@@ -99,11 +88,7 @@ resubmit:
 
 
 void
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-acl_rx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
-#else
 acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
-#endif
 {
 	bt_usb_dev* bdev = (bt_usb_dev*)cookie;
 	// bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer / slower option
@@ -206,11 +191,7 @@ submit_rx_sco(bt_usb_dev* bdev)
 #endif
 
 void
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-command_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
-#else
 command_complete(void* cookie, status_t status, void* data, size_t actual_len)
-#endif
 {
 	snet_buffer* snbuf = (snet_buffer*)cookie;
 	bt_usb_dev* bdev = (bt_usb_dev*)snb_cookie(snbuf);
@@ -235,11 +216,7 @@ command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 
 
 void
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-acl_tx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
-#else
 acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
-#endif
 {
 	net_buffer* nbuf = (net_buffer*)cookie;
 	bt_usb_dev* bdev = GET_DEVICE(nbuf);
@@ -287,9 +264,6 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 
 	error = usb->queue_request(bdev->dev, bRequestType, bRequest,
 		value, wIndex, wLength,	snb_get(snbuf),
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-		wLength,
-#endif
 		command_complete, (void*) snbuf);
 
 	if (error != B_OK) {

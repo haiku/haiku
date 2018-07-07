@@ -12,12 +12,7 @@
 #include <net_device.h>
 
 #include <OS.h>
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #include <USB3.h>
-#else
-#include <USB_spec.h>
-#include <USB.h>
-#endif
 
 #include <util/list.h>
 #include <bluetooth/HCI/btHCI.h>
@@ -61,11 +56,7 @@ extern struct bluetooth_core_data_module_info* btCoreData;
 typedef struct bt_usb_dev bt_usb_dev;
 
 struct bt_usb_dev {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	usb_device		dev;          /* opaque handle */
-#else
-	usb_device*		dev;          /* opaque handle */
-#endif
 	hci_id					hdev; /* HCI device id*/
 	bluetooth_device*		ndev;
 

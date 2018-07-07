@@ -69,10 +69,8 @@ DeskbarReplicant::_Init()
 		return;
 
 	BResources resources(&file);
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (resources.InitCheck() < B_OK)
 		return;
-#endif
 
 	size_t size;
 	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE,
