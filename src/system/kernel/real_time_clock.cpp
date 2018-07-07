@@ -299,7 +299,7 @@ _user_get_timezone(int32 *_timezoneOffset, char *userName, size_t nameLength)
 
 	if (_timezoneOffset != NULL
 		&& (!IS_USER_ADDRESS(_timezoneOffset)
-			|| user_memcpy(_timezoneOffset, &offset, sizeof(time_t)) < B_OK))
+			|| user_memcpy(_timezoneOffset, &offset, sizeof(offset)) < B_OK))
 		return B_BAD_ADDRESS;
 
 	if (userName != NULL
