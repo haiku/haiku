@@ -1,18 +1,14 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan aironetwifi ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-# Enabling C++ structures in C only code
-Includes [ FGristFiles kernel_c++_structs.h ]
-	: <src!system!kernel>kernel_c++_struct_sizes.h ;
-
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] 
-	-Wno-format 
-	-Wno-unused 
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
+	-Wno-format
+	-Wno-unused
 	-Wno-uninitialized ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
@@ -24,6 +20,6 @@ KernelAddon aironetwifi :
 	if_an_pci.c
 	glue.c
 	:
-	libfreebsd_wlan.a
-	libfreebsd_network.a
+	libfreebsd11_wlan.a
+	libfreebsd11_network.a
 	;

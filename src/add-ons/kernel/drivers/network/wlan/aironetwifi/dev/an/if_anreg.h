@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/an/if_anreg.h 299544 2016-05-12 17:47:30Z scottl $
  */
 
 #define AN_TIMEOUT	65536
@@ -276,7 +276,7 @@ struct an_reply {
 #define AN_EV_ALLOC		0x0008	/* async alloc/reclaim completed */
 #define AN_EV_TX_CPY		0x0400
 #define AN_EV_TX_EXC		0x0004	/* async xmit completed with failure */
-#define AN_EV_TX		0x0002	/* async xmit completed succesfully */
+#define	AN_EV_TX		0x0002	/* async xmit completed successfully */
 #define AN_EV_RX		0x0001	/* async rx completed */
 
 #define AN_INTRS(x)	\
@@ -500,7 +500,6 @@ int	an_alloc_port		(device_t, int, int);
 int	an_alloc_memory		(device_t, int, int);
 int	an_alloc_aux_memory	(device_t, int, int);
 int	an_alloc_irq		(device_t, int, int);
-int	an_pci_probe	(device_t);
 int	an_probe	(device_t);
 int	an_shutdown	(device_t);
 void	an_resume	(device_t);
