@@ -434,8 +434,11 @@ bus_bind_intr(device_t dev, struct resource *res, int cpu)
 int bus_describe_intr(device_t dev, struct resource *irq, void *cookie,
 	const char* fmt, ...)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	if (dev->parent == NULL)
+		return EINVAL;
+
+	// we don't really support names for interrupts
+	return 0;
 }
 
 
