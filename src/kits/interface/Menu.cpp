@@ -388,7 +388,14 @@ BMenu::AttachedToWindow()
 	_GetOptionKey(sOptionKey);
 	_GetMenuKey(sMenuKey);
 
-	fAttachAborted = _AddDynamicItems();
+	// The menu should be added to the menu hierarchy and made visible if:
+	// * the mouse is over the menu,
+	// * the user has requested the menu via the keyboard.
+	// So if we don't pass keydown in here, keyboard navigation breaks since
+	// fAttachAborted will return false if the mouse isn't over the menu
+	bool keyDown = Supermenu() != NULL
+		? Supermenu()->fState == MENU_STATE_KEY_TO_SUBMENU : false;
+	fAttachAborted = _AddDynamicItems(keyDown);
 
 	if (!fAttachAborted) {
 		_CacheFontInfo();
@@ -1661,31 +1668,41 @@ BMenu::_Track(int* action, long start)
 			// that our window gets any update message to
 			// redraw itself
 			UnlockLooper();
-			int submenuAction = MENU_STATE_TRACKING;
-			BMenu* submenu = fSelected->Submenu();
-			submenu->_SetStickyMode(_IsStickyMode());
 
-			// The following call blocks until the submenu
-			// gives control back to us, either because the mouse
-			// pointer goes out of the submenu's bounds, or because
-			// the user closes the menu
-			BMenuItem* submenuItem = submenu->_Track(&submenuAction);
-			if (submenuAction == MENU_STATE_CLOSED) {
-				item = submenuItem;
-				fState = MENU_STATE_CLOSED;
-			} else if (submenuAction == MENU_STATE_KEY_LEAVE_SUBMENU) {
-				if (LockLooper()) {
-					BMenuItem* temp = fSelected;
-					// close the submenu:
-					_SelectItem(NULL);
-					// but reselect the item itself for user:
-					_SelectItem(temp, false);
-					UnlockLooper();
+			// To prevent NULL access violation, ensure a menu has actually
+			// been selected and that it has a submenu. Because keyboard and
+			// mouse interactions set selected items differently, the menu
+			// tracking thread needs to be careful in triggering the navigation
+			// to the submenu.
+			if (fSelected != NULL) {
+				BMenu* submenu = fSelected->Submenu();
+				int submenuAction = MENU_STATE_TRACKING;
+				if (submenu != NULL) {
+					submenu->_SetStickyMode(_IsStickyMode());
+
+					// The following call blocks until the submenu
+					// gives control back to us, either because the mouse
+					// pointer goes out of the submenu's bounds, or because
+					// the user closes the menu
+					BMenuItem* submenuItem = submenu->_Track(&submenuAction);
+					if (submenuAction == MENU_STATE_CLOSED) {
+						item = submenuItem;
+						fState = MENU_STATE_CLOSED;
+					} else if (submenuAction == MENU_STATE_KEY_LEAVE_SUBMENU) {
+						if (LockLooper()) {
+							BMenuItem* temp = fSelected;
+							// close the submenu:
+							_SelectItem(NULL);
+							// but reselect the item itself for user:
+							_SelectItem(temp, false);
+							UnlockLooper();
+						}
+						// cancel  key-nav state
+						fState = MENU_STATE_TRACKING;
+					} else
+						fState = MENU_STATE_TRACKING;
 				}
-				// cancel  key-nav state
-				fState = MENU_STATE_TRACKING;
-			} else
-				fState = MENU_STATE_TRACKING;
+			}
 			if (!LockLooper())
 				break;
 		} else if ((item = _HitTestItems(location, B_ORIGIN)) != NULL) {
