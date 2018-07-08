@@ -100,15 +100,16 @@ void dbg_printf_end();
 #define DEBUG_CONTEXT(x)													\
 {																			\
 	dbg_printf_begin();														\
-	__out(DEBUG_APP " [%Ld: %5ld] ", system_time(), DEBUG_THREAD);			\
+	__out(DEBUG_APP " [%" B_PRIdBIGTIME ": %5" B_PRId32 "] ", system_time(),\
+		DEBUG_THREAD);														\
 	x;																		\
 	dbg_printf_end();														\
 }
 #define DEBUG_CONTEXT_FUNCTION(prefix, x)									\
 {																			\
 	dbg_printf_begin();														\
-	__out(DEBUG_APP " [%Ld: %5ld] %s" prefix, system_time(), DEBUG_THREAD,	\
-		__PRETTY_FUNCTION__);												\
+	__out(DEBUG_APP " [%" B_PRIdBIGTIME ": %5" B_PRId32 "] %s" prefix, 		\
+		system_time(), DEBUG_THREAD, __PRETTY_FUNCTION__);					\
 	x;																		\
 	dbg_printf_end();														\
 }
