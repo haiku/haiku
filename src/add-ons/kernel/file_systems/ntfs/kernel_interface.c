@@ -94,14 +94,14 @@ fs_vnode_ops gNTFSVnodeOps = {
 	&fs_remove_vnode,
 
 	/* VM file access */
-	NULL,
-	NULL,
-	NULL,
+	NULL,	// can_page()
+	NULL,	// read_pages()
+	NULL,	// write_pages()
 
 	NULL,	// io()
 	NULL,	// cancel_io()
 
-	NULL,
+	NULL,	// get_file_map()
 
 	NULL,
 	NULL,	//&fs_set_flags,
@@ -201,7 +201,7 @@ static file_system_module_info sNTFSFileSystem = {
 	NULL,	// set_content_name
 	NULL,	// set_content_parameters
 	fs_initialize,
-	NULL	
+	NULL	// uninitialize
 };
 
 
