@@ -34,15 +34,18 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <disk_device_manager.h>
 #include <driver_settings.h>
 #include <KernelExport.h>
-#include <disk_device_manager.h>
+
+#include <kernel.h>
 
 #include "attributes.h"
 #include "fake_attributes.h"
 #include "lock.h"
 #include "ntfs.h"
 #include "volume_util.h"
+
 
 extern int	mkntfs_main(const char *devpath, const char *label);
 
@@ -1191,8 +1194,10 @@ fs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset, void *buf
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
 	size_t  size = *len;
-	int total = 0;
+	size_t total = 0;
 	status_t result = B_OK;
+	void *tempBuffer = NULL;
+	addr_t buffer = (addr_t)buf;
 
 	LOCK_VOL(ns);
 
@@ -1227,26 +1232,47 @@ fs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset, void *buf
 	if (offset + size > na->data_size)
 		size = na->data_size - offset;
 
-	while (size) {
-		off_t bytesRead = ntfs_attr_pread(na, offset, size, buf);
-		if (bytesRead < (s64)size) {
-			ntfs_log_error("ntfs_attr_pread returned less bytes than "
-				"requested.\n");
-		}
-		if (bytesRead <= 0) {
+	if (IS_USER_ADDRESS(buf)) {
+		tempBuffer = malloc(TEMP_BUFFER_SIZE);
+		if (tempBuffer == NULL) {
 			*len = 0;
-			result = EINVAL;
+			result = B_NO_MEMORY;
 			goto exit;
 		}
+	}
+
+	while (size > 0) {
+		s64 sizeToRead = size;
+		if (tempBuffer != NULL && size > TEMP_BUFFER_SIZE)
+			sizeToRead = TEMP_BUFFER_SIZE;
+		s64 bytesRead = ntfs_attr_pread(na, offset, sizeToRead,
+			tempBuffer != NULL ? tempBuffer : (void*)buffer);
+		if (bytesRead <= 0) {
+			*len = 0;
+			result = errno;
+			goto exit;
+		}
+		if (tempBuffer != NULL
+			&& user_memcpy((void*)buffer, tempBuffer, bytesRead) < B_OK) {
+			result = B_BAD_ADDRESS;
+			goto exit;
+		}
+		buffer += bytesRead;
 		size -= bytesRead;
 		offset += bytesRead;
 		total += bytesRead;
+		if (bytesRead < sizeToRead) {
+			ntfs_log_error("ntfs_attr_pread returned less bytes than "
+				"requested.\n");
+			break;
+		}
 	}
 
 	*len = total;
 	fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_ATIME);
 
 exit:
+	free(tempBuffer);
 	if (na != NULL)
 		ntfs_attr_close(na);
 
@@ -1271,9 +1297,11 @@ fs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset,
 	filecookie *cookie = (filecookie*)_cookie;
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
-	int total = 0;
+	size_t total = 0;
 	size_t size = *len;
 	status_t result = B_OK;
+	void *tempBuffer = NULL;
+	addr_t buffer = (addr_t)buf;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERROR("ntfs is read-only\n");
@@ -1324,21 +1352,42 @@ fs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset,
 			notify_stat_changed(ns->id, -1, node->vnid, B_STAT_SIZE);
 	}
 
-	while (size) {
-		off_t bytesWritten = ntfs_attr_pwrite(na, offset, size, buf);
-		if (bytesWritten < (s64)size) {
-			ERROR("fs_write - ntfs_attr_pwrite returned less bytes than "
-				"requested.\n");
+	if (IS_USER_ADDRESS(buf)) {
+		tempBuffer = malloc(TEMP_BUFFER_SIZE);
+		if (tempBuffer == NULL) {
+			*len = 0;
+			result = B_NO_MEMORY;
+			goto exit;
 		}
+	}
+
+	while (size > 0) {
+		s64 sizeToWrite = size;
+		if (tempBuffer != NULL) {
+			if (size > TEMP_BUFFER_SIZE)
+				sizeToWrite = TEMP_BUFFER_SIZE;
+			if (user_memcpy(tempBuffer, (void*)buffer, sizeToWrite) < B_OK) {
+				result = B_BAD_ADDRESS;
+				goto exit;
+			}
+		}
+		s64 bytesWritten = ntfs_attr_pwrite(na, offset, sizeToWrite,
+			tempBuffer != NULL ? tempBuffer : (void*)buffer);
 		if (bytesWritten <= 0) {
 			ERROR("fs_write - ntfs_attr_pwrite()<=0\n");
 			*len = 0;
 			result = EINVAL;
 			goto exit;
 		}
+		buffer += bytesWritten;
 		size -= bytesWritten;
 		offset += bytesWritten;
 		total += bytesWritten;
+		if (bytesWritten < sizeToWrite) {
+			ERROR("fs_write - ntfs_attr_pwrite returned less bytes than "
+				"requested.\n");
+			break;
+		}
 	}
 
 	*len = total;
@@ -1348,6 +1397,7 @@ fs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset,
 	TRACE("fs_write - OK\n");
 
 exit:
+	free(tempBuffer);
 	if (na != NULL)
 		ntfs_attr_close(na);
 exit2:

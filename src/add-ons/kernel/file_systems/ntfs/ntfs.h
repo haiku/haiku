@@ -59,6 +59,7 @@ extern "C" {
 #define 	ERROR dprintf
 
 #define 	DEV_FD(dev)	(*(int *)dev->d_private)
+#define TEMP_BUFFER_SIZE (B_PAGE_SIZE * 32)
 
 #define 	LOCK_VOL(vol) \
 { \
