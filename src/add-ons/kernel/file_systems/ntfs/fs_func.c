@@ -1242,10 +1242,11 @@ fs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset, void *buf
 	}
 
 	while (size > 0) {
+		s64 bytesRead;
 		s64 sizeToRead = size;
 		if (tempBuffer != NULL && size > TEMP_BUFFER_SIZE)
 			sizeToRead = TEMP_BUFFER_SIZE;
-		s64 bytesRead = ntfs_attr_pread(na, offset, sizeToRead,
+		bytesRead = ntfs_attr_pread(na, offset, sizeToRead,
 			tempBuffer != NULL ? tempBuffer : (void*)buffer);
 		if (bytesRead <= 0) {
 			*len = 0;
@@ -1362,6 +1363,7 @@ fs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset,
 	}
 
 	while (size > 0) {
+		s64 bytesWritten;
 		s64 sizeToWrite = size;
 		if (tempBuffer != NULL) {
 			if (size > TEMP_BUFFER_SIZE)
@@ -1371,7 +1373,7 @@ fs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t offset,
 				goto exit;
 			}
 		}
-		s64 bytesWritten = ntfs_attr_pwrite(na, offset, sizeToWrite,
+		bytesWritten = ntfs_attr_pwrite(na, offset, sizeToWrite,
 			tempBuffer != NULL ? tempBuffer : (void*)buffer);
 		if (bytesWritten <= 0) {
 			ERROR("fs_write - ntfs_attr_pwrite()<=0\n");
