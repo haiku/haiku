@@ -342,7 +342,7 @@ fs_initialize(int fd, partition_id partitionID, const char* name,
 
 
 status_t
-fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
+fs_mount(fs_volume *_vol, const char *device, uint32 flags, const char *args,
 	ino_t *_rootID)
 {
 	nspace *ns;

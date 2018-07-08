@@ -61,7 +61,7 @@ status_t	fs_scan_partition(int fd, partition_data *partition, void *_cookie);
 void		fs_free_identify_partition_cookie(partition_data *partition,
 				void *_cookie);
 
-status_t	fs_mount(fs_volume *_vol, const char *device, ulong flags,
+status_t	fs_mount(fs_volume *_vol, const char *device, uint32 flags,
 				const char *args, ino_t *vnid);
 status_t	fs_create_symlink(fs_volume *volume, fs_vnode *dir, const char *name,
 				const char *target, int mode);
