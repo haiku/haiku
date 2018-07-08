@@ -28,7 +28,7 @@ get_volume_name(struct exfat_entry* entry, char* name, size_t length)
 		return B_BAD_VALUE;
 
 	if (entry->type == EXFAT_ENTRY_TYPE_NOT_IN_USE)
-		name = "";
+		strlcpy(name, "", length);
 	else if (entry->type == EXFAT_ENTRY_TYPE_LABEL) {
 		ssize_t utf8Length = utf16le_to_utf8(entry->volume_label.name,
 			entry->volume_label.length, name, length);
