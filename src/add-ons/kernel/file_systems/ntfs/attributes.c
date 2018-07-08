@@ -8,21 +8,24 @@
  */
 
 
-#include <KernelExport.h>
-#include <SupportDefs.h>
-#include <TypeConstants.h>
+#include "attributes.h"
 
 #include <dirent.h>
 #include <fs_attr.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "attributes.h"
+#include <KernelExport.h>
+#include <SupportDefs.h>
+#include <TypeConstants.h>
+
+#include <kernel.h>
+
 #include "mime_table.h"
 #include "ntfs.h"
 
 
-const char* kHaikuAttrPrefix={"HAIKU-XATTR:"};
+const char* kHaikuAttrPrefix = { "HAIKU-XATTR:" };
 
 
 status_t
@@ -452,7 +455,7 @@ fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	attrcookie *cookie = (attrcookie *)_cookie;
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
-	status_t result = B_NO_ERROR;
+	status_t result = B_OK;
 
 	LOCK_VOL(ns);
 
@@ -478,13 +481,13 @@ exit:
 
 	UNLOCK_VOL(ns);
 
-	return B_NO_ERROR;
+	return result;
 }
 
 
 status_t
 fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
-	void *buffer, size_t *len)
+	void *_buffer, size_t *len)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
@@ -493,7 +496,9 @@ fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	ntfs_attr *na = NULL;
 	size_t size = *len;
 	int total = 0;
-	status_t result = B_NO_ERROR;
+	status_t result = B_OK;
+	void *tempBuffer = NULL;
+	addr_t buffer = (addr_t)_buffer;
 
 	if (pos < 0) {
 		*len = 0;
@@ -518,33 +523,46 @@ fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	pos += sizeof(uint32);
 
 	// it is a named stream
-	if (na != NULL) {
-		if (pos + size > na->data_size)
-			size = na->data_size - pos;
-
-		while (size) {
-			off_t bytesRead = ntfs_attr_pread(na, pos, size, buffer);
-			if (bytesRead < (s64)size) {
-				ERROR("ntfs_attr_pread returned less bytes than "
-					"requested.\n");
-			}
-			if (bytesRead <= 0) {
-				*len = 0;
-				result = EINVAL;
-				goto exit;
-			}
-			size -= bytesRead;
-			pos += bytesRead;
-			total += bytesRead;
-		}
-
-		*len = total;
-	} else {
+	if (na == NULL) {
 		*len = 0;
 		result = ENOENT; // TODO
+		goto exit;
 	}
 
+	if (pos + size > na->data_size)
+		size = na->data_size - pos;
+
+	while (size > 0) {
+		s64 sizeToRead = size;
+		if (tempBuffer != NULL && size > TEMP_BUFFER_SIZE)
+			sizeToRead = TEMP_BUFFER_SIZE;
+		s64 bytesRead = ntfs_attr_pread(na, pos, sizeToRead,
+			tempBuffer != NULL ? tempBuffer : (void*)buffer);
+		if (bytesRead <= 0) {
+			*len = 0;
+			result = errno;
+			goto exit;
+		}
+		if (tempBuffer != NULL
+			&& user_memcpy((void*)buffer, tempBuffer, bytesRead) < B_OK) {
+			result = B_BAD_ADDRESS;
+			goto exit;
+		}
+		buffer += bytesRead;
+		size -= bytesRead;
+		pos += bytesRead;
+		total += bytesRead;
+		if (bytesRead < sizeToRead) {
+			ntfs_log_error("ntfs_attr_pread returned less bytes than "
+				"requested.\n");
+			break;
+		}
+	}
+
+	*len = total;
+
 exit:
+	free(tempBuffer);
 	if (na != NULL)
 		ntfs_attr_close(na);
 	if (ni != NULL)
@@ -560,7 +578,7 @@ exit:
 
 status_t
 fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
-	const void *buffer, size_t *_length)
+	const void *_buffer, size_t *_length)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
@@ -570,8 +588,10 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	size_t  size = *_length;
 	char *attr_name = NULL;
 	char *real_name = NULL;
-	int total = 0;
-	status_t result = B_NO_ERROR;
+	size_t total = 0;
+	status_t result = B_OK;
+	void *tempBuffer = NULL;
+	addr_t buffer = (addr_t)_buffer;
 
 	TRACE("%s - ENTER  vnode: %d\n", __FUNCTION__, node->vnid);
 
@@ -600,40 +620,61 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	pos += sizeof(uint32);
 
 	// it is a named stream
-	if (na != NULL) {
-		if (cookie->omode & O_APPEND)
-			pos = na->data_size;
-
-		if (pos + size > na->data_size) {
-			ntfs_mark_free_space_outdated(ns);
-			if (ntfs_attr_truncate(na, pos + size))
-				size = na->data_size - pos;
-			else
-				notify_stat_changed(ns->id, -1, MREF(ni->mft_no), B_STAT_SIZE);
-		}
-
-		while (size) {
-			off_t bytesWritten = ntfs_attr_pwrite(na, pos, size, buffer);
-			if (bytesWritten < (s64)size)
-				ERROR("%s - ntfs_attr_pwrite returned less bytes than "
-					"requested.\n", __FUNCTION__);
-			if (bytesWritten <= 0) {
-				ERROR("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__);
-				*_length = 0;
-				result = EINVAL;
-				goto exit;
-			}
-			size -= bytesWritten;
-			pos += bytesWritten;
-			total += bytesWritten;
-		}
-
-		*_length = total;
-	} else {
+	if (na == NULL) {
 		*_length = 0;
 		result =  EINVAL;
 		goto exit;
 	}
+	if (cookie->omode & O_APPEND)
+		pos = na->data_size;
+
+	if (pos + size > na->data_size) {
+		ntfs_mark_free_space_outdated(ns);
+		if (ntfs_attr_truncate(na, pos + size))
+			size = na->data_size - pos;
+		else
+			notify_stat_changed(ns->id, -1, MREF(ni->mft_no), B_STAT_SIZE);
+	}
+
+	if (IS_USER_ADDRESS(_buffer)) {
+		tempBuffer = malloc(TEMP_BUFFER_SIZE);
+		if (tempBuffer == NULL) {
+			*_length = 0;
+			result = B_NO_MEMORY;
+			goto exit;
+		}
+	}
+
+	while (size > 0) {
+		s64 sizeToWrite = size;
+		if (tempBuffer != NULL) {
+			if (size > TEMP_BUFFER_SIZE)
+				sizeToWrite = TEMP_BUFFER_SIZE;
+			if (user_memcpy(tempBuffer, (void*)buffer, sizeToWrite) < B_OK) {
+				result = B_BAD_ADDRESS;
+				goto exit;
+			}
+		}
+		s64 bytesWritten = ntfs_attr_pwrite(na, pos, sizeToWrite,
+			tempBuffer != NULL ? tempBuffer : (void*)buffer);
+		if (bytesWritten <= 0) {
+			ERROR("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__);
+			*_length = 0;
+			result = EINVAL;
+			goto exit;
+		}
+		buffer += bytesWritten;
+		size -= bytesWritten;
+		pos += bytesWritten;
+		total += bytesWritten;
+		if (bytesWritten < sizeToWrite) {
+			ERROR("%s - ntfs_attr_pwrite returned less bytes than "
+				"requested.\n", __FUNCTION__);
+			break;
+		}
+	}
+
+	*_length = total;
 
 	if (ntfs_ucstombs(na->name, na->name_len, &attr_name, 0) >= 0) {
 		if (attr_name != NULL) {
@@ -647,6 +688,7 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	}
 
 exit:
+	free(tempBuffer);
 	if (na != NULL)
 		ntfs_attr_close(na);
 	if (ni != NULL)
