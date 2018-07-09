@@ -227,9 +227,9 @@ rule KernelArchitectureSetup architecture
 	switch $(cpu) {
 		case ppc :
 			HAIKU_BOOT_PLATFORM ?= openfirmware ;
-			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
-			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
 
 		case arm :
 			HAIKU_BOOT_PLATFORM ?= u-boot ;
