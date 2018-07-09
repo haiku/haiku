@@ -59,9 +59,9 @@ rule DefineDefaultBuildProfiles
 	DefineBuildProfile minimum-raw : image : "haiku-minimum.image" ;
 	DefineBuildProfile minimum-mmc : haiku-mmc-image : "haiku-minimum.mmc" ;
 	DefineBuildProfile minimum-vmware : vmware-image : "haiku-minimum.vmdk" ;
+	DefineBuildProfile minimum-cd : cd-image : "haiku-minimum.iso" ;
 	DefineBuildProfile minimum-anyboot : anyboot-image
 		: "haiku-minimum-anyboot.iso" ;
-
 
 	switch $(HAIKU_BUILD_PROFILE) {
 		case "release-*" : {
