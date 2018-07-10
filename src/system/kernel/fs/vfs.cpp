@@ -7534,7 +7534,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		volume = mount->volume;
 		while (volume) {
-			if (volume->ops->all_layers_mounted != NULL)
+			if (volume->ops != NULL && volume->ops->all_layers_mounted != NULL)
 				volume->ops->all_layers_mounted(volume);
 			volume = volume->super_volume;
 		}
