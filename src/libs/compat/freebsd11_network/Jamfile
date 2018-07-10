@@ -52,7 +52,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 rule MIIHeaderGen
 {
 	SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev mii ] ;
-	SEARCH on $(3) = $(SEARCH_SOURCE) ;
+	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
 
 	Depends $(1) : $(2) $(3) ;
 	MakeLocateArch $(<) ;
@@ -66,3 +66,22 @@ actions MIIHeaderGen1
 }
 
 MIIHeaderGen [ FGristFiles miidevs.h ] : miidevs : miidevs2h.awk ;
+
+rule USBDevsHeaderGen
+{
+    SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev usb ] ;
+	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
+
+    Depends $(1) : $(2) $(3) ;
+	MakeLocateArch $(<) ;
+	USBDevsHeaderGen1 $(1) : $(2) $(3) ;
+	LocalClean clean : $(<) ;
+}
+
+actions USBDevsHeaderGen1
+{
+    gawk -v HEADERFILE=$(1[1]) -v DATAFILE=$(1[2]) -f $(2[2]) $(2[1])
+}
+
+USBDevsHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs
+    : usbdevs2h.awk ;
