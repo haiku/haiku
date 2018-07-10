@@ -453,7 +453,7 @@ device_attach(device_t device)
 	if (result == 0)
 		atomic_or(&device->flags, DEVICE_ATTACHED);
 
-	if (result == 0)
+	if (result == 0 && HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
 		result = start_wlan(device);
 
 	return result;
@@ -467,8 +467,10 @@ device_detach(device_t device)
 		return B_ERROR;
 
 	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
-		&& device->methods.detach != NULL) {
-		int result = stop_wlan(device);
+			&& device->methods.detach != NULL) {
+		int result = 0;
+		if (HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
+			result = stop_wlan(device);
 		if (result != 0) {
 			atomic_or(&device->flags, DEVICE_ATTACHED);
 			return result;
