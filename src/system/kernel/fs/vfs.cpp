@@ -7497,7 +7497,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		status = mount->volume->file_system->mount(mount->volume, device, flags,
 			args, &rootID);
-		if (status != 0)
+		if (status != B_OK || mount->volume->ops == NULL)
 			goto err2;
 	} else {
 		status = path_to_vnode(path, true, &coveredNode, NULL, kernel);
@@ -7523,7 +7523,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		while (volume) {
 			status = volume->file_system->mount(volume, device, flags, args,
 				&rootID);
-			if (status != B_OK) {
+			if (status != B_OK || volume->ops == NULL) {
 				if (volume->sub_volume)
 					goto err4;
 				goto err3;
@@ -7534,7 +7534,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		volume = mount->volume;
 		while (volume) {
-			if (volume->ops != NULL && volume->ops->all_layers_mounted != NULL)
+			if (volume->ops->all_layers_mounted != NULL)
 				volume->ops->all_layers_mounted(volume);
 			volume = volume->super_volume;
 		}
