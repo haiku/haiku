@@ -468,8 +468,10 @@ wpi_attach(device_t dev)
 		| IEEE80211_C_PMGT		/* Station-side power mgmt */
 		;
 
+#ifndef __HAIKU__
 	ic->ic_cryptocaps =
 		  IEEE80211_CRYPTO_AES_CCM;
+#endif
 
 	/*
 	 * Read in the eeprom and also setup the channels for
