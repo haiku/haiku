@@ -112,6 +112,8 @@ init_wlan_stack(void)
 void
 uninit_wlan_stack(void)
 {
+	mtx_destroy(&ic_list_mtx);
+
 	if (sNotificationModule != NULL)
 		put_module(NET_NOTIFICATIONS_MODULE_NAME);
 }
