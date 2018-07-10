@@ -1,6 +1,7 @@
 /*
  * Copyright 2008, Marcus Overhagen. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009-2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef _SATA_REQUEST_H
 #define _SATA_REQUEST_H

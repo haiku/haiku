@@ -1,6 +1,7 @@
 /*
  * Copyright 2008, Marcus Overhagen. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009-2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 
 
@@ -11,6 +12,9 @@
 
 
 #define FIS_TYPE_REGISTER_HOST_TO_DEVICE 0x27
+
+#define ATA_D_LBA 		0x40	/* use LBA addressing */
+#define ATA_A_4BIT		0x08	/* 4 head bits */
 
 
 sata_request::sata_request()
@@ -60,7 +64,10 @@ sata_request::SetATACommand(uint8 command)
 	fFis[0] = FIS_TYPE_REGISTER_HOST_TO_DEVICE;
 	fFis[1] = 0x80;
 		// This is a command
+	if (fCcb != NULL)
+		fFis[1] |= fCcb->target_id & 0x0f;
 	fFis[2] = command;
+	fFis[15] = ATA_A_4BIT;
 }
 
 
@@ -71,8 +78,7 @@ sata_request::SetATA28Command(uint8 command, uint32 lba, uint8 sectorCount)
 	fFis[4] = lba & 0xff;
 	fFis[5] = (lba >> 8) & 0xff;
 	fFis[6] = (lba >> 16) & 0xff;
-	fFis[7] = 0x40 | ((lba >> 24) & 0x0f);
-		// device
+	fFis[7] = ATA_D_LBA | ((lba >> 24) & 0x0f);
 	fFis[12] = sectorCount & 0xff;
 }
 
@@ -84,8 +90,7 @@ sata_request::SetATA48Command(uint8 command, uint64 lba, uint16 sectorCount)
 	fFis[4] = lba & 0xff;
 	fFis[5] = (lba >> 8) & 0xff;
 	fFis[6] = (lba >> 16) & 0xff;
-	fFis[7] = 0x40;
-		// device
+	fFis[7] = ATA_D_LBA;
 	fFis[8] = (lba >> 24) & 0xff;
 	fFis[9] = (lba >> 32) & 0xff;
 	fFis[10] = (lba >> 40) & 0xff;
@@ -107,6 +112,7 @@ sata_request::SetATAPICommand(size_t transferLength)
 {
 	fIsATAPI = true;
 	SetATACommand(0xa0);
+	fFis[7] = ATA_D_LBA;
 	if (1 /* isPIO */) {
 		if (transferLength == 0)
 			transferLength = 2;
