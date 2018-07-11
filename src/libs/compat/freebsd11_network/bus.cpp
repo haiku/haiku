@@ -400,6 +400,9 @@ int
 bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 {
 	struct internal_intr *intr = (struct internal_intr *)arg;
+	if (intr == NULL)
+		return -1;
+
 	struct root_device_softc *root = (struct root_device_softc *)dev->root->softc;
 
 	if ((root->is_msi || root->is_msix) && gPCIx86 != NULL) {
