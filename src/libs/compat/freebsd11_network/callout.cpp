@@ -1,6 +1,7 @@
 /*
  * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
- * Distributed under the terms of the MIT License.
+ * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 
 
@@ -66,7 +67,8 @@ callout_thread(void* /*data*/)
 
 					c->c_func(c->c_arg);
 
-					if (mutex != NULL)
+					if (mutex != NULL
+							&& (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
 						mtx_unlock(mutex);
 
 					mutex_lock(&sLock);
