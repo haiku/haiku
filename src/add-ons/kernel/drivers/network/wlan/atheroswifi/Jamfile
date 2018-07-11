@@ -1,14 +1,14 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan atheroswifi ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] 
-	-Wno-format 
-	-Wno-unused 
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ]
+	-Wno-format
+	-Wno-unused
 	-Wno-uninitialized ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
@@ -20,18 +20,32 @@ Depends atheroswifi : atheroswifi_hal.o ;
 Depends atheroswifi : atheroswifi_rate.o ;
 
 KernelAddon atheroswifi :
+	glue.c
+
 	if_ath.c
+	if_ath_beacon.c
+	if_ath_btcoex.c
+	if_ath_btcoex_mci.c
+	if_ath_descdma.c
+	if_ath_ioctl.c
 	if_ath_pci.c
+	if_ath_led.c
+	if_ath_lna_div.c
 	if_ath_keycache.c
 	if_ath_sysctl.c
+	if_ath_rx.c
+	if_ath_rx_edma.c
+	if_ath_spectral.c
+	if_ath_tdma.c
 	if_ath_tx.c
+	if_ath_tx_edma.c
 	if_ath_tx_ht.c
-	glue.c
+
 	atheroswifi_hal.o
 	atheroswifi_rate.o
 	:
-	libfreebsd_wlan.a
-	libfreebsd_network.a
+	libfreebsd11_wlan.a
+	libfreebsd11_network.a
 	;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ] ;
@@ -119,11 +133,15 @@ KernelMergeObject atheroswifi_hal.o :
 	ar5416_recv.c
 	ar5416_reset.c
 	ar5416_xmit.c
+	ar5416_btcoex.c
+	ar5416_radar.c
+	ar5416_spectral.c
 
 	# RF backend for 5416 and 9160
 	ar2133.c
 
 	# AR9001 and AR9002 support
+	ar9285_btcoex.c
 	ar9130_attach.c
 	ar9130_eeprom.c
 	ar9130_phy.c

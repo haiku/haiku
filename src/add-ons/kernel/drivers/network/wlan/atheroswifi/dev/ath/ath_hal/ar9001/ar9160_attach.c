@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9001/ar9160_attach.c 272292 2014-09-30 03:19:29Z adrian $
  */
 #include "opt_ah.h"
 
@@ -68,8 +68,8 @@ ar9160AniSetup(struct ath_hal *ah)
 		.coarseHigh		= { -14, -14, -14, -14, -12 },
 		.coarseLow		= { -64, -64, -64, -64, -70 },
 		.firpwr			= { -78, -78, -78, -78, -80 },
-		.maxSpurImmunityLevel	= 2,
-		.cycPwrThr1		= { 2, 4, 6 },
+		.maxSpurImmunityLevel	= 7,
+		.cycPwrThr1		= { 2, 4, 6, 8, 10, 12, 14, 16 },
 		.maxFirstepLevel	= 2,	/* levels 0..2 */
 		.firstep		= { 0, 4, 8 },
 		.ofdmTrigHigh		= 500,
@@ -114,6 +114,7 @@ ar9160InitPLL(struct ath_hal *ah, const struct ieee80211_channel *chan)
 static struct ath_hal *
 ar9160Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_OPS_CONFIG *ah_config,
 	HAL_STATUS *status)
 {
 	struct ath_hal_5416 *ahp5416;
@@ -123,13 +124,13 @@ ar9160Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_STATUS ecode;
 	HAL_BOOL rfStatus;
 
-	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp5416 = ath_hal_malloc(sizeof (struct ath_hal_5416));
 	if (ahp5416 == AH_NULL) {
-		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -183,7 +184,7 @@ ar9160Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_INI_INIT(&AH5416(ah)->ah_ini_bank1, ar9160Bank1, 2);
 	HAL_INI_INIT(&AH5416(ah)->ah_ini_bank2, ar9160Bank2, 2);
 	HAL_INI_INIT(&AH5416(ah)->ah_ini_bank3, ar9160Bank3, 3);
-	HAL_INI_INIT(&AH5416(ah)->ah_ini_bank6, ar9160Bank6, 3);
+	HAL_INI_INIT(&AH5416(ah)->ah_ini_bank6, ar9160Bank6TPC, 3);
 	HAL_INI_INIT(&AH5416(ah)->ah_ini_bank7, ar9160Bank7, 2);
 	if (AR_SREV_SOWL_11(ah))
 		HAL_INI_INIT(&AH5416(ah)->ah_ini_addac, ar9160Addac_1_1, 2);
@@ -320,6 +321,8 @@ ar9160FillCapabilityInfo(struct ath_hal *ah)
 	pCap->halAutoSleepSupport = AH_FALSE;	/* XXX? */
 	pCap->halMbssidAggrSupport = AH_TRUE;
 	pCap->hal4AddrAggrSupport = AH_TRUE;
+	/* BB Read WAR */
+	pCap->halHasBBReadWar = AH_TRUE;
 
 	/* AR9160 is a 2x2 stream device */
 	pCap->halTxStreams = 2;

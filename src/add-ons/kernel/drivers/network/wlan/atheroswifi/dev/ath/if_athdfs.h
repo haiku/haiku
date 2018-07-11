@@ -26,16 +26,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/if_athdfs.h 244946 2013-01-02 01:36:10Z adrian $
  */
 #ifndef	__IF_ATHDFS_H__
 #define	__IF_ATHDFS_H__
 
 extern	int ath_dfs_attach(struct ath_softc *sc);
 extern	int ath_dfs_detach(struct ath_softc *sc);
-extern	void ath_dfs_radar_enable(struct ath_softc *,
+extern	int ath_dfs_radar_enable(struct ath_softc *,
     struct ieee80211_channel *chan);
-extern	void ath_dfs_process_phy_err(struct ath_softc *sc, const char *buf,
+extern	int ath_dfs_radar_disable(struct ath_softc *sc);
+extern	void ath_dfs_process_phy_err(struct ath_softc *sc, struct mbuf *m,
     uint64_t tsf, struct ath_rx_status *rxstat);
 extern	int ath_dfs_process_radar_event(struct ath_softc *sc,
     struct ieee80211_channel *chan);

@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5211/ar5211_misc.c 247286 2013-02-25 22:42:43Z adrian $
  */
 #include "opt_ah.h"
 
@@ -687,4 +687,41 @@ ar5211GetDiagState(struct ath_hal *ah, int request,
 		return AH_TRUE;
 	}
 	return AH_FALSE;
+}
+
+/*
+ * Return what percentage of the extension channel is busy.
+ * This is always disabled for AR5211 series NICs.
+ */
+uint32_t
+ar5211Get11nExtBusy(struct ath_hal *ah)
+{
+	return (0);
+}
+
+
+/*
+ * There's no channel survey support for the AR5211.
+ */
+HAL_BOOL
+ar5211GetMibCycleCounts(struct ath_hal *ah, HAL_SURVEY_SAMPLE *hsample)
+{
+
+	return (AH_FALSE);
+}
+
+void
+ar5211SetChainMasks(struct ath_hal *ah, uint32_t txchainmask,
+    uint32_t rxchainmask)
+{
+}
+
+void
+ar5211EnableDfs(struct ath_hal *ah, HAL_PHYERR_PARAM *pe)
+{
+}
+
+void
+ar5211GetDfsThresh(struct ath_hal *ah, HAL_PHYERR_PARAM *pe)
+{
 }

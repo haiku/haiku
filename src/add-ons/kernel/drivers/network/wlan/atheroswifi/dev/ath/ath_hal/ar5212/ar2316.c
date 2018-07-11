@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar2316.c 298939 2016-05-02 19:56:48Z pfg $
  */
 #include "opt_ah.h"
 
@@ -373,9 +373,9 @@ ar2316getGainBoundariesAndPdadcsForPowers(struct ath_hal *ah, uint16_t channel,
 	 * change pwr_I_0 to signed 5-bits.
 	 */
 	int16_t Pmin_t2[MAX_NUM_PDGAINS_PER_CHANNEL];
-	/* to accomodate -ve power levels later on. */
+	/* to accommodate -ve power levels later on. */
 	int16_t Pmax_t2[MAX_NUM_PDGAINS_PER_CHANNEL];
-	/* to accomodate -ve power levels later on */
+	/* to accommodate -ve power levels later on */
 	uint16_t numVpd = 0;
 	uint16_t Vpd_step;
 	int16_t tmpVal ; 

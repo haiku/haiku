@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5211/ar5211_recv.c 238278 2012-07-09 07:19:11Z adrian $
  */
 #include "opt_ah.h"
 
@@ -30,8 +30,10 @@
  * Get the RXDP.
  */
 uint32_t
-ar5211GetRxDP(struct ath_hal *ah)
+ar5211GetRxDP(struct ath_hal *ah, HAL_RX_QUEUE qtype)
 {
+
+	HALASSERT(qtype == HAL_RX_QUEUE_HP);
 	return OS_REG_READ(ah, AR_RXDP);
 }
 
@@ -39,8 +41,10 @@ ar5211GetRxDP(struct ath_hal *ah)
  * Set the RxDP.
  */
 void
-ar5211SetRxDP(struct ath_hal *ah, uint32_t rxdp)
+ar5211SetRxDP(struct ath_hal *ah, uint32_t rxdp, HAL_RX_QUEUE qtype)
 {
+
+	HALASSERT(qtype == HAL_RX_QUEUE_HP);
 	OS_REG_WRITE(ah, AR_RXDP, rxdp);
 	HALASSERT(OS_REG_READ(ah, AR_RXDP) == rxdp);
 }

@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5312/ar5312.h 290612 2015-11-09 15:59:42Z adrian $
  */
 #ifndef _ATH_AR5312_H_
 #define _ATH_AR5312_H_
@@ -62,8 +62,10 @@ extern  void ar5312SetupClock(struct ath_hal *ah, HAL_OPMODE opmode);
 extern  void ar5312RestoreClock(struct ath_hal *ah, HAL_OPMODE opmode);
 extern  void ar5312DumpState(struct ath_hal *ah);
 extern  HAL_BOOL ar5312Reset(struct ath_hal *ah, HAL_OPMODE opmode,
-              struct ieee80211_channel *chan,
-	      HAL_BOOL bChannelChange, HAL_STATUS *status);
+	    struct ieee80211_channel *chan,
+	      HAL_BOOL bChannelChange,
+	      HAL_RESET_TYPE resetType,
+	      HAL_STATUS *status);
 extern  HAL_BOOL ar5312ChipReset(struct ath_hal *ah,
 	      struct ieee80211_channel *chan);
 extern  HAL_BOOL ar5312SetPowerMode(struct ath_hal *ah, HAL_POWER_MODE mode,

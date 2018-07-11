@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9285_phy.h 251643 2013-06-12 06:01:53Z adrian $
  */
 #ifndef	__AR9285_PHY_H__
 #define	__AR9285_PHY_H__
@@ -31,16 +31,11 @@
 /*
  * Manipulate AR9285 antenna diversity configuration
  */
-struct ar9285_antcomb_conf {
-	uint8_t main_lna_conf;
-	uint8_t alt_lna_conf;
-	uint8_t fast_div_bias;
-};
 
 extern	void ar9285_antdiv_comb_conf_set(struct ath_hal *ah,
-		struct ar9285_antcomb_conf *antconf);
+		HAL_ANT_COMB_CONFIG *antconf);
 extern	void ar9285_antdiv_comb_conf_get(struct ath_hal *ah,
-		struct ar9285_antcomb_conf *antconf);
+		HAL_ANT_COMB_CONFIG *antconf);
 extern	HAL_BOOL ar9285_check_div_comb(struct ath_hal *ah);
 
 #endif

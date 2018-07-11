@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9285_cal.h 219481 2011-03-11 11:58:54Z adrian $
  */
 #ifndef	__AR9285_CAL_H__
 #define	__AR9285_CAL_H__

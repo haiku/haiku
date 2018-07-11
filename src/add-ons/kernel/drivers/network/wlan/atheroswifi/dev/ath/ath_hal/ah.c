@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah.c 298939 2016-05-02 19:56:48Z pfg $
  */
 #include "opt_ah.h"
 
@@ -24,6 +24,7 @@
 #include "ah_eeprom.h"			/* for 5ghz fast clock flag */
 
 #include "ar5416/ar5416reg.h"		/* NB: includes ar5212reg.h */
+#include "ar9003/ar9300_devid.h"
 
 /* linker set of registered chips */
 OS_SET_DECLARE(ah_chips, struct ath_hal_chip);
@@ -54,7 +55,9 @@ ath_hal_probe(uint16_t vendorid, uint16_t devid)
  */
 struct ath_hal*
 ath_hal_attach(uint16_t devid, HAL_SOFTC sc,
-	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata, HAL_STATUS *error)
+	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_OPS_CONFIG *ah_config,
+	HAL_STATUS *error)
 {
 	struct ath_hal_chip * const *pchip;
 
@@ -65,7 +68,8 @@ ath_hal_attach(uint16_t devid, HAL_SOFTC sc,
 		/* XXX don't have vendorid, assume atheros one works */
 		if (chip->probe(ATHEROS_VENDOR_ID, devid) == AH_NULL)
 			continue;
-		ah = chip->attach(devid, sc, st, sh, eepromdata, error);
+		ah = chip->attach(devid, sc, st, sh, eepromdata, ah_config,
+		    error);
 		if (ah != AH_NULL) {
 			/* copy back private state to public area */
 			ah->ah_devid = AH_PRIVATE(ah)->ah_devid;
@@ -87,38 +91,60 @@ ath_hal_mac_name(struct ath_hal *ah)
 	switch (ah->ah_macVersion) {
 	case AR_SREV_VERSION_CRETE:
 	case AR_SREV_VERSION_MAUI_1:
-		return "5210";
+		return "AR5210";
 	case AR_SREV_VERSION_MAUI_2:
 	case AR_SREV_VERSION_OAHU:
-		return "5211";
+		return "AR5211";
 	case AR_SREV_VERSION_VENICE:
-		return "5212";
+		return "AR5212";
 	case AR_SREV_VERSION_GRIFFIN:
-		return "2413";
+		return "AR2413";
 	case AR_SREV_VERSION_CONDOR:
-		return "5424";
+		return "AR5424";
 	case AR_SREV_VERSION_EAGLE:
-		return "5413";
+		return "AR5413";
 	case AR_SREV_VERSION_COBRA:
-		return "2415";
-	case AR_SREV_2425:
-		return "2425";
-	case AR_SREV_2417:
-		return "2417";
+		return "AR2415";
+	case AR_SREV_2425:	/* Swan */
+		return "AR2425";
+	case AR_SREV_2417:	/* Nala */
+		return "AR2417";
 	case AR_XSREV_VERSION_OWL_PCI:
-		return "5416";
+		return "AR5416";
 	case AR_XSREV_VERSION_OWL_PCIE:
-		return "5418";
+		return "AR5418";
 	case AR_XSREV_VERSION_HOWL:
-		return "9130";
+		return "AR9130";
 	case AR_XSREV_VERSION_SOWL:
-		return "9160";
+		return "AR9160";
 	case AR_XSREV_VERSION_MERLIN:
-		return "9280";
+		if (AH_PRIVATE(ah)->ah_ispcie)
+			return "AR9280";
+		return "AR9220";
 	case AR_XSREV_VERSION_KITE:
-		return "9285";
+		return "AR9285";
 	case AR_XSREV_VERSION_KIWI:
-		return "9287";
+		if (AH_PRIVATE(ah)->ah_ispcie)
+			return "AR9287";
+		return "AR9227";
+	case AR_SREV_VERSION_AR9380:
+		if (ah->ah_macRev >= AR_SREV_REVISION_AR9580_10)
+			return "AR9580";
+		return "AR9380";
+	case AR_SREV_VERSION_AR9460:
+		return "AR9460";
+	case AR_SREV_VERSION_AR9330:
+		return "AR9330";
+	case AR_SREV_VERSION_AR9340:
+		return "AR9340";
+	case AR_SREV_VERSION_QCA9550:
+		return "QCA9550";
+	case AR_SREV_VERSION_AR9485:
+		return "AR9485";
+	case AR_SREV_VERSION_QCA9565:
+		return "QCA9565";
+	case AR_SREV_VERSION_QCA9530:
+		return "QCA9530";
 	}
 	return "????";
 }
@@ -271,36 +297,42 @@ ath_hal_pkt_txtime(struct ath_hal *ah, const HAL_RATE_TABLE *rates, uint32_t fra
 
 	/* 11n frame - extract out the number of spatial streams */
 	numStreams = HT_RC_2_STREAMS(rc);
-	KASSERT(numStreams == 1 || numStreams == 2, ("number of spatial streams needs to be 1 or 2: MCS rate 0x%x!", rateix));
+	KASSERT(numStreams > 0 && numStreams <= 4,
+	    ("number of spatial streams needs to be 1..3: MCS rate 0x%x!",
+	    rateix));
 
 	return ath_computedur_ht(frameLen, rc, numStreams, isht40, shortPreamble);
 }
 
+static const uint16_t ht20_bps[32] = {
+    26, 52, 78, 104, 156, 208, 234, 260,
+    52, 104, 156, 208, 312, 416, 468, 520,
+    78, 156, 234, 312, 468, 624, 702, 780,
+    104, 208, 312, 416, 624, 832, 936, 1040
+};
+static const uint16_t ht40_bps[32] = {
+    54, 108, 162, 216, 324, 432, 486, 540,
+    108, 216, 324, 432, 648, 864, 972, 1080,
+    162, 324, 486, 648, 972, 1296, 1458, 1620,
+    216, 432, 648, 864, 1296, 1728, 1944, 2160
+};
+
 /*
  * Calculate the transmit duration of an 11n frame.
- * This only works for MCS0->MCS15.
  */
 uint32_t
-ath_computedur_ht(uint32_t frameLen, uint16_t rate, int streams, HAL_BOOL isht40,
-    HAL_BOOL isShortGI)
+ath_computedur_ht(uint32_t frameLen, uint16_t rate, int streams,
+    HAL_BOOL isht40, HAL_BOOL isShortGI)
 {
-	static const uint16_t ht20_bps[16] = {
-	    26, 52, 78, 104, 156, 208, 234, 260,
-	    52, 104, 156, 208, 312, 416, 468, 520
-	};
-	static const uint16_t ht40_bps[16] = {
-	    54, 108, 162, 216, 324, 432, 486, 540,
-	    108, 216, 324, 432, 648, 864, 972, 1080,
-	};
 	uint32_t bitsPerSymbol, numBits, numSymbols, txTime;
 
 	KASSERT(rate & IEEE80211_RATE_MCS, ("not mcs %d", rate));
-	KASSERT((rate &~ IEEE80211_RATE_MCS) < 16, ("bad mcs 0x%x", rate));
+	KASSERT((rate &~ IEEE80211_RATE_MCS) < 31, ("bad mcs 0x%x", rate));
 
 	if (isht40)
-		bitsPerSymbol = ht40_bps[rate & 0xf];
+		bitsPerSymbol = ht40_bps[rate & 0x1f];
 	else
-		bitsPerSymbol = ht20_bps[rate & 0xf];
+		bitsPerSymbol = ht20_bps[rate & 0x1f];
 	numBits = OFDM_PLCP_BITS + (frameLen << 3);
 	numSymbols = howmany(numBits, bitsPerSymbol);
 	if (isShortGI)
@@ -330,7 +362,7 @@ ath_hal_computetxtime(struct ath_hal *ah,
 
 	kbps = rates->info[rateix].rateKbps;
 	/*
-	 * index can be invalid duting dynamic Turbo transitions. 
+	 * index can be invalid during dynamic Turbo transitions. 
 	 * XXX
 	 */
 	if (kbps == 0)
@@ -394,6 +426,50 @@ ath_hal_computetxtime(struct ath_hal *ah,
 	return txTime;
 }
 
+int
+ath_hal_get_curmode(struct ath_hal *ah, const struct ieee80211_channel *chan)
+{
+	/*
+	 * Pick a default mode at bootup. A channel change is inevitable.
+	 */
+	if (!chan)
+		return HAL_MODE_11NG_HT20;
+
+	if (IEEE80211_IS_CHAN_TURBO(chan))
+		return HAL_MODE_TURBO;
+
+	/* check for NA_HT before plain A, since IS_CHAN_A includes NA_HT */
+	if (IEEE80211_IS_CHAN_5GHZ(chan) && IEEE80211_IS_CHAN_HT20(chan))
+		return HAL_MODE_11NA_HT20;
+	if (IEEE80211_IS_CHAN_5GHZ(chan) && IEEE80211_IS_CHAN_HT40U(chan))
+		return HAL_MODE_11NA_HT40PLUS;
+	if (IEEE80211_IS_CHAN_5GHZ(chan) && IEEE80211_IS_CHAN_HT40D(chan))
+		return HAL_MODE_11NA_HT40MINUS;
+	if (IEEE80211_IS_CHAN_A(chan))
+		return HAL_MODE_11A;
+
+	/* check for NG_HT before plain G, since IS_CHAN_G includes NG_HT */
+	if (IEEE80211_IS_CHAN_2GHZ(chan) && IEEE80211_IS_CHAN_HT20(chan))
+		return HAL_MODE_11NG_HT20;
+	if (IEEE80211_IS_CHAN_2GHZ(chan) && IEEE80211_IS_CHAN_HT40U(chan))
+		return HAL_MODE_11NG_HT40PLUS;
+	if (IEEE80211_IS_CHAN_2GHZ(chan) && IEEE80211_IS_CHAN_HT40D(chan))
+		return HAL_MODE_11NG_HT40MINUS;
+
+	/*
+	 * XXX For FreeBSD, will this work correctly given the DYN
+	 * chan mode (OFDM+CCK dynamic) ? We have pure-G versions DYN-BG..
+	 */
+	if (IEEE80211_IS_CHAN_G(chan))
+		return HAL_MODE_11G;
+	if (IEEE80211_IS_CHAN_B(chan))
+		return HAL_MODE_11B;
+
+	HALASSERT(0);
+	return HAL_MODE_11NG_HT20;
+}
+
+
 typedef enum {
 	WIRELESS_MODE_11a   = 0,
 	WIRELESS_MODE_TURBO = 1,
@@ -444,6 +520,13 @@ ath_hal_mac_clks(struct ath_hal *ah, u_int usecs)
 			clks <<= 1;
 	} else
 		clks = usecs * CLOCK_RATE[WIRELESS_MODE_11b];
+
+	/* Compensate for half/quarter rate */
+	if (c != AH_NULL && IEEE80211_IS_CHAN_HALF(c))
+		clks = clks / 2;
+	else if (c != AH_NULL && IEEE80211_IS_CHAN_QUARTER(c))
+		clks = clks / 4;
+
 	return clks;
 }
 
@@ -615,6 +698,10 @@ ath_hal_getcapability(struct ath_hal *ah, HAL_CAPABILITY_TYPE type,
 		return pCap->hal4AddrAggrSupport ? HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_EXT_CHAN_DFS:
 		return pCap->halExtChanDfsSupport ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_RX_STBC:
+		return pCap->halRxStbcSupport ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_TX_STBC:
+		return pCap->halTxStbcSupport ? HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_COMBINED_RADAR_RSSI:
 		return pCap->halUseCombinedRadarRssi ? HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_AUTO_SLEEP:
@@ -626,13 +713,47 @@ ath_hal_getcapability(struct ath_hal *ah, HAL_CAPABILITY_TYPE type,
 	case HAL_CAP_REG_FLAG:
 		*result = AH_PRIVATE(ah)->ah_currentRDext;
 		return HAL_OK;
+	case HAL_CAP_ENHANCED_DMA_SUPPORT:
+		return pCap->halEnhancedDmaSupport ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_NUM_TXMAPS:
+		*result = pCap->halNumTxMaps;
+		return HAL_OK;
+	case HAL_CAP_TXDESCLEN:
+		*result = pCap->halTxDescLen;
+		return HAL_OK;
+	case HAL_CAP_TXSTATUSLEN:
+		*result = pCap->halTxStatusLen;
+		return HAL_OK;
+	case HAL_CAP_RXSTATUSLEN:
+		*result = pCap->halRxStatusLen;
+		return HAL_OK;
+	case HAL_CAP_RXFIFODEPTH:
+		switch (capability) {
+		case HAL_RX_QUEUE_HP:
+			*result = pCap->halRxHpFifoDepth;
+			return HAL_OK;
+		case HAL_RX_QUEUE_LP:
+			*result = pCap->halRxLpFifoDepth;
+			return HAL_OK;
+		default:
+			return HAL_ENOTSUPP;
+	}
+	case HAL_CAP_RXBUFSIZE:
+	case HAL_CAP_NUM_MR_RETRIES:
+		*result = pCap->halNumMRRetries;
+		return HAL_OK;
 	case HAL_CAP_BT_COEX:
 		return pCap->halBtCoexSupport ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_SPECTRAL_SCAN:
+		return pCap->halSpectralScanSupport ? HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_HT20_SGI:
 		return pCap->halHTSGI20Support ? HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_RXTSTAMP_PREC:	/* rx desc tstamp precision (bits) */
 		*result = pCap->halTstampPrecision;
 		return HAL_OK;
+	case HAL_CAP_ANT_DIV_COMB:	/* AR9285/AR9485 LNA diversity */
+		return pCap->halAntDivCombSupport ? HAL_OK  : HAL_ENOTSUPP;
+
 	case HAL_CAP_ENHANCED_DFS_SUPPORT:
 		return pCap->halEnhancedDfsSupport ? HAL_OK : HAL_ENOTSUPP;
 
@@ -659,6 +780,17 @@ ath_hal_getcapability(struct ath_hal *ah, HAL_CAPABILITY_TYPE type,
 		return pCap->halHasRxSelfLinkedTail ? HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_LONG_RXDESC_TSF:		/* 32 bit TSF in RX descriptor? */
 		return pCap->halHasLongRxDescTsf ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_BB_READ_WAR:		/* Baseband read WAR */
+		return pCap->halHasBBReadWar? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_SERIALISE_WAR:		/* PCI register serialisation */
+		return pCap->halSerialiseRegWar ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_MFP:			/* Management frame protection setting */
+		*result = pCap->halMfpSupport;
+		return HAL_OK;
+	case HAL_CAP_RX_LNA_MIXING:	/* Hardware uses an RX LNA mixer to map 2 antennas to a 1 stream receiver */
+		return pCap->halRxUsingLnaMixing ? HAL_OK : HAL_ENOTSUPP;
+	case HAL_CAP_DO_MYBEACON:	/* Hardware supports filtering my-beacons */
+		return pCap->halRxDoMyBeacon ? HAL_OK : HAL_ENOTSUPP;
 	default:
 		return HAL_EINVAL;
 	}
@@ -721,10 +853,11 @@ ath_hal_getregdump(struct ath_hal *ah, const HAL_REGRANGE *regs,
 	int i;
 
 	for (i = 0; space >= 2*sizeof(uint32_t); i++) {
-		u_int r = regs[i].start;
-		u_int e = regs[i].end;
-		*dp++ = (r<<16) | e;
-		space -= sizeof(uint32_t);
+		uint32_t r = regs[i].start;
+		uint32_t e = regs[i].end;
+		*dp++ = r;
+		*dp++ = e;
+		space -= 2*sizeof(uint32_t);
 		do {
 			*dp++ = OS_REG_READ(ah, r);
 			r += sizeof(uint32_t);
@@ -748,6 +881,7 @@ ath_hal_getdiagstate(struct ath_hal *ah, int request,
 	const void *args, uint32_t argsize,
 	void **result, uint32_t *resultsize)
 {
+
 	switch (request) {
 	case HAL_DIAG_REVS:
 		*result = &AH_PRIVATE(ah)->ah_devid;
@@ -804,6 +938,10 @@ ath_hal_getdiagstate(struct ath_hal *ah, int request,
 			AH_PRIVATE(ah)->ah_11nCompat = *(const uint32_t *)args;
 		} else
 			return AH_FALSE;
+		return AH_TRUE;
+	case HAL_DIAG_CHANSURVEY:
+		*result = &AH_PRIVATE(ah)->ah_chansurvey;
+		*resultsize = sizeof(HAL_CHANNEL_SURVEY);
 		return AH_TRUE;
 	}
 	return AH_FALSE;
@@ -940,7 +1078,7 @@ ath_hal_getChanNoise(struct ath_hal *ah, const struct ieee80211_channel *chan)
  * populated with values from NOISE_FLOOR[] + ath_hal_getNfAdjust().
  *
  * The caller must supply ctl/ext NF arrays which are at least
- * AH_MIMO_MAX_CHAINS entries long.
+ * AH_MAX_CHAINS entries long.
  */
 int
 ath_hal_get_mimo_chan_noise(struct ath_hal *ah,
@@ -956,7 +1094,7 @@ ath_hal_get_mimo_chan_noise(struct ath_hal *ah,
 		HALDEBUG(ah, HAL_DEBUG_NFCAL,
 		    "%s: invalid channel %u/0x%x; no mapping\n",
 		    __func__, chan->ic_freq, chan->ic_flags);
-		for (i = 0; i < AH_MIMO_MAX_CHAINS; i++) {
+		for (i = 0; i < AH_MAX_CHAINS; i++) {
 			nf_ctl[i] = nf_ext[i] = 0;
 		}
 		return 0;
@@ -964,7 +1102,7 @@ ath_hal_get_mimo_chan_noise(struct ath_hal *ah,
 
 	/* Return 0 if there's no valid MIMO values (yet) */
 	if (! (ichan->privFlags & CHANNEL_MIMO_NF_VALID)) {
-		for (i = 0; i < AH_MIMO_MAX_CHAINS; i++) {
+		for (i = 0; i < AH_MAX_CHAINS; i++) {
 			nf_ctl[i] = nf_ext[i] = 0;
 		}
 		return 0;
@@ -977,7 +1115,7 @@ ath_hal_get_mimo_chan_noise(struct ath_hal *ah,
 		 * stations which have a very low RSSI, below the
 		 * 'normalised' NF values in NOISE_FLOOR[].
 		 */
-		for (i = 0; i < AH_MIMO_MAX_CHAINS; i++) {
+		for (i = 0; i < AH_MAX_CHAINS; i++) {
 			nf_ctl[i] = nf_ext[i] = NOISE_FLOOR[mode] +
 			    ath_hal_getNfAdjust(ah, ichan);
 		}
@@ -996,7 +1134,7 @@ ath_hal_get_mimo_chan_noise(struct ath_hal *ah,
 		 * don't "wrap" when RSSI is less than the "adjusted" NF value.
 		 * ("Adjust" here is via ichan->noiseFloorAdjust.)
 		 */
-		for (i = 0; i < AH_MIMO_MAX_CHAINS; i++) {
+		for (i = 0; i < AH_MAX_CHAINS; i++) {
 			nf_ctl[i] = ichan->noiseFloorCtl[i] + ath_hal_getNfAdjust(ah, ichan);
 			nf_ext[i] = ichan->noiseFloorExt[i] + ath_hal_getNfAdjust(ah, ichan);
 		}
@@ -1257,4 +1395,75 @@ ath_hal_getcca(struct ath_hal *ah)
 	if (ath_hal_getcapability(ah, HAL_CAP_DIAG, 0, &diag) != HAL_OK)
 		return 1;
 	return ((diag & 0x500000) == 0);
+}
+
+/*
+ * This routine is only needed when supporting EEPROM-in-RAM setups
+ * (eg embedded SoCs and on-board PCI/PCIe devices.)
+ */
+/* NB: This is in 16 bit words; not bytes */
+/* XXX This doesn't belong here!  */
+#define ATH_DATA_EEPROM_SIZE    2048
+
+HAL_BOOL
+ath_hal_EepromDataRead(struct ath_hal *ah, u_int off, uint16_t *data)
+{
+	if (ah->ah_eepromdata == AH_NULL) {
+		HALDEBUG(ah, HAL_DEBUG_ANY, "%s: no eeprom data!\n", __func__);
+		return AH_FALSE;
+	}
+	if (off > ATH_DATA_EEPROM_SIZE) {
+		HALDEBUG(ah, HAL_DEBUG_ANY, "%s: offset %x > %x\n",
+		    __func__, off, ATH_DATA_EEPROM_SIZE);
+		return AH_FALSE;
+	}
+	(*data) = ah->ah_eepromdata[off];
+	return AH_TRUE;
+}
+
+/*
+ * Do a 2GHz specific MHz->IEEE based on the hardware
+ * frequency.
+ *
+ * This is the unmapped frequency which is programmed into the hardware.
+ */
+int
+ath_hal_mhz2ieee_2ghz(struct ath_hal *ah, int freq)
+{
+
+	if (freq == 2484)
+		return 14;
+	if (freq < 2484)
+		return ((int) freq - 2407) / 5;
+	else
+		return 15 + ((freq - 2512) / 20);
+}
+
+/*
+ * Clear the current survey data.
+ *
+ * This should be done during a channel change.
+ */
+void
+ath_hal_survey_clear(struct ath_hal *ah)
+{
+
+	OS_MEMZERO(&AH_PRIVATE(ah)->ah_chansurvey,
+	    sizeof(AH_PRIVATE(ah)->ah_chansurvey));
+}
+
+/*
+ * Add a sample to the channel survey.
+ */
+void
+ath_hal_survey_add_sample(struct ath_hal *ah, HAL_SURVEY_SAMPLE *hs)
+{
+	HAL_CHANNEL_SURVEY *cs;
+
+	cs = &AH_PRIVATE(ah)->ah_chansurvey;
+
+	OS_MEMCPY(&cs->samples[cs->cur_sample], hs, sizeof(*hs));
+	cs->samples[cs->cur_sample].seq_num = cs->cur_seq;
+	cs->cur_sample = (cs->cur_sample + 1) % CHANNEL_SURVEY_SAMPLE_COUNT;
+	cs->cur_seq++;
 }

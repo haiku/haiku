@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9285_reset.c 251655 2013-06-12 14:52:57Z adrian $
  */
 
 /*
@@ -38,8 +38,9 @@
 #include "ar9002/ar9002phy.h"
 #include "ar9002/ar9285phy.h"
 #include "ar9002/ar9285an.h"
+#include "ar9002/ar9285_diversity.h"
 
-/* Eeprom versioning macros. Returns true if the version is equal or newer than the ver specified */ 
+/* Eeprom versioning macros. Returns true if the version is equal or newer than the ver specified */
 #define	EEP_MINOR(_ah) \
 	(AH_PRIVATE(_ah)->ah_eeversion & AR5416_EEP_VER_MINOR_MASK)
 #define IS_EEP_MINOR_V2(_ah)	(EEP_MINOR(_ah) >= AR5416_EEP_MINOR_VER_2)
@@ -51,16 +52,16 @@
 #define RTC_PLL_SETTLE_DELAY    1000    /* 1 ms     */
 
 static HAL_BOOL ar9285SetPowerPerRateTable(struct ath_hal *ah,
-	struct ar5416eeprom_4k *pEepData, 
+	struct ar5416eeprom_4k *pEepData,
 	const struct ieee80211_channel *chan, int16_t *ratesArray,
 	uint16_t cfgCtl, uint16_t AntennaReduction,
-	uint16_t twiceMaxRegulatoryPower, 
+	uint16_t twiceMaxRegulatoryPower,
 	uint16_t powerLimit);
 static HAL_BOOL ar9285SetPowerCalTable(struct ath_hal *ah,
 	struct ar5416eeprom_4k *pEepData,
 	const struct ieee80211_channel *chan,
 	int16_t *pTxPowerIndexOffset);
-static void ar9285GetGainBoundariesAndPdadcs(struct ath_hal *ah, 
+static void ar9285GetGainBoundariesAndPdadcs(struct ath_hal *ah,
 	const struct ieee80211_channel *chan, CAL_DATA_PER_FREQ_4K *pRawDataSet,
 	uint8_t * bChans, uint16_t availPiers,
 	uint16_t tPdGainOverlap, int16_t *pMinCalPower,
@@ -76,11 +77,9 @@ ar9285SetTransmitPower(struct ath_hal *ah,
 
     MODAL_EEP4K_HEADER	*pModal;
     struct ath_hal_5212 *ahp = AH5212(ah);
-    int16_t		ratesArray[Ar5416RateSize];
     int16_t		txPowerIndexOffset = 0;
-    uint8_t		ht40PowerIncForPdadc = 2;	
     int			i;
-    
+
     uint16_t		cfgCtl;
     uint16_t		powerLimit;
     uint16_t		twiceAntennaReduction;
@@ -91,22 +90,24 @@ ar9285SetTransmitPower(struct ath_hal *ah,
 
     HALASSERT(AH_PRIVATE(ah)->ah_eeversion >= AR_EEPROM_VER14_1);
 
+    AH5416(ah)->ah_ht40PowerIncForPdadc = 2;
+
     /* Setup info for the actual eeprom */
-    OS_MEMZERO(ratesArray, sizeof(ratesArray));
+    OS_MEMZERO(AH5416(ah)->ah_ratesArray, sizeof(AH5416(ah)->ah_ratesArray));
     cfgCtl = ath_hal_getctl(ah, chan);
     powerLimit = chan->ic_maxregpower * 2;
     twiceAntennaReduction = chan->ic_maxantgain;
-    twiceMaxRegulatoryPower = AH_MIN(MAX_RATE_POWER, AH_PRIVATE(ah)->ah_powerLimit); 
+    twiceMaxRegulatoryPower = AH_MIN(MAX_RATE_POWER, AH_PRIVATE(ah)->ah_powerLimit);
     pModal = &pEepData->modalHeader;
     HALDEBUG(ah, HAL_DEBUG_RESET, "%s Channel=%u CfgCtl=%u\n",
-	__func__,chan->ic_freq, cfgCtl );      
-  
+	__func__,chan->ic_freq, cfgCtl );
+
     if (IS_EEP_MINOR_V2(ah)) {
-        ht40PowerIncForPdadc = pModal->ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ht40PowerIncForPdadc = pModal->ht40PowerIncForPdadc;
     }
- 
+
     if (!ar9285SetPowerPerRateTable(ah, pEepData,  chan,
-                                    &ratesArray[0],cfgCtl,
+                                    &AH5416(ah)->ah_ratesArray[0],cfgCtl,
                                     twiceAntennaReduction,
 				    twiceMaxRegulatoryPower, powerLimit)) {
         HALDEBUG(ah, HAL_DEBUG_ANY,
@@ -119,15 +120,16 @@ ar9285SetTransmitPower(struct ath_hal *ah,
 	    __func__);
         return AH_FALSE;
     }
-  
-    maxPower = AH_MAX(ratesArray[rate6mb], ratesArray[rateHt20_0]);
-    maxPower = AH_MAX(maxPower, ratesArray[rate1l]);
+
+    maxPower = AH_MAX(AH5416(ah)->ah_ratesArray[rate6mb],
+      AH5416(ah)->ah_ratesArray[rateHt20_0]);
+    maxPower = AH_MAX(maxPower, AH5416(ah)->ah_ratesArray[rate1l]);
 
     if (IEEE80211_IS_CHAN_HT40(chan)) {
-        maxPower = AH_MAX(maxPower, ratesArray[rateHt40_0]);
+        maxPower = AH_MAX(maxPower, AH5416(ah)->ah_ratesArray[rateHt40_0]);
     }
 
-    ahp->ah_tx6PowerInHalfDbm = maxPower;   
+    ahp->ah_tx6PowerInHalfDbm = maxPower;
     AH_PRIVATE(ah)->ah_maxPowerLevel = maxPower;
     ahp->ah_txPowerIndexOffset = txPowerIndexOffset;
 
@@ -135,18 +137,18 @@ ar9285SetTransmitPower(struct ath_hal *ah,
      * txPowerIndexOffset is set by the SetPowerTable() call -
      *  adjust the rate table (0 offset if rates EEPROM not loaded)
      */
-    for (i = 0; i < N(ratesArray); i++) {
-        ratesArray[i] = (int16_t)(txPowerIndexOffset + ratesArray[i]);
+    for (i = 0; i < N(AH5416(ah)->ah_ratesArray); i++) {
+        AH5416(ah)->ah_ratesArray[i] = (int16_t)(txPowerIndexOffset + AH5416(ah)->ah_ratesArray[i]);
 	/* -5 dBm offset for Merlin and later; this includes Kite */
-	ratesArray[i] -= AR5416_PWR_TABLE_OFFSET_DB * 2;
-        if (ratesArray[i] > AR5416_MAX_RATE_POWER)
-            ratesArray[i] = AR5416_MAX_RATE_POWER;
-	if (ratesArray[i] < 0)
-		ratesArray[i] = 0;
+	AH5416(ah)->ah_ratesArray[i] -= AR5416_PWR_TABLE_OFFSET_DB * 2;
+        if (AH5416(ah)->ah_ratesArray[i] > AR5416_MAX_RATE_POWER)
+            AH5416(ah)->ah_ratesArray[i] = AR5416_MAX_RATE_POWER;
+	if (AH5416(ah)->ah_ratesArray[i] < 0)
+		AH5416(ah)->ah_ratesArray[i] = 0;
     }
 
 #ifdef AH_EEPROM_DUMP
-    ar5416PrintPowerPerRate(ah, ratesArray);
+    ar5416PrintPowerPerRate(ah, AH5416(ah)->ah_ratesArray);
 #endif
 
     /*
@@ -157,18 +159,26 @@ ar9285SetTransmitPower(struct ath_hal *ah,
      * XXX handle overflow/too high power level?
      */
     if (IEEE80211_IS_CHAN_HT40(chan)) {
-        ratesArray[rateHt40_0] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_1] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_2] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_3] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_4] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_5] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_6] += ht40PowerIncForPdadc;
-        ratesArray[rateHt40_7] += ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_0] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_1] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_2] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_3] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_4] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_5] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_6] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
+        AH5416(ah)->ah_ratesArray[rateHt40_7] +=
+          AH5416(ah)->ah_ht40PowerIncForPdadc;
     }
 
     /* Write the TX power rate registers */
-    ar5416WriteTxPowerRateRegisters(ah, chan, ratesArray);
+    ar5416WriteTxPowerRateRegisters(ah, chan, AH5416(ah)->ah_ratesArray);
 
     return AH_TRUE;
 #undef POW_SM
@@ -352,13 +362,8 @@ ar9285SetBoardValues(struct ath_hal *ah, const struct ieee80211_channel *chan)
 	if (AR_SREV_9271(ah) || AR_SREV_KITE(ah)) {
 		uint8_t bb_desired_scale = (pModal->bb_scale_smrt_antenna & EEP_4K_BB_DESIRED_SCALE_MASK);
 		if ((eep->baseEepHeader.txGainType == 0) && (bb_desired_scale != 0)) {
-#ifndef __HAIKU__
-			ath_hal_printf(ah, "[ath]: adjusting cck tx gain factor\n");
-#endif
 			uint32_t pwrctrl, mask, clr;
-#ifdef __HAIKU__
 			ath_hal_printf(ah, "[ath]: adjusting cck tx gain factor\n");
-#endif
 
 			mask = (1<<0) | (1<<5) | (1<<10) | (1<<15) | (1<<20) | (1<<25);
 			pwrctrl = mask * bb_desired_scale;
@@ -391,7 +396,7 @@ static HAL_BOOL
 ar9285SetPowerPerRateTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
                            const struct ieee80211_channel *chan,
                            int16_t *ratesArray, uint16_t cfgCtl,
-                           uint16_t AntennaReduction, 
+                           uint16_t AntennaReduction,
                            uint16_t twiceMaxRegulatoryPower,
                            uint16_t powerLimit)
 {
@@ -428,7 +433,7 @@ ar9285SetPowerPerRateTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
 	/* XXX setup for 5212 use (really used?) */
 	ath_hal_eepromSet(ah, AR_EEP_ANTGAINMAX_2, twiceLargestAntenna);
 
-	/* 
+	/*
 	 * scaledPower is the minimum of the user input power level and
 	 * the regulatory allowed power level
 	 */
@@ -484,7 +489,7 @@ ar9285SetPowerPerRateTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
 
 			/* compare test group from regulatory channel list with test mode from pCtlMode list */
 			if ((((cfgCtl & ~CTL_MODE_M) | (pCtlMode[ctlMode] & CTL_MODE_M)) == pEepData->ctlIndex[i]) ||
-				(((cfgCtl & ~CTL_MODE_M) | (pCtlMode[ctlMode] & CTL_MODE_M)) == 
+				(((cfgCtl & ~CTL_MODE_M) | (pCtlMode[ctlMode] & CTL_MODE_M)) ==
 				 ((pEepData->ctlIndex[i] & CTL_MODE_M) | SD_NO_CTL))) {
 				rep = &(pEepData->ctlData[i]);
 				twiceMinEdgePower = ar5416GetMaxEdgePower(freq,
@@ -571,12 +576,12 @@ ar9285SetPowerCalTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
     uint32_t regChainOffset;
 
     OS_MEMZERO(xpdGainValues, sizeof(xpdGainValues));
-    
+
     xpdMask = pEepData->modalHeader.xpdGain;
 
     if (IS_EEP_MINOR_V2(ah)) {
         pdGainOverlap_t2 = pEepData->modalHeader.pdGainOverlap;
-    } else { 
+    } else {
     	pdGainOverlap_t2 = (uint16_t)(MS(OS_REG_READ(ah, AR_PHY_TPCRG5), AR_PHY_TPCRG5_PD_GAIN_OVERLAP));
     }
 
@@ -595,7 +600,7 @@ ar9285SetPowerCalTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
             numXpdGain++;
         }
     }
-    
+
     /* Write the detector gain biases and their number */
     ar5416WriteDetectorGainBiases(ah, numXpdGain, xpdGainValues);
 
@@ -616,7 +621,7 @@ ar9285SetPowerCalTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
                  * negative or greater than 0.  Need to offset the power
                  * values by the amount of minPower for griffin
                  */
-		ar5416SetGainBoundariesClosedLoop(ah, i, pdGainOverlap_t2, gainBoundaries); 
+		ar5416SetGainBoundariesClosedLoop(ah, i, pdGainOverlap_t2, gainBoundaries);
             }
 
             /* Write the power values into the baseband power table */
@@ -629,7 +634,7 @@ ar9285SetPowerCalTable(struct ath_hal *ah, struct ar5416eeprom_4k *pEepData,
 }
 
 static void
-ar9285GetGainBoundariesAndPdadcs(struct ath_hal *ah, 
+ar9285GetGainBoundariesAndPdadcs(struct ath_hal *ah,
                                  const struct ieee80211_channel *chan,
 				 CAL_DATA_PER_FREQ_4K *pRawDataSet,
                                  uint8_t * bChans,  uint16_t availPiers,

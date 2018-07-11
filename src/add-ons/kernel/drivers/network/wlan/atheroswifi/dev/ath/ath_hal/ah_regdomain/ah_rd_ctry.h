@@ -15,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_regdomain/ah_rd_ctry.h 224226 2011-07-20 12:46:58Z adrian $
  */
 
 #ifndef	__AH_REGDOMAIN_CTRY_H__

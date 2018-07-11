@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar5212desc.h 243168 2012-11-17 02:00:33Z adrian $
  */
 #ifndef _ATH_AR5212_DESC_H_
 #define _ATH_AR5212_DESC_H_
@@ -22,7 +22,6 @@
 /*
  * Hardware-specific descriptor structures.
  */
-#include "ah_desc.h"
 
 /*
  * AR5212-specific tx/rx descriptor definition.

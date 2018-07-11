@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_sysctl.h 223459 2011-06-23 02:38:36Z adrian $
  */
 
 #ifndef	__IF_ATH_SYSCTL_H__

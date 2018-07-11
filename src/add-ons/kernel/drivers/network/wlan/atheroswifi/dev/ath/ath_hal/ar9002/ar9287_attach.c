@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9287_attach.c 272292 2014-09-30 03:19:29Z adrian $
  */
 #include "opt_ah.h"
 
@@ -65,7 +65,9 @@ static const HAL_PERCAL_DATA ar9287_adc_init_dc_cal = {
 	.calPostProc	= ar5416AdcDcCalibration
 };
 
-static void ar9287ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore);
+static void ar9287ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore,
+		HAL_BOOL power_off);
+static void ar9287DisablePCIE(struct ath_hal *ah);
 static HAL_BOOL ar9287FillCapabilityInfo(struct ath_hal *ah);
 static void ar9287WriteIni(struct ath_hal *ah,
 	const struct ieee80211_channel *chan);
@@ -76,7 +78,7 @@ ar9287AniSetup(struct ath_hal *ah)
 	/*
 	 * These are the parameters from the AR5416 ANI code;
 	 * they likely need quite a bit of adjustment for the
-	 * AR9280.
+	 * AR9287.
 	 */
         static const struct ar5212AniParams aniparams = {
                 .maxNoiseImmunityLevel  = 4,    /* levels 0..4 */
@@ -84,8 +86,8 @@ ar9287AniSetup(struct ath_hal *ah)
                 .coarseHigh             = { -14, -14, -14, -14, -12 },
                 .coarseLow              = { -64, -64, -64, -64, -70 },
                 .firpwr                 = { -78, -78, -78, -78, -80 },
-                .maxSpurImmunityLevel   = 2,
-                .cycPwrThr1             = { 2, 4, 6 },
+                .maxSpurImmunityLevel   = 7,
+                .cycPwrThr1             = { 2, 4, 6, 8, 10, 12, 14, 16 },
                 .maxFirstepLevel        = 2,    /* levels 0..2 */
                 .firstep                = { 0, 4, 8 },
                 .ofdmTrigHigh           = 500,
@@ -109,6 +111,7 @@ ar9287AniSetup(struct ath_hal *ah)
 static struct ath_hal *
 ar9287Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_OPS_CONFIG *ah_config,
 	HAL_STATUS *status)
 {
 	struct ath_hal_9287 *ahp9287;
@@ -119,13 +122,13 @@ ar9287Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_BOOL rfStatus;
 	int8_t pwr_table_offset;
 
-	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp9287 = ath_hal_malloc(sizeof (struct ath_hal_9287));
 	if (ahp9287 == AH_NULL) {
-		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -135,12 +138,20 @@ ar9287Attach(uint16_t devid, HAL_SOFTC sc,
 
 	ar5416InitState(AH5416(ah), devid, sc, st, sh, status);
 
+	if (eepromdata != AH_NULL) {
+		AH_PRIVATE(ah)->ah_eepromRead = ath_hal_EepromDataRead;
+		AH_PRIVATE(ah)->ah_eepromWrite = NULL;
+		ah->ah_eepromdata = eepromdata;
+	}
+
+
 	/* XXX override with 9280 specific state */
 	/* override 5416 methods for our needs */
 	AH5416(ah)->ah_initPLL = ar9280InitPLL;
 
 	ah->ah_setAntennaSwitch		= ar9287SetAntennaSwitch;
 	ah->ah_configPCIE		= ar9287ConfigPCIE;
+	ah->ah_disablePCIE		= ar9287DisablePCIE;
 
 	AH5416(ah)->ah_cal.iqCalData.calData = &ar9287_iq_cal;
 	AH5416(ah)->ah_cal.adcGainCalData.calData = &ar9287_adc_gain_cal;
@@ -357,14 +368,21 @@ bad:
 }
 
 static void
-ar9287ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore)
+ar9287ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore, HAL_BOOL power_off)
 {
 	if (AH_PRIVATE(ah)->ah_ispcie && !restore) {
 		ath_hal_ini_write(ah, &AH5416(ah)->ah_ini_pcieserdes, 1, 0);
 		OS_DELAY(1000);
 		OS_REG_SET_BIT(ah, AR_PCIE_PM_CTRL, AR_PCIE_PM_CTRL_ENA);
-		OS_REG_WRITE(ah, AR_WA, AR9285_WA_DEFAULT);	/* Yes, Kiwi uses the Kite PCIe PHY WA */
+		/* Yes, Kiwi uses the Kite PCIe PHY WA */
+		OS_REG_WRITE(ah, AR_WA, AR9285_WA_DEFAULT);
 	}
+}
+
+static void
+ar9287DisablePCIE(struct ath_hal *ah)
+{
+	/* XXX TODO */
 }
 
 static void
@@ -402,13 +420,6 @@ ar9287WriteIni(struct ath_hal *ah, const struct ieee80211_channel *chan)
 	regWrites = ath_hal_ini_write(ah, &AH5212(ah)->ah_ini_common, 1, regWrites);
 }
 
-#define	AR_BASE_FREQ_2GHZ	2300
-#define	AR_BASE_FREQ_5GHZ	4900
-#define	AR_SPUR_FEEQ_BOUND_HT40	19
-#define	AR_SPUR_FEEQ_BOUND_HT20	10
-
-
-
 /*
  * Fill all software cached or static hardware state information.
  * Return failure if capabilities are to come from EEPROM and
@@ -443,6 +454,7 @@ ar9287FillCapabilityInfo(struct ath_hal *ah)
 	/* Disable this so Block-ACK works correctly */
 	pCap->halHasRxSelfLinkedTail = AH_FALSE;
 	pCap->halPSPollBroken = AH_FALSE;
+	pCap->halSpectralScanSupport = AH_TRUE;
 
 	/* Hardware supports (at least) single-stream STBC TX/RX */
 	pCap->halRxStbcSupport = 1;
@@ -460,7 +472,7 @@ ar9287FillCapabilityInfo(struct ath_hal *ah)
  * This has been disabled - having the HAL flip chainmasks on/off
  * when attempting to implement 11n disrupts things. For now, just
  * leave this flipped off and worry about implementing TX diversity
- * for legacy and MCS0-7 when 11n is fully functioning.
+ * for legacy and MCS0-15 when 11n is fully functioning.
  */
 HAL_BOOL
 ar9287SetAntennaSwitch(struct ath_hal *ah, HAL_ANT_SETTING settings)
@@ -471,9 +483,12 @@ ar9287SetAntennaSwitch(struct ath_hal *ah, HAL_ANT_SETTING settings)
 static const char*
 ar9287Probe(uint16_t vendorid, uint16_t devid)
 {
-	if (vendorid == ATHEROS_VENDOR_ID &&
-	    (devid == AR9287_DEVID_PCI || devid == AR9287_DEVID_PCIE))
-		return "Atheros 9287";
+	if (vendorid == ATHEROS_VENDOR_ID) {
+		if (devid == AR9287_DEVID_PCI)
+			return "Atheros 9227";
+		if (devid == AR9287_DEVID_PCIE)
+			return "Atheros 9287";
+	}
 	return AH_NULL;
 }
 AH_CHIP(AR9287, ar9287Probe, ar9287Attach);

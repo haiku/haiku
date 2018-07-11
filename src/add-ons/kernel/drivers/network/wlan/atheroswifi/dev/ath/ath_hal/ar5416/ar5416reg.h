@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416reg.h 298939 2016-05-02 19:56:48Z pfg $
  */
 #ifndef _DEV_ATH_AR5416REG_H
 #define	_DEV_ATH_AR5416REG_H
@@ -47,14 +47,58 @@
 #define	AR_GPIO_IN_OUT		0x4048	/* GPIO input/output register */
 #define	AR_GPIO_OE_OUT		0x404c	/* GPIO output enable register */
 #define	AR_GPIO_INTR_POL	0x4050	/* GPIO interrupt polarity */
+
 #define	AR_GPIO_INPUT_EN_VAL	0x4054	/* GPIO input enable and value */
+#define	AR_GPIO_INPUT_EN_VAL_BT_PRIORITY_DEF     0x00000004
+#define	AR_GPIO_INPUT_EN_VAL_BT_PRIORITY_S       2
+#define	AR_GPIO_INPUT_EN_VAL_BT_FREQUENCY_DEF    0x00000008
+#define	AR_GPIO_INPUT_EN_VAL_BT_FREQUENCY_S      3
+#define	AR_GPIO_INPUT_EN_VAL_BT_ACTIVE_DEF       0x00000010
+#define	AR_GPIO_INPUT_EN_VAL_BT_ACTIVE_S         4
+#define	AR_GPIO_INPUT_EN_VAL_RFSILENT_DEF        0x00000080
+#define	AR_GPIO_INPUT_EN_VAL_RFSILENT_DEF_S      7
+#define	AR_GPIO_INPUT_EN_VAL_BT_PRIORITY_BB      0x00000400
+#define	AR_GPIO_INPUT_EN_VAL_BT_PRIORITY_BB_S    10
+#define	AR_GPIO_INPUT_EN_VAL_BT_FREQUENCY_BB     0x00000800
+#define	AR_GPIO_INPUT_EN_VAL_BT_FREQUENCY_BB_S   11
+#define	AR_GPIO_INPUT_EN_VAL_BT_ACTIVE_BB        0x00001000
+#define	AR_GPIO_INPUT_EN_VAL_BT_ACTIVE_BB_S      12
+#define	AR_GPIO_INPUT_EN_VAL_RFSILENT_BB         0x00008000
+#define	AR_GPIO_INPUT_EN_VAL_RFSILENT_BB_S       15
+#define	AR_GPIO_RTC_RESET_OVERRIDE_ENABLE        0x00010000
+#define	AR_GPIO_JTAG_DISABLE                     0x00020000
+
 #define	AR_GPIO_INPUT_MUX1	0x4058
+#define	AR_GPIO_INPUT_MUX1_BT_PRIORITY           0x00000f00
+#define	AR_GPIO_INPUT_MUX1_BT_PRIORITY_S         8
+#define	AR_GPIO_INPUT_MUX1_BT_FREQUENCY          0x0000f000
+#define	AR_GPIO_INPUT_MUX1_BT_FREQUENCY_S        12
+#define	AR_GPIO_INPUT_MUX1_BT_ACTIVE             0x000f0000
+#define	AR_GPIO_INPUT_MUX1_BT_ACTIVE_S           16
+
 #define	AR_GPIO_INPUT_MUX2	0x405c
+#define	AR_GPIO_INPUT_MUX2_CLK25                 0x0000000f
+#define	AR_GPIO_INPUT_MUX2_CLK25_S               0
+#define	AR_GPIO_INPUT_MUX2_RFSILENT              0x000000f0
+#define	AR_GPIO_INPUT_MUX2_RFSILENT_S            4
+#define	AR_GPIO_INPUT_MUX2_RTC_RESET             0x00000f00
+#define	AR_GPIO_INPUT_MUX2_RTC_RESET_S           8
+
 #define	AR_GPIO_OUTPUT_MUX1	0x4060
 #define	AR_GPIO_OUTPUT_MUX2	0x4064
 #define	AR_GPIO_OUTPUT_MUX3	0x4068
+
+#define	AR_GPIO_OUTPUT_MUX_AS_OUTPUT             0
+#define	AR_GPIO_OUTPUT_MUX_AS_PCIE_ATTENTION_LED 1
+#define	AR_GPIO_OUTPUT_MUX_AS_PCIE_POWER_LED     2
+#define	AR_GPIO_OUTPUT_MUX_AS_TX_FRAME           3
+#define	AR_GPIO_OUTPUT_MUX_AS_RX_CLEAR_EXTERNAL  4
+#define	AR_GPIO_OUTPUT_MUX_AS_MAC_NETWORK_LED    5
+#define	AR_GPIO_OUTPUT_MUX_AS_MAC_POWER_LED      6
+
 #define	AR_EEPROM_STATUS_DATA	0x407c
 #define	AR_OBS			0x4080
+#define	AR_GPIO_PDPU		0x4088
 
 #ifdef	AH_SUPPORT_AR9130
 #define	AR_RTC_BASE		0x20000
@@ -79,6 +123,12 @@
 #define	AR_RTC_DERIVED_CLK_PERIOD_S	1
 #endif	/* AH_SUPPORT_AR9130 */
 
+/* AR_USEC: 0x801c */
+#define	AR5416_USEC_TX_LAT	0x007FC000	/* tx latency to start of SIGNAL (usec) */
+#define	AR5416_USEC_TX_LAT_S	14		/* tx latency to start of SIGNAL (usec) */
+#define	AR5416_USEC_RX_LAT	0x1F800000	/* rx latency to start of SIGNAL (usec) */
+#define	AR5416_USEC_RX_LAT_S	23		/* rx latency to start of SIGNAL (usec) */
+
 #define	AR_RESET_TSF		0x8020
 
 /*
@@ -95,6 +145,7 @@
 #define	AR_TSFOOR_THRESHOLD	0x813c
 #define	AR_PHY_ERR_3		0x8168
 #define	AR_PHY_ERR_MASK_3	0x816c	/* mask for AR_PHY_ERR_3 */
+#define	AR_BT_COEX_WEIGHT2	0x81c4
 #define	AR_TXOP_X		0x81ec	/* txop for legacy non-qos */
 #define	AR_TXOP_0_3		0x81f0	/* txop for various tid's */
 #define	AR_TXOP_4_7		0x81f4
@@ -128,6 +179,7 @@
 #define	AR_2040_MODE		0x8318
 #define	AR_EXTRCCNT		0x8328	/* extension channel rx clear count */
 #define	AR_SELFGEN_MASK		0x832c	/* rx and cal chain masks */
+#define	AR_PHY_ERR_MASK_REG	0x8338
 #define	AR_PCU_TXBUF_CTRL	0x8340
 #define	AR_PCU_MISC_MODE2	0x8344
 
@@ -203,27 +255,32 @@
 #define	AR_MAC_LED_MODE_POWON	5	/* Power LED on (s/w control) */
 #define	AR_MAC_LED_MODE_NETON	6	/* Network LED on (s/w control) */
 #define	AR_MAC_LED_ASSOC	0x00000c00
-#define	AR_MAC_LED_ASSOC_NONE	0x00000000 /* STA is not associated or trying */
-#define	AR_MAC_LED_ASSOC_ACTIVE	0x00000400 /* STA is associated */
-#define	AR_MAC_LED_ASSOC_PEND	0x00000800 /* STA is trying to associate */
+#define	AR_MAC_LED_ASSOC_NONE	0x0	/* STA is not associated or trying */
+#define	AR_MAC_LED_ASSOC_ACTIVE	0x1	/* STA is associated */
+#define	AR_MAC_LED_ASSOC_PEND	0x2	/* STA is trying to associate */
 #define	AR_MAC_LED_ASSOC_S	10
 
+#define	AR_WA_BIT6		0x00000040
+#define	AR_WA_BIT7		0x00000080
+#define	AR_WA_D3_L1_DISABLE	0x00004000	/* */
 #define	AR_WA_UNTIE_RESET_EN	0x00008000	/* ena PCI reset to POR */
 #define	AR_WA_RESET_EN		0x00040000	/* ena AR_WA_UNTIE_RESET_EN */
 #define	AR_WA_ANALOG_SHIFT	0x00100000
 #define	AR_WA_POR_SHORT		0x00200000	/* PCIE phy reset control */
+#define	AR_WA_BIT22		0x00400000
+#define	AR_WA_BIT23		0x00800000
 
 #define	AR_WA_DEFAULT		0x0000073f
-#define	AR9280_WA_DEFAULT	0x0040073f
+#define	AR9280_WA_DEFAULT	0x0040073b	/* disable bit 2, see commit */
 #define	AR9285_WA_DEFAULT	0x004a05cb
 
 #define	AR_PCIE_PM_CTRL_ENA	0x00080000
 
 #define	AR_AHB_EXACT_WR_EN	0x00000000	/* write exact bytes */
-#define	AR_AHB_BUF_WR_EN	0x00000001	/* buffer write upto cacheline*/
+#define	AR_AHB_BUF_WR_EN	0x00000001	/* buffer write up to cacheline*/
 #define	AR_AHB_EXACT_RD_EN	0x00000000	/* read exact bytes */
-#define	AR_AHB_CACHELINE_RD_EN	0x00000002	/* read upto end of cacheline */
-#define	AR_AHB_PREFETCH_RD_EN	0x00000004	/* prefetch upto page boundary*/
+#define	AR_AHB_CACHELINE_RD_EN	0x00000002	/* read up to end of cacheline */
+#define	AR_AHB_PREFETCH_RD_EN	0x00000004	/* prefetch up to page boundary*/
 #define	AR_AHB_PAGE_SIZE_1K	0x00000000	/* set page-size as 1k */
 #define	AR_AHB_PAGE_SIZE_2K	0x00000008	/* set page-size as 2k */
 #define	AR_AHB_PAGE_SIZE_4K	0x00000010	/* set page-size as 4k */
@@ -250,6 +307,7 @@
 /* Interrupts */
 #define	AR_ISR_TXMINTR		0x00080000	/* Maximum interrupt tx rate */
 #define	AR_ISR_RXMINTR		0x01000000	/* Maximum interrupt rx rate */
+#define	AR_ISR_GENTMR		0x10000000	/* OR of generic timer bits in S5 */
 #define	AR_ISR_TXINTM		0x40000000	/* Tx int after mitigation */
 #define	AR_ISR_RXINTM		0x80000000	/* Rx int after mitigation */
 
@@ -259,7 +317,13 @@
 
 #define	AR_ISR_S5		0x0098
 #define	AR_ISR_S5_S		0x00d8
-#define	AR_ISR_S5_TIM_TIMER	0x00000010
+#define	AR_ISR_S5_GENTIMER7	0x00000080 // Mask for timer 7 trigger
+#define	AR_ISR_S5_TIM_TIMER	0x00000010 // TIM Timer ISR
+#define	AR_ISR_S5_DTIM_TIMER	0x00000020 // DTIM Timer ISR
+#define	AR_ISR_S5_GENTIMER_TRIG	0x0000FF80 // ISR for generic timer trigger 7-15
+#define	AR_ISR_S5_GENTIMER_TRIG_S	0
+#define	AR_ISR_S5_GENTIMER_THRESH	0xFF800000 // ISR for generic timer threshold 7-15
+#define	AR_ISR_S5_GENTIMER_THRESH_S	16
 
 #define	AR_INTR_SPURIOUS	0xffffffff
 #define	AR_INTR_RTC_IRQ		0x00000001	/* rtc in shutdown state */
@@ -412,10 +476,10 @@
 /* Sleep control */
 #define	AR5416_SLEEP1_ASSUME_DTIM	0x00080000
 #define	AR5416_SLEEP1_CAB_TIMEOUT	0xFFE00000	/* Cab timeout (TU) */
-#define	AR5416_SLEEP1_CAB_TIMEOUT_S	22
+#define	AR5416_SLEEP1_CAB_TIMEOUT_S	21
 
 #define	AR5416_SLEEP2_BEACON_TIMEOUT	0xFFE00000	/* Beacon timeout (TU)*/
-#define	AR5416_SLEEP2_BEACON_TIMEOUT_S	22
+#define	AR5416_SLEEP2_BEACON_TIMEOUT_S	21
 
 /* Sleep Registers */
 #define	AR_SLP32_HALFCLK_LATENCY      0x000FFFFF	/* rising <-> falling edge */
@@ -452,9 +516,12 @@
 #define	AR_PCU_MISS_BCN_IN_SLEEP	0x00004000 /* count bmiss's when sleeping */
 #define	AR_PCU_BUG_12306_FIX_ENA	0x00020000 /* use rx_clear to count sifs */
 #define	AR_PCU_FORCE_QUIET_COLL		0x00040000 /* kill xmit for channel change */
-#define	AR_PCU_TBTT_PROTECT		0x00200000 /* no xmit upto tbtt+20 uS */
+#define	AR_PCU_BT_ANT_PREVENT_RX	0x00100000
+#define	AR_PCU_BT_ANT_PREVENT_RX_S	20
+#define	AR_PCU_TBTT_PROTECT		0x00200000 /* no xmit up to tbtt+20 uS */
 #define	AR_PCU_CLEAR_VMF		0x01000000 /* clear vmf mode (fast cc)*/
 #define	AR_PCU_CLEAR_BA_VALID		0x04000000 /* clear ba state */
+#define	AR_PCU_SEL_EVM			0x08000000 /* select EVM data or PLCP header */
 
 #define	AR_PCU_MISC_MODE2_MGMT_CRYPTO_ENABLE		0x00000002
 #define	AR_PCU_MISC_MODE2_NO_CRYPTO_FOR_NON_DATA_PKT	0x00000004
@@ -497,6 +564,8 @@
 #define	AR928X_GPIO_IN_VAL_S	10
 #define	AR9285_GPIO_IN_VAL	0x00FFF000
 #define	AR9285_GPIO_IN_VAL_S	12
+#define	AR9287_GPIO_IN_VAL	0x003FF800
+#define	AR9287_GPIO_IN_VAL_S	11
 
 #define	AR_GPIO_OE_OUT_DRV	0x3	/* 2 bit mask shifted by 2*bitpos */
 #define	AR_GPIO_OE_OUT_DRV_NO	0x0	/* tristate */
@@ -533,6 +602,25 @@
 #define	AR_EEPROM_STATUS_DATA_BUSY_ACCESS   0x00020000
 #define	AR_EEPROM_STATUS_DATA_PROT_ACCESS   0x00040000
 #define	AR_EEPROM_STATUS_DATA_ABSENT_ACCESS 0x00080000
+
+/* K2 (9271) */
+#define	AR9271_CLOCK_CONTROL		0x50040
+#define	AR9271_CLOCK_SELECTION_22	0x0
+#define	AR9271_CLOCK_SELECTION_88	0x1
+#define	AR9271_CLOCK_SELECTION_44	0x2
+#define	AR9271_CLOCK_SELECTION_117	0x4
+#define	AR9271_CLOCK_SELECTION_OSC_40	0x6
+#define	AR9271_CLOCK_SELECTION_RTC	0x7
+#define	AR9271_SPI_SEL			0x100
+#define	AR9271_UART_SEL			0x200
+
+#define	AR9271_RESET_POWER_DOWN_CONTROL	0x50044
+#define	AR9271_RADIO_RF_RST		0x20
+#define	AR9271_GATE_MAC_CTL		0x4000
+#define	AR9271_MAIN_PLL_PWD_CTL		0x40000
+
+#define	AR9271_CLKMISC			0x4090
+#define	AR9271_OSC_to_10M_EN		0x00000001
 
 /*
  * AR5212 defines the MAC revision mask as 0xF, but both ath9k and
@@ -605,10 +693,10 @@
 #define	AR_XSREV_REVISION_KITE_11	1	/* Kite 1.1 */
 #define	AR_XSREV_REVISION_KITE_12	2	/* Kite 1.2 */
 #define	AR_XSREV_VERSION_KIWI		0x180	/* Kiwi (AR9287) */
-#define	AR_XSREV_REVISION_KIWI_10	0
-#define	AR_XSREV_REVISION_KIWI_11	1
-#define	AR_XSREV_REVISION_KIWI_12	2
-#define	AR_XSREV_REVISION_KIWI_13	3
+#define	AR_XSREV_REVISION_KIWI_10	0	/* Kiwi 1.0 */
+#define	AR_XSREV_REVISION_KIWI_11	1	/* Kiwi 1.1 */
+#define	AR_XSREV_REVISION_KIWI_12	2	/* Kiwi 1.2 */
+#define	AR_XSREV_REVISION_KIWI_13	3	/* Kiwi 1.3 */
 
 /* Owl (AR5416) */
 #define	AR_SREV_OWL(_ah) \
@@ -694,6 +782,10 @@
 #define AR_SREV_KIWI(_ah) \
 	(AH_PRIVATE((_ah))->ah_macVersion == AR_XSREV_VERSION_KIWI)
 
+#define AR_SREV_KIWI_10_OR_LATER(_ah) \
+	(AH_PRIVATE((_ah))->ah_macVersion >= AR_XSREV_VERSION_KIWI)
+
+/* XXX TODO: make these handle macVersion > Kiwi */
 #define AR_SREV_KIWI_11_OR_LATER(_ah) \
 	(AR_SREV_KIWI(_ah) && \
 	 AH_PRIVATE((_ah))->ah_macRev >= AR_XSREV_REVISION_KIWI_11)

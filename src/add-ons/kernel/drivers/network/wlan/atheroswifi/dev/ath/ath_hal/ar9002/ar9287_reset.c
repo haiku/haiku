@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9287_reset.c 249580 2013-04-17 07:31:53Z adrian $
  */
 
 #include "opt_ah.h"
@@ -45,70 +45,70 @@ static void
 ar9287SetPowerCalTable(struct ath_hal *ah,
     const struct ieee80211_channel *chan, int16_t *pTxPowerIndexOffset)
 {
-        struct cal_data_op_loop_ar9287 *pRawDatasetOpenLoop;
-        uint8_t *pCalBChans = NULL;
-        uint16_t pdGainOverlap_t2;
-        uint16_t numPiers = 0, i;
-        uint16_t numXpdGain, xpdMask;
-        uint16_t xpdGainValues[AR5416_NUM_PD_GAINS] = {0, 0, 0, 0};
-        uint32_t regChainOffset;
+	struct cal_data_op_loop_ar9287 *pRawDatasetOpenLoop;
+	uint8_t *pCalBChans = NULL;
+	uint16_t pdGainOverlap_t2;
+	uint16_t numPiers = 0, i;
+	uint16_t numXpdGain, xpdMask;
+	uint16_t xpdGainValues[AR5416_NUM_PD_GAINS] = {0, 0, 0, 0};
+	uint32_t regChainOffset;
 	HAL_EEPROM_9287 *ee = AH_PRIVATE(ah)->ah_eeprom;
-        struct ar9287_eeprom *pEepData = &ee->ee_base;
+	struct ar9287_eeprom *pEepData = &ee->ee_base;
 
-        xpdMask = pEepData->modalHeader.xpdGain;
+	xpdMask = pEepData->modalHeader.xpdGain;
 
-        if ((pEepData->baseEepHeader.version & AR9287_EEP_VER_MINOR_MASK) >=
-            AR9287_EEP_MINOR_VER_2)
-                pdGainOverlap_t2 = pEepData->modalHeader.pdGainOverlap;
-        else
-                pdGainOverlap_t2 = (uint16_t)(MS(OS_REG_READ(ah, AR_PHY_TPCRG5),
-                                            AR_PHY_TPCRG5_PD_GAIN_OVERLAP));
+	if ((pEepData->baseEepHeader.version & AR9287_EEP_VER_MINOR_MASK) >=
+	    AR9287_EEP_MINOR_VER_2)
+		pdGainOverlap_t2 = pEepData->modalHeader.pdGainOverlap;
+	else
+		pdGainOverlap_t2 = (uint16_t)(MS(OS_REG_READ(ah, AR_PHY_TPCRG5),
+					    AR_PHY_TPCRG5_PD_GAIN_OVERLAP));
 
 	/* Note: Kiwi should only be 2ghz.. */
-        if (IEEE80211_IS_CHAN_2GHZ(chan)) {
-                pCalBChans = pEepData->calFreqPier2G;
-                numPiers = AR9287_NUM_2G_CAL_PIERS;
-                pRawDatasetOpenLoop = (struct cal_data_op_loop_ar9287 *)pEepData->calPierData2G[0];
-                AH5416(ah)->initPDADC = pRawDatasetOpenLoop->vpdPdg[0][0];
-        }
-        numXpdGain = 0;
+	if (IEEE80211_IS_CHAN_2GHZ(chan)) {
+		pCalBChans = pEepData->calFreqPier2G;
+		numPiers = AR9287_NUM_2G_CAL_PIERS;
+		pRawDatasetOpenLoop = (struct cal_data_op_loop_ar9287 *)pEepData->calPierData2G[0];
+		AH5416(ah)->initPDADC = pRawDatasetOpenLoop->vpdPdg[0][0];
+	}
+	numXpdGain = 0;
 
-        /* Calculate the value of xpdgains from the xpdGain Mask */
-        for (i = 1; i <= AR5416_PD_GAINS_IN_MASK; i++) {
-                if ((xpdMask >> (AR5416_PD_GAINS_IN_MASK - i)) & 1) {
-                        if (numXpdGain >= AR5416_NUM_PD_GAINS)
-                                break;
-                        xpdGainValues[numXpdGain] =
-                                (uint16_t)(AR5416_PD_GAINS_IN_MASK-i);
-                        numXpdGain++;
-                }
-        }
+	/* Calculate the value of xpdgains from the xpdGain Mask */
+	for (i = 1; i <= AR5416_PD_GAINS_IN_MASK; i++) {
+		if ((xpdMask >> (AR5416_PD_GAINS_IN_MASK - i)) & 1) {
+			if (numXpdGain >= AR5416_NUM_PD_GAINS)
+				break;
+			xpdGainValues[numXpdGain] =
+				(uint16_t)(AR5416_PD_GAINS_IN_MASK-i);
+			numXpdGain++;
+		}
+	}
 
-        OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_NUM_PD_GAIN,
-                      (numXpdGain - 1) & 0x3);
-        OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_PD_GAIN_1,
-                      xpdGainValues[0]);
-        OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_PD_GAIN_2,
-                      xpdGainValues[1]);
-        OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_PD_GAIN_3,
-                      xpdGainValues[2]);
+	OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_NUM_PD_GAIN,
+		      (numXpdGain - 1) & 0x3);
+	OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_PD_GAIN_1,
+		      xpdGainValues[0]);
+	OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_PD_GAIN_2,
+		      xpdGainValues[1]);
+	OS_REG_RMW_FIELD(ah, AR_PHY_TPCRG1, AR_PHY_TPCRG1_PD_GAIN_3,
+		      xpdGainValues[2]);
 
-        for (i = 0; i < AR9287_MAX_CHAINS; i++) {
-                regChainOffset = i * 0x1000;
+	for (i = 0; i < AR9287_MAX_CHAINS; i++) {
+		regChainOffset = i * 0x1000;
 
-                if (pEepData->baseEepHeader.txMask & (1 << i)) {
-                        int8_t txPower;
-                        pRawDatasetOpenLoop =
-                        (struct cal_data_op_loop_ar9287 *)pEepData->calPierData2G[i];
-                                ar9287olcGetTxGainIndex(ah, chan,
-                                    pRawDatasetOpenLoop,
-                                    pCalBChans, numPiers,
-                                    &txPower);
-                                ar9287olcSetPDADCs(ah, txPower, i);
-                }
-        }
+		if (pEepData->baseEepHeader.txMask & (1 << i)) {
+			int8_t txPower;
+			pRawDatasetOpenLoop =
+			(struct cal_data_op_loop_ar9287 *)pEepData->calPierData2G[i];
+				ar9287olcGetTxGainIndex(ah, chan,
+				    pRawDatasetOpenLoop,
+				    pCalBChans, numPiers,
+				    &txPower);
+				ar9287olcSetPDADCs(ah, txPower, i);
+		}
+	}
 
-        *pTxPowerIndexOffset = 0;
+	*pTxPowerIndexOffset = 0;
 }
 
 
@@ -329,41 +329,44 @@ ar9287SetTransmitPower(struct ath_hal *ah,
 	const struct ieee80211_channel *chan, uint16_t *rfXpdGain)
 {
 #define	POW_SM(_r, _s)     (((_r) & 0x3f) << (_s))
-#define	N(a)            (sizeof (a) / sizeof (a[0]))
+#define	N(a)	    (sizeof (a) / sizeof (a[0]))
 
 	const struct modal_eep_ar9287_header *pModal;
 	struct ath_hal_5212 *ahp = AH5212(ah);
-	int16_t             ratesArray[Ar5416RateSize];
-	int16_t             txPowerIndexOffset = 0;
-	uint8_t             ht40PowerIncForPdadc = 2;
-	int                 i;
+	int16_t	     txPowerIndexOffset = 0;
+	int		 i;
 
-	uint16_t            cfgCtl;
-	uint16_t            powerLimit;
-	uint16_t            twiceAntennaReduction;
-	uint16_t            twiceMaxRegulatoryPower;
-	int16_t             maxPower;
+	uint16_t	    cfgCtl;
+	uint16_t	    powerLimit;
+	uint16_t	    twiceAntennaReduction;
+	uint16_t	    twiceMaxRegulatoryPower;
+	int16_t	     maxPower;
 	HAL_EEPROM_9287 *ee = AH_PRIVATE(ah)->ah_eeprom;
 	struct ar9287_eeprom *pEepData = &ee->ee_base;
 
+	AH5416(ah)->ah_ht40PowerIncForPdadc = 2;
+
 	/* Setup info for the actual eeprom */
-	OS_MEMZERO(ratesArray, sizeof(ratesArray));
+	OS_MEMZERO(AH5416(ah)->ah_ratesArray,
+	  sizeof(AH5416(ah)->ah_ratesArray));
 	cfgCtl = ath_hal_getctl(ah, chan);
 	powerLimit = chan->ic_maxregpower * 2;
 	twiceAntennaReduction = chan->ic_maxantgain;
-	twiceMaxRegulatoryPower = AH_MIN(MAX_RATE_POWER, AH_PRIVATE(ah)->ah_powerLimit);
+	twiceMaxRegulatoryPower = AH_MIN(MAX_RATE_POWER,
+	    AH_PRIVATE(ah)->ah_powerLimit);
 	pModal = &pEepData->modalHeader;
 	HALDEBUG(ah, HAL_DEBUG_RESET, "%s Channel=%u CfgCtl=%u\n",
 	    __func__,chan->ic_freq, cfgCtl );
 
 	/* XXX Assume Minor is v2 or later */
-	ht40PowerIncForPdadc = pModal->ht40PowerIncForPdadc;
+	AH5416(ah)->ah_ht40PowerIncForPdadc = pModal->ht40PowerIncForPdadc;
 
 	/* Fetch per-rate power table for the given channel */
 	if (! ar9287SetPowerPerRateTable(ah, pEepData,  chan,
-            &ratesArray[0],cfgCtl,
-            twiceAntennaReduction,
-            twiceMaxRegulatoryPower, powerLimit)) {
+	    &AH5416(ah)->ah_ratesArray[0],
+	    cfgCtl,
+	    twiceAntennaReduction,
+	    twiceMaxRegulatoryPower, powerLimit)) {
 		HALDEBUG(ah, HAL_DEBUG_ANY,
 		    "%s: unable to set tx power per rate table\n", __func__);
 		return AH_FALSE;
@@ -373,11 +376,14 @@ ar9287SetTransmitPower(struct ath_hal *ah,
 	ar9287SetPowerCalTable(ah, chan, &txPowerIndexOffset);
 
 	/* Calculate maximum power level */
-	maxPower = AH_MAX(ratesArray[rate6mb], ratesArray[rateHt20_0]);
-	maxPower = AH_MAX(maxPower, ratesArray[rate1l]);
+	maxPower = AH_MAX(AH5416(ah)->ah_ratesArray[rate6mb],
+	    AH5416(ah)->ah_ratesArray[rateHt20_0]);
+	maxPower = AH_MAX(maxPower,
+	    AH5416(ah)->ah_ratesArray[rate1l]);
 
 	if (IEEE80211_IS_CHAN_HT40(chan))
-		maxPower = AH_MAX(maxPower, ratesArray[rateHt40_0]);
+		maxPower = AH_MAX(maxPower,
+		    AH5416(ah)->ah_ratesArray[rateHt40_0]);
 
 	ahp->ah_tx6PowerInHalfDbm = maxPower;
 	AH_PRIVATE(ah)->ah_maxPowerLevel = maxPower;
@@ -388,18 +394,20 @@ ar9287SetTransmitPower(struct ath_hal *ah,
 	 *  adjust the rate table (0 offset if rates EEPROM not loaded)
 	 */
 	/* XXX what about the pwrTableOffset? */
-	for (i = 0; i < N(ratesArray); i++) {
-		ratesArray[i] = (int16_t)(txPowerIndexOffset + ratesArray[i]);
+	for (i = 0; i < N(AH5416(ah)->ah_ratesArray); i++) {
+		AH5416(ah)->ah_ratesArray[i] =
+		    (int16_t)(txPowerIndexOffset +
+		      AH5416(ah)->ah_ratesArray[i]);
 		/* -5 dBm offset for Merlin and later; this includes Kiwi */
-		ratesArray[i] -= AR5416_PWR_TABLE_OFFSET_DB * 2;
-		if (ratesArray[i] > AR5416_MAX_RATE_POWER)
-			ratesArray[i] = AR5416_MAX_RATE_POWER;
-		if (ratesArray[i] < 0)
-			ratesArray[i] = 0;
+		AH5416(ah)->ah_ratesArray[i] -= AR5416_PWR_TABLE_OFFSET_DB * 2;
+		if (AH5416(ah)->ah_ratesArray[i] > AR5416_MAX_RATE_POWER)
+			AH5416(ah)->ah_ratesArray[i] = AR5416_MAX_RATE_POWER;
+		if (AH5416(ah)->ah_ratesArray[i] < 0)
+			AH5416(ah)->ah_ratesArray[i] = 0;
 	}
 
 #ifdef AH_EEPROM_DUMP
-	ar5416PrintPowerPerRate(ah, ratesArray);
+	ar5416PrintPowerPerRate(ah, AH5416(ah)->ah_ratesArray);
 #endif
 
 	/*
@@ -410,18 +418,26 @@ ar9287SetTransmitPower(struct ath_hal *ah,
 	 * XXX handle overflow/too high power level?
 	 */
 	if (IEEE80211_IS_CHAN_HT40(chan)) {
-		ratesArray[rateHt40_0] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_1] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_2] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_3] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_4] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_5] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_6] += ht40PowerIncForPdadc;
-		ratesArray[rateHt40_7] += ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_0] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_1] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_2] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_3] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_4] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_5] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_6] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
+		AH5416(ah)->ah_ratesArray[rateHt40_7] +=
+		  AH5416(ah)->ah_ht40PowerIncForPdadc;
 	}
 
 	/* Write the TX power rate registers */
-	ar5416WriteTxPowerRateRegisters(ah, chan, ratesArray);
+	ar5416WriteTxPowerRateRegisters(ah, chan, AH5416(ah)->ah_ratesArray);
 
 	return AH_TRUE;
 #undef POW_SM
@@ -476,7 +492,8 @@ ar9287SetBoardValues(struct ath_hal *ah, const struct ieee80211_channel *chan)
 			  pModal->antCtrlChain[i]);
 
 		OS_REG_WRITE(ah, AR_PHY_TIMING_CTRL4_CHAIN(0) + regChainOffset,
-			  (OS_REG_READ(ah, AR_PHY_TIMING_CTRL4_CHAIN(0) + regChainOffset)
+			  (OS_REG_READ(ah, AR_PHY_TIMING_CTRL4_CHAIN(0)
+			      + regChainOffset)
 			   & ~(AR_PHY_TIMING_CTRL4_IQCORR_Q_Q_COFF |
 			       AR_PHY_TIMING_CTRL4_IQCORR_Q_I_COFF)) |
 			  SM(pModal->iqCalICh[i],
@@ -499,7 +516,6 @@ ar9287SetBoardValues(struct ath_hal *ah, const struct ieee80211_channel *chan)
 			      AR9280_PHY_RXGAIN_TXRX_MARGIN,
 			      pModal->rxTxMarginCh[i]);
 	}
-
 
 	if (IEEE80211_IS_CHAN_HT40(chan))
 		OS_REG_RMW_FIELD(ah, AR_PHY_SETTLING,
@@ -539,8 +555,8 @@ ar9287SetBoardValues(struct ath_hal *ah, const struct ieee80211_channel *chan)
 		   SM(pModal->ob_qam, AR9287_AN_RF2G3_OB_QAM) |
 		   SM(pModal->ob_pal_off, AR9287_AN_RF2G3_OB_PAL_OFF));
 
-	OS_REG_WRITE(ah, AR9287_AN_RF2G3_CH0, regval);
-	OS_DELAY(100);	/* analog write */
+	/* Analog write - requires a 100usec delay */
+	OS_A_REG_WRITE(ah, AR9287_AN_RF2G3_CH0, regval);
 
 	regval = OS_REG_READ(ah, AR9287_AN_RF2G3_CH1);
 	regval &= ~(AR9287_AN_RF2G3_DB1 |
@@ -556,8 +572,7 @@ ar9287SetBoardValues(struct ath_hal *ah, const struct ieee80211_channel *chan)
 		   SM(pModal->ob_qam, AR9287_AN_RF2G3_OB_QAM) |
 		   SM(pModal->ob_pal_off, AR9287_AN_RF2G3_OB_PAL_OFF));
 
-	OS_REG_WRITE(ah, AR9287_AN_RF2G3_CH1, regval);
-	OS_DELAY(100);	/* analog write */
+	OS_A_REG_WRITE(ah, AR9287_AN_RF2G3_CH1, regval);
 
 	OS_REG_RMW_FIELD(ah, AR_PHY_RF_CTL2,
 	    AR_PHY_TX_FRAME_TO_DATA_START, pModal->txFrameToDataStart);

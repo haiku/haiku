@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_diagcodes.h 239629 2012-08-24 00:17:39Z adrian $
  */
 #ifndef _ATH_AH_DIAGCODES_H_
 #define _ATH_AH_DIAGCODES_H_
@@ -63,6 +63,10 @@ enum {
 	HAL_DIAG_CHECK_HANGS	= 32,	/* check h/w hangs */
 	HAL_DIAG_SETREGS	= 33,	/* write registers */
 	HAL_DIAG_CHANSURVEY	= 34,	/* channel survey */
+	HAL_DIAG_PRINT_REG	= 35,
+	HAL_DIAG_PRINT_REG_ALL	= 36,
+	HAL_DIAG_CHANNELS	= 37,
+	HAL_DIAG_PRINT_REG_COUNTER	= 38,
 };
 
 #endif /* _ATH_AH_DIAGCODES_H_ */

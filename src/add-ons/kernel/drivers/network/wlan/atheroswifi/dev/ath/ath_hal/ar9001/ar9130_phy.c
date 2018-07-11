@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9001/ar9130_phy.c 242412 2012-10-31 21:14:25Z adrian $
  */
 #include "opt_ah.h"
 
@@ -33,6 +33,9 @@ ar9130InitPLL(struct ath_hal *ah, const struct ieee80211_channel *chan)
 
 	uint32_t pll;
 
+	/*
+	 * XXX TODO: support half/quarter rates
+	 */
 	if (chan && IEEE80211_IS_CHAN_5GHZ(chan))
 		pll = 0x1450;
 	else

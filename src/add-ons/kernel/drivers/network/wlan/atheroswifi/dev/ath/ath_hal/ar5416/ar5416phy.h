@@ -14,12 +14,79 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416phy.h 244943 2013-01-02 00:38:01Z adrian $
  */
 #ifndef _DEV_ATH_AR5416PHY_H_
 #define _DEV_ATH_AR5416PHY_H_
 
 #include "ar5212/ar5212phy.h"
+
+#define	AR_BT_COEX_MODE            0x8170
+#define	AR_BT_TIME_EXTEND          0x000000ff
+#define	AR_BT_TIME_EXTEND_S        0
+#define	AR_BT_TXSTATE_EXTEND       0x00000100
+#define	AR_BT_TXSTATE_EXTEND_S     8
+#define	AR_BT_TX_FRAME_EXTEND      0x00000200
+#define	AR_BT_TX_FRAME_EXTEND_S    9
+#define	AR_BT_MODE                 0x00000c00
+#define	AR_BT_MODE_S               10
+#define	AR_BT_QUIET                0x00001000
+#define	AR_BT_QUIET_S              12
+#define	AR_BT_QCU_THRESH           0x0001e000
+#define	AR_BT_QCU_THRESH_S         13
+#define	AR_BT_RX_CLEAR_POLARITY    0x00020000
+#define	AR_BT_RX_CLEAR_POLARITY_S  17
+#define	AR_BT_PRIORITY_TIME        0x00fc0000
+#define	AR_BT_PRIORITY_TIME_S      18
+#define	AR_BT_FIRST_SLOT_TIME      0xff000000
+#define	AR_BT_FIRST_SLOT_TIME_S    24
+
+#define	AR_BT_COEX_WEIGHT          0x8174
+#define	AR_BT_BT_WGHT              0x0000ffff
+#define	AR_BT_BT_WGHT_S            0
+#define	AR_BT_WL_WGHT              0xffff0000
+#define	AR_BT_WL_WGHT_S            16
+
+#define	AR_BT_COEX_MODE2           0x817c
+#define	AR_BT_BCN_MISS_THRESH      0x000000ff
+#define	AR_BT_BCN_MISS_THRESH_S    0
+#define	AR_BT_BCN_MISS_CNT         0x0000ff00
+#define	AR_BT_BCN_MISS_CNT_S       8
+#define	AR_BT_HOLD_RX_CLEAR        0x00010000
+#define	AR_BT_HOLD_RX_CLEAR_S      16
+#define	AR_BT_DISABLE_BT_ANT       0x00100000
+#define	AR_BT_DISABLE_BT_ANT_S     20
+
+#define	AR_PHY_SPECTRAL_SCAN		0x9910
+#define	AR_PHY_SPECTRAL_SCAN_ENA	0x00000001
+#define	AR_PHY_SPECTRAL_SCAN_ENA_S	0
+#define	AR_PHY_SPECTRAL_SCAN_ACTIVE	0x00000002
+#define	AR_PHY_SPECTRAL_SCAN_ACTIVE_S	1
+#define	AR_PHY_SPECTRAL_SCAN_FFT_PERIOD	0x000000F0
+#define	AR_PHY_SPECTRAL_SCAN_FFT_PERIOD_S	4
+#define	AR_PHY_SPECTRAL_SCAN_PERIOD	0x0000FF00
+#define	AR_PHY_SPECTRAL_SCAN_PERIOD_S	8
+
+/* Scan count and Short repeat flags are different for Kiwi and Merlin */
+#define	AR_PHY_SPECTRAL_SCAN_COUNT	0x00FF0000
+#define	AR_PHY_SPECTRAL_SCAN_COUNT_S	16
+#define	AR_PHY_SPECTRAL_SCAN_COUNT_KIWI	0x0FFF0000
+#define	AR_PHY_SPECTRAL_SCAN_COUNT_KIWI_S	16
+
+#define	AR_PHY_SPECTRAL_SCAN_SHORT_REPEAT	0x01000000
+#define	AR_PHY_SPECTRAL_SCAN_SHORT_REPEAT_S	24
+#define	AR_PHY_SPECTRAL_SCAN_SHORT_REPEAT_KIWI	0x10000000
+#define	AR_PHY_SPECTRAL_SCAN_SHORT_REPEAT_KIWI_S	28
+
+/*
+ * Kiwi only, bit 30 is used to set the error type, if set it is 0x5 (HAL_PHYERR_RADAR)
+ * Else it is 38 (new error type)
+ */
+#define	AR_PHY_SPECTRAL_SCAN_PHYERR_MASK_SELECT_KIWI	0x40000000  /* Spectral Error select bit mask */
+#define	AR_PHY_SPECTRAL_SCAN_PHYERR_MASK_SELECT_KIWI_S	30  /* Spectral Error select bit 30 */
+
+#define	AR_PHY_SPECTRAL_SCAN_PRIORITY_SELECT_KIWI	0x20000000  /* Spectral Error select bit mask */
+#define	AR_PHY_SPECTRAL_SCAN_PRIORITY_SELECT_SELECT_KIWI_S	29  /* Spectral Error select bit 30 */
 
 /* For AR_PHY_RADAR0 */
 #define	AR_PHY_RADAR_0_FFT_ENA		0x80000000
@@ -28,6 +95,8 @@
 #define	AR_PHY_RADAR_EXT_ENA		0x00004000
 
 #define	AR_PHY_RADAR_1			0x9958
+#define	AR_PHY_RADAR_1_BIN_THRESH_SELECT	0x07000000
+#define	AR_PHY_RADAR_1_BIN_THRESH_SELECT_S	24
 #define	AR_PHY_RADAR_1_RELPWR_ENA	0x00800000
 #define	AR_PHY_RADAR_1_USE_FIR128	0x00400000
 #define	AR_PHY_RADAR_1_RELPWR_THRESH	0x003F0000
@@ -121,12 +190,6 @@
 #define AR_PHY_EXT_MINCCA_PWR_S 23
 #define AR_PHY_EXT_CCA_THRESH62	0x007F0000
 #define AR_PHY_EXT_CCA_THRESH62_S	16
-/*
- * This duplicates AR_PHY_EXT_CCA_CYCPWR_THR1; it reads more like
- * an ANI register this way.
- */
-#define	AR_PHY_EXT_TIMING5_CYCPWR_THR1		0x0000FE00
-#define	AR_PHY_EXT_TIMING5_CYCPWR_THR1_S	9
 
 #define AR9280_PHY_EXT_MINCCA_PWR       0x01FF0000
 #define AR9280_PHY_EXT_MINCCA_PWR_S     16
@@ -156,8 +219,14 @@
 #define	AR_PHY_CAL_MEAS_0(_i)	(0x9c10 + ((_i) << 12))
 #define	AR_PHY_CAL_MEAS_1(_i)	(0x9c14 + ((_i) << 12))
 #define	AR_PHY_CAL_MEAS_2(_i)	(0x9c18 + ((_i) << 12))
+/* This is AR9130 and later */
 #define	AR_PHY_CAL_MEAS_3(_i)	(0x9c1c + ((_i) << 12))
 
+/*
+ * AR5416 still uses AR_PHY(263) for current RSSI;
+ * AR9130 and later uses AR_PHY(271).
+ */
+#define	AR9130_PHY_CURRENT_RSSI	0x9c3c		/* rssi of current frame rx'd */
 
 #define AR_PHY_CCA          0x9864
 #define AR_PHY_MINCCA_PWR   0x0FF80000

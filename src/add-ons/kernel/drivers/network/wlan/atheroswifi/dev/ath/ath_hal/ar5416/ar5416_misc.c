@@ -14,20 +14,20 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_misc.c 250856 2013-05-21 14:28:05Z adrian $
  */
 #include "opt_ah.h"
 
 #include "ah.h"
 #include "ah_internal.h"
 #include "ah_devid.h"
-#ifdef AH_DEBUG
 #include "ah_desc.h"                    /* NB: for HAL_PHYERR* */
-#endif
 
 #include "ar5416/ar5416.h"
 #include "ar5416/ar5416reg.h"
 #include "ar5416/ar5416phy.h"
+
+#include "ah_eeprom_v14.h"	/* for owl_get_ntxchains() */
 
 /*
  * Return the wireless modes (a,b,g,n,t) supported by hardware.
@@ -75,21 +75,29 @@ ar5416SetLedState(struct ath_hal *ah, HAL_LED_STATE state)
 		AR_MAC_LED_ASSOC_NONE,
 		AR_MAC_LED_ASSOC_NONE,
 	};
-	uint32_t bits;
 
 	if (AR_SREV_HOWL(ah))
 		return;
 
-	bits = OS_REG_READ(ah, AR_MAC_LED);
-	bits = (bits &~ AR_MAC_LED_MODE)
-	     | SM(AR_MAC_LED_MODE_POWON, AR_MAC_LED_MODE)
-#if 1
-	     | SM(AR_MAC_LED_MODE_NETON, AR_MAC_LED_MODE)
-#endif
-	     ;
-	bits = (bits &~ AR_MAC_LED_ASSOC)
-	     | SM(ledbits[state & 0x7], AR_MAC_LED_ASSOC);
-	OS_REG_WRITE(ah, AR_MAC_LED, bits);
+	/*
+	 * Set the blink operating mode.
+	 */
+	OS_REG_RMW_FIELD(ah, AR_MAC_LED,
+	    AR_MAC_LED_ASSOC, ledbits[state & 0x7]);
+
+	/* XXX Blink slow mode? */
+	/* XXX Blink threshold? */
+	/* XXX Blink sleep hystersis? */
+
+	/*
+	 * Set the LED blink configuration to be proportional
+	 * to the current TX and RX filter bytes.  (Ie, RX'ed
+	 * frames that don't match the filter are ignored.)
+	 * This means that higher TX/RX throughput will result
+	 * in the blink rate increasing.
+	 */
+	OS_REG_RMW_FIELD(ah, AR_MAC_LED, AR_MAC_LED_MODE,
+	    AR_MAC_LED_MODE_PROP);
 }
 
 /*
@@ -120,9 +128,36 @@ ar5416GetTsf64(struct ath_hal *ah)
 	return (((uint64_t) u32) << 32) | ((uint64_t) low2);
 }
 
+/*
+ * Update the TSF.
+ *
+ * The full TSF is only updated once the upper 32 bits have
+ * been written.  Writing only the lower 32 bits of the TSF
+ * will not actually correctly update the TSF.
+ *
+ * The #if 0'ed code is to check whether the previous TSF
+ * reset or write has completed before writing to the
+ * TSF.  Strictly speaking, it should be also checked before
+ * reading the TSF as the write/reset may not have completed.
+ */
 void
 ar5416SetTsf64(struct ath_hal *ah, uint64_t tsf64)
 {
+	/* XXX check if this is correct! */
+#if 0
+	int i;
+	uint32_t v;
+
+	for (i = 0; i < 10; i++) {
+		v = OS_REG_READ(ah, AR_SLP32_MODE);
+		if ((v & AR_SLP32_TSF_WRITE_STATUS) == 0)
+			break;
+		OS_DELAY(10);
+	}
+	if (i == 10)
+		ath_hal_printf(ah, "%s: couldn't slew things right!\n", __func__);
+#endif
+
 	OS_REG_WRITE(ah, AR_TSF_L32, tsf64 & 0xffffffff);
 	OS_REG_WRITE(ah, AR_TSF_U32, (tsf64 >> 32) & 0xffffffff);
 }
@@ -145,6 +180,14 @@ ar5416ResetTsf(struct ath_hal *ah)
 	OS_REG_WRITE(ah, AR_RESET_TSF, AR_RESET_TSF_ONCE);	
 }
 
+uint32_t
+ar5416GetCurRssi(struct ath_hal *ah)
+{
+	if (AR_SREV_OWL(ah))
+		return (OS_REG_READ(ah, AR_PHY_CURRENT_RSSI) & 0xff);
+	return (OS_REG_READ(ah, AR9130_PHY_CURRENT_RSSI) & 0xff);
+}
+
 HAL_BOOL
 ar5416SetAntennaSwitch(struct ath_hal *ah, HAL_ANT_SETTING settings)
 {
@@ -162,13 +205,76 @@ ar5416SetDecompMask(struct ath_hal *ah, uint16_t keyidx, int en)
 void
 ar5416SetCoverageClass(struct ath_hal *ah, uint8_t coverageclass, int now)
 {
-	AH_PRIVATE(ah)->ah_coverageClass = coverageclass;
+
+	ar5212SetCoverageClass(ah, coverageclass, now);
+}
+
+/*
+ * Return the busy for rx_frame, rx_clear, and tx_frame
+ */
+HAL_BOOL
+ar5416GetMibCycleCounts(struct ath_hal *ah, HAL_SURVEY_SAMPLE *hsample)
+{
+	struct ath_hal_5416 *ahp = AH5416(ah);
+	u_int32_t good = AH_TRUE;
+
+	/* XXX freeze/unfreeze mib counters */
+	uint32_t rc = OS_REG_READ(ah, AR_RCCNT);
+	uint32_t ec = OS_REG_READ(ah, AR_EXTRCCNT);
+	uint32_t rf = OS_REG_READ(ah, AR_RFCNT);
+	uint32_t tf = OS_REG_READ(ah, AR_TFCNT);
+	uint32_t cc = OS_REG_READ(ah, AR_CCCNT); /* read cycles last */
+
+	if (ahp->ah_cycleCount == 0 || ahp->ah_cycleCount > cc) {
+		/*
+		 * Cycle counter wrap (or initial call); it's not possible
+		 * to accurately calculate a value because the registers
+		 * right shift rather than wrap--so punt and return 0.
+		 */
+		HALDEBUG(ah, HAL_DEBUG_ANY,
+			    "%s: cycle counter wrap. ExtBusy = 0\n", __func__);
+			good = AH_FALSE;
+	} else {
+		hsample->cycle_count = cc - ahp->ah_cycleCount;
+		hsample->chan_busy = rc - ahp->ah_ctlBusy;
+		hsample->ext_chan_busy = ec - ahp->ah_extBusy;
+		hsample->rx_busy = rf - ahp->ah_rxBusy;
+		hsample->tx_busy = tf - ahp->ah_txBusy;
+	}
+
+	/*
+	 * Keep a copy of the MIB results so the next sample has something
+	 * to work from.
+	 */
+	ahp->ah_cycleCount = cc;
+	ahp->ah_rxBusy = rf;
+	ahp->ah_ctlBusy = rc;
+	ahp->ah_txBusy = tf;
+	ahp->ah_extBusy = ec;
+
+	return (good);
+}
+
+/*
+ * Setup the TX/RX chainmasks - this needs to be done before a call
+ * to the reset method as it doesn't update the hardware.
+ */
+void
+ar5416SetChainMasks(struct ath_hal *ah, uint32_t tx_chainmask,
+    uint32_t rx_chainmask)
+{
+	HAL_CAPABILITIES *pCap = &AH_PRIVATE(ah)->ah_caps;
+
+	AH5416(ah)->ah_tx_chainmask = tx_chainmask & pCap->halTxChainMask;
+	AH5416(ah)->ah_rx_chainmask = rx_chainmask & pCap->halRxChainMask;
 }
 
 /*
  * Return approximation of extension channel busy over an time interval
  * 0% (clear) -> 100% (busy)
  *
+ * XXX TODO: update this to correctly sample all the counters,
+ *           rather than a subset of it.
  */
 uint32_t
 ar5416Get11nExtBusy(struct ath_hal *ah)
@@ -278,7 +384,7 @@ ar5416Get11nRxClear(struct ath_hal *ah)
         rxclear |= HAL_RX_CLEAR_CTL_LOW;
     }
     /* extension channel */
-    if (val & AR_DIAG_RXCLEAR_CTL_LOW) {
+    if (val & AR_DIAG_RXCLEAR_EXT_LOW) {
         rxclear |= HAL_RX_CLEAR_EXT_LOW;
     }
     return rxclear;
@@ -359,10 +465,62 @@ ar5416GetCapability(struct ath_hal *ah, HAL_CAPABILITY_TYPE type,
 			HAL_OK : HAL_ENOTSUPP;
 	case HAL_CAP_DIVERSITY:		/* disable classic fast diversity */
 		return HAL_ENXIO;
+	case HAL_CAP_ENFORCE_TXOP:
+		if (capability == 0)
+			return (HAL_OK);
+		if (capability != 1)
+			return (HAL_ENOTSUPP);
+		(*result) =
+		    !! (AH5212(ah)->ah_miscMode & AR_PCU_TXOP_TBTT_LIMIT_ENA);
+		return (HAL_OK);
 	default:
 		break;
 	}
 	return ar5212GetCapability(ah, type, capability, result);
+}
+
+HAL_BOOL
+ar5416SetCapability(struct ath_hal *ah, HAL_CAPABILITY_TYPE type,
+    u_int32_t capability, u_int32_t setting, HAL_STATUS *status)
+{
+	HAL_CAPABILITIES *pCap = &AH_PRIVATE(ah)->ah_caps;
+
+	switch (type) {
+	case HAL_CAP_RX_CHAINMASK:
+		setting &= ath_hal_eepromGet(ah, AR_EEP_RXMASK, NULL);
+		pCap->halRxChainMask = setting;
+		if (owl_get_ntxchains(setting) > 2)
+			pCap->halRxStreams = 2;
+		else
+			pCap->halRxStreams = 1;
+		return AH_TRUE;
+	case HAL_CAP_TX_CHAINMASK:
+		setting &= ath_hal_eepromGet(ah, AR_EEP_TXMASK, NULL);
+		pCap->halTxChainMask = setting;
+		if (owl_get_ntxchains(setting) > 2)
+			pCap->halTxStreams = 2;
+		else
+			pCap->halTxStreams = 1;
+		return AH_TRUE;
+	case HAL_CAP_ENFORCE_TXOP:
+		if (capability != 1)
+			return AH_FALSE;
+		if (setting) {
+			AH5212(ah)->ah_miscMode
+			    |= AR_PCU_TXOP_TBTT_LIMIT_ENA;
+			OS_REG_SET_BIT(ah, AR_MISC_MODE,
+			    AR_PCU_TXOP_TBTT_LIMIT_ENA);
+		} else {
+			AH5212(ah)->ah_miscMode
+			    &= ~AR_PCU_TXOP_TBTT_LIMIT_ENA;
+			OS_REG_CLR_BIT(ah, AR_MISC_MODE,
+			    AR_PCU_TXOP_TBTT_LIMIT_ENA);
+		}
+		return AH_TRUE;
+	default:
+		break;
+	}
+	return ar5212SetCapability(ah, type, capability, setting, status);
 }
 
 static int ar5416DetectMacHang(struct ath_hal *ah);
@@ -399,36 +557,6 @@ ar5416GetDiagState(struct ath_hal *ah, int request,
 	return ar5212GetDiagState(ah, request,
 	    args, argsize, result, resultsize);
 }
-
-typedef struct {
-	uint32_t dma_dbg_3;
-	uint32_t dma_dbg_4;
-	uint32_t dma_dbg_5;
-	uint32_t dma_dbg_6;
-} mac_dbg_regs_t;
-
-typedef enum {
-	dcu_chain_state		= 0x1,
-	dcu_complete_state	= 0x2,
-	qcu_state		= 0x4,
-	qcu_fsp_ok		= 0x8,
-	qcu_fsp_state		= 0x10,
-	qcu_stitch_state	= 0x20,
-	qcu_fetch_state		= 0x40,
-	qcu_complete_state	= 0x80
-} hal_mac_hangs_t;
-
-typedef struct {
-	int states;
-	uint8_t dcu_chain_state;
-	uint8_t dcu_complete_state;
-	uint8_t qcu_state;
-	uint8_t qcu_fsp_ok;
-	uint8_t qcu_fsp_state;
-	uint8_t qcu_stitch_state;
-	uint8_t qcu_fetch_state;
-	uint8_t qcu_complete_state;
-} hal_mac_hang_check_t;
 
 HAL_BOOL
 ar5416SetRifsDelay(struct ath_hal *ah, const struct ieee80211_channel *chan,
@@ -624,157 +752,3 @@ ar5416DetectBBHang(struct ath_hal *ah)
 #undef N
 }
 #undef NUM_STATUS_READS
-
-/*
- * Get the radar parameter values and return them in the pe
- * structure
- */
-void
-ar5416GetDfsThresh(struct ath_hal *ah, HAL_PHYERR_PARAM *pe)
-{
-	uint32_t val, temp;
-
-	val = OS_REG_READ(ah, AR_PHY_RADAR_0);
-
-	temp = MS(val,AR_PHY_RADAR_0_FIRPWR);
-	temp |= 0xFFFFFF80;
-	pe->pe_firpwr = temp;
-	pe->pe_rrssi = MS(val, AR_PHY_RADAR_0_RRSSI);
-	pe->pe_height =  MS(val, AR_PHY_RADAR_0_HEIGHT);
-	pe->pe_prssi = MS(val, AR_PHY_RADAR_0_PRSSI);
-	pe->pe_inband = MS(val, AR_PHY_RADAR_0_INBAND);
-
-	val = OS_REG_READ(ah, AR_PHY_RADAR_1);
-	temp = val & AR_PHY_RADAR_1_RELPWR_ENA;
-	pe->pe_relpwr = MS(val, AR_PHY_RADAR_1_RELPWR_THRESH);
-	if (temp)
-		pe->pe_relpwr |= HAL_PHYERR_PARAM_ENABLE;
-	temp = val & AR_PHY_RADAR_1_RELSTEP_CHECK;
-	pe->pe_relstep = MS(val, AR_PHY_RADAR_1_RELSTEP_THRESH);
-	if (temp)
-		pe->pe_enabled = 1;
-	else
-		pe->pe_enabled = 0;
-
-	pe->pe_maxlen = MS(val, AR_PHY_RADAR_1_MAXLEN);
-	pe->pe_extchannel = !! (OS_REG_READ(ah, AR_PHY_RADAR_EXT) &
-	    AR_PHY_RADAR_EXT_ENA);
-
-	pe->pe_usefir128 = !! (OS_REG_READ(ah, AR_PHY_RADAR_1) &
-	    AR_PHY_RADAR_1_USE_FIR128);
-	pe->pe_blockradar = !! (OS_REG_READ(ah, AR_PHY_RADAR_1) &
-	    AR_PHY_RADAR_1_BLOCK_CHECK);
-	pe->pe_enmaxrssi = !! (OS_REG_READ(ah, AR_PHY_RADAR_1) &
-	    AR_PHY_RADAR_1_MAX_RRSSI);
-}
-
-/*
- * Enable radar detection and set the radar parameters per the
- * values in pe
- */
-void
-ar5416EnableDfs(struct ath_hal *ah, HAL_PHYERR_PARAM *pe)
-{
-	uint32_t val;
-
-	val = OS_REG_READ(ah, AR_PHY_RADAR_0);
-
-	if (pe->pe_firpwr != HAL_PHYERR_PARAM_NOVAL) {
-		val &= ~AR_PHY_RADAR_0_FIRPWR;
-		val |= SM(pe->pe_firpwr, AR_PHY_RADAR_0_FIRPWR);
-	}
-	if (pe->pe_rrssi != HAL_PHYERR_PARAM_NOVAL) {
-		val &= ~AR_PHY_RADAR_0_RRSSI;
-		val |= SM(pe->pe_rrssi, AR_PHY_RADAR_0_RRSSI);
-	}
-	if (pe->pe_height != HAL_PHYERR_PARAM_NOVAL) {
-		val &= ~AR_PHY_RADAR_0_HEIGHT;
-		val |= SM(pe->pe_height, AR_PHY_RADAR_0_HEIGHT);
-	}
-	if (pe->pe_prssi != HAL_PHYERR_PARAM_NOVAL) {
-		val &= ~AR_PHY_RADAR_0_PRSSI;
-		val |= SM(pe->pe_prssi, AR_PHY_RADAR_0_PRSSI);
-	}
-	if (pe->pe_inband != HAL_PHYERR_PARAM_NOVAL) {
-		val &= ~AR_PHY_RADAR_0_INBAND;
-		val |= SM(pe->pe_inband, AR_PHY_RADAR_0_INBAND);
-	}
-
-	/*Enable FFT data*/
-	val |= AR_PHY_RADAR_0_FFT_ENA;
-
-	OS_REG_WRITE(ah, AR_PHY_RADAR_0, val | AR_PHY_RADAR_0_ENA);
-
-	if (pe->pe_usefir128 == 1)
-		OS_REG_CLR_BIT(ah, AR_PHY_RADAR_1, AR_PHY_RADAR_1_USE_FIR128);
-	else if (pe->pe_usefir128 == 0)
-		OS_REG_SET_BIT(ah, AR_PHY_RADAR_1, AR_PHY_RADAR_1_USE_FIR128);
-
-	if (pe->pe_enmaxrssi == 1)
-		OS_REG_SET_BIT(ah, AR_PHY_RADAR_1, AR_PHY_RADAR_1_MAX_RRSSI);
-	else if (pe->pe_enmaxrssi == 0)
-		OS_REG_CLR_BIT(ah, AR_PHY_RADAR_1, AR_PHY_RADAR_1_MAX_RRSSI);
-
-	if (pe->pe_blockradar == 1)
-		OS_REG_SET_BIT(ah, AR_PHY_RADAR_1, AR_PHY_RADAR_1_BLOCK_CHECK);
-	else if (pe->pe_blockradar == 0)
-		OS_REG_CLR_BIT(ah, AR_PHY_RADAR_1, AR_PHY_RADAR_1_BLOCK_CHECK);
-
-	if (pe->pe_maxlen != HAL_PHYERR_PARAM_NOVAL) {
-		val = OS_REG_READ(ah, AR_PHY_RADAR_1);
-		val &= ~AR_PHY_RADAR_1_MAXLEN;
-		val |= SM(pe->pe_maxlen, AR_PHY_RADAR_1_MAXLEN);
-		OS_REG_WRITE(ah, AR_PHY_RADAR_1, val);
-	}
-
-	/*
-	 * Enable HT/40 if the upper layer asks;
-	 * it should check the channel is HT/40 and HAL_CAP_EXT_CHAN_DFS
-	 * is available.
-	 */
-	if (pe->pe_extchannel == 1)
-		OS_REG_SET_BIT(ah, AR_PHY_RADAR_EXT, AR_PHY_RADAR_EXT_ENA);
-	else if (pe->pe_extchannel == 0)
-		OS_REG_CLR_BIT(ah, AR_PHY_RADAR_EXT, AR_PHY_RADAR_EXT_ENA);
-
-	if (pe->pe_relstep != HAL_PHYERR_PARAM_NOVAL) {
-		val = OS_REG_READ(ah, AR_PHY_RADAR_1);
-		val &= ~AR_PHY_RADAR_1_RELSTEP_THRESH;
-		val |= SM(pe->pe_relstep, AR_PHY_RADAR_1_RELSTEP_THRESH);
-		OS_REG_WRITE(ah, AR_PHY_RADAR_1, val);
-	}
-	if (pe->pe_relpwr != HAL_PHYERR_PARAM_NOVAL) {
-		val = OS_REG_READ(ah, AR_PHY_RADAR_1);
-		val &= ~AR_PHY_RADAR_1_RELPWR_THRESH;
-		val |= SM(pe->pe_relpwr, AR_PHY_RADAR_1_RELPWR_THRESH);
-		OS_REG_WRITE(ah, AR_PHY_RADAR_1, val);
-	}
-}
-
-/*
- * Extract the radar event information from the given phy error.
- *
- * Returns AH_TRUE if the phy error was actually a phy error,
- * AH_FALSE if the phy error wasn't a phy error.
- */
-HAL_BOOL
-ar5416ProcessRadarEvent(struct ath_hal *ah, struct ath_rx_status *rxs,
-    uint64_t fulltsf, const char *buf, HAL_DFS_EVENT *event)
-{
-	/*
-	 * For now, this isn't implemented.
-	 */
-	return AH_FALSE;
-}
-
-/*
- * Return whether fast-clock is currently enabled for this
- * channel.
- */
-HAL_BOOL
-ar5416IsFastClockEnabled(struct ath_hal *ah)
-{
-	struct ath_hal_private *ahp = AH_PRIVATE(ah);
-
-	return IS_5GHZ_FAST_CLOCK_EN(ah, ahp->ah_curchan);
-}

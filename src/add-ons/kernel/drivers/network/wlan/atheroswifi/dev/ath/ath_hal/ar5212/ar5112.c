@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar5112.c 225883 2011-09-30 05:17:57Z adrian $
  */
 #include "opt_ah.h"
 
@@ -611,7 +611,7 @@ getFullPwrTable(uint16_t numPcdacs, uint16_t *pcdacs, int16_t *power, int16_t ma
 	uint16_t    idxR = 1;
 
 	if (numPcdacs < 2) {
-		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
 		     "%s: at least 2 pcdac values needed [%d]\n",
 		     __func__, numPcdacs);
 		return AH_FALSE;

@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5211/ar5211.h 290612 2015-11-09 15:59:42Z adrian $
  */
 #ifndef _ATH_AR5211_H_
 #define _ATH_AR5211_H_
@@ -119,7 +119,6 @@ struct ath_hal_5211 {
 	uint32_t	ah_txEolInterruptMask;
 	uint32_t	ah_txUrnInterruptMask;
 	HAL_TX_QUEUE_INFO ah_txq[HAL_NUM_TX_QUEUES];
-	HAL_POWER_MODE	ah_powerMode;
 	HAL_ANT_SETTING ah_diversityControl;	/* antenna setting */
 	uint32_t	ah_calibrationTime;
 	HAL_BOOL	ah_bIQCalibration;
@@ -148,6 +147,7 @@ extern	void ar5211Detach(struct ath_hal *);
 
 extern	HAL_BOOL ar5211Reset(struct ath_hal *, HAL_OPMODE,
 		struct ieee80211_channel *, HAL_BOOL bChannelChange,
+		HAL_RESET_TYPE,
 		HAL_STATUS *);
 extern	HAL_BOOL ar5211PhyDisable(struct ath_hal *);
 extern	HAL_BOOL ar5211Disable(struct ath_hal *);
@@ -196,7 +196,8 @@ extern	HAL_BOOL ar5211SetupXTxDesc(struct ath_hal *, struct ath_desc *,
 		u_int txRate2, u_int txRetries2,
 		u_int txRate3, u_int txRetries3);
 extern	HAL_BOOL ar5211FillTxDesc(struct ath_hal *, struct ath_desc *,
-		u_int segLen, HAL_BOOL firstSeg, HAL_BOOL lastSeg,
+		HAL_DMA_ADDR *bufAddrList, uint32_t *segLenList,
+		u_int descId, u_int qcuId, HAL_BOOL firstSeg, HAL_BOOL lastSeg,
 		const struct ath_desc *ds0);
 extern	HAL_STATUS ar5211ProcTxDesc(struct ath_hal *,
 		struct ath_desc *, struct ath_tx_status *);
@@ -204,9 +205,15 @@ extern  void ar5211GetTxIntrQueue(struct ath_hal *ah, uint32_t *);
 extern  void ar5211IntrReqTxDesc(struct ath_hal *ah, struct ath_desc *);
 extern	HAL_BOOL ar5211GetTxCompletionRates(struct ath_hal *ah,
 		const struct ath_desc *ds0, int *rates, int *tries);
+extern	void ar5211SetTxDescLink(struct ath_hal *ah, void *ds,
+		uint32_t link);
+extern	void ar5211GetTxDescLink(struct ath_hal *ah, void *ds,
+		uint32_t *link);
+extern	void ar5211GetTxDescLinkPtr(struct ath_hal *ah, void *ds,
+		uint32_t **linkptr);
 
-extern	uint32_t ar5211GetRxDP(struct ath_hal *);
-extern	void ar5211SetRxDP(struct ath_hal *, uint32_t rxdp);
+extern	uint32_t ar5211GetRxDP(struct ath_hal *, HAL_RX_QUEUE);
+extern	void ar5211SetRxDP(struct ath_hal *, uint32_t rxdp, HAL_RX_QUEUE);
 extern	void ar5211EnableReceive(struct ath_hal *);
 extern	HAL_BOOL ar5211StopDmaReceive(struct ath_hal *);
 extern	void ar5211StartPcuReceive(struct ath_hal *);
@@ -276,6 +283,13 @@ extern	HAL_BOOL ar5211SetCapability(struct ath_hal *, HAL_CAPABILITY_TYPE,
 extern	HAL_BOOL ar5211GetDiagState(struct ath_hal *ah, int request,
 		const void *args, uint32_t argsize,
 		void **result, uint32_t *resultsize);
+extern	uint32_t ar5211Get11nExtBusy(struct ath_hal *);
+extern	HAL_BOOL ar5211GetMibCycleCounts(struct ath_hal *,
+		HAL_SURVEY_SAMPLE *);
+extern	void ar5211SetChainMasks(struct ath_hal *ah, uint32_t, uint32_t);
+
+extern	void ar5211EnableDfs(struct ath_hal *, HAL_PHYERR_PARAM *);
+extern	void ar5211GetDfsThresh(struct ath_hal *, HAL_PHYERR_PARAM *);
 
 extern	u_int ar5211GetKeyCacheSize(struct ath_hal *);
 extern	HAL_BOOL ar5211IsKeyCacheEntryValid(struct ath_hal *, uint16_t);

@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9287.c 228517 2011-12-15 00:59:11Z adrian $
  */
 #include "opt_ah.h"
 
@@ -390,3 +390,11 @@ ar9287RfAttach(struct ath_hal *ah, HAL_STATUS *status)
 
 	return AH_TRUE;
 }
+
+static HAL_BOOL
+ar9287RfProbe(struct ath_hal *ah)
+{
+	return (AR_SREV_KIWI(ah));
+}
+
+AH_RF(RF9287, ar9287RfProbe, ar9287RfAttach);

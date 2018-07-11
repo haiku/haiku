@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar5212_ani.c 280940 2015-04-01 03:42:46Z adrian $
  */
 #include "opt_ah.h"
 
@@ -110,7 +110,7 @@ ar5212AniGetCurrentState(struct ath_hal *ah)
 /*
  * Return the current statistics.
  */
-struct ar5212Stats *
+HAL_ANI_STATS *
 ar5212AniGetCurrentStats(struct ath_hal *ah)
 {
 	struct ath_hal_5212 *ahp = AH5212(ah);
@@ -865,16 +865,31 @@ static int32_t
 ar5212AniGetListenTime(struct ath_hal *ah)
 {
 	struct ath_hal_5212 *ahp = AH5212(ah);
-	struct ar5212AniState *aniState;
-	uint32_t txFrameCount, rxFrameCount, cycleCount;
-	int32_t listenTime;
+	struct ar5212AniState *aniState = NULL;
+	int32_t listenTime = 0;
+	int good;
+	HAL_SURVEY_SAMPLE hs;
 
-	txFrameCount = OS_REG_READ(ah, AR_TFCNT);
-	rxFrameCount = OS_REG_READ(ah, AR_RFCNT);
-	cycleCount = OS_REG_READ(ah, AR_CCCNT);
+	/*
+	 * We shouldn't see ah_curchan be NULL, but just in case..
+	 */
+	if (AH_PRIVATE(ah)->ah_curchan == AH_NULL) {
+		ath_hal_printf(ah, "%s: ah_curchan = NULL?\n", __func__);
+		return (0);
+	}
 
-	aniState = ahp->ah_curani;
-	if (aniState->cycleCount == 0 || aniState->cycleCount > cycleCount) {
+	/*
+	 * Fetch the current statistics, squirrel away the current
+	 * sample, bump the sequence/sample counter.
+	 */
+	OS_MEMZERO(&hs, sizeof(hs));
+	good = ar5212GetMibCycleCounts(ah, &hs);
+	ath_hal_survey_add_sample(ah, &hs);
+
+	if (ANI_ENA(ah))
+		aniState = ahp->ah_curani;
+
+	if (good == AH_FALSE) {
 		/*
 		 * Cycle counter wrap (or initial call); it's not possible
 		 * to accurately calculate a value because the registers
@@ -882,15 +897,29 @@ ar5212AniGetListenTime(struct ath_hal *ah)
 		 */
 		listenTime = 0;
 		ahp->ah_stats.ast_ani_lzero++;
-	} else {
-		int32_t ccdelta = cycleCount - aniState->cycleCount;
-		int32_t rfdelta = rxFrameCount - aniState->rxFrameCount;
-		int32_t tfdelta = txFrameCount - aniState->txFrameCount;
+	} else if (ANI_ENA(ah)) {
+		/*
+		 * Only calculate and update the cycle count if we have
+		 * an ANI state.
+		 */
+		int32_t ccdelta =
+		    AH5212(ah)->ah_cycleCount - aniState->cycleCount;
+		int32_t rfdelta =
+		    AH5212(ah)->ah_rxBusy - aniState->rxFrameCount;
+		int32_t tfdelta =
+		    AH5212(ah)->ah_txBusy - aniState->txFrameCount;
 		listenTime = (ccdelta - rfdelta - tfdelta) / CLOCK_RATE;
 	}
-	aniState->cycleCount = cycleCount;
-	aniState->txFrameCount = txFrameCount;
-	aniState->rxFrameCount = rxFrameCount;
+
+	/*
+	 * Again, only update ANI state if we have it.
+	 */
+	if (ANI_ENA(ah)) {
+		aniState->cycleCount = AH5212(ah)->ah_cycleCount;
+		aniState->rxFrameCount = AH5212(ah)->ah_rxBusy;
+		aniState->txFrameCount = AH5212(ah)->ah_txBusy;
+	}
+
 	return listenTime;
 }
 
@@ -956,13 +985,15 @@ ar5212AniPoll(struct ath_hal *ah, const struct ieee80211_channel *chan)
 	const struct ar5212AniParams *params;
 	int32_t listenTime;
 
+	/* Always update from the MIB, for statistics gathering */
+	listenTime = ar5212AniGetListenTime(ah);
+
 	/* XXX can aniState be null? */
 	if (aniState == AH_NULL)
 		return;
 	if (!ANI_ENA(ah))
 		return;
 
-	listenTime = ar5212AniGetListenTime(ah);
 	if (listenTime < 0) {
 		ahp->ah_stats.ast_ani_lneg++;
 		/* restart ANI period if listenTime is invalid */

@@ -15,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9001/ar9130_attach.c 272292 2014-09-30 03:19:29Z adrian $
  */
 #include "opt_ah.h"
 
@@ -69,7 +69,9 @@ static HAL_BOOL ar9130FillCapabilityInfo(struct ath_hal *ah);
  */
 static struct ath_hal *
 ar9130Attach(uint16_t devid, HAL_SOFTC sc,
-	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata, HAL_STATUS *status)
+	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_OPS_CONFIG *ah_config,
+	HAL_STATUS *status)
 {
 	struct ath_hal_5416 *ahp5416;
 	struct ath_hal_5212 *ahp;
@@ -78,13 +80,13 @@ ar9130Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_STATUS ecode;
 	HAL_BOOL rfStatus;
 
-	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp5416 = ath_hal_malloc(sizeof (struct ath_hal_5416));
 	if (ahp5416 == AH_NULL) {
-		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -119,11 +121,11 @@ ar9130Attach(uint16_t devid, HAL_SOFTC sc,
 
 	/*
 	 * Use the "local" EEPROM data given to us by the higher layers.
-	 * This is a private copy out of system flash. The Linux ath9k
-	 * commit for the initial AR9130 support mentions MMIO flash
-	 * access is "unreliable." -adrian
+	 * This is a private copy out of system flash.
+	 * By this stage the SoC SPI flash may have disabled the memory-
+	 * mapping and rely purely on port-based SPI IO.
 	 */
-	AH_PRIVATE((ah))->ah_eepromRead = ar9130EepromRead;
+	AH_PRIVATE((ah))->ah_eepromRead = ath_hal_EepromDataRead;
 	AH_PRIVATE((ah))->ah_eepromWrite = NULL;
 	ah->ah_eepromdata = eepromdata;
 
@@ -298,6 +300,15 @@ ar9130FillCapabilityInfo(struct ath_hal *ah)
 	 */
 	pCap->halMbssidAggrSupport = AH_FALSE;
 	pCap->hal4AddrAggrSupport = AH_TRUE;
+	/* BB Read WAR */
+	pCap->halHasBBReadWar = AH_TRUE;
+
+	/*
+	 * Implement the PLL/config changes needed for half/quarter
+	 * rates before re-enabling them here.
+	 */
+	pCap->halChanHalfRate = AH_FALSE;
+	pCap->halChanQuarterRate = AH_FALSE;
 
 	return AH_TRUE;
 }

@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_eeprom_9287.c 239704 2012-08-26 04:26:49Z adrian $
  */
 #include "opt_ah.h"
 
@@ -310,12 +310,12 @@ ath_hal_9287EepromAttach(struct ath_hal *ah)
 			    "%s Error reading Eeprom MAGIC\n", __func__);
 			return HAL_EEREAD;
 		}
-	}
-	HALDEBUG(ah, HAL_DEBUG_ATTACH, "%s Eeprom Magic = 0x%x\n",
-	    __func__, magic);
-	if (magic != AR5416_EEPROM_MAGIC) {
-		HALDEBUG(ah, HAL_DEBUG_ANY, "Bad magic number\n");
-		return HAL_EEMAGIC;
+		HALDEBUG(ah, HAL_DEBUG_ATTACH, "%s Eeprom Magic = 0x%x\n",
+		    __func__, magic);
+		if (magic != AR5416_EEPROM_MAGIC) {
+			HALDEBUG(ah, HAL_DEBUG_ANY, "Bad magic number\n");
+			return HAL_EEMAGIC;
+		}
 	}
 
 	ee = ath_hal_malloc(sizeof(HAL_EEPROM_9287));

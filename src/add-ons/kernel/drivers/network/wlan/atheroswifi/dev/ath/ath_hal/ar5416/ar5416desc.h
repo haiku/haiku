@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416desc.h 250346 2013-05-08 01:11:25Z adrian $
  */
 #ifndef _ATH_AR5416_DESC_H_
 #define _ATH_AR5416_DESC_H_
@@ -301,6 +301,8 @@ struct ar5416_desc {
 #define AR_FinalTxIdx_S     21
 #define AR_TxStatusRsvd82   0x01800000
 #define AR_PowerMgmt        0x02000000
+#define AR_TxTid            0xf0000000
+#define AR_TxTid_S          28
 #define AR_TxStatusRsvd83   0xfc000000
 
 /***********
@@ -355,6 +357,7 @@ struct ar5416_desc {
 #define AR_RxStatusRsvd30   0xfffff800
 /* Owl 2.x only */
 #define AR_DupFrame	    0x00000004
+#define AR_STBCFrame        0x00000008
 #define AR_RxAntenna        0xffffff00
 #define AR_RxAntenna_S      8
 

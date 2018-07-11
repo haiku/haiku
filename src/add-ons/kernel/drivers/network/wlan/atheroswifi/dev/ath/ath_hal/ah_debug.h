@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_debug.h 249131 2013-04-05 07:41:47Z adrian $
  */
 #ifndef _ATH_AH_DEBUG_H_
 #define _ATH_AH_DEBUG_H_
@@ -47,8 +47,15 @@ enum {
 	HAL_DEBUG_DIVERSITY	= 0x00100000,	/* diversity debugging */
 	HAL_DEBUG_DFS		= 0x00200000,	/* DFS debugging */
 	HAL_DEBUG_HANG		= 0x00400000,	/* BB/MAC hang debugging */
+	HAL_DEBUG_CALIBRATE	= 0x00800000,	/* setup calibration */
+	HAL_DEBUG_POWER_MGMT	= 0x01000000,	/* power calibration */
+	HAL_DEBUG_CHANNEL	= 0x02000000,
+	HAL_DEBUG_QUEUE		= 0x04000000,
+	HAL_DEBUG_PRINT_REG	= 0x08000000,
+	HAL_DEBUG_FCS_RTT	= 0x10000000,
+	HAL_DEBUG_BT_COEX	= 0x20000000,
 
-	HAL_DEBUG_UNMASKABLE	= 0xf0000000,	/* always printed */
+	HAL_DEBUG_UNMASKABLE	= 0x80000000,	/* always printed */
 	HAL_DEBUG_ANY		= 0xffffffff
 };
 #endif /* _ATH_AH_DEBUG_H_ */

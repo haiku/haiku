@@ -14,12 +14,13 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar5212_xmit.c 243169 2012-11-17 02:02:36Z adrian $
  */
 #include "opt_ah.h"
 
 #include "ah.h"
 #include "ah_internal.h"
+#include "ah_desc.h"
 
 #include "ar5212/ar5212.h"
 #include "ar5212/ar5212reg.h"
@@ -263,6 +264,7 @@ ar5212ReleaseTxQueue(struct ath_hal *ah, u_int q)
  * Assumes:
  *  phwChannel has been set to point to the current channel
  */
+#define	TU_TO_USEC(_tu)		((_tu) << 10)
 HAL_BOOL
 ar5212ResetTxQueue(struct ath_hal *ah, u_int q)
 {
@@ -270,7 +272,7 @@ ar5212ResetTxQueue(struct ath_hal *ah, u_int q)
 	HAL_CAPABILITIES *pCap = &AH_PRIVATE(ah)->ah_caps;
 	const struct ieee80211_channel *chan = AH_PRIVATE(ah)->ah_curchan;
 	HAL_TX_QUEUE_INFO *qi;
-	uint32_t cwMin, chanCwMin, value, qmisc, dmisc;
+	uint32_t cwMin, chanCwMin, qmisc, dmisc;
 
 	if (q >= pCap->halTotalQueues) {
 		HALDEBUG(ah, HAL_DEBUG_ANY, "%s: invalid queue num %u\n",
@@ -409,17 +411,40 @@ ar5212ResetTxQueue(struct ath_hal *ah, u_int q)
 		      |  AR_Q_MISC_CBR_INCR_DIS1
 		      |  AR_Q_MISC_CBR_INCR_DIS0;
 
-		if (!qi->tqi_readyTime) {
+		if (qi->tqi_readyTime) {
+			HALDEBUG(ah, HAL_DEBUG_TXQUEUE,
+			    "%s: using tqi_readyTime\n", __func__);
+			OS_REG_WRITE(ah, AR_QRDYTIMECFG(q),
+			    SM(qi->tqi_readyTime, AR_Q_RDYTIMECFG_INT) |
+			    AR_Q_RDYTIMECFG_ENA);
+		} else {
+			int value;
 			/*
 			 * NB: don't set default ready time if driver
 			 * has explicitly specified something.  This is
 			 * here solely for backwards compatibility.
 			 */
-			value = (ahp->ah_beaconInterval
+			/*
+			 * XXX for now, hard-code a CAB interval of 70%
+			 * XXX of the total beacon interval.
+			 */
+
+			value = (ahp->ah_beaconInterval * 70 / 100)
 				- (ah->ah_config.ah_sw_beacon_response_time -
-					ah->ah_config.ah_dma_beacon_response_time)
-				- ah->ah_config.ah_additional_swba_backoff) * 1024;
-			OS_REG_WRITE(ah, AR_QRDYTIMECFG(q), value | AR_Q_RDYTIMECFG_ENA);
+				+ ah->ah_config.ah_dma_beacon_response_time)
+				- ah->ah_config.ah_additional_swba_backoff;
+			/*
+			 * XXX Ensure it isn't too low - nothing lower
+			 * XXX than 10 TU
+			 */
+			if (value < 10)
+				value = 10;
+			HALDEBUG(ah, HAL_DEBUG_TXQUEUE,
+			    "%s: defaulting to rdytime = %d uS\n",
+			    __func__, value);
+			OS_REG_WRITE(ah, AR_QRDYTIMECFG(q),
+			    SM(TU_TO_USEC(value), AR_Q_RDYTIMECFG_INT) |
+			    AR_Q_RDYTIMECFG_ENA);
 		}
 		dmisc |= SM(AR_D_MISC_ARB_LOCKOUT_CNTRL_GLOBAL,
 			    AR_D_MISC_ARB_LOCKOUT_CNTRL);
@@ -481,6 +506,7 @@ ar5212ResetTxQueue(struct ath_hal *ah, u_int q)
 
 	return AH_TRUE;
 }
+#undef	TU_TO_USEC
 
 /*
  * Get the TXDP for the specified queue
@@ -777,12 +803,16 @@ ar5212IntrReqTxDesc(struct ath_hal *ah, struct ath_desc *ds)
 
 HAL_BOOL
 ar5212FillTxDesc(struct ath_hal *ah, struct ath_desc *ds,
-	u_int segLen, HAL_BOOL firstSeg, HAL_BOOL lastSeg,
+	HAL_DMA_ADDR *bufAddrList, uint32_t *segLenList, u_int qcuId,
+	u_int descId, HAL_BOOL firstSeg, HAL_BOOL lastSeg,
 	const struct ath_desc *ds0)
 {
 	struct ar5212_desc *ads = AR5212DESC(ds);
+	uint32_t segLen = segLenList[0];
 
 	HALASSERT((segLen &~ AR_BufLen) == 0);
+
+	ds->ds_data = bufAddrList[0];
 
 	if (firstSeg) {
 		/*
@@ -796,12 +826,14 @@ ar5212FillTxDesc(struct ath_hal *ah, struct ath_desc *ds,
 		 * copy the multi-rate transmit parameters from
 		 * the first frame for processing on completion. 
 		 */
-		ads->ds_ctl0 = 0;
 		ads->ds_ctl1 = segLen;
 #ifdef AH_NEED_DESC_SWAP
+		ads->ds_ctl0 = __bswap32(AR5212DESC_CONST(ds0)->ds_ctl0)
+		    & AR_TxInterReq;
 		ads->ds_ctl2 = __bswap32(AR5212DESC_CONST(ds0)->ds_ctl2);
 		ads->ds_ctl3 = __bswap32(AR5212DESC_CONST(ds0)->ds_ctl3);
 #else
+		ads->ds_ctl0 = AR5212DESC_CONST(ds0)->ds_ctl0 & AR_TxInterReq;
 		ads->ds_ctl2 = AR5212DESC_CONST(ds0)->ds_ctl2;
 		ads->ds_ctl3 = AR5212DESC_CONST(ds0)->ds_ctl3;
 #endif
@@ -809,7 +841,12 @@ ar5212FillTxDesc(struct ath_hal *ah, struct ath_desc *ds,
 		/*
 		 * Intermediate descriptor in a multi-descriptor frame.
 		 */
-		ads->ds_ctl0 = 0;
+#ifdef AH_NEED_DESC_SWAP
+		ads->ds_ctl0 = __bswap32(AR5212DESC_CONST(ds0)->ds_ctl0)
+		    & AR_TxInterReq;
+#else
+		ads->ds_ctl0 = AR5212DESC_CONST(ds0)->ds_ctl0 & AR_TxInterReq;
+#endif
 		ads->ds_ctl1 = segLen | AR_More;
 		ads->ds_ctl2 = 0;
 		ads->ds_ctl3 = 0;
@@ -939,3 +976,27 @@ ar5212GetTxCompletionRates(struct ath_hal *ah, const struct ath_desc *ds0, int *
 
 	return AH_TRUE;
 }  
+
+void
+ar5212SetTxDescLink(struct ath_hal *ah, void *ds, uint32_t link)
+{
+	struct ar5212_desc *ads = AR5212DESC(ds);
+
+	ads->ds_link = link;
+}
+
+void
+ar5212GetTxDescLink(struct ath_hal *ah, void *ds, uint32_t *link)
+{
+	struct ar5212_desc *ads = AR5212DESC(ds);
+
+	*link = ads->ds_link;
+}
+
+void
+ar5212GetTxDescLinkPtr(struct ath_hal *ah, void *ds, uint32_t **linkptr)
+{
+	struct ar5212_desc *ads = AR5212DESC(ds);
+
+	*linkptr = &ads->ds_link;
+}

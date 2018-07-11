@@ -29,14 +29,17 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/if_ath_ahb.c 288349 2015-09-29 03:37:17Z adrian $");
 
 /*
  * AHB bus front-end for the Atheros Wireless LAN controller driver.
  */
 
+#include "opt_ath.h"
+
 #include <sys/param.h>
 #include <sys/systm.h> 
+#include <sys/malloc.h>
 #include <sys/module.h>
 #include <sys/kernel.h>
 #include <sys/lock.h>
@@ -53,6 +56,7 @@ __FBSDID("$FreeBSD$");
 #include <net/if.h>
 #include <net/if_media.h>
 #include <net/if_arp.h>
+#include <net/ethernet.h>
 
 #include <net80211/ieee80211_var.h>
 
@@ -83,16 +87,42 @@ struct ath_ahb_softc {
 static int
 ath_ahb_probe(device_t dev)
 {
+	int vendor_id, device_id;
 	const char* devname;
 
-	/* Atheros / ar9130 */
-	devname = ath_hal_probe(VENDOR_ATHEROS, AR9130_DEVID);
+	/*
+	 * Check if a device/vendor ID is provided in hints.
+	 */
+	if (resource_int_value(device_get_name(dev), device_get_unit(dev),
+	    "vendor_id", &vendor_id) != 0) {
+		vendor_id = VENDOR_ATHEROS;
+	}
+
+	if (resource_int_value(device_get_name(dev), device_get_unit(dev),
+	    "device_id", &device_id) != 0) {
+		device_id = AR9130_DEVID;
+	}
+
+	device_printf(dev, "Vendor=0x%04x, Device=0x%04x\n",
+	    vendor_id & 0xffff,
+	    device_id & 0xffff);
+
+	/* Attempt to probe */
+	devname = ath_hal_probe(vendor_id, device_id);
 
 	if (devname != NULL) {
 		device_set_desc(dev, devname);
 		return BUS_PROBE_DEFAULT;
 	}
 	return ENXIO;
+}
+
+static void
+ath_ahb_intr(void *arg)
+{
+	/* XXX TODO: check if its ours! */
+	ar71xx_device_flush_ddr(AR71XX_CPU_DDR_FLUSH_WMAC);
+	ath_intr(arg);
 }
 
 static int
@@ -103,7 +133,9 @@ ath_ahb_attach(device_t dev)
 	int error = ENXIO;
 	int rid;
 	long eepromaddr;
+	int eepromsize;
 	uint8_t *p;
+	int device_id, vendor_id;
 
 	sc->sc_dev = dev;
 
@@ -114,22 +146,45 @@ ath_ahb_attach(device_t dev)
 		goto bad;
 	}
 
-        if (resource_long_value(device_get_name(dev), device_get_unit(dev),
-            "eepromaddr", &eepromaddr) != 0) {
+	if (resource_long_value(device_get_name(dev), device_get_unit(dev),
+	    "eepromaddr", &eepromaddr) != 0) {
 		device_printf(dev, "cannot fetch 'eepromaddr' from hints\n");
 		goto bad0;
-        }
+	}
+
+	/*
+	 * The default EEPROM size is 2048 * 16 bit words.
+	 * Later EEPROM/OTP/flash regions may be quite a bit bigger.
+	 */
+	if (resource_int_value(device_get_name(dev), device_get_unit(dev),
+	    "eepromsize", &eepromsize) != 0) {
+		eepromsize = ATH_EEPROM_DATA_SIZE * 2;
+	}
+
 	rid = 0;
-	device_printf(sc->sc_dev, "eeprom @ %p\n", (void *) eepromaddr);
-	psc->sc_eeprom = bus_alloc_resource(dev, SYS_RES_MEMORY, &rid, (uintptr_t) eepromaddr,
-	  (uintptr_t) eepromaddr + (uintptr_t) ((ATH_EEPROM_DATA_SIZE * 2) - 1), 0, RF_ACTIVE);
+	device_printf(sc->sc_dev, "eeprom @ %p (%d bytes)\n",
+	    (void *) eepromaddr, eepromsize);
+	/*
+	 * XXX this assumes that the parent device is the nexus
+	 * and will just pass through requests for all of memory.
+	 *
+	 * Later on, when this has to attach off of the actual
+	 * AHB, this won't work.
+	 *
+	 * Ideally this would be done in machdep code in mips/atheros/
+	 * and it'd expose the EEPROM via the firmware interface,
+	 * so the ath/ath_ahb drivers can be loaded as modules
+	 * after boot-time.
+	 */
+	psc->sc_eeprom = bus_alloc_resource(dev, SYS_RES_MEMORY,
+	    &rid, (uintptr_t) eepromaddr,
+	    (uintptr_t) eepromaddr + (uintptr_t) (eepromsize - 1), 0, RF_ACTIVE);
 	if (psc->sc_eeprom == NULL) {
 		device_printf(dev, "cannot map eeprom space\n");
 		goto bad0;
 	}
 
-	/* XXX uintptr_t is a bandaid for ia64; to be fixed */
-	sc->sc_st = (HAL_BUS_TAG)(uintptr_t) rman_get_bustag(psc->sc_sr);
+	sc->sc_st = (HAL_BUS_TAG) rman_get_bustag(psc->sc_sr);
 	sc->sc_sh = (HAL_BUS_HANDLE) rman_get_bushandle(psc->sc_sr);
 	/*
 	 * Mark device invalid so any interrupts (shared or otherwise)
@@ -138,7 +193,7 @@ ath_ahb_attach(device_t dev)
 	sc->sc_invalid = 1;
 
 	/* Copy the EEPROM data out */
-	sc->sc_eepromdata = malloc(ATH_EEPROM_DATA_SIZE * 2, M_TEMP, M_NOWAIT | M_ZERO);
+	sc->sc_eepromdata = malloc(eepromsize, M_TEMP, M_NOWAIT | M_ZERO);
 	if (sc->sc_eepromdata == NULL) {
 		device_printf(dev, "cannot allocate memory for eeprom data\n");
 		goto bad1;
@@ -149,10 +204,10 @@ ath_ahb_attach(device_t dev)
 	bus_space_read_multi_1(
 	    rman_get_bustag(psc->sc_eeprom),
 	    rman_get_bushandle(psc->sc_eeprom),
-	    0, (u_int8_t *) sc->sc_eepromdata, ATH_EEPROM_DATA_SIZE * 2);
+	    0, (u_int8_t *) sc->sc_eepromdata, eepromsize);
 #endif
 	p = (void *) rman_get_bushandle(psc->sc_eeprom);
-	memcpy(sc->sc_eepromdata, p, ATH_EEPROM_DATA_SIZE * 2);
+	memcpy(sc->sc_eepromdata, p, eepromsize);
 
 	/*
 	 * Arrange interrupt line.
@@ -165,7 +220,7 @@ ath_ahb_attach(device_t dev)
 	}
 	if (bus_setup_intr(dev, psc->sc_irq,
 			   INTR_TYPE_NET | INTR_MPSAFE,
-			   NULL, ath_intr, sc, &psc->sc_ih)) {
+			   NULL, ath_ahb_intr, sc, &psc->sc_ih)) {
 		device_printf(dev, "could not establish interrupt\n");
 		goto bad2;
 	}
@@ -189,12 +244,33 @@ ath_ahb_attach(device_t dev)
 		goto bad3;
 	}
 
-	ATH_LOCK_INIT(sc);
+	/*
+	 * Check if a device/vendor ID is provided in hints.
+	 */
+	if (resource_int_value(device_get_name(dev), device_get_unit(dev),
+	    "vendor_id", &vendor_id) != 0) {
+		vendor_id = VENDOR_ATHEROS;
+	}
 
-	error = ath_attach(AR9130_DEVID, sc);
+	if (resource_int_value(device_get_name(dev), device_get_unit(dev),
+	    "device_id", &device_id) != 0) {
+		device_id = AR9130_DEVID;
+	}
+
+	ATH_LOCK_INIT(sc);
+	ATH_PCU_LOCK_INIT(sc);
+	ATH_RX_LOCK_INIT(sc);
+	ATH_TX_LOCK_INIT(sc);
+	ATH_TXSTATUS_LOCK_INIT(sc);
+
+	error = ath_attach(device_id, sc);
 	if (error == 0)					/* success */
 		return 0;
 
+	ATH_TXSTATUS_LOCK_DESTROY(sc);
+	ATH_RX_LOCK_DESTROY(sc);
+	ATH_TX_LOCK_DESTROY(sc);
+	ATH_PCU_LOCK_DESTROY(sc);
 	ATH_LOCK_DESTROY(sc);
 	bus_dma_tag_destroy(sc->sc_dmat);
 bad3:
@@ -234,6 +310,10 @@ ath_ahb_detach(device_t dev)
 	if (sc->sc_eepromdata)
 		free(sc->sc_eepromdata, M_TEMP);
 
+	ATH_TXSTATUS_LOCK_DESTROY(sc);
+	ATH_RX_LOCK_DESTROY(sc);
+	ATH_TX_LOCK_DESTROY(sc);
+	ATH_PCU_LOCK_DESTROY(sc);
 	ATH_LOCK_DESTROY(sc);
 
 	return (0);
@@ -286,6 +366,7 @@ static driver_t ath_ahb_driver = {
 };
 static	devclass_t ath_devclass;
 DRIVER_MODULE(ath, nexus, ath_ahb_driver, ath_devclass, 0, 0);
+DRIVER_MODULE(ath, apb, ath_ahb_driver, ath_devclass, 0, 0);
 MODULE_VERSION(ath, 1);
 MODULE_DEPEND(ath, wlan, 1, 1, 1);		/* 802.11 media layer */
 MODULE_DEPEND(ath, if_ath, 1, 1, 1);		/* if_ath driver */

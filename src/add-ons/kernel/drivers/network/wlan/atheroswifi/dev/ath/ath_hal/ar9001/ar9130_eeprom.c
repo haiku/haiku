@@ -14,30 +14,5 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9001/ar9130_eeprom.c 230147 2012-01-15 19:22:34Z adrian $
  */
-#include "opt_ah.h"
-
-#include "ah.h"
-#include "ah_internal.h"
-
-#include "ar9001/ar9130_eeprom.h"
-
-/* XXX this shouldn't be done here */
-/* This is in 16 bit words; not bytes -adrian */
-#define ATH_DATA_EEPROM_SIZE    2048
-
-HAL_BOOL
-ar9130EepromRead(struct ath_hal *ah, u_int off, uint16_t *data)
-{
-	if (ah->ah_eepromdata == AH_NULL) {
-		HALDEBUG(ah, HAL_DEBUG_ANY, "%s: no eeprom data!\n", __func__);
-		return AH_FALSE;
-	}
-	if (off > ATH_DATA_EEPROM_SIZE) {
-		HALDEBUG(ah, HAL_DEBUG_ANY, "ar9130EepromRead: offset %x > %x\n", off, ATH_DATA_EEPROM_SIZE);
-		return AH_FALSE;
-	}
-	(*data) = ah->ah_eepromdata[off];
-	return AH_TRUE;
-}

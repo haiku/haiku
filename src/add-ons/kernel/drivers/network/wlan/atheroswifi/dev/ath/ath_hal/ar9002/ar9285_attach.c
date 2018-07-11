@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9285_attach.c 272292 2014-09-30 03:19:29Z adrian $
  */
 #include "opt_ah.h"
 
@@ -66,7 +66,9 @@ static const HAL_PERCAL_DATA ar9280_adc_init_dc_cal = {
 	.calPostProc	= ar5416AdcDcCalibration
 };
 
-static void ar9285ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore);
+static void ar9285ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore,
+		HAL_BOOL power_off);
+static void ar9285DisablePCIE(struct ath_hal *ah);
 static HAL_BOOL ar9285FillCapabilityInfo(struct ath_hal *ah);
 static void ar9285WriteIni(struct ath_hal *ah,
 	const struct ieee80211_channel *chan);
@@ -85,8 +87,8 @@ ar9285AniSetup(struct ath_hal *ah)
                 .coarseHigh             = { -14, -14, -14, -14, -12 },
                 .coarseLow              = { -64, -64, -64, -64, -70 },
                 .firpwr                 = { -78, -78, -78, -78, -80 },
-                .maxSpurImmunityLevel   = 2,
-                .cycPwrThr1             = { 2, 4, 6 },
+                .maxSpurImmunityLevel   = 7,
+                .cycPwrThr1             = { 2, 4, 6, 8, 10, 12, 14, 16 },
                 .maxFirstepLevel        = 2,    /* levels 0..2 */
                 .firstep                = { 0, 4, 8 },
                 .ofdmTrigHigh           = 500,
@@ -103,12 +105,35 @@ ar9285AniSetup(struct ath_hal *ah)
         ar5416AniAttach(ah, &aniparams, &aniparams, AH_TRUE);
 }
 
+static const char * ar9285_lna_conf[] = {
+	"LNA1-LNA2",
+	"LNA2",
+	"LNA1",
+	"LNA1+LNA2",
+};
+
+static void
+ar9285_eeprom_print_diversity_settings(struct ath_hal *ah)
+{
+	const HAL_EEPROM_v4k *ee = AH_PRIVATE(ah)->ah_eeprom;
+	const MODAL_EEP4K_HEADER *pModal = &ee->ee_base.modalHeader;
+
+	ath_hal_printf(ah, "[ath] AR9285 Main LNA config: %s\n",
+	    ar9285_lna_conf[(pModal->antdiv_ctl2 >> 2) & 0x3]);
+	ath_hal_printf(ah, "[ath] AR9285 Alt LNA config: %s\n",
+	    ar9285_lna_conf[pModal->antdiv_ctl2 & 0x3]);
+	ath_hal_printf(ah, "[ath] LNA diversity %s, Diversity %s\n",
+	    ((pModal->antdiv_ctl1 & 0x1) ? "enabled" : "disabled"),
+	    ((pModal->antdiv_ctl1 & 0x8) ? "enabled" : "disabled"));
+}
+
 /*
  * Attach for an AR9285 part.
  */
 static struct ath_hal *
 ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_BUS_TAG st, HAL_BUS_HANDLE sh, uint16_t *eepromdata,
+	HAL_OPS_CONFIG *ah_config,
 	HAL_STATUS *status)
 {
 	struct ath_hal_9285 *ahp9285;
@@ -118,13 +143,13 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 	HAL_STATUS ecode;
 	HAL_BOOL rfStatus;
 
-	HALDEBUG_G(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
+	HALDEBUG(AH_NULL, HAL_DEBUG_ATTACH, "%s: sc %p st %p sh %p\n",
 	    __func__, sc, (void*) st, (void*) sh);
 
 	/* NB: memory is returned zero'd */
 	ahp9285 = ath_hal_malloc(sizeof (struct ath_hal_9285));
 	if (ahp9285 == AH_NULL) {
-		HALDEBUG_G(AH_NULL, HAL_DEBUG_ANY,
+		HALDEBUG(AH_NULL, HAL_DEBUG_ANY,
 		    "%s: cannot allocate memory for state block\n", __func__);
 		*status = HAL_ENOMEM;
 		return AH_NULL;
@@ -134,14 +159,30 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 
 	ar5416InitState(AH5416(ah), devid, sc, st, sh, status);
 
-	/* XXX override with 9285 specific state */
-	/* override 5416 methods for our needs */
+	/*
+	 * Use the "local" EEPROM data given to us by the higher layers.
+	 * This is a private copy out of system flash. The Linux ath9k
+	 * commit for the initial AR9130 support mentions MMIO flash
+	 * access is "unreliable." -adrian
+	 */
+	if (eepromdata != AH_NULL) {
+		AH_PRIVATE(ah)->ah_eepromRead = ath_hal_EepromDataRead;
+		AH_PRIVATE(ah)->ah_eepromWrite = NULL;
+		ah->ah_eepromdata = eepromdata;
+	}
+
+	/* override with 9285 specific state */
 	AH5416(ah)->ah_initPLL = ar9280InitPLL;
+	AH5416(ah)->ah_btCoexSetDiversity = ar9285BTCoexAntennaDiversity;
 
 	ah->ah_setAntennaSwitch		= ar9285SetAntennaSwitch;
 	ah->ah_configPCIE		= ar9285ConfigPCIE;
+	ah->ah_disablePCIE		= ar9285DisablePCIE;
 	ah->ah_setTxPower		= ar9285SetTransmitPower;
 	ah->ah_setBoardValues		= ar9285SetBoardValues;
+	ah->ah_btCoexSetParameter	= ar9285BTCoexSetParameter;
+	ah->ah_divLnaConfGet		= ar9285_antdiv_comb_conf_get;
+	ah->ah_divLnaConfSet		= ar9285_antdiv_comb_conf_set;
 
 	AH5416(ah)->ah_cal.iqCalData.calData = &ar9280_iq_cal;
 	AH5416(ah)->ah_cal.adcGainCalData.calData = &ar9280_adc_gain_cal;
@@ -293,10 +334,16 @@ ar9285Attach(uint16_t devid, HAL_SOFTC sc,
 		goto bad;
 	}
 
+	/*
+	 * Print out the EEPROM antenna configuration mapping.
+	 * Some devices have a hard-coded LNA configuration profile;
+	 * others enable diversity.
+	 */
+	ar9285_eeprom_print_diversity_settings(ah);
+
 	/* Print out whether the EEPROM settings enable AR9285 diversity */
 	if (ar9285_check_div_comb(ah)) {
 		ath_hal_printf(ah, "[ath] Enabling diversity for Kite\n");
-		ah->ah_rxAntCombDiversity = ar9285_ant_comb_scan;
 	}
 
 	/* Disable 11n for the AR2427 */
@@ -350,14 +397,92 @@ bad:
 }
 
 static void
-ar9285ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore)
+ar9285ConfigPCIE(struct ath_hal *ah, HAL_BOOL restore, HAL_BOOL power_off)
 {
+	uint32_t val;
+
+	/*
+	 * This workaround needs some integration work with the HAL
+	 * config parameters and the if_ath_pci.c glue.
+	 * Specifically, read the value of the PCI register 0x70c
+	 * (4 byte PCI config space register) and store it in ath_hal_war70c.
+	 * Then if it's non-zero, the below WAR would override register
+	 * 0x570c upon suspend/resume.
+	 */
+#if 0
+	if (AR_SREV_9285E_20(ah)) {
+		val = AH_PRIVATE(ah)->ah_config.ath_hal_war70c;
+		if (val) {
+			val &= 0xffff00ff;
+			val |= 0x6f00;
+			OS_REG_WRITE(ah, 0x570c, val);
+		}
+	}
+#endif
+
 	if (AH_PRIVATE(ah)->ah_ispcie && !restore) {
 		ath_hal_ini_write(ah, &AH5416(ah)->ah_ini_pcieserdes, 1, 0);
 		OS_DELAY(1000);
-		OS_REG_SET_BIT(ah, AR_PCIE_PM_CTRL, AR_PCIE_PM_CTRL_ENA);
-		OS_REG_WRITE(ah, AR_WA, AR9285_WA_DEFAULT);
 	}
+
+	/*
+	 * Set PCIe workaround bits
+	 *
+	 * NOTE:
+	 *
+	 * In Merlin and Kite, bit 14 in WA register (disable L1) should only
+	 * be set when device enters D3 and be cleared when device comes back
+	 * to D0.
+	 */
+	if (power_off) {                /* Power-off */
+		OS_REG_CLR_BIT(ah, AR_PCIE_PM_CTRL, AR_PCIE_PM_CTRL_ENA);
+
+		val = OS_REG_READ(ah, AR_WA);
+
+		/*
+		 * Disable bit 6 and 7 before entering D3 to prevent
+		 * system hang.
+		 */
+		val &= ~(AR_WA_BIT6 | AR_WA_BIT7);
+
+		/*
+		 * See above: set AR_WA_D3_L1_DISABLE when entering D3 state.
+		 *
+		 * XXX The reference HAL does it this way - it only sets
+		 * AR_WA_D3_L1_DISABLE if it's set in AR9280_WA_DEFAULT,
+		 * which it (currently) isn't.  So the following statement
+		 * is currently a NOP.
+		 */
+		if (AR9285_WA_DEFAULT & AR_WA_D3_L1_DISABLE)
+			val |= AR_WA_D3_L1_DISABLE;
+
+		if (AR_SREV_9285E_20(ah))
+			val |= AR_WA_BIT23;
+
+		OS_REG_WRITE(ah, AR_WA, val);
+	} else {			/* Power-on */
+		val = AR9285_WA_DEFAULT;
+		/*
+		 * See note above: make sure L1_DISABLE is not set.
+		 */
+		val &= (~AR_WA_D3_L1_DISABLE);
+
+		/* Software workaroud for ASPM system hang. */
+		val |= (AR_WA_BIT6 | AR_WA_BIT7);
+
+		if (AR_SREV_9285E_20(ah))
+			val |= AR_WA_BIT23;
+
+		OS_REG_WRITE(ah, AR_WA, val);
+
+		/* set bit 19 to allow forcing of pcie core into L1 state */
+		OS_REG_SET_BIT(ah, AR_PCIE_PM_CTRL, AR_PCIE_PM_CTRL_ENA);
+	}
+}
+
+static void
+ar9285DisablePCIE(struct ath_hal *ah)
+{
 }
 
 static void
@@ -411,13 +536,16 @@ ar9285FillCapabilityInfo(struct ath_hal *ah)
 	pCap->halTxStreams = 1;
 	pCap->halRxStreams = 1;
 
+	if (ar9285_check_div_comb(ah))
+		pCap->halAntDivCombSupport = AH_TRUE;
+
 	pCap->halCSTSupport = AH_TRUE;
 	pCap->halRifsRxSupport = AH_TRUE;
 	pCap->halRifsTxSupport = AH_TRUE;
 	pCap->halRtsAggrLimit = 64*1024;	/* 802.11n max */
 	pCap->halExtChanDfsSupport = AH_TRUE;
 	pCap->halUseCombinedRadarRssi = AH_TRUE;
-#if 0
+#if 1
 	/* XXX bluetooth */
 	pCap->halBtCoexSupport = AH_TRUE;
 #endif
@@ -427,6 +555,8 @@ ar9285FillCapabilityInfo(struct ath_hal *ah)
 	pCap->halHasRxSelfLinkedTail = AH_FALSE;
 	pCap->halMbssidAggrSupport = AH_TRUE;  
 	pCap->hal4AddrAggrSupport = AH_TRUE;
+	pCap->halSpectralScanSupport = AH_TRUE;
+	pCap->halRxUsingLnaMixing = AH_TRUE;
 
 	if (AR_SREV_KITE_12_OR_LATER(ah))
 		pCap->halPSPollBroken = AH_FALSE;

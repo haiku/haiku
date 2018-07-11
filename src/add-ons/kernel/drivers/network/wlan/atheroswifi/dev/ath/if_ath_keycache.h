@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_keycache.h 288635 2015-10-03 21:48:27Z adrian $
  */
 
 #ifndef	__IF_ATH_CRYPTO_H__
@@ -35,9 +35,8 @@
 extern int ath_key_alloc(struct ieee80211vap *, struct ieee80211_key *,
     ieee80211_keyix *, ieee80211_keyix *);
 extern int ath_key_delete(struct ieee80211vap *, const struct ieee80211_key *);
-extern int ath_key_set(struct ieee80211vap *, const struct ieee80211_key *,
-    const u_int8_t mac[IEEE80211_ADDR_LEN]);
-extern int ath_keyset(struct ath_softc *sc, const struct ieee80211_key *k,
-    struct ieee80211_node *bss);
+extern int ath_key_set(struct ieee80211vap *, const struct ieee80211_key *);
+extern int ath_keyset(struct ath_softc *sc, struct ieee80211vap *vap,
+    const struct ieee80211_key *k, struct ieee80211_node *bss);
 
 #endif

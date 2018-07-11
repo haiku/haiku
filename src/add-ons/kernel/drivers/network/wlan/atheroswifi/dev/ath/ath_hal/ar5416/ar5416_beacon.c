@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_beacon.c 265031 2014-04-27 23:35:05Z adrian $
  */
 #include "opt_ah.h"
 
@@ -46,6 +46,7 @@ void
 ar5416SetBeaconTimers(struct ath_hal *ah, const HAL_BEACON_TIMERS *bt)
 {
 	uint32_t bperiod;
+	struct ath_hal_5212 *ahp = AH5212(ah);
 
 	OS_REG_WRITE(ah, AR_NEXT_TBTT, TU_TO_USEC(bt->bt_nexttbtt));
 	OS_REG_WRITE(ah, AR_NEXT_DBA, ONE_EIGHTH_TU_TO_USEC(bt->bt_nextdba));
@@ -53,6 +54,7 @@ ar5416SetBeaconTimers(struct ath_hal *ah, const HAL_BEACON_TIMERS *bt)
 	OS_REG_WRITE(ah, AR_NEXT_NDP, TU_TO_USEC(bt->bt_nextatim));
 
 	bperiod = TU_TO_USEC(bt->bt_intval & HAL_BEACON_PERIOD);
+	ahp->ah_beaconInterval = bt->bt_intval & HAL_BEACON_PERIOD;
 	OS_REG_WRITE(ah, AR5416_BEACON_PERIOD, bperiod);
 	OS_REG_WRITE(ah, AR_DBA_PERIOD, bperiod);
 	OS_REG_WRITE(ah, AR_SWBA_PERIOD, bperiod);
@@ -195,6 +197,25 @@ ar5416SetStaBeaconTimers(struct ath_hal *ah, const HAL_BEACON_STATE *bs)
 	 *   beacon jitter; cab timeout is max time to wait for cab
 	 *   after seeing the last DTIM or MORE CAB bit
 	 */
+
+/*
+ * I've bumped these to 30TU for now.
+ *
+ * Some APs (AR933x/AR934x?) in 2GHz especially seem to not always
+ * transmit beacon frames at exactly the right times and with it set
+ * to 10TU, the NIC starts not waking up at the right times to hear
+ * these slightly-larger-jitering beacons.  It also never recovers
+ * from that (it doesn't resync? I'm not sure.)
+ *
+ * So for now bump this to 30TU.  Ideally we'd cap this based on
+ * the beacon interval so the sum of CAB+BEACON timeouts never
+ * exceeded the beacon interval.
+ *
+ * Now, since we're doing all the math in the ath(4) driver in TU
+ * rather than TSF, we may be seeing the result of dumb rounding
+ * errors causing the jitter to actually be a much bigger problem.
+ * I'll have to investigate that with a fine tooth comb.
+ */
 #define CAB_TIMEOUT_VAL     10 /* in TU */
 #define BEACON_TIMEOUT_VAL  10 /* in TU */
 #define SLEEP_SLOP          3  /* in TU */
@@ -246,6 +267,13 @@ ar5416SetStaBeaconTimers(struct ath_hal *ah, const HAL_BEACON_STATE *bs)
 
 	OS_REG_SET_BIT(ah, AR_TIMER_MODE,
 	     AR_TIMER_MODE_TBTT | AR_TIMER_MODE_TIM | AR_TIMER_MODE_DTIM);
+
+#define	HAL_TSFOOR_THRESHOLD	0x00004240 /* TSF OOR threshold (16k us) */
+
+	/* TSF out of range threshold */
+//	OS_REG_WRITE(ah, AR_TSFOOR_THRESHOLD, bs->bs_tsfoor_threshold);
+	OS_REG_WRITE(ah, AR_TSFOOR_THRESHOLD, HAL_TSFOOR_THRESHOLD);
+
 	HALDEBUG(ah, HAL_DEBUG_BEACON, "%s: next DTIM %d\n",
 	    __func__, bs->bs_nextdtim);
 	HALDEBUG(ah, HAL_DEBUG_BEACON, "%s: next beacon %d\n",
