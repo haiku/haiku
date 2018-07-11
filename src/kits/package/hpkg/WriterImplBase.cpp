@@ -20,6 +20,9 @@
 
 #include <AutoDeleter.h>
 #include <ZlibCompressionAlgorithm.h>
+#ifdef ZSTD_ENABLED
+#include <ZstdCompressionAlgorithm.h>
+#endif
 
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
@@ -326,6 +329,29 @@ WriterImplBase::InitHeapReader(size_t headerSize)
 				throw std::bad_alloc();
 			}
 			break;
+#ifdef ZSTD_ENABLED
+		case B_HPKG_COMPRESSION_ZSTD:
+			compressionAlgorithm = CompressionAlgorithmOwner::Create(
+				new(std::nothrow) BZstdCompressionAlgorithm,
+				new(std::nothrow) BZstdCompressionParameters(
+					fParameters.CompressionLevel()));
+			compressionAlgorithmReference.SetTo(compressionAlgorithm, true);
+
+			decompressionAlgorithm = DecompressionAlgorithmOwner::Create(
+				new(std::nothrow) BZstdCompressionAlgorithm,
+				new(std::nothrow) BZstdDecompressionParameters);
+			decompressionAlgorithmReference.SetTo(decompressionAlgorithm, true);
+
+			if (compressionAlgorithm == NULL
+				|| compressionAlgorithm->algorithm == NULL
+				|| compressionAlgorithm->parameters == NULL
+				|| decompressionAlgorithm == NULL
+				|| decompressionAlgorithm->algorithm == NULL
+				|| decompressionAlgorithm->parameters == NULL) {
+				throw std::bad_alloc();
+			}
+			break;
+#endif
 		default:
 			fErrorOutput->PrintError("Error: Invalid heap compression\n");
 			return B_BAD_VALUE;

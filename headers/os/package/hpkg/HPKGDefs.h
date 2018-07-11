@@ -98,7 +98,8 @@ enum BHPKGAttributeID {
 // compression types
 enum {
 	B_HPKG_COMPRESSION_NONE	= 0,
-	B_HPKG_COMPRESSION_ZLIB	= 1
+	B_HPKG_COMPRESSION_ZLIB	= 1,
+	B_HPKG_COMPRESSION_ZSTD	= 2
 };
 
 

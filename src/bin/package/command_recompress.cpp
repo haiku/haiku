@@ -45,6 +45,7 @@ command_recompress(int argc, const char* const* argv)
 	bool quiet = false;
 	bool verbose = false;
 	int32 compressionLevel = BPackageKit::BHPKG::B_HPKG_COMPRESSION_LEVEL_BEST;
+	int32 compression = BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZLIB;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -55,7 +56,7 @@ command_recompress(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+0123456789:hqv",
+		int c = getopt_long(argc, (char**)argv, "+0123456789:hqvz",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
@@ -84,6 +85,10 @@ command_recompress(int argc, const char* const* argv)
 
 			case 'v':
 				verbose = true;
+				break;
+
+			case 'z':
+				compression = BPackageKit::BHPKG::B_HPKG_COMPRESSION_ZSTD;
 				break;
 
 			default:
@@ -123,6 +128,10 @@ command_recompress(int argc, const char* const* argv)
 		writerParameters.SetCompression(
 			BPackageKit::BHPKG::B_HPKG_COMPRESSION_NONE);
 	}
+
+	if (compressionLevel == 0)
+		compression = BPackageKit::BHPKG::B_HPKG_COMPRESSION_NONE;
+	writerParameters.SetCompression(compression);
 
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);

@@ -62,7 +62,9 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		UseBuildFeatureHeaders curl ;
-
+		if [ FIsBuildFeatureEnabled zstd ] {
+			SubDirC++Flags -DZSTD_ENABLED ;
+		}
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
