@@ -114,6 +114,20 @@ UrlPlaylistItem::GetAttribute(const Attribute& attribute, int64& value) const
 }
 
 
+status_t
+UrlPlaylistItem::SetAttribute(const Attribute& attribute, const float& value)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+UrlPlaylistItem::GetAttribute(const Attribute& attribute, float& value) const
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 BString
 UrlPlaylistItem::LocationURI() const
 {

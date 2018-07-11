@@ -34,6 +34,11 @@ struct mpSettings {
 				BG_MOVIES_HALF_VLUME = 1,
 				BG_MOVIES_MUTED = 2
 			};
+			enum {
+				RESUME_NEVER = 0,
+				RESUME_ASK = 1,
+				RESUME_ALWAYS = 2
+			};
 
 			bool				autostart;
 			bool				closeWhenDonePlayingMovie;
@@ -43,6 +48,7 @@ struct mpSettings {
 			bool				useOverlays;
 			bool				scaleBilinear;
 			bool				scaleFullscreenControls;
+			uint32				resume;
 			uint32				subtitleSize;
 			uint32				subtitlePlacement;
 			uint32				backgroundMovieVolumeMode;

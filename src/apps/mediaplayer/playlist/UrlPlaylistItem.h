@@ -38,6 +38,11 @@ public:
 	virtual	status_t			GetAttribute(const Attribute& attribute,
 									int64& value) const;
 
+	virtual	status_t			SetAttribute(const Attribute& attribute,
+									const float& value);
+	virtual	status_t			GetAttribute(const Attribute& attribute,
+									float& value) const;
+
 	virtual	BString				LocationURI() const;
 	virtual	status_t			GetIcon(BBitmap* bitmap,
 									icon_size iconSize) const;

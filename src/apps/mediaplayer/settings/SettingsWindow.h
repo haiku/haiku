@@ -37,7 +37,7 @@ private:
 		mpSettings 				fSettings;
 		mpSettings 				fLastSettings;
 		
-		BCheckBox* 				fAutostartCB; 
+		BCheckBox* 				fAutostartCB;
 		BCheckBox*				fCloseWindowMoviesCB; 
 		BCheckBox*				fCloseWindowSoundsCB; 
 		BCheckBox*				fLoopMoviesCB;
@@ -47,11 +47,12 @@ private:
 		BCheckBox*				fScaleBilinearCB;
 		BCheckBox*				fScaleFullscreenControlsCB;
 
+		BOptionPopUp*			fResumeOP;
 		BOptionPopUp*			fSubtitleSizeOP;
 		BOptionPopUp*			fSubtitlePlacementOP;
 
-		BRadioButton*			fFullVolumeBGMoviesRB; 
-		BRadioButton*			fHalfVolumeBGMoviesRB; 
+		BRadioButton*			fFullVolumeBGMoviesRB;
+		BRadioButton*			fHalfVolumeBGMoviesRB;
 		BRadioButton*			fMutedVolumeBGMoviesRB;
 
 		BButton*				fRevertB;

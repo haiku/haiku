@@ -99,6 +99,15 @@ SettingsWindow::SettingsWindow(BRect frame)
 		B_TRANSLATE("Scale controls in full screen mode"),
 		new BMessage(M_SETTINGS_CHANGED));
 
+	fResumeOP = new BOptionPopUp("resume",
+		B_TRANSLATE("Resume:"), new BMessage(M_SETTINGS_CHANGED));
+	fResumeOP->AddOption(
+		B_TRANSLATE("never"), mpSettings::RESUME_NEVER);
+	fResumeOP->AddOption(
+		B_TRANSLATE("ask every time"), mpSettings::RESUME_ASK);
+	fResumeOP->AddOption(
+		B_TRANSLATE("always"), mpSettings::RESUME_ALWAYS);
+
 	fSubtitleSizeOP = new BOptionPopUp("subtitleSize",
 		B_TRANSLATE("Subtitle size:"), new BMessage(M_SETTINGS_CHANGED));
 	fSubtitleSizeOP->AddOption(
@@ -157,6 +166,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 					.End()
 					.Add(fLoopMoviesCB)
 					.Add(fLoopSoundsCB)
+					.Add(fResumeOP)
 				.End()
 			.End()
 			.AddStrut(kSpacing)
@@ -272,6 +282,7 @@ SettingsWindow::AdoptSettings()
 	fScaleBilinearCB->SetValue(fSettings.scaleBilinear);
 	fScaleFullscreenControlsCB->SetValue(fSettings.scaleFullscreenControls);
 
+	fResumeOP->SetValue(fSettings.resume);
 	fSubtitleSizeOP->SetValue(fSettings.subtitleSize);
 	fSubtitlePlacementOP->SetValue(fSettings.subtitlePlacement);
 
@@ -302,6 +313,7 @@ SettingsWindow::ApplySettings()
 	fSettings.scaleFullscreenControls
 		= fScaleFullscreenControlsCB->Value() == B_CONTROL_ON;
 
+	fSettings.resume = fResumeOP->Value();
 	fSettings.subtitleSize = fSubtitleSizeOP->Value();
 	fSettings.subtitlePlacement = fSubtitlePlacementOP->Value();
 

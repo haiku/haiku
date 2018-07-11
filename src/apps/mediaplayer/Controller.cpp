@@ -17,6 +17,7 @@
 
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Path.h>
 #include <Window.h> // for debugging only
@@ -37,6 +38,11 @@
 #include "SubTitles.h"
 #include "TrackSupplier.h"
 #include "VideoTrackSupplier.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaPlayer-Controller"
+#define MIN_WIDTH 250
 
 using std::nothrow;
 
@@ -694,6 +700,56 @@ Controller::TimePosition()
 }
 
 
+status_t
+Controller::SaveState(bool reset)
+{
+	if (fItem.Get() == NULL)
+		return B_OK;
+	if (reset)
+		fCurrentFrame = 0;
+	status_t status = fItem.Get()->SetLastVolume(fVolume);
+	if (status == B_OK)
+		status = fItem.Get()->SetLastFrame(fCurrentFrame);
+	else
+		fItem.Get()->SetLastFrame(fCurrentFrame);
+	return status;
+}
+
+
+void
+Controller::RestoreState()
+{
+	PlaylistItem *item =fItem.Get();
+	if (item == NULL)
+		return;
+
+	Pause();
+
+	if (item->LastFrame() > 0) {
+		bool resume = fResume == mpSettings::RESUME_ALWAYS;
+		if (fResume == mpSettings::RESUME_ASK) {
+			BString label;
+			int32 time = (int32)((float)item->LastFrame() * TimeDuration()
+					/ (1000000 * _FrameDuration()));
+			label.SetToFormat(B_TRANSLATE("Do you want to resume %s at %dm%ds?"),
+					item->Name().String(), time / 60, time % 60);
+			BAlert *alert = new BAlert(B_TRANSLATE("Resume?"), label,
+					B_TRANSLATE("Resume"), B_TRANSLATE("Reset"));
+			resume = alert->Go() == 0;
+		}
+
+		if (resume)
+			SetFramePosition(item->LastFrame());
+	}
+
+	float lastVolume = item->LastVolume();
+	if (lastVolume >= 0)
+		SetVolume(lastVolume);
+
+	Play();
+}
+
+
 void
 Controller::SetVolume(float value)
 {
@@ -713,6 +769,7 @@ Controller::SetVolume(float value)
 	}
 }
 
+
 void
 Controller::VolumeUp()
 {
@@ -720,12 +777,14 @@ Controller::VolumeUp()
 	SetVolume(Volume() + 0.05);
 }
 
+
 void
 Controller::VolumeDown()
 {
 	// TODO: linear <-> exponential
 	SetVolume(Volume() - 0.05);
 }
+
 
 void
 Controller::ToggleMute()
@@ -988,6 +1047,7 @@ Controller::_AdoptGlobalSettings()
 	fLoopMovies = settings.loopMovie;
 	fLoopSounds = settings.loopSound;
 	fBackgroundMovieVolumeMode = settings.backgroundMovieVolumeMode;
+	fResume = settings.resume;
 }
 
 

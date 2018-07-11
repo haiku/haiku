@@ -22,9 +22,11 @@ PlaylistItem::Listener::Listener()
 {
 }
 
+
 PlaylistItem::Listener::~Listener()
 {
 }
+
 
 void PlaylistItem::Listener::ItemChanged(const PlaylistItem* item)
 {
@@ -34,7 +36,7 @@ void PlaylistItem::Listener::ItemChanged(const PlaylistItem* item)
 // #pragma mark -
 
 
-//#define DEBUG_INSTANCE_COUNT
+// #define DEBUG_INSTANCE_COUNT
 #ifdef DEBUG_INSTANCE_COUNT
 static vint32 sInstanceCount = 0;
 #endif
@@ -146,6 +148,40 @@ PlaylistItem::Duration()
 	}
 
 	return duration;
+}
+
+
+int64
+PlaylistItem::LastFrame() const
+{
+	int64 lastFrame;
+	if (GetAttribute(ATTR_INT64_FRAME, lastFrame) != B_OK)
+		lastFrame = 0;
+	return lastFrame;
+}
+
+
+float
+PlaylistItem::LastVolume() const
+{
+	float lastVolume;
+	if (GetAttribute(ATTR_FLOAT_VOLUME, lastVolume) != B_OK)
+		lastVolume = -1;
+	return lastVolume;
+}
+
+
+status_t
+PlaylistItem::SetLastFrame(int64 value)
+{
+	return SetAttribute(ATTR_INT64_FRAME, value);
+}
+
+
+status_t
+PlaylistItem::SetLastVolume(float value)
+{
+	return SetAttribute(ATTR_FLOAT_VOLUME, value);
 }
 
 

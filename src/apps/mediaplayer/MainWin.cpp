@@ -729,6 +729,9 @@ MainWin::MessageReceived(BMessage* msg)
 		{
 			BAutolock _(fPlaylist);
 
+			//The file is finished. Open at start next time.
+			fController->SaveState(true);
+
 			bool hadNext = fPlaylist->SetCurrentItemIndex(
 				fPlaylist->CurrentItemIndex() + 1);
 			if (!hadNext) {
@@ -831,6 +834,7 @@ MainWin::MessageReceived(BMessage* msg)
 			float volume;
 			if (msg->FindFloat("volume", &volume) == B_OK)
 				fControls->SetVolume(volume);
+			fController->SaveState();
 			break;
 		}
 		case MSG_CONTROLLER_MUTED_CHANGED:
@@ -1108,6 +1112,7 @@ MainWin::WindowActivated(bool active)
 bool
 MainWin::QuitRequested()
 {
+	fController->SaveState();
 	BMessage message(M_PLAYER_QUIT);
 	GetQuitMessage(&message);
 	be_app->PostMessage(&message);
@@ -1429,6 +1434,9 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 		}
 		fController->SetTimePosition(fInitialSeekPosition);
 		fInitialSeekPosition = 0;
+
+		if (fPlaylist->CountItems() == 1)
+			fController->RestoreState();
 	}
 	_SetupWindow();
 

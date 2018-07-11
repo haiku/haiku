@@ -26,6 +26,7 @@ mpSettings::operator!=(const mpSettings& other) const
 		|| useOverlays != other.useOverlays
 		|| scaleBilinear != other.scaleBilinear
 		|| scaleFullscreenControls != other.scaleFullscreenControls
+		|| resume != other.resume
 		|| subtitleSize != other.subtitleSize
 		|| subtitlePlacement != other.subtitlePlacement
 		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode
@@ -61,6 +62,9 @@ Settings::Get(mpSettings& settings) const
 	settings.scaleFullscreenControls
 		= fSettingsMessage.GetValue("scaleFullscreenControls", true);
 
+	settings.resume
+		= fSettingsMessage.GetValue("resume",
+			(uint32)mpSettings::RESUME_ALWAYS);
 	settings.subtitleSize
 		= fSettingsMessage.GetValue("subtitleSize",
 			(uint32)mpSettings::SUBTITLE_SIZE_MEDIUM);
@@ -95,6 +99,7 @@ Settings::Update(const mpSettings& settings)
 	fSettingsMessage.SetValue("scaleFullscreenControls",
 		settings.scaleFullscreenControls);
 
+	fSettingsMessage.SetValue("resume", settings.resume);
 	fSettingsMessage.SetValue("subtitleSize", settings.subtitleSize);
 	fSettingsMessage.SetValue("subtitlePlacement", settings.subtitlePlacement);
 

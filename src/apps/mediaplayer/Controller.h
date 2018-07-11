@@ -10,6 +10,7 @@
 #define __CONTROLLER_H
 
 
+#include <Alert.h>
 #include <Entry.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
@@ -103,6 +104,8 @@ public:
 
 			bigtime_t			TimeDuration();
 			bigtime_t			TimePosition();
+			status_t			SaveState(bool reset = false);
+			void				RestoreState();
 
 	virtual	void				SetVolume(float factor);
 			float				Volume();
@@ -211,6 +214,7 @@ private:
 			bool				fLoopMovies;
 			bool				fLoopSounds;
 			uint32				fBackgroundMovieVolumeMode;
+			uint32				fResume;
 
 			BList				fListeners;
 };

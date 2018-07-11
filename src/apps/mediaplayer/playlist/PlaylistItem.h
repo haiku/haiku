@@ -54,7 +54,9 @@ public:
 		ATTR_INT32_YEAR				= 'year',
 		ATTR_INT32_RATING			= 'rtng',
 
-		ATTR_INT64_DURATION			= 'drtn'
+		ATTR_INT64_DURATION			= 'drtn',
+		ATTR_INT64_FRAME			= 'fram',
+		ATTR_FLOAT_VOLUME			= 'volu'
 	} Attribute;
 
 	virtual	status_t			SetAttribute(const Attribute& attribute,
@@ -72,6 +74,11 @@ public:
 	virtual	status_t			GetAttribute(const Attribute& attribute,
 									int64& value) const = 0;
 
+	virtual	status_t			SetAttribute(const Attribute& attribute,
+									const float& value) = 0;
+	virtual	status_t			GetAttribute(const Attribute& attribute,
+									float& value) const = 0;
+
 	// convenience access to attributes
 			BString				Name() const;
 			BString				Author() const;
@@ -81,6 +88,11 @@ public:
 			int32				TrackNumber() const;
 
 			bigtime_t			Duration();
+			int64				LastFrame() const;
+			float				LastVolume() const;
+
+			status_t			SetLastFrame(int64 value);
+			status_t			SetLastVolume(float value);
 
 	// methods
 	virtual	BString				LocationURI() const = 0;

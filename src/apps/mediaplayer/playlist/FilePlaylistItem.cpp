@@ -192,6 +192,9 @@ FilePlaylistItem::SetAttribute(const Attribute& attribute,
 	const int64& value)
 {
 	switch (attribute) {
+		case ATTR_INT64_FRAME:
+			return _SetAttribute("Media:Frame", B_INT64_TYPE, &value,
+				sizeof(int64));
 		case ATTR_INT64_DURATION:
 			return _SetAttribute("Media:Length", B_INT64_TYPE, &value,
 				sizeof(int64));
@@ -206,12 +209,41 @@ FilePlaylistItem::GetAttribute(const Attribute& attribute,
 	int64& value) const
 {
 	switch (attribute) {
+		case ATTR_INT64_FRAME:
+			return _GetAttribute("Media:Frame", B_INT64_TYPE, &value,
+				sizeof(int64));
 		case ATTR_INT64_DURATION:
 			return _GetAttribute("Media:Length", B_INT64_TYPE, &value,
 				sizeof(int64));
 		default:
 			return B_NOT_SUPPORTED;
 	}
+}
+
+
+status_t
+FilePlaylistItem::SetAttribute(const Attribute& attribute,
+	const float& value)
+{
+	if (attribute == ATTR_FLOAT_VOLUME) {
+		return _SetAttribute("Media:Volume", B_FLOAT_TYPE, &value,
+			sizeof(float));
+	}
+
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+FilePlaylistItem::GetAttribute(const Attribute& attribute,
+	float& value) const
+{
+	if (attribute == ATTR_FLOAT_VOLUME) {
+		return _GetAttribute("Media:Volume", B_FLOAT_TYPE, &value,
+			sizeof(float));
+	}
+
+	return B_NOT_SUPPORTED;
 }
 
 
