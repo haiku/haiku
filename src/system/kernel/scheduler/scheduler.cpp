@@ -184,8 +184,8 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	thread->priority = priority;
 	threadData->CancelPenalty();
 
-	if (priority == thread->priority)
-		return thread->priority;
+	if (priority == oldPriority)
+		return oldPriority;
 
 	if (thread->state != B_THREAD_READY) {
 		if (thread->state == B_THREAD_RUNNING) {
