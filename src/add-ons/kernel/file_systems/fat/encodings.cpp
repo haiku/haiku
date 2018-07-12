@@ -1507,7 +1507,7 @@ status_t generate_short_name(const uchar *name, const uchar *uni,
 /* called to convert a short ms-dos filename to utf8.
    XXX: encoding is assumed to be standard US code page, never shift-JIS
 */
-status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, bool toLower)
+status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, uint8 toLower)
 {
 	uchar normalized[8+1+3+1];
 	int32 i, pos;
@@ -1516,16 +1516,19 @@ status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, bool toLower)
 
 	pos = 0;
 	for (i=0;i<8;i++) {
-		if (msdos[i] == ' ') break;
+		if (msdos[i] == ' ')
+			break;
 		normalized[pos++] = ((i == 0) && (msdos[i] == 5)) ? 0xe5 :
-			(toLower ? tolower(msdos[i]) : msdos[i]);
+			((toLower & 0x08) ? tolower(msdos[i]) : msdos[i]);
 	}
 
 	if (msdos[8] != ' ') {
 		normalized[pos++] = '.';
 		for (i=8;i<11;i++) {
-			if (msdos[i] == ' ') break;
-			normalized[pos++] = (toLower ? tolower(msdos[i]) : msdos[i]);
+			if (msdos[i] == ' ')
+				break;
+			normalized[pos++]
+				= ((toLower & 0x10) ? tolower(msdos[i]) : msdos[i]);
 		}
 	}
 
@@ -1535,20 +1538,26 @@ status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, bool toLower)
 			(char *)utf8, (int32 *)&utf8len);
 }
 
-bool requires_munged_short_name(const uchar *utf8name, const uchar nshort[11], int encoding)
+bool requires_munged_short_name(const uchar *utf8name, const uchar nshort[11],
+	int encoding)
 {
 	int leading = 0;
 	int trailing = 0;
 	int i, len;
 
-	if (encoding != MS_DOS_CONVERSION) return true;
+	if (encoding != MS_DOS_CONVERSION)
+		return true;
 
 	for ( ; *utf8name != 0; utf8name++) {
-		if (!BEGINS_UTF8CHAR(*utf8name)) continue;
-		if (*utf8name == '.') break;
+		if (!BEGINS_UTF8CHAR(*utf8name))
+			continue;
+		if (*utf8name == '.')
+			break;
 		leading++;
-		if (leading > 8) return true;
-		if ((nshort[leading - 1] == '_') && (*utf8name != '_')) return true;
+		if (leading > 8)
+			return true;
+		if ((nshort[leading - 1] == '_') && (*utf8name != '_'))
+			return true;
 	}
 
 	if (*utf8name != 0) {
