@@ -469,13 +469,14 @@ BMenuItem::Draw()
 	DrawContent();
 
 	// draw extra symbols
-	const menu_layout layout = MenuPrivate(fSuper).Layout();
+	MenuPrivate privateAccessor(fSuper);
+	const menu_layout layout = privateAccessor.Layout();
 	if (layout == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
 			_DrawMarkSymbol();
 
 		if (fShortcutChar)
-			_DrawShortcutSymbol();
+			_DrawShortcutSymbol(privateAccessor.HasSubmenus());
 
 		if (Submenu() != NULL)
 			_DrawSubmenuSymbol();
@@ -745,15 +746,17 @@ BMenuItem::_DrawMarkSymbol()
 
 
 void
-BMenuItem::_DrawShortcutSymbol()
+BMenuItem::_DrawShortcutSymbol(bool submenus)
 {
 	BMenu* menu = fSuper;
 	BFont font;
 	menu->GetFont(&font);
 	BPoint where = ContentLocation();
+	// Start from the right and walk our way back
 	where.x = fBounds.right - font.Size();
 
-	if (fSubmenu != NULL)
+	// Leave space for the submenu arrow if any item in the menu has a submenu
+	if (submenus)
 		where.x -= fBounds.Height() / 2;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();

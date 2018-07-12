@@ -91,7 +91,7 @@ private:
 			rgb_color			_HighColor();
 
 			void				_DrawMarkSymbol();
-			void				_DrawShortcutSymbol();
+			void				_DrawShortcutSymbol(bool);
 			void				_DrawSubmenuSymbol();
 			void				_DrawControlChar(char shortcut, BPoint where);
 

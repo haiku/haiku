@@ -56,6 +56,7 @@ public:
 			void				SetSuperItem(BMenuItem* item);
 			void				InvokeItem(BMenuItem* item, bool now = false);
 			void				QuitTracking(bool thisMenuOnly = true);
+			bool				HasSubmenus() { return fMenu->fHasSubmenus; }
 
 	static	status_t			CreateBitmaps();
 	static	void				DeleteBitmaps();

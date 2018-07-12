@@ -313,7 +313,7 @@ private:
 			bool				fStickyMode;
 			bool				fIgnoreHidden;
 			bool				fTriggerEnabled;
-			bool				fRedrawAfterSticky;
+			bool				fHasSubmenus;
 			bool				fAttachAborted;
 };
 
