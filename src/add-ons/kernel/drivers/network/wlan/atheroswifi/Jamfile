@@ -12,7 +12,8 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ]
 	-Wno-uninitialized ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
-UseHeaders [ FDirName $(SUBDIR) dev ath ath_hal ] ;
+UseHeaders [ FDirName $(SUBDIR) dev ath ath_hal ] : true ;
+UseHeaders [ FDirName $(SUBDIR) contrib ath_hal ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ] ;
 
@@ -56,7 +57,9 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5312 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar5416 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar9001 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar9002 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_hal ar9003 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ath ath_dfs null ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) contrib ath_hal ar9300 ] ;
 
 KernelMergeObject atheroswifi_hal.o :
 	ah_osdep.c
@@ -161,6 +164,32 @@ KernelMergeObject atheroswifi_hal.o :
 	ar9280.c
 	ar9285.c
 	ar9287.c
+
+	# AR9300 support
+	ar9300_interrupts.c
+	ar9300_radar.c
+	ar9300_ani.c
+	ar9300_keycache.c
+	ar9300_radio.c
+	ar9300_xmit.c
+	ar9300_attach.c
+	ar9300_mci.c
+	ar9300_stub.c
+	ar9300_xmit_ds.c
+	ar9300_beacon.c
+	ar9300_misc.c
+	ar9300_recv.c
+	ar9300_stub_funcs.c
+	ar9300_eeprom.c
+	ar9300_paprd.c
+	ar9300_recv_ds.c
+	ar9300_freebsd.c
+	ar9300_phy.c
+	ar9300_reset.c
+	ar9300_gpio.c
+	ar9300_power.c
+	ar9300_timer.c
+	ar9300_spectral.c
 
 	dfs_null.c
 	;
