@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan ;
 
-# Haiku-native drivers
-SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ipw2100 ;
-
 # FreeBSD 9.2 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2100 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8335 ;
