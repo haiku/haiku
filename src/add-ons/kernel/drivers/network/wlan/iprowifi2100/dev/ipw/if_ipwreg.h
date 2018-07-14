@@ -1,4 +1,4 @@
-/*      $FreeBSD$	*/
+/*      $FreeBSD: releng/11.1/sys/dev/ipw/if_ipwreg.h 172567 2007-10-12 05:23:00Z thompsa $	*/
 
 /*-
  * Copyright (c) 2004-2006
