@@ -123,7 +123,7 @@ ShortcutsWindow::ShortcutsWindow()
 		B_TRANSLATE("Append KeySet" B_UTF8_ELLIPSIS),
 		new BMessage(APPEND_KEYSET), 'A'));
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert to saved"),
-		new BMessage(REVERT_KEYSET), 'A'));
+		new BMessage(REVERT_KEYSET), 'R'));
 	fileMenu->AddItem(new BSeparatorItem);
 	fileMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("Save KeySet as" B_UTF8_ELLIPSIS),
