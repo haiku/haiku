@@ -32,14 +32,14 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_output.c 301731 2016-06-0
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h> 
+#include <sys/systm.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
-#include <sys/mbuf.h>   
+#include <sys/mbuf.h>
 #include <sys/endian.h>
 
 #include <sys/socket.h>
- 
+
 #include <net/bpf.h>
 #include <net/ethernet.h>
 #include <net/if.h>
@@ -60,7 +60,7 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_output.c 301731 2016-06-0
 #include <net80211/ieee80211_mesh.h>
 
 #if defined(INET) || defined(INET6)
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #endif
 
 #ifdef INET
@@ -313,7 +313,7 @@ ieee80211_start_pkt(struct ieee80211vap *vap, struct mbuf *m)
 	 */
 	if (ic->ic_flags & IEEE80211_F_SCAN)
 		ieee80211_cancel_anyscan(vap);
-	/* 
+	/*
 	 * Find the node for the destination so we can do
 	 * things like power save and fast frames aggregation.
 	 *
@@ -977,7 +977,7 @@ ieee80211_send_nulldata(struct ieee80211_node *ni)
 	return (ret);
 }
 
-/* 
+/*
  * Assign priority to a frame based on any vlan tag assigned
  * to the station and/or any Diffserv setting in an IP header.
  * Finally, if an ACM policy is setup (in station mode) it's
@@ -1006,7 +1006,7 @@ ieee80211_classify(struct ieee80211_node *ni, struct mbuf *m)
 		goto done;
 	}
 
-	/* 
+	/*
 	 * If node has a vlan tag then all traffic
 	 * to it must have a matching tag.
 	 */
@@ -1177,7 +1177,7 @@ ieee80211_mbuf_adjust(struct ieee80211vap *vap, int hdrsize,
  * Return the transmit key to use in sending a unicast frame.
  * If a unicast key is set we use that.  When no unicast key is set
  * we fall back to the default transmit key.
- */ 
+ */
 static __inline struct ieee80211_key *
 ieee80211_crypto_getucastkey(struct ieee80211vap *vap,
 	struct ieee80211_node *ni)
@@ -1196,7 +1196,7 @@ ieee80211_crypto_getucastkey(struct ieee80211vap *vap,
  * Return the transmit key to use in sending a multicast frame.
  * Multicast traffic always uses the group key which is installed as
  * the default tx key.
- */ 
+ */
 static __inline struct ieee80211_key *
 ieee80211_crypto_getmcastkey(struct ieee80211vap *vap,
 	struct ieee80211_node *ni)
@@ -1238,7 +1238,7 @@ ieee80211_encap(struct ieee80211vap *vap, struct ieee80211_node *ni,
 	int meshhdrsize, meshae;
 	uint8_t *qos;
 	int is_amsdu = 0;
-	
+
 	IEEE80211_TX_LOCK_ASSERT(ic);
 
 	/*
@@ -1786,7 +1786,7 @@ ieee80211_add_xrates(uint8_t *frm, const struct ieee80211_rateset *rs)
 	return frm;
 }
 
-/* 
+/*
  * Add an ssid element to a frame.
  */
 uint8_t *
@@ -1870,7 +1870,7 @@ ieee80211_add_wme_info(uint8_t *frm, struct ieee80211_wme_state *wme)
 		.wme_info	= 0,
 	};
 	memcpy(frm, &info, sizeof(info));
-	return frm + sizeof(info); 
+	return frm + sizeof(info);
 }
 
 /*
@@ -2098,11 +2098,13 @@ ieee80211_send_probereq(struct ieee80211_node *ni,
 	 * the xmit is complete all the way in the driver.  On error we
 	 * will remove our reference.
 	 */
+#ifndef __HAIKU__
 	IEEE80211_DPRINTF(vap, IEEE80211_MSG_NODE,
 		"ieee80211_ref_node (%s:%u) %p<%s> refcnt %d\n",
 		__func__, __LINE__,
 		ni, ether_sprintf(ni->ni_macaddr),
 		ieee80211_node_refcnt(ni)+1);
+#endif
 	ieee80211_ref_node(ni);
 
 	/*
@@ -2437,7 +2439,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		}
 #ifdef IEEE80211_SUPPORT_SUPERG
 		if (IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS)) {
-			frm = ieee80211_add_ath(frm, 
+			frm = ieee80211_add_ath(frm,
 				IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS),
 				((vap->iv_flags & IEEE80211_F_WPA) == 0 &&
 				 ni->ni_authmode != IEEE80211_AUTH_8021X) ?
@@ -2518,7 +2520,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		}
 #ifdef IEEE80211_SUPPORT_SUPERG
 		if (IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS))
-			frm = ieee80211_add_ath(frm, 
+			frm = ieee80211_add_ath(frm,
 				IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS),
 				((vap->iv_flags & IEEE80211_F_WPA) == 0 &&
 				 ni->ni_authmode != IEEE80211_AUTH_8021X) ?
@@ -2985,7 +2987,7 @@ ieee80211_beacon_construct(struct mbuf *m, uint8_t *frm,
 
 		tie->tim_ie = IEEE80211_ELEMID_TIM;
 		tie->tim_len = 4;	/* length */
-		tie->tim_count = 0;	/* DTIM count */ 
+		tie->tim_count = 0;	/* DTIM count */
 		tie->tim_period = vap->iv_dtim_period;	/* DTIM period */
 		tie->tim_bitctl = 0;	/* bitmap control */
 		tie->tim_bitmap[0] = 0;	/* Partial Virtual Bitmap */
@@ -3001,7 +3003,7 @@ ieee80211_beacon_construct(struct mbuf *m, uint8_t *frm,
 			frm = ieee80211_add_powerconstraint(frm, vap);
 		bo->bo_csa = frm;
 		if (ic->ic_flags & IEEE80211_F_CSAPENDING)
-			frm = ieee80211_add_csa(frm, vap);	
+			frm = ieee80211_add_csa(frm, vap);
 	} else
 		bo->bo_csa = frm;
 
@@ -3286,7 +3288,7 @@ ieee80211_beacon_update(struct ieee80211_node *ni, struct mbuf *m, int mcast)
 			(struct ieee80211_tim_ie *) bo->bo_tim;
 		if (isset(bo->bo_flags, IEEE80211_BEACON_TIM)) {
 			u_int timlen, timoff, i;
-			/* 
+			/*
 			 * ATIM/DTIM needs updating.  If it fits in the
 			 * current space allocated then just copy in the
 			 * new bits.  Otherwise we need to move any trailing
