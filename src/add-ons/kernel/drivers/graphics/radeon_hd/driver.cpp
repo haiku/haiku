@@ -82,10 +82,13 @@ const struct supported_device {
 	// Codename: Pele
 	// Process: 55 nm
 	{0x94c7, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2350"},
+#if 0
+	// Not working: #12642
 	{0x94c1, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 2400"},
 	{0x94c3, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
 	{0x94c9, 2, 0, RADEON_RV610, CHIP_IGP, "Mobility Radeon HD 2400"},
 	{0x94cc, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
+#endif
 	{0x9519, 2, 0, RADEON_RV630, CHIP_STD, "AMD FireStream 9170"},
 	{0x9586, 2, 0, RADEON_RV630, CHIP_STD, "Radeon HD 2600"},
 	{0x9588, 2, 0, RADEON_RV630, CHIP_STD, "Radeon HD 2600"},
@@ -185,7 +188,10 @@ const struct supported_device {
 	{0x68be, 4, 0, RADEON_JUNIPER, CHIP_STD, "Radeon HD 5700"},
 	{0x68b8, 4, 0, RADEON_JUNIPER, CHIP_STD, "Radeon HD 5770"},
 	//  Juniper LE / XT (67X0 is rebranded 57X0 + tweaks)
+#if 0
+	// Not working: #8154
 	{0x68bf, 4, 0, RADEON_JUNIPER, CHIP_STD, "Radeon HD 6750"},
+#endif
 	{0x68ba, 4, 0, RADEON_JUNIPER, CHIP_STD, "Radeon HD 6770"},
 	//  Cypress
 	{0x689e, 4, 0, RADEON_CYPRESS, CHIP_STD, "Radeon HD 5800"},
@@ -205,8 +211,11 @@ const struct supported_device {
 	//  Sumo (no VGA / LVDS!, only DP)
 	{0x9640, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6550D"},
 	{0x9641, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD Sumo"},
+#if 0
+	// Not working: #10335, #12026
 	{0x9647, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6520G"},
 	{0x9648, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6480G"},
+#endif
 	{0x964a, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6530D"},
 	{0x964e, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD Sumo"},
 	{0x964f, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD Sumo"},
@@ -220,7 +229,10 @@ const struct supported_device {
 	// Codename: Nothern Islands
 	// Process: 40 nm
 	//  Caicos
+#if 0
+	// Not working: #12313
 	{0x6760, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6470"},
+#endif
 	{0x6761, 5, 0, RADEON_CAICOS, CHIP_MOBILE, "Radeon HD 6430"},
 	{0x6762, 5, 0, RADEON_CAICOS, CHIP_STD, "Radeon HD Caicos"},
 	{0x6763, 5, 0, RADEON_CAICOS, CHIP_DISCREET, "Radeon HD E6460"},
@@ -252,10 +264,16 @@ const struct supported_device {
 	{0x6759, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 6570/7570"},
 	{0x675d, 5, 0, RADEON_TURKS, CHIP_STD, "Radeon HD 7570"},
 	{0x6850, 6, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 7570"},
+#if 0
+	// Not working: #12026
 	{0x6840, 6, 0, RADEON_TURKS, CHIP_MOBILE, "Radeon HD 7670"},
+#endif
 	//  Barts
 	{0x673e, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6790"},
+#if 0
+	// Not working: #8765
 	{0x6739, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6850"},
+#endif
 	{0x6738, 5, 0, RADEON_BARTS, CHIP_STD, "Radeon HD 6870"},
 	//  Cayman
 	{0x6700, 5, 0, RADEON_CAYMAN, CHIP_STD, "Radeon HD Cayman"},
@@ -363,7 +381,10 @@ const struct supported_device {
 	{0x999b, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8310"},
 	{0x999c, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8650"},
 	{0x999d, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8550"},
+#if 0
+	// Not working: #12026
 	{0x99a0, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7520"},
+#endif
 	{0x99a2, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7420"},
 	{0x99a4, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7400"},
 	//  Oland   DCE 6,4
@@ -422,15 +443,18 @@ const struct supported_device {
 	{0x6646, 8, 2, RADEON_BONAIRE, CHIP_MOBILE, "Radeon R9 380"},
 	{0x6647, 8, 2, RADEON_BONAIRE, CHIP_MOBILE, "Radeon R9 380"},
 	{0x6649, 8, 2, RADEON_BONAIRE, CHIP_STD, "FirePro W5100"},
-	{0x6650, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
-	{0x6651, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
-	{0x6658, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon R7 200"}, 
+	{0x6650, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
+	{0x6651, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
+	{0x6658, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon R7 200"},
 	{0x665c, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD 7790"},
 	{0x665d, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon R7 200"},
 	{0x665f, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon R7 300"},
 	//  Kabini DCE 8.3
+#if 0
+	// Not working: #10939
 	{0x9830, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8400"},
 	{0x9831, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8400"},
+#endif
 	{0x9832, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8330"},
 	{0x9833, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8330"},
 	{0x9834, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8210"},
