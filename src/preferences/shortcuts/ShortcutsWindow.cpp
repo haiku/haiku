@@ -133,13 +133,8 @@ ShortcutsWindow::ShortcutsWindow()
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(fileMenu);
 
-	BRect tableBounds = Bounds();
-	tableBounds.top = menuBar->Bounds().bottom + 1;
-	tableBounds.right -= B_V_SCROLL_BAR_WIDTH;
-	tableBounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
 	fColumnListView = new BColumnListView(NULL,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
+		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER, false);
 
 	float cellWidth = be_plain_font->StringWidth("Either") + 20;
 		// ShortcutsSpec does not seem to translate the string "Either".
@@ -187,18 +182,20 @@ ShortcutsWindow::ShortcutsWindow()
 	fColumnListView->SetTarget(this);
 
 	fAddButton = new BButton("add", B_TRANSLATE("Add new shortcut"),
-		new BMessage(ADD_HOTKEY_ITEM), B_FOLLOW_BOTTOM);
+		new BMessage(ADD_HOTKEY_ITEM));
 
 	fRemoveButton = new BButton("remove",
 		B_TRANSLATE("Remove selected shortcut"),
-		new BMessage(REMOVE_HOTKEY_ITEM), B_FOLLOW_BOTTOM);
+		new BMessage(REMOVE_HOTKEY_ITEM));
 	fRemoveButton->SetEnabled(false);
 
 	fSaveButton = new BButton("save", B_TRANSLATE("Save & apply"),
-		new BMessage(SAVE_KEYSET), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
+		new BMessage(SAVE_KEYSET));
 	fSaveButton->SetEnabled(false);
 
 	CenterOnScreen();
+
+	fColumnListView->ResizeAllColumnsToPreferred();
 
 	entry_ref windowSettingsRef;
 	if (_GetWindowSettingsFile(&windowSettingsRef)) {
@@ -219,8 +216,6 @@ ShortcutsWindow::ShortcutsWindow()
 		PostMessage(&message);
 			// tell ourselves to load this file if it exists
 	}
-
-	fColumnListView->ResizeAllColumnsToPreferred();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(menuBar)
@@ -403,10 +398,9 @@ ShortcutsWindow::_SaveWindowSettings(BEntry& saveEntry)
 	BMessage saveMsg;
 	saveMsg.AddRect("window frame", Frame());
 
-	for (int i = 0; i < fColumnListView->CountColumns(); i++) {
-		BColumn* column = fColumnListView->ColumnAt(i);
-		saveMsg.AddFloat("column width", column->Width());
-	}
+	BMessage columnsState;
+	fColumnListView->SaveState(&columnsState);
+	saveMsg.AddMessage ("columns state", &columnsState);
 
 	saveMsg.Flatten(&saveTo);
 }
@@ -432,12 +426,9 @@ ShortcutsWindow::_LoadWindowSettings(const BMessage& loadMessage)
 		MoveTo(left, top);
 	}
 
-	for (int i = 0; i < fColumnListView->CountColumns(); i++) {
-		BColumn* column = fColumnListView->ColumnAt(i);
-		float columnWidth;
-		if (loadMessage.FindFloat("column width", i, &columnWidth) == B_OK)
-			column->SetWidth(max_c(column->Width(), columnWidth));
-	}
+	BMessage columnsStateMessage;
+	if (loadMessage.FindMessage ("columns state", &columnsStateMessage) == B_OK)
+		fColumnListView->LoadState(&columnsStateMessage);
 }
 
 
