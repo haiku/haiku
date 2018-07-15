@@ -86,6 +86,7 @@ public:
 		B_FLAT					= 1 << 8, // flat look (e.g. button background)
 		B_INVALID				= 1 << 9, // invalid value, use B_FAILURE_COLOR
 		B_IS_CONTROL			= 1 << 10, // use control colors
+		B_SCROLLABLE			= 1 << 11, // scroll bar within bounds
 
 		B_BLEND_FRAME			= 1 << 16,
 	};
@@ -224,15 +225,17 @@ public:
 									const rgb_color& base,
 									uint32 flags = 0) = 0;
 
-	virtual	void				DrawScrollBarBackground(BView* view,
-									BRect& rect1, BRect& rect2,
+	virtual	void				DrawScrollBar(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
-									orientation orientation) = 0;
-	virtual	void				DrawScrollBarBackground(BView* view,
-									BRect& rect, const BRect& updateRect,
+									orientation orientation,
+									bool doubleArrows = false,
+									int32 buttonDown = -1) = 0;
+	virtual	void				DrawScrollBarThumb(BView* view, BRect& rect,
+									BRect& thumbRect, const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
-									orientation orientation) = 0;
+									orientation orientation,
+									uint32 knobStyle = 0) = 0;
 
 	virtual	void				DrawScrollViewFrame(BView* view,
 									BRect& rect, const BRect& updateRect,
