@@ -474,7 +474,12 @@ BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 int
 BSizeColumn::CompareFields(BField* field1, BField* field2)
 {
-	return ((BSizeField*)field1)->Size() - ((BSizeField*)field2)->Size();
+	off_t diff = ((BSizeField*)field1)->Size() - ((BSizeField*)field2)->Size();
+	if (diff > 0)
+		return 1;
+	if (diff < 0)
+		return -1;
+	return 0;
 }
 
 
