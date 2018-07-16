@@ -86,10 +86,16 @@ public:
 	menu_tracking_hook	trackingHook;
 	void*				trackingState;
 
-	ExtraMenuData(menu_tracking_hook func, void* state)
+	// Used to track when the menu would be drawn offscreen and instead gets
+	// shifted back on the screen towards the left. This information
+	// allows us to draw submenus in the same direction as their parents.
+	bool				frameShiftedLeft;
+
+	ExtraMenuData()
 	{
-		trackingHook = func;
-		trackingState = state;
+		trackingHook = NULL;
+		trackingState = NULL;
+		frameShiftedLeft = false;
 	}
 };
 
@@ -1443,8 +1449,8 @@ BMenu::DrawBackground(BRect updateRect)
 void
 BMenu::SetTrackingHook(menu_tracking_hook func, void* state)
 {
-	delete fExtraMenuData;
-	fExtraMenuData = new (nothrow) BPrivate::ExtraMenuData(func, state);
+	fExtraMenuData->trackingHook = func;
+	fExtraMenuData->trackingState = state;
 }
 
 
@@ -1464,6 +1470,8 @@ BMenu::_InitData(BMessage* archive)
 	font.SetFamilyAndStyle(sMenuInfo.f_family, sMenuInfo.f_style);
 	font.SetSize(sMenuInfo.font_size);
 	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
+
+	fExtraMenuData = new (nothrow) BPrivate::ExtraMenuData();
 
 	fLayoutData = new LayoutData;
 	fLayoutData->lastResizingMode = ResizingMode();
@@ -2387,6 +2395,9 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	BMenu* superMenu = Supermenu();
 	BMenuItem* superItem = Superitem();
 
+	// Reset frame shifted state since this menu is being redrawn
+	fExtraMenuData->frameShiftedLeft = false;
+
 	// TODO: Horrible hack:
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCMenuBar_ to "fake" the menu hierarchy
@@ -2401,19 +2412,23 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	bool scroll = false;
 	if (superMenu == NULL || superItem == NULL || inMenuField) {
 		// just move the window on screen
-
 		if (frame.bottom > screenFrame.bottom)
 			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
 		else if (frame.top < screenFrame.top)
 			frame.OffsetBy(0, -frame.top);
 
-		if (frame.right > screenFrame.right)
+		if (frame.right > screenFrame.right) {
 			frame.OffsetBy(screenFrame.right - frame.right, 0);
+			fExtraMenuData->frameShiftedLeft = true;
+		}
 		else if (frame.left < screenFrame.left)
 			frame.OffsetBy(-frame.left, 0);
 	} else if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
-		if (frame.right > screenFrame.right)
+		if (frame.right > screenFrame.right
+				|| superMenu->fExtraMenuData->frameShiftedLeft) {
 			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2, 0);
+			fExtraMenuData->frameShiftedLeft = true;
+		}
 
 		if (frame.left < 0)
 			frame.OffsetBy(-frame.left + 6, 0);
