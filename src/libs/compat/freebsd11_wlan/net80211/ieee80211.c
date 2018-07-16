@@ -362,15 +362,18 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 {
 	struct ieee80211vap *vap;
 
+	/*
+	 * We use this as an indicator that ifattach never had a chance to be
+	 * called, e.g. early driver attach failed and ifdetach was called
+	 * during subsequent detach.  Never fear, for we have nothing to do
+	 * here.
+	 */
+	if (ic->ic_tq == NULL)
+		return;
+
 	mtx_lock(&ic_list_mtx);
 	LIST_REMOVE(ic, ic_next);
 	mtx_unlock(&ic_list_mtx);
-
-#ifdef __HAIKU__
-	/* Have we even initialized this com? */
-	if (!ic->ic_tq)
-		return;
-#endif
 
 	taskqueue_drain(taskqueue_thread, &ic->ic_restart_task);
 
