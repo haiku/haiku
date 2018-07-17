@@ -1,9 +1,9 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs dump_log ;
 
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
-UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateKernelHeaders ;
 
-SimpleTest dump_log :
-	dump_log.cpp
+SimpleTest bfsdump_log :
+	bfsdump_log.cpp
 	;
 

@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs array ;
 
-SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ;
-UsePrivateHeaders [ FDirName kernel  ] ;			# For kernel_cpp.cpp
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
+UsePrivateKernelHeaders ;
 
 {
 	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
@@ -9,17 +9,17 @@ UsePrivateHeaders [ FDirName kernel  ] ;			# For kernel_cpp.cpp
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
 }
 
-SimpleTest arrayTest
+SimpleTest bfsArrayTest
 	: array.cpp
 	  Utility.cpp
 	: be ;
 
-SimpleTest smallArrayTest
+SimpleTest bfsSmallArrayTest
 	: smallArray.cpp
 	  Utility.o
 	: be ;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles Utility.cpp ]
-	= [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
 

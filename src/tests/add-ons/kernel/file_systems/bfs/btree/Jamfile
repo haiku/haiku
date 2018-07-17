@@ -13,7 +13,7 @@ rule FPreIncludes { return -include$(1:D=$(SUBDIR)) ; }
 	SubDirC++Flags $(defines) $(preIncludes) -fno-exceptions ; #-fcheck-memory-usage
 }
 
-SimpleTest btreeTest
+SimpleTest bfsBtreeTest
 	: test.cpp
 	  Volume.cpp
 	  Inode.cpp
