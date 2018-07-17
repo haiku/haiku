@@ -874,25 +874,24 @@ public:
 	{
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
-		BLayoutBuilder::Group<BLayoutBuilder::Group<void*> > verticalGroup =
-			BLayoutBuilder::Group<>(this)
-				.AddGroup(B_VERTICAL, 0.0f);
+		BGroupLayout* verticalGroup = new BGroupLayout(B_VERTICAL, 0.0f);
+		GroupLayout()->AddItem(verticalGroup);
 
 		{
 			BStringView* userNicknameView = new BStringView("user-nickname",
 				rating.User().NickName());
 			userNicknameView->SetFont(be_bold_font);
-			verticalGroup.Add(userNicknameView);
+			verticalGroup->AddView(userNicknameView);
 		}
 
-		BLayoutBuilder::Group<BLayoutBuilder::Group<
-			BLayoutBuilder::Group<void *> > > ratingGroup =
-				verticalGroup.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING);
+		BGroupLayout* ratingGroup =
+			new BGroupLayout(B_HORIZONTAL, B_USE_DEFAULT_SPACING);
+		verticalGroup->AddItem(ratingGroup);
 
 		if (rating.Rating() >= 0) {
 			RatingView* ratingView = new RatingView("package rating view");
 			ratingView->SetRating(rating.Rating());
-			ratingGroup.Add(ratingView);
+			ratingGroup->AddView(ratingView);
 		}
 
 		{
@@ -913,11 +912,10 @@ public:
 				ratingContextDescription);
 			BFont versionFont(be_plain_font);
 			ratingContextView->SetFont(&versionFont);
-			ratingGroup.Add(ratingContextView);
+			ratingGroup->AddView(ratingContextView);
 		}
 
-		ratingGroup.AddGlue();
-		ratingGroup.End();
+		ratingGroup->AddItem(BSpaceLayoutItem::CreateGlue());
 
 		if (rating.Comment() > 0) {
 			TextView* textView = new TextView("rating-text");
@@ -925,14 +923,12 @@ public:
 			paragraphStyle.SetJustify(true);
 			textView->SetParagraphStyle(paragraphStyle);
 			textView->SetText(rating.Comment());
-			verticalGroup.AddStrut(8.0f);
-			verticalGroup.Add(textView);
-			verticalGroup.AddStrut(8.0f);
+			verticalGroup->AddItem(BSpaceLayoutItem::CreateVerticalStrut(8.0f));
+			verticalGroup->AddView(textView);
+			verticalGroup->AddItem(BSpaceLayoutItem::CreateVerticalStrut(8.0f));
 		}
 
-		verticalGroup
-			.End()
-			.SetInsets(B_USE_DEFAULT_SPACING);
+		verticalGroup->SetInsets(B_USE_DEFAULT_SPACING);
 
 		SetFlags(Flags() | B_WILL_DRAW);
 	}
