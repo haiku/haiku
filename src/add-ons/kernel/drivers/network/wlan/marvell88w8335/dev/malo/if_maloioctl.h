@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/malo/if_maloioctl.h 177595 2008-03-25 06:32:33Z weongyo $
  */
 
 /*
