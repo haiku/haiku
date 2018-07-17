@@ -1,4 +1,4 @@
-/*	$FreeBSD$	*/
+/*	$FreeBSD: releng/11.1/sys/dev/ral/rt2560reg.h 258780 2013-11-30 22:17:27Z eadler $	*/
 
 /*-
  * Copyright (c) 2005, 2006
@@ -268,7 +268,7 @@ struct rt2560_rx_desc {
 #define RT2560_BBP_BUSY		(1 << 15)
 #define RT2560_BBP_WRITE	(1 << 16)
 #define RT2560_RF_20BIT		(20 << 24)
-#define RT2560_RF_BUSY		(1 << 31)
+#define RT2560_RF_BUSY		(1U << 31)
 
 #define RT2560_RF_2522	0x00
 #define RT2560_RF_2523	0x01
