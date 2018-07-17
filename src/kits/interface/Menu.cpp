@@ -2437,14 +2437,8 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
 	} else {
 		if (frame.bottom > screenFrame.bottom) {
-			if (scrollOn != NULL && superMenu != NULL
-				&& dynamic_cast<BMenuBar*>(superMenu) != NULL
-				&& frame.top < (screenFrame.bottom - 80)) {
-				scroll = true;
-			} else {
-				frame.OffsetBy(0, -superItem->Frame().Height()
-					- frame.Height() - 3);
-			}
+			frame.OffsetBy(0, -superItem->Frame().Height()
+				- frame.Height() - 3);
 		}
 
 		if (frame.right > screenFrame.right)
@@ -2928,33 +2922,31 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 		} else {
 			BScreen screen(window);
 
-			// If we need scrolling, resize the window to fit the screen and
-			// attach scrollers to our cached BMenuWindow.
+			// Only scroll on menus not attached to a menubar, or when the
+			// menu frame is above the visible screen
 			if (dynamic_cast<BMenuBar*>(Supermenu()) == NULL || frame.top < 0) {
+
+				// If we need scrolling, resize the window to fit the screen and
+				// attach scrollers to our cached BMenuWindow.
 				window->ResizeTo(Bounds().Width(), screen.Frame().Height());
 				frame.top = 0;
-			} else {
-				// Or, in case our parent was a BMenuBar enable scrolling with
-				// normal size.
-				window->ResizeTo(Bounds().Width(),
-					screen.Frame().bottom - frame.top);
-			}
 
-			if (fLayout == B_ITEMS_IN_COLUMN) {
 				// we currently only support scrolling for B_ITEMS_IN_COLUMN
-				window->AttachScrollers();
+				if (fLayout == B_ITEMS_IN_COLUMN) {
+					window->AttachScrollers();
 
-				BMenuItem* selectedItem = FindMarked();
-				if (selectedItem != NULL) {
-					// scroll to the selected item
-					if (Supermenu() == NULL) {
-						window->TryScrollTo(selectedItem->Frame().top);
-					} else {
-						BPoint point = selectedItem->Frame().LeftTop();
-						BPoint superPoint = Superitem()->Frame().LeftTop();
-						Supermenu()->ConvertToScreen(&superPoint);
-						ConvertToScreen(&point);
-						window->TryScrollTo(point.y - superPoint.y);
+					BMenuItem* selectedItem = FindMarked();
+					if (selectedItem != NULL) {
+						// scroll to the selected item
+						if (Supermenu() == NULL) {
+							window->TryScrollTo(selectedItem->Frame().top);
+						} else {
+							BPoint point = selectedItem->Frame().LeftTop();
+							BPoint superPoint = Superitem()->Frame().LeftTop();
+							Supermenu()->ConvertToScreen(&superPoint);
+							ConvertToScreen(&point);
+							window->TryScrollTo(point.y - superPoint.y);
+						}
 					}
 				}
 			}
