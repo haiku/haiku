@@ -536,7 +536,14 @@ const struct supported_device {
 	// Introduced: 2017
 	// Codename: Vega
 	// Process: 14nm
-	{0x687F, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega"}
+	{0x15dd, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega Mobility"},
+	{0x15ff, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega Mobility"},
+	{0x6861, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon PRO WX 9100"},
+	{0x6863, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon Vega Frontier Edition"},
+	{0x6867, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega 56"},
+	{0x687f, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega 64"},
+	{0x684c, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega M GH"},
+	{0x684e, 13, 0, RADEON_VEGA, CHIP_STD, "Radeon RX Vega M GL"}
 };
 
 
