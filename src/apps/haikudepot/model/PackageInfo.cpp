@@ -526,7 +526,7 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	BString publisherName = info.Vendor();
 	const BStringList& rightsList = info.CopyrightList();
 	if (rightsList.CountStrings() > 0)
-		publisherName = rightsList.StringAt(0);
+		publisherName = rightsList.Last();
 	if (!publisherName.IsEmpty())
 		publisherName.Prepend("© ");
 
