@@ -2267,7 +2267,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 			+ fPad.bottom;
 
 		if (item->fSubmenu != NULL)
-			width += item->Frame().Height();
+			width += item->Frame().Height() / 2;
 
 		frame.right = std::max(frame.right, width + fPad.left + fPad.right);
 		frame.bottom = item->fBounds.bottom;

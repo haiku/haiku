@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <MenuItem.h>
@@ -26,6 +28,8 @@
 
 #include "utf8_functions.h"
 
+
+static const float kMarkTint = 0.75f;
 
 // map control key shortcuts to drawable Unicode characters
 // cf. http://unicode.org/charts/PDF/U2190.pdf
@@ -450,31 +454,14 @@ BMenuItem::Draw()
 	const color_which lowColor = fSuper->LowUIColor();
 	const color_which highColor = fSuper->HighUIColor();
 
-	bool enabled = IsEnabled();
-	bool selected = IsSelected();
-	bool activated = selected && (enabled || Submenu() != NULL);
+	fSuper->SetLowColor(_LowColor());
+	fSuper->SetHighColor(_HighColor());
 
-	// set low color
-	if (activated) {
-		fSuper->SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
+	if (_IsActivated()) {
 		// fill in the background
-		BRect rect(Frame());
-		be_control_look->DrawMenuItemBackground(fSuper, rect, Frame(),
+		BRect frame(Frame());
+		be_control_look->DrawMenuItemBackground(fSuper, frame, frame,
 			fSuper->LowColor(), BControlLook::B_ACTIVATED);
-	} else
-		fSuper->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
-
-	// set high color
-	if (activated && enabled)
-		fSuper->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-	else if (enabled)
-		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-	else {
-		rgb_color bgColor = fSuper->LowColor();
-		if (bgColor.red + bgColor.green + bgColor.blue > 128 * 3)
-			fSuper->SetHighColor(tint_color(bgColor, B_DISABLED_LABEL_TINT));
-		else
-			fSuper->SetHighColor(tint_color(bgColor, B_LIGHTEN_2_TINT));
 	}
 
 	// draw content
@@ -677,6 +664,45 @@ BMenuItem::Select(bool selected)
 }
 
 
+bool
+BMenuItem::_IsActivated()
+{
+	return IsSelected() && (IsEnabled() || fSubmenu != NULL);
+}
+
+
+rgb_color
+BMenuItem::_LowColor()
+{
+	return _IsActivated() ? ui_color(B_MENU_SELECTED_BACKGROUND_COLOR)
+		: ui_color(B_MENU_BACKGROUND_COLOR);
+}
+
+
+rgb_color
+BMenuItem::_HighColor()
+{
+	rgb_color highColor;
+
+	bool isEnabled = IsEnabled();
+	bool isSelected = IsSelected();
+
+	if (isEnabled && isSelected)
+		highColor = ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR);
+	else if (isEnabled)
+		highColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
+	else {
+		rgb_color bgColor = fSuper->LowColor();
+		if (bgColor.red + bgColor.green + bgColor.blue > 128 * 3)
+			highColor = tint_color(bgColor, B_DISABLED_LABEL_TINT);
+		else
+			highColor = tint_color(bgColor, B_LIGHTEN_2_TINT);
+	}
+
+	return highColor;
+}
+
+
 void
 BMenuItem::_DrawMarkSymbol()
 {
@@ -692,7 +718,7 @@ BMenuItem::_DrawMarkSymbol()
 	BPoint center(floorf((r.left + r.right) / 2.0),
 		floorf((r.top + r.bottom) / 2.0));
 
-	float size = min_c(r.Height() - 2, r.Width());
+	float size = std::min(r.Height() - 2, r.Width());
 	r.top = floorf(center.y - size / 2 + 0.5);
 	r.bottom = floorf(center.y + size / 2 + 0.5);
 	r.left = floorf(center.x - size / 2 + 0.5);
@@ -706,6 +732,7 @@ BMenuItem::_DrawMarkSymbol()
 	arrowShape.LineTo(BPoint(center.x - size * 0.25, center.y + size));
 	arrowShape.LineTo(BPoint(center.x + size, center.y - size));
 
+	fSuper->SetHighColor(tint_color(_HighColor(), kMarkTint));
 	fSuper->SetDrawingMode(B_OP_OVER);
 	fSuper->SetPenSize(2.0);
 	// NOTE: StrokeShape() offsets the shape by the current pen position,
@@ -726,8 +753,8 @@ BMenuItem::_DrawShortcutSymbol()
 	BPoint where = ContentLocation();
 	where.x = fBounds.right - font.Size();
 
-	if (fSubmenu)
-		where.x -= fBounds.Height() - 3;
+	if (fSubmenu != NULL)
+		where.x -= fBounds.Height() / 2;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
 	if (fShortcutChar < B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
@@ -775,36 +802,18 @@ BMenuItem::_DrawSubmenuSymbol()
 {
 	fSuper->PushState();
 
-	BRect r(fBounds);
-	float rightMargin;
-	MenuPrivate(fSuper).GetItemMargins(NULL, NULL, &rightMargin, NULL);
-	r.left = r.right - rightMargin + 3;
-	r.right -= 1;
+	float symbolSize = roundf(Frame().Height() * 2 / 3);
 
-	BPoint center(floorf((r.left + r.right) / 2.0),
-		floorf((r.top + r.bottom) / 2.0));
+	BRect rect(fBounds);
+	rect.left = rect.right - symbolSize;
 
-	float size = min_c(r.Height() - 2, r.Width());
-	r.top = floorf(center.y - size / 2 + 0.5);
-	r.bottom = floorf(center.y + size / 2 + 0.5);
-	r.left = floorf(center.x - size / 2 + 0.5);
-	r.right = floorf(center.x + size / 2 + 0.5);
+	// 14px by default, scaled with font size up to right margin - padding
+	BRect symbolRect(0, 0, symbolSize, symbolSize);
+	symbolRect.OffsetTo(BPoint(rect.left,
+		fBounds.top + (fBounds.Height() - symbolSize) / 2));
 
-	BShape arrowShape;
-	center.x += 0.5;
-	center.y += 0.5;
-	size *= 0.25;
-	float hSize = size * 0.7;
-	arrowShape.MoveTo(BPoint(center.x - hSize, center.y - size));
-	arrowShape.LineTo(BPoint(center.x + hSize, center.y));
-	arrowShape.LineTo(BPoint(center.x - hSize, center.y + size));
-
-	fSuper->SetDrawingMode(B_OP_OVER);
-	fSuper->SetPenSize(ceilf(size * 0.4));
-	// NOTE: StrokeShape() offsets the shape by the current pen position,
-	// it is not documented in the BeBook, but it is true!
-	fSuper->MovePenTo(B_ORIGIN);
-	fSuper->StrokeShape(&arrowShape);
+	be_control_look->DrawArrowShape(Menu(), symbolRect, symbolRect,
+		_HighColor(), BControlLook::B_RIGHT_ARROW, 0, kMarkTint);
 
 	fSuper->PopState();
 }
