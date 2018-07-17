@@ -10,12 +10,8 @@ SimpleTest bfs_attribute_iterator_test :
 
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs array ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs bufferPool ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs btree ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs dump_log ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs fragmenter ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs mkbfs ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs queries ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs r5 ;
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs rename ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems bfs structureSizes ;
