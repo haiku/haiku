@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/mwl/mwldiag.h 193240 2009-06-01 18:07:01Z sam $
  */
 
 #ifndef _MWL_DIAG_H_

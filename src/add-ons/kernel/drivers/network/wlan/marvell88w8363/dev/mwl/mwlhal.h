@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/mwl/mwlhal.h 298915 2016-05-02 04:15:15Z adrian $
  */
 
 #ifndef _MWL_HAL_H_
@@ -71,15 +71,13 @@ enum {
 	MWL_WME_AC_VO	= 3,		/* voice access category */
 };
 
-struct device;
-
 struct mwl_hal {
 	bus_space_handle_t mh_ioh;	/* BAR 1 copied from softc */
 	bus_space_tag_t	mh_iot;
 	uint32_t	mh_imask;	/* interrupt mask */
 	/* remainder is opaque to driver */
 };
-struct mwl_hal *mwl_hal_attach(struct device *dev, uint16_t devid,
+struct mwl_hal *mwl_hal_attach(device_t dev, uint16_t devid,
     bus_space_handle_t ioh, bus_space_tag_t iot, bus_dma_tag_t tag);
 void	mwl_hal_detach(struct mwl_hal *);
 

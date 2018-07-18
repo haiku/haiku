@@ -1,17 +1,15 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan marvell88w8363 ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] 
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-## TODO once all driver are updated to their FreeBSD 8 version this define
-## can be omitted
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 __FreeBSD_version__=8
-		_XOPEN_SOURCE ] 
-	-Wno-format 
-	-Wno-unused 
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1
+		_XOPEN_SOURCE ]
+	-Wno-format
+	-Wno-unused
 	-Wno-uninitialized ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
@@ -24,8 +22,8 @@ KernelAddon marvell88w8363 :
 	mwlhal.c
 	glue.c
 	:
-	libfreebsd_wlan.a
-	libfreebsd_network.a
+	libfreebsd11_wlan.a
+	libfreebsd11_network.a
 	;
 
 HAIKU_WIFI_FIRMWARE_PACKAGE on marvell88w8363 = "" ;
