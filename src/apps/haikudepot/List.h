@@ -278,7 +278,7 @@ private:
 		if (end - start < BINARY_SEARCH_LINEAR_THRESHOLD)
 			return _BinarySearchLinearBounded(context, compareFunc, start, end);
 
-		int32 mid = start + (end - start);
+		int32 mid = start + ((end - start) >> 1);
 
 		if (compareFunc(context, ItemAtFast(mid)) >= 0)
 			return _BinarySearchBounded(context, compareFunc, mid, end);
@@ -315,7 +315,7 @@ private:
 		if(end - start < BINARY_SEARCH_LINEAR_THRESHOLD)
 			return _AddOrderedLinearBounded(copyFrom, compareFunc, start, end);
 
-		int32 mid = start + (end - start);
+		int32 mid = start + ((end - start) >> 1);
 
 		if (compareFunc(copyFrom, ItemAtFast(mid)) >= 0)
 			return _AddOrderedBounded(copyFrom, compareFunc, mid, end);
