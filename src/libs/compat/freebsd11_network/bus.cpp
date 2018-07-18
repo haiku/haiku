@@ -124,7 +124,7 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 	if (res->r_mapped_area < B_OK)
 		return -1;
 
-	res->r_bustag = I386_BUS_SPACE_MEM;
+	res->r_bustag = X86_BUS_SPACE_MEM;
 	res->r_bushandle = (bus_space_handle_t)virtualAddr;
 	return 0;
 }
@@ -133,7 +133,7 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 static int
 bus_alloc_ioport_resource(device_t dev, struct resource *res, int regid)
 {
-	res->r_bustag = I386_BUS_SPACE_IO;
+	res->r_bustag = X86_BUS_SPACE_IO;
 	res->r_bushandle = pci_read_config(dev, regid, 4) & PCI_address_io_mask;
 	return 0;
 }
