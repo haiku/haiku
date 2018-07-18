@@ -30,7 +30,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 
 	BMediaTrack* track;
 	media_format format;
-	memset(&format, 0, sizeof(format));
+	format.Clear();
 	media_codec_info codecInfo;
 	bool audioDone(false), videoDone(false);
 	bigtime_t audioDuration = 0;
@@ -57,7 +57,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 			"{0, plural, one{# frame} other{# frames}}"));
 
 		if (format.IsVideo()) {
-			memset(&format, 0, sizeof(format));
+			format.Clear();
 			format.type = B_MEDIA_RAW_VIDEO;
 
 			ret = track->DecodedFormat(&format);
@@ -87,7 +87,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 			videoDone = true;
 
 		} else if (format.IsAudio()) {
-			memset(&format, 0, sizeof(format));
+			format.Clear();
 			format.type = B_MEDIA_RAW_AUDIO;
 			ret = track->DecodedFormat(&format);
 			if (ret != B_OK)

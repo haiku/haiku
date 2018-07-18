@@ -381,11 +381,11 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 	int32 tracks = inFile->CountTracks();
 	for (int32 i = 0; i < tracks && (!outAudTrack || !outVidTrack); i++) {
 		BMediaTrack* inTrack = inFile->TrackAt(i);
-		memset(&inFormat, 0, sizeof(media_format));
+		inFormat.Clear();
 		inTrack->EncodedFormat(&inFormat);
 		if (inFormat.IsAudio() && (audioCodec != NULL)) {
 			inAudTrack = inTrack;
-			memset(&outAudFormat, 0, sizeof(media_format));
+			outAudFormat.Clear();
 			outAudFormat.type = B_MEDIA_RAW_AUDIO;
 			raf = &(outAudFormat.u.raw_audio);
 			inTrack->DecodedFormat(&outAudFormat);
@@ -416,7 +416,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			height = (int32)inFormat.Height();
 
 			// construct desired decoded video format
-			memset(&outVidFormat, 0, sizeof(outVidFormat));
+			outVidFormat.Clear();
 			outVidFormat.type = B_MEDIA_RAW_VIDEO;
 			rvf = &(outVidFormat.u.raw_video);
 			rvf->last_active = (uint32)(height - 1);

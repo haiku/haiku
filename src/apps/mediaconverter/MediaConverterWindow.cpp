@@ -569,7 +569,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	media_file_format* mf_format = &(ffmi->fFileFormat);
 
 	media_format format, outfmt;
-	memset(&format, 0, sizeof(format));
+	format.Clear();
 	media_codec_info codec_info;
 	int32 cookie = 0;
 	CodecMenuItem* cmi;
@@ -622,7 +622,7 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	// construct a generic video format.  Some of these parameters
 	// seem silly, but are needed for R4.5.x, which is more picky
 	// than subsequent BeOS releases will be.
-	memset(&format, 0, sizeof(format));
+	format.Clear();
 	format.type = B_MEDIA_RAW_VIDEO;
 	format.u.raw_video.last_active = (uint32)(240 - 1);
 	format.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
