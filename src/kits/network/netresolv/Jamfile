@@ -6,7 +6,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		UseHeaders [ FDirName $(SUBDIR) include ] : true ;
-		UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+		UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 			: true ;
 		UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 		SubDirSysHdrs $(SUBDIR) ;

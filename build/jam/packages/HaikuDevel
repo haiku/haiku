@@ -61,10 +61,10 @@ AddHeaderDirectoryToPackage posix ;
 # private headers
 AddHeaderDirectoryToPackage private ;
 CopyDirectoryToPackage develop headers private libs compat
-	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_network ]
-	: : -x *.c -x *.cpp -x *.awk -x Jamfile -x miidevs ;
+	: [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network ]
+	: : -x *.c -x *.cpp -x *.awk -x Jamfile -x miidevs -x usbdevs ;
 CopyDirectoryToPackage develop headers private libs compat
-	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ]
+	: [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ]
 	: : -x *.c -x Jamfile ;
 
 # create be -> os symlink for now

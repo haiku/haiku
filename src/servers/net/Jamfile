@@ -2,9 +2,9 @@ SubDir HAIKU_TOP src servers net ;
 
 UsePrivateHeaders app net shared storage ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
 	: true ;
 
