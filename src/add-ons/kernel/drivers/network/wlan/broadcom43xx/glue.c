@@ -32,10 +32,9 @@ int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct bwi_softc* sc = (struct bwi_softc*)device_get_softc(dev);
-	struct ifnet* ifp = sc->sc_ifp;
 	uint32 intr_status;
 
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0
+	if ((sc->sc_flags & BWI_F_RUNNING) == 0
 		|| (sc->sc_flags & BWI_F_STOP))
 		return 0;
 

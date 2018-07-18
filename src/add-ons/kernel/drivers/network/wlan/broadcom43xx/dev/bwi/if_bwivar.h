@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 2007 The DragonFly Project.  All rights reserved.
- * 
+ *
  * This code is derived from software contributed to The DragonFly Project
  * by Sepherosa Ziehau <sepherosa@gmail.com>
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
@@ -17,7 +17,7 @@
  * 3. Neither the name of The DragonFly Project nor the names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific, prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -30,9 +30,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * 
+ *
  * $DragonFly: src/sys/dev/netif/bwi/if_bwivar.h,v 1.14 2008/02/15 11:15:38 sephe Exp $
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/bwi/if_bwivar.h 287197 2015-08-27 08:56:39Z glebius $
  */
 
 #ifndef _IF_BWIVAR_H
@@ -541,10 +541,11 @@ struct bwi_vap {
 #define	BWI_VAP(vap)	((struct bwi_vap *)(vap))
 
 struct bwi_softc {
-	struct ifnet		*sc_ifp;
 	uint32_t		sc_flags;	/* BWI_F_ */
 	device_t		sc_dev;
 	struct mtx		sc_mtx;
+	struct ieee80211com	sc_ic;
+	struct mbufq		sc_snd;
 	int			sc_invalid;
 
 	uint32_t		sc_cap;		/* BWI_CAP_ */
@@ -651,6 +652,7 @@ struct bwi_softc {
 #define BWI_F_BUS_INITED	0x1
 #define BWI_F_PROMISC		0x2
 #define BWI_F_STOP		0x4
+#define	BWI_F_RUNNING		0x8
 
 #define BWI_DBG_MAC		0x00000001
 #define BWI_DBG_RF		0x00000002

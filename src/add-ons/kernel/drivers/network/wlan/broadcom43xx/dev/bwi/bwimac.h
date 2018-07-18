@@ -32,7 +32,7 @@
  * SUCH DAMAGE.
  * 
  * $DragonFly: src/sys/dev/netif/bwi/bwimac.h,v 1.2 2008/02/15 11:15:38 sephe Exp $
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/bwi/bwimac.h 283639 2015-05-27 22:30:21Z glebius $
  */
 
 #ifndef _BWI_MAC_H
@@ -57,6 +57,7 @@ void		bwi_mac_init_tpctl_11bg(struct bwi_mac *);
 void		bwi_mac_dummy_xmit(struct bwi_mac *);
 void		bwi_mac_reset_hwkeys(struct bwi_mac *);
 int		bwi_mac_config_ps(struct bwi_mac *);
+int		bwi_mac_fw_alloc(struct bwi_mac *);
 
 uint16_t	bwi_memobj_read_2(struct bwi_mac *, uint16_t, uint16_t);
 uint32_t	bwi_memobj_read_4(struct bwi_mac *, uint16_t, uint16_t);
