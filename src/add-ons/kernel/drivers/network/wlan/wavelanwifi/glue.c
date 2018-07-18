@@ -30,9 +30,8 @@ int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
 	struct wi_softc* sc = (struct wi_softc*)device_get_softc(dev);
-	struct ifnet* ifp = sc->sc_ifp;
 
-	if (sc->wi_gone || !sc->sc_enabled || (ifp->if_flags & IFF_UP) == 0) {
+	if (sc->wi_gone || !sc->sc_enabled || (sc->sc_flags & WI_FLAGS_RUNNING) == 0) {
 		CSR_WRITE_2(sc, WI_INT_EN, 0);
 		CSR_WRITE_2(sc, WI_EVENT_ACK, 0xFFFF);
 		return 0;

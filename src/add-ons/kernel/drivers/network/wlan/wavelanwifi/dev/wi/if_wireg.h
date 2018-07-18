@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/11.1/sys/dev/wi/if_wireg.h 298955 2016-05-03 03:41:25Z pfg $
  */
 
 #define WI_DELAY	5
@@ -157,7 +157,7 @@
  * - Lucent has created a library called HCF (Hardware Control Functions)
  *   though which it wants developers to interact with the card. The HCF
  *   is needlessly complex, ill conceived and badly documented. Actually,
- *   the comments in the HCP code itself aren't bad, but the publically
+ *   the comments in the HCP code itself aren't bad, but the publicly
  *   available manual that comes with it is awful, probably due largely to
  *   the fact that it has been emasculated in order to hide information
  *   that Lucent wants to keep proprietary. The purpose of the HCF seems
@@ -295,7 +295,7 @@
 #define WI_EV_CMD		0x0010	/* command completed */
 #define WI_EV_ALLOC		0x0008	/* async alloc/reclaim completed */
 #define WI_EV_TX_EXC		0x0004	/* async xmit completed with failure */
-#define WI_EV_TX		0x0002	/* async xmit completed succesfully */
+#define	WI_EV_TX		0x0002	/* async xmit completed successfully */
 #define WI_EV_RX		0x0001	/* async rx completed */
 
 /* Host software registers */
