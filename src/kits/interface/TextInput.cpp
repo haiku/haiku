@@ -116,7 +116,6 @@ _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 
 		default:
 			BTextView::KeyDown(bytes, numBytes);
-			AlignTextRect();
 			break;
 	}
 }
@@ -175,7 +174,7 @@ _BTextInput_::AlignTextRect()
 	float vInset = max_c(1,
 			floorf((textRect.Height() - LineHeight(0)) / 2.0));
 	float hInset = 2;
-	float textFontWidth = TextRect().Width();
+	float textFontWidth = TextRect().right;
 
 	switch (Alignment()) {
 		case B_ALIGN_LEFT:
@@ -183,12 +182,12 @@ _BTextInput_::AlignTextRect()
 			break;
 
 		case B_ALIGN_RIGHT:
-			hInset  = textRect.Width() - textFontWidth;
+			hInset  = textRect.right - textFontWidth;
 			hInset -= be_control_look->DefaultLabelSpacing();
 			break;
 
 		case B_ALIGN_CENTER:
-			hInset = (textRect.Width() - textFontWidth) / 2.0;
+			hInset = (textRect.right - textFontWidth) / 2.0;
 			break;
 
 		default:
