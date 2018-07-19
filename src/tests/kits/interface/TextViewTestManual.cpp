@@ -46,6 +46,11 @@ Window::Window()
 	fTextControl = new BTextControl("text-contr-O",
 		"a single line of text - (c) Conglom-O", NULL);
 
+	BMessage storage;
+	fTextControl->Archive(&storage);
+
+	BTextControl* unarchived = new BTextControl(&storage);
+
 	BTextControl* disabled = new BTextControl("disabled",
 		"I'm disabled: you can't edit me", NULL);
 	disabled->SetEnabled(false);
@@ -60,6 +65,7 @@ Window::Window()
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(fTextControl)
+		.Add(unarchived)
 		.Add(disabled)
 		.Add(invalid)
 		.Add(scrollView)
