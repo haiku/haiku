@@ -1,16 +1,18 @@
 /*
- * Copyright 2001-2016, Haiku.
+ * Copyright 2001-2020, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrian Oanca <adioanca@cotty.iren.ro>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler <axeld@pinc-software.de>
- *		Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>
- *		Brecht Machiels <brecht@mos6581.org>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
- *		Ingo Weinhold <ingo_weinhold@gmx.de>
- *		Joseph Groover <looncraz@looncraz.net>
+ *		Adrian Oanca, adioanca@cotty.iren.ro
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, andrej.spielmann@seh.ox.ac.uk
+ *		Brecht Machiels, brecht@mos6581.org
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Joseph Groover, looncraz@looncraz.net
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 
 
@@ -1542,7 +1544,7 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	// make sure the window cannot mark stuff dirty outside
 	// its visible region...
 	newDirtyRegion.IntersectWith(&window->VisibleRegion());
-	// ...because we do this outself
+	// ...because we do this ourselves
 	newDirtyRegion.Include(&previouslyOccupiedRegion);
 
 	MarkDirty(newDirtyRegion);
@@ -1556,6 +1558,25 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	}
 
 	NotifyWindowResized(window);
+}
+
+
+void
+Desktop::SetWindowOutlinesDelta(Window* window, BPoint delta)
+{
+	AutoWriteLocker _(fWindowLock);
+
+	if (!window->IsVisible())
+		return;
+
+	BRegion newDirtyRegion;
+	window->SetOutlinesDelta(delta, &newDirtyRegion);
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+
+	MarkDirty(newDirtyRegion);
+	_SetBackground(background);
 }
 
 

@@ -1,14 +1,16 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2020, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adi Oanca <adioanca@gmail.com>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler <axeld@pinc-software.de>
- *		Brecht Machiels <brecht@mos6581.org>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		Adi Oanca, adioanca@gmail.com
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Brecht Machiels, brecht@mos6581.org
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 #ifndef WINDOW_H
 #define WINDOW_H
@@ -131,6 +133,8 @@ public:
 			void				ResizeBy(int32 x, int32 y,
 									BRegion* dirtyRegion,
 									bool resizeStack = true);
+			void				SetOutlinesDelta(BPoint delta,
+									BRegion* dirtyRegion);
 
 			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 

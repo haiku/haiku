@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc.
+ * Copyright 2001-2020 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,7 +10,8 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
- *		Joseph Groover <looncraz@looncraz.net>
+ *		Joseph Groover, looncraz@looncraz.net
+ *		Jacob Secunda, secundaja@gmail.com
  */
 
 
@@ -104,6 +105,10 @@ TabDecorator::Draw(BRect updateRect)
 	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(updateRect & fBorderRect);
+
+	if (IsOutlineResizing())
+		_DrawOutlineFrame(updateRect & fOutlineBorderRect);
+
 	_DrawTabs(updateRect & fTitleBarRect);
 }
 
@@ -117,6 +122,10 @@ TabDecorator::Draw()
 	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(fBorderRect);
+
+	if (IsOutlineResizing())
+		_DrawOutlineFrame(fOutlineBorderRect);
+
 	_DrawTabs(fTitleBarRect);
 }
 
@@ -301,6 +310,34 @@ TabDecorator::_DoLayout()
 
 
 void
+TabDecorator::_DoOutlineLayout()
+{
+	fOutlineBorderWidth = 1;
+
+	// calculate left/top/right/bottom outline borders
+	// NOTE: no overlapping, the left and right border rects
+	// don't include the corners!
+	fLeftOutlineBorder.Set(fFrame.left - fOutlineBorderWidth, fFrame.top,
+		fFrame.left - 1, fFrame.bottom);
+
+	fRightOutlineBorder.Set(fFrame.right + 1, fFrame.top ,
+		fFrame.right + fOutlineBorderWidth, fFrame.bottom);
+
+	fTopOutlineBorder.Set(fFrame.left - fOutlineBorderWidth,
+		fFrame.top - fOutlineBorderWidth,
+		fFrame.right + fOutlineBorderWidth, fFrame.top - 1);
+
+	fBottomOutlineBorder.Set(fFrame.left - fOutlineBorderWidth,
+		fFrame.bottom + 1,
+		fFrame.right + fOutlineBorderWidth,
+		fFrame.bottom + fOutlineBorderWidth);
+
+	fOutlineBorderRect = BRect(fTopOutlineBorder.LeftTop(),
+		fBottomOutlineBorder.RightBottom());
+}
+
+
+void
 TabDecorator::_DoTabLayout()
 {
 	float tabOffset = 0;
@@ -481,6 +518,19 @@ TabDecorator::_DistributeTabSize(float delta)
 
 
 void
+TabDecorator::_DrawOutlineFrame(BRect rect)
+{
+	drawing_mode oldMode;
+
+	fDrawingEngine->SetDrawingMode(B_OP_ALPHA, oldMode);
+	fDrawingEngine->SetPattern(B_MIXED_COLORS);
+	fDrawingEngine->StrokeRect(rect);
+
+	fDrawingEngine->SetDrawingMode(oldMode);
+}
+
+
+void
 TabDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
 	BRegion* updateRegion)
 {
@@ -490,6 +540,7 @@ TabDecorator::_SetTitle(Decorator::Tab* tab, const char* string,
 		// Get a rect of all the tabs
 
 	_DoLayout();
+	_DoOutlineLayout();
 
 	if (updateRegion == NULL)
 		return;
@@ -786,6 +837,8 @@ TabDecorator::_AddTab(DesktopSettings& settings, int32 index,
 	_UpdateFont(settings);
 
 	_DoLayout();
+	_DoOutlineLayout();
+
 	if (updateRegion != NULL)
 		updateRegion->Include(fTitleBarRect);
 	return true;
@@ -797,7 +850,10 @@ TabDecorator::_RemoveTab(int32 index, BRegion* updateRegion)
 {
 	BRect oldRect = TabRect(index) | TabRect(CountTabs() - 1);
 		// Get a rect of all the tabs to the right - they will all be moved
+
 	_DoLayout();
+	_DoOutlineLayout();
+
 	if (updateRegion != NULL) {
 		updateRegion->Include(oldRect);
 		updateRegion->Include(fTitleBarRect);
@@ -841,10 +897,9 @@ TabDecorator::_GetFootprint(BRegion *region)
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the view. This is most often used to set a Window
 	// object's visible region.
+
 	if (region == NULL)
 		return;
-
-	region->MakeEmpty();
 
 	if (fTopTab->look == B_NO_BORDER_WINDOW_LOOK)
 		return;

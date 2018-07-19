@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc.
+ * Copyright 2001-2020 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,7 +8,9 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
- *		Joseph Groover <looncraz@looncraz.net>
+ *		Joseph Groover, looncraz@looncraz.net
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 #ifndef DECORATOR_H
 #define DECORATOR_H
@@ -175,6 +177,9 @@ public:
 			void				MoveBy(BPoint offset);
 			void				ResizeBy(float x, float y, BRegion* dirty);
 			void				ResizeBy(BPoint offset, BRegion* dirty);
+			void				SetOutlinesDelta(BPoint delta, BRegion* dirty);
+			bool				IsOutlineResizing() const
+									{ return fOutlinesDelta != BPoint(0, 0); }
 
 	virtual	bool				SetRegionHighlight(Region region,
 									uint8 highlight, BRegion* dirty,
@@ -210,8 +215,10 @@ protected:
 
 	virtual	void				_DoLayout() = 0;
 		//! method for calculating layout for the decorator
+	virtual	void				_DoOutlineLayout() = 0;
 
 	virtual	void				_DrawFrame(BRect rect) = 0;
+	virtual	void				_DrawOutlineFrame(BRect rect) = 0;
 	virtual	void				_DrawTabs(BRect rect);
 
 	virtual	void				_DrawTab(Decorator::Tab* tab, BRect rect) = 0;
@@ -254,6 +261,10 @@ protected:
 	virtual void				_MoveBy(BPoint offset);
 	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty) = 0;
 
+	virtual void				_MoveOutlineBy(BPoint offset);
+	virtual void				_ResizeOutlineBy(BPoint offset, BRegion* dirty);
+	virtual void				_SetOutlinesDelta(BPoint delta, BRegion* dirty);
+
 	virtual bool				_SetSettings(const BMessage& settings,
 									BRegion* updateRegion = NULL);
 
@@ -265,7 +276,8 @@ protected:
 	virtual	bool				_MoveTab(int32 from, int32 to, bool isMoving,
 									BRegion* updateRegion = NULL) = 0;
 
-	virtual	void				_GetFootprint(BRegion *region);
+	virtual	void				_GetFootprint(BRegion* region);
+	virtual void				_GetOutlineFootprint(BRegion* region);
 			void				_InvalidateFootprint();
 
 			void 				_InvalidateBitmaps();
@@ -276,19 +288,28 @@ protected:
 			DrawingEngine*		fDrawingEngine;
 			DrawState			fDrawState;
 
+			BPoint				fOutlinesDelta;
+
 			// Individual rects for handling window frame
 			// rendering the proper way
 			BRect				fTitleBarRect;
 			BRect				fFrame;
 			BRect				fResizeRect;
 			BRect				fBorderRect;
+			BRect				fOutlineBorderRect;
 
 			BRect				fLeftBorder;
 			BRect				fTopBorder;
 			BRect				fBottomBorder;
 			BRect				fRightBorder;
 
+			BRect				fLeftOutlineBorder;
+			BRect				fTopOutlineBorder;
+			BRect				fBottomOutlineBorder;
+			BRect				fRightOutlineBorder;
+
 			int32				fBorderWidth;
+			int32				fOutlineBorderWidth;
 
 			Decorator::Tab*		fTopTab;
 			BObjectList<Decorator::Tab>	fTabList;

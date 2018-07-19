@@ -1,14 +1,16 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2020, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adi Oanca <adioanca@gmail.com>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler <axeld@pinc-software.de>
- *		Brecht Machiels <brecht@mos6581.org>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		Adi Oanca, adioanca@gmail.com
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Brecht Machiels, brecht@mos6581.org
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 
 
@@ -390,6 +392,42 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion, bool resizeStack)
 	msg.AddInt32("width", frame.IntegerWidth());
 	msg.AddInt32("height", frame.IntegerHeight());
 	fWindow->SendMessageToClient(&msg);
+}
+
+
+void
+Window::SetOutlinesDelta(BPoint delta, BRegion* dirtyRegion)
+{
+	float wantWidth = fFrame.IntegerWidth() + delta.x;
+	float wantHeight = fFrame.IntegerHeight() + delta.y;
+
+	// enforce size limits
+	WindowStack* stack = GetWindowStack();
+	if (stack != NULL) {
+		for (int32 i = 0; i < stack->CountWindows(); i++) {
+			Window* window = stack->WindowList().ItemAt(i);
+
+			if (wantWidth < window->fMinWidth)
+				wantWidth = window->fMinWidth;
+			if (wantWidth > window->fMaxWidth)
+				wantWidth = window->fMaxWidth;
+
+			if (wantHeight < window->fMinHeight)
+				wantHeight = window->fMinHeight;
+			if (wantHeight > window->fMaxHeight)
+				wantHeight = window->fMaxHeight;
+		}
+
+		delta.x = wantWidth - fFrame.IntegerWidth();
+		delta.y = wantHeight - fFrame.IntegerHeight();
+	}
+
+	::Decorator* decorator = Decorator();
+
+	if (decorator != NULL)
+		decorator->SetOutlinesDelta(delta, dirtyRegion);
+
+	_UpdateContentRegion();
 }
 
 
