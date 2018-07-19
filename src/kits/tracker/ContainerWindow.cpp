@@ -223,6 +223,8 @@ RunAddOnMessageThread(BMessage *message, void *)
 	BEntry entry;
 	BPath path;
 	status_t result = message->FindRef("addon_ref", &addonRef);
+	image_id addonImage;
+
 	if (result != B_OK)
 		goto end;
 
@@ -235,7 +237,7 @@ RunAddOnMessageThread(BMessage *message, void *)
 	if (result != B_OK)
 		goto end;
 
-	image_id addonImage = load_add_on(path.Path());
+	addonImage = load_add_on(path.Path());
 	if (addonImage < 0) {
 		result = addonImage;
 		goto end;
