@@ -115,11 +115,12 @@ create_mode_list(void)
 		if (initialModes != NULL) {
 			initialModesCount = 1;
 
-			compute_display_timing(initialModes[0].virtual_width,
-				initialModes[0].virtual_height, 60, false,
-				&initialModes[0].timing);
-			fill_display_mode(initialModes[0].virtual_width,
-				initialModes[0].virtual_height, &initialModes[0]);
+			display_mode &mode = gInfo->shared_info->current_mode;
+
+			compute_display_timing(mode.virtual_width, mode.virtual_height,
+				60, false, &initialModes[0].timing);
+			fill_display_mode(mode.virtual_width, mode.virtual_height,
+				&initialModes[0]);
 		}
 	}
 
