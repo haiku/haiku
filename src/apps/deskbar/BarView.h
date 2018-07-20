@@ -169,6 +169,8 @@ public:
 			TDragRegion*		DragRegion() const { return fDragRegion; }
 			TReplicantTray*		ReplicantTray() const { return fReplicantTray; }
 
+			float			TeamMenuItemHeight() const;
+
 private:
 	friend class TBarApp;
 	friend class TDeskbarMenu;

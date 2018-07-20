@@ -66,7 +66,6 @@ const uint32 kShowTimeZone = 'SwTz';
 const uint32 kGetClockSettings = 'GCkS';
 
 
-
 class BCountry;
 class BMessageRunner;
 class CalendarMenuWindow;

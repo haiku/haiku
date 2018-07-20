@@ -45,6 +45,9 @@ All rights reserved.
 #include <Locker.h>
 
 
+const float kSepItemWidth = 5.0f;
+
+
 enum drag_and_drop_selection {
 	kNoSelection,
 	kDeskbarMenuSelection,
@@ -83,12 +86,10 @@ public:
 								BMenuItem** _item = NULL);
 			bool			InDeskbarMenu(BPoint) const;
 
-			void			CheckItemSizes(int32 delta);
+			void			CheckItemSizes(int32 delta, bool reset = false);
 
 			menu_layout		MenuLayout() const;
 			void			SetMenuLayout(menu_layout layout);
-
-			void			SetMaxItemWidth();
 
 			void			SizeWindow(int32 delta);
 			bool			CheckForSizeOverrun();

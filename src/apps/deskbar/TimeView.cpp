@@ -52,6 +52,9 @@ All rights reserved.
 #include <Window.h>
 
 #include "BarApp.h"
+#include "BarView.h"
+#include "BarWindow.h"
+#include "StatusView.h"
 #include "CalendarMenuWindow.h"
 #include "StatusView.h"
 
@@ -185,16 +188,21 @@ TTimeView::FrameMoved(BPoint)
 void
 TTimeView::GetPreferredSize(float* width, float* height)
 {
-	*height = fHeight;
-
 	float timeWidth = StringWidth(fCurrentTimeStr);
 
-	if (fOrientation) {
+	// set the height based on the font size
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	fHeight = fontHeight.ascent + fontHeight.descent;
+
+	if (Vertical()) {
 		float appWidth = static_cast<TBarApp*>(be_app)->Settings()->width;
 		*width = fMaxWidth
 			= std::min(appWidth - (kDragRegionWidth + kHMargin) * 2, timeWidth);
 	} else
 		*width = fMaxWidth = timeWidth;
+
+	*height = fHeight;
 }
 
 
@@ -418,7 +426,8 @@ TTimeView::UpdateTimeFormat()
 
 	delete fTimeFormat;
 	fTimeFormat = new BDateTimeFormat(BLocale::Default());
-	fTimeFormat->SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, fields);
+	fTimeFormat->SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
+		fields);
 
 	delete fDateFormat;
 	fDateFormat = new BDateFormat(BLocale::Default());
@@ -454,8 +463,6 @@ TTimeView::GetCurrentDate()
 void
 TTimeView::CalculateTextPlacement()
 {
-	BRect bounds(Bounds());
-
 	fDateLocation.x = 0.0;
 	fTimeLocation.x = 0.0;
 
@@ -469,7 +476,8 @@ TTimeView::CalculateTextPlacement()
 	font.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC, &delta,
 		rectArray);
 
-	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height()
+	// center vertically
+	fTimeLocation.y = fDateLocation.y = ceilf((Bounds().Height()
 		- rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
 
 	if (fOrientation) {

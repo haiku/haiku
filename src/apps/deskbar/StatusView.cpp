@@ -70,6 +70,7 @@ All rights reserved.
 
 #include "BarApp.h"
 #include "DeskbarUtils.h"
+#include "ExpandoMenuBar.h"
 #include "ResourceSet.h"
 #include "StatusViewShelf.h"
 #include "TimeView.h"
@@ -1191,7 +1192,8 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 				replicantRect.left = view->Frame().right + kIconGap + 1;
 			}
 
-			// calculated left position, add replicantWidth to get right position
+			// calculated left position, add replicantWidth to get the
+			// right position
 			replicantRect.right = replicantRect.left + replicantWidth;
 
 			// check if replicant fits in this row
@@ -1203,15 +1205,36 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 
 			// check next row
 		}
-	} else if (index > 0) {
-		// get the last replicant added for placement reference
-		BView* view = NULL;
-		fShelf->ReplicantAt(index - 1, &view);
-		if (view != NULL) {
-			// push this replicant placement past the last one
-			loc.x = view->Frame().right + kIconGap + 1;
-			loc.y = view->Frame().top;
+
+		fTime->MoveTo(Bounds().right - fTime->Bounds().Width()
+			- kTrayPadding, 2);
+	} else {
+		if (index > 0) {
+			// get the last replicant added for placement reference
+			BView* view = NULL;
+			fShelf->ReplicantAt(index - 1, &view);
+			if (view != NULL) {
+				// push this replicant placement past the last one
+				loc.x = view->Frame().right + kIconGap + 1;
+			}
 		}
+
+		if (fBarView->Vertical()) {
+			// center vertically
+			loc.y = floorf((kMenuBarHeight - fMaxReplicantHeight) / 2) - 1;
+		} else {
+			if (fBarView->Top()) {
+				// align top
+				loc.y = 3;
+			} else {
+				// align bottom
+				loc.y = fBarView->TeamMenuItemHeight() - fMaxReplicantHeight - 2;
+			}
+		}
+
+		// move time in place next to replicants
+		fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - kTrayPadding,
+			loc.y + (fMaxReplicantHeight - fTime->Bounds().Height()) / 2);
 	}
 
 	if (loc.y > fRightBottomReplicant.top

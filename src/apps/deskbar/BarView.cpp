@@ -64,9 +64,10 @@ const int32 kDefaultRecentDocCount = 10;
 const int32 kDefaultRecentAppCount = 10;
 
 const int32 kMenuTrackMargin = 20;
+const float kMinTeamItemHeight = 20.0f;
+const float kVPad = 2.0f;
 
 const uint32 kUpdateOrientation = 'UpOr';
-const float kSepItemWidth = 5.0f;
 
 
 class BarViewMessageFilter : public BMessageFilter
@@ -149,6 +150,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fMouseFilter(NULL)
 {
 	// determine the initial Be menu size
+	// (will be updated later)
 	BRect menuFrame(frame);
 	if (fVertical)
 		menuFrame.bottom = menuFrame.top + kMenuBarHeight;
@@ -212,6 +214,9 @@ TBarView::AttachedToWindow()
 	fTrackingHookData.fTrackingHook = MenuTrackingHook;
 	fTrackingHookData.fTarget = BMessenger(this);
 	fTrackingHookData.fDragMessage = new BMessage(B_REFS_RECEIVED);
+
+	if (!fVertical)
+		UpdatePlacement(); // update MenuBarHeight
 }
 
 
@@ -434,7 +439,8 @@ TBarView::PlaceDeskbarMenu()
 		menuFrame.bottom = menuFrame.top + height;
 	} else {
 		width = gMinimumWindowWidth;
-		height = fBarApp->IconSize() + 4;
+		height = std::max(TeamMenuItemHeight(),
+			kGutter + fReplicantTray->MaxReplicantHeight() + kGutter);
 		menuFrame.bottom = menuFrame.top + height;
 	}
 
@@ -574,7 +580,7 @@ TBarView::PlaceApplicationBar()
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
-		expandoFrame.bottom = fBarApp->IconSize() + 4;
+		expandoFrame.bottom = TeamMenuItemHeight();
 
 		if (fBarMenuBar != NULL)
 			expandoFrame.left = fBarMenuBar->Frame().Width() + 1;
@@ -593,11 +599,6 @@ TBarView::PlaceApplicationBar()
 		: expandoFrame.Height());
 	fExpandoMenuBar->MoveTo(0, 0);
 	fExpandoMenuBar->ResizeTo(expandoFrame.Width(), expandoFrame.Height());
-
-	if (!fVertical) {
-		// Set the max item width based on icon size
-		fExpandoMenuBar->SetMaxItemWidth();
-	}
 
 	if (fState == kExpandoState)
 		fExpandoMenuBar->BuildItems();
@@ -645,7 +646,8 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 			} else {
 				// top or bottom, full
 				fExpandoMenuBar->CheckItemSizes(0);
-				windowHeight = fBarApp->IconSize() + 4;
+				windowHeight = std::max(TeamMenuItemHeight(),
+					kGutter + fReplicantTray->MaxReplicantHeight() + kGutter);
 				windowWidth = screenFrame.Width();
 			}
 		} else {
@@ -1229,4 +1231,38 @@ BRect
 TBarView::IconFrame(const char* name) const
 {
 	return OffsetIconFrame(fReplicantTray->IconFrame(name));
+}
+
+
+float
+TBarView::TeamMenuItemHeight() const
+{
+	const int32 iconSize = fBarApp->IconSize();
+	float iconSizePadded = kVPad + iconSize + kVPad;
+
+	font_height fontHeight;
+	if (fExpandoMenuBar != NULL)
+		fExpandoMenuBar->GetFontHeight(&fontHeight);
+	else
+		GetFontHeight(&fontHeight);
+
+	float labelHeight = fontHeight.ascent + fontHeight.descent;
+	labelHeight = labelHeight < kMinTeamItemHeight ? kMinTeamItemHeight
+		: ceilf(labelHeight * 1.1f);
+
+	bool hideLabels = static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
+	if (hideLabels && iconSize > B_MINI_ICON) {
+		// height is determined based solely on icon size
+		return iconSizePadded;
+	} else if (!fVertical || fVertical && iconSize <= B_LARGE_ICON) {
+		// horizontal or vertical with label on same row as icon:
+		// height based on icon size or font size, whichever is bigger
+		return std::max(iconSizePadded, labelHeight);
+	} else if (fVertical && iconSize > B_LARGE_ICON) {
+		// vertical with label below icon: height based on icon and label
+		return ceilf(iconSizePadded + labelHeight);
+	} else {
+		// height is determined based solely on label height
+		return labelHeight;
+	}
 }

@@ -44,6 +44,9 @@ All rights reserved.
 #include "TruncatableMenuItem.h"
 
 
+const float kSwitchWidth = 12.0f;
+
+
 class BBitmap;
 class TBarView;
 class TWindowMenuItem;
@@ -108,6 +111,7 @@ private:
 			float				fLabelWidth;
 			float				fLabelAscent;
 			float				fLabelDescent;
+			float				fLabelHeight;
 
 			bool				fOverriddenSelected;
 

@@ -47,7 +47,6 @@ All rights reserved.
 
 
 const float kVPad = 2.0f;
-const float kSwitchWidth = 12.0f;
 
 
 //	#pragma mark - TTruncatableMenuItem
