@@ -247,7 +247,7 @@ RunAddOnMessageThread(BMessage *message, void *)
 		(void**)&messageReceived);
 
 	if (result < 0) {
-		PRINT(("Couldn't find populate_menu\n"));
+		PRINT(("Couldn't find message_received\n"));
 		unload_add_on(addonImage);
 		goto end;
 	}
