@@ -547,6 +547,11 @@ BListView::MouseDown(BPoint where)
 	}
 
 	int32 index = IndexOf(where);
+	int32 modifiers = 0;
+
+	BMessage* message = Looper()->CurrentMessage();
+	if (message != NULL)
+		message->FindInt32("modifiers", &modifiers);
 
 	// If the user double (or more) clicked within the current selection,
 	// we don't change the selection but invoke the selection.
@@ -585,30 +590,6 @@ BListView::MouseDown(BPoint where)
 			&BListView::_DoneTracking, &BListView::_Track);
 	}
 
-	BView::MouseDown(where);
-}
-
-
-void
-BListView::MouseUp(BPoint where)
-{
-	if (fTrack->is_dragging) {
-		// do selection only if a drag was not initiated
-		BView::MouseUp(where);
-		return;
-	}
-
-	int32 modifiers = 0;
-
-	BMessage* message = Looper()->CurrentMessage();
-	if (message != NULL)
-		message->FindInt32("modifiers", &modifiers);
-
-	// Evaluate selection based on the selected index
-	// at the time of the mouse starting to track.
-	// Otherwise we cannot properly handle dragging and dropping
-	// with multi-select list.
-	int32 index = fTrack->item_index;
 	if (index >= 0) {
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
 			if ((modifiers & B_SHIFT_KEY) != 0) {
@@ -627,7 +608,12 @@ BListView::MouseUp(BPoint where)
 						Deselect(index);
 					else
 						Select(index, true);
-				} else
+				} else if (!ItemAt(index)->IsSelected())
+					// To enable multi-select drag and drop, we only
+					// exclusively select a single item if it's not one of the
+					// already selected items. This behavior gives the mouse
+					// tracking thread the opportunity to initiate the
+					// multi-selection drag with all the items still selected.
 					Select(index);
 			}
 		} else {
@@ -640,6 +626,13 @@ BListView::MouseUp(BPoint where)
 	} else if ((modifiers & B_COMMAND_KEY) == 0)
 		DeselectAll();
 
+	BView::MouseDown(where);
+}
+
+
+void
+BListView::MouseUp(BPoint where)
+{
 	BView::MouseUp(where);
 }
 
