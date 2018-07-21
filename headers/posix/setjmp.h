@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012 Haiku, Inc.
+ * Copyright 2004-2018 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SETJMP_H_
@@ -29,9 +29,12 @@ extern int	_setjmp(jmp_buf jumpBuffer);
 extern int	setjmp(jmp_buf jumpBuffer);
 extern int	sigsetjmp(jmp_buf jumpBuffer, int saveMask);
 
-extern void	_longjmp(jmp_buf jumpBuffer, int value);
-extern void	longjmp(jmp_buf jumpBuffer, int value);
-extern void	siglongjmp(sigjmp_buf jumpBuffer, int value);
+extern void	_longjmp(jmp_buf jumpBuffer, int value)
+	__attribute__ ((noreturn));
+extern void	longjmp(jmp_buf jumpBuffer, int value)
+	__attribute__ ((noreturn));
+extern void	siglongjmp(sigjmp_buf jumpBuffer, int value)
+	__attribute__ ((noreturn));
 
 #ifdef __cplusplus
 }
