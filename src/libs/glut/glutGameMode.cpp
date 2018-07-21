@@ -207,7 +207,7 @@ GlutGameMode::_FindMatchingMode()
 	int bestMode = -1;
 	for (uint32 i =0; i < fModesCount; i++) {
 
-		printf("[%ld]: %d x %d, %d Bpp, %d Hz\n", i,
+		printf("[%" B_PRId32 "]: %d x %d, %d Bpp, %d Hz\n", i,
 			fModesList[i].virtual_width, fModesList[i].virtual_height,
 			_GetModePixelDepth(&fModesList[i]),
 			_GetModeRefreshRate(&fModesList[i]));
