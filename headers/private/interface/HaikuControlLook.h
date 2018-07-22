@@ -157,17 +157,15 @@ public:
 									const rgb_color& base,
 									uint32 flags = 0);
 
-	virtual	void				DrawScrollBar(BView* view, BRect& rect,
+	virtual	void				DrawScrollBarBackground(BView* view,
+									BRect& rect1, BRect& rect2,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
-									orientation orientation,
-									bool doubleArrows = false,
-									int32 buttonDown = -1);
-	virtual	void				DrawScrollBarThumb(BView* view, BRect& rect,
-									BRect& thumbRect, const BRect& updateRect,
+									orientation orientation);
+	virtual	void				DrawScrollBarBackground(BView* view,
+									BRect& rect, const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
-									orientation orientation,
-									uint32 knobStyle = 0);
+									orientation orientation);
 
 	virtual	void				DrawScrollViewFrame(BView* view,
 									BRect& rect, const BRect& updateRect,
@@ -560,26 +558,6 @@ protected:
 			bool				_RadioButtonAndCheckBoxMarkColor(
 									const rgb_color& base, rgb_color& color,
 									uint32 flags) const;
-
-			void				_DrawScrollBarBackground(BView* view,
-									BRect& rect1, BRect& rect2,
-									const BRect& updateRect,
-									const rgb_color& base, uint32 flags,
-									orientation orientation);
-			void				_DrawScrollBarBackground(BView* view,
-									BRect& rect, const BRect& updateRect,
-									const rgb_color& base, uint32 flags,
-									orientation orientation);
-			void				_DrawDisabledScrollBarBackground(BView* view,
-									BRect rect, orientation orientation,
-									const rgb_color& light,
-									const rgb_color& dark,
-									const rgb_color& fill);
-			void				_DrawScrollBarArrowButton(BView* view,
-									BRect rect, const BRect& updateRect,
-									const rgb_color& base, uint32 flags,
-									int32 direction, orientation orientation,
-									bool doubleArrows, bool down);
 
 private:
 			bool				fCachedOutline;

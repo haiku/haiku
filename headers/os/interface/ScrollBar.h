@@ -114,7 +114,6 @@ private:
 	// disabled
 			BScrollBar&			operator=(const BScrollBar& other);
 
-			bool				_ScrollingEnabled() const;
 			bool				_DoubleArrows() const;
 			void				_UpdateThumbFrame();
 			float				_ValueFor(BPoint where) const;
@@ -122,6 +121,14 @@ private:
 			BRect				_ButtonRectFor(int32 button) const;
 			void				_UpdateTargetValue(BPoint where);
 			void				_UpdateArrowButtons();
+			void				_DrawDisabledBackground(BRect area,
+									const rgb_color& light,
+									const rgb_color& dark,
+									const rgb_color& fill);
+			void				_DrawArrowButton(int32 direction,
+									bool doubleArrows, BRect frame,
+									const BRect& updateRect,
+									bool enabled, bool down);
 
 			BSize				_MinSize() const;
 
