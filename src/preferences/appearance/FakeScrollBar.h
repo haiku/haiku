@@ -1,10 +1,10 @@
 /*
- *  Copyright 2010-2015 Haiku, Inc. All rights reserved.
+ *  Copyright 2010-2012 Haiku, Inc. All rights reserved.
  *  Distributed under the terms of the MIT license.
  *
  *	Authors:
- *		DarkWyrm, bpmagic@columbus.rr.com
- *		John Scipione, jscipione@gmail.com
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		John Scipione <jscipione@gmail.com>
  */
 #ifndef FAKE_SCROLL_BAR_H
 #define FAKE_SCROLL_BAR_H
@@ -16,7 +16,7 @@
 class FakeScrollBar : public BControl {
 public:
 							FakeScrollBar(bool drawArrows, bool doubleArrows,
-								uint32 knobStyle, BMessage* message);
+								BMessage* message);
 							~FakeScrollBar(void);
 
 	virtual	void			MouseDown(BPoint point);
@@ -39,7 +39,7 @@ private:
 
 			bool			fDrawArrows;
 			bool			fDoubleArrows;
-			uint32			fKnobStyle;
+			int32			fKnobStyle;
 };
 
 #endif	// FAKE_SCROLL_BAR_H

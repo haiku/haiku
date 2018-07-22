@@ -1,10 +1,10 @@
 /*
- *  Copyright 2010-2015 Haiku, Inc. All rights reserved.
+ *  Copyright 2010-2012 Haiku, Inc. All rights reserved.
  *  Distributed under the terms of the MIT license.
  *
  *	Authors:
- *		DarkWyrm, bpmagic@columbus.rr.com
- *		John Scipione, jscipione@gmail.com
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		John Scipione <jscipione@gmail.com>
  */
 
 
@@ -27,23 +27,13 @@ typedef enum {
 	ARROW_NONE
 } arrow_direction;
 
-typedef enum {
-	KNOB_NONE = 0,
-	KNOB_DOTS,
-	KNOB_LINES
-} knob_style;
-
-
-//	#pragma mark - FakeScrollBar
-
 
 FakeScrollBar::FakeScrollBar(bool drawArrows, bool doubleArrows,
-	uint32 knobStyle, BMessage* message)
+	BMessage* message)
 	:
 	BControl("FakeScrollBar", NULL, message, B_WILL_DRAW | B_NAVIGABLE),
 	fDrawArrows(drawArrows),
-	fDoubleArrows(doubleArrows),
-	fKnobStyle(knobStyle)
+	fDoubleArrows(doubleArrows)
 {
 	// add some height to draw the ring around the scroll bar
 	float height = B_H_SCROLL_BAR_HEIGHT + 8;
@@ -88,19 +78,11 @@ FakeScrollBar::Draw(BRect updateRect)
 	SetHighColor(tint_color(base, B_DARKEN_1_TINT));
 	StrokeRect(rect);
 	rect.InsetBy(1, 1);
+	SetHighColor(base);
 
-	if (fDrawArrows) {
-		be_control_look->DrawScrollBar(this, rect, updateRect, base,
-			flags, B_HORIZONTAL, fDoubleArrows);
-	} else {
-		// do not draw scroll bar arrows, fake the border
-		rgb_color borderColor = tint_color(base, B_DARKEN_2_TINT);
-		rgb_color navigation = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-		SetHighColor(IsFocus() ? navigation : borderColor);
-		StrokeRect(rect);
-		rect.InsetBy(1, 1);
-	}
-	float less = floorf(rect.Width() / 4); // thumb takes up 3/4 width
+	be_control_look->DrawScrollBar(this, rect, updateRect, base,
+		flags, B_HORIZONTAL, fDoubleArrows);
+	float less = floorf(rect.Width() / 3); // thumb takes up 1/3 full width
 	BRect thumbRect(rect.left + less, rect.top, rect.right - less, rect.bottom);
 	be_control_look->DrawScrollBarThumb(this, rect, thumbRect, updateRect, base,
 		flags, B_HORIZONTAL, fKnobStyle);
@@ -108,29 +90,29 @@ FakeScrollBar::Draw(BRect updateRect)
 
 
 void
-FakeScrollBar::MouseDown(BPoint where)
+FakeScrollBar::MouseDown(BPoint point)
 {
-	BControl::MouseDown(where);
+	BControl::MouseDown(point);
 }
 
 
 void
-FakeScrollBar::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* dragMessage)
+FakeScrollBar::MouseMoved(BPoint point, uint32 transit,
+	const BMessage* message)
 {
-	BControl::MouseMoved(where, transit, dragMessage);
+	BControl::MouseMoved(point, transit, message);
 }
 
 
 void
-FakeScrollBar::MouseUp(BPoint where)
+FakeScrollBar::MouseUp(BPoint point)
 {
 	SetValue(B_CONTROL_ON);
 	Invoke();
 
 	Invalidate();
 
-	BControl::MouseUp(where);
+	BControl::MouseUp(point);
 }
 
 
@@ -142,7 +124,7 @@ FakeScrollBar::SetValue(int32 value)
 		Invalidate();
 	}
 
-	if (value == 0)
+	if (!value)
 		return;
 
 	BView* parent = Parent();
@@ -165,10 +147,10 @@ FakeScrollBar::SetValue(int32 value)
 				child = parent->ChildAt(0);
 		} else
 			child = Window()->ChildAt(0);
-	} else if (Window() != NULL)
+	} else if (Window())
 		child = Window()->ChildAt(0);
 
-	while (child != NULL) {
+	while (child) {
 		FakeScrollBar* scrollbar = dynamic_cast<FakeScrollBar*>(child);
 
 		if (scrollbar != NULL && (scrollbar != this))
@@ -192,12 +174,12 @@ FakeScrollBar::SetValue(int32 value)
 }
 
 
+//	#pragma mark -
+
+
 void
 FakeScrollBar::SetDoubleArrows(bool doubleArrows)
 {
-	if (fDoubleArrows == doubleArrows)
-		return;
-
 	fDoubleArrows = doubleArrows;
 	Invalidate();
 }
@@ -206,9 +188,6 @@ FakeScrollBar::SetDoubleArrows(bool doubleArrows)
 void
 FakeScrollBar::SetKnobStyle(uint32 knobStyle)
 {
-	if (fKnobStyle == knobStyle)
-		return;
-
 	fKnobStyle = knobStyle;
 	Invalidate();
 }
@@ -217,16 +196,13 @@ FakeScrollBar::SetKnobStyle(uint32 knobStyle)
 void
 FakeScrollBar::SetFromScrollBarInfo(const scroll_bar_info &info)
 {
-	if (fDoubleArrows == info.double_arrows && (int32)fKnobStyle == info.knob)
-		return;
-
 	fDoubleArrows = info.double_arrows;
 	fKnobStyle = info.knob;
 	Invalidate();
 }
 
 
-//	#pragma mark - Private methods
+//	#pragma mark -
 
 
 void
