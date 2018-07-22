@@ -181,12 +181,15 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 	stream->Write8(HDAC_STREAM_STATUS, status);
 
 	if ((status & STATUS_FIFO_ERROR) != 0)
-		dprintf("hda: stream fifo error (id:%ld)\n", stream->id);
-	if ((status & STATUS_DESCRIPTOR_ERROR) != 0)
-		dprintf("hda: stream descriptor error (id:%ld)\n", stream->id);
+		dprintf("hda: stream fifo error (id:%" B_PRIu32 ")\n", stream->id);
+	if ((status & STATUS_DESCRIPTOR_ERROR) != 0) {
+		dprintf("hda: stream descriptor error (id:%" B_PRIu32 ")\n",
+			stream->id);
+	}
 
 	if ((status & STATUS_BUFFER_COMPLETED) == 0) {
-		dprintf("hda: stream buffer not completed (id:%ld)\n", stream->id);
+		dprintf("hda: stream buffer not completed (id:%" B_PRIu32 ")\n",
+			stream->id);
 		return false;
 	}
 
@@ -196,8 +199,8 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 	// DMA position for recording and behind for playback streams, but just
 	// for determining the currently active buffer, it should be good enough.
 	if (stream->use_dma_position && stream->incorrect_position_count >= 32) {
-		dprintf("hda: DMA position for stream (id:%ld) seems to be broken. "
-			"Switching to using LPIB.\n", stream->id);
+		dprintf("hda: DMA position for stream (id:%" B_PRIu32 ") seems to be "
+			"broken. Switching to using LPIB.\n", stream->id);
 		stream->use_dma_position = false;
 	}
 
@@ -282,14 +285,15 @@ hda_interrupt_handler(hda_controller* controller)
 					hda_codec* codec = controller->codecs[cad];
 
 					if (codec == NULL) {
-						dprintf("hda: Response for unknown codec %ld: "
-							"%08lx/%08lx\n", cad, response, responseFlags);
+						dprintf("hda: Response for unknown codec %" B_PRIu32
+							": %08" B_PRIx32 "/%08" B_PRIx32 "\n", cad,
+							response, responseFlags);
 						continue;
 					}
 
 					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
-						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
-							response, responseFlags);
+						dprintf("hda: Unsolicited response: %08" B_PRIx32
+							"/%08" B_PRIx32 "\n", response, responseFlags);
 						codec->unsol_responses[codec->unsol_response_write++] =
 							response;
 						codec->unsol_response_write %= MAX_CODEC_UNSOL_RESPONSES;
@@ -299,8 +303,9 @@ hda_interrupt_handler(hda_controller* controller)
 						continue;
 					}
 					if (codec->response_count >= MAX_CODEC_RESPONSES) {
-						dprintf("hda: too many responses received for codec %ld"
-							": %08lx/%08lx!\n", cad, response, responseFlags);
+						dprintf("hda: too many responses received for codec %"
+							B_PRIu32 ": %08" B_PRIx32 "/%08" B_PRIx32 "!\n",
+							cad, response, responseFlags);
 						continue;
 					}
 
@@ -334,7 +339,7 @@ hda_interrupt_handler(hda_controller* controller)
 					}
 				} else {
 					dprintf("hda: Stream interrupt for unconfigured stream "
-						"%ld!\n", index);
+						"%" B_PRIu32 "!\n", index);
 				}
 			}
 		}
@@ -679,7 +684,7 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
-	dprintf("hda_stream_start() offset %lx\n", stream->offset);
+	dprintf("hda_stream_start() offset %" B_PRIx32 "\n", stream->offset);
 
 	stream->frames_count = 0;
 	stream->last_link_frame_position = 0;
@@ -739,7 +744,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		case B_FMT_32BIT:	format |= FORMAT_32BIT; stream->bps = 32; break;
 
 		default:
-			dprintf("hda: Invalid sample format: 0x%lx\n",
+			dprintf("hda: Invalid sample format: 0x%" B_PRIx32 "\n",
 				stream->sample_format);
 			break;
 	}
@@ -756,11 +761,12 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->buffer_size = ALIGN(stream->buffer_length * stream->num_channels
 		* stream->sample_size, 128);
 
-	dprintf("hda: sample size %ld, num channels %ld, buffer length %ld\n",
-		stream->sample_size, stream->num_channels, stream->buffer_length);
-	dprintf("hda: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x (0x%lx)\n",
-		__func__, stream->id, stream->rate, stream->bps, format,
-		stream->sample_format);
+	dprintf("hda: sample size %" B_PRIu32 ", num channels %" B_PRIu32 ", "
+		"buffer length %" B_PRIu32 "\n", stream->sample_size,
+		stream->num_channels, stream->buffer_length);
+	dprintf("hda: %s: setup stream %" B_PRIu32 ": SR=%" B_PRIu32 ", SF=%"
+		B_PRIu32 " F=0x%x (0x%" B_PRIx32 ")\n", __func__, stream->id,
+		stream->rate, stream->bps, format, stream->sample_format);
 
 	// Calculate total size of all buffers (aligned to size of B_PAGE_SIZE)
 	uint32 alloc = stream->buffer_size * stream->num_buffers;
@@ -788,8 +794,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			bufferPhysicalAddress, B_MTR_UC);
 	}
 
-	dprintf("hda: %s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
-		alloc, stream->num_buffers);
+	dprintf("hda: %s(%s): Allocated %" B_PRIu32 " bytes for %" B_PRIu32
+		" buffers\n", __func__, desc, alloc, stream->num_buffers);
 
 	// Store pointers (both virtual/physical)
 	for (uint32 index = 0; index < stream->num_buffers; index++) {
@@ -827,8 +833,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			stream->physical_buffer_descriptors, B_MTR_UC);
 	}
 
-	dprintf("hda: %s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
-		alloc, bdlCount);
+	dprintf("hda: %s(%s): Allocated %" B_PRIu32 " bytes for %" B_PRIu32
+		" BDLEs\n", __func__, desc, alloc, bdlCount);
 
 	// Setup buffer descriptor list (BDL) entries
 	uint32 fragments = 0;
@@ -859,8 +865,9 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->controller->Read32(HDAC_DMA_POSITION_BASE_LOWER)
 		| DMA_POSITION_ENABLED);
 
-	dprintf("hda: stream: %ld fifo size: %d num_io_widgets: %ld\n", stream->id,
-		stream->Read16(HDAC_STREAM_FIFO_SIZE), stream->num_io_widgets);
+	dprintf("hda: stream: %" B_PRIu32 " fifo size: %d num_io_widgets: %"
+		B_PRIu32 "\n", stream->id, stream->Read16(HDAC_STREAM_FIFO_SIZE),
+		stream->num_io_widgets);
 	dprintf("hda: widgets: ");
 
 	hda_codec* codec = audioGroup->codec;
@@ -880,7 +887,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		uint32 response[2];
 		hda_send_verbs(codec, verb, response, 2);
 		//channelNum += 2; // TODO stereo widget ? Every output gets the same stream for now
-		dprintf("%ld ", stream->io_widgets[i]);
+		dprintf("%" B_PRIu32 " ", stream->io_widgets[i]);
 
 		hda_widget* widget = hda_audio_group_get_widget(audioGroup,
 			stream->io_widgets[i]);
@@ -1075,7 +1082,8 @@ hda_hw_init(hda_controller* controller)
 	controller->num_bidir_streams = GLOBAL_CAP_BIDIR_STREAMS(capabilities);
 
 	// show some hw features
-	dprintf("hda: HDA v%d.%d, O:%ld/I:%ld/B:%ld, #SDO:%d, 64bit:%s\n",
+	dprintf("hda: HDA v%d.%d, O:%" B_PRIu32 "/I:%" B_PRIu32 "/B:%" B_PRIu32
+		", #SDO:%d, 64bit:%s\n",
 		controller->Read8(HDAC_VERSION_MAJOR),
 		controller->Read8(HDAC_VERSION_MINOR),
 		controller->num_output_streams, controller->num_input_streams,
@@ -1163,7 +1171,7 @@ no_irq:
 	controller->regs = NULL;
 
 error:
-	dprintf("hda: ERROR: %s(%ld)\n", strerror(status), status);
+	dprintf("hda: ERROR: %s(%" B_PRIx32 ")\n", strerror(status), status);
 
 	return status;
 }
