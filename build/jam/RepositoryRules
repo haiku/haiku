@@ -345,7 +345,7 @@ actions BootstrapRepositoryFetchPackage1
 				secondaryCrossDevelPackage="`pwd`/$secondaryCrossDevelPackage"
 			fi
 			if [ -n "$secondaryCrossDevelPackages" ]; then
-				secondaryCrossDevelPackages="secondaryCrossDevelPackages,$secondaryCrossDevelPackage"
+				secondaryCrossDevelPackages="$secondaryCrossDevelPackages,$secondaryCrossDevelPackage"
 			else
 				secondaryCrossDevelPackages="--secondary-cross-devel-package=$secondaryCrossDevelPackage"
 			fi
@@ -643,7 +643,7 @@ actions BuildHaikuPortsSourcePackageDirectory1
 				secondaryCrossDevelPackage="`pwd`/$secondaryCrossDevelPackage"
 			fi
 			if [ -n "$secondaryCrossDevelPackages" ]; then
-				secondaryCrossDevelPackages="secondaryCrossDevelPackages,$secondaryCrossDevelPackage"
+				secondaryCrossDevelPackages="$secondaryCrossDevelPackages,$secondaryCrossDevelPackage"
 			else
 				secondaryCrossDevelPackages="--secondary-cross-devel-package=$secondaryCrossDevelPackage"
 			fi
