@@ -51,7 +51,10 @@ public:
 		SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 		SetEventMask(B_POINTER_EVENTS);
 
+		// Featured icon package should be scaled to 64x64
 		fIconView = new BitmapView("package icon view");
+		fIconView->SetExplicitMinSize(BSize(64, 64));
+
 		fInstalledIconView = new BitmapView("installed icon view");
 		fTitleView = new BStringView("package title view", "");
 		fPublisherView = new BStringView("package publisher view", "");

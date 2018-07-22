@@ -331,10 +331,12 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 	if (bitmapField != NULL) {
 		const BBitmap* bitmap = bitmapField->Bitmap();
 
+		// Scale the bitmap to 16x16
+		BRect r = BRect(0, 0, 15, 15);
+
 		// figure out the placement
 		float x = 0.0;
-		BRect r = bitmap ? bitmap->Bounds() : BRect(0, 0, 15, 15);
-		float y = rect.top + ((rect.Height() - r.Height()) / 2);
+		float y = rect.top + ((rect.Height() - r.Height()) / 2) - 1;
 		float width = 0.0;
 
 		switch (Alignment()) {
@@ -363,7 +365,8 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		// draw the bitmap
 		if (bitmap != NULL) {
 			parent->SetDrawingMode(B_OP_ALPHA);
-			parent->DrawBitmap(bitmap, BPoint(x, y));
+			BRect viewRect(x, y, x + 16, y + 16);
+			parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
 			parent->SetDrawingMode(B_OP_OVER);
 		}
 
