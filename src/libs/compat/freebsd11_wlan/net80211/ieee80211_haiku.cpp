@@ -492,7 +492,7 @@ ieee80211_flush_ifq(struct ifqueue* ifq, struct ieee80211vap* vap)
  * Re-align the payload in the mbuf.  This is mainly used (right now)
  * to handle IP header alignment requirements on certain architectures.
  */
-struct mbuf *
+extern "C" struct mbuf *
 ieee80211_realign(struct ieee80211vap *vap, struct mbuf *m, size_t align)
 {
 	int pktlen, space;
