@@ -49,7 +49,11 @@ rule PreprocessPackageInfo source : directory : architecture
 		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ]
 	;
 
-	local target = $(source:BSG=package-info)-package-info ;
+	local grist = package-info ;
+	if $(secondaryArchitecture) {
+		grist = $(grist)$(secondaryArchitecture) ;
+	}
+	local target = $(source:BSG=$(grist))-package-info ;
 	MakeLocate $(target) : $(directory) ;
 
 	PreprocessPackageOrRepositoryInfo $(target) : $(source) : $(architecture)
