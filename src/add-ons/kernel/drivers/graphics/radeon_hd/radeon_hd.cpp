@@ -51,7 +51,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 
 	// attempt to access area specified
 	area_id testArea = map_physical_memory("radeon hd rom probe",
-		romBase, romSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA,
+		romBase, romSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA,
 		(void**)&rom);
 
 	if (testArea < 0) {
@@ -85,7 +85,8 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 
 	info.rom_area = create_area("radeon hd AtomBIOS",
 		(void**)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
-		romSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		romSize, B_NO_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 
 	if (info.rom_area < 0) {
 		ERROR("%s: unable to map kernel AtomBIOS space!\n",
@@ -105,7 +106,8 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 		|| !memcmp(&info.atom_buffer[romHeader + 4], "MOTA", 4);
 
 	if (romValid == true) {
-		set_area_protection(info.rom_area, B_READ_AREA);
+		set_area_protection(info.rom_area,
+			B_KERNEL_READ_AREA | B_USER_CLONEABLE_AREA);
 		ERROR("%s: AtomBIOS verified and locked\n", __func__);
 	} else
 		ERROR("%s: AtomBIOS memcpy failed!\n", __func__);
@@ -540,7 +542,8 @@ radeon_hd_init(radeon_info &info)
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("radeon hd shared info",
 		(void**)&info.shared_info, B_ANY_KERNEL_ADDRESS,
-		ROUND_TO_PAGE_SIZE(sizeof(radeon_shared_info)), B_FULL_LOCK, 0);
+		ROUND_TO_PAGE_SIZE(sizeof(radeon_shared_info)), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (info.shared_area < B_OK) {
 		ERROR("%s: card (%ld): couldn't map shared area!\n",
 			__func__, info.id);

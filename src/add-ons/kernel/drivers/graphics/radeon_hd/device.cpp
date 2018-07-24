@@ -184,32 +184,32 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
-			strcpy((char*)buffer, RADEON_ACCELERANT_NAME);
 			TRACE("%s: accelerant: %s\n", __func__, RADEON_ACCELERANT_NAME);
+			if (user_strlcpy((char*)buffer, RADEON_ACCELERANT_NAME,
+					B_FILE_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
 			return B_OK;
 
 		// needed to share data between kernel and accelerant
 		case RADEON_GET_PRIVATE_DATA:
 		{
-			radeon_get_private_data* data = (radeon_get_private_data*)buffer;
+			radeon_get_private_data data;
+			if (user_memcpy(&data, buffer, sizeof(radeon_get_private_data)) < B_OK)
+				return B_BAD_ADDRESS;
 
-			if (data->magic == RADEON_PRIVATE_DATA_MAGIC) {
-				data->shared_info_area = info->shared_area;
-				return B_OK;
+			if (data.magic == RADEON_PRIVATE_DATA_MAGIC) {
+				data.shared_info_area = info->shared_area;
+				return user_memcpy(buffer, &data,
+					sizeof(radeon_get_private_data));
 			}
 			break;
 		}
 
 		// needed for cloning
 		case RADEON_GET_DEVICE_NAME:
-#ifdef __HAIKU__
 			if (user_strlcpy((char*)buffer, gDeviceNames[info->id],
 					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
-#else
-			strncpy((char*)buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH);
-			((char*)buffer)[B_PATH_NAME_LENGTH - 1] = '\0';
-#endif
 			return B_OK;
 
 		default:
