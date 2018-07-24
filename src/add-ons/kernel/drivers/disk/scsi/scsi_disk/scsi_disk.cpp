@@ -413,6 +413,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		case B_FLUSH_DRIVE_CACHE:
 			return synchronize_cache(info);
 
+#if 0
 		case B_TRIM_DEVICE:
 		{
 			fs_trim_data* trimData;
@@ -428,6 +429,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 			return copy_trim_data_to_user(buffer, trimData);
 		}
+#endif
 
 		default:
 			return sSCSIPeripheral->ioctl(handle->scsi_periph_handle, op,
