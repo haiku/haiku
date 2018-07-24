@@ -156,6 +156,7 @@ synchronize_cache(das_driver_info *device)
 }
 
 
+#if 0
 static status_t
 trim_device(das_driver_info* device, fs_trim_data* trimData)
 {
@@ -179,6 +180,7 @@ trim_device(das_driver_info* device, fs_trim_data* trimData)
 
 	return status;
 }
+#endif
 
 
 static int
