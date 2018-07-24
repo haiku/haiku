@@ -1705,8 +1705,9 @@ BWindow::Zoom()
 
 	BDeskbar deskbar;
 	BRect deskbarFrame = deskbar.Frame();
-	if (!deskbar.IsAutoHide()) {
-		// remove area taken up by Deskbar (if not auto-hidden)
+	bool isShiftDown = (modifiers() & B_SHIFT_KEY) != 0;
+	if (!isShiftDown && !deskbar.IsAutoHide()) {
+		// remove area taken up by Deskbar unless hidden or shift is held down
 		switch (deskbar.Location()) {
 			case B_DESKBAR_TOP:
 				zoomArea.top = deskbarFrame.bottom + 2;
