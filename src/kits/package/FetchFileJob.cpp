@@ -90,12 +90,15 @@ FetchFileJob::Execute()
 	if (handle == NULL)
 		return B_NO_MEMORY;
 
-	result = curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0);
+	#if LIBCURL_VERSION_MAJOR > 7 \
+		|| (LIBCURL_VERSION_MAJOR == 7 && LIBCURL_VERSION_MINOR >= 32)
+		result = curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0);
 
-	result = curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION,
-		&_TransferCallback);
-	if (result != CURLE_OK)
-		return B_BAD_VALUE;
+		result = curl_easy_setopt(handle, CURLOPT_XFERINFOFUNCTION,
+			&_TransferCallback);
+		if (result != CURLE_OK)
+			return B_BAD_VALUE;
+	#endif
 
 	result = curl_easy_setopt(handle, CURLOPT_PROGRESSDATA, this);
 	if (result != CURLE_OK)
