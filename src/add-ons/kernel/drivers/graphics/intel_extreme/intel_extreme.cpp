@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Alexander von Gluck IV, kallisti5@unixzen.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
 
@@ -461,14 +462,18 @@ intel_extreme_init(intel_info &info)
 	if (info.device_type.InFamily(INTEL_FAMILY_8xx))
 		info.shared_info->single_head_locked = 1;
 
-	if (info.device_type.InFamily(INTEL_FAMILY_9xx)
-		| info.device_type.InFamily(INTEL_FAMILY_SER5)) {
-		info.shared_info->pll_info.reference_frequency = 96000;	// 96 kHz
+	if (info.device_type.InFamily(INTEL_FAMILY_SER5)) {
+		info.shared_info->pll_info.reference_frequency = 120000;	// 120 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
+	} else if (info.device_type.InFamily(INTEL_FAMILY_9xx)) {
+		info.shared_info->pll_info.reference_frequency = 96000;	// 96 MHz
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
 	} else {
-		info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
+		info.shared_info->pll_info.reference_frequency = 48000;	// 48 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz

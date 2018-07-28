@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src tests add-ons accelerants intel_extreme ;
+
+SubDirHdrs $(HAIKU_TOP) src add-ons accelerants intel_extreme ;
+UsePrivateHeaders [ FDirName graphics ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
+#UsePrivateSystemHeaders ;
+
+SimpleTest PllTest :
+	PllTest.cpp
+	pll.cpp
+	:
+	;
+
+SEARCH on [ FGristFiles pll.cpp ] = [
+	FDirName $(HAIKU_TOP) src add-ons accelerants intel_extreme ] ;
+
