@@ -188,7 +188,7 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 		case B_GET_ACCELERANT_SIGNATURE:
 			TRACE("accelerant: %s\n", INTEL_ACCELERANT_NAME);
 			if (user_strlcpy((char*)buffer, INTEL_ACCELERANT_NAME,
-					B_FILE_NAME_LENGTH) < B_OK)
+					bufferLength) < B_OK)
 				return B_BAD_ADDRESS;
 			return B_OK;
 
@@ -210,7 +210,7 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 		// needed for cloning
 		case INTEL_GET_DEVICE_NAME:
 			if (user_strlcpy((char* )buffer, gDeviceNames[info->id],
-					B_PATH_NAME_LENGTH) < B_OK)
+					bufferLength) < B_OK)
 				return B_BAD_ADDRESS;
 			return B_OK;
 
