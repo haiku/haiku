@@ -163,21 +163,21 @@ public:
 	{
 		int32 flags = 0;
 		fOwner->GetFlags(&flags);
-		return (flags & B_MEDIA_STREAMING) == true;
+		return ((flags & B_MEDIA_STREAMING) == B_MEDIA_STREAMING);
 	}
 
 	bool IsMutable() const
 	{
 		int32 flags = 0;
 		fOwner->GetFlags(&flags);
-		return (flags & B_MEDIA_MUTABLE_SIZE) == true;
+		return ((flags & B_MEDIA_MUTABLE_SIZE) == B_MEDIA_MUTABLE_SIZE);
 	}
 
 	bool IsSeekable() const
 	{
 		int32 flags = 0;
 		fOwner->GetFlags(&flags);
-		return (flags & B_MEDIA_SEEKABLE) == true;
+		return ((flags & B_MEDIA_SEEKABLE) == B_MEDIA_SEEKABLE);
 	}
 
 private:
