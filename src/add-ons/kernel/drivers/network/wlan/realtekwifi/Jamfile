@@ -1,0 +1,28 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan realtekwifi ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+	: true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ]
+	-Wno-format
+	-Wno-unused
+	-Wno-uninitialized ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn ] ;
+
+KernelAddon realtekwifi :
+	if_rtwn.c
+	glue.c
+	:
+	libfreebsd11_wlan.a
+	libfreebsd11_network.a
+	;
+
+HAIKU_WIFI_FIRMWARE_PACKAGES on realtekwifi = rtwn-rtl8192cfw ;
+HAIKU_WIFI_FIRMWARE_ARCHIVES on realtekwifi = rtwn-rtl8192cfw.tgz ;
+HAIKU_WIFI_FIRMWARE_DO_EXTRACT on realtekwifi = true ;
