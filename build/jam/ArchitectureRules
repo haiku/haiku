@@ -34,7 +34,7 @@ rule ArchitectureSetup architecture
 	#  - https://dev.haiku-os.org/ticket/10803#comment:4 (& subsequent comments)
 	# Note that the Linux also does the same:
 	#  - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a3ca86aea507904148870946d599e07a340b39bf
-	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
+	if $(gccVersion[1]) >= 3 {
 		gccBaseFlags += -fno-delete-null-pointer-checks ;
 	}
 
