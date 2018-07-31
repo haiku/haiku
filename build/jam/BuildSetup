@@ -574,10 +574,9 @@ HOST_BE_API_HEADERS =
 	[ FDirName $(HAIKU_TOP) headers build os support ]
 	[ FDirName $(HAIKU_TOP) headers build private ]
 ;
-if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
-	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
-	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
-}
+HOST_BE_API_CCFLAGS = -include [ FDirName $(HAIKU_TOP) headers build
+	BeOSBuildCompatibility.h ] ;
+HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 
 
 #pragma mark - target platform settings
