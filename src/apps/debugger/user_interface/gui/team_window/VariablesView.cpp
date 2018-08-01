@@ -243,7 +243,7 @@ public:
 protected:
 	virtual	uint32 ComputeHashValue() const
 	{
-		uint32 hash = *(uint32*)(&fInfo);
+		uint32 hash = reinterpret_cast<addr_t>(fInfo);
 		hash = hash * 19 + StringUtils::HashValue(fInfo->Expression());
 
 		return hash;
