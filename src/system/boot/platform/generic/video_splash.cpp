@@ -81,14 +81,14 @@ uncompress(const uint8 compressed[], unsigned int compressedSize,
 
 
 extern "C" status_t
-video_display_splash(addr_t frameBuffer)
+video_display_splash(addr_t frameBuffer, bool clear)
 {
 	if (!gKernelArgs.frame_buffer.enabled)
 		return B_NO_INIT;
 
-	// clear the video memory
-	memset((void*)frameBuffer, 0,
-		gKernelArgs.frame_buffer.physical_buffer.size);
+	if (clear)
+		memset((void*)frameBuffer, 0,
+			gKernelArgs.frame_buffer.physical_buffer.size);
 
 	uint8* uncompressedLogo = NULL;
 	unsigned int uncompressedSize = kSplashLogoWidth * kSplashLogoHeight;

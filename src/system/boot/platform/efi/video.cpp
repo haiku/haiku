@@ -118,8 +118,6 @@ get_mode_from_settings(void)
 	if (handle == NULL)
 		return;
 
-	bool found = false;
-
 	const driver_settings *settings = get_driver_settings(handle);
 	if (settings == NULL)
 		goto out;
@@ -129,17 +127,16 @@ get_mode_from_settings(void)
 	for (int32 i = 0; i < settings->parameter_count; i++) {
 		driver_parameter &parameter = settings->parameters[i];
 
-		if (strcmp(parameter.name, "mode") == 0 && parameter.value_count > 2) {
-			uint32 width = strtoul(parameter.values[0], NULL, 0);
-			uint32 height = strtoul(parameter.values[1], NULL, 0);
-			uint32 depth = strtoul(parameter.values[2], NULL, 0);
+		if (parameter.value_count < 3 || strcmp(parameter.name, "mode") != 0) continue;
+		uint32 width = strtoul(parameter.values[0], NULL, 0);
+		uint32 height = strtoul(parameter.values[1], NULL, 0);
+		uint32 depth = strtoul(parameter.values[2], NULL, 0);
 
-			// search mode that fits
-			video_mode *mode = closest_video_mode(width, height, depth);
-			if (mode != NULL) {
-				found = true;
-				sGraphicsMode = mode->mode;
-			}
+		// search mode that fits
+		video_mode *mode = closest_video_mode(width, height, depth);
+		if (mode != NULL) {
+			sGraphicsMode = mode->mode;
+			break;
 		}
 	}
 
@@ -257,7 +254,7 @@ platform_switch_to_logo(void)
 		sGraphicsOutput->Mode->Info->PixelsPerScanLine
 			* gKernelArgs.frame_buffer.depth / 8;
 
-	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start);
+	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start, false);
 }
 
 

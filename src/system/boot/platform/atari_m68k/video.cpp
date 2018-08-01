@@ -1153,7 +1153,7 @@ platform_switch_to_logo(void)
 			gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
 	}
 #endif
-	video_display_splash(sFrameBuffer);
+	video_display_splash(sFrameBuffer, true);
 	dump_vars();
 	spin(10000000);
 	platform_switch_to_text_mode();
