@@ -561,7 +561,7 @@ FileManager::~FileManager()
 	while (entry != NULL) {
 		SourceFileEntry* next = entry->next;
 		delete entry;
-		next = entry;
+		entry = next;
 	}
 	delete fSourceFiles;
 }
