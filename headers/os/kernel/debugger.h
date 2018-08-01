@@ -20,17 +20,17 @@
 #include <arch/arm/arch_debugger.h>
 
 
-#ifdef __x86_64__
+#if defined(__x86_64__)
 	typedef struct x86_64_debug_cpu_state debug_cpu_state;
-#elif __INTEL__
+#elif defined( __INTEL__)
 	typedef struct x86_debug_cpu_state debug_cpu_state;
-#elif __POWERPC__
+#elif defined(__POWERPC__)
 	typedef struct ppc_debug_cpu_state debug_cpu_state;
-#elif __M68K__
+#elif defined(__M68K__)
 	typedef struct m68k_debug_cpu_state debug_cpu_state;
-#elif __MIPSEL__
+#elif defined(__MIPSEL__)
 	typedef struct mipsel_debug_cpu_state debug_cpu_state;
-#elif __ARM__
+#elif defined(__arm__)
 	typedef struct arm_debug_cpu_state debug_cpu_state;
 #else
 	#error unsupported architecture

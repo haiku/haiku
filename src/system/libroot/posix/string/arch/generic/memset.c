@@ -18,7 +18,7 @@ memset(void *s, int c, size_t count)
 	return s;
 }
 
-#ifdef __ARM__
+#if defined(__arm__)
 void* __aeabi_memset(void *s, int c, size_t count)
 	__attribute__((__alias__("memset")));
 #endif

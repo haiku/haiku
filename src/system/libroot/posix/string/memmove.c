@@ -70,7 +70,7 @@ memmove(void* dest, void const* src, size_t count)
 	return dest;
 }
 
-#ifdef __ARM__
+#if defined(__arm__)
 void* __aeabi_memmove(void* dest, void const* src, size_t count)
 	__attribute__((__alias__("memmove")));
 #endif

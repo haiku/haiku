@@ -70,7 +70,7 @@ extern "C" void _start(void);
 extern "C" int start_gen(int argc, const char **argv,
 	struct image_header *uimage=NULL, void *fdt=NULL);
 extern "C" void dump_uimage(struct image_header *image);
-#if defined(__ARM__)
+#if defined(__arm__)
 extern "C" status_t arch_mailbox_init();
 #endif
 
@@ -230,7 +230,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 
 	serial_init(gFDT);
 
-	#if defined(__ARM__)
+	#if defined(__arm__)
 	arch_mailbox_init();
 	#endif
 

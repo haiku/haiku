@@ -17,7 +17,7 @@
 
 #include <arch/generic/debug_uart_8250.h>
 
-#ifdef __ARM__
+#if defined(__arm__)
 #include <arch/arm/arch_uart_pl011.h>
 #endif
 
@@ -101,7 +101,7 @@ debug_uart_from_fdt(const void *fdt)
 		|| fdt_node_check_compatible(fdt, node, "ns16550") == 0) {
 		TRACE(("serial: Found 8250 serial UART!\n"));
 		uart = arch_get_uart_8250(regs, clock);
-	#ifdef __ARM__
+	#if defined(__arm__)
 	} else if (fdt_node_check_compatible(fdt, node, "ti,omap3-uart") == 0
 		|| fdt_node_check_compatible(fdt, node, "ti,omap4-uart") == 0
 		|| fdt_node_check_compatible(fdt, node, "ti,omap5-uart") == 0

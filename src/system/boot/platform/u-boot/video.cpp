@@ -105,7 +105,7 @@ platform_init_video(void)
 {
 
 #warning TODO: Fix u-boot arm framebuffer location from fdt!
-#ifdef __ARM__
+#if defined(__arm__)
 	#if defined(BOARD_CPU_ARM920T)
 		extern ArchFramebuffer *arch_get_fb_arm_920(addr_t base);
 		gFramebuffer = arch_get_fb_arm_920(0x88000000);

@@ -10,7 +10,7 @@
  * Architecture-specific structure passed to signal handlers
  */
 
-#if __ARM__
+#if defined(__arm__)
 struct vregs
 {
 	ulong r0;
@@ -32,7 +32,7 @@ struct vregs
 	ulong cpsr;
 // TODO: ARM: fix floats in vregs, add missing stuff.
 };
-#endif /* __ARM__ */
+#endif /* defined(__arm__) */
 
 
 #endif /* _ARCH_SIGNAL_H_ */

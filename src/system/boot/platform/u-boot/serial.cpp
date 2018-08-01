@@ -15,7 +15,7 @@
 
 #include <arch/generic/debug_uart_8250.h>
 
-#if defined(__ARM__)
+#if defined(__arm__)
 #include <arch/arm/arch_uart_pl011.h>
 #endif
 
