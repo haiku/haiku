@@ -474,12 +474,9 @@ rule ArchitectureSetupWarnings architecture
 	}
 
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		# We need -integrated-as, as otherwise Clang uses GCC as assembler and
-		# passes -fheinous-gnu-extensions to GCC, which GCC does not understand
-		# then errors out.
 		AppendToConfigVar CCFLAGS :
 			HAIKU_TOP src system libroot posix glibc :
-			-integrated-as -fgnu89-inline -fheinous-gnu-extensions : global ;
+			-fgnu89-inline -fheinous-gnu-extensions : global ;
 	}
 
 	EnableWerror src add-ons accelerants ;
