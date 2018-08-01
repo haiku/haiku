@@ -936,19 +936,23 @@ else
 
 		# Override the cross tools variables, if the tools were built or a
 		# prefix was specified.
-		if [ -n "$crossToolsPrefix" ]; then
-			get_build_tool_path AR_$targetArch ${crossToolsPrefix}ar
+		if [ $useClang = 1 ]; then
+			get_build_tool_path LD_$targetArch ld.lld
+			get_build_tool_path ELFEDIT_$targetArch elfedit
+		elif [ -n "$crossToolsPrefix" ]; then
 			get_build_tool_path LD_$targetArch ${crossToolsPrefix}ld
-			get_build_tool_path OBJCOPY_$targetArch ${crossToolsPrefix}objcopy
-			get_build_tool_path RANLIB_$targetArch ${crossToolsPrefix}ranlib
-			get_build_tool_path STRIP_$targetArch ${crossToolsPrefix}strip
-
 			case `get_variable HAIKU_GCC_RAW_VERSION_$targetArch` in
 				4.*|5.*|6.*|7.*|8.*)
 					get_build_tool_path ELFEDIT_$targetArch \
 						${crossToolsPrefix}elfedit
 				;;
 			esac
+		fi
+		if [ -n "$crossToolsPrefix" ]; then
+			get_build_tool_path AR_$targetArch ${crossToolsPrefix}ar
+			get_build_tool_path OBJCOPY_$targetArch ${crossToolsPrefix}objcopy
+			get_build_tool_path RANLIB_$targetArch ${crossToolsPrefix}ranlib
+			get_build_tool_path STRIP_$targetArch ${crossToolsPrefix}strip
 		fi
 
 		# check whether the Haiku compiler really targets Haiku
