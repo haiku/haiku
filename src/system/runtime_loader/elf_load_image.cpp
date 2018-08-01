@@ -629,17 +629,14 @@ load_image(char const* name, image_type type, const char* rpath,
 	// loading) we init the search path subdir if the compiler version doesn't
 	// match ours.
 	if (sSearchPathSubDir == NULL) {
-#if defined(_COMPAT_MODE) && !defined(__x86_64__)
-		sSearchPathSubDir = "x86";
-#else
-		#if __GNUC__ == 2
+		#if __GNUC__ == 2 || (defined(_COMPAT_MODE) && !defined(__x86_64__))
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
 				sSearchPathSubDir = "x86";
-		#elif __GNUC__ >= 4
+		#endif
+		#if __GNUC__ >= 4 || (defined(_COMPAT_MODE) && !defined(__x86_64__))
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2)
 				sSearchPathSubDir = "x86_gcc2";
 		#endif
-#endif
 	}
 
 	set_abi_version(image->abi);
