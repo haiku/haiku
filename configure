@@ -477,17 +477,45 @@ if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
 	usage; exit 0;
 fi
 
-# ensure umask is not too restrictive
-if [ $(umask) -gt 22 ]; then
-	echo "Your umask is too restrictive (should be: <= 0022; is actually:" $(umask)")"
-	exit 1
-fi
-
 # get cwd and the source directory
 currentDir=`pwd`
 cd `dirname "$0"`
 sourceDir=`pwd`
 cd "$currentDir"
+
+# determine output directory
+if [ "$currentDir" = "$sourceDir" ]; then
+	outputDir=$currentDir/generated
+else
+	outputDir=$currentDir
+fi
+buildOutputDir="$outputDir/build"
+HAIKU_BUILD_ATTRIBUTES_DIR="$outputDir/attributes"
+buildConfigFile="$buildOutputDir/BuildConfig"
+
+# check for update request
+if [ "$1" = "--update" ]; then
+	if ! [ -e "$buildConfigFile" ]; then
+		echo $0 --update: \'$buildConfigFile\' not found - updating not possible.
+		exit 1
+	fi
+	# get last configure invocation and flags from BuildConfig and call ourselves with it
+	lastPwd=`grep "#d " "$buildConfigFile" | cut -c 4-`
+	lastConfig=`grep "#c " "$buildConfigFile" | cut -c 4-`
+	lastEnv=`grep "#e " "$buildConfigFile" | cut -c 4-`
+	lastArgs=`grep "#a " "$buildConfigFile" | cut -c 4-`
+	if [ -z "$lastConfig" ]; then
+		echo "$0 --update: The previous configure invocation was not properly" \
+			"encoded into '$buildConfigFile' - updating not possible."
+		exit 1
+	fi
+	cd $lastPwd
+	if [ -n "$lastEnv" ]; then
+		export $lastEnv
+	fi
+	$lastConfig $lastArgs
+	exit $?
+fi
 
 # backup the passed arguments
 configureArgs="$@"
@@ -502,6 +530,12 @@ for var in `env`; do
 			;;
 	esac
 done
+
+# ensure umask is not too restrictive
+if [ $(umask) -gt 22 ]; then
+	echo "Your umask is too restrictive (should be: <= 0022; is actually:" $(umask)")"
+	exit 1
+fi
 
 # internal default parameter values
 #
@@ -571,40 +605,6 @@ supportedTargetArchs="
 	x86_64
 	x86_gcc2
 	"
-
-# determine output directory
-if [ "$currentDir" = "$sourceDir" ]; then
-	outputDir=$currentDir/generated
-else
-	outputDir=$currentDir
-fi
-buildOutputDir="$outputDir/build"
-HAIKU_BUILD_ATTRIBUTES_DIR="$outputDir/attributes"
-buildConfigFile="$buildOutputDir/BuildConfig"
-
-# check for update request
-if [ "$1" = "--update" ]; then
-	if ! [ -e "$buildConfigFile" ]; then
-		echo $0 --update: \'$buildConfigFile\' not found - updating not possible.
-		exit 1
-	fi
-	# get last configure invocation and flags from BuildConfig and call ourselves with it
-	lastPwd=`grep "#d " "$buildConfigFile" | cut -c 4-`
-	lastConfig=`grep "#c " "$buildConfigFile" | cut -c 4-`
-	lastEnv=`grep "#e " "$buildConfigFile" | cut -c 4-`
-	lastArgs=`grep "#a " "$buildConfigFile" | cut -c 4-`
-	if [ -z "$lastConfig" ]; then
-		echo "$0 --update: The previous configure invocation was not properly" \
-			"encoded into '$buildConfigFile' - updating not possible."
-		exit 1
-	fi
-	cd $lastPwd
-	if [ -n "$lastEnv" ]; then
-		export $lastEnv
-	fi
-	$lastConfig $lastArgs
-	exit $?
-fi
 
 # parse parameters
 #
