@@ -1077,7 +1077,7 @@ BHttpRequest::_SendPostData()
 
 			if (fOptInputDataSize < 0) {
 				// Chunked transfer
-				char hexSize[16];
+				char hexSize[20];
 				size_t hexLength = sprintf(hexSize, "%ld", read);
 
 				fSocket->Write(hexSize, hexLength);
