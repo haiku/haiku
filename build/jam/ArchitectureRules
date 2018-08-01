@@ -13,9 +13,9 @@ rule ArchitectureSetup architecture
 	HAIKU_GCC_VERSION_$(architecture) = $(gccVersion) ;
 
 	# enable GCC -pipe option, if requested
-	local gccBaseFlags ;
+	local ccBaseFlags ;
 	if $(HAIKU_USE_GCC_PIPE) = 1 {
-		gccBaseFlags = -pipe ;
+		ccBaseFlags = -pipe ;
 	}
 
 	# disable strict aliasing on anything newer than gcc 2 as it may lead to
@@ -23,7 +23,7 @@ rule ArchitectureSetup architecture
 	# TODO: remove the -fno-strict-aliasing option when all code has been
 	#		analyzed/fixed with regard to aliasing.
 	if $(gccVersion[1]) >= 3 {
-		gccBaseFlags += -fno-strict-aliasing ;
+		ccBaseFlags += -fno-strict-aliasing ;
 	}
 
 	# Without this flag, GCC deletes many null-pointer checks that are
@@ -35,17 +35,17 @@ rule ArchitectureSetup architecture
 	# Note that the Linux also does the same:
 	#  - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a3ca86aea507904148870946d599e07a340b39bf
 	if $(gccVersion[1]) >= 3 {
-		gccBaseFlags += -fno-delete-null-pointer-checks ;
+		ccBaseFlags += -fno-delete-null-pointer-checks ;
 	}
 
 	# disable some builtins that are incompatible with our definitions
 	if $(gccVersion[1]) >= 3 {
-		gccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
+		ccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
 	}
 
 	# disable some Clang warnings that are not very useful
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		gccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field
+		ccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field
 			-Wno-cast-align -Wno-gnu-designator ;
 	}
 
@@ -53,24 +53,24 @@ rule ArchitectureSetup architecture
 	if $(cpu) = arm {
 		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 			# For stackcrawls - not supported by Clang
-			gccBaseFlags += -mapcs-frame ;
+			ccBaseFlags += -mapcs-frame ;
 		}
 	}
 
 	# activating graphite optimizations
 	if $(HAIKU_USE_GCC_GRAPHITE_$(architecture)) = 1 {
-		gccBaseFlags += -floop-interchange -ftree-loop-distribution
+		ccBaseFlags += -floop-interchange -ftree-loop-distribution
 			-floop-strip-mine -floop-block ;
 	}
-	HAIKU_GCC_BASE_FLAGS_$(architecture) = $(gccBaseFlags) ;
+	HAIKU_GCC_BASE_FLAGS_$(architecture) = $(ccBaseFlags) ;
 
 	# initial state for flags etc.
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 	HAIKU_LINK_$(architecture) = $(HAIKU_CC_$(architecture)) ;
-	HAIKU_LINKFLAGS_$(architecture) = $(gccBaseFlags) ;
+	HAIKU_LINKFLAGS_$(architecture) = $(ccBaseFlags) ;
 
-	HAIKU_CCFLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
-	HAIKU_C++FLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
+	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
+	HAIKU_C++FLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
 
 	# strip is required
 	if ! $(HAIKU_STRIP_$(architecture)) {
@@ -302,23 +302,23 @@ rule KernelArchitectureSetup architecture
 		;
 
 	# C/C++ flags
-	local gccBaseFlags = $(HAIKU_GCC_BASE_FLAGS_$(architecture))
+	local ccBaseFlags = $(HAIKU_GCC_BASE_FLAGS_$(architecture))
 		-finline -fno-builtin ;
 
 	if $(gccVersion[1]) >= 4 {
-		gccBaseFlags += -ffreestanding ;
+		ccBaseFlags += -ffreestanding ;
 	}
 
-	local g++BaseFlags = $(gccBaseFlags) -fno-exceptions ;
+	local c++BaseFlags = $(ccBaseFlags) -fno-exceptions ;
 
 	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
-		g++BaseFlags += -fno-use-cxa-atexit ;
+		c++BaseFlags += -fno-use-cxa-atexit ;
 	}
 
-	HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(gccBaseFlags) ;
-	HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
-	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(gccBaseFlags) ;
-	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
+	HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
+	HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
+	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
+	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
 
