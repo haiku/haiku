@@ -704,6 +704,7 @@ while [ $# -gt 0 ] ; do
 			case "$targetArch" in
 				x86)		targetMachine=i586-pc-haiku;;
 				x86_64)		targetMachine=x86_64-unknown-haiku;;
+				arm)		targetMachine=arm-unknown-haiku;;
 				*)
 					echo "Unsupported target architecture: $2" >&2
 					exit 1
