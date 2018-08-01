@@ -1,7 +1,7 @@
 How to Merge Patches from NetBSD Trunk
 ============================================
 Using the NetBSD CVS is a pain, so instead, the preferred thing to do is to use
-[IIJ's Git mirror](https://github.com/IIJ-NetBSD/netbsd-src). The code here is
+[the official Git mirror](https://github.com/NetBSD/src). The code here is
 in the tree at a few places:`inet` is at `lib/libc/inet`, irs is scattered
 across the tree, and `resolv` is at `lib/libc/resolv`.
 
