@@ -15,6 +15,11 @@ BootstrapPackageRepository HaikuPortsCross
 		gcc_bootstrap_x86_syslibs-7.3.0_2018_05_01-1
 		gcc_bootstrap_x86_syslibs_devel-7.3.0_2018_05_01-1
 	}@ # secondary_x86
+
+	secondary_x86_gcc2 @{
+		gcc_bootstrap_x86_gcc2-2.95.3_2014_08_03-1
+		gcc_bootstrap_x86_gcc2_syslibs_devel-2.95.3_2014_08_03-1
+	}@ # secondary_x86_gcc2
 	:
 	# repository architecture packages (stage 1)
 	bash_bootstrap-4.4.012-1
@@ -57,6 +62,20 @@ BootstrapPackageRepository HaikuPortsCross
 		zlib_bootstrap_x86-1.2.11-1
 		zlib_bootstrap_x86_devel-1.2.11-1
 	}@ # secondary_x86
+
+	secondary_x86_gcc2 @{
+		binutils_bootstrap_x86_gcc2-2.17_2013_04_21-3
+		expat_bootstrap_x86_gcc2-2.1.0-1
+		expat_bootstrap_x86_gcc2_devel-2.1.0-1
+		freetype_bootstrap_x86_gcc2-2.6.3-1
+		freetype_bootstrap_x86_gcc2_devel-2.6.3-1
+		icu_bootstrap_x86_gcc2-57.1-2
+		icu_bootstrap_x86_gcc2_devel-57.1-2
+		ncurses6_bootstrap_x86_gcc2-6.0-1
+		ncurses6_bootstrap_x86_gcc2_devel-6.0-1
+		zlib_bootstrap_x86_gcc2-1.2.11-1
+		zlib_bootstrap_x86_gcc2_devel-1.2.11-1
+	}@ # secondary_x86_gcc2
 	:
 	# repository architecture packages (stage 2)
 	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1
@@ -66,6 +85,11 @@ BootstrapPackageRepository HaikuPortsCross
 		libsolv_bootstrap_x86-0.3.0_haiku_2014_12_22-1
 		libsolv_bootstrap_x86_devel-0.3.0_haiku_2014_12_22-1
 	}@ # secondary_x86
+
+	secondary_x86_gcc2 @{
+		libsolv_bootstrap_x86_gcc2-0.3.0_haiku_2014_12_22-1
+		libsolv_bootstrap_x86_gcc2_devel-0.3.0_haiku_2014_12_22-1
+	}@ # secondary_x86_gcc2
 	:
 	# source packages
 	bash_bootstrap
