@@ -598,6 +598,10 @@ getaddrinfo(const char *hostname, const char *servname,
 		error = explore_fqdn(pai, hostname, servname, &cur->ai_next,
 		    &svd);
 
+#ifndef __HAIKU__
+		while (cur && cur->ai_next)
+			cur = cur->ai_next;
+#else
 		while (cur && cur->ai_next) {
 			if ((((uint64_t)1 << cur->ai_next->ai_family) & mask) == 0) {
 				/* entry does not match addrconfig mask, remove from list */
@@ -611,6 +615,7 @@ getaddrinfo(const char *hostname, const char *servname,
 			}
 		}
 	}
+#endif
 
 	/* XXX */
 	if (sentinel.ai_next)
@@ -1103,9 +1108,13 @@ addrconfig(uint64_t *mask)
 
 	*mask = 0;
 	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next)
-		if (ifa->ifa_addr && (ifa->ifa_flags & IFF_UP)
-				&& !(ifa->ifa_flags & IFF_LOOPBACK)) {
+#ifndef __HAIKU__
+		if (ifa->ifa_addr && (ifa->ifa_flags & IFF_UP)) {
+#else
+ 		if (ifa->ifa_addr && (ifa->ifa_flags & IFF_UP)
+ 				&& !(ifa->ifa_flags & IFF_LOOPBACK)) {
 			assert(ifa->ifa_addr->sa_family < 64);
+#endif
 			*mask |= (uint64_t)1 << ifa->ifa_addr->sa_family;
 		}
 
