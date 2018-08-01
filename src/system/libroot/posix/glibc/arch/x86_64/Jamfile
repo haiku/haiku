@@ -23,7 +23,7 @@ SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM -DPIC ;
 SubDirAsFlags -DPIC ;
 
 local genericSources =
-	cmp.c dbl2mpn.c divrem.c 
+	cmp.c dbl2mpn.c divrem.c
 	memrchr.c
 	mpn2dbl.c mpn2flt.c mpn2ldbl.c
 	mul.c mul_n.c
@@ -90,7 +90,7 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_e.o :
-			e_acosl.c e_atan2l.c e_exp2l.S e_expl.c e_fmodl.S e_log10l.S
+			e_acosl.c e_atan2l.c e_exp2l.S e_expl.S e_fmodl.S e_log10l.S
 			e_log2l.S e_logl.S e_powl.S e_remainderl.S e_rem_pio2l.c e_scalbl.S
 			e_sqrt.c e_sqrtf.c e_sqrtl.c
 			;
