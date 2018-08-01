@@ -1,4 +1,4 @@
-/*	$NetBSD: res_mkquery.c,v 1.15 2015/02/24 17:56:20 christos Exp $	*/
+/*	$NetBSD: res_mkquery.c,v 1.16 2017/09/28 23:32:01 christos Exp $	*/
 
 /*
  * Portions Copyright (C) 2004, 2005, 2008  Internet Systems Consortium, Inc. ("ISC")
@@ -66,12 +66,18 @@
  * SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
+#ifdef notdef
 static const char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
-static const char rcsid[] = "$Id: res_mkquery.c,v 1.10 2008/12/11 09:59:00 marka Exp $";
+static const char rcsid[] = "Id: res_mkquery.c,v 1.10 2008/12/11 09:59:00 marka Exp";
+#else
+__RCSID("$NetBSD: res_mkquery.c,v 1.16 2017/09/28 23:32:01 christos Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"
+
 #include <sys/types.h>
 #include <sys/param.h>
 #include <netinet/in.h>
@@ -126,6 +132,7 @@ res_nmkquery(res_state statp,
 	hp->id = htons(statp->id);
 	hp->opcode = op;
 	hp->rd = (statp->options & RES_RECURSE) != 0U;
+	hp->ad = (statp->options & RES_USE_DNSSEC) != 0U;
 	hp->rcode = NOERROR;
 	cp = buf + HFIXEDSZ;
 	ep = buf + buflen;
