@@ -15,14 +15,16 @@
 
 #include <Box.h>
 #include <Catalog.h>
+#include <GroupLayoutBuilder.h>
+#include <LayoutItem.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <String.h>
 #include <StringView.h>
-#include <LayoutItem.h>
-#include <GroupLayoutBuilder.h>
+
+#include <FontPrivate.h>
 
 #include <stdio.h>
 
@@ -449,9 +451,13 @@ FontSelectionView::UpdateFontsMenu()
 		if (get_font_family(i, &family, &flags) != B_OK)
 			continue;
 
-		// if we're setting the fixed font, we only want to show fixed fonts
-		if (!strcmp(Name(), "fixed") && (flags & B_IS_FIXED) == 0)
+		// if we're setting the fixed font, we only want to show fixed and
+		// full-and-half-fixed fonts
+		if (strcmp(Name(), "fixed") == 0
+			&& (flags
+				& (B_IS_FIXED | B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED)) == 0) {
 			continue;
+		}
 
 		float width = font.StringWidth(family);
 		if (width > fMaxFontNameWidth)
