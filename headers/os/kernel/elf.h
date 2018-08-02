@@ -186,7 +186,8 @@ typedef struct {
 #define EM_BLACKFIN		106 /* Analog Devices Blackfin (DSP) processor */
 #define EM_ARCA			109 /* Arca RISC Microprocessor */
 #define EM_VIDCORE3		137 /* Broadcom VideoCore III */
-#define EM_AARCH64		183 /* ARM 64 bit */
+#define EM_ARM64		183 /* ARM 64 bit */
+#define EM_AARCH64		EM_ARM64
 #define EM_AVR32		185 /* AVR-32 */
 #define EM_STM8			186 /* ST STM8S */
 #define EM_CUDA			190 /* Nvidia CUDA */
