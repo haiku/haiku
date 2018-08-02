@@ -18,6 +18,8 @@
 #include <NetServer.h>
 
 extern "C" {
+#	include <compat/sys/cdefs.h>
+#	include <compat/sys/ioccom.h>
 #	include <net80211/ieee80211_ioctl.h>
 }
 

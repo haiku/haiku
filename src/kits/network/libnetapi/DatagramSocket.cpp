@@ -6,6 +6,7 @@
 
 #include <DatagramSocket.h>
 
+#include <errno.h>
 
 //#define TRACE_SOCKET
 #ifdef TRACE_SOCKET
