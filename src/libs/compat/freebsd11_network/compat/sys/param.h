@@ -49,10 +49,10 @@
 #define ALIGN_BYTES		(sizeof(unsigned long) - 1)
 #define ALIGN(x)		((((unsigned long)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
 
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__i386__)
 #define	ALIGNED_POINTER(p, t)	1
-#elif defined(__i386__)
-#define	ALIGNED_POINTER(p, t)	1
+#elif defined(__powerpc__)
+#define	ALIGNED_POINTER(p, t)	((((uintptr_t)(p)) & (sizeof (t) - 1)) == 0)
 #else
 #error Need definition of ALIGNED_POINTER for this arch!
 #endif
