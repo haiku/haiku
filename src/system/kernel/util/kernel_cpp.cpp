@@ -141,6 +141,25 @@ operator delete[](void *ptr) _NOEXCEPT
 	free(ptr);
 }
 
+
+#if __cplusplus >= 201402L
+
+void
+operator delete(void* ptr, std::size_t) _NOEXCEPT
+{
+	free(ptr);
+}
+
+
+void
+operator delete[](void* ptr, std::size_t) _NOEXCEPT
+{
+	free(ptr);
+}
+
+#endif
+
+
 #ifndef _BOOT_MODE
 
 FILE *stderr = NULL;

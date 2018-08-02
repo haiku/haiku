@@ -39,13 +39,8 @@ extern void operator delete(void *ptr) _NOEXCEPT;
 extern void operator delete[](void *ptr) _NOEXCEPT;
 
 #if __cplusplus >= 201402L
-
-inline void
-operator delete(void *ptr, size_t size) throw ()
-{
-	free(ptr);
-}
-
+extern void operator delete(void* ptr, std::size_t) _NOEXCEPT;
+extern void operator delete[](void* ptr, std::size_t) _NOEXCEPT;
 #endif // __cplusplus >= 201402L
 
 #endif	// #if _KERNEL_MODE
