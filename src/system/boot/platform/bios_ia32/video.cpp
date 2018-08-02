@@ -877,7 +877,7 @@ fallback:
 			gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
 	}
 
-	video_display_splash(sFrameBuffer, true);
+	video_display_splash(sFrameBuffer);
 }
 
 

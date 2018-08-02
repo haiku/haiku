@@ -234,7 +234,7 @@ platform_switch_to_logo(void)
 	
 	sFrameBuffer = gKernelArgs.frame_buffer.physical_buffer.start;
 
-	//video_display_splash(sFrameBuffer, true);
+	//video_display_splash(sFrameBuffer);
 
 }
 

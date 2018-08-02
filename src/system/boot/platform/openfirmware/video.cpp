@@ -93,8 +93,7 @@ platform_switch_to_logo(void)
 	gKernelArgs.frame_buffer.enabled = true;
 
 	// the memory will be identity-mapped already
-	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start,
-		true);
+	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start);
 }
 
 

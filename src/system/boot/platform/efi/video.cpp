@@ -254,7 +254,7 @@ platform_switch_to_logo(void)
 		sGraphicsOutput->Mode->Info->PixelsPerScanLine
 			* gKernelArgs.frame_buffer.depth / 8;
 
-	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start, false);
+	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start);
 }
 
 

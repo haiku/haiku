@@ -32,7 +32,7 @@ void uncompress_24bit_RLE(const uint8 compressed[], uint8 *uncompressed);
 void uncompress_8bit_RLE(const uint8 compressed[], uint8 *uncompressed);
 
 /* default splash display */
-status_t video_display_splash(addr_t frameBuffer, bool clear);
+status_t video_display_splash(addr_t frameBuffer);
 
 #ifdef __cplusplus
 }

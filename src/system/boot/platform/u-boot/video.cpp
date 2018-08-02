@@ -89,7 +89,7 @@ platform_switch_to_logo(void)
 			return;
 		}
 
-		err = video_display_splash(gFramebuffer->Base(), true);
+		err = video_display_splash(gFramebuffer->Base());
 	}
 }
 
