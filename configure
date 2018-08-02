@@ -704,6 +704,7 @@ while [ $# -gt 0 ] ; do
 			case "$targetArch" in
 				x86)		targetMachine=i586-pc-haiku;;
 				x86_64)		targetMachine=x86_64-unknown-haiku;;
+				ppc)		targetMachine=powerpc-apple-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
 				*)
 					echo "Unsupported target architecture: $2" >&2
@@ -918,7 +919,11 @@ else
 			# across versions of Clang, so we must collect them for use in the build.
 			mkdir -p "$outputDir/clang_headers" || exit 1
 			clangHeadersDir=`$gcc -print-resource-dir`/include/
-			cp $clangHeadersDir/*intrin* $clangHeadersDir/mm3* "$outputDir/clang_headers" || exit 1
+			case $targetArch in
+				x86*) cp $clangHeadersDir/*intrin* $clangHeadersDir/mm3* "$outputDir/clang_headers" || exit 1 ;;
+				ppc*) cp $clangHeadersDir/*altivec* "$outputDir/clang_headers" || exit 1 ;;
+				arm*) cp $clangHeadersDir/*arm* "$outputDir/clang_headers" || exit 1 ;;
+			esac
 		elif [ -z "${crossToolsPrefix}" ]; then
 			gcc=`get_variable HAIKU_CC_$targetArch`
 		else
