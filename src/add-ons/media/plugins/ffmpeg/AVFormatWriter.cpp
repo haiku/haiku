@@ -42,11 +42,6 @@ extern "C" {
 
 #define ERROR(a...) fprintf(stderr, a)
 
-#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
-#define AV_CODEC_ID_NONE CODEC_ID_NONE
-#define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
-#endif
-
 
 static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
@@ -58,9 +53,7 @@ static const size_t kIOBufferSize = 64 * 1024;
 #define OPEN_CODEC_CONTEXT 1
 #define GET_CONTEXT_DEFAULTS 0
 
-#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
-#endif
 
 // #pragma mark - AVFormatWriter::StreamCookie
 

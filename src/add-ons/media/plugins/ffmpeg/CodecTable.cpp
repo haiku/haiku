@@ -12,15 +12,7 @@ extern "C" {
 }
 
 
-#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
-#else
-#define AV_CODEC_ID_NONE CODEC_ID_NONE
-#define AV_CODEC_ID_PCM_S16LE CODEC_ID_PCM_S16LE
-#define AV_CODEC_ID_RAWVIDEO CODEC_ID_RAWVIDEO
-#define AV_CODEC_ID_DVD_SUBTITLE CODEC_ID_DVD_SUBTITLE
-#define AV_CODEC_ID_ADPCM_IMA_QT CODEC_ID_ADPCM_IMA_QT
-#endif
 
 
 //XXX: newer versions have it in libavformat/internal.h

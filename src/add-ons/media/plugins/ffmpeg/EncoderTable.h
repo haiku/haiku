@@ -13,9 +13,7 @@ extern "C" {
 }
 
 
-#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
-#endif
 
 
 struct EncoderDescription {

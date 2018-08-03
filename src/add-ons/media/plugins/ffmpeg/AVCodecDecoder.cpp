@@ -51,16 +51,7 @@
 	static int sDumpedPackets = 0;
 #endif
 
-
-#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
-#endif
-#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
-#define av_frame_alloc avcodec_alloc_frame
-#define av_frame_unref avcodec_get_frame_defaults
-#define av_frame_free avcodec_free_frame
-#endif
-
 
 struct wave_format_ex {
 	uint16 format_tag;
@@ -127,14 +118,11 @@ AVCodecDecoder::AVCodecDecoder()
 
 	fDecodedDataBuffer(av_frame_alloc()),
 	fDecodedDataBufferOffset(0),
-	fDecodedDataBufferSize(0)
-#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
-	,
+	fDecodedDataBufferSize(0),
 	fBufferSinkContext(NULL),
 	fBufferSourceContext(NULL),
 	fFilterGraph(NULL),
 	fFilterFrame(NULL)
-#endif
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
 
@@ -173,10 +161,8 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_free(fContext);
 	av_free(fDecodedDataBuffer);
 
-#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
 	av_frame_free(&fFilterFrame);
 	avfilter_graph_free(&fFilterGraph);
-#endif
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext != NULL)
@@ -799,10 +785,8 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 		= static_cast<int>(containerProperties.frame_size);
 	ConvertRawAudioFormatToAVSampleFormat(
 		containerProperties.output.format, fContext->sample_fmt);
-#if LIBAVCODEC_VERSION_INT > ((52 << 16) | (114 << 8))
 	ConvertRawAudioFormatToAVSampleFormat(
 		containerProperties.output.format, fContext->request_sample_fmt);
-#endif
 	fContext->sample_rate
 		= static_cast<int>(containerProperties.output.frame_rate);
 	fContext->channels
@@ -1648,18 +1632,10 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		avpicture_alloc(&deinterlacedPicture, fContext->pix_fmt, displayWidth,
 			displayHeight);
 
-#if LIBAVCODEC_VERSION_INT < ((57 << 16) | (0 << 8))
-		if (avpicture_deinterlace(&deinterlacedPicture, &rawPicture,
-				fContext->pix_fmt, displayWidth, displayHeight) < 0) {
-			TRACE("[v] avpicture_deinterlace() - error\n");
-		} else
-			useDeinterlacedPicture = true;
-#else
 		// deinterlace implemented using avfilter
 		_ProcessFilterGraph(&deinterlacedPicture, &rawPicture,
 				fContext->pix_fmt, displayWidth, displayHeight);
 		useDeinterlacedPicture = true;
-#endif
 	}
 
 	// Some decoders do not set pix_fmt until they have decoded 1 frame
@@ -1739,8 +1715,6 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	return B_OK;
 }
 
-
-#if LIBAVCODEC_VERSION_INT >= ((57 << 16) | (0 << 8))
 
 /*! \brief Init the deinterlace filter graph.
 
@@ -1835,4 +1809,3 @@ AVCodecDecoder::_ProcessFilterGraph(AVPicture *dst, const AVPicture *src,
 	av_frame_unref(fFilterFrame);
 	return B_OK;
 }
-#endif

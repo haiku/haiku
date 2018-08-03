@@ -47,14 +47,6 @@ extern "C" {
 
 #define ERROR(a...) fprintf(stderr, a)
 
-#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
-#define AV_CODEC_ID_PCM_S16BE CODEC_ID_PCM_S16BE
-#define AV_CODEC_ID_PCM_S16LE CODEC_ID_PCM_S16LE
-#define AV_CODEC_ID_PCM_U16BE CODEC_ID_PCM_U16BE
-#define AV_CODEC_ID_PCM_U16LE CODEC_ID_PCM_U16LE
-#define AV_CODEC_ID_PCM_S8 CODEC_ID_PCM_S8
-#define AV_CODEC_ID_PCM_U8 CODEC_ID_PCM_U8
-#endif
 
 static const int64 kNoPTSValue = AV_NOPTS_VALUE;
 

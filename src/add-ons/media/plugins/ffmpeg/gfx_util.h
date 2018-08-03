@@ -28,10 +28,6 @@ extern "C" {
 	#include "libavcodec/avcodec.h"
 }
 
-#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
-typedef PixelFormat AVPixelFormat;
-#endif
-
 
 // this function will be used by the wrapper to write into
 // the Media Kit provided buffer from the self-allocated ffmpeg codec buffer

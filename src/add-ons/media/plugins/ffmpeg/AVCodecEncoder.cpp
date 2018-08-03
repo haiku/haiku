@@ -35,18 +35,6 @@ extern "C" {
 
 static const size_t kDefaultChunkBufferSize = 2 * 1024 * 1024;
 
-#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
-#define AV_PIX_FMT_NONE PIX_FMT_NONE
-#define AV_CODEC_ID_NONE CODEC_ID_NONE
-#define AV_CODEC_ID_MPEG1VIDEO CODEC_ID_MPEG1VIDEO
-#define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
-#endif
-#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
-#define av_frame_alloc avcodec_alloc_frame
-#define av_frame_unref avcodec_get_frame_defaults
-#define av_frame_free avcodec_free_frame
-#endif
-
 
 AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
@@ -716,17 +704,12 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			fDstFrame.linesize);
 
 		// Encode one video chunk/frame.
-#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
-		int usedBytes = avcodec_encode_video(fContext, fChunkBuffer,
-			kDefaultChunkBufferSize, fFrame);
-#else
 		int gotPacket;
 		AVPacket pkt;
 		pkt.data = NULL;
 		pkt.size = 0;
 		av_init_packet(&pkt);
 		int usedBytes = avcodec_encode_video2(fContext, &pkt, fFrame, &gotPacket);
-#endif
 		// avcodec.h says we need to set it.
 		fFrame->pts++;
 
@@ -735,17 +718,6 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			return B_ERROR;
 		}
 
-#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
-		// Maybe we need to use this PTS to calculate start_time:
-		if (fContext->coded_frame->pts != kNoPTSValue) {
-			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
-				fContext->coded_frame->pts, fContext->time_base.num,
-				fContext->time_base.den);
-		} else {
-			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
-				fContext->time_base.num, fContext->time_base.den);
-		}
-#else
 		// Maybe we need to use this PTS to calculate start_time:
 		if (pkt.pts != AV_NOPTS_VALUE) {
 			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
@@ -755,7 +727,6 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
 				fContext->time_base.num, fContext->time_base.den);
 		}
-#endif
 
 		// Setup media_encode_info, most important is the time stamp.
 		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
@@ -766,11 +737,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			info->flags |= B_MEDIA_KEY_FRAME;
 
 		// Write the chunk
-#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
-		ret = WriteChunk(fChunkBuffer, usedBytes, info);
-#else
 		ret = WriteChunk(pkt.data, pkt.size, info);
-#endif
 		if (ret != B_OK) {
 			TRACE("  error writing chunk: %s\n", strerror(ret));
 			break;
