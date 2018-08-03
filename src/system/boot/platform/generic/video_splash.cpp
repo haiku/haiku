@@ -89,12 +89,12 @@ video_display_splash(addr_t frameBuffer)
 	// Limit area to clear to estimated screen area
 	// UEFI can happily report a >256M framebuffer
 	addr_t size = min_c(gKernelArgs.frame_buffer.width
-			* gKernelArgs.frame_buffer.height * 4,
+			* gKernelArgs.frame_buffer.height * 4u,
 		gKernelArgs.frame_buffer.physical_buffer.size);
 
 	if (size >= 64) {
 		// Align writes
-		for (addr_t align = 8 - (frameBuffer & 7); pos < align; pos++)
+		for (addr_t align = (8 - (frameBuffer & 7)) & 7; pos < align; pos++)
 			*(char*)(frameBuffer + pos) = 0;
 		// Write eight bytes, many many times, but not too many
 		for (addr_t alignSize = size - 8; pos < alignSize; pos +=8) {
