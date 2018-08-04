@@ -1,6 +1,6 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de.
- * All Rights Reserved. Distributed under the terms of the MIT License.
+ * Copyright 2018, Colin Günther, coling@gmx.de. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 
 
@@ -46,25 +46,24 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct iwn_softc* sc = (struct iwn_softc*)device_get_softc(dev);
 	uint32 r1, r2;
 
+	/* Disable interrupts. */
+	IWN_WRITE(sc, IWN_INT_MASK, 0);
+
 	r1 = IWN_READ(sc, IWN_INT);
+	if (r1 == 0xffffffff || (r1 & 0xfffffff0) == 0xa5a5a5a0) {
+		return 0; /* Hardware gone! */
+	}
 	r2 = IWN_READ(sc, IWN_FH_INT);
 
 	if (r1 == 0 && r2 == 0) {
 		// not for us
-		IWN_WRITE(sc, IWN_INT_MASK, sc->int_mask);
-		return 0;
-	}
-
-	if (r1 == 0xffffffff) {
-		// hardware gone
+		if (sc->sc_flags & IWN_FLAG_RUNNING)
+			IWN_WRITE(sc, IWN_INT_MASK, sc->int_mask);
 		return 0;
 	}
 
 	atomic_set((int32*)&sc->sc_intr_status_1, r1);
 	atomic_set((int32*)&sc->sc_intr_status_2, r2);
-
-	IWN_WRITE(sc, IWN_INT_MASK, 0);
-		// disable interrupts
 
 	return 1;
 }
