@@ -1,6 +1,7 @@
 /*
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2014, Colin Günther <coling@gmx.de>
+ * Copyright 2018, Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the GNU L-GPL license.
  */
 
@@ -398,9 +399,9 @@ StreamBase::FrameRate() const
 {
 	// TODO: Find a way to always calculate a correct frame rate...
 	double frameRate = 1.0;
-	switch (fStream->codec->codec_type) {
+	switch (fStream->codecpar->codec_type) {
 		case AVMEDIA_TYPE_AUDIO:
-			frameRate = (double)fStream->codec->sample_rate;
+			frameRate = (double)fStream->codecpar->sample_rate;
 			break;
 		case AVMEDIA_TYPE_VIDEO:
 			if (fStream->avg_frame_rate.den && fStream->avg_frame_rate.num)
@@ -409,10 +410,6 @@ StreamBase::FrameRate() const
 				frameRate = av_q2d(fStream->r_frame_rate);
 			else if (fStream->time_base.den && fStream->time_base.num)
 				frameRate = 1 / av_q2d(fStream->time_base);
-			else if (fStream->codec->time_base.den
-				&& fStream->codec->time_base.num) {
-				frameRate = 1 / av_q2d(fStream->codec->time_base);
-			}
 
 			// TODO: Fix up interlaced video for real
 			if (frameRate == 50.0f)
@@ -962,32 +959,8 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 	if (ret != B_OK)
 		return ret;
 
-	// Get a pointer to the AVCodecContext for the stream at streamIndex.
-	AVCodecContext* codecContext = fStream->codec;
-
-#if 0
-// stippi: Here I was experimenting with the question if some fields of the
-// AVCodecContext change (or get filled out at all), if the AVCodec is opened.
-	class CodecOpener {
-	public:
-		CodecOpener(AVCodecContext* context)
-		{
-			fCodecContext = context;
-			AVCodec* codec = avcodec_find_decoder(context->codec_id);
-			fCodecOpen = avcodec_open(context, codec) >= 0;
-			if (!fCodecOpen)
-				TRACE("  failed to open the codec!\n");
-		}
-		~CodecOpener()
-		{
-			if (fCodecOpen)
-				avcodec_close(fCodecContext);
-		}
-	private:
-		AVCodecContext*		fCodecContext;
-		bool				fCodecOpen;
-	} codecOpener(codecContext);
-#endif
+	// Get a pointer to the AVCodecPaarameters for the stream at streamIndex.
+	AVCodecParameters* codecParams = fStream->codecpar;
 
 	// initialize the media_format for this stream
 	media_format* format = &fFormat;
@@ -996,10 +969,10 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 	media_format_description description;
 
 	// Set format family and type depending on codec_type of the stream.
-	switch (codecContext->codec_type) {
+	switch (codecParams->codec_type) {
 		case AVMEDIA_TYPE_AUDIO:
-			if ((codecContext->codec_id >= AV_CODEC_ID_PCM_S16LE)
-				&& (codecContext->codec_id <= AV_CODEC_ID_PCM_U8)) {
+			if ((codecParams->codec_id >= AV_CODEC_ID_PCM_S16LE)
+				&& (codecParams->codec_id <= AV_CODEC_ID_PCM_U8)) {
 				TRACE("  raw audio\n");
 				format->type = B_MEDIA_RAW_AUDIO;
 				description.family = B_ANY_FORMAT_FAMILY;
@@ -1027,7 +1000,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 
 	if (format->type == B_MEDIA_RAW_AUDIO) {
 		// We cannot describe all raw-audio formats, some are unsupported.
-		switch (codecContext->codec_id) {
+		switch (codecParams->codec_id) {
 			case AV_CODEC_ID_PCM_S16LE:
 				format->u.raw_audio.format
 					= media_raw_audio_format::B_AUDIO_SHORT;
@@ -1068,7 +1041,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 		}
 	} else {
 		if (description.family == B_MISC_FORMAT_FAMILY)
-			description.u.misc.codec = codecContext->codec_id;
+			description.u.misc.codec = codecParams->codec_id;
 
 		BMediaFormats formats;
 		status_t status = formats.GetFormatFor(description, format);
@@ -1076,7 +1049,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			TRACE("  formats.GetFormatFor() error: %s\n", strerror(status));
 
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32*)format->user_data = codecContext->codec_tag;
+		*(uint32*)format->user_data = codecParams->codec_tag;
 		format->user_data[4] = 0;
 	}
 
@@ -1085,10 +1058,11 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 
 	switch (format->type) {
 		case B_MEDIA_RAW_AUDIO:
-			format->u.raw_audio.frame_rate = (float)codecContext->sample_rate;
-			format->u.raw_audio.channel_count = codecContext->channels;
-			format->u.raw_audio.channel_mask = codecContext->channel_layout;
-			ConvertAVSampleFormatToRawAudioFormat(codecContext->sample_fmt,
+			format->u.raw_audio.frame_rate = (float)codecParams->sample_rate;
+			format->u.raw_audio.channel_count = codecParams->channels;
+			format->u.raw_audio.channel_mask = codecParams->channel_layout;
+			ConvertAVSampleFormatToRawAudioFormat(
+				(AVSampleFormat)codecParams->format,
 				format->u.raw_audio.format);
 			format->u.raw_audio.buffer_size = 0;
 
@@ -1102,28 +1076,32 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			break;
 
 		case B_MEDIA_ENCODED_AUDIO:
-			format->u.encoded_audio.bit_rate = codecContext->bit_rate;
-			format->u.encoded_audio.frame_size = codecContext->frame_size;
+			format->u.encoded_audio.bit_rate = codecParams->bit_rate;
+			format->u.encoded_audio.frame_size = codecParams->frame_size;
 			// Fill in some info about possible output format
 			format->u.encoded_audio.output
 				= media_multi_audio_format::wildcard;
 			format->u.encoded_audio.output.frame_rate
-				= (float)codecContext->sample_rate;
+				= (float)codecParams->sample_rate;
 			// Channel layout bits match in Be API and FFmpeg.
 			format->u.encoded_audio.output.channel_count
-				= codecContext->channels;
+				= codecParams->channels;
 			format->u.encoded_audio.multi_info.channel_mask
-				= codecContext->channel_layout;
+				= codecParams->channel_layout;
 			format->u.encoded_audio.output.byte_order
-				= avformat_to_beos_byte_order(codecContext->sample_fmt);
-			ConvertAVSampleFormatToRawAudioFormat(codecContext->sample_fmt,
+				= avformat_to_beos_byte_order(
+					(AVSampleFormat)codecParams->format);
+
+			ConvertAVSampleFormatToRawAudioFormat(
+					(AVSampleFormat)codecParams->format,
 				format->u.encoded_audio.output.format);
-			if (codecContext->block_align > 0) {
+
+			if (codecParams->block_align > 0) {
 				format->u.encoded_audio.output.buffer_size
-					= codecContext->block_align;
+					= codecParams->block_align;
 			} else {
 				format->u.encoded_audio.output.buffer_size
-					= codecContext->frame_size * codecContext->channels
+					= codecParams->frame_size * codecParams->channels
 						* (format->u.encoded_audio.output.format
 							& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 			}
@@ -1132,9 +1110,9 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 		case B_MEDIA_ENCODED_VIDEO:
 // TODO: Specifying any of these seems to throw off the format matching
 // later on.
-//			format->u.encoded_video.avg_bit_rate = codecContext->bit_rate;
-//			format->u.encoded_video.max_bit_rate = codecContext->bit_rate
-//				+ codecContext->bit_rate_tolerance;
+//			format->u.encoded_video.avg_bit_rate = codecParams->bit_rate;
+//			format->u.encoded_video.max_bit_rate = codecParams->bit_rate
+//				+ codecParams->bit_rate_tolerance;
 
 //			format->u.encoded_video.encoding
 //				= media_encoded_video_format::B_ANY;
@@ -1148,24 +1126,24 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 
 			format->u.encoded_video.output.first_active = 0;
 			format->u.encoded_video.output.last_active
-				= codecContext->height - 1;
+				= codecParams->height - 1;
 				// TODO: Maybe libavformat actually provides that info
 				// somewhere...
 			format->u.encoded_video.output.orientation
 				= B_VIDEO_TOP_LEFT_RIGHT;
 
-			ConvertAVCodecContextToVideoAspectWidthAndHeight(*codecContext,
+			ConvertAVCodecParametersToVideoAspectWidthAndHeight(*codecParams,
 				format->u.encoded_video.output.pixel_width_aspect,
 				format->u.encoded_video.output.pixel_height_aspect);
 
 			format->u.encoded_video.output.display.format
-				= pixfmt_to_colorspace(codecContext->pix_fmt);
+				= pixfmt_to_colorspace(codecParams->format);
 			format->u.encoded_video.output.display.line_width
-				= codecContext->width;
+				= codecParams->width;
 			format->u.encoded_video.output.display.line_count
-				= codecContext->height;
-			TRACE("  width/height: %d/%d\n", codecContext->width,
-				codecContext->height);
+				= codecParams->height;
+			TRACE("  width/height: %d/%d\n", codecParams->width,
+				codecParams->height);
 			format->u.encoded_video.output.display.bytes_per_row = 0;
 			format->u.encoded_video.output.display.pixel_offset = 0;
 			format->u.encoded_video.output.display.line_offset = 0;
@@ -1179,17 +1157,17 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 	}
 
 	// Add the meta data, if any
-	if (codecContext->extradata_size > 0) {
-		format->SetMetaData(codecContext->extradata,
-			codecContext->extradata_size);
+	if (codecParams->extradata_size > 0) {
+		format->SetMetaData(codecParams->extradata,
+			codecParams->extradata_size);
 		TRACE("  extradata: %p\n", format->MetaData());
 	}
 
-	TRACE("  extradata_size: %d\n", codecContext->extradata_size);
-//	TRACE("  intra_matrix: %p\n", codecContext->intra_matrix);
-//	TRACE("  inter_matrix: %p\n", codecContext->inter_matrix);
-//	TRACE("  get_buffer(): %p\n", codecContext->get_buffer);
-//	TRACE("  release_buffer(): %p\n", codecContext->release_buffer);
+	TRACE("  extradata_size: %d\n", codecParams->extradata_size);
+//	TRACE("  intra_matrix: %p\n", codecParams->intra_matrix);
+//	TRACE("  inter_matrix: %p\n", codecParams->inter_matrix);
+//	TRACE("  get_buffer(): %p\n", codecParams->get_buffer);
+//	TRACE("  release_buffer(): %p\n", codecParams->release_buffer);
 
 #ifdef TRACE_AVFORMAT_READER
 	char formatString[512];
@@ -1268,7 +1246,7 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 	}
 	#endif
 
-	*frameCount = fStream->nb_frames * fStream->codec->frame_size;
+	*frameCount = fStream->nb_frames * fStream->codecpar->frame_size;
 	if (*frameCount == 0) {
 		// Calculate from duration and frame rate
 		*frameCount = (int64)(*duration * frameRate / 1000000LL);
@@ -1279,8 +1257,8 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 
 	*format = fFormat;
 
-	*infoBuffer = fStream->codec->extradata;
-	*infoSize = fStream->codec->extradata_size;
+	*infoBuffer = fStream->codecpar->extradata;
+	*infoSize = fStream->codecpar->extradata_size;
 
 	return B_OK;
 }
