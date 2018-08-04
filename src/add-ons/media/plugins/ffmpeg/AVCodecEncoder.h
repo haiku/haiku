@@ -73,7 +73,7 @@ private:
 			CodecID				fCodecID;
 			AVCodec*			fCodec;
 			AVCodecContext*		fOwnContext;
-			AVCodecContext*		fContext;
+			AVCodecContext*		fCodecContext;
 
 			enum {
 				CODEC_INIT_NEEDED = 0,

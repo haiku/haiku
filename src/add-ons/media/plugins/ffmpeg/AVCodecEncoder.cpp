@@ -43,7 +43,7 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fCodecID((CodecID)codecID),
 	fCodec(NULL),
 	fOwnContext(avcodec_alloc_context3(NULL)),
-	fContext(fOwnContext),
+	fCodecContext(fOwnContext),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
 	fFrame(av_frame_alloc()),
 	fSwsContext(NULL),
@@ -142,7 +142,7 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 {
 	TRACE("AVCodecEncoder::SetUp()\n");
 
-	if (fContext == NULL)
+	if (fCodecContext == NULL)
 		return B_NO_INIT;
 
 	if (inputFormat == NULL)
@@ -177,7 +177,7 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 			userData += sizeof(team_id);
 			// Use the AVCodecContext from the Writer. This works better
 			// than using our own context with some encoders.
-			fContext = *(AVCodecContext**)userData;
+			fCodecContext = *(AVCodecContext**)userData;
 		}
 	}
 
@@ -192,12 +192,12 @@ AVCodecEncoder::GetEncodeParameters(encode_parameters* parameters) const
 
 // TODO: Implement maintaining an automatically calculated bit_rate versus
 // a user specified (via SetEncodeParameters()) bit_rate. At this point, the
-// fContext->bit_rate may not yet have been specified (_Setup() was never
+// fCodecContext->bit_rate may not yet have been specified (_Setup() was never
 // called yet). So it cannot work like the code below, but in any case, it's
 // showing how to convert between the values (albeit untested).
-//	int avgBytesPerSecond = fContext->bit_rate / 8;
-//	int maxBytesPerSecond = (fContext->bit_rate
-//		+ fContext->bit_rate_tolerance) / 8;
+//	int avgBytesPerSecond = fCodecContext->bit_rate / 8;
+//	int maxBytesPerSecond = (fCodecContext->bit_rate
+//		+ fCodecContext->bit_rate_tolerance) / 8;
 //
 //	if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
 //		fEncodeParameters.avg_field_size = (int32)(avgBytesPerSecond
@@ -254,8 +254,8 @@ AVCodecEncoder::SetEncodeParameters(encode_parameters* parameters)
 //	// Reset these, so we can tell the difference between uninitialized
 //	// and initialized...
 //	if (avgBytesPerSecond > 0) {
-//		fContext->bit_rate = avgBytesPerSecond * 8;
-//		fContext->bit_rate_tolerance = (maxBytesPerSecond
+//		fCodecContext->bit_rate = avgBytesPerSecond * 8;
+//		fCodecContext->bit_rate_tolerance = (maxBytesPerSecond
 //			- avgBytesPerSecond) * 8;
 //		fBitRateControlledByUser = true;
 //	}
@@ -295,55 +295,55 @@ AVCodecEncoder::_Setup()
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
 		TRACE("  B_MEDIA_RAW_VIDEO\n");
 		// frame rate
-		fContext->time_base.den = (int)fInputFormat.u.raw_video.field_rate;
-		fContext->time_base.num = 1;
+		fCodecContext->time_base.den = (int)fInputFormat.u.raw_video.field_rate;
+		fCodecContext->time_base.num = 1;
 		// video size
-		fContext->width = fInputFormat.u.raw_video.display.line_width;
-		fContext->height = fInputFormat.u.raw_video.display.line_count;
-		fContext->gop_size = 12;
+		fCodecContext->width = fInputFormat.u.raw_video.display.line_width;
+		fCodecContext->height = fInputFormat.u.raw_video.display.line_count;
+		fCodecContext->gop_size = 12;
 
 		// TODO: Fix pixel format or setup conversion method...
 		if (fCodec->pix_fmts != NULL) {
 			for (int i = 0; fCodec->pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
 				// Use the last supported pixel format, which we hope is the
 				// one with the best quality.
-				fContext->pix_fmt = fCodec->pix_fmts[i];
+				fCodecContext->pix_fmt = fCodec->pix_fmts[i];
 			}
 		}
 
 		// TODO: Setup rate control:
-//		fContext->rate_emu = 0;
-//		fContext->rc_eq = NULL;
-//		fContext->rc_max_rate = 0;
-//		fContext->rc_min_rate = 0;
+//		fCodecContext->rate_emu = 0;
+//		fCodecContext->rc_eq = NULL;
+//		fCodecContext->rc_max_rate = 0;
+//		fCodecContext->rc_min_rate = 0;
 		// TODO: Try to calculate a good bit rate...
-		rawBitRate = (int)(fContext->width * fContext->height * 2
+		rawBitRate = (int)(fCodecContext->width * fCodecContext->height * 2
 			* fInputFormat.u.raw_video.field_rate) * 8;
 
 		// Pixel aspect ratio
-		fContext->sample_aspect_ratio.num
+		fCodecContext->sample_aspect_ratio.num
 			= fInputFormat.u.raw_video.pixel_width_aspect;
-		fContext->sample_aspect_ratio.den
+		fCodecContext->sample_aspect_ratio.den
 			= fInputFormat.u.raw_video.pixel_height_aspect;
-		if (fContext->sample_aspect_ratio.num == 0
-			|| fContext->sample_aspect_ratio.den == 0) {
-			av_reduce(&fContext->sample_aspect_ratio.num,
-				&fContext->sample_aspect_ratio.den, fContext->width,
-				fContext->height, 255);
+		if (fCodecContext->sample_aspect_ratio.num == 0
+			|| fCodecContext->sample_aspect_ratio.den == 0) {
+			av_reduce(&fCodecContext->sample_aspect_ratio.num,
+				&fCodecContext->sample_aspect_ratio.den, fCodecContext->width,
+				fCodecContext->height, 255);
 		}
 
 		// TODO: This should already happen in AcceptFormat()
 		if (fInputFormat.u.raw_video.display.bytes_per_row == 0) {
 			fInputFormat.u.raw_video.display.bytes_per_row
-				= fContext->width * 4;
+				= fCodecContext->width * 4;
 		}
 
 		fFrame->pts = 0;
 
 		// Allocate space for colorspace converted AVPicture
 		// TODO: Check allocations...
-		avpicture_alloc(&fDstFrame, fContext->pix_fmt, fContext->width,
-			fContext->height);
+		avpicture_alloc(&fDstFrame, fCodecContext->pix_fmt, fCodecContext->width,
+			fCodecContext->height);
 
 		// Make the frame point to the data in the converted AVPicture
 		fFrame->data[0] = fDstFrame.data[0];
@@ -356,37 +356,37 @@ AVCodecEncoder::_Setup()
 		fFrame->linesize[2] = fDstFrame.linesize[2];
 		fFrame->linesize[3] = fDstFrame.linesize[3];
 
-		fSwsContext = sws_getContext(fContext->width, fContext->height,
+		fSwsContext = sws_getContext(fCodecContext->width, fCodecContext->height,
 			colorspace_to_pixfmt(fInputFormat.u.raw_video.display.format),
-			fContext->width, fContext->height,
-			fContext->pix_fmt, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+			fCodecContext->width, fCodecContext->height,
+			fCodecContext->pix_fmt, SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
 	} else if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
 		TRACE("  B_MEDIA_RAW_AUDIO\n");
 		// frame rate
-		fContext->sample_rate = (int)fInputFormat.u.raw_audio.frame_rate;
+		fCodecContext->sample_rate = (int)fInputFormat.u.raw_audio.frame_rate;
 		// channels
-		fContext->channels = fInputFormat.u.raw_audio.channel_count;
+		fCodecContext->channels = fInputFormat.u.raw_audio.channel_count;
 		// raw bitrate
-		rawBitRate = fContext->sample_rate * fContext->channels
+		rawBitRate = fCodecContext->sample_rate * fCodecContext->channels
 			* (fInputFormat.u.raw_audio.format
 				& media_raw_audio_format::B_AUDIO_SIZE_MASK) * 8;
 		// sample format
 		switch (fInputFormat.u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
-				fContext->sample_fmt = AV_SAMPLE_FMT_FLT;
+				fCodecContext->sample_fmt = AV_SAMPLE_FMT_FLT;
 				break;
 			case media_raw_audio_format::B_AUDIO_DOUBLE:
-				fContext->sample_fmt = AV_SAMPLE_FMT_DBL;
+				fCodecContext->sample_fmt = AV_SAMPLE_FMT_DBL;
 				break;
 			case media_raw_audio_format::B_AUDIO_INT:
-				fContext->sample_fmt = AV_SAMPLE_FMT_S32;
+				fCodecContext->sample_fmt = AV_SAMPLE_FMT_S32;
 				break;
 			case media_raw_audio_format::B_AUDIO_SHORT:
-				fContext->sample_fmt = AV_SAMPLE_FMT_S16;
+				fCodecContext->sample_fmt = AV_SAMPLE_FMT_S16;
 				break;
 			case media_raw_audio_format::B_AUDIO_UCHAR:
-				fContext->sample_fmt = AV_SAMPLE_FMT_U8;
+				fCodecContext->sample_fmt = AV_SAMPLE_FMT_U8;
 				break;
 
 			case media_raw_audio_format::B_AUDIO_CHAR:
@@ -399,33 +399,33 @@ AVCodecEncoder::_Setup()
 			switch (fInputFormat.u.raw_audio.channel_count) {
 				default:
 				case 2:
-					fContext->channel_layout = AV_CH_LAYOUT_STEREO;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_STEREO;
 					break;
 				case 1:
-					fContext->channel_layout = AV_CH_LAYOUT_MONO;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_MONO;
 					break;
 				case 3:
-					fContext->channel_layout = AV_CH_LAYOUT_SURROUND;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_SURROUND;
 					break;
 				case 4:
-					fContext->channel_layout = AV_CH_LAYOUT_QUAD;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_QUAD;
 					break;
 				case 5:
-					fContext->channel_layout = AV_CH_LAYOUT_5POINT0;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_5POINT0;
 					break;
 				case 6:
-					fContext->channel_layout = AV_CH_LAYOUT_5POINT1;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_5POINT1;
 					break;
 				case 8:
-					fContext->channel_layout = AV_CH_LAYOUT_7POINT1;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_7POINT1;
 					break;
 				case 10:
-					fContext->channel_layout = AV_CH_LAYOUT_7POINT1_WIDE;
+					fCodecContext->channel_layout = AV_CH_LAYOUT_7POINT1_WIDE;
 					break;
 			}
 		} else {
 			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
-			fContext->channel_layout = fInputFormat.u.raw_audio.channel_mask;
+			fCodecContext->channel_layout = fInputFormat.u.raw_audio.channel_mask;
 		}
 	} else {
 		TRACE("  UNSUPPORTED MEDIA TYPE!\n");
@@ -439,7 +439,7 @@ AVCodecEncoder::_Setup()
 	if (wantedBitRate == 0)
 		wantedBitRate = (int)(rawBitRate / fBitRateScale);
 
-	fContext->bit_rate = wantedBitRate;
+	fCodecContext->bit_rate = wantedBitRate;
 
 	if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
 		// Some audio encoders support certain bitrates only. Use the
@@ -453,7 +453,7 @@ AVCodecEncoder::_Setup()
 		for (unsigned int i = 0; i < sizeof(kBitRates) / sizeof(int); i++) {
 			int currentDiff = abs(wantedBitRate - kBitRates[i]);
 			if (currentDiff < diff) {
-				fContext->bit_rate = kBitRates[i];
+				fCodecContext->bit_rate = kBitRates[i];
 				diff = currentDiff;
 			} else
 				break;
@@ -462,17 +462,17 @@ AVCodecEncoder::_Setup()
 
 	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f), "
 		"context bitrate: %d\n", rawBitRate, wantedBitRate,
-		fEncodeParameters.quality, fContext->bit_rate);
+		fEncodeParameters.quality, fCodecContext->bit_rate);
 
 	// Add some known fixes from the FFmpeg API example:
-	if (fContext->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
+	if (fCodecContext->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
 		// Just for testing, we also add B frames */
-		fContext->max_b_frames = 2;
-	} else if (fContext->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
+		fCodecContext->max_b_frames = 2;
+	} else if (fCodecContext->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
 		// Needed to avoid using macroblocks in which some coeffs overflow.
 		// This does not happen with normal video, it just happens here as
 		// the motion of the chroma plane does not match the luma plane.
-		fContext->mb_decision = 2;
+		fCodecContext->mb_decision = 2;
 	}
 
 	// Unfortunately, we may fail later, when we try to open the codec
@@ -485,7 +485,7 @@ AVCodecEncoder::_Setup()
 bool
 AVCodecEncoder::_OpenCodecIfNeeded()
 {
-	if (fContext != fOwnContext) {
+	if (fCodecContext != fOwnContext) {
 		// We are using the AVCodecContext of the AVFormatWriter plugin,
 		// and don't maintain it's open/close state.
 		return true;
@@ -497,21 +497,21 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	if (fCodecInitStatus == CODEC_INIT_FAILED)
 		return false;
 
-	fContext->strict_std_compliance = -2;
+	fCodecContext->strict_std_compliance = -2;
 
 	// Some codecs need this to be set before open
-	fFrame->format = fContext->pix_fmt;
-	fFrame->width = fContext->width;
-	fFrame->height = fContext->height;
+	fFrame->format = fCodecContext->pix_fmt;
+	fFrame->width = fCodecContext->width;
+	fFrame->height = fCodecContext->height;
 
 	// Open the codec
-	int result = avcodec_open2(fContext, fCodec, NULL);
+	int result = avcodec_open2(fCodecContext, fCodec, NULL);
 	if (result >= 0)
 		fCodecInitStatus = CODEC_INIT_DONE;
 	else
 		fCodecInitStatus = CODEC_INIT_FAILED;
 
-	TRACE("  avcodec_open(%p, %p): %d\n", fContext, fCodec, result);
+	TRACE("  avcodec_open(%p, %p): %d\n", fCodecContext, fCodec, result);
 
 	return fCodecInitStatus == CODEC_INIT_DONE;
 
@@ -521,13 +521,13 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 void
 AVCodecEncoder::_CloseCodecIfNeeded()
 {
-	if (fContext != fOwnContext) {
+	if (fCodecContext != fOwnContext) {
 		// See _OpenCodecIfNeeded().
 		return;
 	}
 
 	if (fCodecInitStatus == CODEC_INIT_DONE) {
-		avcodec_close(fContext);
+		avcodec_close(fCodecContext);
 		fCodecInitStatus = CODEC_INIT_NEEDED;
 	}
 }
@@ -560,7 +560,7 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	size_t bufferSize = frameCount * inputFrameSize;
 	bufferSize = min_c(bufferSize, kDefaultChunkBufferSize);
 
-	if (fContext->frame_size > 1) {
+	if (fCodecContext->frame_size > 1) {
 		// Encoded audio. Things work differently from raw audio. We need
 		// the fAudioFifo to pipe data.
 		if (av_fifo_realloc2(fAudioFifo,
@@ -571,7 +571,7 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
         av_fifo_generic_write(fAudioFifo, const_cast<uint8*>(buffer),
         	bufferSize, NULL);
 
-		int frameBytes = fContext->frame_size * inputFrameSize;
+		int frameBytes = fCodecContext->frame_size * inputFrameSize;
 		uint8* tempBuffer = new(std::nothrow) uint8[frameBytes];
 		if (tempBuffer == NULL)
 			return B_NO_MEMORY;
@@ -580,7 +580,7 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 		while (av_fifo_size(fAudioFifo) >= frameBytes) {
 			av_fifo_generic_read(fAudioFifo, tempBuffer, frameBytes, NULL);
 
-			ret = _EncodeAudio(tempBuffer, frameBytes, fContext->frame_size,
+			ret = _EncodeAudio(tempBuffer, frameBytes, fCodecContext->frame_size,
 				info);
 			if (ret != B_OK)
 				break;
@@ -621,8 +621,8 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 
 		frame.nb_samples = frameCount;
 
-		ret = avcodec_fill_audio_frame(&frame, fContext->channels,
-				fContext->sample_fmt, (const uint8_t *) buffer, bufferSize, 1);
+		ret = avcodec_fill_audio_frame(&frame, fCodecContext->channels,
+				fCodecContext->sample_fmt, (const uint8_t *) buffer, bufferSize, 1);
 
 		if (ret != 0)
 			return B_ERROR;
@@ -632,11 +632,11 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 			/ fInputFormat.u.raw_audio.frame_rate);
 		fFramesWritten += frame.nb_samples;
 
-		ret = avcodec_encode_audio2(fContext, &packet, &frame, &gotPacket);
+		ret = avcodec_encode_audio2(fCodecContext, &packet, &frame, &gotPacket);
 	} else {
 		// If called with NULL, ask the encoder to flush any buffers it may
 		// have pending.
-		ret = avcodec_encode_audio2(fContext, &packet, NULL, &gotPacket);
+		ret = avcodec_encode_audio2(fCodecContext, &packet, NULL, &gotPacket);
 	}
 
 	if (buffer && frame.extended_data != frame.data)
@@ -650,10 +650,10 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	fFramesWritten += frameCount;
 
 	if (gotPacket) {
-		if (fContext->coded_frame) {
+		if (fCodecContext->coded_frame) {
 			// Store information about the coded frame in the context.
-			fContext->coded_frame->pts = packet.pts;
-			fContext->coded_frame->key_frame = !!(packet.flags & AV_PKT_FLAG_KEY);
+			fCodecContext->coded_frame->pts = packet.pts;
+			fCodecContext->coded_frame->key_frame = !!(packet.flags & AV_PKT_FLAG_KEY);
 		}
 
 		// Setup media_encode_info, most important is the time stamp.
@@ -709,7 +709,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		pkt.data = NULL;
 		pkt.size = 0;
 		av_init_packet(&pkt);
-		int usedBytes = avcodec_encode_video2(fContext, &pkt, fFrame, &gotPacket);
+		int usedBytes = avcodec_encode_video2(fCodecContext, &pkt, fFrame, &gotPacket);
 		// avcodec.h says we need to set it.
 		fFrame->pts++;
 
@@ -721,11 +721,11 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		// Maybe we need to use this PTS to calculate start_time:
 		if (pkt.pts != AV_NOPTS_VALUE) {
 			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
-				pkt.pts, fContext->time_base.num,
-				fContext->time_base.den);
+				pkt.pts, fCodecContext->time_base.num,
+				fCodecContext->time_base.den);
 		} else {
 			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
-				fContext->time_base.num, fContext->time_base.den);
+				fCodecContext->time_base.num, fCodecContext->time_base.den);
 		}
 
 		// Setup media_encode_info, most important is the time stamp.
@@ -733,7 +733,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			/ fInputFormat.u.raw_video.field_rate);
 
 		info->flags = 0;
-		if (fContext->coded_frame->key_frame)
+		if (fCodecContext->coded_frame->key_frame)
 			info->flags |= B_MEDIA_KEY_FRAME;
 
 		// Write the chunk
