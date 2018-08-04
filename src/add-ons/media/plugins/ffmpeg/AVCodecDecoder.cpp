@@ -86,7 +86,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fFrame(0),
 	fIsAudio(false),
 	fCodec(NULL),
-	fContext(avcodec_alloc_context3(NULL)),
+	fCodecContext(avcodec_alloc_context3(NULL)),
 	fResampleContext(NULL),
 	fDecodedData(NULL),
 	fDecodedDataSizeInBytes(0),
@@ -129,9 +129,9 @@ AVCodecDecoder::AVCodecDecoder()
 	system_info info;
 	get_system_info(&info);
 
-	fContext->err_recognition = AV_EF_CAREFUL;
-	fContext->error_concealment = 3;
-	fContext->thread_count = info.cpu_count;
+	fCodecContext->err_recognition = AV_EF_CAREFUL;
+	fCodecContext->error_concealment = 3;
+	fCodecContext->thread_count = info.cpu_count;
 }
 
 
@@ -148,7 +148,7 @@ AVCodecDecoder::~AVCodecDecoder()
 #endif
 
 	if (fCodecInitDone)
-		avcodec_close(fContext);
+		avcodec_close(fCodecContext);
 
 	swr_free(&fResampleContext);
 	free(fChunkBuffer);
@@ -158,7 +158,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_free(fRawDecodedPicture);
 	av_free(fRawDecodedAudio->opaque);
 	av_free(fRawDecodedAudio);
-	av_free(fContext);
+	av_free(fCodecContext);
 	av_free(fDecodedDataBuffer);
 
 	av_frame_free(&fFilterFrame);
@@ -271,7 +271,7 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 	status_t ret = B_OK;
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
 	if (fCodecInitDone) {
-		avcodec_flush_buffers(fContext);
+		avcodec_flush_buffers(fCodecContext);
 		_ResetTempPacket();
 	}
 
@@ -353,10 +353,10 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	// close any previous instance
 	if (fCodecInitDone) {
 		fCodecInitDone = false;
-		avcodec_close(fContext);
+		avcodec_close(fCodecContext);
 	}
 
-	if (avcodec_open2(fContext, fCodec, NULL) >= 0)
+	if (avcodec_open2(fCodecContext, fCodec, NULL) >= 0)
 		fCodecInitDone = true;
 	else {
 		TRACE("avcodec_open() failed to init codec!\n");
@@ -381,9 +381,9 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	media_multi_audio_format outputAudioFormat;
 	outputAudioFormat = media_raw_audio_format::wildcard;
 	outputAudioFormat.byte_order = B_MEDIA_HOST_ENDIAN;
-	outputAudioFormat.frame_rate = fContext->sample_rate;
-	outputAudioFormat.channel_count = fContext->channels;
-	ConvertAVSampleFormatToRawAudioFormat(fContext->sample_fmt,
+	outputAudioFormat.frame_rate = fCodecContext->sample_rate;
+	outputAudioFormat.channel_count = fCodecContext->channels;
+	ConvertAVSampleFormatToRawAudioFormat(fCodecContext->sample_fmt,
 		outputAudioFormat.format);
 	// Check that format is not still a wild card!
 	if (outputAudioFormat.format == 0) {
@@ -409,7 +409,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
-	if (av_sample_fmt_is_planar(fContext->sample_fmt))
+	if (av_sample_fmt_is_planar(fCodecContext->sample_fmt))
 		fInputFrameSize = sampleSize;
 	else
 		fInputFrameSize = fOutputFrameSize;
@@ -419,18 +419,21 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
-	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
+	if (av_sample_fmt_is_planar(fCodecContext->sample_fmt)) {
 		fResampleContext = swr_alloc_set_opts(NULL,
-			fContext->channel_layout, fContext->request_sample_fmt,
-			fContext->sample_rate,
-			fContext->channel_layout, fContext->sample_fmt, fContext->sample_rate,
+			fCodecContext->channel_layout,
+			fCodecContext->request_sample_fmt,
+			fCodecContext->sample_rate,
+			fCodecContext->channel_layout,
+			fCodecContext->sample_fmt,
+			fCodecContext->sample_rate,
 			0, NULL);
 		swr_init(fResampleContext);
 	}
 
 	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, "
 		"output frame size: %d, count: %ld, rate: %.2f\n",
-		fContext->bit_rate, fContext->sample_rate, fContext->channels,
+		fCodecContext->bit_rate, fCodecContext->sample_rate, fCodecContext->channels,
 		fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
 
 	return B_OK;
@@ -458,16 +461,16 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	if (codecCanHandleIncompleteFrames) {
 		// Expect and handle video frames to be splitted across consecutive
 		// data chunks.
-		fContext->flags |= AV_CODEC_FLAG_TRUNCATED;
+		fCodecContext->flags |= AV_CODEC_FLAG_TRUNCATED;
 	}
 
 	// close any previous instance
 	if (fCodecInitDone) {
 		fCodecInitDone = false;
-		avcodec_close(fContext);
+		avcodec_close(fCodecContext);
 	}
 
-	if (avcodec_open2(fContext, fCodec, NULL) >= 0)
+	if (avcodec_open2(fCodecContext, fCodec, NULL) >= 0)
 		fCodecInitDone = true;
 	else {
 		TRACE("avcodec_open() failed to init codec!\n");
@@ -746,7 +749,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 }
 
 
-/*!	\brief Applies all essential audio input properties to fContext that were
+/*!	\brief Applies all essential audio input properties to fCodecContext that were
 		passed to AVCodecDecoder when Setup() was called.
 
 	Note: This function must be called before the AVCodec is opened via
@@ -754,24 +757,24 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 	function avcodec_decode_audio4() is undefined.
 
 	Essential properties applied from fInputFormat.u.encoded_audio:
-		- bit_rate copied to fContext->bit_rate
-		- frame_size copied to fContext->frame_size
-		- output.format converted to fContext->sample_fmt
-		- output.frame_rate copied to fContext->sample_rate
-		- output.channel_count copied to fContext->channels
+		- bit_rate copied to fCodecContext->bit_rate
+		- frame_size copied to fCodecContext->frame_size
+		- output.format converted to fCodecContext->sample_fmt
+		- output.frame_rate copied to fCodecContext->sample_rate
+		- output.channel_count copied to fCodecContext->channels
 
 	Other essential properties being applied:
-		- fBlockAlign to fContext->block_align
-		- fExtraData to fContext->extradata
-		- fExtraDataSize to fContext->extradata_size
+		- fBlockAlign to fCodecContext->block_align
+		- fExtraData to fCodecContext->extradata
+		- fExtraDataSize to fCodecContext->extradata_size
 
 	TODO: Either the following documentation section should be removed or this
 	TODO when it is clear whether fInputFormat.MetaData() and
-	fInputFormat.MetaDataSize() have to be applied to fContext. See the related
+	fInputFormat.MetaDataSize() have to be applied to fCodecContext. See the related
 	TODO in the method implementation.
 	Only applied when fInputFormat.MetaDataSize() is greater than zero:
-		- fInputFormat.MetaData() to fContext->extradata
-		- fInputFormat.MetaDataSize() to fContext->extradata_size
+		- fInputFormat.MetaData() to fCodecContext->extradata
+		- fInputFormat.MetaDataSize() to fCodecContext->extradata_size
 */
 void
 AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
@@ -779,27 +782,27 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 	media_encoded_audio_format containerProperties
 		= fInputFormat.u.encoded_audio;
 
-	fContext->bit_rate
+	fCodecContext->bit_rate
 		= static_cast<int>(containerProperties.bit_rate);
-	fContext->frame_size
+	fCodecContext->frame_size
 		= static_cast<int>(containerProperties.frame_size);
 	ConvertRawAudioFormatToAVSampleFormat(
-		containerProperties.output.format, fContext->sample_fmt);
+		containerProperties.output.format, fCodecContext->sample_fmt);
 	ConvertRawAudioFormatToAVSampleFormat(
-		containerProperties.output.format, fContext->request_sample_fmt);
-	fContext->sample_rate
+		containerProperties.output.format, fCodecContext->request_sample_fmt);
+	fCodecContext->sample_rate
 		= static_cast<int>(containerProperties.output.frame_rate);
-	fContext->channels
+	fCodecContext->channels
 		= static_cast<int>(containerProperties.output.channel_count);
 	// Check that channel count is not still a wild card!
-	if (fContext->channels == 0) {
+	if (fCodecContext->channels == 0) {
 		TRACE("  channel_count still a wild-card, assuming stereo.\n");
-		fContext->channels = 2;
+		fCodecContext->channels = 2;
 	}
 
-	fContext->block_align = fBlockAlign;
-	fContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
-	fContext->extradata_size = fExtraDataSize;
+	fCodecContext->block_align = fBlockAlign;
+	fCodecContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
+	fCodecContext->extradata_size = fExtraDataSize;
 
 	// TODO: This probably needs to go away, there is some misconception
 	// about extra data / info buffer and meta data. See
@@ -808,14 +811,18 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 	// the infoBuffer passed to GetStreamInfo(). I think this may be why
 	// the code below was added.
 	if (fInputFormat.MetaDataSize() > 0) {
-		fContext->extradata = static_cast<uint8_t*>(
+		fCodecContext->extradata = static_cast<uint8_t*>(
 			const_cast<void*>(fInputFormat.MetaData()));
-		fContext->extradata_size = fInputFormat.MetaDataSize();
+		fCodecContext->extradata_size = fInputFormat.MetaDataSize();
 	}
 
 	TRACE("  bit_rate %d, sample_rate %d, channels %d, block_align %d, "
-		"extradata_size %d\n", fContext->bit_rate, fContext->sample_rate,
-		fContext->channels, fContext->block_align, fContext->extradata_size);
+		"extradata_size %d\n",
+		fCodecContext->bit_rate,
+		fCodecContext->sample_rate,
+		fCodecContext->channels,
+		fCodecContext->block_align,
+		fCodecContext->extradata_size);
 }
 
 
@@ -929,7 +936,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	// Some decoders do not support format conversion on themselves, or use
 	// "planar" audio (each channel separated instead of interleaved samples).
 	// In that case, we use swresample to convert the data
-	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
+	if (av_sample_fmt_is_planar(fCodecContext->sample_fmt)) {
 #if 0
 		const uint8_t* ptr[8];
 		for (int i = 0; i < 8; i++) {
@@ -958,7 +965,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		uintptr_t out = (uintptr_t)fRawDecodedAudio->data[0];
 		int32 offset = fDecodedDataBufferOffset;
 		for (int i = 0; i < frames; i++) {
-			for (int j = 0; j < fContext->channels; j++) {
+			for (int j = 0; j < fCodecContext->channels; j++) {
 				memcpy((void*)out, fDecodedDataBuffer->data[j]
 					+ offset, fInputFrameSize);
 				out += fInputFrameSize;
@@ -987,8 +994,8 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 
 		avformat_codec_context* codecContext
 			= static_cast<avformat_codec_context*>(fRawDecodedAudio->opaque);
-		codecContext->channels = fContext->channels;
-		codecContext->sample_rate = fContext->sample_rate;
+		codecContext->channels = fCodecContext->channels;
+		codecContext->sample_rate = fCodecContext->sample_rate;
 	}
 
 	fRawDecodedAudio->data[0] += decodedSize;
@@ -1118,7 +1125,7 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 	fDecodedDataBufferOffset = 0;
 	int gotAudioFrame = 0;
 
-	int encodedDataSizeInBytes = avcodec_decode_audio4(fContext,
+	int encodedDataSizeInBytes = avcodec_decode_audio4(fCodecContext,
 		fDecodedDataBuffer, &gotAudioFrame, &fTempPacket);
 	if (encodedDataSizeInBytes <= 0) {
 		// Error or failure to produce decompressed output.
@@ -1254,7 +1261,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 		// required to buffer the packets between different calls to
 		// _DecodeNextVideoFrame().
 		int gotVideoFrame = 0;
-		int encodedDataSizeInBytes = avcodec_decode_video2(fContext,
+		int encodedDataSizeInBytes = avcodec_decode_video2(fCodecContext,
 			fRawDecodedPicture, &gotVideoFrame, &fTempPacket);
 		if (encodedDataSizeInBytes < 0) {
 			TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %lld:"
@@ -1305,7 +1312,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 }
 
 
-/*!	\brief Applies all essential video input properties to fContext that were
+/*!	\brief Applies all essential video input properties to fCodecContext that were
 		passed to AVCodecDecoder when Setup() was called.
 
 	Note: This function must be called before the AVCodec is opened via
@@ -1313,16 +1320,16 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 	function avcodec_decode_video2() is undefined.
 
 	Essential properties applied from fInputFormat.u.encoded_video.output:
-		- display.line_width copied to fContext->width
-		- display.line_count copied to fContext->height
+		- display.line_width copied to fCodecContext->width
+		- display.line_count copied to fCodecContext->height
 		- pixel_width_aspect and pixel_height_aspect converted to
-		  fContext->sample_aspect_ratio
-		- field_rate converted to fContext->time_base and
-		  fContext->ticks_per_frame
+		  fCodecContext->sample_aspect_ratio
+		- field_rate converted to fCodecContext->time_base and
+		  fCodecContext->ticks_per_frame
 
 	Other essential properties being applied:
-		- fExtraData to fContext->extradata
-		- fExtraDataSize to fContext->extradata_size
+		- fExtraData to fCodecContext->extradata
+		- fExtraDataSize to fCodecContext->extradata_size
 */
 void
 AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
@@ -1330,23 +1337,23 @@ AVCodecDecoder::_ApplyEssentialVideoContainerPropertiesToContext()
 	media_raw_video_format containerProperties
 		= fInputFormat.u.encoded_video.output;
 
-	fContext->width = containerProperties.display.line_width;
-	fContext->height = containerProperties.display.line_count;
+	fCodecContext->width = containerProperties.display.line_width;
+	fCodecContext->height = containerProperties.display.line_count;
 
 	if (containerProperties.pixel_width_aspect > 0
 		&& containerProperties.pixel_height_aspect > 0) {
 		ConvertVideoAspectWidthAndHeightToAVCodecContext(
 			containerProperties.pixel_width_aspect,
-			containerProperties.pixel_height_aspect, *fContext);
+			containerProperties.pixel_height_aspect, *fCodecContext);
 	}
 
 	if (containerProperties.field_rate > 0.0) {
 		ConvertVideoFrameRateToAVCodecContext(containerProperties.field_rate,
-			*fContext);
+			*fCodecContext);
 	}
 
-	fContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
-	fContext->extradata_size = fExtraDataSize;
+	fCodecContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
+	fCodecContext->extradata_size = fExtraDataSize;
 }
 
 
@@ -1484,7 +1491,7 @@ AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 	if (postProcessStatus != B_OK)
 		return postProcessStatus;
 
-	ConvertAVCodecContextToVideoFrameRate(*fContext, fOutputFrameRate);
+	ConvertAVCodecContextToVideoFrameRate(*fCodecContext, fOutputFrameRate);
 
 #ifdef DEBUG
 	dump_ffframe_video(fRawDecodedPicture, "ffpict");
@@ -1523,7 +1530,7 @@ AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 	fTempPacket.size = 0;
 
 	int gotVideoFrame = 0;
-	avcodec_decode_video2(fContext,	fRawDecodedPicture, &gotVideoFrame,
+	avcodec_decode_video2(fCodecContext,	fRawDecodedPicture, &gotVideoFrame,
 		&fTempPacket);
 		// We are only interested in complete frames now, so ignore the return
 		// value.
@@ -1578,7 +1585,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.u.raw_video.first_active_line = 1;
 	fHeader.u.raw_video.line_count = fRawDecodedPicture->height;
 
-	ConvertAVCodecContextToVideoAspectWidthAndHeight(*fContext,
+	ConvertAVCodecContextToVideoAspectWidthAndHeight(*fCodecContext,
 		fHeader.u.raw_video.pixel_width_aspect,
 		fHeader.u.raw_video.pixel_height_aspect);
 
@@ -1629,12 +1636,12 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		rawPicture.linesize[2] = fRawDecodedPicture->linesize[2];
 		rawPicture.linesize[3] = fRawDecodedPicture->linesize[3];
 
-		avpicture_alloc(&deinterlacedPicture, fContext->pix_fmt, displayWidth,
+		avpicture_alloc(&deinterlacedPicture, fCodecContext->pix_fmt, displayWidth,
 			displayHeight);
 
 		// deinterlace implemented using avfilter
 		_ProcessFilterGraph(&deinterlacedPicture, &rawPicture,
-				fContext->pix_fmt, displayWidth, displayHeight);
+				fCodecContext->pix_fmt, displayWidth, displayHeight);
 		useDeinterlacedPicture = true;
 	}
 
@@ -1642,14 +1649,14 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	if (fSwsContext == NULL) {
 		fSwsContext = sws_getContext(displayWidth, displayHeight,
-			fContext->pix_fmt, displayWidth, displayHeight,
+			fCodecContext->pix_fmt, displayWidth, displayHeight,
 			colorspace_to_pixfmt(fOutputColorSpace),
 			SWS_FAST_BILINEAR, NULL, NULL, NULL);
 	}
 #else
 	if (fFormatConversionFunc == NULL) {
 		fFormatConversionFunc = resolve_colorspace(fOutputColorSpace,
-			fContext->pix_fmt, displayWidth, displayHeight);
+			fCodecContext->pix_fmt, displayWidth, displayHeight);
 	}
 #endif
 

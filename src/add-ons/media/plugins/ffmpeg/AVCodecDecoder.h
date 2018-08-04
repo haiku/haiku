@@ -116,7 +116,7 @@ private:
 
 			// FFmpeg related members
 			AVCodec*			fCodec;
-			AVCodecContext*		fContext;
+			AVCodecContext*		fCodecContext;
 			SwrContext*			fResampleContext;
 			uint8_t*			fDecodedData;
 			size_t				fDecodedDataSizeInBytes;
