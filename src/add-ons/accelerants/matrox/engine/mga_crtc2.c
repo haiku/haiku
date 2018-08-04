@@ -161,7 +161,7 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v)
 {
 	char msg[100];
 
-	sprintf(msg, "CRTC2: setting DPMS: ");
+	strlcpy(msg, "CRTC2: setting DPMS: ", sizeof(msg));
 
 	if (si->ps.card_type <= G400MAX)
 	{
@@ -169,13 +169,13 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v)
 		{
 			/* enable CRTC2 and don't touch the rest */
 			CR2W(CTL, ((CR2R(CTL) & 0xFFF0177E) | 0x01));
-			sprintf(msg, "%sdisplay on, hsync enabled, vsync enabled\n", msg);
+			strlcat(msg, "display on, hsync enabled, vsync enabled\n", sizeof(msg));
 		}
 		else
 		{
 			/* disable CRTC2 and don't touch the rest */
 			CR2W(CTL, (CR2R(CTL) & 0xFFF0177E));
-			sprintf(msg, "%sdisplay off, hsync disabled, vsync disabled\n", msg);
+			strlcat(msg, "display off, hsync disabled, vsync disabled\n", sizeof(msg));
 		}
 
 		LOG(4, (msg));
@@ -194,13 +194,13 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v)
 		{
 			/* enable CRTC2 and don't touch the rest */
 			CR2W(CTL, ((CR2R(CTL) & 0xFFF0177E) | 0x01));
-			sprintf(msg, "%sdisplay on, ", msg);
+			strlcat(msg, "display on, ", sizeof(msg));
 		}
 		else
 		{
 			/* disable CRTC2 and don't touch the rest */
 			CR2W(CTL, (CR2R(CTL) & 0xFFF0177E));
-			sprintf(msg, "%sdisplay off, ", msg);
+			strlcat(msg, "display off, ", sizeof(msg));
 		}
 
 		if (si->crossed_conns)
@@ -209,25 +209,25 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v)
 			{
 				/* enable DVI-A hsync */
 				temp &= ~0x01;
-				sprintf(msg, "%shsync enabled, ", msg);
+				strlcat(msg, "hsync enabled, ", sizeof(msg));
 			}
 			else
 			{
 				/* disable DVI-A hsync */
 				temp |= 0x01;
-				sprintf(msg, "%shsync disabled, ", msg);
+				strlcat(msg, "hsync disabled, ", sizeof(msg));
 			}
 			if (v)
 			{
 				/* enable DVI-A vsync */
 				temp &= ~0x02;
-				sprintf(msg, "%svsync enabled\n", msg);
+				strlcat(msg, "vsync enabled\n", sizeof(msg));
 			}
 			else
 			{
 				/* disable DVI-A vsync */
 				temp |= 0x02;
-				sprintf(msg, "%svsync disabled\n", msg);
+				strlcat(msg, "vsync disabled\n", sizeof(msg));
 			}
 		}
 		else
@@ -236,25 +236,25 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v)
 			{
 				/* enable HD15 hsync */
 				temp &= ~0x10;
-				sprintf(msg, "%shsync enabled, ", msg);
+				strlcat(msg, "hsync enabled, ", sizeof(msg));
 			}
 			else
 			{
 				/* disable HD15 hsync */
 				temp |= 0x10;
-				sprintf(msg, "%shsync disabled, ", msg);
+				strlcat(msg, "hsync disabled, ", sizeof(msg));
 			}
 			if (v)
 			{
 				/* enable HD15 vsync */
 				temp &= ~0x20;
-				sprintf(msg, "%svsync enabled\n", msg);
+				strlcat(msg, "vsync enabled\n", sizeof(msg));
 			}
 			else
 			{
 				/* disable HD15 vsync */
 				temp |= 0x20;
-				sprintf(msg, "%svsync disabled\n", msg);
+				strlcat(msg, "vsync disabled\n", sizeof(msg));
 			}
 		}
 

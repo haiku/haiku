@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <math.h>
 #include <OS.h>

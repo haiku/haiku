@@ -603,7 +603,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 	uint8 temp;
 	char msg[100];
 
-	sprintf(msg, "CRTC: setting DPMS: ");
+	strlcpy(msg, "CRTC: setting DPMS: ", sizeof(msg));
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -644,7 +644,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 				/* (confirmed OK on NV28 and NV34) */
 				//CRTCW(0x59, (CRTCR(0x59) | 0x01));
 
-				sprintf(msg, "%s(panel-)", msg);
+				strlcat(msg, "(panel-)", sizeof(msg));
 			}
 			else
 			{
@@ -656,12 +656,12 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 					/* note: this seems to be a write-only register. */
 					NV_REG32(NV32_LVDS_PWR) = 0x00000003;
 
-					sprintf(msg, "%s(panel-)", msg);
+					strlcat(msg, "(panel-)", sizeof(msg));
 				}
 			}
 		}
 
-		sprintf(msg, "%sdisplay on, ", msg);
+		strlcat(msg, "display on, ", sizeof(msg));
 	}
 	else
 	{
@@ -687,7 +687,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 				/* (confirmed OK on NV28 and NV34) */
 				//CRTCW(0x59, (CRTCR(0x59) & 0xfe));
 
-				sprintf(msg, "%s(panel-)", msg);
+				strlcat(msg, "(panel-)", sizeof(msg));
 			}
 			else
 			{
@@ -699,33 +699,33 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 					/* note: this seems to be a write-only register. */
 					NV_REG32(NV32_LVDS_PWR) = 0x00000007;
 
-					sprintf(msg, "%s(panel-)", msg);
+					strlcat(msg, "(panel-)", sizeof(msg));
 				}
 			}
 		}
 
-		sprintf(msg, "%sdisplay off, ", msg);
+		strlcat(msg, "display off, ", sizeof(msg));
 	}
 
 	if (h)
 	{
 		CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x7f));
-		sprintf(msg, "%shsync enabled, ", msg);
+		strlcat(msg, "hsync enabled, ", sizeof(msg));
 	}
 	else
 	{
 		CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x80));
-		sprintf(msg, "%shsync disabled, ", msg);
+		strlcat(msg, "hsync disabled, ", sizeof(msg));
 	}
 	if (v)
 	{
 		CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xbf));
-		sprintf(msg, "%svsync enabled\n", msg);
+		strlcat(msg, "vsync enabled\n", sizeof(msg));
 	}
 	else
 	{
 		CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x40));
-		sprintf(msg, "%svsync disabled\n", msg);
+		strlcat(msg, "vsync disabled\n", sizeof(msg));
 	}
 
 	LOG(4, (msg));

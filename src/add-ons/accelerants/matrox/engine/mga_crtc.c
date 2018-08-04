@@ -286,37 +286,37 @@ status_t gx00_crtc_dpms(bool display, bool h, bool v) // MIL2
 {
 	char msg[100];
 
-	sprintf(msg, "CRTC: setting DPMS: ");
+	strlcpy(msg, "CRTC: setting DPMS: ", sizeof(msg));
 
 	if (display)
 	{
 		VGAW_I(SEQ,1, 0x00);
-		sprintf(msg, "%sdisplay on, ", msg);
+		strlcat(msg, "display on, ", sizeof(msg));
 	}
 	else
 	{
 		VGAW_I(SEQ,1, 0x20);
-		sprintf(msg, "%sdisplay off, ", msg);
+		strlcat(msg, "display off, ", sizeof(msg));
 	}
 	if (h)
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) & 0xef));
-		sprintf(msg, "%shsync enabled, ", msg);
+		strlcat(msg, "hsync enabled, ", sizeof(msg));
 	}
 	else
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) | 0x10));
-		sprintf(msg, "%shsync disabled, ", msg);
+		strlcat(msg, "hsync disabled, ", sizeof(msg));
 	}
 	if (v)
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) & 0xdf));
-		sprintf(msg, "%svsync enabled\n", msg);
+		strlcat(msg, "vsync enabled\n", sizeof(msg));
 	}
 	else
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) | 0x20));
-		sprintf(msg, "%svsync disabled\n", msg);
+		strlcat(msg, "vsync disabled\n", sizeof(msg));
 	}
 
 	LOG(4, (msg));
