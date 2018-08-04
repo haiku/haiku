@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2018, Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the GNU L-GPL license.
  */
 
@@ -118,30 +119,22 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		return B_ERROR;
 	}
 
-//	TRACE("  fStream->codec: %p\n", fStream->codec);
+//	TRACE("  fStream->codecpar: %p\n", fStream->codecpar);
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
 	// or something similar...
-	fStream->codec->codec_id = (CodecID)codecInfo->sub_id;
-	if (fStream->codec->codec_id == AV_CODEC_ID_NONE)
-		fStream->codec->codec_id = raw_audio_codec_id_for(*format);
+	fStream->codecpar->codec_id = (CodecID)codecInfo->sub_id;
+	if (fStream->codecpar->codec_id == AV_CODEC_ID_NONE)
+		fStream->codecpar->codec_id = raw_audio_codec_id_for(*format);
 
 	// Setup the stream according to the media format...
 	if (format->type == B_MEDIA_RAW_VIDEO) {
-		fStream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-#if GET_CONTEXT_DEFAULTS
-// NOTE: API example does not do this:
-		avcodec_get_context_defaults(fStream->codec);
-#endif
-		// frame rate
-		fStream->codec->time_base.den = (int)format->u.raw_video.field_rate;
-		fStream->codec->time_base.num = 1;
-
+		fStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
 		fStream->time_base.den = (int)format->u.raw_video.field_rate;
 		fStream->time_base.num = 1;
 
 		// video size
-		fStream->codec->width = format->u.raw_video.display.line_width;
-		fStream->codec->height = format->u.raw_video.display.line_count;
+		fStream->codecpar->width = format->u.raw_video.display.line_width;
+		fStream->codecpar->height = format->u.raw_video.display.line_count;
 		// pixel aspect ratio
 		fStream->sample_aspect_ratio.num
 			= format->u.raw_video.pixel_width_aspect;
@@ -150,51 +143,46 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		if (fStream->sample_aspect_ratio.num == 0
 			|| fStream->sample_aspect_ratio.den == 0) {
 			av_reduce(&fStream->sample_aspect_ratio.num,
-				&fStream->sample_aspect_ratio.den, fStream->codec->width,
-				fStream->codec->height, 255);
+				&fStream->sample_aspect_ratio.den, fStream->codecpar->width,
+				fStream->codecpar->height, 255);
 		}
 
-		fStream->codec->gop_size = 12;
-
-		fStream->codec->sample_aspect_ratio = fStream->sample_aspect_ratio;
+		fStream->codecpar->sample_aspect_ratio = fStream->sample_aspect_ratio;
 
 		// Use the last supported pixel format of the AVCodec, which we hope
 		// is the one with the best quality (true for all currently supported
 		// encoders).
-//		AVCodec* codec = fStream->codec->codec;
+//		AVCodec* codec = fStream->codecpar->codec;
 //		for (int i = 0; codec->pix_fmts[i] != PIX_FMT_NONE; i++)
-//			fStream->codec->pix_fmt = codec->pix_fmts[i];
-		fStream->codec->pix_fmt = AV_PIX_FMT_YUV420P;
+//			fStream->codecpar->pix_fmt = codec->pix_fmts[i];
+		fStream->codecpar->format = AV_PIX_FMT_YUV420P;
 
 	} else if (format->type == B_MEDIA_RAW_AUDIO) {
-		fStream->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-#if GET_CONTEXT_DEFAULTS
-// NOTE: API example does not do this:
-		avcodec_get_context_defaults(fStream->codec);
-#endif
+		fStream->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
+
 		// frame rate
-		fStream->codec->sample_rate = (int)format->u.raw_audio.frame_rate;
+		fStream->codecpar->sample_rate = (int)format->u.raw_audio.frame_rate;
 
 		// channels
-		fStream->codec->channels = format->u.raw_audio.channel_count;
+		fStream->codecpar->channels = format->u.raw_audio.channel_count;
 
 		// set fStream to the audio format we want to use. This is only a hint
 		// (each encoder has a different set of accepted formats)
 		switch (format->u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
-				fStream->codec->sample_fmt = AV_SAMPLE_FMT_FLT;
+				fStream->codecpar->format = AV_SAMPLE_FMT_FLT;
 				break;
 			case media_raw_audio_format::B_AUDIO_DOUBLE:
-				fStream->codec->sample_fmt = AV_SAMPLE_FMT_DBL;
+				fStream->codecpar->format = AV_SAMPLE_FMT_DBL;
 				break;
 			case media_raw_audio_format::B_AUDIO_INT:
-				fStream->codec->sample_fmt = AV_SAMPLE_FMT_S32;
+				fStream->codecpar->format = AV_SAMPLE_FMT_S32;
 				break;
 			case media_raw_audio_format::B_AUDIO_SHORT:
-				fStream->codec->sample_fmt = AV_SAMPLE_FMT_S16;
+				fStream->codecpar->format = AV_SAMPLE_FMT_S16;
 				break;
 			case media_raw_audio_format::B_AUDIO_UCHAR:
-				fStream->codec->sample_fmt = AV_SAMPLE_FMT_U8;
+				fStream->codecpar->format = AV_SAMPLE_FMT_U8;
 				break;
 
 			case media_raw_audio_format::B_AUDIO_CHAR:
@@ -205,24 +193,24 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 		// Now negociate the actual format with the encoder
 		// First check if the requested format is acceptable
-		AVCodec* codec = avcodec_find_encoder(fStream->codec->codec_id);
+		AVCodec* codec = avcodec_find_encoder(fStream->codecpar->codec_id);
 
 		if (codec == NULL)
 			return B_MEDIA_BAD_FORMAT;
 
 		const enum AVSampleFormat *p = codec->sample_fmts;
 		for (; *p != -1; p++) {
-			if (*p == fStream->codec->sample_fmt)
+			if (*p == fStream->codecpar->format)
 				break;
 		}
 		// If not, force one of the acceptable ones
 		if (*p == -1) {
-			fStream->codec->sample_fmt = codec->sample_fmts[0];
+			fStream->codecpar->format = codec->sample_fmts[0];
 
 			// And finally set the format struct to the accepted format. It is
 			// then up to the caller to make sure we get data matching that
 			// format.
-			switch (fStream->codec->sample_fmt) {
+			switch (fStream->codecpar->format) {
 				case AV_SAMPLE_FMT_FLT:
 					format->u.raw_audio.format
 						= media_raw_audio_format::B_AUDIO_FLOAT;
@@ -254,43 +242,39 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 			switch (format->u.raw_audio.channel_count) {
 				default:
 				case 2:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_STEREO;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
 					break;
 				case 1:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_MONO;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_MONO;
 					break;
 				case 3:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_SURROUND;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_SURROUND;
 					break;
 				case 4:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_QUAD;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_QUAD;
 					break;
 				case 5:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_5POINT0;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_5POINT0;
 					break;
 				case 6:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_5POINT1;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_5POINT1;
 					break;
 				case 8:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_7POINT1;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_7POINT1;
 					break;
 				case 10:
-					fStream->codec->channel_layout = AV_CH_LAYOUT_7POINT1_WIDE;
+					fStream->codecpar->channel_layout = AV_CH_LAYOUT_7POINT1_WIDE;
 					break;
 			}
 		} else {
 			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
-			fStream->codec->channel_layout = format->u.raw_audio.channel_mask;
+			fStream->codecpar->channel_layout = format->u.raw_audio.channel_mask;
 		}
 	}
 
-	// Some formats want stream headers to be separate
-	if ((fContext->oformat->flags & AVFMT_GLOBALHEADER) != 0)
-		fStream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
 		fStream->time_base.num, fStream->time_base.den,
-		fStream->codec->time_base.num, fStream->codec->time_base.den);
+		fStream->codecpar->time_base.num, fStream->codecpar->time_base.den);
 
 #if 0
 	// Write the AVCodecContext pointer to the user data section of the
@@ -337,7 +321,7 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	TRACE_PACKET("  PTS: %lld (stream->time_base: (%d/%d), "
 		"codec->time_base: (%d/%d))\n", fPacket.pts,
 		fStream->time_base.num, fStream->time_base.den,
-		fStream->codec->time_base.num, fStream->codec->time_base.den);
+		fStream->codecpar->time_base.num, fStream->codecpar->time_base.den);
 
 #if 0
 	// TODO: Eventually, we need to write interleaved packets, but
@@ -395,10 +379,13 @@ AVFormatWriter::~AVFormatWriter()
 #if OPEN_CODEC_CONTEXT
 		// We only need to close the AVCodecContext when we opened it.
 		// This is experimental, see CommitHeader().
+
+		// NOTE: Since the introduction of AVCodecParameters
+		// I am not sure this logic is correct.
 		if (fCodecOpened)
 			avcodec_close(fContext->streams[i]->codec);
 #endif
-		av_freep(&fContext->streams[i]->codec);
+		av_freep(&fContext->streams[i]->codecpar);
 		av_freep(&fContext->streams[i]);
     }
 

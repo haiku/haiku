@@ -1,6 +1,7 @@
 /*
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2014, Colin Günther <coling@gmx.de>
+ * Copyright 2018, Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the GNU L-GPL license.
  */
 #ifndef UTILITIES_H
@@ -68,6 +69,42 @@ ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 	av_reduce(&pixelAspectRatio.num, &pixelAspectRatio.den,
 		contextIn.width * contextIn.sample_aspect_ratio.num,
 		contextIn.height * contextIn.sample_aspect_ratio.den,
+		1024 * 1024);
+
+	pixelWidthAspectOut = static_cast<int16>(pixelAspectRatio.num);
+	pixelHeightAspectOut = static_cast<int16>(pixelAspectRatio.den);
+}
+
+
+inline void
+ConvertAVCodecParametersToVideoAspectWidthAndHeight(AVCodecParameters& parametersIn,
+	uint16& pixelWidthAspectOut, uint16& pixelHeightAspectOut)
+{
+	assert(parametersIn.sample_aspect_ratio.num >= 0);
+	assert(parametersIn.width > 0);
+	assert(parametersIn.height > 0);
+
+	// The following code is based on code originally located in
+	// AVFormatReader::Stream::Init() and thus should be copyrighted to Stephan
+	// Aßmus
+	AVRational pixelAspectRatio;
+
+	if (parametersIn.sample_aspect_ratio.num == 0
+		|| parametersIn.sample_aspect_ratio.den == 0) {
+		// AVCodecContext doesn't contain a video aspect ratio, so calculate it
+		// ourselve based solely on the video dimensions
+		av_reduce(&pixelAspectRatio.num, &pixelAspectRatio.den, parametersIn.width,
+			parametersIn.height, 1024 * 1024);
+
+		pixelWidthAspectOut = static_cast<int16>(pixelAspectRatio.num);
+		pixelHeightAspectOut = static_cast<int16>(pixelAspectRatio.den);
+		return;
+	}
+
+	// AVCodecContext contains a video aspect ratio, so use it
+	av_reduce(&pixelAspectRatio.num, &pixelAspectRatio.den,
+		parametersIn.width * parametersIn.sample_aspect_ratio.num,
+		parametersIn.height * parametersIn.sample_aspect_ratio.den,
 		1024 * 1024);
 
 	pixelWidthAspectOut = static_cast<int16>(pixelAspectRatio.num);
