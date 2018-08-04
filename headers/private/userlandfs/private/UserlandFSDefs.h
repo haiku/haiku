@@ -15,7 +15,7 @@ struct fs_init_info {
 	FSCapabilities	capabilities;
 	client_fs_type	clientFSType;
 	int32			portInfoCount;
-	Port::Info		portInfos[0];
+	Port::Info		portInfos[];
 };
 
 }	// namespace UserlandFSUtil
