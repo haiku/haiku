@@ -11,6 +11,7 @@
 
 #include "DebugSupport.h"
 #include "Package.h"
+#include "Utils.h"
 
 
 PackageNode::PackageNode(Package* package, mode_t mode)
@@ -100,4 +101,11 @@ void
 PackageNode::UnsetIndexCookie(void* attributeCookie)
 {
 	((PackageNodeAttribute*)attributeCookie)->SetIndexCookie(NULL);
+}
+
+
+bool
+PackageNode::operator<(const PackageNode& other) const
+{
+	return fModifiedTime < other.fModifiedTime;
 }

@@ -117,7 +117,7 @@ UnpackingLeafNode::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 
 	PackageLeafNode* headNode = fPackageNodes.Head();
 	bool isNewest = headNode == NULL
-		|| packageLeafNode->ModifiedTime() > headNode->ModifiedTime();
+		|| packageLeafNode > headNode;
 
 	if (isNewest) {
 		fPackageNodes.Add(packageLeafNode);
@@ -149,7 +149,7 @@ UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode, dev_t deviceID)
 		it.Next();
 			// skip the first one
 		while (PackageLeafNode* otherNode = it.Next()) {
-			if (otherNode->ModifiedTime() > newestNode->ModifiedTime())
+			if (*otherNode > *newestNode)
 				newestNode = otherNode;
 		}
 
@@ -187,8 +187,7 @@ UnpackingLeafNode::WillBeFirstPackageNode(PackageNode* packageNode) const
 		return false;
 
 	PackageLeafNode* headNode = fPackageNodes.Head();
-	return headNode == NULL
-		|| packageLeafNode->ModifiedTime() > headNode->ModifiedTime();
+	return headNode == NULL || *packageLeafNode > *headNode;
 }
 
 void
