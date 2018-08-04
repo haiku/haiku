@@ -76,7 +76,7 @@ public:
 									size_t size, uint32 flags);
 
 private:
-			AVFormatContext*	fContext;
+			AVFormatContext*	fFormatContext;
 			AVStream*			fStream;
 			AVPacket			fPacket;
 			// Since different threads may write to the target,
@@ -89,7 +89,7 @@ private:
 AVFormatWriter::StreamCookie::StreamCookie(AVFormatContext* context,
 		BLocker* streamLock)
 	:
-	fContext(context),
+	fFormatContext(context),
 	fStream(NULL),
 	fStreamLock(streamLock)
 {
@@ -110,8 +110,8 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 	BAutolock _(fStreamLock);
 
-	fPacket.stream_index = fContext->nb_streams;
-	fStream = avformat_new_stream(fContext, NULL);
+	fPacket.stream_index = fFormatContext->nb_streams;
+	fStream = avformat_new_stream(fFormatContext, NULL);
 	fStream->id = fPacket.stream_index;
 
 	if (fStream == NULL) {
@@ -329,11 +329,11 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	// more than one stream. For the moment, this crashes in AVPacket
 	// shuffling inside libavformat. Maybe if we want to use this, we
 	// need to allocate a separate AVPacket and copy the chunk buffer.
-	int result = av_interleaved_write_frame(fContext, &fPacket);
+	int result = av_interleaved_write_frame(fFormatContext, &fPacket);
 	if (result < 0)
 		TRACE("  av_interleaved_write_frame(): %d\n", result);
 #else
-	int result = av_write_frame(fContext, &fPacket);
+	int result = av_write_frame(fFormatContext, &fPacket);
 	if (result < 0)
 		TRACE("  av_write_frame(): %d\n", result);
 #endif
@@ -360,7 +360,7 @@ AVFormatWriter::StreamCookie::AddTrackInfo(uint32 code,
 
 AVFormatWriter::AVFormatWriter()
 	:
-	fContext(avformat_alloc_context()),
+	fFormatContext(avformat_alloc_context()),
 	fCodecOpened(false),
 	fHeaderError(-1),
 	fIOContext(NULL),
@@ -375,7 +375,7 @@ AVFormatWriter::~AVFormatWriter()
 	TRACE("AVFormatWriter::~AVFormatWriter\n");
 
 	// Free the streams and close the AVCodecContexts
-    for(unsigned i = 0; i < fContext->nb_streams; i++) {
+    for(unsigned i = 0; i < fFormatContext->nb_streams; i++) {
 #if OPEN_CODEC_CONTEXT
 		// We only need to close the AVCodecContext when we opened it.
 		// This is experimental, see CommitHeader().
@@ -383,13 +383,13 @@ AVFormatWriter::~AVFormatWriter()
 		// NOTE: Since the introduction of AVCodecParameters
 		// I am not sure this logic is correct.
 		if (fCodecOpened)
-			avcodec_close(fContext->streams[i]->codec);
+			avcodec_close(fFormatContext->streams[i]->codec);
 #endif
-		av_freep(&fContext->streams[i]->codecpar);
-		av_freep(&fContext->streams[i]);
+		av_freep(&fFormatContext->streams[i]->codecpar);
+		av_freep(&fFormatContext->streams[i]);
     }
 
-	av_free(fContext);
+	av_free(fFormatContext);
 	av_free(fIOContext->buffer);
 	av_free(fIOContext);
 }
@@ -417,19 +417,19 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 	}
 
 	// Setup I/O hooks. This seems to be enough.
-	fContext->pb = fIOContext;
+	fFormatContext->pb = fIOContext;
 
 	// Set the AVOutputFormat according to fileFormat...
-	fContext->oformat = av_guess_format(fileFormat->short_name,
+	fFormatContext->oformat = av_guess_format(fileFormat->short_name,
 		fileFormat->file_extension, fileFormat->mime_type);
-	if (fContext->oformat == NULL) {
+	if (fFormatContext->oformat == NULL) {
 		TRACE("  failed to find AVOuputFormat for %s\n",
 			fileFormat->short_name);
 		return B_NOT_SUPPORTED;
 	}
 
 	TRACE("  found AVOuputFormat for %s: %s\n", fileFormat->short_name,
-		fContext->oformat->name);
+		fFormatContext->oformat->name);
 
 	return B_OK;
 }
@@ -449,15 +449,15 @@ AVFormatWriter::CommitHeader()
 {
 	TRACE("AVFormatWriter::CommitHeader\n");
 
-	if (fContext == NULL)
+	if (fFormatContext == NULL)
 		return B_NO_INIT;
 
 	if (fCodecOpened)
 		return B_NOT_ALLOWED;
 
 #if OPEN_CODEC_CONTEXT
-	for (unsigned i = 0; i < fContext->nb_streams; i++) {
-		AVStream* stream = fContext->streams[i];
+	for (unsigned i = 0; i < fFormatContext->nb_streams; i++) {
+		AVStream* stream = fFormatContext->streams[i];
 		// NOTE: Experimental, this should not be needed. Especially, since
 		// we have no idea (in the future) what CodecID some encoder uses,
 		// it may be an encoder from a different plugin.
@@ -476,14 +476,14 @@ AVFormatWriter::CommitHeader()
 	// We need to close the codecs we opened, even in case of failure.
 	fCodecOpened = true;
 
-	fHeaderError = avformat_write_header(fContext, NULL);
+	fHeaderError = avformat_write_header(fFormatContext, NULL);
 	if (fHeaderError < 0)
 		TRACE("  avformat_write_header(): %d\n", fHeaderError);
 
 	#ifdef TRACE_AVFORMAT_WRITER
 	TRACE("  wrote header\n");
-	for (unsigned i = 0; i < fContext->nb_streams; i++) {
-		AVStream* stream = fContext->streams[i];
+	for (unsigned i = 0; i < fFormatContext->nb_streams; i++) {
+		AVStream* stream = fFormatContext->streams[i];
 		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
 			i, stream->time_base.num, stream->time_base.den,
 			stream->codec->time_base.num, stream->codec->time_base.den);
@@ -508,7 +508,7 @@ AVFormatWriter::Close()
 {
 	TRACE("AVFormatWriter::Close\n");
 
-	if (fContext == NULL)
+	if (fFormatContext == NULL)
 		return B_NO_INIT;
 
 	if (!fCodecOpened)
@@ -519,7 +519,7 @@ AVFormatWriter::Close()
 	if (fHeaderError != 0)
 		return B_ERROR;
 
-	int result = av_write_trailer(fContext);
+	int result = av_write_trailer(fFormatContext);
 	if (result < 0)
 		TRACE("  av_write_trailer(): %d\n", result);
 	return result == 0 ? B_OK : B_ERROR;
@@ -540,7 +540,7 @@ AVFormatWriter::AllocateCookie(void** _cookie, media_format* format,
 	if (_cookie == NULL)
 		return B_BAD_VALUE;
 
-	StreamCookie* cookie = new(std::nothrow) StreamCookie(fContext,
+	StreamCookie* cookie = new(std::nothrow) StreamCookie(fFormatContext,
 		&fStreamLock);
 
 	status_t ret = cookie->Init(format, codecInfo);
