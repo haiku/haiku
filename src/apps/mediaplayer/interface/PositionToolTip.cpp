@@ -57,7 +57,7 @@ public:
 		char durationText[32];
 		duration_to_string(fDuration, durationText, sizeof(durationText));
 
-		char text[64];
+		char text[66];
 		snprintf(text, sizeof(text), "%s / %s", positionText, durationText);
 		SetText(text);
 
