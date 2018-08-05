@@ -64,9 +64,9 @@ struct BPackageInfo::StringBuilder {
 		_Write(attribute);
 		_Write('\t');
 
-		if ((flags & B_PACKAGE_FLAG_APPROVE_LICENSE) == 0)
+		if ((flags & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
 			_Write(" approve_license");
-		if ((flags & B_PACKAGE_FLAG_SYSTEM_PACKAGE) == 0)
+		if ((flags & B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0)
 			_Write(" system_package");
 
 		_Write('\n');
