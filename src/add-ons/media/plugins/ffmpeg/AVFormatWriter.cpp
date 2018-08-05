@@ -268,7 +268,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
 		fStream->time_base.num, fStream->time_base.den,
-		fStream->code->time_base.num, fStream->codec->time_base.den);
+		fStream->codec->time_base.num, fStream->codec->time_base.den);
 
 #if 0
 	// Write the AVCodecContext pointer to the user data section of the

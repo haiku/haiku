@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Stephan Amßus <superstippi@gmx.de>
+ * Copyright 2018, Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
