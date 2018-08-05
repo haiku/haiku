@@ -12,7 +12,7 @@
 
 #include <drivers/bus/FDT.h>
 
-extern char *gFDT;
+char *gFDT;
 
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)

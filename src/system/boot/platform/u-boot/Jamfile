@@ -2,8 +2,11 @@ SubDir HAIKU_TOP src system boot platform u-boot ;
 
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 SubDirHdrs $(HAIKU_TOP) headers private kernel platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ;
+
+UseLibraryHeaders [ FDirName libfdt ] ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -18,17 +21,6 @@ UsePrivateHeaders [ FDirName kernel arch generic ] ;
 	SubDirCcFlags $(defines) -g3 -O0 ;
 	SubDirC++Flags $(defines) -fno-rtti -g3 -O0 ;
 }
-
-UseLibraryHeaders [ FDirName libfdt ] ;
-
-local libFDTSources =
-	fdt.c
-	fdt_ro.c
-	fdt_rw.c
-	fdt_strerror.c
-	fdt_sw.c
-	fdt_wip.c
-;
 
 # we fake NetBSD since we don't have an OS ID yet for uimage,
 # and we also fake a netbsd loader anyway.
@@ -58,15 +50,12 @@ BootMergeObject boot_platform_u-boot_common.o :
 	cpu.cpp
 	uimage.cpp
 	video.cpp
-	fdt_serial.cpp
-	fdt_support.cpp
 	openfirmware.cpp
 	$(genericPlatformSources)
-	$(libFDTSources)
-
-
 	:
-	: boot_platform_generic.a
+	:
+	boot_platform_generic.a
+	boot_fdt.a
 ;
 
 BootMergeObject boot_platform_u-boot.o :
@@ -281,11 +270,8 @@ Depends haiku-mmc-image : haiku-$(TARGET_KERNEL_ARCH).mmc ;
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
-SEARCH on [ FGristFiles openfirmware.cpp fdt_serial.cpp fdt_support.cpp ]
+SEARCH on [ FGristFiles openfirmware.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel platform u-boot ] ;
-
-SEARCH on [ FGristFiles $(libFDTSources) ]
-	= [ FDirName $(HAIKU_TOP) src libs libfdt ] ;
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.

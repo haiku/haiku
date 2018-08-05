@@ -12,9 +12,25 @@ local libFDTSources =
 	fdt_wip.c
 ;
 
+# Do we want / need these in the bus as well?
+local earlyFDTHelpers =
+	fdt_serial.cpp
+	fdt_support.cpp
+;
+
 KernelAddon fdt :
 	fdt.cpp
 #	$(libFDTSources)
+	;
+
+BootStaticLibrary boot_fdt :
+	$(earlyFDTHelpers)
+	$(libFDTSources)
+	;
+
+KernelStaticLibrary kernel_fdt :
+	$(earlyFDTHelpers)
+	$(libFDTSources)
 	;
 
 SEARCH on [ FGristFiles $(libFDTSources) ]

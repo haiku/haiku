@@ -53,6 +53,9 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	arch_asm.S
+
+	# serial uart
+	fdt_serial.cpp
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
 
@@ -70,6 +73,7 @@ KernelMergeObject kernel_arch_ppc.o :
 	:
 	arch_ppc_classic.o
 	arch_ppc_460.o
+	kernel_fdt.a
 ;
 
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;

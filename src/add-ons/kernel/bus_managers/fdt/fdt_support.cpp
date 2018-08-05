@@ -41,14 +41,6 @@ static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 #endif
 
 
-#ifndef _BOOT_MODE
-/* the bootloader has it in asm code to avoid it ending up in .bss */
-void *gFDT;
-#else
-extern void *gFDT;
-#endif
-
-
 #ifdef FDT_DUMP_PROP_VALUES
 static void dump_hex(const char *data, int32 len, int depth)
 {

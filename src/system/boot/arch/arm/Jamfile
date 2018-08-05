@@ -1,9 +1,8 @@
 SubDir HAIKU_TOP src system boot arch arm ;
 
-UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
-
-#XXX: should not be needed here
 UseLibraryHeaders [ FDirName libfdt ] ;
+UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
 
 {
 	local defines = _BOOT_MODE ;

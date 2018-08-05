@@ -15,11 +15,9 @@
 #include <real_time_clock.h>
 #include <util/kernel_cpp.h>
 
+#include "fdt_serial.h"
 
-// TODO: declare this in some header
-extern void *gFDT;
-extern DebugUART *debug_uart_from_fdt(const void *fdt);
-
+void *gFDT;
 static PPCPlatform *sPPCPlatform;
 
 
