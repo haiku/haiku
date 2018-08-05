@@ -268,7 +268,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
 		fStream->time_base.num, fStream->time_base.den,
-		fStream->codecpar->time_base.num, fStream->codecpar->time_base.den);
+		fStream->code->time_base.num, fStream->codec->time_base.den);
 
 #if 0
 	// Write the AVCodecContext pointer to the user data section of the
@@ -317,7 +317,7 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	TRACE_PACKET("  PTS: %lld (stream->time_base: (%d/%d), "
 		"codec->time_base: (%d/%d))\n", fPacket.pts,
 		fStream->time_base.num, fStream->time_base.den,
-		fStream->codecpar->time_base.num, fStream->codecpar->time_base.den);
+		fStream->codec->time_base.num, fStream->codec->time_base.den);
 
 #if 0
 	// TODO: Eventually, we need to write interleaved packets, but
