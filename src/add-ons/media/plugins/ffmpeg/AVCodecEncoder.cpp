@@ -723,28 +723,28 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 				fCodecContext->time_base.num, fCodecContext->time_base.den);
 		}
 
-		// Setup media_encode_info, most important is the time stamp.
-		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
-			/ fInputFormat.u.raw_video.field_rate);
+		if (gotPacket == 1) {
+			// Setup media_encode_info, most important is the time stamp.
+			info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
+				/ fInputFormat.u.raw_video.field_rate);
 
-		info->flags = 0;
-		if (fCodecContext->coded_frame->key_frame)
-			info->flags |= B_MEDIA_KEY_FRAME;
+			info->flags = 0;
+			if (fCodecContext->coded_frame->key_frame)
+				info->flags |= B_MEDIA_KEY_FRAME;
 
-		// Write the chunk
-		ret = WriteChunk(pkt.data, pkt.size, info);
-		if (ret != B_OK) {
-			TRACE("  error writing chunk: %s\n", strerror(ret));
-			break;
+			// Write the chunk
+			ret = WriteChunk(pkt.data, pkt.size, info);
+			if (ret != B_OK) {
+				TRACE("  error writing chunk: %s\n", strerror(ret));
+				break;
+			}
 		}
-
 		// Skip to the next frame (but usually, there is only one to encode
 		// for video).
 		frameCount--;
 		fFramesWritten++;
 		buffer = (const void*)((const uint8*)buffer + bufferSize);
 	}
-
 	return ret;
 }
 
