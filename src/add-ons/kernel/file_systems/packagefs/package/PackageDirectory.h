@@ -26,6 +26,10 @@ public:
 			const PackageNodeList& Children() const
 									{ return fChildren; }
 
+			bool				operator<(const PackageDirectory& other) const;
+	inline	bool				operator>(const PackageDirectory& other) const
+									{ return other < *this; }
+
 private:
 			PackageNodeList		fChildren;
 };
