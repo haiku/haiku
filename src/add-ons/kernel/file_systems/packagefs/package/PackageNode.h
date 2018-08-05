@@ -86,6 +86,7 @@ public:
 
 protected:
 			Package*			fPackage;
+			uint32				fPackageFlags;
 			PackageDirectory*	fParent;
 			String				fName;
 			mode_t				fMode;

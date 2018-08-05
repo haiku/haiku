@@ -268,6 +268,10 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 				break;
 			}
 
+			case B_PACKAGE_INFO_FLAGS:
+				fPackage->SetFlags(value.unsignedInt);
+				break;
+
 			case B_PACKAGE_INFO_ARCHITECTURE:
 				if (value.unsignedInt >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT)
 					RETURN_ERROR(B_BAD_VALUE);
@@ -816,6 +820,7 @@ Package::Package(::Volume* volume, PackagesDirectory* directory, dev_t deviceID,
 	fInstallPath(),
 	fVersionedName(),
 	fVersion(NULL),
+	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fLinkDirectory(NULL),
 	fFD(-1),

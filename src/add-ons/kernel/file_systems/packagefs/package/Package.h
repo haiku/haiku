@@ -7,6 +7,7 @@
 
 
 #include <package/hpkg/DataReader.h>
+#include <package/PackageFlags.h>
 #include <package/PackageArchitecture.h>
 
 #include <Referenceable.h>
@@ -69,6 +70,11 @@ public:
 			::Version*			Version() const
 									{ return fVersion; }
 
+			void				SetFlags(uint32 flags)
+									{ fFlags = flags; }
+			uint32				Flags() const
+									{ return fFlags; }
+
 			void				SetArchitecture(
 									BPackageArchitecture architecture)
 									{ fArchitecture = architecture; }
@@ -123,6 +129,7 @@ private:
 			String				fInstallPath;
 			String				fVersionedName;
 			::Version*			fVersion;
+			uint32				fFlags;
 			BPackageArchitecture fArchitecture;
 			PackageLinkDirectory* fLinkDirectory;
 			int					fFD;
