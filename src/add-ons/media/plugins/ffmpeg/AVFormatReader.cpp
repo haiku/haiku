@@ -49,9 +49,6 @@ extern "C" {
 #define ERROR(a...) fprintf(stderr, a)
 
 
-static const int64 kNoPTSValue = AV_NOPTS_VALUE;
-
-
 static uint32
 avformat_to_beos_byte_order(AVSampleFormat format)
 {
@@ -432,9 +429,9 @@ StreamBase::Duration() const
 	// for a couple of streams and are in line with the documentation, but
 	// unfortunately, libavformat itself seems to set the time_base and
 	// duration wrongly sometimes. :-(
-	if ((int64)fStream->duration != kNoPTSValue)
+	if ((int64)fStream->duration != AV_NOPTS_VALUE)
 		return _ConvertFromStreamTimeBase(fStream->duration);
-	else if ((int64)fContext->duration != kNoPTSValue)
+	else if ((int64)fContext->duration != AV_NOPTS_VALUE)
 		return (bigtime_t)fContext->duration;
 
 	return 0;
@@ -508,7 +505,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 			// know where we really seeked.
 			fReusePacket = false;
 			if (_NextPacket(true) == B_OK) {
-				while (fPacket.pts == kNoPTSValue) {
+				while (fPacket.pts == AV_NOPTS_VALUE) {
 					fReusePacket = false;
 					if (_NextPacket(true) != B_OK)
 						return B_ERROR;
@@ -642,7 +639,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 		fReusePacket = false;
 		if (_NextPacket(true) == B_OK) {
-			if (fPacket.pts != kNoPTSValue)
+			if (fPacket.pts != AV_NOPTS_VALUE)
 				foundTime = _ConvertFromStreamTimeBase(fPacket.pts);
 			else
 				TRACE_SEEK("  no PTS in packet after seeking\n");
@@ -704,9 +701,9 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 		// series (even for videos that contain B-frames).
 		// \see http://git.videolan.org/?p=ffmpeg.git;a=blob;f=libavformat/avformat.h;h=1e8a6294890d580cd9ebc684eaf4ce57c8413bd8;hb=9153b33a742c4e2a85ff6230aea0e75f5a8b26c2#l1623
 		bigtime_t presentationTimeStamp;
-		if (fPacket.dts != kNoPTSValue)
+		if (fPacket.dts != AV_NOPTS_VALUE)
 			presentationTimeStamp = fPacket.dts;
-		else if (fPacket.pts != kNoPTSValue)
+		else if (fPacket.pts != AV_NOPTS_VALUE)
 			presentationTimeStamp = fPacket.pts;
 		else
 			presentationTimeStamp = lastStreamDTS;
@@ -740,7 +737,7 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 //	static bigtime_t lastPrintTime = system_time();
 //	static BLocker printLock;
 //	if (fStream->index < 2) {
-//		if (fPacket.pts != kNoPTSValue)
+//		if (fPacket.pts != AV_NOPTS_VALUE)
 //			pts[fStream->index] = _ConvertFromStreamTimeBase(fPacket.pts);
 //		printLock.Lock();
 //		bigtime_t now = system_time();
@@ -872,7 +869,7 @@ StreamBase::_ConvertToStreamTimeBase(bigtime_t time) const
 {
 	int64 timeStamp = int64_t((double)time * fStream->time_base.den
 		/ (1000000.0 * fStream->time_base.num) + 0.5);
-	if (fStream->start_time != kNoPTSValue)
+	if (fStream->start_time != AV_NOPTS_VALUE)
 		timeStamp += fStream->start_time;
 	return timeStamp;
 }
@@ -881,7 +878,7 @@ StreamBase::_ConvertToStreamTimeBase(bigtime_t time) const
 bigtime_t
 StreamBase::_ConvertFromStreamTimeBase(int64_t time) const
 {
-	if (fStream->start_time != kNoPTSValue)
+	if (fStream->start_time != AV_NOPTS_VALUE)
 		time -= fStream->start_time;
 
 	return bigtime_t(1000000.0 * time * fStream->time_base.num
@@ -1207,7 +1204,7 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 	TRACE("  frameRate: %.4f\n", frameRate);
 
 	#ifdef TRACE_AVFORMAT_READER
-	if (fStream->start_time != kNoPTSValue) {
+	if (fStream->start_time != AV_NOPTS_VALUE) {
 		bigtime_t startTime = _ConvertFromStreamTimeBase(fStream->start_time);
 		TRACE("  start_time: %lld or %.5fs\n", startTime,
 			startTime / 1000000.0);
