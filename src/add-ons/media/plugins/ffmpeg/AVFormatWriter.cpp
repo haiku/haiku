@@ -308,6 +308,8 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 		* fStream->time_base.den / (1000000.0 * fStream->time_base.num)
 		+ 0.5);
 
+	fPacket.dts = fPacket.pts;
+
 	fPacket.flags = 0;
 	if ((encodeInfo->flags & B_MEDIA_KEY_FRAME) != 0)
 		fPacket.flags |= AV_PKT_FLAG_KEY;
