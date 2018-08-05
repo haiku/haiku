@@ -48,8 +48,6 @@ static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
 	// they allow to specify a buffering mode.
 
-#define GET_CONTEXT_DEFAULTS 0
-
 typedef AVCodecID CodecID;
 
 // #pragma mark - AVFormatWriter::StreamCookie
