@@ -48,10 +48,6 @@ static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
 	// they allow to specify a buffering mode.
 
-// NOTE: The following works around some weird bug in libavformat. We
-// have to open the AVFormatContext->AVStream->AVCodecContext, even though
-// we are not interested in donig any encoding here!!
-#define OPEN_CODEC_CONTEXT 1
 #define GET_CONTEXT_DEFAULTS 0
 
 typedef AVCodecID CodecID;
@@ -376,15 +372,6 @@ AVFormatWriter::~AVFormatWriter()
 
 	// Free the streams and close the AVCodecContexts
     for(unsigned i = 0; i < fFormatContext->nb_streams; i++) {
-#if OPEN_CODEC_CONTEXT
-		// We only need to close the AVCodecContext when we opened it.
-		// This is experimental, see CommitHeader().
-
-		// NOTE: Since the introduction of AVCodecParameters
-		// I am not sure this logic is correct.
-		if (fCodecOpened)
-			avcodec_close(fFormatContext->streams[i]->codec);
-#endif
 		av_freep(&fFormatContext->streams[i]->codecpar);
 		av_freep(&fFormatContext->streams[i]);
     }
@@ -454,24 +441,6 @@ AVFormatWriter::CommitHeader()
 
 	if (fCodecOpened)
 		return B_NOT_ALLOWED;
-
-#if OPEN_CODEC_CONTEXT
-	for (unsigned i = 0; i < fFormatContext->nb_streams; i++) {
-		AVStream* stream = fFormatContext->streams[i];
-		// NOTE: Experimental, this should not be needed. Especially, since
-		// we have no idea (in the future) what CodecID some encoder uses,
-		// it may be an encoder from a different plugin.
-		AVCodecContext* codecContext = stream->codec;
-		codecContext->strict_std_compliance = -2;
-		AVCodec* codec = avcodec_find_encoder(codecContext->codec_id);
-		if (codec == NULL || avcodec_open2(codecContext, codec, NULL) < 0) {
-			TRACE("  stream[%u] - failed to open AVCodecContext\n", i);
-		}
-		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
-			i, stream->time_base.num, stream->time_base.den,
-			stream->codec->time_base.num, stream->codec->time_base.den);
-	}
-#endif
 
 	// We need to close the codecs we opened, even in case of failure.
 	fCodecOpened = true;
