@@ -303,6 +303,7 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 
 	fPacket.data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
 	fPacket.size = chunkSize;
+	fPacket.stream_index = fStream->index;
 
 	fPacket.pts = int64_t((double)encodeInfo->start_time
 		* fStream->time_base.den / (1000000.0 * fStream->time_base.num)
