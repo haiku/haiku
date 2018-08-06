@@ -1273,7 +1273,6 @@ get_mount_point(KPartition* partition, KPath* mountPoint)
 	char* path = mountPoint->LockBuffer();
 	int32 pathLen = mountPoint->BufferSize();
 	strncpy(path, basePath, pathLen);
-	panic("OH NO");
 
 	struct stat dummy;
 	for (int i = 1; ; i++) {
