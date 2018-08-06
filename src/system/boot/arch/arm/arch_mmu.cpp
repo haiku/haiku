@@ -86,23 +86,13 @@ struct memblock {
 };
 
 
-#warning TODO: Plot pref. base from fdt!
 static struct memblock LOADER_MEMORYMAP[] = {
-/*
-	{
-		"devices",
-		DEVICE_BASE,
-		DEVICE_BASE + DEVICE_SIZE - 1,
-		ARM_MMU_L2_FLAG_B,
-	},
-*/
 	{
 		"RAM_kernel", // 8MB space for kernel, drivers etc
 		KERNEL_LOAD_BASE,
 		KERNEL_LOAD_BASE + kMaxKernelSize - 1,
 		ARM_MMU_L2_FLAG_C,
 	},
-
 #ifdef FB_BASE
 	{
 		"framebuffer", // 2MB framebuffer ram
@@ -344,6 +334,61 @@ mmu_map_identity(addr_t start, size_t end, int flags)
 	}
 }
 
+
+static void
+map_pages_loader()
+{
+	for (uint32 i = 0; i < B_COUNT_OF(LOADER_MEMORYMAP); i++) {
+
+		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
+			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end));
+
+		addr_t address = LOADER_MEMORYMAP[i].start;
+		ASSERT((address & ~ARM_PTE_ADDRESS_MASK) == 0);
+
+		mmu_map_identity(LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end,
+			LOADER_MEMORYMAP[i].flags);
+	}
+}
+
+
+static status_t
+map_pages_peripherals()
+{
+	int node;
+	phys_addr_t regs_start;
+	phys_addr_t regs_end;
+	const char* name = "/axi";
+
+	node = fdt_path_offset(gFDT, name);
+	if (node < 0) {
+		TRACE(("Unable to locate path offset for simple-bus!"));
+		return B_ERROR;
+	}
+
+	// determine the MMIO address
+	regs_start = fdt_get_device_reg(gFDT, node, false);
+
+	#warning TODO: This MMU code is overly simplistic.
+	if (regs_start == 0) {
+		// TODO: FDT's like am335x have peripherals at various
+		// locations. We should map *each* item within simple-bus.
+		panic("No reg for simple-bus. See TODO");
+		return B_ERROR;
+	}
+
+	// TODO: Obvious hack is obvious
+	regs_end = regs_start + 0x01000000;
+
+	TRACE(("BLOCK: %s START: %lx END %lx\n", name, regs_start, regs_end));
+	ASSERT((regs_start & ~ARM_PTE_ADDRESS_MASK) == 0);
+
+	mmu_map_identity(regs_start, regs_end, ARM_MMU_L2_FLAG_B);
+
+	return B_OK;
+}
+
+
 void
 init_page_directory()
 {
@@ -362,16 +407,13 @@ init_page_directory()
 	// map our page directory region (TODO should not be identity mapped)
 	mmu_map_identity((addr_t)sPageDirectory, sPageTableRegionEnd, ARM_MMU_L2_FLAG_C);
 
-	for (uint32 i = 0; i < B_COUNT_OF(LOADER_MEMORYMAP); i++) {
+	// map our well known / static pages
+	map_pages_loader();
 
-		TRACE(("BLOCK: %s START: %lx END %lx\n", LOADER_MEMORYMAP[i].name,
-			LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end));
-
-		addr_t address = LOADER_MEMORYMAP[i].start;
-		ASSERT((address & ~ARM_PTE_ADDRESS_MASK) == 0);
-
-		mmu_map_identity(LOADER_MEMORYMAP[i].start, LOADER_MEMORYMAP[i].end,
-			LOADER_MEMORYMAP[i].flags);
+	// map peripheral devices from fdt
+	if (map_pages_peripherals() != B_OK) {
+		// This is a panic since we still have serial access.
+		panic("%s: unable to map peripherals! Check FDT.\n", __func__);
 	}
 
 	mmu_flush_TLB();
