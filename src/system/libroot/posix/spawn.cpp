@@ -408,7 +408,7 @@ process_file_actions(const posix_spawn_file_actions_t *_actions, int *errfd)
 					return errno;
 			}
 		} else if (action->type == file_action_dup2) {
-			if (dup2(action->action.dup2_action.srcfd, action->fd) != 0)
+			if (dup2(action->action.dup2_action.srcfd, action->fd) == -1)
 				return errno;
 		}
 	}
