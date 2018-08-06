@@ -43,7 +43,7 @@ relocate_rela(image_t* rootImage, image_t* image, Elf64_Rela* rel,
 
 		// Calculate the relocation value.
 		Elf64_Addr relocValue;
-		switch(type) {
+		switch (type) {
 			case R_X86_64_NONE:
 				continue;
 			case R_X86_64_64:
@@ -70,7 +70,10 @@ relocate_rela(image_t* rootImage, image_t* image, Elf64_Rela* rel,
 				return B_BAD_DATA;
 		}
 
-		*(Elf64_Addr *)relocAddr = relocValue;
+		if (type == R_X86_64_PC32 || type == R_X86_64_DTPOFF32)
+			*(Elf32_Addr *)relocAddr = relocValue;
+		else
+			*(Elf64_Addr *)relocAddr = relocValue;
 	}
 
 	return B_OK;

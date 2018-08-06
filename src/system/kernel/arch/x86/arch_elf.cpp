@@ -239,7 +239,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 
 		// Calculate the relocation value.
 		Elf64_Addr relocValue;
-		switch(type) {
+		switch (type) {
 			case R_X86_64_NONE:
 				continue;
 			case R_X86_64_64:
@@ -269,7 +269,10 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 			return B_BAD_ADDRESS;
 		}
 
-		*(Elf64_Addr *)relocAddr = relocValue;
+		if (type == R_X86_64_PC32)
+			*(Elf32_Addr *)relocAddr = relocValue;
+		else
+			*(Elf64_Addr *)relocAddr = relocValue;
 #endif
 	}
 
