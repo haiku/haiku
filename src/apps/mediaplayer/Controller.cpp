@@ -723,13 +723,20 @@ Controller::RestoreState()
 	if (item == NULL)
 		return;
 
+	int lastFrame = item->LastFrame();
+	float lastVolume = item->LastVolume();
+
+	// Don't Pause()/Play() if we have nothing to do.
+	if (lastFrame <= 0 && lastVolume < 0)
+		return;
+
 	Pause();
 
-	if (item->LastFrame() > 0) {
+	if (lastFrame > 0) {
 		bool resume = fResume == mpSettings::RESUME_ALWAYS;
 		if (fResume == mpSettings::RESUME_ASK) {
 			BString label;
-			int32 time = (int32)((float)item->LastFrame() * TimeDuration()
+			int32 time = (int32)((float)lastFrame * TimeDuration()
 					/ (1000000 * _FrameDuration()));
 			label.SetToFormat(B_TRANSLATE("Do you want to resume %s at %dm%ds?"),
 					item->Name().String(), time / 60, time % 60);
@@ -739,10 +746,9 @@ Controller::RestoreState()
 		}
 
 		if (resume)
-			SetFramePosition(item->LastFrame());
+			SetFramePosition(lastFrame);
 	}
 
-	float lastVolume = item->LastVolume();
 	if (lastVolume >= 0)
 		SetVolume(lastVolume);
 
