@@ -1263,16 +1263,17 @@ get_mount_point(KPartition* partition, KPath* mountPoint)
 		}
 	}
 
-	BStackOrHeapArray<char, 128> basePath(nameLength + 1);
+	BStackOrHeapArray<char, 128> basePath(nameLength + 2);
 	if (!basePath.IsValid())
 		return B_NO_MEMORY;
-	int32 len = snprintf(basePath, nameLength + 1, "/%s", volumeName);
+	int32 len = snprintf(basePath, nameLength + 2, "/%s", volumeName);
 	for (int32 i = 1; i < len; i++)
 		if (basePath[i] == '/')
-		basePath[i] = '-';
+			basePath[i] = '-';
 	char* path = mountPoint->LockBuffer();
 	int32 pathLen = mountPoint->BufferSize();
 	strncpy(path, basePath, pathLen);
+	panic("OH NO");
 
 	struct stat dummy;
 	for (int i = 1; ; i++) {
