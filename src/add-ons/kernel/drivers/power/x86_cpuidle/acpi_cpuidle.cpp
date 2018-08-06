@@ -94,7 +94,7 @@ struct acpi_cstate_info {
 };
 
 
-static acpi_cpuidle_driver_info *sAcpiProcessor[B_MAX_CPU_COUNT];
+static acpi_cpuidle_driver_info *sAcpiProcessor[SMP_MAX_CPUS];
 static CpuidleDevice sAcpiDevice;
 static device_manager_info *sDeviceManager;
 static acpi_module_info *sAcpi;

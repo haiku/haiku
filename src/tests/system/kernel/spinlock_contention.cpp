@@ -33,8 +33,8 @@ struct dummy_smp_msg {
 
 static int				sNumCPUs = 2;
 static bool				sICIEnabled = true;
-static dummy_spinlock	cpu_msg_spinlock[B_MAX_CPU_COUNT];
-static dummy_smp_msg*	smp_msgs[B_MAX_CPU_COUNT];
+static dummy_spinlock	cpu_msg_spinlock[SMP_MAX_CPUS];
+static dummy_smp_msg*	smp_msgs[SMP_MAX_CPUS];
 static dummy_spinlock	broadcast_msg_spinlock;
 static dummy_smp_msg*	smp_broadcast_msgs;
 
