@@ -57,3 +57,12 @@ Package/package repository format
 
 - Add MIME info for types supported by packaged applications
   (and sniffer rules?) to the package attributes.
+
+Miscellaneous
+=============
+- Add MIME directory watching to registrar, so it can update the MIME DB caches
+  when packages are de-/activated.
+- Get rid of post_install scripts. Do that in the build system.
+- Get rid of UserBootscript. Start the scripts in
+  "~/config/settings/boot/launch" from Bootscript instead.
+- Update Installer.
