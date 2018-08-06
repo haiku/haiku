@@ -86,7 +86,7 @@ BitmapView::Draw(BRect updateRect)
 	bounds.right = ceilf(bounds.left + width);
 	bounds.bottom = ceilf(bounds.top + height);
 
-	SetDrawingMode(B_OP_OVER);
+	SetDrawingMode(B_OP_ALPHA);
 	DrawBitmap(fBitmap, bitmapBounds, bounds, B_FILTER_BITMAP_BILINEAR);
 }
 
