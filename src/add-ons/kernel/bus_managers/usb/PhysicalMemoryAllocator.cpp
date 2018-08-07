@@ -11,7 +11,7 @@
 #include <KernelExport.h>
 #include <SupportDefs.h>
 #include <util/kernel_cpp.h>
-#include "BeOSCompatibility.h"
+
 #include "PhysicalMemoryAllocator.h"
 
 

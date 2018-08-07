@@ -6,12 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#include <lock.h> // for mutex
-#else
-#include "BeOSCompatibility.h" // for pseudo mutex
-#endif
+#include <lock.h>
 
 #include "Driver.h"
 #include "ECMDevice.h"

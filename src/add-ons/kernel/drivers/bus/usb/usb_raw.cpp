@@ -6,7 +6,6 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
-#include "BeOSCompatibility.h"
 #include "usb_raw.h"
 
 #include <KernelExport.h>
@@ -883,7 +882,7 @@ usb_raw_write(void *cookie, off_t position, const void *buffer, size_t *length)
 //
 
 
-status_t 
+status_t
 init_hardware()
 {
 	TRACE((DRIVER_NAME": init_hardware()\n"));

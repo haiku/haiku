@@ -4,9 +4,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirC++Flags -fno-rtti ;
 
-local compatSources ;
-
-SubDirSysHdrs $(SUBDIR) ;
 UsePrivateKernelHeaders ;
 
 KernelStaticLibrary libusb.a :
@@ -19,7 +16,6 @@ KernelStaticLibrary libusb.a :
 	Interface.cpp
 	Object.cpp
 	PhysicalMemoryAllocator.cpp
-	$(compatSources)
 ;
 
 KernelAddon usb :
@@ -27,6 +23,3 @@ KernelAddon usb :
 	: libusb.a
 	: usb.rdef
 	;
-
-SEARCH on [ FGristFiles $(compatSources) ]
-	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;

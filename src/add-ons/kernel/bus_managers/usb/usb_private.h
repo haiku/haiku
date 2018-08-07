@@ -9,7 +9,6 @@
 #ifndef _USB_PRIVATE_H
 #define _USB_PRIVATE_H
 
-#include "BeOSCompatibility.h"
 #include "usbspec_private.h"
 #include <lock.h>
 #include <util/Vector.h>

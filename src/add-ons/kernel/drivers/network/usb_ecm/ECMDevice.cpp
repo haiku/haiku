@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "BeOSCompatibility.h"
 #include "ECMDevice.h"
 #include "Driver.h"
 
