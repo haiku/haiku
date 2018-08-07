@@ -2102,21 +2102,18 @@ vm_clone_area(team_id team, const char* name, void** address,
 
 	VMCache* cache = vm_area_get_locked_cache(sourceArea);
 
-	// TODO: for now, B_USER_CLONEABLE is disabled, until all drivers
-	//	have been adapted. Maybe it should be part of the kernel settings,
-	//	anyway (so that old drivers can always work).
-#if 0
-	if (sourceArea->aspace == VMAddressSpace::Kernel()
-		&& addressSpace != VMAddressSpace::Kernel()
+	if (!kernel && sourceAddressSpace == VMAddressSpace::Kernel()
+		&& targetAddressSpace != VMAddressSpace::Kernel()
 		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
-		status = B_NOT_ALLOWED;
-	} else
+#if KDEBUG_LEVEL_2
+		panic("attempting to clone non-user-cloneable kernel area!");
 #endif
-	if (sourceArea->cache_type == CACHE_TYPE_NULL)
 		status = B_NOT_ALLOWED;
-	else {
+	} else if (sourceArea->cache_type == CACHE_TYPE_NULL) {
+		status = B_NOT_ALLOWED;
+	} else {
 		virtual_address_restrictions addressRestrictions = {};
 		addressRestrictions.address = *address;
 		addressRestrictions.address_specification = addressSpec;
