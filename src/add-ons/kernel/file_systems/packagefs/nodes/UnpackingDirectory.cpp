@@ -108,9 +108,9 @@ UnpackingDirectory::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 		= dynamic_cast<PackageDirectory*>(packageNode);
 
 	PackageDirectory* other = fPackageDirectories.Head();
-	bool isNewest = other == NULL || *packageDirectory > *other;
+	bool overridesHead = other == NULL || *packageDirectory > *other;
 
-	if (isNewest) {
+	if (overridesHead) {
 		fPackageDirectories.Insert(other, packageDirectory);
 		NodeReinitVFS(deviceID, fID, packageDirectory, other, fFlags);
 	} else

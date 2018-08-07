@@ -116,10 +116,9 @@ UnpackingLeafNode::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 		= dynamic_cast<PackageLeafNode*>(packageNode);
 
 	PackageLeafNode* headNode = fPackageNodes.Head();
-	bool isNewest = headNode == NULL
-		|| packageLeafNode > headNode;
+	bool overridesHead = headNode == NULL || *packageLeafNode > *headNode;
 
-	if (isNewest) {
+	if (overridesHead) {
 		fPackageNodes.Add(packageLeafNode);
 		NodeReinitVFS(deviceID, fID, packageLeafNode, headNode, fFlags);
 	} else {
