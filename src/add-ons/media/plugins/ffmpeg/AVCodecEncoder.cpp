@@ -700,31 +700,30 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			fDstFrame.linesize);
 
 		// Encode one video chunk/frame.
-		int gotPacket;
+		int result = avcodec_send_frame(fCodecContext, fFrame);
+		if (result != 0) {
+			TRACE("  avcodec_send_frame() failed: %d\n", result);
+			return B_ERROR;
+		}
+
+		// avcodec.h says we need to set it.
+		fFrame->pts++;
+
 		AVPacket pkt;
 		pkt.data = NULL;
 		pkt.size = 0;
 		av_init_packet(&pkt);
-		int usedBytes = avcodec_encode_video2(fCodecContext, &pkt, fFrame, &gotPacket);
-		// avcodec.h says we need to set it.
-		fFrame->pts++;
+		if (avcodec_receive_packet(fCodecContext, &pkt) == 0) {
+			// Maybe we need to use this PTS to calculate start_time:
+			if (pkt.pts != AV_NOPTS_VALUE) {
+				TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+					pkt.pts, fCodecContext->time_base.num,
+					fCodecContext->time_base.den);
+			} else {
+				TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
+					fCodecContext->time_base.num, fCodecContext->time_base.den);
+			}
 
-		if (usedBytes < 0) {
-			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
-			return B_ERROR;
-		}
-
-		// Maybe we need to use this PTS to calculate start_time:
-		if (pkt.pts != AV_NOPTS_VALUE) {
-			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
-				pkt.pts, fCodecContext->time_base.num,
-				fCodecContext->time_base.den);
-		} else {
-			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
-				fCodecContext->time_base.num, fCodecContext->time_base.den);
-		}
-
-		if (gotPacket == 1) {
 			// Setup media_encode_info, most important is the time stamp.
 			info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
 				/ fInputFormat.u.raw_video.field_rate);
