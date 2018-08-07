@@ -16,6 +16,7 @@ DEFINES =
 	HAIKU
 	ENABLE_HAIKU
 	VERSION=\\\"$(libsolvVersion)\\\"
+	_GNU_SOURCE
 	;
 
 # One of the following must be defined:
