@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src system kernel platform efi ;
+
+SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
+SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
+
+KernelMergeObject kernel_platform_efi.o :
+	platform.cpp
+;
