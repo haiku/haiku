@@ -693,20 +693,18 @@ if [ IsPackageAvailable expat_devel ] {
 
 
 # gnu-efi
-if $(TARGET_PACKAGING_ARCH) = x86_64 {
-	if [ IsPackageAvailable gnu_efi_kernel ] {
-		ExtractBuildFeatureArchives gnuefi :
-			file: base gnu_efi_kernel
-				headers: develop/headers/gnuefi
-				headersProtocol: develop/headers/gnuefi/protocol
-				headersArch: develop/headers/gnuefi/$(TARGET_ARCH)
-				libdir: develop/lib/gnuefi
-			;
+if [ IsPackageAvailable gnu_efi_kernel ] {
+	ExtractBuildFeatureArchives gnuefi :
+		file: base gnu_efi_kernel
+			headers: develop/headers/gnuefi
+			headersProtocol: develop/headers/gnuefi/protocol
+			headersArch: develop/headers/gnuefi/$(TARGET_ARCH)
+			libdir: develop/lib/gnuefi
+		;
 
-		EnableBuildFeatures gnuefi ;
-	} else {
-		Echo "gnu_efi_kernel support not available on $(TARGET_PACKAGING_ARCH)" ;
-	}
+	EnableBuildFeatures gnuefi ;
+} else {
+	Echo "gnu_efi_kernel support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
 

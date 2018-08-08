@@ -16,7 +16,7 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 }
 
 local efi_glue_src =
-	crt0-efi-x86_64.S
+	crt0-efi-$(TARGET_ARCH).S
 	;
 
 local platform_src =
