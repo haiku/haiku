@@ -1865,6 +1865,36 @@ DIENameListItem::Tag() const
 }
 
 
+// #pragma mark - DIENamespace
+
+
+DIENamespace::DIENamespace()
+{
+}
+
+
+uint16
+DIENamespace::Tag() const
+{
+	return DW_TAG_namespace;
+}
+
+
+bool
+DIENamespace::IsNamespace() const
+{
+	return true;
+}
+
+
+status_t
+DIENamespace::AddChild(DebugInfoEntry* child)
+{
+	fChildren.Add(child);
+	return B_OK;
+}
+
+
 // #pragma mark - DIEPackedType
 
 
@@ -1952,9 +1982,10 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 			fCallSites.Add(child);
 			return B_OK;
 		default:
-			return DIEDeclaredNamedBase::AddChild(child);
+			return DIENamespace::AddChild(child);
 	}
 }
+
 
 
 status_t
@@ -2407,36 +2438,6 @@ uint16
 DIEInterfaceType::Tag() const
 {
 	return DW_TAG_interface_type;
-}
-
-
-// #pragma mark - DIENamespace
-
-
-DIENamespace::DIENamespace()
-{
-}
-
-
-uint16
-DIENamespace::Tag() const
-{
-	return DW_TAG_namespace;
-}
-
-
-bool
-DIENamespace::IsNamespace() const
-{
-	return true;
-}
-
-
-status_t
-DIENamespace::AddChild(DebugInfoEntry* child)
-{
-	fChildren.Add(child);
-	return B_OK;
 }
 
 

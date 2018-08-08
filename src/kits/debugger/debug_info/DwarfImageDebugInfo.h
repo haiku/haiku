@@ -21,6 +21,7 @@ class Architecture;
 class CompilationUnit;
 class DebuggerInterface;
 class DIENamespace;
+class DIESubprogram;
 class DIEType;
 class DwarfFunctionDebugInfo;
 class DwarfStackFrameDebugInfo;
@@ -130,6 +131,14 @@ private:
 			bool				_EvaluateBaseTypeConstraints(DIEType* type,
 									const TypeLookupConstraints& constraints)
 									const;
+
+			status_t			_RecursiveTraverseNamespaceForFunctions(
+									DIENamespace* nsEntry,
+									CompilationUnit* unit,
+									BObjectList<FunctionDebugInfo>& functions);
+			status_t			_AddFunction(DIESubprogram* subprogramEntry,
+									CompilationUnit* unit,
+									BObjectList<FunctionDebugInfo>& functions);
 
 			status_t			_BuildTypeNameTable();
 			status_t			_RecursiveAddTypeNames(DIEType* type,

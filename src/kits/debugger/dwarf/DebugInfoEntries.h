@@ -366,6 +366,8 @@ public:
 
 			const DebugInfoEntryList& BaseTypes() const
 									{ return fBaseTypes; }
+			const DebugInfoEntryList& MemberFunctions() const
+									{ return fMemberFunctions; }
 			const DebugInfoEntryList& InnerTypes() const
 									{ return fInnerTypes; }
 			const DebugInfoEntryList& TemplateParameters() const
@@ -1218,6 +1220,28 @@ public:
 };
 
 
+class DIENamespace : public DIEDeclaredNamedBase {
+public:
+								DIENamespace();
+
+	virtual	uint16				Tag() const;
+
+	virtual	bool				IsNamespace() const;
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			DebugInfoEntryList	fChildren;
+
+// TODO:
+// DW_AT_extension
+// DW_AT_start_scope
+};
+
+
 class DIEPackedType : public DIEModifiedType {
 public:
 								DIEPackedType();
@@ -1226,7 +1250,7 @@ public:
 };
 
 
-class DIESubprogram : public DIEDeclaredNamedBase {
+class DIESubprogram : public DIENamespace {
 public:
 								DIESubprogram();
 								~DIESubprogram();
@@ -1528,28 +1552,6 @@ public:
 								DIEInterfaceType();
 
 	virtual	uint16				Tag() const;
-};
-
-
-class DIENamespace : public DIEDeclaredNamedBase {
-public:
-								DIENamespace();
-
-	virtual	uint16				Tag() const;
-
-	virtual	bool				IsNamespace() const;
-
-			const DebugInfoEntryList& Children() const
-										{ return fChildren; }
-
-	virtual	status_t			AddChild(DebugInfoEntry* child);
-
-private:
-			DebugInfoEntryList	fChildren;
-
-// TODO:
-// DW_AT_extension
-// DW_AT_start_scope
 };
 
 

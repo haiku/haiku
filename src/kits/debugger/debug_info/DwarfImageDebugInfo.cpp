@@ -409,6 +409,7 @@ DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
 	TRACE_IMAGES("  %" B_PRId32 " compilation units\n",
 		fFile->CountCompilationUnits());
 
+	status_t error = B_OK;
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
 			i++) {
 		DIECompileUnitBase* unitEntry = unit->UnitEntry();
@@ -430,86 +431,21 @@ DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
 		for (DebugInfoEntryList::ConstIterator it
 					= unitEntry->OtherChildren().GetIterator();
 				DebugInfoEntry* entry = it.Next();) {
-			if (entry->Tag() != DW_TAG_subprogram)
-				continue;
-
-			DIESubprogram* subprogramEntry = static_cast<DIESubprogram*>(entry);
-
-			// ignore declarations and inlined functions
-			if (subprogramEntry->IsDeclaration()
-				|| subprogramEntry->Inline() == DW_INL_inlined
-				|| subprogramEntry->Inline() == DW_INL_declared_inlined) {
-				continue;
+			if (entry->Tag() == DW_TAG_subprogram) {
+				DIESubprogram* subprogramEntry
+					= static_cast<DIESubprogram*>(entry);
+				error = _AddFunction(subprogramEntry, unit, functions);
+				if (error != B_OK)
+					return error;
 			}
 
-			// get the name
-			BString name;
-			DwarfUtils::GetFullyQualifiedDIEName(subprogramEntry, name);
-			if (name.Length() == 0)
-				continue;
-
-			// get the address ranges
-			TargetAddressRangeList* rangeList = fFile->ResolveRangeList(unit,
-				subprogramEntry->AddressRangesOffset());
-			if (rangeList == NULL) {
-				target_addr_t lowPC = subprogramEntry->LowPC();
-				target_addr_t highPC = subprogramEntry->HighPC();
-				if (highPC <= lowPC)
-					continue;
-
-				rangeList = new(std::nothrow) TargetAddressRangeList(
-					TargetAddressRange(lowPC, highPC - lowPC));
-				if (rangeList == NULL)
-					return B_NO_MEMORY;
-						// TODO: Clean up already added functions!
+			DIENamespace* nsEntry = dynamic_cast<DIENamespace*>(entry);
+			if (nsEntry != NULL) {
+				error = _RecursiveTraverseNamespaceForFunctions(nsEntry, unit,
+					functions);
+				if (error != B_OK)
+					return error;
 			}
-			BReference<TargetAddressRangeList> rangeListReference(rangeList,
-				true);
-
-			// get the source location
-			const char* directoryPath = NULL;
-			const char* fileName = NULL;
-			int32 line = -1;
-			int32 column = -1;
-			DwarfUtils::GetDeclarationLocation(fFile, subprogramEntry,
-				directoryPath, fileName, line, column);
-
-			LocatableFile* file = NULL;
-			if (fileName != NULL) {
-				file = fFileManager->GetSourceFile(directoryPath,
-					fileName);
-			}
-			BReference<LocatableFile> fileReference(file, true);
-
-			// create and add the functions
-			DwarfFunctionDebugInfo* function
-				= new(std::nothrow) DwarfFunctionDebugInfo(this, unit,
-					subprogramEntry, rangeList, name, file,
-					SourceLocation(line, std::max(column, (int32)0)));
-			if (function == NULL || !functions.AddItem(function)) {
-				delete function;
-				return B_NO_MEMORY;
-					// TODO: Clean up already added functions!
-			}
-
-//			BString name;
-//			DwarfUtils::GetFullyQualifiedDIEName(subprogramEntry, name);
-//			printf("      subprogram entry: %p, name: %s, declaration: %d\n",
-//				subprogramEntry, name.String(),
-//				subprogramEntry->IsDeclaration());
-//
-//			rangeList = subprogramEntry->AddressRanges();
-//			if (rangeList != NULL) {
-//				int32 count = rangeList->CountRanges();
-//				for (int32 i = 0; i < count; i++) {
-//					TargetAddressRange range = rangeList->RangeAt(i);
-//					printf("        %#llx - %#llx\n", range.Start(), range.End());
-//				}
-//			} else {
-//				printf("        %#llx - %#llx\n",
-//					(target_addr_t)subprogramEntry->LowPC(),
-//					(target_addr_t)subprogramEntry->HighPC());
-//			}
 		}
 	}
 
@@ -1384,6 +1320,114 @@ DwarfImageDebugInfo::_EvaluateBaseTypeConstraints(DIEType* type,
 
 
 status_t
+DwarfImageDebugInfo::_RecursiveTraverseNamespaceForFunctions(
+	DIENamespace* nsEntry, CompilationUnit* unit,
+	BObjectList<FunctionDebugInfo>& functions)
+{
+	status_t error = B_OK;
+	for (DebugInfoEntryList::ConstIterator it
+				= nsEntry->Children().GetIterator();
+			DebugInfoEntry* entry = it.Next();) {
+		if (entry->Tag() == DW_TAG_subprogram) {
+			DIESubprogram* subprogramEntry
+				= static_cast<DIESubprogram*>(entry);
+			error = _AddFunction(subprogramEntry, unit, functions);
+			if (error != B_OK)
+				return error;
+		}
+
+		DIENamespace* nsEntry = dynamic_cast<DIENamespace*>(entry);
+		if (nsEntry != NULL) {
+			error = _RecursiveTraverseNamespaceForFunctions(nsEntry, unit,
+				functions);
+			if (error != B_OK)
+				return error;
+			continue;
+		}
+
+		DIEClassBaseType* classEntry = dynamic_cast<DIEClassBaseType*>(entry);
+		if (classEntry != NULL) {
+			for (DebugInfoEntryList::ConstIterator it
+						= classEntry->MemberFunctions().GetIterator();
+					DebugInfoEntry* memberEntry = it.Next();) {
+				error = _AddFunction(static_cast<DIESubprogram*>(memberEntry),
+					unit, functions);
+				if (error != B_OK)
+					return error;
+			}
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfImageDebugInfo::_AddFunction(DIESubprogram* subprogramEntry,
+	CompilationUnit* unit, BObjectList<FunctionDebugInfo>& functions)
+{
+	// ignore declarations and inlined functions
+	if (subprogramEntry->IsDeclaration()
+		|| subprogramEntry->Inline() == DW_INL_inlined
+		|| subprogramEntry->Inline() == DW_INL_declared_inlined) {
+		return B_OK;
+	}
+
+	// get the name
+	BString name;
+	DwarfUtils::GetFullyQualifiedDIEName(subprogramEntry, name);
+	if (name.Length() == 0)
+		return B_OK;
+
+	// get the address ranges
+	TargetAddressRangeList* rangeList = fFile->ResolveRangeList(unit,
+		subprogramEntry->AddressRangesOffset());
+	if (rangeList == NULL) {
+		target_addr_t lowPC = subprogramEntry->LowPC();
+		target_addr_t highPC = subprogramEntry->HighPC();
+		if (highPC <= lowPC)
+			return B_OK;
+
+		rangeList = new(std::nothrow) TargetAddressRangeList(
+			TargetAddressRange(lowPC, highPC - lowPC));
+		if (rangeList == NULL)
+			return B_NO_MEMORY;
+				// TODO: Clean up already added functions!
+	}
+	BReference<TargetAddressRangeList> rangeListReference(rangeList,
+		true);
+
+	// get the source location
+	const char* directoryPath = NULL;
+	const char* fileName = NULL;
+	int32 line = -1;
+	int32 column = -1;
+	DwarfUtils::GetDeclarationLocation(fFile, subprogramEntry,
+		directoryPath, fileName, line, column);
+
+	LocatableFile* file = NULL;
+	if (fileName != NULL) {
+		file = fFileManager->GetSourceFile(directoryPath,
+			fileName);
+	}
+	BReference<LocatableFile> fileReference(file, true);
+
+	// create and add the functions
+	DwarfFunctionDebugInfo* function
+		= new(std::nothrow) DwarfFunctionDebugInfo(this, unit,
+			subprogramEntry, rangeList, name, file,
+			SourceLocation(line, std::max(column, (int32)0)));
+	if (function == NULL || !functions.AddItem(function)) {
+		delete function;
+		return B_NO_MEMORY;
+			// TODO: Clean up already added functions!
+	}
+
+	return B_OK;
+}
+
+
+status_t
 DwarfImageDebugInfo::_BuildTypeNameTable()
 {
 	fTypeNameTable = new(std::nothrow) TypeNameTable;
@@ -1409,10 +1453,10 @@ DwarfImageDebugInfo::_BuildTypeNameTable()
 		for (DebugInfoEntryList::ConstIterator it
 			= unit->UnitEntry()->OtherChildren().GetIterator();
 			DebugInfoEntry* child = it.Next();) {
-			if (child->Tag() != DW_TAG_namespace)
+			DIENamespace* namespaceEntry = dynamic_cast<DIENamespace*>(child);
+			if (namespaceEntry == NULL)
 				continue;
 
-			DIENamespace* namespaceEntry = dynamic_cast<DIENamespace*>(child);
 			if (_RecursiveTraverseNamespaceForTypes(namespaceEntry, unit)
 					!= B_OK) {
 				return B_NO_MEMORY;
@@ -1455,14 +1499,15 @@ DwarfImageDebugInfo::_RecursiveAddTypeNames(DIEType* type, CompilationUnit* unit
 	}
 
 	DIEClassBaseType* classType = dynamic_cast<DIEClassBaseType*>(type);
-	if (classType != NULL) {
-		for (DebugInfoEntryList::ConstIterator it
-				= classType->InnerTypes().GetIterator();
-			DIEType* innerType = dynamic_cast<DIEType*>(it.Next());) {
-			error = _RecursiveAddTypeNames(innerType, unit);
-			if (error != B_OK)
-				return error;
-		}
+	if (classType == NULL)
+		return B_OK;
+
+	for (DebugInfoEntryList::ConstIterator it
+			= classType->InnerTypes().GetIterator();
+		DIEType* innerType = dynamic_cast<DIEType*>(it.Next());) {
+		error = _RecursiveAddTypeNames(innerType, unit);
+		if (error != B_OK)
+			return error;
 	}
 
 	return B_OK;
@@ -1476,20 +1521,22 @@ DwarfImageDebugInfo::_RecursiveTraverseNamespaceForTypes(DIENamespace* nsEntry,
 	for (DebugInfoEntryList::ConstIterator it
 				= nsEntry->Children().GetIterator();
 			DebugInfoEntry* child = it.Next();) {
-		if (child->Tag() == DW_TAG_namespace) {
-			DIENamespace* entry = dynamic_cast<DIENamespace*>(child);
-			status_t error = _RecursiveTraverseNamespaceForTypes(entry, unit);
+
+		if (child->IsType()) {
+			DIEType* type = dynamic_cast<DIEType*>(child);
+			if (_RecursiveAddTypeNames(type, unit) != B_OK)
+				return B_NO_MEMORY;
+		} else {
+			DIENamespace* nameSpace = dynamic_cast<DIENamespace*>(child);
+			if (nameSpace == NULL)
+				continue;
+
+			status_t error = _RecursiveTraverseNamespaceForTypes(nameSpace,
+				unit);
 			if (error != B_OK)
 				return error;
 			continue;
 		}
-
-		if (!child->IsType())
-			continue;
-
-		DIEType* type = dynamic_cast<DIEType*>(child);
-		if (_RecursiveAddTypeNames(type, unit) != B_OK)
-			return B_NO_MEMORY;
 	}
 
 	return B_OK;
