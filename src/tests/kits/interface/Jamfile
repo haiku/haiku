@@ -51,6 +51,7 @@ UnitTestLib libinterfacetest.so
 		RegionIntersect.cpp
 		RegionOffsetBy.cpp
 
+		OutlineListViewTest.cpp
 		TextControlTest.cpp
 		TextViewTest.cpp
 

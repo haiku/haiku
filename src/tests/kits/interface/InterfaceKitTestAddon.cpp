@@ -11,6 +11,7 @@
 #include "btextview/TextViewTest.h"
 //#include "bwidthbuffer/WidthBufferTest.h"
 #include "GraphicsDefsTest.h"
+#include "OutlineListViewTest.h"
 
 
 BTestSuite *
@@ -22,6 +23,7 @@ getTestSuite()
 	suite->addTest("BAlert", AlertTest::Suite());
 	suite->addTest("BBitmap", BitmapTestSuite());
 	suite->addTest("BDeskbar", DeskbarTestSuite());
+	suite->addTest("BOutlineListView", OutlineListViewTestSuite());
 	suite->addTest("BPolygon", PolygonTestSuite());
 	suite->addTest("BRegion", RegionTestSuite());
 	suite->addTest("BTextControl", TextControlTestSuite());
