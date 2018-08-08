@@ -709,15 +709,14 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		// avcodec.h says we need to set it.
 		fFrame->pts++;
 
-		AVPacket pkt;
-		pkt.data = NULL;
-		pkt.size = 0;
-		av_init_packet(&pkt);
-		if (avcodec_receive_packet(fCodecContext, &pkt) == 0) {
+		AVPacket* pkt = av_packet_alloc();
+		// TODO: Since av_codec_receive_packet() could return more than one packet for one frame,
+		// we should run this in a loop, like the ffmpeg example do. 
+		if (avcodec_receive_packet(fCodecContext, pkt) == 0) {
 			// Maybe we need to use this PTS to calculate start_time:
-			if (pkt.pts != AV_NOPTS_VALUE) {
+			if (pkt->pts != AV_NOPTS_VALUE) {
 				TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
-					pkt.pts, fCodecContext->time_base.num,
+					pkt->pts, fCodecContext->time_base.num,
 					fCodecContext->time_base.den);
 			} else {
 				TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
@@ -733,17 +732,20 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 				info->flags |= B_MEDIA_KEY_FRAME;
 
 			// Write the chunk
-			ret = WriteChunk(pkt.data, pkt.size, info);
+			ret = WriteChunk(pkt->data, pkt->size, info);
 			if (ret != B_OK) {
 				TRACE("  error writing chunk: %s\n", strerror(ret));
 				break;
 			}
+			av_packet_unref(pkt);
 		}
+		
 		// Skip to the next frame (but usually, there is only one to encode
 		// for video).
 		frameCount--;
 		fFramesWritten++;
 		buffer = (const void*)((const uint8*)buffer + bufferSize);
+		av_packet_free(&pkt);
 	}
 	return ret;
 }
