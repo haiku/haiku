@@ -376,6 +376,12 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
 			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
 
+			# EFI Bootloader
+			if $(HAIKU_BOOT_PLATFORM) = efi {
+				HAIKU_BOOT_CCFLAGS += -mno-red-zone -maccumulate-outgoing-args ;
+				HAIKU_BOOT_C++FLAGS += -mno-red-zone -maccumulate-outgoing-args ;
+			}
+
 		case x86_64 :
 			# Kernel lives in the top 2GB of the address space, use kernel code
 			# model.
@@ -396,6 +402,12 @@ rule KernelArchitectureSetup architecture
 				HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
 			}
 
+			# EFI Bootloader
+			if $(HAIKU_BOOT_PLATFORM) = efi {
+				HAIKU_BOOT_CCFLAGS += -mno-red-zone -maccumulate-outgoing-args ;
+				HAIKU_BOOT_C++FLAGS += -mno-red-zone -maccumulate-outgoing-args ;
+			}
+
 			if x86 in $(HAIKU_ARCHS[2-]) || x86_gcc2 in $(HAIKU_ARCHS[2-]) {
 				Echo "Enable kernel ia32 compatibility" ;
 				HAIKU_KERNEL_DEFINES += _COMPAT_MODE ;
@@ -404,10 +416,10 @@ rule KernelArchitectureSetup architecture
 	}
 
 	if $(HAIKU_BOOT_PLATFORM) = efi {
-		HAIKU_BOOT_CCFLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar -mno-red-zone
-			-maccumulate-outgoing-args -Wno-error=unused-variable ;
-		HAIKU_BOOT_C++FLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar -mno-red-zone
-			-maccumulate-outgoing-args -Wno-error=unused-variable ;
+		HAIKU_BOOT_CCFLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar
+			-Wno-error=unused-variable ;
+		HAIKU_BOOT_C++FLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar
+			-Wno-error=unused-variable ;
 		HAIKU_BOOT_LDFLAGS = -Bstatic -Bsymbolic -shared -nostdlib -znocombreloc -nostartfiles -no-undefined ;
 	} else {
 		HAIKU_BOOT_CCFLAGS += -fno-pic ;
