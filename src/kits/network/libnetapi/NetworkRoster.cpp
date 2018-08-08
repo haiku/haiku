@@ -207,7 +207,7 @@ BNetworkRoster::GetNextPersistentNetwork(uint32* cookie,
 		return B_ERROR;
 
 	memset(network.name, 0, sizeof(network.name));
-	strncpy(network.name, networkName.String(), sizeof(network.name));
+	strlcpy(network.name, networkName.String(), sizeof(network.name));
 
 	BNetworkAddress address;
 	if (networkMessage.FindFlat("address", &network.address) != B_OK)
