@@ -1307,7 +1307,8 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 					c += 'A' - 'a';
 				const char *hexNumbers = "0123456789abcdef";
 				addr_t number;
-				if (data == NULL || (number = (addr_t)strchr(hexNumbers, c)) == 0)
+				if (data == NULL
+						|| (number = (addr_t)strchr(hexNumbers, c)) == 0)
 					break;
 
 				SetSelection(fStart, fStart);
@@ -1316,13 +1317,17 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 				number -= (addr_t)hexNumbers;
 				fBitPosition = (fBitPosition + 4) % 8;
 
-				c = (data[0] & (fBitPosition ? 0x0f : 0xf0)) | (number << fBitPosition);
-					// mask out overwritten region and bit-wise or the number to be inserted
+				c = (data[0] & (fBitPosition ? 0x0f : 0xf0))
+					| (number << fBitPosition);
+					// mask out overwritten region and bit-wise or the number
+					// to be inserted
 
-				if (fEditor.Replace(fOffset + fStart, &c, 1) == B_OK && fBitPosition == 0)
+				if (fEditor.Replace(fOffset + fStart, &c, 1) == B_OK
+						&& fBitPosition == 0)
 					SetSelection(fStart + 1, fStart + 1);
 			} else {
-				if (fEditor.Replace(fOffset + fStart, (const uint8 *)bytes, numBytes) == B_OK)
+				if (fEditor.Replace(fOffset + fStart, (const uint8 *)bytes,
+						numBytes) == B_OK)
 					SetSelection(fStart + 1, fStart + 1);
 			}
 			break;
@@ -1333,7 +1338,10 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 void
 DataView::SetFont(const BFont *font, uint32 properties)
 {
-	if (!font->IsFixed())
+	// Even in a full and hal fixed font, the characters we use (all in the
+	// Latin-1 range as everything else is filtered out) will all have the same
+	// width.
+	if (!font->IsFixed() && !font->IsFullAndHalfFixed())
 		return;
 
 	BView::SetFont(font, properties);
@@ -1341,7 +1349,8 @@ DataView::SetFont(const BFont *font, uint32 properties)
 	font_height fontHeight;
 	font->GetHeight(&fontHeight);
 
-	fFontHeight = int32(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
+	fFontHeight = int32(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading);
 	fAscent = fontHeight.ascent;
 	fCharWidth = font->StringWidth("w");
 }
