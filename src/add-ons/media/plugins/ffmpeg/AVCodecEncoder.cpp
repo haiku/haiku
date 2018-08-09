@@ -649,6 +649,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		if (fCodecContext->coded_frame) {
 			// Store information about the coded frame in the context.
 			fCodecContext->coded_frame->pts = packet.pts;
+			// TODO: double "!" operator ?
 			fCodecContext->coded_frame->key_frame = !!(packet.flags & AV_PKT_FLAG_KEY);
 		}
 
@@ -709,12 +710,13 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		}
 	}
 
-	// Pass a NULL AVFrame and enter "draining" mode, then flush buffers
-	// before restarting encoding, again.
-	// TODO: It's probably not very efficient to do it like this. We should
-	// do this only when there is no more data (when closing the "stream")
-	_EncodeVideoFrame(NULL, pkt, info);
-	avcodec_flush_buffers(fCodecContext);
+	// TODO: we should pass a NULL AVFrame and enter "draining" mode, then flush buffers
+	// when we have finished and there is no more data. We cannot do that here, though, since
+	// 1. It's not efficient
+	// 2. It's incorrect, since many codecs need the "next" frame to be able to do optimization.
+	// if we drain the codec, they cannot work with the "next" frame.
+	//_EncodeVideoFrame(NULL, pkt, info);
+	//avcodec_flush_buffers(fCodecContext);
 	av_packet_free(&pkt);
 	return ret;
 }
