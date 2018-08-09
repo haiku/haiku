@@ -686,6 +686,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 
 	status_t ret = B_OK;
 
+	AVPacket* pkt = av_packet_alloc();
 	while (frameCount > 0) {
 		size_t bpr = fInputFormat.u.raw_video.display.bytes_per_row;
 		size_t bufferSize = fInputFormat.u.raw_video.display.line_count * bpr;
@@ -698,21 +699,45 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		sws_scale(fSwsContext, fSrcFrame.data, fSrcFrame.linesize, 0,
 			fInputFormat.u.raw_video.display.line_count, fDstFrame.data,
 			fDstFrame.linesize);
-
-		// Encode one video chunk/frame.
-		int result = avcodec_send_frame(fCodecContext, fFrame);
-		if (result != 0) {
-			TRACE("  avcodec_send_frame() failed: %d\n", result);
-			return B_ERROR;
+		
+		if (_EncodeVideoFrame(fFrame, pkt, info) == B_OK) {
+			// Skip to the next frame (but usually, there is only one to encode
+			// for video).
+			frameCount--;
+			fFramesWritten++;
+			buffer = (const void*)((const uint8*)buffer + bufferSize);
 		}
+	}
 
-		// avcodec.h says we need to set it.
-		fFrame->pts++;
+	// Pass a NULL AVFrame and enter "draining" mode, then flush buffers
+	// before restarting encoding, again.
+	// TODO: It's probably not very efficient to do it like this. We should
+	// do this only when there is no more data (when closing the "stream")
+	_EncodeVideoFrame(NULL, pkt, info);
+	avcodec_flush_buffers(fCodecContext);
+	av_packet_free(&pkt);
+	return ret;
+}
 
-		AVPacket* pkt = av_packet_alloc();
-		// TODO: Since av_codec_receive_packet() could return more than one packet for one frame,
-		// we should run this in a loop, like the ffmpeg example do. 
-		if (avcodec_receive_packet(fCodecContext, pkt) == 0) {
+
+status_t
+AVCodecEncoder::_EncodeVideoFrame(AVFrame* frame, AVPacket* pkt, media_encode_info* info)
+{
+	// Encode one video chunk/frame.
+	int result = avcodec_send_frame(fCodecContext, frame);
+	if (result < 0) {
+		TRACE("  avcodec_send_frame() failed: %d\n", result);
+		return B_ERROR;
+	}
+
+	// Increase the frame pts as in the ffmpeg sample code
+	if (frame != NULL)
+		frame->pts++;
+	
+	while (result == 0) {
+		result = avcodec_receive_packet(fCodecContext, pkt);
+		if (result == 0) {
+			TRACE("  avcodec_receive_packet: received one packet\n");
 			// Maybe we need to use this PTS to calculate start_time:
 			if (pkt->pts != AV_NOPTS_VALUE) {
 				TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
@@ -722,31 +747,28 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 				TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
 					fCodecContext->time_base.num, fCodecContext->time_base.den);
 			}
-
+	
 			// Setup media_encode_info, most important is the time stamp.
 			info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
 				/ fInputFormat.u.raw_video.field_rate);
-
+	
 			info->flags = 0;
 			if (fCodecContext->coded_frame->key_frame)
 				info->flags |= B_MEDIA_KEY_FRAME;
-
+	
 			// Write the chunk
-			ret = WriteChunk(pkt->data, pkt->size, info);
-			if (ret != B_OK) {
-				TRACE("  error writing chunk: %s\n", strerror(ret));
+			result = WriteChunk(pkt->data, pkt->size, info);
+			if (result != B_OK) {
+				TRACE("  error writing chunk: %s\n", strerror(result));
 				break;
 			}
-			av_packet_unref(pkt);
-		}
-		
-		// Skip to the next frame (but usually, there is only one to encode
-		// for video).
-		frameCount--;
-		fFramesWritten++;
-		buffer = (const void*)((const uint8*)buffer + bufferSize);
-		av_packet_free(&pkt);
+		}	
+		av_packet_unref(pkt);
 	}
-	return ret;
+	if (result == AVERROR(EAGAIN))
+		return B_OK;
+
+	TRACE("   _EncodeVideoFrame(): returning...\n");
+	return result;
 }
 

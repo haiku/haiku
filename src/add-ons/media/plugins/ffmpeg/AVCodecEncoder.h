@@ -62,6 +62,9 @@ private:
 			status_t			_EncodeVideo(const void* buffer,
 									int64 frameCount,
 									media_encode_info* info);
+			status_t			_EncodeVideoFrame(AVFrame* frame,
+									AVPacket* pkt,
+									media_encode_info* info);
 
 private:
 			media_format		fInputFormat;
