@@ -26,9 +26,8 @@ public:
 			const PackageNodeList& Children() const
 									{ return fChildren; }
 
-			bool				operator<(const PackageDirectory& other) const;
-	inline	bool				operator>(const PackageDirectory& other) const
-									{ return other < *this; }
+			bool				HasPrecedenceOver(const PackageDirectory* other)
+									const;
 
 private:
 			PackageNodeList		fChildren;

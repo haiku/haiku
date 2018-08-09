@@ -73,9 +73,7 @@ public:
 	inline	void*				IndexCookieForAttribute(const StringKey& name)
 									const;
 
-			bool				operator<(const PackageNode& other) const;
-	inline	bool				operator>(const PackageNode& other) const
-									{ return other < *this; }
+			bool				HasPrecedenceOver(const PackageNode* other) const;
 
 			// conceptually protected, but actually declaring it so causes
 			// compilation issues when used with MethodDeleter in subclasses

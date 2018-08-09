@@ -106,15 +106,15 @@ PackageNode::UnsetIndexCookie(void* attributeCookie)
 
 
 bool
-PackageNode::operator<(const PackageNode& other) const
+PackageNode::HasPrecedenceOver(const PackageNode* other) const
 {
 	const bool isSystemPkg = (fPackageFlags
 			& BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0,
-		otherIsSystemPkg = (other.fPackageFlags
+		otherIsSystemPkg = (other->fPackageFlags
 			& BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0;
 	if (isSystemPkg && !otherIsSystemPkg)
-		return false;
-	if (!isSystemPkg && otherIsSystemPkg)
 		return true;
-	return fModifiedTime < other.fModifiedTime;
+	if (!isSystemPkg && otherIsSystemPkg)
+		return false;
+	return fModifiedTime > other->fModifiedTime;
 }

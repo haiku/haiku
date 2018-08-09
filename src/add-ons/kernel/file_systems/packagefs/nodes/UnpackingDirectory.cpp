@@ -108,7 +108,8 @@ UnpackingDirectory::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 		= dynamic_cast<PackageDirectory*>(packageNode);
 
 	PackageDirectory* other = fPackageDirectories.Head();
-	bool overridesHead = other == NULL || *packageDirectory > *other;
+	bool overridesHead = other == NULL
+		|| packageDirectory->HasPrecedenceOver(other);
 
 	if (overridesHead) {
 		fPackageDirectories.Insert(other, packageDirectory);
@@ -134,7 +135,7 @@ UnpackingDirectory::RemovePackageNode(PackageNode* packageNode, dev_t deviceID)
 		it.Next();
 			// skip the first one
 		while (PackageDirectory* otherNode = it.Next()) {
-			if (*otherNode > *newestNode)
+			if (otherNode->HasPrecedenceOver(newestNode))
 				newestNode = otherNode;
 		}
 
@@ -169,7 +170,7 @@ UnpackingDirectory::WillBeFirstPackageNode(PackageNode* packageNode) const
 		return false;
 
 	PackageDirectory* other = fPackageDirectories.Head();
-	return other == NULL || *packageDirectory > *other;
+	return other == NULL || packageDirectory->HasPrecedenceOver(other);
 }
 
 
