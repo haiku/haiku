@@ -559,7 +559,8 @@ radeon_hd_init(radeon_info &info)
 	info.registers_area = mmioMapper.Map("radeon hd mmio",
 		info.pci->u.h0.base_registers[pciBarMmio],
 		info.pci->u.h0.base_register_sizes[pciBarMmio],
-		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		B_ANY_KERNEL_ADDRESS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
 		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		ERROR("%s: card (%ld): couldn't map memory I/O!\n",
