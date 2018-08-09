@@ -188,7 +188,7 @@ UnpackingLeafNode::WillBeFirstPackageNode(PackageNode* packageNode) const
 
 	PackageLeafNode* headNode = fPackageNodes.Head();
 	return headNode == NULL
-		|| packageLeafNode->ModifiedTime() > headNode->ModifiedTime();
+		|| packageLeafNode->HasPrecedenceOver(headNode);
 }
 
 void
