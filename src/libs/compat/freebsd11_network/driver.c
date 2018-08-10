@@ -230,6 +230,10 @@ _fbsd_init_drivers(driver_t *drivers[])
 				break;
 			if (device_attach(device) == 0) {
 				dprintf("%s: init_driver(%p) at %d\n", gDriverName, driver, i);
+				status = init_root_device(&root);
+				if (status != B_OK)
+					break;
+				info = get_pci_info(root);
 			} else
 				device_delete_child(root, device);
 		}
