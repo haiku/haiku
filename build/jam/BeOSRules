@@ -222,6 +222,7 @@ rule ResComp
 	# get compiler and defines for the platform
 	local cc ;
 	local defines ;
+	local flags ;
 	local localIncludesOption ;
 
 	on $(1) { # use on $(1) variable values
@@ -230,11 +231,13 @@ rule ResComp
 		if $(PLATFORM) = host {
 			defines += $(HOST_DEFINES) ;
 			cc = $(HOST_CC) ;
+			flags += $(HOST_CCFLAGS) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 		} else {
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;
 			cc = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
+			flags += $(TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH)) ;
 			localIncludesOption
 				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
@@ -242,6 +245,7 @@ rule ResComp
 
 	DEFINES on $(1) = $(defines) ;
 	CCDEFS on $(1) = [ FDefines $(defines) ] ;
+	CCFLAGS on $(1) = $(flags) ;
 	HDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS)
 		: $(localIncludesOption) ] ;
 	RCHDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS)
@@ -261,7 +265,8 @@ rule ResComp
 actions ResComp1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - | egrep -v '^#' | $(2[1]) $(RCHDRS) --auto-names -o "$(1)" -
+	cat "$(2[2-])" | $(CC) $(CCFLAGS) -E $(CCDEFS) $(HDRS) - \
+		| egrep -v '^#' | $(2[1]) $(RCHDRS) --auto-names -o "$(1)" -
 }
 
 rule ResAttr attributeFile : _resourceFiles : deleteAttributeFile
