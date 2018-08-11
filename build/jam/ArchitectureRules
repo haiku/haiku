@@ -50,12 +50,14 @@ rule ArchitectureSetup architecture
 	}
 
 	# default architecture tuning
-	# TODO: Do we want x86_gcc2 -march=pentium here?
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
+	local archFlags ;
 	switch $(cpu) {
-		case arm :
-			ccBaseFlags += -march=armv7-a -mfloat-abi=hard ;
+		case ppc : archFlags += -mcpu=440fp ;
+		case arm : archFlags += -march=armv7-a -mfloat-abi=hard ;
+		case x86 : archFlags += -march=pentium ;
 	}
+	ccBaseFlags += $(archFlags) ;
 
 	if $(cpu) = arm {
 		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
@@ -78,6 +80,7 @@ rule ArchitectureSetup architecture
 
 	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
 	HAIKU_C++FLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
+	HAIKU_ASFLAGS_$(architecture) += $(archFlags) -nostdinc ;
 
 	# strip is required
 	if ! $(HAIKU_STRIP_$(architecture)) {
@@ -110,9 +113,6 @@ rule ArchitectureSetup architecture
 
 	# set variables for gcc header options
 	SetIncludePropertiesVariables HAIKU : _$(architecture) ;
-
-	# assembler flags
-	HAIKU_ASFLAGS_$(architecture) = ;
 
 	# C/C++ flags
 	if $(gccVersion[1]) >= 4 {
@@ -373,9 +373,6 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_C++FLAGS += -mtune=68020-60 ;
 
 		case x86 :
-			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
-			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
-
 			# EFI Bootloader
 			if $(HAIKU_BOOT_PLATFORM) = efi {
 				HAIKU_BOOT_CCFLAGS += -mno-red-zone -maccumulate-outgoing-args ;
