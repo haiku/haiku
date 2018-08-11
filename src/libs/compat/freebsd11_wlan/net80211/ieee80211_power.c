@@ -612,12 +612,10 @@ ieee80211_sta_ps_timer_check(struct ieee80211vap *vap)
 	if (vap->iv_state != IEEE80211_S_RUN)
 		goto out;
 
-#ifndef __HAIKU__
 	IEEE80211_DPRINTF(vap, IEEE80211_MSG_POWER,
 	    "%s: lastdata=%llu, ticks=%llu\n",
 	    __func__, (unsigned long long) ic->ic_lastdata,
 	    (unsigned long long) ticks);
-#endif
 
 	/* If powersave is disabled on the VAP, don't bother */
 	if (! (vap->iv_flags & IEEE80211_F_PMGTON))
