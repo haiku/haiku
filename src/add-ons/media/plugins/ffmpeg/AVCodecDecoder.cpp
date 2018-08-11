@@ -1740,8 +1740,9 @@ AVCodecDecoder::_InitFilterGraph(enum AVPixelFormat pixfmt, int32 width,
 	fFilterGraph = avfilter_graph_alloc();
 
 	BString arguments;
-	arguments.SetToFormat("buffer=video_size=%dx%d:pix_fmt=%d:time_base=1/1:"
-		"pixel_aspect=0/1[in];[in]yadif[out];[out]buffersink", width, height,
+	arguments.SetToFormat("buffer=video_size=%" B_PRId32 "x%" B_PRId32
+		":pix_fmt=%d:time_base=1/1:pixel_aspect=0/1[in];[in]yadif[out];"
+		"[out]buffersink", width, height,
 		pixfmt);
 	AVFilterInOut* inputs = NULL;
 	AVFilterInOut* outputs = NULL;

@@ -429,6 +429,12 @@ StreamBase::Duration() const
 	// for a couple of streams and are in line with the documentation, but
 	// unfortunately, libavformat itself seems to set the time_base and
 	// duration wrongly sometimes. :-(
+
+	int32 flags;
+	fSource->GetFlags(&flags);
+	if ((flags & B_MEDIA_STREAMING) != 0)
+		return 0;
+
 	if ((int64)fStream->duration != AV_NOPTS_VALUE)
 		return _ConvertFromStreamTimeBase(fStream->duration);
 	else if ((int64)fContext->duration != AV_NOPTS_VALUE)
