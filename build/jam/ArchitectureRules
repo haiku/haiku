@@ -29,11 +29,11 @@ rule ArchitectureSetup architecture
 	# Without this flag, GCC deletes many null-pointer checks that are
 	# technically undefined behavior (e.g. passing NULL to strdup, among
 	# others), which breaks both the kernel and various applications. See:
-	#  - https://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
+	#  - https://freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 	#  - https://dev.haiku-os.org/ticket/13285#comment:8 (& subsequent comments)
 	#  - https://dev.haiku-os.org/ticket/10803#comment:4 (& subsequent comments)
 	# Note that the Linux also does the same:
-	#  - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a3ca86aea507904148870946d599e07a340b39bf
+	#  - https://github.com/torvalds/linux/commit/a3ca86aea507904
 	if $(gccVersion[1]) >= 3 {
 		ccBaseFlags += -fno-delete-null-pointer-checks ;
 	}
@@ -41,12 +41,6 @@ rule ArchitectureSetup architecture
 	# disable some builtins that are incompatible with our definitions
 	if $(gccVersion[1]) >= 3 {
 		ccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
-	}
-
-	# disable some Clang warnings that are not very useful
-	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		ccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field
-			-Wno-cast-align -Wno-gnu-designator ;
 	}
 
 	# default architecture tuning
@@ -126,6 +120,11 @@ rule ArchitectureSetup architecture
 	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall -Wno-trigraphs
 		-Wno-ctor-dtor-privacy -Woverloaded-virtual -Wpointer-arith -Wcast-align
 		-Wsign-compare -Wno-multichar ;
+	# disable some Clang warnings that are not very useful
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		ccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field
+			-Wno-cast-align -Wno-gnu-designator ;
+	}
 
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
 
