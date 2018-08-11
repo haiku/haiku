@@ -108,7 +108,7 @@ atomic_get64(int64 *value)
 
 #endif	/* ATOMIC64_FUNCS_ARE_SYSCALLS */
 
-#if defined(__arm__)
+#if defined(__arm__) && !defined(__clang__)
 
 /* GCC compatibility: libstdc++ needs this one.
  * TODO: Update libstdc++ and drop this.

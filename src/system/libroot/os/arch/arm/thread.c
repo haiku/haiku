@@ -21,6 +21,7 @@ find_thread(const char *name)
 }
 
 
+#if !defined(__clang__)
 /*
  * Fill out gcc __sync_synchronize built-in for ARM
  */
@@ -29,3 +30,4 @@ __sync_synchronize(void)
 {
 	dmb();
 }
+#endif
