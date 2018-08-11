@@ -267,6 +267,7 @@ rule CreateAsmStructOffsetsHeader header : source
 
 	on $(header) { # use on $(1) variable values
 		if ! $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
+			Echo $(PLATFORM) is not in SUPPORTED_PLATFORMS, cannot make struct-offsets header! ;
 			return ;
 		}
 
@@ -283,7 +284,6 @@ rule CreateAsmStructOffsetsHeader header : source
 			if $(USES_BE_API) {
 				sysHeaders += $(HOST_BE_API_HEADERS) ;
 			}
-
 		} else {
 			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
 				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
@@ -320,7 +320,6 @@ rule CreateAsmStructOffsetsHeader header : source
 			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
-
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
@@ -377,7 +376,8 @@ rule CreateAsmStructOffsetsHeader header : source
 actions CreateAsmStructOffsetsHeader1
 {
  	$(C++) -S "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o - \
-		| grep "#define" | $(SED) -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
+		| $(SED) 's/@define/#define/g' | grep "#define" \
+		| $(SED) -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
 }
 
 rule MergeObjectFromObjects
