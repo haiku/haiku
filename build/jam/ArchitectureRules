@@ -460,6 +460,12 @@ rule ArchitectureSetupWarnings architecture
 	# Sets up compiler warnings and error flags for various subdirectories for
 	# the given packaging architecture.
 
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		AppendToConfigVar CCFLAGS :
+			HAIKU_TOP src system libroot posix glibc :
+			-fgnu89-inline -fheinous-gnu-extensions : global ;
+	}
+
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
 	switch $(cpu) {
 		case arm :
@@ -492,12 +498,6 @@ rule ArchitectureSetupWarnings architecture
 	if $(gccVersion[1]) = 2 {
 		local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
 		WARNINGS on $(file) = $(WARNINGS) ;
-	}
-
-	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		AppendToConfigVar CCFLAGS :
-			HAIKU_TOP src system libroot posix glibc :
-			-fgnu89-inline -fheinous-gnu-extensions : global ;
 	}
 
 	EnableWerror src add-ons accelerants ;
