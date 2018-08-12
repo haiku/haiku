@@ -1,15 +1,17 @@
 /*
- * Copyright 2006-2010, Haiku Inc. All rights reserved.
+ * Copyright 2006-2018, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Adrien Destugues <pulkomandy@pulkomandy.tk>
  */
 
 #include "usb_raw.h"
 
 #include <KernelExport.h>
 #include <Drivers.h>
+#include <algorithm>
 #include <lock.h>
 #include <malloc.h>
 #include <stdio.h>
@@ -311,7 +313,12 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR:
+		case B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC:
 		{
+			if (op == B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC
+					&& length < sizeof(command.config_etc))
+				return B_BUFFER_OVERFLOW;
+
 			if (length < sizeof(command.config))
 				return B_BUFFER_OVERFLOW;
 
@@ -322,10 +329,15 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (configurationInfo == NULL)
 				break;
 
+			size_t sizeToCopy = sizeof(usb_configuration_descriptor);
+			if (op == B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR_ETC) {
+				sizeToCopy = std::min(command.config_etc.length,
+					(size_t)configurationInfo->descr->total_length);
+			}
+
 			if (!IS_USER_ADDRESS(command.config.descriptor)
 				|| user_memcpy(command.config.descriptor,
-					configurationInfo->descr,
-					sizeof(usb_configuration_descriptor)) != B_OK) {
+					configurationInfo->descr, sizeToCopy) != B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
