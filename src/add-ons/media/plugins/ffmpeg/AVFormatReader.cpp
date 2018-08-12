@@ -432,7 +432,10 @@ StreamBase::Duration() const
 
 	int32 flags;
 	fSource->GetFlags(&flags);
-	if ((flags & B_MEDIA_STREAMING) != 0)
+
+	// "Mutable Size" (ie http streams) means we can't realistically compute
+	// a duration. So don't let ffmpeg giva (wrong) estimate in this case.
+	if ((flags & B_MEDIA_MUTABLE_SIZE) != 0)
 		return 0;
 
 	if ((int64)fStream->duration != AV_NOPTS_VALUE)
