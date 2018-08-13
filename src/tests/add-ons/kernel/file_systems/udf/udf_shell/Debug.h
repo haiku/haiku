@@ -1,5 +1,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
+#error 8
 /* Debug - debug stuff
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de

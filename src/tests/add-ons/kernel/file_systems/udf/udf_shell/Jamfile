@@ -1,43 +1,61 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems udf udf_shell ;
 
-SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems udf ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders [ FDirName kernel ] ;
+# prevent inclusion of HaikuBuildCompatibility.h
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 
+# set some additional defines
 {
-	local defines = [ FDefines USER ] ; # DEBUG _NO_INLINE_ASM
-	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
-	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+	local defines =
+		FS_SHELL
+		;
+
+	if $(DEBUG) = 0 {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;
 }
 
-local fsShellSources = 
-	fsh.c rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
-	stub.c tracker.cpp sysdep.c hexdump.c argv.c
+# platform specific libraries
+local fsShellCommandLibs ;
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
+}
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
+
+UsePrivateHeaders shared storage ;
+UsePrivateHeaders fs_shell ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
+
+BuildPlatformMain <build>udf_shell
+	:
+	crc_table.cpp
+	DString.cpp
+	Icb.cpp
+	MetadataPartition.cpp
+	PhysicalPartition.cpp
+	Recognition.cpp
+	SparablePartition.cpp
+	UdfDebug.cpp
+	UdfString.cpp
+	UdfStructures.cpp
+	Utils.cpp
+	VirtualPartition.cpp
+	Volume.cpp
+	kernel_interface.cpp
+	:
+	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
-
-SimpleTest udf_shell
-	:
-	$(fsShellSources)
-
-	udf.cpp
-	DirectoryIterator.cpp DString.cpp Icb.cpp
-	MetadataPartition.cpp PhysicalPartition.cpp Recognition.cpp
-	UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp
-	SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
-	:
-	;
-
-# Tell Jam where to find these sources
-SEARCH on [ FGristFiles
-		udf.cpp 
-		CS0String.cpp DirectoryIterator.cpp DString.cpp Icb.cpp
-		MetadataPartition.cpp PhysicalPartition.cpp Recognition.cpp
-		UdfDebug.cpp  UdfString.cpp UdfStructures.cpp Utils.cpp
-		SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
-	] = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
-
-SEARCH on [ FGristFiles
-		$(fsShellSources)
-	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
