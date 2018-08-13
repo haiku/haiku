@@ -372,10 +372,10 @@ AVFormatWriter::~AVFormatWriter()
 	TRACE("AVFormatWriter::~AVFormatWriter\n");
 
 	// Free the streams and close the AVCodecContexts
-    for(unsigned i = 0; i < fFormatContext->nb_streams; i++) {
+	for (unsigned i = 0; i < fFormatContext->nb_streams; i++) {
 		av_freep(&fFormatContext->streams[i]->codecpar);
 		av_freep(&fFormatContext->streams[i]);
-    }
+	}
 
 	av_free(fFormatContext);
 	av_free(fIOContext->buffer);
