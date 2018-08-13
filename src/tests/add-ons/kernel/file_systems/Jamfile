@@ -4,7 +4,6 @@ HaikuSubInclude bfs ;
 HaikuSubInclude btrfs ;
 HaikuSubInclude cdda ;
 HaikuSubInclude consistency_check ;
-HaikuSubInclude fs_shell ;
 HaikuSubInclude fragmenter ;
 HaikuSubInclude iso9660 ;
 HaikuSubInclude random_file_actions ;
