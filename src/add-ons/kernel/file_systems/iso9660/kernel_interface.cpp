@@ -33,13 +33,13 @@
 #	include <fs_volume.h>
 
 #	include <util/kernel_cpp.h>
+
+// TODO: temporary solution as long as there is no public I/O requests API
+#	include <io_requests.h>
 #endif
 
 #include "iso9660.h"
 #include "iso9660_identify.h"
-
-// TODO: temporary solution as long as there is no public I/O requests API
-#include <io_requests.h>
 
 
 //#define TRACE_ISO9660
@@ -456,13 +456,17 @@ fs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
 	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
+#ifndef FS_SHELL
 	if (io_request_is_write(request)) {
 		notify_io_request(request, B_READ_ONLY_DEVICE);
 		return B_READ_ONLY_DEVICE;
 	}
+#endif
 
 	if ((node->flags & ISO_IS_DIR) != 0) {
+#ifndef FS_SHELL
 		notify_io_request(request, B_IS_A_DIRECTORY);
+#endif
 		return B_IS_A_DIRECTORY;
 	}
 
