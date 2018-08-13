@@ -10,8 +10,8 @@
 // To make "bits" images, you can use the "translate" command line program or
 // the BBitmapTranslator (available: http://www.bebits.com/app/647).
 //
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
+// This application and all source files used in its construction, except
+// where noted, are licensed under the MIT License, and have been written
 // and are:
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -19,18 +19,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -43,10 +43,10 @@
 #include <TranslatorFormats.h>
 #include <StorageDefs.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "bitsinfo"
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "bitsinfo"
 
-struct ColorSpaceName { 
+struct ColorSpaceName {
 	color_space id;
 	const char *name;
 };
@@ -58,11 +58,11 @@ void
 PrintBitsInfo(const char *filepath, bool bdumppixels)
 {
 	BFile file(filepath, B_READ_ONLY);
-	
+
 	if (file.InitCheck() == B_OK) {
 		TranslatorBitmap header;
 		memset(&header, 0, sizeof(TranslatorBitmap));
-		
+
 		// read in the rest of the header
 		ssize_t size = sizeof(TranslatorBitmap);
 		if (file.Read(reinterpret_cast<uint8 *> (&header), size) != size) {
@@ -80,14 +80,14 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 			printf(B_TRANSLATE("\nError: Unable to swap byte order\n"));
 			return;
 		}
-		
-		printf(B_TRANSLATE("\nBe bitmap (\"bits\") header for: %s\n\n"), 
+
+		printf(B_TRANSLATE("\nBe bitmap (\"bits\") header for: %s\n\n"),
 			filepath);
-	
+
 		const uint32 kbitsmagic = 0x62697473UL;
 			// in ASCII, this number looks like "bits"
 		if (header.magic == kbitsmagic)
-			printf(B_TRANSLATE("magic number: 0x%.8lx (valid)\n"), 
+			printf(B_TRANSLATE("magic number: 0x%.8lx (valid)\n"),
 				header.magic);
 		else
 			printf(B_TRANSLATE("magic number: 0x%.8lx (INVALID, should be: "
@@ -98,10 +98,10 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 		printf(B_TRANSLATE("dimensions: %d x %d\n"),
 			static_cast<int>(header.bounds.Width() + 1),
 			static_cast<int>(header.bounds.Height() + 1));
-		
+
 		printf(B_TRANSLATE("bytes per row: %u\n"),
 			static_cast<unsigned int>(header.rowBytes));
-	
+
 		// print out colorspace if it matches an item in the list
 		ColorSpaceName colorspaces[] = {
 			COLORSPACENAME(B_NO_COLOR_SPACE),
@@ -162,10 +162,10 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 		if (i == kncolorspaces)
 			printf(B_TRANSLATE("color space: Unknown (0x%.8lx)\n"),
 				static_cast<unsigned long>(header.colors));
-			
+
 		printf(B_TRANSLATE("data size: %u\n"),
 			static_cast<unsigned int>(header.dataSize));
-			
+
 		if (bdumppixels) {
 			const char *components = NULL;
 			int32 ncomponents = 0;
@@ -182,7 +182,7 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 					components = "BGRA";
 					ncomponents = 4;
 					break;
-				
+
 				default:
 					printf(B_TRANSLATE("Sorry, %s isn't supported yet"
 						" for this color space\n"), kpixels);
@@ -209,10 +209,10 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 						printf("\n\n");
 				}
 			}
-		}			
-		
+		}
+
 	} else
-		printf(B_TRANSLATE_COMMENT("Error opening %s\n", 
+		printf(B_TRANSLATE_COMMENT("Error opening %s\n",
 			"file path is opening"), filepath);
 }
 
@@ -225,7 +225,7 @@ main(int argc, char **argv)
 		printf(B_TRANSLATE("\nUsage:\n"));
 		printf(B_TRANSLATE("bitsinfo [options] filename.bits\n\n"));
 		printf(B_TRANSLATE("Options:\n\n"));
-		printf(B_TRANSLATE("\t%s \t print RGB color for each pixel\n"), 
+		printf(B_TRANSLATE("\t%s \t print RGB color for each pixel\n"),
 			kpixels);
 	}
 	else {
@@ -239,9 +239,9 @@ main(int argc, char **argv)
 		for (int32 i = first; i < argc; i++)
 			PrintBitsInfo(argv[i], bdumppixels);
 	}
-	
+
 	printf("\n");
-	
+
 	return 0;
 }
 
