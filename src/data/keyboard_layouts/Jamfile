@@ -17,6 +17,8 @@ rule GenerateKeyboardLayoutLocalizationHeader
 actions GenerateKeyboardLayoutLocalizationHeader1
 {
 	$(RM) $(1)
+	echo "#undef B_TRANSLATION_CONTEXT" >> $(1)
+	echo "#define B_TRANSLATION_CONTEXT \"KeyboardLayoutNames\"" >> $(1)
 	for name in "$(HAIKU_KEYBOARD_LAYOUT_FILES)" ; do
 		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
 	done
