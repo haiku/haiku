@@ -27,7 +27,6 @@
 #include <FindDirectory.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
-#include <StackOrHeapArray.h>
 
 #include <arch_config.h>
 #include <boot_device.h>
@@ -57,6 +56,7 @@
 #include <vm/VMAddressSpace.h>
 
 #include "IORequest.h"
+#include "VMUtils.h"
 
 
 #if	ENABLE_SWAP_SUPPORT
@@ -1241,49 +1241,6 @@ private:
 	int32		fBestScore;
 	VolumeInfo&	fVolumeInfo;
 };
-
-
-status_t
-get_mount_point(KPartition* partition, KPath* mountPoint)
-{
-	if (!mountPoint || !partition->ContainsFileSystem())
-		return B_BAD_VALUE;
-
-	int nameLength = 0;
-	const char* volumeName = partition->ContentName();
-	if (volumeName != NULL)
-		nameLength = strlen(volumeName);
-	if (nameLength == 0) {
-		volumeName = partition->Name();
-		if (volumeName != NULL)
-			nameLength = strlen(volumeName);
-		if (nameLength == 0) {
-			volumeName = "unnamed volume";
-			nameLength = strlen(volumeName);
-		}
-	}
-
-	BStackOrHeapArray<char, 128> basePath(nameLength + 2);
-	if (!basePath.IsValid())
-		return B_NO_MEMORY;
-	int32 len = snprintf(basePath, nameLength + 2, "/%s", volumeName);
-	for (int32 i = 1; i < len; i++)
-		if (basePath[i] == '/')
-			basePath[i] = '-';
-	char* path = mountPoint->LockBuffer();
-	int32 pathLen = mountPoint->BufferSize();
-	strncpy(path, basePath, pathLen);
-
-	struct stat dummy;
-	for (int i = 1; ; i++) {
-		if (stat(path, &dummy) != 0)
-			break;
-		snprintf(path, pathLen, "%s%d", (char*)basePath, i);
-	}
-
-	mountPoint->UnlockBuffer();
-	return B_OK;
-}
 
 
 status_t

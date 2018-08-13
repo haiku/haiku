@@ -100,3 +100,4 @@ SubInclude HAIKU_TOP src tests system kernel slab ;
 SubInclude HAIKU_TOP src tests system kernel swap ;
 SubInclude HAIKU_TOP src tests system kernel unit ;
 SubInclude HAIKU_TOP src tests system kernel util ;
+SubInclude HAIKU_TOP src tests system kernel vm ;

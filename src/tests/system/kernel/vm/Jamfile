@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src tests system kernel vm ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel vm ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel fs ] ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateKernelHeaders ;
+
+UnitTestLib libkernelvmtest.so
+	: KernelVMTestAddon.cpp
+	  VMGetMountPointTest.cpp
+
+	  # vm
+	  VMUtils.cpp
+
+	  # fs
+	  KPath.cpp
+	: [ TargetLibstdc++ ]
+;
+
