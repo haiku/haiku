@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	102336796
+1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
 Cancel	ShortcutsWindow		Cancelar
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Tecla
 Open KeySet…	ShortcutsWindow		Abrir combinação de teclas...
 Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
 Revert to saved	ShortcutsWindow		Reverter para salvo
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Seu Texto Aqui\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(Escolha um aplicativo que contenha um requerente de arquivo)

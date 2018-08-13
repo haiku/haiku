@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PackageInstaller	252728737
+1	spanish; castilian	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Instalar a:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceptar
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Instalando archivos y carpetas
 Package installer	PackageView		Instalador de paquete
 Install…	UninstallView		Instalar…
 Skip all	PackageView		Omitir todo
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Ya existe en la ruta provista el ítem llamado '%s'.\n¿Reemplazar el ítem con el que viene en el paquete u omitir?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Ya existe en la ruta provista el script llamado '%s'.\n¿Reemplazar el script por el que viene en el paquete u omitir?
 Running post-installation scripts	PackageInstall		Ejecutando Scripts post-instalación
 Skip	PackageView		Omitir
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ya existe en la ruta provista el directorio llamado '%s'.\n¿Reemplazar el directorio por el que viene en el paquete u omitir?
 The package you requested has been successfully installed on your system.	PackageView		El paquete solicitado ha sido exitosamente instalado en el sistema.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Error! \"%s\" no es una ruta valida.\n
 Installation type:	PackageView		Tipo de instalación:
@@ -45,11 +42,10 @@ Abort	PackageView		Cancelar
 Replace all	PackageView		Reemplazar todo
 Package description	UninstallView		Descripción del paquete
 Decline	PackageTextViewer		Cancelar
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Ya existe en la ruta provista el archivo llamado '%s'.\n¿Reemplazar el archivo por el que viene en el paquete u omitir?
 All existing files will be skipped?	PackageView		¿Todos los archivos existentes serán omitidos?
 Continue	PackageInfo		Continuar
 %index% of %total%	PackageInstall		%index% de %total%
-The package you selected has been successfully removed from your system.	UninstallView		El paquete seleccionado ha sido desinstalado de su sistema correctamente.
+The package you selected has been successfully removed from your system.	UninstallView		El paquete seleccionado ha sido correctamente desinstalado del sistema.
 Abort	PackageInfo		Cancelar
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Cancelar

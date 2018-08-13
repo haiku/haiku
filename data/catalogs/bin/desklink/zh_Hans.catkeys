@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-desklink	3451447865
+1	english	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		控件物理输出
 Couldn't launch 	MediaReplicant		无法启动
 Muted	MediaReplicant		已静音
@@ -11,6 +11,5 @@ Media preferences…	MediaReplicant		多媒体首选项...
 Open MediaPlayer	MediaReplicant		打开媒体播放器
 desklink	MediaReplicant		磁盘链接
 Options	MediaReplicant		选项
-%ld dB	VolumeControl		%ld dB
 Beep	MediaReplicant		蜂鸣
 Volume	VolumeControl		卷

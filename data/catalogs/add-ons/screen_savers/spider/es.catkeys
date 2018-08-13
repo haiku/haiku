@@ -1,10 +1,13 @@
-1	spanish; castilian	x-vnd.Haiku-SpiderScreensaver	4129112141
+1	spanish; castilian	x-vnd.Haiku-SpiderScreensaver	2602622234
 Blue	SpiderView		Azul
 Gray	SpiderView		Gris
+Max. points per polygon	SpiderView		Cantidad máxima de puntos por polígono
+Max. polygon count	SpiderView		Cantidad máxima de polígonos
 Purple	SpiderView		Púrpura
 Red	SpiderView		Rojo
 Color	SpiderView		Color
-Spider by stippi	SpiderView		Spider, desarrollado por stippi
+Spider by stippi	SpiderView		Spider desarrollado por stippi
 Green	SpiderView		Verde
 Cyan	SpiderView		Cian
 Yellow	SpiderView		Amarillo
+Trail depth	SpiderView		Profundidad de cola

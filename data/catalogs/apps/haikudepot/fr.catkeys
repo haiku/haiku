@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	1831209226
+1	french	x-vnd.Haiku-HaikuDepot	1437744500
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
@@ -54,7 +54,6 @@ System & Utilities	Model		Système & Utilitaires
 Inactive	PackageListView		Inactif
 The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas eu lieu : %Error%
 Science & Mathematics	Model		Science & Mathématiques
-Main Menu	MainWindow		Menu principal
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Vous n’avez pas résolu correctement l’énigme Captcha.
 Success	UserLoginWindow		Opération réussie
@@ -79,7 +78,6 @@ Language	RatePackageWindow		Langue
 Size	PackageListView		Taille
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
 User name:	UserLoginWindow		Nom d’utilisateur :
-User Menu	MainWindow		Menu Utilisateur
 Unstable but usable	RatePackageWindow		Instable mais utilisable
 The email address appears to be malformed.	UserLoginWindow		L’adresse email semble mal formée.
 Games	Model		Jeux

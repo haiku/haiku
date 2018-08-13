@@ -3,7 +3,7 @@ Version %d.%d.%d, %s	PPMTranslator		Versión %d.%d.%d, %s
 PPM Settings	PPMMain		Configuración PPM
 Based on PPMTranslator sample code	PPMTranslator		Basado en el código de ejemplo de PPMTranslator
 OK	PPMMain		Aceptar
-Grayscale 8 bits	PPMTranslator		Escala de grises 8 bits
+Grayscale 8 bits	PPMTranslator		Escala de grises en 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
 PPM image	PPMTranslator		Imagen PPM
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
@@ -22,10 +22,10 @@ RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bits
 None	PPMTranslator		Ninguno
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
-Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+Bitmap 1 bit	PPMTranslator		Mapa de bits de 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Código de ejemplo copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Configuración PPMTranslator 
-Something is wrong with the PPMTranslator!	PPMMain		¡Algo va mal en el PPMTranslator!
-System palette 8 bits	PPMTranslator		Paleta de sistema 8 bits
+Something is wrong with the PPMTranslator!	PPMMain		Algo va mal en el PPMTranslator.
+System palette 8 bits	PPMTranslator		Paleta de sistema en 8 bits

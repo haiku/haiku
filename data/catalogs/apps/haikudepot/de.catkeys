@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku-HaikuDepot	2705096857
+1	german	x-vnd.Haiku-HaikuDepot	4015332039
 Name	PackageListView		Name
 Available packages	MainWindow		Verfügbare Pakete
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
+OK	MainWindow		OK
 Close	RatePackageWindow		Schließen
 The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Changelog	PackageInfoView		Änderungsprotokoll
@@ -41,6 +42,7 @@ Installed packages	MainWindow		Installierte Pakete
 Status	PackageListView		Status
 Switch account…	MainWindow		Konto wechseln…
 Ignore	UserLoginWindow		Ignorieren
+Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
 Language	UserLoginWindow		Sprache
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Das Kennwort ist zu schwach oder ungültig. Es muss mindestens 8 Zeichen lang sein und mindestens 2 Zahlen und 2 Großbuchstaben enthalten.
 Show only featured packages	FilterView		Nur Empfehlungen anzeigen
@@ -56,7 +58,6 @@ System & Utilities	Model		Tools & System
 Inactive	PackageListView		Deaktiviert
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Science & Mathematics	Model		Wissenschaft
-Main Menu	MainWindow		Hauptmenü
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Die Captcha-Frage wurde nicht richtig beantwortet.
 Success	UserLoginWindow		Erfolg
@@ -82,7 +83,6 @@ Language	RatePackageWindow		Sprache
 Size	PackageListView		Größe
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 User name:	UserLoginWindow		Benutzername:
-User Menu	MainWindow		Benutzermenü
 Unstable but usable	RatePackageWindow		Instabil aber brauchbar
 The email address appears to be malformed.	UserLoginWindow		Das Format der angegebenen E-Mail-Adresse ist fehlerhaft.
 Games	Model		Spiele
@@ -118,6 +118,7 @@ Screenshot	ScreenshotWindow		Bildschirmfoto
 Not specified	RatePackageWindow		Keine Angaben
 Available	PackageListView		Verfügbar
 Develop packages	MainWindow		Entwicklungs-Pakete
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (Version %hd.version%)
 n/a	PackageInfoView		n.v.
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Wird keine E-Mail-Adresse hinterlegt, kann das Kennwort nicht zurückgesetzt werden, wenn es mal vergessen wird.
  It responded with: 	UserLoginWindow		 Es antwortete mit: 

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	102336796
+1	german	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Cancel	ShortcutsWindow		Abbrechen
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Taste
 Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
 Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?
 Revert to saved	ShortcutsWindow		Gespeicherten Stand herstellen
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
 (Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)

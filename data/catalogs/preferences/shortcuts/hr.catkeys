@@ -1,10 +1,9 @@
-1	croatian	x-vnd.Haiku-Shortcuts	2172356032
+1	croatian	x-vnd.Haiku-Shortcuts	3681304029
 OK	ShortcutsWindow		U redu
 Cancel	ShortcutsWindow		Otkaži
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tipka
 Revert to saved	ShortcutsWindow		Vrati na spremljeno
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *MouseUp	ShortcutsWindow		*Mišgore
 (Choose application with file requester)	ShortcutsWindow		(Odaberi program sa zahtjevom za datoteku)
 Save	ShortcutsWindow		Spremi

@@ -18,5 +18,5 @@ Address	NetworkStatusView		Dirección
 OK	NetworkStatusView		Aceptar
 NetworkStatus	System name		NetworkStatus
 Open network preferences…	NetworkStatusView		Abrir preferencias de red ...
-Could not join wireless network:\n	NetworkStatusView		No se puedo unir a la red inalámbrica
+Could not join wireless network:\n	NetworkStatusView		No se pudo conectar a la red inalámbrica:\n
 Quit	NetworkStatusView		Salir

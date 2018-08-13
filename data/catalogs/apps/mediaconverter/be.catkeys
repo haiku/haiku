@@ -1,11 +1,9 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	217152063
+1	belarusian	x-vnd.Haiku-MediaConverter	3017975112
 Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
 Video encoding:	MediaConverter		Кадаванне відэа:
-Error read audio frame %lld	MediaConverter		Памылка чытання фрэйма %lld
 No audio	Audio codecs list		Няма аўдыё
 Error	MediaConverter		Памылка
 Error loading a file	MediaConverter		Немагчыма адкрыць файл
-Error read video frame %lld	MediaConverter		Памылка чытання фрэйма %lld
 File Error	MediaConverter-FileInfo		Памылка файла
 Open…	Menu		Адкрыць…
 Start [ms]: 	MediaConverter		Пачатак [мсек]: 
@@ -23,8 +21,6 @@ Audio:	MediaConverter-FileInfo		Аўдыё:
 OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секундаў
 Source files	MediaConverter		Зыходныя файлы
-Error writing video frame %lld	MediaConverter		Памылка запісу фрэйма %lld
-Error writing audio frame %lld	MediaConverter		Памылка запіса аўдыё фрэйма %lld
 Cancelling	MediaConverter		Адмена
 Error loading files	MediaConverter		Немагчыма загрузіць файлы
 Cancel	MediaConverter		Адмена
@@ -41,7 +37,6 @@ Video quality not supported	MediaConverter		Якасць відэа не пад�
 Cancelling…	MediaConverter		Адмена…
 File details	MediaConverter		Падрабязнасці пра файл
 Select	MediaConverter		Абраць
-Writing video track: %ld%% complete	MediaConverter		Запіс відэа трэку: выканана на %ld%%
 Quit	Menu		Выйсці
 Preview	MediaConverter		Прагляд
 File format:	MediaConverter		Фармат файла:
@@ -54,7 +49,6 @@ Audio encoding:	MediaConverter		Аўдыё кадаванне:
 Audio quality not supported	MediaConverter		Якасць аўдыё не падтрымліваецца
 File	Menu		Файл
 Convert	MediaConverter		Канвертаваць
-Writing audio track: %ld%% complete	MediaConverter		Запіс аўдыё трэку: выканана на %ld%%
 Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
 Output folder	MediaConverter		Папка для выходных файлаў
 Audio quality: %3d%%	MediaConverter		Якасць аўдыё: %3d%%

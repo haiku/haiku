@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PackageInstaller	252728737
+1	romanian	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Instalează la:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptare
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Se instalează fișiere și dosare
 Package installer	PackageView		Program de instalare pachete
 Install…	UninstallView		Instalare…
 Skip all	PackageView		Omite tot
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Elementul '%s' există deja pe calea dată.\nÎl înlocuiți cu cel din acest pachet sau omiteți?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scriptul '%s' există deja pe calea dată.\nÎl îinlocuiți cu cel din acest pachet sau omiteți?
 Running post-installation scripts	PackageInstall		Se rulează scripturi post-instalare
 Skip	PackageView		Omite
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Dosarul '%s' există deja pe calea dată.\nÎl înlocuiți cu cel din acest pachet sau omiteți?
 The package you requested has been successfully installed on your system.	PackageView		Pachetul pe care l-ați solicitat a fost instalat cu succes în sistem.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eroare! \"%s\" nu este o cale validă.\n
 Installation type:	PackageView		Tip instalare:
@@ -45,7 +42,6 @@ Abort	PackageView		Anulează
 Replace all	PackageView		Înlocuiește tot
 Package description	UninstallView		Descriere pachet
 Decline	PackageTextViewer		Refuzare
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Fișierul '%s' există deja pe calea dată.\nÎnlocuiți fișierul cu cel din acest pachet sau omiteți?
 All existing files will be skipped?	PackageView		Toate fișierele existente vor fi sărite?
 Continue	PackageInfo		Continuare
 %index% of %total%	PackageInstall		%index% din %total%

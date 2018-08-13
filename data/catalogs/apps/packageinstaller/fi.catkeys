@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	252728737
+1	finnish	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Asenna kohteeseen:
 OK	PackageView		Valmis
 Accept	PackageTextViewer		Hyväksy
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Asennetaan tiedostoja ja kansioita
 Package installer	PackageView		Paketin asennusohjelma
 Install…	UninstallView		Asenna...
 Skip all	PackageView		Ohita kaikki
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko kohde vastaavalla tästä paketista vai ohitetaanko se?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 Running post-installation scripts	PackageInstall		Suoritetaan jälkiasennusskriptit
 Skip	PackageView		Ohita
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Hakemisto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko hakemisto vastaavalla tästä paketista vai ohitetaanko se?
 The package you requested has been successfully installed on your system.	PackageView		Pyytämäsi paketti on asennettu järjestelmääsi onnistuneesti.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Virhe! ”%s” ei ole kelvollinen polku.\n
 Installation type:	PackageView		Asennustyyppi:
@@ -45,7 +42,6 @@ Abort	PackageView		Keskeytä
 Replace all	PackageView		Korvaa kaikki
 Package description	UninstallView		Pakkauskuvaus
 Decline	PackageTextViewer		Kieltäydy
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
 Continue	PackageInfo		Jatka
 %index% of %total%	PackageInstall		%index% / %total%

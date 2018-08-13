@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	1831209226
+1	slovak	x-vnd.Haiku-HaikuDepot	1437744500
 Name	PackageListView		Názov
 Available packages	MainWindow		Dostupné balíky
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
@@ -54,7 +54,6 @@ System & Utilities	Model		Systém a nástroje
 Inactive	PackageListView		Neaktívne
 The package action could not be scheduled: %Error%	PackageInfoView		Operáciu s balíkom nebolo možné naplánovať: %Error%
 Science & Mathematics	Model		Veda a matematika
-Main Menu	MainWindow		Hlavné menu
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Nevyriešili ste správne captcha.
 Success	UserLoginWindow		Úspech
@@ -79,7 +78,6 @@ Language	RatePackageWindow		Jazyk
 Size	PackageListView		Veľkosť
 You need to be logged into an account before you can rate packages.	MainWindow		Musíte byť prihlásení do účtu predtým, než budete môcť hodnotiť balíky.
 User name:	UserLoginWindow		Používateľské meno:
-User Menu	MainWindow		Používateľské menu
 Unstable but usable	RatePackageWindow		Nestabilný, ale použiteľný
 The email address appears to be malformed.	UserLoginWindow		Zdá sa, že formát emailovej adresy je chybný.
 Games	Model		Hry

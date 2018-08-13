@@ -30,7 +30,7 @@ Open network stream	MediaPlayer-NetworkStream		Abrir transmisión de red
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Open…	MediaPlayer-PlaylistWindow		Abrir...
 Undo	MediaPlayer-PlaylistWindow		Deshacer
-Stream URL:	MediaPlayer-NetworkStream		URL de transmisión:
+Stream URL:	MediaPlayer-NetworkStream		URL de streaming:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usar capas de hardware de video si es posible.
 File info…	MediaPlayer-Main		Información del archivo...
 Overlay	MediaPlayer-InfoWin		Superposición
@@ -95,7 +95,7 @@ Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entradas a la pap
 200% scale	MediaPlayer-Main		Escala al 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece el servidor de medios no está ejecutando.\n¿Quiere iniciarlo?
 Duration	MediaPlayer-InfoWin		Duración
-Aspect ratio	MediaPlayer-Main		Radio de aspecto:
+Aspect ratio	MediaPlayer-Main		Relación de aspecto:
 Error: 	MediaPlayer-Main		Error:
 Large	MediaPlayer-SettingsWindow		Grande
 Bottom of video	MediaPlayer-SettingsWindow		Parte inferior del vídeo
@@ -110,7 +110,7 @@ Open clips	MediaPlayer-Main		Abrir las secuencias
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar entrada
 none	Subtitles menu		ninguno
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
-Invalid URL inserted!	MediaPlayer-NetworkStream		La URL no es válida.
+Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida.
 OK	MediaPlayer-NetworkStream		Aceptar
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Pequeño
@@ -119,10 +119,10 @@ Off	Subtitles menu		Apagar
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Desordenar las entradas
 Revert	MediaPlayer-SettingsWindow		Revertir
 Edit	MediaPlayer-PlaylistWindow		Editar
-Start media server	MediaPlayer-Main		Empezar servidor de medios
+Start media server	MediaPlayer-Main		Iniciar servidor de medios
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Bad URL	MediaPlayer-NetworkStream		URL incorrecta
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} other{# Canales}}
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} otros{# Channels}}
 <unnamed>	PlaylistItem-name		<sin nombre>
 OK	MediaPlayer-PlaylistWindow		Aceptar
 none	Audio track menu		ninguno

@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-About	103323823
+1	slovenian	x-vnd.Haiku-About	3637650742
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (in njegovo jedro NewOS)\n
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ustanovitelj projekta)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB v rabi (%d%%)
@@ -9,7 +9,6 @@ Source Code: 	AboutView		Izvorna koda:
 Kernel:	AboutView		Jedro operacijskega sistema:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB skupaj, %inaccessible MiB nedostopnega
 Unknown	AboutView		Neznano
-Public Domain	AboutWindow		Javna domena
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Spomin:
 Past maintainers:\n	AboutView		Nekdanji vzdrževalci:\n

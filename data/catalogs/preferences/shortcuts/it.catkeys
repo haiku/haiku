@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	102336796
+1	italian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
 Cancel	ShortcutsWindow		Annulla
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Tasto
 Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
 Error, NULL state description?	ShortcutsSpec		Errore: probabile descrizione di stato NULL\n
 Revert to saved	ShortcutsWindow		Ripristina quanto salvato
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
 *MouseUp	ShortcutsWindow		*MouseRilasciato
 (Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	3050479328
+1	spanish; castilian	x-vnd.Haiku-Terminal	662975527
 Not found.	Terminal TermWindow		No encontrado.
 Switch Terminals	Terminal TermWindow		Intercambiar Terminales
 Change directory	Terminal TermView		Cambiar directorio 
@@ -33,7 +33,9 @@ Increase	Terminal TermWindow		Aumentar
 Settings	Terminal TermWindow		Ajustes
 Window size	Terminal TermWindow		Tamaño de la ventana
 Selected text	Terminal AppearancePrefView		Seleccionar texto
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo del proceso activo en la pestaña actual.\n\t\t\tOpcionalmente puede especificarse el número máximo de\n\t\t\tcomponentes de ruta. P.ej. '%2d' para al menos dos componentes.\n\t%T\t-\tEl nombre en Terminal de la aplicación para el local actual.\n\t%e\t-\tLa codificación de la pestaña actual. No mostrado para UTF-8.\n\t%i\t-\tEl índice de la ventana.\n\t%p\t-\tEl nombre del proceso activo en la pestaña actual.\n\t%t\t-\tEl nombre de la pestaña actual.
 Find	Terminal FindWindow		Encontrar
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patrón especificando los títulos de las ventanas. Los siguientes marcadores de posición\npueden ser usados:
 Appearance	Terminal PrefWindow		Apariencia
 Tab title:	Terminal AppearancePrefView		Título de la pestaña
 OK	Terminal SetTitleWindow		Aceptar
@@ -75,6 +77,7 @@ Midnight	Terminal colors scheme		Medianoche
 Decrease	Terminal TermWindow		Disminuir
 Default	Terminal colors scheme		Predeterminada
 Create link here	Terminal TermView		Crear enlace aquí
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patrón especificando los títulos de las ventanas. Los siguientes marcadores de posición\npueden usarse:
 Close	Terminal TermWindow		Cerrar
 Text	Terminal AppearancePrefView		Texto
 Clear all	Terminal TermWindow		Limpiar todo
@@ -82,11 +85,12 @@ Text encoding	Terminal TermWindow		Codificación de texto
 Allow bold text	Terminal AppearancePrefView		Permitir texto en negrita
 Close window	Terminal TermWindow		Cerrar ventana
 Copy absolute path	Terminal TermView		Copiar ruta absoluta
-Save as default	Terminal TermWindow		Guardar como predeterminado
+Save as default	Terminal TermWindow		Definir como predeterminado
 Set tab title	Terminal TermWindow		Fijar el título de la ventana
 Settings…	Terminal TermWindow		Ajustes...
 Abort	Terminal Shell		Cancelar
 Open link	Terminal TermView		Abrir enlace
+Solarized Light	Terminal colors scheme		Luz solarizada
 Edit	Terminal TermWindow		Editar
 Color:	Terminal AppearancePrefView		Color:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patrón especifica el título de la ventana. Los siguientes marcadores de posición\ncpueden ser usados:\n
@@ -98,12 +102,14 @@ Find failed	Terminal TermWindow		Busqueda fallida
 Search forward	Terminal FindWindow		Buscar hacia delante
 Edit tab title…	Terminal TermWindow		Cambiar el título de la pestaña
 Open path	Terminal TermView		Abrir ruta
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo del proceso activo.\n\t\t\tOpcionalmente, la cantidad máxima de componentes de la ruta pueden ser\n\t\t\tespecificadas. Por ej. '%2d' para un máximo de dos componentes.\n\t%i\t-\tEl índice de la pestaña.\n\t%e\t-\tLa codificación de la pestaña actual. No se muestra para UTF-8.\n\t%p\t-\tEl nombre del proceso activo.\n\t%%\t-\tEl carácter '%'.
 Find previous	Terminal TermWindow		Buscar anterior
 Copy link location	Terminal TermView		Copiar ubicación del enlace
 Tab title:	Terminal TermWindow		Título de la pestaña:
 Find next	Terminal TermWindow		Buscar siguiente
 Close active tab	Terminal TermWindow		Cerrar la pestaña activa
 Paste	Terminal TermWindow		Pegar
+Solarized Dark	Terminal colors scheme		Oscuridad solarizada
 Shell 	Terminal TermWindow		Shell
 Cancel	Terminal TermView		Cancelar
 Use default	Terminal SetTitleWindow		Usar predeterminado

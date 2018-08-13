@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaConverter	449941121
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	3017975112
 Video using parameters form settings	MediaConverter		Video gebruik makend van de gespecifieerde instellingen
 Video encoding:	MediaConverter		Videocodering:
 No audio	Audio codecs list		Geen audio
@@ -37,7 +37,6 @@ Video quality not supported	MediaConverter		Videokwaliteit niet ondersteund
 Cancelling…	MediaConverter		Wordt geannuleerd...
 File details	MediaConverter		Bestandsdetails
 Select	MediaConverter		Selecteren
-Writing video track: %ld%% complete	MediaConverter		Schrijven van videospoor: %ld%% voltooid
 Quit	Menu		Afsluiten
 Preview	MediaConverter		Voorbeeld
 File format:	MediaConverter		Bestandsformaat:
@@ -50,7 +49,6 @@ Audio encoding:	MediaConverter		Audiocodering:
 Audio quality not supported	MediaConverter		Geluidskwaliteit wordt niet ondersteund
 File	Menu		Bestand
 Convert	MediaConverter		Converteren
-Writing audio track: %ld%% complete	MediaConverter		Schrijven van audiospoor: %ld%% voltooid
 Video quality: %3d%%	MediaConverter		Videokwaliteit: %3d%%
 Output folder	MediaConverter		Uitvoermap
 Audio quality: %3d%%	MediaConverter		Audiokwaliteit: %3d%%

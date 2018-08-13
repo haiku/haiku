@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	102336796
+1	french	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n’a pas pu enregistrer votre jeu de touches.
 Cancel	ShortcutsWindow		Annuler
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Touche
 Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
 Error, NULL state description?	ShortcutsSpec		Erreur : description d’état NULL ?
 Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
 *MouseUp	ShortcutsWindow		*SourisEnHaut
 (Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)

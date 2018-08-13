@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1831209226
+1	hungarian	x-vnd.Haiku-HaikuDepot	1437744500
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
@@ -54,7 +54,6 @@ System & Utilities	Model		Rendszer és eszközök
 Inactive	PackageListView		Inaktív
 The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
 Science & Mathematics	Model		Tudomány és matematika
-Main Menu	MainWindow		Főmenü
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		A megadott kapta kód érvényes.
 Success	UserLoginWindow		Sikeres
@@ -79,7 +78,6 @@ Language	RatePackageWindow		Nyelv
 Size	PackageListView		Méret
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
 User name:	UserLoginWindow		Felhasználónév:
-User Menu	MainWindow		Felhasználói menü
 Unstable but usable	RatePackageWindow		Instabil, de használható
 The email address appears to be malformed.	UserLoginWindow		Hibás az e-mail cím formátuma.
 Games	Model		Játékok

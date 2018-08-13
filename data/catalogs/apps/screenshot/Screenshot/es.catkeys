@@ -9,7 +9,7 @@ Capture active window	ScreenshotWindow		Capturar la ventana actual
 Cancel	ScreenshotWindow		Cancelar
 Name:	ScreenshotWindow		Nombre:
 Choose folder…	ScreenshotWindow		Elegir carpeta…
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		El fichero ya existe.\n¿Está seguro que desea sobrescribirlo?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		El archivo ya existe.\n¿Está seguro de que desea sobrescribirlo?
 Choose folder	ScreenshotWindow		Elegir carpeta
 Save	ScreenshotWindow		Guardar
 Overwrite	ScreenshotWindow		Sobrescribir
@@ -21,7 +21,7 @@ screenshot	Screenshot	Base filename of screenshot files	Captura
 New screenshot	ScreenshotWindow		Nueva captura
 Artwork folder	ScreenshotWindow		Carpeta de Artwork
 Home folder	ScreenshotWindow		Carpeta home
-Failed to save screenshot	ScreenshotWindow		Error al guardar captura de pantalla
+Failed to save screenshot	ScreenshotWindow		Fallo al guardar captura de pantalla
 OK	ScreenshotWindow		Aceptar
 Settings…	ScreenshotWindow		Ajustes...
 overwrite	ScreenshotWindow		Sobreescribir

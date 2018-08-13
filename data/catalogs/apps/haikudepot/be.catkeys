@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	4084227647
+1	belarusian	x-vnd.Haiku-HaikuDepot	1426156857
 Name	PackageListView		Імя
 Close	RatePackageWindow		Закрыць
 Changelog	PackageInfoView		Гісторыя зменаў
@@ -19,7 +19,6 @@ Development	Model		Распрацоўка
 Fatal error	PackageManager		Фатальная памылка
 Ratings	PackageInfoView		Рэйтынг
 Inactive	PackageListView		Неактыўны
-Main Menu	MainWindow		Галоўнае меню
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Спампоўваецца:
 Search terms:	FilterView		Умовы пошуку:

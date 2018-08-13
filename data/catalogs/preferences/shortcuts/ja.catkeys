@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Shortcuts	102336796
+1	japanese	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
 Cancel	ShortcutsWindow		中止
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Key
 Open KeySet…	ShortcutsWindow		キーセットを開く…
 Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
 Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(ファイルリクエスタと共にアプリケーションを選択)

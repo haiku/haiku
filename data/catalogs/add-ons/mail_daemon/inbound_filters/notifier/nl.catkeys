@@ -1,7 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-NewMailNotification	2338542986
+1	dutch; flemish	x-vnd.Haiku-NewMailNotification	2111731137
 none	NotifierConfigView		geen
 Method:	NotifierConfigView		Methode:
 Beep	NotifierConfigView		Geluidssignaal
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Eén nieuw bericht} other {# nieuwe berichten}}
 New mails notification	NotifierFilter		Nieuwe e-mails notificatie
 Central alert	NotifierConfigView		Centraal signaal
 OK	NotifierFilter		OK

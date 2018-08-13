@@ -38,7 +38,7 @@ Landscape	ConfigWindow		Horizontal (apaisado)
 Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Oficio
 There are no printers set up.	PrintServerApp		No hay impresoras configuradas.
 Get name of the transport add-on used for this printer	Printer Scripting		Obtener el nombre del medio usado en esta impresora
-All pages, %1 copies	ConfigWindow		Todas las páginas, 1 copia
+All pages, %1 copies	ConfigWindow		Todas las páginas, %1 copias
 Delete a specific printer	PrintServerApp Scripting		Eliminar la impresora especificada
 Create a new printer	PrintServerApp Scripting		Crear una nueva impresora
 OK	PrintServerApp		Aceptar

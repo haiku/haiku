@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2555682678
+1	english	x-vnd.Haiku-HaikuDepot	2162217952
 Name	PackageListView		名称
 Available packages	MainWindow		可用软件包
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
@@ -54,7 +54,6 @@ System & Utilities	Model		系统工具
 Inactive	PackageListView		未激活
 The package action could not be scheduled: %Error%	PackageInfoView		软件包操作无法预订执行：%Error%
 Science & Mathematics	Model		科学数学
-Main Menu	MainWindow		主菜单
 (%Votes%)	PackageInfoView		（%Votes%）
 You have not solved the captcha puzzle correctly.	UserLoginWindow		验证码输入不正确。
 Success	UserLoginWindow		成功
@@ -79,7 +78,6 @@ Language	RatePackageWindow		语言
 Size	PackageListView		大小
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
 User name:	UserLoginWindow		用户名:
-User Menu	MainWindow		用户菜单
 Unstable but usable	RatePackageWindow		不稳定，但是可用
 The email address appears to be malformed.	UserLoginWindow		邮件地址不正确。
 Games	Model		游戏

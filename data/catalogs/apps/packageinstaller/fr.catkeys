@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PackageInstaller	252728737
+1	french	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Installer vers :
 OK	PackageView		OK
 Accept	PackageTextViewer		Accepter
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Installation des fichiers et des do
 Package installer	PackageView		Installeur de paquets
 Install…	UninstallView		Installer…
 Skip all	PackageView		Passer tout
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L’élément nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer l’élément par celui de ce paquet ?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Le script nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le script par celui de ce paquet ?
 Running post-installation scripts	PackageInstall		Exécution des scripts post-installation
 Skip	PackageView		Passer
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Le dossier nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le dossier par celui de ce paquet ?
 The package you requested has been successfully installed on your system.	PackageView		Le paquet que vous avez demandé a été correctement installé sur votre système.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Erreur ! « %s » n’est pas un chemin valide.\n
 Installation type:	PackageView		Type d’installation :
@@ -45,7 +42,6 @@ Abort	PackageView		Abandonner
 Replace all	PackageView		Remplacer tout
 Package description	UninstallView		Description du paquet
 Decline	PackageTextViewer		Refuser
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Le fichier nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le fichier par celui de ce paquet ?
 All existing files will be skipped?	PackageView		Voulez-vous ignorer tous les fichiers existants ?
 Continue	PackageInfo		Continuer
 %index% of %total%	PackageInstall		%index% sur %total%

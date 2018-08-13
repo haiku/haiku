@@ -12,6 +12,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Stopped	file:ZipOMaticWindow.cpp		Detenido
 Archive	file:ZipperThread.cpp		Archivo
 Error creating archive	file:ZipOMaticWindow.cpp		Error al crear el archivo
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# archivo añadido.} other{# archivos añadidos.}}
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
 Archive created OK	file:ZipOMaticWindow.cpp		Archivo correctamente creado
 Stop them	file:ZipOMatic.cpp		Detenerlos

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	102336796
+1	ukrainian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		Гаразд
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Гарячим клавішам не вдалося зберегти ваші установки.
 Cancel	ShortcutsWindow		Скасувати
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Клавіша
 Open KeySet…	ShortcutsWindow		Відкрити список…
 Error, NULL state description?	ShortcutsSpec		Помилка, опис нульового стану?
 Revert to saved	ShortcutsWindow		Повернутися до збереження
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити рядок \"Ваш текст тут\"
 *MouseUp	ShortcutsWindow		*Мишку вгору
 (Choose application with file requester)	ShortcutsWindow		(Виберіть програму з запитом файла)

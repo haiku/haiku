@@ -1,11 +1,12 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2705096857
+1	romanian	x-vnd.Haiku-HaikuDepot	4015332039
 Name	PackageListView		Nume
 Available packages	MainWindow		Pachete disponibile
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
+OK	MainWindow		OK
 Close	RatePackageWindow		Închidere
 The captcha puzzle needs to be solved.	UserLoginWindow		Puzzle captcha trebuie rezolvat.
 Changelog	PackageInfoView		Jurnal de modificări
-Your rating:	RatePackageWindow		Evaluarea ta:
+Your rating:	RatePackageWindow		Evaluare:
 The passwords do not match.	UserLoginWindow		Parolele nu se potrivesc.
 Log in…	MainWindow		Autentificare…
 Rate %Package%	RatePackageWindow		Evaluează %Package%
@@ -41,6 +42,7 @@ Installed packages	MainWindow		Pachete instalate
 Status	PackageListView		Stare
 Switch account…	MainWindow		Schimbare cont…
 Ignore	UserLoginWindow		Ignoră
+Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 Language	UserLoginWindow		Limbă
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
 Show only featured packages	FilterView		Arată doar pachetele recomandate
@@ -56,7 +58,6 @@ System & Utilities	Model		Sistem & Utilități
 Inactive	PackageListView		Inactiv
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
 Science & Mathematics	Model		Știință & Matematică
-Main Menu	MainWindow		Meniu principal
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Nu ați rezolvat corect puzzle captcha.
 Success	UserLoginWindow		Succes
@@ -68,7 +69,7 @@ Repository	PackageListView		Depozit
 Education	Model		Educație
 Search terms:	FilterView		Termeni de căutat:
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Nu sunt disponibile evaluări de utilizator.
+No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările utilizatorilor.
 Does not start	RatePackageWindow		Nu pornește
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		O eroare s-a întâmplat actualizând depozitul: %error% (%details%)
 There are problems in the form:\n\n	UserLoginWindow		Sunt probleme de forma:\n\n
@@ -82,7 +83,6 @@ Language	RatePackageWindow		Limbă
 Size	PackageListView		Mărime
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.
 User name:	UserLoginWindow		Nume utilizator:
-User Menu	MainWindow		Meniu utilizator
 Unstable but usable	RatePackageWindow		Instabil dar utilizabil
 The email address appears to be malformed.	UserLoginWindow		Adresa de email pare a fi incorectă.
 Games	Model		Jocuri
@@ -118,6 +118,7 @@ Screenshot	ScreenshotWindow		Captură ecran
 Not specified	RatePackageWindow		Nespecificat
 Available	PackageListView		Disponibil
 Develop packages	MainWindow		Dezvoltă pachete
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versiunea %hd.version%)
 n/a	PackageInfoView		n/a
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Dacă nu furnizați o adresă de email, nu veți putea reseta parola dacă o uitați.
  It responded with: 	UserLoginWindow		 A răspuns cu: 

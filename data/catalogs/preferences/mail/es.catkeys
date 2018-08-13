@@ -4,7 +4,7 @@ Never	Config Window	show status window	Nunca
 While sending and receiving	Config Window		Mientras se envíe y reciba
 Incoming	Config Window		Entrante
 Server name:	E-Mail		Nombre del servidor:
-An error occurred while creating the config view: %error.	Config Views		Ha ocurrido un error al crear la vista de configuración: %error.
+An error occurred while creating the config view: %error.	Config Views		Ocurrió un error al crear la vista de configuración: %error.
 OK	Config Window		Aceptar
 E-mail address:	E-Mail		Dirección de correo electrónico:
 Account name:	E-Mail		Nombre de la cuenta:
@@ -19,7 +19,7 @@ Password:	E-Mail		Contraseña:
 Accounts	Config Window		Cuentas
 Finish	AutoConfigWindow		Terminar
 Remove	Config Window		Eliminar
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crea una nueva cuenta con el botón Añadir.\n\nElimina una cuenta con el botón Borrar en el objeto seleccionado.\n\nSelecciona un objeto en la lista para cambiar sus propiedades.
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crear una nueva cuenta con el botón Añadir.\n\nEliminar una cuenta con el botón Borrar en el objeto seleccionado.\n\nSeleccione un objeto en la lista para cambiar sus propiedades.
 Error!	Config Views		¡Error!
 Server Name:	E-Mail		Nombre del servidor:
 While sending	Config Window		Mientras se envia

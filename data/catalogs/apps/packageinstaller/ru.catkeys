@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	252728737
+1	russian	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Установка файлов и 
 Package installer	PackageView		Установщик пакетов
 Install…	UninstallView		Установить…
 Skip all	PackageView		Пропустить все
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Элемент с именем '%s' уже существует по этому пути.\nЗаменить этот файл тем, что находится внутри пакета или пропустить го?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт с именем '%s' уже существует по этому пути.\nЗаменить этот скрипт тем, что находится внутри пакета или пропустить его?
 Running post-installation scripts	PackageInstall		Выполнение постинсталляционных скриптов
 Skip	PackageView		Пропустить
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по этому пути.\nЗаменить эту папку той, что находится внутри пакета или пропустить ее?
 The package you requested has been successfully installed on your system.	PackageView		Пакет, который вы просили, был успешно установлен на вашей системе.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Ошибка! \"%s\" не является правильным путем.\n
 Installation type:	PackageView		Тип установки:
@@ -45,7 +42,6 @@ Abort	PackageView		Прервать
 Replace all	PackageView		Заменить все
 Package description	UninstallView		Описание пакета
 Decline	PackageTextViewer		Отклонить
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл с именем '%s' уже существует по этому пути.\n Заменить этот файл тем, что находится внутри пакета или пропустить его?
 All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
 %index% of %total%	PackageInstall		%index% из %total%

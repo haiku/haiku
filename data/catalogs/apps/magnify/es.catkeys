@@ -5,7 +5,7 @@ Copy image	Magnify-Main		Copiar imagen
 usage: magnify [size] (magnify size * size pixels)\n	Console		uso: magnify [tamaño] (tamaño de ampliar * tamaño de píxeles)\n
 Freeze image	Magnify-Main		Congelar imagen
 Stick coordinates	Magnify-Main		Pegar coordenadas
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# píxel/píxel} other{# píxeles/píxel}}
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Show info	Magnify-Main		Mostrar información
 magnify: size must be a multiple of 4\n	Console		magnify: el tamaño debe ser un múltiplo de 4\n
 Decrease pixel size	Magnify-Main		Disminuir tamaño del píxel

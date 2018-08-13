@@ -921,12 +921,12 @@ else
 			# Clang's compiler intrinsics are not compatible with GCC's or even
 			# across versions of Clang, so we must collect them for use in the build.
 			mkdir -p "$outputDir/clang_headers" || exit 1
-			clangHeadersDir=`$gcc -print-resource-dir`/include/
-			case $targetArch in
-				x86*) cp $clangHeadersDir/*intrin* $clangHeadersDir/mm3* "$outputDir/clang_headers" || exit 1 ;;
-				ppc*) cp $clangHeadersDir/*altivec* "$outputDir/clang_headers" || exit 1 ;;
-				arm*) cp $clangHeadersDir/*arm* "$outputDir/clang_headers" || exit 1 ;;
-			esac
+			#clangHeadersDir=`$gcc -print-resource-dir`/include/
+			#case $targetArch in
+			#	x86*) cp $clangHeadersDir/*intrin* $clangHeadersDir/mm3* "$outputDir/clang_headers" || exit 1 ;;
+			#	ppc*) cp $clangHeadersDir/*altivec* "$outputDir/clang_headers" || exit 1 ;;
+			#	arm*) cp $clangHeadersDir/*arm* "$outputDir/clang_headers" || exit 1 ;;
+			#esac
 		elif [ -z "${crossToolsPrefix}" ]; then
 			gcc=`get_variable HAIKU_CC_$targetArch`
 		else

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Shortcuts	102336796
+1	belarusian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		ОК
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць вашу канфігурацыю (KeySet).
 Cancel	ShortcutsWindow		Адмена
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Клавіша
 Open KeySet…	ShortcutsWindow		Адкрыць KeySet…
 Error, NULL state description?	ShortcutsSpec		Памылка, апісанне стану NULL?
 Revert to saved	ShortcutsWindow		Вярнуцца да захаванага
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*УставіцьСтраку \"Ваш Тэкст\"
 *MouseUp	ShortcutsWindow		*МышУверх
 (Choose application with file requester)	ShortcutsWindow		(Выберыце праграму, якая патрабуе выбара файлу)

@@ -1,15 +1,13 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	2816184527
+1	ukrainian	x-vnd.Haiku-MediaConverter	1322040280
 Video using parameters form settings	MediaConverter		Відео використовує параметри з налаштувань
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не був розпізнаний як підтримуваний медіафайл:} other{# Файли не були розпізнані як підтримувані медіафайли:}}
 Video encoding:	MediaConverter		Кодування відео:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error creating video.	MediaConverter		Помилка при створенні відео
-Error read audio frame %lld	MediaConverter		Помилка читання аудіокадру %lld
 No audio	Audio codecs list		Без звуку
 Error	MediaConverter		Помилка
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# біт} other{# бітів}}
 Error loading a file	MediaConverter		Помилка завантаження файлу
-Error read video frame %lld	MediaConverter		Помилка читання відеокадру %lld
 File Error	MediaConverter-FileInfo		Помилка файлу
 Open…	Menu		Відкрити…
 Start [ms]: 	MediaConverter		Початок [ms]: 
@@ -30,9 +28,7 @@ OK	MediaConverter-FileInfo		Гаразд
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Помилка призаписі до: %strPath%. По замовчуванню: /boot/home
 Source files	MediaConverter		Файли джерела
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Вибраний коталог не знайдено. Позамовчуванню: /boot/home
-Error writing video frame %lld	MediaConverter		Помилка запису відеокадру %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} other{# кадрів}}
-Error writing audio frame %lld	MediaConverter		Помилка запису аудіокадру %lld
 Cancelling	MediaConverter		Відміна
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# біт} other{# бітів}}
 Error loading files	MediaConverter		Помилка завантаження файлів
@@ -51,7 +47,6 @@ Video quality not supported	MediaConverter		Якість відео не під�
 Cancelling…	MediaConverter		Відміна…
 File details	MediaConverter		Деталі файлу
 Select	MediaConverter		Вибрати
-Writing video track: %ld%% complete	MediaConverter		Запис відеотреку: %ld%% завершено
 Quit	Menu		Вийти
 Preview	MediaConverter		Попередній перегляд
 File format:	MediaConverter		Формат файлу:
@@ -66,7 +61,6 @@ File	Menu		Файл
 Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 %.1f kHz stereo	MediaFileInfo		%.1f kHz стерео
 Convert	MediaConverter		Перетворити
-Writing audio track: %ld%% complete	MediaConverter		Запис звукового треку: %ld%% завершено
 Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld канал
 Output folder	MediaConverter		Вихідна тека

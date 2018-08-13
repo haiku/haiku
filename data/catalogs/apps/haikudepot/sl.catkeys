@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-HaikuDepot	2257471805
+1	slovenian	x-vnd.Haiku-HaikuDepot	1864007079
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zapri
 Changelog	PackageInfoView		Zapisnik sprememb
@@ -33,7 +33,6 @@ Fatal error	PackageManager		Usodna napaka
 The user name needs to be at least 3 letters long.	UserLoginWindow		Uporabniško ime mora biti dolgo vsaj 3 znake.
 Log in	UserLoginWindow		Prijava
 Ratings	PackageInfoView		Ocene
-Main Menu	MainWindow		Glavni meni
 (%Votes%)	PackageInfoView		(%Votes%)
 Success	UserLoginWindow		Uspeh
 Downloading:	PackageInfoView		Prenašam:
@@ -48,7 +47,6 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 Language	RatePackageWindow		Jezik
 You need to be logged into an account before you can rate packages.	MainWindow		Prijaviti se morate v svoj račun, preden lahko ocenjujete pakete.
 User name:	UserLoginWindow		Uporabniško ime:
-User Menu	MainWindow		Uporabniški meni
 Unstable but usable	RatePackageWindow		Nestabilen, toda ne neuporaben
 The email address appears to be malformed.	UserLoginWindow		Naslov elektronske pošte se zdi neveljaven.
 Games	Model		Igre

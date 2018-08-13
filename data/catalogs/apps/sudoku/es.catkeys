@@ -26,7 +26,7 @@ Text	SudokuWindow		Texto
 Creating solvable field	SudokuGenerator		Crear campo resoluble
 View	SudokuWindow		Vista
 Progress monitor	ProgressWindow		Indicador de progreso
-Set all hints	SudokuWindow		Mostrar todas las pistas
+Set all hints	SudokuWindow		Mostrar pistas
 Mark invalid values	SudokuWindow		Marcar valores incorrectos
 Blank	SudokuWindow		Vacio
 Help	SudokuWindow		Ayuda

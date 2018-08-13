@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Shortcuts	102336796
+1	slovak	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Aplikácia Skratky nedokázala uložiť vašu sadu kláves.
 Cancel	ShortcutsWindow		Zrušiť
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Kláves
 Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves…
 Error, NULL state description?	ShortcutsSpec		Chyba, NULL popis stavu?
 Revert to saved	ShortcutsWindow		Vrátiť spať uložené
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Váš text sem\"
 *MouseUp	ShortcutsWindow		*MyšHore
 (Choose application with file requester)	ShortcutsWindow		(Vyberte aplikáciu pomocou žiadača súboru)

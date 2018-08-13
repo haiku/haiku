@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-desklink	3451447865
+1	german	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		Physikalischen Ausgang steuern
 Couldn't launch 	MediaReplicant		Konnte nicht starten
 Muted	MediaReplicant		Stumm
@@ -11,6 +11,5 @@ Media preferences…	MediaReplicant		Audio & Video...
 Open MediaPlayer	MediaReplicant		Media-Player öffnen
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Einstellungen
-%ld dB	VolumeControl		%ld dB
 Beep	MediaReplicant		Bestätigungston
 Volume	VolumeControl		Lautstärke

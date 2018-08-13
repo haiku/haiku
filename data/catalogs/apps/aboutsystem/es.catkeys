@@ -1,9 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-About	2396522871
+1	spanish; castilian	x-vnd.Haiku-About	3963412481
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 por los autores de Gutenprint. Todos los derechos reservados.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm y Werner Lemberg.
 Past website & marketing:\n	AboutView		Antiguo sitio web y marketing:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (y su núcleo NewOS)\n
-Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Todos los derechos reservados.
 %d MiB total	AboutView		%d MiB en total
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador del proyecto)\n\n
@@ -13,28 +12,24 @@ AboutSystem	System name		Acerca del sistema
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe y otros.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Todos los derechos reservados.
 Revision	AboutView		Revisión
-Copyright © 2009 Colin Percival	AboutView		Todos los derechos reservados © 2009 Colin Percival
+Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		¡Be Inc. y su equipo de desarrollo, por haber creado BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Todos los derechos reservados.
 Source Code: 	AboutView		Código fuente:
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesador:} other{# Procesadores:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
 Kernel:	AboutView		Núcleo:
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, una división de Lucas Digital Ltd. LLC.
 BSD (4-clause)	AboutWindow		BSD (4 cláusulas)
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Todos los derechos reservados © 2012-2016 Equipo de internacionalización de Google.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		El copyright del código de Haiku es propiedad de Haiku, Inc o de sus respectivos autores si está escrito expresamente en el código fuente. Haiku® y el logo de HAIKU® son marcas registradas de Haiku, Inc.\n\n
-Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTodos los derechos reservados.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		El equipo de HaikuPorts\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB en total, %inaccessible MiB inaccesible(s)
-Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
 Contributors:\n	AboutView		Colaboradores:\n
 Unknown	AboutView		Desconocido
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Mantenedores de Expat.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Todos los derechos reservados.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Todos los derechos reservados.
-Public Domain	AboutWindow		Dominio público
-Intel (firmware)	AboutWindow		Intel (firmware)
 BSD (2-clause)	AboutWindow		BSD (2 cláusulas)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memoria:
@@ -50,10 +45,8 @@ Licenses: 	AboutView		Licencias:
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly y Mark Adler.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Todos los derechos reservados.
 \nCopyrights\n\n	AboutView		\nDerechos de autor\n\n
-Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Todos los derechos reservados.
 Current maintainers:\n	AboutView		Mantenedores actuales:\n
-Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. Todos los derechos reservados.
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	El código que es único en Haiku, especialmente el núcleo y todo el código al que las aplicaciones se pueden enlazar, se distribuye bajo los términos de la <Licencia MIT>. Algunas bibliotecas de sistema que contienen código de terceros distribuido bajo la <licencia LGPL>. Se pueden encontrar las leyendas de derechos reservados de terceros en el código debajo.\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	El código que es único en Haiku, especialmente el núcleo y todo el código al que las aplicaciones se pueden enlazar, se distribuye bajo los términos de la <MIT license>. Algunas bibliotecas de sistema contienen código de terceros distribuido bajo la <LGPL license>. Se pueden encontrar las leyendas de derechos reservados de terceros en el código debajo.\n\n
 Time running:	AboutView		Tiempo en ejecución:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contiene software desarrollado por NetBSD Foundation, Inc. y sus contribuidores:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Todos los derechos reservados.
 GNU GPL v2	AboutWindow		GNU GPL v2
@@ -66,7 +59,6 @@ About this system	AboutWindow		Acerca de este sistema
 Version:	AboutView		Versión:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Todos los derechos reservados.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd y Clark Cooper.
-Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Todos los derechos reservados.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Derechos reservados © 2000-2014 Fabrice Bellard, et. al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Todos los derechos reservados.
@@ -74,12 +66,10 @@ The BeGeistert team\n	AboutView		El equipo de BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		La Universidad de Auckland y a Christof Lutteroth\n\n
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Todos los derechos reservados.
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
-Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Todos los derechos reservados.
 %ld MHz	AboutView		%ld MHz
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Todos los derechos reservados.
 …and the many people making donations!\n\n	AboutView		y a la mucha gente que hizo donaciones!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Haga clic en un nombre para leer la licencia respectiva.]\n\n
-Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Todos los derechos reservados.
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER es una marca registrada de Bitstream Inc.
 BSD (3-clause)	AboutWindow		BSD (3 cláusulas)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Todos los derechos reservados.

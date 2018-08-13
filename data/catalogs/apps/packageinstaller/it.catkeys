@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-PackageInstaller	451044634
+1	italian	x-vnd.Haiku-PackageInstaller	202216665
 Install to:	PackageView		Installare su:
 OK	PackageView		Ok
 Accept	PackageTextViewer		Accetta
@@ -22,11 +22,8 @@ Other…	PackageView		Altro…
 No installation type selected	PackageView		Non avete scelto il tipo di installazione
 Installing files and folders	PackageInstall		Installazione dei file e cartelle
 Package installer	PackageView		Installatore pacchetti
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L'oggetto con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Lo script con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
 Running post-installation scripts	PackageInstall		Avvio script per il dopo-installazione
 Skip	PackageView		Ignora
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La cartella con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirla con quanto presente in questo pacchetto oppure la ignorate?
 The package you requested has been successfully installed on your system.	PackageView		Il pacchetto richiesto è stato installato con successo nel vostro sistema.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Errore! \"%s\" non è un percorso valido.\n
 Installation type:	PackageView		Tipo di installazione:
@@ -36,7 +33,6 @@ Installing package	PackageStatus		Installazione del pacchetto
 Ask again	PackageView		Ripeti richiesta
 Abort	PackageView		Annulla
 Decline	PackageTextViewer		Rifiuto
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Il file con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
 All existing files will be skipped?	PackageView		Volete ignorare tutti i file già presenti?
 Continue	PackageInfo		Prosegui
 Abort	PackageInfo		Annulla

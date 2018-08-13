@@ -32,9 +32,9 @@ Edit	PoorMan		Editar
 Create Log File	PoorMan		Crear archivo de registro
 Log to console	PoorMan		Registrar a consola
 Directory: (none)	PoorMan		Directorio: (ninguno)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, seleccione la carpeta para publicar en la web. \ n \ nHombre Pobre puede crear un defecto \ "public_html \" en la carpeta de inicio. \ nO se selecciona una de sus propias carpetas en su lugar.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Por favor, seleccione la carpeta para publicar en la web.\n\nPoorMan puede crear una carpeta \"public_html\" en la carpeta hogar o de inicio.\nO seleccione una de carpeta propia en su lugar.
 Log To Console	PoorMan		Registrar a consola
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# conexión} other{# conexiones}}
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
 Connections	PoorMan		Conexiones
 Status: Running	PoorMan		Estado: Ejecutando
 Controls	PoorMan		Controles

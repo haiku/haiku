@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Shortcuts	2611306178
+1	lithuanian	x-vnd.Haiku-Shortcuts	4120254175
 OK	ShortcutsWindow		Gerai
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
 Cancel	ShortcutsWindow		Atsisakyti
@@ -7,7 +7,6 @@ Control	ShortcutsSpec	Name for modifier on keyboard	Vald
 Key	ShortcutsWindow		Klavišas
 Open KeySet…	ShortcutsWindow		Atverti sparčiųjų klavišų rinkinį…
 Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 (Choose application with file requester)	ShortcutsWindow		(Atverti programos parinkimo langą)
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio atverti nepavyko!
 Save	ShortcutsWindow		Įrašyti

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PackageInstaller	252728737
+1	hungarian	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Telepítés ide:
 OK	PackageView		Rendben
 Accept	PackageTextViewer		Elfogadás
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Fájlok és mappák telepítése
 Package installer	PackageView		Csomagtelepítő
 Install…	UninstallView		Telepítés…
 Skip all	PackageView		Összes átugrása
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		A(z) '%s' nevű elem már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		A(z) '%s' nevű szkript már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
 Running post-installation scripts	PackageInstall		Telepítés utáni parancsfájlok futtatása
 Skip	PackageView		Átugrás
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		A(z) '%s' nevű mappa már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
 The package you requested has been successfully installed on your system.	PackageView		A kért csomag sikeresen fel lett telepítve a rendszerre.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hiba! Érvénytelen útvonal: %s.\n
 Installation type:	PackageView		Telepítés típusa:
@@ -45,7 +42,6 @@ Abort	PackageView		Megszakítás
 Replace all	PackageView		Összes cseréje
 Package description	UninstallView		Leírás
 Decline	PackageTextViewer		Visszautasítás
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		A(z) '%s' nevű fájl már létezik a megadott útvonalon.\nLegyen felülírva, vagy ugorjuk át?
 All existing files will be skipped?	PackageView		Minden létező fájl átugrása?
 Continue	PackageInfo		Folytatás
 %index% of %total%	PackageInstall		%index% / %total%

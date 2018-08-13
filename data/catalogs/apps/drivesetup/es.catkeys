@@ -29,7 +29,7 @@ Error: 	MainWindow	in any error alert	Error:
 Partition %ld	DiskView		Partición %ld
 <empty>	DiskView		<vacío>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inicialización de la partición %s ha fallado (no se ha escrito nada en el disco).
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios al disco ahora?\\n\n¡Toda la información en la partición se perderá irremediablemente si lo hace!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios al disco ahora?\n\n¡Toda la información en la partición se perderá irremediablemente si lo hace!
 Mounted at	PartitionList		Montado en
 There was an error acquiring the partition row.	MainWindow		Hubo un error adquiriendo la fila de partición.
 You need to select a partition entry from the list.	MainWindow		Debe seleccionar una partición de la lista.

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	1831209226
+1	finnish	x-vnd.Haiku-HaikuDepot	1437744500
 Name	PackageListView		Nimi
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
@@ -54,7 +54,6 @@ System & Utilities	Model		Järjestelmä ja apuohjelmat
 Inactive	PackageListView		Ei käytössä
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
 Science & Mathematics	Model		Tiede ja matematiikka
-Main Menu	MainWindow		Päävalikko
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha-pulman ratkaisui onnistui.
 Success	UserLoginWindow		Valmis
@@ -79,7 +78,6 @@ Language	RatePackageWindow		Kieli
 Size	PackageListView		Koko
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
 User name:	UserLoginWindow		Käyttäjätunnus:
-User Menu	MainWindow		Käyttäjävalikko
 Unstable but usable	RatePackageWindow		Epävakaa, mutta käyttökelpoinen
 The email address appears to be malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Games	Model		Pelit

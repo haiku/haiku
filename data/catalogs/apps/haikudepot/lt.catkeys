@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	4084227647
+1	lithuanian	x-vnd.Haiku-HaikuDepot	1426156857
 Name	PackageListView		Pavadinimas
 Close	RatePackageWindow		Užverti
 Changelog	PackageInfoView		Pakeitimų žurnalas
@@ -19,7 +19,6 @@ Development	Model		Programuotojams
 Fatal error	PackageManager		Kritinė klaida
 Ratings	PackageInfoView		Įvertinimai
 Inactive	PackageListView		Neaktyvus
-Main Menu	MainWindow		Pagrindinis meniu
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Parsiunčiamas:
 Search terms:	FilterView		Ieškomi žodžiai:

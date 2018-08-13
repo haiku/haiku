@@ -12,7 +12,7 @@ This is not a valid URL.	AddRepoWindow	Add URL error message	No es una URL váli
 Repository URL:	AddRepoWindow	Text box label	URL del repositorio:
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Error al obtener la configuración del repositorio %name%.
 Details	TaskLooper	Job log details header	Detalles
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	¡Buenas noticias! La tarea para el repositorio %name% ha sido completada.
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	¡Buenas noticias! La tarea para el repositorio %name% fue completada.
 Status	RepositoriesView	Column title	Estado
 Aborted	TaskLooper	Aborted task status message	Cancelado
 Remove all	RepositoriesView	Button label	Quitar todo
@@ -22,7 +22,7 @@ Name	RepositoriesView	Column title	Nombre
 Enable	RepositoriesView	Button label	Habilitar
 Enable repositories to use with package management:	RepositoriesView	Label text	Habilitar repositorios para usar con el gestor de paquetes:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Se produjo un error al actualizar el cache del repositorio %name%
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Únicamente se puede habilitar una URL por repositorio. Por favor cambia tus selecciones.
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Sólo una URL por cada repositorio puede ser habilitada. Por favor revise sus selecciones.
 Failed	TaskLooper	Failed task status message	Falló
 OK	Constants	Button label	Aceptar
 Cancel task	TaskTimer	Button label	Cancelar tarea
@@ -35,7 +35,7 @@ Enable all	RepositoriesView	Button label	Habilitar todos
 Stop and quit	RepositoriesWindow	Button label	Detener y salir
 The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La tarea para el repositorio %name% está tomando demasiado tiempo para ser completada.
 Disable all	RepositoriesView	Button label	Deshabilitar todos
-Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Algunas tareas están aún en ejecución. ¿Deseas detener dichas tareas y salir?
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Algunas tareas están aún en ejecución. ¿Desea detener dichas tareas y salir?
 This repository URL already exists.	RepositoriesView	Error message	La URL del repositorio ya existe.
 Disable	RepositoriesView	Button label	Deshabilitar
 Unknown	Constants	Unknown repository name	Desconocido

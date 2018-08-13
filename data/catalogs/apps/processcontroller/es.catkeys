@@ -33,7 +33,7 @@ New Terminal	ProcessController		Terminal nuevo
 Urgent priority	ProcessController		Prioridad Urgente
 About ProcessController…	ProcessController		Sobre el Contralador de Procesos...
 Ok!	ProcessController		Vale!
-Quit an application	ProcessController		Salir una applicación
+Quit an application	ProcessController		Cerrar una aplicación
 Install in Deskbar	ProcessController		Instalar en barra de escritorio
 Threads and CPU usage	ProcessController		Hilos y utilización de CPU
 Urgent display priority	ProcessController		Prioridad de muestra Urgente

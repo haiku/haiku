@@ -6,8 +6,8 @@ no link	InterfaceListItem		sin enlace
 WPA2	WPA2 protected network		WPA2
 Choose automatically	IntefaceView		Escoger automáticamente
 connected	IntefaceView		conectado
-Ethernet device	InterfaceListItem		Dispositivo ethernet
-The netmask defines your local network	IntefaceAddressView		La máscara de red define tu red local
+Ethernet device	InterfaceListItem		Dispositivo Ethernet
+The netmask defines your local network	IntefaceAddressView		La máscara de red define su red local
 Dial-up connection	InterfaceListItem		Conexión de acceso telefónico
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Red
@@ -34,7 +34,7 @@ Enable	ServiceView		Habilitar
 disconnected	IntefaceView		desconectado
 Status:	IntefaceView		Estado:
 Link speed:	IntefaceView		Velocidad de conexión:
-Your gateway to the internet	IntefaceAddressView		Tu puerta de enlace a internet
+Your gateway to the internet	IntefaceAddressView		Su puerta de enlace a internet
 New…	NetworkWindow		Nuevo…
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Modo:
@@ -48,6 +48,6 @@ Disable	IntefaceView		Deshabilitar
 <no wireless networks found>	IntefaceView		<no se han encontrado redes inalámbricas>
 Netmask:	IntefaceAddressView		Máscara de red:
 Disable	ServiceView		Deshabilitar
-Your IP address	IntefaceAddressView		Tu dirección IP
+Your IP address	IntefaceAddressView		Su dirección IP:
 Manage…	NetworkWindow		Administrar…
 WEP	WEP protected network		WEP

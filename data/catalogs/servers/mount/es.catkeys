@@ -6,7 +6,7 @@ Mount warning	AutoMounter		Advertencia de montaje
 Mount read/write	AutoMounter		Montar como lectura/escritura
 Mounting volume '%s'\n\n	AutoMounter		Montando el volumen '%s'\n\n
 Cancel	AutoMounter		Cancelar
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No se puede desmontar el disco \"%s\":\n\t%s\n\n¿Debería forzarse el desmontaje?\n\nNota: Si una aplicación está actualmente escribiendo hacia el volumen, desmontarlo puede resultar en pérdida de datos.\n 
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No se puede desmontar el disco \"%s\":\n\t%s\n\n¿Debería forzarse el desmontaje?\n\nNota: Si una aplicación está actualmente escribiendo hacia el volumen, desmontarlo puede resultar en pérdida de datos.\n
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		No se puede desmontar el disco \"%s\":\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Montando el volumen <unnamed volume>\n\n
 OK	AutoMounter		Aceptar

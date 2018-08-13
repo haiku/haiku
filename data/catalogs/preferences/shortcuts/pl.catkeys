@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Shortcuts	102336796
+1	polish	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
 Cancel	ShortcutsWindow		Anuluj
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Przycisk
 Open KeySet…	ShortcutsWindow		Otwórz KeySet…
 Error, NULL state description?	ShortcutsSpec		Błąd, brak opisu stanu?
 Revert to saved	ShortcutsWindow		Cofnięto do zapisu
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(Wybierz aplikację żądającą pliku)

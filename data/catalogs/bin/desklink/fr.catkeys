@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-desklink	3451447865
+1	french	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		Contrôler la sortie physique
 Couldn't launch 	MediaReplicant		Lancement impossible 
 Muted	MediaReplicant		Muet
@@ -11,6 +11,5 @@ Media preferences…	MediaReplicant		Réglages média…
 Open MediaPlayer	MediaReplicant		Ouvrir le Lecteur Média
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Options
-%ld dB	VolumeControl		%ld dB
 Beep	MediaReplicant		Bip
 Volume	VolumeControl		Volume

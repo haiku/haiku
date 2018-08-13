@@ -2,9 +2,9 @@
 Fetching mail for %name	Notifier		Búsqueda de correo para %name
 Check for mails only	DeskbarView		Sólo mirar si hay correo
 Send pending mails	DeskbarView		Enviar correos pendientes
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, uno{# nuevo mensaje} otro{# nuevos mensajes}}
-{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, uno{# nuevo mensaje} otro{# nuevos mensajes}}
-{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, uno{# nuevo mensaje} otro{# nuevos mensajes}} para %name\n
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{One new message} other{# new messages}}
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# new message} other{# new messages}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# new message} other{# new messages}} para %name\n
 New Messages	MailDaemon		Nuevos Mensajes
 <no accounts>	DeskbarView		<no hay ninguna cuenta>
 Mail status	MailDaemon		Estado del correro

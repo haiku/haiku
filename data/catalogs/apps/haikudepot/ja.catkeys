@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2705096857
+1	japanese	x-vnd.Haiku-HaikuDepot	4015332039
 Name	PackageListView		名前
 Available packages	MainWindow		使用可能なパッケージ
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
+OK	MainWindow		OK
 Close	RatePackageWindow		閉じる
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Changelog	PackageInfoView		変更履歴
@@ -41,6 +42,7 @@ Installed packages	MainWindow		インストール済みパッケージ
 Status	PackageListView		状態
 Switch account…	MainWindow		アカウントの切り替え…
 Ignore	UserLoginWindow		無視
+Your rating was updated.	RatePackageWindow		評価が更新されました。
 Language	UserLoginWindow		言語
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		パスワードが弱すぎるか不正です。8 文字以上で、数字が 2 文字以上、大文字が 2 文字以上のパスワードを使用してください。
 Show only featured packages	FilterView		おすすめパッケージのみ表示
@@ -56,7 +58,6 @@ System & Utilities	Model		システム & ユーティリティ
 Inactive	PackageListView		無効
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Science & Mathematics	Model		科学 & 数学
-Main Menu	MainWindow		メインメニュー
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Captcha パズルを正しく解いていません。
 Success	UserLoginWindow		成功
@@ -82,7 +83,6 @@ Language	RatePackageWindow		言語
 Size	PackageListView		サイズ
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージを評価する前にアカウントにログインする必要があります。
 User name:	UserLoginWindow		ユーザー名:
-User Menu	MainWindow		ユーザーメニュー
 Unstable but usable	RatePackageWindow		不安定であるが有用
 The email address appears to be malformed.	UserLoginWindow		メールアドレスが不正なようです。
 Games	Model		ゲーム
@@ -118,6 +118,7 @@ Screenshot	ScreenshotWindow		スクリーンショット
 Not specified	RatePackageWindow		指定なし
 Available	PackageListView		利用可能
 Develop packages	MainWindow		開発用パッケージ
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (バージョン %hd.version%)
 n/a	PackageInfoView		利用不可
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		メールアドレスを入力しない場合、パスワードを忘れた時にリセットできないでしょう。
  It responded with: 	UserLoginWindow		 次に反応する: 

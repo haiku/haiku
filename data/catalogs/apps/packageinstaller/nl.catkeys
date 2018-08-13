@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	181118085
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	4227257412
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
@@ -24,11 +24,8 @@ No installation type selected	PackageView		Er is geen installatietype geselectee
 Installing files and folders	PackageInstall		Bestanden en mappen worden geïnstalleerd
 Package installer	PackageView		Pakketinstallatieprogramma
 Skip all	PackageView		Alles overslaan
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Het item met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u dat item vervangen met het item van dit pakket of het overslaan?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Het script met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u dat script vervangen met het script van dit pakket of het overslaan?
 Running post-installation scripts	PackageInstall		Post-installatiescripts worden uitgevoerd
 Skip	PackageView		Overslaan
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		De map met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u die map vervangen door de map van dit pakket of deze overslaan?
 The package you requested has been successfully installed on your system.	PackageView		Het pakket dat u opvroeg werd succesvol op uw systeem geïnstalleerd.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fout! \"%s\" is geen geldige bestandslocatie.\n
 Installation type:	PackageView		Installatietype:
@@ -39,7 +36,6 @@ Ask again	PackageView		Opnieuw vragen
 Abort	PackageView		Afbreken
 Replace all	PackageView		Alles vervangen
 Decline	PackageTextViewer		Afwijzen
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Het bestand met de naam '%s' bestaat al op de gegeven locatie.\nWilt u dat bestand vervangen door het bestand van dit pakket of het overslaan?
 All existing files will be skipped?	PackageView		Alle bestaande bestanden zullen overgeslaan worden?
 Continue	PackageInfo		Doorgaan
 Abort	PackageInfo		Afbreken

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-PackageInstaller	181118085
+1	croatian	x-vnd.Haiku-PackageInstaller	4227257412
 Install to:	PackageView		Instaliraj u:
 OK	PackageView		U redu
 Accept	PackageTextViewer		Prihvati
@@ -24,11 +24,8 @@ No installation type selected	PackageView		Nije označena niti jedna vrsta insta
 Installing files and folders	PackageInstall		Instaliram datoteke i mape
 Package installer	PackageView		Instaler paketa
 Skip all	PackageView		Preskoči sve
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Stavka po imenu '%s' već postoji u zadanoj putanji.\nZamijeni stavku sa onom iz paketa ili preskoči?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripta  po imenu '%s' već postoji u zadanoj putanji.\nZamijeni skriptu sa onom iz paketa ili preskoči?
 Running post-installation scripts	PackageInstall		Pokretanje post-instalacijskih skripti
 Skip	PackageView		Preskoči
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Direktorij po imenu '%s' već postoji u zadanoj putanji.\nZamijeni direktorij sa onim iz paketa ili preskoči?
 The package you requested has been successfully installed on your system.	PackageView		Traženi paket je uspješno instaliran u vaš sustav.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Greška! \"%s\" nije ispravna putanja.\n
 Installation type:	PackageView		Tip instalacije:
@@ -39,7 +36,6 @@ Ask again	PackageView		Pitaj ponovno
 Abort	PackageView		Prekini
 Replace all	PackageView		Zamijeni sve
 Decline	PackageTextViewer		Odbij
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Paket po imenu '%s' već postoji u zadanoj putanji.\nZamijeni paket sa onim iz paketa ili preskoči?
 All existing files will be skipped?	PackageView		Sve postojeće datoteke će biti preskočene?
 Continue	PackageInfo		Nastavi
 Abort	PackageInfo		Prekini

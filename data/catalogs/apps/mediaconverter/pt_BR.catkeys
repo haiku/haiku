@@ -1,14 +1,12 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	341686525
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	3142509574
 Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, um{O arquivo não foi reconhecido como um arquivo de mídia suportado:} outros{# arquivos não foram reconhecidos como arquivos de mídia suportados:}}
 Video encoding:	MediaConverter		Codificação de vídeo:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Error read audio frame %lld	MediaConverter		Erro ao ler quadro de áudio %lld
 No audio	Audio codecs list		Sem áudio
 Error	MediaConverter		Erro
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, um{# bit} outros{# bits}}
 Error loading a file	MediaConverter		Erro ao carregar um arquivo
-Error read video frame %lld	MediaConverter		Erro ao ler quadro de vídeo %lld
 File Error	MediaConverter-FileInfo		Erro no Arquivo
 Open…	Menu		Abrir…
 Start [ms]: 	MediaConverter		Início [ms]:
@@ -27,9 +25,7 @@ Audio:	MediaConverter-FileInfo		Áudio:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 segundos
 Source files	MediaConverter		Arquivos fonte
-Error writing video frame %lld	MediaConverter		Erro gravando quadro de vídeo %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, um{# quadro} outros{# quadros}}
-Error writing audio frame %lld	MediaConverter		Erro gravando quadro de áudio %lld
 Cancelling	MediaConverter		Cancelando
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, um{# byte} outros{# bytes}}
 Error loading files	MediaConverter		Erro ao carregar arquivos
@@ -47,7 +43,6 @@ Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
 Cancelling…	MediaConverter		Cancelando…
 File details	MediaConverter		Detalhes do arquivo
 Select	MediaConverter		Selecionar
-Writing video track: %ld%% complete	MediaConverter		Gravando trilha de vídeo: %ld%% concluído
 Quit	Menu		Sair
 Preview	MediaConverter		Pré-visualização
 File format:	MediaConverter		Formato de arquivo:
@@ -61,7 +56,6 @@ Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
 File	Menu		Arquivo
 %.1f kHz stereo	MediaFileInfo		%.1f kHz estéreo
 Convert	MediaConverter		Converter
-Writing audio track: %ld%% complete	MediaConverter		Gravando trilha de áudio: %ld%% concluído
 Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canal
 Output folder	MediaConverter		Pasta de saída

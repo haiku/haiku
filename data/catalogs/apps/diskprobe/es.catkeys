@@ -90,7 +90,7 @@ Offset: 	ProbeView		Desplazamiento:
 OK	ProbeView		Aceptar
 Add	ProbeView		Agregar
 Edit	ProbeView		Editar
-Native: %Ld (0x%0*Lx)	ProbeView		Nativo: %Ld (0x%o*Lx)
+Native: %Ld (0x%0*Lx)	ProbeView		Nativo: %Ld (0x%0*Lx)
 32 bit unsigned value:	TypeEditors		Valor de 32 bits sin signo:
 Message	TypeEditors	This is the type of view	Mensaje
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No se pudo abrir \"%s\":\n%s

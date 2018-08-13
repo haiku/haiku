@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-desklink	3451447865
+1	portuguese (brazil)	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		Controle de saída física
 Couldn't launch 	MediaReplicant		Não pode carregar
 Muted	MediaReplicant		Mudo
@@ -11,6 +11,5 @@ Media preferences…	MediaReplicant		Configurações de Mídia...
 Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
 desklink	MediaReplicant		atalho
 Options	MediaReplicant		Opções
-%ld dB	VolumeControl		%ld dB
 Beep	MediaReplicant		bip
 Volume	VolumeControl		Volume

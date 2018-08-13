@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	264118213
+1	spanish; castilian	x-vnd.Haiku-WebPositive	3870208430
 Show home button	Settings Window		Mostrar botón de inicio
 Username:	Authentication Panel		Nombre de usuario:
 Copy URL to clipboard	Download Window		Copiar URL al portapapeles
@@ -17,6 +17,16 @@ Start page:	Settings Window		Página de inicio:
 History	WebPositive Window		Historial
 Error opening downloads folder	Download Window		Error al abrir la carpeta de descargas
 Paste	WebPositive Window		Pegar
+Expiration	Cookie Manager		Caducidad
+Double-click or middle-click to open new tab.	Tab Manager		Doble clic o clic medio para abrir una nueva pestaña.
+Proxy username:	Settings Window		Proxy usuario:
+Save page as…	WebPositive Window		Guardar página como...
+Settings	Settings Window		Configuración
+Confirmation	WebPositive Window		Confirmación
+Window	WebPositive Window		Ventana
+Cookie manager	Cookie Manager		Administrador de cookies
+Decrease size	WebPositive Window		Disminuir tamaño
+Serif font:	Settings Window		Fuente Serif:
 Loading %url	WebPositive Window		Cargando %url
 Download aborted	Download Window		Descarga cancelada
 Value	Cookie Manager		Valor
@@ -26,8 +36,116 @@ Find next	WebPositive Window		Buscar siguiente
 Download folder:	Settings Window		Carpeta de descargas:
 Edit	WebPositive Window		Editar
 Cancel	Authentication Panel		Cancelar
+Match case	WebPositive Window		Coincidir mayúsculas y minúsculas
+Search page:	Settings Window		Página de búsqueda:
+Zoom text only	WebPositive Window		Zoom en el texto únicamente
+Default fixed font size:	Settings Window		Tamaño de fuente monoespaciada por defecto:
+Close tab	WebPositive Window		Cerrar pestaña
+Auto-hide mouse pointer	Settings Window		Ocultar automáticamente el puntero del mouse.
 Quit	WebPositive Window		Salir
+Full screen	WebPositive Window		Pantalla completa
+Open download error	Download Window		Abrir error de descarga
+The cookie jar is empty!	Cookie Manager		¡El contenedor de cookies está vacío!
+Standard font:	Settings Window		Tipo de letra estándar:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Buscar la coincidencia anterior de los términos de búsqueda
+Restart	Download Window		Reiniciar
+Proxy server	Settings Window		Servidor proxy
+Open containing folder	Download Window		Abrir carpeta
+New window	WebPositive Window		Nueva ventana
 WebPositive	Download Window		WebPositive
+Open	Download Window		Abrir
+Reload	WebPositive Window		Recargar
+Downloads	Download Window		Descargas
+Sans serif font:	Settings Window		Tipo de letra Sans serif:
+Delete	Cookie Manager		Borrar
+Forward	WebPositive Window		Siguiente
+of	Download Window	...as in '12kB of 256kB'	de
+Revert	Settings Window		Revertir
+Fixed font:	Settings Window		Fuente monoespaciada:
+Cut	WebPositive Window		Cortar
+Bookmark this page	WebPositive Window		Agregar esta página a marcadores
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hubo un error al intentar mostrar la carpeta de Marcadores.\n\nError: %error
+Open downloads folder	Download Window		Abrir carpeta de descargas
+Proxy password:	Settings Window		Contraseña del proxy:
+Number of days to keep links in History menu:	Settings Window		Cantidad de días a mantener el enlace en el menú Historial:
+Reset size	WebPositive Window		Restablecer tamaño
+Find:	WebPositive Window		Buscar:
+Increase size	WebPositive Window		Aumentar tamaño
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Hubo un error al obtener la carpeta de marcadores.\n\nError: %error
+Downloads	WebPositive Window		Descargas
+Requesting %url	WebPositive Window		Solicitando %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Buscar la siguiente coincidencia de los términos de búsqueda
+Apply	Settings Window		Aplicar
+Bookmark info	WebPositive Window		Información de Marcadores
+Size:	Font Selection view		Tamaño:
+Show tabs if only one page is open	Settings Window		Mostrar pestañas si sólo hay una página abierta
+About	WebPositive Window		Acerca de
+Fonts	Settings Window		Tipos de letra
+OK	Download Window		Aceptar
+Open blank page	Settings Window		Abrir página en blanco
+New tabs:	Settings Window		Nuevas pestañas:
 Cancel	WebPositive Window		Cancelar
+Open all	WebPositive Window		Abrir todos
+Proxy server requires authentication	Settings Window		El servidor proxy requiere autenticación
+Clear	URL Bar		Limpiar
+Cut	URL Bar		Cortar
+Clear	WebPositive Window		Limpiar
+Script console	Console Window		Consola de scripts
+Remove	Download Window		Quitar
+Find	WebPositive Window		Buscar
+Find previous	WebPositive Window		Buscar anterior
+Settings	WebPositive Window		Configuración
+(Finish: %date)	Download Window		(Finaliza: %date)
+Script console	WebPositive Window		Consola de scripts
+Name	Cookie Manager		Nombre
+Proxy server address:	Settings Window		Dirección del servidor proxy:
+Proxy server port:	Settings Window		Puerto del servidor proxy:
+Bookmarks	WebPositive Window		Marcadores
 Paste	URL Bar		Pegar
+Cookie manager	WebPositive Window		Gestor de cookies
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Ocultar contraseña
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	El pingüino Wenceslao hizo kilómetros bajo exhaustiva lluvia y frío, añoraba a su querido cachorro.
+Open start page	Settings Window		Abrir página de inicio
+Continue downloads	WebPositive		Continuar descargas
 Cancel	Download Window		Cancelar
+Flags	Cookie Manager		Opciones
+Open search page	Settings Window		Abrir página de búsqueda
+Clear	Console Window		Limpiar
+Password:	Authentication Panel		Contraseña:
+Path	Cookie Manager		Ruta
+New browser window	Download Window		Nueva ventana del navegador
+Today	WebPositive Window		Hoy
+Remember username and password for this site	Authentication Panel		Recordar nombre de usuario y contraseña para este sitio
+Earlier	WebPositive Window		Anterior
+Authentication required	Authentication Panel		Autenticación requerida
+Use proxy server to connect to the internet	Settings Window		Usar un servidor proxy para conectarse a internet
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Todavía hay descargas en progreso. ¿Desea cerrar WebPositive ahora?
+Auto-hide interface in full screen mode	Settings Window		Ocultar automáticamente la interfaz en modo de pantalla completa
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falló
+New tab	WebPositive Window		Nueva pestaña
+Downloads in progress	WebPositive		Descarga en proceso
+(Finish: %date - %duration left)	Download Window		(Finalizado: %date - %duration restante)
+Style:	Font Selection view		Estilo:
+General	Settings Window		General
+View	WebPositive Window		Ver
+Previous	WebPositive Window		Anterior
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Se produjo un error al crear el archivo de marcadores.\n\nError: %error
+(Finish: %date - Over %duration left)	Download Window		(Finalizado: %date - Más de %duration restante)
+Bookmark error	WebPositive Window		Error de marcadores
+Do you really want to clear the browsing history?	WebPositive Window		¿Realmente desea borrar el historial del navegador?
+Copy	WebPositive Window		Copiar
+Clone current page	Settings Window		Duplicar página actual
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	¿Desea abrir %addedCount marcadores al mismo tiempo?
+Session cookie	Cookie Manager		Cookie de sesión
+OK	Authentication Panel		Aceptar
+Copy	URL Bar		Copiar
+Download finished	Download Window		Descarga finalizada
+Show bookmark bar	WebPositive Window		Mostrar barra de marcadores
+OK	WebPositive Window		Aceptar
+Manage bookmarks	WebPositive Window		Administrar marcadores
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ya existe un marcador para esta página (%bookmarkName).
+Cookies for %s	Cookie Manager		Cookies para %s
+New windows:	Settings Window		Nuevas ventanas:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminado
+Remove finished	Download Window		Limpiar terminados

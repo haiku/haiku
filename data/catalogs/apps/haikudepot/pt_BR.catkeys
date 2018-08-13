@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2555682678
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2162217952
 Name	PackageListView		Nome
 Available packages	MainWindow		Pacotes disponíveis
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -54,7 +54,6 @@ System & Utilities	Model		Sistema & Utilitários
 Inactive	PackageListView		Inativo
 The package action could not be scheduled: %Error%	PackageInfoView		A ação do pacote não pode ser agendada: %Error%
 Science & Mathematics	Model		Ciência & Matemática
-Main Menu	MainWindow		Menu Principal
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Você não resolveu o quebra-cabeça captcha corretamente.
 Success	UserLoginWindow		Sucesso
@@ -79,7 +78,6 @@ Language	RatePackageWindow		Idioma
 Size	PackageListView		Tamanho
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa estar autenticado em uma conta antes de poder classificar pacotes.
 User name:	UserLoginWindow		Nome do usuário:
-User Menu	MainWindow		Menu do Usuário
 Unstable but usable	RatePackageWindow		Instável mas utilizável
 The email address appears to be malformed.	UserLoginWindow		O endereço de e-mail parece disforme.
 Games	Model		Jogos

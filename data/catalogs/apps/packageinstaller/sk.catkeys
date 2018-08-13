@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PackageInstaller	252728737
+1	slovak	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Inštalovať do:
 OK	PackageView		OK
 Accept	PackageTextViewer		Prijať
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Inštalujú sa súbory a priečinky
 Package installer	PackageView		Inštalátor balíkov
 Install…	UninstallView		Nainštalovať…
 Skip all	PackageView		Preskočiť všetky
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Položka s názvom „%s“ už v danej ceste existuje.\nNahradiť položku položkou z tohto balíka alebo ho preskočiť?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skript s názvom „%s“ už v danej ceste existuje.\nNahradiť skript skriptom z tohto balíka alebo ho preskočiť?
 Running post-installation scripts	PackageInstall		Spúšťajú sa poinštalačné skripty
 Skip	PackageView		Preskočiť
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Adresár s názvom „%s“ už v danej ceste existuje.\nNahradiť adresár adresárom z tohto balíka alebo ho preskočiť?
 The package you requested has been successfully installed on your system.	PackageView		Balík, ktorý ste požadovali bol úspešne nainštalovaný na váš systém.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Chyba! „%s“ nie je platná cesta.\n
 Installation type:	PackageView		Typ inštalácie:
@@ -45,7 +42,6 @@ Abort	PackageView		Zrušiť
 Replace all	PackageView		Nahradiť všetky
 Package description	UninstallView		Popis balíka
 Decline	PackageTextViewer		Zamietnuť
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Súbor s názvom „%s“ už v danej ceste existuje.\nNahradiť súbor súborom z tohto balíka alebo ho preskočiť?
 All existing files will be skipped?	PackageView		Všetky existujúce súbory sa preskočia?
 Continue	PackageInfo		Pokračovať
 %index% of %total%	PackageInstall		%index% z %total%

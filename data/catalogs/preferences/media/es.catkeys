@@ -12,8 +12,8 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Reiniciar los servicios de multimedia
 Couldn't remove volume control in Deskbar: %s\n	Media views		No se ha podido remover el control de volumen en el Deskbar: %s\n
 Media	System name		Multimedia
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Finalizar Multimedia ahora detendrá el reinicio de los servicios de multimedia. Los resultados más probables serán fallos o la no disponibilidad de funcionalidad multimedia.
-Audio mixer	Media Window		Finalizar Multimedia ahora detendrá el reinicio de los servicios de multimedia. Los resultados más probables serán fallos o la no disponibilidad de funcionalidad multimedia.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Finalizar Media ahora parará el reinicio de los servicios de multimedia. Los resultados más probables serán fallos o la indisponibilidad de funcionalidad multimedia.
+Audio mixer	Media Window		Mezclador de audio
 This hardware has no controls.	Media Window		Este dispositivo no tiene controles.
 Audio output:	Media views		Salida de audio:
 Audio settings	Media Window		Configuración de audio

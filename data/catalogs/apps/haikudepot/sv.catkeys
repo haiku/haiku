@@ -1,7 +1,8 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2705096857
+1	swedish	x-vnd.Haiku-HaikuDepot	4015332039
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
+OK	MainWindow		OK
 Close	RatePackageWindow		Stäng
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha pusslet behöver lösas.
 Changelog	PackageInfoView		Ändringslogg
@@ -41,6 +42,7 @@ Installed packages	MainWindow		Installerade paket
 Status	PackageListView		Status
 Switch account…	MainWindow		Byt konto...
 Ignore	UserLoginWindow		Ignorera
+Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 Language	UserLoginWindow		Språk
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
 Show only featured packages	FilterView		Visa bara framhävda paket
@@ -56,7 +58,6 @@ System & Utilities	Model		System & Verktyg
 Inactive	PackageListView		Inaktiv
 The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
 Science & Mathematics	Model		Vetenskap & Matematik
-Main Menu	MainWindow		Huvudmeny
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Du har inte löst captcha pusslet rätt.
 Success	UserLoginWindow		Klar
@@ -82,7 +83,6 @@ Language	RatePackageWindow		Språk
 Size	PackageListView		Storlek
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 User name:	UserLoginWindow		Användarnamn:
-User Menu	MainWindow		Användarmeny
 Unstable but usable	RatePackageWindow		Ostabil men kan användas
 The email address appears to be malformed.	UserLoginWindow		E-post adressen är fel formulerat.
 Games	Model		Spel
@@ -118,6 +118,7 @@ Screenshot	ScreenshotWindow		Skärmdump
 Not specified	RatePackageWindow		Inte angivet
 Available	PackageListView		Tillgänglig
 Develop packages	MainWindow		Utvecklingspaket
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
 n/a	PackageInfoView		oviktigt
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Om du inte anger en e-mail adress, kommer du inte kunna återställa ditt lösenord om du glömmer det.
  It responded with: 	UserLoginWindow		 Den svarade med: 

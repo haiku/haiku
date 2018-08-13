@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PackageInstaller	252728737
+1	ukrainian	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Встановити у:
 OK	PackageView		Гаразд
 Accept	PackageTextViewer		Прийняти
@@ -29,11 +29,8 @@ Installing files and folders	PackageInstall		Встановлення файлі
 Package installer	PackageView		Встановлювач пакунків
 Install…	UninstallView		Встановити…
 Skip all	PackageView		Пропустити всі
-The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Елемент з ім'ям '%s' вже є у вказаному місці.\nЗамінити його елементом з цього пакунку чи пропустити його?
-The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт з ім'ям '%s' вже є у вказаному місці.\nЗамінити його скриптом з цього пакунку чи пропустити ?
 Running post-installation scripts	PackageInstall		Запуск післяінсталяційного скрипта
 Skip	PackageView		Пропустити
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Тека з ім'ям '%s' вже є у вказаному місці.\nЗамінити її текою з цього пакунку чи пропустити?
 The package you requested has been successfully installed on your system.	PackageView		Запитуваний пакунок успішно встановлено на вашій системі.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Помилка! \"%s\" не є правильним шляхом.\n
 Installation type:	PackageView		Тип встановлення:
@@ -45,7 +42,6 @@ Abort	PackageView		Перервати
 Replace all	PackageView		Замінити всі
 Package description	UninstallView		Опис пакунку
 Decline	PackageTextViewer		Відхилити
-The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл з ім'ям '%s' вже є у вказаному місці.\nЗамінити його файлом з цього пакунку чи пропустити?
 All existing files will be skipped?	PackageView		Всі наявні файли будуть пропущені?
 Continue	PackageInfo		Продовжити
 %index% of %total%	PackageInstall		%index% з %total%

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	102336796
+1	swedish	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
 Cancel	ShortcutsWindow		Avbryt
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Tangent
 Open KeySet…	ShortcutsWindow		Öppna…
 Error, NULL state description?	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?
 Revert to saved	ShortcutsWindow		Återgå till sparade
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
 *MouseUp	ShortcutsWindow		*MusnappUpp
 (Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)

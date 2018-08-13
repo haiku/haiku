@@ -2,7 +2,7 @@
 Stop cycling	ControlView		Detener ciclo
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Rotación: %d
-Shear: %d	ControlView		Corte: &d
+Shear: %d	ControlView		Corte: %d
 Spacing: %d	ControlView		Espacio: %d
 Cycle fonts	ControlView		Ciclar tipos de letra
 Font:	ControlView		Tipo de letra:

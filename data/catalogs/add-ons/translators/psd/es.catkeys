@@ -3,8 +3,8 @@ Lab	PSDLoader		Laboratorio
 Uncompressed	PSDConfig		Sin comprimir
 Indexed	PSDLoader		Indizado
 Grayscale	PSDLoader		Escala de grises
-Photoshop image translator	PSDConfig		Transformador de imágenes tipo Photoshop
-Photoshop image translator	PSDTranslator		Transformador de imágenes tipo Photoshop
+Photoshop image translator	PSDConfig		Traductor de imágenes tipo Photoshop
+Photoshop image translator	PSDTranslator		Traductor de imágenes tipo Photoshop
 Version %d.%d.%d, %s	PSDConfig		Versión %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Documento de Photoshop (Archivo PSD)
 Photoshop image	PSDTranslator		Imagen de Photoshop

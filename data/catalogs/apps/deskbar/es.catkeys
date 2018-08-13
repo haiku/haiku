@@ -8,7 +8,7 @@ Time preferences…	TimeView		Preferencias de horario…
 About Haiku	DeskbarMenu		Acerca de Haiku
 Edit in Tracker…	PreferencesWindow		Editar en Tracker…
 Recent documents:	PreferencesWindow		Documentos recientes:
-Recent applications	DeskbarMenu		Aplicaciónes recientes
+Recent applications	DeskbarMenu		Aplicaciones recientes
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicaciones
 Find…	DeskbarMenu		Buscar…
 Show clock	Tray		Mostrar reloj
@@ -18,7 +18,7 @@ Menu	PreferencesWindow		Menú
 Recent documents	DeskbarMenu		Documentos recientes
 Auto-hide	PreferencesWindow		Ocultar automáticamente
 Always on top	PreferencesWindow		Siempre encima
-<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la barra está vacia>
+<Deskbar folder is empty>	DeskbarMenu		<La carpeta del Deskbar está vacia>
 Show all	WindowMenu		Mostar todo
 No windows	WindowMenu		Sin ventanas
 Deskbar	System name		Barra de Escritorio
@@ -28,7 +28,7 @@ Auto-raise	PreferencesWindow		Redimensionar automáticamente
 Recent folders:	PreferencesWindow		Carpetas recientes:
 Show application expander	PreferencesWindow		Mostar expansor de aplicación
 Close all	WindowMenu		Cerrar todo
-Deskbar preferences	PreferencesWindow		Preferencias de la barra de escritorio
+Deskbar preferences	PreferencesWindow		Preferencias de Deskbar
 Mount	DeskbarMenu		Montar
 Revert	PreferencesWindow		Revertir
 Small	PreferencesWindow		Pequeño

@@ -4,7 +4,7 @@ Expanding '%s'…	ExpanderWindow		Expandiendo '%s'…
 Close window when done expanding	ExpanderPreferences		Cerrar ventana después de extraer
 Set destination…	ExpanderMenu		Elegir destino...
 Use:	ExpanderPreferences		Uso:
-File expanded	ExpanderWindow		Fichero descomprimido
+File expanded	ExpanderWindow		Archivo descomprimido
 The destination is read only.	ExpanderWindow		El destino es de sólo lectura.
 Expander: Open	ExpanderWindow		Expander: Abrir
  is not supported	ExpanderWindow		 no está soportado
@@ -14,7 +14,7 @@ Source	ExpanderWindow		Origen
 Error when expanding archive	ExpanderWindow		Error extrayendo archivo
 Hide contents	ExpanderWindow		Esconder contenidos
 Cancel	ExpanderWindow		Cancelar
-Automatically expand files	ExpanderPreferences		Automáticamente extraer archivos
+Automatically expand files	ExpanderPreferences		Extraer archivos automáticamente
 Continue	ExpanderWindow		Continuar
 Destination folder	ExpanderPreferences		Carpeta de destino
 Other	ExpanderPreferences		Otro
@@ -29,9 +29,9 @@ Settings…	ExpanderMenu		Configuración...
 Expander: Choose destination	DirectoryFilePanel		Expander: Elegir destino
 Select	ExpanderPreferences		Seleccionar
 Show contents	ExpanderWindow		Mostrar contenidos
-Automatically show contents listing	ExpanderPreferences		Automáticamente mostrar el listado de contenido
+Automatically show contents listing	ExpanderPreferences		Mostrar automáticamente el listado de contenido
 OK	ExpanderPreferences		Aceptar
-Leave destination folder path empty	ExpanderPreferences		Dejar la ruta de la carpeta de destino vacia
+Leave destination folder path empty	ExpanderPreferences		Dejar la ruta de la carpeta de destino vacía
 Failed to create the destination folder.	ExpanderWindow		Fallo al crear la carpeta destino.
 Select '%s'…	DirectoryFilePanel		Seleccionar '%s'…
 Create	ExpanderWindow		Crear

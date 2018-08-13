@@ -1,9 +1,9 @@
 1	spanish; castilian	x-vnd.Haiku-NewMailNotification	73789504
-You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Usted tiene {0, plural, one{Un mensaje nuevo} other{# mensajes nuevos}} en %account.
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Usted tiene {0, plural, one{un mensaje nuevo} other{# mensajes nuevos}} para %account.
 none	NotifierConfigView		ninguno
 Method:	NotifierConfigView		Método:
 Beep	NotifierConfigView		Pitido
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Un mensaje nuevo} other{# mensajes nuevos}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
 New mails notification	NotifierFilter		Nuevas notificaciones de correo
 Central alert	NotifierConfigView		Alerta central 
 OK	NotifierFilter		Aceptar

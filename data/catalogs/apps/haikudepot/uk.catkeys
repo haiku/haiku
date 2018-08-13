@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1831209226
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1437744500
 Name	PackageListView		Ім'я
 Available packages	MainWindow		Доступні пакети
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
@@ -54,7 +54,6 @@ System & Utilities	Model		Система та Інструменти
 Inactive	PackageListView		Неактивний
 The package action could not be scheduled: %Error%	PackageInfoView		Дію пакета неможливо спрогнозувати: %Error%
 Science & Mathematics	Model		Наука та Математика
-Main Menu	MainWindow		Головне меню
 (%Votes%)	PackageInfoView		(%Votes%)
 You have not solved the captcha puzzle correctly.	UserLoginWindow		Головоломка captcha розв'язана неправильно.
 Success	UserLoginWindow		Успішно
@@ -79,7 +78,6 @@ Language	RatePackageWindow		Мова
 Size	PackageListView		Розмір
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.
 User name:	UserLoginWindow		Користувач:
-User Menu	MainWindow		Меню користувача
 Unstable but usable	RatePackageWindow		Нестабільний але використання можливе
 The email address appears to be malformed.	UserLoginWindow		Почтова адреса очевидно має неправильний формат.
 Games	Model		Ігри

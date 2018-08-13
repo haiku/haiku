@@ -29,7 +29,7 @@ Install in Deskbar	PowerStatus		Instalar en barra de escritorio
 Capacity: 	PowerStatus		Capacidad:
 Battery discharging	PowerStatus		Batería está descargando
 Serial number: 	PowerStatus		Número en serie:
-Battery critical	PowerStatus		Batería muy baja
+Battery critical	PowerStatus		Batería críticamente baja
 Capacity granularity 1: 	PowerStatus		Granulación de capacidad 1:
 OEM info: 	PowerStatus		Información de OEM:
 Design voltage: 	PowerStatus		Voltaje de diseño:

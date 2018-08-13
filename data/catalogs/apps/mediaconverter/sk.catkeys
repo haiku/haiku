@@ -1,15 +1,13 @@
-1	slovak	x-vnd.Haiku-MediaConverter	2816184527
+1	slovak	x-vnd.Haiku-MediaConverter	1322040280
 Video using parameters form settings	MediaConverter		Video používajúce parametre z nastavení
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Súbor nebol rozpoznaný ako podporovaný multimediálny súbor:} few{# súbory neboli rozpoznané ako podporované multimediálne súbory:} other{# súborov nebolo rozpoznaných ako podporované multimediálne súbory:}}
 Video encoding:	MediaConverter		Kódovanie videa:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error creating video.	MediaConverter		Chyba pri vytváraní videa.
-Error read audio frame %lld	MediaConverter		Chyba čítania zvukového rámca %lld
 No audio	Audio codecs list		Bez zvuku
 Error	MediaConverter		Chyba
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} other{# bitov}}
 Error loading a file	MediaConverter		Chyba pri načítaní súboru
-Error read video frame %lld	MediaConverter		Chyba čítania video rámca %lld
 File Error	MediaConverter-FileInfo		Chyba súboru
 Open…	Menu		Otvoriť…
 Start [ms]: 	MediaConverter		Začiatok [ms]: 
@@ -30,9 +28,7 @@ OK	MediaConverter-FileInfo		OK
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Chyba pri zapisovaní: %strPath%. Predvolené umiestnenie: /boot/home
 Source files	MediaConverter		Zdrojové súbory
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Zvolený adresár nebol nájdený. Používa sa predvolený adresár /boot/home
-Error writing video frame %lld	MediaConverter		Chyba zápisu video rámca %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# rámec} few{# rámce} other{# rámcov}}
-Error writing audio frame %lld	MediaConverter		Chyba zápisu zvukového rámca %lld
 Cancelling	MediaConverter		Ruší sa
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} other{# bajty} other{# bajtov}}
 Error loading files	MediaConverter		Chyba pri načítaní súborov
@@ -51,7 +47,6 @@ Video quality not supported	MediaConverter		Kvalita videa nie je podporovaná
 Cancelling…	MediaConverter		Ruší sa…
 File details	MediaConverter		Podrobnosti súborov
 Select	MediaConverter		Vybrať
-Writing video track: %ld%% complete	MediaConverter		Zápis video stopy: %ld%% hotovo
 Quit	Menu		Ukončiť
 Preview	MediaConverter		Náhľad
 File format:	MediaConverter		Formát súboru:
@@ -66,7 +61,6 @@ File	Menu		Súbor
 Input file not recognized as Audio or Video	MediaConverter		Vstupný súbor nebol rozpoznaný ako zvuk alebo video
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
 Convert	MediaConverter		Konvertovať
-Writing audio track: %ld%% complete	MediaConverter		Zápis zvukovej stopy: %ld%% hotovo
 Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
 Output folder	MediaConverter		Výstupný priečinok

@@ -1,15 +1,13 @@
-1	japanese	x-vnd.Haiku-MediaConverter	2816184527
+1	japanese	x-vnd.Haiku-MediaConverter	1322040280
 Video using parameters form settings	MediaConverter		設定からのパラメーターを使用したビデオ
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されませんでした:} other{# 個のファイルがサポートされたメディアファイルとして認識されませんでした:}}
 Video encoding:	MediaConverter		ビデオエンコーディング:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error creating video.	MediaConverter		ビデオの作成に失敗しました。
-Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取り時にエラーが発生しました
 No audio	Audio codecs list		オーディオ無し
 Error	MediaConverter		エラー
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# ビット} other{# ビット}}
 Error loading a file	MediaConverter		ファイルのロード中にエラーが発生しました
-Error read video frame %lld	MediaConverter		ビデオフレーム %lld の読み取り時にエラーが発生しました
 File Error	MediaConverter-FileInfo		ファイルエラー
 Open…	Menu		開く…
 Start [ms]: 	MediaConverter		開始 [ms]:
@@ -30,9 +28,7 @@ OK	MediaConverter-FileInfo		OK
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		%strPath% への書き込み時にエラーが発生しました。初期設定の /boot/home を使用します。
 Source files	MediaConverter		ソースファイル
 Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
-Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込み時にエラーが発生しました
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# フレーム} other{# フレーム}}
-Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き出し中にエラーが発生しました
 Cancelling	MediaConverter		キャンセル中
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# バイト} other{# バイト}}
 Error loading files	MediaConverter		ファイルのロード中にエラーが発生しました
@@ -51,7 +47,6 @@ Video quality not supported	MediaConverter		ビデオ品質はサポートされ
 Cancelling…	MediaConverter		中止中…
 File details	MediaConverter		ファイルの詳細
 Select	MediaConverter		選択
-Writing video track: %ld%% complete	MediaConverter		ビデオトラックの書き込み: %ld%% 完了
 Quit	Menu		終了
 Preview	MediaConverter		プレビュー
 File format:	MediaConverter		ファイルフォーマット:
@@ -66,7 +61,6 @@ File	Menu		ファイル
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %.1f kHz stereo	MediaFileInfo		%.1f kHz ステレオ
 Convert	MediaConverter		変換
-Writing audio track: %ld%% complete	MediaConverter		オーディオトラックの書き込み: %ld%% 完了
 Video quality: %3d%%	MediaConverter		映像品質: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld チャンネル
 Output folder	MediaConverter		出力先フォルダー

@@ -1,7 +1,6 @@
-1	italian	x-vnd.Haiku-About	971669133
+1	italian	x-vnd.Haiku-About	1617763448
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autori di Gutenprint. Tutti i diritti riservati.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e il suo kernel NewOS)\n
-Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Tutti i diritti riservati.
 %d MiB total	AboutView		%d MiB totali
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondatore del progetto)\n\n
@@ -17,19 +16,14 @@ Source Code: 	AboutView		Codice sorgente:
 Kernel:	AboutView		Kernel:
 BSD (4-clause)	AboutWindow		BSD (4-clause)
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Il copyright sul codice di Haiku è di Haiku, Inc. o dei rispettivi autori quando espressamente indicato nel codice sorgente. Haiku® e il logo di HAIKU® sono marchi registrati di Haiku, Inc.\n\n
-Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTutti i diritti riservati.
 GNU LGPL v2	AboutWindow		#document
 The HaikuPorts team\n	AboutView		Il gruppo di HaikuPorts\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totali, %inaccessible MiB inaccessibili
-Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
 Contributors:\n	AboutView		Contributori:\n
 Unknown	AboutView		Sconosciuto
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 manutentori di Expat.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Tutti i diritti riservati.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Tutti i diritti riservati.
-Public Domain	AboutWindow		Pubblico Dominio
-Intel (firmware)	AboutWindow		Intel (firmware)
 BSD (2-clause)	AboutWindow		BSD (2-clause)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memoria:
@@ -44,9 +38,7 @@ Licenses: 	AboutView		Licenze:
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly e Mark Adler.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © Steve Lhomme. Tutti i diritti riservati.
 \nCopyrights\n\n	AboutView		\nCopyright\n\n
-Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Tutti i diritti riservati.
 Current maintainers:\n	AboutView		Sviluppatori attuali:\n
-Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2007 Intel Corporation. Tutti i diritti risevati.
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Il codice sviluppato appositamente per Haiku, in particolare il Kernel e tutto il codice che può essere utilizzato dalle applicazioni tramite procedure di linking, è distribuito secondo i termini della <licenza MIT>. Alcune librerie di sistema contengono codice di terze parti distribuito sotto <licenza LGPL>. Il copyright del codice di terze parti è riportato di seguito.\n\n
 Time running:	AboutView		Tempo di attività:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Contiene software sviluppato da NetBSD Foundation, Inc. e dai suoi collaboratori:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Tutti i diritti riservati.
@@ -59,19 +51,16 @@ About this system	AboutWindow		Informazioni su questo sistema
 Version:	AboutView		Versione:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Tutti i diritti riservati.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd e Clark Cooper.
-Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Tutti i diritti riservati.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tutti i diritti riservati.
 The BeGeistert team\n	AboutView		Il gruppo del BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		L'Università di Auckland e Christof Lutteroth\n\n
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Tutti i diritti riservati.
 GNU LGPL v2.1	AboutWindow		GNU LGPL v.21
-Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Tutti i diritti riservati.
 %ld MHz	AboutView		%ld MHz
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Tutti i diritti riservati.
 …and the many people making donations!\n\n	AboutView		…e le tantissime persone che hanno supportato il progetto con le loro donazioni!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Clicca sul nome di una licenza per leggerla.]\n\n
-Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Tutti i diritti riservati.
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Tutti i diritti riservati.
 License: 	AboutView		Licenza: 

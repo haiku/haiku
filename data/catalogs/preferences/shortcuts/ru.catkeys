@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	102336796
+1	russian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		ОК
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
 Cancel	ShortcutsWindow		Отмена
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Клавиша
 Open KeySet…	ShortcutsWindow		Открыть список горячих клавиш…
 Error, NULL state description?	ShortcutsSpec		Ошибка, состояние описания NULL?\n
 Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(Выбрать программу)

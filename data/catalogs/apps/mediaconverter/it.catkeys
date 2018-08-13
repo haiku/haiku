@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaConverter	3718479311
+1	italian	x-vnd.Haiku-MediaConverter	1991546006
 Video using parameters form settings	MediaConverter		Il video utilizza le impostazioni dei parametri
 Video encoding:	MediaConverter		Codifica video:
 No audio	Audio codecs list		Nessun audio
@@ -36,7 +36,6 @@ Video quality not supported	MediaConverter		Qualità video non supportata
 Cancelling…	MediaConverter		Annullamento di...
 File details	MediaConverter		File dettagli
 Select	MediaConverter		Seleziona
-Writing video track: %ld%% complete	MediaConverter		Scrittura traccia video: %ld%% completato
 Quit	Menu		Esci
 Preview	MediaConverter		Anteprima
 File format:	MediaConverter		Formato file:
@@ -49,7 +48,6 @@ Audio encoding:	MediaConverter		Codifica Audio:
 Audio quality not supported	MediaConverter		Qualità audio non supportata
 File	Menu		File
 Convert	MediaConverter		Conversione
-Writing audio track: %ld%% complete	MediaConverter		Scrittura traccia video: %ld%% completato
 Video quality: %3d%%	MediaConverter		Qualità video: %3d%%
 Output folder	MediaConverter		Cartella di output
 Audio quality: %3d%%	MediaConverter		Qualità audio: %3d%% 

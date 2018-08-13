@@ -3,11 +3,11 @@ Boot Manager, the application to configure the Haiku boot menu, could not be lau
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		¿Está seguro que desea abortar la instalación y reiniciar el sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tescrito por Jérôme Duval y Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Aquí hay que comentar la línea \"GRUB_HIDDEN_TIMEOUT=0 \" poniendo un \"#\" delante de ella con el fin de mostrar efectivamente el menú de arranque.\n\n 
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Aquí hay que comentar la línea \"GRUB_HIDDEN_TIMEOUT=0 \" poniendo un \"#\" delante de ella con el fin de mostrar realmente el menú de arranque.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalación finalizada. Se ha escrito el sector de arranque en '%s'. Presione Salir para abandonar el instalador o elija un volumen de destino diferente para realizar otra instalación.
 Quit	InstallerApp		Salir
 Additional disk space required: 0.0 KiB	InstallerWindow		Espacio adicional requerido en disco: 0.0 KiB
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n\
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Detener
 Install progress:  	InstallerWindow		Progreso de instalación:  
 Starting Installation.	InstallProgress		Comenzando instalación.
@@ -32,7 +32,7 @@ Collecting copy information.	InstallProgress		Recopilando información para la c
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elija el disco de origen del menú desplegable. Después haga clic en \"Empezar\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Salir del administrador de arranque y DriveSetup
 Quit	InstallerWindow		Salir
-Welcome to the Haiku Installer!\n\n	InstallerApp		Bienvenido al instalador de Haiku!
+Welcome to the Haiku Installer!\n\n	InstallerApp		¡Bienvenido al instalador de Haiku!\n\n
 Boot sector successfully written.	InstallProgress		Sector de arranque escrito correctamente.
 Performing installation.	InstallProgress		Realizando instalación.
 scanning…	InstallerWindow		buscando discos...
@@ -40,7 +40,7 @@ Set up boot menu	InstallerWindow		Configurar menú de Arranque
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (desde os-prober v1.44)\n
 Abort	InstallerWindow		Abortar
 Finishing Installation.	InstallProgress		Completando instalación.
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <su editor de textos preferido> /etc/default/grub\n\n
+\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo  <your favorite text editor> /etc/default/grub\n\n
 Restart	InstallerWindow		Reiniciar
 README	InstallerApp		LÉEME
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		El disco de destino puede que no tenga suficiente espacio libre. Intente seleccionar otro disco o desmarque elementos opcionales.
@@ -107,4 +107,4 @@ Please close the Boot Manager window before closing the Installer window.	Instal
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Cuando arranque exitosamente en Haiku la primera vez, asegúrese de ler nuestra documentación de \"Bienvenida\" y \"Guía de usuario\". Hay enlaces en el escritorio y en los marcadores de WebPositive.\n\n
 Tools	InstallerWindow		Herramientas
 The mount point could not be retrieved.	InstallProgress		No se pudo recuperar el punto de montaje.
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <su editor de textos preferido> /etc/grub.d/40_custom\n\n
+\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-desklink	3451447865
+1	lithuanian	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		Valdyti fizinę išvestį
 Couldn't launch 	MediaReplicant		Nepavyko paleisti 
 Muted	MediaReplicant		Nutildyta
@@ -11,6 +11,5 @@ Media preferences…	MediaReplicant		Įvairialypės terpės nuostatos…
 Open MediaPlayer	MediaReplicant		Atverti Medijos leistuvę
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Parinktys
-%ld dB	VolumeControl		%ld dB
 Beep	MediaReplicant		Pyptelėti
 Volume	VolumeControl		Garsis

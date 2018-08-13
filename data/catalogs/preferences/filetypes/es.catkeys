@@ -52,7 +52,7 @@ Set preferred application	Preferred App Menu		Seleccione la aplicación preferid
 Don't save	Application Type Window		No guardar
 Save changes before closing?	Application Type Window		¿Guardar cambios antes de cerrar?
 File	Application Type Window		Archivo
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tipo de aplicación pudo removerse} other{# aplicaciones pudieron removerse}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed} other{# Application types could be removed}}
 Version:	Application Type Window		Versión:
 Select…	FileTypes Window		Selección...
 FileTypes request	FileTypes		Petición de Tipos de archivo

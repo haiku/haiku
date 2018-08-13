@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	102336796
+1	hungarian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		Rendben
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
 Cancel	ShortcutsWindow		Mégse
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Billentyű
 Open KeySet…	ShortcutsWindow		Gyorsbillentyű megnyitása…
 Error, NULL state description?	ShortcutsSpec		Hiba, NULL állapotleírás?
 Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*KarakterekBeszúrása \"Ide írja a szöveget\"
 *MouseUp	ShortcutsWindow		*EgérFel
 (Choose application with file requester)	ShortcutsWindow		(A fájlkérővel válasszon programot)

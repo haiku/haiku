@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	2141757280
+1	croatian	x-vnd.Haiku-HaikuDepot	1748292554
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zatvori
 Changelog	PackageInfoView		Dnevnik promjena
@@ -40,7 +40,6 @@ Log in	UserLoginWindow		Prijava
 Ratings	PackageInfoView		Ocjenjivanja
 Inactive	PackageListView		Neaktivan
 Science & Mathematics	Model		Znanost i matematika
-Main Menu	MainWindow		Glavni izbornik
 (%Votes%)	PackageInfoView		(%Glasovi%)
 Success	UserLoginWindow		Uspjeh
 Downloading:	PackageInfoView		Preuzimam:
@@ -56,7 +55,6 @@ Authentication failed	UserLoginWindow		Neuspjela ovjera
 Logged in as %User%	MainWindow		Prijavljen kao %korisnik%
 Language	RatePackageWindow		Jezik
 User name:	UserLoginWindow		Korisničko ime:
-User Menu	MainWindow		Korisnički izbornik
 Unstable but usable	RatePackageWindow		Nestabilan ali može se koristiti
 The email address appears to be malformed.	UserLoginWindow		Email adresa je oštećena.
 Games	Model		Igre

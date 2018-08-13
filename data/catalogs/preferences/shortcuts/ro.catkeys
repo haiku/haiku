@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Shortcuts	102336796
+1	romanian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts nu a putut să salveze setul de taste.
 Cancel	ShortcutsWindow		Anulează
@@ -8,7 +8,6 @@ Key	ShortcutsWindow		Tastă
 Open KeySet…	ShortcutsWindow		Deschide KeySet…
 Error, NULL state description?	ShortcutsSpec		Eroare, descriere stare NULL?
 Revert to saved	ShortcutsWindow		Revenire la salvat
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Textul aici\"
 *MouseUp	ShortcutsWindow		*MauSus
 (Choose application with file requester)	ShortcutsWindow		(Selectează aplicație cu solicitantul de fișier)

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-desklink	3451447865
+1	italian	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		Controllo output fisico
 Couldn't launch 	MediaReplicant		Impossibile eseguire 
 Muted	MediaReplicant		Muto
@@ -11,6 +11,5 @@ Media preferences…	MediaReplicant		Preferenze Media…
 Open MediaPlayer	MediaReplicant		Apri MediaPlayer
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Opzioni
-%ld dB	VolumeControl		%ld dB
 Beep	MediaReplicant		Bip
 Volume	VolumeControl		Volume
