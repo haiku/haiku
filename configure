@@ -719,6 +719,12 @@ while [ $# -gt 0 ] ; do
 					&& [ -z `get_variable buildCrossToolsMachine_$targetArch` ]; then
 				set_variable crossToolsPrefix_$targetArch llvm-
 			fi
+			clangVersion=`$HAIKU_clang -v 2>&1 | head -1 | cut -d " " -f3`
+			if [ `echo $clangVersion | head -c 1` -lt 7 ]; then
+				echo "Haiku requires Clang 7 or better to build, but you have $clangVersion."
+				echo "Please install a newer version."
+				exit 1
+			fi
 			targetArchs="$targetArchs $targetArch"
 			shift 2
 			;;
