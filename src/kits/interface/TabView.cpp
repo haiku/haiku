@@ -308,7 +308,7 @@ BTab::DrawLabel(BView* owner, BRect frame)
 	owner->SetTransform(transform);
 	be_control_look->DrawLabel(owner, Label(), frame, frame,
 		ui_color(B_PANEL_BACKGROUND_COLOR),
-		IsEnabled() ? 0 : BPrivate::BControlLook::B_DISABLED,
+		IsEnabled() ? 0 : BControlLook::B_DISABLED,
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 	owner->SetTransform(BAffineTransform());
 }
