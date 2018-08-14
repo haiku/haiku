@@ -77,6 +77,11 @@ arch_get_fb_arm_bcm2835(addr_t base)
 status_t
 ArchFBArmBCM2835::Init()
 {
+	if (gMailbox == NULL) {
+		dprintf("ERROR: Broadcom mailbox is unavailable!");
+		return B_ERROR;
+	}
+
 	gKernelArgs.frame_buffer.enabled = true;
 	return B_OK;
 }
