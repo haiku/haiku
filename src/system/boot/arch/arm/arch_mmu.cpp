@@ -409,9 +409,7 @@ fdt_map_memory_ranges(const char* path, bool physical = false)
 				return B_ERROR;
 			}
 		} else {
-			if (mmu_map_identity(base, base + size, ARM_MMU_L2_FLAG_B)) {
-				dprintf("cannot identity map memory range!");
-				return B_ERROR;
+			mmu_map_identity(base, base + size, ARM_MMU_L2_FLAG_B);
 		}
 	}
 
