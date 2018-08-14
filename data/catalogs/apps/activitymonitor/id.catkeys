@@ -1,0 +1,47 @@
+1	indonesian	x-vnd.Haiku-ActivityMonitor	1155619009
+P-faults	DataSource		P-faults
+Media nodes	DataSource		Simpul media
+Threads	DataSource		Benang
+Always on top	ActivityWindow		Selalu di atas
+Add graph	ActivityWindow		Menambahkan grafis
+Teams	DataSource		Tim
+MiB	DataSource		MiB
+Network send	DataSource		Jaringan mengirim
+CPU usage (combined)	DataSource		Penggunaan CPU (gabungan)
+CPU	DataSource		CPU
+Used memory	DataSource		Memori yang digunakan
+Cached memory	DataSource		Memori cache
+Apps	DataSource		Aplikasi
+Show legend	ActivityView		Tampilkan legenda
+Text clipboard	DataSource		Teks clipboard
+Settings	ActivityWindow		Pengaturan
+Receiving	DataSource		Menerima
+Settings…	ActivityWindow		Pengaturan…
+Ports	DataSource		Ports
+Page faults	DataSource		Kesalahan halaman
+Sending	DataSource		Mengirim
+Cache	DataSource		Cache
+%.1f faults/s	DataSource		%.1f kesalahan/s
+Update time interval:	SettingsWindow		Memperbarui interval waktu:
+TX	DataSource	Shorter version for Sending	TX
+Quit	ActivityWindow		Keluar
+Block cache memory	DataSource		Memori cache blok
+Remove graph	ActivityView		Menghapus grafik
+%lld sec.	SettingsWindow		%lld detik.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Penggunaan CPU
+Raw clipboard	DataSource		Clipboard mentah
+Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f MiB
+ActivityMonitor	System name		MonitorAktifitas
+Running applications	DataSource		Menjalankan aplikasi
+Semaphores	DataSource		Semaphore
+Block cache	DataSource		Blok cache
+Swap space	DataSource		Ruang swap
+Swap	DataSource		Swap
+File	ActivityWindow		Berkas
+usage	DataSource		pemakaian
+Additional items	ActivityView		Barang tambahan
+Network receive	DataSource		Jaringan menerima
+Memory	DataSource		Memory
+RX	DataSource	Shorter version for Receiving.	RX

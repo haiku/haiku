@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Haiku-MediaConverter	1322040280
+1	japanese	x-vnd.Haiku-MediaConverter	2251404027
 Video using parameters form settings	MediaConverter		設定からのパラメーターを使用したビデオ
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されませんでした:} other{# 個のファイルがサポートされたメディアファイルとして認識されませんでした:}}
 Video encoding:	MediaConverter		ビデオエンコーディング:
+Writing video track: %d%% complete	MediaConverter		ビデオトラックの書込み: %d%% 完了
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error creating video.	MediaConverter		ビデオの作成に失敗しました。
 No audio	Audio codecs list		オーディオ無し
@@ -15,6 +16,7 @@ Output file '%filename' created	MediaConverter		出力ファイル '%filename' �
 Output format	MediaConverter		出力フォーマット
 End   [ms]: 	MediaConverter		終了 [ms]:
 MediaConverter	System name		メディアコンバーター
+Error writing audio frame %ld	MediaConverter		オーディオフレーム %ld の書込みに失敗しました
 No video	Video codecs list		ビデオ無し
 Duration:	MediaConverter-FileInfo		再生時間:
 OK	MediaConverter		OK
@@ -25,6 +27,7 @@ Conversion completed	MediaConverter		変換が完了しました
 Audio:	MediaConverter-FileInfo		オーディオ:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		秒
+Error writing video frame %ld	MediaConverter		ビデオフレーム %ld の書込みに失敗しました
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		%strPath% への書き込み時にエラーが発生しました。初期設定の /boot/home を使用します。
 Source files	MediaConverter		ソースファイル
 Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
@@ -33,6 +36,7 @@ Cancelling	MediaConverter		キャンセル中
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# バイト} other{# バイト}}
 Error loading files	MediaConverter		ファイルのロード中にエラーが発生しました
 Cancel	MediaConverter		中止
+Error read audio frame %ld	MediaConverter		オーディオフレーム %ld の読込みに失敗しました
 None available	Video codecs		利用できません
 Conversion cancelled	MediaConverter		変換は中止されました
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
@@ -48,12 +52,14 @@ Cancelling…	MediaConverter		中止中…
 File details	MediaConverter		ファイルの詳細
 Select	MediaConverter		選択
 Quit	Menu		終了
+Error read video frame %ld	MediaConverter		ビデオフレーム %ld の読込みに失敗しました
 Preview	MediaConverter		プレビュー
 File format:	MediaConverter		ファイルフォーマット:
 None available	Audio codecs		利用できません
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:保存先フォルダー
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました: %strError%
 High	MediaConverter		高い
+Writing audio track: %d%% complete	MediaConverter		オーディトラックの書込み: %d%% 完了
 Drop media files onto this window	MediaConverter		メディアファイルをこのウィンドウにドロップしてください
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません

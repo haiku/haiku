@@ -1,0 +1,10 @@
+1	indonesian	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Pengaturan DNS
+Move down	DNSSettingsView		Turunkan
+DNS settings	DNSSettingsView		Pengaturan DNS
+Remove	DNSSettingsView		Hapus
+Domain:	DNSSettingsView		Domain:
+Add	DNSSettingsView		Tambah
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Pindah ke atas
+Apply	DNSSettingsView		Terapkan

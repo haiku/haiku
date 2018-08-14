@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	3708050243
+1	japanese	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (アメリカ)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
 (not supported)	MediaPlayer-InfoWin		(サポートされていません)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		再生しようとしているファイルはメディアファイルではないようです。
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました。\n\nエラー:
+ask every time	MediaPlayer-SettingsWindow		常に尋ねる
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		新規プレーヤー…
 100% scale	MediaPlayer-Main		100% 表示
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		コンテナー
 Nothing to Play	MediaPlayer-Main		再生するものがありません
 Muted	MediaPlayer-SettingsWindow		ミュート
 Quit	MediaPlayer-Main		終了
+Resume:	MediaPlayer-SettingsWindow		レジューム:
 Video	MediaPlayer-Main		ビデオ
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
 Import Entry	MediaPlayer-ImportPLItemsCmd		項目をインポート
@@ -57,6 +59,7 @@ MediaPlayer	System name		メディアプレーヤー
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		設定…
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 設定
+never	MediaPlayer-SettingsWindow		実行しない
 h	MediaPlayer-InfoWin	Hours	時間
 Select all	MediaPlayer-PlaylistWindow		すべて選択
 Move Entry	MediaPlayer-MovePLItemsCmd		項目を移動
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		エラー:
 Large	MediaPlayer-SettingsWindow		大
 Bottom of video	MediaPlayer-SettingsWindow		ビデオの下側
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+always	MediaPlayer-SettingsWindow		常に実行
 Total duration: %s	MediaPlayer-PlaylistWindow		総再生時間: %s
 <unnamed media>	MediaPlayer-InfoWin		<名前の無いメディア>
 raw video	MediaPlayer-InfoWin		raw ビデオ

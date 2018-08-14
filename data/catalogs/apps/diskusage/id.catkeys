@@ -1,0 +1,23 @@
+1	indonesian	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% dalam {0, plural, one{# file} other{# files}}
+Scanning %refName%	Scanner		Memindai %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d file
+Size	Info Window		Ukuran
+Rescan	Pie View		Rescan
+Kind	Info Window		Jenis
+file unavailable	Pie View		file tidak tersedia
+no supporting apps	Pie View		tidak ada aplikasi pendukung
+Path	Info Window		Lokasi
+Scan	Status View		Pindai
+Rescan	Status View		Scan lagi
+file unavailable	Status View		berkas tidak tersedia
+Get info	Pie View		Dapatkan informasi
+DiskUsage	System name		DiskUsage
+Created	Info Window		Dibuat
+Modified	Info Window		Diubah
+Abort	Status View		gugurkan
+Open with	Pie View		Buka dengan
+Open	Pie View		Buka
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# files}}
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Bebas di %refName%

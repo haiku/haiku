@@ -1,0 +1,27 @@
+1	indonesian	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Kontrol penguatan masukan mewakili
+Linear interpolation	AudioMixer		Interpolasi linier
+Virtual output channels	AudioMixer		Saluran keluaran virtual
+Refuse output format changes	AudioMixer		Menolak perubahan format keluaran
+Output mapping	AudioMixer		Pemetaan keluaran
+Allow input channel remapping	AudioMixer		Ijinkan pemetaan ulang kanal masukan
+Resampling algorithm	AudioMixer		Algoritma sampel-ulang
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Lemahkan keluaran mixer sebesar 3dB (seperti BeOS R5)
+Display balance control for stereo connections	AudioMixer		Tampilkan kontrol keseimbangan untuk sambungan stereo
+To output	AudioMixer		Ke keluaran
+not connected	AudioMixer		tidak terhubung
+Refuse input format changes	AudioMixer		Menolak perubahan format masukan
+Drop/repeat samples	AudioMixer		Jatuhkan/ulangi sampel
+Output channel sources	AudioMixer		Sumber kanal keluaran
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Pengatur penguatan
+Input mapping	AudioMixer		Pemetaan input
+Mute	AudioMixer		Bisu
+Input channel destinations	AudioMixer		Tujuan kanal input
+To master	AudioMixer		Ke master
+Master output	AudioMixer		Keluaran master
+Setup	AudioMixer		Tata
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Pakai penguat slider non-linier (seperti BeOS R5)
+Gain	AudioMixer		Penguatan
+Allow output channel remapping	AudioMixer		Ijinkan pemetaan ulang kanal keluaran
+Physical input channels	AudioMixer		Kanal input fisik

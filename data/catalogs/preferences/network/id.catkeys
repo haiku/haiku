@@ -1,0 +1,48 @@
+1	indonesian	x-vnd.Haiku-Network	887471140
+Static	IntefaceAddressView		Statis
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Layanan
+no link	InterfaceListItem		tak ada link
+WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Pilih otomatis
+connected	IntefaceView		terhubung
+Ethernet device	InterfaceListItem		Perangkat ethernet
+The netmask defines your local network	IntefaceAddressView		Netmask mendefinisikan jaringan lokal anda
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Jaringan
+Show network status in Deskbar	NetworkWindow		Tampilkan status jaringan di Deskbar
+The method for obtaining an IP address	IntefaceAddressView		Metode untuk memperoleh alamat IP
+connected	InterfaceListItem		terhubung
+disabled	InterfaceListItem		dilumpuhkan
+Dial Up	NetworkWindow		Dial Up
+Apply	IntefaceAddressView		Terapkan
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Memasang NetworkStatus di Deskbar gagal: %s
+MAC address:	IntefaceView		Alamat MAC:
+Wireless device	InterfaceListItem		Perangkat nirkabel
+Disabled	IntefaceAddressView		Dilumpuhkan
+Renegotiate	IntefaceView		Renegoisasi
+Ok	NetworkWindow		Oke
+Network:	IntefaceView		Jaringan:
+launch error	NetworkWindow		memunculkan galat
+Other	NetworkWindow		Lainnya
+Automatic	IntefaceAddressView		Otomatis
+Gateway:	IntefaceAddressView		Gateway:
+Revert	NetworkWindow		Pulihkan
+Enable	ServiceView		Dimungkinkan
+disconnected	IntefaceView		terputus
+Status:	IntefaceView		Status:
+Link speed:	IntefaceView		Kecepatan jalur:
+Your gateway to the internet	IntefaceAddressView		Gateway anda ke internet
+New…	NetworkWindow		Baru...
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Mode:
+WPA	WPA protected network		WPA
+Sent:	IntefaceView		Terkirim
+open	Open network		buka
+IP Address:	IntefaceAddressView		Alamat IP:
+Received:	IntefaceView		Diterima:
+Disable	IntefaceView		Dilumpuhkan
+Disable	ServiceView		Dilumpuhkan
+Your IP address	IntefaceAddressView		Alamat IP Anda
+Manage…	NetworkWindow		Kelola...
+WEP	WEP protected network		WEP

@@ -1,0 +1,10 @@
+1	indonesian	x-vnd.Haiku-Installer	224830277
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, aplikasi untuk mengkonfigurasi menu boot Haiku, tidak dapat diluncurkan.
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Anda yakin ingin membatalkan instalasi dan memulai ulang sistem?
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tditulis oleh Jérôme Duval dan Stephan Aßmus\n\tHakcipta 2005-2010, Haiku.\n\n
+\t}\n\n	InstallerApp		\t}\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Di sini anda harus mengomentari baris \"GRUB_HIDDEN_TIMEOUT=0\" dengan meletakkan \"#\" di depannya untuk benar-benar menampilkan menu boot.\n\n
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalasi selesai. Boot sector telah ditulis ke '%s'. Tekan Keluar untuk meninggalkan Installer atau pilih volume target baru untuk melakukan instalasi lain
+Quit	InstallerApp		Keluar
+Additional disk space required: 0.0 KiB	InstallerWindow		Ruang disk tambahan yang diperlukan: 0.0 KiB
+\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n

@@ -1,0 +1,25 @@
+1	indonesian	x-vnd.Haiku-Expander	1813710239
+Expand	ExpanderMenu		Kembangkan
+Expanding '%s'…	ExpanderWindow		Mengembangkan '%s'…
+Close window when done expanding	ExpanderPreferences		Tutup jendela saat selesai mengembangkan
+Set destination…	ExpanderMenu		Tentukan tujuan…
+Use:	ExpanderPreferences		Pakai:
+File expanded	ExpanderWindow		File sudah dikembangkan
+The destination is read only.	ExpanderWindow		Tujuan hanya dapat dibaca saja.
+Expander: Open	ExpanderWindow		Expander: Buka
+ is not supported	ExpanderWindow		 tidak didukung
+Expander settings	ExpanderPreferences		Pengaturan Expander
+Select current	DirectoryFilePanel		Pilih saat ini
+Source	ExpanderWindow		Sumber
+Error when expanding archive	ExpanderWindow		Ada kesalahan saat mengembangkan arsip
+Hide contents	ExpanderWindow		Sembunyikan isi
+Cancel	ExpanderWindow		Batalkan
+Automatically expand files	ExpanderPreferences		Secara otomatis mengembangkan file
+Continue	ExpanderWindow		Lanjutkan
+Destination folder	ExpanderPreferences		Folder tujuan
+Other	ExpanderPreferences		Lainnya
+Cancel	ExpanderPreferences		Batalkan
+Expansion	ExpanderPreferences		pengembangan
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Anda yakin ingin berhenti mengembangkan arsip ini?\n Item yang dikembangkan mungkin tidak lengkap.
+Select	DirectoryFilePanel		Pilih
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Folder yang dituju tidak ada. Anda ingin membuatnya sekarang?

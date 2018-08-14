@@ -1,0 +1,14 @@
+1	indonesian	x-vnd.Haiku-Notifications	672560863
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Terjadi kesalahan menyimpan preferensi.\nAda kemungkinan anda kehabisan ruang penyimpanan.
+Revert	PrefletWin		Pulihkan
+Enable notifications	GeneralView		Aktifkan notifikasi
+Window width:	GeneralView		Lebar Jendela:
+OK	PrefletWin		Oke
+OK	NotificationView		OKE
+Notifications	PrefletWin		Notifikasi
+General	PrefletView		Umum
+Allowed	NotificationView		Diizinkan
+Notifications	System name		Notifikasi
+Applications	PrefletView		Aplikasi
+Application	NotificationView		Aplikasi
+Applications	NotificationView		Aplikasi

@@ -1,0 +1,68 @@
+1	indonesian	x-vnd.Haiku-MediaConverter	1322040280
+Video using parameters form settings	MediaConverter		Video menggunakan parameter dari form pengaturan  
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
+Video encoding:	MediaConverter		Enkode video:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error creating video.	MediaConverter		Terjadi kesalahan saat membuat video.
+No audio	Audio codecs list		Tidak ada suara
+Error	MediaConverter		Kesalahan
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Error loading a file	MediaConverter		Galat memuat berkas
+File Error	MediaConverter-FileInfo		Galat Berkas
+Open…	Menu		Buka…
+Start [ms]: 	MediaConverter		Mulai [ms]: 
+Output file '%filename' created	MediaConverter		Berkas keluaran '%filename' dibuat
+Output format	MediaConverter		Format keluaran
+End   [ms]: 	MediaConverter		Akhir  [ms]: 
+MediaConverter	System name		MediaConverter
+No video	Video codecs list		Tak ada Video
+Duration:	MediaConverter-FileInfo		Durasi:
+OK	MediaConverter		Oke
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
+Error converting '%filename'	MediaConverter		Ada galat saat mengonversi '%filename'
+Low	MediaConverter		Rendah
+Conversion completed	MediaConverter		Konversi selesai
+Audio:	MediaConverter-FileInfo		Audio:
+OK	MediaConverter-FileInfo		Oke
+ seconds	MediaFileInfo		 detik
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ada galat menulis ke lokasi: %strPath%. Membuat standar ke lokasi: /boot/home
+Source files	MediaConverter		Berkas sumber
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Direktori yang dipilih tidak ditemukan. Atur standar ke /boot/home
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Cancelling	MediaConverter		Membatalkan
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Error loading files	MediaConverter		Ada galat saat memuat berkas
+Cancel	MediaConverter		Batalkan
+None available	Video codecs		Tak ada yang tersedia
+Conversion cancelled	MediaConverter		Konversi dibatalkan
+No file selected	MediaConverter-FileInfo		Tak ada berkas yang dipilih
+Select this folder	MediaConverter		Pilih pelipat ini
+Error creating track.	MediaConverter		Ada galat saat membuat lintasan
+Continue	MediaConverter		Lanjutkan
+Encoder parameters	MediaConverter-EncoderWindow		Parameter enkoder
+Video:	MediaConverter-FileInfo		Video:
+%d bit 	MediaFileInfo		%d bit 
+Error creating '%filename'	MediaConverter		Ada galat saat membuat '%filename'
+Video quality not supported	MediaConverter		Kualitas video tidak didukung
+Cancelling…	MediaConverter		Membatalkan…
+File details	MediaConverter		Detail berkas
+Select	MediaConverter		Pilih
+Quit	Menu		Keluar
+Preview	MediaConverter		Pratinjau
+File format:	MediaConverter		Format berkas:
+None available	Audio codecs		Tak ada yang tersedia
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Error launching: %strError%	MediaConverter		Kesalahan peluncuran: %strError%
+High	MediaConverter		Tinggi
+Drop media files onto this window	MediaConverter		Jatuhkan berkas media ke jendela ini
+Audio encoding:	MediaConverter		Penyandi audio:
+Audio quality not supported	MediaConverter		Kualitas audio tidak didukung
+File	Menu		Berkas
+Input file not recognized as Audio or Video	MediaConverter		Berkas masukan tidak dikenali sebagai Audio atau Video
+%.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
+Convert	MediaConverter		Mengkonversi
+Video quality: %3d%%	MediaConverter		Kualitas video: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
+Output folder	MediaConverter		Keluaran pelipat
+Audio quality: %3d%%	MediaConverter		Kualitas audio: %3d%%
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ada galat saat membaca info file.\n\nGalat : 

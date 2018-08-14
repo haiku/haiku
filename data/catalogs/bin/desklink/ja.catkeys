@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-desklink	4132238754
+1	japanese	x-vnd.Haiku-desklink	3940727097
 Control physical output	MediaReplicant		物理出力のコントロール
 Couldn't launch 	MediaReplicant		起動できませんでした
 Muted	MediaReplicant		ミュート
@@ -8,6 +8,7 @@ Sound preferences…	MediaReplicant		サウンドの設定…
 Open %name	DeskButton	Don't translate variable %name	%name を開く
 No media server running	VolumeControl		メディアサーバーが動作していません
 Media preferences…	MediaReplicant		メディアの設定…
+%d dB	VolumeControl		%d dB
 Open MediaPlayer	MediaReplicant		メディアプレーヤーを開く
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		オプション

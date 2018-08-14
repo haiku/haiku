@@ -1,0 +1,72 @@
+1	indonesian	x-vnd.Haiku-HaikuDepot	597955261
+Name	PackageListView		Nama
+Available packages	MainWindow		Paket yang tersedia
+Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
+Close	RatePackageWindow		Tutup
+The captcha puzzle needs to be solved.	UserLoginWindow		Teka-teki captcha perlu diselesaikan.
+Changelog	PackageInfoView		Log perubahan
+Your rating:	RatePackageWindow		Penilaianmu:
+The passwords do not match.	UserLoginWindow		Sandi tak cocok.
+Log in…	MainWindow		Log masuk…
+Rate %Package%	RatePackageWindow		Nilai %Package%
+Stability:	RatePackageWindow		Kestabilan:
+Click a package to view information	PackageInfoView		Klik paket untuk melihat informasi
+Other users can see this rating	RatePackageWindow		Pengguna lain dapat melihat rating ini
+Stability	RatePackageWindow		Kestabilan
+No changelog available.	PackageInfoView		Tak ada log perubahan tersedia.
+Description	PackageListView		Deskripsi
+Install	PackageManager		Instalasi
+Source packages	MainWindow		Paket sumber
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Otentikasi gagal. Pengguna tidak ada atau password yang disediakan salah.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Akun berhasil dibuat. Sekarang Anda dapat menilai paket dan melakukan hal-hal berguna lainnya.
+Tools	MainWindow		Perkakas
+HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Tutup
+Rate package…	PackageInfoView		Nilai paket...
+Category	FilterView		Kategori
+Uninstall	PackageManager		Hapus
+An error occurred while obtaining the package list: %message%	MainWindow		Terjadi kesalahan saat mendapatkan daftar paket: %message%
+Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\n\n%Error%
+An error occurred while initializing the package manager: %message%	MainWindow		Terjadi kesalahan saat inisialisasi manajer paket: %message%
+Email address:	UserLoginWindow		Alamat email:
+Very unstable	RatePackageWindow		Amat tak-stabil
+The username is already taken. Please choose another.	UserLoginWindow		Nama pengguna telah dipakai. Silakan pilih lainnya.
+Close	PackageManager		Tutup
+Not logged in	MainWindow		Tidak masuk
+The authentication was successful.	UserLoginWindow		Otentifikasi sukses
+Installed packages	MainWindow		Paket-paket yang terpasang
+Status	PackageListView		Status
+Switch account…	MainWindow		Beralih akun...
+Ignore	UserLoginWindow		Abaikan
+Language	UserLoginWindow		Bahasa
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Sandi terlalu lemah atau tidak valid. Silakan gunakan minimal 8 karakter dengan minimal 2 angka dan 2 huruf kapital.
+Rate package	RatePackageWindow		Nilai paket
+Development	Model		Pengembangan
+Fatal error	PackageManager		Kesalahan fatal
+The user name needs to be at least 3 letters long.	UserLoginWindow		Nama pengguna harus minimal 3 huruf.
+Log in	UserLoginWindow		Masuk
+Repeat pass phrase:	UserLoginWindow		Ulangi frase sandi:
+Ratings	PackageInfoView		Peringkat
+But none could be listed here, sorry.	UserLoginWindow		Tapi tak satu pun bisa didaftar di sini, maaf.
+System & Utilities	Model		Sistem & Utilitas
+Inactive	PackageListView		Tak aktif
+The package action could not be scheduled: %Error%	PackageInfoView		Tindakan paket tidak dapat dijadwalkan: %Error%
+Science & Mathematics	Model		Sains & Matematika
+(%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Anda belum memecahkan teka-teki captcha dengan benar.
+Success	UserLoginWindow		Berhasil
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot membutuhkan service paket agar berfungsi, dan itu tampaknya tidak berjalan.\nApakah Anda ingin menjalankanya sekarang?
+Downloading:	PackageInfoView		Mengunduh:
+Mostly stable	RatePackageWindow		Sebagian besar stabil
+Log out	MainWindow		Keluar
+Education	Model		Pendidikan
+Search terms:	FilterView		Kriteria pencarian:
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
+Does not start	RatePackageWindow		Tidak memulai
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Terjadi kesalahan saat menyegarkan repositori: %error% (%details%)
+Language	RatePackageWindow		Bahasa
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+There was a puzzling response from the web service.	UserLoginWindow		Ada respon membingungkan dari layanan web.
+Close	MainWindow		Tutup
+It was not possible to contact the web service.	UserLoginWindow		Tidak bisa menghubungi layanan web.

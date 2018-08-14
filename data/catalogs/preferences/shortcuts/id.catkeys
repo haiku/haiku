@@ -1,0 +1,27 @@
+1	indonesian	x-vnd.Haiku-Shortcuts	1338509591
+OK	ShortcutsWindow		OKE
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pemintas tidak bisa menyimpan keyset Anda.
+Cancel	ShortcutsWindow		Batal
+Append KeySet…	ShortcutsWindow		Tambah Keyset...
+Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
+Key	ShortcutsWindow		Kunci
+Open KeySet…	ShortcutsWindow		Buka Keyset...
+Error, NULL state description?	ShortcutsSpec		Ada Kesalahan, deskripsi kondisi NULL?
+Revert to saved	ShortcutsWindow		Kembali ke tersimpan
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Teks Anda Disini\"
+*MouseUp	ShortcutsWindow		*MouseUp
+(Choose application with file requester)	ShortcutsWindow		(Pilih aplikasi dengan berkas pemohon)
+Option	ShortcutsSpec	Name for modifier on keyboard	Opsi
+Save	ShortcutsWindow		Simpan
+File	ShortcutsWindow		Berkas
+Quit	ShortcutsWindow		Keluar
+*MouseDown	ShortcutsWindow		*MouseDown
+Don't save	ShortcutsWindow		Jangan simpan
+Application	ShortcutsWindow		Aplikasi
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Beep
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+Save KeySet as…	ShortcutsWindow		Simpan keyset sebagai...
+Open	ShortcutsWindow		Buka
+Select	ShortcutsWindow		Pilih
+Oh no	ShortcutsWindow		Oh tidak

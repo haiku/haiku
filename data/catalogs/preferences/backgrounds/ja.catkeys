@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Backgrounds	2244817193
+1	japanese	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		背景
 X:	Main View		X 方向:
 Setting the background image failed:	Main View		背景イメージの設定に失敗しました:
@@ -6,6 +6,7 @@ Resolution: 	Image Filepanel		解像度:
 pick one	Main View		１つ選択
 Default	Main View		デフォルト
 Center	Main View		中央
+Folder: %path	Main View		フォルダー: %path
 Manual	Main View		手動
 Set background image error	Main View		背景イメージ設定エラー
 Default folder	Main View		標準フォルダー

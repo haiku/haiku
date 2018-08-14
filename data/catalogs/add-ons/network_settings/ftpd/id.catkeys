@@ -1,0 +1,3 @@
+1	indonesian	x-vnd.Haiku-FTPService	4086152171
+FTP server	FTPServiceAddOn		Server FTP
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		Server FTP memungkinkan Anda untuk mengakses file dari komputer Anda dengan jarak jauh menggunakan protokol FTP.\n\nHarap dicatat bahwa ini adalah koneksi yang tidak aman dan tidak terenkripsi.

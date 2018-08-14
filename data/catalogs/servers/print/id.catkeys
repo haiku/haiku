@@ -1,0 +1,55 @@
+1	indonesian	x-vnd.Be-PSRV	1222926379
+Undefined	ConfigWindow		Tak-didefinisikan
+Return the number of available transports	PrintServerApp Scripting		Mengembalikan jumlah dari transportasi yang tersedia
+Return the number of available printers	PrintServerApp Scripting		Mengembalikan jumlah pencetak yang tersedia
+Get currently available ports/devices	Transport Scripting		Dapatkan yang sekarang tersedia dari kanal/alat
+Retrieve or select the active printer	PrintServerApp Scripting		Dapatkan atau pilih pencetak aktif
+Cancel	PrintServerApp		Batal
+Retrieve a specific printer	PrintServerApp Scripting		Dapatkan satu pencetak spesifik
+Page %1 to %2	ConfigWindow		Hal %1 ke %2
+Get name of the printer add-on used for this printer	Printer Scripting		Dapatkan nama tambahan pencetak yang digunakan pencetak ini
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
+OK	ConfigWindow		OKE
+Cancel	ConfigWindow		Batal
+Printer server	ConfigWindow		Server pencetak
+Page %1 to %2, %3 copies	ConfigWindow		Hal %1 sampai %2, %3 kopi
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Satu Printer dengan nama itu sudah ada, tetapi driver tidak dapat ditemukan! Ganti?
+Yes	PrintServerApp		Ya
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Buku besar
+Would you like to set one up now?	PrintServerApp		Apakah anda ingin menetapkan satu sekarang?
+Print job setup:	ConfigWindow		Atur pekerjaan cetak :
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portrait
+All pages	ConfigWindow		Semua halaman
+There is no default printer set up.	PrintServerApp		Tak ada printer yang diatur default.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+Printer:	ConfigWindow		Pencetak:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Pilih satu pencetak
+Show configuration window	PrintServerApp Scripting		Tampilkan jendela konfigurasi
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Dapatkan komentar tentang pencetak ini
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Sebuah pencetak dengan nama itu sudah ada, tapi itu tidak bisa digunakan sama sekali! Ganti?
+No	PrintServerApp		Tidak
+Get the transport configuration for this printer	Printer Scripting		Dapatkan konfigurasi transportasi untuk pencetak ini
+Landscape	ConfigWindow		Landscape
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Tiada printer yang sudah diatur.
+Get name of the transport add-on used for this printer	Printer Scripting		Dapatkan nama dari tambahan-transpor yang digunakan pencetak ini
+All pages, %1 copies	ConfigWindow		Semua halaman, %1 kopi
+Delete a specific printer	PrintServerApp Scripting		Hapus satu pencetak spesifik
+Create a new printer	PrintServerApp Scripting		Buat pencetak baru
+OK	PrintServerApp		OKE
+Print setup	ConfigWindow		Atur cetak
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Mengambil transportasi spesifik
+Get name of printer	Printer Scripting		Dapatkan nama pencetak
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Dapatkan nama transportasi
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Apakah anda ingin membuat @ pencetak default ?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Pengaturan halaman
+Paper setup:	ConfigWindow		Pengaturan kertas:

@@ -1,0 +1,10 @@
+1	indonesian	x-vnd.Be-PRNT	3328675489
+Waiting	JobListView		Menunggu
+Print test page	PrintersWindow		Cetak halaman test
+ pending jobs	PrinterListView		 pekerjaan tertunda
+page	JobListView		halaman
+Cancel	AddPrinterDialog		Batal
+Test page	PrintersWindow		Halaman test
+Add printer	AddPrinterDialog		Tambah printer
+Green	TestPageView		Hijau
+Test page	TestPageView		Halaman test

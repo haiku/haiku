@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	1611284793
+1	german	x-vnd.Haiku-Shortcuts	986541402
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Cancel	ShortcutsWindow		Abbrechen
@@ -19,6 +19,7 @@ Save	ShortcutsWindow		Speichern
 *MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
 *MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
 Save changes before closing?	ShortcutsWindow		Änderungen vor dem Schließen speichern?
+Command	ShortcutsSpec	Name for modifier on keyboard	Befehl
 Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
 Save & apply	ShortcutsWindow		Speichern & anwenden

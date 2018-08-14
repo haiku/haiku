@@ -1,0 +1,58 @@
+1	indonesian	x-vnd.Haiku-Keymap	1385051534
+Shift:	Modifier keys window	Shift key role name	Shift:
+Revert	Modifier keys window		Pulihkan
+Warning: left and right key roles do not match	Modifier keys window		Peringatan: key-role kiri dan kanan tidak cocok
+Scroll lock	Keyboard Layout View		Scroll lock
+Menu	Keyboard Layout View	Menu key	Menu
+Left control	Keyboard Layout View		Tombol kontrol kiri
+Tilde trigger	Keymap window		Pemicu tilde
+Grave trigger	Keymap window		Pemicu grave
+Role	Modifier keys window	As in the role of a modifier key	Peran
+Caps lock	Keyboard Layout View		Caps lock
+Select dead keys	Keymap window		Pilih tombol mati
+Cancel	Modifier keys window		Batal
+Command	Keyboard Layout View	Command key	Perintah
+Defaults	Keymap window		Bawaan
+Quit	Keymap window		Keluar
+Switch shortcut keys to Haiku mode	Keymap window		Beralih shortcut kunci untuk modus Haiku
+Circumflex trigger	Keymap window		Pemicu sirkomfleks
+Diaeresis trigger	Keymap window		Pemicu diaeresis
+Disabled	Modifier keys window	Do nothing	Dinonaktifkan
+Open…	Keymap window		Buka…
+Error: duplicate keys	Modifier keys window		Kesalahan: terjadi duplikat tuts
+System:	Keymap window		Sistem:
+Left command	Keyboard Layout View		Perintah kiri
+Set modifier keys…	Keymap window		Atur tombol pengubah...
+Option:	Modifier keys window	Option key role name	Pilihan:
+Control	Keyboard Layout View	Control key	Kontrol
+Left option	Keyboard Layout View		Pilihan kiri
+Right control	Keyboard Layout View		Control kanan
+Switch shortcut keys	Keymap window		Tukar tombol pintas
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tombol shift
+User:	Keymap window		Pengguna:
+Right option	Keyboard Layout View		Pilihan kanan
+Right shift	Keyboard Layout View		Shift kanan
+Key	Modifier keys window	As in a computer keyboard key	Tombol
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tombol ctrl
+Control:	Modifier keys window	Control key role name	Kontrol:
+Remove	Keyboard Layout View		Hapus
+Option	Keyboard Layout View	Option key	Pilihan
+Sample and clipboard:	Keymap window		Sampel dan clipboard:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tombol Alt/Opt
+Layout	Keymap window		Tata letak
+Switch shortcut keys to Windows/Linux mode	Keymap window		Beralih tombol pintas untuk modus Windows/Linux
+Right command	Keyboard Layout View		Perintah kanan
+Revert	Keymap window		Pulihkan
+Command:	Modifier keys window	Command key role name	Perintah:
+Save as…	Keymap window		Simpan sebagai:
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tombol Win/Cmd
+File	Keymap window		Berkas
+Num lock	Keyboard Layout View		Num lock
+(Current)	Keymap window		(Saat ini)
+Font	Keymap window		Fonta
+Keymap	System name		Keymap
+Left shift	Keyboard Layout View		Shift kiri
+Shift	Keyboard Layout View	Shift key	Shift
+Set modifier keys	Modifier keys window		Atur tombol pengubah
+Modifier keys	Modifier keys window		Tombol pengubah
+Acute trigger	Keymap window		Pemicu akut

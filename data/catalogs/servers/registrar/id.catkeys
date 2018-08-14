@@ -1,0 +1,23 @@
+1	indonesian	x-vnd.haiku-registrar	2599857937
+Restart system	ShutdownProcess		Sistem restart
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplikasi \"%appName%\" mungkin diblokir pada panel modal.
+OK	ShutdownProcess		Oke
+System is shut down	ShutdownProcess		Sistem dimatikan
+It's now safe to turn off the computer.	ShutdownProcess		Sekarang aman untuk mematikan komputer.
+Cancel	ShutdownProcess		Batal
+Do you really want to shut down the system?	ShutdownProcess		Apakah Anda benar-benar ingin mematikan sistem?
+Asking other processes to quit.	ShutdownProcess		Meminta proses lain untuk berhenti.
+Asking \"%appName%\" to quit.	ShutdownProcess		Meminta \"%appName%\" untuk berhenti.
+%action%?	ShutdownProcess		%action%?
+Shutdown aborted	ShutdownProcess		Shutdown dibatalkan
+Restarting…	ShutdownProcess		Restart...
+Asking background applications to quit.	ShutdownProcess		Meminta aplikasi latar belakang untuk berhenti.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikasi \"%appName%\" telah membatalkan proses shutdown.
+Tidying things up a bit.	ShutdownProcess		Sedikit merapikan hal-hal.
+Do you really want to restart the system?	ShutdownProcess		Apakah Anda benar-benar ingin me-restart sistem?
+Shutdown status	ShutdownProcess		Status shutdown
+Cancel shutdown	ShutdownProcess		Batal matikan
+Kill application	ShutdownProcess		Matikan aplikasi
+Shut down	ShutdownProcess		Shut down
+Restart	ShutdownProcess		Restart
+Shutting down…	ShutdownProcess		Mematikan…

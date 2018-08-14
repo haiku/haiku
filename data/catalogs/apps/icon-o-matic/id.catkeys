@@ -1,0 +1,59 @@
+1	indonesian	x-vnd.haiku-icon_o_matic	3924669857
+Select All	Icon-O-Matic-PathManipulator		Pilih Semua
+Add Style	Icon-O-Matic-AddStylesCmd		Tambahkan Gaya
+Color (#%02x%02x%02x)	Style name after dropping a color		warna (#%02x%02x%02x)
+Add	Icon-O-Matic-StylesList		Menambahkan
+Move Shape	Icon-O-Matic-MoveShapesCommand		Pindahkan Bentuk
+Opening the document failed!	Icon-O-Matic-Main		Membuka dokumen gagal!
+Reset transformation	Icon-O-Matic-ShapesList		Setel ulang transformasi
+Move Paths	Icon-O-Matic-MovePathsCmd		Pindahkan jalur
+None	Icon-O-Matic-Properties		Tidak ada
+New	Icon-O-Matic-Menu-File		Baru
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic mungkin tidak menafsirkan semua data dari SVG ketika dimuat. Dengan menimpa file asli, informasi ini sekarang akan hilang.
+Paste Properties	Icon-O-Matic-Properties		Properti Tempel 
+Stroke	Transformation		Ketukan
+Closed	Icon-O-Matic-PropertyNames		Tutup
+Remove Path	Icon-O-Matic-RemovePathsCmd		Hapus Jalur
+Add shape with path	Icon-O-Matic-Menu-Shape		Tambahkan bentuk dengan jalur
+Select	Icon-O-Matic-Properties		Pilih
+Height	Icon-O-Matic-PropertyNames		Tinggi
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Hapus Transformer
+Width	Icon-O-Matic-PropertyNames		Lebar
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformasi
+Duplicate	Icon-O-Matic-ShapesList		Duplikat
+<unkown property>	Icon-O-Matic-PropertyNames		<unkown property>
+Linear	Icon-O-Matic-StyleTypes		Linear
+Assign Path	Icon-O-Matic-AddPathsCmd		Tetapkan Jalur
+Move	Icon-O-Matic-TransformationBoxStates		Pindah
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Balik Titik Kontrol
+warning	Icon-O-Matic-SVGExport		peringatan
+Copy	Icon-O-Matic-Properties		Salin
+Miter Limit	Icon-O-Matic-PropertyNames		Batas Miter
+OK	Icon-O-Matic-ColorPicker		OKE
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Hapus Titik Kontrol
+Bleep!	Exporter - Continue in error dialog		Bleep!
+Add circle	Icon-O-Matic-PathsList		Tambah lingkaran
+Shorten	Icon-O-Matic-PropertyNames		Persingkat
+bad news	Title of error alert		kabar buruk
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Hapus Jalur
+Scale Y	Icon-O-Matic-PropertyNames		Skala Y
+Add Control Point	Icon-O-Matic-AddPointCmd		Tambahkan Titik Kontrol
+Untitled	Icon-O-Matic-Main		Tanpa judul
+Multi Set 	Multi Set (property name)		Multi Set 
+any of the other lists to	Empty property list - 2nd line		ke salah satu dari daftar lainnya
+Save as…	Icon-O-Matic-Menu-File		Simpan sebagai…
+Don't save	Icon-O-Matic-Menu-Settings		Jangan simpan
+Change Color	Icon-O-Matic-SetColorCmd		Ganti warna
+Style	Icon-O-Matic-Menus		Gaya
+<modify path>	Icon-O-Matic-PathCmd		<modify path>
+Opening the icon failed!	Icon-O-Matic-Main		Membuka ikon gagal!
+Error: 	Icon-O-Matic-Main		Kesalahan: 
+Rotate indices backwards	Icon-O-Matic-PathsList		Putar indeks ke belakang
+Name	Icon-O-Matic-PropertyNames		Nama
+bad news	Icon-O-Matic-Exporter		kabar buruk
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<nothing to undo>
+Off	Icon-O-Matic-Menu-Settings		Mati
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Bekukan Bentuk
+PNG Set	Icon-O-Matic-SavePanel		Set PNG
+Joins	Icon-O-Matic-PropertyNames		Gabung
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Hapus Gaya

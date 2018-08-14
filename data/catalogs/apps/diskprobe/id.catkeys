@@ -1,0 +1,75 @@
+1	indonesian	x-vnd.Haiku-DiskProbe	1707648801
+File offset: 	ProbeView		Ofset berkas: 
+%ld (native)	ProbeView		%ld (asli)
+64 bit unsigned value:	TypeEditors		Nilai unsigned 64 bit:
+Find again	ProbeView		Telusur lagi
+Text	FindWindow		Teks
+Find…	ProbeView		Telusur…
+Case sensitive	FindWindow		Peka huruf besar kecil
+Cancel	OpenWindow		Batalkan
+Close	AttributeWindow		Tutup
+File	ProbeView		Berkas
+Attribute	ProbeView		Atribut
+Floating-point value:	TypeEditors		Nilai Floating-point:
+16 bit	TypeEditors		16 bita
+Attributes	ProbeView		Atribut
+Device offset: 	ProbeView		Offset perangkat: 
+Selection	ProbeView		Pilihan
+DiskProbe	System name		DiskProbe
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	apa: '%.4s'\n\n
+File	FileWindow		Berkas
+OK	DiskProbe		Oke
+Boolean	TypeEditors	This is the type of editor	Boolean
+Paste	ProbeView		Tempel
+PNG format	TypeEditors		format PNG
+Font size	ProbeView		Ukuran huruf
+Attribute type: 	ProbeView		Tipe atribut: 
+Attribute	AttributeWindow		Atribut
+8 bit signed value:	TypeEditors		8 bita signed value:
+Number:	TypeEditors		Nomor:
+Save	ProbeView		Simpan
+Stop	ProbeView		Stop
+Number editor	TypeEditors		Editor angka
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+No type editor available	AttributeWindow		Tidak ada editor tipe yang tersedia
+Double precision floating-point value:	TypeEditors		Nilai double precision floating-point :
+Device: 	ProbeView		Perangkat: 
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Anda benar-benar ingin menghapus atribut \"%s\" dari file \"%s\"?\n\nAnda tidak dapat membatalkan tindakan ini.
+Text	TypeEditors	This is the type of editor	Teks
+8 bit unsigned value:	TypeEditors		Nilai 8 bita unsigned:
+Block	ProbeView		Blok
+Back	ProbeView		Mundur
+Device	ProbeView		Perangkat
+Unknown type	TypeEditors		Tipe tidak dikenal
+Block 0x%Lx	ProbeView		Blok 0x%Lx
+Quit	FileWindow		Keluar
+Undo	ProbeView		Batalkan
+Close	ProbeView		Tutup
+Number	TypeEditors	This is the type of editor	Nomor
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimal
+16 bit signed value:	TypeEditors		Nilai 16 bita signed:
+String editor	TypeEditors		Editor string
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	dari 0x0
+64 bit signed offset:	TypeEditors		ofset 64 bita signed:
+Boolean editor	TypeEditors		Editor boolean
+Copy	ProbeView		Salin
+none	ProbeView	No attributes	tidak ada
+Boolean value:	TypeEditors		Nilai boolean:
+32 bit size or status:	TypeEditors		Status atau ukuran 32 bita:
+8 bit palette	TypeEditors		Palet 8 bita
+Fit	ProbeView	Size of fonts, fits to available room	Sesuaikan
+Probe device	OpenWindow		Perangkat penyelidik
+ (native)	ProbeView		 (asli)
+Unknown format	TypeEditors		Format tak dikenal
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimal
+MIME type:	TypeEditors		Tipe MIME:
+Page setup…	ProbeView		Atur Halaman…
+New…	FileWindow		Baru...
+DiskProbe request	AttributeWindow		Permintaan DiskProbe 
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Tidak bisa membaca gambar
+Save changes before closing?	ProbeView		Simpan perubahan sebelum ditutup?
+Type editor	AttributeWindow		Editor tipe
+Native: 0x%0*Lx	ProbeView		Asli: 0x%0*Lx
+Raw editor	AttributeWindow		Penyunting mentah
+Message View	TypeEditors		Tampilan Pesan
+DiskProbe request	ProbeView		Permintaan DiskProbe 

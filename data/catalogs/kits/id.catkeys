@@ -1,0 +1,42 @@
+1	indonesian	x-vnd.Haiku-libbe	3337473349
+gamma	AboutWindow		gamma
+beta	AboutWindow		beta
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Ditulis oleh:
+About %app%	AboutMenuItem		Tentang %app%
+Cut	TextView		Potong
+Version	AboutWindow		Versi
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Tidak dapat menciptakan replicant untuk \"%description\".\n%error
+Copy	TextView		Salin
+%3.2f KiB	StringForSize		%3.2f KiB
+alpha	AboutWindow		alpha
+Error	PrintJob		Galat
+All Rights Reserved.	AboutWindow		Hak Cipta dilindungi undang-undang.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
+About %app%	AboutWindow		Tentang %app%
+No pages to print!	PrintJob		Tidak ada halaman untuk dicetak!
+OK	Dragger		OKE
+OK	PrintJob		OKE
+Green:	ColorControl		Hijau:
+Version history:	AboutWindow		Sejarah versi:
+Remove replicant	Dragger		Hapus replicant
+Select all	TextView		Pilih semua
+OK	AboutWindow		OKE
+OK	ZombieReplicantView		OKE
+Print Server is not responding.	PrintJob		Server Cetak tidak merespon.
+Paste	TextView		Tempel
+Special Thanks:	AboutWindow		Terima kasih terkhusus:
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Tidak dapat menemukan aplikasi untuk replicant tersebut. Tidak ada tanda tangan aplikasi yang disediakan.\n%error
+Redo	TextView		Ulangi
+<empty>	Menu		<kosong>
+Warning	Dragger		Peringatan
+Undo	TextView		Batal
+Red:	ColorControl		Merah:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Tentang %app…
+development	AboutWindow		pengembangan
+Error	ZombieReplicantView		Galat
+Blue:	ColorControl		Biru:
+gold master	AboutWindow		master emas
+Can't delete this replicant from its original application. Life goes on.	Dragger		Tidak dapat menghapus replicant ini dari aplikasi aslinya. Hidup terus berlanjut.

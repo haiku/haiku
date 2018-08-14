@@ -1,0 +1,14 @@
+1	indonesian	x-vnd.Haiku-WebPositive	723472428
+Show home button	Settings Window		Tampilkan tombol rumah
+Username:	Authentication Panel		Nama pengguna:
+Copy URL to clipboard	Download Window		Salin URL ke papan klip
+Cancel	Settings Window		Batal
+Close window	WebPositive Window		Tutup jendela
+Quit	WebPositive		Keluar
+The download could not be opened.	Download Window		Unduhan tidak bisa dibuka.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Folder unduhan tidak bisa dibuka.\n\nGalat: %error
+Close	Download Window		Tutup
+Open location	WebPositive Window		Buka lokasi
+Clear history	WebPositive Window		Hapus riwayat
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Kemarin

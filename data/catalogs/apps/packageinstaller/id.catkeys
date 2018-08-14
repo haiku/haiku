@@ -1,0 +1,54 @@
+1	indonesian	x-vnd.Haiku-PackageInstaller	1002278303
+Install to:	PackageView		Pasang di:
+OK	PackageView		OKE
+Accept	PackageTextViewer		Terima
+No package selected.	UninstallView		Tak ada paket yang dipilih
+Continue	PackageInstall		Lanjutkan
+Remove	UninstallView		Buang
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Paket yang diminta gagal dipasan pada sistem anda. Ini mungkin masalah dengan file paket target. Silakan berkonsultasi masalah ini dengan distributor paket
+Image not loaded correctly	PackageImageViewer		Gambar tidak dimuat dengan benar
+No package selected.	PackageInfo		Tak ada paket yang dipilih.
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Paket yang diberikan tampaknya sudah terpasang di sistem anda. Apakah anda ingin menghapus yang sudah ada dan melanjutkan instalasi?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Apakah anda ingin mengingat keputusan ini selama sisa instalasi ini?\n
+Installed packages	UninstallWindow		Paket yang dipasang
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Sepertinya ada ketidakcocokan ukuran file dalam file paket. Paket mungkin rusak atau telah dimodifikasi setelah dibuat. Apakah anda masih ingin melanjutkan?
+Error while installing the package\n	PackageView		Terjadi kesalahan saat menginstal paket\n
+Disclaimer	PackageTextViewer		Sangkalan
+%name% (%size% free)	PackageView		%name% (%size% bebas)
+The installation of the package has been aborted.	PackageView		Instalasi paket telah dibatalkan.
+Done	PackageInstall		Selesai
+All existing files will be replaced?	PackageView		Semua file yang ada akan digantikan?
+Preparing package	PackageInstall		Mempersiapkan paket
+No package available.	PackageInfo		Tidak ada paket yang tersedia.
+none	PackageView		tidak ada
+Install %name%	PackageView		Pasang %name%
+Stop	PackageStatus		Berhenti
+Other…	PackageView		Lainnya…
+No installation type selected	PackageView		Tidak ada tipe instalasi yang dipilih
+Installing files and folders	PackageInstall		Memasang file dan folder
+Install…	UninstallView		Pasang…
+Skip all	PackageView		Lewati semua
+Running post-installation scripts	PackageInstall		Menjalankan skrip pasca instalasi
+Skip	PackageView		Lewati
+The package you requested has been successfully installed on your system.	PackageView		Paket yang anda minta telah berhasil diinstal pada sistem Anda.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Kesalahan! \"%s\" bukan jalur yang valid.\n
+Installation type:	PackageView		Tipe pemasangan:
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Kesalahan (%s)! Tidak dapat membuka \"%s\".\n
+Finishing installation	PackageInstall		Menyelesaikan pemasangan
+Installing package	PackageStatus		Memasang paket
+Ask again	PackageView		Tanya lagi
+Replace all	PackageView		Ganti semua
+Package description	UninstallView		Deskripsi paket
+Decline	PackageTextViewer		Tolak
+All existing files will be skipped?	PackageView		Semua file yang sudah ada akan dilewati?
+Continue	PackageInfo		Lanjutkan
+%index% of %total%	PackageInstall		%index% dari %total%
+The package you selected has been successfully removed from your system.	UninstallView		Paket yang anda pilih telah berhasil dihapus dari sistem anda.
+Continue	PackageTextViewer		Lanjutkan
+Begin	PackageView		Mulai
+OK	UninstallView		OKE
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Tautan simbolis bernama '%s' sudah ada di jalur yang diberikan.\n Ganti tautan dengan yang dari paket ini atau lewati?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Paket yang dipilih tidak dihapus dari sistem Anda. File informasi paket terinstal yang diberikan mungkin telah rusak.
+Replace	PackageView		Ganti
+Installation progress	PackageView		Perkembangan pemasangan
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		File paket tidak dapat dibaca.\n Salah satu alasan yang mungkin untuk ini adalah file yang diminta bukan paket BeOS .pkg yang valid.

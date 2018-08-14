@@ -1,0 +1,25 @@
+1	indonesian	x-vnd.Haiku-WebPTranslator	828165164
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Compression method:	ConfigView		Metode kompresi:
+WebP image translator	ConfigView		Penterjemah gambar WebP
+Preset	ConfigView		Pratata
+WebP images	WebPTranslator		Gambar WebP
+WebPTranslator Settings	ConfigView		Pengaturan WebPTranslator
+Output quality:	ConfigView		Kualitas output:
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+WebP Settings	main		Pengaturan WebP
+Text	ConfigView		Teks
+Slower but better	ConfigView		Lebih lambat tapi lebih baik
+WebP image	WebPTranslator		Citra WebP
+Output preset:	ConfigView		Pratata output:
+Picture	ConfigView		Gambar
+Low	ConfigView		Rendah
+High	ConfigView		Tinggi
+Drawing	ConfigView		Menggambar
+Based on libwebp %version%	ConfigView		Berdasarkan libwebp %version%
+Default	ConfigView		Bawaan
+Fast	ConfigView		Cepat
+Photo	ConfigView		Foto
+Preprocessing filter	ConfigView		Penyaring praproses
+WebP image translator	WebPTranslator		Penerjemah citra WebP
+Icon	ConfigView		Ikon

@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku-MediaConverter	1322040280
+1	german	x-vnd.Haiku-MediaConverter	2251404027
 Video using parameters form settings	MediaConverter		Video benutzt die Parameter aus den Einstellungen
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Die Datei wurde nicht als unterstützte Mediendatei erkannt:} other{# Dateien wurden nicht als unterstützte Mediendateien erkannt:}}
 Video encoding:	MediaConverter		Videokodierung:
+Writing video track: %d%% complete	MediaConverter		Schreibe Videospur: %d%% fertig
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
 Error creating video.	MediaConverter		Fehler beim Erstellen des Videos.
 No audio	Audio codecs list		Keine Tonspur
@@ -15,6 +16,7 @@ Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstell
 Output format	MediaConverter		Ausgabeformat
 End   [ms]: 	MediaConverter		Ende [ms]:
 MediaConverter	System name		Media-Konverter
+Error writing audio frame %ld	MediaConverter		Fehler beim Schreiben von Audioframe %ld
 No video	Video codecs list		Keine Videospur
 Duration:	MediaConverter-FileInfo		Dauer:
 OK	MediaConverter		OK
@@ -25,6 +27,7 @@ Conversion completed	MediaConverter		Konvertierung abgeschlossen
 Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 Sekunden
+Error writing video frame %ld	MediaConverter		Fehler beim Schreiben von Videoframe %ld
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Fehler beim Schreiben nach %strPath%. Versuche /boot/home stattdessen.
 Source files	MediaConverter		Quelldateien
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Der gewählte Ordner wurde nicht gefunden. Versuche /boot/home stattdessen.
@@ -33,6 +36,7 @@ Cancelling	MediaConverter		Abbruch
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# Byte} other{# Bytes}}
 Error loading files	MediaConverter		Fehler beim Laden der Dateien
 Cancel	MediaConverter		Abbrechen
+Error read audio frame %ld	MediaConverter		Fehler beim Lesen von Audioframe %ld
 None available	Video codecs		Keine verfügbar
 Conversion cancelled	MediaConverter		Konvertierung abgebrochen
 No file selected	MediaConverter-FileInfo		Keine Datei ausgewählt
@@ -48,12 +52,14 @@ Cancelling…	MediaConverter		Abbruch…
 File details	MediaConverter		Dateidetails
 Select	MediaConverter		Auswählen
 Quit	Menu		Beenden
+Error read video frame %ld	MediaConverter		Fehler beim Lesen von Videoframe %ld
 Preview	MediaConverter		Vorschau
 File format:	MediaConverter		Dateiformat:
 None available	Audio codecs		Keine verfügbar
 MediaConverter+:SaveDirectory	MediaConverter		Media-Konverter+:SaveDirectory
 Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
 High	MediaConverter		Hoch
+Writing audio track: %d%% complete	MediaConverter		Schreibe Audiospur: %d%% fertig
 Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenster fallen lassen.
 Audio encoding:	MediaConverter		Audiokodierung:
 Audio quality not supported	MediaConverter		Tonqualität nicht einstellbar

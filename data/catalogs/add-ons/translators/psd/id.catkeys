@@ -1,0 +1,22 @@
+1	indonesian	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Tak terkompresi
+Indexed	PSDLoader		Diindeks
+Grayscale	PSDLoader		Skala kelabu
+Photoshop image translator	PSDConfig		Penerjemah citra photosop
+Photoshop image translator	PSDTranslator		Penerjemah citra photosop
+Version %d.%d.%d, %s	PSDConfig		Versi %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Dokumen Photoshop (file PSD)
+Photoshop image	PSDTranslator		Citra Photoshop
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Dokumen Besar photoshop (file PSB)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Citra Photoshop (%s)
+PSDTranslator Settings	PSDConfig		Pengaturan PSDTranslator
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Kompresi: 
+Format: 	PSDConfig		Format: 
+Multichannel	PSDLoader		Multikanal
+Duotone	PSDLoader		Duotone

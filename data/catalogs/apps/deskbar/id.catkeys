@@ -1,0 +1,50 @@
+1	indonesian	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Matikan
+Sort applications by name	PreferencesWindow		Urutkan aplikasi berdasarkan nama
+Suspend	DeskbarMenu		Menangguhkan
+Hide clock	TimeView		Sembunyikan jam
+Applications	PreferencesWindow		Aplikasi
+Time preferences…	TimeView		Preferensi waktu...
+About Haiku	DeskbarMenu		Tentang Haiku
+Edit in Tracker…	PreferencesWindow		Menyunting di Tracker…
+Recent documents:	PreferencesWindow		Dokumen terkini:
+Recent applications	DeskbarMenu		Aplikasi terkini
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikasi
+Find…	DeskbarMenu		Cari…
+Show clock	Tray		Tampilkan jam
+Window	PreferencesWindow		Jendela
+Defaults	PreferencesWindow		Konfigurasi standar
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Dokumen terkini
+Auto-hide	PreferencesWindow		Sembunyi otomatis
+Always on top	PreferencesWindow		Selalu di atas
+<Deskbar folder is empty>	DeskbarMenu		<Folder deskbar kosong>
+Show all	WindowMenu		Tampilkan semua
+No windows	WindowMenu		Tidak ada jendela
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Mulai ulang sistem
+Large	PreferencesWindow		Besar
+Auto-raise	PreferencesWindow		Bangkitkan otomatis
+Recent folders:	PreferencesWindow		Folder terkini:
+Show application expander	PreferencesWindow		Tampilkan aplikasi pengembang
+Close all	WindowMenu		Tutup semua
+Deskbar preferences	PreferencesWindow		Preferensi deskbar
+Mount	DeskbarMenu		Pasang
+Revert	PreferencesWindow		Pulihkan
+Small	PreferencesWindow		Kecil
+Recent applications:	PreferencesWindow		Aplikasi terkini:
+Shutdown…	DeskbarMenu		Matikan…
+Tracker always first	PreferencesWindow		Tracker selalu pertama
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferensi
+Recent folders	DeskbarMenu		Folder terkini
+About this system	DeskbarMenu		Tentang sistem ini
+Show calendar…	TimeView		Tampilkan kalender ...
+Deskbar preferences…	DeskbarMenu		Preferensi deskbar…
+Expand new applications	PreferencesWindow		Memperluas aplikasi baru
+Show replicants	DeskbarMenu		Tunjukkan replicants
+Hide application names	PreferencesWindow		Sembunyikan nama-nama aplikasi
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-demo
+Icon size	PreferencesWindow		Ukuran ikon
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet desktop
+Hide all	WindowMenu		Sembunyikan semua
+Quit application	WindowMenu		Keluar dari aplikasi

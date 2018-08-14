@@ -1,0 +1,9 @@
+1	indonesian	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		Pengaturan RAWTranslator
+Version %d.%d.%d, %s	ConfigView		Versi %d.%d.%d, %s
+RAW image translator	RAWTranslator		Penerjemah gambar RAW
+RAW Settings	RAWTranslator main		Pengaturan RAW
+RAW images	RAWTranslator		Gambar RAW
+RAW image translator	ConfigView		Penerjemah gambar RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s gambar RAW
+Based on Dave Coffin's dcraw 8.63	ConfigView		Berdasarkan dcraw dari Dave Coffin 8.63

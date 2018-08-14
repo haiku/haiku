@@ -1,0 +1,24 @@
+1	indonesian	x-vnd.Haiku-GLTeapot	1569683445
+Upper center	TeapotWindow		Tengah atas
+Lighting	TeapotWindow		Pencahayaan
+Off	TeapotWindow		Mati
+Lower left	TeapotWindow		Kiri bawah
+White	TeapotWindow		Putih
+Yellow	TeapotWindow		Kuning
+Blue	TeapotWindow		Biru
+Gouraud shading	TeapotWindow		Bayangan Gouraud
+Quit	TeapotWindow		Keluar
+Filled polygons	TeapotWindow		Poligon terisi
+Settings	TeapotWindow		Pengaturan
+Fog	TeapotWindow		Kabut
+Backface culling	TeapotWindow		Memusnahkan Backface
+Z-buffered	TeapotWindow		Z-buffered
+File	TeapotWindow		Berkas
+Perspective	TeapotWindow		Perspektif
+GLTeapot	System name		GLTeapot
+Green	TeapotWindow		Hijau
+Right	TeapotWindow		Kanan
+FPS display	TeapotWindow		Tampilan FPS
+Add a teapot	TeapotWindow		Tambahkan teko
+Red	TeapotWindow		Merah
+Lights	TeapotWindow		Pencahayaan
