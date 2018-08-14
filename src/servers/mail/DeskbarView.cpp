@@ -24,7 +24,6 @@
 #include <kernel/fs_info.h>
 #include <kernel/fs_index.h>
 #include <MenuItem.h>
-#include <MessageFormat.h>
 #include <Messenger.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -36,6 +35,7 @@
 #include <Resources.h>
 #include <Roster.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <SymLink.h>
 #include <VolumeRoster.h>
 #include <Window.h>
@@ -546,7 +546,7 @@ DeskbarView::_BuildMenu()
 	// The New E-mail query
 
 	if (fNewMessages > 0) {
-		static BMessageFormat format(B_TRANSLATE(
+		static BStringFormat format(B_TRANSLATE(
 			"{0, plural, one{# new message} other{# new messages}}"));
 		BString string;
 		format.Format(string, fNewMessages);

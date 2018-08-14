@@ -14,8 +14,8 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <MessageFormat.h>
 #include <ScrollBar.h>
+#include <StringFormat.h>
 #include <StringForSize.h>
 #include <package/hpkg/Strings.h>
 #include <Window.h>
@@ -716,7 +716,7 @@ public:
 private:
 	BString _GetLabel() const
 	{
-		static BMessageFormat format(B_TRANSLATE("{0, plural, "
+		static BStringFormat format(B_TRANSLATE("{0, plural, "
 			"one{# item} other{# items}}"));
 
 		BString label;

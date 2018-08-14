@@ -41,7 +41,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Locale.h>
-#include <MessageFormat.h>
+#include <StringFormat.h>
 
 #include "AutoLock.h"
 #include "Bitmaps.h"
@@ -217,7 +217,7 @@ BCountView::Draw(BRect updateRect)
 		if (fLastCount == 0)
 			itemString << B_TRANSLATE("no items");
 		else {
-			static BMessageFormat format(B_TRANSLATE_COMMENT(
+			static BStringFormat format(B_TRANSLATE_COMMENT(
 				"{0, plural, one{# item} other{# items}}",
 				"Number of selected items: \"1 item\" or \"2 items\""));
 			format.Format(itemString, fLastCount);

@@ -4,15 +4,15 @@
  *	Started: 5/14/2004
  *	Version: 0.1
  */
- 
+
 #ifndef STATUS_SLIDER
 #define STATUS_SLIDER
 
 //#define BEOS_R5_COMPATIBLE
 
-#include <MessageFormat.h>
 #include <Slider.h>
 #include <String.h>
+#include <StringFormat.h>
 
 
 class StatusSlider: public BSlider {
@@ -28,7 +28,7 @@ public:
 
 private:
 	mutable char			fPattern[256];
-	BMessageFormat			fFormat;
+	BStringFormat			fFormat;
 	mutable	BString			fStr;
 };
 

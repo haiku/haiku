@@ -47,7 +47,6 @@ All rights reserved.
 #include <Font.h>
 #include <Locale.h>
 #include <MenuField.h>
-#include <MessageFormat.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -57,6 +56,7 @@ All rights reserved.
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <StringFormat.h>
 #include <SymLink.h>
 #include <TextView.h>
 #include <Volume.h>
@@ -674,9 +674,9 @@ BInfoWindow::MessageReceived(BMessage* message)
 void
 BInfoWindow::GetSizeString(BString& result, off_t size, int32 fileCount)
 {
-	static BMessageFormat sizeFormat(B_TRANSLATE(
+	static BStringFormat sizeFormat(B_TRANSLATE(
 		"{0, plural, one{(# byte)} other{(# bytes)}}"));
-	static BMessageFormat countFormat(B_TRANSLATE(
+	static BStringFormat countFormat(B_TRANSLATE(
 		"{0, plural, one{for # file} other{for # files}}"));
 
 	char sizeBuffer[128];

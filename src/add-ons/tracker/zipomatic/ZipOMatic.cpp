@@ -10,8 +10,8 @@
 #include "ZipOMatic.h"
 
 #include <Alert.h>
-#include <MessageFormat.h>
 #include <Roster.h>
+#include <StringFormat.h>
 #include <TrackerAddOnAppLaunch.h>
 
 #include "ZipOMaticMisc.h"
@@ -154,7 +154,7 @@ ZipOMatic::QuitRequested(void)
 		// The multi-zipper case differs from the single-zipper case
 		// in that zippers are not paused while the BAlert is up.
 
-		static BMessageFormat format(
+		static BStringFormat format(
 			B_TRANSLATE("You have {0, plural, one{# Zip-O-Matic} "
 				"other{# Zip-O-Matics}} running.\n\n"));
 

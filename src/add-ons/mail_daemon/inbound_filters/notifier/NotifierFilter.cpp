@@ -15,9 +15,9 @@
 #include <Beep.h>
 #include <Catalog.h>
 #include <Message.h>
-#include <MessageFormat.h>
 #include <Path.h>
 #include <String.h>
+#include <StringFormat.h>
 
 #include <MailFilter.h>
 
@@ -77,7 +77,7 @@ NotifyFilter::MailboxSynchronized(status_t status)
 		system_beep("New E-mail");
 
 	if ((fStrategy & NOTIFY_ALERT) != 0) {
-		BMessageFormat format(B_TRANSLATE(
+		BStringFormat format(B_TRANSLATE(
 			"You have {0, plural, one{One new message} other{# new messages}} "
 			"for %account."));
 
@@ -107,7 +107,7 @@ NotifyFilter::MailboxSynchronized(status_t status)
 	}
 
 	if ((fStrategy & NOTIFY_NOTIFICATION) != 0) {
-		BMessageFormat format(B_TRANSLATE("{0, plural, "
+		BStringFormat format(B_TRANSLATE("{0, plural, "
 			"one{One new message} other{# new messages}}"));
 
 		BString message;

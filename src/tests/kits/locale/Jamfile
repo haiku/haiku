@@ -50,8 +50,8 @@ UnitTestLib localekittest.so :
 	DateFormatTest.cpp
 	DurationFormatTest.cpp
 	LanguageTest.cpp
-	MessageFormatTest.cpp
 	RelativeDateTimeFormatTest.cpp
+	StringFormatTest.cpp
 	UnicodeCharTest.cpp
 
 	: be [ TargetLibstdc++ ]

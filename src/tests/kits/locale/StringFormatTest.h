@@ -2,18 +2,18 @@
  * Copyright 2014 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef MESSAGE_FORMAT_TEST_H
-#define MESSAGE_FORMAT_TEST_H
+#ifndef STRING_FORMAT_TEST
+#define STRING_FORMAT_TEST
 
 
 #include <TestCase.h>
 #include <TestSuite.h>
 
 
-class MessageFormatTest: public BTestCase {
+class StringFormatTest: public BTestCase {
 public:
-					MessageFormatTest();
-	virtual			~MessageFormatTest();
+					StringFormatTest();
+	virtual			~StringFormatTest();
 
 			void	TestFormat();
 			void	TestBogus();

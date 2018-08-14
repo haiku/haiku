@@ -9,7 +9,7 @@
 
 #include <Catalog.h>
 #include <MediaTrack.h>
-#include <MessageFormat.h>
+#include <StringFormat.h>
 #include <stdio.h>
 
 #undef B_TRANSLATION_CONTEXT
@@ -53,7 +53,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 		if (ret != B_OK)
 			return ret;
 
-		static BMessageFormat frameFormat(B_TRANSLATE(
+		static BStringFormat frameFormat(B_TRANSLATE(
 			"{0, plural, one{# frame} other{# frames}}"));
 
 		if (format.IsVideo()) {
@@ -97,12 +97,12 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 
 			BString details;
 			if (bytesPerSample == 1 || bytesPerSample == 2) {
-				static BMessageFormat bitFormat(
+				static BStringFormat bitFormat(
 					B_TRANSLATE("{0, plural, one{# bit} other{# bits}}"));
 				bitFormat.Format(details, bytesPerSample * 8);
 				details.SetToFormat(B_TRANSLATE("%d bit "), bytesPerSample * 8);
 			} else {
-				static BMessageFormat bitFormat(
+				static BStringFormat bitFormat(
 					B_TRANSLATE("{0, plural, one{# byte} other{# bytes}}"));
 				bitFormat.Format(details, bytesPerSample);
 			}

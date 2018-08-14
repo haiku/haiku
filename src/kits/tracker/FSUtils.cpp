@@ -58,12 +58,12 @@ respective holders. All rights reserved.
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Locale.h>
-#include <MessageFormat.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <SymLink.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -2092,7 +2092,7 @@ FileStatToString(StatStruct* stat, char* buffer, int32 length)
 	localtime_r(&stat->st_mtime, &timeData);
 
 	BString size;
-	static BMessageFormat format(
+	static BStringFormat format(
 		B_TRANSLATE("{0, plural, one{# byte} other{# bytes}}"));
 	format.Format(size, stat->st_size);
 	uint32 pos = snprintf(buffer, length, "\n\t(%s ", size.String());

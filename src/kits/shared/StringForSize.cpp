@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-#include <MessageFormat.h>
+#include <StringFormat.h>
 #include <SystemCatalog.h>
 
 using BPrivate::gSystemCatalog;
@@ -29,7 +29,7 @@ string_for_size(double size, char* string, size_t stringSize)
 			"{0, plural, one{# byte} other{# bytes}}");
 
 		BString tmp;
-		BMessageFormat format(
+		BStringFormat format(
 			gSystemCatalog.GetString(trKey, B_TRANSLATION_CONTEXT));
 		format.Format(tmp, (int)size);
 

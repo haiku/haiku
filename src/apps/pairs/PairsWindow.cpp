@@ -22,9 +22,9 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
-#include <MessageFormat.h>
 #include <MessageRunner.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <TextView.h>
 
 #include "Pairs.h"
@@ -305,7 +305,7 @@ PairsWindow::MessageReceived(BMessage* message)
 
 				// Note: in english the singular form is never used, but other
 				// languages behave differently.
-				static BMessageFormat format(B_TRANSLATE(
+				static BStringFormat format(B_TRANSLATE(
 					"You completed the game in "
 					"{0, plural, one{# click} other{# clicks}}.\n"));
 				format.Format(strAbout, fButtonClicks);

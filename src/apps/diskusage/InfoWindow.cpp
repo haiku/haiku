@@ -17,7 +17,7 @@
 #include <vector>
 
 #include <Catalog.h>
-#include <MessageFormat.h>
+#include <StringFormat.h>
 #include <StringForSize.h>
 #include <StringView.h>
 #include <Bitmap.h>
@@ -81,7 +81,7 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 	BString name;
 	if (f->count > 0) {
 		// This is a directory, include file count information
-		static BMessageFormat format(B_TRANSLATE(
+		static BStringFormat format(B_TRANSLATE(
 		"%size% in {0, plural, one{# file} other{# files}}"));
 
 		format.Format(name, f->count);

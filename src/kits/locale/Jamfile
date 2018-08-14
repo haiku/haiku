@@ -28,8 +28,8 @@ local sources =
 	DateFormat.cpp
 	DateTimeFormat.cpp
 	DurationFormat.cpp
-	MessageFormat.cpp
 	NumberFormat.cpp
+	StringFormat.cpp
 	TimeFormat.cpp
 	TimeUnitFormat.cpp
 	Format.cpp # Used by some of the above.

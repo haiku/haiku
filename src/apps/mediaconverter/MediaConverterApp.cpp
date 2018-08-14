@@ -15,10 +15,10 @@
 #include <Locale.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
-#include <MessageFormat.h>
 #include <Mime.h>
 #include <Path.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <View.h>
 
 #include "MediaConverterWindow.h"
@@ -131,7 +131,7 @@ MediaConverterApp::RefsReceived(BMessage* msg)
 
 	if (errors) {
 		BString alertText;
-		static BMessageFormat format(B_TRANSLATE("{0, plural, "
+		static BStringFormat format(B_TRANSLATE("{0, plural, "
 			"one{The file was not recognized as a supported media file:} "
 			"other{# files were not recognized as supported media files:}}"));
 		format.Format(alertText, errors);

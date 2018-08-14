@@ -4,11 +4,11 @@
  *	Started: 5/14/2004
  *	Version: 0.1
  */
- 
+
 
 #include "StatusSlider.h"
 
-#include <MessageFormat.h>
+#include <StringFormat.h>
 
 
 StatusSlider::StatusSlider(const char* name, const char* label,

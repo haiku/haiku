@@ -17,9 +17,9 @@
 #include <Catalog.h>
 #include <Box.h>
 #include <Button.h>
-#include <MessageFormat.h>
 #include <Node.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <StringForSize.h>
 #include <StringView.h>
 
@@ -152,7 +152,7 @@ StatusView::ShowInfo(const FileInfo* info)
 	fSizeView->SetText(label);
 
 	if (info->count > 0) {
-		static BMessageFormat format(B_TRANSLATE("{0, plural, "
+		static BStringFormat format(B_TRANSLATE("{0, plural, "
 			"one{# file} other{# files}}"));
 		BString label;
 		format.Format(label, info->count);

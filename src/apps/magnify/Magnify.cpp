@@ -22,13 +22,13 @@
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MenuField.h>
-#include <MessageFormat.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <PropertyInfo.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <StringFormat.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
@@ -1062,7 +1062,7 @@ TInfoView::Draw(BRect updateRect)
 
 	MovePenTo(15 + fPopUp->Bounds().Width(), fFontHeight + 5);
 
-	static BMessageFormat format(B_TRANSLATE("%width x %height  @ {0, plural, "
+	static BStringFormat format(B_TRANSLATE("%width x %height  @ {0, plural, "
 		"one{# pixel/pixel} other{# pixels/pixel}}"));
 
 	BString dimensionsInfo;

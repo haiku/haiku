@@ -20,12 +20,12 @@
 #include <FindDirectory.h>
 #include <fs_index.h>
 #include <IconUtils.h>
-#include <MessageFormat.h>
 #include <NodeMonitor.h>
 #include <Notification.h>
 #include <Path.h>
 #include <Roster.h>
 #include <StringList.h>
+#include <StringFormat.h>
 #include <VolumeRoster.h>
 
 #include <E-mail.h>
@@ -350,7 +350,7 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 
 		case 'numg':
 		{
-			static BMessageFormat format(B_TRANSLATE("{0, plural, "
+			static BStringFormat format(B_TRANSLATE("{0, plural, "
 				"one{# new message} other{# new messages}} for %name\n"));
 
 			int32 numMessages = msg->FindInt32("num_messages");
@@ -797,7 +797,7 @@ MailDaemonApplication::_UpdateNewMessagesNotification()
 {
 	BString title;
 	if (fNewMessages > 0) {
-		BMessageFormat format(B_TRANSLATE(
+		BStringFormat format(B_TRANSLATE(
 			"{0, plural, one{One new message} other{# new messages}}"));
 
 		format.Format(title, fNewMessages);

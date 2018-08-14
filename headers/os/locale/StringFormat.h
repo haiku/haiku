@@ -6,8 +6,8 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *		John Scipione, jscipione@gmail.com
  */
-#ifndef _B_MESSAGE_FORMAT_H_
-#define _B_MESSAGE_FORMAT_H_
+#ifndef _B_STRING_FORMAT_H_
+#define _B_STRING_FORMAT_H_
 
 
 #include <Format.h>
@@ -22,12 +22,12 @@ namespace U_ICU_NAMESPACE {
 }
 
 
-class BMessageFormat: public BFormat {
+class BStringFormat : public BFormat {
 public:
-								BMessageFormat(const BLanguage& language,
+								BStringFormat(const BLanguage& language,
 									const BString pattern);
-								BMessageFormat(const BString pattern);
-								~BMessageFormat();
+								BStringFormat(const BString pattern);
+								~BStringFormat();
 
 			status_t			InitCheck();
 
@@ -41,4 +41,4 @@ private:
 };
 
 
-#endif	// _B_MESSAGE_FORMAT_H_
+#endif	// _B_STRING_FORMAT_H_

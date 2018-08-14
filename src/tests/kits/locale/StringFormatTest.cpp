@@ -4,27 +4,27 @@
  */
 
 
-#include "MessageFormatTest.h"
+#include "StringFormatTest.h"
 
 #include <Locale.h>
-#include <MessageFormat.h>
+#include <StringFormat.h>
 
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 
 
-MessageFormatTest::MessageFormatTest()
+StringFormatTest::StringFormatTest()
 {
 }
 
 
-MessageFormatTest::~MessageFormatTest()
+StringFormatTest::~StringFormatTest()
 {
 }
 
 
 void
-MessageFormatTest::TestFormat()
+StringFormatTest::TestFormat()
 {
 	BString output;
 
@@ -82,7 +82,7 @@ MessageFormatTest::TestFormat()
 		NextSubTest();
 		output.Truncate(0);
 		BLanguage language(tests[i].locale);
-		BMessageFormat formatter(language, tests[i].pattern);
+		BStringFormat formatter(language, tests[i].pattern);
 
 		result = formatter.Format(output, tests[i].number);
 		CPPUNIT_ASSERT_EQUAL(B_OK, result);
@@ -92,7 +92,7 @@ MessageFormatTest::TestFormat()
 
 
 void
-MessageFormatTest::TestBogus()
+StringFormatTest::TestBogus()
 {
 	struct Test {
 		const char* pattern;
@@ -113,7 +113,7 @@ MessageFormatTest::TestBogus()
 		status_t result;
 		BString output;
 
-		BMessageFormat formatter(tests[i].pattern);
+		BStringFormat formatter(tests[i].pattern);
 		CPPUNIT_ASSERT(formatter.InitCheck() != B_OK);
 
 		result = formatter.Format(output, 1);
@@ -126,14 +126,14 @@ MessageFormatTest::TestBogus()
 
 
 /*static*/ void
-MessageFormatTest::AddTests(BTestSuite& parent)
+StringFormatTest::AddTests(BTestSuite& parent)
 {
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("MessageFormatTest");
+	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("StringFormatTest");
 
-	suite.addTest(new CppUnit::TestCaller<MessageFormatTest>(
-		"MessageFormatTest::TestFormat", &MessageFormatTest::TestFormat));
-	suite.addTest(new CppUnit::TestCaller<MessageFormatTest>(
-		"MessageFormatTest::TestBogus", &MessageFormatTest::TestBogus));
+	suite.addTest(new CppUnit::TestCaller<StringFormatTest>(
+		"StringFormatTest::TestFormat", &StringFormatTest::TestFormat));
+	suite.addTest(new CppUnit::TestCaller<StringFormatTest>(
+		"StringFormatTest::TestBogus", &StringFormatTest::TestBogus));
 
-	parent.addTest("MessageFormatTest", &suite);
+	parent.addTest("StringFormatTest", &suite);
 }

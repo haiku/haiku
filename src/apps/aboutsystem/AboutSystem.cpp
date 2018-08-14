@@ -29,7 +29,6 @@
 #include <Font.h>
 #include <fs_attr.h>
 #include <LayoutBuilder.h>
-#include <MessageFormat.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <ObjectList.h>
@@ -40,6 +39,7 @@
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <StringList.h>
 #include <StringView.h>
 #include <TranslationUtils.h>
@@ -471,7 +471,7 @@ AboutView::AboutView()
 		B_ALIGN_VERTICAL_UNSET));
 
 	// CPU count, type and clock speed
-	static BMessageFormat format(B_TRANSLATE_COMMENT(
+	static BStringFormat format(B_TRANSLATE_COMMENT(
 		"{0, plural, one{Processor:} other{# Processors:}}",
 		"\"Processor:\" or \"2 Processors:\""));
 

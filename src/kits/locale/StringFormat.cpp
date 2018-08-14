@@ -8,7 +8,7 @@
  */
 
 #include <unicode/uversion.h>
-#include <MessageFormat.h>
+#include <StringFormat.h>
 
 #include <Autolock.h>
 #include <FormattingConventionsPrivate.h>
@@ -19,35 +19,35 @@
 #include <unicode/msgfmt.h>
 
 
-BMessageFormat::BMessageFormat(const BLanguage& language, const BString pattern)
+BStringFormat::BStringFormat(const BLanguage& language, const BString pattern)
 	: BFormat(language, BFormattingConventions())
 {
 	_Initialize(UnicodeString::fromUTF8(pattern.String()));
 }
 
 
-BMessageFormat::BMessageFormat(const BString pattern)
+BStringFormat::BStringFormat(const BString pattern)
 	: BFormat()
 {
 	_Initialize(UnicodeString::fromUTF8(pattern.String()));
 }
 
 
-BMessageFormat::~BMessageFormat()
+BStringFormat::~BStringFormat()
 {
 	delete fFormatter;
 }
 
 
 status_t
-BMessageFormat::InitCheck()
+BStringFormat::InitCheck()
 {
 	return fInitStatus;
 }
 
 
 status_t
-BMessageFormat::Format(BString& output, const int64 arg) const
+BStringFormat::Format(BString& output, const int64 arg) const
 {
 	if (fInitStatus != B_OK)
 		return fInitStatus;
@@ -72,7 +72,7 @@ BMessageFormat::Format(BString& output, const int64 arg) const
 
 
 status_t
-BMessageFormat::_Initialize(const UnicodeString& pattern)
+BStringFormat::_Initialize(const UnicodeString& pattern)
 {
 	fInitStatus = B_OK;
 	UErrorCode error = U_ZERO_ERROR;

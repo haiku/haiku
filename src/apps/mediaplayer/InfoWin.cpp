@@ -20,11 +20,11 @@
 #include <Debug.h>
 #include <LayoutBuilder.h>
 #include <MediaDefs.h>
-#include <MessageFormat.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <Screen.h>
 #include <String.h>
+#include <StringFormat.h>
 #include <StringForRate.h>
 #include <StringView.h>
 #include <TextView.h>
@@ -486,7 +486,7 @@ InfoWin::_UpdateAudio()
 			info << bitString << " ";
 		}
 
-		static BMessageFormat channelFormat(B_TRANSLATE(
+		static BStringFormat channelFormat(B_TRANSLATE(
 			"{0, plural, =1{Mono} =2{Stereo} other{# Channels}}"));
 		channelFormat.Format(info, channelCount);
 

@@ -11,13 +11,13 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
-#include <MessageFormat.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <OutlineListView.h>
 #include <Path.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <StringFormat.h>
 #include <StringItem.h>
 
 #include <package/PackageDefs.h>
