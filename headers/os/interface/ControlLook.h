@@ -396,6 +396,19 @@ public:
 			void				SetBackgroundInfo(
 									const BMessage& backgroundInfo);
 
+private:
+	// FBC padding
+	virtual	void				_ReservedControlLook1();
+	virtual	void				_ReservedControlLook2();
+	virtual	void				_ReservedControlLook3();
+	virtual	void				_ReservedControlLook4();
+	virtual	void				_ReservedControlLook5();
+	virtual	void				_ReservedControlLook6();
+	virtual	void				_ReservedControlLook7();
+	virtual	void				_ReservedControlLook8();
+	virtual	void				_ReservedControlLook9();
+	virtual	void				_ReservedControlLook10();
+
 protected:
 			int32				fCachedWorkspace;
 			BMessage			fBackgroundInfo;

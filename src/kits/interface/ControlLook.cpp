@@ -77,6 +77,18 @@ BControlLook::SetBackgroundInfo(const BMessage& backgroundInfo)
 }
 
 
+void BControlLook::_ReservedControlLook1() {}
+void BControlLook::_ReservedControlLook2() {}
+void BControlLook::_ReservedControlLook3() {}
+void BControlLook::_ReservedControlLook4() {}
+void BControlLook::_ReservedControlLook5() {}
+void BControlLook::_ReservedControlLook6() {}
+void BControlLook::_ReservedControlLook7() {}
+void BControlLook::_ReservedControlLook8() {}
+void BControlLook::_ReservedControlLook9() {}
+void BControlLook::_ReservedControlLook10() {}
+
+
 // NOTE: May come from a add-on in the future. Initialized in
 // InterfaceDefs.cpp
 BControlLook* be_control_look = NULL;
