@@ -498,7 +498,7 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	if (fCodecInitStatus == CODEC_INIT_FAILED)
 		return false;
 
-	fCodecContext->strict_std_compliance = -2;
+	fCodecContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
 	// Some codecs need this to be set before open
 	fFrame->format = fCodecContext->pix_fmt;
