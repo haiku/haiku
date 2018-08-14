@@ -377,7 +377,7 @@ AVFormatWriter::~AVFormatWriter()
 		av_freep(&fFormatContext->streams[i]);
 	}
 
-	av_free(fFormatContext);
+	avformat_free_context(fFormatContext);
 	av_free(fIOContext->buffer);
 	av_free(fIOContext);
 }
