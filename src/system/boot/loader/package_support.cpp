@@ -104,7 +104,7 @@ PackageVolumeState::Unset()
 const char*
 PackageVolumeState::DisplayName() const
 {
-	return fDisplayName != NULL ? fDisplayName : "Latest version";
+	return fDisplayName != NULL ? fDisplayName : "Latest state";
 }
 
 

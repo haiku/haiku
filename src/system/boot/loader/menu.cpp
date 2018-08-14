@@ -1211,6 +1211,8 @@ add_boot_volume_item(Menu* menu, Directory* volume, const char* name)
 	}
 
 	if (subMenu != NULL && subMenu->CountItems() > 1) {
+		item->SetHelpText(
+			"Enter to choose a different state to boot");
 		item->SetSubmenu(subMenu);
 	} else {
 		delete subMenu;
