@@ -4,8 +4,8 @@ BinCommand bmpinfo : bmpinfo.cpp : be libbe.so localestub translation [ TargetLi
 
 AddResources bmpinfo : bmpinfo.rdef ;
 
-DoCatalogs bmpinfo :
-	x-vnd.Haiku-bmpsinfo
-	: 
-	bmpinfo.cpp
-;
+#DoCatalogs bmpinfo :
+#	x-vnd.Haiku-bmpsinfo
+#	:
+#	bmpinfo.cpp
+#;

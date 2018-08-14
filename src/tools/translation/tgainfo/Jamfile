@@ -1,13 +1,13 @@
 SubDir HAIKU_TOP src tools translation tgainfo ;
 
-BinCommand tgainfo : 
-	tgainfo.cpp 
+BinCommand tgainfo :
+	tgainfo.cpp
 	: be libbe.so localestub translation [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
 
 AddResources tgainfo : tgainfo.rdef ;
 
-DoCatalogs tgainfo :
-	x-vnd.Haiku-tgainfo
-	: 
-	tgainfo.cpp
-;
+#DoCatalogs tgainfo :
+#	x-vnd.Haiku-tgainfo
+#	:
+#	tgainfo.cpp
+#;
