@@ -158,7 +158,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_free(fRawDecodedPicture);
 	av_free(fRawDecodedAudio->opaque);
 	av_free(fRawDecodedAudio);
-	av_free(fCodecContext);
+	avcodec_free_context(&fCodecContext);
 	av_free(fDecodedDataBuffer);
 
 	av_frame_free(&fFilterFrame);

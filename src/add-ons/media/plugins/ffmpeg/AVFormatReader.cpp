@@ -215,7 +215,7 @@ StreamBase::~StreamBase()
 	if (fContext != NULL)
 		avformat_close_input(&fContext);
 	av_free_packet(&fPacket);
-	av_free(fContext);
+	avformat_free_context(fContext);
 	if (fIOContext != NULL)
 		av_free(fIOContext->buffer);
 	av_free(fIOContext);

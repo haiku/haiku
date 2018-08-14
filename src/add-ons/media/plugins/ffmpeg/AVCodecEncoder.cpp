@@ -113,7 +113,7 @@ AVCodecEncoder::~AVCodecEncoder()
 		av_free(fFrame);
 	}
 
-	av_free(fOwnContext);
+	avcodec_free_context(&fOwnContext);
 
 	delete[] fChunkBuffer;
 }
