@@ -32,11 +32,13 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BNode", NodeTest::Suite());
 	suite->addTest("BNodeInfo", NodeInfoTest::Suite());
 	suite->addTest("BPath", PathTest::Suite());
-	suite->addTest("BQuery", QueryTest::Suite());
+	// TODO: calls Lock on destruction hangs
+	//suite->addTest("BQuery", QueryTest::Suite());
 	suite->addTest("BResources", ResourcesTest::Suite());
 	suite->addTest("BResourceStrings", ResourceStringsTest::Suite());
 	suite->addTest("BSymLink", SymLinkTest::Suite());
-	suite->addTest("BVolume", VolumeTest::Suite());
+	// TODO: mkbfs missing
+	//suite->addTest("BVolume", VolumeTest::Suite());
 	suite->addTest("FindDirectory", FindDirectoryTest::Suite());
 	suite->addTest("MimeSniffer", MimeSnifferTest::Suite());
 	

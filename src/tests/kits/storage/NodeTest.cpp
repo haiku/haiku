@@ -47,7 +47,9 @@ NodeTest::Suite() {
 #endif
 														, &NodeTest::AttrRenameTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Attribute Info Test", &NodeTest::AttrInfoTest) );
-	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Attribute BString Test", &NodeTest::AttrBStringTest) );
+	// TODO: AttrBString deadlocks entire OS (UnitTester at 100% CPU,
+	// windows don't respond to actions, won't open, OS won't even shut down)
+	//suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Attribute BString Test", &NodeTest::AttrBStringTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Sync Test", &NodeTest::SyncTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Dup Test", &NodeTest::DupTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Equality Test", &NodeTest::EqualityTest) );

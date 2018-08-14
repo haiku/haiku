@@ -29,6 +29,8 @@
 void TUnlockLooperTest::UnlockLooper1()
 {
 #if !defined(TEST_R5)
+	DEBUGGER_ESCAPE;
+
 	BHandler Handler;
 	Handler.UnlockLooper();
 #endif

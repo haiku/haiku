@@ -571,10 +571,10 @@ BTestShell::_Debugger(const char *message)
 		debugger(message);
 		return;
 	}
-cout << "debugger() called: " << message << endl;
+	cout << "debugger() called: " << message << endl;
 	void *var = tls_get(fTLSDebuggerCall);
 	if (var)
-		tls_set(fTLSDebuggerCall, (void*)((int)var + 1));
+		tls_set(fTLSDebuggerCall, (void*)((addr_t)var + 1));
 	else
 		(*fOldDebuggerHook)(message);
 }

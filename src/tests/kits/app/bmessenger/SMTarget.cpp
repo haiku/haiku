@@ -144,7 +144,7 @@ RemoteSMTarget::RemoteSMTarget(bool preferred)
 	BString unescapedTestDir(BTestShell::GlobalTestDir());
 	unescapedTestDir.CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
 	string remoteApp(unescapedTestDir.String());
-	remoteApp += "/../kits/app/SMRemoteTargetApp ";
+	remoteApp += "/SMRemoteTargetApp ";
 	remoteApp += portName;
 	if (preferred)
 		remoteApp += " preferred";

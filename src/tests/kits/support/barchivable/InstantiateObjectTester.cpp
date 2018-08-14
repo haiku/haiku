@@ -259,7 +259,7 @@ void TInstantiateObjectTester::Case7()
 					errno is set to B_BAD_VALUE.
  */
 void TInstantiateObjectTester::Case8()
-{debugger(__PRETTY_FUNCTION__);
+{
 	errno = B_OK;
 	BMessage Archive;
 	CPPUNIT_ASSERT(Archive.AddString("class", gRemoteClassName) == B_OK);

@@ -43,7 +43,7 @@ class OutlineListViewTest: public TestCase
 
 
 void OutlineListViewTest::EachItemUnder() {
-	BApplication* app = new BApplication(
+	BApplication app(
 		"application/x-vnd.OutlineListView_EachItemUnder.test");
 	BWindow* window = new BWindow(BRect(50,50,550,550),
 		"OutlineListView_EachItemUnder", B_TITLED_WINDOW,
@@ -95,7 +95,6 @@ void OutlineListViewTest::EachItemUnder() {
 
 	// Don't actually run anything
 	delete window;
-	delete app;
 }
 
 

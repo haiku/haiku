@@ -253,8 +253,10 @@ HttpTest::AddTests(BTestSuite& parent)
 		suite.addTest(new CppUnit::TestCaller<HttpTest>(
 			"HttpTest::PortTest", &HttpTest::PortTest));
 
-		suite.addTest(new CppUnit::TestCaller<HttpTest>("HttpTest::ProxyTest",
-			&HttpTest::ProxyTest));
+		// TODO: reaches out to some mysterious IP 120.203.214.182 which does
+		// not respond anymore?
+		//suite.addTest(new CppUnit::TestCaller<HttpTest>("HttpTest::ProxyTest",
+		//	&HttpTest::ProxyTest));
 
 		parent.addTest("HttpTest", &suite);
 	}
