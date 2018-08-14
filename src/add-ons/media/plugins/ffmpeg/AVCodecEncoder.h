@@ -50,7 +50,6 @@ private:
 			status_t			_Setup();
 
 			bool				_OpenCodecIfNeeded();
-			void				_CloseCodecIfNeeded();
 
 			status_t			_EncodeAudio(const void* buffer,
 									int64 frameCount,
@@ -75,15 +74,9 @@ private:
 			// TODO: Refactor common base class from AVCodec[De|En]Coder!
 			CodecID				fCodecID;
 			AVCodec*			fCodec;
-			AVCodecContext*		fOwnContext;
 			AVCodecContext*		fCodecContext;
 
-			enum {
-				CODEC_INIT_NEEDED = 0,
-				CODEC_INIT_DONE,
-				CODEC_INIT_FAILED
-			};
-			uint32				fCodecInitStatus;
+			bool				fCodecInitialized;
 
 			// For video (color space conversion):
 			AVPicture			fSrcFrame;

@@ -43,9 +43,8 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fBitRateScale(bitRateScale),
 	fCodecID((CodecID)codecID),
 	fCodec(NULL),
-	fOwnContext(avcodec_alloc_context3(NULL)),
-	fCodecContext(fOwnContext),
-	fCodecInitStatus(CODEC_INIT_NEEDED),
+	fCodecContext(avcodec_alloc_context3(NULL)),
+	fCodecInitialized(false),
 	fFrame(av_frame_alloc()),
 	fSwsContext(NULL),
 	fFramesWritten(0)
@@ -89,8 +88,6 @@ AVCodecEncoder::~AVCodecEncoder()
 {
 	TRACE("AVCodecEncoder::~AVCodecEncoder()\n");
 
-	_CloseCodecIfNeeded();
-
 	if (fSwsContext != NULL)
 		sws_freeContext(fSwsContext);
 
@@ -110,10 +107,10 @@ AVCodecEncoder::~AVCodecEncoder()
 		fFrame->linesize[1] = 0;
 		fFrame->linesize[2] = 0;
 		fFrame->linesize[3] = 0;
-		av_free(fFrame);
+		av_frame_free(&fFrame);
 	}
 
-	avcodec_free_context(&fOwnContext);
+	avcodec_free_context(&fCodecContext);
 
 	delete[] fChunkBuffer;
 }
@@ -160,27 +157,8 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 		return B_NO_INIT;
 	}
 
-	_CloseCodecIfNeeded();
-
 	fInputFormat = *inputFormat;
 	fFramesWritten = 0;
-
-	const uchar* userData = inputFormat->user_data;
-	if (*(uint32*)userData == 'ffmp') {
-		userData += sizeof(uint32);
-		// The Writer plugin used is the FFmpeg plugin. It stores the
-		// AVCodecContext pointer in the user data section. Use this
-		// context instead of our own. It requires the Writer living in
-		// the same team, of course.
-		app_info appInfo;
-		if (be_app->GetAppInfo(&appInfo) == B_OK
-			&& *(team_id*)userData == appInfo.team) {
-			userData += sizeof(team_id);
-			// Use the AVCodecContext from the Writer. This works better
-			// than using our own context with some encoders.
-			fCodecContext = *(AVCodecContext**)userData;
-		}
-	}
 
 	return _Setup();
 }
@@ -296,8 +274,9 @@ AVCodecEncoder::_Setup()
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
 		TRACE("  B_MEDIA_RAW_VIDEO\n");
 		// frame rate
-		fCodecContext->time_base.den = (int)fInputFormat.u.raw_video.field_rate;
-		fCodecContext->time_base.num = 1;
+		fCodecContext->time_base = (AVRational){1, (int)fInputFormat.u.raw_video.field_rate};
+		fCodecContext->framerate = (AVRational){(int)fInputFormat.u.raw_video.field_rate, 1};
+		
 		// video size
 		fCodecContext->width = fInputFormat.u.raw_video.display.line_width;
 		fCodecContext->height = fInputFormat.u.raw_video.display.line_count;
@@ -486,17 +465,8 @@ AVCodecEncoder::_Setup()
 bool
 AVCodecEncoder::_OpenCodecIfNeeded()
 {
-	if (fCodecContext != fOwnContext) {
-		// We are using the AVCodecContext of the AVFormatWriter plugin,
-		// and don't maintain it's open/close state.
+	if (fCodecInitialized)
 		return true;
-	}
-
-	if (fCodecInitStatus == CODEC_INIT_DONE)
-		return true;
-
-	if (fCodecInitStatus == CODEC_INIT_FAILED)
-		return false;
 
 	fCodecContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
@@ -508,29 +478,14 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	// Open the codec
 	int result = avcodec_open2(fCodecContext, fCodec, NULL);
 	if (result >= 0)
-		fCodecInitStatus = CODEC_INIT_DONE;
+		fCodecInitialized = true;
 	else
-		fCodecInitStatus = CODEC_INIT_FAILED;
+		fCodecInitialized = false;
 
 	TRACE("  avcodec_open(%p, %p): %d\n", fCodecContext, fCodec, result);
 
-	return fCodecInitStatus == CODEC_INIT_DONE;
+	return fCodecInitialized;
 
-}
-
-
-void
-AVCodecEncoder::_CloseCodecIfNeeded()
-{
-	if (fCodecContext != fOwnContext) {
-		// See _OpenCodecIfNeeded().
-		return;
-	}
-
-	if (fCodecInitStatus == CODEC_INIT_DONE) {
-		avcodec_close(fCodecContext);
-		fCodecInitStatus = CODEC_INIT_NEEDED;
-	}
 }
 
 
