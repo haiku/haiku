@@ -156,7 +156,7 @@ ElfImage::GetSymbolRelocations(const char* symbolName, BList* relocations)
 		uint32 type = relocation.GetType();
 		// get the symbol
 		ElfSymbol symbol;
-		if ((type == R_386_GLOB_DAT || type == R_386_JMP_SLOT)
+		if ((type == R_GLOB_DAT || type == R_JUMP_SLOT)
 			&& relocation.GetSymbol(&symbol) == B_OK
 			&& symbol.GetName()) {
 			// only undefined symbols with global binding

@@ -35,7 +35,7 @@
 #include "ElfFile.h"
 
 // sanity bounds
-static const uint32	kMaxELFHeaderSize			= sizeof(Elf32_Ehdr) + 32;
+static const uint32	kMaxELFHeaderSize			= sizeof(Elf_Ehdr) + 32;
 
 // read_exactly
 static
@@ -62,18 +62,18 @@ public:
 								ElfSection();
 								~ElfSection();
 
-			void				SetTo(ElfFile* file, Elf32_Shdr* header);
+			void				SetTo(ElfFile* file, Elf_Shdr* header);
 			void				Unset();
 			bool				IsInitialized() const	{ return fHeader; }
 
 			ElfFile*			GetFile() const;
-			Elf32_Shdr*			GetHeader() const		{ return fHeader; }
+			Elf_Shdr*			GetHeader() const		{ return fHeader; }
 			const char*			GetName() const;
 			uint8*				GetData() const			{ return fData; }
 			size_t				GetSize() const;
-			Elf32_Word			GetType() const;
-			Elf32_Word			GetLink() const;
-			Elf32_Word			GetInfo() const;
+			Elf_Word			GetType() const;
+			Elf_Word			GetLink() const;
+			Elf_Word			GetInfo() const;
 			size_t				GetEntrySize() const;
 			int32				CountEntries() const;
 
@@ -84,7 +84,7 @@ public:
 
 private:
 			ElfFile*			fFile;
-			Elf32_Shdr*			fHeader;
+			Elf_Shdr*			fHeader;
 			uint8*				fData;
 };
 
@@ -104,7 +104,7 @@ ElfSection::~ElfSection()
 
 // SetTo
 void
-ElfSection::SetTo(ElfFile* file, Elf32_Shdr* header)
+ElfSection::SetTo(ElfFile* file, Elf_Shdr* header)
 {
 	Unset();
 	fFile = file;
@@ -149,21 +149,21 @@ ElfSection::GetSize() const
 }
 
 // GetType
-Elf32_Word
+Elf_Word
 ElfSection::GetType() const
 {
 	return fHeader->sh_type;
 }
 
 // GetLink
-Elf32_Word
+Elf_Word
 ElfSection::GetLink() const
 {
 	return fHeader->sh_link;
 }
 
 // GetInfo
-Elf32_Word
+Elf_Word
 ElfSection::GetInfo() const
 {
 	return fHeader->sh_info;
@@ -263,17 +263,17 @@ ElfSymbol::Unset()
 }
 
 // GetSymbolStruct
-const Elf32_Sym*
+const Elf_Sym*
 ElfSymbol::GetSymbolStruct()
 {
-	Elf32_Sym* symbol = fSymbol;
+	Elf_Sym* symbol = fSymbol;
 	if (!symbol && fSection && fSection->GetData()) {
 		size_t symbolSize = fSection->GetEntrySize();
 		if (symbolSize == 0)
 			return NULL;
 		int32 symbolCount = fSection->GetSize() / symbolSize;
 		if (fIndex >= 0 && fIndex < symbolCount)
-			symbol = (Elf32_Sym*)(fSection->GetData() + fIndex * symbolSize);
+			symbol = (Elf_Sym*)(fSection->GetData() + fIndex * symbolSize);
 	}
 	return symbol;
 }
@@ -283,7 +283,7 @@ const char*
 ElfSymbol::GetName()
 {
 	const char* name = NULL;
-	if (const Elf32_Sym* symbol = GetSymbolStruct()) {
+	if (const Elf_Sym* symbol = GetSymbolStruct()) {
 		size_t size = 0;
 		const char* data = fSection->GetFile()->GetStringSectionStrings(
 			fSection->GetLink(), &size);
@@ -298,8 +298,8 @@ uint32
 ElfSymbol::GetBinding()
 {
 	uint32 binding = STB_LOCAL;
-	if (const Elf32_Sym* symbol = GetSymbolStruct())
-		binding = ELF32_ST_BIND(symbol->st_info);
+	if (const Elf_Sym* symbol = GetSymbolStruct())
+		binding = ELF_ST_BIND(symbol->st_info);
 	return binding;
 }
 
@@ -308,8 +308,8 @@ uint32
 ElfSymbol::GetType()
 {
 	uint32 type = STT_NOTYPE;
-	if (const Elf32_Sym* symbol = GetSymbolStruct())
-		type = ELF32_ST_TYPE(symbol->st_info);
+	if (const Elf_Sym* symbol = GetSymbolStruct())
+		type = ELF_ST_TYPE(symbol->st_info);
 	return type;
 }
 
@@ -318,7 +318,7 @@ uint32
 ElfSymbol::GetTargetSectionIndex()
 {
 	uint32 index = SHN_UNDEF;
-	if (const Elf32_Sym* symbol = GetSymbolStruct())
+	if (const Elf_Sym* symbol = GetSymbolStruct())
 		index = symbol->st_shndx;
 	return index;
 }
@@ -359,21 +359,21 @@ ElfRelocation::Unset()
 }
 
 // GetRelocationStruct
-Elf32_Rel*
+Elf_Rel*
 ElfRelocation::GetRelocationStruct()
 {
-	Elf32_Rel* relocation = fRelocation;
+	Elf_Rel* relocation = fRelocation;
 	if (!relocation && fSection) {
 		if (!fSection->GetData()) {
 			if (fSection->Load() != B_OK)
 				return NULL;
 		}
 		size_t entrySize = fSection->GetEntrySize();
-		if (entrySize == 0 || entrySize < sizeof(Elf32_Rel))
+		if (entrySize == 0 || entrySize < sizeof(Elf_Rel))
 			return NULL;
 		int32 entryCount = fSection->GetSize() / entrySize;
 		if (fIndex >= 0 && fIndex < entryCount) {
-			relocation = (Elf32_Rel*)(fSection->GetData()
+			relocation = (Elf_Rel*)(fSection->GetData()
 						 + fIndex * entrySize);
 		}
 	}
@@ -384,9 +384,9 @@ ElfRelocation::GetRelocationStruct()
 uint32
 ElfRelocation::GetType()
 {
-	uint32 type = R_386_NONE;
-	if (Elf32_Rel* relocation = GetRelocationStruct())
-		type = ELF32_R_TYPE(relocation->r_info);
+	uint32 type = R_NONE;
+	if (Elf_Rel* relocation = GetRelocationStruct())
+		type = ELF_R_TYPE(relocation->r_info);
 	return type;
 }
 
@@ -395,17 +395,17 @@ uint32
 ElfRelocation::GetSymbolIndex()
 {
 	uint32 index = 0;
-	if (Elf32_Rel* relocation = GetRelocationStruct())
-		index = ELF32_R_SYM(relocation->r_info);
+	if (Elf_Rel* relocation = GetRelocationStruct())
+		index = ELF_R_SYM(relocation->r_info);
 	return index;
 }
 
 // GetOffset
-Elf32_Addr
+Elf_Addr
 ElfRelocation::GetOffset()
 {
-	Elf32_Addr offset = 0;
-	if (Elf32_Rel* relocation = GetRelocationStruct())
+	Elf_Addr offset = 0;
+	if (Elf_Rel* relocation = GetRelocationStruct())
 		offset = relocation->r_offset;
 	return offset;
 }
@@ -481,7 +481,7 @@ ElfRelocationIterator::_FindNextSection()
 	if (fFile) {
 		for (; fSectionIndex < fFile->CountSections(); fSectionIndex++) {
 			ElfSection* section = fFile->SectionAt(fSectionIndex);
-			if (section && section->GetType() == SHT_REL)
+			if (section && (section->GetType() == SHT_REL || section->GetType() == SHT_RELA))
 				return section;
 		}
 	}
@@ -610,7 +610,7 @@ ElfFile::_SetTo(const char *filename)
 		return error;
 	}
 	// read ELF header
-	error = read_exactly(fFile, 0, &fHeader, sizeof(Elf32_Ehdr),
+	error = read_exactly(fFile, 0, &fHeader, sizeof(Elf_Ehdr),
 						 "Failed to read ELF object header!\n");
 	if (error != B_OK)
 		return error;
@@ -624,7 +624,7 @@ ElfFile::_SetTo(const char *filename)
 		return B_BAD_VALUE;
 	}
 	// class
-	if (fHeader.e_ident[EI_CLASS] != ELFCLASS32) {
+	if (fHeader.e_ident[EI_CLASS] != ELFCLASS) {
 		printf("Wrong ELF class!\n");
 		return B_BAD_VALUE;
 	}
@@ -645,7 +645,7 @@ ElfFile::_SetTo(const char *filename)
 	uint32 sectionHeaderCount		= fHeader.e_shnum;
 	// check the sanity of the header values
 	// ELF header size
-	if (headerSize < sizeof(Elf32_Ehdr) || headerSize > kMaxELFHeaderSize) {
+	if (headerSize < sizeof(Elf_Ehdr) || headerSize > kMaxELFHeaderSize) {
 		printf("Invalid ELF header: invalid ELF header size: %lu.",
 			   headerSize);
 		return B_BAD_VALUE;
@@ -664,7 +664,7 @@ ElfFile::_SetTo(const char *filename)
 	}
 	// section header table offset
 	sectionHeaderTableSize = sectionHeaderSize * sectionHeaderCount;
-	if (sectionHeaderSize < sizeof(Elf32_Shdr)
+	if (sectionHeaderSize < sizeof(Elf_Shdr)
 		|| sectionHeaderTableOffset + sectionHeaderTableSize > fileSize) {
 		printf("Invalid ELF header: section header table exceeds file: %lu.",
 			   sectionHeaderTableOffset + sectionHeaderTableSize);
@@ -692,12 +692,12 @@ ElfFile::_SetTo(const char *filename)
 }
 
 // _SectionHeaderAt
-Elf32_Shdr*
+Elf_Shdr*
 ElfFile::_SectionHeaderAt(int32 index)
 {
-	Elf32_Shdr* header = NULL;
+	Elf_Shdr* header = NULL;
 	if (fSectionHeaders && index >= 0 && index < fSectionCount)
-		header = (Elf32_Shdr*)(fSectionHeaders + index * fSectionHeaderSize);
+		header = (Elf_Shdr*)(fSectionHeaders + index * fSectionHeaderSize);
 	return header;
 }
 

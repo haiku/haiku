@@ -50,7 +50,7 @@ public:
 			void				SetTo(ElfSection* section, int32 index);
 			void				Unset();
 
-			const Elf32_Sym*	GetSymbolStruct();
+			const Elf_Sym*	GetSymbolStruct();
 			const char*			GetName();
 			uint32				GetBinding();
 			uint32				GetType();
@@ -59,7 +59,7 @@ public:
 private:
 			ElfSection*			fSection;
 			int32				fIndex;
-			Elf32_Sym*			fSymbol;
+			Elf_Sym*			fSymbol;
 };
 
 // ElfRelocation
@@ -72,16 +72,16 @@ public:
 			void				SetTo(ElfSection* section, int32 index);
 			void				Unset();
 
-			Elf32_Rel*			GetRelocationStruct();
+			Elf_Rel*			GetRelocationStruct();
 			uint32				GetType();
 			uint32				GetSymbolIndex();
-			Elf32_Addr			GetOffset();
+			Elf_Addr			GetOffset();
 			status_t			GetSymbol(ElfSymbol* symbol);
 
 private:
 			ElfSection*			fSection;
 			int32				fIndex;
-			Elf32_Rel*			fRelocation;
+			Elf_Rel*			fRelocation;
 };
 
 // ElfRelocationIterator
@@ -124,13 +124,13 @@ public:
 private:
 			status_t			_SetTo(const char *filename);
 
-			Elf32_Shdr*			_SectionHeaderAt(int32 index);
+			Elf_Shdr*			_SectionHeaderAt(int32 index);
 
 			status_t			_LoadSection(int32 index);
 
 private:
 			BFile				fFile;
-			Elf32_Ehdr			fHeader;
+			Elf_Ehdr			fHeader;
 			uint8*				fSectionHeaders;
 			ElfSection*			fSections;
 			int32				fSectionCount;
