@@ -151,10 +151,10 @@ rule ArchitectureSetup architecture
 		HAIKU_DEBUG_$(level)_C++FLAGS_$(architecture) = $(flags) ;
 	}
 
-	if $(gccVersion[1]) >= 3 {
-		# TODO: Temporary work-around. Should be defined in the compiler specs
-		HAIKU_LINKFLAGS_$(architecture) += -Xlinker --no-undefined ;
-	} else {
+	# TODO: Temporary work-around. Should be defined in the compiler specs
+	HAIKU_LINKFLAGS_$(architecture) += -Xlinker --no-undefined ;
+
+	if $(gccVersion[1]) < 3 {
 		HAIKU_DEFINES_$(architecture) += _BEOS_R5_COMPATIBLE_ ;
 	}
 
