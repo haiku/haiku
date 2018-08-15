@@ -70,10 +70,10 @@ rule ArchitectureSetup architecture
 	# initial state for flags etc.
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 	HAIKU_LINK_$(architecture) = $(HAIKU_CC_$(architecture)) ;
-	HAIKU_LINKFLAGS_$(architecture) = $(ccBaseFlags) ;
 
 	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
 	HAIKU_C++FLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
+	HAIKU_LINKFLAGS_$(architecture) += $(ccBaseFlags) ;
 	HAIKU_ASFLAGS_$(architecture) += $(archFlags) -nostdinc ;
 
 	# strip is required

@@ -110,6 +110,8 @@ environment variables:
                               Defaults to "".
   HAIKU_CXXFLAGS_<arch>       The C++ flags for target architecture <arch>.
                               Defaults to "".
+  HAIKU_LINKFLAGS_<arch>      The flags passed to the compiler when linking for
+                              target architecture <arch>. Defaults to "".
   HAIKU_LDFLAGS_<arch>        The linker flags for target architecture <arch>.
                               Defaults to "".
   HAIKU_ARFLAGS_<arch>        The flags passed to HAIKU_AR for target
@@ -945,6 +947,7 @@ else
 		set_default_value HAIKU_CPPFLAGS_$targetArch	""
 		set_default_value HAIKU_CCFLAGS_$targetArch		""
 		set_default_value HAIKU_CXXFLAGS_$targetArch	""
+		set_default_value HAIKU_LINKFLAGS_$targetArch	""
 		set_default_value HAIKU_LDFLAGS_$targetArch		""
 		set_default_value HAIKU_ARFLAGS_$targetArch		cru
 		set_default_value HAIKU_UNARFLAGS_$targetArch	x
@@ -1053,6 +1056,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 		HAIKU_CPPFLAGS				HAIKU_CPPFLAGS
 		HAIKU_CCFLAGS				HAIKU_CCFLAGS
 		HAIKU_C++FLAGS				HAIKU_CXXFLAGS
+		HAIKU_LINKFLAGS				HAIKU_LINKFLAGS
 		HAIKU_LDFLAGS				HAIKU_LDFLAGS
 		HAIKU_ARFLAGS				HAIKU_ARFLAGS
 		HAIKU_UNARFLAGS				HAIKU_UNARFLAGS
