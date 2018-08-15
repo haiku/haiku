@@ -211,8 +211,8 @@ if $(HAIKU_HOST_USE_32BIT) = 1 {
 # save jam's variables for the build platform
 HOST_AR				?= $(AR) ;
 HOST_CC				?= $(CC) ;
-HOST_C++			?= $(C++) ;
-HOST_LINK			?= $(LINK) ;
+HOST_C++			?= $(HOST_CC) ;
+HOST_LINK			?= $(HOST_CC) ;
 HOST_RANLIB			?= $(RANLIB) ;
 HOST_CPPFLAGS		?= $(CPPFLAGS) ;
 HOST_CCFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(CCFLAGS) ;
