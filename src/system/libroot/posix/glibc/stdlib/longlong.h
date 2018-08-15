@@ -193,7 +193,8 @@ do {									\
 UDItype __umulsidi3 (USItype, USItype);
 #endif
 
-#if defined (__arm__) && W_TYPE_SIZE == 32
+#if defined (__arm__) && (defined (__thumb2__) || !defined (__thumb__)) \
+ && W_TYPE_SIZE == 32
 #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
   __asm__ ("adds	%1, %4, %5\n\tadc	%0, %2, %3"		\
 	   : "=r" ((USItype) (sh)),					\
@@ -201,7 +202,7 @@ UDItype __umulsidi3 (USItype, USItype);
 	   : "%r" ((USItype) (ah)),					\
 	     "rI" ((USItype) (bh)),					\
 	     "%r" ((USItype) (al)),					\
-	     "rI" ((USItype) (bl)))
+	     "rI" ((USItype) (bl)) __CLOBBER_CC)
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
   __asm__ ("subs	%1, %4, %5\n\tsbc	%0, %2, %3"		\
 	   : "=r" ((USItype) (sh)),					\
@@ -209,10 +210,13 @@ UDItype __umulsidi3 (USItype, USItype);
 	   : "r" ((USItype) (ah)),					\
 	     "rI" ((USItype) (bh)),					\
 	     "r" ((USItype) (al)),					\
-	     "rI" ((USItype) (bl)))
-#define umul_ppmm(xh, xl, a, b) \
-{register USItype __t0, __t1, __t2;					\
-  __asm__ ("%@ Inlined umul_ppmm\n"					\
+	     "rI" ((USItype) (bl)) __CLOBBER_CC)
+# if defined(__ARM_ARCH_2__) || defined(__ARM_ARCH_2A__) \
+     || defined(__ARM_ARCH_3__)
+#  define umul_ppmm(xh, xl, a, b)					\
+  do {									\
+    register USItype __t0, __t1, __t2;					\
+    __asm__ ("%@ Inlined umul_ppmm\n"					\
 	   "	mov	%2, %5, lsr #16\n"				\
 	   "	mov	%0, %6, lsr #16\n"				\
 	   "	bic	%3, %5, %2, lsl #16\n"				\
@@ -229,9 +233,20 @@ UDItype __umulsidi3 (USItype, USItype);
 	     "=r" ((USItype) (xl)),					\
 	     "=&r" (__t0), "=&r" (__t1), "=r" (__t2)			\
 	   : "r" ((USItype) (a)),					\
-	     "r" ((USItype) (b)));}
-#define UMUL_TIME 20
-#define UDIV_TIME 100
+	     "r" ((USItype) (b)) __CLOBBER_CC );			\
+  } while (0)
+#  define UMUL_TIME 20
+# else
+#  define umul_ppmm(xh, xl, a, b)					\
+  do {									\
+    /* Generate umull, under compiler control.  */			\
+    register UDItype __t0 = (UDItype)(USItype)(a) * (USItype)(b);	\
+    (xl) = (USItype)__t0;						\
+    (xh) = (USItype)(__t0 >> 32);					\
+  } while (0)
+#  define UMUL_TIME 3
+# endif
+# define UDIV_TIME 100
 #endif /* __arm__ */
 
 #if defined (__hppa) && W_TYPE_SIZE == 32
