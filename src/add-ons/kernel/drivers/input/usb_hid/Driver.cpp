@@ -41,6 +41,10 @@ usb_support_descriptor gBlackListedDevices[] = {
 		0, 0, 0, 0x0c45, 0x7401
 	},
 	{
+		// Silicon Labs EC3 JTAG/C2 probe, declares itself as usb hid
+		0, 0, 0, 0x10c4, 0x8044
+	},
+	{
 		// wacom devices are handled by the dedicated wacom driver
 		0, 0, 0, USB_VENDOR_WACOM, 0
 	}
