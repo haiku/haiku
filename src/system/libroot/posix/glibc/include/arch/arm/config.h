@@ -110,7 +110,7 @@
 
 /* Define if the regparm attribute shall be used for local functions
    (gcc on ix86 only).  */
-#define	USE_REGPARMS 1
+#define	USE_REGPARMS 0
 
 /* Defined on PowerPC if the GCC being used has a problem with clobbering
    certain registers (CR0, MQ, CTR, LR) in asm statements.  */
@@ -161,7 +161,7 @@
 
 /* Defined to some form of __attribute__ ((...)) if the compiler supports
    a different, more efficient calling convention.  */
-#if defined USE_REGPARMS && !defined PROF && !defined __BOUNDED_POINTERS__
+#if USE_REGPARMS && !defined PROF && !defined __BOUNDED_POINTERS__
 # define internal_function __attribute__ ((regparm (3), stdcall))
 #endif
 
