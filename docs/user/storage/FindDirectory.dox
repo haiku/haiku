@@ -1201,9 +1201,6 @@
 
 
 /*!
-
-
-/*!
 	\fn status_t find_directory(directory_which which, dev_t volume,
 		bool createIt, char* pathString, int32 length)
 	\brief C interface to find_directory
