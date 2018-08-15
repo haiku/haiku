@@ -570,7 +570,7 @@ AcpiOsCreateSemaphore(UINT32 maxUnits, UINT32 initialUnits,
 
 	*outHandle = create_sem(initialUnits, "acpi_sem");
 	DEBUG_FUNCTION_F("max: %lu; count: %lu; result: %ld",
-		maxUnits, initialUnits, *outHandle);
+		(uint32)maxUnits, (uint32)initialUnits, *outHandle);
 
 	if (*outHandle >= B_OK)
 		return AE_OK;
@@ -616,7 +616,7 @@ AcpiOsWaitSemaphore(ACPI_SEMAPHORE handle, UINT32 units, UINT16 timeout)
 {
 	ACPI_STATUS result = AE_OK;
 	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u",
-		handle, units, timeout);
+		handle, (uint32)units, timeout);
 
 	if (timeout == ACPI_WAIT_FOREVER) {
 		result = acquire_sem_etc(handle, units, 0, 0)
@@ -639,7 +639,7 @@ AcpiOsWaitSemaphore(ACPI_SEMAPHORE handle, UINT32 units, UINT16 timeout)
 		}
 	}
 	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u result: %lu",
-		handle, units, timeout, (uint32)result);
+		handle, (uint32)units, timeout, (uint32)result);
 	return result;
 }
 
@@ -660,7 +660,7 @@ ACPI_STATUS
 AcpiOsSignalSemaphore(ACPI_SEMAPHORE handle, UINT32 units)
 {
 	status_t result;
-	DEBUG_FUNCTION_VF("sem: %ld; count: %lu", handle, units);
+	DEBUG_FUNCTION_VF("sem: %ld; count: %lu", handle, (uint32)units);
 	// We can be called from interrupt handler, so don't reschedule
 	result = release_sem_etc(handle, units, B_DO_NOT_RESCHEDULE);
 	return result == B_OK ? AE_OK : AE_BAD_PARAMETER;
@@ -735,7 +735,7 @@ AcpiOsInstallInterruptHandler(UINT32 interruptNumber,
 {
 	status_t result;
 	DEBUG_FUNCTION_F("vector: %lu; handler: %p context %p",
-		interruptNumber, serviceRoutine, context);
+		(uint32)interruptNumber, serviceRoutine, context);
 
 #ifdef _KERNEL_MODE
 	// It so happens that the Haiku and ACPI-CA interrupt handler routines
@@ -744,8 +744,8 @@ AcpiOsInstallInterruptHandler(UINT32 interruptNumber,
 	result = install_io_interrupt_handler(interruptNumber,
 		(interrupt_handler)serviceRoutine, context, 0);
 
-	DEBUG_FUNCTION_F("vector: %lu; handler: %p context %p returned %d",
-		interruptNumber, serviceRoutine, context, result);
+	DEBUG_FUNCTION_F("vector: %lu; handler: %p context %p returned %lu",
+		(uint32)interruptNumber, serviceRoutine, context, (uint32)result);
 
 	return result == B_OK ? AE_OK : AE_BAD_PARAMETER;
 #else
@@ -769,7 +769,7 @@ ACPI_STATUS
 AcpiOsRemoveInterruptHandler(UINT32 interruptNumber,
 		ACPI_OSD_HANDLER serviceRoutine)
 {
-	DEBUG_FUNCTION_F("vector: %lu; handler: %p", interruptNumber,
+	DEBUG_FUNCTION_F("vector: %lu; handler: %p", (uint32)interruptNumber,
 		serviceRoutine);
 #ifdef _KERNEL_MODE
 	remove_io_interrupt_handler(interruptNumber,
@@ -835,7 +835,7 @@ AcpiOsExecute(ACPI_EXECUTE_TYPE type, ACPI_OSD_EXEC_CALLBACK  function,
 void
 AcpiOsStall(UINT32 microseconds)
 {
-	DEBUG_FUNCTION_F("microseconds: %lu", microseconds);
+	DEBUG_FUNCTION_F("microseconds: %lu", (uint32)microseconds);
 	if (microseconds)
 		spin(microseconds);
 }
@@ -855,7 +855,7 @@ AcpiOsStall(UINT32 microseconds)
 void
 AcpiOsSleep(ACPI_INTEGER milliseconds)
 {
-	DEBUG_FUNCTION_F("milliseconds: %lu", milliseconds);
+	DEBUG_FUNCTION_F("milliseconds: %lu", (uint32)milliseconds);
 	if (gKernelStartup)
 		spin(milliseconds * 1000);
 	else
@@ -966,7 +966,7 @@ ACPI_STATUS
 AcpiOsReadPort(ACPI_IO_ADDRESS address, UINT32 *value, UINT32 width)
 {
 #ifdef _KERNEL_MODE
-	DEBUG_FUNCTION_F("addr: 0x%08lx; width: %lu", (addr_t)address, width);
+	DEBUG_FUNCTION_F("addr: 0x%08lx; width: %lu", (addr_t)address, (uint32)width);
 	switch (width) {
 		case 8:
 			*value = gPCIManager->read_io_8(address);
@@ -1009,7 +1009,7 @@ AcpiOsWritePort(ACPI_IO_ADDRESS address, UINT32 value, UINT32 width)
 {
 #ifdef _KERNEL_MODE
 	DEBUG_FUNCTION_F("addr: 0x%08lx; value: %lu; width: %lu",
-		(addr_t)address, value, width);
+		(addr_t)address, (uint32)value, (uint32)width);
 	switch (width) {
 		case 8:
 			gPCIManager->write_io_8(address, value);
@@ -1287,7 +1287,7 @@ AcpiOsCreateMutex(ACPI_MUTEX* outHandle)
 void
 AcpiOsDeleteMutex(ACPI_MUTEX handle)
 {
-	DEBUG_FUNCTION_F("mutex: %ld", handle);
+	DEBUG_FUNCTION_F("mutex: %ld", (addr_t)handle);
 	mutex_destroy(handle);
 	free((void*)handle);
 }
@@ -1297,7 +1297,7 @@ ACPI_STATUS
 AcpiOsAcquireMutex(ACPI_MUTEX handle, UINT16 timeout)
 {
 	ACPI_STATUS result = AE_OK;
-	DEBUG_FUNCTION_VF("mutex: %ld; timeout: %u", handle, timeout);
+	DEBUG_FUNCTION_VF("mutex: %p; timeout: %u", handle, timeout);
 
 	if (timeout == ACPI_WAIT_FOREVER)
 		result = mutex_lock(handle) == B_OK ? AE_OK : AE_BAD_PARAMETER;
@@ -1318,7 +1318,7 @@ AcpiOsAcquireMutex(ACPI_MUTEX handle, UINT16 timeout)
 				break;
 		}
 	}
-	DEBUG_FUNCTION_VF("mutex: %ld; timeout: %u result: %lu",
+	DEBUG_FUNCTION_VF("mutex: %p; timeout: %u result: %lu",
 		handle, timeout, (uint32)result);
 	return result;
 }
