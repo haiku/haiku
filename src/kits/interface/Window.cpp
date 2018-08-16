@@ -2922,6 +2922,8 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		new BMessage(_MINIMIZE_), NULL);
 	AddShortcut('Z', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(_ZOOM_), NULL);
+	AddShortcut('Z', B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(_ZOOM_), NULL);
 	AddShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(B_HIDE_APPLICATION), NULL);
 	AddShortcut('F', B_COMMAND_KEY | B_CONTROL_KEY,
