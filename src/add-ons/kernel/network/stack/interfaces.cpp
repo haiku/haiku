@@ -482,8 +482,6 @@ Interface::~Interface()
 {
 	TRACE("Interface %p: destructor\n", this);
 
-	put_device_interface(fDeviceInterface);
-
 	// Uninitialize the domain datalink protocols
 
 	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
@@ -500,6 +498,8 @@ Interface::~Interface()
 
 		delete datalink;
 	}
+
+	put_device_interface(fDeviceInterface);
 
 	recursive_lock_destroy(&fLock);
 
