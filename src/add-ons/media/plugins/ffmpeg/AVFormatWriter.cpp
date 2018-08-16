@@ -106,12 +106,13 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 	fPacket.stream_index = fFormatContext->nb_streams;
 	fStream = avformat_new_stream(fFormatContext, NULL);
-	fStream->id = fPacket.stream_index;
 
 	if (fStream == NULL) {
 		TRACE("  failed to add new stream\n");
 		return B_ERROR;
 	}
+
+	fStream->id = fPacket.stream_index;
 
 //	TRACE("  fStream->codecpar: %p\n", fStream->codecpar);
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
