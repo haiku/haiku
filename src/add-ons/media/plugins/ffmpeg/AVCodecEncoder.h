@@ -75,8 +75,13 @@ private:
 			CodecID				fCodecID;
 			AVCodec*			fCodec;
 			AVCodecContext*		fCodecContext;
-
-			bool				fCodecInitialized;
+			
+			enum {
+				CODEC_INIT_NEEDED = 0,
+				CODEC_INIT_DONE,
+				CODEC_INIT_FAILED
+			};
+			uint32                          fCodecInitStatus;
 
 			// For video (color space conversion):
 			AVPicture			fSrcFrame;

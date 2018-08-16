@@ -44,7 +44,7 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fCodecID((CodecID)codecID),
 	fCodec(NULL),
 	fCodecContext(avcodec_alloc_context3(NULL)),
-	fCodecInitialized(false),
+	fCodecInitStatus(CODEC_INIT_NEEDED),
 	fFrame(av_frame_alloc()),
 	fSwsContext(NULL),
 	fFramesWritten(0)
@@ -465,8 +465,11 @@ AVCodecEncoder::_Setup()
 bool
 AVCodecEncoder::_OpenCodecIfNeeded()
 {
-	if (fCodecInitialized)
+	if (fCodecInitStatus == CODEC_INIT_DONE)
 		return true;
+
+	if (fCodecInitStatus == CODEC_INIT_FAILED)
+		return false;
 
 	fCodecContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
@@ -478,13 +481,13 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	// Open the codec
 	int result = avcodec_open2(fCodecContext, fCodec, NULL);
 	if (result >= 0)
-		fCodecInitialized = true;
+		fCodecInitStatus = CODEC_INIT_DONE;
 	else
-		fCodecInitialized = false;
+		fCodecInitStatus = CODEC_INIT_FAILED;
 
 	TRACE("  avcodec_open(%p, %p): %d\n", fCodecContext, fCodec, result);
 
-	return fCodecInitialized;
+	return fCodecInitStatus == CODEC_INIT_DONE;
 
 }
 
