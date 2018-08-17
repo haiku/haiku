@@ -393,7 +393,11 @@ rule KernelArchitectureSetup architecture
 
 			# BIOS Bootloader is 32-bit.
 			if $(HAIKU_BOOT_PLATFORM) = bios_ia32 {
-				HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
+				if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+					HAIKU_BOOT_LINKFLAGS += -m elf_i386 ;
+				} else {
+					HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
+				}
 				HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
 				HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
 			}
