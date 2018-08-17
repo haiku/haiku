@@ -3478,8 +3478,8 @@ rtwn_intr(void *arg)
 	uint32_t status;
 	int i;
 
-#ifndef __HAIKU__
 	RTWN_LOCK(sc);
+#ifndef __HAIKU__
 	status = rtwn_read_4(sc, R92C_HISR);
 	if (status == 0 || status == 0xffffffff) {
 		RTWN_UNLOCK(sc);
