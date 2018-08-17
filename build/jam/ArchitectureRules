@@ -51,6 +51,10 @@ rule ArchitectureSetup architecture
 		case arm : archFlags += -march=armv7-a -mfloat-abi=hard ;
 		case x86 : archFlags += -march=pentium ;
 	}
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		# TODO: This should be included in Clang's compiler specs.
+		archFlags += -fPIC ;
+	}
 	ccBaseFlags += $(archFlags) ;
 
 	if $(cpu) = arm {
@@ -122,8 +126,10 @@ rule ArchitectureSetup architecture
 		-Wsign-compare -Wno-multichar ;
 	# disable some Clang warnings that are not very useful
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		ccBaseFlags += -Wno-address-of-packed-member -Wno-unused-private-field
-			-Wno-cast-align -Wno-gnu-designator ;
+		HAIKU_WARNING_CCFLAGS_$(architecture) += -Wno-address-of-packed-member
+			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator ;
+		HAIKU_WARNING_C++FLAGS_$(architecture) += -Wno-address-of-packed-member
+			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator ;
 	}
 
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
