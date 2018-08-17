@@ -191,7 +191,7 @@ VMPageQueue::AppendUnlocked(PageList& pages, uint32 count)
 {
 #if DEBUG_PAGE_QUEUE
 	for (PageList::Iterator it = pages.GetIterator();
-			vm_page* page = it.next();) {
+			vm_page* page = it.Next();) {
 		if (page->queue != NULL) {
 			panic("%p->VMPageQueue::AppendUnlocked(): page %p thinks it is "
 				"already in queue %p", this, page, page->queue);
