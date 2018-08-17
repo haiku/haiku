@@ -27,10 +27,10 @@
 #include <CopyEngine.h>
 #include <package/ActivationTransaction.h>
 #include <package/DaemonClient.h>
-#include <package/FetchFileJob.h>
 #include <package/manager/RepositoryBuilder.h>
 #include <package/ValidateChecksumJob.h>
 
+#include "FetchFileJob.h"
 #include "PackageManagerUtils.h"
 
 #undef B_TRANSLATION_CONTEXT

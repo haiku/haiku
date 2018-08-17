@@ -61,7 +61,6 @@ HPKG_SOURCES =
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
-		UseBuildFeatureHeaders curl ;
 		if [ FIsBuildFeatureEnabled zstd ] {
 			SubDirC++Flags -DZSTD_ENABLED ;
 		}
@@ -69,11 +68,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
-
-		Includes [ FGristFiles FetchFileJob.cpp ]
-			: [ BuildFeatureAttribute curl : headers ] ;
-		Includes [ FGristFiles InitTerminateLibPackage.cpp ]
-			: [ BuildFeatureAttribute curl : headers ] ;
 
 		AddResources $(libsolv) :
 			LibsolvSolver.rdef
@@ -92,7 +86,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DownloadFileRequest.cpp
 			DropRepositoryRequest.cpp
 			FetchFileJob.cpp
-			InitTerminateLibPackage.cpp
 			InstallationLocationInfo.cpp
 			Job.cpp
 			PackageInfo.cpp
@@ -138,7 +131,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			shared
 			bnetapi
 			be localestub
-			[ BuildFeatureAttribute curl : library ]
 			[ TargetLibstdc++ ]
 			$(TARGET_NETWORK_LIBS)
 			;

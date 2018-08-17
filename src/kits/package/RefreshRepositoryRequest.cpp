@@ -17,10 +17,11 @@
 #include <package/ActivateRepositoryCacheJob.h>
 #include <package/ChecksumAccessors.h>
 #include <package/ValidateChecksumJob.h>
-#include <package/FetchFileJob.h>
 #include <package/RepositoryCache.h>
 #include <package/RepositoryConfig.h>
 #include <package/PackageRoster.h>
+
+#include "FetchFileJob.h"
 
 
 namespace BPackageKit {
