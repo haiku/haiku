@@ -185,15 +185,20 @@ actions AssembleNasm
 	fi
 }
 
-rule CompileDTS
+rule CompileDTS target : source
 {
-	MakeLocate $(<) : $(HAIKU_OUTPUT_DIR) ;
-	Depends $(<) : $(>) ;
+	CCDEFS on $(target) = [ FDefines $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
+		$(TARGET_DEFINES) ] ;
+	CC on $(target) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
+
+	MakeLocate $(target) : $(HAIKU_OUTPUT_DIR) ;
+	Depends $(target) : $(source) ;
+	CompileDTS1 $(target) : $(source) ;
 }
 
-actions CompileDTS
+actions CompileDTS1
 {
-	cpp -P -xassembler-with-cpp \
+	$(CC) -E $(CCDEFS) -P -xassembler-with-cpp \
 		-I$(HAIKU_TOP)/src/data/dts/arch/$(TARGET_ARCH) \
 		-I$(HAIKU_TOP)/src/data/dts $(2) \
 	| dtc -O dtb -o $(1) \
