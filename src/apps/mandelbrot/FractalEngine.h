@@ -16,6 +16,9 @@
 class BBitmap;
 
 
+#define MAX_RENDER_THREADS 16
+
+
 class FractalEngine : public BLooper {
 public:
 	enum {
@@ -23,35 +26,40 @@ public:
 		MSG_SET_PALETTE,
 		MSG_SET_ITERATIONS,
 		MSG_RESIZE,
+		MSG_BUFFER_CREATED,
 		MSG_RENDER,
 		MSG_RENDER_COMPLETE,
+		MSG_THREAD_RENDER_COMPLETE,
 	};
 
 	FractalEngine(BHandler* parent, BLooper* looper);
 	~FractalEngine();
 
 	virtual void MessageReceived(BMessage* msg);
+	void WriteToBitmap(BBitmap*);
 
 private:
+	uint16 fWidth;
+	uint16 fHeight;
+
+	uint8* fRenderBuffer;
+	uint32 fRenderBufferLen;
+
 	BMessenger fMessenger;
-	BBitmap* fBitmapStandby;
-	BBitmap* fBitmapDisplay;
 
 	uint8 fThreadCount;
-	thread_id fRenderThreads[4];
+	thread_id fRenderThreads[MAX_RENDER_THREADS];
 	sem_id fRenderSem;
-	sem_id fRenderFinishedSem;
+
+	uint8 fThreadsRendering;
+	bool fRestartRenderThread[MAX_RENDER_THREADS];
+	bool fRenderThreadRunning[MAX_RENDER_THREADS];
 
 	double fLocationX;
 	double fLocationY;
 	double fSize;
 
 	uint16 fIterations;
-	uint16 fWidth;
-	uint16 fHeight;
-
-	uint8* fRenderBuffer;
-	uint32 fRenderBufferLen;
 
 	const uint8* fColorset;
 
@@ -59,7 +67,7 @@ private:
 
 	void Render(double locationX, double locationY, double size);
 	static status_t RenderThread(void* data);
-	void RenderPixel(uint32 x, uint32 y, double real, double imaginary);
+	void RenderPixel(uint32 x, uint32 y);
 
 	int32 DoSet_Mandelbrot(double real, double imaginary);
 	int32 DoSet_BurningShip(double real, double imaginary);
