@@ -20,7 +20,7 @@ class BRepositoryInfo;
 namespace BHPKG {
 
 
-class BPackageInfoAttributeValue;
+struct BPackageInfoAttributeValue;
 
 
 class BRepositoryContentHandler {

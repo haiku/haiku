@@ -13,7 +13,7 @@ namespace BPackageKit {
 
 
 namespace BHPKG {
-	class BPackageVersionData;
+	struct BPackageVersionData;
 }
 using BHPKG::BPackageVersionData;
 

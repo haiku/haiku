@@ -16,7 +16,7 @@ namespace BPackageKit {
 
 
 namespace BHPKG {
-	class BPackageResolvableExpressionData;
+	struct BPackageResolvableExpressionData;
 }
 using BHPKG::BPackageResolvableExpressionData;
 

@@ -15,7 +15,7 @@ namespace BPackageKit {
 
 
 namespace BHPKG {
-	class BPackageResolvableData;
+	struct BPackageResolvableData;
 }
 using BHPKG::BPackageResolvableData;
 

@@ -22,7 +22,7 @@ namespace BHPKG {
 
 class BPackageEntry;
 class BPackageEntryAttribute;
-class BPackageInfoAttributeValue;
+struct BPackageInfoAttributeValue;
 
 
 namespace BPrivate {
