@@ -110,7 +110,7 @@ ExpressionPromptWindow::MessageReceived(BMessage* message)
 			addMessage.AddBool("persistent", true);
 
 			BMessenger(fAddTarget).SendMessage(&addMessage);
-			Quit();
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
 
