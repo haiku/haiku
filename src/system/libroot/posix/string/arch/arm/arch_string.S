@@ -1,170 +1,139 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <asm_defs.h>
 
-#if 1
-
-/* that should be enough for now */
 
 .align 4
 FUNCTION(memcpy):
 FUNCTION(__aeabi_memcpy):
-	// check for zero length copy or the same pointer
-	cmp		r2, #0
-	cmpne	r1, r0
-	bxeq	lr
-
-	// save a few registers for use and the return code (input dst)
-	stmfd	sp!, {r0, r4, r5, lr}
-
-	// check for forwards overlap (src > dst, distance < len)
-	subs	r3, r0, r1
-	cmpgt	r2, r3
-	bgt		.L_forwardoverlap
-
-	// check for a short copy len.
-	// 20 bytes is enough so that if a 16 byte alignment needs to happen there is at least a 
-	//   wordwise copy worth of work to be done.
-	cmp		r2, #(16+4)
-	blt		.L_bytewise
-
-	// see if they are similarly aligned on 4 byte boundaries
-	eor		r3, r0, r1
-	tst		r3, #3
-	bne		.L_bytewise		// dissimilarly aligned, nothing we can do (for now)
-
-	// check for 16 byte alignment on dst.
-	// this will also catch src being not 4 byte aligned, since it is similarly 4 byte 
-	//   aligned with dst at this point.
-	tst		r0, #15
-	bne		.L_not16bytealigned
-
-	// check to see if we have at least 32 bytes of data to copy.
-	// if not, just revert to wordwise copy
-	cmp		r2, #32
-	blt		.L_wordwise
-
-.L_bigcopy:
-	// copy 32 bytes at a time. src & dst need to be at least 4 byte aligned, 
-	// and we need at least 32 bytes remaining to copy
-
-	// save r6-r7 for use in the big copy
-	stmfd	sp!, {r6-r7}
-
-	sub		r2, r2, #32		// subtract an extra 32 to the len so we can avoid an extra compare
-
-.L_bigcopy_loop:
-	ldmia	r1!, {r4, r5, r6, r7}
-	stmia	r0!, {r4, r5, r6, r7}
-	ldmia	r1!, {r4, r5, r6, r7}
-	subs	r2, r2, #32
-	stmia	r0!, {r4, r5, r6, r7}
-	bge		.L_bigcopy_loop
-
-	// restore r6-r7
-	ldmfd	sp!, {r6-r7}
-
-	// see if we are done
-	adds	r2, r2, #32
-	beq		.L_done
-
-	// less then 4 bytes left?
-	cmp		r2, #4
-	blt		.L_bytewise
-
-.L_wordwise:
-	// copy 4 bytes at a time.
-	// src & dst are guaranteed to be word aligned, and at least 4 bytes are left to copy.
-	subs	r2, r2, #4
-
-.L_wordwise_loop:
-	ldr		r3, [r1], #4
-	subs	r2, r2, #4
-	str		r3, [r0], #4
-	bge		.L_wordwise_loop
-
-	// correct the remaining len and test for completion
-	adds	r2, r2, #4	
-	beq		.L_done
-
-.L_bytewise:
-	// simple bytewise copy
-	ldrb	r3, [r1], #1
-	subs	r2, r2, #1
-	strb	r3, [r0], #1
-	bgt		.L_bytewise
-
-.L_done:
-	// load dst for return and restore r4,r5
-//#if ARM_ARCH_LEVEL >= 5
-//	ldmfd	sp!, {r0, r4, r5, pc}
-//#else
-	ldmfd	sp!, {r0, r4, r5, lr}
-	bx		lr
-//#endif
-
-.L_not16bytealigned:
-	// dst is not 16 byte aligned, so we will copy up to 15 bytes to get it aligned.
-	// src is guaranteed to be similarly word aligned with dst.
-
-	// set the condition flags based on the alignment.
-	lsl		r12, r0, #28
-	rsb		r12, r12, #0
-	msr		CPSR_f, r12				// move into NZCV fields in CPSR
-
-	// move as many bytes as necessary to get the dst aligned
-#ifdef __clang__
-	ldrbvs	r3, [r1], #1			// V set
-	ldrhcs	r4, [r1], #2			// C set
-	ldreq	r5, [r1], #4			// Z set
-
-	strbvs	r3, [r0], #1
-	strhcs	r4, [r0], #2
-	streq	r5, [r0], #4
-
-	ldmiami	r1!, {r3-r4}			// N set
-	stmiami	r0!, {r3-r4}
-#else
-	ldrvsb	r3, [r1], #1			// V set
-	ldrcsh	r4, [r1], #2			// C set
-	ldreq	r5, [r1], #4			// Z set
-
-	strvsb	r3, [r0], #1
-	strcsh	r4, [r0], #2
-	streq	r5, [r0], #4
-
-	ldmmiia r1!, {r3-r4}			// N set
-	stmmiia r0!, {r3-r4}
-#endif
-
-	// fix the remaining len
-	sub		r2, r2, r12, lsr #28
-
-	// test to see what we should do now
-	cmp		r2, #32
-	bge		.L_bigcopy
-	b		.L_wordwise
-	
-	// src and dest overlap 'forwards' or dst > src
-.L_forwardoverlap:
-
-	// do a bytewise reverse copy for now
-	add		r1, r1, r2
-	add		r0, r0, r2
-
-.L_bytewisereverse:
-	// simple bytewise reverse copy
-	ldrb	r3, [r1], #-1
-	subs	r2, r2, #1
-	strb	r3, [r0], #-1
-	bgt		.L_bytewisereverse
-
-	b		.L_done
-	// check for zero length copy or the same pointer
-
+        push    {r4, r5, r6, r7, r8, r10, r11, lr}
+        add     r11, sp, #24
+        cmp     r0, r1
+        cmpne   r2, #0
+        bne     .LBB0_2
+.LBB0_1:
+        pop     {r4, r5, r6, r7, r8, r10, r11, pc}
+.LBB0_2:
+        orr     r3, r1, r0
+        tst     r3, #3
+        beq     .LBB0_9
+        eor     r3, r1, r0
+        and     r7, r0, #3
+        tst     r3, #3
+        mov     r12, r2
+        rsbeq   r12, r7, #4
+        cmp     r2, #4
+        movlo   r12, r2
+        sub     r2, r2, r12
+        cmp     r12, #1
+        blt     .LBB0_9
+        mvn     r7, r12
+        cmn     r7, #2
+        mvn     r3, #1
+        mvn     r6, #1
+        movgt   r3, r7
+        add     r3, r12, r3
+        add     r3, r3, #2
+        cmp     r3, #16
+        blo     .LBB0_22
+        cmn     r7, #2
+        movgt   r6, r7
+        add     r7, r12, r6
+        add     r7, r7, #2
+        add     r6, r1, r7
+        cmp     r6, r0
+        addhi   r7, r0, r7
+        cmphi   r7, r1
+        bhi     .LBB0_22
+        bic     r4, r3, #15
+        mov     r7, r0
+        add     r5, r0, r4
+        add     lr, r1, r4
+        sub     r12, r12, r4
+        mov     r6, r4
+.LBB0_7:
+        vld1.8  {d16, d17}, [r1]!
+        subs    r6, r6, #16
+        vst1.8  {d16, d17}, [r7]!
+        bne     .LBB0_7
+        cmp     r3, r4
+        bne     .LBB0_23
+        b       .LBB0_25
+.LBB0_9:
+        mov     r5, r0
+        mov     r3, #0
+        cmp     r3, r2, lsr #2
+        beq     .LBB0_19
+.LBB0_10:
+        bic     r12, r2, #3
+        lsr     r3, r2, #2
+        cmp     r2, #16
+        blo     .LBB0_15
+        add     r7, r1, r12
+        cmp     r5, r7
+        addlo   r7, r5, r12
+        cmplo   r1, r7
+        blo     .LBB0_15
+        and     lr, r3, #3
+        mov     r7, r1
+        sub     r8, r3, lr
+        mov     r6, r5
+        sub     r3, r12, lr, lsl #2
+        add     r4, r5, r3
+        add     r3, r1, r3
+.LBB0_13:
+        vld1.32 {d16, d17}, [r7]!
+        subs    r8, r8, #4
+        vst1.32 {d16, d17}, [r6]!
+        bne     .LBB0_13
+        cmp     lr, #0
+        bne     .LBB0_16
+        b       .LBB0_18
+.LBB0_15:
+        mov     lr, r3
+        mov     r3, r1
+        mov     r4, r5
+.LBB0_16:
+        add     r6, lr, #1
+.LBB0_17:
+        ldr     r7, [r3], #4
+        sub     r6, r6, #1
+        str     r7, [r4], #4
+        cmp     r6, #1
+        bgt     .LBB0_17
+.LBB0_18:
+        add     r5, r5, r12
+        add     r1, r1, r12
+.LBB0_19:
+        ands    r2, r2, #3
+        beq     .LBB0_1
+        add     r2, r2, #1
+.LBB0_21:
+        ldrb    r3, [r1], #1
+        sub     r2, r2, #1
+        strb    r3, [r5], #1
+        cmp     r2, #1
+        bgt     .LBB0_21
+        b       .LBB0_1
+.LBB0_22:
+        mov     lr, r1
+        mov     r5, r0
+.LBB0_23:
+        add     r1, r12, #1
+.LBB0_24:
+        ldrb    r3, [lr], #1
+        sub     r1, r1, #1
+        strb    r3, [r5], #1
+        cmp     r1, #1
+        bgt     .LBB0_24
+.LBB0_25:
+        mov     r1, lr
+        mov     r3, #0
+        cmp     r3, r2, lsr #2
+        bne     .LBB0_10
+        b       .LBB0_19
 FUNCTION_END(memcpy)
 FUNCTION_END(__aeabi_memcpy)
-#endif
