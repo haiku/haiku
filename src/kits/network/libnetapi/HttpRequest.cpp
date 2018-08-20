@@ -1076,12 +1076,13 @@ BHttpRequest::_SendPostData()
 				break;
 
 			if (fOptInputDataSize < 0) {
-				// Chunked transfer
-				char hexSize[20];
-				size_t hexLength = sprintf(hexSize, "%ld", read);
+				// Input data size unknown, so we have to use chunked transfer
+				char hexSize[18];
+				// The string does not need to be NULL terminated.
+				size_t hexLength = snprintf(hexSize, sizeof(hexSize), "%lx\r\n",
+					read);
 
 				fSocket->Write(hexSize, hexLength);
-				fSocket->Write("\r\n", 2);
 				fSocket->Write(outputTempBuffer, read);
 				fSocket->Write("\r\n", 2);
 			} else {
