@@ -373,7 +373,10 @@ const struct supported_device {
 	{0x9995, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8450"},
 	{0x9996, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8470"},
 	{0x9997, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8350"},
+#if 0
+	// Known not to work: reported by ttcoder & Dane
 	{0x9998, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8730"},
+#endif
 	{0x999a, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8410"},
 	{0x999b, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8310"},
 	{0x999c, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 8650"},
