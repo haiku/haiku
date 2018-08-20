@@ -963,6 +963,12 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_RESET_USER_BACKGROUND_STATUS:
+		{
+			fUserInterface->NotifyBackgroundWorkStatus("Ready.");
+			break;
+		}
+
 		default:
 			BLooper::MessageReceived(message);
 			break;
@@ -2546,8 +2552,8 @@ TeamDebugger::_NotifyUser(const char* title, const char* text,...)
 void
 TeamDebugger::_ResetUserBackgroundStatusIfNeeded()
 {
-	if (!fWorker->HasPendingJobs())
-		fUserInterface->NotifyBackgroundWorkStatus("Ready.");
+	if (!fTerminating && !fWorker->HasPendingJobs())
+		PostMessage(MSG_RESET_USER_BACKGROUND_STATUS);
 }
 
 
