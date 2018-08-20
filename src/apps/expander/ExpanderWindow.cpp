@@ -312,7 +312,7 @@ ExpanderWindow::MessageReceived(BMessage* message)
 			if (fExpandingStarted) {
 				fExpandingThread->SuspendExternalExpander();
 				BAlert* alert = new BAlert("stopAlert",
-					B_TRANSLATE("Are you sure you want to stop expanding this\n"
+					B_TRANSLATE("Are you sure you want to stop expanding this "
 						"archive? The expanded items may not be complete."),
 					B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
 					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
@@ -509,7 +509,7 @@ ExpanderWindow::CanQuit()
 	if (fExpandingStarted) {
 		fExpandingThread->SuspendExternalExpander();
 		BAlert* alert = new BAlert("stopAlert",
-			B_TRANSLATE("Are you sure you want to stop expanding this\n"
+			B_TRANSLATE("Are you sure you want to stop expanding this "
 				"archive? The expanded items may not be complete."),
 			B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
@@ -652,7 +652,7 @@ ExpanderWindow::StartExpanding()
 	BEntry destEntry(fDestText->Text(), true);
 	if (!destEntry.Exists()) {
 		BAlert* alert = new BAlert("destAlert",
-		B_TRANSLATE("The folder was either moved, renamed or not\nsupported."),
+		B_TRANSLATE("The folder was either moved, renamed or not supported."),
 		B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
