@@ -1052,6 +1052,8 @@ if_setdrvflagbits(if_t ifp, int set_flags, int clear_flags)
 int
 if_getdrvflags(if_t ifp)
 {
+	if ((struct ifnet *)ifp == NULL)
+		return 0;
 	return ((struct ifnet *)ifp)->if_drv_flags;
 }
 
