@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Expander	747083547
+1	italian	x-vnd.Haiku-Expander	4042566494
 Expand	ExpanderMenu		Decomprimi
 Close window when done expanding	ExpanderPreferences		Chiudi la finestra quando la decompressione è completata
 Set destination…	ExpanderMenu		Scegli la destinazione…
@@ -15,6 +15,7 @@ Cancel	ExpanderWindow		Annulla
 Automatically expand files	ExpanderPreferences		Decomprimi automaticamente i file
 Continue	ExpanderWindow		Continua
 Cancel	ExpanderPreferences		Cancella
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Siete sicuri di voler interrompere la decompressione di questo\narchivio? I file estratti potrebbero essere incompleti.
 Select	DirectoryFilePanel		Seleziona
 Same directory as source (archive) file	ExpanderPreferences		Stessa directory come sorgente del file archivio
 Settings	ExpanderMenu		Impostazioni
@@ -25,6 +26,7 @@ Show contents	ExpanderWindow		Mostra contenuto
 Automatically show contents listing	ExpanderPreferences		Mostra automaticamente listato contenuti
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Lascia il percorso della cartella di destinazione vuoto
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La cartella è stata spostata, rinominata o non è supportata.
 The file doesn't exist	ExpanderWindow		Il file non esiste
 Stop	ExpanderMenu		Arresta
 File	ExpanderMenu		File

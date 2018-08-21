@@ -1,12 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Backgrounds	1339877479
+1	dutch; flemish	x-vnd.Haiku-Backgrounds	5390252
 Backgrounds	System name		Achtergronden
 X:	Main View		X:
-Setting the background image failed:	Main View		Het instellen van de achtergrondafbeelding is mislukt:
 Resolution: 	Image Filepanel		Resolutie:
 pick one	Main View		maak een keuze
 Default	Main View		Standaard
 Center	Main View		Centreren
-Folder: %path	Main View		Map: %path
 Manual	Main View		Handmatig
 Default folder	Main View		Standaardmap
 Revert	Main View		Herstellen

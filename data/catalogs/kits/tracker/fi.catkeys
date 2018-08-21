@@ -28,12 +28,12 @@ Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi t
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä
 Paste links	ContainerWindow		Liitä linkit
 Name	OpenWithWindow		Nimi
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Asiakirjan ”%document” avaus epäonnistui, koska sovellus ”%app” on roskakorissa. 
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Ei voitu avata asiakirjaa ”%document”, koska sovellus ”%app” on roskakorissa.
 File	ContainerWindow		Tiedosto
 Handles any %type	OpenWithWindow		Käsittelee mitä tahansa %type-tyyppiä
 Name	Person Query Columns		Nimi
 the config folder	FSUtils		config-kansio
-If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin muutat kansiota tai sen sisältöä, pidä alhaalla Vaihto-näppäin ja napsauta ”Tiedän, mitä olen tekemässä”.
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin muutat kansiota tai sen sisältöä, pidä alhaalla Vaihto-painike ja napsauta \"Tiedän, mitä olen tekemässä\".
 Delete	ContainerWindow		Poista
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa käynnistystaltiota ”%name”.
@@ -71,7 +71,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		S
 Close all in workspace	ContainerWindow		Sulje kaikki työtilassa
 Empty Trash	ContainerWindow		Tyhjennä roskakori
 Name = %name	FindPanel	FindResultTitle	Nimi = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Oletko varma, että haluat siirtää tai kopioida valitut kohteet tähän kansioon?
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Oletko varma, että haluat kopioida tai siirtää valitut kohteet tähän kansioon?
 Does not handle file	OpenWithWindow		Ei käsittele tiedostoa
 Arrange by	ContainerWindow		Järjestä:
 Mount server error	AutoMounterSettings		Liittämispalvelinvirhe
@@ -101,7 +101,7 @@ Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa.
 New folder	FilePanelPriv		Uusi kansio
 %name info	InfoWindow	InfoWindow Title	%name-tiedot
 Favorites	FavoritesMenu		Suosikit
-\"%name\" is an unsupported executable.	FSUtils		”%name” on tukematon suoritettava tiedosto.
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" on tukematon suoritettava tiedosto.
 Sorry, you can't copy items to the Trash.	PoseView		Et voi kopioida kohteita roskakoriin.
 matches wildcard expression	SelectionWindow		täsmää jokerimerkkilausekkeeseen
 Large	ContainerWindow		Kookas
@@ -113,14 +113,14 @@ Increase size	DeskWindow		Kasvata kokoa
 Resize to fit	ContainerWindow		Muuta koko sopimaan
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
 Add printer…	ContainerWindow		Lisää tulostin...
-If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudelleen kotikansion, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen kotihakemiston, pidä alhaalla Vaihto-näppäin ja napsauta ”Nimeä uudelleen”.
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudelleen kotikansion, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen kotihakemiston, pidä alhaalla Vaihto-painike ja napsauta \"Nimeä uudelleen\".
 New folder	ContainerWindow		Uusi kansio
 Kind	ContainerWindow		Tyyppi
 home	B_USER_DIRECTORY		koti
 Select…	ContainerWindow		Valitse...
 Copy to	ContainerWindow		Kopioi kohteeseen
 Move to Trash	ContainerWindow		Siirrä roskakoriin
-If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät järjestelmäkansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Siirrä”.
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät järjestelmäkansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät järjestelmäkansion tai sen sisällön, pidä alhaalla Vaihto-painike ja napsauta \"Siirrä\".
 Modified	Default Query Columns		Muokattu
 Move to	ContainerWindow		Siirrä kohteeseen
 Create %s clipping	PoseView		Luo %s leikkausta
@@ -206,7 +206,7 @@ Replace other file	WidgetAttributeText		Korvaa muu tiedosto
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
 You cannot create a link to the root directory.	FSUtils		Et voi luoda linkkiä juurihakemistoon.
 48 x 48	ContainerWindow		48 x 48
-Could not find application \"%appname\"	OpenWithWindow		Sovelluksen ”%appname” löytäminen epäonnistui
+Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovellusta ”%appname”
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Valittua kohdetta ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voida palauttaa.)
 Work Phone	Person Query Columns		Työpuhelin
 Invert	SelectionWindow		Käänteinen
@@ -284,7 +284,7 @@ There was an error writing the attribute.	WidgetAttributeText		Attribuutin kirjo
 Recalculate folder size	InfoWindow		Laske kansion koko uudelleen
 Unknown	WidgetAttributeText		Tuntematon
 I know what I'm doing	FSUtils	button label	Tiedän, mitä olen tekemässä
-Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Symboli puuttuu: %symbol).\n
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Symboli puuttu: %symbol).\n
 by name	FindPanel		nimittäin
 Creating links: 	StatusWindow		Luodaan linkit: 
 Paused: click to resume or stop	StatusWindow		Keskeytetty: napsauta painiketta resume tai stop
@@ -303,7 +303,7 @@ File	FilePanelPriv		Tiedosto
 Real name	ContainerWindow		Oikea nimi
 Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet ”Levyt”-ikkunan yhdelle levykuvakkeelle.
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät kotikansion, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät kotikansion, pidä Vaihto-näppäin alhaalla ja napsauta ”Siirrä”.
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät kotikansion, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät kotikansion, pidä Vaihto-painike alhaalla ja napsauta \"Siirrä\".
 Cancel	WidgetAttributeText		Peru
 Could not find an application to open \"%name\" (%error). 	FSUtils		Sovelluksen löytäminen kohteen ”%name” avaamiseksi epäonnistui (%error). 
 Create a Query template	FindPanel		Luo kyselymallinne
@@ -353,7 +353,7 @@ E-mail	Person Query Columns		Sähköposti
 Get info	FilePanelPriv		Hae tiedot
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Peru
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus ”%appname” ei tue asiakirjatyyppiä, jota olet avaamassa.\nOletko varma, että haluat edetä?\n\nJos tiedät, että sovellus tukee asiakirjatyyppiä, ota yhteys sovelluksen julkaisijaan ja pyydä heitä päivittämään sovellustaan, jotta se luettelee oikein tuetut asiakirjatyypit.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus \"%appname\" ei tue asiakirjatyyppiä, jota olet avaamassa.\nOletko varma, että haluat edetä?\n\nJos tiedät, että sovellus tukee asiakirjatyyppiä, ota yhteys sovelluksen julkaisijaan ja pyydä heitä päivittämään sovellustaan, jotta se luettelee oikein tuetut asiakirjatyypit.
 Disks	DirMenu		Levyt
 New folder %ld	FSUtils		Uusi kansio %ld
 Used space color	SettingsView		Käytetyn tilan väri
@@ -398,10 +398,10 @@ And	FindPanel		ja
 Select…	DeskWindow		Valitse...
 Copy	FilePanelPriv		Kopioi
 Icon view	DeskWindow		Kuvakenäkymä
-If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kohtikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kohtikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä alhaalla Vaihto-painike ja napsauta \"Tiedän, mitä olen tekemässä\".
 Select all	QueryContainerWindow		Valitse kaikki
 Files cannot be moved or deleted from a read-only volume.	PoseView		Tiedostoja ei voi siirtää tai poistaa kirjoitussuojatulta taltiolta.
-If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudlleen järjestelmäkansion tai sen sisällön, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Nimeä uudelleen”.
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudlleen järjestelmäkansion tai sen sisällön, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen järjestelmäkansion tai sen sisällön, pidä alhaalla Vaihto-painike ja napsauta \"Nimeä uudelleen\".
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde on ehkä avattu tai se on varattu.
 Owner	FilePermissionsView		Omistaja
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Tallentaminen haluamaasi kansioon epäonnistui. Kokeile jotain toista kansiota.
@@ -422,7 +422,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Select	InfoWindow		Valitse
 Could not update permissions of file \"%name\". %error	FSUtils		Tiedoston ”%name” käyttöoikeuksien päivittäminen epäonnistui. %error
 Select…	FilePanelPriv		Valitse...
-\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		”%name” on perinnäisjärjestelmän suoritettava tiedosto. Hanki päivitetty versio tai käännä sovellus uudelleen.
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" on perinnäisjärjestelmän suoritettava tiedosto. Hanki päivitetty versio tai käännä sovellus uudelleen.
 There was an error resolving the link.	Tracker		Virhe linkin ratkaisemisessa.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.

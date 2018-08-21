@@ -14,7 +14,7 @@ Controller	DeviceClass		Ohjain
 No service available	DeviceClass		Palvelu ei ole käytettävissä
 Wearable	DeviceClass	A wearable computer	Päälle puettava
 Handheld	DeviceClass		Kämmenlaite
-Invalid device class!\n	DeviceClass		Virheellinen laiteluokka!\n
+Invalid device class!\n	DeviceClass		Virheellinen laiteluokka
 Sensing device	DeviceClass		Tuntolaite
 Computer	DeviceClass		Tietokone
 Cellular	DeviceClass		Matkapuhelin

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Backgrounds	681978856
+1	finnish	x-vnd.Haiku-Backgrounds	2244817193
 Backgrounds	System name		Tausta-asetukset
 X:	Main View		X:
 Setting the background image failed:	Main View		Taustakuvan asetus epäonnistui:
@@ -6,7 +6,6 @@ Resolution: 	Image Filepanel		Resoluutio:
 pick one	Main View		poimi yksi
 Default	Main View		Oletus
 Center	Main View		Keskitä
-Folder: %path	Main View		Kansio: %path
 Manual	Main View		Manuaalinen
 Set background image error	Main View		Taustakuvan asetuksen virhe
 Default folder	Main View		Oletuskansio

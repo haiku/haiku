@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-desklink	3940727097
+1	hungarian	x-vnd.Haiku-desklink	4132238754
 Control physical output	MediaReplicant		Fizikai kimenet vezérlése
 Couldn't launch 	MediaReplicant		Nem indítható
 Muted	MediaReplicant		Elnémítva
@@ -8,7 +8,6 @@ Sound preferences…	MediaReplicant		Hangbeállítások…
 Open %name	DeskButton	Don't translate variable %name	%name megnyitása
 No media server running	VolumeControl		Nem fut a médiakiszolgáló
 Media preferences…	MediaReplicant		Médiabeállítások…
-%d dB	VolumeControl		%d dB
 Open MediaPlayer	MediaReplicant		Medialejátszó megnyitása
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Opciók

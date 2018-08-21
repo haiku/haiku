@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	986541402
+1	hungarian	x-vnd.Haiku-Shortcuts	1611284793
 OK	ShortcutsWindow		Rendben
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
 Cancel	ShortcutsWindow		Mégse
@@ -19,7 +19,6 @@ Save	ShortcutsWindow		Mentés
 *MouseButton 1	ShortcutsWindow		*EgérGomb 1
 *MoveMouse +20 +0	ShortcutsWindow		*EgérMozgatás +20 +0
 Save changes before closing?	ShortcutsWindow		Menti a változtatásokat kilépés előtt?
-Command	ShortcutsSpec	Name for modifier on keyboard	Parancs
 Remove selected shortcut	ShortcutsWindow		Kiválasztott gyorsbillentyű eltávolítása
 Add new shortcut	ShortcutsWindow		Új gyorsbillentyű hozzáadása
 Save & apply	ShortcutsWindow		Mentés és alkalmazás

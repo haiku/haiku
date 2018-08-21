@@ -1,6 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	3292779285
-The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se yhdellä tämän pakkauksen komponentilla vai ohitetaanko se?
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Hakemisto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se yhdellä tämän pakkauksen hakemistolla vai ohitetaanko se?
+1	finnish	x-vnd.Haiku-PackageInstaller	3900768
 Install to:	PackageView		Asenna kohteeseen:
 OK	PackageView		Valmis
 Accept	PackageTextViewer		Hyväksy
@@ -47,7 +45,6 @@ Decline	PackageTextViewer		Kieltäydy
 All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
 Continue	PackageInfo		Jatka
 %index% of %total%	PackageInstall		%index% / %total%
-The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se yhdellä tämän pakkauksen tiedostolla vai ohitetaanko se?
 The package you selected has been successfully removed from your system.	UninstallView		Valitsemasi pakkauksen poistaminen järjestelmästäsi onnistui.
 Abort	PackageInfo		Keskeytä
 PackageInstaller	System name		Pakettiasennus
@@ -58,7 +55,6 @@ Begin	PackageView		Alku
 OK	UninstallView		Valmis
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki ’%s’ on jo olemassa annetulla polulla.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko?
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Valitsemaasi pakkausta ei ole poistettu järjestelmästäsi. Annetun asennetun pakkauksen tietotiedosto saattaa olla rikkinäinen.
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko skripti yhdellä tämän pakkauksen skriptillä vai ohitetaanko se?
 Replace	PackageView		Korvaa
 Installation progress	PackageView		Asennuksen eteneminen
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedoston lukeminen epäonnistui.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.

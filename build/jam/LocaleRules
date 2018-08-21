@@ -73,7 +73,7 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 actions ExtractCatalogEntries1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) "$(2[2-])" > "$(1)".pre || true
+	$(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) "$(2[2-])" > "$(1)".pre
 	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
 		-w -o "$(1)" "$(1)".pre
 	$(RM) "$(1)".pre

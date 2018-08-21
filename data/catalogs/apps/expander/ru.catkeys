@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	1129502603
+1	russian	x-vnd.Haiku-Expander	130018254
 Expand	ExpanderMenu		Распаковать
 Expanding '%s'…	ExpanderWindow		Распаковка '%s'…
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
@@ -20,6 +20,7 @@ Destination folder	ExpanderPreferences		Путь для извлечения
 Other	ExpanderPreferences		Другое
 Cancel	ExpanderPreferences		Отмена
 Expansion	ExpanderPreferences		Извлечение
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
 Select	DirectoryFilePanel		Выбрать
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка назначения не существует. Создать её?
 Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив
@@ -34,6 +35,7 @@ Leave destination folder path empty	ExpanderPreferences		Оставить пут
 Failed to create the destination folder.	ExpanderWindow		Не удалось создать папку назначения.
 Select '%s'…	DirectoryFilePanel		Выбрать '%s'…
 Create	ExpanderWindow		Создать
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
 The file doesn't exist	ExpanderWindow		Файл не существует
 Stop	ExpanderMenu		Остановить
 File	ExpanderMenu		Файл

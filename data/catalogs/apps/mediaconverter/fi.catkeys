@@ -1,8 +1,7 @@
-1	finnish	x-vnd.Haiku-MediaConverter	2251404027
+1	finnish	x-vnd.Haiku-MediaConverter	1322040280
 Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Tiedostoa ei tunnistettu tuettuna mediatiedostona:} other{# tiedostoa ei tunnistettu tuettuina mediatiedostoina:}}
 Video encoding:	MediaConverter		Videokoodaus:
-Writing video track: %d%% complete	MediaConverter		Kirjoitetaan videokappaletta: %d%% valmiina
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f kehystä sekunnissa
 Error creating video.	MediaConverter		Videon luominen epäonnistui.
 No audio	Audio codecs list		Ei ääntä
@@ -16,7 +15,6 @@ Output file '%filename' created	MediaConverter		Tulostetiedosto ’%filename’ 
 Output format	MediaConverter		Tulostemuoto
 End   [ms]: 	MediaConverter		Loppu [ms]: 
 MediaConverter	System name		Mediamuunnin
-Error writing audio frame %ld	MediaConverter		Audiokehyksen %ld kirjoitusvirhe
 No video	Video codecs list		Ei videota
 Duration:	MediaConverter-FileInfo		Kesto:
 OK	MediaConverter		Valmis
@@ -27,7 +25,6 @@ Conversion completed	MediaConverter		Muunnos valmis
 Audio:	MediaConverter-FileInfo		Ääni:
 OK	MediaConverter-FileInfo		Valmis
  seconds	MediaFileInfo		 sekuntia
-Error writing video frame %ld	MediaConverter		Videokehyksen %ld kirjoitusvirhe
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Virhe kirjoitettaessa sijaintiin: %strPath%. Muutetaan oletussijainniksi: /boot/home
 Source files	MediaConverter		Lähdetiedostot
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Vallittua hakemistoa ei löytynyt. Muutetaan oletukseksi /boot/home
@@ -36,7 +33,6 @@ Cancelling	MediaConverter		Perutaan
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# tavu} other{# tavua}}
 Error loading files	MediaConverter		Virhe ladattaessa tiedostoja
 Cancel	MediaConverter		Peru
-Error read audio frame %ld	MediaConverter		Audiokehyksen %ld lukuvirhe
 None available	Video codecs		Ei mitään saatavilla
 Conversion cancelled	MediaConverter		Muunnos peruttu
 No file selected	MediaConverter-FileInfo		Ei tiedostoa valittuna
@@ -52,14 +48,12 @@ Cancelling…	MediaConverter		Perutaan...
 File details	MediaConverter		Tiedoston yksityiskohdat
 Select	MediaConverter		Valitse
 Quit	Menu		Lopeta
-Error read video frame %ld	MediaConverter		Videokehyksen %ld lukuvirhe
 Preview	MediaConverter		Esikatselu
 File format:	MediaConverter		Tiedostomuoto:
 None available	Audio codecs		Ei mitään saatavilla
 MediaConverter+:SaveDirectory	MediaConverter		Mediamuunnin+:Tallenna hakemisto
 Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
 High	MediaConverter		Korkea
-Writing audio track: %d%% complete	MediaConverter		Kirjoitetaan audiokappaletta: %d%% valmiina
 Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän ikkunaan
 Audio encoding:	MediaConverter		Äänikoodaus:
 Audio quality not supported	MediaConverter		Äänen laatua ei tueta

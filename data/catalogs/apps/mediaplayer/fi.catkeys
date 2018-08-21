@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1313616492
+1	finnish	x-vnd.Haiku-MediaPlayer	3708050243
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -13,7 +13,6 @@ Save Playlist	MediaPlayer-PlaylistWindow		Tallenna soittoluettelo
 (not supported)	MediaPlayer-InfoWin		(ei ole tuettu)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Mikään tiedostoista, jotka olisit halunnut soittaa, ei näytä olevan mediatiedostoja.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Soittoluettelon tallentaminen epäonnistui.\n\nVirhe: 
-ask every time	MediaPlayer-SettingsWindow		kysy joka kerta
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Uusi soitin...
 100% scale	MediaPlayer-Main		100 % skaala
@@ -46,7 +45,6 @@ Container	MediaPlayer-InfoWin		Säiliö
 Nothing to Play	MediaPlayer-Main		Ei mitään soitettavaa
 Muted	MediaPlayer-SettingsWindow		Mykistetty
 Quit	MediaPlayer-Main		Lopeta
-Resume:	MediaPlayer-SettingsWindow		Ansioluettelo:
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Tuo kappale
@@ -59,7 +57,6 @@ MediaPlayer	System name		Mediasoitin
 OK	MediaPlayer-Main		Valmis
 Settings…	MediaPlayer-Main		Asetukset...
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset
-never	MediaPlayer-SettingsWindow		ei koskaan
 h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
@@ -96,14 +93,13 @@ unknown format	MediaPlayer-InfoWin		tuntematon muoto
 <nothing to redo>	MediaPlayer-PlaylistWindow		<ei mitään uudelleensuoritettavaa>
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Siirrä kappaleita roskakoriin
 200% scale	MediaPlayer-Main		200 % skaala
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnissä.\nHaluaisitko käynnistää sen ?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Näyttää kuin mediapalvelin ei olisi käynnisssä.\nHaluaisitko käynnistää sen ?
 Duration	MediaPlayer-InfoWin		Kesto
 Aspect ratio	MediaPlayer-Main		Kuvasuhde
 Error: 	MediaPlayer-Main		Virhe: 
 Large	MediaPlayer-SettingsWindow		Suuri
 Bottom of video	MediaPlayer-SettingsWindow		Videon alareuna
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
-always	MediaPlayer-SettingsWindow		aina
 Total duration: %s	MediaPlayer-PlaylistWindow		Kokonaiskesto: %s
 <unnamed media>	MediaPlayer-InfoWin		<nimeämätön media>
 raw video	MediaPlayer-InfoWin		raakavideo

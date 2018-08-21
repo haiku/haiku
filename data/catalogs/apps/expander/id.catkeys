@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Expander	594045678
+1	indonesian	x-vnd.Haiku-Expander	1813710239
 Expand	ExpanderMenu		Kembangkan
 Expanding '%s'…	ExpanderWindow		Mengembangkan '%s'…
 Close window when done expanding	ExpanderPreferences		Tutup jendela saat selesai mengembangkan
@@ -20,5 +20,6 @@ Destination folder	ExpanderPreferences		Folder tujuan
 Other	ExpanderPreferences		Lainnya
 Cancel	ExpanderPreferences		Batalkan
 Expansion	ExpanderPreferences		pengembangan
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Anda yakin ingin berhenti mengembangkan arsip ini?\n Item yang dikembangkan mungkin tidak lengkap.
 Select	DirectoryFilePanel		Pilih
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Folder yang dituju tidak ada. Anda ingin membuatnya sekarang?

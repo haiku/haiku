@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	3963412481
+1	finnish	x-vnd.Haiku-About	3042617186
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint-tekijät. Kaikki oikeudet pidätetty.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm ja Werner Lemberg.
 Past website & marketing:\n	AboutView		Entinen webbisivu & markkinointi:\n
@@ -18,7 +18,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Lähdekoodi: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{prosessori:} other{# prosessoria:}}
 Kernel:	AboutView		Ydin:
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, Lucas Digital Ltd. LLC-yrityksen divisioona.
 BSD (4-clause)	AboutWindow		BSD (4-ehto)
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google-kansainvälistäminenryhmä.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai vastaavien lähdekoodissa nimenomaisesti ilmaistujen tekijöiden omaisuutta. Haiku® ja HAIKU logo® ovat Haiku, Inc.-yrityksen rekisteröityjä tavaramerkkejä.\n\n
