@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	130018254
+1	swedish	x-vnd.Haiku-Expander	1129502603
 Expand	ExpanderMenu		Expandera
 Expanding '%s'…	ExpanderWindow		Expanderar '%s'...
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
@@ -20,7 +20,6 @@ Destination folder	ExpanderPreferences		Målmapp
 Other	ExpanderPreferences		Andra
 Cancel	ExpanderPreferences		Avbryt
 Expansion	ExpanderPreferences		Expansion
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera det här\narkivet? De expanderade objekten kan vara inkompletta.
 Select	DirectoryFilePanel		Välj
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Målmappen finns inte. Vill du skapa den?
 Same directory as source (archive) file	ExpanderPreferences		Samma mapp som arkivfilen
@@ -35,7 +34,6 @@ Leave destination folder path empty	ExpanderPreferences		Lämna destinations fol
 Failed to create the destination folder.	ExpanderWindow		Kunde inte skapa målmappen.
 Select '%s'…	DirectoryFilePanel		Välj '%s'…
 Create	ExpanderWindow		Skapa
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Foldern har antingen flyttats, omdöpt eller\nsupporteras inte.
 The file doesn't exist	ExpanderWindow		Filen finns inte
 Stop	ExpanderMenu		Stopp
 File	ExpanderMenu		Fil

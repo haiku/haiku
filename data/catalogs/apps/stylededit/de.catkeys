@@ -61,7 +61,7 @@ Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Bold	Menus		Fett
 Find selection	Menus		Auswahl suchen
 Find:	FindandReplaceWindow		Suche:
-Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von "%s":\n%s
+Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von \"%s\":\n%s
 Copy	Menus		Kopieren
 Cut	Menus		Ausschneiden
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
@@ -72,7 +72,7 @@ Find…	Menus		Suchen…
 Select all	Menus		Alles auswählen
 Don't save	SaveAlert		Verwerfen
 Recover	NodeMonitorAlerts		Wiederherstellen
-Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ignorieren
 Read-only	StatusView		Schreibgeschützt
 Undo typing	QuitAlert		Rückgängig: Eingabe

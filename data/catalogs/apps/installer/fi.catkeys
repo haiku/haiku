@@ -25,7 +25,7 @@ Failed to launch Boot Manager	InstallerWindow		Käynnistyshallinnan käynnistäm
 Install from:	InstallerWindow		Asenna levyltä:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld / %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		TÄRKEITÄ TIETOJA ENNEN HAIKUN ASENTAMISTA\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUB:in nimeämiskaava osioille on: (hdN,n)\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUB:in nimeämiskaava osioille on: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Jatka
 Write boot sector to '%s'	InstallerWindow		Kirjoita käynnistyssektori levylle ’%s’
 Collecting copy information.	InstallProgress		Kerätään kopiointitietoja.
@@ -104,7 +104,7 @@ So below the heading that must not be edited, add something similar to these lin
 Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
 Onto:	InstallerWindow		levylle:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Käynnistyshallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun käynnistät Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi \"Tervetuloa\" ja \"Käyttäjäopas\" -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kun käynnistät Haikun onnistuneesti ensimmäisen kerran, lue varmuuden vuoksi ”Tervetuloa”- ja ”Käyttäjäopas” -asiakirjamme. Niihin löytyy linkit työpöydältä ja WebPositive-selaimen kirjanmerkeistä.\n\n
 Tools	InstallerWindow		Työkalut
 The mount point could not be retrieved.	InstallProgress		Liittämispisteen noutaminen epäonnistui.
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <suosikkieditorisi nimi> /etc/grub.d/40_custom\n\n

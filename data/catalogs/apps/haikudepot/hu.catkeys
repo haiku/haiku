@@ -1,7 +1,8 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1437744500
+1	hungarian	x-vnd.Haiku-HaikuDepot	3936195394
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
+OK	MainWindow		OK
 Close	RatePackageWindow		Bezárás
 The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
 Changelog	PackageInfoView		Változásnapló
@@ -16,6 +17,7 @@ Stability	RatePackageWindow		Stabilitás
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Description	PackageListView		Leírás
 Install	PackageManager		Telepítés
+All repositories	MainWindow		Összes tároló
 Source packages	MainWindow		Forráskód csomagok
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Hitelesítési hiba. A felhasználó nem létezik vagy hibás jelszó került megadásra.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		A fiók sikeresen létrehozva. Mostmár lehetőség van a csomagok értékelésére és további funkciókra.
@@ -40,6 +42,7 @@ Installed packages	MainWindow		Telepített csomagok
 Status	PackageListView		Állapot
 Switch account…	MainWindow		Másik fiók…
 Ignore	UserLoginWindow		Mellőzés
+Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 Language	UserLoginWindow		Nyelv
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A jelszó érvénytelen vagy könnyen megfejthető. A jelszónak legalább 8 karakterből kell álnia, illetve legalább 2 számot és 2 nagybetűt tartalmaz.
 Rate package	RatePackageWindow		Csomag értékelése
@@ -61,6 +64,7 @@ HaikuDepot needs the package daemon to function, and it appears to be not runnin
 Downloading:	PackageInfoView		Letöltés:
 Mostly stable	RatePackageWindow		Nagyrészt stabil
 Log out	MainWindow		Kijelentkezés
+Repository	PackageListView		Tároló
 Education	Model		Oktatás
 Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
@@ -124,6 +128,7 @@ Send	RatePackageWindow		Küldés
 -	no package size		-
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
+Check for updates…	MainWindow		Frissítések keresése…
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
 Start package daemon	App		Csomag démon indítása
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
@@ -132,5 +137,6 @@ Audio	Model		Audió
 About	PackageInfoView		Névjegy
 Active	PackageListView		Aktív
 It was not possible to contact the web service.	UserLoginWindow		Nem sikerült elérni a webes szolgáltatást.
+Refreshing...	MainWindow		Frissítés…
 Failed to create account: %s\n	UserLoginWindow		%s létrehozása sikertelen\n
 Cancel	UserLoginWindow		Mégse

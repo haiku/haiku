@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	3708050243
+1	hungarian	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Lejátszási lista mentése
 (not supported)	MediaPlayer-InfoWin		(nem támogatott)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Egyik fájl se tűnik médiafájlnak.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lejátszási lista mentése sikertelen.\n\nHiba:
+ask every time	MediaPlayer-SettingsWindow		mindig kérdezze
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Új lejátszó…
 100% scale	MediaPlayer-Main		100%-os méret
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Tároló
 Nothing to Play	MediaPlayer-Main		Nincs mit lejátszani
 Muted	MediaPlayer-SettingsWindow		Némítva
 Quit	MediaPlayer-Main		Kilépés
+Resume:	MediaPlayer-SettingsWindow		Folytatás:
 Video	MediaPlayer-Main		Videó
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nincs olyan dekódoló telepítve ami ezt a formátumot kezelni tudná, vagy ha van, a formátum ezen verzióját hibásan kezeli.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Bejegyzés importálása
@@ -57,6 +59,7 @@ MediaPlayer	System name		Médialejátszó
 OK	MediaPlayer-Main		Rendben
 Settings…	MediaPlayer-Main		Beállítások…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Médialejátszó beállításai
+never	MediaPlayer-SettingsWindow		soha
 h	MediaPlayer-InfoWin	Hours	ó
 Select all	MediaPlayer-PlaylistWindow		Mind kijelölése
 Move Entry	MediaPlayer-MovePLItemsCmd		Bejegyzés áthelyezése
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Hiba:
 Large	MediaPlayer-SettingsWindow		Nagy
 Bottom of video	MediaPlayer-SettingsWindow		A videó alján
 DrawBitmap	MediaPlayer-InfoWin		BittérképKirajzolás
+always	MediaPlayer-SettingsWindow		mindig
 Total duration: %s	MediaPlayer-PlaylistWindow		Teljes időtartam: %s
 <unnamed media>	MediaPlayer-InfoWin		<névtelen>
 raw video	MediaPlayer-InfoWin		nyers videó

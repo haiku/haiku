@@ -6,7 +6,7 @@ The file '%name%' could not be written.	People		Kirjoittaminen tiedostoon ’%na
 none	Groups list		ei mitään
 Configure attributes	People		Asetusattribuutit
 Company	People		Yritys
-%name% picture	People		%name%-kuva
+%name% picture	People		%name% -kuva
 Work phone	People		Työpuhelin
 People	System name		Ihmiset
 New person	People		Uusi henkilö

@@ -26,6 +26,6 @@ OK	ScreenshotWindow		Valmis
 Settings…	ScreenshotWindow		Asetukset...
 overwrite	ScreenshotWindow		korvaa
 Delay:	ScreenshotWindow		Viive:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		Virhe tallennettaessa \"%s\":\n\t%s
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Virhe tallennettaessa ”%s”:\n\t%s
 Include mouse pointer	ScreenshotWindow		Sisällytä hiiriosoitin
 Translator Settings	ScreenshotWindow		Muunninasetukset

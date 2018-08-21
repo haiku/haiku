@@ -8,7 +8,7 @@ Cancel	IMAPFolderConfig		Peru
 No encryption	imap_config		Ei salausta
 Apply	IMAPFolderConfig		Sovella
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Noudetaan IMAP-kansioita, ole kärsivällinen...
-Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Yhdistäminen palvelimelle \"%server%\" epäonnistui:\n%error%
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Yhdistäminen palvelimelle ”%server%” epäonnistui:\n%error%
 IMAP Folders	IMAPFolderConfig		IMAP-kansiot
 Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Päivitä IMAP-kansioiden tilausta, kärsivällisyyttä...
 Failed to fetch available storage.	IMAPFolderConfig		Saatavilla olevan tallennuspaikan noutaminen epäonnistui.

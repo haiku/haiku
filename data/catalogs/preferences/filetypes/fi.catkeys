@@ -99,7 +99,7 @@ New resource file…	FileTypes Window		Uusi resurssitiedosto…
 Cancel	New File Type Window		Peru
 Icon	FileTypes Window		Kuvake
 Extension:	Extension Window		Tiedostotarkennin:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistamiseksi pidä vaihto-painiketta alhaalla ja paina ”Poista”.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistamiseksi pidä Vaihto-näppäin alhaalla ja paina ”Poista”.
 Internal name:	FileTypes Window		Sisäinen nimi:
 Add	Attribute Window		Lisää
 Close	Application Type Window		Sulje

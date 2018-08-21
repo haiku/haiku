@@ -35,7 +35,7 @@ Window size	Terminal TermWindow		Fenstergröße
 Selected text	Terminal AppearancePrefView		Ausgewählter Text
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%e\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n
 Find	Terminal FindWindow		Suchen
-The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen stehen zur Verfügung:
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Die Formel für Fenstertitel. Folgende Variablen stehen\nzur Verfügung:
 Appearance	Terminal PrefWindow		Darstellung
 Tab title:	Terminal AppearancePrefView		Reitertitel:
 OK	Terminal SetTitleWindow		OK
