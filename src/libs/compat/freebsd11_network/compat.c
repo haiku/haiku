@@ -595,6 +595,7 @@ printf(const char *format, ...)
 }
 
 
+#ifndef __clang__
 int
 ffs(int value)
 {
@@ -608,6 +609,7 @@ ffs(int value)
 
 	return i;
 }
+#endif
 
 
 int
