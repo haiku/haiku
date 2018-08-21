@@ -19,6 +19,17 @@ OptionalPackageDependencies DevelopmentPowerPC : DevelopmentMin ;
 OptionalPackageDependencies NetFS : UserlandFS ;
 
 
+# Haiku sources
+if $(HAIKU_INCLUDE_SOURCES) = 1 {
+	AddPackageFilesToHaikuImage system
+		:
+		haiku_source.hpkg
+		:
+		nameFromMetaInfo
+		;
+}
+
+
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 	AddHaikuImagePackages be_book ;

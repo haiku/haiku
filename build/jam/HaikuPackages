@@ -3,6 +3,7 @@
 local packages = [ FFilterByBuildFeatures
 	HaikuDevel
 	HaikuLoader
+	HaikuSource
 	HaikuUserguide
 	HaikuWelcome
 	MakefileEngine

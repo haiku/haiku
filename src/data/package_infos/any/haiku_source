@@ -1,0 +1,21 @@
+name			haiku_source
+version			%HAIKU_VERSION%
+architecture	any
+summary			"Haiku's source code"
+description		"This package contains the core source code of Haiku."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2018 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+
+provides {
+	haiku_source=%HAIKU_VERSION%
+}
+
+requires {
+}
