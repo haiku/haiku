@@ -3,14 +3,15 @@
 # Place user customizations in /.profile
 #
 
-ps 2>&1 | grep -e $PPID 2>&1 | grep -e $SHELL 2>&1 | grep -q -e $PPID > /dev/null 2>&1
-if [ $? -eq 1 ] ; then
+ARCH=`getarch 2>/dev/null`
+if [ "$ARCH" = "`getarch -p 2>/dev/null`" ] ; then
 	echo -e "\nWelcome to the Haiku shell.\n"
 	export PS1="\w> "
 else
 	echo -e "\nSwitching to architecture `getarch`\n"
-	export PS1="[`getarch`] \w> "
+	export PS1="[$ARCH] \w> "
 fi
+unset ARCH
 
 export USER=`id -un`
 export GROUP=`id -gn`
