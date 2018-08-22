@@ -13,5 +13,5 @@ Set as read	ConfigView		Aseta luetuksi
 Match header	RuleFilter		Täsmää otsikko
 Reply with	ConfigView		Vastaa
 If	ConfigView		Jos
-Match \"%attribute\" against \"%regex\"	RuleFilter		Täsmää \"%attribute\" säännöllisen lausekkeen \"%regex\" varalta
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokerimerkkiarvot, kuten \"*spam*\".\nKäytä säännöllisissä lausekkeissa etuliitettä \"REGEX:\".
+Match \"%attribute\" against \"%regex\"	RuleFilter		Täsmää ”%attribute” säännöllisen lausekkeen ”%regex” varalta
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokerimerkkiarvot, kuten ”*spam*”.\nKäytä säännöllisissä lausekkeissa etuliitettä ”REGEX:”.

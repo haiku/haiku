@@ -16,7 +16,7 @@ Select a partition from the list below.	DiskView		Valitse osio alapuolella oleva
 No disk devices have been recognized.	DiskView		Levyasemia ei tunnistettu.
 Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
 The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Pitäisikö irrottaminen pakottaa?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, irrottaminen saattaa aiheuttaa datan katoamista.\n
 Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
 The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n

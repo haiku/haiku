@@ -3,7 +3,7 @@ Pairs did not find enough vector icons to start; it needs at least %zu, found %z
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tvon Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		Könner (8x8)
 Beginner (4x4)	PairsWindow		Anfänger (4x4)
-You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Das Spiel wurde mit {0, plural, one{# Klick} other{# Klicks}} gelöst.\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Das Spiel wurde mit {0, plural, one{einem Klick} other{# Klicks}} gelöst.\n
 Quit game	PairsWindow		Spiel beenden
 Large	PairsWindow		Groß
 Small	PairsWindow		Klein

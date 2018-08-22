@@ -27,7 +27,7 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin 
 Blue	Terminal colors scheme		Sininen
 Custom	Terminal colors scheme		Räätälöity
 Encoding:	Terminal AppearancePrefView		Koodaus:
-%app% settings	Terminal PrefWindow	window title	%app%-asetukset
+%app% settings	Terminal PrefWindow	window title	%app% -asetukset
 Cancel	Terminal SetTitleWindow		Peru
 Increase	Terminal TermWindow		Kasvata
 Settings	Terminal TermWindow		Asetukset
@@ -42,7 +42,7 @@ OK	Terminal SetTitleWindow		Valmis
 Background	Terminal AppearancePrefView		Tausta
 Use selection	Terminal FindWindow		Käyttövalinta
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Prosessia ”%1” suoritetaan yhä.\nJos suljet välilehden, prosessi tapetaan.
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Ei voida suorittaa komentoa ”%command”:\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Komennon ”%command” suorittaminen epäonnistui:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               tulosta tämä opaste\n  -t,     --title              aseta ikkunaotsikko\n  -f,     --fullscreen         käynnistä kokoruutunäyttö\n
 Window title…	Terminal TermWindow		Ikkunaotsikko...
 Full screen	Terminal TermWindow		Kokoruutunäyttö
@@ -108,7 +108,7 @@ Copy link location	Terminal TermView		Kopioi linkkisijainti
 Tab title:	Terminal TermWindow		Välilehtiotsikko:
 Find next	Terminal TermWindow		Löydä seuraava
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tMerkki ’%’.\n\t%<\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\ton jälkeenpäin tyhjä.\n\t%>\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\tedellisen  %< kappaleen ja tämän kappaleen välillä ei ole tyhjä.\n\t%-\t-\tLopettaa %<- tai %>-kappaleen.\n\nMikä tahansa ei-aakkosnumeerinen merkki ’%’:n ja muotokirjaimen välissä lisää välilyönnin vain\njos korvaaja-arvo ei ole tyhjä. Se lisätään %<-kappaleeseen.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tMerkki ’%’.\n\t%<\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\ton jälkeenpäin tyhjä.\n\t%>\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\tedellisen  %< kappaleen ja tämän kappaleen välillä ei ole tyhjä.\n\t%-\t-\tLopettaa %< tai %>-kappaleen.\n\nMikä tahansa ei-aakkosnumeerinen merkki ’%’:n ja muotokirjaimen välissä lisää välilyönnin vain\njos korvaaja-arvo ei ole tyhjä. Se lisätään %<-kappaleeseen.
 Paste	Terminal TermWindow		Liitä
 Solarized Dark	Terminal colors scheme		Käänteisen tumma
 Shell 	Terminal TermWindow		Komentoikkuna

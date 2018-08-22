@@ -15,7 +15,7 @@ Remove a crosshair	Magnify-Main		Poista ristikkotähtäin
 Show grid	Magnify-Main		Näytä rasteri
 Save image	Magnify-Main		Tallenna kuva
 Increase window size	Magnify-Main		Kasvata ikkunan kokoa
-Decrease window size	Magnify-Main		Pienennä ikkkunan kokoa
+Decrease window size	Magnify-Main		Pienennä ikkunan kokoa
 Increase pixel size	Magnify-Main		Kasvata pikselin kokoa
   size must be > 4 and a multiple of 4\n	Console		  koon on oltava > 4 ja neljän monikerta\n
 Add a crosshair	Magnify-Main		Lisää ristikkotähtäin
