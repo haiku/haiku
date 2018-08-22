@@ -1,17 +1,20 @@
 #
 # Administrative startup for /bin/sh
-# Place user customizations in /.profile
+# Place user customizations in ~/config/settings/profile
 #
 
 ARCH=`getarch 2>/dev/null`
 if [ "$ARCH" = "`getarch -p 2>/dev/null`" ] ; then
 	echo -e "\nWelcome to the Haiku shell.\n"
-	export PS1="\w> "
+	PS1="\w "
 else
 	echo -e "\nSwitching to architecture `getarch`\n"
-	export PS1="[$ARCH] \w> "
+	PS1="[$ARCH] \w "
 fi
 unset ARCH
+
+PS1="$PS1"'`if [ $? = 0 ]; then echo "\e[32m:)\e[0m\]";	else \
+	echo "\e[31;1m\]:(\e[0m\]"; fi` \e[0m\]$ '
 
 export USER=`id -un`
 export GROUP=`id -gn`
