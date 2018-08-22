@@ -45,7 +45,7 @@
 #include "AllocationInfo.h"
 #include "AttributeIndex.h"
 #include "AttributeIterator.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Directory.h"
 #include "Entry.h"
 #include "EntryIterator.h"
@@ -376,8 +376,8 @@ ramfs_read_symlink(fs_volume* _volume, fs_vnode* _node, char *buffer,
 					memcpy(buffer, symLink->GetLinkedPath(), toRead);
 				*bufferSize = toRead;
 			} else {
-				FATAL(("Node %Ld pretends to be a SymLink, but isn't!\n",
-					node->GetID()));
+				FATAL("Node %Ld pretends to be a SymLink, but isn't!\n",
+					node->GetID());
 				error = B_BAD_VALUE;
 			}
 		}
@@ -957,8 +957,8 @@ ramfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 			if (File *file = dynamic_cast<File*>(node))
 				error = file->ReadAt(pos, buffer, *bufferSize, bufferSize);
 			else {
-				FATAL(("Node %Ld pretends to be a File, but isn't!\n",
-					node->GetID()));
+				FATAL("Node %Ld pretends to be a File, but isn't!\n",
+					node->GetID());
 				error = B_BAD_VALUE;
 			}
 		}
@@ -999,8 +999,8 @@ ramfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 					error = file->WriteAt(pos, buffer, *bufferSize,
 						bufferSize);
 				} else {
-					FATAL(("Node %Ld pretends to be a File, but isn't!\n",
-					node->GetID()));
+					FATAL("Node %Ld pretends to be a File, but isn't!\n",
+						node->GetID());
 					error = B_BAD_VALUE;
 				}
 			}
@@ -1217,8 +1217,8 @@ ramfs_open_dir(fs_volume* /*fs*/, fs_vnode* _node, void** _cookie)
 	if (error == B_OK) {
 		dir = dynamic_cast<Directory*>(node);
 		if (!dir) {
-			FATAL(("Node %Ld pretends to be a Directory, but isn't!\n",
-				node->GetID()));
+			FATAL("Node %Ld pretends to be a Directory, but isn't!\n",
+				node->GetID());
 			error = B_NOT_A_DIRECTORY;
 		}
 	}

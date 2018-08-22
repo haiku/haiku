@@ -7,7 +7,7 @@
 
 #include "Block.h"
 #include "BlockReferenceManager.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "List.h"
 
 #define ENABLE_BA_PANIC	1

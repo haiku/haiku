@@ -4,7 +4,7 @@
 #include "Block.h"
 #include "BlockAllocator.h"		// only for BA_PANIC
 #include "BlockReferenceManager.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 
 static const int kBlockReferenceTableSize = 128;
 
@@ -49,17 +49,17 @@ bool
 BlockReferenceManager::CheckReference(BlockReference *reference)
 {
 	if (reference) {
-		uint32 address = (uint32)reference;
+		uint32 address = (addr_t)reference;
 		int32 tableCount = fTables.CountItems();
 		for (int32 i = 0; i < tableCount; i++) {
 			Table *table = &fTables.ItemAt(i);
-			uint32 first = (uint32)table->GetReferences();
-			uint32 last = (uint32)(table->GetReferences() + table->GetSize());
+			uint32 first = (addr_t)table->GetReferences();
+			uint32 last = (addr_t)(table->GetReferences() + table->GetSize());
 			if (first <= address && address < last)
 				return true;
 		}
 	}
-	FATAL(("BlockReference %p does not exist!\n", reference));
+	FATAL("BlockReference %p does not exist!\n", reference);
 	BA_PANIC("BlockReference doesn't exist.");
 	return false;
 }

@@ -3,7 +3,7 @@
 #include <TypeConstants.h>
 
 #include "AttributeIndexImpl.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "IndexDirectory.h"
 #include "LastModifiedIndex.h"
 #include "NameIndex.h"

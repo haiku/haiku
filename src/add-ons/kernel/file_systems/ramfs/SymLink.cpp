@@ -3,7 +3,7 @@
 #include <limits.h>
 
 #include "AllocationInfo.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "SizeIndex.h"
 #include "SymLink.h"
 #include "Volume.h"

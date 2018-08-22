@@ -1,7 +1,7 @@
 // Entry.cpp
 
 #include "AllocationInfo.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Entry.h"
 #include "EntryIterator.h"
 #include "Node.h"

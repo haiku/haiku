@@ -3,7 +3,7 @@
 #include <TypeConstants.h>
 
 #include "AttributeIndexImpl.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Entry.h"
 #include "EntryListener.h"
 #include "IndexImpl.h"
@@ -377,16 +377,16 @@ AttributeIndexImpl::Iterator::GetCurrent(uint8 *buffer, size_t *keyLength)
 			if ((*attribute)->GetNode() == entry->GetNode()) {
 				(*attribute)->GetKey(buffer, keyLength);
 			} else {
-				FATAL(("Node of current attribute and node of current entry "
+				FATAL("Node of current attribute and node of current entry "
 					   "differ: %Ld vs. %Ld\n",
 					   (*attribute)->GetNode()->GetID(),
-					   entry->GetNode()->GetID()));
+					   entry->GetNode()->GetID());
 				entry = NULL;
 			}
 		} else {
-			FATAL(("We have a current entry (`%s', node: %Ld), but no current "
+			FATAL("We have a current entry (`%s', node: %Ld), but no current "
 				   "attribute.\n", entry->GetName(),
-				   entry->GetNode()->GetID()));
+				   entry->GetNode()->GetID());
 			entry = NULL;
 		}
 	}

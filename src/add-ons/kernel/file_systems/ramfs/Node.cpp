@@ -1,7 +1,7 @@
 // Node.cpp
 
 #include "AllocationInfo.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "EntryIterator.h"
 #include "LastModifiedIndex.h"
 #include "Node.h"

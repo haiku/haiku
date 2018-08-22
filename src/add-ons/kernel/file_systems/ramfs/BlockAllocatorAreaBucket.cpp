@@ -32,16 +32,16 @@ BlockAllocator::AreaBucket::SanityCheck(bool deep) const
 		}
 		// bucket
 		if (area->GetBucket() != this) {
-			FATAL(("Area %p is in bucket %p, but thinks it is in bucket %p\n",
-				   area, this, area->GetBucket()));
+			FATAL("Area %p is in bucket %p, but thinks it is in bucket %p\n",
+				   area, this, area->GetBucket());
 			BA_PANIC("Wrong area bucket.");
 			return false;
 		}
 		// size
 		size_t areaSize = area->GetFreeBytes();
 		if (areaSize < fMinSize || areaSize >= fMaxSize) {
-			FATAL(("Area is in wrong bucket: free: %lu, min: %lu, max: %lu\n",
-				   areaSize, fMinSize, fMaxSize));
+			FATAL("Area is in wrong bucket: free: %lu, min: %lu, max: %lu\n",
+				   areaSize, fMinSize, fMaxSize);
 			BA_PANIC("Area in wrong bucket.");
 			return false;
 		}

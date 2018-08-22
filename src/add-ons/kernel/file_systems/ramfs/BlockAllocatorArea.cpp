@@ -1,7 +1,7 @@
 // BlockAllocatorArea.cpp
 
 #include "BlockAllocatorArea.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 
 // constructor
 BlockAllocator::Area::Area(area_id id, size_t size)
@@ -58,8 +58,8 @@ Block *
 BlockAllocator::Area::AllocateBlock(size_t usableSize, bool dontDefragment)
 {
 if (kMinBlockSize != block_align_ceil(sizeof(TFreeBlock))) {
-FATAL(("kMinBlockSize is not correctly initialized! Is %lu, but should be: "
-"%lu\n", kMinBlockSize, block_align_ceil(sizeof(TFreeBlock))));
+FATAL("kMinBlockSize is not correctly initialized! Is %lu, but should be: "
+"%lu\n", kMinBlockSize, block_align_ceil(sizeof(TFreeBlock)));
 BA_PANIC("kMinBlockSize not correctly initialized.");
 return NULL;
 }
@@ -80,9 +80,9 @@ return NULL;
 				// Our data structures seem to be corrupted, since
 				// _GetBlockFreeBytes() promised that we would have enough
 				// free space.
-				FATAL(("Couldn't find free block of min size %lu after "
+				FATAL("Couldn't find free block of min size %lu after "
 					   "defragmenting, although we should have %lu usable free "
-					   "bytes!\n", size, _GetBlockFreeBytes()));
+					   "bytes!\n", size, _GetBlockFreeBytes());
 				BA_PANIC("Bad area free bytes.");
 			}
 		}
@@ -247,22 +247,22 @@ BlockAllocator::Area::SanityCheck() const
 {
 	// area ID
 	if (fID < 0) {
-		FATAL(("Area ID < 0: %lx\n", fID));
+		FATAL("Area ID < 0: %lx\n", fID);
 		BA_PANIC("Bad area ID.");
 		return false;
 	}
 	// size
 	size_t areaHeaderSize = block_align_ceil(sizeof(Area));
 	if (fSize < areaHeaderSize + sizeof(TFreeBlock)) {
-		FATAL(("Area too small to contain area header and at least one free "
-			   "block: %lu bytes\n", fSize));
+		FATAL("Area too small to contain area header and at least one free "
+			   "block: %lu bytes\n", fSize);
 		BA_PANIC("Bad area size.");
 		return false;
 	}
 	// free bytes
 	if (fFreeBytes > fSize) {
-		FATAL(("Free size greater than area size: %lu vs %lu\n", fFreeBytes,
-			   fSize));
+		FATAL("Free size greater than area size: %lu vs %lu\n", fFreeBytes,
+			   fSize);
 		BA_PANIC("Bad area free bytes.");
 		return false;
 	}
@@ -277,8 +277,8 @@ BlockAllocator::Area::SanityCheck() const
 	uint32 freeBlockCount = 0;
 	size_t freeBytes = 0;
 	if (!fFirstBlock || !fLastBlock) {
-		FATAL(("Invalid block list: first or last block NULL: first: %p, "
-			   "last: %p\n", fFirstBlock, fLastBlock));
+		FATAL("Invalid block list: first or last block NULL: first: %p, "
+			   "last: %p\n", fFirstBlock, fLastBlock);
 		BA_PANIC("Bad area block list.");
 		return false;
 	} else {
@@ -292,42 +292,42 @@ BlockAllocator::Area::SanityCheck() const
 		for (int32 i = 0; i < blockCount; i++) {
 			blockListOK = false;
 			if (!block) {
-				FATAL(("Encountered NULL in block list at index %ld, although "
-					   "list should have %ld blocks\n", i, blockCount));
+				FATAL("Encountered NULL in block list at index %ld, although "
+					   "list should have %ld blocks\n", i, blockCount);
 				BA_PANIC("Bad area block list.");
 				return false;
 			}
-			uint64 address = (uint32)block;
+			uint64 address = (addr_t)block;
 			// block within area?
-			if (address < (uint32)this + areaHeaderSize
-				|| address + sizeof(TFreeBlock) > (uint32)this + fSize) {
-				FATAL(("Utterly mislocated block: %p, area: %p, "
-					   "size: %lu\n", block, this, fSize));
+			if (address < (addr_t)this + areaHeaderSize
+				|| address + sizeof(TFreeBlock) > (addr_t)this + fSize) {
+				FATAL("Utterly mislocated block: %p, area: %p, "
+					   "size: %lu\n", block, this, fSize);
 				BA_PANIC("Bad area block.");
 				return false;
 			}
 			// block too large for area?
 			size_t blockSize = block->GetSize();
 			if (blockSize < sizeof(TFreeBlock)
-				|| address + blockSize > (uint32)this + fSize) {
-				FATAL(("Mislocated block: %p, size: %lu, area: %p, "
-					   "size: %lu\n", block, blockSize, this, fSize));
+				|| address + blockSize > (addr_t)this + fSize) {
+				FATAL("Mislocated block: %p, size: %lu, area: %p, "
+					   "size: %lu\n", block, blockSize, this, fSize);
 				BA_PANIC("Bad area block.");
 				return false;
 			}
 			// alignment
 			if (block_align_floor(address) != address
 				|| block_align_floor(blockSize) != blockSize) {
-				FATAL(("Block %ld not properly aligned: %p, size: %lu\n",
-					   i, block, blockSize));
+				FATAL("Block %ld not properly aligned: %p, size: %lu\n",
+					   i, block, blockSize);
 				BA_PANIC("Bad area block.");
 				return false;
 			}
 			// previous block
 			if (block->GetPreviousBlock() != prevBlock) {
-				FATAL(("Previous block of block %ld was not the previous "
+				FATAL("Previous block of block %ld was not the previous "
 					   "block in list: %p vs %p\n", i,
-					   block->GetPreviousBlock(), prevBlock));
+					   block->GetPreviousBlock(), prevBlock);
 				BA_PANIC("Bad area block list.");
 				return false;
 			}
@@ -341,16 +341,16 @@ BlockAllocator::Area::SanityCheck() const
 					freeBytes += freeBlock->GetUsableSize();
 				// block == next free block of previous free block
 				if (freeBlock != nextFree) {
-					FATAL(("Free block %ld is not the next block in free "
-						   "list: %p vs %p\n", i, freeBlock, nextFree));
+					FATAL("Free block %ld is not the next block in free "
+						   "list: %p vs %p\n", i, freeBlock, nextFree);
 					BA_PANIC("Bad area free list.");
 					return false;
 				}
 				// previous free block
 				if (freeBlock->GetPreviousFreeBlock() != prevFree) {
-					FATAL(("Previous free block of block %ld was not the "
+					FATAL("Previous free block of block %ld was not the "
 						   " previous block in free list: %p vs %p\n", i,
-						   freeBlock->GetPreviousFreeBlock(), prevFree));
+						   freeBlock->GetPreviousFreeBlock(), prevFree);
 					BA_PANIC("Bad area free list.");
 					return false;
 				}
@@ -365,37 +365,37 @@ BlockAllocator::Area::SanityCheck() const
 		// final checks on block list
 		if (blockListOK) {
 			if (block) {
-				FATAL(("More blocks in block list than expected\n"));
+				FATAL("More blocks in block list than expected\n");
 				BA_PANIC("Bad area block count.");
 				return false;
 			} else if (fLastBlock != prevBlock) {
-				FATAL(("last block in block list was %p, but should be "
-					   "%p\n", fLastBlock, prevBlock));
+				FATAL("last block in block list was %p, but should be "
+					   "%p\n", fLastBlock, prevBlock);
 				BA_PANIC("Bad area last block.");
 				return false;
 			} else if (prevFree != fLastFree) {
-				FATAL(("last block in free list was %p, but should be %p\n",
-					   fLastFree, prevFree));
+				FATAL("last block in free list was %p, but should be %p\n",
+					   fLastFree, prevFree);
 				BA_PANIC("Bad area last free block.");
 				return false;
 			}
 			// block counts (a bit reduntant)
 			if (freeBlockCount != fFreeBlockCount) {
-				FATAL(("Free block count is %ld, but should be %ld\n",
-					   fFreeBlockCount, freeBlockCount));
+				FATAL("Free block count is %ld, but should be %ld\n",
+					   fFreeBlockCount, freeBlockCount);
 				BA_PANIC("Bad area free block count.");
 				return false;
 			}
 			if (usedBlockCount != fUsedBlockCount) {
-				FATAL(("Used block count is %ld, but should be %ld\n",
-					   fUsedBlockCount, usedBlockCount));
+				FATAL("Used block count is %ld, but should be %ld\n",
+					   fUsedBlockCount, usedBlockCount);
 				BA_PANIC("Bad area used block count.");
 				return false;
 			}
 			// free bytes
 			if (fFreeBytes != freeBytes) {
-				FATAL(("Free bytes is %lu, but should be %lu\n",
-					   fFreeBytes, freeBytes));
+				FATAL("Free bytes is %lu, but should be %lu\n",
+					   fFreeBytes, freeBytes);
 				BA_PANIC("Bad area free bytes.");
 				return false;
 			}
@@ -412,7 +412,7 @@ BlockAllocator::Area::CheckBlock(Block *checkBlock, size_t minSize)
 		if (block == checkBlock)
 			return (block->GetUsableSize() >= minSize);
 	}
-	FATAL(("Block %p is not in area %p!\n", checkBlock, this));
+	FATAL("Block %p is not in area %p!\n", checkBlock, this);
 	BA_PANIC("Invalid Block.");
 	return false;
 }
@@ -441,7 +441,7 @@ BlockAllocator::Area::_InsertFreeBlock(TFreeBlock *block)
 		for (nextFree = GetFirstFreeBlock();
 			 nextFree;
 			 nextFree = nextFree->GetNextFreeBlock()) {
-			if ((uint32)nextFree > (uint32)block)
+			if ((addr_t)nextFree > (addr_t)block)
 				break;
 		}
 		// get the previous block and insert the block between the two

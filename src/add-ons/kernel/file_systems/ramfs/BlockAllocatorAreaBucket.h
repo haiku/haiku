@@ -7,7 +7,7 @@
 
 #include "BlockAllocator.h"
 #include "BlockAllocatorArea.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 
 
 class BlockAllocator::AreaBucket {

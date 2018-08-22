@@ -1,7 +1,7 @@
 // Directory.cpp
 
 #include "AllocationInfo.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Directory.h"
 #include "Entry.h"
 #include "EntryIterator.h"
@@ -231,8 +231,8 @@ Directory::DeleteEntry(Entry *entry)
 		if (error == B_OK)
 			delete entry;
 		else {
-			FATAL(("Failed to Unlink() entry %p from node %Ld!\n", entry,
-				   entry->GetNode()->GetID()));
+			FATAL("Failed to Unlink() entry %p from node %Ld!\n", entry,
+				   entry->GetNode()->GetID());
 			AddEntry(entry);
 		}
 	}

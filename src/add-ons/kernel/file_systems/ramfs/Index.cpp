@@ -1,6 +1,6 @@
 // Index.cpp
 
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Directory.h"
 #include "Entry.h"
 #include "Index.h"

@@ -28,7 +28,7 @@
 #include <OS.h>
 
 #include "AreaUtils.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Misc.h"
 
 #ifndef USE_STANDARD_FUNCTIONS
@@ -79,8 +79,8 @@ AreaUtils::free(void *ptr)
 				// everything is fine, delete the area
 				delete_area(info.area);
 			} else {
-				INFORM(("WARNING: AreaUtils::free(%p): area begin is %p."
-						"Ignored.\n", ptr, info.address));
+				INFORM("WARNING: AreaUtils::free(%p): area begin is %p."
+						"Ignored.\n", ptr, info.address);
 			}
 		}
 	}
@@ -149,8 +149,8 @@ AreaUtils::realloc(void * ptr, size_t size)
 					}
 				}
 			} else {
-				INFORM(("WARNING: AreaUtils::realloc(%p): area begin is %p."
-						"Ignored.\n", ptr, info.address));
+				INFORM("WARNING: AreaUtils::realloc(%p): area begin is %p."
+						"Ignored.\n", ptr, info.address);
 			}
 		}
 	}

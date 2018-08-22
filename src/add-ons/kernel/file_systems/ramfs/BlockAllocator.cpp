@@ -7,7 +7,7 @@
 #include "BlockAllocator.h"
 #include "BlockAllocatorArea.h"
 #include "BlockAllocatorAreaBucket.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 
 
 // BlockAllocator
@@ -175,15 +175,15 @@ BlockAllocator::SanityCheck(bool deep) const
 	}
 	// area count
 	if (areaCount != fAreaCount) {
-		FATAL(("fAreaCount is %ld, but should be %ld\n", fAreaCount,
-			   areaCount));
+		FATAL("fAreaCount is %ld, but should be %ld\n", fAreaCount,
+			   areaCount);
 		BA_PANIC("BlockAllocator: Bad free bytes.");
 		return false;
 	}
 	// free bytes
 	if (fFreeBytes != freeBytes) {
-		FATAL(("fFreeBytes is %lu, but should be %lu\n", fFreeBytes,
-			   freeBytes));
+		FATAL("fFreeBytes is %lu, but should be %lu\n", fFreeBytes,
+			   freeBytes);
 		BA_PANIC("BlockAllocator: Bad free bytes.");
 		return false;
 	}
@@ -203,7 +203,7 @@ BlockAllocator::CheckArea(Area *checkArea)
 				return true;
 		}
 	}
-	FATAL(("Area %p is not a valid Area!\n", checkArea));
+	FATAL("Area %p is not a valid Area!\n", checkArea);
 	BA_PANIC("Invalid Area.");
 	return false;
 }

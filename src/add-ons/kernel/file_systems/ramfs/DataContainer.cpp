@@ -4,7 +4,7 @@
 #include "Attribute.h"	// for debugging only
 #include "Block.h"
 #include "DataContainer.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Misc.h"
 #include "Node.h"		// for debugging only
 #include "Volume.h"
@@ -405,7 +405,7 @@ DataContainer::_SwitchToSmallBufferMode(size_t newSize)
 	// remove the first (and only) block
 	BlockList *blocks = _GetBlockList();
 	BlockReference *block = blocks->ItemAt(0);
-	blocks->RemoveItem(0L);
+	blocks->RemoveItem((int32)0L);
 	// destroy the block list and copy the data into the small buffer
 	blocks->~BlockList();
 	if (newSize > 0)

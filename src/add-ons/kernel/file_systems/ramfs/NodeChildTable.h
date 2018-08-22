@@ -4,7 +4,7 @@
 #define NODE_CHILD_TABLE_H
 
 #include "AllocationInfo.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Misc.h"
 #include "Node.h"
 #include "OpenHashTable.h"

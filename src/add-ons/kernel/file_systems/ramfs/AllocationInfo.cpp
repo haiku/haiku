@@ -1,7 +1,7 @@
 // AllocationInfo.cpp
 
 #include "AllocationInfo.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 
 #include "Attribute.h"
 #include "Directory.h"

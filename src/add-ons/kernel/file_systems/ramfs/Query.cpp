@@ -12,7 +12,7 @@
 
 
 #include "Query.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Directory.h"
 #include "Entry.h"
 #include "Misc.h"
@@ -874,7 +874,7 @@ Equation::ConvertValue(type_code type)
 			fSize = sizeof(double);
 			break;
 		default:
-			FATAL(("query value conversion to 0x%lx requested!\n", type));
+			FATAL("query value conversion to 0x%lx requested!\n", type);
 			// should we fail here or just do a safety int32 conversion?
 			return B_ERROR;
 	}
@@ -921,7 +921,7 @@ Equation::CompareTo(const uint8 *value, uint16 size)
 		case OP_GREATER_THAN_OR_EQUAL:
 			return compare >= 0;
 	}
-	FATAL(("Unknown/Unsupported operation: %d\n", fOp));
+	FATAL("Unknown/Unsupported operation: %d\n", fOp);
 	return false;
 }
 
@@ -1202,7 +1202,7 @@ Equation::GetNextMatching(Volume *volume, IndexIterator *iterator,
 					other = parent->Left();
 
 				if (other == NULL) {
-					FATAL(("&&-operator has only one child... (parent = %p)\n", parent));
+					FATAL("&&-operator has only one child... (parent = %p)\n", parent);
 					break;
 				}
 				status = other->Match(entry, entry->GetNode());

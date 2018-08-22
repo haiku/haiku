@@ -2,7 +2,7 @@
 
 #include <TypeConstants.h>
 
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Entry.h"
 #include "EntryListener.h"
 #include "IndexImpl.h"

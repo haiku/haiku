@@ -1,6 +1,6 @@
 // NodeTable.cpp
 
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "NodeTable.h"
 
 // constructor

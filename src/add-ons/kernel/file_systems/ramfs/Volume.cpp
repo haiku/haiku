@@ -28,7 +28,7 @@
 
 #include "Block.h"
 #include "BlockAllocator.h"
-#include "Debug.h"
+#include "DebugSupport.h"
 #include "Directory.h"
 #include "Entry.h"
 #include "EntryListener.h"
@@ -754,7 +754,7 @@ Volume::FindAttributeIndex(const char *name, uint32 type)
 void
 Volume::AddQuery(Query *query)
 {
-	AutoLocker<Locker> _(fQueryLocker);
+	AutoLocker<RecursiveLock> _(fQueryLocker);
 
 	if (query)
 		fQueries.Insert(query);
@@ -764,7 +764,7 @@ Volume::AddQuery(Query *query)
 void
 Volume::RemoveQuery(Query *query)
 {
-	AutoLocker<Locker> _(fQueryLocker);
+	AutoLocker<RecursiveLock> _(fQueryLocker);
 
 	if (query)
 		fQueries.Remove(query);
@@ -776,7 +776,7 @@ Volume::UpdateLiveQueries(Entry *entry, Node* node, const char *attribute,
 	int32 type, const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
 	size_t newLength)
 {
-	AutoLocker<Locker> _(fQueryLocker);
+	AutoLocker<RecursiveLock> _(fQueryLocker);
 
 	for (Query* query = fQueries.First();
 		 query;
