@@ -1336,8 +1336,8 @@ StreamReader::ReadAt(off_t position, void *buffer, size_t bufferSize,
 			   && (error = _SeekTo(position)) == B_OK) {
 //PRINT(("  seeked to %Ld: fItemOffset: %Ld, fItemSize: %Ld\n", position,
 //fItemOffset, fItemSize));
-			off_t inItemOffset = max(0LL, position - fItemOffset);
-			off_t toRead = min(fItemSize - inItemOffset, (off_t)bufferSize);
+			off_t inItemOffset = max_c(0LL, position - fItemOffset);
+			off_t toRead = min_c(fItemSize - inItemOffset, (off_t)bufferSize);
 			switch (fItem.GetType()) {
 				case TYPE_INDIRECT:
 					error = _ReadIndirectItem(inItemOffset, buffer, toRead);
@@ -1520,8 +1520,8 @@ StreamReader::_ReadIndirectItem(off_t offset, void *buffer, size_t bufferSize)
 		if (error == B_OK) {
 			// copy the data into the buffer
 			off_t blockOffset = i * (off_t)fBlockSize;
-			uint32 localOffset = max(0LL, offset - blockOffset);
-			uint32 toRead = min(fBlockSize - localOffset, bufferSize);
+			uint32 localOffset = max_c(0LL, offset - blockOffset);
+			uint32 toRead = min_c(fBlockSize - localOffset, bufferSize);
 			memcpy(buffer, (uint8*)block->GetData() + localOffset, toRead);
 			block->Put();
 			bufferSize -= toRead;
