@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
 UseBuildFeatureHeaders zlib ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders package shared storage support ;
+UsePrivateHeaders package shared storage support file_systems ;
 
 local zstdSources ;
 local zstdKernelLib ;
@@ -37,7 +37,6 @@ HAIKU_PACKAGE_FS_SOURCES =
 	AutoPackageAttributes.cpp
 	BlockBufferPoolKernel.cpp
 	CachedDataReader.cpp
-	DebugSupport.cpp
 	Dependency.cpp
 	Directory.cpp
 	EmptyAttributeDirectoryCookie.cpp
@@ -82,6 +81,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 
 HAIKU_PACKAGE_FS_SHARED_SOURCES =
 	QueryParserUtils.cpp
+	DebugSupport.cpp
 ;
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
