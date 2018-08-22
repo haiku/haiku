@@ -7524,6 +7524,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 			status = volume->file_system->mount(volume, device, flags, args,
 				&rootID);
 			if (status != B_OK || volume->ops == NULL) {
+				if (status == B_OK && volume->ops == NULL)
+					panic("fs_mount: mount() succeeded but ops is NULL!");
 				if (volume->sub_volume)
 					goto err4;
 				goto err3;
