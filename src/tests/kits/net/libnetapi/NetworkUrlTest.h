@@ -45,6 +45,7 @@ public:
 			void				TestWhitespaceMiddle();
 			void				TestHttpNoHost();
 			void				TestEmpty();
+			void				TestBadHosts();
 
 	static	void				AddTests(BTestSuite& suite);
 

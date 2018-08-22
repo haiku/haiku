@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Haiku Inc. All rights reserved.
+ * Copyright 2010-2018 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -497,11 +497,19 @@ BUrl::IsValid() const
 	if (!fHasProtocol)
 		return false;
 
+	if (!_IsProtocolValid())
+		return false;
+
+	// it is possible that there can be an authority but no host.
+	// wierd://tea:tree@/x
+	if (HasHost() && !(fHost.IsEmpty() && HasAuthority()) && !_IsHostValid())
+		return false;
+
 	if (fProtocol == "http" || fProtocol == "https" || fProtocol == "ftp"
 		|| fProtocol == "ipp" || fProtocol == "afp" || fProtocol == "telnet"
 		|| fProtocol == "gopher" || fProtocol == "nntp" || fProtocol == "sftp"
 		|| fProtocol == "finger" || fProtocol == "pop" || fProtocol == "imap") {
-		return fHasHost && !fHost.IsEmpty();
+		return HasHost() && !fHost.IsEmpty();
 	}
 
 	if (fProtocol == "file")
@@ -1124,40 +1132,6 @@ enum authority_parse_state {
 	AUTHORITY_COMPLETE
 };
 
-
-static bool
-authority_is_username_char(char c)
-{
-	return !(c == ':' || c == '@');
-}
-
-
-static bool
-authority_is_password_char(char c)
-{
-	return !(c == '@');
-}
-
-
-static bool
-authority_is_ipv6_host_char(char c) {
-	return (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')
-		|| (c >= '0' && c <= '9') || c == ':';
-}
-
-
-static bool
-authority_is_host_char(char c) {
-	return !(c == ':' || c == '/');
-}
-
-
-static bool
-authority_is_port_char(char c) {
-	return c >= '0' && c <= '9';
-}
-
-
 void
 BUrl::SetAuthority(const BString& authority)
 {
@@ -1185,8 +1159,7 @@ BUrl::SetAuthority(const BString& authority)
 			{
 				if (hasUsernamePassword) {
 					int32 end_username = char_offset_until_fn_false(
-						authority_c, length, offset,
-						authority_is_username_char);
+						authority_c, length, offset, _IsUsernameChar);
 
 					SetUserName(BString(&authority_c[offset],
 						end_username - offset));
@@ -1204,8 +1177,7 @@ BUrl::SetAuthority(const BString& authority)
 				if (hasUsernamePassword && ':' == authority[offset]) {
 					offset++; // move past the delimiter
 					int32 end_password = char_offset_until_fn_false(
-						authority_c, length, offset,
-						authority_is_password_char);
+						authority_c, length, offset, _IsPasswordChar);
 
 					SetPassword(BString(&authority_c[offset],
 						end_password - offset));
@@ -1232,8 +1204,7 @@ BUrl::SetAuthority(const BString& authority)
 
 				if (authority_c[offset] == '[') {
 					int32 end_ipv6_host = char_offset_until_fn_false(
-						authority_c, length, offset + 1,
-						authority_is_ipv6_host_char);
+						authority_c, length, offset + 1, _IsIPV6Char);
 
 					if (authority_c[end_ipv6_host] == ']') {
 						SetHost(BString(&authority_c[offset],
@@ -1247,7 +1218,7 @@ BUrl::SetAuthority(const BString& authority)
 
 				if (AUTHORITY_HOST == state) {
 					int32 end_host = char_offset_until_fn_false(
-						authority_c, length, offset, authority_is_host_char);
+						authority_c, length, offset, _IsHostChar);
 
 					SetHost(BString(&authority_c[offset], end_host - offset));
 					state = AUTHORITY_PORT;
@@ -1262,7 +1233,7 @@ BUrl::SetAuthority(const BString& authority)
 				if (authority_c[offset] == ':') {
 					offset++;
 					int32 end_port = char_offset_until_fn_false(
-						authority_c, length, offset, authority_is_port_char);
+						authority_c, length, offset, _IsPortChar);
 					SetPort(atoi(&authority_c[offset]));
 					offset = end_port;
 				}
@@ -1345,7 +1316,50 @@ BUrl::_DoUrlDecodeChunk(const BString& chunk, bool strict)
 
 
 bool
-BUrl::_IsProtocolValid()
+BUrl::_IsHostIPV6Valid(size_t offset, int32 length) const
+{
+	for (int32 i = 0; i < length; i++) {
+		char c = fHost[offset + i];
+		if (!_IsIPV6Char(c))
+			return false;
+	}
+
+	return length > 0;
+}
+
+
+bool
+BUrl::_IsHostValid() const
+{
+	if (fHost.StartsWith("[") && fHost.EndsWith("]"))
+		return _IsHostIPV6Valid(1, fHost.Length() - 2);
+
+	bool lastWasDot = false;
+
+	for (int32 i = 0; i < fHost.Length(); i++) {
+		char c = fHost[i];
+
+		if (c == '.') {
+			if (lastWasDot || i == 0)
+				return false;
+			lastWasDot = true;
+		} else {
+			lastWasDot = false;
+		}
+
+		if (!_IsHostChar(c) && c != '.') {
+			// the underscore is technically not allowed, but occurs sometimes
+			// in the wild.
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool
+BUrl::_IsProtocolValid() const
 {
 	for (int8 index = 0; index < fProtocol.Length(); index++) {
 		char c = fProtocol[index];
@@ -1356,7 +1370,7 @@ BUrl::_IsProtocolValid()
 			return false;
 	}
 
-	return fProtocol.Length() > 0;
+	return !fProtocol.IsEmpty();
 }
 
 
@@ -1381,6 +1395,42 @@ BUrl::_IsSubDelim(char c)
 	return c == '!' || c == '$' || c == '&' || c == '\'' || c == '('
 		|| c == ')' || c == '*' || c == '+' || c == ',' || c == ';'
 		|| c == '=';
+}
+
+
+bool
+BUrl::_IsUsernameChar(char c)
+{
+	return !(c == ':' || c == '@');
+}
+
+
+bool
+BUrl::_IsPasswordChar(char c)
+{
+	return !(c == '@');
+}
+
+
+bool
+BUrl::_IsHostChar(char c)
+{
+	return ((uint8) c) > 127 || isalnum(c) || c == '-' || c == '_' || c == '.'
+		|| c == '%';
+}
+
+
+bool
+BUrl::_IsPortChar(char c)
+{
+	return isdigit(c);
+}
+
+
+bool
+BUrl::_IsIPV6Char(char c)
+{
+	return c == ':' || isxdigit(c);
 }
 
 

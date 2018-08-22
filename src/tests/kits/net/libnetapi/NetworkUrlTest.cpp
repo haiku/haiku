@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Andrew Lindesay, apl@lindesay.co.nz.
+ * Copyright 2016-2018, Andrew Lindesay, apl@lindesay.co.nz.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,7 +34,7 @@ NetworkUrlTest::tearDown()
 }
 
 
-// General Tests ---------------------------------------------------------------
+// #pragma mark - General Tests
 
 /*
 This is the "happy days" tests that checks that a URL featuring all of the
@@ -103,13 +103,13 @@ void NetworkUrlTest::TestHostWithFragment()
 
 void NetworkUrlTest::TestIpv6HostPortPathAndRequest()
 {
-	BUrl url("http://[123:123:0:123::123]:8080/some/path?key1=value1");
+	BUrl url("http://[123:a3:0:E3::123]:8080/some/path?key1=value1");
 	CPPUNIT_ASSERT(url.IsValid());
 	CPPUNIT_ASSERT(url.Protocol() == "http");
 	CPPUNIT_ASSERT(url.HasProtocol());
 	CPPUNIT_ASSERT(!url.HasUserName());
 	CPPUNIT_ASSERT(!url.HasPassword());
-	CPPUNIT_ASSERT(url.Host() == "[123:123:0:123::123]");
+	CPPUNIT_ASSERT(url.Host() == "[123:a3:0:E3::123]");
 	CPPUNIT_ASSERT(url.HasHost());
 	CPPUNIT_ASSERT(url.Port() == 8080);
 	CPPUNIT_ASSERT(url.HasPort());
@@ -154,7 +154,7 @@ void NetworkUrlTest::TestDataUrl()
 }
 
 
-// Authority Tests (UserName, Password, Host, Port) ----------------------------
+// #pragma mark - Authority Tests (UserName, Password, Host, Port)
 
 
 void NetworkUrlTest::TestWithUserNameAndPasswordNoHostAndPort()
@@ -299,7 +299,7 @@ void NetworkUrlTest::TestMailTo()
 }
 
 
-// Various Authority Checks ----------------------------------------------------
+// #pragma mark - Various Authority Checks
 
 
 void NetworkUrlTest::TestAuthorityNoUserName()
@@ -353,7 +353,7 @@ void NetworkUrlTest::TestAuthorityBadPort()
 }
 
 
-// Invalid Forms ---------------------------------------------------------------
+// #pragma mark - Invalid Forms
 
 
 void NetworkUrlTest::TestWhitespaceBefore()
@@ -391,7 +391,40 @@ void NetworkUrlTest::TestEmpty()
 }
 
 
-// Control ---------------------------------------------------------------------
+// #pragma mark - Host validation
+
+
+void NetworkUrlTest::TestBadHosts()
+{
+	CPPUNIT_ASSERT_MESSAGE("control check",
+		BUrl("http://host.example.com").IsValid());
+
+	CPPUNIT_ASSERT_MESSAGE("hyphen in middle",
+		(BUrl("http://host.peppermint_tea.com").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("dot at end",
+		(BUrl("http://host.camomile.co.nz.").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("simple host",
+		(BUrl("http://tumeric").IsValid()));
+
+	CPPUNIT_ASSERT_MESSAGE("idn domain encoded",
+		(BUrl("http://xn--bcher-kva.tld").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("idn domain unencoded",
+		(BUrl("http://www.b\xc3\xbcch.at").IsValid()));
+
+	CPPUNIT_ASSERT_MESSAGE("dot at start",
+		!(BUrl("http://.host.example.com").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("double dot in domain",
+		!(BUrl("http://host.example..com").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("double dot",
+		!(BUrl("http://host.example..com").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("unexpected characters",
+		!(BUrl("http://<unexpected.characters>").IsValid()));
+	CPPUNIT_ASSERT_MESSAGE("whitespace",
+		!(BUrl("http://host.exa ple.com").IsValid()));
+}
+
+
+// #pragma mark - Control
 
 
 /*static*/ void
@@ -467,6 +500,8 @@ NetworkUrlTest::AddTests(BTestSuite& parent)
 		&NetworkUrlTest::TestFileUrl));
 	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
 		"NetworkUrlTest::TestValidFullUrl", &NetworkUrlTest::TestValidFullUrl));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestBadHosts", &NetworkUrlTest::TestBadHosts));
 
 	parent.addTest("NetworkUrlTest", &suite);
 }

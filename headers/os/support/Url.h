@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Haiku Inc. All rights reserved.
+ * Copyright 2010-2018 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_URL_H_
@@ -113,10 +113,18 @@ private:
 	static 	BString				_DoUrlDecodeChunk(const BString& chunk,
 									bool strict);
 
-			bool				_IsProtocolValid();
+			bool				_IsHostValid() const;
+			bool				_IsHostIPV6Valid(size_t offset,
+									int32 length) const;
+			bool				_IsProtocolValid() const;
 	static	bool				_IsUnreserved(char c);
 	static	bool				_IsGenDelim(char c);
 	static	bool				_IsSubDelim(char c);
+	static	bool				_IsIPV6Char(char c);
+	static	bool				_IsUsernameChar(char c);
+	static	bool				_IsPasswordChar(char c);
+	static	bool				_IsHostChar(char c);
+	static	bool				_IsPortChar(char c);
 
 			BString				_UrlMimeType() const;
 
