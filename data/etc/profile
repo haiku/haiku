@@ -13,8 +13,8 @@ else
 fi
 unset ARCH
 
-PS1='`if [ $? = 0 ]; then echo "\e[32m";
-	else echo "\e[31m\]"; fi`'"$PS1\e[0m\]> "
+PS1="\["'`if [ $? = 0 ]; then echo "\e[32m";
+	else echo "\e[31m"; fi`'"\]$PS1\[\e[0m\]> "
 
 export USER=`id -un`
 export GROUP=`id -gn`
