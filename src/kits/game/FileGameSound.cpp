@@ -25,10 +25,10 @@
 const int32 kPages = 20;
 struct _gs_media_tracker
 {
-	BMediaFile*		file;
-	BMediaTrack* 	stream;
-	int64			frames;
-	size_t			position;
+	BMediaFile*	file;
+	BMediaTrack*	stream;
+	int64		frames;
+	size_t		position;
 };
 
 
@@ -341,12 +341,13 @@ BFileGameSound::SetPaused(bool isPaused, bigtime_t rampTime)
 
 	if (rampTime > 100000) {
 		// Setup for ramping
-		if (isPaused)
+		if (isPaused) {
 			fPausing = InitRamp(&fPauseGain, 0.0,
-								Format().frame_rate, rampTime);
-		else
+					Format().frame_rate, rampTime);
+		} else {
 			fPausing = InitRamp(&fPauseGain, 1.0,
-								Format().frame_rate, rampTime);
+					Format().frame_rate, rampTime);
+		}
 	}
 
 	fPaused = isPaused;
