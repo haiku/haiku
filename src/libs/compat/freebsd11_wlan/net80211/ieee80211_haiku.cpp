@@ -695,7 +695,6 @@ ieee80211_sysctl_vattach(struct ieee80211vap* vap)
 		| IEEE80211_MSG_WME
 		| IEEE80211_MSG_DOTH
 		| IEEE80211_MSG_INACT
-		| IEEE80211_MSG_11N
 		| IEEE80211_MSG_ROAM;
 }
 
