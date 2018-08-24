@@ -212,10 +212,8 @@ StreamBase::StreamBase(BMediaIO* source, BLocker* sourceLock,
 
 StreamBase::~StreamBase()
 {
-	if (fContext != NULL)
-		avformat_close_input(&fContext);
+	avformat_close_input(&fContext);
 	av_free_packet(&fPacket);
-	avformat_free_context(fContext);
 	if (fIOContext != NULL)
 		av_free(fIOContext->buffer);
 	av_free(fIOContext);
