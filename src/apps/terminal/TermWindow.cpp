@@ -838,6 +838,18 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case MSG_BLINK_CURSOR_CHANGED:
+		{
+			bool blinkingCursor
+				= PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+
+			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
+				TermView* view = _TermViewAt(i);
+				view->SwitchCursorBlinking(blinkingCursor);
+			}
+			break;
+		}
+
 		case MSG_HALF_FONT_CHANGED:
 		case MSG_FULL_FONT_CHANGED:
 		case MSG_ALLOW_BOLD_CHANGED:

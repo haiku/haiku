@@ -774,7 +774,8 @@ TermView::SetTermFont(const BFont *font)
 
 	fCursorStyle = PrefHandler::Default() == NULL ? BLOCK_CURSOR
 		: PrefHandler::Default()->getCursor(PREF_CURSOR_STYLE);
-	fCursorBlinking = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+	bool blinking = PrefHandler::Default()->getBool(PREF_BLINK_CURSOR);
+	SwitchCursorBlinking(blinking);
 
 	fEmulateBold = PrefHandler::Default() == NULL ? false
 		: PrefHandler::Default()->getBool(PREF_EMULATE_BOLD);
@@ -794,6 +795,26 @@ TermView::SetScrollBar(BScrollBar *scrollBar)
 	fScrollBar = scrollBar;
 	if (fScrollBar != NULL)
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
+}
+
+
+void
+TermView::SwitchCursorBlinking(bool blinkingOn)
+{
+	fCursorBlinking = blinkingOn;
+	if (blinkingOn) {
+		if (fCursorBlinkRunner == NULL) {
+			BMessage blinkMessage(kBlinkCursor);
+			fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
+				BMessenger(this), &blinkMessage, kCursorBlinkInterval);
+		}
+	} else {
+		// make sure the cursor becomes visible
+		fCursorState = 0;
+		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+		delete fCursorBlinkRunner;
+		fCursorBlinkRunner = NULL;
+	}
 }
 
 
@@ -915,29 +936,10 @@ TermView::_DetachShell()
 
 
 void
-TermView::_SwitchCursorBlinking(bool blinkingOn)
-{
-	if (blinkingOn) {
-		if (fCursorBlinkRunner == NULL) {
-			BMessage blinkMessage(kBlinkCursor);
-			fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
-				BMessenger(this), &blinkMessage, kCursorBlinkInterval);
-		}
-	} else {
-		// make sure the cursor becomes visible
-		fCursorState = 0;
-		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
-		delete fCursorBlinkRunner;
-		fCursorBlinkRunner = NULL;
-	}
-}
-
-
-void
 TermView::_Activate()
 {
 	fActive = true;
-	_SwitchCursorBlinking(fCursorBlinking);
+	SwitchCursorBlinking(fCursorBlinking);
 }
 
 
@@ -948,7 +950,7 @@ TermView::_Deactivate()
 	fCursorState = 0;
 	_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
 
-	_SwitchCursorBlinking(false);
+	SwitchCursorBlinking(false);
 
 	fActive = false;
 }
@@ -1792,10 +1794,8 @@ TermView::MessageReceived(BMessage *msg)
 				fCursorStyle = style;
 
 			bool blinking = fCursorBlinking;
-			if (msg->FindBool("blinking", &blinking) == B_OK) {
-				fCursorBlinking = blinking;
-				_SwitchCursorBlinking(fCursorBlinking);
-			}
+			if (msg->FindBool("blinking", &blinking) == B_OK)
+				SwitchCursorBlinking(blinking);
 
 			bool hidden = fCursorHidden;
 			if (msg->FindBool("hidden", &hidden) == B_OK)

@@ -103,6 +103,8 @@ public:
 			void				MakeDebugSnapshots();
 			void				StartStopDebugCapture();
 
+			void				SwitchCursorBlinking(bool blinkingOn);
+
 			// edit functions
 			void				Copy(BClipboard* clipboard);
 			void				Paste(BClipboard* clipboard);
@@ -191,7 +193,6 @@ private:
 
 			void				_Activate();
 			void				_Deactivate();
-			void				_SwitchCursorBlinking(bool blinkingOn);
 
 			void				_DrawLinePart(int32 x1, int32 y1, uint32 attr,
 									char* buffer, int32 width,
