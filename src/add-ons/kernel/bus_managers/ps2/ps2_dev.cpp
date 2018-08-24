@@ -368,7 +368,9 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 	int out_count, uint8* in, int in_count, bigtime_t timeout)
 {
 	status_t res;
+#ifdef TRACE_PS2
 	bigtime_t start;
+#endif
 	int32 sem_count;
 	int i;
 
@@ -426,16 +428,18 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 		}
 
 		release_sem(gControllerSem);
-
+#ifdef TRACE_PS2
 		start = system_time();
+#endif
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, timeout);
 
 		if (res != B_OK)
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 
+#ifdef TRACE_PS2
 		TRACE("ps2: ps2_dev_command wait for ack res 0x%08" B_PRIx32 ", "
 			"wait-time %" B_PRId64 "\n", res, system_time() - start);
-
+#endif
 		if (atomic_get(&dev->flags) & PS2_FLAG_ACK) {
 			TRACE("ps2: ps2_dev_command got ACK\n");
 		}
@@ -454,7 +458,9 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 		if (in_count == 0) {
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 		} else {
+#ifdef TRACE_PS2
 			start = system_time();
+#endif
 			res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT,
 				timeout);
 
@@ -468,11 +474,12 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 				res = B_IO_ERROR;
 			}
 
+#ifdef TRACE_PS2
 			TRACE("ps2: ps2_dev_command wait for input res 0x%08" B_PRIx32 ", "
 				"wait-time %" B_PRId64 "\n", res, system_time() - start);
-
 			for (i = 0; i < in_count; i++)
 				TRACE("ps2: ps2_dev_command rx: 0x%02x\n", in[i]);
+#endif
 		}
 	}
 
