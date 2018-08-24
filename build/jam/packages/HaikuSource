@@ -9,6 +9,7 @@ CopyDirectoryToPackage sources haiku : [ FDirName $(HAIKU_TOP) build ]
 	: build ;
 SEARCH on configure = [ FDirName $(HAIKU_TOP) ] ;
 SEARCH on Jamfile = [ FDirName $(HAIKU_TOP) ] ;
+SEARCH on Jamrules = [ FDirName $(HAIKU_TOP) ] ;
 AddFilesToPackage sources haiku : configure Jamfile Jamrules ;
 
 BuildHaikuPackage $(haikuSourcePackage) : haiku_source ;
