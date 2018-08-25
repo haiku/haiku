@@ -13,7 +13,7 @@
 // Message Signaled Interrupts
 
 
-class PCIDev;
+struct PCIDev;
 
 // MSI
 typedef struct msi_info {
