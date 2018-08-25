@@ -5,7 +5,6 @@ SubInclude HAIKU_TOP src add-ons media media-add-ons dvb ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons equalizer ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons esound_sink ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons firewire_dv ;
-SubInclude HAIKU_TOP src add-ons media media-add-ons legacy ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons mixer ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons multi_audio ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons opensound ;
