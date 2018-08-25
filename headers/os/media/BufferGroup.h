@@ -11,7 +11,7 @@
 
 class BBuffer;
 namespace BPrivate {
-	struct SharedBufferList;
+	class SharedBufferList;
 }
 
 
@@ -55,7 +55,7 @@ private:
 			status_t		_Init();
 
 private:
-	friend struct BPrivate::SharedBufferList;
+	friend class BPrivate::SharedBufferList;
 
 			status_t		fInitError;
 			status_t		fRequestError;
