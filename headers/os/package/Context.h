@@ -11,7 +11,7 @@
 
 
 namespace BSupportKit {
-	class BJobStateListener;
+	struct BJobStateListener;
 }
 
 
