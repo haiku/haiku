@@ -73,12 +73,12 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	AddHaikuImagePackages pkgconfig scons ;
 	AddHaikuImageSourcePackages pkgconfig ;
 
-	# devel packages for mandatory packages
+	# devel packages for some of the base set
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImagePackages curl_devel ffmpeg_devel fontconfig_devel
-				freetype_devel glu_devel jpeg_devel libpng16_devel zlib_devel ;
+			AddHaikuImagePackages curl_devel glu_devel jpeg_devel
+				libpng16_devel zlib_devel ;
 		}
 	}
 }
