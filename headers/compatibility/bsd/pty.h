@@ -17,7 +17,7 @@ __BEGIN_DECLS
 
 extern int		openpty(int* master, int* slave, char* name,
 					struct termios* termAttrs, struct winsize* windowSize);
-extern int		login_pty(int fd);
+extern int		login_tty(int fd);
 extern pid_t	forkpty(int* master, char* name,
 					struct termios* termAttrs, struct winsize* windowSize);
 
