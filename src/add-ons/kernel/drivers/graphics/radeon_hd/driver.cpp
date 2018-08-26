@@ -205,6 +205,7 @@ const struct supported_device {
 	{0x9802, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9803, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6310"},
 	{0x9806, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 6320"},
+	{0x9808, 4, 1, RADEON_PALM, CHIP_APU, "Radeon HD 7340"},
 	//  Sumo (no VGA / LVDS!, only DP)
 	{0x9640, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD 6550D"},
 	{0x9641, 4, 1, RADEON_SUMO, CHIP_APU, "Radeon HD Sumo"},
