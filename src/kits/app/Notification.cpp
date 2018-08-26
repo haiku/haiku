@@ -38,7 +38,7 @@ BNotification::BNotification(notification_type type)
 	get_team_info(B_CURRENT_TEAM, &teamInfo);
 	app_info appInfo;
 	be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
-	
+
 	int32 iconSize = B_LARGE_ICON;
 	fBitmap = new BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1), 0, B_RGBA32);
 	if (fBitmap) {
@@ -466,7 +466,7 @@ BNotification::CountOnClickRefs() const
 const entry_ref*
 BNotification::OnClickRefAt(int32 index) const
 {
-	return (entry_ref*)fArgv.ItemAt(index);
+	return (entry_ref*)fRefs.ItemAt(index);
 }
 
 
