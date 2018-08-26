@@ -6,7 +6,7 @@
 <h1>How To Create a Project Using the Makefile Engine</h1>
 
 <p>Haiku helps developers with the build process of their projects by providing the so
-called makefile-engine. It's made of two files, that reside in 
+called makefile-engine. It's made of two files, that reside in
 <tt>/boot/system/develop/etc</tt> directory and are named 'Makefile' and 'makefile-engine'.<br />
 Together, these two files provide you with a simple ready-to-be used build
 engine for your projects.</p>
@@ -15,7 +15,7 @@ engine for your projects.</p>
 Makefile template v2.6. Regardless of mentioning the 'makefiles' in this
 How-To, the same technique can be used for creating Jamfile-driven
 projects. Corresponding Jamfile and Jamfile-engine template files are provided
-with Haiku. We made both, the Makefile and Jamfile engines completely 
+with Haiku. We made both, the Makefile and Jamfile engines completely
 target-compatible for the user's convenience.</p>
 
 <h2>Contents</h2>
@@ -32,7 +32,7 @@ target-compatible for the user's convenience.</p>
 
 <p>To start a project, just copy Makefile from <tt>/boot/system/develop/etc</tt> directory, into
 your project directory. Write a few files that you want to add to your project. Add
-either relative or full paths to them into the SRCS variable definition in the 
+either relative or full paths to them into the SRCS variable definition in the
 Makefile and run <tt>make</tt>. Example files for a "Hello World" project:</p>
 
 <p><em>hello.cpp</em>:</p>
@@ -80,12 +80,12 @@ needs. Let's take a look at them:</p>
 <li><strong>STATIC</strong> - Static library archive</li>
 <li><strong>DRIVER</strong> - Kernel driver</li>
 </ul></li>
-<li><strong>APP_MIME_SIG</strong> specifies the application's mime signature for 
+<li><strong>APP_MIME_SIG</strong> specifies the application's mime signature for
 localization features. Note that it should correspond to MIME type
 provided to the BApplication's constructor and the application MIME type
 defined in resource file. In case this parameter is not set, the
 default value '<tt>x-vnd.Haiku-$(NAME)</tt>' will be used.</li>
-<li><strong>SRCS</strong> specifies the source files to use. You may specify both, full 
+<li><strong>SRCS</strong> specifies the source files to use. You may specify both, full
 paths and paths relative to the location of the Makefile. All objects,
 regardless of the location of their sources will be created in the
 common object directory. Please note, that this means, that the Makefile
@@ -109,7 +109,7 @@ add <tt>$(STDCPPLIBS</tt> instead of raw "<tt>stdc++[.r4] [supc++]</tt>" library
 <li>for localization support add the following libraries: <tt>locale</tt> <tt>localestub</tt></li>
 <li>if your library doesn't follow the standard library naming
 scheme, you need to specify the path to the library and its name, e.g.
-for the library: <tt>my_lib.a</tt>, the entry would be either: <tt>my_lib.a</tt> or 
+for the library: <tt>my_lib.a</tt>, the entry would be either: <tt>my_lib.a</tt> or
 <tt>path/my_lib.a</tt></li>
 </ul></li>
 <li><strong>LIBPATHS</strong> specifies additional paths to directories following the
@@ -193,19 +193,19 @@ actually be able to use localization in your programs, you have to adjust few
 settings in your Makefile.</p>
 
 <ol>
-<li><p>Adjust a value to your project's <strong>APP_MIME_SIG</strong> variable. 
+<li><p>Adjust a value to your project's <strong>APP_MIME_SIG</strong> variable.
 Application's mime signature should also be set in the following
 format: <tt>x.vnd-&lt;author&gt;-&lt;project_name&gt;</tt></p></li>
-<li><p>Add following two libraries into your <strong>LIBS</strong> variable: <tt>locale</tt> 
+<li><p>Add following two libraries into your <strong>LIBS</strong> variable: <tt>locale</tt>
 <tt>localestub</tt></p></li>
-<li><p>Add every language, that you want to support, into <strong>LOCALES</strong> variable, 
-e.g. '<tt>LOCALES = en de fr</tt>' for English, German and French locale 
+<li><p>Add every language, that you want to support, into <strong>LOCALES</strong> variable,
+e.g. '<tt>LOCALES = en de fr</tt>' for English, German and French locale
 support.</p></li>
-<li><p>Add the resource definition script (also specified in the <em>RDEF</em> 
+<li><p>Add the resource definition script (also specified in the <em>RDEF</em>
 variable) containing the following entries to project:</p>
 
 <pre>resource app_signature "application/x-vnd.&lt;author&gt;-&lt;project_name&gt;";
-resource app<em>name</em>catalog_entry "&lt;author&gt;-&lt;project_name&gt;:System name:Terminal";</pre></li>
+resource app_name_catalog_entry "&lt;author&gt;-&lt;project_name&gt;:System name:Terminal";</pre></li>
 <li><p>Run '<tt>make</tt>' to build the binary file.</p></li>
 <li><p>Run '<tt>make catkeys</tt>' to get the <tt>locales/en.catkeys</tt> file.</p></li>
 <li><p>Copy this file to <tt>locales/&lt;language_code&gt;.catkeys</tt> and translate it,
@@ -250,13 +250,13 @@ everything in the objects folder.</li>
 <li><strong>driverinstall</strong> installs the driver in the system.</li>
 <li><strong>install</strong> installs the program into the directory specified by the <em>INSTALL_DIR</em>
 variable.</li>
-<li><strong>catalogsinstall</strong> installs localization resource catalogs into 
+<li><strong>catalogsinstall</strong> installs localization resource catalogs into
 <tt>/boot/home/config/non-packaged/data/locale/catalogs/&lt;APP_MIME_SIG&gt;</tt>
 for testing purposes. Note that for the distribution of a release version, catalogs should be stored in
 <tt>/boot/system/non-packaged/data/locale/catalogs/&lt;APP_MIME_SIG&gt;</tt> instead of
 home. Even better, create a proper HPKG and don't install in any non-packaged folder at all.</li>
-<li><strong>bindcatalogs</strong> binds localization resource catalogs into the executable 
-file's resources (it's an alternative way of storing localization 
+<li><strong>bindcatalogs</strong> binds localization resource catalogs into the executable
+file's resources (it's an alternative way of storing localization
 catalogs that doesn't require to distribute separate catalog files).</li>
 </ul>
 
