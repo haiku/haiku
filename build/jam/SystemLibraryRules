@@ -173,7 +173,7 @@ rule TargetLibgcc asPath
 			# return libgcc_s.so from the gcc_syslibs build feature and libgcc.a
 			# from the gcc_syslibs_devel build feature.
 			return [
-				BuildFeatureAttribute gcc_syslibs : libgcc_s.so : $(flags)
+				BuildFeatureAttribute gcc_syslibs : libgcc_s.so.1 : $(flags)
 			] [
 				BuildFeatureAttribute gcc_syslibs_devel : libgcc.a : $(flags)
 			] ;

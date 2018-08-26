@@ -43,7 +43,7 @@ if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
 	if [ IsPackageAvailable gcc_syslibs ] {
 		ExtractBuildFeatureArchives gcc_syslibs :
 			file: base gcc_syslibs
-				libgcc_s.so: $(libDir)/libgcc_s.so
+				libgcc_s.so.1: $(libDir)/libgcc_s.so.1
 				libstdc++.so: $(libDir)/libstdc++.so
 				libsupc++.so: $(libDir)/libsupc++.so
 			;
