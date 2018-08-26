@@ -283,11 +283,11 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 	}
 
 	uninit_wlan_stack();
-	uninit_bounce_pages();
-	uninit_mbufs();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
+	uninit_bounce_pages();
 	uninit_callout();
+	uninit_mbufs();
 	uninit_mutexes();
 	uninit_hard_clock();
 
