@@ -136,6 +136,8 @@ RemotePackageRepository HaikuPorts
 	nettle-3.4-1
 	openexr-2.2.1-2
 	openexr_devel-2.2.1-2
+	openjpeg-2.3.0-1
+	openjpeg_devel-2.3.0-1
 	openssh-7.6p1-1
 	openssl-1.0.2p-1
 	openssl_devel-1.0.2p-1
@@ -257,6 +259,7 @@ RemotePackageRepository HaikuPorts
 	netcat
 	nettle
 	openexr
+	openjpeg
 	openssh
 	openssl
 	p7zip

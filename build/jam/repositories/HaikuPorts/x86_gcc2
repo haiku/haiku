@@ -4,7 +4,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-2
-	ca_root_certificates-2018_06_20-1
+	ca_root_certificates-2018_01_17-2
 	gnu_efi_kernel-3.0.8-1
 	haikuporter-1.2.2-1
 	noto-20170920-3
@@ -119,6 +119,8 @@ RemotePackageRepository HaikuPorts
 	netcat-1.10-4
 	openexr-2.2.1-2
 	openexr_devel-2.2.1-2
+	openjpeg-2.1.2-3
+	openjpeg_devel-2.1.2-3
 	openssh-7.2p2-2
 	openssl-1.0.2p-1
 	openssl_devel-1.0.2p-1
@@ -218,7 +220,7 @@ RemotePackageRepository HaikuPorts
 	libtheora_x86_devel-1.1.1-7
 	libtool_x86-2.4.6-1
 	libtool_x86_libltdl-2.4.6-1
-	libunistring_x86-0.9.9-2
+	libunistring_x86-0.9.10-1
 	libvorbis_x86-1.3.5-5
 	libvorbis_x86_devel-1.3.5-5
 	libvpx3_x86-1.5.0-2
@@ -235,9 +237,9 @@ RemotePackageRepository HaikuPorts
 	llvm_x86_clang-5.0.0-3
 	llvm_x86_clang_analysis-5.0.0-3
 	llvm_x86_libs-5.0.0-3
-	mesa_x86-17.1.7-8
-	mesa_x86_devel-17.1.7-8
-	mesa_x86_swpipe-17.1.7-8
+	mesa_x86-17.1.10-1
+	mesa_x86_devel-17.1.10-1
+	mesa_x86_swpipe-17.1.10-1
 	ncurses6_x86-6.1-1
 	ncurses6_x86_devel-6.1-1
 	mpc_x86-1.1.0-1
@@ -245,6 +247,8 @@ RemotePackageRepository HaikuPorts
 	nettle_x86-3.4-1
 	openexr_x86-2.2.1-2
 	openexr_x86_devel-2.2.1-2
+	openjpeg_x86-2.2.0-1
+	openjpeg_x86_devel-2.2.0-1
 	openssl_x86-1.0.2p-1
 	openssl_x86_devel-1.0.2p-1
 	pkgconfig_x86-0.29.2-3
@@ -354,10 +358,10 @@ RemotePackageRepository HaikuPorts
 	nano
 	nasm
 	ncurses6
-	ncurses6_x86
 	netcat
 	nettle
 	openexr
+	openjpeg
 	openssh
 	openssl
 	p7zip
