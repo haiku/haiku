@@ -148,7 +148,7 @@ AVCodecDecoder::~AVCodecDecoder()
 #endif
 
 	if (fCodecInitDone)
-		avcodec_free_context(&fCodecContext);
+		avcodec_close(fCodecContext);
 
 	swr_free(&fResampleContext);
 	free(fChunkBuffer);
@@ -158,6 +158,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_free(fRawDecodedPicture);
 	av_free(fRawDecodedAudio->opaque);
 	av_free(fRawDecodedAudio);
+	av_free(fCodecContext);
 	av_free(fDecodedDataBuffer);
 
 	av_frame_free(&fFilterFrame);
