@@ -202,6 +202,7 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$binutilsSourceDir/configure" \
 	--enable-targets=$binutilsTargets \
 	--disable-nls --disable-shared --disable-werror \
 	--with-sysroot="$sysrootDir" --disable-initfini-array \
+	--disable-maintainer-mode \
 	$binutilsConfigureArgs \
 	|| exit 1
 $MAKE $additionalMakeArgs || exit 1
@@ -265,6 +266,7 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--enable-__cxa-atexit --enable-threads=posix \
 	--with-default-libstdcxx-abi=gcc4-compatible \
 	--with-sysroot="$sysrootDir" \
+	--disable-maintainer-mode \
 	$gccConfigureArgs \
 	|| exit 1
 
