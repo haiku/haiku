@@ -89,23 +89,6 @@ function InstallAllFirmwares()
 }
 
 
-function UnlinkDriver()
-{
-	# remove the driver's symlink
-	#rm -f "${driversDir}/dev/net/${driver}"
-	echo "TODO: UnlinkDriver"
-}
-
-
-function SymlinkDriver()
-{
-	# restore the driver's symlink
-	#cd "${driversDir}/dev/net/"
-	#ln -sf "../../bin/${driver}" "${driver}"
-	echo "TODO: SymlinkDriver"
-}
-
-
 function DownloadFileIfNotCached()
 {
 	# DownloadFileIfNotCached <url> <filename> <destination dir>
@@ -149,14 +132,12 @@ function PreFirmwareInstallation()
 {
 	echo "Acquiring firmware for ${driver} ..."
 	mkdir -p "${tempFirmwareDir}/${driver}"
-	UnlinkDriver
 }
 
 
 function PostFirmwareInstallation()
 {
 	SetFirmwarePermissions
-	SymlinkDriver
 	CleanTemporaryFiles
 	echo "... firmware for ${driver} will be installed."
 }
@@ -278,7 +259,7 @@ function BuildBroadcomFWCutter()
 
 	# Download additonal files for building b43-fwcutter.
 	cd b43-fwcutter-012
-	local baseURL='http://cgit.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc'
+	local baseURL='https://git.haiku-os.org/haiku/plain/src/system/libroot/posix/glibc'
 	DownloadFileIfNotCached ${baseURL}/string/byteswap.h byteswap.h $dir
 	if [ $result -gt 0 ]; then
 		return $result
@@ -295,7 +276,7 @@ function BuildBroadcomFWCutter()
 
 	# Build b43-fwcutter.
 	echo "Compiling b43-fwcutter for installing Broadcom's firmware ..."
-	make PREFIX=/boot/system CFLAGS="-I. -Wall -D_BSD_SOURCE" > /dev/null 2>&1
+	make PREFIX=/boot/system CFLAGS="-I. -Wall -D_BSD_SOURCE" >/dev/null 2>&1
 	result=$?
 	if [ $result -gt 0 ]; then
 		echo "... failed to compile b43-fwcutter."
