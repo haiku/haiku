@@ -3,12 +3,12 @@ resource app_version {
 	middle = 0,
 	minor  = 0,
 
-	variety = B_APPV_ALPHA,
+	variety = B_APPV_BETA,
 
-	internal = 7,
+	internal = 9,
 
 	short_info = "Walter",
-	long_info = "©2001-2011 Haiku Inc."
+	long_info = "©2001-2018 Haiku Inc."
 };
 
 resource app_signature "application/x-vnd.Haiku-libbe" ;
