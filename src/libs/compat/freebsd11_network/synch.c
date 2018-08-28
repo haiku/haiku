@@ -36,12 +36,3 @@ wakeup(void* identifier)
 {
 	publishedConditionNotifyAll(identifier);
 }
-
-
-int
-_pause(const char* waitMessage, int timeout)
-{
-	int waitChannel;
-	KASSERT(timeout != 0, ("pause: timeout required"));
-	return tsleep(&waitChannel, 0, waitMessage, timeout);
-}
