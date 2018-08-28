@@ -7,7 +7,7 @@ resource app_version {
 
 	internal = 9,
 
-	short_info = "Walter",
+	short_info = "R1/beta1",
 	long_info = "©2001-2018 Haiku Inc."
 };
 
