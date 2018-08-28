@@ -463,9 +463,10 @@
 	\brief Get the message to which this message is a reply.
 
 	\return Returns a new BMessage with the same data stuctures as the message
-	        to which this message is a reply. You get the ownership of this
-	        message, so free it when you're done. If this message isn't a
-	        reply to another message, this method will return \c NULL.
+	        to which this message is a reply. The pointer is only valid as
+			long as this message is still allocated, you do not get ownership.
+			If this message isn't a reply to another message, this method will
+			return \c NULL.
 
 	\since BeOS R3
 */
