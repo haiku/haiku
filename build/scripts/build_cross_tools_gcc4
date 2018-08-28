@@ -144,7 +144,7 @@ find "$binutilsSourceDir" "$gccSourceDir" -name \*.info -print0 | xargs -0 touch
 # touch all configure files in order to avoid them being auto-rebuilt,
 # as this often fails because the host system does not have the exact
 # version of autofools that GCC wants
-find "$binutilsSourceDir" "$gccSourceDir" -name configure -print0 | xargs -0 touch
+find "$binutilsSourceDir" "$gccSourceDir" \( -name configure -o -name \*.in \) -print0 | xargs -0 touch
 
 # create the object and installation directories for the cross compilation tools
 objDir="${installDir}-build"
