@@ -151,12 +151,8 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 
 # configure gcc
 cd $gccObjDir
-case `uname` in
-	Darwin)
-		# GCC 2 compiled for x86_64 OS X is broken, compile for i386.
-		export CC="gcc -arch i386"
-	;;
-esac
+# GCC 2 compiled for x86_64 on most systems is broken, compile for 32-bit.
+export CC="gcc -m32"
 CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" $buildToolsDir/gcc/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --enable-languages=c,c++ \
