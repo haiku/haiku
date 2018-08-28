@@ -275,6 +275,10 @@ InstallerWindow::InstallerWindow()
 				.AddGlue()
 				.Add(fBeginButton);
 
+	// These aren't implemented re. package management yet
+	fPackagesSwitch->Hide();
+	packagesScrollView->Hide();
+
 	// Make the optional packages and progress bar invisible on start
 	fPackagesLayoutItem = layout_item_for(packagesScrollView);
 	fPkgSwitchLayoutItem = layout_item_for(fPackagesSwitch);
