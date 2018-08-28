@@ -5,7 +5,7 @@
 // 0: Disables all debug code that hasn't been enabled otherwise.
 // 1: Enables some lightweight debug code.
 // 2: Enables more debug code. Will impact performance.
-#define KDEBUG_LEVEL 2
+#define KDEBUG_LEVEL 1
 
 #define KDEBUG_LEVEL_2	(KDEBUG_LEVEL >= 2)
 #define KDEBUG_LEVEL_1	(KDEBUG_LEVEL >= 1)
