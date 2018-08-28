@@ -21,9 +21,15 @@ msleep(void* identifier, struct mtx* mutex, int priority,
 
 	conditionPublish(&sleep, identifier, description);
 
-	mtx_unlock(mutex);
+	// FreeBSD's msleep() does not allow the mutex to be NULL, but we
+	// do, as we implement some other functions like tsleep() with it.
+	if (mutex != NULL)
+		mtx_unlock(mutex);
+
 	status = publishedConditionTimedWait(identifier, timeout);
-	mtx_lock(mutex);
+
+	if (mutex != NULL)
+		mtx_lock(mutex);
 
 	conditionUnpublish(&sleep);
 
