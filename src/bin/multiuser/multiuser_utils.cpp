@@ -191,8 +191,12 @@ setup_environment(struct passwd* passwd, bool preserveEnvironment, bool chngdir)
 	setenv("USER", passwd->pw_name, true);
 
 	pid_t pid = getpid();
-	if (ioctl(STDIN_FILENO, TIOCSPGRP, &pid) != 0)
-		return errno;
+	// If stdin is not open, don't bother trying to TIOCSPGRP. (This is the
+	// case when there is no PTY, e.g. for a noninteractive SSH session.)
+	if (fcntl(STDIN_FILENO, F_GETFD) != -1) {
+		if (ioctl(STDIN_FILENO, TIOCSPGRP, &pid) != 0)
+			return errno;
+	}
 
 	if (passwd->pw_gid && setgid(passwd->pw_gid) != 0)
 		return errno;
