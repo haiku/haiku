@@ -1042,23 +1042,23 @@ ServerPicture::ExitStateChange()
 
 
 void
-ServerPicture::SyncState(View* view)
+ServerPicture::SyncState(Canvas* canvas)
 {
 	// TODO: Finish this
 	EnterStateChange();
 
-	WriteSetOrigin(view->CurrentState()->Origin());
-	WriteSetPenLocation(view->CurrentState()->PenLocation());
-	WriteSetPenSize(view->CurrentState()->UnscaledPenSize());
-	WriteSetScale(view->CurrentState()->Scale());
-	WriteSetLineMode(view->CurrentState()->LineCapMode(),
-		view->CurrentState()->LineJoinMode(),
-		view->CurrentState()->MiterLimit());
-	//WriteSetPattern(*view->CurrentState()->GetPattern().GetInt8());
-	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
+	WriteSetOrigin(canvas->CurrentState()->Origin());
+	WriteSetPenLocation(canvas->CurrentState()->PenLocation());
+	WriteSetPenSize(canvas->CurrentState()->UnscaledPenSize());
+	WriteSetScale(canvas->CurrentState()->Scale());
+	WriteSetLineMode(canvas->CurrentState()->LineCapMode(),
+		canvas->CurrentState()->LineJoinMode(),
+		canvas->CurrentState()->MiterLimit());
+	//WriteSetPattern(*canvas->CurrentState()->GetPattern().GetInt8());
+	WriteSetDrawingMode(canvas->CurrentState()->GetDrawingMode());
 
-	WriteSetHighColor(view->CurrentState()->HighColor());
-	WriteSetLowColor(view->CurrentState()->LowColor());
+	WriteSetHighColor(canvas->CurrentState()->HighColor());
+	WriteSetLowColor(canvas->CurrentState()->LowColor());
 
 	ExitStateChange();
 }

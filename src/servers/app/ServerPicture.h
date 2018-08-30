@@ -49,7 +49,7 @@ public:
 			void				EnterStateChange();
 			void				ExitStateChange();
 
-			void				SyncState(View* view);
+			void				SyncState(Canvas* canvas);
 			void				WriteFontState(const ServerFont& font,
 									uint16 mask);
 
