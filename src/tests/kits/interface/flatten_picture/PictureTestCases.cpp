@@ -90,6 +90,27 @@ static void testDrawStringWithOffsets(BView* view, BRect frame)
 }
 
 
+static void testDrawStringWithoutPosition(BView* view, BRect frame)
+{
+	BFont font;
+	view->GetFont(&font);
+	font_height height;
+	font.GetHeight(&height);
+	float baseline = frame.bottom - height.descent;
+	// draw base line
+	view->SetHighColor(kGreen);
+	view->StrokeLine(BPoint(frame.left, baseline - 1), BPoint(frame.right, baseline -1));
+
+	view->SetHighColor(kBlack);
+	view->MovePenTo(BPoint(frame.left, baseline));
+	view->DrawString("H");
+	view->DrawString("a");
+	view->DrawString("i");
+	view->DrawString("k");
+	view->DrawString("u");
+}
+
+
 static void testFillArc(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -1022,7 +1043,7 @@ TestCase gTestCases[] = {
 	{ "Test Draw String", testDrawString },
 	{ "Test Draw String With Length", testDrawStringWithLength },
 	{ "Test Draw String With Offsets", testDrawStringWithOffsets },
-
+	{ "Test Draw String Without Position", testDrawStringWithoutPosition },
 	{ "Test FillArc", testFillArc },
 	{ "Test StrokeArc", testStrokeArc },
 	// testFillBezier fails under BeOS because the
