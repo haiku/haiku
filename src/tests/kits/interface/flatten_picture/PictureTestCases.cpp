@@ -1027,6 +1027,54 @@ static void testFontRotation(BView* view, BRect frame)
 }
 
 
+static void testClipToRect(BView* view, BRect frame)
+{
+	BRect clipped = frame;
+	clipped.InsetBy(5, 5);
+	
+	view->ClipToRect(clipped);
+	
+	view->FillRect(frame);
+}
+
+
+static void testClipToInverseRect(BView* view, BRect frame)
+{
+	BRect clipped = frame;
+	clipped.InsetBy(5, 5);
+	
+	view->ClipToInverseRect(clipped);
+	
+	view->FillRect(frame);
+}
+
+
+static void testClipToShape(BView* view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BShape shape;
+	shape.MoveTo(BPoint(frame.left, frame.bottom));
+	shape.LineTo(BPoint(frame.right, frame.top));
+	shape.LineTo(BPoint(frame.left, frame.top));
+	shape.LineTo(BPoint(frame.right, frame.bottom));
+	view->ClipToShape(&shape);
+	
+	view->FillRect(frame);
+}
+
+
+static void testClipToInverseShape(BView* view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BShape shape;
+	shape.MoveTo(BPoint(frame.left, frame.bottom));
+	shape.LineTo(BPoint(frame.right, frame.top));
+	shape.LineTo(BPoint(frame.left, frame.top));
+	shape.LineTo(BPoint(frame.right, frame.bottom));
+	view->ClipToInverseShape(&shape);
+	
+	view->FillRect(frame);
+}
 
 
 // TODO
@@ -1099,6 +1147,10 @@ TestCase gTestCases[] = {
 	{ "Test ConstrainClippingRegion", testConstrainClippingRegion }, 
 	{ "Test ClipToPicture", testClipToPicture },
 	{ "Test ClipToInversePicture", testClipToInversePicture },
+	{ "Test ClipToRect", testClipToRect },
+	{ "Test ClipToInverseRect", testClipToInverseRect },
+	{ "Test ClipToShape", testClipToShape },
+	{ "Test ClipToInverseShape", testClipToInverseShape },
 	{ "Test SetPenSize", testSetPenSize },
 	{ "Test SetPenSize2", testSetPenSize2 },
 	{ "Test Pattern", testPattern },
