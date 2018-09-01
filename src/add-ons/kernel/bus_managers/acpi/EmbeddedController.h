@@ -150,7 +150,7 @@ struct acpi_ec_cookie {
 	uint32						ec_glkhandle;
 	mutex						ec_lock;
 	int							ec_burstactive;
-	int							ec_sci_pending;
+	int32						ec_sci_pending;
 	int32						ec_gencount;
 	ConditionVariable			ec_condition_var;
 	int							ec_suspending;
@@ -165,7 +165,7 @@ struct acpi_ec_cookie {
 #define EC_LOCK_TIMEOUT 1000
 
 /* Default delay in microseconds between each run of the status polling loop. */
-#define EC_POLL_DELAY	5
+#define EC_POLL_DELAY	50
 
 /* Total time in ms spent waiting for a response from EC. */
 #define EC_TIMEOUT		750
@@ -178,8 +178,8 @@ struct acpi_ec_cookie {
 
 
 
-static int		ec_burst_mode = 1;
-static int		ec_polled_mode = 0;
+static bool		ec_burst_mode = true;
+static bool		ec_polled_mode = false;
 
 static int		ec_timeout = EC_TIMEOUT;
 
