@@ -98,6 +98,9 @@ poke_open(const char* name, uint32 flags, void** cookie)
 {
 	*cookie = NULL;
 
+	if (getuid() != 0 && geteuid() != 0)
+		return EPERM;
+
 	if (atomic_add(&open_count, 1) != 0) {
 		atomic_add(&open_count, -1);
 		return B_BUSY;
