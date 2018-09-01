@@ -508,12 +508,8 @@ EcCheckStatus(struct acpi_ec_cookie* sc, const char* msg, EC_EVENT event)
 
 
 static void
-EcGpeQueryHandler(void* context)
+EcGpeQueryHandlerSub(struct acpi_ec_cookie *sc)
 {
-	struct acpi_ec_cookie* sc = (struct acpi_ec_cookie*)context;
-
-	ASSERT(context != NULL);
-
 	// Serialize user access with EcSpaceHandler().
 	status_t status = EcLock(sc);
 	if (status != B_OK) {
@@ -526,7 +522,6 @@ EcGpeQueryHandler(void* context)
 	// interrupt source since we are edge-triggered.  To prevent the GPE
 	// that may arise from running the query from causing another query
 	// to be queued, we clear the pending flag only after running it.
-	int sci_enqueued = sc->ec_sci_pending;
 	acpi_status acpi_status = AE_ERROR;
 	for (uint8 retry = 0; retry < 2; retry++) {
 		acpi_status = EcCommand(sc, EC_COMMAND_QUERY);
@@ -537,7 +532,6 @@ EcGpeQueryHandler(void* context)
 			break;
 	}
 
-	sc->ec_sci_pending = FALSE;
 	if (acpi_status != AE_OK) {
 		EcUnlock(sc);
 		TRACE("GPE query failed.\n");
@@ -563,14 +557,28 @@ EcGpeQueryHandler(void* context)
 	if (status != B_OK) {
 		TRACE("evaluation of query method %s failed\n", qxx);
 	}
+}
 
-    // Reenable runtime GPE if its execution was deferred.
-	if (sci_enqueued) {
-		status = sc->ec_acpi_module->finish_gpe(sc->ec_gpehandle, sc->ec_gpebit);
-		if (status != B_OK)
-			ERROR("reenabling runtime GPE failed.\n");
-	}
 
+static void
+EcGpeQueryHandler(void* context)
+{
+	struct acpi_ec_cookie* sc = (struct acpi_ec_cookie*)context;
+	int32 pending;
+
+	ASSERT(context != NULL);
+
+	do {
+		// Read the current pending count
+		pending = atomic_get(&sc->ec_sci_pending);
+
+		// Call GPE handler function
+		EcGpeQueryHandlerSub(sc);
+
+		// Try to reset the pending count to zero. If this fails we
+		// know another GPE event has occurred while handling the
+		// current GPE event and need to loop.
+	} while (atomic_test_and_set(&sc->ec_sci_pending, 0, pending));
 }
 
 
@@ -595,14 +603,14 @@ EcGpeHandler(acpi_handle gpeDevice, uint32 gpeNumber, void* context)
 	// If the EC_SCI bit of the status register is set, queue a query handler.
 	// It will run the query and _Qxx method later, under the lock.
 	EC_STATUS ecStatus = EC_GET_CSR(sc);
-	if ((ecStatus & EC_EVENT_SCI) && !sc->ec_sci_pending) {
+	if ((ecStatus & EC_EVENT_SCI) && atomic_add(&sc->ec_sci_pending, 1) == 0) {
 		TRACE("gpe queueing query handler\n");
 		acpi_status status = AcpiOsExecute(OSL_GPE_HANDLER, EcGpeQueryHandler,
 			context);
-		if (status == AE_OK)
-			sc->ec_sci_pending = TRUE;
-		else
+		if (status != AE_OK) {
 			dprintf("EcGpeHandler: queuing GPE query handler failed\n");
+			atomic_add(&sc->ec_sci_pending, -1);
+		}
 	}
 	return ACPI_REENABLE_GPE;
 }
@@ -630,7 +638,8 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	TRACE("enter EcSpaceHandler\n");
 	struct acpi_ec_cookie* sc = (struct acpi_ec_cookie*)context;
 
-	if (function != ACPI_READ && function != ACPI_WRITE) return AE_BAD_PARAMETER;
+	if (function != ACPI_READ && function != ACPI_WRITE)
+		return AE_BAD_PARAMETER;
 	if (width % 8 != 0 || value == NULL || context == NULL)
 		return AE_BAD_PARAMETER;
 	if (address + width / 8 > 256)
@@ -641,7 +650,8 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	// (Not sure if it's needed)
 
 	if (gKernelStartup || gKernelShutdown || sc->ec_suspending) {
-		if ((EC_GET_CSR(sc) & EC_EVENT_SCI)) {
+		if ((EC_GET_CSR(sc) & EC_EVENT_SCI) &&
+			atomic_add(&sc->ec_sci_pending, 1) == 0) {
 			//CTR0(KTR_ACPI, "ec running gpe handler directly");
 			EcGpeQueryHandler(sc);
 		}
@@ -662,7 +672,7 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	}
 
 	// Perform the transaction(s), based on width.
-	acpi_physical_address ecAddr = address;
+	ACPI_PHYSICAL_ADDRESS ecAddr = address;
 	uint8* ecData = (uint8 *) value;
 	if (function == ACPI_READ)
 		*value = 0;
@@ -695,39 +705,19 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 static acpi_status
 EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 {
+	static int32 noIntr = 0;
 	acpi_status status = AE_NO_HARDWARE_RESPONSE;
 	int32 count, i;
 
-	// int need_poll = cold || rebooting || ec_polled_mode || sc->ec_suspending;
-	int needPoll = ec_polled_mode || sc->ec_suspending || gKernelStartup || gKernelShutdown;
-
-	// Wait for event by polling or GPE (interrupt).
-	// be "not ready" when we start waiting.  But if the main CPU is really
-	// slow, it's possible we see the current "ready" response.  Since that
-	// can't be distinguished from the previous response in polled mode,
-	// this is a potential issue.  We really should have interrupts enabled
-	// during boot so there is no ambiguity in polled mode.
-	//
-	// If this occurs, we add an additional delay before actually entering
-	// the status checking loop, hopefully to allow the EC to go to work
-	// and produce a non-stale status.
-	if (needPoll) {
-		static int once;
-
-		if (EcCheckStatus(sc, "pre-check", event) == B_OK) {
-			if (!once) {
-				TRACE("warning: EC done before starting event wait\n");
-				once = 1;
-			}
-			spin(10);
-		}
-	}
+	int needPoll = ec_polled_mode || sc->ec_suspending
+		|| gKernelStartup || gKernelShutdown;
 
 	// Wait for event by polling or GPE (interrupt).
 	if (needPoll) {
 		count = (ec_timeout * 1000) / EC_POLL_DELAY;
 		if (count == 0)
 			count = 1;
+		spin(10);
 		for (i = 0; i < count; i++) {
 			status = EcCheckStatus(sc, "poll", event);
 			if (status == AE_OK)
@@ -735,40 +725,45 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 			spin(EC_POLL_DELAY);
 		}
 	} else {
-		bigtime_t sleepInterval = system_time() + ec_timeout * 1000;
-
 		// Wait for the GPE to signal the status changed, checking the
 		// status register each time we get one.  It's possible to get a
 		// GPE for an event we're not interested in here (i.e., SCI for
 		// EC query).
 		status_t waitStatus = B_NO_ERROR;
-		while (waitStatus != B_TIMED_OUT) {
-			if (generationCount != sc->ec_gencount) {
-				// Record new generation count.  It's possible the GPE was
-				// just to notify us that a query is needed and we need to
-				// wait for a second GPE to signal the completion of the
-				// event we are actually waiting for.
-				generationCount = sc->ec_gencount;
-				status = EcCheckStatus(sc, "sleep", event);
-				if (status == AE_OK)
-					break;
+		for (i = 0; i < ec_timeout; i++) {
+			if (generationCount == sc->ec_gencount) {
+				waitStatus =
+					sc->ec_condition_var.Wait(B_RELATIVE_TIMEOUT, 1000);
 			}
-			waitStatus = sc->ec_condition_var.Wait(B_ABSOLUTE_TIMEOUT,
-				sleepInterval);
+			/*
+			 * Record new generation count.  It's possible the GPE was
+			 * just to notify us that a query is needed and we need to
+			 * wait for a second GPE to signal the completion of the
+			 * event we are actually waiting for.
+			 */
+			status = EcCheckStatus(sc, "sleep", event);
+			if (status == AE_OK) {
+				if (generationCount == sc->ec_gencount)
+					noIntr++;
+				else
+					noIntr = 0;
+				break;
+			}
+			generationCount = sc->ec_gencount;
 		}
 
-		// We finished waiting for the GPE and it never arrived.  Try to
-		// read the register once and trust whatever value we got.  This is
-		// the best we can do at this point.
-		// since this system doesn't appear to generate GPEs.
-		if (status != AE_OK) {
+		/*
+		 * We finished waiting for the GPE and it never arrived.  Try to
+		 * read the register once and trust whatever value we got.  This is
+		 * the best we can do at this point.
+		 */
+		if (status != AE_OK)
 			status = EcCheckStatus(sc, "sleep_end", event);
-			TRACE("wait timed out (%sresponse), forcing polled mode\n",
-				status == AE_OK ? "" : "no ");
-			ec_polled_mode = TRUE;
-		}
 	}
-
+	if (!needPoll && noIntr > 10) {
+		TRACE("not getting interrupts, switched to polled mode\n");
+		ec_polled_mode = true;
+	}
 
 	if (status != AE_OK)
 		TRACE("error: ec wait timed out\n");
@@ -840,15 +835,14 @@ EcRead(struct acpi_ec_cookie* sc, uint8 address, uint8* readData)
 		int32 generationCount = sc->ec_gencount;
 		EC_SET_DATA(sc, address);
 		status = EcWaitEvent(sc, EC_EVENT_OUTPUT_BUFFER_FULL, generationCount);
-		if (status != AE_OK) {
-			if (EcCheckStatus(sc, "retr_check",
-				EC_EVENT_INPUT_BUFFER_EMPTY) == AE_OK)
-				continue;
-			else
-				break;
+		if (status == AE_OK) {
+			*readData = EC_GET_DATA(sc);
+			return AE_OK;
 		}
-		*readData = EC_GET_DATA(sc);
-		return AE_OK;
+		if (EcCheckStatus(sc, "retr_check", EC_EVENT_INPUT_BUFFER_EMPTY)
+				!= AE_OK) {
+			break;
+		}
 	}
 
 	TRACE("EcRead: failed waiting to get data\n");
