@@ -12,8 +12,6 @@
 #include "poke.h"
 
 
-////////////////////////////////////////////////////////////////////////////////
-
 static status_t poke_open(const char*, uint32, void**);
 static status_t poke_close(void*);
 static status_t poke_free(void*);
@@ -21,7 +19,6 @@ static status_t poke_control(void*, uint32, void*, size_t);
 static status_t poke_read(void*, off_t, void*, size_t*);
 static status_t poke_write(void*, off_t, const void*, size_t*);
 
-////////////////////////////////////////////////////////////////////////////////
 
 static const char* poke_name[] = {
     "misc/"POKE_DEVICE_NAME,
@@ -44,8 +41,6 @@ isa_module_info* isa;
 pci_module_info* pci;
 
 static int32 open_count;
-
-////////////////////////////////////////////////////////////////////////////////
 
 
 status_t
@@ -94,7 +89,6 @@ find_device(const char* name)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
 //	#pragma mark -
 
 
