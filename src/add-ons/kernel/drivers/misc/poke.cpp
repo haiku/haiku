@@ -1,5 +1,6 @@
 /*
  * Copyright 2005, Oscar Lesta. All rights reserved.
+ * Copyright 2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -127,143 +128,183 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 	switch (op) {
 		case POKE_PORT_READ:
 		{
-    		status_t result;
-			port_io_args* ioctl = (port_io_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			status_t result = B_OK;
+			port_io_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(port_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			result = B_OK;
-			switch (ioctl->size) {
+			switch (ioctl.size) {
 				case 1:
-					ioctl->value = isa->read_io_8(ioctl->port);
+					ioctl.value = isa->read_io_8(ioctl.port);
 				break;
 				case 2:
-	   				ioctl->value = isa->read_io_16(ioctl->port);
+					ioctl.value = isa->read_io_16(ioctl.port);
 				break;
 				case 4:
-	   				ioctl->value = isa->read_io_32(ioctl->port);
+					ioctl.value = isa->read_io_32(ioctl.port);
 				break;
 				default:
 					result = B_BAD_VALUE;
 			}
 
+			if (user_memcpy(arg, &ioctl, sizeof(port_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
 			return result;
-   		}
+		}
 
 		case POKE_PORT_WRITE:
 		{
-    		status_t result;
-			port_io_args* ioctl = (port_io_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			status_t result = B_OK;
+			port_io_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(port_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			result = B_OK;
-			switch (ioctl->size) {
+			switch (ioctl.size) {
 				case 1:
-					isa->write_io_8(ioctl->port, ioctl->value);
+					isa->write_io_8(ioctl.port, ioctl.value);
 					break;
 				case 2:
-					isa->write_io_16(ioctl->port, ioctl->value);
+					isa->write_io_16(ioctl.port, ioctl.value);
 					break;
 				case 4:
-					isa->write_io_32(ioctl->port, ioctl->value);
+					isa->write_io_32(ioctl.port, ioctl.value);
 					break;
 				default:
 					result = B_BAD_VALUE;
 			}
 
 			return result;
-   		}
+		}
 
 		case POKE_PORT_INDEXED_READ:
 		{
-			port_io_args* ioctl = (port_io_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			port_io_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(port_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			isa->write_io_8(ioctl->port, ioctl->size);
-			ioctl->value = isa->read_io_8(ioctl->port + 1);
+			isa->write_io_8(ioctl.port, ioctl.size);
+			ioctl.value = isa->read_io_8(ioctl.port + 1);
+
+			if (user_memcpy(arg, &ioctl, sizeof(port_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
 			return B_OK;
 		}
 
 		case POKE_PORT_INDEXED_WRITE:
 		{
-			port_io_args* ioctl = (port_io_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			port_io_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(port_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			isa->write_io_8(ioctl->port, ioctl->size);
-			isa->write_io_8(ioctl->port + 1, ioctl->value);
+			isa->write_io_8(ioctl.port, ioctl.size);
+			isa->write_io_8(ioctl.port + 1, ioctl.value);
 			return B_OK;
 		}
 
 		case POKE_PCI_READ_CONFIG:
 		{
-			pci_io_args* ioctl = (pci_io_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			pci_io_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(pci_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			ioctl->value = pci->read_pci_config(ioctl->bus, ioctl->device,
-				ioctl->function, ioctl->offset, ioctl->size);
+			ioctl.value = pci->read_pci_config(ioctl.bus, ioctl.device,
+				ioctl.function, ioctl.offset, ioctl.size);
+			if (user_memcpy(arg, &ioctl, sizeof(pci_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
 			return B_OK;
 		}
 
 		case POKE_PCI_WRITE_CONFIG:
 		{
-			pci_io_args* ioctl = (pci_io_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			pci_io_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(pci_io_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			pci->write_pci_config(ioctl->bus, ioctl->device, ioctl->function,
-				ioctl->offset, ioctl->size, ioctl->value);
+			pci->write_pci_config(ioctl.bus, ioctl.device, ioctl.function,
+				ioctl.offset, ioctl.size, ioctl.value);
 			return B_OK;
 		}
 
 		case POKE_GET_NTH_PCI_INFO:
 		{
-		    pci_info_args* ioctl = (pci_info_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			pci_info_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(pci_info_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			ioctl->status = pci->get_nth_pci_info(ioctl->index, ioctl->info);
+			pci_info info;
+			ioctl.status = pci->get_nth_pci_info(ioctl.index, &info);
+
+			if (user_memcpy(ioctl.info, &info, sizeof(pci_info)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (user_memcpy(arg, &ioctl, sizeof(pci_info_args)) != B_OK)
+				return B_BAD_ADDRESS;
 			return B_OK;
 		}
 
 		case POKE_GET_PHYSICAL_ADDRESS:
 		{
-			mem_map_args* ioctl = (mem_map_args*)arg;
+			mem_map_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(mem_map_args)) != B_OK)
+				return B_BAD_ADDRESS;
 			physical_entry table;
 			status_t result;
 
-			if (ioctl->signature != POKE_SIGNATURE)
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			result = get_memory_map(ioctl->address, ioctl->size, &table, 1);
-			ioctl->physical_address = (void*)(addr_t)table.address;
+			result = get_memory_map(ioctl.address, ioctl.size, &table, 1);
+			ioctl.physical_address = (void*)(addr_t)table.address;
 				// TODO: mem_map_args::physical_address should be phys_addr_t!
-			ioctl->size = table.size;
+			ioctl.size = table.size;
+			if (user_memcpy(arg, &ioctl, sizeof(mem_map_args)) != B_OK)
+				return B_BAD_ADDRESS;
 			return result;
 		}
 
 		case POKE_MAP_MEMORY:
 		{
-			mem_map_args* ioctl = (mem_map_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			mem_map_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(mem_map_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			ioctl->area = map_physical_memory(ioctl->name,
-				(addr_t)ioctl->physical_address, ioctl->size, ioctl->flags,
-				ioctl->protection, (void**)&ioctl->address);
-			return ioctl->area;
+			char name[B_OS_NAME_LENGTH];
+			if (user_strlcpy(name, ioctl.name, B_OS_NAME_LENGTH) != B_OK)
+				return B_BAD_ADDRESS;
+
+			ioctl.area = map_physical_memory(name,
+				(addr_t)ioctl.physical_address, ioctl.size, ioctl.flags,
+				ioctl.protection, (void**)&ioctl.address);
+
+			if (user_memcpy(arg, &ioctl, sizeof(mem_map_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			return ioctl.area;
 		}
 
 		case POKE_UNMAP_MEMORY:
 		{
-			mem_map_args* ioctl = (mem_map_args*)arg;
-			if (ioctl->signature != POKE_SIGNATURE)
+			mem_map_args ioctl;
+			if (user_memcpy(&ioctl, arg, sizeof(mem_map_args)) != B_OK)
+				return B_BAD_ADDRESS;
+			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			return delete_area(ioctl->area);
+			return delete_area(ioctl.area);
 		}
 	}
 
