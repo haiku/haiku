@@ -22,7 +22,7 @@ static status_t poke_write(void*, off_t, const void*, size_t*);
 
 
 static const char* poke_name[] = {
-    "misc/"POKE_DEVICE_NAME,
+    "misc/" POKE_DEVICE_NAME,
     NULL
 };
 
