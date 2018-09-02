@@ -288,8 +288,14 @@ abort()
 {
 	fprintf(stderr, "Abort\n");
 
+	// If there's no handler installed for SIGABRT, call debugger().
+	struct sigaction signalAction;
+	if (sigaction(SIGABRT, NULL, &signalAction) == 0
+			&& signalAction.sa_handler == SIG_DFL) {
+		debugger("abort() called");
+	}
+
 	raise(SIGABRT);
-	debugger("abort() called");
 	exit(EXIT_FAILURE);
 }
 
