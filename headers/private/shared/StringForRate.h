@@ -11,8 +11,7 @@
 namespace BPrivate {
 
 
-const char* string_for_rate(double rate, char* string, size_t stringSize,
-	double base = 1000.0f);
+const char* string_for_rate(double rate, char* string, size_t stringSize);
 
 
 }	// namespace BPrivate
