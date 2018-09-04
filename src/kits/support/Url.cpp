@@ -984,6 +984,7 @@ BUrl::_ExplodeUrlString(const BString& url)
 	explode_url_parse_state state = EXPLODE_PROTOCOL;
 	int32 offset = 0;
 	int32 length = url.Length();
+	bool forceHasHost = false;
 	const char *url_c = url.String();
 
 	// The regexp is provided in RFC3986 (URI generic syntax), Appendix B
@@ -1033,6 +1034,9 @@ BUrl::_ExplodeUrlString(const BString& url)
 				// to parsing the path.
 				if (strncmp(&url_c[offset], "//", 2) == 0) {
 					state = EXPLODE_AUTHORITY;
+					// if we see the // then this would imply that a host is
+					// to be rendered even if no host has been parsed.
+					forceHasHost = true;
 					offset += 2;
 				} else {
 					state = EXPLODE_PATH;
@@ -1068,6 +1072,10 @@ BUrl::_ExplodeUrlString(const BString& url)
 						offset, explode_is_request_char);
 					SetRequest(BString(&url_c[offset], end_request - offset));
 					offset = end_request;
+					// if there is a "?" in the parse then it is clear that
+					// there is a 'request' / query present regardless if there
+					// are any valid key-value pairs.
+					fHasRequest = true;
 				}
 				state = EXPLODE_FRAGMENT;
 				break;
@@ -1090,6 +1098,9 @@ BUrl::_ExplodeUrlString(const BString& url)
 
 		}
 	}
+
+	if (forceHasHost)
+		fHasHost = true;
 
 	return B_OK;
 }
