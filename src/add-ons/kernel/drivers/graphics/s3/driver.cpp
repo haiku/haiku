@@ -245,7 +245,7 @@ MapDevice(DeviceInfo& di)
 
 	si.regsArea = map_physical_memory(areaName, regsBase, regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
-		0,		// neither read nor write, to hide it from user space apps
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
 		(void**)(&(di.regs)));
 
 	if (si.regsArea < 0)
@@ -411,7 +411,8 @@ InitDevice(DeviceInfo& di)
 	di.sharedArea = create_area(sharedName, (void**) &(di.sharedInfo),
 		B_ANY_KERNEL_ADDRESS,
 		((sizeof(SharedInfo) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)),
-		B_FULL_LOCK, 0);
+		B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (di.sharedArea < 0)
 		return di.sharedArea;	// return error code
 
