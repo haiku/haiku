@@ -52,8 +52,9 @@ rule ArchitectureSetup architecture
 		case x86 : archFlags += -march=pentium ;
 	}
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		# TODO: This should be included in Clang's compiler specs.
+		# TODO: These should be included in Clang's compiler specs.
 		archFlags += -fPIC ;
+		HAIKU_LINKFLAGS_$(architecture) += -shared ;
 	}
 	ccBaseFlags += $(archFlags) ;
 
