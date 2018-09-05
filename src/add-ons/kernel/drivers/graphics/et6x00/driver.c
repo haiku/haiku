@@ -465,7 +465,8 @@ char shared_name[B_OS_NAME_LENGTH];
         di->pcii.vendor_id, di->pcii.device_id,
         di->pcii.bus, di->pcii.device, di->pcii.function);
     /* create this area with NO user-space read or write permissions, to prevent accidental dammage */
-    di->sharedArea = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS, ((sizeof(ET6000SharedInfo) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK, 0);
+    di->sharedArea = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS, ((sizeof(ET6000SharedInfo) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
     if (di->sharedArea < 0) {
         /* return the error */
         result = di->sharedArea;
