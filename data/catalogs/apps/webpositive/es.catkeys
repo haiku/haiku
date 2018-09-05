@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	3870208430
+1	spanish; castilian	x-vnd.Haiku-WebPositive	1757183267
 Show home button	Settings Window		Mostrar botón de inicio
 Username:	Authentication Panel		Nombre de usuario:
 Copy URL to clipboard	Download Window		Copiar URL al portapapeles
@@ -114,6 +114,7 @@ Open search page	Settings Window		Abrir página de búsqueda
 Clear	Console Window		Limpiar
 Password:	Authentication Panel		Contraseña:
 Path	Cookie Manager		Ruta
+Back	WebPositive Window		Atrás
 New browser window	Download Window		Nueva ventana del navegador
 Today	WebPositive Window		Hoy
 Remember username and password for this site	Authentication Panel		Recordar nombre de usuario y contraseña para este sitio

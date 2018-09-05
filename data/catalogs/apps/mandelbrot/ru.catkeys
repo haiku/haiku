@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mandelbrot	157023036
+1	russian	x-vnd.Haiku-Mandelbrot	1781779654
 About	MandelbrotWindow		О программе
 Julia	MandelbrotWindow		Джулия
 Grassland	MandelbrotWindow		Луг
@@ -9,7 +9,6 @@ Royal	MandelbrotWindow		Королевский
 File	MandelbrotWindow		Файл
 Lightning	MandelbrotWindow		Молния
 Midnight	MandelbrotWindow		Полночь
-kerwizzy (original FractalEngine author)	MandelbrotWindow		kerwhizzy (автор оригинального FractalEngine)
 Palette	MandelbrotWindow		Палитра
 Mandelbrot	MandelbrotWindow		Мандельброт
 Burning Ship	MandelbrotWindow		Горящий корабль

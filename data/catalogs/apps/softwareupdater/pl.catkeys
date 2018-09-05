@@ -1,0 +1,26 @@
+1	polish	x-vnd.haiku-softwareupdater	3197458809
+No active network connection was found	UpdateManager	Error message	Nie znaleziono aktywnego połączenia sieciowego
+Cancel	SoftwareUpdaterWindow		Anuluj
+Packages are being updated	UpdateManager		Pakiety są aktualizowane
+Update now	SoftwareUpdaterWindow		Aktualizuj teraz
+Updates did not complete	UpdateAction		Aktualizacje nie zostały ukończone
+Checking for updates	CheckManager		Wyszukiwanie aktualizacji
+SoftwareUpdater	System name		SoftwareUpdater
+Fatal error while checking for updates: %s\n	CheckAction		Podczas szukania aktualizacji wystąpił błąd krytyczny: %s\n
+from repository	SoftwareUpdaterWindow	List item text	z repozytorium
+Cancel	SoftwareUpdaterWindow	Alert button label	Anuluj
+Quit	SoftwareUpdaterWindow	Alert button label	Zakończ
+Quit	SoftwareUpdaterWindow		Zakończ
+%i of %i	UpdateManager	Do not translate %i	%i z %i
+Quit	SoftwareUpdaterWindow	Button label	Zakończ
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Proszę wybrać jedną z opcji aktualizacji:\n\nZaktualizuj:\n\tAktualizuje wszystkie zainstalowane pakiety.\nPełna synchronizacja:\n\tSynchronizuje zainstalowane pakiety z repozytoriami.
+Exception occurred while checking for updates: %s\n	CheckAction		Podczas sprawdzania aktualizacji wystąpił wyjątek: %s\n
+Exception occurred while updating packages : %s\n	UpdateAction		Podczas aktualizowania pakietów wystąpił wyjątek: %s\n
+Update	SoftwareUpdaterWindow	Alert button label	Zaktualizuj
+OK	UpdateManager		OK
+A reboot may be necessary to complete some updates.	UpdateManager		Restart może być konieczny, aby ukończyć niektóre aktualizacje.
+Show more details	SoftwareUpdaterWindow		Wyświetl więcej szczegółów
+Full sync	SoftwareUpdaterWindow	Alert button label	Pełna synchronizacja
+No active network connection was found.\n	CheckManager		Nie znaleziono aktywnego połączenia z siecią.\n
+OK	SoftwareUpdaterWindow		OK
+There were no updates found.	CheckManager		Nie znaleziono żadnych aktualizacji.

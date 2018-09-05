@@ -1,0 +1,3 @@
+1	italian	x-vnd.Haiku-libpackage	787848306
+Failed to get repository names	PackageManagerKit		Impossibile ottenere i nomi dei repository
+Refreshing repository \"%s\" failed	PackageManagerKit		Impossibile aggiornare il repository \"%s\"

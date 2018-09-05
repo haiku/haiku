@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-BluetoothPrefs	1514658026
+1	italian	x-vnd.Haiku-BluetoothPrefs	1165760090
 About Bluetooth…	Window		Informazioni su Bluetooth…
 Handheld	Settings view		Palmare
 Default inquiry time:	Settings view		Tempo predefinito di interrogazione:
@@ -8,6 +8,7 @@ Starting scan...	Inquiry panel		Avvio scansione…
 Smart phone	Settings view		Smartphone
 Server	Settings view		Server
 Stop bluetooth services…	Window		Interrompi i servizi bluetooth…
+The Bluetooth services are not currently running on this system.	main		Il servizio Bluethooth non è al momento in esecuzione su questo sistema.
 Identify host as:	Settings view		Identifica host come:
 Refresh…	Remote devices		Aggiorna…
 Pair…	Remote devices		Associa…
@@ -18,6 +19,7 @@ Local devices found on system:	Settings view		Dispositivi locali trovati sul sis
 Remaining %1 seconds	Inquiry panel		Restano ancora %1 secondi
 Server	Window		Server
 Scanning completed.	Inquiry panel		Scansione completata.
+Launch now	main		Avvia adesso
 Remove	Remote devices		Rimuovi
 Quit	main		Esci
 15 secs	Settings view		15 secondi
@@ -45,6 +47,7 @@ Always ask	Settings view		Chiedi sempre
 Retrieving name of %1	Inquiry panel		Recupero nome of %1
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificare l'attivazione di Bluetooth sul dispositivo remoto . Premi 'Interrogare' per avviare la scansione. Il tempo necessario per il completamento dell'attività non è noto, anche se normalmente sono previsti non più di tre secondi per ogni dispositivo. Questi potranno poi essere aggiunti alla lista principale, per la successiva associazione.
 Authenticate	Extended local device view		Autenticazione
+Refresh local devices…	Window		Aggiornamento dispositivi locali…
 Pick device...	Settings view		Seleziona dispositivo…
 Retrieving names...	Inquiry panel		Recupero nomi in corso…
 Help	Window		Aiuto

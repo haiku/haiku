@@ -1,10 +1,11 @@
-1	italian	x-vnd.Haiku-Backgrounds	5390252
+1	italian	x-vnd.Haiku-Backgrounds	2560189700
 Backgrounds	System name		Sfondi
 X:	Main View		X:
 Resolution: 	Image Filepanel		Risoluzione: 
 pick one	Main View		scegli un'immagine
 Default	Main View		Predefinito
 Center	Main View		Centrata
+Folder: %path	Main View		Cartella: %path
 Manual	Main View		Manuale
 Default folder	Main View		Cartella predefinita
 Revert	Main View		Ripristina
@@ -19,6 +20,7 @@ Y:	Main View		Y:
 Tile	Main View		Ripetuta
 Select	Main View		Seleziona
 Scale to fit	Main View		Estesa
+OK	Main View		OK
 Placement:	Main View		Posizione:
 Preview	Main View		Anteprima
 Image:	Main View		Immagine:

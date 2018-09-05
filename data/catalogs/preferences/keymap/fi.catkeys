@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	1108623233
+1	finnish	x-vnd.Haiku-Keymap	1039047705
 Croatian	KeymapNames		Kroatialainen
 Turkish (Type-Q)	KeymapNames		Turkkilainen (Type-Q)
 Icelandic	KeymapNames		Islantilainen
@@ -78,6 +78,7 @@ Belarusian	KeymapNames		Valkovenäläinen
 Right option	Keyboard Layout View		Alt Gr-näppäin
 US-International	KeymapNames		US-kansainvälinen
 Dvorak	KeymapNames		Dvorak
+Russian (Yawert)	KeymapNames		Venäläinen (Yawert)
 Right shift	Keyboard Layout View		Oikea vaihtonäppäin
 Belarusian (Latin)	KeymapNames		Valkovenäläinen (latinalainen)
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
@@ -112,7 +113,7 @@ Kazakh	KeymapNames		Kazakstanilainen
 Colemak	KeymapNames		Colemak
 Font	Keymap window		Kirjasin
 Belarusian (Mac)	KeymapNames		Valkovenäläinen (Mac)
-Keymap	System name		Näppäinkuvausasetukset
+Keymap	System name		Näppäimistöasetukset
 Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
 Norwegian	KeymapNames		Norjalainen
 Left shift	Keyboard Layout View		Vasen vaihtonäppäin

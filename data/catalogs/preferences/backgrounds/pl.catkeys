@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Backgrounds	5390252
+1	polish	x-vnd.Haiku-Backgrounds	4123028037
 Backgrounds	System name		Tła
 X:	Main View		X:
 Resolution: 	Image Filepanel		Rozdzielczość: 
@@ -19,6 +19,7 @@ Y:	Main View		Y:
 Tile	Main View		Kafelkuj
 Select	Main View		Wybierz
 Scale to fit	Main View		Dopasuj rozmiar
+OK	Main View		OK
 Placement:	Main View		Położenie:
 Preview	Main View		Podgląd
 Image:	Main View		Obraz:

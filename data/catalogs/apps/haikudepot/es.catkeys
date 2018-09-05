@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	4015332039
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3764618272
 Name	PackageListView		Nombre
 Available packages	MainWindow		Paquetes disponibles
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -45,6 +45,7 @@ Ignore	UserLoginWindow		Ignorar
 Your rating was updated.	RatePackageWindow		Su evaluación ha sido actualizada.
 Language	UserLoginWindow		Idioma
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		La contraseña es demasiado débil o inválida. Por favor use al menos 8 caracteres con al menos 2 números y 2 letras mayúsculas.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Su evaluación fue subida con éxito. Puede actualizarla o eliminarla en el sitio web de HaikuDepot Server.
 Show only featured packages	FilterView		Mostrar sólo paquetes destacados
 Rate package	RatePackageWindow		Puntuar paquete
 Development	Model		Desarrollo
@@ -67,6 +68,7 @@ Mostly stable	RatePackageWindow		Mayormente estable
 Log out	MainWindow		Cerrar sesión
 Repository	PackageListView		Repositorio
 Education	Model		Educación
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		No parece que este paquete esté en el servidor de HaikuDepot, por lo que no es posible crear una nueva valoración o modificar una ya existente.
 Search terms:	FilterView		Términos de búsqueda
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		No hay valoraciones de usuario disponibles.
@@ -80,6 +82,7 @@ Authentication failed	UserLoginWindow		Falló la autenticación
 Logged in as %User%	MainWindow		Sesión iniciada como %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Idioma
+User rating	RatePackageWindow		Puntuación del usuario
 Size	PackageListView		Tamaño
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
 User name:	UserLoginWindow		Nombre de usuario:
@@ -108,6 +111,7 @@ Login or Create account	MainWindow		Ingresar o crear una cuenta
 Pending…	PackageListView		Pendiente…
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		Aceptar
+Package daemon problem	App		Problema con el proceso en segundo plano de paquetes
 Uninstalled	PackageListView		Desinstalado
 Show	MainWindow		Mostrar
 Stable	RatePackageWindow		Estable
@@ -137,6 +141,7 @@ Start package daemon	App		Arrancar demonio de paquetes
 Manage repositories…	MainWindow		Administrar repositorios…
 Business	Model		Trabajo
 Audio	Model		Audio
+Rating not possible	MainWindow		No ha sido posible puntuar
 About	PackageInfoView		Acerca de
 Active	PackageListView		Activo
 It was not possible to contact the web service.	UserLoginWindow		No fue posible contactar al servicio Web.

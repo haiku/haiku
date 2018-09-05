@@ -1,0 +1,9 @@
+1	italian	x-vnd.Haiku-libsolvsolver	750827074
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		il pacchetto %source% genera un conflitto con %dependency" fornita fa %target%
+unspecified problem	SolverProblem		problema non specificato
+do not deinstall \"%selection%\"	SolverProblemSolution		non rimuovere \"%selection%\"
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto %source% rende implicitamente obsoleta %dependency% fornita da %target%
+keep old %source%	SolverProblemSolution		tieni il vecchio %source%
+conflicting requests	SolverProblem		richieste in conflitto
+do not forbid installation of %source%	SolverProblemSolution		non vietare l'installazione di %source%
+allow architecture change of %source% to %target%	SolverProblemSolution		consenti cambio di architettura da %source% a %target%

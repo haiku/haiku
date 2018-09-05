@@ -1,31 +1,23 @@
-1	hungarian	x-vnd.Haiku-Installer	3421507633
+1	hungarian	x-vnd.Haiku-Installer	3694689316
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		A Boot Manager, ami a Haiku rendszertöltő menüt konfigurálja, nem indítható.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Biztosan meg szeretné szakítani a telepítést? A számítógép újra fog indulni!
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Telepítő\n\Írta Jérôme Duval és Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-\t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Itt a \"GRUB_HIDDEN_TIMEOUT=0\" sor elé rakjon egy \"#\" jelet ha azt szeretné, hogy a boot menü ténylegesen meg is jelenjen.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
 Quit	InstallerApp		Kilépés
 Additional disk space required: 0.0 KiB	InstallerWindow		0.0 KiB hely szükséges
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Leállítás
 Install progress:  	InstallerWindow		Másolás:  
 Starting Installation.	InstallProgress		A telepítés előkészítése…
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ez a szoftver alfa verziójú! Ebből következik, hogy adatvesztés könnyen előfordulhat. Gyakran csináljon biztonsági mentéseket! Mi szóltunk.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Biztos meg kívánja szakítani a telepítést?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Biztosan a mostani rendszerindító lemezre telepíti a rendszert? A telepítőnek újra kell indítania a számítógépét, hogy folytathassa a műveletet.
 Quit Boot Manager	InstallerWindow		Kilépés a Rendszerválasztóból
 Stop	InstallerWindow		Leállítás
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ha a rendszer betöltése nem működik, akkor a GRUB 2 rendelkezik egy további konfigurációs fájlal, aminek segítségével egyéni bejegyjézeket adhatunk a rendszertöltő menühöz. Ha a lista elejére szeretnénk új bejegyzést adni, akkor létre kell hozni / szerkeszteni kell a fájlt. Például:\n\n
 OK	InstallerApp		Rendben
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Mehet” gombra.
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Nem sikerült elindítani a Boot Managert
 Install from:	InstallerWindow		Honnan:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		FONTOS TUDNIVALÓK A HAIKU TELEPÍTÉSE ELŐTT\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		A GRUB partíció-elnevezési logikája: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
 Write boot sector to '%s'	InstallerWindow		Bootszektor írása: „%s”
 Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése…
@@ -37,36 +29,27 @@ Boot sector successfully written.	InstallProgress		A rendszerindító szektor m�
 Performing installation.	InstallProgress		A telepítés folyamatban…
 scanning…	InstallerWindow		keresés…
 Set up boot menu	InstallerWindow		Rendszerválasztó beállítása
-2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (v1.44 óta)\n
 Abort	InstallerWindow		Megszakítás
 Finishing Installation.	InstallProgress		Telepítés befejezése…
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <az ön által választott szövegszerkesztő> /etc/default/grub\n\n
 Restart	InstallerWindow		Újraindítás
 README	InstallerApp		OLVASSEL
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válasszon egy másik lemezt vagy csak a szükséges rendszerelemeket telepítse!
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Rendszerválasztó és a Lemezkezelő ablakait még mielőtt a Telepítő ablakát bezárná.
 Scanning for disks…	InstallerWindow		Lemezek keresése…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válasszon egy másikat!
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
 Show optional packages	InstallerWindow		Választható csomagok megjelenítése
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nincs a telepítéshez alkalmas partíció. Kérem, hozza létre a szükséges partíció(ka)t és legalább egy partíciót BFS-sel (Be File System) készítsen elő!
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Ezután pedig még egy másik fájlt is át kell írnia, hogy a boot menü tényleg meg is jelenjen:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből azt a lemezt, melyre telepíteni szeretne, majd kattintson a „Mehet” gombra.
 Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
 <none>	InstallerWindow	No partition available	<nincs>
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés kész. A boot szektor ide lett írva: '%s'. Nyomja meg az „Újraindítás” gombot a gép újraindításához, vagy válasszon ki egy új lemezt még egy telepítés elvégzéséhez.
 Installation canceled.	InstallProgress		A telepítés félbeszakadt.
 Installer	System name		Telepítő
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Magára a már kiválasztott lemezre nem lehet telepíteni. Kérem, válasszon egy másik lemezt!
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" jelöli a partició sorszámát, a GRUB 2 számai \"1\"-gyel kezdődnek.\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Indításkor a v1.44-es (például Ubuntu 11.04 vagy újabb) a Haiku-t fel fogja ismerni, de külsőként. Ha a Haiku-t hozzá akarja adni a GRUB-hoz, a Terminál-ban adja ki a következőt:\n\n
 Quit DriveSetup	InstallerWindow		Kilépés a Lemezkezelőből
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" jelöli a merevlemez sorszámát, a számok \"0\"-val kezdődnek.\n
 Hide optional packages	InstallerWindow		Választható csomagok elrejtése
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérem, zárja be a Lemezkezelő ablakot!
 Restart system	InstallerWindow		Számítógép újraindítása
@@ -78,33 +61,24 @@ Install anyway	InstallProgress		Telepítés folytatása
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Hiba történt és a telepítés nem ment teljesen végbe:\n\nA hiba:  „%s”
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Nyomja meg a „Mehet” gombot a rendszer „%1s” lemezről „%2s” lemezre telepítéshez!
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A Lemezkezelő fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Jó szórakozást, és köszönjük, hogy kipróbálja a Haikut! Reméljük tetszeni fog!
 OK	InstallProgress		Rendben
 Please choose target	InstallerWindow		Válassza ki, hogy hová szeretné telepíteni
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Ha egy valódi gépre akarja feltelepíteni a Haikut épp (nem egy emulátorban), ajánlatos előre elkészíteni neki egy partíciót. A Telepítővel és a Lemezkezelő eszközzel lehet inicializálni már létező partíciókat a Haiku fájlrendszerével, de a partícióelrendezés funkciók nem voltak mindenféle gépeken tesztelve, úgyhogy nem ajánljuk a használatukat.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) A telepítő bootolhatóvá fogja tenni a Haiku partícióját, de nem fogja megpróbálni elhelyezni a Haikut egy már létező boot menübe. Ha már fel van telepítve az ön gépén a GRUB, ahhoz hozzá tudja adni a Haikut. Ennek a módja a GRUB verziójától függ.\n\n\n
 Begin	InstallerWindow		Mehet
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		A végén pedig frissítenie kell a boot menüt ezeknek a beírásával:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Ha még nem készített partíciót, csak indítsa újra a gépet, készítsen egyet amilyen programmal csak akar, utána pedig indítsa el a Haikut a gépén a telepítés folytatásához. Használhatja például a GParted Live-CD eszközt, ami már létező partíciókat is át tud méretezni.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		A GRUB 2-ben az első logikai partíció sorszáma minden esetben \"5\" lesz, függetlenül az elsődeleges partíciók számától.\n\n
 Write boot sector	InstallerWindow		Rendszerbetöltő írása
 Cancel	InstallerWindow		Mégse
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A Lemezkezelőt, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		A cél kötet nem üres. Biztosan telepíteni szeretnéd?\n\nMegjegyzés: a 'rendszer' mappa teljes egészében átmásolásra kerül a forrás lemezről, de a beállítások mappát megtartja, minden más mappa össze lesz fésülve. Azon fájlok és hivatkozások, melyek egyaránt léteznek a forrás és a cél lemezen is, azok esetében a cél lemezen lévő ki lesz cserélve.
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
-All hard disks start with \"hd\".\n	InstallerApp		A merevlemezek mind \"hd\"-val kezdődnek.\n
 Continue	InstallerApp		Folytatás
 Boot sector not written because of an internal error.	InstallProgress		A Boot szektorba egy belső hiba miatt nem lehetett írni.
 Additional disk space required: %s	InstallerWindow		Még ennyi hely szükséges: %s
 Cancel	InstallProgress		Mégse
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		A Rendszerválasztó és a Lemezkezelő fut…\n\nA telepítés folytatásához zárja be mindkét programot.
 Try installing anyway	InstallProgress		Telepítés megpróbálása
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Tehát a fejléc alá, amit nem szabad átírni, írjon be néhány ehhez hasonló sort:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?
 Onto:	InstallerWindow		Hova:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Kérjük, zárja be a Rendszerválasztó ablakát még mielőtt a Telepítő ablakát bezárná.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) A Haiku első indításakor olvassa el az „Köszöntő”-t és a „Felhasználói útmutató”-t. Ezek megtalálhatóak az Asztalon és a WebPositive könyvjelzői között.\n\n
 Tools	InstallerWindow		Eszközök
 The mount point could not be retrieved.	InstallProgress		A csatolási pontot nem lehet meghatározni.
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <az ön által választott szövegszerkesztő> /etc/grub.d/40_custom\n\n

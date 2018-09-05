@@ -1,31 +1,23 @@
-1	romanian	x-vnd.Haiku-Installer	3421507633
+1	romanian	x-vnd.Haiku-Installer	3694689316
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Manager de Boot, aplicația care configurează meniul de pornire a Haiku, nu a putut fi lansată.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Sigur doriți să anulați instalarea și să reporniți sistemul?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Program de instalare\n\tscris de Jérôme Duval și Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-\t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Aici trebuie să transformați linia \"GRUB_HIDDEN_TIMEOUT=0\" într-un comentariu punând un \"#\" în fața acesteia pentru a afișa meniul de pornire a sistemului.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalarea s-a terminat. Sectorul de boot a fost scris pe '%s'. Clic pe Închidere pentru a ieși din programul de instalare sau alege un volum de destinație nou pentru a executa altă instalare.
 Quit	InstallerApp		Închidere
 Additional disk space required: 0.0 KiB	InstallerWindow		Spațiu de disc adițional necesar: 0.0 KiB
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Oprește
 Install progress:  	InstallerWindow		Progres instalare:  
 Starting Installation.	InstallProgress		Se pornește instalarea.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Acestea sunt programe de calitatea alfa! Înseamnă că există un mare risc de a pierde date importante. Efectuați copii de rezervă frecvente! Ați fost avertizați.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Sigur dorești să renunți la instalare?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sigur doriți să instalați pe discul de bot curent? Programul de instalare va fi nevoit să repornească sistemul dacă veți continua.
 Quit Boot Manager	InstallerWindow		Închide Boot Manager
 Stop	InstallerWindow		Oprește
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Dacă abordarea os-prober nu funcționează, GRUB 2 utilizează un fișier de configurare extra pentru a adăuga intrări personalizate la meniul de pornire. Pentru a le adăuga la început, trebuie să creați/editați un fișier prin lansarea editorului preferat dintr-un Terminal în felul acesta:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Alege discul sursă și de destinație din meniurile contextuale. Apoi apasă \"Începe\".
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku pe /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Nu s-a putut lansa Managerul de Boot
 Install from:	InstallerWindow		Instalează de la:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld din %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Schema de denumire pentru partiții a GRUB este: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Continuă
 Write boot sector to '%s'	InstallerWindow		Scrie sectorul de pornire a sistemului pe '%s'
 Collecting copy information.	InstallProgress		Se colectează informațiile de copiere.
@@ -37,36 +29,27 @@ Boot sector successfully written.	InstallProgress		Sector de boot scris cu succe
 Performing installation.	InstallProgress		Se execută instalarea.
 scanning…	InstallerWindow		se scanează…
 Set up boot menu	InstallerWindow		Configurează meniul de pornire a sistemului
-2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (de la os-prober v1.44)\n
 Abort	InstallerWindow		Renunță
 Finishing Installation.	InstallProgress		Se finalizează instalarea.
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <your favorite text editor> /etc/default/grub\n\n
 Restart	InstallerWindow		Repornește
 README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		E posibil ca discul de destinație să nu dețină destul spațiu. Încercați să alegeți un disc diferit sau alegeți să nu instalați elementele opționale.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Închideți Administratorul de boot și ConfigurareDrive înainte de a închide fereastra Programului de instalare.
 Scanning for disks…	InstallerWindow		Se scanează pentru discuri…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Discul nu poate fi montat. Alegeți un disc diferit.
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Porniți utilitatea ConfigurareDrive pentru a partiționa\nhard discurile disponibile și alte media.\nPartițiile pot fi inițializate cu\nsistemul de fișiere Be necesar pentru o partiție de boot\nHaiku.
 Show optional packages	InstallerWindow		Afișează pachete opționale
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nu s-au găsit partiții care sunt potrivite pentru instalare. Configurați partițiile și inițializați cel puțin o partiție cu sistemul de fișiere Be.
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Adițional trebuie să editați încă un fișier pentru a afișa meniul de boot:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul pe care dorești să instalezi din meniul contextual. Apoi apasă \"Începe\".
 Unknown Type	InstallProgress	Partition content type	Tip necunoscut
 <none>	InstallerWindow	No partition available	<nimic>
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalarea s-a terminat. Sectorul de boot a fost scris pe '%s'. Apasă Repornește pentru a reporni calculatorul sau alege un volum de destinație nou pentru a executa altă instalare.
 Installation canceled.	InstallProgress		Instalare anulată.
 Installer	System name		Program instalare
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nu puteți instala conținutul unui disc pe el însuși. Alegeți un disc diferit.
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" este numărul partiției, care pentru GRUB 2 începe cu \"1\"\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Începând cu os-prober v1.44 (e.g. în Ubuntu 11.04 sau mai târziu), Haiku ar trebui să fie recunoscut direct. Pentru a adăuga Haiku la meniul GRUB, deschideți un Terminal și tastați:\n\n
 Quit DriveSetup	InstallerWindow		Închide DriveSetup
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" este numărul hard discului, care începe cu \"0\".\n
 Hide optional packages	InstallerWindow		Ascunde pachetele opționale
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.
 Restart system	InstallerWindow		Repornește sistemul
@@ -78,33 +61,24 @@ Install anyway	InstallProgress		Instalează oricum
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		A apărut o eroare și instalarea nu a fost completată:\n\nEroare:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Apasă butonul Începe pentru a instala din '%1s' pe '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Se pornește ConfigurareDrive...\n\nÎnchideți ConfigurareDrive pentru a continua cu instalarea.
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Distrați-vă și vă mulțumim că ați experimentat Haiku! Sperăm că vă place!
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		Alegeți destinația
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Dacă instalați Haiku pe hardware real (nu într-un emulator) este recomandat să aveți deja pregătită o partiție pe hard disc. Programul de instalare și unealta ConfigurareDriver asigură intițializarea partițiilor existente cu sistemul nativ de fișiere Haiku, dar opțiunile de a schimba aranjamentul partiției actuale s-ar putea să nu fie testate pe o varietate destul de mare de configurări ale calculatorului, prin urmare nu recomandăm să le utilizați.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Programul de instalare va face partiția Haiku bootabilă, dar nu va integra Haiku într-un meniul de boot existent. Dacă aveți deja instalat GRUB, puteți adăuga Haiku la meniul de boot al acestuia. În funcție de versiunea de GRUB pe care o utilizați, acest lucru este realizat diferit.\n\n\n
 Begin	InstallerWindow		Începe
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		În final, trebuie să actualizați meniul de boot prin introducerea:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Nu ați creat o partiție încă, reporniți, creați partiția utilizând un instrument care vă convine mai mult, și reporniți la Haiku pentru a continua instalarea. Ați putea, de exemplu, să utilizați Live-CD GParted, poate să redimensioneze partițiile existente pentru a face spațiu.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Cu GRUB 2 prima partiție logică are întotdeauna numărul \"5\", indiferent de numărul partițiilor primare.\n\n
 Write boot sector	InstallerWindow		Scrie sectorul de boot
 Cancel	InstallerWindow		Anulează
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		ConfigurareDrive, aplicația pentru configurarea partițiilor de disc, nu a putut fi pornită.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volumul țintă nu este liber. Sigur doriți să instalați oricum?\n\nNotă: Dosarul 'system' va fi o copie curată din sursa volumului dar va reține dosarul de configurări, toate celelalte dosare for fi fuzionate, în timp ce fișierele și legăturile care există atât la volumul sursă cât și la cel țintă vor fi suprascrise cu versiunea volumului sursă.
 No optional packages available.	PackagesView		Niciun pachet opțional disponibil.
-All hard disks start with \"hd\".\n	InstallerApp		Toate hard discurile încep cu \"hd\".\n
 Continue	InstallerApp		Continuă
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.
 Additional disk space required: %s	InstallerWindow		Spațiu de disc adițional necesar: %s
 Cancel	InstallProgress		Anulează
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Se pornește Administratorul de boot și ConfigurareDriver...\n\nÎnchideți ambele aplicații pentru a continua cu instalarea.
 Try installing anyway	InstallProgress		Încearcă să instalezi oricum
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Sub antetul care nu trebuie completat, adăugați ceva asemănător cu aceste linii:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Sigur doriți să opriți instalarea?
 Onto:	InstallerWindow		Pe:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Închideți fereastra Administratorului de boot înainte de a închide fereastra Programului de instalare.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Când ați pornit cu succes Haiku pentru prima dată, asigurați-vă că veți citi pagina noastră de \"Welcome\" și documentația din \"Userguide\". Există legături pe Desktop și în favorite WebPositive.\n\n
 Tools	InstallerWindow		Unelte
 The mount point could not be retrieved.	InstallProgress		Punctul de montare nu a putut fi obținut.
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n

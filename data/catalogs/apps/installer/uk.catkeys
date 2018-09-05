@@ -1,31 +1,23 @@
-1	ukrainian	x-vnd.Haiku-Installer	3421507633
+1	ukrainian	x-vnd.Haiku-Installer	3694689316
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Завантажувач, програма для конфігурації завантажувального меню Haiku, не запущений.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ви впевнені що бажаєте зупинити встановлення і перезавантажити систему?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Встановлювач\n\tАвтори Jérôme Duval і Stephan Aßmus\n\tВсі права застережені 2005–2010, Haiku.\n\n
-\t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Там ви можете закоментувати рядок \"GRUB_HIDDEN_TIMEOUT=0\" помістивши \"#\" перед ним, з метою появи меню завантаження.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Встановлення завершене. Завантажувальний сектор записано до '%s'. Натисніть Вихід щоб покинути Завантажувач або виберіть інший цільовий том для виконання другого встановлення.
 Quit	InstallerApp		Завершити
 Additional disk space required: 0.0 KiB	InstallerWindow		Необхідно додатковий дисковий простір: 0.0 KiB
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Зупинити
 Install progress:  	InstallerWindow		Хід встановлення:  
 Starting Installation.	InstallProgress		Початок встановлення.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Це лише альфа-версія, тому є ризик втрати важливих даних. Частіше робіть резервне копіювання! Будьмо уважні!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Ви дійсно бажаєте відмінити встановлення?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ви впевнені що, хочете встановлювати на поточний завантажувальний диск? Встановлювач перезавантажить машину, якщо ви продовжите.
 Quit Boot Manager	InstallerWindow		Вийти з Завантажувача
 Stop	InstallerWindow		Зупинено
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Якщо програма os-prober не працює у Вашому випадку, GRUB 2 використовує додатковий конфігураційний файл для додавання пунктів у завантажувальне меню. Для цього досить запустити в Терміналі свій улюблений редактор і відрегувати цей файл, додавши, наприклад, таку стрічку:\n\n
 OK	InstallerApp		Гаразд
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Виберіть джерело і цільовий диск з випадаючого меню. Тоді клікніть \"Почати\".
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku на /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Призупинено запуск Завантажувача
 Install from:	InstallerWindow		Встановити з:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖЛИВА ІНФОРМАЦІЯ ПЕРЕД ВСТАНОВЛЕННЯМ HAIKU\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Схема поіменування розділів GRUB'а наступна: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Продовжити
 Write boot sector to '%s'	InstallerWindow		Записати завантажувальний сектор до '%s'
 Collecting copy information.	InstallProgress		Збір інформації для копіювання.
@@ -37,36 +29,27 @@ Boot sector successfully written.	InstallProgress		Завантажувальн�
 Performing installation.	InstallProgress		Виконується встановлення.
 scanning…	InstallerWindow		сканування…
 Set up boot menu	InstallerWindow		Встановити меню завантаження
-2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (починаючи з os-prober v1.44)\n
 Abort	InstallerWindow		Відмінити
 Finishing Installation.	InstallProgress		Завершення встановлення.
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <ваш улюблений текстовий редактор> /etc/default/grub\n\n
 Restart	InstallerWindow		Перезавантажити
 README	InstallerApp		ПРОЧИТАЙ
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові елементи.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Закрийте Завантажувач та Розмітку диска до закриття вікна Встановлювача.
 Scanning for disks…	InstallerWindow		Сканування дисків…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск неможливо підмонтувати. Виберіть інший.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту Розмітка диску для розбиття\nдоступних вінчестерів і пристроїв.\nРозділи будуть зініціалізовані у \nBe File System необхідній для завантаження \nрозділу з Haiku.
 Show optional packages	InstallerWindow		Показати необовя’зкові пакети
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Не знайдено жодного розділу, що підходить для встановлення. Налаштуйте розділи або зініціалізуйте один з них в Be File System.
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Додатково доведеться змінити ще один файл, щоб з’явилося меню завантаження:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск для встановлення з випадаючого меню. Тоді клікніть \"Почати\".
 Unknown Type	InstallProgress	Partition content type	Невідомий тип
 <none>	InstallerWindow	No partition available	<немає>
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Встановлення завершене. Завантажувальний сектор записано до '%s'. Натисніть Перезавантажити для рестарту або виберіть новий  цільовий том для іншого встановлення.
 Installation canceled.	InstallProgress		Встановлення відмінено.
 Installer	System name		Встановлювач
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Неможливо встановити розділ на самого себе. Виберіть інший диск.
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" є номер розділу, який для GRUB 2 починається з \"1\"\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Починаючи з os-prober v1.44 (тобто з Ubuntu 11.04 або пізнішої), Haiku повинна розпізнаватись з коробки. Щоб додати Haiku в меню GRUB, відкрийте Термінал та введіть:\n\n
 Quit DriveSetup	InstallerWindow		Вийти з Розмітки диску
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" номер жорсткого диску, починається з \"0\".\n
 Hide optional packages	InstallerWindow		Сховати необов’язкові пакети
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно Розмітки диску до закриття вікна Встановлювача.
 Restart system	InstallerWindow		Перезавантажити систему
@@ -78,33 +61,24 @@ Install anyway	InstallProgress		Встановити будь-що
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Сталася помилка і встановлення неповне:\n\nПомилка: %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Натисніть Почати для встановлення з '%1s' до '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Працює Розмітка диску…\n\nЗакрийте Розмітку диску для продовження встановлення.
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Насолоджуйтесь і дякуємо за спробу використання Haiku! Маємо надію що вона вам сподобається!
 OK	InstallProgress		Гаразд
 Please choose target	InstallerWindow		Виберіть ціль
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Якщо ви встановлюєте Haiku на реальному залізі (не всередині емулятора) рекомендується розбити жорсткий диск на розділи заздалегідь. Встановлювач та утиліта Розмітка диску здатні до ініціалізації присутніх розділів у рідній файловій системі Haiku, але опції зміни існуючих розділів протестовані недостатньо і ми не рекомендуємо їх поки що до використання.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Встановлювач сам зробить розділ Haiku завантажувальним, але він не зробить жодних кроків для інтеграції Haiku в меню завантаження. Якщо Ви маєте встановлений GRUB, то можете додати Haiku до його меню завантаження. В залежності від версії GRUB, це робиться по різному.\n\n\n
 Begin	InstallerWindow		Почати
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Врешті, Ви повинні оновити меню завантаження набравши:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Якщо Ви досі не створили розділ, перезавантажтесь, створіть його за допомогою звичної Вам програми, завантажтесь в Haiku для продовження інсталяції. Для прикладу використайте GParted Live-CD, який також може змінити розміри присутніх розділів.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		У GRUB 2 перший логічний розділ завжди має номер \"5\", в незалежності від кількості первинних розділів.\n\n
 Write boot sector	InstallerWindow		Записати завантажувальний сектор
 Cancel	InstallerWindow		Відмінити
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Неможливо запустити утиліту Розмітка диску для зміни розділів.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Цільовий том не є порожнім. Бажаєте продовжити встановлення будь-що?\n\nЗауваження: Папка 'system' буде повною копією папки з вихідного тома при збереженні всіх налаштувань, решта папок будуть об'єднані. В той же час всі папки і посилання що існують на цільовому та вихідному томах будуть переписані згідно з версією останнього.
 No optional packages available.	PackagesView		Необов’язкові пакети відсутні.
-All hard disks start with \"hd\".\n	InstallerApp		Всі жорсткі диски починаються з \"hd\".\n
 Continue	InstallerApp		Продовжити
 Boot sector not written because of an internal error.	InstallProgress		Завантажувальний сектор не записано через внутрішню помилку.
 Additional disk space required: %s	InstallerWindow		Є потреба в додатковому дисковому просторі: %s
 Cancel	InstallProgress		Відмінити
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Працюють Завантажувач та розмітка диску…\n\nЗакрийте обидві програми для продовження встановлення.
 Try installing anyway	InstallProgress		Провести встановлення будь-що
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Тому під заголовком, котрий редагувати не можна, додайте щось на кшталт:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Ви впевнені, що бажаєте зупинити встановлення?
 Onto:	InstallerWindow		На:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Закрийте вікно Завантажувача до закриття вікна Встановлювача.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) При першому успішному завантаженні у встановлену Haiku, не забудьте прочитати нашу документацію, доступну в файлах \"Welcome (Вітаємо)\" та \"Userguide (Настанова користувача)\". Посилання на них знаходяться на рабочому столі і в закладках WebPositive.\n\n
 Tools	InstallerWindow		Інструменти
 The mount point could not be retrieved.	InstallProgress		Неможливо отримати точку монтування
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <ваш улюблений редактор> /etc/grub.d/40_custom\n\n

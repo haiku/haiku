@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-CodyCam	3696164492
+1	italian	x-vnd.Haiku-CodyCam	1188580421
 Upload…	VideoConsumer.cpp		Carica…
 Capturing Image…	VideoConsumer.cpp		Acquisizione immagine…
 Every 30 seconds	CodyCam		Ogni 30 secondi
@@ -60,6 +60,7 @@ Connected…	VideoConsumer.cpp		Connesso…
 PASS <suppressed>  (real password sent)\n	FtpClient		PASS <soppressa>  (password reale inviata)\n
 File upload failed	VideoConsumer.cpp		Caricamento del file non riuscito
 Every 5 minutes	CodyCam		Ogni 5 minuti
+read: %d\n	SftpClient		letti: %d\n
 Capture controls	CodyCam		Controlli di cattura
 Every hour	CodyCam		Ogni ora
 Cannot connect the video source to the video window	CodyCam		Impossibile connettere la sorgente video alla finestra
@@ -68,9 +69,11 @@ Error getting initial latency for the capture node	CodyCam		Calcolo della latenz
 Send to…	CodyCam		Invia a...
 on or off expected	Settings	Do not translate 'on' and 'off'	stato (on/off) non indicato
 Quit	CodyCam		Esci
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Never	CodyCam		Mai
 Cannot create a video window	CodyCam		Impossibile creare una finestra video
 Every 10 minutes	CodyCam		Ogni 10 minuti
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Sorgente video non trovata.\nCodyCam richiede l'uso di una webcam.
 Cannot start the video source	CodyCam		Impossibile attivare la sorgente video
 Cannot start the video window	CodyCam		Impossibile avviare la finestra video
 password expected	CodyCam		password non indicata

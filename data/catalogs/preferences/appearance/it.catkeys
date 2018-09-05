@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Appearance	727801787
+1	italian	x-vnd.Haiku-Appearance	2087262640
 Plain font:	Font view		Tipo di carattere:
 Control highlight	Colors tab		Evidenziazione del controllo
 Control border	Colors tab		Bordi del controllo
@@ -18,6 +18,7 @@ Failure	Colors tab		Insuccesso
 Hinting menu	AntialiasingSettingsView		Menu dei suggerimenti
 Scroll bar:	DecorSettingsView		Barra di scorrimento:
 Document background	Colors tab		Sfondo del documento
+Status bar	Colors tab		Barra di stato
 Revert	APRWindow		Ripristina
 Window tab	Colors tab		Linguetta della finestra
 Tooltip background	Colors tab		Sfondo dei suggerimenti

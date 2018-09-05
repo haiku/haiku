@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	362374460
+1	italian	x-vnd.Haiku-libtracker	2457169405
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-on
 Mount settings…	ContainerWindow		Impostazioni di mount
@@ -18,7 +18,8 @@ Recent documents	FavoritesMenu		Documenti recenti
 Modified	QueryPoseView		Modificato
 Created	ContainerWindow		Creato
 Move	FSUtils	button label	Sposta
-Error %error loading add-On %name.	ContainerWindow		Il caricamento dell'Add-On %name ha generato il seguente errore: %error.
+Error %error loading add-On %name.	ContainerWindow		Il caricamento dell'add-On %name ha generato il seguente errore: %error.
+Skip all	FSUtils		Salta tutti
 contains	SelectionWindow		contiene
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Non è possibile salvare nulla sulla directory principale (root) del sistema.
 Show shared volumes on Desktop	SettingsView		Mostra volumi condivisi sul Desktop

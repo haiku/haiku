@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-hmulti_audio.media_addon	1515612298
+1	dutch; flemish	x-vnd.Haiku-hmulti_audio.media_addon	451057402
 Master	MultiAudio		Master
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		Versterking
@@ -6,3 +6,29 @@ Output 3D center	MultiAudio		Uitvoer 3D midden
 Extended Setup	MultiAudio		Uitgebreide Instellingen
 CD	MultiAudio		CD
 Tone control	MultiAudio		Toonbediening
+Phone	MultiAudio		Telefoon
+Aux	MultiAudio		Aux
+Output bass	MultiAudio		Basuitvoer
+Headphones	MultiAudio		Koptelefoon
+Beep	MultiAudio		Piep
+Output mono mix	MultiAudio		Monomixuitvoer
+Output stereo mix	MultiAudio		Stereomixuitvoer
+Input	MultiAudio		Invoer
+Output treble	MultiAudio		Hoge-tonen-uitvoer
+Mono mix	MultiAudio		Monomix
+General	MultiAudio		Algemeen
+Input & Output	MultiAudio		In- & uitvoer
+Enhanced Setup	MultiAudio		Uitgebreide instellingen
+Stereo mix	MultiAudio		Stereomix
+Output 3D depth	MultiAudio		Uitvoer 3D-diepte
+Volume	MultiAudio		Volume
+Output	MultiAudio		Uitvoer
+Video	MultiAudio		Video
+Line	MultiAudio		Lijn
+Mic	MultiAudio		Microfoon
+ frequency:	MultiAudio		 frequentie:
+Enable	MultiAudio		Inschakelen
+Mute	MultiAudio		Dempen
+Wave	MultiAudio		Golf
+Setup	MultiAudio		Instellingen
+Level	MultiAudio		Niveau

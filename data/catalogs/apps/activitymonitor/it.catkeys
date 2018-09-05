@@ -1,7 +1,8 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	4111458489
+1	italian	x-vnd.Haiku-ActivityMonitor	2320517302
 P-faults	DataSource		P-fault
 Media nodes	DataSource		Nodi multimediali
 Threads	DataSource		Thread
+Always on top	ActivityWindow		Sempre in primo piano
 Add graph	ActivityWindow		Aggiungi grafico
 Teams	DataSource		Team
 Network send	DataSource		Invio (rete)

@@ -2,13 +2,13 @@
 Website location	PoorMan		Webbisivusijainti
 Error Server	PoorMan		Virhepalvelin
 Settings…	PoorMan		Asetukset...
-Create PoorMan log	PoorMan		Luo Köyhisloki
+Create PoorMan log	PoorMan		Luo Pettuleipäloki
 Shutting down.\n	PoorMan		Lopetetaan.\n
 Hits: %lu	PoorMan		Osumia: %lu
 Web folder:	PoorMan		Webbikansio:
 Save log console selection	PoorMan		Tallenna lokikonsolivalinta
 Run server	PoorMan		Käynnistä palvelin
-PoorMan settings	PoorMan		Köyhisasetukset
+PoorMan settings	PoorMan		Pettuleipäasetukset
 Clear hit counter	PoorMan		Nollaa osumalaskuri
 Copy	PoorMan		Kopioi
 Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
@@ -32,7 +32,7 @@ Edit	PoorMan		Muokkaa
 Create Log File	PoorMan		Luo lokitiedosto
 Log to console	PoorMan		Kirjaa pääteikkunaan
 Directory: (none)	PoorMan		Hakemisto: (ei mitään)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Pettuleipä-palvelimen luoma oletuskansio ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
 Log To Console	PoorMan		Kirjaa konsoliin
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# yhteys} other{# yhteyttä}}
 Connections	PoorMan		Yhteydet
@@ -62,5 +62,5 @@ Console logging	PoorMan		Pääteikkunakirjaaminen
 Cannot start the server	PoorMan		Palvelinta ei voi käynnistää
 Select	PoorMan		Valitse
 Save console as…	PoorMan		Tallenna pääteikkuna nimellä...
-PoorMan	System name		Köyhis
+PoorMan	System name		Pettuleipä
 Console Logging	PoorMan		Pääteikkunakirjaaminen

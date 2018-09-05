@@ -1,13 +1,14 @@
-1	polish	x-vnd.Haiku-HaikuDepot	1437744500
+1	polish	x-vnd.Haiku-HaikuDepot	455766332
 Name	PackageListView		Nazwa
-Available packages	MainWindow		Pakiety dostępne
+Available packages	MainWindow		Dostępne pakiety
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
+OK	MainWindow		OK
 Close	RatePackageWindow		Zamknij
 The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test CAPTCHA.
 Changelog	PackageInfoView		Dziennik zmian
 Your rating:	RatePackageWindow		Twoja ocena:
 The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
-Log in…	MainWindow		Zaloguj…
+Log in…	MainWindow		Zaloguj się…
 Rate %Package%	RatePackageWindow		Oceń %Package%
 Stability:	RatePackageWindow		Stabilność:
 Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje
@@ -16,6 +17,7 @@ Stability	RatePackageWindow		Stabilność
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
 Description	PackageListView		Opis
 Install	PackageManager		Zainstaluj
+All repositories	MainWindow		Wszystkie repozytoria
 Source packages	MainWindow		Pakiety źródłowe
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autoryzacja nie powiodła się. Użytkownik nie istnieje lub podano złe hasło.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Konto zostało utworzone. Możesz teraz oceniać pakiety oraz robić inne przydatne rzeczy.
@@ -36,7 +38,7 @@ The username is already taken. Please choose another.	UserLoginWindow		Ta nazwa 
 Close	PackageManager		Zamknij
 Not logged in	MainWindow		Niezalogowany
 The authentication was successful.	UserLoginWindow		Autoryzacja powiodła się.
-Installed packages	MainWindow		Pakiety zainstalowane
+Installed packages	MainWindow		Zainstalowane pakiety
 Status	PackageListView		Status
 Switch account…	MainWindow		Przełącz konto…
 Ignore	UserLoginWindow		Ignoruj
@@ -61,6 +63,7 @@ HaikuDepot needs the package daemon to function, and it appears to be not runnin
 Downloading:	PackageInfoView		Pobieranie:
 Mostly stable	RatePackageWindow		Całkiem stabilny
 Log out	MainWindow		Wyloguj
+Repository	PackageListView		Repozytorium
 Education	Model		Edukacja
 Search terms:	FilterView		Szukana fraza:
 %Version%	PackageInfoView		%Version%
@@ -121,6 +124,7 @@ Cancel	RatePackageWindow		Anuluj
 Package action failed	PackageInfoView		Akcja dla pakietu nie powiodła się
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Wyślij
+Repositories	MainWindow		Repozytoria
 -	no package size		-
 Category:	FilterView		Kategoria:
 Failed to create account	UserLoginWindow		Nie udało się utworzyć konta
@@ -132,5 +136,6 @@ Audio	Model		Dźwięk
 About	PackageInfoView		O pakiecie
 Active	PackageListView		Aktywny
 It was not possible to contact the web service.	UserLoginWindow		Nie udało się połączyć z usługą sieciową.
+Refreshing...	MainWindow		Odświeżanie...
 Failed to create account: %s\n	UserLoginWindow		Nie udało się utworzyć konta: %s\n
 Cancel	UserLoginWindow		Anuluj
