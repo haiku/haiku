@@ -255,7 +255,8 @@ InitDevice(DeviceInfo& di)
 		(void**) &(di.sharedInfo),
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sharedSize),
-		B_FULL_LOCK, 0);
+		B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (di.sharedArea < 0)
 		return di.sharedArea;	// return error code
 
@@ -285,7 +286,7 @@ InitDevice(DeviceInfo& di)
 		regsBase,
 		regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
 		(void**)&di.regs);
 
 	if (si.regsArea < 0) {
