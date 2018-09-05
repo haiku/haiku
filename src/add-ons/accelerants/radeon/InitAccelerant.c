@@ -81,7 +81,7 @@ static status_t init_common( int the_fd, bool accelerant_is_clone )
 	if( ai->si->memory[mt_AGP].area > 0 ) {
 		ai->mapped_memory[mt_AGP].area = clone_area( "Radeon AGP GART area", 
 			(void **)&ai->mapped_memory[mt_AGP].data, B_ANY_ADDRESS,
-			B_READ_AREA | B_WRITE_AREA, ai->si->memory[mt_PCI].area );
+			B_READ_AREA | B_WRITE_AREA, ai->si->memory[mt_AGP].area );
 		if( ai->mapped_memory[mt_AGP].area < 0 ) {
 			result = ai->mapped_memory[mt_AGP].area;
 			goto err5;
