@@ -1,0 +1,13 @@
+1	italian	x-vnd.haiku-softwareupdater	1334495363
+Cancel	SoftwareUpdaterWindow		Annulla
+Update now	SoftwareUpdaterWindow		Aggiorna ora
+Checking for updates	CheckManager		Controllo aggiornamenti in corso
+Downloading packages	UpdateManager		Scaricamento dei pacchetti
+from repository	SoftwareUpdaterWindow	List item text	dal repository
+Cancel	SoftwareUpdaterWindow	Alert button label	Annulla
+Click here to install updates.	CheckManager		Fai clic qui per installare gli aggiornamenti.
+The following changes will be made:	SoftwareUpdaterWindow		Saranno apportate le seguenti modifiche:
+Quit	SoftwareUpdaterWindow	Alert button label	Esci
+Quit	SoftwareUpdaterWindow		Esci
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacchetti da disinstallare
+Quit	SoftwareUpdaterWindow	Button label	Esci

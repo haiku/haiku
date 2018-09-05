@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Keymap	1108623233
+1	german	x-vnd.Haiku-Keymap	1039047705
 Croatian	KeymapNames		Kroatisch
 Turkish (Type-Q)	KeymapNames		Türkisch (Typ-Q)
 Icelandic	KeymapNames		Isländisch
@@ -78,6 +78,7 @@ Belarusian	KeymapNames		Weißrussisch
 Right option	Keyboard Layout View		Option rechts
 US-International	KeymapNames		US International
 Dvorak	KeymapNames		Dvorak
+Russian (Yawert)	KeymapNames		Russisch (Yawert)
 Right shift	Keyboard Layout View		Shift rechts
 Belarusian (Latin)	KeymapNames		Weißrussisch (lat. Alphabet)
 Key	Modifier keys window	As in a computer keyboard key	Taste

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Expander	1129502603
+1	german	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Entpacken
 Expanding '%s'…	ExpanderWindow		'%s' wird entpackt…
 Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
@@ -21,6 +21,7 @@ Other	ExpanderPreferences		Allgemeines
 Cancel	ExpanderPreferences		Abbrechen
 Expansion	ExpanderPreferences		Entpacken
 Select	DirectoryFilePanel		Auswählen
+The folder was either moved, renamed or not supported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Der Zielordner existiert nicht. Soll er angelegt werden?
 Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
 Settings	ExpanderMenu		Einstellungen
@@ -30,6 +31,7 @@ Select	ExpanderPreferences		Auwählen
 Show contents	ExpanderWindow		Inhalt zeigen
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
 OK	ExpanderPreferences		OK
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
 Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
 Failed to create the destination folder.	ExpanderWindow		Der Zielordner konnte nicht angelegt werden.
 Select '%s'…	DirectoryFilePanel		'%s' auswählen

@@ -1,31 +1,23 @@
-1	swedish	x-vnd.Haiku-Installer	3421507633
+1	swedish	x-vnd.Haiku-Installer	3694689316
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, den applikation man använder för att konfigurera Haiku boot meny kunde inte startas.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-\t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Här måste du kommentera bort raden \"GRUB_HIDDEN_TIMEOUT=0\" genom att sätta en \"#\" framför den för att verkligen visa startmenyn.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installationen är klar. Startsektorn har skrivits på volymen %s. Klicka på Avsluta för att lämna installationsprogrammet eller välj en ny volym att installera på.
 Quit	InstallerApp		Avsluta
 Additional disk space required: 0.0 KiB	InstallerWindow		Ytterligare nödvändigt diskutrymme: 0.0 KiB
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Stopp
 Install progress:  	InstallerWindow		Installationsförlopp:  
 Starting Installation.	InstallProgress		Startar installationen.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Detta är ett program i alfa (ej fullt testad) version! Med det menas att det finns en stor risk för att viktig data kan gå förlorad. Ta backup ofta! Kom ihåg att du har blivit varnad...\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Är du säker på att du vill installera på den valda startdisken? Om du fortsätter måste Installeraren starta om datorn.
 Quit Boot Manager	InstallerWindow		Avsluta Starthanteraren
 Stop	InstallerWindow		Stopp
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Os-prober sättet fungerar inte för dig, GRUB 2 använder en extra konfigurerings fil för att lägg till egna värden till boot menyn. För att lägga till dem högst upp, behöver du ändra/skapa filen med din favorit editor från Terminalen på följande sätt:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Välj käll- och måldisk från menyn. Klicka sedan på \"Starta\".
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku på /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Kunde inte starta Boot Manager
 Install from:	InstallerWindow		Installera från:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMATION INNAN DU INSTALLERAR HAIKU\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUB's namn standard för partioner är: (hdN,n)\n \n
 Continue	InstallerWindow	In alert after pressing Stop	Fortsätt
 Write boot sector to '%s'	InstallerWindow		Skriv startsektor till '%s'
 Collecting copy information.	InstallProgress		Förbereder inför kopiering.
@@ -37,36 +29,27 @@ Boot sector successfully written.	InstallProgress		Skrivning av startsektorn lyc
 Performing installation.	InstallProgress		Verkställer installationen.
 scanning…	InstallerWindow		skannar…
 Set up boot menu	InstallerWindow		Ställ in startmeny
-2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (since os-prober v1.44)\n
 Abort	InstallerWindow		Avbryt
 Finishing Installation.	InstallProgress		Slutför Installationen.
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <valfri textredigerare> /etc/default/grub\n\n
 Restart	InstallerWindow		Starta om
 README	InstallerApp		LÄS MIG
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Måldisken kan ha för lite ledigt utrymme. Försök att välja en annan disk eller välj att installera färre valbara paket.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Vänligen stäng Starthanterarens- och DiskHanterings fönster innan du stänger Installerarens fönster.
 Scanning for disks…	InstallerWindow		Skannar efter diskar…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disken kan inte monteras. Var god välj en annan disk.
 ?? of ??	InstallerWindow	Unknown progress	?? av ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DiskHanteringsverktyget för att partitionera\ntillgängliga hårddiskar och annan media.\nPartitioner can formateras med Be-filsystemet\nsom krävs för en Haiku boot-partition.
 Show optional packages	InstallerWindow		Visa valbara paket
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är dugliga för installation. Var god ställ in partitioner och initialisera minst en partition med Be-filsystemet.
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Eventuellt så måste du redigera en annan fil för att se startmenyn:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj den disk du vill installera till. Klicka sedan på \"Starta\".
 Unknown Type	InstallProgress	Partition content type	Okänd Typ
 <none>	InstallerWindow	No partition available	<ingen>
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installationen är klar. Startsektorn har skrivits till '%s'. Klicka på Starta om för att starta om datorn, eller välj en ny volym att utföra en till installation.
 Installation canceled.	InstallProgress		Installationen avbröts.
 Installer	System name		Installerare
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Du kan inte installera innehållet av en disk på den själv. Var god välj en annan disk.
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" är partitionens nummer, som i GRUB 2 startar med \"1\"\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Starta med os-prober v1.44 (e.g. i Ubuntu 11.04 eller senare), Haiku borde kännas igen utan ändringar. För att lägga till Haiku till GRUB menyn, öppna ett terminalfönster och skriv:\n \n
 Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" är hårddiskens nummer, som startar med \"0\".\n
 Hide optional packages	InstallerWindow		Göm valbara paket
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 Restart system	InstallerWindow		Starta om systemet
@@ -78,33 +61,24 @@ Install anyway	InstallProgress		Installera iallafall
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Ett fel uppstod och installationen slutfördes inte:\n\nFel:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klicka på Kör för att installera från '%1s' till '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Kör DriveSetup…\n\nStäng DriveSetup för att fortsätta med installationen.
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Ha kul och tack för att du testar Haiku! Wi hoppas du gillar Haiku!
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		Välj mål
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Om du vill installera Haiku på riktig hårdvara (inte i en emulator) är det rekomenderat att du skapar och förebereder en hårdisk partion. Installations och DriveSetup programmen kan initiera den existerande partitionen med Haiku egna fil system, men att ändra partitions layouten kanske inte har testats på tillräckligt många olika systemkonfigureringar så vi rekomenderar inte att man använder den.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Installationen kommer att göra Haiku partitionen bootningsbar, men kommer inte att integrera Haiku till någon existerande boot meny. Om du redan använder GRUB , kan du lägga till Haiku till dess boot meny. Beroende på vilken version av GRUB du använder så görs det på olika sätt.\n\n\n
 Begin	InstallerWindow		Börja
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Äntligen, dumåste updatera boot menyn genom att skriva:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Om du inte har skapat en partition än, bara bota om, skapa en partition med en ditt favorit partitions program, boota up i Haiku igen och fortsätt med installationen. Du skulle tex kunna använda GParted Live-CD, den kan också användas för att ändra storlekar på partitioner.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Med GRUB 2 har den första logiska partitionen alltid nummer \"5\", oavsätt antalet primära partitioner.\n\n
 Write boot sector	InstallerWindow		Skriv bootsektor
 Cancel	InstallerWindow		Avbryt
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, applikationen för att konfigurera disk partitioner kunde inte startas.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Den tänkta volumen är inte tom. Är du säker att du villinstallera ändå?\n\nNotering: Systemfoldern kommer att vara en kopia från källans systemfolder men kommer att behålla inställningsfoldern, alla anda foldrar kommer att mergas. De filer och länkar som finns på båda ställena kommer att skrivas över med de nyare.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
-All hard disks start with \"hd\".\n	InstallerApp		Alla hårdiskar startar med \"hd\".\n
 Continue	InstallerApp		Fortsätt
 Boot sector not written because of an internal error.	InstallProgress		Det gick inte att skriva till bootsektorn på grund av ett internt fel.
 Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
 Cancel	InstallProgress		Avbryt
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Kör Boot Manager och DriveSetup…\n\nStäng båda programmen för att fortsätta med installationen.
 Try installing anyway	InstallProgress		Försök installera iallafall
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Under rubriken ska inte ändras. Lägg till något liknande till dessa rader:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Är du säker på att du vill stoppa installationen?
 Onto:	InstallerWindow		Till:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Stäng Boot Manager fönstret före du stänger installatione fönstret.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   När du har startat Haiku första gången. Läs gärna våra dokument \"Välkommen\" och \"Användarguid\". Det finns länkar på skrivbordet och i WebPositive's bokmärken.\n\n
 Tools	InstallerWindow		Verktyg
 The mount point could not be retrieved.	InstallProgress		Monteringspunkt kunde inte läsas av.
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <valfri textredigerare> /etc/grub.d/40_custom\n\n

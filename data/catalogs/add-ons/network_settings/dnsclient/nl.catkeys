@@ -1,0 +1,10 @@
+1	dutch; flemish	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS-instellingen
+Move down	DNSSettingsView		Naar beneden verplaatsen
+DNS settings	DNSSettingsView		DNS-instellingen
+Remove	DNSSettingsView		Verwijderen
+Domain:	DNSSettingsView		Domein:
+Add	DNSSettingsView		Toevoegen
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Omhoog verplaatsen
+Apply	DNSSettingsView		Toepassen

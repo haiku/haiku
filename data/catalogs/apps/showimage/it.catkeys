@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	466377502
+1	italian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Utilizza come sfondo…
 File	Menus		File
 Slide delay	Menus		Tempo d'attesa
@@ -52,6 +52,7 @@ Select all	Menus		Seleziona tutto
 Zoom factor in %:	PrintOptionsWindow		Fattore di zoom in %:
 Width:	PrintOptionsWindow		Larghezza:
 Image	Menus		Immagine
+Move to Trash	Menus		Sposta nel Cestino
 OK	Alerts		OK
 Rotate clockwise	Menus		Ruota in senso orario
 Job setup	PrintOptionsWindow		Imposta attività

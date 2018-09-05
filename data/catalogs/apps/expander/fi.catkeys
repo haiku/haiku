@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Expander	1129502603
+1	finnish	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Laajenna
 Expanding '%s'…	ExpanderWindow		Laajennetaan ’%s’…
 Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
@@ -21,6 +21,7 @@ Other	ExpanderPreferences		Muut
 Cancel	ExpanderPreferences		Peru
 Expansion	ExpanderPreferences		Laajentaminen
 Select	DirectoryFilePanel		Valitse
+The folder was either moved, renamed or not supported.	ExpanderWindow		Kansio on joko muutettu, nimetty uudelleen tai sitä ei tueta.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Kohdekansiota ei ole olemassa. Haluatko luoda sen?
 Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
 Settings	ExpanderMenu		Asetukset
@@ -30,6 +31,7 @@ Select	ExpanderPreferences		Valitse
 Show contents	ExpanderWindow		Näytä sisällöt
 Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
 OK	ExpanderPreferences		Valmis
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Haluatko varmasti pysäyttää tämän arkiston laajentamisen? Laajennetut kohteet eivät ole ehkä valmiita.
 Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
 Failed to create the destination folder.	ExpanderWindow		Kohdekansion luominen epäonnistui.
 Select '%s'…	DirectoryFilePanel		Valitse ’%s’...

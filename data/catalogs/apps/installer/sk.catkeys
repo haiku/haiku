@@ -1,31 +1,23 @@
-1	slovak	x-vnd.Haiku-Installer	3421507633
+1	slovak	x-vnd.Haiku-Installer	3694689316
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správcu zavádzania, aplikáciu na nastavenie zavádzacieho menu Haku, sa nepodarilo spustiť.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istí, že chcete zrušiť inštaláciu a reštartovať systém?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Inštalátor\n\tnapísal Jérôme Duval a Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-\t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tu musíte zakomentovať riadok „GRUB_HIDDEN_TIMEOUT=0“ tým, že predeň dáte znak „#“. Tým sa vlastne zobrazí menu zavádzača.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Inštalácia bola dokončená. Zavádzací sektor bol zapísaný na „%s“. Stlačením „Ukončiť“ opusťte Inštalátor alebo zvoľte nový cieľový zväzok, ak chcete vykonať ďalšiu inštaláciu.
 Quit	InstallerApp		Ukončiť
 Additional disk space required: 0.0 KiB	InstallerWindow		Je potrebných ešte 0.0 KiB miesta.
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Zastaviť
 Install progress:  	InstallerWindow		Priebeh inštalácie:  
 Starting Installation.	InstallProgress		Začína inštalácia.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Toto je softvér v alfa kvalite! Znamená to, že existuje riziko straty dôležitých dát. Robte časté zálohy! Boli ste upozornený.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Ste si istí, že chcete prerušiť inštaláciu?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ste si istí, že chcete vykonať inštaláciu na disk, z ktorého sa v súčasnosti zavádza systém? Ak budete pokračovať Inštalátor bude musieť reštartovať počítač.
 Quit Boot Manager	InstallerWindow		Ukončiť Správcu zavádzania
 Stop	InstallerWindow		Zastaviť
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ak vám prístup založený na os-prober nevyhovuje, GRUB 2 používa ďalší konfiguračný súbor na pridanie vlastných položiek do zavádzacieho menu. Ak ich chcete pridať na vrch menu, musíte vytvoriť/upraviť súbor spustením vášho obľúbeného editora z terminálu, takto:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový a cieľový disk z roletových menu. Potom kliknite na „Začať“.
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku na /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Nepodarilo sa spustiť Správcu zavádzania
 Install from:	InstallerWindow		Inštalovať z:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		DÔLEŽITÉ INFORMÁCIE PRED INŠTALÁCIOU HAIKU\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Konvencia pomenovania oblastí v GRUB je: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Pokračovať
 Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s“
 Collecting copy information.	InstallProgress		Zhromažďujú sa informácie o kopírovaní.
@@ -37,36 +29,27 @@ Boot sector successfully written.	InstallProgress		Zavádzací sektor úspešne 
 Performing installation.	InstallProgress		Prebieha inštalácia.
 scanning…	InstallerWindow		zisťuje sa…
 Set up boot menu	InstallerWindow		Nastaviť zavádzacie menu
-2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (od os-prober v1.44)\n
 Abort	InstallerWindow		Prerušiť
 Finishing Installation.	InstallProgress		Dokončuje sa inštalácia.
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <váš obľúbený textový editor> /etc/default/grub\n\n
 Restart	InstallerWindow		Reštartovať
 README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a Nastavenie diskových oblastí predtým, než zatvoríte okno Inštalátora.
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk nie je možné pripojiť. Prosím, zvoľte iný disk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Spustiť nástroj Nastavenie diskových oblastí na rozdelenie\ndostupných pevných diskov a ďalších médií.\nOblasti je možné inicializovať Súborovým\nsystémom Be, ktorý je vyžadovaný pre\nzavádzaciu oblasť Haiku.
 Show optional packages	InstallerWindow		Zobraziť voliteľné balíky
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Neboli nájdené žiadne oblasti vhodné na inštaláciu. Prosím, pripravte diskové oblasti a inicializujte aspoň jednu oblasť Súborovým systémom Be.
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Naviac budete musieť upraviť ďalší súbor, aby sa zobrazilo zavádzacie menu:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte z roletového menu disk, na ktorý sa má vykonať inštalácia. Potom kliknite na „Začať“.
 Unknown Type	InstallProgress	Partition content type	Neznámy typ
 <none>	InstallerWindow	No partition available	<žiadna>
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Inštalácia bola dokončená. Zavádzací sektor bol zapísaný do „%s“. Stlačením „Reštartovať“ reštartujte počítač alebo zvoľte nový cieľový zväzok ak chcete vykonať ďalšiu inštaláciu.
 Installation canceled.	InstallProgress		Inštalácia zrušená.
 Installer	System name		Inštalátor
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nemôžete inštalovať obsah disku na rovnaký disk. Prosím, zvoľte iný disk.
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		„n“ je číslo oblasti, ktoré pre GRUB 2 začína „1“.\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Počínajúc os-prober v1.44 (napr. v Ubuntu 11.04 alebo novšom), Haiku by malo byť rozpoznané bez nutnosti akejkoľvek konfigurácie. Ak chcete pridať Haiku do menu GRUB, otvorte Terminál a zadajte:\n\n
 Quit DriveSetup	InstallerWindow		Ukončiť Nastavenie diskových oblastí
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		„N“ je číslo pevného disku, začína „0“.\n
 Hide optional packages	InstallerWindow		Skryť voliteľné balíky
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
 Restart system	InstallerWindow		Reštartovať systém
@@ -78,33 +61,24 @@ Install anyway	InstallProgress		Inštalovať napriek tomu
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Vyskytla sa chyba a inštalácia nebola dokončená:\n\nError:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Stlačením tlačidla „Začať“ spustíte inštaláciu z „%1s“ na „%2s“.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Spúšťa sa Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte Nastavenie diskových oblastí.
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Bavte sa a ďakujeme vám za vyskúšanie Haiku! Dúfame, že sa vám bude páčiť!
 OK	InstallProgress		OK
 Please choose target	InstallerWindow		Prosím, vyberte cieľ
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Ak inštalujete Haiku na skutočný hardvér (nie v emulátore), odporúča sa, aby ste mali vopred pripravenú diskovú oblasť. Inštalátor a nástroj Nastavenie diskových oblastí vám ponúknu inicializovať existujúce oblasti natívnym súborovým systémom Haiku, ale voľby na zmenu vlastného rozloženia oblastí neboli otestované na dostatočne rozličných konfiguráciách počítačov, preto neodporúčame ich používať.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Inštalátor označí samotnú oblasť s Haiku ako zavádzaciu, ale nevykoná potrebné kroky na to, aby integroval Haiku do existujúceho menu zavádzača. Ak máte GRUB už nainštalovaný, môžete Haiku pridať do jeho menu. V závislosti na tom, ktorú verziu GRUB používate je postup odlišný.\n\n\n
 Begin	InstallerWindow		Začať
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Nakoniec aktualizujte menu zavádzača zadaním:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Ak ste ešte nevytvorili oblasť, jednoducho reštartujte počítač, vytvorte oblasť použitím ľubovoľného nástroja, ktorý vám vyhovuje a naštartujte do Haiku, kde budete pokračovať v inštalácii. Napríklad môžete použiť Live-CD GParted, ktoré tiež dokáže meniť veľkosť existujúcich oblastí a uvoľniť tak miesto.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		V GRUB 2 má prvá logická oblasť vždy číslo „5“ bez ohľadu na počet primárnych oblastí.\n\n
 Write boot sector	InstallerWindow		Zapísať zavádzací sektor
 Cancel	InstallerWindow		Zrušiť
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nastavenie diskových oblastí, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Cieľový zväzok nie je prázdny. Ste si istý, že napriek tomu chcete pokračovať v inštalácii?\n\nPozn.: Priečinok „system“ bude čistou kópiou zo zdrojového zväzku, ale zachová si priečinok nastavení, všetky ostatné priečinky budú zlúčené, zatiaľ čo súbory a odkazy existujúce zároveň na zdrojovom aj cieľovom zväzku budú prepísané verziou zo zdrojového zväzku.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
-All hard disks start with \"hd\".\n	InstallerApp		Všetky pevné disky začínajú „hd“.\n
 Continue	InstallerApp		Pokračovať
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.
 Additional disk space required: %s	InstallerWindow		Je potrebných ešte %s miesta.
 Cancel	InstallProgress		Zrušiť
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania a Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte obe aplikácie.
 Try installing anyway	InstallProgress		Skúsiť inštalovať napriek tomu
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Takže pod nadpisom, ktorý nesmiete upravovať, pridajte niečo podobné týmto riadkom:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Ste si istí, že chcete zastaviť inštaláciu?
 Onto:	InstallerWindow		Na:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Správcu zavádzania predtým, než zatvoríte okno Inštalátora.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Keď prvýkrát úspešne naštartujete Haiku, uistite sa, že si prečítate našu dokumentáciu „Vitajte“ a „Používateľská príručka“. Nájdete ich v záložkách na Ploche a vo WebPositive.\n\n
 Tools	InstallerWindow		Nástroje
 The mount point could not be retrieved.	InstallProgress		Nie je možné ziskať prípojný bod.
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\t sudo <váš obľúbený textový editor> /etc/grub.d/40_custom\n\n

@@ -1,31 +1,23 @@
-1	indonesian	x-vnd.Haiku-Installer	3421507633
+1	indonesian	x-vnd.Haiku-Installer	3694689316
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, aplikasi untuk mengkonfigurasi menu boot Haiku, tidak dapat diluncurkan.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Anda yakin ingin membatalkan instalasi dan memulai ulang sistem?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tditulis oleh Jérôme Duval dan Stephan Aßmus\n\tHakcipta 2005-2010, Haiku.\n\n
-\t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Di sini anda harus mengomentari baris \"GRUB_HIDDEN_TIMEOUT=0\" dengan meletakkan \"#\" di depannya untuk benar-benar menampilkan menu boot.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalasi selesai. Boot sector telah ditulis ke '%s'. Tekan Keluar untuk meninggalkan Installer atau pilih volume target baru untuk melakukan instalasi lain.
 Quit	InstallerApp		Keluar
 Additional disk space required: 0.0 KiB	InstallerWindow		Ruang disk tambahan yang diperlukan: 0.0 KiB
-\tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Berhenti
 Install progress:  	InstallerWindow		Perkembangan instalasi:  
 Starting Installation.	InstallProgress		Memulai Instalasi.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ini adalah perangkat lunak kualitas alfa! Itu berarti ada risiko tinggi kehilangan data penting. Sering membuat cadangan! Anda telah diperingatkan.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Anda yakin ingin membatalkan instalasi?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Apakah Anda yakin ingin menginstal ke disk boot saat ini? Installer harus me-reboot komputer Anda jika Anda melanjutkan.
 Quit Boot Manager	InstallerWindow		Keluar dari Boot Manager
 Stop	InstallerWindow		Berhenti
-\t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
-If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Jika pendekatan os-prober tidak berfungsi untuk Anda, GRUB 2 menggunakan file konfigurasi tambahan untuk menambahkan entri kustom ke menu boot. Untuk menambahkannya ke atas, Anda harus membuat/mengedit file dengan meluncurkan editor favorit Anda dari Terminal seperti ini:\n\n
 OK	InstallerApp		OKE
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pilih sumber dan disk tujuan dari menu pop-up. Lalu klik \"Begin\".
-\t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku di /dev/sda7\n
 Failed to launch Boot Manager	InstallerWindow		Gagal meluncurkan Boot Manager
 Install from:	InstallerWindow		Instal dari:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld dari %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMASI PENTING SEBELUM MENGINSTAL HAIKU\n\n
-GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Skema penamaan GRUB untuk partisi adalah: (hdN, n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Lanjut
 Write boot sector to '%s'	InstallerWindow		Tulis boot-sector ke '%s'
 Collecting copy information.	InstallProgress		Mengumpulkan informasi salinan.
@@ -37,36 +29,27 @@ Boot sector successfully written.	InstallProgress		Boot-sector berhasil ditulis.
 Performing installation.	InstallProgress		Melakukan instalasi.
 scanning…	InstallerWindow		pemindaian…
 Set up boot menu	InstallerWindow		Atur menu boot
-2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (sejak os-prober v1.44)\n
 Abort	InstallerWindow		Batal
 Finishing Installation.	InstallProgress		Menyelesaiakan Instalasi.
-\tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <your favorite text editor> /etc/default/grub\n\n
 Restart	InstallerWindow		Restart
 README	InstallerApp		BACA SAYA
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Disk tujuan mungkin tidak memiliki cukup ruang. Coba pilih disk yang berbeda atau pilih untuk tidak memasang item opsional.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Harap tutup jendela Boot Manager dan DriveSetup sebelum menutup jendela Installer.
 Scanning for disks…	InstallerWindow		Memindai diska…
-2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Diska tidak dapat dipasang. Silakan pilih diska yang berbeda.
 ?? of ??	InstallerWindow	Unknown progress	?? of ??
-\tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Luncurkan utilitas DriveSetup untuk mempartisi\nhard drive yang tersedia dan media lainnya.\nPartisi dapat diinisialisasi dengan\nBe File System yang dibutuhkan untuk partisi \nboot Haiku.
 Show optional packages	InstallerWindow		Tampilkan paket opsional
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Tidak ada partisi yang ditemukan yang cocok untuk pemasangan. Silakan mengatur partisi dan menginisialisasi setidaknya satu partisi dengan Be File System.
-Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Selain itu anda harus mengedit file lain untuk benar-benar menampilkan menu boot:\n\n
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk yang ingin Anda pasang dari menu pop-up. Lalu klik \"Begin\".
 Unknown Type	InstallProgress	Partition content type	Type tak dikenal
 <none>	InstallerWindow	No partition available	<none>
-\t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalasi selesai. Sektor boot telah ditulis ke '%s'. Tekan Restart untuk menyalakan ulang komputer atau pilih volume target baru untuk melakukan instalasi lain.
 Installation canceled.	InstallProgress		Instalasi dibatalkan.
 Installer	System name		Installer
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Anda tidak dapat menginstal isi disk ke dirinya sendiri. Silakan pilih disk yang berbeda.
 ???	InstallerWindow	Unknown currently copied item	???
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" adalah nomor partisi, yang untuk GRUB 2 dimulai dengan \"1\"\n
-Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Dimulai dengan os-prober v1.44 (mis. Di Ubuntu 11.04 atau lebih baru), Haiku seharusnya langsung dikenali. Untuk menambahkan Haiku ke menu GRUB, buka Terminal dan masukkan:\n\n
 Quit DriveSetup	InstallerWindow		Keluar dari DriveSetup
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" adalah nomor cakram keras, dimulai dengan \"0\".\n
 Hide optional packages	InstallerWindow		Sembunyikan paket opsional
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
 Restart system	InstallerWindow		Start ulang sistem
@@ -78,33 +61,24 @@ Install anyway	InstallProgress		Bagaimanapun lanjut install
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Terjadi kesalahan dan instalasi tidak selesai:\n\nGalat:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Tekan tombol Begin untuk menginstal dari '%1s' ke '%2s'.
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Menjalankan DriveSetup...\n\nTutup DriveSetup untuk melanjutkan instalasi.
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Selamat bersenang-senang dan terima kasih banyak telah mencoba Haiku! Kami harap Anda menyukainya!
 OK	InstallProgress		OKE
 Please choose target	InstallerWindow		Silakan pilih target
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)   Jika Anda menginstal Haiku ke perangkat keras yang sebenarnya (bukan di dalam emulator), sebaiknya Anda sudah menyiapkan partisi hard disk.Kakas Installer dan alat DriveSetup menawarkan untuk menginisialisasi partisi yang ada dengan sistem file asli Haiku,tetapi opsi untuk mengubah tata letak partisi sebenarnya mungkin belum diuji pada berbagai konfigurasi komputer yang cukup bagus sehingga kami tidak menyarankan untuk menggunakannya.\n
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)   Installer akan membuat partisi Haiku sendiri dapat di-boot,tetapi tidak mengambil langkah untuk mengintegrasikan Haiku ke dalam menu boot yang ada. Jika Anda sudah menginstal GRUB, Anda dapat menambahkan Haiku ke menu bootnya. Tergantung pada versi GRUB apa yang Anda gunakan, ini dilakukan secara berbeda.\n\n\n
 Begin	InstallerWindow		Mulai
-Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Akhirnya, anda harus memperbarui menu boot dengan memasukkan:\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Jika Anda belum membuat partisi, cukup reboot, buat partisi menggunakan alat apa pun yang menurut Anda paling nyaman, dan reboot ke Haiku untuk melanjutkan instalasi. Anda bisa misalnya menggunakan GParted Live-CD, itu juga dapat mengubah ukuran partisi yang ada untuk memberi ruang.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		Dengan GRUB 2, partisi logical pertama selalu memiliki nomor \"5\", terlepas dari jumlah partisi primer.\n\n
 Write boot sector	InstallerWindow		Tulis sektor boot
 Cancel	InstallerWindow		Batal
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikasi untuk mengkonfigurasi partisi disk, tidak dapat diluncurkan.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volume target tidak kosong. Anda yakin ingin memasangnya?\n\nCatatan: Folder 'sistem' akan menjadi salinan bersih dari volume sumber tetapi akan mempertahankan folder pengaturannya,sedangkan file dan tautan yang ada pada sumber dan volume target akan ditimpa dengan versi volume sumber.
 No optional packages available.	PackagesView		Tidak ada paket opsional yang tersedia.
-All hard disks start with \"hd\".\n	InstallerApp		Semua cakam keras dimulai dengan \"hd\".\n
 Continue	InstallerApp		Lanjut
 Boot sector not written because of an internal error.	InstallProgress		Boot sector tidak ditulis karena kesalahan internal.
 Additional disk space required: %s	InstallerWindow		Ruang disk tambahan yang diperlukan: %s
 Cancel	InstallProgress		Batal
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Menjalankan Boot Manager dan DriveSetup…\n\nTutup kedua aplikasi untuk melanjutkan instalasi.
 Try installing anyway	InstallProgress		Bagaimanapun coba instal
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Jadi di bawah tajuk yang tidak boleh diedit, tambahkan sesuatu yang mirip dengan baris ini:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Anda yakin ingin menghentikan instalasi?
 Onto:	InstallerWindow		Keatas:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Silakan tutup jendela Boot Manager sebelum menutup jendela Installer.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Ketika Anda berhasil boot ke Haiku untuk pertama kalinya, pastikan untuk membaca dokumentasi kami \"Welcome\" and \"Userguide\". Ada tautan di Desktop dan di bookmark WebPositive.\n\n
 Tools	InstallerWindow		Alat
 The mount point could not be retrieved.	InstallProgress		Titik mount tidak dapat diambil.
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n

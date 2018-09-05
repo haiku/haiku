@@ -1,5 +1,5 @@
 1	italian	x-vnd.Haiku-debug_server	1440673937
-Terminate	DebugServer		Terminare
+Terminate	DebugServer		Termina
 Debug	DebugServer		Debug
 Save report	DebugServer		Salva rapporto
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A causa di un'errore, l'applicazione:\n\n      %app\n\nnon può continuare l'esecuzione e sarà terminata da Haiku.

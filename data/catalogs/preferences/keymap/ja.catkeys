@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Keymap	1108623233
+1	japanese	x-vnd.Haiku-Keymap	1039047705
 Croatian	KeymapNames		クロアチア語
 Turkish (Type-Q)	KeymapNames		トルコ語 (Type-Q)
 Icelandic	KeymapNames		アイスランド語
@@ -78,6 +78,7 @@ Belarusian	KeymapNames		ベラルーシ語
 Right option	Keyboard Layout View		右 Option キー
 US-International	KeymapNames		英語 (US-International)
 Dvorak	KeymapNames		Dvorak
+Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
 Right shift	Keyboard Layout View		右 Shift キー
 Belarusian (Latin)	KeymapNames		ベラルーシ語 (Latin)
 Key	Modifier keys window	As in a computer keyboard key	キー

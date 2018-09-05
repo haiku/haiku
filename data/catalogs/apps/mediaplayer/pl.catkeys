@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	3708050243
+1	polish	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Zapisz listę odtwarzania
 (not supported)	MediaPlayer-InfoWin		(nieobsługiwane)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Żaden z plików, które chciałeś otworzyć, nie wygląda na plik multimedialny.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się.\n\nBłąd: 
+ask every time	MediaPlayer-SettingsWindow		pytaj za każdym razem
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nowy odtwarzacz…
 100% scale	MediaPlayer-Main		100%
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Kontener
 Nothing to Play	MediaPlayer-Main		Brak plików do odtwarzania
 Muted	MediaPlayer-SettingsWindow		Wyciszone
 Quit	MediaPlayer-Main		Zakończ
+Resume:	MediaPlayer-SettingsWindow		Wznów:
 Video	MediaPlayer-Main		Wideo
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nie ma odpowiedniego dekodera do odtworzenia tego formatu lub dekoder ma problem z konkretną wersją tego formatu.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Import wpisu
@@ -57,6 +59,7 @@ MediaPlayer	System name		MediaPlayer
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Ustawienia…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Ustawienia programu MediaPlayer
+never	MediaPlayer-SettingsWindow		nigdy
 h	MediaPlayer-InfoWin	Hours	godz.
 Select all	MediaPlayer-PlaylistWindow		Zaznacz wszystko
 Move Entry	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisu
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Błąd:
 Large	MediaPlayer-SettingsWindow		Duże
 Bottom of video	MediaPlayer-SettingsWindow		Na dole obrazu
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+always	MediaPlayer-SettingsWindow		zawsze
 Total duration: %s	MediaPlayer-PlaylistWindow		Łączny czas trwania: %s
 <unnamed media>	MediaPlayer-InfoWin		<nienazwane medium>
 raw video	MediaPlayer-InfoWin		czyste wideo

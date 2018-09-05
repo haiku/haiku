@@ -30,7 +30,7 @@ Show application expander	PreferencesWindow		Mostra espansore applicazione
 Close all	WindowMenu		Chiudi tutto
 Deskbar preferences	PreferencesWindow		Preferenze di Deskbar
 Mount	DeskbarMenu		Monta
-Revert	PreferencesWindow		Annulla
+Revert	PreferencesWindow		Ripristina
 Small	PreferencesWindow		Piccole
 Recent applications:	PreferencesWindow		Applicazioni recenti:
 Shutdown…	DeskbarMenu		Uscita da Haiku…

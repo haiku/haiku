@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Shortcuts	1611284793
+1	spanish; castilian	x-vnd.Haiku-Shortcuts	986541402
 OK	ShortcutsWindow		Aceptar
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Atajos no pudo guardar tu conjunto de teclas.
 Cancel	ShortcutsWindow		Cancelar
@@ -19,6 +19,7 @@ Save	ShortcutsWindow		Guardar
 *MouseButton 1	ShortcutsWindow		*Botóndelratón 1
 *MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
 Save changes before closing?	ShortcutsWindow		¿Guardar cambios antes de cerrar?
+Command	ShortcutsSpec	Name for modifier on keyboard	Comando
 Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
 Add new shortcut	ShortcutsWindow		Añadir un nuevo atajo
 Save & apply	ShortcutsWindow		Guardar y aplicar

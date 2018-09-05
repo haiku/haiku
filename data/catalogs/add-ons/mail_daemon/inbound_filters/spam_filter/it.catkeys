@@ -1,0 +1,4 @@
+1	italian	x-vnd.Haiku-SpamFilter	518563114
+or empty e-mail	SpamFilterConfig		o una e-mail vuota
+Bayesian Spam Filter	SpamFilter		Filtro Anti-Spam di tipo Bayesiano
+Learn from all incoming e-mail	SpamFilterConfig		Impara da tutte le e-mail in arrivo

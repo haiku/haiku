@@ -1,0 +1,15 @@
+1	italian	x-vnd.Haiku-MatchHeader	4216655435
+<Choose action>	ConfigView		<Scegli un'azione>
+Header field (e.g. Subject, From, ...)	ConfigView		Campo header (Soggetto, Da, ...)
+Account	ConfigView		Account
+has	ConfigView		ha
+Move to	ConfigView		Sposta in
+Then	ConfigView		Quindi
+this field is based on the action	ConfigView		questo campo è basato sull'azione
+Delete message	ConfigView		Cancella messaggio
+<Choose account>	ConfigView		<Scegli un account>
+Set flags to	ConfigView		Imposta flag a
+Set as read	ConfigView		Segna come già letto
+Reply with	ConfigView		Rispondi con
+If	ConfigView		Se
+Match \"%attribute\" against \"%regex\"	RuleFilter		Controlla \"%attribute\" rispetto a \"%regex\"

@@ -1,0 +1,12 @@
+1	italian	x-vnd.Haiku-SMTP	4272000912
+SMTP server:	ConfigView		Server SMTP:
+Error while logging in to %serv	smtp		Errore durante l'autenticazione su %serv
+. The server says:\n	smtp		. Risposta del server:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Connessione al server…
+Error while opening connection to %serv	smtp		Errore durante la connessione a %serv
+POP3 authentication failed. The server said:\n	smtp		L'autenticazione POP3 è fallita. Risposta del server:\n
+Destination:	ConfigView		Destinazione:
+POP3 before SMTP	ConfigView		POP3 prima di SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. Risposta del server:\n

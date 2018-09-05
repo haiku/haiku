@@ -1,4 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-NewMailNotification	2111731137
+1	dutch; flemish	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		U heeft {0, plural, one{Eén nieuw bericht} other{# nieuwe berichten}} voor %account.
 none	NotifierConfigView		geen
 Method:	NotifierConfigView		Methode:
 Beep	NotifierConfigView		Geluidssignaal

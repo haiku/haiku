@@ -1,4 +1,6 @@
-1	polish	x-vnd.Haiku-Keymap	1385051534
+1	polish	x-vnd.Haiku-Keymap	1980403819
+Croatian	KeymapNames		Chorwacki
+Icelandic	KeymapNames		Islandzki
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Cofnij
 Warning: left and right key roles do not match	Modifier keys window		Uwaga: przeznaczenie klawiszy lewego i prawego się nie zgadzają
@@ -7,6 +9,7 @@ Menu	Keyboard Layout View	Menu key	Menu
 Left control	Keyboard Layout View		Lewy Ctrl
 Tilde trigger	Keymap window		Wywołanie tyldy
 Grave trigger	Keymap window		Wywołanie ciężkie
+Polish	KeymapNames		Polski
 Role	Modifier keys window	As in the role of a modifier key	Rola
 Caps lock	Keyboard Layout View		Caps Lock
 Select dead keys	Keymap window		Wybierz martwe klawisze
@@ -17,6 +20,7 @@ Quit	Keymap window		Zakończ
 Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
 Circumflex trigger	Keymap window		Wywołanie akcentu
 Diaeresis trigger	Keymap window		Wywołanie diarezy
+Ukrainian	KeymapNames		Ukraiński
 Disabled	Modifier keys window	Do nothing	Wyłączony
 Open…	Keymap window		Otwórz…
 Error: duplicate keys	Modifier keys window		Błąd: zduplikowane klawisze
@@ -40,6 +44,7 @@ Option	Keyboard Layout View	Option key	Opcja
 Sample and clipboard:	Keymap window		Przykład i schowek:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Klawisz Alt/Opt
 Layout	Keymap window		Układ
+Esperanto	KeymapNames		Esperanto
 Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
 Right command	Keyboard Layout View		Prawy Command
 Revert	Keymap window		Cofnij

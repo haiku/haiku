@@ -1,20 +1,26 @@
-1	italian	x-vnd.Haiku-About	1617763448
+1	italian	x-vnd.Haiku-About	3963412481
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autori di Gutenprint. Tutti i diritti riservati.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm e Werner Lemberg.
+Past website & marketing:\n	AboutView		Vecchio sito web & marketing:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e il suo kernel NewOS)\n
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Tutti i diritti riservati.
 %d MiB total	AboutView		%d MiB totali
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondatore del progetto)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB utilizzati (%d%%)
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Contiene software proveniente dal Progetto GNU, rilasciato sotto licenza GPL e LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
 AboutSystem	System name		Informazioni su Haiku
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe e altri.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Tutti i diritti riservati.
 Revision	AboutView		Revisione
+Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. e i suoi sviluppatori, per aver creato BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Tutti i diritti riservati.
 Source Code: 	AboutView		Codice sorgente: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processore:} other{# Processori:}}
 Kernel:	AboutView		Kernel:
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, una divisione di Lucas Digital Ltd. LLC.
 BSD (4-clause)	AboutWindow		BSD (4-clause)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 team Google Internationalization.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Il copyright sul codice di Haiku è di Haiku, Inc. o dei rispettivi autori quando espressamente indicato nel codice sorgente. Haiku® e il logo di HAIKU® sono marchi registrati di Haiku, Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTutti i diritti riservati.
 GNU LGPL v2	AboutWindow		#document
@@ -31,6 +37,7 @@ Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright �
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Questo software è basato in parte sul lavoro del Independent JPEG Group.
 Past maintainers:\n	AboutView		Precedenti sviluppatori:\n
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Contiene software proveniente dal Progetto FreeBSD, rilasciato sotto licenza BSD:\nftpd, ping, telnet, telnetd, traceroute.\nCopyright © 1994-2008 The FreeBSD Project. Tutti i diritti riservati.
 GNU GPL v3	AboutWindow		#document
 \n\nSpecial thanks to:\n	AboutView		\n\nRingraziamenti speciali a:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…e molti altri che non abbiamo avuto modo di citare (Scusateci tanto!)\n\n
@@ -47,11 +54,13 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		Il gruppo di Haikuware e il loro programma di bounty\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Tutti i diritti riservati.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Tutti i diritti riservati.
+Website & marketing:\n	AboutView		Sito web e marketing:\n
 About this system	AboutWindow		Informazioni su questo sistema
 Version:	AboutView		Versione:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Tutti i diritti riservati.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd e Clark Cooper.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, e altri.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tutti i diritti riservati.
 The BeGeistert team\n	AboutView		Il gruppo del BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		L'Università di Auckland e Christof Lutteroth\n\n
@@ -61,6 +70,7 @@ GNU LGPL v2.1	AboutWindow		GNU LGPL v.21
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Tutti i diritti riservati.
 …and the many people making donations!\n\n	AboutView		…e le tantissime persone che hanno supportato il progetto con le loro donazioni!\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Clicca sul nome di una licenza per leggerla.]\n\n
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER è un marchio registrato di Bitstream Inc.
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Tutti i diritti riservati.
 License: 	AboutView		Licenza: 

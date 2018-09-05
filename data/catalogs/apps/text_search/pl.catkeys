@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku.TextSearch	3108411238
+1	polish	x-vnd.Haiku.TextSearch	172802561
 %s: Not enough room to escape the filename.	Grepper		%s: Niewystarczająca ilość miejsca do wyprowadzenia nazwy pliku.
 Trim to selection	GrepWindow		Zredukuj do zawartości
 Follow symbolic links	GrepWindow		Podążaj za dowiązaniami symbolicznymi
 Close	GrepWindow		Zamknij
 Cancel	GrepWindow		Anuluj
 The unselected files will be removed from the list.	GrepWindow		Niezaznaczone pliki zostaną usunięte z listy.
+Regular expression	GrepWindow		Wyrażenie regularne
 Set target…	GrepWindow		Ustaw cel…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Wybierz pliki które chcesz zaznaczyć w Trackerze.
 Open files in Pe	GrepWindow		Otwórz pliki w Pe
