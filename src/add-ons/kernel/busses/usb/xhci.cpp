@@ -386,6 +386,14 @@ XHCI::Start()
 	TRACE("usbcmd: 0x%08" B_PRIx32 "; usbsts: 0x%08" B_PRIx32 "\n",
 		ReadOpReg(XHCI_CMD), ReadOpReg(XHCI_STS));
 
+	if (WaitOpBits(XHCI_STS, STS_CNR, 0) != B_OK) {
+		TRACE("Start() failed STS_CNR\n");
+	}
+
+	if ((ReadOpReg(XHCI_CMD) & CMD_RUN) != 0) {
+		TRACE_ERROR("Start() warning, starting running XHCI controller!\n");
+	}
+
 	if ((ReadOpReg(XHCI_PAGESIZE) & (1 << 0)) == 0) {
 		TRACE_ERROR("Controller does not support 4K page size.\n");
 		return B_ERROR;
@@ -555,13 +563,8 @@ XHCI::Start()
 	WriteOpReg(XHCI_CMD, CMD_RUN | CMD_INTE | CMD_HSEE);
 
 	// wait for start up state
-	int32 tries = 100;
-	while ((ReadOpReg(XHCI_STS) & STS_HCH) != 0) {
-		snooze(1000);
-		if (tries-- < 0) {
-			TRACE_ERROR("start up timeout\n");
-			break;
-		}
+	if (WaitOpBits(XHCI_STS, STS_HCH, 0) != B_OK) {
+		TRACE_ERROR("HCH start up timeout\n");
 	}
 
 	fRootHubAddress = AllocateAddress();
@@ -1883,15 +1886,14 @@ XHCI::ClearPortFeature(uint8 index, uint16 feature)
 status_t
 XHCI::ControllerHalt()
 {
-	WriteOpReg(XHCI_CMD, 0);
+	// Mask off run state
+	WriteOpReg(XHCI_CMD, ReadOpReg(XHCI_CMD) & ~CMD_RUN);
 
-	int32 tries = 100;
-	while ((ReadOpReg(XHCI_STS) & STS_HCH) == 0) {
-		snooze(1000);
-		if (tries-- < 0)
-			return B_ERROR;
+	// wait for shutdown state
+	if (WaitOpBits(XHCI_STS, STS_HCH, STS_HCH) != B_OK) {
+		TRACE_ERROR("HCH shutdown timeout\n");
+		return B_ERROR;
 	}
-
 	return B_OK;
 }
 
@@ -1903,22 +1905,14 @@ XHCI::ControllerReset()
 		ReadOpReg(XHCI_CMD), ReadOpReg(XHCI_STS));
 	WriteOpReg(XHCI_CMD, ReadOpReg(XHCI_CMD) | CMD_HCRST);
 
-	int32 tries = 250;
-	while (ReadOpReg(XHCI_CMD) & CMD_HCRST) {
-		snooze(1000);
-		if (tries-- < 0) {
-			TRACE("ControllerReset() failed CMD_HCRST\n");
-			return B_ERROR;
-		}
+	if (WaitOpBits(XHCI_CMD, CMD_HCRST, 0) != B_OK) {
+		TRACE_ERROR("ControllerReset() failed CMD_HCRST\n");
+		return B_ERROR;
 	}
 
-	tries = 250;
-	while (ReadOpReg(XHCI_STS) & STS_CNR) {
-		snooze(1000);
-		if (tries-- < 0) {
-			TRACE("ControllerReset() failed STS_CNR\n");
-			return B_ERROR;
-		}
+	if (WaitOpBits(XHCI_STS, STS_CNR, 0) != B_OK) {
+		TRACE_ERROR("ControllerReset() failed STS_CNR\n");
+		return B_ERROR;
 	}
 
 	return B_OK;
@@ -2474,6 +2468,28 @@ inline uint32
 XHCI::ReadOpReg(uint32 reg)
 {
 	return *(volatile uint32 *)(fOperationalRegisters + reg);
+}
+
+
+inline status_t
+XHCI::WaitOpBits(uint32 reg, uint32 mask, uint32 expected)
+{
+	int loops = 0;
+	uint32 value = ReadOpReg(reg);
+	while ((value & mask) != expected) {
+		snooze(1000);
+		value = ReadOpReg(reg);
+		if (loops == 25) {
+			TRACE("delay waiting on reg 0x%x match 0x%x (0x%x)\n",
+				reg, expected, mask);
+		} else if (loops > 100) {
+			TRACE_ERROR("timeout waiting on reg 0x%x match 0x%x (0x%x)\n",
+				reg, expected, mask);
+			return B_ERROR;
+		}
+		loops++;
+	}
+	return B_OK;
 }
 
 

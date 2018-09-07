@@ -184,6 +184,7 @@ private:
 			// Operational register functions
 	inline	void				WriteOpReg(uint32 reg, uint32 value);
 	inline	uint32				ReadOpReg(uint32 reg);
+	inline	status_t			WaitOpBits(uint32 reg, uint32 mask, uint32 expected);
 
 			// Capability register functions
 	inline	uint32				ReadCapReg32(uint32 reg);
