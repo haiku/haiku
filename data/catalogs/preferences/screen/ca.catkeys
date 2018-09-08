@@ -1,0 +1,51 @@
+1	catalan; valencian	x-vnd.Haiku-Screen	1388881963
+yes	Screen		sí
+Use laptop panel:	Screen		Utilitza la pantalla del portàtil:
+15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colors
+/other…	Screen		/altre…
+16 bits/pixel, 65536 colors	Screen		16 bits/píxel, 65536 colors
+Revert	Screen		Reverteix
+Swap displays:	Screen		Intercanvia les pantalles:
+Combine displays:	Screen		Visualització combinada:
+Done	Screen		Fet
+Set background…	Screen		Seleccioneu el fons...
+Undo	Screen		Desfés
+if needed	Screen		si cal
+Screen preferences by the Haiku team	Screen		Preferències de la pantalla, pel equip del Haiku
+Screen	System name		Pantalla
+OK	Screen		D'acord
+Workspaces	Screen		Espais de treball
+The screen mode could not be set:\n\t%s\n	Screen		No ha estat possible ajustar el mode de la pantalla:\n\t%s\n
+no	Screen		no
+Could not write VESA mode settings file:\n\t	Screen		No ha estat possible desar el fitxer de configuració del mode VESA:\n\t
+Type or use the left and right arrow keys.	Screen		Escriviu o feu servir les fletxes dreta i esquerra.
+Warning	Screen		Avís
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Freqüència horitzontal:\t%lu - %lu kHz\nFreqüència vertical:\t%lu - %lu Hz\n\nAmple de banda màxim :\t%g MHz
+Keep	Screen		Conserva
+Unknown mode	Screen		Mode desconegut
+disable	Screen		desactiva
+Columns:	Screen		Columnes:
+All workspaces	Screen		Tots els espais de treball
+always	Screen		sempre
+32 bits/pixel, 16 Million colors	Screen		32 bits/píxel, 16 Milions de colors
+Current workspace	Screen		Espai de treball actual
+About	Screen		Quant a
+24 bits/pixel, 16 Million colors	Screen		24 bits/píxel, 16 Milions de colors
+horizontally	Screen		horitzontalment
+Other…	Screen		Altre…
+Cancel	Screen		Anul·la
+bits/pixel	Screen		bits/píxel
+Refresh rate:	Screen		La configuració es restablirà en %seconds segons.
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Voleu conservar aquesta configuració?
+Rows:	Screen		Files:
+vertically	Screen		verticalment
+Resolution:	Screen		Resolució:
+Screen	Screen		Pantalla
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bits/píxels, 256 colors
+Apply	Screen		Aplica
+Refresh rate	Screen		Freqüència de refresc
+%sSerial no.: %s	Screen		Núm. de sèrie de %s : %s
+Colors:	Screen		Colors:
+Video format:	Screen		Format del vídeo:

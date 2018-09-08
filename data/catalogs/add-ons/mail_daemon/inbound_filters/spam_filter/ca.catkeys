@@ -1,0 +1,6 @@
+1	catalan; valencian	x-vnd.Haiku-SpamFilter	160316705
+or empty e-mail	SpamFilterConfig		o correu buit
+Genuine below and uncertain above:	SpamFilterConfig		Genuí per sota i incert per sobre de:
+Spam above:	SpamFilterConfig		Brossa per sobre de:
+Add spam rating to start of subject	SpamFilterConfig		Afegeix el valor del correu brossa a l'inici del tema
+Learn from all incoming e-mail	SpamFilterConfig		Aprèn de tot el correu entrant

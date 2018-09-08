@@ -1,0 +1,47 @@
+1	catalan; valencian	x-vnd.Haiku-Time	2676925183
+GMT (UNIX compatible)	Time		GMT (compatible amb l'UNIX)
+OK	Time		D'acord
+Asia	Time		Àsia
+\nNow: 	Time		\nAra: 
+Africa	Time		Àfrica
+Stop	Time		Atura
+Australia	Time		Austràlia
+Preview time:	Time		Vista prèvia de l'hora:
+Synchronize	Time		Sincronitza
+Revert	Time		Reverteix
+Pacific	Time		Pacífic
+Show day of week	Time		Mostra el dia de la setmana
+Add	Time		Afegeix
+Date and time	Time		Data i hora
+about	Time		quant a
+Local time (Windows compatible)	Time		Hora local (compatible amb el Windows)
+Message receiving failed	Time		No ha estat possible rebre el missatge
+Set time zone	Time		Tria el fus horari
+Waiting for answer failed	Time		No ha estat possible esperar la resposta
+Hardware clock set to:	Time		S'ha ajustat el rellotge del maquinari a:
+The following error occured while synchronizing:r\n%s	Time		S'ha produït aquest error en sincronitzar:r\n%s
+Europe	Time		Europa
+Remove	Time		Suprimeix
+Time	Time		Hora
+Indian	Time		Indi
+Sending request failed	Time		No ha estat possible enviar la petició
+Arctic	Time		Àrtic
+Display time with seconds	Time		Mostra l'hora amb els segons
+Time	System name		Hora
+America	Time		Amèrica
+Synchronize at boot	Time		Sincronitza-ho a l'arrencada
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Di i Hora, escrit per:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Received invalid time	Time		S'ha rebut una hora no vàlida
+Antarctica	Time		Antàrtida
+Show time zone	Time		Mostra el fus horari
+Show clock in Deskbar	Time		Mostra el rellotge a la Barra de l'Escriptori
+The following error occured while synchronizing:r\n%s: %s	Time		S'ha produït aquest error en sincronitzar:r\n%s: %s
+<Other>	Time		<Altre>
+Current time:	Time		Hora actual:
+Try all servers	Time		Prova tots els servidors
+Time zone	Time		Fus horari
+Could not create socket	Time		No s'ha pogut obrir el sòcol
+Synchronize again	Time		Sincronitza-ho un altre cop
+Clock	Time		Rellotge
+Network time	Time		Hora de la xarxa
+Atlantic	Time		Atlàntic

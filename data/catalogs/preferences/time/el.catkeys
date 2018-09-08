@@ -1,0 +1,41 @@
+1	greek, modern (1453-)	x-vnd.Haiku-Time	1277298809
+GMT (UNIX compatible)	Time		GMT (Συμβατό με το UNIX)
+OK	Time		Εντάξει
+Asia	Time		Ασία
+\nNow: 	Time		\nΤώρα:
+Africa	Time		Αφρική
+Stop	Time		Διακοπή
+Australia	Time		Αυστραλία
+Preview time:	Time		Προεπισκόπηση ώρας:
+Synchronize	Time		Συγχρονισμός
+Revert	Time		Αντιστροφή
+Pacific	Time		Ειρηνικός
+Add	Time		Προσθήκη
+Date and time	Time		Ημερομηνία και ώρα
+about	Time		περί
+Local time (Windows compatible)	Time		Τοπική ώρα (συμβατή με τα Windows)
+Message receiving failed	Time		Η λήψη μηνυμάτων απέτυχε
+Set time zone	Time		Ορισμός ζώνης ώρας
+Waiting for answer failed	Time		Η αναμονή για απάντηση απέτυχε
+Hardware clock set to:	Time		Το ρολόι υλικού μέρους ορίστηκε στο:
+The following error occured while synchronizing:r\n%s	Time		Το παρακάτω σφάλμα προέκυψε κατά τον συγχρονισμό:r\n%s
+Europe	Time		Ευρώπη
+Remove	Time		Αφαίρεση
+Time	Time		Ώρα
+Indian	Time		Ινδικός
+Sending request failed	Time		Η αποστολή αίτησης απέτυχε
+Arctic	Time		Αρκτική
+Time	System name		Time
+America	Time		Αμερική
+Synchronize at boot	Time		Συγχρονισμός κατά την εκκίνηση
+Received invalid time	Time		Ελήφθη λανθασμένη ώρα
+Antarctica	Time		Ανταρκτική
+The following error occured while synchronizing:r\n%s: %s	Time		Το παρακάτω σφάλμα προέκυψε κατά τον συγχρονισμό::r\n%s: %s
+<Other>	Time		<Άλλο>
+Current time:	Time		Τρέχουσα ώρα:
+Try all servers	Time		Δοκιμή όλων των εξυπηρετητών
+Time zone	Time		Ζώνη ώρας
+Could not create socket	Time		Αδυναμία δημιουργίας υποδοχής
+Synchronize again	Time		Συγχρονισμός ξανά
+Network time	Time		Ώρα δικτύου
+Atlantic	Time		Αντλαντικός

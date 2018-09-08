@@ -1,0 +1,14 @@
+1	catalan; valencian	x-vnd.Haiku-TGATranslator	77519970
+Targa image (%d bits truecolor)	TGATranslator		Imatge Targa (color real de %d bits)
+Ignore TGA alpha channel	TGAView		Ignora el canal alfa TGA
+Targa image (%d bits colormap)	TGATranslator		Imatge Targa (mapa de colors de %d bits)
+TGA image translator	TGAView		Traductor d'imatges TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Imatge Targa (mapa de colors RLE de %d bits)
+Targa image (%d bits gray)	TGATranslator		Imatge Targa (gris de %d bits)
+Written by the Haiku Translation Kit Team	TGAView		Escrit pel Equip de Traducció del Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		Imatge Targa (color real RLE de %d bits)
+TGA images	TGATranslator		Imatges TGA
+TGATranslator Settings	TGATranslator		Paràmetres del TGATranslator
+TGA image translator	TGATranslator		Traductor d'imatges TGA
+Targa image (%d bits RLE gray)	TGATranslator		Imatge Targa (gris RLE de %d bits)
+TGA Settings	TGAMain		Paràmetres del TGA

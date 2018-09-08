@@ -1,0 +1,12 @@
+1	greek, modern (1453-)	x-vnd.Haiku-IMAP	354143849
+Destination:	imap_config		Προορισμός:
+Ok	IMAPFolderConfig		Εντάξει
+status	IMAPFolderConfig		κατάσταση
+Configure IMAP Folders	imap_config		Ρύθμιση φακέλων IMAP
+Cancel	IMAPFolderConfig		Άκυρο
+Apply	IMAPFolderConfig		Εφαρμογή
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Κατέβασμα φακέλων IMAP, υπομονή..
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Αδυναμία σύνδεσης με το διακομιστή \"%server%\":\n%error%
+IMAP Folders	IMAPFolderConfig		Φάκελοι IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Ενημέρωση συνδρομής στους φακέλους IMAP, υπομονή...
+Failed to fetch available storage.	IMAPFolderConfig		Αδύνατο το κατέβασμα επιπλέον χωρητικότητας.

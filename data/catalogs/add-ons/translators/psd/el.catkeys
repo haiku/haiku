@@ -1,0 +1,12 @@
+1	greek, modern (1453-)	x-vnd.Haiku-PSDTranslator	4014515690
+Uncompressed	PSDConfig		Αποσυμπιεσμένο
+Version %d.%d.%d, %s	PSDConfig		Έκδοση %d.%d.%d, %s
+Photoshop image	PSDTranslator		Εικόνα Photoshop
+RLE	PSDConfig		RLE
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Εικόνα Photoshop (%s)
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Συμπίεση:
+Format: 	PSDConfig		Μορφοποίηση:

@@ -1,0 +1,66 @@
+1	catalan; valencian	x-vnd.Haiku-CodyCam	2441206793
+Capturing Image…	VideoConsumer.cpp		S'està capturant la imatge...
+Every 30 seconds	CodyCam		Cada 30 segons
+File name:	CodyCam		Nom del fitxer:
+Last Capture: 	VideoConsumer.cpp		Darrera Captura: 
+Server login failed	VideoConsumer.cpp		Ha fallat la identificació del servidor
+Remote host has closed the connection.\n	FtpClient		El servidor remot ha tancat la connexió.\n
+Login:	CodyCam		Entrada:
+Format:	CodyCam		Format:
+Every 2 hours	CodyCam		Cada 2 hores
+Closing the window\n	VideoConsumer.cpp		S'està tancant la finestra\n
+login ID expected	CodyCam		Cal un identificador d'usuari
+Rate:	CodyCam		Rati:
+JPEG image	CodyCam		Imatge JPEG
+Password:	CodyCam		Contrasenya:
+Passive FTP	CodyCam		FTP Passiu
+destination directory expected	CodyCam		cal una carpeta destí
+password	CodyCam		contrasenya
+Directory:	CodyCam		Directori:
+Every minute	CodyCam		Cada minut
+read: %ld\n	SftpClient		llegeix: %ld\n
+Waiting…	CodyCam		S'està esperant...
+Logging in…	VideoConsumer.cpp		S'està entrant...
+Server:	CodyCam		Servidor:
+server address expected	CodyCam		cal l'adreça del servidor
+Error creating output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
+unrecognized upload client specified	CodyCam		no es pot reconèixer el client al que es vol enviar
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		Fitxer %s ; Línia %ld # cometes inacabades\n
+Output	CodyCam		Sortida
+Every 15 minutes	CodyCam		Cada 15 minuts
+Cannot find an available video stream	CodyCam		No es pot trobar el flux de vídeo
+Can't find an available connection to the video window	CodyCam		No es pot trobar una connexió a la finestra de vídeo disponible
+Every 8 hours	CodyCam		Cada 8 hores
+Rename failed	VideoConsumer.cpp		No ha estat possible reanomenar el fitxer
+Cannot register the video window	CodyCam		No es pot registrar la finestra de vídeo
+CodyCam	System name		CodyCam
+Every 24 hours	CodyCam		Cada 24 hores
+unknown command	SettingsHandler		ordre desconeguda
+Video settings	CodyCam		Paràmetres de vídeo
+Every 15 seconds	CodyCam		Cada 15 segons
+Error writing output file	VideoConsumer.cpp		S'ha produït un error en escriure el fitxer de sortida
+Type:	CodyCam		Tipus:
+Stop video	CodyCam		Atura el vídeo
+Locking the window\n	VideoConsumer.cpp		S'està tancant la finestra\n
+File %s; Line %ld # %s	SettingsHandler		Fitxer %s; Línia %ld # %s
+Local	CodyCam		Local
+SFTP	CodyCam		SFTP
+Connected…	VideoConsumer.cpp		Connectat...
+Every 5 minutes	CodyCam		Cada 5 minuts
+read: %d\n	SftpClient		llegeix: %d\n
+Capture controls	CodyCam		Controls de captura
+Every hour	CodyCam		Cada hora
+Send to…	CodyCam		Envia a...
+Quit	CodyCam		Surt
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Never	CodyCam		Mai
+Every 10 minutes	CodyCam		Cada 10 minuts
+password expected	CodyCam		s'espera la contrasenya
+reply: %d, %d\n	FtpClient		respon: %d, %d\n
+Every 4 hours	CodyCam		Cada 4 hores
+FTP	CodyCam		FTP
+File	CodyCam		Fitxer
+Image Format Menu	CodyCam		Menú del format de la imatge
+Every 30 minutes	CodyCam		Cada 30 minuts
+reply: '%s'\n	SftpClient		respón: '%s'\n
+Start video	CodyCam		Inicia el vídeo

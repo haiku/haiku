@@ -1,0 +1,19 @@
+1	catalan; valencian	x-vnd.Haiku-Login	2683778354
+Error: %1	Login App		Error: %1
+Hide password	Login View		Amaga la contrasenya
+Desktop	Desktop Window		Escriptori
+Invalid login!	Login View		La identificació no és vàlida!
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tExecuta en mode edició al terminal per tal de personalitzar l'escriptori.\n
+OK	Login View		D'acord
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	error %s\n
+Login:	Login View		Nom d'usuari:
+Error	Login App		Error
+Unimplemented	Login App		Podeu personalitzar l'escriptori que es mostra darrera de l'aplicació Autenticació deixant-hi anar replicants.\n\nQuan haureu acabat només heu de sortir de l'aplicació (Alt-Q).
+Welcome to Haiku	Login Window		Benvingut al Haiku!
+Reboot	Login View		Reinicia
+Login application for Haiku\nUsage:\n	Login App		Aplicació d'identificació del Haiku\nÚs:\n
+Info	Login App		Informació
+Halt	Login View		Atura
+Password:	Login View		Contrasenya:
+OK	Login App		D'acord
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNo ho facis a una finestra modal\n

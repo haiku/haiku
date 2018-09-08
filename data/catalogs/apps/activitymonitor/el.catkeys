@@ -1,0 +1,45 @@
+1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	4107381384
+P-faults	DataSource		P-σφάλματα
+Media nodes	DataSource		Κόμβοι πολυμέσων
+Threads	DataSource		Θέματα
+Add graph	ActivityWindow		Προσθήκη γραφήματος
+Teams	DataSource		Ομάδες
+MiB	DataSource		MiB
+Network send	DataSource		Αποστολή δικτύου
+CPU usage (combined)	DataSource		Χρήση ΚΜΕ (συνδυασμένη)
+CPU	DataSource		ΚΜΕ
+Used memory	DataSource		Χρησιμοποιημένη μνήμη
+Cached memory	DataSource		Μνήμη προσωρινής αποθήκευσης
+Apps	DataSource		Εφαρμογές
+Show legend	ActivityView		Εμφάνιση υπομνήματος
+Text clipboard	DataSource		Πρόχειρο κειμένου
+Settings	ActivityWindow		Ρυθμίσεις
+Receiving	DataSource		Λήψη
+Settings…	ActivityWindow		Ρυθμίσεις...
+Ports	DataSource		Θύρες 
+Page faults	DataSource		Σφάλματα σελίδας
+Sending	DataSource		Αποστολή
+Cache	DataSource		Λανθάνουσα μνήμη
+%.1f faults/s	DataSource		%.1ς λάθοι/s
+Update time interval:	SettingsWindow		Ενημέρωση χρονικού διαστήματος:
+TX	DataSource	Shorter version for Sending	ΑΠ
+Quit	ActivityWindow		Έξοδος
+Block cache memory	DataSource		Αποκλεισμός λανθάνουσας μνήμης
+Remove graph	ActivityView		Αφαίρεση γραφήματος
+%lld sec.	SettingsWindow		%lld δευτ.
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Χρήση ΚΜΕ
+Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
+Sems	DataSource		Sems
+ActivityMonitor	System name		ActivityMonitor
+Running applications	DataSource		Ενεργές εφαρμογές
+Semaphores	DataSource		Σηματοφόροι
+Block cache	DataSource		Αποκλεισμός cache
+Swap space	DataSource		Χώρος Swap
+Swap	DataSource		Swap
+File	ActivityWindow		Αρχείο
+usage	DataSource		χρήση
+Additional items	ActivityView		Επιπλέον αντικείμενα
+Network receive	DataSource		Λήψεις δικτύου
+Memory	DataSource		Μνήμη
+RX	DataSource	Shorter version for Receiving.	ΛΗ

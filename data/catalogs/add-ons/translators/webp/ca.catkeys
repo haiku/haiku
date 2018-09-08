@@ -1,0 +1,22 @@
+1	catalan; valencian	x-vnd.Haiku-WebPTranslator	3343078170
+Compression method:	ConfigView		Mètode de compressió:
+WebP image translator	ConfigView		Traductor d'imatges WebP
+Preset	ConfigView		Configuració
+WebP images	WebPTranslator		Imatges WebP
+WebPTranslator Settings	ConfigView		Paràmetres del WebPTranslator
+Output quality:	ConfigView		Qualitat de la sortida:
+WebP Settings	main		Paràmetres del WepP
+Text	ConfigView		Text
+Slower but better	ConfigView		Més lent però millor
+WebP image	WebPTranslator		Imatge WebP
+Output preset:	ConfigView		Configuració de la sortida:
+Picture	ConfigView		Imatge
+Low	ConfigView		Baixa
+High	ConfigView		Alta
+Drawing	ConfigView		Dibuix
+Default	ConfigView		Per omissió
+Fast	ConfigView		Ràpid
+Photo	ConfigView		Foto
+Preprocessing filter	ConfigView		Filtre de preprocessat
+WebP image translator	WebPTranslator		Traductor d'imatges WebP
+Icon	ConfigView		Icona

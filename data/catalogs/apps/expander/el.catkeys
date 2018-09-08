@@ -1,0 +1,39 @@
+1	greek, modern (1453-)	x-vnd.Haiku-Expander	747083547
+Expand	ExpanderMenu		Επέκταση
+Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας
+Set destination…	ExpanderMenu		Ορισμός προορισμού...
+Use:	ExpanderPreferences		Χρήση:
+File expanded	ExpanderWindow		Το αρχείο επεκτάθηκε
+The destination is read only.	ExpanderWindow		Ο προορισμός είναι μόνο για ανάγνωση.
+Expander: Open	ExpanderWindow		Expander: Άνοιγμα
+Expander settings	ExpanderPreferences		Ρυθμίσεις του Expander
+Select current	DirectoryFilePanel		Τρέχουσα επιλογή
+Source	ExpanderWindow		Πηγή
+Error when expanding archive	ExpanderWindow		Σφάλμα κατά την επέκταση του αρχείου
+Hide contents	ExpanderWindow		Απόκρυψη περιεχομένων
+Cancel	ExpanderWindow		Άκυρο
+Automatically expand files	ExpanderPreferences		Αυτόματη επέκταση αρχείων
+Continue	ExpanderWindow		Συνέχεια
+Cancel	ExpanderPreferences		Άκυρο
+Select	DirectoryFilePanel		Επιλογή
+Same directory as source (archive) file	ExpanderPreferences		Ίδιος κατάλογος με τον αρχείο πηγής 
+Settings	ExpanderMenu		Ρυθμίσεις
+Settings…	ExpanderMenu		Ρυθμίσεις...
+Expander: Choose destination	DirectoryFilePanel		Expander: Επιλογή προορισμού
+Select	ExpanderPreferences		Επίλεξε
+Show contents	ExpanderWindow		Εμφάνιση περιεχομένων
+Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
+OK	ExpanderPreferences		Εντάξει
+Leave destination folder path empty	ExpanderPreferences		Αφήσε την διαδρομή του φάκελο προορισμού άδεια
+The file doesn't exist	ExpanderWindow		Το αρχείο δεν υπάρχει
+Stop	ExpanderMenu		Σταμάτα
+File	ExpanderMenu		Αρχείο
+Expander	System name		Expander
+Expand	ExpanderWindow		Επέκταση
+Close	ExpanderMenu		Κλείσιμο
+The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
+Open destination folder after extraction	ExpanderPreferences		Ανοιξε τον φάκελο προορισμού μετά την εξαγωγή
+Set source…	ExpanderMenu		Ορισμός πηγής...
+Show contents	ExpanderMenu		Εμφάνιση περιεχομένων
+Stop	ExpanderWindow		Σταμάτα
+Destination	ExpanderWindow		Προορισμός

@@ -1,16 +1,3 @@
-1	korean	x-vnd.Haiku-Network	2513327377
-Adapter:	EthernetSettingsView		어뎁터:
-Apply	EthernetSettingsView		적용
-Auto-configuring failed: 	EthernetSettingsView		자동 설정 실패: 
-DHCP	EthernetSettingsView		동적 호스트 설정
-DNS #1:	EthernetSettingsView		도메인 네임 서버 #1:
-DNS #2:	EthernetSettingsView		도메인 네임 서버 #2:
-Domain:	EthernetSettingsView		도메인:
-Gateway:	EthernetSettingsView		게이트웨이:
-IP address:	EthernetSettingsView		IP 주소:
-Mode:	EthernetSettingsView		모드:
-Netmask:	EthernetSettingsView		넷마스크:
-OK	EthernetSettingsView		확인
-Revert	EthernetSettingsView		되돌리기
-Static	EthernetSettingsView		정적 호스트 설정
-The net_server needs to run for the auto configuration!	EthernetSettingsView		자동 설정 실행을 위해서는 net_server가 필요합니다!
+1	korean	x-vnd.Haiku-Network	3363740538
+Apply	IntefaceAddressView		적용
+Revert	NetworkWindow		되돌리기

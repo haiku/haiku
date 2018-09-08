@@ -1,0 +1,34 @@
+1	catalan; valencian	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Primari
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Guany
+Output 3D center	MultiAudio		Sortida 3D central
+Extended Setup	MultiAudio		Configuració avançada
+CD	MultiAudio		CD
+Tone control	MultiAudio		Control de tons
+Phone	MultiAudio		Telèfon
+Aux	MultiAudio		Aux
+Output bass	MultiAudio		Greus a la sortida
+Headphones	MultiAudio		Auriculars
+Beep	MultiAudio		Timbre
+Output mono mix	MultiAudio		Mono barrejat a la sortida
+Output stereo mix	MultiAudio		Estéreo barrejat a la sortida
+Input	MultiAudio		Entrada
+Output treble	MultiAudio		Aguts a la sortida
+Mono mix	MultiAudio		Mescla mono
+General	MultiAudio		General
+Input & Output	MultiAudio		Entrada i sortida
+Enhanced Setup	MultiAudio		Configuració avançada
+Stereo mix	MultiAudio		Mescla estèreo
+Output 3D depth	MultiAudio		Profunditat 3D a la sortida
+Volume	MultiAudio		Volum
+Output	MultiAudio		Sortida
+Video	MultiAudio		Vídeo
+Line	MultiAudio		Línia
+Mic	MultiAudio		Mic
+ frequency:	MultiAudio		 freqüència:
+Enable	MultiAudio		Habilita
+Mute	MultiAudio		Silencia
+Wave	MultiAudio		Ones
+Setup	MultiAudio		Configuració
+Level	MultiAudio		Nivell

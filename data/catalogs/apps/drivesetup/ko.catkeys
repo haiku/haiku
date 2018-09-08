@@ -1,71 +1,62 @@
-1	korean	x-vnd.Haiku-DriveSetup	2752917331
-%ld MiB	Support		%ld MiB
-<empty>	DiskView		<빈 공간>
-<empty>	PartitionList		<빈 공간>
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		당신은 선택된 파티션을 지우기를 원합니까?\n\n그렇게 하면 파티션의 모든 데이타는 영구적으로 지워지게될 것입니다!n
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 디스크 %s 의 모든 데이타는 영구적으로 지워지게될 것입니다!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 파티션 %s 의 모든 데이타는 영구적으로 지워지게될 것입니다!n
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n 그렇게 하면 파티션의 모든 데이타는 영구적으로 지워지게 될 것입니다!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 선택된 디스크의 모든 데이타는 영구적으로 지워지게될 것입니다!
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		당신은 지금 변경 사항을 디스크에 기록하시겠습니까?\n\n선택된 파티션의 모든 데이타가 영원히 지워질것입니다!
-Cancel	CreateParamsPanel		취소
-Cancel	InitParamsPanel		취소
-Cancel	MainWindow		취소
-Cannot delete the selected partition.	MainWindow		선택한 파티션을 지울 수 없습니다.
-Continue	MainWindow		계속
-Could not aquire partitioning information.	MainWindow		파티션 정보를 얻을 수 없습니다.
-Could not delete the selected partition.	MainWindow		선택된 파티션을 지울 수 없습니다.
-Could not mount partition %s.	MainWindow		%s 파티션을 마운트 할 수 없습니다.
-Could not unmount partition %s.	MainWindow		%s 파티션을 마운트 해제할 수 업습니다.
-Create	CreateParamsPanel		만들기
-Create…	MainWindow		만들기…
-Creation of the partition has failed.	MainWindow		파티션 만들기 실패함.
+1	korean	x-vnd.Haiku-DriveSetup	1487820795
+DriveSetup	System name		드라이브설정
+Cancel	AbstractParametersPanel		취소
 Delete	MainWindow		지우기
-Delete partition	MainWindow		파티션 지우기
-Device	DiskView		장치
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		당신은 지금 변경 사항을 디스크에 기록하시겠습니까?\n\n선택된 파티션의 모든 데이타가 영원히 지워질것입니다!
+Rescan	MainWindow		다시 스캔
+OK	MainWindow		확인
+There's no space on the partition where a child partition could be created.	MainWindow		이 파티션에는 자식 파티션을 만들 공간이 없습니다.
+Initialize	InitializeParametersPanel		초기화
+OK	AbstractParametersPanel		확인
+<empty>	PartitionList		<빈 공간>
+Unable to find the selected partition by ID.	MainWindow		선택된 파티션 ID를 찾을 수 없음
+Select a partition from the list below.	DiskView		아래의 목록에서 파티션 선택.
+No disk devices have been recognized.	DiskView		어떤 디스크 장치도 찾을 수 업습니다.
+The selected disk is read-only.	MainWindow		선택된 디스크는 읽기만 가능합니다.
+Could not mount partition %s.	MainWindow		%s 파티션을 마운트 할 수 없습니다.
+The partition %s is already unmounted.	MainWindow		이 파티션 %s은(는) 이미 마운트 해제되엇습니다.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		파티션 삭제 실패. 어떤 변화도 디스크에 기록되지 않았습니다.
+Could not delete the selected partition.	MainWindow		선택된 파티션을 지울 수 없습니다.
+Initialize	MainWindow		초기화
+Error: 	MainWindow	in any error alert	에러: 
+Partition %ld	DiskView		파티션 %ld
+<empty>	DiskView		<빈 공간>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		파티션 %s 초기화 실패. (디스크에 아무 것도 기록 안됨.)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n 그렇게 하면 파티션의 모든 데이타는 영구적으로 지워지게 될 것입니다!
+Mounted at	PartitionList		마운트 위치
+There was an error acquiring the partition row.	MainWindow		파티션 열의 정보를 얻는 과정에서 에러가 발생했습니다.
+You need to select a partition entry from the list.	MainWindow		당신은 목록에서 파티션 엔트리를 선택해야 합니다.
+The currently selected partition does not have a parent partition.	MainWindow		현재 선택된 파티션은 부모 파티션을 가지고 있지 않습니다.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 선택된 디스크의 모든 데이타는 영구적으로 지워지게될 것입니다!
+Write changes	MainWindow		변경된 것을 쓰기
+There was an error preparing the disk for modifications.	MainWindow		수정을 위해 디스크를 준비하는 중에 에러가 발생했습니다.
+The partition %s is already mounted.	MainWindow		이 파티션 %s은(는) 이미 마운트되었습니다.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 디스크 %s 의 모든 데이타는 영구적으로 지워지게될 것입니다!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		당신은 선택된 파티션을 지우기를 원합니까?\n\n그렇게 하면 파티션의 모든 데이타는 영구적으로 지워지게될 것입니다!n
+Create…	MainWindow		만들기…
+Could not unmount partition %s.	MainWindow		%s 파티션을 마운트 해제할 수 업습니다.
+Mount	MainWindow		마운트
 Device	PartitionList		장치
 Disk	MainWindow		디스크
-Disk system \"%s\"\" not found!	MainWindow		디스크 시스템  \"%s\"\" 을 찾을 수 없습니다!
-Eject	MainWindow		꺼내기
-End: %ld MB	Support		끝: %ld MB
-Error: 	MainWindow	in any error alert	에러: 
-Failed to delete the partition. No changes have been written to disk.	MainWindow		파티션 삭제 실패. 어떤 변화도 디스크에 기록되지 않았습니다.
-Failed to initialize the partition %s!\n	MainWindow		%s 파티션 초기화 실패!\n
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		파티션 초기화 실패.어떤 변화도 디스크에 기록되지 않았습니다.
-File system	PartitionList		파일 시스템
-Format (not implemented)	MainWindow		포맷 (구현이 안됨)
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		파티션 %s 초기화 실패. (디스크에 아무 것도 기록 안됨.)
-Initialize	InitParamsPanel		초기화
-Initialize	MainWindow		초기화
-Mount	MainWindow		마운트
-Mount all	MainWindow		모두 마운트
-Mounted at	PartitionList		마운트 위치
-No disk devices have been recognized.	DiskView		어떤 디스크 장치도 찾을 수 업습니다.
-OK	MainWindow		확인
-Offset: %ld MB	Support		오프셋: %ld MB
-Partition	MainWindow		파티션
-Partition %ld	DiskView		파티션 %ld
-Partition name:	CreateParamsPanel		파티션 이름:
-Partition size	CreateParamsPanel		파티션 크기
-Partition type:	CreateParamsPanel		파티션 형식:
-Rescan	MainWindow		다시 스캔
-Select a partition from the list below.	DiskView		아래의 목록에서 파티션 선택.
-Size	PartitionList		크기
-Surface test (not implemented)	MainWindow		표면 검사 (아직 구현안됨)
-The currently selected partition does not have a parent partition.	MainWindow		현재 선택된 파티션은 부모 파티션을 가지고 있지 않습니다.
-The currently selected partition is not empty.	MainWindow		선택된 파티션은 비워있지 않습니다.
-The partition %s has been successfully initialized.\n	MainWindow		이 파티션 %s 은(는) 성공적으로 초기화되었습니다.\n
-The partition %s is already mounted.	MainWindow		이 파티션 %s은(는) 이미 마운트되었습니다.
-The partition %s is already unmounted.	MainWindow		이 파티션 %s은(는) 이미 마운트 해제되엇습니다.
-The partition %s is currently mounted.	MainWindow		이 파티션 %s은(는) 이미 마운트되었습니다.
-The selected disk is read-only.	MainWindow		선택된 디스크는 읽기만 가능합니다.
-The selected partition does not contain a partitioning system.	MainWindow		선택된 파티션은 파티션 시스템을 가지고 있지 않습니다.
-There was an error acquiring the partition row.	MainWindow		파티션 열의 정보를 얻는 과정에서 에러가 발생했습니다.
-There was an error preparing the disk for modifications.	MainWindow		수정을 위해 디스크를 준비하는 중에 에러가 발생했습니다.
-Unable to find the selected partition by ID.	MainWindow		선택된 파티션 ID를 찾을 수 없음
-Unmount	MainWindow		마운트 해제
-Validation of the given creation parameters failed.	MainWindow		주어진 생성 매개 변수의 유효성 검사에 실패했습니다.
-Validation of the given initialization parameters failed.	MainWindow		지정된 초기화 매개 변수의 유효성 검사에 실패했습니다.
+Device	DiskView		장치
+Active	PartitionList		활성
 Volume name	PartitionList		볼륨 이름
-Write changes	MainWindow		변경된 것을 쓰기
-You need to select a partition entry from the list.	MainWindow		당신은 목록에서 파티션 엔트리를 선택해야 합니다.
+Continue	MainWindow		계속
+Cannot delete the selected partition.	MainWindow		선택한 파티션을 지울 수 없습니다.
+Mount all	MainWindow		모두 마운트
+Cancel	MainWindow		취소
+Delete partition	MainWindow		파티션 지우기
+Eject	MainWindow		꺼내기
+Partition	MainWindow		파티션
+File system	PartitionList		파일 시스템
+Validation of the given creation parameters failed.	MainWindow		주어진 생성 매개 변수의 유효성 검사에 실패했습니다.
+Size	PartitionList		크기
+Validation of the given initialization parameters failed.	MainWindow		지정된 초기화 매개 변수의 유효성 검사에 실패했습니다.
+The selected partition does not contain a partitioning system.	MainWindow		선택된 파티션은 파티션 시스템을 가지고 있지 않습니다.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 파티션 %s 의 모든 데이타는 영구적으로 지워지게될 것입니다!n
+The partition %s is currently mounted.	MainWindow		이 파티션 %s은(는) 이미 마운트되었습니다.
+Surface test (not implemented)	MainWindow		표면 검사 (아직 구현안됨)
+Parameters	PartitionList		매개변수
+Creation of the partition has failed.	MainWindow		파티션 만들기 실패함.
+The currently selected partition is not empty.	MainWindow		선택된 파티션은 비워있지 않습니다.
+Unmount	MainWindow		마운트 해제

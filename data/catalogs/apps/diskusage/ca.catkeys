@@ -1,0 +1,20 @@
+1	catalan; valencian	x-vnd.Haiku-DiskUsage	4268917316
+Scanning %refName%	Scanner		S'està escanejant %refName%
+Size	Info Window		Mida
+Rescan	Pie View		Torna a escanejar
+Kind	Info Window		Tipus
+file unavailable	Pie View		el fitxer no està disponible
+no supporting apps	Pie View		no hi ha suport per a cap aplicació
+Path	Info Window		Ruta
+Scan	Status View		Escaneja
+Rescan	Status View		Torna a escanejar
+file unavailable	Status View		el fitxer no està disponible
+Get info	Pie View		Obté la informació
+DiskUsage	System name		Ús del disc
+Created	Info Window		Creat
+Modified	Info Window		Modificat
+Abort	Status View		Anul·la
+Open with	Pie View		Obre amb
+Open	Pie View		Obre
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		Lliure a %refName%

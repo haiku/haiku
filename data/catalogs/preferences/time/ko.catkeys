@@ -1,0 +1,41 @@
+1	korean	x-vnd.Haiku-Time	1277298809
+GMT (UNIX compatible)	Time		그리니치 표준시(UNIX 호환)
+OK	Time		확인
+Asia	Time		아시아
+\nNow: 	Time		\n지금: 
+Africa	Time		아프리카
+Stop	Time		정지
+Australia	Time		오스트레일리아
+Preview time:	Time		이전 시간:
+Synchronize	Time		동기화
+Revert	Time		되돌리기
+Pacific	Time		태평양
+Add	Time		더하기
+Date and time	Time		날짜와 시간
+about	Time		정보
+Local time (Windows compatible)	Time		지역 시간 (윈도우즈 호환)
+Message receiving failed	Time		메세지 응답 실패함
+Set time zone	Time		시간대 설정
+Waiting for answer failed	Time		답변 대기중에 실패함
+Hardware clock set to:	Time		하드웨어 시간  설정:
+The following error occured while synchronizing:r\n%s	Time		동기화 중에 다음 에러가 발생했음:r\n%s
+Europe	Time		유럽
+Remove	Time		지우기
+Time	Time		시간
+Indian	Time		인도
+Sending request failed	Time		응답 보내는 중에 실패함
+Arctic	Time		북극
+Time	System name		시간
+America	Time		미국
+Synchronize at boot	Time		부트시 동기화
+Received invalid time	Time		올바르지 않은 시간이 응답됨
+Antarctica	Time		남극
+The following error occured while synchronizing:r\n%s: %s	Time		동기화 중에 다음 에러가 발생했음:r\n%s: %s
+<Other>	Time		<다른...>
+Current time:	Time		현재 시간:
+Try all servers	Time		모든 서버 시도
+Time zone	Time		시간대
+Could not create socket	Time		소켓을 만들 수 없습니다
+Synchronize again	Time		다시 동기화
+Network time	Time		네트워크 시간
+Atlantic	Time		대서양

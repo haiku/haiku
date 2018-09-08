@@ -1,0 +1,16 @@
+1	catalan; valencian	x-vnd.Haiku-mount_server	1677274447
+Mount read-only	AutoMounter		Munta-ho només com a lectura
+Error mounting volume:\n\n%s	AutoMounter		Hi ha hagut un error en muntar el volum:\n\n%s
+Unmount error	AutoMounter		Error de muntatge
+Mount warning	AutoMounter		Avís del muntatge
+Mount read/write	AutoMounter		Munta-ho per a lectura/escriptura
+Mounting volume '%s'\n\n	AutoMounter		S'està muntant el volum '%s'\n\n
+Cancel	AutoMounter		Anul·la
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No ha estat possible desmuntar el disc \"%s\":\n\t%s\n\nVoleu forçar el seu desmuntatge?\n\nNota: Si ara mateix hi ha alguna aplicació escrivint al volum, si es desmunta es podrien perdre dades.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		No ha estat possible desmuntar el disc \"%s\":\n\t%s
+Mounting volume <unnamed volume>\n\n	AutoMounter		S'està muntant el volum <volum desconegut>\n\n
+OK	AutoMounter		D'acord
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		El sistema de fitxers del volum no és el sistema de fitxers del Haiku. És molt aconsellable muntar-ho en mode de només lectura. Això pot evitar la eventual pèrdua de dades degut a errors del Haiku.
+Mount error	AutoMounter		Error de muntatge
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		És aconsellable tots la resta dels volums del Haiku en mode de només lectura. Això pot evitar la eventual pèrdua de dades degut a errors del Haiku.
+Force unmount	AutoMounter		Força el muntatge

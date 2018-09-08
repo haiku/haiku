@@ -1,0 +1,69 @@
+1	catalan; valencian	x-vnd.Haiku-Appearance	727801787
+Plain font:	Font view		Tipus de lletra simple:
+Control highlight	Colors tab		Control de realçat
+Control border	Colors tab		Control de la vora
+Antialiasing type:	AntialiasingSettingsView		Tipus de suavitzat:
+Shadow	Colors tab		Ombra
+On	AntialiasingSettingsView		Activat
+Defaults	APRWindow		Valors predeterminats
+Grayscale	AntialiasingSettingsView		Escala de grisos
+Shine	Colors tab		Llum
+About	DecorSettingsView		Quant a
+About decorator	DecorSettingsView		Quant al decorador
+Off	AntialiasingSettingsView		Apagat
+Choose Decorator	DecorSettingsView		Trieu la decoració
+Success	Colors tab		Èxit
+Inactive window tab text	Colors tab		Test de la pestanya de les finestres inactives
+Failure	Colors tab		Fallada
+Hinting menu	AntialiasingSettingsView		Menú de millora del tipus de lletra
+Scroll bar:	DecorSettingsView		Barra de desplaçament:
+Document background	Colors tab		Fons del document
+Revert	APRWindow		Reverteix
+Window tab	Colors tab		Pestanya de la finestra
+Tooltip background	Colors tab		Fons del consell
+Selected menu item background	Colors tab		Fons de l'element seleccionat del menú
+Antialiasing	APRWindow		Suavitzat
+Navigation base	Colors tab		Base de la navegació
+Selected list item text	Colors tab		Text de l'element seleccionat de la llista
+Window border	Colors tab		Vora de la finestra
+Double:	DecorSettingsView		Doble:
+Window tab text	Colors tab		Text de la pestanya de la finestra
+Document text	Colors tab		Text del document
+Navigation pulse	Colors tab		Pols de la navegació
+Selected menu item text	Colors tab		Text de l'element seleccionat del menú
+Menu background	Colors tab		Fons del menú
+List background	Colors tab		Fons de la llista
+OK	DecorSettingsView		D'acord
+Control mark	Colors tab		Marca de control
+Size:	Font Selection view		Mida:
+Decorator:	DecorSettingsView		Decoració:
+Selected list item background	Colors tab		Fons de l'element seleccionat de la llista
+Panel background	Colors tab		Fons del plafó
+Menu font:	Font view		Tipus de lletra del menú:
+Colors	APRWindow		Colors
+Control background	Colors tab		Color del rerefons
+Inactive window tab	Colors tab		Pestanya de la finestra inactiva
+List item text	Colors tab		Text de l'element de la llista
+Appearance	System name		Aparença
+Fixed font:	Font view		Tipus de lletra d'amplada fixa:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	A la taula i al llit, al primer crit.
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutors:\n\t%decorAuthors\n\nURL: %decorURL\nLlicència: %decorLic\n\n%decorDesc\n
+Reduce colored edges filter strength:	AntialiasingSettingsView		Redueix el filtre de les vores de color:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Para evitar conflictes de patents, el suavitzat basat en subpíxels, en combinació amb la millora per glifs, no està disponible en aquesta compilació del Haiku. Per a activar-los, haureu de compilar el Haiku activant alguns opcions a la capçalera de configuració de libfreetype.
+Scroll bar thumb	Colors tab		Cursor de la barra de desplaçament
+Control text	Colors tab		Text de control
+Single:	DecorSettingsView		Senzill
+Tooltip text	Colors tab		Text del consell
+Bold font:	Font view		Negreta:
+Inactive window border	Colors tab		Vora de la finestra inactiva
+Menu item text	Colors tab		Text de l'element del menú
+LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
+Selected menu item border	Colors tab		Vora de l'element seleccionat del menú
+Strong	AntialiasingSettingsView		Fort
+Panel text	Colors tab		Text del tauler
+Arrow style	DecorSettingsView		Estil de la fletxa
+Monospaced fonts only	AntialiasingSettingsView		Només tipus de lletra monoespai
+Look and feel	APRWindow		Aparença i comportament
+Antialiasing menu	AntialiasingSettingsView		Menú del suavitzat
+Fonts	APRWindow		Tipus de lletra
+Glyph hinting:	AntialiasingSettingsView		Millora per glifs:
