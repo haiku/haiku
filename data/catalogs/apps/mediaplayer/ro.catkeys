@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	3708050243
+1	romanian	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		audio raw
 Location	MediaPlayer-InfoWin		Locaţie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Salvează lista de redare
 (not supported)	MediaPlayer-InfoWin		(nesuportat)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Niciun fișier pe care ați vrut să le redați nu par a fi fișiere media.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat.\n\nEroare: 
+ask every time	MediaPlayer-SettingsWindow		întreabă de fiecare dată
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Player nou…
 100% scale	MediaPlayer-Main		scală 100%
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Recipient
 Nothing to Play	MediaPlayer-Main		Nimic de redat
 Muted	MediaPlayer-SettingsWindow		Mut
 Quit	MediaPlayer-Main		Închidere
+Resume:	MediaPlayer-SettingsWindow		Revenire:
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nu există niciun decodor instalat pentru a gestiona formatul fișierului, sau decodorul întâmpină probleme cu versiunea specifică a formatului.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importă intrare
@@ -57,6 +59,7 @@ MediaPlayer	System name		PlayerMedia
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Configurări…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
+never	MediaPlayer-SettingsWindow		niciodată
 h	MediaPlayer-InfoWin	Hours	o
 Select all	MediaPlayer-PlaylistWindow		Selectează tot
 Move Entry	MediaPlayer-MovePLItemsCmd		Mută intrare
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Eroare:
 Large	MediaPlayer-SettingsWindow		Larg
 Bottom of video	MediaPlayer-SettingsWindow		Baza video
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+always	MediaPlayer-SettingsWindow		întotdeauna
 Total duration: %s	MediaPlayer-PlaylistWindow		Durată totală: %s
 <unnamed media>	MediaPlayer-InfoWin		<unnamed media>
 raw video	MediaPlayer-InfoWin		video raw

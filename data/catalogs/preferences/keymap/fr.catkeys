@@ -1,6 +1,8 @@
-1	french	x-vnd.Haiku-Keymap	1385051534
+1	french	x-vnd.Haiku-Keymap	856521107
+Croatian	KeymapNames		Croate
 Shift:	Modifier keys window	Shift key role name	Majuscule :
 Revert	Modifier keys window		Défaire
+Canadian-French	KeymapNames		Canadien-Français
 Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas
 Scroll lock	Keyboard Layout View		Arrêt défilement
 Menu	Keyboard Layout View	Menu key	Menu
@@ -10,15 +12,22 @@ Grave trigger	Keymap window		Accent grave
 Role	Modifier keys window	As in the role of a modifier key	Rôle
 Caps lock	Keyboard Layout View		Verr. maj.
 Select dead keys	Keymap window		Sélection des touches mortes
+Swiss-French	KeymapNames		Suisse-Français
 Cancel	Modifier keys window		Annuler
 Command	Keyboard Layout View	Command key	Commande
+Irish	KeymapNames		Irlandais
+French (Mac)	KeymapNames		Français (Mac)
+German (Mac)	KeymapNames		Allemand (Mac)
 Defaults	Keymap window		Valeurs par défaut
+Japanese	KeymapNames		Japonais
 Quit	Keymap window		Quitter
 Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
+French (Bépo)	KeymapNames		Français (Bépo)
 Circumflex trigger	Keymap window		Accent circonflexe
 Diaeresis trigger	Keymap window		Tréma
 Disabled	Modifier keys window	Do nothing	Désactivé
 Open…	Keymap window		Ouvrir…
+Greek	KeymapNames		Grec
 Error: duplicate keys	Modifier keys window		Erreur : touches dupliquées
 System:	Keymap window		Système :
 Left command	Keyboard Layout View		Commande gauche
@@ -28,11 +37,14 @@ Control	Keyboard Layout View	Control key	Contrôle
 Left option	Keyboard Layout View		Option gauche
 Right control	Keyboard Layout View		Contrôle droit
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
+German	KeymapNames		Allemand
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
 User:	Keymap window		Utilisateur :
+Italian	KeymapNames		Italien
 Right option	Keyboard Layout View		Option droite
 Right shift	Keyboard Layout View		Majuscule droite
 Key	Modifier keys window	As in a computer keyboard key	Touche
+Dutch	KeymapNames		Néerlandais
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Touche contrôle
 Control:	Modifier keys window	Control key role name	Contrôle :
 Remove	Keyboard Layout View		Supprimer
@@ -44,8 +56,11 @@ Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches d
 Right command	Keyboard Layout View		Commande droite
 Revert	Keymap window		Défaire
 Command:	Modifier keys window	Command key role name	Commande :
+US	KeymapNames		US
 Save as…	Keymap window		Enregistrer sous…
+Swiss-German	KeymapNames		Suisse-Allemand
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
+French	KeymapNames		Français
 File	Keymap window		Fichier
 Num lock	Keyboard Layout View		Verr. Num.
 (Current)	Keymap window		(Actif)
@@ -53,6 +68,8 @@ Font	Keymap window		Police
 Keymap	System name		Disposition du clavier
 Left shift	Keyboard Layout View		Majuscule gauche
 Shift	Keyboard Layout View	Shift key	Majuscule
+Finnish	KeymapNames		Finnois
 Set modifier keys	Modifier keys window		Régler les touches modificatrices
+Portuguese	KeymapNames		Portugais
 Modifier keys	Modifier keys window		Touches modificatrices
 Acute trigger	Keymap window		Accent aigu

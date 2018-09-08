@@ -1,7 +1,8 @@
-1	italian	x-vnd.Haiku-Network	498577683
+1	italian	x-vnd.Haiku-Network	1398692389
 Static	IntefaceAddressView		Statico
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
+no link	InterfaceListItem		nessun collegamento
 WPA2	WPA2 protected network		WPA2
 The netmask defines your local network	IntefaceAddressView		La netmask definisce la tua rete locale
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)

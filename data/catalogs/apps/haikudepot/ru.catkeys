@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1437744500
+1	russian	x-vnd.Haiku-HaikuDepot	2038365407
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
+OK	MainWindow		OK
 Close	RatePackageWindow		Закрыть
 The captcha puzzle needs to be solved.	UserLoginWindow		Капча должна быть решена.
 Changelog	PackageInfoView		История изменений
@@ -16,6 +17,7 @@ Stability	RatePackageWindow		Стабильность
 No changelog available.	PackageInfoView		История изменений недоступна.
 Description	PackageListView		Описание
 Install	PackageManager		Установить
+All repositories	MainWindow		Все репозитории
 Source packages	MainWindow		Пакеты с исходным кодом
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Авторизация завершилась неудачно. Пользователь не существует или был введен неверный пароль.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Аккаунт был успешно создан. Теперь вы можете оценивать пакеты и делать другие полезные вещи.
@@ -40,8 +42,11 @@ Installed packages	MainWindow		Установленные пакеты
 Status	PackageListView		Статус
 Switch account…	MainWindow		Сменить аккаунт…
 Ignore	UserLoginWindow		Игнорировать
+Your rating was updated.	RatePackageWindow		Ваш рейтинг был обновлен.
 Language	UserLoginWindow		Язык
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Слишком слабый или неподходящий пароль. Пожалуйста, используйте в пароле минимум 8 символов, 2 цифры и 2 заглавных буквы.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ваш рейтинг был сохранен успешно. Вы можете изменить или удалить его на сайте HaikuDepot Server.
+Show only featured packages	FilterView		Показывать только избранные пакеты
 Rate package	RatePackageWindow		Оценить пакет
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
@@ -61,6 +66,7 @@ HaikuDepot needs the package daemon to function, and it appears to be not runnin
 Downloading:	PackageInfoView		Загружается:
 Mostly stable	RatePackageWindow		В основном стабилен
 Log out	MainWindow		Выход из системы
+Repository	PackageListView		Репозиторий
 Education	Model		Образование
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%

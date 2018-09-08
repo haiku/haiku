@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Screen	2339556848
+1	italian	x-vnd.Haiku-Screen	4090394050
 yes	Screen		sì
 Use laptop panel:	Screen		Usa pannello del portatile
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colori
@@ -39,6 +39,7 @@ bits/pixel	Screen		bit/pixel
 Refresh rate:	Screen		Ritmo di aggiornamento
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Desideri tenere queste impostazioni?
+Confirm changes	Screen		Conferma modifiche
 Rows:	Screen		Righe
 vertically	Screen		verticalmente
 Resolution:	Screen		Risoluzione:

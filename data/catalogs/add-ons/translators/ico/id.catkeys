@@ -1,3 +1,14 @@
-1	indonesian	x-vnd.Haiku-ICOTranslator	1514810723
+1	indonesian	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Kursor
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Gambar %s %ld bita Windows
+Valid icon sizes are 16, 32, or 48	ConfigView		Ukuran ikon yang valid adalah 16, 32, or 48
+Windows icons	ICOTranslator		Ikon Windows
+Enforce valid icon sizes	ConfigView		Memaksakan ukuran ikon yang valid
+ICO Settings	main		Pengaturan ICO
+Windows icon translator	ICOTranslator		Penerjemah ikon Windows
+pixels in either direction.	ConfigView		piksel di kedua arah.
+Write 32 bit images on true color input	ConfigView		Tulis gambar 32 bit pada input warna-sebenarnya
+Icon	ICOTranslator		Ikon
+ICOTranslator Settings	ConfigView		Pengaturan ICOTranslator
+Windows icon translator	ConfigView		Penerjemah ikon Windows

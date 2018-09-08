@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Appearance	2087262640
+1	italian	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Tipo di carattere:
 Control highlight	Colors tab		Evidenziazione del controllo
 Control border	Colors tab		Bordi del controllo
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
 Shadow	Colors tab		Ombra
 On	AntialiasingSettingsView		Attivo
 Defaults	APRWindow		Predefiniti
+Link hover	Colors tab		Testo del collegamento al passaggio del mouse
 Grayscale	AntialiasingSettingsView		Scala di grigio
 Shine	Colors tab		Brillantezza
 About	DecorSettingsView		Informazioni su
 About decorator	DecorSettingsView		Informazioni sul decoratore
 Off	AntialiasingSettingsView		Disattivato
+Link text	Colors tab		Testo del collegamento
+Link active	Colors tab		Testo del collegamento attivo
 Choose Decorator	DecorSettingsView		Scegli decorazione
 Success	Colors tab		Successo
 Inactive window tab text	Colors tab		Testo della linguetta della finestra inattiva
@@ -37,6 +40,7 @@ List background	Colors tab		Sfondo della lista
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Marcatore del controllo
 Size:	Font Selection view		Dimensione:
+Link visited	Colors tab		Testo del collegamento visitato
 Decorator:	DecorSettingsView		Decoratore:
 Selected list item background	Colors tab		Sfondo della voce selezionata nella lista
 Panel background	Colors tab		Sfondo del pannello

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-BluetoothPrefs	1165760090
+1	italian	x-vnd.Haiku-BluetoothPrefs	145165464
 About Bluetooth…	Window		Informazioni su Bluetooth…
 Handheld	Settings view		Palmare
 Default inquiry time:	Settings view		Tempo predefinito di interrogazione:
@@ -6,6 +6,7 @@ Manufacturer: 	Device View		Produttore
 Add device to list	Inquiry panel		Aggiungi dispositivo alla lista
 Starting scan...	Inquiry panel		Avvio scansione…
 Smart phone	Settings view		Smartphone
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Con il supporto fi:\n - Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nGrazie a tutti coloro che hanno aiutato...\n\nPeriferiche donate/spedite:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEconomicamente:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nCon delle patch:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTest:\n- Petter H. Juliussen\nPer avermi insegnato tutto:\n- il team di yellowTAB
 Server	Settings view		Server
 Stop bluetooth services…	Window		Interrompi i servizi bluetooth…
 The Bluetooth services are not currently running on this system.	main		Il servizio Bluethooth non è al momento in esecuzione su questo sistema.

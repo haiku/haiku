@@ -1,0 +1,24 @@
+1	russian	x-vnd.haiku-softwareupdater	1797814522
+Cancel	SoftwareUpdaterWindow		Отмена
+Packages are being updated	UpdateManager		Пакеты были обновлены
+Update now	SoftwareUpdaterWindow		Обновить сейчас
+Updates did not complete	UpdateAction		Обновление не было завершено
+Checking for updates	CheckManager		Проверка обновлений
+%count% packages have available updates	CheckManager		Для %count% пакетов имеются обновления
+No updates available	UpdateAction		Обновления отсутствуют
+Downloading packages	UpdateManager		Загрузка пакетов
+Attempting to cancel the updates...	SoftwareUpdaterWindow		Попытка отменить обновления...
+from repository	SoftwareUpdaterWindow	List item text	из репозитория
+Cancel	SoftwareUpdaterWindow	Alert button label	Отмена
+Click here to install updates.	CheckManager		Нажмите здесь, чтобы установить обновления.
+The following changes will be made:	SoftwareUpdaterWindow		Будут произведены следующие изменения:
+Available updates found	CheckManager		Найдены доступные обновления
+Checking for updates	SoftwareUpdaterWindow		Проверка наличия обновлений
+Quit	SoftwareUpdaterWindow	Alert button label	Выйти
+Cancelling updates	SoftwareUpdaterWindow		Отмена обновлений
+Updating version	SoftwareUpdaterWindow	List item text	Обновляемая версии
+Applying changes	UpdateManager		Применение изменений
+Quit	SoftwareUpdaterWindow		Выйти
+There were no updates found.	UpdateAction		Обновлений не было найдено.
+Uninstalling version	SoftwareUpdaterWindow	List item text	Удаляемая версия
+Quit	SoftwareUpdaterWindow	Button label	Выйти

@@ -1,0 +1,16 @@
+1	indonesian	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Simpan dengan kompresi RLE
+Targa image (%d bits truecolor)	TGATranslator		Gambar targa (%d bita warna sebenarnya)
+Ignore TGA alpha channel	TGAView		Abaikan kanal alpha TGA
+Targa image (%d bits colormap)	TGATranslator		Gambar targa (%d bita peta warna)
+TGA image translator	TGAView		Penerjemah gambar TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Gambar targa (%d bita RLE peta-warna)
+Targa image (%d bits gray)	TGATranslator		Gambar targa (%d bita abu-abu)
+Written by the Haiku Translation Kit Team	TGAView		Ditulis oleh Tim Translation Kit Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		Gambar targa (%d bita RLE warna-asli)
+TGA images	TGATranslator		Gambar TGA
+Version %d.%d.%d, %s	TGAView		Versi %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		Pengaturan TGATranslator 
+TGA image translator	TGATranslator		Penerjemah gambar TGA
+Targa image (%d bits RLE gray)	TGATranslator		Gambar targa (%d bita RLE abu-abu)
+TGA Settings	TGAMain		Pengaturan TGA

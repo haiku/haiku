@@ -1,9 +1,11 @@
-1	russian	x-vnd.Haiku-IMAP	354143849
+1	russian	x-vnd.Haiku-IMAP	478742289
 Destination:	imap_config		Каталог сохранения:
+SSL	imap_config		SSL
 Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		статус
 Configure IMAP Folders	imap_config		Настроить папки IMAP
 Cancel	IMAPFolderConfig		Отмена
+No encryption	imap_config		Без шифрования
 Apply	IMAPFolderConfig		Применить
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Запрашиваются IMAP папки, имейте терпение...
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Не удалось подключиться к серверу \"%server%\":\n%error%

@@ -33,7 +33,7 @@ Time	System name		日付と時刻
 America	Time		アメリカ
 Synchronize at boot	Time		起動時に同期
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		日付と時刻 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
-Received invalid time	Time		不正な時間を受け取りました
+Received invalid time	Time		不正な時刻を受け取りました
 Antarctica	Time		南極
 Show time zone	Time		タイムゾーンを表示
 Show clock in Deskbar	Time		Deskbar に時計を表示

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	4036897333
+1	indonesian	x-vnd.Haiku-libtracker	2455797547
 OK	WidgetAttributeText		OKE
 Add-ons	FilePanelPriv		Pengaya
 Mount settings…	ContainerWindow		Pengaturan mount…
@@ -218,6 +218,7 @@ Select	SelectionWindow		Memilih
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 Or	FindPanel		Atau
 The Tracker must be running to see set the default printer.	PoseView		Tracker harus berjalan untuk melihat, mengatur printer default.
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} lain{# bytes}}
 by formula	FindPanel		dengan rumus
 40 x 40	DeskWindow		40 x 40
 Corrupted expression.	libtracker		Exspresi rusak.

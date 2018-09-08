@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	1611284793
+1	italian	x-vnd.Haiku-Shortcuts	986541402
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
 Cancel	ShortcutsWindow		Annulla
@@ -19,6 +19,7 @@ Save	ShortcutsWindow		Salva
 *MouseButton 1	ShortcutsWindow		*TastoMouse 1
 *MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
 Save changes before closing?	ShortcutsWindow		Salvare le modifiche prima di uscire?
+Command	ShortcutsSpec	Name for modifier on keyboard	Comando
 Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
 Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
 Save & apply	ShortcutsWindow		Salva e applica

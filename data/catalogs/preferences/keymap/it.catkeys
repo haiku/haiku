@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Keymap	792903710
+1	italian	x-vnd.Haiku-Keymap	1039047705
 Croatian	KeymapNames		Croato
 Turkish (Type-Q)	KeymapNames		Turco (Type-Q)
 Icelandic	KeymapNames		Islandese
@@ -22,6 +22,7 @@ Role	Modifier keys window	As in the role of a modifier key	Ruolo
 Caps lock	Keyboard Layout View		Bloc Maiusc
 Spanish (Dvorak)	KeymapNames		Spagnolo (Dvorak)
 Select dead keys	Keymap window		Tasti attivazione accenti
+Belgian (point)	KeymapNames		Belga (punto)
 Hebrew	KeymapNames		Ebraico
 Russian (Mac)	KeymapNames		Russo (Mac)
 United-Kingdom	KeymapNames		Regno Unito
@@ -57,6 +58,7 @@ Brazilian	KeymapNames		Brasiliano
 Left command	Keyboard Layout View		Command sinistro
 Set modifier keys…	Keymap window		Imposta tasti modificatori…
 Option:	Modifier keys window	Option key role name	Opzione:
+Belgian (comma)	KeymapNames		Belga (virgola)
 Control	Keyboard Layout View	Control key	Control
 Left option	Keyboard Layout View		Opzione sinistro
 Faeroese	KeymapNames		Faeroese
@@ -98,6 +100,7 @@ Right command	Keyboard Layout View		Command destro
 Revert	Keymap window		Ripristina
 Command:	Modifier keys window	Command key role name	Comando:
 Polish (Typewriter)	KeymapNames		Polacco (Macchina da Scrivere)
+US	KeymapNames		US
 Save as…	Keymap window		Salva come…
 Swiss-German	KeymapNames		Tedesco (Svizzera)
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tasto Win/Cmd

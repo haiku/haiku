@@ -133,12 +133,12 @@ Edit name	ContainerWindow		Zmień nazwę
 Nested *?+.	libtracker		Zagnieżdzone *?+.
 Show volumes on Desktop	SettingsView		Pokaż woluminy na pulpicie
 KiB	WidgetAttributeText		KiB
-Error %error loading Add-On %name.	ContainerWindow		Błąd %error przy ładowaniu wtyczki %name.
+Error %error loading Add-On %name.	ContainerWindow		Błąd %error przy ładowaniu dodatku %name.
 Mini	ContainerWindow		Mini
 Defaults	TrackerSettingsWindow		Przywróć domyślne
 Mini icon view	ContainerWindow		Widok mini ikon
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nie można otworzyć „%name”. Plik jest błędnie oznaczony jako wykonywalny. 
-Add-ons	ContainerWindow		Wtyczki
+Add-ons	ContainerWindow		Dodatki
 Edit templates…	TemplatesMenu		Modyfikuj szablony…
 Finish: %time - Over %finishtime left	StatusWindow		Koniec o: %time - Pozostało %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Obiekt o nazwie „%name” już istnieje w tym katalogu. Zamienić na dowiązanie symboliczne?
@@ -390,7 +390,7 @@ Preferences…	ContainerWindow		Ustawienia...
 Move	PoseView		Przenieś
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Jesteś pewien, że chcesz usunąć zaznaczone obiekt(y)? Ta operacja nie może być cofnięta.
-Add-ons	DeskWindow		Wtyczki
+Add-ons	DeskWindow		Dodatki
 Name	FindPanel		Nazwa
 And	FindPanel		Oraz
 Select…	DeskWindow		Wybierz…
