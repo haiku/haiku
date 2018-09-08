@@ -64,10 +64,8 @@ public:
 			void				UrlEncode(bool strict = false);
 			void				UrlDecode(bool strict = false);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			status_t			IDNAToAscii();
 			status_t			IDNAToUnicode();
-#endif
 
 	// Url encoding/decoding of strings
 	static	BString				UrlEncode(const BString& url,
@@ -76,13 +74,11 @@ public:
 	static	BString				UrlDecode(const BString& url,
 									bool strict = false);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	// utility functionality
 			bool				HasPreferredApplication() const;
 			BString				PreferredApplication() const;
 			status_t			OpenWithPreferredApplication(
 									bool onProblemAskUser = true) const;
-#endif
 
 	// BArchivable members
 	virtual	status_t			Archive(BMessage* into,
