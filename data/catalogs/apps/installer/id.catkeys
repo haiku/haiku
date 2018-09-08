@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Installer	3694689316
+1	indonesian	x-vnd.Haiku-Installer	4172072111
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, aplikasi untuk mengkonfigurasi menu boot Haiku, tidak dapat diluncurkan.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Anda yakin ingin membatalkan instalasi dan memulai ulang sistem?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tditulis oleh Jérôme Duval dan Stephan Aßmus\n\tHakcipta 2005-2010, Haiku.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMASI PENTIN
 Continue	InstallerWindow	In alert after pressing Stop	Lanjut
 Write boot sector to '%s'	InstallerWindow		Tulis boot-sector ke '%s'
 Collecting copy information.	InstallProgress		Mengumpulkan informasi salinan.
+Have fun and thanks for trying out Haiku!	InstallerApp		Bersenang-senanglah dan terima kasih telah mencoba Haiku!
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Keluar dari Boot Manager dan DriveSetup
 Quit	InstallerWindow		Keluar
@@ -29,6 +30,7 @@ Boot sector successfully written.	InstallProgress		Boot-sector berhasil ditulis.
 Performing installation.	InstallProgress		Melakukan instalasi.
 scanning…	InstallerWindow		pemindaian…
 Set up boot menu	InstallerWindow		Atur menu boot
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installer akan membuat partisi Haiku dapat di-boot, tetapi tidak melangkah untuk mengintegrasikan Haiku ke dalam menu boot yang ada. Jika Anda sudah menginstal GRUB, Anda dapat menambahkan Haiku ke sana.\nUntuk detailnya, silakan baca panduan tentang mem-boot Haiku di situs web kami di https://www.haiku-os.org/guides/booting.\nAtau Anda dapat mengatur menu boot dari menu Installer \"Tools \", lihat topik Panduan pengguna pada aplikasi \"BootManager\".\n\n\n
 Abort	InstallerWindow		Batal
 Finishing Installation.	InstallProgress		Menyelesaiakan Instalasi.
 Restart	InstallerWindow		Restart
@@ -53,6 +55,7 @@ Quit DriveSetup	InstallerWindow		Keluar dari DriveSetup
 Hide optional packages	InstallerWindow		Sembunyikan paket opsional
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
 Restart system	InstallerWindow		Start ulang sistem
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Jika Anda menginstal Haiku ke perangkat keras yang sebenarnya (tidak di dalam emulator),Anda mungkin ingin menyiapkan partisi hard disk dari OS lain (Anda dapat, misalnya, menggunakan GParted Live-CD, yang juga dapat mengubah ukuran partisi yang ada untuk membuat ruang).\nAnda juga dapat mengatur partisi dengan meluncurkan DriveSetup dari Installer, tetapi Anda tidak akan dapat mengubah ukuran partisi yang ada dengannya. Sementara DriveSetup telah diuji secara menyeluruh selama bertahun-tahun,disarankan untuk memiliki cadangan terbaru dari partisi lain di sistem Anda. Untuk berjaga-jaga…
 OK	InstallerWindow		OKE
 Set up partitions…	InstallerWindow		Siapkan partisi…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partisi tidak dapat dipasang. Silakan pilih partisi yang lain.
@@ -71,6 +74,7 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Volume target tidak kosong. Anda yakin ingin memasangnya?\n\nCatatan: Folder 'sistem' akan menjadi salinan bersih dari volume sumber tetapi akan mempertahankan folder pengaturannya,sedangkan file dan tautan yang ada pada sumber dan volume target akan ditimpa dengan versi volume sumber.
 No optional packages available.	PackagesView		Tidak ada paket opsional yang tersedia.
 Continue	InstallerApp		Lanjut
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ini adalah perangkat lunak berkualitas beta! Itu berarti ada risiko kehilangan data penting. Sering membuat cadangan! Anda telah diperingatkan.\n\n\n
 Boot sector not written because of an internal error.	InstallProgress		Boot sector tidak ditulis karena kesalahan internal.
 Additional disk space required: %s	InstallerWindow		Ruang disk tambahan yang diperlukan: %s
 Cancel	InstallProgress		Batal

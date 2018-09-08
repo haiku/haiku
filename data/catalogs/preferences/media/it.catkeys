@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Media	3383826947
+1	italian	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		Non è stato possibile aggiungere il controllo del volume nella Deskbar: %s\n
 Video input:	Media views		Ingresso Video:
 Warning!	Media Window		Avvertimento!
@@ -12,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Riavvio servizi media
 Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
 Media	System name		Media
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Chiudendo Media adesso si impedirà ai servizi media di riavviarsi. Ciò comporterà probabilmente funzionalità media peggiorate o del tutto assenti.
 Audio mixer	Media Window		Mixer audio
 This hardware has no controls.	Media Window		Questo hardware non possiede controlli.
 Audio output:	Media views		Uscite Audio:

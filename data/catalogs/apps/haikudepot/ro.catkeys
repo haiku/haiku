@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	4015332039
+1	romanian	x-vnd.Haiku-HaikuDepot	3764618272
 Name	PackageListView		Nume
 Available packages	MainWindow		Pachete disponibile
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
@@ -45,6 +45,7 @@ Ignore	UserLoginWindow		Ignoră
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 Language	UserLoginWindow		Limbă
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Evaluarea a fost încărcată cu succes. Puteți să o actualizați sau să o eliminați pe pagina web Server HaikuDepot.
 Show only featured packages	FilterView		Arată doar pachetele recomandate
 Rate package	RatePackageWindow		Evaluați pachet
 Development	Model		Dezvoltare
@@ -67,6 +68,7 @@ Mostly stable	RatePackageWindow		Majoritatea stabile
 Log out	MainWindow		Ieșire
 Repository	PackageListView		Depozit
 Education	Model		Educație
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Acest pachet nu pare a fi pe Server HaikuDepot, prin urmare nu este posibil să creați o evaluare nouă sau să editați o evaluare existentă.
 Search terms:	FilterView		Termeni de căutat:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluările utilizatorilor.
@@ -80,6 +82,7 @@ Authentication failed	UserLoginWindow		Autentificarea a eșuat
 Logged in as %User%	MainWindow		Autentificat ca %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Limbă
+User rating	RatePackageWindow		Evaluarea utilizatorului
 Size	PackageListView		Mărime
 You need to be logged into an account before you can rate packages.	MainWindow		Trebuie să fiți autentificat într-un cont înainte de a evalua pachete.
 User name:	UserLoginWindow		Nume utilizator:
@@ -108,6 +111,7 @@ Login or Create account	MainWindow		Autentificare sau Creare cont
 Pending…	PackageListView		În așteptare…
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
 OK	PackageInfoView		OK
+Package daemon problem	App		Problemă la serviciul pachetului
 Uninstalled	PackageListView		Dezinstalat
 Show	MainWindow		Arată
 Stable	RatePackageWindow		Stabil
@@ -137,6 +141,7 @@ Start package daemon	App		Pornire demon de pachet
 Manage repositories…	MainWindow		Gestionare depozite...
 Business	Model		Afaceri
 Audio	Model		Audio
+Rating not possible	MainWindow		Evaluarea nu este posibilă
 About	PackageInfoView		Despre
 Active	PackageListView		Activ
 It was not possible to contact the web service.	UserLoginWindow		Contactarea serviciului web nu a fost posibilă.

@@ -6,7 +6,7 @@ Append KeySet…	ShortcutsWindow		Добавить список горячих �
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Клавиша
 Open KeySet…	ShortcutsWindow		Открыть список горячих клавиш…
-Error, NULL state description?	ShortcutsSpec		Ошибка, состояние описания NULL?\n
+Error, NULL state description?	ShortcutsSpec		Ошибка, состояние описания NULL?
 Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Ваш текст\"
 *MouseUp	ShortcutsWindow		*MouseUp

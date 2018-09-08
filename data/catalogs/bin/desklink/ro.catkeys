@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-desklink	4132238754
+1	romanian	x-vnd.Haiku-desklink	3940727097
 Control physical output	MediaReplicant		Controlează ieșirea fizică
 Couldn't launch 	MediaReplicant		Nu s-a putut lansa 
 Muted	MediaReplicant		Sunet oprit
@@ -8,6 +8,7 @@ Sound preferences…	MediaReplicant		Preferințe sunet…
 Open %name	DeskButton	Don't translate variable %name	Deschide %name
 No media server running	VolumeControl		Nu rulează niciun server media
 Media preferences…	MediaReplicant		Preferințe media…
+%d dB	VolumeControl		%d dB
 Open MediaPlayer	MediaReplicant		Deschide PlayerMedia
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Opțiuni

@@ -1,12 +1,14 @@
-1	italian	x-vnd.Haiku-Backgrounds	2560189700
+1	italian	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Sfondi
 X:	Main View		X:
+Setting the background image failed:	Main View		Impostazione dell'immagine di sfondo fallita:
 Resolution: 	Image Filepanel		Risoluzione: 
 pick one	Main View		scegli un'immagine
 Default	Main View		Predefinito
 Center	Main View		Centrata
 Folder: %path	Main View		Cartella: %path
 Manual	Main View		Manuale
+Set background image error	Main View		Errore nell'impostazione dell'immagine di sfondo
 Default folder	Main View		Cartella predefinita
 Revert	Main View		Ripristina
 None	Main View		Nessuna

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	3708050243
+1	russian	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Сохранить плейлист
 (not supported)	MediaPlayer-InfoWin		(не поддерживается)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ни один из файлов, которые вы хотели проиграть, не является медиа файлом.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ошибка сохранения плейлиста.\n\nОшибка: 
+ask every time	MediaPlayer-SettingsWindow		спрашивать каждый раз
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 New player…	MediaPlayer-Main		Новый плеер…
 100% scale	MediaPlayer-Main		Масштаб 100%
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Контейнер
 Nothing to Play	MediaPlayer-Main		Нечего проигрывать
 Muted	MediaPlayer-SettingsWindow		Без звука
 Quit	MediaPlayer-Main		Выход
+Resume:	MediaPlayer-SettingsWindow		Возобновить:
 Video	MediaPlayer-Main		Видео
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не установлен декодер, необходимый для работы с этим форматом файлов или у декодера возникли проблемы с указанной версией этого формата.
 Import Entry	MediaPlayer-ImportPLItemsCmd		импортирование записи
@@ -57,6 +59,7 @@ MediaPlayer	System name		Медиаплеер
 OK	MediaPlayer-Main		ОК
 Settings…	MediaPlayer-Main		Настройки…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
+never	MediaPlayer-SettingsWindow		никогда
 h	MediaPlayer-InfoWin	Hours	ч
 Select all	MediaPlayer-PlaylistWindow		Выделить все
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Ошибка:
 Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+always	MediaPlayer-SettingsWindow		всегда
 Total duration: %s	MediaPlayer-PlaylistWindow		Общая длительность: %s
 <unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
 raw video	MediaPlayer-InfoWin		необработанное видео

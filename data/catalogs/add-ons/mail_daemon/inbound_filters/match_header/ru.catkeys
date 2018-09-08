@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MatchHeader	2711986092
+1	russian	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Выберите действие>
 Header field (e.g. Subject, From, ...)	ConfigView		Поле заголовка (например, Тема, От, ...)
 Account	ConfigView		Аккаунт
@@ -13,3 +13,5 @@ Set as read	ConfigView		Отметить как прочитанное
 Match header	RuleFilter		Совпадающий заголовок
 Reply with	ConfigView		Ответить с
 If	ConfigView		Если
+Match \"%attribute\" against \"%regex\"	RuleFilter		Совпадает \"%attribute\" с\"%regex\"
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Подставить значение как \"*spam*\".\nПрефикс \"REGEX:\" используется для регулярных выражений.

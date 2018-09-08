@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	1544806248
+1	french	x-vnd.Haiku-Notifications	332239666
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Une erreur est survenue à la sauvegarde des préférences.\nIl est possible que vous manquiez d’espace disque.
 Add…	NotificationView		Ajouter…
 Status	NotificationView		État
@@ -10,14 +10,17 @@ OK	PrefletWin		OK
 Duration:	GeneralView		Durée :
 OK	NotificationView		OK
 Application does not have a valid signature	NotificationView	Alert message	L'application n'a pas de signature valide
+Follow Deskbar	GeneralView		Suivre la Deskbar
 Notifications	PrefletWin		Notifications
 Timeout:	GeneralView		Temps imparti :
 Muted	NotificationView		Silencieux
 General	PrefletView		Général
 Allowed	NotificationView		Autorisé
 Remove	NotificationView		Retirer
+Lower right	GeneralView		Inférieur droit
 Notifications preflet sample	PrefletWin		Exemple de notification d'un preflet
 Notifications	System name		Notifications
+Position:	GeneralView		Position :
 Applications	PrefletView		Applications
 Defaults	PrefletWin		Défauts
 pixels	GeneralView		pixels
@@ -25,5 +28,8 @@ Application	NotificationView		Application
 Width:	GeneralView		Largeur :
 seconds	GeneralView		secondes
 Mute notifications from this application	NotificationView		Ignorer les notifications de cette application
+Upper right	GeneralView		Supérieur droit
  is already listed	NotificationView	Alert message	 est déjà listé
+Lower left	GeneralView		Inférieur gauche
+Upper left	GeneralView		Supérieur gauche
 Applications	NotificationView		Applications
