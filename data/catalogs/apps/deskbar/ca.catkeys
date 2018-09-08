@@ -1,0 +1,50 @@
+1	catalan; valencian	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Atura
+Sort applications by name	PreferencesWindow		Ordena les aplicacions pel nom
+Suspend	DeskbarMenu		Suspensió
+Hide clock	TimeView		Amaga el rellotge
+Applications	PreferencesWindow		Aplicacions
+Time preferences…	TimeView		Preferències de l'hora...
+About Haiku	DeskbarMenu		Quant al Haiku
+Edit in Tracker…	PreferencesWindow		Edita al Traçador...
+Recent documents:	PreferencesWindow		Documents recents:
+Recent applications	DeskbarMenu		Aplicacions usades recentment
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicacions
+Find…	DeskbarMenu		Cerca...
+Show clock	Tray		Mostra el rellotge
+Window	PreferencesWindow		Finestra
+Defaults	PreferencesWindow		Predeterminats
+Menu	PreferencesWindow		Menú
+Recent documents	DeskbarMenu		Documents recents
+Auto-hide	PreferencesWindow		Oculta automàticament
+Always on top	PreferencesWindow		Sempre en primer pla
+<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la Barra de l'Escriptori és buïda>
+Show all	WindowMenu		Mostra-ho tot
+No windows	WindowMenu		Sense finestres
+Deskbar	System name		Barra de l'Escriptori
+Restart system	DeskbarMenu		Reinicia el sistema
+Large	PreferencesWindow		Ample
+Auto-raise	PreferencesWindow		Autoelevació
+Recent folders:	PreferencesWindow		Carpetes recents:
+Show application expander	PreferencesWindow		Mostra el desplegador d'aplicacions
+Close all	WindowMenu		Tanca-ho tot
+Deskbar preferences	PreferencesWindow		Preferències de la barra de l'Escriptori
+Mount	DeskbarMenu		Munta
+Revert	PreferencesWindow		Reverteix
+Small	PreferencesWindow		Petita
+Recent applications:	PreferencesWindow		Aplicacions recents:
+Shutdown…	DeskbarMenu		Atura...
+Tracker always first	PreferencesWindow		El Traçador sempre al davant
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferències
+Recent folders	DeskbarMenu		Carpetes recents
+About this system	DeskbarMenu		Quant al sistema
+Show calendar…	TimeView		Mostra el calendari...
+Deskbar preferences…	DeskbarMenu		Preferències de la barra de l'Escriptori
+Expand new applications	PreferencesWindow		Desplega les noves aplicacions
+Show replicants	DeskbarMenu		Mostra els replicadors
+Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions
+Icon size	PreferencesWindow		Mida de la icona
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Ginys de l'escriptori
+Hide all	WindowMenu		Amaga-ho tot
+Quit application	WindowMenu		Surt de l'aplicació

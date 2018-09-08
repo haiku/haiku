@@ -1,0 +1,39 @@
+1	catalan; valencian	x-vnd.Haiku-Keymap	761976561
+Shift:	Modifier keys window	Shift key role name	Tecla de majúscules
+Revert	Modifier keys window		Reverteix
+Tilde trigger	Keymap window		Forma d'afegir els accents
+Grave trigger	Keymap window		Accent greu
+Role	Modifier keys window	As in the role of a modifier key	Funció
+Select dead keys	Keymap window		Trieu les tecles inútils
+Cancel	Modifier keys window		Anul·la
+Defaults	Keymap window		Valors predeterminats
+Quit	Keymap window		Surt
+Switch shortcut keys to Haiku mode	Keymap window		Canvia les dreceres de teclat en mode Haiku
+Circumflex trigger	Keymap window		Accent circumflex
+Diaeresis trigger	Keymap window		Dièresi
+Disabled	Modifier keys window	Do nothing	Desactivat
+Open…	Keymap window		Obre...
+System:	Keymap window		Sistema:
+Set modifier keys…	Keymap window		Tria les tecles modificadores...
+Option:	Modifier keys window	Option key role name	Opció:
+Switch shortcut keys	Keymap window		Canvia les tecles de drecera
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla de majúscules
+User:	Keymap window		Usuari:
+Key	Modifier keys window	As in a computer keyboard key	Tecla
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla de Control
+Control:	Modifier keys window	Control key role name	Control:
+Sample and clipboard:	Keymap window		Exemple i porta-retalls:
+Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opció
+Layout	Keymap window		Disposició
+Switch shortcut keys to Windows/Linux mode	Keymap window		Canvia les dreceres de tecla al mode Windows/Linux
+Revert	Keymap window		Reverteix
+Command:	Modifier keys window	Command key role name	Ordre:
+Save as…	Keymap window		Anomena i desa…
+Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
+File	Keymap window		Fitxer
+(Current)	Keymap window		(Actual)
+Font	Keymap window		Tipus de lletra
+Keymap	System name		Mapa de tecles
+Set modifier keys	Modifier keys window		Configura les tecles modificadores
+Modifier keys	Modifier keys window		Tecles modificadores
+Acute trigger	Keymap window		Accent agut

@@ -1,0 +1,38 @@
+1	catalan; valencian	x-vnd.Be-PRNT	2279754695
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nControlador:  %driver%\n
+Waiting	JobListView		En espera
+Print test page	PrintersWindow		Imprimeix una pàgina de prova
+page	JobListView		pàgina
+Cancel	AddPrinterDialog		Anul·la
+Add printer	AddPrinterDialog		Afegeix una impressora
+Green	TestPageView		Verd
+Printers	PrintersWindow		Impressores
+Default Printer	PrinterListView		Impressora predeterminada
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+pages	JobListView		pàgines
+Printers	System name		Impressores
+Processing	JobListView		En procés
+Red	TestPageView		Vermell
+Printer name:	AddPrinterDialog		Nom de la impressora:
+Driver: %driver%	PrinterListView		Controlador: %driver%
+Black	TestPageView		Negre
+Restart job	PrintersWindow		Reinicia la feina
+Add	AddPrinterDialog		Afegeix
+Make default	PrintersWindow		Fes-la predeterminada
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Cancel job	PrintersWindow		Anuŀla la feina
+Yellow	TestPageView		Groc
+Blue	TestPageView		Blau
+Remove	PrintersWindow		Suprimeix
+<pick one>	AddPrinterDialog		<trie'n un>
+Print jobs for 	PrintersWindow		Feines d'impressió per a 
+Failed	JobListView		Ha fallat
+%.2f KB	JobListView		%.2f KB
+Magenta	TestPageView		Magenta
+Completed	JobListView		Completada
+No printer found!	TransportMenu		No s'ha trobat cap impressora!
+Print jobs: No printer selected	PrintersWindow		Feines d'impressió: No s'ha triat cap impressora
+Cyan	TestPageView		Cian
+Unknown status	JobListView		Es desconeix l'estat
+Connected to:	AddPrinterDialog		Connectat a:
+Printer type:	AddPrinterDialog		Tipus d'impressora:

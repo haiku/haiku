@@ -1,18 +1,18 @@
-1	korean	x-vnd.Haiku-MidiPlayer	3885957623
-Cavern	Main Window		동굴
-Closet	Main Window		화장실
-Could not load song	Main Window		노래를 불러올 수 없습니다
-Drop MIDI file here	Scope View		미디 파일을 여기다가 떨어트려 주세요
-Dungeon	Main Window		지하 감옥
-Garage	Main Window		차고
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI 플레이어 1.0.0 베타\n\n이 작은 프로그램은\n 수천개의 간단한 \n노래를 재생할 줄 압니다.
-Igor's lab	Main Window		이고르의 실험실
-Live input:	Main Window		라이브 입력:
+1	korean	x-vnd.Haiku-MidiPlayer	471142057
 None	Main Window		없음
+Live input:	Main Window		라이브 입력:
+Stop	Main Window		정지
+Cavern	Main Window		동굴
+Volume:	Main Window		소리 크기:
+Reverb:	Main Window		잔향:
 OK	Main Window		확인
 Off	Main Window		끄기
+Dungeon	Main Window		지하 감옥
 Play	Main Window		재생
-Reverb:	Main Window		잔향:
+Garage	Main Window		차고
+Closet	Main Window		화장실
+MidiPlayer	System name		미디재생기
+Drop MIDI file here	Scope View		미디 파일을 여기다가 떨어트려 주세요
+Igor's lab	Main Window		이고르의 실험실
 Scope	Main Window		범위
-Stop	Main Window		정지
-Volume:	Main Window		소리 크기:
+Could not load song	Main Window		노래를 불러올 수 없습니다

@@ -1,0 +1,10 @@
+1	catalan; valencian	x-vnd.Haiku-libmail	161731481
+Partially download messages larger than	ProtocolConfigView		Només s'ha baixat una part dels missatges de més de
+Password:	ProtocolConfigView		Contrasenya:
+Remove mail from server when deleted	ProtocolConfigView		Suprimeix el correu també del servidor quan es suprimeixi
+Mail server:	ProtocolConfigView		Servidor de correu:
+Select…	MailKit		Seleccioneu...
+Connection type:	ProtocolConfigView		Tipus de connexió:
+Leave mail on server	ProtocolConfigView		Deixa els missatges al servidor
+Username:	ProtocolConfigView		Nom d'usuari:
+Login type:	ProtocolConfigView		Tipus d'entrada:

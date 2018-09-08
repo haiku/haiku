@@ -1,0 +1,27 @@
+1	catalan; valencian	x-vnd.Haiku-mixer.media_addon	3450667169
+Input gain controls represent	AudioMixer		Els controls de guany de l'entrada representen
+Linear interpolation	AudioMixer		Interpolació lineal
+Virtual output channels	AudioMixer		Canals de sortida virtuals
+Refuse output format changes	AudioMixer		Rebutja els canvis de format de la sortida
+Output mapping	AudioMixer		Mapeig de sortida
+Allow input channel remapping	AudioMixer		Permet el remapat del canal d'entrada
+Resampling algorithm	AudioMixer		Algorisme de canvi del mostratge
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenua 3dB la sortida del mesclador (com al BeOS R5)
+Display balance control for stereo connections	AudioMixer		Mostra el control de l'equilibri de les connexions estèreo
+To output	AudioMixer		Cap a la sortida
+not connected	AudioMixer		no està connectat
+Refuse input format changes	AudioMixer		Rebutja els canvis de format de l'entrada
+Drop/repeat samples	AudioMixer		Abandona/repeteix les mostres
+Output channel sources	AudioMixer		Procedència del canal de sortida
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Controls de guany
+Input mapping	AudioMixer		Mapeig d'entrada
+Mute	AudioMixer		Silencia
+Input channel destinations	AudioMixer		Destins de canal d'entrada
+To master	AudioMixer		Cap al mestre
+Master output	AudioMixer		Sortida principal
+Setup	AudioMixer		Configuració
+Use non linear gain sliders (like BeOS R5)	AudioMixer		Fes servir controls de guany lliscants no lineals (com al BeOS R5)
+Gain	AudioMixer		Guany
+Allow output channel remapping	AudioMixer		Permet el remapat del canal de sortida
+Physical input channels	AudioMixer		Canals d'entrada físics

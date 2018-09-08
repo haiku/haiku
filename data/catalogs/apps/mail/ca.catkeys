@@ -1,0 +1,163 @@
+1	catalan; valencian	x-vnd.Be-MAIL	3209807243
+View	Mail		Visualització
+%d - Date	Mail		%d - Data
+Attach attributes:	Mail		Inclou els atributs:
+Inconsistency occurred in the undo/redo buffer.	Mail		S'ha produït una inconsistència en desfer/ refer la memòria intermèdia.
+An error occurred trying to save the attachment.	Mail		S'ha produït un error en desar el fitxer inclòs.
+Copy to new	Mail		Copia-ho a un missatge nou
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Deixa-ho com a 'Nou'
+Edit	Mail		Edita
+Print	Mail		Imprimeix
+<none>	Mail		<cap>
+New mail message	Mail		Nou missatge de correu
+Untitled	Mail		Sense títol
+Automatic	Mail		Automàtic
+Automatically mark mail as read:	Mail		Marca automàticament els correus com a llegits:
+helpful message	Mail		missatge d'ajuda
+Colored quotes:	Mail		Cites acolorides:
+Subject:	Mail		Assumpte:
+Reply to all	Mail		Respon a tots
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Adjunt: %name% (Tipus: %type%)
+Show icons & labels	Mail		Mostra les icones i les etiquetes
+Remove attachment	Mail		Suprimeix l'adjunt
+Button bar:	Mail		Barra dels botons:
+spam	B_USER_DIRECTORY/mail/spam		correu brossa
+Beginner	Mail		Principiant
+Don't save	Mail		No ho desis
+Expert	Mail		Expert
+Reply account:	Mail		Compte de resposta:
+Message	Mail		Missatge
+Settings…	Mail		Paràmetres…
+Reply to sender	Mail		Respon al remitent
+There is no installed handler for URL links.	Mail		No hi ha cap gestor d'enllaços URL instal·lat.
+Signature	Mail		Signatura
+Find again	Mail		Repeteix la cerca
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté caràcters no codificables.Pot ser amb un joc de caràcters diferent funcionaria millor. Premeu Envia per enviar-ho igualment (llavors es substituirà amb un altre els caràcters que no es poden codificar), o bé trieu 'Anul·la' per anar enredera i intentar corregir-ho.
+Signature:	Mail		Signatura:
+Save changes to this signature?	Mail		Voleu desar els canvis d'aquesta signatura?
+Cc:	Mail		Cc:
+Off	Mail		Atura
+Find	Mail		Cerca
+Undo	Mail		Desfés
+Date:	Mail		Data:
+An error occurred trying to open this signature.	Mail		Ha ocorregut un error mentre s'intentava obrir aquesta signatura.
+No file attributes, just plain data	Mail		No hi ha cap atribut del fitxer, només dades simples
+Edit queries…	Mail		Edita les consultes...
+queries	B_USER_DIRECTORY/mail/queries		consultes
+Paste	Mail		Enganxa
+in	B_USER_DIRECTORY/mail/in		a
+Save attachment…	Mail		Desa l'adjunt...
+Include file attributes in attachments	Mail		Inclou els atributs del fitxer amb els adjunts
+OK	Mail		D'acord
+Send	Mail		Envia
+Show icons only	Mail		Mostra només les icones
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Encara no està desenvolupada la supressió de correus reenviats!\No funcionarà correctament.
+Hide	Mail		Amaga
+Forward without attachments	Mail		Reenvia sense els adjunts
+Previous	Mail		Anterior
+Redo	Mail		Refés
+Add enclosure…	Mail		Afegeix un fitxer...
+Mail	System name		Correu electrònic
+Print…	Mail		Imprimeix…
+Warn unencodable:	Mail		Avisa si no es codificable:
+Quit	Mail		Surt
+%n - Full name	Mail		%n - Nom complet
+ Read 	Mail		 Llegeix 
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Trash	Mail		Paperera
+Default account:	Mail		Compte per omissió:
+Size:	Mail		Mida:
+Account from mail	Mail		Compte de correu
+Edit signatures…	Mail		Edita les signatures...
+New	Mail		Nou
+Attachments: 	Mail		Fitxers adjunts: 
+On	Mail		Actiu
+Set to %s	Mail		Estableix com a %s
+Forward	Mail		Reenvia
+E-mail draft could not be saved!	Mail		No ha estat possible desar l'esborrany!
+%e wrote:\\n	Mail		%e ha escrit:\\n
+To:	Mail		A:
+Only files can be added as attachments.	Mail		Només es poden afegir fitxers amb els adjunts.
+Previous message	Mail		Missatge anterior
+Attachments:	Mail		Fitxers inclosos:
+Title:	Mail		Títol:
+<no account found>	Mail		<no s'ha trobat cap compte>
+Find…	Mail		Cerca…
+Accounts…	Mail		Comptes...
+Mail preferences	Mail		Preferències del correu
+Initial spell check mode:	Mail		Mode de correcció ortogràfica inicial:
+Leave same	Mail		Deixa-ho igual
+Page setup…	Mail		Configuració de la pàgina...
+Text wrapping:	Mail		Ajustament de línia:
+Revert	Mail		Reverteix
+File	Mail		Fitxer
+mail	B_USER_DIRECTORY/mail		correu
+None	Mail		Cap
+(Name unavailable)	Mail		(El nom no està disponible)
+Copy link location	Mail		Copia la ubicació de l'enllaç
+out	B_USER_DIRECTORY/mail/out		bústia de sortida
+Show header	Mail		Mostra la capçalera
+%e - E-mail address	Mail		%e - Adreça de correu electrònic
+Resend	Mail		Torna a enviar
+Show raw message	Mail		Mostra el missatge en cru
+\\n - Newline	Mail		\\n - Nova línia
+Start now	Mail		Comença ara
+Close	Mail		Tanca
+No matches	Mail		Cap resultat
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		El dimoni del correu no està en execució. S'ha afegit el missatge a la cua i s'enviarà que s'arrenqui el dimoni.
+Really delete this signature? This cannot be undone.	Mail		Realment voleu suprimir aquesta signatura? No ho podreu desfer.
+Save this message as a draft before closing?	Mail		Voleu desar aquest missatge abans de tancar?
+Open	Mail		Obre
+draft	B_USER_DIRECTORY/mail/draft		esborrany
+Quote	Mail		Cita
+Add	Mail		Afegeix
+Next message	Mail		Missatge següent
+User interface	Mail		Interfície d'usuari
+Cancel	Mail		Anul·la
+Send message	Mail		Envia el missatge
+Remove enclosure	Mail		Suprimeix l'adjunt
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Ho sentim, no ha estat possible trobar una aplicació que conegui el tipus de dada 'Persona'.
+Delete	Mail		Suprimeix
+Don't send	Mail		No ho enviïs
+Leave as '%s'	Mail		Deixa-ho com a '%s'
+Copy	Mail		Copia
+Mail couldn't find its dictionary.	Mail		No ha estat possible trobar aquest diccionari.
+Reply preamble:	Mail		Preàmbul de la resposta:
+Signatures	Mail		Signatures
+Next	Mail		Següent
+Set to…	Mail		Estableix-ho com a...
+Use default account	Mail		Utilitza el compte predeterminat
+Sorry	Mail		Ho sentim
+Encoding:	Mail		Codificació:
+Font:	Mail		Tipus de lletra:
+(Address unavailable)	Mail		(L'adreça no està disponible)
+Save address	Mail		Desa l'adreça
+Queries	Mail		Consultes
+Send this message before closing?	Mail		Voleu enviar aquest missatge abans de tancar?
+Save	Mail		Desa
+Random	Mail		Aleatori
+Close and 	Mail		Tanca i 
+Save as draft	Mail		Desa-ho com a esborrany
+The mail_daemon could not be started:\n\t	Mail		No ha estat possible engegar el dimoni del correu:\n\t
+Open attachment	Mail		Obre l'adjunt
+sent	B_USER_DIRECTORY/mail/sent		enviat
+(Date unavailable)	Mail		(La data no està disponible)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Poseu les vostres consultes correu i plantilles de consultes en aquesta carpeta.
+Reply	Mail		Respon
+From:	Mail		De :
+Couldn't open this signature. Sorry.	Mail		Ho sentim. No ha estat possible obrir aquesta signatura.
+Open draft	Mail		Obre l'esborrany
+Cut	Mail		Retalla
+Check spelling	Mail		Revisa l'ortografia
+Set to Saved	Mail		Marca com a desat
+Open this link	Mail		Obre aquest enllaç
+Auto signature:	Mail		Auto signatura:
+Add signature	Mail		Afegeix una signatura
+Need Tracker to move items to trash	Mail		Cal el Rastrejador per tal de moure els elements a la parerera
+Mailing	Mail		Combinació de correu
+Unread	Mail		Sense llegir
+Remove quote	Mail		Esborra la cita
+Move to trash	Mail		Mou a la paperera
+Select all	Mail		Selecciona-ho tot
+An error occurred trying to save this signature.	Mail		Hi ha hagut un error en intentar desar aquesta signatura.

@@ -1,0 +1,32 @@
+1	catalan; valencian	x-vnd.Haiku-Sudoku	283857338
+Could not set Sudoku:\n%s\n	SudokuWindow		No ha estat possible iniciar el Sudoku:\n%s\n
+Export as…	SudokuWindow		Exporta com a...
+OK	SudokuWindow		D'acord
+New	SudokuWindow		Nou
+Abort	ProgressWindow		Interromp
+Sudoku	System name		Sudoku
+Could not open \"%s\":\n%s\n	SudokuWindow		No ha estat possible obrir \"%s\":\n%s\n
+Easy	SudokuWindow		Fàcil
+Open file…	SudokuWindow		Obre un fitxer...
+Solve single field	SudokuWindow		Resol una casella
+Solve	SudokuWindow		Resol
+Redo	SudokuWindow		Refés
+File	SudokuWindow		Fitxer
+Advanced	SudokuWindow		Avançat
+Start again	SudokuWindow		Torna a començar
+HTML	SudokuWindow		HTML
+Sudoku request	SudokuWindow		Demana un Sudoku
+Copy	SudokuWindow		Copia
+Mark valid hints	SudokuWindow		Marca les pistes no vàlides
+Sudoku solved - congratulations!\n	SudokuWindow		Heu resolt el Sudoku - Enhorabona!\n
+Hard	SudokuWindow		Difícil
+Text	SudokuWindow		Text
+Creating solvable field	SudokuGenerator		S'esta creant un camp resoluble
+View	SudokuWindow		Visualitza
+Progress monitor	ProgressWindow		Indicador de progrés
+Mark invalid values	SudokuWindow		Marca els valors no vàlids
+Blank	SudokuWindow		En blanc
+Help	SudokuWindow		Ajuda
+Searching for removable values	SudokuGenerator		S'estan cercant els valors eliminables
+Undo	SudokuWindow		Desfés
+Quit	SudokuWindow		Surt

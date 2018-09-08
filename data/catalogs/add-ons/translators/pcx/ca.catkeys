@@ -1,0 +1,8 @@
+1	catalan; valencian	x-vnd.Haiku-PCXTranslator	938242683
+PCX Settings	main		Paràmetres del PCX
+Version %d.%d.%d, %s	ConfigView		Versió %d.%d.%d,%s
+PCXTranslator Settings	ConfigView		Paràmetres del PCXTranslator
+PCX image translator	PCXTranslator		Traductor d'imatges PCX
+PCX %lu bit image	PCXTranslator		Imatge PCX de %lu bits
+PCX images	PCXTranslator		Imatges PCX
+PCX image translator	ConfigView		Traductor d'imatges PCX

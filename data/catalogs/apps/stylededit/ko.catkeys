@@ -1,57 +1,72 @@
-1	korean	x-vnd.Haiku-StyledEdit	2271525877
+1	korean	x-vnd.Haiku-StyledEdit	537696910
+StyledEdit	System name		스타일드편집기
+Paste	Menus		붙여 넣기
+OK	LoadAlert		확인
+File	Menus		파일
 ???	LoadAlert		???
-Align	Menus		정렬
-Black	Menus		검정색
-Blue	Menus		파랑색
+Lines:	Statistics		줄:
+Italic	Menus		이탤릭
+Left	Menus		왼쪽
+Search backwards	FindandReplaceWindow		거꾸로 찾기
+Size	Menus		크기
+Save	QuitAlert		저장
+Page setup…	Menus		인쇄 설정...
+Print…	Menus		인쇄...
 Can't undo	Menus		되돌릴 수 없음
-Cancel	FindandReplaceWindow		취소
-Cancel	QuitAlert		취소
-Cancel	RevertToSavedAlert		취소
+Save	Menus		저장
+Default	Menus		기본
+Replace with:	FindandReplaceWindow		바꿀 단어:
 Cancel	SaveAlert		취소
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		파일을 찾을 수 없기 때문에, 되졸릴 수 없습니다: \"%s\".
 Case-sensitive	FindandReplaceWindow		대소문자 구별
-Center	Menus		가운데
-Color	Menus		색상
-Cyan	Menus		청록색
-Default	Open_and_SaveAsPanel		기본
+Replace in all windows	FindandReplaceWindow		모든 창에서 바꾸기
+Wrap lines	Menus		줄 바꾸기
+Quit	Menus		나가기
+Document statistics	Statistics		문서 통계
+Cancel	RevertToSavedAlert		취소
 Document	Menus		문서
-Don't save	QuitAlert		저장 안함
-Don't save	SaveAlert		저장 안함
-Encoding	Open_and_SaveAsPanel		인코딩
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\ 불러오는 중 에러 발생":\n\t%s
+Save changes to the document \"%s\"? 	QuitAlert		 \"%s\"  문서에서 바뀐 것을 저장하겠습니까? 
+Edit	Menus		편집
+Font	Menus		글꼴
+Replace all	FindandReplaceWindow		모두 바꾸기
+Statistics…	Menus		통계..
+Default	Open_and_SaveAsPanel		기본
+Replace next	Menus		다음 바꾸기
+Cancel	FindandReplaceWindow		취소
+Close	Menus		닫기
+Save	SaveAlert		저장
+Words:	Statistics		단어:
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		 \"%s\" 불러오기 에러:\n\t지원하지 않는 형식
-Error saving \"%s\":\n%s	SaveAlert		 \"%s\" 저장하는 중 에러 발생:\n%s
-Find	FindandReplaceWindow		찾기
-Find again	Menus		다시 찾기
+OK	RevertToSavedAlert		확인
+Don't save	QuitAlert		저장 안함
+Align	Menus		정렬
+Color	Menus		색상
+OK	QuitAlert		확인
+Open…	Menus		열기…
+Center	Menus		가운데
+OK	Statistics		확인
+New	Menus		새 파일
+Wrap-around search	FindandReplaceWindow		끝에서 되돌려서 찾기
+Bold	Menus		굵게
 Find selection	Menus		선택된 부분에서 찾기
 Find:	FindandReplaceWindow		찾기:
-Find…	Menus		찾기…
-Font	Menus		글꼴
-Green	Menus		녹색
-Left	Menus		왼쪽
-Magenta	Menus		자홍색
-New	Menus		새 파일
-OK	LoadAlert		확인
-OK	RevertToSavedAlert		확인
-OK	SaveAlert		확인
-Open…	Menus		열기…
-Red	Menus		빨강색
+Error saving \"%s\":\n%s	SaveAlert		 \"%s\" 저장하는 중 에러 발생:\n%s
+Copy	Menus		복사
+Cut	Menus		잘라내기
 Replace	FindandReplaceWindow		바꾸기
-Replace all	FindandReplaceWindow		모두 바꾸기
-Replace in all windows	FindandReplaceWindow		모든 창에서 바꾸기
-Replace with:	FindandReplaceWindow		바꿀 단어:
-Replace…	Menus		바꾸기…
-Revert to saved…	Menus		저장되었던 것으로 되돌리기…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		 \"%s\" 의 최근 버젼으로 되돌아 가겟습니까? 
-Right	Menus		오른쪽
-Save	Menus		저장
-Save	QuitAlert		저장
-Save	SaveAlert		저장
-Save changes to the document \"%s\"? 	QuitAlert		 \"%s\"  문서에서 바뀐 것을 저장하겠습니까? 
-Search backwards	FindandReplaceWindow		거꾸로 찾기
-Size	Menus		크기
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		이 파일은 읽기 전용입니다. 문서\"%s\"가 변경된 것을 저장하겠습니까? 
+Find again	Menus		다시 찾기
+Cancel	QuitAlert		취소
+Find…	Menus		찾기…
+Select all	Menus		모두 선택
+Don't save	SaveAlert		저장 안함
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\ 불러오는 중 에러 발생":\n\t%s
+Undo typing	QuitAlert		실행 취소
 Untitled 	StyledEditWindow		제목없음
-Wrap lines	Menus		줄 바꾸기
-Wrap-around search	FindandReplaceWindow		끝에서 되돌려서 찾기
-Yellow	Menus		노랑색
+OK	SaveAlert		확인
+Find	FindandReplaceWindow		찾기
+Encoding	Open_and_SaveAsPanel		인코딩
+Characters:	Statistics		문자:
+Save as…	Menus		다른 이름으로 저장...
+Redo typing	QuitAlert		다시 실행
+Replace…	Menus		바꾸기…
+Right	Menus		오른쪽

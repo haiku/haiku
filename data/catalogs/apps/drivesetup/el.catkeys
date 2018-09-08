@@ -1,0 +1,57 @@
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	1532132034
+DriveSetup	System name		Εγκατάσταση Οδηγού
+Cancel	AbstractParametersPanel		Άκυρο
+Delete	MainWindow		Διαγραφή
+Rescan	MainWindow		Επανάληψη σάρωσης
+OK	MainWindow		Εντάξει
+There's no space on the partition where a child partition could be created.	MainWindow		Δεν υπάρχει χώρος στη κατάτμηση, όπου θα μπορούσε να δημιουργηθεί νέα κατάτμηση.
+Initialize	InitializeParametersPanel		Αρχικοποίηση
+OK	AbstractParametersPanel		Εντάξει
+<empty>	PartitionList		<άδειο>
+Unable to find the selected partition by ID.	MainWindow		Αδύνατο να βρεθεί η επιλεγμένη κατάτμηση ID.
+Select a partition from the list below.	DiskView		Επιλέξτε μία κατάτμηση από την παρακάτω λίστα.
+No disk devices have been recognized.	DiskView		Καμία συσκευή δίσκου δεν έχει αναγνωριστεί.
+The selected disk is read-only.	MainWindow		Ο επιλεγμένος δίσκος είναι μόνο για ανάγνωση.
+Could not mount partition %s.	MainWindow		Αδυναμία προσάρτησης της κατάτμησης %s.
+The partition %s is already unmounted.	MainWindow		Η κατάτμηση %s είναι ήδη αποπροσαρτημένη
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Αποτυχία διαγραφής της κατάτμησης. Καμία τροποποίηση δεν έχει γραφτεί στο δίσκο.
+Could not delete the selected partition.	MainWindow		Αδυναμία διαγραφής της επιλεγμένης κατάτμησης.
+Initialize	MainWindow		Αρχικοποίηση
+Error: 	MainWindow	in any error alert	Σφάλμα:
+Partition %ld	DiskView		Κατάτμηση %ld
+<empty>	DiskView		<άδειο>
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Η αρχικοποίηση της κατάτμησης %s απέτυχε. (Τίποτα δεν γράφτηκε στο δίσκο.)
+Mounted at	PartitionList		Προσαρτήθηκε στο
+There was an error acquiring the partition row.	MainWindow		Υπήρξε ένα σφάλμα κατά την απόκτηση της σειράς κατάτμησης.
+You need to select a partition entry from the list.	MainWindow		Θα χρειαστεί να επιλέξετε μια καταχωρημένη κατάτμηση από τη λίστα.
+The currently selected partition does not have a parent partition.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν έχει κατάτμηση γονέα.
+Write changes	MainWindow		Εγγραφή αλλαγών
+There was an error preparing the disk for modifications.	MainWindow		Υπήρξε ένα σφάλμα κατά την προετοιμασία του δίσκου για τροποποιήσεις.
+The partition %s is already mounted.	MainWindow		Η κατάτμηση %s είναι ήδη προσαρτημένη.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να γράψετε τις αλλαγές στο δίσκο τώρα;\n\nΌλα τα δεδομένα στο δίσκο %s θα χαθούν οριστικά αν το κάνετε αυτό!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να διαγράψετε την επιλεγμένη κατάτμηση;\n\nΌλα τα δεδομένα στη κατάτμηση θα χαθούν οριστικά αν το κάνετε αυτό!
+Create…	MainWindow		Δημιουργία...
+Could not unmount partition %s.	MainWindow		Αδυναμία αποπροσάρτησης της κατάτμησης %s.
+Mount	MainWindow		Προσάρτηση
+Device	PartitionList		Συσκευή
+Disk	MainWindow		Δίσκος
+Device	DiskView		Συσκευή
+Active	PartitionList		Ενεργό
+Volume name	PartitionList		Όνομα τόμου
+Continue	MainWindow		Συνέχεια
+Cannot delete the selected partition.	MainWindow		Δεν μπορείτε να διαγράψετε την επιλεγμένη κατάτμηση.
+Mount all	MainWindow		Προσάρτηση όλων
+Cancel	MainWindow		Άκυρο
+Delete partition	MainWindow		Διαγραφή κατάτμησης
+Eject	MainWindow		Εξαγωγή
+Partition	MainWindow		Κατάτμηση
+Validation of the given creation parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων δημιουργίας απέτυχε.
+Size	PartitionList		Μέγεθος
+Validation of the given initialization parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων αρχικοποίησης απέτυχε.
+The selected partition does not contain a partitioning system.	MainWindow		Η επιλεγμένη κατάτμηση δεν περιέχει σύστημα διαμέρισης.
+The partition %s is currently mounted.	MainWindow		Η κατάτμηση %s είναι τώρα προσαρτημένη.
+Surface test (not implemented)	MainWindow		Έλεγχος επιφάνειας (δεν υλοποιήθηκε)
+Parameters	PartitionList		Παράμετροι
+Creation of the partition has failed.	MainWindow		Η δημιουργία της κατάτμησης έχει αποτύχει.
+The currently selected partition is not empty.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν είναι άδεια.
+Unmount	MainWindow		Αποπροσάρτηση

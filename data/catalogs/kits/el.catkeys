@@ -1,0 +1,30 @@
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	484001623
+%3.2f GiB	StringForSize		%3.2f GiB
+Written by:	AboutWindow		Γράφτηκε από τον:
+About %app%	AboutMenuItem		Περί %app%
+Cut	TextView		Αποκοπή
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Αδυναμία δημιουργίας αντιγράφου για το \"%description\".\n%σφάλμα
+Copy	TextView		Αντιγραφή
+%3.2f KiB	StringForSize		%3.2f KiB
+Error	PrintJob		Σφάλμα
+About %app%	AboutWindow		Περί %app%
+OK	Dragger		Εντάξει
+OK	PrintJob		Εντάξει
+Green:	ColorControl		Πράσινο:
+Remove replicant	Dragger		Αφαίρεση αντιγράφου
+OK	AboutWindow		Εντάξει
+OK	ZombieReplicantView		Εντάξει
+Print Server is not responding.	PrintJob		Ο Εξυπηρετητής εκτυπώσεων δεν ανταποκρίνεται.
+Paste	TextView		Επικόλληση
+%.2f TiB	StringForSize		%.2f TiB
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Αδύνατη η εύρεση της εφαρμογής. Δεν δόθηκε η υπογραφή της %error
+Redo	TextView		Ακύρωση αναίρεσης
+<empty>	Menu		<άδειο>
+Warning	Dragger		Προειδοποίηση
+Undo	TextView		Αναίρεση
+Red:	ColorControl		Κόκκινο:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		Σχετικά με %app…
+Error	ZombieReplicantView		Σφάλμα
+Blue:	ColorControl		Μπλέ:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Αδύνατη η διαγραφή της ρέπλικας από την αρχική θέση. Η ζωή συνεχίζεται.

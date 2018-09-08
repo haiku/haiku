@@ -1,0 +1,31 @@
+1	catalan; valencian	x-vnd.Haiku-Locale	1488345554
+Available languages	Locale Preflet Window		Idiomes disponibles
+Negative:	TimeFormatSettings		Negatiu:
+already chosen	LanguageListView		ja s'ha escollit
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		No ha estat possible trobar els idiomes disponibles! No podeu utilitzar aquest preflet!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Cal reiniciar la Barra del Escriptori i el Rastrejador per tal d'aplicar aquest canvi. Els voleu reiniciar ara?
+Long format:	TimeFormatSettings		Format llarg:
+Currency	TimeFormatSettings		Moneda
+Locale	System name		Localització
+Short format:	TimeFormatSettings		Format curt:
+Language	Locale Preflet Window		Idioma
+Preferred languages	Locale Preflet Window		Idiomes preferits
+Use month/day-names from preferred language	TimeFormatSettings		Utilitza els noms de mes i de dia de l'idioma predeterminat
+Formatting	Locale Preflet Window		Formatació
+Locale	Locale Preflet Window		Localització
+Numbers	TimeFormatSettings		Nombres
+24 hour	TimeFormatSettings		24 hores
+OK	Locale Preflet Window		D'acord
+Restart	Locale Preflet Window		Reinicia
+Full format:	TimeFormatSettings		Formatat complet:
+Defaults	Locale Preflet Window		Valors predeterminats
+Cancel	Locale Preflet Window		Anul·la
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Tradueix el nom de les aplicacions i de les carpetes a la Barra de l'Escriptori i al Rastrejador.
+Revert	Locale Preflet Window		Reverteix
+Medium format:	TimeFormatSettings		Format mitjà:
+12 hour	TimeFormatSettings		12 hores
+Time	TimeFormatSettings		Hora
+Date	TimeFormatSettings		Data
+Positive:	TimeFormatSettings		Positiu:
+Locale	Locale Preflet		Localització
+Options	Locale Preflet Window		Opcions

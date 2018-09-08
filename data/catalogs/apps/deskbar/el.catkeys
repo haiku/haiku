@@ -1,0 +1,45 @@
+1	greek, modern (1453-)	x-vnd.Be-TSKB	2839057790
+Power off	DeskbarMenu		Απενεργοποίηση
+Hide clock	TimeView		Απόκρυψη ρολογιού
+Applications	PreferencesWindow		Εφαρμογές
+Time preferences…	TimeView		Προτιμήσεις ώρας...
+About Haiku	DeskbarMenu		Σχετικά με το Haiku
+Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
+Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
+Find…	DeskbarMenu		Αναζήτηση…
+Show clock	Tray		Εμφάνιση ρολογιού
+Window	PreferencesWindow		Παράθυρο
+Defaults	PreferencesWindow		Προεπιλεγμένα
+Menu	PreferencesWindow		Μενού
+Recent documents	DeskbarMenu		Πρόσφατα έγγραφα
+Auto-hide	PreferencesWindow		Αυτόματη Απόκρυψη
+Always on top	PreferencesWindow		Πάντα στην κορυφή
+<Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος Deskbar είναι άδειος>
+Show all	WindowMenu		Εμφάνιση όλων
+No windows	WindowMenu		Χωρίς παράθυρα
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
+Large	PreferencesWindow		Μεγάλο
+Auto-raise	PreferencesWindow		Αυτόματη-ανύψωση
+Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
+Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Επεκτατής
+Close all	WindowMenu		Κλείσιμο όλων
+Deskbar preferences	PreferencesWindow		Προτιμήσεις Deskbar
+Mount	DeskbarMenu		Προσάρτηση
+Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
+Shutdown…	DeskbarMenu		Κλείσιμο…
+Tracker always first	PreferencesWindow		Ο Tracker πάντα πρώτος
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Προτιμήσεις
+Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
+About this system	DeskbarMenu		Περί Συστήματος
+Show calendar…	TimeView		Εμφάνιση ημερολογίου…
+Deskbar preferences…	DeskbarMenu		Προτιμήσεις Deskbar…
+Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
+Show replicants	DeskbarMenu		Εμφάνιση αντιγράφων
+Hide application names	PreferencesWindow		Απόκρυψη ονομάτων εφαρμογών
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις
+Icon size	PreferencesWindow		Μέγεθος εικονιδίων
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applets επιφάνειας εργασίας
+Hide all	WindowMenu		Απόκρυψη όλων
+Quit application	WindowMenu		Έξοδος εφαρμογής

@@ -1,0 +1,25 @@
+1	catalan; valencian	x-vnd.haiku-screenshot	4088965159
+seconds	ScreenshotWindow		segons
+Desktop	ScreenshotWindow		Escriptori
+Include window border	ScreenshotWindow		Inclou la vora de la finestra
+Screenshot	System name		Captura de pantalla
+Select	ScreenshotWindow		Seleccioneu
+Capture active window	ScreenshotWindow		Captura la finestra activa
+Cancel	ScreenshotWindow		Anul·la
+Name:	ScreenshotWindow		Nom:
+Choose folder	ScreenshotWindow		Escolliu una carpeta
+Save	ScreenshotWindow		Desa
+Overwrite	ScreenshotWindow		Sobreescriu
+Please select	ScreenshotWindow		Seleccioneu
+Save as:	ScreenshotWindow		Desa com a:
+Copy to clipboard	ScreenshotWindow		Copiar al porta-retalls
+Save in:	ScreenshotWindow		Desa a:
+screenshot	Screenshot	Base filename of screenshot files	captura
+New screenshot	ScreenshotWindow		Nova captura
+Artwork folder	ScreenshotWindow		Carpeta d'imatges
+Home folder	ScreenshotWindow		Carpeta de l'usuari
+Settings…	ScreenshotWindow		Paràmetres…
+overwrite	ScreenshotWindow		sobreescriu
+Delay:	ScreenshotWindow		Retard:
+Include mouse pointer	ScreenshotWindow		Incloure el punter del ratolí
+Translator Settings	ScreenshotWindow		Paràmetres del traductor

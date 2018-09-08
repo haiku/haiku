@@ -1,0 +1,37 @@
+1	greek, modern (1453-)	x-vnd.Haiku-PowerStatus	4055870417
+Design capacity low warning: 	PowerStatus		Χαμηλή προειδοποίηση χωριτικότητας σχεδίασης:
+Show percent	PowerStatus		Εμφάνιση ποσοστού
+Design capacity: 	PowerStatus		Σχεδιασμένη χωριτικότητα:
+Type: 	PowerStatus		Τύπος:
+non-rechargeable	PowerStatus		μη-επαναφορτιζόμενο
+Empty battery slot	PowerStatus		Κενή υποδοχή μπαταρίας
+Run in window	PowerStatus		Εκτέλεση σε παράθυρο
+PowerStatus	System name		PowerStatus
+Battery info…	PowerStatus		Πληροφορίες μπαταρίας...
+Damaged battery	PowerStatus		Κατεστραμμένη μπαταρία
+Show time	PowerStatus		Εμφάνιση ώρας
+Last full charge: 	PowerStatus		Τελευταία πλήρης φόρτιση:
+Battery unused	PowerStatus		Αχρησιμοποίητη μπαταρία
+Extended battery info	PowerStatus		Λεπτομερείς πληροφορίες μπαταρίας
+Current rate: 	PowerStatus		Τρέχων ρυθμός:
+discharging	PowerStatus		αποφόρτιση
+Show text label	PowerStatus		Εμφάνιση κειμένου ετικέτας
+About…	PowerStatus		Περί...
+Model number: 	PowerStatus		Αριθμός μοντέλου:
+Install in Deskbar	PowerStatus		Εγκατάσταση στη Deskbar
+Capacity: 	PowerStatus		Χωρητικότητα:
+Battery discharging	PowerStatus		Η μπαταρία αποφορτίζεται
+Serial number: 	PowerStatus		Σειριακός αριθμός:
+Capacity granularity 1: 	PowerStatus		Κατάτμηση χωριτικότητας 1:
+OEM info: 	PowerStatus		Πληροφορίες OEM:
+Design voltage: 	PowerStatus		Σχεδιασμένη τάση:
+Battery charging	PowerStatus		Η μπαταρία φορτίζεται
+Design capacity warning: 	PowerStatus		Προειδοποίηση σχεδιασμένης τάσης:
+Quit	PowerStatus		Έξοδος
+rechargeable	PowerStatus		επαναφορτιζόμενο
+charging	PowerStatus		φόρτιση
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Μπορείτε να τρέξετε το PowerStatus σε ένα παράθυρο ή να το εγκαταστήσετε στη Deskbar.
+Show status icon	PowerStatus		Εικονίδιο κατάστασης ενέργειας
+Capacity granularity 2: 	PowerStatus		Κατάτμηση χωριτικότητας 2:
+Technology: 	PowerStatus		Τεχνολογία:
+no battery	PowerStatus		καμία μπαταρία

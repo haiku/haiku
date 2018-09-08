@@ -1,0 +1,12 @@
+1	catalan; valencian	x-vnd.Haiku-MatchHeader	1349121828
+<Choose action>	ConfigView		<Trieu una acció>
+has	ConfigView		té
+Move to	ConfigView		Mou a
+Then	ConfigView		Llavors
+this field is based on the action	ConfigView		aquest camp es basa en l'acció
+Delete message	ConfigView		Suprimeix el missatge
+<Choose account>	ConfigView		<Trieu un compte>
+Set flags to	ConfigView		Posa les banderes a
+Set as read	ConfigView		Marca com a llegit
+Reply with	ConfigView		Respon amb
+If	ConfigView		Si

@@ -1,0 +1,30 @@
+1	catalan; valencian	x.vnd.OBOS-Inspector	1686702095
+User Translators	ActiveTranslatorsWindow		Traductors de l'Usuari
+No image available to save.	ImageWindow		No hi ha cap imatge per desar.
+Sorry, unable to write the image file.	ImageView		Ho sentin, no es possible desar la imatge.
+Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Nombre de Documents: %1\n\nTraductor Utilitzat:\nNom: %2\nInformació: %3\nVersió: %4\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTipus: '%1' (%2)\nGrup: '%3' (%4)\nQualitat: %5\nFuncionalitat: %6\nTipus MIME: %7\nNom: %8\n
+Bummer	ImageWindow		Rotllo
+Last Page	ImageWindow		Darrera pàgina
+\nInput Formats:	ImageView		\nFormats d'entrada:
+Sorry, unable to load the image.	ImageView		Ho sentim, no és possible carregar la imatge.
+Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is therefore shortened.	Propietats per a Win
+Active Translators	InspectorApp		Traductors Actius
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Imatge: %1\nEspai de Colors: %2 (%3)\nDimensions: %4 x %5\nBytes per Fila: %6\nBytes Totals: %7\n\nInformació de la Identitat:\nCadena ID: %8\nTipus MIME: %9\nTipus: '%10' (%11)\nTraductor ID: %12\nGrup: '%13' (%14)\nQualitat: %15\nFuncionalitat: %16\n\nInformació de l'Extensió:\n
+\nOutput Formats:	ImageView		\nFormats de sortida:
+Save feature not implemented yet.	ImageWindow		La característica per desar encara no està disponible.
+First Page	ImageWindow		Primera pàgina
+Next Page	ImageWindow		Pàgina següent
+\nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTraductor Utilitzat:\nNom: %1\nInformació: %2\nVersió: %3\n
+Info	ImageWindow		Informació
+OK	ImageWindow		D'acord
+Window	ImageWindow		Finestra
+Quit	ImageWindow		Surt
+Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Document Triat: %1\n\nTraductor Utilitzat:\nNom: %2\nInformació: %3\nVersió: %4\n
+Active Translators	ImageWindow		Traductors Actius
+View	ImageWindow		Visualitza
+Previous Page	ImageWindow		Pàgina anterior
+OK	ImageView		D'acord
+System Translators	ActiveTranslatorsWindow		D'acord
+Unknown	ImageView		Desconegut
+File	ImageWindow		Fitxer

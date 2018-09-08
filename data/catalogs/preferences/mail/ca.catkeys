@@ -1,0 +1,50 @@
+1	catalan; valencian	x-vnd.Haiku-Mail	688530788
+Settings	Config Window		Paràmetres
+Never	Config Window	show status window	Mai
+While sending and receiving	Config Window		Mentre s'estigui enviant i rebent
+Incoming	Config Window		Entrada
+Server name:	E-Mail		Nom del servidor:
+OK	Config Window		D'acord
+E-mail address:	E-Mail		Adreça de correu:
+Account name:	E-Mail		Nom del compte:
+Account name:	Config Views		Nom del compte:
+Create new account	AutoConfigWindow		Obre un compte nou
+OK	Config Views		D'acord
+The filter could not be moved. Deleting filter.	Config Views		No ha estat possible moure el filtre. Així que s'està suprimint.
+Revert	Config Window		Reverteix
+Login name:	E-Mail		Nom d'usuari:
+Incoming	E-Mail		Entrada
+Password:	E-Mail		Contrasenya:
+Accounts	Config Window		Comptes
+Finish	AutoConfigWindow		Acaba
+Remove	Config Window		Suprimeix
+Server Name:	E-Mail		Nom del servidor:
+While sending	Config Window		Mentre s'està enviant
+Enter a valid e-mail address.	AutoConfigWindow		Introduïu una adreça de correu electrònic vàlida.
+Add	Config Window		Afegeix
+Account settings	AutoConfigWindow		Paràmetres del compte
+E-mail	System name		Correu electrònic
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNo ha estat possible de recuperar les preferències generals.\n\nS'ha produït un error en recuperar les preferències :\n%s\n
+Real name:	Config Views		Nom real:
+\t\t· Outgoing	Config Window		\t\t· Sortint
+Choose Protocol	E-Mail		Escolliu un protocol
+Return address:	Config Views		Adreça de retorn:
+Edit mailbox menu…	Config Window		Edita el menú de la bústia d'entrada...
+Outgoing	E-Mail		Sortint
+\t\t· E-mail filters	Config Window		\t\t· Filtres de correu
+Remove	Config Views		Suprimeix
+\t\t· Incoming	Config Window		\t\t· Entrant
+Next	AutoConfigWindow		Següent
+Check every	Config Window		Comprova cada
+Back	AutoConfigWindow		Anterior
+Incoming mail filters	Config Views		Filtres del correu entrant
+Account settings	Config Views		Configuració del compte
+minutes	Config Window		minuts
+Error retrieving general settings: %s\n	Config Window		S'ha produït un error en recuperar les preferències : %s\n
+Real name:	E-Mail		Nom real:
+Apply	Config Window		Aplica
+OK	AutoConfigWindow		D'acord
+Add filter	Config Views		Afegeix un filtre
+Outgoing	Config Window		Sortint
+Outgoing mail filters	Config Views		Filtres del correu de sortida
+Error	Config Window		Error

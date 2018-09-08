@@ -1,0 +1,33 @@
+1	catalan; valencian	x-vnd.Haiku-Expander	2784864376
+Expand	ExpanderMenu		Expandeix
+Set destination…	ExpanderMenu		Seleccioneu el destí...
+Use:	ExpanderPreferences		Utilitza:
+Expander: Open	ExpanderWindow		Descompressor: Obre
+Expander settings	ExpanderPreferences		Paràmetres del Descompressor
+Select current	DirectoryFilePanel		Tria l'actual
+Source	ExpanderWindow		Origen
+Hide contents	ExpanderWindow		Oculta el contingut
+Cancel	ExpanderWindow		Anul·la
+Continue	ExpanderWindow		Segueix
+Destination folder	ExpanderPreferences		Carpeta de destí
+Other	ExpanderPreferences		Altre
+Cancel	ExpanderPreferences		Anul·la
+Expansion	ExpanderPreferences		Descompressió
+Select	DirectoryFilePanel		Seleccioneu
+Settings	ExpanderMenu		Paràmetres
+Settings…	ExpanderMenu		Paràmetres…
+Select	ExpanderPreferences		Seleccioneu
+Show contents	ExpanderWindow		Mostra el contingut
+OK	ExpanderPreferences		D'acord
+Create	ExpanderWindow		Crea
+The file doesn't exist	ExpanderWindow		No existeix el fitxer
+Stop	ExpanderMenu		Atura
+File	ExpanderMenu		Fitxer
+Expander	System name		Descompressor
+Expand	ExpanderWindow		Expandeix
+Close	ExpanderMenu		Tanca
+The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
+Open destination folder after extraction	ExpanderPreferences		Obre la carpeta de destinació després de l'extracció
+Show contents	ExpanderMenu		Mostra el contingut
+Stop	ExpanderWindow		Atura
+Destination	ExpanderWindow		Destí

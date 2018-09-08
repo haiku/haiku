@@ -1,0 +1,16 @@
+1	catalan; valencian	x-vnd.Haiku-GIFTranslator	3793186771
+Websafe	GIFView		Websafe
+Write interlaced images	GIFView		Desa les imatges entrellaçades
+Optimal	GIFView		Òptim
+Greyscale	GIFView		Escala de grisos
+GIF image translator	GIFTranslator		Traductor d'imatges GIF
+Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Be Bitmap (GIFTranslator)
+GIF image translator	GIFView		Traductor d'imatges GIF
+GIF image	GIFTranslator		Imatge GIF
+Write transparent images	GIFView		Desa les imatges transparents
+GIF images	GIFTranslator		Imatges GIF
+Use RGB color	GIFView		Utilitza els colors RGB
+Use dithering	GIFView		Amb tramat
+GIF Settings	GIFTranslator		Paràmetres GIF
+BeOS system	GIFView		Sistema BeOS
+Automatic (from alpha channel)	GIFView		Automàtic (a partir del canal alfa)

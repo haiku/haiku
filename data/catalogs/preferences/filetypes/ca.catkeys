@@ -1,0 +1,156 @@
+1	catalan; valencian	x-vnd.Haiku-FileTypes	3116280330
+Application types…	FileTypes Window		Tipus d'aplicacions...
+Description:	Application Types Window		Descripció:
+Args only	Application Type Window		Només els arguments
+Recognition rule is not valid:\n\n	FileTypes Window		La regla de reconeixement no és vàlida:\n\n
+Add group	New File Type Window		Afegeix un grup
+Remove	Application Type Window		Suprimeix
+Select same type as	FileType Window		Selecciona el mateix tipus que
+Remove icon	Icon View		Suprimeix la icona
+Supported types	Application Type Window		Tipus permesos
+Show icons in list	FileTypes Window		Mostra les icones a la llista
+Type name:	FileTypes Window		Nom del tipus:
+Internal name:	New File Type Window		Nom intern:
+Choose type	Type List Window		Escolliu el tipus
+New file type	New File Type Window		Nou tipus de fitxer
+Rule:	FileTypes Window		Regla:
+Add icon…	Icon View		Afegeix una icona...
+Multiple files from \"%s\" file type	FileType Window		Múltiples fitxers basat al tipus \"%s\"
+File type	FileType Window		Tipus de fitxer
+Could not change attributes	Attribute Window		No s'ha pogut canviar els atributs
+Could not retrieve preferred application of this file	Preferred App Menu		No ha estat possible recuperar l'aplicació preferida d'aquest fitxer
+Beta	Application Types Window		Beta
+Extensions:	FileTypes Window		Extensions:
+Select same preferred application as	FileTypes Window		Seleccioneu la mateixa aplicació preferida que
+Save	Application Type Window		Desa
+Could not retrieve application signature	Preferred App Menu		No ha estat possible triar la mateixa aplicació preferida
+Add	Extension Window		Afegeix
+Select same preferred application as	FileType Window		Seleccioneu la mateixa aplicació preferida que
+Cancel	Attribute Window		Anul·la
+Icon	Application Type Window		Icona
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		No es pot recuperar un tipus de fitxer suprimit.\nEsteu segur que el voleu suprimir?
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Editable
+Multiple launch	Application Type Window		Instàncies múltiples
+(from application)	FileTypes Window		(De l'aplicació)
+Could not set preferred application	FileTypes Window		No ha estat possible tria l'aplicació preferida
+Group:	New File Type Window		Grup:
+%1 application type	Application Type Window		Tipus d'aplicació %1
+Done	Extension Window		Fet
+Application type	Application Type Window		Tipus d'aplicació
+Done	Type List Window		Fet
+Attribute	Attribute Window		Atribut
+Show recognition rule	FileTypes Window		Mostra l regla de reconeixement
+FileTypes request	Preferred App Menu		Demana un tipus de fitxer
+Could not open file	FileType Window		No es pot obrir el fitxer
+Description:	FileTypes Window		Descripció:
+File	FileTypes Window		Fitxer
+Name:	Application Types Window		Nom:
+Group name:	New File Type Window		Nom del grup:
+Preferred application	FileType Window		Aplicació preferida
+Progress	Application Types Window		Progrés
+Set preferred application	Preferred App Menu		Tria l'aplicació preferida
+Don't save	Application Type Window		No ho desis
+Save changes before closing?	Application Type Window		Voleu desar els canvis abans de tancar?
+File	Application Type Window		Fitxer
+Version:	Application Type Window		Versió:
+Select…	FileTypes Window		Seleccioneu...
+FileTypes request	FileTypes		Petició d'un tipus de fitxer
+Open…	FileTypes Window		Obre...
+Select…	FileType Window		Seleccioneu...
+Launch	Application Types Window		Executa
+Same as…	FileType Window	The same APPLICATION as ...	El mateix que...
+Abort	Application Types Window		Interromp
+FileTypes	FileTypes		Tipus de fitxers
+OK	FileTypes		D'acord
+Extra attributes	FileTypes Window		Atributs addicionals
+Development	Application Type Window		Desenvolupament
+Edit…	Application Types Window		Edita...
+Icon	FileType Window		Icona
+Final	Application Types Window		Acabat
+Development	Application Types Window		Desenvolupament
+Open file	FileTypes		Obre un fitxer
+Special:	Attribute Window		Especial:
+Alpha	Application Type Window		Alfa
+Add…	FileTypes Window		Afegeix…
+Signature:	Application Type Window		Signatura:
+Add…	Application Type Window		Afegeix…
+[Multiple files] file types	FileType Window		Tipus de fitxer [múltiples fitxers]
+Information	Application Types Window		Informació
+Gamma	Application Types Window		Gama
+Quit	FileTypes Window		Surt
+Select preferred application	FileType Window		Seleccioneu l'aplicació preferida
+Single launch	Application Type Window		Només una instància
+Golden master	Application Types Window		Candidat
+%s file type	FileType Window		Tipus de fitxer %s
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'aplicació \"%s\" no permet fitxers d'aquest tipus.\nEsteu segur que tot i així ela voleu triar?
+Type:	Attribute Window		Tipus:
+Removing uninstalled application types	Application Types Window		S'estan suprimint els tipus d'aplicació desinstal·lats
+Done	Attribute Window		Fet
+no icon	FileTypes Window		cap icona
+Alpha	Application Types Window		Alfa
+Version	Application Types Window		Versió
+Background app	Application Type Window		Aplicació de fons
+Add new group	New File Type Window		Afegeix un grup nou
+Move down	FileTypes Window		Desplaça cap avall
+Cancel	Application Type Window		Anul·la
+Settings	FileTypes Window		Paràmetres
+New resource file…	FileTypes Window		Nou fitxer de recursos...
+Cancel	New File Type Window		Anul·la
+Icon	FileTypes Window		Icona
+Extension:	Extension Window		Extensió:
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		No es pot recuperar un tipus de fitxer super suprimit..\nEs perdran tots els fitxers d'aquest super tipus!\n\nEsteu segur que ho voleu fer? per suprimir tot el grup, premeu \"Suprimeix\" mantenint premuda la tecla Shift.
+Internal name:	FileTypes Window		Nom intern:
+Add	Attribute Window		Afegeix
+Close	Application Type Window		Tanca
+File recognition	FileTypes Window		Reconeixement de fitxers
+Remove uninstalled	Application Types Window		Suprimeix el que s'han desinstal·tat
+Center	Attribute Window	Attribute column alignment in Tracker	Centre
+Golden master	Application Type Window		Candidat
+Could not open \"%s\":\n%s	FileTypes		No ha estat possible obrir \"%s\":\n%s
+Alignment:	Attribute Window		Alineació:
+Left	Attribute Window	Attribute column alignment in Tracker	Esquerra
+Cancel	Extension Window		Anul·la
+Path:	Application Types Window		Camí:
+Application flags	Application Type Window		Indicador de l'aplicació
+Cancel	Type List Window		Anul·la
+Move up	FileTypes Window		Puja
+Description	FileTypes Window		Descripció
+Save request	Application Type Window		Desa la sol·licitud
+Beta	Application Type Window		Beta
+None	FileTypes Window		Cap
+Remove	FileTypes Window		Suprimeix
+Attribute name:	Attribute Window		Nom de l'atribut:
+Extension	Extension Window		Extensió
+Add type	New File Type Window		Afegeix un tipus
+Internal name:	Attribute Window		Nom intern:
+Show in Tracker…	Application Types Window		Mostra al Traçador...
+Final	Application Type Window		Acabat
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Amplada:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Mostra-ho com a:
+This file type already exists	New File Type Window		Aquest tipus de fitxer ja existeix
+Same as…	FileTypes Window		Igual que...
+Exclusive launch	Application Type Window		Només una execució
+FileTypes	System name		Tipus de fitxers
+Application types	Application Types Window		Tipus de l'aplicacions
+Could not remove file type: %s\n	FileTypes Window		No s'ha pogut suprimir el fitxer del tipus: %s\n
+Signature:	Application Types Window		Signatura:
+Gamma	Application Type Window		Gama
+Cancel	Preferred App Menu		Anul·la
+Cancel	FileTypes Window		Anul·la
+Select preferred application	FileTypes Window		Seleccioneu l'aplicació preferida
+Right	Attribute Window	Attribute column alignment in Tracker	Dreta
+Default application	FileType Window		Aplicació per omissió
+Long description:	Application Type Window		Descripció llarga:
+FileTypes request	FileTypes Window		Sol·licitud de Tipus de fitxer
+Version info	Application Type Window		Informació de la versió
+(from super type)	FileTypes Window		(basat en un super tipus)
+Version:	Application Types Window		Versió:
+Preferred application	FileTypes Window		Aplicació preferida
+Short description:	Application Type Window		Descripció curta:
+File could not be opened	Preferred App Menu		No s'ha pogut obrir el fitxer
+Could not change file extensions	Extension Window		No ha estat possible canviar les extensions dels fitxers
+Edit icon…	Icon View		Edita la icona...
+Same as…	FileType Window	The same TYPE as ...	El mateix que...
+Save into resource file…	Application Type Window		Desa-ho al fitxer de recursos...
+Visible	Attribute Window		Visible
+Could not install file type	New File Type Window		No s'han pogut instal·lar el tipus de fitxer

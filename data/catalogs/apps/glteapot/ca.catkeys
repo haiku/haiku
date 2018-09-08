@@ -1,0 +1,22 @@
+1	catalan; valencian	x-vnd.Haiku-GLTeapot	1557538833
+Upper center	TeapotWindow		Amunt al centre
+Lighting	TeapotWindow		Il·luminació
+Off	TeapotWindow		Apaga
+Lower left	TeapotWindow		Inferior esquerre
+White	TeapotWindow		Blanc
+Yellow	TeapotWindow		Groc
+Blue	TeapotWindow		Blau
+Gouraud shading	TeapotWindow		Ombrejat Gourad
+Quit	TeapotWindow		Surt
+Filled polygons	TeapotWindow		Polígons plens
+Settings	TeapotWindow		Paràmetres
+Fog	TeapotWindow		Boira
+File	TeapotWindow		Fitxer
+Perspective	TeapotWindow		Perspectiva
+GLTeapot	System name		GLTeapot
+Green	TeapotWindow		Verd
+Right	TeapotWindow		A la dreta
+FPS display	TeapotWindow		Mostra la velocitat de l'animació
+Add a teapot	TeapotWindow		Afegeix una tetera
+Red	TeapotWindow		Vermell
+Lights	TeapotWindow		Llums

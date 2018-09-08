@@ -1,0 +1,416 @@
+1	catalan; valencian	x-vnd.Haiku-libtracker	320002301
+OK	WidgetAttributeText		D'acord
+Add-ons	FilePanelPriv		Complements
+Desktop	Model		Escriptori
+Identify	ContainerWindow		Identifica com a
+Warning space color	SettingsView		L'espai de color és feble
+Open	OpenWithWindow		Obre
+Tracker status	StatusWindow		Estat del traçador
+Eject when unmounting	AutoMounterSettings		Expulsa-ho quan es desmuntuti
+Window	ContainerWindow		Finestra
+Decrease size	ContainerWindow		Redueix la seva mida
+You must have at least one attribute showing.	PoseView		Heu de triar al menys un atribut visible.
+Permissions	InfoWindow		Permisos
+128 x 128	DeskWindow		128 x 128
+128 x 128	ContainerWindow		128 x 128
+Recent documents	FavoritesMenu		Documents recents
+Modified	QueryPoseView		Modificat
+Created	ContainerWindow		Generat
+Move	FSUtils	button label	Mou
+Error %error loading add-On %name.	ContainerWindow		S'ha produït un error %error en carregar el Complement %name.
+contains	SelectionWindow		conté
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Ho lamentem, no podeu desar fitxers a la carpeta arrel del sistema.
+Show shared volumes on Desktop	SettingsView		Mostra els volums a l'Escriptori
+Paste links	ContainerWindow		Enganxa els enllaços
+Name	OpenWithWindow		Nom
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		No ha estat possible obrir \"%document\" ja que l'aplicació \"%app\" és a la Paperera. 
+File	ContainerWindow		Fitxer
+Handles any %type	OpenWithWindow		Gestiona qualsevol %type
+Name	Person Query Columns		Nom
+Delete	ContainerWindow		Suprimeix
+32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		No és possible desmuntar el volum \"%name\".
+Open with…	ContainerWindow		Obre amb...
+Write	FilePermissionsView		Escriu
+Modified	PoseView		Modificat
+Make active printer	ContainerWindow		Estableix com a impressora activa
+Create link here	ContainerWindow		Fes un enllaç aquí
+Moving: 	StatusWindow		S'està movent: 
+before	FindPanel		abans
+Error emptying Trash	FSUtils		S'ha produït un error en buidar la paperera
+On	FindPanel		A
+MiB	WidgetAttributeText		MiB
+greater than	FindPanel		més gran que
+Delete	PoseView		Suprimeix
+Select all	ContainerWindow		Selecciona-ho tot
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Ho sentim, el 'Caràcter' de l'atribut no pot ser un glif multi byte
+Clean up	DeskWindow		Neteja
+You cannot copy or move the root directory.	FSUtils		No podeu copiar o moure la carpeta arrel.
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed de %TotalSize, %BytesPerSecond/s
+Invert selection	FilePanelPriv		Inverteix la selecció
+save text	FilePanelPriv		desa el text
+Select all	FilePanelPriv		Selecciona-ho tot
+Link to:	InfoWindow		Enllaç a:
+Location	ContainerWindow		Ubicació
+Location	QueryPoseView		Ubicació
+config	B_USER_CONFIG_DIRECTORY		configuració
+apps	B_APPS_DIRECTORY		aplicacions
+Icon view	ContainerWindow		Mostra les icones
+Size	QueryPoseView		Mida
+Emptying Trash… 	StatusWindow		S'està buidant la Paperera... 
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Noves plantilles del Seguidor
+Close all in workspace	ContainerWindow		Tancat-ho tot a l'espai de treball
+Empty Trash	ContainerWindow		Buida la Paperera
+Name = %name	FindPanel	FindResultTitle	Nom = %name
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Esteu segur que voleu moure o copiar els fitxers seleccionats a aquesta carpeta?
+Does not handle file	OpenWithWindow		No gestiona fitxers
+Arrange by	ContainerWindow		Organitza-ho per
+Mount server error	AutoMounterSettings		Error del servidor de muntatge
+Search	FindPanel		Cerca
+Preparing to empty Trash…	StatusWindow		S'està preparant per buidar la Paperera...
+You cannot put the selected item(s) into the trash.	FSUtils		No podeu posar els elements triats a la paperera.
+Disks	Model		Discs
+Create link	ContainerWindow		Crea un enllaç
+Decrease size	DeskWindow		Minva la seva mida
+Size	ContainerWindow		Mida
+All disks	AutoMounterSettings		Tots els discs
+Would you like to find some other suitable application?	FSUtils		Voleu trobar un altre aplicació adequada?
+Finish: %time - %finishtime left	StatusWindow		Acabarà: %time - falten %finishtime
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		No ha estat possible obrir \"%document\" amb l'aplicació \"%app\" (Falten les llibraries: %library). \n
+no items	CountView		no hi ha cap element
+Ignore case	SelectionWindow		Ignora les diferències de majúscules i minúscules
+is not	FindPanel		no és
+OK	AutoMounterSettings		D'acord
+Windows	TrackerSettingsWindow		Finestres
+Tracker preferences	TrackerSettingsWindow		Preferències del rastrejador
+Cut	FilePanelPriv		Retalla
+Replace	FilePanelPriv		Substitueix
+Opens with:	InfoWindow		S'obre amb:
+Open	ContainerWindow		Obre
+96 x 96	DeskWindow		96 x 96
+Error calculating folder size.	InfoWindow		S'ha produït un error en calcular la mida de la carpeta.
+New folder	FilePanelPriv		Carpeta nova
+%name info	InfoWindow	InfoWindow Title	Propietats de %name
+Favorites	FavoritesMenu		Preferits
+Sorry, you can't copy items to the Trash.	PoseView		Ho sentim, però no es poden copiar els elements a la Paperera.
+matches wildcard expression	SelectionWindow		es correspon amb l'expressió regular
+You cannot replace a folder or a symbolic link with a file.	FSUtils		No podeu substituir una carpeta o enllaç simbòlic amb un fitxer.
+Show space bars on volumes	SettingsView		Mostra les barres d'espai dels volums
+Invert selection	ContainerWindow		Inverteix la selecció
+Increase size	DeskWindow		Augmenta la mida
+Resize to fit	ContainerWindow		Redimensiona per ajustar-ho
+Add printer…	ContainerWindow		Afegeix una impressora...
+New folder	ContainerWindow		Carpeta nova
+Kind	ContainerWindow		Tipus
+home	B_USER_DIRECTORY		inici
+Select…	ContainerWindow		Seleccioneu...
+Copy to	ContainerWindow		Còpia a
+Move to Trash	ContainerWindow		Llença a la paperera
+Modified	Default Query Columns		Modificat
+Move to	ContainerWindow		Mou a
+Create %s clipping	PoseView		Fes un retall de %s
+Set new link target	InfoWindow		Defineix un nou objectiu de l'enllaç
+Save as Query template:	FindPanel		Desa-ho com una plantilla de Consulta:
+preferences	B_PREFERENCES_DIRECTORY		preferències
+Cancel	FSUtils		Anul·la
+Edit name	ContainerWindow		Edita el nom
+Show volumes on Desktop	SettingsView		Mostra els volums a l'Escriptori
+KiB	WidgetAttributeText		KiB
+Error %error loading Add-On %name.	ContainerWindow		S'ha produït un error %error en carregar el Complement %name.
+Defaults	TrackerSettingsWindow		Valors predeterminats
+Mini icon view	ContainerWindow		Mostra les icones petites
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		No es pot obrir \"%name\". Aquest fitxer està erròniament indicat com un executable. 
+Add-ons	ContainerWindow		Complements
+Edit templates…	TemplatesMenu		Edita les plantilles...
+Finish: %time - Over %finishtime left	StatusWindow		Fi: %time - falten %finishtime
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ja existeix un element amb el nom \"%name\" a la carpeta indicada. El voleu substituir amb l'enllaç simbòlic que demaneu?
+Fewer options	FindPanel		Menys opcions
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Ho lamentem, al disc destí no hi ha prou espai per a copiar la selecció.
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No ha estat possible obrir \"%document\" amb l'aplicació \"%app\" (%error). 
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Ho lamentem, no està permès desar més d'un element.
+Searching for disks to mount…	StatusWindow		S'està cercant els discs que cal muntar...
+New folder	FSUtils		Carpeta nova
+Free space color	SettingsView		Color de l'espai lliure
+Cut	ContainerWindow		Retalla
+Remove	FindPanel		Suprimeix
+Resize to fit	QueryContainerWindow		Redimensiona-ho per ajustar-ho
+Desktop	TrackerSettingsWindow		Escriptori
+Sorry, you can't copy items to the Trash.	FSClipBoard		Ho sentim, no podeu copiar elements a la Paperera.
+by attribute	FindPanel		per l'atribut
+Disk mounting during boot	AutoMounterSettings		Muntatge del disc a l'arrencada
+New Query	FindPanel		Consulta nova
+Preparing to move items…	StatusWindow		S'està preparant el trasllat dels elements...
+You cannot replace a file with a folder or a symbolic link.	FSUtils		No podeu substituir un fitxer amb una carpeta o amb un enllaç simbòlic.
+Unmount	InfoWindow		Desmunta
+no supporting apps	OpenWithWindow		no hi ha cap aplicació no apta
+That name is already taken. Please type another one.	InfoWindow		Ja existeix aquest nom d'usuari. Escolliu-ne un altre.
+Sorry, you can't create links in the Trash.	PoseView		Ho lamentem, no podeu fer enllaços a la Papelera
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ja existeix un element amb el nom \"%name\" a la carpeta indicada, i podria incloure\nelements amb els mateixos noms. Els voleu substituir amb els de la carpeta %verb?
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Enllaça \"%name\" a:
+All disks	FindPanel		Tots els discs
+Revert	TrackerSettingsWindow		Torna a l'estat anterior
+Invert selection	QueryContainerWindow		Inverteix la selecció
+Execute	FilePermissionsView		Executa
+Size	FindPanel		Mida
+Open parent	ContainerWindow		Obre el pare
+Location:	InfoWindow		Ubicació:
+Edit favorites…	FilePanelPriv		Edita els preferits...
+Create relative link	ContainerWindow		Fés un enllaç relatiu
+Copy	ContainerWindow		Copia
+Size	PoseView		Mida
+Location	OpenWithWindow		Ubicació
+Force identify	ContainerWindow		Força la identificació
+Duplicate	ContainerWindow		Duplica
+New folder%ld	FSUtils		Carpeta nova%ld
+Outline selection rectangle only	SettingsView		Només els contorns del rectangle de selecció
+Select all	DeskWindow		Selecciona-ho tot
+OK	InfoWindow		D'acord
+Replace	FSUtils		Substitueix
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Esteu intentant substituir l'element:\n\t%name%dest\namb:\n\t%name%src\n\nEsteu segur que el voleu substituir per %movemode?
+Mini icon view	DeskWindow		Mostra les icones petites
+Error in regular expression:\n\n'%errstring'	PoseView		Hi hagur un error a l'expressió regular:\n\n'%errstring'
+Mount all	MountMenu		Munta-ho tot
+calculating…	InfoWindow		s'està calculant...
+Mount all disks now	AutoMounterSettings		Munta tots els discs ara
+Untitled bitmap	PoseView		Imatge sense nom
+of %items	StatusWindow		de %items
+Description:	InfoWindow		Descripció:
+New	DeskWindow		Nou
+Open	InfoWindow		Obre
+64 x 64	ContainerWindow		64 x 64
+Replace all	FSUtils		Reemplaça'ls tots
+Preparing to restore items…	StatusWindow		S'està preparant la restauració dels elements...
+Replace other file	WidgetAttributeText		Reemplaça un altre fitxer
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dels elements triats no es poden moure a la Paperera. Els voleu suprimir? (Aquesta operació no es pot desfer.)
+You cannot create a link to the root directory.	FSUtils		No podeu fer un enllaç cap a la carpeta arrel.
+48 x 48	ContainerWindow		48 x 48
+Could not find application \"%appname\"	OpenWithWindow		No ha estat possible trobar l'aplicació \"%appname\"
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element triat no es pot moure a la Paperera. El voleu suprimir? (Aquesta operació no es pot desfer.)
+Invert	SelectionWindow		Inverteix
+Find	FindPanel		Cerca
+Get info	ContainerWindow		Informació
+Error creating link to \"%name\".	FSUtils		Hi hagut un error en enllaçar amb \"%name\".
+Select	SelectionWindow		Seleccioneu
+Or	FindPanel		O
+The Tracker must be running to see set the default printer.	PoseView		Per veure la impressora predeterminada cal que el traçador s'estigui executant.
+by formula	FindPanel		per fórmula
+40 x 40	DeskWindow		40 x 40
+Name	PoseView		Nom
+Group	FilePermissionsView		Grup
+Version:	InfoWindow		Versió:
+Created:	InfoWindow		Generat
+\nShould this be fixed?	FSUtils		\nCal corregir-ho?
+Copying: 	StatusWindow		S'està copiant:
+Capacity:	InfoWindow		Capacitat:
+Delete	FilePanelPriv		Suprimeix
+Save	FindPanel		Desa
+copy	FSUtils	filename copy	còpia
+Temporary	FindPanel		Temporal
+Version	OpenWithWindow		Versió
+Default application	InfoWindow		Aplicació per omissió
+Preparing to copy items…	StatusWindow		S'està preparant la còpia dels elements...
+Save query as template…	FindPanel		Desa el model de la consulta...
+Show folder location in title tab	SettingsView		Mostra la ubicació de la carpeta a la pestanya
+Proceed	FSUtils		Continua
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alguns elements d¡aquesta carpeta tenen el mateix nom que els elements que esteu %verb.\n \nVoleu substituir-los amb els que esteu %verb o confirmar cada un d'ells?
+The mount server could not be contacted.	AutoMounterSettings		No s'ha pogut contactar amb el servidor del muntatge.
+Error deleting items	FSUtils		S'ha produït un error en esborrar les capes
+Create relative link here	ContainerWindow		Fes un enllaç relatiu aquí
+trash	B_TRASH_DIRECTORY		paperera
+matches regular expression	SelectionWindow		es correspon amb l'expressió regular
+Edit name	InfoWindow		Edita el nom
+Could not open \"%name\" (%error). 	FSUtils		No ha estat possible muntar \"%name\" (%error). 
+Paste	ContainerWindow		Enganxa
+Modified:	InfoWindow		Modificat
+Error moving \"%name\".	FSUtils		Hi hagut un error en moure \"%name\".
+TiB	WidgetAttributeText		TiB
+40 x 40	ContainerWindow		40 x 40
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Ja existeix un fitxer amb el nom \"%name\" a la carpeta indicada. El voleu substituir?
+Cancel	ContainerWindow		Anul·la
+Only the boot disk	AutoMounterSettings		Només el disc de l'arrencada
+Unmount	ContainerWindow		Desmunta
+Copy layout	ContainerWindow		Copia la disposició
+label too long	PoseView		l'etiqueta és massa llarga
+Finish: %time	StatusWindow		Fi: %time
+Cancel	Tracker		Anul·la
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Ho sentim, no podeu modificar aquest atribut.
+Name	ContainerWindow		Nom
+Reverse order	ContainerWindow		Inverteix l'ordre
+48 x 48	DeskWindow		48 x 48
+OK	OpenWithWindow		D'acord
+Add current folder	FilePanelPriv		Afegeix la carpeta actual
+Name	Default Query Columns		Nom
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		No ha estat possible obrir \"%document\" amb l'aplicació \"%app\" (Falta el símbol: %symbol). \n
+The target disk does not support creating links.	FSUtils		El disc de destí no permet fer enllaços.
+starts with	SelectionWindow		comença amb
+Preparing to delete items…	StatusWindow		S'està preparant per suprimir els elements...
+Enable type-ahead filtering	SettingsView		Habilita el filtrat a mida que s'escriu
+Would you like to find a suitable application to open the file?	FSUtils		Voleu trobar una aplicació adequada per tal d'obrir el fitxer?
+There was an error writing the attribute.	WidgetAttributeText		S'ha produït un error en escriure l'atribut.
+Recalculate folder size	InfoWindow		Torna a calcular la mida de la carpeta
+Unknown	WidgetAttributeText		Desconegut
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No ha estat possible obrir \"%document\" (Falta el símbol: %symbol). \n
+by name	FindPanel		per nom
+Creating links: 	StatusWindow		S'estan fent els enllaços: 
+Paused: click to resume or stop	StatusWindow		En pausa: cliqueu per continuar o aturar
+Preferred for %type	OpenWithWindow		Preferit per a %type
+GiB	WidgetAttributeText		GiB
+There was an error deleting \"%name\":\n\t%error	FSUtils		Hi hagut un error en suprimir \"%name\":\n\t%error
+Paste	FilePanelPriv		Enganxa
+Copy more	ContainerWindow		Copia'n més
+OK	PoseView		D'acord
+Read	FilePermissionsView		Lectura
+Clean up all	ContainerWindow		Neteja-ho tot
+New folder	TemplatesMenu		Carpeta nova
+Move here	ContainerWindow		Mou aquí
+File	FilePanelPriv		Fitxer
+Real name	ContainerWindow		Nom real
+Error moving \"%name\"	FSUtils		S'ha produït un error en moure \"%name\"
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".
+Cancel	WidgetAttributeText		Anul·la
+Could not find an application to open \"%name\" (%error). 	FSUtils		No ha estat possible trobar una aplicació per obrir \"%name\" (%error). 
+Create a Query template	FindPanel		Fes un nou model
+Previously mounted disks	AutoMounterSettings		Dics que s'han muntat anteriorment
+%Ld B	WidgetAttributeText		%Ld B
+copying	FSUtils		s'està copiant
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hi ha hagut un error en copiar la carpeta \"%name\":\n\t%error\n\nVoleu continuar?
+Show Disks icon	SettingsView		Mostra la icona dels Discs
+Cancel	PoseView		Anul·la
+You can't move or copy items to read-only volumes.	FSUtils		No podeu moure o copiar elements als volums de només lectura.
+Unknown	FilePermissionsView		Desconegut
+All files and folders	FindPanel		Tots els fitxers i carpetes
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		No ha estat possible obrir \"%document\" (Falten les biblioteques: %library). \n
+The Tracker must be running to see Info windows.	PoseView		Cal que el Traçador funcioni per veure les finestres de la informació.
+Other	FilePermissionsView		Altre
+Query name:	FindPanel		Nom de la consulta:
+Permissions	ContainerWindow		Permisos
+96 x 96	ContainerWindow		96 x 96
+moving	FSUtils		s'està movent
+Identify	InfoWindow		Identifica com a
+Recent folders	ContainerWindow		Carpetes recents
+Close all	ContainerWindow		Tanca-ho tot
+Include trash	FindPanel		Inclou la paperera
+Query template	FindPanel		Model de consulta
+Open %name with:	OpenWithWindow		Obre %name amb:
+Empty folder	NavMenu		Carpeta buida
+Copy here	ContainerWindow		Copia aquí
+Move to Trash	FilePanelPriv		Llença a la paperera
+Current folder	ContainerWindow		Carpeta actual
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Ja existeix una carpeta amb aquest nom a la carpeta indicada. Trieu-ne si us plau un altre.
+Clean up	ContainerWindow		Neteja
+after	FindPanel		després
+Select…	QueryContainerWindow		Seleccioneu...
+More options	FindPanel		Més opcions
+link	FSUtils	filename link	enllaç
+The specified name is illegal. Please choose another name.	FilePanelPriv		El nom indicat és il·legal. Trieu-ne si us plau un altre.
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		No podeu moure una carpeta dintre seu o a alguna de les seves subcarpetes.
+Handles any file	OpenWithWindow		Gestiona qualsevol fitxer
+Get info	FilePanelPriv		Informació
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		Anul·la
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		L'aplicació \"%appname\" no permet el tipus de document que aneu a obrir.\nEsteu segur que voleu continuar?\n\nSi sabeu que l'aplicació permet aquest tipus de document, hauríeu de posar-vos en contacte amb qui la publica i demanar-li que afegeixi aquest tipus de document a la llista de documents acceptats.
+Disks	DirMenu		Discs
+New folder %ld	FSUtils		Carpeta nova %ld
+Used space color	SettingsView		Espai de color utilitzat
+Sorry, could not create a new folder.	FSUtils		Ho lamentem, no ha estat possible preparar una nova carpeta.
+multiple disks	FindPanel		discs múltiples
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".
+Untitled clipping	PoseView		Retall sense nom
+Don't automount	AutoMounterSettings		No ho muntis automàticament
+Save	FilePanelPriv		Desa
+To: %dir	StatusWindow		A: %dir
+Window	FilePanelPriv		Finestra
+Edit name	FilePanelPriv		Edita el nom
+Size:	InfoWindow		Mida:
+Empty folder	SlowContextPopup		Carpeta buida
+Open selection with:	OpenWithWindow		Obre la selecció amb:
+Preparing to create links…	StatusWindow		S'està preparant per fer els nous enllaços...
+Size	Default Query Columns		Mida
+Show navigator	SettingsView		Mostra el navegador
+Desktop	B_DESKTOP_DIRECTORY		Escriptori
+List folders first	SettingsView		Mostra primer les carpetes
+Name	SelectionWindow		Nom
+Trash	Model		Paperera
+Favorites	FilePanelPriv		Preferits
+Name	QueryPoseView		Nom
+OK	Email Query Columns		D'acord
+Delete	FSUtils		Suprimeix
+Modified	FindPanel		Modificat
+Error moving \"%name\" to Trash. (%error)	FSUtils		Hi ha hagut un error en moure \"%name\" a la Paperera. (%error)
+You can't replace a folder with one of its sub-folders.	FSUtils		No podeu substituir una carpeta amb alguna de les seves subcarpetes.
+<No recent items>	FavoritesMenu		<No hi ha cap element recent>
+Preferences…	ContainerWindow		Preferències...
+Move	PoseView		Mou
+Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Esteu segur que voleu suprimir els elements seleccionats? Aquesta operació no es pot desfer.
+Add-ons	DeskWindow		Complements
+Name	FindPanel		Nom
+And	FindPanel		I
+Select…	DeskWindow		Seleccioneu...
+Copy	FilePanelPriv		Copia
+Icon view	DeskWindow		Mostra les icones
+Select all	QueryContainerWindow		Selecciona-ho tot
+Files cannot be moved or deleted from a read-only volume.	PoseView		No podeu moure o suprimir un fitxer d'un volum de només lectura.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Hi hagut un problema al intentar substituir \"%name\". Potser el element estava obert o ocupat.
+Owner	FilePermissionsView		Propietari
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Hi hagut un problema al intentar desar a la carpeta que heu indicat. Si us plau, intenteu-ho en una altre.
+Restore	ContainerWindow		Restaura
+Restoring: 	StatusWindow		S'està restaurant: 
+system	B_SYSTEM_DIRECTORY		sistema
+Skip	FSUtils		Omet
+Settings…	MountMenu		Paràmetres...
+Recent folders	FavoritesMenu		Carpetes recents
+Close	ContainerWindow		Tanca
+Preferred for file	OpenWithWindow		Preferit pel fitxer
+Go to parent	FilePanelPriv		Vés al pare
+Cancel	OpenWithWindow		Anul·la
+That name is too long. Please type another one.	InfoWindow		Aquest nom és massa llarg. Si us plau entreu-ne un altre.
+OK	FSUtils		D'acord
+Paste layout	ContainerWindow		Enganxa la disposició
+Select	InfoWindow		Seleccioneu
+Could not update permissions of file \"%name\". %error	FSUtils		No ha estat possible actualitzar els permisos del fitxer \"%name\". %error
+Select…	FilePanelPriv		Seleccioneu...
+There was an error resolving the link.	Tracker		Hi hagut un error en resoldre l'enllaç.
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+You can't move or copy the trash.	FSUtils		No podeu moure o copiar la paperera.
+ends with	SelectionWindow		acaba amb
+Volume icons	TrackerSettingsWindow		Icones dels volums
+That name is already taken. Please type another one.	WidgetAttributeText		Ja existeix aquest nom. Si us plau, escolliu-ne un altre.
+Close	QueryContainerWindow		Tanca
+Formula %formula	FindPanel	FindResultTitle	Formula %formula
+Kind:	InfoWindow		Tipus:
+starts with	FindPanel		comença amb
+Increase size	ContainerWindow		Augmenta la mida
+is	FindPanel		és
+Attributes	ContainerWindow		Atributs
+Handles %type	OpenWithWindow		Gestiona el tipus %type
+ends with	FindPanel		acaba amb
+New	ContainerWindow		Nou
+less than	FindPanel		menys que
+64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		desenvolupa
+Modified	ContainerWindow		Modificat
+Edit Query template	FindPanel		Edita el model de consulta
+Prompt	FSUtils		Indicador
+Edit query	ContainerWindow		Edita la consulta
+Find…	ContainerWindow		Cerca...
+Create a Query	FindPanel		Nova consulta
+Move to Trash	FSUtils		Llença a la paperera
+Automatic disk mounting	AutoMounterSettings		Muntatge automàtic dels discs
+Original name	ContainerWindow		Nom original
+Find	FSUtils		Cerca
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hi ha hagut un error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
+Single window navigation	SettingsView		Navega en una sola finestra
+parent folder	NavMenu		carpeta pare
+contains	FindPanel		conté
+Relation	OpenWithWindow		Relació
+Open	FilePanelPriv		Obre
+Mount	DeskWindow		Munta
+Recent queries	FindPanel		Consultes recents
+Mount	ContainerWindow		Munta
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used usat -- %free lliure)
+Cancel	FSClipBoard		Anul·la
+Cut more	ContainerWindow		Retalla'n més
+Deleting: 	StatusWindow		S'està suprimint...
+Empty Trash	InfoWindow		Buida la Paperera
+Add	FindPanel		Afegeix

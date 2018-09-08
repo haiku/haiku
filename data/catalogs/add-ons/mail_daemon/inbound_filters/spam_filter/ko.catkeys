@@ -1,0 +1,6 @@
+1	korean	x-vnd.Haiku-SpamFilter	160316705
+or empty e-mail	SpamFilterConfig		나 빈 이-메일
+Genuine below and uncertain above:	SpamFilterConfig		위의 진짜와 아래의 불확실:
+Spam above:	SpamFilterConfig		스팸보다 위에:
+Add spam rating to start of subject	SpamFilterConfig		제목 시작에 스팸 순위 추가하기
+Learn from all incoming e-mail	SpamFilterConfig		모든 받는 이-메일로부터 듣기

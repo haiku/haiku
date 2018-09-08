@@ -1,0 +1,20 @@
+1	catalan; valencian	x-vnd.mmu_man.filepanel	1802971238
+display a load/save file panel\n	FilePanelApp		mostra un quadre per carregar o desar un arxiu\n
+options:\n	FilePanelApp		opcions:\n
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		ús: %s [--help] [--directory carpeta] [--load|--save] [--title títol] [--single] [--modal] [--allow plantilla_acceptable] [--forbid plantilla_inacceptable]\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipus d'entrades que es poden obrir (com ara): qualsevol combinació de f, d, s (fitxer (predeterminat), carpeta, enllaç simbòlic)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		ús: %s [-h]     [-d carpeta]              [-l|-s]     [-t títol]      [-1]       [-m]      [-a plantilla_acceptable]      [-f plantilla_inacceptable]\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tobre la <carpeta>\n
+%s not a valid option\n	FilePanelApp		%s no és una opció vàlida\n
+short\tlong\tdescription\n	FilePanelApp		descripció\t curta\tllarga\n
+%s: this option requires a parameter\n	FilePanelApp		%s: amb aquesta opció cal un paràmetre\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tfés servir un quadre FilePanel per carregar-ho(per omissió)\n
+-f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tno està suportat\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tfés servir un quadre FilePanel per desar-ho\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tindica el nom per omissió per a desar-ho\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tfa que el quadre FilePanel sigui de tipus modal\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tmostra'n l'ús\n
+-a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tno està suportat\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermet triar 1 sol fitxer\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tindica el títol de la finestra del quadre FilePanel\n
+%s: UNIMPLEMENTED\n	FilePanelApp		%s: NO ESTÀ SUPORTAT\n

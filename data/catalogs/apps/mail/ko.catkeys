@@ -1,136 +1,32 @@
-1	korean	x-vnd.Be-MAIL	1161078438
-%d - Date	Mail		%d - 날짜
-%e - E-mail address	Mail		%e - 이메일 주소
-%n - Full name	Mail		%n - 이름
-Account from mail	Mail		메일 계정 사용
-Account:	Mail		계정:
-Accounts…	Mail		계정…
-Add	Mail		추가
-Add enclosure…	Mail		첨부파일 추가…
-Add signature	Mail		서명 추가
-An error occurred trying to open this signature.	Mail		이 서명을 열려고 시도하는 중에 에러가 발생했습니다.
-An error occurred trying to save the attachment.	Mail		첨부 파일을 저장중에 에러가 발생했습니다.
-An error occurred trying to save this signature.	Mail		이 서명을 저장하려고 시도하는 중에 에러가 발생했습니다.
-Attach attributes:	Mail		파일 첨부:
-Attachments:	Mail		첨부파일: 
-Auto signature:	Mail		자동 서명:
-Automatically mark mail as read:	Mail		자동으로 메일을 읽은 것으로 표시:
-Bcc:	Mail		숨은 참조:
-Beginner	Mail		초보자
-Button bar:	Mail		버튼 바
-Cancel	Mail		취소
-Cc:	Mail		참조:
-Check spelling	Mail		맞춤법 검사
-Close	Mail		닫기
-Close and 	Mail		닫고 그리고
-Colored quotes:	Mail		색깔있는 인용문:
-Copy	Mail		복사
-Copy link location	Mail		링크 위치 복사
-Copy to new	Mail		새 메일로 복사
-Couldn't open this signature. Sorry.	Mail		서명을 열 수 없습니다.미안합니다.
-Cut	Mail		잘라내기
-Decoding:	Mail		디코딩:
-Default account:	Mail		기본 계정:
-Delete	Mail		지우기
-Discard	Mail		삭제
-Do you wish to save this message as a draft before closing?	Mail		초안이긴 하지만 닫기 전에 메세지를 저장하겠습니까?
-Do you wish to send this message before closing?	Mail		닫기 전에 메세지를 보내겠습니까?
-Don't save	Mail		저장 안함
-E-mail draft could not be saved!	Mail		이메일 초안을 저장할 수 없습니다!
-Edit	Mail		편집
-Edit queries…	Mail		검색어 편집…
-Edit signatures…	Mail		서명 편집…
-Encoding:	Mail		인코딩:
-Expert	Mail		전문가
-Find	Mail		찾기
-Find again	Mail		다시 찾기
-Find…	Mail		찾기…
-Font:	Mail		글꼴:
-Forward	Mail		전달
-Forward without attachments	Mail		첩부파일 없이 전달
-From:	Mail		보낸 이:
-Hide	Mail		숨기기
-Include file attributes in attachments	Mail		첨부 파일에 속성 포함
-Inconsistency occurred in the undo/redo buffer.	Mail		되돌리기/다시실행 버퍼에서 불일치가 발생했습니다.
-Initial spell check mode:	Mail		편집시 맞춤법 검사:
-Leave as '%s'	Mail		'%s' 로 남김
-Leave as New	Mail		새 메세지로 남김
-Leave same	Mail		변경 없음
-Mail preferences	Mail		메일 환경설정
-Mailing	Mail		메일링
-Message	Mail		메세지
-Move to trash	Mail		휴지통으로 이동
-Need Tracker to move items to trash	Mail		트랙커는 아이템을 휴지통으로 보내기 위해 필요합니다
-New	Mail		새 파일
-New mail message	Mail		새 이메일 메세지
-Next	Mail		다음
-Next message	Mail		다음 메세지
-No file attributes, just plain data	Mail		파일 속성 무시, 단지 평범한 데이타로 취급
-None	Mail		없음
-OK	Mail		확인
-Only files can be added as attachments.	Mail		오직 파일만 첨부파일로 추가될 수 있습니다.
-Open	Mail		열기
-Open attachment	Mail		첨부파일 열기
-Open draft	Mail		초안 열기
-Open this link	Mail		링크 열기
-Page setup…	Mail		페이지 설정
-Paste	Mail		붙여넣기
-Preferences…	Mail		환경설정…
-Previous	Mail		이전
-Previous message	Mail		이전 메세지
-Print	Mail		인쇄
-Print…	Mail		인쇄…
-Queries	Mail		검색어
-Quit	Mail		나가기
-Quote	Mail		인용문
-Random	Mail		무작위
-Really delete this signature? This cannot be undone.	Mail		진짜로 서명을 지우겠습니까?  이 작업은 되돌릴 수 없습니다.
-Redo	Mail		다시 실행
-Remove attachment	Mail		첨부파일 제거
-Remove enclosure	Mail		첨부파일 제거
-Remove quote	Mail		인용문 제거
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		전달된 메일에서 첨부파일 제거는 아직 구현이 안됬습니다!\n 제대로 작동하지 않을 것입니다.
-Reply	Mail		답장
-Reply account:	Mail		회신 계정:
-Reply preamble:	Mail		답장에 추가:
-Reply to all	Mail		전체 답장
-Reply to sender	Mail		보낸 사람에게 답장
-Resend	Mail		다시 보내기
-Revert	Mail		되돌리기
-Save	Mail		저장
-Save address	Mail		주소 저장
-Save as draft	Mail		초안으로 저장
-Save attachment…	Mail		첨부파일 저장…
-Save changes to this signature?	Mail		이 서명이 바뀐 것을 저장하겠습니까?
-Select all	Mail		모두 선택
-Send	Mail		보내기
-Send message	Mail		메세지 보내기
-Set to %s	Mail		%s로 설정
-Set to Saved	Mail		저장함으로 설정
-Set to…	Mail		설정을…
-Show header	Mail		헤더 보기
-Show icons & labels	Mail		아이콘&라벨 보기
-Show icons only	Mail		아이콘만 보기
-Show raw message	Mail		원래 메세지 보기
-Signature	Mail		서명
-Signature:	Mail		서명:
-Signatures	Mail		서명
-Size:	Mail		크기:
-Sorry	Mail		미안합니다
-Sorry, could not find an application that supports the 'Person' data type.	Mail		미안합니다, 'Person' 데이터 타입을 지원하는 프로그램을 찾을 수 없습니다.
-Start now	Mail		지금 시작
-Subject:	Mail		제목:
-The mail_daemon could not be started:\n\t	Mail		메일 데몬을 시작할 수 없습니다:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		메일 데몬이  실행되지 않았습니다.  이 메세지는 대기했다가 메일 데몬이 시작하면 보내질것입니다.
-There is no installed handler for URL links.	Mail		URL 링크에 연결된 처리기가 없습니다.
-Title:	Mail		제목:
-To:	Mail		대상:
-Trash	Mail		휴지통
-Undo	Mail		되돌리기
-Unread	Mail		읽지 않음
-Use default account	Mail		기본 계정 사용
-User interface	Mail		사용자 인터페이스
+1	korean	x-vnd.Be-MAIL	4168631549
 View	Mail		보기
-Warn unencodable:	Mail		인코드 할 수 없다는 경고:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		메세지 본문은 인코딩 할 수 없는 %ld 문자를 포함하고 있습니다. 아마도 다른 문자 집합을 선택하는 것이 더 좋지 않을까여? 보내기를 선택하면 어땋게든 보내질 것입니다(인코드 할 수 없는 문자 대신에 대체 문자가 사용될 것입니다), 아니면 취소를 선택해서 다시 돌아가서 고치십시오.
-\\n - Newline	Mail		\\n -새 줄
+%d - Date	Mail		%d - 날짜
+Attach attributes:	Mail		파일 첨부:
+Inconsistency occurred in the undo/redo buffer.	Mail		되돌리기/다시실행 버퍼에서 불일치가 발생했습니다.
+An error occurred trying to save the attachment.	Mail		첨부 파일을 저장중에 에러가 발생했습니다.
+Copy to new	Mail		새 메일로 복사
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'새 메세지'로 남겨둠
+Edit	Mail		편집
+Print	Mail		인쇄
+<none>	Mail		<없음>
+New mail message	Mail		새 이메일 메세지
+Automatic	Mail		자동
+Automatically mark mail as read:	Mail		자동으로 메일을 읽은 것으로 표시:
+helpful message	Mail		도움이 되는 메세지
+Colored quotes:	Mail		색깔있는 인용문:
+Subject:	Mail		제목:
+Reply to all	Mail		전체 답장
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	첨부파일: %name% (종류: %type%)
+Show icons & labels	Mail		아이콘&라벨 보기
+Remove attachment	Mail		첨부파일 제거
+Button bar:	Mail		버튼 바
+spam	B_USER_DIRECTORY/mail/spam		스팸
+Beginner	Mail		초보자
+Don't save	Mail		저장 안함
+Expert	Mail		전문가
+Reply account:	Mail		회신 계정:
+Message	Mail		메세지
+Reply to sender	Mail		보낸 사람에게 답장
+There is no installed handler for URL links.	Mail		URL 링크에 연결된 처리기가 없습니다.
+Signature	Mail		서명
+Find again	Mail		다시 찾기

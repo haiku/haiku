@@ -1,0 +1,86 @@
+1	catalan; valencian	x-vnd.haiku-icon_o_matic	2924118455
+Select All	Icon-O-Matic-PathManipulator		Selecciona-ho tot
+Add Style	Icon-O-Matic-AddStylesCmd		Afegeix un estil
+Add	Icon-O-Matic-StylesList		Afegeix
+Move Shape	Icon-O-Matic-MoveShapesCommand		Mou la forma
+Opening the document failed!	Icon-O-Matic-Main		No s'ha pogut obrir el document
+Move Paths	Icon-O-Matic-MovePathsCmd		Mou el camins
+None	Icon-O-Matic-Properties		Cap
+New	Icon-O-Matic-Menu-File		Nou
+Paste Properties	Icon-O-Matic-Properties		Enganxa les propietats
+Stroke	Transformation		Traç
+Closed	Icon-O-Matic-PropertyNames		Tancat
+Remove Path	Icon-O-Matic-RemovePathsCmd		Suprimeix el camí
+Add shape with path	Icon-O-Matic-Menu-Shape		Afegeix una forma amb un camí
+Select	Icon-O-Matic-Properties		Selecciona
+Height	Icon-O-Matic-PropertyNames		Alçada
+Width	Icon-O-Matic-PropertyNames		Amplada
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformació
+<unkown property>	Icon-O-Matic-PropertyNames		<propietat desconeguda>
+Move	Icon-O-Matic-TransformationBoxStates		Mou
+OK	Icon-O-Matic-ColorPicker		D'acord
+Add circle	Icon-O-Matic-PathsList		Afegeix un cercle
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Suprimeix els camins
+Scale Y	Icon-O-Matic-PropertyNames		Escala Y
+Add Control Point	Icon-O-Matic-AddPointCmd		Afegeix un punt de control
+Untitled	Icon-O-Matic-Main		Sense títol
+Save as…	Icon-O-Matic-Menu-File		Anomena i desa…
+Don't save	Icon-O-Matic-Menu-Settings		No ho desis
+Change Color	Icon-O-Matic-SetColorCmd		Canvia el Color
+Style	Icon-O-Matic-Menus		Estil
+Opening the icon failed!	Icon-O-Matic-Main		No ha estat possible obrir la icona!
+Error: 	Icon-O-Matic-Main		Error: 
+Name	Icon-O-Matic-PropertyNames		Nom
+Cancel	Icon-O-Matic-SVGExport		Anul·la
+Add shape with style	Icon-O-Matic-Menu-Shape		Afegeix una forma amb un estil
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Suprimeix la forma
+Reverse	Icon-O-Matic-PathsList		Inverteix
+Settings	Icon-O-Matic-Menus		Paràmetres
+All	Icon-O-Matic-Properties		Tot
+Multi Paste Properties	Icon-O-Matic-Properties		Propietats de l'enganxat múltiple
+Undo	Icon-O-Matic-Main		Desfés
+Add Shape	Icon-O-Matic-AddShapesCmd		Afegeix una forma
+Contour	Transformation		Contorn
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Voleu desar els canvis a la icona actual abans de tancar?
+Perspective	Transformation		Perspectiva
+Opacity	Icon-O-Matic-PropertyNames		Opacitat
+Add with path	Icon-O-Matic-ShapesList		Afegeix amb un camí
+Cancel	Icon-O-Matic-Menu-Settings		Anul·la
+Remove	Icon-O-Matic-StylesList		Suprimeix
+Add with path & style	Icon-O-Matic-ShapesList		Afegeix una forma amb un estil
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Suprimeix el Transformador
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Afegeix un transformador
+Remove	Icon-O-Matic-PathsList		Suprimeix
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Suprimeix les formes
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Suprimeix els estils
+Add	Icon-O-Matic-TransformersList		Afegeix
+Settings…	Icon-O-Matic-SavePanel		Paràmetres…
+Remove	Icon-O-Matic-PathManipulator		Suprimeix
+Perspective	Icon-O-Matic-TransformersList		Perspectiva
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Afegeix una forma amb un estil
+Transformation	Transformation		Transformació
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Mou els Transformadors
+Move Styles	Icon-O-Matic-MoveStylesCmd		Suprimeix els estils
+Save	Icon-O-Matic-Menu-Settings		Desa
+Add empty	Icon-O-Matic-ShapesList		Afegeix buit
+Close	Icon-O-Matic-Menu-File		Tanca
+Cancel	Icon-O-Matic-ColorPicker		Anul·la
+Paste	Icon-O-Matic-Properties		Enganxa
+Error: 	Icon-O-Matic-Exporter		Error: 
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Afegeix alguns transformadors
+Add with style	Icon-O-Matic-ShapesList		Afegeix amb un estil
+Add	Icon-O-Matic-PathsList		Afegeix
+Add Shapes	Icon-O-Matic-AddShapesCmd		Afegeix una forma
+Remove	Icon-O-Matic-ShapesList		Suprimeix
+Transformation	Icon-O-Matic-TransformersList		Transformació
+Add Styles	Icon-O-Matic-AddStylesCmd		Afegeix estils
+Add rect	Icon-O-Matic-PathsList		Afegeix una recta
+Edit	Icon-O-Matic-Menus		Edita
+Add Paths	Icon-O-Matic-AddPathsCmd		Afegeix alguns camins
+OK	Icon-O-Matic-SVGImport		D'acord
+Multi paste	Icon-O-Matic-Properties		Enganxament múltiple
+Save	Icon-O-Matic-Menu-File		Desa
+Open…	Icon-O-Matic-Menu-File		Obre...
+Save icon	Dialog title		Desa la icona
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Edita el degradat
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Suprimeix les formes
