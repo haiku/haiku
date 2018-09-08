@@ -1098,7 +1098,7 @@ int32
 TSwitchManager::CountWindows(int32 groupIndex, bool )
 {
 	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(groupIndex);
-	if (!teamGroup)
+	if (teamGroup == NULL)
 		return 0;
 
 	int32 result = 0;
@@ -1146,6 +1146,8 @@ TSwitchManager::SwitchWindow(team_id team, bool, bool activate)
 
 	int32 index;
 	TTeamGroup* teamGroup = FindTeam(team, &index);
+	if (teamGroup == NULL)
+		return;
 
 	// cycle through the windows in the active application
 	int32 count;
