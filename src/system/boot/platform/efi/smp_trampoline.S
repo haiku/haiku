@@ -46,7 +46,7 @@ smp_trampoline_args:
 	pushl  %eax
 	.byte 0x66
 .code32
-	retf
+	lret
 
 trampoline_32:
 	mov    $0x10, %ax
@@ -88,7 +88,7 @@ trampoline_32:
 	pushl	$KERNEL_CODE_SELECTOR
 	leal	(.Llmode - smp_trampoline)(%ebx), %eax
 	pushl	%eax
-	retf
+	lret
 .align 8
 .code64
 .Llmode:
