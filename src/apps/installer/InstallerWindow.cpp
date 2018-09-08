@@ -181,14 +181,14 @@ InstallerWindow::InstallerWindow()
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
 	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.8,
-		B_SIZE_UNSET));
+		logoSize.height));
 
 	// Explicitly create group view to set the background white in case
 	// height resizing is needed for the status view
-	BGroupView* logoGroup = new BGroupView(B_HORIZONTAL, 0);
-	logoGroup->SetViewColor(255, 255, 255);
-	logoGroup->AddChild(logoView);
-	logoGroup->AddChild(fStatusView);
+	fLogoGroup = new BGroupView(B_HORIZONTAL, 0);
+	fLogoGroup->SetViewColor(255, 255, 255);
+	fLogoGroup->GroupLayout()->AddView(logoView);
+	fLogoGroup->GroupLayout()->AddView(fStatusView);
 
 	fDestMenu = new BPopUpMenu(B_TRANSLATE("scanning" B_UTF8_ELLIPSIS),
 		true, false);
@@ -252,7 +252,7 @@ InstallerWindow::InstallerWindow()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(mainMenu)
-		.Add(logoGroup)
+		.Add(fLogoGroup)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING)
 			.SetInsets(B_USE_WINDOW_SPACING)
@@ -496,10 +496,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			PartitionMenuItem* dstItem
 				= (PartitionMenuItem*)fDestMenu->FindMarked();
 
-			char status[1024];
+			BString status;
 			if (be_roster->IsRunning(kDeskbarSignature)) {
 				fBeginButton->SetLabel(B_TRANSLATE("Quit"));
-				snprintf(status, sizeof(status), B_TRANSLATE("Installation "
+				status.SetToFormat(B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
 					"Quit to leave the Installer or choose a new target "
 					"volume to perform another installation."),
@@ -507,7 +507,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 						"Unknown partition name"));
 			} else {
 				fBeginButton->SetLabel(B_TRANSLATE("Restart"));
-				snprintf(status, sizeof(status), B_TRANSLATE("Installation "
+				status.SetToFormat(B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
 					"Restart to restart the computer or choose a new target "
 					"volume to perform another installation."),
@@ -515,7 +515,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 						"Unknown partition name"));
 			}
 
-			_SetStatusMessage(status);
+			_SetStatusMessage(status.String());
 			fInstallStatus = kFinished;
 			_DisableInterface(false);
 			fProgressLayoutItem->SetVisible(false);
@@ -787,10 +787,10 @@ InstallerWindow::_UpdateControls()
 	fDestMenuField->MenuItem()->SetLabel(label.String());
 
 	if (srcItem != NULL && dstItem != NULL) {
-		char message[255];
-		sprintf(message, B_TRANSLATE("Press the Begin button to install from "
-		"'%1s' onto '%2s'."), srcItem->Name(), dstItem->Name());
-		_SetStatusMessage(message);
+		BString message;
+		message.SetToFormat(B_TRANSLATE("Press the Begin button to install "
+			"from '%1s' onto '%2s'."), srcItem->Name(), dstItem->Name());
+		_SetStatusMessage(message.String());
 	} else if (srcItem != NULL) {
 		_SetStatusMessage(B_TRANSLATE("Choose the disk you want to install "
 			"onto from the pop-up menu. Then click \"Begin\"."));
@@ -872,12 +872,7 @@ void
 InstallerWindow::_SetStatusMessage(const char *text)
 {
 	fStatusView->SetText(text);
-
-	// Make the status view taller if needed
-	BSize size = fStatusView->ExplicitMinSize();
-	float heightNeeded = fStatusView->TextHeight(0, fStatusView->CountLines()) + 15.0;
-	if (heightNeeded > size.height)
-		fStatusView->SetExplicitMinSize(BSize(size.width, heightNeeded));
+	fLogoGroup->GroupLayout()->InvalidateLayout();
 }
 
 
