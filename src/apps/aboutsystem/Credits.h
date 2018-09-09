@@ -103,6 +103,7 @@ static const Translation kTranslations[] = {
 	{ "fi",
 		"Jorma Karvonen (Karvjorm)\n"
 		"Jaakko Leikas (Garjala)\n"
+		"Tommi Nieminen (SuperOscar)\n"
 		"Niels Sascha Reedijk\n"
 		"Slavi Stefanov Sotirov\n"
 		"nortti\n"
@@ -184,6 +185,7 @@ static const Translation kTranslations[] = {
 		"Daniele Tosti\n"
 		"davide.orsi\n"
 		"fabiusp98\n"
+		"TheClue\n"
 		"TropinotoHirto\n"
 		"valzant\n"
 	},
@@ -394,8 +396,8 @@ static const Translation kTranslations[] = {
 	"Scott McCreary\n" \
 	"Puck Meerburg\n" \
 	"Fredrik Modéen\n" \
-	"Hamish Morrison\n" \
 	"Joseph R. Prostko\n" \
+	"Niels Sascha Reedijk\n" \
 	"François Revol\n" \
 	"Philippe Saint-Pierre\n" \
 	"Jonathan Schleifer\n" \
@@ -431,12 +433,12 @@ static const Translation kTranslations[] = {
 	"Matt Madia\n" \
 	"David McPaul\n" \
 	"Wim van der Meer\n" \
+	"Hamish Morrison\n" \
 	"Michael Pfeiffer\n" \
 	"Frans Van Nispen\n" \
 	"Adi Oanca\n" \
 	"Marcus Overhagen\n" \
 	"Michael Phipps\n" \
-	"Niels Sascha Reedijk\n" \
 	"David Reid\n" \
 	"Hugo Santos\n" \
 	"Alex Smith\n" \
