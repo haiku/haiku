@@ -365,6 +365,7 @@ void hda_codec_delete(hda_codec* codec);
 
 /* hda_multi_audio.c */
 status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t length);
+void get_settings_from_file();
 
 /* hda_controller.c: Basic controller support */
 status_t hda_hw_init(hda_controller* controller);

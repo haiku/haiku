@@ -1,0 +1,24 @@
+# Settings file for the HDA driver
+#
+#  This file should be moved to the directory
+#  ~/config/settings/kernel/drivers/
+#  Uncomment and edit any of the setting lines you wish to set.
+#  The values shown are just the defaults.
+#  Don't uncomment any that you don't need to differ from the default.
+
+#  Remember that latency will probably be at least
+#   2*buffer_frames/sample_rate
+#  For real time audio, a buffer of 1024 frames at 192000
+#  should be good (<15ms).
+#  You will need more buffers if they're small.
+#  e.g.:
+#     play_buffer_frames	1024
+#     play_buffer_count	4
+
+###########################################################
+
+# play_buffer_frames	10240
+# play_buffer_count	2
+
+# record_buffer_frames	10240
+# record_buffer_count	2
