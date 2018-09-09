@@ -123,8 +123,10 @@ PrintersWindow::MessageReceived(BMessage* msg)
 		{
 			fSelectedPrinter = fPrinterListView->SelectedItem();
 			if (fSelectedPrinter) {
-				fJobsBox->SetLabel((BString(B_TRANSLATE("Print jobs for "))
-					<< fSelectedPrinter->Name()).String());
+				BString text = B_TRANSLATE("Print jobs for %printer_name%");
+				text.ReplaceFirst("%printer_name%", fSelectedPrinter->Name());
+
+				fJobsBox->SetLabel(text);
 				fMakeDefault->SetEnabled(true);
 				fRemove->SetEnabled(true);
 				fJobListView->SetSpoolFolder(fSelectedPrinter->Folder());
