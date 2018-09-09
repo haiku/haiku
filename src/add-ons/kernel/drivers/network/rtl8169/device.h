@@ -97,9 +97,7 @@ typedef struct {
 	uint32				speed;
 	bool				full_duplex;
 	
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	sem_id				linkChangeSem;
-#endif
 	
 } rtl8169_device;
 

@@ -32,10 +32,6 @@
 #endif
 #define ERROR(x...) dprintf("intel_gart: " x)
 
-#ifndef __HAIKU__
-#	define B_KERNEL_READ_AREA	0
-#	define B_KERNEL_WRITE_AREA	0
-#endif
 
 /* read and write to PCI config space */
 #define get_pci_config(info, offset, size) \

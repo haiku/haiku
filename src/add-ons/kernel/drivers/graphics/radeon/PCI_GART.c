@@ -51,13 +51,8 @@ createGARTBuffer(GART_info *gart, size_t size)
 	gart->buffer.area = create_area("Radeon PCI GART buffer",
 		&gart->buffer.ptr, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK,
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		// TODO: really user read/write?
-		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA
-#else
-		0
-#endif
-		);
+		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (gart->buffer.area < 0) {
 		SHOW_ERROR(1, "cannot create PCI GART buffer (%s)",
 			strerror(gart->buffer.area));
@@ -155,13 +150,8 @@ static status_t initGATT( GART_info *gart )
 		B_32_BIT_CONTIGUOUS,
 			// TODO: Physical address is cast to 32 bit below! Use B_CONTIGUOUS,
 			// when that is (/can be) fixed!
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		// TODO: really user read/write?
-		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA
-#else
-		0
-#endif
-		);
+		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA);
 
 	if (gart->GATT.area < 0) {
 		SHOW_ERROR(1, "cannot create GATT table (%s)",

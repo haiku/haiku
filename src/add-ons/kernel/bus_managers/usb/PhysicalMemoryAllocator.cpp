@@ -68,12 +68,10 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 	fManagedMemory = fBlockSize[0] * fArrayLength[0];
 
 	size_t roundedSize = biggestSize * minCountPerBlock;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	fDebugBase = roundedSize;
 	fDebugChunkSize = 128;
 	fDebugUseMap = 0;
 	roundedSize += sizeof(fDebugUseMap) * 8 * fDebugChunkSize;
-#endif
 	roundedSize = (roundedSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	fArea = create_area(fName, &fLogicalBase, B_ANY_KERNEL_ADDRESS,
@@ -133,7 +131,6 @@ status_t
 PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 	phys_addr_t *physicalAddress)
 {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		if (size > fDebugChunkSize) {
 			kprintf("usb allocation of %" B_PRIuSIZE
@@ -156,7 +153,6 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 
 		return B_NO_MEMORY;
 	}
-#endif
 
 	if (size == 0 || size > fBlockSize[fArrayCount - 1]) {
 		TRACE_ERROR(("PMA: bad value for allocate (%ld bytes)\n", size));
@@ -242,14 +238,12 @@ status_t
 PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 	phys_addr_t physicalAddress)
 {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		uint32 index = ((uint8 *)logicalAddress - (uint8 *)fLogicalBase
 			- fDebugBase) / fDebugChunkSize;
 		fDebugUseMap &= ~(1LL << index);
 		return B_OK;
 	}
-#endif
 
 	if (size == 0 || size > fBlockSize[fArrayCount - 1]) {
 		TRACE_ERROR(("PMA: bad value for deallocate (%ld bytes)\n", size));

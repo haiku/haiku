@@ -7,11 +7,11 @@
  *		Niels S. Reedijk
  */
 
+
 #include "usb_private.h"
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
- #include <kernel.h>
-#endif
+#include <kernel.h>
+
 
 Transfer::Transfer(Pipe *pipe)
 	:	fPipe(pipe),

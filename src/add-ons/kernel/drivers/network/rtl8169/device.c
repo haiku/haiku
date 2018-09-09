@@ -24,9 +24,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <driver_settings.h>
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	#include <net/if_media.h>
-#endif
+#include <net/if_media.h>
 
 
 #include "debug.h"
@@ -423,10 +421,8 @@ rtl8169_get_link_state(rtl8169_device *device)
 	device->full_duplex = full_duplex;
 	device->speed = speed;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (linkStateChange && device->linkChangeSem >= B_OK)
 		release_sem_etc(device->linkChangeSem, 1, B_DO_NOT_RESCHEDULE);
-#endif
 
 	return B_OK;
 }
@@ -620,9 +616,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	// configure PHY
 	phy_config(device);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	device->linkChangeSem = -1;
-#endif
 
 	rtl8169_get_link_state(device);
 
@@ -966,7 +960,6 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 			*(uint32*)arg = device->maxframesize;
 			return B_OK;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case ETHER_GET_LINK_STATE:
 		{
 			ether_link_state_t state;
@@ -995,7 +988,6 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 			}
 			return B_OK;
 		}
-#endif
 
 		default:
 			TRACE("rtl8169_control() Invalid command\n");

@@ -31,19 +31,12 @@
 #include <PCI.h>
 
 #include <util/OpenHashTable.h>
-#ifdef __HAIKU__
-#	include <kernel/lock.h>
-#	include <vm/vm_page.h>
-#	include <vm/vm_types.h>
-#endif
+#include <kernel/lock.h>
+#include <vm/vm_page.h>
+#include <vm/vm_types.h>
 
 #include <lock.h>
 
-#ifndef __HAIKU__
-#	define PCI_capabilities_ptr		0x34
-#	define PCI_status_capabilities	0x0010
-#	define PCI_cap_id_agp			0x02
-#endif
 
 #define TRACE_AGP
 #ifdef TRACE_AGP
@@ -79,7 +72,7 @@ struct aperture_memory {
 	addr_t		base;
 	size_t		size;
 	uint32		flags;
-#if defined(__HAIKU__) && !defined(GART_TEST)
+#if !defined(GART_TEST)
 	union {
 		vm_page	**pages;
 		vm_page *page;
@@ -488,7 +481,7 @@ Aperture::CreateMemory(size_t size, size_t alignment, uint32 flags)
 		", flags %" B_PRIx32 "\n", memory, memory->base, memory->size, flags);
 
 	memory->flags = flags;
-#if defined(__HAIKU__) && !defined(GART_TEST)
+#if !defined(GART_TEST)
 	memory->pages = NULL;
 #else
 	memory->area = -1;
@@ -537,7 +530,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	}
 	TRACE("allocate %ld bytes out of %ld\n", size, memory->size);
 
-#if defined(__HAIKU__) && !defined(GART_TEST)
+#if !defined(GART_TEST)
 	uint32 count = size / B_PAGE_SIZE;
 
 	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
@@ -592,7 +585,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	memory->allocating_thread = find_thread(NULL);
 #endif
 
-#else	// !__HAIKU__ || GART_TEST
+#else	// GART_TEST
 	void *address;
 	memory->area = create_area("GART memory", &address, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK | ((flags & B_APERTURE_NEED_PHYSICAL) != 0
@@ -644,14 +637,8 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 
 	if ((memory->flags & ALLOCATED_APERTURE) != 0) {
 		// We allocated this memory, get the base and size from there
-#ifdef __HAIKU__
 		size = memory->size;
 		physical = true;
-#else
-		status_t status = get_area_base_and_size(memory->area, address, size);
-		if (status < B_OK)
-			return status;
-#endif
 	}
 
 	// We don't need to bind reserved memory
@@ -685,7 +672,6 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 
 			physicalAddress = entry.address;
 		} else {
-#ifdef __HAIKU__
 			uint32 index = offset >> PAGE_SHIFT;
 			vm_page *page;
 			if ((memory->flags & B_APERTURE_NEED_PHYSICAL) != 0)
@@ -695,7 +681,6 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 
 			physicalAddress
 				= (phys_addr_t)page->physical_page_number << PAGE_SHIFT;
-#endif
 		}
 
 		status = fModule->bind_page(fPrivateAperture, start + offset,
@@ -718,7 +703,7 @@ Aperture::_Free(aperture_memory *memory)
 	if ((memory->flags & ALLOCATED_APERTURE) == 0)
 		return;
 
-#if defined(__HAIKU__) && !defined(GART_TEST)
+#if !defined(GART_TEST)
 	// Remove the stolen area from the allocation
 	size_t size = memory->size;
 	addr_t reservedEnd = fInfo.base + fInfo.reserved_size;
@@ -1068,7 +1053,7 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 	}
 
 	if (_physicalBase != NULL && (flags & B_APERTURE_NEED_PHYSICAL) != 0) {
-#if defined(__HAIKU__) && !defined(GART_TEST)
+#if !defined(GART_TEST)
 		*_physicalBase
 			= (phys_addr_t)memory->page->physical_page_number * B_PAGE_SIZE;
 #else

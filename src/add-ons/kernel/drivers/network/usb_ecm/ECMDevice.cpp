@@ -272,7 +272,6 @@ ECMDevice::Control(uint32 op, void *buffer, size_t length)
 			*(uint32 *)buffer = fMaxSegmentSize;
 			return B_OK;
 
-#if HAIKU_TARGET_PLATFORM_HAIKU
 		case ETHER_SET_LINK_STATE_SEM:
 			fLinkStateChangeSem = *(sem_id *)buffer;
 			return B_OK;
@@ -286,7 +285,6 @@ ECMDevice::Control(uint32 op, void *buffer, size_t length)
 			state->speed = fDownstreamSpeed;
 			return B_OK;
 		}
-#endif
 
 		default:
 			TRACE_ALWAYS("unsupported ioctl %" B_PRIu32 "\n", op);

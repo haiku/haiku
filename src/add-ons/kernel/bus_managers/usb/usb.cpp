@@ -7,6 +7,7 @@
  *		Niels S. Reedijk
  */
 
+
 #include <util/kernel_cpp.h>
 #include "usb_private.h"
 #include <USB_rle.h>
@@ -16,7 +17,6 @@
 Stack *gUSBStack = NULL;
 
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 /*!	The function is an evil hack to allow <tt> <kdebug>usb_keyboard </tt> to
 	execute transfers.
 	When invoked the first time, a new transfer is started, each time the
@@ -137,7 +137,6 @@ debug_clear_stall(int argc, char *argv[])
 
 	return B_TIMED_OUT;
 }
-#endif
 
 
 static int32
@@ -149,27 +148,8 @@ bus_std_ops(int32 op, ...)
 			if (gUSBStack)
 				return B_OK;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-			// This code is to handle plain R5 (non-BONE) where the same module
-			// gets loaded multiple times (once for each exported module
-			// interface, the USB v2 and v3 API in our case). We don't want to
-			// ever create multiple stacks however, so we "share" the same stack
-			// for both modules by storing it's address in a shared area.
-			void *address = NULL;
-			area_id shared = find_area("shared usb stack");
-			if (shared >= B_OK && clone_area("usb stack clone", &address,
-				B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, shared) >= B_OK) {
-				gUSBStack = *((Stack **)address);
-				TRACE_MODULE("found shared stack at %p\n", gUSBStack);
-				return B_OK;
-			}
-#endif
-
 #ifdef TRACE_USB
 			set_dprintf_enabled(true);
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-			load_driver_symbols("usb");
-#endif
 #endif
 			Stack *stack = new(std::nothrow) Stack();
 			TRACE_MODULE("usb_module: stack created %p\n", stack);
@@ -183,7 +163,6 @@ bus_std_ops(int32 op, ...)
 
 			gUSBStack = stack;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			add_debugger_command("get_usb_pipe_for_id",
 				&debug_get_pipe_for_id,
 				"Sets _usbPipe by resolving _usbPipeID");
@@ -195,14 +174,6 @@ bus_std_ops(int32 op, ...)
 				&debug_clear_stall,
 				"Tries to issue a clear feature request for the endpoint halt"
 				" feature on pipe _usbPipe");
-#elif HAIKU_TARGET_PLATFORM_BEOS
-			// Plain R5 workaround, see comment above.
-			shared = create_area("shared usb stack", &address,
-				B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_NO_LOCK,
-				B_KERNEL_WRITE_AREA);
-			if (shared >= B_OK)
-				*((Stack **)address) = gUSBStack;
-#endif
 			break;
 		}
 
@@ -211,10 +182,8 @@ bus_std_ops(int32 op, ...)
 			delete gUSBStack;
 			gUSBStack = NULL;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			remove_debugger_command("get_usb_pipe_for_id",
 				&debug_get_pipe_for_id);
-#endif
 			break;
 
 		default:

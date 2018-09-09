@@ -5,9 +5,9 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-
 #ifndef _PHYSICAL_MEMORY_ALLOCATOR_H_
 #define _PHYSICAL_MEMORY_ALLOCATOR_H_
+
 
 #include <condition_variable.h>
 #include <SupportDefs.h>
@@ -62,11 +62,9 @@ private:
 		ConditionVariable			fNoMemoryCondition;
 		uint32						fMemoryWaitersCount;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		uint32						fDebugBase;
 		uint32						fDebugChunkSize;
 		uint64						fDebugUseMap;
-#endif
 };
 
 #endif // !_PHYSICAL_MEMORY_ALLOCATOR_H_

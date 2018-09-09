@@ -1115,7 +1115,6 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			break;
 		}
 
-#if HAIKU_TARGET_PLATFORM_HAIKU
 		case B_GET_ICON:
 			// We don't support this legacy ioctl anymore, but the two other
 			// icon ioctls below instead.
@@ -1170,7 +1169,6 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			TRACE_ALWAYS("got device name: \"%s\" = %s\n", name, strerror(result));
 			break;
 		}
-#endif
 
 		default:
 			TRACE_ALWAYS("unhandled ioctl %" B_PRIu32 "\n", op);

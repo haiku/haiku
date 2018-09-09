@@ -1155,9 +1155,6 @@ EHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
 	set_dprintf_enabled(true);
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	load_driver_symbols("ehci");
-#endif
 #endif
 
 	if (!sPCIModule) {

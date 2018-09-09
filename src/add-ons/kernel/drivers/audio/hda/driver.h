@@ -17,23 +17,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-#	define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
-#	include <multi_audio.h>
-#else
-#	define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%lu"
-#	include <hmulti_audio.h>
-#endif
+#define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%lu"
+#include <hmulti_audio.h>
 
 #include "hda_controller_defs.h"
 #include "hda_codec_defs.h"
 
 #define MAX_CARDS				4
-
-/* values for the class_sub field for class_base = 0x04 (multimedia device) */
-#ifndef __HAIKU__
-#	define PCI_hd_audio			3
-#endif
 
 #define HDA_MAX_AUDIO_GROUPS	15
 #define HDA_MAX_CODECS			15
