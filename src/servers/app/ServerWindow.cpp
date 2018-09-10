@@ -3699,13 +3699,13 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<bool>(&inverse) != B_OK)
 				break;
 
-			ServerPicture* picture = fServerApp->GetPicture(pictureToken);
-			if (picture == NULL)
+			ServerPicture* pictureToClip = fServerApp->GetPicture(pictureToken);
+			if (pictureToClip == NULL)
 				break;
 
-			picture->WriteClipToPicture(picture->Token(), where, inverse);
+			picture->WriteClipToPicture(pictureToClip->Token(), where, inverse);
 
-			picture->ReleaseReference();
+			pictureToClip->ReleaseReference();
 			break;
 		}
 
