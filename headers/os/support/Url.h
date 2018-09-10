@@ -100,7 +100,8 @@ public:
 private:
 			void				_ResetFields();
 			bool				_ContainsDelimiter(const BString& url);
-			status_t			_ExplodeUrlString(const BString& urlString);
+			status_t			_ExplodeUrlString(const BString& urlString,
+									uint32 flags);
 			BString				_MergePath(const BString& relative) const;
 			void				_SetPathUnsafe(const BString& path);
 
@@ -121,6 +122,8 @@ private:
 	static	bool				_IsPasswordChar(char c);
 	static	bool				_IsHostChar(char c);
 	static	bool				_IsPortChar(char c);
+
+	static	void				_RemoveLastPathComponent(BString& path);
 
 			BString				_UrlMimeType() const;
 

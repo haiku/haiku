@@ -30,6 +30,11 @@
 
 static const char* kArchivedUrl = "be:url string";
 
+/*! These flags can be combined to control the parse process. */
+
+const uint32 PARSE_NO_MASK_BIT				= 0x00000000;
+const uint32 PARSE_RAW_PATH_MASK_BIT		= 0x00000001;
+
 
 BUrl::BUrl(const char* url)
 	:
@@ -126,7 +131,12 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 {
 	// This implements the algorithm in RFC3986, Section 5.2.
 
-	BUrl relative(location);
+	BUrl relative;
+	relative._ExplodeUrlString(location, PARSE_RAW_PATH_MASK_BIT);
+		// This parse will leave the path 'raw' so that it still carries any
+		// special sequences such as '..' and '.' in it.  This way it can be
+		// later combined with the base.
+
 	if (relative.HasProtocol()) {
 		SetProtocol(relative.Protocol());
 		if (relative.HasAuthority())
@@ -212,7 +222,7 @@ BUrl::~BUrl()
 BUrl&
 BUrl::SetUrlString(const BString& url)
 {
-	_ExplodeUrlString(url);
+	_ExplodeUrlString(url, PARSE_NO_MASK_BIT);
 	return *this;
 }
 
@@ -273,6 +283,18 @@ BUrl::SetPort(int port)
 }
 
 
+void
+BUrl::_RemoveLastPathComponent(BString& path)
+{
+	int32 outputLastSlashIdx = path.FindLast('/');
+
+	if (outputLastSlashIdx == B_ERROR)
+		path.Truncate(0);
+	else
+		path.Truncate(outputLastSlashIdx);
+}
+
+
 BUrl&
 BUrl::SetPath(const BString& path)
 {
@@ -309,13 +331,13 @@ BUrl::SetPath(const BString& path)
 		// 2.C.
 		if (input.StartsWith("/../")) {
 			input.Remove(0, 3);
-			output.Truncate(output.FindLast('/'));
+			_RemoveLastPathComponent(output);
 			continue;
 		}
 
 		if (input == "/..") {
 			input.Remove(1, 2);
-			output.Truncate(output.FindLast('/'));
+			_RemoveLastPathComponent(output);
 			continue;
 		}
 
@@ -971,7 +993,7 @@ char_offset_until_fn_false(const char* url, int32 len, int32 offset,
  * This function takes a URL in string-form and parses the components of the URL out.
  */
 status_t
-BUrl::_ExplodeUrlString(const BString& url)
+BUrl::_ExplodeUrlString(const BString& url, uint32 flags)
 {
 	_ResetFields();
 
@@ -1058,7 +1080,12 @@ BUrl::_ExplodeUrlString(const BString& url)
 			{
 				int end_path = char_offset_until_fn_false(url_c, length, offset,
 					explode_is_path_char);
-				SetPath(BString(&url_c[offset], end_path - offset));
+				BString path(&url_c[offset], end_path - offset);
+
+				if ((flags & PARSE_RAW_PATH_MASK_BIT) == 0)
+					SetPath(path);
+				else
+					_SetPathUnsafe(path);
 				state = EXPLODE_REQUEST;
 				offset = end_path;
 				break;
@@ -1116,8 +1143,13 @@ BUrl::_MergePath(const BString& relative) const
 		return result;
 	}
 
-	BString result(fPath);
-	result.Truncate(result.FindLast("/") + 1);
+	int32 lastSlashIndex = fPath.FindLast("/");
+
+	if (lastSlashIndex == B_ERROR)
+		return relative;
+
+	BString result;
+	result.SetTo(fPath, lastSlashIndex + 1);
 	result << relative;
 
 	return result;
