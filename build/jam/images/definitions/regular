@@ -183,7 +183,6 @@ SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
 	DebugNow
 	Flurry@mesa
 	GLife@mesa Gravity@mesa
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku
 	Icons IFS
 	Leaves
 	Message
