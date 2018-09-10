@@ -475,22 +475,20 @@ static void
 clip_to_picture(void* _canvas, int32 pictureToken, const BPoint& where,
 	bool clipToInverse)
 {
-/* TODO
+	// TODO: Doesn't seem to work
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 
 	ServerPicture* picture = canvas->GetPicture(pictureToken);
 	if (picture == NULL)
 		return;
-
-	AlphaMask* mask = new(std::nothrow) AlphaMask(
-		picture, clipToInverse, where, *canvas->CurrentState());
+	AlphaMask* mask = new(std::nothrow) PictureAlphaMask(canvas->GetAlphaMask(), 
+		picture, *canvas->CurrentState(), where, clipToInverse);
 	canvas->SetAlphaMask(mask);
 	canvas->UpdateCurrentDrawingRegion();
 	if (mask != NULL)
 		mask->ReleaseReference();
 
 	picture->ReleaseReference();
-*/
 }
 
 
