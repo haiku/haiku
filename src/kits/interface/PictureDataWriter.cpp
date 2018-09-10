@@ -75,13 +75,14 @@ status_t
 PictureDataWriter::WriteInvertRect(const BRect& rect)
 {
 	try {
+		WritePushState();
 		WriteSetDrawingMode(B_OP_INVERT);
 
 		BeginOp(B_PIC_FILL_RECT);
 		Write<BRect>(rect);
 		EndOp();
 
-		WriteSetDrawingMode(B_OP_COPY);
+		WritePopState();
 	} catch (status_t& status) {
 		return status;
 	}
