@@ -43,8 +43,7 @@ SymbolButton::Draw(BRect updateRect)
 			base, flags & ~BControlLook::B_DISABLED, fBorders);
 		be_control_look->DrawButtonBackground(this, bounds, updateRect, base,
 			flags);
-	} else
-		FillRect(updateRect, B_SOLID_LOW);
+	}
 
 	if (fSymbol == NULL)
 		return;
