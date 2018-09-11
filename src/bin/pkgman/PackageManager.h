@@ -32,7 +32,6 @@ public:
 			void				SetInteractive(bool interactive);
 
 	virtual	void				JobFailed(BSupportKit::BJob* job);
-	virtual	void				JobAborted(BSupportKit::BJob* job);
 
 private:
 	// UserInteractionHandler

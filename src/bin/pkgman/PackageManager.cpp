@@ -70,13 +70,6 @@ PackageManager::JobFailed(BSupportKit::BJob* job)
 
 
 void
-PackageManager::JobAborted(BSupportKit::BJob* job)
-{
-	DIE(job->Result(), "aborted");
-}
-
-
-void
 PackageManager::HandleProblems()
 {
 	printf("Encountered problems:\n");
