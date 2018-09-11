@@ -7904,10 +7904,13 @@ fs_sync(dev_t device)
 		put_vnode(vnode);
 	}
 
-	// And then, let the file systems do their synchronizing work
-
+	// Let the file systems do their synchronizing work
 	if (HAS_FS_MOUNT_CALL(mount, sync))
 		status = FS_MOUNT_CALL_NO_PARAMS(mount, sync);
+
+	// Finally, flush the underlying device's write cache (if possible.)
+	if (mount->partition != NULL && mount->partition->Device() != NULL)
+		ioctl(mount->partition->Device()->FD(), B_FLUSH_DRIVE_CACHE);
 
 	put_mount(mount);
 	return status;
