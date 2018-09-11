@@ -1,0 +1,14 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "video/hevc";
+
+resource(2, "META:SNIFF_RULE") "0.50 (0x0000000140010c)";
+
+resource(3, "META:S:DESC") #'MSDC' "HEVC elementary stream";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "hevc",
+	"extensions" = "h265",
+	"type" = "video/hevc"
+};
