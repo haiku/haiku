@@ -2294,6 +2294,8 @@ TitleView::SetColumnVisible(BColumn* column, bool visible)
 
 	Invalidate(titleInvalid);
 	fOutlineView->Invalidate(outlineInvalid);
+
+	FixScrollBar(false);
 }
 
 
@@ -2642,7 +2644,8 @@ TitleView::_VirtualWidth() const
 	int32 count = fColumns->CountItems();
 	for (int32 i = 0; i < count; i++) {
 		BColumn* column = reinterpret_cast<BColumn*>(fColumns->ItemAt(i));
-		width += column->Width();
+		if (column->IsVisible())
+			width += column->Width();
 	}
 
 	return width;
