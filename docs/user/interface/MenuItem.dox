@@ -115,7 +115,9 @@
 	\fn BMenuItem::~BMenuItem()
 	\brief Destructor.
 
-	Also frees the memory used by the label or submenu.
+	If this item is attached to a menu, it will be removed from it.
+
+	Also destroys the label and submenu.
 
 	\since BeOS R3
 */
