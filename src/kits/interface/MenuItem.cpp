@@ -181,6 +181,9 @@ BMenuItem::Archive(BMessage* data, bool deep) const
 
 BMenuItem::~BMenuItem()
 {
+	if (fSuper != NULL)
+		fSuper->RemoveItem(this);
+
 	free(fLabel);
 	delete fSubmenu;
 }
