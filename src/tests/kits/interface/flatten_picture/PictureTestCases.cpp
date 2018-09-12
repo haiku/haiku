@@ -85,8 +85,19 @@ static void testDrawStringWithOffsets(BView* view, BRect frame)
 	view->StrokeLine(BPoint(frame.left, baseline - 1), BPoint(frame.right, baseline -1));
 
 	view->SetHighColor(kBlack);
-	const BPoint pointArray[] = { BPoint(frame.left, baseline) };
-	view->DrawString("Haiku [ÖÜÄöüä]", pointArray, sizeof(pointArray) / sizeof(pointArray[0]));
+	BPoint point(frame.left, baseline);
+	BPoint pointArray[] = {
+		point,
+		point,
+		point,
+		point,
+		point
+	};
+	
+	for (size_t i = 1; i < (sizeof(pointArray) / sizeof(pointArray[0])); i++)
+		pointArray[i] = pointArray[i - 1] + BPoint(10, 0);
+
+	view->DrawString("Haiku", pointArray, sizeof(pointArray) / sizeof(pointArray[0]));
 }
 
 
