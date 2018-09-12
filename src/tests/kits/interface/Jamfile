@@ -9,6 +9,7 @@ UsePrivateHeaders interface shared ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) balert ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bmenu ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bregion ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) btextcontrol ] ;
@@ -41,6 +42,9 @@ UnitTestLib libinterfacetest.so
 		DummyPolygon.cpp
 		CreatePolygonTest.cpp
 		MapPolygonTest.cpp
+
+		# BMenu
+		MenuTest.cpp
 
 		# BRegion
 		RegionTest.cpp
