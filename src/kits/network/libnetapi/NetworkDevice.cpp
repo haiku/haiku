@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <sys/sockio.h>
 
-#include <Messenger.h>
 #include <Looper.h>
+#include <Messenger.h>
 
 #include <AutoDeleter.h>
 #include <NetServer.h>
@@ -741,6 +741,8 @@ BNetworkDevice::Scan(bool wait, bool forceRescan)
 			BString interfaceName;
 			if (message->FindString("interface", &interfaceName) != B_OK)
 				return;
+			// See comment in AutoconfigLooper::_NetworkMonitorNotification
+			// for the reason as to why we use FindFirst instead of ==.
 			if (fInterface.FindFirst(interfaceName) < 0)
 				return;
 			if (message->FindInt32("opcode") != B_NETWORK_WLAN_SCANNED)
@@ -788,11 +790,15 @@ BNetworkDevice::Scan(bool wait, bool forceRescan)
 	// If there is already a scan currently running, it's probably an "infinite"
 	// one, which we of course don't want to wait for. So just return immediately
 	// if that's the case.
-	if (status == EINPROGRESS)
+	if (status == EINPROGRESS) {
+		delete listener;
 		return B_OK;
+	}
 
-	if (!wait || status != B_OK)
+	if (!wait || status != B_OK) {
+		delete listener;
 		return status;
+	}
 
 	while (wait_for_thread(listener->Run(), NULL) == B_INTERRUPTED)
 		;
