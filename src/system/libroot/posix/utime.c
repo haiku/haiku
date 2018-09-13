@@ -13,14 +13,7 @@
 
 #include <errno_private.h>
 #include <syscalls.h>
-
-
-#define RETURN_AND_SET_ERRNO(err) \
-	if (err < 0) { \
-		__set_errno(err); \
-		return -1; \
-	} \
-	return err;
+#include <syscall_utils.h>
 
 
 int
