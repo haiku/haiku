@@ -281,6 +281,7 @@ configure_wireless(const char* name, char* const* args, int32 argCount)
 {
 	enum {
 		NONE,
+		SCAN,
 		LIST,
 		JOIN,
 		LEAVE,
@@ -290,7 +291,9 @@ configure_wireless(const char* name, char* const* args, int32 argCount)
 	int controlOption = -1;
 	int controlValue = -1;
 
-	if (!strcmp(args[0], "list") || !strcmp(args[0], "scan"))
+	if (!strcmp(args[0], "scan"))
+		mode = SCAN;
+	else if (!strcmp(args[0], "list"))
 		mode = LIST;
 	else if (!strcmp(args[0], "join"))
 		mode = JOIN;
@@ -324,6 +327,16 @@ configure_wireless(const char* name, char* const* args, int32 argCount)
 	argCount--;
 
 	switch (mode) {
+		case SCAN:
+		{
+			status_t status = device.Scan(true, true);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Scan on \"%s\" failed: %s\n", kProgramName,
+					name, strerror(status));
+				exit(1);
+			}
+			// fall through
+		}
 		case LIST:
 		{
 			// list wireless network(s)
