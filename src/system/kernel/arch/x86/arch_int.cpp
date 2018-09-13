@@ -327,7 +327,7 @@ x86_page_fault_exception(struct iframe* frame)
 		panic("page fault not allowed at this place. Touching address "
 			"%p from ip %p\n", (void*)cr2, (void*)frame->ip);
 		return;
-	} else if ((frame->error_code & PGFAULT_U) == 0
+	} else if (!IFRAME_IS_USER(frame)
 		&& (frame->error_code & PGFAULT_I) != 0
 		&& (x86_read_cr4() & IA32_CR4_SMEP) != 0) {
 		// check that: 1. come not from userland,
@@ -335,7 +335,7 @@ x86_page_fault_exception(struct iframe* frame)
 		panic("SMEP violation user-mapped address %p touched from kernel %p\n",
 			(void*)cr2, (void*)frame->ip);
 	} else if ((frame->flags & X86_EFLAGS_ALIGNMENT_CHECK) == 0
-		&& (frame->error_code & PGFAULT_U) == 0
+		&& !IFRAME_IS_USER(frame)
 		&& (frame->error_code & PGFAULT_P) != 0
 		&& (x86_read_cr4() & IA32_CR4_SMAP) != 0) {
 		// check that: 1. AC flag is not set, 2. come not from userland,
