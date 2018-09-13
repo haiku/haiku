@@ -241,7 +241,9 @@ ethernet_control(net_device *_device, int32 op, void *argument,
 	size_t length)
 {
 	ethernet_device *device = (ethernet_device *)_device;
-	return ioctl(device->fd, op, argument, length);
+	if (ioctl(device->fd, op, argument, length) < 0)
+		return errno;
+	return B_OK;
 }
 
 
