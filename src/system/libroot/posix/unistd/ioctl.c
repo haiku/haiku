@@ -10,14 +10,7 @@
 #include <errno.h>
 
 #include <errno_private.h>
-
-
-#define RETURN_AND_SET_ERRNO(err) \
-	if (err < 0) { \
-		__set_errno(err); \
-		return -1; \
-	} \
-	return err;
+#include <syscall_utils.h>
 
 
 int
@@ -35,5 +28,5 @@ ioctl(int fd, ulong cmd, ...)
 
 	status = _kern_ioctl(fd, cmd, argument, size);
 
-	RETURN_AND_SET_ERRNO(status)
+	RETURN_AND_SET_ERRNO(status);
 }
