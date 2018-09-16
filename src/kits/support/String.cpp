@@ -1545,7 +1545,7 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount,
 BString&
 BString::ReplaceFirst(const char* replaceThis, const char* withThis)
 {
-	if (!replaceThis || !withThis || FindFirst(replaceThis) < 0)
+	if (replaceThis == NULL || FindFirst(replaceThis) < 0)
 		return *this;
 
 	if (_MakeWritable() != B_OK)
@@ -1558,14 +1558,16 @@ BString::ReplaceFirst(const char* replaceThis, const char* withThis)
 BString&
 BString::ReplaceLast(const char* replaceThis, const char* withThis)
 {
-	if (!replaceThis || !withThis)
+	if (replaceThis == NULL)
 		return *this;
+	if (withThis == NULL)
+		withThis = "";
 
 	int32 replaceThisLength = strlen(replaceThis);
 	int32 pos = _FindBefore(replaceThis, Length(), replaceThisLength);
 
 	if (pos >= 0) {
-		int32 withThisLength =  strlen(withThis);
+		int32 withThisLength = strlen(withThis);
 		int32 difference = withThisLength - replaceThisLength;
 
 		if (difference > 0) {
@@ -1589,7 +1591,7 @@ BString&
 BString::ReplaceAll(const char* replaceThis, const char* withThis,
 	int32 fromOffset)
 {
-	if (!replaceThis || !withThis || FindFirst(replaceThis) < 0)
+	if (replaceThis == NULL || FindFirst(replaceThis) < 0)
 		return *this;
 
 	if (_MakeWritable() != B_OK)
@@ -1604,7 +1606,7 @@ BString&
 BString::Replace(const char* replaceThis, const char* withThis,
 	int32 maxReplaceCount, int32 fromOffset)
 {
-	if (!replaceThis || !withThis || maxReplaceCount <= 0
+	if (replaceThis == NULL || maxReplaceCount <= 0
 		|| FindFirst(replaceThis) < 0)
 		return *this;
 
@@ -1696,7 +1698,7 @@ BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount,
 BString&
 BString::IReplaceFirst(const char* replaceThis, const char* withThis)
 {
-	if (!replaceThis || !withThis || IFindFirst(replaceThis) < 0)
+	if (replaceThis == NULL || IFindFirst(replaceThis) < 0)
 		return *this;
 
 	if (_MakeWritable() != B_OK)
@@ -1708,8 +1710,10 @@ BString::IReplaceFirst(const char* replaceThis, const char* withThis)
 BString&
 BString::IReplaceLast(const char* replaceThis, const char* withThis)
 {
-	if (!replaceThis || !withThis)
+	if (replaceThis == NULL)
 		return *this;
+	if (withThis == NULL)
+		withThis = "";
 
 	int32 replaceThisLength = strlen(replaceThis);
 	int32 pos = _IFindBefore(replaceThis, Length(), replaceThisLength);
@@ -1739,7 +1743,7 @@ BString&
 BString::IReplaceAll(const char* replaceThis, const char* withThis,
 	int32 fromOffset)
 {
-	if (!replaceThis || !withThis || IFindFirst(replaceThis) < 0)
+	if (replaceThis == NULL || IFindFirst(replaceThis) < 0)
 		return *this;
 
 	if (_MakeWritable() != B_OK)
@@ -1754,7 +1758,7 @@ BString&
 BString::IReplace(const char* replaceThis, const char* withThis,
 	int32 maxReplaceCount, int32 fromOffset)
 {
-	if (!replaceThis || !withThis || maxReplaceCount <= 0
+	if (replaceThis == NULL || maxReplaceCount <= 0
 		|| FindFirst(replaceThis) < 0)
 		return *this;
 
@@ -2634,7 +2638,7 @@ BString::_DoReplace(const char* findThis, const char* replaceWith,
 	TFindMethod findMethod = ignoreCase
 		? &BString::_IFindAfter : &BString::_FindAfter;
 
-	if (!replaceWith)
+	if (replaceWith == NULL)
 		replaceWith = "";
 
 	int32 replaceLen = strlen(replaceWith);
