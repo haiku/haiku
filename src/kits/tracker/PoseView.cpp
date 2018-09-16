@@ -893,6 +893,17 @@ BPoseView::DetachedFromWindow()
 		tracker->Unlock();
 	}
 
+	std::set<thread_id> addPosesThreads(fAddPosesThreads);
+	fAddPosesThreads.clear();
+		// The threads check periodically if they are still valid,
+		// and clearing the list makes them all "invalid."
+	std::set<thread_id>::iterator it;
+	for (it = addPosesThreads.begin(); it != addPosesThreads.end(); it++) {
+		UnlockLooper();
+		wait_for_thread(*it, NULL);
+		LockLooper();
+	}
+
 	StopWatching();
 	CommitActivePose();
 	SavePoseLocations();
@@ -10168,7 +10179,7 @@ BPoseView::ShowBarberPole()
 void
 BPoseView::HideBarberPole()
 {
-	if (fCountView) {
+	if (fCountView != NULL) {
 		AutoLock<BWindow> lock(Window());
 		if (!lock)
 			return;
