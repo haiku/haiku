@@ -108,6 +108,12 @@ StringReplaceTest::PerformTest(void)
 		"she sells sea shells on the seashore") == 0);
 	delete str1;
 
+	NextSubTest();
+	str1 = new BString("Error moving \"%name\"");
+	str1->ReplaceFirst("%name", NULL);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "Error moving \"\"") == 0);
+	delete str1;
+
 	// &ReplaceLast(const char*, const char*)
 	NextSubTest();
 	str1 = new BString("she sells sea shells on the seashore");
@@ -123,6 +129,13 @@ StringReplaceTest::PerformTest(void)
 		"she sells sea shells on the seashore") == 0);
 	delete str1;
 
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the seashore");
+	str1->ReplaceLast("sea", NULL);
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the shore") == 0);
+	delete str1;
+
 	// &ReplaceAll(const char*, const char*, int32)
 	NextSubTest();
 	str1 = new BString("abc abc abc");
@@ -134,6 +147,12 @@ StringReplaceTest::PerformTest(void)
 	str1 = new BString("abc abc abc");
 	str1->ReplaceAll("abc", "abc");
 	CPPUNIT_ASSERT(strcmp(str1->String(), "abc abc abc") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("abc abc abc");
+	str1->ReplaceAll("abc", NULL);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "  ") == 0);
 	delete str1;
 
 	NextSubTest();
@@ -244,6 +263,13 @@ StringReplaceTest::PerformTest(void)
 		"she sells sea shells on the seashore") == 0);
 	delete str1;
 
+	NextSubTest();
+	str1 = new BString("she sells SeA shells on the seashore");
+	str1->IReplaceFirst("sea ", NULL);
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells shells on the seashore") == 0);
+	delete str1;
+
 	// &IReplaceLast(const char*, const char*)
 #ifndef TEST_R5
 	NextSubTest();
@@ -258,6 +284,13 @@ StringReplaceTest::PerformTest(void)
 	str1->IReplaceLast("tex", "the");
 	CPPUNIT_ASSERT(strcmp(str1->String(),
 		"she sells sea shells on the seashore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("she sells sea shells on the SEashore");
+	str1->IReplaceLast("sea", NULL);
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"she sells sea shells on the shore") == 0);
 	delete str1;
 
 	// &IReplaceAll(const char*, const char*, int32)
@@ -280,6 +313,13 @@ StringReplaceTest::PerformTest(void)
 	str1->IReplaceAll("sea", "the", 11);
 	CPPUNIT_ASSERT(strcmp(str1->String(),
 		"she sells SeA shells on the theshore") == 0);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString("abc ABc aBc");
+	str1->IReplaceAll("ab", NULL);
+	CPPUNIT_ASSERT(strcmp(str1->String(),
+		"c c c") == 0);
 	delete str1;
 
 	// ReplaceSet(const char*, char)
