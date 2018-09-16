@@ -25,6 +25,7 @@ KernelAddon iprowifi4965 :
 	;
 
 HAIKU_WIFI_FIRMWARE_PACKAGES on iprowifi4965 =
+	iwlwifi-100-ucode-39.31.5.1
 	iwlwifi-105-ucode-18.168.6.1 iwlwifi-135-ucode-18.168.6.1
 	iwlwifi-1000-ucode-39.31.5.1
 	iwlwifi-2000-ucode-18.168.6.1 iwlwifi-2030-ucode-18.168.6.1
@@ -33,6 +34,7 @@ HAIKU_WIFI_FIRMWARE_PACKAGES on iprowifi4965 =
 	iwlwifi-6000-ucode-9.221.4.1 iwlwifi-6000g2a-ucode-18.168.6.1
 	iwlwifi-6000g2b-ucode-18.168.6.1 iwlwifi-6050-ucode-41.28.5.1 ;
 HAIKU_WIFI_FIRMWARE_ARCHIVES on iprowifi4965 =
+	iwlwifi-100-ucode-39.31.5.1.tgz
 	iwlwifi-105-ucode-18.168.6.1.tgz iwlwifi-135-ucode-18.168.6.1.tgz
 	iwlwifi-1000-ucode-39.31.5.1.tgz
 	iwlwifi-2000-ucode-18.168.6.1.tgz iwlwifi-2030-ucode-18.168.6.1.tgz
