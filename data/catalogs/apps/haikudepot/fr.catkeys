@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-HaikuDepot	1437744500
+1	french	x-vnd.Haiku-HaikuDepot	3764618272
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
+OK	MainWindow		Valider
 Close	RatePackageWindow		Fermer
 The captcha puzzle needs to be solved.	UserLoginWindow		Vous devez résoudre l’énigme Captcha.
 Changelog	PackageInfoView		Journal des modifications
@@ -16,6 +17,7 @@ Stability	RatePackageWindow		Stabilité
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 Description	PackageListView		Description
 Install	PackageManager		Installer
+All repositories	MainWindow		Tous les dépôts
 Source packages	MainWindow		Paquets sources
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		L’authentification a échoué. L’utilisateur n’existe pas, ou le mot de passe est incorrect.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Compte créé avec succès. Vous pouvez maintenant évaluer les paquets, et faire d’autres choses utiles.
@@ -40,8 +42,11 @@ Installed packages	MainWindow		Paquets installés
 Status	PackageListView		État
 Switch account…	MainWindow		Changer de compte…
 Ignore	UserLoginWindow		Ignorer
+Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
 Language	UserLoginWindow		Langue
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Le mot de passe est trop faible ou invalide. Utilisez au moins 8 caractères dont au moins 2 chiffres et 2 lettres majuscules.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Votre évaluation a été postée avec succès. Vous pouvez la mettre à jour ou la supprimer sur le site Web du Dépôt Haiku.
+Show only featured packages	FilterView		Afficher uniquement les paquets en vitrine
 Rate package	RatePackageWindow		Évaluer le paquet
 Development	Model		Développement
 Fatal error	PackageManager		Erreur fatale
@@ -61,7 +66,9 @@ HaikuDepot needs the package daemon to function, and it appears to be not runnin
 Downloading:	PackageInfoView		Téléchargement en cours :
 Mostly stable	RatePackageWindow		Plutôt stable
 Log out	MainWindow		Déconnexion
+Repository	PackageListView		Dépôt
 Education	Model		Enseignement
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur du Dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
 Search terms:	FilterView		Termes à rechercher :
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
@@ -75,6 +82,7 @@ Authentication failed	UserLoginWindow		L’authentification a échoué
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 9999.99 KiB	PackageListView		9999.99 Kio
 Language	RatePackageWindow		Langue
+User rating	RatePackageWindow		Avis de l'utilisateur
 Size	PackageListView		Taille
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
 User name:	UserLoginWindow		Nom d’utilisateur :
@@ -103,6 +111,7 @@ Login or Create account	MainWindow		Se connecter ou créer un compte
 Pending…	PackageListView		En attente…
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# objet} other{# objets}}
 OK	PackageInfoView		OK
+Package daemon problem	App		Problème du serveur de paquets
 Uninstalled	PackageListView		Désinstallé
 Show	MainWindow		Afficher
 Stable	RatePackageWindow		Stable
@@ -113,6 +122,7 @@ Screenshot	ScreenshotWindow		Capture d’écran
 Not specified	RatePackageWindow		Non spécifié
 Available	PackageListView		Disponible
 Develop packages	MainWindow		Paquets de développement
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)
 n/a	PackageInfoView		n/a
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Si vous ne fournissez pas d’adresse email, vous ne pourrez pas réinitialiser votre mot de passe en cas d’oubli.
  It responded with: 	UserLoginWindow		 Il a répondu : 
@@ -121,16 +131,20 @@ Cancel	RatePackageWindow		Annuler
 Package action failed	PackageInfoView		L’action du paquet a échoué
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Envoyer
+Repositories	MainWindow		Dépôts
 -	no package size		-
 Category:	FilterView		Catégorie :
 Failed to create account	UserLoginWindow		La création du compte a échoué
+Check for updates…	MainWindow		Vérifier les mises à jour…
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n
-Start package daemon	App		Démarrer le gestionnaire de paquets
+Start package daemon	App		Démarrer le serveur de paquets
 Manage repositories…	MainWindow		Gérer les dépôts…
 Business	Model		Professionnel
 Audio	Model		Son
+Rating not possible	MainWindow		Évaluation impossible
 About	PackageInfoView		À propos
 Active	PackageListView		Actif
 It was not possible to contact the web service.	UserLoginWindow		Impossible de joindre le service web.
+Refreshing...	MainWindow		Actualisation…
 Failed to create account: %s\n	UserLoginWindow		Impossible de créer le compte : %s\n
 Cancel	UserLoginWindow		Annuler

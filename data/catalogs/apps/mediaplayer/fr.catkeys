@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	3708050243
+1	french	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		audio brut
 Location	MediaPlayer-InfoWin		Emplacement
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Enregistrer la liste de lecture
 (not supported)	MediaPlayer-InfoWin		(non-supporté)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Aucun des fichiers que vous voulez lire ne semble être un média.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
+ask every time	MediaPlayer-SettingsWindow		demander à chaque fois
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nouveau lecteur…
 100% scale	MediaPlayer-Main		Échelle 100%
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Conteneur
 Nothing to Play	MediaPlayer-Main		Rien à Lire
 Muted	MediaPlayer-SettingsWindow		Muet
 Quit	MediaPlayer-Main		Quitter
+Resume:	MediaPlayer-SettingsWindow		Reprendre :
 Video	MediaPlayer-Main		Vidéo
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n’existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importer une entrée
@@ -57,6 +59,7 @@ MediaPlayer	System name		Lecteur Média
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Réglages…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
+never	MediaPlayer-SettingsWindow		jamais
 h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Sélectionner tout
 Move Entry	MediaPlayer-MovePLItemsCmd		Déplacer l’entrée
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Erreur :
 Large	MediaPlayer-SettingsWindow		Large
 Bottom of video	MediaPlayer-SettingsWindow		Au bas de la vidéo
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+always	MediaPlayer-SettingsWindow		toujours
 Total duration: %s	MediaPlayer-PlaylistWindow		Durée totale : %s
 <unnamed media>	MediaPlayer-InfoWin		<média sans nom>
 raw video	MediaPlayer-InfoWin		vidéo brute

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	3694689316
+1	french	x-vnd.Haiku-Installer	4172072111
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Le Gestionnaire d’amorçage, l’application pour configurer le menu d’amorçage d’Haiku, ne peux pas être lancé.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l’installation et redémarrer le système ?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMATIONS IMP
 Continue	InstallerWindow	In alert after pressing Stop	Continuer
 Write boot sector to '%s'	InstallerWindow		Écrire le secteur d’amorce sur « %s »
 Collecting copy information.	InstallProgress		Récupération des informations de copie.
+Have fun and thanks for trying out Haiku!	InstallerApp		Amusez-vous et merci d'expérimenter Haiku !
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Choisir le disque source dans la liste déroulante, puis cliquer sur « Commencer ».
 Quit Boot Manager and DriveSetup	InstallerWindow		Quitter le gestionnaire d’amorçage et le gestionnaire de disques
 Quit	InstallerWindow		Quitter
@@ -29,6 +30,7 @@ Boot sector successfully written.	InstallProgress		Écriture du secteur d’amor
 Performing installation.	InstallProgress		Installation en cours.
 scanning…	InstallerWindow		recherche…
 Set up boot menu	InstallerWindow		Mettre en place le menu de démarrage
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L’Installeur rendra la partition Haiku amorçable, mais ne fera rien pour intégrer Haiku au menu de démarrage existant. Si GRUB est déjà installé, vous pouvez y ajouter Haiku.\nPour plus de détails, veuillez consulter le guide sur le démarrage d’Haiku sur notre site Web à https://www.haiku-os.org/guides/booting.\nAutrement, vous pouvez configurer le menu de démarrage à partir du menu « Outils » de l'installeur, voir la rubrique « Guide de l’utilisateur » de l’application « Gestionnaire d’amorçage ».\n\n\n
 Abort	InstallerWindow		Abandonner
 Finishing Installation.	InstallProgress		Termine l’installation.
 Restart	InstallerWindow		Redémarrer
@@ -53,6 +55,7 @@ Quit DriveSetup	InstallerWindow		Quitter le Gestionnaire de Disques
 Hide optional packages	InstallerWindow		Cacher les paquets optionnels
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du Gestionnaire de Disques avant celle de l’Installeur.
 Restart system	InstallerWindow		Redémarrer le système
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Si vous installez Haiku sur du matériel réel (pas dans un émulateur), vous pouvez préparer une partition de disque dur à partir d'un autre système d’exploitation (vous pouvez, par exemple, utiliser un Live-CD de GParted, qui peut aussi redimensionner des partitions existantes pour faire de la place).\nVous pouvez également configurer des partitions en lançant le « Gestionnaire de Disque » à partir du programme d'installation, mais vous ne pourrez pas redimensionner les partitions existantes avec lui. Bien que le « Gestionnaire de Disque » ait été testé à fond au fil des ans, il est recommandé d'avoir des sauvegardes à jour pour les autres partitions de votre système. Juste au cas où…
 OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Ajuster les partitions…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Impossible de monter la partition. Veuillez en choisir une autre.
@@ -71,6 +74,7 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Le volume cible n’est pas vide. Êtes-vous sûr de vouloir poursuivre l’installation ?\n\nNote : Le dossier « system » sera une copie propre depuis le volume source, à l’exception du dossier de réglages. Tous les autres dossiers seront fusionnés, et les fichiers qui existent à la fois sur les volumes source et destination seront écrasés par la version de la source.
 No optional packages available.	PackagesView		Pas de paquets optionnels disponibles.
 Continue	InstallerApp		Continuer
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ce logiciel est de qualité bêta ! Cela signifie que vous risquez de perdre des données importantes. Faites des sauvegardes fréquentes ! Vous aurez été prévenus.\n\n\n
 Boot sector not written because of an internal error.	InstallProgress		Le secteur d’amorçage n’a pas été écrit à cause d’une erreur interne.
 Additional disk space required: %s	InstallerWindow		Espace disque requis supplémentaire : %s
 Cancel	InstallProgress		Annuler

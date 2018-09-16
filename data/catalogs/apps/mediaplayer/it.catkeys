@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	201442852
+1	italian	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		audio grezzo
 Location	MediaPlayer-InfoWin		Luogo
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -12,7 +12,8 @@ Save Playlist	MediaPlayer-PlaylistWindow		Salva elenco di riproduzione
 <no media>	MediaPlayer-InfoWin		<nessun media>
 (not supported)	MediaPlayer-InfoWin		(non supportato)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nessuno dei file da riprodurre sembra essere in un formato multimediale.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio dell'elenco di riproduzione non riuscito.\n\nErrore:
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio dell'elenco di riproduzione non riuscito.\n\nErrore: 
+ask every time	MediaPlayer-SettingsWindow		chiedi sempre
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Nuova riproduzione…
 100% scale	MediaPlayer-Main		Scala 100%
@@ -26,9 +27,11 @@ Track %d	MediaPlayer-Main		Traccia %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Modalità visualizzazione
 Medium	MediaPlayer-SettingsWindow		Medio
+Open network stream	MediaPlayer-NetworkStream		Apri stream di rete
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Open…	MediaPlayer-PlaylistWindow		Apri…
 Undo	MediaPlayer-PlaylistWindow		Annulla
+Stream URL:	MediaPlayer-NetworkStream		URL dello stream:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usa gli overlay video hardware, se disponibili
 File info…	MediaPlayer-Main		Informazioni sul file…
 Overlay	MediaPlayer-InfoWin		Overlay
@@ -43,11 +46,12 @@ Container	MediaPlayer-InfoWin		Contenitore
 Nothing to Play	MediaPlayer-Main		Nulla da riprodurre
 Muted	MediaPlayer-SettingsWindow		Muto
 Quit	MediaPlayer-Main		Esci
+Resume:	MediaPlayer-SettingsWindow		Riprendi:
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Non sono stati installati decoder specifici per questo formato, oppure il decoder ha un problema con questa versione del formato.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importa elemento
 400% scale	MediaPlayer-Main		Scala 400%
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio elenco di riproduzione non riuscito:\n\nErrore:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio elenco di riproduzione non riuscito:\n\nErrore: 
 Move Entries	MediaPlayer-MovePLItemsCmd		Sposta elementi
 Audio	MediaPlayer-Main		Audio
 Open Playlist	MediaPlayer-PlaylistWindow		Apri elenco di riproduzione
@@ -55,9 +59,12 @@ MediaPlayer	System name		MediaPlayer
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Impostazioni…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazioni di MediaPlayer
+never	MediaPlayer-SettingsWindow		mai
+h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Seleziona tutto
 Move Entry	MediaPlayer-MovePLItemsCmd		Sposta elemento
 Open	MediaPlayer-PlaylistWindow		Apri
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Il file '%filename' non può essere aperto.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Errore: 
 Audio	MediaPlayer-InfoWin		Audio
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Spostamento nel Cestino non riuscito
@@ -66,6 +73,7 @@ Internal error (malformed message). Saving the playlist failed.	MediaPlayer-Play
 Close window after playing video	MediaPlayer-SettingsWindow		Chiudere la finestra al termine della riproduzione video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scala i filmati in modo fluido (modalità non-overlay)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		Apri stream di rete
 50% scale	MediaPlayer-Main		Scala 50%
 Subtitles	MediaPlayer-Main		Sottotitoli
 Audio track	MediaPlayer-Main		Traccia audio
@@ -95,22 +103,30 @@ Error: 	MediaPlayer-Main		Errore:
 Large	MediaPlayer-SettingsWindow		Grande
 Bottom of video	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
 DrawBitmap	MediaPlayer-InfoWin		Disegna bitmap
+always	MediaPlayer-SettingsWindow		sempre
+Total duration: %s	MediaPlayer-PlaylistWindow		Durata totale: %s
 <unnamed media>	MediaPlayer-InfoWin		<media senza nome>
 raw video	MediaPlayer-InfoWin		video grezzo
+Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (memoria piena). Salvataggio dell'elenco di riproduzione non riuscito.
 Hide interface	MediaPlayer-Main		Nascondi interfaccia
+Open clips	MediaPlayer-Main		Apri clip
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copia elemento
 none	Subtitles menu		nessuno
 Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
+Invalid URL inserted!	MediaPlayer-NetworkStream		Immesso URL invalido!
 OK	MediaPlayer-NetworkStream		OK
 min	MediaPlayer-InfoWin	Minutes	min
 Small	MediaPlayer-SettingsWindow		Piccolo
 Randomize	MediaPlayer-PlaylistWindow		Casuale
 Off	Subtitles menu		Off
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rendi casuali gli elementi
-Revert	MediaPlayer-SettingsWindow		Annulla
+Revert	MediaPlayer-SettingsWindow		Ripristina
 Edit	MediaPlayer-PlaylistWindow		Modifica
 Start media server	MediaPlayer-Main		Avvia il media server
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Bad URL	MediaPlayer-NetworkStream		URL errato
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canali}}
 <unnamed>	PlaylistItem-name		<senza nome>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nessuno
@@ -135,4 +151,5 @@ Bottom of screen	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
 Save error	MediaPlayer-PlaylistWindow		Errore durante il salvataggio
 Rating	MediaPlayer-Main		Giudizio
 Playlist	MediaPlayer-PlaylistWindow		Elenco di riproduzione
+Lock Peaks	MediaPlayer-PeakView		Blocca picchi
 Low volume	MediaPlayer-SettingsWindow		Volume basso

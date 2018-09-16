@@ -1,36 +1,46 @@
-1	italian	x-vnd.Haiku-PowerStatus	1851974203
-Design capacity low warning: 	PowerStatus		Avviso di batteria scarica (di fabbrica):
+1	italian	x-vnd.Haiku-PowerStatus	3173765686
+Design capacity low warning: 	PowerStatus		Avviso di batteria scarica (di fabbrica): 
 Show percent	PowerStatus		Mostra percentuale
-Design capacity: 	PowerStatus		Capacità (in base al costruttore):
-Type: 	PowerStatus		Tipo:
+Design capacity: 	PowerStatus		Capacità (in base al costruttore): 
+ mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Il livello della batteria sta scendendo, per favore connetti l'alimentazione.
+Battery low	PowerStatus		Livello batteria basso
+Type: 	PowerStatus		Tipo: 
 non-rechargeable	PowerStatus		non ricaricabile
 Empty battery slot	PowerStatus		Slot della batteria vuoto
+ mV	PowerStatus		 mV
 Run in window	PowerStatus		Esegui in una finestra
 PowerStatus	System name		PowerStatus
+ mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informazioni batteria...
+Damaged battery	PowerStatus		Batteria danneggiata
 Show time	PowerStatus		Mostra il tempo
-Last full charge: 	PowerStatus		Ultima carica completa:
+Last full charge: 	PowerStatus		Ultima carica completa: 
 Battery unused	PowerStatus		Batteria non usata
 Extended battery info	PowerStatus		Informazioni batteria estese
-Current rate: 	PowerStatus		Valore attuale:
+ mA	PowerStatus		 mA
+Current rate: 	PowerStatus		Valore attuale: 
 discharging	PowerStatus		in scarica
 Show text label	PowerStatus		Mostra etichette di testo
 About…	PowerStatus		Informazioni...
-Model number: 	PowerStatus		Numero modello:
+Model number: 	PowerStatus		Numero modello: 
 Install in Deskbar	PowerStatus		Installa nella Deskbar
-Capacity: 	PowerStatus		Capacità:
+ mAh	PowerStatus		 mAh
+Capacity: 	PowerStatus		Capacità: 
 Battery discharging	PowerStatus		Batteria in scarica
-Serial number: 	PowerStatus		Numero seriale:
-Capacity granularity 1: 	PowerStatus		Granularità della capacità 1:
-OEM info: 	PowerStatus		Informazioni OEM:
-Design voltage: 	PowerStatus		Voltaggio di progettazione:
+Serial number: 	PowerStatus		Numero seriale: 
+Battery critical	PowerStatus		Livello batteria critico
+Capacity granularity 1: 	PowerStatus		Granularità della capacità 1: 
+OEM info: 	PowerStatus		Informazioni OEM: 
+Design voltage: 	PowerStatus		Voltaggio di progettazione: 
 Battery charging	PowerStatus		Batteria in carica
-Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica):
+The battery level is critical, please plug in the device immediately.	PowerStatus		La batteria è al livello critico, per favore connetti l'alimentazione immediatamente.
+Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica): 
 Quit	PowerStatus		Esci
 rechargeable	PowerStatus		ricaricabile
 charging	PowerStatus		in carica
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus può essere eseguito in una finestra o installato nella Deskbar.
 Show status icon	PowerStatus		Mostra l'icona di stato
-Capacity granularity 2: 	PowerStatus		Granularità della capacità 2:
-Technology: 	PowerStatus		Tecnologia:
+Capacity granularity 2: 	PowerStatus		Granularità della capacità 2: 
+Technology: 	PowerStatus		Tecnologia: 
 no battery	PowerStatus		nessuna batteria

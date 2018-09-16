@@ -1,13 +1,13 @@
 1	italian	x-vnd.Haiku-Pulse	2324471783
-OK	PrefsWindow		Ok
+OK	PrefsWindow		OK
 Quit	DeskbarPulseView		Esci
 Mini mode	DeskbarPulseView		Modalità mini
 Remove replicant	CPUButton		Rimuovi replicante
 Active color	ConfigView		Colore attivo
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizzo:  Pulse [--mini] [-w valore] [--width=valore]\n\t[--deskbar] [--normal] [--framecolor 0xrrvvbb]\n\t[--activecolor 0xrrvvbb] [--idlecolor 0xrrvvbb]\n
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizzo: Pulse [--mini] [-w valore] [--width=valore]\n\t[--deskbar] [--normal] [--framecolor 0xrrvvbb]\n\t[--activecolor 0xrrvvbb] [--idlecolor 0xrrvvbb]\n
 Fade colors	ConfigView		Colori sfumati
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDi David Ramsey e Arve Hjønnevåg\nModificato da Daniel Switkin\n
-OK	DeskbarPulseView		Ok
+OK	DeskbarPulseView		OK
 Deskbar mode	PrefsWindow		Modalità Deskbar
 %.2f GHz	NormalPulseView		%.2f GHz
 Normal mode	PrefsWindow		Modalità normale
@@ -18,13 +18,13 @@ Info	PulseView		Informazioni
 Deskbar	CPUButton		Deskbar
 Frame color	ConfigView		Colore cornice
 Mini mode	PrefsWindow		Modalità mini
-OK	PulseApp		Ok
+OK	PulseApp		OK
 Bar colors	ConfigView		Colori della barra
 Settings…	PulseView		Impostazioni…
-You can't disable the last active CPU.	PulseView		Non potete disattivare l'unica CPU attiva.
+You can't disable the last active CPU.	PulseView		Non puoi disattivare l'unica CPU attiva.
 Info	PulseApp		Informazioni
 Info	CPUButton		Informazioni
-OK	PulseView		Ok
+OK	PulseView		OK
 Deskbar menu	CPUButton		Menu Deskbar
 About Pulse…	PulseView		Informazioni su Pulse…
 Deskbar mode	MiniPulseView		Modalità Deskbar
@@ -37,7 +37,7 @@ Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		Larghezza dell'icona:
 You can't disable the last active CPU.	CPUButton		Non puoi disattivare l'ultima CPU attiva.
 Normal mode	DeskbarPulseView		Modalità normale
-OK	CPUButton		Ok
+OK	CPUButton		OK
 About Pulse…	CPUButton		Informazioni su Pulse…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Rimozione dalla Deskbar fallita.\n%s
 Mini mode	NormalPulseView		Modalità mini

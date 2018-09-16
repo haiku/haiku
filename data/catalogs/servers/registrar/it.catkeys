@@ -5,9 +5,9 @@ OK	ShutdownProcess		OK
 System is shut down	ShutdownProcess		Sistema in fase di spegnimento
 It's now safe to turn off the computer.	ShutdownProcess		Ora è sicuro spegnere il computer.
 Cancel	ShutdownProcess		Annulla
-Do you really want to shut down the system?	ShutdownProcess		Davvero volete spegnere il sistema?
-Asking other processes to quit.	ShutdownProcess		Chiedendo ad altri processi di chiudersi.
-Asking \"%appName%\" to quit.	ShutdownProcess		Chiedendo a \"%appName%\" di terminare.
+Do you really want to shut down the system?	ShutdownProcess		Vuoi davvero spegnere il sistema?
+Asking other processes to quit.	ShutdownProcess		In attesa della chiusura degli altri processi
+Asking \"%appName%\" to quit.	ShutdownProcess		In attesa che \"%appName%\" termini.
 %action%?	ShutdownProcess		%action%?
 Shutdown aborted	ShutdownProcess		Spegnimento interrotto
 Restarting…	ShutdownProcess		Riavvio in corso...

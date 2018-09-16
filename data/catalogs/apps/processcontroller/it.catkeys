@@ -1,12 +1,15 @@
-1	italian	x-vnd.Haiku-ProcessController	2886374724
+1	italian	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Uso della memoria
+Kill this team!	ProcessController		Termina questo team!
 Idle priority	ProcessController		Priorità inattivo
 Restart Deskbar	ProcessController		Riavvia Deskbar
 Custom priority	ProcessController		Priorità personalizzata
 This team is already gone…	ProcessController		Questo team è già terminato...
 Error saving file	ProcessController		Errore nel salvataggio del file
 Real-time priority	ProcessController		Priorità in tempo reale
+Power saving	ProcessController		Risparmio energetico
 Your setting file could not be saved!\n(%s)	ProcessController		Il tuo file impostazioni non può essere salvato!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Cosa intendi fare con il team \"%s\"?
 This thread is already gone…	ProcessController		Questo thread è già terminato...
 Cancel	ProcessController		Cancella
 Display priority	ProcessController		Priorità visualizzazione
@@ -34,8 +37,10 @@ Quit an application	ProcessController		Chiudi un'applcazione
 Install in Deskbar	ProcessController		Installa nella Deskbar
 Threads and CPU usage	ProcessController		Thread e uso della CPU
 Urgent display priority	ProcessController		Priorità video urgente
+Low latency	ProcessController		Bassa latenza
 OK	ProcessController		OK
 Damned!	ProcessController		Accidenti!
+Debug this team!	ProcessController		Effettua il debug di questo team!
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
 ProcessController	System name		ProcessController
 Real-time display priority	ProcessController		Priorità video in tempo reale

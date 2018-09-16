@@ -1,12 +1,16 @@
-1	italian	x-vnd.Be-PRNT	2279754695
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver: %driver%\n
+1	italian	x-vnd.Be-PRNT	686411231
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver:  %driver%\n
 Waiting	JobListView		In attesa
 Print test page	PrintersWindow		Stampa pagina di prova
+ pending jobs	PrinterListView		 lavori di stampa in attesa
 page	JobListView		pagina
 Cancel	AddPrinterDialog		Annulla
+Test page	PrintersWindow		Stampa di prova
 Add printer	AddPrinterDialog		Aggiungi una stampante
 Green	TestPageView		Verde
 Printers	PrintersWindow		Stampanti
+Add…	PrintersWindow		Aggiungi…
+No pending jobs	PrinterListView		Nessun lavoro di stampa in attesa
 Default Printer	PrinterListView		Stampante predefinita
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 pages	JobListView		pagine
@@ -34,5 +38,7 @@ No printer found!	TransportMenu		Nessuna stampante trovata
 Print jobs: No printer selected	PrintersWindow		Nessuna stampante selezionata
 Cyan	TestPageView		Ciano
 Unknown status	JobListView		Status sconosciuto
+1 pending job	PrinterListView		1 lavoro di stampa in attesa
 Connected to:	AddPrinterDialog		Connesso a:
 Printer type:	AddPrinterDialog		Tipo stampante:
+Test page	TestPageView		Stampa di prova

@@ -1,10 +1,12 @@
-1	french	x-vnd.Haiku-WebPTranslator	3343078170
+1	french	x-vnd.Haiku-WebPTranslator	828165164
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
 Compression method:	ConfigView		Méthode de compression :
 WebP image translator	ConfigView		Traducteur d’images WebP
 Preset	ConfigView		Préréglage
 WebP images	WebPTranslator		Images WebP
 WebPTranslator Settings	ConfigView		Réglages du traducteur WebP
 Output quality:	ConfigView		Qualité de sortie :
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
 WebP Settings	main		Réglages WebP
 Text	ConfigView		Texte
 Slower but better	ConfigView		Plus lent mais meilleur
@@ -14,6 +16,7 @@ Picture	ConfigView		Illustration
 Low	ConfigView		Basse
 High	ConfigView		Haute
 Drawing	ConfigView		Dessin
+Based on libwebp %version%	ConfigView		Basé sur libwebp %version%
 Default	ConfigView		Par défaut
 Fast	ConfigView		Rapide
 Photo	ConfigView		Photo

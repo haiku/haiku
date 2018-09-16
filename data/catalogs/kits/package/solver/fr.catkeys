@@ -1,7 +1,7 @@
 1	french	x-vnd.Haiku-libsolvsolver	3404387783
 %dependency% is provided by the system	SolverProblem		%dependency% est fourni par le système
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		le paquet %source% est en conflit avec %dependency% fourni par %target%
-nothing provides requested %dependency%	SolverProblem		Rien ne satisfait à la demande de %dependency%
+nothing provides requested %dependency%	SolverProblem		rien ne satisfait à la demande de %dependency%
 unspecified problem	SolverProblem		problème indéterminé
 keep %source% despite its inferior architecture	SolverProblemSolution		conserver %source% malgré son architecture moins bien adaptée
 do not deinstall \"%selection%\"	SolverProblemSolution		ne pas désinstaller « %selection% »

@@ -1,9 +1,9 @@
-1	italian	x-vnd.Haiku-CodyCam	1188580421
+1	italian	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Carica…
 Capturing Image…	VideoConsumer.cpp		Acquisizione immagine…
 Every 30 seconds	CodyCam		Ogni 30 secondi
 File name:	CodyCam		Nome del file:
-Last Capture: 	VideoConsumer.cpp		Ultima Cattura:
+Last Capture: 	VideoConsumer.cpp		Ultima Cattura: 
 Server login failed	VideoConsumer.cpp		Autenticazione fallita
 Remote host has closed the connection.\n	FtpClient		L'host remoto ha chiuso la connessione.\n
 Login:	CodyCam		Login:
@@ -14,6 +14,7 @@ login ID expected	CodyCam		ID di login atteso
 Rate:	CodyCam		Fotogrammi per secondo:
 JPEG image	CodyCam		Immagine JPEG
 Capture Rate Menu	CodyCam		Menu frequenze di cattura fotogrammi
+File %s # unterminated quote at end of file\n	SettingsHandler		File %s # stringa non terminata a fine file\n
 Password:	CodyCam		Password:
 Passive FTP	CodyCam		FTP passivo
 destination directory expected	CodyCam		cartella di destinazione non indicata
@@ -27,7 +28,8 @@ Server:	CodyCam		Server:
 server address expected	CodyCam		indirizzo server non indicato
 Error creating output file	VideoConsumer.cpp		Errore nella creazione del file di output
 unrecognized upload client specified	CodyCam		client di trasmissione non riconosciuto
-Output	CodyCam		Output
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		File %s ; Riga %ld # stringa non terminata\n
+Output	CodyCam		Uscita
 Every 15 minutes	CodyCam		Ogni 15 minuti
 Cannot find an available video stream	CodyCam		Impossibile trovare un flusso video disponibile
 Can't find an available connection to the video window	CodyCam		Impossibile trovare una connessione disponibile per la finestra video
@@ -52,12 +54,13 @@ Stop video	CodyCam		Arresta il video
 Locking the window\n	VideoConsumer.cpp		Blocco della finestra\n
 File %s; Line %ld # %s	SettingsHandler		File %s; Linea %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		Impossibile trovare sul server la cartella richiesta
+Renaming…	VideoConsumer.cpp		Rinomina in corso…
 Local	CodyCam		Locale
 Error setting type of output file	VideoConsumer.cpp		Errore durante l'impostazione del tipo di file in output
 upload client name expected	CodyCam		nome del client di trasmissione non indicato
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Connesso…
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <soppressa>  (password reale inviata)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <esclusa>  (password reale inviata)\n
 File upload failed	VideoConsumer.cpp		Caricamento del file non riuscito
 Every 5 minutes	CodyCam		Ogni 5 minuti
 read: %d\n	SftpClient		letti: %d\n
@@ -81,6 +84,7 @@ reply: %d, %d\n	FtpClient		ripeti: %d, %d\n
 Cannot find the media roster	CodyCam		Impossibile trovare il registro dei media
 Every 4 hours	CodyCam		Ogni 4 ore
 FTP	CodyCam		FTP
+Cannot seek time source!	CodyCam		Impossibile seguire sorgente temporale!
 File	CodyCam		File
 Image Format Menu	CodyCam		Menu dei formati immagine
 Every 30 minutes	CodyCam		Ogni 30 minuti

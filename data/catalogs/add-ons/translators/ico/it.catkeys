@@ -6,9 +6,9 @@ Valid icon sizes are 16, 32, or 48	ConfigView		Le dimensioni valide possono esse
 Windows icons	ICOTranslator		Icone Windows
 Enforce valid icon sizes	ConfigView		Forzare le dimensioni dell'icona
 ICO Settings	main		Impostazioni ICO
-Windows icon translator	ICOTranslator		Translator icone Windows
+Windows icon translator	ICOTranslator		Translator icona Windows
 pixels in either direction.	ConfigView		pixel in entrambe le direzioni.
 Write 32 bit images on true color input	ConfigView		Scrivere immagini a 32 bit su input true color
 Icon	ICOTranslator		Icona
 ICOTranslator Settings	ConfigView		Impostazioni Translator ICO
-Windows icon translator	ConfigView		Translator icone Windows
+Windows icon translator	ConfigView		Translator icona Windows

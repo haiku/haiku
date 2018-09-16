@@ -6,10 +6,10 @@ Grid Height: 	GLife ScreenSaver		Altezza Griglia:
 %sx	GLife ScreenSaver	This is a factor: the x represents 'times'	%sx
 None	GLife ScreenSaver		Nessuno
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
-Grid Width: %li	GLife ScreenSaver		Ampiezza Griglia:%li
-Grid Height: %li	GLife ScreenSaver		Altezza Griglia:%li
+Grid Width: %li	GLife ScreenSaver		Ampiezza Griglia: %li
+Grid Height: %li	GLife ScreenSaver		Altezza Griglia: %li
 Grid Life Delay: 	GLife ScreenSaver		Attesa Griglia Vita: 
-OpenGL \"Game of Life\"	GLife ScreenSaver		\"Game of Life\" OpenGL
+OpenGL \"Game of Life\"	GLife ScreenSaver		Il \"Gioco della Vita\" in versione OpenGL
 Grid Life Delay: %s	GLife ScreenSaver		Attesa Griglia Vita: %s
 Grid Border: 	GLife ScreenSaver		Bordo Griglia: 
 by Aaron Hill	GLife ScreenSaver		di Aaron Hill

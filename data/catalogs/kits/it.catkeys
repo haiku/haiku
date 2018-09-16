@@ -27,7 +27,7 @@ Print Server is not responding.	PrintJob		Il Server di stampa non risponde.
 Paste	TextView		Incolla
 Special Thanks:	AboutWindow		Ringraziamenti speciali:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossibile individuare l'applicazione da cui generare il replicante. Non è stata fornita alcuna firma per l'applicazione. \n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossibile individuare l'applicazione da cui generare il replicante. Non è stata fornita alcuna firma per l'applicazione.\n%error
 Redo	TextView		Ripeti
 <empty>	Menu		<vuoto>
 Warning	Dragger		Attenzione

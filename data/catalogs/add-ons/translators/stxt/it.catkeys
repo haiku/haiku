@@ -1,6 +1,8 @@
-1	italian	x-vnd.Haiku-STXTTranslator	3302294301
-Be styled text file	STXTTranslator		Be styled text file
-Plain text file	STXTTranslator		Plain text file
-STXTTranslator Settings	STXTTranslator		Impostazioni STXTTranslator
+1	italian	x-vnd.Haiku-STXTTranslator	274886668
+Be styled text file	STXTTranslator		File testo Be con stili
+Plain text file	STXTTranslator		File solo testo
+STXTTranslator Settings	STXTTranslator		Impostazioni Translator STXT
+StyledEdit file translator	STXTView		Translator file StyledEdit
 StyledEdit files	STXTTranslator		File di StyledEdit
+StyledEdit file translator	STXTTranslator		Translator file StyledEdit
 STXT Settings	STXTMain		Impostazioni STXT

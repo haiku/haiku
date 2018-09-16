@@ -1,10 +1,11 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	2320517302
+1	italian	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		P-fault
 Media nodes	DataSource		Nodi multimediali
 Threads	DataSource		Thread
 Always on top	ActivityWindow		Sempre in primo piano
 Add graph	ActivityWindow		Aggiungi grafico
 Teams	DataSource		Team
+MiB	DataSource		MiB
 Network send	DataSource		Invio (rete)
 CPU usage (combined)	DataSource		Uso CPU (combinato)
 CPU	DataSource		CPU
@@ -27,9 +28,11 @@ Quit	ActivityWindow		Esci
 Block cache memory	DataSource		Blocca memoria cache
 Remove graph	ActivityView		Rimuovi grafico
 %lld sec.	SettingsWindow		%lld sec.
+%lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Uso della CPU
 Raw clipboard	DataSource		Appunti grezzi
 Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		MonitorAttività
 Running applications	DataSource		Applicazioni in esecuzione
 Semaphores	DataSource		Semafori

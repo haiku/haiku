@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPTranslator	3686178351
+1	russian	x-vnd.Haiku-WebPTranslator	828165164
 ©2010-2017 Haiku Inc.	ConfigView		Все права защищены ©2010-2017 Haiku Inc.
 Compression method:	ConfigView		Метод сжатия:
 WebP image translator	ConfigView		Транслятор WebP изображений
@@ -16,6 +16,7 @@ Picture	ConfigView		Изображение
 Low	ConfigView		Низкое
 High	ConfigView		Высокое
 Drawing	ConfigView		Рисунок
+Based on libwebp %version%	ConfigView		Основано на libwebp %version%
 Default	ConfigView		По умолчанию
 Fast	ConfigView		Быстро
 Photo	ConfigView		Фотография
