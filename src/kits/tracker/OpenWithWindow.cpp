@@ -431,7 +431,6 @@ OpenWithContainerWindow::InitLayout()
 	fRootLayout->SetInsets(B_USE_ITEM_INSETS);
 	fPoseContainer->GridLayout()->SetInsets(0);
 	fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 0);
-	fCountContainer->GroupLayout()->SetInsets(0);
 
 	fRootLayout->AddView(fButtonContainer);
 	fButtonContainer->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
