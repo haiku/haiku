@@ -1,5 +1,6 @@
 /*
- * Copyright 2018, Colin Günther, coling@gmx.de. All rights reserved.
+ * Copyright 2009, Colin Günther, coling@gmx.de. All rights reserved.
+ * Copyright 2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 
@@ -24,7 +25,8 @@ NO_HAIKU_FBSD_MII_DRIVER();
 NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(44417);
-HAIKU_FIRMWARE_NAME_MAP(12) = {
+HAIKU_FIRMWARE_NAME_MAP(13) = {
+	{"iwn100fw", "iwlwifi-100-5.ucode"},
 	{"iwn105fw", "iwlwifi-105-6.ucode"},
 	{"iwn135fw", "iwlwifi-135-6.ucode"},
 	{"iwn1000fw", "iwlwifi-1000-5.ucode"},
