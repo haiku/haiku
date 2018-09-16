@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	575555985
+1	italian	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Utilizza come sfondo…
 File	Menus		File
 Slide delay	Menus		Tempo d'attesa
@@ -7,7 +7,8 @@ Zoom in	Menus		Zoom avanti
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
 Page setup…	Menus		Imposta pagina…
 Print…	Menus		Stampa…
-OK	SaveToFile		Ok
+Get info…	Menus		Ottieni informazioni…
+OK	SaveToFile		OK
 Previous page	Menus		Pagina precedente
 View	Menus		Visualizza
 Full screen	Menus		Schermo intero
@@ -34,7 +35,7 @@ Next file	Menus		File seguente
 Clear selection	Menus		Pulisci selezione
 Close document	ClosePrompt		Chiudi documento
 Height: 	PrintOptionsWindow		Altezza: 
-The file '%s' could not be written.	SaveToFile		Il file \"%s\" non può essere scritto.
+The file '%s' could not be written.	SaveToFile		Impossibile scrivere il file '%s'.
 Cancel	ClosePrompt		Annulla
 Show tool bar	Menus		Mostra strumenti
 Fit to window	Menus		Adatta alla finestra

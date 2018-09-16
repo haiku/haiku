@@ -1,0 +1,20 @@
+1	italian	x-vnd.Haiku-Login	336867745
+Error: %1	Login App		Errore: %1
+Hide password	Login View		Nascondi password
+Desktop	Desktop Window		Scrivania
+Invalid login!	Login View		Accesso invalido!
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tEsegui in modalità 'self editing' per la personalizzazione della Scrivania.\n
+OK	Login View		OK
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	errore: %s\n
+Login:	Login View		Nome utente:
+Error	Login App		Errore
+Unimplemented	Login App		Non implementato
+Welcome to Haiku	Login Window		Benvenuti su Haiku!
+Reboot	Login View		Riavvia
+Login application for Haiku\nUsage:\n	Login App		Applicazione di Login per Haiku\nUso:\n
+Info	Login App		Informazioni
+Halt	Login View		Arresta
+Password:	Login View		Password:
+OK	Login App		OK
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNon rendere la finestra modale\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puoi modificare l'aspetto della scrivania mostrata dietro l'applicazione Login trascinandovi sopra dei replicanti.\n\nQuando hai terminato, chiudi semplicemente l'applicazione (Cmd-Q).

@@ -1,10 +1,10 @@
 1	italian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 Kill application	Team monitor		Termina applicazione
 Quit application	Team monitor		Esci dall'applicazione
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Per uscire da un'applicazione selezionatela dalla lista sovrastante e fate clic sul tasto 'Termina applicazione' o 'Chiudi applicazione'.\n\nPer poter riavviare tenete premuti i tasti CONTROL+ALT+DELETE per %ld secondi.
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Per uscire da un'applicazione selezionala dalla lista sovrastante e fao clic sul tasto 'Termina applicazione' o 'Chiudi applicazione'.\n\nPer poter riavviare, tieni premuti i tasti CONTROL+ALT+DELETE per %ld secondi.
 If the application will not quit you may have to kill it.	Team monitor		Se l'applicazione non si chiude potreste doverla terminare.
 Force reboot	Team monitor		Forzare il riavvio
 Team monitor	Team monitor		Team monitor
 (This team is a system component)	Team monitor		(Team monitor è un componente di sistema)
-Restart the desktop	Team monitor		Riavvia il desktop
+Restart the desktop	Team monitor		Riavvia la scrivania
 Cancel	Team monitor		Annulla

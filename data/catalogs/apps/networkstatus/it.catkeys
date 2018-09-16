@@ -5,7 +5,7 @@ You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatu
 Run in window	NetworkStatus		Avvia in finestra
 No link	NetworkStatusView		Nessun collegamento
 Install in Deskbar	NetworkStatus		Installa sulla Deskbar
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		L'avvio della preflet di rete è fallita.\n\nErrore:
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		L'avvio della preflet di rete è fallita.\n\nErrore: 
 Netmask	NetworkStatusView		Maschera di rete
 Broadcast	NetworkStatusView		Broadcast
 Unknown	NetworkStatusView		Sconosciuto
@@ -15,7 +15,7 @@ No stateful configuration	NetworkStatusView		Configurazione senza stato
 %ifaceName information:\n	NetworkStatusView		%ifaceName informazioni:\n
 Configuring	NetworkStatusView		Configurazione in corso
 Address	NetworkStatusView		Indirizzo
-OK	NetworkStatusView		Ok
+OK	NetworkStatusView		OK
 NetworkStatus	System name		NetworkStatus
 Open network preferences…	NetworkStatusView		Apri le preferenze di rete…
 Could not join wireless network:\n	NetworkStatusView		Impossibile accedere alla rete wireless:\n

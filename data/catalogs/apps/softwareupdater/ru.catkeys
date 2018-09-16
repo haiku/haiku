@@ -1,4 +1,5 @@
-1	russian	x-vnd.haiku-softwareupdater	1797814522
+1	russian	x-vnd.haiku-softwareupdater	4036285572
+No active network connection was found	UpdateManager	Error message	Отсутствует соединение с сетью
 Cancel	SoftwareUpdaterWindow		Отмена
 Packages are being updated	UpdateManager		Пакеты были обновлены
 Update now	SoftwareUpdaterWindow		Обновить сейчас
@@ -19,6 +20,6 @@ Cancelling updates	SoftwareUpdaterWindow		Отмена обновлений
 Updating version	SoftwareUpdaterWindow	List item text	Обновляемая версии
 Applying changes	UpdateManager		Применение изменений
 Quit	SoftwareUpdaterWindow		Выйти
-There were no updates found.	UpdateAction		Обновлений не было найдено.
+There were no updates found.	UpdateAction		Обновления не были найдены.
 Uninstalling version	SoftwareUpdaterWindow	List item text	Удаляемая версия
 Quit	SoftwareUpdaterWindow	Button label	Выйти

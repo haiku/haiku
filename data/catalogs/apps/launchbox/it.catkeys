@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-LaunchBox	3241401664
+1	italian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Nuovo
 Set description…	LaunchBox		Imposta descrizione…
 Vertical layout	LaunchBox		Disposizione verticale
@@ -23,12 +23,13 @@ Horizontal layout	LaunchBox		Disposizione orizzontale
 Failed to launch '%1'.\n\nError:	LaunchBox		Esecuzione di '%1' fallita.\n\nError:
 Name Panel	LaunchBox		Nome pannello
 Add button here	LaunchBox		Aggiungi un pulsante in questa posizione
-Description for '%3'	LaunchBox		Descrizione per '%3' 
+Description for '%3'	LaunchBox		Descrizione per '%3'
 Settings	LaunchBox		Impostazioni
 Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzione di '????' fallita, errore nei dati del Pad.
 Pad %1	LaunchBox		Pad %1
 Close	LaunchBox		Chiudi
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Errore nell'invio del comando 'apri cartella' al Tracker.\n\nErrore: 
 You can drag an icon here.	LaunchBox		È possibile trascinare un'icona in questa posizione.
 Clone	LaunchBox		Clona
 launch popup	LaunchBox		esegui popup
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Si è certi di voler chiudere questo pad?\n(Il pad non sarà conservato.)
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sei certo di voler chiudere questo pad?\n(Il pad non sarà conservato.)

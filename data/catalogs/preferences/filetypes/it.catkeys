@@ -62,7 +62,7 @@ Launch	Application Types Window		Avvia
 Same as…	FileType Window	The same APPLICATION as ...	La stessa di…
 Abort	Application Types Window		Annulla
 FileTypes	FileTypes		FileTypes
-OK	FileTypes		Ok
+OK	FileTypes		OK
 Extra attributes	FileTypes Window		Attributi extra
 Development	Application Type Window		Sviluppo
 Edit…	Application Types Window		Modifica…
@@ -99,7 +99,7 @@ New resource file…	FileTypes Window		Nuovo file risorsa…
 Cancel	New File Type Window		Annulla
 Icon	FileTypes Window		Icona
 Extension:	Extension Window		Estensione:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozione di un super tipo non può essere annullata.\nTutti i tipi di file appartenenti a questo super tipo saranno perduti!\n\nSei sicuro di voler continuare? Per rimuovere l'intero gruppo tieni premuto il tasto Maiuscole e premi \"Rimuovi\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozione di un super tipo non può essere annullata.\nTutti i tipi di file appartenenti a questo super tipo saranno perduti!\n\nSei sicuro di voler continuare? Per rimuovere l'intero gruppo, tieni premuto il tasto Maiuscole e premi \"Rimuovi\".
 Internal name:	FileTypes Window		Nome intrinseco:
 Add	Attribute Window		Aggiungi
 Close	Application Type Window		Chiudi

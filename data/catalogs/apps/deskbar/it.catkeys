@@ -34,7 +34,7 @@ Revert	PreferencesWindow		Ripristina
 Small	PreferencesWindow		Piccole
 Recent applications:	PreferencesWindow		Applicazioni recenti:
 Shutdown…	DeskbarMenu		Uscita da Haiku…
-Tracker always first	PreferencesWindow		#document
+Tracker always first	PreferencesWindow		Tracker sempre per primo
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferenze
 Recent folders	DeskbarMenu		Cartelle recenti
 About this system	DeskbarMenu		Informazioni sul sistema
@@ -45,6 +45,6 @@ Show replicants	DeskbarMenu		Mostra replicanti
 Hide application names	PreferencesWindow		Nascondi il nome delle applicazioni
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni dimostrative
 Icon size	PreferencesWindow		Dimensione icone
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet del desktop
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet della scrivania
 Hide all	WindowMenu		Nascondi tutto
 Quit application	WindowMenu		Chiudi l'applicazione

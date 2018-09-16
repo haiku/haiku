@@ -13,7 +13,7 @@ Shutdown aborted	ShutdownProcess		Cancelado el apagado
 Restarting…	ShutdownProcess		Reiniciando...
 Asking background applications to quit.	ShutdownProcess		Solicitando a las aplicaciones de fondo que salgan.
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La aplicación \"%appName%\" a cancelado el proceso de apagado.
-Tidying things up a bit.	ShutdownProcess		Juntando un poco las cosas
+Tidying things up a bit.	ShutdownProcess		Limpiando un poco las cosas.
 Do you really want to restart the system?	ShutdownProcess		¿Realmente quieres reiniciar el sistema?
 Shutdown status	ShutdownProcess		Estado de apagado
 Cancel shutdown	ShutdownProcess		Cancelar apagado

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-PEPL	663213804
+1	italian	x-vnd.Be-PEPL	2332202134
 Edit	People		Modifica
 Error	People		Errore
 City	People		Città
@@ -8,6 +8,7 @@ Configure attributes	People		Configura attributi
 Company	People		Compagnia
 %name% picture	People		%name% foto
 Work phone	People		Telefono di lavoro
+People	System name		Persone
 New person	People		Nuova persona
 Select all	People		Seleziona tutto
 File	People		File
@@ -16,10 +17,11 @@ Could not create %s.	People		Non è stato possibile creare %s.
 Country	People		Paese
 Close	People		Chiudi
 Group	People		Gruppo
-Nickname	People		Nickname
+Nickname	People		Soprannome
 Quit	People		Esci
 Name	People		Nome
 Revert	People		Ripristina
+Don't save	People		Non salvare
 Undo	People		Annulla
 E-mail	People		E-mail
 Load image…	People		Carica un immagine...
@@ -29,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Telefono di casa
 Save as…	People		Salva come...
 Redo	People		Ripeti
+Save changes before closing?	People		Salvare le modifiche prima di uscire?
 Paste	People		Incolla
 Drop an image here,\nor use the contextual menu.	People		Trascina un immagine qui,\ne usa il menu contestuale.
 Save	People		Salva

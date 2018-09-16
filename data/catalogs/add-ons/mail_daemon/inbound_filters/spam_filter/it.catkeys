@@ -1,4 +1,7 @@
-1	italian	x-vnd.Haiku-SpamFilter	518563114
+1	italian	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		o una e-mail vuota
+Genuine below and uncertain above:	SpamFilterConfig		Leciti sotto e sospetti sopra:
+Spam above:	SpamFilterConfig		Posta indesiterata sopra:
+Add spam rating to start of subject	SpamFilterConfig		Aggiungi valutazione per indesiderata all'inizio dell'oggetto
 Bayesian Spam Filter	SpamFilter		Filtro Anti-Spam di tipo Bayesiano
 Learn from all incoming e-mail	SpamFilterConfig		Impara da tutte le e-mail in arrivo

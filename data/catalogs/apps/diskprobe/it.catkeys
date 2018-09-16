@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DiskProbe	3344134505
+1	italian	x-vnd.Haiku-DiskProbe	2944605311
 File offset: 	ProbeView		Posizione file: 
 %ld (native)	ProbeView		%ld (nativo)
 64 bit unsigned value:	TypeEditors		Valore a 64 bit senza segno:
@@ -13,17 +13,17 @@ Attribute	ProbeView		Attributo
 Floating-point value:	TypeEditors		Valore in virgola mobile:
 16 bit	TypeEditors		16 bit
 Attributes	ProbeView		Attributi
-Device offset: 	ProbeView		Posizione dispositivo:
+Device offset: 	ProbeView		Posizione dispositivo: 
 Selection	ProbeView		Selezione
 DiskProbe	System name		Editor esadecimale
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	cosa: '%.4s'\n\n
 File	FileWindow		File
-OK	DiskProbe		Ok
+OK	DiskProbe		OK
 Boolean	TypeEditors	This is the type of editor	Booleano
 Paste	ProbeView		Incolla
 PNG format	TypeEditors		Formato PNG
-Font size	ProbeView		Dimensione Font
-Attribute type: 	ProbeView		Tipo Attributo:
+Font size	ProbeView		Dimensione carattere
+Attribute type: 	ProbeView		Tipo Attributo: 
 Attribute	AttributeWindow		Attributo
 8 bit signed value:	TypeEditors		Valore a 8 bit con segno:
 Number:	TypeEditors		Numero:
@@ -33,7 +33,7 @@ Number editor	TypeEditors		Editor Numerico
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimale
 No type editor available	AttributeWindow		Nessun editor disponibile
 Double precision floating-point value:	TypeEditors		Valore in virgola mobile a doppia precisione:
-Device: 	ProbeView		Dispositivo:
+Device: 	ProbeView		Dispositivo: 
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Sei sicuro di voler rimuovere l'attributo \"%s\" dal file \"%s\"?\n\nNon potrai annullare questa azione.
 Text	TypeEditors	This is the type of editor	Testo
 8 bit unsigned value:	TypeEditors		Valore a 8 bit senza segno:
@@ -59,6 +59,7 @@ Boolean value:	TypeEditors		Valore Booleano:
 8 bit palette	TypeEditors		Tavolozza a 8 bit
 Fit	ProbeView	Size of fonts, fits to available room	Adatta
 Probe device	OpenWindow		Interroga il dispositivo
+ (native)	ProbeView		 (nativo)
 Unknown format	TypeEditors		Formato sconosciuto
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimale
 MIME type:	TypeEditors		Tipo MIME:
@@ -85,8 +86,8 @@ Previous	ProbeView		Precedente
 Icon	TypeEditors		Icona
 Block: 	ProbeView		Blocco: 
 Examine device:	OpenWindow		Esamina il dispositivo:
-Offset: 	ProbeView		Posizione:
-OK	ProbeView		Ok
+Offset: 	ProbeView		Posizione: 
+OK	ProbeView		OK
 Add	ProbeView		Aggiungi
 Edit	ProbeView		Modifica
 Native: %Ld (0x%0*Lx)	ProbeView		Nativo: %Ld (0x%0*Lx)
@@ -115,7 +116,7 @@ Mode:	FindWindow		Modalità:
 Open device	FileWindow		Apri dispositivo
 Could not find search string.	ProbeView		Impossibile trovare la stringa cercata.
 16 bit unsigned value:	TypeEditors		Valore a 16 bit senza segno:
-Attribute offset: 	ProbeView		Posizione attributo:
+Attribute offset: 	ProbeView		Posizione attributo: 
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Vista
 Redo	ProbeView		Ripristina
 File: 	ProbeView		File: 

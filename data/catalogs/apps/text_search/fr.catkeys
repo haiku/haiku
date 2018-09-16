@@ -1,11 +1,14 @@
-1	french	x-vnd.Haiku.TextSearch	3108411238
+1	french	x-vnd.Haiku.TextSearch	3622532554
 %s: Not enough room to escape the filename.	Grepper		%s: Pas assez de place pour coder le nom du fichier.
 Trim to selection	GrepWindow		Réduire à la sélection
+Failed to open errors pipe!	Grepper		Impossible d’ouvrir le flux d’erreur !
 Follow symbolic links	GrepWindow		Suivre les liens symboliques
 Close	GrepWindow		Fermer
 Cancel	GrepWindow		Annuler
 The unselected files will be removed from the list.	GrepWindow		Les fichiers non-sélectionnés seront retirés de la liste.
+Regular expression	GrepWindow		Expression régulière
 Set target…	GrepWindow		Choisir la cible…
+Failed to open output pipe!	Grepper		Impossible d’ouvrir le flux de sortie !
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Veuillez choisir les fichiers qui seront sélectionnés pour vous dans le Tracker.
 Open files in Pe	GrepWindow		Ouvrir les fichiers avec Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
@@ -22,7 +25,9 @@ Actions	GrepWindow		Actions
 File	GrepWindow		Fichier
 Encoding	GrepWindow		Encodage
 History	GrepWindow		Historique
+Failed to start xargs program!	Grepper		Impossible de démarrer le programme xargs !
 New window	GrepWindow		Nouvelle fenêtre
+Failed to open input pipe!	Grepper		Impossible d’ouvrir le flux d’entrée !
 Please select the files you wish to keep searching.	GrepWindow		Veuillez sélectionnez les fichiers dans lesquels vous souhaitez continuer à scruter.
 TextSearch	GrepWindow		Recherche Texte
 Quit	GrepWindow		Quitter

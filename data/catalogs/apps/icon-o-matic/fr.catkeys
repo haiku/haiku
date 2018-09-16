@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	3587255161
+1	french	x-vnd.haiku-icon_o_matic	1913591617
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -117,6 +117,7 @@ Invert selection	Icon-O-Matic-Properties		Inverser la sélection
 Drop shapes	Icon-O-Matic-ShapesList		Supprimer les formes
 Export as…	Icon-O-Matic-Menu-File		Exporter sous…
 Transformation	Transformation		Transformation
+Click on an object in	Empty property list - 1st line		Cliquez sur un objet
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Déplacer les transformations
 Move Styles	Icon-O-Matic-MoveStylesCmd		Déplacer les styles
 Reset transformation	Icon-O-Matic-StylesList		Réinitialiser la transformation

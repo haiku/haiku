@@ -1,26 +1,60 @@
-1	swedish	x-vnd.Haiku-Keymap	1385051534
+1	swedish	x-vnd.Haiku-Keymap	376381550
+Croatian	KeymapNames		Kroatiska
+Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
+Icelandic	KeymapNames		Isländska
+Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
 Shift:	Modifier keys window	Shift key role name	Skift:
 Revert	Modifier keys window		Återställ
+Estonian	KeymapNames		Estländska
+Canadian-French	KeymapNames		Kanadensisk franska
 Warning: left and right key roles do not match	Modifier keys window		Warning: Höger och vänster roller matchar inte varandra
+Romanian	KeymapNames		Rumänska
 Scroll lock	Keyboard Layout View		Scroll lock
 Menu	Keyboard Layout View	Menu key	Meny
 Left control	Keyboard Layout View		vänster control
 Tilde trigger	Keymap window		Tilde trigger
+Bulgarian (Phonetic)	KeymapNames		Bulgariska (Fonetisk)
+Hungarian	KeymapNames		Ungerska
 Grave trigger	Keymap window		Grave trigger
+Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
+Polish	KeymapNames		Polska
 Role	Modifier keys window	As in the role of a modifier key	Roll
 Caps lock	Keyboard Layout View		Caps Lock
+Spanish (Dvorak)	KeymapNames		Spanska (Dvorak)
 Select dead keys	Keymap window		Markera döda tangenter
+Belgian (point)	KeymapNames		Belgiska (punkt)
+Hebrew	KeymapNames		Hebreiska
+Russian (Mac)	KeymapNames		Ryska (Mac)
+United-Kingdom	KeymapNames		Storbritannien
+Swiss-French	KeymapNames		Schweizisk franska
 Cancel	Modifier keys window		Avbryt
+Danish	KeymapNames		Danska
+Lithuanian	KeymapNames		Litauiska
+Spanish	KeymapNames		Spanska
 Command	Keyboard Layout View	Command key	Kommando
+Macedonian	KeymapNames		Makedonska
+Irish	KeymapNames		Irländska
+French (Mac)	KeymapNames		Franska (Mac)
+German (Mac)	KeymapNames		Tyska (Mac)
 Defaults	Keymap window		Standardvärde
+Ukrainian (Mac)	KeymapNames		Ukrainska (Mac)
+Japanese	KeymapNames		Japanska
 Quit	Keymap window		Avsluta
 Switch shortcut keys to Haiku mode	Keymap window		Byt snabbtangentsknapp till Haikustandard
+French (Bépo)	KeymapNames		Franska (Bépo)
 Circumflex trigger	Keymap window		Circumflex trigger
 Diaeresis trigger	Keymap window		Diaeresis trigger
+Ukrainian	KeymapNames		Ukrainska
 Disabled	Modifier keys window	Do nothing	Inaktiverad
+Dvorak (programmer's)	KeymapNames		Dvorak (programmerares)
+ISO-9995	KeymapNames		ISO-9995
+Albanian	KeymapNames		Albanska
 Open…	Keymap window		Öppna…
+Greek	KeymapNames		Grekiska
 Error: duplicate keys	Modifier keys window		Fel: Upprepad tangenter
 System:	Keymap window		System:
+Lithuanian (Standard)	KeymapNames		Litauiska (Standard)
+Brazilian	KeymapNames		Brasilianska
 Left command	Keyboard Layout View		Vänster kommando
 Set modifier keys…	Keymap window		Sätt modifierings tangent...
 Option:	Modifier keys window	Option key role name	Alternativ:

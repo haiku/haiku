@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2038365407
+1	russian	x-vnd.Haiku-HaikuDepot	886323823
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -81,6 +81,7 @@ Authentication failed	UserLoginWindow		Авторизация завершила
 Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Язык
+User rating	RatePackageWindow		Пользовательский рейтинг
 Size	PackageListView		Размер
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
 User name:	UserLoginWindow		Имя пользователя:
@@ -109,6 +110,7 @@ Login or Create account	MainWindow		Войти или создать учетн�
 Pending…	PackageListView		Ожидание…
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
 OK	PackageInfoView		OK
+Package daemon problem	App		Проблема с пакетным демоном
 Uninstalled	PackageListView		Удаленные
 Show	MainWindow		Показывать
 Stable	RatePackageWindow		Стабилен
@@ -119,6 +121,7 @@ Screenshot	ScreenshotWindow		Снимок экрана
 Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
 Develop packages	MainWindow		Пакеты для разработчиков
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (версия %hd.version%)
 n/a	PackageInfoView		н/д
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Если вы не укажите адрес электронной почты, вы не сможете восстановить пароль в случае его утери.
  It responded with: 	UserLoginWindow		 Он ответил так: 
@@ -127,16 +130,20 @@ Cancel	RatePackageWindow		Отмена
 Package action failed	PackageInfoView		Действие с пакетом не удалось.
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Отправить
+Repositories	MainWindow		Репозитории
 -	no package size		-
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
+Check for updates…	MainWindow		Проверить обновления…
 There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n
 Start package daemon	App		Запустить пакетный демон
 Manage repositories…	MainWindow		Управление репозиториями…
 Business	Model		Бизнес
 Audio	Model		Аудио
+Rating not possible	MainWindow		Оценка невозможна
 About	PackageInfoView		О программе
 Active	PackageListView		Активирован
 It was not possible to contact the web service.	UserLoginWindow		Не удалось связаться с веб сервером.
+Refreshing...	MainWindow		Обновление…
 Failed to create account: %s\n	UserLoginWindow		Не удалось создать учётную запись: %s\n
 Cancel	UserLoginWindow		Отмена

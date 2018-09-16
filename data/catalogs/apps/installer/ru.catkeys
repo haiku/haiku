@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	3694689316
+1	russian	x-vnd.Haiku-Installer	3213814791
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, приложение для настройки загрузочного меню Haiku, не может быть запущено.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖНАЯ И�
 Continue	InstallerWindow	In alert after pressing Stop	Продолжить
 Write boot sector to '%s'	InstallerWindow		Записать загрузочный сектор на раздел '%s'
 Collecting copy information.	InstallProgress		Сбор иформации для копирования.
+Have fun and thanks for trying out Haiku!	InstallerApp		Не скучайте и спасибо, что пробуете Haiku!
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберите источник из выпадающего меню. Затем нажмите \"Начать\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Закройте Менеджер загрузки и Разметку диска
 Quit	InstallerWindow		Выход
@@ -29,6 +30,7 @@ Boot sector successfully written.	InstallProgress		Загрузочный сек
 Performing installation.	InstallProgress		Выполняется установка.
 scanning…	InstallerWindow		сканирование…
 Set up boot menu	InstallerWindow		Установить загрузочное меню
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) Установщик сделает раздел с Haiku загрузочным, но не предпримет никаких действий для интеграции Haiku в существующее загрузочное меню. Если у вас уже установлен GRUB, то вы можете добавить Haiku в его загрузочное меню.\nДля дополнительной информации обратитесь к руководству по загрузке Haiku на нашем сайте https://www.haiku-os.org/guides/booting.\nИли вы можете установить загрузочное меню из меню Установщика \"Инструменты\" , смотрите руководство по приложению \"Загрузчик\".\n\n\n
 Abort	InstallerWindow		Прервать
 Finishing Installation.	InstallProgress		Завершение установки.
 Restart	InstallerWindow		Перезагрузить
@@ -53,6 +55,7 @@ Quit DriveSetup	InstallerWindow		Закройте Разметку диска
 Hide optional packages	InstallerWindow		Скрыть опциональные пакеты
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Пожалуйста, закройте окно разметки диска перед закрытием окна Установщика.
 Restart system	InstallerWindow		Перезагрузить компьютер
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) Если вы устанавливаете Haiku на реальный компьютер (не в эмуляторе), то рекомендуем заранее подготовить раздел на жестком диске из другой ОС (например можно воспользоваться загрузочным диском GParted Live-CD, который также умеет изменять размеры разделов).\nВы также можете настроить разделы запустив утилиту разметки диска DriveSetup прямо из Установщика, однако функция изменения размеров разделов пока еще не реализована. Хотя и DriveSetup был протестирована на достаточном количестве компьютеров за последние годы, мы все же рекомендуем сделать резервную копию ваших данных перед его использованием. Просто на всякий случай…
 OK	InstallerWindow		ОК
 Set up partitions…	InstallerWindow		Настройка разделов…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Раздел не может быть подключен. Пожалуйста, выберите другой раздел.

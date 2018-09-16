@@ -67,7 +67,7 @@ Selected menu item border	Colors tab		Bordo della voce selezionata nel menu
 Strong	AntialiasingSettingsView		Forte
 Panel text	Colors tab		Testo del pannello
 Arrow style	DecorSettingsView		Stile estremità linea
-Monospaced fonts only	AntialiasingSettingsView		Solo font con spaziatura fissa
+Monospaced fonts only	AntialiasingSettingsView		Solo caratteri con spaziatura fissa
 Look and feel	APRWindow		Aspetto
 Antialiasing menu	AntialiasingSettingsView		Antialiasing sul menu
 Fonts	APRWindow		Tipi di carattere

@@ -1,13 +1,16 @@
-1	italian	x-vnd.Haiku-StyledEdit	736146348
+1	italian	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Il file è di sola lettura. Salvare comunque i cambiamenti al documento \"%s\"? 
 Paste	Menus		Incolla
 OK	LoadAlert		OK
 File	Menus		File
 ???	LoadAlert		???
+Modified	StatusView		Modificato
 Lines:	Statistics		Linee:
 Italic	Menus		Corsivo
 Left	Menus		Sinistra
-Search backwards	FindandReplaceWindow		Trova precedente
+Search backwards	FindandReplaceWindow		Cerca all'indietro
+Unlock file	StatusView		Sblocca file
 Size	Menus		Dimensione
 Save	QuitAlert		Salva
 Page setup…	Menus		Imposta pagina…
@@ -18,14 +21,17 @@ Default	Menus		Predefinito
 Replace with:	FindandReplaceWindow		Sostituisci con:
 Cancel	SaveAlert		Annulla
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%s\".
-Case-sensitive	FindandReplaceWindow		Sensibile alle maiuscole-minuscole
+Case-sensitive	FindandReplaceWindow		Distingue maiuscole e minuscole
+Reload	NodeMonitorAlerts		Carica nuovamente
 Replace in all windows	FindandReplaceWindow		Sostituisci in tutte le finestre
 Wrap lines	Menus		A capo automatico
 Quit	Menus		Esci
-Document statistics	Statistics		Statistiche documento
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Il file \"%file%\" è stato rimosso da un'altra applicazione. Recuperarlo?
+Document statistics	Statistics		Statistiche sul documento
 Cancel	RevertToSavedAlert		Annulla
+Autodetect	Menus		Rilevamento automatico
 Document	Menus		Documento
-Save changes to the document \"%s\"? 	QuitAlert		Salva le modifiche sul documento \"%s\"? 
+Save changes to the document \"%s\"? 	QuitAlert		Salva le modifiche al documento \"%s\"? 
 Edit	Menus		Modifica
 Revert	RevertToSavedAlert		Ripristina
 Font	Menus		Carattere
@@ -35,10 +41,11 @@ Default	Open_and_SaveAsPanel		Predefinito
 Replace next	Menus		Sostituisci prossimo
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Le modifiche a \"%s\" non sono state salvate.\nRipristinare l'ultima versione salvata? 
 Cancel	FindandReplaceWindow		Annulla
+Text encoding	Menus		Codifica testo
 Close	Menus		Chiudi
 Save	SaveAlert		Salva
 Words:	Statistics		Parole:
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Errore nel caricamento \"%s\":\n\tFormato non supportato
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Errore nel caricamento di \"%s\":\n\tFormato non supportato
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Non salvare
 Align	Menus		Allinea
@@ -46,29 +53,36 @@ Color	Menus		Colore
 OK	QuitAlert		OK
 Open…	Menus		Apri…
 Center	Menus		Centra
+Unable to unlock file\n\t%s	QuitAlert		Impossibile sbloccare il file\n\t%s
+line %d, column %d	StatusView		riga: %d colonna: %d
 OK	Statistics		OK
 New	Menus		Nuovo
-Wrap-around search	FindandReplaceWindow		Ricerca ovunque
+Wrap-around search	FindandReplaceWindow		Cerca in tutto il documento
 Bold	Menus		Grassetto
-Find selection	Menus		Trova selezione
-Find:	FindandReplaceWindow		Trova:
+Find selection	Menus		Cerca nel testo selezionato
+Find:	FindandReplaceWindow		Cerca:
 Error saving \"%s\":\n%s	SaveAlert		Si è verificato un errore durante il salvataggio \"%s\":\n%s
 Copy	Menus		Copia
 Cut	Menus		Taglia
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Il file \"%file%\" è stato modificato da un'altra applicazione, caricarlo nuovamente?
 Replace	FindandReplaceWindow		Sostituisci
-Find again	Menus		Trova ancora
+Find again	Menus		Cerca ancora
 Cancel	QuitAlert		Annulla
 Find…	Menus		Trova…
 Select all	Menus		Seleziona tutto
 Don't save	SaveAlert		Non salvare
-Error loading \"%s\":\n\t%s	LoadAlert		Errore caricando \"%s\":\n\t%s
+Recover	NodeMonitorAlerts		Ripristina
+Error loading \"%s\":\n\t%s	LoadAlert		Errore nel caricamento di \"%s\":\n\t%s
+Ignore	NodeMonitorAlerts		Ignora
+Read-only	StatusView		Sola lettura
 Undo typing	QuitAlert		Annulla digitazione
-Untitled 	StyledEditWindow		Senza titolo
+Untitled 	StyledEditWindow		Senza nome 
 OK	SaveAlert		OK
-Find	FindandReplaceWindow		Trova
+Find	FindandReplaceWindow		Cerca
 Encoding	Open_and_SaveAsPanel		Codifica
 Characters:	Statistics		Caratteri:
 Save as…	Menus		Salva con nome…
 Redo typing	QuitAlert		Ripeti digitazione
+Reload…	Menus		Carica nuovamente…
 Replace…	Menus		Sostituisci…
 Right	Menus		Destra

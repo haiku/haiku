@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Sudoku	2463385585
+1	italian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Ripristina snapshot
 Could not set Sudoku:\n%s\n	SudokuWindow		Impossibile impostare Sudoku:\n%s\n
 Export as…	SudokuWindow		Esporta come...
@@ -26,6 +26,7 @@ Text	SudokuWindow		Testo
 Creating solvable field	SudokuGenerator		Crea campi risolvibili
 View	SudokuWindow		Visualizza
 Progress monitor	ProgressWindow		Monitor progresso
+Set all hints	SudokuWindow		Imposta tutti i suggerimenti
 Mark invalid values	SudokuWindow		Segna numeri inseriti non validi
 Blank	SudokuWindow		Vuoto
 Help	SudokuWindow		Aiuto

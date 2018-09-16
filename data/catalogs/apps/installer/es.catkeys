@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	3694689316
+1	spanish; castilian	x-vnd.Haiku-Installer	2124553984
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, la aplicación para configurar el menú de arranque de Haiku, no se pudo abrir.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		¿Está seguro que desea abortar la instalación y reiniciar el sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tescrito por Jérôme Duval y Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACION IMPO
 Continue	InstallerWindow	In alert after pressing Stop	Continuar
 Write boot sector to '%s'	InstallerWindow		Escribir sector de arranque en '%s'
 Collecting copy information.	InstallProgress		Recopilando información para la copia.
+Have fun and thanks for trying out Haiku!	InstallerApp		¡Diviértase y gracias por probar Haiku!
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elija el disco de origen del menú desplegable. Después haga clic en \"Empezar\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Salir del administrador de arranque y DriveSetup
 Quit	InstallerWindow		Salir
@@ -29,6 +30,7 @@ Boot sector successfully written.	InstallProgress		Sector de arranque escrito co
 Performing installation.	InstallProgress		Realizando instalación.
 scanning…	InstallerWindow		buscando discos...
 Set up boot menu	InstallerWindow		Configurar menú de Arranque
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) El instalador modificará la partición de Haiku para que pueda iniciar desde ella, pero no realizará ninguna acción para incorporar Haiku a un menú de arranque preexistente. Si usted posee GRUB ya instalado, puede agregar Haiku a él.\nPara más detalles, por favor consulte la guía acerca del inicio de Haiku en nuestra página web: https://www.haiku-os.org/guides/booting \nAlternativamente, puede crear un menú de arranque desde la opción \"Herramientas\" del instalador.  Para mayor información, consulte el capítulo referido al \"BootManager\" (Gestor de Arranque) de la Guía de Usuario.\n\n\n
 Abort	InstallerWindow		Abortar
 Finishing Installation.	InstallProgress		Completando instalación.
 Restart	InstallerWindow		Reiniciar
@@ -71,6 +73,7 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		El volumen de destino no está vacío. ¿Está seguro de que desea instalarlo de todos modos?\n\nNota: El directorio 'system' será una copia limpia del volumen de origen pero mantendrá su directorio de configuración, el resto de los directorios serán fusionados, mientras que los archivos y enlaces que existan tanto en el volumen de origen como en el de destino serán reemplazados con la versión del volumen de origen.
 No optional packages available.	PackagesView		No hay paquetes opcionales disponibles.
 Continue	InstallerApp		Continuar
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		¡Este software es beta! Esto significa que existe el riesgo de perder información valiosa. ¡Recuerde realizar copias de seguridad con frecuencia!\n\n\n
 Boot sector not written because of an internal error.	InstallProgress		Sector de arranque no escrito debido a un error interno.
 Additional disk space required: %s	InstallerWindow		Espacio en disco adicional requerido: %s
 Cancel	InstallProgress		Cancelar

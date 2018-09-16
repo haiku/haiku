@@ -1,34 +1,51 @@
-1	italian	x-vnd.Haiku-Network	1398692389
+1	italian	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Statico
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
 no link	InterfaceListItem		nessun collegamento
 WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Scegli automaticamente
+connected	IntefaceView		connesso
+Ethernet device	InterfaceListItem		Dispositivo Ethernet
 The netmask defines your local network	IntefaceAddressView		La netmask definisce la tua rete locale
+Dial-up connection	InterfaceListItem		Connessione Dial-up
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Rete
 VPN connection	InterfaceListItem		Connessione VPN
 Show network status in Deskbar	NetworkWindow		Mostra lo stato della rete in Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
+connected	InterfaceListItem		connesso
+disabled	InterfaceListItem		disabilitato
 Dial Up	NetworkWindow		Dial Up
 Apply	IntefaceAddressView		Applica
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di NetworkStatus in Deskbar fallita: %s
+MAC address:	IntefaceView		Indirizzo MAC:
+Wireless device	InterfaceListItem		Dispositivo Wireless
 Disabled	IntefaceAddressView		Disabilitata
-Ok	NetworkWindow		Ok
+Renegotiate	IntefaceView		Rinegoziare
+Ok	NetworkWindow		OK
+Network:	IntefaceView		Rete:
 launch error	NetworkWindow		Errore di avvio
 Other	NetworkWindow		Altro
 Automatic	IntefaceAddressView		Automatico
 Gateway:	IntefaceAddressView		Gateway:
 Revert	NetworkWindow		Ripristina
 Enable	ServiceView		Abilita
+disconnected	IntefaceView		disconnesso
+Status:	IntefaceView		Stato:
+Link speed:	IntefaceView		Velocità collegamento:
 Your gateway to the internet	IntefaceAddressView		Il tuo gateway su internet
 New…	NetworkWindow		Nuovo...
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Modalità:
 WPA	WPA protected network		WPA
+Sent:	IntefaceView		Inviati:
 open	Open network		apri
 IP Address:	IntefaceAddressView		Indirizzo IP:
+VPN	NetworkWindow		VPN
+Received:	IntefaceView		Ricevuti:
 Disable	IntefaceView		Disabilita
+<no wireless networks found>	IntefaceView		<nessuna rete senza fili trovata>
 Netmask:	IntefaceAddressView		Netmask:
 Disable	ServiceView		Disabilita
 Your IP address	IntefaceAddressView		Il tuo indirizzo IP
