@@ -11,3 +11,8 @@ UnitTestLib libkerneldebuggertest.so :
 	be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	;
 
+SimpleTest haikuc++filt :
+	c++filt.cpp
+	: <nogrist>Debugger_demangler.o
+	be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	;
