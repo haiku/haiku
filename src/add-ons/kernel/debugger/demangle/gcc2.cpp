@@ -19,10 +19,69 @@
 
 //#define TRACE_GCC2_DEMANGLER
 #ifdef TRACE_GCC2_DEMANGLER
-#	define TRACE(x...) kprintf(x)
+#	include <stdio.h>
+#	define TRACE(x...) printf(x)
 #else
 #	define TRACE(x...) ;
 #endif
+
+
+class Input {
+public:
+	Input(const char* string, size_t length)
+		:
+		fString(string),
+		fLength(length)
+	{
+	}
+
+	const char* String() const
+	{
+		return fString;
+	}
+
+	int CharsRemaining() const
+	{
+		return fLength;
+	}
+
+	void Skip(size_t count)
+	{
+		if (count > fLength) {
+			TRACE("Input::Skip(): fOffset > fLength\n");
+			return;
+		}
+
+		fString += count;
+		fLength -= count;
+	}
+
+	Input& operator++()
+	{
+		Skip(1);
+		return *this;
+	}
+	Input operator++(int)
+	{
+		Input result(*this);
+		++(*this);
+		return result;
+	}
+
+	char operator[](size_t index) const
+	{
+		if (index >= fLength) {
+			TRACE("Input::operator[](): fOffset + index >= fLength\n");
+			return '\0';
+		}
+
+		return fString[index];
+	}
+
+private:
+	const char*	fString;
+	size_t		fLength;
+};
 
 
 enum {
@@ -32,29 +91,29 @@ enum {
 
 
 static void
-ignore_qualifiers(const char** _arg)
+ignore_qualifiers(Input& _arg)
 {
-	while (isupper(**_arg)) {
-		if (**_arg == 'Q') {
+	while (isupper(_arg[0])) {
+		if (_arg[0] == 'Q') {
 			// argument has namespaces
 			break;
 		}
-		if (**_arg == 'F') {
+		if (_arg[0] == 'F') {
 			// skip function declaration
-			while (**_arg && **_arg != '_')
-				(*_arg)++;
+			while (_arg.CharsRemaining() && _arg[0] != '_')
+				_arg++;
 
-			if (**_arg == 0)
+			if (!_arg.CharsRemaining())
 				break;
 		}
 
-		(*_arg)++;
+		_arg++;
 	}
 }
 
 
 static uint32
-argument_type(const char* arg, size_t& length)
+argument_type(Input arg, size_t& length)
 {
 	length = sizeof(int);
 
@@ -62,7 +121,7 @@ argument_type(const char* arg, size_t& length)
 		case 'P':	// pointer
 		case 'R':	// reference
 			length = sizeof(void*);
-			ignore_qualifiers(&arg);
+			ignore_qualifiers(arg);
 			if (arg[0] == 'c')
 				return B_STRING_TYPE;
 			if (arg[0] == 't') {
@@ -126,9 +185,9 @@ argument_type(const char* arg, size_t& length)
 
 
 static uint32
-parse_number(const char** _arg, bool numberLeft)
+parse_number(Input& _arg, bool numberLeft)
 {
-	const char* arg = *_arg;
+	Input arg = _arg;
 
 	while (isdigit(arg[0]))
 		arg++;
@@ -137,12 +196,14 @@ parse_number(const char** _arg, bool numberLeft)
 
 	if (arg[0] == '_' && (!numberLeft || isdigit(arg[1]))) {
 		// long value
-		value = strtoul(*_arg, (char**)_arg, 10);
-		if (**_arg == '_')
-			(*_arg)++;
+		const char* tmp_arg = _arg.String();
+		value = strtoul(tmp_arg, (char**)&tmp_arg, 10);
+		_arg.Skip(tmp_arg - _arg.String());
+		if (_arg[0] == '_')
+			_arg++;
 	} else {
-		value = **_arg - '0';
-		(*_arg)++;
+		value = _arg[0] - '0';
+		_arg++;
 	}
 
 	return value;
@@ -150,12 +211,12 @@ parse_number(const char** _arg, bool numberLeft)
 
 
 static uint32
-parse_repeats(const char** _arg, uint32& index)
+parse_repeats(Input& _arg, uint32& index)
 {
-	if (**_arg != 'N')
+	if (_arg[0] != 'N')
 		return 0;
 
-	(*_arg)++;
+	_arg++;
 
 	uint32 count = parse_number(_arg, true);
 	index = parse_number(_arg, false);
@@ -165,10 +226,10 @@ parse_repeats(const char** _arg, uint32& index)
 
 
 static void
-skip_numbers(const char** _arg, int32 count)
+skip_numbers(Input& _arg, int32 count)
 {
 	// skip leading character
-	(*_arg)++;
+	_arg++;
 
 	while (count-- > 0) {
 		parse_number(_arg, count != 0);
@@ -177,67 +238,68 @@ skip_numbers(const char** _arg, int32 count)
 
 
 static uint32
-count_namespaces(const char** _mangled)
+count_namespaces(Input& _mangled)
 {
-	const char* mangled = *_mangled;
+	Input mangled = _mangled;
 
 	int32 namespaces = 0;
 	if (mangled[0] == 'Q') {
 		// more than one namespace
 		if (mangled[1] == '_') {
 			// more than 9 namespaces
-			namespaces = strtoul(mangled + 2, (char**)&mangled, 10);
+			const char* mangled_str = mangled.String();
+			namespaces = strtoul(mangled_str + 2, (char**)&mangled_str, 10);
+			mangled.Skip(mangled_str - mangled.String());
 			if (mangled[0] != '_')
 				namespaces = 0;
 
 			mangled++;
 		} else {
 			namespaces = mangled[1] - '0';
-			mangled += 2;
+			mangled.Skip(2);
 		}
 	} else if (isdigit(mangled[0]))
 		namespaces = 1;
 
-	*_mangled = mangled;
+	_mangled = mangled;
 	return namespaces;
 }
 
 
 static void
-skip_namespaces(const char** _mangled)
+skip_namespaces(Input& mangled)
 {
-	const char* mangled = *_mangled;
-	int32 namespaces = count_namespaces(&mangled);
+	int32 namespaces = count_namespaces(mangled);
 
 	while (namespaces-- > 0) {
 		if (!isdigit(mangled[0]))
 			break;
 
-		mangled += strtoul(mangled, (char**)&mangled, 10);
+		const char* mangled_str = mangled.String();
+		mangled_str += strtoul(mangled_str, (char**)&mangled_str, 10);
+		mangled.Skip(mangled_str - mangled.String());
 	}
-
-	*_mangled = mangled;
 }
 
 
 static bool
-has_named_argument(const char** _arg)
+has_named_argument(Input& arg)
 {
-	ignore_qualifiers(_arg);
+	ignore_qualifiers(arg);
 
 	// See if it's a built-in type
-	return **_arg == 'Q' || isdigit(**_arg);
+	return arg[0] == 'Q' || isdigit(arg[0]);
 }
 
 
 static uint32
-argument_length(const char** _arg)
+argument_length(Input& _arg)
 {
-	if (**_arg == 'N') {
+	if (_arg[0] == 'N') {
 		// skip repeats
 		skip_numbers(_arg, 2);
 		return 0;
-	} else if (**_arg == 'T') {
+	} else if (_arg[0] == 'T') {
 		// skip reference
 		skip_numbers(_arg, 1);
 		return 0;
@@ -245,59 +307,54 @@ argument_length(const char** _arg)
 
 	ignore_qualifiers(_arg);
 
-	if (!**_arg)
+	if (!_arg.CharsRemaining())
 		return 0;
 
 	// See if it's a built-in type
-	if (**_arg != 'Q' && !isdigit(**_arg))
+	if (_arg[0] != 'Q' && !isdigit(_arg[0]))
 		return 1;
 
-	const char* mangled = *_arg;
-	skip_namespaces(&mangled);
+	Input mangled = _arg;
+	skip_namespaces(mangled);
 
-	return mangled - *_arg;
+	return mangled.String() - _arg.String();
 }
 
 
-static const char*
-next_argument(const char* arg)
+static Input
+next_argument(Input arg)
 {
-	if (arg == NULL || !arg[0])
-		return NULL;
+	if (!arg.CharsRemaining() || !arg[0])
+		return arg;
 
-	uint32 length = argument_length(&arg);
-	arg += length;
-
-	if (!arg[0])
-		return NULL;
+	uint32 length = argument_length(arg);
+	arg.Skip(length);
 
 	return arg;
 }
 
 
-static const char*
-first_argument(const char* mangled)
+static Input
+first_argument(Input mangled)
 {
-	skip_namespaces(&mangled);
+	skip_namespaces(mangled);
 
 	return mangled;
 }
 
 
-static const char*
-mangled_start(const char* name, size_t* _symbolLength, int32* _symbolType)
+static bool
+mangled_start(Input& name, size_t* _symbolLength, int32* _symbolType)
 {
-	if (name == NULL)
-		return NULL;
-
 	// search '__' starting from the end, don't accept them at the start
-	size_t pos = strlen(name) - 1;
-	const char* mangled = NULL;
+	size_t pos = name.CharsRemaining() - 1;
+	bool foundStart = false;
 
 	while (pos > 1) {
 		if (name[pos] == '_') {
 			if (name[pos - 1] == '_') {
-				mangled = name + pos + 1;
+				foundStart = true;
+				name.Skip(pos + 1);
 				break;
 			} else
 				pos--;
@@ -305,26 +362,27 @@ mangled_start(const char* name, size_t* _symbolLength, int32* _symbolType)
 		pos--;
 	}
 
-	if (mangled == NULL)
-		return NULL;
+	if (!foundStart)
+		return false;
 
-	if (mangled[0] == 'H') {
+	if (name[0] == 'H') {
 		// TODO: we don't support templates yet
-		return NULL;
+		return false;
 	}
 
 	if (_symbolLength != NULL)
 		*_symbolLength = pos - 1;
 
-	if (mangled[0] == 'F') {
+	if (name[0] == 'F') {
 		if (_symbolType != NULL)
 			*_symbolType = TYPE_FUNCTION;
-		return mangled + 1;
+		name.Skip(1);
+		return true;
 	}
 
 	if (_symbolType != NULL)
 		*_symbolType = TYPE_METHOD;
-	return mangled;
+	return true;
 }
 
 
@@ -332,11 +390,11 @@ static status_t
 get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 	size_t nameSize, int32* _type, size_t* _argumentLength, bool repeating)
 {
-	const char* mangled = mangled_start(symbol, NULL, NULL);
-	if (mangled == NULL)
+	Input mangled(symbol, strlen(symbol));
+	if (!mangled_start(mangled, NULL, NULL))
 		return B_BAD_VALUE;
 
-	const char* arg = first_argument(mangled);
+	Input arg = first_argument(mangled);
 
 	// (void) is not an argument
 	if (arg[0] == 'v')
@@ -348,10 +406,10 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 
 	for (uint32 i = 0; i < current; i++) {
 		arg = next_argument(arg);
-		if (arg != NULL && arg[0] == 'N') {
+		if (arg.CharsRemaining() && arg[0] == 'N') {
 			// repeat argument 'count' times
 			uint32 index;
-			uint32 count = parse_repeats(&arg, index);
+			uint32 count = parse_repeats(arg, index);
 			if (current <= i + count) {
 				if (repeating)
 					return B_LINK_LIMIT;
@@ -368,10 +426,10 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 		}
 	}
 
-	if (arg == NULL)
+	if (arg[0] == '\0' || !arg.CharsRemaining())
 		return B_ENTRY_NOT_FOUND;
 
-	TRACE("\n\targ %ld: %s\n", current, arg);
+	TRACE("\n\targ %ld: %s\n", current, arg.String());
 
 	if (arg[0] == 'T') {
 		// duplicate argument
@@ -379,7 +437,7 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 			return B_LINK_LIMIT;
 
 		arg++;
-		uint32 index = parse_number(&arg, false);
+		uint32 index = parse_number(arg, false);
 		status_t status = get_next_argument_internal(&index, symbol, name,
 			nameSize, _type, _argumentLength, true);
 		if (status == B_OK)
@@ -400,11 +458,11 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 		*_argumentLength = argumentLength;
 
 	name[0] = '\0';
-	if (!has_named_argument(&arg))
+	if (!has_named_argument(arg))
 		return B_OK;
 
-	const char* namespaceStart = arg;
-	int32 namespaces = count_namespaces(&namespaceStart);
+	Input namespaceStart = arg;
+	int32 namespaces = count_namespaces(namespaceStart);
 
 	while (namespaces-- > 0) {
 		if (namespaceStart[0] == 't') {
@@ -414,12 +472,15 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 		if (!isdigit(namespaceStart[0]))
 			break;
 
-		uint32 length = strtoul(namespaceStart, (char**)&namespaceStart, 10);
+		const char* ns_str = namespaceStart.String();
+		uint32 length = strtoul(ns_str, (char**)&ns_str, 10);
+		namespaceStart.Skip(ns_str - namespaceStart.String());
+
 		uint32 max = strlen(name) + length + 1;
-		strlcat(name, namespaceStart, min_c(max, nameSize));
+		strlcat(name, namespaceStart.String(), min_c(max, nameSize));
 		if (namespaces > 0)
 			strlcat(name, "::", nameSize);
-		namespaceStart += length;
+		namespaceStart.Skip(length);
 	}
 
 	return B_OK;
@@ -433,10 +494,13 @@ const char*
 demangle_symbol_gcc2(const char* name, char* buffer, size_t bufferSize,
 	bool* _isObjectMethod)
 {
+	if (name == NULL)
+		return NULL;
+
 	size_t nameLength;
 	int32 type;
-	const char* mangled = mangled_start(name, &nameLength, &type);
-	if (mangled == NULL)
+	Input mangled(name, strlen(name));
+	if (!mangled_start(mangled, &nameLength, &type))
 		return NULL;
 
 	if (mangled[0] == 'C') {
@@ -450,8 +514,8 @@ demangle_symbol_gcc2(const char* name, char* buffer, size_t bufferSize,
 		*_isObjectMethod = type == TYPE_METHOD;
 	}
 
-	const char* namespaceStart = mangled;
-	int32 namespaces = count_namespaces(&namespaceStart);
+	Input namespaceStart = mangled;
+	int32 namespaces = count_namespaces(namespaceStart);
 
 	buffer[0] = '\0';
 
@@ -463,11 +527,14 @@ demangle_symbol_gcc2(const char* name, char* buffer, size_t bufferSize,
 		if (!isdigit(namespaceStart[0]))
 			break;
 
-		uint32 length = strtoul(namespaceStart, (char**)&namespaceStart, 10);
+		const char* ns_str = namespaceStart.String();
+		uint32 length = strtoul(ns_str, (char**)&ns_str, 10);
+		namespaceStart.Skip(ns_str - namespaceStart.String());
+
 		uint32 max = strlen(buffer) + length + 1;
-		strlcat(buffer, namespaceStart, min_c(max, bufferSize));
+		strlcat(buffer, namespaceStart.String(), min_c(max, bufferSize));
 		strlcat(buffer, "::", bufferSize);
-		namespaceStart += length;
+		namespaceStart.Skip(length);
 	}
 
 	size_t max = strlen(buffer) + nameLength + 1;
