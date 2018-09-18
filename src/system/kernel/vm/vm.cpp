@@ -2107,8 +2107,9 @@ vm_clone_area(team_id team, const char* name, void** address,
 		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
-#if KDEBUG_LEVEL_2
-		panic("attempting to clone non-user-cloneable kernel area!");
+#if KDEBUG
+		panic("attempting to clone kernel area \"%s\" (%" B_PRId32 ")!",
+			sourceArea->name, sourceID);
 #endif
 		status = B_NOT_ALLOWED;
 	} else if (sourceArea->cache_type == CACHE_TYPE_NULL) {
