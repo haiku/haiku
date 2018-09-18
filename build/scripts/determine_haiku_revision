@@ -37,7 +37,7 @@ if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
 		exit 1
 	fi
 
-	revision=`echo $revision | sed 's/-g.....//' | sed 's/-/+/g'`
+	revision=`echo $revision | sed 's/-g[0-9a-z]\+//' | sed 's/-/+/g'`
 	if echo "$revision" | grep -- '-' >/dev/null; then
 		# HEAD is not directly a changeset from Haiku's central repo, so we
 		# add the current branch name as additional info
