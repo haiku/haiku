@@ -204,7 +204,7 @@ SharedBitmap::_CreateBitmapFromMimeType(int32 size) const
 	if (status != B_OK)
 		return NULL;
 
-	BBitmap* bitmap = new BBitmap(BRect(0, 0, size, size), 0, B_RGBA32);
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
 	status = bitmap->InitCheck();
 	if (status == B_OK)
 		status = mimeType.GetIcon(bitmap, B_MINI_ICON);
@@ -267,7 +267,7 @@ BBitmap*
 SharedBitmap::_LoadIconFromBuffer(const void* data, size_t dataSize,
 	int32 size) const
 {
-	BBitmap* bitmap = new BBitmap(BRect(0, 0, size, size), 0,
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0,
 		B_RGBA32);
 	status_t status = bitmap->InitCheck();
 	if (status == B_OK) {
