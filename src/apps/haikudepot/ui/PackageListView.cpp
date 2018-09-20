@@ -332,7 +332,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		const BBitmap* bitmap = bitmapField->Bitmap();
 
 		// Scale the bitmap to 16x16
-		BRect r = BRect(0, 0, 16, 16);
+		BRect r = BRect(0, 0, 15, 15);
 
 		// figure out the placement
 		float x = 0.0;
@@ -365,7 +365,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		// draw the bitmap
 		if (bitmap != NULL) {
 			parent->SetDrawingMode(B_OP_ALPHA);
-			BRect viewRect(x, y, x + 16, y + 16);
+			BRect viewRect(x, y, x + 15, y + 15);
 			parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
 			parent->SetDrawingMode(B_OP_OVER);
 		}
