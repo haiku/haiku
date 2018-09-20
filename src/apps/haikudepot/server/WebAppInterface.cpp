@@ -17,6 +17,7 @@
 #include <HttpRequest.h>
 #include <Json.h>
 #include <JsonTextWriter.h>
+#include <JsonMessageWriter.h>
 #include <Message.h>
 #include <Roster.h>
 #include <Url.h>
@@ -418,7 +419,8 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 	requestEnvelopeWriter.WriteObjectEnd();
 
 	return _SendJsonRequest("userrating", requestEnvelopeData,
-		requestEnvelopeData->Position(), NEEDS_AUTHORIZATION, message);
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
+		message);
 }
 
 
@@ -498,7 +500,8 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	requestEnvelopeWriter.WriteObjectEnd();
 
 	return _SendJsonRequest("userrating", requestEnvelopeData,
-		requestEnvelopeData->Position(), NEEDS_AUTHORIZATION, message);
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
+		message);
 }
 
 
@@ -556,7 +559,8 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 	requestEnvelopeWriter.WriteObjectEnd();
 
 	return _SendJsonRequest("userrating", requestEnvelopeData,
-		requestEnvelopeData->Position(), NEEDS_AUTHORIZATION, message);
+		_LengthAndSeekToZero(requestEnvelopeData), NEEDS_AUTHORIZATION,
+		message);
 }
 
 
@@ -706,9 +710,15 @@ WebAppInterface::_WriteStandardJsonRpcEnvelopeValues(BJsonWriter& writer,
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
+WebAppInterface::_SendJsonRequest(const char* domain, BPositionIO* requestData,
 	size_t requestDataSize, uint32 flags, BMessage& reply) const
 {
+	if (requestDataSize == 0) {
+		if (Logger::IsInfoEnabled())
+			printf("jrpc; empty request payload\n");
+		return B_ERROR;
+	}
+
 	if (!ServerHelper::IsNetworkAvailable()) {
 		if (Logger::IsDebugEnabled()) {
 			printf("jrpc; dropping request to ...[%s] as network is not "
@@ -740,22 +750,11 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 	// delivered from memory.
 
 	if (Logger::IsTraceEnabled()) {
-		BMallocIO *loggedRequestData = new BMallocIO();
-		loggedRequestData->SetSize(requestDataSize);
-		status_t dataCopyResult = DataIOUtils::Copy(loggedRequestData,
-			requestData, requestDataSize);
-		delete requestData;
-		requestData = loggedRequestData;
-
-		if (dataCopyResult != B_OK) {
-			delete requestData;
-			return dataCopyResult;
-		}
-
+		off_t requestDataPosition = requestData->Position();
 		printf("jrpc request; ");
-		_LogPayload(static_cast<const char *>(loggedRequestData->Buffer()),
-			loggedRequestData->BufferLength());
+		_LogPayload(requestData, requestDataSize);
 		printf("\n");
+		requestData->Seek(requestDataPosition, SEEK_SET);
 	}
 
 	ProtocolListener listener(Logger::IsTraceEnabled());
@@ -778,6 +777,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 		authentication.SetMethod(B_HTTP_AUTHENTICATION_BASIC);
 		context.AddAuthentication(url, authentication);
 	}
+
 
 	request.AdoptInputData(requestData, requestDataSize);
 
@@ -813,14 +813,16 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 
 	if (Logger::IsTraceEnabled()) {
 		printf("jrpc response; ");
-		_LogPayload(static_cast<const char *>(replyData.Buffer()),
-			replyData.BufferLength());
+		replyData.Seek(0, SEEK_SET);
+		_LogPayload(&replyData, replyData.BufferLength());
 		printf("\n");
 	}
 
-	status_t status = BJson::Parse(
-		static_cast<const char *>(replyData.Buffer()), replyData.BufferLength(),
-		reply);
+	replyData.Seek(0, SEEK_SET);
+	BJsonMessageWriter jsonMessageWriter(reply);
+	BJson::Parse(&replyData, &jsonMessageWriter);
+	status_t status = jsonMessageWriter.ErrorStatus();
+
 	if (Logger::IsTraceEnabled() && status == B_BAD_DATA) {
 		BString resultString(static_cast<const char *>(replyData.Buffer()),
 			replyData.BufferLength());
@@ -831,12 +833,12 @@ WebAppInterface::_SendJsonRequest(const char* domain, BDataIO* requestData,
 
 
 status_t
-WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
+WebAppInterface::_SendJsonRequest(const char* domain, const BString& jsonString,
 	uint32 flags, BMessage& reply) const
 {
 	// gets 'adopted' by the subsequent http request.
-	BMemoryIO* data = new BMemoryIO(
-		jsonString.String(), jsonString.Length() - 1);
+	BMemoryIO* data = new BMemoryIO(jsonString.String(),
+		jsonString.Length() - 1);
 
 	return _SendJsonRequest(domain, data, jsonString.Length() - 1, flags,
 		reply);
@@ -844,21 +846,41 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 
 void
-WebAppInterface::_LogPayload(const char* data, ssize_t size)
+WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
 {
+	char buffer[LOG_PAYLOAD_LIMIT];
+
 	if (size > LOG_PAYLOAD_LIMIT)
 		size = LOG_PAYLOAD_LIMIT;
 
-	for (int32 i = 0; i < size; i++) {
-		bool esc = data[i] > 126 ||
-			(data[i] < 0x20 && data[i] != 0x0a);
+	if (B_OK != requestData->ReadExactly(buffer, size)) {
+		printf("jrpc; error logging payload\n");
+	} else {
+		for (uint32 i = 0; i < size; i++) {
+    		bool esc = buffer[i] > 126 ||
+    			(buffer[i] < 0x20 && buffer[i] != 0x0a);
 
-		if (esc)
-			printf("\\u%02x", data[i]);
-		else
-			putchar(data[i]);
+    		if (esc)
+    			printf("\\u%02x", buffer[i]);
+    		else
+    			putchar(buffer[i]);
+    	}
+
+    	if (size == LOG_PAYLOAD_LIMIT)
+    		printf("...(continues)");
 	}
+}
 
-	if (size == LOG_PAYLOAD_LIMIT)
-		printf("...(continues)");
+
+/*! This will get the position of the data to get the length an then sets the
+    offset to zero so that it can be re-read for reading the payload in to log
+    or send.
+*/
+
+off_t
+WebAppInterface::_LengthAndSeekToZero(BPositionIO* data)
+{
+	off_t dataSize = data->Position();
+    data->Seek(0, SEEK_SET);
+    return dataSize;
 }
