@@ -49,6 +49,8 @@ public:
 	{
 		if (count > fLength) {
 			TRACE("Input::Skip(): fOffset > fLength\n");
+			fString += fLength;
+			fLength = 0;
 			return;
 		}
 

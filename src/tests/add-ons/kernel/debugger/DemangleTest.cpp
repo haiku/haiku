@@ -37,7 +37,7 @@ DemangleTest::RunGCC2Tests()
 		"registerInstance__Q26icu_5713BreakIteratorPQ26icu_5713BreakIteratorRCQ26icu_576Locale18UBreakIteratorTypeR10UErrorCode");
 
 	// Previously caused crashes
-	TEST("SetTo__Q282_GLOBAL_", "SetTo__Q282_GLOBAL_");
+	TEST("SetTo__Q282_GLOBAL_", "_GLOBAL_::SetTo()");
 }
 
 
