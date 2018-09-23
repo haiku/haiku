@@ -762,12 +762,13 @@ VideoProducer::_FrameGeneratorThread()
 						err = B_OK;
 					}
 					// clean the buffer if something went wrong
-					if (err != B_OK) {
+					if (err != B_OK && err != B_LAST_BUFFER_ERROR) {
 						// TODO: should use "back value" according
 						// to color space!
 						memset(buffer->Data(), 0, h->size_used);
 						err = B_OK;
-					}
+					} else if (err == B_LAST_BUFFER_ERROR)
+						running = false;
 					// Send the buffer on down to the consumer
 					if (wasCached || (err = SendBuffer(buffer, fOutput.source,
 							fOutput.destination) != B_OK)) {
