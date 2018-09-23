@@ -35,7 +35,7 @@ extern "C" {
 #include "gfx_util.h"
 
 
-#ifdef __x86_64
+#if 1
 #define USE_SWS_FOR_COLOR_SPACE_CONVERSION 1
 #else
 #define USE_SWS_FOR_COLOR_SPACE_CONVERSION 0
