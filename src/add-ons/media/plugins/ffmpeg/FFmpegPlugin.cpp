@@ -16,8 +16,6 @@
 
 #include <new>
 
-#include <Locker.h>
-
 extern "C" {
 	#include "avcodec.h"
 	#include "avformat.h"
@@ -40,64 +38,6 @@ extern "C" {
 #endif
 
 #define ERROR(a...) fprintf(stderr, a)
-
-
-static int
-manage_locks(void** _lock, enum AVLockOp operation)
-{
-	TRACE("manage_locks(%p, %d)\n", *_lock, operation);
-
-	BLocker** lock = reinterpret_cast<BLocker**>(_lock);
-
-	switch (operation) {
-		case AV_LOCK_CREATE:
-			TRACE("  AV_LOCK_CREATE\n");
-			*lock = new(std::nothrow) BLocker("FFmpeg lock");
-			if (*lock == NULL)
-				return 1;
-			break;
-
-		case AV_LOCK_OBTAIN:
-			TRACE("  AV_LOCK_OBTAIN\n");
-			if (!(*lock)->Lock())
-				return 1;
-			break;
-
-		case AV_LOCK_RELEASE:
-			TRACE("  AV_LOCK_RELEASE\n");
-			(*lock)->Unlock();
-			break;
-
-		case AV_LOCK_DESTROY:
-			TRACE("  AV_LOCK_DESTROY\n");
-			delete *lock;
-			break;
-
-		default:
-			return 1;
-	}
-	return 0;
-}
-
-
-FFmpegPlugin::GlobalInitilizer::GlobalInitilizer()
-{
-	if (av_lockmgr_register(manage_locks) != 0)
-		ERROR("Failed to register lock management!\n");
-
-	av_register_all();
-		// This will also call av_codec_init() by registering codecs.
-	avfilter_register_all();
-}
-
-
-FFmpegPlugin::GlobalInitilizer::~GlobalInitilizer()
-{
-	av_lockmgr_register(NULL);
-}
-
-
-FFmpegPlugin::GlobalInitilizer FFmpegPlugin::sInitilizer;
 
 
 // #pragma mark -
