@@ -832,10 +832,18 @@ _user_xsi_semget(key_t key, int numberOfSemaphores, int flags)
 
 int
 _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
-	union semun *args)
+	union semun *_args)
 {
 	TRACE(("xsi_semctl: semaphoreID = %d, semaphoreNumber = %d, command = %d\n",
 		semaphoreID, semaphoreNumber, command));
+
+	union semun args = {0};
+	if (_args != NULL) {
+		if (!IS_USER_ADDRESS(_args)
+				|| user_memcpy(&args, _args, sizeof(union semun)) != B_OK)
+			return B_BAD_ADDRESS;
+	}
+
 	MutexLocker ipcHashLocker(sIpcLock);
 	MutexLocker setHashLocker(sXsiSemaphoreSetLock);
 	XsiSemaphoreSet *semaphoreSet = sSemaphoreHashTable.Lookup(semaphoreID);
@@ -850,10 +858,6 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 			"semaphore %d\n", semaphoreNumber, semaphoreID));
 		return EINVAL;
 	}
-	if (args != 0 && !IS_USER_ADDRESS(args)) {
-		TRACE_ERROR(("xsi_semctl: semun address is not valid\n"));
-		return B_BAD_ADDRESS;
-	}
 
 	// Lock the semaphore set itself and release both the semaphore
 	// set hash table lock and the ipc hash table lock _only_ if
@@ -865,11 +869,12 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		setLocker.SetTo(&semaphoreSet->Lock(), false);
 		setHashLocker.Unlock();
 		ipcHashLocker.Unlock();
-	} else
+	} else {
 		// We are about to delete the set along with its mutex, so
 		// we can't use the MutexLocker class, as the mutex itself
 		// won't exist on function exit
 		mutex_lock(&semaphoreSet->Lock());
+	}
 
 	int result = 0;
 	XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
@@ -892,15 +897,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 					(int)semaphoreSet->IpcKey()));
 				result = EACCES;
 			} else {
-				int value;
-				if (user_memcpy(&value, &args->val, sizeof(int)) < B_OK) {
-					TRACE_ERROR(("xsi_semctl: user_memcpy failed\n"));
-					result = B_BAD_ADDRESS;
-				} else if (value > USHRT_MAX) {
-					TRACE_ERROR(("xsi_semctl: value %d out of range\n", value));
+				if (args.val > USHRT_MAX) {
+					TRACE_ERROR(("xsi_semctl: value %d out of range\n", args.val));
 					result = ERANGE;
 				} else {
-					semaphore->SetValue(value);
+					semaphore->SetValue(args.val);
 					semaphoreSet->ClearUndo(semaphoreNumber);
 				}
 			}
@@ -950,8 +951,8 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 				for (int i = 0; i < semaphoreSet->NumberOfSemaphores(); i++) {
 					semaphore = semaphoreSet->Semaphore(i);
 					unsigned short value = semaphore->Value();
-					if (user_memcpy(&args->array[i], &value,
-						sizeof(unsigned short)) < B_OK) {
+					if (user_memcpy(args.array + i, &value,
+							sizeof(unsigned short)) != B_OK) {
 						TRACE_ERROR(("xsi_semctl: user_memcpy failed\n"));
 						result = B_BAD_ADDRESS;
 						break;
@@ -971,8 +972,8 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 				for (int i = 0; i < semaphoreSet->NumberOfSemaphores(); i++) {
 					semaphore = semaphoreSet->Semaphore(i);
 					unsigned short value;
-					if (user_memcpy(&value, &args->array[i], sizeof(unsigned short))
-						< B_OK) {
+					if (user_memcpy(&value, args.array + i,
+							sizeof(unsigned short)) != B_OK) {
 						TRACE_ERROR(("xsi_semctl: user_memcpy failed\n"));
 						result = B_BAD_ADDRESS;
 						doClear = false;
@@ -998,8 +999,8 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 				sem.sem_nsems = semaphoreSet->NumberOfSemaphores();
 				sem.sem_otime = semaphoreSet->LastSemopTime();
 				sem.sem_ctime = semaphoreSet->LastSemctlTime();
-				if (user_memcpy(args->buf, &sem, sizeof(struct semid_ds))
-					< B_OK) {
+				if (user_memcpy(args.buf, &sem, sizeof(struct semid_ds))
+						< B_OK) {
 					TRACE_ERROR(("xsi_semctl: user_memcpy failed\n"));
 					result = B_BAD_ADDRESS;
 				}
@@ -1015,8 +1016,8 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 				result = EACCES;
 			} else {
 				struct semid_ds sem;
-				if (user_memcpy(&sem, args->buf, sizeof(struct semid_ds))
-					< B_OK) {
+				if (user_memcpy(&sem, args.buf, sizeof(struct semid_ds))
+						!= B_OK) {
 					TRACE_ERROR(("xsi_semctl: user_memcpy failed\n"));
 					result = B_BAD_ADDRESS;
 				} else
@@ -1105,7 +1106,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 	MemoryDeleter operationsDeleter(operations);
 
 	if (user_memcpy(operations, ops,
-		(sizeof(struct sembuf) * numOps)) < B_OK) {
+			(sizeof(struct sembuf) * numOps)) != B_OK) {
 		TRACE_ERROR(("xsi_semop: user_memcpy failed\n"));
 		return B_BAD_ADDRESS;
 	}
