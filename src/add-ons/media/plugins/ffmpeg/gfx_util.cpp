@@ -46,7 +46,7 @@ resolve_colorspace(color_space colorSpace, AVPixelFormat pixelFormat, int width,
 
 			if (pixelFormat == AV_PIX_FMT_YUV420P
 				|| pixelFormat == AV_PIX_FMT_YUVJ420P) {
-#ifndef __x86_64__
+#if 0
 				if (cpu.HasSSSE3() && width % 8 == 0 && height % 2 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_ssse3\n");
 					return gfx_conv_yuv420p_rgba32_ssse3;
@@ -65,7 +65,7 @@ resolve_colorspace(color_space colorSpace, AVPixelFormat pixelFormat, int width,
 
 			if (pixelFormat == AV_PIX_FMT_YUV422P
 				|| pixelFormat == AV_PIX_FMT_YUVJ422P) {
-#ifndef __x86_64__
+#if 0
 				if (cpu.HasSSSE3() && width % 8 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_ssse3\n");
 					return gfx_conv_yuv422p_rgba32_ssse3;
@@ -87,7 +87,7 @@ resolve_colorspace(color_space colorSpace, AVPixelFormat pixelFormat, int width,
 
 			// Packed Formats
 			if (pixelFormat == AV_PIX_FMT_YUYV422) {
-#ifndef __x86_64__
+#if 0
 				if (cpu.HasSSSE3() && width % 8 == 0) {
 					return gfx_conv_yuv422_rgba32_ssse3;
 				} else if (cpu.HasSSE2() && width % 8 == 0) {

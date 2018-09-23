@@ -24,14 +24,14 @@ local sources =
 	gfx_util.cpp
 	;
 
-if $(TARGET_ARCH) != x86_64 {
-	sources +=
-		gfx_conv_mmx.cpp
-		yuvrgb_sse.nasm
-		yuvrgb_sse2.nasm
-		yuvrgb_ssse3.nasm
-	;
-}
+#if $(TARGET_ARCH) != x86_64 {
+#	sources +=
+#		gfx_conv_mmx.cpp
+#		yuvrgb_sse.nasm
+#		yuvrgb_sse2.nasm
+#		yuvrgb_ssse3.nasm
+#	;
+#}
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
