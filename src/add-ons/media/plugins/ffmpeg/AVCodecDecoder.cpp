@@ -1570,9 +1570,9 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
 	fHeader.start_time = fRawDecodedPicture->pkt_dts;
-	fHeader.size_used = avpicture_get_size(
+	fHeader.size_used = av_image_get_buffer_size(
 		colorspace_to_pixfmt(fOutputColorSpace), fRawDecodedPicture->width,
-		fRawDecodedPicture->height);
+		fRawDecodedPicture->height, 1);
 	fHeader.u.raw_video.display_line_width = fRawDecodedPicture->width;
 	fHeader.u.raw_video.display_line_count = fRawDecodedPicture->height;
 	fHeader.u.raw_video.bytes_per_row
@@ -1622,11 +1622,11 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 {
 	int displayWidth = fRawDecodedPicture->width;
 	int displayHeight = fRawDecodedPicture->height;
-	AVPicture deinterlacedPicture;
+	AVFrame deinterlacedPicture;
 	bool useDeinterlacedPicture = false;
 
 	if (fRawDecodedPicture->interlaced_frame) {
-		AVPicture rawPicture;
+		AVFrame rawPicture;
 		rawPicture.data[0] = fRawDecodedPicture->data[0];
 		rawPicture.data[1] = fRawDecodedPicture->data[1];
 		rawPicture.data[2] = fRawDecodedPicture->data[2];
@@ -1636,12 +1636,14 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		rawPicture.linesize[2] = fRawDecodedPicture->linesize[2];
 		rawPicture.linesize[3] = fRawDecodedPicture->linesize[3];
 
-		avpicture_alloc(&deinterlacedPicture, fCodecContext->pix_fmt, displayWidth,
-			displayHeight);
+		if (av_image_alloc(deinterlacedPicture.data,
+				deinterlacedPicture.linesize, displayWidth, displayHeight,
+				fCodecContext->pix_fmt, 1) < 0)
+			return B_NO_MEMORY;
 
 		// deinterlace implemented using avfilter
 		_ProcessFilterGraph(&deinterlacedPicture, &rawPicture,
-				fCodecContext->pix_fmt, displayWidth, displayHeight);
+			fCodecContext->pix_fmt, displayWidth, displayHeight);
 		useDeinterlacedPicture = true;
 	}
 
@@ -1717,7 +1719,7 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	}
 
 	if (fRawDecodedPicture->interlaced_frame)
-		avpicture_free(&deinterlacedPicture);
+		av_freep(&deinterlacedPicture.data[0]);
 
 	return B_OK;
 }
@@ -1787,7 +1789,7 @@ AVCodecDecoder::_InitFilterGraph(enum AVPixelFormat pixfmt, int32 width,
 	\returns B_NO_MEMORY Not enough memory available for correct operation.
 */
 status_t
-AVCodecDecoder::_ProcessFilterGraph(AVPicture *dst, const AVPicture *src,
+AVCodecDecoder::_ProcessFilterGraph(AVFrame *dst, const AVFrame *src,
 	enum AVPixelFormat pixfmt, int32 width, int32 height)
 {
 	if (fFilterGraph == NULL || width != fLastWidth
@@ -1812,8 +1814,8 @@ AVCodecDecoder::_ProcessFilterGraph(AVPicture *dst, const AVPicture *src,
 	if (ret < 0)
 		return B_BAD_DATA;
 
-	av_picture_copy(dst, (const AVPicture *)fFilterFrame, pixfmt, width,
-		height);
+	av_image_copy(dst->data, dst->linesize, (const uint8**)fFilterFrame->data,
+		fFilterFrame->linesize, pixfmt, width, height);
 	av_frame_unref(fFilterFrame);
 	return B_OK;
 }
