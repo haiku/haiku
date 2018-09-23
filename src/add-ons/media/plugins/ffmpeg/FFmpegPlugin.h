@@ -42,15 +42,6 @@ public:
 									media_format_family* formatFamily,
 									media_format* inputFormat,
 									media_format* outputFormat);
-
-private:
-	class GlobalInitilizer {
-		public:
-								GlobalInitilizer();
-								~GlobalInitilizer();
-	};
-
-	static	GlobalInitilizer	sInitilizer;
 };
 
 
