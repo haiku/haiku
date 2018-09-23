@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders media shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 
-SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wno-deprecated-declarations ;
+SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wdeprecated ;
 
 local sources =
 	AVCodecDecoder.cpp
