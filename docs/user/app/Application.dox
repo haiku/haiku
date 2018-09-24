@@ -67,7 +67,7 @@
 main()
 {
 	/* Vendor is your vendor name, application is your application name */
-	BApplication app("application/x-vnd.vendor-application");
+	BApplication *app = new BApplication("application/x-vnd.vendor-application");
 	app->Run();
 	delete app;
 
