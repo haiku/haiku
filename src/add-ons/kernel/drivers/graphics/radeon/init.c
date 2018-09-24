@@ -130,7 +130,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 		di->pcii.u.h0.base_registers[fb],
 		di->pcii.u.h0.base_register_sizes[fb],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
-		B_READ_AREA + B_WRITE_AREA,
+		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA,
 		(void **)&(si->local_mem));
 
 	if( si->memory[mt_local].area < 0 ) {
@@ -140,7 +140,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 			di->pcii.u.h0.base_registers[fb],
 			di->pcii.u.h0.base_register_sizes[fb],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
-			B_READ_AREA + B_WRITE_AREA,
+			B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA,
 			(void **)&(si->local_mem));
 	}
 
