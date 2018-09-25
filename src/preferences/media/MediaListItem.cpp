@@ -98,8 +98,9 @@ struct MediaListItem::Renderer {
 
 		iconFrame = MediaIcons::IconRectAt(iconFrame.RightTop() + BPoint(1, 0));
 
-		if (fDoubleInsets && fPrimaryIcon) {
-			onto->DrawBitmap(fPrimaryIcon, iconFrame);
+		if (fDoubleInsets) {
+			if (fPrimaryIcon != NULL)
+				onto->DrawBitmap(fPrimaryIcon, iconFrame);
 			point.x = iconFrame.right + 1;
 		}
 
