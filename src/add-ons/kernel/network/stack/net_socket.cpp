@@ -1066,8 +1066,15 @@ int
 socket_getsockname(net_socket* socket, struct sockaddr* address,
 	socklen_t* _addressLength)
 {
-	if (socket->address.ss_len == 0)
-		return ENOTCONN;
+	if (socket->address.ss_len == 0) {
+		struct sockaddr buffer;
+		memset(&buffer, 0, sizeof(buffer));
+		buffer.sa_family = socket->family;
+
+		memcpy(address, &buffer, min_c(*_addressLength, sizeof(buffer)));
+		*_addressLength = sizeof(buffer);
+		return B_OK;
+	}
 
 	memcpy(address, &socket->address, min_c(*_addressLength,
 		socket->address.ss_len));
