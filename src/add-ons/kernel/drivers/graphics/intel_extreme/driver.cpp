@@ -79,12 +79,12 @@ const struct supported_device {
 	{0xa011, INTEL_MODEL_PINEM, "Atom N4xx"},
 	{0xa012, INTEL_MODEL_PINEM, "Atom N5xx"},
 
-	{0x0042, INTEL_MODEL_ILKG, "IronLake Desktop"},
+//	{0x0042, INTEL_MODEL_ILKG, "IronLake Desktop"},
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 
-	{0x0102, INTEL_MODEL_SNBG, "SandyBridge Desktop GT1"},
+//	{0x0102, INTEL_MODEL_SNBG, "SandyBridge Desktop GT1"},
 	{0x0112, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2"},
 	{0x0122, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2+"},
 	{0x0106, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT1"},
@@ -92,7 +92,7 @@ const struct supported_device {
 	{0x0126, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT2+"},
 	{0x010a, INTEL_MODEL_SNBGS, "SandyBridge Server"},
 
-	{0x0152, INTEL_MODEL_IVBG, "IvyBridge Desktop GT1"},
+//	{0x0152, INTEL_MODEL_IVBG, "IvyBridge Desktop GT1"},
 	{0x0162, INTEL_MODEL_IVBG, "IvyBridge Desktop GT2"},
 	{0x0156, INTEL_MODEL_IVBGM, "IvyBridge Mobile GT1"},
 	{0x0166, INTEL_MODEL_IVBGM, "IvyBridge Mobile GT2"},
