@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <KernelExport.h>
 
 #include "AreaSupport.h"
 #include "Compatibility.h"
@@ -238,7 +239,8 @@ RequestAllocator::AllocateAddress(Address& address, int32 size, int32 align,
 #else
 			B_ANY_ADDRESS,
 #endif
-			areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			areaSize, B_NO_LOCK,
+			B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA);
 		if (area < 0)
 			RETURN_ERROR(area);
 		fAllocatedAreas[fAllocatedAreaCount++] = area;
