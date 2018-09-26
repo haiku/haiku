@@ -45,7 +45,7 @@ DESKBAR_DESKTOP_APPLETS +=
 ;
 
 SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
-	Bluetooth
+#	Bluetooth
 	DataTranslations
 	E-mail
 	Media
@@ -98,14 +98,17 @@ rule HaikuImageGetPrivateSystemLibs
 
 SYSTEM_SERVERS += [ FFilterByBuildFeatures
 	mail_daemon media_addon_server media_server midi_server
-	nfs4_idmapper_server bluetooth_server
+	nfs4_idmapper_server
+#	bluetooth_server
 	print_server print_addon_server
 ] ;
 
 # Bluetooth stack + drivers
-SYSTEM_BT_STACK = hci btCoreData ;
+SYSTEM_BT_STACK =
+#	hci btCoreData
+;
 SYSTEM_ADD_ONS_DRIVERS_BT_H2 +=
-	h2generic
+#	h2generic
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
