@@ -116,9 +116,7 @@ requires {
 	lib:libavcodec >= 58
 	lib:libavfilter >= 7
 	lib:libavformat >= 58
-	lib:libavresample >= 4
 	lib:libavutil >= 56
-	lib:libswscale >= 5
 	lib:libswresample >= 3
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_64_ZSTD_ENABLED
