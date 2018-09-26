@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Rodastahm Islamov
  *		Sergei Reznikov
+ *		Rodastahm Islamov
  *		Humdinger
  *
 -->
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Типы файлов</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="index.html">Содержание</a>  »
 </span></div>
 </div>
@@ -89,7 +89,7 @@
 <p><span class="cli">listattr</span> - отображает список атрибутов файла, но не содержимое атрибутов.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Пример:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -118,7 +118,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> хранит тип файла в виде <acronym title="Multipurpose Internet Mail Extensions">MIME-строки</acronym> , в нашем случае - "<tt>application/x-person</tt>". Он определяет иконку по умолчанию и приложение, которое открывает файл по двойному щелчку по нему.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" при помощи этого атрибута Tracker отслеживает месторасположение иконки.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,7 +126,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> - выводит содержимое указанного атрибута файла. </p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Пример:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -141,7 +141,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>Допустим, Clara (Клара) устроилась на работу в Barkelbaer Inc., и вы теперь можете заполнить ранее пустой атрибут "Company" (Компания) следующим образом:</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -152,7 +152,7 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Хотя можно было бы просто не заполнять атрибут "Fax" (Факс), но вы также можете полностью удалить этот атрибут у файла Clara:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -171,7 +171,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Типы файлов</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="index.html">Содержание</a>  »
 </span></div>
 </div>

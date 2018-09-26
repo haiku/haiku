@@ -4,13 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2017 Haiku. All rights reserved.
+ * Copyright 2013-2018 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -63,7 +63,7 @@
 <tr class="index"><td><a href="#filter">Suodatin</a><br />
                 <a href="#list">Luettelo</a><br />
                 <a href="#info">Tietoalue</a><br />
-                <a href="#menu">Työkalut ja näyttimet</a><br />
+                <a href="#menu">Työkalut ja Näytä-valikot</a><br />
                 <a href="#account">Käyttäjätilin luominen</a><br />
                 <a href="#rating">Arvosanat ja kommentointi</a><br />
 </td></tr>
@@ -79,20 +79,22 @@
 <p><br /></p>
 <p>HaikuVarasto on keskeinen sovellus ohjelmistopakkaustesi hallintaan. Sovelluksella voit selata ja etsiä tietovarastoja sekä asentaa, päivittää ja poistaa pakkauksia. HaikuVarasto alkaa <i>Viralliset pakkaukset</i>-luettelolla, jossa on ohjelmistoja, jotka tuntuvat kiinnostavan monia käyttäjiä.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>Heti kun kirjoitat jotain <span class="menu">Hakutermit</span>-laatikkoon, niin näyttö vaihtuu pienemmiksi kuvakkeiksi ja lisätiedot järjestetään sarakkeisiin.</p>
+<p>Kun <span class="menu">Näytä vain viralliset pakkaukset</span>-valintaruutu ei ole aktivoituna, näytetään kaikki saatavilla olevat pakkaukset ja näyttö vaihtaa pienempiin kuvakkeisiin ja sarakkeisiin, joissa on lisätietoa:</p>
+<img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Suodatin</a></h2>
-<p>Ylimpänä löydämme muutamia keinoja suodattaa alla saatavilla olevien pakkausten luetteloa:</p>
+<p>Ylimpänä löydämme muutamia keinoja suodattaa allapuolella näkyvien saatavilla olevien pakkausten luetteloa:</p>
 <ul>
 <li><p><span class="menu">Luokka</span> ponnahdusvalikko sallii sinun rajoittaa luettelon yksittäisiksi luokiksi kuten "<i>Audio</i>" tai "<i>Pelit</i>".</p></li>
-<li><p><span class="menu">Tietovarasto</span> ponnahdusvalikko määrittää, mitkä verkkovarastot kysellään tai jos näytetään vain ne asennetut pakkaukset, jotka on asennettu jostain muualta kuin verkkovarastosta ("<i>Paikallinen</i>"). Ehkä USB-tikulta tai joltain webbisivulta ladatut tai pakkaukset, jotka olet rakentanut itse.</p></li>
 <li><p><span class="menu">Etsintätermit</span>-tekstikenttäsuodattimet sitten luetteloivat ne pakkaukset, jotka on kirjoitettu (välilyönneillä eroteltuina) merkkijonoina niiden nimissä tai kuvauksissa.</p></li>
+<li><p>Valintaruutu <span class="menu">Näytä vain viralliset pakkaukset</span> voidaan aktivoida tulosten lisäsuodattamiseen valitussa luokassa tai kirjoitetussa hakutermissä.</p></li>
+<li><p>Valikkopalkin <span class="menu">Tietovarasto</span>-valikko määrittää, mitkä verkkovarastot kysellään. ("<i>Paikallinen</i>")-pakkaukset ovat niitä, jotka on asennettu jostain muualta kuin verkkotietovarastosta: ehkä USB-tikulta tai joltain webbisivulta ladatut tai pakkaukset, jotka olet rakentanut itse.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list" name="list">Luettelo</a></h2>
-<p>Kuten mikä tahansa Seuraaja-ikkuna, voit valita asiayhteysvalikosta mitkä sarakkeet näytetään napsauttamalla sarakeotsaketta hiiren kakkospainikkeella. Ykköspainike lajittelee luettelon tuon sarakkeen mukaiseksi. Tietysti voit järjestää sarakkeet uudelleen raahaamalla ne uuteen paikkaan.</p>
+<p>Kuten missä tahansa Seuraaja-ikkunassa, voit valita asiayhteysvalikosta mitkä sarakkeet näytetään napsauttamalla sarakeotsaketta hiiren kakkospainikkeella. Ykköspainike lajittelee luettelon tuon sarakkeen mukaiseksi. Tietysti voit järjestää sarakkeet uudelleen raahaamalla ne uuteen paikkaan.</p>
 <p>Pakkauksen tilasarakkeessa voi olla yksi seuraavista tiloista:</p>
 <ul>
 <li><p><span class="menu">Aktiivi</span>: Pakkaus on asennettu ja valmiina käytettäväksi.</p></li>
@@ -100,7 +102,7 @@
 <li><p><span class="menu">Odottaa / %</span>: <i>Odottaa</i> näytetään pakkaukselle, jota jonotetaan lataukseen/asennukseen. Pakkauksen latauksen aikana edistyminen näytetään prosentteina.</p></li>
 <li><p><span class="menu">Päivitys saatavilla</span>: Asennettuun pakkaukseen on saatavilla uudempi versio.</p></li>
 </ul>
-<p>Voit tarttua pisteviivaan pakkausluettelon välissä ja vaakasuora tietoalue muuttaa pakkausluettelon kokoa.</p>
+<p>Voit tarttua pisteviivaan pakkausluettelon välissä ja vaakasuoraan tietoalueeseen pakkausluettelon koon muuttamiseksi.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="info" name="info">Tietoalue</a></h2>
@@ -125,15 +127,15 @@ Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa t
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Työkalut ja näyttimet</a></h2>
-<p><span class="menu">Työkalut</span>-valikosta ikkunan yläosassa löydät rivin <span class="menu">Päivitä tietovarastot</span>. Tämä pyytää tietovarastoista ajantasaisen luettelon saatavilla olevista pakkauksista. Toinen rivi on <span class="menu">Hallinnoi tietovarastoja...</span>. Se avaa <a href="../preferences/repositories.html">Tietovarastot</a>-asetusohjelman tietovarastojen lisäämiseksi/poistamiseksi tai tietovarastojen ottamiseksi käyttöön tai niiden poistamiseksi käytöstä.</p>
-<p>Valikosta <span class="menu">Näyttimet</span> voit poistaa <span class="menu">Vain viralliset pakkaukset</span>-aktivoinnin. Nyt näet aina kaikki pakkaukset ja et vain viralliset pakkaukset kun HaikuDepot käynnistyy ja hakutekstikenttä on tyhjä.<br />
-Edelleen, voit valita myös Näyttimet-valikosta <span class="menu">Kehityspakkaukset</span> ja <span class="menu">Lähdekoodipakkaukset</span> pakkausluettelossa. Tavalliset käyttäjät eivät ole niistä kiinnostuneita ja ne voisivat vain sekoittaa luetteloa. Ne ovat kuitenkin tärkeitä niille ihmisille, jotka tarvitsevat pakkauskehittämiseen ja ohjelmien kääntämisen ohjelmointikielistä toimiviksi ohjelmiksi lähdekoodipakkauksista riippuvia kirjastoja, otsaketiedostoja jne.</p>
-<p>Kiinnostavia ovat myös valikkorivit <span class="menu">Näytä saatavilla olevat pakkaukset</span> ja <span class="menu">Näytä asennetut pakkaukset</span>, jotka ovat aika itseään selittäviä.</p>
+<a id="menu" name="menu">Työkalut- ja Näytä-valikko</a></h2>
+<p><span class="menu">Työkalut</span>-valikosta ikkunan yläosassa löydät rivin <span class="menu">Päivitä tietovarastot</span>. Tämä pyytää tietovarastoista ajantasaisen luettelon kaikista saatavilla olevista pakkauksista. Toinen rivi on <span class="menu">Hallinnoi tietovarastoja...</span>. Se avaa <a href="../preferences/repositories.html">Tietovarastot</a>-asetusohjelman tietovarastojen lisäämiseksi/poistamiseksi tai tietovarastojen ottamiseksi käyttöön tai niiden poistamiseksi käytöstä.<br />
+<span class="menu">Tarkista päivitykset</span> avaa <a href="../apps/softwareupdater.html">Ohjelmistopäivittäjän</a> päivitettyjen pakkausten etsimiseksi ja asentamiseksi.</p>
+<p>Valikosta <span class="menu">Näytä</span> voit valita pakkausten luettelosta <span class="menu">Kehityspakkaukset</span> ja <span class="menu">Lähdekoodipakkaukset</span>. Normaalikäyttäjille ne eivät ole kiinnostavia ja vain sekoittaisivat luetteloa. Ne ovat kuitenkin tärkeitä ihmisille, jotka tarvitsevat pakkausten kirjastoja, otsaketiedostoja jne. niistä riippuvien ohjelmien kehittämiseksi ja kääntämiseksi ohjelmakielistä toimivaksi ohjelmiksi.</p>
+<p>Kiinnostavampia ovat valitsimet, jotka näyttävät vain <span class="menu">Saatavilla olevat pakkaukset</span> ja <span class="menu">Asennetut pakkaukset</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Käyttäjätilin luominen</a></h2>
-<p>Voidaksesi antaa pakkaukselle arvosanan sinulla on oltava tili <a href="http://depot.haiku-os.org">Haiku Depot-palvelimella</a>, joka palvelee kaikkia pakkauksia ja kirjaa arvosanat sekä käyttäjäkommentit. Voit luoda tilin HaikuVarasto-sovelluksella napsauttamalla valikon oikeassa yläkulmassa, jossa näytetään nykyinen tila: <span class="menu">Et ole kirjautunut sisään</span>. Valinta <span class="menu">Kirjaudu...</span> avaa ikkunan kahdella välilehdellä; yhdellä voit kirjoittaa käyttäjätunnuksesi ja salasanasi (sitten kun sinulla on ne) kirjautuaksesi, ja toisessa luot uuden tilin:</p>
+<p>Voidaksesi antaa pakkaukselle arvosanan sinulla on oltava tili <a href="http://depot.haiku-os.org">Haiku Depot-palvelimella</a>, joka palvelee kaikkia pakkauksia ja kirjaa arvosanat sekä käyttäjäkommentit. Voit luoda tilin HaikuVarasto-sovelluksella napsauttamalla nykytilanteen näyttävän valikkopalkin oikeassa yläkulmassa olevaa valikkoa: <span class="menu">Et ole kirjautunut sisään</span>. Valinta <span class="menu">Kirjaudu...</span> avaa ikkunan kahdella välilehdellä; yhdellä voit kirjoittaa käyttäjätunnuksesi ja salasanasi (sitten kun sinulla on ne) kirjautuaksesi, ja toisessa luot uuden tilin:</p>
 <img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
 <p>Tilin luomiseksi sinun on:</p>
 <ul><li>käytettävä käyttäjätunnusta, joka koostuu pienistä kirjaimista ilman erikoismerkkejä (äöå)</li>
@@ -146,7 +148,7 @@ Edelleen, voit valita myös Näyttimet-valikosta <span class="menu">Kehityspakka
 <a id="rating" name="rating">Arvosanat ja kommentointi</a></h2>
 <p>Kun olet luonut käyttäjätilin ja kirjautunut sisään, voit antaa pakkaukselle arvosanan ja jättää kommentin, jos haluat. Liikuta vain hiiren kohdistinta pakkauksen tietoalueen arvosanatähtien päällä ja ne muuttuvat <span class="button">Anna pakkauksen arvosana...</span>-painikkeeksi. Napsauta sitä arvosanaikkunan avaamiseksi:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
-<p>Tässä liikutat hiiren kohdistinta tähtien yläpuolella niiden sytyttämiseksi ja arvosanasi valitsemiseksi, voit myös valita tasonumeron sovelluksen stabilisuusarvioksi ja poimia valinnaisen kommentin kielen. Jotta kommentti olisi merkityksellinen, sinun pitäisi työskennellä sovelluksella, jota arvioit tutustuaksesi sen ominaisuuksiin, ohjelmointivirheisiin ja oikkuihin. Ja älä kirjoita seuraa suomalaista suurromaania... pidä se lyhyenä, lempeänä ja kohteliaana. :)<br />
+<p>Tässä liikutat hiiren kohdistinta tähtien yläpuolella niiden sytyttämiseksi ja arvosanasi valitsemiseksi, voit myös valita tasonumeron sovelluksen stabilisuusarvioksi ja poimia valinnaisen kommentin kielen. Jotta kommentti olisi merkityksellinen, sinun pitäisi työskennellä arvioitavalla sovelluksella tutustuaksesi sen ominaisuuksiin, ohjelmointivirheisiin ja oikkuihin. Ja älä kirjoita seuraavaa suomalaista suurromaania... pidä kommenttisi lyhyenä, lempeänä ja kohteliaana. :)<br />
 <span class="button">Lähetä</span>-painikkeen napsauttamisen jälkeen tiedot lähetetään palvelimelle. Sinun on ehkä siirryttävä <span class="menu">Työkalut</span>-valikkoon valitsemaan <span class="menu">Päivitä tietovarastot</span> ennen kuin voit nähdä muutoksesi.</p>
 <p>Milloin tahansa voit palata ja muokata kommenttiasi tai antaa arvosanan uudelleen. Voit myös piilottaa arvioinnin muilta käyttäjältä poistamalla valinnan valintaruudusta <span class="menu">Muut käyttäjät voivat nähdä tämän arvosanan</span>.</p>
 </div>

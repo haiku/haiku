@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2017 Haiku. All rights reserved.
+ * Copyright 2013-2018 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,12 +61,12 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Содержание</td></tr>
-<tr class="index"><td><a href="#filter">Фильтры</a><br />
-                <a href="#list">Список</a><br />
-                <a href="#info">Информация</a><br />
-                <a href="#menu">Инструменты и отображение</a><br />
-                <a href="#account">Создание аккаунта пользователя</a><br />
-                <a href="#rating">Оценивание и комментирование</a><br />
+<tr class="index"><td><a href="#filter">The Filter</a><br />
+                <a href="#list">The List</a><br />
+                <a href="#info">The Info Area</a><br />
+                <a href="#menu">Tools and Show menus</a><br />
+                <a href="#account">Creating a User Account</a><br />
+                <a href="#rating">Rating and Commenting</a><br />
 </td></tr>
 </table>
 
@@ -80,15 +80,17 @@
 <p><br /></p>
 <p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>Как только вы вводите критерий в поле <span class="menu">Условия поиска</span> отображение переключается на иконки меньшего размера, а вместе с ними - выводит дополнительную информацию в новых колонках.</p>
+<p>When the <span class="menu">Show only featured packages</span> checkbox is deactivated, all available packages are shown and the display changes to smaller icons and more information arranged in columns:</p>
+<img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Фильтры</a></h2>
 <p>Вверху мы видим несколько способов фильтрации списка пакетов:</p>
 <ul>
 <li><p><span class="menu">Категория</span> - позволяет ограничить перечень определенной категорией, например "<i>Аудио</i>" или "<i>Игры</i>".</p></li>
-<li><p>The <span class="menu">Repositories</span> pop-up menu determines which online repos are queried or if only those packages are shown, that were installed from somewhere other than an online repo ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
 <li><p><span class="menu">Условия поиска</span> - фильтрует список, отображая лишь те пакеты, которые содержат введенные слова (разделенные пробелом) в названии и описании.</p></li>
+<li><p>The checkbox to <span class="menu">Show only featured packages</span> can be activated to further filter the results in the set category or of the entered search terms.</p></li>
+<li><p>The <span class="menu">Repositories</span> menu of the menu bar determines which repos are being queried. "<i>Local</i>" packages are the ones that were installed from somewhere other than an online repo; maybe from a USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -124,11 +126,12 @@
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Инструменты и отображение</a></h2>
-<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories. The other item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.</p>
-<p>В меню <span class="menu">Показывать</span> вы можете выбрать, отображать ли <span class="menu">Только популярные пакеты</span>. В случае отключения опции будут отображаться все доступные пакеты.<br />
-Более того, вы также можете настроить видимость <span class="menu">Пакетов для разработчиков</span> и <span class="menu">Пакетов с исходным кодом</span>  в общем списке. Для обычного пользователя они не представляют особого интереса и будут лишь загромождать список. Тем не менее, данные пакеты важны для людей, которые нуждаются в библиотеках, заголовочных файлах из пакета для разработки и компиляции приложений, зависящих от них.</p>
-<p>Более интересными являются другие две опции, показывающие <span class="menu">Доступные пакеты</span> и <span class="menu">Установленные пакеты</span>. Их предназначение очевидно.</p>
+<a id="menu" name="menu">Tools and Show menu</a></h2>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
+The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
+<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.</p>
+<p>Under <span class="menu">Show</span> you can choose to also display <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
+<p>Of more interest are the options to only show <span class="menu">Available packages</span> and <span class="menu">Installed packages</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Создание аккаунта пользователя</a></h2>

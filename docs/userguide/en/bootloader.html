@@ -59,14 +59,14 @@
 
 <h1>Boot Loader</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
-<p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
+<p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
+<p>To enter the Boot Loader Options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Boot Loader Options</a></h2>
 <p>Once it's there, you're offered four menus:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation/version to start.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation/state to start (see <a href="#troubleshooting">Troubleshooting</a> below).</td></tr>
 <tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
@@ -108,11 +108,11 @@
 		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
 		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session</p>
+		Displays the syslog from the previous Haiku session.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
@@ -123,12 +123,12 @@
 <p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
 <p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
 <li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
 <li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
 <p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
-So, if you encounter boot problems after installing some package, boot a Haiku version from before that time and uninstall the offending package.</p></li>
+So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +51,7 @@
 </ul>
 <span>
  «  <a href="mouse.html">マウス</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="printers.html">プリンター</a>  »
 </span></div>
 </div>
@@ -67,7 +67,7 @@
 </table>
 <p><br /></p>
 <p>ネットワークプレファレンス (Network preference) は、利用可能なすべてのネットワークデバイスとサービスを一箇所で設定するパネルです。左側はデバイスおよびサービスの折りたためるリストです。右側は選択された項目に対する情報または設定です。<br />
-下には、<span class="menu"><a href="../desktop-applets/networkstatus.html">ネットワーク状況 (Network status)</a> を Deskbar に表示 (Show Network status in Deskbar)</span> するためのチェックボックスがあります。. <span class="button">元に戻す (Revert) </span> は、パネルを起動した時に有効であった設定に戻します。
+下には、<span class="menu"><a href="../desktop-applets/networkstatus.html">ネットワーク状況 (Network status)</a> を Deskbar に表示 (Show Network status in Deskbar)</span> するためのチェックボックスがあります。<span class="button">元に戻す (Revert) </span> は、パネルを起動したときの設定に戻します。
 
 </p>
 
@@ -75,11 +75,11 @@
 <img src="../images/prefs-images/network-prefs-device.png" alt="network-prefs-device.png" />
 
 <p>ここでは、iprowifi4965 ドライバーを使用するワイヤレスデバイスを表示しています。接続のために、ポップアップメニューから WLAN を選択します。メニュー中の WLAN 名の後ろに、シグナル強度を示すアイコンがあるでしょう。<br />
-いったん WLAN が選択されたら、Haiku は起動毎に自動的に接続を試みます。<span class="menu">自動選択 (Choose automatically) </span> を選ぶと、回りで最も強度の高い WLAN と接続を試みます。
+一度 WLAN が選択されたら、Haiku は起動毎に自動的に接続を試みます。<span class="menu">自動選択 (Choose automatically) </span> を選ぶと、周囲で最も強度の高い WLAN と接続を試みます。
 </p>
-<p>保護されたネットワークに接続している場合は、パスワードと、接続に対して一度だけ許可するかまたは常に許可するかを求められるでしょう。後者を選んだ場合、パスワードは保存され、将来入力する手間を省きます。
+<p>保護されたネットワークに接続している場合は、パスワードと、接続に対して一度だけ許可するかまたは常に許可するかを求められるでしょう。後者を選んだ場合、パスワードは保存され、次回以降入力する手間を省きます。
 </p>
-<p>その下のボタンで、.デバイスの<span class="button">無効 (Disable)</span> 化、または接続の<span class="button">再ネゴシエート (Renegotiate)</span> を行えます。
+<p>その下のボタンで、デバイスの<span class="button">無効 (Disable)</span> 化、または接続の<span class="button">再ネゴシエート (Renegotiate)</span> を行えます。
 </p>
 
 <p>デバイスの真下に、利用可能なプロトコル、IPv4 と IPv6 のリストがあります。</p>
@@ -93,7 +93,7 @@
 <h3>DNS 設定 (DNS settings)</h3>
 <img src="../images/prefs-images/network-prefs-dns.png" alt="network-prefs-dns.png" />
 
-<p>DHCP を使用している場合は、DNS サーバーの IP アドレスとドメインはネットワーク (ルーターなど) から与えられます。ユーザーは、別の DNS サーバーを追加および削除でき。それらを右側のボタンを使ってリスト内で上下することで優先度を調整できます。<br />
+<p>DHCP を使用している場合は、DNS サーバーの IP アドレスとドメインはネットワーク (ルーターなど) から与えられます。ユーザーは、別の DNS サーバーを追加および削除でき。それらを右側のボタンを使ってリスト内で上下すれば優先度を調整できます。<br />
 <span class="button">適用 (Apply) </span> を押すと、新しい設定が有効になります。
 
 </p>
@@ -102,11 +102,11 @@
 
 <img src="../images/prefs-images/network-prefs-ftp.png" alt="network-prefs-ftp.png" />
 
-<p>Haiku はユーザーが<span class="button">有効 (Enable)</span> または <span class="button">無効 (Disable)</span> にできるサーバーを提供しています。 ウィンドウの右側に注意すべきその特定のサーバーに関する情報があります。FTP および Telnetサーバーは<b>セキュアでなく</b>、<b>暗号化されていません</b>。 デフォルトでは、それらは無効化されており、セキュリティリスクを承知している場合にだけ有効にするべきものです。</p>
+<p>Haiku はユーザーが<span class="button">有効 (Enable)</span> または <span class="button">無効 (Disable)</span> にできるサーバーを提供しています。ウィンドウの右側に注意すべきその特定のサーバーに関する情報があります。FTP および Telnetサーバーは<b>セキュアでなく</b>、<b>暗号化されていません</b>。 デフォルトでは、それらは無効化されており、セキュリティリスクを承知している場合にだけ有効にするべきものです。</p>
 
 <h2>設定ファイル</h2>
 
-<p>ネットワークの設定ファイルは、<span class="path">/system/settings/network/</span> フォルダー内にあります。通常、これらを気にする必要はありません。恐らく、状況がひどく悪化したあとで白紙の状態から始めるためにそれらを削除する以外は…</p>
+<p>ネットワークの設定ファイルは、<span class="path">/system/settings/network/</span> フォルダー内にあります。通常、これらを気にする必要はありません。おそらく、状況がひどく悪化したあとで白紙の状態から始めるためにそれらを削除する以外は…</p>
 <p>しかし、一つのファイルは、特にターミナルで作業する場合にはとても便利かもしれません。ホストファイル (<tt>hosts</tt> file) で特定の IP アドレスへの別名を定義できます。たとえば、</p>
 <pre>127.0.0.1			   		localhost	  #loopback
 192.168.178.3		 	NAS			     	#Synology
@@ -121,7 +121,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="mouse.html">マウス</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="printers.html">プリンター</a>  »
 </span></div>
 </div>

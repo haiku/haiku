@@ -10,10 +10,10 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Victor Widell
- *		Jimmy Olsson
  *		deejam
+ *		Victor Widell
  *		Humdinger
+ *		Jimmy Olsson
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -65,14 +65,14 @@
 
 <h1>Starthanteraren</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
+<p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
 <p>För att få fram valen i Boot Loader måste du tycka på, och fortsätta hålla ner tangenten <span class="key">SKIFT</span> innan Haikus startprocess. Om du har en boot manager installerad kan du börja hålla ner <span class="key">SKIFT</span> innan du väljer att starta Haiku. Om Haiku är det enda installerade operativsystemet på datorn kan du börja hålla ner tangenten när du fortfarande ser startmeddelanden från BIOS.  </p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Boot Loader Options</a></h2>
 <p>När den kommit fram erbjuds du fyra menyer:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation/version to start.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation/state to start (see <a href="#troubleshooting">Troubleshooting</a> below).</td></tr>
 <tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
@@ -114,11 +114,11 @@
 		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
 		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session</p>
+		Displays the syslog from the previous Haiku session.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
 		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
@@ -129,29 +129,29 @@
 <p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
 <p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
 <li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
 <li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
 <p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
-So, if you encounter boot problems after installing some package, boot a Haiku version from before that time and uninstall the offending package.</p></li>
+So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="booting" name="booting">Booting Haiku</a></h2>
-<p>Efter att du aktiverat ett eller flera val återvänder du till huvudmenyn och fortsätter med startprocessen som visar dig denna skärm:</p>
+<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>Om allt är OK tänds symbolerna snabbt, en efter en.<br />
-De olika symbolerna motsvarar ungefärligt dessa i steg startsprocessen:</p>
+<p>If everything works OK, one symbol after another quickly lights up.<br />
+The different symbols roughly correspond to these boot stages:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initierar moduler.</td></tr>
-	<tr><td><b>Hårddisk + förstoringsglas</b></td><td> </td><td>Skapar rootfs (<span class="path">/</span>) och monterar devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Kretskort</b></td><td> </td><td>Initierar enhetshanteraren.</td></tr>
-	<tr><td><b>Startdisk</b></td><td> </td><td>Monterar startdisk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Laddar CPU-specifika moduler.</td></tr>
-	<tr><td><b>Mapp</b></td><td> </td><td>Slutgiltig initiering av delsystem.</td></tr>
-	<tr><td><b>Raket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
+	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
+	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
+	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
+	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
 </table>
 
 </div>

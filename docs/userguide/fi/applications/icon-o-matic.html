@@ -10,8 +10,8 @@
  * Authors:
  *              Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
  *		Humdinger
+ *		Jorma Karvonen
  *
 -->
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -87,7 +87,7 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bitmap-vector" name="bitmap-vector">BeOS-bittikartta vs. Haikun-vektorikuvakkeet</a></h2>
-<p>Päinvastoin kuin BeOS, Haiku käyttää vektorikuvakkeita bittikarttakuvakkeiden sijasta. Kehitettiin erityinen Haiku-vektorikuvakemuoto (HVIF), joka on hyvin optimoitu pieneen tiedostokokoon ja nopeaan renderointiin. Tästä syystä kuvakkeemme ovat enimmäkseen <i>paljon</i> pienempiä kuin bittikartat tai laajalti käytetty SVG-muoto. Myös toisin kuin BeOS:n bittikarttakuvakkeissa, Haiku ei ole rajoittunut 8-bittiseen palettiin (256 väriä).<br />
+<p>Päinvastoin kuin BeOS, Haiku käyttää vektorikuvakkeita bittikarttakuvakkeiden sijasta. Haikua varten kehitettiin erityinen Haiku-vektorikuvakemuoto (HVIF), joka on hyvin optimoitu pieneen tiedostokokoon ja nopeaan renderointiin. Tästä syystä kuvakkeemme ovat enimmäkseen <i>paljon</i> pienempiä kuin bittikartat tai laajalti käytetty SVG-muoto. Myös toisin kuin BeOS:n bittikarttakuvakkeissa, Haiku ei ole rajoittunut 8-bittiseen palettiin (256 väriä).<br />
 Ota esimerkiksi tämä Pääteikkunakuvake:</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td><b>Bittikartta</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
@@ -121,12 +121,12 @@ Ota esimerkiksi tämä Pääteikkunakuvake:</p>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m" name="i-o-m">Kuvakkeiden luominen Kuvakemaatilla</a></h2>
 <p>Kuvakemaatti on Haikun kuvake-editori, joka voi tallentaa työsi HVIF-, SVG- tai PNG-tiedostona. Kuvake voidaan myös suoraan liittää olemassa olevan tiedoston attribuutiksi tai viedä kehittäjien käyttämäksi resurssiksi tai lähdetiedostoksi. Koska sovellus räätälöitiin optimoituun HVIF-muotoon, sen käyttö heijastaa tämän muodon sisäistä toimintaa.</p>
-<p>Toisin kun tavalliset vektorigrafiikkaohjelmistot, et jaa erillisiä objekteja, joista jokainen sisällyttää kaikki tietyt ominaisuutensa, kuten polku, viivaleveys, viiva ja täyttöväri, jne. Pikemminkin asennat objekti("hahmosi") jaetuista poluista ja väreistä ("tyylit") ja asetat tiettyjä ominaisuuksia. Tämä elementtien uudelleenkäyttö on yksi HVIF-muodon tehokkuuden salaisuuksista. Vaikka se määrää joitakin rajoituksia kuvakesuunnittelijalle, siitä on myös muutamia etuja.<br />Esimerkiksi polkua uudelleenkäytettäessä useita objekteja voidaan muokata yhdessä manipuloimalla tätä yhtä polkua. Ajattele objektia ja sen varjoa. Niiden jaetun polkun muokkaaminen muuttaa itse objektia ja automaattisesti sen (ehkä hiukan vääristynyttä/kääntynyttä) varjoa.</p>
+<p>Toisin kun tavalliset vektorigrafiikkaohjelmistot, et jaa erillisiä objekteja, joista jokainen sisällyttää kaikki tietyt ominaisuutensa, kuten polku, viivaleveys, viiva ja täyttöväri, jne. Pikemminkin asennat objektit ("hahmot") jaetuista poluista ja värit ("tyylit") sekä asetat tiettyjä ominaisuuksia. Tämä elementtien uudelleenkäyttö on yksi HVIF-muodon tehokkuuden salaisuuksista. Vaikka se määrää joitakin rajoituksia kuvakesuunnittelijalle, siitä on myös muutamia etuja.<br />Esimerkiksi polkua uudelleenkäytettäessä useita objekteja voidaan muokata yhdessä manipuloimalla tätä yhtä polkua. Ajattele objektia ja sen varjoa. Niiden jaetun polun muokkaaminen muuttaa itse objektia ja automaattisesti sen (ehkä hiukan vääristynyttä/kääntynyttä) varjoa.</p>
 
 <p>Tässä on Kuvakemaatti-ikkunan pikayleiskuva:</p>
 <img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
-<p>Tarvitset kaikkien näkyvien objektien luominen kankaalle hahmoa polulla ja tyylillä. Kätevästi voit luoda yhden, kaksi tai kaikki kolme yhdessä <span class="menu">Hahmo</span>-valikosta. Jokaisella objektityyppillä (polut, hahmot, tiedostomuuntimet, ja tyylit) on valikko sen elementtiluettelon yläpuolella tarjoten eri komentoja. Jokaisella elementillä on tiettyjä valitsimia, jotka asetetaan <span class="menu">Ominaisuudet</span>-näkymässä.</p>
+<p>Jotta voit luoda näkyvän objektin piirtoalueelle, tarvitset hahmon polulla ja tyylillä. Voit luoda kätevästi yhden, kaksi tai kaikki kolme yhdessä <span class="menu">Hahmo</span>-valikosta. Jokaisella objektityyppillä (polut, hahmot, tiedostomuuntimet ja tyylit) on sen elementtiluettelon yläpuolella valikko, joka tarjoaa eri komentoja. Jokaisella elementillä on tiettyjä valitsimia, jotka asetetaan <span class="menu">Ominaisuudet</span>-näkymässä.</p>
 
 
 <h3>
@@ -134,7 +134,7 @@ Ota esimerkiksi tämä Pääteikkunakuvake:</p>
 <a id="i-o-m-path" name="i-o-m-path">Polku</a></h3>
 <p>Polku koostuu useista pisteistä, jotka yhdistetään viivoilla tai Bezier-kaarilla. Pisteiden lisäämiseksi tai muuttamiseksi varmista, että polku on valittu polkuluettelossa.</p>
 
-<p>Kankaan napsauttaminen asettaa yksinkertaisesti ensimmäisen pisteen. Pisteitä asetettaessa päätät, jos tuloksena oleva viiva on suora tai kaareva: yksinkertainen napsautus ja vapautus tuottaa suoran viivan, hiiren painikkeen pitäminen alhaalla ja hiiren siirtäminen raahaa Bezier-kaaren kahvan. Tietysti voit myös muuttaa sen kaiken myöhemmin.</p>
+<p>Piirtoalueen napsauttaminen asettaa yksinkertaisesti ensimmäisen pisteen. Pisteitä asetettaessa päätät, jos tuloksena oleva viiva on suora tai kaareva: yksinkertainen napsautus ja vapautus tuottaa suoran viivan, hiiren painikkeen pitäminen alhaalla ja hiiren siirtäminen raahaa Bezier-kaaren kahvan. Tietysti voit myös muuttaa sen kaiken myöhemmin.</p>
 
 <img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
 
@@ -154,7 +154,7 @@ Ota esimerkiksi tämä Pääteikkunakuvake:</p>
         </tr>
         <tr align="center">
                 <td>Siirrä pisteet</td>
-                <td>Lisäpiste</td>
+                <td>Lisää piste (kahden pisteen väliin)</td>
                 <td>Lisää piste</td>
                 <td>Poista piste<br /><span class="key">CTRL</span></td>
                 <td>Kulma↔Bezier<br /><span class="key">ALT</span></td>
@@ -165,7 +165,7 @@ Ota esimerkiksi tämä Pääteikkunakuvake:</p>
 <table summary="Path context" border="0" cellspacing="0" cellpadding="2">
 <tr><td class="onelinetop"><span class="menu">Valitse kaikki</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Valitsee nykyisen polun kaikki pisteet.</td></tr>
 <tr><td><span class="menu">Muunna</span></td><td><span class="key">T</span></td><td>Laittaa kaikki valitut pisteet muunnosikkunaan, joten voit siirtää, muuttaa niiden kokoa ja pyörittää niitä ympäri yhdessä. Se toimii aivan samoin kuin muodoilla, kuten kuvataan myöhemmin tässä asikirjassa.</td></tr>
-<tr><td><span class="menu">Jaa kahtia</span></td><td></td><td>Jakka valitut pisteet kahtia, toinen sijaiten toisen päällä.</td></tr>
+<tr><td><span class="menu">Jaa kahtia</span></td><td></td><td>Jakaa valitut pisteet kahtia, toinen sijaiten toisen päällä.</td></tr>
 <tr><td><span class="menu">Käännä ylösalaisin</span></td><td></td><td>Pyörittää valittuja pisteitä 180°. Tällä on vaikutusta vain Bezier-pisteisiin.</td></tr>
 <tr><td><span class="menu">Poista</span></td><td><span class="key">DEL</span></td><td>Poistaa valitut pisteet.</td></tr>
 </table>
@@ -174,21 +174,21 @@ Ota esimerkiksi tämä Pääteikkunakuvake:</p>
 <p>Valikko <span class="menu">Polku</span> tarjoaa muutamia ilmeisiä rivejä <span class="menu">Lisää nelikulmio</span> and <span class="menu">Lisää ympyrä</span> tai polulle <span class="menu">Tee kaksoiskappale</span> tai <span class="menu">Poista</span>. Tässä on muutamia, jotka vaatinevat lisäselitystä:</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Käännä päinvastaiseksi</span></td><td style="width:15px;"></td><td>Jos polkusi ei ole "suljettu" (katso Polkuominaisuuksia alla), napsautus canvas-komponenttiin luo aina uuden pisteen, joka yhdistyy edelliseen. "Käännä päinvastaiseksi" muuttaa tämän järjestyksen ja uusi piste yhdistetään sen sijaan alkuperäiseen aloituspisteeseen.</td></tr>
+<tr><td><span class="menu">Käännä päinvastaiseksi</span></td><td style="width:15px;"></td><td>Jos polkusi ei ole "suljettu" (katso Polkuominaisuuksia alla), napsautus piirtoalueelle luo aina uuden pisteen, joka yhdistyy edelliseen. "Käännä päinvastaiseksi" muuttaa tämän järjestyksen ja uusi piste yhdistetään sen sijaan alkuperäiseen aloituspisteeseen.</td></tr>
 <tr><td><span class="menu">Siivoa</span></td><td></td><td>Kaikkein hyödyllisin tuoduille SVG-tiedostoille, tämä toiminto poistaa kaksoiskappalepisteet.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Pyöritä indeksejä oikealle</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Käytännössä tämä pyörittää polun avausta. Se nähdään parhaiten, kun käytetään ei-suljettua tyylillä varustettua polkua ja hahmoa viivamuuntimella. Nyt, jos polku näyttää kuten ⊂ se pyörii kuin tämä: ⊂ ∩ ⊃ ∪.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Pyöritä indeksejä oikealle</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Käytännössä tämä pyörittää polun avausta. Se nähdään parhaiten, kun käytetään ei-suljetulla tyylillä varustettua polkua ja hahmoa viivamuuntimella. Nyt, jos polku näyttää kuin ⊂ se pyörii kuin tämä: ⊂ ∩ ⊃ ∪.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Pyöritä indeksejä vasemmalle</span></td><td><span class="key">ALT</span> <span class="key">VAIHTO</span> <span class="key">R</span></td><td>Tekee saman toiseen suuntaan.</td></tr>
 </table>
 
 <h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Polkuominaisuudet</a></h4>
-<p><span class="menu">Ominaisuudet</span> ikkunan vasemmassa alakulmassa tarjoaa kaikki käytettävissä olevat nykyisin valitun objektin asetukset. Polulla on vain kaksi: a <span class="menu">Nimi</span> ja onko se <span class="menu">Suljettu</span> vai ei.</p>
+<p><span class="menu">Ominaisuudet</span>-valikko ikkunan vasemmassa alakulmassa tarjoaa kaikki käytettävissä olevat nykyisin valitun objektin asetukset. Polulla on vain kaksi objektia: a <span class="menu">Nimi</span> ja onko se <span class="menu">Suljettu</span> vai ei.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-shape" name="i-o-m-shape">Hahmo</a></h3>
-<p>Hahmo ryhmittää yhteen yhden tai useampia polkuja, joilla on tyyli. Käytännössä se on objekti, jonka todellisuudessa näkee canvas-komponentissa. Ryhmitys tehdään valintaruuduilla polkujen ja tyylien edessä: valitse vain hahmosi ja rasti halutut polut ja tyyli.</p>
-<p>Hahmo määrittää, kuinka polku ja tyyli toteutetaan, esimerkiksi sen, että onko objekti täytetty vai vain raidoitettu (mikä tehdään käyttämällä muunninta hahmossa, tulemme siihen myöhemmin). Myös hahmoa voidaan siirtää, pyörittää ja sen kokoa voidaan muuttaa koskettamatta käytettyä polkua. Tällä tavalla voit käyttää uudelleen yksittäistä polkua ja saada erilaisen, mutta sukua olevat muodot.</p>
+<p>Hahmo ryhmittää yhteen yhden tai useampia polkuja, joilla on tyyli. Käytännössä se on objekti, jonka todellisuudessa näkee piirtoalueella. Ryhmitys tehdään valintaruuduilla polkujen ja tyylien edessä: valitse vain hahmosi ja rasti halutut polut ja tyyli.</p>
+<p>Hahmo määrittää, kuinka polku ja tyyli toteutetaan, esimerkiksi sen, että onko objekti täytetty vai vain raidoitettu (mikä tehdään käyttämällä muunninta hahmossa, tulemme siihen myöhemmin). Myös hahmoa voidaan siirtää, pyörittää ja sen kokoa voidaan muuttaa koskettamatta käytettyä polkua. Tällä tavalla voit käyttää uudelleen yksittäistä polkua ja saada erilaiset, mutta sukua olevat muodot.</p>
 
 <img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
 
@@ -234,10 +234,10 @@ Jos näin ei ole, "Jäädytä muunnos" soveltaa nykyistä hahmomuunnosta liitett
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_32.png" alt="i-o-m-lod-icon_32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-lod-icon_64.png" alt="i-o-m-lod-icon_64" width="64" height="64" /></td></tr>
 </table>
-<p>Katso, onko BeVexed-kuvakkeen 16 pikseliversiossa numeroita? Se tehdään niiden hahmojen "Yksityiskohtataso"-asetuksella.<br />
+<p>Katso, onko BeVexed-kuvakkeen 16 pikselin versiossa numeroita? Se tehdään niiden hahmojen "Yksityiskohtataso"-asetuksella.<br />
 LOD-asetuksella ohjaat hahmon näkyvyyttä sen koosta riippuen. Sillä tavalla voit jättää pois kuvakkeesta yksityiskohdat, jotka näyttävät hyvältä isommassa kuvakkeessa, mutta eivät niin paljoa pienemmässä versiossa.</p>
 <p>Näin se toimii: 1.0 LOD on määritelty 64 pikselin kuvakekoko. Jotta saataisiin tietty LOD-kuvakekoko, se on yksinkertaisesti jaettava 64:lla, esimerkiksi 16 pikselin kuvakkeella on 16/64 LOD = 0.25. Hahmo ei ole näkyvä sen <span class="menu">Minimi LOD</span>-arvon alla ja sen <span class="menu">Maksimi LOD</span>-arvon yläpuolella.</p>
-<p>Joten, jos asetat hahmon <span class="menu">Minimi LOD</span>-arvoksi 0.0 ja <span class="menu">Maksimi LOD</span>-arvoksi 0.5, tämä tarkoittaa, että hahmo on näkyvä ainoastaan kuvakekkoina, jotka ovat pienempiä tai <i>yhtäsuuria</i> kuin 32 pikseliä. Jos haluat sulkea pois 32 pikselin kuvakekoon, sinun on jäätävä arvon 0.5 alapuolelle, sanotaan vaikka 0.49.</p>
+<p>Joten, jos asetat hahmon <span class="menu">Minimi LOD</span>-arvoksi 0.0 ja <span class="menu">Maksimi LOD</span>-arvoksi 0.5, tämä tarkoittaa, että hahmo on näkyvä ainoastaan kuvakekokoina, jotka ovat pienempiä tai <i>yhtäsuuria</i> kuin 32 pikseliä. Jos haluat sulkea pois 32 pikselin kuvakekoon, sinun on jäätävä arvon 0.5 alapuolelle, sanotaan vaikka 0.49.</p>
 <p>LOD ei ole vain hahmon yksityiskohtien jättämistä varten, mutta myös esim.: piirrosviivan leveyden vaihtamiseksi erikokoiseksi, jos sinusta tuntuu, että sitä tarvitaan. Kopioi hahmosta kaksoiskappale ja tee muutoksesi sekä aseta sen molemmat LOD-asetukset näyttämään joko yhtä tai toista. Tässä on yksi hämmennyksen lähde, kun vahingossa kirjoitat hahmon LOD-arvojen päälle, ja ihmettelet, että miksei jotkut kokoarvot ole näkyvissä...<br />
 Esimerkiksi, jos Hahmo 1 näytettiin alle 48 pikselin kokoisena ja Hahmo 2 arvosta 48 pikseliä ylöspäin (LOD: 48/64 = 0.75):</p>
 
@@ -259,7 +259,7 @@ Paitsi ennakolta määriteltyjä värejä <span class="menu">Palaset</span>-vali
 <img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
 <p>Luot uuden tyylin nopeasti sekoittamalla värisi ja yksinkertaisesti raahaamalla ja pudottamalla sen tyylien luetteloon.</p>
 <p>Jos siirryt liukuväriin, aseta tyypiksi (<span class="menu">Lineaarinen</span>, <span class="menu">Säteettäinen</span>, <span class="menu">Vinoneliö</span>, <span class="menu">Kartio</span>) ja määrittele sitten alku- ja loppuvärit. Tämä tehdään raahaamalla ja pudottamalla värisanko vastaavaan väri-indikaattoriin liukuvärin alla.<br />
-Voit tietysti siirtää nämä indikaattorit vaihtamaan liukuväriä halusi mukaan. Voit myös lisätä lisää värejä kaksoisnapsauttamalla liukuväriin. Painikkeen <span class="key">DEL</span> painaminen poistaa valitun indikaattorin.</p>
+Voit tietysti siirtää nämä indikaattorit vaihtamaan liukuväriä halusi mukaan. Voit myös lisätä lisää värejä kaksoisnapsauttamalla liukuväriin. Näppäimen <span class="key">DEL</span> painaminen poistaa valitun indikaattorin.</p>
 <p>Voit siirtää, muuttaa kokoa ja kääntää liukuvärin esittelyikkunaa piirtoalueella kunnes se sopii tarkoituksiisi. Tämä toimii kuten hahmoilla.</p>
 
 <h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Tyylivalikko</a></h4>
@@ -272,7 +272,7 @@ Voit tietysti siirtää nämä indikaattorit vaihtamaan liukuväriä halusi muka
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-transformer" name="i-o-m-transformer">Muunnin</a></h3>
-<p>Hahmolla voi olla Muuntimia, jotka vaihtavat sen ulkoasun. Tehosteet ovat kuitenkin hienovaraisempia kuin kuorma-auton muuntuminen taistelurobotiksi...</p>
+<p>Hahmolla voi olla muuntimia, jotka vaihtavat sen ulkoasun. Tehosteet ovat kuitenkin hienovaraisempia kuin kuorma-auton muuntuminen taistelurobotiksi...</p>
 
 <h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Muuntimen Lisää-valikko</a></h4>
 <table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
@@ -304,8 +304,8 @@ Voit tietysti siirtää nämä indikaattorit vaihtamaan liukuväriä halusi muka
 <tr><td>HVIF RDef</td><td></td><td>Tallentaa ohjelmoijien käyttämänä resurssina</td></tr>
 <tr><td>HVIF-lähdekoodi</td><td></td><td>Tallentaa ohjelmoijien käyttämänä lähdekoodina</td></tr>
 <tr><td>SVG</td><td></td><td>Tallentaa SVG-tiedostona</td></tr>
-<tr><td>PNG</td><td></td><td>Tallentaa 64px -kokoisena PNG-tiedostona</td></tr>
-<tr><td>PNG set</td><td></td><td>Tallentaa 16-, 32- ja 64px -kokoisina PNG-tiedostoina</td></tr>
+<tr><td>PNG</td><td></td><td>Tallentaa 64 pikselin kokoisena PNG-tiedostona</td></tr>
+<tr><td>PNG set</td><td></td><td>Tallentaa 16, 32 ja 64 pikselin kokoisina PNG-tiedostoina</td></tr>
 <tr><td>BEOS:ICON-attribuutti</td><td></td><td>Valitse tiedosto ja aseta kuvakeattribuutti suoraan</td></tr>
 <tr><td>META:ICON-attribuutti</td><td></td><td>Valitse tiedosto ja liitä kuvake pelkkänä meta-tietona</td></tr>
 </table>
@@ -314,15 +314,15 @@ Voit tietysti siirtää nämä indikaattorit vaihtamaan liukuväriä halusi muka
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="i-o-m-tips" name="i-o-m-tips">Vihjeet ja niksit</a></h3>
-<p>Muutamia asioita tulisi pitää mielessä, kun työskennellään Kuvakemaatilla ja joitakin yleisiä vihjeitä sen käytöstä:</p>
+<p>Muutamia asioita, jotka tulisi pitää mielessä, kun työskennellään Kuvakemaatilla ja joitakin yleisiä vihjeitä sen käytöstä:</p>
 <ul>
-<li><p>Lue <a href="https://www.haiku-os.org/development/icon-guidelines">Kuvakeohjeet</a> oppiaksesi Haiku-kuvakkeiden tärkeät ominaisuudet, esim.: perspektiivi, värit ja varjot.</p></li>
+<li><p>Lue <a href="https://www.haiku-os.org/development/icon-guidelines">Kuvakeohjeet</a> oppiaksesi Haiku-kuvakkeiden tärkeät ominaisuudet, esim.: perspektiivi, varjot ja <a href="https://www.haiku-os.org/files/downloads/2007-03-20_haiku-color-palette.png">Haiku-väripaletti</a>.</p></li>
 <li><p>Polkujen käyttöä tulisia aina yrittää minimoida, koska ne ovat kalliimpia tiedoston koon kannalta.  Yritä käyttää polkuja uudelleen aina kun mahdollista ja työskentele sen sijaan manipuloitujen hahmojen ja niiden muunnosten kanssa. Liukuvärien älykäs käyttö voi myös säästää tilaa.</p></li>
 <li><p>Pitäisi milloin vain mahdollista aktivoida Kiinnitä-rasteriin <span class="menu">Valitsimet</span>-valikosta kun muokataan polkuja. Polkupisteet, jotka tasaavat 64x64 pikselin rasterikäyttöön käyttävät vähemmän tallennustila. Saat myös teräväpiirteisemmän näkymän, jos pisteet on asetettu tarkalleen pikselirajoille. Esimerkiksi, on tärkeää tasata silmiinpistävimmät ääriviivat 16x16-rasteriin.</p></li>
 <li><p>Tarkista esikatselu nähdäksesi, näyttääkö kuvake yhä hyvältä 16x16-koossa. Haluat ehkä käyttää Hahmo-kappaleessa kuvailtuja <a href="#i-o-m-shape-lod">Yksityiskohtataso</a>-asetuksia.</p></li>
-<li><p>Kirjainten tuottamien on helppoa, vaikka Kuvakemaatti ei tarjoa sellaista työkalua. Kirjoita vain teksti sellaisessa tekstieditorissa kuin StyleEdit, säädä kirjasintyyppi ja -tyyli sekä raahaa ja pudota tai kopioi-liitä valittu teksti Kuvakemaattiin. Tämä luo vastaavat polut ja hahmot.</p></li>
+<li><p>Kirjainten tuottamien on helppoa, vaikka Kuvakemaatti ei tarjoa sellaista työkalua. Kirjoita vain teksti sellaisessa tekstieditorissa kuin Tyylitelty editori, säädä kirjasintyyppi ja -tyyli sekä raahaa ja pudota tai kopioi-liitä valittu teksti Kuvakemaattiin. Tämä luo vastaavat polut ja hahmot.</p></li>
 <li><p>Jos liität useamman kuin yhden polun hahmoon, päällekkäiset alueet peruvat toisensa. Kun yksi polku on kokonaan toisen sisällä, se luo käytännössä reiän tuloksena olevaan hahmoon.</p></li>
-<li><p>Voit lähentää ja loitontaa piirrosaluetta hiiren rullalla. Vieritys tehdään joko napsauttamalla ja raahaamalla hiiren keskimmäisellä painikkeella tai normaalilla napsauta hiiren vasemmalla painikkeella ja raahaa samalla kun <span class="key">VÄLI</span>-painiketta pidetään alhaalla.</p></li>
+<li><p>Voit lähentää ja loitontaa piirrosaluetta hiiren rullalla. Vieritys tehdään joko napsauttamalla ja raahaamalla hiiren keskimmäisellä painikkeella tai normaalilla napsauta hiiren ykköspainikkeella ja raahaa samalla kun <span class="key">VÄLI</span>-painiketta pidetään alhaalla.</p></li>
 </ul>
 
 

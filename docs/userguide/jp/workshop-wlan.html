@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		mt
  *		Humdinger
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -62,7 +62,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#firmware">サポートされているハードウェアを動くようにする</a><br />
 	<a href="#gui">ワイヤレスネットワークに接続する</a><br />
@@ -73,19 +73,19 @@
 
 <h1>ワークショップ: ワイヤレスネットワーク</h1>
 
-<p>ネットワークを動作させるようにすることは、今日のインターネット常時接続への要求において必要不可欠なことです。小さなプロジェクトにとって、すべてのさまざまな、絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku はネットワークドライバーを <a href="http://www.freebsd.org">FreeBSD</a>  互換レイヤーに依存しています。<br />
-これは、大量のハードウェアのサポートを保証します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルの<a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">リスト</a>をオンラインで参照するか、<a href="http://www.freebsd.org/releases/9.3R/hardware.html#wlan">FreeBSD 9.3 リリースのハードウェアノート</a>をチェックしてください。</p>
+<p>ネットワークを動作させることは、インターネット常時接続に対する今日の要求で必要不可欠なことです。小さなプロジェクトにとって、さまざまな、絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku はネットワークドライバーを <a href="http://www.freebsd.org">FreeBSD</a>  互換レイヤーに依存しています。<br />
+これは、大量のハードウェアのサポートを保証します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルの<a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">リスト</a>をオンラインで参照するか、<a href="http://www.freebsd.org/releases/11.1R/hardware.html#wlan">FreeBSD 11.1 リリースのハードウェアノート</a>をチェックしてください。</p>
 <div class="box-info">現在のところ、PCI、PCI-X、PCI-Express、Mini PCI、および Mini PCI-Express デバイスのみサポートされているはずです。<br />PCMCIA、CardBus、ExpressCard、USB、および ISA デバイスは動作するようになるのにまだ作業が必要です。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="firmware" name="firmware">サポートされているハードウェアを動くようにする</a></h2>
-<p>一般にサポートされたハードウェアの最初のハードルを超えたとしても、いくつかのワイヤレスネットワークカードは正しく動作させるためにバイナリのファームウェアを必要とします。ライセンス問題のため、Haiku はいくつかのプロエタリなファームウェアを同梱できません。しかし、Haiku には、ユーザーのために必要なプロエタリバイナリをすべて取得してインストールする簡単なスクリプトが入っています。一般に、ワイヤレスネットワークを使おうとするなら、このスクリプトを動かして、システムが必要とするときに、これらすべてのファームウェアを利用可能な状態にするのは良い考えです。</p>
+<p>一般にサポートされたハードウェアの最初のハードルを超えたとしても、いくつかのワイヤレスネットワークカードは正しく動作させるためにバイナリのファームウェアを必要とします。ライセンス問題のため、Haiku はいくつかのプロエタリなファームウェアを同梱できません。しかし、Haiku には、ユーザーのために必要なプロエタリバイナリをすべて取得してインストールする簡単なスクリプトが入っています。一般に、ワイヤレスネットワークを使おうとするなら、このスクリプトを動かして、システムが必要とするときに、これらすべてのファームウェアを利用可能な状態にすることは良い考えです。</p>
 <p>ターミナルを立ち上げて、次のように入力します。</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
 
-<p>Haiku でこれら不足するファームウェアをダウンロードするためのインターネットアクセスが無い場合、オフラインで行う方法があります。以下の <a href="#tips">tips</a> を見てください。</p>
+<p>これらの不足するファームウェアをダウンロードするためのインターネットアクセスが Haiku に無い場合、オフラインで行う方法があります。以下の <a href="#tips">tips</a> を見てください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -102,7 +102,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="commandline" name="commandline">コマンドラインから接続する</a></h2>
-<p>コマンドラインを使うのを好むか、スクリプトを使いたいか、または <span class="path">~/config/settings/boot/UserBootscriptt</span> で起動時に特定のネットワークへの接続を自動化したいなら、<tt>ifconfig</tt> コマンドがあります。</p>
+<p>コマンドラインを使うのを好むか、スクリプトを使いたいか、または <span class="path">~/config/settings/boot/UserBootscriptt</span> で起動時に特定のネットワークへの接続を自動化するなら、<tt>ifconfig</tt> コマンドがあります。</p>
 <p>ターミナルを起動して、以下の最初の行を入力して利用できるワイヤレスネットワークを検索します。</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
 name                             address              signal  auth
@@ -123,7 +123,7 @@ Windows ユーザーは、Windows 用の <a href="http://gnuwin32.sourceforge.ne
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>ライセンスを見なおして承認後、利用できるファームウェアファイルをすべてインストールします。</p>
 <h3>接続の切断を避ける</h3>
-<p>iprowifi4965 のようないくつかのワイヤレスネットワークチップセット用の Haiku ドライバーは、WPA 暗号化を使用している時に接続が失われがちです。もし、その影響を受けているなら、ネットワークに接続する前に、"HT モード" (802.11n の高スループットモード) を無効にしてみてください。
+<p>iprowifi4965 のようないくつかのワイヤレスネットワークチップセット用の Haiku ドライバーは、WPA 暗号化を使用している時に接続が失われがちです。その影響を受けているなら、ネットワークに接続する前に、"HT モード" (802.11n の高スループットモード) を無効にしてみてください。
 </p>
 <pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
 <p>それで問題が解決するなら、毎起動時に自動的に適用されるよう、<span class="path">~/config/settings/boot/UserBootscript</span> にその行を記載してください。</p>

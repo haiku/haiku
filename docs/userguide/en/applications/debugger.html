@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2017, Haiku. All rights reserved.
+ * Copyright 2015-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,7 +65,7 @@
 <span class="path">~/config/settings/Debugger/</span></td></tr>
 </table>
 <p><br /></p>
-<p>The Debugger is an application the common user hasn't much use for. It's targeted at developers to investigate bugs in programs. Sometimes those bugs result in crashes and that is when even end users come into contact with the Debugger. When a program crashes, you're confronted with this alert:</p>
+<p>The Debugger is an application the common user hasn't much use for. It's targeted at developers to investigate bugs in programs. Sometimes those bugs result in crashes and that is when even end users come into contact with the Debugger. When a program crashes, you're confronted with this alert :</p>
 <img src="../images/apps-images/debugger_alert.png" alt="debugger_alert.png" />
 <p>It offers four options to react to the crash:</p>
 <ul>
@@ -75,6 +75,27 @@
 <li><p><span class="button">Save report</span> creates a debug report which is saved as a text file on the Desktop and can be emailed to the developer of the crashed app or attached to a ticket at its bugtracker, if available.<br />
 The debug report contains information on your hardware (type of CPU and used memory etc.), the exact version of Haiku and all available information on the state of the system that could be relevant to the crash.</p></li>
 </ul>
+<p>The default action when a crash happens can be configured with a text file <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
+The file takes on a driver_settings style format as follows:</p>
+<pre>default_action user
+
+executable_actions {
+	app1 log
+	/path/app2* debug
+}</pre>
+<p>Valid values for a default_action are:</p>
+<table summary="action values" border="0" cellspacing="0" cellpadding="2">
+<tr><td>user</td><td style="width:30px"></td><td>Prompt the user for action.</td></tr>
+<tr><td>kill</td><td></td><td>Silently terminate the crashing team.</td></tr>
+<tr><td>debug</td><td></td><td>Attach the debugger to the crashing team.</td></tr>
+<tr><td>log / report</td><td></td><td>Save a crash report and terminate the team.</td></tr>
+<tr><td>core</td><td></td><td>Save a (possibly very large) core file and terminate the team.</td></tr>
+</table>
+<p>If no default_action is specified, "user" is assumed.</p>
+<p>The executable_actions subsection contains individual overrides of the default. These take the form above, where the individual lines can be only a team name, or a path, with wildcards.</p>
+<p><br /></p>
+<hr />
+<p><br /></p>
 <p>Describing the usage of the actual Debugger is out of scope for this guide that is addressing the needs of the common user of Haiku. For completeness sake, here's the window that'll come up if you choose the <span class="button">Debug</span> option in the above alert:</p>
 <img src="../images/apps-images/debugger.png" alt="debugger.png" />
 <p>As you'll quickly see when you start poking around a bit, the Debugger is one of the most complex and sophisticated applications for Haiku. If you're a developer and are used to graphical debuggers on other platforms, many features will be familiar to you.</p>
@@ -83,7 +104,6 @@ The debug report contains information on your hardware (type of CPU and used mem
 <tr><td class="onelinetop"><a href="https://www.dropbox.com/s/e6gx39r0asc2t8f/DebuggerReferenceManual.pdf?dl=1">Debugger Reference Manual</a></td><td></td><td>This is the most in-depth source on how to work with the Debugger.</td></tr>
 <tr><td><a href="https://www.haiku-os.org/blog/anevilyak/">Blogposts</a></td><td> </td><td>There are a few articles on the Debugger, mostly by Rene Gollent after implementing a new feature.</td></tr>
 <tr><td class="onelinetop"><a href="https://www.youtube.com/watch?v=n-NDFwtmQcI&amp;list=PL2KiE-VO9zk-9XPmfusEDaOFd_7AiVKzz">BeGeistert 026 video</a></td><td> </td><td>A video from the BeGeistert meeting in 2012, in which Ingo Weinhold demonstrates the state of the Debugger back then and shows other interesting tools like the profiler to hunt down bottlenecks.</td></tr>
-<tr><td class="onelinetop"><a href="http://cgit.haiku-os.org/haiku/commit/?id=hrev46547">Default action when crashing</a></td><td> </td><td>This commit message describes how to change the behavior when something crashes. For example, you can have the system always save a crash report instead of asking the user by showing the usual crash alert. You can limit that behavior to specific applications.</td></tr>
 </table>
 
 </div>

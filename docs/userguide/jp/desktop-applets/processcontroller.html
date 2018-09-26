@@ -11,8 +11,8 @@
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		pooper
  *		mt
+ *		pooper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -52,8 +52,8 @@
 </ul>
 <span>
  «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="../desktop-applets.html" class="uplink">デスクトップアプレット</a> 
+::  <a href="workspaces.html">ワークスペース</a>  »
 </span></div>
 </div>
 
@@ -67,19 +67,19 @@
 <tr><td>設定ファイル:</td><td></td><td><i>無し</i></td></tr>
 </table>
 
-<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />プロセスコントローラー (ProcessController) は CPU と物理メモリの使用率の表示を主な目的としています。プロセスコントローラーにより、個々のチームの観察、優先度の変更、およびそれらがフリーズした場合に強制終了できます。マルチプロセッサ環境では、プロセスコントローラーによって個々の CPU を有効 / 無効にできます。Tracker と Deskbar がクラッシュしたとき、プロセスコントローラーのメニューから再起動できます。</p>
-<p>左側のインジケーターはそれぞれの CPU の使用率を表して右側のインジケーターはメモリ使用量を表します。インジケーターの数はシステムのプロセッサ / コア数に依存することを覚えておいてください。</p>
+<p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />プロセスコントローラー (ProcessController) は CPU と物理メモリの使用率の表示が主な目的です。プロセスコントローラーにより、個々のチームの観察、優先度の変更、およびそれらがフリーズした場合に強制終了できます。マルチプロセッサ環境では、プロセスコントローラーによって個々の CPU を有効 / 無効にできます。Tracker と Deskbar がクラッシュしたとき、プロセスコントローラーのメニューから再起動できます。</p>
+<p>左側のインジケーターはそれぞれの CPU の使用率を表して右側のインジケーターはメモリ使用量を表します。インジケーターの数は、システムのプロセッサ / コア数に依存することを覚えておいてください。</p>
 <p>まだ実行していなければ、プロセスコントローラーを起動する際に、ウィンドウモードか Deskbar モードのどちらで開くかを選択してください。ウィンドウモードでは、ウィンドウのサイズを変更して、<a href="../gui.html#replicants">レプリカント</a>を使ってデスクトップにドラッグすることもできます。<br />
-どちらのモードでも、プロセスコントローラーは右クリック経由のコンテキストメニューで使います。<br />
+どちらのモードでも、プロセスコントローラーは右クリックのコンテキストメニュー経由で使います。<br />
 Deskbar から再び削除するには、コンテキストメニューの <span class="menu">Deskbar 中で動作 (Live in the Deskbar)</span> のチェックボックスをオフにします。</p>
 <h2>アプリケーションを終了</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
-<p>アプリケーションを終了するには、<span class="menu">アプリケーションを終了 (Quit an application)</span> メニューでアプリケーション名をクリックしてください。これは、強制終了ではなく、「閉じる」ボタンのクリックと同様のアプリケーションの正しい終了方法です。しかし、サーバーやデーモンのようなシステムのプロセスを終了しないように注意してください。その場合には、システム全体の実行が停止するかもしれません。</p>
+<p>アプリケーションを終了するには、<span class="menu">アプリケーションを終了 (Quit an application)</span> メニューでアプリケーション名をクリックしてください。これは、強制終了ではなく、「閉じる」ボタンのクリックと同様のアプリケーションの正しい終了方法です。しかし、サーバーやデーモンのようなシステムプロセスを終了しないように注意してください。その場合には、システム全体の実行が停止するかもしれません。</p>
 <h2>メモリ使用量</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
 <p>メモリ使用量の監視はかなり不正確になることがあります。</p>
 <p>このメニューではシステムでのチームのメモリ使用量を観察できます。チーム名のそばに 2 つの列があります。1 番目の列は書き込み可能メモリの量で、2 番目は読み込み専用メモリ (たとえば共用ライブラリ) 込みのメモリ量です。</p>
-<p>一番目の行、<i>システムリソースとキャッシュ… (System resources &amp; caches...)</i> はシステムおよびすべてのアプリケーションで使用されているメモリの数を表示します。青いバーの長さはコンピューターの物理メモリ量によります。次の行はそれぞれのプロセスを使用しているメモリ量を表示します。注：バーの長さはメモリを使用している部分だけによります。</p>
+<p>一番目の行、<i>システムリソースとキャッシュ… (System resources &amp; caches...)</i> はシステムおよびすべてのアプリケーションで使用されているメモリの数を表示します。青いバーの長さはコンピューターの物理メモリ量によります。次の行はそれぞれのプロセスを使用しているメモリ量を表示します。注：バーの長さは、実際に使用されているメモリ部分だけに基づきます。</p>
 <table>
 		<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>特定のアプリケーションだけが使用しているメモリ (書き込み権限あり)</td></tr>
 		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>読み取り空間のメモリを含む (ほかのアプリケーションと共有可能)</td></tr>
@@ -96,7 +96,7 @@ Deskbar から再び削除するには、コンテキストメニューの <span
 </table>
 <p>最初のレベルはチーム名です。1 つをクリックするとチーム全体を終了します。バーのダークブルー部分はカーネルコード内で消費した時間、ライトブルーの部分はユーザーコード内で消費した時間、そして緑の部分は待機スレッドです。完全に青くなったバーは、チームがすべてのプロセッサパワーを使用していることを意味します。</p>
 <p>2 番目のレベルはチームのスレッドを表示します。クリックすると、デバッグまたは強制終了できます。完全に青くなったバーは、スレッドが 1 つのプロセッサ/コアを固定していることを示します。</p>
-<p>最後のレベルはスレットの優先度を変更できますが、変更は注意してください。大雑把に言って、スレッドの優先度はその CPU 使用量とは反対になるべきです。つまり、優先度を上げると CPU 時間を要求しようとし、優先度を下げなければなりません。一般に、アプリケーションの優先度をいじってはいけません。アプリの作者に連絡してください。優先度の変更は彼らの行うことです。</p>
+<p>メニューの最後のレベルはスレットの優先度を変更できますが、変更は注意してください。大雑把に言って、スレッドの優先度はその CPU 使用量とは反対になるべきです。つまり、優先度を上げると CPU 時間を要求しようとし、優先度を下げなければなりません。一般に、アプリケーションの優先度を変更してはいけません。アプリの作者に連絡してください。優先度の変更は彼らの行うことです。</p>
 
 </div>
 </div>
@@ -104,8 +104,8 @@ Deskbar から再び削除するには、コンテキストメニューの <span
 <div class="nav">
 <div class="inner"><span>
 «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+::  <a href="../desktop-applets.html" class="uplink">デスクトップアプレット</a> 
+::  <a href="workspaces.html">ワークスペース</a>  »
 </span></div>
 </div>
 

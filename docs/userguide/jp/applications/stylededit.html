@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		thebowseat
  *		log-1
  *		mt
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -67,7 +67,7 @@
 <tr><td>設定ファイル:</td><td></td><td><i>無し</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit はHaiku のシンプルなテキストエディタです。StyledEdit はファイルを普通のテキスト形式で保存しますが、StyledEdit で表示したときに限られたフォーマット機能を実現するために、追加の属性が書き込まれます。</p>
+<p>StyledEdit は Haiku のシンプルなテキストエディターです。StyledEdit はファイルを普通のテキスト形式で保存しますが、StyledEdit で表示したときに限られたフォーマット機能を実現するために、追加の属性が書き込まれます。</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
 <p>興味があれば、ターミナルで <span class="cli">listattr</span> を使うと属性はこのように表示されます。</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
@@ -82,9 +82,9 @@ MIME String         11  "BEOS:TYPE"
 
 1071 bytes total in attributes.</pre>
 <p>この通り、StyledEdit のメニューからのフォーマットオプションはすべて表示されています。ワードラップ (オン / オフ) と配置 (左、中央、右) がそれぞれ一つの属性に入っています。文字のスタイル (フォント、サイズ、色) も別の属性に入っています。</p>
-<div class="box-info">これらの属性は BFS の機能なので、ほかのプラットフォームはただのテキストファイルと認識することだけでなく、BFS 以外のパーティションにファイルを保存するとフォーマットが消えてしまいます。上記の属性はたやすく取り除かれ、普通のテキストファイルが残ります。</div>
-<p>いずれにしても、普通のテキストファイルであっても異なるフォントやサイズで書かれた色つきのテキストを可能にするというのは、すてきなアイデアです。たとえば、ReadMe.txt はこの仕組みによってどんなプラットフォーム上でもシェルで読むことができますし、その状態でもなおかつ Haiku からダブルクリックで開いた場合には、少しだけ書式の内容を保持しているのです。</p>
-<p>StyledEdit を使用するのはとても簡単なので、メニュー項目をひとつひとつ説明するのは飛ばします。テキストを書き、フォーマットしたいテキストを選択して、<span class="menu">フォント (Font)</span> メニューからフォント、サイズと色を変更してください。<span class="menu">ドキュメント (Document)</span> メニューのワードラップと配置はファイル全体にしか適用できません。</p>
+<div class="box-info">これらの属性は BFS の機能なので、ほかのプラットフォームがただのテキストファイルと認識するだけでなく、BFS 以外のパーティションにファイルを保存するとフォーマットが消えてしまいます。上記の属性はたやすく取り除かれ、普通のテキストファイルが残ります。</div>
+<p>いずれにしても、普通のテキストファイルであっても異なるフォントやサイズで書かれた色つきのテキストを可能にするというのは、すてきなアイデアです。たとえば、ReadMe.txt はこの仕組みによって任意のプラットフォーム上でもシェルで読むことができますし、それでも Haiku からダブルクリックで開いた場合には、少しだけ書式の内容を保持しているのです。</p>
+<p>StyledEdit を使用するのはとても簡単なので、メニュー項目をひとつひとつ説明することは飛ばします。テキストを書き、フォーマットするテキストを選択して、<span class="menu">フォント (Font)</span> メニューからフォント、サイズと色を変更してください。<span class="menu">ドキュメント (Document)</span> メニューのワードラップと配置はファイル全体にしか適用できません。</p>
 
 </div>
 </div>

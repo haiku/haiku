@@ -10,16 +10,16 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		satashun
- *		Kentaro Ozeki
  *		log-1
  *		mt
+ *		Kentaro Ozeki
+ *		satashun
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>目次</title>
+	<title>インデックス</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -61,13 +61,13 @@
 <div id="content">
 <div>
 
-<h1>目次</h1>
+<h1>インデックス</h1>
 
-<p><a href="attributes.html">属性</a>と<a href="queries.html">クエリ</a>は Haiku の重要な特徴です。属性はそれだけで便利ですが、クエリが追加的なファイルの情報を表示するためには、属性をインデックス化する必要があります。インデックスは属性をルックアップテーブルに置くので、クエリはきわめて高速になります。<br />
+<p><a href="attributes.html">属性</a>と<a href="queries.html">クエリ</a>は Haiku の重要な特徴です。属性はそれだけで便利ですが、クエリがファイルの追加情報を表示するためには、属性をインデックス化する必要があります。インデックスは属性をルックアップテーブルに置くので、クエリはきわめて高速になります。<br />
 インデックスはファイルシステムの一部であり、ボリューム / パーティションごとに別々に保存されます。</p>
 
 <h2>ターミナルでのインデックスコマンド</h2> 
-<p>インデックスを管理するためのコマンドがいくつかあります。</p>
+<p>インデックス管理用コマンドがいくつかあります。</p>
 <ul> 
 <li><b>lsindex</b> - 現在のボリューム / パーティションに対するインデックス化された属性を表示します。<br />
 以下は標準でインデックス化されている属性です。</li>
@@ -121,14 +121,14 @@ size
   -d, --volume=PATH     インデックスが追加されるボリュームのパス、
                         標準では現在のボリュームに追加されます。
   -t, --type=TYPE       インデックス化された属性のタイプ  "int", 
-                        "llong", "string", "float",  "double"　のいずれか 1 つ。
+                        "llong", "string", "float",  "double" のいずれか 1 つ。
                         標準では "string" 
       --copy-from      インデックスをコピーするボリュームへのパス
   -v, --verbose         作られているインデックスについての情報を表示します
 
 </pre>
 <p>指定された属性を持つファイルが<b>新規に</b>作成される場合にのみ、自動的にインデックスに追加されます！<br />
-既存のファイルは、手動でコピーして、そのあと元のファイルを消すことで追加する必要があります。あるいは <span class="cli">reindex</span> コマンドを使うこともできます。 </p>
+既存のファイルは、手動でコピー後、元のファイルを消すことでインデックスに追加する必要があります。あるいは <span class="cli">reindex</span> コマンドを使うこともできます。 </p>
 <ul>
 <li><b>reindex</b> - ボリューム / パーティションの新たに作られたインデックスに既存のファイルの属性を追加します。</li>
 </ul>
@@ -145,12 +145,12 @@ size
 <pre>使い方: rmindex [オプション]... INDEX_NAME 
  
 ディスクボリュームから INDEX_NAME という名前のインデックスを削除します。
-これを行ってしまうと、クエリシステムを使って INDEX_NAME 属性のファイルを探すことはできません。
+これを実行してしまうと、クエリシステムを使って INDEX_NAME 属性のファイルを探すことはできません。
  
   -d, --volume=PATH     インデックスを削除するボリュームのパス
   -h, --help            ヘルプを表示して終了します 
   -p, --pattern         INDEX_NAME がパターンである場合 
-  -v, --verbose         削除されるインデックスについての情報を表示します
+  -v, --verbose         削除されるインデックスの情報を表示します
  
 INDEX_NAME はファイル属性の名前です。
  

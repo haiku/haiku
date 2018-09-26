@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -49,15 +49,14 @@
 <li><a href="../jp/gui.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="workspaces.html">Työtilat</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -70,18 +69,18 @@
 
 <h1>Haikun graafinen käyttöliittymä</h1>
 
-<p>Haikun graafinen käyttöliittymä on järjestelmän kiinteä osa. Toisin kuin Unix-perustaisissa järjestelmissä, ei ole mitään erillistä ikkunahallintaa eikä alkulataus vain komentorivikuoreen ei ole mahdollista. Haikun kohdistuu työpöytäkäyttäjiin, ja komentorivikuoreen käynnistymistä ei ole pidetty tarpeellisena.</p>
+<p>Haikun graafinen käyttöliittymä on järjestelmän kiinteä osa. Toisin kuin Unix-perustaisissa järjestelmissä, ei ole mitään erillistä ikkunahallintaa eikä käynnistys vain komentorivikuoreen ei ole mahdollista. Haiku kohdistuu työpöytäkäyttäjiin, ja komentorivikuoreen käynnistymistä ei ole katsottu tarpeelliseksi.</p>
 <p>Koska sinulla on luultavasti kokemuksia muista graafisista ympäristöistä, hypätään standardien, kuten valikoiden, hiiren kakkospainikkeella näkyviin saatavan asiayhteysvalikon, vedä ja raahaa -toiminnon jne. ylitse. Tutustutaan sen sijaan muutamaan Haikun ainutlaatuiseen puoleen.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
 <p>Haikun graafisessa käyttöliittymässä on vain muutamia asioita, jotka eivät ole itsestään selviä ja ansaitsevat selityksen.</p>
 <ol>
 <li><p>Työpöytäpalkki on Haikun "Käynnistä"-valikko ja tehtäväpalkki, jos niin haluat. Katso aihetta <a href="deskbar.html">Työpöytäpalkki</a>.</p></li>
 <li>Keltainen välilehti tarjoaa muutakin kuin vain ohjelman nimen tai asiakirjan tiedostonimen:
-<ul><li>Voit siirtää ikkunaa pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla raahatessasi sitä toiseen paikkaan, ottaen käyttöön useiden ikkunoiden pinoamisen ja pääset kätevästi käsiksi niihin niiden nimetyn välilehden kautta.</li>
-<li>Muutat ikkunan minimikokoiseksi kaksoisnapsauttamalla sen välilehteä (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> -näppäimillä). Sellainen piilotettu ikkuna voidaan kutsua valitsemalla sen valikkorivi <a href="deskbar.html">Työpöytäpalkissa</a> tai <a href="twitcher.html">Vaihtaja</a>-ohjelmassa.</li>
+<ul><li>Voit siirtää ikkunaa pitämällä <span class="key">VAIHTO</span>-näppäimen alhaalla raahatessasi ikkunaa toiseen paikkaan, mikä ottaa myös käyttöön useiden ikkunoiden pinoamisen ja pääset kätevästi käsiksi niihin niiden nimetyn välilehden kautta.</li>
+<li>Muutat ikkunan minimikokoiseksi kaksoisnapsauttamalla sen välilehteä (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> -näppäimillä). Piilotettu ikkuna voidaan kutsua valitsemalla sen valikkorivi <a href="deskbar.html">Työpöytäpalkissa</a> tai <a href="twitcher.html">Vaihtaja</a>-ohjelmassa.</li>
 <li>Voit lähettää ikkunan taustalle napsauttamalla sen välilehteä (tai sen reunaa) hiiren kakkospainikkeella.</li></ul></li>
 <li><p>Sulje-painike.</p></li>
-<li><p>Laajentamispainike (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). useimmissa sovelluksissa, laajentaa ikkunan maksimikokoon. Sen ei kuitenkaan tarvitse tehdä sitä. Seuraaja-ikkunat esimerkiksi muuttavat kokoaan parhaiten sisältöön sopivaan kokoon.</p></li>
+<li><p>Laajentamispainike (tai <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Useimmissa sovelluksissa se laajentaa ikkunan maksimikokoon pimentämättä Työpöytäpalkkia (pidä alhaalla painiketta <span class="key">VAIHTO</span>, jos haluat kattaa myös Työpöytäpalkin). Sen ei kuitenkaan tarvitse tehdä sitä. Seuraaja-ikkunat esimerkiksi muuttavat kokoaan parhaiten sisältöön sopivaan kokoon.</p></li>
 <li><p>Ikkunan reuna. Raahaaminen hiiren vasemmalla painikkeella siirtää ikkunan, raahaaminen hiiren kakkospainikkeella muuttaa ikkunan kokoa.</p></li>
 <li><p>Koon muuttamiskulma.</p></li>
 </ol>
@@ -98,8 +97,8 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="stack-tile" name="stack-tile">Pino ja laatoitus</a></h2>
-<p>Haikun käyttöliittymä tarjoaa ainutlaatuisia ominaisuuksia, jotka painottaa, että ikkkunoilla on keltainen välilehti eikä täysilevyinen otsikkopalkki käytön parantamiseksi. Sitä kutsutaan nimellä "Pino ja laatoitus".<br />
-Alla olevassa esimerkissä, Seuraaja-ikkuna kirjanmerkillä on laatoitettu WebPositive-ikkunan viereen, mikä itse on pinottu toisen Seuraajaikkunan kanssa, mikä näyttää lähdekansion <tt>haiku</tt>. Tässä animaatiossa käyttäjä napsauttaa pinoikkunan välilehtiä tuoden ne vuorotellen etualalle.</p> 
+<p>Haikun käyttöliittymä tarjoaa ainutlaatuisia ominaisuuksia, jotka painottavat, että ikkkunoissa on käytön parantamiseksi keltainen välilehti eikä täysilevyinen otsikkopalkki. Sitä kutsutaan nimellä "Pino ja laatoitus".<br />
+Alla olevassa esimerkissä kirjanmerkin sisältävä Seuraaja-ikkuna on laatoitettu WebPositive-ikkunan viereen, mikä itse on pinottu toisen lähdekansion <tt>haiku</tt> näyttävän Seuraajaikkunan kanssa. Tässä animaatiossa käyttäjä napsauttaa pinoikkunan välilehtiä tuoden ne vuorotellen etualalle.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
 <p>Tällä tavalla yhdistetty ikkunoiden ryhmää voidaan siirtää ja sen kokoa voidaan muuttaa yhdessä - näppärä järjestely työskenneltäessä hankekeskeisemmässä ympäristössä. Oikean selainikkunan etsimisen sijasta dokumentaatio, editori ja seuraajaikkunat ja ehkä hankkeeseen liittyvät sähköpostiviestit voidaan vain pinota ja laatoittaa yhteen.</p>
 <p>Ikkunoiden todellisen järjestelyn tekeminen on helppoa. Pidä alhaalla <span class="key">Alt Gr/OPT</span>-näppäintä samalla kun raahaat ikkunaa välilehdestä toisen ikkunan välilehden tai reunan viereen, kunnes se korostuu ja vapauta sitten hiiren painike.</p>
@@ -125,7 +124,7 @@ Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="open-save-shortcuts" name="open-save-shortcuts">Näppäimistön pikanäppäimet</a></h3>
-<p>Monet pikanäppäinmäärittelyt avaus- ja sulkemispaneelissa ovat samat kuin Seuraajassa käytetyt. Sitäpaitsi komennoissa, jotka ovat myös käytettävissä <span class="menu">Tiedosto</span>-valikon kautta, on muutamia jotka eivät ole itsestäänselviä:</p>
+<p>Monet pikanäppäinmäärittelyt avaus- ja sulkemispaneelissa ovat samat kuin Seuraajassa käytetyt. Sitä paitsi komennoissa, jotka ovat myös käytettävissä <span class="menu">Tiedosto</span>-valikon kautta, on muutamia jotka eivät ole itsestäänselviä:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Luo uuden kansion.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Sallii sinun nimetä uudelleen valitun kohteen.</td></tr>
@@ -134,7 +133,7 @@ Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Siirtää sinut työpöydällesi.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Siirtää sinut kotikansioosi.</td></tr>
 </table>
-<p>For keyboard shortcuts in Haiku in general, see chapter <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
+<p>Haikun pikanäppäimiin yleensä voi tutustua kappaleessa <a href="keyboard-shortcuts.html">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -148,17 +147,17 @@ Pidä taas alhaalla painiketta <span class="key">Alt Gr/OPT</span>, ja ne reunat
 <a id="replicants" name="replicants">Kopiot</a></h2>
 <p>Kopiot ovat pieniä itsensä sisältäviä sovellusosia, jotka on integroitu toisiin sovelluksiin. Edellyttäen, että Seuraajan valitsin <span class="menu">Näytä  kopiot</span> on aktivoitu, tunnistat sovelluksen kopio-osan pienestä kahvasta, joka on normaalisti oikeassa alakulmassa:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>Huomioonherättävin paikka, joka hyväksyy Kopiot on Työpöytä. Yksinkertaisesti rahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa Työpöytää ja sovellus, josta Kopio on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren kakkospainikkeen painallus Kopiokahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista kopio</span>-valikon.</p>
-<div class="box-info">Jos koet vaikeuksia Kopion kanssa Työpöydällä ja et pääse niistä eroon, poista <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Valitettavasti tämä poistaa <i>kaikki</i> Kopiot Työpöydältä.</div>
+<p>Huomioonherättävin paikka, joka hyväksyy kopiot on työpöytä. Yksinkertaisesti raahaat ja pudotat pienen kahvan sille. Siitä alkaen se on osa työpöytää ja sovellus, josta Kopio on lähtöisin, ei tarvitse käynnistyä toimiakseen.<br />Hiiren kakkospainikkeen painallus kopiokahvassa tarjoaa asiayhteysvalikon, joka näyttää alkuperäsovelluksen <span class="menu">Ohjelmasta</span>-ikkunan ja <span class="menu">Poista kopio</span>-valikon.</p>
+<div class="box-info">Jos sinulla on vaikeuksia kopion kanssa työpöydällä ja et pääse niistä eroon, poista <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Valitettavasti tämä poistaa <i>kaikki</i> kopiot työpöydältä.</div>
 <p>Esimerkkejä kopioitavista sovelluksista ovat  <a href="applications/activitymonitor.html">Aktiviteettivalvonta</a>-ohjelman graafit, <a href="workspaces.html">Työtilat-sovelma</a> tai <a href="applications/deskcalc.html">Työpöytälaskin</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="workspaces.html">Työtilat</a>  »
 </span></div>
 </div>
 

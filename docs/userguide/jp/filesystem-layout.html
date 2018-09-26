@@ -10,10 +10,10 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		satashun
- *		Kentaro Ozeki
- *		mt
  *		log-1
+ *		mt
+ *		Kentaro Ozeki
+ *		satashun
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -66,23 +66,23 @@
 <p>Haiku のファイルシステムの設計は完全に透過的で、ファイルやフォルダーに暗号的でない名前を使うよう常に努力しています。システムが正しく機能するために重要なファイルやフォルダーについては、次のような警告を表示して不慮の操作からそれらを保護します:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
-<p>システム階層下の何かをリネームまたは削除しようとすると、第二の警告が表示されます。 "<span class="button">名前を変更 (Rename)</span>" ボタンは <span class="key">SHIFT</span> キーを押している間だけクリックできます。</p>
-<p>通常、ブートボリュームのルートフォルダーから、次の 2 つのフォルダーが別々に枝分かれしています。</p>
+<p>システム階層下のファイルやフォルダーをリネームまたは削除しようとすると、第二の警告が表示されます。"<span class="button">名前を変更 (Rename)</span>" ボタンは <span class="key">SHIFT</span> キーを押している間だけクリックできます。</p>
+<p>通常、ブートボリュームのルートフォルダーから、次の 2 つのフォルダーが枝分かれしています。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/</span></td><td> </td><td>システムファイルおよびすべてのユーザーが共有するアプリケーション / パッケージを含んでいます。</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>これは、ユーザーの個人的なフォルダーで、ユーザーのデータ、設定、およびほかのユーザーと共有<i>しない</i>アプリケーション / パッケージを保存します。</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>これは、ユーザーの個人フォルダーで、ユーザーのデータ、設定、およびほかのユーザーと共有<i>しない</i>アプリケーション / パッケージを保存します。</td></tr>
 </table>
-<p>Haiku はまだマルチユーザーに対応していないので、この共有と共有でないアプリケーション / パッケージの区別は明らかな影響はありません。それは、1 つのホームフォルダーを持つたった 1 人のユーザーしかいないからです。しかし、いつかは複数ユーザーのサポートが行われるので、最初から正しい方法を学ぶのは意味のあることです。</p>
+<p>Haiku がマルチユーザーに対応していない限り、共有と共有でないアプリケーション / パッケージの区別は明確な影響を及ぼしません。1 つのホームフォルダーを持つたった 1 人のユーザーしかいないからです。しかし、いつかは複数ユーザーのサポートが行われるので、最初から正しい方法を学ぶのは意味のあることです。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">システムフォルダー - <span class="path">/boot/system/</span></a></h2>
 <p>Haiku の前身である BeOS では、このフォルダーは <span class="path">/boot/beos/</span> と名付けられていました。まだその名称をいくつかの古いドキュメント (たとえば、オリジナルの BeBook) 中に見ることがあるでしょう。<br />
-<span class="path">/boot/system/</span> 内のほとんどのフォルダーは読み取り専用です。それは理にかなったことです。なぜなら、それらは Haiku が正常に動作するために必要なファイルを含んでおり、そのために、(不慮の) 変更から安全である必要があるからです。ユーザーが書き込み可能なフォルダーは以下のものだけです。</p>
+<span class="path">/boot/system/</span> 内のほとんどのフォルダーは読み取り専用です。それは理にかなったことです。なぜなら、それらは Haiku が正常に動作するために必要なファイルを含んでおり、そのために、(不慮の) 変更から安全である必要があるからです。ユーザーが書き込めるフォルダーは以下のものだけです。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>キャッシュファイルや、<span class="path">/tmp/</span> にリンクされた一時フォルダーを含みます。</td></tr>
 <tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>.hpkg の一部でない (おそらく古い BeOS アーカイブ由来の) ファイル用のフォルダー階層を含みます。</td></tr>
-<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Haiku のシステムパッケージを含むだけでなく、すべてのユーザーで共有するパッケージをユーザーが追加または削除できます。</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Haiku のシステムパッケージを含むだけでなく、すべてのユーザーで共有するパッケージをユーザーが追加 / 削除できます。</td></tr>
 <tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>システム全体の設定を含みます。</td></tr>
 <tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Syslog (トラブルシューティングの際に重要となります) のようなログを含み、またスワップファイルの標準の置き場所です。</td></tr>
 </table>
@@ -91,8 +91,8 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">ホームフォルダー - <span class="path">/boot/home/</span></a></h2>
-<p>このフォルダーはユーザーの所有物です。ここには、ユーザーが好きなだけファイルやフォルダーを作成できます(ところで、チルダ ("<tt>~</tt>") はユーザーのホームフォルダーへのショートカットです。そのため、ターミナル内で常に "<span class="path">/boot/home/</span>" と書く必要はありません)。<br />
-将来のマルチユーザー環境で、ほかのユーザーと共有したいファイルは、<span class="path">/boot/home/</span> 以外に置く必要がります。たとえば、<span class="path">/boot/all-users/</span> というフォルダーを作って、そこにファイルを置くことができるでしょう。</p>
+<p>このフォルダーはユーザーの所有物です。ここには、ユーザーが好きなだけファイルやフォルダーを作成できます (ところで、チルダ ("<tt>~</tt>") はユーザーのホームフォルダーへのショートカットです。そのため、ターミナル内で常に "<span class="path">/boot/home/</span>" と書く必要はありません)。<br />
+将来のマルチユーザー環境では、ほかのユーザーと共有するファイルは、<span class="path">/boot/home/</span> 以外に置く必要があります。たとえば、<span class="path">/boot/all-users/</span> というフォルダーを作って、そこにファイルを置くことができるでしょう。</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
@@ -105,17 +105,17 @@
 <td><a href="queries.html">クエリ</a>がここに保存されます。標準では 7 日間仮保存されます。</td></tr>
 </table>
 
-<p><span class="path">/boot/home/config/</span> フォルダーは特別です。<span class="path">/boot/system/</span> のように、そのほとんどはパッケージ管理のコントロール下にあり、したがって読み取り専用です。そこにはまた以下の 3 つのユーザーが書き込めるフォルダーがあります:</p>
+<p><span class="path">/boot/home/config/</span> フォルダーは特別です。<span class="path">/boot/system/</span> のように、そのほとんどはパッケージ管理のコントロール下にあり、したがって読み取り専用です。さらにそこにはユーザーが書き込める 3 つのフォルダーがあります:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
-<td>ここに、ほかのユーザーと共有<i>しない</i>パッケージを追加または削除できます。</td></tr>
+<td>ここに、ほかのユーザーと共有<i>しない</i>パッケージを追加 / 削除できます。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
 <td>.hpkg の一部でなく (おそらく古い BeOS アーカイブ由来)、ほかのユーザーと共有しないファイル用のフォルダー階層を含みます。</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
-<td>このフォルダーは、すべてのアプリケーションの設定と、システムに関する 2、3 の設定を含んでいます。個別のサブフォルダーによって設定を管理するアプリケーションと、単に設定ファイルを置くだけのアプリケーションがあります。</td></tr>
+<td>このフォルダーは、すべてのアプリケーションの設定と、システムに関する 2、3 の設定を含んでいます。特有のサブフォルダー内で設定を管理するアプリケーションと、単に設定ファイルをそこに置くだけのアプリケーションがあります。</td></tr>
 </table>
 
 <p><span class="box-info"><span class="path">packages</span> および <span class="path">non-packaged</span> フォルダーについて詳しくは、<a href="applications.html">アプリケーション</a>のトピックを参照ください。</span></p>
@@ -129,13 +129,13 @@
 <td>このフォルダー下にあるプログラムやドキュメントへのリンクは、ブートごとに自動で起動します。</td></tr>
 
 <tr><td><span class="path">beos_mime/</span></td><td> </td>
-<td>この <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> データベースで、Haiku はすべての異なる<a href="filetypes.html">ファイルタイプ</a>およびそれらの設定を管理します。</td></tr>
+<td>この <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> データベースで、Haiku はすべての<a href="filetypes.html">ファイルタイプ</a>とそれらの設定を管理します。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
 <td>このフォルダーに、ファイル / フォルダー / クエリをコピーまたはリンクすると、<a href="deskbar.html#deskbar-menu">Deskbar menu</a> 内に表示されます。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
-<td>興味を引きそうな設定ファイルである <span class="cli">kernel</span> は、<acronym title="Symmetric Multi Processing">SMP</acronym> を無効にする、シリアルデバッグを有効にする、あるいは高度な電源管理を可能にするといったいくつかの低レベルの設定を提供します。コメント記号 "<tt>#</tt>" を削除することで設定行が有効になります。このフォルダー内では慎重になってください！</td></tr>
+<td>興味を引きそうな設定ファイルである <span class="cli">kernel</span> は、<acronym title="Symmetric Multi Processing">SMP</acronym> を無効にする、シリアルデバッグを有効にする、あるいは高度な電源管理を可能にするなどの低レベルな設定を提供します。コメント記号 "<tt>#</tt>" を削除すれば設定行が有効になります。このフォルダー内では慎重になってください！</td></tr>
 
 <tr><td><span class="path">Tracker/</span></td><td> </td>
 
@@ -144,9 +144,9 @@
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>特定のファイルタイプ用の、クエリ結果ウィンドウのレイアウトを定義できます。トピック<a href="queries.html#result-window">クエリ: 結果ウィンドウ</a>を参照してください。</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>たとえば、読込 / 保存パネルでリンクが利用できるようにするといった目的で、このフォルダーの中にユーザーの使いたい場所へのリンクを置きます。トピック <a href="gui.html#favorites-recent">Haiku の GUI: Favorites および Recent フォルダー</a>を参照してください。</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>たとえば、読込 / 保存パネルでリンクを利用する目的で、このフォルダー内にお気に入りの場所へのリンクを置きます。トピック <a href="gui.html#favorites-recent">Haiku の GUI: Favorites および Recent フォルダー</a>を参照してください。</td></tr>
 
-<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Tracker の <span class="menu">File | New...</span> メニューから利用可能なあらゆるファイルタイプのためのテンプレートを追加します。トピック <a href="tracker.html#working-with-files">Tracker: ファイル操作</a> を参照してください。</td></tr>
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Tracker の <span class="menu">File | New...</span> メニューから利用可能な任意のファイルタイプ用テンプレートを追加します。トピック <a href="tracker.html#working-with-files">Tracker: ファイル操作</a> を参照してください。</td></tr>
 </table>
 
 </div>

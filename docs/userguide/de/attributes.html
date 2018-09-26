@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Dateitypen</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>
@@ -89,7 +89,7 @@
 <p><span class="cli">listattr</span> listet die Attribute einer Datei auf, zeigt aber nicht deren Inhalt.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Von obigem Beispiel-Screenshot:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -118,7 +118,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> enthält den Dateityp als <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> String, hier "<tt>application/x-person</tt>". Er bestimmt das Standard-Icon und welche Anwendung die Datei z.B. bei einem Doppelklick öffnet.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" ist das Attribut, in dem Tracker die Position des Icons der Datei speichert.</p></li></ul>
-<div class="box-info">Man beachte den umgekehrten Schrägstrich nach "Clara". Im Terminal muss man Sonderzeichen wie <tt>' " * \ $ ? !</tt> "escapen". Das Leerzeichen zwischen "Clara" und "Botters" ist ebenfalls eines. Der Backslash ist also in Wirklichkeit vor dem Leerzeichen, und nicht etwa nach "Clara".</div>
+<div class="box-info">Man beachte den umgekehrten Schrägstrich nach "Clara". Im Terminal muss man Sonderzeichen wie <tt>' " * \\ $ ? !</tt> "escapen". Das Leerzeichen zwischen "Clara" und "Botters" ist ebenfalls eines. Der Backslash ist also in Wirklichkeit vor dem Leerzeichen, und nicht etwa nach "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,7 +126,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> gibt den Inhalt eines bestimmten Attributs einer Datei aus.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Wieder das Beispiel:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -141,7 +141,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>Wenn also die gute Clara einen Job bei der multi-nationalen Barkelbaer Inc. angetreten hat, befüllt man das vorher leere "Company" Attribut mit dieser Information (welches vom Typ "string" ist):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -152,7 +152,7 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Obwohl es in der Praxis wohl immer genügen würde das "Fax" Attribut einfach nicht zu füllen, kann man es so auch komplett von Claras Datei entfernen:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -171,7 +171,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Dateitypen</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Inhalt</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>

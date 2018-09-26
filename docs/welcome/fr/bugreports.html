@@ -12,10 +12,10 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Loïc
- *		Vincent Duvert
- *		roptat
  *		Humdinger
+ *		Loïc
+ *		roptat
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -78,7 +78,7 @@
 <h1>Signaler les bogues</h1>
 
 <p>Comme il est impossible pour nos développeurs de tester toutes les combinaisons de matériel, ni tous les cas de figure pouvant interagir avec le système d'exploitation, nous comptons sur les utilisateurs pour nous dire si les choses fonctionnent pour eux. puisque Haiku est encore tout jeune, il est très probable que vous rencontriez des bogues. Nous vous remercions de bien vouloir prendre le temps de nous les signaler. Ensemble, nous pourrons, petit à petit, améliorer Haiku.</p>
-<p>Afin que le suivi de nos bogues reste efficace, il est essentiel de respecter l'<a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">étiquette de suivi des bogues</a>.</p>
+<p>Afin que le suivi de nos bogues reste efficace, il est essentiel de respecter l’<a href="https://dev.haiku-os.org/wiki/BugTrackerEtiquette">étiquette de suivi des bogues</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="accout">Obtenir un compte Trac</a></h2>
@@ -92,25 +92,23 @@ Après vous être assuré que votre bogue est unique, obtenez des informations p
 <ul>
 	<li><p>Essayez de reproduire votre problème avec la version actuelle d'Haiku. Des <a href="http://haiku-files.org/">images préfabriqués</a> sont disponible à cet usage.</p></li>
 	<li><p>Indiquez comment vous testez Haiku (sur machine réelle, dans VMware, dans Qemu…)</p></li>
-	<li><p>Indiquez quelle révision vous utilisez. Vous pouvez trouver cette information dans le menu « <i>About Haiku…</i> » de la Deskbar.
-N'oubliez pas de mentionner le type de construction dont est issu le système que vous testez (gcc2, gcc4, gcc2hybrid, gcc4hybrid). 
+	<li><p>Indiquez quelle révision vous utilisez. Vous pouvez trouver cette information dans le menu <span class="menu">À propos de Haiku...</span> de la Deskbar.
+N'oubliez pas de mentionner le type de construction dont est issu le système que vous testez (x86_gcc2, x86_64). 
 Les images téléchargeables sont nommés en conséquence. Si vous avez construit l'image vous-même, vous devriez savoir comment vous l'avez compilé.</p></li>
 	<li><p>Décrivez le problème que vous rencontrez. soyez aussi précis que possible : décrivez le comportement réel, et celui que vous attendiez.</p></li>
 	<li><p>Décrivez les actions que vous avez effectuées avant de faire ressortir le bogue. Cela permettra aux développeurs de le reproduire.</p></li>
-	<li><p>Attachez au rapport le plus d’informations possibles. Si le bogue concerne l’interface graphique ou une application, essayez de faire une capture d’écran à l'aide de la la touche <span class="key">IMPR ÉCRAN</span>.</p></li>
+	<li><p>Attachez au rapport le plus d’informations possibles. Si le bogue concerne l’interface graphique ou une application, essayez de faire une capture d’écran à l'aide de la la touche <span class="key">Impr Écran</span>.</p></li>
 </ul>
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Bogues logiciels</a></h2>
-<p>Lorsqu'une application se plante, vous devez appeler le débogueur depuis le message d'alerte qui s'affiche. 
-Une fenêtre de Terminal devrait s'ouvrir avec gdb (le débogueur GNU) lancé à l'intérieur.
-En saisissant <span class="cli">bt</span>, vous obtiendrez ainsi une trace de la « pile d'appel » (<i>backtrace</i>) que vous devez joindre en intégralité (y compris la partie précédant l'appel à la commande <span class="cli">bt</span>) à votre rapport de bogue.</p>
+<p>Lorsqu'une application plante, vous pouvez soit enregistrer un rapport, soit écrire un fichier de base (les deux seront sauvegardés sur le Bureau) afin de les joindre à un rapport de bug. Vous pouvez aussi invoquer le <a href="../../userguide/fr/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Bogues dans les serveurs</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
-Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+<p>Lorsque les serveurs vitaux comme le serveur d'application, de registre ou d'entrées plantent, vous ne verrez pas l'alerte de crash habituelle. À la place, l'écran sera nettoyé à blanc et une session gdb sera lancée, qui affichera directement ses restitutions à l'écran. Il se pourrait que vous soyez toujours à même de déplacer la souris, qui dessinera alors par dessus l'écran blanc de gdb. Les applications encore en cours (comme ProcessController ou l'horloge dans la barre de Bureau) pourrait également continuer à se dessiner au dessus de la sortie du débogueur à l'écran.<br />
+Bien que tout soit plus laid et peu commode, les même fondamentaux que pour déboguer les applications s'appliquent. Le plus important est de fournir une trace de la pile d'appel à l'aide de la commande <span class="cli">bt</span> (backtrace). Comme vous ne serez pas en mesure de copier le texte, Vous devrez peut-être prendre une photo de l'écran avec un appareil photo numérique<br />
+En fonction de ce qui s'est planté, vous pouvez essayer d'enregistrer un rapport d'accident sur le Bureau avec <span class="cli">save-report</span> ou <span class="cli">write-core</span> pour un fichier image, puis appuyez une fois sur le bouton marche/arrêt pour essayer d'arrêter proprement le système. Si le bouton d'alimentation ne fonctionne pas, il y a aussi les commandes <span class="cli">shutdown</span> et <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Bogues du noyau</a></h2>
@@ -119,8 +117,8 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 <li><p>Le système entre en mode débogage du noyau (KDL) de lui même. La partie supérieure de l'écran est mise à blanc et plusieurs lignes de texte sont affichées.
 La seconde ligne dit « <i>Welcome to Kernel Debugging Land…</i> ». Celle au-dessus, précise la raison qui a déclenchée la session de débogage du noyau (KDL).</p></li>
 <li><p>Le système redémarre spontanément.</p></li>
-<li><p>Le système se bloque complètement. Vous ne pouvez pas déplacer la souris et plus aucune application ne dessine quoi que se soit. Dans cette situation, un bon test consiste à essayer d'accéder au KDL via le raccourci <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> étant la touche <span class="key">Impr</span> sur la plus part des claviers). Attendez au moins une minute, pour voir si quelque chose se passe.</p></li>
-<li><p>Le système ne démarre pas correctement. Il peut redémarrer spontanément ou s'arrêter à un moment donné (par exemple au niveau d'une icône de l'écran de démarrage). Dans ce dernier cas vous pouvez essayer aussi <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
+<li><p>Le système se bloque complètement. Vous ne pouvez pas déplacer la souris et plus aucune application ne dessine quoi que se soit. Dans cette situation, un bon test consiste à essayer d'accéder au KDL via le raccourci <span class="key">Alt</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> étant la touche <span class="key">Impr Écran</span> sur la plus part des claviers). Attendez au moins une minute, pour voir si quelque chose se passe.</p></li>
+<li><p>Le système ne démarre pas correctement. Il peut redémarrer spontanément ou s'arrêter à un moment donné (par exemple au niveau d'une icône de l'écran de démarrage). Dans ce dernier cas vous pouvez essayer aussi <span class="key">Alt</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
 <li><p>L'ensemble du système ou un élément matériel ne se comporte pas correctement. Par exemple, il pourrait être très lent, des erreurs pourraient se produisent, ou quelque chose pourrait ne pas fonctionner du tous. Si un périphérique ne fonctionne pas du tout, la première vérification évidente à faire, est de se renseigner pour savoir si il est déjà supporté par Haiku (par exemple, en posant la question sur une liste de diffusion ou un forum).</p></li>
 </ul>
 <p>Notez que si seul le dernier point semble indiquer une relation avec le matériel, tous les autres symptômes pourraient aussi être causés par un bogue dans un pilote.
@@ -129,12 +127,12 @@ Par exemple, si vous soupçonnez le Wifi, votre BIOS a peut-être une option pou
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Le mode débogage noyau - KDL</a></h3>
-<p>Si le système n'entre pas de lui même en mode déboguage du noyau (KDL) vous pouvez le faire volontairement en invoquant le raccourci clavier <span class="key">ALT</span> <span class="key">Syst</span> <span class="key">D</span> Attention : l'ordre des touches compte (<span class="key">SYST</span> correspond à <span class="key">Impr Écran</span> sur la plupart des claviers).
-Notez bien que votre clavier pourrait ne pas fonctionner en mode déboguage du noyau. Alors que les claviers PS/2
-ne posent pas de problème, les claviers USB connecté à un controleur UHCI ne fonctionne que si vous être entré au moins une fois en mode débogage à l'aide du raccourci clavier. Pour le moment l'USB OHCI n'est pas supporté.</p>
+<p>Si le système n’entre pas de lui même en mode débogage du noyau (KDL) vous pouvez l’invoquer à l'aide du raccourci clavier <span class="key">At</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> correspond à <span class="key">Impr Écran</span> sur la plupart des claviers) Attention : l'ordre des touches compte<br />
+Notez bien que votre clavier pourrait ne pas fonctionner en mode débogage du noyau. Si les claviers PS/2 ne posent pas de problème, pour les claviers USB cela dépend du type de contrôleur USB (UHCI/EHCI).
+En règle générale, le clavier doit être branché directement sur le port, et non par l'intermédiaire d'un concentrateur. Dans certains cas, le clavier ne fonctionne que si l'on a invoqué le mode débogage du noyau une première fois via le raccourci clavier. Pour le moment l'USB OHCI n'est pas supporté.</p>
 <p>KDL est, par lui-même, une sorte d'interpréteur de commande. On peut exécuter des instructions pour afficher des informations sur le système. Les commandes suivantes pourraient vous intéresser :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (alias sc)</td><td> </td><td>Affiche une trace de débogage (backtrace), Faites systematiquement cette commande quand le système entre dans le débogueur de lui même.</td></tr>
+<tr><td><span class="cli">bt</span> (alias <span class="cli">sc</span>)</td><td> </td><td>Affiche une trace de débogage (backtrace), Faites systematiquement cette commande quand le système entre dans le débogueur de lui même.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Affichera les interruptions matérielles qui sont gérées, ainsi que celles qui sont ignorées.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (alias continue)</td><td> </td><td>Quitte le débogueur pour reprendre, si possible, les opérations normales du système.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Redémarre le système immédiatement. Vous perdrez toutes les données non enregistrées, ainsi que celles qui ont été enregistrés, mais qui n'ont pas encore été écrites sur le disque.</td></tr>
@@ -145,8 +143,8 @@ ne posent pas de problème, les claviers USB connecté à un controleur UHCI ne 
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Le journal système</a></h3>
-<p><b>C'est la méthode privilégiée pour obtenir des informations d'un système qui ne démarre pas.</b><br />Le journal système ( « syslog » en abgégé) contient des informations précieuses sur ce qui s'est passé dans votre système, y compris les productions des sessions KDL. L'attacher au ticket « kernel » dans l'outil de suivi de bogues (Trac) est généralement une bonne pratique.
-Le journal est consigné dans le fichier <span class="path">/boot/system/var/log/syslog</span>.Puisque l'écriture d'un fichier requiert un système qui fonctionne, les entrées les plus récente faites dans le journal peuvent ne pas être présentes quand un problème se produit dans le noyau (en particulier lors d'un redémarrage spontané ou d'une session KDL non recouvrable).</p>
+<p><b>C'est la méthode privilégiée pour obtenir des informations d'un système qui ne démarre pas.</b><br />Le journal système ( « syslog » en abrégé) contient des informations précieuses sur ce qui s'est passé dans votre système, y compris les productions des sessions KDL. L'attacher au ticket « kernel » dans l'outil de suivi de bogues (Trac) est généralement une bonne pratique.
+Le journal est consigné dans le fichier <span class="path">/boot/system/var/log/syslog</span>. Puisque l'écriture d'un fichier requiert un système qui fonctionne, les entrées les plus récentes faites dans le journal peuvent ne pas être présentes quand un problème se produit dans le noyau (en particulier lors d'un redémarrage spontané ou d'une session KDL non recouvrable).</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
 If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
 In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>
@@ -165,11 +163,12 @@ Une ou plusieurs pages de texte seront affiché à l'écran, Seules les quelques
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td>Fait une liste détaillée de votre matériel, en y incluant les identifiants des périphériques PCI et de leurs fabriquants, à la manière de <span class="cli">lshw</span> ou <span class="cli">lspci</span> dans GNU/Linux.</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Fait comme <span class="cli">lsusb</span> en supposant que c'est un problème lié à l'USB.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Le journal système principal utilisé par Haiku, semblable à celui de l'écran de débogage pendant le démarrage. Avec la commande <span class="cli">open</span>, vous pouvez modifier ce journal dans un éditeur de texte pour n'en conserver que la partie la plus pertinente.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Le journal système principal utilisé par Haiku (voir <a href="#syslog">Le journal système</a> ci-dessus)
+est similaire à l'écran de débogage pendant le démarrage. Avec la commande <span class="cli">open</span>, vous pouvez modifier ce journal dans un éditeur de texte pour n'en conserver que la partie la plus pertinente.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Liste tous les drivers utilisés.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Seulement disponible dans le <i>mode débogage du noyau</i> (voir ci-dessous). Montre l'utilisation des interruptions. 
 Il ne devrait pas y avoir trop d'interruptions partagées par plusieurs périphériques.</td></tr>
-<tr><td colspan="3">- Les sorties écran du débogueur (une option de mode sans échec du démarrage).</td></tr>
+<tr><td colspan="3">- Les sorties écran du débogueur (une option de démarrage en mode sans échec, voir <a href="#onscreen">ci-dessus</a>).</td></tr>
 </table>
 
 <p>Les 4 premières commandes sont à exécuter dans le Terminal. Si vous ajoutez <span class="cli"> &gt; sortie.txt</span> après une commande, sa sortie sera redirigée dans un fichier texte nommé « sortie.txt » que vous pourrez attachez à votre rapport de bogue ou e-mail.</p>

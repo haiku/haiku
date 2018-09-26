@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Podręcznik użytkownika</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +51,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Spis treści</a> 
 ::  <a href="index.html">Spis treści</a>  »
 </span></div>
 </div>
@@ -89,7 +89,7 @@
 <p><span class="cli">listattr</span> listuje nazwy atrybutów pliku lub plików bez pokazywania zawartości tych atrybutów.</p>
 <pre>użyj: listattr 'nazwa pliku' ['nazwa pliku' ...]</pre>
 <p>Z naszej migawki ekranowej powyżej:</p>
-<pre class="terminal"> ~/osoby -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/osoby -&gt;listattr Clara\\ Botters
 File: Clara Botters
     Typ       Rozmiar               Nazwa
 -----------  ---------  -------------------------------
@@ -118,7 +118,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> przechowuje informacje o typie pliku jako ciąg tekstowy <acronym title="dwuczęściowy identyfikator formatu pliku ">MIME</acronym>, w tym przypadku „<tt>application/x-person</tt>”. Ten typ wyznacza domyślną ikonę i aplikację, którą będziemy otwierać plik kiedy np. podwójnie w nią klikniemy.</p></li>
 <li><p>„<tt>_trk/pinfo_le</tt>” jest atrybutem, w którym aplikacja Tracker trzyma informację o pozycji ikony pliku.</p></li></ul>
-<div class="box-info">Uwaga dotycząca znaku odwróconego ukośnika po słowie „Clara”. W aplikacji Terminal znaki specjalne typu <tt>'"*\$?!</tt> musisz opakować w szczególny sposób, aby pozbawić je specjalnego znaczenia poprzedzasz je znakiem <b>\</b>. Spacja pomiędzy napisem „Clara” i „Botters” ma specjalne znaczenie i należy do tego typu przypadków. Należy zauważyć, że znak odwróconego ukośnika jest związany ze spacją a nie z napisem „Clara”.</div>
+<div class="box-info">Uwaga dotycząca znaku odwróconego ukośnika po słowie „Clara”. W aplikacji Terminal znaki specjalne typu <tt>'"*\\$?!</tt> musisz opakować w szczególny sposób, aby pozbawić je specjalnego znaczenia poprzedzasz je znakiem <b>\\</b>. Spacja pomiędzy napisem „Clara” i „Botters” ma specjalne znaczenie i należy do tego typu przypadków. Należy zauważyć, że znak odwróconego ukośnika jest związany ze spacją a nie z napisem „Clara”.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,7 +126,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> prezentuje zawartość wybranego atrybutu.</p>
 <pre>użyj: catattr [--raw|-r] 'nazwa atrybutu' 'nazwa pliku 1' ['nazwa plik 2'...]</pre>
 <p>Ponownie z naszego przykładu:</p>
-<pre class="terminal"> ~/osoby -&gt;catattr 'META:city' 'Clara\ Botters'
+<pre class="terminal"> ~/osoby -&gt;catattr 'META:city' 'Clara\\ Botters'
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -141,7 +141,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          Typem domyślnym jest "string"</pre>
 <p>Powiedzmy, że nasza Klara podjęła pracę w międzynarodowej korporacji Barkelbaer Inc., możesz w takim przypadku wypełnić do tej pory pusty atrybut „Company” odpowiednimi danym (które są typu „string”):</p>
-<pre class="terminal"> ~/osoby -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/osoby -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -152,7 +152,7 @@ Clara Botters : string : Whelton</pre>
         'atrybut' jest nazwą atrybutu przywiązanego do pliku, jeśli opcja
         '-p' jest włączona to 'atrybut' jest traktowany jako wzorzec.</pre>
 <p>Jeżeli w praktyce chciałbyś nie wypełniać atrybutu „Fax” możesz go całkowicie usunąć wydając następujące polecenie:</p>
-<pre class="terminal"> ~/osoby -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/osoby -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -171,7 +171,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Spis treści</a> 
 ::  <a href="index.html">Spis treści</a>  »
 </span></div>
 </div>

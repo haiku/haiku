@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Vincent Duvert
- *		Loïc
  *		Humdinger
+ *		Loïc
+ *		Vincent Duvert
  *		Wabouz
  *
 -->
@@ -27,7 +27,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -53,15 +53,14 @@
 <li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Atelier</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="desktop-applets.html">Appliquettes du bureau</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Applications</h1>
 
@@ -71,8 +70,8 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Les paquets Haiku (.hpkg)</a></h2>
-<p>The simplest way is to use <a href="applications/haikudepot.html">HaikuDepot</a> to find, download and automatically install and uninstall a package. If you have downloaded a package from somewhere else — maybe because it's not (yet) in a public repository — just double-click it to open in HaikuDepot and install from there.</p>
-<p>You'll find the newly installed application in <tt>/system/apps/</tt> or, in case of a commandline application, in <tt>/system/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
+<p>La façon la plus simple est d'utiliser <a href="applications/haikudepot.html">HaikuDepot</a> pour trouver, télécharger et installer ou désinstaller automatiquement un package. Si l'installation n'est pas disponible — peut-être parce que vous avez téléchargé un package dans un dépôt (repositories) qui n'est pas (encore) public — il est tout aussi facile de l'installer manuellement: Déplacez simplement le fichier .hpkg vers <tt>~/config/packages/</tt>. </p>
+<p>Vous trouverez l'application nouvellement installée dans <tt>/system/apps/</tt> ou, dans le cas d'une application en ligne de commande, dans <tt>/system/bin/</tt>. Tous les autres fichiers dont dépend le programme (libraires, données, extensions, etc.) apparaissent automatiquement au bon endroit dans le système de fichiers.</p>
 <p>Généralement, rien de tout cela ne sera nécessaire et vous aurez terminé après avoir décompressé l'archive.<br />
 Consultez les sujets <a href="deskbar.html">Deskbar</a> ou <a href="desktop-applets/launchbox.html">LaunchBox</a> pour savoir comment créer des raccourcis vers vos applications nouvellement installées.</p>
 <div class="box-info">À propos, bien que vous pouvez déballer un fichier .hpkg comme n'importe quel autre archive, ce n'est pas ce que le gestionnaire de paquets fait lorsque vous installer un paquet. Les fichiers système sous-jacents apparaissent seulement pour propager des fichiers dans leurs dossiers respectifs, il n'y a aucun mouvement autour de là où ils se trouvent. Ceci explique la rapidité et la netteté de l'installation/désinstallation.</div>
@@ -84,7 +83,7 @@ Consultez les sujets <a href="deskbar.html">Deskbar</a> ou <a href="desktop-appl
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Anciennes archives BeOS (.zip and .pkg)</a></h2>
 <p>Les archives BeOS qui incluent tout ce dont elles ont besoin dans le dossier de l'application peuvent simplement être déballées (double cliquer ouvre <span class="app">Expander</span> ou le vieux <span class="app">PackageInstaller</span>) n'importe où dans <tt>/boot/home/</tt> et démarre à partir de là. Désinstaller  une telle application auto-suffisante est très aisé. Supprimez simplement le dossier de l'application.</p>
-<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>/system/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
+<p>Pour une majorité des anciennes applications BeOS, si vous tombez sur une application qui ne marche pas parce qu'elle veut déployer des fichiers dans des endroits codés en dur qui n'existent pas forcément, vous pouvez essayer de corriger le problème manuellement. Le dossier <tt>~/config/non-packaged/</tt> vous permet de recréer l'arborescence des dossiers nécessaires. Puisque de plus en plus de paquets .hpkg sont disponibles et que les vieilles applications BeOS sont ré-empaquetées, ceci sera bientôt inutile. Veuillez consulter <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">cet article</a> pour savoir comment utiliser l'arborescence des <tt>dossiers non empaqueté</tt>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -136,7 +135,7 @@ Consultez les sujets <a href="deskbar.html">Deskbar</a> ou <a href="desktop-appl
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
 		<td valign="top">Une visionneuse d'images.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/softwareupdater-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/softwareupdater.html">SoftwareUpdater</a></td><td> </td>
-		<td valign="top">A tool to update software packages and Haiku itself.</td></tr>
+		<td valign="top">Un outil pour mettre à jour Haiku, ainsi que vos divers logiciels.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Permet d'enregistrer du son depuis une entrée audio ou microphone. [<i>pas encore documenté</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
@@ -185,9 +184,9 @@ en ligne de commandes spécifiques à Haiku mérites d'êtres mentionnés. Ces c
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Atelier</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="desktop-applets.html">Appliquettes du bureau</a>  »
 </span></div>
 </div>
 

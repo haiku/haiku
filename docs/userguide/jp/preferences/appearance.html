@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		log-1
  *		Humdinger
+ *		log-1
  *		mt
  *
 -->
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +51,7 @@
 <li><a href="../../uk/preferences/appearance.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 </ul>
 <span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
+    <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="backgrounds.html">背景</a>  »
 </span></div>
 </div>
@@ -66,21 +66,21 @@
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
-<p>外観 (Appearance) プリファレンスで、Haiku の外見の一部を変更できます。</p>
+<p>外観 (Appearance) プレファレンスで、Haiku の見た目の一部を変更できます。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="fonts" name="fonts">フォント</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku は異なった目的のために 3 種類の標準フォントを定めています。ここでシステム全体で用いられるフォントのスタイル (通常・太字・固定幅) とサイズを設定します。加えて、メニューで使われるフォントの設定が別にあります。</p>
+<p>Haiku は目的別に 3 種類の標準フォントを定めています。ここでシステム全体に用いられるフォントのスタイル (通常・太字・固定幅) とサイズを設定します。加えて、メニューで使われるフォントの設定が別にあります。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">新しいフォントのインストール</a></h3>
-<p>正規の .hpkg パッケージの一部でない新しいフォントをインストールするには、<tt>non-packaged</tt> フォルダーの、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントに関しては、コピー先は以下のようになるでしょう。</p>
+<p>正規の .hpkg パッケージの一部でない新しいフォントをインストールするには、<tt>non-packaged</tt> フォルダーの、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>すべてのユーザー用フォント</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>ユーザー専用フォント</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>あなたの専用フォント</td></tr>
 </table>
 
 <h2>
@@ -92,7 +92,7 @@
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="decorators" name="decorators">ウィンドウデコレーター (Window decorators)</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku はデフォルトデコレーターただ 1 つだけが付属しています。ほかのデコレーターを見つけてインストールすることがあれば、ポップアップメニューからべつのデコレーターを選べるでしょう。</p>
+<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku はデフォルトデコレーターただ 1 つが付属しています。ほかのデコレーターを見つけてインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
 <p>デフォルトデコレーターでは、スクロールバーの矢印のスタイルを設定できます。スクロールバーの終端に、スペースを節約するために単独の矢印にするか、上下左右にスクロールする際にマウスの移動を潜在的にいくつか減らせる— 伝統的な BeOS の方法 —上下矢印にするかを設定できます。</p>
 
 <h2>
@@ -104,34 +104,34 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 グリフのヒンティング (Glyph hinting)</h3>
-<p><span class="menu">グリフのヒンティング (Glyph hinting)</span> を有効にすると、すべての文字の縦方向および横方向両端に、必ず 2 ピクセルの空白が入るようになります。特に、白い背景で黒い文字を扱う場合には、これを有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきりして見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">等幅フォントのみ有効 (Monospaced Fonts Only)</span> の設定もあります。ヒンティングをオンにした場合、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディターやターミナルでヒンティングの恩恵を受けることができます。</p>
+<p><span class="menu">グリフのヒンティング (Glyph hinting)</span> を有効にすると、すべての文字の縦方向および横方向両端に、必ず 2 ピクセルの空白が入るようになります。特に、白い背景で黒い文字を扱う場合には、これを有効にしたときとしないときとで、結果は完全に対照的になります。有効にした場合、テキストがはっきりして見えます。ネットブックのような低解像度の機器で特に効果的な、<span class="menu">等幅フォントのみ有効 (Monospaced Fonts Only)</span> の設定もあります。ヒンティングをオンにすると、小さい文字がかなり汚く見えることがありますが、その場合でもテキストエディターやターミナルでヒンティングの恩恵を受けられます。</p>
 <p>次の拡大したスクリーンショットは、Hinting を有効にした場合と有効にしない場合とで、どれだけ見た目が変わるのかを示しています:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />ヒンティング無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />ヒンティング有効</td></tr>
 </table>
-<p>このページに掲載されているすべての<span class="app">拡大鏡</span>ウィンドウは、当然のことながらそれぞれ異なるオプションで描画されている点に注意する必要があります。ですので、たとえば、黄色いタブの太文字タイトルや、"33 x 15 @ 8 pixels/pixel" というテキストを比較することで、各設定が実際に作り出す印象を知ることができます。</p>
+<p>このページに掲載されているすべての<span class="app">拡大鏡 (Magnify)</span> ウィンドウは、当然のことながらそれぞれ異なるオプションで描画されている点に注意する必要があります。ですので、たとえば、黄色いタブの太文字タイトルや、"33 x 15 @ 8 pixels/pixel" というテキストの比較により、各設定が実際に作り出す印象を知ることができます。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 アンチエイリアスのタイプ (Antialiasing type)</h3>
-<p>画面描画を改善するもう 1 つの方法は <i>Antialiasing</i> (アンチエイリアス) で、テキストだけでなくすべてのベクターグラフィックをサポートします。アンチエイリアスはあるピクセルの色を変更することにより、線をなめらかにします。線をなめらかにする手法には、次の 2 つがあります。</p>
-<p><span class="menu">グレースケール (Grayscale)</span> は、輪郭のピクセルの明るさを変更します。<br />
-<span class="menu">LCD サブピクセル (LCD subpixel)</span> は、特に (高解像度の) LCD ディスプレイを使用する場合に、グレースケールよりもさらになめらかに描画します。LCD ディスプレイの 1 つのピクセルは、赤、緑、青の要素で構成されているので、この手法では 1 ピクセルの明るさを変更する代わりに、1 ピクセルより小さな分量だけ輪郭を移動させて輪郭の色を変更します。</p>
+<p>もう 1 つの画面描画を改善する方法は <i>アンチエイリアス (Antialiasing)</i> で、テキストだけでなくすべてのベクターグラフィックをサポートします。アンチエイリアスはあるピクセルの色を変更することで、線をなめらかにします。線をなめらかにする手法には、次の 2 つがあります。</p>
+<p><span class="menu">グレースケール (Grayscale)</span> は、輪郭のピクセルの明度を変更します。<br />
+<span class="menu">LCD サブピクセル (LCD subpixel)</span> は、特に (高解像度の) LCD ディスプレイを使用する場合に、グレースケールよりなめらかに描画します。LCD ディスプレイの各ピクセルは、赤、緑、青の要素で構成されているので、この手法では 1 ピクセルの明度を変更する代わりに、その何分の 1 以下だけ輪郭を移動させて輪郭の色を変更します。</p>
 <p>先ほどと同様に、次の拡大したスクリーンショットは、この 2 つの方法の違いを示しています。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />グレースケール、ヒンティング無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD サブピクセル、ヒンティング無効</td></tr>
 </table>
-<p>サブピクセルベースのアンチエイリアスでは、図形オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きを、だれもが許容するわけではありません。Haiku では、この 2 つのアンチエイリアス手法を混ぜて使えます。スライダーを使って、最適な混合比を設定できます。</p>
+<p>サブピクセルベースのアンチエイリアスでは、図形オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きをだれもが許容するわけではありません。Haiku では、この 2 つのアンチエイリアス手法を混ぜて使えます。スライダーを使って、最適な混合比を設定できます。</p>
 <div class="box-info">サブピクセルベースのアンチエイリアスをグリフのヒンティングとあわせて使用することは、ソフトウェア特許の対象となるため、デフォルトでは両者を同時に使用できないようになっています。ユーザーの居住地域次第では、ロック解除バージョンの入手が合法である場合があります。その場合は申し訳ありませんが、その地域の配布担当者と交渉してください。</div>
-<p>仮にソースコードを変更して再コンパイルすることで、ヒンティングと LCD サブピクセルを組み合わせた描画方法を有効にした場合、ヒンティングとグレースケールを組み合わせたものと見た目を比較すると、次のようになります。</p>
+<p>ソースコードを変更して再コンパイルすることで、ヒンティングと LCD サブピクセルを組み合わせた描画方法を有効にした場合、ヒンティングとグレースケールを組み合わせたものと見た目を比較すると、次のようになります。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />グレースケール、ヒンティング有効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD サブピクセル、ヒンティング有効</td></tr>
 </table>
 <p><br /></p>
 <p>設定パネルの下に、次の 2 つのボタンがあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセットします。</td></tr>
-<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>外観プリファレンスを起動したときの設定に戻します。</td></tr>
+<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセット。</td></tr>
+<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>外観プレファレンスを起動したときの設定に戻します。</td></tr>
 </table>
 
 </div>
@@ -139,7 +139,7 @@
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
+    <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="backgrounds.html">背景</a>  »
 </span></div>
 </div>

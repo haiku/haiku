@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
  *		Humdinger
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -61,12 +61,12 @@
 
 <h1>Bash ja skriptaus</h1>
 
-<p>”Skriptaus” on proseduurien automointitekniikka, jossa komentoja ketjutetaan merkkijonoiksi ja tallennetaan tekstitiedostona, niin kutsuttuna ”skripteinä”. Joka kerta kun skripti suoritetaan, komennot käsitellään yksi kerrallaan aivan kuin ne olisi kirjoitettu käsin <a href="applications/terminal.html">Pääteikkunassa</a>.<br />Skriptit voivat ulottua yksinkertaisesta muutaman komennon suorittamisesta aina edistyneisiin koodipätkiin, jotka ratkaisevat monimutkaisia tehtäviä.</p>
+<p>”Skriptaus” on proseduurien automointitekniikka, jossa komentoja ketjutetaan merkkijonoiksi ja tallennetaan tekstitiedostona, niin kutsuttuina ”skripteinä”. Joka kerta kun skripti suoritetaan, komennot käsitellään yksi kerrallaan aivan kuin ne olisi kirjoitettu käsin <a href="applications/terminal.html">Pääteikkunassa</a>.<br />Skriptit voivat ulottua yksinkertaisesta muutaman komennon suorittamisesta aina edistyneisiin koodipätkiin, jotka ratkaisevat monimutkaisia tehtäviä.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Bash-komentotulkki</a></h2>
-<p>Koska skriptit turvautuvat luonnollisesti paljolti komentotulkkeihin, jotka tulkitsevat niitä, sinun pitäisi ensiksi tutustua BASH-komentotulkkiin, jota käytetään Haikussa. Verkossa on monia resursseja, koska kyseessä on laajalti käytetty komentotulkki. Yksi hyvä dokumentti on Johan Janssonin <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Perehdyttämien bash-komentotulkkiin - oppitunti bash-komnentotulkista BeOS-käyttöjärjestelmässä</a>.<br />
+<p>Koska skriptit turvautuvat luonnollisesti paljolti komentotulkkeihin, jotka tulkitsevat niitä, sinun pitäisi ensiksi tutustua BASH-komentotulkkiin, jota käytetään Haikussa. Verkossa on monia resursseja, koska kyseessä on laajalti käytetty komentotulkki. Yksi hyvä dokumentti on Johan Janssonin <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Perehdyttäminen bash-komentotulkkiin - oppitunti bash-komentotulkista BeOS-käyttöjärjestelmässä</a>.<br />
 <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash-viitekäsikirja (PDF, 720 kibitavua)</a> auttaa pääsemään selville yksityiskohdista.</p>
 
 <h2>
@@ -81,8 +81,8 @@ Jos niitä ei jo ole olemassa, sinun on lisättävä tarvittavat tiedostot itse.
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> suoritetaan sen jälkeen kun järjestelmä on lopettanut alkulatausprosessin. Esimerkiksi voisit käynnistää skriptissä lukuisia ohjelmia, jotka käynnistyisivät silloin automaattisesti jokaisen alkulatauksen yhteydessä:</p>
+<a id="userbootscript" name="userbootscript">Käyttäjäkäynnistysskripti</a></h3>
+<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> suoritetaan sen jälkeen kun järjestelmä on lopettanut käynnistysprosessin. Esimerkiksi voisit käynnistää skriptissä lukuisia ohjelmia, jotka käynnistyisivät silloin automaattisesti jokaisen käynnistyksen yhteydessä:</p>
 <pre># Käynnistä LaunchBox
 /boot/system/apps/LaunchBox &amp;
 
@@ -90,16 +90,16 @@ Jos niitä ei jo ole olemassa, sinun on lisättävä tarvittavat tiedostot itse.
 /boot/system/apps/Workspaces &amp;</pre>
 <p>Muista lisätä komennon loppuun "<tt>&amp;</tt>" ohjelman käynnistämiseksi taustaprosessina, tai skripti pysähtyy, kunnes komento on suoritettu loppuun (tässä tapauksessa: kunnes käynnistetty sovellus on taas suljettu).</p>
 
-<p>Yksinkertainen vaihtoehto yllämainitulle sovellusten käynnistämiselle alkulatauksen yhteydessä on laittaa linkit sovelluksiin <span class="path">/boot/home/config/settings/boot/launch</span>-hakemistoon. Tämä voidaan tehdä yksinkertaisesti hiiren kakkospainikkeen napsautuksella sellaisen sovelluksen kohdalla, jonka toivot käynnistyvän automaattisesti, valitsemalla valikosta <span class="menu">Luo linkki</span> ja sitten <a href="tracker.html#navigating">navigoimalla</a> yllä olevaan hakemistoon.</p>
+<p>Yksinkertainen vaihtoehto yllämainitulle sovellusten käynnistämiselle käynnistyksen yhteydessä on laittaa linkit sovelluksiin <span class="path">/boot/home/config/settings/boot/launch</span>-hakemistoon. Tämä voidaan tehdä yksinkertaisesti hiiren kakkospainikkeen napsautuksella sellaisen sovelluksen kohdalla, jonka toivot käynnistyvän automaattisesti, valitsemalla valikosta <span class="menu">Luo linkki</span> ja sitten <a href="tracker.html#navigating">navigoimalla</a> yllä olevaan hakemistoon.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
+<a id="usershutdownscript" name="usershutdownscript">Käyttäjän järjestelmän sulkemisskripti</a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> suoritetaan ensimmäisenä askeleena sulkemisprosessissa. Jos skripti palauttaa nollasta poikkeavan arvon, sulkeminen keskeytetään.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">Käyttäjän järjestelmän sulkemisen päättämisskripti</a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> suoritetaan sulkemisprosessin viimeisenä askeleena. Huomaa, että suurin osa järjestelmästä on lopetettu siinä vaiheessa kun tämä skripti suoritetaan.</p>
 
 </div>

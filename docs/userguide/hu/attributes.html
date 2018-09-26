@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Használati útmutató</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +50,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Fájltípusok</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>
@@ -87,7 +87,7 @@
 <p>A <span class="cli">listattr</span> megjeleníti a fájl összes jellemzőjét a hozzájuk tartozó adatok nélkül.</p>
 <pre>használat: listattr 'fájl' ['fájl' ...]</pre>
 <p>Például:</p>
-<pre class="terminal"> ~/people -&gt;listattr Ecet\ Tibor
+<pre class="terminal"> ~/people -&gt;listattr Ecet\\ Tibor
 File: Ecet Tibor
         Type       Size  Name                                
 ----------------------------------------------------------
@@ -114,7 +114,7 @@ File: Ecet Tibor
 <ul>
 <li><p>A <tt>BEOS:TYPE</tt> tartalmazza a fájl típusát, mint <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> szöveget, esetünkben "<tt>application/x-person</tt>". Ez alapján megkapjuk az alapértelmezett ikont és a programot, mely kezeli a fájlt.</p></li>
 <li><p>A "<tt>_trk/pinfo_le</tt>" jellemző tartalmazza a Tracker-ben az ikon pozícióját.</p></li></ul>
-<div class="box-info">Magyarázatra szorul a vissza-perjel a névben. A Terminálban a speciális karaktereket, mint például <tt>'"*\$?!</tt> kilépő karakterrel kell "jelölni". A szóköz a névben épp ilyen. Tehát, a vissza-perjel (kilépő karakter) az a szóköz előtt van, nem pedig a név után.</div>
+<div class="box-info">Magyarázatra szorul a vissza-perjel a névben. A Terminálban a speciális karaktereket, mint például <tt>'"*\\$?!</tt> kilépő karakterrel kell "jelölni". A szóköz a névben épp ilyen. Tehát, a vissza-perjel (kilépő karakter) az a szóköz előtt van, nem pedig a név után.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -122,7 +122,7 @@ File: Ecet Tibor
 <p>A <span class="cli">catattr</span> megjeleníti a megadott jellemzőhöz tartozó adatot.</p>
 <pre>használat: catattr [--raw|-r] jellenző_neve fájl1 [fájl2...]</pre>
 <p>Például:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Ecet\ Tibor
+<pre class="terminal"> ~/people -&gt;catattr META:city Ecet\\ Tibor
 Ecet Tibor : string : Hatvan</pre>
 
 <h3>
@@ -137,7 +137,7 @@ Ecet Tibor : string : Hatvan</pre>
                  vagy szám-érték (például 0x1234, 42, 'ABCD', ...)
          Az alapértelmezett a "string"</pre>
 <p>Nos, tegyük fel, hogy Tibor elválal egy állást a Cukor Kft-nél, így most feltöltünk egy eddig üres jellemzőt adattal (aminek a típusa "string" (szöveg)):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Cukor\ Kft Ecet\ Tibor
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Cukor\\ Kft Ecet\\ Tibor
 </pre>
 
 <h3>
@@ -149,7 +149,7 @@ Ecet Tibor : string : Hatvan</pre>
          'jellemző' a fájl egyik jellemzőjének a neve
          Ha a '-p' meg van adva, akkor a 'jellemző' mintaként szolgál.</pre>
 <p>Például a "Fax" jellemzőt üresen is hagyhatjuk, de teljesen ki is törölhetjük azt:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Ecet\ Tibor</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Ecet\\ Tibor</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -168,7 +168,7 @@ Ecet Tibor : string : Hatvan</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Fájltípusok</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Tartalom</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>

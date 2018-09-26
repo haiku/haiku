@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
  *		Humdinger
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -69,7 +69,7 @@
 </table>
 <p><br /></p>
 <p>Pääteikkuna on Haikun käyttöliittymä bash-komentotulkkiin, the Bourne Again Shell.</p>
-<p>Viittaan aiheen <a href="../bash-scripting.html">Skriptaus</a> muutamiin verkko-oppituntien linkkeihin toimimisestä komentotulkin alla ja kannattaa myös katsoa <a href="cli-apps.html">Haikun komentorivisovellukset</a>. Tässä keskitymme itse Pääteikkuna-sovellukseen.</p>
+<p>Komentotulkin alla toimimisessa viittaan aiheen <a href="../bash-scripting.html">Skriptaus</a> muutamien verkko-oppituntien linkkeihin ja kannattaa myös katsoa <a href="cli-apps.html">Haikun komentorivisovellukset</a>. Tässä keskitymme itse Pääteikkuna-sovellukseen.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -77,9 +77,9 @@
 <p>Voit avata niin monta Pääteikkunaa kuin tarvitset, joko jokainen omana ikkunana käynnistämällä Pääteikkuna tai näppäimillä <span class="key">ALT</span> <span class="key">N</span> jo käynnissä olevasta Pääteikkunasta. Tai voit käyttää Pääteikkunan välilehtinäkymää ja avata lisää välilehtiä näppäimillä <span class="key">ALT</span> <span class="key">T</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Kaksoisnapsautus välilehtipalkin tyhjään osaan avaa uuden välilehden; kaksoisnapsautus välilehteen avaa valintaikkunan otsikon uudelleennimeämiseksi. Käytettävissä on useita työkaluvihjeessä selitettyjä %-suunniteltuja muuttujia, kun siirrät hiiren osoittimen tekstikentän yläpuolelle.<br />
-Oletuksena, <tt>%1d: %p</tt>, välilehti näyttää nykyisen kansion ja, erotettuna merkillä <tt>:</tt>, parhaillaan suoritettavan prosessin nimen (tai <tt>--</tt> jos se on vain suoritettava komentotulkki, luultavasti joutokäynnissä). Yllä oleva näytönkaappaus näyttää ensimmäisen välilehden FTP-istunnolla <span class="path">Työpöytä</span>-kansiossa ja toisen välilehden joutokäynnissä <span class="path">koti</span>-kansiossa.<br />
-Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotssikkoa voidaan muokata samalla tavoin.</p>
+<p>Kaksoisnapsautus välilehtipalkin tyhjään osaan avaa uuden välilehden; kaksoisnapsautus välilehteen avaa valintaikkunan otsikon uudelleennimeämiseksi. Kun siirrät hiiren osoittimen tekstikentän yläpuolelle niin käytettävissä on useita työkaluvihjeessä selitettyjä %-suunniteltuja muuttujia.<br />
+Välilehti näyttää oletuksena <tt>%1d: %p</tt> nykyisen kansion ja merkillä <tt>:</tt> erotettuna parhaillaan suoritettavan prosessin nimen (tai <tt>--</tt> jos se on vain suoritettava komentotulkki, luultavasti joutokäynnissä). Yllä oleva näytönkaappaus näyttää ensimmäisen välilehden FTP-istunnolla <span class="path">Työpöytä</span>-kansiossa ja toisen välilehden joutokäynnissä <span class="path">koti</span>-kansiossa.<br />
+Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotsikkoa voidaan muokata samalla tavoin.</p>
 <p>Välilehden napsauttaminen hiiren kakkospainikkeella näyttää asiayhteysvalikon <span class="menu">Sulje välilehti</span>, <span class="menu">Sulje muut välilehdet</span> tai, kuten kaksoisnapsautuksessa, <span class="menu">Muokkaa välilehtiotsikkoa...</span>.</p>
 <p>Pääteikkunan kokoa voidaan muuttaa kuten kaikkia muitakin ikkunoita tai voit käyttää uudelleenasetuksia valikosta <span class="menu">Asetukset | Ikkunakoko</span>. Näppäimet <span class="key">ALT</span> <span class="key">ENTER</span> vaihtavat kokonäyttötilaan.</p>
 <p>Kaikki asetukset, jotka muutat suoraan <span class="menu">Asetukset</span>-valikon kautta, kuten <span class="menu">Ikkunaotsikko</span>, <span class="menu">Ikkunakoko</span>, <span class="menu">Tekstikoodaus</span> tai <span class="menu">Kirjasinkoko</span> säilytetään vain nykyisessä istunnossa. Jos haluat tehdä pysyvät muutokset, sinun on toteutettava ne <span class="menu">Asetukset...</span>-paneelissa.</p>
@@ -90,21 +90,21 @@ Valikon <span class="menu">Muokkaa | Ikkunaotsikko...</span> Pääteikkunaotssik
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
 <p>Useimmat tarjotut asetukset selittävät itsensä.<br />
-Välilehden ja ikkunaotsikon nimeämiseksi liikuta hiiren kohdistinta kohdan "kaavat" yläpuolella, jolloin saat työkaluvihjeet saatavilla olevista muuttujista. <br />
-Voit valita esiasennetun värikaavan kuten <span class="menu">Keskiyö</span> tai <span class="menu">Retro</span> tai luoda <span class="menu">Oma</span>:n värikaavan valitsemalla sen värin, jonka halat muuttaa (<span class="menu">Teksti</span>, <span class="menu">Tausta</span>, <span class="menu">Kohdistin</span> jne.) ja käytä sitten alla olevaa väripoimijaa.</p>
-<p>Sitten seuraa lisää valitsimia: sinulla voi olla <span class="menu">Vilkkuva kohdistin</span> ja valitse <span class="menu">Käytä vaaleaa eikä vahvennettua tekstin sijasta</span>. Jälkimmäinen asetus välttää joskus melko näkymättömän lihavointikirjasimien renderoinnin Pääteikkunassa.<br />
+Välilehden ja ikkunaotsikon nimeämiseksi liikuta hiiren kohdistinta Välilehtiotsikko- ja Ikkunaotsikko-"kaavojen" päällä, jolloin saat työkaluvihjeet saatavilla olevista muuttujista. <br />
+Voit valita esiasennetun värikaavan kuten <span class="menu">Keskiyö</span> tai <span class="menu">Retro</span> tai luoda <span class="menu">Oma</span>:n värikaavan valitsemalla sen värin, jonka haluat muuttaa (<span class="menu">Teksti</span>, <span class="menu">Tausta</span>, <span class="menu">Kohdistin</span> jne.) ja käytä sitten alla olevaa väripoimijaa.</p>
+<p>Sitten seuraa lisää valitsimia: sinulla voi olla <span class="menu">Vilkkuva kohdistin</span> ja valitse <span class="menu">Käytä vaaleaa eikä vahvennettua tekstiä</span>. Jälkimmäinen asetus välttää joskus melko näkymättömän lihavointikirjasimien renderoinnin Pääteikkunassa.<br />
 Aktivoi valintaruutu <span class="menu">Vahvista poistuminen, jos ohjelmia on käytössä</span> ja sinua varoitetaan, kun yrität sulkea Pääteikkunan, jossa suoritetaan sovellusta.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td class="onelinetop"><span class="button">Tallenna tiedostoon...</span></td><td width="10"> </td><td>antaa sinun tallentaa eri asetukset erillisenä profiilina, joka avautuu kaksoisnapsautuksella  profiilin mukaisesti asetetuksi Pääteikkunaksi.</td></tr>
-<tr><td><span class="button">Palauta</span></td><td> </td><td>tuo sinulle takaisin ne asetukset, jotka olivat aktiivisia, kun avasit asetukset-paneelin.</td></tr>
+<tr><td><span class="button">Palauta</span></td><td> </td><td>tuo sinulle takaisin ne asetukset, jotka olivat aktiivisia, kun avasit Asetukset-paneelin.</td></tr>
 <tr><td><span class="button">Oletukset</span></td><td> </td><td>nollaa kaikki oletusarvoihin.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Pikanäppäimet</a></h2>
 <p>Löydät hyödyllisten pikanäppäimien luettelon asiakirjasta <a href="../keyboard-shortcuts.html#terminal">Pikanäppäimet ja näppäinyhdistelmät</a>.</p>
-<p>Toinen näppärä ominaisuus, joka on enemmän näppäin &amp; hiiri-yhdistelmä: Pitämällä alhaalla näppäintä <span class="key">ALT</span> polku tai verkko-osoite hiiren osoittimen alla tulee korostetuksi. Hiiren ykköspainike avaa kohteen tiedosto/kansio file/folder tai webbisivun. Hiiren kakkospainike avaa joko asiayhteysvalikosta joko <span class="menu">Kopioi polku</span>- tai <span class="menu">Kopioi absoluuttinen polku</span>-rivin. Kuvittele, että olet kohteessa <span class="path">/MyData/source/haiku/</span> ja sinulla on hiiren osoittimen alla polku <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>, jälkimmäinen valikkorivi saa aikaan yhdistelmän, absoluuttisen polun &lt;<i>syvä henkäys</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
-<p>Jos pidät alhaalla näppäimiä <span class="key">ALT</span> <span class="key">VAIHTO</span>, korostetaan vain polku sieltä alusta, missä hiiren kohdistin sijaitsee.</p>
+<p>Toinen näppärä ominaisuus, joka on enemmän näppäin &amp; hiiri-yhdistelmä: Pitämällä alhaalla näppäintä <span class="key">ALT</span>, jolloin polku tai verkko-osoite hiiren osoittimen alla tulee korostetuksi. Hiiren ykköspainike avaa kohteen tiedosto/kansio tai webbisivun. Hiiren kakkospainike avaa asiayhteysvalikosta joko <span class="menu">Kopioi polku</span>- tai <span class="menu">Kopioi absoluuttinen polku</span>-rivin. Kuvittele, että olet kohteessa <span class="path">/MyData/source/haiku/</span> ja sinulla on hiiren osoittimen alla polku <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>, jälkimmäinen valikkorivi saa aikaan yhdistelmän eli absoluuttisen polun &lt;<i>syvä henkäys</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>Jos pidät alhaalla näppäimiä <span class="key">ALT</span> <span class="key">VAIHTO</span>, korostetaan polkua vain polun alusta sinne missä hiiren kohdistin sijaitsee.</p>
 <p>Muuten, hiiren kakkospainikkeen napsauttaminen lisää leikepöydän Pääteikkunaan. Korostettujen polkujen yhdistelmässä tätä voidaan käyttää nopeaan navigointiin syvälle kansiohierarkkiaan.</p>
 
 <h2>

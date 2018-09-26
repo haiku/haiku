@@ -17,14 +17,14 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>日付と時間</title>
+	<title>日付と時刻</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +51,7 @@
 </ul>
 <span>
  «  <a href="sounds.html">サウンド</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="tracker.html">Tracker</a>  »
 </span></div>
 </div>
@@ -66,7 +66,7 @@
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/networktime settings</span> - ネットワークを通じた時刻同期に関するすべての設定<br />
 <span class="path">~/config/settings/RTC_time_settings</span> - ハードウェアクロックの設定 (現地時刻または GMT)<br />
 <span class="path">~/config/settings/Time settings</span> - タイムゾーン設定<br />
-<span class="path">~/config/settings/Time_preflet_window</span> - パネルの位置など<br />
+<span class="path">~/config/settings/Time_preflet_window</span> - パネル位置など<br />
 </td></tr>
 </table>
 <p>この設定は、4 つのタブに分けられています。</p>
@@ -75,7 +75,7 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="date-time" name="date-time">日付と時刻 (Date and time)</a></h2>
 <img src="../images/prefs-images/time-time.png" alt="time-time.png" />
-<p>左側で、カレンダーをクリックすることで、日を設定します。月と年はそれをクリックしてから右側の上下矢印で変更するか、またはキーボードのカーソルキーを使って変更します。</p>
+<p>左側でカレンダーをクリックすると、日を設定します。月と年はそれをクリックしてから右側の上下矢印で変更するか、またはキーボードのカーソルキーを使って変更します。</p>
 <p>同様に、右側で時刻を設定します。または、単純に時計の針を直接動かします。</p>
 
 <h2>
@@ -85,16 +85,16 @@
 <p>地域のリストからユーザーの国を探して選択し、<span class="button">タイムゾーンを設定 (Set time zone)</span> を押すだけです。複数のタイムゾーンがある国はもう一段深いレベルに展開する必要があるでしょう。<br />右側には、現在設定されているタイムゾーンの時刻と、ユーザーが選んだタイムゾーンの時刻が表示されます。</p>
 <p>右側にはコンピューターのハードウェアクロックの設定があります。クロックには次の 2 つのモードがあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">現地時刻 (Local Time)</span></td><td></td><td>ユーザーの現地時刻を表示するためのモードです。Windows とデュアルブートする場合に通常設定します。</td></tr>
-<tr><td><span class="menu">GMT</span></td><td></td><td>グリニッジ標準時 (Greenwich Mean Time) を表示するためのモードです。UNIX と互換の設定です。</td></tr>
+<tr><td><span class="menu">現地時刻 (Local Time)</span></td><td></td><td>ユーザーの現地時刻を表示するためのモード。Windows とデュアルブートする場合に通常設定する。</td></tr>
+<tr><td><span class="menu">GMT</span></td><td></td><td>グリニッジ標準時 (Greenwich Mean Time) を表示するためのモード。UNIX と互換の設定。</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="network" name="network">ネットワークタイム (Network time)</a></h2>
-<p>インターネットに接続しているなら、日付と時刻を手動で設定するのはもう時代遅れです。大変正確な時刻信号を提供する公開サーバー (NTP サーバー) があります。</p>
+<p>インターネットに接続しているなら、日付と時刻を手動で設定することはもう時代遅れです。大変正確な時刻信号を提供する公開サーバーがあります。</p>
 <img src="../images/prefs-images/time-network.png" alt="time-network.png" />
-<p> <span class="button">+</span>/<span class="button">-</span> ボタンでリストに <acronym title="Network Time Protocol">NTP</acronym> サーバーを追加または削除することができます。</p>
+<p> <span class="button">+</span>/<span class="button">-</span> ボタンでリストへ <acronym title="Network Time Protocol">NTP</acronym> サーバーを追加 / 削除できます。</p>
 <p>下のチェックボックスは、システムに時刻の同期時に現在選択されているサーバーだけではなく、<span class="menu">すべてのサーバーを試す (Try all servers)</span> ように伝えます。また、常に正しい時刻を示していることを確認するため、<span class="menu">起動時に同期 (Synchronize at boot)</span> するようにも伝えます。</p>
 <p>誤って稼働中の NTP サーバーを削除した場合、<span class="button">デフォルトのサーバーリストにリセット (Reset to default server list)</span> でき、また、手動で時計を<span class="button">同期 (Synchronize)</span> することも可能です。また、同期はコマンドライン (またはスクリプト) からも実現できます。</p>
 <pre class="terminal">Time --update</pre>
@@ -113,7 +113,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="sounds.html">サウンド</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="tracker.html">Tracker</a>  »
 </span></div>
 </div> </body>

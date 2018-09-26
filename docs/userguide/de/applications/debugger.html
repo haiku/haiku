@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2017, Haiku. All rights reserved.
+ * Copyright 2015-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -77,6 +77,27 @@
 <li><p><span class="button">Bericht speichern</span> erzeugt einen Debugbericht der als Textdatei auf dem Desktop gespeichert wird. Der Bericht kann dann an den Entwickler der abgestürzten Anwendung gemailt oder an ein Ticket des Bugtrackers der Anwendung gehangen werden.<br />
 Der Debugbericht enthält Angaben zur Hardware (CPU-Typ und Speichernutzung usw.), die genaue Haiku Version und andere Systeminformationen, die mit dem Absturz zusammenhängen könnten.</p></li>
 </ul>
+<p>Welche Standard-Aktion bei einem Crash ausgeführt wird, kann mit der Textdatei <span class="path">~/config/settings/system/debug_server/settings</span> konfiguriert werden.<br />
+Die Datei verwendet den 'driver_settings' Stil:</p>
+<pre>default_action user
+
+executable_actions {
+	app1 log
+	/path/app2* debug
+}</pre>
+<p>Gültige Werte für 'default_action' sind:</p>
+<table summary="action values" border="0" cellspacing="0" cellpadding="2">
+<tr><td>user</td><td style="width:30px"></td><td>Beim Benutzer nachfragen was zu tun ist.</td></tr>
+<tr><td>kill</td><td></td><td>Das crashende Team wird still und leise beendet.</td></tr>
+<tr><td>debug</td><td></td><td>Das crashende Team wird im Debugger untersucht.</td></tr>
+<tr><td>log / report</td><td></td><td>Speichert einen Crash-Bericht und beendet das Team.</td></tr>
+<tr><td>core</td><td></td><td>Speichert eine (evtl. sehr große) Core-Datei und beendet das Team.</td></tr>
+</table>
+<p>Ohne eine 'default_action' wird die 'user' Einstellung benutzt.</p>
+<p>Mit dem Block 'executable_actions' lässt sich die 'default_action' für bestimmte Teams/Anwendungen aushebeln. Das Format ist wie oben beschrieben, wobei die einzelnen Zeilen aus einem Team-Namen oder einem Pfad bestehen können (inkl. Platzhaltern).</p>
+<p><br /></p>
+<hr />
+<p><br /></p>
 <p>Die Benutzung des eigentlichen Debuggers würde den Rahmen dieses Userguides sprengen, der sich ja an die Bedürfnisse des Endbenutzers richtet. Der Vollständigkeit halber, hier das Debugger Fenster das erscheint, wählt man die <span class="button">Debug</span> Option aus dem ersten Screenshot:</p>
 <img src="../images/apps-images/debugger.png" alt="debugger.png" />
 <p>Wie man schnell sieht wenn man den Debugger ein bisschen erkundet, handelt es sich um eine der komplexesten und ausgereiftesten Anwendungen für Haiku. Ein Entwickler, der bereits mit grafischen Debuggern anderer Plattformen vertraut ist, wird viele Features bestimmt wiedererkennen.</p>
@@ -85,7 +106,6 @@ Der Debugbericht enthält Angaben zur Hardware (CPU-Typ und Speichernutzung usw.
 <tr><td class="onelinetop"><a href="https://www.dropbox.com/s/e6gx39r0asc2t8f/DebuggerReferenceManual.pdf?dl=1">Debugger Reference Manual</a></td><td></td><td>Das (englische) Reference Manual ist die bisher detallierteste Beschreibung des Debuggers.</td></tr>
 <tr><td><a href="https://www.haiku-os.org/blog/anevilyak/">Blogposts</a></td><td> </td><td>Es existieren einige Artikel über den Debugger, meist von Rene Gollent geschrieben, nachdem er ein neues Feature implementiert hat.</td></tr>
 <tr><td class="onelinetop"><a href="https://www.youtube.com/watch?v=n-NDFwtmQcI&amp;list=PL2KiE-VO9zk-9XPmfusEDaOFd_7AiVKzz">BeGeistert 026 Video</a></td><td> </td><td>Aufgenommen auf dem BeGeistert Treffen im Jahre 2012, demonstriert Ingo Weinhold den damaligen Stand des Debuggers und zeigt einige interessante Werkzeuge wie den Profiler, um Flaschenhälse im Code zu identifizieren.</td></tr>
-<tr><td class="onelinetop"><a href="http://cgit.haiku-os.org/haiku/commit/?id=hrev46547">Absturzverhalten ändern</a></td><td> </td><td>Diese Commit-Message beschreibt wie das normale Verhalten bei einem Absturz geändert werden kann. So kann beispielsweise immer ein Crash-Bericht abgespeichert werden, anstatt beim User mit dem üblichen Crash-Fenster nachzufragen. Dieses Verhalten kann für einzelne Anwendungen unterschiedlich eingestellt werden.</td></tr>
 </table>
 
 </div>

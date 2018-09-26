@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -60,7 +60,7 @@
 
 <h1>Tiedostojärjestelmäsijoittelu</h1>
 
-<p>Haikun tiedostojärjestelmäsijoittelu on aika läpinäkyvä, yrittäen aina käyttää salaamattomia tiedosto- ja kansionimiä, mikä ei jätä käyttäjille arvaamisen tarvetta. Tiedostot ja kansiot, jotka ovat tärkeitä järjestelmän toimimiseksi kunnolla, on suojattu vahingossa tapahtuvalta käsitttelyltä yhdellä näistä hälytyksistä:</p>
+<p>Haikun tiedostojärjestelmäsijoittelu on aika läpinäkyvä ja yrittää aina käyttää salaamattomia tiedosto- ja kansionimiä, mikä ei jätä käyttäjille arvaamisen tarvetta. Tiedostot ja kansiot, jotka ovat tärkeitä järjestelmän toimimiseksi kunnolla, on suojattu vahingossa tapahtuvalta käsitttelyltä yhdellä näistä hälytyksistä:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>Toinen hälytys ponnahtaa esiin, jos yrität nimetä uudelleen tai poistaa jotain järjestelmähierarkiasta. Tässä painiketta <span class="button">Nimeä uudelleen</span> on napsautettava vain, jos pidät <span class="button">VAIHTO</span>-näppäintä alhaalla.</p>
@@ -88,7 +88,7 @@ Useimmat kansion <span class="path">/boot/system/</span> sisällä olevat kansio
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">Kotikansio - <span class="path">/boot/home/</span></a></h2>
-<p>Tämä kansio kuuluu sinulle. Tässä voit luoda ja poistaa tiedostoja ja kansioita halusi mukaan. (Muuten tilde-merkki ("<tt>~</tt>") on oikotie kotihakemistoon, joten sinun ei tarvitse aina kirjoitta "<span class="path">/boot/home/</span>" Pääteikkunassa.)<br />
+<p>Tämä kansio kuuluu sinulle. Tässä voit luoda ja poistaa tiedostoja ja kansioita halusi mukaan. (Muuten tilde-merkki (”<tt>~</tt>”) on oikotie kotihakemistoon, joten sinun ei tarvitse aina kirjoitta ”<span class="path">/boot/home/</span>” Pääteikkunassa.)<br />
 Ne tiedostot, jotka haluat tulevaisuudessa jakaa monikäyttäjäympäristössä muiden käyttäjien kanssa on laitettava kansion <span class="path">/boot/home/</span> ulkopuolelle. Esimerkiksi voit luoda kansion <span class="path">/boot/all-users/</span> ja laittaa materiaalin sinne.</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
@@ -109,7 +109,7 @@ Ne tiedostot, jotka haluat tulevaisuudessa jakaa monikäyttäjäympäristössä 
 <td>Tässä voit lisätä/poistaa pakkauksia, joita <i>ei</i> ole jaettu kaikkien käyttäjien kanssa.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
-<td>Sisältää hierarkian tiedostoille, jotka eivät ole osa pakkausta .hpkg (luultavasti vanhasta BeOS-arkistotiedostosta) ja <i>ei</i> ole jaettu kaikkien käyttäjien kesken.</td></tr>
+<td>Sisältää hierarkian tiedostoille, jotka eivät ole osa pakkausta .hpkg (luultavasti vanhasta BeOS-arkistotiedostosta) ja joita <i>ei</i> ole jaettu kaikkien käyttäjien kesken.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>Tämä kansio sisältää asetuksia kaikkiin sovelluksiin ja muutamia järjestelmän asetuksia. Jotkut sovellukset käsittelevät asetuksiaan omissa alikansioisssa, toiset laittavat yksinkertaisesti asetustiedostonsa tänne.</td></tr>
@@ -126,13 +126,13 @@ Ne tiedostot, jotka haluat tulevaisuudessa jakaa monikäyttäjäympäristössä 
 <td>Linkit ohjelmiin tai asiakirjoihin tässä kansiossa käynnistetään automaattisesti jokaisen käynnistyksen yhteydessä.</td></tr>
 
 <tr><td><span class="path">beos_mime/</span></td><td> </td>
-<td>Tässä <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-tietokannassa Haiku säilyttää kaikkien eri <a href="filetypes.html">tiedostotyyppien</a> jäljet ja niiden asetuksia.</td></tr>
+<td>Tässä <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-tietokannassa Haiku seuraa kaikkia eri <a href="filetypes.html">tiedostotyyppejä</a> ja niiden asetuksia.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
 <td>Kopioituna tai linkitetynä kansioon files/folders/queries tämä kansio ilmaantuu <a href="deskbar.html#deskbar-menu">Työpöytäpalkkivalikko</a>on.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
-<td>Yksi asetustiedosto saattaa olla kiinnostava: <span class="cli">kernel</span> tarjoaa joitakin alemman tason asetuksia kuten <acronym title="Symmetric Multi Processing">SMP</acronym>:n ottamisen pois käytöstä, sarjavianjäljityksen aktivoinnin tai kehittyneen virranhallinnan (APM) käyttöönoton. Voit aktivoida asetusrivin poistamalla kommenttimerkin "<tt>#</tt>" rivin alusta. Ole varovainen tässä!</td></tr>
+<td>Yksi asetustiedosto saattaa olla kiinnostava: <span class="cli">kernel</span> tarjoaa joitakin alemman tason asetuksia kuten <acronym title="Symmetric Multi Processing">SMP</acronym>:n ottamisen pois käytöstä, sarjaporttivianjäljityksen aktivoinnin tai kehittyneen virranhallinnan (APM) käyttöönoton. Voit aktivoida asetusrivin poistamalla kommenttimerkin ”<tt>#</tt>” rivin alusta. Ole varovainen tässä!</td></tr>
 
 <tr><td><span class="path">Tracker/</span></td><td> </td>
 

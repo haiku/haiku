@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		thebowseat
- *		mt
  *		Humdinger
+ *		mt
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -53,7 +53,7 @@
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">テキスト検索</a>  »
 </span></div>
 </div>
 
@@ -80,7 +80,7 @@
 <br />
 <p>タブの空白部分をダブルクリックすると新しいタブが開かれ、タブをダブルクリックするとタイトルを編集するダイアログが開かれます。% で指定された変数はいくつかあり、テキストフィールドの上にマウスを移動させると説明がツールチップで表示されます。<br />
 標準 (<tt>%1d: %p</tt>) では、タブはカレントディレクトリを表示し、<tt>:</tt> で区切った後、現在実行中のプロセス (bash が実行中かアイドル中の場合は <tt>--</tt>) を表示します。上のスクリーンショットでは、<span class="path">Desktop</span> フォルダー内の FTP セッションを最初のタブで実行しており、二つ目のタブは、<span class="path">home</span> でアイドルしています。<br /><span class="menu">設定 | ウィンドウタイトル... (Edit | Window title...)</span> でターミナルのウィンドウタイトルも同様に編集できます。</p>
-<p>タブを右クリックすると、<span class="menu">タブを閉じる (Close tab)</span> か、ダブルクリックのように<span class="menu">タブタイトルの編集... (Edit tab title...)</span> を行うコンテキストメニューが表示されます。</p>
+<p>タブを右クリックすると、<span class="menu">タブを閉じる (Close tab)</span> か、ダブルクリックのように<span class="menu">タブタイトルの編集... (Edit tab title...)</span> をするコンテキストメニューが表示されます。</p>
 <p>ターミナルのウィンドウはほかのウィンドウのようにサイズを変更するか、<span class="menu">設定 | ウィンドウサイズ (Settings | Window size)</span> メニューでプリセットされたサイズを使えます。<span class="key">ALT</span> <span class="key">ENTER</span> で全画面表示に切り替えます。</p>
 <p>直接 <span class="menu">設定 (Settings)</span> メニューを介して変更したすべての設定 <span class="menu">ウィンドウタイトル (Window title)</span>、<span class="menu">ウィンドウサイズ (Window size)</span>、<span class="menu">テキストエンコーディング (Text encoding)</span>、または<span class="menu">フォントサイズ (Font size)</span> は、現在のセッション間のみ保存されます。変更を確定する場合は、<span class="menu">設定… (Settings...)</span> パネルを使用する必要があります。</p>
 
@@ -91,20 +91,20 @@
 <br />
 <p>用意された設定のほとんどは見ればわかるものです。<br />
 マウスポインターでタブタイトルとウィンドウタイトルの "式" を指すと、利用可能な変数についてのツールチップが表示されます。<br />
-<span class="menu">ミッドナイト (Midnight)</span> や<span class="menu">レトロ (Retro)</span> のような設定済みの配色パターンを選択できます。また、変更したい色 (<span class="menu">テキスト (Text)</span>、<span class="menu">背景 (Background)</span>、<span class="menu">カーソル (Cursor)</span> など) を選び、下にあるカラーピッカーを使って、<span class="menu">Custom</span>配色を作成できます。</p>
+<span class="menu">ミッドナイト (Midnight)</span> や<span class="menu">レトロ (Retro)</span> のような設定済み配色パターンを選択できます。また、変更する色 (<span class="menu">テキスト (Text)</span>、<span class="menu">背景 (Background)</span>、<span class="menu">カーソル (Cursor)</span> など) を選び、下にあるカラーピッカーを使って、<span class="menu">カスタム (Custom)</span> 配色を作成できます。</p>
 <p>続けて、いくつかのオプションについて: <span class="menu">カーソルを点滅させる (Blinking cursor)</span> を使用でき、<span class="menu">太字の代わりに高輝度テキストを使う (Use bright instead of bold text)</span> を選択できます。後者の設定は、ターミナルでボールドフォントのレンダリングが時々多少見苦しくなることを回避します。<br />
 <span class="menu">実行中のプログラムがある場合、終了時に確認する (Confirm exit if active programs exist)</span> チェックボックスを有効にすると、アプリケーションがまだ実行されている時に、ターミナルウィンドウを閉じようとすると警告されるでしょう。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td class="onelinetop"><span class="button">ファイルに保存… (Save to file...)</span></td><td width="10"> </td><td>異なる設定を別のプロファイルに保存します。プロファイルをダブルクリックすると、それに応じて設定されたターミナルが開きます。</td></tr>
-<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>設定パネルを開いた時の設定に戻します。</td></tr>
-<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセットします。</td></tr>
+<tr><td class="onelinetop"><span class="button">ファイルに保存… (Save to file...)</span></td><td width="10"> </td><td>異なる設定を別のプロファイルに保存する。プロファイルをダブルクリックすると、それに応じて設定されたターミナルが開く。</td></tr>
+<tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>設定パネルを開いた時の設定に戻す。</td></tr>
+<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセット。</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">キーボードショートカット</a></h2>
 <p><a href="../keyboard-shortcuts.html#terminal">ショートカットとキーの組み合わせ</a>に、便利なショートカットの一覧が載っています。</p>
 <p>もう 1 つの便利な機能として、さらなるキーボードとマウスの組み合わせがあります。<span class="key">ALT</span> を押したままだと、マウスポインターの下のパスまたは URL が反転表示されます。左クリックでファイル / フォルダーあるいはウェブサイトが開きます。右クリックで <span class="menu">Copy path</span> (パスをコピー)または <span class="menu">Copy absolute path</span> (絶対パスをコピー) のコンテキストメニューが開きます。ユーザーが <span class="path">/MyData/source/haiku/</span> にいるとして、マウスポインターの下のパスが <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> であるとすると、後者のメニューは結合された絶対パス&lt;<i>ここで深呼吸</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> となります。</p>
-<p><span class="key">ALT</span> <span class="key">SHIFT</span> を押したままの場合は、マウスポインターが指すところまでのパスが反転表示されます。</p>
+<p><span class="key">ALT</span> <span class="key">SHIFT</span> を押したままだと、マウスポインターが指すところまでのパスが反転表示されます。</p>
 <p>ところで、ターミナルウィンドウ内で右クリックすると、クリップボードの内容を挿入します。これと反転表示されたパスのコピーとを組み合わせると、深いフォルダー階層のすばやいナビゲーションに使えます。</p>
 
 <h2>
@@ -133,11 +133,11 @@
 <ul><li><p>
 ファイルやフォルダーを Tracker ウィンドウからターミナルにドラッグすると、ファイルやフォルダーの場所をカーソル位置に挿入します。右クリックでドラッグすると、次のようなアクションがコンテキストメニューに表示されます。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">パスを挿入 (Insert path)</span></td><td> </td><td>左クリックと同様、ファイルの場所を挿入します。</td></tr>
-<tr><td><span class="menu">ディレクトリを変更 (Change directory)</span></td><td> </td><td>ドラッグされたファイルのフォルダーへディレクトリを変更します。</td></tr>
-<tr><td><span class="menu">カレントディレクトリにリンク作成 (Create link here)</span></td><td> </td><td>現在ターミナルで作業中のディレクトリにドラッグされたファイルのリンクを作成します。</td></tr>
-<tr><td><span class="menu">カレントディレクトリへ移動 (Move here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリへ移動します。</td></tr>
-<tr><td><span class="menu">カレントディレクトリへコピー (Copy here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリにコピーします。</td></tr>
+<tr><td><span class="menu">パスを挿入 (Insert path)</span></td><td> </td><td>左クリックと同様、ファイルの場所を挿入。</td></tr>
+<tr><td><span class="menu">ディレクトリを変更 (Change directory)</span></td><td> </td><td>ドラッグされたファイルのフォルダーへディレクトリを変更。</td></tr>
+<tr><td><span class="menu">カレントディレクトリにリンク作成 (Create link here)</span></td><td> </td><td>現在ターミナルで作業中のディレクトリにドラッグされたファイルのリンクを作成。</td></tr>
+<tr><td><span class="menu">カレントディレクトリへ移動 (Move here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリへ移動。</td></tr>
+<tr><td><span class="menu">カレントディレクトリへコピー (Copy here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリにコピー。</td></tr>
 </table></li>
 <li><p><span class="cli">open <i>[filename]</i></span> コマンドでどのファイルも標準アプリケーションで開けます。これは現在 ("<span class="cli">.</span>") と親 ("<span class="cli">..</span>") フォルダーの表現でも動作可能で、Tracker ウィンドウで開かれます。現在作業しているディレクトリを開くには、</p>
 <pre class="terminal">open .</pre> <p>と入力してください。</p>
@@ -151,7 +151,7 @@
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">テキスト検索</a>  »
 </span></div>
 </div>
 

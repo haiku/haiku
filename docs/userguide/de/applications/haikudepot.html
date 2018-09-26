@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2017 Haiku. All rights reserved.
+ * Copyright 2013-2018 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -79,15 +79,17 @@
 <p><br /></p>
 <p>HaikuDepot ist die zentrale Anwendung, um Software-Pakete zu managen. Mit ihr lassen sich Softwarequellen durchstöbern und Pakete installieren, aktualisieren und deinstallieren. Standardmäßig öffnet sich HaikuDepot mit einer Liste empfohlener Pakete.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>Sobald man einen oder mehrere <span class="menu">Suchbegriffe</span> eingibt, ändert sich die Darstellung zu kleineren Icons und es werden weitere Informationen in Spalten angezeigt.</p>
+<p>Wird die Checkbox  <span class="menu">Nur Empfehlungen anzeigen</span> deaktiviert, werden alle verfügbaren Pakete angezeigt und die Darstellung ändert sich zu kleineren Icons, weitere Informationen werden in Spalten angezeigt.</p>
+<img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Filter</a></h2>
 <p>Ganz oben hat man einige Möglichkeiten, die Paketliste darunter zu filtern:</p>
 <ul>
 <li><p>Mit dem <span class="menu">Kategorien</span> Menü lässt sich die Liste auf bestimmte Kategorien wie "<i>Audio</i>" oder "<i>Spiele</i>" begrenzen. </p></li>
-<li><p>Im Menü <span class="menu">Paketquellen</span> bestimmt man welche Online-Quellen überhaupt in der Liste auftauchen sollen, oder ob nur die Pakete gelistet werden sollen, die aus anderen Quellen gekommen sind ("<i>Lokal</i>"). Diese können beispielsweise von einem USB Stick kopiert, oder von irgendeiner Webseite heruntergeladen, oder auch selbst gebaut worden sein.</p></li>
 <li><p>Die im <span class="menu">Suchbegriffe</span> Textfeld eingegebenen Zeichen filtern die Liste auf die Pakete, die alle (per Leerzeichen getrennten) Wörter in Namen oder Beschreibung haben.</p></li>
+<li><p>Die Checkbox <span class="menu">Nur Empfehlungen anzeigen</span> kann aktiviert werden, um die Paketliste der gewählten Kategorie bzw. eingegebener Suchbegriffe weiter zu filtern.</p></li>
+<li><p>Im Menü <span class="menu">Paketquellen</span> bestimmt man welche Online-Quellen abgefragt werden sollen. "<i>Lokal</i>" sind Pakete, die aus anderen Quellen gekommen sind. Beispielsweise von einem USB Stick, oder von irgendeiner Webseite, oder auch Pakete die man selbst erstellt hat.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,10 +128,11 @@ Mittels der kleinen Daumen-rauf/runter-Icons rechts, kann man die einzelnen Komm
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="menu" name="menu">Werkzeuge und Anzeigen</a></h2>
-<p>Im <span class="menu">Werkzeuge</span> Menü ganz oben im HaikuDepot-Fenster findet sich der Menüpunkt <span class="menu">Paketquellen aktualisieren</span>, um eine aktuelle Liste aller verfügbaren Pakete anzufordern. <span class="menu">Paketquellen verwalten...</span> öffnet die <a href="../preferences/repositories.html"><acronym title="Repositories">Paketquellen</acronym></a> Einstellungen, um sie hinzuzufügen, zu entfernen oder sie zu aktivieren und zu deaktivieren.</p>
-<p>Im <span class="menu">Anzeigen</span> Menü gibt es die Möglichkeit <span class="menu">Nur Empfehlungen</span> zu deaktivieren. Dann sieht man immer alle verfügbaren Pakete, nicht nur die empfohlenen, wenn HaikuDepot startet oder kein Suchbegriff eingegeben wurde.<br />
-Außerdem kann man <span class="menu">Entwicklungs-Pakete</span> und <span class="menu">Quellcode-Pakete</span> anzeigen lassen. Für den normalen Benutzer sind sie nicht so interessant und blähen die Paketliste nur unnötig auf. Sie sind allerdings wichtig für Leute, die deren Bibliotheken, Header-Dateien etc. brauchen, um darauf aufbauende Programme zu entwickeln und zu kompilieren.</p>
-<p>Interessanter, und selbsterklärend, sind die beiden anderen Menüpunkte, um nur <span class="menu">Verfügbare Pakete</span> und <span class="menu">Installierte Pakete</span> anzuzeigen.</p>
+<p>Im <span class="menu">Werkzeuge</span> Menü ganz oben im HaikuDepot-Fenster findet sich der Menüpunkt <span class="menu">Paketquellen aktualisieren</span>, um eine aktuelle Liste aller verfügbaren Pakete anzufordern.<br />
+<span class="menu">Paketquellen verwalten...</span> öffnet die <a href="../preferences/repositories.html"><acronym title="Repositories">Paketquellen</acronym></a> Einstellungen, um sie hinzuzufügen, zu entfernen oder sie zu aktivieren und zu deaktivieren.<br />
+<span class="menu">Aktualisierungen suchen...</span> öffnet den <a href="../apps/softwareupdater.html">SoftwareUpdater</a> um aktualisierte Pakete zu suchen und zu installieren.</p>
+<p>Im <span class="menu">Anzeigen</span> Menü gibt es die Möglichkeit <span class="menu">Entwicklungs-Pakete</span> und <span class="menu">Quellcode-Pakete</span> anzuzeigen. Für den normalen Benutzer sind sie nicht so interessant und blähen die Paketliste nur unnötig auf. Sie sind allerdings wichtig für Leute, die deren Bibliotheken, Header-Dateien etc. brauchen, um darauf aufbauende Programme zu entwickeln und zu kompilieren.</p>
+<p>Interessanter sind da die beiden anderen Menüpunkte, um nur <span class="menu">Verfügbare Pakete</span> und <span class="menu">Installierte Pakete</span> anzuzeigen.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Benutzerkonto einrichten</a></h2>

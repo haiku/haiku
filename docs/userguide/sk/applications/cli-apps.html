@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		helix84
  *		Bachoru
+ *		helix84
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -80,7 +80,7 @@ Tieto príkazy sú popísané v téme <a href="../index.html">Index</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-pkg" name="cli-pkg">Súvisiace so správou balíkov: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>Príkaz <span class="cli">package</span> sa používa na správu balíkov HPKG. Prečítajte si článok <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Inštalovanie aplikácií</a>, kde sa naučíte úplné základy. Na tvorbu receptov na automatické zostavovanie balíkov sa zvyčajne používa nástroj <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a>.</p>
+<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to automatically create packages from so-called recipes.</p>
 <p><span class="cli">pkgman</span> sa používa na hľadanie, inštalovanie, aktualizovanie a odinštalovanie balíkov. Zdroje balíkov je možné pridať, odstrániť a obnoviť zoznam balíkov z nich. Špeciálny druh aktualizácie sa vyvolá parametrom <tt>full-sync</tt>: Je agresívnejší a tiež môže znížiť verziu alebo odstrániť balíky, ak je to nutné.<br />
 Ďalšie podrobnosti o tomto parametri sa dozviete pridaním parametra „--help“, napr. <tt>pkgman search --help</tt>.</p>
 
@@ -100,7 +100,8 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> je malý nástroj, ktorý pošle BMessages aplikáciám a vypíše ich odpoveď. Je možné použiť ho na písanie skriptov aplikácií, t.j. na „Diaľkové ovládanie“ programov zo skriptu alebo z príkazového riadka. Jeho používanie je trochu zložitejšie... Vďaka knihe Scot Hacker BeOS Bible si môžete prečítať pekný <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">návod na prácu s „hey“</a>, ktorý napísal Chris Herborth.</p></td></tr>
+<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+</td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> je verzia panela „Nájsť...“ pre príkazový riadok. Rýchlym spôsobom ako vygenerovať hľadaný termín je vytvoriť požiadavku v paneli „Nájsť...“, prepnúť na <span class="menu">podľa vzorca</span>, pridať úvodzovky (<tt>"</tt>) na začiatok a koniec a celý reťazec skopírovať za váš príkaz <span class="cli">query</span> v Termináli alebo vašom skripte.</p>
 </td></tr>
@@ -115,8 +116,8 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
 		<td><p><span class="cli">checkfs</span> je dôležitý nástroj na hľadanie chýb vo vašom súborovom systéme. Jednoducho pridajte názov zväzku ako <span class="path">/Haiku</span> alebo cestu k zariadeniu a systém prebehne každý súbor a opraví možné nezrovnalosti.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> dokáže priradiť ikonu ľubovolnému súboru, priečinku, požiadavke alebo aplikácii v oznamovacej oblasti Panela. Taktiež ponúka možnosť poskytnúť kontextové menu po kliknutí na ikonu pravým tlačidlom na vykonanie špeciálnych operácií. Ako príklad môžete skúsiť pridať aplikáciu príkazového riadka <span class="app">screenshot</span> s rôznymi možnosťami pomocou tohto kódu (znak „<tt>\</tt>“ v prvom riadku je na zalomenie riadka v Termináli):</p>
-<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
+		<td valign="top"><p><span class="cli">desklink</span> dokáže priradiť ikonu ľubovolnému súboru, priečinku, požiadavke alebo aplikácii v oznamovacej oblasti Panela. Taktiež ponúka možnosť poskytnúť kontextové menu po kliknutí na ikonu pravým tlačidlom na vykonanie špeciálnych operácií. Ako príklad môžete skúsiť pridať aplikáciu príkazového riadka <span class="app">screenshot</span> s rôznymi možnosťami pomocou tohto kódu (znak „<tt>\\</tt>“ v prvom riadku je na zalomenie riadka v Termináli):</p>
+<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \\
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
@@ -124,10 +125,10 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">diskimage</span> vám umožňuje zaregistrovať obyčajný súbor ako diskové zariadenia. Napríklad môžete sa zaregistrovať obraz Haiku vo formáte anyboot, pripojiť ho v Trackeri a kopírovať, upravovať alebo odstraňovať súbory na ňom predtým, než ho použijete ho ako zdroj v Inštalátore.</p></td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>launch_daemon spúšťa rôzne služby a aplikácie pri štarte systému. Je nastavený tak, aby niektoré z nich znovu spustil ak sa zastavia. Ak si to neželáte (napríklad by ste chceli vyskúšať upravený Tracker), použite <span class="cli">launch_roster</span> na <tt>stop</tt> reštartovanie aplikácie pred jej ukončením. Podobne ju môžete znova spustiť (<tt>start</tt>) alebo zistiť informácie o nej (<tt>info</tt>). Bez parametra <span class="cli">launch_roster</span> vypíše všetky aplikácie a služby, ktoré riadi.<br />
-Napríklad takto zastavíte spúšťanie zastavenej aplikácie Panel:</p>
-<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
-</td></tr>
+		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it.c  The parameter <tt>log</tt> prints out a log of all launch_daemon related events.<br />
+Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
+For example, this will stop the re-launching of the Deskbar:</p>
+<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">mountvolume</span> mnohí používatelia preferujú na pripájanie lokálnych oblastí a diskov, pretože sa tak jednoducho používa: stačí ho zavolať s názvom diskovej oblasti a hotovo. Skúste si prečítať o ďalších voľbých zadaním <tt>--help</tt>.</p>
 <p><span class="cli">mount</span> môže naviac pripájať vzdialené pevné disky pomocou sieťového súborového systému ako je NFS4. Používaná súborový systém zadáte parametrom <tt>-t</tt> a vzdialené umiestnenie parametrom <tt>-p</tt>. Ako parameter súborového systému môžete použiť čokoľvek, čo nájdete v <span class="path">/system/add-ons/kernel/file_system</span> (a zodpovedajúcich hierarchiách súborov v priečinku <span class="path">~/config</span> alebo „<span class="path">non-packaged</span>“). Tiež musíte vytvoriť priečinok ako bod pripojenia. Napríklad:</p>
@@ -137,19 +138,19 @@ mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 		<td valign="top"><p><span class="cli">open</span> je veľmi užitočný nástroj. Môžete ním otvoriť ľubovoľný súbor v jeho preferovanej aplikácii alebo spustiť konkrétnu aplikáciu podľa jej podpisu bez potreby poznať jej presnú cestu. Príkaz funguje aj na odkazoch URL a dokonca aj na „virtuálnych“ priečinkoch - <tt>.</tt> pre aktuálny priečinok a <tt>..</tt> pre nadradený otvorí priečinok v Trackeri.</p>
 </td></tr>
 <tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
-To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+		<td valign="top"><p>Ramdisk je ako pevný disk, ktorý beží len v pamäti počítača. Preto je veľmi rýchly, ale tiež dočasný, pretože jeho obsah zmizne pri vypnutí, havárii počítača alebo výpadku prúdu.<br />
+Ak chcete vytvoriť 1 GiB ramdisk, nazvať ho „RAMzes“ a pripojiť ho, môžete toto zadať do terminálu alebo vytvoriť skript, ktorý obsahuje:</p>
 <pre class="terminal">ramdisk create -s 1gb
-mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
-mountvolume RAMses</pre>
-<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
-<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
-<pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
-mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
-<p>From now on, you start the ramdisk like this:</p>
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMzes
+mountvolume RAMzes</pre>
+<p>Pozn.: Pri vytváraní ramdisku príkaz<span class="cli">ramdisk</span> vypíše cestu k nemu. Ak vytvoríte niekoľko diskov, bude táto cesta <span class="path">/dev/disk/virtual/ram/0/raw</span> sa zmení!</p>
+<p>Ak chcete zachovať jeho obsah, teda aspoň do najbližšej havárie alebo výpadku prúdu, ramdisk môžete označiť, aby čítal/zapisoval obraz na pevný disk. Na to treba dodať súbor požadovanej veľkosti, ktorý bude načítaný pri každom spustení vášho ramdisku a zapísaný pri jeho odpojení. Ak chcete vytvoriť image súbor „RAMobraz“ s veľkosťou 500 MiB a sformátovať ho, postupujte nasledovne:</p>
+<pre class="terminal">dd if=/dev/zero of=RAMobraz bs=500M count=1
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMobraz</pre>
+<p>Odteraz budete spúšťať ramdisk takto:</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
+<p>Je veľmi dôležité, aby ste váš ramdisk vždy správne odpojili, buď z Trackera alebo príkazom <span class="cli">unmount /RAMobraz</span>, inak sa zmeny nezapíšu späť do súboru s obrazom disku!</p>
 </td></tr>
 </table>
 </div>

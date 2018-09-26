@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +50,7 @@
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="attributes.html">属性</a>  »
 </span></div>
 </div>
@@ -61,7 +61,7 @@
 <h1>ファイルタイプ</h1>
 
 <p>Windows と異なり、Haiku はファイルタイプを 3 文字の拡張子 (たとえば、txt、.jpg、.mp3) に頼りません。この方法は最後の代案に過ぎません。Haiku はインターネット上の習慣と同様に、<acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 形式を使用します。</p>
-<div class="box-info">Haiku において拡張子を使う理由はまったくありませんが、たとえば、メールを通じて、サーバーへのアップロード、または USB ドライブの交換によって、別のオペレーティングシステムのユーザーと共有したいファイルには拡張子を付けることを覚えていてください。そうでなければ、彼らのシステムではファイルタイプを認識できないでしょう。</div>
+<div class="box-info">Haiku で拡張子を使う理由はまったくありませんが、たとえば、メールを通じて、サーバーへのアップロード、または USB ドライブの交換によって、別のオペレーティングシステムのユーザーと共有するファイルには拡張子を付けることを覚えていてください。そうしなければ、彼らのシステムではファイルタイプを認識できないでしょう。</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="specific-file" name="specific-file">特定のファイルのファイルタイプを設定する</a></h2>
@@ -74,44 +74,44 @@
 <p>上図は PNG ファイルで、MIME 文字列は image/png です。仮にファイルが PNG ではなく、GIF であることが明確にわかっているとしましょう。正しい MIME 文字列を手入力するか、あるいはテキストボックスの下にある 2 個のボタンのどちらかで MIME 文字列を変更できます。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">選択… (Select...)</span></td><td> </td><td>ファイルタイプの階層リストを表示し、そこから <tt>image | GIF Image</tt> へ移動します。</td></tr>
-<tr><td><span class="button">このタイプと同様… (Same as...)</span></td><td> </td><td>ファイルダイアログを開き、探しているファイルタイプをすでに持つファイルをどれでも選択します。</td></tr>
+<tr><td><span class="button">このタイプと同様… (Same as...)</span></td><td> </td><td>ファイルダイアログを開き、探しているファイルタイプをすでに持つ任意のファイルを選択します。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferred-app" name="preferred-app">優先アプリケーション</a></h3>
-<p>このポップアップメニューは、この特定のファイルタイプを扱えるすべてのアプリケーションのリストを表示します。ここから、この特定のファイルがダブルクリックされた時に開くべきプログラムを選択できます。たとえば、作業中の HTML ファイルの優先アプリケーションをブラウザからテキストエディターに変更できます。にもかかわらずほかの HTML  ファイルはブラウザで開きます、この特定のファイルだけが、テキストエディター中に開きます。</p>
+<p>このポップアップメニューは、特定のファイルタイプを扱えるアプリケーションのリストを表示します。ここから、特定のファイルがダブルクリックされた時に開くべきプログラムを選択できます。たとえば、作業中の HTML ファイルの優先アプリケーションをブラウザーからテキストエディターに変更できます。それでもほかの HTML  ファイルはブラウザーで開きます。この特定のファイルだけが、テキストエディター中に開きます。</p>
 
-<p><span class="menu">デフォルトアプリケーション (Default application)</span> はそのファイルタイプに関してアプリケーションを全体的に設定するものです。ポップアップメニューの中にこのファイルに関連させたいプログラムが見つからなかったら、再び、<span class="button">選択… (Select...)</span> および<span class="button">このタイプと同様… (Same as...)</span> ボタンに行き着くでしょう。これらのボタンは上記の "ファイルタイプ" で記述されているものと同じ働きをします。</p>
+<p><span class="menu">デフォルトアプリケーション (Default application)</span> はそのファイルタイプに関してアプリケーションを全体的に設定するものです。ポップアップメニュー中にこのファイルに関連させたいプログラムが見つからなかったら、再び、<span class="button">選択… (Select...)</span> および<span class="button">このタイプと同様… (Same as...)</span> ボタンに行き着くでしょう。これらのボタンは上記の "ファイルタイプ" で記述されているものと同じ働きをします。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icon" name="icon">アイコン</a></h3>
-<p>なぜ右上のアイコンウェルが空か不思議に思っているならば、通常、そのファイルタイプのシステムデフォルトからアイコンは継承されます。アイコンを含んでいるファイルで  <span class="app">Filetype アドオン</span>を起動し、アイコンをアイコンウェルにドラッグ＆ドロップできます。あるいは、アイコンウェルをダブルクリックし、独自のアイコンを作成または編集します。アイコンに関するさらに詳しい情報および独自のアイコンの作成方法については <a href="applications/icon-o-matic.html">Icon-O-Matic</a> のトピックを見てください。</p>
+<p>なぜ右上のアイコンウェルが空なのと思うならば、通常、アイコンはそのファイルタイプのシステムデフォルトから継承されます。アイコンを含んでいるファイルで  <span class="app">Filetype アドオン</span>を起動し、アイコンをアイコンウェルにドラッグ＆ドロップできます。あるいは、アイコンウェルをダブルクリックし、独自のアイコンを作成または編集します。アイコンに関するさらに詳しい情報および独自のアイコンの作成方法については <a href="applications/icon-o-matic.html">Icon-O-Matic</a> のトピックを見てください。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings-apps" name="settings-apps">アプリケーションのための特別な設定</a></h2>
+<a id="settings-apps" name="settings-apps">アプリケーション用の特別な設定</a></h2>
 <p>実行可能なファイル上 (ここでは <span class="app">StyledEdit</span>) で <span class="app">Filetype アドオン</span>を起動した場合、異なるダイアログが開きます。</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
 <p>一番上には、標準化された MIME 文字列の代わりに、ユニークなアプリケーション署名が見つかるでしょう。それによって、プログラムがどこにインストールされていても、システムはプログラムを見つけます。</p>
 <p>その下に、アプリケーションの振る舞いをコントロールするいくつかのフラグがあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">複数同時起動不可 (Single launch)</span></td><td> </td><td>実行可能なファイルごとに 1 つのインスタンスだけが実行できます。しかしながら、アプリケーションの 2 つのコピーがあれば、それらは並行して実行できます。</td></tr>
-<tr><td><span class="menu">複数起動可能 (Multiple launch)</span></td><td> </td><td>アプリケーションの複数のインスタンスが同時に実行できます。</td></tr>
-<tr><td class="onelinetop"><span class="menu">排他的起動 (Exclusive launch)</span></td><td> </td><td>実際に、そのアプリケーションの署名を備えたただ 1 つのインスタンスだけが、同時に実行することを許されます。</td></tr>
+<tr><td><span class="menu">複数同時起動不可 (Single launch)</span></td><td> </td><td>実行可能なファイルごとに、アプリケーションのインスタンス 1 つだけが実行できます。しかし、アプリケーションの 2 つのコピーがあれば、それらは並行して実行できます。</td></tr>
+<tr><td><span class="menu">複数起動可能 (Multiple launch)</span></td><td> </td><td>アプリケーションの複数のインスタンスが同時実行できます。</td></tr>
+<tr><td class="onelinetop"><span class="menu">排他的起動 (Exclusive launch)</span></td><td> </td><td>アプリケーションの署名を備えた本当にただ 1 つのインスタンスだけが、一度に実行できます。</td></tr>
 <tr><td><span class="menu">引数のみ (Args only)</span></td><td> </td><td>アプリケーションがメッセージに応答しないことを意味します。</td></tr>
 <tr><td><span class="menu">バックグラウンド実行 (Background app)</span></td><td> </td><td>アプリケーションは、<a href="twitcher.html">Twitcher</a>、あるいは Deskbar の実行中アプリケーションリストに表示されません。</td></tr>
 </table>
 <p>その次に、アプリケーションがサポートするファイルタイプのリストがあります。アプリケーションがそれらを扱えると考えるなら、ファイルタイプを追加 (および削除) できます。結果として、そのタイプのファイルを右クリックすると、アプリケーションが優先アプリケーション、あるいは Tracker の  <span class="menu">Open with...</span> コンテキストメニューに現れるでしょう。</p>
-<p>いちばん下には、バージョンおよび著作権情報があります。アプリケーションの署名と同じく、それらはアプリケーションの作者によって記入されています。それらを変更してはいけません。</p>
+<p>いちばん下には、バージョンおよび著作権情報があります。アプリケーションの署名と同じく、それらは作者によって記入されています。それらを変更してはいけません。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filetypes-preferences" name="filetypes-preferences">Filetypes プレファレンスの全体設定</a></h2>
 <p><span class="app">FileTypes</span> preferences は、個々のファイルでなく、ファイルタイプの全体的な設定を処理します。デフォルトアイコンや優先アプリケーションを変更でき、また、ファイルタイプ全体の属性を追加、削除、変更できます。さらに一から独自のファイルタイプを作成できます。</p>
 <p>すべてのファイルタイプおよびそれらの設定は <span class="path">/boot/home/config/settings/beos_mime/</span> に格納されます。試してみる前に、そのフォルダーのバックアップを作ることは賢明なことでしょう…</p>
-<p><span class="app">FileTypes</span> preferences に関してより多くを学ぶには、ワークショップ、<a href="workshop-filetypes+attributes.html">ファイルタイプ、属性、インデックス、クエリ</a>を参照ください。</p>
+<p><span class="app">FileTypes</span> preferences に関してより多く学ぶには、ワークショップ、<a href="workshop-filetypes+attributes.html">ファイルタイプ、属性、インデックス、クエリ</a>を参照ください。</p>
 
 </div>
 </div>
@@ -119,7 +119,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="attributes.html">属性</a>  »
 </span></div>
 </div>

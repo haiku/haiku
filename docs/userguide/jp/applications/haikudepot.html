@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2017 Haiku. All rights reserved.
+ * Copyright 2013-2018 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -59,7 +59,7 @@
 <div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td><a href="#filter">フィルター</a><br />
                 <a href="#list">リスト</a><br />
                 <a href="#info">情報エリア</a><br />
@@ -77,22 +77,24 @@
 <span class="path">~/config/cache/HaikuDepot/</span> - キャッシュされたアイコン、スクリーンショット、説明など。</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot は、ユーザーのソフトウェアパッケージ管理に関して、中心となるアプリケーションです。HaikuDepot により、パッケージリポジトリを経由して、一覧や検索ができ、パッケージのインストール、更新およびアンインストールができます。初期設定では、HaikuDepot は、"<i>おすすめパッケージ (Featured packages)</i>" リスト、つまり、多くのユーザーが興味を持つと見なされたソフトウェアのリストを表示します。</p>
+<p>HaikuDepot は、ソフトウェアパッケージ管理に関して、中心となるアプリケーションです。HaikuDepot により、パッケージリポジトリを経由して、一覧や検索ができ、パッケージのインストール、更新およびアンインストールができます。初期設定では、HaikuDepot は、"<i>おすすめパッケージ (Featured packages)</i>" リスト、つまり、多くのユーザーが興味を持つと見なされたソフトウェアのリストを表示します。</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p><span class="menu">検索語句 (Search terms)</span> テキストボックスに用語を入力すると、すぐに表示は小アイコンと多くの情報が列に配列されたものに変化します。</p>
+<p><span class="menu">おすすめパッケージのみ (Show only featured packages)</span> チェックボックスのチェックを外すと、すべての利用可能なパッケージが表示され、表示は小アイコンと多くの情報が列に配列されたものに変化します:</p>
+<img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">フィルター</a></h2>
 <p>一番上には、その下の使用可能なパッケージのリストをフィルタリングするいくつかの手段があります。</p>
 <ul>
 <li><p> <span class="menu">カテゴリー (Category)</span> ポップアップメニューは、"<i>オーディオ</i>" や "<i>ゲーム</i>" のような特定のカテゴリーにリストを制限します。</p></li>
-<li><p><span class="menu">リポジトリ (Repositories)</span> ポップアップメニューは、どのオンラインリポジトリに問い合わせるか、またはオンラインリポジトリ以外 ("<i>ローカル (Local)</i>") のどこかからインストールされたパッケージのみを表示するかどうかを決定します。それらはおそらく、USB スティックからか、どこかのウェブサイトからのダウンロードか、または自分でビルドしたパッケージでしょう。</p></li>
 <li><p><span class="menu">検索 (Search terms)</span> テキストフィールドは、リストを入力された文字列 (スペース区切り) をパッケージ名または説明に含むパッケージにフィルタリングします。</p></li>
+<li><p><span class="menu">おすすめパッケージのみ (Show only featured packages)</span> チェックボックスは、設定されたカテゴリーや、入力された検索語句からさらにフィルターをかけるためにチェックできます。</p></li>
+<li><p>メニューバーの<span class="menu">リポジトリ (Repositories)</span> メニューは、どのリポジトリが問い合わせされるかを決定します。"<i>ローカル (Local)</i>" パッケージは、オンライン以外のどこかからインストールされたものです。それらはおそらく、USB スティックからか、どこかのウェブサイトからのダウンロードか、または自分でビルドしたパッケージでしょう。</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list" name="list">リスト</a></h2>
-<p>Tracker ウィンドウと同じく、コンテキストメニューから表示する列を選択するには、列見出しで右クリックします。左クリックは、列に応じてリストを並び替えます。もちろん、列を新しい位置にドラッグすることで列を再配置できます。</p>
+<p>Tracker ウィンドウと同じく、コンテキストメニューから表示する列を選択するには、列見出しで右クリックします。左クリックは、列に応じてリストを並び替えます。もちろん、列を新しい位置にドラッグすると列を再配置できます。</p>
 <p>パッケージの状態 (status) 列は、以下のうちの 1 つを取ります。</p>
 <ul>
 <li><p><span class="menu">有効 (Active)</span>: パッケージはインストール済みで、いつでも利用できます。</p></li>
@@ -109,7 +111,7 @@
 <p>その下に 、パッケージについて (About)、評価 (Ratings)、変更履歴 (Changelog) 、および内容 (Contents) の 4 つのタブがあります。</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">パッケージについて (About)</span></p>
-<p _translation_id="5253">最初のタブには、パッケージの詳しい説明と、スクリーンショット、および利用可能ならパッケージされたソフトウェアをメンテしているチームへの連絡用のトアドレスと URL があります。スクリーンショットのサムネールをクリックすると、新しいウインドウ内にフルサイズで開くでしょう。</p></li>
+<p _translation_id="5253">最初のタブには、パッケージの詳しい説明と、スクリーンショット、および利用可能ならパッケージされたソフトウェアをメンテしているチームへの連絡用アドレスと URL が表示されています。スクリーンショットのサムネールをクリックすると、新しいウィンドウ内にフルサイズで開くでしょう。</p></li>
 <li><p _translation_id="5254"><span class="menu">評価 (Ratings)</span></p>
 <p _translation_id="5255">2番目のタブには、利用可能であれば、ユーザーの評価とコメントが表示されます。</p>
 <img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
@@ -119,36 +121,36 @@
 <li><p _translation_id="5257"><span class="menu">変更履歴 (Changelog)</span></p>
 <p _translation_id="5258">パッケージのメンテナーが情報を提供していれば、ここでは、パッケージのこれまでリリースされてきたすべてのバージョンの詳しい履歴を表示します。</p></li>
 <li><p><span class="menu">内容 (Contents)</span></p>
-<p>最後のタブは、ひとつのパッケージが含んでいるファイルとフォルダーをすべて表示します。これは、ダウンロード済のパッケージに対してのみ機能します。</p></li>
+<p>最後のタブは、パッケージが含んでいるファイルとフォルダーをすべて表示します。これは、ダウンロード済のパッケージに対してのみ機能します。</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="menu" name="menu">ツールと表示メニュー</a></h2>
-<p>ウィンドウの一番上にある <span class="menu">ツール (Tools)</span> メニューの中に、<span class="menu">リポジトリを更新 (Refresh repositories)</span> する項目があります。これは、リポジトリから利用可能なパッケージの最新のリストを要求します。もうひとつの項目は、<span class="menu">リポジトリの管理... (Manage repositories...)</span> です。それは、<a href="../preferences/repositories.html">リポジトリ</a> pレファレンスを開き、リポジトリの追加 / 削除、または有効化 / 無効化を行います。
-</p>
-<p><span class="menu">表示 (Show)</span> メニューで、<span class="menu">おすすめパッケージのみ (Only featured packages)</span> を無効にできます。すぐに、HaikuDepot の起動時やサーチテキストが空のときにおすすめだけでないすべてのパッケージを常に見るでしょう。<br />
-さらに、<span class="menu">開発用パッケージ (Develop packages)</span> および、<span class="menu">ソースパッケージ (Source packages)</span> をパッケージリスト内に表示することも選択できます。これらは通常のユーザーには興味のあるものではなく、リストをごちゃごちゃさせるだけです。しかし、パッケージのライブラリやヘッダーなどを必要とする人たちにとっては、それらに依存するプログラムの開発やコンパイルのために重要となります。</p>
-<p>もっと興味があることは、<span class="menu">使用可能なパッケージ (Available packages)</span> と、 <span class="menu">インストール済みパッケージ (Installed packages)</span> だけを表示するためのオプションです。これらは、とても自明なものです。</p>
+<p>ウィンドウの一番上にある<span class="menu">ツール (Tools)</span> メニュー内に、<span class="menu">リポジトリを更新 (Refresh repositories)</span> する項目があります。これは、リポジトリから利用可能なすべてのパッケージの最新リストを要求します。<br />
+もうひとつの項目は、<span class="menu">リポジトリの管理... (Manage repositories...)</span> です。それは、<a href="../preferences/repositories.html">リポジトリ</a> プレファレンスを開き、リポジトリの追加 / 削除、または有効化 / 無効化をします。<br />
+<span class="menu">更新のチェック... (Check for updates...)</span> は、<a href="../apps/softwareupdater.html">ソフトウェアの更新 (SoftwareUpdater)</a> を開き、更新されたパッケージの検索とインストールをします。</p>
+<p><span class="menu">表示 (Show)</span> の下では、<span class="menu">開発用パッケージ (Develop packages)</span> および、<span class="menu">ソースパッケージ (Source packages)</span> をパッケージリスト内に表示することも選択できます。これらは通常のユーザーには興味のあるものではなく、リストをごちゃごちゃさせるだけです。しかし、パッケージのライブラリやヘッダーなどを必要とする人たちにとっては、それらに依存するプログラムの開発やコンパイルのために重要となります。</p>
+<p>さらに興味深いものは、<span class="menu">使用可能なパッケージ (Available packages)</span> と、<span class="menu">インストール済みパッケージ (Installed packages)</span> だけを表示するためのオプションです。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">ユーザーアカウントの作成</a></h2>
-<p>パッケージを評価できるようにするには、<a href="http://depot.haiku-os.org">Haiku Depot Server</a> にユーザーアカウントを作成する必要があります。そこはそべてのパッケージを提供し、評価とユーザーコメントを記録しています。HaikuDepot アプリケーション内から、メニューバーの右端のメニューをクリックすることでアカウントを作成できます。メニューには現在のステータス <span class="menu">ログインしていません (Not logged in)</span> が表示されています。. <span class="menu">ログイン… (Log in...)</span> を選択すると、タブが 2 つあるウィンドウが開きます。ひとつは (いったんこれらが揃えば) ログインするためのユーザー名とパスワードを入力するためのもので、 もうひとつは新規アカウントを作成するためのものです。</p>
+<p>パッケージを評価できるようにするには、<a href="http://depot.haiku-os.org">Haiku Depot Server</a> にユーザーアカウントを作成する必要があります。そこはすべてのパッケージを提供し、評価とユーザーコメントを記録しています。HaikuDepot アプリケーション内から、メニューバーの右端のメニューをクリックするとアカウントを作成できます。メニューには現在のステータス <span class="menu">ログインしていません (Not logged in)</span> が表示されています。<span class="menu">ログイン… (Log in...)</span> を選択すると、タブが 2 つあるウィンドウが開きます。ひとつは (いったんこれらが揃えば) ログインするためのユーザー名とパスワードを入力するためのもので、もうひとつは新規アカウントを作成するためのものです。</p>
 <img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
-<p>アカウントを作成するには以下が必要となります。</p>
+<p>アカウントの作成には以下が必要となります。</p>
 <ul><li>特殊文字のない、すべて小文字のユーザー名を使用してください。</li>
 <li>8 文字以上の長さで、2 文字以上の大文字と、2 文字以上の数字を含むパスワードを使用してください。</li>
 <li>有効な email アドレスを入力してください (パスワードを忘れた場合、新しいパスワードが必要なら送信されます)。</li>
 <li>キャプチャを解いてください。</li></ul>
-<p>ログイン後、HaikuDepot の上右端のメニューは、<span class="menu">…としてログイン (Logged in as (...))</span> となるでしょう。ここで、() 内はユーザー名を表示しています。メニューは直ちに、<span class="menu">アカウントの変更… (Switch account...)</span> または <span class="menu">ログアウト (Log out)</span> を提供します。</p>
+<p>ログイン後、HaikuDepot の上右端のメニューは、<span class="menu">(...) としてログイン (Logged in as (...))</span> となるでしょう。ここで、() 内はユーザー名を表示しています。メニューは直ちに、<span class="menu">アカウントの変更… (Switch account...)</span> または <span class="menu">ログアウト (Log out)</span> を提供します。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">評価とコメント</a></h2>
-<p>アカウントを作成してログイン後、パッケージを評価して、コメントを残せるようになります。もし望むなら、マウスをパッケージの情報エリアにある評価の星のうえに重ねるだけで、<span class="button">評価 (Rating...)</span> ボタンに変化します。それをクリックして評価ウィンドウを開きます。</p>
+<p>アカウントを作成してログイン後、パッケージを評価して、コメントを残せるようになります。望むなら、マウスをパッケージの情報エリアにある評価の星のうえに重ねるだけで、<span class="button">評価 (Rating...)</span> ボタンに変化します。それをクリックして評価ウィンドウを開きます。</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
-<p>ここで、マウスを星の上に持ってきて光らせてから、評価を選択します。また、アプリケーションの安定性を判定するためにレベル数値からの選択もできます。また、追加コメントの言語を指定できます。コメントを意味あるものにするためには、評価しようとするアプリケーションの特徴やバグ、癖に慣れるためにしばらく使うべきです。それから、次の素晴らしいアメリカ小説は書かないでください…短く、親切で礼儀正しいコメントにしてください :)<br />
-<span class="button">送信 (Send)</span> をクリック後、データーはサーバーへ送られます。変更を見る前に、<span class="menu">ツール (Tools)</span> メニューから <span class="menu">リポジトリを更新 (Refresh repositories)</span> を選ばないといけないかもしれません。
+<p>ここで、マウスを星の上に持ってきて光らせてから、評価を選択します。また、アプリケーションの安定性を判定するためにレベル数値からの選択もできます。また、追加コメントの言語を指定できます。コメントを意味あるものにするためには、評価しようとするアプリケーションの特徴やバグ、癖に慣れるためにしばらく使うべきです。それから、"次の素晴らしいアメリカ小説" は書かないでください…短く、親切で礼儀正しいコメントにしてください :)<br />
+<span class="button">送信 (Send)</span> をクリック後、データはサーバーへ送られます。変更を見る前に、<span class="menu">ツール (Tools)</span> メニューから <span class="menu">リポジトリを更新 (Refresh repositories)</span> を選ばないといけないかもしれません。
 </p>
-<p>いつでも、評価ウィンドウに戻ってコメントの編集とパッケージの再評価ができます。また、<span class="menu">ほかのユーザーがこの評価を見ることができます (Other users can see this rating)</span> チェックボックスを無効にすることで、ほかのユーザーにコメントを見せないようにできます。</p>
+<p>いつでも、評価ウィンドウに戻ってコメントの編集とパッケージの再評価ができます。また、<span class="menu">ほかのユーザーがこの評価を見ることができます (Other users can see this rating)</span> チェックボックスを無効にすれば、ほかのユーザーにコメントを見せないようにできます。</p>
 </div>
 </div>
 

@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		log-1
  *		Humdinger
+ *		log-1
  *		mt
  *
 -->
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -52,8 +52,8 @@
 </ul>
 <span>
  «  <a href="filetypes.html">ファイルタイプ</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="index.html">目次</a>  »
+::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="index.html">インデックス</a>  »
 </span></div>
 </div>
 
@@ -62,27 +62,27 @@
 
 <h1>属性</h1>
 
-<p>属性 (Attribute) とは、ファイルに属するけれどもそのファイルの一部ではないデータフィールドです。たとえば、属性はファイルサイズの計算には含まれませんが、属性をコピーしたり、ファイル自体に触れることなく属性に変更を加えたりできます。システムはこれら属性をファイルサイズやファイルタイプ、ファイルが最後に変更された日付などを保存するのに使用します。この仕組みはほかのオペレーティングシステムやそのファイルシステムと似ています。</p>
-<p>ほかのオペレーティングシステムとの違いは、任意のファイルに対して任意の種類の属性を追加できること、および、Tracker ウィンドウの中でその属性の表示または編集ができることです。必要なことはファイルタイプに追加する属性の種類 (文字列や整数値、時刻など) を定義し、属性に名前と説明を付けることだけです。</p>
-<p>ファイルそのものは中身がある必要すらまったくありません。たとえば、次の People ファイルを見てください。</p>
+<p>属性 (Attribute) とは、ファイルに属しているが、その一部ではないデータフィールドです。たとえば、属性はファイルサイズの計算には含まれませんが、ファイル自体に触れることなくコピーまたは変更ができます。システムはこれら属性をファイルサイズやファイルタイプ、ファイルの最終変更日などを保存するのに使用します。この仕組みはほかのオペレーティングシステムやそのファイルシステムと似ています。</p>
+<p>ほかのオペレーティングシステムとの違いは、任意のファイルに任意の種類の属性を追加できること、および、Tracker ウィンドウ中でその属性の表示または編集ができることです。必要なことはファイルタイプに追加する属性の種類 (文字列や整数値、時刻など) を定義し、属性に名前と説明を付けることだけです。</p>
+<p>ファイルそのものは中身がある必要さえまったくありません。たとえば、次の People ファイルを見てください。</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
-<p>見てのとおり、これらはすべて属性が付与された大きさが 0 のファイルです。Tracker ウィンドウの右側で、"John Nox" のメール属性を編集中です。</p>
-<p>People ファイル、メールファイル、または音声ファイルがデフォルトでそうしているように、これら属性をインデックス化すれば、Haiku の高速クエリシステムを使って属性を検索できるようになります。</p>
+<p>見てのとおり、これらはすべて属性が付与されたサイズ 0 のファイルです。Tracker ウィンドウの右側で、"John Nox" のメール属性を編集中です。</p>
+<p>People ファイル、メールファイル、または音声ファイルがデフォルトで行っているように、これら属性をインデックス化すれば、Haiku の高速クエリシステムを使って属性を検索できるようになります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-tracker" name="attributes-tracker">Tracker での属性</a></h2>
-<p>属性はデータベースやスプレッドシートと非常によく似た形で表示されます。Tracker を使うことで、どの属性 (列) を表示するのかの選択や、属性にしたがってファイルリストの順番 (行) の並べ替えができます。</p>
-<p>Tracker で属性を操作するには、Tracker ウィンドウを開いて<span class="menu">属性 (Attributes) </span>メニューをクリックし、表示したい属性を選択します。あるいは単純に列見出しを右クリックし、コンテキストメニューで該当する項目をマークします。また、列見出しをドラッグ＆ドロップするだけで、列を再配置できます。列をウィンドウの外に移動させることにより、不要な列をすばやく取り除けます。</p>
-<p>列見出し中の 2 つの属性の間の線をダブルクリックすると、列幅が自動的に適切なサイズに調整されます。</p>
-<p>列見出しをクリックすると、並び替えの順序が昇順から降順へ切り替わります。<span class="key">SHIFT</span> を押しながら列見出しをクリックすることで、2 番目の並び替え順を決められます。たとえば、1 番目の並び替え順を会社名、2 番目の並び替え順をコンタクト名にして People ファイルを並べ替えられます。例として上のスクリーンショットを見てください。2 番目の並び替え順は、列見出しすぐそばの、1 番目の並び替え順よりも明るい色の目印でマークされています。</p>
-<p>これら属性の編集はファイルのリネームと同様にシンプルです: 項目をクリックするか、<span class="key">ALT</span> <span class="key">E</span> を押します。属性間の移動は <span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> で行います。変更を適応せずに編集モードを抜けるには <span class="key">ESC</span> を押します。</p>
+<p>属性はデータベースやスプレッドシートと非常によく似た形で表示されます。Tracker を使って、どの属性 (列) を表示するのかの選択や、属性にしたがってファイルリストの順番 (行) の並べ替えができます。</p>
+<p>Tracker で属性を操作するには、Tracker ウィンドウを開いて<span class="menu">属性 (Attributes) </span>メニューをクリックし、表示する属性を選択します。あるいは単純に列見出しを右クリックし、コンテキストメニューで該当する項目をマークします。また、列見出しをドラッグ＆ドロップするだけで、列を再配置できます。列をウィンドウの外に移動させることで、不要な列をすばやく取り除けます。</p>
+<p>列見出し中の 属性間の線をダブルクリックすると、列幅が自動的に適切なサイズに調整されます。</p>
+<p>列見出しをクリックすると、並び替えの順序が昇順から降順へ切り替わります。<span class="key">SHIFT</span> を押しながら列見出しをクリックすれば、2 番目の並び替え順を決められます。たとえば、1 番目の並び替え順を会社名、2 番目の並び替え順をコンタクト名にして People ファイルを並べ替えられます。例として上のスクリーンショットを見てください。2 番目の並び替え順は、列見出しすぐそばの、1 番目の並び替え順よりも明るい色の目印でマークされています。</p>
+<p>これら属性の編集はファイルのリネームと同様に簡単です: 項目をクリックするか、<span class="key">ALT</span> <span class="key">E</span> を押します。属性間の移動は <span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> で行います。変更を適用せずに編集モードを抜けるには <span class="key">ESC</span> を押します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-terminal" name="attributes-terminal">ターミナルでの属性</a></h2>
-<p>コマンドラインがお好みの場合やスクリプトを使って大量のファイルを処理しようという場合に備えて、ターミナルから属性を制御できるコマンドがいくつか用意されています。</p>
+<p>コマンドラインが好みの場合やスクリプトを使って大量のファイルを処理しようという場合に備えて、ターミナルから属性を制御できるコマンドがいくつか用意されています。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
@@ -90,7 +90,7 @@
 <pre>使い方: listattr 'filename' ['filename' ...]</pre>
 <p>上のスクリーンショットの例です。
 </p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -117,9 +117,9 @@ MIME String         21  "BEOS:TYPE"
 131 bytes total in attributes.</pre>
 <p>コンタクト情報を保持しているすべての "<tt>META:*</tt>" 属性に加えて、システムによって管理されている次の 2 つの属性が存在します。</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> は <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 文字列としてファイルタイプを保持しています。この例では "<tt>application/x-person</tt>" です。この属性によりデフォルトのアイコンやファイルをダブルクリックしたときなどにそのファイルを開くアプリケーションが決まります。</p></li>
+<li><p><tt>BEOS:TYPE</tt> は <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 文字列としてファイルタイプを保持しています。この例では "<tt>application/x-person</tt>" です。この属性により、デフォルトのアイコンやファイルをダブルクリックしたときなどにそのファイルを開くアプリケーションが決まります。</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" は Tracker がファイルのアイコンの位置を記録するために使用する属性です。</p></li></ul>
-<div class="box-info">"Clara" のうしろのバックスラッシュに関する補足です。ターミナルでは、<tt>'"*\$?!</tt> 等の特別な文字を「エスケープ」する必要があります。"Clara" と "Botters" の間のスペースもエスケープする必要のある文字の 1 つです。したがってこの例のバックスラッシュは、実は空白文字の直前にあるのであり、"Clara" のうしろにあるのではありません。</div>
+<div class="box-info">"Clara" のうしろのバックスラッシュに関する補足です。ターミナルでは、<tt>'"*\\$?!</tt> 等の特別な文字を「エスケープ」する必要があります。"Clara" と "Botters" の間のスペースもエスケープする必要のある文字の 1 つです。したがってこの例のバックスラッシュは、実はスペースの直前にあるのであり、"Clara" のうしろにあるのではありません。</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -127,22 +127,22 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> はファイルの指定された属性の内容を表示します。</p>
 <pre>使い方: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>先のファイルを再び例にします。</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> はファイルに属性を追加します。同時に属性の内容を入力することもできます。</p>
+<p><span class="cli">addattr</span> はファイルに属性を追加。または属性を値で満たす、そのどちらもできます。</p>
 <pre>使い方: addattr [-t type] attr value file1 [file2...]
     または: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
-         type は次のうちのいずれか 1 つです:
+         type は次のいずれか 1 つです:
                  string, mime, int, llong, float, double, bool, icon, raw
                  または数値です (例: 0x1234, 42, 'ABCD', ...)
          デフォルトは "string" です。</pre>
 <p>ではここで、親友の Clara が多国籍企業 Barkelbaer 社で働くことになりました。これまで空だった "Company" 属性 (「文字列」型) をその情報で入力しましょう。</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -153,18 +153,18 @@ Clara Botters : string : Whelton</pre>
          'attr' はそのファイル属性の名前です。
          '-p' が指定されると、'attr' はパターンとみなされます。</pre>
 <p>実用的な観点から見れば、単に "Fax" 属性の内容を入力しないことで十分対応できますが、次のようにタイプすると、Clara のファイルから "Fax" 属性を完全に削除できます。</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> は 1 つまたは複数のファイルの属性を、ほかのファイルにコピーします。デフォルトでは実際のファイルの内容については<b>コピーされません</b>。</p>
+<p><span class="cli">copyattr</span> は 1 つ以上のファイルの属性を、ほかのファイルにコピーします。デフォルトではファイルの実際の内容については<b>コピーされません</b>。</p>
 <pre>使い方: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-<p>属性に加えてファイルの内容そのものもコピーしたい場合は、"<span class="cli">-d</span>" または "<span class="cli">--data</span>" オプションを追加します。</p>
+<p>属性に加えてファイルの内容そのものもコピーする場合は、"<span class="cli">-d</span>" または "<span class="cli">--data</span>" オプションを追加します。</p>
 
 <p><br /></p>
-<p>以上のコマンドに関する情報や各コマンドのオプションに関する情報は、コマンド名のうしろに "<span class="cli">-h</span>" または "<span class="cli">--help</span>" を続けてタイプすることにより見られます。</p>
+<p>以上のコマンドに関する情報や各コマンドのオプションに関する情報は、コマンド名の次に "<span class="cli">-h</span>" または "<span class="cli">--help</span>" を続けてタイプすると得られます。</p>
 
 </div>
 </div>
@@ -172,8 +172,8 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">ファイルタイプ</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="index.html">目次</a>  »
+::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="index.html">インデックス</a>  »
 </span></div>
 </div>
 

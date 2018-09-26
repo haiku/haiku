@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2017, Haiku. All rights reserved.
+ * Copyright 2015-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -58,6 +58,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h2><img src="../../images/apps-images/debugger-icon_64.png" alt="debugger-icon_64.png" width="64" height="64" />Debugger (Depurador)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -77,6 +78,27 @@
 <li><p><span class="button">Guardar informe</span> crea un informe de depuración que es guardado como archivo de texto en el Escritorio y puede ser enviado por correo electrónico al desarrollador de la aplicación con la falla, o adjuntado a una entrada en el rastreador de fallos, si es que está disponible.<br />
 El informe de depuración contiene información sobre su hardware (tipo de CPU y memoria utilizada, etc.), la versión exacta de Haiku y toda la información disponible sobre el estado del sistema que pudiera ser relevante al fallo.</p></li>
 </ul>
+<p>The default action when a crash happens can be configured with a text file <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
+The file takes on a driver_settings style format as follows:</p>
+<pre>default_action user
+
+executable_actions {
+	app1 log
+	/path/app2* debug
+}</pre>
+<p>Valid values for a default_action are:</p>
+<table summary="action values" border="0" cellspacing="0" cellpadding="2">
+<tr><td>user</td><td style="width:30px"></td><td>Prompt the user for action.</td></tr>
+<tr><td>kill</td><td></td><td>Silently terminate the crashing team.</td></tr>
+<tr><td>debug</td><td></td><td>Attach the debugger to the crashing team.</td></tr>
+<tr><td>log / report</td><td></td><td>Save a crash report and terminate the team.</td></tr>
+<tr><td>core</td><td></td><td>Save a (possibly very large) core file and terminate the team.</td></tr>
+</table>
+<p>If no default_action is specified, "user" is assumed.</p>
+<p>The executable_actions subsection contains individual overrides of the default. These take the form above, where the individual lines can be only a team name, or a path, with wildcards.</p>
+<p><br /></p>
+<hr />
+<p><br /></p>
 <p>Describir el uso del propio Depurador está fuera del alcance de esta guía, que se concentra en abordar las necesidades del usuario promedio de Haiku. En aras de la exhaustividad, aquí se muestra una ventana que aparecerá si escoje la opción <span class="button">Depurar</span> en la alerta mostrada anteriormente:</p>
 <img src="../images/apps-images/debugger.png" alt="debugger.png" />
 <p>Como pronto verá cuando comience a explorar, el Depurador es una de la aplicaciones más complejas y sofisticadas para Haiku. Si es un desarrollador y tiene la costumbre de usar depuradores gráficos en otras plataformas, muchas características le resultaran conocidas.</p>
@@ -85,7 +107,6 @@ El informe de depuración contiene información sobre su hardware (tipo de CPU y
 <tr><td class="onelinetop"><a href="https://www.dropbox.com/s/e6gx39r0asc2t8f/DebuggerReferenceManual.pdf?dl=1">Manual de Referencia del Depurador (en inglés)</a></td><td></td><td>Este es la fuente con información de mayor profundidad sobre cómo trabajar con el Depurador.</td></tr>
 <tr><td><a href="https://www.haiku-os.org/blog/anevilyak/">Publicaciones en blogs (en inglés)</a></td><td> </td><td>Existen algunos artículos sobre el Depurador, mayormente por Rene Gollent luego de implementar una nueva característica.</td></tr>
 <tr><td class="onelinetop"><a href="https://www.youtube.com/watch?v=n-NDFwtmQcI&amp;list=PL2KiE-VO9zk-9XPmfusEDaOFd_7AiVKzz">Vídeo BeGeistert (en inglés)</a></td><td> </td><td>Un video de la reunión BeGeistert en 2012, en la cual Ingo Weinhold demuestra el estado del Depurador en ese entonces y luego enseña otras herramientas interesantes como el perfilador para ubicar puntos de congestión.</td></tr>
-<tr><td class="onelinetop"><a href="http://cgit.haiku-os.org/haiku/commit/?id=hrev46547">Acción predeterminada cuando hay cuelgues (en inglés)</a></td><td> </td><td>Este mensaje de registro describe como cambiar el comportamiento cuando algo tiene una falla. Por ejemplo, puede hacer que el sistema siempre guarde un informe de cuelgue en vez de preguntarle al usuario con la alerta de fallo convencional. Puede limitar esta conducta a aplicaciones específicas.</td></tr>
 </table>
 
 </div>

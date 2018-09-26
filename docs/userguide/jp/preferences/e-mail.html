@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		mt
  *		Kentaro Ozeki
  *		thebowseat
- *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="filetypes.html">FileTypes</a>  »
 </span></div>
 </div>
@@ -61,7 +61,7 @@
 <div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 <a href="#creating">新規メールアカウントの作成</a><br />
 <a href="#account-settings">アカウントの設定</a><br />
@@ -80,7 +80,7 @@
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku は、メールサービス (mail_daemon) を通じ定期的に電子メールを取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読 (既読) といった必要なすべてのヘッダー情報と共に属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムはすべてのデータと構成を保ちつつメールクライアントを切り替えることを容易にします。<br />
+<p>Haiku は、メールサービス (mail_daemon) を通じ定期的に電子メールを取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読 (既読) といった必要なすべてのヘッダー情報でメールファイルの属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムはすべてのデータと構成を保ちつつメールクライアントを切り替えることを容易にします。<br />
 構成はメール設定パネルで行います。</p>
 
 <h2>
@@ -91,7 +91,7 @@
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
 <p>最初に、メールを取得する方法として、<span class="menu">POP3</span> か <span class="menu">IMAP</span> を選びます。</p>
 <p>それから、<i>E-mail アドレス</i> (E-mail Address)、<i>ログイン名</i> (Login Name)、<i>パスワード</i> (Password) を入力して、Haiku 内で用いられる<i>アカウント名</i> (Account Name) と<i>本名</i> (Real Name) も決めてください。</p>
-<p>(海外の) メジャーな電子メールプロバイダーを利用している場合、Haiku はすでにサーバーの IP アドレスのような技術項目をすべて理解しています。それ以外の場合は、<span class="button">次へ (Next)</span> をクリックすると、手でこの情報を入力するためのウィンドウが開きます。</p>
+<p>(海外の) 主要な電子メールプロバイダーを利用している場合、Haiku はすでにサーバーの IP アドレスのような技術項目をすべて理解しています。それ以外の場合は、<span class="button">次へ (Next)</span> をクリックすると、これらの情報を手入力するためのウィンドウが開きます。</p>
 <img src="../images/prefs-images/e-mail-new-account-2.png" alt="e-mail-new-account-2.png" />
 <p>まず、受信メールの<i>サーバー名 (Server name)</i>、<i>認証方法 (Login type)</i>、および<i>接続タイプ (Connection type)</i> を設定します。その下は、送信メールの設定です。ユーザーの電子メールプロバイダーのウェブサイトで必要な情報は得られるはずです。<br />
 各種設定や追加の設定について詳しくは以下を見てください。</p>
@@ -102,7 +102,7 @@
 <p>左側のリスト中のアカウント名を選ぶと、いくつかの全般設定を変更できます。</p>
 <img src="../images/prefs-images/e-mail-accounts.png" alt="e-mail-accounts.png" />
 <p><i>アカウント名</i>は、たとえば E-mail 設定のアカウントリストに表示される名前です。<i>実名</i>は、メールを受信した人が見る名前です。<i>返信先アドレス</i>は、メールに返信するときに用いられるメールアドレスです。通常は、送信元アドレスと同じになります。</p>
-<p>もし、アカウントを送信専用、または受信専用にするなら、左側のアカウント名を右クリックして、それに応じてチェックマークをセットすることで、機能を無効 / 有効にできます。</p>
+<p>もし、アカウントを送信専用、または受信専用にするなら、左側のアカウント名を右クリックして、チェックマークをセットすることで、機能を無効 / 有効にできます。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -113,7 +113,7 @@
 <p>次に、ログイン情報として、<i>ログイン名 (Login name)</i>、および<i>パスワード (Password)</i> を入力してください。必要なら、<i>認証方法 (Login type)</i> をデフォルトの<span class="menu">平文 (Plain text)</span> から <span class="menu">APOP</span> に変更してください。</p>
 <p>もし <i>POP3</i> を使っていて、このアカウントのメールを複数のコンピューターで取得するなら、<span class="menu">受信後もサーバーにメールを保存する (Leave mail on server)</span> オプションと、<span class="menu">ローカルから削除されたらメールをサーバーから削除する (Remove mail from server when deleted)</span> を有効にしてもよいでしょう。</p>
 <p>もし代わりに <i>IMAP</i> を使っているならば、<span class="menu">Remove mail from server when deleted</span> locally オプションが利用できます。また、同期するフォルダーを、<span class="menu">Top Mailbox Folder</span> (最上層の受信箱フォルダー) から指定したフォルダーとそのサブフォルダーに変更できます。</p>
-<p>同様に、指定したサイズより大きいメールについて、<span class="menu">Partially download messages</span> (部分的にメッセージをダウンロード) するよう設定することもできます。これはヘッダーのみを取得するので、題名と差出人を見た後でメッセージの続きと有効な添付ファイルをダウンロードするか決めることができます。低速な接続回線を利用している場合に便利です。</p>
+<p>同様に、指定したサイズより大きいメールについて、<span class="menu">部分的にメッセージをダウンロード</span> (Partially download messages) するようにも設定できます。これはヘッダーのみを取得するので、題名と差出人を見た後でメッセージの続きと有効な添付ファイルをダウンロードするか決められます。低速な接続回線を利用している場合に便利です。</p>
 <p>受信箱の<i>場所 (Destination)</i> を変更できます (デフォルト: <span class="path">/boot/home/mail/in/</span>)。これは、異なるアカウントのメールを独自のフォルダーに分けたい場合に便利ですが、クエリでも同様の整理ができます。 </p>
 
 
@@ -124,7 +124,7 @@
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
 <p>最初に、送信用の <i>SMTP サーバー (SMTP Server)</i>  アドレスを設定します。先の受信サーバーと同様、必要に応じて特定のポートを指定できます (例 <tt>mail.your-provider.org:1200</tt>)。</p>
 <p>ログインする必要があれば、<i>ログインの種類 (Login Type)</i> を <span class="menu">ESMTP</span> に変更しユーザー名とパスワードを入力します。もう 1 つは、プロバイダーがメール確認時に認証のため <span class="menu">POP3 before SMTP</span> を要求する場合に用いられます。</p>
-<p>受信メールと同様に、送信箱の <i>Destination</i> (場所) を変更できます。(デフォルト: <span class="path">/boot/home/mail/out/</span>)</p>
+<p>受信メールと同様に、送信箱の <i>場所</i> (Destination) を変更できます。(デフォルト: <span class="path">/boot/home/mail/out/</span>)</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filters" name="filters">通知とその他の電子メールフィルター</a></h2>
@@ -135,7 +135,7 @@
 スパムフィルター (AGMS ベイジアン)</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
 <p>スパムフィルターは不要なスパムの判定に統計的手法を利用します。メールには 0 から 1 までの評価値が付与され、ユーザーはスパムと通常のメールとの境界値を決めることができます。<br />
-評価値を受信メールの題名の先頭に追加することが可能です。<br />
+評価値を受信メールの題名の先頭に追加できます。<br />
 また、スパムフィルターはすべての受信メールから学習できます。もちろん、誤ってスパム判定されている偽陽性のメールを仕分けて、スパムフィルターに学習させなくてはいけません。<span class="app">メール</span>アプリケーションの説明時に詳しく知るでしょう。</p>
 <p><span class="menu">ルールフィルター (Rule filter)</span> との併用で、検出されたスパムメールを自動的に整理できます。</p>
 
@@ -173,7 +173,7 @@
 	<tr><td class="onelinetop"><span class="menu">Spam/Genuine Estimate</span> (評価値)</td><td> </td>
 		<td>これはスパムフィルターが電子メールに付加する評価値です。これは科学的記法で表記され、たとえば、1.065e-12 は 1.065 を 10 の 12 乗で割った 0.000000000001065 を意味します。</td></tr>
 </table>
-<p>2 番目のテキストフィールドには検索パターンを入力します。ここでは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expression (正規表現)</a> が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関してはまったく複雑にならないことがわかるでしょう。</p>
+<p>2 番目のテキストフィールドには検索パターンを入力します。ここでは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression" rel="nofollow">正規表現 (regular expression)</a> が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関しては<i>それほど</i>複雑にならないことがわかるでしょう。</p>
 <p>その下のポップアップメニューで、パターンが一致した際の処理を選択します。メールの移動や削除、"Read (既読)" などメールのステータス変更、返信に用いるメールアドレスの設定ができます。</p>
 
 <h3>
@@ -185,15 +185,15 @@
 	<tr><td><span class="menu">無し</span></td><td style="width:5px;"> </td>
 		<td>通知しない</td></tr>
 	<tr><td><span class="menu">ビープ音</span></td><td> </td>
-		<td><i>すべての</i>新着メールごとに、<a href="sounds.html">サウンド</a>設定で設定したサウンドファイルを再生</td></tr>
+		<td><i>すべての</i>新着メールに対して、<a href="sounds.html">サウンド</a>プレファレンスで設定したサウンドファイルを再生</td></tr>
 	<tr><td><span class="menu">警告</span></td><td> </td>
-		<td><i>すべての</i>新着メールごとに、警告ウィンドウを表示</td></tr>
+		<td><i>すべての</i>新着メールに対して、警告ウィンドウを表示</td></tr>
 	<tr><td><span class="menu">キーボード LED</span></td><td> </td>
 		<td>CapsLock キーのような、キーボードの LED を点滅</td></tr>
 	<tr><td class="onelinetop"><span class="menu">Central alert</span></td><td> </td>
 		<td>新着メールに対して、警告ウィンドウを<i> 1 つ</i>表示</td></tr>
 	<tr><td><span class="menu">Central beep</span></td><td> </td>
-		<td><a href="sounds.html">サウンド</a> 設定で設定した新着メール用のサウンドファイルを<i>一度</i> 再生</td></tr>
+		<td><a href="sounds.html">サウンド</a>プレファレンスで設定した新着メール用サウンドファイルを<i>一度</i>再生</td></tr>
 	<tr><td><span class="menu">ログウィンドウ</span></td><td> </td>
 		<td>ログウィンドウを表示</td></tr>
 </table>
@@ -202,17 +202,17 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 送信メールフィルター</h3>
 <p>送信メールに適用できるフィルターはたった 1 つ、<span class="cli">fortune</span> (占い) です。
-<br />このフィルターは送信するメールが送られる前に、その末尾にランダムに選ばれた愉快な (あるいは賢い) "fortune cookie" を付け加えます。ターミナルで <span class="cli">fortune</span> コマンドを実行することで試せます。</p>
+<br />このフィルターはメールが送信される前に、その末尾にランダムに選ばれた愉快な (あるいは賢い) "fortune cookie" を付け加えます。ターミナルで <span class="cli">fortune</span> コマンドを実行することで試せます。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">メールサービスの設定</a></h2>
 <p>受信および送信メールサーバーの設定が (おそらくフィルターの設定も) 完了したので、実際の確認と取得のすべてを行うメールサービスに、ジョブをどのように行うか知らせる必要があります。</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
-<p><i>メールチェック (Mail Checking)</i> で、アカウントのメールサーバーに新着メールの問い合わせを行う間隔を指定します。<br />
-ダイヤルアップ接続を利用している場合、メールチェックのためだけに自動でダイヤルしてしまうのを防ぐため<span class="menu">ダイヤルアップ接続の時のみ (Only When Dial-Up is Connected)</span> と <span class="menu">ダイヤルアップ接続が中断した時に送信メールを予約する (Schedule Outgoing Mail When Dial-Up is Disconnected)</span> を有効にするとよいでしょう。 </p>
-<p>メールサービスでは、ステータスウィンドウの表示を<span class="menu">表示しない (Never)</span>、<span class="menu">送信中に (While Sending)</span>、<span class="menu">送受信中に (While Sending and Receiving)</span>、<span class="menu">常に (Always)</span>　から選択できます。</p>
-<p><span class="menu">起動時にメールサービスを開始する (Start Mail Services on Startup)</span> が無効だと、処理を実行する mail_daemon が起動していないので、有効であるかしっかり確かめてください。</p>
+<p><i>メールチェック (Mail Checking)</i> で、アカウントのメールサーバーに新着メールを問い合わせる間隔を指定します。<br />
+ダイヤルアップ接続を利用しているなら、メールチェックのためだけに自動でダイヤルしてしまうのを防ぐため<span class="menu">ダイヤルアップ接続の時のみ (Only When Dial-Up is Connected)</span> と <span class="menu">ダイヤルアップ接続が中断した時に送信メールを予約する (Schedule Outgoing Mail When Dial-Up is Disconnected)</span> を有効にするとよいでしょう。 </p>
+<p>メールサービスでは、ステータスウィンドウの表示を<span class="menu">表示しない (Never)</span>、<span class="menu">送信中に (While Sending)</span>、<span class="menu">送受信中に (While Sending and Receiving)</span>、<span class="menu">常に (Always)</span> から選択できます。</p>
+<p><span class="menu">起動時にメールサービスを開始する (Start Mail Services on Startup)</span> が無効だと、処理を実行する mail_daemon が起動していないので、有効であるかしっかり確認してください。</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
 <p><span class="menu">メールボックスメニューを編集… (Edit Mailbox Menu...)</span> は、<span class="path">/boot/home/config/Mail/Menu Links/</span> フォルダーを開きます。この中に格納されたすべてのフォルダーやクエリ、またそれらのリンクが、Deskbar トレイのメールサービスにあるメールボックスアイコンのコンテキストメニューに表示されます。</p>
 <p>メニューからは、<span class="menu">メッセージを作成... (Create new message...)</span>、<span class="menu">直にメッセージをチェック (Check for mail now)</span> 、<span class="menu">メール設定の変更... (Preferences...)</span> といった操作ができます。</p>
@@ -233,7 +233,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="deskbar.html">Deskbar</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
 ::  <a href="filetypes.html">FileTypes</a>  »
 </span></div>
 </div>

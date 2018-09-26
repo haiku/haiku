@@ -90,7 +90,7 @@ Miután megbizonyosodtál róla, hogy a hiba egyedi, akkor azt a lehető legpont
 <ul>
 	<li><p>Próbáld meg a hibát a legújabb verzión is előidézni. Előre elkészített képfájlok is a <a href="http://download.haiku-os.org">rendelkezésre állnak</a>.</p></li>
 	<li><p>Add meg az alapvető információkat arra vonatkozóan, hogy miként használtad a Haiku-t (például valós gépen vagy emulátoron (VMWare, QEMU), stb.).</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
+	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>Írd le a tapasztalt problémát. Próbáld meg olyan pontosan, ahogy tudod: mi és hogyan viselkedett, és mire számítottál.</p></li>
 	<li><p>Írd le, hogy milyen lépések szükségesek ahhoz, hogy a hibát meg tudjuk ismételni. Ez a lépés segít a fejlesztőknek.</p></li>
 	<li><p>Mellékelj annyi információt, amennyit csak tudsz. Ha ez a grafikus felület, vagy egy program hibája, akkor készíts egy képernyőképet a <span class="key">PRINT</span> billentyű lenyomásával.</p></li>
@@ -98,13 +98,13 @@ Miután megbizonyosodtál róla, hogy a hiba egyedi, akkor azt a lehető legpont
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Program hibák</a></h2>
-<p>Ha egy program meghibásodott, akkor a hibakereső a megjelenített üzenetből is előhívható. Ekkor megnyílik egy Terminál ablak a gdb-t (GNU hibakereső) futtatva. A <span class="cli">bt</span>-t kiadva létrehozhatunk egy "visszakövetést", aminek az eredményét a jelentéshez kell mellékelni (azt is, amit a <span class="cli">bt</span> előtt kaptál).</p>
+<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/hu/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Kiszolgáló/szolgáltatás hibák</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
 Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Kernel hibák</a></h2>
@@ -120,11 +120,11 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Kernel Debugging Land - KDL (Kernel Hibakereső Felület)</a></h3>
-<p>Ha a rendszer nem lép be automatikusan a KDL-be, akkor a <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> kombinációval manuálisan is beléphetsz oda.<br />
-Ne feledd, megeshet, hogy a billentyűzeted nem fog működni a KDL-ben. A PS/2 billentyűzet biztosan, az USB csak akkor, ha UHCI vezérlőre van csatlakoztatva. USB OHCI jelenleg nem használható.</p>
+<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being the <span class="key">Print</span> key, normally).<br />
+Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>A KDL egyfajta shell. Itt néhány parancsot is használhatunk. Az alábbi parancsok érdekesek lehetnek:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (sc)</td><td> </td><td>A hiba visszakövetése. Ha egy hiba miatt kerülsz a KDL-be, akkor ezt alapból kiadja az.</td></tr>
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>A hiba visszakövetése. Ha egy hiba miatt kerülsz a KDL-be, akkor ezt alapból kiadja az.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>A kezelt és nem kezelt eszköz-megszakítások megjelenítése.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (continue)</td><td> </td><td>Ha lehetséges, akkor kilép a hibakeresőből, és folytatja a normális működést.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Azonnal újraindítja a rendszert. Minden nem mentett adatot elveszítesz. Azokat is, amit bár elmentettél, de még nem lett a lemezre írva.</td></tr>
@@ -143,10 +143,10 @@ A rendszertöltő <span class="menu">Debug menu</span>-ben (hibakereső menü) a
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">Hibakeresés a képernyőn</a></h3>
-<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
-This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
-Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
-One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/hu/bootloader.html">Boot Loader</a>.</p>
+<p><b>A képernyőn történő hibakeresés csak egy megadott hiba esetében hasznos, és időigényes. Ne használd, ha nem szükséges.</b><br />
+Ez akkor fontos, ha a Haiku nem tud elindulni és a <span class="menu">hibakereső naplózás</span> valamiért nem működik. Mielőtt a Haiku logó megjelenik, tartsd lenyomva a <span class="key">SHIFT</span>-et a rendszertöltőbe való belépéshez. Válasszd a <span class="menu">Select safe mode options</span> (hibakereső opciók) menüt, majd azon belül az <span class="menu">[ ] Enable on screen debug output</span> (képernyőn történő hibakeresés engedélyezése) opciót. (Megjegyzés: több opció is haszálható betöltéskor. Ha a Haiku indításakor egy vagy több opciót is használsz, akkor azokat is említsd meg.)<br />
+Végül válaszd a <span class="menu">Return to main menu</span> (visszatérés a főmenübe), majd a <span class="menu">Continue booting</span> (betöltés folytatása) menüpontot.<br />
+Egy vagy több oldalnyi szöveg is megjelenik majd a képernyőn, amiből csak az utolsó néhány sort szükséges a jelentéshez csatolni. További információk a <a href="../../userguide/hu/bootloader.html">Rendszertöltő</a> fejezetben.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">Eszköz/vezérlő hibák</a></h2>
@@ -155,10 +155,10 @@ One or more pages of text will display on the screen, only the last few lines ne
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td>Részletes lista az eszközökről/összetevőkről a pci és a gyártó azonosítójával együtt. Hasonló a Linux <span class="cli">lshw</span> és <span class="cli">lspci</span> parancsához.</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>USB-vel kapcsolatos hiba esetén. Hasonló a <span class="cli">lsusb</span>-hez.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Az elsődleges napló, amit a Haiku használ, amibe az indításkori üzenetek is bekerülnek. Az <span class="cli">open</span> használatával a naplóból egy adott részt is kimásolhatunk, mert az egy szövegszerksztőben nyílik meg.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Az összes használt eszközvezérlő.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Csak a <i>Kernel Debugging Land</i>-ben haszálatos (lásd fejjebb). A megszakítások használatát jeleníti meg. Elvileg nem lehet túl sok amit megosztva használnak az eszközök.</td></tr>
-<tr><td colspan="3">- Hibakeresés a képernyőn (indításkori biztonsági opció).</td></tr>
+<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>
 
 <p>Az elős 4 parancsot a Terminálban kell kiadni. Kiegészítve a <span class="cli"> &gt; output.txt</span> paraméterrel, a parancsok kimenete nem a képernyőre, hanem egy "output.txt" (kimenet) nevű fájlba kerül, amit a jelentéshez csatolhatunk vagy levélhez mellékelhetünk.</p>

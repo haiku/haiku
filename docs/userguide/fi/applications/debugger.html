@@ -4,13 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2017, Haiku. All rights reserved.
+ * Copyright 2015-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -77,6 +77,27 @@
 <li><p><span class="button">Save report</span> luo vianjäljitysilmoituksen, joka tallennetaan Työpöydän tekstitiedostoon ja voidaan lähettää sähköpostiviestissä kaatuneen sovelluksen kehittäjälle tai liittää vianjäljitysohjelman vikalistaan, jos sellainen on käytettävissä.<br />
 Vianjäljitysilmoitus sisältää tietoja laitteistostasi (prosessorityypistä ja käytetystä muistista jne.), Haikun tarkasta versiosta ja kaikesta saatavilla olevasta tiedosta järjestelmän siitä tilasta, joka voisi olla olennaista kaatumiselle.</p></li>
 </ul>
+<p>Oletustoiminto kaatumisen tapahtuessa voidaan asettaa tekstitiedostossa <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
+Tiedosto käyttäää driver_settings-tyylimuotoa seuraavasti:</p>
+<pre>default_action user
+
+executable_actions {
+	app1 log
+	/path/app2* debug
+}</pre>
+<p>Kelvolliset default_action-arvot ovat:</p>
+<table summary="action values" border="0" cellspacing="0" cellpadding="2">
+<tr><td>user</td><td style="width:30px"></td><td>Käyttäjätoiminnon kehote</td></tr>
+<tr><td>kill</td><td></td><td>Kaatumisryhmän hiljainen päättäminen.</td></tr>
+<tr><td>debug</td><td></td><td>Vianjäljittimen liittäminen kaatumisryhmään.</td></tr>
+<tr><td>log / report</td><td></td><td>Tallenna kaatumisilmoitus ja lopeta ryhmä.</td></tr>
+<tr><td>core</td><td></td><td>Tallenna (mahdolliset hyvin suuri) ydintiedosto ja lopeta ryhmä.</td></tr>
+</table>
+<p>Jos default_action-oletustoimintoa ei ole määritelty, käytetään toimintoa ”user”.</p>
+<p>Alilohko executable_actions sisältää oletusarvojen yksittäisiä korvauksia. Nämä noudattavat yllä olevaa muotoa, jossa yksittäisinä riveinä voi olla vain ryhmänimi, tai polku, sisältäen jokerimerkkejä.</p>
+<p><br /></p>
+<hr />
+<p><br /></p>
 <p>Todellisen Vianjäljittäjän käytön kuvaaminen ei kuulu tämän opasteen aihepiiriin, koska tämä on osoitettu Haikun tavallisille käyttäjille. Täydellisyyden vuoksi tässä on ikkuna, joka tulee näkyviin, jos valitset  <span class="button">Debug</span>-valitsimen yllä olevasta hälytyksestä:</p>
 <img src="../images/apps-images/debugger.png" alt="debugger.png" />
 <p>Kuten nopeasti näet, jos alat tutkimaan sovellusta, Vianjäljitin on yksi monimutkaisimmista ja kehittyneimmistä Haikun sovelluksista. Jos olet kehittäjä ja olet käyttänyt muiden alustojen vianjäljittimiä, monet ominaisuudet ovat sinulle tuttuja.</p>
@@ -85,7 +106,6 @@ Vianjäljitysilmoitus sisältää tietoja laitteistostasi (prosessorityypistä j
 <tr><td class="onelinetop"><a href="https://www.dropbox.com/s/e6gx39r0asc2t8f/DebuggerReferenceManual.pdf?dl=1">Debugger Reference Manual</a></td><td></td><td>Tämä on kaikkein perusteellisin lähde Vianjäljittimen kanssa työskentelyyn.</td></tr>
 <tr><td><a href="https://www.haiku-os.org/blog/anevilyak/">Blogposts</a></td><td> </td><td>Tässä on muutamia artikkeleita Vianjäljittäjästä, tekijänä enimmäkseen Rene Gollent uuden ominaisuuden toteutuksen jälkeen.</td></tr>
 <tr><td class="onelinetop"><a href="https://www.youtube.com/watch?v=n-NDFwtmQcI&amp;list=PL2KiE-VO9zk-9XPmfusEDaOFd_7AiVKzz">BeGeistert 026 video</a></td><td> </td><td>Video BeGeistert-kokoontumisesta vuonna 2012, jolloin Ingo Weinhold esitteli Vianjäljittimen silloista tilaa ja näytti muita mielenkiintoisia työkaluja kuten profiloija pullonkaulojen etsimiseen.</td></tr>
-<tr><td class="onelinetop"><a href="http://cgit.haiku-os.org/haiku/commit/?id=hrev46547">Default action when crashing</a></td><td> </td><td>Tämä commit-viesti kuvaa, kuinka muuttaa käyttäytymistä, kun jokin kaatuu. Esimerkiksi voit pyytää järjestelmää aina tallentamaan kaatumisilmoituksen eikä pyytämään käyttäjää näyttämään tavallista kaatumishälytystä. Voit rajoittaa tuon käyttäytymisen määrättyihin sovelluksiin.</td></tr>
 </table>
 
 </div>

@@ -12,8 +12,8 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Pengphei Han
  *		dgy18787
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -92,7 +92,7 @@
 <ul>
 	<li><p>尝试在当前版本的Haiku系统中重现您的问题。  有许多用于测试的预编译镜像都是<a href="http://haiku-files.org/">可用的</a>。</p></li>
 	<li><p>包括基本的信息，例如以何种方式测试 Haiku（利用真实的硬件，VMware，还是 QEMU）。</p></li>
-	<li><p>注意您所运行的系统版本。您可以在桌面栏菜单的 <span class="menu">关于 Haiku...</span> 找到该信息。<br /> 同时您还需要注意您所测试的 Haiku 的构建类型（gcc2，gcc4，gcc2hybird，gcc4hybird）。 可下载的镜像都会给出相应的命名，对于自主构建的镜像，您需要了解自己的构建方法。</p></li>
+	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>描述您所遇到的问题。尽量把问题讲得精确和明白：详细的描述系统的行为反馈，和您期望的反馈。</p></li>
 	<li><p>描述出现该错误所需要的操作步骤。这将会有助于开发者重现该错误，并对其进行修复和完善。</p></li>
 	<li><p>附带你所掌握的尽可能多的信息。如果是一个GUI错误，或者其中的程序错误，尽量使用 <span class="key">PRINT</span> 键来截取当时的屏幕图像。</p></li>
@@ -100,14 +100,13 @@
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">程序错误</a></h2>
-<p>如果程序发生崩溃，您需要从弹出的警告窗口中启动调试程序。它将会打开一个运行gdb（GNUdebugger）的终端窗口。输入 <span class="cli">bt</span>，您将会创建一个有关调试信息的“回溯”，然后您需要把它完整的复制出来（包括您输入 <span class="cli">bt</span> 命令之前终端中显示的内容），附加到错误报告中。</p>
+<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/zh_CN/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">服务错误</a></h2>
-<p>当 app server，registrar server 或者 input server 等重要组件崩溃时，您将无法看到通常的崩溃警告。相反的，整个屏幕将会呈现白色，并且启动一个 gdb 会话，相关的输出信息直接在屏幕中进行显示。您可能还可以继续移动鼠标，这将会覆盖掉屏幕中的白色区域和 gdb 输出信息。仍在运行的程序 (例如，进程控制器或者桌面栏的时钟) 可能也会覆盖屏幕中的调试信息。
-<br />
-除却所有显示的丑陋和操作的不便，它与软件出错基本一样。 最重要的是获取一个有关错误的回溯（使用 <span class="cli">bt</span> 命令）。您可能还需要使用数码相机记录下相关的屏幕显示，因为这种情况下，您无法拷贝相关的文本，<br />
-根据不同的崩溃问题，您可以尝试通过 <span class="cli">save-report</span> 指令在桌面保存崩溃报告，然后按下电源键尝试重启。</p>
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">内核错误</a></h2>
@@ -123,11 +122,11 @@
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">内核调试 - KDL</a></h3>
-<p>如果系统没有自动的进入内核调试状态，您也可以有意识的使用 <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> 快捷键手动进入。<br />
-需要注意的是，在内核调试状态，您的键盘可能会无法工作。PS/2 键盘通常都能够正常工作；对于 UHCI 控制器连接的 USB 键盘，您至少需要使用快捷键进入内核调试状态一次，它才可用。但是对于 USB OCHI，目前还未实现支持。</p>
+<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being the <span class="key">Print</span> key, normally).<br />
+Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>KDL 本身是 shell 中的一类。它可以执行命令，打印系统信息。下面是一些感兴趣的命令：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka sc)</td><td> </td><td>打印回溯信息。如果系统自主进入内核调试状态，通常需要输入该命令。</td></tr>
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>打印回溯信息。如果系统自主进入内核调试状态，通常需要输入该命令。</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>显示已处理和未处理的硬件中断。</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (aka continue)</td><td> </td><td>离开内核调试状态；如果可能的话，继续正常的系统操作。</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>立即重启系统。您将会丢失所有未保存的数据，甚至包括那些已经保存，但是还未写入硬盘的数据。</td></tr>
@@ -141,16 +140,16 @@
 <p><b>这是从无法引导的系统中获取信息的首选方法。</b>
 <br />
 系统日志（syslog，system log 的缩写）中包含了关于系统问题的有用信息，包括 KDL 会话的输出信息 。通常将它附带到有关内核问题的报告中是个不错的主意。系统日志将会写入文件 <span class="path">/boot/system/var/log/syslog</span>。由于写入文件需要系统处于运行状态，因此当内核出现问题时（尤其是，系统自动重启，或者无法持续 KDL 会话），最新的输出信息可能无法写入日志文件。</p>
-<p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
-If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
-In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>
+<p>引导程序的 <span class="menu">Debug menu</span> 中的<span class="menu">Enable debug syslog</span> 选项可以使系统日志持久存在。如果启用了引导菜单中的 <span class="menu">Save syslog from previous session during boot</span> 选项（默认情况下启用），您可以在 <span class="path">/boot/system/var/log/previous_syslog</span> 中找到最近登陆会话的系统日志。<br />
+如果您无法启动并获取最近的日志文件 previous_syslog，您需要在引导时按下 <span class="key">SHIFT</span> 进入引导程序菜单。<br />
+在引导程序的 <span class="menu">Debug menu</span> 中，您可以找到 <span class="menu">Display syslog from previous session</span> 和 <span class="menu">Save syslog from previous session</span> 两个入口。前者将系统日志显示于屏幕，后者允许您将其保存到硬盘。需要注意的是，目前只有 FAT32 卷支持保存该文件。如果您使用 USB 磁盘，但是插入晚了，可能它将不被识别；您可以重置机器，然后再次进入引导程序菜单。但是还要注意：不要无故的启动任何操作系统，否则数据将会丢失。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">屏幕调试</a></h3>
-<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
-This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
-Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
-One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/zh_CN/bootloader.html">Boot Loader</a>.</p>
+<p><b>屏幕调试输出仅对调试特殊问题有用，而且自身也有（定时）问题。若非必须，不要使用它。</b><br />
+只有当 Haiku 引导机器失败，而且 <span class="menu">Debug syslog option</span> 出于某些原因无法使用，它才具有重要意义。 在Haiku的引导徽标出现之前，按下 <span class="key">SHIFT</span> 进入引导程序菜单。 选择 <span class="menu">Select safe mode options</span>。 在接近屏幕底部，<span class="menu">[ ] Enable on screen debug output</span> 将会列出。（注意：如果尝试启动Haiku，您可以启用另一个选项。如果 Haiku 只有在启用多个选项时才可以启动，您在错误报告中一定要给出这些选项。）<br />
+最后，选择 <span class="menu">Return to main menu</span> 和 <span class="menu">Continue booting</span>。<br />
+在屏幕上将会显示一页或者多页文本，只有最后几行才需要附带到您的错误报告。更多信息，参阅 <a href="../../userguide/zh_CN/bootloader.html">引导程序</a>。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">硬件错误</a></h2>
@@ -159,10 +158,10 @@ One or more pages of text will display on the screen, only the last few lines ne
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td> 给出所有硬件的详细列表，包括提供商和 PCI ID；类似于Linux下的 <span class="cli">lshw</span> 和 <span class="cli">lspci</span> 。</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>假如是有关 USB 的问题，它类似于Linux下的 <span class="cli">lsusb</span>。</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haiku的主要系统日志，类似于引导过程中的屏幕调试信息。您可以使用 <span class="cli">open</span> 命令在文本编辑器中获取到系统日志中相关的部分。</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td> 列出所有使用的驱动。</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>只在 <i>内核调试状态</i> 可用（参阅下文）。它用显示中断使用情况。不可能有许多由不同硬件共享的中断。</td></tr>
-<tr><td colspan="3">- 屏幕调试输出（引导时间选项的安全模式）。</td></tr>
+<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>
 
 <p>前四个命令需要在终端中进行输入。在命令后添加 <span class="cli"> &gt; output.txt</span> ，然后输出的信息将会重定向到“output.txt”文本文件，您可以将其附带到您的错误报告或者邮件。</p>

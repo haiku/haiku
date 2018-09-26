@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -80,7 +80,7 @@ Die Befehle sind im Kapitel <a href="../index.html">Index</a> beschrieben.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-pkg" name="cli-pkg">Paketmanagement betreffend: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>Mit dem <span class="cli">package</span> Befehl werden HPKG Pakete verwaltet. Der Artikel <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> zeigt die grundsätzliche Anwendung. Normalerweise wird das Tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> benutzt um sogenannte "Recipes" zu erstellen, aus denen Pakete automatisiert erzeugt werden.</p>
+<p>Mit dem <span class="cli">package</span> Befehl werden HPKG Pakete verwaltet. Der Artikel <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> zeigt die grundsätzliche Anwendung. Normalerweise wird das Tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> benutzt, um automatisiert Pakete aus sogenannten "Recipes" ("Rezepten") zu erstellen.</p>
 <p>Mit <span class="cli">pkgman</span> lassen sich Pakete suchen, installieren, aktualisieren und deinstallieren. Paket-Repositories können hinzugefügt, entfernt und deren Paketlisten aktualisiert werden. Eine besondere Art des Updates ist der Parameter <tt>full-sync</tt>: Er geht aggressiver zu Werke und ersetzt wenn nötig auch eine Software mit einer älteren Version, oder entfernt Pakete komplett.<br />
 Mehr Details zu einzelnen Parametern erhält man durch Anhängen von "--help", beispielsweise <tt>pkgman search --help</tt>.</p>
 
@@ -100,8 +100,7 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> ist ein kleines tool das BMessages an Anwendungen sendet und deren Antwort ausgibt. Es kann zum Skripten von Anwendungen benutzt werden, also zum "Fernsteuern" von Programmen mittels Skripts oder von der Kommandozeile aus. Das ist leider etwas kompliziert... Aber Dank Scot Hacker's BeOS Bible gibt es ein schönes <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey Tutorial</a> von Chris Herborth.</p>
-</td></tr>
+<td valign="top"><p><span class="cli">hey</span> ist ein kleines tool das BMessages an Anwendungen sendet und deren Antwort ausgibt. Es kann zum Skripten von Anwendungen benutzt werden, also zum "Fernsteuern" von Programmen mittels Skripts oder von der Kommandozeile aus. Das ist leider etwas kompliziert... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdingers Blogpost</a> ist eine gute Einführung, und Dank Scot Hacker's BeOS Bible gibt es ein schönes <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey Tutorial</a> von Chris Herborth.</p></td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> ist die Konsolen-Variante des Find Panels. Um eine Suchformel bequem zu generieren lässt sich übrigens sehr gut eben dieses Find Panel benutzen: Einfach dort die entsprechende Suche zusammenklicken, dann umschalten zum "<span class="menu">by formula</span>" Mode, Anführungszeichen (<tt>"</tt>) an Anfang und Ende und anschließend das Ganze hinter den <span class="cli">query</span> Befehl ins Terminal oder Skript einfügen.</p>
 </td></tr>
@@ -117,8 +116,8 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 		<td><p><span class="cli">checkfs</span> ist ein wichtiges Tool um das Dateisystem zu überprüfen. Es wird einfach ein Partitionsname, beispielsweise <span class="path">/Haiku</span> oder ein Device-Pfad übergeben, um dort alle Dateien durchzusehen und Inkonsistenzen zu beheben, sofern möglich.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit dem Konsolenprogramm <span class="app">screenshot</span> (das "<tt>\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
-<pre class="terminal">desklink "cmd=Aktives Fenster (2s):/bin/screenshot --window --border --delay 2" \
+		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit dem Konsolenprogramm <span class="app">screenshot</span> (das "<tt>\\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
+<pre class="terminal">desklink "cmd=Aktives Fenster (2s):/bin/screenshot --window --border --delay 2" \\
 "cmd=Replicant entfernen:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
@@ -127,7 +126,8 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 		<td valign="top"><p>Mittels <span class="cli">diskimage</span> können normale Dateien als "Disk" angemeldet werden. So lässt dich beispielsweise ein Haiku Anyboot Image anmelden. Anschließend kann es per Tracker eingehängt werden, um Dateien darauf zu kopieren, zu ändern oder zu löschen, bevor man es als Quelle für den Installer benutzt.</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Der launch_daemon startet beim Hochfahren verschiedene Dienste und Anwendungen. Einige werden bei ihrer Beendigung automatisch neu gestartet. Soll das nicht geschehen – vielleicht will man einen veränderten Tracker ausprobieren – kann man per <span class="cli">launch_roster stop</span> den Neustart der Anwendung verhindern, bevor man sie beendet. Mittels <tt>start</tt> lässt sich der automatische Neustart wieder einschalten,  <tt>info</tt> gibt zusätzliche Informationen aus. Ohne Parameter zeigt <span class="cli">launch_roster</span> alle Anwendungen/Dienste an, die so gesteuert werden können.<br />
+		<td valign="top"><p>Der launch_daemon startet beim Hochfahren verschiedene Dienste und Anwendungen. Einige werden bei ihrer Beendigung automatisch neu gestartet. Soll das nicht geschehen – vielleicht will man einen veränderten Tracker ausprobieren – kann man per <span class="cli">launch_roster stop</span> den Neustart der Anwendung verhindern, bevor man sie beendet. Mittels <tt>start</tt> lässt sich der automatische Neustart wieder einschalten,  <tt>info</tt> gibt zusätzliche Informationen aus. Mit <tt>log</tt> werden alle den launch_daemon betreffenden Ereignisse ausgegeben.<br />
+Ohne Parameter zeigt <span class="cli">launch_roster</span> alle Anwendungen/Dienste an, die so gesteuert werden können.<br />
 So lässt sich zum Beispiel der Neustart der Deskbar anhalten:</p>
 <pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>

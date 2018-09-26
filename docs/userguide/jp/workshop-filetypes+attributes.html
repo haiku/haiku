@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +50,7 @@
 </ul>
 <span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>
@@ -60,7 +60,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#preparations">準備</a><br />
 	<a href="#custom-filetype">カスタムファイルタイプの作成</a><br />
@@ -82,9 +82,9 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preparations" name="preparations">準備</a></h2>
-<p>最初に、どのようなファイルタイプおよび属性が私たちのニーズを満たすか決定しましょう。元々、私は映画の IMdB ページへのリンクを備えたブックマークファイルを使用したかったが、当時 Haiku には BeOS の <span class="app">NetPositive</span> のような「ブックマークを付けられる」ブラウザがありませんでした。それで、私はファイル自身を映画のカバーの JPEG イメージにすることを思いつきました。<br />
+<p>最初に、どのようなファイルタイプおよび属性が私たちのニーズを満たすか決定しましょう。元々、私は映画の IMdB ページへのリンクを備えたブックマークファイルを使用したかったが、当時 Haiku には BeOS の <span class="app">NetPositive</span> のような「ブックマークを付けられる」ブラウザーがありませんでした。それで、私はファイル自身を映画のカバーの JPEG イメージにすることを思いつきました。<br />
 <span class="app">WebPositive</span> によって、Haiku は再びブックマークを付けられるブラウザーを持ちました。そのため、データベースファイルには基本的なファイルタイプを備えたファイルの代わりに、ブックマークファイルも使えます。<br />
-どの場合でも、これらのファイルに 2、3 の属性を加えます。ここでは、後でそれをクエリするかどうか (次に、インデックスにそれを加えなければなりません) 決定しなければなりません。また、クエリをするなら、属性がどのような型であるべきかを決定しなければなりません。数 (整数、小数) は、テキストとは異なる評価をされます(例： &lt;/=/&gt; 対 等しい/を含む/で始まる)。</p>
+どの場合でも、これらのファイルに 2、3 の属性を加えます。ここでは、後でそれをクエリするかどうか (次に、インデックスにそれを加えなければなりません) 決定しなければなりません。また、クエリをするなら、属性がどのような型であるべきかを決定しなければなりません。数 (整数、小数) は、テキストとは異なる評価をされます(例： &lt;/=/&gt; 対 is/contains/starts with)。</p>
 <p>以下は、DVD について見たい属性です:</p>
 <ul>
 <li>映画のタイトル (Movie title)</li>
@@ -93,14 +93,14 @@
 <li>監督/キャスト (Director/Cast)</li>
 <li>あらすじ (Plot)</li>
 <li>1 から 10 までの点数 (Rating)</li>
-<li>棚の座標 (例: A2, B3)、実生活でもこれによって DVD を探します :)</li>
+<li>棚の座標 (例: A2, B3)、実生活でもこれで DVD を探します :)</li>
 <li>もしそうならば、だれが DVD を借りたか…</li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="custom-filetype" name="custom-filetype">カスタムファイルタイプの作成</a></h2>
-<p><span class="app">Filetypes</span> プレファレンスを立ち上げて、左の階層化リストの下にある、<span class="button">追加… (Add...)</span> ボタンをクリックします。小さなダイアログが開くので、そこで新しいファイルタイプがどの MINE グループに属するか決めます。また、まったく新しいグループを作成することもできます。では、ファイルタイプを "<i>applications</i>" のグループに入れて、"内部名 (Internal Name)" を DVDdb にしましょう。</p>
+<p><span class="app">Filetypes</span> プレファレンスを立ち上げて、左の階層化リストの下にある、<span class="button">追加… (Add...)</span> ボタンをクリックします。小さなダイアログが開くので、そこで新しいファイルタイプがどの MINE グループに属するか決めます。また、まったく新しいグループも作成できます。では、ファイルタイプを "<i>applications</i>" のグループに入れて、"内部名 (Internal Name)" を DVDdb にしましょう。</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
 <p>さて、新しい DVDdb ファイルタイプ用のダイアログが開きます。</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
@@ -128,14 +128,14 @@
 <a id="pref_app" name="pref_app">優先アプリケーション (Preferred Application)</a></h3>
 <p>このポップアップメニューは、特定のファイルタイプを扱えるすべてのアプリケーションのリストを示します。ここから、この特定のファイルがダブルクリックされた時にどのプログラムで開くかを選択できます。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">選択… (Select...)</span></td><td> </td><td>ファイルダイアログを開いて、そこからこのファイルタイプを開くためのアプリケーションを選択します。ここでは DVD のカバーを開くために、<span class="app">ShowImage</span> を設定します。</td></tr>
+<tr><td><span class="button">選択… (Select...)</span></td><td> </td><td>ファイルダイアログを開いて、そこからこのファイルタイプを開くためのアプリケーションを選択します。ここでは DVD のカバーを開くために、<span class="app">画像ビューワ (ShowImage)</span> を設定します。</td></tr>
 <tr><td class="onelinetop"><span class="button">このタイプと同様… (Same as...)</span></td><td> </td><td>ファイルダイアログを開いて、求める優先アプリケーションのセットを持ったファイルを選択します。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="extra_attribute" name="extra_attribute">拡張属性 (Extra Attributes)</a></h3>
-<p>ここで、準備のところで決定したすべてのカスタム属性を入力します。<span class="button">追加… (Add...)</span> ボタンをクリックするとパネルが開き、新しい属性のデーターを登録できます。既存の属性はダブルクリックで編集できます。</p>
+<p>ここで、準備のところで決定したすべてのカスタム属性を入力します。<span class="button">追加… (Add...)</span> ボタンをクリックするとパネルが開き、新しい属性のデータを登録できます。既存の属性はダブルクリックで編集できます。</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
 <li><p><i>属性の名前 (Attribute name)</i> - たとえば、Tracker ウィンドウの列ヘッダーに表示されます。</p></li>
@@ -158,7 +158,7 @@
     </ul></li>
 </ul>
 <ul>
-<li><i>表示する (Visible)</i> - このチェックボックスは、Tracker ウィンドウで属性がそもそも表示できるかどうか決定します。Tracker は DVD データベースのインターフェースなので、これをチェックし、以下の項目で外観を定義します。<ul>
+<li><i>表示する (Visible)</i> - このチェックボックスは、Tracker ウィンドウで属性が少しでも表示できるかどうか決定します。Tracker は DVD データベースのインターフェースなので、これをチェックし、以下の項目で外観を定義します。<ul>
     <li><span class="menu">表示形式 (Display as)</span> - "Default" のままにしてください。将来、評価用のバーや星などのより多くのオプションが利用できるでしょう。</li>
     <li><span class="menu">編集可能 (Editable)</span> - Tracker 上で属性が編集できるかどうか決定します。</li>
     <li><span class="menu">幅 (Width)</span> - Tracker ウィンドウの属性行のデフォルト幅。</li>
@@ -190,7 +190,7 @@
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>これらにインデックスを付けるには、ターミナルを立ち上げて、次々に属性に追加していくだけです。</p>
+<p>これらにインデックスを付けるには、ターミナルを立ち上げて、次々に属性を追加していくだけです。</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
@@ -200,12 +200,12 @@ mkindex -t int DVDdb:rating</pre>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filling-data" name="filling-data">データを入力する</a></h2>
-<p>さて、すべてが設定されたので、データベースにデータを入れ始められます。<br />
-基本のファイルはカバーイメージなので、IMdB のようなオンラインリソースへ行き、最初の映画を探してカバーまたは映画のポスターを DVDdb のファイルを保持したい新規フォルダーに保存します。</p>
+<p>さて、すべて設定されたので、データベースにデータを入れ始められます。<br />
+基本のファイルはカバーイメージなので、IMdB のようなオンラインリソースへ行き、最初の映画を探してカバーまたは映画のポスターを DVDdb のファイルを保持する新規フォルダーに保存します。</p>
 <p>フォルダーを開くと、JPEG ファイルが 1 つある標準的な Tracker ウィンドウが見えます。JPEG ファイルを右クリックして、<span class="app">Filetype アドオン</span>を使って、ファイルタイプを <tt>application/DVDdb</tt> に変更します。<a href="filetypes.html">ファイルタイプ</a>のドキュメントにこれについて詳しい情報があります。</p>
 <p>さて、Tracker ウィンドウの <span class="menu">属性 (Attributes)</span> メニューから DVDdb の属性をすべて有効にし、好きなように Tracker の列を再構成します。</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>まだ空の属性をクリックする (または <span class="key">ALT</span> <span class="key">E</span> を押す) ことで、編集モードに入り、それぞれの属性を入力します。<span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> によって、属性間を移動できます。</p>
+<p>まだ空の属性をクリックする (または <span class="key">ALT</span> <span class="key">E</span> を押す) と、編集モードに入り、それぞれの属性を入力します。<span class="key">TAB</span> および <span class="key">SHIFT</span> <span class="key">TAB</span> によって、属性間を移動できます。</p>
 <p>今回の例では、通常ダウンロードした JPEG カバーでスタートし、そのタイプを applications/DVDdb に変更します。動作するファイルを作成する、別のエレガントなやりかたがあります。私たちが定義したファイルタイプを持つ空のファイルを <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> にコピーし、それを DVDdb にリネームします。</p>
 <p>Tracker ウィンドウ中で右クリックすると、<span class="menu">新規… (New...)</span> メニューのデフォルトである、"新規フォルダー (New folder)" の下に新たな項目を見つけるでしょう。</p>
 
@@ -225,7 +225,7 @@ DVDdb ファイルを含んでいるフォルダーを開き、クエリ結果�
 <div class="nav">
 <div class="inner"><span>
  «  <a href="queries.html">クエリ</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
 ::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>

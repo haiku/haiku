@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filesystem layout</title>
+	<title>Układ systemu plików</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -47,7 +49,7 @@
 <li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="bootloader.html">Boot Loader</a> 
+ «  <a href="bootloader.html">Moduł rozruchu</a> 
 ::  <a href="contents.html" class="uplink">Spis treści</a> 
 ::  <a href="gui.html">Haiku's GUI</a>  »
 </span></div>
@@ -57,7 +59,7 @@
 <div>
 <div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
-<h1>Filesystem layout</h1>
+<h1>Układ systemu plików</h1>
 
 <p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
@@ -72,7 +74,7 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h2>
+<a id="system" name="system">Katalog systemowy – <span class="path">/boot/system/</span></a></h2>
 <p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
 Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -86,7 +88,7 @@ Most of the folders inside <span class="path">/boot/system/</span> are read-only
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="home" name="home">The home folder - <span class="path">/boot/home/</span></a></h2>
+<a id="home" name="home">Katalog domowy – <span class="path">/boot/home/</span></a></h2>
 <p>This folder belongs to you. Here you can create and delete files and folders as you wish. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)<br />
 Files that you'd like to share with other users in a future multi-user environment have do be put outside <span class="path">/boot/home/</span>. For example, you could create a folder <span class="path">/boot/all-users/</span> and put the stuff there.</p>
 
@@ -150,7 +152,7 @@ Files that you'd like to share with other users in a future multi-user environme
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="bootloader.html">Boot Loader</a> 
+ «  <a href="bootloader.html">Moduł rozruchu</a> 
 ::  <a href="contents.html" class="uplink">Spis treści</a> 
 ::  <a href="gui.html">Haiku's GUI</a>  »
 </span></div>

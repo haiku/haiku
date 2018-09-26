@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Typy súborov</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="index.html">Obsah</a>  »
 </span></div>
 </div>
@@ -89,7 +89,7 @@
 <p><span class="cli">listattr</span> vypíše zoznam atribútov súboru, no nezobrazí obsah týchto atribútov.</p>
 <pre>použitie: listattr 'názov súboru' ['názov súboru' ...]</pre>
 <p>Z nášho obrázka hore:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -118,7 +118,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> ukladá typ súboru ako reťazec <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, tu „<tt>application/x-person</tt>“. Ten určuje predvolenú ikonu a aplikáciu, v ktorej sa súbor otvorí keď naň napr. dvakrát kliknete.</p></li>
 <li><p>„<tt>_trk/pinfo_le</tt>“ je atribút, ktorým Tracker sleduje pozíciu ikony súboru.</p></li></ul>
-<div class="box-info">Všimnite si obrátené lomítko po slove "Clara". V termináli sa musíte „vyhnúť“ špeciálnym znakom ako <tt>'"*\$?!</tt>. Medzera medzi "Clara" a "Botters" je tiež jedným z nich. Tým pádom sa lomítko v skutočnosti nachádza pred medzerou, nie po slove "Clara".</div>
+<div class="box-info">Všimnite si obrátené lomítko po slove "Clara". V termináli sa musíte „vyhnúť“ špeciálnym znakom ako <tt>'"*\\$?!</tt>. Medzera medzi "Clara" a "Botters" je tiež jedným z nich. Tým pádom sa lomítko v skutočnosti nachádza pred medzerou, nie po slove "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,7 +126,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> zobrazí obsah konkrétneho atribútu súboru.</p>
 <pre>použitie: catattr [--raw|-r] názov_atribútu súbor1 [súbor2...]</pre>
 <p>A znova náš príklad:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -141,7 +141,7 @@ Clara Botters : string : Whelton</pre>
                  alebo číselná hodnota (ie. 0x1234, 42, 'ABCD', ...)
          Predvolený je „string“</pre>
 <p>Povedzme, že si Clara našla prácu v nadnárodnom Barkelbaer Inc., predtým prázdny atribút „Company“ zaplníme údajom, ktorý je typu „string“ (reťazec znakov):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -152,7 +152,7 @@ Clara Botters : string : Whelton</pre>
          „attr“ je názov atribútu súboru
          Ak je „-p“ uvedené, „attr“ sa považuje za vzor.</pre>
 <p>Aj keď by bolo praktickejšie vôbec nevypĺňať atribút „Fax“, môžete ho úplne odstrániť zo súboru Clary napísaním:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -171,7 +171,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Typy súborov</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="index.html">Obsah</a>  »
 </span></div>
 </div>
