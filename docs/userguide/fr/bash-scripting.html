@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Vincent Duvert
- *		Loïc
  *		Humdinger
+ *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -59,7 +59,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h1>Bash et les scripts</h1>
 
@@ -70,8 +69,9 @@ Les scripts peuvent aussi bien être utilisés pour simplement exécuter quelque
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Le Bash</a></h2>
-<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.<br />
-The <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash Reference Manual (PDF, 720 KiB)</a> is a nice resource to get into the details.</p>
+<p>Comme les scripts dépendent évidemment beaucoup du shell qui les interprète, vous devez d'abord vous familiariser avec le BASH qui est utilisé par le Haiku. Il y a beaucoup de ressources en ligne car c'est un shell largement utilisé.
+<a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction à bash - un tutoriel pour bash sous BeOS</a> de Johan Jansson est un document intéressant. (en anglais)<br />
+Le livre <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash Reference Manual (PDF, 720 KiB)</a> vous permettra d'entrer dans les détails.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -97,14 +97,13 @@ Par exemple, vous pouvez demander le lancement automatique de certains programme
 
 <p>Une autre manière de faire ceci est de placer des liens vers les applications à lancer dans le dossier <span class="path">/boot/home/config/settings/boot/launch</span>. Ceci peut être fait en effectuant un clic droit sur l'application que vous voulez lancer automatiquement, en choisissant <span class="menu">Create Link</span> (créer un lien) et en <a href="tracker.html#navigating">allant</a> jusqu'au dossier mentionné.</p>
 
-<h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">Le script d'arrêt UserShutdownScript</a></h3>
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">Le script d'arrêt UserShutdownScript - <i>ne fonctionne pas encore</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> sera exécuté au début du processus d'arrêt. Si ce script renvoie une valeur de retour non nulle, l'arrêt sera annulé.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">Le script de fin d'arrêt UserShutdownFinishScript</a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">Le script de fin d'arrêt UserShutdownFinishScript - <i>ne fonctionne pas encore</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> sera exécuté à la fin du processus d'arrêt. Veuillez noter que la majorité des services du système auront déjà été arrêtés à ce stade.</p>
 
 </div>

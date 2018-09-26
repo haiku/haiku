@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		mt
  *		Humdinger
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -62,7 +62,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#mailsystem">Haiku のメールシステム</a><br />
 	<a href="#statuses">カスタムステータスを使う</a><br />
@@ -84,8 +84,8 @@
 <p>メールサーバーとの通信を管理する、<span class="app">mail_daemon</span> があります。<a href="preferences/e-mail.html">メール</a>プレファレンスは、メールをチェックする頻度を設定する中心の 1 つであり、たとえば、メールアカウントや、メールをチェックする頻度を設定します。</p>
 <p>受信または送信されたすべてのメールは、個別のメールファイルとして保存されます。ファイルは、ヘッダー情報 (差出人 (sender)、表題 (subject)、日付 (date) のような)、およびステータス (新規 (New)、受信済 (Replied)、送信済 (Sent) のような) を BFS 属性中に持っています。これにより、Haiku のすばやいクエリで、メールを検索 / フィルタリングできます。</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>メールはすべて別々のファイルなので、それらを閲覧することは,フォルダー内の、(またはクエリの結果の) 画像ファイルを <a href="applications/showimage.html">ShowImage</a> でブラウズするのと同じぐらい容易なことです。Tracker ウィンドウを開いたままにしておくと、移動のために、前へ / 次へボタンを使うたびに、現在見ているファイルの選択が移動するのが見えるでしょう。<br />
-それらは別々のファイルなので、Haiku の<a href="applications/mail.html">メール</a>以外のビューアを使ってもまったく問題ありません。</p>
+<p>メールはすべて別々のファイルなので、それらの閲覧はフォルダー内の (またはクエリの結果の) 画像ファイルを <a href="applications/showimage.html">画像ビューワ (ShowImage)</a> でブラウズするのと同じぐらい容易なことです。Tracker ウィンドウを開いたままにしておくと、移動のために、前へ / 次へボタンを使うたびに、現在見ているファイルの選択が移動するのが見えるでしょう。<br />
+それらは別々のファイルなので、Haiku の<a href="applications/mail.html">メール</a>以外のビューワを使ってもまったく問題ありません。</p>
 <p>同様に、新規メッセージの作成はメール送信を管理する mail_daemon によって扱われるありふれたファイルの作成となります。コンタクト情報は、<a href="applications/people.html">People</a> アプリケーションに従います。</p>
 <p>一言で言えば、ほかのメールクライアントが、メールサーバーとの通信からすべてのメールへのビューおよびそれらを検索およびフィルタリングするためのツールの提供に至るまで、あらゆることができる場所です。Haiku は一連の小さなツールと、一般的なファイル管理を使います。</p>
 <ul>
@@ -93,7 +93,7 @@
 <li><p>Tracker ウィンドウおよびクエリは、メールファイルを検索および表示します。</p></li>
 <li><p><span class="app">メール</span>アプリケーションは、メールファイルを閲覧し、<span class="app">People</span> アプリケーションによるシステム全体に渡るコンタクト管理にしたがって、新規メッセージを作成します。</p></li>
 </ul>
-<p>特に、Tracker およびクエリを使ってメールを管理することは強力なアイデアです。得られる経験は、ファイル操作のあらゆる問題に転換できます。それが、画像、音楽、ビデオ、コンタクト、またはどんな書類でも、Tracker の使用はファイル管理のコアとなります。<br />
+<p>特に、Tracker とクエリを使ってメールを管理するのは強力なアイデアです。得られる経験は、ファイル操作のあらゆる問題に移行できます。それが、画像、音楽、ビデオ、コンタクト、またはほかの任意の書類でも、Tracker の使用はファイル管理のコアとなります。<br />
 同様に、これらのシステムエリアの改良は、メールだけでなく、それらを利用するすべてのアプリケーションに役立ちます。</p>
 
 <h2>
@@ -104,14 +104,14 @@
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
 <p>さらに良い、<span class="menu">閉じる (Close and) | ほかの属性に変更… (Set to...)</span> の使用は、新しいステータスを作成し、メールを分類するためにそれを使用するためです。たとえば、ステータスを、"<i>後で (Later)</i>" と呼ぶことができ、それから、より多くの時間が取れたときに、そのためにクエリを実行できました。<br />
 あるいは、特定のプロジェクトのために別のステータスを使用します。たとえば、ステータス "<i>HUG</i>" ("Haiku ユーザーガイド" 用) を作成し、そこに、ユーザーガイドのコンテンツに影響をおよぼすかもしれないすべてのメールを集めます。それらは、いくつかの機能を変更または導入する、コードの変更に関するコミットメッセージのようなメール、または、ユーザーガイドを改善すると感じるあらゆるメールです。<br />
-どんな場合でも、ステータス名を短くするように努めてください。その方が、常に Tracker 中で通常の幅の "Status" 列に適合します。</p>
-<p>そのステータスをセットするために、<span class="app">メール</span>アプリケーションでメールを開く必要はありません。Tracker アドオン、<span class="app">Mark as Read </span> および<span class="app"> Mark as...</span> で、いくつかのメールファイルを選択し、一度にそれらのステータスを設定できます。</p>
+どのような場合でも、ステータス名を短くするように努めてください。その方が、常に Tracker 中で通常の幅の "Status" 列に適合します。</p>
+<p>ステータスをセットするために、<span class="app">メール</span>アプリケーションでメールを開く必要はありません。Tracker アドオン、<span class="app">Mark as Read </span> および<span class="app"> Mark as...</span> で、いくつかのメールファイルを選択し、一度にそれらのステータスを設定できます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="queries" name="queries">クエリを使う</a></h2>
-<p>確かに、メールをすべて格納するためにフォルダーを指定し、しかもそれを開けることができます。そこに読者のメールのすべてがあります。しかし、時間とともに、フォルダーは込み入ってきます。そして、すべてを表示することは何千ものファイルのようにますます長くかかり、それらの属性を解析し、並び替えしなければなりません。同様に、たいていの場合、2 年前のナイジェリアの王子およびそれらの相続問題のメールに実際に関心がありません…</p>
-<div class="box-info">フォルダーを読み込むとき、ディスクから読み込まれたファイルを正しい並び順にし、それらをウィンドウ中に表示することに多くの時間が費やされます。非常に多くのファイルがあるフォルダーを開く必要があるならば、Tracker ウィンドウを、"不可視 (invisible)" にすることで待ち時間を短くできます、つまり、ウィンドウを最小化するか、あるいは別のワークスペースへ変更するかのいずれかです。それがどのように CPU 使用率に影響するか確かめるためには、<a href="desktop-applets/processcontroller.html">プロセスコントローラー</a>を観察してください。</div>
+<p>確かに、メールをすべて格納するためにフォルダーを指定し、しかもそれを開けることができます。そこにユーザーのメールのすべてがあります。しかし、時間とともにフォルダーは込み入ってきます。そして、すべてを表示することは何千ものファイルのようにますます長くかかり、それらの属性を解析し、並び替えしなければなりません。同様に、たいていの場合、2 年前のナイジェリアの王子たちと彼らの相続問題のメールには実際に関心がありません…</p>
+<div class="box-info">フォルダーを読み込むとき、ディスクから読み込まれたファイルを正しい並び順にし、それらをウィンドウ中に表示することに多くの時間が費やされます。非常に多くのファイルがあるフォルダーを開く必要があるならば、Tracker ウィンドウを、"不可視" にすることで待ち時間を短くできます、つまり、ウィンドウを最小化するか、あるいは別のワークスペースへ変更するかのいずれかです。それがどのように CPU 使用率に影響するか確かめるためには、<a href="desktop-applets/processcontroller.html">プロセスコントローラー</a>を観察してください。</div>
 <p>メールを探すための<a href="queries.html">クエリ</a></p>
 <p>クエリを使うことで、メールの表示範囲を絞れます。実際、Deskbar 中のメールボックスアイコンはクエリを使っています。</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
@@ -120,7 +120,7 @@
 <p><span class="menu"># 通の新着メッセージがあります (# new messages)</span> サブメニューは、ステータス "<i>New (新着)</i>" に対するクエリによって現れます (ところで、同じクエリがメールボックスにメールがあることを示すため、メールボックスアイコンを変更するのに使われます)。</p>
 
 <p>独自のクエリ (または、フォルダー、アプリケーション、スクリプトなど) をそのコンテキストメニューに追加できます。それら、またはそれらへのリンクを、<span class="path">~/config/settings/Mail/Menu Links</span> に入れてください。</p>
-<div class="box-info">クエリ、<span class="path">~/config/settings/Mail/mailbox</span> は特例です。それは、Deskbar 内のメールボックスアイコンを左クリックしたときに実行されます。その振る舞いを変えたいなら、それをほかのどんなファイル (またはファイルへのリンク) にでも置き換えられます。それには、単にファイル名を "<i>mailbox</i>" とするだけです。それはクエリである必要はありません。クエリのフォルダーへのリンク、スクリプト、またはアプリケーションでも同様に動作します。</div>
+<div class="box-info">クエリ、<span class="path">~/config/settings/Mail/mailbox</span> は特例です。それは、Deskbar 内のメールボックスアイコンを左クリックしたときに実行されます。その振る舞いを変えるなら、それをほかの任意のファイル (またはファイルへのリンク) に置き換えられます。単にファイル名を "<i>mailbox</i>" とするだけです。それはクエリである必要はありません。クエリのフォルダーへのリンク、スクリプト、またはアプリケーションでも同様に動作します。</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -142,7 +142,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">追加のヒント</a></h2>
 <ul>
-<li><p>クエリを、"<i>クエリ</i>" で保存せず、"<i>クエリテンプレート</i>" として保存するなら、その起動は結果ウィンドウではなく、検索…ウィンドウとなるでしょう。そのほうが、件名または送信元に対する検索文字列の交換や、たとえば、"<i>2 days</i>" タイムリミットを "<i>3 days</i>" に変更することが容易にできます。</p></li>
+<li><p>クエリを、"<i>クエリ</i>" で保存せず、"<i>クエリテンプレート</i>" として保存するなら、その起動は結果ウィンドウではなく、検索…ウィンドウとなるでしょう。そのほうが、件名または送信元に対する検索文字列の交換や、たとえば、"<i>2 days</i>" タイムリミットの "<i>3 days</i>" への変更が容易にできます。</p></li>
 <li><p> <a href="tracker.html#tracker-preferences">Tracker 設定</a>で、"先行入力フィルタリング (type-ahead filtering)" を有効にすると、さらにクエリの結果をよりすばやくフィルタリングできます。たいてい、すべてのメールを過去 3 日間でクエリし、そこから先行入力フィルタリングで進むだけで充分です。大きな利点は、検索する属性を正確に指定する必要がないことです。フィルタリング中は、表示されている属性がすべて考慮されます。</p></li>
 <!-- <li _translation_id="4718"><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li> -->
 </ul>

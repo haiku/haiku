@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>BootManager</title>
+	<title>Menedżer rozruchu</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -49,51 +51,49 @@
 <span>
  «  <a href="activitymonitor.html">MonitorAktywności</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplikacje</a> 
-::  <a href="charactermap.html">CharacterMap</a>  »
+::  <a href="charactermap.html">Mapa znaków</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
-<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager</h2>
+<h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />Menedżer rozruchu</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally started from Installer's <span class="menu">Tools</span> menu</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Brak wpisu, uruchamiany z menu <span class="menu">Narzędzia</span> w Instalatorze</i></td></tr>
 <tr><td>Ścieżka:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>Ustawienia:</td><td></td><td><i>none</i><br />MBR backups are saved by default in <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>Ustawienia:</td><td></td><td><i>brak</i><br />kopie zapasowe MBR domyślnie zapisywane w <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>If you don't add the Haiku partition to an existing boot manager like GRUB, BootManager can install a small boot menu in the Master Boot Record (MBR) that looks something like this:</p>
+<p>Jeżeli nie dodasz partycji z Haiku do istniejącego menedżera rozruchu, takiego jak GRUB, ta aplikacja może zainstalować proste menu rozruchowe w Głównym Sektorze Rozruchowym (MBR), które wygląda jak na obrazku poniżej:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</div>
-<p>BootManager guides you through the installation process of the boot menu.</p>
+<div class="box-info">Menedżer rozruchu nie jest jeszcze zbyt dobrze przetestowany i nadal ma kilka ograniczeń, o których da znać, jeśli będzie taka potrzeba: menu może być zainstalowane tylko na pierwszym dysku twardym oraz musi zostać 2 KiB wolnej przestrzeni po Głównym Sektorze Rozruchowym (MBR).</div>
+<p>Menedżer rozruchu poprowadzi Cię przez proces instalacji menu rozruchowego.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="1-drives" id="1-drives">Choosing the destination drive</a></h2>
+<a name="1-drives" id="1-drives">Wybieranie dysku docelowego</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu again.<br />
-Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>Po uruchomieniu, Menedżer rozruchu wyświetla listę wszystkich dostępnych dysków, z której możesz wybrać ten docelowy. Jeśli menu rozruchowe jest już na tym dysku zainstalowane, przycisk <span class="button">Usuń</span> będzie aktywny, pozwalając na łatwe przywrócenie Głównego Sektora Rozruchowego z kopii zapasowej, w ten sposób usuwając menu. W przeciwnym razie, kliknij <span class="button">Instaluj</span>, aby kontynuować.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">Sporządzanie kopii zapasowej Głównego Sektora Rozruchowego (MBR)</a></h2>
+<p>W przypadku gdy coś pójdzie nie tak lub będziesz chcieć usunąć menu rozruchowe, kopia Głównego Sektora Rozruchowego (MBR) będzie teraz zachowana. Jest to bardzo ważny krok, upewnij się, że przypadkiem nie nadpisujesz innej kopii zapasowej (np. z poprzednich eksperymentów).</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>Wybierz ścieżkę dla pliku „<tt>MBR</tt>” zawierającego kopię albo pozostaw domyślną. Po kliknięciu <span class="button">Dalej</span> otrzymasz potwierdzenie z informacją czy zapis kopii się powiódł.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">Konfigurowanie menu rozruchowego</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>Teraz zostanie zaprezentowana lista partycji na wybranym dysku. Zanaczając pola obok każdego z wpisów, możesz zdecydować które z nich pojawią się w menu, a pola tekstowe pozwalają zmienić nazwę widoczną w menu.</p>
+<p>Następnie, ustaw w rozwijanym menu który wpis powinien zostać wybrany domyślnie oraz, korzystając z suwaka poniżej, limit czasowy. „<i>Natychmiast</i>” pominie menu całkowicie, „<i>Nigdy</i>” spowoduje zatrzymanie rozruchu do czasu wybrania wpisu. Możesz usunąć limit przytrzymując klawisz <span class="key">ALT</span> podczas rozruchu.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">Zapisywanie menu rozruchowego</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>Zanim menu zostanie zapisane na dysku, zobaczysz podsumowanie wybranych ustawień oraz będziesz mieć ostatnią szansę na zaniechanie operacji. Nie martw się jednak, tak długo jak posiadasz kopię zapasową sektora MBR, możesz łatwo odwrócić zmiany. Jeśli coś poszło bardzo źle, zawsze możesz uruchomić Haiku z płyty CD lub dysku USB i przywrócić sektor MBR przy pomocy Menedżera rozruchu.</p>
 
 </div>
 </div>
@@ -102,7 +102,7 @@ Otherwise, choose <span class="button">Install</span> to continue.</p>
 <div class="inner"><span>
  «  <a href="activitymonitor.html">MonitorAktywności</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Aplikacje</a> 
-::  <a href="charactermap.html">CharacterMap</a>  »
+::  <a href="charactermap.html">Mapa znaków</a>  »
 </span></div>
 </div>
 

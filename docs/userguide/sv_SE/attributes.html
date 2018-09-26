@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		deejam
  *		Victor Widell
  *		Humdinger
- *		deejam
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Användarhandbok</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Filetyper</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
 ::  <a href="index.html">Innehåll</a>  »
 </span></div>
 </div>
@@ -89,7 +89,7 @@
 <p><span class="cli">listattr</span> listar en fils attribut, men visar inte attributens innehåll.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Från exemplet i skärmbilden ovan:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -118,7 +118,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> innehåller filtypen som en <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-sträng, i det här fallet "<tt>application/x-person</tt>". Det bestämmer standardikonen och vilket program som öppnar filen om du dubbel-klickar på den.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" är det attribut Tracker använder för att hålla ordning på filens ikonplacering.</p></li></ul>
-<div class="box-info">Notera snedstrecket efter "Clara". I Terminalen måste specialtecken som <tt>'"*\$?!</tt> och mellanslag föregås av ett snedstreck. Därför kommer snedstrecket egentligen före mellanslaget och inte efter "Clara".</div>
+<div class="box-info">Notera snedstrecket efter "Clara". I Terminalen måste specialtecken som <tt>'"*\\$?!</tt> och mellanslag föregås av ett snedstreck. Därför kommer snedstrecket egentligen före mellanslaget och inte efter "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,7 +126,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> visar innehållet i ett specifikt attribut till en fil.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Ett exempel:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -141,7 +141,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>Låt säga att vår Clara tog ett jobb i det multinationella företaget Barkelbaer Inc. Du fyller i det hitintills tomma attributet "Company" med företagsnamnet (som är av typen "sträng"):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -153,7 +153,7 @@ Clara Botters : string : Whelton</pre>
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Även om det i praktiken skulle vara tillräckligt att bara inte fylla i attributet "Fax", kan du helt radera det från Claras fil
 genom att skriva:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -172,7 +172,7 @@ genom att skriva:</p>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Filetyper</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Innehållsförteckning</a> 
 ::  <a href="index.html">Innehåll</a>  »
 </span></div>
 </div>

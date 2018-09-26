@@ -86,18 +86,17 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 
 # Start Workspaces Applet
 /boot/system/apps/Workspaces &amp;</pre>
-<p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed again).</p>
+<p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed).</p>
 
 <p>A simple alternative to the above for launching applications at boot up is to put links to them in the <span class="path">/boot/home/config/settings/boot/launch</span> directory. This can be done simply by right-clicking on the application you wish to have started automatically, going to <span class="menu">Create Link</span> and then <a href="tracker.html#navigating">navigating</a> to the above directory.</p>
 
-<h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h3>
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript - <i>not yet working</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript - <i>not yet working</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
 
 </div>

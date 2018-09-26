@@ -12,8 +12,8 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
  *		Humdinger
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -65,10 +65,10 @@
                 <a href="#app">Sovellusviat</a><br />
                   <a href="#server">Palvelinviat</a><br />
                   <a href="#kernel">Käyttöjärjestelmäydinviat</a><br />
-                  <a href="#kdl">Kernel Debugging Land - KDL</a><br />
+                  <a href="#kdl">Käyttöjärjestelmäytimen vianjäljitysalue - KDL</a><br />
                   <a href="#syslog">Järjestelmäloki</a><br />
                   <a href="#onscreen">Vikajäljitystulostus näytölle</a><br />
-                  <a href="#hardware">Laitteisto-/Ajuriviat</a><br />
+                  <a href="#hardware">Laitteisto-/ajuriviat</a><br />
                   <a href="#next">Mitä seuraavaksi?</a></td></tr>
 </table>
 
@@ -80,7 +80,7 @@
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="accout">Trac-tiilin  saaminen</a></h2>
 <p>Jos luot vikalipun, sinulla on oltava tili <a href="http://dev.haiku-os.org/register" title="Registröidy Haikun vikajäljittäjään">Haikun vikajäljittäjässä</a>.<br />
-Luotaessa uutta tiliä muista <b>tarjota sähköpostiosoitteesi</b>, koska se on välttämätön lipun muokkausoikeusien saamiseksi. Tarkista varmuuden vuoksi <b>roskapostikansiosi</b> pian jälkeenpäin, koska kaikki tärkeät vahvistussähköpostiviestit usein päättyvät sinne.</p>
+Luotaessa uutta tiliä muista <b>tarjota sähköpostiosoitteesi</b>, koska se on välttämätön lipun muokkausoikeuksien saamiseksi. Tarkista varmuuden vuoksi <b>roskapostikansiosi</b> pian jälkeenpäin, koska kaikki tärkeät vahvistussähköpostiviestit usein päättyvät sinne.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="report" name="report">Vikailmoituksen luominen</a></h2>
@@ -89,7 +89,7 @@ Varmista sen jälkeen kun olet esitellyt ainutlaatuisen vian, että tietosi ovat
 <ul>
 	<li><p>Yritä toistaa havaitsemasi vika nykyisessä Haikun korjausversiossa. Esirakennetut tiedostovedokset testaustarkoituksiin löytyvät <a href="http://haiku-files.org/">täältä</a>.</p></li>
 	<li><p>Sisällytä mukaan perustietoa siitä, kuinka testaat Haikua (todellisessa tietokoneessa, VMWare-ympäristössä, QEMU-emulaattorissa, jne.).</p></li>
-	<li><p>Mainitse, mitä korjausversiota käytät. Löydät tämän tiedon Työpöytäpalkin valikosta <span class="menu">Haikusta...</span>. Mainitse myös, että minkälaisella rakennusjärjestelmällä (gcc2, gcc4, gcc2hybrid, gcc4hybrid) testaamasi järjestelmä on rakennettu. Ladattavat tiedostovedokset on nimetty niiden mukaan. Itse rakennetuissa tiedostovedoksissa tiedät itse, kuinka se on rakennettu.</p></li>
+	<li><p>Mainitse, mitä korjausversiota käytät. Löydät tämän tiedon Työpöytäpalkin valikosta <span class="menu">Haikusta...</span>. Mainitse myös, että minkälaisella rakennusjärjestelmällä (x86_gcc2, x86_64) testaamasi järjestelmä on rakennettu. Ladattavat tiedostovedokset on nimetty niiden mukaan. Itse rakennetuissa tiedostovedoksissa tiedät itse, kuinka se on rakennettu.</p></li>
 	<li><p>Kuvaile kokemasi pulma. Yritä olla niin tarkka kuin voit: kuvaile todellinen käyttäytyminen, ja se käyttäytyminen, jota odotit.</p></li>
 	<li><p>Kuvaile, mitä vaiheita pitää suorittaa vian paljastumiseksi. Tämä auttaa kehittäjiä toistamaan vian.</p></li>
 	<li><p>Liitä mukaan niin paljon tietoja, kuin sinulla on. Jos kyseessä on graafisen käyttöliittymän vika, tai vika yhdessä sovelluksessa, yritä tehdä näytönkaappaus painamalla <span class="key">PRINT SCREEN</span>-näppäintä.</p></li>
@@ -97,13 +97,13 @@ Varmista sen jälkeen kun olet esitellyt ainutlaatuisen vian, että tietosi ovat
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Sovellusviat</a></h2>
-<p>Kun sovellus kaatuu, sinun pitäisi kutsua vikajäljitintä hälytysikkunasta, joka ponnahtaa näkyviin. Tämä avaa Pääteikkunan gdb-ohjelmalla (GNU-vikajäljitin), joka käynnistyy. Kirjoittamalla <span class="cli">bt</span>, luot "paluujäljen". jonka sinun pitäisi kopioida kokonaisuudessaan (mukaan lukien se osa, joka tuli näkyviin, ennen kuin kirjoitit <span class="cli">bt</span>-komennon) ja liittää se vikalippuun.</p>
+<p>Kun sovellus kaatuu, voit joko tallentaa ilmoituksen tai kirjoittaa ydintiedoston (molemmat tallentuvat Työpöydälle), jonka voit liittää vikailmoitukseen, tai voit kutsua <a href="../../userguide/fi/applications/debugger.html">Vianjäljittäjän</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Palvelinviat</a></h2>
-<p>Kun elintärkeät palvelimet, kuten app-, registrar- tai input-palvelin kaatuvat, et näe tavallista kaatumishälytystä. Sen sijaan koko näyttö muuttuu valkoiseksi ja gdb-istunto käynnistyy ja sen tuloste ilmaantuu näytölle. Todennäköisesti pystyt yhä liikuttamaan hiiren kohdistinta, mikä ylikirjoittaa valkoisen ja gdb-tulosteen näytöllä. Yhä vielä toimivat sovellukset (kuten Prosessivalvonta tai Työpöytäpalkin kello) saattavat myös kirjoittaa vikajäljittimen tulosteen päälle näytölle.<br />
+<p>Kun elintärkeät palvelimet, kuten app-, registrar- tai input-palvelin kaatuvat, et näe tavallista kaatumishälytystä. Sen sijaan koko näyttö muuttuu valkoiseksi ja gdb-istunto käynnistyy tekstitilassa ja vianjäljittimen tuloste ilmaantuu suoraan näytölle. Todennäköisesti pystyt yhä liikuttamaan hiiren kohdistinta, mikä ylikirjoittaa valkoisen ja gdb-tulosteen näytöllä. Yhä vielä toimivat sovellukset (kuten Prosessivalvonta tai Työpöytäpalkin kello) saattavat myös kirjoittaa vikajäljittimen tulosteen päälle näytölle.<br />
 Paitsi että kaikki on rumempaa ja epämukavampaa, sama koskee myös sovellusvikoja. Tärkeintä on hankkia paluujälki (<span class="cli">bt</span>-komento). Sinun on ehkä otettava valokuva näytöstä digitaalikameralla, koska et voi kopioida tekstiä mihinkään.<br />
-Riippuen siitä mikä kaatui voit yrittää tallentaa kaatumisilmoituksen Työpöydälle <span class="cli">save-report</span>-komentorivisovelluksella ja painaa virtapainiketta kerran, mikä sulkee järjestelmän puhtaasti.</p>
+Riippuen siitä mikä kaatui voit yrittää tallentaa kaatumisilmoituksen Työpöydälle <span class="cli">save-report</span>-komentorivisovelluksella tai ydintiedoston <span class="cli">write-core</span>-komentorivisovelluksella ja painaa virtapainiketta kerran, mikä yrittää sulkea järjestelmän siististi. Jos virtapainike ei toimi, niin on myös olemassa <span class="cli">shutdown</span>- ja <span class="cli">reboot</span>-komentorivisovellukset.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Käyttöjärjestelmäydinviat</a></h2>
@@ -111,21 +111,21 @@ Riippuen siitä mikä kaatui voit yrittää tallentaa kaatumisilmoituksen Työp�
 <ul>
 <li><p>Järjestelmä siirtyy Käyttöjärjestelmän vianjäljitysmaahan (KDL) omasta tahdostaan. Näytön ylempi osa muuttuu valkoiseksi ja sille tulostetaan useita rivejä tekstiä. Toinen rivi sanoo "<i>Welcome to Kernel Debugging Land...</i>". Sen yläpuolella oleva rivi kertoo välittömän syyn siirtymisestä KDL:ään.</p></li>
 <li><p>Järjestelmä alkulatautuu itsestään.</p></li>
-<li><p>Järjestelmä jäätyy täysin. Et voi siirtää hiiren osoitinta ja mikään sovellus ei enää toimi. Tärkeä testi siinä tilanteessa on, että pystytkö siirtymään KDL:ään pikanäppäimellä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> mikä on <span class="key">PRINT</span> useimmissa näppäimistöissä). Odota vähintään minuutti nähdeksesi, että tapahtuuko jotain.</p></li>
+<li><p>Järjestelmä jäätyy täysin. Et voi siirtää hiiren osoitinta ja mikään sovellus ei enää toimi. Tärkeä testi siinä tilanteessa on, että pystytkö siirtymään KDL:ään pikanäppäimellä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> on sama kuin <span class="key">PRINT</span> useimmissa näppäimistöissä). Odota vähintään minuutti nähdeksesi, että tapahtuuko jotain.</p></li>
 <li><p>Järjestelmä ei alkulataa oikein. Se voi alkulatautua itsestään tai pysähtyä jossain vaiheessa (esimerkiksi jonkun alkaulatausnäytön kuvakkeen kohdalla). Yritä jälkimmäisessä tapauksessa myös <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
 <li><p>Koko järjestelmä tai joku laitteiston osa ei toimi kunnolla. Esimerkiksi se voisi olla hyvin hidas, tapahtuu virheitä, tai jokin ei toimi ollenkaan. Jos  jokin laite ei toimi ollenkaan, ensimmäinen ilmeinen tarkistus on, että tukeeko Haiku sitä ylimalkaan tällä hetkellä (esim.: kysy sähköpostituslistalta tai foorumilta).</p></li>
 </ul>
 <p>Huomaa että vaikka ainoastaan viimeinen kohta tuntuu viittaavan laittoistovikaan, kaikki muutkin oireet voivat johtua myös viasta laitteistoajurissa. Jos sinulla on epäilyjä, että mikä laitteiston osa tai vastaava ajuri aiheuttaa pulmia, tarkista, että eroaako tilanne, jos poistat tai otat pois käytöstä laitteen tai ajurin. Esimerkiksi jos epäilet Wifi-verkkoa, saatat huomata, että BIOS-asetuksissa voidaan ottaa se pois käytöstä. Tai jos ei, niin voisit merkata vastuullisen Wifi-ajurin mustalle listalle Haiku-asennuksestasi (katso <a href="../../userguide/fi/bootloader.html">Käynnistyslataaja</a>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kdl" name="kdl">Käyttöjärjestelmäytimen viajäljitysalue - KDL</a></h3>
-<p>Jos järjestelmä ei ole siirtynyt KDL-tilaan itsestään, voit tehdä sen tarkoituksellisesti pikanäppäimillä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
-Huomaa, että KDL-tilassa näppäimistösi ei ehkä toimi. PS/2-näppäimistöt toimivat aina, UCHI-ohjaimen kautta yhdistetyt USB-näppäimistöt toimivat vain jos jos KDL-tilaan on siirrytty näppäimistön avulla vähintään kerran. USB OHCI ei tällä hetkellä tueta.</p>
+<a id="kdl" name="kdl">Käyttöjärjestelmäytimen vianjäljitysalue - KDL</a></h3>
+<p>Jos järjestelmä ei ole siirtynyt KDL-tilaan itsestään, voit tehdä sen tarkoituksellisesti pikanäppäimillä <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span>-näppäin on normaalisti <span class="key">Print</span>-näppäin).<br />
+Huomaa, että KDL-tilassa näppäimistösi ei ehkä toimi. PS/2-näppäimistöt toimivat aina, USB-näppäimistöjen kohdalla se riippuu USB-ohjaimen (UCHI/ECHI) tyypistä. Yleensä näppäimistöt olisi liitettävä suoraan porttiin, ei minkään keskittimen (hub) kautta. Joissakin tilanteissa näppäimistöt toimivat vain jos KDL-tilaan on siirrytty pikanäppäinten avulla vähintään kerran. USB OHCI-näppäimistöä ei tällä hetkellä tueta.</p>
 <p>KDL itse on erään tyyppinen komentotulkki. Käyttäjä voi suorittaa komentoja, jotka tulostavat tietoja järjestelmästä. Seuraavat komennot saattavat olla kiinnostavia:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (eli sc)</td><td> </td><td>Tulostaa paluujäljen. Jos järjestelmä siirtyy KDL-tilaan omasta tahdostaan, kirjoita aina tämä komento.</td></tr>
+<tr><td><span class="cli">bt</span> (eli <span class="cli">sc</span>)</td><td> </td><td>Tulostaa paluujäljen. Jos järjestelmä siirtyy KDL-tilaan omasta tahdostaan, kirjoita aina tämä komento.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Näyttää käsitellyt ja käsittelemättömät laitteistokeskeytykset.</td></tr>
-<tr><td class="onelinetop"><span class="cli">co</span> (eli jatka)</td><td> </td><td>Jättää järjestelmävianjäljittimen ja jatkaa normaalia järjestelmän toimintaa, jos se on mahdollista.</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (eli <span class="cli">continue</span>)</td><td> </td><td>Jättää järjestelmävianjäljittimen ja jatkaa normaalia järjestelmän toimintaa, jos se on mahdollista.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Alkulataa järjestelmän välittömästi. Menetät kaiken tallentamattomat tiedot ja vieläpä nuo, jotka on tallennettu, mutta joita ei ole vielä kirjoitettu levylle.</td></tr>
 </table>
 <p>Katso lisätietoja artikkelista <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Tervetuloa vikajäljitysalueelle</a>.</p>
@@ -148,16 +148,16 @@ Valitse lopuksi <span class="menu">Paluu päävalikkoon</span> ja sitten <span c
 Yksi tai useampia tekstisivuja näytetään näytölle, vain muutama harva viimeinen rivi on liitettävä vikailmoituslippuun. Tässä on lisätietoja <a href="../../userguide/fi/bootloader.html">Alkulataaja</a>sta.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hardware" name="hardware">Laitteisto/ajuriviat</a></h2>
+<a id="hardware" name="hardware">Laitteisto-/ajuriviat</a></h2>
 <p>Kun ollaan tekemisissä laitteisto- tai ajurivikojen kanssa, sinun pitäisi liittää seuraavia tietoja tekstitiedostona:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td>Yksityiskohtainen luettelo laitteistostasi, mukaanlukien valmistaja- ja pci-tunnisteet, samanlainen kuin Linuxin <span class="cli">lshw</span> ja <span class="cli">lspci</span>.</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Otaksutaan sen olevan USB:hen liittyvä pulma, sama kuin <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haikun ensisijainen järjestelmäloki, sukua alkulatauksen aikaiselle vianjäljitykselle. Komennolla <span class="cli">open</span> voit poimia olennaisen osan järjestelmälokista testieditorissa.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haikun käyttämään ensisijaiseen järjestelmälokiin tutustumiseksi katso yllä <a href="#syslog">Syslog</a>, joka on kuin vianjäljitys näytölle käynnistyksen aikana. Komennolla <span class="cli">open</span> voit poimia olennaisen osan järjestelmälokista testieditorissa.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Luettelee kaikki käytetyt ajurit.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Käytettävissä vain <i>Käyttöjärjestelmäytimen vianjäljitysalueella</i> (katso yllä). Näyttää keskeytysten käytön. Eri laitteiden kesken jaettuja keskeytyksiä ei pitäisi olla montaa.</td></tr>
-<tr><td colspan="3">- Vianjäljitystulostus näytölle (alkulatausvalitsin turvatilassa).</td></tr>
+<tr><td colspan="3">- Vianjäljitystulostuksessa näytölle (turvatilan käynnistysvalitsin, katso <a href="#onscreen">yllä</a>).</td></tr>
 </table>
 
 <p>Neljä ensimmäistä komentoa kirjoitetaan Pääteikkunassa. Lisää <span class="cli"> &gt; output.txt</span> komennon jälkeen ja se putkitetaan tekstitiedostoon, jonka nimi on "output.txt", jonka voit liittää vikailmoitukseesi tai sähköpostiviestiisi.</p>

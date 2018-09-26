@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2017 Haiku. All rights reserved.
+ * Copyright 2013-2018 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,12 +62,12 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
-<tr class="index"><td><a href="#filter">The Filter</a><br />
-                <a href="#list">The List</a><br />
-                <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Show</a><br />
-                <a href="#account">Creating a User Account</a><br />
-                <a href="#rating">Rating and Commenting</a><br />
+<tr class="index"><td><a href="#filter">Le filtre</a><br />
+                <a href="#list">La liste</a><br />
+                <a href="#info">La zone d'information</a><br />
+                <a href="#menu">Outils et options d'affichage</a><br />
+                <a href="#account">Créer un compte utilisateur</a><br />
+                <a href="#rating">Noter et Commenter</a><br />
 </td></tr>
 </table>
 
@@ -75,21 +75,25 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/HaikuDepot/main_settings</span><br />
-<span class="path">~/config/cache/HaikuDepot/</span> - Cached icons, screenshots, descriptions etc.</td></tr>
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span>
+
+<span class="path">~/config/settings/HaikuDepot/main_settings</span><br />
+<span class="path">~/config/cache/HaikuDepot/</span> -mise en cache des icônes, des captures d'écrans, des descriptions, etc.</td></tr>
 </table>
 <p><br /></p>
 <p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>As soon as you enter something in the <span class="menu">Search terms</span> box, the display changes to smaller icons and more information arranged in columns.</p>
+<p>When the <span class="menu">Show only featured packages</span> checkbox is deactivated, all available packages are shown and the display changes to smaller icons and more information arranged in columns:</p>
+<img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Le filtre</a></h2>
 <p>Au dessus de la liste des paquets, on trouve des critères pour filtrer ceux visibles :</p>
 <ul>
 <li><p>Le menu déroulant <span class="menu">Category</span> (catégorie) permet de limiter la liste à une catégorie, comme « <i>Audio</i> » ou « <i>Jeux</i> ».</p></li>
-<li><p>The <span class="menu">Repositories</span> pop-up menu determines which online repos are queried or if only those packages are shown, that were installed from somewhere other than an online repo ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
 <li><p>Le champs de texte <span class="menu">Search terms</span> permet de filtrer la liste aux paquets qui contiennent tout les chaînes saisies (séparée par des espaces) soit dans leur nom soit dans leur description.</p></li>
+<li><p>The checkbox to <span class="menu">Show only featured packages</span> can be activated to further filter the results in the set category or of the entered search terms.</p></li>
+<li><p>The <span class="menu">Repositories</span> menu of the menu bar determines which repos are being queried. "<i>Local</i>" packages are the ones that were installed from somewhere other than an online repo; maybe from a USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -108,7 +112,8 @@
 <a id="info" name="info">La zone d'information</a></h2>
 <p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
 To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span>, <span class="button">Uninstall</span> or <span class="button">Update</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
-<p>Below are four tabs: About, Ratings, Changelog and Contents.</p>
+<p>Au dessous il y a les 4 onglets 
+À propos, Évaluations, et Journal des modifications et Contenu.</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">À propos</span></p>
 <p _translation_id="5253">Le premier onglet comporte une description détaillée du paquet, accompagné d'une copie d'écran, une adresse de contact et l'URL de l'équipe qui maintient ce paquet logiciel, quand l'information est disponible. En cliquant sur la copie d'écran, la vignette s'ouvrira en taille réelle dans une nouvelle fenêtre</p></li>
@@ -120,28 +125,29 @@ In the middle are user comments with their nickname, the number of stars they ga
 <!--  With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.
 -->
 </p></li>
-<li><p _translation_id="5257"><span class="menu">Changelog</span></p>
-<p _translation_id="5258">Here you find a detailed history of all the  versions of the package that have been released so far, if the maintainer of the package  provides that information.</p></li>
+<li><p _translation_id="5257"><span class="menu">Journal des modifications</span></p>
+<p _translation_id="5258">Le dernier onglet montre l'historique détaillé de toutes les versions du paquet qui ont été publiées jusqu'à maintenant, si le mainteneur du pacquet fournit cette information.</p></li>
 <li><p><span class="menu">Contents</span></p>
 <p>The last tab shows all the files and folders a package contains. This only works for already downloaded packages.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Tools and Show</a></h2>
-<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories. The other item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.</p>
-<p>Under <span class="menu">Show</span> you can deactivate <span class="menu">Only featured packages</span>. Now you'll always see all packages and not just the featured ones when HaikuDepot starts up or the search text field is empty.<br />
-Furthermore, you can choose to also Show <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
-<p>Of more interest are the options to only show <span class="menu">Available packages</span> and <span class="menu">Installed packages</span>, which are pretty self-explanatory.</p>
+<a id="menu" name="menu">Outils et options d'affichage</a></h2>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
+The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
+<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.</p>
+<p>Under <span class="menu">Show</span> you can choose to also display <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
+<p>Les deux autres éléments, ceux pour n'afficher que les <span class="menu">paquets disponibles</span> et les <span class="menu">Paquets installés</span>, sont d'un plus grand intérêt.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Créer un compte utilisateur</a></h2>
 <p>To be able to rate a package, you need a user account at the <a href="http://depot.haiku-os.org">Haiku Depot Server</a> that serves all the packages and keeps track of ratings and user comments. You can create an account within the HaikuDepot application by clicking on the menu in the far right of the menu bar that shows your current status: <span class="menu">Not logged in</span>. Choosing <span class="menu">Log in...</span> opens a window with two tabs; one to enter your user name and password (once you have those) to log in, and the other to create a new account:</p>
 <img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
-<p>To create an account you need to:</p>
-<ul><li>use an all lower-case user name without special characters</li>
-<li>use a password that's at least 8 characters long with at least 2 capitals and 2 numbers</li>
-<li>provide a valid email address (if you want a new password sent to you in case you forgot it)</li>
-<li>solve the captcha</li></ul>
+<p>Pour créer un compte vous avez besoin de :</p>
+<ul><li>choisir un nom d'utilisateur, en minuscules et sans caractères spéciaux.</li>
+<li>définir un mot de passe long d'au moins 8 caractères avec au moins 2 majuscules et 2 chiffres</li>
+<li>fournir une adresse email valide (si vous avez besoin qu'un nouveau mot de passe vous soit envoyé)</li>
+<li>résoudre le captcha</li></ul>
 <p>After logging in, the top-right menu of the HaikuDepot window will now say <span class="menu">Logged in as (...)</span>, showing your user name. The menu now offers you to <span class="menu">Switch account...</span> or <span class="menu">Log out</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -60,7 +60,7 @@
 <div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td><a href="#reading">メッセージを読む</a><br />
 	<a href="#creating">新規メッセージの作成</a><br />
 	<a href="#preferences">メールの設定</a></td></tr>
@@ -76,7 +76,7 @@
 <span class="path">~/config/settings/Mail/status/</span> - カスタムステータスの保存場所</td></tr>
 </table>
 <p><br /></p>
-<p>メール (Mail) は、Haiku の電子メールのデフォルトビューアまたは編集ソフトです。電子メールの送受信はメールサービスによって行われ、メールとは全く関係ありません。送受信の設定は<a href="../preferences/e-mail.html">メール</a>設定で変更できます。</p>
+<p>メール (Mail) は、Haiku の電子メールのデフォルトビューワおよび編集ソフトです。電子メールの送受信はメールサービスによって行われ、メールとは全く関係ありません。送受信の設定は<a href="../preferences/e-mail.html">メール</a>設定で変更できます。</p>
 <p>このページは、メールアプリケーションの概要です。Haiku とメールの詳細は、<a href="../workshop-email.html">ワークショップ - メールの管理</a>を参照してください。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -109,7 +109,7 @@
 </table>
 <div class="box-info">メールに返信する前に一部分を選択した場合、返信メールに引用されるテキストは選択された部分のみになります。ほとんどの人から嫌われている過度の引用を抑えることができます。</div>
 <p><span class="menu">転送 (Forward)</span>、<span class="menu">再送信 (Resend)</span> と<span class="menu">新規メッセージにコピー (Copy to new)</span> するアイテムはまた一目瞭然です。</p>
-<p>メールを Tracker かクエリから開いた場合、<span class="menu">前のメッセージ (Previous message)</span> と<span class="menu">次のメッセージ (Next message)</span> は、リストの前 / 次のメールになります。</p>
+<p>メールを Tracker またはクエリから開いた場合、<span class="menu">前のメッセージ (Previous message)</span> と<span class="menu">次のメッセージ (Next message)</span> は、リストの前 / 次のメールになります。</p>
 <p><span class="menu">アドレスを保存 (Save address)</span> はヘッダーのメールアドレスすべてを回収し、メールの内容をサブメニューに保存します。メールアドレスを選択すると、<a href="people.html">People</a> アプリケーションが開いて連絡情報を保存できます。</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>クエリ</h3>
@@ -121,8 +121,8 @@
 <p>新規メッセージを作成するには、<span class="menu">新規メッセージ (New mail message)</span> メニュー、またはツールバーからアイコンを選択します。または、メールアプリケーションを起動するか、Deskbar のメールボックスアイコンのコンテキストメニューから<span class="menu">新規メッセージの作成... (Create new message...)</span> を選択することでも作成できます。</p>
 <img src="../images/apps-images/mail-write.png" alt="email-write.png" /> 
 <p>このウィンドウはメールを読むときのウィンドウと似ています。メニューとツールバーは少し違っていて、テキストボックスには受信者のメールアドレスや件名などを入力しなければいけません。</p>
-<p><span class="menu">Cc</span> は "<i>カーボンコピー</i>" の略で、送信したメールのコピーをリストのメールアドレスにも送信できます。Cc と "To (宛先)" にメールアドレスを入力する違いは、Cc のアドレスには直接送信しないので、Cc のアドレスからは返信は期待していないと言っていることです。<br />
-<span class="menu">Bcc</span> は "<i>ブラインドカーボンコピー</i>" のことで、”Cc” と同じことをしますが、受信者のメールアドレスを隠します。</p>
+<p><span class="menu">Cc</span> は "<i>カーボンコピー (carbon copy)</i>" の略で、送信したメールのコピーをリストのメールアドレスにも送信できます。Cc と "To (宛先)" にメールアドレスを入力する違いは、Cc のアドレスには直接送信しないので、Cc のアドレスからは返信は期待していないと言っていることです。<br />
+<span class="menu">Bcc</span> は "<i>ブラインドカーボンコピー (blind carbon copy)</i>" のことで、”Cc” と同じことをしますが、受信者のメールアドレスを隠します。</p>
 <p>複数の受信者を入力するには、コンマでメールアドレスを分離します。<span class="menu">To</span>、<span class="menu">Cc</span> と <span class="menu">Bcc</span> はポップアップメニューです。それらは、<a href="people.html">People</a> ファイルのクエリでシステムが見つけたすべてのメールアドレスを持っています。”Group” 属性はそれをサブメニューに類別するときに使われます。</p>
 <p>次はメニューの面白い機能に注目します。</p>
 <h3>
@@ -130,7 +130,7 @@
 <p><span class="menu">下書きとして保存 (Save as draft)</span> でメールを保存して後で再開できます。<span class="menu">下書きを開く (Open draft)</span> サブメニューに ”Draft (下書き)” のステータスのメールがすべて表示され、一覧からメールを選択すると再開できます。</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>編集</h3>
-<p><span class="menu">引用符を付ける (Quote)</span>  と<span class="menu">引用を削除 (Remove quote)</span> または、ショートカット <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> を使い、&gt; シンボルの数を調整して引用レベルを変更できます。引用したいテキストを選択してメニューを開いてください。</p>
+<p><span class="menu">引用符を付ける (Quote)</span>  と<span class="menu">引用を削除 (Remove quote)</span> または、ショートカット <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> を使い、&gt; シンボルの数を調整して引用レベルを変更できます。引用するテキストを選択してメニューを開いてください。</p>
 
 <img src="../images/apps-images/mail-spellcheck.png" alt="email-spellcheck.png" /> 
 
@@ -151,7 +151,7 @@
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>クエリ</h3>
-<p>この機能はまだ動作しませんが、現在開いているメッセージに関連するメッセージを表示するためのクエリ (同じ受信者や同じ件名) の表示を目的としています。</p>
+<p>この機能はまだ動作しませんが、現在開いているメッセージに関連するメッセージを表示するためのクエリ (同じ受信者や同じ件名) の表示が目的です。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -161,12 +161,12 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>インターフェースの設定</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">ボタンバー (Button bar)</span></td><td style="width:10px;"></td><td>アイコンにラベルを表示、またはツールバーを隠すオプションです。</td></tr>
-<tr><td><span class="menu">フォント (Font)</span></td><td></td><td>メッセージのテキストに使用するフォントを設定します。</td></tr>
-<tr><td><span class="menu">フォントサイズ (Size)</span></td><td></td><td>フォントサイズを設定します。</td></tr>
-<tr><td><span class="menu">引用部分の着色 (Colored quotes)</span></td><td></td><td>引用部分をレベル別に着色します。</td></tr>
-<tr><td class="onelinetop"><span class="menu">スペルチェックモード (Initial spell check mode)</span></td><td></td><td>起動時にスペルチェックをオン / オフにします。</td></tr>
-<tr><td class="onelinetop"><span class="menu">メールを自動的に既読に設定 (Automatically mark mail as read)</span></td><td></td><td>”New (新着)” ステータスのメールを閉じた後、ステータスを自動的に ”Read (既読)” に変更します。</td></tr>
+<tr><td><span class="menu">ボタンバー (Button bar)</span></td><td style="width:10px;"></td><td>アイコンにラベルを表示、またはツールバーを隠すオプション。</td></tr>
+<tr><td><span class="menu">フォント (Font)</span></td><td></td><td>メッセージのテキストに使用するフォントを設定。</td></tr>
+<tr><td><span class="menu">フォントサイズ (Size)</span></td><td></td><td>フォントサイズを設定。</td></tr>
+<tr><td><span class="menu">引用部分の着色 (Colored quotes)</span></td><td></td><td>引用部分をレベル別に着色。</td></tr>
+<tr><td class="onelinetop"><span class="menu">スペルチェックモード (Initial spell check mode)</span></td><td></td><td>起動時にスペルチェックをオン / オフ。</td></tr>
+<tr><td class="onelinetop"><span class="menu">メールを自動的に既読に設定 (Automatically mark mail as read)</span></td><td></td><td>”New (新着)” ステータスのメールを閉じた後、ステータスを自動的に ”Read (既読)” に変更。</td></tr>
 </table>
 
 <h3>
@@ -174,14 +174,14 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">標準アカウント (Default account)</span></td><td style="width:10px;"></td><td>複数のメールアカウントがある場合、新規メッセージを作成するとき使用するアカウントを指定します。</td></tr>
 <tr><td><span class="menu">返信アカウント (Reply account)</span></td><td></td><td>メールに返信するとき、上のポップアップメニューの<span class="menu">標準アカウントを使う (Use default account)</span> または<span class="menu">メッセージを受信したアカウント (Account from mail)</span> で、メールを返信するアカウントを指定できます。</td></tr>
-<tr><td><span class="menu">返信の前書き (Reply preamble)</span></td><td></td><td>これは引用されたテキストの前に挿入されます。テキストフィールドの横のポップアップメニューからさまざまな変数を使えます。<br />例: "<i>こんにちは %n!\n\n %d にあなたは書きました：\n</i>" は次のようになります：<pre>こんにちは Dr. Hawking!
+<tr><td><span class="menu">返信の前書き (Reply preamble)</span></td><td></td><td>これは引用されたテキストの前に挿入されます。テキストフィールドの横のポップアップメニューからさまざまな変数を使えます。<br />例: "<i>こんにちは %n!\\n\\n %d にあなたは書きました：\\n</i>" は次のようになります：<pre>こんにちは Dr. Hawking!
 
 Mon, 18 Jan 1998 02:55:16 +0800 あなたは書きました：
 &gt; so thanks again for the inspiration concerning the cosmological constant.
 &gt; ...and the rest of the quoted text following...</pre></td></tr>
 <tr><td><span class="menu">署名の自動追加 (Auto signature)</span></td><td></td><td>メールの終わりに自動的に署名を追加します。</td></tr>
 <tr><td><span class="menu">文字コード (Encoding)</span></td><td></td><td>標準文字コードを設定します。</td></tr>
-<tr><td class="onelinetop"><span class="menu">文字コード不一致通知 (Warn unencodable)</span></td><td></td><td>メールに現在の設定ではエンコードできない文字が含まれていた場合、設定してこれに関する警告を受けことができます。それにより、文字コードを変更することができます。文字コードを変更しないと、エンコードできない文字は四角形のシンボルに置き換えられます。</td></tr>
+<tr><td class="onelinetop"><span class="menu">文字コード不一致通知 (Warn unencodable)</span></td><td></td><td>メールに現在の設定ではエンコードできない文字が含まれていた場合、設定してこれに関する警告を受けとれます。それにより、文字コードを変更するチャンスが得られます。設定しないと、エンコードできない文字は四角形のシンボルに置き換えられます。</td></tr>
 <tr><td><span class="menu">文字列の折り返し (Text wrapping)</span></td><td></td><td>76 文字ごとに改行し、メールを見やすくします。</td></tr>
 <tr><td><span class="menu">属性の添付 (Attach attributes)</span></td><td></td><td>添付ファイルと一緒に BFS 属性を送るかどうか選択できます。これはほかの Haiku ユーザーにとっては、”完全な” ファイル (MP3 ファイルのアーティスト、アルバム、タイトル属性を考えてください) を受信できるので便利ですが、Haiku を使用していないユーザーには混乱 (または疑い) を起こす可能性があり、追加された ”BeOS 属性” が何なのか知りたがるかもしれません。<br />添付ファイルに BFS 属性を付けずに送信することを選択した場合、送信前にファイルを zip 圧縮することを思い出してください、さもなければ属性は取りさられてしまうでしょう。</td></tr>
 </table>

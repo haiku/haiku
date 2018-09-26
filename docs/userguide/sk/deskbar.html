@@ -10,10 +10,10 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		helix84
- *		Peter Poláčik
  *		Bachoru
+ *		helix84
  *		Humdinger
+ *		Peter Poláčik
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -26,7 +26,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Používateľská príručka</span></div>
 </div>
 
 <div class="nav">
@@ -53,14 +53,13 @@
 </ul>
 <span>
  «  <a href="tracker-add-ons.html">Doplnky Trackera</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="filetypes.html">Typy súborov</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Obsah</td></tr>
@@ -76,9 +75,9 @@
 <p>Panel je malý panel, ktorý je štandardne umiestnený v pravom hornom rohu obrazovky. Je to Haiku obdoba panelu úloh vo Windows, s jeho tlačidlom Štart. Obsahuje menu Panelu, odkiaľ môžete spustiť aplikácie a nastavenia, oznamovaciu oblasť s hodinami a ostatnými nástrojmi pod ním a zoznam momentálne bežiacich programov na spodku.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
 <p>Panel môžete presunúť do akéhokoľvek rohu obrazovky alebo umiestniť ako lištu kdekoľvek pozdĺž horného alebo spodného okraja obrazovky chytením za bodkovanú oblasť na boku oznamovacej oblasti, potiahnutím a následným pustením na novú pozíciu. Môžete ho tiež zložiť do kompaktnejšej verzie, potiahnutím a pustením bodkovanej oblasti na menu Panelu.</p>
-<p>By gripping the other knobbly widget of the tray, you can change the width of the Deskbar by dragging the mouse left or right:</p>
+<p>Ťahaním myši vpravo alebo vľavo po uchopení za označený ovládací prvok panelu môžete zmeniť šírku Panelu:</p>
 <img src="images/deskbar-images/width.png" alt="width" />
-<p>A wider Deskbar allows for more icons in the tray on a single row. It also truncates longer application names in the list of running programs less often, especially if you use larger icons.</p>
+<p>Širší Panel vám umožňuje mať viac ikon na jednom riadku. Tiež menej často skracuje dlhšie názvy aplikácií v zozname bežiacich aplikácií, obzvlášť ak používate väčšie ikony.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,10 +114,10 @@
 </table>
 
 <h4>Menu</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>Kým prvých pár položiek menu v Paneli je pevne daných, ostatné pod <span class="menu">Vypnúť...</span> môžete upraviť.<br />
+Tu môžete nastaviť počet nedávnych dokumentov, priečinkov a aplikácií, ktoré sú zobrazené vo svojom menu v Paneli, alebo či ich vôbec chcete vidieť.<br />
+Tlačidlo <span class="button">Upraviť v Trackeri...</span> otvorí priečinok <span class="path">~/config/settings/deskbar/menu/</span>. V ňom nájdete súbory a priečinky, ktoré sa zobrazujú v Paneli, štandardne sú to <span class="menu">Aplikácie</span>, <span class="menu">Demá</span>, <span class="menu">Applety Panelu</span> a <span class="menu">Nastavenia</span>.<br />
+Môžete zmazať alebo pridať položky, ako napríklad odkazy na aplikácie, dokumenty alebo dokonca požiadavky, ak ich jednoducho prekopírujete/vymažete do/z tohto priečinka.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>Programy nainštalované z balíka automaticky vložia položku do Panelu. Ak máte nainštalovaný veľký počet balíkov, Panel môže byť trochu preplnený. Ak uprednostňujete mať plnú kontrolu a vidieť len aplikácie, ktoré ste tam sami pridali (a prípadne rozdelili do podmenu), tu je návod, ako na to:<br />
 Vytvorte odkaz priečinka <span class="path">menu</span> v <span class="path">~/config/settings/deskbar/</span> a premenujte na <span class="path">menu_entries</span>. Z Terminálu, čo dosiahnete pomocou:</p>
@@ -143,9 +142,9 @@ Vytvorte odkaz priečinka <span class="path">menu</span> v <span class="path">~/
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Zoznam bežiacich programov</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
-<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows from the submenu. By right-clicking you can <span class="menu">Hide/Show all</span> windows or <span class="menu">Close all</span> and with them the entire application.</p>
-<p>A <span class="key">SHIFT</span> <span class="key">CTRL</span> click on an application hides all its windows, a <span class="key">CTRL</span> click shows them again.</p>
-<div class="box-info">Sometimes an application may hang and even though all its windows are gone, the entry in the list of running applications in the Deskbar just won't disappear. In such a situation you use the Vulcan Death Grip to get rid of it: hold <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> and click on the offending entry in the Deskbar. Fascinating!</div>
+<p>Môžete prepnúť na konkrétnu spustenú aplikáciu kliknutím na jej položku v Paneli a vybraním (jedného z) jej okien z podmenu. Kliknutím pravým tlačidlom môžete <span class="menu">Skryť/zobraziť všetky</span> okná alebo minimalizovať alebo <span class="menu">Zatvoriť všetky</span> okná a s nimi celú aplikáciu.</p>
+<p><span class="key">SHIFT</span> <span class="key">CTRL</span> a kliknutie na aplikáciu skryje všetky jej okná. <span class="key">CTRL</span> kliknutie ich znova zobrazí.</p>
+<div class="box-info">Niekedy môže aplikácia zamrznúť a aj keď sú všetky jej okná zatvorené, položka zo zoznamu bežiacich aplikácií v Paneli nezmizne. V takom prípade môžete použiť vulkánsky smrtiaci chvat, aby ste sa jej zbavili: podržte <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span> a kliknite na aplikáciu v Paneli.</div>
 <p>Ak ste aktivovali Vysúvacie zoznamy aplikácii v nastaveniach Panelu, môžete rozbaliť resp. zbaliť zoznam okien priamo pod položkou danej aplikácie.</p>
 <p>Pred každým z okien aplikácie je symbol poskytujúci informácie o jeho stave. Jasný symbol znamená, že okno je viditeľné; tmavý, že je minimalizované. Tri čiary pred symbolom znamenajú, že sa nenachádza na aktuálnej pracovnej ploche.</p>
 
@@ -155,7 +154,7 @@ Vytvorte odkaz priečinka <span class="path">menu</span> v <span class="path">~/
 <div class="nav">
 <div class="inner"><span>
  «  <a href="tracker-add-ons.html">Doplnky Trackera</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Obsah</a> 
 ::  <a href="filetypes.html">Typy súborov</a>  »
 </span></div>
 </div>

@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Manual d'usuari</span></div>
 </div>
 
 <div class="nav">
@@ -50,14 +50,14 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Tipus d'arxius</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contingut</a> 
 ::  <a href="index.html">Índex</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">La traducció d'aquesta pàgina encara no està acabada. Fins que ho sigui, algunes part correspondrà a la versió anglesa.</div>
 
 <h1>Atributs</h1>
 
@@ -88,7 +88,7 @@
 <p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Al nostre exemple de la captura anterior:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -125,7 +125,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>De nou el nostre exemple:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -140,7 +140,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -151,7 +151,7 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -170,7 +170,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Tipus d'arxius</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contingut</a> 
 ::  <a href="index.html">Índex</a>  »
 </span></div>
 </div>

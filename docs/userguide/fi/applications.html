@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -50,9 +50,9 @@
 <li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 </ul>
 <span>
- «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Työpaja</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="desktop-applets.html">Työpöytäsovelmat</a>  »
 </span></div>
 </div>
 
@@ -61,7 +61,7 @@
 
 <h1>Sovellukset</h1>
 
-<p>Katsokaamme yksityiskohtaisesti sitä kuinka asennetaan ja poistetaan ohjelmia ennen sukeltamista Haikun mukana tuleviin sovelluksiin. Kätevin tapa löytää, asentaa, päivittää ja poistaa sovelluksia on Haikun pakkauksenhallintajärjestelmän kautta. Koska Haiku on kuitenkin suurelta osin binaarinen ja lähdeyhteensopiva BeOS-esi-isän kanssa, saatat löytää vanhempia arkistoja (.zip ja .pkg), jotka voidaan myös asentaa.</p>
+<p>Katsokaamme yksityiskohtaisesti sitä kuinka asennetaan ja poistetaan ohjelmia ennen Haikun mukana tuleviin sovelluksiin sukeltamista. Kätevin tapa löytää, asentaa, päivittää ja poistaa sovelluksia on Haikun pakkauksenhallintajärjestelmän kautta. Koska Haiku on kuitenkin suurelta osin binaarinen ja lähdeyhteensopiva BeOS-esi-isän kanssa, saatat löytää vanhempia arkistoja (.zip ja .pkg), jotka voidaan myös asentaa.</p>
 <div class="box-info">Alla mainitaan aina <tt>~/system/</tt>-kansiohierarkia. Jos tarkoituksesi on asentaa pakkauksia vain yhdelle käyttäjälle (sitten kun Haikusta tulee monikäyttäjäkäyttöjärjestelmä), sinun pitäisi käyttää peilitiedostojärjestelmää kotikansion <tt>~/config/</tt> alla. Katso lisätietoja aiheesta <a href="filesystem-layout.html">Tiedostojärjestelmäkokoonpano</a>.</div>
 
 <h2>
@@ -78,8 +78,8 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Vanhat BeOS-arkistot (.zip ja .pkg)</a></h2>
-<p>BeOS-arkistot, jotka sisältävät sovelluskansiossa kaiken tarvittavan, voidaan yksinkertaisesti purkaa (kaksoisnapsautus avaa <span class="app">Laajentaja</span>n tai vanhan <span class="app">Pakkausasentaja</span>n) avulla missä tahansa kansion <tt>/boot/home/</tt> alla ja sovellus voidaan suorittaa siellä. Sellaisten itsensäsisältävien sovellusten asennuksen purkaminen on helppoa: poista vain sovelluksen kansio.</p>
-<p>Seuraava koskee vanhojen BeOS-sovellusten enemmistöä. Jos ilmenee, että sovellus ei toimi suoraan "laatikosta otettuna", koska se haluaa levittää tiedostojaan kiinteästi koodattuihin kansiosijainteihin, joiden olemassaoloa ei taata, voit yrittää korjata pulman manuaalisesti. Kansio <tt>~/system/non-packaged/</tt> sallii sinun luoda uudelleen tarvittavan kansiohierarkia. Kun yhä enemmän oikeita .hpkg-pakkauksia tulee saataville ja vanhat BeOS-sovellukset pakataan uudelleen, tätä tarvitaan yhä vähemmän. Tarkista tästä <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">verkkoartikkelista</a> kuinka <tt>non-packaged</tt>-hierarkiaa käytetään.</p>
+<p>BeOS-arkistot, jotka sisältävät sovelluskansiossa kaiken tarvittavan, voidaan yksinkertaisesti purkaa (kaksoisnapsautus avaa <span class="app">Laajentaja</span>n tai vanhan <span class="app">Pakkausasentaja</span>n) avulla missä tahansa kansion <tt>/boot/home/</tt> alla ja sovellus voidaan suorittaa siellä. Sellaisten itsensäsisältävien sovellusten asennuksen poistaminen on helppoa: poista vain sovelluksen kansio.</p>
+<p>Seuraava koskee vanhojen BeOS-sovellusten enemmistöä. Jos ilmenee, että sovellus ei toimi suoraan ”laatikosta otettuna”	, koska se haluaa levittää tiedostojaan kiinteästi koodattuihin kansiosijainteihin, joiden olemassaoloa ei taata, voit yrittää korjata pulman manuaalisesti. Kansio <tt>~/system/non-packaged/</tt> sallii sinun luoda uudelleen tarvittavan kansiohierarkian. Kun yhä enemmän oikeita .hpkg-pakkauksia tulee saataville ja vanhat BeOS-sovellukset pakataan uudelleen, tätä tarvitaan yhä vähemmän. Tarkista tästä <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">verkkoartikkelista</a> kuinka <tt>non-packaged</tt>-hierarkiaa käytetään.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -88,8 +88,8 @@
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">Aktiviteettivalvonta</a></td><td style="width:10px;"> </td>
 		<td valign="top">Työkalu järjestelmäresurssien kuten prosessori- ja muistikäytön jäljittämiseksi.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">Alkulataushallinta</a></td><td> </td>
-		<td valign="top">Työkalu, joka asentaa alkulatausvalikon levyaseman Master Boot Record (MBR) -tietueeseen.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/bootmanager-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bootmanager.html">Käynnistyshallinta</a></td><td> </td>
+		<td valign="top">Työkalu, joka asentaa käynnistysvalikon levyaseman Master Boot Record (MBR) -tietueeseen.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">Merkkikuvaus</a></td><td> </td>
 		<td valign="top">Sovellus, joka näyttää Unicode-merkkikuvauksen.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">Cody-kamera</a></td><td> </td>
@@ -107,7 +107,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Laajentaja</a></td><td> </td>
 		<td valign="top">Työkalu, joka purkaa tavalliset arkistot.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">HaikuVarastot</a></td><td> </td>
-		<td valign="top">Työkalu (sovellus)pakkausten löytämiseksi, lataamiseksi, päivittämiseksi ja asennuksen purkamiseksi</td></tr>
+		<td valign="top">Työkalu (sovellus)pakkausten löytämiseksi, lataamiseksi, päivittämiseksi ja asennuksen poistamiseksi</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Kuvakemaatti</a></td><td> </td>
 		<td valign="top">Sovellus Haikun vektorikuvakkeiden luomiseksi.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Asennusohjelma</a></td><td> </td>
@@ -158,7 +158,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-bundled-apps" name="list-of-bundled-apps">Sovelluspaketit</a></h2>
-<p>Paitsi yllä luetellut sovellukset, joita Haiku-hanke ylläpitää, vakiossa Haiku-järjestelmässä on muutamia olennaisia sovelluspaketteja. Viat ja ominaisuustoivomukset niille on lähetettävä kyseisten sovellusten ylläpitäjille.</p>
+<p>Paitsi yllä luetellut sovellukset, joita Haiku-hanke ylläpitää, normaalissa Haiku-järjestelmässä on muutamia olennaisia sovelluspaketteja. Viat ja ominaisuustoivomukset niistä on lähetettävä kyseisten sovellusten ylläpitäjille.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
 		<td valign="top"><acronym title="Portable Document Format">PDF</acronym>-selain.</td></tr>
@@ -179,9 +179,9 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-filetypes+attributes.html">Workshop</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="desktop-applets.html">Desktop Applets</a>  »
+ «  <a href="workshop-filetypes+attributes.html">Työpaja</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="desktop-applets.html">Työpöytäsovelmat</a>  »
 </span></div>
 </div>
 

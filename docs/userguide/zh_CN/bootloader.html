@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Pengphei Han
  *		dill
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -63,14 +63,14 @@
 
 <h1>引导程序</h1>
 
-<p>Haiku 的系统引导程序可以帮助您解决遇到的硬件相关问题，或者用于选择通过 Haiku 的哪种安装方式来启动，如果您有多个引导介质（可以是 CD 光驱或 USB 盘安装）。此外，如果安装了某个软件组件导致系统无法启动，请查看下述的 <a href="#troubleshooting">故障诊断</a> 。</p>
+<p>Haiku's Boot Loader Options can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
 <p>为了进入引导程序选项，您需要在 Haiku 的启动进程开始前，持续按住 <span class="key">SHIFT</span> 键。如果已经安装了启动管理软件，您可以在进入 Haiku 启动调用之前开始按下 <span class="key">SHIFT</span> 键。如果Haiku是唯一的操作系统，您可以在 BIOS 中显示启动消息时就开始按下该按键。</p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">引导管理器选项</a></h2>
 <p>进入选项之后，出现了下面四个菜单：</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>选择希望启动的 Haiku 版本或者安装。</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation/state to start (see <a href="#troubleshooting">Troubleshooting</a> below).</td></tr>
 <tr><td><b>Select safe mode options</b><br />
 </td><td> </td><td>在系统引导中遇到硬件问题时，可以尝试下面的几个选项。当选择条移动到某个选项时，在屏幕底部会显示相应的简短说明。</td></tr>
 <tr><td></td><td></td><td>
@@ -99,59 +99,58 @@
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取<a href="../../welcome/en/bugreports.html">错误报告</a>的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
-		打开并输出 syslog 信息到串口（默认：115200, 8N1）。</p>
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
 	<p><span class="menu">Enable on screen debug output</span><br />
-		在系统启动时，在屏幕显示调试信息，而不是常规的启动画面。</p>
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
 	<p><span class="menu">Disable on screen paging</span><br />
-		在屏幕调试输出启用时，禁用翻页效果。</p>
+		Disables paging when on screen debug output is enabled.</p>
 	<p><span class="menu">Enable debug syslog</span><br />
-		为该回话启用特殊的内存日志缓存，在系统重启时供引导管理器访问。</p>
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
 	<p><span class="menu">Display current boot loader log</span><br />
-		显示引导管理器登陆调试信息（按下 <span class="key">Q</span> 退出登陆)</p>
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
-		允许直接输入高级调试选项。</p></td></tr>
-<tr><td></td><td></td><td>如果激活了 "Enable debug syslog" ，那么在崩溃后，热启动后将提示如下附加选项：</td></tr>
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		在启动时保存前一次 Haiku 会话的 syslog 系统日志到 /var/log/previous_syslog 。</p>
+		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		显示前一次 Haiku 会话的 syslog 系统日志</p>
+		Displays the syslog from the previous Haiku session.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
-		保存前一次 Haiku 会话的 syslog 系统日志到磁盘，目前仅支持 FAT32 分区。</p></td></tr>
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">故障诊断</a></h2>
-<p>如果 Haiku 从一开始就无法从您的硬件上进行启动，那么您需要尝试以下 <span class="menu">选择安全模式选项</span> 中的不同设置项。或者考虑提交一个 <a href="../welcome/en/bugreports.html">问题报告</a> 。</p>
-<p>换句话说，如果在您安装完某些软件之后，Haiku 突然无法启动，特别是一些硬件驱动，您可以通过一些设置让 Haiku 能够重新启动，然后通过卸载这些软件包来进行修复： </p>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
 <ul>
-<li><p>激活 <span class="menu">Safe mode</span> 将会阻止多数的服务，后台以及 UserBootScript 启动。 </p></li>
-<li><p>激活 <span class="menu">Disable user add-ons</span> 将会阻止所有在 Home 目录下用户目录中安装的附加组件（驱动，转换器，等）的使用。</p></li>
-<li><p>如果一些恶意的驱动，附件组件等安装到了系统路径中，问题可能会有些复杂，因为这些位置都是只读的。下面的 <span class="menu">Blacklist entries</span> 将会起到作用。通过该菜单，您将能够导航并进入到任意的系统目录，然后通过 <span class="key">SPACE</span> 或者 <span class="key">RETURN</span> 选中并禁用那些造成问题的组件。<span class="key">ESC</span> 键用于返回到上级目录。</p>
-<p>如何进行更多的设置，可以参考在线文档 <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">如何将包文件永久列入黑名单</a>。</p></li>
-<li><p> 在 <span class="menu">Select boot volume</span> 菜单中，您可以指定希望启动的 Haiku 版本。每次在安装或者卸载矽统组件时，原有状态都将保存。您可以在引导管理器选项列表中选择对应的启动状态。
-因此，如果在安装完某些包之后，出现了启动引导问题，您可以选择引导在问题出现以前的 Haiku 版本，并且卸载该软件包。</p></li>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
+<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+<li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
+So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">引导 Haiku</a></h2>
-<p>在激活几个选项之后，返回主菜单，继续系统引导。开机界面如下：</p>
+<a id="booting" name="booting">Booting Haiku</a></h2>
+<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>如果一切运行正常，那么所有的图标都将依此点亮。<br />
-这些不同的符号大致对应了下面的启动步骤：</p>
+<p>If everything works OK, one symbol after another quickly lights up.<br />
+The different symbols roughly correspond to these boot stages:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>系统组件初始化。</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>创建文件系统 (<span class="path">/</span>) 和挂载硬件驱动 (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>硬件管理初始化。</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>挂载启动磁盘。</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>CPU特定模块加载</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>子系统初始化。</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon 启动系统</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
+	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
+	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
+	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
+	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
 </table>
 
 </div>

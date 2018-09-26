@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Humdinger
  *		log-1
  *		mt
- *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -62,13 +62,13 @@
 
 <h1>Bash とスクリプト処理</h1>
 
-<p>「スクリプト処理」とは、複数のコマンドを並べて書き、「スクリプト」と呼ばれるテキストファイルとして保存することにより処理を自動化する方法のことです。スクリプトを走らせるたびに、あたかも<a href="applications/terminal.html">ターミナル</a>でそれらコマンドをひとつひとつ手で打ち込んでいるようにコマンドが実行されます。<br />
+<p>「スクリプト処理」とは、複数のコマンドを並べて書き、「スクリプト」と呼ばれるテキストファイルとして保存することで処理を自動化する方法のことです。スクリプトを走らせるたびに、<a href="applications/terminal.html">ターミナル</a>でそれらコマンドを手で打ち込んでいるようにひとつひとつコマンドが実行されます。<br />
 スクリプトは、単に数個のコマンドをある特定の順番で実行するものから、複雑なタスクを処理するための高度なコードのかたまりまで、多岐にわたります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Bash</a></h2>
-<p>スクリプトは解釈されるシェルに必然的に大きく依存するため、まずは Haiku で使用されている BASH に慣れる必要があります。BASH は広く使用されているシェルなので、オンライン上に資料が豊富に存在します。すばらしいドキュメントの 1 つに、Johan Jansson 氏の <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> があります。.<br />
+<p>スクリプトはそれらを解釈するシェルに必然的に大きく依存するため、まずは Haiku で使用されている BASH に慣れる必要があります。BASH は広く使用されているシェルなので、オンライン上に資料が豊富に存在します。すばらしいドキュメントの 1 つに、Johan Jansson 氏の <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> があります。<br />
 <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash Reference Manual (PDF, 720 KiB)</a>は、詳細に興味を持つには良いリソースです。</p>
 
 <h2>
@@ -78,7 +78,7 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haiku でのスクリプト</a></h2>
-<p>以前、Haiku は起動とシャットダウンのためのスクリプトを持っていました。現在は代わりに <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> を使用しています。しかし、特定のユーザースクリプトについてこのプロセスを増やすことができます。それらがすでに存在しない場合は、ユーザー自身で必要なファイルを作成する必要があります。ほかに、コマンドを実行したいプロセス内に単純に追加する方法もあります。</p>
+<p>以前、Haiku には起動とシャットダウンのためのスクリプトがありました。現在は代わりに <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> を使用しています。しかし、特定のユーザースクリプトについてこのプロセスを増やすことができます。それらがすでに存在しない場合は、ユーザー自身で必要なファイルを作成する必要があります。ほかに、コマンドを実行するプロセス内に単純に追加する方法もあります。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -89,18 +89,17 @@
 
 # ワークスペースアプレットを起動する
 /boot/system/apps/Workspaces &amp;</pre>
-<p>コマンドをバックグラウンドプロセスとして実行するために、コマンドの末尾は "<tt>&amp;</tt>" で終わらせることを覚えておいてください。そうしなければ、そのコマンドが完了するまで (この例では、起動したアプリケーションが再度閉じられるまで) スクリプトが停止してしまいます。</p>
+<p>コマンドをバックグラウンドプロセスとして実行するために、コマンドの末尾を "<tt>&amp;</tt>" で終わらせることを覚えておいてください。そうしなければ、そのコマンドが完了するまで (この例では、起動したアプリケーションが再度閉じられるまで) スクリプトが停止してしまいます。</p>
 
-<p>システムの起動時にアプリケーションを起動させるための、上記とは違うシンプルな方法の 1 つに、それらアプリケーションへのリンクを <span class="path">/boot/home/config/settings/boot/launch</span> ディレクトリに置くという方法があります。この方法は、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>することで簡単に実現できます。</p>
+<p>システムの起動時にアプリケーションを起動させるための、上記とは違うシンプルな方法の 1 つは、それらアプリケーションへのリンクを <span class="path">/boot/home/config/settings/boot/launch</span> ディレクトリに置くことです。これは、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>すれば簡単に実現できます。</p>
 
-<h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
+<h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript - <i>まだ動作しません</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> はシャットダウンプロセスの最初のステップで実行されます。このスクリプトが 0 以外の終了ステータスを返すと、シャットダウンは中断されます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a></h3>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript - <i>まだ動作しません</i></a></h3>
 <p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> はシャットダウンの最終ステップで実行されます。このスクリプトが実行されるときには、システムの大部分が終了していることに注意してください。</p>
 
 </div>

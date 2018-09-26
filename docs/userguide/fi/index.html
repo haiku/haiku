@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +50,7 @@
 </ul>
 <span>
  «  <a href="attributes.html">Attribuutit</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="queries.html">Kyselyt</a>  »
 </span></div>
 </div>
@@ -60,7 +60,7 @@
 
 <h1>Hakemisto</h1>
 
-<p><a href="attributes.html">Attribuutit</a> ja <a href="queries.html">Kyselyt</a> ovat Haikun avainominaisuuksia. Kun attribuutit ovat hyödyllisiä sellaisenaan, lisätietojen näyttämiseksi tiedostosta, niiden kyselemiseksi attribuutit on indeksoitava. Se laittaa ne hakutauluun, joka vuorostaan tekee kyselyt salamannopeiksi.<br />
+<p><a href="attributes.html">Attribuutit</a> ja <a href="queries.html">Kyselyt</a> ovat Haikun avainominaisuuksia. Vaikka attribuutit ovat hyödyllisiä sellaisenaan lisätietojen näyttämiseksi tiedostosta, niiden kyselemiseksi attribuutit on indeksoitava. Indeksointi laittaa attribuutit hakutauluun, mikä vuorostaan tekee kyselyt salamannopeiksi.<br />
 Indeksi on tiedostojärjestelmän osa ja se pidetään jokaisella taltiolla tai osiolla erikseen.</p>
 
 <h2>Indeksointikomennot Pääteikkunassa</h2> 
@@ -117,14 +117,14 @@ Luo uuden indeksin määrätylle attribuutille.
  
   -d, --volume=POLKU    polku taltioon, johon indeksi lisätään, 
                         oletuksena nykyinen taltio. 
-  -t, --type=TYYPPI      indeksoitavan attribuutin tyyppi.  Yksi seuraavista: "int", 
+  -t, --type=TYYPPI     indeksoitavan attribuutin tyyppi.  Yksi seuraavista: "int", 
                         "llong", "string", "float", tai "double". 
                         Oletus on "string". 
       --copy-from       polku taltioon, josta indeksit kopioidaan. 
   -v, --verbose         tulosta tiedot luodusta indeksistä 
 
 </pre>
-<p>Vain <b>uudet</b> tiedostot, joilla on attribuutti, indekstoidaan automaattisesti!<br />
+<p>Vain <b>uudet</b> tiedostot, joilla on attribuutti, indeksoidaan automaattisesti!<br />
 Olemassa olevat tiedostot on lisättävä manuaalisesti kopioimalla ne ja poistamalla alkuperäiset sen jälkeen. Vaihtoehtoisesti voit käyttää komentoa <span class="cli">reindex</span>. 
 </p>
 <ul>
@@ -146,7 +146,7 @@ Poistaa indeksin nimeltään INDEKSI_NIMI levytaltiosta.  Heti kun tämä on teh
 etsimiseen INDEKSI_NIMI-attribuutilla. 
  
   -d, --volume=POLKU    polku taltioon, josta indeksi 
-                         poistetaan 
+                        poistetaan 
   -h, --help            näytä opaste ja poistu 
   -p, --pattern         INDEKSI_NIMI on malli 
   -v, --verbose         tulosta tiedot poistettavasta indeksistä 
@@ -161,7 +161,7 @@ Jos taltiota ei ole määritelty, otaksutaan taltio, jossa nykyinen hakemisto si
 <div class="nav">
 <div class="inner"><span>
  «  <a href="attributes.html">Attribuutit</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="queries.html">Kyselyt</a>  »
 </span></div>
 </div>

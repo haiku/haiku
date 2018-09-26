@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guia do Usuário</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +50,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Tipos de Arquivos</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
 ::  <a href="index.html">Índice</a>  »
 </span></div>
 </div>
@@ -87,7 +87,7 @@
 <p><span class="cli">listattr</span> lista os atributos do arquivo, mas não mostra o conteúdo dos atributos.</p>
 <pre>uso: listattr 'nome do arquivo' ['nome do arquivo' ...]</pre>
 <p>Do nosso exemplo de tela acima:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -116,7 +116,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> retem o tipo de arquivo como uma sequência <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, aqui "<tt>application/x-person</tt>". Ele determina o ícone padrão e o aplicativo que abre o arquivo quando, por exemplo, damos um duplo clique nele.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" é o atributo com o qual o Rastreador mantem o controle da posição do ícone de um arquivo.</p></li></ul>
-<div class="box-info">Observe a barra invertida após "Clara". No Terminal é preciso realizar o "escape" de caracteres especiais como <tt>'"*\$?!</tt>. O espaço entre "Clara" e "Botters" é também um deles. Portanto a barra invertida está na verdade na frente de um caractere de espaço, e não após "Clara".</div>
+<div class="box-info">Observe a barra invertida após "Clara". No Terminal é preciso realizar o "escape" de caracteres especiais como <tt>'"*\\$?!</tt>. O espaço entre "Clara" e "Botters" é também um deles. Portanto a barra invertida está na verdade na frente de um caractere de espaço, e não após "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -124,7 +124,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> exibe o conteúdo de um atributo específico de um arquivo.</p>
 <pre>uso: catattr [--raw|-r] nome_do_atributo arquivo1 [arquivo2...]</pre>
 <p>Novamente nosso exemplo:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -139,7 +139,7 @@ Clara Botters : string : Whelton</pre>
                  ou um valor numérico (por exemplo, 0x1234, 42, 'ABCD', ...)
          O padrão é "string"</pre>
 <p>Então, digamos que a querida Clara conseguiu um emprego coma multinacional Barkelbaer Inc., preencha o inicialmente vazio atributo "Companhia" com aqueles dados (os quais são do tipo "string" (sequência)):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -150,7 +150,7 @@ Clara Botters : string : Whelton</pre>
          'atrib' é o nome de um atributo do arquivo
          Se '-p' é especificado, 'atrib' é considerado como um padrão.</pre>
 <p>Embora, em todo seu aspecto prático, seria suficiente apenas não preencher o atributo "Fax", pode-se removê-lo completamente do arquivo de Clara digitando:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -169,7 +169,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Tipos de Arquivos</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Conteúdo</a> 
 ::  <a href="index.html">Índice</a>  »
 </span></div>
 </div>

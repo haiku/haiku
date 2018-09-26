@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		thebowseat
  *		mt
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -50,9 +50,9 @@
 <li><a href="../uk/queries.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 </ul>
 <span>
- «  <a href="index.html">目次</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
+ «  <a href="index.html">インデックス</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="workshop-filetypes+attributes.html">ワークショップ</a>  »
 </span></div>
 </div>
 
@@ -61,7 +61,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#find-window">検索ウィンドウ</a><br />
 	<a href="#basic-query">基本クエリ - "名前で検索"</a><br />
@@ -74,7 +74,7 @@
 
 <h1>クエリ</h1>
 
-<p>クエリ (Query) はファイル属性に基づいたファイル検索で、Tracker 内やターミナル内で実行できます。クエリは、<span class="path">/boot/home/queries/</span> に、デフォルトでは消去されるまで最新 7 日間保存されます。これらが静的な検索結果のリストではなく、開くたびに常に新しい検索を引き起こすクエリ式であることに注意してください。<br />
+<p>クエリ (Query) はファイル属性に基づいたファイル検索で、Tracker 内やターミナル内で実行できます。クエリは、<span class="path">/boot/home/queries/</span> に、デフォルトでは消去されるまで 7 日間保存されます。これらが静的な検索結果のリストではなく、開くたびに常に新しい検索を引き起こすクエリ式であることに注意してください。<br />
 さらによいことに、再クエリのためにダブルクリックの必要はありません。ほかのフォルダーのように、保存したクエリを右クリックで<a href="tracker.html#navigating">ドリルダウン</a>して、サブメニューで移動してください。 </p>
 
 <h2>
@@ -89,12 +89,12 @@
     <li><span class="menu">名前で検索 (by Name)</span> - ファイル名による基本的な検索</li>
     <li><span class="menu">属性で検索 (by Attribute)</span> - 進んだ検索。1 つまたは複数の属性に対して検索語を指定します。</li>
     <li><span class="menu">式で検索 (by Formula)</span> - さらに進んだ検索。複雑なクエリを微調整できます。</li></ul></li>
-<li><p>検索を行うドライブを指定します。</p></li>
+<li><p>検索するドライブを指定します。</p></li>
 <li><p>検索語を入力します。</p></li>
-<li><p>三角のアイコン (expander) は追加オプションの表示 / 非表示を行います。</p></li>
+<li><p>三角アイコン (expander) は追加オプションの表示 / 非表示をします。</p></li>
 <li><p>クエリを ７ 日後に自動消去したくない場合は、<span class="menu">一時的なクエリ (Temporary)</span> チェックボックスのチェックを外します。</p></li>
 <li><p>クエリが、<span class="menu">ごみ箱を含む (Include trash)</span>と考えられる場合はチェックします。</p></li>
-<li><p>オプションとして、クエリを保存したい場合名前を入力します。</p></li>
+<li><p>オプションとして、クエリを保存する場合名前を入力します。</p></li>
 <li><p>このアイコンをどこにでもドラッグ＆ドロップして、クエリを保存できます。右クリックで行うと、テンプレートとして保存のオプションが現れます。</p></li>
 </ol>
 
@@ -106,11 +106,11 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="adv-query" name="adv-query">高度なクエリ - "属性で検索"</a></h2>
-<p>特定のファイルタイプの属性を検索する、より高度なクエリを作成できます。それが動作するためには、これらの属性は<a href="index.html">インデックス</a>づけがされている必要があります。</p>
+<p>特定のファイルタイプの属性を検索する、より高度なクエリを作成できます。それが動作するためには、これらの属性は<a href="index.html">インデックス</a>化されている必要があります。</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
 <p>例として、ファイルタイプを<span class="menu">すべてのファイルとフォルダー (All files and folders)</span> から <span class="menu">Text | E-mail</span> に設定することから始め、検索方法を<span class="menu">属性で検索 (by Attribute)</span> に変更します。</p>
 <p>これにより、テキストボックスの左側にポップアップメニューを、また下側に<span class="button">追加 (Add)</span> と<span class="button">削除 (Remove)</span> ボタンを追加します。メニューから、クエリする属性を決めます。<span class="button">追加 (Add)</span> および<span class="button">削除 (Remove)</span> ボタンで追加の属性のクエリや、再びそれらを削除できます。これらの属性は、AND/OR で論理的にリンクできます。</p>
-<p>例として、メールのクエリを行いましょう。</p>
+<p>例として、メールをクエリしましょう。</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
 <p>件名が "vibraphone" あるいは "skepticality" である、過去 2 か月に Clara Botter が送信したすべてのメールを探している場合、検索ウィンドウはこのようになります。<br />ごらんのように、時間ベースの属性を介した検索は、いくつかの便利なフレーズをサポートしています。"last 2 months (最後の 2 ヶ月)" に加えて、"today (今日)"、"yesterday (昨日)"、"Monday (月曜日)"、"last Monday" (先週の月曜日になるでしょう)、または "last 2 minutes/hours/days/weeks (最後の 2 分間/時間/日/週)" も使えます。<br />
 検索結果の数を減らすのに良い方法です。</p>
@@ -118,7 +118,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="more-adv-query" name="more-adv-query">さらに高度なクエリ - "式で検索"</a></h2>
-<p>式クエリを手入力することはとっつきにくく、かつ、まったく非実用的です。にもかかわらず、それには用途があります。
+<p>式クエリの手入力はとっつきにくく、かつ、まったく非実用的です。にもかかわらず、それには用途があります。
 
 </p>
 <p>上記の、vibraphone などに関する Clara のメールの属性によるクエリを例にとります。属性と検索語がすべて確定された場合に、<span class="menu">式で検索 (by Formula)</span> モードへの変更を試みると、この 1 行のクエリ文字列に圧倒されるでしょう。</p>
@@ -133,7 +133,7 @@
 <ul>
 <li><p>メール、フォーラム、あるいは IRC に、文字列をコピーし貼り付けることで、ほかの人が使ったり、デバッグできたりするかもしれません。</p></li>
 <li><p>この方法を使って、<span class="menu">Attribute</span> モードでクエリを構築した後、<span class="menu">Formula</span> モードへ変更して、ターミナルのクエリあるいはスクリプトに使用する検索文字列を簡単に生成できます。</p></li>
-<li><p>必要なところへのかっこの挿入や、部分的に大文字小文字を区別することや、修正により論理結合を否定 (例:NOT AND のために "<tt>==</tt>" を "<tt>!=</tt> に変える) することでクエリを微調整できます。必要とするのは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression">正規表現</a>に対する基本的な理解と、たぶんいくつかのスクリプトの基本だけです。</p></li>
+<li><p>必要なところへの括弧の挿入や、部分的に大文字小文字を区別することや、修正により論理結合を否定 (例:NOT AND のために "<tt>==</tt>" を "<tt>!=</tt> に変える) することでクエリを微調整できます。必要とすることは、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression">正規表現</a>に対する基本的な理解と、たぶんいくつかのスクリプトの基本だけです。</p></li>
 </ul>
 
 <h2>
@@ -147,24 +147,24 @@
 <li><p><span class="menu">ファイル (File) | クエリを編集 (Edit query)</span> または <span class="key">ALT</span> <span class="key">G</span> によって、検索ウィンドウを呼び戻してクエリを改良できます。</p></li>
 <li><p>クエリはライブです、つまり、検索基準と一致するファイルがシステム上に現れるか、またはシステム上から消える場合、この変更は検索結果にリアルタイムで反映されます。</p></li>
 </ul>
-<p>特定のファイルタイプのクエリ結果のためにふさわしい属性レイアウトを割り当てられます。テンプレートを作成したいファイルタイプのファイルを含んでいるフォルダーを開き、クエリ結果を示したいものになるように属性を配置します。<span class="menu">属性 (Attributes) | レイアウトをコピー (Copy layout)</span> で、このレイアウトをコピーします。</p>
+<p>特定のファイルタイプのクエリ結果のためにふさわしい属性レイアウトを割り当てられます。テンプレートを作成するファイルタイプのファイルを含んでいるフォルダーを開き、クエリ結果を示したいものになるように属性を配置します。<span class="menu">属性 (Attributes) | レイアウトをコピー (Copy layout)</span> で、このレイアウトをコピーします。</p>
 <p><span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span> を開き、新しいフォルダーを作成し、それを <i>group/filetype</i> にリネームします。ここで、/ は _ に置き換えてください (例: "audio_x-mp3")。新しいフォルダーを開き、<span class="menu">属性 (Attributes) | レイアウトを貼り付け (Paste layout)</span> でレイアウトを貼り付けます。</p>
 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-template" name="query-template">クエリテンプレート</a></h2>
-<p>保存済のクエリをダブルクリックすると、すぐにファイル検索が始まり、ただちに結果ウィンドウが開きます。しかし、これらの<i>正確な</i>パラメーターで検索したくなく、それらを少しだけ式を調整するための始点として使いたいかもしれません。<br />
- <span class="menu">クエリをテンプレートとして保存 (Save query as template)</span> メニュー項目を使うか (一番上の<a href="#find-window">スクリーンショットの (1) </a> を見てください)、右クリックしながら (10) のアイコンをどこかにドラッグ＆ドロップすると、そのようなテンプレートを作成できます。テンプレートをダブルクリックしても結果ウィンドウは開かず、検索パネルが開きます。そこですばやく検索文字列の変更、または属性の追加 / 削除ができるチャンスが与えられます。</p>
+<p>保存済のクエリをダブルクリックすると、すぐにファイル検索が始まり、ただちに結果ウィンドウが開きます。しかし、これらの<i>そのものの</i>検索パラメーターで検索するのではなく、それらを少しだけ式を調整するための始点として使うかもしれません。<br />
+ <span class="menu">クエリをテンプレートとして保存 (Save query as template)</span> メニュー項目を使うか (一番上の<a href="#find-window">スクリーンショットの (1) </a> を見てください)、右クリックしながら (10) のアイコンをどこかにドラッグ＆ドロップすると、そのようなテンプレートを作成できます。テンプレートをダブルクリックしても結果ウィンドウは開かず、検索パネルが開きます。そこですばやく検索文字列の変更、または属性の追加 / 削除ができる機会が与えられます。</p>
 <p>クエリテンプレートを保存することを選択すれば、それらは検索パネルの最近使ったクエリメニューに表示されるでしょう。</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="index.html">目次</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
+ «  <a href="index.html">インデックス</a> 
+::  <a href="contents.html" class="uplink">目次</a> 
+::  <a href="workshop-filetypes+attributes.html">ワークショップ</a>  »
 </span></div>
 </div>
 

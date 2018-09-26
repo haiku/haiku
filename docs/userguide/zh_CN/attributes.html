@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Pengphei Han
  *		Humdinger
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +51,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">文件类型</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
 ::  <a href="index.html">索引</a>  »
 </span></div>
 </div>
@@ -88,7 +88,7 @@
 <p><span class="cli">listattr</span> 命令列出了文件的属性，但不显示属性内容。</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>上面我们的截图中的例子：</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -117,7 +117,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> 以 <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 字符串的形式保存文件类型，保存于 "<tt>application/x-person</tt>" 。它决定了默认的图标以及当你双击打开该文件时所要运行的程序。</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" 是一个位置属性，Tracker 可以通过它来跟踪文件图标的位置。</p></li></ul>
-<div class="box-info">需要注意的是 "Clara" 之后的反斜杠。在 Terminal 中您必须 "避开" 特殊字符，例如 <tt>'"*\$?!</tt> ；同时，处于 "Clara" 和 "Botters" 之间的空格也属于此类字符。所以反斜杠真实的出现在空格字符之前，而不是 "Clara" 之后。</div>
+<div class="box-info">需要注意的是 "Clara" 之后的反斜杠。在 Terminal 中您必须 "避开" 特殊字符，例如 <tt>'"*\\$?!</tt> ；同时，处于 "Clara" 和 "Botters" 之间的空格也属于此类字符。所以反斜杠真实的出现在空格字符之前，而不是 "Clara" 之后。</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -125,7 +125,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> 命令显示了文件特有属性的内容。</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>还是上面的例子：</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -140,7 +140,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>所以当亲爱的 Clara 在跨国公司 Barkelbaer Inc.找到了工作，你就可以为原本空白的 "Company" 属性补充该数据 (而此数据也属于 "string" 类型)：</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -151,7 +151,7 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>即使不填写 "Fax" 属性，在实际应用中也已经足够了；所以你可以通过键入下面的命令来从 Clara 文件中完全删除它：</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -170,7 +170,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">文件类型</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
 ::  <a href="index.html">索引</a>  »
 </span></div>
 </div>

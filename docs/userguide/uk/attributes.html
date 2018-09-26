@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		totish
  *		Humdinger
+ *		totish
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Настанова користувачеві</span></div>
 </div>
 
 <div class="nav">
@@ -51,7 +51,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
 ::  <a href="index.html">Зміст</a>  »
 </span></div>
 </div>
@@ -88,7 +88,7 @@
 <p><span class="cli">listattr</span> - показує список атрибутів, але не їх вміст .</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Приклад:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -117,7 +117,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> зберігає тип файлу у вигляді <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> стрічки, у нашому випадку "<tt>application/x-person</tt>".Він визначає іконку по замовчуванню і додаток, який відкриває файл за подвійним кліком по ньому.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" при допомозі цього атрибуту Tracker відслідковує місце розташування іконки. </p></li></ul>
-<div class="box-info">Зверніть увагу на бекслеш після "Clara". В Terminal'i Ви можете відміняти спеціальні символи такі як <tt>'"*\$?!</tt>. Пробіл між "Clara" і "Botters" також є таким. Отже бекслеш є насправді попереду пробілу а не після "Clara".</div>
+<div class="box-info">Зверніть увагу на бекслеш після "Clara". В Terminal'i Ви можете відміняти спеціальні символи такі як <tt>'"*\\$?!</tt>. Пробіл між "Clara" і "Botters" також є таким. Отже бекслеш є насправді попереду пробілу а не після "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -125,7 +125,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> - виводить вміст вказаного атрибуту файлу.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Приклад:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -140,7 +140,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>Припустимо Clara  влаштувалась на роботу в Barkelbaer Inc., Ви можете тепер заповнити атрибут "Company", який раніше був пустим наступним чином:</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -151,12 +151,12 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>хоча просто можна би було не заповняти атрибут "Fax" , але ви можете повністю видалити цей атрибут в файлу Clara:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> дозволяє зкопіювати атрибути з одного або дікількох файлів на інший. По замовчуванню вміст файлу <b>не</b> \ копіюється.</p>
+<p><span class="cli">copyattr</span> дозволяє зкопіювати атрибути з одного або дікількох файлів на інший. По замовчуванню вміст файлу <b>не</b> \\ копіюється.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
 <p>Якщо Ви забажаєте скопіювати не тільки атрибути але і вміст файлу слід додати опцію "<span class="cli">-d</span>" або "<span class="cli">--data</span>".</p>
@@ -170,7 +170,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Зміст</a> 
 ::  <a href="index.html">Зміст</a>  »
 </span></div>
 </div>

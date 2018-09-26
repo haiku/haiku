@@ -17,14 +17,14 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>コマンドの一覧表</title>
+	<title>コマンドラインアプリケーションの一覧表</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -58,303 +58,308 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドラインアプリケーションの一覧表</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku に標準装備されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin</span> に存在します。ユーザー自身が作ったコマンドラインアプリケーションや、追加インストールしたコマンドラインアプリケーションは、.hpkg パッケージからインストールされた場合 <span class="path">~/config/bin/</span> に現れます。パッケージでない場合は、<span class="path">~/config/non-packaged/bin/</span> に入れられます。これらの場所はすべて PATH 環境変数に含まれているため、自動的に検出されます。<br />
-以下は、Haiku に標準装備されているすべてのコマンドラインアプリケーションの一覧表です。それぞれの動作について短い説明だけがあります。使い方についてさらに詳しい情報を見るには、<tt>--help</tt> という引数を付けてアプリケーションを実行してください。</p>
+<p>Haiku に標準装備されているコマンドラインアプリケーションは、すべて <span class="path">/boot/system/bin</span> に存在します。ユーザー自身が作ったコマンドラインアプリケーションや、追加インストールしたコマンドラインアプリケーションは、.hpkg パッケージからインストールされた場合 <span class="path">~/config/bin/</span> に現れます。パッケージでない場合は、<span class="path">~/config/non-packaged/bin/</span> に入れられます。これらの場所はすべて PATH 環境変数に含まれているため、自動的に検出されます。<br />
+以下は、Haiku に標準装備されているコマンドラインアプリケーションの一覧表です。それぞれの動作について、ほんの短い説明があります。使い方についてさらに詳しい情報を見るには、<tt>--help</tt> という引数を付けて実行してください。</p>
 <p><br /></p>
 <p>索引:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>使用中の、オーディオおよびビデオアドオンをモニターするサービスを起動します。</td></tr>
-<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>使用言語とキーボードマップの設定</td></tr>
-<tr><td><tt>[</tt></td><td> </td><td>要素を比較して、真 / 偽を返します。</td></tr>
+<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>使用中の、オーディオおよびビデオアドオンをモニターするサービスを起動。</td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>使用言語とキーボードマップの設定。</td></tr>
+<tr><td><tt>[</tt></td><td> </td><td>要素を比較して、真 / 偽を返す。</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
-<tr><td><tt>addattr</tt></td><td> </td><td>ファイルに属性を書き込みます。その際、型を考慮して値を変換します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>alert</tt></td><td> </td><td>メッセージボックスを表示します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>arp</tt></td><td> </td><td>システムの ARP キャッシュを操作します。</td></tr>
-<tr><td><tt>awk</tt></td><td> </td><td><tt>gawk</tt> を参照ください。</td></tr>
-<tr><td><tt>base64</tt></td><td> </td><td>標準出力へ、Base64 のエンコード、またはデコードを行います。</td></tr>
-<tr><td><tt>basename</tt></td><td> </td><td>"/パス/目的の/ファイル名" 文字列からディレクトリと、オプションで拡張子を取り除きます。</td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>ファイルに属性を書き込みます。その際、型を考慮して値を変換します <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>メッセージボックスの表示 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>システムの ARP キャッシュを操作。</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td><tt>gawk</tt> を参照。</td></tr>
+<tr><td><tt>base64</tt></td><td> </td><td>標準出力へ、Base64 のエンコード / デコードを行う。</td></tr>
+<tr><td><tt>basename</tt></td><td> </td><td>"/パス/目的の/ファイル名" (/path/to/filename) 文字列からディレクトリと、オプションで拡張子を取り除く。</td></tr>
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again シェル</td></tr>
-<tr><td><tt>bc</tt></td><td> </td><td>任意精度の電卓言語です。</td></tr>
-<tr><td><tt>beep</tt></td><td> </td><td>ベルを鳴らします。</td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td><tt>bzip2</tt> を参照ください。</td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>任意精度の電卓言語</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>ベルを鳴らす。</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td><tt>bzip2</tt> を参照。</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>ファイル圧縮</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++ コンパイラ</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>カレンダーを表示します。</td></tr>
-<tr><td><tt>cat</tt></td><td> </td><td>ファイルを連結して、標準出力に表示します。</td></tr>
-<tr><td><tt>catattr</tt></td><td> </td><td>ファイルの属性の内容を表示します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
+<tr><td><tt>cal</tt></td><td> </td><td>カレンダーを表示。</td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>ファイルを連結して、標準出力へ表示。</td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>ファイルの属性の内容を表示 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>C コンパイラ</td></tr>
-<tr><td><tt>checkfs</tt></td><td> </td><td>ファイルシステムのチェックと、修復を行います <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>checkitout</tt></td><td> </td><td>ソースコードを、単純にそのレポジトリの URL でチェックアウトします。</td></tr>
-<tr><td><tt>chgrp</tt></td><td> </td><td>ファイルのグループを変更します。</td></tr>
-<tr><td><tt>chmod</tt></td><td> </td><td>ファイルのパーミッションを変更します。</td></tr>
-<tr><td><tt>chop</tt></td><td> </td><td>ファイルを小さなファイルに分割します。</td></tr>
-<tr><td><tt>chown</tt></td><td> </td><td>ファイルの所有者を変更します。</td></tr>
-<tr><td><tt>chroot</tt></td><td> </td><td>指定したルートディレクトリでコマンドを実行します。</td></tr>
-<tr><td><tt>cksum</tt></td><td> </td><td>ファイルの CRC チェックサムとバイト数を表示します。</td></tr>
-<tr><td><tt>clear</tt></td><td> </td><td>端末の内容を消去します。</td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>時刻の設定を表示します。</td></tr>
-<tr><td><tt>cmp</tt></td><td> </td><td>1 バイトずつファイルを比較します。</td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>ファイルシステムのチェックと、修復 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>checkitout</tt></td><td> </td><td>ソースコードを、そのレポジトリの URL でチェックアウト。</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>ファイルのグループオーナーシップを変更。</td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>ファイルのパーミッションを変更。</td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>ファイルを小さなファイルに分割。</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>ファイルの所有者を変更。</td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>指定したルートディレクトリでコマンドを実行。</td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>ファイルの CRC チェックサムとバイト数を表示。</td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>ターミナルウィンドウの内容を消去。</td></tr>
+<tr><td><tt>clockconfig</tt></td><td> </td><td>時刻の設定を表示。</td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>1 バイトずつファイルを比較。</td></tr>
 <tr><td><tt>collectcatkeys </tt></td><td> </td><td>[ロケールキットの移動した残り]</td></tr>
-<tr><td><tt>comm</tt></td><td> </td><td>ソート済ファイルを 1 行ずつ比較します。</td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>ソート済ファイルを 1 行ずつ比較。</td></tr>
 <tr><td><tt>compress</tt></td><td> </td><td>データ圧縮プログラム</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>コンソールデーモン</td></tr>
-<tr><td><tt>copyattr</tt></td><td> </td><td>1 つまたは複数のファイルの属性のすべてかサブセットを、ほかのファイルまたは新規ファイルにコピーします <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>cp</tt></td><td> </td><td>ファイルおよびディレクトリをコピーします。</td></tr>
-<tr><td><tt>csplit</tt></td><td> </td><td>指定のパターンでファイルを分割します。</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>ファイルで見つかったさまざまな言語オブジェクト用の索引ファイルを生成します。 </td></tr>
-<tr><td><tt>cut</tt></td><td> </td><td>ファイルの各行からのセクションを印字します。</td></tr>
-<tr><td><tt>date</tt></td><td> </td><td>現在の時刻と日付を表示または設定します。</td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>1 つまたは複数のファイルの属性のすべてかサブセットを、ほかのファイルまたは新規ファイルにコピー <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>ファイルおよびディレクトリをコピー。</td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>指定のパターンでファイルを分割。</td></tr>
+<tr><td><tt>ctags</tt></td><td> </td><td>ファイルで見つかったさまざまな言語オブジェクト用の索引ファイルを生成。</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>ファイルの各行からのセクションを表示。</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>現在の時刻と日付を表示または設定。</td></tr>
 <tr><td><tt>dc</tt></td><td> </td><td>電卓言語</td></tr>
-<tr><td><tt>dd</tt></td><td> </td><td>生データをオペランドにしたがって変換およびフォーマットしながらコピーします。</td></tr>
-<tr><td><tt>desklink</tt></td><td> </td><td>アイテムを Deskbar にインストールします <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>ファイルをマウントできるディスクデバイスとして登録します <a href="cli-apps.html">(Haiku 固有)。</a></td></tr>
-<tr><td><tt>df</tt></td><td> </td><td>マウントされたボリュームの空き領域と使用済み領域を報告します。</td></tr>
-<tr><td><tt>diff</tt></td><td> </td><td>行ごとにファイルを比較します。</td></tr>
-<tr><td><tt>diff3</tt></td><td> </td><td>3 つのファイルを行ごとに比較します。</td></tr>
-<tr><td><tt>dircolors</tt></td><td> </td><td><tt>ls</tt> の色を設定します。</td></tr>
-<tr><td><tt>dirname</tt></td><td> </td><td>/path/to/filename 文字列から、ファイル名を取り去ります。</td></tr>
-<tr><td><tt>draggers</tt></td><td> </td><td>レプリカントのハンドルの状態を表示または設定します。</td></tr>
-<tr><td><tt>driveinfo</tt></td><td> </td><td>ハードウェア情報を表示します。</td></tr>
-<tr><td><tt>dstcheck</tt></td><td> </td><td>夏時間に変わる際、または夏時間から変わる際に使われるメッセージボックスを表示します。</td></tr>
-<tr><td><tt>du</tt></td><td> </td><td>再帰的にディレクトリに対して、各ファイルのディスク使用量をまとめます。</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>生データをオペランドにしたがって変換およびフォーマットしながらコピー。</td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>アイテムを Deskbar にインストール <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>ファイルをマウントできるディスクデバイスとして登録 <a href="cli-apps.html">(Haiku 特有)。</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>マウントされたボリュームの空き領域と使用済み領域を報告。</td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>行ごとにファイルを比較。</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>3 つのファイルを行ごとに比較。</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td><tt>ls</tt> の色を設定。</td></tr>
+<tr><td><tt>dirname</tt></td><td> </td><td>/path/to/filename 文字列から、ファイル名を除去。</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>レプリカントのハンドルの状態を表示または設定。</td></tr>
+<tr><td><tt>driveinfo</tt></td><td> </td><td>ハードウェア情報を表示。</td></tr>
+<tr><td><tt>dstcheck</tt></td><td> </td><td>夏時間に変わる / 夏時間から変わる際に使われるメッセージボックスを表示。</td></tr>
+<tr><td><tt>du</tt></td><td> </td><td>再帰的にディレクトリに対して、各ファイルのディスク使用量をまとめる。</td></tr>
 <tr><td><tt>dumpcatalog</tt></td><td> </td><td>[ロケールキットの移動した残り]</td></tr>
-<tr><td><tt>echo</tt></td><td> </td><td>1 行テキストを表示します。</td></tr>
-<tr><td><tt>egrep</tt></td><td> </td><td><tt>grep</tt> を参照ください。</td></tr>
-<tr><td><tt>eject</tt></td><td> </td><td>リムーバブルメディアをイジェクトします。</td></tr>
-<tr><td><tt>env</tt></td><td> </td><td>修正された環境でプログラムを実行します。</td></tr>
-<tr><td><tt>error</tt></td><td> </td><td>任意のエラー番号に対する平文エラーメッセージを表示します。</td></tr>
-<tr><td><tt>expand</tt></td><td> </td><td>タブをスペースに変換します。</td></tr>
-<tr><td><tt>expr</tt></td><td> </td><td>式の値を表示します。</td></tr>
+<tr><td><tt>echo</tt></td><td> </td><td>1 行テキストを表示。</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td><tt>grep</tt> を参照。</td></tr>
+<tr><td><tt>eject</tt></td><td> </td><td>リムーバブルメディアをイジェクト。</td></tr>
+<tr><td><tt>env</tt></td><td> </td><td>修正された環境でプログラムを実行。</td></tr>
+<tr><td><tt>error</tt></td><td> </td><td>任意のエラー番号に対する平文エラーメッセージを表示。</td></tr>
+<tr><td><tt>expand</tt></td><td> </td><td>タブをスペースに変換。</td></tr>
+<tr><td><tt>expr</tt></td><td> </td><td>式の値を表示。</td></tr>
 <tr><td colspan="3"><a id="F" name="F"><h2>F</h2></a></td></tr>
-<tr><td><tt>factor</tt></td><td> </td><td>整数の素因数を表示します。</td></tr>
-<tr><td><tt>false</tt></td><td> </td><td>何もしません。"失敗 (unsuccessful)" を示し、値 "1" を返します。 </td></tr>
-<tr><td><tt>fdinfo</tt></td><td> </td><td>システム中の、使用済ファイル記述子に関する情報を表示します。</td></tr>
-<tr><td><tt>ffm</tt></td><td> </td><td>フォーカスをマウス位置に合わせる (focus follows mouse) を設定します。</td></tr>
-<tr><td><tt>fgrep</tt></td><td> </td><td><tt>grep</tt> を参照ください。</td></tr>
-<tr><td><tt>filepanel</tt></td><td> </td><td>読み込み / 保存ファイルパネルを表示します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>find</tt></td><td> </td><td>ディレクトリ階層内でファイルを検索します。</td></tr>
-<tr><td><tt>finddir</tt></td><td> </td><td>システムで定義された特別なディレクトリを探します。</td></tr>
-<tr><td><tt>fmt</tt></td><td> </td><td>ファイルの段落を再設定します。</td></tr>
-<tr><td><tt>fold</tt></td><td> </td><td>ファイルの入力行を折りたたみます。</td></tr>
-<tr><td><tt>fortune</tt></td><td> </td><td>ランダムに、うまくいけば面白い格言を表示します。</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>ファイル名のリストを圧縮するため、updatedb によって呼び出されます。  </td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>FreeType のコンパイル情報とリンク情報を表示します。</td></tr>
-<tr><td><tt>fstrim</tt></td><td> </td><td>SSD ドライブに TRIM コマンドを送信します。</td></tr>
+<tr><td><tt>factor</tt></td><td> </td><td>整数の素因数を表示。</td></tr>
+<tr><td><tt>false</tt></td><td> </td><td>何もしません。"失敗 (unsuccessful)" を示し、値 "1" を返す 。</td></tr>
+<tr><td><tt>fdinfo</tt></td><td> </td><td>システム中の、使用済ファイル記述子に関する情報を表示。</td></tr>
+<tr><td><tt>ffm</tt></td><td> </td><td>フォーカスをマウス位置に合わせる (focus follows mouse) を設定。</td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td><tt>grep</tt> を参照。</td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>読み込み / 保存ファイルパネルを表示 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>ディレクトリ階層内でファイルを検索。</td></tr>
+<tr><td><tt>finddir</tt></td><td> </td><td>システムで定義された特別なディレクトリを検索。</td></tr>
+<tr><td><tt>fmt</tt></td><td> </td><td>ファイルの段落を再設定。</td></tr>
+<tr><td><tt>fold</tt></td><td> </td><td>ファイルの入力行を折りたたむ。</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>ランダムに、できれば面白い格言を表示。</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>ファイル名リストの圧縮のため、updatedb によって呼び出される。</td></tr>
+<tr><td><tt>freetype-config</tt></td><td> </td><td>FreeType のコンパイル情報とリンク情報を表示。</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>SSD ドライブに TRIM コマンドを送信。</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>ファイル転送プログラム</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP デーモン</td></tr>
-<tr><td><tt>funzip</tt></td><td> </td><td>アーカイブの最初のアイテムを標準出力に展開します。</td></tr>
+<tr><td><tt>funzip</tt></td><td> </td><td>アーカイブの最初のアイテムを標準出力に展開。</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire 制御プログラム</td></tr>
-<tr><td><tt>gawk</tt></td><td> </td><td>パターン検索および処理言語。</td></tr>
+<tr><td><tt>gawk</tt></td><td> </td><td>パターン検索および処理言語</td></tr>
 <tr><td><tt>gdb</tt></td><td> </td><td>GNU デバッガー</td></tr>
-<tr><td><tt>getarch</tt></td><td> </td><td>環境のコンパイラのバージョンを表示します。</td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>シェルスクリプトに役立つフォーマット内のプラットフォーム依存の範囲を表示します。</td></tr>
-<tr><td><tt>grep</tt></td><td> </td><td>パターン検索</td></tr>
-<tr><td><tt>groups</tt></td><td> </td><td>それぞれのユーザー名に対して、グループメンバーシップを表示します。</td></tr>
-<tr><td><tt>gunzip</tt></td><td> </td><td><tt>gzip</tt> を参照ください。</td></tr>
-<tr><td><tt>gzexe</tt></td><td> </td><td>実行ファイルの解凍 / 圧縮</td></tr>
-<tr><td><tt>gzip</tt></td><td> </td><td>ファイルの解凍 / 圧縮</td></tr>
-<tr><td><tt>hd</tt></td><td> </td><td>16 進ダンプ</td></tr>
-<tr><td><tt>head</tt></td><td> </td><td>ファイルの先頭の行を表示します。</td></tr>
-<tr><td><tt>hey</tt></td><td> </td><td>GUI アプリケーションをスクリプトで操作する小さなツールです。</td></tr>
-<tr><td><tt>hostname</tt></td><td> </td><td>システムのホスト名を表示または設定します。</td></tr>
-<tr><td><tt>id</tt></td><td> </td><td>ユーザーおよびグループ情報を表示します。</td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>ファイル中の RCS キーワードを確認します。</td></tr>
-<tr><td><tt>ifconfig</tt></td><td> </td><td>ネットワークインターフェースを構成します。</td></tr>
-<tr><td><tt>install</tt></td><td> </td><td>実行中のシステムを中断させることなく、インストール先へファイルをコピーします。</td></tr>
-<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>さまざまな無線ネットワークカードのファームウェアをインストールします。</td></tr>
-<tr><td><tt>installsound</tt></td><td> </td><td>サウンドプレファレンスパネル内のイベントに新しいサウンドを設定します。</td></tr>
-<tr><td><tt>iroster</tt></td><td> </td><td>入力デバイスを一覧表示します。</td></tr>
-<tr><td><tt>isvolume</tt></td><td> </td><td>マウントされたボリュームに対する情報を得ます。</td></tr>
-<tr><td><tt>join</tt></td><td> </td><td>同じ結合フィールドを持つそれぞれの入力ファイルの組に対して、行を標準出力に書き出します。</td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>環境のコンパイラのバージョンを表示。</td></tr>
+<tr><td><tt>getlimits</tt></td><td> </td><td>シェルスクリプトに便利なフォーマットで、プラットフォーム依存の範囲を表示。</td></tr>
+<tr><td><tt>grep</tt></td><td> </td><td>パターン検索。</td></tr>
+<tr><td><tt>groups</tt></td><td> </td><td>各ユーザー名に対して、グループメンバーシップを表示。</td></tr>
+<tr><td><tt>gunzip</tt></td><td> </td><td><tt>gzip</tt> を参照。</td></tr>
+<tr><td><tt>gzexe</tt></td><td> </td><td>実行ファイルの解凍 / 圧縮。</td></tr>
+<tr><td><tt>gzip</tt></td><td> </td><td>ファイルの解凍 / 圧縮。</td></tr>
+<tr><td><tt>hd</tt></td><td> </td><td>16 進ダンプ。</td></tr>
+<tr><td><tt>head</tt></td><td> </td><td>ファイルの先頭行を表示。</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>GUI アプリケーションをスクリプトで操作する小さなツール。</td></tr>
+<tr><td><tt>hostname</tt></td><td> </td><td>システムのホスト名を表示または設定。</td></tr>
+<tr><td><tt>id</tt></td><td> </td><td>ユーザーおよびグループ情報を表示。</td></tr>
+<tr><td><tt>ident</tt></td><td> </td><td>ファイル中の RCS キーワードを確認。</td></tr>
+<tr><td><tt>ifconfig</tt></td><td> </td><td>ネットワークインターフェースを構成。</td></tr>
+<tr><td><tt>install</tt></td><td> </td><td>実行中のシステムを中断させることなく、インストール先へファイルをコピー。</td></tr>
+<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>さまざまな無線ネットワークカードのファームウェアをインストール。</td></tr>
+<tr><td><tt>installsound</tt></td><td> </td><td>サウンドプレファレンスパネル内のイベントに新しいサウンドを設定。</td></tr>
+<tr><td><tt>iroster</tt></td><td> </td><td>入力デバイスを一覧表示。</td></tr>
+<tr><td><tt>isvolume</tt></td><td> </td><td>マウントされたボリュームに対する情報を得る。</td></tr>
+<tr><td><tt>join</tt></td><td> </td><td>同じ結合フィールドを持つそれぞれの入力ファイルの組に対して、行を標準出力に書き出す。</td></tr>
 <tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K</h2></a></td></tr>
-<tr><td><tt>kernel_debugger</tt></td><td> </td><td>カーネルデバッガーに入ります。</td></tr>
-<tr><td><tt>keymap</tt></td><td> </td><td>キーマップの読み込みまたは保存を行います。</td></tr>
-<tr><td><tt>kill</tt></td><td> </td><td>シグナルを送信して、プロセスを終了させます。</td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>launch_daemon を制御します。たとえば、サービスの停止と再起動を行います。<a href="cli-apps.html">(Haiku 固有)</a></td></tr>
-<tr><td><tt>less</tt></td><td> </td><td>ファイルを表示します。</td></tr>
-<tr><td><tt>lessecho</tt></td><td> </td><td>引数を表示して、ファイル名中の * や ? のような、メタキャラクタを展開します。</td></tr>
-<tr><td><tt>lesskey</tt></td><td> </td><td>less のキーバインディングを指定します。</td></tr>
-<tr><td><tt>link</tt></td><td> </td><td>ファイルへのリンクを作成します。</td></tr>
+<tr><td><tt>kernel_debugger</tt></td><td> </td><td>カーネルデバッガーに入る。</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>キーマップの読み込み / 保存。</td></tr>
+<tr><td><tt>kill</tt></td><td> </td><td>シグナルを送信して、プロセスを終了させる。</td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>launch_daemon を制御します。たとえば、サービスの停止と再起動をします。<a href="cli-apps.html">(Haiku 特有)</a></td></tr>
+<tr><td><tt>less</tt></td><td> </td><td>ファイルを表示。</td></tr>
+<tr><td><tt>lessecho</tt></td><td> </td><td>引数を表示して、ファイル名中の * や ? のような、メタキャラクタを展開。</td></tr>
+<tr><td><tt>lesskey</tt></td><td> </td><td>less のキーバインディングを指定。</td></tr>
+<tr><td><tt>link</tt></td><td> </td><td>ファイルへのリンクを作成。</td></tr>
 <tr><td><tt>linkcatkeys</tt></td><td> </td><td>[ロケールキットの移動した残り]</td></tr>
-<tr><td><tt>listarea</tt></td><td> </td><td>現在実行中のすべてのチームに対するエリアを一覧表示します。</td></tr>
+<tr><td><tt>listarea</tt></td><td> </td><td>現在実行中のすべてのチームに対するエリアを一覧表示。</td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>ファイルの属性を一覧表示します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>listdev</tt></td><td> </td><td>ハードウェアデバイスを一覧表示します。</td></tr>
-<tr><td><tt>listimage</tt></td><td> </td><td>現在実行中のチームに対するイメージ情報を一覧表示します。</td></tr>
-<tr><td><tt>listport</tt></td><td> </td><td>チームによってまとめられた、システム中のすべての開いているポートを一覧表示します。</td></tr>
-<tr><td><tt>listres</tt></td><td> </td><td>ファイルのリソースを一覧表示します。</td></tr>
-<tr><td><tt>listsem</tt></td><td> </td><td>特定のチームによって割り当てられたセマフォを一覧表示します。</td></tr>
-<tr><td><tt>listusb</tt></td><td> </td><td>USB デバイスを一覧表示します。</td></tr>
-<tr><td><tt>ln</tt></td><td> </td><td>ファイルへのリンクを作成します。</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>優先言語の組、その LC_CTYPE、および優先フォーマットを表示します。</td></tr>
-<tr><td><tt>locate</tt></td><td> </td><td>ファイルを検索します。</td></tr>
-<tr><td><tt>logger</tt></td><td> </td><td>メッセージをシステムログに送信します。</td></tr>
+<tr><td><tt>listdev</tt></td><td> </td><td>ハードウェアデバイスを一覧表示。</td></tr>
+<tr><td><tt>listimage</tt></td><td> </td><td>現在実行中のチームに対するイメージ情報を一覧表示。</td></tr>
+<tr><td><tt>listport</tt></td><td> </td><td>チームによってまとめられた、システム中のすべての開いているポートを一覧表示。</td></tr>
+<tr><td><tt>listres</tt></td><td> </td><td>ファイルのリソースを一覧表示。</td></tr>
+<tr><td><tt>listsem</tt></td><td> </td><td>特定のチームによって割り当てられたセマフォを一覧表示。</td></tr>
+<tr><td><tt>listusb</tt></td><td> </td><td>USB デバイスを一覧表示。</td></tr>
+<tr><td><tt>ln</tt></td><td> </td><td>ファイルへのリンクを作成</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>優先言語の組、その LC_CTYPE と優先フォーマットを表示</td></tr>
+<tr><td><tt>locate</tt></td><td> </td><td>ファイルを検索</td></tr>
+<tr><td><tt>logger</tt></td><td> </td><td>メッセージをシステムログに送信</td></tr>
 <tr><td><tt>login</tt></td><td> </td><td>システム上のセッションを開始します。</td></tr>
 <tr><td><tt>logname</tt></td><td> </td><td>現在のユーザーの名前を表示します。</td></tr>
-<tr><td><tt>ls</tt></td><td> </td><td>ディレクトリの内容を一覧表示します。</td></tr>
-<tr><td><tt>lsindex</tt></td><td> </td><td>現在のボリューム / パーティション上のインデックス付けされた属性を表示します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>mail2mbox</tt></td><td> </td><td>BeOS の e-mail ファイルを、Unix のメールボックスファイルに変換します。</td></tr>
+<tr><td><tt>ls</tt></td><td> </td><td>ディレクトリの内容を一覧表示。</td></tr>
+<tr><td><tt>lsindex</tt></td><td> </td><td>現在のボリューム / パーティション上のインデックス付けされた属性を表示 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>mail2mbox</tt></td><td> </td><td>BeOS の e-mail ファイルを、Unix のメールボックスファイルに変換。</td></tr>
 <tr><td><tt>make</tt></td><td> </td><td>GNU make ユーティリティ</td></tr>
-<tr><td><tt>makebootable</tt></td><td> </td><td>指定した BFS パーティション / デバイスを、最初の 2 セクタにブートコードを書きこむことで起動可能にします。</td></tr>
-<tr><td><tt>mbox2mail</tt></td><td> </td><td>Unix メールボックスファイルを BeOS の e-mail ファイルに変換します。</td></tr>
-<tr><td><tt>md5sum</tt></td><td> </td><td>MD5 チェックサムを表示またはチェックします。</td></tr>
-<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" は、オーディオファイルを再生します。</td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>指定した BFS パーティション / デバイスを、最初の 2 セクタにブートコードを書きこむことで起動可能にする。</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>Unix メールボックスファイルを BeOS の e-mail ファイルに変換。</td></tr>
+<tr><td><tt>md5sum</tt></td><td> </td><td>MD5 チェックサムを表示 / チェック。</td></tr>
+<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" で、オーディオファイルを再生。</td></tr>
 <tr><td><tt>merge</tt></td><td> </td><td>3 方向ファイルマージ。</td></tr>
-<tr><td><tt>message</tt></td><td> </td><td>フラット化した BMessage ファイルを表示します。</td></tr>
-<tr><td><tt>mimeset</tt></td><td> </td><td>ファイルの MIME タイプを設定します。</td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile の依存ファイルを生成します。</td></tr>
-<tr><td><tt>mkdir</tt></td><td> </td><td>ディレクトリを作成します。</td></tr>
-<tr><td><tt>mkdos</tt></td><td> </td><td>FAT パーティションを初期化します。</td></tr>
-<tr><td><tt>mkfifo</tt></td><td> </td><td>名前付きパイプを作成します。</td></tr>
-<tr><td><tt>mkfs</tt></td><td> </td><td>ファイルシステムを作成します。</td></tr>
-<tr><td><tt>mkindex</tt></td><td> </td><td>属性に対する新しいインデックスを作成します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>mktemp</tt></td><td> </td><td>一時ファイルまたは一時ディレクトリを安全に作成します。</td></tr>
-<tr><td><tt>modifiers</tt></td><td> </td><td>現在押されている (または押されていない) モディファイアキーを表示します。</td></tr>
-<tr><td><tt>more</tt></td><td> </td><td><tt>less</tt> を参照ください。</td></tr>
-<tr><td><tt>mount</tt></td><td> </td><td>ファイルシステムをマウントします。</td></tr>
-<tr><td><tt>mount_nfs</tt></td><td> </td><td>NFS パーティションををマウントします。</td></tr>
-<tr><td><tt>mountvolume</tt></td><td> </td><td>ボリュームを名前でマウントします。</td></tr>
-<tr><td><tt>mv</tt></td><td> </td><td>ファイルの移動 / リネームを行います。</td></tr>
+<tr><td><tt>message</tt></td><td> </td><td>フラット化した BMessage ファイルを表示。</td></tr>
+<tr><td><tt>mimeset</tt></td><td> </td><td>ファイルの MIME タイプを設定。</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile の依存ファイルを生成。</td></tr>
+<tr><td><tt>mkdir</tt></td><td> </td><td>ディレクトリを作成。</td></tr>
+<tr><td><tt>mkdos</tt></td><td> </td><td>FAT パーティションを初期化。</td></tr>
+<tr><td><tt>mkfifo</tt></td><td> </td><td>名前付きパイプを作成。</td></tr>
+<tr><td><tt>mkfs</tt></td><td> </td><td>ファイルシステムを作成。</td></tr>
+<tr><td><tt>mkindex</tt></td><td> </td><td>属性に対する新しいインデックスを作成 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>mktemp</tt></td><td> </td><td>一時ファイルまたは一時ディレクトリを安全に作成。</td></tr>
+<tr><td><tt>modifiers</tt></td><td> </td><td>現在押されている (または押されていない) モディファイアキーを表示。</td></tr>
+<tr><td><tt>more</tt></td><td> </td><td><tt>less</tt> を参照。</td></tr>
+<tr><td><tt>mount</tt></td><td> </td><td>ファイルシステムをマウント。</td></tr>
+<tr><td><tt>mount_nfs</tt></td><td> </td><td>NFS パーティションをマウント。</td></tr>
+<tr><td><tt>mountvolume</tt></td><td> </td><td>ボリュームを名前でマウント。</td></tr>
+<tr><td><tt>mv</tt></td><td> </td><td>ファイルの移動 / リネーム。</td></tr>
 <tr><td><tt>nano</tt></td><td> </td><td>ターミナルでのデフォルトテキストエディターで、'Pico' のクローンです。 </td></tr>
 <tr><td><tt>netcat</tt></td><td> </td><td>TCP および UDP ユーティリティ</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>ネットワークコネクション、ルーティングテーブル、インターフェース統計、マスカレードコネクション、およびマルチキャストメンバーシップを表示します。</td></tr>
-<tr><td><tt>nl</tt></td><td> </td><td>それぞれのファイルに行番号を付けて表示します。</td></tr>
-<tr><td><tt>nohup</tt></td><td> </td><td>ハングアップシグナルを無視してコマンドを実行します。</td></tr>
-<tr><td><tt>nproc</tt></td><td> </td><td>利用できるプロセッシングユニットの数を表示します。</td></tr>
-<tr><td><tt>od</tt></td><td> </td><td>ファイルのはっきりとした表現を書き出します。</td></tr>
-<tr><td><tt>open</tt></td><td> </td><td>シェルから、アプリケーション / ドキュメントを起動します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
+<tr><td><tt>nl</tt></td><td> </td><td>それぞれのファイルに行番号を付けて表示。</td></tr>
+<tr><td><tt>nohup</tt></td><td> </td><td>ハングアップシグナルを無視してコマンドを実行。</td></tr>
+<tr><td><tt>nproc</tt></td><td> </td><td>利用できるプロセッシングユニットの数を表示。</td></tr>
+<tr><td><tt>od</tt></td><td> </td><td>ファイルの明確な表現を書き出す。</td></tr>
+<tr><td><tt>open</tt></td><td> </td><td>シェルから、アプリケーション / ドキュメントを起動 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
-<tr><td><tt>package</tt></td><td> </td><td>Haiku パッケージを作成、検査、または解凍します。</td></tr>
-<tr><td><tt>package_repo</tt></td><td> </td><td>Haiku パッケージリポジトリファイルを作成または検査します。</td></tr>
-<tr><td><tt>passwd</tt></td><td> </td><td>ユーザーパスワードを変更します。</td></tr>
-<tr><td><tt>paste</tt></td><td> </td><td>タブによって分離された各ファイルからの連続して一致する行を表示します。</td></tr>
-<tr><td><tt>patch</tt></td><td> </td><td>diff ファイルをオリジナルのファイルに適用します。</td></tr>
-<tr><td><tt>pathchk</tt></td><td> </td><td>無効な、またはポータブルでないファイル名を診断します。</td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Haiku パッケージを作成、検査、または解凍。</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Haiku パッケージリポジトリファイルを作成 / 検査。</td></tr>
+<tr><td><tt>passwd</tt></td><td> </td><td>ユーザーパスワードを変更。</td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>タブによって分離された各ファイルからの連続して一致する行を表示。</td></tr>
+<tr><td><tt>patch</tt></td><td> </td><td>diff ファイルをオリジナルのファイルに適用。</td></tr>
+<tr><td><tt>pathchk</tt></td><td> </td><td>無効な、またはポータブルでないファイル名を診断。</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>プログラマー用電卓</td></tr>
-<tr><td><tt>ping</tt></td><td> </td><td>ICMP エコーリクエストをネットワークホストに送信します。</td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Haiku パッケージを分析および設定します。</td></tr>
-<tr><td><tt>pkgman</tt></td><td> </td><td>パッケージとパッケージリポジトリを管理します。</td></tr>
-<tr><td><tt>play</tt></td><td> </td><td>CD のトラックを再生します。</td></tr>
-<tr><td><tt>pr</tt></td><td> </td><td>印刷のため、ファイルをページ割付または段組みします。</td></tr>
-<tr><td><tt>printenv</tt></td><td> </td><td>環境変数の値を表示します。</td></tr>
-<tr><td><tt>printf</tt></td><td> </td><td>データを書式設定して表示します。</td></tr>
-<tr><td><tt>prio</tt></td><td> </td><td>プロセスの優先度を変更します。</td></tr>
-<tr><td><tt>profile</tt></td><td> </td><td>スレッドを分析します。</td></tr>
-<tr><td><tt>ps</tt></td><td> </td><td>実行中のプロセスを一覧表示します。</td></tr>
-<tr><td><tt>ptx</tt></td><td> </td><td>入力ファイル中の単語の、コンテキストを含む変更されたインデックスを出力します。</td></tr>
-<tr><td><tt>pwd</tt></td><td> </td><td>現在のディレクトリを表示します。</td></tr>
-<tr><td><tt>query</tt></td><td> </td><td>Tracker の "式で検索 (Find by formula)" 機能をエミュレートするシェルユーティリティです <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>quit</tt></td><td> </td><td>アプリケーションを終了します。</td></tr>
-<tr><td><tt>ramdisk</tt></td><td> </td><td>ラムディスクを作成します。 <a href="cli-apps.html">(Haiku 固有)</a></td></tr>
+<tr><td><tt>ping</tt></td><td> </td><td>ICMP エコーリクエストをネットワークホストに送信。</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Haiku パッケージを分析 / 設定。</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>パッケージとパッケージリポジトリを管理。</td></tr>
+<tr><td><tt>play</tt></td><td> </td><td>CD トラックを再生。</td></tr>
+<tr><td><tt>pr</tt></td><td> </td><td>印刷のため、ファイルをページ割付または段組する。</td></tr>
+<tr><td><tt>printenv</tt></td><td> </td><td>環境変数を表示。</td></tr>
+<tr><td><tt>printf</tt></td><td> </td><td>データを書式設定して表示。</td></tr>
+<tr><td><tt>prio</tt></td><td> </td><td>プロセスの優先度を変更。</td></tr>
+<tr><td><tt>profile</tt></td><td> </td><td>スレッドを分析。</td></tr>
+<tr><td><tt>ps</tt></td><td> </td><td>実行中のプロセスを一覧表示。</td></tr>
+<tr><td><tt>ptx</tt></td><td> </td><td>入力ファイル中の単語の、コンテキストを含む変更されたインデックスを出力。</td></tr>
+<tr><td><tt>pwd</tt></td><td> </td><td>カレントディレクトリを表示。</td></tr>
+<tr><td><tt>query</tt></td><td> </td><td>Tracker の "式で検索 (Find by formula)" 機能をエミュレートするシェルユーティリティ <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>quit</tt></td><td> </td><td>アプリケーションを終了。</td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>ラムディスクを作成 <a href="cli-apps.html">(Haiku 特有)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>リソースコンパイラ</td></tr>
-<tr><td><tt>readlink</tt></td><td> </td><td>シンボリックリンクが指すパスを表示します。</td></tr>
-<tr><td><tt>reindex</tt></td><td> </td><td>既存のファイルの属性を、新規に作成したインデックスに入れます <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>release</tt></td><td> </td><td>セマフォを開放します。</td></tr>
-<tr><td><tt>renice</tt></td><td> </td><td>実行中のプロセスの優先度を変更します。</td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>RCS ファイルに関するログメッセージとその他の情報を表示します。</td></tr>
-<tr><td><tt>rm</tt></td><td> </td><td>ファイルおよびディレクトリを削除します。</td></tr>
-<tr><td><tt>rmattr</tt></td><td> </td><td>ファイルから属性を削除します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>rmdir</tt></td><td> </td><td>ディレクトリを削除します。</td></tr>
-<tr><td><tt>rmindex</tt></td><td> </td><td>属性に対するインデックスを削除します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>roster</tt></td><td> </td><td>実行中のチームに関する情報を表示します。</td></tr>
+<tr><td><tt>readlink</tt></td><td> </td><td>シンボリックリンクが指すパスを表示。</td></tr>
+<tr><td><tt>reindex</tt></td><td> </td><td>既存のファイルの属性を、新規に作成したインデックスに入れる <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>release</tt></td><td> </td><td>セマフォを開放。</td></tr>
+<tr><td><tt>renice</tt></td><td> </td><td>実行中プロセスの優先度を変更。</td></tr>
+<tr><td><tt>rlog</tt></td><td> </td><td>RCS ファイルに関するログメッセージとその他の情報を表示。</td></tr>
+<tr><td><tt>rm</tt></td><td> </td><td>ファイルやディレクトリを削除。</td></tr>
+<tr><td><tt>rmattr</tt></td><td> </td><td>ファイルから属性を削除 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>rmdir</tt></td><td> </td><td>ディレクトリを削除。</td></tr>
+<tr><td><tt>rmindex</tt></td><td> </td><td>属性に対するインデックスを削除 <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>roster</tt></td><td> </td><td>実行中チームに関する情報を表示。</td></tr>
 <tr><td><tt>route</tt></td><td> </td><td>ネットワークルートを一覧表示および操作します。</td></tr>
-<tr><td><tt>safemode</tt></td><td> </td><td>システムがセーフモードで実行されているかどうかチェックします。</td></tr>
-<tr><td><tt>screen_blanker</tt></td><td> </td><td>screen blanker を起動します。</td></tr>
-<tr><td><tt>screenmode</tt></td><td> </td><td>スクリーンモードの表示 / 設定を行います。</td></tr>
-<tr><td><tt>sdiff</tt></td><td> </td><td>隣り合ったファイルの違いを表示またはマージします。</td></tr>
-<tr><td><tt>seq</tt></td><td> </td><td>一連の数字を表示します。</td></tr>
-<tr><td><tt>setarch</tt></td><td> </td><td>環境を特定のコンパイラのバージョンに設定します、</td></tr>
-<tr><td><tt>setdecor</tt></td><td> </td><td>ウィンドウデコレーターの表示、および設定を行います。</td></tr>
-<tr><td><tt>settype</tt></td><td> </td><td>ファイルの MIME タイプ、シグネチャー、および優先アプリケーションを設定します。</td></tr>
-<tr><td><tt>setversion</tt></td><td> </td><td>ファイルのバージョンを表示します。</td></tr>
-<tr><td><tt>setvolume</tt></td><td> </td><td>システムサウンドボリュームを設定します。</td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>無線ネットワーク用の WEP 暗号化を提供します。</td></tr>
-<tr><td><tt>sh</tt></td><td> </td><td><tt>bash</tt> を参照ください。</td></tr>
-<tr><td><tt>sha1sum</tt></td><td> </td><td>SHA1 チェックサムの表示とチェックを行います。</td></tr>
-<tr><td><tt>shar</tt></td><td> </td><td>シェルアーカイブを作成します。</td></tr>
-<tr><td><tt>shred</tt></td><td> </td><td>ファイルを繰り返し上書きします。</td></tr>
-<tr><td><tt>shuf</tt></td><td> </td><td>入力行のランダムな置換を表示します。</td></tr>
-<tr><td><tt>shutdown</tt></td><td> </td><td>コンピューターをシャットダウンします。</td></tr>
-<tr><td><tt>sleep</tt></td><td> </td><td>指定された秒数停止します。</td></tr>
-<tr><td><tt>sort</tt></td><td> </td><td>すべてのファイルのソート済みの連結を表示します。</td></tr>
-<tr><td><tt>spamdbm</tt></td><td> </td><td>電子メールをスパムか本物かに分類します。</td></tr>
-<tr><td><tt>split</tt></td><td> </td><td>入力ファイルの、接頭辞を備えた固定サイズの断片を出力します。  </td></tr>
-<tr><td><tt>stat</tt></td><td> </td><td>ファイルまたはファイルシステムの状態を表示します。</td></tr>
-<tr><td><tt>strace</tt></td><td> </td><td>スレッドまたはチームの syscall をトレースします。</td></tr>
-<tr><td><tt>stty</tt></td><td> </td><td>端末の特性を表示 / 設定します。</td></tr>
-<tr><td><tt>su</tt></td><td> </td><td>有効なユーザー id およびグループを変更します。</td></tr>
-<tr><td><tt>sum</tt></td><td> </td><td>それぞれのファイルに対して、チェックサムとブロックカウントを表示します。</td></tr>
-<tr><td><tt>sync</tt></td><td> </td><td>ディスクへのブロック変更を強制し、スーパーブロックを更新します。</td></tr>
-<tr><td><tt>sysinfo</tt></td><td> </td><td>システム情報を表示します。</td></tr>
+<tr><td><tt>safemode</tt></td><td> </td><td>システムがセーフモードで実行されているかどうかチェック。</td></tr>
+<tr><td><tt>screen_blanker</tt></td><td> </td><td>screen blanker を起動。</td></tr>
+<tr><td><tt>screenmode</tt></td><td> </td><td>スクリーンモードの表示 / 設定。</td></tr>
+<tr><td><tt>sdiff</tt></td><td> </td><td>隣り合ったファイルの違いを表示またはマージ。</td></tr>
+<tr><td><tt>seq</tt></td><td> </td><td>一連の数字を表示。</td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>環境を特定のコンパイラのバージョンに設定、</td></tr>
+<tr><td><tt>setdecor</tt></td><td> </td><td>ウィンドウデコレーターの表示 / 設定。</td></tr>
+<tr><td><tt>settype</tt></td><td> </td><td>ファイルの MIME タイプ、シグネチャー、および優先アプリケーションを設定。</td></tr>
+<tr><td><tt>setversion</tt></td><td> </td><td>ファイルのバージョンを表示。</td></tr>
+<tr><td><tt>setvolume</tt></td><td> </td><td>システムサウンドボリュームを設定。</td></tr>
+<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
+<tr><td><tt>sh</tt></td><td> </td><td><tt>bash</tt> を参照。</td></tr>
+<tr><td><tt>sha1sum</tt></td><td> </td><td>SHA1 チェックサムの表示とチェック。</td></tr>
+<tr><td><tt>shar</tt></td><td> </td><td>シェルアーカイブを作成。</td></tr>
+<tr><td><tt>shred</tt></td><td> </td><td>ファイルを繰り返し上書き。</td></tr>
+<tr><td><tt>shuf</tt></td><td> </td><td>入力行のランダムな置換を表示。</td></tr>
+<tr><td><tt>shutdown</tt></td><td> </td><td>コンピューターをシャットダウン。</td></tr>
+<tr><td><tt>sleep</tt></td><td> </td><td>指定された秒数停止。</td></tr>
+<tr><td><tt>sort</tt></td><td> </td><td>すべてのファイルのソート済みの連結を表示。</td></tr>
+<tr><td><tt>spamdbm</tt></td><td> </td><td>電子メールをスパムか本物かに分類。</td></tr>
+<tr><td><tt>split</tt></td><td> </td><td>入力ファイルの、接頭辞を備えた固定サイズの断片を出力。  </td></tr>
+<tr><td><tt>stat</tt></td><td> </td><td>ファイルまたはファイルシステムの状態を表示。</td></tr>
+<tr><td><tt>strace</tt></td><td> </td><td>スレッドまたはチームの syscall をトレース。</td></tr>
+<tr><td><tt>stty</tt></td><td> </td><td>端末の特性を表示 / 設定。</td></tr>
+<tr><td><tt>su</tt></td><td> </td><td>有効なユーザー id およびグループを変更。</td></tr>
+<tr><td><tt>sum</tt></td><td> </td><td>それぞれのファイルに対して、チェックサムとブロックカウントを表示。</td></tr>
+<tr><td><tt>sync</tt></td><td> </td><td>ディスクへのブロック変更を強制し、スーパーブロックを更新。</td></tr>
+<tr><td><tt>sysinfo</tt></td><td> </td><td>システム情報を表示。</td></tr>
 <tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T</h2></a></td></tr>
-<tr><td><tt>tac</tt></td><td> </td><td>最後の行を最初にして、ファイルを連結し表示します。</td></tr>
-<tr><td><tt>tail</tt></td><td> </td><td>ファイルの最後の 10 行を表示します。</td></tr>
-<tr><td><tt>tcpdump</tt></td><td> </td><td>ネットワークトラフィックをダンプします。</td></tr>
-<tr><td><tt>tcptester</tt></td><td> </td><td>[このコマンドは廃止予定です] </td></tr>
-<tr><td><tt>tee</tt></td><td> </td><td>標準入力からファイルへデータを書き込みまたは追加します。</td></tr>
-<tr><td><tt>telnet</tt></td><td> </td><td>Telnet プロトコルのユーザーインターフェースです。 </td></tr>
+<tr><td><tt>tac</tt></td><td> </td><td>行を逆順にして、ファイルを連結し表示。</td></tr>
+<tr><td><tt>tail</tt></td><td> </td><td>ファイルの末尾 10 行を表示。</td></tr>
+<tr><td><tt>tcpdump</tt></td><td> </td><td>ネットワークトラフィックをダンプ。</td></tr>
+<tr><td><tt>tcptester</tt></td><td> </td><td>[廃止予定] </td></tr>
+<tr><td><tt>tee</tt></td><td> </td><td>標準入力からファイルへデータを書き込みまたは追加。</td></tr>
+<tr><td><tt>telnet</tt></td><td> </td><td>Telnet プロトコルのユーザーインターフェース。 </td></tr>
 <tr><td><tt>telnetd</tt></td><td> </td><td>Telnet デーモン</td></tr>
-<tr><td><tt>test</tt></td><td> </td><td>要素を比較して、真 / 偽を返します。</td></tr>
-<tr><td><tt>timeout</tt></td><td> </td><td>コマンドを開始し、それが指定された秒数後にまだ動いていれば強制終了します。</td></tr>
-<tr><td><tt>top</tt></td><td> </td><td>実行中のスレッドおよび CPU 使用率を表示します。</td></tr>
-<tr><td><tt>touch</tt></td><td> </td><td>ファイルのタイムスタンプを変更します。</td></tr>
-<tr><td><tt>tput</tt></td><td> </td><td>端末の初期化つまり、terminfo データベースへの問い合わせを行います。</td></tr>
-<tr><td><tt>tr</tt></td><td> </td><td>標準入力から文字を翻訳し、強制し、かつ / または削除します。  </td></tr>
-<tr><td><tt>traceroute</tt></td><td> </td><td>ネットワークを通るルートパケットショットを表示します。</td></tr>
-<tr><td><tt>translate</tt></td><td> </td><td>DataTranslators を使って、ファイルフォーマットを変換します。</td></tr>
-<tr><td><tt>trash</tt></td><td> </td><td>ファイルをごみ箱に送るか、ごみ箱から元に戻します。</td></tr>
-<tr><td><tt>true</tt></td><td> </td><td>何もしません。"成功 (success)" を示し、値 "0" を返します。</td></tr>
+<tr><td><tt>test</tt></td><td> </td><td>要素を比較して、真 / 偽を返す。</td></tr>
+<tr><td><tt>timeout</tt></td><td> </td><td>コマンドを開始し、それが指定された秒数後にまだ動いていれば強制終了する。</td></tr>
+<tr><td><tt>top</tt></td><td> </td><td>実行中のスレッドおよび CPU 使用率を表示。</td></tr>
+<tr><td><tt>touch</tt></td><td> </td><td>ファイルのタイムスタンプを変更。</td></tr>
+<tr><td><tt>tput</tt></td><td> </td><td>端末の初期化つまり、terminfo データベースへの問い合わせを行う。</td></tr>
+<tr><td><tt>tr</tt></td><td> </td><td>標準入力から文字を翻訳、圧縮、削除する。  </td></tr>
+<tr><td><tt>traceroute</tt></td><td> </td><td>ネットワークを通るルートパケットを表示。</td></tr>
+<tr><td><tt>translate</tt></td><td> </td><td>DataTranslators を使って、ファイルフォーマットを変換。</td></tr>
+<tr><td><tt>trash</tt></td><td> </td><td>ファイルをごみ箱に送るか、ごみ箱から元に戻す。</td></tr>
+<tr><td><tt>true</tt></td><td> </td><td>何もしません。"成功 (success)" を示し、値 "0" を返す。</td></tr>
 <tr><td><tt>truncate</tt></td><td> </td><td>ファイルのサイズを縮めるか、あるいは拡張します。</td></tr>
-<tr><td><tt>tsort</tt></td><td> </td><td>トポロジカルソートを行います。</td></tr>
-<tr><td><tt>tty</tt></td><td> </td><td>標準入力に接続した端末のファイル名を表示します。</td></tr>
-<tr><td><tt>uname</tt></td><td> </td><td>システム情報を表示します。</td></tr>
-<tr><td><tt>unchop</tt></td><td> </td><td>先に <tt>chop</tt> によって分割されたファイルを再作成します。</td></tr>
-<tr><td><tt>unexpand</tt></td><td> </td><td>スペースをタブに変換します。</td></tr>
-<tr><td><tt>uniq</tt></td><td> </td><td>出力の隣接した位置する行をフィルタリングして、出力に書き出します。</td></tr>
-<tr><td><tt>unlink</tt></td><td> </td><td>指定のファイルを削除するために、unlink 関数を呼びます。  </td></tr>
-<tr><td><tt>unmount</tt></td><td> </td><td>ボリュームをマウント解除します。</td></tr>
-<tr><td><tt>unrar</tt></td><td> </td><td>rar アーカイブを解凍します。</td></tr>
-<tr><td><tt>unshar</tt></td><td> </td><td>shar アーカイブを解凍します。</td></tr>
-<tr><td><tt>untrash</tt></td><td> </td><td><tt>trash</tt> を参照ください。</td></tr>
-<tr><td><tt>unzip</tt></td><td> </td><td>zip アーカイブを解凍します。</td></tr>
-<tr><td><tt>unzipsfx</tt></td><td> </td><td>既存の zip アーカイブを自己解凍にするために使用されます。  </td></tr>
-<tr><td><tt>updatedb</tt></td><td> </td><td>ローカライズデータベースを更新します。</td></tr>
-<tr><td><tt>uptime</tt></td><td> </td><td>システムが開始してからの日付と時間、および経過時間を表示します。 </td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>それらを直接扱わないコマンドラインあるいはほかのアプリケーションを URL MIME 形式で包みます。  </td></tr>
-<tr><td><tt>useradd</tt></td><td> </td><td>新規ユーザーを作成します。</td></tr>
-<tr><td><tt>uudecode</tt></td><td> </td><td>uuencode されたファイルをデコードします。</td></tr>
-<tr><td><tt>uuencode</tt></td><td> </td><td>離れたシステムにファイルをメールで送れるように、uuencode します。</td></tr>
-<tr><td><tt>vdir</tt></td><td> </td><td>ファイルに関する情報を一覧表示します。</td></tr>
-<tr><td><tt>version</tt></td><td> </td><td>ファイルのバージョンを返します。</td></tr>
-<tr><td><tt>vmstat</tt></td><td> </td><td>仮想メモリシステムに関する情報を表示します。</td></tr>
-<tr><td><tt>waitfor</tt></td><td> </td><td>特定のスレッドが現れるまで待ちます <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
-<tr><td><tt>watch</tt></td><td> </td><td>プログラムを一定期間ごとに実行します。</td></tr>
-<tr><td><tt>wc</tt></td><td> </td><td>ファイルの段落、単語、および文字 (バイト) の数を表示します。</td></tr>
-<tr><td><tt>wget</tt></td><td> </td><td>HTTP、HTTPS、または FTP を経由してファイルをダウンロードするツールです。</td></tr>
-<tr><td><tt>which</tt></td><td> </td><td>コマンドを探します。</td></tr>
-<tr><td><tt>whoami</tt></td><td> </td><td>現在の有効なユーザー ID と関係のあるユーザー名を表示します。</td></tr>
-<tr><td><tt>xargs</tt></td><td> </td><td>標準入力からコマンドラインを構築し実行します。</td></tr>
-<tr><td><tt>xres</tt></td><td> </td><td>リソースの表示と操作を行います。</td></tr>
-<tr><td><tt>yes</tt></td><td> </td><td>強制終了されるまで文字列を繰り返し表示します。</td></tr>
-<tr><td><tt>zcat</tt></td><td> </td><td><tt>gzip</tt> を参照ください。</td></tr>
-<tr><td><tt>zcmp</tt></td><td> </td><td><tt>zdiff</tt> を参照ください。</td></tr>
-<tr><td><tt>zdiff</tt></td><td> </td><td>圧縮済ファイルを比較します。</td></tr>
-<tr><td><tt>zforce</tt></td><td> </td><td>gzip ファイルに、'.gz' 拡張子を強制します。</td></tr>
-<tr><td><tt>zgrep</tt></td><td> </td><td>おそらく圧縮されたファイルを正規表現スキャンします。 </td></tr>
-<tr><td><tt>zip</tt></td><td> </td><td>Zip アーカイブ中のアイテムを追加または置き換えます。</td></tr>
-<tr><td><tt>zipcloak</tt></td><td> </td><td>zip アーカイブ中の暗号化されていないファイルをすべて暗号化します。</td></tr>
-<tr><td><tt>zipgrep</tt></td><td> </td><td>指定の zip アイテムを、文字列かパターンでスキャンします。  </td></tr>
-<tr><td><tt>zipinfo</tt></td><td> </td><td><tt>unzip</tt> を参照ください。</td></tr>
-<tr><td><tt>zipnote</tt></td><td> </td><td>Zip アーカイブ中のコメントを表示します。</td></tr>
-<tr><td><tt>zipsplit</tt></td><td> </td><td>Zip アーカイブを小さく分割します。</td></tr>
-<tr><td><tt>zmore</tt></td><td> </td><td><tt>more</tt> に似ていますが、任意の圧縮ファイルの圧縮されていない内容上で動作します。</td></tr>
-<tr><td><tt>znew</tt></td><td> </td><td>.Z ファイルを、.gz (gzip) アーカイブに再圧縮します。</td></tr>
+<tr><td><tt>tsort</tt></td><td> </td><td>トポロジカルソートを行う。</td></tr>
+<tr><td><tt>tty</tt></td><td> </td><td>標準入力に接続した端末のファイル名を表示。</td></tr>
+<tr><td><tt>uname</tt></td><td> </td><td>システム情報を表示。</td></tr>
+<tr><td><tt>unchop</tt></td><td> </td><td>先に <tt>chop</tt> によって分割されたファイルを再作成。</td></tr>
+<tr><td><tt>unexpand</tt></td><td> </td><td>スペースをタブに変換。</td></tr>
+<tr><td><tt>uniq</tt></td><td> </td><td>出力の隣接した位置する行をフィルタリングして、出力に書き出す。</td></tr>
+<tr><td><tt>unlink</tt></td><td> </td><td>unlink 関数を呼んで、指定のファイルを削除。  </td></tr>
+<tr><td><tt>unmount</tt></td><td> </td><td>ボリュームをマウント解除。</td></tr>
+<tr><td><tt>unrar</tt></td><td> </td><td>rar アーカイブを解凍。</td></tr>
+<tr><td><tt>unshar</tt></td><td> </td><td>shar アーカイブを解凍。</td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td><tt>trash</tt> を参照。</td></tr>
+<tr><td><tt>unzip</tt></td><td> </td><td>zip アーカイブを解凍。</td></tr>
+<tr><td><tt>unzipsfx</tt></td><td> </td><td>既存の zip アーカイブを自己解凍にするために使用する。  </td></tr>
+<tr><td><tt>updatedb</tt></td><td> </td><td>ローカライズデータベースを更新。</td></tr>
+<tr><td><tt>uptime</tt></td><td> </td><td>システムが開始してからの日付と時間、および経過時間を表示。 </td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>それらを直接扱わないコマンドラインあるいはほかのアプリケーションを URL MIME 形式で包む。  </td></tr>
+<tr><td><tt>useradd</tt></td><td> </td><td>新規ユーザーを作成。</td></tr>
+<tr><td><tt>uudecode</tt></td><td> </td><td>uuencode されたファイルをデコード。</td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>離れたシステムにファイルをメールで送れるように、uuencode する。</td></tr>
+<tr><td><tt>vdir</tt></td><td> </td><td>ファイルに関する情報を一覧表示。</td></tr>
+<tr><td><tt>version</tt></td><td> </td><td>ファイルのバージョンを返す。</td></tr>
+<tr><td><tt>vmstat</tt></td><td> </td><td>仮想メモリシステムに関する情報を表示。</td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>特定のスレッドが現れるまで待つ <a href="cli-apps.html">(Haiku 特有)</a>。</td></tr>
+<tr><td><tt>watch</tt></td><td> </td><td>プログラムを一定期間ごとに実行。</td></tr>
+<tr><td><tt>wc</tt></td><td> </td><td>ファイルの段落、単語、および文字 (バイト) の数を表示。</td></tr>
+<tr><td><tt>wget</tt></td><td> </td><td>HTTP、HTTPS、または FTP を経由してファイルをダウンロードするツール。</td></tr>
+<tr><td><tt>which</tt></td><td> </td><td>コマンドを探す。</td></tr>
+<tr><td><tt>whoami</tt></td><td> </td><td>現在の有効なユーザー ID と関係のあるユーザー名を表示。</td></tr>
+<tr><td><tt>xargs</tt></td><td> </td><td>標準入力からコマンドラインを構築し実行。</td></tr>
+<tr><td><tt>xres</tt></td><td> </td><td>リソースの一覧表示と操作。</td></tr>
+<tr><td><tt>yes</tt></td><td> </td><td>強制終了されるまで文字列を繰り返し表示。</td></tr>
+<tr><td><tt>zcat</tt></td><td> </td><td><tt>gzip</tt> を参照。</td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td><tt>zdiff</tt> を参照
+。</td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>圧縮済ファイルを比較
+。</td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>gzip ファイルに、'.gz' 拡張子を強制
+。</td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>おそらく圧縮されたファイルを正規表現スキャン
+。 </td></tr>
+<tr><td><tt>zip</tt></td><td> </td><td>Zip アーカイブ中のアイテムを追加または置き換え。</td></tr>
+<tr><td><tt>zipcloak</tt></td><td> </td><td>zip アーカイブ中の暗号化されていないファイルをすべて暗号化。</td></tr>
+<tr><td><tt>zipgrep</tt></td><td> </td><td>指定の zip アイテムを、文字列かパターンでスキャン。  </td></tr>
+<tr><td><tt>zipinfo</tt></td><td> </td><td><tt>unzip</tt> を参照。</td></tr>
+<tr><td><tt>zipnote</tt></td><td> </td><td>Zip アーカイブ中のコメントを表示。</td></tr>
+<tr><td><tt>zipsplit</tt></td><td> </td><td>Zip アーカイブを小さく分割。</td></tr>
+<tr><td><tt>zmore</tt></td><td> </td><td><tt>more</tt> に似ているが、任意の圧縮ファイルの圧縮されていない内容上で動作する。</td></tr>
+<tr><td><tt>znew</tt></td><td> </td><td>.Z ファイルを、.gz (gzip) アーカイブに再圧縮。</td></tr>
 </table>
 </div>
 </div>

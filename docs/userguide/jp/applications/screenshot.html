@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		thebowseat
  *		log-1
  *		mt
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -74,15 +74,15 @@
 <p>その下に名前、フォーマットの設定と、<span class="button">保存 (Save)</span> をクリックしたときの保存場所を指定します。ファイルをディスクに保存せず、<span class="button">クリップボードにコピー (Copy to clipboard)</span> してほかのアプリケーションに直接貼り付けるか、<span class="button">新しいスクリーンショット (New screenshot)</span> を撮ることもできます。</p>
 <p>設定はすべて記憶されるので、次にスクリーンショットを撮る時に以下の便利なキーボードショートカットを使えます。</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>すぐにスクリーンショットを撮り、スクリーンショットパネルを開きます。</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、(パネルを開かずに) スクリーンショットを撮影します。</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮影しますが、それをファイルとして保存する代わりに、クリップボードにコピーします。</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>すぐにスクリーンショットを撮り、スクリーンショットパネルを開く。</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>最後に用いた設定を引き継いで、(パネルを開かずに) スクリーンショットを撮影。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>同様に保存された設定で静かにスクリーンショットを撮影するが、それをファイルとして保存する代わりに、クリップボードにコピーする。</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 ターミナルからスクリーンショットを撮る</h2>
 <p>ターミナルやスクリプトから使うための特別な <span class="cli">screenshot</span> アプリケーションがあります。<br />
-<span class="cli">screenshot --help</span> は便利なオプションをパラメータとして表示します。</p>
+<span class="cli">screenshot --help</span> は便利なオプションをパラメーターとして表示します。</p>
 
 <pre class="terminal">~&gt; screenshot --help
 
@@ -92,15 +92,15 @@ FILE は、silent mode のときに使われる保存場所 / ファイル名で
 FILE が指定されてない場合、スクリーンショットはユーザーのホームディレクトリにデフォルトの名前で保存されます。
 
 オプション
-  -m, --mouse-pointer   マウスポインタを含める
+  -m, --mouse-pointer   マウスポインターを含める
   -b, --border          ウィンドウ境界を含める
   -w, --window          アクティブなウィンドウのみを撮る
   -d, --delay=seconds   指定された延長時間の後スクリーンショットを撮ります [秒]
-  -s, --silent          アプリケーションウィンドウを表示せずにスクリーンショットを保存します
+  -s, --silent          アプリケーションウィンドウを表示することなくスクリーンショットを保存します
   -f, --format=image    フォーマットを指定します：[bmp], [gif], [jpg], [png], [ppm], [tga], [tif]
-  -c, --clipboard       スクリーンショットをアプリケーションウィンドウを表示せずにシステムクリップボードに保存します。
+  -c, --clipboard       スクリーンショットをアプリケーションウィンドウを表示することなくシステムクリップボードに保存します。
 
-注：オプション -b, --border は -w, --window と一緒に使ったときのみ有効です。</pre>
+注：オプション -b, --border は -w, --window と共に使用したときのみ有効です。</pre>
 
 </div>
 </div>

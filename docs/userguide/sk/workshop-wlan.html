@@ -75,7 +75,7 @@
 <h1>Workshop: Bezdrôtová sieť</h1>
 
 <p>Rozchodenie bezdrôtovej siete je nevyhnutné v dnešnej dobe neustáleho sieťového pripojenia. Pretože udržiavanie aktuálnej podpory rozličného a neustále sa meniaceho hardvéru a ovládačov je pre malý projekt celkom nemožné, Haiku sa pri implementácii sieťových ovládačov spolieha na vrstvu kompatibility <a href="http://www.freebsd.org">FreeBSD</a>.<br />
-Tá nám zabezpečuje obrovské množstvo podporovaného hardvéru, hoci zrejme nie 100% všetkých, ktoré existujú. Pozrite si online <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">zoznam podporovaných modelov</a> alebo sa pozrite do <a href="http://www.freebsd.org/releases/9.3R/hardware.html#WLAN">Poznámok o hardvéri FreeBSD 9.3</a>.</p>
+Tá nám zabezpečuje obrovské množstvo podporovaného hardvéru, hoci zrejme nie 100% všetkých, ktoré existujú. Pozrite si online <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">zoznam podporovaných modelov</a> alebo sa pozrite do <a href="http://www.freebsd.org/releases/11.1R/hardware.html#WLAN">Poznámok o hardvéri FreeBSD 11.1</a>.</p>
 <div class="box-info">Momentálne sa očakáva, že budú fungovať iba zariadenia PCI, PCI-X, PCI-Express, Mini PCI a Mini PCI-Express.<br />
 Zariadenia PCMCIA, CardBus, ExpressCard, USB a ISA ešte vyžadujú ďalšiu prácu, než budú funkčné.</div>
 
@@ -92,38 +92,38 @@ Zariadenia PCMCIA, CardBus, ExpressCard, USB a ISA ešte vyžadujú ďalšiu pr�
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="gui" name="gui">Ako sa pripojiť k bezdrôtovej sieti</a></h2>
-<p>By default, Haiku will join the first unencrypted wireless network it finds after booting up. To connect to a specific network, you use the Desktop applet <a href="desktop-applets/networkstatus.html">NetworkStatus</a>.</p>
-<p>Right-click on its icon in the Deskbar and choose the network's public name (which is the "SSID" it broadcasts) from the context menu.</p>
+<p>Haiku sa štadardne pripojí k prvej nešifrovanej sieti, ktorú po spustení nájde. Ak sa chcete pripojiť ku konkrétnej sieti, použite v Paneli aplet <a href="desktop-applets/networkstatus.html">Stav siete</a>.</p>
+<p>Kliknite na jeho ikonu na Paneli pravým tlačidlom a zvoľte z kontextového menu verejné meno siete (SSID, ktoré vysiela).</p>
 <img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
-<p>A window opens where you enter the type of authentication (probably WPA/WPA2, WEP is not a secure encryption anymore!) and the password for that wireless network. Click <span class="button">OK</span> to start the login process.<br /> Depending on your hardware and network configuration this may take a while. You'll be kept informed of the progress by notifications:</p>
+<p>Otvorí sa okno, kde napíšete typ overenia totožnosti  (pravdepodobne WPA/WPA2; WEP u6 nie je bezpečné šifrovanie!) a heslo danej bezdrôtovej siete. Kliknutím na <span class="button">OK</span> spustíte prihlasovanie.<br /> V závislosti od vášho hardvéru a nastavenia siete to môže chvíľu trvať. O priebehu vás budú informovať oznámenia:</p>
 <img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
-<p>Once it reads "Ready" and the NetworkStatus icon in the Deskbar shows a green round light, the connection is established. If the notifications end in "No link" and a yellow triangle, something went wrong, probably an incorrect password.</p>
+<p>Keď sa zobrazí „Pripravené“ a ikona Stavu siete v Paneli zobrazí zelené okrúhle svetielko, spojenie je nadviazané. Ak oznámenie hlási „Bez spojenia“ so žltým trojuholníkom, niečo nie je v poriadku - zrejme nesprávne heslo.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="commandline" name="commandline">Ako sa pripojiť z príkazového riadka</a></h2>
-<p>If you prefer to use the command line or would like to use scripting or the <span class="path">~/config/settings/boot/UserBootscript</span> to automate things to join a specific network on bootup, there's the command <tt>ifconfig</tt>.</p>
-<p>Start a Terminal and enter the first line to scan for available wireless networks:</p>
+<p>Ak radšej používate príkazový riadok alebo by ste chceli napísať skript alebo <span class="path">~/config/settings/boot/UserBootscript</span> na automatizáciu pripojenia ku konkrétnej sieti pri štarte, môžete použiť príkaz <tt>ifconfig</tt>.</p>
+<p>Spustite Terminál a zadajte prvý riadok, ktorý spustí vyhľadávanie dostupných bezdrôtových sietí:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
 name                             address              signal  auth
 haiku-top                        01:d0:19:a6:88:42        30  WPA
 ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
-<p>The path to your wireless network adapter has to be adjusted, of course.<br />
-The output shows the public name (SSID), MAC address, signal strength and authentication method of all found networks.</p>
-<p>To join a network, use this line and insert the respective public name (SSID) and password:</p>
+<p>Samozrejme musíte upraviť cestu k vášmu bezdrôtovému adaptéru.<br />
+Výstup zobrazuje verejné meno (SSID), MAC adresu, silu signálu a spôsob overenia totožnosti pri všetkých nájdených sieťach.</p>
+<p>K sieti sa pripojíte týmto riadkom, kam doplňte zodpovedajúci verejný názov (SSID) a heslo:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 join {SSID} {heslo}</pre>
-<p>Make sure the initial configuration of the wireless network adapter after booting up has finished, before issuing <tt>ifconfig</tt> commands or they might be ignored. Depending on your hardware and network configuration that may take a while. Watch those notifications...</p>
+<p>Ubezpečte sa, že prvotné nastavenie bezdrôtového adaptéra po štarte bolo dokončené predtým, než spustíte príkazy <tt>ifconfig</tt>, inak by nemuseli uspieť. V závislosti od vášho hardvéru a nastavenia siete to môže chvíľu trvať. Sledujte oznámenia.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Tipy</a></h2>
-<h3>Offline download of binary firmware files</h3>
+<h3>Offline stiahnutie binárnych súborov s firmvérom</h3>
 <p>If you cannot obtain the binary firmware files via the <tt>install-wifi-firmwares.sh</tt> script (for example due to lack of internet connection within Haiku), you can also download <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">this shell script</a>, and run it from another OS that has <tt>wget</tt> and <tt>zip</tt> installed.<br />
 Windows users need to have <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">wget</a> and <a href="http://gnuwin32.sourceforge.net/packages/zip.htm">zip</a> for Windows installed in their default locations and use <a href="https://www.haiku-os.org/files/download-data-for-wlan-firmwares.bat">this batch script</a>.<br />
 The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Review the licenses and accept them to install all of the now available firmware files.</p>
-<h3>Avoiding connection loss</h3>
+<h3>Predchádzanie strate spojenia</h3>
 <p>Haiku's drivers for some WLAN chipsets like the iprowifi4965 are prone to lose connection when using WPA encryption. If you're affected by that, try to disable the "HT mode" (high throughput, 802.11n) before connecting to a network:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
 <p>If that fixes the problem, put the line into <span class="path">~/config/settings/boot/UserBootscript</span> to have it applied automatically every boot-up.</p>

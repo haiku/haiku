@@ -12,9 +12,9 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		tiagoms
- *		Adriano Duarte
  *		Humdinger
+ *		Adriano Duarte
+ *		tiagoms
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -91,7 +91,7 @@ Após constatar que é um erro original, torne sua informação a mais acurada p
 <ul>
 	<li><p>Tente reproduzir o problema na versão atual do Haiku. Imagens pré-compiladas para o propósito de testes estão <a href="http://haiku-files.org/">disponíveis</a>.</p></li>
 	<li><p>Inclua informação básica sobre como está testando o Haiku (em equipamento real, no VMWare, no QEMU, etc.).</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
+	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>Descreva o problema que está experimentando. Tente ser o mais acurado possível: descreva o comportamento atual e o comportamento que deseja.</p></li>
 	<li><p>Descreva que passos precisa realizar a fim de expor o erro. Isto ajudará os desenvolvedores a reproduzir o erro.</p></li>
 	<li><p>Anexe toda a informação que tiver. Se é um erro de interface gráfica, ou um erro em um dos aplicativos, tente obter uma imagem da tela pressionando a tecla <span class="key">PRINT</span>.</p></li>
@@ -99,13 +99,13 @@ Após constatar que é um erro original, torne sua informação a mais acurada p
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Erros de Aplicativo</a></h2>
-<p>Quando um aplicativo trava, deve-se executar o depurador a partir do alerta que aparece na tela. Isto abrirá uma janela do Terminal com o gdb (o depurador GNU) rodando nele. Executando <span class="cli">bt</span>, cria-se um "rastro" que deverá ser copiado inteiramente (incluindo a parte antes de executar o comando <span class="cli">bt</span>) e anexado ao tíquete.</p>
+<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/pt_BR/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Erros de servidor</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
 Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Erros do Kernel</a></h2>
@@ -121,11 +121,11 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Terra da Depuração do Kernel  - KDL</a></h3>
-<p>Se o sistema não entrar no KDL por si mesmo, pode-se fazê-lo intencionalmente invocando através do atalho de teclado <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
-Observe que no KDL seu teclado pode não funcionar. Teclados PS/2 sempre funcionam, teclados USB conectados via controladores UHCI apenas se alguém entrou no KDL via atalho de teclado ao menos uma vez. USB OHCI não é suportado no momento.</p>
+<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being the <span class="key">Print</span> key, normally).<br />
+Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>O KDL propriamente é uma espécie de shell. Alguém pode executar comandos que exibem informação sobre o sistema. Os seguintes comandos podem ser de interesse:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (conhecido como sc)</td><td> </td><td>Exibe um rastro. Se o sistema entrar no KDL por sua própria vontade, sempre o execute.</td></tr>
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>Exibe um rastro. Se o sistema entrar no KDL por sua própria vontade, sempre o execute.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Mostra as interrupções de dispositivos tratadas e não tratadas.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (conhecido como continue)</td><td> </td><td>Sai do depurador do kernel e continua a operação normal do sistema, se for possível.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Reinicia o sistema imediatamente. Perder-se-á todos os dados não salvos e até mesmo aqueles que tenham sido salvos, mas que não tenham sido gravados no disco.</td></tr>
@@ -136,8 +136,8 @@ Observe que no KDL seu teclado pode não funcionar. Teclados PS/2 sempre funcion
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Relatório de sistema</a></h3>
-<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
-The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/system/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
+<p><b>Este é o método preferido para obter informação de um sistema que não inicializa.</b><br />
+O relatório do sistema contém informação valiosa sobre o que aconteceu no seu sistema, incluindo a saída das sessões da KDL. É geralmente uma boa ideia anexá-lo ao tíquete do Trac relacionado ao kernel. O relatório do sistema é gravado no arquivo <span class="path">/boot/common/var/log/syslog</span>. Uma vez que gravar um arquivo requer um sistema funcional, a saída mais recente deve não ter sido feita ao relatório de sistema quando um problema de kernel ocorre (particularmente em reinicializações espontâneas ou sessões descontinuadas da KDL).</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
 If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
 In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>
@@ -156,10 +156,10 @@ Uma ou mais páginas de texto serão exibidas na tela, apenas as últimas poucas
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td>Uma lista detalhada do seu dispositivo, incluindo fornecedor e id's pci, similar ao  <span class="cli">lshw</span> e <span class="cli">lspci</span> do Linux.</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Supondo que seja um problema relacionado a USB, é similar ao <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>O relatório primário de sistema utilizado pelo Haiku, parecido com a depuração na tela durante a inicialização. Com o comando <span class="cli">open</span> pode-se cortar a parte relevante do relatório de sistema em um editor de texto.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Lista todos os drivers utilizados.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Apenas disponível na <i>Terra da Deupração do Kernel</i> (ver acima). Exibe a utilização das interrupções. There shouldn't be too many that are shared by different devices.</td></tr>
-<tr><td colspan="3">- Saída de depuração na tela (Uma opção de  modo de segurança em tempo de inicialização).</td></tr>
+<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>
 
 <p>Os primeiros quatro comandos são executados no Terminal. Adicione um <span class="cli"> &gt; output.txt</span> após um comando e ele será direcionado para um arquivo de texto chamado "output.txt" que pode ser anexado a seu relatório de erro ou mensagem de correio eletrônico.</p>

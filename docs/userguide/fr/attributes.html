@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Vincent Duvert
- *		Loïc
  *		Humdinger
+ *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Types de fichiers</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>
@@ -91,7 +91,7 @@ Vous pouvez mettre en place un ordre de tri secondaire en pressant la touche <sp
 <p><span class="cli">listattr</span> liste les attributs d'un fichier, mais n'affiche pas le contenu desdits attributs.</p>
 <pre>usage: listattr 'nom_de_fichier' ['nom_de_fichier2' ...]</pre>
 <p>En l'appelant sur un des fichiers de l'exemple précédent, voici le résultat :</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -120,7 +120,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> indique le type du fichier, sous forme de type <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, ici "<tt>application/x-person</tt>". Il permet de déterminer l'icône du fichier et l'application utilisée pour l'ouvrir quand vous double-cliquez dessus.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" est utilisé par le Tracker pour mémoriser la position de l'icône du fichier.</p></li></ul>
-<div class="box-info">Notez l'antislash après "Clara". Dans le Terminal, vous devez "échapper" certains caractères spéciaux comme <tt>'"*\$?!</tt>. L'espace entre  "Clara" et "Botters" est aussi un caractère spécial. On place donc un antislash devant celui-ci pour qu'il se comporte comme un caractère normal.</div>
+<div class="box-info">Notez l'antislash après "Clara". Dans le Terminal, vous devez "échapper" certains caractères spéciaux comme <tt>'"*\\$?!</tt>. L'espace entre  "Clara" et "Botters" est aussi un caractère spécial. On place donc un antislash devant celui-ci pour qu'il se comporte comme un caractère normal.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -128,7 +128,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> affiche le contenu d'un attribut spécifique d'un fichier.</p>
 <pre>usage: catattr [--raw|-r] nom_attribut fichier1 [fichier2...]</pre>
 <p>Encore une fois, avec notre exemple :</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -143,7 +143,7 @@ Clara Botters : string : Whelton</pre>
                  ou une valeur numérique (ie. 0x1234, 42, 'ABCD', ...)
          Le type par défaut est "string"</pre>
 <p>Donc si par exemple Clara vient de commencer à travailler pour la multinationale Barkelbaer Inc., vous pourrez remplir le champ "Company" qui était vide avec cette information (qui est de type "string", chaîne de caractères)  :</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -154,7 +154,7 @@ Clara Botters : string : Whelton</pre>
          'attribut' est le nom d'un attribut du fichier.
          Si '-p' est spécifié, 'attribut' est considéré comme un motif de recherche.</pre>
 <p>Même s'il serait suffiant de ne pas remplir l'attribut "Fax", vous pouvez le supprimer complètement du fichier de Clara en tapant :</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -173,7 +173,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Types de fichiers</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Sommaire</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>

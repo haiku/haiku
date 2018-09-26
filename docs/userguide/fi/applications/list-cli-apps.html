@@ -11,7 +11,7 @@
  *		Daniel Marth
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -58,13 +58,14 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Kaikkien komentorivisovellusten luettelo</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Sijainti:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Kaikki Haikun mukana tulevat komentoriviohjelmat sijaitsevat joko hakemistossa <span class="path">/boot/system/bin</span>. Omat tai muut lisäämäsi komentoriviohjelmat pitäisi sijoittaa hakemistoon <span class="path">~/config/bin</span>, kun asennus tapahtuu .hpkg-pakkauksesta. Muussa tapauksessa laitat ne hakemistoon <span class="path">~/config/non-packaged/bin/</span>. Kaikki nämä sijainnit ovat osa PATH-ympäristömuuttujaa ja löytyvät siksi automaattisesti.<br />
+<p>Kaikki Haikun mukana tulevat komentoriviohjelmat sijaitsevat hakemistossa <span class="path">/boot/system/bin</span>. Omat tai muut lisäämäsi komentoriviohjelmat pitäisi sijoittaa hakemistoon <span class="path">~/config/bin</span>, kun asennus tapahtuu .hpkg-pakkauksesta. Muussa tapauksessa voit laittaa ne hakemistoon <span class="path">~/config/non-packaged/bin/</span>. Kaikki nämä sijainnit ovat osa PATH-ympäristömuuttujaa ja löytyvät siksi automaattisesti.<br />
 Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen kohdalla on vain lyhyt kuvaus siitä, mitä ne tekevät, yksityiskohtaisempia tietoja ohjelman käytöstä saa komentoriviparametrilla <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Indeksi:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
@@ -121,7 +122,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>diff3</tt></td><td> </td><td>Vertailee kolmea tiedostoa rivi riviltä.</td></tr>
 <tr><td><tt>dircolors</tt></td><td> </td><td>Väriasetukset komennolle <tt>ls</tt>. </td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Riisuu tiedostonimen /polku/tiedostonimi -merkkijonosta.</td></tr>
-<tr><td><tt>draggers</tt></td><td> </td><td>Näyttää/asettaa Replikaattien dragger-tilan.</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>Näyttää/asettaa Kopioiden raahaajatilan.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>Näyttää laitteistotietoja. </td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Näyttää viesti-ikkunan kun vaihdetaan kesäaikaan tai talviaikaan.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>Tekee yhteenvedon jokaisen tiedoston levyasemakäytöstä, rekursiivisesti myös alihakemistoissa. </td></tr>
@@ -140,12 +141,12 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>ffm</tt></td><td> </td><td>Asettaa kohdistus seuraa hiirtä -toiminnon. </td></tr>
 <tr><td><tt>fgrep</tt></td><td> </td><td>Katso <tt>grep</tt>.</td></tr>
 <tr><td><tt>filepanel</tt></td><td> </td><td>Näyttää lataa/tallenna tiedosto -paneelin. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
-<tr><td><tt>find</tt></td><td> </td><td>Etsii tiedostoja hakemistohierarkkiassa.</td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>Etsii tiedostoja hakemistohierarkiassa.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Löytää järjestelmän määrittelemän erikoishakemiston.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Muotoilee uudelleen tiedoston kappaleet.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Jakaa tiedoston syöttörivit riviltä toiselle.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Tulostaa satunnaisia, toivon mukaan mielenkiintoisia, mietelauseita.</td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Komento updatedb kutsuu tiivistämään tiedostonimen luettelon.</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>Komento updatedb kutsuu tätä komentoa tiivistämään tiedostonimien luettelon.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Näyttää FreeType-käännös- ja -linkitystiedot.</td></tr>
 <tr><td><tt>fstrim</tt></td><td> </td><td>Lähetä TRIM-komento SSD-asemalle.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Tiedostonsiirto-ohjelma</td></tr>
@@ -163,7 +164,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>gzip</tt></td><td> </td><td>Dekoodaa tai tiivistää tiedostoja.</td></tr>
 <tr><td><tt>hd</tt></td><td> </td><td>Heksadesimaalivedos</td></tr>
 <tr><td><tt>head</tt></td><td> </td><td>Tulosta tiedoston ensimmäisen rivin.</td></tr>
-<tr><td><tt>hey</tt></td><td> </td><td>Pieni työkalu graafisella käyttöliittymällä varustetujen sovellusten skriptaukseen.</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>Pieni työkalu graafisella käyttöliittymällä varustettujen sovellusten skriptaukseen.</td></tr>
 <tr><td><tt>hostname</tt></td><td> </td><td>Tulostaa ja asettaa järjestelmän verkkonimen. </td></tr>
 <tr><td><tt>id</tt></td><td> </td><td>Tulostaa käyttäjä- ja ryhmätietoja. </td></tr>
 <tr><td><tt>ident</tt></td><td> </td><td>Tunnistaa RCS-avainsanat tiedostoissa. </td></tr>
@@ -176,7 +177,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>join</tt></td><td> </td><td>Kirjoittaa jokaiselle syöttörivien parillle identtisillä liitoskentillä rivin vakiotulosteeseen.</td></tr>
 <tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K</h2></a></td></tr>
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Siirtyy ydinvikajäljittimeen.</td></tr>
-<tr><td><tt>keymap</tt></td><td> </td><td>Lataa ja tallentaa näppäimistökuvauksen.</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>Lataa ja tallentaa näppäimistöasetuksen.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Lähettää signaalin prosessin lopettamiseksi. </td></tr>
 <tr><td><tt>launch_roster</tt></td><td> </td><td>Ohjaa launch_daemon-taustaprosessia, esim.: pysäyttää ja käynnistää palvelut uudelleen. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Katsoo tiedoston sisällön.</td></tr>
@@ -202,7 +203,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>lsindex</tt></td><td> </td><td>Näyttää nykyisen taltion/osion indeksoidut attribuutit.  <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>mail2mbox</tt></td><td> </td><td>Muuntaa BeOS-sähköpostilaatikkotiedostot Unix-sähköpostilaatikkotiedostoiksi. </td></tr>
 <tr><td><tt>make</tt></td><td> </td><td>GNU make -apuohjelma</td></tr>
-<tr><td><tt>makebootable</tt></td><td> </td><td>Tekee määrätyt BFS-osiot/laitteet alkuladattaviksi kirjoittamalla alkulatauskoodin ensimmäiselle kahdelle sektorille. </td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>Tekee määrätyt BFS-osiot/laitteet käynnistettäviksi kirjoittamalla käynnistyskoodin ensimmäiselle kahdelle sektorille. </td></tr>
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Muuntaa Unix-sähköpostilaatikkotiedostot BeOS-sähköpostilaatikkotiedostoiksi.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>Tulostaa ja tarkistaa MD5-tarkistussummia.</td></tr>
 <tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" soittaa tausta-audiotiedostoja.</td></tr>
@@ -275,7 +276,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>settype</tt></td><td> </td><td>Asettaa tiedoston MIME-tyypin, allekirjoituksen ja ensisijaisen sovelluksen. </td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Näyttää tiedoston version.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Asettaa järjestelmän äänen voimakkuuden. </td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Tarjoaa WEP-salauksen langattomille verkoille. </td></tr>
+<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
 <tr><td><tt>sh</tt></td><td> </td><td>Katso <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Tulostaa ja tarkistaa SHA1-tarkistussummia. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Luo komentotulkkiarkistoja.</td></tr>
@@ -330,7 +331,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>urlwrapper</tt></td><td> </td><td>Käärii verkko-osoite-MIME-tyypit komentoriville tai muille sovelluksille, jotka eivät käsittele niitä suoraan. </td></tr>
 <tr><td><tt>useradd</tt></td><td> </td><td>Luo uuden käyttäjän. </td></tr>
 <tr><td><tt>uudecode</tt></td><td> </td><td>Dekoodaa uu-koodatun tiedoston.</td></tr>
-<tr><td><tt>uuencode</tt></td><td> </td><td>Uu-koodaaa tiedoston niin, että se voidaan postittaa etäjärjestelmään. </td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>Uu-koodaa tiedoston niin, että se voidaan postittaa etäjärjestelmään. </td></tr>
 <tr><td><tt>vdir</tt></td><td> </td><td>Luettelee tietoja tiedostoista. </td></tr>
 <tr><td><tt>version</tt></td><td> </td><td>Palauttaa tiedoston version. </td></tr>
 <tr><td><tt>vmstat</tt></td><td> </td><td>Tulostaa tietoja virtuaalimuistijärjestelmästä.</td></tr>

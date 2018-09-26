@@ -12,8 +12,8 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		miguel~1.mx
  *		kervas
+ *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -90,7 +90,7 @@ Tras haber establecido que es un fallo nuevo, haga que su información sea lo m�
 <ul>
 	<li><p>Intente reproducir su problema en la revisión actual de Haiku. Hay imagenes pre-construidas para fines de prueba <a href="http://download.haiku-os.org">disponibles</a> en línea.</p></li>
 	<li><p>Incluya información básica tal como dónde está probando a Haiku (sobre hardware real, en VMWare, en QEMU, etc.).</p></li>
-	<li><p>Mencione cuál revisión está corriendo. Puede encontrar esta información en <span class="menu">Acerca de Haiku…</span> del menú del Deskbar. También mencione cual versión de Haiku está poniendo a prueba (gcc2, gcc4, gcc2hybrid, gcc4hybrid). Las imagenes descargables tienen su nombre de esa forma, para una imagen auto-construida deberá saber cómo la construyó.</p></li>
+	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>Describa el problema que esté experimentando. Intente ser tan preciso como pueda: describa el comportamiento actual, y el comportamiento esperado.</p></li>
 	<li><p>Describa qué pasos necesita realizar para exponer el fallo. Esto ayudará a los desarrolladores a reproducir el fallo.</p></li>
 	<li><p>Adjunte tanta información como tenga. Si es un fallo de interfaz de usuario, o un fallo en una de las aplicaciones, intente hacer una captura de pantalla presionando la tecla <span class="key">Impr pant</span>.</p></li>
@@ -98,17 +98,17 @@ Tras haber establecido que es un fallo nuevo, haga que su información sea lo m�
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Fallos de programas</a></h2>
-<p>Cuando falla una aplicación, debería invocar el depurador desde la alerta que aparece. Esto abrirá una ventana de Terminal con gdb (el depurador GNU) ejecutandose en ella. Al ingresar <span class="cli">bt</span>, creará un "backtrace", del cual debe copiar su contenido completo (incluyendo la parte antes que ingresara la orden <span class="cli">bt</span>) y adjuntarlo al reporte de fallo.</p>
+<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/es/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Fallos de servidor</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
 Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Fallos de núcleo (kernel)</a></h2>
-<p>Kernel bugs are usual the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
+<p>Kernel bugs are usually the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
 <ul>
 <li><p>The system enters kernel debugging land (KDL) on its own volition. The upper part of the screen is cleared white and several lines of text are printed on it. The second line says "<i>Welcome to Kernel Debugging Land...</i>", the one above it states the immediate reason for entering KDL.</p></li>
 <li><p>The system reboots spontaneously.</p></li>
@@ -120,11 +120,11 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Zona de depuración del núcleo - KDL</a></h3>
-<p>Si el sistema no ha entrado al KDL por sí sólo, puede ingresar deliberadamente invocando la combinación de teclas <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (siendo <span class="key">SysReq</span> (PetSis) el mismo botón que <span class="key">Impr pant</span> en la mayoría de los teclados).<br />
-Tome nota que en el KDL su teclado podría dejar de funcionar. Los teclados PS/2 siempre lo hacen, los teclados USB conectados via controladores UHCI lo hacen solo si ha ingresado al KDL a través del método abreviado al menos una vez anteriormente. Actualmente no se soporta OHCI USB.</p>
+<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being the <span class="key">Print</span> key, normally).<br />
+Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>El KDL mismo es un tipo de intérprete de comandos. Uno puede ejecutar ordenes que despliegan información sobre el sistema. Los siguientes comandos pueden ser de interés:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (también conocido como sc)</td><td> </td><td>muestra el "backtrace", detallando dónde exactamente sucedió el fallo. Si el sistema entró en el KDL por sí sólo, ingrese ese.</td></tr>
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>muestra el "backtrace", detallando dónde exactamente sucedió el fallo. Si el sistema entró en el KDL por sí sólo, ingrese ese.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>mostrará el uso de interruptores manejados y no manejados de hardware.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (lo mismo que continue)</td><td> </td><td>saldrá del depurador del kernel y continuará la operación del sistema, si es posible.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Reinicia el sistema inmediatamente. Perderá toda la información no guardada y tal vez alguna que haya guardado, pero que todavía no se ha escrito en el disco.</td></tr>
@@ -135,7 +135,7 @@ Tome nota que en el KDL su teclado podría dejar de funcionar. Los teclados PS/2
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Historial de Eventos de Sistema</a></h3>
-<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
+<p><b>This is the preferred method for extracting information from a non-booting system.</b><br />
 The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/system/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
 If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
@@ -144,7 +144,7 @@ In the boot loader's <span class="menu">Debug menu</span> you should find the en
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">Salida de depuración en pantalla</a></h3>
 <p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
-This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
+This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog</span> option doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
 Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
 One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/es/bootloader.html">Boot Loader</a>.</p>
 
@@ -155,10 +155,10 @@ One or more pages of text will display on the screen, only the last few lines ne
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td>un listado detallado de su hardware, incluyendo las IDs de fabricante y dispositivo PCI, similar a los comandos de Linux <span class="cli">lshw</span> y <span class="cli">lspci</span>.</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>asumiendo que el conflicto se relacione con USB, esto es similar a <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>el historial primario de sucesos de sistema utilizado por Haiku, parecido a la pantalla de depuración durante el arranque. Con el comando <span class="cli">open</span> se puede acortar la parte relevante de los sucesos de sistema en un editor de textos.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>muestra una lista de todos los controladores utilizados.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>sólo disponible en la <i>Zona de depuración del núcleo (kernel)</i> (vea abajo). Muestra el uso de interruptores. No deberían haber muchos que esten compartidos por diferentes dispositivos.</td></tr>
-<tr><td colspan="3">Salida de depuración a pantalla (una opción de modo a prueba de fallas en el momento de arranque)</td></tr>
+<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>
 
 <p>Las primeras cuatro ordenes se pueden ingresar en la Terminal. Agregue un <span class="cli"> &gt; output.txt</span> tras una orden, y será canalizada a un archivo de texto llamado "output.txt" que puede adjuntar al reporte de fallos o correo electrónico.</p>

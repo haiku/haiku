@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Matthias
  *		Humdinger
+ *		Matthias
  *		taos
  *
 -->
@@ -60,97 +60,98 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h1>Boot Loader</h1>
 
-<p>Mit dem "Haiku Boot Loader" kann man zum einen unterschiedliche Haiku-Installationen starten, zum anderen hardware-spezifische Probleme umgehen. Er is auch nützlich wenn man etwas installiert hat, das das Booten von Haiku verhindert, siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
+<p>Mit den "Haiku Boot Loader Optionen" kann man zum einen unterschiedliche Haiku-Installationen starten, zum anderen hardware-spezifische Probleme umgehen. Er is auch nützlich wenn man etwas installiert hat, das das Booten von Haiku verhindert, siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
 <p>Um zum Bildschirm der Boot Loader Optionen zu gelangen, muss man noch vor Beginn des Boot-Prozesses <span class="key">SHIFT</span> gedrückt halten. Ist ein Bootmanager installiert, kann man das bereits tun, bevor man dort den Haiku-Eintrag auswählt. Ist Haiku das einzige Betriebssystem auf dem Rechner, kann die Taste schon gehalten werden, während noch die BIOS Meldungen zu sehen sind.</p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Boot Loader Optionen</a></h2>
 <p>Im Boot Loader hat man vier Auswahlmöglichkeiten:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Hier lässt sich die zu bootende Haiku-Installation und Version auswählen.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>Hier lässt sich die zu bootende Haiku-Installation und ihr historischer Zustand auswählen (siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten).</td></tr>
 <tr><td><b>Select safe mode options</b><br />
 </td><td> </td><td>Es gibt mehrere Möglichkeiten Haiku bei hardware-bezogenen Problemen zum Booten zu bringen, oder falls das System durch ein installiertes Add-On instabil wurde, indem man verschiedene Komponenten deaktiviert. Wird über die Pfeiltasten eine Option auswählt, wird am unteren Bildschirmrand eine kurze Erklärung angezeigt.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Versetzt das System in einen abgesicherten Modus. Diese Einstellung kann unabhängig von den anderen Optionen aktiviert werden.</p>
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Verhindert das Laden jeglicher vom Benutzer installierten Add-Ons. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Deaktiviert IDE DMA, erhöht die IDE-Kompatibilität auf Kosten der Performance.</p>
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignoriert den Speicher über dem 4 GiB Adresslimit, setzt die Einstellung in der 'kernel' Datei außer Kraft.</p>
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		Aktiviert den VESA-Mode, es wird nicht versucht einen speziellen Grafiktreiber zu benutzen.</p>
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Deaktiviert den IO APIC für das Interrupt-Routing und erzwingt stattdessen die Benutzung von "Legacy PIC".</p>
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Deaktiviert den lokalen APIC und auch SMP (Multiprozessor).</p>
+		Disables using the local APIC, also disables SMP.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Deaktiviert alle CPU Cores bis auf einen.</p>
+		Disables all but one CPU core.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Es werden keine BIOS-Funktionen aufgerufen.</p>
+		Stops the system from calling BIOS functions.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Deaktiviert Advanced Power Management Hardware-Unterstützung, setzt APM-Einstellungen in der 'kernel' Datei außer Kraft.</p>
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Deaktiviert Advanced Configuration and Power Interface Hardware-Unterstützung, setzt ACPI-Einstellungen in der 'kernel' Datei außer Kraft.</p>
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		Ermöglicht die Auswahl von Systemdateien, die ignoriert werden sollen. Nützlich, um beispielsweise Treiber vorübergehend zu deaktivieren. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p></td></tr>
-<tr><td><b>Select debug options</b>
-</td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen <a href="../../welcome/de/bugreports.html">Bugreport</a> zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.</td></tr>
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
-		Aktiviert die Syslog-Ausgabe über die serielle Schnittstelle (Standard: 115200, 8N1).</p>
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
 	<p><span class="menu">Enable on screen debug output</span><br />
-		Zeigt statt dem üblichen Boot-Logo die Debug-Ausgaben während dem Hochfahren.</p>
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
 	<p><span class="menu">Disable on screen paging</span><br />
-		Schaltet die seitenweise Ausgabe aus, wenn "on screen debug" aktiviert ist.</p>
+		Disables paging when on screen debug output is enabled.</p>
 	<p><span class="menu">Enable debug syslog</span><br />
-		Aktiviert für diese Sitzung einen besonderen Syslog-Buffer im Speicher, auf den der Boot-Loader nach einem Neustart zugreifen kann.</p>
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
 	<p><span class="menu">Display current boot loader log</span><br />
-		Zeigt die vom Boot-Loader gesammelten Debug-Informationen (<span class="key">Q</span> verlässt das Log)</p>
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
-		Erlaubt das direkte Eingeben erweiterter Debug-Optionen.</p></td></tr>
-<tr><td></td><td></td><td>Ist "<i>Enable debug syslog</i>" aktiviert, werden beim folgenden Warmstart nach einem Crash noch weitere Optionen angeboten:</td></tr>
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Speichert beim Hochfahren das Syslog der letzten Haiku Sitzung als /var/log/previous_syslog.</p>
+		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		Zeigt das Syslog der letzten Haiku Sitzung an.</p>
+		Displays the syslog from the previous Haiku session.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
-		Speichert das Syslog der letzten Haiku Sitzung auf FAT32 formatiertes Laufwerk, z. B. USB-Stick.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Hiermit lässt sich eine bestimmte Bildschirmauflösung und Farbtiefe erzwingen.</td></tr>
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Fehlersuche</a></h2>
-<p>Falls sich Haiku weigert auf einem Rechner überhaupt nur hochzufahren, sollte man mal diverse Optionen unter <span class="menu">Select safe mode options</span> ausprobieren. Auf alle Fälle ist ein <a href="../../welcome/de/bugreports.html">Bug Report</a> angeraten.</p>
-<p>Falls Haiku hingegen Ärger macht nachdem bestimmte Software, insbesondere Treiber, installiert wurde, gibt es mehrere Möglichkeiten Haiku wieder bootbar zu machen, um das verantworliche Paket wieder deinstallieren zu können:</p>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
 <ul>
-<li><p>Aktiviert man <span class="menu">Safe mode</span>, verhindert das den Start der meisten Server, Daemons und dem UserBootScript.</p></li>
-<li><p>Aktiviert man <span class="menu">Disable user add-ons</span>, verhindert das die Nutzung jeglicher Add-Ons (Treiber, Translatoren etc.), die in der Benutzer-Hierarchie unter Home installiert wurden.</p></li>
-<li><p>Befindet sich der problematische Treiber oder Add-On etc. allerdings in der System Hierarchie, wird die Sache etwas komplizierter, da dieser Teil des Dateisystems nicht beschreibbar ist. Hier kommt die Option <span class="menu">Blacklist entries</span> zum Einsatz. Mit ihr lässt sich durch die System-Verzeichnisse navigieren, um die entsprechende Komponente mittels <span class="key">LEERTASTE</span> oder <span class="key">RETURN</span> zu deaktivieren. <span class="key">ESC</span> führt wieder eine Verzeichnisebene zurück nach oben.</p>
-<p>Online zeigt der Artikel "<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a>" wie man diese Einstellung festlegt, damit sie bei jedem Hochfahren erhalten bleibt.</p></li>
-<li><p>Unter <span class="menu">Select boot volume</span> kann man angeben welche frühere "Version" von Haiku gebootet werden soll. Jedesmal wenn ein Paket installiert oder deinstalliert wird, wird der alte Zustand gespeichert und er kann in den Boot Loader Optionen aus einer Liste ausgewählt werden, um Haiku in diesen alten Zustand zu booten.<br />
-Wenn Haiku also nach der Installation eines Pakets nicht mehr hochfahren kann, einfach eine Haiku Version vor diesem Zeitpunkt booten und dann das betreffende Paket wieder deinstallieren.</p></li>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
+<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+<li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
+So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Haiku starten</a></h2>
-<p>Nach der Auswahl einer oder mehrerer Optionen kann man über das Hauptmenü den eigentlichen Boot-Vorgang starten. Es erscheint daraufhin folgender Bildschirm:</p>
+<a id="booting" name="booting">Booting Haiku</a></h2>
+<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>Wenn Haiku ordnungsgemäß bootet, leuchten nacheinander alle Icons auf, und das System wechselt zum Desktop.<br />
-Die unterschiedlichen Symbole repräsentieren die verschiedenen Phasen des Boot-Vorganges:</p>
+<p>If everything works OK, one symbol after another quickly lights up.<br />
+The different symbols roughly correspond to these boot stages:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Die einzelnen Kernel-Module werden geladen.</td></tr>
-	<tr><td><b>Laufwerk/Lupe</b></td><td> </td><td>Die Boot-Partition wird gesucht und spezielle Dateisysteme angelegt (rootfs: <span class="path">/</span> und <span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Steckkarte</b></td><td> </td><td>Der Geräte-Manager, der sich um die Zuteilung von Systemressourcen an die einzelnen Hardware-Komponenten kümmert, wird geladen.</td></tr>
-	<tr><td><b>Boot-Laufwerk</b></td><td> </td><td>Die vorher gefundene Boot-Partition wird in das Dateisystem eingebunden.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Spezielle Hauptprozessor-Module werden geladen.</td></tr>
-	<tr><td><b>Ordner</b></td><td> </td><td>Alle Subsysteme werden aktiviert.</td></tr>
-	<tr><td><b>Rakete</b></td><td> </td><td>Der Launch_daemon hat das System gestarted.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
+	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
+	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
+	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
+	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
 </table>
 
 </div>

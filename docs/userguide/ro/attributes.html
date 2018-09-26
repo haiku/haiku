@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Ghid de utilizare</span></div>
 </div>
 
 <div class="nav">
@@ -50,7 +50,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Conținut</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>
@@ -87,7 +87,7 @@
 <p><span class="cli">listattr</span> listează atributele unui fișier dar nu afișează conținutul atributelor.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>De la exemplul din captura de ecran de mai sus:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -116,7 +116,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> conține tipul fișierului ca șir <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, aici "<tt>application/x-person</tt>". Determină pictograma implicită și aplicația care deschide fișierul atunci când ex: dați dublu clic pe el.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" este atributul cu care Tracker monitorizează poziția pictogramei unui fișier.</p></li></ul>
-<div class="box-info">Observați bara oblică inversă (backslash) după "Clara". În Terminal trebuie să „escapați” caracterele speciale precum <tt>'"*\$?!</tt>. Spațiul între „Clara” și "Botters" este unul dintre acestea. Prin urmare bara oblică inversă este chiar în fața caracterului spațiu, și nu după „Clara”.</div>
+<div class="box-info">Observați bara oblică inversă (backslash) după "Clara". În Terminal trebuie să „escapați” caracterele speciale precum <tt>'"*\\$?!</tt>. Spațiul între „Clara” și "Botters" este unul dintre acestea. Prin urmare bara oblică inversă este chiar în fața caracterului spațiu, și nu după „Clara”.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -124,7 +124,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> afișează conținutul unui atribut specific al unui fișier.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Din nou exemplul nostru:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -139,7 +139,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>Deci, să spunem că Clara a obținut un job la multi-naționalul Barkelbaer Inc., completați atributul înainte liber „Companie” cu aceste date (care sunt de tipul „string”):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -150,7 +150,7 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Chiar dacă având în vedere simțul practic ar fi fost de ajuns să nu completăm atributul „Fax”, puteți să îl eliminați din fișierul lui Clara prin:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -169,7 +169,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Filetypes</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Conținut</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
 </div>

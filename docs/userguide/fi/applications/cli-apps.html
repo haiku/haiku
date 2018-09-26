@@ -10,7 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Karvjorm
+ *		Jorma Karvonen
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -79,8 +79,8 @@ Nämä komennot kuvaillaan aiheessa <a href="../index.html">Hakemisto</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-pkg" name="cli-pkg">Pakkaushallintaan liittyvää: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>Komentoa <span class="cli">package</span> käytetään hallitsemaan HPKG-pakkauksia. Vilkaise artikkelia <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Sovellusten asentaminen</a> oppiaksesi perusteet. Tavallisesti käytetään työkalua <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> luomaan niin kutsuttua valmistusohjeita (recipes) pakkausten automaattiseen rakentamiseen.</p>
-<p>Komentoa <span class="cli">pkgman</span> käytetään etsimään, asentamaan, päivittämäänä ja poistamaan pakkauksia. Pakkaustietovarastoja voidaan lisätä, poistaa tai niiden pakkausluetteloita voidaan päivittää. Erityistyyppinen päivitys kutsutaan parametrillä <tt>full-sync</tt>: Se on agressiivisempi ja alentaa tai poistaa pakkauksia, jos on välttämätöntä.<br />
+<p>Komentoa <span class="cli">package</span> käytetään hallitsemaan HPKG-pakkauksia. Vilkaise artikkelia <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Sovellusten asentaminen</a> oppiaksesi perusteet. Tavallisesti käytetään työkalua <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> luomaan automaattisesti niin kutsuttua valmistusohjeita (recipes) pakkausten rakentamiseen.</p>
+<p>Komentoa <span class="cli">pkgman</span> käytetään etsimään, asentamaan, päivittämään ja poistamaan pakkauksia. Pakkaustietovarastoja voidaan lisätä, poistaa tai niiden pakkausluetteloita voidaan päivittää. Erityistyyppinen päivitys kutsutaan parametrillä <tt>full-sync</tt>: Se on agressiivisempi ja alentaa tai poistaa pakkauksia, jos se on välttämätöntä.<br />
 Lisätietoja parametreistä saa lisäämällä ”--help”, esim.: <tt>pkgman search --help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -99,7 +99,7 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> on pieni aputyökalu, joka lähettää BMessage-viestit sovellukseen ja tulostaa niiden vastauksen. Sitä voidaan käyttää sovellusskriptaukseen, toisin sanoen sovelluksen "kauko-ohjaukseen" skriptistä tai komentoriviltä. Sen käyttö on hiukan mutkikasta... Scot Hackerin BeOS-raamatussa on perusteellinen <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey-oppikurssi</a>, jonka tekijä on Chris Herborth.</p>
+<td valign="top"><p><span class="cli">hey</span> on pieni aputyökalu, joka lähettää BMessage-viestit sovellukseen ja tulostaa niiden vastauksen. Sitä voidaan käyttää sovellusskriptaukseen, toisin sanoen sovelluksen  määritellyin ”kauko-ohjaukseen” skriptistä tai komentoriviltä. Sen käyttö on hiukan mutkikasta... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdingerin blogikirjoitus</a> palvelee hyvänä esittelynä, ja Scot Hackerin BeOS-raamatussa on perusteellinen <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey-oppikurssi</a>, jonka tekijä on Chris Herborth.</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> on komentoriviversio Etsi-paneelista. Itse asiassa, nopea tapa tuottaa hakutermi on rakentaa kysely Työpöytäpalkin Etsi-paneelissa, vaihtaa valikkoon <span class="menu">kaavoittain</span>, lisätä kaksoislainausmerkit (<tt>"</tt>) eteen ja taakse ja liittää koko merkkijono <span class="cli">query</span>-komentosi perään Pääteikkunassa tai skriptissäsi.</p>
@@ -113,11 +113,11 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> on tärkeä työkalu tarkistamaan tiedostojärjestelmäsi virheet. Lisää yksinkertaisesti taltionimi, kuten <span class="path">/Haiku</span> tai laitepolku ja ohjelma käy lävitse jokaisen tiedoston ja korjaa epäyhtenäisyydet missä mahdollista.</p>
+		<td><p><span class="cli">checkfs</span> on tärkeä työkalu tarkistamaan tiedostojärjestelmäsi virheet. Lisää yksinkertaisesti taltionimi, kuten <span class="path">/Haiku</span> tai laitepolku ja ohjelma käy lävitse jokaisen tiedoston ja korjaa epäyhtenäisyydet siellä missä se on mahdollista.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> voi asentaa kuvakkeen mille tahansa tiedostolle, kansiolle, kyselylle tai sovellukselle Työpöytäpalkin tarjottimelle. Se tarjoaa myös mahdollisuuden tiettyjen toimintojen suorittamiseen kontekstivalikosta napsauttamalla hiiren oikealla painikkeella kuvaketta. Esimerkkinä, yritä tätä lisäämällä komentorivisovellus <span class="app">screenshot</span> eri valitsimilla ("<tt>\</tt>" ensimmäisellä rivillä on vain rivinvaihto Pääteikkunassa):</p>
-<pre class="terminal"> desklink "cmd=Aktivoi ikkuna (2s):/bin/screenshot --window --border --delay 2" \
+		<td valign="top"><p><span class="cli">desklink</span> voi asentaa kuvakkeen mille tahansa tiedostolle, kansiolle, kyselylle tai sovellukselle Työpöytäpalkin tarjottimelle. Se tarjoaa myös mahdollisuuden tiettyjen toimintojen suorittamiseen asiayhteysvalikosta napsauttamalla hiiren kakkospainikkeella kuvaketta. Esimerkkinä, yritä tätä lisäämällä komentorivisovellus <span class="app">screenshot</span> eri valitsimilla (”<tt>\\</tt>” ensimmäisellä rivillä on vain rivinvaihto Pääteikkunassa):</p>
+<pre class="terminal"> desklink "cmd=Aktivoi ikkuna (2s):/bin/screenshot --window --border --delay 2" \\
 "cmd=Poista kopio:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
@@ -126,7 +126,8 @@ Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"
 		<td valign="top"><p><span class="cli">diskimage</span> sallii sinun rekisteröidä tavallisen tiedoston levylaitteena. Voit esimerkiksi rekisteröidä Haiku anyboot-levyvedoksen, liittää se Seuraajassa ja kopoida, muokata tai poistaa siitä tiedostoja käyttäen sitä Asennusohjelman lähteenä.</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Taustaprosessi launch_daemon käynnistää kaiken tyyppisiä palveluita ja sovelluksia järjestelmän käynnistyessä. Jotkut niistä se on käskytetty käynnistämään uudelleen, jos ne sulkeutuvat. Jos et halua sitä – ehkä haluat esimerkiksi testata muokattua Seuraajaa – käytä <span class="cli">launch_roster</span>-sovellusta <tt>pysäyttämään</tt> sovelluksen uudelleenkäynnistyminen ennen siitä poistumista. Samalla tavalla voit <tt>käynnistää</tt> sen uudestaan tai hakea <tt>tietoja</tt> siitä. Ilman parametriä, <span class="cli">launch_roster</span> luettelee kaikki sovellukset/palvelut, jotka ovat sen hallinnassa.<br />
+		<td valign="top"><p>Taustaprosessi launch_daemon käynnistää kaiken tyyppisiä palveluita ja sovelluksia järjestelmän käynnistyessä. Jotkut niistä se on käskytetty käynnistymään uudelleen, jos ne sulkeutuvat. Jos et halua sitä – ehkä haluat esimerkiksi testata muokattua Seuraajaa – käytä <span class="cli">launch_roster</span>-sovellusta <tt>pysäyttämään</tt> sovelluksen uudelleenkäynnistyminen ennen siitä poistumista. Samalla tavalla voit <tt>käynnistää</tt> sen uudestaan tai hakea <tt>tietoja</tt> siitä. Parametri <tt>log</tt> tulostaa kaikkien launch_daemon-riippuvaisten tapahtumien lokitekstit.<br />
+Ilman parametriä <span class="cli">launch_roster</span> luettelee kaikki sovellukset/palvelut, jotka ovat sen hallinnassa.<br />
 Esimerkiksi, tämä pysäyttää Työpöytäpalkin uudelleenkäynnistymisen:</p>
 <pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
 </td></tr>
@@ -151,7 +152,7 @@ mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
 <p>Tämän jälkeen käynnistät ramlevyn kuten tämä:</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>On hyvin tärkeää aina irrottaa ramlevy siististi joka Jäljittäjästä tai Pääteikkunan komennolla <span class="cli">unmount /RAMimage</span>, tai muutokset eivät tallennu takaisin levykuvatiedostoon!</p>
+<p>On hyvin tärkeää aina irrottaa ramlevy siististi joko Seuraajasta tai Pääteikkunasta komennolla <span class="cli">unmount /RAMimage</span>, tai muutokset eivät tallennu takaisin levykuvatiedostoon!</p>
 </td></tr>
 </table>
 </div>

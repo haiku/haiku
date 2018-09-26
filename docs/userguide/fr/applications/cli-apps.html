@@ -68,8 +68,8 @@
 <span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Tous les programmes en ligne de commande livrés avec Haiku se trouvent dans <span class="path">/boot/system/bin/</span>. Vos commandes personnalisées ou additionnelles, installées depuis un paquet .hpkg apparaitrons dans ce même répertoire ou dans <span class="path">~/config/bin/</span>.Autrement, vous pouvez les mettre dans <span class="path">/boot/system/non-packaged/bin/</span> ou <span class="path">~/config/non-packaged/bin/</span>. Ces répertoires faisant tous partie de la variable PATH, l'emplacement d'un programme est donc automatiquement détecté.<br />
+Ce qui suit n'est pas une liste exhaustive de toutes les commande spécifiques à Haiku, mais juste un mise en évidence des quelques commandes les plus utiles pour vous en donnez un aperçu. N'hésitez pas à explorer le contenu du dossier <span class="path">bin/</span> de vous même, en exécutant une commande avec le paramètre <tt>--help</tt>, vous accéderez à ses différentes options disponibles pour l'utiliser.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">Concernant les attributs : <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
@@ -84,9 +84,10 @@ Ces commandes sont décrites dans le sujet qui traite des <a href="../index.html
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-pkg" name="cli-pkg">Concernant la gestion des paquets : <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
 <p>La commande  <span class="cli">package</span> sert à gérer les paquets HPKG. 
-Consultez l'article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> pour apprendre les rudiments. Les paquets sont généralement construits automatiquement à partir de recettes élaborées depuis l'outil <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a>.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: It is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt>.</p>
+Consultez l'article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> pour apprendre les rudiments. 
+Habituellement, l'outil <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> est utilisé pour créer automatiquement des paquets à partir de règles appelées « recettes ».</p>
+<p><span class="cli">pkgman</span> sert à rechercher, installer, mettre à jour et désinstaller les paquets. Les dépôts de paquets peuvent être ajoutés, retirés, et la liste de leurs paquets peut être rafraîchi. Le paramètre <tt>full-sync</tt> appelle un type de mise à jour plus agressif : si nécessaire, il retire ou rétrograde des paquets.<br />
+pour plus de détails sur un paramètre, ajouter "--help", e.g. <tt>pkgman search --help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">Commandes utiles dans les scripts</a></h3>
@@ -104,7 +105,7 @@ Parmi les paramètres disponibles, vous pouvez définir un répertoire de dépar
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> est un petit utilitaire pour envoyer des BMessages aux applications et afficher leurs réponses.  Il peut être utilisé pour écrire des scripts d'applications, i.e. "contrôle à distance" d'un programme à partir d'un script ou de la ligne de commande. Son utilisation est un peu complexe... Mais grâce à la "BeOS Bible" de Scot Hacker, il y a un beau <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">tutoriel pour hey</a> pour Chris Herborth.</p></td></tr>
+<td valign="top"><p><span class="cli">hey</span> est un petit utilitaire pour envoyer des BMessages aux applications et afficher leurs réponses.  Il peut être utilisé pour écrire des scripts d'applications, i.e. « contrôle à distance » d'un programme à partir d'un script ou de la ligne de commande. Son utilisation est un peu complexe… <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">l'article du blog de Humdinger</a> constitue une bonne introduction, et dans la "BeOS Bible" de Scot Hacker, vous trouverez un <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">tutoriel pour hey</a> par Chris Herborth, très complet.</p></td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> est la version ligne de commande de la fenêtre de recherche. En fait, une façon rapide de créer une expression de recherche, est de construire une requête dans la fenêtre de recherche, de basculer vers les formules (<span class="menu">by formula</span>), et de copier le tout entre doubles quottes (<tt>"</tt>) en paramètre à la commande <span class="cli">query</span> que vous appelez à partir du Terminal ou de votre script.</p></td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
@@ -120,8 +121,8 @@ Parmi les paramètres disponibles, vous pouvez définir un répertoire de dépar
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> vous permet d'installer une icône dans le cartouche de la Deskbar à partir de n'importe quel fichier, dossier, requête ou application. Vous pourrez également pourvoir le menu contextuel d'actions spécifiques à exécuter quand vous ferez un clic droit sur l'icône.
-Voici par exemple comment ajouter <span class="app">Screenshot</span> avec diverses options (le "<tt>\</tt>" à la fin de la première ligne sert juste au saut de ligne dans Terminal) :</p>
-<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
+Voici par exemple comment ajouter <span class="app">Screenshot</span> avec diverses options (le "<tt>\\</tt>" à la fin de la première ligne sert juste au saut de ligne dans Terminal) :</p>
+<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \\
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
@@ -129,10 +130,10 @@ Voici par exemple comment ajouter <span class="app">Screenshot</span> avec diver
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">diskimage</span> vous permet d'inscrire un ficher ordinaire en tant que periphérique disque. Par exemple, vous pouvez inscrire l'image disque "anyboot" d'Haiku, puis monter le volume qu'elle contient dans le Tracker et copier, éditer ou supprimer les fichiers avant de l'utiliser comme source dans le programme d'installation.</p></td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it. Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
+		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it.c  The parameter <tt>log</tt> prints out a log of all launch_daemon related events.<br />
+Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
 For example, this will stop the re-launching of the Deskbar:</p>
-<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
-</td></tr>
+<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
 <p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>

@@ -12,10 +12,10 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Michael Smirnov
  *		Sergei Reznikov
  *		Rodastahm Islamov
  *		Humdinger
+ *		Michael Smirnov
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -92,7 +92,7 @@
 <ul>
 	<li><p>Попытайтесь воспроизвести вашу проблему на текущей ревизии Haiku. Готовые образы для тестирования доступны  <a href="http://haiku-files.org/">здесь</a>.</p></li>
 	<li><p>Включите информацию о том как вы тестируете Haiku (на реальном компьютере, в эмуляторе VMWare, QEMU, и т. д.).</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
+	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>Опишите проблему, с которой вы столкнулись, попытайтесь описать её наиболее точно: как именно она проявилась, и как правильно должен бы был действовать проблемный объект при её отсутствии.</p></li>
 	<li><p>Расскажите какие шаги нужно выполнить для её возникновения, что поможет разработчикам воспроизвести эту ошибку.</p></li>
 	<li><p>Прикрепите всю имеющуюся информацию. Если это ошибка графического интерфейса или баг в каком-либо приложении, то попытайтесь сделать скриншот клавишей <span class="key">Print Screen</span> key.</p></li>
@@ -100,13 +100,13 @@
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Ошибки приложений</a></h2>
-<p>Когда приложение аварийно завершилось, вы должны запустить отладчик из окна сообщения о падении программы. Откроется окно Терминала с запущенным gdb (the GNU debugger). Введя в окне терминала <span class="cli">bt</span>, вы создадите "трассировку", которую необходимо полностью скопировать (включая текст, который уже был до ввода команды <span class="cli">bt</span>) и прикрепить ее в ваш багрепорт.</p>
+<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/ru/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Ошибки серверов</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
 Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Ошибки ядра</a></h2>
@@ -123,11 +123,11 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Царство отладки ядра - KDL</a>
 </h3>
-<p>Когда какой-либо системный низкоуровневый компонент вызывает фатальную ошибку, то вы, с большой долей вероятности, окажетесь в отладчике ядра. Также он может быть вызван намеренно при нажатии на клавиши <span class="key">ALT</span>+<span class="key">SysReq</span>+<span class="key">D</span> (клавиша <span class="key">SysReq</span> называется <span class="key">PrintScreen</span> на большинстве клавиатур).
-Учтите, что ваша клавиатура может не работать в KD. PS/2 клавиатуры работают всегда, USB клавиатуры, подключенные через UHCI контроллер работают, только если вы входили в KDL через клавиатурное сочетание хотя бы раз. USB OHCI не поддерживаются в данный момент.</p>
+<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being the <span class="key">Print</span> key, normally).<br />
+Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>Сам по себе KDL является некой оболочкой. Вы можете выполнять команды, которые выводят информацию о системе. Следующие команды могут быть интересны:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (синоним sc)</td><td> </td><td><span class="cli">bt</span> - покажет трассировку, уточняющую где именно произошла ошибка.
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td><span class="cli">bt</span> - покажет трассировку, уточняющую где именно произошла ошибка.
 Если система вошла в KDL самопроизвольно, всегда используйте эту команду.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td><span class="cli">int</span> - отобразит обработанные и необработанные прерывания.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (синоним continue)</td><td> </td><td>выведет систему из отладчика ядра продолжит нормальную работу Haiku, если это возможно.</td></tr>
@@ -139,7 +139,7 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Системный журнал</a></h3>
-<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
+<p><b>This is the preferred method for extracting information from a non-booting system.</b><br />
 The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/system/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
 If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
@@ -159,10 +159,10 @@ In the boot loader's <span class="menu">Debug menu</span> you should find the en
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td><span class="cli">listdev</span> - подробный список оборудования, включающий ID производителей и отдельных устройств, схожа с командами Linux <span class="cli">lshw</span> и <span class="cli">lspci</span>.</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td><span class="cli">listusb -v</span> - используйте при ошибке, связанной с USB, аналогична команде <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td><span class="cli">open /var/log/syslog</span> - основной системный лог, используемый Haiku. С командой <span class="cli">open</span> можно вырезать нужную часть лога в текстовом редакторе.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td><span class="cli">listimage | grep drivers/</span> - список всех загруженных драйверов.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td><span class="cli">ints</span> - доступна только в режиме <i>Царства отладки ядра (Kernel Debugging Land - KDL)</i> (см. выше). Отображает используемые прерывания. Не должно быть слишком много устройств, использующих одно прерывание.</td></tr>
-<tr><td colspan="3">- On screen debug output (опция загрузочного меню).</td></tr>
+<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>
 
 <p>Все эти команды вводятся в терминале, если не указано иное. Если добавить <span class="cli"> &gt; output.txt</span> после команды, то результат её работы сохранится в текстовый файл "output.txt", который можно прикрепить к своему сообщению об ошибке или отправить по электронной почте.</p>

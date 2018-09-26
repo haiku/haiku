@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -68,25 +68,25 @@
 <p><br /></p>
 <p>DriveSetup はパーティションの作成、削除、初期化をするツールです。このツールでは既存パーティションのリサイズや移動はできないので、パーティションが作成されていないディスク (外部 USB ドライブや別のハードディスクなど) を用意するか、<a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> のようなツールで初期化する必要があるでしょう。</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>一番上の図は、下のリストで選択されたデバイスのパーティションの分割状態を表しています。それぞれのデバイスは 4 つまでのプライマリーパーティションに分割でき、それぞれにいくつかの拡張パーティションや論理パーティションを格納できます。論理パーティションの詳細を見るためには、+/- ボタンでリストを展開する必要があるかもしれません。</p>
+<p>一番上の図は、下のリストで選択されたデバイスのパーティションの分割状態を表しています。それぞれのデバイスは 4 つまでのプライマリパーティションに分割でき、それぞれにいくつかの拡張パーティションや論理パーティションを格納できます。論理パーティションの詳細を見るには、+/- ボタンでリストを展開する必要があるかもしれません。</p>
 <p>リストからパーティションを選択して、<span class="key">ALT</span> <span class="key">M</span> / <span class="key">ALT</span> <span class="key">U</span> を押すか、<span class="menu">パーティション (Partition)</span> メニューから操作することで、マウント / アンマウントを行えます。</p>
 <p><span class="menu">パーティション | 削除 (Partition | Delete)</span> からパーティションの削除もできます。<br /></p>
-<div class="box-stop">パーティションの作成・削除・初期化は非常に危険です。操作しているパーティションが適切なものであることと、万が一に備えて最新のバックアップを行っていることを、必ず 2 度確認してください。</div>
+<div class="box-stop">パーティションの作成・削除・初期化は非常に危険です。操作しているパーティションが適切なものであることと、万が一に備えて最新のバックアップをしていることを、必ず 2 度確認してください。</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">新しいパーティションを作成する</a></h2>
 <div class="box-info">もし、(USB フラッシュメモリやコンパクトフラッシュを利用するなどして) ディスクに 1 つのパーティションしか作らないならば、<a href="#initializing">パーティションの初期化</a>までスキップしてください。</div>
 <p>上の画像のように、<tt>&lt;empty&gt;</tt> となっている未フォーマットのスペースがあれば、<span class="menu">パーティション | 新規作成... (Partition | Create...)</span> (<span class="key">ALT</span> <span class="key">C</span>) で、パーティションを作成できます。</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
-<p>ダイアログでパーティションのサイズとタイプを調節してください。パーティションを Haiku のインストールに用いる場合、または Haiku の特徴的な属性やクエリを使用したい場合は、<span class="menu">Be File System</span> をパーティションタイプに設定してください。また、<span class="menu">Be File System</span> のパーティションは、ほかの OS からアクセスできないことにご注意ください。</p>
-<p>もし、拡張パーティションや論理パーティションと一緒にプライマリーパーティションを 1 つのディスクに作成した時、ダイアログに、<span class="menu">アクティブパーティション (Active partition)</span> というチェックボックスが現れます。パーティションを Haiku のブートディスクとして利用するにはチェックしてください。</p>
-<p>新しく作られたパーティションを使用する前に、ファイルシステムを初期化する必要があります。</p>
+<p>ダイアログでパーティションのサイズとタイプを調節してください。パーティションを Haiku のインストールに用いる場合、または Haiku の特徴的な属性やクエリを使用する場合は、<span class="menu">Be File System</span> をパーティションタイプに設定してください。また、<span class="menu">Be File System</span> のパーティションは、ほかの OS からアクセスできないことにご注意ください。</p>
+<p>もし、拡張パーティションや論理パーティションと一緒にプライマリパーティションを 1 つのディスクに作成した時、ダイアログに、<span class="menu">アクティブパーティション (Active partition)</span> というチェックボックスが現れます。パーティションを Haiku のブートディスクとして利用するにはチェックしてください。</p>
+<p>新しく作成されたパーティションを使用する前に、ファイルシステムを初期化する必要があります。</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="initializing" name="initializing">パーティションの初期化</a></h2>
 <p>アンマウントされたパーティションを、<span class="menu">パーティション | 初期化 (Partition | Initialize)</span> から初期化できます。</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
-<p>ダイアログにパーティションの名前とブロックサイズを入力してください。ブロックサイズは 2048 が推奨されますが、特に必要ならより大きなサイズにもより小さなサイズにも設定できます。<br />
+<p>ダイアログにパーティションの名前とブロックサイズを入力してください。ブロックサイズは 2048 が推奨されますが、特に必要なら大きなサイズにも小さなサイズにも設定できます。<br />
 初期化により、パーティションのすべてのデータが消されるので注意してください!</p>
 
 </div>

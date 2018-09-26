@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		DKnoto
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Bash and Scripting</title>
+	<title>Bash i skrypty</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -51,57 +52,56 @@
 <span>
  «  <a href="preferences.html">Preferences</a> 
 ::  <a href="contents.html" class="uplink">Spis treści</a> 
-<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
+<!-- ::  <a href="filesystem-layout.html">Układ systemu plików</a>  » -->
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
-<h1>Bash and Scripting</h1>
+<h1>Bash i skrypty</h1>
 
-<p>"Scripting" to technika automatyzacji zadań zlecanych systemowi operacyjnemu poprzez zapisanie komend w pliku tekstowym zwanym skryptem. W każdym momencie kiedy wykonujesz skrypt komendy w nim zawarte wykonywane są jedna za drugą tak jakbyś ręcznie wprowadzał je z <a href="applications/terminal.html">Terminala</a>.<br />
+<p>„Skrypty” pozwalają automatyzować zadania zlecane systemowi operacyjnemu poprzez zapisanie komend w pliku tekstowym zwanym skryptem. Za każdym razem kiedy wykonywany jest skrypt, komendy w nim zawarte uruchamiane są jedna za drugą tak, jakby były ręcznie wprowadzane z <a href="applications/terminal.html">Terminala</a>.<br />
 Skrypty mogą być prostymi plikami wykonującymi kilka komend w określonym porządku lub wyrafinowanymi kawałkami kodu rozwiązującymi złożone zadania.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bash" name="bash">The Bash</a></h2>
-<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.<br />
-The <a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Bash Reference Manual (PDF, 720 KiB)</a> is a nice resource to get into the details.</p>
+<a id="bash" name="bash">Bash</a></h2>
+<p>Zważywszy na fakt, że skrypty są z natury zależne od powłoki która je interpretuje, zapoznanie się z powłoką bash używaną w Haiku będzie dobrym początkiem. W sieci istnieje wiele materiałów na jej temat, ponieważ jest szeroko stosowana. Jednym z nich jest <a href="https://web.archive.org/web/20011205095723/http://www.beforever.com/bashtut.htm" class="printurl">Wprowadzenie do powłoki bash - poradnik dla użytkowników BeOS-a</a> (ang.) Johana Janssona.<br />
+<a href="https://www.gnu.org/software/bash/manual/bash.pdf" class="printurl">Instrukcja obsługi powłoki Bash (PDF, 720 KiB)</a> (ang.) opisuje powłokę w bardziej szczegółowy sposób.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="scripting-bible" name="scripting-bible">The Scripting Bible</a></h2>
-<p>After you've learned a few basics about working in the shell, it's time to slowly ease yourself into the world of scripting. Again, you'll find loads of tutorials and reference material online as well as in bookstores. A very nice introduction that's practically tailor-made for Haiku is the online available <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900 KiB</a>) of Scot Hacker's BeOS Bible.</p>
+<a id="scripting-bible" name="scripting-bible">Biblia skryptów</a></h2>
+<p>Gdy juz poznasz podstawy pracy w powłoce, czas powoli wkroczyć do świata skryptów. Również w tym przypadku znajdziesz mnóstwo poradników i materiałów, zarówno w sieci, jaki i w księgarniach. Bardzo dobre wprowadzenie, właściwie specjalnie przygotowane dla Haiku, to dostępny w internecie <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">rozdział o skryptach</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900 KiB</a>, ang.) z Biblii BeOS-a, napisanej przez Scota Hackera.</p>
 
 <h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Scripts in Haiku</a></h2>
-<p>Haiku used to have scripts for booting and shutting down. Today it uses the <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> instead. However, the user can still augment this process with certain user scripts.
-If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Skrypty w Haiku</a></h2>
+<p>Haiku dawniej korzystało ze skryptów podczas rozruchu i zamykania systemu. Obecnie ich rolę wypełnia usługa <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a>. Jednakże, nadal można korzystać ze skryptów do modyfikacji zachowania systemu w trakcie tych czynności. Jeśli pliki w odpowiednich lokacjach jeszcze nie istnieją, należy utworzyć je ręcznie. W przeciwnym razie, wystarczy po prostu dodać komendy w miejscu, w którym mają być wykonane.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="userbootscript" name="userbootscript">The UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
-<pre># Start LaunchBox
+<a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
+<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> zostanie wykonany gdy system zakończy proces rozruchu. Dla przykładu, możesz wtedy uruchomić kilka programów:</p>
+<pre># Uruchom LaunchBox
 /boot/system/apps/LaunchBox &amp;
 
-# Start Workspaces Applet
+# Uruchom aplet Workspaces
 /boot/system/apps/Workspaces &amp;</pre>
-<p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed again).</p>
+<p>Pamiętaj aby na końcu komendy dodać  "<tt>&amp;</tt>", co wystartuje aplikację w tle. Bez tego, wykonywanie skryptu zostanie wstrzymane do momentu, w którym komenda zakończy działanie (w tym przypadku: uruchomiona aplikacja zostanie zamknięta).</p>
 
-<p>A simple alternative to the above for launching applications at boot up is to put links to them in the <span class="path">/boot/home/config/settings/boot/launch</span> directory. This can be done simply by right-clicking on the application you wish to have started automatically, going to <span class="menu">Create Link</span> and then <a href="tracker.html#navigating">navigating</a> to the above directory.</p>
-
-<h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
+<p>Łatwiejszym sposobem uruchamiania aplikacji przy starcie systemu jest umieszczenie odnośników do nich w katalogu <span class="path">/boot/home/config/settings/boot/launch</span>. Można to zrobić klikając prawym przyciskiem myszy na ikonie aplikacji i <a href="tracker.html#navigating">wybierając</a> z menu <span class="menu">Utwórz dowiązanie</span>  powyższy katalog.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
+<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript –
+ jeszcze nieobsługiwany</a></h3>
+<p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> będzie uruchomiony przed rozpoczęciem procesu wyłączania systemu. Jeżeli skrypt zwróci kod inny niż 0, wyłączanie zostanie przerwane.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript – jeszcze nieobsługiwany</a></h3>
+<p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> będzie uruchomiony po zakończeniu procesu wyłączania systemu. Weź pod uwagę, że większość systemu jest już wyłączona w momencie wykonania tego skryptu.</p>
 
 </div>
 </div>
@@ -110,7 +110,7 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 <div class="inner"><span>
  «  <a href="preferences.html">Preferences</a> 
 ::  <a href="contents.html" class="uplink">Spis treści</a> 
-<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
+<!-- ::  <a href="filesystem-layout.html">Układ systemu plików</a>  » -->
 </span></div>
 </div>
 

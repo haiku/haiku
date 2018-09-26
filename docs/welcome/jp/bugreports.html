@@ -12,9 +12,9 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Shota Fukumori
  *		log-1
  *		mt
+ *		Shota Fukumori
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -60,7 +60,7 @@
 <div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td><a href="#account">Trac アカウントを取得する</a><br />
                 <a href="#report">バグレポートの作成</a><br />
                 <a href="#app">アプリケーションのバグ</a><br />
@@ -68,29 +68,29 @@
                   <a href="#kernel">カーネルのバグ</a><br />
                   <a href="#kdl">Kernel Debugging Land - KDL</a><br />
                   <a href="#syslog">Syslog</a><br />
-                  <a href="#onscreen">スクリーン上でのデバッグ</a><br />
-                  <a href="#hardware">Hardware/Driver bugs</a><br />
-                  <a href="#next">そして次は</a></td></tr>
+                  <a href="#onscreen">画面上でのデバッグ</a><br />
+                  <a href="#hardware">ハードウェアとドライバーのバグ</a><br />
+                  <a href="#next">次はどうする</a></td></tr>
 </table>
 
 <h1>バグの報告</h1>
 
-<p>開発者はすべてのハードウェア構成でテストをできません。また、オペレーティングシステムとのあらゆる関わり方をテストすることもできません。そのため私たちは、動作報告をユーザーに頼っています。そして Haiku はまだ幼いプロジェクトのため、バグに遭遇する可能性が高いです。私たちはあなたがバグ報告に時間を割いてくれることに対して感謝します。共に私たちは Haiku を少しづつ改善していくことができます。</p>
+<p>開発者はすべてのハードウェア構成でテストをできません。また、オペレーティングシステムとのあらゆる関わり方をテストすることもできません。そのため私たちは、動作報告をユーザーに頼っています。そして Haiku はまだ幼いプロジェクトのため、バグに遭遇する可能性が高いです。私たちはあなたがバグ報告に時間を割いてくれることに対して感謝します。共に私たちは Haiku を少しずつ改善していくことができます。</p>
 <p>私たちのバグトラッカーを有効に保つため、<a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">バグトラッカーでのエチケット</a>を絶対に守ってください。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="accout">Trac アカウントを取得する</a></h2>
 <p>チケットを登録するには、<a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku バグトラッカー</a>でアカウントを取得する必要があります。<br />
-アカウントを作るときは、チケットの更新通知メールを受信するために<b>自分のメールアドレスを登録すること</b>が必要です。さまざまな確認のためのメールが届くため、アカウントを作成した後は、こまめに<b>迷惑メールフォルダ</b>をチェックするようにしてください。というのも、重要な確認メールがしばしば迷惑メールに分類されてしまうからです。</p>
+アカウントを作るときは、チケットの更新通知メールを受信するために<b>自分のメールアドレスを登録すること</b>が必要です。さまざまな確認のためのメールが届くため、アカウントを作成した後は、こまめに<b>迷惑メールフォルダ</b>をチェックしてください。というのも、重要な確認メールがしばしば迷惑メールに分類されてしまうからです。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="report" name="report">バグレポートの作成</a></h2>
-<p>バグを報告する前に、すでに報告されていないか<a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">確認を</a>するようにしてください。<a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">検索機能</a>が有用です。<br />
+<p>バグを報告する前に、すでに報告されていないか<a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">確認</a>してください。<a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">検索機能</a>が有用です。<br />
 報告されていないことを確認したら、以下の情報をできる限り多く提供してください。</p>
 <ul>
-	<li><p>その問題が最新バージョンの Haiku でも再現するかを確認してみてください。テスト用のビルド済イメージが<a href="http://download.haiku-os.org">利用可能です</a>。</p></li>
+	<li><p>その問題が最新バージョンの Haiku でも再現するかを確認してください。テスト用のビルド済イメージが<a href="http://download.haiku-os.org">利用可能です</a>。</p></li>
 	<li><p>テストした環境の情報 (物理的なハードウェア、QEMU、VMware など)</p></li>
-	<li><p>動かしているリビジョン番号について言及してください。この情報は、Deskbar メニューの<span class="menu">Haiku について (About Haiku...)</span> から得られます。同様にテストしているHaiku のビルドの種類 (gcc2, gcc4, gcc2hybrid, gcc4hybrid) についても触れてください。ダウンロードイメージはビルドの種類に従って命名されています。自分でビルドしたイメージについては、どのようにビルドしたか知っておく必要があります。</p></li>
+	<li><p>動かしているリビジョン番号について言及してください。この情報は、Deskbar メニューの <span class="menu">Haiku について (About Haiku...)</span> から得られます。同様にテストしている Haiku のビルドの種類 (x86_gcc2, x86_64) についても触れてください。ダウンロードイメージはビルドの種類に従って命名されています。自分でビルドしたイメージについては、どのようにビルドしたか知っておく必要があります。</p></li>
 	<li><p>できる限り正しく、実際に起きた挙動を説明し、その後自分が予測した挙動と、現在の挙動の問題を説明する</p></li>
 	<li><p>再現する手順や準備。これは開発者が再現するために必要です。</p></li>
 	<li><p>その他の情報。GUI 周りのバグやアプリケーションのバグならば、<span class="key">PRINT</span> キーを押してスクリーンショットを取得してください。</p></li>
@@ -98,40 +98,40 @@
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">アプリケーションのバグ</a></h2>
-<p>アプリケーションがクラッシュしたときは、ポップアップしたダイアログからデバッガーを起動すべきです。そうすれば gdb (GNU デバッガー) がターミナル画面の上で起動します。<span class="cli">bt</span> と入力すると "バックトレース" が出力されるので、それをそのままコピーし (<span class="cli">bt</span> と入力する前も含める) 、そのままチケットに添付してください。</p>
+<p>アプリケーションがクラッシュしたときは、レポートを保存するかコアファイルを書き込むかができ (どちらもデスクトップ上に保存されます)。それらはバグレポートに添付できます。または、<a href="../../userguide/jp/applications/debugger.html">デバッガー</a>を起動します。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">サーバーのバグ</a></h2>
-<p>App server、registrar、input server のような重要なサーバーがクラッシュしたときはよくあるクラッシュアラートを見ることは無いでしょう。その代わりに、スクリーン全体が白で塗りつぶされ、gdb のセッションがスタートします。出力はスクリーンに直接出力されます。たぶん、マウスはまだ動かせでも gdb の出力を上書きするでしょう。アプリケーションも動いたままで、(たとえば、プロセスコントローラーや デスクバーの時計のように) それも gdb の出力を上書きします。<br />
-さらに、アプリケーションのバグに比べ、すべては見にくく便利ではありません。アプリケーションのバグのようにはいかないでしょう。もっとも重要なバックトレースの取得 (<span class="cli">bt</span> コマンド) も、どこでもテキストのコピーができないのでデジタルカメラ等を用いて写真を撮影しないとならないでしょう。<br />
-実際にクラッシュしているものに応じて、デスクトップに <span class="cli">save-report</span> を使ってクラッシュレポートを保存してみてもよいです。それから電源ボタンを一度押して、手際よくシャットダウンしてみることもできます。</p>
+<p>App server、registrar、input server のような重要なサーバーがクラッシュしたときはよくあるクラッシュアラートを見ることは無いでしょう。その代わりに、画面全体が白で塗りつぶされ、デバッガーがテキストモードで開始します。出力はスクリーンに直接出力されます。たぶん、マウスはまだ動かせでも デバッガーの出力を上書きするでしょう。アプリケーションも動いたままで、(たとえば、プロセスコントローラーや デスクバーの時計のように) それもデバッガーの画面上への出力を上書きします。<br />
+すべては見にくく便利でないことを除けば、基本的にアプリケーションのバグと同様なものが適用できます。もっとも重要なバックトレースの取得 (<span class="cli">bt</span> コマンド) も、どこでもテキストのコピーができないのでデジタルカメラ等を用いて写真を撮影しないとならないでしょう。<br />
+実際にクラッシュしているものに応じて、デスクトップに <span class="cli">save-report</span> を使ってクラッシュレポートを保存するか、<span class="cli">write-core</span> で core file を保存してみてもよいです。それから電源ボタンを一度押して、手際よくシャットダウンしてみることもできます。電源ボタンが動作しない場合は、<span class="cli">shutdown</span> および <span class="cli">reboot</span> コマンドがあります。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">カーネルのバグ</a></h2>
-<p>カーネルのバグのデバッグはもっとも難しいでしょう。カーネルやドライバーのバグにはこのようなさまざまな症状があります:</p>
+<p>カーネルのバグは、もっとも重い努力を伴うバグであり、一方それと同時に、デバッグはもっとも困難なものでしょう。以下のようなさまざまな種類の症状は、そのほとんどがカーネルやドライバーのバグを示しています:</p>
 <ul>
 <li><p>システムは kernel debugging land (KDL) に入ります。画面上部はクリアされいくつかの KDL に入る原因となった理由を含むと思われる文字列が出力されます。次に、"<i>Welcome to Kernel Debugging Land...</i>" と出力されます。その上に、KDL に入った直接の理由が表示されます。</p></li>
-<li><p>システムは自然に再起動します。</p></li>
+<li><p>システムは自発的に再起動します。</p></li>
 <li><p>システムは完全にフリーズします。マウスを動かすこともできず、アプリケーションも停止します。<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (だいたいのキーボードで、<span class="key">SysReq</span> は <span class="key">PRINT</span> と同じキーです) を押して、KDL に入れます。</p></li>
 <li><p>システムは正常に起動しません。起動中に再起動するか、起動中にどこかで止まるか (たとえば、ブートスクリーンでのいくつかのアイコンで) のどちらかかもしれません。後者の場合でも、<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> を押してみてください。</p></li>
-<li><p>システム全体または一部のハードウェアで正常な動作をしない。たとえば、動作がすごく遅い、エラーが発生する、完全に動作しない、などです。一部のハードウェアが動作しないならば、まず Haiku がそれをサポートするかどうかを確認してください (メーリングリストやフォーラムで聞いてみるなど)</p></li>
+<li><p>システム全体または一部のハードウェアで正常な動作をしない。たとえば、動作がすごく遅い、エラーが発生する、完全に動作しない、などです。一部のハードウェアが動作しないならば、まず Haiku がそれをサポートするかどうかを確認してください (メーリングリストやフォーラムで聞いてみるなど)。</p></li>
 </ul>
-<p>最後のポイントだけは、ハードウェアに関係あることを示すように思えますが、すべての他の症状も同様に、ハードウェアのドライバーのバグが原因で発生することがありえることに注意してください。もしドライバーやハードウェアに疑いを持っているならば、そのハードウェアを取り外すか、無効化をしてどのように変わるかを確認してください。たとえば、Wifi が問題だと疑っているならば BIOS の設定を参照して Wifi を無効化できます。設定がない場合は、問題の原因である Wifi ドライバーを Haiku のインストールからブラックリストに入れる (<a href="../../../userguide/en/bootloader.html">ブートローダー</a>を参照ください) ことができます。</p>
+<p>最後のポイントだけは、ハードウェアに関係あることを示すように思えますが、すべての他の症状も同様に、ハードウェアのドライバーのバグが原因で発生することがありえることに注意してください。もしドライバーやハードウェアに疑いを持っているならば、そのハードウェアを取り外すか、無効化をしてどのように変わるかを確認してください。たとえば、Wifi が問題だと疑っているならば BIOS 設定を参照して Wifi を無効化できます。設定がない場合は、問題の原因である Wifi ドライバーを Haiku のインストールからブラックリストに入れる (<a href="../../../userguide/en/bootloader.html">ブートローダー</a>を参照ください) ことができます。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Kernel Debugging Land - KDL</a></h3>
-<p>システムが KDL に自動で入らなかった場合、<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> を押して手動で入れます。<br />
-KDL ではキーボードが動作しないかもしれません。PS/2 キーボードは常に動作します。UHCI コントローラーに接続された USB キーボードは、一度キーボードショートカット経由で KDL に入った場合のみ動作するでしょう。現時点では、USB OHCI はサポートされていません。</p>
+<p>システムが KDL に自動で入らなかった場合、<span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (通常、<span class="key">SysReq</span> は、<span class="key">Print</span> キーです) を押して意図的に入ることができます。<br />
+ここで注意することは、KDL ではキーボードが動作しないかもしれないことです。PS/2 キーボードは常に動作します。USB キーボードは、USB コントローラーのタイプ (UHCI/EHCI) 次第です。通常、キーボードはハフを介さず、直接 USB ポートに接続されるべきです。少なくとも一度は、キーボードショートカット経由で KDL に入った場合、状況次第でキーボードのみ動作するでしょう。現時点では、USB OHCI はサポートされていません。</p>
 <p>KDL 自体はシェルの一種です。システム情報を出力するコマンドを実行できますす。次のコマンドが役に立つでしょう:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (もしくは sc)</td><td> </td><td>バックトレースを出力する。システムが自ら KDL に入った場合、これを必ず実行します。</td></tr>
-<tr><td><span class="cli">ints</span></td><td> </td><td>処理される / 処理されないハードウェア割り込みを表示します。</td></tr>
-<tr><td class="onelinetop"><span class="cli">co</span> (もしくは continue)</td><td> </td><td>カーネルデバッガーを離れ、可能ならばシステムの実行に戻ります。</td></tr>
-<tr><td><span class="cli">reboot</span></td><td> </td><td>システムをすぐに再起動します。まだ保存されていないすべてのデータ、保存はしていてもまだディスクに書き込まれていないデータは失われます。</td></tr>
+<tr><td><span class="cli">bt</span> (別名 <span class="cli">sc</span>)</td><td> </td><td>バックトレースを出力する。システムが自ら KDL に入った場合、これを必ず実行する。</td></tr>
+<tr><td><span class="cli">ints</span></td><td> </td><td>処理される / 処理されないハードウェア割り込みを表示。</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (または continue)</td><td> </td><td>カーネルデバッガーを離れ、可能ならばシステムの実行に戻る。</td></tr>
+<tr><td><span class="cli">reboot</span></td><td> </td><td>システムをすぐに再起動する。まだ保存されていないすべてのデータ、保存はしていてもまだディスクに書き込まれていないデータは失われる。</td></tr>
 </table>
 <p>詳細は <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Kernel Debugging Land へようこそ</a>も参照してください。</p>
 <p>KDL はシリアルポートと syslog にも出力します (もしあるならば。シリアルケーブルをもう一つのコンピューターに接続し、出力を受け取れます)。KDL を終了できない場合 syslog には出力されませんが、ブートローダーのデバッグ用オプションがそれを可能にするでしょう (下記も参照ください)。</p>
-<p>KDL の出力から QR コードを生成できます。QR コードは、スマートフォンなどを使ってテキストに変換できます。この機能を使って KDL のデータを取り出すことについては、次のブログ投稿、<a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> を参照してください。</p>
+<p>KDL の出力から QR コードを生成できます。QR コードは、スマートフォンなどを使ってテキストに変換できます。この機能を使った KDL データの取り出しについては、次のブログ投稿、<a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> を参照してください。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Syslog</a></h3>
@@ -142,26 +142,26 @@ syslog (system log の略称) はシステムに発生した有益な情報を�
 ブートローダーメニューにある <span class="menu">Debug menu</span> の中には <span class="menu">Display syslog from previous session</span> と <span class="menu">Save syslog from previous session</span> があります。前者は syslog をスクリーンに表示し、後者はディスクに保存します。現時点では FAT32 フォーマットのみサポートされていることに注意してください。USB メモリを使用する場合は、後から接続しても認識しないので 1 度再起動し、再度ブートローダーメニューに入る必要があります。注意: 誤ってほかのオペレーションシステムを実行しないようにしてください。syslog を失ってしまいます。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="onscreen" name="onscreen">スクリーン上でのデバッグ</a></h3>
-<p><b>スクリーン上のデバッグ出力は極めて特定の問題とすでにわかっている (タイミング) 問題について役立つでしょう。必要でないなら使用しないでください。</b><br />
+<a id="onscreen" name="onscreen">画面上でのデバッグ</a></h3>
+<p><b>画面上のデバッグ出力は極めて特定の問題にのみ役立ち、(タイミングの) 問題を持つことがわかっています。必要でないなら使用しないでください。</b><br />
 これは Haiku がユーザーのマシンでうまく起動せず、なおかつ何らかの理由で <span class="menu">Debug syslog option</span> もうまく動作しないときに使います。Haiku の起動ロゴが現れる前に、<span class="key">SHIFT</span> を押したままにしてブートローダーメニューに入り、<span class="menu">Select safe mode options</span> を選びます。下の方に <span class="menu">[ ] Enable on screen debug output</span> がリストにあります (注意: ほかのオプションも Haiku のブートを試みる際に有効にできます。Haiku がひとつ以上のオプションを有効にした時のみ起動する場合は、必ずどのオプションかを挙げるようにしてください)。<br />
 最後に、<span class="menu">Return to main menu</span> を選択し、それから <span class="menu">Continue booting</span> を選択します。<br />
-1 ページ以上のテキストがスクリーンに表示されますが、最後の数行のみがチケットに添付する必要がある物でしょう。詳細は、<a href="../../userguide/jp/bootloader.html">ブートローダー</a>を参照ください。</p>
+1 ページ以上のテキストが画面に表示されますが、最後の数行のみがチケットに添付する必要がある物でしょう。詳細は、<a href="../../userguide/jp/bootloader.html">ブートローダー</a>を参照ください。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">ハードウェアとドライバーのバグ</a></h2>
 <p>もしハードウェアやドライバーのバグに関連したバグを扱うならば、以下の情報を添付する必要があります:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td>- <span class="cli">listdev</span></td><td> </td><td>ベンダーと PCI id を含む詳細なハードウェアのリストを出力します。linux の <span class="cli">lshw</span> と <span class="cli">lspci</span> に似ています。</td></tr>
+<tr><td>- <span class="cli">listdev</span></td><td> </td><td>ベンダーと PCI id を含む詳細なハードウェアのリストを出力します。Linux の <span class="cli">lshw</span> と <span class="cli">lspci</span> に似ています。</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>USB 関連のバグを取り扱うときに使用します。Linux の <span class="cli">lsusb</span> に似ています。</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haiku システムのメインログ。ブート中のスクリーン上デバッグと似ています。<span class="cli">open</span> コマンドを用いることで、必要な部分をテキストエディターに切り出せます。</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haiku で使用するシステムのメインログ、上の <a href="#syslog">Syslog</a> を参照ください。ブート中の画面上デバッグと似ています。<span class="cli">open</span> コマンドを用いることで、syslog の関連する部分をテキストエディターに切り出せます。</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>使用されているドライバーのリストを出力する。</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td><i>Kernel Debugging Land</i> (上記を参照) でのみ有効。割り込みの使用状況を表示します。同じ割り込みが複数のデバイスで共有されるのは好ましくありません。</td></tr>
-<tr><td colspan="3">- スクリーン上へのデバッグ出力 (ブート時のセーフモードオプション)</td></tr>
+<tr><td colspan="3">- 画面上へのデバッグ出力 (ブート時のセーフモードオプション<a href="#onscreen">上</a>を参照)</td></tr>
 </table>
 
-<p>最初の 4 つのコマンドはターミナルに入力できます。<span class="cli"> &gt; output.txt</span> をコマンドの最後に追加することで、"output.txt" というテキストファイルに出力されるようになります。つまり、それをバグレポートやメールに添付できるようになります。</p>
+<p>最初の 4 つのコマンドはターミナルに入力できます。<span class="cli">&gt; output.txt</span> をコマンドの最後に追加すると、"output.txt" というテキストファイルに出力されます。つまり、それをバグレポートやメールに添付できます。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="next" name="next">次はどうする</a></h2>

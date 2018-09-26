@@ -11,11 +11,13 @@
  * 		Niels Reedijk, Matt Madia and Ingo Weinhold who wrote
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kacper Kasper
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Reporting bugs</title>
+	<title>Zgłaszanie błędów</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -54,118 +56,115 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Spis treści</td></tr>
-<tr class="index"><td><a href="#account">Getting a Trac account</a><br />
-                <a href="#report">Creating a bug report</a><br />
-                <a href="#app">Application bugs</a><br />
-                  <a href="#server">Server bugs</a><br />
-                  <a href="#kernel">Kernel bugs</a><br />
-                  <a href="#kdl">Kernel Debugging Land - KDL</a><br />
+<tr class="index"><td><a href="#account">Zakładanie konta Trac</a><br />
+                <a href="#report">Otwieranie zgłoszenia</a><br />
+                <a href="#app">Błędy w aplikacjach</a><br />
+                  <a href="#server">Błędy w serwerach</a><br />
+                  <a href="#kernel">Błędy w jądrze</a><br />
+                  <a href="#kdl">Tryb krokowy jądra (KDL)</a><br />
                   <a href="#syslog">Syslog</a><br />
-                  <a href="#onscreen">On screen debug output</a><br />
-                  <a href="#hardware">Hardware/Driver bugs</a><br />
-                  <a href="#next">What's next?</a></td></tr>
+                  <a href="#onscreen">Wypis dziennika na ekran</a><br />
+                  <a href="#hardware">Błędy sprzętowe/w sterownikach</a><br />
+                  <a href="#next">Co dalej?</a></td></tr>
 </table>
 
-<h1>Reporting bugs</h1>
+<h1>Zgłaszanie błędów</h1>
 
-<p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on users to give us some input on how things work at their end. Since Haiku is still quite young, it's very likely that you will encounter bugs. We thank you for taking the time to report these. Together we can improve Haiku, bit by bit.</p>
-<p>To keep our bugtracker effective, it's essential to abide by the <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>.</p>
-
-<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="accout">Getting a Trac account</a></h2>
-<p>To file a ticket, you need to have an account at <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku's Bugtracker</a>.<br />
-When creating a new account, be certain to <b>provide your email address</b> as it is necessary to obtain basic ticket modification privileges. Be sure to <b>check your spam folder</b> shortly afterwards, as the all important verification mail often ends up there.</p>
+<p>Nasi deweloperzy nie są w stanie przetestować każdej możliwej kombinacji sprzętu ani każdego możliwego sposobu interakcji z systemem. Z tego powodu polegamy na użytkownikach, licząc na to, że dadzą nam znać jak Haiku działa na ich komputerach. Ponieważ Haiku jest projektem dość młodym, istnieje duże prawdopodobieństwo, że natkniesz się na błędy. Dziękujemy za czas poświęcony na ich zgłoszenie. Razem możemy ulepszyć Haiku, krok po kroku.</p>
+<p>Aby ułatwić na śledzenie problemów ważne jest przestrzeganie <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Etykiety systemu śledzenia błędów</a> (ang.).</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="report" name="report">Creating a bug report</a></h2>
-<p>Before reporting a bug, please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.<br />
-After you have established that it's a unique bug, make your information as accurate as possible:</p>
+<a id="account" name="accout">Zakładanie konta Trac</a></h2>
+<p>Aby zgłosić problem, potrzebujesz konta w <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">systemie śledzenia błędów Haiku</a>.<br />
+Zakładając konto koniecznie <b>podaj swój adres e-mail</b> ponieważ jest on niezbędny do otrzymania podstawowych uprawinień modyfikacji zgłoszeń. Nie zapomnij <b>sprawdzić katalogu ze spamem</b> maile weryfikacyjne zwykle tam trafiają.</p>
+
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="report" name="report">Otwieranie zgłoszenia</a></h2>
+<p>Przed otworzeniem zgłoszenia <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">upewnij się</a>, że podobne jeszcze nie istnieje. Możesz do tego użyć funkcji <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">Szukaj</a>.<br />
+Kiedy już ustaliłeś, że Twój problem nie został wcześniej zgłoszony, ustal informacje najdokładniej jak potrafisz:</p>
 <ul>
-	<li><p>Attempt to reproduce your issue on the current revision of Haiku. Pre-built images for testing purposes are  <a href="http://download.haiku-os.org">available</a> online.</p></li>
-	<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
-	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (gcc2, gcc4, gcc2hybrid, gcc4hybrid). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
-	<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
-	<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
-	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to take a screenshot by pressing the <span class="key">PRINT</span> key.</p></li>
+	<li><p>Spróbuj spowodować problem na najnowszej wersji Haiku. Gotowe obrazy do testów <a href="http://download.haiku-os.org">dostępne</a> są w sieci.</p></li>
+	<li><p>Załącz podstawowe informacje, takie jak na czym testujesz Haiku (na sprzęcie, w VMWare, w QEMU, itp.).</p></li>
+	<li><p>Napisz jakiej wersji używasz. Znajdziesz tę informację w oknie <span class="menu">O Haiku...</span> dostępnym z menu Deskbara. Istotna jest także architektura systemu (x86_gcc2, x86_64). Obrazy pobrane z sieci mają odpowiednie nazwy, w przypadku systemu zbudowanego samodzielnie powinieneś wiedzieć jakiej jest architektury.</p></li>
+	<li><p>Opisz problem najdokładniej jak możesz: zawrzyj nie tylko opis zachowania obserwowanego, ale też zachowania oczekiwanego.</p></li>
+	<li><p>Opisz krok po kroku jak wywołać opisane zachowanie. To pomoże deweloperom szybciej naprawić błąd.</p></li>
+	<li><p>Załącz jak najwięcej informacji. Jeśli to problem z interfejsem graficznym lub błąd w aplikacji, wykonaj zrzut ekranu klawiszem <span class="key">PRINT</span>.</p></li>
 </ul>
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="app" name="app">Application bugs</a></h2>
-<p>When an application crashed, you should invoke the debugger from the alert that pops up. This will open a Terminal window with gdb (the GNU debugger) running in it. Entering <span class="cli">bt</span>, you create a "backtrace" that you should copy in its entirety (including the part before you entered the <span class="cli">bt</span> command) and attach it to the ticket.</p>
+<a id="app" name="app">Błędy w aplikacjach</a></h2>
+<p>Kiedy aplikacja ulegnie awarii, możesz włączyć <a href="../../userguide/pl/applications/debugger.html">Debugger</a>, zapisać raport lub zrzut pamięci (oba na pulpicie). Pliki dołącz do zgłoszenia.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="server" name="server">Server bugs</a></h2>
-<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
-Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
-Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
+<a id="server" name="server">Błędy w serwerach</a></h2>
+<p>Gdy krytyczne dla systemu serwery takie jak app server, registrar lub input server ulegają awarii, nie zobaczysz zwyczajnego okna z błędem, jak w przypadku aplikacji. Zamiast tego cały ekran zostanie wyczyszczony na biało i zostanie wystartowana tekstowa sesja Debuggera, której rezultaty pojawią się na ekranie. Prawdopodobnie nadal będziesz mieć możliwość poruszania kursorem, który nadpisze fragmenty ekranu. Wciąż działające aplikacji (takie jak ProcessController lub zegar w Deskbarze) również mogą się tak zachowywać.<br />
+Poza tym, że wszystko będzie brzydsze i mniej wygodne, obowiązują te same zasady co w przypadku błędów w aplikacjach. Co najważniejsze, uzyskaj stos wywołań (komenda <span class="cli">bt</span>). Może być konieczne zrobienie zdjęcia ekranu, ze względu na brak możliwości skopiowania tekstu.<br />
+W zależności od tego, co dokładnie uległo awarii, możesz spróbować zapisać raport lub zrzut pamięci na pulpicie komendami (odpowiednio) <span class="cli">save-report</span> i <span class="cli">write-core</span>, a następnie wcisnąć krótko przycisk zasilania jeden raz, aby wyłączyć komputer. Jeżeli przycisk zasilania nie działa, dostępne są również komendy <span class="cli">shutdown</span> i <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kernel" name="kernel">Kernel bugs</a></h2>
-<p>Kernel bugs are usual the ones with the most severe effects while at the same time being the hardest to debug. There are different kinds of symptoms, which most likely point to a kernel or driver issue:</p>
+<a id="kernel" name="kernel">Błędy w jądrze</a></h2>
+<p>Błędy w jądrze zazwyczaj sprawiają najwięcej problemów, będąc jednocześnie najtrudniejszymi do zbadania. Są różne objawy wskazujące na błąd w jądrze lub sterowniku:</p>
 <ul>
-<li><p>The system enters kernel debugging land (KDL) on its own volition. The upper part of the screen is cleared white and several lines of text are printed on it. The second line says "<i>Welcome to Kernel Debugging Land...</i>", the one above it states the immediate reason for entering KDL.</p></li>
-<li><p>The system reboots spontaneously.</p></li>
-<li><p>The system freezes completely. You can't move the mouse and no application draws anything anymore. An important test in that situation is, whether you still can enter KDL via the shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being <span class="key">PRINT</span> on most keyboards). Wait at least a minute to see, if anything happens.</p></li>
-<li><p>The system doesn't boot up correctly. It may reboot spontaneously or stop at some point (e.g. at some icon of the boot screen). In the latter case also try <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
-<li><p>The whole system or some piece of hardware doesn't behave correctly. For example, it could be very slow, errors occur, or something doesn't work at all. If some hardware doesn't work at all, the first obvious check is whether Haiku supports it at all at the moment (e.g. ask on a mailing list or a forum).</p></li>
+<li><p>System z własnej woli wchodzi do trybu badania jądra (KDL). Górna część ekranu zostaje wyczyszczona białym kolorem i wypisane zostaje kilka linii tekstu. Druga linia to „<i>Welcome to Kernel Debugging Land...</i>”, ponad nią znajduje się bezpośredni powód wejścia do tego trybu.</p></li>
+<li><p>System spontanicznie się restartuje.</p></li>
+<li><p>System kompletnie się zawiesza. Nie można ruszyć kursorem oraz żadna aplikacja nie przerysowuje ekranu. Ważnym testem w tej sytuacji jest próba wejścia do KDL skrótem <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> to <span class="key">PRINT</span> na większości klawiatur). Poczekaj na efekt przynajmniej minutę.</p></li>
+<li><p>System nie startuje poprawnie. Może uruchamiać się ponownie lub zatrzymywać w którymś momencie (np. na którejś z ikon na ekranie rozruchowym). W drugim przypadku również spróbuj skrótu <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
+<li><p>Cały system lub któreś z urządzeń nie zachowuje się poprawnie. Na przykład może być bardzo powolne, powodować błędy lub w ogóle nie działać. Jeśli urządzenie nie działa, pierwszą rzeczą do sprawdzenia jest, czy Haiku ten sprzęt obsługuje (np. pytając na liście mailingowej lub forum).</p></li>
 </ul>
-<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could blacklist the responsible Wifi driver from your Haiku installation (see <a href="../../userguide/pl/bootloader.html">Boot Loader</a>).</p>
+<p>Mimo że tylko ostatni symptom wskazuje na powiązanie ze sprzętem, wszystkie pozostałe objawy też mogą być spowodowane błędem w sterowniku. Jeżeli podejrzewasz jakieś konkretne urządzenie lub sterownik o powodowanie problemów, sprawdź czy wyłączenie/usunięcie ich robi różnicę. Dla przykładu, podejrzewając WiFi poszukaj w BIOS-ie opcji wyłączenia łączności bezprzewodowej. Możesz również wyłączyć ładowanie odpowiedniego sterownika (zobacz rozdział <a href="../../userguide/pl/bootloader.html">Boot Loader</a>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="kdl" name="kdl">Kernel Debugging Land - KDL</a></h3>
-<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
-Note that in KDL your keyboard may not work. PS/2 keyboards always do, USB keyboards connected via UHCI controllers do only, if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
-<p>KDL itself is a kind of a shell. One can execute commands that print information about the system. The following commands might be of interest:</p>
+<a id="kdl" name="kdl">Tryb krokowy jądra (Kernel Debugging Land, KDL)</a></h3>
+<p>Jeżeli system nie wszedł do KDL, możesz to zrobić samodzielnie skrótem klawiszowym <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> to zazwyczaj <span class="key">Print</span>).<br />
+Weź pod uwagę, że w KDL klawiatura może nie działać. Klawiatury PS/2 działają zawsze, klawiatury USB podłączone do kontrolera UHCI działają tylko, gdy KDL został wywołany z klawiatury przynajmniej raz. USB OHCI nie jest obecnie obsługiwane.</p>
+<p>Sam KDL jest rodzajem powłoki. Można w nim wywoływać komendy zwracające informacje o stanie systemu. Poniższe są szczególnie przydatne:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka sc)</td><td> </td><td>Prints a back trace. If the system entered KDL on its on volition, always enter that one.</td></tr>
-<tr><td><span class="cli">ints</span></td><td> </td><td>Shows the handled and unhandled hardware interrupts.</td></tr>
-<tr><td class="onelinetop"><span class="cli">co</span> (aka continue)</td><td> </td><td>Leaves the kernel debugger and continues normal operation of the system, if that is possible.</td></tr>
-<tr><td><span class="cli">reboot</span></td><td> </td><td>Reboots the system immediately. You will lose all unsaved data and even those that have been saved, but have not yet been written back to disk.</td></tr>
+<tr><td><span class="cli">bt</span> (lub <span class="cli">sc</span>)</td><td> </td><td>Wypisuje stos wywołań. Zawsze wywołaj tę komendę, jeśli KDL pojawił się samoczynnie.</td></tr>
+<tr><td><span class="cli">ints</span></td><td> </td><td>Wypisuje obsłużone i nieobsłużone przerwania sprzętowe.</td></tr>
+<tr><td class="onelinetop"><span class="cli">co</span> (lub continue)</td><td> </td><td>Opuszcza tryb badania jądra i wznawia normalną pracę systemu, o ile jest to możliwe.</td></tr>
+<tr><td><span class="cli">reboot</span></td><td> </td><td>Natychmiast restartuje system. Powoduje utratę niezapisanych danych oraz tych zapisanych, ale nie zrzuconych jeszcze na dysk.</td></tr>
 </table>
-<p>For more information, see the article <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a>.</p>
-<p>The KDL output is written to the serial port (if you have one, a respective cable, and a second computer to connect with, you can capture the output there via a terminal program) and to the syslog. If you can't leave KDL it won't be written to the syslog file, though. There's a boot loader debug option that allows you to capture it nonetheless (see below).</p>
-<p>You can generate QR codes from KDL output that can then be converted to text using smartphones or similar devices. See the blog post <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> on how to get data out of KDL using that feature.</p>
+<p>Więcej informacji w artykule <a href="http://www.haiku-os.org/documents/dev/welcome_to_kernel_debugging_land">Welcome to Kernel Debugging Land</a> (ang.).</p>
+<p>Wyjście KDL jest kopiowane na port szeregowy (jeśli komputer jest wyposażony w taki port, a ponadto masz odpowiedni kabel i drugi komputer, możesz je przechwycić korzystając z terminala) oraz do dziennika systemu. To ostatnie nie będzie możliwe, jeżeli nie możesz wyjść z KDL. Istnieje opcja boot loadera pozwalająca przechwycić informacje z KDL mimo tego (patrz niżej).</p>
+<p>Możesz wygenerować kody QR z wynikiem KDL, które mogą być potem odczytane na smartfonie lub podobnym urządzeniu. Zobacz wpis <a href="http://www.haiku-os.org/blog/mmlr/2012-07-01_qr_encode_your_kdl_output">QR Encode your KDL Output</a> (ang.) na blogu, aby dowiedzieć się jak korzystać z tej możliwości.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Syslog</a></h3>
-<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
-The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/system/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
-<p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
-If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
-In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>
+<p><b>Jest to preferowana metoda wyciągnięcia informacji z niestartującego systemu.</b><br />
+Syslog (skrót od ang. <i>system log</i>, dziennik systemu) zawiera wartościowe informacje dotyczące tego, co działo się z systemem, włączając w to sesje KDL. Dobrą praktyką jest dołączanie tego pliku do zgłoszeń dotyczących jądra. Syslog jest zapisywany do pliku <span class="path">/boot/system/var/log/syslog</span>. Ponieważ zapisywanie do pliku wymaga działającego systemu, najświeższe informacje mogą się w nim nie znaleźć, jeżeli wystąpi problem z jądrem (w szczególności przy losowych restartach lub sesjach KDL, z których nie można wyjść).</p>
+<p>Opcja <span class="menu">Enable debug syslog</span> w menu bootloadera <span class="menu">Debug menu</span> sprawia, że syslog jest zrzucany bezpośrednio do pliku. Jeżeli opcja <span class="menu">Save syslog from previous session during boot</span> jest aktywowana (a domyślnie jest), syslog z poprzedniej sesji znajdziesz w pliku <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
+W przypadku niestartującego systemu, aby dostać się do poprzedniego syslogu wciśnij klawisz <span class="key">SHIFT</span> podczas rozruchu.<br />
+W <span class="menu">Debug menu</span> bootloadera znajdziesz pozycje <span class="menu">Display syslog from previous session</span> oraz <span class="menu">Save syslog from previous session</span>. Pierwsza z nich wyświetla syslog na ekranie, druga pozwala zapisać dziennik do pliku. Obecnie tylko partycje FAT32 są obsługiwane. Jeśli chcesz użyć dysku USB, ale został podłączony za późno i przez to nierozpoznany, uruchom komputer ponownie i jeszcze raz wejdź do menu. Uwaga: przypadkowe uruchomienie systemu spowoduje utratę danych z dziennika.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="onscreen" name="onscreen">On screen debug output</a></h3>
-<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
-This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
-Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
-One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/pl/bootloader.html">Boot Loader</a>.</p>
+<a id="onscreen" name="onscreen">Wypis dziennika na ekran</a></h3>
+<p><b>Ta opcja jest przydatna do badania tylko ściśle określonych przypadków i wiadomo, że są z nią problemy. Nie używaj jej, o ile nie musisz.</b><br />
+Poniższe informacje mają zastosowanie tylko jeśli Haiku nie uruchamia się i opcja <span class="menu">Debug syslog</span> z jakiejś przyczyny nie działa. Podczas rozruchu, zanim pojawi się logo Haiku, przytrzymaj <span class="key">SHIFT</span>, aby otworzyć menu bootloadera. Wybierz <span class="menu">Select safe mode options</span>. Na dole pojawi się opcja <span class="menu">[ ] Enable on screen debug output</span>. (Uwaga: inne opcje także mogą być zaznaczone. Jeśli Haiku uruchamia się tylko z określonymi kombinacjami, opisz je w zgłoszeniu).<br />
+Na koniec wybierz <span class="menu">Return to main menu</span>, a następnie <span class="menu">Continue booting</span>.<br />
+Kilka stron tekstu zostanie wyświetlone na ekranie, ale tylko kilka ostatnich linii powinno być dołączone do zgłoszenia. Więcej informacji o rozruchu systemu jest w rozdziale <a href="../../userguide/pl/bootloader.html">Boot Loader</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hardware" name="hardware">Hardware/Driver bugs</a></h2>
-<p>When dealing with a hardware/driver related bug, you should attach the following information as text files:</p>
+<a id="hardware" name="hardware">Błędy sprzętowe/w sterownikach</a></h2>
+<p>Mając do czynienia z błędem dotyczącym sprzętu lub sterownika, do zgłoszenia powinny być załączone jako pliki wyniki następujących komend:</p>
 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td>- <span class="cli">listdev</span></td><td> </td><td>A detailed listing of your hardware, including vendor and pci id's, similar to Linux' <span class="cli">lshw</span> and <span class="cli">lspci</span>.</td></tr>
-<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>Assuming its a USB related issue, similar to <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
-<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Lists all used drivers.</td></tr>
-<tr><td>- <span class="cli">ints</span></td><td> </td><td>Only available within <i>Kernel Debugging Land</i> (see above). Shows interrupt usage. There shouldn't be too many that are shared by different devices.</td></tr>
-<tr><td colspan="3">- On screen debug output (a safe mode boot time option).</td></tr>
+<tr><td>- <span class="cli">listdev</span></td><td> </td><td>Szczegółowa lista sprzętu, zawierająca identyfikatory producentów i modeli, odpowiednik linuksowych <span class="cli">lshw</span> i <span class="cli">lspci</span>.</td></tr>
+<tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>W przypadku problemów z USB, odpowiednik <span class="cli">lsusb</span>.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Dziennik systemu opisany <a href="#syslog">wyżej</a>. Komendą <span class="cli">open</span> możesz przyciąć dziennik w edytorze tekstu.</td></tr>
+<tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>Sporządza listę wszystkich używanych sterowników.</td></tr>
+<tr><td>- <span class="cli">ints</span></td><td> </td><td>Dostępna tylko w <i>Trybie krokowym jądra (KDL)</i> (patrz wyżej). Wyświetla przerwania. Nie powinno być zbyt wielu współdzielonych przez różne urządzenia.</td></tr>
+<tr><td colspan="3">- Wypis dziennika na ekran (opcja ustawiana podczas rozruchu, zobacz <a href="#onscreen">wyżej</a>).</td></tr>
 </table>
 
-<p>The first four commands are entered into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
+<p>Pierwsze cztery komendy należy wpisać w aplikacji Terminal. Dodając <span class="cli"> &gt; output.txt</span> po komendzie, można przekierować jej wynik z ekranu do pliku o nazwie „output.txt”, który później łatwo załączyć do zgłoszenia lub maila.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="next" name="next">What's next?</a></h2>
-<p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding
-non-descriptive comments.</p>
-<p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked
-as 'fixed'.</p>
+<a id="next" name="next">Co dalej?</a></h2>
+<p>Po zgłoszeniu błędu, jeden z deweloperów rzuci na niego okiem i spróbuje go sklasyfikować. Pamiętaj, wszyscy jesteśmy wolontariuszami, czasami zgłoszenie może pozostać przez jakiś czas bez odpowiedzi. Dołączanie nowych informacji zazwyczaj sprawia, że błąd zostanie naprawiony szybciej, ale nie należy „podbijać” zgłoszenia nieistotnymi komentarzami.</p>
+<p>Pamiętaj też, że zgłoszenie błędu to nie jest jednorazowy wysiłek. Po otwarciu zgłoszenia stajesz się częścią procesu jego rozwiązywania. W jego trakcie deweloperzy mogą mieć pytania. Zostań w kontakcie, aby móc na nie odpowiedzieć. Możesz uznać swoje zaangażowanie za „zakończone” dopiero gdy zgłoszenie zostanie oznaczone jako „rozwiązane”.</p>
 
 </div>
 </div>

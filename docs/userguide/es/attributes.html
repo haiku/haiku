@@ -10,9 +10,9 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		Oscar Carballal
- *		miguel~1.mx
  *		Humdinger
+ *		miguel~1.mx
+ *		Oscar Carballal
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -52,7 +52,7 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Tipos de archivo</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="index.html">Contenido</a>  »
 </span></div>
 </div>
@@ -89,7 +89,7 @@
 <p><span class="cli">listattr</span> muestra una lista de los atributos de un archivo, pero no muestra los contenidos de los mismos.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>Captura de pantalla de ejemplo:</p>
-<pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
+<pre class="terminal"> ~/people -&gt;listattr Clara\\ Botters
 File: Clara Botters
    Type         Size                 Name
 -----------  ---------  -------------------------------
@@ -118,7 +118,7 @@ MIME String         21  "BEOS:TYPE"
 <ul>
 <li><p><tt>BEOS:TYPE</tt> mantiene el tipo de archivo como un string <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, en este caso "<tt>application/x-person</tt>". El atributo determina el icono predeterminado y la aplicación que abre el archivo cuando, p. ej., se hace doble clic en él.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" es el atributo con el cual Tracker mantiene récord de la posición del icono de un archivo.</p></li></ul>
-<div class="box-info">Note la diagonal invertida después de "Clara". En la terminal se debe usar notación de "escape" en carácteres especiales como <tt>'"*\$?!</tt>. El espacio entre "Clara" y "Botters" también es uno de ellos. Por lo tanto la diagonal invertida está en realidad  junto al carácter espacio, y no después de "Clara".</div>
+<div class="box-info">Note la diagonal invertida después de "Clara". En la terminal se debe usar notación de "escape" en carácteres especiales como <tt>'"*\\$?!</tt>. El espacio entre "Clara" y "Botters" también es uno de ellos. Por lo tanto la diagonal invertida está en realidad  junto al carácter espacio, y no después de "Clara".</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -126,7 +126,7 @@ MIME String         21  "BEOS:TYPE"
 <p><span class="cli">catattr</span> despliega el contenido de un atributo específico de un archivo.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>De nuevo en nuestro ejemplo:</p>
-<pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
+<pre class="terminal"> ~/people -&gt;catattr META:city Clara\\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
@@ -141,7 +141,7 @@ Clara Botters : string : Whelton</pre>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
 <p>Así que digamos que nuestra querida Clara consiguió un trabajo con la multinacional Barkelbaer Inc., y se llene el atributo "Company" anteriormente vacío con esa información (la cual es del tipo "string"):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\\ Inc. Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -152,7 +152,7 @@ Clara Botters : string : Whelton</pre>
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Aunque en la práctica sería suficiente sólo con no llenar el atributo "Fax", se puede removerlo completamente del archivo de Clara escribiendo:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -171,7 +171,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Tipos de archivo</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="index.html">Contenido</a>  »
 </span></div>
 </div>

@@ -4,14 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2015-2017, Haiku. All rights reserved.
+ * Copyright 2015-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		mt
  *		Humdinger
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -68,25 +68,45 @@
 <span class="path">~/config/settings/Debugger/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Debugger は、一般ユーザーがあまり使う機会のないアプリケーションです。それは、プログラム中のバグを詳細に調べる開発者をターゲットにしています。時々、これらのバグはクラッシュをもたらし、しかもそこでエンドユーザーでも Debugger に出会うことがあります。プログラムがクラッシュした時、次のアラートに遭遇します。</p>
+<p>Debugger は、一般ユーザーはあまり使う機会のないアプリケーションです。それは、プログラム中のバグを詳細に調べる開発者をターゲットにしています。時々、これらのバグはクラッシュをもたらし、しかもそこでエンドユーザーでも Debugger に出会うことがあります。プログラムがクラッシュした時、次のアラートに遭遇します。</p>
 <img src="../images/apps-images/debugger_alert.png" alt="debugger_alert.png" />
-<p>そこには、クラッシュに対応するための 3 つのオプションがあります。</p>
+<p>アラートには、クラッシュに対応する 3 つのオプションがあります。</p>
 <ul>
-<li><p><span class="button">終了 (Terminate)</span> クラッシュしたアプリケーションの後始末をしますが、そのほかはこれ以上何もしません。</p></li>
+<li><p><span class="button">終了 (Terminate)</span> クラッシュしたアプリケーションの後始末をしますが、それ以上何もしません。</p></li>
 <li><p><span class="button">デバッグ (Debug)</span> さらに調査するために Debugger を起動します。</p></li>
 <li><p><span class="button">コアファイルの出力 (Write core file)</span> は、システム状態に関するたぶん巨大なダンプファイルを生成します。バグレポートを提出する際は、最初に通常のデバッグレポートを添付するのが良く、コアファイルは要求があったときにだけ添付してください。</p></li>
-<li><p><span class="button">レポートを保存 (Save report)</span> デバッグレポートを作成します。それはデスクトップ上にテキストファイルとして作成され、クラッシュしたアプリケーションの作者にメールで送付することや、または、可能であればそのアプリケーションのバグトラッカーに添付することができます。<br />
-デバッグレポートは以下のものを含みます。ハードウェア情報 (CPU の種類やメモリー使用量など)、Haiku の正確なバージョン、およびクラッシュに関連すると考えられるシステム状態のあらゆる入手可能な情報。</p></li>
+<li><p><span class="button">レポートを保存 (Save report)</span> デバッグレポートを作成します。それはデスクトップ上にテキストファイルとして作成され、クラッシュしたアプリケーションの作者にメールで送付でき、また、可能であればそのアプリケーションのバグトラッカーに添付できます。<br />
+デバッグレポートは以下のものを含みます。ハードウェア情報 (CPU の種類やメモリ使用量など)、Haiku の正確なバージョン、およびクラッシュに関連すると考えられるシステム状態のあらゆる入手可能な情報。</p></li>
 </ul>
-<p>実際のDebugger の操作の記載は、Haiku の一般ユーザー向けというユーザーガイドの範囲を超えます。完全を期すために、以下のウィンドウは、上記のアラートで<span class="button">デバッグ (Debug)</span> オプションを選んだ際に現れるものです。</p>
+<p>クラッシュが発生した時のデフォルトのアクションは、テキストファイル <span class="path">~/config/settings/system/debug_server/settings</span> で設定できます。<br />
+ファイルは、以下のような driver_settings スタイルのフォーマットとなります。</p>
+<pre>default_action user
+
+executable_actions {
+	app1 log
+	/path/app2* debug
+}</pre>
+<p>default_action の有効な値は以下の通りです:</p>
+<table summary="action values" border="0" cellspacing="0" cellpadding="2">
+<tr><td>user</td><td style="width:30px"></td><td>ユーザーのアクションの入力を待つ。</td></tr>
+<tr><td>kill</td><td></td><td>クラッシュしている team を静かに終了。</td></tr>
+<tr><td>debug</td><td></td><td>Debugger をクラッシュしている team へ接続。</td></tr>
+<tr><td>log / report</td><td></td><td>クラッシュレポートを保存し、team を終了。</td></tr>
+<tr><td>core</td><td></td><td>(たぶん非常に巨大な) コアファイルを保存し、team を終了。</td></tr>
+</table>
+<p>default_action が指定されてなければ、"user" が仮定されます。</p>
+<p>executable_actions サブセクションは、デフォルトを個別に上書きします。これらは上記のような形式をとります。個々の行は、team 名か path のみとなります (ワイルドカードも使えます)。</p>
+<p><br /></p>
+<hr />
+<p><br /></p>
+<p>実際の Debugger の操作の記載は、Haiku の一般ユーザー向けというユーザーガイドの範囲を超えてしまいます。完全を期すために、以下のウィンドウは、上記のアラートで<span class="button">デバッグ (Debug)</span> オプションを選んだ際に現れるものです。</p>
 <img src="../images/apps-images/debugger.png" alt="debugger.png" />
 <p>少しさわり始めるとすぐわかるように、Debugger はもっとも複雑かつ洗練された Haiku 用アプリケーションのひとつです。もし読者が開発者で、ほかのプラットフォーム上のグラフィカルなデバッガーに慣れているなら、多くの機能はよく知っているものでしょう。</p>
-<p>以下は、Haiku の Debugger の複雑さに光を当てるかもしれないいくつかのリンクです。もし特定の質問があるなら、それを<a href="http://www.freelists.org/list/haiku-development">開発メーリングリスト</a> (development mailing list) にポストしてください。もしもより有用なリソースを見つけたら、その情報とともに<a href="../../../welcome/en/bugreports.html">バグレポート</a>に報告してください。</p>
+<p>以下のリンクは、Haiku の Debugger の複雑さに光を当てるかもしれません。もし特定の質問があるなら、それを<a href="http://www.freelists.org/list/haiku-development">開発メーリングリスト</a> (development mailing list) にポストしてください。もしもより有用なリソースを見つけたら、その情報とともに<a href="../../../welcome/en/bugreports.html">バグレポート</a>に報告してください。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td class="onelinetop"><a href="https://www.dropbox.com/s/e6gx39r0asc2t8f/DebuggerReferenceManual.pdf?dl=1">Debugger レファレンスマニュアル</a></td><td></td><td>Debugger の使い方についてのもっとも詳しい情報源。</td></tr>
 <tr><td><a href="https://www.haiku-os.org/blog/anevilyak/">Blog 記事</a></td><td> </td><td>Debugger に関する 2、3 の記事があります。ほとんどは新機能追加後の Rene Gollent による記事です。</td></tr>
 <tr><td class="onelinetop"><a href="https://www.youtube.com/watch?v=n-NDFwtmQcI&amp;list=PL2KiE-VO9zk-9XPmfusEDaOFd_7AiVKzz">BeGeistert 026 のビデオ</a></td><td> </td><td>2012 年の BeGeistert ミーティングで、Ingo Weinhold が Debugger の状況をデモしています。また、ボトルネックを追い詰めるプロファイラーのような、ほかの興味深いツールも紹介しています。</td></tr>
-<tr><td class="onelinetop"><a href="http://cgit.haiku-os.org/haiku/commit/?id=hrev46547">Default action when crashing</a></td><td> </td><td>このコミットメッセージは、なにかがクラッシュしたときの挙動を変更する方法を記載しています。たとえば、ユーザーにいつものクラッシュアラートを表示する代わりに、常にクラッシュレポートを保存するようにシステムを変更できます。そのような変更を特定のアプリケーションに限定することができます。</td></tr>
 </table>
 
 </div>

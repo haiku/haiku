@@ -10,8 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		thebowseat
  *		mt
+ *		thebowseat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -61,7 +61,7 @@
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>目次</td></tr>
+<tr class="heading"><td>インデックス</td></tr>
 <tr class="index"><td>
 	<a href="#mounting-volumes">ボリュームのマウント</a><br />
 	<a href="#navigating">ナビゲーション</a><br />
@@ -75,16 +75,16 @@
 <h1>Tracker</h1>
 
 <p>Tracker はすべてのファイルへのグラフィカルインターフェースです。それは新しいファイルおよびフォルダーの作成や、検索、起動や名前の編集のほかに、既存のファイルのコピーや削除も行います。</p>
-<p>ほかのアプリケーションと同様に (アイコンを備えたデスクトップは実際にはうしろにある単なるフルスクリーンウィンドウです)、Tracker はそのウィンドウとともに Deskbar 上に現れ、終了および再起動ができます。クラッシュやフリーズした Tracker (あるいは不安定な Deskbar) を終了して再起動するもっとも簡単な方法は、<a href="teammonitor.html">チームモニター</a>を呼び出すことです。</p>
+<p>ほかのアプリケーションと同様に (アイコンを備えたデスクトップは実際には背面にある単なるフルスクリーンウィンドウです)、Tracker はそのウィンドウとともに Deskbar 上に現れ、終了および再起動ができます。クラッシュやフリーズした Tracker (あるいは不安定な Deskbar) を終了して再起動するもっとも簡単な方法は、<a href="teammonitor.html">チームモニター</a>を呼び出すことです。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">ボリュームのマウント</a></h2>
 <p>ハードディスク、CD、USB スティック等にアクセスするためには、まずボリュームをマウントしなければなりません、すなわち、システムにそれがそこにあることを知らせます。ボリュームをマウントするには、デスクトップあるいはマウント済のボリューム (ブートディスク等) を右クリックして <span class="menu">マウント (Mount)</span> サブメニューからボリュームを選択します。Deskbar に同様のマウントメニューが見つかります。</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>また、<span class="menu">設定 (Settings)</span> もあるので、起動のたびにすべてを手動でマウントする必要はありません。上図の設定は、接続や挿入されたあらゆる記憶装置を自動的にマウントし、以前にマウントされたすべてのディスクを起動時にマウントするでしょう。</p>
+<p><span class="menu">設定 (Settings)</span> もあるため、起動のたびにすべてを手動でマウントする必要はありません。上図の設定は、接続や挿入されたあらゆる記憶装置を自動的にマウントし、以前にマウントされたすべてのディスクを起動時にマウントするでしょう。</p>
 <div class="box-warning">ハードドライブや USB スティック等を取り外す前に、ボリュームが正しくアンマウントされ、アイコンが消えていることを確かめてください。これはデータ転送がすべて終了したことを保証します。そうしないと、データを失うか、あるいはディスクを破損するかもしれません。</div>
-<div class="box-warning">Haiku は、BFS フォーマット以外のボリュームをマウントできます。しかし、これら BFS 以外のファイルシステムは詳しくテストされていないことに注意してください。これらのボリュームへの書き込みは場合によってはデーター破損の原因になるかもしれません。大事を取るなら、マウント時は常に <span class="button">読み取り専用 (Mount read-only)</span> を選んでください!</div>
+<div class="box-warning">Haiku は、BFS フォーマット以外のボリュームをマウントできます。しかし、これら BFS 以外のファイルシステムは詳しくテストされていないことに注意してください。これらのボリュームへの書き込みは場合によってはデータ破損の原因になるかもしれません。大事を取るなら、マウント時は常に <span class="button">読み取り専用 (Mount read-only)</span> を選んでください!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -155,7 +155,7 @@
 <li><p><span class="menu">デスクトップ (Desktop)</span> - マウントされたディスクを、すべてデスクトップに表示するか、またはデスクトップ上の単独のディスク (Disks) アイコンをクリックして表示されるウィンドウ中に表示するかを決めます。</p></li>
 <li><p><span class="menu">ウィンドウ (Windows)</span> - <span class="menu">シングルウィンドウナビゲーション (Single window navigation)</span> を設定できます。つまり、フォルダーをダブルクリックすると、それ自身のウィンドウを開く代わりにすでに開いているウィンドウの中に開きます。これは上記の <span class="key">OPT</span> キーを押しながらクリックするのとは違います。なぜなら、ウィンドウごとに保存された位置やサイズを失うからです。<br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Tracker を<span class="menu">シングルウィンドウナビゲーション</span>へ切り替える前に、よりなじんでいるかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこでは、パス名の入力や、コピー＆ペーストができます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
+<p>Tracker を<span class="menu">シングルウィンドウナビゲーション</span>へ切り替える前に、より慣れているかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこでは、パス名の入力や、コピー＆ペーストができます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
 <p> <span class="menu">先行入力フィルターを有効にする (Enable type-ahead filtering)</span>  を有効にすると、入力している間、入力文字列がファイル名または表示されている属性にマッチするファイルだけを表示するように、Tracker ウィンドウの内容をフィルタリングします。<a href="#type-ahead-filter">上記を</a>見てください。</p></li>
 <li><p><span class="menu">ごみ箱 (Trash)</span> - ファイルを削除する時の動作を設定します。</p></li>
 <li><p><span class="menu">ディスクアイコン (Volume icons)</span> - ディスクアイコンの横に表示される空き容量表示の有無や色を設定します。</p></li>
@@ -183,7 +183,7 @@
 <img src="images/tracker-images/get-info.png" alt="get-info" />
 <p>このパネルでは、選択されたファイルの情報の表示およびデフォルトアプリケーションの設定が行えます。また、パネルの一部を拡げると、ファイルのパーミッションおよび所有者を設定できます。パスをクリックすると、Tracker ウィンドウ中にファイルを選択します。</p></li>
 <li><p><span class="menu">名前の変更 (Edit name)</span>, <span class="menu">複製 (Duplicate)</span>、<span class="menu">ごみ箱に移動 (Move to Trash)</span> - ファイル名の編集、ファイルの複製、または選択したファイルをごみ箱へ移動できます。</p></li>
-<li><p><span class="menu">次へ移動 (Move to)</span>、<span class="menu">次へにコピー (Copy to)</span>、<span class="menu">指定先にリンクを作成 (Create link)</span> - サブメニューナビゲーション方法を使用して、選択したファイルの移動、コピー、またはリンクができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けると、相対リンクを作成するオプションを提供します。</p></li>
+<li><p><span class="menu">次へ移動 (Move to)</span>、<span class="menu">次へコピー (Copy to)</span>、<span class="menu">指定先にリンクを作成 (Create link)</span> - サブメニューナビゲーション方法を使用して、選択したファイルの移動、コピー、またはリンクができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けると、相対リンクを作成するオプションを提供します。</p></li>
 <li><p><span class="menu">切り取り (Cut)</span>、<span class="menu">コピー (Copy)</span>、<span class="menu">貼り付け (Paste)</span> - クリップボードを使ってファイルのカット、コピー、そしてペーストができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けることによって、おそらく別のフォルダーからファイルを<span class="menu">さらにコピー / 切り取り (Copy/Cut more)</span> でき、後でほかのどこかにペーストできます。さらに、<span class="key">SHIFT</span> を押し続ける間、クリップボードにコピーされたファイルをリンクとしてペーストできます。</p></li>
 <li><p><span class="menu">ファイル形式を判別 (Identify)</span> - ファイルタイプを見つけ出して、たとえば、<span class="cli">wget</span> でファイルを転送した場合のように、ファイルがファイルタイプを持っていなければ、セットするでしょう。メニューを起動する間に <span class="key">SHIFT</span> を押していると、メニューは<span class="menu">ファイル形式を判別 (Force identify)</span> に変わります。これは、ファイルタイプを識別し、誤りだった場合は修正します。</p></li>
 <li><p><span class="menu">アドオン (Add-ons)</span> - すべての一般的な Tracker アドオンと、選択されたファイルを扱えるアドオンを表示します。詳しくは、<a href="tracker-add-ons.html">Tracker アドオン</a>のトピックを見てください。</p></li>
@@ -194,7 +194,7 @@
 <a id="transaction-status" name="transaction-status">処理状況</a></h2>
 <p>ファイルをコピー、移動、または削除する場合、Tracker は進行状況をステータスウィンドウで表示します。複数の処理を始めた場合、ジョブごとに状態が表示されます。</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>右側に、処理を休止あるいは完全に止めるための 2 個のボタンがあります。大きな処理を一時的に休止することはたまには有用かもしれません。たとえば、大きなアプリケーションを速く起動する必要があるかもしれません。大量のデータコピーはユーザーのハードディスクの I/O 帯域幅を詰まらせるので、ワークフローを遅らせます。</p>
+<p>右側に、処理を休止あるいは完全に止める 2 個のボタンがあります。大きな処理を一時的に休止することはたまには有用かもしれません。たとえば、大きなアプリケーションを速く起動する必要があるかもしれません。大量のデータコピーはユーザーのハードディスクの I/O 帯域幅を詰まらせるので、ワークフローを遅らせます。</p>
 
 </div>
 </div>

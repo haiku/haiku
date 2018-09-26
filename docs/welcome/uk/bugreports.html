@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Зміст</td></tr>
@@ -88,7 +89,7 @@
 <ul>
 	<li><p>Спробуйте відтворити проблему на поточній версії Haiku. Передналаштовані образи для цілей тестування  <a href="http://download.haiku-os.org">доступні</a> в інтернеті.</p></li>
 	<li><p>Повідомте основну інформацію про те як Ви тестуєте Haiku (на реальному залізі, у VMWare, у QEMU і тд).</p></li>
-	<li><p>Уточніть з якою версією Ви працюєте. Інформацію про це можна знайти у пункті меню Deskbar'а <span class="menu">Про Haiku... (About Haiku...)</span>. Також вкажіть вид  збірки Haiku (gcc2, gcc4, gcc2hybrid, gcc4hybrid), яка тестується. Стягнуті з мережі образи відповідно проіменовані, у випадку самостійного збирання Ви повинні знати що збирали.</p></li>
+	<li><p>Mention which revision you are running. You can find this information in <span class="menu">About Haiku...</span> from the Deskbar menu. Also mention what kind of Haiku build you are testing (x86_gcc2, x86_64). The downloadable images are named accordingly, for a self-built image you should know how you built it.</p></li>
 	<li><p>Опишіть проблему яка Вас спіткала. Постарайтесь бути якомога точнішим: опишіть реальну поведінку та ту яку Ви очікуєте.</p></li>
 	<li><p>Опишіть які кроки необхідно виконати для того, щоб натрапити на помилку. Це допоможе розробникам відтворити її.</p></li>
 	<li><p>Вкладіть всю інформацію яка у Вас є. Якщо це помилка графічного інтерфейсу або помилка одного з додатків спробуйте при можливості зробити знімок екрану натиснувши клавішу <span class="key">PRINT</span>.</p></li>
@@ -96,14 +97,13 @@
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Помилки у додатках</a></h2>
-<p>Коли додаток зазнав краху Ви повинні з вікна повідомлення яке з'явиться викликати відладчик. Відкриється вікно Терміналу з запущеним у ньому gdb (відладчиком GNU). 
-Введіть команду <span class="cli">bt</span>, Ви створите "трасування" яке Ви повинні скопіювати повністю (включаючи ту частину, що була у вікні до введення команди <span class="cli">bt</span>) і прикріпити його до квитка.</p>
+<p>When an application crashed, you can either save a report or write a core file (both saved to the Desktop) that you can attach to a bugreport, or you can evoke the <a href="../../userguide/uk/applications/debugger.html">Debugger</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Помилки у серверах</a></h2>
-<p>Коли зазнають краху життєво важливі сервери такі як:  app server, registrar або input server Ви не побачите звичного попередження про аварію. Замість нього екран очиститься стане білим та стартує сесія відладчика gdb, його вихід з'явиться безпосередньо на екрані. Можливо Ви надалі зможете рухати курсором мишки який  затиратиме на екрані біле тло та рядки виводу відладчика. Працюючі додатки (такі як, наприклад, ProcessController або годинник в Deskbar) також можуть малювати поверх виведення відладчика на екрані.<br />
-До того ж, все буде виглядати так само незграбно та жахливо як і при помилках додатків. Найважливіше тепер отримати зворотнє трасування (командою <span class="cli">bt</span>). Ви можете зробити знімок екрану цифровою камерою, бо текст gdb скоріше всього скопіювати не вдасться.<br />
-В залежності від того що зазнало краху можна спробувати зберегти звіт про помилку на робочому столі ввівши команду <span class="cli">save-report</span>, а після цього натиснути кнопку живлення один раз щоб спробувати акуратно завершити роботу.</p>
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and the Debugger will be started in text-mode, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and Debugger output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> or <span class="cli">write-core</span> for a core file, and then press the power button once to try shutting cleanly down. If the power button doesn't work, there are also the commands <span class="cli">shutdown</span> and <span class="cli">reboot</span>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Помилки у ядрі</a></h2>
@@ -119,11 +119,11 @@
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Територія відладки ядра (Kernel Debugging Land) - далі KDL</a></h3>
-<p>Якщо система не потрапляє у режим KDL самостійно Ви можете змусити  її до цього натискаючи комбінацію клавіш <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.<br />
-Зауважте що у режимі KDL Ваша клавіатура може не працювати. PS/2 клавіатури працюватимуть завжди, USB клавіатури підключені до контролерів UHCI спрацюють для входу у  KDL тільки один раз. Клавіатури USB OHCI на даний момент у цьому режимі не працюють.</p>
+<p>If the system hasn't entered KDL by itself, you can do that intentionally by invoking the keyboard shortcut <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> (<span class="key">SysReq</span> being the <span class="key">Print</span> key, normally).<br />
+Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>Сама KDL є свого роду оболонкою. Можна виконувати команди, які надають інформацію про систему. Можуть бути цікавими наступні команди :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka sc)</td><td> </td><td>виводити зворотнє трасування. Якщо система потрапила у  KDL за власним бажанням завжди набирайте цю команду.</td></tr>
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>виводити зворотнє трасування. Якщо система потрапила у  KDL за власним бажанням завжди набирайте цю команду.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>показати оброблені та необроблені переривання апаратного забезпечення.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (aka continue)</td><td> </td><td>залишити територію відладки ядра та продовжити при можливості роботу системи.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>негайно перезавантажує систему. Будуть втрачені всі незбережені дані і навіть ті, які були збережені, але ще не були записані назад на диск.</td></tr>
@@ -154,10 +154,10 @@
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td>детальний список Вашого апаратного забезпечення, включаючи визначники vendor id та pci id, аналогічно Linux'овим командам <span class="cli">lshw</span> та  <span class="cli">lspci</span>. </td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>підсумок всього що зв'язане з USB, аналогічно <span class="cli">lsusb</span>.</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Первинний системний журнал Haiku, щось подібне до екранного виводу відладки при завантаженні. За допомогою команди <span class="cli">open</span> Ви зможете вирізати потрібну частину в текстовому редакторі.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>перелічує всі драйвери які використовуються.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>Доступне тільки зсередини <i>Території відладки ядра (Kernel Debugging Land)</i> (дивись вище). Показує використання переривань. Не повинно бути занадто багато таких, які спільно використовують різні пристрої.</td></tr>
-<tr><td colspan="3">- Екранний вивід відладки (On screen debug output) (опція безпечного режиму під час завантаження).</td></tr>
+<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
 </table>
 
 <p>Перші чотири команди вводяться в Терміналі. Додайте <span class="cli"> &gt; output.txt</span> після команди, і це конвеєрує вивід в текстовий файл з ім'ям "output.txt", який ви можете прикріпити до зголошення про помилку або до електронного листа.</p>
