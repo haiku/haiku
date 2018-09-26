@@ -858,11 +858,13 @@ delete_object_cache_internal(object_cache* cache)
 
 	mutex_lock(&cache->lock);
 
+#if KDEBUG
 	if (!cache->full.IsEmpty())
 		panic("cache destroy: still has full slabs");
 
 	if (!cache->partial.IsEmpty())
 		panic("cache destroy: still has partial slabs");
+#endif
 
 	while (!cache->empty.IsEmpty())
 		cache->ReturnSlab(cache->empty.RemoveHead(), 0);
