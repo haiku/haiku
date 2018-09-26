@@ -73,14 +73,17 @@ rule DefineDefaultBuildProfiles
 			if $(DEBUG) != 0 {
 				HAIKU_IMAGE_SIZE ?= 1300 ;
 			}
-			HAIKU_IMAGE_SIZE ?= 1100 ;
+			if $(HAIKU_INCLUDE_SOURCES) = 1 {
+				HAIKU_IMAGE_SIZE ?= 1100 ;
+			} else {
+				HAIKU_IMAGE_SIZE ?= 700 ;
+			}
 
 			AddHaikuImagePackages
 				bepdf
 				keymapswitcher
 				llvm
 				man
-				mercurial
 				nano
 				noto
 				noto_sans_cjk_jp
