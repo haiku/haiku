@@ -18,7 +18,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.16.1-1
 	bash-4.4.023-1
 	bc-1.07.1-2
-	bepdf-2.1.0-2
+	bepdf-2.1.0-3
 	binutils-2.17_2016_07_24-4
 	bison-3.0.5-1
 	bzip2-1.0.6-8
@@ -241,9 +241,9 @@ RemotePackageRepository HaikuPorts
 	llvm_x86_clang-5.0.0-3
 	llvm_x86_clang_analysis-5.0.0-3
 	llvm_x86_libs-5.0.0-3
-	mesa_x86-17.1.10-2
-	mesa_x86_devel-17.1.10-2
-	mesa_x86_swpipe-17.1.10-2
+	mesa_x86-17.1.10-3
+	mesa_x86_devel-17.1.10-3
+	mesa_x86_swpipe-17.1.10-3
 	ncurses6_x86-6.1-1
 	ncurses6_x86_devel-6.1-1
 	mpc_x86-1.1.0-1
