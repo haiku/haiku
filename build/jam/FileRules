@@ -405,35 +405,6 @@ actions DetermineHaikuRevision2
 }
 
 
-rule DetermineEffectiveHaikuRevision
-{
-	local revisionFile = <haiku-rootdir>effective-haiku-revision ;
-	if ! [ on $(revisionFile) return $(HAIKU_EFFECTIVE_REVISION_DETERMINED) ] {
-		HAIKU_EFFECTIVE_REVISION_DETERMINED on $(revisionFile) = 1 ;
-		MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
-		local rawRevision = [ DetermineHaikuRevision ] ;
-		Depends $(revisionFile) : $(rawRevision) ;
-		DetermineEffectiveHaikuRevision1 $(revisionFile) : $(rawRevision) ;
-		LocalClean clean : $(revisionFile) ;
-	}
-
-	return $(revisionFile) ;
-}
-
-
-actions DetermineEffectiveHaikuRevision1
-{
-	revision=`sed -n 's,^\(hrev[0-9]*\).*,\1,p' "$(2:E=unknown-revision)"`
-	if [ -z "$revision" ]; then
-		echo "Error: unable to determine the effective Haiku revision."
-		echo "       If you are using a Haiku clone without tags, you can set"
-		echo "       the revision tag to use with e.g. HAIKU_REVISION=hrev43210"
-		exit 1
-	fi
-	echo "${revision:-0}" > "$(1)"
-}
-
-
 rule DataFileToSourceFile sourceFile : dataFile : dataVariable : sizeVariable
 {
 	sourceFile = [ FGristFiles $(sourceFile) ] ;
