@@ -117,7 +117,7 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 		defines += HAIKU_BUILD_FEATURE_$(featureSplit:UJ=_)_ENABLED ;
 	}
 
-	local revisionFile = [ DetermineEffectiveHaikuRevision ] ;
+	local revisionFile = [ DetermineHaikuRevision ] ;
 	Depends $(target) : $(source) $(revisionFile) ;
 
 	if useCPP in $(flags) {
@@ -135,7 +135,7 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 
 actions PreprocessPackageOrRepositoryInfo1
 {
-	revision=`cat $(2[2])`
+	revision=`cat $(2[2]) | sed 's/[+-]/_/g'`
 	version=$(HAIKU_VERSION)_${revision}
 	sed $(HAIKU_SED_REPLACEMENTS) \
 			-e s,%HAIKU_VERSION%,${version}-1, \
