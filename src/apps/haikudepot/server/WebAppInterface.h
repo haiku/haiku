@@ -33,6 +33,10 @@ typedef List<BString, false>	StringList;
 #define ERROR_CODE_LIMITEXCEEDED				-32805
 #define ERROR_CODE_AUTHORIZATIONRULECONFLICT	-32806
 
+/*! This constant can be used to indicate the lack of a rating. */
+
+#define RATING_NONE -1
+
 
 class WebAppInterface {
 public:

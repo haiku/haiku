@@ -53,6 +53,7 @@ private:
 			TextDocumentRef		fRatingText;
 			TextEditorRef		fTextEditor;
 			float				fRating;
+			bool				fRatingDeterminate;
 			BString				fStability;
 			StabilityRatingList	fStabilityCodes;
 			BString				fCommentLanguage;
