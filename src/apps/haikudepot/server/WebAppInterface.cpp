@@ -750,11 +750,9 @@ WebAppInterface::_SendJsonRequest(const char* domain, BPositionIO* requestData,
 	// delivered from memory.
 
 	if (Logger::IsTraceEnabled()) {
-		off_t requestDataPosition = requestData->Position();
 		printf("jrpc request; ");
 		_LogPayload(requestData, requestDataSize);
 		printf("\n");
-		requestData->Seek(requestDataPosition, SEEK_SET);
 	}
 
 	ProtocolListener listener(Logger::IsTraceEnabled());
@@ -806,19 +804,19 @@ WebAppInterface::_SendJsonRequest(const char* domain, BPositionIO* requestData,
 			return HD_CLIENT_TOO_OLD;
 
 		default:
-			printf("json-rpc request to endpoint [.../%s] failed with http "
+			printf("jrpc request to endpoint [.../%s] failed with http "
 				"status [%" B_PRId32 "]\n", domain, statusCode);
 			return B_ERROR;
 	}
 
+	replyData.Seek(0, SEEK_SET);
+
 	if (Logger::IsTraceEnabled()) {
 		printf("jrpc response; ");
-		replyData.Seek(0, SEEK_SET);
 		_LogPayload(&replyData, replyData.BufferLength());
 		printf("\n");
 	}
 
-	replyData.Seek(0, SEEK_SET);
 	BJsonMessageWriter jsonMessageWriter(reply);
 	BJson::Parse(&replyData, &jsonMessageWriter);
 	status_t status = jsonMessageWriter.ErrorStatus();
@@ -848,6 +846,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, const BString& jsonString,
 void
 WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
 {
+	off_t requestDataOffset = requestData->Position();
 	char buffer[LOG_PAYLOAD_LIMIT];
 
 	if (size > LOG_PAYLOAD_LIMIT)
@@ -869,6 +868,8 @@ WebAppInterface::_LogPayload(BPositionIO* requestData, size_t size)
     	if (size == LOG_PAYLOAD_LIMIT)
     		printf("...(continues)");
 	}
+
+	requestData->Seek(requestDataOffset, SEEK_SET);
 }
 
 
