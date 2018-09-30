@@ -421,7 +421,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_CCFLAGS += $(compatibilityHeader) ;
 	HOST_C++FLAGS += $(compatibilityHeader) ;
 } else {
-	HOST_LINKFLAGS += -lm ;
+	HOST_LINKFLAGS += -lm -ldl ;
 	HOST_LIBSTDC++ = stdc++ ;
 	if $(HOST_PLATFORM) = cygwin {
 		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
