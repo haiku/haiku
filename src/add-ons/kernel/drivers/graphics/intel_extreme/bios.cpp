@@ -144,7 +144,7 @@ get_bios(void)
 		kVBIOSAddress, vbios.memory));
 
 	int vbtOffset = vbios.ReadWord(kVbtPointer);
-	if (vbtOffset >= kVBIOSSize) {
+	if ((vbtOffset + sizeof(vbt_header)) >= kVBIOSSize) {
 		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", vbtOffset));
 		delete_area(vbios.area);
 		return false;
@@ -156,7 +156,6 @@ get_bios(void)
 		delete_area(vbios.area);
 		return false;
 	}
-
 	return true;
 }
 
