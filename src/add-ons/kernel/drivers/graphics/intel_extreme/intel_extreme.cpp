@@ -332,13 +332,11 @@ intel_extreme_init(intel_info &info)
 
 	memset((void*)info.shared_info, 0, sizeof(intel_shared_info));
 
-	int fbIndex = 0;
 	int mmioIndex = 1;
 	if (info.device_type.Generation() >= 3) {
 		// For some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
-		fbIndex = 2;
 	}
 
 	// evaluate driver settings, if any
