@@ -115,24 +115,6 @@ if [ IsPackageAvailable icu_devel ] {
 }
 
 
-# curl
-if [ IsPackageAvailable curl_devel ] {
-	ExtractBuildFeatureArchives curl :
-		file: base curl
-			runtime: lib
-		file: devel curl_devel
-			depends: base
-			library:
-				$(developLibDir)/libcurl.so
-			headers: $(developHeadersDir) $(developHeadersDir)/curl
-		;
-
-	EnableBuildFeatures curl ;
-} else {
-	Echo "Curl not available for $(TARGET_PACKAGING_ARCH)" ;
-}
-
-
 # CLucene
 
 # TODO: Update to packages!

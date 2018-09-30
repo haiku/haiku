@@ -42,7 +42,6 @@ Whether they are installed can be tested by running them in a shell with
 the `--version` parameter.
 
 The following libraries (and their respective headers) are required:
- * `curl`
  * `zlib`
 
 ### Haiku for ARM
