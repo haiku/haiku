@@ -750,6 +750,9 @@ BeDecorator::_DrawZoom(Decorator::Tab* _tab, bool direct, BRect rect)
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
 		rect.bottom));
 
+	if (rect.IntegerWidth() < 1)
+		return;
+
 	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	int32 index = (tab->buttonFocus ? 0 : 1) + (tab->zoomPressed ? 0 : 2);
 	ServerBitmap* bitmap = tab->zoomBitmaps[index];
