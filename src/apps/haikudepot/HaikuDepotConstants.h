@@ -32,6 +32,10 @@ enum {
 #define HD_ERR_NO_DATA					(HD_ERROR_BASE + 4)
 
 
+#define REPOSITORY_NAME_SYSTEM "system"
+#define REPOSITORY_NAME_INSTALLED "installed"
+
+
 // These constants reference resources in 'HaikuDepot.ref'
 enum {
 	RSRC_STAR_BLUE		= 510,
