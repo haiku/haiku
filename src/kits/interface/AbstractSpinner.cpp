@@ -347,7 +347,7 @@ SpinnerButton::Draw(BRect updateRect)
 
 	BView::Draw(updateRect);
 
-	float frameTint = B_DARKEN_1_TINT;
+	float frameTint = fIsEnabled ? B_DARKEN_1_TINT : B_NO_TINT;
 
 	float fgTint;
 	if (!fIsEnabled)
@@ -380,6 +380,7 @@ SpinnerButton::Draw(BRect updateRect)
 		borders |= be_control_look->B_LEFT_BORDER;
 
 	uint32 flags = fIsMouseDown ? BControlLook::B_ACTIVATED : 0;
+	flags |= !fIsEnabled ? BControlLook::B_DISABLED : 0;
 
 	// draw the button
 	be_control_look->DrawButtonFrame(this, rect, updateRect,
