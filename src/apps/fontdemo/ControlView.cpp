@@ -361,7 +361,7 @@ ControlView::_UpdateFontmenus(bool setInitialfont)
 
 	for (int32 i = 0; i < fontfamilies; i++) {
 		if (get_font_family(i, &fontFamilyName) == B_OK) {
-			stylemenu = new BPopUpMenu(fontFamilyName);
+			stylemenu = new BMenu(fontFamilyName);
 			stylemenu->SetLabelFromMarked(false);
 			const int32 styles = count_font_styles(fontFamilyName);
 
