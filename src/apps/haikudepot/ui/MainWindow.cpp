@@ -936,6 +936,9 @@ MainWindow::_RefreshPackageList(bool force)
 	if (fSinglePackageMode)
 		return;
 
+	if (Logger::IsDebugEnabled())
+		printf("will refresh the package list\n");
+
 	BPackageRoster roster;
 	BStringList repositoryNames;
 
@@ -1221,6 +1224,9 @@ MainWindow::_RefreshPackageList(bool force)
 		printf("Unknown exception occurred while resolving system "
 			"dependencies.\n");
 	}
+
+	if (Logger::IsDebugEnabled())
+		printf("did refresh the package list\n");
 }
 
 
