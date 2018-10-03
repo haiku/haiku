@@ -96,6 +96,7 @@ const struct supported_device {
 	{0x0162, INTEL_MODEL_IVBG, "IvyBridge Desktop GT2"},
 	{0x0156, INTEL_MODEL_IVBGM, "IvyBridge Mobile GT1"},
 	{0x0166, INTEL_MODEL_IVBGM, "IvyBridge Mobile GT2"},
+	{0x0152, INTEL_MODEL_IVBGS, "IvyBridge Server"},
 	{0x015a, INTEL_MODEL_IVBGS, "IvyBridge Server GT1"},
 	{0x016a, INTEL_MODEL_IVBGS, "IvyBridge Server GT2"},
 
