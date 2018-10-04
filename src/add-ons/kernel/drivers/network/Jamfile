@@ -39,3 +39,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network rtl81xx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network syskonnect ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network via_rhine ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network vt612x ;
+
+# FreeBSD 11.2 drivers
+SubInclude HAIKU_TOP src add-ons kernel drivers network emulex_oce ;
