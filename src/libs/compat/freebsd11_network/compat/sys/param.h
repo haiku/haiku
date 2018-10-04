@@ -65,6 +65,7 @@
 #define roundup2(x, y)	(((x) + ((y) - 1)) & (~((y) - 1)))
 #define rounddown(x, y)  (((x) / (y)) * (y))
 #define rounddown2(x, y) ((x)&(~((y)-1)))          /* if y is power of two */
+#define powerof2(x)	((((x)-1)&(x))==0)
 
 #define	PRIMASK	0x0ff
 #define	PCATCH	0x100

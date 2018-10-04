@@ -32,11 +32,12 @@ KernelStaticLibrary libfreebsd11_network.a :
 	fbsd_mii.c
 	fbsd_mii_bitbang.c
 	fbsd_mii_physubr.c
+	fbsd_subr_bufring.c
 	fbsd_subr_sbuf.c
 	fbsd_time.c
 	firmware.c
 	if.c
-	libkern.c
+	libkern.cpp
 	mbuf.c
 	mii.c
 	mutex.c
@@ -44,7 +45,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 	smp.c
 	subr_autoconf.cpp
 	synch.c
-	systm.c
+	systm.cpp
 	taskqueue.c
 	unit.cpp
 	;

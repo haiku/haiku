@@ -12,6 +12,7 @@
 
 extern int random(void);
 uint32_t arc4random(void);
+u_int read_random(void *, u_int);
 
 static __inline int imax(int a, int b) { return (a > b ? a : b); }
 static __inline int imin(int a, int b) { return (a < b ? a : b); }

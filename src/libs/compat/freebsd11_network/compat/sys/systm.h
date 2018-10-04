@@ -98,6 +98,9 @@ int _pause(const char *, int);
 	msleep((channel), NULL, (priority), (waitMessage), (timeout))
 #define mtx_sleep msleep
 
+void critical_enter(void);
+void critical_exit(void);
+
 struct unrhdr;
 struct unrhdr *new_unrhdr(int low, int high, struct mtx *mutex);
 void delete_unrhdr(struct unrhdr *);

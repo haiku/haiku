@@ -3,9 +3,12 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-
+extern "C" {
 #include <compat/sys/systm.h>
 #include <compat/sys/kernel.h>
+}
+
+#include <thread.h>
 
 
 int
@@ -13,6 +16,20 @@ _pause(const char* waitMessage, int timeout)
 {
 	KASSERT(timeout != 0, ("pause: timeout required"));
 	return snooze(ticks_to_usecs(timeout));
+}
+
+
+void
+critical_enter(void)
+{
+	thread_pin_to_current_cpu(thread_get_current_thread());
+}
+
+
+void
+critical_exit(void)
+{
+	thread_unpin_from_current_cpu(thread_get_current_thread());
 }
 
 

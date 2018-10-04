@@ -25,7 +25,11 @@
 
 #define	M_MAGIC			877983977	/* time when first defined :-) */
 
-#define M_DEVBUF
+#define M_DEVBUF		0
+
+
+struct malloc_type {
+};
 
 
 void *_kernel_malloc(size_t size, int flags);

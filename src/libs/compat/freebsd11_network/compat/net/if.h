@@ -72,7 +72,7 @@ struct if_data {
 	uint16_t	ifi_datalen;		/* length of this data struct */
 	uint32_t	ifi_mtu;			/* maximum transmission unit */
 	uint32_t	ifi_metric;			/* routing metric (external only) */
-	uint32_t	ifi_baudrate;		/* linespeed */
+	uint64_t	ifi_baudrate;		/* linespeed */
 	/* volatile statistics */
 	uint64_t	ifi_ipackets;		/* packets received on interface */
 	uint64_t	ifi_ierrors;		/* input errors on interface */

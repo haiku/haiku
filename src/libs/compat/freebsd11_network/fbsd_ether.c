@@ -29,9 +29,13 @@
  *	@(#)if_ethersubr.c	8.1 (Berkeley) 6/10/93
  * $FreeBSD: src/sys/net/if_ethersubr.c,v 1.193.2.12 2006/08/28 02:54:14 thompsa Exp $
  */
+
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/mbuf.h>
 #include <net/ethernet.h>
+#include <net/if_vlan_var.h>
+#include <netinet/in.h>
 
 #if 0
 /*
@@ -115,4 +119,32 @@ ether_sprintf(const u_char *ap)
 		(unsigned)ap[0], (unsigned)ap[1], (unsigned)ap[2],
 		(unsigned)ap[3], (unsigned)ap[4], (unsigned)ap[5]);
 	return (etherbuf);
+}
+
+struct mbuf *
+ether_vlanencap(struct mbuf *m, uint16_t tag)
+{
+	struct ether_vlan_header *evl;
+
+	M_PREPEND(m, ETHER_VLAN_ENCAP_LEN, M_NOWAIT);
+	if (m == NULL)
+		return (NULL);
+	/* M_PREPEND takes care of m_len, m_pkthdr.len for us */
+
+	if (m->m_len < sizeof(*evl)) {
+		m = m_pullup(m, sizeof(*evl));
+		if (m == NULL)
+			return (NULL);
+	}
+
+	/*
+	 * Transform the Ethernet header into an Ethernet header
+	 * with 802.1Q encapsulation.
+	 */
+	evl = mtod(m, struct ether_vlan_header *);
+	bcopy((char *)evl + ETHER_VLAN_ENCAP_LEN,
+	    (char *)evl, ETHER_HDR_LEN - ETHER_TYPE_LEN);
+	evl->evl_encap_proto = htons(ETHERTYPE_VLAN);
+	evl->evl_tag = htons(tag);
+	return (m);
 }

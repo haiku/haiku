@@ -46,9 +46,6 @@ extern "C" {
 #endif
 
 
-#define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
-
-
 struct internal_intr {
 	device_t		dev;
 	driver_filter_t	filter;
@@ -85,7 +82,7 @@ map_mem(void **virtualAddr, phys_addr_t _phy, size_t size, uint32 protection,
 	phys_addr_t physicalAddr = _phy - offset;
 	area_id area;
 
-	size = ROUNDUP(size + offset, B_PAGE_SIZE);
+	size = roundup(size + offset, B_PAGE_SIZE);
 	area = map_physical_memory(name, physicalAddr, size, B_ANY_KERNEL_ADDRESS,
 		protection, virtualAddr);
 	if (area < B_OK)
@@ -262,6 +259,13 @@ int
 rman_get_rid(struct resource *res)
 {
 	return 0;
+}
+
+
+void*
+rman_get_virtual(struct resource *res)
+{
+	return NULL;
 }
 
 

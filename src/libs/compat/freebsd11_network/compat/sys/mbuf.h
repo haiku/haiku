@@ -79,6 +79,54 @@
 #define M_ASSERTPKTHDR(m) KASSERT(m != NULL && m->m_flags & M_PKTHDR, \
 	("%s: no mbuf packet header!", __func__))
 
+
+/*
+ * Network interface cards are able to hash protocol fields (such as IPv4
+ * addresses and TCP port numbers) classify packets into flows.  These flows
+ * can then be used to maintain ordering while delivering packets to the OS
+ * via parallel input queues, as well as to provide a stateless affinity
+ * model.  NIC drivers can pass up the hash via m->m_pkthdr.flowid, and set
+ * m_flag fields to indicate how the hash should be interpreted by the
+ * network stack.
+ *
+ * Most NICs support RSS, which provides ordering and explicit affinity, and
+ * use the hash m_flag bits to indicate what header fields were covered by
+ * the hash.  M_HASHTYPE_OPAQUE and M_HASHTYPE_OPAQUE_HASH can be set by non-
+ * RSS cards or configurations that provide an opaque flow identifier, allowing
+ * for ordering and distribution without explicit affinity.  Additionally,
+ * M_HASHTYPE_OPAQUE_HASH indicates that the flow identifier has hash
+ * properties.
+ */
+#define	M_HASHTYPE_HASHPROP		0x80	/* has hash properties */
+#define	M_HASHTYPE_HASH(t)		(M_HASHTYPE_HASHPROP | (t))
+/* Microsoft RSS standard hash types */
+#define	M_HASHTYPE_NONE			0
+#define	M_HASHTYPE_RSS_IPV4		M_HASHTYPE_HASH(1) /* IPv4 2-tuple */
+#define	M_HASHTYPE_RSS_TCP_IPV4		M_HASHTYPE_HASH(2) /* TCPv4 4-tuple */
+#define	M_HASHTYPE_RSS_IPV6		M_HASHTYPE_HASH(3) /* IPv6 2-tuple */
+#define	M_HASHTYPE_RSS_TCP_IPV6		M_HASHTYPE_HASH(4) /* TCPv6 4-tuple */
+#define	M_HASHTYPE_RSS_IPV6_EX		M_HASHTYPE_HASH(5) /* IPv6 2-tuple +
+							    * ext hdrs */
+#define	M_HASHTYPE_RSS_TCP_IPV6_EX	M_HASHTYPE_HASH(6) /* TCPv6 4-tuple +
+							    * ext hdrs */
+/* Non-standard RSS hash types */
+#define	M_HASHTYPE_RSS_UDP_IPV4		M_HASHTYPE_HASH(7) /* IPv4 UDP 4-tuple*/
+#define	M_HASHTYPE_RSS_UDP_IPV4_EX	M_HASHTYPE_HASH(8) /* IPv4 UDP 4-tuple +
+							    * ext hdrs */
+#define	M_HASHTYPE_RSS_UDP_IPV6		M_HASHTYPE_HASH(9) /* IPv6 UDP 4-tuple*/
+#define	M_HASHTYPE_RSS_UDP_IPV6_EX	M_HASHTYPE_HASH(10)/* IPv6 UDP 4-tuple +
+							    * ext hdrs */
+
+#define	M_HASHTYPE_OPAQUE		63	/* ordering, not affinity */
+#define	M_HASHTYPE_OPAQUE_HASH		M_HASHTYPE_HASH(M_HASHTYPE_OPAQUE)
+						/* ordering+hash, not affinity*/
+
+#define	M_HASHTYPE_CLEAR(m)	((m)->m_pkthdr.rsstype = 0)
+#define	M_HASHTYPE_GET(m)	((m)->m_pkthdr.rsstype)
+#define	M_HASHTYPE_SET(m, v)	((m)->m_pkthdr.rsstype = (v))
+#define	M_HASHTYPE_TEST(m, v)	(M_HASHTYPE_GET(m) == (v))
+#define	M_HASHTYPE_ISHASH(m)	(M_HASHTYPE_GET(m) & M_HASHTYPE_HASHPROP)
+
 #define MBUF_CHECKSLEEP(how) do { } while (0)
 
 #define MTAG_PERSISTENT	0x800
@@ -122,12 +170,16 @@ extern int max_datalen;		// MHLEN - max_hdr
 
 struct pkthdr {
 	struct ifnet*					rcvif;
-	int								len;
-	int								csum_flags;
-	int								csum_data;
-	uint16_t						tso_segsz;
-	uint16_t						ether_vtag;
 	SLIST_HEAD(packet_tags, m_tag)	tags;
+	int								len;
+
+	/* Layer crossing persistent information. */
+	uint32_t	flowid;		/* packet's 4-tuple system */
+	uint64_t	csum_flags;	/* checksum and offload features */
+	int			csum_data;
+	uint8_t		rsstype;		/* hash type */
+	uint16_t	tso_segsz;
+	uint16_t	ether_vtag;
 };
 
 struct m_tag {

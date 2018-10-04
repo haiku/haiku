@@ -21,6 +21,9 @@ struct sysctl_ctx_list {
 struct sysctl_oid_list {
 };
 
+struct sysctl_oid {
+};
+
 
 #define SYSCTL_HANDLER_ARGS void *oidp, void *arg1, int arg2, \
 	struct sysctl_req *req
