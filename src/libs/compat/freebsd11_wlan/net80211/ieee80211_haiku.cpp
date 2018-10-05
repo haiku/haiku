@@ -1,7 +1,7 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de.
- * Copyright 2018, Haiku, Inc.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2009, Colin Günther, coling@gmx.de. All rights reserved.
+ * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -57,7 +57,6 @@ extern "C" {
 #include <util/KMessage.h>
 
 #include <ether_driver.h>
-#include <bosii_driver.h>
 #include <net_notifications.h>
 
 #include <shared.h>
@@ -207,147 +206,9 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 	struct ifnet* ifp = (struct ifnet*)cookie;
 
 	switch (op) {
-		case BOSII_DEVICE:
-			return B_OK;
-
-		case BOSII_DETECT_NETWORKS:
-		{
-			struct ieee80211req request;
-			struct ieee80211_scan_req scanRequest;
-
-			if_printf(ifp, "%s: BOSII_DETECT_NETWORKS\n", __func__);
-			memset(&scanRequest, 0, sizeof(scanRequest));
-			scanRequest.sr_flags = IEEE80211_IOC_SCAN_ACTIVE
-				| IEEE80211_IOC_SCAN_NOPICK
-				| IEEE80211_IOC_SCAN_ONCE;
-			scanRequest.sr_duration = 10000; // 10 s
-			scanRequest.sr_nssid = 0;
-
-			memset(&request, 0, sizeof(request));
-			request.i_type = IEEE80211_IOC_SCAN_REQ;
-			request.i_data = &scanRequest;
-			request.i_len = sizeof(scanRequest);
-
-			ifp->if_ioctl(ifp, SIOCS80211, (caddr_t)&request);
-
-			acquire_sem_etc(ifp->scan_done_sem, 1, B_RELATIVE_TIMEOUT,
-				10000000); // 10 s
-
-			return B_OK;
-		}
-
-		case BOSII_GET_DETECTED_NETWORKS:
-		{
-			struct ieee80211req request;
-			struct ifreq ifRequest;
-			struct route_entry* networkRequest = &ifRequest.ifr_route;
-
-			if_printf(ifp, "%s: BOSII_GET_DETECTED_NETWORKS\n", __func__);
-
-			if (length < sizeof(struct ieee80211req_scan_result))
-				return B_BAD_VALUE;
-
-			if (user_memcpy(&ifRequest, arg, sizeof(ifRequest)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			memset(&request, 0, sizeof(request));
-			request.i_type = IEEE80211_IOC_SCAN_RESULTS;
-			request.i_len = length;
-			request.i_data = networkRequest->destination;
-
-			// After return value of request.i_data is copied into user
-			// space, already.
-			if (ifp->if_ioctl(ifp, SIOCG80211, (caddr_t)&request) < B_OK)
-				return B_BAD_ADDRESS;
-
-			// Tell the user space how much data was copied
-			networkRequest->mtu = request.i_len;
-			if (user_memcpy(&((struct ifreq*)arg)->ifr_route.mtu,
-				&networkRequest->mtu, sizeof(networkRequest->mtu)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			return B_OK;
-		}
-
-		case BOSII_JOIN_NETWORK:
-		{
-			struct ieee80211req request;
-			struct ifreq ifRequest;
-			struct route_entry* networkRequest = &ifRequest.ifr_route;
-			struct ieee80211req_scan_result network;
-
-			if_printf(ifp, "%s: BOSII_JOIN_NETWORK\n", __func__);
-
-			if (length < sizeof(struct ifreq))
-				return B_BAD_VALUE;
-
-			if (user_memcpy(&ifRequest, arg, sizeof(ifRequest)) != B_OK
-				|| user_memcpy(&network, networkRequest->source,
-						sizeof(ieee80211req_scan_result)) != B_OK)
-				return B_BAD_ADDRESS;
-
-			memset(&request, 0, sizeof(ieee80211req));
-
-			request.i_type = IEEE80211_IOC_SSID;
-			request.i_val = 0;
-			request.i_len = network.isr_ssid_len;
-			request.i_data = (uint8*)networkRequest->source
-				+ network.isr_ie_off;
-			if (ifp->if_ioctl(ifp, SIOCS80211, (caddr_t)&request) < B_OK)
-				return B_ERROR;
-
-			// wait for network join
-
-			return B_OK;
-		}
-
-		case BOSII_GET_ASSOCIATED_NETWORK:
-		{
-			struct ieee80211req request;
-			struct ifreq ifRequest;
-			struct route_entry* networkRequest = &ifRequest.ifr_route;
-
-			if_printf(ifp, "%s: BOSII_GET_ASSOCIATED_NETWORK\n", __func__);
-
-			if (length < sizeof(struct ieee80211req_sta_req))
-				return B_BAD_VALUE;
-
-			if (user_memcpy(&ifRequest, arg, sizeof(ifRequest)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			// Only want station information about associated network.
-			memset(&request, 0, sizeof(request));
-			request.i_type = IEEE80211_IOC_BSSID;
-			request.i_len = IEEE80211_ADDR_LEN;
-			request.i_data = ((struct ieee80211req_sta_req*)networkRequest->
-					destination)->is_u.macaddr;
-			if (ifp->if_ioctl(ifp, SIOCG80211, (caddr_t)&request) < B_OK)
-				return B_BAD_ADDRESS;
-
-			request.i_type = IEEE80211_IOC_STA_INFO;
-			request.i_len = length;
-			request.i_data = networkRequest->destination;
-
-			// After return value of request.i_data is copied into user
-			// space, already.
-			if (ifp->if_ioctl(ifp, SIOCG80211, (caddr_t)&request) < B_OK)
-				return B_BAD_ADDRESS;
-
-			// Tell the user space how much data was copied
-			networkRequest->mtu = request.i_len;
-			if (user_memcpy(&((struct ifreq*)arg)->ifr_route.mtu,
-					&networkRequest->mtu, sizeof(networkRequest->mtu)) != B_OK)
-				return B_BAD_ADDRESS;
-
-			return B_OK;
-		}
-
 		case SIOCG80211:
 		case SIOCS80211:
 		{
-			// Allowing FreeBSD based WLAN ioctls to pass, as those will become
-			// the future Haiku WLAN ioctls anyway.
-
 			// FreeBSD drivers assume that the request structure has already
 			// been copied into kernel space
 			struct ieee80211req request;
