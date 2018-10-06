@@ -572,7 +572,7 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 	if (device >= 0)
 		return Device()->Update();
 
-	return B_ERROR;
+	return device;
 }
 
 
