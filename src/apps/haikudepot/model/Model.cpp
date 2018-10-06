@@ -392,13 +392,15 @@ Model::Model()
 
 	// TODO: Fetch this from the web-app.
 	fSupportedLanguages.Add("en");
+	fSupportedLanguages.Add("es");
 	fSupportedLanguages.Add("de");
 	fSupportedLanguages.Add("fr");
+	fSupportedLanguages.Add("it");
 	fSupportedLanguages.Add("ja");
-	fSupportedLanguages.Add("es");
-	fSupportedLanguages.Add("zh");
 	fSupportedLanguages.Add("pt");
 	fSupportedLanguages.Add("ru");
+	fSupportedLanguages.Add("sk");
+	fSupportedLanguages.Add("zh");
 
 	if (!fSupportedLanguages.Contains(fPreferredLanguage)) {
 		// Force the preferred language to one of the currently supported
