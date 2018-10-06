@@ -39,6 +39,7 @@ private:
 			status_t			StreamStringEncoded(const char* string);
 			status_t			StreamStringEncoded(const char* string,
 									off_t offset, size_t length);
+			status_t			StreamStringUnicodeCharacter(uint32 c);
 
 			status_t			StreamQuotedEncodedString(const char* string);
 			status_t			StreamQuotedEncodedString(const char* string,

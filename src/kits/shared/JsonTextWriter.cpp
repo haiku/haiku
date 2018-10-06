@@ -55,6 +55,20 @@ b_json_simple_esc_sequence(char c)
 }
 
 
+static size_t
+b_json_len_7bit_clean_non_esc(uint8* c, size_t length) {
+	size_t result = 0;
+
+	while (result < length
+		&& b_json_is_7bit_clean(c[result])
+		&& b_json_simple_esc_sequence(c[result]) == NULL) {
+		result++;
+	}
+
+	return result;
+}
+
+
 /*! The class and sub-classes of it are used as a stack internal to the
     BJsonTextWriter class.  As the JSON is parsed, the stack of these
     internal listeners follows the stack of the JSON parsing in terms of
@@ -595,6 +609,16 @@ BJsonTextWriter::StreamStringEncoded(const char* string)
 }
 
 
+status_t
+BJsonTextWriter::StreamStringUnicodeCharacter(uint32 c)
+{
+	sprintf(&fUnicodeAssemblyBuffer[2], "%04" B_PRIx32, c);
+		// note that the buffer's first two bytes are populated with the JSON
+		// prefix for a unicode char.
+	return StreamStringVerbatim(fUnicodeAssemblyBuffer, 0, 6);
+}
+
+
 /*! Note that this method will expect a UTF-8 encoded string. */
 
 status_t
@@ -603,67 +627,43 @@ BJsonTextWriter::StreamStringEncoded(const char* string,
 {
 	status_t writeResult = B_OK;
 	uint8* string8bit = (uint8*)string;
+	off_t i = 0;
 
-	while (writeResult == B_OK && length != 0) {
-		uint8 c = string8bit[offset];
+	while (i < length && writeResult == B_OK) {
+		uint8 c = string8bit[offset + i];
 		const char* simpleEsc = b_json_simple_esc_sequence(c);
 
-			// simple escape sequence involving the backslash + one character.
-
 		if (simpleEsc != NULL) {
+			// here the character to emit is something like a tab or a quote
+			// in this case the output JSON should escape it so that it looks
+			// like \t or \n in the output.
 			writeResult = StreamStringVerbatim(simpleEsc, 0, 2);
-
-			if (writeResult == B_OK) {
-				offset++;
-				length--;
-			}
+			i++;
 		} else {
-
 			if (b_json_is_7bit_clean(c)) {
-
-					// roll forward while the characters are simple and then
-					// output them at as a block verbatim.
-
-				uint32 count7BitClean = 1;
-
-				while (count7BitClean < length
-					&& b_json_is_7bit_clean(
-						string8bit[offset + count7BitClean])) {
-					count7BitClean++;
-				}
-
-				writeResult = StreamStringVerbatim(&string[offset], 0,
-					count7BitClean);
-
-				if (writeResult == B_OK) {
-					offset += count7BitClean;
-					length -= count7BitClean;
-				}
+				// in this case the first character is a simple one that can be
+				// output without any special handling.  Find the sequence of
+				// such characters and output them as a sequence so that it's
+				// included as one write operation.
+				size_t l = 1 + b_json_len_7bit_clean_non_esc(
+					&string8bit[offset + i + 1], length - (offset + i + 1));
+				writeResult = StreamStringVerbatim(&string[offset + i], 0, l);
+				i += static_cast<off_t>(l);
 			} else {
 				if (b_json_is_illegal(c)) {
 					fprintf(stderr, "! string encoding error - illegal "
 						"character [%" B_PRIu32 "]\n", static_cast<uint32>(c));
-					offset++;
-					length--;
+					i++;
 				} else {
-						// if the character is < 128 then it can be rendered
-						// verbatim - check how many are like this and then
-						// render those verbatim.
-					const char* stringInitial = &string[offset];
+					// now we have a UTF-8 sequence.  Read the UTF-8 sequence
+					// to get the unicode character and then encode that as
+					// JSON.
+					const char* unicodeStr = &string[offset + i];
 					uint32 unicodeCharacter = BUnicodeChar::FromUTF8(
-						&stringInitial);
-
-					sprintf(&fUnicodeAssemblyBuffer[2], "%04" B_PRIx32,
+						&unicodeStr);
+					writeResult = StreamStringUnicodeCharacter(
 						unicodeCharacter);
-					writeResult = StreamStringVerbatim(fUnicodeAssemblyBuffer,
-						0, 6);
-
-					if (writeResult == B_OK) {
-						uint32 sequence_length
-							= (uint32)(stringInitial - &string[offset]);
-						offset += sequence_length;
-						length -= sequence_length;
-					}
+					i += static_cast<off_t>(unicodeStr - &string[offset + i]);
 				}
 			}
 		}

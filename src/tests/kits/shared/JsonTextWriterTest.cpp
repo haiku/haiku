@@ -173,6 +173,52 @@ JsonTextWriterTest::TestFalse()
 }
 
 
+void
+JsonTextWriterTest::TestStringGeneric(const char *input,
+	const char *expectedOut)
+{
+	BMallocIO* outputData = new BMallocIO();
+	ObjectDeleter<BMallocIO> outputDataDeleter(outputData);
+	BJsonTextWriter writer(outputData);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, writer.WriteString(input));
+	writer.Complete();
+
+	BString outputString((char*)outputData->Buffer(),
+		outputData->BufferLength());
+	fprintf(stderr, "expected out >%s<\n", expectedOut);
+	fprintf(stderr, "actual out   >%s< (%" B_PRIuSIZE ")\n",
+		outputString.String(), outputData->BufferLength());
+
+	CPPUNIT_ASSERT_EQUAL(BString(expectedOut),
+		outputString);
+}
+
+void
+JsonTextWriterTest::TestString()
+{
+	TestStringGeneric(
+		"\"Eichh\xc3\xb6rnchen\"\nsind\nTiere.",
+		"\"\\\"Eichh\\u00f6rnchen\\\"\\nsind\\nTiere.\"");
+		// complex example with unicode, escapes and simple sequences.
+	TestStringGeneric("", "\"\"");
+	TestStringGeneric("Press \"C\" to continue",
+		"\"Press \\\"C\\\" to continue\"");
+		// test of a simple string of one character enclosed with escape
+		// characters to check handling of one character simple sub-sequences.
+	TestStringGeneric("\xc3\xb6", "\"\\u00f6\"");
+		// test of a unicode character on its own.
+	TestStringGeneric("simple", "\"simple\"");
+		// test of a simple string that contains no escapes or anything complex.
+	TestStringGeneric("\t", "\"\\t\"");
+		// test of a single escape character.
+	TestStringGeneric("\007B", "\"B\"");
+		// contains an illegal character which should be ignored.
+	TestStringGeneric("X", "\"X\"");
+		// a simple string with a single character
+}
+
+
 /*static*/ void
 JsonTextWriterTest::AddTests(BTestSuite& parent)
 {
@@ -190,6 +236,10 @@ JsonTextWriterTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<JsonTextWriterTest>(
 		"JsonTextWriterTest::TestFalse",
 		&JsonTextWriterTest::TestFalse));
+
+	suite.addTest(new CppUnit::TestCaller<JsonTextWriterTest>(
+		"JsonTextWriterTest::TestString",
+		&JsonTextWriterTest::TestString));
 
 	suite.addTest(new CppUnit::TestCaller<JsonTextWriterTest>(
 		"JsonTextWriterTest::TestArrayA",

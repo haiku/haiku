@@ -25,9 +25,12 @@ public:
 			void				TestDouble();
 			void				TestInteger();
 			void				TestFalse();
+			void				TestString();
 
 	static	void				AddTests(BTestSuite& suite);
 private:
+			void				TestStringGeneric(const char *input,
+									const char *expectedOut);
 
 };
 
