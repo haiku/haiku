@@ -7,7 +7,7 @@ Password:	ScreenSaver		Password:
 Password lock	ScreenSaver		Password blocco
 Screensavers	ScreenSaver		Salvaschermi
 Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling non disponibile
-ScreenSaver	System name		ScreenSaver
+ScreenSaver	System name		Salvaschermo
 Test	ScreenSaver		Test
 General	ScreenSaver		Generale
 Fade now when mouse is here	ScreenSaver		Dissolvi quando il puntatore del mouse è in posizione
@@ -22,7 +22,7 @@ Passwords don't match. Please try again.	ScreenSaver		Le password non corrispond
 OK	ScreenSaver		OK
 Blackness	ScreenSaver		Oscurità
 Use custom password	ScreenSaver		Usa una password personalizzata
-Done	ScreenSaver		Fatto
+Done	ScreenSaver		Applica
 Confirm password:	ScreenSaver		Conferma password:
 No preview available	PreviewView		Nessuna anteprima disponibile
 Use network password	ScreenSaver		Usa password di rete

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Repositories	4031066397
+1	russian	x-vnd.Haiku-Repositories	3159161433
 Completed	TaskLooper	Completed task status message	Завершено
 Repositories	System name		Репозиториии
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Ошибка при подключении репозитория %url%
@@ -21,6 +21,7 @@ Name	RepositoriesView	Column title	Имя
 Enable	RepositoriesView	Button label	Включить
 Enable repositories to use with package management:	RepositoriesView	Label text	Включить репозитории для работы с пакетным менеджером:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Произошла ошибка обновления кеша репозитория для %name%
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Для каждого репозитория может быть включен только один URL. Пожалуйста, измените ваш выбор.
 Failed	TaskLooper	Failed task status message	Ошибка
 OK	Constants	Button label	OK
 Cancel task	TaskTimer	Button label	Отменить задачу

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	376381550
+1	swedish	x-vnd.Haiku-Keymap	1039047705
 Croatian	KeymapNames		Kroatiska
 Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
 Icelandic	KeymapNames		Isländska
@@ -58,35 +58,70 @@ Brazilian	KeymapNames		Brasilianska
 Left command	Keyboard Layout View		Vänster kommando
 Set modifier keys…	Keymap window		Sätt modifierings tangent...
 Option:	Modifier keys window	Option key role name	Alternativ:
+Belgian (comma)	KeymapNames		Belgiska (komma)
 Control	Keyboard Layout View	Control key	Kontroll
 Left option	Keyboard Layout View		Vänster alternativ
+Faeroese	KeymapNames		Färöisk
 Right control	Keyboard Layout View		Höger kontroll
+Svorak	KeymapNames		Dvorak
 Switch shortcut keys	Keymap window		Switch shortcut keys
+Russian (Udmurt, Komi, Mari)	KeymapNames		Ryska (udmurt, komi, mari)
+German	KeymapNames		Tyska
+Swedish	KeymapNames		Svenska
+Russian	KeymapNames		Ryska
+Arabic (102)	KeymapNames		Arabiska (102)
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
 User:	Keymap window		Användare:
+Turkish (Type-F)	KeymapNames		Turkiska (typ-F)
+Italian	KeymapNames		Italienska
+Belarusian	KeymapNames		Vitryska
 Right option	Keyboard Layout View		Höger alternativ
+US-International	KeymapNames		US-Internationell
+Dvorak	KeymapNames		Dvorak
+Russian (Yawert)	KeymapNames		Ryska (yawert)
 Right shift	Keyboard Layout View		Höger skift
+Belarusian (Latin)	KeymapNames		Vitryska (Latin)
 Key	Modifier keys window	As in a computer keyboard key	Tangent
+Dutch	KeymapNames		Holländska
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
 Control:	Modifier keys window	Control key role name	Kontroll:
+Russian (Typewriter)	KeymapNames		Ryska (skrivmaskin)
+Slovene	KeymapNames		Slovenska
 Remove	Keyboard Layout View		Ta bort
 Option	Keyboard Layout View	Option key	Alternativ
 Sample and clipboard:	Keymap window		Exempel:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt tangent
 Layout	Keymap window		Utseende
+Serbian (Latin)	KeymapNames		Serbiska (Latin)
+Esperanto	KeymapNames		Esperanto
 Switch shortcut keys to Windows/Linux mode	Keymap window		Byt snabbtangentsknapp till Windows/Linux-standard
+Latin-American	KeymapNames		Latinamerikansk
 Right command	Keyboard Layout View		Höger kommando
 Revert	Keymap window		Återställ
 Command:	Modifier keys window	Command key role name	Kommando:
+Polish (Typewriter)	KeymapNames		Polska (Skrivmaskin)
+US	KeymapNames		US
 Save as…	Keymap window		Spara som…
+Swiss-German	KeymapNames		Schweizisk tyska
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd tangent
+French	KeymapNames		Franska
 File	Keymap window		Arkiv
 Num lock	Keyboard Layout View		Num lock
+Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrillisk)
 (Current)	Keymap window		(Nuvarande)
+Kazakh	KeymapNames		Kazakiska
+Colemak	KeymapNames		Colemak
 Font	Keymap window		Typsnitt
+Belarusian (Mac)	KeymapNames		Vitryska (Mac)
 Keymap	System name		TangentUppsättning
+Czech (Mac)	KeymapNames		Tjeckiska (Mac)
+Norwegian	KeymapNames		Norska
 Left shift	Keyboard Layout View		Vänster skift
+Czech	KeymapNames		Tjeckiska
 Shift	Keyboard Layout View	Shift key	Skift
+Slovak	KeymapNames		Slovakiska
+Finnish	KeymapNames		Finska
 Set modifier keys	Modifier keys window		Set modifierings tangent
+Portuguese	KeymapNames		Portugisiska
 Modifier keys	Modifier keys window		Modifierings tangenter
 Acute trigger	Keymap window		Acute trigger

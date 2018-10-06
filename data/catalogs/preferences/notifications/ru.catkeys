@@ -1,14 +1,34 @@
-1	russian	x-vnd.Haiku-Notifications	672560863
+1	russian	x-vnd.Haiku-Notifications	4065652325
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Произошла ошибка при сохранении настроек.\nВозможно кончилось место на диске.
+Add…	NotificationView		Добавить…
+Status	NotificationView		Статус
 Revert	PrefletWin		Вернуть
 Enable notifications	GeneralView		Включить уведомления
 Window width:	GeneralView		Ширина окна:
+This is a test notification message	PrefletWin		Это тестовое уведомление
 OK	PrefletWin		ОК
+Duration:	GeneralView		Длительность:
 OK	NotificationView		ОК
+Application does not have a valid signature	NotificationView	Alert message	Приложение не имеет действительной подписи
+Follow Deskbar	GeneralView		Следовать за Deskbar
 Notifications	PrefletWin		Уведомления
+Timeout:	GeneralView		Время отображения:
+Muted	NotificationView		Приглушено
 General	PrefletView		Основные
 Allowed	NotificationView		Разрешено
+Remove	NotificationView		Удалить
+Lower right	GeneralView		Внизу справа
 Notifications	System name		Уведомления
+Position:	GeneralView		Расположение:
 Applications	PrefletView		Приложения
+Defaults	PrefletWin		По умолчанию
+pixels	GeneralView		пикселей
 Application	NotificationView		Приложение
+Width:	GeneralView		Ширина:
+seconds	GeneralView		секунд
+Mute notifications from this application	NotificationView		Приглушить уведомления от этого приложения
+Upper right	GeneralView		Вверху справа
+ is already listed	NotificationView	Alert message	 уже есть в списке
+Lower left	GeneralView		Внизу слева
+Upper left	GeneralView		Вверху слева
 Applications	NotificationView		Приложения

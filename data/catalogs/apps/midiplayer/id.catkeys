@@ -1,0 +1,20 @@
+1	indonesian	x-vnd.Haiku-MidiPlayer	1046133011
+None	Main Window		Tidak ada
+Live input:	Main Window		Masukan langsung:
+Stop	Main Window		Berhenti
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Program kecil ini\nMengetahui bagaimana memainkan ribuan\nLagu - lagu yang terdengar buruk
+Cavern	Main Window		Gua
+Volume:	Main Window		Suara:
+Reverb:	Main Window		Reverb:
+OK	Main Window		OK:
+Loading instruments…	Scope View		Memuat instrumen…
+Off	Main Window		Mati
+Dungeon	Main Window		Penjara bawah tanah
+Play	Main Window		Mainkan
+Garage	Main Window		Garasi
+Closet	Main Window		Kabinet
+MidiPlayer	System name		MidiPlayer
+Drop MIDI file here	Scope View		Jatuhkan berkas MIDI di sini
+Igor's lab	Main Window		Labnya Igor
+Scope	Main Window		Cakupan
+Could not load song	Main Window		Tidak dapat memuat lagu

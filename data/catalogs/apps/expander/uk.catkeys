@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	1129502603
+1	ukrainian	x-vnd.Haiku-Expander	3300517306
 Expand	ExpanderMenu		Розпакувати
 Expanding '%s'…	ExpanderWindow		Розпаковка '%s'…
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
@@ -21,6 +21,7 @@ Other	ExpanderPreferences		Інше
 Cancel	ExpanderPreferences		Відмінити
 Expansion	ExpanderPreferences		Розширення
 Select	DirectoryFilePanel		Вибрати
+The folder was either moved, renamed or not supported.	ExpanderWindow		Тека була переміщена, перейменована або не підтримується.
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка призначення не існує. Створити її?
 Same directory as source (archive) file	ExpanderPreferences		Та ж папка що і джерела (архіву)
 Settings	ExpanderMenu		Налаштування
@@ -30,6 +31,7 @@ Select	ExpanderPreferences		Вибрати
 Show contents	ExpanderWindow		Показати вміст
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
 OK	ExpanderPreferences		Гаразд
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені що бажаєте зупинити розпаковку архіву? Видобуті елементи можуть бути неповними.
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях теки призначення пустим
 Failed to create the destination folder.	ExpanderWindow		Не вдалося створити теку призначення.
 Select '%s'…	DirectoryFilePanel		Вибрати '%s'…

@@ -29,7 +29,7 @@ Failed to start xargs program!	Grepper		¡Falló al iniciar el programa xargs !
 New window	GrepWindow		Nueva ventana
 Failed to open input pipe!	Grepper		¡Falló al abrir el conducto de entrada!
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecciona los archivos que desea seguir buscado
-TextSearch	GrepWindow		TExtSearch
+TextSearch	GrepWindow		TextSearch
 Quit	GrepWindow		Salir
 Show files in Tracker	GrepWindow		Mostrar archivos en el rastreador
 Case-sensitive	GrepWindow		Entre mayúsculas y minúsculas 

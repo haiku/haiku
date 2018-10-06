@@ -5,7 +5,7 @@ Copy image	Magnify-Main		Копіювати зображення
 usage: magnify [size] (magnify size * size pixels)\n	Console		використання: magnify [size] (magnify size * size pixels)\n
 Freeze image	Magnify-Main		Зображення заморожено
 Stick coordinates	Magnify-Main		Вісь кординат
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# піксель/піксель}other{#пікселі/піксель}}
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel}, other{# pixels/pixel}}
 Show info	Magnify-Main		Показати інформацію
 magnify: size must be a multiple of 4\n	Console		збільшувач: розмір має бути кратним 4\n
 Decrease pixel size	Magnify-Main		Зменшити розмір пікселя

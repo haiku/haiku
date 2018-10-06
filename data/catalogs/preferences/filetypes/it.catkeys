@@ -35,9 +35,9 @@ Multiple launch	Application Type Window		Avvio multiplo
 Could not set preferred application	FileTypes Window		Impossibile impostare l'applicazione preferita
 Group:	New File Type Window		Gruppo:
 %1 application type	Application Type Window		%1 tipo applicazione
-Done	Extension Window		Fatto
+Done	Extension Window		Applica
 Application type	Application Type Window		Tipo d'applicazione
-Done	Type List Window		Fatto
+Done	Type List Window		Applica
 Attribute	Attribute Window		Attributo
 Show recognition rule	FileTypes Window		Mostra regola di riconoscimento
 FileTypes request	Preferred App Menu		Richiesta di FileTypes
@@ -86,7 +86,7 @@ Golden master	Application Types Window		Golden master
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		L'applicazione \"%s\" non supporta questo tipo di file.\nSei sicuro di volerlo impostare comunque?
 Type:	Attribute Window		Tipo:
 Removing uninstalled application types	Application Types Window		Rimozione dei tipi delle applicazioni disinstallate
-Done	Attribute Window		Fatto
+Done	Attribute Window		Applica
 no icon	FileTypes Window		nessun'icona
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versione

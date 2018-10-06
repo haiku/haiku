@@ -1,11 +1,14 @@
-1	russian	x-vnd.Haiku.TextSearch	3108411238
+1	russian	x-vnd.Haiku.TextSearch	3622532554
 %s: Not enough room to escape the filename.	Grepper		%s: Недостаточно места для экранирования имени файла.
 Trim to selection	GrepWindow		Искать в выделенных
+Failed to open errors pipe!	Grepper		Не удалось открыть канал ошибок!
 Follow symbolic links	GrepWindow		Переходить по ссылкам
 Close	GrepWindow		Закрыть
 Cancel	GrepWindow		Стоп
 The unselected files will be removed from the list.	GrepWindow		Невыделенные файлы будут удалены из списка.
+Regular expression	GrepWindow		Регулярное выражение
 Set target…	GrepWindow		Выбрать цель…
+Failed to open output pipe!	Grepper		Не удалось открыть канал вывода!
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Пожалуйста, выберите файлы, которые вы хотите увидеть выделенными в Tracker.
 Open files in Pe	GrepWindow		Открывать файлы в Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
@@ -22,7 +25,9 @@ Actions	GrepWindow		Действия
 File	GrepWindow		Файл
 Encoding	GrepWindow		Кодировка
 History	GrepWindow		История
+Failed to start xargs program!	Grepper		Не удалось запустить программу xargs!
 New window	GrepWindow		Новое окно
+Failed to open input pipe!	Grepper		Не удалось открыть канал ввода!
 Please select the files you wish to keep searching.	GrepWindow		Пожалуйста, выберите файлы, в которых вы хотите продолжить поиск.
 TextSearch	GrepWindow		Текстовый поиск
 Quit	GrepWindow		Выход

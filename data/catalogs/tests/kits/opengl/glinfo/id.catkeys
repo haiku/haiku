@@ -1,8 +1,9 @@
-1	indonesian	x-vnd.Haiku-GLInfo	2436661475
+1	indonesian	x-vnd.Haiku-GLInfo	3678488342
 Capability	Capabilities		Kemampuan
 Information	InfoView		Informasi
 GL Info	System name		Info GL
 Capabilities	Capabilities		Kemampuan
+Maximum convolution	Capabilities		Konvolusi maksimum
 Available extensions	Extensions		Ketersediaan ekstensi
 Value	Capabilities		Nilai
 Extensions	Extensions		Ekstensi

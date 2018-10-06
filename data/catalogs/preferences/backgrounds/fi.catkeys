@@ -2,7 +2,7 @@
 Backgrounds	System name		Tausta-asetukset
 X:	Main View		X:
 Setting the background image failed:	Main View		Taustakuvan asetus epäonnistui:
-Resolution: 	Image Filepanel		Resoluutio: 
+Resolution: 	Image Filepanel		Erottelutarkkuus: 
 pick one	Main View		poimi yksi
 Default	Main View		Oletus
 Center	Main View		Keskitä
@@ -21,7 +21,7 @@ Other folder…	Main View		Muu kansio…
 Y:	Main View		Y:
 Tile	Main View		Vierekkäin
 Select	Main View		Valitse
-Scale to fit	Main View		Skaalaa sopimaan
+Scale to fit	Main View		Sovita
 OK	Main View		Valmis
 Placement:	Main View		Sijoittaminen:
 Preview	Main View		Esikatselu

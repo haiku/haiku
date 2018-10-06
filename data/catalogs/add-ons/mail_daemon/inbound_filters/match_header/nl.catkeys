@@ -1,6 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-MatchHeader	626071694
+1	dutch; flemish	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Kies actie>
-Header field (e.g. Subject, From, ...)	ConfigView		Headerveld (bijv. Onderwerk, Van, …)
+Header field (e.g. Subject, From, ...)	ConfigView		Headerveld (bijv. Onderwerp, Van, …)
 Account	ConfigView		Account
 has	ConfigView		Heeft
 Move to	ConfigView		Verplaats naar
@@ -14,3 +14,4 @@ Match header	RuleFilter		Header matchen
 Reply with	ConfigView		Antwoord met
 If	ConfigView		Als
 Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" tegen \"%regex\"
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Wildcard-waarde zoals \"*spam*\".\nGebruik voorvoegsel \"REGEX:\" om reguliere expressies te gebruiken.

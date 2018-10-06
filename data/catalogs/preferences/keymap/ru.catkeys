@@ -1,40 +1,91 @@
-1	russian	x-vnd.Haiku-Keymap	1385051534
+1	russian	x-vnd.Haiku-Keymap	2785929096
+Croatian	KeymapNames		Хорватская
+Turkish (Type-Q)	KeymapNames		Турецкая (тип Q)
+Icelandic	KeymapNames		Исландская
+Serbian (Cyrillic)	KeymapNames		Сербская (кириллица)
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
+Estonian	KeymapNames		Эстонская
+Canadian-French	KeymapNames		Канадская французская
 Warning: left and right key roles do not match	Modifier keys window		Внимание: роль левой и правой клавиши не совпадают
+Romanian	KeymapNames		Румынская
 Scroll lock	Keyboard Layout View		Scroll lock
 Menu	Keyboard Layout View	Menu key	Меню
 Left control	Keyboard Layout View		Левый control
 Tilde trigger	Keymap window		Тильда
+Bulgarian (Phonetic)	KeymapNames		Болгарская (фонетическая)
+Hungarian	KeymapNames		Венгерская
 Grave trigger	Keymap window		Апостроф
+Brazilian (ABNT2)	KeymapNames		Бразильская (ABNT2)
+Polish	KeymapNames		Польская
 Role	Modifier keys window	As in the role of a modifier key	Роль
 Caps lock	Keyboard Layout View		Caps lock
+Spanish (Dvorak)	KeymapNames		Испанская (Дворак)
 Select dead keys	Keymap window		Выбор мертвых клавиш
+Belgian (point)	KeymapNames		Бельгийская с точкой
+Hebrew	KeymapNames		Иврит
+Russian (Mac)	KeymapNames		Русская (Mac)
+United-Kingdom	KeymapNames		Британская
+Swiss-French	KeymapNames		Швейцарско-французская
 Cancel	Modifier keys window		Отмена
+Danish	KeymapNames		Датская
+Lithuanian	KeymapNames		Литовская
+Spanish	KeymapNames		Испанская
 Command	Keyboard Layout View	Command key	Command
+Macedonian	KeymapNames		Македонская
+Irish	KeymapNames		Ирландская
+French (Mac)	KeymapNames		Французская (Mac)
+German (Mac)	KeymapNames		Немецкая (Mac)
 Defaults	Keymap window		По умолчанию
+Ukrainian (Mac)	KeymapNames		Украинская (Mac)
+Japanese	KeymapNames		Японская
 Quit	Keymap window		Выйти
 Switch shortcut keys to Haiku mode	Keymap window		Переключить раскладку в режим Haiku
+French (Bépo)	KeymapNames		Французская (Bépo)
 Circumflex trigger	Keymap window		Циркумфлекс
 Diaeresis trigger	Keymap window		Диерезис
+Ukrainian	KeymapNames		Украинская
 Disabled	Modifier keys window	Do nothing	Отключено
+Dvorak (programmer's)	KeymapNames		Дворак для программистов
+ISO-9995	KeymapNames		ISO-9995
+Albanian	KeymapNames		Албанская
 Open…	Keymap window		Открыть…
+Greek	KeymapNames		Греческая
 Error: duplicate keys	Modifier keys window		Ошибка: дублирующиеся клавиши
 System:	Keymap window		Системные:
+Lithuanian (Standard)	KeymapNames		Литовская (стандартная)
+Brazilian	KeymapNames		Бразильская
 Left command	Keyboard Layout View		Левый command
 Set modifier keys…	Keymap window		Назначить клавиши-модификаторы…
 Option:	Modifier keys window	Option key role name	Option:
+Belgian (comma)	KeymapNames		Бельгийская с запятой
 Control	Keyboard Layout View	Control key	Control
 Left option	Keyboard Layout View		Левый option
+Faeroese	KeymapNames		Фарерская
 Right control	Keyboard Layout View		Правый control
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
+Russian (Udmurt, Komi, Mari)	KeymapNames		Русская (удмуртский, коми, мари)
+German	KeymapNames		Немецкая
+Swedish	KeymapNames		Шведская
+Russian	KeymapNames		Русская
+Arabic (102)	KeymapNames		Арабская (102)
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift
 User:	Keymap window		Пользовательские:
+Turkish (Type-F)	KeymapNames		Турецкая (тип F)
+Italian	KeymapNames		Итальянская
+Belarusian	KeymapNames		Беларуская
 Right option	Keyboard Layout View		Правый option
+US-International	KeymapNames		США-международная
+Dvorak	KeymapNames		Дворака
+Russian (Yawert)	KeymapNames		Русская (фонетическая)
 Right shift	Keyboard Layout View		Правый shift
+Belarusian (Latin)	KeymapNames		Беларуская (латиница)
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
+Dutch	KeymapNames		Нидерландская
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавиша Ctrl
 Control:	Modifier keys window	Control key role name	Control:
+Russian (Typewriter)	KeymapNames		Русская (машинопись)
+Slovene	KeymapNames		Словенская
 Remove	Keyboard Layout View		Удалить
 Option	Keyboard Layout View	Option key	Option
 Sample and clipboard:	Keymap window		Пример и буфер обмена:

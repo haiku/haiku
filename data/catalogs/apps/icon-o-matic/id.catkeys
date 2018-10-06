@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	3924669857
+1	indonesian	x-vnd.haiku-icon_o_matic	3449344557
 Select All	Icon-O-Matic-PathManipulator		Pilih Semua
 Add Style	Icon-O-Matic-AddStylesCmd		Tambahkan Gaya
 Color (#%02x%02x%02x)	Style name after dropping a color		warna (#%02x%02x%02x)
@@ -57,3 +57,4 @@ Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Bekukan Bentuk
 PNG Set	Icon-O-Matic-SavePanel		Set PNG
 Joins	Icon-O-Matic-PropertyNames		Gabung
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Hapus Gaya
+Cancel	Icon-O-Matic-SVGExport		Batal

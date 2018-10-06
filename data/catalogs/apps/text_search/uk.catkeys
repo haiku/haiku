@@ -1,11 +1,14 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	3108411238
+1	ukrainian	x-vnd.Haiku.TextSearch	3622532554
 %s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу.
 Trim to selection	GrepWindow		Обрізати для вибору
+Failed to open errors pipe!	Grepper		Помилка при відкритті вихідного канала!
 Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
 Close	GrepWindow		Закрити
 Cancel	GrepWindow		Відмінити
 The unselected files will be removed from the list.	GrepWindow		Не вибрані файли будуть вилучені зі списку.
+Regular expression	GrepWindow		Регулярний вираз
 Set target…	GrepWindow		Встановити ціль…
+Failed to open output pipe!	Grepper		Призупинено выдкриття вихідного канала! 
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker'i.
 Open files in Pe	GrepWindow		Відкрити файл у Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
@@ -22,7 +25,9 @@ Actions	GrepWindow		Дії
 File	GrepWindow		Файл
 Encoding	GrepWindow		Кодування
 History	GrepWindow		Історія
+Failed to start xargs program!	Grepper		Не вдалося запустити програму xargs!
 New window	GrepWindow		Нове вікно
+Failed to open input pipe!	Grepper		Помилка при відкритті вхідного канала!
 Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли які ви хочете продовжувати шукати.
 TextSearch	GrepWindow		Пошук тексту
 Quit	GrepWindow		Вийти

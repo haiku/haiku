@@ -1,0 +1,27 @@
+1	indonesian	x-vnd.Haiku-Sudoku	3095678633
+Export as…	SudokuWindow		Ekspor sebagai...
+OK	SudokuWindow		OK
+New	SudokuWindow		Baru
+Abort	ProgressWindow		Batalkan
+Sudoku	System name		Sudoku
+Easy	SudokuWindow		Mudah
+Open file…	SudokuWindow		Buka berkas...
+Solve single field	SudokuWindow		Selesaikan bidang tunggal
+Solve	SudokuWindow		Selesaikan
+File	SudokuWindow		Berkas
+Advanced	SudokuWindow		Tingkat lanjut
+Start again	SudokuWindow		Mulai lagi
+HTML	SudokuWindow		HTML
+Copy	SudokuWindow		Salin
+Mark valid hints	SudokuWindow		Tandai petunjuk yang benar
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku diselesaikan - Selamat!\n
+Hard	SudokuWindow		Sulit
+Creating solvable field	SudokuGenerator		Buat bidang yang bisa diselesaikan
+View	SudokuWindow		Tamplikan
+Progress monitor	ProgressWindow		Monitor kemajuan
+Set all hints	SudokuWindow		Atur semua petunjuk
+Mark invalid values	SudokuWindow		Tandai isian yang salah
+Blank	SudokuWindow		Kosong
+Help	SudokuWindow		Bantuan
+Searching for removable values	SudokuGenerator		Mencari nilai yang dapat dihapus
+Quit	SudokuWindow		Keluar

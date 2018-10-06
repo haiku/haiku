@@ -1,8 +1,32 @@
-1	indonesian	x-vnd.Haiku-CharacterMap	1600702059
+1	indonesian	x-vnd.Haiku-CharacterMap	1665258718
 Enclosed alphanumerics	UnicodeBlocks		Alfanumerik tertutup
 Basic Latin	UnicodeBlocks		Bahasa Latin dasar
 Latin-1 supplement	UnicodeBlocks		Supplemen latin-1
 Hebrew	UnicodeBlocks		Ibrani
 Georgian supplement	UnicodeBlocks		Suplemen georgia
 CJK unified ideographs	UnicodeBlocks		Ideograf CJK Dipersatukan
+Armenian	UnicodeBlocks		Armenia
+Mathematical operators	UnicodeBlocks		Operator matematik
+Arabic	UnicodeBlocks		Arab
+Balinese	UnicodeBlocks		Bali
+Specials	UnicodeBlocks		Spesial
+Khmer symbols	UnicodeBlocks		Simbol Khmer
+Musical symbols	UnicodeBlocks		Simbol musikal
+Katakana	UnicodeBlocks		Katakana
+Sundanese	UnicodeBlocks		Sunda
+IPA extensions	UnicodeBlocks		Ekstensi IPA
+Tagalog	UnicodeBlocks		Tagalog
+Geometric shapes	UnicodeBlocks		Bentuk Geometrik
+Currency symbols	UnicodeBlocks		Simbol mata uang
+File	CharacterWindow		Berkas
+Old Persian	UnicodeBlocks		Persia lama
+Myanmar	UnicodeBlocks		Myanmar
+Tibetan	UnicodeBlocks		Tibet
+Ancient Greek numbers	UnicodeBlocks		Angka Yunani lama
 Mongolian supplement	UnicodeBlocks		Suplemen mongolia
+Quit	CharacterWindow		Keluar
+Braille patterns	UnicodeBlocks		Pola Braille
+Rejang	UnicodeBlocks		Rejang
+Mongolian	UnicodeBlocks		Mongolia
+Copy character	CharacterView		Salin karakter
+Greek and Coptic	UnicodeBlocks		Yunani dan Koptik

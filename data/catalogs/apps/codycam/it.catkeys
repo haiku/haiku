@@ -55,7 +55,7 @@ Locking the window\n	VideoConsumer.cpp		Blocco della finestra\n
 File %s; Line %ld # %s	SettingsHandler		File %s; Linea %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		Impossibile trovare sul server la cartella richiesta
 Renaming…	VideoConsumer.cpp		Rinomina in corso…
-Local	CodyCam		Locale
+Local	CodyCam		Localizzazione
 Error setting type of output file	VideoConsumer.cpp		Errore durante l'impostazione del tipo di file in output
 upload client name expected	CodyCam		nome del client di trasmissione non indicato
 SFTP	CodyCam		SFTP

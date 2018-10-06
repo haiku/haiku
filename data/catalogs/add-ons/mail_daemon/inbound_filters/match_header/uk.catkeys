@@ -8,7 +8,7 @@ Then	ConfigView		Тоді
 this field is based on the action	ConfigView		це поле базується на дії
 Delete message	ConfigView		Видалити повідомлення
 <Choose account>	ConfigView		<Вибрати обліковий запис>
-Set flags to	ConfigView		Позначити прапори до
+Set flags to	ConfigView		Встановити прапори до
 Set as read	ConfigView		Позначити як прочитані
 Match header	RuleFilter		Узгодити заголовок
 Reply with	ConfigView		Відповісти з

@@ -1,12 +1,16 @@
-1	dutch; flemish	x-vnd.Be-PRNT	2279754695
+1	dutch; flemish	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
 Waiting	JobListView		Bezig met wachten
 Print test page	PrintersWindow		Druk een testpagina af
+ pending jobs	PrinterListView		 taken in de wachtrij
 page	JobListView		pagina
 Cancel	AddPrinterDialog		Annuleren
+Test page	PrintersWindow		Testpagina
 Add printer	AddPrinterDialog		Printer toevoegen
 Green	TestPageView		Groen
 Printers	PrintersWindow		Printers
+Add…	PrintersWindow		Toevoegen…
+No pending jobs	PrinterListView		Geen taken in de wachtrij
 Default Printer	PrinterListView		Standaardprinter
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 pages	JobListView		pagina's
@@ -34,5 +38,7 @@ No printer found!	TransportMenu		Er werd geen printer gevonden!
 Print jobs: No printer selected	PrintersWindow		Afdruktaken: Geen printer geselecteerd
 Cyan	TestPageView		Cyaan
 Unknown status	JobListView		Onbekende status
+1 pending job	PrinterListView		1 taak in de wachtrij
 Connected to:	AddPrinterDialog		Verbonden met:
 Printer type:	AddPrinterDialog		Printertype:
+Test page	TestPageView		Testpagina

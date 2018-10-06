@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		Riavvia
 Large	PreferencesWindow		Grandi
 Auto-raise	PreferencesWindow		Automaticamente in primo piano
 Recent folders:	PreferencesWindow		Cartelle recenti:
-Show application expander	PreferencesWindow		Mostra espansore applicazione
+Show application expander	PreferencesWindow		Mostra menù applicazione
 Close all	WindowMenu		Chiudi tutto
 Deskbar preferences	PreferencesWindow		Preferenze di Deskbar
 Mount	DeskbarMenu		Monta

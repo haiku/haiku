@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	3708050243
+1	swedish	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Spara spellista
 (not supported)	MediaPlayer-InfoWin		(stöds inte)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filerna som du ville spela verkar vara mediafiler.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Kunde inte spara spellistan.\n\nFel:
+ask every time	MediaPlayer-SettingsWindow		fråga varje gång
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Ny spelare...
 100% scale	MediaPlayer-Main		Skala till 100%
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Behållare
 Nothing to Play	MediaPlayer-Main		Inget att spela upp
 Muted	MediaPlayer-SettingsWindow		Tyst läge aktiverat
 Quit	MediaPlayer-Main		Avsluta
+Resume:	MediaPlayer-SettingsWindow		Återuppta:
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det finns ingen avkodare installerad som kan hantera filformatet, eller så har avkodaren problem med filformatsversionen.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importera post
@@ -57,6 +59,7 @@ MediaPlayer	System name		MediaSpelare
 OK	MediaPlayer-Main		OK
 Settings…	MediaPlayer-Main		Inställningar...
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
+never	MediaPlayer-SettingsWindow		aldrig
 h	MediaPlayer-InfoWin	Hours	h
 Select all	MediaPlayer-PlaylistWindow		Markera alla
 Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Fel:
 Large	MediaPlayer-SettingsWindow		Stor
 Bottom of video	MediaPlayer-SettingsWindow		Botten av videon
 DrawBitmap	MediaPlayer-InfoWin		Rita Bitmap
+always	MediaPlayer-SettingsWindow		alltid
 Total duration: %s	MediaPlayer-PlaylistWindow		Totallängd: %s
 <unnamed media>	MediaPlayer-InfoWin		<inget namn media>
 raw video	MediaPlayer-InfoWin		raw video

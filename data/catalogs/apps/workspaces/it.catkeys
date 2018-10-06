@@ -1,7 +1,7 @@
 1	italian	x-vnd.Be-WORK	3927737357
 Invalid argument: %s\n	Workspaces		Argomento non valido: %s\n
 Quit	Workspaces		Esci
-Workspaces	System name		Workspace
+Workspaces	System name		Spazi di lavoro
 Change workspace count…	Workspaces		Modifica il numero di workspace…
 Remove replicant	Workspaces		Rimuovi replicante
 Show window border	Workspaces		Mostra i bordi della finestra

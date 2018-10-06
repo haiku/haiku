@@ -34,7 +34,7 @@ Log to console	PoorMan		Виводити лог в консоль
 Directory: (none)	PoorMan		Тека: (жодна)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть теку для публікації в інтернеті.\n\nPoorMan може створити теку по замовчуванню \"public_html\" у вашій домашній теці.\nАбо виберіть одну з своїх власних тек.
 Log To Console	PoorMan		Лог в консоль
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# з'єднання} other{# з'єднань}}
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection}, other{# connections}}
 Connections	PoorMan		Підє'днання
 Status: Running	PoorMan		Стан: Запущений
 Controls	PoorMan		Органи управління

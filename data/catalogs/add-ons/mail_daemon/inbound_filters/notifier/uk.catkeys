@@ -3,12 +3,12 @@ You have {0, plural, one{One new message} other{# new messages}} for %account.	N
 none	NotifierConfigView		жодного
 Method:	NotifierConfigView		Метод:
 Beep	NotifierConfigView		Сигнал
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message}, other{# new messages}}
 New mails notification	NotifierFilter		Нові оповіщення пошти
-Central alert	NotifierConfigView		Головне попередження
+Central alert	NotifierConfigView		Головне оповіщення
 OK	NotifierFilter		Гаразд
 New messages	NotifierFilter		Нові повідомлення
-Log window	NotifierConfigView		Вікно логів
-Keyboard LEDs	NotifierConfigView		Світлодіоди клавіатури
+Log window	NotifierConfigView		Вікно журналу
+Keyboard LEDs	NotifierConfigView		Індикатори клавіатури
 Central beep	NotifierConfigView		Головний сигнал
 Alert	NotifierConfigView		Попередження

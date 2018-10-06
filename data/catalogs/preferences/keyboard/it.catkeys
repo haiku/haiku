@@ -5,7 +5,7 @@ Defaults	KeyboardWindow		Predefiniti
 Key repeat rate	KeyboardView		Velocità di ripetizione del tasto
 Revert	KeyboardWindow		Ripristina
 Delay until key repeat	KeyboardView		Ritardo di ripetizione del tasto
-Keyboard	System name		Keyboard
+Keyboard	System name		Tastiera
 OK	KeyboardApplication		OK
 Fast	KeyboardView		Veloce
 Slow	KeyboardView		Lento

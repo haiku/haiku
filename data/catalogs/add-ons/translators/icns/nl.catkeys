@@ -1,0 +1,5 @@
+1	dutch; flemish	x-vnd.Haiku-ICNSTranslator	130825931
+Valid colors: RGB32, RGBA32	ICNSConfig		Geldige kleuren: RGB32, RGBA32
+Version %d.%d.%d, %s	ICNSConfig		Versie %d.%d.%d, %s
+Apple icons	ICNSTranslator		Apple-iconen
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Geldige grootten: 16, 32, 48, 128, 256, 512, 1024

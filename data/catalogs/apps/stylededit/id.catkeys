@@ -1,0 +1,61 @@
+1	indonesian	x-vnd.Haiku-StyledEdit	2229028996
+StyledEdit	System name		StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
+Paste	Menus		Tempel
+OK	LoadAlert		OKE
+File	Menus		Berkas
+???	LoadAlert		???
+Modified	StatusView		Termodifikasi
+Lines:	Statistics		Baris:
+Italic	Menus		Miring
+Left	Menus		Kiri
+Search backwards	FindandReplaceWindow		Cari mundur
+Unlock file	StatusView		Buka kunci berkas
+Size	Menus		Ukuran
+Save	QuitAlert		Simpan
+Page setup…	Menus		Pengaturan halaman…
+Print…	Menus		Cetak…
+Can't undo	Menus		Tidak dapat membatalkan
+Save	Menus		Simpan
+Replace with:	FindandReplaceWindow		Ganti dengan:
+Cancel	SaveAlert		Batal
+Reload	NodeMonitorAlerts		Muat ulang
+Document statistics	Statistics		Statistik dokumen
+Cancel	RevertToSavedAlert		Batal
+Document	Menus		Dokumen
+Save changes to the document \"%s\"? 	QuitAlert		Simpan perubahan ke dokumen \"%s\"? 
+Replace all	FindandReplaceWindow		Ganti semua
+Statistics…	Menus		Statistik…
+Cancel	FindandReplaceWindow		Batal
+Close	Menus		Tutup
+Save	SaveAlert		Simpan
+Words:	Statistics		Kata:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Galat memuat  \"%s\":\n\tFormat tidak didukung
+OK	RevertToSavedAlert		OKE
+Don't save	QuitAlert		Jangan simpan
+Color	Menus		Warna
+OK	QuitAlert		OKE
+Open…	Menus		Buka…
+Center	Menus		Tengah
+Unable to unlock file\n\t%s	QuitAlert		Tidak dapat buka kunci berkas\n\t%s
+line %d, column %d	StatusView		baris %d, kolom %d
+OK	Statistics		OKE
+New	Menus		Baru
+Bold	Menus		Tebal
+Copy	Menus		Salin
+Replace	FindandReplaceWindow		Ganti
+Find again	Menus		Cari lagi
+Cancel	QuitAlert		Batal
+Find…	Menus		Cari…
+Select all	Menus		Pilih semua
+Don't save	SaveAlert		Jangan simpan
+Recover	NodeMonitorAlerts		Pemulihan
+Error loading \"%s\":\n\t%s	LoadAlert		Galat memuat \"%s\":\n\t%s
+Ignore	NodeMonitorAlerts		Abaikan
+Read-only	StatusView		Hanya baca
+OK	SaveAlert		OKE
+Find	FindandReplaceWindow		Cari
+Save as…	Menus		Simpan sebagai…
+Reload…	Menus		Muat ulang…
+Replace…	Menus		Ganti…
+Right	Menus		Kanan

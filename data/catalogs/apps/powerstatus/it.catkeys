@@ -10,7 +10,7 @@ non-rechargeable	PowerStatus		non ricaricabile
 Empty battery slot	PowerStatus		Slot della batteria vuoto
  mV	PowerStatus		 mV
 Run in window	PowerStatus		Esegui in una finestra
-PowerStatus	System name		PowerStatus
+PowerStatus	System name		Stato Batteria
  mWh	PowerStatus		 mWh
 Battery info…	PowerStatus		Informazioni batteria...
 Damaged battery	PowerStatus		Batteria danneggiata
@@ -39,7 +39,7 @@ Design capacity warning: 	PowerStatus		Avviso di capacità (di fabbrica):
 Quit	PowerStatus		Esci
 rechargeable	PowerStatus		ricaricabile
 charging	PowerStatus		in carica
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus può essere eseguito in una finestra o installato nella Deskbar.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stato Batteria può essere eseguito in una finestra o installato nella Deskbar.
 Show status icon	PowerStatus		Mostra l'icona di stato
 Capacity granularity 2: 	PowerStatus		Granularità della capacità 2: 
 Technology: 	PowerStatus		Tecnologia: 

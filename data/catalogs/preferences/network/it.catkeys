@@ -7,18 +7,18 @@ WPA2	WPA2 protected network		WPA2
 Choose automatically	IntefaceView		Scegli automaticamente
 connected	IntefaceView		connesso
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
-The netmask defines your local network	IntefaceAddressView		La netmask definisce la tua rete locale
+The netmask defines your local network	IntefaceAddressView		La maschera di rete definisce la tua rete locale
 Dial-up connection	InterfaceListItem		Connessione Dial-up
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Rete
 VPN connection	InterfaceListItem		Connessione VPN
-Show network status in Deskbar	NetworkWindow		Mostra lo stato della rete in Deskbar
+Show network status in Deskbar	NetworkWindow		Mostra lo stato della rete sulla Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
 connected	InterfaceListItem		connesso
 disabled	InterfaceListItem		disabilitato
 Dial Up	NetworkWindow		Dial Up
 Apply	IntefaceAddressView		Applica
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di NetworkStatus in Deskbar fallita: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di Stato Rete nella Deskbar fallita: %s
 MAC address:	IntefaceView		Indirizzo MAC:
 Wireless device	InterfaceListItem		Dispositivo Wireless
 Disabled	IntefaceAddressView		Disabilitata

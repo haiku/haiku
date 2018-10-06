@@ -41,7 +41,7 @@ Full volume	MediaPlayer-SettingsWindow		Volume massimo
 Drop files to play	MediaPlayer-Main		Trascina qui i file da riprodurre
 Copyright	MediaPlayer-InfoWin		Copyright
 Cancel	MediaPlayer-SettingsWindow		Annulla
-Loop audio	MediaPlayer-SettingsWindow		Riprodurre audio ciclicamente
+Loop audio	MediaPlayer-SettingsWindow		Riproduci audio ciclicamente
 Container	MediaPlayer-InfoWin		Contenitore
 Nothing to Play	MediaPlayer-Main		Nulla da riprodurre
 Muted	MediaPlayer-SettingsWindow		Muto
@@ -70,7 +70,7 @@ Audio	MediaPlayer-InfoWin		Audio
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Spostamento nel Cestino non riuscito
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (messaggio malformato). Fallito il salvataggio dell'Elenco di riproduzione.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% è incorso in un errore interno. Il file non può essere aperto.
-Close window after playing video	MediaPlayer-SettingsWindow		Chiudere la finestra al termine della riproduzione video
+Close window after playing video	MediaPlayer-SettingsWindow		Chiudi la finestra al termine della riproduzione video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scala i filmati in modo fluido (modalità non-overlay)
 OK	MediaPlayer-RemovePLItemsCmd		OK
 Open network stream	MediaPlayer-Main		Apri stream di rete
@@ -87,7 +87,7 @@ none	MediaPlayer-Main		nessuno
 Play mode	MediaPlayer-SettingsWindow		Modalità di riproduzione
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Rimuovi elementi
 Video track	MediaPlayer-Main		Traccia video
-Loop video	MediaPlayer-SettingsWindow		Riprodurre video ciclicamente
+Loop video	MediaPlayer-SettingsWindow		Riproduci video ciclicamente
 Attributes	MediaPlayer-Main		Attributi
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Impossibile spostare tutti i file nel Cestino
 <untitled>	PlaylistItem-title		<senza titolo>

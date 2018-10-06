@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-JPEG2000Translator	3703348128
+1	indonesian	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Menulis
 JPEG2000 images	JPEG2000Translator		Gambar JPEG2000
 Version %d.%d.%d	JPEG2000Translator		Versi %d.%d.%d
@@ -9,3 +9,6 @@ Read	JPEG2000Translator		Baca
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nDidasarkan atas pustaka JasPer:\n© 1999-2000, Image Power, Inc. dan\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec sudah digunakan di \"tutorial\".\n\thttp://www.imagemagick.org/\n
 Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Format Bitmap Be (JPEG2000Translator)
 Low	JPEG2000Translator		Rendah
+About	JPEG2000Translator		Tentang
+High	JPEG2000Translator		Tinggi
+Read greyscale images as RGB32	JPEG2000Translator		Baca gambar abu-abu sebagai RGB32

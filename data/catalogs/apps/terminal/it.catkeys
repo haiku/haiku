@@ -20,7 +20,7 @@ Font:	Terminal AppearancePrefView		Carattere:
 Copy here	Terminal TermView		Copia qui
 Really close?	Terminal TermWindow		Chiudo veramente?
 Copy	Terminal TermWindow		Copia
-Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminale
 Color scheme:	Terminal AppearancePrefView		Schema di colore:
 Window title:	Terminal TermWindow		Titolo finestra:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opzione non riconosciuta \"%s\"\n
@@ -50,7 +50,7 @@ Page setup…	Terminal TermWindow		Imposta pagina…
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		I seguenti processi sono ancora in esecuzione:\n\n\t%1\n\nSe si chiude il terminale i processi verranno fermati.
 Custom	Terminal AppearancePrefView	Window size	Personalizzato
 Insert path	Terminal TermView		Inserisci percorso
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminale\nCopyright 2001-2009 Haiku, Inc.\nCopyright © 1999 Kazuho Okui e Takashi Murai.\n\nUtilizzo: %s [OPZIONE] [SHELL]\n
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright © 1999 Kazuho Okui e Takashi Murai.\n\nUtilizzo: %s [OPZIONE] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Dimensioni della finestra:
 No search string was entered.	Terminal TermWindow		Non è stato inserito alcun testo di ricerca.
 Font size	Terminal TermWindow		Dimensione del carattere

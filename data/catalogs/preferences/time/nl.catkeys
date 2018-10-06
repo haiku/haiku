@@ -1,15 +1,18 @@
-1	dutch; flemish	x-vnd.Haiku-Time	2666700793
+1	dutch; flemish	x-vnd.Haiku-Time	3755504714
 GMT (UNIX compatible)	Time		GMT (UNIX-compatibel)
 OK	Time		Oké
 Asia	Time		Azië
 \nNow: 	Time		\nNu:
 Africa	Time		Afrika
+Reset to default server list	Time		Herstel standaard-serverlijst
+Could not resolve server address	Time		Het serveradres opzoeken is mislukt
 Stop	Time		Stoppen
 Australia	Time		Australië
 Preview time:	Time		Voorvertoning tijd:
 Synchronize	Time		Synchroniseren
 Revert	Time		Ongedaan maken
 Pacific	Time		Pacific
+Show day of week	Time		Dag van de week tonen
 Add	Time		Toevoegen 
 Date and time	Time		Datum en tijd
 about	Time		over
@@ -25,12 +28,15 @@ Time	Time		Tijd
 Indian	Time		Indisch
 Sending request failed	Time		Het verzenden van het verzoek is mislukt
 Arctic	Time		Arctica
+Display time with seconds	Time		Tijd met seconden tonen
 Time	System name		Tijd
 America	Time		Amerika
 Synchronize at boot	Time		Synchroniseren bij het opstarten
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, geschreven door:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nAlle rechten voorbehouden, 2004-2012, Haiku.
 Received invalid time	Time		Ongeldige tijd ontvangen
 Antarctica	Time		Antarctica
+Show time zone	Time		Tijdzone tonen
+Show clock in Deskbar	Time		Klok in Deskbar tonen
 The following error occured while synchronizing:r\n%s: %s	Time		De volgende fout deed zich voor tijdens het synchroniseren:r\n%s: %s
 <Other>	Time		<Anders>
 Current time:	Time		Huidige tijd:
@@ -38,5 +44,6 @@ Try all servers	Time		Alle servers proberen
 Time zone	Time		Tijdzone
 Could not create socket	Time		De socket kon niet aangemaakt worden
 Synchronize again	Time		Opnieuw synchroniseren
+Clock	Time		Klok
 Network time	Time		Netwerktijd
 Atlantic	Time		Atlantic

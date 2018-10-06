@@ -1,5 +1,5 @@
 1	italian	x-vnd.Haiku-debug_server	2134779566
-Write core file	DebugServer		Scrivi file di core
+Write core file	DebugServer		Scrivi file di registro
 Terminate	DebugServer		Termina
 Debug	DebugServer		Debug
 Save report	DebugServer		Salva rapporto

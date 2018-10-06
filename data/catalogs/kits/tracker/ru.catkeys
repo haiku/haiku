@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1081925983
+1	russian	x-vnd.Haiku-libtracker	860981592
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -15,6 +15,7 @@ Permissions	InfoWindow		Права
 Keywords	Bookmark Query Columns		Ключевые слова
 128 x 128	DeskWindow		128 x 128
 128 x 128	ContainerWindow		128 x 128
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы переместите  %target, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
 Recent documents	FavoritesMenu		Недавние документы
 Modified	QueryPoseView		Изменён
 Created	ContainerWindow		Создан
@@ -31,11 +32,13 @@ Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUt
 File	ContainerWindow		Файл
 Handles any %type	OpenWithWindow		Поддерживает любой из %type
 Name	Person Query Columns		Имя
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что изменить ее?\n\nЧтобы изменить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Я знаю, что я делаю\".
 Delete	ContainerWindow		Удалить
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \"%name\".
 Open with…	ContainerWindow		Открыть в…
 Write	FilePermissionsView		Запись
+When	Email Query Columns		Когда
 Modified	PoseView		Изменён
 Make active printer	ContainerWindow		Сделать принтер основным
 Create link here	ContainerWindow		Создать ссылку здесь
@@ -109,12 +112,14 @@ Increase size	DeskWindow		Увеличить размер
 Resize to fit	ContainerWindow		Подогнать размер окна
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Не удалось выполнить %func в find_directory(). \nПричина: %error
 Add printer…	ContainerWindow		Добавить принтер…
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Если вы переименуете папку home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переименовать папку system или её содержимое, зажмите клавишу Shift и нажмите \"Переименовать\".
 New folder	ContainerWindow		Новая папка
 Kind	ContainerWindow		Тип
 home	B_USER_DIRECTORY		Домашняя
 Select…	ContainerWindow		Выделить…
 Copy to	ContainerWindow		Копировать в
 Move to Trash	ContainerWindow		В корзину
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
 Modified	Default Query Columns		Изменён
 Move to	ContainerWindow		Переместить в
 Create %s clipping	PoseView		Сохранить как %s
@@ -289,6 +294,7 @@ File	FilePanelPriv		Файл
 Real name	ContainerWindow		Реальное имя
 Error moving \"%name\"	FSUtils		Ошибка при перемещении \"%name\"
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Вам следует перенести объект(ы) на один из значков диска в окне \"Диски\".
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку home или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
 Cancel	WidgetAttributeText		Отмена
 Could not find an application to open \"%name\" (%error). 	FSUtils		Невозможно найти программу для открытия \"%name\" (%error). 
 Create a Query template	FindPanel		Создать шаблон запроса

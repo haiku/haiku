@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-MediaConverter	1322040280
+1	russian	x-vnd.Haiku-MediaConverter	2251404027
 Video using parameters form settings	MediaConverter		Видео использует параметры из настроек
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не был распознан как поддерживаемый медиафайл:} few{# файла не были распознаны как поддерживаемые медиафайлы:} other{# файлов не было распознано как поддерживаемые медиафайлы:}}
 Video encoding:	MediaConverter		Кодирование видео:
+Writing video track: %d%% complete	MediaConverter		Запись видеотрека: %d%% завершено
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fкадр/с
 Error creating video.	MediaConverter		Ошибка создания видео.
 No audio	Audio codecs list		Без аудио
@@ -15,6 +16,7 @@ Output file '%filename' created	MediaConverter		Выходящий файл '%fi
 Output format	MediaConverter		Формат вывода
 End   [ms]: 	MediaConverter		Конец [мс]: 
 MediaConverter	System name		Медиаконвертер
+Error writing audio frame %ld	MediaConverter		Ошибка при записи аудиокадра %ld
 No video	Video codecs list		Без видео
 Duration:	MediaConverter-FileInfo		Длительность:
 OK	MediaConverter		ОК
@@ -25,6 +27,7 @@ Conversion completed	MediaConverter		Конвертация завершена
 Audio:	MediaConverter-FileInfo		Аудио:
 OK	MediaConverter-FileInfo		ОК
  seconds	MediaFileInfo		 секунд
+Error writing video frame %ld	MediaConverter		Ошибка при записи видеокадра %ld
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ошибка записи в папку %strPath%. Записываем в папку по умолчанию: /boot/home
 Source files	MediaConverter		Исходные файлы
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранная папка не найдена. Выбираем по умолчанию /boot/home
@@ -33,6 +36,7 @@ Cancelling	MediaConverter		Отменяется
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# байт} few{# байта} other{# байтов}}
 Error loading files	MediaConverter		Ошибка при загрузке файлов
 Cancel	MediaConverter		Отмена
+Error read audio frame %ld	MediaConverter		Ошибка при чтении аудиокадра %ld
 None available	Video codecs		Не доступно
 Conversion cancelled	MediaConverter		Конвертация отменена
 No file selected	MediaConverter-FileInfo		Файл не выбран
@@ -48,12 +52,14 @@ Cancelling…	MediaConverter		Отменяется…
 File details	MediaConverter		Параметры файла
 Select	MediaConverter		Выбрать
 Quit	Menu		Выход
+Error read video frame %ld	MediaConverter		Ошибка при чтении видеокадра %ld
 Preview	MediaConverter		Предпросмотр
 File format:	MediaConverter		Формат файла:
 None available	Audio codecs		Недоступно
 MediaConverter+:SaveDirectory	MediaConverter		Медиаконвертер: выбор папки сохранения
 Error launching: %strError%	MediaConverter		Ошибка запуска: %strError%
 High	MediaConverter		Высокое
+Writing audio track: %d%% complete	MediaConverter		Запись аудиотрека: %d%% завершено
 Drop media files onto this window	MediaConverter		Перенесите медиа файлы в это окно
 Audio encoding:	MediaConverter		Кодирование звука:
 Audio quality not supported	MediaConverter		Качество звука не поддерживается

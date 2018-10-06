@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	1611284793
+1	ukrainian	x-vnd.Haiku-Shortcuts	986541402
 OK	ShortcutsWindow		Гаразд
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Гарячим клавішам не вдалося зберегти ваші установки.
 Cancel	ShortcutsWindow		Скасувати
@@ -19,6 +19,7 @@ Save	ShortcutsWindow		Зберегти
 *MouseButton 1	ShortcutsWindow		*Кнопка мишки 1
 *MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишки +20 +0
 Save changes before closing?	ShortcutsWindow		Зберегти зміни перед закриттям?
+Command	ShortcutsSpec	Name for modifier on keyboard	Команда
 Remove selected shortcut	ShortcutsWindow		Видалити вибрану гарячу клавішу
 Add new shortcut	ShortcutsWindow		Додати нову гарячу клавішу
 Save & apply	ShortcutsWindow		Зберегти і використати

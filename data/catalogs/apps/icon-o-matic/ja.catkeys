@@ -48,7 +48,7 @@ Style	Icon-O-Matic-Menus		スタイル
 <modify path>	Icon-O-Matic-PathCmd		<パスを修正>
 Opening the icon failed!	Icon-O-Matic-Main		アイコンを開けません!
 Error: 	Icon-O-Matic-Main		エラー:
-Rotate indices backwards	Icon-O-Matic-PathsList		インデックスを逆順に辿る
+Rotate indices backwards	Icon-O-Matic-PathsList		インデックスを逆回転
 Name	Icon-O-Matic-PropertyNames		名前
 bad news	Icon-O-Matic-Exporter		悪い知らせ
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<取り消せるものはありません>
@@ -102,7 +102,7 @@ Pick a color	Icon-O-Matic-ColorPicker		カラーを選択
 Quit	Icon-O-Matic-Menu-File		終了
 Export	Icon-O-Matic-Menu-File		エクスポート
 No	Icon-O-Matic-StyledTextImport		いいえ
-Rotate indices forwards	Icon-O-Matic-PathsList		インデックスを順に辿る
+Rotate indices forwards	Icon-O-Matic-PathsList		インデックスを正回転
 Unassign Path	Icon-O-Matic-UnassignPathCmd		パスの割り当て解除
 load error	Icon-O-Matic-SVGImport		読み込みエラー
 Move Shapes	Icon-O-Matic-MoveShapesCommand		シェイプを移動

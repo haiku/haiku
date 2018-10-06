@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2455797547
+1	indonesian	x-vnd.Haiku-libtracker	3394192241
 OK	WidgetAttributeText		OKE
 Add-ons	FilePanelPriv		Pengaya
 Mount settings…	ContainerWindow		Pengaturan mount…
@@ -232,6 +232,7 @@ Copying: 	StatusWindow		Menyalin:
 Capacity:	InfoWindow		Kapasitas:
 Delete	FilePanelPriv		Hapus
 Path	Default Query Columns		Lokasi
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
 Save	FindPanel		Simpan
 copy	FSUtils	filename copy	salin
 Temporary	FindPanel		Sementara
@@ -267,6 +268,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Maaf, anda tidak dap
 Name	ContainerWindow		Nama
 Reverse order	ContainerWindow		Balikkan urutan
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# items}}
 OK	OpenWithWindow		OKE
 Add current folder	FilePanelPriv		Tambah folder ini
 Invalid bracket range.	libtracker		Jangkauan kurung tidak valid.
@@ -316,6 +318,7 @@ Unknown	FilePermissionsView		Tak diketahui
 Junk on end.	libtracker		Sampah di akhir.
 All files and folders	FindPanel		Semua file dan folder
 Trailing \\.	libtracker		Membuntuti \\.
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Tidak bisa membuka \"%document\" (Ada library yang hilang: %library). \n
 The Tracker must be running to see Info windows.	PoseView		Tracker harus berjalan untuk melihat Info jendela.
 Other	FilePermissionsView		Lainnya

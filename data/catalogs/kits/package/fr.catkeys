@@ -4,4 +4,4 @@ Failed to get repository names	PackageManagerKit		Impossible d'obtenir les noms 
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Impossible d'obtenir le cache pour le dépôt « %s ». Abandon.
 Refreshing repository \"%s\" failed	PackageManagerKit		Impossible de rafraîchir le dépôt « %s »
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Impossible d'obtenir la configuration pour le dépôt « %s ». Abandon.
-Failed to remove transaction directory	PackageManagerKit		Impossible de supprimer de répertoire de transaction
+Failed to remove transaction directory	PackageManagerKit		Impossible de supprimer le répertoire de transaction

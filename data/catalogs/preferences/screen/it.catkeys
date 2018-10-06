@@ -7,13 +7,13 @@ Use laptop panel:	Screen		Usa pannello del portatile
 Revert	Screen		Ripristina
 Swap displays:	Screen		Scambia schermi:
 Combine displays:	Screen		Combina schemi
-Done	Screen		Fatto
+Done	Screen		Applica
 Set background…	Screen		Imposta sfondo…
 Undo	Screen		Annulla
 if needed	Screen		se necessario
 Screen preferences by the Haiku team	Screen		Impostazioni schermo dal team di Haiku
 Settings will revert in %seconds.	Screen		Le impostazioni saranno ripristinate in %seconds secondi.
-Screen	System name		Screen
+Screen	System name		Schermo
 OK	Screen		OK
 Workspaces	Screen		Spazi di lavoro
 The screen mode could not be set:\n\t%s\n	Screen		Non è stato possibile impostare lo schermo:\n\t%s\n

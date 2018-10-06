@@ -1,6 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-JPEG2000Translator	547915409
+1	dutch; flemish	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Schrijven
 JPEG2000 images	JPEG2000Translator		JPEG2000 afbeeldingen
+Version %d.%d.%d	JPEG2000Translator		Versie %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		Uitgang alleen codestream (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Schrijf zwart-en-wit afbeeldingen als RGB24
 Output quality	JPEG2000Translator		Uitvoerkwaliteit

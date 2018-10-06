@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	3694689316
+1	finnish	x-vnd.Haiku-Installer	4172072111
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Käynnistyshallinnan, Haikun käynnistysvalikon asettamissovelluksen käynnistäminen epäonnistui.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijät: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		TÄRKEITÄ TIETO
 Continue	InstallerWindow	In alert after pressing Stop	Jatka
 Write boot sector to '%s'	InstallerWindow		Kirjoita käynnistyssektori levylle ’%s’
 Collecting copy information.	InstallProgress		Kerätään kopiointitietoja.
+Have fun and thanks for trying out Haiku!	InstallerApp		Pidä hauskaa ja kiitos, että kokeilet Haikua!
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse lähdelevy ponnahdusvalikosta. Napsauta sitten ”Aloita”.
 Quit Boot Manager and DriveSetup	InstallerWindow		Poistu Käynnistyshallinnasta ja Levyasema-asetuksista
 Quit	InstallerWindow		Poistu
@@ -29,6 +30,7 @@ Boot sector successfully written.	InstallProgress		Käynnistyssektorin kirjoitta
 Performing installation.	InstallProgress		Suoritetaan asennus.
 scanning…	InstallerWindow		etsitään…
 Set up boot menu	InstallerWindow		Aseta käynnistysvalikko
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Asennusohjelma tekee itse Haiku-osiosta käynnistettävän, mutta se ei integroi Haikua olemassaoleviin käynnistysvalikoihin. Jos sinulla on jo GRUB asennettuna, voit lisätä Haikun siihen.\nYksityiskohtaiset ohjeet löydät Haikun käynnistysoppaasta webbisivultamme osoitteesta https://www.haiku-os.org/guides/booting.\nTai voit asettaa käynnistysvalikon Asennusohjelman ”Työkalut”-valikosta, katso Käyttäjäoppaan aihe sovelluksesta ”Käynnistyshallinta”.\n\n\n
 Abort	InstallerWindow		Keskeytä
 Finishing Installation.	InstallProgress		Lopetetaan asennusta.
 Restart	InstallerWindow		Käynnistä uudelleen
@@ -53,6 +55,7 @@ Quit DriveSetup	InstallerWindow		Poistu Levyasema-asetuksista
 Hide optional packages	InstallerWindow		Piilota valinnaiset pakkaukset
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
 Restart system	InstallerWindow		Käynnistä järjestelmä uudelleen
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Jos asennat Haikun oikealle laitteistolle (etkä emulaattorin sisälle), saatat haluta valmistella levyaseman osion toisessa käyttöjärjestelmässä (voit esimerkiksi käyttää GParted Live-CD:tä, joka kykenee muuttamaan olemassaolevien osioiden kokoa lisätilan tekemiseksi).\nVoit asettaa osiot myös käynnistämällä Levyasema-asetukset-sovelluksen Asennusohjelmasta, mutta et pysty muuttamaan olemassaolevan osion kokoa kyseisellä sovelluksella. Vaikka Levyasema-asetukset-ohjelma on testattu aika perusteellisesti vuosien mittaan, on suositeltavaa ottaa ajantasaiset varmuuskopiot järjestelmäsi muista osioista. Varmuuden vuoksi…
 OK	InstallerWindow		Valmis
 Set up partitions…	InstallerWindow		Aseta osiot…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Osiota ei voi liittää. Valitse eri osio.
@@ -71,6 +74,7 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat silti asentaa sille?\n\nHuomaa: Kansio 'system' on puhdas kopio lähdetaltiolta, mutta säilyttää settings-kansion, kaikki muut kansiota yhdistetään, kun taas tiedostot ja linkit, jotka ovat olemassa sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
 Continue	InstallerApp		Jatka
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on beeta-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa riski menettää tärkeää dataa. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
 Boot sector not written because of an internal error.	InstallProgress		Käynnistyssektoria ei kirjoitettu sisäisen virheen vuoksi.
 Additional disk space required: %s	InstallerWindow		Vaadittu lisälevytilaa: %s
 Cancel	InstallProgress		Peru

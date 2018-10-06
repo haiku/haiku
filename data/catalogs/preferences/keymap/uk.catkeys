@@ -1,58 +1,127 @@
-1	ukrainian	x-vnd.Haiku-Keymap	1385051534
+1	ukrainian	x-vnd.Haiku-Keymap	1039047705
+Croatian	KeymapNames		Хорватська
+Turkish (Type-Q)	KeymapNames		Турецька (Тип-Q)
+Icelandic	KeymapNames		Ісландська
+Serbian (Cyrillic)	KeymapNames		Сербська (Кирилиця)
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Повернути
+Estonian	KeymapNames		Естонська
+Canadian-French	KeymapNames		Канадська-Французська
 Warning: left and right key roles do not match	Modifier keys window		Увага: функції лівої і правої клавіш не співпадають
+Romanian	KeymapNames		Румунська
 Scroll lock	Keyboard Layout View		Scroll lock
 Menu	Keyboard Layout View	Menu key	Меню
 Left control	Keyboard Layout View		Ліва Control
 Tilde trigger	Keymap window		Тільда
+Bulgarian (Phonetic)	KeymapNames		Болгарська (Фонетична)
+Hungarian	KeymapNames		Угорська
 Grave trigger	Keymap window		Апостроф
+Brazilian (ABNT2)	KeymapNames		Бразильська (ABNT2)
+Polish	KeymapNames		Польська
 Role	Modifier keys window	As in the role of a modifier key	Роль
 Caps lock	Keyboard Layout View		Caps lock
+Spanish (Dvorak)	KeymapNames		Іспанська (Dvorak)
 Select dead keys	Keymap window		Вибрати мертві клавіші
+Belgian (point)	KeymapNames		Бельгійська (point)
+Hebrew	KeymapNames		Іврит
+Russian (Mac)	KeymapNames		Російська (Mac)
+United-Kingdom	KeymapNames		Об'єднане королівство
+Swiss-French	KeymapNames		Швейцарська-Французька
 Cancel	Modifier keys window		Скасувати
+Danish	KeymapNames		Данська
+Lithuanian	KeymapNames		Литовська
+Spanish	KeymapNames		Іспанська
 Command	Keyboard Layout View	Command key	Command
+Macedonian	KeymapNames		Македонська
+Irish	KeymapNames		Ірландська
+French (Mac)	KeymapNames		Французька (Mac)
+German (Mac)	KeymapNames		Німецька (Mac)
 Defaults	Keymap window		Типово
+Ukrainian (Mac)	KeymapNames		Українська (Mac)
+Japanese	KeymapNames		Японська
 Quit	Keymap window		Вихід
 Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
+French (Bépo)	KeymapNames		Французька (Bépo)
 Circumflex trigger	Keymap window		Ціркумфлекс
 Diaeresis trigger	Keymap window		Діарезіс
+Ukrainian	KeymapNames		Українська
 Disabled	Modifier keys window	Do nothing	Вимкнути
+Dvorak (programmer's)	KeymapNames		Dvorak (для програмістів)
+ISO-9995	KeymapNames		SO-9995
+Albanian	KeymapNames		Албанська
 Open…	Keymap window		Відкрити…
+Greek	KeymapNames		Грецька
 Error: duplicate keys	Modifier keys window		Помилка: дублювання клавіш
 System:	Keymap window		Системні:
+Lithuanian (Standard)	KeymapNames		Литовська (Standard)
+Brazilian	KeymapNames		Бразильська
 Left command	Keyboard Layout View		Ліва Сommand
 Set modifier keys…	Keymap window		Призначити клавіші-модифікатори...
 Option:	Modifier keys window	Option key role name	Параметр:
+Belgian (comma)	KeymapNames		Бельгійська (comma)
 Control	Keyboard Layout View	Control key	Керування
 Left option	Keyboard Layout View		Ліва Option
+Faeroese	KeymapNames		Фарерська
 Right control	Keyboard Layout View		Права Control
+Svorak	KeymapNames		Svorak
 Switch shortcut keys	Keymap window		Перемкнути швидкі кнопки
+Russian (Udmurt, Komi, Mari)	KeymapNames		Російська  (Udmurt, Komi, Mari)
+German	KeymapNames		Німецька
+Swedish	KeymapNames		Шведська
+Russian	KeymapNames		Ролсійська
+Arabic (102)	KeymapNames		Арабська (102)
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавіша Shift
 User:	Keymap window		Користувацькі:
+Turkish (Type-F)	KeymapNames		Турецька (Type-F)
+Italian	KeymapNames		Італійська
+Belarusian	KeymapNames		Білоруська
 Right option	Keyboard Layout View		Права Option
+US-International	KeymapNames		US-міжнародна
+Dvorak	KeymapNames		Dvorak
+Russian (Yawert)	KeymapNames		Російська (Yawert)
 Right shift	Keyboard Layout View		Правий Shift
+Belarusian (Latin)	KeymapNames		Білоруська (Латина)
 Key	Modifier keys window	As in a computer keyboard key	Клавіша
+Dutch	KeymapNames		Данська
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавіша Ctrl
 Control:	Modifier keys window	Control key role name	Керування:
+Russian (Typewriter)	KeymapNames		Російська (Typewriter)
+Slovene	KeymapNames		Словенська
 Remove	Keyboard Layout View		Видалити
 Option	Keyboard Layout View	Option key	Опції
 Sample and clipboard:	Keymap window		Приклад і буфер обміну:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавіша Alt/Opt
 Layout	Keymap window		Макет
+Serbian (Latin)	KeymapNames		Сербська (Латина)
+Esperanto	KeymapNames		Есперанто
 Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
+Latin-American	KeymapNames		Латиноамериканська
 Right command	Keyboard Layout View		Права Command
 Revert	Keymap window		Повернути
 Command:	Modifier keys window	Command key role name	Команда:
+Polish (Typewriter)	KeymapNames		Польська (Typewriter) 
+US	KeymapNames		US
 Save as…	Keymap window		Зберегти як…
+Swiss-German	KeymapNames		Швейцарська-Німецька
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавіша Win/Cmd
+French	KeymapNames		Французька
 File	Keymap window		Файл
 Num lock	Keyboard Layout View		Num lock
+Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
 (Current)	Keymap window		(Поточна)
+Kazakh	KeymapNames		Казаська
+Colemak	KeymapNames		Colemak
 Font	Keymap window		Шрифт
+Belarusian (Mac)	KeymapNames		Білоруська (Mac)
 Keymap	System name		Розкладка
+Czech (Mac)	KeymapNames		Чешська (Mac)
+Norwegian	KeymapNames		Норвежська
 Left shift	Keyboard Layout View		Лівий Shift
+Czech	KeymapNames		Чешська
 Shift	Keyboard Layout View	Shift key	Shift
+Slovak	KeymapNames		Словацька
+Finnish	KeymapNames		Фінська
 Set modifier keys	Modifier keys window		Призначити клавіші-модифікатори
+Portuguese	KeymapNames		Португальська
 Modifier keys	Modifier keys window		Клавіші-модифікатори
 Acute trigger	Keymap window		Ак'юте

@@ -1,4 +1,6 @@
-1	russian	x-vnd.Haiku-PackageInstaller	3900768
+1	russian	x-vnd.Haiku-PackageInstaller	3292779285
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Объект с именем '%s' уже существует по данному пути.\nЗаменить этот объект тем, что находится в данном пакете или пропустить его?
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по данному пути.\nЗаменить эту папку той, что находится в данном пакете или пропустить ее?
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -45,6 +47,7 @@ Decline	PackageTextViewer		Отклонить
 All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
 %index% of %total%	PackageInstall		%index% из %total%
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл с именем '%s' уже существует по данному пути.\nЗаменить файл тем, что находится в данном пакете или пропустить его?
 The package you selected has been successfully removed from your system.	UninstallView		Выбранный пакет был успешно удалён из системы.
 Abort	PackageInfo		Прервать
 PackageInstaller	System name		Установщик пакетов
@@ -55,6 +58,7 @@ Begin	PackageView		Установить
 OK	UninstallView		ОК
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символьная ссылка с именем '%s' уже существует по данному пути.\nЗаменить ссылку на ту, что находится в этом пакете или пропустить ее?
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Выбранный пакет не был удалён из вашей системы. Файл инсталляции этого пакета возможно поврежден.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт с именем '%s' уже существует по данному пути.\nЗаменить этот скрипт тем, что находится в данном пакете или пропустить его?
 Replace	PackageView		Заменить
 Installation progress	PackageView		Прогресс установки
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакета не может быть прочитан.\nОдна из возможных причин этого может бы быть то, что требуемый файл не является корректным BeOS .pkg файлом.

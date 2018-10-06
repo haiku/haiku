@@ -1,0 +1,60 @@
+1	indonesian	x-vnd.haiku-softwareupdater	3418694338
+No active network connection was found	UpdateManager	Error message	Tidak ditemukan koneksi jaringan aktif
+Cancel	SoftwareUpdaterWindow		Batal
+Packages are being updated	UpdateManager		Paket sedang diperbarui
+Update now	SoftwareUpdaterWindow		Membarui sekarang
+Updates did not complete	UpdateAction		Pembaruan tidak selesai
+Checking for updates	CheckManager		Memeriksa pembaruan
+%count% packages have available updates	CheckManager		%count% paket memiliki pembaruan yang tersedia
+SoftwareUpdater	System name		SoftwareUpdater
+Fatal error while checking for updates: %s\n	CheckAction		Kesalahan fatal saat memeriksa pembaruan: %s\n
+No remote repositories are available	UpdateManager	Error message	Tidak ada repositori remote yang tersedia
+No updates available	UpdateAction		Tidak ada pembaruan yang tersedia
+Downloading packages	UpdateManager		Mengunduh paket
+Attempting to cancel the updates...	SoftwareUpdaterWindow		Mencoba membatalkan pembaruan…
+from repository	SoftwareUpdaterWindow	List item text	dari repositori
+Cancel	SoftwareUpdaterWindow	Alert button label	Batal
+Click here to install updates.	CheckManager		Klik di sini untuk menginstal pembaruan.
+The following changes will be made:	SoftwareUpdaterWindow		Perubahan berikut akan dilakukan:
+Available updates found	CheckManager		Pembaruan yang tersedia ditemukan
+Checking for updates	SoftwareUpdaterWindow		Memeriksa pembaruan
+Quit	SoftwareUpdaterWindow	Alert button label	Berhenti
+Cancelling updates	SoftwareUpdaterWindow		Membatalkan pembaruan
+Updating version	SoftwareUpdaterWindow	List item text	Memperbarui versi
+Applying changes	UpdateManager		Menerapkan perubahan
+Quit	SoftwareUpdaterWindow		Berhenti
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Tidak ada repositori remote yang tersedia.Harap verifikasi bahwa beberapa repositori diaktifkan menggunakan preflet Repositori atau perintah 'pkgman'.
+There were no updates found.	UpdateAction		Tak ada pembaruan yang ditemukan.
+Uninstalling version	SoftwareUpdaterWindow	List item text	Menghapus versi
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Paket diperbarui
+Installing version	SoftwareUpdaterWindow	List item text	Memasang versi
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variabel argumen tidak lagi diterima\n
+Updates completed	UpdateManager		Pembaruan selesai
+Invalid update type, cannot continue with updates	UpdateAction		Jenis pembaruan tidak sah, tidak dapat melanjutkan pembaruan
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Paket-paket yang akan dihapus
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Pembaruan belum selesai, apakah Anda yakin ingin berhenti?
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Pemakaian:  SoftwareUpdater <command> [ <option> ]\nPembaruan paket yang diinstal.\n\nCommand:\n  update    - Cari repositori untuk pembaruan di semua paket.\n  check      - Periksa pembaruan yang tersedia tetapi hanya menampilkan pemberitahuan dengan hasil.\n  full-sync  - Sinkronkan paket yang diinstal dengan repositori.\n\nOptioni:\n  -h atau --help     Cetak bantuan penggunaan ini\n  -v atau --verbose    Output informasi bertele-tele\n
+There were no updates found.	CheckAction		Tidak ada pembaruan yang ditemukan.
+%i of %i	UpdateManager	Do not translate %i	%i dari %i
+Updates found	SoftwareUpdaterWindow		Pembaruan ditemukan
+to	SoftwareUpdaterWindow	List item text	ke
+No updates available	CheckManager		Tidak ada pembaruan yang tersedia
+Don't quit	SoftwareUpdaterWindow		Jangan berhenti
+Quit	SoftwareUpdaterWindow	Button label	Berhenti
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klik di sini untuk menjalankan SoftwareUpdater. Beberapa pembaruan akan membutuhkan solusi masalah untuk dipilih.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Menghubungi repositori perangkat halus untuk memeriksa pembaruan paket.
+Unrecognized argument	SoftwareUpdaterApp	Error message	Argumen tidak dikenal
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Silakan pilih dari opsi pembaruan ini:\n\nMemperbarui:\n\tPerbarui semua paket yang diinstal.\nSinkronisasi penuh:\n\tSinkronisasi paket yang diinstal dengan repositori.
+Exception occurred while checking for updates: %s\n	CheckAction		Pengecualian terjadi saat memeriksa pembaruan: %s\n
+Exception occurred while updating packages : %s\n	UpdateAction		Pengecualian terjadi saat memperbarui paket : %s\n
+Update	SoftwareUpdaterWindow	Alert button label	Memperbarui
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Paket baru yang akan diinstal
+OK	UpdateManager		OKE
+A reboot may be necessary to complete some updates.	UpdateManager		Sebuah reboot mungkin diperlukan untuk menyelesaikan beberapa pembaruan.
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Buka Repositori
+Show more details	SoftwareUpdaterWindow		Tampilkan lebih detail
+Contacting software repositories to check for package updates.	CheckManager		Menghubungi repositori perangkat halus untuk memeriksa pembaruan paket.
+Full sync	SoftwareUpdaterWindow	Alert button label	Sinkronisasi penuh
+No active network connection was found.\n	CheckManager		Tidak ditemukan koneksi jaringan aktif.\n
+OK	SoftwareUpdaterWindow		OKE
+There were no updates found.	CheckManager		Tidak ada pembaruan yang ditemukan.

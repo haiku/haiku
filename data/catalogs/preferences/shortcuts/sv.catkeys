@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	1611284793
+1	swedish	x-vnd.Haiku-Shortcuts	986541402
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
 Cancel	ShortcutsWindow		Avbryt
@@ -19,6 +19,7 @@ Save	ShortcutsWindow		Spara
 *MouseButton 1	ShortcutsWindow		*Musknapp 1
 *MoveMouse +20 +0	ShortcutsWindow		*FlyttaMusenTill +20 +0
 Save changes before closing?	ShortcutsWindow		Spara ändringar innan programmet avslutas?
+Command	ShortcutsSpec	Name for modifier on keyboard	Kommando
 Remove selected shortcut	ShortcutsWindow		Ta bort
 Add new shortcut	ShortcutsWindow		Lägg till
 Save & apply	ShortcutsWindow		Spara

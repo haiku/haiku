@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	723472428
+1	indonesian	x-vnd.Haiku-WebPositive	299683995
 Show home button	Settings Window		Tampilkan tombol rumah
 Username:	Authentication Panel		Nama pengguna:
 Copy URL to clipboard	Download Window		Salin URL ke papan klip
@@ -12,3 +12,102 @@ Open location	WebPositive Window		Buka lokasi
 Clear history	WebPositive Window		Hapus riwayat
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Kemarin
+History	WebPositive Window		Riwayat
+Error opening downloads folder	Download Window		Galat membuka folder unduhan
+Paste	WebPositive Window		Tempel
+Expiration	Cookie Manager		Kedaluwarsa
+Double-click or middle-click to open new tab.	Tab Manager		Klik ganda atau klik tengah untuk membuka tab baru.
+Proxy username:	Settings Window		nama pengguna Proksi:
+Save page as…	WebPositive Window		Simpan halaman sebagai…
+Settings	Settings Window		Pengaturan
+Confirmation	WebPositive Window		Konfirmasi
+Window	WebPositive Window		Jendela
+Cookie manager	Cookie Manager		Manajer kuki
+Decrease size	WebPositive Window		Perkecil ukuran
+Loading %url	WebPositive Window		Memuat %url
+Download aborted	Download Window		Unduhan dibatalkan
+Value	Cookie Manager		Nilai
+Page source	WebPositive Window		Sumber halaman
+Next	WebPositive Window		Selanjutnya
+Find next	WebPositive Window		Cari selanjutnya
+Download folder:	Settings Window		Folder unduhan:
+Cancel	Authentication Panel		Batal
+Close tab	WebPositive Window		Tutup tab
+Quit	WebPositive Window		Keluar
+Full screen	WebPositive Window		Layar penuh
+Open download error	Download Window		Galat membuka unduhan
+The cookie jar is empty!	Cookie Manager		Tempat kuki kosong!
+Standard font:	Settings Window		Font standar:
+Restart	Download Window		Mulai ulang
+Proxy server	Settings Window		Server proksi
+New window	WebPositive Window		Jendela baru
+WebPositive	Download Window		WebPositive
+Open	Download Window		Buka
+Reload	WebPositive Window		Muat ulang
+Downloads	Download Window		Unduhan
+Delete	Cookie Manager		Hapus
+of	Download Window	...as in '12kB of 256kB'	dari
+Cut	WebPositive Window		Potong
+Open downloads folder	Download Window		Buka folder unduhan
+Proxy password:	Settings Window		Sandi proksi:
+Find:	WebPositive Window		Cari:
+Increase size	WebPositive Window		Perbesar ukuran
+Downloads	WebPositive Window		Unduhan
+Requesting %url	WebPositive Window		Meminta %url
+Apply	Settings Window		Terapkan
+Size:	Font Selection view		Ukuran:
+Show tabs if only one page is open	Settings Window		Tampilkan tab ketika hanya satu laman yang terbuka
+About	WebPositive Window		Tentang
+Fonts	Settings Window		Font
+OK	Download Window		OK
+Open blank page	Settings Window		Buka laman kosong
+New tabs:	Settings Window		Tab baru:
+Cancel	WebPositive Window		Batalkan
+Open all	WebPositive Window		Buka semua
+Proxy server requires authentication	Settings Window		Server proksi membutuhkan otentikasi
+Clear	URL Bar		Bersihkan
+Cut	URL Bar		Potong
+Clear	WebPositive Window		Bersihkan
+Script console	Console Window		Konsol skrip
+Remove	Download Window		Hilangkan
+Find	WebPositive Window		Cari
+Settings	WebPositive Window		Pengaturan
+(Finish: %date)	Download Window		(Selesai: %date)
+Script console	WebPositive Window		Konsol skrip
+Name	Cookie Manager		Nama
+Proxy server address:	Settings Window		Alamat proksi server:
+Proxy server port:	Settings Window		Port proksi server:
+Paste	URL Bar		Tempel
+Cookie manager	WebPositive Window		Manajer kuki
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Sembunyikan teks sandi
+Open start page	Settings Window		Buka laman mulai
+Continue downloads	WebPositive		Lanjutkan unduhan
+Cancel	Download Window		Batalkan
+Open search page	Settings Window		Buka laman pencarian
+Clear	Console Window		Bersihkan
+Password:	Authentication Panel		Sandi:
+New browser window	Download Window		Jendela peramban baru
+Today	WebPositive Window		Hari ini
+Remember username and password for this site	Authentication Panel		Ingat nama pengguna dan kata sandi untuk situs ini
+Authentication required	Authentication Panel		Otentikasi dibutuhkan
+Use proxy server to connect to the internet	Settings Window		Gunakan server proksi untuk terhubung ke internet
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	Gagal memuat %url
+New tab	WebPositive Window		Tab baru
+Downloads in progress	WebPositive		Pengunduhan dalam proses
+General	Settings Window		Umum
+View	WebPositive Window		Tampilan
+Previous	WebPositive Window		Sebelumnya
+Do you really want to clear the browsing history?	WebPositive Window		Apakah Anda ingin membersihkan riwayat jelajah?
+Copy	WebPositive Window		Salin
+Clone current page	Settings Window		Gandakan laman saat ini
+Session cookie	Cookie Manager		Sesi kuki
+OK	Authentication Panel		OK
+Copy	URL Bar		Salin
+Download finished	Download Window		Unduhan selesai
+OK	WebPositive Window		OK
+Cookies for %s	Cookie Manager		Kuki untuk %s
+New windows:	Settings Window		Jendela baru:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url selesai
+Remove finished	Download Window		Penghapusan selesai

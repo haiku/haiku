@@ -16,7 +16,7 @@ Show day of week	Time		Mostra giorno della settimana
 Add	Time		Aggiungi
 Date and time	Time		Data e ora
 about	Time		informazioni
-Local time (Windows compatible)	Time		Ora Locale (Windows compatibile)
+Local time (Windows compatible)	Time		Ora locale (compatibile Windows)
 Message receiving failed	Time		Ricezione del messaggio fallito
 Set time zone	Time		Imposta fuso orario
 Waiting for answer failed	Time		Attesa di una risposta fallita
@@ -45,5 +45,5 @@ Time zone	Time		Fuso orario
 Could not create socket	Time		Non è stato possibile creare un socket
 Synchronize again	Time		Sincronizza nuovamente
 Clock	Time		Orologio
-Network time	Time		Orario di Rete
+Network time	Time		Orario di rete
 Atlantic	Time		Atlantico

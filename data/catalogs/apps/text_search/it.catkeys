@@ -7,7 +7,7 @@ Close	GrepWindow		Chiudi
 Cancel	GrepWindow		Annulla
 The unselected files will be removed from the list.	GrepWindow		I file non selezionati verranno rimossi dalla lista.
 Regular expression	GrepWindow		Espressione regolare
-Set target…	GrepWindow		Imposta obbiettivo
+Set target…	GrepWindow		Seleziona destinazione…
 Failed to open output pipe!	Grepper		Impossibile aprire la pipe di output!
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Scegli i file che desideri che vengano selezionati per te nel Tracker.
 Open files in Pe	GrepWindow		Apri i file con Pe
@@ -29,7 +29,7 @@ Failed to start xargs program!	Grepper		Impossibile avviare applicativo xargs!
 New window	GrepWindow		Nuova finestra
 Failed to open input pipe!	Grepper		Impossibile aprire la pipe di input!
 Please select the files you wish to keep searching.	GrepWindow		Seleziona i file sui quali desideri continuare la ricerca.
-TextSearch	GrepWindow		TextSearch
+TextSearch	GrepWindow		Ricerca Testo
 Quit	GrepWindow		Esci
 Show files in Tracker	GrepWindow		Mostra i file nel Tracker
 Case-sensitive	GrepWindow		Sensibile alle maiuscole/minuscole

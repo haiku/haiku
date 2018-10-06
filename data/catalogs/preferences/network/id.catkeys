@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Network	887471140
+1	indonesian	x-vnd.Haiku-Network	1314732966
 Static	IntefaceAddressView		Statis
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Layanan
@@ -8,8 +8,10 @@ Choose automatically	IntefaceView		Pilih otomatis
 connected	IntefaceView		terhubung
 Ethernet device	InterfaceListItem		Perangkat ethernet
 The netmask defines your local network	IntefaceAddressView		Netmask mendefinisikan jaringan lokal anda
+Dial-up connection	InterfaceListItem		Koneksi dial-up
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Jaringan
+VPN connection	InterfaceListItem		Koneksi VPN
 Show network status in Deskbar	NetworkWindow		Tampilkan status jaringan di Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Metode untuk memperoleh alamat IP
 connected	InterfaceListItem		terhubung
@@ -40,8 +42,11 @@ WPA	WPA protected network		WPA
 Sent:	IntefaceView		Terkirim
 open	Open network		buka
 IP Address:	IntefaceAddressView		Alamat IP:
+VPN	NetworkWindow		VPN
 Received:	IntefaceView		Diterima:
 Disable	IntefaceView		Dilumpuhkan
+<no wireless networks found>	IntefaceView		<no wireless networks found>
+Netmask:	IntefaceAddressView		Netmask:
 Disable	ServiceView		Dilumpuhkan
 Your IP address	IntefaceAddressView		Alamat IP Anda
 Manage…	NetworkWindow		Kelola...

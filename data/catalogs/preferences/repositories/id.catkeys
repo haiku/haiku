@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Repositories	1782199077
+1	indonesian	x-vnd.Haiku-Repositories	2658607939
 Completed	TaskLooper	Completed task status message	Terselesaikan
 Repositories	System name		Repositori
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Terjadi kesalahan saat mengaktifkan repositori %url%
@@ -13,6 +13,7 @@ Repository URL:	AddRepoWindow	Text box label	URL Repositori:
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Ada kesalahan mendapatkan konfigurasi repositori untuk %name%.
 Details	TaskLooper	Job log details header	Rincian
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Kabar baik! Tugas untuk repositori %name% diselesaikan.
+Status	RepositoriesView	Column title	Status
 Aborted	TaskLooper	Aborted task status message	Dibatalkan
 Remove all	RepositoriesView	Button label	Hapus semua
 Remove	RepositoriesView	Button label	Hapus
@@ -21,6 +22,7 @@ Name	RepositoriesView	Column title	Nama
 Enable	RepositoriesView	Button label	Mengizinkan
 Enable repositories to use with package management:	RepositoriesView	Label text	Pilih repositori yang akan digunakan oleh manajemen paket:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Terjadi kesalahan menyegarkan cache repositori untuk %name%
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Hanya satu URL untuk setiap repositori yang dapat diaktifkan. Silakan ubah pilihan Anda.
 Failed	TaskLooper	Failed task status message	Gagal
 OK	Constants	Button label	OKE
 Cancel task	TaskTimer	Button label	Batalkan tugas

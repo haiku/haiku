@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	886323823
+1	russian	x-vnd.Haiku-HaikuDepot	3764618272
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -68,6 +68,7 @@ Mostly stable	RatePackageWindow		В основном стабилен
 Log out	MainWindow		Выход из системы
 Repository	PackageListView		Репозиторий
 Education	Model		Образование
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Похоже, что этого пакета нет на сервере HaikuDepot из-за чего создать новый рейтинг или изменить существующий невозможно.
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.

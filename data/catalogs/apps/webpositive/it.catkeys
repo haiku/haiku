@@ -8,7 +8,7 @@ Quit	WebPositive		Esci
 The download could not be opened.	Download Window		La cartella dei file scaricari non può essere aperta.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La cartella dei file scaricati non può essere aperta.\n\nErrore: %error
 Close	Download Window		Chiudi
-Open location	WebPositive Window		Apri posizione
+Open location	WebPositive Window		Apri indirizzo
 Clear history	WebPositive Window		Cancella cronologia
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Ieri
@@ -20,7 +20,7 @@ Paste	WebPositive Window		Incolla
 Expiration	Cookie Manager		Scadenza
 Double-click or middle-click to open new tab.	Tab Manager		Doppio click o click centrale per aprire una nuova tab.
 Proxy username:	Settings Window		Nome utente server proxy:
-Save page as…	WebPositive Window		Salva pagine come…
+Save page as…	WebPositive Window		Salva pagina come…
 Settings	Settings Window		Impostazioni
 Confirmation	WebPositive Window		Conferma
 Window	WebPositive Window		Finestra
@@ -67,7 +67,7 @@ Bookmark this page	WebPositive Window		Aggiungi questa pagina ai segnalibri
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nel tentativo di mostrare la cartella dei segnalibri.\n\nErrore: %error
 Open downloads folder	Download Window		Apri cartella dei file scaricati
 Proxy password:	Settings Window		Password server proxy:
-Number of days to keep links in History menu:	Settings Window		Numero di giorni per cui mantenere i collegamenti nella cronologia:
+Number of days to keep links in History menu:	Settings Window		Numero di giorni in cui mantenere i collegamenti nel menu Cronologia:
 Reset size	WebPositive Window		Reimposta dimensioni
 Find:	WebPositive Window		Trova:
 Increase size	WebPositive Window		Aumenta dimensioni
@@ -144,7 +144,7 @@ Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't 
 Session cookie	Cookie Manager		Cookie di sessione
 OK	Authentication Panel		OK
 Copy	URL Bar		Copia
-Download finished	Download Window		Download terminato
+Download finished	Download Window		Download completato
 Show bookmark bar	WebPositive Window		Mostra barra dei segnalibri
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Gestisci segnalibri

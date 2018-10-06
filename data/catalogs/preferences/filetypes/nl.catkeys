@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-FileTypes	4042259532
+1	dutch; flemish	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Toepassingstypes...
 Description:	Application Types Window		Beschrijving:
 Args only	Application Type Window		Alleen argumenten
@@ -49,7 +49,10 @@ Group name:	New File Type Window		Groepnaam:
 Preferred application	FileType Window		Voorkeurstoepassing
 Progress	Application Types Window		Voortgang
 Set preferred application	Preferred App Menu		Voorkeurstoepassing instellen
+Don't save	Application Type Window		Niet opslaan
+Save changes before closing?	Application Type Window		Wilt u de wijzigingen opslaan alvorens te sluiten?
 File	Application Type Window		Bestand
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Toepassingssoort kon verwijderd worden} other{# Toepassingssoorten konden verwijderd worden}}
 Version:	Application Type Window		Versie:
 Select…	FileTypes Window		Selecteer...
 FileTypes request	FileTypes		BestandsTypen-verzoek

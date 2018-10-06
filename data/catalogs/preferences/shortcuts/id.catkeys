@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Shortcuts	2879381470
+1	indonesian	x-vnd.Haiku-Shortcuts	3163844049
 OK	ShortcutsWindow		OKE
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pemintas tidak bisa menyimpan keyset Anda.
 Cancel	ShortcutsWindow		Batal
@@ -11,11 +11,16 @@ Revert to saved	ShortcutsWindow		Kembali ke tersimpan
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Teks Anda Disini\"
 *MouseUp	ShortcutsWindow		*MouseUp
 (Choose application with file requester)	ShortcutsWindow		(Pilih aplikasi dengan berkas pemohon)
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pintasan tidak dapat membuka file KeySet Anda!
 Option	ShortcutsSpec	Name for modifier on keyboard	Opsi
 Save	ShortcutsWindow		Simpan
 Save changes before closing?	ShortcutsWindow		Simpan perubahan sebelum menutup?
 Command	ShortcutsSpec	Name for modifier on keyboard	Perintah
+Remove selected shortcut	ShortcutsWindow		Hapus pintasan yang dipilih
+Add new shortcut	ShortcutsWindow		Tambahkan pintasan baru
+Save & apply	ShortcutsWindow		Simpan & terapkan
+Append	ShortcutsWindow		Tambahkan
 File	ShortcutsWindow		Berkas
 Quit	ShortcutsWindow		Keluar
 *MouseDown	ShortcutsWindow		*MouseDown
@@ -26,5 +31,8 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
 Save KeySet as…	ShortcutsWindow		Simpan keyset sebagai...
 Open	ShortcutsWindow		Buka
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pintasan tidak dapat mengurai file KeySet Anda!
 Select	ShortcutsWindow		Pilih
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pintasan tidak dapat menyimpan file KeySet Anda!
 Oh no	ShortcutsWindow		Oh tidak
+Shortcuts	System name		Pintasan

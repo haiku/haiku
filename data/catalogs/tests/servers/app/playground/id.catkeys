@@ -1,4 +1,17 @@
-1	indonesian	x-vnd.Haiku-Playground	1822600985
+1	indonesian	x-vnd.Haiku-Playground	1375574837
+Line	Playground		Garis
+Fill	Playground		Mengisi
+Over	Playground		Di atas
+Quit	Playground		Keluar
+Rect	Playground		Persegi
+Select	Playground		Memilih
+Click and drag to draw an object	Playground		Klik dan seret untuk menggambar objek
+Controls	Playground		Kontrol
+Round rect	Playground		Persegi membulat
+Alpha:	Playground		Alfa:
+Mode:	Playground		Moda:
+Submenu	Playground		Submenu
+Copy	Playground		Salin
 Cancel	Playground		Batal
 Clear	Playground		Bersihkan
 Min	Playground		Min
@@ -6,6 +19,7 @@ Blend	Playground		Campur
 Invert	Playground		Balikkan
 Clear all drawing objects?	Playground		Bersihkan semua obyek gambar?
 Width:	Playground		Lebar:
+Alpha	Playground		Alfa
 New object	Playground		Obyek baru
 Test	Playground		Uji
 Max	Playground		Maks
@@ -14,4 +28,5 @@ Playground	System name		Tempat bermain
 Erase	Playground		Hapus
 File	Playground		Berkas
 Subtract	Playground		Kurangi
+<pick>	Playground		<pick>
 Ellipse	Playground		Elips

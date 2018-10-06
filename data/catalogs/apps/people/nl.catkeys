@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-PEPL	3273435274
+1	dutch; flemish	x-vnd.Be-PEPL	3676386979
 Edit	People		Aanpassen
 Error	People		Fout
 City	People		Stad
@@ -30,6 +30,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Telefoon thuis
 Save as…	People		Opslaan als...
 Redo	People		Opnieuw uitvoeren
+Save changes before closing?	People		Wilt u wijzigingen opslaan alvorens te sluiten?
 Paste	People		Plakken
 Drop an image here,\nor use the contextual menu.	People		Sleep hier een afbeelding naar toe,\nof gebruik het contextmenu.
 Save	People		Opslaan

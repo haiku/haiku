@@ -1,10 +1,12 @@
-1	ukrainian	x-vnd.Haiku-WebPTranslator	3343078170
+1	ukrainian	x-vnd.Haiku-WebPTranslator	828165164
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
 Compression method:	ConfigView		Метод стискання:
 WebP image translator	ConfigView		Перетворювач зображень WebP
 Preset	ConfigView		Попередньо встановлене
 WebP images	WebPTranslator		Зображення WebP
 WebPTranslator Settings	ConfigView		Налаштування перетворювача WebP
 Output quality:	ConfigView		Якість виведення:
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
 WebP Settings	main		Налаштування WebP
 Text	ConfigView		Текст
 Slower but better	ConfigView		Повільніше, але краще
@@ -14,6 +16,7 @@ Picture	ConfigView		Картинка
 Low	ConfigView		Низький
 High	ConfigView		Високий
 Drawing	ConfigView		Малюнок
+Based on libwebp %version%	ConfigView		На основі libwebp %version%
 Default	ConfigView		Типово
 Fast	ConfigView		Швидко
 Photo	ConfigView		Фото

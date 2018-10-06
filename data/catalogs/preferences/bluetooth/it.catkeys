@@ -46,7 +46,7 @@ Only from trusted devices	Settings view		Solo da dispositivi affidabili
 Scanning progress	Inquiry panel		Scansione in corso
 Always ask	Settings view		Chiedi sempre
 Retrieving name of %1	Inquiry panel		Recupero nome of %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificare l'attivazione di Bluetooth sul dispositivo remoto . Premi 'Interrogare' per avviare la scansione. Il tempo necessario per il completamento dell'attività non è noto, anche se normalmente sono previsti non più di tre secondi per ogni dispositivo. Questi potranno poi essere aggiunti alla lista principale, per la successiva associazione.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificare l'attivazione di Bluetooth sul dispositivo remoto . Premi 'Interroga' per avviare la scansione. Il tempo necessario per il completamento dell'attività non è noto, anche se normalmente sono previsti non più di tre secondi per ogni dispositivo. Questi potranno poi essere aggiunti alla lista principale, per la successiva associazione.
 Authenticate	Extended local device view		Autenticazione
 Refresh local devices…	Window		Aggiornamento dispositivi locali…
 Pick device...	Settings view		Seleziona dispositivo…

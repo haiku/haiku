@@ -1,0 +1,60 @@
+1	ukrainian	x-vnd.haiku-softwareupdater	3418694338
+No active network connection was found	UpdateManager	Error message	Не знайдено жодного активного підключення
+Cancel	SoftwareUpdaterWindow		Відмінити
+Packages are being updated	UpdateManager		Пакунки оновлено
+Update now	SoftwareUpdaterWindow		Оновити зараз
+Updates did not complete	UpdateAction		Оновлення не завершені
+Checking for updates	CheckManager		Перевірка оновлень
+%count% packages have available updates	CheckManager		для %count% пакунків доступні оновлення
+SoftwareUpdater	System name		SoftwareUpdater
+Fatal error while checking for updates: %s\n	CheckAction		Критична помилка при перевірці оновлень: %s\n
+No remote repositories are available	UpdateManager	Error message	Віддалені сховища відсутні
+No updates available	UpdateAction		Немає доступних оновлень
+Downloading packages	UpdateManager		Отримання пакунків
+Attempting to cancel the updates...	SoftwareUpdaterWindow		Спроба відміни оновлень…
+from repository	SoftwareUpdaterWindow	List item text	зі сховища
+Cancel	SoftwareUpdaterWindow	Alert button label	Відмінити
+Click here to install updates.	CheckManager		Клацніть тут для встановлення оновлень.
+The following changes will be made:	SoftwareUpdaterWindow		Будуть зроблені наступні зміни:
+Available updates found	CheckManager		Знайдено доступні оновлення
+Checking for updates	SoftwareUpdaterWindow		Перевірка оновлень
+Quit	SoftwareUpdaterWindow	Alert button label	Вийти
+Cancelling updates	SoftwareUpdaterWindow		Відміна оновлень
+Updating version	SoftwareUpdaterWindow	List item text	Оновлення версії
+Applying changes	UpdateManager		Застосування змін
+Quit	SoftwareUpdaterWindow		Вийти
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Відсутні віддалені сховища. Переконайтеся, що деякі сховища увімкнені за допомогою префлета Repositories або команди "pkgman".
+There were no updates found.	UpdateAction		Не знайдено жодних оновлень.
+Uninstalling version	SoftwareUpdaterWindow	List item text	Видалення версії
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Пакунки будуть оновлені
+Installing version	SoftwareUpdaterWindow	List item text	Встановлення версії
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Змінні аргументу більше не приймаються\n
+Updates completed	UpdateManager		Оновлення завершені
+Invalid update type, cannot continue with updates	UpdateAction		Недійсний тип оновлення, неможливо продовжити оновлення
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Пакуноу буде видалено
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Оновлення може бути неповним, Ви впевнені що бажаєте вийти?
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Використання: SoftwareUpdater <command> [ <option> ]\nОновити встановлені пакунки.\n\nКоманди:\nupdate - пошук сховищ для оновлення всіх пакунків.\ncheck - пошук доступних оновлень, але у вигляді повідомлень про їх доступність.\nfull-sync - Синхронізувати встановлені пакунки зі сховищами.\n\nОпції:\n-h or --help ЖЛПоказати цей файл\n-v or --verbose Виведити докладну інформацію\n
+There were no updates found.	CheckAction		Оновлень не знайдено.
+%i of %i	UpdateManager	Do not translate %i	%i з %i
+Updates found	SoftwareUpdaterWindow		Знайдено оновлення
+to	SoftwareUpdaterWindow	List item text	до
+No updates available	CheckManager		Оновлення відсутні
+Don't quit	SoftwareUpdaterWindow		Не виходити
+Quit	SoftwareUpdaterWindow	Button label	Вийти
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Клайніть для запуску SoftwareUpdater. Для деяких оновлень буде потрібно вибрати вирішення.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Зконтактуйтесь зі сховищами для перевірки оновлень пакунків.
+Unrecognized argument	SoftwareUpdaterApp	Error message	Нерозпізнаний аргумент
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Будь-ласка, оберіть з цих параметрів оновлення:\n\nОновлення:\n\tОновити всі встановлені пакунки.\nПовна синхронізація:\n\tСинхронізувати встановлені пакунки зі сховищами.
+Exception occurred while checking for updates: %s\n	CheckAction		Стався виняток під час перевірки оновлень: %s\n
+Exception occurred while updating packages : %s\n	UpdateAction		Стався виняток під час оновлення пакунків: %s\n
+Update	SoftwareUpdaterWindow	Alert button label	Оновлення
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Нові пакунки встановлено
+OK	UpdateManager		Гаразд
+A reboot may be necessary to complete some updates.	UpdateManager		Для завершення оновлень перезавантажтесь.
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Відкрити Сховища
+Show more details	SoftwareUpdaterWindow		Показати деталі
+Contacting software repositories to check for package updates.	CheckManager		Під'єднати сховища для перевірки оновлень.
+Full sync	SoftwareUpdaterWindow	Alert button label	Повна синхронізація
+No active network connection was found.\n	CheckManager		Не знайдено жодних активних під'єднань.\n
+OK	SoftwareUpdaterWindow		Гаразд
+There were no updates found.	CheckManager		Не знайдено жодних оновлень.

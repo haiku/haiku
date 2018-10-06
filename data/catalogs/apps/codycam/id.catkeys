@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-CodyCam	3445069859
+1	indonesian	x-vnd.Haiku-CodyCam	1775183691
 Upload…	VideoConsumer.cpp		Unggah…
 Capturing Image…	VideoConsumer.cpp		Mengambil Gambar
 Every 30 seconds	CodyCam		Setiap 30 detik
@@ -7,5 +7,13 @@ Last Capture: 	VideoConsumer.cpp		Pengambilan Terakhir:
 Server login failed	VideoConsumer.cpp		Gagal masuk ke server
 Remote host has closed the connection.\n	FtpClient		Remote host telah menutup koneksi.\n
 Login:	CodyCam		Masuk:
+Format:	CodyCam		Format:
 Every 2 hours	CodyCam		Setiap 2 jam
 Closing the window\n	VideoConsumer.cpp		Menutup jendela\n
+Password:	CodyCam		Kata Sandi:
+Directory:	CodyCam		Direktori:
+Server:	CodyCam		Server:
+Every 15 minutes	CodyCam		Setiap 15 menit
+Every 8 hours	CodyCam		Setiap 8 jam
+Every 24 hours	CodyCam		Setiap 24 jam
+Every 15 seconds	CodyCam		Setiap 15 detik

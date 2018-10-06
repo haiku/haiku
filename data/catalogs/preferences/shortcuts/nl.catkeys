@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Shortcuts	2746774963
+1	dutch; flemish	x-vnd.Haiku-Shortcuts	372053878
 OK	ShortcutsWindow		Oké
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sneltoetsen was niet in staat om uw toetsencombinatie op te slaan.
 Cancel	ShortcutsWindow		Annuleren
@@ -17,6 +17,7 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sneltoetsen kon u
 Save	ShortcutsWindow		Opslaan
 *MouseButton 1	ShortcutsWindow		*Muisknop 1
 *MoveMouse +20 +0	ShortcutsWindow		*VerplaatsMuis +20 +0
+Save changes before closing?	ShortcutsWindow		Wijzigingen opslaan alvorens te sluiten?
 Remove selected shortcut	ShortcutsWindow		Geselecteerde sneltoets verwijderen
 Add new shortcut	ShortcutsWindow		Nieuwe sneltoets toevoegen
 Save & apply	ShortcutsWindow		Opslaan & toepassen

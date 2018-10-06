@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtextencoding	3062073902
+1	dutch; flemish	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		ISO Grieks
 ISO South European	textencodings		ISO Zuid-Europees
 Chinese Big5	textencodings		Chinees Big5
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		ISO Arabisch
 ISO Latin 9	textencodings		ISO Latijn 9
 Japanese Shift JIS	textencodings		Japanse Shift JIS
 DOS Cyrillic	textencodings		DOS Cyrillisch
+Windows Central European (CP 1250)	textencodings		Windows Centraal Europees (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Windows Cyrillisch (CP 1251)
 Japanese EUC	textencodings		Japanse EUC
 Unicode	textencodings		Unicode

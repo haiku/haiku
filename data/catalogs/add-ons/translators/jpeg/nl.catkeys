@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-JPEGTranslator	965709535
+1	dutch; flemish	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Uitvoerkwaliteit
 JPEG images	JPEGTranslator		JPEG afbeeldingen
 Prevent colors 'washing out'	JPEGTranslator		Voorkom kleuren 'uitwassen'
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Sterkte van uitvoersmoothing
 High	JPEGTranslator		Hoog
 Write	JPEGTranslator		Schrijven
 Write black-and-white images as RGB24	JPEGTranslator		Zwart-wit afbeeldingen als RGB24 schrijven
+Version %d.%d.%d	JPEGTranslator		Versie %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Afbeeldingen met grijswaarden als RGB32 lezen
 Read	JPEGTranslator		Lezen
 JPEG Library Warning: %s\n	be_jerror		JPEG Bibliotheek waarschuwing: %s\n

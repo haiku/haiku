@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	2373738110
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	488985677
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#%02x%02x%02x)
@@ -71,6 +71,7 @@ Undo	Icon-O-Matic-Main		Ongedaan maken
 Click on a shape above	Empty transformers list - 1st line		Klik op een vorm hierboven
 Add Shape	Icon-O-Matic-AddShapesCmd		Vorm toevoegen
 Contour	Transformation		Contour
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Wilt u wijzigingen aan het huidige icoon opslaan alvorens te sluiten?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<niets om opnieuw te doen>
 Perspective	Transformation		Perspectief
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator verplaatsen

@@ -12,6 +12,6 @@ Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		�
 Stopped	file:ZipOMaticWindow.cpp		Зупинено
 Archive	file:ZipperThread.cpp		Архів
 Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# файл додано.} other{# файлів додано}}
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.}, other{# files added.}}
 Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створено
 Stop them	file:ZipOMatic.cpp		Зупинити це

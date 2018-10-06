@@ -21,7 +21,7 @@ The installation of the package has been aborted.	PackageView		Die Installation 
 Done	PackageInstall		Fertig
 All existing files will be replaced?	PackageView		Alle vorhandenen Dateien werden ersetzt?
 Preparing package	PackageInstall		Paket wird vorbereitet
-No package available.	PackageInfo		Kein Paket verfügbar.
+No package available.	PackageInfo		Kein Paket verfügbar
 none	PackageView		entfällt
 Install %name%	PackageView		Installiere %name%
 Stop	PackageStatus		Stopp

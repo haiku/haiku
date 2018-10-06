@@ -16,7 +16,7 @@ Display priority	ProcessController		Priorità visualizzazione
 Run in window	ProcessController		Esegui in finestra
 Processor %d	ProcessController		Processore %d
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController è già installato nella Deskbar
+ProcessController is already installed in Deskbar.	ProcessController		Gestione Processi è già installato nella Deskbar
 This is the last active processor...\nYou can't turn it off!	ProcessController		Questo è l'ultimo processore attivo...\nNon puoi spegnerlo!
 Info	ProcessController		Informazioni
 Quit application	ProcessController		Chiudi applicazione
@@ -31,7 +31,7 @@ Debug this thread!	ProcessController		Esegui il debug di questo thread!
 Normal priority	ProcessController		Priorità normale
 New Terminal	ProcessController		Nuovo Terminale
 Urgent priority	ProcessController		Priorità urgente
-About ProcessController…	ProcessController		Informazioni su ProcessController...
+About ProcessController…	ProcessController		Informazioni su Gestione Processi...
 Ok!	ProcessController		OK!
 Quit an application	ProcessController		Chiudi un'applcazione
 Install in Deskbar	ProcessController		Installa nella Deskbar
@@ -42,9 +42,9 @@ OK	ProcessController		OK
 Damned!	ProcessController		Accidenti!
 Debug this team!	ProcessController		Effettua il debug di questo team!
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
-ProcessController	System name		ProcessController
+ProcessController	System name		Gestione Processi
 Real-time display priority	ProcessController		Priorità video in tempo reale
 Please confirm	ProcessController		Confermate
 System resources & caches…	ProcessController		Risorse di sistema & cache
 That's no Fun!	ProcessController		Non è divertente!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		E' possibile eseguire ProcessController in una finestra o installarlo nella Deskbar
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		E' possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar

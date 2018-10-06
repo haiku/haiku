@@ -7,7 +7,7 @@ Defaults	Media views		Predefiniti
 MIDI Settings	Media Window		Impostazioni MIDI
 Quit	Media Window		Esci
 Video settings	Media Window		Impostazioni video
-Video output:	Media views		Uscita Video:
+Video output:	Media views		Uscita video:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nAvviarlo?
 Restart media services	Media views		Riavvio servizi media
 Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
@@ -15,10 +15,10 @@ Media	System name		Media
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Chiudendo Media adesso si impedirà ai servizi media di riavviarsi. Ciò comporterà probabilmente funzionalità media peggiorate o del tutto assenti.
 Audio mixer	Media Window		Mixer audio
 This hardware has no controls.	Media Window		Questo hardware non possiede controlli.
-Audio output:	Media views		Uscite Audio:
+Audio output:	Media views		Uscita audio:
 Audio settings	Media Window		Impostazioni Audio
 Start media server	Media Window		Avvia media server
-<none>	Media views		<niente>
+<none>	Media views		<nessuna>
 Channel:	Media views		Canale:
 Show volume control on Deskbar	Media views		Mostra controlli volume nella Deskbar
 Audio input:	Media views		Ingresso audio:

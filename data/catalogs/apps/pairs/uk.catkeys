@@ -3,7 +3,7 @@ Pairs did not find enough vector icons to start; it needs at least %zu, found %z
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tАвтор Ralf Schülke\n\tВсі права застережені 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		Експерт (8x8)
 Beginner (4x4)	PairsWindow		Початківець (4x4)
-You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ви завершили гру в {0, plural, one{# клік} other{# кліків}}.\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ви завершили гру в {0, plural, one{# click}, other{# clicks}}.\n
 Quit game	PairsWindow		Завершити гру
 Large	PairsWindow		Великий
 Small	PairsWindow		Мале

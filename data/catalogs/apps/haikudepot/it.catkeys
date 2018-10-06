@@ -48,7 +48,7 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tua valutazione è stata caricata con successo. Puoi modificarla o rimuoverla sul sito di HaikuDepot.
 Show only featured packages	FilterView		Mostra solo pacchetti in evidenza
 Rate package	RatePackageWindow		Valuta pacchetto
-Development	Model		Programmazione
+Development	Model		Sviluppo
 Fatal error	PackageManager		Errore fatale
 The user name needs to be at least 3 letters long.	UserLoginWindow		Il nome utente deve essere composto da almeno tre caratteri alfanumerici.
 Log in	UserLoginWindow		Accesso
@@ -135,7 +135,7 @@ Repositories	MainWindow		Repository
 -	no package size		-
 Category:	FilterView		Categoria:
 Failed to create account	UserLoginWindow		Non è stato possibile creare l'account
-Check for updates…	MainWindow		Controllo aggiornamenti in corso…
+Check for updates…	MainWindow		Controllo aggiornamenti…
 There are problems with the data you entered:\n\n	UserLoginWindow		Ci sono dei problemi con i dati inseriti:\n\n
 Start package daemon	App		Avvia server dei pacchetti
 Manage repositories…	MainWindow		Gestisci repository…

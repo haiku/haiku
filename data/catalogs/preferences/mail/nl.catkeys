@@ -1,9 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Mail	688530788
+1	dutch; flemish	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Instellingen
 Never	Config Window	show status window	Nooit
 While sending and receiving	Config Window		Tijdens versturen en ontvangen
 Incoming	Config Window		Binnenkomend
 Server name:	E-Mail		Servernaam:
+An error occurred while creating the config view: %error.	Config Views		Bij het maken van de configuratieweergave is een fout opgetreden: %error.
 OK	Config Window		Oké
 E-mail address:	E-Mail		E-mailadres
 Account name:	E-Mail		Accountnaam:
@@ -14,12 +15,15 @@ The filter could not be moved. Deleting filter.	Config Views		Het filter kon nie
 Revert	Config Window		Herstellen
 Login name:	E-Mail		Loginnaam:
 Incoming	E-Mail		Binnenkomend
-Password:	E-Mail		Paswoord:
+Password:	E-Mail		Wachtwoord:
 Accounts	Config Window		Accounts
 Finish	AutoConfigWindow		Voltooien
 Remove	Config Window		Verwijderen
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Maak een nieuw account aan met de Toevoegen-knop.\n\nVerwijder een account met de knop Verwijderen-knop.\n\nSelecteer een item uit de lijst om de instelling te wijzigen.
+Error!	Config Views		Fout!
 Server Name:	E-Mail		Servernaam:
 While sending	Config Window		Tijdens het versturen
+Show notifications:	Config Window		Toon meldingen:
 Enter a valid e-mail address.	AutoConfigWindow		Vul een geldig e-mailadres in.
 Add	Config Window		Toevoegen
 Account settings	AutoConfigWindow		Accountinstellingen

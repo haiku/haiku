@@ -1,14 +1,35 @@
-1	indonesian	x-vnd.Haiku-Notifications	672560863
+1	indonesian	x-vnd.Haiku-Notifications	332239666
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Terjadi kesalahan menyimpan preferensi.\nAda kemungkinan anda kehabisan ruang penyimpanan.
+Add…	NotificationView		Tambah…
+Status	NotificationView		Status
 Revert	PrefletWin		Pulihkan
 Enable notifications	GeneralView		Aktifkan notifikasi
-Window width:	GeneralView		Lebar Jendela:
-OK	PrefletWin		Oke
+Window width:	GeneralView		Lebar jendela:
+This is a test notification message	PrefletWin		Ini adalah test pesan pemberitahuan
+OK	PrefletWin		OKE
+Duration:	GeneralView		Lamanya:
 OK	NotificationView		OKE
+Application does not have a valid signature	NotificationView	Alert message	Aplikasi tidak memiliki tanda tangan yang valid
+Follow Deskbar	GeneralView		Ikuti Deskbar
 Notifications	PrefletWin		Notifikasi
+Timeout:	GeneralView		Waktu habis:
+Muted	NotificationView		Terdiam
 General	PrefletView		Umum
 Allowed	NotificationView		Diizinkan
+Remove	NotificationView		Hapus
+Lower right	GeneralView		Kanan bawah
+Notifications preflet sample	PrefletWin		Sampel preflet notifikasi
 Notifications	System name		Notifikasi
+Position:	GeneralView		Posisi:
 Applications	PrefletView		Aplikasi
+Defaults	PrefletWin		Standar
+pixels	GeneralView		piksel
 Application	NotificationView		Aplikasi
+Width:	GeneralView		Lebar:
+seconds	GeneralView		detik
+Mute notifications from this application	NotificationView		Nonaktifkan pemberitahuan dari aplikasi ini
+Upper right	GeneralView		Kanan atas
+ is already listed	NotificationView	Alert message	 sudah terdaftar
+Lower left	GeneralView		Kiri bawah
+Upper left	GeneralView		Kiri atas
 Applications	NotificationView		Aplikasi

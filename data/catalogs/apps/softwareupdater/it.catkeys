@@ -6,7 +6,7 @@ Update now	SoftwareUpdaterWindow		Aggiorna ora
 Updates did not complete	UpdateAction		Gli aggiornamenti non sono stati completati
 Checking for updates	CheckManager		Controllo aggiornamenti in corso...
 %count% packages have available updates	CheckManager		%count% pacchetti hanno degli aggiornamenti disponibili
-SoftwareUpdater	System name		SoftwareUpdater
+SoftwareUpdater	System name		Aggiornamento del Sistema
 Fatal error while checking for updates: %s\n	CheckAction		Errore critico durante il controllo per gli aggiornamenti: %s\n
 No remote repositories are available	UpdateManager	Error message	Nessun repository remoto disponibile
 No updates available	UpdateAction		Nessun aggiornamento disponibile

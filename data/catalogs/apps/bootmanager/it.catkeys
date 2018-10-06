@@ -64,5 +64,5 @@ BootManager	System name		BootManager
 Summary	BootManagerController	Title	Sommario
 OK	BootManagerController	Button	OK
 Immediately	DefaultPartitionPage		Immediatamente
-Done	BootManagerController	Button	Fatto
+Done	BootManagerController	Button	Applica
 After three seconds	DefaultPartitionPage		Dopo tre secondi

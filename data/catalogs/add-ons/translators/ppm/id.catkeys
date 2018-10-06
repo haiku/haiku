@@ -1,0 +1,31 @@
+1	indonesian	x-vnd.Haiku-PPMTranslator	2233502290
+Version %d.%d.%d, %s	PPMTranslator		Versi %d.%d.%d, %s
+PPM Settings	PPMMain		Pengaturan PPM
+Based on PPMTranslator sample code	PPMTranslator		Berdasarkan pada kode sampel PPMTranslator
+OK	PPMMain		OKE
+Grayscale 8 bits	PPMTranslator		Grayscale 8 bita
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bita
+PPM image	PPMTranslator		Gambar PPM
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bita
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Bitmap Be (PPMTranslator)
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bita
+Input color space:	PPMTranslator		Masukan ruang warna:
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bita
+PPM image translator	PPMTranslator		Penerjemah gambar PPM
+bits/space	PPMTranslator		bita/ruang
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bita big-endian
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bita big-endian
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bita big-endian
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bita
+Write ASCII	PPMTranslator		Tulis ASCII
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bita
+None	PPMTranslator		Tidak ada
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bita big-endian
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bita
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bita
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bita big-endian
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bita
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Kode contoh hak cipta Be Incorporated, 1999
+PPMTranslator Settings	PPMTranslator		Pengaturan PPMTranslator
+Something is wrong with the PPMTranslator!	PPMMain		Ada yang salah dengan PPMTranslator!
+System palette 8 bits	PPMTranslator		System palette 8 bita

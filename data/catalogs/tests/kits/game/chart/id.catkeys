@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ChartDemo	13938051
+1	indonesian	x-vnd.Haiku-ChartDemo	986636897
 Slow rotation	ChartWindow		Rotasi pelan
 Pink	ChartWindow		Pink
 Comet	ChartWindow		Komet
@@ -8,6 +8,7 @@ Refresh rate	ChartWindow		Rasio penyegaran
 Blue	ChartWindow		Biru
 Colors	ChartWindow		Warna
 Novas	ChartWindow		Novas
+LineArray	ChartWindow		LineArray
  0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s   (skala logaritmik)
 Free motion	ChartWindow		Gerak bebas
 (high) 100% 	ChartWindow		(tinggi) 100% 
@@ -31,4 +32,11 @@ Space color	ChartWindow		Warna ruang
 White	ChartWindow		Putih
 Chart	System name		Bagan
 Animation:	ChartWindow		Animasi:
+Frames/s	ChartWindow		Bingkai/dt
+Auto demo	ChartWindow		Demo otomatis
+CPU load	ChartWindow		Beban CPU
+DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Merah
+None	ChartWindow		Tak satupun
+Battle	ChartWindow		Pertempuran
+Space:	ChartWindow		Ruang:

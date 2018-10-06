@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Mail	1937280729
+1	indonesian	x-vnd.Haiku-Mail	2023761177
 Settings	Config Window		Pengaturan
 Never	Config Window	show status window	Tidak pernah
 While sending and receiving	Config Window		Saat mengirim dan menerima
@@ -20,6 +20,8 @@ Accounts	Config Window		Akun
 Finish	AutoConfigWindow		Selesai
 Remove	Config Window		Hapus
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Buat akun baru dengan tombol tambah.\n\nHapus akun dengan tombol hapus pada item yang dipilih.\n\nPilih item dalam daftar untuk mengubah pengaturannya.
+Error!	Config Views		Galat!
+Server Name:	E-Mail		Nama Server:
 Account settings	AutoConfigWindow		Pengaturan akun
 E-mail	System name		E-mail
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nPengaturan umum tidak dapat dipulihkan.\n\nTerjadi kesalahan mengambil pengaturan umum:\n%s\n
@@ -30,7 +32,9 @@ Return address:	Config Views		Alamat pengembalian:
 Edit mailbox menu…	Config Window		Sunting menu mailbox…
 Outgoing	E-Mail		Keluaran
 Remove	Config Views		Hapus
+Check every	Config Window		Periksa setiap
 Account settings	Config Views		Pengaturan akun
+minutes	Config Window		menit
 Error retrieving general settings: %s\n	Config Window		Ada kesalahan saat mengambil pengaturan umum: %s\n
 Real name:	E-Mail		Nama sebenarnya:
 Apply	Config Window		Terapkan

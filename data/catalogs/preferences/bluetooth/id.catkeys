@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-BluetoothPrefs	2081710684
+1	indonesian	x-vnd.Haiku-BluetoothPrefs	145165464
 About Bluetooth…	Window		Tentang Bluetooth…
 Handheld	Settings view		Perangkat genggam
 Default inquiry time:	Settings view		Waktu penyelidikan bawaan:
@@ -11,6 +11,7 @@ Server	Settings view		Server
 Stop bluetooth services…	Window		Menghentikan layanan bluetooth...
 The Bluetooth services are not currently running on this system.	main		Layanan Bluetooth saat ini tidak berjalan pada sistem ini.
 Identify host as:	Settings view		Identifikas host sebagai:
+Refresh…	Remote devices		Refres…
 Pair…	Remote devices		Pasangkan...
 Incoming connections policy:	Settings view		Kebijakan koneksi masuk:
 From all devices	Settings view		Dari semua perangkat
@@ -39,6 +40,7 @@ Revert	Window		Pulihkan
 Remote devices	Window		Perangkat remote
 Laptop	Settings view		Leptop
 Discoverable	Extended local device view		Dapat dicari
+Service classes: 	Device View		Kelas layanan: 
 Settings	Window		Pengaturan
 Only from trusted devices	Settings view		Hanya dari perangkat terpercaya
 Scanning progress	Inquiry panel		Proses pemindaian

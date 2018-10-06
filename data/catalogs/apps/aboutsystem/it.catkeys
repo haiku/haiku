@@ -21,7 +21,7 @@ Kernel:	AboutView		Kernel:
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, una divisione di Lucas Digital Ltd. LLC.
 BSD (4-clause)	AboutWindow		BSD (4-clause)
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 team Google Internationalization.
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Il copyright sul codice di Haiku è di Haiku, Inc. o dei rispettivi autori quando espressamente indicato nel codice sorgente. Haiku® e il logo di HAIKU® sono marchi registrati di Haiku, Inc.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		I diritti sul codice di Haiku appartengono a Haiku, Inc. o ai rispettivi autori quando espressamente indicato nel codice sorgente. Haiku® e il logo di HAIKU® sono marchi registrati appartenenti a Haiku, Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTutti i diritti riservati.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Il gruppo di HaikuPorts\n

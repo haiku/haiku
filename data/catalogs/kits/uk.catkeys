@@ -12,7 +12,7 @@ Copy	TextView		Копіювати
 alpha	AboutWindow		альфа
 Error	PrintJob		Помилка
 All Rights Reserved.	AboutWindow		Усі права застережено.
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# біт} other{# бітів}}
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte}, other{# bytes}}
 About %app%	AboutWindow		Про %app%
 No pages to print!	PrintJob		Жодної сторінки для друку!
 OK	Dragger		Гаразд

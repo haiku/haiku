@@ -1,0 +1,7 @@
+1	russian	x-vnd.Haiku-libpackage	2012114212
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Пакет %s-%s не имеет совпадающих требований для своего базового пакета \"%s\"
+Failed to get repository names	PackageManagerKit		Не удалось получить имена репозиториев
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить кэш для репозитория \"%s\". Пропускаем.
+Refreshing repository \"%s\" failed	PackageManagerKit		Не удалось обновить репозиторий \"%s\"
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не удалось получить конфигурацию для репозитория \"%s\". Пропускаем.
+Failed to remove transaction directory	PackageManagerKit		Не удалось удалить папку с транзакциями

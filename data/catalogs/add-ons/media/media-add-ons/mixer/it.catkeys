@@ -8,7 +8,7 @@ Allow input channel remapping	AudioMixer		Consenti il remapping del canale di in
 Resampling algorithm	AudioMixer		Algoritmo di ricampionamento
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Attenua l'uscita del mixer di 3dB (come BeOS R5)
 Display balance control for stereo connections	AudioMixer		Visualizza controlli di bilanciamento per le connessioni stereo
-To output	AudioMixer		All'uscita
+To output	AudioMixer		In uscita
 not connected	AudioMixer		non connessa
 Refuse input format changes	AudioMixer		Rifiuta cambiamenti nel formato di ingresso
 Drop/repeat samples	AudioMixer		Rimuovi/ripeti campioni

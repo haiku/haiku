@@ -215,10 +215,10 @@ Find	FindPanel		Знайти
 Get info	ContainerWindow		Отриматити інформацію
 Error creating link to \"%name\".	FSUtils		Помилка створення посилання на \"%name\".
 Select	SelectionWindow		Вибрати
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# біт} other{# бітів}}
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte}, other{# bytes}}
 Or	FindPanel		Або
 The Tracker must be running to see set the default printer.	PoseView		Щоб побачити типовий принтер Tracker має бути запущеним.
-{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# біт} other{# бітів}}
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte}, other{# bytes}}
 by formula	FindPanel		за формулою
 40 x 40	DeskWindow		40 x 40
 Corrupted expression.	libtracker		Пошкоджений вираз.
@@ -232,7 +232,7 @@ Copying: 	StatusWindow		Копіювання:
 Capacity:	InfoWindow		Ємність:
 Delete	FilePanelPriv		Видалити
 Path	Default Query Columns		Шлях
-{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# біт)} other{(# бітів)}}
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)}, other{# (bytes)}}
 Save	FindPanel		Зберегти
 copy	FSUtils	filename copy	копія
 Temporary	FindPanel		Тимчасовий
@@ -268,7 +268,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Вибачти, ви
 Name	ContainerWindow		Ім'я
 Reverse order	ContainerWindow		Зворотній порядок
 48 x 48	DeskWindow		48 x 48
-{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# елемент} other{# елементів}}
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item}, other{# items}}
 OK	OpenWithWindow		Гаразд
 Add current folder	FilePanelPriv		Додати поточну теку
 Invalid bracket range.	libtracker		Неприпустимий діапазон дужок
@@ -318,7 +318,7 @@ Unknown	FilePermissionsView		Невідомий
 Junk on end.	libtracker		Мотлох в кінці.
 All files and folders	FindPanel		Всі файли і теки
 Trailing \\.	libtracker		Змінний \\.
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # файл} other{for # файлів}}
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file}, other{for # files}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Не вдалося відкрити\"%document\" (Очікується бібліотека: %library). \n
 The Tracker must be running to see Info windows.	PoseView		Для перегляду вікна інформації Tracker повинен бути запущений.
 Other	FilePermissionsView		Інший

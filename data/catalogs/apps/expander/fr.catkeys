@@ -31,7 +31,7 @@ Select	ExpanderPreferences		Sélectionner
 Show contents	ExpanderWindow		Montrer le contenu
 Automatically show contents listing	ExpanderPreferences		Montrer l’inventaire automatiquement
 OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Êtes-vous sûr de vouloir arrêter l’extraction de cette archive? Les éléments extraits peuvent ne pas être complets.
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Êtes-vous sûr de vouloir arrêter l’extraction de cette archive ? Les éléments extraits peuvent ne pas être complets.
 Leave destination folder path empty	ExpanderPreferences		Laissez vide le chemin du dossier de destination
 Failed to create the destination folder.	ExpanderWindow		Impossible de créer le dossier de destination.
 Select '%s'…	DirectoryFilePanel		Sélectionner « %s »…

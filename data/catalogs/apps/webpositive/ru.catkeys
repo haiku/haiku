@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	1593161601
+1	russian	x-vnd.Haiku-WebPositive	2763299522
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -7,6 +7,7 @@ Close window	WebPositive Window		Закрыть окно
 Quit	WebPositive		Выход
 The download could not be opened.	Download Window		Невозможно открыть загруженный файл.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Папка с загруженными файлами не может быть открыта.\n\nОшибка: %error
+Close	Download Window		Закрыть
 Open location	WebPositive Window		Открыть адрес
 Clear history	WebPositive Window		Очистить историю
 WebPositive	System name		WebPositive
@@ -95,6 +96,7 @@ Remove	Download Window		Удалить
 Find	WebPositive Window		Найти
 Find previous	WebPositive Window		Найти ранее
 Settings	WebPositive Window		Настройки
+(Finish: %date)	Download Window		(Завершение: %date)
 Script console	WebPositive Window		Консоль сценариев
 Name	Cookie Manager		Имя
 Proxy server address:	Settings Window		Адрес прокси-сервера:
@@ -125,11 +127,13 @@ Auto-hide interface in full screen mode	Settings Window		Автоматичес�
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	не удалось обработать %url
 New tab	WebPositive Window		Новая вкладка
 Downloads in progress	WebPositive		Загрузка файлов
+(Finish: %date - %duration left)	Download Window		(Завершение: %date - %duration осталось)
 Style:	Font Selection view		Стиль:
 General	Settings Window		Общие
 View	WebPositive Window		Вид
 Previous	WebPositive Window		Ранее
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Произошла ошибка при создании закладки.\n\nОшибка: %error
+(Finish: %date - Over %duration left)	Download Window		(Окончание: %date - Более %duration осталось)
 Bookmark error	WebPositive Window		Ошибка закладки
 Do you really want to clear the browsing history?	WebPositive Window		Вы действительно хотите очистить историю посещений?
 Copy	WebPositive Window		Копировать

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-EXRTranslator	2160233532
+1	ukrainian	x-vnd.Haiku-EXRTranslator	3596882613
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 EXR image translator	EXRTranslator		Перетворювач зображень EXR
 EXR Settings	main		Налаштування EXR
@@ -6,3 +6,4 @@ EXR images	EXRTranslator		Зображення EXR
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		відділення Lucasfilm Entertainment Company Ltd
 EXR image	EXRTranslator		Зображення EXR
 EXR image translator	ConfigView		Перетворювач зображень EXR
+Based on OpenEXR %version%	ConfigView		На основі OpenEXR %version%

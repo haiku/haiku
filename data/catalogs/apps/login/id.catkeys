@@ -1,0 +1,17 @@
+1	indonesian	x-vnd.Haiku-Login	3751819334
+Error: %1	Login App		Kesalahan: %1
+Hide password	Login View		Sembunyikan kata sandi
+Desktop	Desktop Window		Desktop
+Invalid login!	Login View		Login tidak valid!
+OK	Login View		OKE
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	Kesalahan %s\n
+Login:	Login View		Login:
+Error	Login App		Kesalahan
+Unimplemented	Login App		Tidak diimplementasikan
+Welcome to Haiku	Login Window		Selamat datang di Haiku
+Reboot	Login View		Reboot
+Login application for Haiku\nUsage:\n	Login App		Aplikasi login untuk Haiku\nPenggunaan:\n
+Info	Login App		Info
+Password:	Login View		Kata sandi:
+OK	Login App		OKE
+--nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tJangan membuat jendela menjadi modal\n

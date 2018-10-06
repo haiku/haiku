@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	3708050243
+1	ukrainian	x-vnd.Haiku-MediaPlayer	1313616492
 raw audio	MediaPlayer-InfoWin		raw аудіо
 Location	MediaPlayer-InfoWin		Шлях
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
@@ -13,6 +13,7 @@ Save Playlist	MediaPlayer-PlaylistWindow		Зберегти список відт
 (not supported)	MediaPlayer-InfoWin		(не підтримується)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден з файлів, які ви хотіли відкрити не є медіа файлом.
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено.\n\nПомилка: 
+ask every time	MediaPlayer-SettingsWindow		запитувати завжди
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 New player…	MediaPlayer-Main		Новий програвач…
 100% scale	MediaPlayer-Main		Масштаб 100%
@@ -45,6 +46,7 @@ Container	MediaPlayer-InfoWin		Контейнер
 Nothing to Play	MediaPlayer-Main		Нічого для відтворення
 Muted	MediaPlayer-SettingsWindow		Приглушений
 Quit	MediaPlayer-Main		Вийти
+Resume:	MediaPlayer-SettingsWindow		Підсумок:
 Video	MediaPlayer-Main		Відео
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не встановлено декодера для підтримки файла цього формату, або у декодера є проблема з спеціальною версією формату.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
@@ -57,6 +59,7 @@ MediaPlayer	System name		Медіапрогравач
 OK	MediaPlayer-Main		Гаразд
 Settings…	MediaPlayer-Main		Налаштування…
 MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіапрогравача
+never	MediaPlayer-SettingsWindow		ніколи
 h	MediaPlayer-InfoWin	Hours	г
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
@@ -100,6 +103,7 @@ Error: 	MediaPlayer-Main		Помилка:
 Large	MediaPlayer-SettingsWindow		Великий
 Bottom of video	MediaPlayer-SettingsWindow		Нижня частина відео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+always	MediaPlayer-SettingsWindow		завжди
 Total duration: %s	MediaPlayer-PlaylistWindow		Загальна тривалість: %s
 <unnamed media>	MediaPlayer-InfoWin		<неназване медіа>
 raw video	MediaPlayer-InfoWin		необроблене відео
@@ -122,7 +126,7 @@ Edit	MediaPlayer-PlaylistWindow		Редагувати
 Start media server	MediaPlayer-Main		Запустити Медіа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Bad URL	MediaPlayer-NetworkStream		Невірний URL
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} other{# Канали}}
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Channels}}
 <unnamed>	PlaylistItem-name		<неназваний>
 OK	MediaPlayer-PlaylistWindow		Гаразд
 none	Audio track menu		нічого

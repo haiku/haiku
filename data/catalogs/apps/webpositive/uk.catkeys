@@ -140,7 +140,7 @@ Copy	WebPositive Window		Копіювати
 Open bookmarks confirmation	WebPositive Window		Відкрити підтвердження закладок
 Remove missing	Download Window		Очікування видалення
 Clone current page	Settings Window		Клонувати поточну сторінку
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити всі закладки % addedCount одразу?
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити всі закладки %addedCount одразу?
 Session cookie	Cookie Manager		Сесійний файл cookie
 OK	Authentication Panel		Гаразд
 Copy	URL Bar		Копіювати

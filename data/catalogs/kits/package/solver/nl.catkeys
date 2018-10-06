@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libsolvsolver	64832192
+1	dutch; flemish	x-vnd.Haiku-libsolvsolver	3404387783
 %dependency% is provided by the system	SolverProblem		%dependency% wordt door het systeem aangeboden
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		pakket %source% is in conflict met %dependency% aangeboden door %target%
 nothing provides requested %dependency%	SolverProblem		nergens wordt de gevraagde %dependency% aangeboden
@@ -9,3 +9,30 @@ do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection\" niet verw
 dependency problem	SolverProblem		afhankelijkheidsprobleem
 do not keep %source% installed	SolverProblemSolution		houd %source% niet geïnstalleerd
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakket %source% maakt %dependency% aangeboden door %target% impliciet overbodig
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		geen van de oplosbare \"%selection%\" verwijderen
+keep %source% from excluded repository	SolverProblemSolution		behoud %source% uit het uitgesloten depot
+install %selection% despite its old version	SolverProblemSolution		installeer %selection% ondanks diens oude versie
+allow downgrade of %source% to %target%	SolverProblemSolution		sta downgrade van %source% naar %target% toe
+do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" niet vastzetten
+install %source% despite its inferior architecture	SolverProblemSolution		installeer %source% ondanks diens ondergeschikte architectuur
+do not install \"%selection%\"	SolverProblemSolution		installeer \"%selection%\" niet
+do something	SolverProblemSolution		iets doen
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		installeer niet de meest recente versie van \"%selection%\"
+package %source% conflicts with %dependency% provided by itself	SolverProblem		pakket %source% conflicteert met %dependency% welke voorzien wordt door zichzelf
+cannot install both %source% and %target%	SolverProblem		kan niet zowel %source% als %target% installeren
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		leverancierswijziging toestaan van \"%sourceVendor%\" (%source%) naar \"%targetVendor%\" (%target%)
+install %source% from excluded repository	SolverProblemSolution		installeer %source% uit uitgesloten depot
+keep old %source%	SolverProblemSolution		behoud oude %source%
+conflicting requests	SolverProblem		tegenstrijdige verzoeken
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		pakket %source% vereist %dependency%, maar geen van de leveranciers kan geïnstalleerd worden
+do not forbid installation of %source%	SolverProblemSolution		verbied de installatie van %source% niet
+allow architecture change of %source% to %target%	SolverProblemSolution		sta wijziging van architectuur van %source% naar %target% toe
+allow name change of %source% to %target%	SolverProblemSolution		sta naamwijziging van %source% naar %target% toe
+allow replacement of %source% with %target%	SolverProblemSolution		sta vervanging van %source% met %target% toe
+allow deinstallation of %source%	SolverProblemSolution		sta deïnstallatie van %source% toe
+%source% does not belong to a distupgrade repository	SolverProblem		%source% behoort niet toe tot een distupgrade pakketbron
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		pakket %source% maakt %dependency% geleverd door %target% overbodig
+package %source% is not installable	SolverProblem		pakket %source% is niet installeerbaar
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		geïnstalleerd pakket %source% maakt %dependency% geleverd door %target% overbodig
+problem with installed package %source%	SolverProblem		probleem met geïnstalleerd pakket %source%
+nothing provides %dependency% needed by %source%	SolverProblem		niets voorziet in %dependency% vereist door %source%

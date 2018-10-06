@@ -1,10 +1,10 @@
 1	finnish	x-vnd.Haiku-Appearance	2499598353
-Plain font:	Font view		Pelkkä kirjasin:
-Control highlight	Colors tab		Kontrollin korostus
-Control border	Colors tab		Kontrollin reuna
+Plain font:	Font view		Tavallinen kirjasin:
+Control highlight	Colors tab		Säätimen korostus
+Control border	Colors tab		Säätimen reuna
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Shadow	Colors tab		Varjo
-On	AntialiasingSettingsView		Päällä
+On	AntialiasingSettingsView		Käytössä
 Defaults	APRWindow		Oletusasetukset
 Link hover	Colors tab		Linkkileijunta
 Grayscale	AntialiasingSettingsView		Harmaasävy

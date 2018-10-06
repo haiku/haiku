@@ -8,7 +8,7 @@ do not deinstall \"%selection%\"	SolverProblemSolution		älä asenna valintaa �
 %source% has inferior architecture	SolverProblem		lähteen %source% arkkitehtuuri on ala-arvoinen
 dependency problem	SolverProblem		riippuvuuspulma
 do not keep %source% installed	SolverProblemSolution		älä pidä lähdettä %source% asennettuna
-package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakkaus %source% vanhentaa epäsuorasti riippuvuuden %dependency%, jonka  kohteen %target% tarjoaa
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		pakkaus %source% vanhentaa epäsuorasti riippuvuuden %dependency%, jonka kohde %target% tarjoaa
 do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		älä asenna uudestaan kaikkia uudelleen ratkaistavissa olevia ”%selection%”-valintoja
 keep %source% from excluded repository	SolverProblemSolution		pidä %source% poistetusta tietovarastosta
 install %selection% despite its old version	SolverProblemSolution		asenna %selection%, vaikka versio on vanha

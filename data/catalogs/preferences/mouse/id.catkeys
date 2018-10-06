@@ -1,4 +1,6 @@
-1	indonesian	x-vnd.Haiku-Mouse	3356686664
+1	indonesian	x-vnd.Haiku-Mouse	3990055017
+Mouse type:	SettingsView		Jenis tetikus:
+Warp	SettingsView		Warp
 2-Button	SettingsView		2-Tombol
 Double-click test area	SettingsView		Test area dobel-klik
 Revert	MouseWindow		Pulihkan
@@ -9,6 +11,8 @@ Click to focus and raise	SettingsView		Klik untuk fokus dan menaikkan
 3-Button	SettingsView		3-Tombol
 Mouse speed	SettingsView		Kecepatan mouse
 Focus mode:	SettingsView		Mode fokus:
+Instant warp	SettingsView		Warp instan
+Dig Deal	MouseApplication		Gali Urusan
 1-Button	SettingsView		1-Tombol
 Double-click speed	SettingsView		Kecepatan dobel-klik
 Defaults	MouseWindow		Bawaan

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	3694689316
+1	swedish	x-vnd.Haiku-Installer	2124553984
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, den applikation man använder för att konfigurera Haiku boot meny kunde inte startas.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMATI
 Continue	InstallerWindow	In alert after pressing Stop	Fortsätt
 Write boot sector to '%s'	InstallerWindow		Skriv startsektor till '%s'
 Collecting copy information.	InstallProgress		Förbereder inför kopiering.
+Have fun and thanks for trying out Haiku!	InstallerApp		Ha det så kul och tack för att du provar Haiku!
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Välj källdisk från menyn. Klicka sedan på \"Starta\".
 Quit Boot Manager and DriveSetup	InstallerWindow		Avsluta Starthanteraren och DiskHantering
 Quit	InstallerWindow		Avsluta
@@ -29,6 +30,7 @@ Boot sector successfully written.	InstallProgress		Skrivning av startsektorn lyc
 Performing installation.	InstallProgress		Verkställer installationen.
 scanning…	InstallerWindow		skannar…
 Set up boot menu	InstallerWindow		Ställ in startmeny
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Installeraren gör själva Haiku-partitionen startbar men tar inga steg för att integrera Haiku i en befintlig startmeny. Om du redan har GRUB installerat kan du lägga till Haiku i GRUB's meny.\nFör detaljer, se guiden om att starta Haiku på adressen https://www.haiku-os.org/guides/booting.\n\nDu kan även ställa in startmenyn från installationsprogrammets verktygsmeny. Se användarhandbokens ämne på programmet \"BootManager\".\n\n\n
 Abort	InstallerWindow		Avbryt
 Finishing Installation.	InstallProgress		Slutför Installationen.
 Restart	InstallerWindow		Starta om
@@ -71,6 +73,7 @@ DriveSetup, the application to configure disk partitions, could not be launched.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Den tänkta volumen är inte tom. Är du säker att du villinstallera ändå?\n\nNotering: Systemfoldern kommer att vara en kopia från källans systemfolder men kommer att behålla inställningsfoldern, alla anda foldrar kommer att mergas. De filer och länkar som finns på båda ställena kommer att skrivas över med de nyare.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
 Continue	InstallerApp		Fortsätt
+This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Detta är programvara av betakvalitet! Det betyder att det finns risk för att du förlorar viktig data. Gör frekventa säkerhetskopior! Du har blivit varnad.\n\n\n
 Boot sector not written because of an internal error.	InstallProgress		Det gick inte att skriva till bootsektorn på grund av ett internt fel.
 Additional disk space required: %s	InstallerWindow		Ytterligare diskutrymme behövs: %s
 Cancel	InstallProgress		Avbryt

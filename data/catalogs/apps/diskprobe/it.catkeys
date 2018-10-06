@@ -15,7 +15,7 @@ Floating-point value:	TypeEditors		Valore in virgola mobile:
 Attributes	ProbeView		Attributi
 Device offset: 	ProbeView		Posizione dispositivo: 
 Selection	ProbeView		Selezione
-DiskProbe	System name		Editor esadecimale
+DiskProbe	System name		DiskProbe
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	cosa: '%.4s'\n\n
 File	FileWindow		File
 OK	DiskProbe		OK
@@ -58,7 +58,7 @@ Boolean value:	TypeEditors		Valore Booleano:
 32 bit size or status:	TypeEditors		Dimensione o stato a 32 bit
 8 bit palette	TypeEditors		Tavolozza a 8 bit
 Fit	ProbeView	Size of fonts, fits to available room	Adatta
-Probe device	OpenWindow		Interroga il dispositivo
+Probe device	OpenWindow		Analizza dispositivo
  (native)	ProbeView		 (nativo)
 Unknown format	TypeEditors		Formato sconosciuto
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimale
@@ -108,7 +108,7 @@ Block %Ld (0x%Lx)	ProbeView		Blocco %Ld (0x%Lx)
 Image	TypeEditors	This is the type of view	Immagine
 Could not open file \"%s\": %s\n	DiskProbe		Impossibile aprire il file \"%s\": %s\n
 Select all	ProbeView		Seleziona tutto
-Probe file…	OpenWindow		Interroga il file…
+Probe file…	OpenWindow		Analizza file…
 Icon view	TypeEditors		Vista a icona
 Bookmarks	ProbeView		Segnalibri
 Mode:	FindWindow		Modalità:

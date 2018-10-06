@@ -44,8 +44,8 @@ Undo	Mail		Annulla
 Date:	Mail		Data:
 An error occurred trying to open this signature.	Mail		Si è verificato un errore durante l'apertura del file contenente la firma.
 No file attributes, just plain data	Mail		Nessun attributo, solo dati grezzi
-Edit queries…	Mail		Modifica query…
-queries	B_USER_DIRECTORY/mail/queries		Query
+Edit queries…	Mail		Modifica interrogazioni…
+queries	B_USER_DIRECTORY/mail/queries		interrogazioni
 Paste	Mail		Incolla
 in	B_USER_DIRECTORY/mail/in		in entrata
 Save attachment…	Mail		Salva allegato…
@@ -134,7 +134,7 @@ Encoding:	Mail		Codifica:
 Font:	Mail		Carattere:
 (Address unavailable)	Mail		(Indirizzo non disponibile)
 Save address	Mail		Salva indirizzo
-Queries	Mail		Query
+Queries	Mail		Interrogazioni
 Send this message before closing?	Mail		Invia questo messaggio prima di chiudere?
 Save	Mail		Salva
 Random	Mail		Casuale
@@ -144,7 +144,7 @@ The mail_daemon could not be started:\n\t	Mail		Non è stato possibile avviare i
 Open attachment	Mail		Apri allegato
 sent	B_USER_DIRECTORY/mail/sent		inviato
 (Date unavailable)	Mail		(Data non disponibile)
-Put your favorite e-mail queries and query templates in this folder.	Mail		Conserva le tue query e i tuoi template in questa cartella.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Conserva le tue interrogazioni e i tuoi modelli in questa cartella.
 Spam	Mail		Indesiderata
 Reply	Mail		Rispondi
 Encoding	Mail		Codifica

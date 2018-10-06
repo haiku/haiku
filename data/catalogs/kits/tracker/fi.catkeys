@@ -110,7 +110,7 @@ Show space bars on volumes	SettingsView		Näytä tilapalkit taltioissa
 Company	Person Query Columns		Yritys
 Invert selection	ContainerWindow		Käänteinen valinta
 Increase size	DeskWindow		Kasvata kokoa
-Resize to fit	ContainerWindow		Muuta koko sopimaan
+Resize to fit	ContainerWindow		Sovita koko
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
 Add printer…	ContainerWindow		Lisää tulostin...
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudelleen kotikansion, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen kotihakemiston, pidä alhaalla Vaihto-näppäin ja napsauta ”Nimeä uudelleen”.
@@ -123,7 +123,7 @@ Move to Trash	ContainerWindow		Siirrä roskakoriin
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät järjestelmäkansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Siirrä”.
 Modified	Default Query Columns		Muokattu
 Move to	ContainerWindow		Siirrä kohteeseen
-Create %s clipping	PoseView		Luo %s leikkausta
+Create %s clipping	PoseView		Luo %s-leikkaus
 Set new link target	InfoWindow		Aseta uusi linkityskohde
 Save as Query template:	FindPanel		Tallenna kyselymallinteena
 preferences	B_PREFERENCES_DIRECTORY		asetukset
@@ -152,7 +152,7 @@ Free space color	SettingsView		Vapaan tilan väri
 Cut	ContainerWindow		Leikkaa
 Status	Email Query Columns		Tila
 Remove	FindPanel		Poista
-Resize to fit	QueryContainerWindow		Muuta koko sopimaan
+Resize to fit	QueryContainerWindow		Sovita koko
 Desktop	TrackerSettingsWindow		Työpöytä
 Sorry, you can't copy items to the Trash.	FSClipBoard		Et voi kopioida kohteita roskakoriin.
 by attribute	FindPanel		attribuuteittain
@@ -262,7 +262,7 @@ Only the boot disk	AutoMounterSettings		Vain käynnistyslevy
 Unmount	ContainerWindow		Irrota
 Copy layout	ContainerWindow		Kopioi sijoittelu
 label too long	PoseView		nimike on liian pitkä
-Finish: %time	StatusWindow		Loppuu klo: %time
+Finish: %time	StatusWindow		Loppuu: %time
 Cancel	Tracker		Peru
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Et voi muokata tuota attribuuttia.
 Name	ContainerWindow		Nimi
@@ -311,14 +311,14 @@ Previously mounted disks	AutoMounterSettings		Aiemmin liitetyt levyt
 %Ld B	WidgetAttributeText		%Ld tavua
 copying	FSUtils		kopioidaan
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa kansiota ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
-Show Disks icon	SettingsView		Näytä levyjen kuvake
+Show Disks icon	SettingsView		Näytä Levyt-kuvake
 Cancel	PoseView		Peru
 You can't move or copy items to read-only volumes.	FSUtils		Et voi siirtää tai kopioida kohteita kirjoitussuojatuille taltioille.
 Unknown	FilePermissionsView		Tuntematon
 Junk on end.	libtracker		Roskaa lopussa.
 All files and folders	FindPanel		Kaikki tiedostot ja kansiot
 Trailing \\.	libtracker		Jäljessä oleva \\.
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# tiedostolle} other{# tiedostolle}}
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# tiedostolle} other{# tiedostoille}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Puuttuvat kirjastot: %library).\n
 The Tracker must be running to see Info windows.	PoseView		Seuraajan on oltava käynnissä, jotta voit nähdä tietoikkunat.
 Other	FilePermissionsView		Muu
@@ -333,7 +333,7 @@ Close all	ContainerWindow		Sulje kaikki
 Include trash	FindPanel		Sisällytä roskakori
 Query template	FindPanel		Kyselymallinne
 Open %name with:	OpenWithWindow		Avaa kohde %name sovelluksella:
-Empty folder	NavMenu		Tyhjennä kansio
+Empty folder	NavMenu		Tyhjä kansio
 Copy here	ContainerWindow		Kopioi tänne
 Move to Trash	FilePanelPriv		Siirrä roskakoriin
 Current folder	ContainerWindow		Nykyiset kansiot
@@ -369,7 +369,7 @@ To: %dir	StatusWindow		Vastaanottaja: %dir
 Window	FilePanelPriv		Ikkuna
 Edit name	FilePanelPriv		Muokkaa nimeä
 Size:	InfoWindow		Koko:
-Empty folder	SlowContextPopup		Tyhjennä kansio
+Empty folder	SlowContextPopup		Tyhjä kansio
 Open selection with:	OpenWithWindow		Avaa valinta sovelluksella:
 Preparing to create links…	StatusWindow		Valmistaudutaan luomaan linkkejä...
 Size	Default Query Columns		Koko
@@ -398,10 +398,10 @@ And	FindPanel		ja
 Select…	DeskWindow		Valitse...
 Copy	FilePanelPriv		Kopioi
 Icon view	DeskWindow		Kuvakenäkymä
-If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kohtikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kotikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.
 Select all	QueryContainerWindow		Valitse kaikki
 Files cannot be moved or deleted from a read-only volume.	PoseView		Tiedostoja ei voi siirtää tai poistaa kirjoitussuojatulta taltiolta.
-If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudlleen järjestelmäkansion tai sen sisällön, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Nimeä uudelleen”.
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudelleen järjestelmäkansion tai sen sisällön, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Nimeä uudelleen”.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde on ehkä avattu tai se on varattu.
 Owner	FilePermissionsView		Omistaja
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Tallentaminen haluamaasi kansioon epäonnistui. Kokeile jotain toista kansiota.
@@ -458,7 +458,7 @@ Original name	ContainerWindow		Alkuperäinen nimi
 Find	FSUtils		Etsi
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 Single window navigation	SettingsView		Yksittäisikkunanavigointi
-parent folder	NavMenu		Ylemmän tason kansio
+parent folder	NavMenu		ylemmän tason kansio
 contains	FindPanel		sisältää
 Relation	OpenWithWindow		Suhde
 Open	FilePanelPriv		Avaa

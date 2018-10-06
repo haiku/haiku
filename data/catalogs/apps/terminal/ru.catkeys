@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	3977292818
+1	russian	x-vnd.Haiku-Terminal	662975527
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -109,6 +109,7 @@ Tab title:	Terminal TermWindow		Заголовок вкладки:
 Find next	Terminal TermWindow		Найти далее
 Close active tab	Terminal TermWindow		Закрыть активную вкладку
 Paste	Terminal TermWindow		Вставить
+Solarized Dark	Terminal colors scheme		Соляризированная тьма
 Shell 	Terminal TermWindow		Консоль 
 Cancel	Terminal TermView		Отмена
 Use default	Terminal SetTitleWindow		По умолчанию

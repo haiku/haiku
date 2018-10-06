@@ -1,0 +1,38 @@
+1	indonesian	x-vnd.Haiku-SoundRecorder	3829382335
+Loop	RecorderWindow		Loop
+Cannot find default audio hardware	RecorderWindow		Tidak dapat menemukan perangkat lunak audio default
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Tidak dapat menemukan berkas sementara yang dibuat untuk mempertahankan rekaman terbaru
+Sample size:	RecorderWindow		Ukuran sampel:
+File info	RecorderWindow		Info berkas
+Drop files here	SoundListView		Jatuhkan berkas di sini
+Input	RecorderWindow		Masukan
+Some of the files don't appear to be audio files.	RecorderWindow		Beberapa berkas tidak tampak sebagai berkas suara.
+Stop	RecorderWindow		Berhenti
+Format:	RecorderWindow		Format:
+Sound List	RecorderWindow		Daftar suara
+Rewind	RecorderWindow		Ulang
+Sample rate:	RecorderWindow		Kadar sampel:
+Invalid audio files	RecorderWindow		Berkas audio invalid
+ seconds	RecorderWindow		 detik
+OK	RecorderWindow		OK
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Tidak dapat membuka berkas sementara yang dibuat untuk mempertahankan rekaman terbaru
+Input:	RecorderWindow		Masukan:
+Play	RecorderWindow		Mainkan
+Channels:	RecorderWindow		Saluran:
+ bits	RecorderWindow		 bits
+None	RecorderWindow		Tiada
+Record	RecorderWindow		Rekam
+Sample size: 	RecorderWindow		Ukuran sampel: 
+Cannot recognize this file as a media file	RecorderWindow		Tidak dapat mengenali berkas ini sebagai berkas media
+Format: 	RecorderWindow		Format: 
+File name: 	RecorderWindow		Nama berkas: 
+Cannot connect to the selected sound input	RecorderWindow		Tidak dapat terhubung dengan masukan suara yang dipilih
+Cannot get the file to play	RecorderWindow		Tidak bisa mendapatkan berkas untuk dimainkan
+Cannot record a sound that long	RecorderWindow		Tidak dapat merekam suara selama itu
+Duration:	RecorderWindow		Durasi:
+Compression:	RecorderWindow		Kompresi:
+Channels: 	RecorderWindow		Saluran: 
+Save	RecorderWindow		Simpan
+Sample rate: 	RecorderWindow		Kadar sampel: 
+Cannot connect to media server	RecorderWindow		Tidak dapat terhubung ke server media
+File name:	RecorderWindow		Nama berkas:

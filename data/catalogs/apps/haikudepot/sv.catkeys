@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	4015332039
+1	swedish	x-vnd.Haiku-HaikuDepot	3764618272
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -45,6 +45,7 @@ Ignore	UserLoginWindow		Ignorera
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 Language	UserLoginWindow		Språk
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lösenordet är för svagt eller inte rätt. Varvänlig och använd minst 8 tecken med minst 2 nummer och 2 stora bokstäver.
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
 Show only featured packages	FilterView		Visa bara framhävda paket
 Rate package	RatePackageWindow		Betygsatt paket
 Development	Model		Utveckling
@@ -67,6 +68,7 @@ Mostly stable	RatePackageWindow		Mestadels stabil
 Log out	MainWindow		Logga ut
 Repository	PackageListView		Repositorie
 Education	Model		Utbildning
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Det här paketet verkar inte finnas på HaikuDepot-servern, så det är inte möjligt att skapa ett nytt betyg eller redigera ett befintligt betyg.
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
@@ -80,6 +82,7 @@ Authentication failed	UserLoginWindow		Autentisering misslyckades
 Logged in as %User%	MainWindow		Inloggad som %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Språk
+User rating	RatePackageWindow		Användarbetyg
 Size	PackageListView		Storlek
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 User name:	UserLoginWindow		Användarnamn:
@@ -108,6 +111,7 @@ Login or Create account	MainWindow		Logga in eller skapa konto
 Pending…	PackageListView		Väntar...
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
 OK	PackageInfoView		OK
+Package daemon problem	App		Problem med paketdemonen
 Uninstalled	PackageListView		Avinstallera
 Show	MainWindow		Visa
 Stable	RatePackageWindow		Stabil
@@ -137,6 +141,7 @@ Start package daemon	App		Starta paket-servicen
 Manage repositories…	MainWindow		Hantera repositorier...
 Business	Model		Företag
 Audio	Model		Ljud
+Rating not possible	MainWindow		Betyg ej möjligt
 About	PackageInfoView		Om
 Active	PackageListView		Aktiv
 It was not possible to contact the web service.	UserLoginWindow		Det gick inte att kontakta webb servicen.

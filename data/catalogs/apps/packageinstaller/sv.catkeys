@@ -1,4 +1,6 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	3900768
+1	swedish	x-vnd.Haiku-PackageInstaller	3292779285
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Föremålet med namnet '%s' finns redan i den angivna sökvägen.\nVill du byta föremålet med det som finns i det här paketet eller hoppa över det?
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Mappen med namnet '%s' finns redan i den angivna sökvägen.\nVill du byta ut mappen med den som finns i det här paketet eller hoppa över den?
 Install to:	PackageView		Installera till:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptera
@@ -45,6 +47,7 @@ Decline	PackageTextViewer		Acceptera inte
 All existing files will be skipped?	PackageView		Hoppa över alla befintliga filer?
 Continue	PackageInfo		Fortsätt
 %index% of %total%	PackageInstall		%index% av %total%
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		En fil med med namnet '%s' finns redan i den angivna sökvägen.\nVill du byta ut filen med den som finns i det här paketet eller hoppa över den?
 The package you selected has been successfully removed from your system.	UninstallView		Det valda paketet har framgångsrikt tagits bort från systemet.
 Abort	PackageInfo		Avbryt
 PackageInstaller	System name		PaketInstallerare
@@ -55,6 +58,7 @@ Begin	PackageView		Börja
 OK	UninstallView		OK
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Symboliska länken '%s' finns redan.\nErsätt länken med den från detta paket eller avbryt?
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Det valda paketet kunde inte tas bort. Den angivna paketinformationen kan vara skadad. 
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skriptet med namnet '%s' finns redan i den angivna sökvägen.\nVill du byta ut skriptet med det som finns i det här paketet eller hoppa över det?
 Replace	PackageView		Ersätt
 Installation progress	PackageView		Installationsförlopp
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketfilen är inte läsbar.\nEn möjlig anledning är att den begärda filen inte är ett giltigt BeOS paket.

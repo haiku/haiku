@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-VirtualMemory	837291207
+1	indonesian	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Keluar
 Automatic swap management	SettingsWindow		Pengaturan swap otomatis
 Turn off	SettingsWindow		Matikan
@@ -11,6 +11,7 @@ Use volume:	SettingsWindow		Pakai volume:
 Keep enabled	SettingsWindow		Tetap diaktifkan
 Revert	SettingsWindow		Pulihkan
 VirtualMemory	System name		VirtualMemory
+Use boot volume	SettingsWindow		Gunakan volume boot
 Load defaults	SettingsWindow		Muat nilai bawaan
 OK	VirtualMemoryApp		Oke
 Changes will take effect upon reboot.	SettingsWindow		Perubahan akan berlaku setelah reboot.

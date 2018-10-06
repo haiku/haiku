@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Backgrounds	2244817193
+1	indonesian	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Latar belakang
 X:	Main View		X:
 Setting the background image failed:	Main View		Mengatur gambar latar belakang gagal:
@@ -6,6 +6,7 @@ Resolution: 	Image Filepanel		Resolusi:
 pick one	Main View		pilih satu
 Default	Main View		Bawaan
 Center	Main View		Tengah
+Folder: %path	Main View		Pelipat: %path
 Manual	Main View		Manual
 Set background image error	Main View		Atur gambar latar belakang masalah
 Default folder	Main View		Manual
