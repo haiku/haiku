@@ -398,6 +398,14 @@ volume_init(int fd, uint8* buf,
 		}
 	}
 
+	/* check that the partition is large enough to contain the file system */
+	if (geo != NULL
+			&& vol->total_sectors >
+				geo->sectors_per_track * geo->cylinder_count
+				* geo->head_count) {
+		dprintf("dosfs: volume extends past end of partition, mounting read-only\n");
+		vol->flags |= B_FS_IS_READONLY;
+	}
 
 	// now we are convinced of the drive's validity
 
@@ -593,14 +601,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		dprintf("dosfs error: failed to initialize volume\n");
 		err = B_ERROR;
 		goto error1;
-	}
-
-	/* check that the partition is large enough to contain the file system */
-	if (vol->total_sectors > geo.sectors_per_track * geo.cylinder_count
-			* geo.head_count) {
-		dprintf("dosfs: volume extends past end of partition\n");
-		err = B_PARTITION_TOO_SMALL;
-		goto error2;
 	}
 
 	vol->volume = _vol;
