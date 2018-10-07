@@ -90,6 +90,9 @@ FetchFileJob::Execute()
 
 	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(fFileURL.String(),
 		this);
+	if (request == NULL)
+		return B_BAD_VALUE;
+
 	thread_id thread = request->Run();
 	wait_for_thread(thread, NULL);
 
