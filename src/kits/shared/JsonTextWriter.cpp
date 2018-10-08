@@ -627,7 +627,7 @@ BJsonTextWriter::StreamStringEncoded(const char* string,
 {
 	status_t writeResult = B_OK;
 	uint8* string8bit = (uint8*)string;
-	off_t i = 0;
+	size_t i = 0;
 
 	while (i < length && writeResult == B_OK) {
 		uint8 c = string8bit[offset + i];
@@ -648,7 +648,7 @@ BJsonTextWriter::StreamStringEncoded(const char* string,
 				size_t l = 1 + b_json_len_7bit_clean_non_esc(
 					&string8bit[offset + i + 1], length - (offset + i + 1));
 				writeResult = StreamStringVerbatim(&string[offset + i], 0, l);
-				i += static_cast<off_t>(l);
+				i += static_cast<size_t>(l);
 			} else {
 				if (b_json_is_illegal(c)) {
 					fprintf(stderr, "! string encoding error - illegal "
@@ -663,7 +663,7 @@ BJsonTextWriter::StreamStringEncoded(const char* string,
 						&unicodeStr);
 					writeResult = StreamStringUnicodeCharacter(
 						unicodeCharacter);
-					i += static_cast<off_t>(unicodeStr - &string[offset + i]);
+					i += static_cast<size_t>(unicodeStr - &string[offset + i]);
 				}
 			}
 		}
