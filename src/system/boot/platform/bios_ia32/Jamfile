@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src system boot platform bios_ia32 ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
-SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform bios_ia32 ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -17,42 +15,49 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -fno-rtti ;
 }
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+local platform ;
+for platform in [ MultiBootSubDirSetup bios_ia32 ] {
+	on $(platform) {
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-BootMergeObject boot_platform_bios_ia32.o :
-	shell.S
-	start.cpp
-	debug.cpp
-	bios.cpp
-	bios_asm.S
-	console.cpp
-	serial.cpp
-	devices.cpp
-	keyboard.cpp
-	menu.cpp
-	mmu.cpp
-	multiboot.cpp
-	cpu.cpp
-	acpi.cpp
-	smp.cpp
-	smp_trampoline.S
-	support.S
-	video.cpp
-	apm.cpp
-	hpet.cpp
-	interrupts.cpp
-	interrupts_asm.S
-	long.cpp
-	long_asm.S
+		BootMergeObject boot_platform_bios_ia32.o :
+			shell.S
+			start.cpp
+			debug.cpp
+			bios.cpp
+			bios_asm.S
+			console.cpp
+			serial.cpp
+			devices.cpp
+			keyboard.cpp
+			menu.cpp
+			mmu.cpp
+			multiboot.cpp
+			cpu.cpp
+			acpi.cpp
+			smp.cpp
+			smp_trampoline.S
+			support.S
+			video.cpp
+			apm.cpp
+			hpet.cpp
+			interrupts.cpp
+			interrupts_asm.S
+			long.cpp
+			long_asm.S
 
-	# VESA/DDC EDID
-	decode_edid.c
-	dump_edid.c
+			# VESA/DDC EDID
+			decode_edid.c
+			dump_edid.c
 
-	:
-	: boot_platform_generic.a
-;
+			:
+			: boot_platform_generic_bios_ia32.a
+		;
+	}
+}
 
-NASMFLAGS on stage1.bin = -f bin -O5 ;
+local flags = -f bin -O5 -dKERNEL_PLATFORM=$(HAIKU_KERNEL_PLATFORM) ;
+NASMFLAGS on stage1.bin = $(flags) ;
+Echo "NASMFLAGS = $(flags)" ;
 
 Object stage1.bin : stage1.nasm ;

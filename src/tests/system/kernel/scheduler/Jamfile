@@ -4,7 +4,7 @@ SubDir HAIKU_TOP src tests system kernel scheduler ;
 
 UsePrivateHeaders kernel ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_KERNEL_PLATFORM) ] ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src system kernel cache ] ;
 
 local includes = -include $(SUBDIR)/override_types.h ;

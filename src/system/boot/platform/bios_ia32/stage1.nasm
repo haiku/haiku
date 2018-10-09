@@ -644,11 +644,14 @@ kErrorString				db	"Failed to load OS. Press any key to reboot..."
 %endif
 
 ; the path to the boot loader
+%defstr platformName KERNEL_PLATFORM
+%defstr loaderName
+%strcat loaderName "haiku_loader",".",platformName
 kPathComponents:
 pathComponent				"system"
 pathComponent				"packages"
 kLastPathComponent:
-pathComponent				"haiku_loader"
+pathComponent				loaderName
 							db	0
 
 

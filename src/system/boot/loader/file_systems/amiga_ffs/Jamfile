@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src system boot loader file_systems amiga_ffs ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel storage ;
 
@@ -10,9 +7,16 @@ UsePrivateHeaders kernel storage ;
 
 SubDirC++Flags -fno-rtti ;
 
-BootStaticLibrary boot_amiga_ffs :
-	amiga_ffs.cpp
-	Volume.cpp
-	Directory.cpp
-	File.cpp
-	;
+local platform ;
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
+		UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+
+		BootStaticLibrary [ MultiBootGristFiles boot_amiga_ffs ] :
+			amiga_ffs.cpp
+			Volume.cpp
+			Directory.cpp
+			File.cpp
+		;
+	}
+}

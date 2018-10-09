@@ -239,13 +239,15 @@ rule KernelArchitectureSetup architecture
 
 	switch $(cpu) {
 		case ppc :
-			HAIKU_BOOT_PLATFORM ?= openfirmware ;
-			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
+			HAIKU_KERNEL_PLATFORM ?= openfirmware ;
+			HAIKU_BOOT_TARGETS += openfirmware ;
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 384 ; # in kB
 
 		case arm :
-			HAIKU_BOOT_PLATFORM ?= u-boot ;
+			HAIKU_KERNEL_PLATFORM ?= u-boot ;
+			HAIKU_BOOT_TARGETS += u-boot ;
 
 			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader
@@ -269,7 +271,9 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_LOADER_BASE ?= 0x1000000 ;
 
 		case x86 :
-			HAIKU_BOOT_PLATFORM ?= bios_ia32 ;
+			HAIKU_KERNEL_PLATFORM ?= bios_ia32 ;
+			HAIKU_BOOT_TARGETS += bios_ia32 pxe_ia32 ;
+
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
@@ -280,8 +284,10 @@ rule KernelArchitectureSetup architecture
 			}
 
 		case x86_64 :
-			# x86_64 completely shares the x86 bootloader.
-			HAIKU_BOOT_PLATFORM ?= bios_ia32 ;
+			# x86_64 completely shares the x86 bootloader for MBR.
+			HAIKU_KERNEL_PLATFORM ?= bios_ia32 ;
+			HAIKU_BOOT_TARGETS += bios_ia32 efi pxe_ia32 ;
+
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
@@ -295,8 +301,9 @@ rule KernelArchitectureSetup architecture
 			}
 
 		case m68k :
-			HAIKU_BOOT_PLATFORM ?= atari_m68k ;
-			switch $(HAIKU_BOOT_PLATFORM) {
+			HAIKU_KERNEL_PLATFORM ?= atari_m68k ;
+			HAIKU_BOOT_TARGETS += atari_m68k ;
+			switch $(HAIKU_KERNEL_PLATFORM) {
 				case atari_m68k :
 				{
 					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
@@ -319,7 +326,7 @@ rule KernelArchitectureSetup architecture
 	# private kernel headers to be used when compiling kernel code
 	HAIKU_PRIVATE_KERNEL_HEADERS =
 		[ PrivateHeaders $(DOT) kernel libroot shared
-			kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
+			kernel/boot/platform/$(HAIKU_KERNEL_PLATFORM) ]
 		[ ArchHeaders $(HAIKU_KERNEL_ARCH) ]
 		[ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR_$(architecture)) system
 			kernel ]
@@ -379,11 +386,8 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_C++FLAGS += -mtune=68020-60 ;
 
 		case x86 :
-			# EFI Bootloader
-			if $(HAIKU_BOOT_PLATFORM) = efi {
-				HAIKU_BOOT_CCFLAGS += -mno-red-zone -maccumulate-outgoing-args ;
-				HAIKU_BOOT_C++FLAGS += -mno-red-zone -maccumulate-outgoing-args ;
-			}
+			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
+			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
 
 		case x86_64 :
 			# Kernel lives in the top 2GB of the address space, use kernel code
@@ -398,23 +402,6 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
 			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
 
-			# BIOS Bootloader is 32-bit.
-			if $(HAIKU_BOOT_PLATFORM) = bios_ia32 {
-				if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-					HAIKU_BOOT_LINKFLAGS += -m elf_i386 ;
-				} else {
-					HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
-				}
-				HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
-				HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
-			}
-
-			# EFI Bootloader
-			if $(HAIKU_BOOT_PLATFORM) = efi {
-				HAIKU_BOOT_CCFLAGS += -mno-red-zone -maccumulate-outgoing-args ;
-				HAIKU_BOOT_C++FLAGS += -mno-red-zone -maccumulate-outgoing-args ;
-			}
-
 			if x86 in $(HAIKU_ARCHS[2-]) || x86_gcc2 in $(HAIKU_ARCHS[2-]) {
 				Echo "Enable kernel ia32 compatibility" ;
 				HAIKU_KERNEL_DEFINES += _COMPAT_MODE ;
@@ -422,15 +409,50 @@ rule KernelArchitectureSetup architecture
 			}
 	}
 
-	if $(HAIKU_BOOT_PLATFORM) = efi {
-		HAIKU_BOOT_CCFLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar
-			-Wno-error=unused-variable ;
-		HAIKU_BOOT_C++FLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar
-			-Wno-error=unused-variable ;
-		HAIKU_BOOT_LDFLAGS = -Bstatic -Bsymbolic -shared -nostdlib -znocombreloc -nostartfiles -no-undefined ;
-	} else {
-		HAIKU_BOOT_CCFLAGS += -fno-pic ;
-		HAIKU_BOOT_C++FLAGS += -fno-pic ;
+	local bootTarget ;
+	for bootTarget in $(HAIKU_BOOT_TARGETS) {
+		switch $(bootTarget) {
+			case efi :
+				# efi bootloader is PIC
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fpic -fno-stack-protector
+					-fPIC -fshort-wchar -mno-red-zone -maccumulate-outgoing-args
+					-Wno-error=unused-variable -Wno-error=main ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fpic -fno-stack-protector
+					-fPIC -fshort-wchar -mno-red-zone -maccumulate-outgoing-args
+					-Wno-error=unused-variable -Wno-error=main ;
+				HAIKU_BOOT_$(bootTarget:U)_LDFLAGS = -Bstatic -Bsymbolic
+					-nostdlib -znocombreloc -nostartfiles -no-undefined ;
+			case bios_ia32 :
+				# bios_ia32 is non-PIC
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -march=pentium ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fno-pic -march=pentium ;
+				if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+					HAIKU_BOOT_$(bootTarget:U)_LDFLAGS += -m elf_i386 ;
+				} else {
+					HAIKU_BOOT_$(bootTarget:U)_LDFLAGS += -m elf_i386_haiku ;
+				}
+				if $(gccVersion[1]) >= 3 {
+					HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -Wno-error=main -m32 ;
+					HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -Wno-error=main -m32 ;
+				}
+			case pxe_ia32 :
+				# pxe_ia32 is non-PIC
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -march=pentium ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fno-pic -march=pentium ;
+				if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+					HAIKU_BOOT_$(bootTarget:U)_LDFLAGS += -m elf_i386 ;
+				} else {
+					HAIKU_BOOT_$(bootTarget:U)_LDFLAGS += -m elf_i386_haiku ;
+				}
+				if $(gccVersion[1]) >= 3 {
+					HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -Wno-error=main -m32 ;
+					HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -Wno-error=main -m32 ;
+				}
+			case * :
+				# all other bootloaders are non-PIC
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -Wno-error=main ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fno-pic -Wno-error=main ;
+		}
 	}
 
 	# warning flags

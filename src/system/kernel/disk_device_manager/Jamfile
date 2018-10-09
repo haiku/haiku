@@ -4,7 +4,6 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage disk_device ] ;
 	# DiskDeviceTypes.cpp
 
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;

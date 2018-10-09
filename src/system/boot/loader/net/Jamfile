@@ -1,28 +1,32 @@
 SubDir HAIKU_TOP src system boot loader net ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
-UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders drivers ;
 
 SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
-local tcp = ;
-local iscsi = ;
-if $(TARGET_ARCH) = ppc {
-	tcp = TCP.cpp ;
-	iscsi = iSCSITarget.cpp ;
-}
+local platform ;
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
+		UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
-BootStaticLibrary boot_net :
-	ARP.cpp
-	ChainBuffer.cpp
-	Ethernet.cpp
-	IP.cpp
-	NetDefs.cpp
-	NetStack.cpp
-	RemoteDisk.cpp
-	UDP.cpp
-	$(tcp)
-	$(iscsi)
-;
+		local tcp = ;
+		local iscsi = ;
+		if $(TARGET_ARCH) = ppc {
+			tcp = TCP.cpp ;
+			iscsi = iSCSITarget.cpp ;
+		}
+
+		BootStaticLibrary [ MultiBootGristFiles boot_net ] :
+			ARP.cpp
+			ChainBuffer.cpp
+			Ethernet.cpp
+			IP.cpp
+			NetDefs.cpp
+			NetStack.cpp
+			RemoteDisk.cpp
+			UDP.cpp
+			$(tcp)
+			$(iscsi)
+		;
+	}
+}

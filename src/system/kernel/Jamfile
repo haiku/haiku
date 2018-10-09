@@ -113,7 +113,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 	kernel_vm.o
 
 	kernel_arch_$(TARGET_KERNEL_ARCH).o
-	kernel_platform_$(TARGET_BOOT_PLATFORM).o
+	kernel_platform_$(TARGET_KERNEL_PLATFORM).o
 
 	linkhack.so
 
@@ -153,7 +153,7 @@ if $(HAIKU_ARCH) in x86_64 arm {
 		kernel_vm.o
 
 		kernel_arch_$(TARGET_KERNEL_ARCH).o
-		kernel_platform_$(TARGET_BOOT_PLATFORM).o
+		kernel_platform_$(TARGET_KERNEL_PLATFORM).o
 
 		linkhack.so
 
@@ -202,6 +202,6 @@ SubInclude HAIKU_TOP src system kernel slab ;
 SubInclude HAIKU_TOP src system kernel util ;
 SubInclude HAIKU_TOP src system kernel vm ;
 
-if $(TARGET_BOOT_PLATFORM) {
-	SubInclude HAIKU_TOP src system kernel platform $(TARGET_BOOT_PLATFORM) ;
+if $(TARGET_KERNEL_PLATFORM) {
+	SubInclude HAIKU_TOP src system kernel platform $(TARGET_KERNEL_PLATFORM) ;
 }

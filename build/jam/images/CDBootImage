@@ -28,9 +28,14 @@ if $(TARGET_ARCH) = ppc {
 
 	BuildCDBootPPCImage $(HAIKU_CD_BOOT_IMAGE) : $(hfsmaps) : $(elfloader) : $(coffloader) : $(chrpscript) : $(extras) ;
 } else {
-	SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+	local efiLoader = haiku_loader.efi ;
+	local efiPartition = esp.image ;
+	MakeLocate $(efiPartition) : $(HAIKU_OUTPUT_DIR) ;
+	BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 
-	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : $(extras) ;
+	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : $(efiPartition) : $(extras) ;
+
+	SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 }
 
 NotFile haiku-boot-cd ;

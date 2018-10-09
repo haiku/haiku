@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src add-ons kernel file_cache ;
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
 KernelAddon log :
 	log.cpp

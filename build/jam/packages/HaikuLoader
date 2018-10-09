@@ -3,7 +3,7 @@ HaikuPackage $(haikuLoaderPackage) ;
 
 
 # boot loader
-AddFilesToPackage : haiku_loader ;
+AddFilesToPackage : haiku_loader.$(HAIKU_KERNEL_PLATFORM) ;
 
 
 # Force no compression, so the stage one loader can directly execute the boot

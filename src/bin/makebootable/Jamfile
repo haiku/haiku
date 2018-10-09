@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src bin makebootable ;
 
-if $(TARGET_BOOT_PLATFORM) {
-	SubInclude HAIKU_TOP src bin makebootable platform $(TARGET_BOOT_PLATFORM) ;
+if $(TARGET_KERNEL_PLATFORM) {
+	SubInclude HAIKU_TOP src bin makebootable platform $(TARGET_KERNEL_PLATFORM) ;
 }

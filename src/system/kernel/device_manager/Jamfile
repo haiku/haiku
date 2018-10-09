@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src system kernel device_manager ;
 
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel util ] shared ;
 
 KernelMergeObject kernel_device_manager.o :

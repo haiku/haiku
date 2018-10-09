@@ -3,7 +3,6 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers isa arch x86 ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
 UsePrivateHeaders kernel [ FDirName kernel arch x86 ] ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
 KernelStaticLibrary isa_arch_bus_manager : 
 	isa_dma.cpp

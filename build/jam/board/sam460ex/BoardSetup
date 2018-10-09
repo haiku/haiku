@@ -3,7 +3,7 @@
 HAIKU_BOARD_DESCRIPTION = "ACube Sam460ex" ;
 
 # must force both since they are set before this file is read.
-HAIKU_BOOT_PLATFORM = u-boot ;
+HAIKU_KERNEL_PLATFORM = u-boot ;
 
 #FIXME!!!!!!!!!!!!!!!
 #

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system boot platform efi ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
 UsePrivateHeaders [ FDirName kernel boot ] ;
 UseBuildFeatureHeaders gnuefi ;
 UseBuildFeatureHeaders gnuefi : headersProtocol ;
@@ -46,16 +44,22 @@ Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]
 	[ BuildFeatureAttribute gnuefi : headersArch ]
 	;
 
-BootMergeObject boot_platform_efi.o :
-	$(efi_glue_src)
-	$(platform_src)
-	:
-	: boot_platform_generic.a
-	;
+local platform ;
+for platform in [ MultiBootSubDirSetup efi ] {
+	on $(platform) {
 
-SEARCH on [ FGristFiles relocation_func.cpp ]
-	= [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
-LOCATE on [ FGristFiles $(efi_glue_src) ]
-	 = [ BuildFeatureAttribute gnuefi : libdir : path ] ;
-Depends [ FGristFiles $(efi_glue_src) ]
-	: [ BuildFeatureAttribute gnuefi : libdir ] ;
+		BootMergeObject boot_platform_efi.o :
+			$(efi_glue_src)
+			$(platform_src)
+			:
+			: boot_platform_generic_efi.a
+		;
+
+		SEARCH on [ FGristFiles relocation_func.cpp ]
+			= [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
+		LOCATE on [ FGristFiles $(efi_glue_src) ]
+			= [ BuildFeatureAttribute gnuefi : libdir : path ] ;
+		Depends [ FGristFiles $(efi_glue_src) ]
+			: [ BuildFeatureAttribute gnuefi : libdir ] ;
+	}
+}

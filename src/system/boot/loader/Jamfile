@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system boot loader ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
@@ -11,142 +9,150 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 
-{
-	DEFINES +=
-		_BOOT_MODE
-		BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH)\\\"
-		KMESSAGE_CONTAINER_ONLY
+local defines = $(DEFINES) ;
 
-		BOOT_SUPPORT_PARTITION_INTEL
-
-		BOOT_SUPPORT_FILE_SYSTEM_BFS
-		BOOT_SUPPORT_FILE_SYSTEM_TARFS
-		#BOOT_SUPPORT_FILE_MAP_DISK
-		BOOT_SUPPORT_FILE_SYSTEM_FAT
-	;
-
-	# Add architecture specific partition/file system modules
-
-	switch $(TARGET_KERNEL_ARCH) {
-		case "ppc" :
+local platform ;
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
 		{
+			DEFINES = $(defines) ;
+
 			DEFINES +=
-				BOOT_SUPPORT_PARTITION_AMIGA
-				BOOT_SUPPORT_PARTITION_APPLE
+				_BOOT_MODE
+				BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH)\\\"
+				KMESSAGE_CONTAINER_ONLY
 
-				BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+				BOOT_SUPPORT_PARTITION_INTEL
+
+				BOOT_SUPPORT_FILE_SYSTEM_BFS
+				BOOT_SUPPORT_FILE_SYSTEM_TARFS
+				#BOOT_SUPPORT_FILE_MAP_DISK
+				BOOT_SUPPORT_FILE_SYSTEM_FAT
 			;
-		}
-		case "x86" :
-		{
-			DEFINES +=
-				ALTERNATE_BOOT_ARCH=\\\"x86_64\\\"
-				BOOT_SUPPORT_ELF64
 
-				BOOT_SUPPORT_PARTITION_EFI
+			# Add architecture specific partition/file system modules
 
-				#BOOT_SUPPORT_FILE_SYSTEM_FAT
-			;
-			if $(HAIKU_BOOT_PLATFORM) = efi {
-				DEFINES +=
-					_BOOT_PLATFORM_EFI
-				;
+			switch $(TARGET_KERNEL_ARCH) {
+				case "ppc" :
+				{
+					DEFINES +=
+						BOOT_SUPPORT_PARTITION_AMIGA
+						BOOT_SUPPORT_PARTITION_APPLE
+
+						BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+					;
+				}
+				case "x86" :
+				{
+					DEFINES +=
+						ALTERNATE_BOOT_ARCH=\\\"x86_64\\\"
+						BOOT_SUPPORT_ELF64
+
+						BOOT_SUPPORT_PARTITION_EFI
+
+						#BOOT_SUPPORT_FILE_SYSTEM_FAT
+					;
+					if $(TARGET_BOOT_PLATFORM) = efi {
+						DEFINES +=
+							_BOOT_PLATFORM_EFI
+						;
+					}
+				}
 			}
+
+			if $(TARGET_BOOT_PLATFORM) != efi {
+				DEFINES += BOOT_SUPPORT_ELF32 ;
+			}
+
+			local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
+				kernel_cpp.h ] ;
+
+			SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
 		}
+
+
+		BootStaticLibrary [ MultiBootGristFiles boot_loader ] :
+			PathBlacklist.cpp
+			elf.cpp
+			heap.cpp
+			kernel_args.cpp
+			load_driver_settings.cpp
+			loader.cpp
+			main.cpp
+			menu.cpp
+			package_support.cpp
+			pager.cpp
+			partitions.cpp
+			RootFileSystem.cpp
+			stdio.cpp
+			vfs.cpp
+			vm.cpp
+
+			# libroot
+			driver_settings.cpp
+
+			# utils
+			kernel_cpp.cpp
+			KMessage.cpp
+			list.cpp
+			ring_buffer.cpp
+			safemode_settings.cpp
+			StringHash.cpp
+
+			DataIO.cpp
+			Referenceable.cpp
+			;
+
+		# The partition support is built in an extra static library
+		# so that only the ones that are used will be included.
+
+		BootStaticLibrary [ MultiBootGristFiles boot_partitions ] :
+			FileMapDisk.cpp
+			amiga_rdb.cpp
+			apple.cpp
+
+			efi_gpt.cpp
+			Header.cpp
+			crc32.cpp
+			utility.cpp
+
+			intel.cpp
+			PartitionMap.cpp
+			PartitionMapParser.cpp
+			;
+
+		# Tell Jam where to find the utility sources
+		SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ring_buffer.cpp StringHash.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+		SEARCH on [ FGristFiles KMessage.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
+
+		SEARCH on [ FGristFiles safemode_settings.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
+
+		SEARCH on [ FGristFiles driver_settings.cpp ]
+			= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+
+		SEARCH on [ FGristFiles amiga_rdb.cpp ]
+			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ] ;
+
+		SEARCH on [ FGristFiles apple.cpp ]
+			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
+
+		SEARCH on [ FGristFiles efi_gpt.cpp Header.cpp crc32.cpp utility.cpp ]
+			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ] ;
+
+		SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
+			= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
+
+		SEARCH on [ FGristFiles stage2_crt0.S ]
+			= [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ] ;
+
+		SEARCH on [ FGristFiles DataIO.cpp Referenceable.cpp ]
+			= [ FDirName $(HAIKU_TOP) src kits support ] ;
 	}
-
-	if $(HAIKU_BOOT_PLATFORM) != efi {
-		DEFINES += BOOT_SUPPORT_ELF32 ;
-	}
-
-	local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
-		kernel_cpp.h ] ;
-
-	SubDirC++Flags -fno-rtti -include $(kernelC++Header) ;
 }
-
-
-BootStaticLibrary boot_loader :
-	PathBlacklist.cpp
-	elf.cpp
-	heap.cpp
-	kernel_args.cpp
-	load_driver_settings.cpp
-	loader.cpp
-	main.cpp
-	menu.cpp
-	package_support.cpp
-	pager.cpp
-	partitions.cpp
-	RootFileSystem.cpp
-	stdio.cpp
-	vfs.cpp
-	vm.cpp
-
-	# libroot
-	driver_settings.cpp
-
-	# utils
-	kernel_cpp.cpp
-	KMessage.cpp
-	list.cpp
-	ring_buffer.cpp
-	safemode_settings.cpp
-	StringHash.cpp
-
-	DataIO.cpp
-	Referenceable.cpp
-	;
-
-# The partition support is built in an extra static library
-# so that only the ones that are used will be included.
-
-BootStaticLibrary boot_partitions :
-	FileMapDisk.cpp
-	amiga_rdb.cpp
-	apple.cpp
-
-	efi_gpt.cpp
-	Header.cpp
-	crc32.cpp
-	utility.cpp
-
-	intel.cpp
-	PartitionMap.cpp
-	PartitionMapParser.cpp
-	;
-
-# Tell Jam where to find the utility sources
-SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ring_buffer.cpp StringHash.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
-SEARCH on [ FGristFiles KMessage.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
-
-SEARCH on [ FGristFiles safemode_settings.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
-
-SEARCH on [ FGristFiles driver_settings.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
-
-SEARCH on [ FGristFiles amiga_rdb.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ] ;
-
-SEARCH on [ FGristFiles apple.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
-
-SEARCH on [ FGristFiles efi_gpt.cpp Header.cpp crc32.cpp utility.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ] ;
-
-SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
-
-SEARCH on [ FGristFiles stage2_crt0.S ]
-    = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_KERNEL_ARCH) ] ;
-
-SEARCH on [ FGristFiles DataIO.cpp Referenceable.cpp ]
-    = [ FDirName $(HAIKU_TOP) src kits support ] ;
-
 
 SubInclude HAIKU_TOP src system boot loader file_systems ;
 SubInclude HAIKU_TOP src system boot loader net ;

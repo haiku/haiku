@@ -1,86 +1,8 @@
 SubDir HAIKU_TOP src system boot ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
 DEFINES += _BOOT_MODE ;
 
-if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
-	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
-				x86_64 ] ;
-} else {
-	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
-				$(TARGET_KERNEL_ARCH) ] ;
-}
-
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix stdlib ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix locale ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) kernel lib ] ;
-
 UsePrivateHeaders [ FDirName libroot locale ] ;
-
-local extraSources = ;
-if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
-	extraSources += atomic.S ;
-}
-
-BootMergeObject boot_libroot.o :
-	abs.c
-	ctype.cpp
-	LocaleData.cpp
-	qsort.c
-	kernel_vsprintf.cpp
-	memchr.c
-	memcmp.c
-	memmove.c
-	strdup.cpp
-	strndup.cpp
-	strlen.cpp
-	strnlen.cpp
-	strcmp.c
-	strcasecmp.c
-	strncmp.c
-	strcat.c
-	strcpy.c
-	strerror.c
-	strlcat.c
-	strlcpy.c
-	strchr.c
-	strrchr.c
-	strtol.c
-	strtoul.c
-	$(extraSources)
-;
-
-AddResources haiku_loader : boot_loader.rdef ;
-
-BootLd boot_loader_$(TARGET_BOOT_PLATFORM) :
-	boot_platform_$(TARGET_BOOT_PLATFORM).o
-	boot_arch_$(TARGET_KERNEL_ARCH).o
-	boot_loader.a
-	boot_net.a
-	boot_partitions.a
-
-	# file systems
-	boot_bfs.a
-	boot_amiga_ffs.a
-	boot_tarfs.a
-	boot_fatfs.a
-	boot_packagefs.a
-
-	boot_loader.a
-		# a second time, so undefined references in the file systems can be
-		# resolved
-
-	# needed by tarfs, packagefs, and video_splash.cpp
-	boot_zlib.a
-
-	# libroot functions needed by the stage2 boot loader
-	boot_libroot.o
-
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(TARGET_BOOT_PLATFORM).ld
-	: $(TARGET_BOOT_LDFLAGS)
-;
 
 rule BuildCoffLoader {
 	local coffLoader = $(1) ;
@@ -107,8 +29,6 @@ actions BuildCoffLoader bind HACK_COFF {
 	$(HACK_COFF) $(1)
 }
 
-BuildCoffLoader boot_loader_$(TARGET_BOOT_PLATFORM)_coff : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-
 rule BuildBiosLoader {
 	local haikuLoader = $(1) ;
 	local bootLoader = $(2) ;
@@ -128,11 +48,6 @@ actions BuildBiosLoader {
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O binary $(2) $(1)
 }
 
-BuildBiosLoader haiku_loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-
-# different target for PXE, to be build with TARGET_BOOT_PLATFORM=pxe_ia32 jam pxehaiku-loader
-BuildBiosLoader pxehaiku-loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-
 rule BuildEFILoader {
 	local efiLoader = $(1) ;
 	local bootLoader = $(2) ;
@@ -147,7 +62,104 @@ actions BuildEFILoader {
 	-j .rel -j .rela -j .reloc --target=efi-app-x86_64 $(2) $(1)
 }
 
-BuildEFILoader haiku_loader.efi : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+local extraSources = ;
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
+	extraSources += atomic.S ;
+}
+
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
+		if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
+			SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
+								x86_64 ] ;
+		} else {
+			SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
+									$(TARGET_KERNEL_ARCH) ] ;
+		}
+
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix stdlib ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix locale ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) kernel lib ] ;
+
+		BootMergeObject boot_libroot_$(platform:G=).o :
+			abs.c
+			ctype.cpp
+			LocaleData.cpp
+			qsort.c
+			kernel_vsprintf.cpp
+			memchr.c
+			memcmp.c
+			memmove.c
+			strdup.cpp
+			strndup.cpp
+			strlen.cpp
+			strnlen.cpp
+			strcmp.c
+			strcasecmp.c
+			strncmp.c
+			strcat.c
+			strcpy.c
+			strerror.c
+			strlcat.c
+			strlcpy.c
+			strchr.c
+			strrchr.c
+			strtol.c
+			strtoul.c
+			$(extraSources)
+		;
+
+		AddResources haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader.rdef ;
+
+		local archGrist = [ FGrist src system boot arch $(TARGET_KERNEL_ARCH) $(platform:G=) ] ;
+		local archObject = boot_arch_$(TARGET_KERNEL_ARCH).o ;
+		local ldflags = $(HAIKU_BOOT_$(platform:G=:U)_LDFLAGS) ;
+		ldflags ?= $(TARGET_BOOT_LDFLAGS) ;
+
+		# efi loader needs to be shared.
+		if $(TARGET_BOOT_PLATFORM) = efi {
+			ldflags += -shared ;
+		}
+
+		BootLd boot_loader_$(platform:G=) :
+			boot_platform_$(platform:G=).o
+			$(archObject:G=$(archGrist))
+			[ MultiBootGristFiles
+				boot_loader.a
+				boot_net.a
+				boot_partitions.a
+
+				# file systems
+				boot_bfs.a
+				boot_amiga_ffs.a
+				boot_tarfs.a
+				boot_fatfs.a
+				boot_packagefs.a
+
+				boot_loader.a
+					# a second time, so undefined references in the file systems can be
+					# resolved
+
+				# needed by tarfs, packagefs, and video_splash.cpp
+				boot_zlib.a
+			]
+			# libroot functions needed by the stage2 boot loader
+			boot_libroot_$(platform:G=).o
+
+			: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(platform:G=).ld
+			: $(ldflags)
+		;
+
+		BuildCoffLoader boot_loader_$(TARGET_BOOT_PLATFORM)_coff : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
+		if $(TARGET_BOOT_PLATFORM) != efi {
+			BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+		} else {
+			BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+		}
+	}
+}
 
 SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH) ;
 SubInclude HAIKU_TOP src system boot loader ;

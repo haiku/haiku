@@ -3,11 +3,11 @@ SubDir HAIKU_TOP src add-ons kernel bluetooth hci ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net bluetooth ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+#UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_KERNEL_PLATFORM) ] ;
 
 # disable debug output, if debugging is disabled
 if $(DEBUG) = 0 {
-	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
+	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0 ] ;
 }
 
 KernelAddon hci :

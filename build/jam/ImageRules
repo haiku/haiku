@@ -1492,12 +1492,12 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 	FLOPPY_IMAGE_SIZE on $(image) = $(HAIKU_BOOT_FLOPPY_IMAGE_SIZE) ;
 	ARCHIVE_IMAGE_OFFSET on $(image) = $(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
-	if $(HAIKU_BOOT_PLATFORM) = atari_m68k {
+	if $(HAIKU_KERNEL_PLATFORM) = atari_m68k {
 		Depends $(image) : <build>fixup_tos_boot_checksum ;
 		BuildFloppyBootImageFixupM68K $(image)
 			: <build>fixup_tos_boot_checksum ;
 	}
-	if $(HAIKU_BOOT_PLATFORM) = amiga_m68k {
+	if $(HAIKU_KERNEL_PLATFORM) = amiga_m68k {
 		Depends $(image) : <build>fixup_amiga_boot_checksum ;
 		BuildFloppyBootImageFixupM68K $(image)
 			: <build>fixup_amiga_boot_checksum ;
@@ -1544,20 +1544,21 @@ actions BuildFloppyBootImageFixupM68K
 
 #pragma mark - CD Boot Image rules
 
-rule BuildCDBootImage image : bootfloppy : extrafiles
+rule BuildCDBootImage image : bootfloppy : bootefi : extrafiles
 {
 	Depends $(image) : $(bootfloppy) ;
+	Depends $(image) : $(bootefi) ;
 	Depends $(image) : $(extrafiles) ;
 	BOOTIMG on $(image) = $(bootfloppy) ;
+	BOOTEFI on $(image) = $(bootefi) ;
 
-	BuildCDBootImage1 $(image) : $(bootfloppy) $(extrafiles) ;
+	BuildCDBootImage1 $(image) : $(bootfloppy) $(bootefi) $(extrafiles) ;
 }
 
 actions BuildCDBootImage1
 {
 	$(RM) $(<)
-	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-]) \
-		|| genisoimage -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
+	mkisofs -b $(BOOTIMG) -eltorito-alt-boot -no-emul-boot -e $(BOOTEFI) -r -J -V bootimg -o $(<) $(>[1]) $(>[2]) $(>[3-])
 }
 
 
@@ -1599,4 +1600,23 @@ actions BuildCDBootPPCImage1 bind MAPS
 		-V bootimg -hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -prep-boot \
 		boot/haikuloader.xcf -r -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
+}
+
+#pragma mark - EFI System Partition rules
+
+rule BuildEfiSystemPartition image : efiLoader
+{
+	Depends $(image) : $(efiLoader) ;
+
+	BuildEfiSystemPartition1 $(image) : $(efiLoader) ;
+}
+
+actions BuildEfiSystemPartition1
+{
+	$(RM) $(<)
+	dd if=/dev/zero of=$(<) bs=1024 count=2880
+	mformat -i $(<) -n 36 -h 2 -t 80
+	mmd -D s -i $(<) ::/EFI
+	mmd -D s -i $(<) ::/EFI/BOOT
+	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/BOOTX64.EFI
 }

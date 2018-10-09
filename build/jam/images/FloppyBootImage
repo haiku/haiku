@@ -169,7 +169,7 @@ Depends haiku-floppyboot-archive : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
 HAIKU_BOOT_FLOPPY = haiku-boot-floppy.image ;
 MakeLocate $(HAIKU_BOOT_FLOPPY) : $(HAIKU_OUTPUT_DIR) ;
 
-BuildFloppyBootImage $(HAIKU_BOOT_FLOPPY) : haiku_loader
+BuildFloppyBootImage $(HAIKU_BOOT_FLOPPY) : haiku_loader.$(HAIKU_KERNEL_PLATFORM)
 	: $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
 
 # remove the archive

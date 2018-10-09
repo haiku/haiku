@@ -1,25 +1,23 @@
 SubDir HAIKU_TOP src system boot loader file_systems fat ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
-#UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
-#UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-#UsePrivateHeaders [ FDirName storage ] ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared storage ;
-
-#SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems fat ;
 
 local defines = [ FDefines _BOOT_MODE ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags -fno-rtti $(defines) ;
 
-BootStaticLibrary boot_fatfs :
-	fatfs.cpp
-	Volume.cpp
-	CachedBlock.cpp
-	Directory.cpp
-	File.cpp
-	Stream.cpp
-	;
+local platform ;
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
+		BootStaticLibrary [ MultiBootGristFiles boot_fatfs ] :
+			fatfs.cpp
+			Volume.cpp
+			CachedBlock.cpp
+			Directory.cpp
+			File.cpp
+			Stream.cpp
+		;
+	}
+}

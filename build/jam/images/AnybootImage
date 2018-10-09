@@ -19,13 +19,41 @@ actions BuildAnybootImage1 {
 	$(2[1]) -b $(2[2]) $(2[3]) $(2[4]) $(1)
 }
 
+rule BuildAnybootImageEfi anybootImage : mbrPart : efiPart : isoPart : imageFile {
+	local anyboot = <build>anyboot ;
+
+	Depends $(anybootImage) : $(anyboot) ;
+	Depends $(anybootImage) : $(isoPart) ;
+	Depends $(anybootImage) : $(mbrPart) ;
+	Depends $(anybootImage) : $(efiPart) ;
+	Depends $(anybootImage) : $(imageFile) ;
+
+	BuildAnybootImageEfi1 $(anybootImage) : $(anyboot) $(mbrPart) $(efiPart) $(isoPart) $(imageFile) ;
+}
+
+actions BuildAnybootImageEfi1 {
+	$(2[1]) -b $(2[2]) -e $(2[3]) $(2[4]) $(2[5]) $(1)
+}
+
 local baseMBR = base_mbr.bin ;
 local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.S ] ;
 BuildMBR $(baseMBR) : $(mbrSource) ;
 MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
 MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
-BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
-	: $(HAIKU_IMAGE_NAME) ;
+
+if $(HAIKU_ANYBOOT_UEFI) = 1 {
+	Echo "Anyboot is MBR/UEFI hybrid" ;
+	local efiLoader = haiku_loader.efi ;
+	local efiPartition = esp.image ;
+	MakeLocate $(efiPartition) ;
+	BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
+	BuildAnybootImageEfi $(HAIKU_ANYBOOT) : $(baseMBR) : $(efiPartition) : $(HAIKU_CD_BOOT_IMAGE)
+		: $(HAIKU_IMAGE_NAME) ;
+} else {
+	Echo "Anyboot is MBR only" ;
+	BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
+		: $(HAIKU_IMAGE_NAME) ;
+}
 
 # TODO: this one seems to cause the build to fail each other run (caching?)
 #RmTemps $(HAIKU_ANYBOOT) : $(baseMBR) ;

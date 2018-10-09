@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system boot platform pxe_ia32 ;
 
 SubDirHdrs $(SUBDIR) $(DOTDOT) bios_ia32 ;
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform bios_ia32 ;
-SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform pxe_ia32 ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -47,30 +47,35 @@ local bios_ia32_edid_src =
 ;
 
 
-BootMergeObject boot_platform_pxe_ia32.o :
-	pxe_stage2.S
-	smp_trampoline.S
-	pxe_bios.S
-	devices.cpp
-	network.cpp
-	pxe_undi.cpp
-	$(bios_ia32_src)
-	$(bios_ia32_edid_src)
+local platform ;
+for platform in [ MultiBootSubDirSetup pxe_ia32 ] {
+	on $(platform) {
+		BootMergeObject boot_platform_pxe_ia32.o :
+			pxe_stage2.S
+			smp_trampoline.S
+			pxe_bios.S
+			devices.cpp
+			network.cpp
+			pxe_undi.cpp
+			$(bios_ia32_src)
+			$(bios_ia32_edid_src)
 
-	:
-	: boot_platform_generic.a
-;
+			:
+			: boot_platform_generic_pxe_ia32.a
+		;
 
 
-SEARCH on [ FGristFiles $(bios_ia32_src) ]
-	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
+		SEARCH on [ FGristFiles $(bios_ia32_src) ]
+			= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
 
-SEARCH on [ FGristFiles $(bios_ia32_edid_src) ]
-	= [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+		SEARCH on [ FGristFiles $(bios_ia32_edid_src) ]
+			= [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-SEARCH on [ FGristFiles $(genericPlatformSources) ]
-	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+		SEARCH on [ FGristFiles $(genericPlatformSources) ]
+			= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
-# We also need the bios_ia32 stage1.bin for building bin/makebootable
-SEARCH on stage1.bin
- 	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
+		# We also need the bios_ia32 stage1.bin for building bin/makebootable
+		SEARCH on stage1.bin
+			= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
+	}
+}

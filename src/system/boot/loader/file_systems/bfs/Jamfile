@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system boot loader file_systems bfs ;
 
-SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders file_systems shared storage ;
 
@@ -12,18 +10,23 @@ local defines = [ FDefines _BOOT_MODE ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags -fno-rtti $(defines) ;
 
-BootStaticLibrary boot_bfs :
-	bfs.cpp
-	Directory.cpp
-	File.cpp
-	Link.cpp
-	Stream.cpp
-	BPlusTree.cpp
-	QueryParserUtils.cpp
-	;
+local platform ;
+for platform in [ MultiBootSubDirSetup ] {
+	on $(platform) {
+		BootStaticLibrary [ MultiBootGristFiles boot_bfs ] :
+			bfs.cpp
+			Directory.cpp
+			File.cpp
+			Link.cpp
+			Stream.cpp
+			BPlusTree.cpp
+			QueryParserUtils.cpp
+		;
 
-SEARCH on [ FGristFiles BPlusTree.cpp ]
-    = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
+		SEARCH on [ FGristFiles BPlusTree.cpp ]
+			= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
 
-SEARCH on [ FGristFiles QueryParserUtils.cpp ]
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+		SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+			+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+	}
+}

@@ -260,7 +260,9 @@ load_modules(stage2_args* args, BootVolume& volume)
 	// and now load all partitioning and file system modules
 	// needed to identify the boot volume
 
-	if (!gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
+	if (!gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)
+		&& gBootVolume.GetInt32(BOOT_METHOD, BOOT_METHOD_DEFAULT)
+			!= BOOT_METHOD_CD) {
 		// iterate over the mounted volumes and load their file system
 		Partition *partition;
 		if (gRoot->GetPartitionFor(volume.RootDirectory(), &partition)
