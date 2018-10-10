@@ -102,7 +102,7 @@ struct usb_port_status
 #define PORT_STATUS_HIGH_SPEED		0x0400
 #define PORT_STATUS_TEST			0x0800
 #define PORT_STATUS_INDICATOR		0x1000
-// USB 3.0 spec table 10-11
+// USB 3.0 spec table 10-10
 #define PORT_STATUS_SS_LINK_STATE	0x01e0
 #define PORT_STATUS_SS_POWER		0x0200
 #define PORT_STATUS_SS_SPEED		0x1c00
@@ -135,5 +135,8 @@ struct usb_port_status
 #define C_PORT_BH_PORT_RESET		29
 #define PORT_FORCE_LINKPM_STATE		30
 
+// USB 3.0 spec table 10-11
+#define PORT_CHANGE_BH_PORT_RESET	0x0020
+#define PORT_CHANGE_LINK_STATE		0x0040
 
 #endif // _USBSPEC_PRIVATE_H
