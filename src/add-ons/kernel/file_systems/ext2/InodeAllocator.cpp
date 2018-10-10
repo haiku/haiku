@@ -84,12 +84,14 @@ InodeAllocator::Free(Transaction& transaction, ino_t id, bool isDirectory)
 			fVolume->Has64bitFeature());
 	}
 
-	status = fVolume->WriteBlockGroup(transaction, blockGroup);
+	uint32 checksum = 0;
+	status = _UnmarkInBitmap(transaction,
+		group->InodeBitmap(fVolume->Has64bitFeature()), numInodes, id,
+		checksum);
 	if (status != B_OK)
 		return status;
-
-	return _UnmarkInBitmap(transaction,
-		group->InodeBitmap(fVolume->Has64bitFeature()), numInodes, id);
+	_SetInodeBitmapChecksum(group, checksum);
+	return fVolume->WriteBlockGroup(transaction, blockGroup);
 }
 
 
@@ -135,6 +137,12 @@ InodeAllocator::_AllocateInGroup(Transaction& transaction, uint32 blockGroup,
 	}
 
 	fsblock_t block = group->InodeBitmap(fVolume->Has64bitFeature());
+	if (block == 0) {
+		ERROR("_AllocateInGroup(%" B_PRIu32 "): inodeBitmap is zero\n",
+			blockGroup);
+		return B_BAD_VALUE;
+	}
+
 	_InitGroup(transaction, group, block, fVolume->InodesPerGroup());
 	uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
 	if (freeInodes == 0)
@@ -149,17 +157,19 @@ InodeAllocator::_AllocateInGroup(Transaction& transaction, uint32 blockGroup,
 	}
 	
 	uint32 pos = 0;
+	uint32 checksum = 0;
 	status = _MarkInBitmap(transaction, block, blockGroup, 
-		fVolume->InodesPerGroup(), pos);
+		fVolume->InodesPerGroup(), pos, checksum);
 	if (status != B_OK)
 		return status;
 
-	if (fVolume->HasChecksumFeature() && pos > (fVolume->InodesPerGroup() - 1
-		- group->UnusedInodes(fVolume->Has64bitFeature()))) {
-		group->SetUnusedInodes(fVolume->InodesPerGroup() - 1 - pos,
+	if ((fVolume->HasChecksumFeature() || fVolume->HasMetaGroupChecksumFeature())
+		&& pos > (fVolume->InodesPerGroup()
+			- group->UnusedInodes(fVolume->Has64bitFeature()) - 1)) {
+		group->SetUnusedInodes(fVolume->InodesPerGroup() - pos - 1,
 			fVolume->Has64bitFeature());
 	}
-
+	_SetInodeBitmapChecksum(group, checksum);
 	status = fVolume->WriteBlockGroup(transaction, blockGroup);
 	if (status != B_OK)
 		return status;
@@ -172,7 +182,7 @@ InodeAllocator::_AllocateInGroup(Transaction& transaction, uint32 blockGroup,
 
 status_t
 InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
-	uint32 blockGroup, uint32 numInodes, uint32& pos)
+	uint32 blockGroup, uint32 numInodes, uint32& pos, uint32& checksum)
 {
 	BitmapBlock inodeBitmap(fVolume, numInodes);
 
@@ -199,13 +209,15 @@ InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 		return B_BAD_DATA;
 	}
 
+	checksum = inodeBitmap.Checksum(fVolume->InodesPerGroup());
+
 	return B_OK;
 }
 
 
 status_t
 InodeAllocator::_UnmarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
-	uint32 numInodes, ino_t id)
+	uint32 numInodes, ino_t id, uint32& checksum)
 {
 	BitmapBlock inodeBitmap(fVolume, numInodes);
 
@@ -221,6 +233,8 @@ InodeAllocator::_UnmarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 			B_PRIu64 "\n", pos, bitmapBlock);
 		return B_BAD_DATA;
 	}
+
+	checksum = inodeBitmap.Checksum(fVolume->InodesPerGroup());
 
 	return B_OK;
 }
@@ -242,5 +256,18 @@ InodeAllocator::_InitGroup(Transaction& transaction, ext2_block_group* group,
 	group->SetFlags(flags & ~EXT2_BLOCK_GROUP_INODE_UNINIT);
 
 	return B_OK;
+}
+
+
+void
+InodeAllocator::_SetInodeBitmapChecksum(ext2_block_group* group, uint32 checksum)
+{
+	if (fVolume->HasMetaGroupChecksumFeature()) {
+		group->inode_bitmap_csum = checksum & 0xffff;
+		if (fVolume->GroupDescriptorSize() >= offsetof(ext2_block_group,
+			_reserved)) {
+			group->inode_bitmap_csum_high = checksum >> 16;
+		}
+	}
 }
 

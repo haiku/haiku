@@ -57,12 +57,14 @@ public:
 			void		RemovedFromTransaction();
 
 private:
-			status_t	_ScanFreeRanges();
+			status_t	_ScanFreeRanges(bool verify = false);
 			void		_AddFreeRange(uint32 start, uint32 length);
 			void		_LockInTransaction(Transaction& transaction);
 			status_t	_InitGroup(Transaction& transaction);
 			bool		_IsSparse();
 			uint32		_FirstFreeBlock();
+			void		_SetBlockBitmapChecksum(BitmapBlock& block);
+			bool		_VerifyBlockBitmapChecksum(BitmapBlock& block);
 
 			Volume*		fVolume;
 			uint32		fBlockGroup;
@@ -93,6 +95,7 @@ AllocationBlockGroup::AllocationBlockGroup()
 	fVolume(NULL),
 	fBlockGroup(0),
 	fGroupDescriptor(NULL),
+	fCurrentTransaction(-1),
 	fStart(0),
 	fNumBits(0),
 	fBitmapBlock(0),
@@ -131,6 +134,11 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 		return status;
 
 	fBitmapBlock = fGroupDescriptor->BlockBitmap(fVolume->Has64bitFeature());
+	if (fBitmapBlock == 0) {
+		ERROR("AllocationBlockGroup(%" B_PRIu32 ")::Initialize(): "
+			"blockBitmap is zero\n", fBlockGroup);
+		return B_BAD_VALUE;
+	}
 
 	if (fGroupDescriptor->Flags() & EXT2_BLOCK_GROUP_BLOCK_UNINIT) {
 		fFreeBits = fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature());
@@ -140,7 +148,7 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 		return B_OK;
 	}
 	
-	status = _ScanFreeRanges();
+	status = _ScanFreeRanges(true);
 	if (status != B_OK)
 		return status;
 
@@ -164,7 +172,7 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 
 
 status_t
-AllocationBlockGroup::_ScanFreeRanges()
+AllocationBlockGroup::_ScanFreeRanges(bool verify)
 {
 	TRACE("AllocationBlockGroup::_ScanFreeRanges() for group %" B_PRIu32 "\n",
 		fBlockGroup);
@@ -172,6 +180,12 @@ AllocationBlockGroup::_ScanFreeRanges()
 
 	if (!block.SetTo(fBitmapBlock))
 		return B_ERROR;
+
+	if (verify && !_VerifyBlockBitmapChecksum(block)) {
+		ERROR("AllocationBlockGroup(%" B_PRIu32 ")::_ScanFreeRanges(): "
+			"blockGroup verification failed\n", fBlockGroup);
+		return B_BAD_DATA;
+	}
 
 	fFreeBits = 0;
 	uint32 start = 0;
@@ -235,6 +249,7 @@ AllocationBlockGroup::Allocate(Transaction& transaction, fsblock_t _start,
 
 	fFreeBits -= length;
 	fGroupDescriptor->SetFreeBlocks(fFreeBits, fVolume->Has64bitFeature());
+	_SetBlockBitmapChecksum(block);
 	fVolume->WriteBlockGroup(transaction, fBlockGroup);
 
 	if (start == fLargestStart) {
@@ -338,6 +353,7 @@ AllocationBlockGroup::Free(Transaction& transaction, uint32 start,
 
 	fFreeBits += length;
 	fGroupDescriptor->SetFreeBlocks(fFreeBits, fVolume->Has64bitFeature());
+	_SetBlockBitmapChecksum(block);
 	fVolume->WriteBlockGroup(transaction, fBlockGroup);
 
 	return B_OK;
@@ -434,10 +450,12 @@ AllocationBlockGroup::_InitGroup(Transaction& transaction)
 	BitmapBlock blockBitmap(fVolume, fNumBits);
 	if (!blockBitmap.SetToWritable(transaction, fBitmapBlock))
 		return B_ERROR;
+
 	blockBitmap.Mark(0, _FirstFreeBlock(), true);
 	blockBitmap.Unmark(0, fNumBits, true);
 	
 	fGroupDescriptor->SetFlags(flags & ~EXT2_BLOCK_GROUP_BLOCK_UNINIT);
+	_SetBlockBitmapChecksum(blockBitmap);
 	fVolume->WriteBlockGroup(transaction, fBlockGroup);
 
 	status_t status = _ScanFreeRanges();
@@ -505,6 +523,36 @@ AllocationBlockGroup::_FirstFreeBlock()
 
 
 void
+AllocationBlockGroup::_SetBlockBitmapChecksum(BitmapBlock& block)
+{
+	if (fVolume->HasMetaGroupChecksumFeature()) {
+		uint32 checksum = block.Checksum(fVolume->BlocksPerGroup());
+		fGroupDescriptor->block_bitmap_csum = checksum & 0xffff;
+		if (fVolume->GroupDescriptorSize() >= offsetof(ext2_block_group,
+			inode_bitmap_high)) {
+			fGroupDescriptor->block_bitmap_csum_high = checksum >> 16;
+		}
+	}
+}
+
+
+bool
+AllocationBlockGroup::_VerifyBlockBitmapChecksum(BitmapBlock& block) {
+	if (fVolume->HasMetaGroupChecksumFeature()) {
+		uint32 checksum = block.Checksum(fVolume->BlocksPerGroup());
+		uint32 provided = fGroupDescriptor->block_bitmap_csum;
+		if (fVolume->GroupDescriptorSize() >= offsetof(ext2_block_group,
+			inode_bitmap_high)) {
+			provided |= (fGroupDescriptor->block_bitmap_csum_high << 16);
+		} else
+			checksum &= 0xffff;
+		return provided == checksum;
+	}
+	return true;
+}
+
+
+void
 AllocationBlockGroup::TransactionDone(bool success)
 {
 	if (success) {
@@ -539,7 +587,8 @@ BlockAllocator::BlockAllocator(Volume* volume)
 	fGroups(NULL),
 	fBlocksPerGroup(0),
 	fNumBlocks(0),
-	fNumGroups(0)
+	fNumGroups(0),
+	fFirstBlock(0)
 {
 	mutex_init(&fLock, "ext2 block allocator");
 }
@@ -576,18 +625,19 @@ BlockAllocator::Initialize()
 	mutex_lock(&fLock);
 		// Released by _Initialize
 
-	thread_id id = -1; // spawn_kernel_thread(
-		// (thread_func)BlockAllocator::_Initialize, "ext2 block allocator",
-		// B_LOW_PRIORITY, this);
+#if 0
+	thread_id id = spawn_kernel_thread(
+		(thread_func)BlockAllocator::_Initialize, "ext2 block allocator",
+		B_LOW_PRIORITY, this);
 	if (id < B_OK)
 		return _Initialize(this);
 
-	// mutex_transfer_lock(&fLock, id);
+	mutex_transfer_lock(&fLock, id);
 
-	// return resume_thread(id);
-	panic("Failed to fall back to synchronous block allocator"
-		"initialization.\n");
-	return B_ERROR;
+	return resume_thread(id);
+#else
+	return _Initialize(this);
+#endif
 }
 
 
@@ -866,3 +916,4 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 
 	return B_OK;
 }
+

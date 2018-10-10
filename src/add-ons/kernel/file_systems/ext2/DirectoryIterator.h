@@ -62,6 +62,20 @@ protected:
 			off_t		_Offset() { return fLogicalBlock * fBlockSize
 							+ fDisplacement; }
 
+			bool		_CheckDirEntry(const ext2_dir_entry* dirEntry,
+							const uint8* buffer);
+			status_t	_CheckBlock(const uint8* buffer);
+			uint32		_MaxSize();
+
+#if 0
+			ext2_dir_entry_tail* _DirEntryTail(uint8* block) const;
+			uint32		_Checksum(uint8* block) const;
+			void		_SetDirEntryChecksum(uint8* block);
+#endif
+			ext2_htree_tail* _HTreeEntryTail(uint8* block, uint16 offset) const;
+			uint32		_HTreeRootChecksum(uint8* block, uint16 offset, uint16 count) const;
+			void		_SetHTreeEntryChecksum(uint8* block, uint16 offset, uint16 count);
+
 
 	Inode*				fDirectory;
 	Volume*				fVolume;

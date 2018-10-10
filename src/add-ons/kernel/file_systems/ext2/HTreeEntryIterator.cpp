@@ -12,6 +12,7 @@
 #include <new>
 
 #include "CachedBlock.h"
+#include "CRCTable.h"
 #include "HTree.h"
 #include "Inode.h"
 
@@ -30,6 +31,8 @@ HTreeEntryIterator::HTreeEntryIterator(off_t offset, Inode* directory)
 	fDirectory(directory),
 	fVolume(directory->GetVolume()),
 	fHasCollision(false),
+	fLimit(0),
+	fCount(0),
 	fBlockSize(directory->GetVolume()->BlockSize()),
 	fParent(NULL),
 	fChild(NULL)
@@ -53,6 +56,8 @@ HTreeEntryIterator::HTreeEntryIterator(uint32 block, uint32 blockSize,
 	fDirectory(directory),
 	fVolume(directory->GetVolume()),
 	fHasCollision(hasCollision),
+	fLimit(0),
+	fCount(0),
 	fFirstEntry(1),
 	fCurrentEntry(1),
 	fBlockSize(blockSize),
@@ -98,10 +103,14 @@ HTreeEntryIterator::Init()
 		return B_ERROR;
 	}
 
-	if (fLimit != fBlockSize / sizeof(HTreeEntry) - fFirstEntry) {
+	uint32 maxSize = fBlockSize;
+	if (fVolume->HasMetaGroupChecksumFeature())
+		maxSize -= sizeof(ext2_htree_tail);
+
+	if (fLimit != maxSize / sizeof(HTreeEntry) - fFirstEntry) {
 		ERROR("HTreeEntryIterator::Init() bad fLimit %u should be %" B_PRIu32
 			" at block %" B_PRIu64 "\n", fLimit,
-			(uint32)(fBlockSize / sizeof(HTreeEntry) - fFirstEntry), fBlockNum);
+			(uint32)(maxSize / sizeof(HTreeEntry) - fFirstEntry), fBlockNum);
 		fCount = fLimit = 0;
 		return B_ERROR;
 	}
@@ -336,6 +345,10 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 		if (secondBlockData == NULL)
 			return B_IO_ERROR;
 
+		uint32 maxSize = fBlockSize;
+		if (fVolume->HasMetaGroupChecksumFeature())
+			maxSize -= sizeof(ext2_dir_entry_tail);
+
 		HTreeFakeDirEntry* fakeEntry = (HTreeFakeDirEntry*)secondBlockData;
 		fakeEntry->inode_id = 0; // ?
 		fakeEntry->SetEntryLength(fBlockSize);
@@ -345,6 +358,7 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 		HTreeEntry* secondBlockEntries = (HTreeEntry*)secondBlockData;
 		memmove(&entries[fFirstEntry + count / 2], &secondBlockEntries[1],
 			(count - count / 2) * sizeof(HTreeEntry));
+		_SetHTreeEntryChecksum(secondBlockData);
 	}
 
 	TRACE("HTreeEntryIterator::InsertEntry(): Inserting node. Count: %u, "
@@ -366,5 +380,45 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 
 	countLimit->SetCount(count + 1);
 
+	_SetHTreeEntryChecksum(blockData);
+
 	return B_OK;
 }
+
+
+ext2_htree_tail*
+HTreeEntryIterator::_HTreeEntryTail(uint8* block) const
+{
+	HTreeEntry* entries = (HTreeEntry*)block;
+	HTreeCountLimit* countLimit = (HTreeCountLimit*)&entries[fFirstEntry];
+	uint16 limit = countLimit->Limit();
+	return (ext2_htree_tail*)(&entries[fFirstEntry + limit]);
+}
+
+
+uint32
+HTreeEntryIterator::_Checksum(uint8* block) const
+{
+	uint32 number = fDirectory->ID();
+	uint32 checksum = calculate_crc32c(fVolume->ChecksumSeed(),
+		(uint8*)&number, sizeof(number));
+	uint32 gen = fDirectory->Node().generation;
+	checksum = calculate_crc32c(checksum, (uint8*)&gen, sizeof(gen));
+	checksum = calculate_crc32c(checksum, block,
+		(fFirstEntry + fCount) * sizeof(HTreeEntry));
+	ext2_htree_tail dummy;
+	checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));
+	return checksum;
+}
+
+
+void
+HTreeEntryIterator::_SetHTreeEntryChecksum(uint8* block)
+{
+	if (fVolume->HasMetaGroupChecksumFeature()) {
+		ext2_htree_tail* tail = _HTreeEntryTail(block);
+		tail->reserved = 0xde00000c;
+		tail->checksum = _Checksum(block);
+	}
+}
+

@@ -20,8 +20,8 @@
 #endif
 
 
-HashRevokeManager::HashRevokeManager()
-	:
+HashRevokeManager::HashRevokeManager(bool has64bits)
+	: RevokeManager(has64bits),
 	fHash(NULL),
 	kInitialHashSize(128)
 		// TODO: Benchmark and find an optimal value

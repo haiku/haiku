@@ -301,11 +301,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
-	TRACE("features %" B_PRIx32 ", incompatible features %" B_PRIx32
-		", read-only features %" B_PRIx32 "\n",
-		fSuperBlock.CompatibleFeatures(), fSuperBlock.IncompatibleFeatures(),
-		fSuperBlock.ReadOnlyFeatures());
-
 	// read the superblock
 	status_t status = Identify(fDevice, &fSuperBlock);
 	if (status != B_OK) {
@@ -313,19 +308,37 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
+	TRACE("features %" B_PRIx32 ", incompatible features %" B_PRIx32
+		", read-only features %" B_PRIx32 "\n",
+		fSuperBlock.CompatibleFeatures(), fSuperBlock.IncompatibleFeatures(),
+		fSuperBlock.ReadOnlyFeatures());
+
 	// check read-only features if mounting read-write
 	if (!IsReadOnly() && _UnsupportedReadOnlyFeatures(fSuperBlock) != 0)
 		return B_UNSUPPORTED;
+
+	if (HasMetaGroupChecksumFeature() && HasChecksumFeature())
+		return B_ERROR;
+
+	if (!_VerifySuperBlock())
+		return B_ERROR;
 
 	// initialize short hands to the superblock (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
 	if (fBlockShift < 10 || fBlockShift > 16)
 		return B_ERROR;
+	if (fBlockShift > 12) {
+		FATAL("blocksize not supported!\n");
+		return B_UNSUPPORTED;
+	}
 	fBlockSize = 1UL << fBlockShift;
 	fFirstDataBlock = fSuperBlock.FirstDataBlock();
 
 	fFreeBlocks = fSuperBlock.FreeBlocks(Has64bitFeature());
 	fFreeInodes = fSuperBlock.FreeInodes();
+
+	if (fFirstDataBlock > fSuperBlock.NumBlocks(Has64bitFeature()))
+		return B_ERROR;
 
 	off_t numBlocks = fSuperBlock.NumBlocks(Has64bitFeature()) - fFirstDataBlock;
 	uint32 blocksPerGroup = fSuperBlock.BlocksPerGroup();
@@ -333,18 +346,31 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (numBlocks % blocksPerGroup != 0)
 		fNumGroups++;
 
+	if (blocksPerGroup == 0 || fSuperBlock.FragmentsPerGroup() == 0) {
+		FATAL("zero blocksPerGroup or fragmentsPerGroup!\n");
+		return B_UNSUPPORTED;
+	}
+	if (blocksPerGroup != fSuperBlock.FragmentsPerGroup()) {
+		FATAL("blocksPerGroup is not equal to fragmentsPerGroup!\n");
+		return B_UNSUPPORTED;
+	}
+
 	if (Has64bitFeature()) {
+		TRACE("64bits\n");
 		fGroupDescriptorSize = fSuperBlock.GroupDescriptorSize();
 		if (fGroupDescriptorSize < sizeof(ext2_block_group))
 			return B_ERROR;
+		if (fGroupDescriptorSize != sizeof(ext2_block_group))
+			return B_UNSUPPORTED;
 	} else
 		fGroupDescriptorSize = EXT2_BLOCK_GROUP_NORMAL_SIZE;
 	fGroupsPerBlock = fBlockSize / fGroupDescriptorSize;
 	fNumInodes = fSuperBlock.NumInodes();
 
 	TRACE("block size %" B_PRIu32 ", num groups %" B_PRIu32 ", groups per "
-		"block %" B_PRIu32 ", first %" B_PRIu32 "\n", fBlockSize, fNumGroups,
-		fGroupsPerBlock, fFirstDataBlock);
+		"block %" B_PRIu32 ", first %" B_PRIu32 ", group_descriptor_size %"
+		B_PRIu32 "\n", fBlockSize, fNumGroups,
+		fGroupsPerBlock, fFirstDataBlock, fGroupDescriptorSize);
 
 	uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1) / fGroupsPerBlock;
 
@@ -354,6 +380,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	memset(fGroupBlocks, 0, blockCount * sizeof(uint8*));
 	fInodesPerBlock = fBlockSize / InodeSize();
+
+	_SuperBlockChecksumSeed();
 
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
@@ -480,6 +508,8 @@ Volume::Unmount()
 
 	status_t status = fJournal->Uninit();
 
+	// this will wait on the block notifier/writer thread
+	FlushDevice();
 	delete fJournal;
 	delete fJournalInode;
 
@@ -524,7 +554,8 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 		| EXT2_INCOMPATIBLE_FEATURE_RECOVER
 		| EXT2_INCOMPATIBLE_FEATURE_JOURNAL
 		| EXT2_INCOMPATIBLE_FEATURE_EXTENTS
-		| EXT2_INCOMPATIBLE_FEATURE_FLEX_GROUP;
+		| EXT2_INCOMPATIBLE_FEATURE_FLEX_GROUP
+		| EXT2_INCOMPATIBLE_FEATURE_64BIT;
 		/*| EXT2_INCOMPATIBLE_FEATURE_META_GROUP*/;
 	uint32 unsupported = superBlock.IncompatibleFeatures()
 		& ~supportedIncompatible;
@@ -546,7 +577,8 @@ Volume::_UnsupportedReadOnlyFeatures(ext2_super_block& superBlock)
 		| EXT2_READ_ONLY_FEATURE_HUGE_FILE
 		| EXT2_READ_ONLY_FEATURE_EXTRA_ISIZE
 		| EXT2_READ_ONLY_FEATURE_DIR_NLINK
-		| EXT2_READ_ONLY_FEATURE_GDT_CSUM;
+		| EXT2_READ_ONLY_FEATURE_GDT_CSUM
+		| EXT4_READ_ONLY_FEATURE_METADATA_CSUM;
 	// TODO actually implement EXT2_READ_ONLY_FEATURE_SPARSE_SUPER when
 	// implementing superblock backup copies
 
@@ -577,19 +609,32 @@ Volume::_GroupDescriptorBlock(uint32 blockIndex)
 uint16
 Volume::_GroupCheckSum(ext2_block_group *group, int32 index)
 {
-	uint16 checksum = 0;
-	if (HasChecksumFeature()) {
-		int32 number = B_HOST_TO_LENDIAN_INT32(index);
-		checksum = calculate_crc(0xffff, fSuperBlock.uuid,
+	int32 number = B_HOST_TO_LENDIAN_INT32(index);
+	size_t offset = offsetof(ext2_block_group, checksum);
+	size_t offsetExt4 = offsetof(ext2_block_group, block_bitmap_high);
+	if (HasMetaGroupChecksumFeature()) {
+		uint16 dummy = 0;
+		uint32 checksum = calculate_crc32c(fChecksumSeed, (uint8*)&number,
+			sizeof(number));
+		checksum = calculate_crc32c(checksum, (uint8*)group, offset);
+		checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));
+		if (fGroupDescriptorSize > offset + sizeof(dummy)) {
+			checksum = calculate_crc32c(checksum, (uint8*)group + offsetExt4,
+				fGroupDescriptorSize - offsetExt4);
+		}
+		return checksum & 0xffff;
+	} else if (HasChecksumFeature()) {
+		uint16 checksum = calculate_crc(0xffff, fSuperBlock.uuid,
 			sizeof(fSuperBlock.uuid));
 		checksum = calculate_crc(checksum, (uint8*)&number, sizeof(number));
-		checksum = calculate_crc(checksum, (uint8*)group, 30);
-		if (Has64bitFeature()) {
-			checksum = calculate_crc(checksum, (uint8*)group + 34,
-				fGroupDescriptorSize - 34);
+		checksum = calculate_crc(checksum, (uint8*)group, offset);
+		if (Has64bitFeature() && fGroupDescriptorSize > offsetExt4) {
+			checksum = calculate_crc(checksum, (uint8*)group + offsetExt4,
+				fGroupDescriptorSize - offsetExt4);
 		}
+		return checksum;
 	}
-	return checksum;
+	return 0;
 }
 
 
@@ -890,6 +935,11 @@ Volume::WriteSuperBlock(Transaction& transaction)
 	fSuperBlock.SetFreeInodes(fFreeInodes);
 	// TODO: Rest of fields that can be modified
 
+	if (HasMetaGroupChecksumFeature()) {
+		fSuperBlock.checksum = calculate_crc32c(0xffffffff, (uint8*)&fSuperBlock,
+			offsetof(struct ext2_super_block, checksum));
+	}
+
 	TRACE("Volume::WriteSuperBlock(): free blocks: %" B_PRIu64 ", free inodes:"
 		" %" B_PRIu32 "\n", fSuperBlock.FreeBlocks(Has64bitFeature()),
 		fSuperBlock.FreeInodes());
@@ -911,6 +961,31 @@ Volume::WriteSuperBlock(Transaction& transaction)
 	TRACE("Volume::WriteSuperBlock(): Done\n");
 
 	return B_OK;
+}
+
+
+void
+Volume::_SuperBlockChecksumSeed()
+{
+	if (HasChecksumSeedFeature()) {
+		fChecksumSeed = fSuperBlock.checksum_seed;
+	} else if (HasMetaGroupChecksumFeature()) {
+		fChecksumSeed = calculate_crc32c(0xffffffff, (uint8*)fSuperBlock.uuid,
+			sizeof(fSuperBlock.uuid));
+	} else
+		fChecksumSeed = 0;
+}
+
+
+bool
+Volume::_VerifySuperBlock()
+{
+	if (!HasMetaGroupChecksumFeature())
+		return true;
+
+	uint32 checksum = calculate_crc32c(0xffffffff, (uint8*)&fSuperBlock,
+		offsetof(struct ext2_super_block, checksum));
+	return checksum == fSuperBlock.checksum;
 }
 
 
@@ -945,8 +1020,10 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 		return B_BAD_VALUE;
 	}
 
-	return _UnsupportedIncompatibleFeatures(*superBlock) == 0
-		? B_OK : B_UNSUPPORTED;
+	if (_UnsupportedIncompatibleFeatures(*superBlock) != 0)
+		return B_UNSUPPORTED;
+
+	return B_OK;
 }
 
 

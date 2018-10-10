@@ -38,6 +38,7 @@ public:
 								uint32& length);
 
 			uint32			NumBits() const { return fNumBits; }
+			uint32			Checksum(uint32 unitsPerGroup) const;
 
 private:
 			bool			_Check(uint32 start, uint32 length, bool marked);
@@ -45,6 +46,7 @@ private:
 			bool			_Update(uint32 start, uint32 length, bool mark,
 								bool force);
 
+			Volume*			fVolume;
 			uint32*			fData;
 			const uint32*	fReadOnlyData;
 

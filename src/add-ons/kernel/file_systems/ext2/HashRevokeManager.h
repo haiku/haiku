@@ -51,7 +51,7 @@ typedef BOpenHashTable<RevokeHash> RevokeTable;
 
 class HashRevokeManager : public RevokeManager {
 public:
-						HashRevokeManager();
+						HashRevokeManager(bool has64bits);
 	virtual				~HashRevokeManager();
 
 			status_t	Init();

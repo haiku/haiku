@@ -51,6 +51,7 @@ HTreeRoot::IsValid() const
 HTree::HTree(Volume* volume, Inode* directory)
 	:
 	fDirectory(directory),
+	fHashVersion(HTREE_HASH_LEGACY),
 	fRootEntry(NULL)
 {
 	fBlockSize = volume->BlockSize();

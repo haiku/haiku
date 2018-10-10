@@ -15,7 +15,7 @@ struct JournalRevokeHeader;
 
 class RevokeManager {
 public:
-						RevokeManager();
+						RevokeManager(bool has64bits);
 	virtual				~RevokeManager() = 0;
 
 	virtual	status_t	Insert(uint32 block, uint32 commitID) = 0;
@@ -29,6 +29,7 @@ public:
 
 protected:
 			uint32		fRevokeCount;
+			bool		fHas64bits;
 };
 
 #endif	// REVOKEMANAGER_H

@@ -81,7 +81,7 @@ public:
 								{ return (fSuperBlock.CompatibleFeatures()
 									& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
 			bool				Has64bitFeature() const
-								{ return (fSuperBlock.CompatibleFeatures()
+								{ return (fSuperBlock.IncompatibleFeatures()
 									& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0; }
 			bool				HasExtentsFeature() const
 								{ return (fSuperBlock.IncompatibleFeatures()
@@ -93,6 +93,14 @@ public:
 			bool				HasMetaGroupFeature() const
 								{ return (fSuperBlock.IncompatibleFeatures()
 									& EXT2_INCOMPATIBLE_FEATURE_META_GROUP)
+									!= 0; }
+			bool				HasMetaGroupChecksumFeature() const
+								{ return (fSuperBlock.ReadOnlyFeatures()
+									& EXT4_READ_ONLY_FEATURE_METADATA_CSUM)
+									!= 0; }
+			bool				HasChecksumSeedFeature() const
+								{ return (fSuperBlock.IncompatibleFeatures()
+									& EXT2_INCOMPATIBLE_FEATURE_CSUM_SEED)
 									!= 0; }
 			uint8				DefaultHashVersion() const
 								{ return fSuperBlock.default_hash_version; }
@@ -125,6 +133,11 @@ public:
 			// cache access
 			void*				BlockCache() { return fBlockCache; }
 
+			uint32				ChecksumSeed() const
+									{ return fChecksumSeed; }
+			uint16				GroupDescriptorSize() const
+									{ return fGroupDescriptorSize; }
+
 			status_t			FlushDevice();
 			status_t			Sync();
 
@@ -140,10 +153,10 @@ private:
 	static	uint32				_UnsupportedReadOnlyFeatures(
 									ext2_super_block& superBlock);
 			uint32				_GroupDescriptorBlock(uint32 blockIndex);
-			uint16				_GroupDescriptorSize() 
-									{ return fGroupDescriptorSize; }
 			uint16				_GroupCheckSum(ext2_block_group *group,
 									int32 index);
+			void				_SuperBlockChecksumSeed();
+			bool				_VerifySuperBlock();
 
 private:
 			mutex				fLock;
@@ -173,6 +186,8 @@ private:
 
 			void*				fBlockCache;
 			Inode*				fRootNode;
+
+			uint32				fChecksumSeed;
 };
 
 

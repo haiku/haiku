@@ -120,7 +120,11 @@ public:
 
 			status_t	Sync();
 
+			void		SetDirEntryChecksum(uint8* block, uint32 id, uint32 gen);
+			void		SetDirEntryChecksum(uint8* block);
 
+			void		SetExtentChecksum(ext2_extent_stream* stream);
+			bool		VerifyExtentChecksum(ext2_extent_stream* stream);
 
 protected:
 	virtual	void		TransactionDone(bool success);
@@ -140,6 +144,15 @@ private:
 	
 			uint64		_NumBlocks();
 			status_t	_SetNumBlocks(uint64 numBlocks);
+
+			uint32		_InodeChecksum();
+
+			ext2_dir_entry_tail*	_DirEntryTail(uint8* block) const;
+			uint32		_DirEntryChecksum(uint8* block, uint32 id,
+							uint32 gen) const;
+
+			uint32		_ExtentLength(ext2_extent_stream* stream) const;
+			uint32		_ExtentChecksum(ext2_extent_stream* stream) const;
 
 			rw_lock		fLock;
 			::Volume*	fVolume;

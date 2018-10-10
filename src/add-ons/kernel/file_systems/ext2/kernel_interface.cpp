@@ -72,6 +72,9 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 static float
 ext2_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
+	STATIC_ASSERT(sizeof(struct ext2_super_block) == 1024);
+	STATIC_ASSERT(sizeof(struct ext2_block_group) == 64);
+
 	ext2_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
 	if (status != B_OK)
@@ -819,17 +822,7 @@ ext2_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	if (length < EXT2_SHORT_SYMLINK_LENGTH) {
 		strcpy(link->Node().symlink, path);
 		link->Node().SetSize((uint32)length);
-
-		TRACE("ext2_create_symlink(): Publishing vnode\n");
-		publish_vnode(volume->FSVolume(), id, link, &gExt2VnodeOps,
-			link->Mode(), 0);
-		put_vnode(volume->FSVolume(), id);
 	} else {
-		TRACE("ext2_create_symlink(): Publishing vnode\n");
-		publish_vnode(volume->FSVolume(), id, link, &gExt2VnodeOps,
-			link->Mode(), 0);
-		put_vnode(volume->FSVolume(), id);
-
 		if (!link->HasFileCache()) {
 			status = link->CreateFileCache();
 			if (status != B_OK)
@@ -845,16 +838,20 @@ ext2_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	if (status == B_OK)
 		status = link->WriteBack(transaction);
 
-	entry_cache_add(volume->ID(), directory->ID(), name, id);
+	TRACE("ext2_create_symlink(): Publishing vnode\n");
+	publish_vnode(volume->FSVolume(), id, link, &gExt2VnodeOps,
+		link->Mode(), 0);
+	put_vnode(volume->FSVolume(), id);
 
-	status = transaction.Done();
-	if (status != B_OK) {
-		entry_cache_remove(volume->ID(), directory->ID(), name);
-		return status;
+	if (status == B_OK) {
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+
+		status = transaction.Done();
+		if (status == B_OK)
+			notify_entry_created(volume->ID(), directory->ID(), name, id);
+		else
+			entry_cache_remove(volume->ID(), directory->ID(), name);
 	}
-
-	notify_entry_created(volume->ID(), directory->ID(), name, id);
-
 	TRACE("ext2_create_symlink(): Done\n");
 
 	return status;
@@ -902,22 +899,23 @@ ext2_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
 	if (status != B_OK)
 		return status;
 
-	Vnode vnode(volume, id);
-	Inode* inode;
-	status = vnode.Get(&inode);
-	if (status != B_OK)
-		return status;
+	{
+		Vnode vnode(volume, id);
+		Inode* inode;
+		status = vnode.Get(&inode);
+		if (status != B_OK)
+			return status;
 
-	inode->WriteLockInTransaction(transaction);
+		inode->WriteLockInTransaction(transaction);
 
-	status = inode->Unlink(transaction);
-	if (status != B_OK)
-		return status;
+		status = inode->Unlink(transaction);
+		if (status != B_OK)
+			return status;
 
-	status = directoryIterator->RemoveEntry(transaction);
-	if (status != B_OK)
-		return status;
-
+		status = directoryIterator->RemoveEntry(transaction);
+		if (status != B_OK)
+			return status;
+	}
 	entry_cache_remove(volume->ID(), directory->ID(), name);
 
 	status = transaction.Done();
@@ -969,6 +967,8 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	if (status != B_OK)
 		return status;
 
+	TRACE("ext2_rename(): found entry to rename\n");
+
 	if (oldDirectory != newDirectory) {
 		TRACE("ext2_rename(): Different parent directories\n");
 		CachedBlock cached(volume);
@@ -1005,6 +1005,8 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	if (status != B_OK)
 		return status;
 
+	TRACE("ext2_rename(): found new directory\n");
+
 	ObjectDeleter<DirectoryIterator> newIteratorDeleter(newIterator);
 
 	Vnode vnode(volume, oldID);
@@ -1028,6 +1030,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	ino_t existentID;
 	status = newIterator->FindEntry(newName, &existentID);
 	if (status == B_OK) {
+		TRACE("ext2_rename(): found existing new entry\n");
 		if (existentID == oldID) {
 			// Remove entry in oldID
 			// return inode->Unlink();
@@ -1059,8 +1062,20 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 			oldID, fileType);
 		if (status != B_OK)
 			return status;
+
 	} else
 		return status;
+
+	if (oldDirectory == newDirectory) {
+		status = oldHTree.Lookup(oldName, &oldIterator);
+		if (status != B_OK)
+			return status;
+
+		oldIteratorDeleter.SetTo(oldIterator);
+		status = oldIterator->FindEntry(oldName, &oldID);
+		if (status != B_OK)
+			return status;
+	}
 
 	// Remove entry from source folder
 	status = oldIterator->RemoveEntry(transaction);
@@ -1074,7 +1089,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 		status = inodeIterator.FindEntry("..");
 		if (status == B_ENTRY_NOT_FOUND) {
-			TRACE("Corrupt file system. Missing \"..\" in directory %"
+			ERROR("Corrupt file system. Missing \"..\" in directory %"
 				B_PRIdINO "\n", inode->ID());
 			return B_BAD_DATA;
 		} else if (status != B_OK)
@@ -1082,6 +1097,15 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 		inodeIterator.ChangeEntry(transaction, newDirectory->ID(),
 			(uint8)EXT2_TYPE_DIRECTORY);
+		// Decrement hardlink count on the source folder
+		status = oldDirectory->Unlink(transaction);
+		if (status != B_OK)
+			ERROR("Error while decrementing hardlink count on the source folder\n");
+		// Increment hardlink count on the destination folder
+		newDirectory->IncrementNumLinks(transaction);
+		status = newDirectory->WriteBack(transaction);
+		if (status != B_OK)
+			ERROR("Error while writing back the destination folder inode\n");
 	}
 
 	status = inode->WriteBack(transaction);

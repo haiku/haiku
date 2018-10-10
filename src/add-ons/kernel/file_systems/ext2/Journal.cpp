@@ -17,6 +17,7 @@
 #include <fs_cache.h>
 
 #include "CachedBlock.h"
+#include "CRCTable.h"
 #include "HashRevokeManager.h"
 
 
@@ -107,7 +108,8 @@ Journal::Journal(Volume* fsVolume, Volume* jVolume)
 	recursive_lock_init(&fLock, "ext2 journal");
 	mutex_init(&fLogEntriesLock, "ext2 journal log entries");
 
-	HashRevokeManager* revokeManager = new(std::nothrow) HashRevokeManager;
+	HashRevokeManager* revokeManager = new(std::nothrow) HashRevokeManager(
+		fsVolume->Has64bitFeature());
 	TRACE("Journal::Journal(): Allocated a hash revoke manager at %p\n",
 		revokeManager);
 
@@ -131,6 +133,7 @@ Journal::Journal()
 	fJournalBlockCache(NULL),
 	fFilesystemVolume(NULL),
 	fFilesystemBlockCache(NULL),
+	fOwner(NULL),
 	fRevokeManager(NULL),
 	fInitStatus(B_OK),
 	fBlockSize(sizeof(JournalSuperBlock)),
@@ -148,7 +151,10 @@ Journal::Journal()
 	fHasSubTransaction(false),
 	fSeparateSubTransactions(false),
 	fUnwrittenTransactions(0),
-	fTransactionID(0)
+	fTransactionID(0),
+	fChecksumEnabled(false),
+	fChecksumV3Enabled(false),
+	fFeature64bits(false)
 {
 	recursive_lock_init(&fLock, "ext2 journal");
 	mutex_init(&fLogEntriesLock, "ext2 journal log entries");
@@ -683,6 +689,9 @@ Journal::_SaveSuperBlock()
 	superblock.SetFirstCommitID(fFirstCommitID);
 	superblock.SetLogStart(fLogStart);
 
+	if (fChecksumEnabled)
+		superblock.SetChecksum(_Checksum(&superblock));
+
 	TRACE("Journal::SaveSuperBlock(): Write to %" B_PRIdOFF "\n",
 		superblockPos);
 	size_t bytesWritten = write_pos(fJournalVolume->Device(), superblockPos,
@@ -700,6 +709,9 @@ Journal::_SaveSuperBlock()
 status_t
 Journal::_LoadSuperBlock()
 {
+	STATIC_ASSERT(sizeof(struct JournalHeader) == 12);
+	STATIC_ASSERT(sizeof(struct JournalSuperBlock) == 1024);
+
 	TRACE("Journal::_LoadSuperBlock()\n");
 	fsblock_t superblockPos;
 
@@ -737,11 +749,23 @@ Journal::_LoadSuperBlock()
 	}
 
 	if (fVersion >= 2) {
+		TRACE("Journal::_LoadSuperBlock(): incompatible features %" B_PRIx32
+			", read-only features %" B_PRIx32 "\n",
+			superblock.IncompatibleFeatures(),
+			superblock.ReadOnlyCompatibleFeatures());
+
 		status = _CheckFeatures(&superblock);
 
-		if (status != B_OK) {
-			ERROR("Journal::_LoadSuperBlock(): Unsupported features\n");
+		if (status != B_OK)
 			return status;
+
+		if (fChecksumEnabled) {
+			if (superblock.Checksum() != _Checksum(&superblock)) {
+				ERROR("Journal::_LoadSuperBlock(): Invalid checksum\n");
+				return B_BAD_DATA;
+			}
+			fChecksumSeed = calculate_crc32c(0xffffffff, (uint8*)superblock.uuid,
+				sizeof(superblock.uuid));
 		}
 	}
 
@@ -775,13 +799,60 @@ Journal::_LoadSuperBlock()
 status_t
 Journal::_CheckFeatures(JournalSuperBlock* superblock)
 {
-	if ((superblock->ReadOnlyCompatibleFeatures()
-			& ~JOURNAL_KNOWN_READ_ONLY_COMPATIBLE_FEATURES) != 0
-		|| (superblock->IncompatibleFeatures()
-			& ~JOURNAL_KNOWN_INCOMPATIBLE_FEATURES) != 0)
+	uint32 readonly = superblock->ReadOnlyCompatibleFeatures();
+	uint32 incompatible = superblock->IncompatibleFeatures();
+	bool hasReadonly = (readonly & ~JOURNAL_KNOWN_READ_ONLY_COMPATIBLE_FEATURES)
+		!= 0;
+	bool hasIncompatible = (incompatible
+		& ~JOURNAL_KNOWN_INCOMPATIBLE_FEATURES) != 0;
+	if (hasReadonly || hasIncompatible ) {
+		ERROR("Journal::_CheckFeatures(): Unsupported features: %" B_PRIx32
+			" %" B_PRIx32 "\n", readonly, incompatible);
 		return B_UNSUPPORTED;
+	}
 
+	bool hasCsumV2 =
+		(superblock->IncompatibleFeatures() & JOURNAL_FEATURE_INCOMPATIBLE_CSUM_V2) != 0;
+	bool hasCsumV3 =
+		(superblock->IncompatibleFeatures() & JOURNAL_FEATURE_INCOMPATIBLE_CSUM_V3) != 0;
+	if (hasCsumV2 && hasCsumV3) {
+		return B_BAD_VALUE;
+	}
+
+	fChecksumEnabled = hasCsumV2 && hasCsumV3;
+	fChecksumV3Enabled = hasCsumV3;
+	fFeature64bits =
+		(superblock->IncompatibleFeatures() & JOURNAL_FEATURE_INCOMPATIBLE_64BIT) != 0;
 	return B_OK;
+}
+
+
+uint32
+Journal::_Checksum(JournalSuperBlock* superblock)
+{
+	uint32 oldChecksum = superblock->checksum;
+	superblock->checksum = 0;
+	uint32 checksum = calculate_crc32c(0xffffffff, (uint8*)superblock,
+		sizeof(JournalSuperBlock));
+	superblock->checksum = oldChecksum;
+	return checksum;
+}
+
+
+bool
+Journal::_Checksum(uint8* block, bool set)
+{
+	JournalBlockTail *tail = (JournalBlockTail*)(block + fBlockSize
+		- sizeof(JournalBlockTail));
+	uint32 oldChecksum = tail->checksum;
+	tail->checksum = 0;
+	uint32 checksum = calculate_crc32c(0xffffffff, block, fBlockSize);
+	if (set) {
+		tail->checksum = checksum;
+	} else {
+		tail->checksum = oldChecksum;
+	}
+	return checksum == oldChecksum;
 }
 
 
@@ -789,22 +860,25 @@ uint32
 Journal::_CountTags(JournalHeader* descriptorBlock)
 {
 	uint32 count = 0;
+	size_t tagSize = _TagSize();
+	size_t size = fBlockSize;
+
+	if (fChecksumEnabled)
+		size -= sizeof(JournalBlockTail);
 
 	JournalBlockTag* tags = (JournalBlockTag*)descriptorBlock->data;
 		// Skip the header
 	JournalBlockTag* lastTag = (JournalBlockTag*)
-		(descriptorBlock + fBlockSize - sizeof(JournalBlockTag));
+		(descriptorBlock + size - tagSize);
 
 	while (tags < lastTag && (tags->Flags() & JOURNAL_FLAG_LAST_TAG) == 0) {
-		if ((tags->Flags() & JOURNAL_FLAG_SAME_UUID) == 0) {
-			// sizeof(UUID) = 16 = 2*sizeof(JournalBlockTag)
-			tags += 2;	// Skip new UUID
-		}
+		if ((tags->Flags() & JOURNAL_FLAG_SAME_UUID) == 0)
+			tags = (JournalBlockTag*)((uint8*)tags + 16); // Skip new UUID
 
 		TRACE("Journal::_CountTags(): Tag block: %" B_PRIu32 "\n",
 			tags->BlockNumber());
 
-		tags++; // Go to next tag
+		tags = (JournalBlockTag*)((uint8*)tags + tagSize); // Go to next tag
 		count++;
 	}
 
@@ -814,6 +888,21 @@ Journal::_CountTags(JournalHeader* descriptorBlock)
 	TRACE("Journal::_CountTags(): counted tags: %" B_PRIu32 "\n", count);
 
 	return count;
+}
+
+
+size_t
+Journal::_TagSize()
+{
+	if (fChecksumV3Enabled)
+		return sizeof(JournalBlockTagV3);
+
+	size_t size = sizeof(JournalBlockTag);
+	if (fChecksumEnabled)
+		size += sizeof(uint16);
+	if (!fFeature64bits)
+		size -= sizeof(uint32);
+	return size;
 }
 
 
@@ -862,6 +951,10 @@ Journal::_RecoverPassScan(uint32& lastCommitID)
 		uint32 blockType = header->BlockType();
 
 		if (blockType == JOURNAL_DESCRIPTOR_BLOCK) {
+			if (fChecksumEnabled && !_Checksum((uint8*)header, false)) {
+				ERROR("Journal::_RecoverPassScan(): Invalid checksum\n");
+				return B_BAD_DATA;
+			}
 			uint32 tags = _CountTags(header);
 			nextBlock += tags;
 			TRACE("Journal recover pass scan: Found a descriptor block with "

@@ -42,6 +42,10 @@ private:
 									HTreeEntryIterator* parent,
 									bool hasCollision);
 
+			ext2_htree_tail*	_HTreeEntryTail(uint8* block) const;
+			uint32				_Checksum(uint8* block) const;
+			void				_SetHTreeEntryChecksum(uint8* block);
+
 private:
 			Inode*				fDirectory;
 			Volume*				fVolume;

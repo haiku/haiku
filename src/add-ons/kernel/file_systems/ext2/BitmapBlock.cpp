@@ -10,6 +10,8 @@
 
 #include "BitmapBlock.h"
 
+#include "CRCTable.h"
+
 
 //#define TRACE_EXT2
 #ifdef TRACE_EXT2
@@ -23,6 +25,7 @@
 BitmapBlock::BitmapBlock(Volume* volume, uint32 numBits)
 	:
 	CachedBlock(volume),
+	fVolume(volume),
 	fData(NULL),
 	fReadOnlyData(NULL),
 	fNumBits(numBits),
@@ -513,3 +516,13 @@ BitmapBlock::FindLargestUnmarkedRange(uint32& start, uint32& length)
 	}
 }
 
+
+uint32
+BitmapBlock::Checksum(uint32 unitsPerGroup) const
+{
+	const uint32* data = fData == NULL ? fReadOnlyData : fData;
+	if (data == NULL)
+		panic("BitmapBlock::Checksum() data is NULL\n");
+	return calculate_crc32c(fVolume->ChecksumSeed(),
+		(uint8*)data, unitsPerGroup / 8);
+}

@@ -18,9 +18,10 @@
 #endif
 
 
-RevokeManager::RevokeManager()
+RevokeManager::RevokeManager(bool has64bits)
 	:
-	fRevokeCount(0)
+	fRevokeCount(0),
+	fHas64bits(has64bits)
 {
 }
 

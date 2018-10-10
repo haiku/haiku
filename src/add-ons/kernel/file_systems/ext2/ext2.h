@@ -85,9 +85,13 @@ struct ext2_super_block {
 	uint64	mmp_block;
 	uint32	raid_stripe_width;
 	uint8	groups_per_flex_shift;
-	uint8	_reserved3;
+	uint8	checksum_type;
 	uint16	_reserved4;
-	uint32	_reserved5[162];
+	uint64	kb_written;
+	uint32	_reserved5[60];
+	uint32	checksum_seed;
+	uint32	_reserved6[98];
+	uint32	checksum;
 
 	uint16 Magic() const { return B_LENDIAN_TO_HOST_INT16(magic); }
 	uint16 State() const { return B_LENDIAN_TO_HOST_INT16(state); }
@@ -109,11 +113,20 @@ struct ext2_super_block {
 			blocks |= ((uint64)B_LENDIAN_TO_HOST_INT32(free_blocks_high) << 32);
 		return blocks;
 	}
+	uint64 ReservedBlocks(bool has64bits) const
+	{
+		uint64 blocks = B_LENDIAN_TO_HOST_INT32(reserved_blocks);
+		if (has64bits)
+			blocks |= ((uint64)B_LENDIAN_TO_HOST_INT32(reserved_blocks_high) << 32);
+		return blocks;
+	}
 	uint16 InodeSize() const { return B_LENDIAN_TO_HOST_INT16(inode_size); }
 	uint32 FirstDataBlock() const
 		{ return B_LENDIAN_TO_HOST_INT32(first_data_block); }
 	uint32 BlocksPerGroup() const
 		{ return B_LENDIAN_TO_HOST_INT32(blocks_per_group); }
+	uint32 FragmentsPerGroup() const
+		{ return B_LENDIAN_TO_HOST_INT32(fragments_per_group); }
 	uint32 InodesPerGroup() const
 		{ return B_LENDIAN_TO_HOST_INT32(inodes_per_group); }
 	uint32 FirstMetaBlockGroup() const
@@ -152,6 +165,7 @@ struct ext2_super_block {
 		// implemented in Volume.cpp
 } _PACKED;
 
+
 #define EXT2_OLD_REVISION		0
 #define EXT2_DYNAMIC_REVISION	1
 
@@ -168,6 +182,7 @@ struct ext2_super_block {
 #define EXT2_FEATURE_EXT_ATTR					0x0008
 #define EXT2_FEATURE_RESIZE_INODE				0x0010
 #define EXT2_FEATURE_DIRECTORY_INDEX			0x0020
+#define EXT2_FEATURE_SPARSESUPER2				0x0200
 
 // read-only compatible features
 #define EXT2_READ_ONLY_FEATURE_SPARSE_SUPER		0x0001
@@ -177,6 +192,11 @@ struct ext2_super_block {
 #define EXT2_READ_ONLY_FEATURE_GDT_CSUM			0x0010
 #define EXT2_READ_ONLY_FEATURE_DIR_NLINK		0x0020
 #define EXT2_READ_ONLY_FEATURE_EXTRA_ISIZE		0x0040
+#define EXT2_READ_ONLY_FEATURE_QUOTA			0x0100
+#define EXT2_READ_ONLY_FEATURE_BIGALLOC			0x0200
+#define EXT4_READ_ONLY_FEATURE_METADATA_CSUM	0x0400
+#define EXT4_READ_ONLY_FEATURE_READONLY			0x1000
+#define EXT4_READ_ONLY_FEATURE_PROJECT			0x2000
 
 // incompatible features
 #define EXT2_INCOMPATIBLE_FEATURE_COMPRESSION	0x0001
@@ -188,13 +208,18 @@ struct ext2_super_block {
 #define EXT2_INCOMPATIBLE_FEATURE_64BIT			0x0080
 #define EXT2_INCOMPATIBLE_FEATURE_MMP			0x0100
 #define EXT2_INCOMPATIBLE_FEATURE_FLEX_GROUP	0x0200
+#define EXT2_INCOMPATIBLE_FEATURE_EA_INODE		0x0400
+#define EXT2_INCOMPATIBLE_FEATURE_DIR_DATA		0x1000
+#define EXT2_INCOMPATIBLE_FEATURE_CSUM_SEED		0x2000
+#define EXT2_INCOMPATIBLE_FEATURE_LARGEDIR		0x4000
+#define EXT2_INCOMPATIBLE_FEATURE_INLINE_DATA	0x8000
+#define EXT2_INCOMPATIBLE_FEATURE_ENCRYPT		0x10000
 
 // states
 #define EXT2_STATE_VALID						0x01
 #define	EXT2_STATE_INVALID						0x02
 
 #define EXT2_BLOCK_GROUP_NORMAL_SIZE			32
-#define EXT2_BLOCK_GROUP_64BIT_SIZE				64
 
 // block group flags
 #define EXT2_BLOCK_GROUP_INODE_UNINIT	0x1
@@ -209,7 +234,9 @@ struct ext2_block_group {
 	uint16	free_inodes;
 	uint16	used_directories;
 	uint16	flags;
-	uint32	_reserved[2];
+	uint32	exclude_bitmap;
+	uint16	block_bitmap_csum;
+	uint16	inode_bitmap_csum;
 	uint16	unused_inodes;
 	uint16	checksum;
 
@@ -221,7 +248,10 @@ struct ext2_block_group {
 	uint16	free_inodes_high;
 	uint16	used_directories_high;
 	uint16	unused_inodes_high;
-	uint32	_reserved2[3];
+	uint32	exclude_bitmap_high;
+	uint16	block_bitmap_csum_high;
+	uint16	inode_bitmap_csum_high;
+	uint32	_reserved;
 
 	fsblock_t BlockBitmap(bool has64bits) const
 	{
@@ -354,6 +384,10 @@ struct ext2_extent_header {
 		{ generation = B_HOST_TO_LENDIAN_INT32(_generation); }
 } _PACKED;
 
+struct ext2_extent_tail {
+	uint32 checksum;
+} _PACKED;
+
 struct ext2_extent_index {
 	uint32 logical_block;
 	uint32 physical_block;
@@ -434,14 +468,15 @@ struct ext2_inode {
 		};
 		uint16 num_blocks_high;
 	};
-	uint16	_padding;
+	uint16	file_access_control_high;
 	uint16	uid_high;
 	uint16	gid_high;
-	uint32	_reserved2;
+	uint16	checksum;
+	uint16	reserved;
 
 	// extra attributes
 	uint16	extra_inode_size;
-	uint16	_padding2;
+	uint16	checksum_high;
 	uint32	change_time_extra;
 	uint32	modification_time_extra;
 	uint32	access_time_extra;
@@ -668,6 +703,11 @@ struct ext2_inode {
 
 #define EXT2_NAME_LENGTH	255
 
+#define EXT2_DIR_PAD		4
+#define EXT2_DIR_ROUND		(EXT2_DIR_PAD - 1)
+#define EXT2_DIR_REC_LEN(namelen)	(((namelen) + 8 + EXT2_DIR_ROUND) \
+										& ~EXT2_DIR_ROUND)
+
 struct ext2_dir_entry {
 	uint32	inode_id;
 	uint16	length;
@@ -709,6 +749,19 @@ struct ext2_dir_entry {
 	}
 } _PACKED;
 
+struct ext2_dir_entry_tail {
+	uint32	zero1;
+	uint16	twelve;
+	uint8	zero2;
+	uint8	hexade;
+	uint32	checksum;
+} _PACKED;
+
+struct ext2_htree_tail {
+	uint32	reserved;
+	uint32	checksum;
+} _PACKED;
+
 // file types
 #define EXT2_TYPE_UNKNOWN		0
 #define EXT2_TYPE_FILE			1
@@ -730,7 +783,8 @@ struct ext2_xattr_header {
 	uint32	refcount;
 	uint32	blocks;		// must be 1 for ext2
 	uint32	hash;
-	uint32	reserved[4];	// zero
+	uint32	checksum;
+	uint32	reserved[3];	// zero
 
 	bool IsValid() const
 	{

@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "CachedBlock.h"
+#include "Inode.h"
 #include "Volume.h"
 
 
@@ -27,10 +28,11 @@
 #define ERROR(x...)	dprintf("\33[34mext2:\33[0m ExtentStream::" x)
 
 
-ExtentStream::ExtentStream(Volume* volume, ext2_extent_stream* stream,
-	off_t size)
+ExtentStream::ExtentStream(Volume* volume, Inode* inode,
+	ext2_extent_stream* stream, off_t size)
 	:
 	fVolume(volume),
+	fInode(inode),
 	fStream(stream),
 	fFirstBlock(volume->FirstDataBlock()),
 	fAllocatedPos(fFirstBlock),
@@ -75,6 +77,10 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			stream->extent_index[i - 1].PhysicalBlock());
 		if (!stream->extent_header.IsValid())
 			panic("ExtentStream::FindBlock() invalid header\n");
+		if (!fInode->VerifyExtentChecksum(stream)) {
+			panic("ExtentStream::FindBlock() invalid checksum\n");
+			return B_BAD_DATA;
+		}
 	}
 
 	// find the extend following the one that should contain the logical block
@@ -556,3 +562,4 @@ ExtentStream::_CheckBlock(ext2_extent_stream *stream, fsblock_t block)
 	}
 	return B_OK;
 }
+

@@ -47,7 +47,7 @@ InodeJournal::InodeJournal(Inode* inode)
 		TRACE("InodeJournal::InodeJournal(): Inode's file cache disabled "
 			"successfully\n");
 		HashRevokeManager* revokeManager = new(std::nothrow)
-			HashRevokeManager;
+			HashRevokeManager(volume->Has64bitFeature());
 		TRACE("InodeJournal::InodeJournal(): Allocated a hash revoke "
 			"manager at %p\n", revokeManager);
 

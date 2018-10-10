@@ -13,14 +13,15 @@
 #include "Transaction.h"
 
 
+class Inode;
 class Volume;
 
 
 class ExtentStream
 {
 public:
-					ExtentStream(Volume* volume, ext2_extent_stream* stream,
-						off_t size);
+					ExtentStream(Volume* volume, Inode* inode,
+						ext2_extent_stream* stream, off_t size);
 					~ExtentStream();
 
 	status_t		FindBlock(off_t offset, fsblock_t& block,
@@ -36,6 +37,7 @@ private:
 	status_t		_CheckBlock(ext2_extent_stream *stream, fsblock_t block);
 
 	Volume*			fVolume;
+	Inode*			fInode;
 	ext2_extent_stream* fStream;
 	fsblock_t		fFirstBlock;
 

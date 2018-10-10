@@ -166,7 +166,7 @@ DataStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 		ASSERT(block != 0);
 	} else {
 		// Outside of the possible data stream
-		dprintf("ext2: block outside datastream!\n");
+		ERROR("ext2: block outside datastream!\n");
 		return B_ERROR;
 	}
 
@@ -384,6 +384,8 @@ DataStream::_GetBlock(Transaction& transaction, uint32& blockNum)
 			ERROR("DataStream::_GetBlock(): AllocateBlocks() failed()\n");
 			return status;
 		}
+		if (fAllocatedPos > UINT_MAX)
+			return B_FILE_TOO_LARGE;
 
 		fWaiting -= fAllocated;
 

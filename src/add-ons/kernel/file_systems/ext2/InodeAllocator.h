@@ -37,13 +37,15 @@ private:
 							ino_t& id, uint32 numInodes);
 			status_t	_MarkInBitmap(Transaction& transaction,
 							fsblock_t bitmapBlock, uint32 blockGroup,
-							uint32 numInodes, uint32& pos);
+							uint32 numInodes, uint32& pos, uint32& checksum);
 			status_t	_UnmarkInBitmap(Transaction& transaction,
-							fsblock_t bitmapBlock, uint32 numInodes, ino_t id);
+							fsblock_t bitmapBlock, uint32 numInodes, ino_t id,
+							uint32& checksum);
 			status_t	_InitGroup(Transaction& transaction,
 							ext2_block_group* group, fsblock_t bitmapBlock,
 							uint32 numInodes);
-
+			void		_SetInodeBitmapChecksum(ext2_block_group* group,
+							uint32 checksum);
 
 			Volume*		fVolume;
 			mutex		fLock;

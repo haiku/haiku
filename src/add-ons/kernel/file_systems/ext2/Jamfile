@@ -26,4 +26,6 @@ KernelAddon ext2 :
 	CRCTable.cpp
 
 	kernel_interface.cpp
+
+	crc32.c
 ;
