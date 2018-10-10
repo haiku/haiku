@@ -1789,9 +1789,9 @@ XHCI::GetPortStatus(uint8 index, usb_port_status* status)
 
 	if (fPortSpeeds[index] == USB_SPEED_SUPER) {
 		if (portStatus & PS_PLC)
-			status->change |= PORT_LINK_STATE;
+			status->change |= PORT_CHANGE_LINK_STATE;
 		if (portStatus & PS_WRC)
-			status->change |= PORT_BH_PORT_RESET;
+			status->change |= PORT_CHANGE_BH_PORT_RESET;
 	}
 
 	return B_OK;
@@ -1873,6 +1873,12 @@ XHCI::ClearPortFeature(uint8 index, uint16 feature)
 		break;
 	case C_PORT_RESET:
 		WriteOpReg(portRegister, portStatus | PS_PRC);
+		break;
+	case C_PORT_BH_PORT_RESET:
+		WriteOpReg(portRegister, portStatus | PS_WRC);
+		break;
+	case C_PORT_LINK_STATE:
+		WriteOpReg(portRegister, portStatus | PS_PLC);
 		break;
 	default:
 		return B_BAD_VALUE;

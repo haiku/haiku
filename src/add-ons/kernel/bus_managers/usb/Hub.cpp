@@ -335,6 +335,21 @@ Hub::Explore(change_item **changeList)
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_RESET, i + 1,
 				0, NULL, 0, NULL);
 		}
+
+		if (fPortStatus[i].change & PORT_CHANGE_LINK_STATE) {
+			TRACE_ALWAYS("port %" B_PRId32 " link state changed\n", i);
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_LINK_STATE, i + 1,
+				0, NULL, 0, NULL);
+		}
+
+		if (fPortStatus[i].change & PORT_CHANGE_BH_PORT_RESET) {
+			TRACE_ALWAYS("port %" B_PRId32 " was warm reset\n", i);
+			DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
+				USB_REQUEST_CLEAR_FEATURE, C_PORT_BH_PORT_RESET, i + 1,
+				0, NULL, 0, NULL);
+		}
+
 	}
 
 	// explore down the tree if we have hubs connected
