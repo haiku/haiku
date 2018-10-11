@@ -349,19 +349,19 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 			.Add(fNewTabBehaviorMenu->CreateLabelLayoutItem(), 0, 4)
 			.Add(fNewTabBehaviorMenu->CreateMenuBarLayoutItem(), 1, 4)
 		)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing))
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing))
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 		.Add(fShowTabsIfOnlyOnePage)
 		.Add(fAutoHideInterfaceInFullscreenMode)
 		.Add(fAutoHidePointer)
 		.Add(fShowHomeButton)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing))
-		.Add(fDaysInHistory)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 
+		.Add(fDaysInHistory)
+		.AddGlue()
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
-
 		.TopView()
 	;
 	view->SetName(B_TRANSLATE("General"));
@@ -385,45 +385,39 @@ SettingsWindow::_CreateFontsPage(float spacing)
 	fStandardSizesMenu =  new BMenuField("standard font size",
 		B_TRANSLATE("Default standard font size:"), new BPopUpMenu("sizes"),
 		B_WILL_DRAW);
+	fStandardSizesMenu->SetAlignment(B_ALIGN_RIGHT);
+
 	_BuildSizesMenu(fStandardSizesMenu->Menu(),
 		MSG_STANDARD_FONT_SIZE_SELECTED);
 
 	fFixedSizesMenu =  new BMenuField("fixed font size",
 		B_TRANSLATE("Default fixed font size:"), new BPopUpMenu("sizes"),
 		B_WILL_DRAW);
+	fFixedSizesMenu->SetAlignment(B_ALIGN_RIGHT);
+
 	_BuildSizesMenu(fFixedSizesMenu->Menu(), MSG_FIXED_FONT_SIZE_SELECTED);
 
 	BView* view = BGridLayoutBuilder(spacing / 2, spacing / 2)
 		.Add(fStandardFontView->CreateFontsLabelLayoutItem(), 0, 0)
 		.Add(fStandardFontView->CreateFontsMenuBarLayoutItem(), 1, 0)
-		.Add(fStandardFontView->PreviewBox(), 0, 1, 2)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing), 0, 2, 2)
-
-		.Add(fSerifFontView->CreateFontsLabelLayoutItem(), 0, 3)
-		.Add(fSerifFontView->CreateFontsMenuBarLayoutItem(), 1, 3)
-		.Add(fSerifFontView->PreviewBox(), 0, 4, 2)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing), 0, 5, 2)
-
-		.Add(fSansSerifFontView->CreateFontsLabelLayoutItem(), 0, 6)
-		.Add(fSansSerifFontView->CreateFontsMenuBarLayoutItem(), 1, 6)
-		.Add(fSansSerifFontView->PreviewBox(), 0, 7, 2)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing), 0, 8, 2)
-
-		.Add(fFixedFontView->CreateFontsLabelLayoutItem(), 0, 9)
-		.Add(fFixedFontView->CreateFontsMenuBarLayoutItem(), 1, 9)
-		.Add(fFixedFontView->PreviewBox(), 0, 10, 2)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing), 0, 11, 2)
-
-		.Add(fStandardSizesMenu->CreateLabelLayoutItem(), 0, 12)
-		.Add(fStandardSizesMenu->CreateMenuBarLayoutItem(), 1, 12)
-		.Add(fFixedSizesMenu->CreateLabelLayoutItem(), 0, 13)
-		.Add(fFixedSizesMenu->CreateMenuBarLayoutItem(), 1, 13)
-
+		.Add(fStandardSizesMenu->CreateLabelLayoutItem(), 2, 0)
+		.Add(fStandardSizesMenu->CreateMenuBarLayoutItem(), 3, 0)
+		.Add(fStandardFontView->PreviewBox(), 1, 1, 3)
+		.Add(fSerifFontView->CreateFontsLabelLayoutItem(), 0, 2)
+		.Add(fSerifFontView->CreateFontsMenuBarLayoutItem(), 1, 2)
+		.Add(fSerifFontView->PreviewBox(), 1, 3, 3)
+		.Add(fSansSerifFontView->CreateFontsLabelLayoutItem(), 0, 4)
+		.Add(fSansSerifFontView->CreateFontsMenuBarLayoutItem(), 1, 4)
+		.Add(fSansSerifFontView->PreviewBox(), 1, 5, 3)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing / 2), 0, 6, 2)
+		.Add(fFixedFontView->CreateFontsLabelLayoutItem(), 0, 7)
+		.Add(fFixedFontView->CreateFontsMenuBarLayoutItem(), 1, 7)
+		.Add(fFixedSizesMenu->CreateLabelLayoutItem(), 2, 7)
+		.Add(fFixedSizesMenu->CreateMenuBarLayoutItem(), 3, 7)
+		.Add(fFixedFontView->PreviewBox(), 1, 8, 3)
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
-
-		.View()
-	;
+		.View();
 
 	view->SetName(B_TRANSLATE("Fonts"));
 	return view;

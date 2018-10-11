@@ -80,6 +80,7 @@ protected:
 			BPopUpMenu*			fStylesMenu;
 			BPopUpMenu*			fSizesMenu;
 			BStringView*		fPreviewText;
+			BBox*				fPreviewBox;
 
 			BFont				fSavedFont;
 			BFont				fCurrentFont;

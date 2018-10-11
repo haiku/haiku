@@ -60,7 +60,7 @@ FontSelectionView::FontSelectionView(const char* name, const char* label,
 
 	// font menu
 	fFontsMenuField = new BMenuField("fonts", label, fFontsMenu, B_WILL_DRAW);
-	fFontsMenuField->SetFont(be_bold_font);
+	fFontsMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// styles menu, if desired
 	if (separateStyles) {
@@ -86,7 +86,14 @@ FontSelectionView::FontSelectionView(const char* name, const char* label,
 	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNLIMITED));
 	fPreviewText->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, 1.65);
-	fPreviewText->SetAlignment(B_ALIGN_RIGHT);
+
+	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
+	fPreviewBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.Add(fPreviewText)
+		.SetInsets(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING,
+			B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
+		.TopView()
+	);
 	_UpdateFontPreview();
 }
 
@@ -399,7 +406,7 @@ FontSelectionView::CreateStylesMenuBarLayoutItem()
 BView*
 FontSelectionView::PreviewBox() const
 {
-	return fPreviewText;
+	return fPreviewBox;
 }
 
 
