@@ -377,8 +377,6 @@ public:
 			if (status != B_OK)
 				return status;
 
-			std::vector<uint32> uidsToFetch;
-
 			// Determine how much we need to download
 			// TODO: also retrieve the header size, and only take the body
 			// size into account if it's below the limit -- that does not
