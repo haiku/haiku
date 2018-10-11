@@ -865,6 +865,7 @@ void
 IMAPConnectionWorker::_Disconnect()
 {
 	fProtocol.Disconnect();
+	fSelectedBox = NULL;
 }
 
 
