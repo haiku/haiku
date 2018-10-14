@@ -383,7 +383,10 @@ check_entry_name(const char *entry)
 status_t
 check_path_name(const char *path)
 {
+	// check the path is not NULL
 	status_t error = (path ? B_OK : B_BAD_VALUE);
+	if (error == B_BAD_VALUE)
+		return error;
 	// check the path components
 	const char *remainder = path;
 	int32 length, nextComponent;
