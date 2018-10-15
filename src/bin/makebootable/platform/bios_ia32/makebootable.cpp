@@ -614,7 +614,7 @@ main(int argc, const char *const *argv)
 				}
 			}
 
-		#endif	// __BEOS__
+		#endif	// HAIKU_TARGET_PLATFORM_HAIKU
 
 		// adjust the partition offset in the boot code data
 		// hard coded sector size: 512 bytes
