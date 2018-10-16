@@ -25,6 +25,7 @@
 #include "fssh_errno.h"
 #include "fssh_errors.h"
 #include "fssh_fs_info.h"
+#include "fssh_fcntl.h"
 #include "fssh_module.h"
 #include "fssh_node_monitor.h"
 #include "fssh_stat.h"
@@ -688,6 +689,54 @@ command_chmod(int argc, const char* const* argv)
 
 
 static fssh_status_t
+command_cat(int argc, const char* const* argv)
+{
+	size_t numBytes = 10;
+	int fileStart = 1;
+	if (argc < 2 || strcmp(argv[1], "--help") == 0) {
+		printf("Usage: %s [ -n ] [FILE]...\n"
+			"\t -n\tNumber of bytes to read\n",
+			argv[0]);
+		return FSSH_B_OK;
+	}
+
+	if (argc > 3 && strcmp(argv[1], "-n") == 0) {
+		fileStart += 2;
+		numBytes = strtol(argv[2], NULL, 10);
+	}
+
+	const char* const* files = argv + fileStart;
+	for (; *files; files++) {
+		const char* file = *files;
+		int fd = _kern_open(-1, file, FSSH_O_RDONLY, FSSH_O_RDONLY);
+		if (fd < 0) {
+			fprintf(stderr, "error: %s\n", fssh_strerror(fd));
+			return FSSH_B_BAD_VALUE;
+		}
+
+		char buffer[numBytes + 1];
+		if (buffer == NULL) {
+			fprintf(stderr, "error: No memory\n");
+			_kern_close(fd);
+			return FSSH_B_NO_MEMORY;
+		}
+
+		if (_kern_read(fd, 0, buffer, numBytes) != (ssize_t)numBytes) {
+			fprintf(stderr, "error reading: %s\n", fssh_strerror(fd));
+			_kern_close(fd);
+			return FSSH_B_BAD_VALUE;
+		}
+
+		_kern_close(fd);
+		buffer[numBytes] = '\0';
+		printf("%s\n", buffer);
+	}
+
+	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
 command_help(int argc, const char* const* argv)
 {
 	printf("supported commands:\n");
@@ -1214,6 +1263,7 @@ register_commands()
 		command_cd,			"cd",			"change current directory",
 		command_chmod,		"chmod",		"change file permissions",
 		command_cp,			"cp",			"copy files and directories",
+		command_cat,		"cat",	"concatenate file(s) to stdout",
 		command_help,		"help",			"list supported commands",
 		command_info,		"info",			"prints volume informations",
 		command_ioctl,		"ioctl",		"ioctl() on root, for FS debugging only",

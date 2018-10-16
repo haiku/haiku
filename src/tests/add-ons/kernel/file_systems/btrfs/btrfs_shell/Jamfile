@@ -56,8 +56,7 @@ BuildPlatformMergeObject <build>btrfs.o : $(btrfsSources) $(utilitySources) ;
 
 BuildPlatformMain <build>btrfs_shell
 	:
-	additional_commands.cpp
-	command_cat.cpp
+	# no extra files
 	:
 	<build>btrfs.o
 	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
