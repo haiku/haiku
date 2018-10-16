@@ -678,8 +678,9 @@ UserLoginWindow::_CreateAccountThread()
 				} else if (message == "validationerror") {
 					_CollectValidationFailures(result, error);
 				} else {
-					error << B_TRANSLATE(" It responded with: ");
-					error << message;
+					BString response = B_TRANSLATE("It responded with: %message%");
+					response.ReplaceFirst("%message%", message);
+					error << " " << response;
 				}
 			}
 		}

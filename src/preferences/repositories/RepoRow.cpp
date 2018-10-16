@@ -9,9 +9,14 @@
 
 #include "RepoRow.h"
 
+#include <Catalog.h>
 #include <ColumnTypes.h>
 
 #include "constants.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RepoRow"
 
 
 RepoRow::RepoRow(const char* repo_name, const char* repo_url, bool enabled)
@@ -53,7 +58,8 @@ RepoRow::RefreshEnabledField()
 {
 	BStringField* field = (BStringField*)GetField(kEnabledColumn);
 	if (fTaskState == STATE_NOT_IN_QUEUE)
-		field->SetString(fEnabled ? B_TRANSLATE("Enabled") : "");
+		field->SetString(fEnabled ? B_TRANSLATE_COMMENT("Enabled",
+			"Tag in the Status column") : "");
 	else
 		field->SetString(B_UTF8_ELLIPSIS);
 	Invalidate();

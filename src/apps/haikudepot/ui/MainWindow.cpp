@@ -1250,7 +1250,7 @@ MainWindow::_StartRefreshWorker(bool force)
 	if (parameters == NULL)
 		return;
 
-	fWorkStatusView->SetBusy(B_TRANSLATE("Refreshing..."));
+	fWorkStatusView->SetBusy(B_TRANSLATE("Refreshing" B_UTF8_ELLIPSIS));
 
 	ObjectDeleter<RefreshWorkerParameters> deleter(parameters);
 	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
@@ -1304,7 +1304,7 @@ MainWindow::_PackageActionWorker(void* arg)
 		BMessenger messenger(window);
 		BMessage busyMessage(MSG_PACKAGE_WORKER_BUSY);
 		BString text(ref->Label());
-		text << "...";
+		text << B_UTF8_ELLIPSIS;
 		busyMessage.AddString("reason", text);
 
 		messenger.SendMessage(&busyMessage);

@@ -256,7 +256,7 @@ MidiSettingsView::_UpdateSoundFontStatus()
 {
 	if (fListView->IsEmpty()) {
 		fSoundFontStatus->SetText(
-			B_TRANSLATE("There are no SoundFont installed."));
+			B_TRANSLATE("There are no SoundFonts installed."));
 		return;
 	}
 	int32 selection = fListView->CurrentSelection();

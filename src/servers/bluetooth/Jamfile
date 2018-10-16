@@ -15,6 +15,12 @@ Server bluetooth_server
 	HCITransportAccessor.cpp
 	LocalDeviceHandler.cpp
 	LocalDeviceImpl.cpp
-	: be network libbluetooth.so
+	: be network libbluetooth.so localestub
 	[ TargetLibstdc++ ]
+;
+
+DoCatalogs bluetooth_server :
+	x-vnd.Haiku-bluetooth_server
+	:
+	DeskbarReplicant.cpp
 ;

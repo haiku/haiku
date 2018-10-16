@@ -11,6 +11,7 @@
 #include <LayoutBuilder.h>
 #include <SeparatorView.h>
 #include <StatusBar.h>
+#include <StringFormat.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -144,12 +145,11 @@ void
 WorkStatusView::_SetTextPendingDownloads()
 {
 	BString text;
-	const size_t pendingCount = fPendingPackages.size();
-	text << pendingCount;
-	if (pendingCount > 1)
-		text << B_TRANSLATE(" packages to download");
-	else
-		text << B_TRANSLATE(" package to download");
+	static BStringFormat format(B_TRANSLATE("{0, plural,"
+		"one{1 package to download}"
+		"other{# packages to download}}"));
+		format.Format(text, fPendingPackages.size());
+
 	SetText(text);
 }
 
@@ -157,12 +157,15 @@ WorkStatusView::_SetTextPendingDownloads()
 void
 WorkStatusView::_SetTextDownloading(const BString& title)
 {
-	BString text(B_TRANSLATE("Downloading package "));
-	text << title;
+	BString text(B_TRANSLATE("Downloading package '%name%'"));
+	text.ReplaceFirst("%name%", title);
+
 	if (!fPendingPackages.empty()) {
-		text << " (";
-		text << fPendingPackages.size();
-		text << B_TRANSLATE(" more to download)");
+		BString count;
+		cout << fPendingPackages.size();
+		BString more(B_TRANSLATE("(%count% more to download)"));
+		more.ReplaceFirst("%count%", count);
+		text += more;
 	}
 	SetText(text);
 }

@@ -48,11 +48,13 @@ SettingsView::SettingsView()
 	fOutputMenu(NULL)
 {
 	// input menu
-	fInputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
+	fInputMenu = new BPopUpMenu(B_TRANSLATE_ALL("<none>",
+		"VideoInputMenu", "Used when no video input is available"));
 	fInputMenu->SetLabelFromMarked(true);
 
-	// input menu
-	fOutputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
+	// output menu
+	fOutputMenu = new BPopUpMenu(B_TRANSLATE_ALL("<none>",
+		"VideoOutputMenu", "Used when no video output is available"));
 	fOutputMenu->SetLabelFromMarked(true);
 }
 

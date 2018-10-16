@@ -78,14 +78,14 @@ static const float kMinimumHeightScientific	= 200.0f;
 static const float kMaximumHeightScientific	= 400.0f;
 
 // basic mode keypad layout (default)
-const char *kKeypadDescriptionBasic =
+const char *kKeypadDescriptionBasic = B_TRANSLATE_MARK(
 	"7   8   9   (   )  \n"
 	"4   5   6   *   /  \n"
 	"1   2   3   +   -  \n"
-	"0   .   BS  =   C  \n";
+	"0   .   BS  =   C  \n");
 
 // scientific mode keypad layout
-const char *kKeypadDescriptionScientific =
+const char *kKeypadDescriptionScientific = B_TRANSLATE_MARK(
     "ln    sin   cos   tan   π    \n"
     "log   asin  acos  atan  sqrt \n"
     "exp   sinh  cosh  tanh  cbrt \n"
@@ -93,7 +93,7 @@ const char *kKeypadDescriptionScientific =
     "7     8     9     (     )    \n"
     "4     5     6     *     /    \n"
     "1     2     3     +     -    \n"
-    "0     .     BS    =     C    \n";
+    "0     .     BS    =     C    \n");
 
 
 enum {
@@ -1214,28 +1214,30 @@ CalcView::_PressKey(int key)
 	assert(key < (fRows * fColumns));
 	assert(key >= 0);
 
-	if (strcmp(fKeypad[key].label, "BS") == 0) {
+	if (strcmp(fKeypad[key].label, B_TRANSLATE_COMMENT("BS",
+		"Key label, 'BS' means backspace")) == 0) {
 		// BS means backspace
 		fExpressionTextView->BackSpace();
-	} else if (strcmp(fKeypad[key].label, "C") == 0) {
+	} else if (strcmp(fKeypad[key].label, B_TRANSLATE_COMMENT("C",
+		"Key label, 'C' means clear")) == 0) {
 		// C means clear
 		fExpressionTextView->Clear();
-	} else if (strcmp(fKeypad[key].label, "acos") == 0
-		|| strcmp(fKeypad[key].label, "asin") == 0
-		|| strcmp(fKeypad[key].label, "atan") == 0
-		|| strcmp(fKeypad[key].label, "cbrt") == 0
-		|| strcmp(fKeypad[key].label, "ceil") == 0
-		|| strcmp(fKeypad[key].label, "cos") == 0
-		|| strcmp(fKeypad[key].label, "cosh") == 0
-		|| strcmp(fKeypad[key].label, "exp") == 0
-		|| strcmp(fKeypad[key].label, "floor") == 0
-		|| strcmp(fKeypad[key].label, "log") == 0
-		|| strcmp(fKeypad[key].label, "ln") == 0
-		|| strcmp(fKeypad[key].label, "sin") == 0
-		|| strcmp(fKeypad[key].label, "sinh") == 0
-		|| strcmp(fKeypad[key].label, "sqrt") == 0
-		|| strcmp(fKeypad[key].label, "tan") == 0
-		|| strcmp(fKeypad[key].label, "tanh") == 0) {
+	} else if (strcmp(fKeypad[key].label, B_TRANSLATE("acos")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("asin")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("atan")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("cbrt")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("ceil")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("cos")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("cosh")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("exp")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("floor")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("log")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("ln")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("sin")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("sinh")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("sqrt")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("tan")) == 0
+		|| strcmp(fKeypad[key].label, B_TRANSLATE("tanh")) == 0) {
 		int32 labelLen = strlen(fKeypad[key].label);
 		int32 startSelection = 0;
 		int32 endSelection = 0;

@@ -934,26 +934,41 @@ const char*
 KeyboardLayoutView::_SpecialKeyLabel(const key_map& map, uint32 code,
 	bool abbreviated)
 {
-	if (code == map.caps_key)
-		return abbreviated ? "CAPS" : "CAPS LOCK";
+	if (code == map.caps_key) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("CAPS", "Very short for 'caps lock'")
+			: B_TRANSLATE("CAPS LOCK");
+	}
 	if (code == map.scroll_key)
-		return "SCROLL";
-	if (code == map.num_key)
-		return abbreviated ? "NUM" : "NUM LOCK";
+		return B_TRANSLATE("SCROLL");
+	if (code == map.num_key) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("NUM", "Very short for 'num lock'")
+			: B_TRANSLATE("NUM LOCK");
+	}
 	if (code == map.left_shift_key || code == map.right_shift_key)
-		return "SHIFT";
-	if (code == map.left_command_key || code == map.right_command_key)
-		return abbreviated ? "CMD" : "COMMAND";
-	if (code == map.left_control_key || code == map.right_control_key)
-		return abbreviated ? "CTRL" : "CONTROL";
-	if (code == map.left_option_key || code == map.right_option_key)
-		return abbreviated ? "OPT" : "OPTION";
+		return B_TRANSLATE("SHIFT");
+	if (code == map.left_command_key || code == map.right_command_key) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("CMD", "Very short for 'command'")
+			: B_TRANSLATE("COMMAND");
+	}
+	if (code == map.left_control_key || code == map.right_control_key) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("CTRL", "Very short for 'control'")
+			: B_TRANSLATE("CONTROL");
+	}
+	if (code == map.left_option_key || code == map.right_option_key) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("OPT", "Very short for 'option'")
+			: B_TRANSLATE("OPTION");
+	}
 	if (code == map.menu_key)
-		return "MENU";
+		return B_TRANSLATE("MENU");
 	if (code == B_PRINT_KEY)
-		return "PRINT";
+		return B_TRANSLATE("PRINT");
 	if (code == B_PAUSE_KEY)
-		return "PAUSE";
+		return B_TRANSLATE("PAUSE");
 
 	return NULL;
 }
@@ -991,22 +1006,28 @@ KeyboardLayoutView::_SpecialMappedKeyLabel(const char* bytes, size_t numBytes,
 {
 	if (numBytes != 1)
 		return NULL;
-
 	if (bytes[0] == B_ESCAPE)
-		return "ESC";
-
+		return B_TRANSLATE("ESC");
 	if (bytes[0] == B_INSERT)
-		return "INS";
+		return B_TRANSLATE("INS");
 	if (bytes[0] == B_DELETE)
-		return "DEL";
+		return B_TRANSLATE("DEL");
 	if (bytes[0] == B_HOME)
-		return "HOME";
+		return B_TRANSLATE("HOME");
 	if (bytes[0] == B_END)
-		return "END";
-	if (bytes[0] == B_PAGE_UP)
-		return abbreviated ? "PG \xe2\x86\x91" : "PAGE \xe2\x86\x91";
-	if (bytes[0] == B_PAGE_DOWN)
-		return abbreviated ? "PG \xe2\x86\x93" : "PAGE \xe2\x86\x93";
+		return B_TRANSLATE("END");
+	if (bytes[0] == B_PAGE_UP) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("PG \xe2\x86\x91",
+				"Very short for 'page up'")
+			: B_TRANSLATE("PAGE \xe2\x86\x91");
+	}
+	if (bytes[0] == B_PAGE_DOWN) {
+		return abbreviated
+			? B_TRANSLATE_COMMENT("PG \xe2\x86\x93",
+				"Very short for 'page down'")
+			: B_TRANSLATE("PAGE \xe2\x86\x93");
+	}
 
 	return NULL;
 }

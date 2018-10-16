@@ -13,12 +13,12 @@
 #include <ControlLook.h>
 
 
-static const char* kEnabledState = "on";
-static const char* kDisabledState = "off";
-
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ServiceListItem"
+
+
+static const char* kEnabledState = B_TRANSLATE_MARK("on");
+static const char* kDisabledState = B_TRANSLATE_MARK("off");
 
 
 ServiceListItem::ServiceListItem(const char* name, const char* label,

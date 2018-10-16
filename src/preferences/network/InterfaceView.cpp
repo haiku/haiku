@@ -313,7 +313,8 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 	}
 
 	//fRenegotiateButton->SetEnabled(!disabled);
-	fToggleButton->SetLabel(disabled ? "Enable" : "Disable");
+	fToggleButton->SetLabel(disabled
+		? B_TRANSLATE("Enable") : B_TRANSLATE("Disable"));
 
 	return B_OK;
 }

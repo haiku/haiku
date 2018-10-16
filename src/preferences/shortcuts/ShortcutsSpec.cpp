@@ -75,20 +75,20 @@ SetupStandardMap(MetaKeyStateMap& map, const char* name, uint32 both,
 	map.SetInfo(name);
 
 	// In this state, neither key may be pressed.
-	map.AddState("(None)", new HasBitsFieldTester(0, both));
+	map.AddState(B_TRANSLATE("(None)"), new HasBitsFieldTester(0, both));
 
 	// Here, either may be pressed. (Remember both is NOT a 2-bit chord, it's
 	// another bit entirely)
-	map.AddState("Either", new HasBitsFieldTester(both));
+	map.AddState(B_TRANSLATE("Either"), new HasBitsFieldTester(both));
 
 	// Here, only the left may be pressed
-	map.AddState("Left", new HasBitsFieldTester(left, right));
+	map.AddState(B_TRANSLATE("Left"), new HasBitsFieldTester(left, right));
 
 	// Here, only the right may be pressed
-	map.AddState("Right", new HasBitsFieldTester(right, left));
+	map.AddState(B_TRANSLATE("Right"), new HasBitsFieldTester(right, left));
 
 	// Here, both must be pressed.
-	map.AddState("Both", new HasBitsFieldTester(left | right));
+	map.AddState(B_TRANSLATE("Both"), new HasBitsFieldTester(left | right));
 }
 
 

@@ -12,6 +12,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <IconUtils.h>
 #include <MenuItem.h>
@@ -31,6 +32,11 @@ const uint32 kMsgQuitBluetoothServer = 'qbts';
 
 const char* kDeskbarItemName = "BluetoothServerReplicant";
 const char* kClassName = "DeskbarReplicant";
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BluetoothReplicant"
+
 
 //	#pragma mark -
 
@@ -167,12 +173,12 @@ DeskbarReplicant::MouseDown(BPoint where)
 
 	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 
-	menu->AddItem(new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenBluetoothPreferences)));
 
 	// TODO show list of known/paired devices
 
-	menu->AddItem(new BMenuItem("Quit",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(kMsgQuitBluetoothServer)));
 
 	menu->SetTargetForItems(this);
@@ -194,7 +200,8 @@ DeskbarReplicant::_QuitBluetoothServer()
 	status_t status = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
 		B_QUIT_REQUESTED);
 	if (status < B_OK) {
-		_ShowErrorAlert("Stopping the Bluetooth server failed.", status);
+		_ShowErrorAlert(B_TRANSLATE("Stopping the Bluetooth server failed."),
+			status);
 	}
 }
 
@@ -202,8 +209,11 @@ DeskbarReplicant::_QuitBluetoothServer()
 void
 DeskbarReplicant::_ShowErrorAlert(BString msg, status_t status)
 {
-	msg << "\n\nError: " << strerror(status);
-	BAlert* alert = new BAlert("Bluetooth error", msg.String(), "OK");
+	BString error = B_TRANSLATE("Error: %status%");
+	error.ReplaceFirst("%status%", strerror(status));
+	msg << "\n\n" << error;
+	BAlert* alert = new BAlert(B_TRANSLATE("Bluetooth error"), msg.String(),
+		B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go(NULL);
 }

@@ -23,6 +23,7 @@ DoCatalogs Repositories :
 	:
 	AddRepoWindow.cpp
 	constants.h
+	RepoRow.cpp
 	Repositories.cpp
 	RepositoriesView.cpp
 	RepositoriesWindow.cpp
