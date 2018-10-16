@@ -7,6 +7,7 @@ SharedLibrary libkernelland_emu.so :
 	condition_variable.cpp
 	debug.cpp
 	device_manager.cpp
+	KPath.cpp
 	lock.cpp
 	low_resource_manager.cpp
 	misc.cpp
