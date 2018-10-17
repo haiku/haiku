@@ -28,13 +28,13 @@ Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -93,7 +93,7 @@ using std::nothrow;
 
 /*  1 if two clipping_rects overlap.
  *  0 if two clipping_rects do not overlap.
- *  Remember, right and bottom are not in the region 
+ *  Remember, right and bottom are not in the region
  */
 #define EXTENTCHECK(r1, r2) \
 	((r1)->right > (r2)->left && \
@@ -289,9 +289,9 @@ BRegion::Support::XOffsetRegion(
     pRegion->fBounds.bottom += y;
 }
 
-/* 
+/*
    Utility procedure Compress:
-   Replace r by the region r', where 
+   Replace r by the region r', where
      p in r' iff (Quantifer m <= dx) (p + m in r), and
      Quantifier is Exists if grow is true, For all if grow is false, and
      (x,y) + m = (x+m,y) if xdir is true; (x,y+m) if xdir is false.
@@ -474,9 +474,9 @@ BRegion::Support::XIntersectRegion(
 	(!EXTENTCHECK(&reg1->fBounds, &reg2->fBounds)))
         newReg->fCount = 0;
     else
-	miRegionOp (newReg, reg1, reg2, 
+	miRegionOp (newReg, reg1, reg2,
     		miIntersectO, NULL, NULL);
-    
+
     /*
      * Can't alter newReg's fBounds before we call miRegionOp because
      * it might be one of the source regions and miRegionOp depends
@@ -503,7 +503,7 @@ BRegion::Support::miRegionCopy(
 /*
  *  combinRegs(newReg, reg1, reg2)
  *    if one region is above or below the other.
-*/ 
+*/
 
 static void
 combineRegs(
@@ -553,7 +553,7 @@ combineRegs(
  *  QuickCheck checks to see if it does not have to go through all the
  *  the ugly code for the region call.  It returns 1 if it did all
  *  the work for Union, otherwise 0 - still work to be done.
-*/ 
+*/
 
 static int
 QuickCheck(BRegion* newReg, BRegion* reg1, BRegion* reg2)
@@ -587,8 +587,8 @@ QuickCheck(BRegion* newReg, BRegion* reg1, BRegion* reg2)
 /*   TopRects(fData, reg1, reg2)
  * N.B. We now assume that reg1 and reg2 intersect.  Therefore we are
  * NOT checking in the two while loops for stepping off the end of the
- * region.  
- */ 
+ * region.
+ */
 
 static int
 TopRects(
@@ -607,7 +607,7 @@ TopRects(
         while(tempRects->top < reg2->fBounds.top)
 	{
 	    MEMCHECK(newReg, rects_, FirstRect);
-            ADDRECTNOX(newReg,rects_, tempRects->left, tempRects->top, 
+            ADDRECTNOX(newReg,rects_, tempRects->left, tempRects->top,
 		       tempRects->right, min_c(tempRects->bottom, reg2->fBounds.top));
             tempRects++;
 	}
@@ -619,7 +619,7 @@ TopRects(
         while (tempRects->top < reg1->fBounds.top)
         {
             MEMCHECK(newReg, rects_, FirstRect);
-            ADDRECTNOX(newReg, rects_, tempRects->left,tempRects->top, 
+            ADDRECTNOX(newReg, rects_, tempRects->left,tempRects->top,
 		       tempRects->right, min_c(tempRects->bottom, reg1->fBounds.top));
             tempRects++;
 	}
@@ -683,7 +683,7 @@ BRegion::Support::miCoalesce(
     {
 	pCurBox++;
     }
-    
+
     if (pCurBox != pRegEnd)
     {
 	/*
@@ -700,7 +700,7 @@ BRegion::Support::miCoalesce(
 	curStart = pRegEnd - pReg->fData;
 	pRegEnd = pReg->fData + pReg->fCount;
     }
-	
+
     if ((curNumRects == prevNumRects) && (curNumRects != 0)) {
 	pCurBox -= curNumRects;
 	/*
@@ -768,7 +768,7 @@ BRegion::Support::miCoalesce(
 		    *pPrevBox++ = *pCurBox++;
 		} while (pCurBox != pRegEnd);
 	    }
-	    
+
 	}
     }
     return (curStart);
@@ -848,7 +848,7 @@ BRegion::Support::miRegionOp(
 						 * band */
     int     	  	bot;	    	    	/* Bottom of non-overlapping
 						 * band */
-    
+
     /*
      * Initialization:
      *	set r1, r2, r1End and r2End appropriately, preserve the important
@@ -860,9 +860,9 @@ BRegion::Support::miRegionOp(
     r2 = reg2->fData;
     r1End = r1 + reg1->fCount;
     r2End = r2 + reg2->fCount;
-    
+
 //    oldRects = newReg->fData;
-    
+
     EMPTY_REGION(newReg);
 
     /*
@@ -875,7 +875,7 @@ BRegion::Support::miRegionOp(
     if (!newReg->_SetSize(max_c(reg1->fCount,reg2->fCount) * 2)) {
 		return;
     }
-    
+
     /*
      * Initialize ybot and ytop.
      * In the upcoming loop, ybot and ytop serve different functions depending
@@ -893,7 +893,7 @@ BRegion::Support::miRegionOp(
 	ybot = reg1->fBounds.top;
     else
 	ybot = reg2->fBounds.top;
-    
+
     /*
      * prevBand serves to mark the start of the previous band so rectangles
      * can be coalesced into larger rectangles. qv. miCoalesce, above.
@@ -904,7 +904,7 @@ BRegion::Support::miRegionOp(
      * array of rectangles.
      */
     prevBand = 0;
-    
+
     do
     {
 	curBand = newReg->fCount;
@@ -921,13 +921,13 @@ BRegion::Support::miRegionOp(
 	{
 	    r1BandEnd++;
 	}
-	
+
 	r2BandEnd = r2;
 	while ((r2BandEnd != r2End) && (r2BandEnd->top == r2->top))
 	{
 	    r2BandEnd++;
 	}
-	
+
 	/*
 	 * First handle the band that doesn't intersect, if any.
 	 *
@@ -987,7 +987,7 @@ BRegion::Support::miRegionOp(
 	    (* overlapFunc) (newReg, r1, r1BandEnd, r2, r2BandEnd, ytop, ybot);
 
 	}
-	
+
 	if (newReg->fCount != curBand)
 	{
 	    prevBand = miCoalesce (newReg, prevBand, curBand);
@@ -1156,7 +1156,7 @@ BRegion::Support::miUnionO (
     register int	bottom)
 {
     register clipping_rect*	pNextRect;
-    
+
     pNextRect = &pReg->fData[pReg->fCount];
 
 #define MERGERECT(r) \
@@ -1183,7 +1183,7 @@ BRegion::Support::miUnionO (
     }  \
     assert(pReg->fCount<=pReg->fDataSize);\
     r++;
-    
+
     assert (top<bottom);
     while ((r1 != r1End) && (r2 != r2End))
     {
@@ -1196,7 +1196,7 @@ BRegion::Support::miUnionO (
 	    MERGERECT(r2);
 	}
     }
-    
+
     if (r1 != r1End)
     {
 	do
@@ -1242,7 +1242,7 @@ BRegion::Support::XUnionRegion(
     /*
      * BRegion* 1 completely subsumes region 2
      */
-    if ((reg1->fCount == 1) && 
+    if ((reg1->fCount == 1) &&
 	(reg1->fBounds.left <= reg2->fBounds.left) &&
 	(reg1->fBounds.top <= reg2->fBounds.top) &&
 	(reg1->fBounds.right >= reg2->fBounds.right) &&
@@ -1256,7 +1256,7 @@ BRegion::Support::XUnionRegion(
     /*
      * BRegion* 2 completely subsumes region 1
      */
-    if ((reg2->fCount == 1) && 
+    if ((reg2->fCount == 1) &&
 	(reg2->fBounds.left <= reg1->fBounds.left) &&
 	(reg2->fBounds.top <= reg1->fBounds.top) &&
 	(reg2->fBounds.right >= reg1->fBounds.right) &&
@@ -1267,7 +1267,7 @@ BRegion::Support::XUnionRegion(
         return 1;
     }
 
-    miRegionOp (newReg, reg1, reg2, miUnionO, 
+    miRegionOp (newReg, reg1, reg2, miUnionO,
     		miUnionNonO, miUnionNonO);
 
     newReg->fBounds.left = min_c(reg1->fBounds.left, reg2->fBounds.left);
@@ -1306,9 +1306,9 @@ BRegion::Support::miSubtractNonO1 (
     register int   	bottom)
 {
     register clipping_rect*	pNextRect;
-	
+
     pNextRect = &pReg->fData[pReg->fCount];
-	
+
     assert(top<bottom);
 
     while (r != rEnd)
@@ -1355,9 +1355,9 @@ BRegion::Support::miSubtractO(
 {
     register clipping_rect*	pNextRect;
     register int  	left;
-    
+
     left = r1->left;
-    
+
     assert(top<bottom);
     pNextRect = &pReg->fData[pReg->fCount];
 
@@ -1476,7 +1476,7 @@ BRegion::Support::miSubtractO(
     }
     return 0;	/* lint */
 }
-	
+
 /*-
  *-----------------------------------------------------------------------
  * miSubtract --
@@ -1495,7 +1495,7 @@ BRegion::Support::miSubtractO(
 int
 BRegion::Support::XSubtractRegion(
     const BRegion* 	  	regM,
-    const BRegion*	  	regS,          
+    const BRegion*	  	regS,
     register BRegion*	regD)
 {
    /* check for trivial reject */
@@ -1505,8 +1505,8 @@ BRegion::Support::XSubtractRegion(
 	miRegionCopy(regD, regM);
         return 1;
     }
- 
-    miRegionOp (regD, regM, regS, miSubtractO, 
+
+    miRegionOp (regD, regM, regS, miSubtractO,
     		miSubtractNonO1, NULL);
 
     /*
@@ -1524,14 +1524,14 @@ int
 BRegion::Support::XXorRegion(const BRegion* sra, const BRegion* srb,
 	BRegion* dr)
 {
-    BRegion* tra;
-    BRegion* trb;
+    BRegion* tra = NULL;
+    BRegion* trb = NULL;
 
     if ((! (tra = CreateRegion())) || (! (trb = CreateRegion())))
     {
         DestroyRegion(tra);
         DestroyRegion(trb);
-	return 0;
+		return 0;
     }
     (void) XSubtractRegion(sra,srb,tra);
     (void) XSubtractRegion(srb,sra,trb);
@@ -1542,7 +1542,7 @@ BRegion::Support::XXorRegion(const BRegion* sra, const BRegion* srb,
 }
 
 
-int 
+int
 BRegion::Support::XPointInRegion(
     const BRegion* pRegion,
     int x, int y)
@@ -1562,7 +1562,7 @@ BRegion::Support::XPointInRegion(
     return false;
 }
 
-int 
+int
 BRegion::Support::XRectInRegion(
     register const BRegion* region,
     const clipping_rect& rect)
@@ -1574,7 +1574,7 @@ BRegion::Support::XRectInRegion(
 
     int rx = prect->left;
     int ry = prect->top;
-    
+
     /* this is (just) a useful optimization */
     if ((region->fCount == 0) || !EXTENTCHECK(&region->fBounds, prect))
         return(RectangleOut);
@@ -1636,6 +1636,6 @@ BRegion::Support::XRectInRegion(
 
     }
 
-    return(partIn ? ((ry < prect->bottom) ? RectanglePart : RectangleIn) : 
+    return(partIn ? ((ry < prect->bottom) ? RectanglePart : RectangleIn) :
 		RectangleOut);
 }
