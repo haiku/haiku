@@ -1528,7 +1528,11 @@ BRegion::Support::XXorRegion(const BRegion* sra, const BRegion* srb,
     BRegion* trb;
 
     if ((! (tra = CreateRegion())) || (! (trb = CreateRegion())))
+    {
+        DestroyRegion(tra);
+        DestroyRegion(trb);
 	return 0;
+    }
     (void) XSubtractRegion(sra,srb,tra);
     (void) XSubtractRegion(srb,sra,trb);
     (void) XUnionRegion(tra,trb,dr);
