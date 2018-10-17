@@ -5,10 +5,13 @@
 ; partitions. The offset of the partition in 512 byte blocks must be written at
 ; position PARTITION_OFFSET_OFFSET (32 bit little endian; makebootable does
 ; that) or otherwise the code can't find the partition.
-; The partition must be BFS formatted. The file "system/haiku_loader"
-; (the stage 2 boot loader) loaded into memory at 0x1000:0x0000 (linear address
-; 0x10000) and entered at 0x:1000:0x0200 with parameters eax - partition offset
-; in 512 byte blocks and dl - BIOS ID of the boot drive.
+; The partition must be BFS formatted. The haiku_loader hpkg file must be located
+; at "system/packages/haiku_loader*" and the haiku_loader.bios_ia32 must be the
+; first file in the haiku_loader package.
+;
+; The bios_ia32 stage 2 boot loader is loaded into memory at 0x1000:0x0000
+; (linear address 0x10000) and entered at 0x:1000:0x0200 with parameters
+; eax - partition offset in 512 byte blocks and dl - BIOS ID of the boot drive.
 ;
 ; Compile via:
 ; nasm -f bin -O5 -o stage1.bin stage1.S
@@ -639,19 +642,15 @@ kNotADirectoryString		db	"not a directory", 0
 kBadInodeMagicString		db	"bad inode", 0
 kNoZbeosString				db	"no loader", 0
 %else
-kErrorString				db	"Failed to load OS. Press any key to reboot..."
+kErrorString				db	"bios_ia32 stage1: Failed to load OS. Press any key to reboot..."
 							db	0
 %endif
 
-; the path to the boot loader
-%defstr platformName KERNEL_PLATFORM
-%defstr loaderName
-%strcat loaderName "haiku_loader",".",platformName
 kPathComponents:
 pathComponent				"system"
 pathComponent				"packages"
 kLastPathComponent:
-pathComponent				loaderName
+pathComponent				"haiku_loader"
 							db	0
 
 
