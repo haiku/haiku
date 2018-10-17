@@ -238,7 +238,7 @@ extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	void *(*start_routine)(void*), void *arg);
 extern int pthread_detach(pthread_t thread);
 extern int pthread_equal(pthread_t t1, pthread_t t2);
-extern void pthread_exit(void *value_ptr);
+extern void pthread_exit(void *value_ptr) __attribute__ ((noreturn));
 extern int pthread_join(pthread_t thread, void **_value);
 extern pthread_t pthread_self(void);
 extern int pthread_getconcurrency(void);
