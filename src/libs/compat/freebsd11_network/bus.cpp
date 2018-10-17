@@ -369,7 +369,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 		}
 
 		status = install_io_interrupt_handler(intr->irq,
-			intr_wrapper, intr, B_NO_HANDLED_INFO);
+			intr_wrapper, intr, 0);
 	}
 
 	if (status == B_OK && res->r_bustag == 1 && gPCIx86 != NULL) {
