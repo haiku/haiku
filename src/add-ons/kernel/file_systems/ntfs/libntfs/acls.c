@@ -4097,6 +4097,7 @@ int ntfs_build_permissions(const char *securattr,
 	return (perm);
 }
 
+#ifndef __HAIKU__
 /*
  *		The following must be in some library...
  */
@@ -4110,6 +4111,7 @@ static unsigned long atoul(const char *p)
 		v = v * 10 + (*p++) - '0';
 	return (v);
 }
+#endif
 
 /*
  *		Build an internal representation of a SID
