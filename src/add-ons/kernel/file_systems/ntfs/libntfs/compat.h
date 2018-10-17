@@ -37,6 +37,10 @@
 #define ENODATA ENOENT
 #endif
 
+#ifndef ELIBBAD
+#define ELIBBAD ENOEXEC
+#endif
+
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
@@ -65,10 +69,8 @@ extern char *strsep(char **stringp, const char *delim);
 
 #else /* !defined WINDOWS */
 
-#ifndef __HAIKU__
 #ifndef O_BINARY
 #define O_BINARY		0		/* unix is binary by default */
-#endif
 #endif
 
 #endif /* defined WINDOWS */

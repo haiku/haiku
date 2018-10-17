@@ -77,6 +77,14 @@ enum {
 #define PARTIAL_RUNLIST_UPDATING 1
 
 /*
+ *		Parameters for upper-case table
+ */
+
+	/* Create upper-case tables as defined by Windows 6.1 (Win7) */
+#define UPCASE_MAJOR 6
+#define UPCASE_MINOR 1
+
+/*
  *		Parameters for user and xattr mappings
  */
 
@@ -99,31 +107,45 @@ enum {
  *	performances, but bad on security with internal fuse or external
  *	fuse older than 2.8
  *
+ *	On Linux, cacheing is discouraged for the high level interface
+ *	in order to get proper support of hard links. As a consequence,
+ *	having access control in the file system leads to fewer requests
+ *	to the file system and fewer context switches.
+ *
  *	Possible values for high level :
  *		1 : no cache, kernel control (recommended)
  *		4 : no cache, file system control
+ *		6 : kernel/fuse cache, file system control (OpenIndiana only)
  *		7 : no cache, kernel control for ACLs
  *
  *	Possible values for low level :
  *		2 : no cache, kernel control
- *		3 : use kernel/fuse cache, kernel control (external fuse >= 2.8)
- *		5 : no cache, file system control (recommended)
+ *		3 : use kernel/fuse cache, kernel control  (recommended)
+ *		5 : no cache, file system control
+ *		6 : kernel/fuse cache, file system control (OpenIndiana only)
  *		8 : no cache, kernel control for ACLs
+ *		9 : kernel/fuse cache, kernel control for ACLs (target)
  *
- *	Use of options 7 and 8 requires a patch to fuse
+ *	Use of options 7, 8 and 9 requires a fuse module upgrade
  *	When Posix ACLs are selected in the configure options, a value
  *	of 6 is added in the mount report.
  */
 
 #if defined(__sun) && defined(__SVR4)
-#define HPERMSCONFIG 4 /* access control by kernel is broken on OpenIndiana */
-#else
+/*
+ *	Access control by kernel is not implemented on OpenIndiana,
+ *	however care is taken of cacheing hard-linked files.
+ */
+#define HPERMSCONFIG 6
+#define LPERMSCONFIG 6
+#else /* defined(__sun) && defined(__SVR4) */
+/*
+ *	Cacheing by kernel is buggy on Linux when access control is done
+ *	by the file system, and also when using hard-linked files on
+ *	the fuse high level interface.
+ */
 #define HPERMSCONFIG 1
-#endif
-#if defined(FUSE_INTERNAL) || !defined(FUSE_VERSION) || (FUSE_VERSION < 28)
-#define LPERMSCONFIG 5
-#else
-#define LPERMSCONFIG 3
-#endif
+#define LPERMSCONFIG 3 /* Use 9 when ACLs are supported by fuse kernel */
+#endif /* defined(__sun) && defined(__SVR4) */
 
 #endif /* defined _NTFS_PARAM_H */

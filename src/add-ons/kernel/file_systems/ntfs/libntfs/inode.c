@@ -36,9 +36,6 @@
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
-#ifdef HAVE_SETXATTR
-#include <sys/xattr.h>
-#endif
 
 #include "param.h"
 #include "compat.h"
@@ -57,6 +54,7 @@
 #include "ntfstime.h"
 #include "logging.h"
 #include "misc.h"
+#include "xattrs.h"
 
 ntfs_inode *ntfs_inode_base(ntfs_inode *ni)
 {
@@ -570,7 +568,7 @@ int ntfs_inode_close(ntfs_inode *ni)
  * Note, extent inodes are never closed directly. They are automatically
  * disposed off by the closing of the base inode.
  */
-ntfs_inode *ntfs_extent_inode_open(ntfs_inode *base_ni, const MFT_REF mref)
+ntfs_inode *ntfs_extent_inode_open(ntfs_inode *base_ni, const leMFT_REF mref)
 {
 	u64 mft_no = MREF_LE(mref);
 	VCN extent_vcn;
@@ -806,7 +804,7 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni, ntfs_inode *dir_ni)
 		goto err_out;
 	}
 	/* Collect the reparse tag, if any */
-	reparse_tag = cpu_to_le32(0);
+	reparse_tag = const_cpu_to_le32(0);
 	if (ni->flags & FILE_ATTR_REPARSE_POINT) {
 		if (!ntfs_attr_lookup(AT_REPARSE_POINT, NULL,
 				0, CASE_SENSITIVE, 0, NULL, 0, ctx)) {
@@ -874,7 +872,7 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni, ntfs_inode *dir_ni)
 				(ni->flags & FILE_ATTR_VALID_FLAGS);
 		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
 			fnx->data_size = fnx->allocated_size
-				= const_cpu_to_le64(0);
+				= const_cpu_to_sle64(0);
 		else {
 			fnx->allocated_size = cpu_to_sle64(ni->allocated_size);
 			fnx->data_size = cpu_to_sle64(ni->data_size);
@@ -1168,7 +1166,7 @@ int ntfs_inode_add_attrlist(ntfs_inode *ni)
 		if (ctx->attr->non_resident)
 			ale->lowest_vcn = ctx->attr->lowest_vcn;
 		else
-			ale->lowest_vcn = 0;
+			ale->lowest_vcn = const_cpu_to_sle64(0);
 		ale->mft_reference = MK_LE_MREF(ni->mft_no,
 			le16_to_cpu(ni->mrec->sequence_number));
 		ale->instance = ctx->attr->instance;
@@ -1206,7 +1204,7 @@ int ntfs_inode_add_attrlist(ntfs_inode *ni)
 
 	/* Add $ATTRIBUTE_LIST to mft record. */
 	if (ntfs_resident_attr_record_add(ni,
-				AT_ATTRIBUTE_LIST, NULL, 0, NULL, 0, 0) < 0) {
+				AT_ATTRIBUTE_LIST, NULL, 0, NULL, 0, const_cpu_to_le16(0)) < 0) {
 		err = errno;
 		ntfs_log_perror("Couldn't add $ATTRIBUTE_LIST to MFT");
 		goto rollback;
@@ -1446,8 +1444,6 @@ int ntfs_inode_badclus_bad(u64 mft_no, ATTR_RECORD *attr)
 	return ret;
 }
 
-#ifdef HAVE_SETXATTR	/* extended attributes interface required */
-
 /*
  *		Get high precision NTFS times
  *
@@ -1477,18 +1473,18 @@ int ntfs_inode_get_times(ntfs_inode *ni, char *value, size_t size)
 					le16_to_cpu(ctx->attr->value_offset));
 			if (value && (size >= 8)) {
 				times = (u64*)value;
-				times[0] = le64_to_cpu(std_info->creation_time);
+				times[0] = sle64_to_cpu(std_info->creation_time);
 				ret = 8;
 				if (size >= 16) {
-					times[1] = le64_to_cpu(std_info->last_data_change_time);
+					times[1] = sle64_to_cpu(std_info->last_data_change_time);
 					ret = 16;
 				}
 				if (size >= 24) {
-					times[2] = le64_to_cpu(std_info->last_access_time);
+					times[2] = sle64_to_cpu(std_info->last_access_time);
 					ret = 24;
 				}
 				if (size >= 32) {
-					times[3] = le64_to_cpu(std_info->last_mft_change_time);
+					times[3] = sle64_to_cpu(std_info->last_mft_change_time);
 					ret = 32;
 				}
 			} else
@@ -1551,16 +1547,16 @@ int ntfs_inode_set_times(ntfs_inode *ni, const char *value, size_t size,
 				 * return sub-second times in getattr()
 				 */
 				set_nino_flag(ni, TimesSet);
-				std_info->creation_time = cpu_to_le64(times[0]);
+				std_info->creation_time = cpu_to_sle64(times[0]);
 				ni->creation_time
 					= std_info->creation_time;
 				if (size >= 16) {
-					std_info->last_data_change_time = cpu_to_le64(times[1]);
+					std_info->last_data_change_time = cpu_to_sle64(times[1]);
 					ni->last_data_change_time
 						= std_info->last_data_change_time;
 				}
 				if (size >= 24) {
-					std_info->last_access_time = cpu_to_le64(times[2]);
+					std_info->last_access_time = cpu_to_sle64(times[2]);
 					ni->last_access_time
 						= std_info->last_access_time;
 				}
@@ -1578,13 +1574,13 @@ int ntfs_inode_set_times(ntfs_inode *ni, const char *value, size_t size,
 					fn = (FILE_NAME_ATTR*)((u8 *)ctx->attr +
 						le16_to_cpu(ctx->attr->value_offset));
 					fn->creation_time
-						= cpu_to_le64(times[0]);
+						= cpu_to_sle64(times[0]);
 					if (size >= 16)
 						fn->last_data_change_time
-							= cpu_to_le64(times[1]);
+							= cpu_to_sle64(times[1]);
 					if (size >= 24)
 						fn->last_access_time
-							= cpu_to_le64(times[2]);
+							= cpu_to_sle64(times[2]);
 					fn->last_mft_change_time = now;
 					cnt++;
 				}
@@ -1604,5 +1600,3 @@ int ntfs_inode_set_times(ntfs_inode *ni, const char *value, size_t size,
 			errno = EEXIST;
 	return (ret);
 }
-
-#endif /* HAVE_SETXATTR */

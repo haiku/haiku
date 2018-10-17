@@ -19,8 +19,27 @@
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _NTFS_XATTR_H_
-#define _NTFS_XATTR_H_
+#ifndef _NTFS_XATTRS_H_
+#define _NTFS_XATTRS_H_
+
+/*
+ * Flags that modify setxattr() semantics.  These flags are also used by a
+ * number of libntfs-3g functions, such as ntfs_set_ntfs_acl(), which were
+ * originally tied to extended attributes support but now can be used by
+ * applications even if the platform does not support extended attributes.
+ *
+ * Careful: applications including this header should define HAVE_SETXATTR or
+ * HAVE_SYS_XATTR_H if the platform supports extended attributes.  Otherwise the
+ * defined flags values may be incorrect (they will be correct for Linux but not
+ * necessarily for other platforms).
+ */
+#if defined(HAVE_SETXATTR) || defined(HAVE_SYS_XATTR_H)
+#include <sys/xattr.h>
+#else
+#include "compat.h" /* may be needed for ENODATA definition */
+#define XATTR_CREATE	1
+#define XATTR_REPLACE	2
+#endif
 
 /*
  *		Identification of data mapped to the system name space
@@ -39,6 +58,7 @@ enum SYSTEMXATTRS {
 	XATTR_NTFS_TIMES_BE,
 	XATTR_NTFS_CRTIME,
 	XATTR_NTFS_CRTIME_BE,
+	XATTR_NTFS_EA,
 	XATTR_POSIX_ACC, 
 	XATTR_POSIX_DEF
 } ;
@@ -60,6 +80,8 @@ void ntfs_xattr_free_mapping(struct XATTRMAPPING*);
 enum SYSTEMXATTRS ntfs_xattr_system_type(const char *name,
 			ntfs_volume *vol);
 
+struct SECURITY_CONTEXT;
+
 int ntfs_xattr_system_getxattr(struct SECURITY_CONTEXT *scx,
 			enum SYSTEMXATTRS attr,
 			ntfs_inode *ni, ntfs_inode *dir_ni,
@@ -72,4 +94,4 @@ int ntfs_xattr_system_removexattr(struct SECURITY_CONTEXT *scx,
 			enum SYSTEMXATTRS attr,
 			ntfs_inode *ni, ntfs_inode *dir_ni);
 
-#endif /* _NTFS_XATTR_H_ */
+#endif /* _NTFS_XATTRS_H_ */

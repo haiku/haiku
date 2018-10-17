@@ -36,9 +36,7 @@
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
-#ifdef HAVE_SYS_MOUNT_H
-#include <sys/mount.h>
-#endif
+	/* Do not #include <sys/mount.h> here : conflicts with <linux/fs.h> */
 #ifdef HAVE_MNTENT_H
 #include <mntent.h>
 #endif
@@ -62,6 +60,7 @@ typedef struct _ntfs_volume ntfs_volume;
 enum {
 	NTFS_MNT_NONE                   = 0x00000000,
 	NTFS_MNT_RDONLY                 = 0x00000001,
+	NTFS_MNT_MAY_RDONLY             = 0x02000000, /* Allow fallback to ro */
 	NTFS_MNT_FORENSIC               = 0x04000000, /* No modification during
 	                                               * mount. */
 	NTFS_MNT_EXCLUSIVE              = 0x08000000,

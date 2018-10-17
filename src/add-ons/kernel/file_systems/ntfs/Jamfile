@@ -27,12 +27,7 @@ KernelAddon ntfs :
 	libntfs.a
 	;
 
-SEARCH on [ FGristFiles
-		kernel_cpp.cpp
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
 SEARCH on [ FGristFiles mime_ext_table.c ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
-

@@ -211,6 +211,7 @@ typedef enum {
 	NA_FullyMapped,		/* 1: Attribute has been fully mapped */
 	NA_DataAppending,	/* 1: Attribute is being appended to */
 	NA_ComprClosing,	/* 1: Compressed attribute is being closed */
+	NA_RunlistDirty,	/* 1: Runlist has been updated */
 } ntfs_attr_state_bits;
 
 #define  test_nattr_flag(na, flag)	 test_bit(NA_##flag, (na)->state)
@@ -236,6 +237,10 @@ typedef enum {
 #define NAttrDataAppending(na)		test_nattr_flag(na, DataAppending)
 #define NAttrSetDataAppending(na)	set_nattr_flag(na, DataAppending)
 #define NAttrClearDataAppending(na)	clear_nattr_flag(na, DataAppending)
+
+#define NAttrRunlistDirty(na)		test_nattr_flag(na, RunlistDirty)
+#define NAttrSetRunlistDirty(na)	set_nattr_flag(na, RunlistDirty)
+#define NAttrClearRunlistDirty(na)	clear_nattr_flag(na, RunlistDirty)
 
 #define NAttrComprClosing(na)		test_nattr_flag(na, ComprClosing)
 #define NAttrSetComprClosing(na)	set_nattr_flag(na, ComprClosing)
@@ -391,6 +396,8 @@ extern int ntfs_attr_data_read(ntfs_inode *ni,
 extern int ntfs_attr_data_write(ntfs_inode *ni,
 		ntfschar *stream_name, int stream_name_len,
 		const char *buf, size_t size, off_t offset);
+extern int ntfs_attr_shrink_size(ntfs_inode *ni, ntfschar *stream_name,
+		int stream_name_len, off_t offset);
 
 #endif /* defined _NTFS_ATTRIB_H */
 

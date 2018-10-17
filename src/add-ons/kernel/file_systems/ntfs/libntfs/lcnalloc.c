@@ -676,7 +676,7 @@ int ntfs_cluster_free(ntfs_volume *vol, ntfs_attr *na, VCN start_vcn, s64 count)
 	
 	ntfs_log_enter("Entering for inode 0x%llx, attr 0x%x, count 0x%llx, "
 		       "vcn 0x%llx.\n", (unsigned long long)na->ni->mft_no,
-		       na->type, (long long)count, (long long)start_vcn);
+		       le32_to_cpu(na->type), (long long)count, (long long)start_vcn);
 
 	rl = ntfs_attr_find_vcn(na, start_vcn);
 	if (!rl) {

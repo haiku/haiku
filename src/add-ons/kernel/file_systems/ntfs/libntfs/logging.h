@@ -38,10 +38,11 @@ typedef int (ntfs_log_handler)(const char *function, const char *file, int line,
 	u32 level, void *data, const char *format, va_list args);
 
 /* Set the logging handler from one of the functions, below. */
-#ifndef __HAIKU__
-void ntfs_log_set_handler(ntfs_log_handler *handler 
-			  __attribute__((format(printf, 6, 0))));
+void ntfs_log_set_handler(ntfs_log_handler *handler
+#if __GNUC__ > 3
+			  __attribute__((format(printf, 6, 0)))
 #endif
+			  );
 
 /* Logging handlers */
 ntfs_log_handler ntfs_log_handler_syslog  __attribute__((format(printf, 6, 0)));

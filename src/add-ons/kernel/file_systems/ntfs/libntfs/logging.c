@@ -226,6 +226,7 @@ static FILE * ntfs_log_get_stream(u32 level)
 
 	return stream;
 }
+#endif
 
 /**
  * ntfs_log_get_prefix - Default prefixes for logging levels
@@ -297,7 +298,6 @@ void ntfs_log_set_handler(ntfs_log_handler *handler)
 	} else
 		ntfs_log.handler = ntfs_log_handler_null;
 }
-#endif //__HAIKU___
 
 /**
  * ntfs_log_redirect - Pass on the request to the real handler
@@ -359,9 +359,9 @@ int ntfs_log_redirect(const char *function, const char *file,
 #define LOG_LINE_LEN 	512
 
 int ntfs_log_handler_syslog(const char *function  __attribute__((unused)),
-			    const char *file __attribute__((unused)), 
-			    int line __attribute__((unused)), u32 level, 
-			    void *data __attribute__((unused)), 
+			    const char *file __attribute__((unused)),
+			    int line __attribute__((unused)), u32 level,
+			    void *data __attribute__((unused)),
 			    const char *format, va_list args)
 {
 	char logbuf[LOG_LINE_LEN];
@@ -370,20 +370,20 @@ int ntfs_log_handler_syslog(const char *function  __attribute__((unused)),
 #ifndef DEBUG
 	if ((level & NTFS_LOG_LEVEL_PERROR) && errno == ENOSPC)
 		return 1;
-#endif	
+#endif
 	ret = vsnprintf(logbuf, LOG_LINE_LEN, format, args);
 	if (ret < 0) {
 		vsyslog(LOG_NOTICE, format, args);
 		ret = 1;
 		goto out;
 	}
-	
+
 	if ((LOG_LINE_LEN > ret + 3) && (level & NTFS_LOG_LEVEL_PERROR)) {
 		strncat(logbuf, ": ", LOG_LINE_LEN - ret - 1);
 		strncat(logbuf, strerror(olderr), LOG_LINE_LEN - (ret + 3));
 		ret = strlen(logbuf);
 	}
-	
+
 	syslog(LOG_NOTICE, "%s", logbuf);
 out:
 	errno = olderr;
@@ -400,8 +400,10 @@ out:
 
 void ntfs_log_early_error(const char *format, ...)
 {
-#ifndef __HAIKU__
 	va_list args;
+#ifdef __HAIKU__
+	char buffer[1024];
+#endif
 
 	va_start(args, format);
 #ifdef HAVE_SYSLOG_H
@@ -409,11 +411,13 @@ void ntfs_log_early_error(const char *format, ...)
 	ntfs_log_handler_syslog(NULL, NULL, 0,
 		NTFS_LOG_LEVEL_ERROR, NULL,
 		format, args);
+#elif defined(__HAIKU__)
+	vsnprintf(buffer, sizeof(buffer) - 1, format, args);
+	dprintf("%s", buffer);
 #else
 	vfprintf(stderr,format,args);
 #endif
 	va_end(args);
-#endif //__HAIKU__
 }
 
 /**
@@ -437,7 +441,6 @@ void ntfs_log_early_error(const char *format, ...)
  *            0  Message wasn't logged
  *          num  Number of output characters
  */
-#ifndef __HAIKU__
 int ntfs_log_handler_fprintf(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
@@ -446,11 +449,17 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 #endif
 	int ret = 0;
 	int olderr = errno;
+
+#ifndef __HAIKU__
 	FILE *stream;
 
 	if (!data)		/* Interpret data as a FILE stream. */
 		return 0;	/* If it's NULL, we can't do anything. */
 	stream = (FILE*)data;
+#else
+#define fprintf(stream, ...) dprintf(__VA_ARGS__)
+	char buffer[1024];
+#endif
 
 #ifdef DEBUG
 	if (level == NTFS_LOG_LEVEL_LEAVE) {
@@ -458,10 +467,10 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 			tab--;
 		return 0;
 	}
-	
+
 	for (i = 0; i < tab; i++)
 		ret += fprintf(stream, " ");
-#endif	
+#endif
 	if ((ntfs_log.flags & NTFS_LOG_FLAG_ONLYNAME) &&
 	    (strchr(file, PATH_SEP)))		/* Abbreviate the filename */
 		file = strrchr(file, PATH_SEP) + 1;
@@ -479,7 +488,12 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 	    (level & NTFS_LOG_LEVEL_TRACE) || (level & NTFS_LOG_LEVEL_ENTER))
 		ret += fprintf(stream, "%s(): ", function);
 
+#ifndef __HAIKU__
 	ret += vfprintf(stream, format, args);
+#else
+	ret += vsnprintf(buffer, sizeof(buffer - 1), format, args);
+	dprintf("%s", buffer);
+#endif
 
 	if (level & NTFS_LOG_LEVEL_PERROR)
 		ret += fprintf(stream, ": %s\n", strerror(olderr));
@@ -487,12 +501,15 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 #ifdef DEBUG
 	if (level == NTFS_LOG_LEVEL_ENTER)
 		tab++;
-#endif	
+#endif
+#ifndef __HAIKU__
 	fflush(stream);
+#else
+#undef fprintf
+#endif
 	errno = olderr;
 	return ret;
 }
-#endif // __HAIKU__
 
 /**
  * ntfs_log_handler_null - Null logging handler (no output)
@@ -537,12 +554,13 @@ int ntfs_log_handler_null(const char *function __attribute__((unused)), const ch
  *            0  Message wasn't logged
  *          num  Number of output characters
  */
-#ifndef __HAIKU__
 int ntfs_log_handler_stdout(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
+#ifndef __HAIKU__
 	if (!data)
 		data = stdout;
+#endif
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
 }
@@ -572,8 +590,10 @@ int ntfs_log_handler_stdout(const char *function, const char *file,
 int ntfs_log_handler_outerr(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
+#ifndef __HAIKU__
 	if (!data)
 		data = ntfs_log_get_stream(level);
+#endif
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
 }
@@ -602,12 +622,14 @@ int ntfs_log_handler_outerr(const char *function, const char *file,
 int ntfs_log_handler_stderr(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
+#ifndef __HAIKU__
 	if (!data)
 		data = stderr;
+#endif
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
 }
-#endif //__HAIKU__
+
 
 /**
  * ntfs_log_parse_option - Act upon command line options

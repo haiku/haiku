@@ -129,6 +129,7 @@ typedef struct {
 	VCN parent_vcn[MAX_PARENT_VCN]; /* entry's parent nodes */
 	int pindex;	     /* maximum it's the number of the parent nodes  */
 	BOOL ib_dirty;
+	BOOL bad_index;
 	u32 block_size;
 	u8 vcn_size_bits;
 } ntfs_index_context;

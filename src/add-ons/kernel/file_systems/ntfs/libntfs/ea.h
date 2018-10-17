@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2008 Jean-Pierre Andre
+ * Copyright (c) 2014 Jean-Pierre Andre
  *
  */
 
@@ -21,21 +21,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef REPARSE_H
-#define REPARSE_H
+#ifndef EA_H
+#define EA_H
 
-char *ntfs_make_symlink(ntfs_inode *ni, const char *mnt_point);
+int ntfs_get_ntfs_ea(ntfs_inode *ni, char *value, size_t size);
 
-BOOL ntfs_possible_symlink(ntfs_inode *ni);
+int ntfs_set_ntfs_ea(ntfs_inode *ni, const char *value, size_t size, int flags);
 
-int ntfs_get_ntfs_reparse_data(ntfs_inode *ni, char *value, size_t size);
+int ntfs_remove_ntfs_ea(ntfs_inode *ni);
 
-REPARSE_POINT *ntfs_get_reparse_point(ntfs_inode *ni);
-
-int ntfs_set_ntfs_reparse_data(ntfs_inode *ni, const char *value,
-			size_t size, int flags);
-int ntfs_remove_ntfs_reparse_data(ntfs_inode *ni);
-
-int ntfs_delete_reparse_index(ntfs_inode *ni);
-
-#endif /* REPARSE_H */
+#endif /* EA_H */

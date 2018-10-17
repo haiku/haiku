@@ -37,11 +37,6 @@
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
-
-#ifdef HAVE_SETXATTR
-#include <sys/xattr.h>
-#endif
-
 #ifdef HAVE_SYS_SYSMACROS_H
 #include <sys/sysmacros.h>
 #endif
@@ -59,6 +54,7 @@
 #include "object_id.h"
 #include "logging.h"
 #include "misc.h"
+#include "xattrs.h"
 
 /*
  *			Endianness considerations
@@ -130,7 +126,6 @@ struct OBJECT_ID_INDEX {		/* index entry in $Extend/$ObjId */
 
 static ntfschar objid_index_name[] = { const_cpu_to_le16('$'),
 					 const_cpu_to_le16('O') };
-#ifdef HAVE_SETXATTR	/* extended attributes interface required */
 
 /*
  *			Set the index for a new object id
@@ -176,8 +171,6 @@ static int set_object_id_index(ntfs_inode *ni, ntfs_index_context *xo,
 	return (ntfs_ie_add(xo,(INDEX_ENTRY*)&indx));
 }
 
-#endif /* HAVE_SETXATTR */
-
 /*
  *		Open the $Extend/$ObjId file and its index
  *
@@ -213,7 +206,6 @@ static ntfs_index_context *open_object_id_index(ntfs_volume *vol)
 	return (xo);
 }
 
-#ifdef HAVE_SETXATTR	/* extended attributes interface required */
 
 /*
  *		Merge object_id data stored in the index into
@@ -263,7 +255,6 @@ static int merge_index_data(ntfs_inode *ni,
 	return (res);
 }
 
-#endif /* HAVE_SETXATTR */
 
 /*
  *		Remove an object id index entry if attribute present
@@ -311,7 +302,6 @@ static int remove_object_id_index(ntfs_attr *na, ntfs_index_context *xo,
 	return (ret);
 }
 
-#ifdef HAVE_SETXATTR	/* extended attributes interface required */
 
 /*
  *		Update the object id and index
@@ -417,7 +407,6 @@ static int add_object_id(ntfs_inode *ni, int flags)
 	return (res);
 }
 
-#endif /* HAVE_SETXATTR */
 
 /*
  *		Delete an object_id index entry
@@ -456,7 +445,6 @@ int ntfs_delete_object_id_index(ntfs_inode *ni)
 	return (res);
 }
 
-#ifdef HAVE_SETXATTR	/* extended attributes interface required */
 
 /*
  *		Get the ntfs object id into an extended attribute
@@ -636,5 +624,3 @@ int ntfs_remove_ntfs_object_id(ntfs_inode *ni)
 	}
 	return (res ? -1 : 0);
 }
-
-#endif /* HAVE_SETXATTR */

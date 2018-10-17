@@ -5,6 +5,7 @@
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2004-2008 Szabolcs Szakacsits
  * Copyright (c)      2005 Yura Pakhuchiy
+ * Copyright (c) 2014-2015 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -354,7 +355,7 @@ int ntfs_mft_record_layout(const ntfs_volume *vol, const MFT_REF mref,
 		 * Set the NTFS 3.1+ specific fields while we know that the
 		 * volume version is 3.1+.
 		 */
-		mrec->reserved = cpu_to_le16(0);
+		mrec->reserved = const_cpu_to_le16(0);
 		mrec->mft_record_number = cpu_to_le32(MREF(mref));
 	}
 	mrec->magic = magic_FILE;
@@ -362,7 +363,7 @@ int ntfs_mft_record_layout(const ntfs_volume *vol, const MFT_REF mref,
 		mrec->usa_count = cpu_to_le16(vol->mft_record_size /
 				NTFS_BLOCK_SIZE + 1);
 	else {
-		mrec->usa_count = cpu_to_le16(1);
+		mrec->usa_count = const_cpu_to_le16(1);
 		ntfs_log_error("Sector size is bigger than MFT record size.  "
 				"Setting usa_count to 1.  If Windows chkdsk "
 				"reports this as corruption, please email %s "
@@ -371,14 +372,14 @@ int ntfs_mft_record_layout(const ntfs_volume *vol, const MFT_REF mref,
 				"Thank you.\n", NTFS_DEV_LIST);
 	}
 	/* Set the update sequence number to 1. */
-	*(u16*)((u8*)mrec + le16_to_cpu(mrec->usa_ofs)) = cpu_to_le16(1);
-	mrec->lsn = cpu_to_le64(0ull);
-	mrec->sequence_number = cpu_to_le16(1);
-	mrec->link_count = cpu_to_le16(0);
+	*(le16*)((u8*)mrec + le16_to_cpu(mrec->usa_ofs)) = const_cpu_to_le16(1);
+	mrec->lsn = const_cpu_to_sle64(0ll);
+	mrec->sequence_number = const_cpu_to_le16(1);
+	mrec->link_count = const_cpu_to_le16(0);
 	/* Aligned to 8-byte boundary. */
 	mrec->attrs_offset = cpu_to_le16((le16_to_cpu(mrec->usa_ofs) +
 			(le16_to_cpu(mrec->usa_count) << 1) + 7) & ~7);
-	mrec->flags = cpu_to_le16(0);
+	mrec->flags = const_cpu_to_le16(0);
 	/*
 	 * Using attrs_offset plus eight bytes (for the termination attribute),
 	 * aligned to 8-byte boundary.
@@ -386,11 +387,11 @@ int ntfs_mft_record_layout(const ntfs_volume *vol, const MFT_REF mref,
 	mrec->bytes_in_use = cpu_to_le32((le16_to_cpu(mrec->attrs_offset) + 8 +
 			7) & ~7);
 	mrec->bytes_allocated = cpu_to_le32(vol->mft_record_size);
-	mrec->base_mft_record = cpu_to_le64((MFT_REF)0);
-	mrec->next_attr_instance = cpu_to_le16(0);
+	mrec->base_mft_record = const_cpu_to_le64((MFT_REF)0);
+	mrec->next_attr_instance = const_cpu_to_le16(0);
 	a = (ATTR_RECORD*)((u8*)mrec + le16_to_cpu(mrec->attrs_offset));
 	a->type = AT_END;
-	a->length = cpu_to_le32(0);
+	a->length = const_cpu_to_le32(0);
 	/* Finally, clear the unused part of the mft record. */
 	memset((u8*)a + 8, 0, vol->mft_record_size - ((u8*)a + 8 - (u8*)mrec));
 	return 0;
@@ -553,7 +554,7 @@ static int ntfs_mft_bitmap_find_free_rec(ntfs_volume *vol, ntfs_inode *base_ni)
 					"data_pos 0x%llx, bit 0x%llx, "
 					"*byte 0x%hhx, b %u.\n", size,
 					(long long)data_pos, (long long)bit,
-					byte ? *byte : -1, b);
+					(u8) (byte ? *byte : -1), b);
 			for (; bit < size && data_pos + bit < pass_end;
 					bit &= ~7ull, bit += 8) {
 				/* 
@@ -580,7 +581,7 @@ static int ntfs_mft_bitmap_find_free_rec(ntfs_volume *vol, ntfs_inode *base_ni)
 					"data_pos 0x%llx, bit 0x%llx, "
 					"*byte 0x%hhx, b %u.\n", size,
 					(long long)data_pos, (long long)bit,
-					byte ? *byte : -1, b);
+					(u8) (byte ? *byte : -1), b);
 			data_pos += size;
 			/*
 			 * If the end of the pass has not been reached yet,
@@ -1354,7 +1355,7 @@ undo_data_init:
 	goto out;
 }
 
-static ntfs_inode *ntfs_mft_rec_alloc(ntfs_volume *vol)
+ntfs_inode *ntfs_mft_rec_alloc(ntfs_volume *vol, BOOL mft_data)
 {
 	s64 ll, bit;
 	ntfs_attr *mft_na, *mftbmp_na;
@@ -1363,6 +1364,7 @@ static ntfs_inode *ntfs_mft_rec_alloc(ntfs_volume *vol)
 	ntfs_inode *base_ni;
 	int err;
 	le16 seq_no, usn;
+	BOOL forced_mft_data;
 
 	ntfs_log_enter("Entering\n");
 
@@ -1371,7 +1373,38 @@ static ntfs_inode *ntfs_mft_rec_alloc(ntfs_volume *vol)
 
 	base_ni = mft_na->ni;
 
-	bit = ntfs_mft_bitmap_find_free_rec(vol, base_ni);
+	/*
+	 * The first extent containing $MFT:$AT_DATA is better located
+	 * in record 15 to make sure it can be read at mount time.
+	 * The record 15 is prereserved as a base inode with no
+	 * extents and no name, and it is marked in use.
+	 */
+	forced_mft_data = FALSE;
+	if (mft_data) {
+		ntfs_inode *ext_ni = ntfs_inode_open(vol, FILE_mft_data);
+			/*
+			 * If record 15 cannot be opened, it is probably in
+			 * use as an extent. Apply standard procedure for
+			 * further extents.
+			 */
+		if (ext_ni) {
+			/*
+			 * Make sure record 15 is a base extent and has
+			 * no extents.
+			 * Also make sure it has no name : a base inode with
+			 * no extents and no name cannot be in use.
+			 * Otherwise apply standard procedure.
+			 */
+   			if (!ext_ni->mrec->base_mft_record
+			    && !ext_ni->nr_extents)
+				forced_mft_data = TRUE;
+			ntfs_inode_close(ext_ni);
+		}
+	}
+	if (forced_mft_data)
+		bit = FILE_mft_data;
+	else
+		bit = ntfs_mft_bitmap_find_free_rec(vol, base_ni);
 	if (bit >= 0)
 		goto found_free_rec;
 
@@ -1408,7 +1441,9 @@ found_free_rec:
 		goto undo_mftbmp_alloc;
 	}
 	/* Sanity check that the mft record is really not in use. */
-	if (ntfs_is_file_record(m->magic) && (m->flags & MFT_RECORD_IN_USE)) {
+	if (!forced_mft_data
+	    && (ntfs_is_file_record(m->magic)
+	    && (m->flags & MFT_RECORD_IN_USE))) {
 		ntfs_log_error("Inode %lld is used but it wasn't marked in "
 			       "$MFT bitmap. Fixed.\n", (long long)bit);
 		free(m);
@@ -1475,7 +1510,7 @@ found_free_rec:
 	ntfs_inode_mark_dirty(ni);
 	/* Initialize time, allocated and data size in ntfs_inode struct. */
 	ni->data_size = ni->allocated_size = 0;
-	ni->flags = 0;
+	ni->flags = const_cpu_to_le32(0);
 	ni->creation_time = ni->last_data_change_time =
 			ni->last_mft_change_time =
 			ni->last_access_time = ntfs_current_time();
@@ -1524,8 +1559,9 @@ err_out:
  * @base_ni is NULL we start where we last stopped and we perform wrap around
  * when we reach the end.  Note, we do not try to allocate mft records below
  * number 24 because numbers 0 to 15 are the defined system files anyway and 16
- * to 24 are special in that they are used for storing extension mft records
- * for the $DATA attribute of $MFT.  This is required to avoid the possibility
+ * to 24 are used for storing extension mft records or used by chkdsk to store
+ * its log. However the record number 15 is dedicated to the first extent to
+ * the $DATA attribute of $MFT.  This is required to avoid the possibility
  * of creating a run list with a circular dependence which once written to disk
  * can never be read in again.  Windows will only use records 16 to 24 for
  * normal files if the volume is completely out of space.  We never use them
@@ -1591,7 +1627,9 @@ ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
 	MFT_RECORD *m;
 	ntfs_inode *ni = NULL;
 	int err;
+	u32 usa_ofs;
 	le16 seq_no, usn;
+	BOOL oldwarn;
 
 	if (base_ni)
 		ntfs_log_enter("Entering (allocating an extent mft record for "
@@ -1605,7 +1643,7 @@ ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
 	}
 	
 	if (ntfs_is_mft(base_ni)) {
-		ni = ntfs_mft_rec_alloc(vol);
+		ni = ntfs_mft_rec_alloc(vol, FALSE);
 		goto out;
 	}
 
@@ -1705,10 +1743,22 @@ found_free_rec:
 	if (!m)
 		goto undo_mftbmp_alloc;
 	
+	/*
+	 * As this is allocating a new record, do not expect it to have
+	 * been initialized previously, so do not warn over bad fixups
+	 * (hence avoid warn flooding when an NTFS partition has been wiped).
+	 */
+	oldwarn = !NVolNoFixupWarn(vol);
+	NVolSetNoFixupWarn(vol);
 	if (ntfs_mft_record_read(vol, bit, m)) {
+		if (oldwarn)
+			NVolClearNoFixupWarn(vol);
 		free(m);
 		goto undo_mftbmp_alloc;
 	}
+	if (oldwarn)
+		NVolClearNoFixupWarn(vol);
+
 	/* Sanity check that the mft record is really not in use. */
 	if (ntfs_is_file_record(m->magic) && (m->flags & MFT_RECORD_IN_USE)) {
 		ntfs_log_error("Inode %lld is used but it wasn't marked in "
@@ -1717,7 +1767,16 @@ found_free_rec:
 		goto retry;
 	}
 	seq_no = m->sequence_number;
-	usn = *(le16*)((u8*)m + le16_to_cpu(m->usa_ofs));
+		/*
+		 * As ntfs_mft_record_read() returns what has been read
+		 * even when the fixups have been found bad, we have to
+		 * check where we fetch the initial usn from.
+		 */
+	usa_ofs = le16_to_cpu(m->usa_ofs);
+	if (!(usa_ofs & 1) && (usa_ofs < NTFS_BLOCK_SIZE)) {
+		usn = *(le16*)((u8*)m + usa_ofs);
+	} else
+		usn = const_cpu_to_le16(1);
 	if (ntfs_mft_record_layout(vol, bit, m)) {
 		ntfs_log_error("Failed to re-format mft record.\n");
 		free(m);
@@ -1777,7 +1836,7 @@ found_free_rec:
 	ntfs_inode_mark_dirty(ni);
 	/* Initialize time, allocated and data size in ntfs_inode struct. */
 	ni->data_size = ni->allocated_size = 0;
-	ni->flags = 0;
+	ni->flags = const_cpu_to_le32(0);
 	ni->creation_time = ni->last_data_change_time =
 			ni->last_mft_change_time =
 			ni->last_access_time = ntfs_current_time();

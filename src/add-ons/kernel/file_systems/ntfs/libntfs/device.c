@@ -211,14 +211,14 @@ s64 ntfs_pread(struct ntfs_device *dev, const s64 pos, s64 count, void *b)
 	struct ntfs_device_operations *dops;
 
 	ntfs_log_trace("pos %lld, count %lld\n",(long long)pos,(long long)count);
-	
+
 	if (!b || count < 0 || pos < 0) {
 		errno = EINVAL;
 		return -1;
 	}
 	if (!count)
 		return 0;
-	
+
 	dops = dev->d_ops;
 
 	for (total = 0; count; count -= br, total += br) {
@@ -273,7 +273,7 @@ s64 ntfs_pwrite(struct ntfs_device *dev, const s64 pos, s64 count,
 		errno = EROFS;
 		goto out;
 	}
-	
+
 	dops = dev->d_ops;
 
 	NDevSetDirty(dev);
@@ -296,7 +296,7 @@ s64 ntfs_pwrite(struct ntfs_device *dev, const s64 pos, s64 count,
 		total--; /* on sync error, return partially written */
 	}
 	ret = total;
-out:	
+out:
 	return ret;
 }
 
@@ -605,18 +605,19 @@ s64 ntfs_device_size_get(struct ntfs_device *dev, int block_size)
 
 		partition_info partitionInfo;
 		device_geometry geometry;
-		
+
 		if (dev->d_ops->ioctl(dev, B_GET_PARTITION_INFO, &partitionInfo) == 0)
 			size = partitionInfo.size;
 		else if (dev->d_ops->ioctl(dev, B_GET_GEOMETRY, &geometry) == 0) {
 			size = (off_t)geometry.cylinder_count * geometry.sectors_per_track
 				* geometry.head_count * geometry.bytes_per_sector;
 		}
-		
+
 		if (size > 0)
 			return (s64)size / block_size;
 	}
-#endif
+ #endif
+
 	/*
 	 * We couldn't figure it out by using a specialized ioctl,
 	 * so do binary search to find the size of the device.

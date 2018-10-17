@@ -65,7 +65,7 @@ BOOL ntfs_boot_sector_is_ntfs(NTFS_BOOT_SECTOR *b)
 	ntfs_log_debug("Beginning bootsector check.\n");
 
 	ntfs_log_debug("Checking OEMid, NTFS signature.\n");
-	if (b->oem_id != cpu_to_le64(0x202020205346544eULL)) { /* "NTFS    " */
+	if (b->oem_id != const_cpu_to_le64(0x202020205346544eULL)) { /* "NTFS    " */
 		ntfs_log_error("NTFS signature is missing.\n");
 		goto not_ntfs;
 	}
@@ -140,7 +140,7 @@ BOOL ntfs_boot_sector_is_ntfs(NTFS_BOOT_SECTOR *b)
 		}
 	}
 
-	if (b->end_of_sector_marker != cpu_to_le16(0xaa55))
+	if (b->end_of_sector_marker != const_cpu_to_le16(0xaa55))
 		ntfs_log_debug("Warning: Bootsector has invalid end of sector "
 			       "marker.\n");
 
@@ -204,7 +204,7 @@ int ntfs_boot_sector_parse(ntfs_volume *vol, const NTFS_BOOT_SECTOR *bs)
 				  (sectors - 1) << vol->sector_size_bits,
 				  SEEK_SET) == -1) {
 		ntfs_log_perror("Failed to read last sector (%lld)",
-			       	(long long)sectors);
+			       	(long long)(sectors - 1));
 		ntfs_log_error("%s", last_sector_error);
 		return -1;
 	}

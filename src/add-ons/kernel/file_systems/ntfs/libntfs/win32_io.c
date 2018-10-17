@@ -6,7 +6,7 @@
  * Copyright (c) 2003-2004 Lode Leroy
  * Copyright (c) 2003-2006 Anton Altaparmakov
  * Copyright (c) 2004-2005 Yuval Fledel
- * Copyright (c) 2012-2013 Jean-Pierre Andre
+ * Copyright (c) 2012-2014 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -150,6 +150,7 @@ enum { /* see http://msdn.microsoft.com/en-us/library/cc704588(v=prot.10).aspx *
    STATUS_FILE_NOT_FOUND =       0xC0000028,
    STATUS_OBJECT_NAME_INVALID =  0xC0000033,
    STATUS_OBJECT_NAME_NOT_FOUND = 0xC0000034,
+   STATUS_SHARING_VIOLATION =    0xC0000043,
    STATUS_INVALID_PARAMETER_1 =  0xC00000EF,
    STATUS_IO_DEVICE_ERROR =      0xC0000185,
    STATUS_GUARD_PAGE_VIOLATION = 0x80000001
@@ -354,6 +355,8 @@ static int ntfs_ntstatus_to_errno(NTSTATUS status)
 		case STATUS_IO_DEVICE_ERROR :
 		case STATUS_END_OF_FILE :
 			return (EIO);
+		case STATUS_SHARING_VIOLATION :
+			return (EBUSY);
 		default:
 			/* generic message */
 			return ENOMSG;
@@ -1547,6 +1550,7 @@ static int ntfs_device_win32_close(struct ntfs_device *dev)
 		rvl = NtClose(fd->handle) == STATUS_SUCCESS;
 	} else
 		rvl = CloseHandle(fd->handle);
+	NDevClearOpen(dev);
 	free(fd);
 	if (!rvl) {
 		errno = ntfs_w32error_to_errno(GetLastError());
@@ -1633,7 +1637,8 @@ static s64 ntfs_device_win32_write(struct ntfs_device *dev, const void *b,
 {
 	s64 old_pos, to_write, i, bw = 0;
 	win32_fd *fd = (win32_fd *)dev->d_private;
-	BYTE *alignedbuffer;
+	const BYTE *alignedbuffer;
+	BYTE *readbuffer;
 	int old_ofs, ofs;
 
 	old_pos = fd->pos;
@@ -1658,15 +1663,16 @@ static s64 ntfs_device_win32_write(struct ntfs_device *dev, const void *b,
 	if (!count)
 		return 0;
 	NDevSetDirty(dev);
+	readbuffer = (BYTE*)NULL;
 	if (!((unsigned long)b & (fd->geo_sector_size - 1)) && !old_ofs &&
 			!(count & (fd->geo_sector_size - 1)))
-		alignedbuffer = (BYTE *)b;
+		alignedbuffer = (const BYTE *)b;
 	else {
 		s64 end;
 
-		alignedbuffer = (BYTE *)VirtualAlloc(NULL, to_write,
+		readbuffer = (BYTE *)VirtualAlloc(NULL, to_write,
 				MEM_COMMIT, PAGE_READWRITE);
-		if (!alignedbuffer) {
+		if (!readbuffer) {
 			errno = ntfs_w32error_to_errno(GetLastError());
 			ntfs_log_trace("VirtualAlloc failed for write.\n");
 			return -1;
@@ -1675,7 +1681,7 @@ static s64 ntfs_device_win32_write(struct ntfs_device *dev, const void *b,
 		if (ofs) {
 			i = ntfs_device_win32_pread_simple(fd,
 					old_pos & ~(s64)(fd->geo_sector_size - 1),
-					fd->geo_sector_size, alignedbuffer);
+					fd->geo_sector_size, readbuffer);
 			if (i != fd->geo_sector_size) {
 				if (i >= 0)
 					errno = EIO;
@@ -1693,7 +1699,7 @@ static s64 ntfs_device_win32_write(struct ntfs_device *dev, const void *b,
 				((to_write > fd->geo_sector_size) || !ofs)) {
 			i = ntfs_device_win32_pread_simple(fd,
 					end & ~(s64)(fd->geo_sector_size - 1),
-					fd->geo_sector_size, alignedbuffer +
+					fd->geo_sector_size, readbuffer +
 					to_write - fd->geo_sector_size);
 			if (i != fd->geo_sector_size) {
 				if (i >= 0)
@@ -1701,8 +1707,9 @@ static s64 ntfs_device_win32_write(struct ntfs_device *dev, const void *b,
 				goto write_error;
 			}
 		}
-		/* Copy the data to be written into @alignedbuffer. */
-		memcpy(alignedbuffer + ofs, b, count);
+		/* Copy the data to be written into @readbuffer. */
+		memcpy(readbuffer + ofs, b, count);
+		alignedbuffer = readbuffer;
 	}
 	if (fd->vol_handle != INVALID_HANDLE_VALUE && old_pos < fd->geo_size) {
 		s64 vol_to_write = fd->geo_size - old_pos;
@@ -1740,8 +1747,8 @@ static s64 ntfs_device_win32_write(struct ntfs_device *dev, const void *b,
 		bw = count;
 	fd->pos = old_pos + bw;
 write_partial:
-	if (alignedbuffer != b)
-		VirtualFree(alignedbuffer, 0, MEM_RELEASE);
+	if (readbuffer)
+		VirtualFree(readbuffer, 0, MEM_RELEASE);
 	return bw;
 write_error:
 	bw = -1;
@@ -1877,7 +1884,11 @@ static int ntfs_device_win32_ioctl(struct ntfs_device *dev, int request,
 #ifdef BLKSSZGET
 	case BLKSSZGET:
 		ntfs_log_debug("BLKSSZGET detected.\n");
-		return ntfs_win32_blksszget(dev, (int *)argp);
+		if (fd && !fd->ntdll) {
+			*(int*)argp = fd->geo_sector_size;
+			return (0);
+		} else
+			return ntfs_win32_blksszget(dev, (int *)argp);
 #endif
 #ifdef BLKBSZSET
 	case BLKBSZSET:

@@ -15,6 +15,7 @@ KernelStaticLibrary libntfs.a :
 	debug.c
 	device.c
 	dir.c
+	ea.c
 	efs.c
 	index.c
 	inode.c

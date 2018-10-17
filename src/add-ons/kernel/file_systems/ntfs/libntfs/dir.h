@@ -29,12 +29,6 @@
 
 #define PATH_SEP '/'
 
-#ifdef __HAIKU__
-#ifndef MAX_PATH
-#define MAX_PATH 1024
-#endif
-#endif
-
 /*
  * We do not have these under DJGPP, so define our version that do not conflict
  * with other S_IFs defined under DJGPP.
@@ -115,10 +109,8 @@ extern int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 		void *dirent, ntfs_filldir_t filldir);
 
 ntfs_inode *ntfs_dir_parent_inode(ntfs_inode *ni);
-
-#ifdef __HAIKU__
 MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni);
-#endif
+u32 ntfs_interix_types(ntfs_inode *ni);
 
 int ntfs_get_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
 			char *value, size_t size);

@@ -72,7 +72,7 @@ struct hd_geometry {
 /* A few useful functions */
 int ntfs_win32_set_sparse(int);
 int ntfs_win32_ftruncate(int fd, s64 size);
-int ntfs_win32_device_ftruncate(struct ntfs_device*, s64);
+int ntfs_device_win32_ftruncate(struct ntfs_device*, s64);
 
 #endif /* HAVE_WINDOWS_H */
 
