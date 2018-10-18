@@ -200,18 +200,17 @@ for platform in [ MultiBootSubDirSetup ] {
 			: $(ldflags)
 		;
 
-
 		switch $(TARGET_BOOT_PLATFORM) {
 			case efi :
 				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
-		    case bios_ia32 :
+			case bios_ia32 :
 				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case pxe_ia32 :
 				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
-		    case openfirmware :
+			case openfirmware :
 				BuildCoffLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case u-boot :
@@ -222,7 +221,7 @@ for platform in [ MultiBootSubDirSetup ] {
 					-a $(HAIKU_BOOT_LOADER_BASE) -e $(loader_entry)
 					-n 'Haiku $(TARGET_KERNEL_ARCH) loader' ;
 				BuildUImage haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) : haiku-floppyboot.tgz :
-				    -A $(TARGET_ARCH) -O linux -T ramdisk -C none
+					-A $(TARGET_ARCH) -O linux -T ramdisk -C none
 					-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
 				BuildUImageScript boot.scr : $(HAIKU_MMC_UBOOT_SCRIPT) ;
 
