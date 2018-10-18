@@ -15,263 +15,57 @@ UsePrivateHeaders [ FDirName storage ] ;
 UsePrivateHeaders [ FDirName kernel arch generic ] ;
 
 {
-	local defines = _BOOT_MODE ;
+    local defines = _BOOT_MODE ;
 
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -g3 -O0 ;
-	SubDirC++Flags $(defines) -fno-rtti -g3 -O0 ;
+    defines = [ FDefines $(defines) ] ;
+    SubDirCcFlags $(defines) -g3 -O0 ;
+    SubDirC++Flags $(defines) -fno-rtti -g3 -O0 ;
 }
-
-# we fake NetBSD since we don't have an OS ID yet for uimage,
-# and we also fake a netbsd loader anyway.
-local uImageFakeOS = "netbsd" ;
-
-# Modern u-boot fill in sane addresses for us.
-# We only need to fill in the FDT dtb
-HAIKU_MMC_UBOOT_SCRIPT = "\
-	test -e mmc 0 uEnv.txt && fatload mmc 0 ${scriptaddr} uEnv.txt && env import -t ${scriptaddr} ${filesize} \
-	fatload mmc 0 ${kernel_addr_r} haiku_loader.ub \
-	fatload mmc 0 ${ramdisk_addr_r} haiku-floppyboot.tgz.ub \
-	fatload mmc 0 ${fdt_addr_r} ${dtb} \
-	fdt addr ${fdt_addr_r} \
-	bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}" ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-# First build the non arch dependent parts
-BootMergeObject boot_platform_u-boot_common.o :
-	start.cpp
-	debug.cpp
-	console.cpp
-	serial.cpp
-	devices.cpp
-	keyboard.cpp
-	menu.cpp
-	cpu.cpp
-	uimage.cpp
-	video.cpp
-	openfirmware.cpp
-	$(genericPlatformSources)
-	:
-	:
-	boot_platform_generic.a
-	boot_fdt.a
-;
-
-BootMergeObject boot_platform_u-boot.o :
-	: :
-	# must come first to have _start_* at correct locations
-	boot_platform_u-boot_$(TARGET_ARCH).o
-	boot_platform_u-boot_common.o
-;
-
-# TODO: handle flash and SD images as Container stuff ?
-
-# bootable flash image
-rule BuildUBootFlashImage image : haikuLoader : parts
-{
-	Depends $(image) : $(haikuLoader) ;
-	#Depends $(image) : $(archive) ;
-	Depends $(image) : $(parts) ;
-	LocalClean clean : $(image) ;
-	FLASH_IMAGE_BLOCK_SIZE on $(image) = 1024 ;
-	FLASH_IMAGE_BLOCK_COUNT on $(image) = 32768 ;
-	#FLASH_IMAGE_UBOOT_OFFSET on $(image) = 0 ;
-	FLASH_IMAGE_LOADER_OFFSET on $(image) = 248 ;
-
-	# add u-boot
-	FLASH_OFFSET on $(haikuLoader) = $(FLASH_IMAGE_LOADER_OFFSET) ;
-	local offsets = ;
-	for dep in $(haikuLoader) $(parts) {
-		offsets += [ on $(dep) return $(FLASH_OFFSET) ] ;
-	}
-	FLASH_OFFSETS on $(image) = $(offsets) ;
-
-	# create empty image
-	BuildUBootFlashImage1 $(image) : $(haikuLoader) $(parts) ;
-}
-
-
-actions BuildUBootFlashImage1
-{
-	$(RM) $(<)
-
-	# make an empty image
-	dd of=$(<) \
-		if=/dev/zero \
-		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
-		count=$(FLASH_IMAGE_BLOCK_COUNT)
-
-	# add binaries
-	# ugly HACK
-	FLASH_OFFSETS=" $(FLASH_OFFSETS) "
-	FLASH_OFFSETS=${FLASH_OFFSETS# }
-	for b in $(>) ; do
-		s="${FLASH_OFFSETS%% *}"
-		FLASH_OFFSETS="${FLASH_OFFSETS#* }"
-		dd of=$(<) \
-			if=$b \
-			bs=$(FLASH_IMAGE_BLOCK_SIZE) \
-			conv=notrunc seek=$s
-	done
-}
-
-# uImage
-rule BuildUImage image : data : args
-{
-	Depends $(image) : $(data) ;
-	LocalClean clean : $(image) ;
-	MKIMAGE_ARGS on $(image) = $(args) ;
-	colon on $(image) = ":" ;
-	local files = $(data:G=) ;
-	BuildUImage1 $(image) : $(data) ;
-}
-
-actions BuildUImage1
-{
-	mkimage $(MKIMAGE_ARGS) -d $(>:J=$(colon)) $(<)
-}
-
-rule BuildUImageScript script : content
-{
-	LocalClean clean : $(script) ;
-	SCRIPTCONTENT on $(script) = $(content) ;
-	SCRIPTNAME on $(script) = $(script) ;
-	FAKEOS on $(script) = $(uImageFakeOS) ;
-	BuildUImageScript1 $(script) : $(content) ;
-}
-
-actions BuildUImageScript1
-{
-	rm -f $(<) $(<).txt
-	echo '$(SCRIPTCONTENT)' > $(<).txt
-	mkimage -A $(TARGET_ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
-		-d $(<).txt $(<)
-	rm -f $(<).txt
-}
-
-# SD/mmc image rule
-# requires mtools package on linux
-rule BuildUBootSDImage image : files
-{
-	Depends $(image) : $(files) $(TARGET_DEVICE_TREES) ;
-	SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1MiB
-	SDIMAGE_MTOOLS_H on $(image) = 255 ;
-	SDIMAGE_MTOOLS_S on $(image) = 63 ;
-	SDIMAGE_MTOOLS_C on $(image) = 8 ;
-	SDIMAGE_SIZE on $(image) = $(HAIKU_BOOT_SDIMAGE_SIZE) ;
-	SDIMAGE_BEGIN on $(image) = $(HAIKU_BOOT_SDIMAGE_BEGIN:E=63) ;
-	BuildUBootSDImage1 $(image) : $(files) ;
-}
-
-actions BuildUBootSDImage1
-{
-	$(RM) $(1)
-	$(RM) $(1).mtools
-
-	# make an empty image
-	dd of=$(1) \
-		if=/dev/zero \
-		bs=$(SDIMAGE_BLOCK_SIZE) \
-		count=$(SDIMAGE_SIZE)
-	# generate mtools config
-	echo 'drive i: file="$(1)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
-		heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
-		mformat_only' > $(1).mtools
-	# partition it
-	MTOOLSRC=$(1).mtools mpartition -b$(SDIMAGE_BEGIN) -cI -T 0xc i:
-	# format the image
-	MTOOLSRC=$(1).mtools mformat -L 32 -v "HAIKU" i:
-
-	# generate u-boot environment variables
-	echo '$(HAIKU_BOARD_SDIMAGE_UBOOT_UENV)' > uEnv.txt
-	# populate
-	MTOOLSRC=$(1).mtools mcopy $(2[1-]) i:
-	MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
-	# populate fdts
-	MTOOLSRC=$(1).mtools mmd i:\fdt
-	MTOOLSRC=$(1).mtools mcopy $(TARGET_DEVICE_TREES[1-]) i:\fdt\
-	# list content
-	MTOOLSRC=$(1).mtools mdir i:
-	MTOOLSRC=$(1).mtools mdir i:\fdt
-	# cleanup
-	$(RM) $(1).mtools
-	$(RM) uEnv.txt
-	# Add haiku bootstrap partition to MMC image
-	#cat $(2[0]) >> $(1)
-}
-
-
-rule BlessSDImage image
-{
-	# "Blesses" SD cards by writing out data to a fixed point outside of the
-	# filesystem. Handy if your board needs an SPL or boot0 at a fixed point.
-	if $(HAIKU_BOARD_SDIMAGE_BOOT0_FILE) {
-		Depends $(image) : $(HAIKU_BOARD_SDIMAGE_BOOT0_FILE) ;
-	}
-
-	if $(HAIKU_BOARD_SDIMAGE_BOOT1_FILE) {
-		Depends $(image) : $(HAIKU_BOARD_SDIMAGE_BOOT1_FILE) ;
-	}
-
-	BlessSDImage1 $(image) : $(HAIKU_BOARD_SDIMAGE_BOOT0_FILE) $(HAIKU_BOARD_SDIMAGE_BOOT1_FILE) ;
-}
-
-
-actions BlessSDImage1 bind HAIKU_BOARD_SDIMAGE_BOOT0_SEEK HAIKU_BOARD_SDIMAGE_BOOT1_SEEK
-{
-	if [ $(HAIKU_BOARD_SDIMAGE_BOOT0_SEEK:E=-1) -ge 0 ]; then
-		dd if=$(2[1]) of=$(1) bs=1 seek=$(HAIKU_BOARD_SDIMAGE_BOOT0_SEEK) conv=notrunc
-	fi
-
-	if [ $(HAIKU_BOARD_SDIMAGE_BOOT1_SEEK:E=-1) -ge 0 ]; then
-		dd if=$(2[2]) of=$(1) bs=1 seek=$(HAIKU_BOARD_SDIMAGE_BOOT1_SEEK) conv=notrunc
-	fi
-}
-
-HAIKU_BOOT_LOADER_ENTRY_LINUX = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIKU_BOOT_LOADER_BASE)|bc` ;
-
-# uimage targets
-BuildUImage haiku-floppyboot.tgz.ub : haiku-floppyboot.tgz :
-	-A $(TARGET_ARCH) -O linux -T ramdisk -C none
-		-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
-
-BuildUImage haiku_loader.ub : haiku_loader :
-	-A $(TARGET_ARCH) -O linux -T kernel -C none
-	-a $(HAIKU_BOOT_LOADER_BASE) -e $(HAIKU_BOOT_LOADER_ENTRY_LINUX)
-		-n 'Haiku $(TARGET_KERNEL_ARCH) loader' ;
-
-BuildUImageScript boot.scr : $(HAIKU_MMC_UBOOT_SCRIPT) ;
-
-# flash image targets
-
-BuildUBootFlashImage haiku-$(TARGET_KERNEL_ARCH)_flash_image_raw.img : haiku_loader :
-	$(FLASH_IMAGE_PARTS) ;
-NotFile haiku-flash-image ;
-Depends haiku-flash-image : haiku-$(TARGET_KERNEL_ARCH)_flash_image_raw.img ;
-
-#BuildUBootFlashImage haiku-$(TARGET_KERNEL_ARCH)_flash_image_elf.img : boot_loader_u-boot :
-#	$(FLASH_IMAGE_PARTS) ;
-#NotFile haiku-flash-elf-image ;
-#Depends haiku-flash-elf-image : haiku-$(TARGET_KERNEL_ARCH)_flash_image_elf.img ;
-
-BuildUBootFlashImage haiku-$(TARGET_KERNEL_ARCH)_flash_image_uimage.img : haiku_loader.ub :
-	$(FLASH_IMAGE_PARTS) ;
-NotFile haiku-flash-uimage ;
-Depends haiku-flash-uimage : haiku-$(TARGET_KERNEL_ARCH)_flash_image_uimage.img ;
-
-# SD/mmc image targets
-BuildUBootSDImage haiku-$(TARGET_KERNEL_ARCH).mmc :
-	$(HAIKU_IMAGE) haiku_loader.ub haiku-floppyboot.tgz.ub boot.scr ;
-BlessSDImage haiku-$(TARGET_KERNEL_ARCH).mmc ;
-NotFile haiku-mmc-image ;
-Depends haiku-mmc-image : haiku-$(TARGET_KERNEL_ARCH).mmc ;
-
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
-	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+    = [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
-SEARCH on [ FGristFiles openfirmware.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel platform u-boot ] ;
+local platform ;
+for platform in [ MultiBootSubDirSetup u-boot ] {
+	on $(platform) {
+
+		local kernelPlatformSources =
+			openfirmware.cpp ;
+
+		SEARCH on [ FGristFiles $(kernelPlatformSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel platform u-boot ] ;
+
+		# First build the non arch dependent parts
+		BootMergeObject boot_platform_u-boot_common.o :
+		    start.cpp
+		    debug.cpp
+		    console.cpp
+		    serial.cpp
+		    devices.cpp
+		    keyboard.cpp
+		    menu.cpp
+		    cpu.cpp
+		    uimage.cpp
+		    video.cpp
+			$(kernelPlatformSources)
+		    $(genericPlatformSources)
+		    :
+		    :
+		    boot_platform_generic.a
+		    boot_fdt.a
+		;
+
+		BootMergeObject boot_platform_u-boot.o :
+		    : :
+		    # must come first to have _start_* at correct locations
+		    boot_platform_u-boot_$(TARGET_ARCH).o
+		    boot_platform_u-boot_common.o
+		;
+	}
+}
+
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.

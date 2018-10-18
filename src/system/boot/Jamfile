@@ -4,6 +4,9 @@ DEFINES += _BOOT_MODE ;
 
 UsePrivateHeaders [ FDirName libroot locale ] ;
 
+#
+# Coff haiku_loader creation
+#
 rule BuildCoffLoader {
 	local coffLoader = $(1) ;
 	local bootLoader = $(2) ;
@@ -29,6 +32,10 @@ actions BuildCoffLoader bind HACK_COFF {
 	$(HACK_COFF) $(1)
 }
 
+
+#
+# BIOS haiku_loader creation
+#
 rule BuildBiosLoader {
 	local haikuLoader = $(1) ;
 	local bootLoader = $(2) ;
@@ -48,6 +55,10 @@ actions BuildBiosLoader {
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O binary $(2) $(1)
 }
 
+
+#
+# EFI loader creation
+#
 rule BuildEFILoader {
 	local efiLoader = $(1) ;
 	local bootLoader = $(2) ;
@@ -61,6 +72,44 @@ actions BuildEFILoader {
 	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
 	-j .rel -j .rela -j .reloc --target=efi-app-x86_64 $(2) $(1)
 }
+
+
+#
+# U-boot image creation
+#
+rule BuildUImage image : data : args
+{
+    Depends $(image) : $(data) ;
+    LocalClean clean : $(image) ;
+    MKIMAGE_ARGS on $(image) = $(args) ;
+    colon on $(image) = ":" ;
+    local files = $(data:G=) ;
+    BuildUImage1 $(image) : $(data) ;
+}
+
+actions BuildUImage1
+{
+    mkimage $(MKIMAGE_ARGS) -d $(>:J=$(colon)) $(<)
+}
+
+rule BuildUImageScript script : content
+{
+    LocalClean clean : $(script) ;
+    SCRIPTCONTENT on $(script) = $(content) ;
+    SCRIPTNAME on $(script) = $(script) ;
+    FAKEOS on $(script) = "linux" ;
+    BuildUImageScript1 $(script) : $(content) ;
+}
+
+actions BuildUImageScript1
+{
+    rm -f $(<) $(<).txt
+    echo '$(SCRIPTCONTENT)' > $(<).txt
+    mkimage -A $(TARGET_ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
+        -d $(<).txt $(<)
+    rm -f $(<).txt
+}
+
 
 local extraSources = ;
 if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
@@ -151,12 +200,34 @@ for platform in [ MultiBootSubDirSetup ] {
 			: $(ldflags)
 		;
 
-		BuildCoffLoader boot_loader_$(TARGET_BOOT_PLATFORM)_coff : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
-		if $(TARGET_BOOT_PLATFORM) != efi {
-			BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-		} else {
-			BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+		switch $(TARGET_BOOT_PLATFORM) {
+			case efi :
+				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
+		    case bios_ia32 :
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
+			case pxe_ia32 :
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
+		    case openfirmware :
+				BuildCoffLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
+			case u-boot :
+				local loader_entry = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIKU_BOOT_LOADER_BASE)|bc` ;
+				BuildUImage haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM)
+					:
+					-A $(TARGET_ARCH) -O linux -T kernel -C none
+					-a $(HAIKU_BOOT_LOADER_BASE) -e $(loader_entry)
+					-n 'Haiku $(TARGET_KERNEL_ARCH) loader' ;
+				BuildUImage haiku-floppyboot.tgz.$(TARGET_BOOT_PLATFORM) : haiku-floppyboot.tgz :
+				    -A $(TARGET_ARCH) -O linux -T ramdisk -C none
+					-n 'Haiku $(TARGET_KERNEL_ARCH) floppyboot' ;
+				BuildUImageScript boot.scr : $(HAIKU_MMC_UBOOT_SCRIPT) ;
+
+			case * :
+				Exit "Currently unsupported haiku_loader:" $(TARGET_BOOT_PLATFORM) ;
 		}
 	}
 }

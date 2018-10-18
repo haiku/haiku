@@ -1,0 +1,63 @@
+# Set anyboot file name and directory defaults.
+HAIKU_MMC_NAME ?= $(HAIKU_DEFAULT_MMC_NAME) ;
+HAIKU_MMC_DIR ?= $(HAIKU_DEFAULT_MMC_DIR) ;
+HAIKU_MMC = $(HAIKU_MMC_NAME) ;
+HAIKU_MMC_LABEL ?= $(HAIKU_DEFAULT_MMC_LABEL) ;
+
+# SD/mmc image rule
+# requires mtools package on linux
+rule BuildUBootSDImage image : files
+{
+    Depends $(image) : $(files) $(TARGET_DEVICE_TREES) ;
+    SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1MiB
+    SDIMAGE_MTOOLS_H on $(image) = 255 ;
+    SDIMAGE_MTOOLS_S on $(image) = 63 ;
+    SDIMAGE_MTOOLS_C on $(image) = 8 ;
+    SDIMAGE_SIZE on $(image) = $(HAIKU_BOOT_SDIMAGE_SIZE) ;
+    SDIMAGE_BEGIN on $(image) = $(HAIKU_BOOT_SDIMAGE_BEGIN:E=63) ;
+    BuildUBootSDImage1 $(image) : $(files) ;
+}
+
+actions BuildUBootSDImage1
+{
+    $(RM) $(1)
+    $(RM) $(1).mtools
+
+    # make an empty image
+    dd of=$(1) \
+        if=/dev/zero \
+        bs=$(SDIMAGE_BLOCK_SIZE) \
+        count=$(SDIMAGE_SIZE)
+    # generate mtools config
+    echo 'drive i: file="$(1)" partition=1 cylinders=$(SDIMAGE_MTOOLS_C)
+        heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
+        mformat_only' > $(1).mtools
+    # partition it
+    MTOOLSRC=$(1).mtools mpartition -b$(SDIMAGE_BEGIN) -cI -T 0xc i:
+    # format the image
+    MTOOLSRC=$(1).mtools mformat -L 32 -v "HAIKU" i:
+
+    # generate u-boot environment variables
+    echo '$(HAIKU_BOARD_SDIMAGE_UBOOT_UENV)' > uEnv.txt
+    # populate
+    MTOOLSRC=$(1).mtools mcopy $(2[1-]) i:
+    MTOOLSRC=$(1).mtools mcopy uEnv.txt i:
+    # populate fdts
+    MTOOLSRC=$(1).mtools mmd i:\fdt
+    MTOOLSRC=$(1).mtools mcopy $(TARGET_DEVICE_TREES[1-]) i:\fdt\
+    # list content
+    MTOOLSRC=$(1).mtools mdir i:
+    MTOOLSRC=$(1).mtools mdir i:\fdt
+    # cleanup
+    $(RM) $(1).mtools
+    $(RM) uEnv.txt
+    # Add haiku bootstrap partition to MMC image
+    #cat $(2[0]) >> $(1)
+}
+
+# SD/mmc image targets
+BuildUBootSDImage $(HAIKU_MMC_NAME) :
+    $(HAIKU_IMAGE) haiku_loader.u-boot haiku-floppyboot.tgz.u-boot boot.scr ;
+#BlessSDImage haiku-$(TARGET_KERNEL_ARCH).mmc ;
+NotFile haiku-mmc-image ;
+Depends haiku-mmc-image : $(HAIKU_MMC_NAME) ;
