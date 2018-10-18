@@ -41,17 +41,16 @@ BuildMBR $(baseMBR) : $(mbrSource) ;
 MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
 MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
 
-if $(HAIKU_ANYBOOT_UEFI) = 1 {
-	Echo "Anyboot is MBR/UEFI hybrid" ;
+if $(HAIKU_ANYBOOT_LEGACY) = 1 {
+	Echo "HAIKU_ANYBOOT_LEGACY defined so anyboot is MBR only" ;
+	BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
+		: $(HAIKU_IMAGE_NAME) ;
+} else {
 	local efiLoader = haiku_loader.efi ;
 	local efiPartition = esp.image ;
 	MakeLocate $(efiPartition) ;
 	BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 	BuildAnybootImageEfi $(HAIKU_ANYBOOT) : $(baseMBR) : $(efiPartition) : $(HAIKU_CD_BOOT_IMAGE)
-		: $(HAIKU_IMAGE_NAME) ;
-} else {
-	Echo "Anyboot is MBR only" ;
-	BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
 		: $(HAIKU_IMAGE_NAME) ;
 }
 
