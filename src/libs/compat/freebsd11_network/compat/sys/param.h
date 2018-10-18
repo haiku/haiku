@@ -53,6 +53,10 @@
 #define	ALIGNED_POINTER(p, t)	1
 #elif defined(__powerpc__)
 #define	ALIGNED_POINTER(p, t)	((((uintptr_t)(p)) & (sizeof (t) - 1)) == 0)
+#elif defined(__arm__)
+#define	ALIGNED_POINTER(p, t)	((((unsigned)(p)) & (sizeof(t) - 1)) == 0)
+#elif defined(__mips__)
+#define	ALIGNED_POINTER(p, t)	((((unsigned long)(p)) & (sizeof (t) - 1)) == 0)
 #else
 #error Need definition of ALIGNED_POINTER for this arch!
 #endif
