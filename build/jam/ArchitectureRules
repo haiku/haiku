@@ -360,14 +360,15 @@ rule KernelArchitectureSetup architecture
 
 	HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
+	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
+	HAIKU_KERNEL_PIC_LINKFLAGS = ;
+	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
+
+	# Common boot-related cflags which apply to all loaders
 	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
-
-	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
-	HAIKU_KERNEL_PIC_LINKFLAGS = ;
-	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
 	# Any special kernel base addresses
 	if $(HAIKU_BOOT_LOADER_BASE) {
@@ -420,6 +421,7 @@ rule KernelArchitectureSetup architecture
 			}
 	}
 
+	# bootloader-centric flags
 	local bootTarget ;
 	for bootTarget in $(HAIKU_BOOT_TARGETS) {
 		switch $(bootTarget) {
