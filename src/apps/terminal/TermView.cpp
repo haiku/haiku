@@ -1781,9 +1781,8 @@ TermView::MessageReceived(BMessage *msg)
 				if (msg->FindUInt8("index", i, &index) != B_OK)
 					break;
 
-				if (index < kTermColorCount)
-					SetTermColor(index,
-						TermApp::DefaultPalette()[index], dynamic);
+				SetTermColor(index,
+					TermApp::DefaultPalette()[index], dynamic);
 			}
 			break;
 		}

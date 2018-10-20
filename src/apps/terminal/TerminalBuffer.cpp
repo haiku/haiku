@@ -231,15 +231,14 @@ TerminalBuffer::SetCursorHidden(bool hidden)
 void
 TerminalBuffer::SetPaletteColor(uint8 index, rgb_color color)
 {
-	if (index < kTermColorCount)
-		fColorsPalette[index] = color;
+	fColorsPalette[index] = color;
 }
 
 
 rgb_color
 TerminalBuffer::PaletteColor(uint8 index)
 {
-	return fColorsPalette[min_c(index, kTermColorCount - 1)];
+	return fColorsPalette[index];
 }
 
 
