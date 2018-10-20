@@ -1005,7 +1005,7 @@ XHCI::WriteDescriptorChain(xhci_td *descriptor, iovec *vector,
 	size_t bufferOffset = 0;
 
 	while (current != NULL) {
-		if (current->buffer_log == NULL)
+		if (current->buffer_log[0] == NULL)
 			break;
 
 		while (true) {
@@ -1060,7 +1060,7 @@ XHCI::ReadDescriptorChain(xhci_td *descriptor, iovec *vector,
 	size_t bufferOffset = 0;
 
 	while (current != NULL) {
-		if (current->buffer_log == NULL)
+		if (current->buffer_log[0] == NULL)
 			break;
 
 		while (true) {
