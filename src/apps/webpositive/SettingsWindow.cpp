@@ -470,31 +470,23 @@ SettingsWindow::_CreateProxyPage(float spacing)
 	fProxyPasswordControl->SetText(
 		fSettings->GetValue(kSettingsKeyProxyPassword, ""));
 
-	BView* view = BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(fUseProxyCheckBox)
-		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
-			.Add(fProxyAddressControl->CreateLabelLayoutItem(), 0, 0)
-			.Add(fProxyAddressControl->CreateTextViewLayoutItem(), 1, 0)
-
-			.Add(fProxyPortControl->CreateLabelLayoutItem(), 0, 1)
-			.Add(fProxyPortControl->CreateTextViewLayoutItem(), 1, 1)
-		)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
-		.Add(fUseProxyAuthCheckBox)
-		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
-			.Add(fProxyUsernameControl->CreateLabelLayoutItem(), 0, 0)
-			.Add(fProxyUsernameControl->CreateTextViewLayoutItem(), 1, 0)
-
-			.Add(fProxyPasswordControl->CreateLabelLayoutItem(), 0, 1)
-			.Add(fProxyPasswordControl->CreateTextViewLayoutItem(), 1, 1)
-		)
-		.Add(BSpaceLayoutItem::CreateGlue())
-
+	BView* view = BGridLayoutBuilder(spacing / 2, spacing / 2)
+		.Add(fUseProxyCheckBox, 0, 0, 2)
+		.Add(fProxyAddressControl->CreateLabelLayoutItem(), 0, 1)
+		.Add(fProxyAddressControl->CreateTextViewLayoutItem(), 1, 1, 2)
+		.Add(fProxyPortControl->CreateLabelLayoutItem(), 0, 2)
+		.Add(fProxyPortControl->CreateTextViewLayoutItem(), 1, 2, 2)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing), 0, 3)
+		.Add(fUseProxyAuthCheckBox, 0, 4, 2)
+		.Add(fProxyUsernameControl->CreateLabelLayoutItem(), 0, 5)
+		.Add(fProxyUsernameControl->CreateTextViewLayoutItem(), 1, 5, 2)
+		.Add(fProxyPasswordControl->CreateLabelLayoutItem(), 0, 6)
+		.Add(fProxyPasswordControl->CreateTextViewLayoutItem(), 1, 6, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 7)
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+		.View();
 
-		.TopView()
-	;
 	view->SetName(B_TRANSLATE("Proxy server"));
 	return view;
 }
