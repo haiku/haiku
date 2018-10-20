@@ -535,10 +535,23 @@ for var in `env`; do
 done
 
 # ensure umask is not too restrictive
-if [ $(umask) -gt 22 ]; then
-	echo "Your umask is too restrictive (should be: <= 0022; is actually:" $(umask)")"
+if [ `umask` -gt 22 ]; then
+	echo Your umask is too restrictive "(should be <= 0022;" is actually `umask`")"
+	echo
+	echo Additionally, if the source tree was cloned with a too-restrictive umask,
+	echo you will need to run \"git checkout\" again to fix this.
 	exit 1
 fi
+# ensure git checkout was not done with a restrictive umask
+if [ `stat -c '%a' $sourceDir/data/system/boot/SetupEnvironment` -ne 644 ]; then
+	echo "The source tree was cloned with a umask > 0022. It seems you"
+	echo have already corrected your umask, but not re-checked-out the
+	echo source tree. Try running:
+	echo "	git checkout --force"
+	echo to fix this problem.
+	exit 1
+fi
+
 
 # internal default parameter values
 #
