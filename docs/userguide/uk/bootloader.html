@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2015, Haiku. All rights reserved.
+ * Copyright 2008-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -101,55 +101,56 @@
 <tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
-		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+		Дозволити переадресування виводу системного журнала на послідовний інтерфейс (типово: 115200, 8N1).</p>
 	<p><span class="menu">Enable on screen debug output</span><br />
-		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+		Дозволити вивід системного журналу замість нормального загрузочного екрану  при завантаженні системи.</p>
 	<p><span class="menu">Disable on screen paging</span><br />
-		Disables paging when on screen debug output is enabled.</p>
+		 Заборонити посторінковий вивід системного журналу.</p>
 	<p><span class="menu">Enable debug syslog</span><br />
-		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+		Дозволити буферизацію системного журналу у пам'ять для цієї сесії з доступом після завантаження.</p>
 	<p><span class="menu">Display current boot loader log</span><br />
-		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+		Показати відладочну інформацію Завантажувача (натисніть <span class="key">Q</span> для виходу)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
-		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
+		Дозволити введення додаткових відладочних опцій напряму.</p></td></tr>
+<tr><td></td><td></td><td>Якщо "<i>Enable debug syslog</i>" активовано, то гаряче перезавантаження після падіння покаже такі додаткові опції:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
+		Зберігати системний журнал попередніх сесій до /var/log/previous_syslog призавантаженні.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session.</p>
+		Показати системний журнал з попередніх сесій Haiku</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
-		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
+		Зберігати системний журнал з попередніх сесій Haiku на диск. Поки що підтримуються тільки томи з FAT32.</p></td></tr>
 <tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
-<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting (Труднощі)</a></h2>
+<p>Якщо Haiku відмовляєть завантажуватись можна спробувати побавитись різними варіантами вибору опцій під <span class="menu">Select safe mode options</span>. Бажано розглянути можливість формування <a href="../../welcome/en/bugreports.html">звіту про помилку</a> у будь-якому випадку.</p>
+<p>З іншого боку, якщо раптом Haiku перестане працювати після встановлення деяких програм, особливо драйверів, залишається кілька варіантів повернення її працездатності  шляхом видалення сумнівного пакунку:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
-<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
-<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
-<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+<li><p>Активація <span class="menu">Safe mode</span> запобігатиме запуску основних серверів, служб та користувацького завантажувального скрипта.</p></li>
+<li><p>Активація <span class="menu">Disable user add-ons</span> запобігатиме використанню усіх додатків (драйверів, трансляторів, etc.) встановлених у користувацькій ієрархії  у Вашій теці Home.</p></li>
+<li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
+<li><p>Якщо сумнівний драйвер, додаток або щось інше встановлені у системній ієрархії (тека "system"), ситуація ускладнюється, бо це область тільки для читання. Тоді вступає в силу опція <span class="menu">Blacklist entries</span>. З  нею Ви отримуєте можливість подорожуючи системною ієрархією забороняти роботу компонентів вибравши їх за допомогою клавіш <span class="key">SPACE</span> або <span class="key">RETURN</span>. Кнопка <span class="key">ESC</span> повертатиме Вас до батьківської директорії.</p>
+<p>Онлайн доступна стаття <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> де показано приклад як це зробити.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
 So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Booting Haiku</a></h2>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<a id="booting" name="booting">Завантаження Haiku</a></h2>
+<p>Після активації однієї чи більшої кількості опцій поверніться в головне меню і продовжіть загрузку. Ви побачите екран завантаження:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Якщо все працюватиме іконки послідовно одна за одною засвітяться.<br />
+Кожна з них відповідає певному етапу завантаження:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Атом</b></td><td style="width:10px;"> </td><td>Ініціалізація модулів.</td></tr>
+	<tr><td><b>Диск з лупою</b></td><td> </td><td>Створення кореневої файлової системи (<span class="path">/</span>) та монтування файлової системи пристроїв (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Карта розширення</b></td><td> </td><td>Ініціалізація менеджера пристроїв.</td></tr>
+	<tr><td><b>Загрузочний диск</b></td><td> </td><td>Монтування загрузочного диску.</td></tr>
+	<tr><td><b>Чіп</b></td><td> </td><td>Завантаження модулів процесора.</td></tr>
+	<tr><td><b>Папка</b></td><td> </td><td>Завершальна ініціалізація підсистем.</td></tr>
+	<tr><td><b>Ракета</b></td><td> </td><td>Запуск системи завантажувальним скриптом.</td></tr>
 </table>
 
 </div>

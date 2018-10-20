@@ -124,7 +124,7 @@
 ここで注意することは、KDL ではキーボードが動作しないかもしれないことです。PS/2 キーボードは常に動作します。USB キーボードは、USB コントローラーのタイプ (UHCI/EHCI) 次第です。通常、キーボードはハフを介さず、直接 USB ポートに接続されるべきです。少なくとも一度は、キーボードショートカット経由で KDL に入った場合、状況次第でキーボードのみ動作するでしょう。現時点では、USB OHCI はサポートされていません。</p>
 <p>KDL 自体はシェルの一種です。システム情報を出力するコマンドを実行できますす。次のコマンドが役に立つでしょう:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (別名 <span class="cli">sc</span>)</td><td> </td><td>バックトレースを出力する。システムが自ら KDL に入った場合、これを必ず実行する。</td></tr>
+<tr><td><span class="cli">bt</span> (別名 <span class="cli">sc</span>)</td><td> </td><td>バックトレース (別名 stack crawl) を出力する。システムが自ら KDL に入った場合、通常バックトレースは自動的に出力されます。それが起こらないか、その一部分がよく見えない(たとえば、スタックトレースが非常に長くて、回り込んでいる場合) なら、コマンドを入力してください。そうすると、画面を写真に撮ることがデベロッパーに情報を伝える唯一の方法となります。</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>処理される / 処理されないハードウェア割り込みを表示。</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (または continue)</td><td> </td><td>カーネルデバッガーを離れ、可能ならばシステムの実行に戻る。</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>システムをすぐに再起動する。まだ保存されていないすべてのデータ、保存はしていてもまだディスクに書き込まれていないデータは失われる。</td></tr>

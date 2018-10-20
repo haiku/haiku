@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2015, Haiku. All rights reserved.
+ * Copyright 2008-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -99,58 +99,60 @@
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td><b>Debug menu</b><br />Hibakereső menü
+</td><td> </td><td>Az alábbi opciók segítséghetnek a hiba keresésben illetve a hiba <a href="../../welcome/hu/bugreports.html">jelentésében</a>. Szintén kapunk egy kis leírást a képernyő alján ha kiválasztunk egy opciót.</td></tr>
 <tr><td></td><td></td><td>
-	<p><span class="menu">Enable serial debug output</span><br />
-		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
-	<p><span class="menu">Enable on screen debug output</span><br />
-		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
-	<p><span class="menu">Disable on screen paging</span><br />
-		Disables paging when on screen debug output is enabled.</p>
-	<p><span class="menu">Enable debug syslog</span><br />
-		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
-	<p><span class="menu">Display current boot loader log</span><br />
-		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
-	<p><span class="menu">Add advanced debug option</span><br />
-		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
-<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
-	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session.</p>
-	<p><span class="menu">Save syslog from previous session</span><br />
-		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
+	<p><span class="menu">Enable serial debug output</span> (Soros porton történő hibakeresés engedélyezése)<br />
+		A naplózást a soros portra irányítja át (eredeti beállítások: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span> (Képernyőn történő hibakeresés engedélyezése)<br />
+		A szokásos logó helyett a rendszer napló látható betöltéskor a képernyőn.</p>
+	<p><span class="menu">Disable on screen paging</span> (Képernyőn való lapozás tiltása)<br />
+		Ha a képernyőn történő hibakeresés engedélyezve van, akkor letiltja a kézzel történő lapozást.</p>
+	<p><span class="menu">Enable debug syslog</span> (Hibakereső naplózás engedélyezése)<br />
+		Engedélyezi a rendszernapló a memória egy speciális területén való eltárolását, így újraindítás után is elérhető lesz.</p>
+	<p><span class="menu">Display current boot loader log</span> (A jelenlegi rendszertöltő naplójának megtekintése)<br />
+		Megjeleníti a jelenlegi, már összegyűjtött hibakereső információkat (a <span class="key">Q</span> lenyomásával kiléphetünk).</p>
+	<p><span class="menu">Add advanced debug option</span> (További hibakereső opciók)<br />
+		További opciók megadása.</p></td></tr>
+<tr><td></td><td></td><td>Ha az "<i>Enable debug syslog</i>" engedélyezve van, hiba utáni újraindítás esetén a következő opciók is megjelennek:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span> (Az előző munkamenet naplójának mentése betöltés közben)<br />
+		Az előző Haiku munkamenet naplójának mentése a /var/log/previous_syslog fájlba a rendszer betöltésekor.</p>
+	<p><span class="menu">Display syslog from previous session</span> (Előző munkamenet naplójának megjelenítése)<br />
+		A legutóbbi munkamenetben összegyűjtött hibakeresési információk megjelenítse.</p>
+	<p><span class="menu">Save syslog from previous session</span> (Előző munkamenet naplójának elmentése)<br />
+		A legutóbbi munkamenetben összegyűjtött hibakeresési információk elmentése lemezre. Jelenleg csak FAT32 fájlrendszerű lemezek használhatóak.</p></td></tr>
 <tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
-<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
+<a id="troubleshooting" name="troubleshooting">Hibaelhárítás</a></h2>
+<p>Ha a Haiku elsőre nem tud elindulni, akkor ajánlott kipróbálni néhány hibakeresési opciót a <span class="menu">Select safe mode options</span> menüben. Továbbá egy <a href="../../welcome/hu/bugreports.html">hibajelentést</a> is lehet küldeni.</p>
+<p>Az is lehetséges, hogy a Haiku csak egy újonnan feltelepített program, eszközvezérlő miatt nem indul el. Ekkor több lehetőségünk is van hogy újra be tudjuk tölteni a rendszerünket, például a feltelepített csomag eltávolításával:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
-<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
-<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
-<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+<li><p>A <span class="menu">Safe mode</span> engedélyezésével megakadályozhatjuk a legtöbb szerver, démon elindítását illetve a UserBootScript végrehajtását.</p></li>
+<li><p>A <span class="menu">Disable user add-ons</span> aktiválásával elkerülhetjük az általunk feltelepített kiegészítők (vezérlők, értelmezők, stb.) betöltését, használatát.</p></li>
+<li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
+<li><p>Ha az érintett vezérlő, kiegészítő, stb rendszer szinten van telepítve, akkor a helyzet kicsit nehezebb. Itt kap szerepet a <span class="menu">Blacklist entries</span>. Használatakor az egész fájlrendszeren végig mehetünk és letilthatjuk a szükséges összetevőket. A kiválasztás a <span class="key">SPACE</span> vagy <span class="key">RETURN</span> billentyűvel történik. Az <span class="key">ESC</span> lenyomásával egy szintel feljebb mehetünk.</p>
+<p>Az interneten olvasható egy cikk (<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a>) arról, hogy hogyan tudjuk véglegesíteni ezeknek az összetevőknek a letiltását.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
 So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Booting Haiku</a></h2>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<a id="booting" name="booting">A Haiku indítása</a></h2>
+<p>Ha bejelöltük a megfelelő opciókat, utána térjünk vissza a főmenübe, majd folytassuk a betöltést. Ez a következő képernyőt eredményezi:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Ha minden rendben megy, akkor az összes szimbólum gyorsan aktívvá válik.<br />
+A különféle szimbólumok az alábbi betöltési szakaszokat jelölik:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>A modulok betöltése.</td></tr>
+	<tr><td><b>Lemez nagyítóval</b></td><td> </td><td>A gyökér fájlrendszer (<span class="path">/</span>) és az eszközök fájlrendszer (<span class="path">/dev</span>) létrehozása.</td></tr>
+	<tr><td><b>Csatolókártya</b></td><td> </td><td>Eszközkezelő betöltése.</td></tr>
+	<tr><td><b>Rendszerlemez</b></td><td> </td><td>Rendszerlemez csatolása.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Processzor-függő modulok betöltése.</td></tr>
+	<tr><td><b>Mappa</b></td><td> </td><td>Alrendszerek betöltése.</td></tr>
+	<tr><td><b>Rakéta</b></td><td> </td><td>A Launch_daemon elindította a rendszert.</td></tr>
 </table>
 
 </div>

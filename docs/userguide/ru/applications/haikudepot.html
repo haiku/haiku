@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Akuji
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>HaikuDepot</title>
+	<title>Склад (HaikuDepot)</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -57,30 +58,29 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Содержание</td></tr>
-<tr class="index"><td><a href="#filter">The Filter</a><br />
-                <a href="#list">The List</a><br />
-                <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Show menus</a><br />
-                <a href="#account">Creating a User Account</a><br />
-                <a href="#rating">Rating and Commenting</a><br />
+<tr class="index"><td><a href="#filter">Фильтры</a><br />
+                <a href="#list">Список</a><br />
+                <a href="#info">Информация</a><br />
+                <a href="#menu">Инструменты и отображение</a><br />
+                <a href="#account">Создание аккаунта пользователя</a><br />
+                <a href="#rating">Оценки и комментирование</a><br />
 </td></tr>
 </table>
 
-<h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
+<h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />Склад (HaikuDepot)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
 <tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/main_settings</span><br />
-<span class="path">~/config/cache/HaikuDepot/</span> - Cached icons, screenshots, descriptions etc.</td></tr>
+<span class="path">~/config/cache/HaikuDepot/</span> - Кэшированные иконки, скриншоты, описания и т. д.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
+<p>Склад является главным приложением, отвечающим за управление вашими пакетами программного обеспечения. С его помощью вы можете просматривать репозитории и пользоваться поиском, а также устанавливать, обновлять и удалять пакеты. По умолчанию при запуске Склад отображает список "<i>Избранных пакетов</i>" - приложений, которые считаются интересными большинству пользователей.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
-<p>When the <span class="menu">Show only featured packages</span> checkbox is deactivated, all available packages are shown and the display changes to smaller icons and more information arranged in columns:</p>
+<p>Если снять отметку <span class="menu">Показывать только избранные пакеты</span>, показываются все доступные пакеты, а отображение переключается на иконки меньшего размера с дополнительной информацией в новых колонках.</p>
 <img src="../images/apps-images/haikudepot_all.png" alt="haikudepot.png" />
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -89,8 +89,8 @@
 <ul>
 <li><p><span class="menu">Категория</span> - позволяет ограничить перечень определенной категорией, например "<i>Аудио</i>" или "<i>Игры</i>".</p></li>
 <li><p><span class="menu">Условия поиска</span> - фильтрует список, отображая лишь те пакеты, которые содержат введенные слова (разделенные пробелом) в названии и описании.</p></li>
-<li><p>The checkbox to <span class="menu">Show only featured packages</span> can be activated to further filter the results in the set category or of the entered search terms.</p></li>
-<li><p>The <span class="menu">Repositories</span> menu of the menu bar determines which repos are being queried. "<i>Local</i>" packages are the ones that were installed from somewhere other than an online repo; maybe from a USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
+<li><p>Опцию <span class="menu">Показывать только избранные пакеты</span> можно активировать, чтобы более строго отфильтровать содержимое выбранной категории или результаты поисковой выдачи.</p></li>
+<li><p>В меню <span class="menu">Репозитории</span> - можно выбрать запрашиваемые репозитории. Источник ("<i>Локальный</i>") указывается для пакетов, установленных не из сетевого источника. К примеру, это может быть USB-флэшка, пакет, скачанный с веб-сайта или собранный самостоятельно.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -99,7 +99,7 @@
 <p>Колонка "Статус" может иметь одно из нескольких значений:</p>
 <ul>
 <li><p><span class="menu">Активирован</span>: Пакет в данный момент установлен и готов к использованию.</p></li>
-<li><p><span class="menu">Available</span>: The package exists in that repository and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
+<li><p><span class="menu">Доступен</span>: Пакет существует в репозитории и может быть скачан и установлен. Если присутствуют какие-либо зависимости от других пакетов, вы будете проинформированы об этом в процессе установки и вам будет дана возможность выбрать установку всего необходимого.</p></li>
 <li><p><span class="menu">Ожидание... / %</span>: <i>Ожидание...</i> отображается для пакета, который стоит в очереди на скачивание и установку. В процессе скачивания прогресс отображается в виде процентного значения.</p></li>
 <li><p><span class="menu">Доступно обновление</span>: Доступна новая версия установленного пакета.</p></li>
 </ul>
@@ -126,30 +126,30 @@
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Tools and Show menu</a></h2>
-<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
-The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
-<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.</p>
-<p>Under <span class="menu">Show</span> you can choose to also display <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
-<p>Of more interest are the options to only show <span class="menu">Available packages</span> and <span class="menu">Installed packages</span>.</p>
+<a id="menu" name="menu">Инструменты и отображение</a></h2>
+<p>В меню <span class="menu">Инструменты</span> вверху окна находится опция <span class="menu">Обновить репозитории</span>. Она запрашивает обновленный список всех пакетов из репозиториев.<br />
+Второй пункт - <span class="menu">Управление репозиториями...</span>. Он открывает панель настроек <a href="../preferences/repositories.html">Репозитории</a>, с помощью которой можно добавлять и удалять либо включать и отключать репозитории.<br />
+Пункт <span class="menu">Проверить обновления...</span> запускает <a href="../apps/softwareupdater.html">Обновление приложений</a> для поиска и установки обновленных пакетов.</p>
+<p>В меню <span class="menu">Показывать</span> вы можете выбрать, отображать ли <span class="menu">Пакеты для разработчиков</span> и <span class="menu">Пакеты с исходным кодом</span> в общем списке. Для обычного пользователя они не представляют особого интереса и будут лишь загромождать список. Тем не менее, данные пакеты важны для людей, которые нуждаются в библиотеках, заголовочных файлах из пакета для разработки и компиляции приложений, зависящих от них.</p>
+<p>Более интересны другие две опции, позволяющие показывать только <span class="menu">Доступные пакеты</span> и <span class="menu">Установленные пакеты</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="account">Создание аккаунта пользователя</a></h2>
+<a id="account" name="account">Создание учетной записи пользователя</a></h2>
 <p>Чтобы иметь возможность оценивать пакет, вам необходима учетная запись на <a href="http://depot.haiku-os.org">сервере Haiku Depot</a>, который обслуживает все пакеты, а также хранит оценки и комментарии пользователей. Вы можете создать аккаунт в приложении HaikuDepot, кликнув на область в правом верхнем углу, которая отображает ваш текущий статус: <span class="menu">Вход не выполнен</span>. Выбор опции <span class="menu">Войти...</span>, открывает окно с двумя вкладками; одна предназначена для ввода логина и пароля (когда они у вас будут), а вторая - для создания учетной записи:</p>
 <img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
-<p>Для создания аккаунта вам необходимо:</p>
+<p>Для создания учетной записи вам необходимо:</p>
 <ul><li>использовать любое имя пользователя без заглавных букв и специальных символов</li>
 <li>использовать пароль длиной минимум восемь символов, содержащий минимум две заглавные буквы и две цифры</li>
 <li>указать корректный адрес email (если вы хотите иметь возможность получить новый пароль в случае, когда старый - забыт)</li>
 <li>ответить на капчу</li></ul>
-<p>После входа в правом верхнем углу окна HaikuDepot будет написано <span class="menu">Выполнен вход под пользователем (...)</span> вместе с вашим ником. Данное меню теперь позволяет вам <span class="menu">Сменить аккаунт...</span> или <span class="menu">Выйти из системы</span>.</p>
+<p>После входа в правом верхнем углу окна HaikuDepot будет написано <span class="menu">Выполнен вход под пользователем (...)</span> вместе с вашим ником. Данное меню теперь позволяет вам <span class="menu">Сменить учетную запись...</span> или <span class="menu">Выйти из системы</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="rating" name="rating">Оценивание и комментирование</a></h2>
-<p>После создания учетной записи и входа в систему, вы можете оценивать пакеты и оставлять комментарии, если хотите. Наведите курсор на рейтинг пакета в виде звезд в разделе информации и он превратится в кнопку <span class="button">Оценить пакет...</span>. Нажмите на нее для открытия окна оценивания:</p>
+<a id="rating" name="rating">Оценки и комментирование</a></h2>
+<p>После создания учетной записи и входа в систему вы можете оценивать пакеты и оставлять комментарии, если хотите. Наведите курсор на рейтинг пакета в виде звезд в разделе информации и он превратится в кнопку <span class="button">Оценить пакет...</span>. Нажмите на нее для открытия окна оценки:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
-<p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
-After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh repositories</span> before you can see your changes.</p>
+<p>Вы можете навести мышь на звездочки, чтобы подсветить их и поставить свою оценку. Вы также можете указать стабильность пакета, выбрав один из предоставленных уровней, и язык вашего комментария. Чтобы сделать комментарий значимым, вы должны сперва некоторое время поработать с приложением, дабы познакомиться с его возможностями, проблемами и особенностями. И старайтесь не растягивать комментарий до размеров романа, пишите кратко, вежливо и по существу :)<br />
+После нажатия кнопки <span class="button">Отправить</span> данные будут переданы на сервер. Вам, возможно, придется выбрать в меню <span class="menu">Инструменты</span> опцию <span class="menu">Обновить репозитории</span>, прежде чем вы сможете увидеть ваши изменения.</p>
 <p>Вы можете вернуться и изменить ваш комментарий и переоценить пакет в любое время. Вы также можете скрыть вашу оценку от других пользователей, убрав метку <span class="menu">Другие пользователи могут видеть этот рейтинг</span>.</p>
 </div>
 </div>

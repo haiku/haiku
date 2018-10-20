@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Bachoru
  *		helix84
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -51,8 +52,8 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
@@ -90,17 +91,23 @@ Tieto príkazy sú popísané v téme <a href="../index.html">Index</a>.</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> vyvolá typické okno s upozornením obsahujúce preddefinovanú ikonu, vysvetlujúci text a maximálne tri tlačidlá. Vráti názov stlačeného tlačidla a návratový kód (počínajúc nulou). Napríklad okno na obrázku bolo vyvolané týmto riadkom:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> zobrazí okno na otvorenie alebo uloženie a nechá používateľa vybrať súbor alebo lokalitu. Ako návratnú hodnotu dostanete vybraný súbor alebo cestu priečinka. Dostupné sú viaceré parametre, napríklad nastavenie začínajúceho priečinka, názov okna, predvolený názov súboru pri ukladaní alebo obmedzenia povolených typov súborov. Príklad:</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+</td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
+An example:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> je verzia panela „Nájsť...“ pre príkazový riadok. Rýchlym spôsobom ako vygenerovať hľadaný termín je vytvoriť požiadavku v paneli „Nájsť...“, prepnúť na <span class="menu">podľa vzorca</span>, pridať úvodzovky (<tt>"</tt>) na začiatok a koniec a celý reťazec skopírovať za váš príkaz <span class="cli">query</span> v Termináli alebo vašom skripte.</p>
@@ -158,8 +165,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">Zoznam príkazov</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Aplikácie</a> 
+ «  <a href="list-cli-apps.html">Zoznam príkazov</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Aplikácie</a> 
 </span></div>
 </div>
 

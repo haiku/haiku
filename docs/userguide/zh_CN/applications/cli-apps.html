@@ -4,12 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Humdinger
  *		Pengphei Han
  *
 -->
@@ -50,8 +51,8 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
@@ -89,17 +90,23 @@ For more details on a parameter, append "--help", e.g. <tt>pkgman search --help<
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> 该命令将会打开一个带有预定义图标，说明注记和三个按钮的典型警示窗口，并且在终端中返回已选中按钮的标题和退出状态（以0开始）。例如，下面就是一个例子：</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> 显示一个装载或者保存文件的面板，并且让用户选择相应的文件和位置。同时您将会获取到一个文件或者文件的路径作为返回值。并且还有几个参数可供使用，例如，设置起始目录，窗体的标题，默认保存的文件名。下面是一个例子：</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+</td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
+An example:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> 是查询面板的命令行版本。实际上，一个创建搜索项目的快速方式是在搜索面板创建一个查询，选择 <span class="menu">by formula</span> ，在查询词的前后添加双引号（<tt>"</tt>），然后在终端或者脚本中的 <span class="cli">query</span> 命令之后粘贴所要查找的整个查询词。</p>
@@ -160,9 +167,9 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">命令列表</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">应用程序
-</a> 
+ «  <a href="list-cli-apps.html">命令列表</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">应用程序
+</a> 
 </span></div>
 </div>
 

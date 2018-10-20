@@ -126,7 +126,7 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>KDL 本身是 shell 中的一类。它可以执行命令，打印系统信息。下面是一些感兴趣的命令：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>打印回溯信息。如果系统自主进入内核调试状态，通常需要输入该命令。</td></tr>
+<tr><td><span class="cli">bt</span> (等同 <span class="cli">sc</span>)</td><td> </td><td>打印回溯信息（即堆栈抓取）。如果系统自主进入内核KDL 状态，通常会自动打印回溯信息。如果没有显示，或者部分内容超出范围（如，堆栈跟踪太长，以至于超出屏幕），您可以输入该指令；并且您只能通过抓取屏幕截图为开发者提供相关信息。</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>显示已处理和未处理的硬件中断。</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (aka continue)</td><td> </td><td>离开内核调试状态；如果可能的话，继续正常的系统操作。</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>立即重启系统。您将会丢失所有未保存的数据，甚至包括那些已经保存，但是还未写入硬盘的数据。</td></tr>
@@ -158,10 +158,10 @@ Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB 
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td>- <span class="cli">listdev</span></td><td> </td><td> 给出所有硬件的详细列表，包括提供商和 PCI ID；类似于Linux下的 <span class="cli">lshw</span> 和 <span class="cli">lspci</span> 。</td></tr>
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>假如是有关 USB 的问题，它类似于Linux下的 <span class="cli">lsusb</span>。</td></tr>
-<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>The primary system log used by Haiku, see <a href="#syslog">Syslog</a> above, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</td></tr>
+<tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>Haiku的主要系统日志，查看上述  <a href="#syslog">Syslog</a>，类似于引导过程中的屏幕调试信息。您可以使用 <span class="cli">open</span> 命令在文本编辑器中获取到系统日志中相关的部分。</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td> 列出所有使用的驱动。</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>只在 <i>内核调试状态</i> 可用（参阅下文）。它用显示中断使用情况。不可能有许多由不同硬件共享的中断。</td></tr>
-<tr><td colspan="3">- On screen debug output (a safe mode boot time option, see <a href="#onscreen">above</a>).</td></tr>
+<tr><td colspan="3">- 屏幕调试输出（一种安全模式引导时间选项，查看 <a href="#onscreen">上述</a>）。</td></tr>
 </table>
 
 <p>前四个命令需要在终端中进行输入。在命令后添加 <span class="cli"> &gt; output.txt</span> ，然后输出的信息将会重定向到“output.txt”文本文件，您可以将其附带到您的错误报告或者邮件。</p>

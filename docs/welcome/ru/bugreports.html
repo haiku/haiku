@@ -127,8 +127,7 @@ Depending on what exactly crashed, you can try to save a crash report on the Des
 Note that in KDL your keyboard may not work. PS/2 keyboards always do, with USB keyboards it depends on the type of USB controller (UHCI/EHCI). Generally, the keyboard should be plugged into the port directly, not via any hubs. In some circumstances, the keyboard only works if one has entered KDL via the keyboard shortcut at least once. USB OHCI is not supported at the moment.</p>
 <p>Сам по себе KDL является некой оболочкой. Вы можете выполнять команды, которые выводят информацию о системе. Следующие команды могут быть интересны:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td><span class="cli">bt</span> - покажет трассировку, уточняющую где именно произошла ошибка.
-Если система вошла в KDL самопроизвольно, всегда используйте эту команду.</td></tr>
+<tr><td><span class="cli">bt</span> (aka <span class="cli">sc</span>)</td><td> </td><td>Prints a back trace (aka stack crawl). If the system entered KDL on its on volition, a back trace is normally printed automatically. Enter the command if that didn't happen or part of it is obscured (e.g. when the stack trace is so long that it wrapped around) and your only way of providing the information to developers is by taking a picture of the screen.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td><span class="cli">int</span> - отобразит обработанные и необработанные прерывания.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (синоним continue)</td><td> </td><td>выведет систему из отладчика ядра продолжит нормальную работу Haiku, если это возможно.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Немедленно перезагрузит систему. Вы потеряете все несохраненные данные и те, что были сохранены, но еще не успели записаться из памяти обратно на диск.</td></tr>

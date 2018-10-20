@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2015, Haiku. All rights reserved.
+ * Copyright 2008-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -73,82 +73,83 @@
 <tr><td><b>Select safe mode options</b></td><td> </td><td>Oferuje kilka opcji do wypróbowania w przypadku problemów ze sprzętem, niestabilności systemu lub niedziałającego oprogramowania. Przy podświetlaniu poszczególnych opcji, na dole ekranu pojawia się krótkie wyjaśnienie ich działania.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
-		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+		Przełącza system w tryb awaryjny. Ta opcją można być włączona niezależnie od innych.</p>
 	<p><span class="menu">Disable user add-ons</span><br />
-		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+		Zapobiega ładowaniu rozszerzeń zainstalowanych przez użytkownika. Tylko rozszerzenia z katalogu systemowego zostaną załadowane. Zobacz sekcję <a href="#troubleshooting">Rozwiązywanie problemów</a>.</p>
 	<p><span class="menu">Disable IDE DMA</span><br />
-		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+		Wyłącza tryb DMA interfejsu IDE, poświęcając wydajność na rzecz kompatybilności.</p>
 	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
-		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+		Ignoruje pamięć powyżej 4 GiB, ignorując instrukcje w pliku ustawień jądra.
 </p>
 	<p><span class="menu">Use fail-safe graphics driver</span><br />
-		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+		Zapobiega ładowaniu sterowników graficznych, zamiast tego system użyje trybu VESA.</p>
 	<p><span class="menu">Disable IO-APIC</span><br />
-		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+		Wyłącza IO APIC do trasowania przerwań, wymuszając użycie starego interfejsu PIC.</p>
 	<p><span class="menu">Disable local APIC</span><br />
-		Disables using the local APIC, also disables SMP.</p>
+		Wyłącza lokalne APIC, dodatkowo wyłączając wszystkie rdzenie procesora, prócz jednego.</p>
 	<p><span class="menu">Disable SMP</span><br />
-		Disables all but one CPU core.</p>
+		Wyłącza wszystkie rdzenie procesora, prócz jednego.</p>
 	<p><span class="menu">Don't call the BIOS</span><br />
-		Stops the system from calling BIOS functions.</p>
+		Zapobiega wywoływaniu funkcji BIOS-u przez system.</p>
 	<p><span class="menu">Disable APM</span><br />
-		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+		Wyłącza sprzętową obsługę Advanced Power Management, ignorując instrukcje w pliku ustawień jądra.</p>
 	<p><span class="menu">Disable ACPI</span><br />
-		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+		Wyłącza sprzętową obsługę Advanced Configuration and Power Interface, ignorując instrukcje w pliku ustawień jądra.</p>
 	<p><span class="menu">Blacklist entries</span><br />
-		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+		Pozwala określić pliki, które mają być ignorowane przez system, np. w celu tymczasowego wyłączenia sterowników. Zobacz sekcję <a href="#troubleshooting">Rozwiązywanie problemów</a>.</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Tutaj znajdują się opcje pomocne przy badaniu problemów oraz pozyskiwaniu informacji do <a href="../../welcome/pl/bugreports.html">zgłoszenia błędu</a>. Tak jak w przypadku menu opisanego wyżej, krótkie wyjaśnienie każdej opcji pojawia się na dole ekranu.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
-		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+		Włącza przekazywanie dziennika systemu na port szeregowy (domyślne parametry: 115200, 8N1).</p>
 	<p><span class="menu">Enable on screen debug output</span><br />
-		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+		Wyświetla dziennik systemu na ekranie podczas rozruchu, zamiast zwyczajnego logo.</p>
 	<p><span class="menu">Disable on screen paging</span><br />
-		Disables paging when on screen debug output is enabled.</p>
+		Wyłącza stronicowanie dziennika wypisywanego na ekran.</p>
 	<p><span class="menu">Enable debug syslog</span><br />
-		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+		Na czas jednej sesji, włącza specjalny bufor dziennika systemu, do którego moduł rozruchu będzie mieć dostęp po restarcie komputera.</p>
 	<p><span class="menu">Display current boot loader log</span><br />
-		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+		Wyświetla dziennik modułu rozruchu (do zamknięcia służy klawisz <span class="key">Q</span>).</p>
 	<p><span class="menu">Add advanced debug option</span><br />
-		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If <span class="menu">Enable debug syslog</span> is activated, a warm reboot after a crash shows these additional options:</td></tr>
+		Pozwala na ręczne podanie opcji zaawansowanych.</p></td></tr>
+<tr><td></td><td></td><td>Jeżeli opcja <span class="menu">Enable debug syslog</span> jest aktywna, miękki restart po wystąpieniu awarii wyświetla dodatkowo poniższe opcje:</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to <span class="path">/var/log/previous_syslog</span> when booting.</p>
+		Zapisuje podczas rozruchu dziennik systemu z poprzedniej sesji do pliku <span class="path">/var/log/previous_syslog</span>.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session.</p>
+		Wyświetla dziennik systemu z poprzedniej sesji.</p>
 	<p><span class="menu">Save syslog from previous session</span><br />
-		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
-<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Lets you force a certain screen resolution and color depth.</td></tr>
+		Zapisuje dziennik systemu z poprzedniej sesji Haiku na dysk. Obecnie tylko partycje FAT32 są obsługiwane.</p></td></tr>
+<tr><td class="onelinetop"><b>Select screen resolution</b></td><td> </td><td>Pozwala wymusić określoną rozdzielczość i głębię kolorów.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
-<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
+<a id="troubleshooting" name="troubleshooting">Rozwiązywanie problemów</a></h2>
+<p>Jeżeli Haiku nie uruchamia się na Twoim sprzęcie od razu, wypróbuj różne opcje z menu <span class="menu">Select safe mode options</span>. W każdym wypadku rozważ wypełnienie <a href="../../welcome/pl/bugreports.html">zgłoszenia o błędzie</a>.</p>
+<p>Z drugiej strony, w przypadku gdy Haiku odmawia posłuszeństwa po zainstalowaniu jakiegoś oprogramowania, zwłaszcza sterowników, jest kilka możliwości przywrócenia systemu do działania, aby było możliwe usunięcie problemowego pakietu:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootscript from being started.</p></li>
-<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
-<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
-<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+<li><p>Aktywowanie <span class="menu">Safe mode</span> zapobiegnie uruchomienie większości serwerów, usług i skryptu UserBootscript.</p></li>
+<li><p>Aktywowanie <span class="menu">Disable user add-ons</span> zapobiegnie ładowaniu jakichkolwiek rozszerzeń (sterowników, translatorów, itd.) zainstalowanych w hierarchii katalogu domowego.</p></li>
+<li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
+<li><p>Jeżeli problematyczny sterownik, rozszerzenie, itd. są zainstalowane w hierarchii katalogu systemowego, sprawa się komplikuje, ponieważ ten obszar systemu plików jest tylko do odczytu. W tym miejscu do gry wkracza opcja <span class="menu">Blacklist entries</span>. Przy jej pomocy możesz poruszać się po katalogu systemowym i wyłączyć komponent odpowiedzialny za problemy klawiszami <span class="key">SPACE</span> lub <span class="key">RETURN</span>. <span class="key">ESC</span> cofa do katalogu wyżej.</p>
+<p>W sieci dostępny jest artykuł <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> (ang.) wyjaśniający jak zachować to ustawienie.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
 So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Booting Haiku</a></h2>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<a id="booting" name="booting">Rozruch Haiku</a></h2>
+<p>Po aktywowaniu pożądanych opcji, należy wrócić do głównego menu i kontynuować rozruch (<span class="menu">Continue booting</span>). Wyświetli się wtedy taki ekran:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Jeżeli wszystko jest w porządku, symbole będą szybko zapalać się jeden po drugim.<br />
+Każdy z symboli mniej więcej odpowiada poniższym etapom rozruchu:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Inicjalizacja modułów.</td></tr>
+	<tr><td><b>Dysk + lupa</b></td><td> </td><td>Tworzenie korzenia systemu plików (<span class="path">/</span>) i montowanie devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Karta rozszerzeń</b></td><td> </td><td>Inicjalizacja menedżera urządzeń.</td></tr>
+	<tr><td><b>Dysk rozruchowy</b></td><td> </td><td>Montowanie dysku rozruchowego.</td></tr>
+	<tr><td><b>Mikroprocesor</b></td><td> </td><td>Ładowanie modułów obsługi procesora.</td></tr>
+	<tr><td><b>Katalog</b></td><td> </td><td>Końcowa inicjalizacja podsystemów.</td></tr>
+	<tr><td><b>Rakieta</b></td><td> </td><td>Launch_daemon uruchomił system.</td></tr>
 </table>
 
 </div>

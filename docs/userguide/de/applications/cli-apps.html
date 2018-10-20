@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,8 +51,8 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
@@ -90,17 +90,24 @@ Mehr Details zu einzelnen Parametern erhält man durch Anhängen von "--help", b
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> erzeugt das typische Hinweis-Fenster mit einem vordefinierten Symbol, erklärenden Text und bis zu drei Buttons. Als Rückgabewert dient der Titel des geklickten Buttons, bzw. ein Exitstatus, beginnend mit 0). Zum Beispiel:</p>
-<pre class="terminal">alert --idea "SpitzenApp(tm) wurde erfolgreich installiert!
+<pre class="terminal">alert --idea "SpitzenApp(tm) wurde erfolgreich installiert! \
 Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nein Danke"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> öffnet einen Öffnen- oder Speicher-Dialog, in dem der Benutzer eine Datei oder Verzeichnis auswählen kann. Der Rückgabewert ist der gewählte Datei- oder Ordnerpfad. Es stehen diverse Parameter zur Verfügung, um beispielsweise einen Startordner oder einen Fenstertitel zu setzen, oder einen Dateinamen beim Speichern vorzugeben oder erlaubte Dateitypen einzuschränken. Zum Beispiel:</p>
 <pre class="terminal">filepanel -s -t "Logdatei speichern" -d ~/config/settings -n Spitzen.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> ist ein kleines tool das BMessages an Anwendungen sendet und deren Antwort ausgibt. Es kann zum Skripten von Anwendungen benutzt werden, also zum "Fernsteuern" von Programmen mittels Skripts oder von der Kommandozeile aus. Das ist leider etwas kompliziert... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdingers Blogpost</a> ist eine gute Einführung, und Dank Scot Hacker's BeOS Bible gibt es ein schönes <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey Tutorial</a> von Chris Herborth.</p></td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> zeigt eine Benachrichtigung. Mit <span class="cli">notify --help</span> erhält man eine Beschreibung aller möglichen Parameter. Eine Benachrichtigung kann auch zur Fortschrittsanzeige eines Vorgangs benutzt werden. Dann ist es wichtig eine <i>messageID</i> zu vergeben, die man bei jeder Aktualisierung des Fortschritts (eine Zahl zwischen 0.0 und 1.0, die als Prozent ausgegeben wird) angibt. Sonst sieht man womöglich mehrere Benachrichtigungen gleichzeitig, wenn man schneller aktualisiert als der gesetzte Timeout die Fenster verschwinden lässt.<br />
+Ein Beispiel:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MeineMessageID --progress .75 "Bitte warten"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
+</td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> ist die Konsolen-Variante des Find Panels. Um eine Suchformel bequem zu generieren lässt sich übrigens sehr gut eben dieses Find Panel benutzen: Einfach dort die entsprechende Suche zusammenklicken, dann umschalten zum "<span class="menu">by formula</span>" Mode, Anführungszeichen (<tt>"</tt>) an Anfang und Ende und anschließend das Ganze hinter den <span class="cli">query</span> Befehl ins Terminal oder Skript einfügen.</p>
 </td></tr>
@@ -159,8 +166,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">Liste aller Konsolenprogramme</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Anwendungen</a> 
+ «  <a href="list-cli-apps.html">Liste aller Konsolenprogramme</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Anwendungen</a> 
 </span></div>
 </div>
 

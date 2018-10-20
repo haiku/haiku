@@ -12,6 +12,7 @@
  * Translators:
  *		Sergei Reznikov
  *		Rodastahm Islamov
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -68,8 +69,8 @@
 <p>Второе предупреждение появляется в случае, если Вы попытаетесь удалить или переименовать что-нибудь в иерархии системы. Для того чтобы активировать кнопку "<span class="button">Сделать это</span>" нужно удерживать клавишу <span class="key">SHIFT</span>.</p>
 <p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Содержит системные файлы и приложения/пакеты, общие для всех пользователей.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>Это ваша личная папка, где хранятся ваши данные и настройки, а также приложения/пакеты, <i>не</i> общие для всех пользователей.</td></tr>
 </table>
 <p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
@@ -85,7 +86,7 @@ Most of the folders inside <span class="path">/boot/system/</span> are read-only
 <tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
 <tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Applications</a>.</span></p>
+<p><span class="box-info">Для более подробной информации о папках <span class="path">packages</span> и <span class="path">non-packaged</span> обратитесь к теме <a href="applications.html">Приложения</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -117,8 +118,8 @@ Files that you'd like to share with other users in a future multi-user environme
 <td>Эта папка содержит настройки для всех приложений и некоторые настройки системы. Некоторые приложения хранят свои настройки в собственных папках, другие просто хранят конфигурационные файлы прямо здесь.</td></tr>
 </table>
 
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Applications</a>.</span></p>
-<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings/</span>:</p>
+<p><span class="box-info">Для более подробной информации о папках <span class="path">packages</span> и <span class="path">non-packaged</span> обратитесь к теме <a href="applications.html">Приложения</a>.</span></p>
+<p>Вот несколько наиболее интересных подпапок в иерархии <span class="path">~/config/settings/</span>:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>

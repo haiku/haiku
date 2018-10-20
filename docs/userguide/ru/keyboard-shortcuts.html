@@ -12,6 +12,7 @@
  * Translators:
  *		Sergei Reznikov
  *		Rodastahm Islamov
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -75,7 +76,7 @@
 <tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span>/<span class="key">→</span>/<span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Перемещение по рабочим столам. Для перемещения активного окна следует также удерживать клавишу <span class="key">SHIFT</span>.</td></tr>
 <tr><td> </td></tr>
 <tr><td><span class="key">OPT</span></td><td></td><td>Перемещайте одно окно за ярлычок к ярлычку другого и удерживайте в это время клавишу <span class="key">OPT</span> и окна соединятся.(более подробно в теме <a href="gui.html#stack-tile">Графический интерфейс</a>).</td></tr>
-<tr><td><span class="key">OPT</span><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Cycles through the open windows within the current workspace.</td></tr>
+<tr><td><span class="key">OPT</span><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Переключаться между открытыми окнами в пределах текущего рабочего стола.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + левый щелчок мыши</td><td></td><td>Для перемещения окна щёлкните левой кнопкой мыши и потащите его. (более подробно в теме <a href="gui.html#move-resize">Графический интерфейс</a>).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + правый щелчок мыши</td><td></td><td>Для изменения размера окна щёлкните правой кнопкой мыши и потащите его. (более подробно в теме <a href="gui.html#move-resize">Графический интерфейс</a>).</td></tr>
 <tr><td> </td></tr>
@@ -135,7 +136,7 @@
 <tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Открыть новую сессию терминала в новой вкладке.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span>...</td><td></td><td>Переключение между соответствующими вкладками.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Переключиться к следующему окну терминала.</td></tr>
-<tr><td><span class="key">SHIFT</span> <span class="key">←</span>/<span class="key">→</span></td><td></td><td>Переключение к предыдущей/следующей вкладке.</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Переключение к предыдущей/следующей вкладке.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">←</span> / <span class="key">→</span></td><td></td><td>Переместить текущую вкладку влево/вправо.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">+</span> / <span class="key">-</span></td><td></td><td>Увеличить/Уменьшить размер шрифта.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Войти/покинуть полноэкранный режим.</td></tr>
@@ -143,8 +144,7 @@
 <tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">PageUP</span>/<span class="key">PageDOWN</span></td><td></td><td>Прокрутить содержимое терминала вверх/вниз на одну страницу.</td></tr>
 <tr><td><span class="key">TAB</span></td><td></td><td>После ввода нескольких букв имени файла или пути, если нажмете <span class="key">TAB</span>, то название автодополнится. Если будет более одного соответствия, то дополнение остановится в том месте, где начинается различие в названиях, и вам следует ввести ещё несколько букв. Если вы нажмете <span class="key">TAB</span> дважды, то отобразится список всех соответствий.</td></tr>
 <tr><td><span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Просмотр истории всех ранее введенных команд.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Bash history. All the commands you enter
-are stored in the file <span class="path">~/config/settings/bash_history</span>. Press <span class="key">CTRL</span> <span class="key">R</span> and start to enter a command and you'll be provided with the first match from the bash history. Keep pressing <span class="key">CTRL</span> <span class="key">R</span> until you find the right command line and press <span class="key">ENTER</span> to execute it.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Все ранее введенные вами команды хранятся в файле <span class="path">~/config/settings/bash_history</span>. Нажмите <span class="key">CTRL</span> <span class="key">R</span> и начните вводить команду и вам будет предоставлена первая команда из истории bash, которая соответствует введеной вами. Продолжайте нажимать <span class="key">CTRL</span> <span class="key">R</span> пока не найдете нужную. После этого нажмите <span class="key">ENTER</span> для исполнения.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Остановить запущенную в данный момент команду.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Закрыть текущую сессию терминала.</td></tr>
 </table>

@@ -4,12 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Humdinger
  *		log-1
  *		mt
  *
@@ -51,8 +52,8 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
@@ -90,17 +91,23 @@
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> は既定のアイコンと説明文、および 3 つのボタンの付いた典型的な警告ウィンドウを表示します。このコマンドは、クリックされたボタンのタイトルと終了ステータス (0 から始まります) を返します。たとえば、下図は次の 1 行で作成されます:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> はファイルの読み込み / 書き込みパネルを表示して、ユーザーがファイルや場所を選択できるようにします。戻り値として選択されたファイルまたはフォルダーのパスが得られます。既定のディレクトリを指定したり、ウィンドウタイトルを設定したり、ファイルを保存する際の既定のファイル名および許可するファイルタイプを指定したりするための引数がいくつか利用できます。下図は次のコマンドを実行した場合の例です:</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> は、BMessage をアプリケーションに送信し、アプリケーションからの返信を出力する小さなヘルパーツールです。それは、アプリケーションスクリプティングに使用されます。つまり、あるプログラムを、スクリプトまたはコマンドラインから "リモートコントロール" します。使い方はすこし複雑です... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger 氏の ブログへの投稿</a> が良い入門書となります。また、Scot Hacker 氏の BeOS Bible のおかげで、Chris Herborth によるさらに広範囲の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey チュートリアル</a>があります。</p>
+</td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> は、メッセージ入りの通知パネルを表示します。<span class="cli">notify --help</span> を呼び出すと、さまざまなパラメーターが表示されます。また、通知は何らかのアクションの進捗表示にも使用されます。それを行う際は、<i>messageID</i> を設定して、進捗 (0.0 と 1.0 の間の不動小数点値で、%として表示されます) を更新するときに常に使用することが大切です。そうしないと、設定されたタイムアウトより早く更新した場合、いくつかの通知パネルが表示されます。<br />
+例:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> は、検索 (Find) パネルのコマンドラインバージョンです。ちなみに、検索語句をすばやく生成するには、検索パネルでクエリを生成し、<span class="menu">式で検索 (by formula)</span> に切り替えて先頭と末尾にダブルクオート (<tt>"</tt>) を追加し、その文字列全体をターミナルまたはスクリプトの <span class="cli">query</span> コマンドの後に貼り付けます。</p></td></tr>
@@ -158,8 +165,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">コマンドラインアプリケーションの一覧表</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">アプリケーション</a> 
+ «  <a href="list-cli-apps.html">コマンドラインアプリケーションの一覧表</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">アプリケーション</a> 
 </span></div>
 </div>
 

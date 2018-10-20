@@ -12,6 +12,7 @@
  * Translators:
  *		Sergei Reznikov
  *		mrNoisy
+ *		Vsevolod
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -58,56 +59,53 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/prefs-images/time-icon_64.png" alt="time-icon_64.png" width="64" height="64" />Время (Time)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Настройки (Preferences)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/preferences/Time</span></td></tr>
-<tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/networktime settings</span> - All the settings concerning synchronizing the time through the network<br />
-<span class="path">~/config/settings/RTC_time_settings</span> - The setting of the hardware clock (local or GMT)<br />
-<span class="path">~/config/settings/Time settings</span> - The time zone setting<br />
-<span class="path">~/config/settings/Time_preflet_window</span> - The panel's window position etc.<br />
-</td></tr>
+<tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/networktime settings</span> - Все настройки, касающиеся синхронизации времени по сети<br />
+<span class="path">~/config/settings/RTC_time_settings</span> - Настройка аппаратных часов (местное время или GMT)<br />
+<span class="path">~/config/settings/Time settings</span> - Текущий часовой пояс<br />
+<span class="path">~/config/settings/Time_preflet_window</span> - Координаты окна и т. д.<br /></td></tr>
 </table>
-<p>The panel of the Time preferences is split into four tabs:</p>
+<p>Панель настроек Времени (Time) разделена на четыре вкладки:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="date-time" name="date-time">Date and time</a></h2>
+<a id="date-time" name="date-time">Дата и время</a></h2>
 <img src="../images/prefs-images/time-time.png" alt="time-time.png" />
 <p>В левой части вы можете установить день месяца, кликнув по нему в календаре. Смена месяца и года производится стрелками вверх/вниз на клавиатуре, после щелчка на них мышью.</p>
-<p>Similarly, you set the time at the right. Or simply move the hands of the clock directly.</p>
+<p>Точно так же справа меняется время. Кроме того, можно просто передвигать стрелки часов вручную.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="timezone" name="timezone">Time zone</a></h2>
+<a id="timezone" name="timezone">Часовой пояс</a></h2>
 <img src="../images/prefs-images/time-timezone.png" alt="time-timezone.png" />
-<p>Simply find and choose your country in the list of continents and press <span class="button">Set time zone</span>. For countries with more than one time zone you'll have to expand one level deeper.<br />
-To the right you'll find the time of the currently set time zone and the preview time of the the zone you've chosen.</p>
-<p>Also on the right side is a setting for the hardware clock of your computer. There are two modes for the clock:</p>
+<p>Для установки часового пояса найдите и выберите свою страну в списке континентов и нажмите <span class="button">Установить часовой пояс</span>. Для стран более чем с одним часовым поясом нужно раскрыть еще один уровень меню. В правой части окна показывается время текущего и выбранного часовых поясов.</p>
+<p>Справа также расположены настройки аппаратных часов вашего компьютера. Для них есть два режима:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Местное время</span></td><td></td><td>to display your local time, which you normally want if you dual-boot into Windows.</td></tr>
-<tr><td><span class="menu">GMT</span></td><td></td><td>to display Greenwich Mean Time, which is the UNIX compatible setting.</td></tr>
+<tr><td><span class="menu">Местное время</span></td><td></td><td>отображать местное время, что нужно, если у вас также установлена Windows.</td></tr>
+<tr><td><span class="menu">GMT</span></td><td></td><td>отображать среднее время по гринвичскому меридиану, совместимое с UNIX.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="network" name="network">Network time</a></h2>
-<p>Setting date and time manually is pretty much obsolete if you're connected to the internet. There are public servers that supply very exact time signals.</p>
+<a id="network" name="network">Синхронизация</a></h2>
+<p>Если у вас есть доступ в интернет, установку даты и времени вручную можно считать устаревшей. Существуют общедоступные сервера, предоставляющие очень точные сигналы времени.</p>
 <img src="../images/prefs-images/time-network.png" alt="time-network.png" />
-<p>With the <span class="button">+</span>/<span class="button">-</span> buttons you can add/remove <acronym title="Network Time Protocol">NTP</acronym>-servers to/from the list.</p>
-<p>The checkboxes below tell the system to <span class="menu">Try all servers</span> when synchronizing, not only the currently selected one, and to <span class="menu">Synchronize at boot</span>, so you can be sure you're clock always shows the correct time.</p>
-<p>You can <span class="button">Reset to default server list</span> if you accidentally deleted working NTP-servers and <span class="button">Synchronize</span> your clock manually. The synchronization can be achived from the command line (or a script) as well:</p>
+<p>С помощью кнопок <span class="button">+</span>/<span class="button">-</span> можно добавлять в список и убирать из него <acronym title="Network Time Protocol, сетевой протокол синхронизации">NTP</acronym>-сервера.</p>
+<p>Флажки ниже указывают системе <span class="menu">Пробовать все сервера</span> при синхронизации, а не только выбранный, и <span class="menu">Синхронизировать при загрузке</span>, дабы вы всегда могли быть уверены, что ваши часы показывают верное время.</p>
+<p>Вы можете <span class="button">Восстановить список серверов по умолчанию</span>, если вы случайно удалили рабочие NTP-сервера и <span class="button">Синхронизировать</span> часы вручную. Синхронизацию можно также запустить из командной строки (или скриптом):</p>
 <pre class="terminal">Time --update</pre>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="clock" name="clock">Clock</a></h2>
+<a id="clock" name="clock">Часы</a></h2>
 <img src="../images/prefs-images/time-clock.png" alt="time-clock.png" />
-<p>The last tab shows the options of the clock displayed in the Deskbar. You can disable the clock there completely with the top checkbox. The rest are equally self-explanatory.</p>
+<p>Последняя вкладка показывает настройки часов, отображаемых в Deskbar. Верхняя опция полностью отключает отображение часов. Названия остальных говорят сами за себя.</p>
 <p><br /></p>
-<p>In every tab is a button <span class="button">Revert</span> that brings back the settings that were active when you started the Time preferences.</p>
+<p>На каждой вкладке есть кнопка <span class="button">Вернуть</span>, которая возвращает настройки, активные на момент запуска панели настроек Время.</p>
 
 </div>
 </div>

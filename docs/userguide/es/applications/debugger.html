@@ -58,17 +58,16 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <h2><img src="../../images/apps-images/debugger-icon_64.png" alt="debugger-icon_64.png" width="64" height="64" />Debugger (Depurador)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicaciones</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/apps/Debugger</span></td></tr>
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/Debugger settings</span><br />
 <span class="path">~/config/settings/Debugger/</span></td></tr>
 </table>
 <p><br /></p>
-<p>El Depurador es una aplicación para la cual es usuario común no tiene mucho uso. Está dirigido a desarrolladores para investigar fallos en programas. A veces esos fallos resultan en cuelgues y ahí es cuando aún los usuarios finales entran en contacto con el Depurador. Cuando un programa se descompone, se enfrentará a esta alerta:</p>
+<p>El Depurador es una aplicación para la cual es usuario final no tiene mucho uso. Está dirigido a desarrolladores para investigar fallos en programas. A veces esos fallos resultan en cuelgues y es ahí cuando aún los usuarios finales entran en contacto con el Depurador. Cuando un programa se descompone, se enfrentará a esta alerta:</p>
 <img src="../images/apps-images/debugger_alert.png" alt="debugger_alert.png" />
 <p>Le muestra cuatro opciones para reaccionar a este fallo:</p>
 <ul>
@@ -78,24 +77,24 @@
 <li><p><span class="button">Guardar informe</span> crea un informe de depuración que es guardado como archivo de texto en el Escritorio y puede ser enviado por correo electrónico al desarrollador de la aplicación con la falla, o adjuntado a una entrada en el rastreador de fallos, si es que está disponible.<br />
 El informe de depuración contiene información sobre su hardware (tipo de CPU y memoria utilizada, etc.), la versión exacta de Haiku y toda la información disponible sobre el estado del sistema que pudiera ser relevante al fallo.</p></li>
 </ul>
-<p>The default action when a crash happens can be configured with a text file <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
-The file takes on a driver_settings style format as follows:</p>
+<p>La acción predeterminada cuando una aplicación deja de responder puede ser configurada con un archivo de texto <span class="path">~/config/settings/system/debug_server/settings</span>.<br />
+El archivo toma el formato de estilo de driver_settings de la siguiente manera:</p>
 <pre>default_action user
 
 executable_actions {
 	app1 log
 	/path/app2* debug
 }</pre>
-<p>Valid values for a default_action are:</p>
+<p>Los valores válidos para una default_action son:</p>
 <table summary="action values" border="0" cellspacing="0" cellpadding="2">
-<tr><td>user</td><td style="width:30px"></td><td>Prompt the user for action.</td></tr>
-<tr><td>kill</td><td></td><td>Silently terminate the crashing team.</td></tr>
-<tr><td>debug</td><td></td><td>Attach the debugger to the crashing team.</td></tr>
-<tr><td>log / report</td><td></td><td>Save a crash report and terminate the team.</td></tr>
-<tr><td>core</td><td></td><td>Save a (possibly very large) core file and terminate the team.</td></tr>
+<tr><td>user</td><td style="width:30px"></td><td>pedirá acción al usuario.</td></tr>
+<tr><td>kill</td><td></td><td>detendrá de manera silenciosa el grupo que dejó de responder.</td></tr>
+<tr><td>debug</td><td></td><td>adjuntará el depurador al grupo que dejó de responder.</td></tr>
+<tr><td>log / report</td><td></td><td>guardará un informe de fallos y detendrá el grupo afectado.</td></tr>
+<tr><td>core</td><td></td><td>guardará un volcado de archivo (posiblemente de gran tamaño) y detendrá el grupo.</td></tr>
 </table>
-<p>If no default_action is specified, "user" is assumed.</p>
-<p>The executable_actions subsection contains individual overrides of the default. These take the form above, where the individual lines can be only a team name, or a path, with wildcards.</p>
+<p>Si no se especifica una default_action, se asume "user" (usuario).</p>
+<p>La subsección executable_actions contiene supresiones individuales sobre el predeterminado. Estos toman el formato de arriba, donde las líneas individuales sólo pueden ser un nombre de equipo, o una ruta, con comodines.</p>
 <p><br /></p>
 <hr />
 <p><br /></p>

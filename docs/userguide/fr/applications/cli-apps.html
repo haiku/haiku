@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,8 +51,8 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
@@ -94,18 +94,25 @@ pour plus de détails sur un paramètre, ajouter "--help", e.g. <tt>pkgman searc
 <p>Voici quelques outils en ligne de commande qui sont particulièrement utiles pour les scripts (voir aussi le sujet sur <a href="../bash-scripting.html">le Bash et les Scripts</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> invoque la fenêtre d'alerte typique avec une icône ad-hoc, un texte explicatif et jusqu'à trois boutons. le titre du bouton pressé sera renvoyé avec un code d'état (commençant à 0). Voici un exemple et son résultat :</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
-<p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p></td></tr>
+<p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
+</td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> affiche une boite de dialogue pour ouvrir ou enregistrer un fichier en permettant à l'utilisateur de choisir un fichier ou un emplacement. Vous obtiendrez comme valeur de retour, le fichier choisi ou le chemin du dossier.
-Parmi les paramètres disponibles, vous pouvez définir un répertoire de départ, un titre de fenêtre, un nom par défaut pour le fichier à enregistrer ou des restrictions aux types de fichiers autorisés. En voici un exemple :</p>
+		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> est un petit utilitaire pour envoyer des BMessages aux applications et afficher leurs réponses.  Il peut être utilisé pour écrire des scripts d'applications, i.e. « contrôle à distance » d'un programme à partir d'un script ou de la ligne de commande. Son utilisation est un peu complexe… <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">l'article du blog de Humdinger</a> constitue une bonne introduction, et dans la "BeOS Bible" de Scot Hacker, vous trouverez un <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">tutoriel pour hey</a> par Chris Herborth, très complet.</p></td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
+An example:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
+</td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> est la version ligne de commande de la fenêtre de recherche. En fait, une façon rapide de créer une expression de recherche, est de construire une requête dans la fenêtre de recherche, de basculer vers les formules (<span class="menu">by formula</span>), et de copier le tout entre doubles quottes (<tt>"</tt>) en paramètre à la commande <span class="cli">query</span> que vous appelez à partir du Terminal ou de votre script.</p></td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
@@ -162,8 +169,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">Liste des commandes</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">Liste des commandes</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 

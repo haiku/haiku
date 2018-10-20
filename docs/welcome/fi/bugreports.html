@@ -57,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -123,7 +124,7 @@ Riippuen siitä mikä kaatui voit yrittää tallentaa kaatumisilmoituksen Työp�
 Huomaa, että KDL-tilassa näppäimistösi ei ehkä toimi. PS/2-näppäimistöt toimivat aina, USB-näppäimistöjen kohdalla se riippuu USB-ohjaimen (UCHI/ECHI) tyypistä. Yleensä näppäimistöt olisi liitettävä suoraan porttiin, ei minkään keskittimen (hub) kautta. Joissakin tilanteissa näppäimistöt toimivat vain jos KDL-tilaan on siirrytty pikanäppäinten avulla vähintään kerran. USB OHCI-näppäimistöä ei tällä hetkellä tueta.</p>
 <p>KDL itse on erään tyyppinen komentotulkki. Käyttäjä voi suorittaa komentoja, jotka tulostavat tietoja järjestelmästä. Seuraavat komennot saattavat olla kiinnostavia:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (eli <span class="cli">sc</span>)</td><td> </td><td>Tulostaa paluujäljen. Jos järjestelmä siirtyy KDL-tilaan omasta tahdostaan, kirjoita aina tämä komento.</td></tr>
+<tr><td><span class="cli">bt</span> (eli <span class="cli">sc</span>)</td><td> </td><td>Prints a back trace (aka stack crawl). If the system entered KDL on its on volition, a back trace is normally printed automatically. Enter the command if that didn't happen or part of it is obscured (e.g. when the stack trace is so long that it wrapped around) and your only way of providing the information to developers is by taking a picture of the screen.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Näyttää käsitellyt ja käsittelemättömät laitteistokeskeytykset.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (eli <span class="cli">continue</span>)</td><td> </td><td>Jättää järjestelmävianjäljittimen ja jatkaa normaalia järjestelmän toimintaa, jos se on mahdollista.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Alkulataa järjestelmän välittömästi. Menetät kaiken tallentamattomat tiedot ja vieläpä nuo, jotka on tallennettu, mutta joita ei ole vielä kirjoitettu levylle.</td></tr>

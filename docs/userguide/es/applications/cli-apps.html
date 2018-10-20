@@ -4,12 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Humdinger
+ *		kervas
  *		miguel~1.mx
  *		Oscar Carballal
  *
@@ -51,23 +53,25 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin traducir se muestran en el inglés original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-specific commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplicaciones de línea de comandos específicas de Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Ubicación:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br />
-<span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
+<span class="path">/boot/system/non-packaged/bin/</span><br />
+<span class="path">~/config/bin/</span><br />
+<span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Todas las aplicaciones de línea de comandos incluidas con Haiku están en <span class="path">/boot/system/bin/</span>. Las aplicaciones de línea de comandos propias o instaladas adicionalmente deberían ir en esa ubicación también, o en <span class="path">~/config/bin</span>, cuando se instalen desde un paquete .hpkg. De otra forma también puede ubicarlas en <span class="path">/boot/system/non-packaged/bin/</span> o en <span class="path">~/config/non-packaged/bin/</span>. Todas estas ubicaciones son parte de la variable PATH y por lo tanto serán encontradas automáticamente.<br />
+
+La siguiente no es una lista exhaustiva de las aplicaciones CLI específicas de Haiku. Solo sirve para destacar algunas de las más útiles para darle una pequeña muestra. Anímese a explorar lo qué hay en las carpetas <span class="path">bin/</span> por su cuenta. Al ejecutar una aplicación con el parámetro <tt>--help</tt>, se muestra el uso del comando y todas sus opciones.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">Relacionados con los atributos: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
@@ -77,83 +81,90 @@ Todos estos comandos están descritos en el tema <a href="../attributes.html#att
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-index" name="cli-index">Relacionados con el indexado: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
 <p>Con estos comandos se puede listar, crear, reindexar y eliminar atributos del índice de BFS. Todo volumen tiene su propio índice, recuérdelo cuando copie ficheros de un volumen a otro.<br />
-Estos comandos están descritos en el tema <a href="../index.html">Indice</a>.</p>
+Estos comandos están descritos en el tema <a href="../index.html">Índice</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-pkg" name="cli-pkg">Relating to package management: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to automatically create packages from so-called recipes.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: it is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt>.</p>
+<a id="cli-pkg" name="cli-pkg">Administración de paquetes: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
+<p>La orden <span class="cli">package</span> se utiliza para administrar paquetes HPKG. Vea el artículo <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Instalación de aplicaciones</a> (en inglés) para aprender sobre los aspectos básicos. Normalmente la herramienta <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> es utilizada para crear paquetes automáticamente a partir de "recetas".</p>
+<p>Se utiliza <span class="cli">pkgman</span> para buscar, instalar, actualizar y desinstalar paquetes. Los repositorios de paquetes pueden ser añadidos, eliminados y sus listas de paquetes pueden ser refrescados. Un tipo de actualización especial se invoca con el parametro <tt>full-sync</tt>: es más agresivo y también permite regresar a versiones anteriores o elimina paquetes, de ser necesario.<br />
+Para más detalles sobre un parametro, añada "--help", por ejemplo, <tt>pkgman search --help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">Comandos útiles de scripting</a></h3>
 <p>Aquí se muestran unas pocas herramientas en línea de comandos que son especialmente útiles para scripting (ver también el tema <a href="../bash-scripting.html">Bash y Scripting</a>).</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+		<td valign="top"><p><span class="cli">alert</span> invoca una ventana de alerta típica con un ícono predefinido, texto explicatorio y hasta tres botones. Devolverá el título del botón presionado y un estado de salida (iniciando con 0). Por ejemplo, el siguiente cuadro es creado con la siguiente orden:</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> muestra un panel de abrir o guardar y permite al usuario escoger un archivo o ubicación. Recibirá como valor devuelto la ruta del archivo o carpeta elegida. Hay varios parametros disponibles, por ejemplo, uno para establecer la carpeta inicial, un título de ventana, un nombre predeterminado para guardar o restricciones sobre los tipos de archivos permitidos. Este es un ejemplo de </p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="ejemplo de resultado de orden filepanel" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+<td valign="top"><p><span class="cli">hey</span> es una pequeña herramienta auxiliar que envía BMessages a aplicaciones y muestra su respuesta. Puede ser utilizado para crear <i>scripts</i> de aplicaciones, por ejemplo controlar un programa por "control remoto" desde un script o la línea de comandos. Su uso es algo complejo... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">La entrada en el blog de Humdinger</a> es una buena introducción, y gracias a la Biblia del BeOS de Scot Hacker, hay un <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">tutorial de hey</a> mucho más amplio por Chris Herborth.</p>
 </td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> muestra un panel de notificación con un mensaje. Hay varios parametros que se describen cuando invoca <span class="cli">notify --help</span>. Una notificación también se puede usar para mostrar el progreso de alguna acción. Cuando lo hace, es importante poner un <i>messageID</i> y que lo use siempre cuando actualice el progreso (es un flotante entre 0.0 y 1.0 que se muestra como porcentaje). En caso contrario verá varios paneles de notificación si actualiza más rápido que el tiempo de espera establecido.<br />
+Un ejemplo:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p></td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
+		<td valign="top"><p><span class="cli">query</span> es la versión de la línea de comandos del panel Buscar. De hecho, una manera rápida de generar el término de búsqueda es crear una consulta en el panel Buscar, luego cambiarse a <span class="menu">por fórmula</span> (by formula), añadir comillas (<tt>"</tt>) en frente y luego pegar la cadena completa después de su orden <span class="cli">query</span> en la Terminal o en su <i>script</i>.</p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span> es una buena forma de esperar a que un hilo o aplicación particular inicie o termine.</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">Otras ordenes</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
+		<td><p><span class="cli">checkfs</span> es una herramienta importante para revisar su sistema de archivos por errores. Simplemente añada un nombre de volumen como <span class="path">/Haiku</span> o una ruta de dispositivo y ejecutará a través de cada archivo y corregirá inconsistencias cuando sea posible.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span> puede instalar un ícono en la bandeja de la Barra de Escritorio para cualquier archivo, carpeta, consulta o aplicación. También ofrece la opción de proveer un menú contextual cuando da un clic con el botón derecho para ejecutar acciones especiales. Por ejemplo, puede intentar añadir esto a la aplicación de intérprete de comandos <span class="app">Captura de pantalla</span> (screenshot) con varias opciones (la "<tt>\</tt>" en la primera línea sólo es para lograr una nueva línea en la Terminal):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
+		<td valign="top"><p><span class="cli">diskimage</span> le permite registrar un archivo normal como un dispositivo de disco. Por ejemplo, puede registrar una imagen anyboot de Haiku, montarla en el Tracker y copiar, editar o quitar archivos de ahí antes de usarla como origen en el Instalador.</p>
 </td></tr>
 <tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it.c  The parameter <tt>log</tt> prints out a log of all launch_daemon related events.<br />
-Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
-For example, this will stop the re-launching of the Deskbar:</p>
+		<td valign="top"><p>El launch_daemon inicia todo tipo de servicios y aplicaciones al arrancar. Para algunos se les dirige a reiniciarlos en caso que hubieran cerrado. Si no quiere que eso suceda – por ejemplo, en caso que quiera poner a prueba un Tracker modificado – entonces usaría <span class="cli">launch_roster</span> para detener (<tt>stop</tt>) el reinicio de la aplicación previo a cerrarla. De manera similar, puede iniciarla de nuevo (<tt>start</tt>) o lograr averiguar información sobre ella (<tt>info</tt>). El parámetro <tt>log</tt> muestra un historial de todos los eventos relacionados con launch_daemon.<br />
+Si se invoca sin ningún parámetro, <span class="cli">launch_roster</span> despliega una lista de todos las aplicaciones y servicios que estan bajo su control.<br />
+Por ejemplo, la siguiente orden detendrá el re-lanzamiento de la Barra de Escritorio:</p>
 <pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
-<p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>
+		<td valign="top"><p>La orden <span class="cli">mountvolume</span> es preferida por muchos para montar discos y particiones locales, porque su formato de uso es muy fácil: sólo debe invocarlo con el nombre de la partición y eso es todo. Ingrese la orden junto a <tt>--help</tt> para conocer más opciones.</p>
+<p>La orden <span class="cli">mount</span> puede montar adicionalmente discos remotos utilizando un sistema de archivos de red, como NFS4. Puede especificar el sistema de archivos a usarse con el parámetro <tt>-t</tt> y luego la ubicación remota con el parámetro <tt>-p</tt>. Como parámetro de sistema de archivos, puede usar cualquiera de los que encuentre en <span class="path">/system/add-ons/kernel/file_system</span> (y las jerarquías de archivos correspondientes bajo <span class="path">~/config</span> o "<span class="path">non-packaged</span>"). También debe crear una carpeta como punto de montaje. A continuación se muestra un ejemplo:</p>
 <pre class="terminal">mkdir -p /DiskStation
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+		<td valign="top"><p><span class="cli">open</span> es una útil pequeña herramienta. Con ella puede abrir cualquier archivo con su aplicación preestablecida, o iniciar una aplicación específica por su firma sin la necesidad de saber su ruta exacta. También funciona con direcciones URL e incluso con directorios "virtuales"<tt>.</tt> para el directorio actual y <tt>..</tt> para el directorio padre, abriendo la carpeta en el Tracker.</p>
 </td></tr>
 <tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
-To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+		<td valign="top"><p>Un Disco RAM, o ramdisk, es como un disco duro que se ejecuta únicamente en la memoria de la computadora. Eso la hace muy rápido pero también volatil, porque su contenido se desvanece cuando apaga la computadora, o se cuelga o si hay un apagón.<br />
+Para crear un ramdisk de 1 GiB, formatearlo con el nombre "RAMses" y montarlo, debe ingresar la siguiente orden en la Terminal o crear un <i>script</i> con lo siguiente:</p>
 <pre class="terminal">ramdisk create -s 1gb
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
 mountvolume RAMses</pre>
-<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
-<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
+<p>Nota: Cuando esté creando un ramdisk, la orden <span class="cli">ramdisk</span> muesstra la ruta al mismo. Si crea varios discos, la ruta <span class="path">/dev/disk/virtual/ram/0/raw</span> cambiará!</p>
+<p>Para conservar el contenido, al menos si no hay una calamidad como un apagón, etc., un ramdisk se puede configurar para leer/escribir una imagen al disco duro. Para eso, debe proveer un archivo del tamaño deseado de donde será leído cada vez que inicie su ramdisk, y donde se escriba cada vez que lo desmonte. Para crear un archivo de imagen "RAMimage" de 500MiB y luego formatearlo, ingrese lo siguiente:</p>
 <pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
 mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
-<p>From now on, you start the ramdisk like this:</p>
+<p>De ahora en adelante, puede iniciar el ramdisk de la siguiente manera:</p>
 <pre class="terminal">ramdisk create RAMimage
 mountvolume RAMimage</pre>
-<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
+<p></p>
+<p>Es muy importante que siempre desmonte su ramdisk de manera limpia, ya sea desde el Tracker o con la orden <span class="cli">unmount /RAMimage</span>, de lo contrario los cambios no se escribirán de vuelta en el archivo imagen!</p>
 </td></tr>
 </table>
 </div>
@@ -161,8 +172,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Aplicaciones</a> 
+ «  <a href="list-cli-apps.html">Lista de ordenes</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Aplicaciones</a> 
 </span></div>
 </div>
 

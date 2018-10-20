@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tłumaczenie tej strony jest niekompletne. Nieukończone części wyświetlane są w języku angielskim.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Spis treści</td></tr>
@@ -122,7 +123,7 @@ W zależności od tego, co dokładnie uległo awarii, możesz spróbować zapisa
 Weź pod uwagę, że w KDL klawiatura może nie działać. Klawiatury PS/2 działają zawsze, klawiatury USB podłączone do kontrolera UHCI działają tylko, gdy KDL został wywołany z klawiatury przynajmniej raz. USB OHCI nie jest obecnie obsługiwane.</p>
 <p>Sam KDL jest rodzajem powłoki. Można w nim wywoływać komendy zwracające informacje o stanie systemu. Poniższe są szczególnie przydatne:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="cli">bt</span> (lub <span class="cli">sc</span>)</td><td> </td><td>Wypisuje stos wywołań. Zawsze wywołaj tę komendę, jeśli KDL pojawił się samoczynnie.</td></tr>
+<tr><td><span class="cli">bt</span> (lub <span class="cli">sc</span>)</td><td> </td><td>Prints a back trace (aka stack crawl). If the system entered KDL on its on volition, a back trace is normally printed automatically. Enter the command if that didn't happen or part of it is obscured (e.g. when the stack trace is so long that it wrapped around) and your only way of providing the information to developers is by taking a picture of the screen.</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>Wypisuje obsłużone i nieobsłużone przerwania sprzętowe.</td></tr>
 <tr><td class="onelinetop"><span class="cli">co</span> (lub continue)</td><td> </td><td>Opuszcza tryb badania jądra i wznawia normalną pracę systemu, o ile jest to możliwe.</td></tr>
 <tr><td><span class="cli">reboot</span></td><td> </td><td>Natychmiast restartuje system. Powoduje utratę niezapisanych danych oraz tych zapisanych, ale nie zrzuconych jeszcze na dysk.</td></tr>

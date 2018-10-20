@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Barrett
  *		Francesco Franchina
+ *		Humdinger
  *		MichaelPeppers
  *
 -->
@@ -52,8 +53,8 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
@@ -94,17 +95,23 @@ For more details on a parameter, append "--help", e.g. <tt>pkgman search --help<
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> si occupa di far apparire una semplice finestra di notifica con un'icona predefinita, del testo esplicativo e un massimo di tre pulsanti. Ritornerà il titolo del pulsante premuto e lo stato di uscita (che comincia con uno 0), l'esempio è stato creato con la riga:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully! \
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> visualizza una finestra che permette di selezionare un percorso utilizzato per aprire o salvare file. Come valore di ritorno si otterrà il percorso del file o della cartella selezionata. Esistono diversi parametri utilizzabili, ad esempio per impostare la cartella di partenza, il titolo della finestra, il nome di default per il salvataggio oppure le restrizioni ai diversi tipi di file selezionabili. Ecco qui un esempio: </p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdinger's blog post</a> serves as a good introduction, and thanks to Scot Hacker's BeOS Bible, there is a much more comprehensive <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
+</td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
+An example:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> è la versione su riga di comando del pannello Trova. Infatti, un modo rapido per generare i termini di ricerca è creare una query nel pannello Trova, selezionando <span class="menu">per formula</span>, e aggiungendo le doppie virgolette (<tt>"</tt>) in testa e in coda, successivamente si incolla l'intera stringa dopo il comando <span class="cli">query</span> nel Terminale o nello script che si sta realizzando.</p></td></tr>
@@ -162,8 +169,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">Lista dei comandi</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applicazioni</a> 
+ «  <a href="list-cli-apps.html">Lista dei comandi</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applicazioni</a> 
 </span></div>
 </div>
 

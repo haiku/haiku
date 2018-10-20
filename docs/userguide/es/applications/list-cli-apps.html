@@ -10,12 +10,14 @@
  * Authors:
  *		Daniel Marth
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		kervas
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>List of commands</title>
+	<title>Lista de ordenes</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
@@ -56,304 +58,304 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin traducir se muestran en el inglés original.</div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />List of all commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Lista de todas las aplicaciones de la línea de comandos</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Ubicación:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>Todas las aplicaciones de línea de comandos incluidas en Haiku se encuentran en <span class="path">/boot/system/bin/</span>. Sus propias aplicaciones o las que instale adicionalmente aparecerán en <span class="path">~/config/bin/</span> cuando se instalen desde un paquete .hpkg. De otra forma, puede ponerlos en <span class="path">~/config/non-packaged/bin/</span>. Todas estas ubicaciones son parte de la variable de ruta PATH y por tanto serán encontradas automáticamente.<br />
+A continuación se muestra una lista de todas las aplicaciones de línea de comando que se incluyen con Haiku. Cada una va con una pequeña descripción de lo que hace, para más información sobre su uso, ejecute la orden con el parametro <tt>--help</tt>.</p>
 <p><br /></p>
-<p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
+<p>Índice:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Starts service to monitor audio and video media add-ons in use. </td></tr>
-<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
-<tr><td><tt>[</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
-<tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
-<tr><td><tt>addattr</tt></td><td> </td><td>Writes an attribute to a file, taking the type into account and converting the values accordingly. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>alert</tt></td><td> </td><td>Shows a message box. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>arp</tt></td><td> </td><td>Manipulates the system ARP cache. </td></tr>
-<tr><td><tt>awk</tt></td><td> </td><td>See <tt>gawk</tt>.</td></tr>
-<tr><td><tt>base64</tt></td><td> </td><td>Base64 encode or decode to standard output. </td></tr>
-<tr><td><tt>basename</tt></td><td> </td><td>Strips directory and optionally suffix from a /path/to/filename string.</td></tr>
-<tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell.</td></tr>
-<tr><td><tt>bc</tt></td><td> </td><td>An arbitrary precision calculator language.</td></tr>
-<tr><td><tt>beep</tt></td><td> </td><td>Rings a bell. </td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td>See <tt>bzip2</tt>.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C  -Compiler.</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Displays a calendar. </td></tr>
-<tr><td><tt>cat</tt></td><td> </td><td>Concatenates files and prints to standard output. </td></tr>
-<tr><td><tt>catattr</tt></td><td> </td><td>Prints out the contents of an attribute of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cc</tt></td><td> </td><td>C-Compiler.</td></tr>
-<tr><td><tt>checkfs</tt></td><td> </td><td>Checks and repairs the file system. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>checkitout</tt></td><td> </td><td>Checks out sources simply with their repository's URL.</td></tr>
-<tr><td><tt>chgrp</tt></td><td> </td><td>Changes group ownership of files. </td></tr>
-<tr><td><tt>chmod</tt></td><td> </td><td>Changes permissions of files.</td></tr>
-<tr><td><tt>chop</tt></td><td> </td><td>Splits a file into smaller files. </td></tr>
-<tr><td><tt>chown</tt></td><td> </td><td>Changes the owner of files. </td></tr>
-<tr><td><tt>chroot</tt></td><td> </td><td>Runs a command within a specified root directory. </td></tr>
-<tr><td><tt>cksum</tt></td><td> </td><td>Prints out CRC checksum and byte count of files. </td></tr>
-<tr><td><tt>clear</tt></td><td> </td><td>Clears the terminal window. </td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Prints out the clock configuration.</td></tr>
-<tr><td><tt>cmp</tt></td><td> </td><td>Compares files byte by byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Leftover from the move of locale-kit.]</td></tr>
-<tr><td><tt>comm</tt></td><td> </td><td>Compares sorted files line by line. </td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Data compression program.</td></tr>
-<tr><td><tt>consoled</tt></td><td> </td><td>Console daemon.</td></tr>
-<tr><td><tt>copyattr</tt></td><td> </td><td>Copies all or a subset of attributes from one or more files to another or new file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cp</tt></td><td> </td><td>Copies files and directories. </td></tr>
-<tr><td><tt>csplit</tt></td><td> </td><td>Split a file into pieces separated by a specified pattern.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Generates an index file for a variety of language objects found in files.</td></tr>
-<tr><td><tt>cut</tt></td><td> </td><td>Prints out sections from each line of a file.</td></tr>
-<tr><td><tt>date</tt></td><td> </td><td>Displays or sets the current time and date.</td></tr>
-<tr><td><tt>dc</tt></td><td> </td><td>Desk calculator language.</td></tr>
-<tr><td><tt>dd</tt></td><td> </td><td>Copies raw data, converting and formatting according operands. </td></tr>
-<tr><td><tt>desklink</tt></td><td> </td><td>Installs items in Deskbar. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>diskimage</tt></td><td> </td><td>Registers a file as disk device that can then be mounted. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>df</tt></td><td> </td><td>Reports free and used space of mounted volumes.</td></tr>
-<tr><td><tt>diff</tt></td><td> </td><td>Compares files line by line.</td></tr>
-<tr><td><tt>diff3</tt></td><td> </td><td>Compares three files line by line.</td></tr>
-<tr><td><tt>dircolors</tt></td><td> </td><td>Color setup for <tt>ls</tt>. </td></tr>
-<tr><td><tt>dirname</tt></td><td> </td><td>Strips the filename from a /path/to/filename string.</td></tr>
-<tr><td><tt>draggers</tt></td><td> </td><td>Shows/sets the dragger state of Replicants.</td></tr>
-<tr><td><tt>driveinfo</tt></td><td> </td><td>Shows hardware information. </td></tr>
-<tr><td><tt>dstcheck</tt></td><td> </td><td>Shows a message box used when switching to/from daylight saving time.</td></tr>
-<tr><td><tt>du</tt></td><td> </td><td>Summarizes disk usage of each file, recursively for directories. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>echo</tt></td><td> </td><td>Displays a line of text.</td></tr>
-<tr><td><tt>egrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
-<tr><td><tt>eject</tt></td><td> </td><td>Ejects removable media. </td></tr>
-<tr><td><tt>env</tt></td><td> </td><td>Runs a program in a modified environment. </td></tr>
-<tr><td><tt>error</tt></td><td> </td><td>Prints clear text error messages for given error numbers. </td></tr>
-<tr><td><tt>expand</tt></td><td> </td><td>Converts tabs to spaces.</td></tr>
-<tr><td><tt>expr</tt></td><td> </td><td>Prints the value of an expression.</td></tr>
-<tr><td colspan="3"><a id="F" name="F"><h2>F</h2></a></td></tr>
-<tr><td><tt>factor</tt></td><td> </td><td>Prints the prime factors of integer numbers.</td></tr>
-<tr><td><tt>false</tt></td><td> </td><td>Does nothing, indicates "unsuccessful" and returns the value "1".</td></tr>
-<tr><td><tt>fdinfo</tt></td><td> </td><td>Shows info about the used file descriptors in the system. </td></tr>
-<tr><td><tt>ffm</tt></td><td> </td><td>Sets focus follows mouse. </td></tr>
-<tr><td><tt>fgrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
-<tr><td><tt>filepanel</tt></td><td> </td><td>Displays a load/save file panel. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>find</tt></td><td> </td><td>Searches for files in a directory hierarchy.</td></tr>
-<tr><td><tt>finddir</tt></td><td> </td><td>Finds special directories defined by the system.</td></tr>
-<tr><td><tt>fmt</tt></td><td> </td><td>Reformats the paragraphs of a file.</td></tr>
-<tr><td><tt>fold</tt></td><td> </td><td>Wraps input lines of a file.</td></tr>
-<tr><td><tt>fortune</tt></td><td> </td><td>Prints a random, hopefully interesting, adage. </td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Called by updatedb to compress the list of file names.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Shows FreeType compilation and linking information.</td></tr>
-<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>File transfer program.</td></tr>
-<tr><td><tt>ftpd</tt></td><td> </td><td>FTP daemon.</td></tr>
-<tr><td><tt>funzip</tt></td><td> </td><td>Extracts the first item of an archive to standard output.</td></tr>
-<tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire control program.</td></tr>
-<tr><td><tt>gawk</tt></td><td> </td><td>Pattern scanning and processing language. </td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>GNU debugger.</td></tr>
-<tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Prints platform dependent limits in a format useful for shell scripts. </td></tr>
-<tr><td><tt>grep</tt></td><td> </td><td>Search for a pattern.</td></tr>
-<tr><td><tt>groups</tt></td><td> </td><td>Prints group memberships for each username. </td></tr>
-<tr><td><tt>gunzip</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
-<tr><td><tt>gzexe</tt></td><td> </td><td>De/Compresses executables. </td></tr>
-<tr><td><tt>gzip</tt></td><td> </td><td>De/Compresses files. </td></tr>
-<tr><td><tt>hd</tt></td><td> </td><td>Hexdump.</td></tr>
-<tr><td><tt>head</tt></td><td> </td><td>Prints the first lines of a file.</td></tr>
-<tr><td><tt>hey</tt></td><td> </td><td>A small tool for scripting GUI apps.</td></tr>
-<tr><td><tt>hostname</tt></td><td> </td><td>Prints or sets the hostname of the system. </td></tr>
-<tr><td><tt>id</tt></td><td> </td><td>Prints user and group information. </td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identifies RCS keywords in files. </td></tr>
-<tr><td><tt>ifconfig</tt></td><td> </td><td>Configures a network interface. </td></tr>
-<tr><td><tt>install</tt></td><td> </td><td>Copies files to a destination without disrupting the running system.</td></tr>
-<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Installs firmware for various wireless network cards. </td></tr>
-<tr><td><tt>installsound</tt></td><td> </td><td>Installs a new sound event in the Sounds preferences panel. </td></tr>
-<tr><td><tt>iroster</tt></td><td> </td><td>Lists input devices. </td></tr>
-<tr><td><tt>isvolume</tt></td><td> </td><td>Gets information about a mounted volume.</td></tr>
-<tr><td><tt>join</tt></td><td> </td><td>For each pair of input lines with identical join fields, write a line to standard output. </td></tr>
-<tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K</h2></a></td></tr>
-<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Enters the kernel debugger.</td></tr>
-<tr><td><tt>keymap</tt></td><td> </td><td>Loads or saves a keymap.</td></tr>
-<tr><td><tt>kill</tt></td><td> </td><td>Sends a signal to quit a process. </td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>less</tt></td><td> </td><td>Views a file.</td></tr>
-<tr><td><tt>lessecho</tt></td><td> </td><td>Echos its arguments and expands metacharacters, such as * and ? in filenames.</td></tr>
-<tr><td><tt>lesskey</tt></td><td> </td><td>Specifies key binding for less. </td></tr>
-<tr><td><tt>link</tt></td><td> </td><td>Creates a link to a file. </td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>listarea</tt></td><td> </td><td>Lists area info for all currently running teams. </td></tr>
-<tr><td><tt>listattr</tt></td><td> </td><td>Lists the attributes of a file. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>listdev</tt></td><td> </td><td>Lists all hardware devices.</td></tr>
-<tr><td><tt>listimage</tt></td><td> </td><td>Lists image info for all currently running teams. </td></tr>
-<tr><td><tt>listport</tt></td><td> </td><td>Lists all open ports in the system organized by team. </td></tr>
-<tr><td><tt>listres</tt></td><td> </td><td>Lists resources of files. </td></tr>
-<tr><td><tt>listsem</tt></td><td> </td><td>Lists the semaphores allocated by the specified team. </td></tr>
-<tr><td><tt>listusb</tt></td><td> </td><td>Lists USB devices. </td></tr>
-<tr><td><tt>ln</tt></td><td> </td><td>Creates a link to a file.</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
-<tr><td><tt>locate</tt></td><td> </td><td>Locates a file. </td></tr>
-<tr><td><tt>logger</tt></td><td> </td><td>Sends a message to the system log. </td></tr>
-<tr><td><tt>login</tt></td><td> </td><td>Starts a session on the system. </td></tr>
-<tr><td><tt>logname</tt></td><td> </td><td>Prints the name of the current user. </td></tr>
-<tr><td><tt>ls</tt></td><td> </td><td>Lists directory content. </td></tr>
-<tr><td><tt>lsindex</tt></td><td> </td><td>Displays the indexed attributes on the current volume/partition.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mail2mbox</tt></td><td> </td><td>Converts BeOS e-mail files to Unix mailbox files. </td></tr>
-<tr><td><tt>make</tt></td><td> </td><td>GNU make utility.</td></tr>
-<tr><td><tt>makebootable</tt></td><td> </td><td>Makes the specified BFS partitions/devices bootable by writing boot code into the first two sectors. </td></tr>
-<tr><td><tt>mbox2mail</tt></td><td> </td><td>Converts Unix mailbox files to BeOS e-mail files.</td></tr>
-<tr><td><tt>md5sum</tt></td><td> </td><td>Prints or checks MD5 checksums.</td></tr>
-<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" plays back audio files.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Three-way file merge. </td></tr>
-<tr><td><tt>message</tt></td><td> </td><td>Prints a flattened BMessage file. </td></tr>
-<tr><td><tt>mimeset</tt></td><td> </td><td>Sets MIME type of a file. </td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
-<tr><td><tt>mkdir</tt></td><td> </td><td>Creates a directory. </td></tr>
-<tr><td><tt>mkdos</tt></td><td> </td><td>Initializes FAT partitions. </td></tr>
-<tr><td><tt>mkfifo</tt></td><td> </td><td>Creates named pipes. </td></tr>
-<tr><td><tt>mkfs</tt></td><td> </td><td>Creates a file system.</td></tr>
-<tr><td><tt>mkindex</tt></td><td> </td><td>Creates a new index for an attribute.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mktemp</tt></td><td> </td><td>Safely creates a temporary file or directory.</td></tr>
-<tr><td><tt>modifiers</tt></td><td> </td><td>Prints currently (un)pressed modifier keys. </td></tr>
-<tr><td><tt>more</tt></td><td> </td><td>See <tt>less</tt>. </td></tr>
-<tr><td><tt>mount</tt></td><td> </td><td>Mounts a file system. </td></tr>
-<tr><td><tt>mount_nfs</tt></td><td> </td><td>Mounts a NFS partition. </td></tr>
-<tr><td><tt>mountvolume</tt></td><td> </td><td>Mounts a volume by name.</td></tr>
-<tr><td><tt>mv</tt></td><td> </td><td>Moves/renames a file. </td></tr>
-<tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>TCP and UDP utility.</td></tr>
-<tr><td><tt>netstat</tt></td><td> </td><td>Prints network connections, routing tables, interface statistics, masquerade connections and multicast memberships. </td></tr>
-<tr><td><tt>nl</tt></td><td> </td><td>Prints each file with line numbers added. </td></tr>
-<tr><td><tt>nohup</tt></td><td> </td><td>Runs a command ignoring hangup signals. </td></tr>
-<tr><td><tt>nproc</tt></td><td> </td><td>Prints the number of available processing units.</td></tr>
-<tr><td><tt>od</tt></td><td> </td><td>Writes an unambiguous representation of a file.</td></tr>
-<tr><td><tt>open</tt></td><td> </td><td>Launches an application/document from the shell. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
-<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
-<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
-<tr><td><tt>passwd</tt></td><td> </td><td>Changes the user password. </td></tr>
-<tr><td><tt>paste</tt></td><td> </td><td>Prints lines consisting of the sequentially corresponding lines from each file, separated by tabs.</td></tr>
-<tr><td><tt>patch</tt></td><td> </td><td>Applies a diff file to an original. </td></tr>
-<tr><td><tt>pathchk</tt></td><td> </td><td>Diagnoses invalid or unportable file names. </td></tr>
-<tr><td><tt>pc</tt></td><td> </td><td>Programmer's calculator.</td></tr>
-<tr><td><tt>ping</tt></td><td> </td><td>Sends ICMP-echo-request to network host. </td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
-<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
-<tr><td><tt>play</tt></td><td> </td><td>Plays tracks from CD. </td></tr>
-<tr><td><tt>pr</tt></td><td> </td><td>Paginates or columnates files for printing. </td></tr>
-<tr><td><tt>printenv</tt></td><td> </td><td>Prints the value of an environment variable.</td></tr>
-<tr><td><tt>printf</tt></td><td> </td><td>Formats and prints data. </td></tr>
-<tr><td><tt>prio</tt></td><td> </td><td>Changes priority of a process. </td></tr>
-<tr><td><tt>profile</tt></td><td> </td><td>Profiles threads. </td></tr>
-<tr><td><tt>ps</tt></td><td> </td><td>Lists running processes. </td></tr>
-<tr><td><tt>ptx</tt></td><td> </td><td>Outputs a permuted index, including context, of the words in the input files.</td></tr>
-<tr><td><tt>pwd</tt></td><td> </td><td>Prints current directory. </td></tr>
-<tr><td><tt>query</tt></td><td> </td><td>A shell utility emulating Tracker's "Find by formula" functionality.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>quit</tt></td><td> </td><td>Quits an application. </td></tr>
-<tr><td><tt>ramdisk</tt></td><td> </td><td>Creates a ramdisk. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>rc</tt></td><td> </td><td>Resource compiler.</td></tr>
-<tr><td><tt>readlink</tt></td><td> </td><td>Prints the path to the destination of a symbolic link.</td></tr>
-<tr><td><tt>reindex</tt></td><td> </td><td>Puts attributes of existing files into newly created indexes. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>release</tt></td><td> </td><td>Releases a semaphore. </td></tr>
-<tr><td><tt>renice</tt></td><td> </td><td>Alters the priority of a running process. </td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Prints log messages and other information about RCS files.</td></tr>
-<tr><td><tt>rm</tt></td><td> </td><td>Removes files and directories. </td></tr>
-<tr><td><tt>rmattr</tt></td><td> </td><td>Removes an attribute from a file.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>rmdir</tt></td><td> </td><td>Removes directories.</td></tr>
-<tr><td><tt>rmindex</tt></td><td> </td><td>Removes the index for an attribute. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>roster</tt></td><td> </td><td>Prints information about running teams. </td></tr>
-<tr><td><tt>route</tt></td><td> </td><td>Lists and manipulates network routes. </td></tr>
-<tr><td><tt>safemode</tt></td><td> </td><td>Checks if the system is running in safemode. </td></tr>
-<tr><td><tt>screen_blanker</tt></td><td> </td><td>Starts the screen blanker.</td></tr>
-<tr><td><tt>screenmode</tt></td><td> </td><td>Show/sets the screen mode. </td></tr>
-<tr><td><tt>sdiff</tt></td><td> </td><td>Shows or merges differences of two files side-by-side.</td></tr>
-<tr><td><tt>seq</tt></td><td> </td><td>Prints a sequence of numbers.</td></tr>
-<tr><td><tt>setarch</tt></td><td> </td><td>Sets the environment to a specific compiler version. </td></tr>
-<tr><td><tt>setdecor</tt></td><td> </td><td>Shows/sets the decorator. </td></tr>
-<tr><td><tt>settype</tt></td><td> </td><td>Sets the MIME type, signature and preferred application of a file. </td></tr>
-<tr><td><tt>setversion</tt></td><td> </td><td>Shows the version of a file.</td></tr>
-<tr><td><tt>setvolume</tt></td><td> </td><td>Sets the system sound volume. </td></tr>
+<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>inicia el servicio para monitorear los añadidos (add-ons) de medios de audio y video en uso.</td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Configuración de mapa de teclado e idioma.</td></tr>
+<tr><td><tt>[</tt></td><td> </td><td>Devuelve verdadero/falso luego de comparar elementos.</td></tr>
+<tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A – E</h2></a></td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>Escribe un atributo a un archivo, tomando en cuenta el tipo de archivo y convirtiendo los valores acorde. <a href="cli-apps.html">(específico de Haiku)</a></td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>Muestra un cuadro de mensaje. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>Manipula el caché ARP del sistema.</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td>Vea <tt>gawk</tt>.</td></tr>
+<tr><td><tt>base64</tt></td><td> </td><td>Codifica o decodifica en Base64 para la salida estándar. </td></tr>
+<tr><td><tt>basename</tt></td><td> </td><td>Aísla el nombre del directorio, y opcionalmente un sufijo, de una cadena de /ruta/hacia/archivo</td></tr>
+<tr><td><tt>bash</tt></td><td> </td><td>intérprete de comandos Bourne-again.</td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>Lenguaje de calculadora de precisión arbitraria.</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>Emite un pitido.</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>Vea <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>Compresor de archivos.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>Compilador de C.</td></tr>
+<tr><td><tt>cal</tt></td><td> </td><td>muestra un calendario.</td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>concatena archivos y muestra a la salida estandar.</td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>Muestra el contenido de los atributos de un archivo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>cc</tt></td><td> </td><td>Compilador de C.</td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>revisa y repara el sistema de archivos. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>checkitout</tt></td><td> </td><td>Despliega fuentes usando solamente el URL de su repositorio.</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>cambia cuál es el grupo que es propietario de archivos.</td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>Cambia los permisos de archivos.</td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>Divide un archivo en archivos más pequeños.</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>Cambia el propietario de los archivos.</td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>Ejecuta una orden dentro de un directorio raíz especificado.</td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>Imprime suma de comprobación CRC y conteo de bytes de archivos.</td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>Limpia la ventana de la terminal.</td></tr>
+<tr><td><tt>clockconfig</tt></td><td> </td><td>Imprime la configuración del reloj.</td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>Compara archivos byte por byte.</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>Compara archivos ordenados línea por línea.</td></tr>
+<tr><td><tt>compress</tt></td><td> </td><td>programa de compresión de datos.</td></tr>
+<tr><td><tt>consoled</tt></td><td> </td><td>Daemon de la consola.</td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>Copia todos los atributos o un subconjunto de ellos de uno o más archivos a otro o a nuevo archivo(s). <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>Copia archivos y directorios.</td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>Divide un archivo en piezas separadas por un patrón específico.</td></tr>
+<tr><td><tt>ctags</tt></td><td> </td><td>Genera un archivo índice para una variedad de objetos de lenguaje que se encuentran en archivos.</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>Imprime segmentos de cada línea de un archivo.</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>Muestra o configura la hora y fecha actual.</td></tr>
+<tr><td><tt>dc</tt></td><td> </td><td>lenguaje de calculadora de escritorio.</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>Copia datos en bruto, la convierte y le da formato de acuerdo a operandos.</td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>Instala elementos en la Barra de Escritorio. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>diskimage</tt></td><td> </td><td>Registra un archivo como un dispositivo de disco que puede ser montado. <a href="cli-apps.html">(específoco a Haiku)</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>Presenta un informe sobre espacio usado y libre de los volúmenes montados.</td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>Compara archivos línea por línea.</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>Compara tres archivos línea por línea.</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td>Configuración de colores para <tt>ls</tt>. </td></tr>
+<tr><td><tt>dirname</tt></td><td> </td><td>Aísla el nombre de directorio de una cadena ruta/hacia/archivo.</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>Muestra/establece el estado del agarrable de los Replicantes.</td></tr>
+<tr><td><tt>driveinfo</tt></td><td> </td><td>Muestra información de hardware.</td></tr>
+<tr><td><tt>dstcheck</tt></td><td> </td><td>Muestra un cuadro de texto utilizado al cambiar desde/hacia el horario de verano.</td></tr>
+<tr><td><tt>du</tt></td><td> </td><td>Resume el espacio de uso de disco de cada archivo, de forma recursiva para los directorios.</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
+<tr><td><tt>echo</tt></td><td> </td><td>Muestra una línea de texto.</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td>Vea <tt>grep</tt>.</td></tr>
+<tr><td><tt>eject</tt></td><td> </td><td>Expulsa medios extraíbles.</td></tr>
+<tr><td><tt>env</tt></td><td> </td><td>Ejecuta un programa en un entorno modificado.</td></tr>
+<tr><td><tt>error</tt></td><td> </td><td>Imprime mensajes de error en texto sencillo para números de error dados.</td></tr>
+<tr><td><tt>expand</tt></td><td> </td><td>Convierte tabulaciones a espacios.</td></tr>
+<tr><td><tt>expr</tt></td><td> </td><td>Despliega el valor de una expresión.</td></tr>
+<tr><td colspan="3"><a id="F" name="F"><h2>F – J</h2></a></td></tr>
+<tr><td><tt>factor</tt></td><td> </td><td>muestra los factores primos de números enteros.</td></tr>
+<tr><td><tt>false</tt></td><td> </td><td>No hace nada, indica "fallido" y devuelve el valor "1".</td></tr>
+<tr><td><tt>fdinfo</tt></td><td> </td><td>Muestra información sobre los descriptores de archivos usados en el sistema.</td></tr>
+<tr><td><tt>ffm</tt></td><td> </td><td>Activa la configuración de enfoque de ventanas activado por ratón.</td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td>Vea <tt>grep</tt>.</td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>Muestra un panel de archivos para abrir/guardar. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>Busca archivos en una jerarquía de directorios.</td></tr>
+<tr><td><tt>finddir</tt></td><td> </td><td>Busca directorios especiales definidos por el sistema.</td></tr>
+<tr><td><tt>fmt</tt></td><td> </td><td>Reformatea los párrafos de un archivo.</td></tr>
+<tr><td><tt>fold</tt></td><td> </td><td>Ajusta las lineas de entrada de un archivo.</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>Imprime un adagio, posiblemente interesante, al azar.</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>Invocado por updatedb para comprimir la lista de nombres de archivos.</td></tr>
+<tr><td><tt>freetype-config</tt></td><td> </td><td>Muestra información de vinculado y compilado de FreeType.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Envía una orden TRIM a una unidad SSD.</td></tr>
+<tr><td><tt>ftp</tt></td><td> </td><td>Programa de transferencia de archivos.</td></tr>
+<tr><td><tt>ftpd</tt></td><td> </td><td>Daemon de FTP.</td></tr>
+<tr><td><tt>funzip</tt></td><td> </td><td>Extrae el primer elemento de un archivo comprimido.</td></tr>
+<tr><td><tt>fwcontrol</tt></td><td> </td><td>Programa de control para FireWire.</td></tr>
+<tr><td><tt>gawk</tt></td><td> </td><td>Lenguaje de rastreo de patrones y procesamiento.</td></tr>
+<tr><td><tt>gdb</tt></td><td> </td><td>depurador GNU.</td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>Muestra la versión del compilador del entorno.</td></tr>
+<tr><td><tt>getlimits</tt></td><td> </td><td>Imprime limites dependientes de plataforma en un formato útil para scripts de intérprete de comandos.</td></tr>
+<tr><td><tt>grep</tt></td><td> </td><td>Busca por patrón.</td></tr>
+<tr><td><tt>groups</tt></td><td> </td><td>Imprime la afiliación de grupos de cada usuario.</td></tr>
+<tr><td><tt>gunzip</tt></td><td> </td><td>Vea <tt>gzip</tt>.</td></tr>
+<tr><td><tt>gzexe</tt></td><td> </td><td>Comprime/descomprime ejecutables.</td></tr>
+<tr><td><tt>gzip</tt></td><td> </td><td>Comprime/descomprime archivos.</td></tr>
+<tr><td><tt>hd</tt></td><td> </td><td>Vaciado hexadecimal.</td></tr>
+<tr><td><tt>head</tt></td><td> </td><td>Imprime las primeras lineas de un archivo.</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>Una pequeña herramienta útil al hacer scripts con aplicaciones de interfaz gráfica de usuario.</td></tr>
+<tr><td><tt>hostname</tt></td><td> </td><td>Imprime o establece el nombre de host del sistema.</td></tr>
+<tr><td><tt>id</tt></td><td> </td><td>Imprime información de usuario y de grupo.</td></tr>
+<tr><td><tt>ident</tt></td><td> </td><td>Identifica palabras clave RCS en archivos.</td></tr>
+<tr><td><tt>ifconfig</tt></td><td> </td><td>Configura una interface de red.</td></tr>
+<tr><td><tt>install</tt></td><td> </td><td>Copia archivos a un destino sin perturbar el sistema en ejecución.</td></tr>
+<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Instala firmware para varias tarjetas de red inalámbricas.</td></tr>
+<tr><td><tt>installsound</tt></td><td> </td><td>instala un nuevo evento de sonido en el panel de preferencias de Sonidos.</td></tr>
+<tr><td><tt>iroster</tt></td><td> </td><td>muestra una lista de dispositivos de entrada.</td></tr>
+<tr><td><tt>isvolume</tt></td><td> </td><td>busca información sobre un volumen montado.</td></tr>
+<tr><td><tt>join</tt></td><td> </td><td>Por cada par de lineas de entrada con campos de unión idénticos, escribe una línea a la salida estándar.</td></tr>
+<tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K – O</h2></a></td></tr>
+<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Ingresa al depurador del núcleo.</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>Carga o guarda un mapa de teclado.</td></tr>
+<tr><td><tt>kill</tt></td><td> </td><td>Envía una señal para salir de un proceso.</td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Controla el launch_daemon, por ejemplo servicios de iniciado y reiniciado. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>less</tt></td><td> </td><td>Visualiza el contenido de un archivo.</td></tr>
+<tr><td><tt>lessecho</tt></td><td> </td><td>Hace eco de sus argumentos y expande metacaracteres, como * y ? en nombres de archivos.</td></tr>
+<tr><td><tt>lesskey</tt></td><td> </td><td>Establece la tecla clave para less.</td></tr>
+<tr><td><tt>link</tt></td><td> </td><td>Crea un enlace a un archivo.</td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Remanente del traslado de locale-kit.] </td></tr>
+<tr><td><tt>listarea</tt></td><td> </td><td>Muestra listado de información de área para todos los grupos actualmente en ejecución.</td></tr>
+<tr><td><tt>listattr</tt></td><td> </td><td>Muestra listado de atributos de un archivo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>listdev</tt></td><td> </td><td>Muestra un listado de todos los dispositivos de hardware.</td></tr>
+<tr><td><tt>listimage</tt></td><td> </td><td>Muestra listado de información de imagen de todos los grupos actualmente en ejecución.</td></tr>
+<tr><td><tt>listport</tt></td><td> </td><td>Muestra listado de todos los puertos abiertos en el sistema ordenados por grupo.</td></tr>
+<tr><td><tt>listres</tt></td><td> </td><td>Muestra listado de recursos de archivos.</td></tr>
+<tr><td><tt>listsem</tt></td><td> </td><td>Muestra los semáforos asignados por el grupo especificado.</td></tr>
+<tr><td><tt>listusb</tt></td><td> </td><td>Muestra una lista de los dispositivos USB.</td></tr>
+<tr><td><tt>ln</tt></td><td> </td><td>Crea un enlace a un archivo.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Muestra el idioma predilecto, su LC_CTYPE y el formato predilecto.</td></tr>
+<tr><td><tt>locate</tt></td><td> </td><td>ubica un archivo.</td></tr>
+<tr><td><tt>logger</tt></td><td> </td><td>Envía un mensaje al registro de historial del sistema.</td></tr>
+<tr><td><tt>login</tt></td><td> </td><td>Inicia una sesión en el sistema.</td></tr>
+<tr><td><tt>logname</tt></td><td> </td><td>Imprime el nombre del usuario actual.</td></tr>
+<tr><td><tt>ls</tt></td><td> </td><td>Muestra un listado de contenido de directorio.</td></tr>
+<tr><td><tt>lsindex</tt></td><td> </td><td>Muestra los atributos indexados de la partición/volumen actual.  <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>mail2mbox</tt></td><td> </td><td>Convierte archivos de correo electrónico de BeOS a archivos de mailbox de Unix.</td></tr>
+<tr><td><tt>make</tt></td><td> </td><td>utilidad make de GNU.</td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>Hace que los dispositivos/particiones BFS puedan arrancar, escribiendo código de arranque en los primeros dos sectores.</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>Convierte archivos de mailbox de Unix a archivos de correo electrónico de BeOS.</td></tr>
+<tr><td><tt>md5sum</tt></td><td> </td><td>Imprime o revisa sumas de comprobación MD5.</td></tr>
+<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" reproduce archivos de audio.</td></tr>
+<tr><td><tt>merge</tt></td><td> </td><td>Hace combinación de archivo de tres vías.</td></tr>
+<tr><td><tt>message</tt></td><td> </td><td>Imprime un archivo BMessage aplanado. </td></tr>
+<tr><td><tt>mimeset</tt></td><td> </td><td>Establece el tipo MIME de un archivo.</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Generador de dependencias de archivo makefile.</td></tr>
+<tr><td><tt>mkdir</tt></td><td> </td><td>Crea un directorio.</td></tr>
+<tr><td><tt>mkdos</tt></td><td> </td><td>Inicializa particiones FAT.</td></tr>
+<tr><td><tt>mkfifo</tt></td><td> </td><td>Crea canalizaciones con nombre.</td></tr>
+<tr><td><tt>mkfs</tt></td><td> </td><td>Crea un sistema de archivos.</td></tr>
+<tr><td><tt>mkindex</tt></td><td> </td><td>Crea un nuevo índice para un atributo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>mktemp</tt></td><td> </td><td>Crea directorio o archivo temporal de forma segura.</td></tr>
+<tr><td><tt>modifiers</tt></td><td> </td><td>Imprime teclas modificadores actualmente presionadas/no presionadas. </td></tr>
+<tr><td><tt>more</tt></td><td> </td><td>Vea <tt>less</tt>. </td></tr>
+<tr><td><tt>mount</tt></td><td> </td><td>Monta un sistema de archivos.</td></tr>
+<tr><td><tt>mount_nfs</tt></td><td> </td><td>Monta una partición NFS.</td></tr>
+<tr><td><tt>mountvolume</tt></td><td> </td><td>Monta un volumen por su nombre.</td></tr>
+<tr><td><tt>mv</tt></td><td> </td><td>Mueve/cambia el nombre de un archivo.</td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>El editor de texto predeterminado en la Terminal, un clon de 'Pico'. </td></tr>
+<tr><td><tt>netcat</tt></td><td> </td><td>utilidad TCP y UDP.</td></tr>
+<tr><td><tt>netstat</tt></td><td> </td><td>Imprime conexiones de red, tablas de enrutamiento, estadísticas de interfaz, conexiones enmascaradas y afiliaciones multidifusión.</td></tr>
+<tr><td><tt>nl</tt></td><td> </td><td>Imprime cada archivo con números de línea añadidos.</td></tr>
+<tr><td><tt>nohup</tt></td><td> </td><td>Ejecuta una orden ignorando señales de colgado.</td></tr>
+<tr><td><tt>nproc</tt></td><td> </td><td>Imprime el número de unidades de procesamiento disponibles.</td></tr>
+<tr><td><tt>od</tt></td><td> </td><td>Escribe una representación de un archivo sin ambigüedades.</td></tr>
+<tr><td><tt>open</tt></td><td> </td><td>Inicia un documento o aplicación desde el intérprete de ordenes. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P – S</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Crea, examina o extrae un paquete de Haiku.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Crea o examina un archivo de repositorio de paquete de Haiku.</td></tr>
+<tr><td><tt>passwd</tt></td><td> </td><td>Cambia la contraseña del usuario.</td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>Imprime líneas que consisten de líneas correspondientes de cada archivo, separados por tabulaciones.</td></tr>
+<tr><td><tt>patch</tt></td><td> </td><td>Aplica un archivo diff a un original.</td></tr>
+<tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostica nombres de archivos inválidos o no portátiles.</td></tr>
+<tr><td><tt>pc</tt></td><td> </td><td>calculadora de programador.</td></tr>
+<tr><td><tt>ping</tt></td><td> </td><td>envía solicitud de echo-ICMP al <i>host</i> de red.</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>analiza y configura un paquete de Haiku.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Administra paquetes y repositorios de paquetes.</td></tr>
+<tr><td><tt>play</tt></td><td> </td><td>Reproduce pistas de un CD.</td></tr>
+<tr><td><tt>pr</tt></td><td> </td><td>Hace paginado o columnado de archivos para impresión.</td></tr>
+<tr><td><tt>printenv</tt></td><td> </td><td>Imprime el valor de una variable de entorno.</td></tr>
+<tr><td><tt>printf</tt></td><td> </td><td>Da formato a datos y los imprime.</td></tr>
+<tr><td><tt>prio</tt></td><td> </td><td>Cambia la prioridad de un proceso.</td></tr>
+<tr><td><tt>profile</tt></td><td> </td><td>Perfila hilos.</td></tr>
+<tr><td><tt>ps</tt></td><td> </td><td>Muestra listado de procesos en ejecución.</td></tr>
+<tr><td><tt>ptx</tt></td><td> </td><td>Produce un índice permutado, incluyendo contexto, de las palabras en los archivos de entrada.</td></tr>
+<tr><td><tt>pwd</tt></td><td> </td><td>Imprime el directorio actual.</td></tr>
+<tr><td><tt>query</tt></td><td> </td><td>Una utilidad del intérprete de comandos que emula la funcionalidad del Tracker de "Buscar por fórmula".  <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>quit</tt></td><td> </td><td>Sale de una aplicación.</td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Crea un Disco RAM. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>rc</tt></td><td> </td><td>Compilador de recursos.</td></tr>
+<tr><td><tt>readlink</tt></td><td> </td><td>Impime la ruta del destino de un enlace simbólico.</td></tr>
+<tr><td><tt>reindex</tt></td><td> </td><td>Pone atributos de archivos eixtentes en índices nuevamente creados. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>release</tt></td><td> </td><td>Libera un semáforo.</td></tr>
+<tr><td><tt>renice</tt></td><td> </td><td>Altera la prioridad de un proceso en ejecución.</td></tr>
+<tr><td><tt>rlog</tt></td><td> </td><td>Imprime historial de mensajes y otra información sobre archivos RCS.</td></tr>
+<tr><td><tt>rm</tt></td><td> </td><td>Elimina archivos y directorios.</td></tr>
+<tr><td><tt>rmattr</tt></td><td> </td><td>Elimina un atributo de un archivo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>rmdir</tt></td><td> </td><td>Elimina directorios.</td></tr>
+<tr><td><tt>rmindex</tt></td><td> </td><td>Elimina el índice para un atributo. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>roster</tt></td><td> </td><td>Imprime información sobre equipos en ejecución.</td></tr>
+<tr><td><tt>route</tt></td><td> </td><td>Muestra listado y manipula recorridos de red.</td></tr>
+<tr><td><tt>safemode</tt></td><td> </td><td>Revisa si el sistema está ejecutando en Modo a Prueba de Fallos.</td></tr>
+<tr><td><tt>screen_blanker</tt></td><td> </td><td>Inicia el salvapantallas.</td></tr>
+<tr><td><tt>screenmode</tt></td><td> </td><td>Muestra/establece el modo de pantalla.</td></tr>
+<tr><td><tt>sdiff</tt></td><td> </td><td>Muestra o combina diferencias de dos archivos lado a lado.</td></tr>
+<tr><td><tt>seq</tt></td><td> </td><td>Imprime una secuencia de números.</td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>Establece el entorno a una versión de compilador específica.</td></tr>
+<tr><td><tt>setdecor</tt></td><td> </td><td>Muestra/establece el decorador.</td></tr>
+<tr><td><tt>settype</tt></td><td> </td><td>Establece el tipo MIME de un archivo, su firma y aplicación predilecta.</td></tr>
+<tr><td><tt>setversion</tt></td><td> </td><td>Muestra la versión de un archivo.</td></tr>
+<tr><td><tt>setvolume</tt></td><td> </td><td>Establece el volumen de sonido del sistema.</td></tr>
 <tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
-<tr><td><tt>sh</tt></td><td> </td><td>See <tt>bash</tt>. </td></tr>
-<tr><td><tt>sha1sum</tt></td><td> </td><td>Prints or checks SHA1 checksums. </td></tr>
-<tr><td><tt>shar</tt></td><td> </td><td>Creates shell archives.</td></tr>
-<tr><td><tt>shred</tt></td><td> </td><td>Overwrites a file repeatedly. </td></tr>
-<tr><td><tt>shuf</tt></td><td> </td><td>Prints a random permutation of the input lines.</td></tr>
-<tr><td><tt>shutdown</tt></td><td> </td><td>Shuts down the computer. </td></tr>
-<tr><td><tt>sleep</tt></td><td> </td><td>Pauses for a specified number of seconds. </td></tr>
-<tr><td><tt>sort</tt></td><td> </td><td>Prints a sorted concatenation of all files.</td></tr>
-<tr><td><tt>spamdbm</tt></td><td> </td><td>Classifies e-mail messages as spam or genuine. </td></tr>
-<tr><td><tt>split</tt></td><td> </td><td>Outputs fixed-size pieces of input files to files with prefixes. </td></tr>
-<tr><td><tt>stat</tt></td><td> </td><td>Displays file or file system status. </td></tr>
-<tr><td><tt>strace</tt></td><td> </td><td>Traces the syscalls of a thread or a team. </td></tr>
-<tr><td><tt>stty</tt></td><td> </td><td>Shows/sets terminal characteristics. </td></tr>
-<tr><td><tt>su</tt></td><td> </td><td>Changes the effective user id and group. </td></tr>
-<tr><td><tt>sum</tt></td><td> </td><td>Prints checksum and block counts for each file. </td></tr>
-<tr><td><tt>sync</tt></td><td> </td><td>Forces changed blocks to disk, updates the superblock. </td></tr>
-<tr><td><tt>sysinfo</tt></td><td> </td><td>Shows system info. </td></tr>
-<tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T</h2></a></td></tr>
-<tr><td><tt>tac</tt></td><td> </td><td>Concatenates and prints files, last line first. </td></tr>
-<tr><td><tt>tail</tt></td><td> </td><td>Prints the last ten lines of a file.</td></tr>
-<tr><td><tt>tcpdump</tt></td><td> </td><td>Dumps traffic of a network. </td></tr>
-<tr><td><tt>tcptester</tt></td><td> </td><td>[deprecated] </td></tr>
-<tr><td><tt>tee</tt></td><td> </td><td>Writes or appends data from standard input to a file.</td></tr>
-<tr><td><tt>telnet</tt></td><td> </td><td>User interface to the telnet protocol. </td></tr>
-<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet daemon.</td></tr>
-<tr><td><tt>test</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
-<tr><td><tt>timeout</tt></td><td> </td><td>Starts a command and kills it if it's still running after a specified number of seconds. </td></tr>
-<tr><td><tt>top</tt></td><td> </td><td>Displays running threads and CPU usage.</td></tr>
-<tr><td><tt>touch</tt></td><td> </td><td>Changes a file's timestamp. </td></tr>
-<tr><td><tt>tput</tt></td><td> </td><td>Initializes a terminal or query terminfo database. </td></tr>
-<tr><td><tt>tr</tt></td><td> </td><td>Translates, squeezes and/or deletes characters from standard input.</td></tr>
-<tr><td><tt>traceroute</tt></td><td> </td><td>Prints the route packets take through a network.</td></tr>
-<tr><td><tt>translate</tt></td><td> </td><td>Uses DataTranslators to convert file formats.</td></tr>
-<tr><td><tt>trash</tt></td><td> </td><td>Sends files to trash or restores them. </td></tr>
-<tr><td><tt>true</tt></td><td> </td><td>Does nothing, indicates "success" and returns the value "0".</td></tr>
-<tr><td><tt>truncate</tt></td><td> </td><td>Shrinks or extends the size of a file.</td></tr>
-<tr><td><tt>tsort</tt></td><td> </td><td>Does a topological sorting.</td></tr>
-<tr><td><tt>tty</tt></td><td> </td><td>Prints the file name of the terminal connected to standard input.</td></tr>
-<tr><td><tt>uname</tt></td><td> </td><td>Prints out system information. </td></tr>
-<tr><td><tt>unchop</tt></td><td> </td><td>Recreates a file previously split with <tt>chop</tt>. </td></tr>
-<tr><td><tt>unexpand</tt></td><td> </td><td>Converts spaces to tabs.</td></tr>
-<tr><td><tt>uniq</tt></td><td> </td><td>Filters adjacent matching lines from input, writing to output. </td></tr>
-<tr><td><tt>unlink</tt></td><td> </td><td>Calls the unlink function to remove the specified file. </td></tr>
-<tr><td><tt>unmount</tt></td><td> </td><td>Unmounts a volume.</td></tr>
-<tr><td><tt>unrar</tt></td><td> </td><td>Expands a rar archive.</td></tr>
-<tr><td><tt>unshar</tt></td><td> </td><td>Expands a shar archive.</td></tr>
-<tr><td><tt>untrash</tt></td><td> </td><td>See <tt>trash</tt>. </td></tr>
-<tr><td><tt>unzip</tt></td><td> </td><td>Expands a zip archive.</td></tr>
-<tr><td><tt>unzipsfx</tt></td><td> </td><td>Used to make existing zip archives self-extracting.</td></tr>
-<tr><td><tt>updatedb</tt></td><td> </td><td>Updates a localization database.</td></tr>
-<tr><td><tt>uptime</tt></td><td> </td><td>Prints date and time, as well as the time elapsed since the system was started. </td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>Wraps URL MIME types around command line or other apps that don't handle them directly. </td></tr>
-<tr><td><tt>useradd</tt></td><td> </td><td>Creates a new user. </td></tr>
-<tr><td><tt>uudecode</tt></td><td> </td><td>Decodes a uuencoded file.</td></tr>
-<tr><td><tt>uuencode</tt></td><td> </td><td>Uuencodes a file so it can be mailed to a remote system. </td></tr>
-<tr><td><tt>vdir</tt></td><td> </td><td>Lists information about files. </td></tr>
-<tr><td><tt>version</tt></td><td> </td><td>Returns the version of a file. </td></tr>
-<tr><td><tt>vmstat</tt></td><td> </td><td>Prints information about the virtual memory system.</td></tr>
-<tr><td><tt>waitfor</tt></td><td> </td><td>Waits until a certain thread appears. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>watch</tt></td><td> </td><td>Executes a program periodically. </td></tr>
-<tr><td><tt>wc</tt></td><td> </td><td>Prints the number of paragraphs, words and characters (bytes) of a file. </td></tr>
-<tr><td><tt>wget</tt></td><td> </td><td>Tool for downloading via HTTP, HTTPS or FTP.</td></tr>
-<tr><td><tt>which</tt></td><td> </td><td>Locates a command. </td></tr>
-<tr><td><tt>whoami</tt></td><td> </td><td>Prints user name associated with the current effective user ID. </td></tr>
-<tr><td><tt>xargs</tt></td><td> </td><td>Builds and executes command lines from standard input. </td></tr>
-<tr><td><tt>xres</tt></td><td> </td><td>Lists and manipulates resources. </td></tr>
-<tr><td><tt>yes</tt></td><td> </td><td>Prints out a string repeatedly until killed. </td></tr>
-<tr><td><tt>zcat</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
-<tr><td><tt>zcmp</tt></td><td> </td><td>See <tt>zdiff</tt>. </td></tr>
-<tr><td><tt>zdiff</tt></td><td> </td><td>Compares compressed files. </td></tr>
-<tr><td><tt>zforce</tt></td><td> </td><td>Forces a '.gz' extension on gzip files. </td></tr>
-<tr><td><tt>zgrep</tt></td><td> </td><td>Scan through possibly compressed files for a regular expression. </td></tr>
-<tr><td><tt>zip</tt></td><td> </td><td>Adds or replaces items in a zip archive.</td></tr>
-<tr><td><tt>zipcloak</tt></td><td> </td><td>Encrypts all unencrypted items in a zip archive. </td></tr>
-<tr><td><tt>zipgrep</tt></td><td> </td><td>Scans the given zip items for a string or pattern. </td></tr>
-<tr><td><tt>zipinfo</tt></td><td> </td><td>See <tt>unzip</tt>.</td></tr>
-<tr><td><tt>zipnote</tt></td><td> </td><td>Prints the comments in a zip archive.</td></tr>
-<tr><td><tt>zipsplit</tt></td><td> </td><td>Splits a zip archive into smaller pieces. </td></tr>
-<tr><td><tt>zmore</tt></td><td> </td><td>Like <tt>more</tt> but operates on the uncompressed contents of any compressed file.</td></tr>
-<tr><td><tt>znew</tt></td><td> </td><td>Recompresses .Z files into .gz (gzip) archives.</td></tr>
+<tr><td><tt>sh</tt></td><td> </td><td>Vea <tt>bash</tt>. </td></tr>
+<tr><td><tt>sha1sum</tt></td><td> </td><td>Imprime o revisa sumas de control SHA1. </td></tr>
+<tr><td><tt>shar</tt></td><td> </td><td>Crea archivos de intérprete de comandos.</td></tr>
+<tr><td><tt>shred</tt></td><td> </td><td>Sobrescribe un archivo repetidamente.</td></tr>
+<tr><td><tt>shuf</tt></td><td> </td><td>Imprime una permutación aleatoria de la lineas de ingresadas.</td></tr>
+<tr><td><tt>shutdown</tt></td><td> </td><td>Apaga la computadora.</td></tr>
+<tr><td><tt>sleep</tt></td><td> </td><td>Pausa por un número especificado de segundos.</td></tr>
+<tr><td><tt>sort</tt></td><td> </td><td>Imprime una concatenación ordenada de todos los archivos.</td></tr>
+<tr><td><tt>spamdbm</tt></td><td> </td><td>Clasifica mensajes de correo electrónico como correo basura o genuinos.</td></tr>
+<tr><td><tt>split</tt></td><td> </td><td>Produce piezas de tamaño fijo a partir de archivos de entrada, en archivos con prefijos.</td></tr>
+<tr><td><tt>stat</tt></td><td> </td><td>Muestra estado de archivo o sistema de archivos.</td></tr>
+<tr><td><tt>strace</tt></td><td> </td><td>Rastrea las llamadas al sistema de un hilo o equipo.</td></tr>
+<tr><td><tt>stty</tt></td><td> </td><td>Muestra/establece las características de la terminal.</td></tr>
+<tr><td><tt>su</tt></td><td> </td><td>Cambia el identificador de usuario y grupo.</td></tr>
+<tr><td><tt>sum</tt></td><td> </td><td>Imprime conteo de bloques y sumas de comprobación para cada archivo.</td></tr>
+<tr><td><tt>sync</tt></td><td> </td><td>Obliga escribir los bloques modificados al disco, actualiza el superbloque.</td></tr>
+<tr><td><tt>sysinfo</tt></td><td> </td><td>Muestra información del sistema.</td></tr>
+<tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T – Z</h2></a></td></tr>
+<tr><td><tt>tac</tt></td><td> </td><td>Concatena y muestra archivos, con la última línea de primero.</td></tr>
+<tr><td><tt>tail</tt></td><td> </td><td>Muestra las últimas diez líneas de un archivo.</td></tr>
+<tr><td><tt>tcpdump</tt></td><td> </td><td>Hace un volcado de tráfico de red.</td></tr>
+<tr><td><tt>tcptester</tt></td><td> </td><td>[desfasado] </td></tr>
+<tr><td><tt>tee</tt></td><td> </td><td>Escribe o añade datos desde la entrada estándar, hacia un archivo.</td></tr>
+<tr><td><tt>telnet</tt></td><td> </td><td>Interfaz de usuario para el protocolo telnet.</td></tr>
+<tr><td><tt>telnetd</tt></td><td> </td><td>Daemon de telnet.</td></tr>
+<tr><td><tt>test</tt></td><td> </td><td>Devuelve verdadero/falso luego de comparar elementos.</td></tr>
+<tr><td><tt>timeout</tt></td><td> </td><td>Inicia una orden y la detiene si todavía se está ejecutando, luego de un número especificado de segundos.</td></tr>
+<tr><td><tt>top</tt></td><td> </td><td>Muestra el uso del CPU e hilos en ejecución.</td></tr>
+<tr><td><tt>touch</tt></td><td> </td><td>Cambia la información de registro de hora de un archivo.</td></tr>
+<tr><td><tt>tput</tt></td><td> </td><td>Inicializa base de datos de consulta de terminfo o terminal.</td></tr>
+<tr><td><tt>tr</tt></td><td> </td><td>Traduce, exprime y/o elimina caracteres de la entrada estándar.</td></tr>
+<tr><td><tt>traceroute</tt></td><td> </td><td>Imprime el recorrido que toman los paquetes por una red.</td></tr>
+<tr><td><tt>translate</tt></td><td> </td><td>Usa Traductores de Datos para convertir formatos de archivos.</td></tr>
+<tr><td><tt>trash</tt></td><td> </td><td>Envía archivos a la papelera o los recupera.</td></tr>
+<tr><td><tt>true</tt></td><td> </td><td>No hace nada, indica "éxito" y devuelve el valor "0".</td></tr>
+<tr><td><tt>truncate</tt></td><td> </td><td>Contrae o extiende el tamaño de un archivo.</td></tr>
+<tr><td><tt>tsort</tt></td><td> </td><td>Realiza una clasificación topológica.</td></tr>
+<tr><td><tt>tty</tt></td><td> </td><td>Imprime el nombre de archivo de la terminal conectada a la entrada estándar.</td></tr>
+<tr><td><tt>uname</tt></td><td> </td><td>Imprime información de sistema.</td></tr>
+<tr><td><tt>unchop</tt></td><td> </td><td>Recrea un archivo dividido previamente con <tt>chop</tt>. </td></tr>
+<tr><td><tt>unexpand</tt></td><td> </td><td>Convierte espacios a tabulaciones.</td></tr>
+<tr><td><tt>uniq</tt></td><td> </td><td>Filtra líneas continuas concordantes desde la entrada, y las escribe a la salida.</td></tr>
+<tr><td><tt>unlink</tt></td><td> </td><td>Llama la función unlink (desenlazar) para eliminar un archivo especificado. </td></tr>
+<tr><td><tt>unmount</tt></td><td> </td><td>desmonta un volumen.</td></tr>
+<tr><td><tt>unrar</tt></td><td> </td><td>Expande un archivo rar.</td></tr>
+<tr><td><tt>unshar</tt></td><td> </td><td>Expande un archivo shar.</td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td>Vea <tt>trash</tt>. </td></tr>
+<tr><td><tt>unzip</tt></td><td> </td><td>Expande un archivo zip.</td></tr>
+<tr><td><tt>unzipsfx</tt></td><td> </td><td>Utilizado para convertir archivos zip existentes en auto-extraíbles</td></tr>
+<tr><td><tt>updatedb</tt></td><td> </td><td>actualiza la base de datos de localización.</td></tr>
+<tr><td><tt>uptime</tt></td><td> </td><td>Muestra la fecha y la hora, además del tiempo que ha pasado desde que el sistema se inició.</td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>envuelve tipos de MIME URL alrededor de la línea de comandos u otras aplicaciones que no las manejan correctamente.</td></tr>
+<tr><td><tt>useradd</tt></td><td> </td><td>Crea un nuevo usuario.</td></tr>
+<tr><td><tt>uudecode</tt></td><td> </td><td>Decodifica un archiva uuencoded.</td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>Codifica un archivo con uuencode para que pueda ser transferido a un sistema remoto. </td></tr>
+<tr><td><tt>vdir</tt></td><td> </td><td>Muestra información sobre archivos.</td></tr>
+<tr><td><tt>version</tt></td><td> </td><td>Devuelve la versión de un archivo.</td></tr>
+<tr><td><tt>vmstat</tt></td><td> </td><td>muestra información sobre el sistema de memoria virtual.</td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>Espera a que aparezca un hilo particular. <a href="cli-apps.html">(específico a Haiku)</a></td></tr>
+<tr><td><tt>watch</tt></td><td> </td><td>ejecuta un programa de manera periódica.</td></tr>
+<tr><td><tt>wc</tt></td><td> </td><td>muestra la cantidad de párrafos, palabras y caracteres (bytes) de un archivo.</td></tr>
+<tr><td><tt>wget</tt></td><td> </td><td>herramientas para descargar por HTTP, HTTPS o FTP.</td></tr>
+<tr><td><tt>which</tt></td><td> </td><td>encuentra la ubicación de un comando.</td></tr>
+<tr><td><tt>whoami</tt></td><td> </td><td>muestra el nombre de usuario asociado con el ID de usuario actual.</td></tr>
+<tr><td><tt>xargs</tt></td><td> </td><td>crea y ejecuta líneas de ordenes a partir de la salida estándar.</td></tr>
+<tr><td><tt>xres</tt></td><td> </td><td>Muestra un listado de recursos y los manipula.</td></tr>
+<tr><td><tt>yes</tt></td><td> </td><td>muestra una cadena de forma repetida hasta ser detenido.</td></tr>
+<tr><td><tt>zcat</tt></td><td> </td><td>Vea <tt>gzip</tt>.</td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td>Vea <tt>zdiff</tt>. </td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>Compara archivos comprimidos.</td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>obliga una extensión '.gz' en archivos gzip. </td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>Rastrea a través de archivos posiblemente comprimidos por una expresión regular.</td></tr>
+<tr><td><tt>zip</tt></td><td> </td><td>Añade o remplaza elementos en un archivo zip.</td></tr>
+<tr><td><tt>zipcloak</tt></td><td> </td><td>Cifra todos los elementos no cifrados en un archivo zip.</td></tr>
+<tr><td><tt>zipgrep</tt></td><td> </td><td>Rastrea los elementos zip dados por una cadena o patrón.</td></tr>
+<tr><td><tt>zipinfo</tt></td><td> </td><td>Vea <tt>unzip</tt>.</td></tr>
+<tr><td><tt>zipnote</tt></td><td> </td><td>Muestra los comentarios de un archivo zip.</td></tr>
+<tr><td><tt>zipsplit</tt></td><td> </td><td>Divide un archivo zip en partes más pequeñas.</td></tr>
+<tr><td><tt>zmore</tt></td><td> </td><td>Similar a <tt>more</tt> pero opera sobre los contenidos sin comprimir de cualquier archivo comprimido.</td></tr>
+<tr><td><tt>znew</tt></td><td> </td><td>Recomprime archivos .Z en archivos .gz (gzip).</td></tr>
 </table>
 </div>
 </div>

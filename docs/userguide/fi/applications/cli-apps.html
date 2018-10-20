@@ -4,12 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2016, Haiku. All rights reserved.
+ * Copyright 2010-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Humdinger
  *		Jorma Karvonen
  *
 -->
@@ -50,13 +51,14 @@
 </ul>
 
 <span>
- «  <a href="list-cli-apps.html">List of commands</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+ «  <a href="list-cli-apps.html">List of commands</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-kohtaiset komentorivisovellukset</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -89,17 +91,23 @@ Lisätietoja parametreistä saa lisäämällä ”--help”, esim.: <tt>pkgman s
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> taikoo tyypillisen hälytysikkunan ennalta määritellyllä kuvakkeella, selittävällä tekstillä ja enimmillään kolmella painikkeella. Se palauttaa painetun painikkeen otsikon ja poistumistilan (alkaen numerosta 0). Esimerkiksi, tämä on tehty rivillä:</p>
-<pre class="terminal">alert --idea "FantasticApp(tm) asennettu onnistuneesti!
+<pre class="terminal">alert --idea "FantasticApp(tm) asennettu onnistuneesti! \
 Haluaisitko linkittää sen?" "Työpöydälle" "Työpöytäpalkkiin" "Ei kiitos"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">filepanel</span> näyttää lataus- ja tallennustiedostopaneelin ja sallii käyttäjän valita tiedoston tai sijainnin. Paluuarvona saat valitun tiedoston tai kansion polun. Käytettävissä on useita parametreja, esimerkiksi aloituskansion asettaminen, ikkunan otsikko, oletusnimi tallennettaessa tai rajoitukset sallituissa tiedostotyypeissä. Tämä on esimerkki</p>
 <pre class="terminal">filepanel -s -t "Tallenna lokitiedostosi" -d ~/config/settings -n Fantastic.log</pre>
-<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
-</td></tr>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-filepanel.png" /></p></td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
 <td valign="top"><p><span class="cli">hey</span> on pieni aputyökalu, joka lähettää BMessage-viestit sovellukseen ja tulostaa niiden vastauksen. Sitä voidaan käyttää sovellusskriptaukseen, toisin sanoen sovelluksen  määritellyin ”kauko-ohjaukseen” skriptistä tai komentoriviltä. Sen käyttö on hiukan mutkikasta... <a href="https://www.haiku-os.org/blog/humdinger/2017-11-05_scripting_the_gui_with_hey/">Humdingerin blogikirjoitus</a> palvelee hyvänä esittelynä, ja Scot Hackerin BeOS-raamatussa on perusteellinen <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey-oppikurssi</a>, jonka tekijä on Chris Herborth.</p>
+</td></tr>
+<tr><td><p><span class="cli">notify</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">notify</span> shows a notification panel with a message. There are various parameters that are described when you call <span class="cli">notify --help</span>. A notification can also be used to show the progress of some action. When doing that, it's important to set a <i>messageID</i> and always use it when you update the progress (a float between 0.0 and 1.0 that's printed as percent). Otherwise you'll see several notification panels if you update quicker then the set timeout.<br />
+An example:</p>
+<pre class="terminal">notify --type progress --group "--group" --title "--title" --icon /boot/home/bebook.hvif \
+--messageID MyMessageID --progress .75 "Keep waiting"</pre>
+<p><img src="../images/apps-images/cli-notification.png" alt="cli-notification.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> on komentoriviversio Etsi-paneelista. Itse asiassa, nopea tapa tuottaa hakutermi on rakentaa kysely Työpöytäpalkin Etsi-paneelissa, vaihtaa valikkoon <span class="menu">kaavoittain</span>, lisätä kaksoislainausmerkit (<tt>"</tt>) eteen ja taakse ja liittää koko merkkijono <span class="cli">query</span>-komentosi perään Pääteikkunassa tai skriptissäsi.</p>
@@ -160,8 +168,8 @@ mountvolume RAMimage</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="list-cli-apps.html">Komentojen luettelo</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">Sovellukset</a> 
+ «  <a href="list-cli-apps.html">Komentojen luettelo</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Sovellukset</a> 
 </span></div>
 </div>
 
