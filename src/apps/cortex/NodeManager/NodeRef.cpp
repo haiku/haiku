@@ -1742,7 +1742,7 @@ status_t NodeRef::_setRunModeAuto(
 	const uint32					runMode) {
 
 	if(
-		kind() && B_BUFFER_PRODUCER &&
+		kind() & B_BUFFER_PRODUCER &&
 		runMode == BMediaNode::B_RECORDING) {
 
 		return _setRunMode(
