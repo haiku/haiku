@@ -471,7 +471,7 @@ device_detach(device_t device)
 		int result = 0;
 		if (HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
 			result = stop_wlan(device);
-		if (result != 0) {
+		if (result != 0 && result != B_BAD_VALUE) {
 			atomic_or(&device->flags, DEVICE_ATTACHED);
 			return result;
 		}

@@ -254,9 +254,9 @@ err6:
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
 err5:
-	uninit_mbufs();
-err4:
 	uninit_callout();
+err4:
+	uninit_mbufs();
 err3:
 	uninit_mutexes();
 err2:
