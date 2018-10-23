@@ -37,7 +37,7 @@
 #include <OS.h>
 #include <Roster.h>
 
-#include <debug.h>
+#include <MediaDebug.h>
 #include <MediaMisc.h>
 
 #include "BufferManager.h"

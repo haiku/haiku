@@ -47,9 +47,9 @@
 #include <String.h>
 
 #include <AddOnMonitorHandler.h>
-#include <debug.h>
 #include <DataExchange.h>
 #include <DormantNodeManager.h>
+#include <MediaDebug.h>
 #include <MediaMisc.h>
 #include <MediaRosterEx.h>
 #include <MediaSounds.h>

@@ -16,7 +16,7 @@
 #include <TimeSource.h>
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 #include "DormantNodeManager.h"
 #include "media_server.h"
 #include "NodeManager.h"
