@@ -14,7 +14,7 @@
 
 #include <new>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 /*************************************************************
  * public BMediaEncoder

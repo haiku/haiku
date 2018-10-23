@@ -33,7 +33,7 @@
 #include <scheduler.h>
 #include <Buffer.h>
 #include <ServerInterface.h>
-#include "debug.h"
+#include "MediaDebug.h"
 
 /*************************************************************
  * protected BMediaEventLooper

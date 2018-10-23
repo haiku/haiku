@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 #include "PluginManager.h"
 

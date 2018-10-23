@@ -12,7 +12,7 @@
 
 #include "TrackReader.h"
 
-#include <debug.h>
+#include <MediaDebug.h>
 #include <new>
 #include <string.h>
 

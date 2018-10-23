@@ -22,7 +22,7 @@
 #include <TextControl.h>
 #include <Window.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 using namespace BPrivate;

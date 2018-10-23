@@ -1,7 +1,7 @@
 #ifndef _MEDIA_T_LIST_H
 #define _MEDIA_T_LIST_H
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 template<class value> class List
 {

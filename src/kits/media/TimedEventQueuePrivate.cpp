@@ -40,7 +40,7 @@
 #include "TimedEventQueuePrivate.h"
 
 #include "Debug.h"
-#include "debug.h"
+#include "MediaDebug.h"
 
 _event_queue_imp::_event_queue_imp() :
 	fLock(new BLocker("BTimedEventQueue locker")),

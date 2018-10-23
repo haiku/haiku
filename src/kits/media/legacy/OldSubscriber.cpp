@@ -12,7 +12,7 @@
 
 #include "OldSubscriber.h"
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 /*************************************************************

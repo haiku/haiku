@@ -32,7 +32,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <new>
-#include "debug.h"
+#include "MediaDebug.h"
 #include "DataExchange.h"
 
 

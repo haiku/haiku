@@ -18,7 +18,7 @@
 #include "AddOnManager.h"
 #include "PluginManager.h"
 #include "DataExchange.h"
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 PluginManager gPluginManager;

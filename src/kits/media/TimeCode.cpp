@@ -4,7 +4,7 @@
  *  DESCR: Handles all TimeCode functions.
  ***********************************************************************/
 #include <TimeCode.h>
-#include "debug.h"
+#include "MediaDebug.h"
 #include <string.h>
 
 status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code)

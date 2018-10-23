@@ -15,7 +15,7 @@
 #include <MediaTrack.h>
 #include <Url.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 #include "MediaExtractor.h"
 #include "MediaStreamer.h"

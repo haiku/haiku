@@ -12,7 +12,7 @@
 
 #include "OldAudioStream.h"
 
-#include <debug.h>
+#include <MediaDebug.h>
 
 
 /*************************************************************

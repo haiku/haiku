@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 media_client_id

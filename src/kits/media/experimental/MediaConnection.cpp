@@ -9,7 +9,7 @@
 
 #include "MediaClientNode.h"
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 BMediaConnection::BMediaConnection(media_connection_kinds kinds,

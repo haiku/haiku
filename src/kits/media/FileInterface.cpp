@@ -10,7 +10,7 @@
  *
  */
 
-#include "debug.h"
+#include "MediaDebug.h"
 #include "DataExchange.h"
 #include <string.h>
 #include <FileInterface.h>

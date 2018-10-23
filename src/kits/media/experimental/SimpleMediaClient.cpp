@@ -5,7 +5,7 @@
 
 #include <SimpleMediaClient.h>
 
-#include <debug.h>
+#include <MediaDebug.h>
 
 
 BSimpleMediaClient::BSimpleMediaClient(const char* name,

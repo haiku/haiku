@@ -5,7 +5,7 @@
  *         All return codes are guessed!!! (void most times means it's still wrong)
  ***********************************************************************/
 #include <MediaTrack.h>
-#include "debug.h"
+#include "MediaDebug.h"
 
 #if 0
 // SoundPlay 4.8 is evil, uses undocumented media kit API

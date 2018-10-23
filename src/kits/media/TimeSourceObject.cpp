@@ -18,7 +18,7 @@
 #include <OS.h>
 
 #include <MediaMisc.h>
-#include <debug.h>
+#include <MediaDebug.h>
 
 #include "TimeSourceObjectManager.h"
 

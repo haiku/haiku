@@ -17,7 +17,7 @@
 
 #include <Autolock.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 #define TIMEOUT	5000000LL

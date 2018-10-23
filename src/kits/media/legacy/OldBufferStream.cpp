@@ -12,7 +12,7 @@
 
 #include "OldBufferStream.h"
 
-#include <debug.h>
+#include <MediaDebug.h>
 #include <new>
 
 

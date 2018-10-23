@@ -28,7 +28,7 @@
 
 #include "AddOnManager.h"
 #include "DataExchange.h"
-#include "debug.h"
+#include "MediaDebug.h"
 #include "MediaMisc.h"
 #include "MediaRosterEx.h"
 

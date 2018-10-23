@@ -16,7 +16,7 @@
 #include <Autolock.h>
 
 #include "ChunkCache.h"
-#include "debug.h"
+#include "MediaDebug.h"
 #include "PluginManager.h"
 
 

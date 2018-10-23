@@ -41,7 +41,7 @@
 #include <Roster.h>
 #include <TimeSource.h>
 
-#include <debug.h>
+#include <MediaDebug.h>
 #include <DataExchange.h>
 #include <Notifications.h>
 

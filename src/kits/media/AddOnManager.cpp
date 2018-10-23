@@ -23,7 +23,7 @@
 #include <image.h>
 #include <Path.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 #include "FormatManager.h"
 #include "MetaFormat.h"

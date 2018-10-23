@@ -12,7 +12,7 @@
 #include <Locker.h>
 
 #include <DataExchange.h>
-#include <debug.h>
+#include <MediaDebug.h>
 
 
 namespace BPrivate {

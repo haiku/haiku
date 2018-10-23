@@ -13,7 +13,7 @@
 
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 #define B_NEW_BUFFER (BTimedEventQueue::B_USER_EVENT + 1)
 

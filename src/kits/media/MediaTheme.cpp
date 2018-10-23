@@ -9,7 +9,7 @@
 
 
 #include "DefaultMediaTheme.h"
-#include "debug.h"
+#include "MediaDebug.h"
 
 #include <MediaTheme.h>
 #include <StringView.h>

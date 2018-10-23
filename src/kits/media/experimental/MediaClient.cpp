@@ -12,7 +12,7 @@
 
 #include "MediaClientNode.h"
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 namespace BPrivate { namespace media {

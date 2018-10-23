@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 /*************************************************************
  * public BSoundFile

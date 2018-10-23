@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 #define TIMEOUT_QUANTA 100000

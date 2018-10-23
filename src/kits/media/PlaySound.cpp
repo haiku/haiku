@@ -9,7 +9,7 @@
 #include <Entry.h>
 
 #include <PlaySound.h>
-#include "debug.h"
+#include "MediaDebug.h"
 
 sound_handle play_sound(const entry_ref *soundRef,
 						bool mix,

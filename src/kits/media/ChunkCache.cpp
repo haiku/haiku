@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 // #pragma mark -
 

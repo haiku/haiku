@@ -21,7 +21,7 @@
 
 #include "SoundPlayNode.h"
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 // Flags used internally in BSoundPlayer

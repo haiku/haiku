@@ -12,7 +12,7 @@
 #include <Messenger.h>
 #include <OS.h>
 
-#include <debug.h>
+#include <MediaDebug.h>
 #include <MediaMisc.h>
 
 

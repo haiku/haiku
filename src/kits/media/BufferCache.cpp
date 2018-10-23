@@ -12,7 +12,7 @@
 
 #include <Buffer.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 namespace BPrivate {

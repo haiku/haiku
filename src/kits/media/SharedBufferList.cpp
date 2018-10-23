@@ -21,7 +21,7 @@
 #include <Buffer.h>
 #include <Locker.h>
 
-#include <debug.h>
+#include <MediaDebug.h>
 #include <DataExchange.h>
 
 

@@ -7,7 +7,7 @@
 #include <TimedEventQueue.h>
 #include <string.h>
 #include "TimedEventQueuePrivate.h"
-#include "debug.h"
+#include "MediaDebug.h"
 
 /*************************************************************
  * struct media_timed_event

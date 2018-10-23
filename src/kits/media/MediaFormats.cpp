@@ -12,7 +12,7 @@
 #include "DataExchange.h"
 #include "FormatManager.h"
 #include "MetaFormat.h"
-#include "debug.h"
+#include "MediaDebug.h"
 
 #include <MediaFormats.h>
 #include <ObjectList.h>

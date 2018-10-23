@@ -20,7 +20,7 @@
 
 #include <TimeSource.h>
 #include <MediaRoster.h>
-#include "debug.h"
+#include "MediaDebug.h"
 
 
 #define SEND_NEW_BUFFER_EVENT (BTimedEventQueue::B_USER_EVENT + 1)

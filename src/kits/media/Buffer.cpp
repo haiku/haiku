@@ -37,7 +37,7 @@
 #include <AppMisc.h>
 #include <MediaDefs.h>
 
-#include "debug.h"
+#include "MediaDebug.h"
 #include "DataExchange.h"
 #include "SharedBufferList.h"
 

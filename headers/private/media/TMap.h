@@ -2,7 +2,7 @@
 #define _MEDIA_T_MAP_H
 
 
-#include "debug.h"
+#include "MediaDebug.h"
 
 template<class key, class value> class Map
 {
