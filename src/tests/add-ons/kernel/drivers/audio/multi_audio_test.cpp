@@ -11,11 +11,7 @@
 #include <unistd.h>
 #include <math.h>
 
-#ifdef HAIKU_MULTI_AUDIO
-#	include <hmulti_audio.h>
-#else
-#	include <multi_audio.h>
-#endif
+#include <hmulti_audio.h>
 
 #include "argv.h"
 

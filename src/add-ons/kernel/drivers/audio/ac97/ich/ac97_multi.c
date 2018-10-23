@@ -27,7 +27,7 @@
  */
 #include <OS.h>
 #include <MediaDefs.h>
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 #include "ac97_multi.h"
 
 //#define DEBUG 1
