@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 geode ;
 
-UsePrivateHeaders media ;
+UsePrivateHeaders audio ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 

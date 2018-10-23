@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio ice1712 ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateKernelHeaders ;
-UsePrivateHeaders media ;
+UsePrivateHeaders audio ;
 
 KernelAddon ice1712 :
 	ice1712.cpp
