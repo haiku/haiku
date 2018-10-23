@@ -12,7 +12,7 @@ Info Win	InspectorApp	This is a quite narrow info window and title 'Info Win' is
 Active Translators	InspectorApp		Penerjemah Aktif
 Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Gambar: %1\nSpasi warna: %2 (%3)\nDimensi: %4 x %5\nByte per baris: %6\nTotal Byte: %7\n\nInfo Identitas:\nID String: %8\nTipe MIME: %9\nTipe: '%10' (%11)\nID penerjemah: %12\nGrup: '%13' (%14)\nKualitas: %15\nKapabilitas: %16\n\nInfo Tambahan:\n
 \nOutput Formats:	ImageView		\nFormat Keluaran:
-Save feature not implemented yet.	ImageWindow		Fitur simpan belum diimplementasikan
+Save feature not implemented yet.	ImageWindow		Fitur simpan belum diimplementasikan.
 First Page	ImageWindow		Hal Pertama
 Next Page	ImageWindow		Hal Berikut
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nPenterjemah dipakai:\nNama: %1\nInfo: %2\nVersi: %3\n
@@ -23,10 +23,10 @@ Quit	ImageWindow		Keluar
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Dokumen Terpilih: %1\n\nPenterjemah terpakai:\nNama: %2\nInfo: %3\nVersi: %4\n
 Active Translators	ImageWindow		Penterjemah aktif
 View	ImageWindow		Tinjau
-Open…	ImageWindow		Buka...
+Open…	ImageWindow		Buka…
 Previous Page	ImageWindow		Hal Sebelum
 OK	ImageView		Oke
 System Translators	ActiveTranslatorsWindow		Penerjemah Sistem
-Save…	ImageWindow		Simpan...
+Save…	ImageWindow		Simpan…
 Unknown	ImageView		Takdiketahui
 File	ImageWindow		Berkas

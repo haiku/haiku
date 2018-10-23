@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2162217952
+1	english	x-vnd.Haiku-HaikuDepot	351687830
 Name	PackageListView		名称
 Available packages	MainWindow		可用软件包
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
@@ -16,6 +16,7 @@ Stability	RatePackageWindow		稳定性
 No changelog available.	PackageInfoView		未发现更新记录。
 Description	PackageListView		描述
 Install	PackageManager		安装
+All repositories	MainWindow		确定
 Source packages	MainWindow		源代码包
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		授权失败。用户不存在或者提供密码错误。
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		账号创建成功。你现在可以进行软件包评分或其他操作。
@@ -40,8 +41,11 @@ Installed packages	MainWindow		已安装软件包
 Status	PackageListView		状态
 Switch account…	MainWindow		切换账户…
 Ignore	UserLoginWindow		忽略
+Your rating was updated.	RatePackageWindow		您的评价已被更新。
 Language	UserLoginWindow		语言
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		密码太简单或者无效。请输入至少包含 2 个数字和 2 个大写字符的 8 个字符作为密码。
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的评价上传成功。您可以在 HaikuDepot Server 网站上更新或者移除它。
+Show only featured packages	FilterView		只显示新特性包
 Rate package	RatePackageWindow		软件包评分
 Development	Model		开发
 Fatal error	PackageManager		严重错误
@@ -61,7 +65,9 @@ HaikuDepot needs the package daemon to function, and it appears to be not runnin
 Downloading:	PackageInfoView		下载中：
 Mostly stable	RatePackageWindow		基本稳定
 Log out	MainWindow		注销
+Repository	PackageListView		仓库
 Education	Model		教育
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
 Search terms:	FilterView		搜索项目：
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		未发现用户评分。
@@ -75,6 +81,7 @@ Authentication failed	UserLoginWindow		认证失败
 Logged in as %User%	MainWindow		登录 as %User%
 9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		语言
+User rating	RatePackageWindow		用户评分
 Size	PackageListView		大小
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
 User name:	UserLoginWindow		用户名:
@@ -89,6 +96,7 @@ Local	MainWindow		本地
 Close	MainWindow		关闭
 Preferred language:	UserLoginWindow		首选语言:
 Internet & Network	Model		互联网和网络
+Refresh repositories	MainWindow		刷新仓库
 Cancel	MainWindow		取消
 Quit HaikuDepot	App		退出 HaikuDepot
 Input validation	UserLoginWindow		输入无效
@@ -100,8 +108,9 @@ An error occurred while refreshing the repository: %error%	MainWindow		刷新软
 Try again	App		请重试
 Login or Create account	MainWindow		登录或者新建账户
 Pending…	PackageListView		挂起…
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# 项} other{# 项}}
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		确定
+Package daemon problem	App		软件包守护进程问题
 Uninstalled	PackageListView		已卸载
 Show	MainWindow		显示
 Stable	RatePackageWindow		稳定
@@ -112,6 +121,7 @@ Screenshot	ScreenshotWindow		屏幕截图
 Not specified	RatePackageWindow		未指定
 Available	PackageListView		可用
 Develop packages	MainWindow		开发软件包
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
 n/a	PackageInfoView		n/a
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		如果未填写邮箱地址，在密码忘记后将无法进行重置。
  It responded with: 	UserLoginWindow		 回复为： 
@@ -120,15 +130,20 @@ Cancel	RatePackageWindow		取消
 Package action failed	PackageInfoView		软件包操作失败
 OK	UserLoginWindow		确定
 Send	RatePackageWindow		发送
+Repositories	MainWindow		仓库
 -	no package size		-
 Category:	FilterView		分类:
 Failed to create account	UserLoginWindow		账户创建失败
+Check for updates…	MainWindow		检查更新…
 There are problems with the data you entered:\n\n	UserLoginWindow		您所输入的数据存在问题：\n\n
 Start package daemon	App		启动软件包管理后台
+Manage repositories…	MainWindow		管理仓库…
 Business	Model		商业
 Audio	Model		音频
+Rating not possible	MainWindow		无法评价
 About	PackageInfoView		关于
 Active	PackageListView		激活
 It was not possible to contact the web service.	UserLoginWindow		无法连接网络服务。
+Refreshing...	MainWindow		更新中…
 Failed to create account: %s\n	UserLoginWindow		创建账户失败：%s\n
 Cancel	UserLoginWindow		取消

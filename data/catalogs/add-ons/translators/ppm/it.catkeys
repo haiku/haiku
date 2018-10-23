@@ -1,11 +1,11 @@
 1	italian	x-vnd.Haiku-PPMTranslator	2233502290
 Version %d.%d.%d, %s	PPMTranslator		Versione %d.%d.%d, %s
-PPM Settings	PPMMain		PPM Impostazioni
+PPM Settings	PPMMain		 Impostazioni PPM
 Based on PPMTranslator sample code	PPMTranslator		Basato sul codice d'esempio del Translator PPM
 OK	PPMMain		OK
 Grayscale 8 bits	PPMTranslator		Scala di grigi 8 bits
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bits
-PPM image	PPMTranslator		PPM immagine
+PPM image	PPMTranslator		Immagine PPM
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bits
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Formato Be Bitmap (Translator PPM)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bits
@@ -25,7 +25,7 @@ RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
 Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Codice sorgente copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Impostazioni Translator PPM
 Something is wrong with the PPMTranslator!	PPMMain		Qualcosa non va con il Translator PPM!
 System palette 8 bits	PPMTranslator		Tavolozza di sistema 8 bits

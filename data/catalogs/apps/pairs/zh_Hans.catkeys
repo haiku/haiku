@@ -1,9 +1,9 @@
 1	english	x-vnd.Haiku-Pairs	818003250
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	对对碰未发现足够适量图标，无法启动；至少需要 %zu 个图标，当前仅发现 %zu 个图标。\n
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\t由 Ralf Schülke 编写\n\版权所有 2008-2010, Haiku Inc.\n\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\t由 Ralf Schülke 编写\n\t版权所有 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		骨灰级(8x8)
 Beginner (4x4)	PairsWindow		菜鸟级 (4x4)
-You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		您使用 {0, plural, one{# 步} other{# 步}} 完成了游戏。\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		您使用 {0, plural, one{# click} other{# clicks}} 完成了游戏。\n
 Quit game	PairsWindow		退出游戏
 Large	PairsWindow		大图标
 Small	PairsWindow		小图标

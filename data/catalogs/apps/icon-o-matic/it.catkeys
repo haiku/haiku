@@ -74,7 +74,7 @@ Click on a shape above	Empty transformers list - 1st line		Fai click su una sago
 Add Shape	Icon-O-Matic-AddShapesCmd		Aggiungi Sagoma
 Contour	Transformation		Contorno
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salva le modifiche all'icona corrente prima di chiudere?
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<niente da annullare>
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<niente da ripristinare>
 Perspective	Transformation		Prospettiva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Sposta Trasformatore
 Opacity	Icon-O-Matic-PropertyNames		Opacità
@@ -184,7 +184,7 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Inverti Percorso
 Scale	Icon-O-Matic-TransformationBoxStates		Scala
 Duplicate	Icon-O-Matic-PathsList		Duplica
 Save	Icon-O-Matic-Menu-File		Salva
-Append…	Icon-O-Matic-Menu-File		Aggiungere...
+Append…	Icon-O-Matic-Menu-File		Aggiungi...
 Move Path	Icon-O-Matic-MovePathsCmd		Sposta Percorso
 Overwrite	Icon-O-Matic-SVGExport		Sovrascrivi
 Text too long	Icon-O-Matic-StyledTextImport		Testo troppo lungo

@@ -1,10 +1,12 @@
-1	indonesian	x-vnd.Haiku-Screen	267463306
+1	indonesian	x-vnd.Haiku-Screen	4090394050
 yes	Screen		ya
 Use laptop panel:	Screen		Memakai panel laptop:
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 warna
 /other…	Screen		/other…
 16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 warna
 Revert	Screen		Pulihkan
+Swap displays:	Screen		Tukar penampil digital:
+Combine displays:	Screen		Gabung penampil digital:
 Done	Screen		Sudah
 Set background…	Screen		Set latar belakang...
 Undo	Screen		Batal
@@ -41,7 +43,7 @@ Confirm changes	Screen		Konfirmasi perubahan
 Rows:	Screen		Baris
 vertically	Screen		secara vertikal
 Resolution:	Screen		Resolusi:
-Screen	Screen		Batal
+Screen	Screen		Layar
 %.1f Hz	Screen		%.1f Hz
 8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 warna
 Apply	Screen		Terapkan

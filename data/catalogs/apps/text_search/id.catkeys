@@ -17,10 +17,10 @@ Settings	GrepWindow		Pengaturan
 Select all	GrepWindow		Pilih Semua
 OK	GrepWindow		Oke
 Skip folders starting with a dot	GrepWindow		Lewati folder yang dimulai dengan titik
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME tidak bisa membuka satu atau lebih pelipat.
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME tidak bisa membuka satu atau lebih folder.
 Search	GrepWindow		Pencarian
 Open selection	GrepWindow		Buka seleksi
-Look in sub-folders	GrepWindow		Lihat di sub-pelipat
+Look in sub-folders	GrepWindow		Lihat di sub-folder
 Actions	GrepWindow		Tindakan
 File	GrepWindow		Berkas
 Encoding	GrepWindow		Penyandian

@@ -1,3 +1,17 @@
-1	indonesian	x-vnd.Haiku-PowerStatus	2215350516
+1	indonesian	x-vnd.Haiku-PowerStatus	678063321
 Design capacity low warning: 	PowerStatus		Desain peringatan kapasitas rendah: 
 Show percent	PowerStatus		Tampilkan persen
+Design capacity: 	PowerStatus		Kapasitas desain: 
+ mW	PowerStatus		  mW
+Type: 	PowerStatus		Tipe: 
+PowerStatus	System name		PowerStatus
+ mWh	PowerStatus		 mWh
+Show time	PowerStatus		Tampilkan waktu
+ mA	PowerStatus		 mA
+About…	PowerStatus		Tentang…
+Model number: 	PowerStatus		Nomor model: 
+Capacity: 	PowerStatus		Kapasitas: 
+OEM info: 	PowerStatus		Info OEM: 
+Quit	PowerStatus		Keluar
+Technology: 	PowerStatus		Teknologi: 
+no battery	PowerStatus		baterai tidak ada

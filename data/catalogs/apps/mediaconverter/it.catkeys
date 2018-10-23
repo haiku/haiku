@@ -69,6 +69,6 @@ Input file not recognized as Audio or Video	MediaConverter		File sorgente non ri
 Convert	MediaConverter		Conversione
 Video quality: %3d%%	MediaConverter		Qualità video: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canale
-Output folder	MediaConverter		Cartella di output
+Output folder	MediaConverter		Cartella di destinazione
 Audio quality: %3d%%	MediaConverter		Qualità audio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Si è verificato un errore.\n\nErrore: 

@@ -1,2 +1,32 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	1688552528
+1	indonesian	x-vnd.Haiku-MediaPlayer	2249053190
+raw audio	MediaPlayer-InfoWin		audio mentah
+Location	MediaPlayer-InfoWin		Lokasi
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerika)
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Stream settings	MediaPlayer-Main		Pengaturan aliran
+Video	MediaPlayer-InfoWin		Video
+(not supported)	MediaPlayer-InfoWin		(tidak didukung)
+ask every time	MediaPlayer-SettingsWindow		tanya tiap kali
+Close	MediaPlayer-Main		Tutup
+OK	MediaPlayer-SettingsWindow		OKE
+Medium	MediaPlayer-SettingsWindow		Medium
+Close	MediaPlayer-PlaylistWindow		Tutup
+File info…	MediaPlayer-Main		Info berkas…
 Copyright	MediaPlayer-InfoWin		Hak cipta
+Cancel	MediaPlayer-SettingsWindow		Batal
+Quit	MediaPlayer-Main		Keluar
+400% scale	MediaPlayer-Main		Skala 400%
+Audio	MediaPlayer-Main		Audio
+OK	MediaPlayer-Main		OKE
+Settings…	MediaPlayer-Main		Pengaturan…
+h	MediaPlayer-InfoWin	Hours	h
+Open	MediaPlayer-PlaylistWindow		Buka
+Audio	MediaPlayer-InfoWin		Audio
+OK	MediaPlayer-RemovePLItemsCmd		OKE
+50% scale	MediaPlayer-Main		Skala 50%
+Duration	MediaPlayer-InfoWin		Durasi
+Large	MediaPlayer-SettingsWindow		Besar
+Total duration: %s	MediaPlayer-PlaylistWindow		Total durasi: %s
+Hide interface	MediaPlayer-Main		Sembunyikan antarmuka
+Full screen	MediaPlayer-Main		Layara penuh
+Bottom of screen	MediaPlayer-SettingsWindow		Sisi bawah layar

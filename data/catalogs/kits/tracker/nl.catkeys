@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2576338826
+1	dutch; flemish	x-vnd.Haiku-libtracker	247700208
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Invoegtoepassingen
 Mount settings…	ContainerWindow		Instellingen voor betrekken...
@@ -224,6 +224,7 @@ by formula	FindPanel		op formule
 Corrupted expression.	libtracker		Ongeldige expressie.
 Name	PoseView		Naam
 Group	FilePermissionsView		Groep
+Subject	Email Query Columns		Onderwerp
 Version:	InfoWindow		Versie:
 Created:	InfoWindow		Gemaakt:
 \nShould this be fixed?	FSUtils		\nMoet dit opgelost worden?
@@ -314,6 +315,7 @@ Show Disks icon	SettingsView		Toon schijf-iconen
 Cancel	PoseView		Annuleren
 You can't move or copy items to read-only volumes.	FSUtils		U kunt items niet naar alleen-lezen-gegevensdragers verplaatsen of kopiëren.
 Unknown	FilePermissionsView		Onbekend
+Junk on end.	libtracker		Rommel aan het einde.
 All files and folders	FindPanel		Alle bestanden en mappen
 Trailing \\.	libtracker		\\ aan het einde.
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{voor # bestand} other{voor # bestanden}}

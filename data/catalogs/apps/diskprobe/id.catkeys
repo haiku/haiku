@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DiskProbe	1707648801
+1	indonesian	x-vnd.Haiku-DiskProbe	565370940
 File offset: 	ProbeView		Ofset berkas: 
 %ld (native)	ProbeView		%ld (asli)
 64 bit unsigned value:	TypeEditors		Nilai unsigned 64 bit:
@@ -22,7 +22,7 @@ OK	DiskProbe		Oke
 Boolean	TypeEditors	This is the type of editor	Boolean
 Paste	ProbeView		Tempel
 PNG format	TypeEditors		format PNG
-Font size	ProbeView		Ukuran huruf
+Font size	ProbeView		Ukuran fon
 Attribute type: 	ProbeView		Tipe atribut: 
 Attribute	AttributeWindow		Atribut
 8 bit signed value:	TypeEditors		8 bita signed value:
@@ -73,3 +73,4 @@ Native: 0x%0*Lx	ProbeView		Asli: 0x%0*Lx
 Raw editor	AttributeWindow		Penyunting mentah
 Message View	TypeEditors		Tampilan Pesan
 DiskProbe request	ProbeView		Permintaan DiskProbe 
+Add	ProbeView		Tambah

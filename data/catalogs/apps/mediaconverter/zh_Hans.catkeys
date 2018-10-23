@@ -1,11 +1,11 @@
 1	english	x-vnd.Haiku-MediaConverter	3142509574
 Video using parameters form settings	MediaConverter		视频参数表使用设置
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{该文件未被识别为支持的媒体文件:} other{# 文件未被识别为支持的媒体文件:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
 Video encoding:	MediaConverter		视频编码：
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 No audio	Audio codecs list		无音频
 Error	MediaConverter		错误
-{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# 位} other{# 位}}
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
 Error loading a file	MediaConverter		载入文件错误
 File Error	MediaConverter-FileInfo		文件错误
 Open…	Menu		打开...
@@ -25,9 +25,9 @@ Audio:	MediaConverter-FileInfo		音频：
 OK	MediaConverter-FileInfo		确定
  seconds	MediaFileInfo		秒
 Source files	MediaConverter		源文件
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# 帧} other{# 帧}}
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
 Cancelling	MediaConverter		取消
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# 字节} other{# 字节}}
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Error loading files	MediaConverter		载入文件错误
 Cancel	MediaConverter		取消
 None available	Video codecs		无可用

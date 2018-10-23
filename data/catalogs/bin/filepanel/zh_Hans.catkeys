@@ -4,7 +4,7 @@ options:\n	FilePanelApp		选项：\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		用法：%s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		用法：%s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m] [-a pattern] [-f pattern]\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t在该 <文件夹> 中打开\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t在该 <folder> 中打开\n
 %s not a valid option\n	FilePanelApp		%s 不是一个有效地选项。\n
 short\tlong\tdescription\n	FilePanelApp		短\t长\t描述\n
 %s: this option requires a parameter\n	FilePanelApp		%s：该选项需要一个参数\n

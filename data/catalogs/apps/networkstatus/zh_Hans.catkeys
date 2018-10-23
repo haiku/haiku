@@ -1,5 +1,5 @@
 1	english	x-vnd.Haiku-NetworkStatus	1729819859
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		网络状态选项：\n\t--deskbar\自动添加复制到桌面栏\n\t--help\t\t打印该信息并退出\n
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		网络状态选项：\n\t--deskbar\t自动添加复制到桌面栏\n\t--help\t\t打印该信息并退出\n
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		您可以在窗口中运行网络状态或者将其安装到桌面栏。
 <no wireless networks found>	NetworkStatusView		<未发现无线网络>
 Run in window	NetworkStatus		在窗口中运行

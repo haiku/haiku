@@ -107,7 +107,7 @@ All categories	FilterView		Tutte le categorie
 Contents	PackageInfoView		Contenuto
 An error occurred while refreshing the repository: %error%	MainWindow		Si è verificato un errore durante l'aggiornamento del repository: %error%
 Try again	App		Riprova
-Login or Create account	MainWindow		Login o Crea account
+Login or Create account	MainWindow		Accedi o Registrati
 Pending…	PackageListView		In attesa…
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 OK	PackageInfoView		OK

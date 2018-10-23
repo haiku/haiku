@@ -10,7 +10,7 @@ Terminal couldn't start the shell. Sorry.	Terminal TermApp		Spiacente, Terminal 
 Match case	Terminal FindWindow		Sensibile alle maiuscole/minuscole
 Quit	Terminal TermWindow		Esci
 Use default shell	Terminal Shell		Usa shell predefinita
-Confirm exit if active programs exist	Terminal AppearancePrefView		Chiedi conferma per l'uscita in caso ci siano programmi attivi
+Confirm exit if active programs exist	Terminal AppearancePrefView		Chiedi conferma per l'uscita in caso ci siano processi attivi
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il modello specificando il titolo attuale scheda. I seguenti segnaposto \npossono essere utilizzati:\n
 Select all	Terminal TermWindow		Seleziona tutto
 Close tab	Terminal TermWindow		Chiudi scheda
@@ -57,7 +57,7 @@ Font size	Terminal TermWindow		Dimensione del carattere
 Blinking cursor	Terminal AppearancePrefView		Cursore lampeggiante
 Set window title	Terminal TermWindow		Imposta titolo finestra
 Revert	Terminal PrefWindow		Ripristina
-Terminal	System name		Terminale
+Terminal	System name		Terminal
 Copy path	Terminal TermView		Copia percorso
 Close other tabs	Terminal TermWindow		Chiudi altre schede
 Defaults	Terminal PrefWindow		Predefiniti

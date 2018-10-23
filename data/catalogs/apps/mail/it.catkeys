@@ -38,7 +38,7 @@ Your main text contains %ld unencodable characters. Perhaps a different characte
 Signature:	Mail		Firma:
 Save changes to this signature?	Mail		Salva le modifiche a questa firma?
 Cc:	Mail		Cc:
-Off	Mail		Off
+Off	Mail		Disattivo
 Find	Mail		Cerca
 Undo	Mail		Annulla
 Date:	Mail		Data:
@@ -73,7 +73,7 @@ Account from mail	Mail		Account del messaggio
 Edit signatures…	Mail		Modifica firme…
 New	Mail		Nuovo
 Attachments: 	Mail		Allegati: 
-On	Mail		On
+On	Mail		Attivo
 Set to %s	Mail		Imposta a %s
 Forward	Mail		Inoltra
 E-mail draft could not be saved!	Mail		La bozza di messaggio non è stata salvata!
@@ -142,7 +142,7 @@ Close and 	Mail		Chiudi e
 Save as draft	Mail		Salva come bozza
 The mail_daemon could not be started:\n\t	Mail		Non è stato possibile avviare il server 'mail_daemon':\n\t
 Open attachment	Mail		Apri allegato
-sent	B_USER_DIRECTORY/mail/sent		inviato
+sent	B_USER_DIRECTORY/mail/sent		inviate
 (Date unavailable)	Mail		(Data non disponibile)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Conserva le tue interrogazioni e i tuoi modelli in questa cartella.
 Spam	Mail		Indesiderata

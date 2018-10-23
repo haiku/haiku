@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Devices	4260340328
+1	indonesian	x-vnd.Haiku-Devices	525009626
 Manufacturer	DeviceSCSI		Pabrikan
 Order by:	DevicesView		Urutkan berdasarkan:
 ACPI controller	Device		Pengontrol ACPI
@@ -56,8 +56,10 @@ Manufacturer:	Device		Pabrikan:
 ACPI bus	DevicesView		Bus ACPI
 Devices	System name		Perangkat
 Multimedia controller	Device		Pengontrol multimedia
+Unknown	DevicePCI		Tidak diketahui
 Device name:	Device		Nama perangkat:
 Computer	DevicesView		Komputer
+Value	PropertyList		Nilai
 Report compatibility	DevicesView		Laporkan kompatibilitas
 Device	Device		Perangkat
 Wireless controller	Device		Pengontrol nirkabel
@@ -72,7 +74,10 @@ Enclosure	DeviceSCSI		Enklosur
 Bridge	Device		Jembatan
 Refresh devices	DevicesView		Segarkan perangkat
 Unknown device	DevicesView		Perangkat tak dikenal
+Graphics Peripheral	DeviceSCSI		Perangkat Grafis
+Bus Information	Device		Informasi Bus
 Connection	DevicesView		Koneksi
 Device name	DeviceSCSI		Nama perangkat
 Card Reader	DeviceSCSI		Pembaca kartu
+Class info	DevicePCI		Info kelas
 Devices	DevicesView		Perangkat

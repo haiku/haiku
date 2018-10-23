@@ -7,7 +7,7 @@ Retrieve or select the active printer	PrintServerApp Scripting		Rileva o selezio
 Cancel	PrintServerApp		Annulla
 Retrieve a specific printer	PrintServerApp Scripting		Rileva una stampante
 Page %1 to %2	ConfigWindow		Pagina %1 di %2
-Get name of the printer add-on used for this printer	Printer Scripting		Rileva l'add-on utilizzato per questa stampante
+Get name of the printer add-on used for this printer	Printer Scripting		Rileva il componente aggiuntivo utilizzato per questa stampante
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Annulla
@@ -37,7 +37,7 @@ Get the transport configuration for this printer	Printer Scripting		Rileva la co
 Landscape	ConfigWindow		Orizzontale
 Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	US-Legal
 There are no printers set up.	PrintServerApp		Non è stata impostata nessuna stampante.
-Get name of the transport add-on used for this printer	Printer Scripting		Rileva l'add-on di collegamento utilizzato per questa stampante
+Get name of the transport add-on used for this printer	Printer Scripting		Rileva il componente aggiuntivo di collegamento utilizzato per questa stampante
 All pages, %1 copies	ConfigWindow		Tutte le pagine, %1 copie
 Delete a specific printer	PrintServerApp Scripting		Elimina una stampante
 Create a new printer	PrintServerApp Scripting		Crea una nuova stampante

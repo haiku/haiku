@@ -13,5 +13,5 @@ Set as read	ConfigView		设为读取
 Match header	RuleFilter		头部匹配
 Reply with	ConfigView		回复为
 If	ConfigView		如果
-Match \"%attribute\" against \"%regex\"	RuleFilter		基于 \"%regex\" 进行 \"%attribute\" 匹配
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		通配符如 \"*spam*\" 。\n包含前缀 \"REGEX:\" 用于使用正则表达式。
+Match \"%attribute\" against \"%regex\"	RuleFilter		匹配 \"%attribute\" 根据 \"%regex\" 
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		通配符如 \"*spam*\" .\n包含前缀 \"REGEX:\" 用于使用正则表达式.

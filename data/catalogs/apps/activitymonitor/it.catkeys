@@ -30,7 +30,7 @@ Remove graph	ActivityView		Rimuovi grafico
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Uso della CPU
-Raw clipboard	DataSource		Appunti grezzi
+Raw clipboard	DataSource		Appunti binari
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		MonitorAttività

@@ -35,14 +35,14 @@ Window size	Terminal TermWindow		窗口大小
 Selected text	Terminal AppearancePrefView		选中文本
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.
 Find	Terminal FindWindow		查找
-The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式指定窗口标题。可以使用占位符：
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式指定窗口标题。可以使用如下\n占位符：
 Appearance	Terminal PrefWindow		外观
 Tab title:	Terminal AppearancePrefView		标签标题：
 OK	Terminal SetTitleWindow		确定
 Background	Terminal AppearancePrefView		背景
 Use selection	Terminal FindWindow		使用选择
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
-Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%错误
+Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help 打印帮助内容\n-t, --title 设置窗口标题\n-f, --fullscreen 全屏启动\n
 Window title…	Terminal TermWindow		窗口标题...
 Full screen	Terminal TermWindow		全屏
@@ -77,7 +77,7 @@ Midnight	Terminal colors scheme		午夜主题
 Decrease	Terminal TermWindow		缩小
 Default	Terminal colors scheme		默认主题
 Create link here	Terminal TermView		创建链接
-The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式用于指定标签标题。可以使用下述占位符：
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式用于指定标签标题。可以使用下述\n占位符：
 Close	Terminal TermWindow		关闭
 Text	Terminal AppearancePrefView		文本
 Clear all	Terminal TermWindow		清空
@@ -101,13 +101,13 @@ Find failed	Terminal TermWindow		查找失败
 Search forward	Terminal FindWindow		搜索前一个
 Edit tab title…	Terminal TermWindow		编辑标签标题...
 Open path	Terminal TermView		打开路径
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t活动进程的当前工作目录。\n\t\t\t可以指定路径组成的最大数量，如，'%2d' 表示最多两个部分。\n\t%i\t-\t标签索引。\n\t%e\t-\t当前标签编码格式。对于 UTF-8 不显示。\n\t%p\t-\t活动进程名称。\n\t%%\t-\t字符 '%'。
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t活动进程的当前工作目录。\n\t\t\t可以指定路径组成的最大数量，\n\t\t\t如，'%2d' 表示最多两个部分。\n\t%i\t-\t标签索引。\n\t%e\t-\t当前标签编码格式。对于 UTF-8 不显示。\n\t%p\t-\t活动进程名称。\n\t%%\t-\t字符 '%'。
 Find previous	Terminal TermWindow		查找上一个
 Copy link location	Terminal TermView		复制链接位置
 Tab title:	Terminal TermWindow		标签标题：
 Find next	Terminal TermWindow		查找下一个
 Close active tab	Terminal TermWindow		关闭活动标签
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t字符 '%' 。\n\t%<\t-\t开始新区块，仅当其后的占位符不为空时显示。\n\t%>\t-\t开始新区块，仅当之前的 %< 和该区块不为空时显示。\n\t%-\t-\t结束一个 %< 或者 %> 区块。\n\n仅当占位符的值不为空时，任何位于 '%' 和格式化字符之间的非字母数字字符都\n将会插入一个空格。它将会添加到 %< 区块。
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t字符 '%' 。\n\t%<\t-\t开始新区块，仅当其后的\n\t\t\t占位符不为空时显示。\n\t%>\t-\t开始新区块，仅当之前的\n\t\t\t %< 和该区块不为空时显示。\n\t%-\t-\t结束一个 %< or %> 区块。\n\n仅当占位符的值不为空时，任何位于 '%' 和格式化字符之间的非字母数字字符都\n将会插入一个空格。它将会添加到 %< 区块。
 Paste	Terminal TermWindow		粘贴
 Solarized Dark	Terminal colors scheme		深色的 Solarized
 Shell 	Terminal TermWindow		Shell

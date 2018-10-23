@@ -7,7 +7,7 @@ Send pending mails	DeskbarView		Inviare la posta in uscita
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}} per %name\n
 New Messages	MailDaemon		Nuovi Messaggi
 <no accounts>	DeskbarView		<nessun account>
-Mail status	MailDaemon		Status
+Mail status	MailDaemon		Stato posta elettronica
 Shutdown mail services	DeskbarView		Arresto servizi di posta elettronica
 Sending mail for %name	Notifier		Invio della posta di %name in corso
 Create new message…	DeskbarView		Crea nuovo messaggio…

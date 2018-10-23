@@ -314,7 +314,7 @@ Unknown	FilePermissionsView		Unbekannt
 Junk on end.	libtracker		Müll am Ende.
 All files and folders	FindPanel		Alle Dateien und Ordner
 Trailing \\.	libtracker		\\ am Ende.
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # Datei} other{for # Dateien}}
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{für # Datei} other{für # Dateien}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht geöffnet werden (Fehlende Bibliotheken: %library). \n
 The Tracker must be running to see Info windows.	PoseView		Um Info-Fenster zeigen zu können, muss Tracker laufen.
 Other	FilePermissionsView		Andere

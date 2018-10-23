@@ -60,7 +60,7 @@ Error setting type of output file	VideoConsumer.cpp		设置输出文件类型出
 upload client name expected	CodyCam		预期的上传客户端
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		连接中...
-PASS <suppressed>  (real password sent)\n	FtpClient		通过<禁止>（发送真实密码）\n
+PASS <suppressed>  (real password sent)\n	FtpClient		通过 <suppressed> （发送真实密码）\n
 File upload failed	VideoConsumer.cpp		文件上传失败
 Every 5 minutes	CodyCam		间隔 5 分钟
 read: %d\n	SftpClient		读取：%d\n

@@ -1,14 +1,15 @@
-1	indonesian	x-vnd.Haiku.TV	2921601561
+1	indonesian	x-vnd.Haiku.TV	1995288111
 TV	MainWin		TV
 Channel	MainWin		Saluran
 Settings…	MainWin		Pengaturan…
 Interface	MainWin		Antarmuka
+Keep aspect ratio	MainWin		Jaga aspek rasio
 Previous channel	MainWin		Saluran sebelumnya
 Settings	MainWin		Pengaturan
 TV	System name		TV
 No border	MainWin		Tanpa tepian
 Always on top	MainWin		Selalu di atas
-OK	MainWin		OK
+OK	MainWin		OKE
 Quit	MainWin		Keluar
 Full screen	MainWin		Layar penuh
 Debug	MainWin		Debug

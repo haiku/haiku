@@ -27,7 +27,7 @@ Install %name%	PackageView		Pasang %name%
 Stop	PackageStatus		Berhenti
 Other…	PackageView		Lainnya…
 No installation type selected	PackageView		Tidak ada tipe instalasi yang dipilih
-Installing files and folders	PackageInstall		Memasang file dan folder
+Installing files and folders	PackageInstall		Memasang berkas dan folder
 Package installer	PackageView		Penginstal paket
 Install…	UninstallView		Pasang…
 Skip all	PackageView		Lewati semua

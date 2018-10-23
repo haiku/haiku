@@ -4,7 +4,7 @@ Make square	Magnify-Main		创建方形
 Copy image	Magnify-Main		复制图像
 usage: magnify [size] (magnify size * size pixels)\n	Console		用法：magnify [size]（如，放大 size * size 像素）\n
 Stick coordinates	Magnify-Main		插入坐标
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# 像素/像素} other{# 像素/像素}}
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 magnify: size must be a multiple of 4\n	Console		放大：尺寸必须为 4 的倍数。\n
 Decrease pixel size	Magnify-Main		缩小像素尺寸
 Magnify	System name		放大镜

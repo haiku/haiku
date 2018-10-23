@@ -2,7 +2,7 @@
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, l'applicazione utilizzata per configurare il menu di avvio di Haiku, non può essere eseguita.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Sei sicuro di voler annullare l'installazione e riavviare il sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tscritto da Jérôme Duval e Stephan Aßmus\n\tCopyright©2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per abbandonare il programma di installazione oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per abbandonare l'Installer oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
 Quit	InstallerApp		Esci
 Additional disk space required: 0.0 KiB	InstallerWindow		Spazio aggiuntivo richiesto sul disco: 0.0 KiB
 Stop	InstallerWindow	In alert after pressing Stop	Interrompi
@@ -30,13 +30,13 @@ Boot sector successfully written.	InstallProgress		Settore d'avvio scritto con s
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 scanning…	InstallerWindow		scansione…
 Set up boot menu	InstallerWindow		Configura il menu di avvio
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Il programma di installazione provvederà a rendere la partizione di Haiku avviabile, ma non integrerà Haiku su un menu di avvio già esistente. Se hai GRUB installato, puoi aggiungere Haiku da li\nPer maggiori dettagli, per favore consulta la guida sull'avvio di Haiku su https://www.haiku-os.org/guides/booting.\nOppure puoi creare un menu di avvio dal menu \"Strumenti\" del programma di installazione, consulta la Guida per l'Utente all'argomento che riguarda l'applicazione \"BootManager\".\n\n\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   L'Installer provvederà a rendere la partizione di Haiku avviabile, ma non integrerà Haiku su un menu di avvio già esistente. Se hai GRUB installato, puoi aggiungere Haiku da li\nPer maggiori dettagli, per favore consulta la guida sull'avvio di Haiku su https://www.haiku-os.org/guides/booting.\nOppure puoi creare un menu di avvio dal menu \"Strumenti\" del programma di installazione, consulta la Guida per l'Utente all'argomento che riguarda l'applicazione \"BootManager\".\n\n\n
 Abort	InstallerWindow		Annulla
 Finishing Installation.	InstallProgress		Conclusione installazione.
 Restart	InstallerWindow		Riavvia
 README	InstallerApp		LEGGIMI
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disco di destinazione potrebbe non avere abbastanza spazio. Prova a scegliere un disco differente oppure non installare elementi opzionali.
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Chiudi le finestre del Boot Manager e di DriveSetup prima di chiudere la finestra del programma di installazione.
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Chiudi le finestre del Boot Manager e di DriveSetup prima di chiudere la finestra dell'Installer.
 Scanning for disks…	InstallerWindow		Scansione dei dischi…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Il disco non può essere montato. Scegli un disco differente.
 ?? of ??	InstallerWindow	Unknown progress	?? di ??
@@ -48,14 +48,14 @@ Unknown Type	InstallProgress	Partition content type	Tipo Sconosciuto
 <none>	InstallerWindow	No partition available	<nessuna>
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completata. Il boot sector è stato scritto su '%s'. Premi Riavvia o scegli una nuova partizione per effettuare un'altra installazione.
 Installation canceled.	InstallProgress		Installazione annullata.
-Installer	System name		Programma di installazione
+Installer	System name		Installer
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Non puoi installare i contenuti di un disco su se stesso. Scegli un disco differente.
 ???	InstallerWindow	Unknown currently copied item	???
 Quit DriveSetup	InstallerWindow		Esci da DriveSetup
 Hide optional packages	InstallerWindow		Nascondi pacchetti opzionali
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra del Gestore Disco prima di chiudere quella del programma di installazione
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra del Gestore Disco prima di chiudere quella dell'Installer.
 Restart system	InstallerWindow		Riavvia sistema
-1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se intendi installare Haiku su dell'hardware reale (non all'interno di un emulatore), potresti voler preparare una partizione sul disco rigido da un altro sistema operativo (potresti, ad esempio, utilizzare un CD avviabile con GParted, che è anche in grado di ridimensionale le partizioni esistenti per liberare spazio).\nPuoi anche configurare le partizioni lanciando il Gestore Disco dal programma di installazione, ma non sarai in grado di ridimensionare le partizioni con quello. Per quanto il Gestore Disco sia stato testato a fondo nel corso degli anni, è raccomandato disporre di un backup aggiornato delle altre partizioni del sistema. Non si sa mai…
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se intendi installare Haiku su dell'hardware reale (non all'interno di un emulatore), potresti voler preparare una partizione sul disco rigido da un altro sistema operativo (potresti, ad esempio, utilizzare un CD avviabile con GParted, che è anche in grado di ridimensionare le partizioni esistenti per liberare spazio).\nPuoi anche configurare le partizioni lanciando il DriveSetup, il gestore dei dischi, dal programma di installazione, ma non sarai in grado di ridimensionare le partizioni con quello. Per quanto DriveSetup sia stato testato a fondo nel corso degli anni, è raccomandato disporre di un backup aggiornato delle altre partizioni del sistema. Non si sa mai…
 OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Imposta partizioni…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La partizione non può essere montata. Scegli una partizione differente.
@@ -82,7 +82,7 @@ Running Boot Manager and DriveSetup…\n\nClose both applications to continue wi
 Try installing anyway	InstallProgress		Prova ad installare comunque
 Are you sure you want to to stop the installation?	InstallerWindow		Sei sicuro di voler interrompere l'installazione?
 Onto:	InstallerWindow		Su:
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Chiudi la finestra del Boot Manager prima di chiudere la finestra del programma di installazione.
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Chiudi la finestra del Boot Manager prima di chiudere la finestra dell'Installer.
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quando avrai avviato Haiku la prima volta, assicurati di leggere la documentazione alle voci \"Benvenuto\" e \"Guida per l'utente\". Troverai i loro collegamenti sulla Scrivania a tra i preferiti di WebPositive.\n\n
 Tools	InstallerWindow		Strumenti
 The mount point could not be retrieved.	InstallProgress		Impossibile recuperare il punto di montaggio.

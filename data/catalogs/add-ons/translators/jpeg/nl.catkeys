@@ -10,7 +10,7 @@ Low	JPEGTranslator		Laag
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Maak het bestand kleiner (beetje slechtere kwaliteit)
 None	JPEGTranslator		Geen
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmap Formaat (JPEGVertaler)
-Show warning messages	JPEGTranslator		Laat aarschuwingsberichten zien
+Show warning messages	JPEGTranslator		Laat waarschuwingsberichten zien
 Output smoothing strength	JPEGTranslator		Sterkte van uitvoersmoothing
 High	JPEGTranslator		Hoog
 Write	JPEGTranslator		Schrijven

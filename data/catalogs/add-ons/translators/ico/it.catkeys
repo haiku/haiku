@@ -7,7 +7,7 @@ Windows icons	ICOTranslator		Icone Windows
 Enforce valid icon sizes	ConfigView		Forzare le dimensioni dell'icona
 ICO Settings	main		Impostazioni ICO
 Windows icon translator	ICOTranslator		Translator icona Windows
-pixels in either direction.	ConfigView		pixel in entrambe le direzioni.
+pixels in either direction.	ConfigView		pixel sia in larghezza che in alterzza.
 Write 32 bit images on true color input	ConfigView		Scrivere immagini a 32 bit su input true color
 Icon	ICOTranslator		Icona
 ICOTranslator Settings	ConfigView		Impostazioni Translator ICO

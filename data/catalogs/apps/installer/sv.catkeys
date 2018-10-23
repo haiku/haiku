@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	2124553984
+1	swedish	x-vnd.Haiku-Installer	4172072111
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, den applikation man använder för att konfigurera Haiku boot meny kunde inte startas.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Är du säker på att du vill avbryta installationen och starta om systemet?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installerare\n\tskriven av Jérôme Duval och Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -55,6 +55,7 @@ Quit DriveSetup	InstallerWindow		Avsluta DiskHantering
 Hide optional packages	InstallerWindow		Göm valbara paket
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 Restart system	InstallerWindow		Starta om systemet
+1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Om du installerar Haiku på riktig hårdvara (inte inuti en emulator) kanske du vill förbereda en hårddiskpartition från ett annat operativsystem (du kan till exempel använda en GParted Live-CD, som också kan ändra storlek på befintliga partitioner för att göra rum för nya)\nDu kan också konfigurera partitioner genom att starta DiskHanterare från installeraren, men du kommer inte att kunna ändra storlek på befintliga partitioner. Även fast DiskHanterare har testats grundligt under årens lopp rekommenderas det att ha uppdaterade säkerhetskopior av de andra partitionerna på ditt system. Utifall att…
 OK	InstallerWindow		OK
 Set up partitions…	InstallerWindow		Ställ in partitioner...
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partitionen kan inte monteras. Var god välj en annan partition.

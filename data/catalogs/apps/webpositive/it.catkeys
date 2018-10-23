@@ -5,7 +5,7 @@ Copy URL to clipboard	Download Window		Copia URL negli appunti
 Cancel	Settings Window		Annulla
 Close window	WebPositive Window		Chiudi finestra
 Quit	WebPositive		Esci
-The download could not be opened.	Download Window		La cartella dei file scaricari non può essere aperta.
+The download could not be opened.	Download Window		La cartella dei file scaricati non può essere aperta.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	La cartella dei file scaricati non può essere aperta.\n\nErrore: %error
 Close	Download Window		Chiudi
 Open location	WebPositive Window		Apri indirizzo

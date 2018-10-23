@@ -1,4 +1,5 @@
-1	indonesian	x-vnd.Be-PRNT	565888589
+1	indonesian	x-vnd.Be-PRNT	2301744530
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Pencetak: %printer_name%\nDriver:  %driver%\n
 Waiting	JobListView		Menunggu
 Print test page	PrintersWindow		Cetak halaman test
  pending jobs	PrinterListView		 pekerjaan tertunda
@@ -10,16 +11,29 @@ Green	TestPageView		Hijau
 Printers	PrintersWindow		Pencetak
 Add…	PrintersWindow		Tambahkan...
 No pending jobs	PrinterListView		Tidak ada pekerjaan yang tertunda
+Default Printer	PrinterListView		Pencetak Asali
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+pages	JobListView		halaman
+Printers	System name		Pencetak
+Processing	JobListView		Pemrosesan
 Red	TestPageView		Merah
 Printer name:	AddPrinterDialog		Nama pencetak:
+Driver: %driver%	PrinterListView		Driver: %driver%
 Black	TestPageView		Hitam
 Restart job	PrintersWindow		Mulai ulang tugas
 Add	AddPrinterDialog		Tambahkan
+Make default	PrintersWindow		Membuat asali
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Cancel job	PrintersWindow		Batalkan pekerjaan
 Yellow	TestPageView		Kuning
 Blue	TestPageView		Biru
 Remove	PrintersWindow		Hapus
+Print jobs for 	PrintersWindow		Pekerjaan cetak untuk 
 Failed	JobListView		Gagal
+%.2f KB	JobListView		%.2f KB
 Completed	JobListView		Selesai
+Unknown status	JobListView		Status tidak diketahui
+1 pending job	PrinterListView		1 pekerjaan tertunda
 Connected to:	AddPrinterDialog		Terhubung ke:
 Printer type:	AddPrinterDialog		Tipe pencetak:
 Test page	TestPageView		Halaman test

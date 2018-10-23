@@ -41,7 +41,7 @@ File:	FileSelectionPage	Text control label	Berkas:
 Previous	WizardView	Button	Sebelumnya
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Partisi pertama pada disk dimulai terlalu dini dan tidak meninggalkan ruang kosong untuk menu booting.\nManajer Boot membutuhkan 2 ruang KiB yang tersedia sebelum partisi pertama.
 Install	DrivesPage	Button	Pasang
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		About to write the following boot menu to the boot disk(%s). Harap verifikasi informasi di bawah ini sebelum melanjutkan.
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Akan menulis menu but berikut ke diska but(%s). Harap verifikasi informasi di bawah ini sebelum melanjutkan.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Tidak diketahui
 Update	DrivesPage	Button	Memperbarui
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Silakan cari file save Master Boot Record (MBR) untuk dipulihkan. Ini adalah file yang dibuat saat boot manager pertama kali diinstal.
@@ -56,7 +56,7 @@ Error reading partition table	BootManagerController	Title	Ada kesalahan saat mem
 Installation of boot menu failed	BootManagerController	Title	Pemasangan menu boot gagal
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Tabel partisi hard disk pertama tidak kompatibel dengan Boot Manager.\nBoot Manager hanya bekerja dengan partisi IBM PC MBR.
 Backup Master Boot Record	BootManagerController	Title	Cadangkan Master Boot Record
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Akan menulis menu boot ke disk. Apakah anda yakin ingin melanjutkan?
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Akan menulis menu but ke diska. Apakah anda yakin ingin melanjutkan?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Master Boot Record lama berhasil disimpan ke %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Partitisi standar:
 Partitions	DefaultPartitionPage	Pop up menu title	Partisi

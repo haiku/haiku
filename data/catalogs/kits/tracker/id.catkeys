@@ -182,7 +182,7 @@ Location	OpenWithWindow		Lokasi
 Force identify	ContainerWindow		Memaksa mengidentifikasi
 Duplicate	ContainerWindow		Menduplikasi
 Corrupted pointers.	libtracker		Pointer rusak.
-New folder%ld	FSUtils		Pelipat baru%ld
+New folder%ld	FSUtils		Folder baru%ld
 Outline selection rectangle only	SettingsView		Hanya pilih yang dikotak
 Select all	DeskWindow		Pilih semua
 OK	InfoWindow		OKE
@@ -355,7 +355,7 @@ Get info	FilePanelPriv		Dapatkan info
 Cancel	FilePanelPriv		Batal
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Aplikasi \"%appname\" tidak mendukung jenis dokumen yang akan dibuka.\nAnda yakin ingin melanjutkan?\n\nJika Anda tahu bahwa aplikasi mendukung jenis dokumen itu, Anda sebaiknya menghubungi penerbit aplikasi dan meminta mereka memperbarui aplikasi mereka ke dalam daftar jenis dokumen anda sebagai yang didukung.
 Disks	DirMenu		Diska
-New folder %ld	FSUtils		Pelipat baru %ld
+New folder %ld	FSUtils		Folder baru %ld
 Used space color	SettingsView		Warna ruang yang digunakan
 Sorry, could not create a new folder.	FSUtils		Maaf, tidak bisa membuat folder baru.
 Disk mount	TrackerSettingsWindow		Memasang disk
@@ -404,7 +404,7 @@ Files cannot be moved or deleted from a read-only volume.	PoseView		File tidak d
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jika Anda mengubah nama folder sistem atau isinya, Anda tidak akan bisa boot %osName!\n\nApakah anda yakin melakukan ini?\n\nUntuk tetap mengubah nama folder sistem, tekan kunci Shift dan klik \"Ubah\".
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ada masalah saat mencoba untuk mengganti \"%name\". Item tersebut mungkin terbuka atau sibuk.
 Owner	FilePermissionsView		Pemilik
-There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Terjadi masalah saat mencoba menyimpan di pelipat yang Anda tentukan. Silakan coba yang lain.
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Terjadi masalah saat mencoba menyimpan di folder yang Anda tentukan. Silakan coba yang lain.
 Restore	ContainerWindow		Memulihkan
 Restoring: 	StatusWindow		Sedang memulihkan: 
 system	B_SYSTEM_DIRECTORY		sistem
@@ -458,7 +458,7 @@ Original name	ContainerWindow		Nama asli
 Find	FSUtils		Cari
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ada kesalahan menyalin file \"%name\":\n\t%error\n\nApakah anda ingin melanjutkan?
 Single window navigation	SettingsView		Navigasi satu jendela
-parent folder	NavMenu		pelipat induk
+parent folder	NavMenu		folder induk
 contains	FindPanel		berisi
 Relation	OpenWithWindow		Hubungan
 Open	FilePanelPriv		Buka

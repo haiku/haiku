@@ -12,13 +12,13 @@ Dial-up connection	InterfaceListItem		Einwählverbindung
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Netzwerk
 VPN connection	InterfaceListItem		VPN Verbindung
-Show network status in Deskbar	NetworkWindow		NetworkStatus in der Deskbar
+Show network status in Deskbar	NetworkWindow		Netzwerkstatus in Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Die Art wie IP Adressen bezogen werden
 connected	InterfaceListItem		verbunden
 disabled	InterfaceListItem		deaktiviert
 Dial Up	NetworkWindow		Einwahl
 Apply	IntefaceAddressView		Anwenden
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installation von NetworkStatus in der Deskbar fehlgeschlagen: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installation von Netzwerkstatus in Deskbar fehlgeschlagen: %s
 MAC address:	IntefaceView		MAC-Adresse:
 Wireless device	InterfaceListItem		Funknetzwerkgerät
 Disabled	IntefaceAddressView		Deaktiviert
@@ -33,8 +33,8 @@ Revert	NetworkWindow		Anfangswerte
 Enable	ServiceView		Aktivieren
 disconnected	IntefaceView		getrennt
 Status:	IntefaceView		Status:
-Link speed:	IntefaceView		Verbindungsgeschwindigkeit:
-Your gateway to the internet	IntefaceAddressView		Die Zugangsadresse zu Internet
+Link speed:	IntefaceView		Geschwindigkeit:
+Your gateway to the internet	IntefaceAddressView		Zugangsadresse zum Internet
 New…	NetworkWindow		Neu…
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Modus:

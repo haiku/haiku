@@ -3,6 +3,6 @@ Be styled text file	STXTTranslator		File testo Be con stili
 Plain text file	STXTTranslator		File solo testo
 STXTTranslator Settings	STXTTranslator		Impostazioni Translator STXT
 StyledEdit file translator	STXTView		Translator file StyledEdit
-StyledEdit files	STXTTranslator		File di StyledEdit
+StyledEdit files	STXTTranslator		File di testo di StyledEdit
 StyledEdit file translator	STXTTranslator		Translator file StyledEdit
 STXT Settings	STXTMain		Impostazioni STXT

@@ -38,7 +38,7 @@ Font	Menus		Carattere
 Replace all	FindandReplaceWindow		Sostituisci tutto
 Statistics…	Menus		Statistiche...
 Default	Open_and_SaveAsPanel		Predefinito
-Replace next	Menus		Sostituisci prossimo
+Replace next	Menus		Sostituisci successivo
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Le modifiche a \"%s\" non sono state salvate.\nRipristinare l'ultima versione salvata? 
 Cancel	FindandReplaceWindow		Annulla
 Text encoding	Menus		Codifica testo

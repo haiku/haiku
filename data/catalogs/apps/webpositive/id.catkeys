@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	299683995
+1	indonesian	x-vnd.Haiku-WebPositive	803654513
 Show home button	Settings Window		Tampilkan tombol rumah
 Username:	Authentication Panel		Nama pengguna:
 Copy URL to clipboard	Download Window		Salin URL ke papan klip
@@ -12,6 +12,7 @@ Open location	WebPositive Window		Buka lokasi
 Clear history	WebPositive Window		Hapus riwayat
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Kemarin
+Default standard font size:	Settings Window		Ukuran fon standar asali:
 History	WebPositive Window		Riwayat
 Error opening downloads folder	Download Window		Galat membuka folder unduhan
 Paste	WebPositive Window		Tempel
@@ -24,6 +25,7 @@ Confirmation	WebPositive Window		Konfirmasi
 Window	WebPositive Window		Jendela
 Cookie manager	Cookie Manager		Manajer kuki
 Decrease size	WebPositive Window		Perkecil ukuran
+Serif font:	Settings Window		Fon serif:
 Loading %url	WebPositive Window		Memuat %url
 Download aborted	Download Window		Unduhan dibatalkan
 Value	Cookie Manager		Nilai
@@ -32,21 +34,26 @@ Next	WebPositive Window		Selanjutnya
 Find next	WebPositive Window		Cari selanjutnya
 Download folder:	Settings Window		Folder unduhan:
 Cancel	Authentication Panel		Batal
+Default fixed font size:	Settings Window		Ukuran fon tetap asali:
 Close tab	WebPositive Window		Tutup tab
+Auto-hide mouse pointer	Settings Window		Sembunyikan otomatis penunjuk tetikus
 Quit	WebPositive Window		Keluar
 Full screen	WebPositive Window		Layar penuh
 Open download error	Download Window		Galat membuka unduhan
 The cookie jar is empty!	Cookie Manager		Tempat kuki kosong!
-Standard font:	Settings Window		Font standar:
+Standard font:	Settings Window		Fon standar:
 Restart	Download Window		Mulai ulang
 Proxy server	Settings Window		Server proksi
+Open containing folder	Download Window		Buka folder yang berisi
 New window	WebPositive Window		Jendela baru
 WebPositive	Download Window		WebPositive
 Open	Download Window		Buka
 Reload	WebPositive Window		Muat ulang
 Downloads	Download Window		Unduhan
+Sans serif font:	Settings Window		Fon sans serif:
 Delete	Cookie Manager		Hapus
 of	Download Window	...as in '12kB of 256kB'	dari
+Fixed font:	Settings Window		Fon tetap:
 Cut	WebPositive Window		Potong
 Open downloads folder	Download Window		Buka folder unduhan
 Proxy password:	Settings Window		Sandi proksi:
@@ -58,8 +65,8 @@ Apply	Settings Window		Terapkan
 Size:	Font Selection view		Ukuran:
 Show tabs if only one page is open	Settings Window		Tampilkan tab ketika hanya satu laman yang terbuka
 About	WebPositive Window		Tentang
-Fonts	Settings Window		Font
-OK	Download Window		OK
+Fonts	Settings Window		Fon
+OK	Download Window		OKE
 Open blank page	Settings Window		Buka laman kosong
 New tabs:	Settings Window		Tab baru:
 Cancel	WebPositive Window		Batalkan
@@ -93,6 +100,7 @@ Remember username and password for this site	Authentication Panel		Ingat nama pe
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Use proxy server to connect to the internet	Settings Window		Gunakan server proksi untuk terhubung ke internet
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Masih ada unduhan yang berjalan, apakah Anda ingin keluar dari WebPositive sekarang?
+Auto-hide interface in full screen mode	Settings Window		Otomatis sembunyikan antarmuka pada jendela mode penuh
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	Gagal memuat %url
 New tab	WebPositive Window		Tab baru
 Downloads in progress	WebPositive		Pengunduhan dalam proses
@@ -103,10 +111,10 @@ Do you really want to clear the browsing history?	WebPositive Window		Apakah And
 Copy	WebPositive Window		Salin
 Clone current page	Settings Window		Gandakan laman saat ini
 Session cookie	Cookie Manager		Sesi kuki
-OK	Authentication Panel		OK
+OK	Authentication Panel		OKE
 Copy	URL Bar		Salin
 Download finished	Download Window		Unduhan selesai
-OK	WebPositive Window		OK
+OK	WebPositive Window		OKE
 Cookies for %s	Cookie Manager		Kuki untuk %s
 New windows:	Settings Window		Jendela baru:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url selesai

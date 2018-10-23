@@ -1,5 +1,5 @@
 1	italian	x-vnd.Haiku-cmd-dstconfig	684321431
-Ask me later	dstcheck		Ricordamelo dopo
+Ask me later	dstcheck		Ricorda più tardi
 Manually adjust time…	dstcheck		Regolazione manuale dell'orario…
-Keep this time	dstcheck		Mantieni questa volta
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Attenzione\n\nA causa del passaggio all'ora solare, l'orologio del tuo computer può essere indietro di un'ora.\nL'ora attuale è: %current time%\n\nE' corretta?
+Keep this time	dstcheck		Mantieni questo orario
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Attenzione\n\nA causa del passaggio all'ora solare, l'orologio del tuo computer può essere indietro di un'ora.\nL'ora attuale è: %current time%\n\nÈ corretta?

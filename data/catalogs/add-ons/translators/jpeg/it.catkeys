@@ -1,5 +1,5 @@
 1	italian	x-vnd.Haiku-JPEGTranslator	3788699631
-Output quality	JPEGTranslator		Qualità dell'output
+Output quality	JPEGTranslator		Qualità dell'uscita
 JPEG images	JPEGTranslator		Immagini JPEG
 Prevent colors 'washing out'	JPEGTranslator		Previeni il 'dilavamento' dei colori
 JPEG Library Error: %s\n	be_jerror		Errore Libreria JPEG: %s\n
@@ -11,12 +11,12 @@ Make file smaller (sligthtly worse quality)	JPEGTranslator		Rendi i file più pi
 None	JPEGTranslator		Nessuno
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato Be Bitmap (Translator JPEG)
 Show warning messages	JPEGTranslator		Mostra messaggi di avviso
-Output smoothing strength	JPEGTranslator		Intensità dello smoothing in output
+Output smoothing strength	JPEGTranslator		Intensità dello smoothing in uscita
 High	JPEGTranslator		Alto
-Write	JPEGTranslator		Scrivi
+Write	JPEGTranslator		Scrittura
 Write black-and-white images as RGB24	JPEGTranslator		Scrivi immagini bianco e nero come RGB24
 Version %d.%d.%d	JPEGTranslator		Versione %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Leggi immagini in scala di grigio come RGB32
-Read	JPEGTranslator		Leggi
+Read	JPEGTranslator		Lettura
 JPEG Library Warning: %s\n	be_jerror		Avviso Libreria JPEG: %s\n
 Use progressive compression	JPEGTranslator		Usa compressione progressiva

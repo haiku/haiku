@@ -18,7 +18,7 @@ Recent documents	FavoritesMenu		最近文本
 Modified	QueryPoseView		修改
 Created	ContainerWindow		创建
 Move	FSUtils	button label	移动
-Error %error loading add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
+Error %error loading add-On %name.	ContainerWindow		错误 %error，载入附加组件 %name 出错。
 Skip all	FSUtils		跳过所有
 contains	SelectionWindow		包含
 Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
@@ -78,7 +78,7 @@ Size	ContainerWindow		尺寸
 All disks	AutoMounterSettings		所有磁盘
 Would you like to find some other suitable application?	FSUtils		您希望使用其他可用应用程序吗？
 Finish: %time - %finishtime left	StatusWindow		完成：%time - 剩余 %finishtime
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失库：%library）。\n
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		无法打开 \"%document\"，使用 \"%app\" 程序出错（缺失库：%library）。\n
 no items	CountView		无项目
 Ignore case	SelectionWindow		忽略事件
 is not	FindPanel		不是
@@ -120,7 +120,7 @@ Cancel	FSUtils		取消
 Edit name	ContainerWindow		编辑名称
 Show volumes on Desktop	SettingsView		在桌面显示卷
 KiB	WidgetAttributeText		KiB
-Error %error loading Add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
+Error %error loading Add-On %name.	ContainerWindow		错误 %error，载入附加组件 %name 出错 。
 Defaults	TrackerSettingsWindow		默认
 Mini icon view	ContainerWindow		迷你视图
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		无法打开 \"%name\"。  该文件被错误标识为可执行文件。
@@ -130,7 +130,7 @@ Finish: %time - Over %finishtime left	StatusWindow		完成：%time - 剩余 %fin
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		该文件夹中已经存在命名为 \"%name\" 的项目，您希望将其替换为正在创建的符号链接吗？
 Fewer options	FindPanel		简单选项
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		对不起，目标卷中没有足够的空间以复制选取对象。
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法使用 \"%app\" 应用程序打开 \"%document\"（%error)）。
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法打开 \"%document\"，使用 \"%app\" 应用程序出错 (%error)。
 Sorry, saving more than one item is not allowed.	FilePanelPriv		对不起，不允许保存多个项目。
 Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
 New folder	FSUtils		新建文件

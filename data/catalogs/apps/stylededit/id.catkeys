@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-StyledEdit	2229028996
+1	indonesian	x-vnd.Haiku-StyledEdit	2697854206
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Berkas ini ditandai hanya baca. Simpan perubahan ke dokumen \"%s\"? 
 Paste	Menus		Tempel
@@ -24,6 +24,7 @@ Document statistics	Statistics		Statistik dokumen
 Cancel	RevertToSavedAlert		Batal
 Document	Menus		Dokumen
 Save changes to the document \"%s\"? 	QuitAlert		Simpan perubahan ke dokumen \"%s\"? 
+Font	Menus		Fon
 Replace all	FindandReplaceWindow		Ganti semua
 Statistics…	Menus		Statistik…
 Cancel	FindandReplaceWindow		Batal

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-FileTypes	3460643285
+1	indonesian	x-vnd.Haiku-FileTypes	3627644543
 Application types…	FileTypes Window		Tipe aplikasi...
 Description:	Application Types Window		Keterangan:
 Args only	Application Type Window		Hanya args
@@ -38,6 +38,7 @@ Application type	Application Type Window		Jenis aplikasi
 Done	Type List Window		Selesai
 Attribute	Attribute Window		Atribut
 Show recognition rule	FileTypes Window		Tampilkan aturan pengenalan
+Could not open file	FileType Window		Tidak dapat membuka berkas
 Description:	FileTypes Window		Keterangan:
 File	FileTypes Window		Berkas
 Name:	Application Types Window		Nama:
@@ -114,11 +115,24 @@ Internal name:	Attribute Window		Nama internal:
 Show in Tracker…	Application Types Window		Tunjukkan di Tracker...
 Final	Application Type Window		Final
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Lebar:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Tampilkan sebagai:
 This file type already exists	New File Type Window		Jenis file ini sudah sudah ada
+Exclusive launch	Application Type Window		Peluncuran eksklusif
 FileTypes	System name		FileTypes
+Application types	Application Types Window		Jenis aplikasi
+Gamma	Application Type Window		Gama
 Cancel	Preferred App Menu		Batal
 Cancel	FileTypes Window		Batal
 Select preferred application	FileTypes Window		Pilih aplikasi yang disukai
+Right	Attribute Window	Attribute column alignment in Tracker	Kanan
+Default application	FileType Window		Aplikasi asali
+Long description:	Application Type Window		Deskripsi panjang:
+FileTypes request	FileTypes Window		Permintaan FileTypes
+Version info	Application Type Window		Info versi
+Version:	Application Types Window		Versi:
 Preferred application	FileTypes Window		Aplikasi yang disukai
 Short description:	Application Type Window		Deskripsi singkat:
+File could not be opened	Preferred App Menu		Berkas tidak dapat dibuka
+Could not change file extensions	Extension Window		Tidak dapat mengubah ektensi berkas
+Edit icon…	Icon View		Edit ikon…
 Same as…	FileType Window	The same TYPE as ...	Sama seperti...

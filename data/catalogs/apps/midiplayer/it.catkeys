@@ -8,12 +8,12 @@ Volume:	Main Window		Volume:
 Reverb:	Main Window		Riverbero:
 OK	Main Window		OK
 Loading instruments…	Scope View		Caricamento strumenti…
-Off	Main Window		Disattiva
+Off	Main Window		Disattivo
 Dungeon	Main Window		Segreta
 Play	Main Window		Riproduci
 Garage	Main Window		Garage
 Closet	Main Window		Ripostiglio
-MidiPlayer	System name		Lettore Midi
+MidiPlayer	System name		MidiPlayer
 Drop MIDI file here	Scope View		Trascina un file MIDI qui
 Igor's lab	Main Window		Laboratorio di Igor
 Scope	Main Window		Oscilloscopio

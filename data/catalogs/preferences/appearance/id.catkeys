@@ -59,7 +59,7 @@ Scroll bar thumb	Colors tab		Scroll bar thumb
 Control text	Colors tab		Teks kontrol
 Single:	DecorSettingsView		Tunggal:
 Tooltip text	Colors tab		Teks tooltip
-Bold font:	Font view		Fonta tebal:
+Bold font:	Font view		Fon tebal:
 Inactive window border	Colors tab		Batas jendela non-aktif
 Menu item text	Colors tab		Teks daftar item
 LCD subpixel	AntialiasingSettingsView		Subpiksel LCD
@@ -67,8 +67,8 @@ Selected menu item border	Colors tab		Batas daftar item terpilih
 Strong	AntialiasingSettingsView		Kuat
 Panel text	Colors tab		Teks panel
 Arrow style	DecorSettingsView		Gaya panah
-Monospaced fonts only	AntialiasingSettingsView		Hanya fonta monospace
+Monospaced fonts only	AntialiasingSettingsView		Hanya fon monospace
 Look and feel	APRWindow		Tampilan dan rasa
 Antialiasing menu	AntialiasingSettingsView		Menu antialias
-Fonts	APRWindow		Fonta
+Fonts	APRWindow		Fon
 Glyph hinting:	AntialiasingSettingsView		Glyph hinting:

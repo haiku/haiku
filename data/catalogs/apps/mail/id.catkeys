@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Be-MAIL	3664794708
+1	indonesian	x-vnd.Be-MAIL	4033168402
 View	Mail		Melihat
 %d - Date	Mail		Tanggal - %d
 Attach attributes:	Mail		Lampirkan atribut:
@@ -57,8 +57,13 @@ Hide	Mail		Sembunyikan
 Forward without attachments	Mail		Teruskan tanpa lampiran
 Previous	Mail		Sebelumnya
 Redo	Mail		Ulangi
-Add enclosure…	Mail		Tambahkan lampiran…
+Add enclosure…	Mail		Tambah lampiran…
 Mail	System name		Surel
 Print…	Mail		Cetak…
 Warn unencodable:	Mail		Peringatan tak terenskripsi:
 Quit	Mail		Keluar
+Add	Mail		Tambah
+Font:	Mail		Fon:
+(Address unavailable)	Mail		(Alamat tidak tersedia)
+Put your favorite e-mail queries and query templates in this folder.	Mail		Taruh kueri email favorite dan kueri templat anda dalam folder ini.
+Add signature	Mail		Tambah tanda tangan

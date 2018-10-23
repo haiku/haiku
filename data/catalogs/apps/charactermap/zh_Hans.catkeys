@@ -1,12 +1,16 @@
-1	english	x-vnd.Haiku-CharacterMap	1534181938
+1	english	x-vnd.Haiku-CharacterMap	3896407464
 Enclosed alphanumerics	UnicodeBlocks		封装字母数字
 Basic Latin	UnicodeBlocks		基本拉丁语
+Cyrillic extended C	UnicodeBlocks		西里尔字母扩展 C
 View	CharacterWindow		视图
+Cherokee supplement	UnicodeBlocks		切罗基文补充
 Latin-1 supplement	UnicodeBlocks		拉丁语-1补充
 Hebrew	UnicodeBlocks		希伯来语
 Georgian supplement	UnicodeBlocks		格鲁吉亚语补充
+Multani	UnicodeBlocks		Multani
 CJK unified ideographs	UnicodeBlocks		CJK 统一象形文字
 Modifier tone letters	UnicodeBlocks		声调修饰字母
+Old Hungarian	UnicodeBlocks		古匈牙利语
 Khmer	UnicodeBlocks		高棉语
 Supplementary private use area A	UnicodeBlocks		单独使用区域扩充 A
 Hanunoo	UnicodeBlocks		哈努诺文
@@ -25,7 +29,9 @@ Ol Chiki	UnicodeBlocks		雷鬼摇摆乐
 Arabic	UnicodeBlocks		阿拉伯语
 Ethiopic extended	UnicodeBlocks		埃塞俄比亚语扩展
 Arrows	UnicodeBlocks		箭头
+Sutton SignWriting	UnicodeBlocks		Sutton SignWriting
 Font	CharacterWindow		字体
+Hatran	UnicodeBlocks		Hatran
 Variation selectors supplement	UnicodeBlocks		变异选择符扩充
 Gujarati	UnicodeBlocks		Gujarati
 Cuneiform	UnicodeBlocks		楔形文字
@@ -33,6 +39,7 @@ CJK radicals supplement	UnicodeBlocks		CJK 字根补充
 Balinese	UnicodeBlocks		巴厘语
 Cham	UnicodeBlocks		卡姆语
 Specials	UnicodeBlocks		专有字符
+Ahom	UnicodeBlocks		Ahom
 CJK compatibility ideographs	UnicodeBlocks		CJK 兼容象形文字
 Phonetic extensions	UnicodeBlocks		注音扩展
 Khmer symbols	UnicodeBlocks		高棉语符号
@@ -122,6 +129,7 @@ Ancient Greek numbers	UnicodeBlocks		古希腊数字
 Vai	UnicodeBlocks		瓦伊语
 Yi Radicals	UnicodeBlocks		彝文字根
 Cyrillic extended B	UnicodeBlocks		斯拉夫文扩展 B
+Mongolian supplement	UnicodeBlocks		格鲁吉亚语补充
 Quit	CharacterWindow		退出
 Ancient symbols	UnicodeBlocks		古代符号
 Braille patterns	UnicodeBlocks		盲文图案
@@ -161,6 +169,7 @@ Alphabetic presentation forms	UnicodeBlocks		字母表现形式
 Halfwidth and fullwidth forms	UnicodeBlocks		半型及全型形式
 Lydian	UnicodeBlocks		吕底亚语
 Ethiopic supplement	UnicodeBlocks		埃塞俄比亚语扩展
+CJK unified ideographs extension E	UnicodeBlocks		CJK 统一象形文字扩展 E
 Latin extended B	UnicodeBlocks		拉丁语扩展 B
 Box drawing	UnicodeBlocks		方格绘制
 Mathematical alphanumeric symbols	UnicodeBlocks		数学字符数字符号

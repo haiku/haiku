@@ -1,6 +1,6 @@
 1	italian	x-vnd.Haiku-libtracker	3394192241
 OK	WidgetAttributeText		OK
-Add-ons	FilePanelPriv		Add-on
+Add-ons	FilePanelPriv		Componenti aggiuntivi
 Mount settings…	ContainerWindow		Impostazioni di mount
 Desktop	Model		Scrivania
 Identify	ContainerWindow		Identifica
@@ -21,7 +21,7 @@ Modified	QueryPoseView		Modificato
 Created	ContainerWindow		Creato
 Unmatched brackets.	libtracker		Parentesi non bilanciate.
 Move	FSUtils	button label	Sposta
-Error %error loading add-On %name.	ContainerWindow		Il caricamento dell'add-On %name ha generato il seguente errore: %error.
+Error %error loading add-On %name.	ContainerWindow		Il caricamento del componente aggiuntivo %name ha generato il seguente errore: %error.
 Skip all	FSUtils		Salta tutti
 contains	SelectionWindow		contiene
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Non è possibile salvare nulla sulla directory principale (root) del sistema.
@@ -133,12 +133,12 @@ Edit name	ContainerWindow		Modifica nome
 Nested *?+.	libtracker		Annidamento tra *?+.
 Show volumes on Desktop	SettingsView		Mostra i volumi sulla Scrivania
 KiB	WidgetAttributeText		KiB
-Error %error loading Add-On %name.	ContainerWindow		Errore %error caricando l'Add-On %name.
+Error %error loading Add-On %name.	ContainerWindow		Errore %error caricando il componente aggiuntivo %name.
 Mini	ContainerWindow		Mini
 Defaults	TrackerSettingsWindow		Predefiniti
 Mini icon view	ContainerWindow		Visualizza icone piccole
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Non è stato possibile aprire \"%name\". Il file è stato erroneamente marcato come eseguibile. 
-Add-ons	ContainerWindow		Add-on
+Add-ons	ContainerWindow		Componenti aggiuntivi
 Edit templates…	TemplatesMenu		Modifica modelli…
 Finish: %time - Over %finishtime left	StatusWindow		Completamento: %time - %finishtime mancanti
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Esiste già in questa cartella un elemento chiamato \"%name\". Vuoi sostituirlo con il collegamento simbolico che stai creando?
@@ -270,7 +270,7 @@ Reverse order	ContainerWindow		Ordine inverso
 48 x 48	DeskWindow		48 × 48
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# elemento} other{# elementi}}
 OK	OpenWithWindow		OK
-Add current folder	FilePanelPriv		Aggiungi cartella attuale
+Add current folder	FilePanelPriv		Aggiungi cartella corrente
 Invalid bracket range.	libtracker		Area in parentesi non valida.
 Name	Default Query Columns		Nome
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (Simbolo mancante: %symbol). \n
@@ -392,7 +392,7 @@ Preferences…	ContainerWindow		Preferenze…
 Move	PoseView		Sposta
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sei sicuro di voler eliminare gli elementi selezionati? Questa operazione non può essere annullata.
-Add-ons	DeskWindow		Add-on
+Add-ons	DeskWindow		Componenti aggiuntivi
 Name	FindPanel		Nome
 And	FindPanel		E
 Select…	DeskWindow		Seleziona…

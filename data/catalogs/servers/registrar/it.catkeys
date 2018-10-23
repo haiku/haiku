@@ -3,7 +3,7 @@ Restart system	ShutdownProcess		Riavvia il sistema
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'applicazione \"%appName%\" potrebbe essere bloccata da una finestra di dialogo.
 OK	ShutdownProcess		OK
 System is shut down	ShutdownProcess		Sistema in fase di spegnimento
-It's now safe to turn off the computer.	ShutdownProcess		Ora è sicuro spegnere il computer.
+It's now safe to turn off the computer.	ShutdownProcess		Puoi spegnere il computer, adesso.
 Cancel	ShutdownProcess		Annulla
 Do you really want to shut down the system?	ShutdownProcess		Vuoi davvero spegnere il computer?
 Asking other processes to quit.	ShutdownProcess		In attesa della chiusura degli altri processi

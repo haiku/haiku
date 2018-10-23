@@ -14,7 +14,7 @@ Unknown device	Device		Dispositivo sconosciuto
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informazioni classe:\t\t\t\t: %classInfo%
 Processor	DeviceSCSI		Processore
 RBC	DeviceSCSI		RBC
-Detailed	DevicesView		Dettagliato
+Detailed	DevicesView		Informazioni dettagliate
 Category	DevicesView		Categoria
 Quit	DevicesView		Esci
 Device paths	Device		Percorsi del dispositivo
@@ -56,7 +56,7 @@ Manufacturer:	Device		Produttore:
 ACPI bus	DevicesView		Bus ACPI
 Changer	DeviceSCSI		Modificatore
 ACPI System Bus	DeviceACPI		Bus di Sistema ACPI
-Devices	System name		Dispositivi
+Devices	System name		Devices
 Worm	DeviceSCSI		Worm
 Multimedia controller	Device		Controller multimediale
 Unknown	DevicePCI		sconosciuto
@@ -85,7 +85,7 @@ Graphics Peripheral	DeviceSCSI		Periferica Grafica
 Tape Drive	DeviceSCSI		Unità a nastro
 Bus Information	Device		Informazioni Bus
 Connection	DevicesView		Connessione
-Generate system information	DevicesView		Generare informazioni di sistema
+Generate system information	DevicesView		Genera informazioni di sistema
 Encryption controller	Device		Controller di cifratura
 Unclassified device	Device		Dispositivo non classificato
 Device name	DeviceSCSI		Nome del dispositivo

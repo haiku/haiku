@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	3694689316
+1	english	x-vnd.Haiku-Installer	1083967962
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器，用于配置 Haiku 引导菜单，该程序无法启动。
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		您是否确定终止安装，重新启动系统？
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		系统安装器\n\t编写者：Jérôme Duval 和 Stephan Aßmus \n\t版权所有 2005-2001 Haiku, Inc.\n\n
@@ -21,6 +21,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		安装必读\n\n
 Continue	InstallerWindow	In alert after pressing Stop	继续
 Write boot sector to '%s'	InstallerWindow		引导扇区写入到 '%s'
 Collecting copy information.	InstallProgress		收集复制信息。
+Have fun and thanks for trying out Haiku!	InstallerApp		祝你使用愉快，感谢尝试使用 Haiku!
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Quit Boot Manager and DriveSetup	InstallerWindow		退出引导管理器和磁盘管理器
 Quit	InstallerWindow		退出
@@ -38,7 +39,7 @@ Please close the Boot Manager and DriveSetup windows before closing the Installe
 Scanning for disks…	InstallerWindow		扫描磁盘...
 The disk can't be mounted. Please choose a different disk.	InstallProgress		磁盘无法挂载。请选择其他磁盘。
 ?? of ??	InstallerWindow	Unknown progress	??来源于??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		启动磁盘管理器为和其他媒介进行分区。\n分区可以初始化为 Be 文件系统以作为 \n Haiku 引导分区。
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		启动磁盘管理器为可用硬盘\n和其他媒介进行分区。\n分区可以初始化为 Be \n 文件系统以作为 Haiku \n引导分区。
 Show optional packages	InstallerWindow		显示附加软件包
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		未发现可用于安装的分区。请设置分区，并至少将一个分区初始化为 Be 文件系统。
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择希望安装的磁盘。然后点击\"开始\"。

@@ -5,7 +5,7 @@ Rotation: %d	ControlView		Rotasi: %d
 Shear: %d	ControlView		Pencukuran: %d
 Spacing: %d	ControlView		Jarak: %d
 Cycle fonts	ControlView		Siklus font
-Font:	ControlView		Font:
+Font:	ControlView		Fon:
 Drawing mode:	ControlView		Mode gambar:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Kontrol

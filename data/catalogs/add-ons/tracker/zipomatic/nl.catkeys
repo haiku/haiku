@@ -1,15 +1,17 @@
-1	dutch; flemish	x-vnd.haiku.zip-o-matic	1573273374
+1	dutch; flemish	x-vnd.haiku.zip-o-matic	2032806096
 Stop	file:ZipOMaticWindow.cpp		Stop
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creëert archief: %s
 Continue	file:ZipOMaticWindow.cpp		Doorgaan
 Preparing to archive	file:ZipperThread.cpp		Archivering voorbereiden
 Drop files here.	file:ZipOMaticWindow.cpp		Plaats de bestanden hier.
 Filename: %s	file:ZipOMaticWindow.cpp		Bestandsnaam: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Er {0, plural, one{is # Zip-O-Matic} other{zijn # Zip-O-Matics}} actief.\n\n
 Let them continue	file:ZipOMatic.cpp		Laat ze doorgaan
 Do you want to stop them?	file:ZipOMatic.cpp		Wilt u ze stoppen?
 Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Bent u zeker dat u de creatie van dit archief wilt stoppen?
 Stopped	file:ZipOMaticWindow.cpp		Gestopt
 Archive	file:ZipperThread.cpp		Archief
 Error creating archive	file:ZipOMaticWindow.cpp		Fout bij creatie van archief
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# bestand} other{# bestanden}} toegevoegd.
 Archive created OK	file:ZipOMaticWindow.cpp		Creatie van archief gelukt
 Stop them	file:ZipOMatic.cpp		Stoppen

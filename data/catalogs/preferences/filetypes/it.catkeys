@@ -1,5 +1,5 @@
 1	italian	x-vnd.Haiku-FileTypes	734679611
-Application types…	FileTypes Window		Tipi dell'applicazione…
+Application types…	FileTypes Window		Tipi applicazioni…
 Description:	Application Types Window		Descrizione
 Args only	Application Type Window		Solo argomenti
 Recognition rule is not valid:\n\n	FileTypes Window		Regola per il riconoscimento non valida:\n\n
@@ -10,7 +10,7 @@ Remove icon	Icon View		Rimuovi icona
 Supported types	Application Type Window		Tipi supportati
 Show icons in list	FileTypes Window		Mostra le icone nell'elenco
 Type name:	FileTypes Window		Nome del tipo:
-Internal name:	New File Type Window		Nome intrinseco:
+Internal name:	New File Type Window		Nome interno:
 Choose type	Type List Window		Seleziona il tipo
 New file type	New File Type Window		Nuovo tipo di file
 Rule:	FileTypes Window		Regola:
@@ -100,7 +100,7 @@ Cancel	New File Type Window		Annulla
 Icon	FileTypes Window		Icona
 Extension:	Extension Window		Estensione:
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozione di un super tipo non può essere annullata.\nTutti i tipi di file appartenenti a questo super tipo saranno perduti!\n\nSei sicuro di voler continuare? Per rimuovere l'intero gruppo, tieni premuto il tasto Maiuscole e premi \"Rimuovi\".
-Internal name:	FileTypes Window		Nome intrinseco:
+Internal name:	FileTypes Window		Nome interno:
 Add	Attribute Window		Aggiungi
 Close	Application Type Window		Chiudi
 File recognition	FileTypes Window		Riconoscimento del file
@@ -112,7 +112,7 @@ Alignment:	Attribute Window		Allineamento:
 Left	Attribute Window	Attribute column alignment in Tracker	Sinistra
 Cancel	Extension Window		Annulla
 Path:	Application Types Window		Percorso:
-Application flags	Application Type Window		Flag dell'applicazione
+Application flags	Application Type Window		Opzioni applicazione
 Cancel	Type List Window		Annulla
 Move up	FileTypes Window		Sposta su
 Description	FileTypes Window		Descrizione
@@ -129,7 +129,7 @@ Final	Application Type Window		Finale
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Larghezza:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Mostra come:
 This file type already exists	New File Type Window		Questo tipo è già esistente
-Same as…	FileTypes Window		Lo stesso di…
+Same as…	FileTypes Window		La stesso di…
 Exclusive launch	Application Type Window		Avvio esclusivo
 FileTypes	System name		Tipi di File
 Application types	Application Types Window		Tipi applicazioni
@@ -151,7 +151,7 @@ Short description:	Application Type Window		Descrizione breve:
 File could not be opened	Preferred App Menu		Impossibile aprire il file
 Could not change file extensions	Extension Window		Impossibile modificare le estensioni del file
 Edit icon…	Icon View		Modifica icona…
-Same as…	FileType Window	The same TYPE as ...	Lo stesso di…
+Same as…	FileType Window	The same TYPE as ...	La stesso di…
 Save into resource file…	Application Type Window		Salva in un file risorsa…
 Visible	Attribute Window		Visibile
 Could not install file type	New File Type Window		Impossibile installare il tipo di file

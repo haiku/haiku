@@ -1,12 +1,12 @@
 1	english	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		恢复快照
-Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n 
+Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n
 Export as…	SudokuWindow		导出为...
 OK	SudokuWindow		确定
 New	SudokuWindow		新建
 Abort	ProgressWindow		关于
 Sudoku	System name		数独
-Could not open \"%s\":\n%s\n	SudokuWindow		无法打开 \"%s\"：\n%s\n 
+Could not open \"%s\":\n%s\n	SudokuWindow		无法打开 \"%s\"：\n%s\n
 Easy	SudokuWindow		容易
 Open file…	SudokuWindow		打开文件...
 Solve single field	SudokuWindow		保存单个区域
@@ -19,7 +19,7 @@ HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		数独要求
 Copy	SudokuWindow		复制
 Mark valid hints	SudokuWindow		标记有效线索
-Sudoku solved - congratulations!\n	SudokuWindow		数独已完成 - 祝贺您取得成功！\n 
+Sudoku solved - congratulations!\n	SudokuWindow		数独已完成 - 祝贺您取得成功！\n
 Hard	SudokuWindow		困难
 Snapshot current	SudokuWindow		当前快照
 Text	SudokuWindow		文本

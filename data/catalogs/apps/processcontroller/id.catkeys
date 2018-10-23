@@ -1,0 +1,18 @@
+1	indonesian	x-vnd.Haiku-ProcessController	2677715882
+Memory usage	ProcessController		Pemakaian memori
+Cancel	ProcessController		Batal
+Processor %d	ProcessController		Prosesor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+Info	ProcessController		Info
+Quit application	ProcessController		Keluar aplikasi
+Low priority	ProcessController		Prioritas rendah
+New Terminal	ProcessController		Terminal baru
+Urgent priority	ProcessController		Priority penting
+About ProcessController…	ProcessController		Tentang ProcessController…
+Ok!	ProcessController		Ok!
+Quit an application	ProcessController		Hentikan suatu aplikasi
+Low latency	ProcessController		Latensi rendah
+OK	ProcessController		OK
+Usage: %s [-deskbar]\n	ProcessController		Penggunaan: %s [-deskbar]\n
+Please confirm	ProcessController		Mohon konfirmasi
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Anda dapat menjalankan ProcessController dalam sebuah window atau memasangnya di Deskbar.

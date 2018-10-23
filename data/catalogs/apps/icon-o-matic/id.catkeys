@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	3449344557
+1	indonesian	x-vnd.haiku-icon_o_matic	3531701790
 Select All	Icon-O-Matic-PathManipulator		Pilih Semua
 Add Style	Icon-O-Matic-AddStylesCmd		Tambahkan Gaya
 Color (#%02x%02x%02x)	Style name after dropping a color		warna (#%02x%02x%02x)
@@ -57,4 +57,57 @@ Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Bekukan Bentuk
 PNG Set	Icon-O-Matic-SavePanel		Set PNG
 Joins	Icon-O-Matic-PropertyNames		Gabung
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Hapus Gaya
+Set 	Set (property name)		Set 
 Cancel	Icon-O-Matic-SVGExport		Batal
+Add shape with style	Icon-O-Matic-Menu-Shape		Tambah bentuk dengan gaya
+Settings	Icon-O-Matic-Menus		Pengaturan
+All	Icon-O-Matic-Properties		Semua
+Add Shape	Icon-O-Matic-AddShapesCmd		Tambah Bentuk
+Contour	Transformation		Kontur
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Simpan perubahan ikon sekarang sebelum menutup?
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nothing to redo>
+Perspective	Transformation		Perspektif
+Add with path	Icon-O-Matic-ShapesList		Tambah dengan jalur
+Export icon	Dialog title		Ekspor ikon
+Cancel	Icon-O-Matic-Menu-Settings		Batal
+Split	Icon-O-Matic-PathManipulator		Bagi
+Add with path & style	Icon-O-Matic-ShapesList		Tambah dengan jalur & gaya
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotasi
+Add Transformer	Icon-O-Matic-AddTransformersCmd		Tambah Transformator
+Pick a color	Icon-O-Matic-ColorPicker		Pilih warna
+Quit	Icon-O-Matic-Menu-File		Keluar
+Export	Icon-O-Matic-Menu-File		Ekspor
+No	Icon-O-Matic-StyledTextImport		Tidak
+Add	Icon-O-Matic-TransformersList		Tambah
+Color	Icon-O-Matic-StyleTypes		Warna
+Perspective	Icon-O-Matic-TransformersList		Perspektif
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Tambah bentuk dengan jalur & gaya
+Export as…	Icon-O-Matic-Menu-File		Ekspor sebagai…
+Transformation	Transformation		Transformasi
+Save	Icon-O-Matic-Menu-Settings		Simpan
+Add empty	Icon-O-Matic-ShapesList		Tambah kosong
+Close	Icon-O-Matic-Menu-File		Tutup
+Cancel	Icon-O-Matic-ColorPicker		Batal
+Shape	Icon-O-Matic-Menus		Bentuk
+File	Icon-O-Matic-Menus		Berkas
+Error: 	Icon-O-Matic-Exporter		Galat: 
+Add Transformers	Icon-O-Matic-AddTransformersCmd		Tambah Transformator
+Rotation	Icon-O-Matic-PropertyNames		Rotasi
+Add with style	Icon-O-Matic-ShapesList		Tambah dengan gaya
+Add	Icon-O-Matic-PathsList		Tambah
+Add Shapes	Icon-O-Matic-AddShapesCmd		Tambah Bentuk
+Yes	Icon-O-Matic-StyledTextImport		Ya
+Transformation	Icon-O-Matic-TransformersList		Transformasi
+Add Styles	Icon-O-Matic-AddStylesCmd		Tambah Gaya
+Edit	Icon-O-Matic-Menus		Edit
+Add Paths	Icon-O-Matic-AddPathsCmd		Tambah Jalur
+Add Path	Icon-O-Matic-AddPathsCmd		Tambah Jalur
+Color	Icon-O-Matic-PropertyNames		Warna
+OK	Icon-O-Matic-SVGImport		OK
+Scale	Icon-O-Matic-TransformationBoxStates		Skala
+Duplicate	Icon-O-Matic-PathsList		Duplikat
+Save	Icon-O-Matic-Menu-File		Simpan
+Text too long	Icon-O-Matic-StyledTextImport		Teks terlalu panjang
+Open…	Icon-O-Matic-Menu-File		Buka…
+Save icon	Dialog title		Simpan ikon
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Warna (#%02x%02x%02x)

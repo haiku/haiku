@@ -3,7 +3,7 @@ OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Cancel	ShortcutsWindow		Abbrechen
 Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen…
-Control	ShortcutsSpec	Name for modifier on keyboard	Steuerung
+Control	ShortcutsSpec	Name for modifier on keyboard	Strg
 Key	ShortcutsWindow		Taste
 Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
 Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?

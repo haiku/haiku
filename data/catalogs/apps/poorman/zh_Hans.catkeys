@@ -34,7 +34,7 @@ Log to console	PoorMan		输出日志到控制台
 Directory: (none)	PoorMan		目录：（无）
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		请选择j将要在网络上发布的目录。\n\n 您可以使用 PoorMan 在 home 目录中创建默认的  \"public_html\"。\n或者选择自定义的目录。
 Log To Console	PoorMan		控制台日志
-{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# 连接} other{# 连接}}
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} other{# connections}}
 Connections	PoorMan		连接
 Status: Running	PoorMan		状态：运行
 Controls	PoorMan		控制

@@ -26,7 +26,7 @@ OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Traccia %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Modalità visualizzazione
-Medium	MediaPlayer-SettingsWindow		Medio
+Medium	MediaPlayer-SettingsWindow		Medi
 Open network stream	MediaPlayer-NetworkStream		Apri stream di rete
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Open…	MediaPlayer-PlaylistWindow		Apri…
@@ -100,7 +100,7 @@ It appears the media server is not running.\nWould you like to start it ?	MediaP
 Duration	MediaPlayer-InfoWin		Durata
 Aspect ratio	MediaPlayer-Main		Proporzioni
 Error: 	MediaPlayer-Main		Errore: 
-Large	MediaPlayer-SettingsWindow		Grande
+Large	MediaPlayer-SettingsWindow		Grandi
 Bottom of video	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
 DrawBitmap	MediaPlayer-InfoWin		Disegna bitmap
 always	MediaPlayer-SettingsWindow		sempre
@@ -117,9 +117,9 @@ Move file to Trash	MediaPlayer-PlaylistWindow		Sposta file nel Cestino
 Invalid URL inserted!	MediaPlayer-NetworkStream		Immesso URL invalido!
 OK	MediaPlayer-NetworkStream		OK
 min	MediaPlayer-InfoWin	Minutes	min
-Small	MediaPlayer-SettingsWindow		Piccolo
+Small	MediaPlayer-SettingsWindow		Piccoli
 Randomize	MediaPlayer-PlaylistWindow		Casuale
-Off	Subtitles menu		Off
+Off	Subtitles menu		Disattivi
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Rendi casuali gli elementi
 Revert	MediaPlayer-SettingsWindow		Ripristina
 Edit	MediaPlayer-PlaylistWindow		Modifica

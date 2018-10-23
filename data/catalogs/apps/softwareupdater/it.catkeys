@@ -6,7 +6,7 @@ Update now	SoftwareUpdaterWindow		Aggiorna ora
 Updates did not complete	UpdateAction		Gli aggiornamenti non sono stati completati
 Checking for updates	CheckManager		Controllo aggiornamenti in corso...
 %count% packages have available updates	CheckManager		%count% pacchetti hanno degli aggiornamenti disponibili
-SoftwareUpdater	System name		Aggiornamento del Sistema
+SoftwareUpdater	System name		SoftwareUpdater
 Fatal error while checking for updates: %s\n	CheckAction		Errore critico durante il controllo per gli aggiornamenti: %s\n
 No remote repositories are available	UpdateManager	Error message	Nessun repository remoto disponibile
 No updates available	UpdateAction		Nessun aggiornamento disponibile
@@ -33,7 +33,7 @@ Updates completed	UpdateManager		Aggiornamenti completati
 Invalid update type, cannot continue with updates	UpdateAction		Tipo di aggiornamento non valido, impossibile continuare con gli aggiornamenti
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacchetti da disinstallare
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Gli aggiornamenti non sono stati completati, sei sicuro di voler uscire?
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Uso:  SoftwareUpdater <command> [ <option> ]\nAggiorna i pacchetti installati.\n\nComandio:\n  update     - Cerca i repository per aggiornamenti per tutti i pacchetti.\n  check      - Cerca per aggiornamenti disponibili, ma mostra soltanto una notifica con i risultati.\n  full-sync  - Sincronizza i pacchetti installati con i repository.\n\nOpzioni:\n  -h or --help       Mostra questo messaggio di aiuto\n  -v or --verbose    Mostra informazioni di dettaglio\n
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Uso:  SoftwareUpdater <comando> [ <opzioni> ]\nAggiorna i pacchetti installati.\n\nComandi:\n  update     - Cerca i repository per aggiornamenti per tutti i pacchetti.\n  check      - Cerca per aggiornamenti disponibili, ma mostra soltanto una notifica con i risultati.\n  full-sync  - Sincronizza i pacchetti installati con i repository.\n\nOpzioni:\n  -h or --help       Mostra questo messaggio di aiuto\n  -v or --verbose    Mostra informazioni di dettaglio\n
 There were no updates found.	CheckAction		Non sono stati trovati aggiornamenti.
 %i of %i	UpdateManager	Do not translate %i	%i di %i
 Updates found	SoftwareUpdaterWindow		Aggiornamenti trovati
@@ -51,7 +51,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Aggiorna
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Nuovi pacchetti che verranno installati
 OK	UpdateManager		OK
 A reboot may be necessary to complete some updates.	UpdateManager		Un riavvio potrebbe essere necessario per completare alcuni aggiornamenti.
-Open Repositories	SoftwareUpdaterWindow	Alert button label	Apri Repositories
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Apri Repository
 Show more details	SoftwareUpdaterWindow		Mostra ulteriori dettagli
 Contacting software repositories to check for package updates.	CheckManager		Contatta i repository del software per verificare la presenza di aggiornamenti ai pacchetti.
 Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizzazione completa

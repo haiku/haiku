@@ -36,7 +36,7 @@ Cancel	MediaConverter		Batalkan
 None available	Video codecs		Tak ada yang tersedia
 Conversion cancelled	MediaConverter		Konversi dibatalkan
 No file selected	MediaConverter-FileInfo		Tak ada berkas yang dipilih
-Select this folder	MediaConverter		Pilih pelipat ini
+Select this folder	MediaConverter		Pilih folder ini
 Error creating track.	MediaConverter		Ada galat saat membuat lintasan
 Continue	MediaConverter		Lanjutkan
 Encoder parameters	MediaConverter-EncoderWindow		Parameter enkoder
@@ -63,6 +63,6 @@ Input file not recognized as Audio or Video	MediaConverter		Berkas masukan tidak
 Convert	MediaConverter		Mengkonversi
 Video quality: %3d%%	MediaConverter		Kualitas video: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
-Output folder	MediaConverter		Keluaran pelipat
+Output folder	MediaConverter		Folder keluaran
 Audio quality: %3d%%	MediaConverter		Kualitas audio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ada galat saat membaca info file.\n\nGalat : 

@@ -2,7 +2,7 @@
 Memory usage	ProcessController		Uso della memoria
 Kill this team!	ProcessController		Termina questo team!
 Idle priority	ProcessController		Priorità inattivo
-Restart Deskbar	ProcessController		Riavvia Deskbar
+Restart Deskbar	ProcessController		Riavvia la Deskbar
 Custom priority	ProcessController		Priorità personalizzata
 This team is already gone…	ProcessController		Questo team è già terminato...
 Error saving file	ProcessController		Errore nel salvataggio del file
@@ -44,7 +44,7 @@ Debug this team!	ProcessController		Effettua il debug di questo team!
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
 ProcessController	System name		Gestione Processi
 Real-time display priority	ProcessController		Priorità video in tempo reale
-Please confirm	ProcessController		Confermate
+Please confirm	ProcessController		Conferma
 System resources & caches…	ProcessController		Risorse di sistema & cache
 That's no Fun!	ProcessController		Non è divertente!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		E' possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		È possibile eseguire Gestione Processi in una finestra o installarlo nella Deskbar.

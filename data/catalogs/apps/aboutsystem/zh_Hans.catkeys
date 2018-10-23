@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	202089568
+1	english	x-vnd.Haiku-About	3963412481
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权所有 © 1999-2010 Gutenprint 的所有编写者，保留所有权利。
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		版权所有 © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Past website & marketing:\n	AboutView		早先网站及市场：\n
@@ -12,12 +12,15 @@ AboutSystem	System name		关于系统
 Copyright © 2003 Peter Hanappe and others.	AboutView		版权所有 © 2003 Peter Hanappe 及其他人员。
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		版权所有 © 1994-1997 Mark Kilgard。保留所有权利。
 Revision	AboutView		发行版本
+Copyright © 2009 Colin Percival	AboutView		版权所有© 2009 Colin Percival
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. 及其开发团队，它们的努力孕育了 BeOS！\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		版权所有 © 1999-2000 Y.Takagi。保留所有权利。
 Source Code: 	AboutView		源代码： 
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{处理器:} other{# 处理器:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
 Kernel:	AboutView		内核：
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		版权所有 © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
 BSD (4-clause)	AboutWindow		BSD (4-clause)
+Copyright © 2012-2016 Google Internationalization team.	AboutView		版权所有 © 2012-2016 Google 国际化团队。
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku 代码的版权属于 Haiku, Inc. ，或者代码中注明的相应作者。Haiku® 和 HAIKU 标志® 是 Haiku, Inc. 的注册商标。\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		版权所有 © 1987-1988 Digital Equipment Corporation，Maynard, Massachusetts。\n保留所有权利。
 GNU LGPL v2	AboutWindow		GNU LGPL v2
@@ -67,6 +70,7 @@ GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		版权所有 © 1991-2000 Silicon Graphic, Inc，保留所有权利。
 …and the many people making donations!\n\n	AboutView		…以及其他更多的贡献者！\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[点击协议名称阅读相关协议。]\n\n
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER 是 Bitstream Inc. 的注册商标。
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		版权素有 © 1990-2002 Info-ZIP，保留所有权利。
 License: 	AboutView		协议： 

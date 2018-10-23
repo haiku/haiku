@@ -9,7 +9,7 @@ Stick coordinates	Magnify-Main		Mantieni queste coordinate
 Show info	Magnify-Main		Mostra informazioni
 magnify: size must be a multiple of 4\n	Console		magnify: la dimensione deve essere un multiplo di 4\n
 Decrease pixel size	Magnify-Main		Diminuisci la dimensione dei pixel
-Magnify	System name		Ingrandimento
+Magnify	System name		Magnify
 Info	Magnify-Main		Informazioni
 Remove a crosshair	Magnify-Main		Rimuovi un mirino
 Show grid	Magnify-Main		Mostra griglia

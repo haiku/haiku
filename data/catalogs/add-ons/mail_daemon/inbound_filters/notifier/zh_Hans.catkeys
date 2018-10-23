@@ -3,7 +3,7 @@ You have {0, plural, one{One new message} other{# new messages}} for %account.	N
 none	NotifierConfigView		无
 Method:	NotifierConfigView		方法：
 Beep	NotifierConfigView		蜂鸣
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{一条新消息} other{# 更多新消息}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
 New mails notification	NotifierFilter		新邮件通知
 Central alert	NotifierConfigView		中部警告
 OK	NotifierFilter		确定

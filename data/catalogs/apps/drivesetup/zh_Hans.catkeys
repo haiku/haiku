@@ -18,10 +18,10 @@ Failed to initialize the disk %s!\n	MainWindow		初始化磁盘 %s 失败！\n
 The selected disk is read-only.	MainWindow		所选磁盘是只读的。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化分区 \"%s\" ？在磁盘写入修改前，您将需要再次确认。
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		是否强制卸载？\n\n注意：如果目前应用正在写入卷，强制卸载可能会导致数据丢失。\n
-Could not mount partition %s.	MainWindow		无法挂载分区 ％s。
+Could not mount partition %s.	MainWindow		无法挂载分区 %s.
 The partition %s has been successfully formatted.\n	MainWindow		分区 %s 已完成初始化。\n
 Change parameters	MainWindow		修改参数
-The partition %s is already unmounted.	MainWindow		分区 ％s 已经卸载。  
+The partition %s is already unmounted.	MainWindow		分区 %s 已经卸载。  
 Failed to delete the partition. No changes have been written to disk.	MainWindow		删除分区失败。所作修改未写入磁盘。
 Could not delete the selected partition.	MainWindow		无法删除所选分区。  
 Initialize	MainWindow		初始化
@@ -45,7 +45,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定删除所选分区吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
 Create…	MainWindow		创建…
 Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		是否希望格式化磁盘？(通常需要首先利用分区软件初始化磁盘)在修改写入磁盘前需要再次进行确认。
-The disk has been successfully initialized.\n	MainWindow		磁盘 %s 已完成初始化。\n
+The disk has been successfully initialized.\n	MainWindow		磁盘已成功完成初始化。\n
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		修改分区参数失败。修改未写入磁盘。
 Failed to format the partition %s!\n	MainWindow		分区 %s 格式化失败！\n

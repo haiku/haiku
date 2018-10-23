@@ -4,7 +4,7 @@ Are you sure you want to abort the installation and restart the system?	Installe
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tditulis oleh Jérôme Duval dan Stephan Aßmus\n\tHakcipta 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalasi selesai. Boot sector telah ditulis ke '%s'. Tekan Keluar untuk meninggalkan Installer atau pilih volume target baru untuk melakukan instalasi lain.
 Quit	InstallerApp		Keluar
-Additional disk space required: 0.0 KiB	InstallerWindow		Ruang disk tambahan yang diperlukan: 0.0 KiB
+Additional disk space required: 0.0 KiB	InstallerWindow		Ruang diska tambahan yang diperlukan: 0.0 KiB
 Stop	InstallerWindow	In alert after pressing Stop	Berhenti
 Install progress:  	InstallerWindow		Perkembangan instalasi:  
 Starting Installation.	InstallProgress		Memulai Instalasi.
@@ -76,7 +76,7 @@ No optional packages available.	PackagesView		Tidak ada paket opsional yang ters
 Continue	InstallerApp		Lanjut
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ini adalah perangkat lunak berkualitas beta! Itu berarti ada risiko kehilangan data penting. Sering membuat cadangan! Anda telah diperingatkan.\n\n\n
 Boot sector not written because of an internal error.	InstallProgress		Boot sector tidak ditulis karena kesalahan internal.
-Additional disk space required: %s	InstallerWindow		Ruang disk tambahan yang diperlukan: %s
+Additional disk space required: %s	InstallerWindow		Ruang diska tambahan yang diperlukan: %s
 Cancel	InstallProgress		Batal
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Menjalankan Boot Manager dan DriveSetup…\n\nTutup kedua aplikasi untuk melanjutkan instalasi.
 Try installing anyway	InstallProgress		Bagaimanapun coba instal

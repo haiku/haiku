@@ -6,7 +6,7 @@ Resolution: 	Image Filepanel		Resolusi:
 pick one	Main View		pilih satu
 Default	Main View		Bawaan
 Center	Main View		Tengah
-Folder: %path	Main View		Pelipat: %path
+Folder: %path	Main View		Folder: %path
 Manual	Main View		Manual
 Set background image error	Main View		Atur gambar latar belakang masalah
 Default folder	Main View		Manual

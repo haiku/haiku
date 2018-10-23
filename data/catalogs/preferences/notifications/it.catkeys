@@ -27,7 +27,7 @@ pixels	GeneralView		pixel
 Application	NotificationView		Applicazione
 Width:	GeneralView		Larghezza:
 seconds	GeneralView		secondi
-Mute notifications from this application	NotificationView		Silenzia le notifiche da quest'applicazione
+Mute notifications from this application	NotificationView		Silenzia le notifiche da questa applicazione
 Upper right	GeneralView		In alto a destra
  is already listed	NotificationView	Alert message	 è già in elenco
 Lower left	GeneralView		In basso a sinistra

@@ -1,8 +1,9 @@
-1	indonesian	x-vnd.Haiku-SoundRecorder	3829382335
+1	indonesian	x-vnd.Haiku-SoundRecorder	14314667
 Loop	RecorderWindow		Loop
 Cannot find default audio hardware	RecorderWindow		Tidak dapat menemukan perangkat lunak audio default
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Tidak dapat menemukan berkas sementara yang dibuat untuk mempertahankan rekaman terbaru
 Sample size:	RecorderWindow		Ukuran sampel:
+Duration: 	RecorderWindow		Durasi: 
 File info	RecorderWindow		Info berkas
 Drop files here	SoundListView		Jatuhkan berkas di sini
 Input	RecorderWindow		Masukan
@@ -10,6 +11,7 @@ Some of the files don't appear to be audio files.	RecorderWindow		Beberapa berka
 Stop	RecorderWindow		Berhenti
 Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Daftar suara
+Compression: 	RecorderWindow		Kompresi: 
 Rewind	RecorderWindow		Ulang
 Sample rate:	RecorderWindow		Kadar sampel:
 Invalid audio files	RecorderWindow		Berkas audio invalid
@@ -17,7 +19,9 @@ Invalid audio files	RecorderWindow		Berkas audio invalid
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Tidak dapat membuka berkas sementara yang dibuat untuk mempertahankan rekaman terbaru
 Input:	RecorderWindow		Masukan:
+Forward	RecorderWindow		Majukan
 Play	RecorderWindow		Mainkan
+SoundRecorder	System name		SoundRecorder
 Channels:	RecorderWindow		Saluran:
  bits	RecorderWindow		 bits
 None	RecorderWindow		Tiada
@@ -35,4 +39,5 @@ Channels: 	RecorderWindow		Saluran:
 Save	RecorderWindow		Simpan
 Sample rate: 	RecorderWindow		Kadar sampel: 
 Cannot connect to media server	RecorderWindow		Tidak dapat terhubung ke server media
+The file doesn't appear to be an audio file.	RecorderWindow		Berkas tidak tampak sebagai berkas suara.
 File name:	RecorderWindow		Nama berkas:

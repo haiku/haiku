@@ -16,7 +16,7 @@ Select all	Terminal TermWindow		Pilih semua
 Close tab	Terminal TermWindow		Tutup tab
 Save to file…	Terminal PrefWindow		Simpan ke file...
 Window title:	Terminal AppearancePrefView		Judul jendela:
-Font:	Terminal AppearancePrefView		Huruf:
+Font:	Terminal AppearancePrefView		Fon:
 Copy here	Terminal TermView		Salin ke sini
 Really close?	Terminal TermWindow		Benar-benar hapus?
 Copy	Terminal TermWindow		Salin
@@ -53,7 +53,7 @@ Insert path	Terminal TermView		Sisipkan jalur
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nHak cipta 2001-2009 Haiku, Inc.\nHak cipta(C) 1999 Kazuho Okui dan Takashi Murai.\n\nPenggunaan: %s [OPTION] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Ukuran jendela:
 No search string was entered.	Terminal TermWindow		Tidak ada kata pencarian yang dimasukkan.
-Font size	Terminal TermWindow		Ukuran huruf
+Font size	Terminal TermWindow		Ukuran fon
 Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
 Set window title	Terminal TermWindow		Setel judul jendela
 Revert	Terminal PrefWindow		Pulih
