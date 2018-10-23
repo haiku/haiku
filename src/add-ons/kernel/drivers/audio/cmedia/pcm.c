@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include <ByteOrder.h>
-#include "R3MediaDefs.h"
+#include <MediaDefs.h>
 
 #include "cm_private.h"
 #include "sound.h"
@@ -16,6 +16,17 @@ extern int sprintf(char *, const char *, ...);
 
 
 extern void dump_card(cmedia_pci_dev * card);
+
+// Buffer header for audio server from BeOS R3 MediaDefs.h
+
+typedef struct audio_buffer_header {
+	int32		buffer_number;
+	int32		subscriber_count;
+	bigtime_t	time;
+	int32		reserved_1;
+	int32		reserved_2;
+	bigtime_t	sample_clock;
+} audio_buffer_header;
 
 #if !defined(OLDAPI)
  #if DEBUG
