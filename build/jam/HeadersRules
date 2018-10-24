@@ -436,9 +436,9 @@ rule FStandardOSHeaders
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
 					   add-ons/input_server add-ons/registrar
 					   add-ons/screen_saver
-					   add-ons/tracker app device drivers game interface
-					   kernel locale media mail midi midi2 net storage
-					   support translation ;
+					   add-ons/tracker app codec device drivers game
+					   interface kernel locale media mail midi midi2
+					   net storage support translation ;
 
 	return [ FDirName $(HAIKU_TOP) headers os ]
 		[ PublicHeaders $(osIncludes) ] ;
@@ -450,9 +450,9 @@ rule FStandardHeaders architecture
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
 					   add-ons/input_server add-ons/registrar
 					   add-ons/screen_saver
-					   add-ons/tracker app device drivers game interface
-					   kernel locale media mail midi midi2 net storage
-					   support translation ;
+					   add-ons/tracker app device drivers game codec
+					   interface kernel locale media mail midi midi2
+					   net storage support translation ;
 
 	local headers = ;
 

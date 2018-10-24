@@ -106,6 +106,7 @@ DoCatalogs libbe.so
 
 SubInclude HAIKU_TOP src kits app ;
 SubInclude HAIKU_TOP src kits bluetooth ;
+SubInclude HAIKU_TOP src kits codec ;
 SubInclude HAIKU_TOP src kits debug ;
 SubInclude HAIKU_TOP src kits debugger ;
 SubInclude HAIKU_TOP src kits device ;
