@@ -1,28 +1,22 @@
 SubDir HAIKU_TOP src kits codec ;
 
-UsePrivateHeaders media shared ;
-UsePrivateHeaders [ FDirName media experimental ] ;
+UsePrivateHeaders app media shared ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
 
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
-		SharedLibrary [ MultiArchDefaultGristFiles libcodec.so ] :
-			# Experimental Media Kit
-			#AdapterIO.cpp
-			#MediaClient.cpp
-			#MediaClientDefs.cpp
-			#MediaClientNode.cpp
-			#MediaConnection.cpp
-			#MediaIO.cpp
-			#SimpleMediaClient.cpp
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits media ] ;
 
-			# Internal Functionality
-			AddOnManager.cpp
+		SharedLibrary [ MultiArchDefaultGristFiles libcodec.so ] :
+			# Adapter Kit
+			AdapterIO.cpp
+			MediaIO.cpp
 
 			# Codec Plugin API
 			ChunkCache.cpp
@@ -36,6 +30,15 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ReaderPlugin.cpp
 			StreamerPlugin.cpp
 			WriterPlugin.cpp
+
+			# Internal Functionality
+			AddOnManager.cpp
+			FormatManager.cpp
+
+			# We need this to do not depend on libmedia
+			# will be removed when libmedia2 is introduced
+			RealtimeAlloc.cpp
+			MediaFormats.cpp
 
 			:
 			be localestub shared
