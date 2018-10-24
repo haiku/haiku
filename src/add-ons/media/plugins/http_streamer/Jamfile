@@ -9,7 +9,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Addon [ MultiArchDefaultGristFiles http_streamer ] :
 			HTTPStreamerPlugin.cpp
 			HTTPMediaIO.cpp
-			: be media bnetapi shared
+			: be codec media bnetapi shared
 			[ TargetLibsupc++ ]
 		;
 	}

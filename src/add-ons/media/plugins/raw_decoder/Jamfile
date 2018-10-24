@@ -10,7 +10,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Addon [ MultiArchDefaultGristFiles raw_decoder ] :
 			AudioConversion.cpp
 			RawDecoderPlugin.cpp
-			: be media [ TargetLibsupc++ ]
+			: be codec media [ TargetLibsupc++ ]
 		;
 	}
 }
