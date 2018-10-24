@@ -9,7 +9,7 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 
 UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel 			# For kernel_cpp.cpp
-	media ;
+	audio ;
 
 # set some additional defines
 SubDirCcFlags -DECHO_BEOS -DECHO3G_FAMILY ;
