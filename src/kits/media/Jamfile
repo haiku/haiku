@@ -27,6 +27,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MediaAddOn.cpp
 			MediaDecoder.cpp
 			MediaDefs.cpp
+			MediaDefsNotify.cpp
 			MediaEncoder.cpp
 			MediaEventLooper.cpp
 			MediaFile.cpp

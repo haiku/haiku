@@ -6,12 +6,11 @@ if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
 
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits media ] ;
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits media ] ;
 
 		SharedLibrary [ MultiArchDefaultGristFiles libcodec.so ] :
 			# Adapter Kit
@@ -37,8 +36,9 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits media ] ;
 
 			# We need this to do not depend on libmedia
 			# will be removed when libmedia2 is introduced
-			RealtimeAlloc.cpp
+			MediaDefs.cpp
 			MediaFormats.cpp
+			RealtimeAlloc.cpp
 
 			:
 			be localestub shared
