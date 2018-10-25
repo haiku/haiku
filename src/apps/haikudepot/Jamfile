@@ -147,6 +147,7 @@ DoCatalogs HaikuDepot :
 	RatePackageWindow.cpp
 	ScreenshotWindow.cpp
 	UserLoginWindow.cpp
+	WorkStatusView.cpp
 ;
 
 Application TextDocumentTest :
