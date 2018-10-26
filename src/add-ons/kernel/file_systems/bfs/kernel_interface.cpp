@@ -26,6 +26,14 @@
 
 #define BFS_IO_SIZE	65536
 
+#if defined(BFS_LITTLE_ENDIAN_ONLY)
+#define BFS_ENDIAN_SUFFIX ""
+#define BFS_ENDIAN_PRETTY_SUFFIX ""
+#else
+#define BFS_ENDIAN_SUFFIX "_big"
+#define BFS_ENDIAN_PRETTY_SUFFIX " (Big Endian)"
+#endif
+
 
 struct identify_cookie {
 	disk_super_block super_block;
@@ -2500,13 +2508,13 @@ fs_vnode_ops gBFSVnodeOps = {
 
 static file_system_module_info sBeFileSystem = {
 	{
-		"file_systems/bfs" B_CURRENT_FS_API_VERSION,
+		"file_systems/bfs" BFS_ENDIAN_SUFFIX B_CURRENT_FS_API_VERSION,
 		0,
 		bfs_std_ops,
 	},
 
-	"bfs",						// short_name
-	"Be File System",			// pretty_name
+	"bfs" BFS_ENDIAN_SUFFIX,						// short_name
+	"Be File System" BFS_ENDIAN_PRETTY_SUFFIX,		// pretty_name
 
 	// DDM flags
 	0
