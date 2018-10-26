@@ -162,7 +162,7 @@ WorkStatusView::_SetTextDownloading(const BString& title)
 
 	if (!fPendingPackages.empty()) {
 		BString count;
-		cout << fPendingPackages.size();
+		count << fPendingPackages.size();
 		BString more(B_TRANSLATE("(%count% more to download)"));
 		more.ReplaceFirst("%count%", count);
 		text += more;
