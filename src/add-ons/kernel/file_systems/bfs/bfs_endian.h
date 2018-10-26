@@ -13,6 +13,9 @@
 //	default setting; BFS is now primarily a little endian file system
 #	define BFS_LITTLE_ENDIAN_ONLY
 #endif
+#if defined(BFS_LITTLE_ENDIAN_ONLY) && defined(BFS_BIG_ENDIAN_ONLY)
+#	error Building BFS with both big and little endian is not supported.
+#endif
 
 
 #if defined(BFS_LITTLE_ENDIAN_ONLY) && B_HOST_IS_LENDIAN \
