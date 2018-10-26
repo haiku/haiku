@@ -1,0 +1,59 @@
+# Since we also build a big-endian version of BFS,
+# this file is also included by the Jamfile in ../bfs_big/.
+
+# set some additional defines
+{
+	local defines =
+		BFS_DEBUGGER_COMMANDS
+		;
+
+	if $(SUBDIR:B) = bfs_big {
+		defines += BFS_BIG_ENDIAN_ONLY ;
+		SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
+	}
+
+	if $(DEBUG) = 0 {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders shared storage ;
+
+local bfsSources =
+	bfs_disk_system.cpp
+	BlockAllocator.cpp
+	BPlusTree.cpp
+	kernel_cpp.cpp
+	Attribute.cpp
+	CheckVisitor.cpp
+	Debug.cpp
+	FileSystemVisitor.cpp
+	Index.cpp
+	Inode.cpp
+	Journal.cpp
+	Query.cpp
+	QueryParserUtils.cpp
+	Volume.cpp
+
+	kernel_interface.cpp
+	;
+
+KernelAddon $(SUBDIR:B) :
+	$(bfsSources)
+	;
+
+SEARCH on [ FGristFiles $(bfsSources) ]
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
+
+SEARCH on [ FGristFiles kernel_cpp.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+SEARCH on [ FGristFiles QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
+SubDir HAIKU_TOP src add-ons kernel file_systems bfs_big ;
 
 include [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs JamCommon ] ;
 
