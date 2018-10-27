@@ -12,6 +12,8 @@
 
 #include <sys/queue.h>
 
+#include <util/list.h>
+
 
 struct callout {
 	struct list_link	link;

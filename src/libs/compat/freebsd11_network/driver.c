@@ -97,62 +97,6 @@ get_pci_info(struct device *device)
 
 
 status_t
-_fbsd_init_hardware(driver_t *drivers[])
-{
-	status_t status = B_ENTRY_NOT_FOUND;
-	device_t root;
-	pci_info *info;
-	driver_t *driver = NULL;
-	int i = 0;
-
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
-		return B_ERROR;
-
-	status = init_root_device(&root);
-	if (status != B_OK)
-		goto err;
-
-	for (info = get_pci_info(root); gPci->get_nth_pci_info(i, info) == B_OK;
-		i++) {
-		int index;
-		driver = NULL;
-
-		for (index = 0; drivers[index] && gDeviceCount < MAX_DEVICES
-			&& driver == NULL; index++) {
-			int result;
-			device_t device;
-			status = add_child_device(drivers[index], root, &device);
-			if (status < B_OK)
-				break;
-
-			result = device->methods.probe(device);
-			if (result >= 0) {
-				TRACE(("%s, found %s at %d\n", gDriverName,
-					device_get_desc(device), i));
-				driver = drivers[index];
-			}
-			device_delete_child(root, device);
-		}
-
-		if (driver != NULL)
-			break;
-	}
-
-	device_delete_child(NULL, root);
-
-	if (driver == NULL) {
-		status = B_ERROR;
-		TRACE(("%s: no hardware found.\n", gDriverName));
-	}
-err:
-	put_module(B_PCI_MODULE_NAME);
-	TRACE(("%s: status 0x%lx\n", gDriverName, status));
-
-	return status;
-}
-
-
-status_t
 _fbsd_init_drivers(driver_t *drivers[])
 {
 	status_t status;
