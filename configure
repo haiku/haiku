@@ -543,7 +543,7 @@ if [ `umask` -gt 22 ]; then
 	exit 1
 fi
 # ensure git checkout was not done with a restrictive umask
-if [ `stat -c '%a' $sourceDir/data/system/boot/SetupEnvironment` -ne 644 ]; then
+if [ `stat -c '%a' $sourceDir/data/system/boot/SetupEnvironment` -lt 644 ]; then
 	echo "The source tree was cloned with a umask > 0022. It seems you"
 	echo have already corrected your umask, but not re-checked-out the
 	echo source tree. Try running:
