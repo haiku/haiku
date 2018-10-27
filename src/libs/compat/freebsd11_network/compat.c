@@ -621,6 +621,18 @@ resource_int_value(const char *name, int unit, const char *resname,
 }
 
 
+int
+resource_disabled(const char *name, int unit)
+{
+	int error, value;
+
+	error = resource_int_value(name, unit, "disabled", &value);
+	if (error)
+	       return (0);
+	return (value);
+}
+
+
 void *
 _kernel_malloc(size_t size, int flags)
 {

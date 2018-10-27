@@ -148,15 +148,47 @@
 #define EXT_FLAG_EMBREF		0x000001	/* embedded ext_count */
 #define EXT_FLAG_EXTREF		0x000002	/* external ext_cnt, notyet */
 
-#define CSUM_IP			0x0001
-#define CSUM_TCP		0x0002
-#define CSUM_UDP		0x0004
-#define CSUM_TSO		0x0020
-#define CSUM_IP_CHECKED	0x0100
-#define CSUM_IP_VALID	0x0200
-#define CSUM_DATA_VALID	0x0400
-#define CSUM_PSEUDO_HDR	0x0800
-#define CSUM_DELAY_DATA	(CSUM_TCP | CSUM_UDP)
+/* Flags indicating checksum, segmentation and other offload work */
+#define	CSUM_IP			0x00000001	/* IP header checksum offload */
+#define	CSUM_IP_UDP		0x00000002	/* UDP checksum offload */
+#define	CSUM_IP_TCP		0x00000004	/* TCP checksum offload */
+#define	CSUM_IP_SCTP		0x00000008	/* SCTP checksum offload */
+#define	CSUM_IP_TSO		0x00000010	/* TCP segmentation offload */
+#define	CSUM_IP_ISCSI		0x00000020	/* iSCSI checksum offload */
+
+#define	CSUM_IP6_UDP		0x00000200	/* UDP checksum offload */
+#define	CSUM_IP6_TCP		0x00000400	/* TCP checksum offload */
+#define	CSUM_IP6_SCTP		0x00000800	/* SCTP checksum offload */
+#define	CSUM_IP6_TSO		0x00001000	/* TCP segmentation offload */
+#define	CSUM_IP6_ISCSI		0x00002000	/* iSCSI checksum offload */
+
+/* Inbound checksum support where the checksum was verified by hardware. */
+#define	CSUM_L3_CALC		0x01000000	/* calculated layer 3 csum */
+#define	CSUM_L3_VALID		0x02000000	/* checksum is correct */
+#define	CSUM_L4_CALC		0x04000000	/* calculated layer 4 csum */
+#define	CSUM_L4_VALID		0x08000000	/* checksum is correct */
+#define	CSUM_L5_CALC		0x10000000	/* calculated layer 5 csum */
+#define	CSUM_L5_VALID		0x20000000	/* checksum is correct */
+#define	CSUM_COALESCED		0x40000000	/* contains merged segments */
+
+/* CSUM flags compatibility mappings. */
+#define	CSUM_IP_CHECKED		CSUM_L3_CALC
+#define	CSUM_IP_VALID		CSUM_L3_VALID
+#define	CSUM_DATA_VALID		CSUM_L4_VALID
+#define	CSUM_PSEUDO_HDR		CSUM_L4_CALC
+#define	CSUM_SCTP_VALID		CSUM_L4_VALID
+#define	CSUM_DELAY_DATA		(CSUM_TCP|CSUM_UDP)
+#define	CSUM_DELAY_IP		CSUM_IP		/* Only v4, no v6 IP hdr csum */
+#define	CSUM_DELAY_DATA_IPV6	(CSUM_TCP_IPV6|CSUM_UDP_IPV6)
+#define	CSUM_DATA_VALID_IPV6	CSUM_DATA_VALID
+#define	CSUM_TCP		CSUM_IP_TCP
+#define	CSUM_UDP		CSUM_IP_UDP
+#define	CSUM_SCTP		CSUM_IP_SCTP
+#define	CSUM_TSO		(CSUM_IP_TSO|CSUM_IP6_TSO)
+#define	CSUM_UDP_IPV6		CSUM_IP6_UDP
+#define	CSUM_TCP_IPV6		CSUM_IP6_TCP
+#define	CSUM_SCTP_IPV6		CSUM_IP6_SCTP
+
 
 #define MEXTADD(m, buf, size, free, arg1, arg2, flags, type) \
 	m_extadd((m), (caddr_t)(buf), (size), (free),(arg1),(arg2),(flags), (type))

@@ -84,6 +84,7 @@ typedef void driver_intr_t(void *);
 
 int resource_int_value(const char *name, int unit, const char *resname,
 	int *result);
+int resource_disabled(const char *name, int unit);
 
 struct resource *bus_alloc_resource(device_t dev, int type, int *rid,
 	unsigned long start, unsigned long end, unsigned long count, uint32 flags);

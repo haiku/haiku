@@ -18,29 +18,41 @@
 #define IF_Gbps(x)				(IF_Mbps((x) * 1000))
 
 /* Capabilities that interfaces can advertise. */
-#define IFCAP_RXCSUM			0x00001	/* can offload checksum on RX */
-#define IFCAP_TXCSUM			0x00002	/* can offload checksum on TX */
-#define IFCAP_NETCONS			0x00004	/* can be a network console */
-#define	IFCAP_VLAN_MTU			0x00008	/* VLAN-compatible MTU */
+#define	IFCAP_RXCSUM		0x00001  /* can offload checksum on RX */
+#define	IFCAP_TXCSUM		0x00002  /* can offload checksum on TX */
+#define	IFCAP_NETCONS		0x00004  /* can be a network console */
+#define	IFCAP_VLAN_MTU		0x00008	/* VLAN-compatible MTU */
 #define	IFCAP_VLAN_HWTAGGING	0x00010	/* hardware VLAN tag support */
-#define	IFCAP_JUMBO_MTU			0x00020	/* 9000 byte MTU supported */
-#define	IFCAP_POLLING			0x00040	/* driver supports polling */
-#define	IFCAP_VLAN_HWCSUM		0x00080
-#define	IFCAP_TSO4				0x00100	/* supports TCP segmentation offload */
-#define	IFCAP_TSO6				0x00200	/* can do TCP6 Segmentation Offload */
-#define	IFCAP_WOL_UCAST			0x00800	/* wake on any unicast frame */
-#define	IFCAP_WOL_MCAST			0x01000	/* wake on any multicast frame */
-#define	IFCAP_WOL_MAGIC			0x02000	/* wake on any Magic Packet */
-#define	IFCAP_VLAN_HWFILTER		0x10000	/* interface hw can filter vlan tag */
-#define	IFCAP_POLLING_NOCOUNT	0x20000
-#define	IFCAP_VLAN_HWTSO		0x40000
-#define	IFCAP_LINKSTATE			0x80000
+#define	IFCAP_JUMBO_MTU		0x00020	/* 9000 byte MTU supported */
+#define	IFCAP_POLLING		0x00040	/* driver supports polling */
+#define	IFCAP_VLAN_HWCSUM	0x00080	/* can do IFCAP_HWCSUM on VLANs */
+#define	IFCAP_TSO4		0x00100	/* can do TCP Segmentation Offload */
+#define	IFCAP_TSO6		0x00200	/* can do TCP6 Segmentation Offload */
+#define	IFCAP_LRO		0x00400	/* can do Large Receive Offload */
+#define	IFCAP_WOL_UCAST		0x00800	/* wake on any unicast frame */
+#define	IFCAP_WOL_MCAST		0x01000	/* wake on any multicast frame */
+#define	IFCAP_WOL_MAGIC		0x02000	/* wake on any Magic Packet */
+#define	IFCAP_TOE4		0x04000	/* interface can offload TCP */
+#define	IFCAP_TOE6		0x08000	/* interface can offload TCP6 */
+#define	IFCAP_VLAN_HWFILTER	0x10000 /* interface hw can filter vlan tag */
+#define	IFCAP_POLLING_NOCOUNT	0x20000 /* polling ticks cannot be fragmented */
+#define	IFCAP_VLAN_HWTSO	0x40000 /* can do IFCAP_TSO on VLANs */
+#define	IFCAP_LINKSTATE		0x80000 /* the runtime link state is dynamic */
+#define	IFCAP_NETMAP		0x100000 /* netmap mode supported/enabled */
+#define	IFCAP_RXCSUM_IPV6	0x200000  /* can offload checksum on IPv6 RX */
+#define	IFCAP_TXCSUM_IPV6	0x400000  /* can offload checksum on IPv6 TX */
+#define	IFCAP_HWSTATS		0x800000 /* manages counters internally */
+
+#define IFCAP_HWCSUM_IPV6	(IFCAP_RXCSUM_IPV6 | IFCAP_TXCSUM_IPV6)
 
 #define IFCAP_HWCSUM	(IFCAP_RXCSUM | IFCAP_TXCSUM)
-#define IFCAP_TSO		(IFCAP_TSO4 | IFCAP_TSO6)
-#define	IFCAP_WOL		(IFCAP_WOL_UCAST | IFCAP_WOL_MCAST | IFCAP_WOL_MAGIC)
+#define	IFCAP_TSO	(IFCAP_TSO4 | IFCAP_TSO6)
+#define	IFCAP_WOL	(IFCAP_WOL_UCAST | IFCAP_WOL_MCAST | IFCAP_WOL_MAGIC)
+#define	IFCAP_TOE	(IFCAP_TOE4 | IFCAP_TOE6)
 
+#define	IFCAP_CANTCHANGE	(IFCAP_NETMAP)
 
+/* Interface flags */
 #define IFF_DRV_RUNNING		0x00010000
 #define IFF_DRV_OACTIVE		0x00020000
 #define IFF_LINK0			0x00040000		/* per link layer defined bit */
