@@ -84,7 +84,9 @@
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/tcp.h>
+#ifndef __HAIKU__
 #include <netinet/tcp_lro.h>
+#endif
 #include <netinet/udp.h>
 
 #include <machine/in_cksum.h>
@@ -395,7 +397,9 @@ struct rx_ring {
 	u32			me;
 	struct igb_dma_alloc	rxdma;
 	union e1000_adv_rx_desc	*rx_base;
+#ifndef __HAIKU__
 	struct lro_ctrl		lro;
+#endif
 	bool			lro_enabled;
 	bool			hdr_split;
 	struct mtx		rx_mtx;

@@ -33,10 +33,6 @@
 /*$FreeBSD$*/
 
 
-#include "opt_inet.h"
-#include "opt_inet6.h"
-#include "opt_rss.h"
-
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"
 #include "opt_altq.h"
@@ -801,7 +797,8 @@ igb_resume(device_t dev)
 
 	if ((ifp->if_flags & IFF_UP) &&
 	    (ifp->if_drv_flags & IFF_DRV_RUNNING) && adapter->link_active) {
-		for (int i = 0; i < adapter->num_queues; i++, txr++) {
+		int i;
+		for (i = 0; i < adapter->num_queues; i++, txr++) {
 			IGB_TX_LOCK(txr);
 #ifndef IGB_LEGACY_TX
 			/* Process the stack queue only if not depleted */
@@ -912,7 +909,7 @@ igb_mq_start(struct ifnet *ifp, struct mbuf *m)
 	struct adapter		*adapter = ifp->if_softc;
 	struct igb_queue	*que;
 	struct tx_ring		*txr;
-	int 			i, err = 0;
+	int 			i = 0, err = 0;
 #ifdef	RSS
 	uint32_t		bucket_id;
 #endif
@@ -1029,8 +1026,9 @@ igb_qflush(struct ifnet *ifp)
 	struct adapter	*adapter = ifp->if_softc;
 	struct tx_ring	*txr = adapter->tx_rings;
 	struct mbuf	*m;
+	int i;
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		IGB_TX_LOCK(txr);
 		while ((m = buf_ring_dequeue_sc(txr->br)) != NULL)
 			m_freem(m);
@@ -1455,7 +1453,8 @@ igb_handle_link_locked(struct adapter *adapter)
 	adapter->hw.mac.get_link_status = 1;
 	igb_update_link_status(adapter);
 	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) && adapter->link_active) {
-		for (int i = 0; i < adapter->num_queues; i++, txr++) {
+		int i;
+		for (i = 0; i < adapter->num_queues; i++, txr++) {
 			IGB_TX_LOCK(txr);
 #ifndef IGB_LEGACY_TX
 			/* Process the stack queue only if not depleted */
@@ -2096,7 +2095,7 @@ igb_local_timer(void *arg)
 	struct ifnet		*ifp = adapter->ifp;
 	struct tx_ring		*txr = adapter->tx_rings;
 	struct igb_queue	*que = adapter->queues;
-	int			hung = 0, busy = 0;
+	int			hung = 0, busy = 0, i = 0;
 
 
 	IGB_CORE_LOCK_ASSERT(adapter);
@@ -2109,7 +2108,7 @@ igb_local_timer(void *arg)
 	**	- central locked handling of OACTIVE
 	**	- watchdog only if all queues show hung
         */
-	for (int i = 0; i < adapter->num_queues; i++, que++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, que++, txr++) {
 		if ((txr->queue_status & IGB_QUEUE_HUNG) &&
 		    (adapter->pause_frames == 0))
 			++hung;
@@ -2240,6 +2239,7 @@ igb_update_link_status(struct adapter *adapter)
 		/* This can sleep */
 		if_link_state_change(ifp, LINK_STATE_UP);
 	} else if (!link_check && (adapter->link_active == 1)) {
+		int i;
 		ifp->if_baudrate = adapter->link_speed = 0;
 		adapter->link_duplex = 0;
 		if (bootverbose)
@@ -2251,7 +2251,7 @@ igb_update_link_status(struct adapter *adapter)
 		/* This can sleep */
 		if_link_state_change(ifp, LINK_STATE_DOWN);
 		/* Reset queue state */
-		for (int i = 0; i < adapter->num_queues; i++, txr++)
+		for (i = 0; i < adapter->num_queues; i++, txr++)
 			txr->queue_status = IGB_QUEUE_IDLE;
 	}
 }
@@ -2269,6 +2269,7 @@ igb_stop(void *arg)
 	struct adapter	*adapter = arg;
 	struct ifnet	*ifp = adapter->ifp;
 	struct tx_ring *txr = adapter->tx_rings;
+	int i;
 
 	IGB_CORE_LOCK_ASSERT(adapter);
 
@@ -2283,7 +2284,7 @@ igb_stop(void *arg)
 	ifp->if_drv_flags |= IFF_DRV_OACTIVE;
 
 	/* Disarm watchdog timer. */
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		IGB_TX_LOCK(txr);
 		txr->queue_status = IGB_QUEUE_IDLE;
 		IGB_TX_UNLOCK(txr);
@@ -2431,6 +2432,7 @@ igb_allocate_msix(struct adapter *adapter)
 	struct igb_queue	*que = adapter->queues;
 	int			error, rid, vector = 0;
 	int			cpu_id = 0;
+	int i;
 #ifdef	RSS
 	cpuset_t cpu_mask;
 #endif
@@ -2461,7 +2463,7 @@ igb_allocate_msix(struct adapter *adapter)
 	}
 #endif
 
-	for (int i = 0; i < adapter->num_queues; i++, vector++, que++) {
+	for (i = 0; i < adapter->num_queues; i++, vector++, que++) {
 		rid = vector +1;
 		que->res = bus_alloc_resource_any(dev,
 		    SYS_RES_IRQ, &rid, RF_SHAREABLE | RF_ACTIVE);
@@ -2608,9 +2610,10 @@ igb_configure_queues(struct adapter *adapter)
 	case e1000_i210:
 	case e1000_i211:
 	case e1000_vfadapt:
-	case e1000_vfadapt_i350:
+	case e1000_vfadapt_i350: {
+		int i;
 		/* RX entries */
-		for (int i = 0; i < adapter->num_queues; i++) {
+		for (i = 0; i < adapter->num_queues; i++) {
 			u32 index = i >> 1;
 			ivar = E1000_READ_REG_ARRAY(hw, E1000_IVAR0, index);
 			que = &adapter->queues[i];
@@ -2624,7 +2627,7 @@ igb_configure_queues(struct adapter *adapter)
 			E1000_WRITE_REG_ARRAY(hw, E1000_IVAR0, index, ivar);
 		}
 		/* TX entries */
-		for (int i = 0; i < adapter->num_queues; i++) {
+		for (i = 0; i < adapter->num_queues; i++) {
 			u32 index = i >> 1;
 			ivar = E1000_READ_REG_ARRAY(hw, E1000_IVAR0, index);
 			que = &adapter->queues[i];
@@ -2644,9 +2647,11 @@ igb_configure_queues(struct adapter *adapter)
 		adapter->link_mask = 1 << adapter->linkvec;
 		E1000_WRITE_REG(hw, E1000_IVAR_MISC, ivar);
 		break;
-	case e1000_82576:
+	}
+	case e1000_82576: {
+		int i;
 		/* RX entries */
-		for (int i = 0; i < adapter->num_queues; i++) {
+		for (i = 0; i < adapter->num_queues; i++) {
 			u32 index = i & 0x7; /* Each IVAR has two entries */
 			ivar = E1000_READ_REG_ARRAY(hw, E1000_IVAR0, index);
 			que = &adapter->queues[i];
@@ -2661,7 +2666,7 @@ igb_configure_queues(struct adapter *adapter)
 			adapter->que_mask |= que->eims;
 		}
 		/* TX entries */
-		for (int i = 0; i < adapter->num_queues; i++) {
+		for (i = 0; i < adapter->num_queues; i++) {
 			u32 index = i & 0x7; /* Each IVAR has two entries */
 			ivar = E1000_READ_REG_ARRAY(hw, E1000_IVAR0, index);
 			que = &adapter->queues[i];
@@ -2681,8 +2686,10 @@ igb_configure_queues(struct adapter *adapter)
 		adapter->link_mask = 1 << adapter->linkvec;
 		E1000_WRITE_REG(hw, E1000_IVAR_MISC, ivar);
 		break;
+	}
 
-	case e1000_82575:
+	case e1000_82575: {
+		int i;
                 /* enable MSI-X support*/
 		tmp = E1000_READ_REG(hw, E1000_CTRL_EXT);
                 tmp |= E1000_CTRL_EXT_PBA_CLR;
@@ -2692,7 +2699,7 @@ igb_configure_queues(struct adapter *adapter)
                 E1000_WRITE_REG(hw, E1000_CTRL_EXT, tmp);
 
 		/* Queues */
-		for (int i = 0; i < adapter->num_queues; i++) {
+		for (i = 0; i < adapter->num_queues; i++) {
 			que = &adapter->queues[i];
 			tmp = E1000_EICR_RX_QUEUE0 << i;
 			tmp |= E1000_EICR_TX_QUEUE0 << i;
@@ -2706,6 +2713,7 @@ igb_configure_queues(struct adapter *adapter)
 		E1000_WRITE_REG(hw, E1000_MSIXBM(adapter->linkvec),
 		    E1000_EIMS_OTHER);
 		adapter->link_mask |= E1000_EIMS_OTHER;
+	}
 	default:
 		break;
 	}
@@ -2718,11 +2726,12 @@ igb_configure_queues(struct adapter *adapter)
                 newitr |= newitr << 16;
         else
                 newitr |= E1000_EITR_CNT_IGNR;
-
-	for (int i = 0; i < adapter->num_queues; i++) {
+{ int i;
+	for (i = 0; i < adapter->num_queues; i++) {
 		que = &adapter->queues[i];
 		E1000_WRITE_REG(hw, E1000_EITR(que->msix), newitr);
 	}
+}
 
 	return;
 }
@@ -2734,6 +2743,7 @@ igb_free_pci_resources(struct adapter *adapter)
 	struct		igb_queue *que = adapter->queues;
 	device_t	dev = adapter->dev;
 	int		rid;
+	int i;
 
 	/*
 	** There is a slight possibility of a failure mode
@@ -2749,7 +2759,7 @@ igb_free_pci_resources(struct adapter *adapter)
 	/*
 	 * First release all the interrupt resources:
 	 */
-	for (int i = 0; i < adapter->num_queues; i++, que++) {
+	for (i = 0; i < adapter->num_queues; i++, que++) {
 		rid = que->msix + 1;
 		if (que->tag != NULL) {
 			bus_teardown_intr(dev, que->res, que->tag);
@@ -2775,7 +2785,7 @@ igb_free_pci_resources(struct adapter *adapter)
 	if (adapter->res != NULL)
 		bus_release_resource(dev, SYS_RES_IRQ, rid, adapter->res);
 
-	for (int i = 0; i < adapter->num_queues; i++, que++) {
+	for (i = 0; i < adapter->num_queues; i++, que++) {
 		if (que->tq != NULL) {
 #ifndef IGB_LEGACY_TX
 			taskqueue_drain(que->tq, &que->txr->txq_task);
@@ -3362,6 +3372,7 @@ igb_allocate_queues(struct adapter *adapter)
 	struct rx_ring		*rxr = NULL;
 	int rsize, tsize, error = E1000_SUCCESS;
 	int txconf = 0, rxconf = 0;
+	int i;
 
 	/* First allocate the top level queue structs */
 	if (!(adapter->queues =
@@ -3397,7 +3408,7 @@ igb_allocate_queues(struct adapter *adapter)
 	 * possibility that things fail midcourse and we need to
 	 * undo memory gracefully
 	 */ 
-	for (int i = 0; i < adapter->num_queues; i++, txconf++) {
+	for (i = 0; i < adapter->num_queues; i++, txconf++) {
 		/* Set up some basics */
 		txr = &adapter->tx_rings[i];
 		txr->adapter = adapter;
@@ -3438,7 +3449,7 @@ igb_allocate_queues(struct adapter *adapter)
 	 */ 
 	rsize = roundup2(adapter->num_rx_desc *
 	    sizeof(union e1000_adv_rx_desc), IGB_DBA_ALIGN);
-	for (int i = 0; i < adapter->num_queues; i++, rxconf++) {
+	for (i = 0; i < adapter->num_queues; i++, rxconf++) {
 		rxr = &adapter->rx_rings[i];
 		rxr->adapter = adapter;
 		rxr->me = i;
@@ -3470,7 +3481,7 @@ igb_allocate_queues(struct adapter *adapter)
 	/*
 	** Finally set up the queue holding structs
 	*/
-	for (int i = 0; i < adapter->num_queues; i++) {
+	for (i = 0; i < adapter->num_queues; i++) {
 		que = &adapter->queues[i];
 		que->adapter = adapter;
 		que->txr = &adapter->tx_rings[i];
@@ -3621,8 +3632,9 @@ static void
 igb_setup_transmit_structures(struct adapter *adapter)
 {
 	struct tx_ring *txr = adapter->tx_rings;
+	int i;
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++)
+	for (i = 0; i < adapter->num_queues; i++, txr++)
 		igb_setup_transmit_ring(txr);
 
 	return;
@@ -3639,12 +3651,13 @@ igb_initialize_transmit_units(struct adapter *adapter)
 	struct tx_ring	*txr = adapter->tx_rings;
 	struct e1000_hw *hw = &adapter->hw;
 	u32		tctl, txdctl;
+	int i;
 
 	INIT_DEBUGOUT("igb_initialize_transmit_units: begin");
 	tctl = txdctl = 0;
 
 	/* Setup the Tx Descriptor Rings */
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		u64 bus_addr = txr->txdma.dma_paddr;
 
 		E1000_WRITE_REG(hw, E1000_TDLEN(i),
@@ -3695,8 +3708,9 @@ static void
 igb_free_transmit_structures(struct adapter *adapter)
 {
 	struct tx_ring *txr = adapter->tx_rings;
+	int i;
 
-	for (int i = 0; i < adapter->num_queues; i++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, txr++) {
 		IGB_TX_LOCK(txr);
 		igb_free_transmit_buffers(txr);
 		igb_dma_free(adapter, &txr->txdma);
@@ -3983,7 +3997,7 @@ igb_tx_ctx_setup(struct tx_ring *txr, struct mbuf *mp,
 				type_tucmd_mlhl |= E1000_ADVTXD_TUCMD_L4T_UDP;
 			break;
 
-#if __FreeBSD_version >= 800000
+#if (__FreeBSD_version >= 800000) && !defined(__HAIKU__)
 		case IPPROTO_SCTP:
 #if __FreeBSD_version >= 1000000
 			if (mp->m_pkthdr.csum_flags & (CSUM_IP_SCTP | CSUM_IP6_SCTP))
@@ -4336,9 +4350,10 @@ igb_free_receive_ring(struct rx_ring *rxr)
 {
 	struct	adapter		*adapter = rxr->adapter;
 	struct igb_rx_buf	*rxbuf;
+	int i;
 
 
-	for (int i = 0; i < adapter->num_rx_desc; i++) {
+	for (i = 0; i < adapter->num_rx_desc; i++) {
 		rxbuf = &rxr->rx_buffers[i];
 		if (rxbuf->m_head != NULL) {
 			bus_dmamap_sync(rxr->htag, rxbuf->hmap,
@@ -4373,8 +4388,11 @@ igb_setup_receive_ring(struct rx_ring *rxr)
 	device_t		dev;
 	struct igb_rx_buf	*rxbuf;
 	bus_dma_segment_t	pseg[1], hseg[1];
+#ifndef __HAIKU__
 	struct lro_ctrl		*lro = &rxr->lro;
+#endif
 	int			rsize, nsegs, error = 0;
+	int j;
 #ifdef DEV_NETMAP
 	struct netmap_adapter *na = NA(rxr->adapter->ifp);
 	struct netmap_slot *slot;
@@ -4403,7 +4421,7 @@ igb_setup_receive_ring(struct rx_ring *rxr)
 		rxr->hdr_split = TRUE;
 
         /* Now replenish the ring mbufs */
-	for (int j = 0; j < adapter->num_rx_desc; ++j) {
+	for (j = 0; j < adapter->num_rx_desc; ++j) {
 		struct mbuf	*mh, *mp;
 
 		rxbuf = &rxr->rx_buffers[j];
@@ -4487,14 +4505,20 @@ skip_head:
 	** are undesirable in similar setups.
 	*/
 	if (ifp->if_capenable & IFCAP_LRO) {
+#ifndef __HAIKU__
 		error = tcp_lro_init(lro);
+#else
+		error = -1;
+#endif
 		if (error) {
 			device_printf(dev, "LRO Initialization failed!\n");
 			goto fail;
 		}
 		INIT_DEBUGOUT("RX LRO Initialized\n");
 		rxr->lro_enabled = TRUE;
+#ifndef __HAIKU__
 		lro->ifp = adapter->ifp;
+#endif
 	}
 
 	IGB_RX_UNLOCK(rxr);
@@ -4516,7 +4540,7 @@ static int
 igb_setup_receive_structures(struct adapter *adapter)
 {
 	struct rx_ring *rxr = adapter->rx_rings;
-	int i;
+	int i, j;
 
 	for (i = 0; i < adapter->num_queues; i++, rxr++)
 		if (igb_setup_receive_ring(rxr))
@@ -4529,7 +4553,7 @@ fail:
 	 * the rings that completed, the failing case will have
 	 * cleaned up for itself. 'i' is the endpoint.
 	 */
-	for (int j = 0; j < i; ++j) {
+	for (j = 0; j < i; ++j) {
 		rxr = &adapter->rx_rings[j];
 		IGB_RX_LOCK(rxr);
 		igb_free_receive_ring(rxr);
@@ -4651,6 +4675,7 @@ igb_initialize_receive_units(struct adapter *adapter)
 	struct ifnet	*ifp = adapter->ifp;
 	struct e1000_hw *hw = &adapter->hw;
 	u32		rctl, rxcsum, psize, srrctl = 0;
+	int i;
 
 	INIT_DEBUGOUT("igb_initialize_receive_unit: begin");
 
@@ -4708,7 +4733,7 @@ igb_initialize_receive_units(struct adapter *adapter)
 	}
 
 	/* Setup the Base and Length of the Rx Descriptor Rings */
-	for (int i = 0; i < adapter->num_queues; i++, rxr++) {
+	for (i = 0; i < adapter->num_queues; i++, rxr++) {
 		u64 bus_addr = rxr->rxdma.dma_paddr;
 		u32 rxdctl;
 
@@ -4783,7 +4808,8 @@ igb_initialize_receive_units(struct adapter *adapter)
 	 * Setup the HW Rx Head and Tail Descriptor Pointers
 	 *   - needs to be after enable
 	 */
-	for (int i = 0; i < adapter->num_queues; i++) {
+{ int i;
+	for (i = 0; i < adapter->num_queues; i++) {
 		rxr = &adapter->rx_rings[i];
 		E1000_WRITE_REG(hw, E1000_RDH(i), rxr->next_to_check);
 #ifdef DEV_NETMAP
@@ -4808,6 +4834,7 @@ igb_initialize_receive_units(struct adapter *adapter)
 #endif /* DEV_NETMAP */
 		E1000_WRITE_REG(hw, E1000_RDT(i), rxr->next_to_refresh);
 	}
+}
 	return;
 }
 
@@ -4820,11 +4847,16 @@ static void
 igb_free_receive_structures(struct adapter *adapter)
 {
 	struct rx_ring *rxr = adapter->rx_rings;
+	int i;
 
-	for (int i = 0; i < adapter->num_queues; i++, rxr++) {
+	for (i = 0; i < adapter->num_queues; i++, rxr++) {
+#ifndef __HAIKU__
 		struct lro_ctrl	*lro = &rxr->lro;
+#endif
 		igb_free_receive_buffers(rxr);
+#ifndef __HAIKU__
 		tcp_lro_free(lro);
+#endif
 		igb_dma_free(adapter, &rxr->rxdma);
 	}
 
@@ -4949,9 +4981,11 @@ igb_rx_input(struct rx_ring *rxr, struct ifnet *ifp, struct mbuf *m, u32 ptype)
 		 **  - no LRO resources, or
 		 **  - lro enqueue fails
 		 */
+#ifndef __HAIKU__
 		if (rxr->lro.lro_cnt != 0)
 			if (tcp_lro_rx(&rxr->lro, m, 0) == 0)
 				return;
+#endif
 	}
 	IGB_RX_UNLOCK(rxr);
 	(*ifp->if_input)(ifp, m);
@@ -4975,7 +5009,9 @@ igb_rxeof(struct igb_queue *que, int count, int *done)
 	struct adapter		*adapter = que->adapter;
 	struct rx_ring		*rxr = que->rxr;
 	struct ifnet		*ifp = adapter->ifp;
+#ifndef __HAIKU__
 	struct lro_ctrl		*lro = &rxr->lro;
+#endif
 	int			i, processed = 0, rxdone = 0;
 	u32			ptype, staterr = 0;
 	union e1000_adv_rx_desc	*cur;
@@ -5200,10 +5236,12 @@ next_desc:
 
 	rxr->next_to_check = i;
 
+#ifndef __HAIKU__
 	/*
 	 * Flush any outstanding LRO work
 	 */
 	tcp_lro_flush_all(lro);
+#endif
 
 	if (done != NULL)
 		*done += rxdone;
@@ -5323,6 +5361,7 @@ igb_setup_vlan_hw_support(struct adapter *adapter)
 	struct e1000_hw *hw = &adapter->hw;
 	struct ifnet	*ifp = adapter->ifp;
 	u32             reg;
+	int i;
 
 	if (adapter->vf_ifp) {
 		e1000_rlpml_set_vf(hw,
@@ -5354,7 +5393,7 @@ igb_setup_vlan_hw_support(struct adapter *adapter)
 	** A soft reset zero's out the VFTA, so
 	** we need to repopulate it now.
 	*/
-	for (int i = 0; i < IGB_VFTA_SIZE; i++)
+	for (i = 0; i < IGB_VFTA_SIZE; i++)
                 if (adapter->shadow_vfta[i] != 0) {
 			if (adapter->vf_ifp)
 				e1000_vfta_set_vf(hw,
@@ -5561,12 +5600,14 @@ igb_get_vf_counter(if_t ifp, ift_counter cnt)
 	case IFCOUNTER_OERRORS:
 		return (adapter->watchdog_events);
 #ifndef IGB_LEGACY_TX
-	case IFCOUNTER_OQDROPS:
+	case IFCOUNTER_OQDROPS: {
+		int i;
 		rv = 0;
 		txr = adapter->tx_rings;
-		for (int i = 0; i < adapter->num_queues; i++, txr++)
+		for (i = 0; i < adapter->num_queues; i++, txr++)
 			rv += txr->br->br_drops;
 		return (rv);
+	}
 #endif
 	default:
 		return (if_get_counter_default(ifp, cnt));
@@ -5614,12 +5655,14 @@ igb_get_counter(if_t ifp, ift_counter cnt)
 	case IFCOUNTER_IQDROPS:
 		return (stats->mpc);
 #ifndef IGB_LEGACY_TX
-	case IFCOUNTER_OQDROPS:
+	case IFCOUNTER_OQDROPS: {
+		int i;
 		rv = 0;
 		txr = adapter->tx_rings;
-		for (int i = 0; i < adapter->num_queues; i++, txr++)
+		for (i = 0; i < adapter->num_queues; i++, txr++)
 			rv += txr->br->br_drops;
 		return (rv);
+	}
 #endif
 	default:
 		return (if_get_counter_default(ifp, cnt));
@@ -5822,12 +5865,16 @@ igb_update_vf_stats_counters(struct adapter *adapter)
 static int
 igb_sysctl_reg_handler(SYSCTL_HANDLER_ARGS)
 {
+#ifndef __HAIKU__
 	struct adapter *adapter;
 	u_int val;
 
 	adapter = oidp->oid_arg1;
 	val = E1000_READ_REG(&adapter->hw, oidp->oid_arg2);
 	return (sysctl_handle_int(oidp, &val, 0, req));
+#else
+	return -1;
+#endif
 }
 
 /*
@@ -5836,6 +5883,7 @@ igb_sysctl_reg_handler(SYSCTL_HANDLER_ARGS)
 static int
 igb_sysctl_interrupt_rate_handler(SYSCTL_HANDLER_ARGS)
 {
+#ifndef __HAIKU__
 	struct igb_queue	*que = ((struct igb_queue *)oidp->oid_arg1);
 	int			error;
 	u32			reg, usec, rate;
@@ -5849,6 +5897,7 @@ igb_sysctl_interrupt_rate_handler(SYSCTL_HANDLER_ARGS)
 	error = sysctl_handle_int(oidp, &rate, 0, req);
 	if (error || !req->newptr)
 		return error;
+#endif
 	return 0;
 }
 
@@ -5858,10 +5907,12 @@ igb_sysctl_interrupt_rate_handler(SYSCTL_HANDLER_ARGS)
 static void
 igb_add_hw_stats(struct adapter *adapter)
 {
+#ifndef __HAIKU__
 	device_t dev = adapter->dev;
 
 	struct tx_ring *txr = adapter->tx_rings;
 	struct rx_ring *rxr = adapter->rx_rings;
+	int i;
 
 	struct sysctl_ctx_list *ctx = device_get_sysctl_ctx(dev);
 	struct sysctl_oid *tree = device_get_sysctl_tree(dev);
@@ -5919,7 +5970,7 @@ igb_add_hw_stats(struct adapter *adapter)
 			CTLFLAG_RD, &adapter->hw.fc.low_water, 0,
 			"Flow Control Low Watermark");
 
-	for (int i = 0; i < adapter->num_queues; i++, rxr++, txr++) {
+	for (i = 0; i < adapter->num_queues; i++, rxr++, txr++) {
 		struct lro_ctrl *lro = &rxr->lro;
 
 		snprintf(namebuf, QUEUE_NAME_LEN, "queue%d", i);
@@ -6264,6 +6315,7 @@ igb_add_hw_stats(struct adapter *adapter)
 	SYSCTL_ADD_QUAD(ctx, host_list, OID_AUTO, "header_redir_missed",
 			CTLFLAG_RD, &stats->hrmpc,
 			"Header Redirection Missed Packet Count");
+#endif
 }
 
 

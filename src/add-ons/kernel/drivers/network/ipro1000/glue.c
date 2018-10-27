@@ -23,6 +23,7 @@ __haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[]))
 	driver_t *drivers[] = {
 		DRIVER_MODULE_NAME(em, pci),
 		DRIVER_MODULE_NAME(lem, pci),
+		DRIVER_MODULE_NAME(igb, pci),
 		NULL
 	};
 	return (*handler)(drivers);
