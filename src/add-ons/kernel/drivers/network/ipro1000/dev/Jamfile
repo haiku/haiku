@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network ipro1000 dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 dev e1000 ;
