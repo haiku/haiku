@@ -1550,12 +1550,22 @@ rule BuildCDBootImage image : bootfloppy : bootefi : extrafiles
 	Depends $(image) : $(bootefi) ;
 	Depends $(image) : $(extrafiles) ;
 	BOOTIMG on $(image) = $(bootfloppy) ;
-	BOOTEFI on $(image) = $(bootefi) ;
 
-	BuildCDBootImage1 $(image) : $(bootfloppy) $(bootefi) $(extrafiles) ;
+	if $(HAIKU_ANYBOOT_LEGACY) = 1 {
+		BuildCDBootImageMBR $(image) : $(bootfloppy) $(extrafiles) ;
+	} else {
+		BOOTEFI on $(image) = $(bootefi) ;
+		BuildCDBootImageEFI $(image) : $(bootfloppy) $(bootefi) $(extrafiles) ;
+	}
 }
 
-actions BuildCDBootImage1
+actions BuildCDBootImageMBR
+{
+	$(RM) $(<)
+	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
+}
+
+actions BuildCDBootImageEFI
 {
 	$(RM) $(<)
 	mkisofs -b $(BOOTIMG) -eltorito-alt-boot -no-emul-boot -e $(BOOTEFI) -r -J -V bootimg -o $(<) $(>[1]) $(>[2]) $(>[3-])

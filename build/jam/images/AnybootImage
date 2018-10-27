@@ -42,7 +42,6 @@ MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
 MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
 
 if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-	Echo "HAIKU_ANYBOOT_LEGACY defined so anyboot is MBR only" ;
 	BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
 		: $(HAIKU_IMAGE_NAME) ;
 } else {

@@ -27,13 +27,18 @@ if $(TARGET_ARCH) = ppc {
 	SEARCH on $(chrpscript) $(hfsmaps) $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 
 	BuildCDBootPPCImage $(HAIKU_CD_BOOT_IMAGE) : $(hfsmaps) : $(elfloader) : $(coffloader) : $(chrpscript) : $(extras) ;
+} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
+	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : : $(extras) ;
+
+	SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 } else {
 	local efiLoader = haiku_loader.efi ;
 	local efiPartition = esp.image ;
 	MakeLocate $(efiPartition) : $(HAIKU_OUTPUT_DIR) ;
 	BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 
-	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : $(efiPartition) : $(extras) ;
+	BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
+		: $(efiPartition) : $(extras) ;
 
 	SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
 }
