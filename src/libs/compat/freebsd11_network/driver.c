@@ -172,7 +172,10 @@ _fbsd_init_drivers(driver_t *drivers[])
 			status = add_child_device(driver, root, &device);
 			if (status != B_OK)
 				break;
-			if (device_attach(device) == 0) {
+			// some drivers expect probe() to be called before attach()
+			// (i.e. they set driver softc in probe(), etc.)
+			if (device->methods.probe(device) >= 0
+					&& device_attach(device) == 0) {
 				dprintf("%s: init_driver(%p) at %d\n", gDriverName, driver, i);
 				status = init_root_device(&root);
 				if (status != B_OK)
