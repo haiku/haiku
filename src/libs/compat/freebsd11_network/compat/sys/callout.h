@@ -9,22 +9,7 @@
 
 
 #include <sys/haiku-module.h>
-
-#include <sys/queue.h>
-
-#include <util/list.h>
-
-
-struct callout {
-	struct list_link	link;
-	bigtime_t			due;
-	uint32				flags;
-
-	void *				c_arg;
-	void				(*c_func)(void *);
-	struct mtx *		c_mtx;
-	int					c_flags;
-};
+#include <sys/_callout.h>
 
 
 #define	CALLOUT_MPSAFE			0x0008 /* deprecated */
