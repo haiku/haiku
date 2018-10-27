@@ -3,17 +3,17 @@
 # Place user customizations in ~/config/settings/profile
 #
 
-ARCH=`getarch 2>/dev/null`
-if [ "$ARCH" = "`getarch -p 2>/dev/null`" ] ; then
+_ARCH=`getarch 2>/dev/null`
+if [ "$_ARCH" = "`getarch -p 2>/dev/null`" ] ; then
 	echo -e "\nWelcome to the Haiku shell.\n"
 	PS1="\w"
 else
 	echo -e "\nSwitching to architecture `getarch`\n"
-	PS1="[$ARCH] \w"
+	PS1="[$_ARCH] \w"
 fi
-unset ARCH
+unset _ARCH
 
-PS1="\["'`if [ $? = 0 ]; then echo "\e[32m";
+export PS1="\["'`if [ $? = 0 ]; then echo "\e[32m";
 	else echo "\e[31m"; fi`'"\]$PS1\[\e[0m\]> "
 
 export USER=`id -un`
