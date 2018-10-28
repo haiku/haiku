@@ -47,7 +47,6 @@ private:
 	virtual void				_ReservedWriter4();
 	virtual void				_ReservedWriter5();
 
-public: // XXX for test programs only
 			void				Setup(BDataIO* target);
 
 			BDataIO*			fTarget;
