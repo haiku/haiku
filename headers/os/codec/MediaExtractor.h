@@ -93,6 +93,8 @@ private:
 			int32				fStreamCount;
 
 			media_file_format	fFileFormat;
+
+			uint32				fReserved[5];
 };
 
 } // namespace media

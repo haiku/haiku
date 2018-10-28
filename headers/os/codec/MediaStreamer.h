@@ -25,6 +25,11 @@ public:
 private:
 			BUrl				fUrl;
 			Streamer*			fStreamer;
+
+			// No virtual padding needed. Looks like a design decision.
+			// Let's respect that, for now.
+			// Same apply to MediaWriter and MediaExtractor.
+			uint32				fReserved[5];
 };
 
 

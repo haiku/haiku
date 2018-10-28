@@ -18,3 +18,7 @@ MediaPlugin::~MediaPlugin()
 {
 }
 
+
+// FBC
+void MediaPlugin::_ReservedMediaPlugin1() {}
+void MediaPlugin::_ReservedMediaPlugin2() {}
