@@ -57,7 +57,6 @@ private:
 	virtual void				_ReservedReader4();
 	virtual void				_ReservedReader5();
 
-public: // XXX for test programs only
 			void				Setup(BDataIO* source);
 
 			BDataIO*			fSource;
