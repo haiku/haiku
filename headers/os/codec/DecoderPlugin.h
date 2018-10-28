@@ -1,6 +1,7 @@
 #ifndef _DECODER_PLUGIN_H
 #define _DECODER_PLUGIN_H
 
+
 #include <MediaTrack.h>
 #include <MediaFormats.h>
 #include "MediaPlugin.h"
@@ -48,17 +49,17 @@ public:
 	virtual status_t			Perform(perform_code code, void* data);
 
 private:
-	virtual void				_ReservedDecoder1();
-	virtual void				_ReservedDecoder2();
-	virtual void				_ReservedDecoder3();
-	virtual void				_ReservedDecoder4();
-	virtual void				_ReservedDecoder5();
-
 			ChunkProvider*		fChunkProvider;
 
 	// needed for plug-in reference count management
 	friend class PluginManager;
 			MediaPlugin*		fMediaPlugin;
+
+	virtual void				_ReservedDecoder1();
+	virtual void				_ReservedDecoder2();
+	virtual void				_ReservedDecoder3();
+	virtual void				_ReservedDecoder4();
+	virtual void				_ReservedDecoder5();
 
 			uint32				fReserved[5];
 };

@@ -88,10 +88,6 @@ private:
 	friend class PluginManager;
 			MediaPlugin*		fMediaPlugin;
 
-private:
-	// FBC padding
-			uint32				fReserved[20];
-
 	virtual void				_ReservedEncoder1();
 	virtual void				_ReservedEncoder2();
 	virtual void				_ReservedEncoder3();
@@ -112,6 +108,9 @@ private:
 	virtual void				_ReservedEncoder18();
 	virtual void				_ReservedEncoder19();
 	virtual void				_ReservedEncoder20();
+
+	// FBC padding
+			uint32				fReserved[20];
 };
 
 

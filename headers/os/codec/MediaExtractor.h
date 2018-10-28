@@ -74,7 +74,6 @@ public:
 
 			void				StopProcessing();
 
-
 private:
 			void				_Init(BDataIO* source, int32 flags);
 
@@ -82,7 +81,6 @@ private:
 	static	int32				_ExtractorEntry(void* arg);
 			void				_ExtractorThread();
 
-private:
 			status_t			fInitStatus;
 
 			sem_id				fExtractorWaitSem;

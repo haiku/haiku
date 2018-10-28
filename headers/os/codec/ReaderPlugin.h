@@ -1,8 +1,10 @@
 #ifndef _READER_PLUGIN_H
 #define _READER_PLUGIN_H
 
+
 #include <MediaTrack.h>
 #include "MediaPlugin.h"
+
 
 namespace BPrivate { namespace media {
 
@@ -12,6 +14,7 @@ enum {
 	B_MEDIA_SEEK_TO_TIME	= 0x10000,
 	B_MEDIA_SEEK_TO_FRAME	= 0x20000
 };
+
 
 class Reader {
 public:
@@ -51,12 +54,6 @@ public:
 	virtual status_t			Perform(perform_code code, void* data);
 
 private:
-	virtual void				_ReservedReader1();
-	virtual void				_ReservedReader2();
-	virtual void				_ReservedReader3();
-	virtual void				_ReservedReader4();
-	virtual void				_ReservedReader5();
-
 			void				Setup(BDataIO* source);
 
 			BDataIO*			fSource;
@@ -64,6 +61,12 @@ private:
 	// needed for plug-in reference count management
 	friend class PluginManager;
 			MediaPlugin*		fMediaPlugin;
+
+	virtual void				_ReservedReader1();
+	virtual void				_ReservedReader2();
+	virtual void				_ReservedReader3();
+	virtual void				_ReservedReader4();
+	virtual void				_ReservedReader5();
 
 			uint32				fReserved[5];
 };

@@ -51,7 +51,6 @@ private:
 				void*			cookie;
 			};
 
-private:
 			BDataIO*			fTarget;
 			Writer*				fWriter;
 

@@ -13,23 +13,26 @@ namespace BPrivate { namespace media {
 
 class PluginManager;
 
+
 class Streamer {
 public:
 								Streamer();
 	virtual						~Streamer();
 
 	virtual status_t			Sniff(const BUrl& url, BDataIO** source) = 0;
+
 private:
+	friend class PluginManager;
+
+			MediaPlugin*		fMediaPlugin;
+
 	virtual void				_ReservedStreamer1();
 	virtual void				_ReservedStreamer2();
 	virtual void				_ReservedStreamer3();
 	virtual void				_ReservedStreamer4();
 	virtual void				_ReservedStreamer5();
 
-			MediaPlugin*		fMediaPlugin;
 			uint32				fReserved[5];
-
-	friend class PluginManager;
 };
 
 
