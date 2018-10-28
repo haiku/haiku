@@ -395,7 +395,12 @@ public:
 		fTitleView->SetText(package.Title());
 
 		BString publisher = package.Publisher().Name();
-		fPublisherView->SetText(publisher);
+		if (publisher.CountChars() > 45) {
+			fPublisherView->SetToolTip(publisher);
+			fPublisherView->SetText(publisher.TruncateChars(45)
+				.Append(B_UTF8_ELLIPSIS));
+		} else
+			fPublisherView->SetText(publisher);
 
 		BString version = B_TRANSLATE("%Version%");
 		version.ReplaceAll("%Version%", package.Version().ToString());
