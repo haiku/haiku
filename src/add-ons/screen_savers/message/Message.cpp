@@ -112,7 +112,7 @@ Message::~Message()
 {
 	for (int32 i = 0; i < fFontFamilies.CountItems(); i++) {
 		if (fFontFamilies.ItemAt(i))
-			delete fFontFamilies.ItemAt(i);
+			delete[] fFontFamilies.ItemAt(i);
 	}
 }
 
