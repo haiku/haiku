@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "DecoderPlugin.h"
 
 #include <stdio.h>
@@ -47,13 +48,12 @@ Decoder::Perform(perform_code code, void* _data)
 	return B_OK;
 }
 
+
 void Decoder::_ReservedDecoder1() {}
 void Decoder::_ReservedDecoder2() {}
 void Decoder::_ReservedDecoder3() {}
 void Decoder::_ReservedDecoder4() {}
 void Decoder::_ReservedDecoder5() {}
-
-//	#pragma mark -
 
 
 DecoderPlugin::DecoderPlugin()
