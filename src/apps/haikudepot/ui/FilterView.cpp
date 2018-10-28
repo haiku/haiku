@@ -46,10 +46,6 @@ FilterView::FilterView()
 	BPopUpMenu* showMenu = new BPopUpMenu(B_TRANSLATE("Category"));
 	fShowField = new BMenuField("category", B_TRANSLATE("Category:"), showMenu);
 
-	fShowFeaturedPackages = new BCheckBox("showonlyfeatured",
-		B_TRANSLATE("Show only featured packages"),
-		new BMessage(MSG_SHOW_FEATURED_PACKAGES));
-
 	// Construct search terms field
 	fSearchTermsText = new BTextControl("search terms",
 		B_TRANSLATE("Search terms:"), "", NULL);
@@ -71,7 +67,6 @@ FilterView::FilterView()
 		.AddGroup(B_HORIZONTAL)
 			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1.2f)
 				.Add(fShowField, 0.0f)
-				.Add(fShowFeaturedPackages, 0.0f)
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.5f)
@@ -92,7 +87,6 @@ void
 FilterView::AttachedToWindow()
 {
 	fShowField->Menu()->SetTargetForItems(Window());
-	fShowFeaturedPackages->SetTarget(Window());
 	fSearchTermsText->SetTarget(this);
 
 	fSearchTermsText->MakeFocus();
@@ -121,8 +115,6 @@ FilterView::MessageReceived(BMessage* message)
 void
 FilterView::AdoptModel(const Model& model)
 {
-	fShowFeaturedPackages->SetValue(model.ShowFeaturedPackages());
-
 	// Adopt categories
 	BMenu* showMenu = fShowField->Menu();
 	showMenu->RemoveItems(0, showMenu->CountItems(), true);

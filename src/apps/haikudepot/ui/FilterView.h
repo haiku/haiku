@@ -18,7 +18,6 @@ enum {
 	MSG_CATEGORY_SELECTED		= 'ctsl',
 	MSG_DEPOT_SELECTED			= 'dpsl',
 	MSG_SEARCH_TERMS_MODIFIED	= 'stmd',
-	MSG_SHOW_FEATURED_PACKAGES	= 'sofp',
 };
 
 
@@ -34,7 +33,6 @@ public:
 
 private:
 			BMenuField*			fShowField;
-			BCheckBox*			fShowFeaturedPackages;
 			BTextControl*		fSearchTermsText;
 };
 

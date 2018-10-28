@@ -348,7 +348,7 @@ private:
 
 FeaturedPackagesView::FeaturedPackagesView()
 	:
-	BView("featured package view", 0)
+	BView(B_TRANSLATE("Featured packages"), 0)
 {
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);

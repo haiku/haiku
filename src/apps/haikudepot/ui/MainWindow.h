@@ -10,6 +10,7 @@
 
 #include <Window.h>
 
+#include "TabView.h"
 #include "BulkLoadStateMachine.h"
 #include "Model.h"
 #include "PackageAction.h"
@@ -94,7 +95,7 @@ private:
 
 private:
 			FilterView*			fFilterView;
-			BCardLayout*		fListLayout;
+			TabView*			fListTabs;
 			FeaturedPackagesView* fFeaturedPackagesView;
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;

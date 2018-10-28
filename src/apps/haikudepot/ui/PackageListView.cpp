@@ -772,7 +772,7 @@ struct PackageListView::RowByNameHashDefinition {
 
 PackageListView::PackageListView(BLocker* modelLock)
 	:
-	BColumnListView("package list view", 0, B_FANCY_BORDER, true),
+	BColumnListView(B_TRANSLATE("All packages"), 0, B_FANCY_BORDER, true),
 	fModelLock(modelLock),
 	fPackageListener(new(std::nothrow) PackageListener(this)),
 	fRowByNameTable(new RowByNameTable()),

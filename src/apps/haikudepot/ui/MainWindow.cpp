@@ -76,6 +76,7 @@ enum {
 	MSG_AUTHORIZATION_CHANGED	= 'athc',
 	MSG_PACKAGE_CHANGED			= 'pchd',
 
+	MSG_SHOW_FEATURED_PACKAGES	= 'sofp',
 	MSG_SHOW_AVAILABLE_PACKAGES	= 'savl',
 	MSG_SHOW_INSTALLED_PACKAGES	= 'sins',
 	MSG_SHOW_SOURCE_PACKAGES	= 'ssrc',
@@ -156,11 +157,10 @@ MainWindow::MainWindow(const BMessage& settings)
 	fWorkStatusView = new WorkStatusView("work status");
 	fPackageListView->AttachWorkStatusView(fWorkStatusView);
 
-	BView* listArea = new BView("list area", 0);
-	fListLayout = new BCardLayout();
-	listArea->SetLayout(fListLayout);
-	listArea->AddChild(fFeaturedPackagesView);
-	listArea->AddChild(fPackageListView);
+	fListTabs = new TabView(BMessenger(this),
+		BMessage(MSG_SHOW_FEATURED_PACKAGES), "list tabs");
+	fListTabs->AddTab(fFeaturedPackagesView);
+	fListTabs->AddTab(fPackageListView);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -170,7 +170,7 @@ MainWindow::MainWindow(const BMessage& settings)
 		.Add(fFilterView)
 		.AddSplit(fSplitView)
 			.AddGroup(B_VERTICAL)
-				.Add(listArea)
+				.Add(fListTabs)
 				.SetInsets(
 					B_USE_DEFAULT_SPACING, 0.0f,
 					B_USE_DEFAULT_SPACING, 0.0f)
@@ -203,9 +203,9 @@ MainWindow::MainWindow(const BMessage& settings)
 		fModel.SetShowSourcePackages(showOption);
 
 	if (fModel.ShowFeaturedPackages())
-		fListLayout->SetVisibleItem((int32)0);
+		fListTabs->Select(0);
 	else
-		fListLayout->SetVisibleItem(1);
+		fListTabs->Select(1);
 
 	_RestoreUserName(settings);
 	_RestoreWindowFrame(settings);
@@ -348,10 +348,14 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_SHOW_FEATURED_PACKAGES:
+			// check to see if we aren't already on the current tab
+			if (fListTabs->Selection() ==
+					(fModel.ShowFeaturedPackages() ? 0 : 1))
+				break;
 			{
 				BAutolock locker(fModel.Lock());
 				fModel.SetShowFeaturedPackages(
-					!fModel.ShowFeaturedPackages());
+					fListTabs->Selection() == 0);
 			}
 			_AdoptModel();
 			break;
@@ -849,9 +853,9 @@ MainWindow::_AdoptModel()
 	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
 
 	if (fModel.ShowFeaturedPackages())
-		fListLayout->SetVisibleItem((int32)0);
+		fListTabs->Select(0);
 	else
-		fListLayout->SetVisibleItem((int32)1);
+		fListTabs->Select(1);
 
 	fFilterView->AdoptModel(fModel);
 }

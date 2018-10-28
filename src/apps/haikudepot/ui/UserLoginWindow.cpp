@@ -17,12 +17,12 @@
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
-#include <TabView.h>
 #include <TextControl.h>
 #include <UnicodeChar.h>
 
 #include "BitmapView.h"
 #include "Model.h"
+#include "TabView.h"
 #include "WebAppInterface.h"
 
 
@@ -36,31 +36,6 @@ enum {
 	MSG_CAPTCHA_OBTAINED		= 'cpob',
 	MSG_VALIDATE_FIELDS			= 'vldt',
 	MSG_LANGUAGE_SELECTED		= 'lngs',
-};
-
-
-class TabView : public BTabView {
-public:
-	TabView(const BMessenger& target, const BMessage& message)
-		:
-		BTabView("tab view", B_WIDTH_FROM_WIDEST),
-		fTarget(target),
-		fMessage(message)
-	{
-	}
-
-	virtual void Select(int32 tabIndex)
-	{
-		BTabView::Select(tabIndex);
-
-		BMessage message(fMessage);
-		message.AddInt32("tab index", tabIndex);
-		fTarget.SendMessage(&message);
-	}
-
-private:
-	BMessenger	fTarget;
-	BMessage	fMessage;
 };
 
 
