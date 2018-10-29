@@ -877,20 +877,21 @@ uninit_stack()
 	TRACE(("Unloading network stack\n"));
 
 	put_module(NET_SOCKET_MODULE_NAME);
-	uninit_timers();
-	uninit_device_interfaces();
-	uninit_interfaces();
-	uninit_domains();
 	uninit_notifications();
-
-	mutex_destroy(&sChainLock);
-	mutex_destroy(&sInitializeChainLock);
 
 	// remove chains and families
 
 	chain::DeleteChains(sProtocolChains);
 	chain::DeleteChains(sDatalinkProtocolChains);
 	chain::DeleteChains(sReceivingProtocolChains);
+
+	mutex_destroy(&sChainLock);
+	mutex_destroy(&sInitializeChainLock);
+
+	uninit_timers();
+	uninit_device_interfaces();
+	uninit_interfaces();
+	uninit_domains();
 
 	struct family* current;
 	current = sFamilies->Clear(true);
