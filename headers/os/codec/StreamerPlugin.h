@@ -22,9 +22,9 @@ public:
 	virtual status_t			Sniff(const BUrl& url, BDataIO** source) = 0;
 
 private:
-	friend class PluginManager;
-
 			MediaPlugin*		fMediaPlugin;
+
+	friend class PluginManager;
 
 	virtual void				_ReservedStreamer1();
 	virtual void				_ReservedStreamer2();

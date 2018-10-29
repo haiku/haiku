@@ -4,6 +4,7 @@
 
 #include <MediaTrack.h>
 #include <MediaFormats.h>
+
 #include "MediaPlugin.h"
 
 
@@ -52,9 +53,10 @@ public:
 private:
 			ChunkProvider*		fChunkProvider;
 
+			MediaPlugin*		fMediaPlugin;
+
 	// needed for plug-in reference count management
 	friend class PluginManager;
-			MediaPlugin*		fMediaPlugin;
 
 	virtual void				_ReservedDecoder1();
 	virtual void				_ReservedDecoder2();

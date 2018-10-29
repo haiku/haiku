@@ -276,7 +276,7 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 		}
 
 		buffered_source->Seek(0, SEEK_SET);
-		(*reader)->Setup(buffered_source);
+		(*reader)->_Setup(buffered_source);
 		(*reader)->fMediaPlugin = plugin;
 
 		if ((*reader)->Sniff(streamCount) == B_OK) {
@@ -466,7 +466,7 @@ PluginManager::CreateWriter(Writer** writer, const media_file_format& mff,
 		return B_ERROR;
 	}
 
-	(*writer)->Setup(target);
+	(*writer)->_Setup(target);
 	(*writer)->fMediaPlugin = plugin;
 
 	TRACE("PluginManager::CreateWriter leave\n");

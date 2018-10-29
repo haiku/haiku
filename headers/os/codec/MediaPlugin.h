@@ -15,10 +15,10 @@ public:
 	virtual						~MediaPlugin();
 
 private:
+			int32				fRefCount;
+
 	// needed for plug-in reference count management
 	friend class PluginManager;
-
-			int32				fRefCount;
 
 	virtual void				_ReservedMediaPlugin1();
 	virtual void				_ReservedMediaPlugin2();

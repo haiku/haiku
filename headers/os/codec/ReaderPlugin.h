@@ -3,6 +3,7 @@
 
 
 #include <MediaTrack.h>
+
 #include "MediaPlugin.h"
 
 
@@ -54,13 +55,14 @@ public:
 	virtual status_t			Perform(perform_code code, void* data);
 
 private:
-			void				Setup(BDataIO* source);
+			void				_Setup(BDataIO* source);
 
 			BDataIO*			fSource;
 
+			MediaPlugin*		fMediaPlugin;
+
 	// needed for plug-in reference count management
 	friend class PluginManager;
-			MediaPlugin*		fMediaPlugin;
 
 	virtual void				_ReservedReader1();
 	virtual void				_ReservedReader2();
