@@ -572,19 +572,7 @@ dump_rw_lock_info(int argc, char** argv)
 void
 mutex_init(mutex* lock, const char *name)
 {
-	lock->name = name;
-	lock->waiters = NULL;
-	B_INITIALIZE_SPINLOCK(&lock->lock);
-#if KDEBUG
-	lock->holder = -1;
-#else
-	lock->count = 0;
-	lock->ignore_unlock_count = 0;
-#endif
-	lock->flags = 0;
-
-	T_SCHEDULING_ANALYSIS(InitMutex(lock, name));
-	NotifyWaitObjectListeners(&WaitObjectListener::MutexInitialized, lock);
+	mutex_init_etc(lock, name, 0);
 }
 
 
@@ -618,7 +606,7 @@ mutex_destroy(mutex* lock)
 
 #if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
-		!= lock->holder) {
+			!= lock->holder) {
 		panic("mutex_destroy(): there are blocking threads, but caller doesn't "
 			"hold the lock (%p)", lock);
 		if (_mutex_lock(lock, &locker) != B_OK)
@@ -636,6 +624,12 @@ mutex_destroy(mutex* lock)
 	}
 
 	lock->name = NULL;
+	lock->flags = 0;
+#if KDEBUG
+	lock->holder = 0;
+#else
+	lock->count = INT16_MIN;
+#endif
 
 	locker.Unlock();
 
@@ -717,7 +711,7 @@ _mutex_lock(mutex* lock, void* _locker)
 		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
 	} else if (lock->holder == 0)
-		panic("_mutex_lock(): using unitialized lock %p", lock);
+		panic("_mutex_lock(): using uninitialized lock %p", lock);
 #else
 	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
 		lock->flags &= ~MUTEX_FLAG_RELEASED;
