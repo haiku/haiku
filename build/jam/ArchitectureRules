@@ -415,6 +415,10 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
 			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
 
+			# Just slip these in here as well for EFI (if used)
+			HAIKU_BOOT_EFI_CCFLAGS += -mno-red-zone -maccumulate-outgoing-args ;
+			HAIKU_BOOT_EFI_C++FLAGS += -mno-red-zone -maccumulate-outgoing-args ;
+
 			if x86 in $(HAIKU_ARCHS[2-]) || x86_gcc2 in $(HAIKU_ARCHS[2-]) {
 				Echo "Enable kernel ia32 compatibility" ;
 				HAIKU_KERNEL_DEFINES += _COMPAT_MODE ;
@@ -429,11 +433,9 @@ rule KernelArchitectureSetup architecture
 			case efi :
 				# efi bootloader is PIC
 				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fpic -fno-stack-protector
-					-fPIC -fshort-wchar -mno-red-zone -maccumulate-outgoing-args
-					-Wno-error=unused-variable -Wno-error=main ;
+					-fPIC -fshort-wchar -Wno-error=unused-variable -Wno-error=main ;
 				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fpic -fno-stack-protector
-					-fPIC -fshort-wchar -mno-red-zone -maccumulate-outgoing-args
-					-Wno-error=unused-variable -Wno-error=main ;
+					-fPIC -fshort-wchar -Wno-error=unused-variable -Wno-error=main ;
 				HAIKU_BOOT_$(bootTarget:U)_LDFLAGS = -Bstatic -Bsymbolic
 					-nostdlib -znocombreloc -nostartfiles -no-undefined ;
 			case bios_ia32 :
