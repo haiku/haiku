@@ -37,14 +37,15 @@ static bigtime_t sTimeout;
 static status_t
 callout_thread(void* /*data*/)
 {
-	status_t status = B_OK;
+	status_t status = B_NO_INIT;
 
 	do {
 		bigtime_t timeout = B_INFINITE_TIMEOUT;
 
 		if (status == B_TIMED_OUT || status == B_OK) {
 			// scan timers for new timeout and/or execute a timer
-			mutex_lock(&sLock);
+			if ((status = mutex_lock(&sLock)) != B_OK)
+				continue;
 
 			struct callout* c = NULL;
 			while (true) {
@@ -71,7 +72,8 @@ callout_thread(void* /*data*/)
 							&& (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
 						mtx_unlock(mutex);
 
-					mutex_lock(&sLock);
+					if ((status = mutex_lock(&sLock)) != B_OK)
+						continue;
 
 					sCurrentCallout = NULL;
 					c = NULL;
@@ -127,10 +129,10 @@ init_callout(void)
 
 	return resume_thread(sThread);
 
-err1:
-	mutex_destroy(&sLock);
 err2:
 	delete_sem(sWaitSem);
+err1:
+	mutex_destroy(&sLock);
 	return status;
 }
 
@@ -139,12 +141,11 @@ void
 uninit_callout(void)
 {
 	delete_sem(sWaitSem);
+
+	wait_for_thread(sThread, NULL);
+
 	mutex_lock(&sLock);
-
 	mutex_destroy(&sLock);
-
-	status_t status;
-	wait_for_thread(sThread, &status);
 }
 
 
