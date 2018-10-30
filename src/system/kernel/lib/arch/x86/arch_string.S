@@ -1,10 +1,11 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
-*/
+ */
 
 
 #include <asm_defs.h>
@@ -19,6 +20,12 @@ FUNCTION(memcpy):
 	movl	16(%esp),%esi	/* source */
 	movl	20(%esp),%ecx	/* count */
 
+	/* (count == 0 || dest == src) -> quick way out */
+	testl	%ecx, %ecx
+	je		.tail
+	cmpl	%edi, %esi
+	je		.tail
+
 	/* move by words */
 	// TODO: The addresses might not be aligned!
 	cld
@@ -32,6 +39,7 @@ FUNCTION(memcpy):
 	rep
 	movsb
 
+.tail:
 	popl	%edi
 	popl	%esi
 	ret
