@@ -1515,7 +1515,6 @@ BListView::_FixupScrollBar()
 			horizontalScroller->SetRange(0, w - scrollBarSize.Width());
 			horizontalScroller->SetProportion(scrollBarSize.Width() / w);
 		}
-		printf("Range: %f - %f\n", w, scrollBarSize.Width());
 	}
 }
 
