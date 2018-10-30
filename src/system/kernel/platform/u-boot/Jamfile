@@ -8,5 +8,4 @@ SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 
 KernelMergeObject kernel_platform_u-boot.o :
 	platform.cpp
-	openfirmware.cpp
 ;

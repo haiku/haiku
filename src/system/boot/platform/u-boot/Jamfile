@@ -31,12 +31,6 @@ local platform ;
 for platform in [ MultiBootSubDirSetup u-boot ] {
 	on $(platform) {
 
-		local kernelPlatformSources =
-			openfirmware.cpp ;
-
-		SEARCH on [ FGristFiles $(kernelPlatformSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel platform u-boot ] ;
-
 		# First build the non arch dependent parts
 		BootMergeObject boot_platform_u-boot_common.o :
 		    start.cpp
@@ -49,7 +43,6 @@ for platform in [ MultiBootSubDirSetup u-boot ] {
 		    cpu.cpp
 		    uimage.cpp
 		    video.cpp
-			$(kernelPlatformSources)
 		    $(genericPlatformSources)
 		    :
 		    :

@@ -235,7 +235,9 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	#endif
 
 	// initialize the OpenFirmware wrapper
-	of_init(NULL);
+	// TODO: We need to call this when HAIKU_KERNEL_PLATFORM == openfirmware
+	// boot_platform_init()?
+	//of_init(NULL);
 
 	console_init();
 
