@@ -53,7 +53,7 @@ for platform in [ MultiBootSubDirSetup u-boot ] {
 		    $(genericPlatformSources)
 		    :
 		    :
-		    boot_platform_generic.a
+		    boot_platform_generic_u-boot.a
 		    boot_fdt.a
 		;
 

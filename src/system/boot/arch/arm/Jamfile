@@ -4,14 +4,6 @@ UseLibraryHeaders [ FDirName libfdt ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
 
-{
-	local defines = _BOOT_MODE ;
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti -std=c++1y ;
-}
-
 # TODO: Is there any reason to recompile arch_string.S here?
 local librootArchObjects =
 #	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
@@ -39,43 +31,49 @@ local kernelGenericDriverSources =
 	debug_uart_8250.cpp
 ;
 
-BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
-	# Kernel Drivers (src/system/kernel)
-	$(kernelGenericDriverSources)
-	$(kernelArchDriverSources)
+local platform ;
+for platform in [ MultiBootSubDirSetup u-boot efi ] {
+    on $(platform) {
+		DEFINES += _BOOT_MODE ;
+		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
+			# Kernel Drivers (src/system/kernel)
+			$(kernelGenericDriverSources)
+			$(kernelArchDriverSources)
 
-	# Framebuffer Drivers
-	arch_framebuffer_920.cpp
-	arch_framebuffer_bcm2835.cpp
-	arch_framebuffer_pxa.cpp
-	arch_framebuffer_omap3.cpp
+			# Framebuffer Drivers
+			arch_framebuffer_920.cpp
+			arch_framebuffer_bcm2835.cpp
+			arch_framebuffer_pxa.cpp
+			arch_framebuffer_omap3.cpp
 
-	# Mailbox drivers
-	arch_mailbox_bcm2835.cpp
+			# Mailbox drivers
+			arch_mailbox_bcm2835.cpp
 
-	arch_elf.cpp
-	arch_cpu.cpp
-	arch_mmu.cpp
-	arch_start_kernel.S
+			arch_elf.cpp
+			arch_cpu.cpp
+			arch_mmu.cpp
+			arch_start_kernel.S
 
-	# Reuse a subset of kernel debugging.
-	kernel_stubs.cpp
-	$(kernelDebugSources)
+			# Reuse a subset of kernel debugging.
+			kernel_stubs.cpp
+			$(kernelDebugSources)
 
-	$(librootArchObjects)
-	:
-	:
-	$(kernelLibArchObjects)
-;
+			$(librootArchObjects)
+			:
+			:
+			$(kernelLibArchObjects)
+		;
+		SEARCH on [ FGristFiles arch_elf.cpp $(kernelArchDriverSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
-SEARCH on [ FGristFiles arch_elf.cpp $(kernelArchDriverSources) ]
-	= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
 
-SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
-	= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
+		SEARCH on [ FGristFiles $(librootArchObjects) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
 
-SEARCH on [ FGristFiles $(librootArchObjects) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
+		SEARCH on [ FGristFiles $(kernelDebugSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
+	}
+}
 
-SEARCH on [ FGristFiles $(kernelDebugSources) ]
-	= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
