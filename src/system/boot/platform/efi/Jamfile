@@ -40,7 +40,7 @@ local arch_src =
 	entry.S
 	;
 
-Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]
+Includes [ FGristFiles $(efi_glue_src) $(platform_src) $(arch_src) ]
 	:
 	[ BuildFeatureAttribute gnuefi : headers ]
 	[ BuildFeatureAttribute gnuefi : headersProtocol ]
