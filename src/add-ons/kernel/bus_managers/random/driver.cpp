@@ -48,7 +48,6 @@ typedef struct {
 static status_t
 random_init_device(void* _info, void** _cookie)
 {
-	mutex_init(&sRandomLock, "/dev/random lock");
 	return B_OK;
 }
 
@@ -56,7 +55,6 @@ random_init_device(void* _info, void** _cookie)
 static void
 random_uninit_device(void* _cookie)
 {
-	mutex_destroy(&sRandomLock);
 }
 
 
@@ -186,6 +184,8 @@ random_init_driver(device_node *node, void **cookie)
 	if (info == NULL)
 		return B_NO_MEMORY;
 
+	mutex_init(&sRandomLock, "/dev/random lock");
+
 	memset(info, 0, sizeof(*info));
 
 	info->node = node;
@@ -199,6 +199,9 @@ static void
 random_uninit_driver(void *_cookie)
 {
 	CALLED();
+
+	mutex_destroy(&sRandomLock);
+
 	random_driver_info* info = (random_driver_info*)_cookie;
 	free(info);
 }
