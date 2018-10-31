@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2007-2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FBSD_COMPAT_SYS_KERNEL_H_
@@ -14,22 +14,22 @@
 #include <sys/queue.h>
 
 
-/*
- *
- * The rate at which FreeBSD can generate callouts (kind of timeout mechanism).
+/* The rate at which FreeBSD can generate callouts (kind of timeout mechanism).
  * For FreeBSD 8 this is typically 1000 times per second (100 for ARM).
  * This value is defined in a file called subr_param.c
  *
- * WHile Haiku can have a much higher granularity, it is not a good idea to have
+ * While Haiku can have a much higher granularity, it is not a good idea to have
  * this since FreeBSD tries to do certain tasks based on ticks, for instance
  * autonegotiation and wlan scanning.
  * Suffixing LL prevents integer overflows during calculations.
- * as it defines a long long constant.*/
+ * as it defines a long long constant. */
 #define hz	1000LL
 
-#define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
+int32_t get_ticks();
+#define ticks (get_ticks())
 
-extern int32 ticks;
+#define ticks_to_usecs(t) (1000000*((bigtime_t)t) / hz)
+#define usecs_to_ticks(t) (((bigtime_t)t*hz) / 1000000)
 
 
 typedef void (*system_init_func_t)(void *);

@@ -113,10 +113,6 @@ _fbsd_init_drivers(driver_t *drivers[])
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info **)&gPCIx86) != B_OK)
 		gPCIx86 = NULL;
 
-	status = init_hard_clock();
-	if (status < B_OK)
-		goto err1;
-
 	status = init_mutexes();
 	if (status < B_OK)
 		goto err2;
@@ -207,8 +203,6 @@ err4:
 err3:
 	uninit_mutexes();
 err2:
-	uninit_hard_clock();
-err1:
 	put_module(B_PCI_MODULE_NAME);
 	if (gPCIx86 != NULL)
 		put_module(B_PCI_X86_MODULE_NAME);
@@ -236,7 +230,6 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 	uninit_callout();
 	uninit_mbufs();
 	uninit_mutexes();
-	uninit_hard_clock();
 
 	put_module(B_PCI_MODULE_NAME);
 	if (gPCIx86 != NULL)

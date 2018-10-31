@@ -5,12 +5,11 @@
  */
 
 
-#include "device.h"
-
 #include <lock.h>
 #include <thread.h>
 
 extern "C" {
+#	include "device.h"
 #	include <sys/callout.h>
 #	include <sys/mutex.h>
 }
@@ -176,7 +175,7 @@ callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 
 
 int
-callout_reset(struct callout *c, int ticks, void (*func)(void *), void *arg)
+callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 {
 	int canceled = callout_stop(c);
 
@@ -192,7 +191,7 @@ callout_reset(struct callout *c, int ticks, void (*func)(void *), void *arg)
 		if (c->due <= 0)
 			list_add_item(&sTimers, c);
 
-		c->due = system_time() + ticks_to_usecs(ticks);
+		c->due = system_time() + ticks_to_usecs(_ticks);
 
 		// notify timer about the change if necessary
 		if (sTimeout > c->due)
@@ -204,9 +203,9 @@ callout_reset(struct callout *c, int ticks, void (*func)(void *), void *arg)
 
 
 int
-callout_schedule(struct callout *callout, int ticks)
+callout_schedule(struct callout *callout, int _ticks)
 {
-	return callout_reset(callout, ticks, callout->c_func, callout->c_arg);
+	return callout_reset(callout, _ticks, callout->c_func, callout->c_arg);
 }
 
 

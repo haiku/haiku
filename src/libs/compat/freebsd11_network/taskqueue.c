@@ -345,7 +345,7 @@ taskqueue_timeout_func(void *arg)
 
 int
 taskqueue_enqueue_timeout(struct taskqueue *queue,
-	struct timeout_task *ttask, int ticks)
+	struct timeout_task *ttask, int _ticks)
 {
 	int res;
 	cpu_status status;
@@ -359,7 +359,7 @@ taskqueue_enqueue_timeout(struct taskqueue *queue,
 		/* Do nothing */
 		tq_unlock(queue, status);
 		res = -1;
-	} else if (ticks == 0) {
+	} else if (_ticks == 0) {
 		tq_unlock(queue, status);
 		taskqueue_enqueue(queue, &ttask->t);
 	} else {
@@ -368,12 +368,12 @@ taskqueue_enqueue_timeout(struct taskqueue *queue,
 		} else {
 			queue->tq_callouts++;
 			ttask->f |= DT_CALLOUT_ARMED;
-			if (ticks < 0)
-				ticks = -ticks; /* Ignore overflow. */
+			if (_ticks < 0)
+				_ticks = -_ticks; /* Ignore overflow. */
 		}
 		tq_unlock(queue, status);
-		if (ticks > 0) {
-			callout_reset(&ttask->c, ticks,
+		if (_ticks > 0) {
+			callout_reset(&ttask->c, _ticks,
 				taskqueue_timeout_func, ttask);
 		}
 	}

@@ -38,7 +38,7 @@ void taskqueue_block(struct taskqueue *queue);
 void taskqueue_unblock(struct taskqueue *queue);
 int taskqueue_enqueue(struct taskqueue *tq, struct task *task);
 int taskqueue_enqueue_timeout(struct taskqueue *queue,
-	struct timeout_task *ttask, int ticks);
+	struct timeout_task *ttask, int _ticks);
 int taskqueue_cancel(struct taskqueue *queue, struct task *task,
 	u_int *pendp);
 int taskqueue_cancel_timeout(struct taskqueue *queue,
