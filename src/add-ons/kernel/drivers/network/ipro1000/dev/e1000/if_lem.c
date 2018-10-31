@@ -1,31 +1,31 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2015, Intel Corporation 
+  Copyright (c) 2001-2015, Intel Corporation
   All rights reserved.
-  
-  Redistribution and use in source and binary forms, with or without 
+
+  Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
-  
-   1. Redistributions of source code must retain the above copyright notice, 
+
+   1. Redistributions of source code must retain the above copyright notice,
       this list of conditions and the following disclaimer.
-  
-   2. Redistributions in binary form must reproduce the above copyright 
-      notice, this list of conditions and the following disclaimer in the 
+
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-  
-   3. Neither the name of the Intel Corporation nor the names of its 
-      contributors may be used to endorse or promote products derived from 
+
+   3. Neither the name of the Intel Corporation nor the names of its
+      contributors may be used to endorse or promote products derived from
       this software without specific prior written permission.
-  
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 
@@ -623,7 +623,7 @@ lem_attach(device_t dev)
 		error = ENOMEM;
 		goto err_tx_desc;
 	}
-	adapter->tx_desc_base = 
+	adapter->tx_desc_base =
 	    (struct e1000_tx_desc *)adapter->txdma.dma_vaddr;
 
 	/*
@@ -745,7 +745,7 @@ lem_attach(device_t dev)
 	adapter->vlan_attach = EVENTHANDLER_REGISTER(vlan_config,
 	    lem_register_vlan, adapter, EVENTHANDLER_PRI_FIRST);
 	adapter->vlan_detach = EVENTHANDLER_REGISTER(vlan_unconfig,
-	    lem_unregister_vlan, adapter, EVENTHANDLER_PRI_FIRST); 
+	    lem_unregister_vlan, adapter, EVENTHANDLER_PRI_FIRST);
 
 	lem_add_hw_stats(adapter);
 
@@ -843,7 +843,7 @@ lem_detach(device_t dev)
 	if (adapter->vlan_attach != NULL)
 		EVENTHANDLER_DEREGISTER(vlan_config, adapter->vlan_attach);
 	if (adapter->vlan_detach != NULL)
-		EVENTHANDLER_DEREGISTER(vlan_unconfig, adapter->vlan_detach); 
+		EVENTHANDLER_DEREGISTER(vlan_unconfig, adapter->vlan_detach);
 
 	ether_ifdetach(adapter->ifp);
 	callout_drain(&adapter->timer);
@@ -1117,7 +1117,7 @@ lem_ioctl(if_t ifp, u_long command, caddr_t data)
 			EM_CORE_LOCK(adapter);
 			lem_disable_intr(adapter);
 			lem_set_multi(adapter);
-			if (adapter->hw.mac.type == e1000_82542 && 
+			if (adapter->hw.mac.type == e1000_82542 &&
 	    		    adapter->hw.revision_id == E1000_REVISION_2) {
 				lem_initialize_receive_unit(adapter);
 			}
@@ -1259,7 +1259,7 @@ lem_init_locked(struct adapter *adapter)
 
 	INIT_DEBUGOUT1("lem_init: pba=%dK",pba);
 	E1000_WRITE_REG(&adapter->hw, E1000_PBA, pba);
-	
+
 	/* Get the latest mac address, User can use a LAA */
         bcopy(if_getlladdr(adapter->ifp), adapter->hw.mac.addr,
               ETHER_ADDR_LEN);
@@ -1355,7 +1355,7 @@ lem_init(void *arg)
 #ifdef DEVICE_POLLING
 /*********************************************************************
  *
- *  Legacy polling routine  
+ *  Legacy polling routine
  *
  *********************************************************************/
 static int
@@ -1395,7 +1395,7 @@ lem_poll(if_t ifp, enum poll_cmd cmd, int count)
 
 /*********************************************************************
  *
- *  Legacy Interrupt Service routine  
+ *  Legacy Interrupt Service routine
  *
  *********************************************************************/
 static void
@@ -1491,7 +1491,7 @@ lem_handle_rxtx(void *context, int pending)
 
 /*********************************************************************
  *
- *  Fast Legacy/MSI Combined Interrupt Service routine  
+ *  Fast Legacy/MSI Combined Interrupt Service routine
  *
  *********************************************************************/
 static int
@@ -1743,7 +1743,7 @@ lem_xmit(struct adapter *adapter, struct mbuf **m_headp)
 		    &txd_upper, &txd_lower);
 
 	i = adapter->next_avail_tx_desc;
-	if (adapter->pcix_82544) 
+	if (adapter->pcix_82544)
 		txd_saved = i;
 
 	/* Set up our transmit descriptors */
@@ -1906,7 +1906,7 @@ lem_82547_move_tail(void *arg)
 
 	hw_tdt = E1000_READ_REG(&adapter->hw, E1000_TDT(0));
 	sw_tdt = adapter->next_avail_tx_desc;
-	
+
 	while (hw_tdt != sw_tdt) {
 		tx_desc = &adapter->tx_desc_base[hw_tdt];
 		length += tx_desc->lower.flags.length;
@@ -1925,12 +1925,12 @@ lem_82547_move_tail(void *arg)
 			lem_82547_update_fifo_head(adapter, length);
 			length = 0;
 		}
-	}	
+	}
 }
 
 static int
 lem_82547_fifo_workaround(struct adapter *adapter, int len)
-{	
+{
 	int fifo_space, fifo_pkt_len;
 
 	fifo_pkt_len = roundup2(len + EM_FIFO_HDR, EM_FIFO_HDR);
@@ -1953,7 +1953,7 @@ static void
 lem_82547_update_fifo_head(struct adapter *adapter, int len)
 {
 	int fifo_pkt_len = roundup2(len + EM_FIFO_HDR, EM_FIFO_HDR);
-	
+
 	/* tx_fifo_head is always 16 byte aligned */
 	adapter->tx_fifo_head += fifo_pkt_len;
 	if (adapter->tx_fifo_head >= adapter->tx_fifo_size) {
@@ -1969,7 +1969,7 @@ lem_82547_tx_fifo_reset(struct adapter *adapter)
 
 	if ((E1000_READ_REG(&adapter->hw, E1000_TDT(0)) ==
 	    E1000_READ_REG(&adapter->hw, E1000_TDH(0))) &&
-	    (E1000_READ_REG(&adapter->hw, E1000_TDFT) == 
+	    (E1000_READ_REG(&adapter->hw, E1000_TDFT) ==
 	    E1000_READ_REG(&adapter->hw, E1000_TDFH)) &&
 	    (E1000_READ_REG(&adapter->hw, E1000_TDFTS) ==
 	    E1000_READ_REG(&adapter->hw, E1000_TDFHS)) &&
@@ -2066,7 +2066,7 @@ lem_set_multi(struct adapter *adapter)
 	mta = adapter->mta;
 	bzero(mta, sizeof(u8) * ETH_ADDR_LEN * MAX_NUM_MULTICAST_ADDRESSES);
 
-	if (adapter->hw.mac.type == e1000_82542 && 
+	if (adapter->hw.mac.type == e1000_82542 &&
 	    adapter->hw.revision_id == E1000_REVISION_2) {
 		reg_rctl = E1000_READ_REG(&adapter->hw, E1000_RCTL);
 		if (adapter->hw.bus.pci_cmd_word & CMD_MEM_WRT_INVALIDATE)
@@ -2085,7 +2085,7 @@ lem_set_multi(struct adapter *adapter)
 	} else
 		e1000_update_mc_addr_list(&adapter->hw, mta, mcnt);
 
-	if (adapter->hw.mac.type == e1000_82542 && 
+	if (adapter->hw.mac.type == e1000_82542 &&
 	    adapter->hw.revision_id == E1000_REVISION_2) {
 		reg_rctl = E1000_READ_REG(&adapter->hw, E1000_RCTL);
 		reg_rctl &= ~E1000_RCTL_RST;
@@ -2384,7 +2384,7 @@ lem_allocate_irq(struct adapter *adapter)
 		adapter->tq = NULL;
 		return (error);
 	}
-	
+
 	return (0);
 }
 
@@ -2538,7 +2538,7 @@ lem_setup_interface(device_t dev, struct adapter *adapter)
 		if_setcapabilitiesbit(ifp, IFCAP_WOL, 0);
 		if_setcapenablebit(ifp, IFCAP_WOL_MAGIC, 0);
 	}
-		
+
 	/*
 	 * Specify the media types supported by this adapter and register
 	 * callbacks to update media and link information
@@ -2551,7 +2551,7 @@ lem_setup_interface(device_t dev, struct adapter *adapter)
 
 		if (adapter->hw.mac.type == e1000_82545)
 			fiber_type = IFM_1000_LX;
-		ifmedia_add(&adapter->media, IFM_ETHER | fiber_type | IFM_FDX, 
+		ifmedia_add(&adapter->media, IFM_ETHER | fiber_type | IFM_FDX,
 			    0, NULL);
 		ifmedia_add(&adapter->media, IFM_ETHER | fiber_type, 0, NULL);
 	} else {
@@ -2911,7 +2911,7 @@ lem_initialize_transmit_unit(struct adapter *adapter)
 	/* This write will effectively turn on the transmit unit. */
 	E1000_WRITE_REG(&adapter->hw, E1000_TCTL, tctl);
 
-	/* Setup Transmit Descriptor Base Settings */   
+	/* Setup Transmit Descriptor Base Settings */
 	adapter->txd_cmd = E1000_TXD_CMD_IFCS;
 
 	if (adapter->tx_int_delay.value > 0)
@@ -3153,7 +3153,7 @@ lem_txeof(struct adapter *adapter)
 
 	/*
 	 * What this does is get the index of the
-	 * first descriptor AFTER the EOP of the 
+	 * first descriptor AFTER the EOP of the
 	 * first packet, that way we can do the
 	 * simple comparison on the inner while loop.
 	 */
@@ -3223,7 +3223,7 @@ lem_txeof(struct adapter *adapter)
          * tell the stack that it is OK to send packets.
          * If there are no pending descriptors, clear the watchdog.
          */
-        if (adapter->num_tx_desc_avail > EM_TX_CLEANUP_THRESHOLD) {                
+        if (adapter->num_tx_desc_avail > EM_TX_CLEANUP_THRESHOLD) {
                 if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE);
 #ifdef NIC_PARAVIRT
 		if (adapter->csb) { // XXX also csb_on ?
@@ -3234,7 +3234,7 @@ lem_txeof(struct adapter *adapter)
                 if (adapter->num_tx_desc_avail == adapter->num_tx_desc) {
 			adapter->watchdog_check = FALSE;
 			return;
-		} 
+		}
         }
 }
 
@@ -3603,7 +3603,7 @@ lem_free_receive_structures(struct adapter *adapter)
  *
  *  We loop at most count times if count is > 0, or until done if
  *  count < 0.
- *  
+ *
  *  For polling we also now return the number of cleaned packets
  *********************************************************************/
 static bool
@@ -3716,7 +3716,7 @@ lem_rxeof(struct adapter *adapter, int count, int *done)
 			if (adapter->fmp != NULL)
 				pkt_len += adapter->fmp->m_pkthdr.len;
 
-			last_byte = *(mtod(mp, caddr_t) + desc_len - 1);			
+			last_byte = *(mtod(mp, caddr_t) + desc_len - 1);
 			if (TBI_ACCEPT(&adapter->hw, status,
 			    current_desc->errors, pkt_len, last_byte,
 			    adapter->min_frame_size, adapter->max_frame_size)) {
@@ -4081,7 +4081,7 @@ lem_disable_intr(struct adapter *adapter)
 /*
  * Bit of a misnomer, what this really means is
  * to enable OS management of the system... aka
- * to disable special hardware management features 
+ * to disable special hardware management features
  */
 static void
 lem_init_manageability(struct adapter *adapter)
@@ -4328,7 +4328,7 @@ lem_enable_phy_wakeup(struct adapter *adapter)
 	for (int i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
 #else
 	for (i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
-#endif	
+#endif
 		mreg = E1000_READ_REG_ARRAY(hw, E1000_MTA, i);
 		e1000_write_phy_reg(hw, BM_MTA(i), (u16)(mreg & 0xFFFF));
 		e1000_write_phy_reg(hw, BM_MTA(i) + 1,
@@ -4527,17 +4527,17 @@ lem_update_stats_counters(struct adapter *adapter)
 	adapter->stats.bptc += E1000_READ_REG(&adapter->hw, E1000_BPTC);
 
 	if (adapter->hw.mac.type >= e1000_82543) {
-		adapter->stats.algnerrc += 
+		adapter->stats.algnerrc +=
 		E1000_READ_REG(&adapter->hw, E1000_ALGNERRC);
-		adapter->stats.rxerrc += 
+		adapter->stats.rxerrc +=
 		E1000_READ_REG(&adapter->hw, E1000_RXERRC);
-		adapter->stats.tncrs += 
+		adapter->stats.tncrs +=
 		E1000_READ_REG(&adapter->hw, E1000_TNCRS);
-		adapter->stats.cexterr += 
+		adapter->stats.cexterr +=
 		E1000_READ_REG(&adapter->hw, E1000_CEXTERR);
-		adapter->stats.tsctc += 
+		adapter->stats.tsctc +=
 		E1000_READ_REG(&adapter->hw, E1000_TSCTC);
-		adapter->stats.tsctfc += 
+		adapter->stats.tsctfc +=
 		E1000_READ_REG(&adapter->hw, E1000_TSCTFC);
 	}
 }
@@ -4596,16 +4596,16 @@ lem_add_hw_stats(struct adapter *adapter)
 	struct sysctl_oid_list *stat_list;
 
 	/* Driver Statistics */
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "cluster_alloc_fail", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "cluster_alloc_fail",
 			 CTLFLAG_RD, &adapter->mbuf_cluster_failed,
 			 "Std mbuf cluster failed");
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "mbuf_defrag_fail", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "mbuf_defrag_fail",
 			 CTLFLAG_RD, &adapter->mbuf_defrag_failed,
 			 "Defragmenting mbuf chain failed");
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "dropped", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "dropped",
 			CTLFLAG_RD, &adapter->dropped_pkts,
 			"Driver dropped packets");
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "tx_dma_fail", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "tx_dma_fail",
 			CTLFLAG_RD, &adapter->no_tx_dma_setup,
 			"Driver tx dma failure in xmit");
 	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "tx_desc_fail1",
@@ -4632,7 +4632,7 @@ lem_add_hw_stats(struct adapter *adapter)
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_high_water",
 			CTLFLAG_RD, &adapter->hw.fc.high_water, 0,
 			"Flow Control High Watermark");
-	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_low_water", 
+	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_low_water",
 			CTLFLAG_RD, &adapter->hw.fc.low_water, 0,
 			"Flow Control Low Watermark");
 	SYSCTL_ADD_UQUAD(ctx, child, OID_AUTO, "fifo_workaround",
@@ -4642,27 +4642,27 @@ lem_add_hw_stats(struct adapter *adapter)
 			CTLFLAG_RD, &adapter->tx_fifo_reset_cnt,
 			"TX FIFO resets");
 
-	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "txd_head", 
+	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "txd_head",
 			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_TDH(0),
 			lem_sysctl_reg_handler, "IU",
  			"Transmit Descriptor Head");
-	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "txd_tail", 
+	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "txd_tail",
 			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_TDT(0),
 			lem_sysctl_reg_handler, "IU",
  			"Transmit Descriptor Tail");
-	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rxd_head", 
+	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rxd_head",
 			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_RDH(0),
 			lem_sysctl_reg_handler, "IU",
 			"Receive Descriptor Head");
-	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rxd_tail", 
+	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "rxd_tail",
 			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_RDT(0),
 			lem_sysctl_reg_handler, "IU",
 			"Receive Descriptor Tail");
-	
+
 
 	/* MAC stats get their own sub node */
 
-	stat_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "mac_stats", 
+	stat_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "mac_stats",
 				    CTLFLAG_RD, NULL, "Statistics");
 	stat_list = SYSCTL_CHILDREN(stat_node);
 
@@ -4765,13 +4765,13 @@ lem_add_hw_stats(struct adapter *adapter)
 			CTLFLAG_RD, &adapter->stats.prc1522,
 			"1023-1522 byte frames received");
  	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_octets_recvd",
- 			CTLFLAG_RD, &adapter->stats.gorc, 
+ 			CTLFLAG_RD, &adapter->stats.gorc,
  			"Good Octets Received");
 
 	/* Packet Transmission Stats */
  	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_octets_txd",
- 			CTLFLAG_RD, &adapter->stats.gotc, 
- 			"Good Octets Transmitted"); 
+ 			CTLFLAG_RD, &adapter->stats.gotc,
+ 			"Good Octets Transmitted");
 	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "total_pkts_txd",
 			CTLFLAG_RD, &adapter->stats.tpt,
 			"Total Packets Transmitted");
@@ -4872,7 +4872,7 @@ lem_sysctl_int_delay(SYSCTL_HANDLER_ARGS)
 	u32 regval;
 	int error;
 	int usecs;
-	int ticks;
+	int _ticks;
 
 	info = (struct em_int_delay_info *)arg1;
 	usecs = info->value;
@@ -4882,21 +4882,21 @@ lem_sysctl_int_delay(SYSCTL_HANDLER_ARGS)
 	if (usecs < 0 || usecs > EM_TICKS_TO_USECS(65535))
 		return (EINVAL);
 	info->value = usecs;
-	ticks = EM_USECS_TO_TICKS(usecs);
+	_ticks = EM_USECS_TO_TICKS(usecs);
 	if (info->offset == E1000_ITR)	/* units are 256ns here */
-		ticks *= 4;
+		_ticks *= 4;
 
 	adapter = info->adapter;
-	
+
 	EM_CORE_LOCK(adapter);
 	regval = E1000_READ_OFFSET(&adapter->hw, info->offset);
-	regval = (regval & ~0xffff) | (ticks & 0xffff);
+	regval = (regval & ~0xffff) | (_ticks & 0xffff);
 	/* Handle a few special cases. */
 	switch (info->offset) {
 	case E1000_RDTR:
 		break;
 	case E1000_TIDV:
-		if (ticks == 0) {
+		if (_ticks == 0) {
 			adapter->txd_cmd &= ~E1000_TXD_CMD_IDE;
 			/* Don't write 0 into the TIDV register. */
 			regval++;

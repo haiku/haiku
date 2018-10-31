@@ -1,31 +1,31 @@
 /******************************************************************************
 
-  Copyright (c) 2001-2015, Intel Corporation 
+  Copyright (c) 2001-2015, Intel Corporation
   All rights reserved.
-  
-  Redistribution and use in source and binary forms, with or without 
+
+  Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
-  
-   1. Redistributions of source code must retain the above copyright notice, 
+
+   1. Redistributions of source code must retain the above copyright notice,
       this list of conditions and the following disclaimer.
-  
-   2. Redistributions in binary form must reproduce the above copyright 
-      notice, this list of conditions and the following disclaimer in the 
+
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-  
-   3. Neither the name of the Intel Corporation nor the names of its 
-      contributors may be used to endorse or promote products derived from 
+
+   3. Neither the name of the Intel Corporation nor the names of its
+      contributors may be used to endorse or promote products derived from
       this software without specific prior written permission.
-  
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 
@@ -570,7 +570,7 @@ em_attach(device_t dev)
 	/*
 	** For ICH8 and family we need to
 	** map the flash memory, and this
-	** must happen after the MAC is 
+	** must happen after the MAC is
 	** identified
 	*/
 	if ((hw->mac.type == e1000_ich8lan) ||
@@ -697,7 +697,7 @@ em_attach(device_t dev)
 	 */
 	hw->mac.report_tx_early = 1;
 
-	/* 
+	/*
 	** Get queue/ring memory
 	*/
 	if (em_allocate_queues(adapter)) {
@@ -798,7 +798,7 @@ em_attach(device_t dev)
 	adapter->vlan_attach = EVENTHANDLER_REGISTER(vlan_config,
 	    em_register_vlan, adapter, EVENTHANDLER_PRI_FIRST);
 	adapter->vlan_detach = EVENTHANDLER_REGISTER(vlan_unconfig,
-	    em_unregister_vlan, adapter, EVENTHANDLER_PRI_FIRST); 
+	    em_unregister_vlan, adapter, EVENTHANDLER_PRI_FIRST);
 
 	em_add_hw_stats(adapter);
 
@@ -883,7 +883,7 @@ em_detach(device_t dev)
 	if (adapter->vlan_attach != NULL)
 		EVENTHANDLER_DEREGISTER(vlan_config, adapter->vlan_attach);
 	if (adapter->vlan_detach != NULL)
-		EVENTHANDLER_DEREGISTER(vlan_unconfig, adapter->vlan_detach); 
+		EVENTHANDLER_DEREGISTER(vlan_unconfig, adapter->vlan_detach);
 
 	ether_ifdetach(adapter->ifp);
 	callout_drain(&adapter->timer);
@@ -1035,7 +1035,7 @@ em_start(if_t ifp)
 }
 #else /* EM_MULTIQUEUE */
 /*********************************************************************
- *  Multiqueue Transmit routines 
+ *  Multiqueue Transmit routines
  *
  *  em_mq_start is called by the stack to initiate a transmit.
  *  however, if busy the driver can queue the request rather
@@ -1066,7 +1066,7 @@ em_mq_start(if_t ifp, struct mbuf *m)
 	if (EM_TX_TRYLOCK(txr)) {
 		em_mq_start_locked(ifp, txr);
 		EM_TX_UNLOCK(txr);
-	} else 
+	} else
 		taskqueue_enqueue(txr->tq, &txr->tx_task);
 
 	return (0);
@@ -1093,7 +1093,7 @@ em_mq_start_locked(if_t ifp, struct tx_ring *txr)
 				/* It was freed, move forward */
 				drbr_advance(ifp, txr->br);
 			} else {
-				/* 
+				/*
 				 * Still have one left, it may not be
 				 * the same since the transmit function
 				 * may have changed it.
@@ -1410,7 +1410,7 @@ em_init_locked(struct adapter *adapter)
 	if_clearhwassist(ifp);
 	if (if_getcapenable(ifp) & IFCAP_TXCSUM)
 		if_sethwassistbits(ifp, CSUM_TCP | CSUM_UDP, 0);
-	/* 
+	/*
 	** There have proven to be problems with TSO when not
 	** at full gigabit speed, so disable the assist automatically
 	** when at lower speeds.  -jfv
@@ -1561,7 +1561,7 @@ em_poll(if_t ifp, enum poll_cmd cmd, int count)
 
 /*********************************************************************
  *
- *  Fast Legacy/MSI Combined Interrupt Service routine  
+ *  Fast Legacy/MSI Combined Interrupt Service routine
  *
  *********************************************************************/
 static int
@@ -1953,7 +1953,7 @@ em_xmit(struct tx_ring *txr, struct mbuf **m_headp)
 	 * which also has similar restrictions.
 	 */
 	if (do_tso || m_head->m_pkthdr.csum_flags & CSUM_OFFLOAD) {
-		if (do_tso || (m_head->m_next != NULL && 
+		if (do_tso || (m_head->m_next != NULL &&
 		    m_head->m_pkthdr.csum_flags & CSUM_OFFLOAD)) {
 			if (M_WRITABLE(*m_headp) == 0) {
 				m_head = m_dup(*m_headp, M_NOWAIT);
@@ -2162,7 +2162,7 @@ retry:
 			if (++i == adapter->num_tx_desc)
 				i = 0;
 
-			/* Now make the sentinel */	
+			/* Now make the sentinel */
 			txr->tx_avail--;
 			ctxd = &txr->tx_base[i];
 			tx_buffer = &txr->tx_buffers[i];
@@ -2289,7 +2289,7 @@ em_set_multi(struct adapter *adapter)
 	mta = adapter->mta;
 	bzero(mta, sizeof(u8) * ETH_ADDR_LEN * MAX_NUM_MULTICAST_ADDRESSES);
 
-	if (adapter->hw.mac.type == e1000_82542 && 
+	if (adapter->hw.mac.type == e1000_82542 &&
 	    adapter->hw.revision_id == E1000_REVISION_2) {
 		reg_rctl = E1000_READ_REG(&adapter->hw, E1000_RCTL);
 		if (adapter->hw.bus.pci_cmd_word & CMD_MEM_WRT_INVALIDATE)
@@ -2308,7 +2308,7 @@ em_set_multi(struct adapter *adapter)
 	} else
 		e1000_update_mc_addr_list(&adapter->hw, mta, mcnt);
 
-	if (adapter->hw.mac.type == e1000_82542 && 
+	if (adapter->hw.mac.type == e1000_82542 &&
 	    adapter->hw.revision_id == E1000_REVISION_2) {
 		reg_rctl = E1000_READ_REG(&adapter->hw, E1000_RCTL);
 		reg_rctl &= ~E1000_RCTL_RST;
@@ -2361,7 +2361,7 @@ em_local_timer(void *arg)
 		trigger = E1000_ICS_RXDMT0;
 
 	/*
-	** Check on the state of the TX queue(s), this 
+	** Check on the state of the TX queue(s), this
 	** can be done without the lock because its RO
 	** and the HUNG state will be static if set.
 	*/
@@ -2374,7 +2374,7 @@ em_local_timer(void *arg)
 		if (txr->tx_avail <= EM_MAX_SCATTER)
 			taskqueue_enqueue(txr->tq, &txr->tx_task);
 	}
-	
+
 	callout_reset(&adapter->timer, hz, em_local_timer, adapter);
 #ifndef DEVICE_POLLING
 	/* Trigger an RX interrupt to guarantee mbuf refresh */
@@ -2616,7 +2616,7 @@ em_allocate_legacy(struct adapter *adapter)
 		adapter->tq = NULL;
 		return (error);
 	}
-	
+
 	return (0);
 }
 
@@ -2871,7 +2871,7 @@ em_setup_msix(struct adapter *adapter)
 			    "Unable to map MSIX table \n");
 			goto msi;
        		}
-		val = pci_msix_count(dev); 
+		val = pci_msix_count(dev);
 
 #ifdef EM_MULTIQUEUE
 		/* We need 5 vectors in the multiqueue case */
@@ -2922,7 +2922,7 @@ msi:
        	if (pci_alloc_msi(dev, &val) == 0) {
                	device_printf(adapter->dev, "Using an MSI interrupt\n");
 		return (val);
-	} 
+	}
 	/* Should only happen due to manual configuration */
 	device_printf(adapter->dev,"No MSI/MSIX using a Legacy IRQ\n");
 	return (0);
@@ -3019,12 +3019,12 @@ em_flush_desc_rings(struct adapter *adapter)
 	device_t	dev = adapter->dev;
 	u16		hang_state;
 	u32		fext_nvm11, tdlen;
- 
+
 	/* First, disable MULR fix in FEXTNVM11 */
 	fext_nvm11 = E1000_READ_REG(hw, E1000_FEXTNVM11);
 	fext_nvm11 |= E1000_FEXTNVM11_DISABLE_MULR_FIX;
 	E1000_WRITE_REG(hw, E1000_FEXTNVM11, fext_nvm11);
-        
+
 	/* do nothing if we're not in faulty state, or if the queue is empty */
 	tdlen = E1000_READ_REG(hw, E1000_TDLEN(0));
 	hang_state = pci_read_config(dev, PCICFG_DESC_RING_STATUS, 2);
@@ -3176,7 +3176,7 @@ em_reset(struct adapter *adapter)
 			hw->fc.high_water = 0x2800;
 			hw->fc.low_water = hw->fc.high_water - 8;
 			break;
-		} 
+		}
 		/* else fall thru */
 	default:
 		if (hw->mac.type == e1000_80003es2lan)
@@ -3243,7 +3243,7 @@ em_setup_interface(device_t dev, struct adapter *adapter)
 	if_setstartfn(ifp, em_start);
 	if_setsendqlen(ifp, adapter->num_tx_desc - 1);
 	if_setsendqready(ifp);
-#endif	
+#endif
 
 	ether_ifattach(ifp, adapter->hw.mac.addr);
 
@@ -3281,7 +3281,7 @@ em_setup_interface(device_t dev, struct adapter *adapter)
 		if_setcapabilitiesbit(ifp, IFCAP_WOL, 0);
 		if_setcapenablebit(ifp, IFCAP_WOL_MAGIC, 0);
 	}
-		
+
 	/*
 	 * Specify the media types supported by this adapter and register
 	 * callbacks to update media and link information
@@ -3292,7 +3292,7 @@ em_setup_interface(device_t dev, struct adapter *adapter)
 	    (adapter->hw.phy.media_type == e1000_media_type_internal_serdes)) {
 		u_char fiber_type = IFM_1000_SX;	/* default type */
 
-		ifmedia_add(&adapter->media, IFM_ETHER | fiber_type | IFM_FDX, 
+		ifmedia_add(&adapter->media, IFM_ETHER | fiber_type | IFM_FDX,
 			    0, NULL);
 		ifmedia_add(&adapter->media, IFM_ETHER | fiber_type, 0, NULL);
 	} else {
@@ -3445,7 +3445,7 @@ em_allocate_queues(struct adapter *adapter)
 	 * Now set up the TX queues, txconf is needed to handle the
 	 * possibility that things fail midcourse and we need to
 	 * undo memory gracefully
-	 */ 
+	 */
 	for (i = 0; i < adapter->num_queues; i++, txconf++) {
 		/* Set up some basics */
 		txr = &adapter->tx_rings[i];
@@ -3484,7 +3484,7 @@ em_allocate_queues(struct adapter *adapter)
 
 	/*
 	 * Next the RX queues...
-	 */ 
+	 */
 	rsize = roundup2(adapter->num_rx_desc *
 	    sizeof(union e1000_rx_desc_extended), EM_DBA_ALIGN);
 	for (i = 0; i < adapter->num_queues; i++, rxconf++) {
@@ -3898,7 +3898,7 @@ em_free_transmit_buffers(struct tx_ring *txr)
  *  until the previous request completes. This means setting up
  *  a new context effectively disables pipelined Tx data DMA which
  *  in turn greatly slow down performance to send small sized
- *  frames. 
+ *  frames.
  **********************************************************************/
 static void
 em_transmit_checksum_setup(struct tx_ring *txr, struct mbuf *mp, int ip_off,
@@ -4029,7 +4029,7 @@ em_transmit_checksum_setup(struct tx_ring *txr, struct mbuf *mp, int ip_off,
  		TXD->upper_setup.tcp_fields.tucse = htole16(0);
  		TXD->upper_setup.tcp_fields.tucso = tucso;
   	}
-  
+
  	if (offload & CSUM_IP) {
  		txr->last_hw_ipcss = ipcss;
  		txr->last_hw_ipcso = ipcso;
@@ -4164,7 +4164,7 @@ em_txeof(struct tx_ring *txr)
 
 	/*
 	 * What this does is get the index of the
-	 * first descriptor AFTER the EOP of the 
+	 * first descriptor AFTER the EOP of the
 	 * first packet, that way we can do the
 	 * simple comparison on the inner while loop.
 	 */
@@ -4233,7 +4233,7 @@ em_txeof(struct tx_ring *txr)
          * If we have a minimum free, clear IFF_DRV_OACTIVE
          * to tell the stack that it is OK to send packets.
 	 * Notice that all writes of OACTIVE happen under the
-	 * TX lock which, with a single queue, guarantees 
+	 * TX lock which, with a single queue, guarantees
 	 * sanity.
          */
         if (txr->tx_avail >= EM_MAX_SCATTER) {
@@ -4712,7 +4712,7 @@ em_initialize_receive_unit(struct adapter *adapter)
 			E1000_WRITE_REG(hw, E1000_RETA(i), reta);
 		}
 
-		E1000_WRITE_REG(hw, E1000_MRQC, E1000_MRQC_RSS_ENABLE_2Q | 
+		E1000_WRITE_REG(hw, E1000_MRQC, E1000_MRQC_RSS_ENABLE_2Q |
 				E1000_MRQC_RSS_FIELD_IPV4_TCP |
 				E1000_MRQC_RSS_FIELD_IPV4 |
 				E1000_MRQC_RSS_FIELD_IPV6_TCP_EX |
@@ -4787,7 +4787,7 @@ em_initialize_receive_unit(struct adapter *adapter)
 			E1000_WRITE_REG(hw, E1000_RXDCTL(i), rxdctl);
 		}
 	}
-		
+
 	if (adapter->hw.mac.type >= e1000_pch2lan) {
 		if (if_getmtu(ifp) > ETHERMTU)
 			e1000_lv_jumbo_workaround_ich8lan(hw, TRUE);
@@ -4822,7 +4822,7 @@ em_initialize_receive_unit(struct adapter *adapter)
  *
  *  We loop at most count times if count is > 0, or until done if
  *  count < 0.
- *  
+ *
  *  For polling we also now return the number of cleaned packets
  *********************************************************************/
 static bool
@@ -4910,7 +4910,7 @@ em_rxeof(struct rx_ring *rxr, int count, int *done)
 				goto skip;
 #endif
 			if (status & E1000_RXD_STAT_VP) {
-				if_setvtag(sendmp, 
+				if_setvtag(sendmp,
 				    le16toh(cur->wb.upper.vlan));
 				sendmp->m_flags |= M_VLANTAG;
 			}
@@ -5177,7 +5177,7 @@ em_enable_intr(struct adapter *adapter)
 	if (hw->mac.type == e1000_82574) {
 		E1000_WRITE_REG(hw, EM_EIAC, EM_MSIX_MASK);
 		ims_mask |= EM_MSIX_MASK;
-	} 
+	}
 	E1000_WRITE_REG(hw, E1000_IMS, ims_mask);
 }
 
@@ -5194,7 +5194,7 @@ em_disable_intr(struct adapter *adapter)
 /*
  * Bit of a misnomer, what this really means is
  * to enable OS management of the system... aka
- * to disable special hardware management features 
+ * to disable special hardware management features
  */
 static void
 em_init_manageability(struct adapter *adapter)
@@ -5525,7 +5525,7 @@ static void
 em_led_func(void *arg, int onoff)
 {
 	struct adapter	*adapter = arg;
- 
+
 	EM_CORE_LOCK(adapter);
 	if (onoff) {
 		e1000_setup_led(&adapter->hw);
@@ -5649,17 +5649,17 @@ em_update_stats_counters(struct adapter *adapter)
 	adapter->stats.icrxoc += E1000_READ_REG(&adapter->hw, E1000_ICRXOC);
 
 	if (adapter->hw.mac.type >= e1000_82543) {
-		adapter->stats.algnerrc += 
+		adapter->stats.algnerrc +=
 		E1000_READ_REG(&adapter->hw, E1000_ALGNERRC);
-		adapter->stats.rxerrc += 
+		adapter->stats.rxerrc +=
 		E1000_READ_REG(&adapter->hw, E1000_RXERRC);
-		adapter->stats.tncrs += 
+		adapter->stats.tncrs +=
 		E1000_READ_REG(&adapter->hw, E1000_TNCRS);
-		adapter->stats.cexterr += 
+		adapter->stats.cexterr +=
 		E1000_READ_REG(&adapter->hw, E1000_CEXTERR);
-		adapter->stats.tsctc += 
+		adapter->stats.tsctc +=
 		E1000_READ_REG(&adapter->hw, E1000_TSCTC);
-		adapter->stats.tsctfc += 
+		adapter->stats.tsctfc +=
 		E1000_READ_REG(&adapter->hw, E1000_TSCTFC);
 	}
 }
@@ -5723,18 +5723,18 @@ em_add_hw_stats(struct adapter *adapter)
 
 #define QUEUE_NAME_LEN 32
 	char namebuf[QUEUE_NAME_LEN];
-	
+
 	/* Driver Statistics */
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "dropped", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "dropped",
 			CTLFLAG_RD, &adapter->dropped_pkts,
 			"Driver dropped packets");
 	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "link_irq",
 			CTLFLAG_RD, &adapter->link_irq,
 			"Link MSIX IRQ Handled");
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "mbuf_defrag_fail", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "mbuf_defrag_fail",
 			 CTLFLAG_RD, &adapter->mbuf_defrag_failed,
 			 "Defragmenting mbuf chain failed");
-	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "tx_dma_fail", 
+	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "tx_dma_fail",
 			CTLFLAG_RD, &adapter->no_tx_dma_setup,
 			"Driver tx dma failure in xmit");
 	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "rx_overruns",
@@ -5743,7 +5743,7 @@ em_add_hw_stats(struct adapter *adapter)
 	SYSCTL_ADD_ULONG(ctx, child, OID_AUTO, "watchdog_timeouts",
 			CTLFLAG_RD, &adapter->watchdog_events,
 			"Watchdog timeouts");
-	
+
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "device_control",
 			CTLTYPE_UINT | CTLFLAG_RD, adapter, E1000_CTRL,
 			em_sysctl_reg_handler, "IU",
@@ -5755,7 +5755,7 @@ em_add_hw_stats(struct adapter *adapter)
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_high_water",
 			CTLFLAG_RD, &adapter->hw.fc.high_water, 0,
 			"Flow Control High Watermark");
-	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_low_water", 
+	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "fc_low_water",
 			CTLFLAG_RD, &adapter->hw.fc.low_water, 0,
 			"Flow Control Low Watermark");
 
@@ -5765,12 +5765,12 @@ em_add_hw_stats(struct adapter *adapter)
 					    CTLFLAG_RD, NULL, "TX Queue Name");
 		queue_list = SYSCTL_CHILDREN(queue_node);
 
-		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "txd_head", 
+		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "txd_head",
 				CTLTYPE_UINT | CTLFLAG_RD, adapter,
 				E1000_TDH(txr->me),
 				em_sysctl_reg_handler, "IU",
  				"Transmit Descriptor Head");
-		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "txd_tail", 
+		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "txd_tail",
 				CTLTYPE_UINT | CTLFLAG_RD, adapter,
 				E1000_TDT(txr->me),
 				em_sysctl_reg_handler, "IU",
@@ -5778,7 +5778,7 @@ em_add_hw_stats(struct adapter *adapter)
 		SYSCTL_ADD_ULONG(ctx, queue_list, OID_AUTO, "tx_irq",
 				CTLFLAG_RD, &txr->tx_irq,
 				"Queue MSI-X Transmit Interrupts");
-		SYSCTL_ADD_ULONG(ctx, queue_list, OID_AUTO, "no_desc_avail", 
+		SYSCTL_ADD_ULONG(ctx, queue_list, OID_AUTO, "no_desc_avail",
 				CTLFLAG_RD, &txr->no_desc_avail,
 				"Queue No Descriptor Available");
 
@@ -5787,12 +5787,12 @@ em_add_hw_stats(struct adapter *adapter)
 					    CTLFLAG_RD, NULL, "RX Queue Name");
 		queue_list = SYSCTL_CHILDREN(queue_node);
 
-		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "rxd_head", 
+		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "rxd_head",
 				CTLTYPE_UINT | CTLFLAG_RD, adapter,
 				E1000_RDH(rxr->me),
 				em_sysctl_reg_handler, "IU",
 				"Receive Descriptor Head");
-		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "rxd_tail", 
+		SYSCTL_ADD_PROC(ctx, queue_list, OID_AUTO, "rxd_tail",
 				CTLTYPE_UINT | CTLFLAG_RD, adapter,
 				E1000_RDT(rxr->me),
 				em_sysctl_reg_handler, "IU",
@@ -5804,7 +5804,7 @@ em_add_hw_stats(struct adapter *adapter)
 
 	/* MAC stats get their own sub node */
 
-	stat_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "mac_stats", 
+	stat_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "mac_stats",
 				    CTLFLAG_RD, NULL, "Statistics");
 	stat_list = SYSCTL_CHILDREN(stat_node);
 
@@ -5908,13 +5908,13 @@ em_add_hw_stats(struct adapter *adapter)
 			CTLFLAG_RD, &adapter->stats.prc1522,
 			"1023-1522 byte frames received");
  	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_octets_recvd",
- 			CTLFLAG_RD, &adapter->stats.gorc, 
- 			"Good Octets Received"); 
+ 			CTLFLAG_RD, &adapter->stats.gorc,
+ 			"Good Octets Received");
 
 	/* Packet Transmission Stats */
  	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "good_octets_txd",
- 			CTLFLAG_RD, &adapter->stats.gotc, 
- 			"Good Octets Transmitted"); 
+ 			CTLFLAG_RD, &adapter->stats.gotc,
+ 			"Good Octets Transmitted");
 	SYSCTL_ADD_UQUAD(ctx, stat_list, OID_AUTO, "total_pkts_txd",
 			CTLFLAG_RD, &adapter->stats.tpt,
 			"Total Packets Transmitted");
@@ -5955,7 +5955,7 @@ em_add_hw_stats(struct adapter *adapter)
 
 	/* Interrupt Stats */
 
-	int_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "interrupts", 
+	int_node = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "interrupts",
 				    CTLFLAG_RD, NULL, "Interrupt Statistics");
 	int_list = SYSCTL_CHILDREN(int_node);
 
@@ -6053,7 +6053,7 @@ em_sysctl_int_delay(SYSCTL_HANDLER_ARGS)
 	struct em_int_delay_info *info;
 	struct adapter *adapter;
 	u32 regval;
-	int error, usecs, ticks;
+	int error, usecs, _ticks;
 
 	info = (struct em_int_delay_info *)arg1;
 	usecs = info->value;
@@ -6063,21 +6063,21 @@ em_sysctl_int_delay(SYSCTL_HANDLER_ARGS)
 	if (usecs < 0 || usecs > EM_TICKS_TO_USECS(65535))
 		return (EINVAL);
 	info->value = usecs;
-	ticks = EM_USECS_TO_TICKS(usecs);
+	_ticks = EM_USECS_TO_TICKS(usecs);
 	if (info->offset == E1000_ITR)	/* units are 256ns here */
-		ticks *= 4;
+		_ticks *= 4;
 
 	adapter = info->adapter;
-	
+
 	EM_CORE_LOCK(adapter);
 	regval = E1000_READ_OFFSET(&adapter->hw, info->offset);
-	regval = (regval & ~0xffff) | (ticks & 0xffff);
+	regval = (regval & ~0xffff) | (_ticks & 0xffff);
 	/* Handle a few special cases. */
 	switch (info->offset) {
 	case E1000_RDTR:
 		break;
 	case E1000_TIDV:
-		if (ticks == 0) {
+		if (_ticks == 0) {
 			adapter->txd_cmd &= ~E1000_TXD_CMD_IDE;
 			/* Don't write 0 into the TIDV register. */
 			regval++;
@@ -6125,16 +6125,16 @@ em_set_sysctl_value(struct adapter *adapter, const char *name,
 */
 static int
 em_set_flowcntl(SYSCTL_HANDLER_ARGS)
-{       
+{
         int		error;
 	static int	input = 3; /* default is full */
         struct adapter	*adapter = (struct adapter *) arg1;
-                    
+
         error = sysctl_handle_int(oidp, &input, 0, req);
-    
+
         if ((error) || (req->newptr == NULL))
                 return (error);
-                
+
 	if (input == adapter->fc) /* no change? */
 		return (error);
 

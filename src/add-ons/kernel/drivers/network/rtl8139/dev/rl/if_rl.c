@@ -586,7 +586,7 @@ rl_probe(device_t dev)
 	const struct rl_type	*t;
 	uint16_t		devid, revid, vendor;
 	int			i;
-	
+
 	vendor = pci_get_vendor(dev);
 	devid = pci_get_device(dev);
 	revid = pci_get_revid(dev);
@@ -1389,7 +1389,7 @@ rl_twister_update(struct rl_softc *sc)
 	case DONE:
 		break;
 	}
-	
+
 }
 
 static void
@@ -1397,7 +1397,7 @@ rl_tick(void *xsc)
 {
 	struct rl_softc		*sc = xsc;
 	struct mii_data		*mii;
-	int ticks;
+	int _ticks;
 
 	RL_LOCK_ASSERT(sc);
 	/*
@@ -1421,15 +1421,15 @@ rl_tick(void *xsc)
 		else
 			rl_twister_update(sc);
 		if (sc->rl_twister == DONE)
-			ticks = hz;
+			_ticks = hz;
 		else
-			ticks = hz / 10;
+			_ticks = hz / 10;
 	} else {
 		rl_watchdog(sc);
-		ticks = hz;
+		_ticks = hz;
 	}
 
-	callout_reset(&sc->rl_stat_callout, ticks, rl_tick, sc);
+	callout_reset(&sc->rl_stat_callout, _ticks, rl_tick, sc);
 }
 
 #ifdef DEVICE_POLLING
@@ -1856,7 +1856,7 @@ rl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 			ifp->if_capenable |= IFCAP_POLLING;
 			RL_UNLOCK(sc);
 			return (error);
-			
+
 		}
 		if (!(ifr->ifr_reqcap & IFCAP_POLLING) &&
 		    ifp->if_capenable & IFCAP_POLLING) {
