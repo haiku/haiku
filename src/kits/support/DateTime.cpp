@@ -13,6 +13,9 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include <DateFormat.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 #include <Message.h>
 
 
@@ -1018,14 +1021,13 @@ BDate::LongDayName(int32 day)
 	if (day < 1 || day > 7)
 		return BString();
 
-	tm tm_struct;
-	memset(&tm_struct, 0, sizeof(tm));
-	tm_struct.tm_wday = day == 7 ? 0 : day;
+	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
+	BDateFormat format(locale);
+	BString out;
+	if (format.GetDayName(day, out, B_LONG_DATE_FORMAT) != B_OK)
+		return BString();
 
-	char buffer[256];
-	strftime(buffer, sizeof(buffer), "%A", &tm_struct);
-
-	return BString(buffer);
+	return out;
 }
 
 
@@ -1049,14 +1051,13 @@ BDate::LongMonthName(int32 month)
 	if (month < 1 || month > 12)
 		return BString();
 
-	tm tm_struct;
-	memset(&tm_struct, 0, sizeof(tm));
-	tm_struct.tm_mon = month - 1;
+	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
+	BDateFormat format(locale);
+	BString out;
+	if (format.GetMonthName(month, out, B_LONG_DATE_FORMAT) != B_OK)
+		return BString();
 
-	char buffer[256];
-	strftime(buffer, sizeof(buffer), "%B", &tm_struct);
-
-	return BString(buffer);
+	return out;
 }
 
 
