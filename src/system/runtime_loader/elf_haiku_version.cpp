@@ -117,6 +117,8 @@ analyze_object_gcc_version(int fd, image_t* image, elf_ehdr& eheader,
 		// GCC: (GNU) 2.95.3-haiku-080322
 		// GCC: (GNU) 4.1.2
 		// GCC: (2016_02_29) 5.3.0
+		// GCC: (2018_05_01) 7.3.0
+		// GCC: (GNU) 7.3.0
 
 		// FIXME this does not handle binaries generated with clang or other
 		// compilers.
@@ -191,10 +193,10 @@ analyze_object_gcc_version(int fd, image_t* image, elf_ehdr& eheader,
 		else
 			image->abi = B_HAIKU_ABI_GCC_2_BEOS;
 	} else {
-		if (gccMajor == 5) {
-			// The ABI changes in GCC 5 are optional, and currently we are using
-			// it in backwards compatible mode. So, it is still generating ABI
-			// version 4.
+		if (gccMajor >= 5) {
+			// The ABI changes in libstdc++ 5+ are optional, and currently we
+			// are using it in backwards compatible mode. So, it is still
+			// generating ABI version 4.
 			gccMajor = 4;
 		}
 		image->abi = gccMajor << 16;
