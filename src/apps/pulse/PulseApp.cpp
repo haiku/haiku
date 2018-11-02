@@ -266,7 +266,8 @@ LoadInDeskbar()
 		width = min_width;
 	}
 
-	BRect rect(0, 0, width - 1, 15);
+	float height = deskbar->MaxItemHeight();
+	BRect rect(0, 0, width - 1, height - 1);
 	DeskbarPulseView *replicant = new DeskbarPulseView(rect);
 	status_t err = deskbar->AddItem(replicant);
 	delete replicant;

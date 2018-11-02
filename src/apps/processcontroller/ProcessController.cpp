@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2015, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2018, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -117,6 +117,7 @@ typedef struct {
 } Tdebug_thead_param;
 
 // Bar layout depending on number of CPUs
+// This is used only in case the replicant width is 16
 
 typedef struct {
 	float	cpu_width;
@@ -141,13 +142,14 @@ layoutT layout[] = {
 };
 
 
-extern "C" _EXPORT BView *instantiate_deskbar_item(void);
+extern "C" _EXPORT BView* instantiate_deskbar_item(float maxWidth,
+	float maxHeight);
 
-extern "C" _EXPORT BView *
-instantiate_deskbar_item(void)
+extern "C" _EXPORT BView*
+instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
 	gInDeskbar = true;
-	return new ProcessController();
+	return new ProcessController(maxHeight - 1, maxHeight - 1);
 }
 
 
@@ -196,8 +198,10 @@ ProcessController::ProcessController(BMessage *data)
 }
 
 
-ProcessController::ProcessController()
-	: BView(BRect (0, 0, 15, 15), kDeskbarItemName, B_FOLLOW_NONE, B_WILL_DRAW),
+ProcessController::ProcessController(float width, float height)
+	:
+	BView(BRect (0, 0, width, height), kDeskbarItemName, B_FOLLOW_NONE,
+		B_WILL_DRAW),
 	fProcessControllerIcon(kSignature),
 	fProcessorIcon(k_cpu_mini),
 	fTrackerIcon(kTrackerSig),
@@ -602,10 +606,23 @@ ProcessController::DoDraw(bool force)
 	float h = floorf(bounds.Height ()) - 2;
 	float top = 1, left = 1;
 	float bottom = top + h;
-	float barWidth = layout[gCPUcount].cpu_width;
+	float barWidth;
+	float barGap;
+	float memWidth;
+	if (gCPUcount < 12 && bounds.Width() == 15) {
+		// Use fixed sizes for small icon sizes
+		barWidth = layout[gCPUcount].cpu_width;
+		barGap = layout[gCPUcount].cpu_inter;
+		memWidth = layout[gCPUcount].mem_width;
+	} else {
+		memWidth = floorf((bounds.Height() + 1) / 8);
+		barGap = bounds.Width() / gCPUcount > 3 ? 1 : 0;
+		barWidth = floorf((bounds.Width() - 2 - memWidth - barGap * gCPUcount)
+			/ gCPUcount);
+	}
 	// interspace
-	float right = left + gCPUcount * (barWidth + layout[gCPUcount].cpu_inter)
-		- layout[gCPUcount].cpu_inter; // right of CPU frame...
+	float right = left + gCPUcount * (barWidth + barGap) - barGap;
+		// right of CPU frame...
 	if (force && Parent()) {
 		SetHighColor(Parent()->ViewColor());
 		FillRect(BRect(right + 1, top - 1, right + 2, bottom + 1));
@@ -614,16 +631,15 @@ ProcessController::DoDraw(bool force)
 	if (force) {
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
-		if (gCPUcount > 1 && layout[gCPUcount].cpu_inter == 1) {
+		if (gCPUcount > 1 && barGap == 1) {
 			for (unsigned int x = 1; x < gCPUcount; x++)
 				StrokeLine(BPoint(left + x * barWidth + x - 1, top),
 					BPoint(left + x * barWidth + x - 1, bottom));
 		}
 	}
-	float leftMem = bounds.Width() - layout[gCPUcount].mem_width;
+	float leftMem = bounds.Width() - memWidth;
 	if (force)
-		StrokeRect(BRect(leftMem - 1, top - 1,
-			leftMem + layout[gCPUcount].mem_width, bottom + 1));
+		StrokeRect(BRect(leftMem - 1, top - 1, leftMem + memWidth, bottom + 1));
 
 	for (unsigned int x = 0; x < gCPUcount; x++) {
 		right = left + barWidth - 1;
@@ -654,7 +670,7 @@ ProcessController::DoDraw(bool force)
 			SetHighColor(active_color);
 			FillRect(BRect(left, limit + 1, right, active_bottom));
 		}
-		left += layout[gCPUcount].cpu_width + layout[gCPUcount].cpu_inter;
+		left += barWidth + barGap;
 		fLastBarHeight[x] = barHeight;
 	}
 

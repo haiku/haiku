@@ -78,6 +78,7 @@ public:
 			void				ItemExists(BMessage* message);
 
 			void				CountItems(BMessage* message);
+			void				MaxItemSize(BMessage* message);
 
 			void				AddItem(BMessage* message);
 			void				RemoveItem(BMessage* message);

@@ -136,13 +136,20 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	fMultiRowMode(vertical),
 	fAlignmentSupport(false)
 {
+	fMaxReplicantHeight = std::max(kMinReplicantHeight,
+		floorf(kMinReplicantHeight * be_plain_font->Size() / 12));
+	// TODO: depends on window size... (so use something like
+	// max(129, height * 3), and restrict the minimum window width for it)
+	fMaxReplicantWidth = 129;
+
+	fMinTrayHeight = kGutter + fMaxReplicantHeight + kGutter;
 	if (vertical)
 		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
 	else
 		fMinimumTrayWidth = kMinimumTrayWidth;
 
 	// Create the time view
-	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0);
+	fTime = new TTimeView(fMinimumTrayWidth, fMaxReplicantHeight - 1.0);
 }
 
 
@@ -211,7 +218,7 @@ void
 TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 {
 	float width = 0;
-	float height = kMinimumTrayHeight;
+	float height = fMinTrayHeight;
 
 	if (fMultiRowMode) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
@@ -221,12 +228,12 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 		else if (ReplicantCount() > 0) {
 			// The height will be uniform for the number of rows necessary
 			// to show all the replicants and gutters.
-			int32 rowCount = (int32)(height / kMaxReplicantHeight);
-			height = kGutter + (rowCount * kMaxReplicantHeight)
+			int32 rowCount = (int32)(height / fMaxReplicantHeight);
+			height = kGutter + (rowCount * fMaxReplicantHeight)
 				+ ((rowCount - 1) * kIconGap) + kGutter;
-			height = std::max(kMinimumTrayHeight, height);
+			height = std::max(fMinTrayHeight, height);
 		} else
-			height = kMinimumTrayHeight;
+			height = fMinTrayHeight;
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
@@ -240,7 +247,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 		}
 
 		// this view has a fixed minimum width
-		width = std::max(fMinimumTrayWidth, width);
+		width = std::max(kMinimumTrayWidth, width);
 		height = kGutter + static_cast<TBarApp*>(be_app)->IconSize() + kGutter;
 	}
 
@@ -641,8 +648,8 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 	//    we first look for a symbol that takes an image_id
 	//    and entry_ref pointer, if not found, go with normal
 	//    instantiate function
-	BView* (*entryFunction)(image_id, const entry_ref*);
-	BView* (*itemFunction)(void);
+	BView* (*entryFunction)(image_id, const entry_ref*, float, float);
+	BView* (*itemFunction)(float, float);
 	BView* view = NULL;
 
 	entry_ref ref;
@@ -650,10 +657,11 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 
 	if (get_image_symbol(image, kInstantiateEntryCFunctionName,
 			B_SYMBOL_TYPE_TEXT, (void**)&entryFunction) >= B_OK) {
-		view = (*entryFunction)(image, &ref);
+		view = (*entryFunction)(image, &ref, fMaxReplicantWidth,
+			fMaxReplicantHeight);
 	} else if (get_image_symbol(image, kInstantiateItemCFunctionName,
 			B_SYMBOL_TYPE_TEXT, (void**)&itemFunction) >= B_OK) {
-		view = (*itemFunction)();
+		view = (*itemFunction)(fMaxReplicantWidth, fMaxReplicantHeight);
 	} else {
 		unload_add_on(image);
 		return B_ERROR;
@@ -1121,7 +1129,7 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 	if (message == NULL)
 		return false;
 
-	if (replicantFrame.Height() > kMaxReplicantHeight)
+	if (replicantFrame.Height() > fMaxReplicantHeight)
 		return false;
 
 	alignment align = B_ALIGN_LEFT;
@@ -1163,12 +1171,12 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 
 	if (fMultiRowMode) {
 		// try to find free space in every row
-		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
+		for (int32 row = 0; ; loc.y += fMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
 					- (kTrayPadding + kDragWidth + kGutter) * 2,
-				loc.y + kMaxReplicantHeight);
+				loc.y + fMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden())
 				rowRect.right -= kClockMargin + fTime->Frame().Width();
 
@@ -1210,7 +1218,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 		|| (loc.y == fRightBottomReplicant.top
 			&& loc.x > fRightBottomReplicant.left)) {
 		fRightBottomReplicant.Set(loc.x, loc.y, loc.x + replicantWidth,
-			loc.y + kMaxReplicantHeight);
+			loc.y + fMaxReplicantHeight);
 		fLastReplicant = index;
 	}
 

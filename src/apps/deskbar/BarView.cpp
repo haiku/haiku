@@ -1119,6 +1119,14 @@ TBarView::CountItems(DeskbarShelf)
 }
 
 
+BSize
+TBarView::MaxItemSize(DeskbarShelf shelf)
+{
+	return BSize(fReplicantTray->MaxReplicantWidth(),
+		fReplicantTray->MaxReplicantHeight());
+}
+
+
 status_t
 TBarView::AddItem(BMessage* item, DeskbarShelf, int32* id)
 {

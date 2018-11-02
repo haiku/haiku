@@ -400,6 +400,7 @@ TBarApp::MessageReceived(BMessage* message)
 		case kMsgGetItemInfo:
 		case kMsgHasItem:
 		case kMsgCountItems:
+		case kMsgMaxItemSize:
 		case kMsgAddView:
 		case kMsgRemoveItem:
 		case kMsgAddAddOn:

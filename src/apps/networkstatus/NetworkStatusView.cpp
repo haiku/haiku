@@ -64,7 +64,7 @@ static const char *kStatusDescriptions[] = {
 	B_TRANSLATE("Ready")
 };
 
-extern "C" _EXPORT BView *instantiate_deskbar_item(void);
+extern "C" _EXPORT BView *instantiate_deskbar_item(float maxWidth, float maxHeight);
 
 
 const uint32 kMsgShowConfiguration = 'shcf';
@@ -574,9 +574,9 @@ NetworkStatusView::_OpenNetworksPreferences()
 
 
 extern "C" _EXPORT BView *
-instantiate_deskbar_item(void)
+instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
-	return new NetworkStatusView(BRect(0, 0, 15, 15),
+	return new NetworkStatusView(BRect(0, 0, maxHeight - 1, maxHeight - 1),
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, true);
 }
 

@@ -143,6 +143,8 @@ public:
 
 			int32			CountItems(DeskbarShelf shelf);
 
+			BSize			MaxItemSize(DeskbarShelf shelf);
+
 			status_t		AddItem(BMessage* archive, DeskbarShelf shelf,
 								int32* id);
 			status_t		AddItem(BEntry* entry, DeskbarShelf shelf,

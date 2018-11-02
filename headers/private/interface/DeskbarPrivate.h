@@ -29,6 +29,7 @@ static const uint32 kMsgAddAddOn = 'adon';
 static const uint32 kMsgHasItem = 'exst';
 static const uint32 kMsgGetItemInfo = 'info';
 static const uint32 kMsgCountItems = 'cwnt';
+static const uint32 kMsgMaxItemSize = 'mxsz';
 static const uint32 kMsgRemoveItem = 'remv';
 static const uint32 kMsgLocation = 'gloc';
 static const uint32 kMsgIsExpanded = 'gexp';

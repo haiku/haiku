@@ -47,8 +47,8 @@ All rights reserved.
 
 
 const float kDragWidth = 4.0f;
-const float kMaxReplicantHeight = 16.0f;
-const float kMaxReplicantWidth = 16.0f;
+const float kMinReplicantHeight = 16.0f;
+const float kMinReplicantWidth = 16.0f;
 const int32 kMinimumReplicantCount = 6;
 const int32 kIconGap = 2;
 const int32 kGutter = 1;
@@ -59,10 +59,9 @@ const int32 kClockMargin = 12;
 // 1 pixel for left gutter
 // space for replicant tray (6 items)
 // 6 pixel drag region
-const float kMinimumTrayWidth = kIconGap + kMaxReplicantWidth
+const float kMinimumTrayWidth = kIconGap + kMinReplicantWidth
 	+ (kMinimumReplicantCount * kIconGap)
-	+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
-const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
+	+ (kMinimumReplicantCount * kMinReplicantWidth) + kGutter;
 
 extern float gMinimumWindowWidth;
 extern float gMaximumWindowWidth;
@@ -109,6 +108,10 @@ public:
 				bool				IconExists(const char* name);
 
 				int32				ReplicantCount() const;
+				float				MaxReplicantWidth() const
+										{ return fMaxReplicantWidth; }
+				float				MaxReplicantHeight() const
+										{ return fMaxReplicantHeight; }
 
 				status_t			AddIcon(BMessage*, int32* id,
 										const entry_ref* = NULL);
@@ -174,6 +177,9 @@ private:
 				TReplicantShelf*	fShelf;
 				BRect				fRightBottomReplicant;
 				int32				fLastReplicant;
+				float				fMaxReplicantWidth;
+				float				fMaxReplicantHeight;
+				float				fMinTrayHeight;
 
 				bool				fMultiRowMode;
 				float				fMinimumTrayWidth;

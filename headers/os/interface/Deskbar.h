@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_DESKBAR_H
@@ -56,6 +56,8 @@ public:
 			bool				HasItem(int32 id) const;
 			bool				HasItem(const char* name) const;
 			uint32				CountItems() const;
+			float				MaxItemWidth() const;
+			float				MaxItemHeight() const;
 
 	// Item modification methods
 			status_t			AddItem(BView* archivableView,

@@ -198,6 +198,10 @@ TBarWindow::MessageReceived(BMessage* message)
 			CountItems(message);
 			break;
 
+		case kMsgMaxItemSize:
+			MaxItemSize(message);
+			break;
+
 		case kMsgAddAddOn:
 		case kMsgAddView:
 			AddItem(message);
@@ -541,6 +545,24 @@ TBarWindow::CountItems(BMessage* message)
 
 	BMessage reply('rply');
 	reply.AddInt32("count", fBarView->CountItems(shelf));
+	message->SendReply(&reply);
+}
+
+
+void
+TBarWindow::MaxItemSize(BMessage* message)
+{
+	DeskbarShelf shelf;
+#if SHELF_AWARE
+	if (message->FindInt32("shelf", (int32*)&shelf) != B_OK)
+#endif
+		shelf = B_DESKBAR_TRAY;
+
+	BSize size = fBarView->MaxItemSize(shelf);
+
+	BMessage reply('rply');
+	reply.AddFloat("width", size.width);
+	reply.AddFloat("height", size.height);
 	message->SendReply(&reply);
 }
 

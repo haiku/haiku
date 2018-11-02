@@ -1,7 +1,7 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2013, Haiku, Inc. All rights reserved.
+	Copyright (c) 2006-2018, Haiku, Inc. All rights reserved.
 
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ class ProcessController : public BView {
 	public:
 						ProcessController(BRect frame, bool temp = false);
 						ProcessController(BMessage *data);
-						ProcessController();
+						ProcessController(float width, float height);
 		virtual			~ProcessController();
 
 		virtual	void	MessageReceived(BMessage *message);

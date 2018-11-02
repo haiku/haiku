@@ -640,8 +640,9 @@ MediaReplicant::_ConnectMixer()
 
 
 extern "C" BView*
-instantiate_deskbar_item(void)
+instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
-	return new MediaReplicant(BRect(0, 0, 16, 16), kReplicantName);
+	return new MediaReplicant(BRect(0, 0, maxHeight - 1, maxHeight - 1),
+		kReplicantName);
 }
 

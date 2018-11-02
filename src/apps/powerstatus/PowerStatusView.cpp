@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -49,7 +49,8 @@
 #define B_TRANSLATION_CONTEXT "PowerStatus"
 
 
-extern "C" _EXPORT BView *instantiate_deskbar_item(void);
+extern "C" _EXPORT BView *instantiate_deskbar_item(float maxWidth,
+	float maxHeight);
 extern const char* kDeskbarItemName;
 
 const uint32 kMsgToggleLabel = 'tglb';
@@ -397,7 +398,7 @@ PowerStatusView::Update(bool force)
 
 	if (fInDeskbar) {
 		// make sure the tray icon is (just) large enough
-		float width = fShowStatusIcon ? kMinIconWidth - 1 : 0;
+		float width = fShowStatusIcon ? Bounds().Height() : 0;
 
 		if (fShowLabel) {
 			char text[64];
@@ -870,7 +871,8 @@ PowerStatusReplicant::_OpenExtendedWindow()
 
 
 extern "C" _EXPORT BView*
-instantiate_deskbar_item(void)
+instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
-	return new PowerStatusReplicant(BRect(0, 0, 15, 15), B_FOLLOW_NONE, true);
+	return new PowerStatusReplicant(BRect(0, 0, maxHeight - 1, maxHeight - 1),
+		B_FOLLOW_NONE, true);
 }

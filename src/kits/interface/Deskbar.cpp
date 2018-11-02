@@ -320,7 +320,33 @@ BDeskbar::CountItems() const
 }
 
 
-//	#pragma mark - Item querying methods
+float
+BDeskbar::MaxItemWidth() const
+{
+	BMessage request(kMsgMaxItemSize);
+	BMessage reply;
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		return reply.GetFloat("width", 129);
+
+	return 129;
+}
+
+
+float
+BDeskbar::MaxItemHeight() const
+{
+	BMessage request(kMsgMaxItemSize);
+	BMessage reply;
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		return reply.GetFloat("height", 16);
+
+	return 16;
+}
+
+
+//	#pragma mark - Item modification methods
 
 
 status_t

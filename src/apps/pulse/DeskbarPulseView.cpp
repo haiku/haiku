@@ -138,7 +138,7 @@ void DeskbarPulseView::MessageReceived(BMessage *message) {
 			break;
 		case PRV_DESKBAR_ICON_WIDTH: {
 			int width = message->FindInt32("width");
-			ResizeTo(width - 1, 15);
+			ResizeTo(width - 1, Bounds().Height());
 			Draw(Bounds());
 			break;
 		}
