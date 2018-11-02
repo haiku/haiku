@@ -24,4 +24,4 @@ cd $GENERATED
 $WORKPATH/src/haiku/configure -j4 --build-cross-tools $TARGET_ARCH $WORKPATH/src/buildtools \
 	--bootstrap $WORKPATH/src/haikuporter/haikuporter $WORKPATH/src/haikuports.cross $WORKPATH/src/haikuports
 
-echo "If everything was successful, your next step is 'make bootstrap'"
+echo "If everything was successful, your next step is 'TARGET_ARCH=$TARGET_ARCH make bootstrap'"

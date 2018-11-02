@@ -1,7 +1,7 @@
 default:
 	docker build . -t docker.io/haiku/bootstrap
 clean:
-	docker rm docker.io/haiku/bootstrap
+	docker ps -a -q --filter=ancestor=docker.io/haiku/bootstrap | xargs -I {} docker rm {}
 	docker volume rm bootstrap_work
 init:
 	docker run -v bootstrap_work:/work docker.io/haiku/bootstrap prep

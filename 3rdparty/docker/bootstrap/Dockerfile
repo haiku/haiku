@@ -3,10 +3,15 @@ FROM debian
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get update
+
+# Base Haiku requirements
 RUN apt-get install -y git nasm autoconf automake texinfo flex \
 	bison gawk build-essential unzip wget zip less zlib1g-dev \
 	libcurl4-openssl-dev genisoimage libtool mtools gcc-multilib \
 	u-boot-tools util-linux device-tree-compiler bc
+
+# GCC Requirements
+RUN apt-get install -y python
 
 ENV GIT_BUILDTOOLS="https://git.haiku-os.org/buildtools"
 ENV GIT_HAIKU="https://git.haiku-os.org/haiku"
