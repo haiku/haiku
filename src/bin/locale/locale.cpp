@@ -22,6 +22,20 @@ extern const char *__progname;
 static const char *kProgramName = __progname;
 
 
+void
+print_available_languages()
+{
+	BMessage languages;
+	BLocaleRoster::Default()->GetAvailableLanguages(&languages);
+	BString language;
+	for (int i = 0; languages.FindString("language", i, &language) == B_OK;
+			i++) {
+		printf("%s.UTF-8\n", language.String());
+	}
+	printf("POSIX\n");
+}
+
+
 BString
 preferred_language()
 {
@@ -73,7 +87,8 @@ print_time_conventions()
 void
 usage(int status)
 {
-	printf("Usage: %s [-lftcm]\n"
+	printf("Usage: %s [-alftcm]\n"
+		"  -a, --all\t\tPrint all available languages\n"
 		"  -l, --language\tPrint the currently set preferred language\n"
 		"  -f, --format\t\tPrint the formatting-related locale\n"
 		"  -t, --time\t\tPrint the time-related locale\n"
@@ -90,6 +105,7 @@ int
 main(int argc, char **argv)
 {
 	static struct option const longopts[] = {
+		{"all", no_argument, 0, 'a'},
 		{"language", no_argument, 0, 'l'},
 		{"format", no_argument, 0, 'f'},
 		{"time", no_argument, 0, 't'},
@@ -100,7 +116,7 @@ main(int argc, char **argv)
 	};
 
 	int c;
-	while ((c = getopt_long(argc, argv, "lcfmth", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "lcfmath", longopts, NULL)) != -1) {
 		switch (c) {
 			case 'l':
 				printf("%s\n", preferred_language().String());
@@ -119,7 +135,10 @@ main(int argc, char **argv)
 			case 'm':
 				puts("UTF-8");
 				break;
-			// TODO 'a', 'c', 'k'
+			case 'a':
+				print_available_languages();
+				break;
+			// TODO 'c', 'k'
 
 			case 'h':
 				usage(0);
