@@ -1,0 +1,20 @@
+name			haiku_extras
+version			%HAIKU_VERSION%
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"Haiku extra files"
+description 	"Miscellaneous files and applications for Haiku, usually not
+needed on standard installations."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2007-2018 Haiku, Inc."
+licenses		MIT
+
+provides {
+	haiku_extras=%HAIKU_VERSION%
+}
+
+requires {
+	haiku
+}

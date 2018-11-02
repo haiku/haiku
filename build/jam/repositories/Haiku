@@ -19,6 +19,7 @@ local packages = [ FFilterByBuildFeatures
 
 if $(HAIKU_IS_BOOTSTRAP) != 1 {
 	packages += [ FFilterByBuildFeatures
+		haiku_extras
 		haiku_source
 		haiku_userguide_ca
 		haiku_userguide_de
