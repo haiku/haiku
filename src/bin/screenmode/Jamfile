@@ -16,4 +16,5 @@ BinCommand screenmode :
 	ScreenMode.cpp
 
 	: be [ TargetLibsupc++ ] libaccelerantscommon.a
+	: screenmode.rdef
 ;

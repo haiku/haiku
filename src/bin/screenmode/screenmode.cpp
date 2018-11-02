@@ -25,6 +25,7 @@ static struct option const kLongOptions[] = {
 	{"short", no_argument, 0, 's'},
 	{"list", no_argument, 0, 'l'},
 	{"help", no_argument, 0, 'h'},
+	{"brightness", required_argument, 0, 'b'},
 	{NULL}
 };
 
@@ -96,6 +97,8 @@ usage(int status)
 			"\t\t\tprinted in short form.\n"
 		"  -l  --list\t\tdisplay a list of the available modes.\n"
 		"  -q  --dont-confirm\tdo not confirm the mode after setting it.\n"
+		"  -b  --brightness f\tset brightness (range 0 to 1).\n"
+		"  -b  --brightness +/-f\tchange brightness by given amount.\n"
 		"  -m  --modeline\taccept and print X-style modeline modes:\n"
 		"\t\t\t  <pclk> <h-display> <h-sync-start> <h-sync-end> <h-total>\n"
 		"\t\t\t  <v-disp> <v-sync-start> <v-sync-end> <v-total> [flags] "
@@ -120,13 +123,15 @@ main(int argc, char** argv)
 	int height = -1;
 	int depth = -1;
 	float refresh = -1;
+	float brightness = std::nanf("0");
+	bool relativeBrightness = false;
 	display_mode mode;
 
 	// TODO: add a possibility to set a virtual screen size in addition to
 	// the display resolution!
 
 	int c;
-	while ((c = getopt_long(argc, argv, "shlfqm", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "shlfqmb:", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 0:
 				break;
@@ -146,6 +151,12 @@ main(int argc, char** argv)
 				break;
 			case 'q':
 				confirm = false;
+				break;
+			case 'b':
+				if (optarg[0] == '+' || optarg[0] == '-')
+					relativeBrightness = true;
+				brightness = atof(optarg);
+				printf("b %f rel %d\n", brightness, relativeBrightness);
 				break;
 			case 'h':
 				usage(0);
@@ -233,6 +244,25 @@ main(int argc, char** argv)
 	ScreenMode screenMode(NULL);
 	screen_mode currentMode;
 	screenMode.Get(currentMode);
+
+	if (!isnan(brightness)) {
+		BScreen screen;
+		if (relativeBrightness) {
+			float previousBrightness;
+			screen.GetBrightness(&previousBrightness);
+			brightness = previousBrightness + brightness;
+			printf("new %f\n", brightness);
+
+			// Clamp to min/max values
+			if (brightness < 0.f)
+				brightness = 0.f;
+
+			if (brightness > 1.f)
+				brightness = 1.f;
+			printf("clamp %f\n", brightness);
+		}
+		screen.SetBrightness(brightness);
+	}
 
 	if (listModes) {
 		// List all reported modes
