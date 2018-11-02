@@ -37,8 +37,8 @@ public:
 	virtual addr_t			Base() { return fBase; };
 			addr_t			PhysicalBase() { return fPhysicalBase; };
 
-	virtual	status_t		Write(uint8 channel, uint32 value);
-	virtual status_t		Read(uint8 channel, uint32& value);
+	virtual	status_t		Write(uint8 channel, uint32 value) { return B_OK; };
+	virtual status_t		Read(uint8 channel, uint32& value) { return B_OK; };
 
 
 protected:
