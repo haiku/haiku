@@ -27,14 +27,19 @@
 
 #include "arch_mailbox.h"
 #include "arch_mmu.h"
+#include "fdt_support.h"
 
 
 //XXX
 extern "C" bool
 mmu_get_virtual_mapping(addr_t virtualAddress, phys_addr_t *_physicalAddress);
 
+extern "C" ArchMailbox*
+arch_get_mailbox_arm_bcm2835(addr_t base);
 
-extern ArchMailbox *gMailbox;
+
+extern void* gFDT;
+
 
 struct framebuffer_config {
 	uint32	width;
@@ -64,6 +69,8 @@ virtual	status_t			Init();
 virtual	status_t			Probe();
 virtual	status_t			SetDefaultMode();
 virtual	status_t			SetVideoMode(int width, int height, int depth);
+private:
+		ArchMailbox*		fMailbox;
 };
 
 
@@ -77,7 +84,18 @@ arch_get_fb_arm_bcm2835(addr_t base)
 status_t
 ArchFBArmBCM2835::Init()
 {
-	if (gMailbox == NULL) {
+	if (!gFDT) {
+		dprintf("ERROR: FDT access is unavailable!");
+		return B_ERROR;
+	}
+	phys_addr_t mboxBase = fdt_get_device_reg_byname(gFDT, "/axi/mbox");
+	if (!mboxBase) {
+		dprintf("ERROR: /axi/mbox is unavailable!");
+		return B_ERROR;
+	}
+	fMailbox = arch_get_mailbox_arm_bcm2835(mboxBase);
+
+	if (fMailbox == NULL) {
 		dprintf("ERROR: Broadcom mailbox is unavailable!");
 		return B_ERROR;
 	}
@@ -129,13 +147,13 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 			sFramebufferConfig.color_map[i] = 0x1111 * i;
 	}
 
-	status_t result = gMailbox->Write(ARM_MAILBOX_CHANNEL_FRAMEBUFFER,
+	status_t result = fMailbox->Write(ARM_MAILBOX_CHANNEL_FRAMEBUFFER,
 		(uint32)&sFramebufferConfig | BCM283X_VIDEO_CORE_L2_COHERENT);
 	if (result != B_OK)
 		return result;
 
 	uint32 value;
-	result = gMailbox->Read(ARM_MAILBOX_CHANNEL_FRAMEBUFFER, value);
+	result = fMailbox->Read(ARM_MAILBOX_CHANNEL_FRAMEBUFFER, value);
 	if (result != B_OK)
 		return result;
 

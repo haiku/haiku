@@ -83,6 +83,7 @@ ArchMailboxArmBCM2835::GetRegister(unsigned reg)
 	return *reinterpret_cast<std::atomic<uint32_t>*>(addr);
 }
 
+
 inline uint32
 ArchMailboxArmBCM2835::RegisterRead(addr_t reg)
 {
