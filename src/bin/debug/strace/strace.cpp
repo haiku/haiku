@@ -686,7 +686,12 @@ main(int argc, const char *const *argv)
 				Team* team = it->second;
 				MemoryReader& memoryReader = team->GetMemoryReader();
 
-				int32 syscallNumber = message.post_syscall.syscall;
+				uint32 syscallNumber = message.post_syscall.syscall;
+				if (syscallNumber >= sSyscallVector.size()) {
+					fprintf(stderr, "%s: invalid syscall %" B_PRIu32 " attempted\n",
+						kCommandName, syscallNumber);
+					break;
+				}
 				Syscall* syscall = sSyscallVector[syscallNumber];
 
 				if (stats)
