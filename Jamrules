@@ -1,11 +1,13 @@
 # Haiku Jamrules
 
-# Make sure HAIKU_TOP is relative and either the current or parent directory.
+# Make sure HAIKU_TOP is a relative path (and prefer it to be the current or
+# parent directory.)
 #
 # This is done so that invocations to the compiler and other tools, which
 # under some circumstances inject the source's path into the generated file,
 # are passed relative paths, making builds more reproducible.
-if $(HAIKU_TOP) != "." && $(HAIKU_TOP) != ".." {
+if $(HAIKU_TOP) != "." && $(HAIKU_TOP) != ".."
+		&& ! [ Match "\\.\\./(.*)" : $(HAIKU_TOP) ] {
 	Exit "The present path to the project root is '$(HAIKU_TOP)', but you"
 		"must be in the project root or a \"generated\" directory in order to"
 		"build Haiku."
