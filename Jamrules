@@ -6,9 +6,12 @@
 # under some circumstances inject the source's path into the generated file,
 # are passed relative paths, making builds more reproducible.
 if $(HAIKU_TOP) != "." && $(HAIKU_TOP) != ".." {
-	Exit "You must be in the project root or a \"generated\" directory"
-		"in order to build Haiku (if you are and are still seeing this"
-		"message, run \"../configure --update\" to solve the issue.)" ;
+	Exit "The present path to the project root is '$(HAIKU_TOP)', but you"
+		"must be in the project root or a \"generated\" directory in order to"
+		"build Haiku."
+
+		"(If you are, and are still seeing this message, run "
+		"\"../configure --update\" to solve the issue.)" ;
 }
 
 # Main directories used by the build.
