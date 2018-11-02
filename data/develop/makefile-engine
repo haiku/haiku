@@ -272,6 +272,9 @@ $(OBJ_DIR)/%.d : %.cp
 $(OBJ_DIR)/%.d : %.cc
 	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .cc:$(OBJ_DIR)/%n.o -m -f "$@" $<
+$(OBJ_DIR)/%.d : %.cxx
+	mkdir -p $(OBJ_DIR); \
+	mkdepend $(LOC_INCLUDES) -p .cxx:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.C
 	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .C:$(OBJ_DIR)/%n.o -m -f "$@" $<
@@ -281,6 +284,9 @@ $(OBJ_DIR)/%.d : %.CC
 $(OBJ_DIR)/%.d : %.CPP
 	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .CPP:$(OBJ_DIR)/%n.o -m -f "$@" $<
+$(OBJ_DIR)/%.d : %.CXX
+	mkdir -p $(OBJ_DIR); \
+	mkdepend $(LOC_INCLUDES) -p .CXX:$(OBJ_DIR)/%n.o -m -f "$@" $<
 
 -include $(DEPENDS)
 
@@ -293,11 +299,15 @@ $(OBJ_DIR)/%.o : %.cp
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cc
 	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+$(OBJ_DIR)/%.o : %.cxx
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.C
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CC
 	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CPP
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
+$(OBJ_DIR)/%.o : %.CXX
 	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 
 # Rules to compile the resource definition files.
