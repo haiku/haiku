@@ -395,7 +395,7 @@ TBarView::PlaceDeskbarMenu()
 	BRect menuFrame(Bounds());
 	if (fVertical) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width;
-		height = kMenuBarHeight;
+		height = 4 + fReplicantTray->MaxReplicantHeight();
 		menuFrame.bottom = menuFrame.top + height;
 	} else {
 		width = gMinimumWindowWidth;

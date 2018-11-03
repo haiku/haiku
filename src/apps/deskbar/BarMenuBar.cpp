@@ -36,9 +36,12 @@ All rights reserved.
 
 #include "BarMenuBar.h"
 
+#include <algorithm>
+
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <IconUtils.h>
 #include <NodeInfo.h>
 
 #include "icons.h"
@@ -108,8 +111,24 @@ TBarMenuBar::TBarMenuBar(BRect frame, const char* name, TBarView* barView)
 	TDeskbarMenu* beMenu = new TDeskbarMenu(barView);
 	TBarWindow::SetDeskbarMenu(beMenu);
 
-	fDeskbarMenuItem = new TBarMenuTitle(0.0f, 0.0f,
-		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_LeafLogoBitmap), beMenu);
+	BBitmap* icon = NULL;
+	size_t dataSize;
+	const void* data = AppResSet()->FindResource(B_VECTOR_ICON_TYPE,
+		R_LeafLogoBitmap, &dataSize);
+	if (data != NULL) {
+		// Scale bitmap according to font size
+		float width = std::max(63.f, ceilf(63 * be_plain_font->Size() / 12.f));
+		float height = std::max(22.f, ceilf(22 * be_plain_font->Size() / 12.f));
+		icon = new BBitmap(BRect(0, 0, width - 1, height - 1), B_RGBA32);
+		if (icon->InitCheck() != B_OK
+			|| BIconUtils::GetVectorIcon((const uint8*)data, dataSize, icon)
+					!= B_OK) {
+			delete icon;
+			icon = NULL;
+		}
+	}
+
+	fDeskbarMenuItem = new TBarMenuTitle(0.0f, 0.0f, icon, beMenu);
 	AddItem(fDeskbarMenuItem);
 }
 

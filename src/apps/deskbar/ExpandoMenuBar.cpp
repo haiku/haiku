@@ -106,10 +106,12 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 
 	// top or bottom mode, add deskbar menu and sep for menubar tracking
 	// consistency
-	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
-		R_LeafLogoBitmap);
-	if (logoBitmap != NULL)
-		fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
+	// TODO: this is broken code
+	fDeskbarMenuWidth = 63 + 16;
+//	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
+//		R_LeafLogoBitmap);
+//	if (logoBitmap != NULL)
+//		fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
 }
 
 

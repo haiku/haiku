@@ -122,7 +122,9 @@ TBarMenuTitle::DrawContent()
 	iconRect.OffsetTo(frame.LeftTop());
 
 	float widthOffset = rintf((frame.Width() - iconRect.Width()) / 2);
-	float heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
+	float heightOffset = 0;
+	if (frame.Height() > iconRect.Height() + 2)
+		heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
 	iconRect.OffsetBy(widthOffset - 1.0f, heightOffset + 2.0f);
 
 	menu->DrawBitmapAsync(fIcon, iconRect);
