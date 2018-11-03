@@ -158,7 +158,8 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 		case STATUS_PACKET:
 			//fingers, no palm
 			cookie->fingers = (packet[4] & 0x80) == 0 ? packet[1] & 0x1f: 0;
-			dprintf("ELANTECH: Fingers %d, raw %x (STATUS)\n", cookie->fingers, packet[1]);
+			dprintf("ELANTECH: Fingers %" B_PRId32 ", raw %x (STATUS)\n",
+				cookie->fingers, packet[1]);
 			break;
 		case HEAD_PACKET:
 			dprintf("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
@@ -172,7 +173,8 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 
 			cookie->x = event.xPosition = ((packet[1] & 0xf) << 8) | packet[2];
 			cookie->y = event.yPosition = ((packet[4] & 0xf) << 8) | packet[5];
-			dprintf("ELANTECH: Pos: %d:%d\n (HEAD)", cookie->x, cookie->y);
+			dprintf("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 "\n (HEAD)",
+				cookie->x, cookie->y);
 			TRACE("ELANTECH: buttons 0x%x x %" B_PRIu32 " y %" B_PRIu32
 				" z %d\n", event.buttons, event.xPosition, event.yPosition,
 				event.zPressure);
@@ -188,7 +190,8 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 				event.xPosition = cookie->x += (int8)packet[1];
 				event.yPosition = cookie->y += (int8)packet[2];
 			}
-			dprintf("ELANTECH: Pos: %d:%d (Motion\n", cookie->x, cookie->y);
+			dprintf("ELANTECH: Pos: %" B_PRId32 ":%" B_PRId32 " (Motion)\n",
+				cookie->x, cookie->y);
 
 			break;
 		default:
