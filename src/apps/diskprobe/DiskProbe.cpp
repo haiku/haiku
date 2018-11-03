@@ -1,6 +1,6 @@
 /*
- * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
- * Distributed under the terms of the MIT License.
+ * Copyright 2004-2018, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
@@ -36,7 +36,7 @@
 #define B_TRANSLATION_CONTEXT "DiskProbe"
 
 
-const char *kSignature = "application/x-vnd.Haiku-DiskProbe";
+const char* kSignature = "application/x-vnd.Haiku-DiskProbe";
 
 static const uint32 kMsgDiskProbeSettings = 'DPst';
 static const uint32 kCascadeOffset = 20;
@@ -51,50 +51,54 @@ struct disk_probe_settings {
 
 
 enum disk_probe_flags {
-	kCaseSensitive	= 0x01,	// this flag alone is R5 DiskProbe settings compatible
+	kCaseSensitive	= 0x01,
+		// this flag alone is R5 DiskProbe settings compatible
 	kHexFindMode	= 0x02,
 };
 
 
 class Settings {
-	public:
-		Settings();
-		~Settings();
+public:
+								Settings();
+								~Settings();
 
-		const BMessage &Message() const { return fMessage; }
-		void UpdateFrom(BMessage *message);
+			const BMessage&		Message() const { return fMessage; }
+			void				UpdateFrom(BMessage* message);
 
-	private:
-		status_t Open(BFile *file, int32 mode);
+private:
+			status_t			Open(BFile* file, int32 mode);
 
-		BMessage	fMessage;
-		bool		fUpdated;
+private:
+			BMessage			fMessage;
+			bool				fUpdated;
 };
 
 
 class DiskProbe : public BApplication {
-	public:
-		DiskProbe();
-		virtual ~DiskProbe();
+public:
+								DiskProbe();
+	virtual						~DiskProbe();
 
-		virtual void ReadyToRun();
+	virtual	void				ReadyToRun();
 
-		virtual void RefsReceived(BMessage *message);
-		virtual void ArgvReceived(int32 argc, char **argv);
-		virtual void MessageReceived(BMessage *message);
+	virtual	void				RefsReceived(BMessage* message);
+	virtual	void				ArgvReceived(int32 argc, char** argv);
+	virtual	void				MessageReceived(BMessage* message);
 
-		virtual bool QuitRequested();
+	virtual bool				QuitRequested();
 
-	private:
-		status_t Probe(BEntry &entry, const char *attribute = NULL);
+private:
+			status_t			Probe(BEntry& entry,
+									const char* attribute = NULL);
 
-		Settings	fSettings;
-		BFilePanel	*fFilePanel;
-		BWindow		*fOpenWindow;
-		FindWindow	*fFindWindow;
-		uint32		fWindowCount;
-		BRect		fWindowFrame;
-		BMessenger	fFindTarget;
+private:
+			Settings			fSettings;
+			BFilePanel*			fFilePanel;
+			BWindow*			fOpenWindow;
+			FindWindow*			fFindWindow;
+			uint32				fWindowCount;
+			BRect				fWindowFrame;
+			BMessenger			fFindTarget;
 };
 
 
@@ -123,7 +127,7 @@ Settings::Settings()
 	if (Open(&file, B_READ_ONLY) != B_OK)
 		return;
 
-	// ToDo: load/save settings as flattened BMessage - but not yet,
+	// TODO: load/save settings as flattened BMessage - but not yet,
 	//		since that will break compatibility with R5's DiskProbe
 
 	disk_probe_settings settings;
@@ -200,7 +204,7 @@ Settings::~Settings()
 
 
 status_t
-Settings::Open(BFile *file, int32 mode)
+Settings::Open(BFile* file, int32 mode)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -213,7 +217,7 @@ Settings::Open(BFile *file, int32 mode)
 
 
 void
-Settings::UpdateFrom(BMessage *message)
+Settings::UpdateFrom(BMessage* message)
 {
 	BRect frame;
 	if (message->FindRect("window_frame", &frame) == B_OK)
@@ -271,27 +275,26 @@ DiskProbe::ReadyToRun()
 }
 
 
-/** Opens a window containing the file pointed to by the entry_ref.
- *	This function will fail if that file doesn't exist or could not
- *	be opened.
- *	It will check if there already is a window that probes the
- *	file in question and will activate it in that case.
- *	This function must be called with the application looper locked.
- */
-
+/*!	Opens a window containing the file pointed to by the entry_ref.
+	This function will fail if that file doesn't exist or could not
+	be opened.
+	It will check if there already is a window that probes the
+	file in question and will activate it in that case.
+	This function must be called with the application looper locked.
+*/
 status_t
-DiskProbe::Probe(BEntry &entry, const char *attribute)
+DiskProbe::Probe(BEntry& entry, const char* attribute)
 {
 	entry_ref ref;
 	status_t status = entry.GetRef(&ref);
 	if (status < B_OK)
 		return status;
 
-	ProbeWindow *lastWindow(NULL);
+	ProbeWindow* lastWindow(NULL);
 
 	// Do we already have that window open?
 	for (int32 i = CountWindows(); i-- > 0; ) {
-		ProbeWindow *window = dynamic_cast<ProbeWindow *>(WindowAt(i));
+		ProbeWindow* window = dynamic_cast<ProbeWindow*>(WindowAt(i));
 		if (window == NULL)
 			continue;
 
@@ -318,16 +321,17 @@ DiskProbe::Probe(BEntry &entry, const char *attribute)
 
 	rect.OffsetBy(kCascadeOffset, kCascadeOffset);
 
-	BWindow *window;
-	if (attribute != NULL)
-		window = new AttributeWindow(rect, &ref, attribute, &fSettings.Message());
-	else
+	BWindow* window;
+	if (attribute != NULL) {
+		window = new AttributeWindow(rect, &ref, attribute,
+			&fSettings.Message());
+	} else
 		window = new FileWindow(rect, &ref, &fSettings.Message());
 
 	window->Show();
 
-	/* adjust the cascading... we can only do this after the window was created
-	 * to adjust to the real size */
+	// Adjust the cascading... we can only do this after the window was created
+	// to adjust to the real size.
 	rect.right = window->Frame().right;
 	rect.bottom = window->Frame().bottom;
 
@@ -352,14 +356,14 @@ DiskProbe::Probe(BEntry &entry, const char *attribute)
 
 
 void
-DiskProbe::RefsReceived(BMessage *message)
+DiskProbe::RefsReceived(BMessage* message)
 {
 	bool traverseLinks = (modifiers() & B_SHIFT_KEY) == 0;
 
 	int32 index = 0;
 	entry_ref ref;
 	while (message->FindRef("refs", index++, &ref) == B_OK) {
-		const char *attribute = NULL;
+		const char* attribute = NULL;
 		if (message->FindString("attributes", index - 1, &attribute) == B_OK)
 			traverseLinks = false;
 
@@ -389,9 +393,9 @@ DiskProbe::RefsReceived(BMessage *message)
 
 
 void
-DiskProbe::ArgvReceived(int32 argc, char **argv)
+DiskProbe::ArgvReceived(int32 argc, char** argv)
 {
-	BMessage *message = CurrentMessage();
+	BMessage* message = CurrentMessage();
 
 	BDirectory currentDirectory;
 	if (message)
@@ -425,7 +429,7 @@ DiskProbe::ArgvReceived(int32 argc, char **argv)
 
 
 void
-DiskProbe::MessageReceived(BMessage *message)
+DiskProbe::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgOpenOpenWindow:
@@ -472,8 +476,8 @@ DiskProbe::MessageReceived(BMessage *message)
 
 			if (fFindWindow == NULL) {
 				// open it!
-				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80), *message,
-										target, &fSettings.Message());
+				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80),
+					*message, target, &fSettings.Message());
 				fFindWindow->Show();
 			} else
 				fFindWindow->Activate();
@@ -506,7 +510,7 @@ DiskProbe::QuitRequested()
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	DiskProbe probe;
 

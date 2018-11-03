@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+/*
+ * Copyright 2004-2018, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
 #ifndef PROBE_WINDOW_H
 #define PROBE_WINDOW_H
 
@@ -11,20 +11,22 @@
 
 
 class ProbeWindow : public BWindow {
-	public:
-		ProbeWindow(BRect rect, entry_ref *ref);
-		virtual ~ProbeWindow();
+public:
+								ProbeWindow(BRect rect, entry_ref* ref);
+	virtual						~ProbeWindow();
 
-		virtual void MessageReceived(BMessage *message);
-		virtual bool QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
-		virtual bool Contains(const entry_ref &ref, const char *attribute) = 0;
+	virtual	bool				Contains(const entry_ref& ref,
+									const char* attribute) = 0;
 
-	protected:
-		const entry_ref &Ref() const { return fRef; }
+protected:
+			const entry_ref&	Ref() const { return fRef; }
 
-	private:
-		entry_ref	fRef;
+private:
+			entry_ref			fRef;
 };
+
 
 #endif	/* PROBE_WINDOW_H */

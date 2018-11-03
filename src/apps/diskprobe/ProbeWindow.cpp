@@ -1,18 +1,33 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2004-2018, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
+/*!	Abstract base class for probe windows. It only provides the following
+	functionality:
+		- Access to the basic entry_ref
+		- Common BWindow flags
+		- Stores size in settings on QuitRequested()
+		- Redirects drops to BApplication
+		- Notifies BApplication about closed window
+		- Forwards mouse wheel to the DataView
+		- Contains() checks whether or not the ref/attribute is what this
+		  window contains
+*/
+
+
 #include "ProbeWindow.h"
-#include "DiskProbe.h"
 
 #include <Application.h>
 #include <View.h>
 
+#include "DiskProbe.h"
 
-ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref)
-	: BWindow(rect, ref->name, B_DOCUMENT_WINDOW,
+
+ProbeWindow::ProbeWindow(BRect rect, entry_ref* ref)
+	:
+	BWindow(rect, ref->name, B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRef(*ref)
 {
@@ -25,11 +40,11 @@ ProbeWindow::~ProbeWindow()
 
 
 void 
-ProbeWindow::MessageReceived(BMessage *message)
+ProbeWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_MOUSE_WHEEL_CHANGED:
-			if (BView *view = FindView("dataView"))
+			if (BView* view = FindView("dataView"))
 				view->MessageReceived(message);
 			break;
 

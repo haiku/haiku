@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2018, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -73,138 +73,148 @@ static const uint32 kMsgStopFind = 'sfnd';
 
 
 class IconView : public BView {
-	public:
-		IconView(const entry_ref *ref, bool isDevice);
-		virtual ~IconView();
+public:
+								IconView(const entry_ref* ref, bool isDevice);
+	virtual						~IconView();
 
-		virtual void AttachedToWindow();
-		virtual void Draw(BRect updateRect);
+	virtual	void				AttachedToWindow();
+	virtual	void				Draw(BRect updateRect);
 
-		void UpdateIcon();
+			void				UpdateIcon();
 
-	private:
-		entry_ref	fRef;
-		bool		fIsDevice;
-		BBitmap		*fBitmap;
+private:
+			entry_ref			fRef;
+			bool				fIsDevice;
+			BBitmap*			fBitmap;
 };
 
 
 class PositionSlider : public BSlider {
-	public:
-		PositionSlider(const char *name, BMessage *message, off_t size,
-			uint32 blockSize);
-		virtual ~PositionSlider();
+public:
+								PositionSlider(const char* name,
+									BMessage* message, off_t size,
+									uint32 blockSize);
+	virtual						~PositionSlider();
 
 #ifdef DRAW_SLIDER_BAR
-		virtual void DrawBar();
+	virtual	void				DrawBar();
 #endif
 
-		off_t Position() const;
-		off_t Size() const { return fSize; }
-		uint32 BlockSize() const { return fBlockSize; }
+			off_t				Position() const;
+			off_t				Size() const { return fSize; }
+			uint32				BlockSize() const { return fBlockSize; }
 
-		virtual void SetPosition(float position);
-		void SetPosition(off_t position);
-		void SetSize(off_t size);
-		void SetBlockSize(uint32 blockSize);
+	virtual	void				SetPosition(float position);
+			void				SetPosition(off_t position);
+			void				SetSize(off_t size);
+			void				SetBlockSize(uint32 blockSize);
 
-	private:
-		void Reset();
+private:
+			void				Reset();
 
-		static const int32 kMaxSliderLimit = 0x7fffff80;
-			// this is the maximum value that BSlider seem to work with fine
+private:
+	static	const int32			kMaxSliderLimit = 0x7fffff80;
+		// this is the maximum value that BSlider seem to work with fine
 
-		off_t	fSize;
-		uint32	fBlockSize;
+			off_t				fSize;
+			uint32				fBlockSize;
 };
 
 
 class HeaderView : public BGridView, public BInvoker {
-	public:
-		HeaderView(const entry_ref *ref, DataEditor &editor);
-		virtual ~HeaderView();
+public:
+								HeaderView(const entry_ref* ref,
+									DataEditor& editor);
+	virtual						~HeaderView();
 
-		virtual void AttachedToWindow();
-		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage *message);
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
+	virtual	void				MessageReceived(BMessage* message);
 
-		base_type Base() const { return fBase; }
-		void SetBase(base_type);
+			base_type			Base() const { return fBase; }
+			void				SetBase(base_type);
 
-		off_t CursorOffset() const { return fPosition % fBlockSize; }
-		off_t Position() const { return fPosition; }
-		uint32 BlockSize() const { return fBlockSize; }
-		void SetTo(off_t position, uint32 blockSize);
+			off_t				CursorOffset() const
+									{ return fPosition % fBlockSize; }
+			off_t				Position() const { return fPosition; }
+			uint32				BlockSize() const { return fBlockSize; }
+			void				SetTo(off_t position, uint32 blockSize);
 
-		void UpdateIcon();
+			void				UpdateIcon();
 
-	private:
-		void FormatValue(char *buffer, size_t bufferSize, off_t value);
-		void UpdatePositionViews(bool all = true);
-		void UpdateOffsetViews(bool all = true);
-		void UpdateFileSizeView();
-		void NotifyTarget();
+private:
+			void				FormatValue(char* buffer, size_t bufferSize,
+									off_t value);
+			void				UpdatePositionViews(bool all = true);
+			void				UpdateOffsetViews(bool all = true);
+			void				UpdateFileSizeView();
+			void				NotifyTarget();
 
-		const char		*fAttribute;
-		off_t			fFileSize;
-		uint32			fBlockSize;
-		base_type		fBase;
-		off_t			fPosition;
-		off_t			fLastPosition;
+private:
+			const char*			fAttribute;
+			off_t				fFileSize;
+			uint32				fBlockSize;
+			base_type			fBase;
+			off_t				fPosition;
+			off_t				fLastPosition;
 
-		BTextControl	*fTypeControl;
-		BTextControl	*fPositionControl;
-		BStringView		*fPathView;
-		BStringView		*fSizeView;
-		BTextControl	*fOffsetControl;
-		BTextControl	*fFileOffsetControl;
-		PositionSlider	*fPositionSlider;
-		IconView		*fIconView;
-		BButton			*fStopButton;
+			BTextControl*		fTypeControl;
+			BTextControl*		fPositionControl;
+			BStringView*		fPathView;
+			BStringView*		fSizeView;
+			BTextControl*		fOffsetControl;
+			BTextControl*		fFileOffsetControl;
+			PositionSlider*		fPositionSlider;
+			IconView*			fIconView;
+			BButton*			fStopButton;
 };
 
 
 class TypeMenuItem : public BMenuItem {
-	public:
-		TypeMenuItem(const char *name, const char *type, BMessage *message);
+public:
+								TypeMenuItem(const char* name, const char* type,
+									BMessage* message);
 
-		virtual void GetContentSize(float *_width, float *_height);
-		virtual void DrawContent();
+	virtual	void				GetContentSize(float* _width, float* _height);
+	virtual	void				DrawContent();
 
-	private:
-		BString fType;
+private:
+			BString				fType;
 };
 
 
 class EditorLooper : public BLooper {
-	public:
-		EditorLooper(const char *name, DataEditor &editor, BMessenger messenger);
-		virtual ~EditorLooper();
+public:
+								EditorLooper(const char* name,
+									DataEditor& editor, BMessenger messenger);
+	virtual						~EditorLooper();
 
-		virtual void MessageReceived(BMessage *message);
+	virtual	void				MessageReceived(BMessage* message);
 
-		bool FindIsRunning() const { return !fQuitFind; }
-		void Find(off_t startAt, const uint8 *data, size_t dataSize,
-				bool caseInsensitive, BMessenger progressMonitor);
-		void QuitFind();
+			bool				FindIsRunning() const { return !fQuitFind; }
+			void				Find(off_t startAt, const uint8* data,
+									size_t dataSize, bool caseInsensitive,
+									BMessenger progressMonitor);
+			void				QuitFind();
 
-	private:
-		DataEditor		&fEditor;
-		BMessenger		fMessenger;
-		volatile bool	fQuitFind;
+private:
+			DataEditor&			fEditor;
+			BMessenger			fMessenger;
+	volatile bool				fQuitFind;
 };
 
 
 class TypeView : public BView {
-	public:
-		TypeView(BRect rect, const char* name, int32 index,
-			DataEditor& editor, int32 resizingMode);
-		virtual ~TypeView();
+public:
+								TypeView(BRect rect, const char* name,
+									int32 index, DataEditor& editor,
+									int32 resizingMode);
+	virtual						~TypeView();
 
-		virtual void FrameResized(float width, float height);
+	virtual	void				FrameResized(float width, float height);
 
-	private:
-		BView*	fTypeEditorView;
+private:
+			BView*				fTypeEditorView;
 };
 
 
@@ -212,7 +222,7 @@ class TypeView : public BView {
 
 
 static void
-get_type_string(char *buffer, size_t bufferSize, type_code type)
+get_type_string(char* buffer, size_t bufferSize, type_code type)
 {
 	for (int32 i = 0; i < 4; i++) {
 		buffer[i] = type >> (24 - 8 * i);
@@ -228,7 +238,7 @@ get_type_string(char *buffer, size_t bufferSize, type_code type)
 //	#pragma mark - IconView
 
 
-IconView::IconView(const entry_ref *ref, bool isDevice)
+IconView::IconView(const entry_ref* ref, bool isDevice)
 	: BView(NULL, B_WILL_DRAW),
 	fRef(*ref),
 	fIsDevice(isDevice),
@@ -309,9 +319,10 @@ IconView::UpdateIcon()
 //	#pragma mark - PositionSlider
 
 
-PositionSlider::PositionSlider(const char *name, BMessage *message,
+PositionSlider::PositionSlider(const char* name, BMessage* message,
 	off_t size, uint32 blockSize)
-	: BSlider(name, NULL, message, 0, kMaxSliderLimit, B_HORIZONTAL,
+	:
+	BSlider(name, NULL, message, 0, kMaxSliderLimit, B_HORIZONTAL,
 		B_TRIANGLE_THUMB),
 	fSize(size),
 	fBlockSize(blockSize)
@@ -334,7 +345,7 @@ PositionSlider::~PositionSlider()
 void
 PositionSlider::DrawBar()
 {
-	BView *view = OffscreenView();
+	BView* view = OffscreenView();
 
 	BRect barFrame = BarFrame();
 	BRect frame = barFrame.InsetByCopy(1, 1);
@@ -471,7 +482,7 @@ PositionSlider::SetBlockSize(uint32 blockSize)
 //	#pragma mark - HeaderView
 
 
-HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
+HeaderView::HeaderView(const entry_ref* ref, DataEditor& editor)
 	: BGridView("probeHeader", B_USE_SMALL_SPACING, B_USE_SMALL_SPACING),
 	fAttribute(editor.Attribute()),
 	fFileSize(editor.FileSize()),
@@ -495,7 +506,7 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	boldFont.SetSize(plainFont.Size() * 0.83);
 	plainFont.SetSize(plainFont.Size() * 0.83);
 
-	BStringView *stringView = new BStringView(
+	BStringView* stringView = new BStringView(
 		B_EMPTY_STRING, editor.IsAttribute()
 			? B_TRANSLATE("Attribute: ") : editor.IsDevice()
 			? B_TRANSLATE("Device: ") : B_TRANSLATE("File: "));
@@ -620,7 +631,7 @@ HeaderView::AttachedToWindow()
 	fFileOffsetControl->SetTarget(this);
 	fPositionSlider->SetTarget(this);
 
-	BMessage *message;
+	BMessage* message;
 	Window()->AddShortcut(B_HOME, B_COMMAND_KEY,
 		message = new BMessage(kMsgPositionUpdate), this);
 	message->AddInt64("block", 0);
@@ -654,7 +665,7 @@ HeaderView::UpdateIcon()
 
 
 void
-HeaderView::FormatValue(char *buffer, size_t bufferSize, off_t value)
+HeaderView::FormatValue(char* buffer, size_t bufferSize, off_t value)
 {
 	snprintf(buffer, bufferSize, fBase == kHexBase ? "0x%" B_PRIxOFF : "%"
 		B_PRIdOFF, value);
@@ -740,7 +751,7 @@ HeaderView::NotifyTarget()
 
 
 void
-HeaderView::MessageReceived(BMessage *message)
+HeaderView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_OBSERVER_NOTICE_CHANGE: {
@@ -910,16 +921,17 @@ HeaderView::MessageReceived(BMessage *message)
 	It is used to display the attribute and type in the attributes menu.
 	It does not mix nicely with short cuts.
 */
-TypeMenuItem::TypeMenuItem(const char *name, const char *type,
-		BMessage *message)
-	: BMenuItem(name, message),
+TypeMenuItem::TypeMenuItem(const char* name, const char* type,
+		BMessage* message)
+	:
+	BMenuItem(name, message),
 	fType(type)
 {
 }
 
 
 void
-TypeMenuItem::GetContentSize(float *_width, float *_height)
+TypeMenuItem::GetContentSize(float* _width, float* _height)
 {
 	BMenuItem::GetContentSize(_width, _height);
 
@@ -963,7 +975,7 @@ TypeMenuItem::DrawContent()
 	this looper.
 	Also, it will run the find action in the editor.
 */
-EditorLooper::EditorLooper(const char *name, DataEditor &editor,
+EditorLooper::EditorLooper(const char* name, DataEditor& editor,
 		BMessenger target)
 	: BLooper(name),
 	fEditor(editor),
@@ -981,7 +993,7 @@ EditorLooper::~EditorLooper()
 
 
 void
-EditorLooper::MessageReceived(BMessage *message)
+EditorLooper::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgPositionUpdate:
@@ -1038,8 +1050,8 @@ EditorLooper::MessageReceived(BMessage *message)
 			bool caseInsensitive = !message->FindBool("case_sensitive");
 
 			ssize_t dataSize;
-			const uint8 *data;
-			if (message->FindData("data", B_RAW_TYPE, (const void **)&data,
+			const uint8* data;
+			if (message->FindData("data", B_RAW_TYPE, (const void**)&data,
 					&dataSize) == B_OK)
 				Find(startAt, data, dataSize, caseInsensitive, progressMonitor);
 		}
@@ -1052,7 +1064,7 @@ EditorLooper::MessageReceived(BMessage *message)
 
 
 void
-EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
+EditorLooper::Find(off_t startAt, const uint8* data, size_t dataSize,
 	bool caseInsensitive, BMessenger progressMonitor)
 {
 	fQuitFind = false;
@@ -1062,7 +1074,7 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
 	bigtime_t startTime = system_time();
 
 	off_t foundAt = fEditor.Find(startAt, data, dataSize, caseInsensitive,
-						true, progressMonitor, &fQuitFind);
+		true, progressMonitor, &fQuitFind);
 	if (foundAt >= B_OK) {
 		fEditor.SetViewOffset(foundAt);
 
@@ -1151,8 +1163,8 @@ TypeView::FrameResized(float width, float height)
 //	#pragma mark - ProbeView
 
 
-ProbeView::ProbeView(entry_ref *ref, const char *attribute,
-		const BMessage *settings)
+ProbeView::ProbeView(entry_ref* ref, const char* attribute,
+		const BMessage* settings)
 	: BView("probeView", B_WILL_DRAW),
 	fPrintSettings(NULL),
 	fTypeView(NULL),
@@ -1209,7 +1221,7 @@ ProbeView::DetachedFromWindow()
 
 
 void
-ProbeView::_UpdateAttributesMenu(BMenu *menu)
+ProbeView::_UpdateAttributesMenu(BMenu* menu)
 {
 	// remove old contents
 
@@ -1241,7 +1253,7 @@ ProbeView::_UpdateAttributesMenu(BMenu *menu)
 					break;
 			}
 
-			BMessage *message = new BMessage(B_REFS_RECEIVED);
+			BMessage* message = new BMessage(B_REFS_RECEIVED);
 			message->AddRef("refs", &fEditor.AttributeRef());
 			message->AddString("attributes", attribute);
 
@@ -1252,7 +1264,7 @@ ProbeView::_UpdateAttributesMenu(BMenu *menu)
 	if (menu->CountItems() == 0) {
 		// if there are no attributes, add an item to the menu
 		// that says so
-		BMenuItem *item = new BMenuItem(B_TRANSLATE_COMMENT("none",
+		BMenuItem* item = new BMenuItem(B_TRANSLATE_COMMENT("none",
 			"No attributes"), NULL);
 		item->SetEnabled(false);
 		menu->AddItem(item);
@@ -1276,7 +1288,7 @@ ProbeView::AddSaveMenuItems(BMenu* menu, int32 index)
 void
 ProbeView::AddPrintMenuItems(BMenu* menu, int32 index)
 {
-	BMenuItem *item;
+	BMenuItem* item;
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgPageSetup)), index++);
 	item->SetTarget(this);
@@ -1343,45 +1355,47 @@ ProbeView::AttachedToWindow()
 
 	// Add menu to window
 
-	BMenuBar *bar = Window()->KeyMenuBar();
+	BMenuBar* bar = Window()->KeyMenuBar();
 	if (bar == NULL) {
 		// there is none? Well, but we really want to have one
 		bar = new BMenuBar("");
 		Window()->AddChild(bar);
 
-		BMenu *menu = new BMenu(fEditor.IsAttribute()
-			? B_TRANSLATE("Attribute") : fEditor.IsDevice() ? B_TRANSLATE("Device") : B_TRANSLATE("File"));
+		BMenu* menu = new BMenu(fEditor.IsAttribute()
+			? B_TRANSLATE("Attribute") : fEditor.IsDevice()
+			? B_TRANSLATE("Device") : B_TRANSLATE("File"));
 		AddSaveMenuItems(menu, 0);
 		menu->AddSeparatorItem();
 		AddPrintMenuItems(menu, menu->CountItems());
 		menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_CLOSE_REQUESTED),
-			'W'));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
+			new BMessage(B_CLOSE_REQUESTED), 'W'));
 		bar->AddItem(menu);
 	}
 
 	// "Edit" menu
 
-	BMenu *menu = new BMenu(B_TRANSLATE("Edit"));
-	BMenuItem *item;
-	menu->AddItem(fUndoMenuItem = new BMenuItem(B_TRANSLATE("Undo"), new BMessage(B_UNDO),
-		'Z'));
+	BMenu* menu = new BMenu(B_TRANSLATE("Edit"));
+	BMenuItem* item;
+	menu->AddItem(fUndoMenuItem = new BMenuItem(B_TRANSLATE("Undo"),
+		new BMessage(B_UNDO), 'Z'));
 	fUndoMenuItem->SetEnabled(fEditor.CanUndo());
 	fUndoMenuItem->SetTarget(fDataView);
-	menu->AddItem(fRedoMenuItem = new BMenuItem(B_TRANSLATE("Redo"), new BMessage(B_REDO),
-		'Z', B_SHIFT_KEY));
+	menu->AddItem(fRedoMenuItem = new BMenuItem(B_TRANSLATE("Redo"),
+		new BMessage(B_REDO), 'Z', B_SHIFT_KEY));
 	fRedoMenuItem->SetEnabled(fEditor.CanRedo());
 	fRedoMenuItem->SetTarget(fDataView);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Copy"), new BMessage(B_COPY), 'C'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
 	item->SetTarget(NULL, Window());
-	menu->AddItem(fPasteMenuItem = new BMenuItem(B_TRANSLATE("Paste"), new BMessage(B_PASTE),
-		'V'));
+	menu->AddItem(fPasteMenuItem = new BMenuItem(B_TRANSLATE("Paste"),
+		new BMessage(B_PASTE), 'V'));
 	fPasteMenuItem->SetTarget(NULL, Window());
 	_CheckClipboard();
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"), new BMessage(B_SELECT_ALL),
-		'A'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
 	item->SetTarget(NULL, Window());
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
@@ -1396,19 +1410,21 @@ ProbeView::AttachedToWindow()
 	// "Block" menu
 
 	menu = new BMenu(B_TRANSLATE("Block"));
-	BMessage *message = new BMessage(kMsgPositionUpdate);
+	BMessage* message = new BMessage(kMsgPositionUpdate);
 	message->AddInt32("delta", 1);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Next"), message, B_RIGHT_ARROW));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Next"), message,
+		B_RIGHT_ARROW));
 	item->SetTarget(fHeaderView);
 	message = new BMessage(kMsgPositionUpdate);
 	message->AddInt32("delta", -1);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Previous"), message, B_LEFT_ARROW));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Previous"), message,
+		B_LEFT_ARROW));
 	item->SetTarget(fHeaderView);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Back"), new BMessage(kMsgLastPosition),
-		'J'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Back"),
+		new BMessage(kMsgLastPosition), 'J'));
 	item->SetTarget(fHeaderView);
 
-	BMenu *subMenu = new BMenu(B_TRANSLATE("Selection"));
+	BMenu* subMenu = new BMenu(B_TRANSLATE("Selection"));
 	message = new BMessage(kMsgPositionUpdate);
 	message->AddInt64("block", 0);
 	subMenu->AddItem(fNativeMenuItem = new BMenuItem("", message, 'K'));
@@ -1565,7 +1581,7 @@ void
 ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 {
 	int64 position = 0;
-	const uint8 *data = fDataView->DataAt(start);
+	const uint8* data = fDataView->DataAt(start);
 	if (data == NULL) {
 		fNativeMenuItem->SetEnabled(false);
 		fSwappedMenuItem->SetEnabled(false);
@@ -1620,11 +1636,11 @@ void
 ProbeView::_UpdateBookmarkMenuItems()
 {
 	for (int32 i = 2; i < fBookmarkMenu->CountItems(); i++) {
-		BMenuItem *item = fBookmarkMenu->ItemAt(i);
+		BMenuItem* item = fBookmarkMenu->ItemAt(i);
 		if (item == NULL)
 			break;
 
-		BMessage *message = item->Message();
+		BMessage* message = item->Message();
 		if (message == NULL)
 			break;
 
@@ -1656,10 +1672,10 @@ ProbeView::_AddBookmark(off_t position)
 	off_t block = position / fEditor.BlockSize();
 
 	off_t bookmark = -1;
-	BMenuItem *item;
+	BMenuItem* item;
 	int32 i;
 	for (i = 2; (item = fBookmarkMenu->ItemAt(i)) != NULL; i++) {
-		BMessage *message = item->Message();
+		BMessage* message = item->Message();
 		if (message != NULL && message->FindInt64("block", &bookmark) == B_OK) {
 			if (block <= bookmark)
 				break;
@@ -1676,7 +1692,7 @@ ProbeView::_AddBookmark(off_t position)
 	else
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %Ld (0x%Lx)"), block, block);
 
-	BMessage *message;
+	BMessage* message;
 	item = new BMenuItem(buffer, message = new BMessage(kMsgPositionUpdate));
 	item->SetTarget(fHeaderView);
 	if (count < 12)
@@ -1737,9 +1753,9 @@ ProbeView::_CheckClipboard()
 		return;
 
 	bool hasData = false;
-	BMessage *clip;
+	BMessage* clip;
 	if ((clip = be_clipboard->Data()) != NULL) {
-		const void *data;
+		const void* data;
 		ssize_t size;
 		if (clip->FindData(B_FILE_MIME_TYPE, B_MIME_TYPE, &data, &size) == B_OK
 			|| clip->FindData("text/plain", B_MIME_TYPE, &data, &size) == B_OK)
@@ -1848,7 +1864,7 @@ ProbeView::QuitRequested()
 
 
 void
-ProbeView::MessageReceived(BMessage *message)
+ProbeView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_SAVE_REQUESTED:
@@ -1961,13 +1977,14 @@ ProbeView::MessageReceived(BMessage *message)
 
 		case kMsgFind:
 		{
-			const uint8 *data;
+			const uint8* data;
 			ssize_t size;
-			if (message->FindData("data", B_RAW_TYPE, (const void **)&data, &size) != B_OK) {
+			if (message->FindData("data", B_RAW_TYPE, (const void**)&data,
+					&size) != B_OK) {
 				// search again for last pattern
-				BMessage *itemMessage = fFindAgainMenuItem->Message();
-				if (itemMessage == NULL
-					|| itemMessage->FindData("data", B_RAW_TYPE, (const void **)&data, &size) != B_OK) {
+				BMessage* itemMessage = fFindAgainMenuItem->Message();
+				if (itemMessage == NULL || itemMessage->FindData("data",
+						B_RAW_TYPE, (const void**)&data, &size) != B_OK) {
 					// this shouldn't ever happen, but well...
 					beep();
 					break;
@@ -2000,7 +2017,7 @@ ProbeView::MessageReceived(BMessage *message)
 					break;
 				case B_ATTR_CHANGED:
 				{
-					const char *name;
+					const char* name;
 					if (message->FindString("attr", &name) != B_OK)
 						break;
 
@@ -2008,9 +2025,9 @@ ProbeView::MessageReceived(BMessage *message)
 						if (!strcmp(name, fEditor.Attribute()))
 							fEditor.ForceUpdate();
 					} else {
-						BMenuBar *bar = Window()->KeyMenuBar();
+						BMenuBar* bar = Window()->KeyMenuBar();
 						if (bar != NULL) {
-							BMenuItem *item = bar->FindItem("Attributes");
+							BMenuItem* item = bar->FindItem("Attributes");
 							if (item != NULL && item->Submenu() != NULL)
 								_UpdateAttributesMenu(item->Submenu());
 						}
