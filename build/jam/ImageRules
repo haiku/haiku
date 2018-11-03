@@ -1383,7 +1383,8 @@ rule BuildNetBootArchive archive : scripts
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(archive) : $(mainScript) $(scripts) ;
-	BuildNetBootArchive1 $(archive) : $(mainScript) $(scripts) ;
+	BuildNetBootArchive1 $(archive) : $(mainScript)
+		$(scripts:R=$(HAIKU_ABSOLUTE_OUTPUT_DIR)) ;
 }
 
 actions BuildNetBootArchive1
@@ -1474,7 +1475,8 @@ rule BuildFloppyBootArchive archive : scripts
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(archive) : $(mainScript) $(scripts) ;
-	BuildFloppyBootArchive1 $(archive) : $(mainScript) $(scripts) ;
+	BuildFloppyBootArchive1 $(archive) : $(mainScript)
+		$(scripts:R=$(HAIKU_ABSOLUTE_OUTPUT_DIR)) ;
 }
 
 actions BuildFloppyBootArchive1
