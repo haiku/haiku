@@ -157,7 +157,7 @@ void
 TWindowMenuItem::DrawContent()
 {
 	BMenu* menu = Menu();
-	BPoint contentLocation = ContentLocation() + BPoint(kHPad, kVPad);
+	BPoint contentLocation = ContentLocation() + BPoint(kHPad, 0);
 
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
@@ -165,6 +165,10 @@ TWindowMenuItem::DrawContent()
 		float width = fBitmap->Bounds().Width();
 		if (width > 16)
 			contentLocation.x -= 8;
+
+		float height;
+		GetContentSize(NULL, &height);
+		contentLocation.y += (height - fBitmap->Bounds().Height()) / 2;
 
 		menu->MovePenTo(contentLocation);
 		menu->DrawBitmapAsync(fBitmap);
@@ -174,7 +178,7 @@ TWindowMenuItem::DrawContent()
 
 		contentLocation.x += kIconRect.Width() + kLabelOffset;
 	}
-	contentLocation.y += fLabelAscent;
+	contentLocation.y = ContentLocation().y + kVPad + fLabelAscent;
 
 	menu->SetDrawingMode(B_OP_COPY);
 	menu->MovePenTo(contentLocation);
