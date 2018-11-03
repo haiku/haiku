@@ -992,7 +992,7 @@ NetServer::_JoinNetwork(const BMessage& message, const BNetworkAddress* address,
 		&& device.GetNetwork(name, network) != B_OK) {
 		// We did not find a network - just ignore that, and continue
 		// with some defaults
-		strlcpy(network.name, name, sizeof(network.name));
+		strlcpy(network.name, name != NULL ? name : "", sizeof(network.name));
 		network.address = *address;
 		network.authentication_mode = B_NETWORK_AUTHENTICATION_NONE;
 		network.cipher = 0;
