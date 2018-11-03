@@ -52,6 +52,9 @@ All rights reserved.
 #include <MessagePrivate.h>
 #include <Screen.h>
 
+#include <DeskbarPrivate.h>
+#include <tracker_private.h>
+
 #include "BarApp.h"
 #include "BarMenuBar.h"
 #include "BarView.h"
@@ -60,7 +63,6 @@ All rights reserved.
 #include "ExpandoMenuBar.h"
 #include "StatusView.h"
 
-#include "tracker_private.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MainWindow"

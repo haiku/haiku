@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017 Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2018 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,9 @@
 
 
 #include <Deskbar.h>
+
+#include <string.h>
+
 #include <Messenger.h>
 #include <Message.h>
 #include <View.h>
@@ -18,10 +21,10 @@
 #include <InterfaceDefs.h>
 #include <Node.h>
 
-#include <string.h>
+#include <DeskbarPrivate.h>
 
 
-// ToDo: in case the BDeskbar methods are called from a Deskbar add-on,
+// TODO: in case the BDeskbar methods are called from a Deskbar add-on,
 //	they will currently deadlock most of the time (only those that do
 //	not need a reply will work).
 //	That should be fixed in the Deskbar itself, even if the Be API found
@@ -29,27 +32,6 @@
 
 // The API in this file should be considered as part of OpenTracker - but
 // should work with all versions of Tracker available for Haiku.
-
-
-static const char* kDeskbarSignature = "application/x-vnd.Be-TSKB";
-
-static const uint32 kMsgIsAlwaysOnTop = 'gtop';
-static const uint32 kMsgAlwaysOnTop = 'stop';
-static const uint32 kMsgIsAutoRaise = 'grse';
-static const uint32 kMsgAutoRaise = 'srse';
-static const uint32 kMsgIsAutoHide = 'ghid';
-static const uint32 kMsgAutoHide = 'shid';
-
-static const uint32 kMsgAddView = 'icon';
-static const uint32 kMsgAddAddOn = 'adon';
-static const uint32 kMsgHasItem = 'exst';
-static const uint32 kMsgGetItemInfo = 'info';
-static const uint32 kMsgCountItems = 'cwnt';
-static const uint32 kMsgRemoveItem = 'remv';
-static const uint32 kMsgLocation = 'gloc';
-static const uint32 kMsgIsExpanded = 'gexp';
-static const uint32 kMsgSetLocation = 'sloc';
-static const uint32 kMsgExpand = 'sexp';
 
 
 status_t
@@ -328,7 +310,7 @@ BDeskbar::HasItem(const char* name) const
 uint32
 BDeskbar::CountItems() const
 {
-	BMessage request(kMsgCountItems);	
+	BMessage request(kMsgCountItems);
 	BMessage reply;
 
 	if (fMessenger->SendMessage(&request, &reply) == B_OK)
