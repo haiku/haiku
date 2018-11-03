@@ -33,7 +33,7 @@ HAIKU_OPTIONAL_BUILD_PACKAGES_DIR	?= [ FDirName $(HAIKU_OUTPUT_DIR)
 
 # Absolutely rooted versions of some of the main directories
 HAIKU_ABSOLUTE_TOP					?= [ FDirName $(PWD) $(HAIKU_TOP) ] ;
-HAIKU_ABSOLUTE_OUTPUT_DIR			?= [ FDirName $(HAIKU_ABSOLUTE_TOP) generated ] ;
+HAIKU_ABSOLUTE_OUTPUT_DIR			?= [ FDirName $(PWD) $(HAIKU_OUTPUT_DIR) ] ;
 
 # Cache files for header scanning and jamfile caching
 HCACHEFILE = header_cache ;
