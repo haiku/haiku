@@ -79,6 +79,7 @@ private:
 
 private:
 			BSize				_ValidatePreferredSize();
+			float				_StringWidth(const char* text);
 
 private:
 			char*				fText;

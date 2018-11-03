@@ -15,7 +15,6 @@
 #include <View.h>
 
 class BPopUpMenu;
-class BTextView;
 
 
 // Config panel messages
@@ -33,7 +32,6 @@ class PNGView : public BView {
 		~PNGView();
 
 		virtual void AttachedToWindow();
-		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage *message);
 
 	private:
@@ -41,7 +39,6 @@ class PNGView : public BView {
 
 	private:
 		BPopUpMenu*			fInterlaceMenu;
-		BTextView*			fCopyrightView;
 		TranslatorSettings*	fSettings;
 			// the actual settings for the translator,
 			// shared with the translator
