@@ -5,12 +5,6 @@
 #include <KernelExport.h>
 
 
-#if 1
-#	define INFO(x...) dprintf(x)
-#else
-#	define INFO(x...)
-#endif
-
 //#define TRACE_MOVEMENT_MAKER
 #ifdef TRACE_MOVEMENT_MAKER
 #	define TRACE(x...) dprintf(x)
@@ -226,7 +220,7 @@ MovementMaker::GetMovement(uint32 posX, uint32 posY)
 {
 	_GetRawMovement(posX, posY);
 
-//	INFO("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
+//	TRACE("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
 //		posX, posY, xDelta, yDelta,
 //		fDeltaSumX, fDeltaSumY);
 
