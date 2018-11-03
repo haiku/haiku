@@ -382,7 +382,7 @@ DOWNLOAD_IN_PORT_DIRECTORY="yes"
 PACKAGE_COMMAND="$(2[1])"
 MIMESET_COMMAND="$(2[2])"
 SYSTEM_MIME_DB="$(2[3])"
-LICENSES_DIRECTORY="$(HAIKU_TOP)/data/system/data/licenses"
+LICENSES_DIRECTORY="$(HAIKU_ABSOLUTE_TOP)/data/system/data/licenses"
 OUTPUT_DIRECTORY="$(HAIKU_REPOSITORY_BUILD_DIRECTORY)"
 EOF
 
@@ -463,7 +463,9 @@ rule BootstrapPackageRepository repository : architecture
 		= haiku_cross_devel_sysroot_$(crossDevelPackageSuffixes).hpkg ;
 
 	# prepare the config file for the HaikuPorts cross build
+	# This path needs to be absolute due to haikuporter's cwd
 	local outputDir = [ FDirName
+		$(PWD)
 		$(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture))
 		$(repository:G=)-build ] ;
 	local configFile = haikuports.conf ;
