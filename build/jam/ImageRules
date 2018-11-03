@@ -1274,7 +1274,8 @@ rule BuildHaikuImage haikuImage : scripts : isImage : isVMwareImage
 	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
 
 	Depends $(haikuImage) : $(mainScript) $(scripts) ;
-	BuildHaikuImage1 $(haikuImage) : $(mainScript) $(scripts) ;
+	BuildHaikuImage1 $(haikuImage) : $(mainScript)
+		$(scripts:R=$(HAIKU_ABSOLUTE_OUTPUT_DIR)) ;
 }
 
 actions BuildHaikuImage1

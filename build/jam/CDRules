@@ -7,7 +7,8 @@ rule BuildHaikuCD haikuCD : bootFloppy : scripts
 
 	Depends $(haikuCD) : $(mainScript) $(scripts) ;
 	Depends $(haikuCD) : $(bootFloppy) ;
-	BuildHaikuCD1 $(haikuCD) : $(bootFloppy) $(mainScript) $(scripts) ;
+	BuildHaikuCD1 $(haikuCD) : $(bootFloppy) $(mainScript)
+		$(scripts:R=$(HAIKU_ABSOLUTE_OUTPUT_DIR)) ;
 }
 
 actions BuildHaikuCD1
