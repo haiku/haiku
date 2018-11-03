@@ -27,18 +27,27 @@ typedef struct {
 			sem_id				sem;
 	struct	packet_buffer*		ring_buffer;
 			size_t				packet_index;
-			uint8				buffer[PS2_PACKET_ELANTECH];
-			uint8				mode;
 
-			uint8				previousZ;
 			TouchpadMovement	movementMaker;
 
 			touchpad_settings	settings;
 			uint32				version;
 			uint32				fwVersion;
-			uint8				capabilities[3];
-			bool				crcEnabled;
+
+			uint32				x;
+			uint32				y;
 			uint32				fingers;
+
+
+			uint8				buffer[PS2_PACKET_ELANTECH];
+			uint8				capabilities[3];
+
+			uint8				previousZ;
+
+			uint8				mode;
+			bool				crcEnabled;
+
+
 	status_t (*send_command)(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count);
 } elantech_cookie;
 

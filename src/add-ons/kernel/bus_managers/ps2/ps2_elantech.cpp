@@ -112,6 +112,9 @@ const char* kElantechPath[4] = {
 
 #define ELANTECH_HISTORY_SIZE	256
 
+#define STATUS_PACKET	0x0
+#define HEAD_PACKET		0x1
+#define MOTION_PACKET	0x2
 
 static hardware_specs gHardwareSpecs;
 
@@ -120,7 +123,7 @@ static status_t
 get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 {
 	touch_event event;
-	uint8 event_buffer[PS2_PACKET_ELANTECH];
+	uint8 packet[PS2_PACKET_ELANTECH];
 
 	status_t status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
@@ -131,69 +134,75 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 		return B_ERROR;
 	}
 
-	if (packet_buffer_read(cookie->ring_buffer, event_buffer,
+	if (packet_buffer_read(cookie->ring_buffer, packet,
 			cookie->dev->packet_size) != cookie->dev->packet_size) {
 		TRACE("ELANTECH: error copying buffer\n");
 		return B_ERROR;
 	}
 
-	if (cookie->crcEnabled && (event_buffer[3] & 0x08) != 0) {
+	if (cookie->crcEnabled && (packet[3] & 0x08) != 0) {
 		TRACE("ELANTECH: bad crc buffer\n");
 		return B_ERROR;
-	} else if (!cookie->crcEnabled && ((event_buffer[0] & 0x0c) != 0x04
-		|| (event_buffer[3] & 0x1c) != 0x10)) {
+	} else if (!cookie->crcEnabled && ((packet[0] & 0x0c) != 0x04
+		|| (packet[3] & 0x1c) != 0x10)) {
 		TRACE("ELANTECH: bad crc buffer\n");
 		return B_ERROR;
 	}
-	uint8 type = event_buffer[3] & 3;
-	TRACE("ELANTECH: packet type %d\n", type);
+		// https://www.kernel.org/doc/html/v4.16/input/devices/elantech.html
+	uint8 packet_type = packet[3] & 3;
+	TRACE("ELANTECH: packet type %d\n", packet_type);
 	TRACE("ELANTECH: packet content 0x%02x%02x%02x%02x%02x%02x\n",
-		event_buffer[0], event_buffer[1], event_buffer[2], event_buffer[3],
-		event_buffer[4], event_buffer[5]);
-	switch (type) {
-		case 0:
-			// fingers
-			cookie->fingers = event_buffer[1] & 0x1f;
+		packet[0], packet[1], packet[2], packet[3],
+		packet[4], packet[5]);
+	switch (packet_type) {
+		case STATUS_PACKET:
+			//fingers, no palm
+			cookie->fingers = (packet[4] & 0x80) == 0 ? packet[1] & 0x1f: 0;
+			dprintf("ELANTECH: Fingers %d, raw %x (STATUS)\n", cookie->fingers, packet[1]);
 			break;
-		case 1:
-			if ((((event_buffer[3] & 0xe0) >> 5) - 1) != 0) {
-				// only process first finger
+		case HEAD_PACKET:
+			dprintf("ELANTECH: Fingers %d, raw %x (HEAD)\n", (packet[3] & 0xe0) >>5, packet[3]);
+			// only process first finger
+			if ((packet[3] & 0xe0) != 0x20)
 				return B_OK;
-			}
-			event.zPressure = (event_buffer[1] & 0xf0)
-				| ((event_buffer[4] & 0xf0) >> 4);
+
+			event.zPressure = (packet[1] & 0xf0) | ((packet[4] & 0xf0) >> 4);
 
 			cookie->previousZ = event.zPressure;
 
-			event.xPosition = ((event_buffer[1] & 0xf) << 8) | event_buffer[2];
-			event.yPosition = (((event_buffer[4] & 0xf) << 8)
-				| event_buffer[5]);
+			cookie->x = event.xPosition = ((packet[1] & 0xf) << 8) | packet[2];
+			cookie->y = event.yPosition = ((packet[4] & 0xf) << 8) | packet[5];
+			dprintf("ELANTECH: Pos: %d:%d\n (HEAD)", cookie->x, cookie->y);
 			TRACE("ELANTECH: buttons 0x%x x %" B_PRIu32 " y %" B_PRIu32
 				" z %d\n", event.buttons, event.xPosition, event.yPosition,
 				event.zPressure);
 			break;
-		case 2:
-			TRACE("ELANTECH: packet type motion\n");
-			// TODO
-			return B_OK;
+		case MOTION_PACKET:
+			dprintf("ELANTECH: Fingers %d, raw %x (MOTION)\n", (packet[3] & 0xe0) >>5, packet[3]);			//Most likely palm
+			if (cookie->fingers == 0) return B_OK;
+			//handle overflow and delta values
+			if ((packet[0] & 0x10) == 1) {
+				event.xPosition = cookie->x += 5 * (int8)packet[1];
+				event.yPosition = cookie->y += 5 * (int8)packet[2];
+			} else {
+				event.xPosition = cookie->x += (int8)packet[1];
+				event.yPosition = cookie->y += (int8)packet[2];
+			}
+			dprintf("ELANTECH: Pos: %d:%d (Motion\n", cookie->x, cookie->y);
+
+			break;
 		default:
-			TRACE("ELANTECH: unknown packet type %d\n", type);
+			dprintf("ELANTECH: unknown packet type %d\n", packet_type);
 			return B_ERROR;
 	}
 
 	event.buttons = 0;
-	// finger on touchpad
-	if ((cookie->fingers & 1) != 0) {
-		// finger with normal width
-		event.wValue = 4;
-	} else {
-		event.wValue = 3;
-	}
+	event.wValue = cookie->fingers == 1 ? 4 :0;
 	status = cookie->movementMaker.EventToMovement(&event, movement);
 
 	if (cookie->movementMaker.WasEdgeMotion()
 		|| cookie->movementMaker.TapDragStarted()) {
-		gEventProducer.FireEvent(cookie, event_buffer);
+		gEventProducer.FireEvent(cookie, packet);
 	}
 
 	return status;
@@ -566,7 +575,7 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 				goto err4;
 		}
 	}
-	TRACE("ELANTECH: version 0x%" B_PRIu32 " (0x%" B_PRIu32 ")\n",
+	INFO("ELANTECH: version 0x%" B_PRIu32 " (0x%" B_PRIu32 ")\n",
 		cookie->version, cookie->fwVersion);
 
 	if (cookie->version >= 3)
@@ -698,7 +707,7 @@ elantech_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 			return B_OK;
 
 		case MS_SET_TOUCHPAD_SETTINGS:
-			TRACE("ELANTECH: MS_SET_TOUCHPAD_SETTINGS");
+			TRACE("ELANTECH: MS_SET_TOUCHPAD_SETTINGS\n");
 			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
 			return B_OK;
 
@@ -708,7 +717,7 @@ elantech_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 				sizeof(bigtime_t));
 
 		default:
-			TRACE("ELANTECH: unknown opcode: %" B_PRIu32 "\n", op);
+			INFO("ELANTECH: unknown opcode: 0x%" B_PRIx32 "\n", op);
 			return B_BAD_VALUE;
 	}
 }
