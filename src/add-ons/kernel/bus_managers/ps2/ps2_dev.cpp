@@ -45,7 +45,7 @@ ps2_reset_mouse(ps2_dev* dev)
 		status = ps2_dev_command(dev, PS2_CMD_RESEND, NULL, 0, data, 2);
 	}
 
-	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
+	if (status == B_OK && (data[0] != 0xAA || data[1] != 0x00)) {
 		TRACE("ps2: reset mouse failed, response was: 0x%02x 0x%02x\n",
 			data[0], data[1]);
 		status = B_ERROR;
