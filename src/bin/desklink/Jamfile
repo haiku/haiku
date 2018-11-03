@@ -13,7 +13,7 @@ BinCommand desklink :
 	VolumeWindow.cpp
 
 	: be libmedia.so localestub [ TargetLibsupc++ ]
-	: desklink.rdef
+	: desklink.rdef SpeakerBox.rdef
 ;
 
 DoCatalogs desklink :

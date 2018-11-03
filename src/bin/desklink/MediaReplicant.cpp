@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013, Haiku. All rights reserved.
+ * Copyright 2003-2018, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,6 +29,7 @@
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Resources.h>
 #include <Roster.h>
 #include <String.h>
 #include <StringView.h>
@@ -37,7 +38,6 @@
 #include <ToolTipManager.h>
 
 #include "desklink.h"
-#include "iconfile.h"
 #include "MixerControl.h"
 #include "VolumeWindow.h"
 
@@ -141,6 +141,7 @@ private:
 			void			_LoadSettings();
 			void			_SaveSettings();
 			void			_Init();
+			BBitmap*		_LoadIcon(BResources& resources, const char* name);
 
 			void			_DisconnectMixer();
 			status_t		_ConnectMixer();
@@ -156,6 +157,23 @@ private:
 				// which volume parameter to act on (Mixer/Phys.Output)
 			bool				fMuted;
 };
+
+
+status_t
+our_image(image_info& image)
+{
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
+		if ((char*)our_image >= (char*)image.text
+			&& (char*)our_image <= (char*)image.text + image.text_size)
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+//	#pragma mark -
 
 
 MediaReplicant::MediaReplicant(BRect frame, const char* name,
@@ -527,18 +545,43 @@ MediaReplicant::_SaveSettings()
 void
 MediaReplicant::_Init()
 {
-	fIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),
-		B_RGBA32);
-	BIconUtils::GetVectorIcon(kSpeakerIcon, sizeof(kSpeakerIcon), fIcon);
+	image_info info;
+	if (our_image(info) != B_OK)
+		return;
 
-	fMutedIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),
-		B_RGBA32);
-	BIconUtils::GetVectorIcon(kMutedSpeakerIcon, sizeof(kMutedSpeakerIcon),
-		fMutedIcon);
+	BFile file(info.name, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	BResources resources(&file);
+	if (resources.InitCheck() != B_OK)
+		return;
+
+	fIcon = _LoadIcon(resources, "Speaker");
+	fMutedIcon = _LoadIcon(resources, "SpeakerMuted");
 
 	_LoadSettings();
 
 	SetToolTip(new VolumeToolTip(fVolumeWhich));
+}
+
+
+BBitmap*
+MediaReplicant::_LoadIcon(BResources& resources, const char* name)
+{
+	size_t size;
+	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE, name, &size);
+	if (data == NULL)
+		return NULL;
+
+	// Scale tray icon
+	BBitmap* icon = new BBitmap(Bounds(), B_RGBA32);
+	if (icon->InitCheck() != B_OK
+		|| BIconUtils::GetVectorIcon((const uint8*)data, size, icon) != B_OK) {
+		delete icon;
+		return NULL;
+	}
+	return icon;
 }
 
 
