@@ -1,9 +1,9 @@
 /*
-	
+
 	StarWindow.cpp
-	
+
 	by Pierre Raynaud-Richard.
-	
+
 */
 
 /*
@@ -69,7 +69,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 
 	// init the crc pseudo-random generator
 	crc_alea = CRC_START;
-	
+
 	// allocate the star struct array
 	star_count_max = 8192;
 	star_count = 0;
@@ -81,11 +81,11 @@ StarWindow::StarWindow(BRect frame, const char *name)
 		// to do it (the probability and the angle are linked), but that's
 		// simple and doesn't require any trigonometry.
 		do {
-			dx = (crc_alea&0xffff) - 0x8000;		
+			dx = (crc_alea&0xffff) - 0x8000;
 			CrcStep();
 			CrcStep();
 
-			dy = (crc_alea&0xffff) - 0x8000;			
+			dy = (crc_alea&0xffff) - 0x8000;
 			CrcStep();
 			CrcStep();
 		} while ((dx == 0) && (dy == 0));
@@ -98,11 +98,11 @@ StarWindow::StarWindow(BRect frame, const char *name)
 			dy <<= 1;
 			square <<= 2;
 		}
-			
+
 		// save the starting speed vector.
 		star_list[i].dx0 = dx;
 		star_list[i].dy0 = dy;
-		
+
 		// simulate the animation to see how many moves are needed to
 		// get out by at least 1024 in one direction. That will give us
 		// an minimal value for how long we should wait before restarting
@@ -118,7 +118,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 			dy += (dy>>4);
 			cnt++;
 		}
-		
+
 		// add a random compenent [0 to 15] to the minimal count before
 		// restart.
 		star_list[i].count0 = cnt + ((crc_alea&0xf0000)>>16);
@@ -131,7 +131,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 		star_list[i].dx = 0;
 		star_list[i].dy = 0;
 		star_list[i].count = (i&255);
-	}	
+	}
 
 	// allocate the semaphore used to synchronise the star animation drawing access.
 	drawing_lock = create_sem(0, "star locker");
@@ -142,7 +142,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 	my_thread = spawn_thread(StarWindow::StarAnimation, "StarAnimation",
 							 B_DISPLAY_PRIORITY, (void*)this);
 	resume_thread(my_thread);
-	
+
 	// add a view in the background to insure that the content area will
 	// be properly erased in black. This erase mechanism is not synchronised
 	// with the star animaton, which means that from time to time, some
@@ -156,7 +156,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 	// to do it, as it gives us access to hardware acceleration...
 	frame.OffsetTo(0.0, 0.0);
 	//view = new BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW);
-	
+
 	// The only think we want from the view mechanism is to
 	// erase the background in black. Because of the way the
 	// star animation is done, this erasing operation doesn't
@@ -165,18 +165,18 @@ StarWindow::StarWindow(BRect frame, const char *name)
 	// mechanism to draw in the same area of the StarWindow.
 	// Such thing is usualy not recommended as synchronisation
 	// is generally an issue (drawing in random order usualy
-	// gives remanent incorrect result).	
+	// gives remanent incorrect result).
 	// set the view color to be black (nicer update).
 	//view->SetViewColor(0, 0, 0);
 	//AddChild(view);
-	
+
 	// Add a shortcut to switch in and out of fullscreen mode.
-	AddShortcut('f', B_COMMAND_KEY, new BMessage('full'));	
-	
+	AddShortcut('f', B_COMMAND_KEY, new BMessage('full'));
+
 	// As we said before, the window shouldn't get wider than 2048 in any
 	// direction, so those limits will do.
 	SetSizeLimits(40.0, 2000.0, 40.0, 2000.0);
-	
+
 	// If the graphic card/graphic driver we use doesn't support directwindow
 	// in window mode, then we need to switch to fullscreen immediately, or
 	// the user won't see anything, as long as it doesn't used the undocumented
@@ -188,7 +188,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 
 		key_map *map;
 		get_key_map(&map, &buf);
-		
+
 		if (map != NULL) {
 			sSwapped = (map->left_control_key == 0x5d)
 				&& (map->left_command_key == 0x5c);
@@ -225,7 +225,7 @@ StarWindow::~StarWindow()
 
 	status_t result;
 	wait_for_thread(my_thread, &result);
-	
+
 	// Free window resources. As they're used by the drawing thread, we
 	// need to terminate that thread before freeing them, or we could crash.
 	free(star_list);
@@ -329,11 +329,11 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 	star_count_new = (star_count_max*(window_area>>10))>>10;
 	if (star_count_new > star_count_max)
 		star_count_new = star_count_max;
-		
+
 	// set the position of the new center of the window (in case of move or resize)
 	cx = (info->window_bounds.right+info->window_bounds.left+1)/2;
 	cy = (info->window_bounds.bottom+info->window_bounds.top+1)/2;
-	
+
 	// update to the new clipping region. The local copy is kept relative
 	// to the center of the animation (origin of the star coordinate).
 	clipping_bound.left = info->clip_bounds.left - cx;
@@ -350,19 +350,19 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 		clipping_list[i].top = info->clip_list[i].top - cy;
 		clipping_list[i].bottom = info->clip_list[i].bottom - cy;
 	}
-	
+
 	// update the new rowbyte
 	// NOTE: "row_bytes" is completely misnamed, and was misused too
 	row_bytes = info->bytes_per_row / (info->bits_per_pixel / 8);
-	
+
 	// update the screen bases (only one of the 3 will be really used).
-	draw_ptr8 = (uint8*)info->bits + info->bytes_per_row 
-		* info->window_bounds.top + info->window_bounds.left 
+	draw_ptr8 = (uint8*)info->bits + info->bytes_per_row
+		* info->window_bounds.top + info->window_bounds.left
 		* (info->bits_per_pixel / 8);
 		// Note: parenthesis around "info->bits_per_pixel / 8"
 		// are needed to avoid an overflow when info->window_bounds.left
 		// becomes negative.
-		
+
 	draw_ptr16 = (uint16*)draw_ptr8;
 	draw_ptr32 = (uint32*)draw_ptr8;
 
@@ -407,11 +407,11 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 				r++;
 			}
 			goto invisible;
-			
+
 			// if it's still visible...
 		visible:
 			if (i >= star_count_new) {
-				// ...and the star won't be used anylonger, then we erase it. 
+				// ...and the star won't be used anylonger, then we erase it.
 				if (pixel_depth == 32)
 					draw_ptr32[s->last_draw] = 0;
 				else if (pixel_depth == 16)
@@ -420,7 +420,7 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 					draw_ptr8[s->last_draw] = 0;
 			}
 			goto not_defined;
-				
+
 			// if the star just became invisible and it was because the
 			// context was modified and not fully stop, then we need to erase
 			// those stars who just became invisible (or they could leave
@@ -443,7 +443,7 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 		not_defined:
 			s++;
 		}
-		
+
 		// initialise all the new star (the ones which weren't used but
 		// will be use after that context update) to set their last position
 		// as invalid.
@@ -453,18 +453,18 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 			s++;
 		}
 	}
-	
+
 	// update the window origin offset.
 	window_offset = row_bytes*(cy-info->window_bounds.top) + (cx-info->window_bounds.left);
-	
+
 	// set the pixel_depth and the pixel data, from the color_space.
 	switch (info->pixel_format) {
 	case B_RGBA32 :
 	case B_RGB32 :
 		pixel_depth = 32;
-		((uint8*)&pixel32)[0] = 0x20; 
-		((uint8*)&pixel32)[1] = 0xff; 
-		((uint8*)&pixel32)[2] = 0x20; 
+		((uint8*)&pixel32)[0] = 0x20;
+		((uint8*)&pixel32)[1] = 0xff;
+		((uint8*)&pixel32)[2] = 0x20;
 		((uint8*)&pixel32)[3] = 0xff;
 		break;
 	case B_RGB16 :
@@ -485,9 +485,9 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 	case B_RGBA32_BIG :
 	case B_RGB32_BIG :
 		pixel_depth = 32;
-		((uint8*)&pixel32)[3] = 0x20; 
-		((uint8*)&pixel32)[2] = 0xff; 
-		((uint8*)&pixel32)[1] = 0x20; 
+		((uint8*)&pixel32)[3] = 0x20;
+		((uint8*)&pixel32)[2] = 0xff;
+		((uint8*)&pixel32)[1] = 0x20;
 		((uint8*)&pixel32)[0] = 0xff;
 		break;
 	case B_RGB16_BIG :
@@ -506,10 +506,10 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 		exit(1);
 		break;
 	}
-	
+
 	// set the new star count.
 	star_count = star_count_new;
-	
+
 	// save a copy of the variables used to calculate the move of the window center
 	cx_old = cx - info->window_bounds.left;
 	cy_old = cy - info->window_bounds.top;
@@ -518,7 +518,7 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 
 // This is the thread doing the star animation itself. It would be easy to
 // adapt to do any other sort of pixel animation.
-long
+status_t
 StarWindow::StarAnimation(void *data)
 {
 	star			*s;
@@ -527,15 +527,15 @@ StarWindow::StarAnimation(void *data)
 	bigtime_t		time;
 	StarWindow		*w;
 	clipping_rect	*r;
-	
+
 	// receive a pointer to the StarWindow object.
 	w = (StarWindow*)data;
-	
+
 	// loop, frame after frame, until asked to quit.
 	while (!w->kill_my_thread) {
 		// we want a frame to take at least 16 ms.
 		time = system_time()+16000;
-		
+
 		// get the right to do direct screen access.
 		while (acquire_sem(w->drawing_lock) == B_INTERRUPTED)
 			;
@@ -604,17 +604,17 @@ StarWindow::StarAnimation(void *data)
 			s->last_draw = INVALID;
 		loop:
 			s++;
-		}		
-		
+		}
+
 		// release the direct screen access
 		release_sem(w->drawing_lock);
-		
+
 		// snooze for whatever time is left from the initial allocation done
 		// at the beginning of the loop.
 		time -= system_time();
 		if (time > 0)
 			snooze(time);
-	}	
+	}
 	return 0;
 }
 
