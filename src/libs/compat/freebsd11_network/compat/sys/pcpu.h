@@ -10,7 +10,9 @@
 
 
 struct thread;
+int get_curcpu();
 
+#define curcpu (get_curcpu())
 #define curthread ((struct thread*)NULL)
 	/* NOTE: Dereferencing curthread will crash, which is intentional. There is
 	   no FreeBSD compatible struct thread and Haiku's should not be used as it

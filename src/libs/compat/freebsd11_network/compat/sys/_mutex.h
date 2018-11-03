@@ -17,7 +17,6 @@ struct mtx {
 			mutex			lock;
 			thread_id		owner;
 		}					mutex;
-		int32				spinlock;
 		recursive_lock		recursive;
 	} u;
 };

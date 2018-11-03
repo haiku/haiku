@@ -41,6 +41,7 @@ KernelStaticLibrary libfreebsd11_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
+	pcpu.cpp
 	priv.cpp
 	smp.c
 	subr_autoconf.cpp

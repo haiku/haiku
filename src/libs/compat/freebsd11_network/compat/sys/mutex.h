@@ -54,6 +54,22 @@ mtx_lock(struct mtx* mutex)
 }
 
 
+static inline int
+mtx_trylock(struct mtx* mutex)
+{
+	if (mutex->type == MTX_DEF) {
+		if (mutex_trylock(&mutex->u.mutex.lock) != B_OK)
+			return 0;
+		mutex->u.mutex.owner = find_thread(NULL);
+		return 1;
+	} else if (mutex->type == MTX_RECURSE) {
+		if (recursive_lock_trylock(&mutex->u.recursive) != B_OK)
+			return 0;
+		return 1;
+	}
+}
+
+
 static inline void
 mtx_unlock(struct mtx* mutex)
 {
