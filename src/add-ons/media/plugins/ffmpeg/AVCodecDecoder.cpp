@@ -1239,76 +1239,75 @@ AVCodecDecoder::_UpdateMediaHeaderForAudioFrame()
 status_t
 AVCodecDecoder::_DecodeNextVideoFrame()
 {
-	while (true) {
-		status_t loadingChunkStatus
-			= _LoadNextChunkIfNeededAndAssignStartTime();
-		if (loadingChunkStatus == B_LAST_BUFFER_ERROR)
-			return _FlushOneVideoFrameFromDecoderBuffer();
-		if (loadingChunkStatus != B_OK) {
-			TRACE("AVCodecDecoder::_DecodeNextVideoFrame(): error from "
-				"GetNextChunk(): %s\n", strerror(loadingChunkStatus));
-			return loadingChunkStatus;
-		}
+	int error;
+	int send_error;
 
 #if DO_PROFILING
-		bigtime_t startTime = system_time();
+	bigtime_t startTime = system_time();
 #endif
 
-		// NOTE: In the FFMPEG 0.10.2 code example decoding_encoding.c, the
-		// length returned by avcodec_decode_video2() is used to update the
-		// packet buffer size (here it is fTempPacket.size). This way the
-		// packet buffer is allowed to contain incomplete frames so we are
-		// required to buffer the packets between different calls to
-		// _DecodeNextVideoFrame().
-		int gotVideoFrame = 0;
-		int encodedDataSizeInBytes = avcodec_decode_video2(fCodecContext,
-			fRawDecodedPicture, &gotVideoFrame, &fTempPacket);
-		if (encodedDataSizeInBytes < 0) {
-			TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %lld:"
-				" %d\n", fFrame, encodedDataSizeInBytes);
-			// NOTE: An error from avcodec_decode_video2() is ignored by the
-			// FFMPEG 0.10.2 example decoding_encoding.c. Only the packet
-			// buffers are flushed accordingly
+	error = avcodec_receive_frame(fCodecContext, fRawDecodedPicture);
+
+	if (error == AVERROR(EAGAIN)) {
+		do {
+			status_t loadingChunkStatus
+				= _LoadNextChunkIfNeededAndAssignStartTime();
+			if (loadingChunkStatus == B_LAST_BUFFER_ERROR)
+				return _FlushOneVideoFrameFromDecoderBuffer();
+			if (loadingChunkStatus != B_OK) {
+				TRACE("[v] AVCodecDecoder::_DecodeNextVideoFrame(): error from "
+					"GetNextChunk(): %s\n", strerror(loadingChunkStatus));
+				return loadingChunkStatus;
+			}
+
+			char timestamp[AV_TS_MAX_STRING_SIZE];
+			av_ts_make_time_string(timestamp,
+				fTempPacket.dts, &fCodecContext->time_base);
+			TRACE("[v] Feed %d more bytes (dts %s)\n", fTempPacket.size,
+				timestamp);
+
+			send_error = avcodec_send_packet(fCodecContext, &fTempPacket);
+			if (send_error < 0 && send_error != AVERROR(EAGAIN)) {
+				TRACE("[v] AVCodecDecoder: ignoring error in decoding frame "
+				"%lld: %d\n", fFrame, error);
+			}
+
+			// Packet is consumed, clear it
 			fTempPacket.data = NULL;
 			fTempPacket.size = 0;
-			continue;
-		}
 
-		fTempPacket.size -= encodedDataSizeInBytes;
-		fTempPacket.data += encodedDataSizeInBytes;
+			error = avcodec_receive_frame(fCodecContext, fRawDecodedPicture);
+			if (error != 0 && error != AVERROR(EAGAIN)) {
+				TRACE("[v] frame %lld - decoding error, error code: %d, "
+					"chunk size: %ld\n", fFrame, error, fChunkBufferSize);
+			}
 
-		bool gotNoVideoFrame = gotVideoFrame == 0;
-		if (gotNoVideoFrame) {
-			TRACE("frame %lld - no picture yet, encodedDataSizeInBytes: %d, "
-				"chunk size: %ld\n", fFrame, encodedDataSizeInBytes,
-				fChunkBufferSize);
-			continue;
-		}
-
-#if DO_PROFILING
-		bigtime_t formatConversionStart = system_time();
-#endif
-
-		status_t handleStatus = _HandleNewVideoFrameAndUpdateSystemState();
-		if (handleStatus != B_OK)
-			return handleStatus;
-
-#if DO_PROFILING
-		bigtime_t doneTime = system_time();
-		decodingTime += formatConversionStart - startTime;
-		conversionTime += doneTime - formatConversionStart;
-		profileCounter++;
-		if (!(fFrame % 5)) {
-			printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required %Ld\n",
-				decodingTime / profileCounter, conversionTime / profileCounter,
-				fFrame, bigtime_t(1000000LL / fOutputFrameRate));
-			decodingTime = 0;
-			conversionTime = 0;
-			profileCounter = 0;
-		}
-#endif
-		return B_OK;
+		} while (error != 0);
 	}
+
+#if DO_PROFILING
+	bigtime_t formatConversionStart = system_time();
+#endif
+
+	status_t handleStatus = _HandleNewVideoFrameAndUpdateSystemState();
+	if (handleStatus != B_OK)
+		return handleStatus;
+
+#if DO_PROFILING
+	bigtime_t doneTime = system_time();
+	decodingTime += formatConversionStart - startTime;
+	conversionTime += doneTime - formatConversionStart;
+	profileCounter++;
+	if (!(fFrame % 5)) {
+		printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required %Ld\n",
+			decodingTime / profileCounter, conversionTime / profileCounter,
+			fFrame, bigtime_t(1000000LL / fOutputFrameRate));
+		decodingTime = 0;
+		conversionTime = 0;
+		profileCounter = 0;
+	}
+#endif
+	return error;
 }
 
 
