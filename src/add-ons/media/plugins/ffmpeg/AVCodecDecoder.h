@@ -25,6 +25,7 @@ extern "C" {
 	#include "imgutils.h"
 	#include "swresample.h"
 	#include "swscale.h"
+	#include "timestamp.h"
 }
 
 

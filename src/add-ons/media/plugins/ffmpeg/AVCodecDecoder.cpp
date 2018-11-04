@@ -1589,11 +1589,12 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 		fHeader.u.raw_video.pixel_width_aspect,
 		fHeader.u.raw_video.pixel_height_aspect);
 
-	TRACE("[v] start_time=%02d:%02d.%02d field_sequence=%lu\n",
-		int((fHeader.start_time / 60000000) % 60),
-		int((fHeader.start_time / 1000000) % 60),
-		int((fHeader.start_time / 10000) % 100),
-		fHeader.u.raw_video.field_sequence);
+	char timestamp[AV_TS_MAX_STRING_SIZE];
+	av_ts_make_time_string(timestamp,
+		fRawDecodedPicture->best_effort_timestamp, &fCodecContext->time_base);
+
+	TRACE("[v] start_time=%s field_sequence=%lu\n",
+		timestamp, fHeader.u.raw_video.field_sequence);
 }
 
 
