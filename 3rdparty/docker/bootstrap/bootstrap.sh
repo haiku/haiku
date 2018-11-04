@@ -18,4 +18,4 @@ fi
 GENERATED=$WORKPATH/generated.$TARGET_ARCH
 
 cd $GENERATED
-jam -q @bootstrap-raw
+HAIKU_PORTER_EXTRA_OPTIONS="--debug" jam -q @bootstrap-raw
