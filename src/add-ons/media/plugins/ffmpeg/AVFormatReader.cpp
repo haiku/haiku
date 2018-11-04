@@ -682,12 +682,6 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 		return ret;
 	}
 
-	// NOTE: AVPacket has a field called "convergence_duration", for which
-	// the documentation is quite interesting. It sounds like it could be
-	// used to know the time until the next I-Frame in streams that don't
-	// let you know the position of keyframes in another way (like through
-	// the index).
-
 	// According to libavformat documentation, fPacket is valid until the
 	// next call to av_read_frame(). This is what we want and we can share
 	// the memory with the least overhead.
