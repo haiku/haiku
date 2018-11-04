@@ -30,19 +30,14 @@ class ErrorPanel : public BView {
 
 		void TargetedByScrollView(BScrollView *scroll_view) { scroll = scroll_view; /*scroll->ScrollBar(B_VERTICAL)->SetRange(0,add_next_at);*/ }
 		void FrameResized(float w, float /*h*/) {
-			if (w == Frame().Width())
-				return;
-
 			add_next_at = 0;
 			for (int32 i = 0; i < CountChildren(); i++) {
 				ChildAt(i)->MoveTo(BPoint(0,add_next_at));
-				ChildAt(i)->ResizeTo(w,ChildAt(i)->Frame().Height());
+				ChildAt(i)->ResizeTo(w, ChildAt(i)->Frame().Height());
 				ChildAt(i)->ResizeToPreferred();
 				add_next_at += ChildAt(i)->Bounds().Height();
 			}
-			ResizeTo(w,add_next_at);				
 		}
-		
 		int32 alerts_displayed;
 		float add_next_at;
 		BScrollView *scroll;
@@ -130,8 +125,6 @@ void
 ErrorLogWindow::FrameResized(float newWidth, float newHeight)
 {
 	ErrorPanel *panel = (ErrorPanel *)view;
-	panel->ResizeTo(newWidth, panel->add_next_at);
-	panel->FrameResized(newWidth - B_V_SCROLL_BAR_WIDTH, panel->add_next_at);
 	panel->Invalidate();
 
 	if (panel->add_next_at > newHeight) {
