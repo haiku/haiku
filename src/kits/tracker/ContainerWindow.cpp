@@ -2142,28 +2142,10 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	BMenu* listViewMenu = new BMenu(B_TRANSLATE("List view"));
-
-	message = new BMessage(kListMode);
-	message->AddInt32("icon_size", B_MINI_ICON);
-	item = new BMenuItem(listViewMenu, message);
-	item->SetShortcut('3', B_COMMAND_KEY);
+	item = new BMenuItem(B_TRANSLATE("List view"),
+		new BMessage(kListMode), '3');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
-
-	message = new BMessage(kListMode);
-	message->AddInt32("icon_size", B_MINI_ICON);
-	item = new BMenuItem(B_TRANSLATE("Mini"), message);
-	item->SetTarget(PoseView());
-	listViewMenu->AddItem(item);
-
-	message = new BMessage(kListMode);
-	message->AddInt32("icon_size", B_LARGE_ICON);
-	item = new BMenuItem(B_TRANSLATE("Large"), message);
-	item->SetTarget(PoseView());
-	listViewMenu->AddItem(item);
-
-	listViewMenu->SetTargetForItems(PoseView());
 
 	menu->AddSeparatorItem();
 
@@ -3287,33 +3269,6 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 			} else {
 				BMenuItem* item;
 				for (int32 i = 0; (item = iconSizeMenu->ItemAt(i)) != NULL; i++)
-					item->SetMarked(false);
-			}
-		}
-
-		BMenu* listSizeMenu = NULL;
-		if (BMenuItem* item = menu->FindItem(kListMode))
-			listSizeMenu = item->Submenu();
-
-		if (listSizeMenu != NULL) {
-			if (viewMode == kListMode) {
-				int32 iconSize = PoseView()->IconSizeInt();
-				BMenuItem* item = listSizeMenu->ItemAt(0);
-				for (int32 i = 0; (item = listSizeMenu->ItemAt(i)) != NULL;
-						i++) {
-					BMessage* message = item->Message();
-					if (message == NULL) {
-						item->SetMarked(false);
-						continue;
-					}
-					int32 size;
-					if (message->FindInt32("icon_size", &size) != B_OK)
-						size = -1;
-					item->SetMarked(iconSize == size);
-				}
-			} else {
-				BMenuItem* item;
-				for (int32 i = 0; (item = listSizeMenu->ItemAt(i)) != NULL; i++)
 					item->SetMarked(false);
 			}
 		}

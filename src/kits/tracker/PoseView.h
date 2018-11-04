@@ -224,7 +224,6 @@ public:
 		// returns height, descent, etc.
 	float FontHeight() const;
 	float ListElemHeight() const;
-	void SetListElemHeight();
 
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
@@ -698,6 +697,7 @@ private:
 	void DrawOpenAnimation(BRect);
 
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);
+	void _ResetStartOffset();
 
 protected:
 	TScrollBar* fHScrollBar;
@@ -724,6 +724,7 @@ protected:
 	BCountView* fCountView;
 	float fListElemHeight;
 	float fIconPoseHeight;
+	float fListIconSize;
 	BPose* fDropTarget;
 	BPose* fAlreadySelectedDropTarget;
 	BLooper* fSelectionHandler;
@@ -862,18 +863,6 @@ inline float
 BPoseView::ListElemHeight() const
 {
 	return fListElemHeight;
-}
-
-
-inline void
-BPoseView::SetListElemHeight()
-{
-	float extra = 0;
-	if (IconSize() > B_MINI_ICON)
-		extra = kLargeIconSeparator;
-
-	fListElemHeight = std::max((float)IconSize() + extra,
-		ceilf(sFontHeight) < 20 ? 20 : ceilf(sFontHeight * 1.1f));
 }
 
 
@@ -1076,7 +1065,7 @@ BPoseView::CountColumns() const
 inline float
 BPoseView::StartOffset() const
 {
-	return kListOffset + IconSizeInt() + kMiniIconSeparator + 1;
+	return kListOffset + fListIconSize + kMiniIconSeparator + 1;
 }
 
 

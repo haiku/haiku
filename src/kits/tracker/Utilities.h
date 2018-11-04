@@ -79,7 +79,6 @@ const int64 kGBSize = 1073741824;
 const int64 kTBSize = kGBSize * kKBSize;
 
 const int32 kMiniIconSeparator = 3;
-const int32 kLargeIconSeparator = 6;
 
 const color_space kDefaultIconDepth = B_RGBA32;
 
