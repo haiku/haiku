@@ -12,9 +12,10 @@ RUN apt-get install -y git nasm autoconf automake texinfo flex \
 
 # GCC Requirements
 RUN apt-get install -y python
-
 # zlib Requirements
 RUN apt-get install -y cmake
+# ICU Requirements
+RUN apt-get install -y pkg-config
 
 ENV GIT_BUILDTOOLS="https://git.haiku-os.org/buildtools"
 ENV GIT_HAIKU="https://git.haiku-os.org/haiku"
