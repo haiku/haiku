@@ -10457,6 +10457,9 @@ BPoseView::ExcludeTrashFromSelection()
 void
 BPoseView::_ResetStartOffset()
 {
+	if (fColumnList == NULL || fColumnList->IsEmpty()
+			|| fColumnList->ItemAt(0) == NULL)
+		return;
 	fColumnList->ItemAt(0)->SetOffset(StartOffset());
 }
 
