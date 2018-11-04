@@ -90,7 +90,7 @@ StartTeamWindow::_Init()
 			.Add(fStartButton)
 		.End();
 
-	fTeamTextControl->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
+	fTeamTextControl->SetExplicitMinSize(BSize(300.0, B_SIZE_UNSET));
 	fGuideText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fStartButton->SetTarget(this);
@@ -126,6 +126,9 @@ StartTeamWindow::MessageReceived(BMessage* message)
 				}
 				fBrowseTeamPanel->SetMessage(message);
 			}
+
+			fBrowseTeamPanel->SetPanelDirectory(fTeamTextControl->TextView()
+					->Text());
 
 			fBrowseTeamPanel->Show();
 			break;
