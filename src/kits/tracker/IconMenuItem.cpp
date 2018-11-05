@@ -126,7 +126,8 @@ ModelMenuItem::DrawContent()
 {
 	if (fDrawText) {
 		BPoint drawPoint(ContentLocation());
-		drawPoint.x += ListIconSize() + (fExtraPad ? 10 : 4);
+		drawPoint.x += ListIconSize() + ListIconSize() / 4
+			+ (fExtraPad ? 6 : 0);
 		if (fHeightDelta > 0)
 			drawPoint.y += ceil(fHeightDelta / 2);
 		Menu()->MovePenTo(drawPoint);
@@ -184,7 +185,7 @@ ModelMenuItem::GetContentSize(float* width, float* height)
 	fHeightDelta = iconSize - *height;
 	if (*height < iconSize)
 		*height = iconSize;
-	*width = *width + 4 + iconSize + (fExtraPad ? 18 : 0);
+	*width = *width + iconSize / 4 + iconSize + (fExtraPad ? 18 : 0);
 }
 
 
