@@ -417,6 +417,8 @@ const BMenuItem* EachMenuItem(const BMenu* menu, bool recursive,
 int64 StringToScalar(const char* text);
 	// string to num, understands kB, MB, etc.
 
+int32 ListIconSize();
+
 // misc calls
 void EmbedUniqueVolumeInfo(BMessage* message, const BVolume* volume);
 status_t MatchArchivedVolume(BVolume* volume, const BMessage* message,

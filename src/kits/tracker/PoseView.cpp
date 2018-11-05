@@ -235,7 +235,6 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fCountView(NULL),
 	fListElemHeight(0.0f),
 	fIconPoseHeight(0.0f),
-	fListIconSize(0.0f),
 	fDropTarget(NULL),
 	fAlreadySelectedDropTarget(NULL),
 	fSelectionHandler(be_app),
@@ -278,9 +277,7 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fDeskbarFrame(0, 0, -1, -1),
 	fTextWidgetToCheck(NULL)
 {
-	fListIconSize = std::max((float)B_MINI_ICON,
-		B_MINI_ICON * be_plain_font->Size() / 12);
-	fListElemHeight = std::max(fListIconSize,
+	fListElemHeight = std::fmax(ListIconSize(),
 		ceilf(sFontHeight) < 20 ? 20 : ceilf(sFontHeight * 1.1f));
 
 	fViewState->SetViewMode(viewMode);
@@ -1032,7 +1029,7 @@ BPoseView::SetIconPoseHeight()
 		case kListMode:
 		default:
 		{
-			fViewState->SetIconSize(fListIconSize);
+			fViewState->SetIconSize(ListIconSize());
 			fIconPoseHeight = fListElemHeight;
 			break;
 		}

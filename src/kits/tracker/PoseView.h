@@ -724,7 +724,6 @@ protected:
 	BCountView* fCountView;
 	float fListElemHeight;
 	float fIconPoseHeight;
-	float fListIconSize;
 	BPose* fDropTarget;
 	BPose* fAlreadySelectedDropTarget;
 	BLooper* fSelectionHandler;
@@ -1065,7 +1064,7 @@ BPoseView::CountColumns() const
 inline float
 BPoseView::StartOffset() const
 {
-	return kListOffset + fListIconSize + kMiniIconSeparator + 1;
+	return kListOffset + ListIconSize() + kMiniIconSeparator + 1;
 }
 
 

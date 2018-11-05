@@ -126,7 +126,7 @@ ModelMenuItem::DrawContent()
 {
 	if (fDrawText) {
 		BPoint drawPoint(ContentLocation());
-		drawPoint.x += 20 + (fExtraPad ? 6 : 0);
+		drawPoint.x += ListIconSize() + (fExtraPad ? 10 : 4);
 		if (fHeightDelta > 0)
 			drawPoint.y += ceil(fHeightDelta / 2);
 		Menu()->MovePenTo(drawPoint);
@@ -164,12 +164,12 @@ ModelMenuItem::DrawIcon()
 	// draw small icon, synchronously
 	if (IsEnabled()) {
 		IconCache::sIconCache->Draw(fModel.ResolveIfLink(), Menu(), where,
-			kNormalIcon, B_MINI_ICON);
+			kNormalIcon, (icon_size)ListIconSize());
 	} else {
 		// dimmed, for now use a special blitter; icon cache should
 		// know how to blit one eventually
 		IconCache::sIconCache->SyncDraw(fModel.ResolveIfLink(), Menu(), where,
-			kNormalIcon, B_MINI_ICON, DimmedIconBlitter);
+			kNormalIcon, (icon_size)ListIconSize(), DimmedIconBlitter);
 	}
 
 	Menu()->PopState();
@@ -180,10 +180,11 @@ void
 ModelMenuItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
-	fHeightDelta = 16 - *height;
-	if (*height < 16)
-		*height = 16;
-	*width = *width + 20 + (fExtraPad ? 18 : 0);
+	float iconSize = ListIconSize();
+	fHeightDelta = iconSize - *height;
+	if (*height < iconSize)
+		*height = iconSize;
+	*width = *width + 4 + iconSize + (fExtraPad ? 18 : 0);
 }
 
 

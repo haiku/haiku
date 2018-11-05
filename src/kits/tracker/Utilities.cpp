@@ -1257,6 +1257,15 @@ StringToScalar(const char* text)
 }
 
 
+int32
+ListIconSize()
+{
+	static int32 sIconSize = std::max((int32)B_MINI_ICON,
+		(int32)ceilf(B_MINI_ICON * be_plain_font->Size() / 12));
+	return sIconSize;
+}
+
+
 static BRect
 LineBounds(BPoint where, float length, bool vertical)
 {
