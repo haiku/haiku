@@ -49,6 +49,7 @@ public:
 									read_flags flags = B_READ);
 
 	virtual void				MessageReceived(BMessage* message);
+	const ::Settings*			Settings() const { return &fSettings; };
 
 protected:
 	virtual status_t			HandleFetchBody(const entry_ref& ref,
@@ -66,7 +67,7 @@ protected:
 	typedef std::map<IMAPFolder*, IMAPConnectionWorker*> WorkerMap;
 	typedef std::map<ino_t, IMAPFolder*> FolderNodeMap;
 
-			Settings			fSettings;
+			::Settings			fSettings;
 			mutex				fWorkerLock;
 			BObjectList<IMAPConnectionWorker> fWorkers;
 			WorkerMap			fWorkerMap;

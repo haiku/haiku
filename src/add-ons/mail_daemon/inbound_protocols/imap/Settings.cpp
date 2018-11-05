@@ -108,3 +108,9 @@ Settings::BodyFetchLimit() const
 {
 	return fMessage.GetInt32("partial_download_limit", -1);
 }
+
+bool
+Settings::DeleteRemoteWhenLocal() const
+{
+	return fMessage.FindBool("delete_remote_when_local");
+}
