@@ -43,15 +43,15 @@ GenerateFlagString(uint32 flags)
 	BString string;
 
 	if ((flags & IMAP::kSeen) != 0)
-		PutFlag(string, "\\Seen ");
+		PutFlag(string, "\\Seen");
 	if ((flags & IMAP::kAnswered) != 0)
-		PutFlag(string, "\\Answered ");
+		PutFlag(string, "\\Answered");
 	if ((flags & IMAP::kFlagged) != 0)
-		PutFlag(string, "\\Flagged ");
+		PutFlag(string, "\\Flagged");
 	if ((flags & IMAP::kDeleted) != 0)
-		PutFlag(string, "\\Deleted ");
+		PutFlag(string, "\\Deleted");
 	if ((flags & IMAP::kDraft) != 0)
-		PutFlag(string, "\\Draft ");
+		PutFlag(string, "\\Draft");
 
 	return string;
 }
