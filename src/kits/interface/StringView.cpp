@@ -593,10 +593,10 @@ BStringView::_ValidatePreferredSize()
 
 		int32 lines = 0;
 		char* temp = fText;
-		do {
+		while (temp != NULL) {
 			temp = strchr(temp + 1, '\n');
 			lines++;
-		} while (temp != NULL);
+		};
 
 		fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent
 			+ fontHeight.leading) * lines;
