@@ -121,9 +121,15 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 		BString* URL = repositoryAndRepositorySource
 			.repositorySource->RepoInfoUrl();
 
+		// to be simplified soon because there will no longer be a need to
+		// check for the baseURL.
 
-		if (!baseURL->IsEmpty() || !URL->IsEmpty()) {
-			fModel->ReplaceDepotByUrl(*URL, *baseURL, this,
+		if ((baseURL != NULL && !baseURL->IsEmpty())
+			|| (URL != NULL && !URL->IsEmpty())) {
+			fModel->ReplaceDepotByUrl(
+				URL == NULL ? BString() : *URL,
+				baseURL == NULL ? BString() : *baseURL,
+				this,
 				&repositoryAndRepositorySource);
 		}
 	}
