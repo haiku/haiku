@@ -733,13 +733,16 @@ IMAPConnectionWorker::_Worker()
 		CommandDeleter deleter(*this, command);
 
 		status_t status = _Connect();
-		if (status != B_OK)
+		if (status != B_OK) {
+			fOwner.WorkerQuit(this);
 			return status;
+		}
 
 		status = command->Process(*this);
-		if (status != B_OK)
+		if (status != B_OK) {
+			fOwner.WorkerQuit(this);
 			return status;
-
+		}
 		if (!command->IsDone()) {
 			deleter.Detach();
 			command->SetContinuation();
