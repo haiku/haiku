@@ -1524,19 +1524,15 @@ AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 status_t
 AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 {
-	// Create empty fTempPacket to tell the video decoder it is time to flush
-	fTempPacket.data = NULL;
-	fTempPacket.size = 0;
+	// Tell the decoder there is nothing to send anymore
+	avcodec_send_packet(fCodecContext, NULL);
 
-	int gotVideoFrame = 0;
-	avcodec_decode_video2(fCodecContext,	fRawDecodedPicture, &gotVideoFrame,
-		&fTempPacket);
-		// We are only interested in complete frames now, so ignore the return
-		// value.
+	// Get any remaining frame
+	int error = avcodec_receive_frame(fCodecContext, fRawDecodedPicture);
 
-	bool gotNoVideoFrame = gotVideoFrame == 0;
-	if (gotNoVideoFrame) {
+	if (error != 0 && error != AVERROR(EAGAIN)) {
 		// video buffer is flushed successfully
+		// (or there is an error, not much we can do about it)
 		return B_LAST_BUFFER_ERROR;
 	}
 
@@ -1565,10 +1561,15 @@ AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 void
 AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 {
+	AVRational rationalTimestamp = av_make_q(
+		fRawDecodedPicture->pkt_dts, 1);
+	AVRational seconds = av_mul_q(rationalTimestamp, fCodecContext->time_base);
+	AVRational microseconds = av_mul_q(seconds, av_make_q(1000000, 1));
+
 	fHeader.type = B_MEDIA_RAW_VIDEO;
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
-	fHeader.start_time = fRawDecodedPicture->pkt_dts;
+	fHeader.start_time = (bigtime_t)(av_q2d(microseconds));
 	fHeader.size_used = av_image_get_buffer_size(
 		colorspace_to_pixfmt(fOutputColorSpace), fRawDecodedPicture->width,
 		fRawDecodedPicture->height, 1);
