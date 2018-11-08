@@ -1,0 +1,10 @@
+1	slovenian	x-vnd.Haiku-NewMailNotification	2407147532
+none	NotifierConfigView		noben
+Method:	NotifierConfigView		Metoda:
+Beep	NotifierConfigView		Pisk
+New mails notification	NotifierFilter		Obvestilo o novih sporočilih
+OK	NotifierFilter		V redu
+New messages	NotifierFilter		Nova sporočila
+Log window	NotifierConfigView		Okno dnevnika
+Keyboard LEDs	NotifierConfigView		Lučke na tipkovnici
+Alert	NotifierConfigView		Opozorilo

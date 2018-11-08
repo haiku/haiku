@@ -1,0 +1,30 @@
+1	slovenian	x-vnd.Be-PRNT	2944555829
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tiskalnik: %printer_name%\nGonilnik:  %driver%\n
+Waiting	JobListView		Čakam
+Print test page	PrintersWindow		Natisni preizkusno stran
+page	JobListView		stran
+Cancel	AddPrinterDialog		Prekliči
+Add printer	AddPrinterDialog		Dodaj tiskalnik
+Green	TestPageView		Zelena
+Printers	PrintersWindow		Tiskalniki
+Default Printer	PrinterListView		Privzeti tiskalnik
+pages	JobListView		strani
+Printers	System name		Tiskalniki
+Processing	JobListView		Obdelovanje
+Red	TestPageView		Rdeča
+Printer name:	AddPrinterDialog		Ime tiskalnika:
+Yellow	TestPageView		Rumena
+Blue	TestPageView		Modra
+Remove	PrintersWindow		Odstrani
+<pick one>	AddPrinterDialog		(izberite enega)
+Print jobs for 	PrintersWindow		Dokumenti za tiskanje na 
+Failed	JobListView		Ni uspelo
+%.2f KB	JobListView		%.2f KB
+Magenta	TestPageView		Magenta
+Completed	JobListView		Končano
+No printer found!	TransportMenu		Ni mogoče najti tiskalnika!
+Print jobs: No printer selected	PrintersWindow		Dokumenti za tiskanje: izbran ni bil noben tiskalnik
+Cyan	TestPageView		Cian
+Unknown status	JobListView		Neznano stanje
+Connected to:	AddPrinterDialog		Povezan na:
+Printer type:	AddPrinterDialog		Vrsta tiskalnika:

@@ -1,0 +1,8 @@
+1	slovenian	x-vnd.Haiku-BFSAddOn	1074880496
+Enable query support	BFS_Initialize_Parameter		Omogoči podporo za poizvedbe
+2048 (Recommended)	BFS_Initialize_Parameter		2048 (priporočeno)
+8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (večinoma velike datoteke)
+Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Onemogočanje podpore za poizvedbe lahko posodobi nekatere operacije z datotekami, vendar priporočamo, da to naredite samo, če ste prepričani, da ne boste potrebovali poizvedb.\nVsaka particija, na katero želite namestiti Haiku, mora imeti poizvedbe omogočene.
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (večinoma majhne datoteke)
+Blocksize:	BFS_Initialize_Parameter		Velikost blokov:
+Name:	BFS_Initialize_Parameter		Ime:

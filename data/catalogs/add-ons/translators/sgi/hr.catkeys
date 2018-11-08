@@ -1,0 +1,13 @@
+1	croatian	x-vnd.Haiku-SGITranslator	129108011
+Use compression:	SGIView		Koristi kompresiju:
+SGITranslator Settings	SGITranslator		SGITranslator postavke
+None	SGIView		Nema
+SGI images	SGITranslator		SGI slike
+SGI image translator	SGITranslator		SGI prevoditelj slika
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbazirano na GIMP SGI priključku v1.5:\n
+Version %d.%d.%d, %s	SGIView		Verzija %d.%d.%d %s
+SGI image	SGITranslator		SGI slika
+RLE	SGIView		RLE
+SGI Settings	SGIMain		SGI postavke
+written by:\n	SGIView		napisao:\n
+SGI image translator	SGIView		SGI prevoditelj slika

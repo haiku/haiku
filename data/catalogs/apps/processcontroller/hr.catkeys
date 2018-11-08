@@ -1,0 +1,26 @@
+1	croatian	x-vnd.Haiku-ProcessController	154629361
+Memory usage	ProcessController		Upotreba memorije
+Restart Deskbar	ProcessController		Ponovno pokreni Deskabar
+Custom priority	ProcessController		Prilagođeni prioritet
+Error saving file	ProcessController		Greška pri spremanju datoteke
+Real-time priority	ProcessController		 Prioritet stvarnog vremena
+Your setting file could not be saved!\n(%s)	ProcessController		Vaša datoteka postavki nije mogla biti spremljena!\n(%s)
+Cancel	ProcessController		Otkaži
+Run in window	ProcessController		Pokreni u prozoru
+Processor %d	ProcessController		Procesor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+This is the last active processor...\nYou can't turn it off!	ProcessController		Ovo je zadnji aktivni procesor...\nNe možete ga isključiti!
+Info	ProcessController		Informacije
+Quit application	ProcessController		Izađi iz programa
+Low priority	ProcessController		Niski prioritet
+Lowest active priority	ProcessController		Najniži aktivni prioritet
+Normal priority	ProcessController		Normalni prioritet
+New Terminal	ProcessController		Novi terminal
+Urgent priority	ProcessController		Hitni prioritet
+Ok!	ProcessController		U redu!
+Quit an application	ProcessController		Ugasi program
+Install in Deskbar	ProcessController		Instaliraj u Deskbar
+OK	ProcessController		U redu
+Usage: %s [-deskbar]\n	ProcessController		Upotreba: %s [-deskbar]\n
+Please confirm	ProcessController		Molim potvrdite
+That's no Fun!	ProcessController		To nije zabavno!

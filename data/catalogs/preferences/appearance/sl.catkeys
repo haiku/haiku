@@ -1,0 +1,33 @@
+1	slovenian	x-vnd.Haiku-Appearance	3190432012
+Plain font:	Font view		Običajna pisava:
+Control border	Colors tab		Okvir gradnika
+Antialiasing type:	AntialiasingSettingsView		Vrsta glajenja:
+Shadow	Colors tab		Senca
+On	AntialiasingSettingsView		Vključeno
+Defaults	APRWindow		Privzete vrednosti
+Grayscale	AntialiasingSettingsView		Sivinsko
+Shine	Colors tab		Sijaj
+About	DecorSettingsView		O programu
+About decorator	DecorSettingsView		O dekoratorju
+Off	AntialiasingSettingsView		Izključeno
+Success	Colors tab		Uspeh
+Inactive window tab text	Colors tab		Besedilo neaktivnega okenskega jezička
+Failure	Colors tab		Neuspeh
+Scroll bar:	DecorSettingsView		Drsni trak:
+Double:	DecorSettingsView		Dvojno:
+Window tab text	Colors tab		Besedilo okenskega jezička
+Document text	Colors tab		Besedilo dokumenta
+Selected menu item text	Colors tab		Besedilo izbrane menijske možnosti
+Menu background	Colors tab		Ozadje menija
+List background	Colors tab		Ozadje seznama
+OK	DecorSettingsView		V redu
+Inactive window tab	Colors tab		Neaktiven okenski jeziček
+List item text	Colors tab		Besedilo seznamskega vnosa
+Appearance	System name		Izgled
+Fixed font:	Font view		Pisava stalne širine:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	V kožuščku hudobnega fanta stopiclja mizar.
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAvtorji:\n\t%decorAuthors\n\nURL: %decorURL\nLicenca: %decorLic\n\n%decorDesc\n
+Arrow style	DecorSettingsView		Slog puščic
+Monospaced fonts only	AntialiasingSettingsView		Samo pisave stalne širine
+Look and feel	APRWindow		Izgled in občutek
+Fonts	APRWindow		Pisave

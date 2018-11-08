@@ -1,0 +1,51 @@
+1	croatian	x-vnd.Haiku-Screen	1475614814
+yes	Screen		da
+Use laptop panel:	Screen		Koristi laptop ploču:
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 boja
+/other…	Screen		/ostalo...
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 boja
+Revert	Screen		Preokreni
+Swap displays:	Screen		Zamjeni ekrane:
+Combine displays:	Screen		Koristi ekrane zajedno:
+Done	Screen		Završeno
+Set background…	Screen		Postavi pozadinu...
+Undo	Screen		Poništi
+if needed	Screen		ako je potrebno
+Screen preferences by the Haiku team	Screen		Osobitosti ekrana koje je načinio Haiku tim
+Settings will revert in %seconds.	Screen		Postavke će se vratiti za %sekundi.
+Screen	System name		Ekran
+OK	Screen		U redu
+Workspaces	Screen		Radni prostori
+The screen mode could not be set:\n\t%s\n	Screen		Način rada ekrana se ne može postaviti:\n\t%s\n
+no	Screen		ne
+Could not write VESA mode settings file:\n\t	Screen		Nije moguće zapisati datoteku postavki VESA načina rada :\n\t
+Type or use the left and right arrow keys.	Screen		Tipkaj ili koristi tipku lijeve i desne strelice.
+Warning	Screen		Upozorenje
+Keep	Screen		Zadrži
+Unknown mode	Screen		Nepoznati način rada
+disable	Screen		onemogući
+Columns:	Screen		Kolone:
+All workspaces	Screen		Svi radni prostori
+always	Screen		uvijek
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Miliona boja
+Current workspace	Screen		Trenutni radni prostor
+About	Screen		O programu
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Miliona boja
+horizontally	Screen		horizontalno
+Other…	Screen		Drugo...
+Cancel	Screen		Poništi
+bits/pixel	Screen		bit/pixel
+Refresh rate:	Screen		Vrijeme osvježenja:
+Hz	Screen		Hz
+Do you wish to keep these settings?	Screen		Da li želite zadržati ove postavke?
+Rows:	Screen		Redovi:
+vertically	Screen		vertikalno
+Resolution:	Screen		Rezolucija:
+Screen	Screen		Ekran
+%.1f Hz	Screen		%.1f Hz
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 boja
+Apply	Screen		Primjeni
+Refresh rate	Screen		Vrijeme osveženja
+%sSerial no.: %s	Screen		%sSerial no.: %s
+Colors:	Screen		Boje:
+Video format:	Screen		Format videa:

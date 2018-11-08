@@ -1,0 +1,21 @@
+1	slovenian	x-vnd.Haiku-Locale	1257591166
+Available languages	Locale Preflet Window		Jeziki, ki so na voljo
+Negative:	TimeFormatSettings		Negativno:
+already chosen	LanguageListView		že izbran
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Ni mogoče najti jezikov! Tega programa ne morete uporabiti!
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar in Tracker je treba za uveljavitev sprememb ponovno zagnati. Želite to storiti zdaj?
+Long format:	TimeFormatSettings		Dolga oblika:
+Currency	TimeFormatSettings		Valuta
+Locale	System name		Kraj
+Short format:	TimeFormatSettings		Kratka oblika:
+Language	Locale Preflet Window		Jezik
+Preferred languages	Locale Preflet Window		Želeni jeziki
+Use month/day-names from preferred language	TimeFormatSettings		Uporabi imena dni in mesecev želenega jezika
+Formatting	Locale Preflet Window		Oblikovanje
+Locale	Locale Preflet Window		Kraj
+Numbers	TimeFormatSettings		Števila
+24 hour	TimeFormatSettings		24-urna
+OK	Locale Preflet Window		V redu
+Restart	Locale Preflet Window		Ponovno zaženi
+Locale	Locale Preflet		Kraj
+Options	Locale Preflet Window		Možnosti

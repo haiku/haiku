@@ -1,0 +1,43 @@
+1	croatian	x-vnd.Haiku-Appearance	1125400238
+Plain font:	Font view		Obični font:
+Shadow	Colors tab		Sjena
+On	AntialiasingSettingsView		Uključeno
+Defaults	APRWindow		Zadano
+Grayscale	AntialiasingSettingsView		Sivo
+Shine	Colors tab		Sjaj
+About	DecorSettingsView		O programu
+About decorator	DecorSettingsView		O dekoratoru
+Off	AntialiasingSettingsView		Isključeno
+Choose Decorator	DecorSettingsView		Odaberite dekorator
+Success	Colors tab		Uspjeh
+Inactive window tab text	Colors tab		Tekst neaktivne kartice prozora
+Failure	Colors tab		Neuspjeh
+Document background	Colors tab		Pozadina dokumenta
+Revert	APRWindow		Obrnuto
+Window tab	Colors tab		Kartica prozora
+Selected menu item background	Colors tab		Odabrana pozadina stavke izbornika
+Selected list item text	Colors tab		Tekst odabrane stavke liste
+Window border	Colors tab		Obrub prozora
+Double:	DecorSettingsView		Dvostruko:
+Window tab text	Colors tab		Tekst kartice prozora
+Document text	Colors tab		Tekst dokumenta
+Selected menu item text	Colors tab		Tekst odabrane stavke izbornika
+Menu background	Colors tab		Pozadina izbornika
+OK	DecorSettingsView		U redu
+Size:	Font Selection view		Veličina:
+Decorator:	DecorSettingsView		Dekorater:
+Panel background	Colors tab		Pozadina ploče
+Menu font:	Font view		Font izbornika:
+Colors	APRWindow		Boje
+Inactive window tab	Colors tab		Neaktivna kartica prozora
+Appearance	System name		Izgled
+Single:	DecorSettingsView		Jednostruko:
+Bold font:	Font view		Podebljani font:
+Inactive window border	Colors tab		Neaktivni obrub prozora
+Menu item text	Colors tab		Tekst stavke izbornika
+LCD subpixel	AntialiasingSettingsView		LCD podpiksel
+Selected menu item border	Colors tab		Obrub odabrane stavke izbornika
+Strong	AntialiasingSettingsView		Jako
+Panel text	Colors tab		Tekst ploče
+Arrow style	DecorSettingsView		Stil strelice
+Fonts	APRWindow		Fontovi

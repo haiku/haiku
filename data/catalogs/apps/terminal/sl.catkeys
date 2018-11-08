@@ -1,0 +1,63 @@
+1	slovenian	x-vnd.Haiku-Terminal	788230226
+Not found.	Terminal TermWindow		Ni mogoče najti.
+Change directory	Terminal TermView		Zamenjaj imenik
+Cursor	Terminal AppearancePrefView		Kurzor
+Professional	Terminal colors scheme		Profesionalna
+OK	Terminal TermWindow		V redu
+New Terminal	Terminal TermWindow		Nov terminal
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ni mogel zagnati lupine. Oprostite.
+Match case	Terminal FindWindow		Razlikuj velike in male črke
+Quit	Terminal TermWindow		Izhod
+Use default shell	Terminal Shell		Uporabi privzeto lupino
+Confirm exit if active programs exist	Terminal AppearancePrefView		Zahtevaj potrditev izhoda, če se programi še izvajajo
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzorec, ki določa naslov jezička. Uporabljate lahko spremenljivke:\n
+Select all	Terminal TermWindow		Izberi vse
+Close tab	Terminal TermWindow		Zapri jeziček
+Save to file…	Terminal PrefWindow		Shrani v datoteko…
+Window title:	Terminal AppearancePrefView		Naslov okna:
+Window title:	Terminal TermWindow		Naslov okna:
+Custom	Terminal colors scheme		Po meri
+%app% settings	Terminal PrefWindow	window title	Nastavitve za %app%
+Cancel	Terminal SetTitleWindow		Prekliči
+Increase	Terminal TermWindow		Povečaj
+Settings	Terminal TermWindow		Nastavitve
+Selected text	Terminal AppearancePrefView		Izbrano besedilo
+Find	Terminal FindWindow		Poišči
+Appearance	Terminal PrefWindow		Izgled
+Tab title:	Terminal AppearancePrefView		Naslov jezička:
+OK	Terminal SetTitleWindow		V redu
+Window title…	Terminal TermWindow		Naslov okna…
+Page setup…	Terminal TermWindow		Postavitev strani…
+Custom	Terminal AppearancePrefView	Window size	Po meri
+Insert path	Terminal TermView		Vstavi pot
+No search string was entered.	Terminal TermWindow		Izkalni niz ni določen.
+Font size	Terminal TermWindow		Velikost pisave
+Blinking cursor	Terminal AppearancePrefView		Utripajoč kurzor
+Move here	Terminal TermView		Premakni sem
+Retro	Terminal colors scheme		Retro
+Error!	Terminal getString		Napaka!
+New tab	Terminal TermWindow		Nov jeziček
+Selected background	Terminal AppearancePrefView		Ozadje izbranega
+Slate	Terminal colors scheme		Tabla
+Text under cursor	Terminal AppearancePrefView		Besedilo pod kurzorjem
+Text encoding	Terminal TermWindow		Kodiranje besedila
+Close window	Terminal TermWindow		Zapri okno
+Copy absolute path	Terminal TermView		Kopiraj absolutno pot
+Set tab title	Terminal TermWindow		Nastavi naslov jezička
+Settings…	Terminal TermWindow		Nastavitve…
+Abort	Terminal Shell		Prekini
+Cancel	Terminal TermWindow		Prekliči
+OK	Terminal TermApp		V redu
+Find failed	Terminal TermWindow		Iskanje ni uspelo
+Search forward	Terminal FindWindow		Išči naprej
+Edit tab title…	Terminal TermWindow		Uredi naslov jezička…
+Open path	Terminal TermView		Odpri pot
+Find previous	Terminal TermWindow		Najdi prejšnje
+Copy link location	Terminal TermView		Kopiraj mesto povezave
+Tab title:	Terminal TermWindow		Naslov jezička:
+Find next	Terminal TermWindow		Najdi naslednje
+Close active tab	Terminal TermWindow		Zapri trenutni jeziček
+Paste	Terminal TermWindow		Prilepi
+Shell 	Terminal TermWindow		Lupina
+Cancel	Terminal TermView		Prekliči
+Use default	Terminal SetTitleWindow		Uporabi privzeto

@@ -1,0 +1,35 @@
+1	slovenian	x-vnd.Haiku-DiskProbe	1685318053
+Find again	ProbeView		Najdi znova
+Text	FindWindow		Besedilo
+Find…	ProbeView		Poišči…
+Case sensitive	FindWindow		Loči male in velike črke
+Cancel	OpenWindow		Prekliči
+Close	AttributeWindow		Zapri
+File	ProbeView		Datoteka
+Attribute	ProbeView		Atribut
+Attributes	ProbeView		Atributi
+Selection	ProbeView		Izbor
+DiskProbe	System name		DiskProbe
+File	FileWindow		Datoteka
+Attribute	AttributeWindow		Atribut
+Number:	TypeEditors		Število:
+Save	ProbeView		Shrani
+Stop	ProbeView		Ustavi
+Number editor	TypeEditors		Urejevalnik števil
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnajstiški
+Text	TypeEditors	This is the type of editor	Besedilo
+Back	ProbeView		Nazaj
+Device	ProbeView		Naprava
+Unknown type	TypeEditors		Neznana vrsta
+Block 0x%Lx	ProbeView		Blok 0x%Lx
+Quit	FileWindow		Izhod
+Undo	ProbeView		Razveljavi
+Close	ProbeView		Zapri
+Number	TypeEditors	This is the type of editor	Število
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desetiški
+Copy	ProbeView		Kopiraj
+none	ProbeView	No attributes	noben
+Boolean value:	TypeEditors		Boolova vrednost:
+Close	FileWindow		Zapri
+Cancel	AttributeWindow		Prekliči
+Cancel	ProbeView		Prekliči

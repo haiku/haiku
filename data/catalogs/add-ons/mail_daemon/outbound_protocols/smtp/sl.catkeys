@@ -1,0 +1,14 @@
+1	slovenian	x-vnd.Haiku-SMTP	815985329
+SMTP server:	ConfigView		Strežnik SMTP:
+Error while logging in to %serv	smtp		Napaka med prijavljanjem v %serv
+Unencrypted	ConfigView		Nešifrirano
+. The server says:\n	smtp		. Strežnik pravi:\n
+ESMTP	ConfigView		ESMTP
+Connecting to server…	smtp		Povezujem se s strežnikom…
+Error while opening connection to %serv	smtp		Napaka pri odpiranju povezave s %serv
+POP3 authentication failed. The server said:\n	smtp		Overjanje POP3 ni uspelo. Strežnik je rekel:\n
+Destination:	ConfigView		Cilj:
+None	ConfigView		Noben
+POP3 before SMTP	ConfigView		POP3 pred SMTP
+SSL	ConfigView		SSL
+. The server said:\n	smtp		. Strežnik je rekel:\n

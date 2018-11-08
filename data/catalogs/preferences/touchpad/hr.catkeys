@@ -1,0 +1,19 @@
+1	croatian	x-vnd.Haiku-Touchpad	2206557856
+Scrolling	TouchpadPrefView		Pomicanje
+Touchpad	System name		Touchpad
+Revert	TouchpadPrefView		Obrni
+Please confirm	TouchpadPrefView		Molim potvrdite
+Two finger scrolling	TouchpadPrefView		Pomicanje sa dva prsta
+Defaults	TouchpadPrefView		Zadane
+Slow	TouchpadPrefView		Sporo
+Vertical	TouchpadPrefView		Okomito
+High	TouchpadPrefView		Visoko
+Horizontal scrolling	TouchpadPrefView		Vodoravno pomicanje
+Fast	TouchpadPrefView		Brzo
+OK	TouchpadPrefView		U redu
+Acceleration	TouchpadPrefView		Ubrzanje
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Novi prostor za pomicanje je velik i moze ometati normalan rad miša. Želite li ga zaista promjeniti?
+Horizontal	TouchpadPrefView		Vodoravno
+Off	TouchpadPrefView		Isključeno
+Sensitivity	TouchpadPrefView		Osjetljivost
+Cancel	TouchpadPrefView		Odustani

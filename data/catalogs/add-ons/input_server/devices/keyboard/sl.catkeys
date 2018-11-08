@@ -1,0 +1,9 @@
+1	slovenian	x-vnd.Haiku-KeyboardInputServerDevice	2745442621
+Kill application	Team monitor		Prisilno zapri aplikacijo
+Quit application	Team monitor		Zapri aplikacijo
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Izberite aplikacijo s seznama in kliknite "Zapri aplikacijo", da ji ukažete, naj se zapre, ali "Prisilno zapri aplikacijo", da jo zaprete brez opozorila.\n\nPritisnite in držite Ctrl+Alt+Del %ld s, da ponovno zaženete računalnik.
+If the application will not quit you may have to kill it.	Team monitor		Če se aplikacija ne odziva, jo boste morali prisilno zapreti.
+Force reboot	Team monitor		Prisili ponovni zagon
+(This team is a system component)	Team monitor		(Ta skupina je del operacijskega sistema)
+Restart the desktop	Team monitor		Ponovno zaženi namizje
+Cancel	Team monitor		Prekliči

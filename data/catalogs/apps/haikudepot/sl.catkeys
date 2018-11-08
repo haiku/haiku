@@ -1,0 +1,81 @@
+1	slovenian	x-vnd.Haiku-HaikuDepot	1864007079
+Name	PackageListView		Ime
+Close	RatePackageWindow		Zapri
+Changelog	PackageInfoView		Zapisnik sprememb
+Your rating:	RatePackageWindow		Vaša ocena:
+The passwords do not match.	UserLoginWindow		Gesli se ne ujemata.
+Log in…	MainWindow		Prijava…
+Rate %Package%	RatePackageWindow		Oceni &Package%
+Stability:	RatePackageWindow		Stabilnost:
+Click a package to view information	PackageInfoView		Kliknite na paket, da vidite informacije o njem
+Other users can see this rating	RatePackageWindow		Ostali uporabniki lahko vidijo to oceno
+Stability	RatePackageWindow		Stabilnost
+No changelog available.	PackageInfoView		Zapisnik sprememb ni na voljo.
+Description	PackageListView		Opis
+Install	PackageManager		Namesti
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Prijava ni uspela. Uporabiško ime ne obstaja ali pa je geslo napačno.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Račun je bil uspešno ustvarjen. Zdaj lahko ocenjujete pakete in počnete druge uporabne stvari.
+Tools	MainWindow		Orodja
+HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Zapri
+Rate package…	PackageInfoView		Oceni paket…
+Category	FilterView		Kategorija
+Uninstall	PackageManager		Odstrani
+An error occurred while obtaining the package list: %message%	MainWindow		Med pridobivanjem seznama paketov je prišlo do napake: %message%
+An error occurred while initializing the package manager: %message%	MainWindow		Med zagonom upravitelja paketov je prišlo do napake: %message%
+Email address:	UserLoginWindow		Naslov elektronske pošte:
+Close	PackageManager		Zapri
+Language	UserLoginWindow		Jezik
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Geslo je prešibko. Prosimo, uporabite vsaj 8 znakov z vsaj dvema števkama in dvema velikima črkama.
+Rate package	RatePackageWindow		Oceni paket
+Development	Model		Razvoj
+Fatal error	PackageManager		Usodna napaka
+The user name needs to be at least 3 letters long.	UserLoginWindow		Uporabniško ime mora biti dolgo vsaj 3 znake.
+Log in	UserLoginWindow		Prijava
+Ratings	PackageInfoView		Ocene
+(%Votes%)	PackageInfoView		(%Votes%)
+Success	UserLoginWindow		Uspeh
+Downloading:	PackageInfoView		Prenašam:
+Mostly stable	RatePackageWindow		Večinoma stabilen
+Log out	MainWindow		Odjava
+Education	Model		Izobrazba
+Search terms:	FilterView		Pogoji iskanja:
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Ocene uporabnikov niso na voljo.
+Does not start	RatePackageWindow		Se ne zažene
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Prišlo je do napake med osveževanjem zbirke: %error% (%details%)
+Language	RatePackageWindow		Jezik
+You need to be logged into an account before you can rate packages.	MainWindow		Prijaviti se morate v svoj račun, preden lahko ocenjujete pakete.
+User name:	UserLoginWindow		Uporabniško ime:
+Unstable but usable	RatePackageWindow		Nestabilen, toda ne neuporaben
+The email address appears to be malformed.	UserLoginWindow		Naslov elektronske pošte se zdi neveljaven.
+Games	Model		Igre
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+Graphics	Model		Grafika
+Local	MainWindow		Lokalni
+Close	MainWindow		Zapri
+Cancel	MainWindow		Prekliči
+Update	RatePackageWindow		Posodobi
+Video	Model		Video
+All categories	FilterView		Vse kategorije
+An error occurred while refreshing the repository: %error%	MainWindow		Prišlo je do napake med osveževanjem zbirke: %error%
+Login or Create account	MainWindow		Prijava ali ustvarjanje računa
+Pending…	PackageListView		V vrsti…
+OK	PackageInfoView		V redu
+Uninstalled	PackageListView		Odstranjen
+Stable	RatePackageWindow		Stabilen
+Comment language:	RatePackageWindow		Jezik komentarja:
+ It responded with: 	UserLoginWindow		 Odgovoril je: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Prijava ni uspela. Povezava na storitev ni uspela.
+Cancel	RatePackageWindow		Prekliči
+OK	UserLoginWindow		V redu
+Send	RatePackageWindow		Pošlji
+Category:	FilterView		Kategorija:
+Failed to create account	UserLoginWindow		Ni bilo mogoče ustvariti računa
+There are problems with the data you entered:\n\n	UserLoginWindow		S podatki, ki ste jih vnesli, ni vse v redu:\n\n
+Business	Model		Posel
+Audio	Model		Audio
+Active	PackageListView		Aktiven
+It was not possible to contact the web service.	UserLoginWindow		Ni se bilo mogoče povezati s spletno storitvijo.
+Failed to create account: %s\n	UserLoginWindow		Ni bilo mogoče ustvariti računa: %s\n
+Cancel	UserLoginWindow		Prekliči

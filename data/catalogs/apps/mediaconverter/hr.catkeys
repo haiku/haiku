@@ -1,0 +1,40 @@
+1	croatian	x-vnd.Haiku-MediaConverter	357964370
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, množina, jedan{Datoteka nije prepoznata kao podržana medijska datoteka:} ostalo{#datoteke nisu prepoznate kao podržane medijske datoteke:}}
+Error creating video.	MediaConverter		Greška pri stvaranju videa.
+Error	MediaConverter		Greška
+Error loading a file	MediaConverter		Greška pri učitavanju datoteke
+File Error	MediaConverter-FileInfo		Greška datoteke
+Open…	Menu		Otvori...
+Start [ms]: 	MediaConverter		Start [ms]: 
+Output format	MediaConverter		Izlazni format
+End   [ms]: 	MediaConverter		Kraj [ms]: 
+Duration:	MediaConverter-FileInfo		Trajanje:
+OK	MediaConverter		U redu
+Low	MediaConverter		Nizak
+Audio:	MediaConverter-FileInfo		Audio:
+OK	MediaConverter-FileInfo		U redu
+ seconds	MediaFileInfo		 sekundi
+Source files	MediaConverter		Izvorne datoteke
+Cancelling	MediaConverter		Otkazujem
+Error loading files	MediaConverter		Greška pri učitavanju datoteka
+Cancel	MediaConverter		Otkaži
+None available	Video codecs		Nijedan nije dostupan
+No file selected	MediaConverter-FileInfo		Nije odabrana ni jedna datoteka
+Select this folder	MediaConverter		Odaberi ovu mapu
+Continue	MediaConverter		Nastavi
+Video:	MediaConverter-FileInfo		Video:
+Video quality not supported	MediaConverter		Video kvaliteta nije podržana
+Cancelling…	MediaConverter		Otkazujem...
+File details	MediaConverter		Pojedinosti datoteke
+Select	MediaConverter		Odaberi
+Quit	Menu		Izađi
+Preview	MediaConverter		Pregled
+File format:	MediaConverter		Format datoteke:
+None available	Audio codecs		Nijedan nije doatupan
+High	MediaConverter		Visok
+Audio quality not supported	MediaConverter		Audio kvaliteta nije podržana
+File	Menu		Datoteka
+Convert	MediaConverter		Pretvori
+Video quality: %3d%%	MediaConverter		Video kvaliteta: %3d%%
+Output folder	MediaConverter		Izlazna mapa
+Audio quality: %3d%%	MediaConverter		Audio kvaliteta: %3d%%

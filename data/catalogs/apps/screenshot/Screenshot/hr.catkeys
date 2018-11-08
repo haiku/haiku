@@ -1,0 +1,25 @@
+1	croatian	x-vnd.haiku-screenshot	2753042206
+seconds	ScreenshotWindow		sekunde
+Desktop	ScreenshotWindow		Radna površina
+Include window border	ScreenshotWindow		Uključi rub prozora
+Screenshot	System name		Slika zaslona
+Select	ScreenshotWindow		Odaberi
+Capture active window	ScreenshotWindow		Uhvati aktivni prozor
+Cancel	ScreenshotWindow		Odustani
+Name:	ScreenshotWindow		Ime:
+Choose folder…	ScreenshotWindow		Izaberite mapu...
+Choose folder	ScreenshotWindow		Izaberite mapu
+Save	ScreenshotWindow		Spremi
+Overwrite	ScreenshotWindow		Prebriši
+Please select	ScreenshotWindow		Molim izaberite
+Save as:	ScreenshotWindow		Spremi kao:
+Save in:	ScreenshotWindow		Spremi u:
+screenshot	Screenshot	Base filename of screenshot files	slika zaslona
+New screenshot	ScreenshotWindow		Nova slika zaslona
+Artwork folder	ScreenshotWindow		Mapa sa umjetničkim dijelima
+Home folder	ScreenshotWindow		Osobna mapa
+Settings…	ScreenshotWindow		Postavke...
+overwrite	ScreenshotWindow		Prebriši
+Delay:	ScreenshotWindow		Odgoda:
+Include mouse pointer	ScreenshotWindow		Uključi pokazivač miša
+Translator Settings	ScreenshotWindow		Postavke Prevoditelja

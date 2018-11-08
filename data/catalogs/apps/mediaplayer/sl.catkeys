@@ -1,0 +1,68 @@
+1	slovenian	x-vnd.Haiku-MediaPlayer	1511648381
+Location	MediaPlayer-InfoWin		Lokacija
+1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (ameriško)
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Video	MediaPlayer-InfoWin		Video
+Subtitle size:	MediaPlayer-SettingsWindow		Velikost podnapisov:
+Save Playlist	MediaPlayer-PlaylistWindow		Shrani seznam predvajanja
+(not supported)	MediaPlayer-InfoWin		(ni podprto)
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Izgleda, da nobena od datotek, ki ste jih želeli predvajati, ni multimedijska datoteka.
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Shranjevanje seznama predvajanja ni uspelo.\n\nNapaka: 
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+New player…	MediaPlayer-Main		Nov predvajalnik…
+100% scale	MediaPlayer-Main		100% velikost
+Subtitle placement:	MediaPlayer-SettingsWindow		Položaj podnapisov:
+Close	MediaPlayer-Main		Zapri
+Open	MediaPlayer-Main		Odpri
+OK	MediaPlayer-SettingsWindow		V redu
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
+Display mode	MediaPlayer-InfoWin		Način prikaza
+Close	MediaPlayer-PlaylistWindow		Zapri
+Full volume	MediaPlayer-SettingsWindow		Polna glasnost
+Drop files to play	MediaPlayer-Main		Povlecite datoteke za predvajanje
+Cancel	MediaPlayer-SettingsWindow		Prekliči
+Loop audio	MediaPlayer-SettingsWindow		Ponavljaj audio
+Nothing to Play	MediaPlayer-Main		Ničesar ni za predvajati
+Video	MediaPlayer-Main		Video
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Za ta format ni nameščenega dekoderja ali pa ima dekoder težave s specifično verzijo formata.
+Import Entry	MediaPlayer-ImportPLItemsCmd		Uvozi vnos
+400% scale	MediaPlayer-Main		400% velikost
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Shranjevanje seznama predvajanja ni uspelo:\n\nNapaka: 
+Move Entries	MediaPlayer-MovePLItemsCmd		Premakni vnose
+Audio	MediaPlayer-Main		Audio
+Open Playlist	MediaPlayer-PlaylistWindow		Odpri seznam predvajanja
+OK	MediaPlayer-Main		V redu
+Move Entry	MediaPlayer-MovePLItemsCmd		Premakni vnos
+Open	MediaPlayer-PlaylistWindow		Odpri
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Datoteke "%filename" ni bilo mogoče odpreti.\n\n
+Error: 	MediaPlayer-RemovePLItemsCmd		Napaka: 
+Audio	MediaPlayer-InfoWin		Audio
+OK	MediaPlayer-RemovePLItemsCmd		V redu
+Import Entries	MediaPlayer-ImportPLItemsCmd		Uvozi vnose
+No aspect correction	MediaPlayer-Main		Brez popravljanja razmerja
+Automatically start playing	MediaPlayer-SettingsWindow		Začni predvajati samodejno
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Vseh datotek ni bilo mogoče premakniti v koš.
+unknown format	MediaPlayer-InfoWin		neznan format
+Duration	MediaPlayer-InfoWin		Trajanje
+Error: 	MediaPlayer-Main		Napaka: 
+Bottom of video	MediaPlayer-SettingsWindow		Na dnu videa
+Volume of background clips	MediaPlayer-SettingsWindow		Glasnost posnetkov, ki se predvajajo v ozadju
+Hide interface	MediaPlayer-Main		Skrij vmesnik
+Move file to Trash	MediaPlayer-PlaylistWindow		Premakni datoteko v koš
+OK	MediaPlayer-NetworkStream		V redu
+min	MediaPlayer-InfoWin	Minutes	min
+OK	MediaPlayer-PlaylistWindow		V redu
+Cancel	MediaPlayer-NetworkStream		Prekliči
+Save as…	MediaPlayer-PlaylistWindow		Shrani kot…
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopiraj vnose
+Always on top	MediaPlayer-Main		Vedno na vrhu
+Save	MediaPlayer-Main		Shrani
+File info	MediaPlayer-InfoWin		Informacije o datoteki
+Save	MediaPlayer-PlaylistWindow		Shrani
+Full screen	MediaPlayer-Main		Cel zaslon
+Open file…	MediaPlayer-Main		Odpri datoteko…
+300% scale	MediaPlayer-Main		300% velikost
+Bottom of screen	MediaPlayer-SettingsWindow		Dno zaslona
+Save error	MediaPlayer-PlaylistWindow		Napaka pri shranjevanju
+Rating	MediaPlayer-Main		Ocena
+Playlist	MediaPlayer-PlaylistWindow		Seznam predvajanja

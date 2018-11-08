@@ -1,0 +1,63 @@
+1	croatian	x-vnd.Haiku-Installer	2560762702
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Upravitelj podizanja sustava, program koji konfigurira Haiku izbornik podizanja, ne može se pokrenuti.
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju i ponovno pokrenuti sustav?
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tnapisali Jérôme Duval i Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Quit	InstallerApp		Isključi
+Additional disk space required: 0.0 KiB	InstallerWindow		Potreban dodatni prostor na disku: 0.0 KiB
+Stop	InstallerWindow	In alert after pressing Stop	Stop
+Install progress:  	InstallerWindow		Napredak instalacije:  
+Starting Installation.	InstallProgress		Pokretanje instalacije.
+Are you sure you want to abort the installation?	InstallerWindow		Jeste li sigurni da želite prekinuti instalaciju?
+Stop	InstallerWindow		Stop
+OK	InstallerApp		Uredu
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Izaberite izvor i odredišni disk iz pop-up izbornika.Zatim kliknite \"Počni\".
+Failed to launch Boot Manager	InstallerWindow		Neuspjelo pokretanje upravitelja podizanjem sustava
+Install from:	InstallerWindow		Instaliraj sa:
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld od %2ld
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VAŽNA INFORMACIJA PRIJE HAIKU INSTALACIJE\n\n
+Continue	InstallerWindow	In alert after pressing Stop	Nastavi
+Write boot sector to '%s'	InstallerWindow		Zapišite boot sektor na '%s'
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izaberite disk izvora iz poo-up izbornika.Zatim kliknite \"Počni\".
+Quit	InstallerWindow		Isključi
+Welcome to the Haiku Installer!\n\n	InstallerApp		Dobrodošli u Haiku instaler!\n\n
+Boot sector successfully written.	InstallProgress		Boot sektor je uspješno zapisan.
+Performing installation.	InstallProgress		Vršim instalaciju.
+scanning…	InstallerWindow		skeniram...
+Set up boot menu	InstallerWindow		Postavljanje izbornika podizanja sustava
+Abort	InstallerWindow		Prekini
+Finishing Installation.	InstallProgress		Završavam instalaciju.
+Restart	InstallerWindow		Ponovo pokreni
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Odredišni direktorij možda nema dovoljno prostara.Probajte izabrati drugi disk ili izaberite neinstaliranje neobaveznih stavki.
+Scanning for disks…	InstallerWindow		Skeniram za diskove...
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk ne može biti montiran.Izaberite drugi disk.
+?? of ??	InstallerWindow	Unknown progress	?? od ??
+Show optional packages	InstallerWindow		Pokaži neobavezne pakete
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nije pronađena ijedna particija pogodna za instalaciju.Molim uredite particije i inicirajte barem jednu sa Be File sustavom.
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Iz pop-up izbornika izaberite disk na koji žekite instalirati.Zatim kliknite \"Počni\".
+Unknown Type	InstallProgress	Partition content type	Nepoznata vrsta
+<none>	InstallerWindow	No partition available	<nijedan>
+Installation canceled.	InstallProgress		Instalacija opozvana.
+Installer	System name		Instalacijski program
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Ne možete instalirati sadržaj diska na sami disk.Izaberite drugi disk.
+???	InstallerWindow	Unknown currently copied item	???
+Hide optional packages	InstallerWindow		Sakrij neobavezne pakete.
+Restart system	InstallerWindow		Ponovo pokreni sustav
+OK	InstallerWindow		Uredu
+Set up partitions…	InstallerWindow		Postavi particije...
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Particija se ne može montirati.molim izaberite drugu particiju.
+Install anyway	InstallProgress		Ipak instaliraj
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo je do greške i instalacija nije dovršena:\n\nGreška:  %s
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Pritisnite tipku Počni za instalaciju sa '%1s' na '%2s'.
+OK	InstallProgress		U redu
+Please choose target	InstallerWindow		Molim izaberite metu
+???	InstallerWindow	Unknown partition name	???
+Begin	InstallerWindow		Počni
+Write boot sector	InstallerWindow		Zapiši boot sektor
+Cancel	InstallerWindow		Odustani
+Continue	InstallerApp		Nastavi
+Additional disk space required: %s	InstallerWindow		Potreban dodatni prostor na disku: %s
+Cancel	InstallProgress		Odustani
+Try installing anyway	InstallProgress		Ipak pokušaj instalirati
+Are you sure you want to to stop the installation?	InstallerWindow		Jeste li sigurni da želite zaustaviti instalaciju?
+Onto:	InstallerWindow		Na:
+Tools	InstallerWindow		Alati

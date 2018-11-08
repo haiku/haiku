@@ -1,0 +1,16 @@
+1	croatian	x-vnd.Haiku-PSDTranslator	245378338
+Uncompressed	PSDConfig		Nesabijeno
+Indexed	PSDLoader		Indeksirano
+Grayscale	PSDLoader		Sivi tonovi
+Version %d.%d.%d, %s	PSDConfig		Verzija %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop dokument (PSD datoteka)
+Photoshop image	PSDTranslator		Photoshop slika
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop veliki dokument (PSB datoteka)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop slika (%s)
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmapa
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Kompresija: 
+Format: 	PSDConfig		Format: 

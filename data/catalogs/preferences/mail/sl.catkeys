@@ -1,0 +1,50 @@
+1	slovenian	x-vnd.Haiku-Mail	688530788
+Settings	Config Window		Nastavitve
+Never	Config Window	show status window	Nikoli
+While sending and receiving	Config Window		Med pošiljanjem in prejemanjem
+Incoming	Config Window		Prejemanje
+Server name:	E-Mail		Ime strežnika:
+OK	Config Window		V redu
+E-mail address:	E-Mail		Naslov elektronske pošte:
+Account name:	E-Mail		Ime računa:
+Account name:	Config Views		Ime računa:
+Create new account	AutoConfigWindow		Ustvari nov račun
+OK	Config Views		V redu
+The filter could not be moved. Deleting filter.	Config Views		Filtra ni mogoče premakniti. Brišem filter.
+Revert	Config Window		Povrni
+Login name:	E-Mail		Prijavno ime:
+Incoming	E-Mail		Prejemanje
+Password:	E-Mail		Geslo:
+Accounts	Config Window		Računi
+Finish	AutoConfigWindow		Dokončaj
+Remove	Config Window		Odstrani
+Server Name:	E-Mail		Ime strežnika:
+While sending	Config Window		Med pošiljanjem
+Enter a valid e-mail address.	AutoConfigWindow		Vnesite veljaven naslov elektronske pošte.
+Add	Config Window		Dodaj
+Account settings	AutoConfigWindow		Nastavitve računa
+E-mail	System name		Elektronska pošta
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nSplošnih nastavitev ni bilo mogoče povrniti.\n\nNapaka pri dobivanju splošnih nastavitev:\n%s\n
+Real name:	Config Views		Pravo ime:
+\t\t· Outgoing	Config Window		\t\t· Pošiljanje
+Choose Protocol	E-Mail		Izberite protokol
+Return address:	Config Views		Povratni naslov:
+Edit mailbox menu…	Config Window		Uredi meni poštnega nabiralnika…
+Outgoing	E-Mail		Pošiljanje
+\t\t· E-mail filters	Config Window		\t\t· Filtri za elektronsko pošto
+Remove	Config Views		Odstrani
+\t\t· Incoming	Config Window		\t\t· Prejemanje
+Next	AutoConfigWindow		Naprej
+Check every	Config Window		Preveri na vsakih
+Back	AutoConfigWindow		Nazaj
+Incoming mail filters	Config Views		Filtri za prihajajočo pošto
+Account settings	Config Views		Nastavitve računa
+minutes	Config Window		minut
+Error retrieving general settings: %s\n	Config Window		Napaka pri dobivanju splošnih nastavitev: %s\n
+Real name:	E-Mail		Pravo ime:
+Apply	Config Window		Uporabi
+OK	AutoConfigWindow		V redu
+Add filter	Config Views		Dodaj filter
+Outgoing	Config Window		Pošiljanje
+Outgoing mail filters	Config Views		Filtri za odhajajočo pošto
+Error	Config Window		Napaka

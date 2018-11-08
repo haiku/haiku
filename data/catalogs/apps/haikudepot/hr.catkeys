@@ -1,0 +1,92 @@
+1	croatian	x-vnd.Haiku-HaikuDepot	1748292554
+Name	PackageListView		Ime
+Close	RatePackageWindow		Zatvori
+Changelog	PackageInfoView		Dnevnik promjena
+The passwords do not match.	UserLoginWindow		Lozinke se ne podudaraju.
+Log in…	MainWindow		Prijava...
+Rate %Package%	RatePackageWindow		Ocijeni %paket%
+Stability:	RatePackageWindow		Stabilnost:
+Click a package to view information	PackageInfoView		Klikni na paket da vidiš informacije
+Other users can see this rating	RatePackageWindow		Ostali korisnici mogu vidjeti ovo ocjenjivanje
+Stability	RatePackageWindow		Stabilnost
+Description	PackageListView		Opis
+Install	PackageManager		Instaliraj
+Source packages	MainWindow		 Izvorni paketi
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Neuspjela ovjera. Korisnik ne postoji ili je isporučena kriva lozinka.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Račun je uspješno napravljen. Sada možete ocijeniti pakete i raditi ostale korisne stvari.
+Tools	MainWindow		Alati
+Close	UserLoginWindow		Zatvori
+Rate package…	PackageInfoView		Ocijeni paket...
+Category	FilterView		Kategorija
+Uninstall	PackageManager		Deinstaliraj
+An error occurred while obtaining the package list: %message%	MainWindow		Došlo je do greške kod pribavljanja liste paketa: %poruka%
+<no info>	PackageInfoView		<no info>
+An error occurred while initializing the package manager: %message%	MainWindow		Došlo je do greške pri iniciranju upravitelja paketima: %poruka%
+Email address:	UserLoginWindow		Adresa e-pošte:
+Very unstable	RatePackageWindow		Vrlo nestabilan
+The username is already taken. Please choose another.	UserLoginWindow		Korisničko ime je već zauzeto. Molim izaberite drugo.
+Close	PackageManager		Zatvori
+Not logged in	MainWindow		Niste prijavljeni
+The authentication was successful.	UserLoginWindow		Ovjera je bila uspješna.
+Status	PackageListView		Status
+Switch account…	MainWindow		Prebaci račun...
+Ignore	UserLoginWindow		Zanemari
+Language	UserLoginWindow		Jezik
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Lozinka je preslaba ili neispravna. Molim koristite najmanje 8 znakova sa najmanje 2 broja i 2 velika slova.
+Rate package	RatePackageWindow		Ocijeni paket
+Development	Model		Razvoj
+Fatal error	PackageManager		Ozbiljna greška
+Log in	UserLoginWindow		Prijava
+Ratings	PackageInfoView		Ocjenjivanja
+Inactive	PackageListView		Neaktivan
+Science & Mathematics	Model		Znanost i matematika
+(%Votes%)	PackageInfoView		(%Glasovi%)
+Success	UserLoginWindow		Uspjeh
+Downloading:	PackageInfoView		Preuzimam:
+Mostly stable	RatePackageWindow		Uglavnom stabilan
+Log out	MainWindow		Odjava
+Education	Model		Obrazovanje
+Search terms:	FilterView		Pojmovi pretrage:
+%Version%	PackageInfoView		%Verzija%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Dogodila se greška kod osvježavanja repozitorija:%greška% (%pojedinosti%)
+Create account	UserLoginWindow		Napravi račun
+Productivity	Model		Produktivnost
+Authentication failed	UserLoginWindow		Neuspjela ovjera
+Logged in as %User%	MainWindow		Prijavljen kao %korisnik%
+Language	RatePackageWindow		Jezik
+User name:	UserLoginWindow		Korisničko ime:
+Unstable but usable	RatePackageWindow		Nestabilan ali može se koristiti
+The email address appears to be malformed.	UserLoginWindow		Email adresa je oštećena.
+Games	Model		Igre
+Rating	PackageListView		Ocjenjivanje
+(%Votes%)	FeaturedPackagesView		(%Glasovi%)
+Graphics	Model		Grafika
+Local	MainWindow		Lokalno
+Close	MainWindow		Zatvori
+Preferred language:	UserLoginWindow		Preferirani jezik:
+Internet & Network	Model		Internet i mreža
+Cancel	MainWindow		Otkaži
+Update	RatePackageWindow		Ažuriraj
+Video	Model		Video
+All categories	FilterView		Sve kategorije
+An error occurred while refreshing the repository: %error%	MainWindow		Dogodila se greška kod osvježavanja repozitorija: %greška%
+Login or Create account	MainWindow		Prijava ili napravi račun
+OK	PackageInfoView		U redu
+Uninstalled	PackageListView		Deinstalirani
+Stable	RatePackageWindow		Stabilno
+Unknown	PackageListView		Nepoznato
+Not specified	RatePackageWindow		Nije određeno
+Available	PackageListView		Dostupno
+Cancel	RatePackageWindow		Otkaži
+OK	UserLoginWindow		U redu
+Send	RatePackageWindow		Pošalji
+Category:	FilterView		Kategorija:
+Failed to create account	UserLoginWindow		Neuspjelo kreiranje računa
+There are problems with the data you entered:\n\n	UserLoginWindow		Ima problema sa podacima koje ste unijeli:\n\n
+Business	Model		Posao
+Audio	Model		Audio
+About	PackageInfoView		O programu
+Active	PackageListView		Aktivan
+It was not possible to contact the web service.	UserLoginWindow		Nije bilo moguće kontaktirati web servis.
+Failed to create account: %s\n	UserLoginWindow		Neuspjelo kreiranje računa: %s\n
+Cancel	UserLoginWindow		Otkaži

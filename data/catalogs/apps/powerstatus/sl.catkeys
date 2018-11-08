@@ -1,0 +1,25 @@
+1	slovenian	x-vnd.Haiku-PowerStatus	2880318498
+Show percent	PowerStatus		Pokaži odstotke
+ mW	PowerStatus		 mW
+Type: 	PowerStatus		Vrsta:
+Empty battery slot	PowerStatus		Prazno ležišče baterije
+ mV	PowerStatus		 mV
+Run in window	PowerStatus		Teci v oknu
+PowerStatus	System name		Stanje napajanja
+ mWh	PowerStatus		mWh
+Battery info…	PowerStatus		Informacije o bateriji…
+Damaged battery	PowerStatus		Poškodovana baterija
+Show time	PowerStatus		Pokaži čas
+Last full charge: 	PowerStatus		Zadnje popolno polnjenje:
+Battery unused	PowerStatus		Baterija ni v rabi
+Extended battery info	PowerStatus		Razširjene informacije o bateriji
+ mA	PowerStatus		 mA
+Capacity: 	PowerStatus		Kapaciteta:
+Battery discharging	PowerStatus		Baterija se prazni
+Serial number: 	PowerStatus		Serijska številka:
+Battery charging	PowerStatus		Baterija se polni
+Quit	PowerStatus		Izhod
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stanje napajanja lahko teče v oknu ali pa se namesti v Deskbar.
+Show status icon	PowerStatus		Pokaži ikono stanja
+Technology: 	PowerStatus		Tehnologija:
+no battery	PowerStatus		ni baterije

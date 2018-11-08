@@ -1,0 +1,68 @@
+1	croatian	x-vnd.Haiku-StyledEdit	993302155
+StyledEdit	System name		StyleEdit
+Paste	Menus		Zalijepi
+OK	LoadAlert		U redu
+File	Menus		Datoteka
+???	LoadAlert		???
+Lines:	Statistics		Linije:
+Italic	Menus		Italik
+Left	Menus		Lijevo
+Search backwards	FindandReplaceWindow		Traži unazad
+Size	Menus		Veličina
+Save	QuitAlert		Spremi
+Page setup…	Menus		Postavke stranice...
+Print…	Menus		Ispis...
+Can't undo	Menus		Nemoguće vratiti korak nazad
+Save	Menus		Spremi
+Default	Menus		Zadano
+Replace with:	FindandReplaceWindow		Zamjeni sa:
+Cancel	SaveAlert		Otkaži
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemoguće obrnuti, datoteka nije pronađena: \"%s\".
+Case-sensitive	FindandReplaceWindow		Osjetljivo na veličinu slova
+Replace in all windows	FindandReplaceWindow		Zamjeni u svim prozorima
+Quit	Menus		Izađi
+Document statistics	Statistics		Statistike dokumenta
+Cancel	RevertToSavedAlert		Otkaži
+Document	Menus		Dokument
+Save changes to the document \"%s\"? 	QuitAlert		Spremi izmjene u dokument \"%s\"? 
+Edit	Menus		Uredi
+Font	Menus		Font
+Replace all	FindandReplaceWindow		Zamjeni sve
+Statistics…	Menus		Statistike...
+Default	Open_and_SaveAsPanel		Zadano
+Replace next	Menus		Zamijeni slijedeće
+Cancel	FindandReplaceWindow		Otkaži
+Close	Menus		Zatvori
+Save	SaveAlert		Spremi
+Words:	Statistics		Riječi:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Greška pri učitavanju \"%s\":\n\tNepodržani format
+OK	RevertToSavedAlert		U redu
+Don't save	QuitAlert		Nemoj spremiti
+Align	Menus		Poredaj
+Color	Menus		Boja
+OK	QuitAlert		U redu
+Open…	Menus		Otvori...
+Center	Menus		Centar
+OK	Statistics		U redu
+New	Menus		Novo
+Bold	Menus		Podebljano
+Find selection	Menus		Nađi označeno
+Find:	FindandReplaceWindow		Pronađi:
+Error saving \"%s\":\n%s	SaveAlert		Greška pri spremanju \"%s\":\n%s
+Copy	Menus		Kopiraj
+Cut	Menus		Isjeci
+Replace	FindandReplaceWindow		Zamijeni
+Find again	Menus		Pronađi opet
+Cancel	QuitAlert		Poništi
+Find…	Menus		Pronađi...
+Select all	Menus		Odaberi sve
+Don't save	SaveAlert		Nemoj spremiti
+Error loading \"%s\":\n\t%s	LoadAlert		Greška pri učitavanju \"%s\":\n\t%s
+Untitled 	StyledEditWindow		Neimenovano 
+OK	SaveAlert		U redu
+Find	FindandReplaceWindow		Pronađi
+Encoding	Open_and_SaveAsPanel		Enkodiranje
+Characters:	Statistics		Znakovi:
+Save as…	Menus		Spremi kao...
+Replace…	Menus		Zamjeni...
+Right	Menus		Desno

@@ -1,0 +1,47 @@
+1	croatian	x-vnd.Be-TSKB	2792700964
+Power off	DeskbarMenu		Isključi
+Sort applications by name	PreferencesWindow		Sortiraj programe po imenu
+Suspend	DeskbarMenu		Suspendiraj
+Hide clock	TimeView		Sakrij sat
+Applications	PreferencesWindow		Programi
+Time preferences…	TimeView		Osobitosti vremena...
+About Haiku	DeskbarMenu		O Haiku
+Recent documents:	PreferencesWindow		Nedavni dokumenti:
+Recent applications	DeskbarMenu		Nedavni programi
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programi
+Find…	DeskbarMenu		Nađi...
+Show clock	Tray		Pokaži sat
+Window	PreferencesWindow		Prozor
+Defaults	PreferencesWindow		Zadano
+Menu	PreferencesWindow		Izbornik
+Recent documents	DeskbarMenu		Nedavni dokumenti
+Auto-hide	PreferencesWindow		Samoskrivanje
+Always on top	PreferencesWindow		Uvijek na vrhu
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar mapa je prazna>
+Show all	WindowMenu		Pokaži sve
+No windows	WindowMenu		Bez prozora
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Ponovno pokreni sustav
+Large	PreferencesWindow		Veliko
+Auto-raise	PreferencesWindow		Samopodizanje
+Recent folders:	PreferencesWindow		Nedavne mape:
+Show application expander	PreferencesWindow		Pokaži proširivač programa
+Close all	WindowMenu		Zatvori sve
+Deskbar preferences	PreferencesWindow		Deskbar osobitosti
+Mount	DeskbarMenu		Montiraj
+Revert	PreferencesWindow		Vrati izvorno
+Small	PreferencesWindow		Malen
+Recent applications:	PreferencesWindow		Nedavni programi:
+Shutdown…	DeskbarMenu		Isključivanje...
+Tracker always first	PreferencesWindow		Tracker uvijek prvi
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Osobitosti
+Recent folders	DeskbarMenu		Nedavne mape
+About this system	DeskbarMenu		O ovom sustavu
+Show calendar…	TimeView		Pokaži kalendar...
+Deskbar preferences…	DeskbarMenu		Deskbar osobitosti...
+Expand new applications	PreferencesWindow		Proširi nove programe
+Hide application names	PreferencesWindow		Sakrij imena programa
+Icon size	PreferencesWindow		Veličina ikone
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Programčić radne površine
+Hide all	WindowMenu		Sakrij sve
+Quit application	WindowMenu		Zatvori program

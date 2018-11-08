@@ -1,0 +1,18 @@
+1	slovenian	x-vnd.Haiku-NetworkStatus	4133831122
+<no wireless networks found>	NetworkStatusView		(nobeno brezžično omrežje ni bilo najdeno)
+Run in window	NetworkStatus		Teci v oknu
+No link	NetworkStatusView		Ni povezave
+Install in Deskbar	NetworkStatus		Namesti v Deskbar
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Zaganjanje omrežnih nastavitev ni uspelo.\n\nNapaka:
+Netmask	NetworkStatusView		Omrežna maska
+Broadcast	NetworkStatusView		Oddajanje
+Unknown	NetworkStatusView		Neznano
+Network Status	NetworkStatusView		Omrežno stanje
+Ready	NetworkStatusView		Pripravljen
+Configuring	NetworkStatusView		Nastavljam
+Address	NetworkStatusView		Naslov
+OK	NetworkStatusView		V redu
+NetworkStatus	System name		Omrežno stanje
+Open network preferences…	NetworkStatusView		Odpri omrežne nastavitve…
+Could not join wireless network:\n	NetworkStatusView		Ni se mogoče pridružiti brezžičnemu omrežju:\n
+Quit	NetworkStatusView		Izhod

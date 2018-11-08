@@ -1,0 +1,9 @@
+1	slovenian	x-vnd.Haiku-BMPTranslator	2497639570
+BMP images	BMPTranslator		Slike BMP
+BMPTranslator Settings	BMPTranslator		Nastavitve prevajalca BMP
+BMP image (OS/2 format, %d bits)	BMPTranslator		Slika BMP (format OS/2, %d bitov)
+BMP image translator	BMPView		Prevajalec za slike BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Slika BMP (Microsoftov format, %d bitov)
+BMP Settings	BMPMain		Nastavitve BMP
+Version %d.%d.%d, %s	BMPView		Verzija %d.%d.%d, %s
+BMP image translator	BMPTranslator		Prevajalec za slike BMP

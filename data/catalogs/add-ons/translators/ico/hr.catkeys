@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-ICOTranslator	3190803318
+Cursor	ICOTranslator		Pokazivač
+Version %d.%d.%d, %s	ConfigView		Verzija %d.%d.%d, %s
+Valid icon sizes are 16, 32, or 48	ConfigView		Valjane veličine su 16, 32, ili 48
+Windows icons	ICOTranslator		Windows ikone
+Enforce valid icon sizes	ConfigView		Prisili valjane veličine ikona
+ICO Settings	main		ICO postavke
+Windows icon translator	ICOTranslator		Prevoditelj ikona prozora
+pixels in either direction.	ConfigView		piksela u svakom smjeru.
+Icon	ICOTranslator		Ikona
+ICOTranslator Settings	ConfigView		Postavke ICO prevoditelja
+Windows icon translator	ConfigView		Prevoditelj ikona prozora

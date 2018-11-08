@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-GIFTranslator	2353264164
+Optimal	GIFView		Optimalno
+Greyscale	GIFView		Sivi tonovi
+Colors:	GIFView		Boje:
+Palette:	GIFView		Paleta:
+GIF image	GIFTranslator		GIF slika
+GIF images	GIFTranslator		GIF slike
+Version %d.%d.%d, %s	GIFView		Verzija %d.%d.%d, %s
+Use RGB color	GIFView		Koristi RGB boju
+GIF Settings	GIFTranslator		GIF postavke
+BeOS system	GIFView		BeOS sustav
+Automatic (from alpha channel)	GIFView		Automatski (iz alfa kanala)

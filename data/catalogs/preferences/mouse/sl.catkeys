@@ -1,0 +1,15 @@
+1	slovenian	x-vnd.Haiku-Mouse	4132506509
+Mouse type:	SettingsView		Vrsta miši:
+2-Button	SettingsView		2-gumbna
+Double-click test area	SettingsView		Prostor za preizkus dvoklika
+Revert	MouseWindow		Povrni
+...by Andrew Edward McCall	MouseApplication		Avtor: Andrew Edward McCall
+Mouse acceleration	SettingsView		Pospešek
+3-Button	SettingsView		3-gumbna
+Mouse speed	SettingsView		Hitrost miši
+1-Button	SettingsView		1-gumbna
+Double-click speed	SettingsView		Hitrost dvoklika
+Defaults	MouseWindow		Privzete vrednosti
+Accept first click	SettingsView		Sprejmi prvi klik
+Normal	SettingsView		običajna
+Mouse	System name		Miš

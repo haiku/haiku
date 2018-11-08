@@ -1,0 +1,58 @@
+1	slovenian	x-vnd.Haiku-ShowImage	1429812405
+Use as background…	Menus		Uporabi kot ozadje…
+File	Menus		Datoteka
+Slide delay	Menus		Zakasnitev
+Selection mode	Menus		Način izbiranja
+Zoom in	Menus		Povečaj
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument %s je bil spremenjen. Ga želite zapreti?
+Page setup…	Menus		Postavitev strani…
+Print…	Menus		Natisni…
+OK	SaveToFile		V redu
+Previous page	Menus		Prejšnja stran
+View	Menus		Pogled
+Full screen	Menus		Celozaslonski način
+Go to page	Menus		Pojdi na stran
+Zoom out	Menus		Pomanjšaj
+Quit	Menus		Izhod
+Rotate counterclockwise	Menus		Zavrti v nasprotni smeri urinega kazalca
+High-quality zooming	Menus		Povečevanje visoke kakovosti
+Browse	Menus		Brskaj
+Edit	Menus		Urejanje
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ni bilo mogoče naložiti slike. Slika ali prevajalnik zanjo ne obstaja.
+First page	Menus		Prva stran
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument %s (stran %d) je bil spremenjen. Ga želite zapreti?
+Close	Menus		Zapri
+Close	ClosePrompt		Zapri
+Resize to (in 1/72 inches):	PrintOptionsWindow		Spremeni velikost na (v 1/72 palca):
+Rating	Menus		Ocena
+Flip left to right	Menus		Zrcali od leve proti desni
+Show caption in full screen mode	Menus		Pokaži naslov v celozaslonskem načinu
+DPI:	PrintOptionsWindow		Pik na palec:
+Open…	Menus		Odpri…
+Next file	Menus		Naslednja datoteka
+Clear selection	Menus		Počisti izbor
+Close document	ClosePrompt		Zapri dokument
+Height: 	PrintOptionsWindow		Višina: 
+The file '%s' could not be written.	SaveToFile		Datoteke %s ni bilo mogoče zapisati.
+Cancel	ClosePrompt		Prekliči
+Show tool bar	Menus		Pokaži orodno vrstico
+Fit to window	Menus		Prilagodi oknu
+Print options	PrintOptionsWindow		Možnosti tiskanja
+Copy	Menus		Kopiraj
+Last page	Menus		Zadnja stran
+Stretch to window	Menus		Raztegni po oknu
+Previous file	Menus		Prejšnja datoteka
+ShowImage	System name		Pregledovalnik slik
+Slide show	Menus		Diaprojekcija
+Fit image to page	PrintOptionsWindow		Prilagodi sliko strani
+Flip top to bottom	Menus		Zrcali od vrha do dna
+Select all	Menus		Izberi vse
+Zoom factor in %:	PrintOptionsWindow		Faktor povečave v %:
+Width:	PrintOptionsWindow		Širina:
+Image	Menus		Slika
+Move to Trash	Menus		Premakni v koš
+OK	Alerts		V redu
+Rotate clockwise	Menus		Zavrti v smeri urinega kazalca
+Original size	Menus		Izvorna velikost
+Next page	Menus		Naslednja stran
+Save as…	Menus		Shrani kot…

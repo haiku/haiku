@@ -1,0 +1,9 @@
+1	croatian	x-vnd.Haiku-KeyboardInputServerDevice	2745442621
+Kill application	Team monitor		Uništi program
+Quit application	Team monitor		Isključi program
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Odaberite program sa gornje liste i kliknite na jedno od dugmeta 'Uništi program' i 'Isključi program' da biste ga zatvorili.\n\nDržite CONTROL+ALT+DELETE %ld sekunda za ponovno podizanje sustava.
+If the application will not quit you may have to kill it.	Team monitor		ako se program ne isključi možda ćete ga trebati uništiti.
+Force reboot	Team monitor		Prisili ponovno podizanje sustava
+(This team is a system component)	Team monitor		(Ovaj tim je komponenta sustava)
+Restart the desktop	Team monitor		Ponovno pokreni radnu površinu
+Cancel	Team monitor		Otkaži

@@ -1,0 +1,69 @@
+1	croatian	x-vnd.Haiku-About	2424436225
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Autorsko pravo © 1999-2010 Gutenprint autora. Sva prava pridržana.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Autorska prava © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
+Past website & marketing:\n	AboutView		Bivša web stranica & marketing:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i njegov NewOS kernel)\n
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Autorska prava © 1996-2005 Julian R Seward.Sva prava pridržana.
+%d MiB total	AboutView		%d MiB ukupno
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (utemeljitelj projekta)\n\n
+%d MiB used (%d%%)	AboutView		%d MiB korišteno (%d%%)
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Sadrži software iz GNU Projecta, objavljenog pod GPL i LGPL licencama:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nAutorska prava © The Free Software Foundation.
+AboutSystem	System name		O sustavu
+Copyright © 2003 Peter Hanappe and others.	AboutView		Autorska prava © 2003 Peter Hanappe i ostali.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Autorska prava © 1994-1997 Mark Kilgard.Sva prava pridržana.
+Revision	AboutView		Revizija
+Copyright © 2009 Colin Percival	AboutView		Autorska prava © 2009 Colin Percival
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i njihovom razvojnom timu, jer su napravili BeOS!\n\n
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Autorska prava © 1999-2000 Y.Takagi. Sva prava pridržana.
+Source Code: 	AboutView		Izvorni kod: 
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, množina, jedan{Processor:} ostalo{# Procesori:}}
+Kernel:	AboutView		Kernel:
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Autorska prava na Haiku kod su vlasništvo Haiku, Inc. ili poštovanih autora gdje je to naznačeno u izvornom kodu. Haiku® and the HAIKU logo® su registrirani zaštitni znaci Haiku, Inc.\n\n
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Autorska prava © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nSva prava pridržana.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
+The HaikuPorts team\n	AboutView		Haiku-Ports tim\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ukupno, %inaccessible MiB nepristupačno
+Contributors:\n	AboutView		Doprinositelji:\n
+Unknown	AboutView		Nepoznato
+Copyright © 2001-2003 Expat maintainers.	AboutView		Autorska prava © 2001-2003 Expat održavatelji.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Autorska prava © 1999-2006 Brian Paul. Mesa3D projekt. Sva prava pridržana.
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memorija:
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Autorska prava © 1996-1997 Jeff Prosise.Sva prava pridržana.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Autorska prava © 2006-2012 Kentaro Fukuchi
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Autorsk prava © 1994-2009, Thomas G. Lane, Guido Vollbeding.Ovaj software je temeljen na dijelu rada Independent JPEG Group.
+Past maintainers:\n	AboutView		Bivši održavatelji:\n
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Sadrži software iz FreeBSD Projekta, objavljenog pod the BSD licencom:\nftpd, ping, telnet, telnetd, traceroute\nAutorska prava © 1994-2008 The FreeBSD Project. Sva prava pridržana.
+GNU GPL v3	AboutWindow		GNU GPL v3
+\n\nSpecial thanks to:\n	AboutView		\n\nPosebna zahvala:\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…i vjerojatno još neki koje smo zaboravili spomenuti (oprostite!)\n\n
+Licenses: 	AboutView		Licence: 
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Autorska prava © 1995-2004 Jean-loup Gailly and Mark Adler.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Autorska prava © 2002-2003 Steve Lhomme.Sva prava pridržana.
+\nCopyrights\n\n	AboutView		\nAutorska prava\n\n
+Current maintainers:\n	AboutView		Trenutni održavatelji:\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kod koji je jedinstven za Haiku, posebno kernel i sav kod sa kojim su povezani programi, distribuiraju se pod uvjetima <MIT license>. Neke biblioteke sustava sadrže kod trće strane distribuiran pod <LGPL licencom>. Autorska prava za kod treće strane možete naći ispod.\n\n
+Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Sadrži software koji je razvio  NetBSD Foundation, Inc. i njihovi doprinositelji:\nftp, tput\nAutorska prava © 1996-2008 The NetBSD Foundation, Inc. Sva prava pridržana.
+GNU GPL v2	AboutWindow		GNU LGPL v2
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google i njhovi Google Summer of Code i Google Code In programi\n
+The Haikuware team and their bounty program\n	AboutView		Haikuware tim i njihov darežljivi program\n
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Autorska prava © 1995, 1998-2001 Jef Poskanzer. Sva prava pridržana.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Autorska prava © 2010-2011 Google Inc. Sva prava pridržana.
+Website & marketing:\n	AboutView		Web stranica & marketing:\n
+About this system	AboutWindow		O ovom sustavu
+Version:	AboutView		Verzija:
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Autorska prava © 1994-2008 Xiph.Org.Sva prava pridržana.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Autorska prava © 1998-2000 Thai Open Source Software Center Ltd i Clark Cooper.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Autorska prava © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Autorska prava © 2000-2007 Fabrice Bellard, et al.
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Autorska prava © 1999-2007 Michael C. Ring.Sva prava pridržana.
+The BeGeistert team\n	AboutView		BeGeistert tim\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Sveučilište u Aucklandu i Christof Lutteroth\n\n
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Autorska prava © 1995-2001 Lars Düning.Sva prava pridržana.
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
+%ld MHz	AboutView		%ld MHz
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Autorska prava © 1991-2000 Silicon Graphics, Inc. Sva prava pridržana.
+…and the many people making donations!\n\n	AboutView		... i mnogi ljudi koji su donirali!\n\n
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Autorska prava © 1990-2002 Info-ZIP.Sva prava pridržana.
+License: 	AboutView		Licenca: 
+Translations:\n	AboutView		Prijevodi:\n

@@ -1,0 +1,17 @@
+1	slovenian	x-vnd.Haiku-mixer.media_addon	3159513799
+Linear interpolation	AudioMixer		Linearna interpolacija
+Virtual output channels	AudioMixer		Navidezni izhodni kanali
+Refuse output format changes	AudioMixer		Zavrni spremembe izhodnega formata
+Resampling algorithm	AudioMixer		Algoritem prevzorčenja
+To output	AudioMixer		Na izhod
+not connected	AudioMixer		ni povezave
+Refuse input format changes	AudioMixer		Zavrni spremembe vhodnega formata
+Drop/repeat samples	AudioMixer		Spuščaj oz. ponavljaj vzorce
+Output channel sources	AudioMixer		Izvori izhodnega kanala
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Nadzor ojačevanja
+Mute	AudioMixer		Nemo
+Master output	AudioMixer		Glavni izhod
+Setup	AudioMixer		Nastavitve
+Gain	AudioMixer		Ojačanje
+Physical input channels	AudioMixer		Fizični vhodni kanali

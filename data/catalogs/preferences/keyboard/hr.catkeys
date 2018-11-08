@@ -1,0 +1,10 @@
+1	croatian	x-vnd.Haiku-Keyboard	2959416995
+Written by Andrew Edward McCall	KeyboardApplication		Napisao Andrew Edward McCall
+Defaults	KeyboardWindow		Zadano
+Revert	KeyboardWindow		Obrnuto
+Keyboard	System name		Tipkovnica
+OK	KeyboardApplication		U redu
+Fast	KeyboardView		Brzo
+Slow	KeyboardView		Sporo
+Long	KeyboardView		Dugo
+Short	KeyboardView		Kratko

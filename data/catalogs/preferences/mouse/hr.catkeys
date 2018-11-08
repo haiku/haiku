@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-Mouse	2029478710
+Mouse type:	SettingsView		Tip miša:
+2-Button	SettingsView		2-tipka
+Mouse acceleration	SettingsView		Ubrzanje miša
+3-Button	SettingsView		3-tipka
+Mouse speed	SettingsView		Brzina miša
+1-Button	SettingsView		1-tipka
+Double-click speed	SettingsView		Brzina dvostrukog klika
+Defaults	MouseWindow		Zadano
+Accept first click	SettingsView		Prihvati prvi klik
+Normal	SettingsView		Normalno
+Mouse	System name		Miš

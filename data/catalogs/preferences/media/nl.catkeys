@@ -1,7 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Media	2605101563
+1	dutch; flemish	x-vnd.Haiku-Media	3383826947
 Couldn't add volume control in Deskbar: %s\n	Media views		De volumebesturing kon niet aan Deskbar worden toegevoegd: %s\n
 Video input:	Media views		Video-invoer:
+Warning!	Media Window		Waarschuwing!
+Quit anyway	Media Window		Toch afsluiten
 Defaults	Media views		Standaardwaarden
+MIDI Settings	Media Window		MIDI-instellingen
 Quit	Media Window		Afsluiten
 Video settings	Media Window		Video-instellingen
 Video output:	Media views		Video-output:

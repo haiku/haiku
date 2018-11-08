@@ -1,0 +1,89 @@
+1	croatian	x-vnd.Haiku-WebPositive	3382113145
+Username:	Authentication Panel		Korisničko ime:
+Copy URL to clipboard	Download Window		Kopiraj URL u međuspremnik
+Cancel	Settings Window		Otkaži
+Close window	WebPositive Window		Zatvori prozor
+Quit	WebPositive		Isključi
+The download could not be opened.	Download Window		Preuzimanje se ne može otvoriti.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Mapa preuzimanja se ne može otvoriti.\n\nGreška: %greška
+Open location	WebPositive Window		Otvori lokaciju
+Clear history	WebPositive Window		Očisti povijest
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Jučer
+Default standard font size:	Settings Window		Zadana standardna veličina fonta:
+Start page:	Settings Window		Početna stranica:
+History	WebPositive Window		Povijest
+Error opening downloads folder	Download Window		Greška pri otvaranju mape preuzimanja
+Paste	WebPositive Window		Zalijepi
+Expiration	Cookie Manager		Istjecanje
+Settings	Settings Window		Postavke
+Serif font:	Settings Window		Serif font:
+Loading %url	WebPositive Window		Učitavam %url
+Download aborted	Download Window		Preuzimaje prekinuto
+Value	Cookie Manager		Vrijednost
+Next	WebPositive Window		Slijedeće
+Find next	WebPositive Window		Nađi slijedeće
+Download folder:	Settings Window		Mapa preuzimanja:
+Edit	WebPositive Window		Uredi
+Cancel	Authentication Panel		Otkaži
+Quit	WebPositive Window		Isključi
+Standard font:	Settings Window		Standardni font:
+Restart	Download Window		Ponovno pokreni
+Proxy server	Settings Window		Proxy poslužitelj
+New window	WebPositive Window		Novi prozor
+WebPositive	Download Window		WebPositive
+Downloads	Download Window		Preuzimanja
+Cut	WebPositive Window		Izreži
+Bookmark this page	WebPositive Window		Zabilježi ovu stranicu
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Došlo je do greške kod prikaza mape zabilješki.\n\nGreška: %greška
+Open downloads folder	Download Window		Otvori mapu preuzimanja
+Proxy password:	Settings Window		Proxy lozinka:
+Downloads	WebPositive Window		Preuzimanja
+Apply	Settings Window		Primjeni
+Bookmark info	WebPositive Window		Informacije o zabilješkama
+Size:	Font Selection view		Veličina:
+Show tabs if only one page is open	Settings Window		Pokaži kartice ako je otvorena samo jedna stranica
+About	WebPositive Window		O programu
+Fonts	Settings Window		Fontovi
+OK	Download Window		U redu
+Open blank page	Settings Window		Otvori praznu stranicu
+New tabs:	Settings Window		Nove kartice:
+Cancel	WebPositive Window		Otkaži
+Open all	WebPositive Window		Otvori sve
+Clear	URL Bar		Očisti
+Cut	URL Bar		Izreži
+Clear	WebPositive Window		Očisti
+Remove	Download Window		Ukloni
+Find	WebPositive Window		Nađi
+Find previous	WebPositive Window		Nađi prethodno
+Settings	WebPositive Window		Postavke
+Name	Cookie Manager		Ime
+Proxy server address:	Settings Window		Adresa proxy poslužitelja:
+Proxy server port:	Settings Window		Port proxy poslužitelja:
+Bookmarks	WebPositive Window		Zabilješke
+Paste	URL Bar		Zalijepi
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Sakrije tekst lozinke
+Open start page	Settings Window		Otvori početnu stranicu
+Continue downloads	WebPositive		Nastavite sa preuzimanjima
+Cancel	Download Window		Otkaži
+Clear	Console Window		Očisti
+Password:	Authentication Panel		Lozinka:
+Path	Cookie Manager		Putanja
+Back	WebPositive Window		Natrag
+Today	WebPositive Window		Danas
+Remember username and password for this site	Authentication Panel		Zapamti korisničko ime i lozinku za ovu stranicu
+Earlier	WebPositive Window		Ranije
+Use proxy server to connect to the internet	Settings Window		Koristi proxy poslužitelj za spajanje na internet
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Još ima preuzimanja u tijeku, želite li zaista sada isključiti WebPositive?
+New tab	WebPositive Window		Nova kartica
+Downloads in progress	WebPositive		Preuzimanje u tijeku
+Style:	Font Selection view		Stil:
+General	Settings Window		Općenito
+Previous	WebPositive Window		Prethodno
+Bookmark error	WebPositive Window		Greška zabilješke
+Do you really want to clear the browsing history?	WebPositive Window		Želite li doista očistiti povijest pregledavanja?
+Copy	WebPositive Window		Kopiraj
+OK	Authentication Panel		U redu
+Copy	URL Bar		Kopiraj
+OK	WebPositive Window		U redu

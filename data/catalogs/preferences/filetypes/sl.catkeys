@@ -1,0 +1,97 @@
+1	slovenian	x-vnd.Haiku-FileTypes	563893652
+Application types…	FileTypes Window		Vrste aplikacij…
+Description:	Application Types Window		Opis:
+Recognition rule is not valid:\n\n	FileTypes Window		Pravilo za prepoznavo ni veljavno:\n\n
+Add group	New File Type Window		Dodaj skupino
+Remove	Application Type Window		Odstrani
+Select same type as	FileType Window		Izberi isto vrsto kot
+Remove icon	Icon View		Odstrani ikono
+Supported types	Application Type Window		Podprte vrste
+Show icons in list	FileTypes Window		Pokaži ikone na seznamu
+Type name:	FileTypes Window		Ime vrste:
+Internal name:	New File Type Window		Interno ime:
+Choose type	Type List Window		Izberite vrsto
+New file type	New File Type Window		Nova vrsta datoteke
+Rule:	FileTypes Window		Pravilo:
+Add icon…	Icon View		Dodaj ikono…
+Multiple files from \"%s\" file type	FileType Window		Več datotek vrste \"%s\"
+File type	FileType Window		Vrsta datoteke
+Beta	Application Types Window		Beta
+Add	Extension Window		Dodaj
+Cancel	Attribute Window		Prekliči
+Icon	Application Type Window		Ikona
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Odstranjene vrste datoteke ni mogoče povrniti.\nAli ste prepričani, da jo želite odstraniti?
+Could not set preferred application	FileTypes Window		Ni bilo mogoče nastaviti prednostne aplikacije
+Group:	New File Type Window		Skupina:
+%1 application type	Application Type Window		%1 vrsta aplikacije
+Done	Extension Window		Končano
+Done	Type List Window		Končano
+Description:	FileTypes Window		Opis:
+File	FileTypes Window		Datoteka
+Name:	Application Types Window		Ime:
+Group name:	New File Type Window		Ime skupine:
+Preferred application	FileType Window		Prednostna aplikacija
+Progress	Application Types Window		Potek
+Set preferred application	Preferred App Menu		Nastavi prednostno aplikacijo
+Don't save	Application Type Window		Ne shrani
+Save changes before closing?	Application Type Window		Shranim spremembe pred zapiranjem?
+File	Application Type Window		Datoteka
+Version:	Application Type Window		Verzija:
+Same as…	FileType Window	The same APPLICATION as ...	Isto kot…
+Abort	Application Types Window		Prekini
+FileTypes	FileTypes		Vrste datotek
+OK	FileTypes		V redu
+Extra attributes	FileTypes Window		Dodatni atributi
+Development	Application Type Window		Razvoj
+Edit…	Application Types Window		Uredi…
+Icon	FileType Window		Ikona
+Final	Application Types Window		Dokončno
+Development	Application Types Window		Razvoj
+Signature:	Application Type Window		Podpis:
+Quit	FileTypes Window		Izhod
+Select preferred application	FileType Window		Izberite prednostno aplikacijo
+%s file type	FileType Window		%s vrsta datoteke
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplikacija \"%s\" ne podpira te vrste datoteke.\nAli ste prepričani, da jo želite vseeno nastaviti?
+Type:	Attribute Window		Vrsta:
+Done	Attribute Window		Končano
+Cancel	Application Type Window		Prekliči
+Cancel	New File Type Window		Prekliči
+Icon	FileTypes Window		Ikona
+Extension:	Extension Window		Pripona:
+Internal name:	FileTypes Window		Interno ime:
+Add	Attribute Window		Dodaj
+Close	Application Type Window		Zapri
+File recognition	FileTypes Window		Prepoznava datoteke
+Cancel	Extension Window		Prekliči
+Path:	Application Types Window		Pot:
+Cancel	Type List Window		Prekliči
+Move up	FileTypes Window		Premakni gor
+Description	FileTypes Window		Opis
+Save request	Application Type Window		Shrani zahtevo
+Beta	Application Type Window		Beta
+Remove	FileTypes Window		Odstrani
+Internal name:	Attribute Window		Interno ime:
+Final	Application Type Window		Dokončno
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Prikaži kot:
+This file type already exists	New File Type Window		Ta vrsta datoteke že obstaja
+Same as…	FileTypes Window		Isto kot…
+FileTypes	System name		Vrste datotek
+Application types	Application Types Window		Vrste aplikacij
+Could not remove file type: %s\n	FileTypes Window		Ni bilo mogoče odstraniti vrste datoteke: %s\n
+Signature:	Application Types Window		Podpis:
+Cancel	Preferred App Menu		Prekliči
+Cancel	FileTypes Window		Prekliči
+Select preferred application	FileTypes Window		Izberite prednostno aplikacijo
+Right	Attribute Window	Attribute column alignment in Tracker	Desno
+Default application	FileType Window		Privzeta aplikacija
+Long description:	Application Type Window		Dolgi opis:
+Version info	Application Type Window		Informacije o verziji
+Version:	Application Types Window		Verzija:
+Preferred application	FileTypes Window		Prednostna aplikacija
+Short description:	Application Type Window		Kratek opis:
+File could not be opened	Preferred App Menu		Datoteke ni bilo mogoče odpreti
+Could not change file extensions	Extension Window		Ni bilo mogoče spremeniti pripone
+Edit icon…	Icon View		Uredi ikono…
+Same as…	FileType Window	The same TYPE as ...	Ista kot…
+Visible	Attribute Window		Vidno
+Could not install file type	New File Type Window		Ni bilo mogoče namestiti vrste datoteke

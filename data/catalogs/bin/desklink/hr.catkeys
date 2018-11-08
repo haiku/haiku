@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-desklink	1476084863
+Control physical output	MediaReplicant		Kontrola fizičkog izlaza
+Couldn't launch 	MediaReplicant		NIsam mogao pokrenuti 
+Muted	MediaReplicant		Utišano
+OK	MediaReplicant		U redu
+Sound preferences…	MediaReplicant		Osobitosti zvuka...
+%g dB	MediaReplicant		%g dB
+Open %name	DeskButton	Don't translate variable %name	Otvori %ime
+No media server running	VolumeControl		NIjedan medijski poslužitelj nije pokrenut
+Media preferences…	MediaReplicant		Osobtosti medija...
+Options	MediaReplicant		Opcije
+Volume	VolumeControl		Jačina zvuka

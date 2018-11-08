@@ -1,0 +1,19 @@
+1	croatian	x-vnd.haiku-registrar	3918106242
+Restart system	ShutdownProcess		Ponovno pokrenite sustav
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Program \"%appName%\" je možda blokiran na modalnom panelu.
+OK	ShutdownProcess		U redu
+System is shut down	ShutdownProcess		Sustav će se isključiti
+It's now safe to turn off the computer.	ShutdownProcess		Sada je sigurno isključiti računalo.
+Cancel	ShutdownProcess		Otkaži
+Do you really want to shut down the system?	ShutdownProcess		 Želite li doista isključiti sustav?
+%action%?	ShutdownProcess		%akcija%?
+Shutdown aborted	ShutdownProcess		Iskjlučivanje prekinuto
+Restarting…	ShutdownProcess		Ponovno pokrećem...
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Program \"%appName%\" je prekinuo proces isključivanja.
+Do you really want to restart the system?	ShutdownProcess		Želite li doista ponovno pokrenuti sustav?
+Shutdown status	ShutdownProcess		Stanje isključivanja
+Cancel shutdown	ShutdownProcess		Otkaži isključivanje
+Kill application	ShutdownProcess		Uništi program
+Shut down	ShutdownProcess		Isključi
+Restart	ShutdownProcess		Ponovno pokreni
+Shutting down…	ShutdownProcess		Isključivanje...

@@ -1,0 +1,6 @@
+1	slovenian	x-vnd.Haiku-FirstBootPrompt	3657467003
+Custom	BootPromptWindow		Po meri
+Boot to Desktop	BootPromptWindow		Zaženi namizje
+Language	BootPromptWindow		Jezik
+Run Installer	BootPromptWindow		Namesti
+Keymap	BootPromptWindow		Razpored tipkovnice

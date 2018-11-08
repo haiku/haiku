@@ -99,7 +99,7 @@ Open	ContainerWindow		Apri
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Errore durante il calcolo della dimenzione della cartella.
 New folder	FilePanelPriv		Nuova cartella
-%name info	InfoWindow	InfoWindow Title	%name informazioni
+%name info	InfoWindow	InfoWindow Title	Informazioni su %name
 Favorites	FavoritesMenu		Preferiti
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" non è un eseguibile supportato.
 Sorry, you can't copy items to the Trash.	PoseView		Non è possibile copiare elementi nel Cestino.

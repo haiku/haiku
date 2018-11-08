@@ -1,0 +1,17 @@
+1	slovenian	x-vnd.Haiku-DiskUsage	206011136
+Scanning %refName%	Scanner		Pregledujem %refName%
+Size	Info Window		Velikost
+Rescan	Pie View		Ponovno preglej
+Kind	Info Window		Vrsta
+file unavailable	Pie View		datoteka ni na voljo
+Path	Info Window		Pot
+Scan	Status View		Preglej
+Rescan	Status View		Ponovno preglej
+file unavailable	Status View		datoteka ni na voljo
+Get info	Pie View		Informacije
+DiskUsage	System name		Poraba diskov
+Created	Info Window		Ustvarjeno
+Modified	Info Window		Spremenjeno
+Abort	Status View		Prekini
+Open	Pie View		Odpri
+Free on %refName%	Scanner		Prosto na %refName%

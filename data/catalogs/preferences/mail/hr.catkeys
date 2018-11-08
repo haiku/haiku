@@ -1,0 +1,49 @@
+1	croatian	x-vnd.Haiku-Mail	194787538
+Settings	Config Window		Postavke
+Never	Config Window	show status window	Nikada
+While sending and receiving	Config Window		Za vrijeme slanja i primanja
+Incoming	Config Window		Dolazno
+Server name:	E-Mail		Ime poslužitelja:
+OK	Config Window		U redu
+E-mail address:	E-Mail		Adresa elektroničke pošte:
+Account name:	E-Mail		Ime računa:
+Account name:	Config Views		Ime računa:
+Create new account	AutoConfigWindow		Napravite novi račun
+OK	Config Views		U redu
+The filter could not be moved. Deleting filter.	Config Views		Filter se ne može maknuti. Brišem filter.
+Revert	Config Window		Obrnuto
+Login name:	E-Mail		Ime prijave:
+Incoming	E-Mail		Dolazno
+Password:	E-Mail		Lozinka:
+Accounts	Config Window		Računi
+Finish	AutoConfigWindow		Kraj
+Remove	Config Window		Ukloni
+Error!	Config Views		Greška!
+Server Name:	E-Mail		Ime poslužitelja:
+While sending	Config Window		Prilikom slanja
+Enter a valid e-mail address.	AutoConfigWindow		Unesite valjanu adresu elektroničke pošte.
+Add	Config Window		Dodaj
+Account settings	AutoConfigWindow		Postavke računa
+E-mail	System name		Elektronička pošta
+Real name:	Config Views		Pravo ime:
+\t\t· Outgoing	Config Window		\t\t· Odlazno
+Choose Protocol	E-Mail		Odaberite protokol
+Return address:	Config Views		Povratna adresa:
+Edit mailbox menu…	Config Window		Uredi izbornik poštanskog sandučića...
+Outgoing	E-Mail		Odlazno
+\t\t· E-mail filters	Config Window		\t\t· Filteri ekektroničke pošte
+Remove	Config Views		Ukloni
+\t\t· Incoming	Config Window		\t\t· Dolazno
+Next	AutoConfigWindow		Slijedeće
+Check every	Config Window		Provjeri svakih
+Back	AutoConfigWindow		Natrag
+Incoming mail filters	Config Views		Filteri dolazne pošte
+Account settings	Config Views		Postavke računa
+minutes	Config Window		minute
+Real name:	E-Mail		Pravo ime:
+Apply	Config Window		Primjeni
+OK	AutoConfigWindow		U redu
+Add filter	Config Views		Dodaj filter
+Outgoing	Config Window		Odlazno
+Outgoing mail filters	Config Views		Filteri odlazne pošte
+Error	Config Window		Greška

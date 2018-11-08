@@ -1,0 +1,12 @@
+1	croatian	x-vnd.Haiku-mixer.media_addon	526355835
+Virtual output channels	AudioMixer		Virtualni izlazni kanali
+Refuse output format changes	AudioMixer		Odbij promjene izlaznog formata
+not connected	AudioMixer		nije spojeno
+Refuse input format changes	AudioMixer		Odbij promjene ulaznog formata
+Output channel sources	AudioMixer		Izvori izlaznog kanala
+dB	AudioMixer		dB
+Mute	AudioMixer		Utišaj
+Input channel destinations	AudioMixer		Odredišta ulaznog kanala
+Master output	AudioMixer		Glavni izlaz
+Setup	AudioMixer		Postavi
+Physical input channels	AudioMixer		Fizički ulazni kanali

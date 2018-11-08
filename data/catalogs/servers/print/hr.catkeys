@@ -1,0 +1,51 @@
+1	croatian	x-vnd.Be-PSRV	3747595904
+Undefined	ConfigWindow		Nedefinirano
+Return the number of available transports	PrintServerApp Scripting		Vrati broj dostupnih transporta
+Return the number of available printers	PrintServerApp Scripting		Vrati broj dostupnih pisača
+Get currently available ports/devices	Transport Scripting		Uzmi trenutno dostupne portove/uređaje
+Retrieve or select the active printer	PrintServerApp Scripting		Odaberi aktivni pisač
+Cancel	PrintServerApp		Poništi
+Retrieve a specific printer	PrintServerApp Scripting		Preuzmi određeni pisač
+Page %1 to %2	ConfigWindow		Stranica %1 do %2
+Get name of the printer add-on used for this printer	Printer Scripting		Uzmi ime dodatka koji se koristi za ovaj pisač
+OK	ConfigWindow		U redu
+Cancel	ConfigWindow		Poništi
+Printer server	ConfigWindow		Poslužitelj pisača
+Page %1 to %2, %3 copies	ConfigWindow		Stranica %1 do %2, %3 kopije
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Pisač sa tim imenom već postoji,alii ne mogu naći upravljačke programe!Zamijeniti?
+Yes	PrintServerApp		Da
+Would you like to set one up now?	PrintServerApp		Da li želite postaviti jednu sad?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Portret
+All pages	ConfigWindow		Sve stranice
+There is no default printer set up.	PrintServerApp		Nema postavljenog zadanog pisača.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Pismo
+Printer:	ConfigWindow		Pisač:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Odaber pisač
+Show configuration window	PrintServerApp Scripting		Prikaži konfiguracijski prozor
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Uzmi komentare o ovom pisaču
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Pisač sa ovim imenom već postoji, ali se ne može koristiti! Zamijeniti?
+No	PrintServerApp		Ne
+Get the transport configuration for this printer	Printer Scripting		Uzmi transportne konfiguracije za ovaj poslužitelj
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Nema postavljenih pisača.
+Get name of the transport add-on used for this printer	Printer Scripting		Uzmi ime transportnog dodatzka koji se koristi za ovaj pisač
+All pages, %1 copies	ConfigWindow		Sve stranice, %1 kopija
+Delete a specific printer	PrintServerApp Scripting		Obriši određeni pisač
+Create a new printer	PrintServerApp Scripting		Napravi novi pisač
+OK	PrintServerApp		U redu
+Print setup	ConfigWindow		Postavke ispisa
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Uzmi specifični transport
+Get name of printer	Printer Scripting		Uzmi ime pisača
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Uzmi ime transporta
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Da li želite napraviti @ zadanim pisačem?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Postavka stranice
+Paper setup:	ConfigWindow		Postavka papira:

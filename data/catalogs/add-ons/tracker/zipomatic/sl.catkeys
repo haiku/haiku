@@ -1,0 +1,13 @@
+1	slovenian	x-vnd.haiku.zip-o-matic	2878582660
+Stop	file:ZipOMaticWindow.cpp		Ustavi
+Creating archive: %s	file:ZipOMaticWindow.cpp		Ustvarjam arhiv: %s
+Continue	file:ZipOMaticWindow.cpp		Nadaljuj
+Preparing to archive	file:ZipperThread.cpp		Priprava na arhiviranje
+Drop files here.	file:ZipOMaticWindow.cpp		Povlecite datoteke sem.
+Filename: %s	file:ZipOMaticWindow.cpp		Ime datoteke: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Jih želite ustaviti?
+Stopped	file:ZipOMaticWindow.cpp		Ustavljeno
+Archive	file:ZipperThread.cpp		Arhiv
+Error creating archive	file:ZipOMaticWindow.cpp		Napaka pri ustvarjanju arhiva
+Archive created OK	file:ZipOMaticWindow.cpp		Arhiv uspešno ustvarjen
+Stop them	file:ZipOMatic.cpp		Ustavi jih

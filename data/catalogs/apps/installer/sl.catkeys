@@ -1,0 +1,43 @@
+1	slovenian	x-vnd.Haiku-Installer	1951792307
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ali ste prepričani, da želite prekiniti namestitev in ponovno zagnati sistem?
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Namestitev končana. Zagonski sektor je bil zapisan na '%s'. Izberite Izhod, da zapustite namestitveni program ali pa izberite nov ciljni nosilec, da opravite še eno namestitev.
+Quit	InstallerApp		Izhod
+Additional disk space required: 0.0 KiB	InstallerWindow		Potreben dodatni prostor na disku: 0 KiB
+Stop	InstallerWindow	In alert after pressing Stop	Ustavi
+Install progress:  	InstallerWindow		Potek namestitve:
+Starting Installation.	InstallProgress		Namestitev se začenja.
+Are you sure you want to abort the installation?	InstallerWindow		Ali ste prepričani, da želite prekiniti namestitev?
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ali ste prepričani, da želite nameščati na trenutni zagonski disk? Če nadaljujete, bo moral namestitveni program ponovno zagnati vaš računalnik.
+Stop	InstallerWindow		Ustavi
+OK	InstallerApp		V redu
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld od %2ld
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		POMEMBNE INFORMACIJE PRED NAMESTITVIJO\n\n
+Continue	InstallerWindow	In alert after pressing Stop	Nadaljuj
+Write boot sector to '%s'	InstallerWindow		Zapiši zagonski sektor na %s
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Izberite izvorni disk z menija, nato kliknite \"Začni\".
+Quit	InstallerWindow		Izhod
+Abort	InstallerWindow		Prekini
+Finishing Installation.	InstallProgress		Zaključujem namestitev.
+Restart	InstallerWindow		Ponovno zaženi računalnik
+Scanning for disks…	InstallerWindow		Pregledujem diske…
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Iz menija izberite disk, na katerega želite nameščati, nato kliknite \"Začni\".
+Unknown Type	InstallProgress	Partition content type	Neznana vrsta
+<none>	InstallerWindow	No partition available	<noben>
+Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Namestitev končana. Zagonski sektor je bil zapisan na %s. Ponovno zaženite računalnik ali pa izberite nov ciljni disk za še eno namestitev.
+Installation canceled.	InstallProgress		Namestitev prekinjena.
+Hide optional packages	InstallerWindow		Skrij neobvezne pakete
+Restart system	InstallerWindow		Ponovno zaženi računalnik
+OK	InstallerWindow		V redu
+Set up partitions…	InstallerWindow		Postavi particije...
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Particije ni mogoče priklopiti. Prosim, izberite drugo particijo.
+Install anyway	InstallProgress		Vseeno namesti
+OK	InstallProgress		V redu
+Begin	InstallerWindow		Začni
+Write boot sector	InstallerWindow		Zapiši zagonski sektor
+Cancel	InstallerWindow		Prekliči
+Continue	InstallerApp		Nadaljuj
+Cancel	InstallProgress		Prekliči
+Try installing anyway	InstallProgress		Vseeno poskusi z nameščanjem
+Are you sure you want to to stop the installation?	InstallerWindow		Ali ste prepričani, da želite ustaviti namestitev?
+Onto:	InstallerWindow		Na:
+Tools	InstallerWindow		Orodja

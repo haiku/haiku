@@ -1,0 +1,28 @@
+1	slovenian	x-vnd.Haiku-libbe	2896436356
+gamma	AboutWindow		gama
+beta	AboutWindow		beta
+%3.2f GiB	StringForSize		%3.2f GiB
+About %app%	AboutMenuItem		O %app%
+Cut	TextView		Izreži
+Version	AboutWindow		Verzija
+Copy	TextView		Kopiraj
+%3.2f KiB	StringForSize		%3.2f KiB
+alpha	AboutWindow		alfa
+Error	PrintJob		Napaka
+All Rights Reserved.	AboutWindow		Vse pravice pridržane.
+About %app%	AboutWindow		O %app%
+OK	Dragger		V redu
+OK	PrintJob		V redu
+OK	AboutWindow		V redu
+OK	ZombieReplicantView		V redu
+Special Thanks:	AboutWindow		Posebna zahvala:
+%.2f TiB	StringForSize		%.2f TiB
+Redo	TextView		Ponovno uveljavi
+<empty>	Menu		(prazno)
+Warning	Dragger		Opozorilo
+Undo	TextView		Razveljavi
+Red:	ColorControl		Rdeča:
+%3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		O %app…
+Error	ZombieReplicantView		Napaka
+Blue:	ColorControl		Modra:

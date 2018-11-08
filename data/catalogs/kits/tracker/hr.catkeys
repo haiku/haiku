@@ -1,0 +1,360 @@
+1	croatian	x-vnd.Haiku-libtracker	647936343
+OK	WidgetAttributeText		U redu
+Add-ons	FilePanelPriv		Dodaci
+Mount settings…	ContainerWindow		Postavke za montiranje...
+Desktop	Model		Radna površina
+Identify	ContainerWindow		Identificiraj
+Warning space color	SettingsView		Boja upozoravajućeg prostora
+Open	OpenWithWindow		Otvori
+Tracker status	StatusWindow		Status Tracker-a
+Eject when unmounting	AutoMounterSettings		Izbaci nakon odmontiranja
+Window	ContainerWindow		Prozor
+Decrease size	ContainerWindow		Smanji veličinu
+You must have at least one attribute showing.	PoseView		Morate imati barem jedan prikazani atribut.
+Permissions	InfoWindow		Dozvole
+128 x 128	DeskWindow		128 x 128
+128 x 128	ContainerWindow		128 x 128
+Recent documents	FavoritesMenu		Nedavni dokumenti
+Modified	QueryPoseView		Izmjenjeno
+Created	ContainerWindow		Napravljeno
+Move	FSUtils	button label	Premjesti
+Error %error loading add-On %name.	ContainerWindow		Greška %greška pri učitavanju dodatka %imena.
+contains	SelectionWindow		sadrži
+Paste links	ContainerWindow		Zalijepi poveznice
+Name	OpenWithWindow		Ime
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Ne mogu otvoriti \"%document\" jer je program \"%app\" u smeću. 
+File	ContainerWindow		Datoteka
+Name	Person Query Columns		Ime
+Delete	ContainerWindow		Izbriši
+32 x 32	ContainerWindow		32 x 32
+Open with…	ContainerWindow		Otvori pomoću...
+Write	FilePermissionsView		Pisanje
+Modified	PoseView		Izmjenjeno
+Create link here	ContainerWindow		Napravi poveznicu ovdje
+Moving: 	StatusWindow		Premještam... 
+before	FindPanel		prije
+Error emptying Trash	FSUtils		Greška pri pražnjenju Smeća
+On	FindPanel		Uključeno
+MiB	WidgetAttributeText		MiB
+greater than	FindPanel		veće od
+Delete	PoseView		Izbriši
+Select all	ContainerWindow		Odaberi sve
+Clean up	DeskWindow		Očisti
+You cannot copy or move the root directory.	FSUtils		Ne možete kopirati ili premještati korjenski direktorij.
+Invert selection	FilePanelPriv		Obrnuti odabir
+save text	FilePanelPriv		spremi tekst
+Select all	FilePanelPriv		Odaberi sve
+Link to:	InfoWindow		Poveznica prema:
+Location	ContainerWindow		Lokacija
+Location	QueryPoseView		Lokacija
+config	B_USER_CONFIG_DIRECTORY		konfiguracija
+apps	B_APPS_DIRECTORY		programi
+Icon view	ContainerWindow		Pregled ikona
+Size	QueryPoseView		Veličina
+Emptying Trash… 	StatusWindow		Praznim smeće... 
+Close all in workspace	ContainerWindow		Zatvori sve radne prostore
+Empty Trash	ContainerWindow		Isprazni smeće
+Name = %name	FindPanel	FindResultTitle	Ime = %ime
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Jeste li sigurni da želite premjestiti ili kopirati odabranu stavku(e) u ovu mapu?
+Does not handle file	OpenWithWindow		Ne rukuje datotekom
+Arrange by	ContainerWindow		Posloži po
+Mount server error	AutoMounterSettings		Greška montiranja poslužitelja
+Search	FindPanel		Traži
+Preparing to empty Trash…	StatusWindow		Priprema za pražnjenje smeća...
+Disks	Model		Diskovi
+Create link	ContainerWindow		Napravi poveznicu
+Decrease size	DeskWindow		Smanji veličinu
+Size	ContainerWindow		Veličina
+All disks	AutoMounterSettings		Svi diskovi
+Would you like to find some other suitable application?	FSUtils		Želite li naći neki drugi prikladni program?
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nemože se otvoriti \"%document\" sa programom \"%app\"(nedostaju biblioteke: %library). \n
+no items	CountView		nema stavki
+Ignore case	SelectionWindow		Ignoriraj slučaj
+is not	FindPanel		nije
+OK	AutoMounterSettings		U redu
+Windows	TrackerSettingsWindow		Prozori
+Tracker preferences	TrackerSettingsWindow		Osobitosti Tracker-a
+Cut	FilePanelPriv		Izreži
+Replace	FilePanelPriv		Zamijeni
+Opens with:	InfoWindow		Otvori pomoću:
+Open	ContainerWindow		Otvori
+96 x 96	DeskWindow		96 x 96
+Error calculating folder size.	InfoWindow		Greška pri izračunavanju veličine mape.
+New folder	FilePanelPriv		Nova mapa
+Favorites	FavoritesMenu		Favoriti
+Sorry, you can't copy items to the Trash.	PoseView		Oprostite,ne možete kopirati stavke u smeće.
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Ne možete zamjeniti mapu ili simboličku poveznicu sa datotekom.
+Invert selection	ContainerWindow		Obrnuti odabir
+Increase size	DeskWindow		Povećaj veličinu
+Resize to fit	ContainerWindow		Promijeni veličinu da se uklapa
+Add printer…	ContainerWindow		Dodaj pisač...
+New folder	ContainerWindow		Nova mapa
+Kind	ContainerWindow		Vrsta
+home	B_USER_DIRECTORY		osobna mapa
+Select…	ContainerWindow		Odaberi...
+Copy to	ContainerWindow		Kopiraj u
+Move to Trash	ContainerWindow		Premjesti u smeće
+Modified	Default Query Columns		Izmjenjeno
+Move to	ContainerWindow		Premjesti u
+Create %s clipping	PoseView		Napravi %s isječak
+preferences	B_PREFERENCES_DIRECTORY		osobitosti
+Cancel	FSUtils		Odustani
+Edit name	ContainerWindow		Uredi ime
+KiB	WidgetAttributeText		KiB
+Error %error loading Add-On %name.	ContainerWindow		Greška %greška pri učitavanju dodatka %imena.
+Defaults	TrackerSettingsWindow		Zadano
+Mini icon view	ContainerWindow		Prikaz mini ikona
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Ne mogu otvoriti \"%name\".Datoteka je pogrešno označena kao izvršna. 
+Add-ons	ContainerWindow		Dodaci
+Edit templates…	TemplatesMenu		Uredi predloške...
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Stavka imenonana kao \"%ime\" već postoji u ovoj mapi.Želite li je zamjeniti simboličkom poveznicom koju stvarate?
+Searching for disks to mount…	StatusWindow		Traženje diskova za montiranje...
+New folder	FSUtils		Nova mapa
+Free space color	SettingsView		Boja slobodnog prostora
+Cut	ContainerWindow		Izreži
+Remove	FindPanel		Ukloni
+Resize to fit	QueryContainerWindow		Promjeni veličinu da se uklopi
+Desktop	TrackerSettingsWindow		Radna površina
+Sorry, you can't copy items to the Trash.	FSClipBoard		Oprostite,ne možete kopirati stavke u smeće.
+by attribute	FindPanel		po osobinama
+Disk mounting during boot	AutoMounterSettings		Montiranje diska pri podizanju sustava
+New Query	FindPanel		Novi upit
+Preparing to move items…	StatusWindow		Priprema za premještanje stavki...
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Ne možete zamjeniti datoteku mapom ili simboličkom poveznicom.
+Unmount	InfoWindow		Odmontirati
+no supporting apps	OpenWithWindow		nema podržanih programa
+That name is already taken. Please type another one.	InfoWindow		Ime je zauzeto.Molim vas upišite drugo ime.
+Sorry, you can't create links in the Trash.	PoseView		Oprostite,ne možete praviti poveznice u smeću.
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Poveznica \"%name\" do:
+All disks	FindPanel		Svi diskovi
+Revert	TrackerSettingsWindow		Obrni
+Invert selection	QueryContainerWindow		Obrnuti odabir
+Execute	FilePermissionsView		Izvrši
+Size	FindPanel		Veličina
+Location:	InfoWindow		Lokacija:
+Edit favorites…	FilePanelPriv		Uredi favorite....
+Create relative link	ContainerWindow		Kreiraj relativne poveznice
+Copy	ContainerWindow		Kopiraj
+Size	PoseView		Veličina
+Location	OpenWithWindow		Lokacija
+Force identify	ContainerWindow		Forsiraj identificiranje
+Duplicate	ContainerWindow		Udvostruči
+New folder%ld	FSUtils		Nova mapa%ld
+Select all	DeskWindow		Odaberi sve
+OK	InfoWindow		U redu
+Replace	FSUtils		Zamjeni
+Mini icon view	DeskWindow		Pregled sa malim ikonama
+Mount all	MountMenu		Montiraj sve
+calculating…	InfoWindow		izračunavanje...
+Mount all disks now	AutoMounterSettings		Montiraj sve diskove
+Untitled bitmap	PoseView		Neimenovana bitmapa
+of %items	StatusWindow		od %stavki
+Description:	InfoWindow		Opis:
+New	DeskWindow		Novi
+Open	InfoWindow		Otvori
+64 x 64	ContainerWindow		64 x 64
+Replace all	FSUtils		Zamjeni sve
+Preparing to restore items…	StatusWindow		Pripremanje da se vrate stavke..
+Replace other file	WidgetAttributeText		Zamjeni drugu datoteku
+48 x 48	ContainerWindow		48 x 48
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Označena stavka nemože biti pomaknuta u smeće. Želite izbrisati(ovu operaciju nemožete vratiti)
+Invert	SelectionWindow		Obrnuto
+Find	FindPanel		Nađi
+Get info	ContainerWindow		Uzmi infomacije
+Error creating link to \"%name\".	FSUtils		Greška pri stvaranju poveznice ka \"%ime\".
+Select	SelectionWindow		Odaberi
+Or	FindPanel		Ili
+The Tracker must be running to see set the default printer.	PoseView		Tracker mora biti pokrenut da bi vidjeli zadani pisač
+by formula	FindPanel		po formuli
+40 x 40	DeskWindow		40 x 40
+Name	PoseView		Ime
+Group	FilePermissionsView		Grupa
+Version:	InfoWindow		Verzija:
+Created:	InfoWindow		Napravljeno:
+Copying: 	StatusWindow		Kopiram: 
+Capacity:	InfoWindow		Kapacitet:
+Delete	FilePanelPriv		Obriši
+Save	FindPanel		Spremi
+copy	FSUtils	filename copy	kopiraj
+Temporary	FindPanel		Privremeno
+Version	OpenWithWindow		Verzija
+Default application	InfoWindow		Zadani program
+Preparing to copy items…	StatusWindow		Priprema za kopiranje stavki...
+Show folder location in title tab	SettingsView		Prikaži lokaciju mape u kartici nalova
+Proceed	FSUtils		Nastavi
+Error deleting items	FSUtils		Greška pri brisanju stavki
+Create relative link here	ContainerWindow		Stvori relativnu poveznicu ovdje
+trash	B_TRASH_DIRECTORY		smeće
+matches regular expression	SelectionWindow		podudara se sa normalnim izrazom
+Edit name	InfoWindow		Uredi ime
+Could not open \"%name\" (%error). 	FSUtils		Nije moguće otvoriti \"%name\" (%greška). 
+Paste	ContainerWindow		Zalijepi
+Modified:	InfoWindow		Izmjenjeno:
+Error moving \"%name\".	FSUtils		Greška pri pomicanju \"%name\"
+TiB	WidgetAttributeText		TiB
+40 x 40	ContainerWindow		40 x 40
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Datoteka \"%ime\" već postoji u određenoj mapi.  Želite li je zamjeniti?
+Cancel	ContainerWindow		Odustani
+Unmount	ContainerWindow		Odmontiraj
+Copy layout	ContainerWindow		Kopiraj raspored
+label too long	PoseView		naljepnica je preduga
+Finish: %time	StatusWindow		Završi: %time
+Cancel	Tracker		Odustani
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Žao nam je, ne možete ureditii taj atribut.
+Name	ContainerWindow		Ime
+Reverse order	ContainerWindow		Preokreni red
+48 x 48	DeskWindow		48 x 48
+OK	OpenWithWindow		U redu
+Add current folder	FilePanelPriv		Dodaj trenutnu mapu
+Name	Default Query Columns		Ime
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nemože se otvoriti \"%document\" sa programom \"%app\" (Nedostaje simbol: %symbol). \n
+The target disk does not support creating links.	FSUtils		Željeni disk ne podržava kreiranje poveznica.
+starts with	SelectionWindow		počinje sa
+Preparing to delete items…	StatusWindow		Pripremanje  za brisanje stavki...
+Would you like to find a suitable application to open the file?	FSUtils		Želite li naći prikladni program za otvaranje datoteke?
+There was an error writing the attribute.	WidgetAttributeText		Dogodila se greška pri pisanju atributa.
+Recalculate folder size	InfoWindow		Ponovno izračunaj veličinu mape
+Unknown	WidgetAttributeText		Nepoznato
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nije moguće otvoriti \"%document\" (Nedostaje simbol: %symbol). \n
+by name	FindPanel		po imenu
+Creating links: 	StatusWindow		Stvaranje poveznica: 
+Paused: click to resume or stop	StatusWindow		Pauzirano: klikni za nastavljanje ili zaustavljanje
+Preferred for %type	OpenWithWindow		Proželjno za %vrstu
+GiB	WidgetAttributeText		GiB
+There was an error deleting \"%name\":\n\t%error	FSUtils		Dogodila se greška pri brisanju \"%name\":\n\t%error
+Paste	FilePanelPriv		Zalijepi
+Copy more	ContainerWindow		Kopiraj više
+OK	PoseView		U redu
+Read	FilePermissionsView		Čitaj
+Clean up all	ContainerWindow		Očisti sve
+New folder	TemplatesMenu		Nova mapa
+Move here	ContainerWindow		Premjesti ovdje
+File	FilePanelPriv		Datoteka
+Real name	ContainerWindow		Pravo ime
+Error moving \"%name\"	FSUtils		Greška pri premještanju \"%name\"
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Moraš spustiti stavke na jednu od ikona diska u \"Disks\" prozoru.
+Cancel	WidgetAttributeText		Odustani
+Could not find an application to open \"%name\" (%error). 	FSUtils		Nije moguće naći program za otvaranje \"%name\" (%error) 
+Previously mounted disks	AutoMounterSettings		Prethodno montirani diskovi
+%Ld B	WidgetAttributeText		%Ld B
+copying	FSUtils		kopiranje
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Greška pri kopiranju mape \"%name\":\n\t%error\n\nŽelite li nastaviti?
+Show Disks icon	SettingsView		Prikaži Disks ikonu
+Cancel	PoseView		Odustani
+Unknown	FilePermissionsView		Nepoznato
+All files and folders	FindPanel		Sve datoteke i mape
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Ne može se otvoriti \"%document\" (nedostaju biblioteke: %library). \n
+The Tracker must be running to see Info windows.	PoseView		Tracker mora biti pokrenut da bi vidio Info prozore.
+Other	FilePermissionsView		Drugo
+Permissions	ContainerWindow		Dozvole
+96 x 96	ContainerWindow		96 x 96
+moving	FSUtils		premještanja
+Identify	InfoWindow		Identificiraj
+Recent folders	ContainerWindow		Nedavno korištene mape
+Close all	ContainerWindow		Zatvori sve
+Include trash	FindPanel		Uključi smeće
+Open %name with:	OpenWithWindow		Otvori %name sa:
+Empty folder	NavMenu		Isprazni mapu
+Copy here	ContainerWindow		Kopiraj ovdje
+Move to Trash	FilePanelPriv		Premjesti u smeće
+Current folder	ContainerWindow		Trenutna mapa
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Specificirano ime je već zauzeto kao ime mape. Molim izaberite drugo ime.
+Clean up	ContainerWindow		Očisti
+after	FindPanel		poslije
+Select…	QueryContainerWindow		Odaberi...
+link	FSUtils	filename link	poveznica
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ne možete premjestiti mapu u nju samu ili njenu vlastitu podmapu.
+Get info	FilePanelPriv		Uzmi infomacije
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		Odustani
+Disks	DirMenu		Diskovi
+New folder %ld	FSUtils		Nova mapa %ld
+Used space color	SettingsView		Boja korišrenog prostora
+Sorry, could not create a new folder.	FSUtils		Žao nam je, nemožete napraviti novu mapu.
+multiple disks	FindPanel		više diskova
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Moraš spustiti  stavke na jednoj od ikona diskova u \"Diskovi\" prozoru.
+Untitled clipping	PoseView		Neimenovani isječak
+Don't automount	AutoMounterSettings		Nemoj automatski montirati
+Save	FilePanelPriv		Spremi
+To: %dir	StatusWindow		U: %dir
+Window	FilePanelPriv		Prozor
+Edit name	FilePanelPriv		Uredi ime
+Size:	InfoWindow		Veličina:
+Empty folder	SlowContextPopup		Prazna mapa
+Open selection with:	OpenWithWindow		Otvori odabir pomoću:
+Preparing to create links…	StatusWindow		Priprema za stvaranje  poveznica...
+Size	Default Query Columns		Veličina
+Show navigator	SettingsView		Prikaži navigator
+Desktop	B_DESKTOP_DIRECTORY		Radna površina
+List folders first	SettingsView		Najprije izlistaj mape
+Name	SelectionWindow		Ime
+Trash	Model		Smeće
+Favorites	FilePanelPriv		Favoriti
+Name	QueryPoseView		Ime
+OK	Email Query Columns		U redu
+Delete	FSUtils		Izbriši
+Modified	FindPanel		Izmjenjeno
+Error moving \"%name\" to Trash. (%error)	FSUtils		Greška pri pomicanju\"%name\" u Smeće. (%error)
+You can't replace a folder with one of its sub-folders.	FSUtils		Ne možte zamijeniti mapu sa njenim podmapama.
+<No recent items>	FavoritesMenu		<nema skorih stavki>
+Preferences…	ContainerWindow		Osobitosti...
+Move	PoseView		Premjesti
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Da li ste sigurni da želite izbrisati označene stavke? Ova operacija se neće moći vratiti.
+Add-ons	DeskWindow		Dodaci
+Name	FindPanel		Ime
+And	FindPanel		I
+Select…	DeskWindow		Odaberi...
+Copy	FilePanelPriv		Kopiraj
+Icon view	DeskWindow		Ikonski pregled
+Select all	QueryContainerWindow		Odaberi sve
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Bio je problem pri premještanju \"%name\". Stavka je možda otvorena il zauzeta.
+Owner	FilePermissionsView		Vlasnik
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Došlo je do problema pri pokušaju spremanja u mapu koju ste odredili.Molim pokušajte drugu mapu.
+Restore	ContainerWindow		Vratiti
+Restoring: 	StatusWindow		Vraćanje: 
+system	B_SYSTEM_DIRECTORY		sustav
+Skip	FSUtils		Preskoči
+Settings…	MountMenu		Postavke...
+Recent folders	FavoritesMenu		Nedavno korištene mape
+Close	ContainerWindow		Zatvori
+Preferred for file	OpenWithWindow		Poželjno za datoteku
+Cancel	OpenWithWindow		Odustani
+That name is too long. Please type another one.	InfoWindow		Ime je predugačko. Upišite drugo.
+OK	FSUtils		U redu
+Paste layout	ContainerWindow		Zalijepi raspored
+Select	InfoWindow		Odaberi
+Could not update permissions of file \"%name\". %error	FSUtils		Nije moguće dopuniti dozvole datoteke \"%name\". %error
+Select…	FilePanelPriv		Odaberi...
+You can't move or copy the trash.	FSUtils		Ne možeš pomicati ili kopirati smeće.
+ends with	SelectionWindow		završava sa
+Volume icons	TrackerSettingsWindow		Ikone diskova
+That name is already taken. Please type another one.	WidgetAttributeText		Ime je već zauzeto. Molim upišite drugo.
+Close	QueryContainerWindow		Zatvori
+Formula %formula	FindPanel	FindResultTitle	Formula %formula
+Kind:	InfoWindow		Vrsta:
+starts with	FindPanel		počinje sa
+Increase size	ContainerWindow		Povećaj veličinu
+is	FindPanel		je
+Attributes	ContainerWindow		Atributi
+ends with	FindPanel		završava sa
+New	ContainerWindow		Novo
+less than	FindPanel		manje od
+64 x 64	DeskWindow		64 x 64
+Modified	ContainerWindow		Izmjenjeno
+Find…	ContainerWindow		Nađi...
+Move to Trash	FSUtils		Premjesti u smeće
+Automatic disk mounting	AutoMounterSettings		Automatsko montiranje diska
+Original name	ContainerWindow		Izvorno ime
+Find	FSUtils		Nađi
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Greška pri kopiranju datoteke\"%name\":\n\t%error\n\nŽelite li nastaviti?
+Single window navigation	SettingsView		Navigacija s jednim prozorom
+contains	FindPanel		sadrži
+Relation	OpenWithWindow		Relacija
+Open	FilePanelPriv		Otvori
+Mount	DeskWindow		Montiraj
+Mount	ContainerWindow		Montiraj
+Cancel	FSClipBoard		Odustani
+Cut more	ContainerWindow		Isjeci još
+Deleting: 	StatusWindow		Brisanje: 
+Empty Trash	InfoWindow		Isprazni smeće
+Add	FindPanel		Dodaj

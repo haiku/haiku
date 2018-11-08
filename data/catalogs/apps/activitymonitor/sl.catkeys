@@ -1,0 +1,31 @@
+1	slovenian	x-vnd.Haiku-ActivityMonitor	1207951351
+Threads	DataSource		Niti
+Always on top	ActivityWindow		Vedno na vrhu
+Add graph	ActivityWindow		Dodaj graf
+Teams	DataSource		Skupine
+MiB	DataSource		MiB
+CPU	DataSource		CPE
+Used memory	DataSource		Spomin v rabi
+Cached memory	DataSource		Predpomnjen spomin
+Apps	DataSource		Aplikacije
+Show legend	ActivityView		Pokaži legendo
+Settings	ActivityWindow		Nastavitve
+Receiving	DataSource		Prejemanje
+Settings…	ActivityWindow		Nastavitve
+Ports	DataSource		Vrata
+Sending	DataSource		Pošiljanje
+Cache	DataSource		Predpomnilnik
+Update time interval:	SettingsWindow		Interval osveževanja:
+Quit	ActivityWindow		Izhod
+Remove graph	ActivityView		Odstrani graf
+%lld sec.	SettingsWindow		%lld s
+%lld ms	SettingsWindow		%lld ms
+CPU usage	DataSource		Poraba CPE
+Running applications	DataSource		Tekoče aplikacije
+Semaphores	DataSource		Semaforji
+Swap space	DataSource		Izmenjevalni prostor
+File	ActivityWindow		Datoteka
+usage	DataSource		poraba
+Additional items	ActivityView		Dodatno
+Network receive	DataSource		Prejeto po omrežju
+Memory	DataSource		Spomin

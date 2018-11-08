@@ -1,0 +1,38 @@
+1	slovenian	x-vnd.Be-TSKB	4188810283
+Power off	DeskbarMenu		Ugasni
+Sort applications by name	PreferencesWindow		Razvrsti aplikacije po imenu
+Hide clock	TimeView		Skrij uro
+Applications	PreferencesWindow		Aplikacije
+Time preferences…	TimeView		Nastavitve časa…
+About Haiku	DeskbarMenu		O Haikuju
+Recent documents:	PreferencesWindow		Nedavni dokumenti:
+Recent applications	DeskbarMenu		Nedavne aplikacije
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacije
+Find…	DeskbarMenu		Poišči…
+Show clock	Tray		Pokaži uro
+Window	PreferencesWindow		Okno
+Defaults	PreferencesWindow		Privzete vrednosti
+Menu	PreferencesWindow		Meni
+Recent documents	DeskbarMenu		Nedavni dokumenti
+Auto-hide	PreferencesWindow		Samodejno skrij
+Always on top	PreferencesWindow		Vedno na vrhu
+Show all	WindowMenu		Pokaži vse
+No windows	WindowMenu		Nima oken
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Ponovno zaženi računalnik
+Auto-raise	PreferencesWindow		Samodejno dvigni
+Recent folders:	PreferencesWindow		Nedavne mape:
+Close all	WindowMenu		Zapri vse
+Mount	DeskbarMenu		Priklopi
+Revert	PreferencesWindow		Povrni
+Small	PreferencesWindow		Majhne
+Recent applications:	PreferencesWindow		Nedavne aplikacije:
+Shutdown…	DeskbarMenu		Zaustavi…
+Tracker always first	PreferencesWindow		Tracker vedno prvi
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Nastavitve
+Recent folders	DeskbarMenu		Nedavne mape
+About this system	DeskbarMenu		O tem sistemu
+Show calendar…	TimeView		Pokaži koledar…
+Hide application names	PreferencesWindow		Skrij imena aplikacij
+Icon size	PreferencesWindow		Velikost ikon
+Hide all	WindowMenu		Skrij vse

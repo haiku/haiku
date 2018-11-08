@@ -1,0 +1,77 @@
+1	slovenian	x-vnd.Haiku-WebPositive	2276120443
+Show home button	Settings Window		Pokaži gumb za domačo stran
+Username:	Authentication Panel		Uporabniško ime:
+Copy URL to clipboard	Download Window		Kopiraj URL na odložišče
+Cancel	Settings Window		Prekliči
+Close window	WebPositive Window		Zapri okno
+Quit	WebPositive		Izhod
+The download could not be opened.	Download Window		Prenesene datoteke ni mogoče odpreti.
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Mape s prenesenimi datotekami ni mogoče odpreti.\n\nNapaka: %error
+Open location	WebPositive Window		Pojdi na naslov
+Clear history	WebPositive Window		Počisti zgodovino
+WebPositive	System name		WebPositive
+Yesterday	WebPositive Window		Včeraj
+Default standard font size:	Settings Window		Privzeta standardna velikost pisave:
+Start page:	Settings Window		Začetna stran:
+History	WebPositive Window		Zgodovina
+Error opening downloads folder	Download Window		Napaka pri odpiranju mape s prenosi
+Paste	WebPositive Window		Prilepi
+Double-click or middle-click to open new tab.	Tab Manager		Dvokliknite ali kliknite na sredinski gumb, da odprete nov jeziček.
+Next	WebPositive Window		Naprej
+Find next	WebPositive Window		Najdi naslednje
+Download folder:	Settings Window		Mapa s prenosi:
+Edit	WebPositive Window		Urejanje
+Cancel	Authentication Panel		Prekliči
+Match case	WebPositive Window		Razlikuj velike in male črke
+Zoom text only	WebPositive Window		Velikost spremeni samo besedilu
+Restart	Download Window		Ponovno zaženi
+Proxy server	Settings Window		Posredovalni strežnik
+Open containing folder	Download Window		Odpri vsebujočo mapo
+New window	WebPositive Window		Novo okno
+Open	Download Window		Odpri
+Reload	WebPositive Window		Ponovno naloži
+Downloads	Download Window		Prenosi
+Proxy password:	Settings Window		Geslo posredniškega strežnika:
+Reset size	WebPositive Window		Ponastavi velikost
+Find:	WebPositive Window		Poišči:
+Increase size	WebPositive Window		Povečaj velikost
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Ni bilo mogoče dobiti mape z zaznamki.\n\nNapaka: %error
+Downloads	WebPositive Window		Prenosi
+Fonts	Settings Window		Pisave
+OK	Download Window		V redu
+Open blank page	Settings Window		Odpri prazno stran
+New tabs:	Settings Window		Novi jezički:
+Cancel	WebPositive Window		Prekliči
+Open all	WebPositive Window		Odpri vse
+Proxy server requires authentication	Settings Window		Posredniški strežnik zahteva overitev
+Script console	WebPositive Window		Skriptna konzola
+Proxy server address:	Settings Window		Naslov posredniškega strežnika:
+Proxy server port:	Settings Window		Vrata posredniškega strežnika:
+Bookmarks	WebPositive Window		Zaznamki
+Paste	URL Bar		Prilepi
+/s)	Download Window	...as in 'per second'	/s)
+Hide password text	Authentication Panel		Skrij geslo
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	V kožuščku hudobnega fanta stopiclja mizar.
+New browser window	Download Window		Novo okno za brskanje
+Today	WebPositive Window		Danes
+Remember username and password for this site	Authentication Panel		Zapomni si uporabniško ime in geslo za to stran
+Earlier	WebPositive Window		Prej
+Authentication required	Authentication Panel		Zahtevana je overitev
+Use proxy server to connect to the internet	Settings Window		Uporabi posredniški strežnik
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Prenosi še tečejo. Ali res želite končati WebPositive?
+Auto-hide interface in full screen mode	Settings Window		Samodejno skrij uporabniški vmesnik v celozaslonskem načinu
+Do you really want to clear the browsing history?	WebPositive Window		Ali res želite počistiti zgodovino brskanja?
+Copy	WebPositive Window		Kopiraj
+Remove missing	Download Window		Odstrani manjkajoče
+Clone current page	Settings Window		Kloniraj trenutno stran
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ali res želite odpreti %addedCount zaznamkov naenkrat?
+OK	Authentication Panel		V redu
+Copy	URL Bar		Kopiraj
+Download finished	Download Window		Prenos končan
+Show bookmark bar	WebPositive Window		Pokaži vrstico z zaznamki
+OK	WebPositive Window		V redu
+Manage bookmarks	WebPositive Window		Upravljaj z zaznamki
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zaznamek za to stran (%bookmarkName) že obstaja.
+New windows:	Settings Window		Nova okna:
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url končan
+Remove finished	Download Window		Odstrani končane

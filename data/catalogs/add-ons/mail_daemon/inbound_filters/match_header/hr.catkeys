@@ -1,0 +1,9 @@
+1	croatian	x-vnd.Haiku-MatchHeader	706469410
+<Choose action>	ConfigView		<Odaberi radnju>
+Account	ConfigView		Račun
+Move to	ConfigView		Premjesti u
+this field is based on the action	ConfigView		ovo polje je bazirano na radnji
+Delete message	ConfigView		Izbriši poruku
+<Choose account>	ConfigView		<Odaberi račun>
+Reply with	ConfigView		Odgovori pomoću
+If	ConfigView		Ako

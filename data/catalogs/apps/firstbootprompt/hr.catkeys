@@ -1,0 +1,8 @@
+1	croatian	x-vnd.Haiku-FirstBootPrompt	2649051796
+Custom	BootPromptWindow		Prilagođeno
+Boot to Desktop	BootPromptWindow		Boot u radnu površinu
+Thank you for trying out Haiku! We hope you'll like it!\n\nYou can select your preferred language and keyboard layout from the list on the left which will then be used instantly. You can easily change both settings from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?\n	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Hvala vam što isprobavate Haiku! Nadamo se da vam se sviđa!\n\nMožete izabrati željeni jezik i raspored tipkovnice sa liste na lijevo koja će odmah biti korištena.Lako možetepromjeniti postavke sa radne povšine u letu.\n\nŽelite li pokrenuti instalacijski program ili ćete nastaviti boot u radnu površinu?\n
+Language	BootPromptWindow		Jezik
+Welcome to Haiku!	BootPromptWindow		Dobro došli u Haiku!
+Run Installer	BootPromptWindow		Pokreni instalacijski program
+Keymap	BootPromptWindow		Tipkovnica

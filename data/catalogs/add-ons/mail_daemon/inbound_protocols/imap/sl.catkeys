@@ -1,0 +1,11 @@
+1	slovenian	x-vnd.Haiku-IMAP	3411602015
+Destination:	imap_config		Cilj:
+Ok	IMAPFolderConfig		V redu
+status	IMAPFolderConfig		stanje
+Configure IMAP Folders	imap_config		Nastavi mape IMAP
+Cancel	IMAPFolderConfig		Prekliči
+Apply	IMAPFolderConfig		Uporabi
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Dobivam mape IMAP; prosimo, počakajte…
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Povezava s strežnikom \"%server%\" ni uspela \n\n
+IMAP Folders	IMAPFolderConfig		Mape IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Posodabljam mape IMAP, prosimo, počakajte…

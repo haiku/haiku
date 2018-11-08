@@ -1,0 +1,13 @@
+1	slovenian	x-vnd.Haiku-Sounds	3720291557
+Sound file:	HWindow		Zvočna datoteka:
+Sounds	System name		Zvoki
+No such file or directory	HEventList		Datoteka ali mapa ne obstaja
+OK	SoundsHApp		V redu
+OK	HEventList		V redu
+OK	HWindow		V redu
+This is not an audio file.	HWindow		To ni zvočna datoteka.
+Sound	HEventList		Zvok
+Event	HEventList		Dogodek
+<none>	HEventList		(noben)
+<none>	HWindow		(noben)
+Other…	HWindow		Drugo…

@@ -1,0 +1,25 @@
+1	slovenian	x-vnd.Haiku-Keymap	1981797144
+Shift:	Modifier keys window	Shift key role name	Shift:
+Revert	Modifier keys window		Povrni
+Warning: left and right key roles do not match	Modifier keys window		Opozorilo: vlogi leve in desne tipke se ne ujemata
+Scroll lock	Keyboard Layout View		Scroll Lock
+Menu	Keyboard Layout View	Menu key	Meni
+Left control	Keyboard Layout View		Levi Control
+Command	Keyboard Layout View	Command key	Ukaz
+Disabled	Modifier keys window	Do nothing	Onemogočeno
+Open…	Keymap window		Odpri…
+Error: duplicate keys	Modifier keys window		Napaka: podvojene tipke
+System:	Keymap window		Sistem:
+Control	Keyboard Layout View	Control key	Control
+Left option	Keyboard Layout View		Leva opcijska
+Right control	Keyboard Layout View		Desni Control
+Switch shortcut keys	Keymap window		Zamenjaj bližnjične tipke
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tipka Shift
+User:	Keymap window		Uporabnik:
+Layout	Keymap window		Razpored
+Revert	Keymap window		Povrni
+Save as…	Keymap window		Shrani kot…
+File	Keymap window		Datoteka
+Num lock	Keyboard Layout View		Num Lock
+Left shift	Keyboard Layout View		Levi Shift
+Shift	Keyboard Layout View	Shift key	Shift

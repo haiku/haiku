@@ -1,0 +1,13 @@
+1	croatian	x-vnd.Haiku-Notifications	213548865
+Revert	PrefletWin		Obrnuto
+Enable notifications	GeneralView		Omogući obavijesti
+Window width:	GeneralView		Širina prozora:
+OK	PrefletWin		U redu
+OK	NotificationView		U redu
+Notifications	PrefletWin		Obavijesti
+General	PrefletView		Općenito
+Allowed	NotificationView		Dopušteno
+Notifications	System name		Obavijesti
+Applications	PrefletView		Programi
+Application	NotificationView		Program
+Applications	NotificationView		Programi

@@ -1,0 +1,13 @@
+1	slovenian	x-vnd.Haiku-MatchHeader	709288665
+<Choose action>	ConfigView		<Izberi ukrep>
+Account	ConfigView		Račun
+has	ConfigView		ima
+Move to	ConfigView		Premakni v
+Then	ConfigView		potem
+this field is based on the action	ConfigView		To polje temelji na dejanju
+Delete message	ConfigView		Izbriši sporočilo
+<Choose account>	ConfigView		<Izberi račun>
+Set flags to	ConfigView		Nastavi zastavice na
+Set as read	ConfigView		Označi kot prebrano
+Reply with	ConfigView		Odgovori z
+If	ConfigView		Če

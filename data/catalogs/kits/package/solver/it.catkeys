@@ -9,7 +9,7 @@ do not deinstall \"%selection%\"	SolverProblemSolution		non rimuovere \"%selecti
 dependency problem	SolverProblem		problema di dipendenza
 do not keep %source% installed	SolverProblemSolution		non tenere installato %source%
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		il pacchetto %source% rende implicitamente obsoleta %dependency% fornita da %target%
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		se risolvibili, non disinstallare tutte le \"%selection%\"
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		se risolvibili, non disinstallare \"%selection%\"
 keep %source% from excluded repository	SolverProblemSolution		mantieni %source% dal repository escluso
 install %selection% despite its old version	SolverProblemSolution		installa %selection% nonostante sia una vecchia versione
 allow downgrade of %source% to %target%	SolverProblemSolution		consenti il downgrade di %source% a %target%

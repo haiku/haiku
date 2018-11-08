@@ -1,0 +1,85 @@
+1	croatian	x-vnd.Haiku-DiskProbe	3418781567
+Find again	ProbeView		Nađi ponovno
+Text	FindWindow		Tekst
+Find…	ProbeView		Nađi...
+Case sensitive	FindWindow		Osjetljivo na velika i mala slova
+Cancel	OpenWindow		Otkaži
+Close	AttributeWindow		Zatvori
+File	ProbeView		Datoteka
+Attribute	ProbeView		Atribut
+16 bit	TypeEditors		16 bit
+Attributes	ProbeView		Atributi
+Selection	ProbeView		Odabir
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	što: '%.4s'\n\n
+File	FileWindow		Datoteka
+OK	DiskProbe		U redu
+Boolean	TypeEditors	This is the type of editor	Boolean
+Paste	ProbeView		Zalijepi
+PNG format	TypeEditors		PNG format
+Font size	ProbeView		Veličina fonta
+Attribute type: 	ProbeView		Vrsta atributa: 
+Attribute	AttributeWindow		Atribut
+Number:	TypeEditors		Broj:
+Save	ProbeView		Spremi
+Stop	ProbeView		Stani
+Number editor	TypeEditors		Uređivač-broja
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Device: 	ProbeView		Uređaj: 
+Text	TypeEditors	This is the type of editor	Tekst
+Block	ProbeView		Blok
+Back	ProbeView		Natrag
+Device	ProbeView		Uređaj
+Unknown type	TypeEditors		Nepoznati tip
+Quit	FileWindow		Isključi
+Close	ProbeView		Zatvori
+Number	TypeEditors	This is the type of editor	Broj
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimalni
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	od 0x0
+Copy	ProbeView		Kopiraj
+none	ProbeView	No attributes	nijedan
+Boolean value:	TypeEditors		Booleanska vrijednost:
+32 bit size or status:	TypeEditors		32 bitna veličina ili status:
+8 bit palette	TypeEditors		8 bitna paleta
+Unknown format	TypeEditors		Nepoznati format
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadecimalno
+MIME type:	TypeEditors		MIME vrsta:
+Page setup…	ProbeView		Postavljanje stranice...
+New…	FileWindow		Nova...
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Ne mogu čitati sliku
+Save changes before closing?	ProbeView		Spremiti izmjene prije zatvaranja?
+Open file…	FileWindow		Otvori datoteku...
+Next	ProbeView		Slijedeće
+Close	FileWindow		Zatvori
+Attribute: 	ProbeView		Atribut: 
+Remove from file	AttributeWindow		Ukloni iz datoteke
+Don't save	ProbeView		Nemoj spremiti
+Previous	ProbeView		Prethodno
+Icon	TypeEditors		Ikona
+Examine device:	OpenWindow		Pregledaj uređaj:
+OK	ProbeView		U redu
+Add	ProbeView		Dodaj
+Edit	ProbeView		Uredi
+Message	TypeEditors	This is the type of view	Poruka
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ne mogu otvoriti  \"%s\":\n%s
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Osnova
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Pregled slike
+Cancel	AttributeWindow		Otkaži
+Type editor not supported	ProbeView		Vrsta uređivača nije podržana
+Find	FindWindow		Nađi
+Remove	AttributeWindow		Ukloni
+Print…	ProbeView		Ispisuj...
+Image	TypeEditors	This is the type of view	Slika
+Could not open file \"%s\": %s\n	DiskProbe		Ne mogu otvoriti datoteku \"%s\": %s\n
+Select all	ProbeView		Odaberi sve
+Icon view	TypeEditors		Pogled ikona
+Bookmarks	ProbeView		Zabilješke
+Mode:	FindWindow		Način rada:
+15 bit	TypeEditors		15 bit
+Open device	FileWindow		Otvori uređaj
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Pogled
+File: 	ProbeView		Datoteka: 
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Pisanje u datoteku nije uspjelo:\n%s\n\nSve promjene će biti izgubljene kada isključite.
+32 bit	TypeEditors		32 bit
+Cancel	ProbeView		Otkaži
+Grayscale	TypeEditors		Sivo
+Contents:	TypeEditors		Sadržaj:

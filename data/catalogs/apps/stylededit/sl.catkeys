@@ -1,0 +1,61 @@
+1	slovenian	x-vnd.Haiku-StyledEdit	1471823110
+StyledEdit	System name		StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ta datoteka je samo za branje. Shranim spremembe v dokument \"%s\"?
+Paste	Menus		Prilepi
+OK	LoadAlert		V redu
+File	Menus		Datoteka
+???	LoadAlert		???
+Modified	StatusView		Spremenjeno
+Lines:	Statistics		Vrstic:
+Italic	Menus		Ležeče
+Left	Menus		Levo
+Search backwards	FindandReplaceWindow		Išči nazaj
+Unlock file	StatusView		Odkleni datoteko
+Size	Menus		Velikost
+Save	QuitAlert		Shrani
+Page setup…	Menus		Postavitev strani…
+Print…	Menus		Natisni…
+Can't undo	Menus		Ni mogoče razveljaviti
+Save	Menus		Shrani
+Cancel	SaveAlert		Prekliči
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Datoteko \"%file%\" je odstranila druga aplikacija. Jo obnovim?
+Document statistics	Statistics		Statistika dokumenta
+Cancel	RevertToSavedAlert		Prekliči
+Autodetect	Menus		Samodejno zaznavanje
+Document	Menus		Dokument
+Save changes to the document \"%s\"? 	QuitAlert		Shranim spremembe v dokument \"%s\"?
+Edit	Menus		Urejanje
+Revert	RevertToSavedAlert		Povrni
+Font	Menus		Pisava
+Cancel	FindandReplaceWindow		Prekliči
+Save	SaveAlert		Shrani
+Words:	Statistics		Besed:
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Napaka pri nalaganju \"%s\":\n\tNepodprt format
+OK	RevertToSavedAlert		V redu
+Don't save	QuitAlert		Ne shrani
+Align	Menus		Poravnava
+Color	Menus		Barva
+OK	QuitAlert		V redu
+Open…	Menus		Odpri…
+OK	Statistics		V redu
+Bold	Menus		Krepko
+Find selection	Menus		Poišči izbrano
+Find:	FindandReplaceWindow		Išči:
+Error saving \"%s\":\n%s	SaveAlert		Napaka pri shranjevanju \"%s\":\n%s
+Copy	Menus		Kopiraj
+Cut	Menus		Izreži
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Datoteko \"%file%\" je spremenila druga aplikacija. Jo ponovno naložim?
+Replace	FindandReplaceWindow		Zamenjaj
+Find again	Menus		Poišči znova
+Cancel	QuitAlert		Prekliči
+Don't save	SaveAlert		Ne shrani
+Untitled 	StyledEditWindow		Neimenovano
+OK	SaveAlert		V redu
+Find	FindandReplaceWindow		Poišči
+Encoding	Open_and_SaveAsPanel		Kodiranje
+Characters:	Statistics		Znakov:
+Save as…	Menus		Shrani kot…
+Redo typing	QuitAlert		Ponovno uveljavi tipkanje
+Reload…	Menus		Ponovno naloži…
+Replace…	Menus		Zamenjaj…
+Right	Menus		Desno

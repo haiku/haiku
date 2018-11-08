@@ -1,0 +1,24 @@
+1	slovenian	x-vnd.haiku-screenshot	1091549889
+seconds	ScreenshotWindow		s
+Desktop	ScreenshotWindow		Namizje
+Include window border	ScreenshotWindow		Vključi tudi okvir
+Screenshot	System name		Zajem
+Select	ScreenshotWindow		Izberi
+Capture active window	ScreenshotWindow		Zajemi aktivno okno
+Cancel	ScreenshotWindow		Prekliči
+Name:	ScreenshotWindow		Ime:
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Ta datoteka že obstaja.\nAli ste prepričani, da jo želite zamenjati?
+Choose folder	ScreenshotWindow		Izberite mapo
+Save	ScreenshotWindow		Shrani
+Overwrite	ScreenshotWindow		Zamenjaj
+Please select	ScreenshotWindow		Prosim, izberite
+Save as:	ScreenshotWindow		Shrani kot:
+Copy to clipboard	ScreenshotWindow		Kopiraj v odložišče
+Save in:	ScreenshotWindow		Shrani v:
+screenshot	Screenshot	Base filename of screenshot files	zajem
+Home folder	ScreenshotWindow		Domača mapa
+Settings…	ScreenshotWindow		Nastavitve…
+overwrite	ScreenshotWindow		zamenjaj
+Delay:	ScreenshotWindow		Zakasnitev:
+Include mouse pointer	ScreenshotWindow		Vključi kazalec
+Translator Settings	ScreenshotWindow		Nastavitve prevajalca

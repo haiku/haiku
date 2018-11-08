@@ -1,0 +1,130 @@
+1	croatian	x-vnd.haiku-icon_o_matic	1592365908
+Select All	Icon-O-Matic-PathManipulator		Odaberi sve
+Add Style	Icon-O-Matic-AddStylesCmd		Dodaj stil
+Color (#%02x%02x%02x)	Style name after dropping a color		Boja (#%02x%02x%02x)
+Add	Icon-O-Matic-StylesList		Dodaj
+Move Shape	Icon-O-Matic-MoveShapesCommand		Pomakni stil
+Opening the document failed!	Icon-O-Matic-Main		Neuspjelo otvaranje dokumenta!
+Move Paths	Icon-O-Matic-MovePathsCmd		Premjesti putanje
+None	Icon-O-Matic-Properties		Nijedan
+New	Icon-O-Matic-Menu-File		Novi
+Paste Properties	Icon-O-Matic-Properties		Zalijepi svojstva
+Closed	Icon-O-Matic-PropertyNames		Zatvoreno
+Remove Path	Icon-O-Matic-RemovePathsCmd		Ukloni putanju
+Select	Icon-O-Matic-Properties		Odaberi
+Height	Icon-O-Matic-PropertyNames		Visina
+Width	Icon-O-Matic-PropertyNames		Širina
+Transformation	Icon-O-Matic-TransformationBoxStates		Pretvorba
+Duplicate	Icon-O-Matic-ShapesList		Udvostruči
+<unkown property>	Icon-O-Matic-PropertyNames		<nepoznato svojstvo>
+Assign Path	Icon-O-Matic-AddPathsCmd		Dodjeli putanju
+Move	Icon-O-Matic-TransformationBoxStates		Premjesti
+warning	Icon-O-Matic-SVGExport		upozorenje
+Copy	Icon-O-Matic-Properties		Kopiraj
+OK	Icon-O-Matic-ColorPicker		U redu
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Ukloni kontrolnu točku
+Add circle	Icon-O-Matic-PathsList		Dodaj krug
+bad news	Title of error alert		loše vijesti
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Ukloni putanje
+Add Control Point	Icon-O-Matic-AddPointCmd		Dodaj kontrolnu točku
+Untitled	Icon-O-Matic-Main		Nenaslovljeno
+Save as…	Icon-O-Matic-Menu-File		Spremi kao...
+Don't save	Icon-O-Matic-Menu-Settings		Ne spremaj
+Change Color	Icon-O-Matic-SetColorCmd		Promjeeni boju
+Style	Icon-O-Matic-Menus		Stil
+<modify path>	Icon-O-Matic-PathCmd		<izmjeni putanju>
+Opening the icon failed!	Icon-O-Matic-Main		Neuspjelo otvaranje ikone!
+Error: 	Icon-O-Matic-Main		Greška: 
+Name	Icon-O-Matic-PropertyNames		Ime
+bad news	Icon-O-Matic-Exporter		loše vijesti
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Ukloni stil
+Cancel	Icon-O-Matic-SVGExport		Odustani
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Ukloni stil
+Reverse	Icon-O-Matic-PathsList		Obrnuto
+HVIF Source Code	Icon-O-Matic-SavePanel		HVIF izvorni kod
+Settings	Icon-O-Matic-Menus		Postavke
+All	Icon-O-Matic-Properties		Sve
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Tekst koji pokušavate uvesti je dugačak, jeste li sigurni?
+Perspective	Transformation		Perspektiva
+Opacity	Icon-O-Matic-PropertyNames		Neprozirnost
+Add with path	Icon-O-Matic-ShapesList		Dodaj sa putanjom
+Export icon	Dialog title		Izvezi ikonu
+Cancel	Icon-O-Matic-Menu-Settings		Odustani
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Izmjeni kontrolnu točku
+Saving your document failed!	Icon-O-Matic-Exporter		Neuspjelo spremanje vašeg dokumenta!
+edit it's properties here.	Empty property list - 3rd line		uredi njegova svojstva ovdje.
+Split	Icon-O-Matic-PathManipulator		Podijeli
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Gurni kontrolne točke
+Remove	Icon-O-Matic-StylesList		Ukloni
+Add with path & style	Icon-O-Matic-ShapesList		Dodaj sa putanjom i stilom
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotiraj
+Remove	Icon-O-Matic-PathsList		Ukloni
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Dodaj kontrolnu točku
+Pick a color	Icon-O-Matic-ColorPicker		Odaberi boju
+Quit	Icon-O-Matic-Menu-File		Isključi
+Export	Icon-O-Matic-Menu-File		Izvoz
+No	Icon-O-Matic-StyledTextImport		Ne
+load error	Icon-O-Matic-SVGImport		greška učitavanja
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Pomakni stilove
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Ukloni stilove
+Add	Icon-O-Matic-TransformersList		Dodaj
+Color	Icon-O-Matic-StyleTypes		Boja
+Settings…	Icon-O-Matic-SavePanel		Postavke...
+Remove	Icon-O-Matic-PathManipulator		Ukloni
+Radial	Icon-O-Matic-StyleTypes		Radijalno
+Perspective	Icon-O-Matic-TransformersList		Perspektiva
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Dodaj sa putanjom & stilom
+Gradient	Icon-O-Matic-StyleTypes		Gradijent
+Invert selection	Icon-O-Matic-Properties		Obrnuti odabir
+Export as…	Icon-O-Matic-Menu-File		Izvezi kao...
+Transformation	Transformation		Pretvorba
+Move Styles	Icon-O-Matic-MoveStylesCmd		Ukloni stilove
+Split Control Points	Icon-O-Matic-SplitPointsCmd		Podijeli kontrolne točke
+Save	Icon-O-Matic-Menu-Settings		Spremi
+Add empty	Icon-O-Matic-ShapesList		Dodaj prazno
+Close	Icon-O-Matic-Menu-File		Zatvori
+Cancel	Icon-O-Matic-ColorPicker		Odustani
+Paste	Icon-O-Matic-Properties		Zalijepi
+Shape	Icon-O-Matic-Menus		Oblik
+Properties	Icon-O-Matic-Menus		Osobitosti
+Path	Icon-O-Matic-Menus		Putanja
+File	Icon-O-Matic-Menus		Datoteka
+Error: 	Icon-O-Matic-Exporter		Greška: 
+Diamond	Icon-O-Matic-StyleTypes		Dijamant
+Path	Icon-O-Matic-PropertyNames		Putanja
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Neuspjelo otvaranje datoteke '%s' kao SVG dokumenta.\n\nError: %s
+<unavailable>	Icon-O-Matic-StyleTypes		<nedostupno>
+Rotation	Icon-O-Matic-PropertyNames		Rotacija
+Add with style	Icon-O-Matic-ShapesList		Dodaj sa stilom
+Add	Icon-O-Matic-PathsList		Dodaj
+Move Style	Icon-O-Matic-MoveStylesCmd		Premjesti stil
+Snap to grid	Icon-O-Matic-Menu-Settings		Poravnaj s rešetkom
+Remove	Icon-O-Matic-ShapesList		Ukloni
+Yes	Icon-O-Matic-StyledTextImport		Da
+Transformation	Icon-O-Matic-TransformersList		Pretvorba
+Add Styles	Icon-O-Matic-AddStylesCmd		Dodaj stilove
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Ukloni kontrolne točke
+Format	Icon-O-Matic-SavePanel		Format
+Edit	Icon-O-Matic-Menus		Uredi
+Duplicate	Icon-O-Matic-StylesList		Udvostruči
+Add Paths	Icon-O-Matic-AddPathsCmd		Dodaj putanje
+Style type	Icon-O-Matic-StyleTypes		Tip stila
+Assign Style	Icon-O-Matic-AssignStyleCmd		Dodjeli stil
+Add Path	Icon-O-Matic-AddPathsCmd		Dodaj putanju
+Color	Icon-O-Matic-PropertyNames		Boja
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Unesi kontrolnu točku
+Assign Paths	Icon-O-Matic-AddPathsCmd		Dodjeli putanje
+OK	Icon-O-Matic-SVGImport		U redu
+Duplicate	Icon-O-Matic-PathsList		Udvostruči
+Save	Icon-O-Matic-Menu-File		Spremi
+Append…	Icon-O-Matic-Menu-File		Dodaj...
+Move Path	Icon-O-Matic-MovePathsCmd		Premjesti putanju
+Overwrite	Icon-O-Matic-SVGExport		Prebriši
+Split Control Point	Icon-O-Matic-SplitPointsCmd		Podijelo kontrolnu točku
+Open…	Icon-O-Matic-Menu-File		Otvori...
+Save icon	Dialog title		Spremi ikonu
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Boja (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Uredi gradijent
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Očisti putanju
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Ukloni stilove
+Clean up	Icon-O-Matic-PathsList		Očisti

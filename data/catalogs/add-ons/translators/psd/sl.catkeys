@@ -1,0 +1,11 @@
+1	slovenian	x-vnd.Haiku-PSDTranslator	3392594018
+Uncompressed	PSDConfig		Nestisnjeno
+Grayscale	PSDLoader		Sivine
+Photoshop image	PSDTranslator		Photoshopova slika
+RLE	PSDConfig		RLE
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshopova slika (%s)
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitna slika
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Stiskanje: 
