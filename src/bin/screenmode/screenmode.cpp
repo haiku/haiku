@@ -156,7 +156,6 @@ main(int argc, char** argv)
 				if (optarg[0] == '+' || optarg[0] == '-')
 					relativeBrightness = true;
 				brightness = atof(optarg);
-				printf("b %f rel %d\n", brightness, relativeBrightness);
 				break;
 			case 'h':
 				usage(0);
@@ -251,7 +250,6 @@ main(int argc, char** argv)
 			float previousBrightness;
 			screen.GetBrightness(&previousBrightness);
 			brightness = previousBrightness + brightness;
-			printf("new %f\n", brightness);
 
 			// Clamp to min/max values
 			if (brightness < 0.f)
@@ -259,8 +257,10 @@ main(int argc, char** argv)
 
 			if (brightness > 1.f)
 				brightness = 1.f;
-			printf("clamp %f\n", brightness);
 		}
+
+		if (brightness < 0.f || brightness > 1.f)
+			printf("Brightness %f is out of range\n", brightness);
 		screen.SetBrightness(brightness);
 	}
 
