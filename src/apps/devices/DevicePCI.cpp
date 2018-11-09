@@ -103,8 +103,13 @@ DevicePCI::InitFromAttributes()
 	
 	SetAttribute(B_TRANSLATE("Device name"), DeviceName);
 	SetAttribute(B_TRANSLATE("Manufacturer"), ManufacturerName);
+#if 0
+	// These are a source of confusion for users, leading them to think there
+	// is no driver for their device. Until we can display something useful,
+	// let's not show the lines at all.
 	SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE("Not implemented"));
 	SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE("Not implemented"));
+#endif
 	SetAttribute(B_TRANSLATE("Class info"), classInfo);
 	fCategory = (Category)fClassBaseId;
 	BString outlineName;
