@@ -115,7 +115,7 @@
 
 <para>Careful planning is the key to writing excellent software, regardless of
 	what stage of development a project may be in. In order to be easy, good
-	software only has what is really needed. It also helps the user do his work
+	software only has what is really needed. It also helps the user do their work
 	wherever possible. Only by thoroughly understanding what the work is, how it
 	is to be done, and who is doing it can a program provide the best experience
 	possible.</para>
@@ -128,11 +128,11 @@
 <title>Qualities of Good Software</title>
 
 <para>When it comes to software, the proof is in the usage. If a piece of
-	software requires significant time to learn, the user will only invest the
-	time in learning it if (a) he has no other choice but to use that particular
+	software requires significant time to learn, users will only invest the
+	time in learning it if (a) they have no other choice but to use that particular
 	software and (b) the importance of the need filled by the software is much
-	greater than the importance of the user's time. In short, a user will learn
-	only what he must in order to do his job and even then only when forced to
+	greater than the importance of the user's time. In short, users will learn
+	only what they must in order to do their job and even then only when forced to
 	do so.</para>
 
 
@@ -142,7 +142,7 @@
 <para>In Chapter 1, it was mentioned that your program should meet the needs of
 	80 percent of your target audience. It is impossible to meet the needs of
 	all users in the same software and still retain some semblance of being easy
-	to use. Sometimes a user doesn't even know that he needs or doesn't need a
+	to use. Sometimes users don't even know that they need or don't need a
 	feature and it is up to the designer and developer to figure out what is
 	needed. Most often, it is better to have a small collection of more
 	specialized tools than one which does everything.</para>
@@ -158,7 +158,7 @@
 	use a computer is called a monitor or just 'the screen'; the little arrow on
 	the screen is called the cursor, and the thing they type with is called a
 	keyboard. Few users know (or care) what a 'file format' is and fewer still
-	do not know what an 'invalid sector' on a floppy disk might be.</para>
+	do know what an 'invalid sector' on a floppy disk might be.</para>
 
 <para>Good programs use language appropriate for the audience. The problem is
 	that quite a lot of software intended for the general desktop user reads
@@ -167,7 +167,7 @@
 	really disks -- even though the term isn't quite accurate, a normal person
 	thinks a disk is a storage container and that volume is what you have up too
 	high at really good parties. Images are 'pictures'. A person doesn't 'kill'
-	a application that has 'hung' -- he 'forces a frozen program to quit'.
+	a application that has 'hung' -- they 'force a frozen program to quit'.
 	Details like this may seem minor, but many small improvements in a program's
 	usability can have a profound effect overall. Of course, if your target
 	audience is IT professionals, these kinds of terms are perfectly acceptable.
@@ -232,12 +232,12 @@
 <para>Good software keep the lines of communication open. Good feedback just
 	means making sure that the user knows what your program is doing at any
 	given time, especially if the program is busy doing something which makes
-	him wait. CD and DVD burning programs tell the user how much is left before
+	them wait. CD and DVD burning programs tell the user how much is left before
 	they are finished making a CD or DVD. File management programs tell how many
 	files are left to copy or move. Web browsers animate a little icon while
 	they download a web page. Users have a natural tendency to think that if
 	nothing seems to be happening, then the program is probably frozen. Making
-	sure that the user knows your program is hard at work puts his mind at
+	sure that the user knows your program is hard at work puts their mind at
 	ease.</para>
 
 </sect1>
@@ -254,12 +254,13 @@
 	do it. Does your program require a selection from a list before the user
 	clicks OK? Tell the user that -- nicely, of course -- and then disable the
 	OK button until a selection is made. An even better solution would be to
-	select a good default choice for the user and give him the option to change
+	select a good default choice for the user and give them the option to change
 	it. Build constraints into your application which prevent errors. This would
 	be why 3.5" floppy disks have a notch in one side -- it can be inserted into
 	a drive only one way. Constraints are also good for lazy developers because
 	then their software crashes less and they don't need to write as much
-	error-handling code.</para> </sect1>
+	error-handling code.</para>
+</sect1>
 
 <sect1>
 <title>Good Applications Handle Errors Gracefully</title>
@@ -287,7 +288,7 @@
 	it has no business being given. Take a valid document, back it up, open it
 	in DiskProbe, enter as much junk data into it as you like, and then try to
 	open it. Break your Internet connection while it's in the middle of an
-	update. Try to using filenames with really wonky filenames. Be creative and
+	update. Try to use files with really wonky filenames. Be creative and
 	ridiculous and, most of all, have fun breaking things!</para>
 </sect1>
 
@@ -308,7 +309,7 @@
 <title>Summary</title>
 
 <para>Good software takes real work to produce. It is not for the stereotypical
-	'lazy programmer' unless he knows where it is acceptable to be lazy. In
+	'lazy programmer' unless they know where it is acceptable to be lazy. In
 	creating something of value to customers, good software creates a positive
 	image for a company and loyal customers who will do your own advertising for
 	you. The best advertising is done by your customers to their friends,
@@ -410,7 +411,7 @@
 	outside your program. It could just be as simple as updating an entry in a
 	list of items as the user types makes changes to it in a form in a different
 	part of the GUI. Responsiveness like this in a program helps the user feel
-	more in control of the work he is doing and prevents possible loss of
+	more in control of the work they are doing and prevents possible loss of
 	data.</para>
 </sect1>
 
@@ -419,23 +420,17 @@
 
 <para>Haiku comes with bits of technology that allows lazy programmers to be
 	lazy and still have their programs be good ones. One of them is the
-	Translation Kit. Merely by including the library and making use of even
+	Translation Kit. Merely including the library and making use of even
 	something as simple as the BTranslationUtils class will help to ensure that
 	at least this portion of your code is free of bugs. In general, you will
 	probably find yourself making use of image translators most in order to load
 	image resources that your program will use. Just remember that translators
 	are system add-ons and that unless your program has installed a translator
 	for a particular file format, depend only on the formats installed by
-	default in the system. As an aside, MP3 is a format which requires licensing
-	for decoding and encoding to be legal, so depending on the MP3 format is not
-	a good idea unless your program deals specifically with it. </para>
+	default in the system. As an aside, some formats are undocumented or require
+	licensing, which makes it difficult for users to access their own data. Use
+	open and documented formats as much as possible.</para>
 
-<variablelist>
-<title>Formats to prefer:</title>
-<varlistentry><term>Image</term><listitem>JPEG or PNG</listitem></varlistentry>
-<varlistentry><term>Sound</term><listitem>WAV or Ogg Vorbis</listitem></varlistentry>
-<varlistentry><term>Movie</term><listitem>Ogg Theora or AVI</listitem></varlistentry>
-</variablelist>
 </sect1>
 
 <sect1>
@@ -481,7 +476,7 @@
 <para>Tracker can be quite a useful tool for your program which requires little
 	effort to provide some courtesies to the user which would otherwise be a lot
 	of work. The Open and Save windows have already been done for you. Please
-	use them. Note that if just a certain type of entry is needed, such as a
+	use them. If just a certain type of entry is needed, such as a
 	folder or specific type of file, make a filter that shows only those types
 	of entries. By removing unneeded items from the file navigation window, you
 	are reducing the number of choices the user must pick from and also
@@ -489,7 +484,7 @@
 	there may be files that may not have had their MIME type identified, so do
 	not exclude them, either. You can also make Tracker show a window for a
 	particular folder in order to show the user where a particular file has been
-	stored and give him access to it directly.</para>
+	stored and give them access to it directly.</para>
 </sect1>
 
 </chapter>
@@ -691,7 +686,7 @@
 	dragged object. Drop feedback can take a variety of forms:
 
 <itemizedlist>
-<listitem>A list control could draw a line in between two items to show where
+<listitem>A list control draws a line in between two items to show where
 	the dragged item would be placed if the user released the button.</listitem>
 
 <listitem>BTextView controls show a line where dragged text would be placed if
@@ -713,14 +708,14 @@ better understand how to use your program to get something done.</para>
 
 <para>Another way of getting data from one program into another is via the
 	system clipboard. Unlike other forms of data exchange, using the clipboard
-	requires very little effort or code because you have to do is to plunk data
+	requires very little effort or code because you have to do is plunk data
 	into a particular BMessage. Some of the standard controls already do it for
 	you. The BTextView class already implements copying, cutting, and pasting by
 	way of keyboard accelerators. In cases like these, all that you will want to
 	do is add some menu items for less advanced users.</para>
 
 <variablelist>
-<title>Standardized Clipboard Data Formats</title>
+	<title>Standardized Clipboard/Drag Data Formats</title>
 <varlistentry><term>Plain Text</term>
 	<listitem>
 	<para>It is easiest to describe the basics with this code snippet.
@@ -862,15 +857,15 @@ better understand how to use your program to get something done.</para>
 </sect1>
 
 <sect1>
-<title>...Ellipses...</title>
+<title>…Ellipses…</title>
 
 <para>An ellipsis is a series of 3 dots (…) used to tell the user that a
-	control, often a menu item or button, will open a window. For example, a
+	control, often a menu item or button, will require further input. For example, a
 	menu item named "New…" will display a window which has the title "New".
 	However, if creating a new document does not require showing a window, then
 	an ellipsis should not be used. Please be sure to use the B_UTF8_ELLIPSIS
-	character instead of 3 periods. Some BeOS keymaps, such as the US QWERTY
-	keymap, allow you to type in an ellipsis with the Option + period keyboard
+	character instead of 3 periods. Most Haiku keymaps
+	allow you to type in an ellipsis with the Option + period keyboard
 	shortcut.</para> </sect1>
 
 <sect1>
@@ -882,8 +877,8 @@ better understand how to use your program to get something done.</para>
 	enough space is it isn't being used as efficiently as possible. When you use
 	an abbreviation, please be sure that it is absolutely necessary, that it is
 	both common and clear, and that it is appropriate for your program's target
-	audience. For example, using the octothorpe (# symbol) is an abbreviation
-	for the word 'number' in the English language which fits these criteria in
+	audience. For example, using the octothorpe (# symbol) as an abbreviation
+	for the word 'number' in the English language fits these criteria in
 	most cases. These same guidelines also apply to acronyms. For example, the
 	acronym CMYK (Cyan, Magenta, Yellow, Black) is acceptable in a color picker
 	for an image processing application designed for graphics professionals, but
@@ -1051,14 +1046,14 @@ better understand how to use your program to get something done.</para>
 
 </sect1>
 <sect1>
-<title>About Windows... Doorways to Creative Expression</title>
+<title>About Windows… Doorways to Creative Expression</title>
 
 <para>Give yourself some credit in your program: make an About window. They
 	don't need to be especially fancy, but they can be if you are so inclined.
 	It should contain the title of your program, the version, you and any other
 	authors or the name of your company, and copyright information. If nothing
-	else, write a few lines of code to show a BAlert with this information and
-	you'll have enough. If there is a lot of information to show, using a
+	else, write a few lines of code to show a BAboutWindow with this information
+	and you'll have enough. If there is a lot of information to show, using a
 	marquee effect to automatically scroll the information or at least a
 	read-only text view with a scroll bar. Do not include information about the
 	computer itself, such as the amount of RAM or processor speed; it doesn't
@@ -1097,11 +1092,9 @@ better understand how to use your program to get something done.</para>
 <sect1>
 <title>Predefined Cursors and their Uses</title>
 
-<para>As of this writing, there are only two predefined icons available in
-	Haiku: the hand cursor and the text cursor. The text cursor is used whenever
-	text editing is needed and the hand is used everywhere else. There will be
-	more cursors for other uses at some future time which will include resizing
-	and drag and drop.</para>
+<para>There are predefined cursor icons in Haiku for a variety of uses,
+	including text selection, hyperlinks, resizing, and the default hand used
+	for anything else.</para>
 </sect1>
 
 <sect1>
@@ -1109,8 +1102,8 @@ better understand how to use your program to get something done.</para>
 
 <para>You can very easily make your own cursors for your own purposes, but do it
 	only if a different cursor will dramatically improve how well the user can
-	work with your program. At the moment, cursors can only be 16 pixels square
-	and be black, white, or transparent. Be sure that the hot spot -- the actual
+	work with your program. At the moment, cursors can only be 16 pixels square.
+	Be sure that the hot spot -- the actual
 	location passed to applications when a mouse button is pressed -- is very
 	obvious. Good hot spots are the tip of the hand cursor, the point of an
 	arrow, or the center of a crosshairs. Use the full dimensions available to
@@ -1152,9 +1145,9 @@ better understand how to use your program to get something done.</para>
 	items it contains. For instance, a File menu should not have Copy and Paste
 	items in it. The name for a menu item should both concisely and accurately
 	describe the function it performs. Items are capitalized as described in
-	Chapter 6 and an ellipsis is used with any item which opens a window. If a
-	menu item opens a window, the names of both the item and the window should
-	be the same.</para>
+	Chapter 6 and an ellipsis is used with any item which requires further
+	action. If a menu item opens a window, the names of both the item and the
+	window should be the same.</para>
 
 <para>Two ways to organize menus are the Noun-Verb method and the Verb-Noun
 	method. Noun-Verb names menus after the kind of object that it operates on
@@ -1192,8 +1185,8 @@ better understand how to use your program to get something done.</para>
 
 <para>Submenus are another possibility for grouping menu items, particularly for
 	attributes. They should be avoided when other options exist because they
-	slow the user down and also add complexity to the interface. Younger and
-	older users also have trouble navigating to submenus because of the fine
+	slow the user down and also add complexity to the interface.
+	Users may also have trouble navigating to submenus because of the fine
 	motor skills required. If your submenu has 6 or more items in it, consider
 	placing them in their own top-level menu.</para>
 </sect1>
@@ -1214,7 +1207,7 @@ to prevent confusion.</para>
 
 |Help|
 -----------------------
-Open manual...
+Open manual…
 -----------------------
 * Show tooltips
 -----------------------
@@ -1223,7 +1216,7 @@ Go to the MyApp website
 
 |Font|
 -----------------------
-Choose font and size...
+Choose font and size…
 -----------------------
 * Normal
   Bold
@@ -1266,11 +1259,12 @@ Choose font and size...
 
 <varlistentry><term>
 New (Command + N) </term><listitem><para>Create a new document. This item should
-	have an ellipsis if it shows a window, but not if it
+	have an ellipsis if it shows a window asking for further information (for
+	example, canvas size for a drawing program), but not if it
 	doesn't.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Open... (Command + O) </term><listitem><para>Open a document from disk.</para></listitem></varlistentry>
+Open… (Command + O) </term><listitem><para>Open a document from disk.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Open recent </term><listitem><para>This is a submenu in the File menu to allow
@@ -1314,6 +1308,7 @@ Save all </term><listitem><para>This item executes a Save command for all
 	<listitem>When all documents have been processed, bring the window which was
 		originally the active one back to the front.</listitem>
 	</orderedlist>
+	Note that the same procedure is to be applied when closing the program.
 	</para>
 </para></listitem></varlistentry>
 
@@ -1330,7 +1325,9 @@ Import from… </term><listitem><para>Import data from another file format into 
 <varlistentry><term>
 Export to… </term><listitem><para>Convert the data in the current document to
 	another format. Like Save as…, this always shows a
-	window.</para>
+	window. This should be reserved for lossy conversions. If your program
+	can save its data in multiple formats without any information loss,
+	these should be available in the Save and Save as… menu items instead.</para>
 </listitem></varlistentry>
 
 <varlistentry><term>
@@ -1375,7 +1372,9 @@ Copy (Command + C) </term><listitem><para>Copies the currently-selected data in
 Paste (Command + V) </term><listitem><para>Inserts the data on the clipboard
 	into the current document. If there is an existing selection in the current
 	document, the paste operation replaces the selected data with the pasted
-	data.</para></listitem></varlistentry>
+	data. Like undo and redo, this menu item should be dynamic according to
+	the clipboard content ('Paste Text' or 'Paste Image')</para>
+</listitem></varlistentry>
 
 <varlistentry><term>
 Select all (Command + A) </term><listitem><para>Selects all data in the current
@@ -1405,8 +1404,10 @@ Find again (Command + G) </term><listitem><para>This repeats the most recent
 
 <varlistentry><term>
 Open manual… </term><listitem><para>Shows the manual for the program in a new
-	window. The manual should never be shown in a
-	BAlert.</para></listitem></varlistentry>
+	window. The manual should never be shown in a BAlert, prefer opening an
+	HTML or read-only text file (using the preferred application set by the
+	user), or showing a non-editable text view from which the text can
+	be copied.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
@@ -1433,12 +1434,17 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 <sect1>
 <title>Styles and Purpose</title>
 
+<para>Haiku allows you to specify the look and feel when creating a window.
+	Setting these properly will help the user immediately know what kind of
+	window they are dealing with, and it also restricts the operations
+	they are allowed to perform on it.</para>
+
 <segmentedlist>
 <segtitle>Look</segtitle><segtitle>Purpose</segtitle>
 <seglistitem><seg>Document</seg><seg>Windows containing a user document, such as an editor or viewer</seg></seglistitem>
 <seglistitem><seg>Titled</seg><seg>General purpose</seg></seglistitem>
 <seglistitem><seg>Floating</seg><seg>Tool and utility windows</seg></seglistitem>
-<seglistitem><seg>Modal</seg><seg>Modal windows</seg></seglistitem>
+<seglistitem><seg>Modal</seg><seg>Modal window</seg></seglistitem>
 <seglistitem><seg>Bordered</seg><seg>Alert-type dialog windows</seg></seglistitem>
 <seglistitem><seg>Borderless</seg><seg>Splash screens</seg></seglistitem>
 </segmentedlist>
@@ -1510,18 +1516,18 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 	permit zooming and how it should be done. Utility windows, for example, are
 	not intended to be the main focus of the program, so they should not allow
 	zooming even though they should allow resizing except where inappropriate.
-	Document windows should expand to fill the largest sensible space to allow
-	editing. Often times this is the entire screen, but some for some programs,
-	this doesn't make sense. Word processors, for example, will probably move
-	the document window to the top of the screen, resize the width to the
-	maximum width of the current document's view, and resize the height to the
-	bottom of the screen.</para>
+	Document windows should expand to fill the most sensible space to allow
+	viewing or editing. Often times this is the entire screen, but some for
+	some programs, this doesn't make sense. An image viewer, for example, should
+	set its size to fit exactly the image currently being shown at its current
+	zoom level.</para>
 
 <para>The placement of a window on the screen also varies depending on its
 	usage. Program windows should initially either show themselves in the center
-	of the screen or just a little above it. The same goes for the initial
+	of the screen or just a little above it (use BWindow::CenterOnScreen).
+	The same goes for the initial
 	placement of a document window. Additional document windows should duplicate
-	the most recent document window's frame offset by 15 pixels in both
+	the most recent document window's frame offset by the window tab height in both
 	directions. As with size, a program should generally remember the screen
 	placement of the windows and movement should not be restricted unless there
 	is a good reason for it.</para>
@@ -1557,7 +1563,8 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 	focus. As a rule, this behavior should not be used, but there are times when
 	it is quite useful, such as for system monitor programs, the Deskbar, and so
 	forth. Typically, this flag is used for "helper" applications and utility
-	windows.</para>
+	windows. Note that the user can override this from the Mouse preferences
+	if they wish so, forcing all windows to accept the first click.</para>
 </sect1>
 
 <sect1>
@@ -1600,7 +1607,7 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 	would like your program to be the default handler for a particular kind of
 	file when your program is installed. It is *never* acceptable to ask the
 	user "Are you sure you want to quit?" If your program is asked to quit,
-	handle unsaved documents and quit. "Are you sure..." questions should be
+	handle unsaved documents and quit. "Are you sure…" questions should be
 	asked only if the action involves the undoable destruction of data, such as
 	deleting a file instead of moving it to the Trash. Avoiding these kinds of
 	situations entirely is a better solution. If the confirmation is asked too
@@ -1655,7 +1662,8 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 
 <listitem><para>Provide settings for significant features. This would include
 		things like default file format for CD ripper, European vs American date
-		format, or the default account in a mail client. Unncessary settings
+		format (although the system-wide setting should be used instead),
+		or the default account in a mail client. Unncessary settings
 		include "Use Ins key for paste" and "Confirm Program Quit".</para></listitem>
 
 <listitem><para>Use language appropriate for the target audience as mentioned in
@@ -1792,7 +1800,7 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 <entry>
 <itemizedlist>
 <listitem>Use them individually or use them the same way as checkboxes</listitem>
-<listitem>Use more than 5 or 6 in a group</listitem>
+<listitem>Use more than 5 or 6 in a group. Consider a list view instead.</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -1902,7 +1910,7 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 </entry>
 <entry>
 <itemizedlist>
-<listitem>Use a label for large amounts of static text</listitem>
+<listitem>Use a label for large amounts of static text. Consider a read-only text view.</listitem>
 <listitem>Use a separate label object for controls which have label functions built-in</listitem>
 </itemizedlist>
 </entry>
@@ -2196,8 +2204,7 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 <varlistentry><term>Toolbars</term>
 <listitem>
 <para>
-	While BeOS doesn't have official support for toolbars, they are easily
-	constructed because they are little more than a collection of graphical
+	Toolbars are little more than a collection of graphical
 	buttons. They are used for providing fast access to commonly-used functions.
 
 <table frame="all">
@@ -2210,9 +2217,9 @@ Go to (MyApp or MyCompany)'s website </term><listitem><para>Opens the default
 <entry>
 <itemizedlist>
 <listitem>Use them to speed up access to common functions</listitem>
-<listitem>Avoid bright colors</listitem>
+<listitem>Use icons from the standard set if possible</listitem>
 <listitem>Make the function of each button obvious from the icons used</listitem>
-<listitem>Make toolbar buttons look like buttons and look clickable</listitem>
+<listitem>Follow the specific icon guidelines for toolbar icons</listitem>
 </itemizedlist>
 </entry>
 <entry>
