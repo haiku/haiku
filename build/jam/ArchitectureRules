@@ -323,7 +323,7 @@ rule KernelArchitectureSetup architecture
 
 		case m68k :
 			HAIKU_KERNEL_PLATFORM ?= atari_m68k ;
-			HAIKU_BOOT_TARGETS += atari_m68k ;
+			HAIKU_BOOT_TARGETS += amiga_m68k atari_m68k ;
 			switch $(HAIKU_KERNEL_PLATFORM) {
 				case atari_m68k :
 				{

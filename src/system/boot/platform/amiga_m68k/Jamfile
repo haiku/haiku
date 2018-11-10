@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src system boot platform amiga_m68k ;
 
-SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform amiga_m68k ;
 
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform amiga_m68k ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -17,73 +17,55 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -fno-rtti ;
 }
 
-#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+local platform ;
+for platform in [ MultiBootSubDirSetup amiga_m68k ] {
+	on $(platform) {
+		#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-BootMergeObject boot_platform_amiga_m68k_shell.o :
-	shell.S
-	: -Wa,--pcrel
-;
-
-
-BootMergeObject boot_platform_amiga_m68k_other.o :
-#	shell.S
-	start.cpp
-	rom_calls.cpp
-	debug.cpp
-	#bios.S
-	console.cpp
-	#serial.cpp
-	Handle.cpp
-	devices.cpp
-	keyboard.cpp
-	menu.cpp
-	mmu.cpp
-	cpu.cpp
-	#smp.cpp
-	#smp_trampoline.S
-#	support.S
-	video.cpp
-	#apm.cpp
-
-	# VESA/DDC EDID
-	#decode_edid.c
-	#dump_edid.c
-
-	: #-Wa,--pcrel
-	: boot_platform_generic.a
-;
+		BootMergeObject boot_platform_amiga_m68k_shell.o :
+			shell.S
+			: -Wa,--pcrel
+		;
 
 
-BootMergeObject boot_platform_amiga_m68k.o :
-	: :
-	boot_platform_amiga_m68k_shell.o
-	boot_platform_amiga_m68k_other.o
-	boot_arch_m68k_030.o
-	boot_arch_m68k_040.o
-;
+		BootMergeObject boot_platform_amiga_m68k_other.o :
+		#	shell.S
+			start.cpp
+			rom_calls.cpp
+			debug.cpp
+			#bios.S
+			console.cpp
+			#serial.cpp
+			Handle.cpp
+			devices.cpp
+			keyboard.cpp
+			menu.cpp
+			mmu.cpp
+			cpu.cpp
+			#smp.cpp
+			#smp_trampoline.S
+		#	support.S
+			video.cpp
+			#apm.cpp
+
+			# VESA/DDC EDID
+			#decode_edid.c
+			#dump_edid.c
+
+			: #-Wa,--pcrel
+			: boot_platform_generic_amiga_m68k.a
+		;
 
 
-# the bootsector in haiku_loader must be checksummed
-rule ChecksumAmigaLoader
-{
-	local haikuLoader = $(1) ;
-	local checksummer = <build>fixup_amiga_boot_checksum ;
-
-	Depends $(haikuLoader) : $(checksummer) ;
-
-	TARGET_CHECKSUM on $(haikuLoader) = $(checksummer) ;
-
+		BootMergeObject boot_platform_amiga_m68k.o :
+			: :
+			boot_platform_amiga_m68k_shell.o
+			boot_platform_amiga_m68k_other.o
+			boot_arch_m68k_030.o
+			boot_arch_m68k_040.o
+		;
+	}
 }
-
-
-actions ChecksumAmigaLoader bind TARGET_CHECKSUM
-{
-	$(TARGET_CHECKSUM) $(1)
-}
-
-
-ChecksumAmigaLoader haiku_loader ;
-
 
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;

@@ -1,43 +1,57 @@
 SubDir HAIKU_TOP src system boot arch m68k ;
 
-DEFINES += _BOOT_MODE ;
+local platform ;
+for platform in [ MultiBootSubDirSetup amiga_m68k atari_m68k ] {
+	on $(platform) {
+		DEFINES += _BOOT_MODE ;
 
-# TODO: Is there any reason to recompile arch_string.S here?
-local librootArchObjects =
-#	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
-	arch_string.S
-;
+		local kernelArchSources =
+			arch_elf.cpp
+		;
 
-local kernelLibArchObjects =
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
-;
+		local librootStringArchSources =
+			arch_string.S
+		;
 
-BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
-	arch_elf.cpp
-	$(librootArchObjects)
-	:
-	:
-	$(kernelLibArchObjects)
-;
+		local librootOsArchSources =
+			byteorder.S
+		;
 
-BootMergeObject boot_arch_m68k_030.o :
-	mmu_030.cpp
-	: -Wno-unused -mcpu=68030
-;
+		local librootStringGenericSources =
+			#memcpy.c
+			memset.c
+		;
 
-BootMergeObject boot_arch_m68k_040.o :
-	mmu_040.cpp
-	: -Wno-unused -mcpu=68040 -Wa,-m68040
-;
+		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
+			$(kernelArchSources)
+			$(librootStringArchSources)
+			$(librootOsArchSources)
+			$(librootStringGenericSources)
+			:
+		;
 
-BootMergeObject boot_arch_m68k_060.o :
-	mmu_060.cpp
-	: -Wno-unused -mcpu=68060
-;
+		BootMergeObject boot_arch_m68k_030.o :
+			mmu_030.cpp
+			: -Wno-unused -mcpu=68030
+		;
 
-SEARCH on [ FGristFiles arch_elf.cpp ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+		BootMergeObject boot_arch_m68k_040.o :
+			mmu_040.cpp
+			: -Wno-unused -mcpu=68040 -Wa,-m68040
+		;
 
-SEARCH on [ FGristFiles $(librootArchObjects) ]
-    = [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
+		BootMergeObject boot_arch_m68k_060.o :
+			mmu_060.cpp
+			: -Wno-unused -mcpu=68060
+		;
+
+		SEARCH on [ FGristFiles $(kernelArchSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch m68k ] ;
+		SEARCH on [ FGristFiles $(librootStringArchSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch m68k ] ;
+		SEARCH on [ FGristFiles $(librootOsArchSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot os arch m68k ] ;
+		SEARCH on [ FGristFiles $(librootStringGenericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
+	}
+}

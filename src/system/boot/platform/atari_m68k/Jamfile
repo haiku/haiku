@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system boot platform atari_m68k ;
 
-SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform atari_m68k ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
@@ -17,122 +17,60 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -fno-rtti ;
 }
 
-#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+local platform ;
+for platform in [ MultiBootSubDirSetup atari_m68k ] {
+	on $(platform) {
+		#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-BootMergeObject boot_platform_atari_m68k_shell.o :
-	shell.S
-	: -Wa,--pcrel
-;
-
-
-# cpu-specific stuff
-# should be moved to boot/arch/m68k/...
-# TODO: add 020+68851 support
+		BootMergeObject boot_platform_atari_m68k_shell.o :
+			shell.S
+			: -Wa,--pcrel
+		;
 
 
-BootMergeObject boot_platform_atari_m68k_other.o :
-#	shell.S
-	start.cpp
-	toscalls.cpp
-	debug.cpp
-	#bios.S
-	console.cpp
-	#serial.cpp
-	Handle.cpp
-	devices.cpp
-	keyboard.cpp
-	menu.cpp
-	mmu.cpp
-	cpu.cpp
-	#smp.cpp
-	#smp_trampoline.S
-#	support.S
-	video.cpp
-	#apm.cpp
-
-	# VESA/DDC EDID
-	#decode_edid.c
-	#dump_edid.c
-
-	: #-Wa,--pcrel
-	: boot_platform_generic.a
-;
+		# cpu-specific stuff
+		# should be moved to boot/arch/m68k/...
+		# TODO: add 020+68851 support
 
 
-BootMergeObject boot_platform_atari_m68k.o :
-	: :
-	boot_platform_atari_m68k_shell.o
-	boot_platform_atari_m68k_other.o
-	boot_arch_m68k_030.o
-	boot_arch_m68k_040.o
-;
+		BootMergeObject boot_platform_atari_m68k_other.o :
+		#	shell.S
+			start.cpp
+			toscalls.cpp
+			debug.cpp
+			#bios.S
+			console.cpp
+			#serial.cpp
+			Handle.cpp
+			devices.cpp
+			keyboard.cpp
+			menu.cpp
+			mmu.cpp
+			cpu.cpp
+			#smp.cpp
+			#smp_trampoline.S
+		#	support.S
+			video.cpp
+			#apm.cpp
+
+			# VESA/DDC EDID
+			#decode_edid.c
+			#dump_edid.c
+
+			: #-Wa,--pcrel
+			: boot_platform_generic.a
+		;
 
 
-# the bootsector in haiku_loader must be checksummed
-
-
-rule ChecksumAtariLoader
-{
-	local haikuLoader = $(1) ;
-	local checksummer = <build>fixup_tos_boot_checksum ;
-
-	Depends $(haikuLoader) : $(checksummer) ;
-
-	TARGET_CHECKSUM on $(haikuLoader) = $(checksummer) ;
-
+		BootMergeObject boot_platform_atari_m68k.o :
+			: :
+			boot_platform_atari_m68k_shell.o
+			boot_platform_atari_m68k_other.o
+			boot_arch_m68k_030.o
+			boot_arch_m68k_040.o
+		;
+	}
 }
-
-
-actions ChecksumAtariLoader bind TARGET_CHECKSUM {
-	$(TARGET_CHECKSUM) $(1)
-}
-
-
-ChecksumAtariLoader haiku_loader ;
-
-
-# AUTO folder PRG target
-
-
-# based on KernelLd
-rule AtariBootPrgLd
-{
-	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
-
-	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
-
-	LINKFLAGS on $(1) = $(4) ;
-	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
-
-	# Remove any preset LINKLIBS
-	LINKLIBS on $(1) = ;
-
-	# TODO: Do we really want to invoke SetupKernel here? The objects should
-	# have been compiled with KernelObjects anyway, so we're doing that twice.
-	SetupKernel $(2) ;
-
-	# Show that we depend on the libraries we need
-	LocalClean clean : $(1) ;
-	LocalDepends all : $(1) ;
-	Depends $(1) : $(2) ;
-
-	MakeLocateDebug $(1) ;
-
-}
-
-
-actions AtariBootPrgLd
-{
-	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
-}
-
-
-AtariBootPrgLd haiku.prg :
-	boot_loader_$(TARGET_BOOT_PLATFORM)
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
-	: -Bstatic
-;
-
 
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;

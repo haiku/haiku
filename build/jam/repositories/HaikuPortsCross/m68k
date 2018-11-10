@@ -20,6 +20,8 @@ BootstrapPackageRepository HaikuPortsCross
 
 	:
 	# source packages
+	binutils_bootstrap
+	gcc_bootstrap
 	libsolv_bootstrap
 	zlib_bootstrap
 	:
