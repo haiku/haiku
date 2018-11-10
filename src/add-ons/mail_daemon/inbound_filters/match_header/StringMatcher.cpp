@@ -1,5 +1,5 @@
 //--------This file shamelessly stolen from Jeremy Friesner's excellent MUSCLE---------
-/* This file is Copyright 2000 Level Control Systems.  See the included LICENSE.txt file for details. */  
+/* This file is Copyright 2000 Level Control Systems.  See the included LICENSE.txt file for details. */
 
 #include <new>
 #include <stdio.h>
@@ -12,7 +12,7 @@
 StringMatcher::StringMatcher() : _regExpValid(false)
 {
    // empty
-} 
+}
 
 StringMatcher :: StringMatcher(const char * str) : _regExpValid(false)
 {
@@ -24,7 +24,7 @@ StringMatcher::~StringMatcher()
    if (_regExpValid) regfree(&_regExp);
 }
 
-bool StringMatcher::SetPattern(const char * str, bool isSimple) 
+bool StringMatcher::SetPattern(const char * str, bool isSimple)
 {
    PortableString pattern;
 
@@ -36,14 +36,14 @@ bool StringMatcher::SetPattern(const char * str, bool isSimple)
       for (const char * ptr = str; *ptr != '\0'; ptr++)
       {
          if (escapeMode)
-         { 
+         {
             escapeMode = false;
             switch(*ptr)
             {
-               case ',': case '|': case '(': case ')': case '?': 
+               case ',': case '|': case '(': case ')': case '?':
                   pattern += *ptr;
                break;
-   
+
                default:
                   pattern += '\\';
                   pattern += *ptr;
@@ -52,32 +52,32 @@ bool StringMatcher::SetPattern(const char * str, bool isSimple)
          }
          else
          {
-            switch(*ptr) 
+            switch(*ptr)
             {
-               case ',': case '|': 
+               case ',': case '|':
                   pattern += "\\|";
                break;
 
-               case '.': case '(': case ')': 
+               case '.': case '(': case ')':
                   pattern += '\\';
                   pattern += *ptr;
                break;
 
-               case '*': 
+               case '*':
                   pattern += ".*";
                break;
 
-               case '?': 
+               case '?':
                   pattern += '.';
                break;
 
-               case '\\': 
+               case '\\':
                   escapeMode = true;
                break;
 
                break;
-     
-               default:  
+
+               default:
                   pattern += *ptr;
                break;
             }
@@ -88,7 +88,7 @@ bool StringMatcher::SetPattern(const char * str, bool isSimple)
    }
 
    // Free the old regular expression, if any
-   if (_regExpValid)    
+   if (_regExpValid)
    {
      regfree(&_regExp);
      _regExpValid = false;
@@ -103,23 +103,13 @@ bool StringMatcher::SetPattern(const char * str, bool isSimple)
 bool
 StringMatcher::Match(const char *str) const
 {
-#ifdef __INTEL__
-	char buffer[1024];
-	if (strlen(str) > 1024) {
-		// internal Be regex seems to be broken with strings larger than a certain size :-/
-		memcpy(buffer, str, 1023);
-		buffer[1023] = '\0';
-		str = buffer;
-	}
-#endif
-
 	if (_regExpValid == false)
 		return false;
 
 	int regExpStat = regexec(&_regExp, str, 0, NULL, 0);
 
 	return (regExpStat != REG_NOMATCH);
-} 
+}
 
 
 bool IsRegexToken(char c)
