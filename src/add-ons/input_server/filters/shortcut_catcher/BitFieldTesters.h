@@ -17,13 +17,6 @@
 // This file contains various BitTester classes, each of which defines a
 // sequence of bit testing logics to do on a uint32.
 
-#ifndef __HAIKU__
-#ifndef __INTEL__
-#pragma export on
-#endif
-#endif
-
-
 // The abstract base class. Defines the interface.
 _EXPORT class BitFieldTester;
 class BitFieldTester : public BArchivable {
@@ -94,7 +87,7 @@ private:
 
 
 // The most interesting class: This one returns true if at least (minNum) of
-// its slaves return true. It can be used for OR (i.e. minNum==1), AND 
+// its slaves return true. It can be used for OR (i.e. minNum==1), AND
 // (i.e. minNum==numberofchildren), or anything in between!
 _EXPORT class MinMatchFieldTester;
 class MinMatchFieldTester : public BitFieldTester {
@@ -119,11 +112,5 @@ private:
 			bool				fDeleteSlaves;
 };
 
-
-#ifndef __HAIKU__
-#ifndef __INTEL__
-#pragma export reset
-#endif
-#endif
 
 #endif	// _BIT_FIELD_TESTERS_H
