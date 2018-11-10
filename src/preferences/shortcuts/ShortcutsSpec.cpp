@@ -618,16 +618,8 @@ ShortcutsSpec::_InitModifierNames()
 		"Name for modifier on keyboard");
 	sControlName = B_TRANSLATE_COMMENT("Control",
 		"Name for modifier on keyboard");
-// TODO: Wrapping in __INTEL__ define probably won't work to extract catkeys?
-#if __INTEL__
 	sOptionName = B_TRANSLATE_COMMENT("Option",
 		"Name for modifier on keyboard");
 	sCommandName = B_TRANSLATE_COMMENT("Alt",
 		"Name for modifier on keyboard");
-#else
-	sOptionName = B_TRANSLATE_COMMENT("Option",
-		"Name for modifier on keyboard");
-	sCommandName = B_TRANSLATE_COMMENT("Command",
-		"Name for modifier on keyboard");
-#endif
 }
