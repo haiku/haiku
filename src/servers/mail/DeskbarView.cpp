@@ -56,33 +56,21 @@
 const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 
-//-----The following #defines get around a bug in get_image_info on ppc---
-#if __INTEL__
-#define text_part text
-#define text_part_size text_size
-#else
-#define text_part data
-#define text_part_size data_size
-#endif
-
-
 extern "C" _EXPORT BView* instantiate_deskbar_item(float maxWidth,
 	float maxHeight);
 
 
-status_t
-our_image(image_info* image)
+static status_t
+our_image(image_info& image)
 {
 	int32 cookie = 0;
-	status_t ret;
-	while ((ret = get_next_image_info(0, &cookie, image)) == B_OK) {
-		if ((char*)our_image >= (char*)image->text_part
-			&& (char*)our_image <= (char*)image->text_part
-				+ image->text_part_size)
-			break;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
+		if ((char *)our_image >= (char *)image.text
+			&& (char *)our_image <= (char *)image.text + image.text_size)
+			return B_OK;
 	}
 
-	return ret;
+	return B_ERROR;
 }
 
 
@@ -338,7 +326,7 @@ DeskbarView::_InitBitmaps()
 		fBitmaps[i] = NULL;
 
 	image_info info;
-	if (our_image(&info) != B_OK)
+	if (our_image(info) != B_OK)
 		return;
 
 	BFile file(info.name, B_READ_ONLY);
