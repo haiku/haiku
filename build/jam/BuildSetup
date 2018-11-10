@@ -478,8 +478,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# build platform we need to make sure, this is also defined.
 	if $(HOST_CPU) = x86 {
 		HOST_DEFINES += __INTEL__ ;
-	} else if $(HOST_CPU) = x86_64 {
-		HOST_DEFINES += __x86_64__ ;
 	} else if $(HOST_CPU) = ppc {
 		HOST_DEFINES += __POWERPC__ ;
 	} else if $(HOST_CPU) = m68k {
