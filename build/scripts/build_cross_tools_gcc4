@@ -146,6 +146,11 @@ find "$binutilsSourceDir" "$gccSourceDir" -name \*.info -print0 | xargs -0 touch
 # version of autofools that GCC wants
 find "$binutilsSourceDir" "$gccSourceDir" \( -name configure -o -name \*.in \) -print0 | xargs -0 touch
 
+# export some variables to stop the subsequent configure/make from invoking
+# tools which we don't require the user to have installed (or do not require
+# a specific version of, which autofools does.)
+export ACLOCAL=:
+
 # create the object and installation directories for the cross compilation tools
 objDir="${installDir}-build"
 binutilsObjDir="$objDir/binutils"
