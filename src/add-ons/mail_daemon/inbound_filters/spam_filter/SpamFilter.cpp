@@ -125,11 +125,9 @@ SpamFilter::_CheckForSpam(BFile& file)
 	delete[] stringBuffer;
 
 	// write attributes
-	const char *classificationString;
-	classificationString = spamRatio >= fSpamCutoffRatio ? "Spam"
+	BString classificationString = spamRatio >= fSpamCutoffRatio ? "Spam"
 		: spamRatio < fGenuineCutoffRatio ? "Genuine" : "Uncertain";
-	file.WriteAttr("MAIL:classification", B_STRING_TYPE, 0 /* offset */,
-		classificationString, strlen(classificationString) + 1);
+	file.WriteAttrString("MAIL:classification", &classificationString);
 
 	// Store the spam ratio in an attribute called MAIL:ratio_spam,
 	// attached to the eventual output file.
@@ -303,8 +301,7 @@ SpamFilter::_AddSpamToSubject(BNode& file, float spamRatio)
 	newSubjectString << buffer;
 	delete[] buffer;
 
-	if (file.WriteAttr("Subject", B_STRING_TYPE, 0, newSubjectString.String(),
-		newSubjectString.Length()) < 0)
+	if (file.WriteAttrString("Subject", &newSubjectString) < 0)
 		return B_ERROR;
 
 	return B_OK;

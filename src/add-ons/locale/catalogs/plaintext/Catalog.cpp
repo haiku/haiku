@@ -1,7 +1,7 @@
 /*
-** Copyright 2009 Adrien Destugues, pulkomandy@gmail.com. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+ * Copyright 2009 Adrien Destugues, pulkomandy@gmail.com. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <PlainTextCatalog.h>
 
@@ -354,16 +354,12 @@ PlainTextCatalog::UpdateAttributes(BFile& catalogFile)
 			kCatMimeType, strlen(kCatMimeType)+1);
 	}
 	if (catalogFile.ReadAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0,
-		&buf, bufSize) <= 0
-		|| fLanguageName != buf) {
-		catalogFile.WriteAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0,
-			fLanguageName.String(), fLanguageName.Length()+1);
+			&buf, bufSize) <= 0 || fLanguageName != buf) {
+		catalogFile.WriteAttrString(BLocaleRoster::kCatLangAttr, &fLanguageName);
 	}
 	if (catalogFile.ReadAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0,
-		&buf, bufSize) <= 0
-		|| fSignature != buf) {
-		catalogFile.WriteAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0,
-			fSignature.String(), fSignature.Length()+1);
+			&buf, bufSize) <= 0 || fSignature != buf) {
+		catalogFile.WriteAttrString(BLocaleRoster::kCatSigAttr, &fSignature);
 	}
 	if (catalogFile.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE,
 		0, &temp, sizeof(uint32)) <= 0) {

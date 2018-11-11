@@ -185,7 +185,8 @@ Keymap::Save(const entry_ref& ref)
 	}
 
 	if (status == B_OK) {
-		file.WriteAttr("keymap:name", B_STRING_TYPE, 0, fName, strlen(fName));
+		const BString name(fName);
+		file.WriteAttrString("keymap:name", &name);
 			// Failing would be non-fatal
 	}
 

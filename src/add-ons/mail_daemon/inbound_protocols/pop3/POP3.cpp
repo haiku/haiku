@@ -228,8 +228,8 @@ POP3Protocol::SyncMessages()
 		}
 		ReportProgress(1, 0);
 
-		if (file.WriteAttr("MAIL:unique_id", B_STRING_TYPE, 0, uid,
-				strlen(uid)) < 0)
+		const BString uidStr(uid);
+		if (file.WriteAttrString("MAIL:unique_id", &uidStr) < 0)
 			error = B_ERROR;
 
 		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));

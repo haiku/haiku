@@ -330,8 +330,10 @@ InputServer::_SaveKeymap(bool isDefault)
 	// don't bother reporting an error if this fails, since this isn't fatal
 	// the keymap will still be functional, and will just be identified as (Current) in prefs instead of its
 	// actual name
-	if (isDefault)
-		file.WriteAttr("keymap:name", B_STRING_TYPE, 0, kSystemKeymapName, strlen(kSystemKeymapName));
+	if (isDefault) {
+		const BString systemKeymapName(kSystemKeymapName);
+		file.WriteAttrString("keymap:name", &systemKeymapName);
+	}
 
 	return B_OK;
 }

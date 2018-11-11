@@ -23,6 +23,7 @@
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
+#include <String.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
@@ -678,8 +679,8 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file, const char 
 			outText += length;
 		} while (sourceLength > 0);
 
-		file->WriteAttr("be:encoding", B_STRING_TYPE, 0,
-			encoding, strlen(encoding));
+		BString encodingStr(encoding);
+		file->WriteAttrString("be:encoding", &encodingStr);
 	}
 
 	// truncate any extra text
