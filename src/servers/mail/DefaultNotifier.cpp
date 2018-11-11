@@ -104,6 +104,8 @@ DefaultNotifier::ReportProgress(uint32 messages, uint64 bytes,
 	const char* message)
 {
 	fSizeDone += bytes;
+	fItemsDone += messages;
+
 	if (fTotalSize > 0)
 		fNotification.SetProgress(fSizeDone / (float)fTotalSize);
 	else if (fTotalItems > 0) {
@@ -117,8 +119,6 @@ DefaultNotifier::ReportProgress(uint32 messages, uint64 bytes,
 		fNotification.SetProgress(0);
 	}
 
-	fItemsDone += messages;
-
 	BString progress;
 	progress << message << "\t";
 
@@ -128,7 +128,7 @@ DefaultNotifier::ReportProgress(uint32 messages, uint64 bytes,
 	fNotification.SetContent(progress);
 
 	int timeout = 0; // Default timeout
-	if (fItemsDone == fTotalItems && fTotalItems != 0)
+	if (fItemsDone >= fTotalItems && fTotalItems != 0)
 		timeout = 1; // We're done, make the window go away faster
 
 	_NotifyIfAllowed(timeout);
@@ -138,10 +138,12 @@ DefaultNotifier::ReportProgress(uint32 messages, uint64 bytes,
 void
 DefaultNotifier::ResetProgress(const char* message)
 {
+	fSizeDone = 0;
+	fItemsDone = 0;
 	fNotification.SetProgress(0);
 	if (message != NULL)
 		fNotification.SetTitle(message);
-	_NotifyIfAllowed();
+	_NotifyIfAllowed(1); // go away faster
 }
 
 
