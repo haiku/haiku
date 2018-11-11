@@ -881,7 +881,7 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 		return;
 	}
 
-	fSaveMessage = new BMessage(B_SAVE_REQUESTED);
+	fSaveMessage = new(std::nothrow) BMessage(B_SAVE_REQUESTED);
 	if (fSaveMessage) {
 		BEntry entry(ref, true);
 		BEntry parent;
