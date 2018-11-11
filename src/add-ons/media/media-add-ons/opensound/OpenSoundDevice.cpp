@@ -389,7 +389,8 @@ OpenSoundDevice::AddEngine(oss_audioinfo *info)
 	if (info->caps & PCM_CAP_HIDDEN)
 		return B_OK;
 */
-	OpenSoundDeviceEngine *engine = new OpenSoundDeviceEngine(info);
+	OpenSoundDeviceEngine *engine =
+		new(std::nothrow) OpenSoundDeviceEngine(info);
 	if (!engine)
 		return ENOMEM;
 	err = engine->InitCheck();
@@ -407,7 +408,8 @@ OpenSoundDevice::AddMixer(oss_mixerinfo *info)
 {
 	status_t err;
 	CALLED();
-	OpenSoundDeviceMixer *mixer = new OpenSoundDeviceMixer(info);
+	OpenSoundDeviceMixer *mixer =
+		new(std::nothrow) OpenSoundDeviceMixer(info);
 	if (!mixer)
 		return ENOMEM;
 	err = mixer->InitCheck();
