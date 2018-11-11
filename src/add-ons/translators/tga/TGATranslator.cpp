@@ -122,7 +122,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 {
 	BTranslator *ptranslator = NULL;
 	if (!n)
-		ptranslator = new TGATranslator();
+		ptranslator = new(std::nothrow) TGATranslator();
 
 	return ptranslator;
 }
@@ -142,7 +142,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 TGATranslator::TGATranslator()
-	: BaseTranslator(B_TRANSLATE("TGA images"), 
+	: BaseTranslator(B_TRANSLATE("TGA images"),
 		B_TRANSLATE("TGA image translator"),
 		TGA_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
@@ -394,34 +394,34 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 		outInfo->capability = TGA_IN_CAPABILITY;
 		switch (fileheader.imagetype) {
 			case TGA_NOCOMP_COLORMAP:
-				snprintf(outInfo->name, sizeof(outInfo->name), 
-					B_TRANSLATE("Targa image (%d bits colormap)"), 
+				snprintf(outInfo->name, sizeof(outInfo->name),
+					B_TRANSLATE("Targa image (%d bits colormap)"),
 					imagespec.depth);
 				break;
 			case TGA_NOCOMP_TRUECOLOR:
-				snprintf(outInfo->name, sizeof(outInfo->name), 
-					B_TRANSLATE("Targa image (%d bits truecolor)"), 
+				snprintf(outInfo->name, sizeof(outInfo->name),
+					B_TRANSLATE("Targa image (%d bits truecolor)"),
 					imagespec.depth);
 				break;
 			case TGA_RLE_COLORMAP:
-				snprintf(outInfo->name, sizeof(outInfo->name), 
-					B_TRANSLATE("Targa image (%d bits RLE colormap)"), 
+				snprintf(outInfo->name, sizeof(outInfo->name),
+					B_TRANSLATE("Targa image (%d bits RLE colormap)"),
 					imagespec.depth);
 				break;
 			case TGA_RLE_TRUECOLOR:
-				snprintf(outInfo->name, sizeof(outInfo->name), 
-					B_TRANSLATE("Targa image (%d bits RLE truecolor)"), 
+				snprintf(outInfo->name, sizeof(outInfo->name),
+					B_TRANSLATE("Targa image (%d bits RLE truecolor)"),
 					imagespec.depth);
 				break;
 			case TGA_RLE_BW:
-				snprintf(outInfo->name, sizeof(outInfo->name), 
-					B_TRANSLATE("Targa image (%d bits RLE gray)"), 
+				snprintf(outInfo->name, sizeof(outInfo->name),
+					B_TRANSLATE("Targa image (%d bits RLE gray)"),
 					imagespec.depth);
 				break;
 			case TGA_NOCOMP_BW:
 			default:
-				snprintf(outInfo->name, sizeof(outInfo->name), 
-					B_TRANSLATE("Targa image (%d bits gray)"), 
+				snprintf(outInfo->name, sizeof(outInfo->name),
+					B_TRANSLATE("Targa image (%d bits gray)"),
 					imagespec.depth);
 				break;
 
@@ -695,7 +695,7 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	uint16 nread = 0;
 	status_t result, bytescopied = 0;
 	uint8 *prawbuf, *praw;
-	prawbuf = new uint8[bitsBytesPerPixel * 128];
+	prawbuf = new(std::nothrow) uint8[bitsBytesPerPixel * 128];
 	praw = prawbuf;
 	if (!prawbuf)
 		return B_ERROR;
@@ -873,10 +873,10 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 	int32 tgaRowBytes = (imagespec.width * tgaBytesPerPixel) +
 		(imagespec.width / 2);
 	uint32 tgapixrow = 0;
-	uint8 *tgaRowData = new uint8[tgaRowBytes];
+	uint8 *tgaRowData = new(std::nothrow) uint8[tgaRowBytes];
 	if (!tgaRowData)
 		return B_ERROR;
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	uint8 *bitsRowData = new(std::nothrow) uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] tgaRowData;
 		tgaRowData = NULL;
@@ -966,17 +966,17 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 	int32 tgaRowBytes = (imagespec.width * tgaBytesPerPixel) +
 		(imagespec.width / 2);
 	uint32 tgapixrow = 0;
-	uint8 *tgaRowData = new uint8[tgaRowBytes];
+	uint8 *tgaRowData = new(std::nothrow) uint8[tgaRowBytes];
 	if (!tgaRowData)
 		return B_ERROR;
 
-	uint8 *medRowData = new uint8[imagespec.width];
+	uint8 *medRowData = new(std::nothrow) uint8[imagespec.width];
 	if (!medRowData) {
 		delete[] tgaRowData;
 		tgaRowData = NULL;
 		return B_ERROR;
 	}
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	uint8 *bitsRowData = new(std::nothrow) uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] medRowData;
 		medRowData = NULL;
@@ -1561,10 +1561,10 @@ TGATranslator::translate_from_tganm_to_bits(BPositionIO *inSource,
 		outDestination->Seek(bitsoffset, SEEK_CUR);
 
 	// allocate row buffers
-	uint8 *tgaRowData = new uint8[tgaRowBytes];
+	uint8 *tgaRowData = new(std::nothrow) uint8[tgaRowBytes];
 	if (!tgaRowData)
 		return B_ERROR;
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	uint8 *bitsRowData = new(std::nothrow) uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] tgaRowData;
 		tgaRowData = NULL;
@@ -1658,7 +1658,7 @@ TGATranslator::translate_from_tganmrle_to_bits(BPositionIO *inSource,
 		outDestination->Seek(bitsoffset, SEEK_CUR);
 
 	// allocate row buffers
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	uint8 *bitsRowData = new(std::nothrow) uint8[bitsRowBytes];
 	if (!bitsRowData)
 		return B_ERROR;
 
@@ -1864,10 +1864,10 @@ translate_from_tgam_to_bits(BPositionIO *inSource,
 		outDestination->Seek(bitsoffset, SEEK_CUR);
 
 	// allocate row buffers
-	uint8 *tgaRowData = new uint8[tgaRowBytes];
+	uint8 *tgaRowData = new(std::nothrow) uint8[tgaRowBytes];
 	if (!tgaRowData)
 		return B_ERROR;
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	uint8 *bitsRowData = new(std::nothrow) uint8[bitsRowBytes];
 	if (!bitsRowData) {
 		delete[] tgaRowData;
 		tgaRowData = NULL;
@@ -1963,7 +1963,7 @@ TGATranslator::translate_from_tgamrle_to_bits(BPositionIO *inSource,
 		outDestination->Seek(bitsoffset, SEEK_CUR);
 
 	// allocate row buffers
-	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	uint8 *bitsRowData = new(std::nothrow) uint8[bitsRowBytes];
 	if (!bitsRowData)
 		return B_ERROR;
 
@@ -2130,7 +2130,7 @@ TGATranslator::translate_from_tga(BPositionIO *inSource, uint32 outType,
 			nentrybytes = mapspec.entrysize / 8;
 			if (mapspec.entrysize % 8)
 				nentrybytes++;
-			ptgapalette = new uint8[nentrybytes * mapspec.length];
+			ptgapalette = new(std::nothrow) uint8[nentrybytes * mapspec.length];
 			inSource->Read(ptgapalette, nentrybytes * mapspec.length);
 		}
 
@@ -2214,7 +2214,7 @@ TGATranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 TGATranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new TGAView(B_TRANSLATE("TGATranslator Settings"), 
+	return new(std::nothrow) TGAView(B_TRANSLATE("TGATranslator Settings"),
 		B_WILL_DRAW, settings);
 }
 
