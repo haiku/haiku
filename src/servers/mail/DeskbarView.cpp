@@ -164,14 +164,6 @@ void DeskbarView::_RefreshMailQuery()
 		newMailQuery->PushAttr(B_MAIL_ATTR_READ);
 		newMailQuery->PushInt32(B_UNREAD);
 		newMailQuery->PushOp(B_EQ);
-		newMailQuery->PushAttr("BEOS:TYPE");
-		newMailQuery->PushString("text/x-email");
-		newMailQuery->PushOp(B_EQ);
-		newMailQuery->PushAttr("BEOS:TYPE");
-		newMailQuery->PushString("text/x-partial-email");
-		newMailQuery->PushOp(B_EQ);
-		newMailQuery->PushOp(B_OR);
-		newMailQuery->PushOp(B_AND);
 		newMailQuery->Fetch();
 
 		BEntry entry;
@@ -447,8 +439,7 @@ DeskbarView::_CreateNewMailQuery(BEntry& query)
 	if (file.InitCheck() != B_OK)
 		return;
 
-	BString string("((" B_MAIL_ATTR_READ "<2)&&((BEOS:TYPE=="
-		"\"text/x-email\")||(BEOS:TYPE==\"text/x-partial-email\")))");
+	BString string(B_MAIL_ATTR_READ "<2");
 	file.WriteAttrString("_trk/qrystr", &string);
 	file.WriteAttrString("_trk/qryinitstr", &string);
 	int32 mode = 'Fbyq';
