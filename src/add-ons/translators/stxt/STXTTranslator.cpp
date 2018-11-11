@@ -247,7 +247,7 @@ identify_text(uint8* data, int32 bytesRead, BPositionIO* source,
 	outInfo->quality = TEXT_IN_QUALITY;
 	outInfo->capability = capability;
 
-	strlcpy(outInfo->name, B_TRANSLATE("Plain text file"), 
+	strlcpy(outInfo->name, B_TRANSLATE("Plain text file"),
 		sizeof(outInfo->name));
 
 	//strlcpy(outInfo->MIME, type.Type(), sizeof(outInfo->MIME));
@@ -474,7 +474,7 @@ output_styles(BPositionIO *outDestination, uint32 text_size,
 	styled text in outDestination
 */
 status_t
-translate_from_text(BPositionIO* source, const char* encoding, bool forceEncoding,
+translate_from_text(BPositionIO* source, const char* outEncoding, bool forceEncoding,
 	BPositionIO* destination, uint32 outType)
 {
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT)
@@ -524,17 +524,16 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 	BMallocIO encodingIO;
 
 	BNode* node = dynamic_cast<BNode*>(source);
-	BString name(encoding);
+	BString encoding(outEncoding);
 	if (node != NULL) {
 		// determine encoding, if available
 		bool hasAttribute = false;
-		if (encoding != NULL && !forceEncoding) {
+		if (encoding.String() && !forceEncoding) {
 			attr_info info;
 			node->GetAttrInfo("be:encoding", &info);
 
 			if ((info.type == B_STRING_TYPE) && (node->ReadAttrString(
-					"be:encoding", &name) == B_OK)) {
-				encoding = name.String();
+					"be:encoding", &encoding) == B_OK)) {
 				hasAttribute = true;
 			} else if (info.type == B_INT32_TYPE) {
 				// Try the BeOS version of the atribute, which used an int32
@@ -543,7 +542,6 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 				ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
 					&value, sizeof(value));
 				if (bytesRead == (ssize_t)sizeof(value)) {
-					hasAttribute = true;
 					if (value != 65535) {
 						const BCharacterSet* characterSet
 							= BCharacterSetRoster::GetCharacterSetByConversionID(value);
@@ -557,21 +555,20 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 				// we don't write the encoding in this case
 		}
 
-		if (encoding != NULL)
+		if (!encoding.IsEmpty())
 			encodingBuffer.Allocate(READ_BUFFER_SIZE * 4);
 
-		if (!hasAttribute && encoding != NULL) {
+		if (!hasAttribute && !encoding.IsEmpty()) {
 			// add encoding attribute, so that someone opening the file can
 			// retrieve it for persistance
-			node->WriteAttr("be:encoding", B_STRING_TYPE, 0, encoding,
-				strlen(encoding));
+			node->WriteAttrString("be:encoding", &encoding);
 		}
 	}
 
 	off_t outputSize = 0;
 	ssize_t bytesRead;
 
-	BPrivate::BTextEncoding codec(encoding);
+	BPrivate::BTextEncoding codec(encoding.String());
 
 	// output the actual text part of the data
 	do {
@@ -682,7 +679,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 
 STXTTranslator::STXTTranslator()
-	: BaseTranslator(B_TRANSLATE("StyledEdit files"), 
+	: BaseTranslator(B_TRANSLATE("StyledEdit files"),
 		B_TRANSLATE("StyledEdit file translator"),
 		STXT_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
@@ -805,7 +802,7 @@ STXTTranslator::Translate(BPositionIO* source, const translator_info* info,
 BView *
 STXTTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new STXTView(BRect(0, 0, 225, 175), 
+	return new STXTView(BRect(0, 0, 225, 175),
 		B_TRANSLATE("STXTTranslator Settings"),
 		B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
