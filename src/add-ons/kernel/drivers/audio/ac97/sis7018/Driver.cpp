@@ -79,7 +79,7 @@ init_driver()
 					break;
 				}
 
-				Device* device = new Device(cardInfos[idx], info);
+				Device* device = new(std::nothrow) Device(cardInfos[idx], info);
 				if (device == 0) {
 					return ENODEV;
 				}
