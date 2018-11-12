@@ -618,6 +618,10 @@ void
 IMAPConnectionWorker::Quit()
 {
 	printf("IMAP: worker %p: enqueue quit\n", this);
+	BAutolock locker(fLocker);
+	while (!fPendingCommands.IsEmpty())
+		delete(fPendingCommands.RemoveItemAt(0));
+	locker.Unlock();
 	_EnqueueCommand(new QuitCommand());
 }
 
@@ -732,7 +736,11 @@ IMAPConnectionWorker::_Worker()
 
 		CommandDeleter deleter(*this, command);
 
-		status_t status = _Connect();
+		status_t status = B_OK;
+
+		if (dynamic_cast<QuitCommand*>(command) == NULL) // do not connect on QuitCommand
+			status = _Connect();
+
 		if (status != B_OK) {
 			fOwner.WorkerQuit(this);
 			return status;
