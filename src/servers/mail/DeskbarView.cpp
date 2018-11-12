@@ -161,8 +161,8 @@ void DeskbarView::_RefreshMailQuery()
 		BQuery *newMailQuery = new BQuery;
 		newMailQuery->SetTarget(this);
 		newMailQuery->SetVolume(&volume);
-		newMailQuery->PushAttr(B_MAIL_ATTR_READ);
-		newMailQuery->PushInt32(B_UNREAD);
+		newMailQuery->PushAttr(B_MAIL_ATTR_STATUS);
+		newMailQuery->PushString("New");
 		newMailQuery->PushOp(B_EQ);
 		newMailQuery->Fetch();
 
@@ -439,7 +439,7 @@ DeskbarView::_CreateNewMailQuery(BEntry& query)
 	if (file.InitCheck() != B_OK)
 		return;
 
-	BString string(B_MAIL_ATTR_READ "<2");
+	BString string(B_MAIL_ATTR_STATUS "==\"New\"");
 	file.WriteAttrString("_trk/qrystr", &string);
 	file.WriteAttrString("_trk/qryinitstr", &string);
 	int32 mode = 'Fbyq';
