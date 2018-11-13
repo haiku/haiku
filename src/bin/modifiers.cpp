@@ -54,11 +54,10 @@ list_modifiers(int mods)
 {
 	int i;
 	int gotone = 0;
-	for (i=0; modifier_names[i]; i++) {
+	for (i = 0; modifier_names[i]; i++) {
 		if (mods & modifier_bits[i]) {
 			if (gotone)
 				printf(",");
-			gotone = 0;
 			printf("%s", modifier_names[i]);
 			gotone = 1;
 		}
