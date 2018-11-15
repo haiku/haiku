@@ -12,11 +12,8 @@ import errno
 from pprint import pprint
 
 parser = argparse.ArgumentParser(description='Configure a build of Haiku')
-parser.add_argument('--target-arch', nargs=1, type=str,
-    help='Target primary architecture',
-    choices=('x86_gcc2', 'x86', 'x86_64', 'ppc', 'm68k', 'arm', 'arm64', 'riscv32', 'riscv64'))
-parser.add_argument('--target-secondary-arch', nargs=1,
-    help='Target secondary architecture',
+parser.add_argument('--target-arch', nargs=1,
+    help='Target architectures. First provided is primary.', type=str, action='append',
     choices=('x86_gcc2', 'x86', 'x86_64', 'ppc', 'm68k', 'arm', 'arm64', 'riscv32', 'riscv64'))
 parser.add_argument('--bootstrap', nargs=3,
     help='Prepare for a bootstrap build. No pre-built packages will be used, instead they will be built from the sources (in several phases).',
@@ -24,10 +21,10 @@ parser.add_argument('--bootstrap', nargs=3,
 parser.add_argument('--build-gcc-toolchain', nargs=1,
     help='Assume cross compilation. Build a gcc-based toolchain.',
     metavar=('<buildtools dir>'))
-parser.add_argument('--use-clang', default=False, action='store_true', help='Assume native clang build')
-parser.add_argument('--cross-tools-prefix', nargs=1,
-    help='Assume cross compilation. Use an existing toolchain.',
+parser.add_argument('--use-gcc-toolchain', nargs=1,
+    help='Assume cross compilation. Build using an existing gcc-based toolchain.',
     metavar=('<prefix>'))
+parser.add_argument('--use-clang', default=False, action='store_true', help='Assume native clang build')
 parser.add_argument('--distro-compatibility', nargs=1,
     help='The distribution\'s level of compatibility with the official Haiku distribution. The generated files will contain the respective trademarks accordingly.',
     choices=('official', 'compatible', 'default'), default='default')
@@ -186,6 +183,9 @@ def setup_target_compiler(arch):
     if args["use_clang"]:
         set_build_config("HAIKU_CC_" + arch, "clang -target " + triplet + " -B llvm-")
 
+def build_gcc_toolchain(buildtools_dir, arch):
+    bok(arch + " toolchain build complete!")
+
 ### Workflow
 
 umask = os.umask(0)
@@ -198,12 +198,20 @@ if umask > 22:
     exit(1)
 
 if args["target_arch"] == None:
-    berror("You need to specify a target architecture via --target-arch")
+    berror("You need to specify at least one target architecture via --target-arch")
     exit(1)
 
-if args["use_clang"] == False and args["build_gcc_toolchain"] == None and args["cross_tools_prefix"] == None:
-    berror("You need to pick a toolchain via --build-gcc-toolchain, --use-clang, or --cross-tools-prefix")
+if args["use_clang"] == False and args["build_gcc_toolchain"] == None and args["use_gcc_toolchain"] == None:
+    berror("You need to pick a toolchain via --build-gcc-toolchain, --use-gcc-toolchain, or --use-clang")
     exit(1)
+elif args["use_clang"] == True:
+    bok("Using the host's clang toolchain with a haiku target.")
+elif args["build_gcc_toolchain"] != None:
+    bok("Building a gcc cross-compiler.")
+elif args["use_gcc_toolchain"] != None:
+    bok("Using the existing gcc toolchain at " + args["use_gcc_toolchain"][0])
+
+mkdir_p(outputDir + "/build")
 
 # Some Defaults
 set_build_config("TARGET_PLATFORM", "haiku")
@@ -217,14 +225,16 @@ set_build_config("HAIKU_DISTRO_COMPATIBILITY", args["distro_compatibility"])
 setup_bootstrap()
 setup_host_tools()
 setup_host_compiler()
-setup_target_compiler(args["target_arch"][0])
-
-if args["target_secondary_arch"] != None:
-    setup_target_compiler(args["target_secondary_arch"][0])
 
 binfo("Configuring a Haiku build at " + outputDir)
 
-mkdir_p(outputDir + "/build")
+for arch in args["target_arch"]:
+    binfo("Configuring " + arch[0] + " architecture...")
+    setup_target_compiler(arch[0])
+
+    if args["build_gcc_toolchain"] != None:
+        build_gcc_toolchain(args["build_gcc_toolchain"][0], arch[0])
+
 write_build_config(outputDir + "/build/BuildConfig")
 
 # Write out an entry Jamfile in our build directory
