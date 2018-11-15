@@ -1,0 +1,181 @@
+#!/bin/env python3
+#
+# Haiku build configuration tool
+# Copyright 2002-2018, Haiku, Inc. All rights reserved.
+#
+
+import argparse
+import os
+import subprocess
+import sys
+from pprint import pprint
+
+parser = argparse.ArgumentParser(description='Configure a build of Haiku')
+parser.add_argument('--target-arch', nargs=1, type=str,
+    help='Target primary architecture',
+    choices=('x86_gcc2', 'x86', 'x86_64', 'ppc', 'm68k', 'arm', 'arm64', 'riscv32', 'riscv64'))
+parser.add_argument('--target-secondary-arch', nargs=1,
+    help='Target secondary architecture',
+    choices=('x86_gcc2', 'x86', 'x86_64', 'ppc', 'm68k', 'arm', 'arm64', 'riscv32', 'riscv64'))
+parser.add_argument('--bootstrap', nargs=3,
+    help='Prepare for a bootstrap build. No pre-built packages will be used, instead they will be built from the sources (in several phases).',
+    metavar=('<haikuporter>','<haikuports.cross>', '<haikuports>'))
+parser.add_argument('--build-gcc-toolchain', nargs=1,
+    help='Assume cross compilation. Build a gcc-based toolchain.',
+    metavar=('<buildtools dir>'))
+parser.add_argument('--use-clang', default=False, action='store_true', help='Assume native clang build')
+parser.add_argument('--cross-tools-prefix', nargs=1,
+    help='Assume cross compilation. Use an existing toolchain.',
+    metavar=('<prefix>'))
+parser.add_argument('--distro-compatibility', nargs=1,
+    help='The distribution\'s level of compatibility with the official Haiku distribution. The generated files will contain the respective trademarks accordingly.',
+    choices=('official', 'compatible', 'default'), default='default')
+args = vars(parser.parse_args())
+
+### Global Varables
+
+buildConfig = []
+# TODO: Remove "../.." if this ever moves to the source root
+sourceDir = os.path.dirname(os.path.realpath(__file__) + "../..")
+outputDir = os.getcwd()
+
+### Helper Functions
+
+def bok(message):
+    start_color = ""
+    end_color = ""
+    if sys.stdout.isatty():
+        start_color = "\033[92m"
+        end_color = "\033[0m"
+    print(start_color + message + end_color)
+
+def berror(message):
+    start_color = ""
+    end_color = ""
+    if sys.stdout.isatty():
+        start_color = "\033[91m"
+        end_color = "\033[0m"
+    print(start_color + message + end_color)
+
+def binfo(message):
+    start_color = ""
+    end_color = ""
+    if sys.stdout.isatty():
+        start_color = "\033[94m"
+        end_color = "\033[0m"
+    print(start_color + message + end_color)
+
+# Run a command, collect stdout into a string
+def cmdrun(cmd):
+    return subprocess.check_output(cmd).decode(sys.stdout.encoding)
+
+# Get a config key
+def get_build_config(key):
+    global buildConfig
+    for i in buildConfig:
+        if i["key"] == key:
+            return i["value"]
+    return None
+
+# Delete a config key
+def drop_build_config(key):
+    global buildConfig
+    value = get_build_config(key)
+    if value != None:
+        buildConfig.remove({"key": key, "value": value})
+
+# Set a config key
+def set_build_config(key, value):
+    global buildConfig
+    if get_build_config(key) != None:
+        drop_build_config(key)
+    buildConfig.append({"key": key, "value": value})
+
+def triplet_lookup(arch):
+    if arch == "x86_gcc2":
+        return "i586-pc-haiku"
+    elif arch == "x86":
+        return "i586-pc-haiku"
+    elif arch == "x86_64":
+        return "x86_64-unknown-haiku"
+    elif arch == "ppc":
+        return "powerpc-apple-haiku"
+    elif arch == "m68k":
+        return "m68k-unknown-haiku"
+    elif arch == "arm":
+        return "arm-unknown-haiku"
+    elif arch == "riscv32":
+        return "riscv32-unknown-haiku"
+    elif arch == "riscv64":
+        return "riscv64-unknown-haiku"
+    else:
+        berror("Unsupported target architecture: " + arch)
+        exit(1)
+
+def setup_bootstrap():
+    if args["bootstrap"] == None:
+        return
+    set_build_config("HOST_HAIKU_PORTER", os.path.abspath(args["bootstrap"][0]))
+    set_build_config("HAIKU_PORTS", os.path.abspath(args["bootstrap"][1]))
+    set_build_config("HAIKU_PORTS_CROSS", os.path.abspath(args["bootstrap"][2]))
+
+def setup_host_tools():
+    set_build_config("HOST_SHA256", "sha256sum")
+    set_build_config("HOST_EXTENDED_REGEX_SED", "sed -r")
+
+def setup_host_compiler():
+    cc = os.environ.get("CC")
+    if cc == None:
+        # We might want to step through each potential compiler here
+        cc = "gcc"
+    set_build_config("HOST_CC", cc)
+    set_build_config("HOST_CC_LD", cmdrun([cc, "-print-prog-name=ld"]).strip())
+    set_build_config("HOST_CC_OBJCOPY", cmdrun([cc, "-print-prog-name=objcopy"]).strip())
+
+def setup_target_compiler(arch):
+    cc = get_build_config("HOST_CC")
+    set_build_config("HAIKU_GCC_RAW_VERSION_" + arch, cmdrun([cc, "-dumpversion"]).strip())
+    set_build_config("HAIKU_GCC_MACHINE_" + arch, triplet_lookup(arch))
+    set_build_config("HAIKU_CPU_" + arch, arch)
+    if args["use_clang"]:
+        set_build_config("HAIKU_CC_" + arch, "clang -target " + arch + "-unknown-haiku -B llvm-")
+
+### Workflow
+
+umask = os.umask(0)
+os.umask(umask)
+if umask > 22:
+    berror("Your umask is too restrictive (should be <= 0022; is actually " + str(umask) + ")")
+    print()
+    berror("Additionally, if the source tree was cloned with a too-restrictive umask,")
+    berror("you will need to run \"git checkout\" again to fix this.")
+    exit(1)
+
+if args["target_arch"] == None:
+    berror("You need to specify a target architecture via --target-arch")
+    exit(1)
+
+if args["use_clang"] == False and args["build_gcc_toolchain"] == None and args["cross_tools_prefix"] == None:
+    berror("You need to pick a toolchain via --build-gcc-toolchain, --use-clang, or --cross-tools-prefix")
+    exit(1)
+
+# Some Defaults
+set_build_config("TARGET_PLATFORM", "haiku")
+set_build_config("HAIKU_INCLUDE_SOURCES", 0)
+set_build_config("HAIKU_USE_GCC_PIPE", 0)
+set_build_config("HAIKU_HOST_USE_32BIT", 0)
+set_build_config("HAIKU_HOST_USE_XATTR", "")
+set_build_config("HAIKU_HOST_USE_XATTR_REF", "")
+set_build_config("HAIKU_DISTRO_COMPATIBILITY", args["distro_compatibility"])
+
+setup_bootstrap()
+setup_host_tools()
+setup_host_compiler()
+setup_target_compiler(args["target_arch"][0])
+
+if args["target_secondary_arch"] != None:
+    setup_target_compiler(args["target_secondary_arch"][0])
+
+binfo("Configuring a Haiku build at " + outputDir)
+
+pprint(buildConfig)
