@@ -143,7 +143,7 @@ rule AddDirectoryToContainer container : directoryTokens : attributeFiles
 	if $(attributeFiles) {
 		SEARCH on $(attributeFiles)
 			+= [ FDirName $(HAIKU_TOP) src data directory_attrs ] ;
-		ATTRIBUTE_FILES on $(dir) += $(attributeFiles) ;
+		ATTRIBUTE_FILES on $(directory) += $(attributeFiles) ;
 	}
 
 	return $(directory) ;
@@ -654,9 +654,6 @@ rule CreateContainerMakeDirectoriesScript container : script
 					$(serializationDependency) ;
 				Depends $(script) : $(dummyTarget) ;
 				serializationDependency = $(dummyTarget) ;
-
-				Echo $(dummyTarget)
-					$(initScript) $(attributeFile)  ;
 
 				AppendToContainerMakeDirectoriesScriptAttributes $(dummyTarget)
 					: $(initScript) $(attributeFile) ;
