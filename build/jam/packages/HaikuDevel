@@ -50,6 +50,10 @@ AddFilesToPackage develop lib : libposix_error_mapper.a ;
 
 # ABI independent stuff
 
+# directory attributes
+AddDirectoryToPackage develop : system-develop.rdef ;
+
+
 # headers
 AddHeaderDirectoryToPackage config ;
 AddHeaderDirectoryToPackage glibc ;

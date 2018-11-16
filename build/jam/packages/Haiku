@@ -263,6 +263,9 @@ AddFilesToPackage add-ons decorators : BeDecorator ;
 # the MIME DB
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 
+# directory attributes
+AddDirectoryToPackage apps : system-apps.rdef ;
+AddDirectoryToPackage preferences : system-preferences.rdef ;
 
 # Deskbar menu symlinks
 

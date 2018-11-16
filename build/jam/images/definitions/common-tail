@@ -2,8 +2,10 @@
 # all the other definitions.
 
 # create directories that may remain empty
+AddDirectoryToHaikuImage home : home.rdef ;
 AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home mail ;
+AddDirectoryToHaikuImage home config : home-config.rdef ;
 AddDirectoryToHaikuImage home config cache ;
 AddDirectoryToHaikuImage home config packages ;
 AddDirectoryToHaikuImage home config settings ;
@@ -22,6 +24,7 @@ AddDirectoryToHaikuImage home config non-packaged add-ons Tracker ;
 AddDirectoryToHaikuImage home config non-packaged add-ons Print ;
 AddDirectoryToHaikuImage home config non-packaged add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config non-packaged add-ons Translators ;
+AddDirectoryToHaikuImage system : system.rdef ;
 AddDirectoryToHaikuImage system cache tmp ;
 AddDirectoryToHaikuImage system non-packaged bin ;
 AddDirectoryToHaikuImage system non-packaged data fonts ;

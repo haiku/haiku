@@ -35,32 +35,11 @@ WriteMailCatalogEntryAttribute()
 
 # TODO: Several of the directories are read-only, so this doesn't work.
 WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_APPS_DIRECTORY)" B_APPS_DIRECTORY
-
-WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_COMMON_DIRECTORY)" B_COMMON_DIRECTORY
-
-WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_COMMON_DEVELOP_DIRECTORY)" B_COMMON_DEVELOP_DIRECTORY
-
-WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_USER_DIRECTORY)" B_USER_DIRECTORY
-
-WriteTrackerCatalogEntryAttribute \
 	"$(finddir B_DESKTOP_DIRECTORY)" B_DESKTOP_DIRECTORY
-
-WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_USER_CONFIG_DIRECTORY)" B_USER_CONFIG_DIRECTORY
 
 WriteTrackerCatalogEntryAttribute \
 	"$(finddir B_USER_SETTINGS_DIRECTORY)/Tracker/Tracker New Templates" \
 	"B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates"
-
-WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_PREFERENCES_DIRECTORY)" B_PREFERENCES_DIRECTORY
-
-WriteTrackerCatalogEntryAttribute \
-	"$(finddir B_SYSTEM_DIRECTORY)" B_SYSTEM_DIRECTORY
 
 WriteTrackerCatalogEntryAttribute \
 	"$(finddir B_TRASH_DIRECTORY)" B_TRASH_DIRECTORY
