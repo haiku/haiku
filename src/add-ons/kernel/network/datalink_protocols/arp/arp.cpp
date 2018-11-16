@@ -607,6 +607,7 @@ handle_arp_request(net_buffer *buffer, arp_header &header)
 	buffer->flags = 0;
 		// make sure this won't be a broadcast message
 
+	gBufferModule->trim(buffer, sizeof(arp_header));
 	return entry->protocol->next->module->send_data(entry->protocol->next,
 		buffer);
 }
