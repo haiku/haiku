@@ -38,8 +38,8 @@ static const char* const kUsage =
 	"%s"
 	"Other commands:\n"
 	"%s"
-	"Common Options:\n"
-	"  -h, --help   - Print usage info.\n"
+	"Common options:\n"
+	"  -h, --help   - Print usage info for a specific command.\n"
 ;
 
 
