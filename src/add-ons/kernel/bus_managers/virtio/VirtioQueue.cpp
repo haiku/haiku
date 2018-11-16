@@ -246,7 +246,7 @@ VirtioQueue::Interrupt()
 
 
 void*
-VirtioQueue::Dequeue(uint16 *_size)
+VirtioQueue::Dequeue(uint32* _usedLength)
 {
 	TRACE("Dequeue() fRingUsedIndex: %u\n", fRingUsedIndex);
 
@@ -257,12 +257,11 @@ VirtioQueue::Dequeue(uint16 *_size)
 	TRACE("Dequeue() usedIndex: %u\n", usedIndex);
 	struct vring_used_elem *element = &fRing.used->ring[usedIndex];
 	uint16 descriptorIndex = element->id;
-		// uint32 length = element->len;
+	if (_usedLength != NULL)
+		*_usedLength = element->len;
 
 	void* cookie = fDescriptors[descriptorIndex]->Cookie();
 	uint16 size = fDescriptors[descriptorIndex]->Size();
-	if (_size != NULL)
-		*_size = size;
 	if (size == 0)
 		panic("VirtioQueue::Dequeue() size is zero\n");
 	fDescriptors[descriptorIndex]->Unset();

@@ -185,10 +185,10 @@ virtio_queue_size(virtio_queue _queue)
 
 
 void*
-virtio_queue_dequeue(virtio_queue _queue, uint16* _size)
+virtio_queue_dequeue(virtio_queue _queue, uint32* _usedLength)
 {
 	VirtioQueue *queue = (VirtioQueue *)_queue;
-	return queue->Dequeue(_size);
+	return queue->Dequeue(_usedLength);
 }
 
 

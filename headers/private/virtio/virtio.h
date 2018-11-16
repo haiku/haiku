@@ -134,7 +134,7 @@ typedef struct {
 
 	uint16 (*queue_size)(virtio_queue queue);
 
-	void* (*queue_dequeue)(virtio_queue queue, uint16* _size);
+	void* (*queue_dequeue)(virtio_queue queue, uint32* _usedLength);
 
 } virtio_device_interface;
 

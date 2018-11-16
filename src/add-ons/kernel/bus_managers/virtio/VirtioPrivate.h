@@ -131,7 +131,7 @@ public:
 			void				EnableInterrupt();
 			void				DisableInterrupt();
 
-			void*				Dequeue(uint16* _size = NULL);
+			void*				Dequeue(uint32* _usedLength = NULL);
 
 private:
 			void				UpdateAvailable(uint16 index);
