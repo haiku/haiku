@@ -46,6 +46,7 @@ struct BufInfo : DoublyLinkedListLinkImpl<BufInfo> {
 	struct virtio_net_hdr*	hdr;
 	physical_entry			entry;
 	physical_entry			hdrEntry;
+	uint32					rxUsedLength;
 };
 
 
@@ -549,17 +550,20 @@ virtio_net_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 
 		mutex_lock(&info->rxLock);
 		while (info->rxDone != -1) {
+			uint32 usedLength = 0;
 			BufInfo* buf = (BufInfo*)info->virtio->queue_dequeue(
-				info->rxQueues[0], NULL);
+				info->rxQueues[0], &usedLength);
 			if (buf == NULL)
 				break;
+
+			buf->rxUsedLength = usedLength;
 			info->rxFullList.Add(buf);
 		}
 		TRACE("virtio_net_read: finished waiting\n");
 	}
 
 	BufInfo* buf = info->rxFullList.RemoveHead();
-	*_length = MIN(buf->entry.size, *_length);
+	*_length = MIN(buf->rxUsedLength, *_length);
 	memcpy(buffer, buf->buffer, *_length);
 	virtio_net_rx_enqueue_buf(info, buf);
 	mutex_unlock(&info->rxLock);
