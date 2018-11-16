@@ -275,115 +275,56 @@ FilterHTMLTag(int32 &first, char **t, char *end)
 }
 
 
-/** Returns the type and length of the URL in the string if it is one.
- *	If the "url" string is specified, it will fill it with the complete
- *	URL that might differ from the one in the text itself (i.e. because
- *	of an prepended "http://").
+/*! Returns the type of the next URL in the string.
+ *
+ * If the "url" string is specified, it will fill it with the complete
+ * URL.
  */
-
 static uint8
-CheckForURL(const char *string, size_t &urlLength, BString *url = NULL)
+FindURL(const BString& string, int32 startIndex, int32& urlPos,
+	int32& urlLength, BString* urlString = NULL)
 {
-	const char *urlPrefixes[] = {
-		"http://",
-		"ftp://",
-		"shttp://",
-		"https://",
-		"finger://",
-		"telnet://",
-		"gopher://",
-		"news://",
-		"nntp://",
-		"file://",
-		NULL
-	};
-
-	//
-	//	Search for URL prefix
-	//
 	uint8 type = 0;
-	for (const char **prefix = urlPrefixes; *prefix != 0; prefix++) {
-		if (!cistrncmp(string, *prefix, strlen(*prefix))) {
-			type = TYPE_URL;
-			break;
-		}
-	}
+	urlPos = string.Length();
 
-	//
-	//	Not a URL? check for "mailto:" or "www."
-	//
-	if (type == 0 && !cistrncmp(string, "mailto:", 7))
-		type = TYPE_MAILTO;
-	if (type == 0 && !strncmp(string, "www.", 4)) {
-		// this type will be special cased later (and a http:// is added
-		// for the enclosure address)
-		type = TYPE_URL;
-	}
-	if (type == 0) {
-		// check for valid eMail addresses
-		const char *at = strchr(string, '@');
-		if (at) {
-			const char *pos = string;
-			bool readName = false;
-			for (; pos < at; pos++) {
-				// ToDo: are these all allowed characters?
-				if (!isalnum(pos[0]) && pos[0] != '_' && pos[0] != '.' && pos[0] != '-')
-					break;
-
-				readName = true;
-			}
-			if (pos == at && readName)
-				type = TYPE_MAILTO;
-		}
-	}
-
-	if (type == 0)
+	int32 baseOffset = string.FindFirst("://", startIndex),
+		mailtoOffset = string.FindFirst("mailto:", startIndex);
+	if (baseOffset == B_ERROR && mailtoOffset == B_ERROR)
 		return 0;
+	if (baseOffset == B_ERROR)
+		baseOffset = string.Length();
+	if (mailtoOffset == B_ERROR)
+		mailtoOffset = string.Length();
 
-	int32 index = strcspn(string, " \t<>)\"\\,\r\n");
+	if (baseOffset < mailtoOffset) {
+		type = TYPE_URL;
+
+		// Find the actual start of the URL
+		urlPos = baseOffset;
+		while (urlPos >= startIndex && (isalnum(string.ByteAt(urlPos - 1))
+				|| string.ByteAt(urlPos - 1) == '-'))
+			urlPos--;
+	} else if (mailtoOffset < baseOffset) {
+		type = TYPE_MAILTO;
+		urlPos = mailtoOffset;
+	}
+
+	// find the end of the URL based on word boundaries
+	const char* str = string.String() + urlPos;
+	urlLength = strcspn(str, " \t<>)\"\\,\r\n");
 
 	// filter out some punctuation marks if they are the last character
-	char suffix = string[index - 1];
-	if (suffix == '.'
-		|| suffix == ','
-		|| suffix == '?'
-		|| suffix == '!'
-		|| suffix == ':'
-		|| suffix == ';')
-		index--;
+	char suffix = str[urlLength - 1];
+	while (suffix == '.'
+			|| suffix == ','
+			|| suffix == '?'
+			|| suffix == '!'
+			|| suffix == ':'
+			|| suffix == ';')
+		urlLength--;
 
-	if (type == TYPE_URL) {
-		char *parenthesis = NULL;
-
-		// filter out a trailing ')' if there is no left parenthesis before
-		if (string[index - 1] == ')') {
-			char *parenthesis = strchr(string, '(');
-			if (parenthesis == NULL || parenthesis > string + index)
-				index--;
-		}
-
-		// filter out a trailing ']' if there is no left bracket before
-		if (parenthesis == NULL && string[index - 1] == ']') {
-			char *parenthesis = strchr(string, '[');
-			if (parenthesis == NULL || parenthesis > string + index)
-				index--;
-		}
-	}
-
-	if (url != NULL) {
-		// copy the address to the specified string
-		if (type == TYPE_URL && string[0] == 'w') {
-			// URL starts with "www.", so add the protocol to it
-			url->SetTo("http://");
-			url->Append(string, index);
-		} else if (type == TYPE_MAILTO && cistrncmp(string, "mailto:", 7)) {
-			// eMail address had no "mailto:" prefix
-			url->SetTo("mailto:");
-			url->Append(string, index);
-		} else
-			url->SetTo(string, index);
-	}
-	urlLength = index;
+	if (urlString != NULL)
+		*urlString = BString(string.String() + urlPos, urlLength);
 
 	return type;
 }
@@ -2151,9 +2092,14 @@ TTextView::AddAsContent(BEmailMessage *mail, bool wrap, uint32 charset, mail_enc
 	// hard-wrap, based on TextView's soft-wrapping
 	int32 numLines = CountLines();
 	bool spaceMoved = false;
-	char *content = (char *)malloc(textLength + numLines * 72);	// more we'll ever need
+	char *content = (char *)malloc(textLength + numLines * 72);
+		// more we'll ever need
 	if (content != NULL) {
 		int32 contentLength = 0;
+
+		int32 nextUrlAt = 0, nextUrlLength = 0;
+		BString textStr(text);
+		FindURL(text, 0, nextUrlAt, nextUrlLength, NULL);
 
 		for (int32 i = 0; i < numLines; i++) {
 			int32 startOffset = OffsetAt(i);
@@ -2164,42 +2110,41 @@ TTextView::AddAsContent(BEmailMessage *mail, bool wrap, uint32 charset, mail_enc
 			int32 endOffset = OffsetAt(i + 1);
 			int32 lineLength = endOffset - startOffset;
 
-			// quick hack to not break URLs into several parts
-			for (int32 pos = startOffset; pos < endOffset; pos++) {
-				size_t urlLength;
-				uint8 type = CheckForURL(text + pos, urlLength);
-				if (type != 0)
-					pos += urlLength;
+			// don't break URLs into several parts
+			if (nextUrlAt >= startOffset && nextUrlAt < endOffset
+					&& (nextUrlAt + nextUrlLength) > endOffset) {
+				int32 pos = nextUrlAt + nextUrlLength;
 
-				if (pos > endOffset) {
-					// find first break character after the URL
-					for (; text[pos]; pos++) {
-						if (isalnum(text[pos]) || isspace(text[pos]))
-							break;
-					}
-					if (text[pos] && isspace(text[pos]) && text[pos] != '\n')
-						pos++;
-
-					endOffset += pos - endOffset;
-					lineLength = endOffset - startOffset;
-
-					// insert a newline (and the same number of quotes) after the
-					// URL to make sure the rest of the text is properly wrapped
-
-					char buffer[64];
-					if (text[pos] == '\n')
-						buffer[0] = '\0';
-					else
-						strcpy(buffer, "\n");
-
-					size_t quoteLength;
-					CopyQuotes(text + startOffset, lineLength, buffer + strlen(buffer), quoteLength);
-
-					Insert(pos, buffer, strlen(buffer));
-					numLines = CountLines();
-					text = Text();
-					i++;
+				// find first break character after the URL
+				for (; text[pos]; pos++) {
+					if (isalnum(text[pos]) || isspace(text[pos]))
+						break;
 				}
+				if (text[pos] && isspace(text[pos]) && text[pos] != '\n')
+					pos++;
+
+				endOffset += pos - endOffset;
+				lineLength = endOffset - startOffset;
+
+				// insert a newline (and the same number of quotes) after the
+				// URL to make sure the rest of the text is properly wrapped
+
+				char buffer[64];
+				if (text[pos] == '\n')
+					buffer[0] = '\0';
+				else
+					strcpy(buffer, "\n");
+
+				size_t quoteLength;
+				CopyQuotes(text + startOffset, lineLength, buffer + strlen(buffer), quoteLength);
+
+				Insert(pos, buffer, strlen(buffer));
+				numLines = CountLines();
+				text = Text();
+				i++;
+
+				textStr = BString(text);
+				FindURL(text, endOffset, nextUrlAt, nextUrlLength, NULL);
 			}
 			if (text[endOffset - 1] != ' '
 				&& text[endOffset - 1] != '\n'
@@ -2370,6 +2315,12 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 	char line[522];
 	int32 count = 0;
 
+	const BString dataStr(data, data_len);
+	BString nextUrl;
+	int32 nextUrlPos = 0, nextUrlLength = 0;
+	uint8 nextUrlType
+		= FindURL(dataStr, 0, nextUrlPos, nextUrlLength, &nextUrl);
+
 	for (int32 loop = 0; loop < data_len; loop++) {
 		if (fView->fStopLoading)
 			return false;
@@ -2379,9 +2330,7 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 			count += strlen(QUOTE);
 		}
 		if (!fRaw && fIncoming && (loop < data_len - 7)) {
-			size_t urlLength;
-			BString url;
-			uint8 type = CheckForURL(data + loop, urlLength, &url);
+			uint8 type = (nextUrlPos == loop) ? nextUrlType : 0;
 
 			if (type) {
 				if (!Insert(line, count, false, isHeader))
@@ -2394,19 +2343,23 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 
 				memset(enclosure, 0, sizeof(hyper_text));
 				fView->GetSelection(&enclosure->text_start,
-									&enclosure->text_end);
+					&enclosure->text_end);
 				enclosure->type = type;
-				enclosure->name = strdup(url.String());
+				enclosure->name = strdup(nextUrl.String());
 				if (enclosure->name == NULL) {
 					free(enclosure);
 					return false;
 				}
 
-				Insert(&data[loop], urlLength, true, isHeader);
-				enclosure->text_end += urlLength;
-				loop += urlLength - 1;
+				Insert(&data[loop], nextUrlLength, true, isHeader);
+				enclosure->text_end += nextUrlLength;
+				loop += nextUrlLength - 1;
 
 				fEnclosures->AddItem(enclosure);
+
+				nextUrlType
+					= FindURL(dataStr, loop,
+						nextUrlPos, nextUrlLength, &nextUrl);
 				continue;
 			}
 		}
