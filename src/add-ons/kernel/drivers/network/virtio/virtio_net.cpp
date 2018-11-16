@@ -23,7 +23,6 @@
 #define VIRTIO_NET_DEVICE_ID_GENERATOR	"virtio_net/device_id"
 
 #define BUFFER_SIZE	2048
-// #define MAX_FRAME_SIZE	(BUFFER_SIZE - sizeof(virtio_net_hdr))
 #define MAX_FRAME_SIZE 1536
 
 
@@ -269,8 +268,6 @@ virtio_net_init_device(void* _info, void** _cookie)
 
 	char* rxBuffer;
 	char* txBuffer;
-	const size_t rxBufferSize = BUFFER_SIZE + sizeof(virtio_net_rx_hdr);
-	const size_t txBufferSize = BUFFER_SIZE + sizeof(virtio_net_tx_hdr);
 
 	info->rxQueues = new(std::nothrow) virtio_queue[info->pairsCount];
 	info->txQueues = new(std::nothrow) virtio_queue[info->pairsCount];
@@ -301,8 +298,8 @@ virtio_net_init_device(void* _info, void** _cookie)
 
 	// create receive buffer area
 	info->rxArea = create_area("virtionet rx buffer", (void**)&rxBuffer,
-		B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(
-			rxBufferSize * info->rxSizes[0]),
+		B_ANY_KERNEL_BLOCK_ADDRESS, ROUND_TO_PAGE_SIZE(
+			BUFFER_SIZE * info->rxSizes[0]),
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (info->rxArea < B_OK) {
 		status = info->rxArea;
@@ -316,19 +313,27 @@ virtio_net_init_device(void* _info, void** _cookie)
 			status = B_NO_MEMORY;
 			goto err4;
 		}
+
 		info->rxBufInfos[i] = buf;
 		buf->hdr = (struct virtio_net_hdr*)((addr_t)rxBuffer
-			+ i * rxBufferSize);
+			+ i * BUFFER_SIZE);
 		buf->buffer = (char*)((addr_t)buf->hdr + sizeof(virtio_net_rx_hdr));
-		get_memory_map(buf->buffer, BUFFER_SIZE, &buf->entry, 1);
-		get_memory_map(buf->hdr, sizeof(struct virtio_net_hdr),
+
+		status = get_memory_map(buf->buffer,
+			BUFFER_SIZE - sizeof(virtio_net_rx_hdr), &buf->entry, 1);
+		if (status != B_OK)
+			goto err4;
+
+		status = get_memory_map(buf->hdr, sizeof(struct virtio_net_hdr),
 			&buf->hdrEntry, 1);
+		if (status != B_OK)
+			goto err4;
 	}
 
 	// create transmit buffer area
 	info->txArea = create_area("virtionet tx buffer", (void**)&txBuffer,
-		B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(
-			txBufferSize * info->txSizes[0]),
+		B_ANY_KERNEL_BLOCK_ADDRESS, ROUND_TO_PAGE_SIZE(
+			BUFFER_SIZE * info->txSizes[0]),
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (info->txArea < B_OK) {
 		status = info->txArea;
@@ -342,13 +347,22 @@ virtio_net_init_device(void* _info, void** _cookie)
 			status = B_NO_MEMORY;
 			goto err6;
 		}
+
 		info->txBufInfos[i] = buf;
 		buf->hdr = (struct virtio_net_hdr*)((addr_t)txBuffer
-			+ i * txBufferSize);
+			+ i * BUFFER_SIZE);
 		buf->buffer = (char*)((addr_t)buf->hdr + sizeof(virtio_net_tx_hdr));
-		get_memory_map(buf->buffer, BUFFER_SIZE, &buf->entry, 1);
-		get_memory_map(buf->hdr, sizeof(struct virtio_net_hdr),
+
+		status = get_memory_map(buf->buffer,
+			BUFFER_SIZE - sizeof(virtio_net_tx_hdr), &buf->entry, 1);
+		if (status != B_OK)
+			goto err6;
+
+		status = get_memory_map(buf->hdr, sizeof(struct virtio_net_hdr),
 			&buf->hdrEntry, 1);
+		if (status != B_OK)
+			goto err6;
+
 		info->txFreeList.Add(buf);
 	}
 
