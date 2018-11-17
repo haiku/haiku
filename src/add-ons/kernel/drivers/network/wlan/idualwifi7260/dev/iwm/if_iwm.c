@@ -539,7 +539,8 @@ iwm_fw_info_free(struct iwm_fw_info *fw)
 	firmware_put(fw->fw_fp, FIRMWARE_UNLOAD);
 	fw->fw_fp = NULL;
 	/* don't touch fw->fw_status */
-	memset(fw->fw_sects, 0, sizeof(fw->fw_sects));
+	if (fw->fw_sects)
+		memset(fw->fw_sects, 0, sizeof(fw->fw_sects));
 }
 
 static int
