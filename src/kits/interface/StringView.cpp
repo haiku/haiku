@@ -591,8 +591,8 @@ BStringView::_ValidatePreferredSize()
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		int32 lines = 0;
-		char* temp = fText;
+		int32 lines = 1;
+		char* temp = fText ? strchr(fText, '\n') : NULL;
 		while (temp != NULL) {
 			temp = strchr(temp + 1, '\n');
 			lines++;
