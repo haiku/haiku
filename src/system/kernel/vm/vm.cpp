@@ -756,8 +756,12 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 				VMArea* area = it.Next();) {
 			addr_t areaLast = area->Base() + (area->Size() - 1);
 			if (area->Base() < lastAddress && address < areaLast) {
-				if ((area->protection & B_KERNEL_AREA) != 0)
+				if (area->address_space == VMAddressSpace::Kernel()) {
+					dprintf("unmap_address_range: team %" B_PRId32 " tried to "
+						"unmap range of kernel area %" B_PRId32 " (%s)\n",
+						team_get_current_team_id(), area->id, area->name);
 					return B_NOT_ALLOWED;
+				}
 			}
 		}
 	}
@@ -2069,9 +2073,6 @@ vm_clone_area(team_id team, const char* name, void** address,
 		if (status != B_OK)
 			return status;
 
-		if (!kernel && (sourceArea->protection & B_KERNEL_AREA) != 0)
-			return B_NOT_ALLOWED;
-
 		sourceArea->protection |= B_SHARED_AREA;
 		protection |= B_SHARED_AREA;
 	}
@@ -2096,9 +2097,6 @@ vm_clone_area(team_id team, const char* name, void** address,
 	sourceArea = lookup_area(sourceAddressSpace, sourceID);
 	if (sourceArea == NULL)
 		return B_BAD_VALUE;
-
-	if (!kernel && (sourceArea->protection & B_KERNEL_AREA) != 0)
-		return B_NOT_ALLOWED;
 
 	VMCache* cache = vm_area_get_locked_cache(sourceArea);
 
@@ -2278,8 +2276,8 @@ vm_delete_area(team_id team, area_id id, bool kernel)
 
 	cacheLocker.Unlock();
 
-	if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
-		return B_NOT_ALLOWED;
+	// SetFromArea will have returned an error if the area's owning team is not
+	// the same as the passed team, so we don't need to do those checks here.
 
 	delete_area(locker.AddressSpace(), area, false);
 	return B_OK;
@@ -2563,8 +2561,12 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 		cacheLocker.SetTo(cache, true);	// already locked
 
-		if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
+		if (!kernel && area->address_space == VMAddressSpace::Kernel()) {
+			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
+				"set protection %#" B_PRIx32 " on kernel area %" B_PRId32
+				" (%s)\n", team, newProtection, areaID, area->name);
 			return B_NOT_ALLOWED;
+		}
 
 		if (area->protection == newProtection)
 			return B_OK;
@@ -4987,11 +4989,13 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		cacheLocker.SetTo(cache, true);	// already locked
 
 		// enforce restrictions
-		if (!kernel) {
-			if ((area->protection & B_KERNEL_AREA) != 0)
-				return B_NOT_ALLOWED;
-			// TODO: Enforce all restrictions (team, etc.)!
+		if (!kernel && area->address_space == VMAddressSpace::Kernel()) {
+			dprintf("vm_resize_area: team %" B_PRId32 " tried to "
+				"resize kernel area %" B_PRId32 " (%s)\n",
+				team_get_current_team_id(), areaID, area->name);
+			return B_NOT_ALLOWED;
 		}
+		// TODO: Enforce all restrictions (team, etc.)!
 
 		oldSize = area->Size();
 		if (newSize == oldSize)
@@ -6434,7 +6438,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			if (area == NULL)
 				return B_NO_MEMORY;
 
-			if ((area->protection & B_KERNEL_AREA) != 0)
+			if (area->address_space == VMAddressSpace::Kernel())
 				return B_NOT_ALLOWED;
 
 			// TODO: For (shared) mapped files we should check whether the new
