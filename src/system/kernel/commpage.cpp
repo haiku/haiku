@@ -66,7 +66,7 @@ clone_commpage_area(team_id team, void** address)
 	if (*address == NULL)
 		*address = (void*)KERNEL_USER_DATA_BASE;
 	return vm_clone_area(team, "commpage", address,
-		B_RANDOMIZED_BASE_ADDRESS, B_READ_AREA | B_EXECUTE_AREA | B_KERNEL_AREA,
+		B_RANDOMIZED_BASE_ADDRESS, B_READ_AREA | B_EXECUTE_AREA,
 		REGION_PRIVATE_MAP, sCommPageArea, true);
 }
 

@@ -31,9 +31,7 @@
 //	flags region in the protection field.
 #define B_OVERCOMMITTING_AREA	0x1000
 #define B_SHARED_AREA			0x2000
-#define B_KERNEL_AREA			0x4000
-	// Usable from userland according to its protection flags, but the area
-	// itself is not deletable, resizable, etc from userland.
+/* 0x4000 was B_KERNEL_AREA until hrev52545 */
 
 #define B_USER_AREA_FLAGS		(B_USER_PROTECTION | B_OVERCOMMITTING_AREA)
 #define B_KERNEL_AREA_FLAGS \
