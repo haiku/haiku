@@ -24,3 +24,8 @@ void Streamer::_ReservedStreamer2() {}
 void Streamer::_ReservedStreamer3() {}
 void Streamer::_ReservedStreamer4() {}
 void Streamer::_ReservedStreamer5() {}
+
+
+StreamerPlugin::StreamerPlugin()
+{
+}
