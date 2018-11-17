@@ -539,8 +539,7 @@ iwm_fw_info_free(struct iwm_fw_info *fw)
 	firmware_put(fw->fw_fp, FIRMWARE_UNLOAD);
 	fw->fw_fp = NULL;
 	/* don't touch fw->fw_status */
-	if (fw->fw_sects)
-		memset(fw->fw_sects, 0, sizeof(fw->fw_sects));
+	memset(fw->fw_sects, 0, sizeof(fw->fw_sects));
 }
 
 static int
@@ -1166,7 +1165,8 @@ iwm_reset_tx_ring(struct iwm_softc *sc, struct iwm_tx_ring *ring)
 		}
 	}
 	/* Clear TX descriptors. */
-	memset(ring->desc, 0, ring->desc_dma.size);
+	if (ring->desc)
+		memset(ring->desc, 0, ring->desc_dma.size);
 	bus_dmamap_sync(ring->desc_dma.tag, ring->desc_dma.map,
 	    BUS_DMASYNC_PREWRITE);
 	sc->qfullmsk &= ~(1 << ring->qid);
