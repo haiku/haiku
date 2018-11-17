@@ -42,13 +42,6 @@ Decoder::SetChunkProvider(ChunkProvider *provider)
 }
 
 
-status_t
-Decoder::Perform(perform_code code, void* _data)
-{
-	return B_OK;
-}
-
-
 void Decoder::_ReservedDecoder1() {}
 void Decoder::_ReservedDecoder2() {}
 void Decoder::_ReservedDecoder3() {}

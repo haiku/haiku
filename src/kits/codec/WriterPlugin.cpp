@@ -37,13 +37,6 @@ Writer::_Setup(BDataIO* target)
 }
 
 
-status_t
-Writer::Perform(perform_code code, void* data)
-{
-	return B_OK;
-}
-
-
 void Writer::_ReservedWriter1() {}
 void Writer::_ReservedWriter2() {}
 void Writer::_ReservedWriter3() {}

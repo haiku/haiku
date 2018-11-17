@@ -80,8 +80,6 @@ public:
 
 			void				SetChunkWriter(ChunkWriter* writer);
 
-	virtual status_t			Perform(perform_code code, void* data);
-
 private:
 			ChunkWriter*		fChunkWriter;
 

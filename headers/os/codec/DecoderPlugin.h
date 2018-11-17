@@ -48,8 +48,6 @@ public:
 
 			void				SetChunkProvider(ChunkProvider* provider);
 
-	virtual status_t			Perform(perform_code code, void* data);
-
 private:
 			ChunkProvider*		fChunkProvider;
 
