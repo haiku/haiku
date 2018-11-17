@@ -717,6 +717,8 @@ IMAPConnectionWorker::MessageExpungeReceived(uint32 index)
 status_t
 IMAPConnectionWorker::_Worker()
 {
+	status_t status = B_OK;
+
 	while (!fStopped) {
 		BAutolock locker(fLocker);
 
@@ -736,21 +738,16 @@ IMAPConnectionWorker::_Worker()
 
 		CommandDeleter deleter(*this, command);
 
-		status_t status = B_OK;
-
-		if (dynamic_cast<QuitCommand*>(command) == NULL) // do not connect on QuitCommand
+		if (dynamic_cast<QuitCommand*>(command) == NULL) { // do not connect on QuitCommand
 			status = _Connect();
-
-		if (status != B_OK) {
-			fOwner.WorkerQuit(this);
-			return status;
+			if (status != B_OK)
+				break;
 		}
 
 		status = command->Process(*this);
-		if (status != B_OK) {
-			fOwner.WorkerQuit(this);
-			return status;
-		}
+		if (status != B_OK)
+			break;
+
 		if (!command->IsDone()) {
 			deleter.Detach();
 			command->SetContinuation();
@@ -759,7 +756,7 @@ IMAPConnectionWorker::_Worker()
 	}
 
 	fOwner.WorkerQuit(this);
-	return B_OK;
+	return status;
 }
 
 
