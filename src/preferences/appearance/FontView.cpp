@@ -26,7 +26,6 @@
 #include "APRWindow.h"
 #include "FontSelectionView.h"
 
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Font view"
 
@@ -43,8 +42,7 @@ add_font_selection_view(BGridLayout* layout, FontSelectionView* view,
 
 	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 2, row);
 
-	layout->AddItem(view->CreateSizesLabelLayoutItem(), 3, row);
-	layout->AddItem(view->CreateSizesMenuBarLayoutItem(), 4, row);
+	layout->AddView(view->GetFontSizeSpinner(), 4, row);
 
 	row++;
 
