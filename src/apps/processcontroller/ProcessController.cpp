@@ -609,15 +609,15 @@ ProcessController::DoDraw(bool force)
 	float barWidth;
 	float barGap;
 	float memWidth;
-	if (gCPUcount < 12 && bounds.Width() == 15) {
+	if (gCPUcount <= 12 && bounds.Width() == 15) {
 		// Use fixed sizes for small icon sizes
 		barWidth = layout[gCPUcount].cpu_width;
 		barGap = layout[gCPUcount].cpu_inter;
 		memWidth = layout[gCPUcount].mem_width;
 	} else {
 		memWidth = floorf((bounds.Height() + 1) / 8);
-		barGap = bounds.Width() / gCPUcount > 3 ? 1 : 0;
-		barWidth = floorf((bounds.Width() - 2 - memWidth - barGap * gCPUcount)
+		barGap = ((bounds.Width() + 1) / gCPUcount) > 3 ? 1 : 0;
+		barWidth = floorf((bounds.Width() - 1 - memWidth - barGap * gCPUcount)
 			/ gCPUcount);
 	}
 	// interspace
