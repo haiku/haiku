@@ -6562,6 +6562,9 @@ common_write_stat(struct file_descriptor* descriptor, const struct stat* stat,
 	FUNCTION(("common_write_stat(vnode = %p, stat = %p, statMask = %d)\n",
 		vnode, stat, statMask));
 
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
+		return B_BAD_VALUE;
+
 	if (!HAS_FS_CALL(vnode, write_stat))
 		return B_READ_ONLY_DEVICE;
 

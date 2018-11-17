@@ -6,6 +6,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +48,20 @@ main(int argc, char **argv)
 			argv[1], strerror(errno));
 		return 1;
 	}
+
+	int fd = open(argv[1], O_RDONLY);
+	if (fd < 0) {
+		fprintf(stderr, "%s: could open the file read-only \"%s\": %s\n",
+			__progname, argv[1], strerror(errno));
+		return 1;
+	}
+	if (ftruncate(fd, newSize) == 0 || errno != EINVAL) {
+		fprintf(stderr, "%s: could truncate a file opened read-only \"%s\": %s\n",
+			__progname, argv[1], strerror(errno));
+		close(fd);
+		return 1;
+	}
+	close(fd);
 
 	return 0;
 }
