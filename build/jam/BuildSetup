@@ -400,7 +400,7 @@ HOST_DEFINES += ARCH_$(HOST_CPU) ;
 HOST_DEFINES += _NO_INLINE_ASM __NO_INLINE__ ;
 
 # for builds of tools in the current environment
-HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
+HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(PWD) $(HOST_OBJECT_BASE_DIR) lib ] ;
 
 # For the generic attributes emulation: Target rm_attrs -- rm replacement that
 # also removes the attributes.
