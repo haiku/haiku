@@ -4915,7 +4915,6 @@ vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 
 /*!	This function enforces some protection properties:
 	 - if B_WRITE_AREA is set, B_KERNEL_WRITE_AREA is set as well
-	 - if B_EXECUTE_AREA is set, B_KERNEL_EXECUTE_AREA is set as well
 	 - if only B_READ_AREA has been set, B_KERNEL_READ_AREA is also set
 	 - if no protection is specified, it defaults to B_KERNEL_READ_AREA
 	   and B_KERNEL_WRITE_AREA.
@@ -4929,8 +4928,6 @@ fix_protection(uint32* protection)
 			*protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 		else
 			*protection |= B_KERNEL_READ_AREA;
-		if ((*protection & B_EXECUTE_AREA) != 0)
-			*protection |= B_KERNEL_EXECUTE_AREA;
 	}
 }
 
