@@ -102,8 +102,8 @@ public:
 			if (fBuffer != NULL)
 				fBufferSize *= 2;
 
-			int32* newBuffer = NULL;
-			newBuffer = (int32*)realloc(fBuffer, fBufferSize * sizeof(int32));
+			int32* newBuffer =
+				(int32*)realloc(fBuffer, fBufferSize * sizeof(int32));
 			if (newBuffer == NULL)
 				return false;
 
