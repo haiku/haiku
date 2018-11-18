@@ -27,6 +27,18 @@
 static const size_t kMaxCacheBytes = 3 * 1024 * 1024;
 
 
+struct BPrivate::media::stream_info {
+	status_t		status;
+	void*			cookie;
+	bool			hasCookie;
+	const void*		infoBuffer;
+	size_t			infoBufferSize;
+	ChunkCache*		chunkCache;
+	chunk_buffer*	lastChunk;
+	media_format	encodedFormat;
+};
+
+
 class MediaExtractorChunkProvider : public ChunkProvider {
 public:
 	MediaExtractorChunkProvider(MediaExtractor* extractor, int32 stream)

@@ -20,18 +20,7 @@ namespace media {
 
 class ChunkCache;
 struct chunk_buffer;
-
-
-struct stream_info {
-	status_t		status;
-	void*			cookie;
-	bool			hasCookie;
-	const void*		infoBuffer;
-	size_t			infoBufferSize;
-	ChunkCache*		chunkCache;
-	chunk_buffer*	lastChunk;
-	media_format	encodedFormat;
-};
+struct stream_info;
 
 
 class MediaExtractor {
