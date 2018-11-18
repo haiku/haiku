@@ -17,7 +17,7 @@ key_to_string(uint32 key)
 {
 	char buf[sizeof(char) * sizeof(uint32) * 4 + 1];
 	if (buf) {
-		sprintf(buf, "%"B_PRId32, key);
+		sprintf(buf, "%" B_PRId32, key);
 	}
 	BString ret(buf);
 	ret.Prepend("codec:metadata:");
