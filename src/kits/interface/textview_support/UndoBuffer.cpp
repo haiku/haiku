@@ -271,7 +271,6 @@ BTextView::TypingUndoBuffer::UndoSelf(BClipboard* clipboard)
 	int32 len = fTypedEnd - fTypedStart;
 	
 	free(fTypedText);
-	fTypedText = NULL;
 	fTypedText = (char*)malloc(len);
 	memcpy(fTypedText, fTextView->Text() + fTypedStart, len);
 	
