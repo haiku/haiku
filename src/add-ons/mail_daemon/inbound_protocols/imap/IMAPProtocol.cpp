@@ -38,15 +38,6 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 
 IMAPProtocol::~IMAPProtocol()
 {
-	MutexLocker locker(fWorkerLock);
-	for (int32 i = 0; i < fWorkers.CountItems(); i++)
-		fWorkers.ItemAt(i)->Quit();
-	int tries = 10;
-	while (fWorkers.CountItems() > 0 && --tries > 0) {
-		locker.Unlock();
-		snooze(500000);
-		locker.Lock();
-	}
 }
 
 
