@@ -39,6 +39,8 @@ public:
 
 			BDataIO*			Target() const;
 
+	virtual status_t			Perform(perform_code code, void* data);
+
 private:
 			void				_Setup(BDataIO* target);
 

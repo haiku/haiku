@@ -52,6 +52,8 @@ public:
 
 			BDataIO*			Source() const;
 
+	virtual status_t			Perform(perform_code code, void* data);
+
 private:
 			void				_Setup(BDataIO* source);
 

@@ -67,6 +67,13 @@ Reader::_Setup(BDataIO *source)
 }
 
 
+status_t
+Reader::Perform(perform_code code, void* _data)
+{
+	return B_OK;
+}
+
+
 void Reader::_ReservedReader1() {}
 void Reader::_ReservedReader2() {}
 void Reader::_ReservedReader3() {}

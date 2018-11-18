@@ -101,6 +101,13 @@ Encoder::SetChunkWriter(ChunkWriter* writer)
 // #pragma mark - FBC padding
 
 
+status_t
+Encoder::Perform(perform_code code, void* data)
+{
+	return B_OK;
+}
+
+
 void Encoder::_ReservedEncoder1() {}
 void Encoder::_ReservedEncoder2() {}
 void Encoder::_ReservedEncoder3() {}
