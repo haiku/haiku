@@ -591,7 +591,7 @@ device_free(void* cookie)
 
 // implements the POSIX ioctl()
 static status_t
-device_control(void* cookie, uint32 msg, void* params, size_t size)
+device_control(void* cookie, uint32 msg, void* _params, size_t size)
 {
 	status_t 	err = B_ERROR;
 	bt_usb_dev*	bdev = (bt_usb_dev*)cookie;
@@ -609,10 +609,14 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 		return B_BAD_VALUE;
 	}
 
-	if (params == NULL) {
+	if (_params == NULL || !IS_USER_ADDRESS(_params)) {
 		TRACE("%s: Invalid pointer control\n", __func__);
 		return B_BAD_VALUE;
 	}
+
+	void* params = alloca(size);
+	if (user_memcpy(params, _params, size) != B_OK)
+		return B_BAD_ADDRESS;
 
 	acquire_sem(bdev->lock);
 
@@ -634,7 +638,6 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 		break;
 
 		case BT_UP:
-
 			//  EVENTS
 			err = submit_rx_event(bdev);
 			if (err != B_OK) {
