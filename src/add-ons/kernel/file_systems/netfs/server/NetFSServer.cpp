@@ -1150,7 +1150,7 @@ NetFSServer::_ConnectionDeleter()
 		ClientConnection* connection = NULL;
 		if (error == B_OK) {
 			AutoLocker<Locker> _(fLock);
-			connection = (ClientConnection*)fClosedConnections.RemoveItem(0L);
+			connection = (ClientConnection*)fClosedConnections.RemoveItem((int32)0);
 		}
 		if (connection)
 			delete connection;

@@ -2046,15 +2046,15 @@ ClientConnection::VisitReadAttrRequest(ReadAttrRequest* request)
 		// the size of the attribute.
 		attr_info info;
 		result = handle->StatAttr(request->name.GetString(), &info);
-		off_t originalPos = max(request->pos, 0LL);
-		int32 originalSize = max(request->size, 0L);
+		off_t originalPos = max(request->pos, (off_t)0);
+		int32 originalSize = max(request->size, (int32)0);
 		off_t pos = originalPos;
 		int32 size = originalSize;
 		type_code type = B_SWAP_INT32(request->type);
 		bool convert = false;
 
 		if (result == B_OK) {
-			originalSize = min((off_t)originalSize, max(0LL, info.size - pos));
+			originalSize = min((off_t)originalSize, max((off_t)0, info.size - pos));
 			size = originalSize;
 
 			// deal with inverse endianess clients
@@ -2193,7 +2193,7 @@ ClientConnection::VisitWriteAttrRequest(WriteAttrRequest* request)
 	managerLocker.Unlock();
 
 	if (result == B_OK) {
-		off_t pos = max(request->pos, 0LL);
+		off_t pos = max(request->pos, (off_t)0);
 		int32 size = request->data.GetSize();
 		type_code type = request->type;
 		char* buffer = (char*)request->data.GetData();
@@ -2204,8 +2204,8 @@ ClientConnection::VisitWriteAttrRequest(WriteAttrRequest* request)
 				if (pos != 0) {
 					WARN("WriteAttr(): WARNING: Need to convert attribute "
 						"endianess, but position is not 0: attribute: %s, "
-						"pos: %lld, size: %ld\n", request->name.GetString(),
-						pos, size);
+						"pos: %" B_PRIdOFF ", size: %" B_PRId32 "\n",
+						request->name.GetString(), pos, size);
 				}
 				swap_data(type, buffer, size, B_SWAP_ALWAYS);
 			} else
@@ -2571,7 +2571,7 @@ ClientConnection::ProcessQueryEvent(NodeMonitoringEvent* event)
 	} else {
 		// We only support "entry created" and "entry removed" query events.
 		// "entry moved" is split by the volume manager into those.
-		ERROR("Ignoring unexpected query event: opcode: 0x%lx\n",
+		ERROR("Ignoring unexpected query event: opcode: 0x%" B_PRIx32 "\n",
 			event->opcode);
 		return;
 	}

@@ -217,7 +217,7 @@ private:
 			status_t			_MultiWalk(
 									RequestMemberArray<EntryInfo>& entryInfos,
 									MultiWalkReply** reply);
-			status_t			_Close(int32 cookie);
+			status_t			_Close(intptr_t cookie);
 
 			uint32				_GetConnectionState();
 			bool				_IsConnected();

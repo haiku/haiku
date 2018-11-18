@@ -40,7 +40,7 @@ if $(HAIKU_IS_BOOTSTRAP) != 1 {
 		haiku_userguide_zh_CN
 		haiku_welcome
 		makefile_engine
-		netfs@!x86_64
+		netfs
 		userland_fs
 		] ;
 }

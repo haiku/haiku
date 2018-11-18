@@ -132,7 +132,7 @@ struct ShareVolume::AttrDirCookie {
 	}
 
 	ShareAttrDirIterator*	iterator;
-	int32					cookie;
+	intptr_t				cookie;
 	bool					rewind;
 };
 
@@ -747,7 +747,7 @@ ShareVolume::Close(Node* _node, void* cookie)
 status_t
 ShareVolume::FreeCookie(Node* _node, void* cookie)
 {
-	return _Close((int32)cookie);
+	return _Close((intptr_t)cookie);
 }
 
 // Read
@@ -765,7 +765,7 @@ ShareVolume::Read(Node* _node, void* cookie, off_t pos, void* _buffer,
 	// prepare the request
 	ReadRequest request;
 	request.volumeID = fID;
-	request.cookie = (int32)cookie;
+	request.cookie = (intptr_t)cookie;
 	request.pos = pos;
 	request.size = bufferSize;
 
@@ -861,7 +861,7 @@ ShareVolume::Write(Node* _node, void* cookie, off_t pos, const void* _buffer,
 		// prepare the request
 		WriteRequest request;
 		request.volumeID = fID;
-		request.cookie = (int32)cookie;
+		request.cookie = (intptr_t)cookie;
 		request.pos = pos;
 		request.data.SetTo(buffer, toWrite);
 
@@ -2951,7 +2951,7 @@ ShareVolume::_MultiWalk(RequestMemberArray<EntryInfo>& _entryInfos,
 
 // _Close
 status_t
-ShareVolume::_Close(int32 cookie)
+ShareVolume::_Close(intptr_t cookie)
 {
 	if (!_EnsureShareMounted())
 		return ERROR_NOT_CONNECTED;

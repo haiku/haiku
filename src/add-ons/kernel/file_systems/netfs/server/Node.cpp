@@ -151,7 +151,8 @@ Node::UpdateStat()
 	// check if it is the same node
 	if (st.st_dev != fStat.st_dev || st.st_ino != fStat.st_ino) {
 		ERROR("Node::UpdateStat(): ERROR: GetPath() returned path that "
-			"doesn't point to this node: node: (%ld, %lld), path: `%s'\n",
+			"doesn't point to this node: node: (%" B_PRIdDEV ", %" B_PRIdINO "), "
+			"path: `%s'\n",
 			GetVolumeID(), GetID(), path.GetPath());
 		return B_ENTRY_NOT_FOUND;
 	}

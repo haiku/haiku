@@ -468,7 +468,7 @@ struct CreateFileReply : ReplyRequest {
 	}
 
 	EntryInfo		entryInfo;
-	int32			cookie;
+	intptr_t		cookie;
 };
 
 // OpenRequest
@@ -500,7 +500,7 @@ struct OpenReply : ReplyRequest {
 	}
 
 	NodeInfo		nodeInfo;
-	int32			cookie;
+	intptr_t		cookie;
 };
 
 // CloseRequest
@@ -514,7 +514,7 @@ struct CloseRequest : VolumeRequest {
 		visitor->Visit(this, cookie);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 };
 
 // CloseReply
@@ -542,7 +542,7 @@ struct ReadRequest : VolumeRequest {
 		visitor->Visit(this, size);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 	off_t			pos;
 	int32			size;
 };
@@ -578,7 +578,7 @@ struct WriteRequest : VolumeRequest {
 		visitor->Visit(this, data);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 	off_t			pos;
 	Data			data;
 };
@@ -825,7 +825,7 @@ struct OpenDirReply : ReplyRequest {
 	}
 
 	NodeInfo		nodeInfo;
-	int32			cookie;
+	intptr_t		cookie;
 };
 
 // ReadDirRequest
@@ -841,7 +841,7 @@ struct ReadDirRequest : VolumeRequest {
 		visitor->Visit(this, rewind);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 	int32			count;
 	bool			rewind;
 };
@@ -955,7 +955,7 @@ struct OpenAttrDirReply : ReplyRequest {
 	}
 
 	AttrDirInfo		attrDirInfo;
-	int32			cookie;
+	intptr_t		cookie;
 };
 
 // ReadAttrDirRequest
@@ -970,7 +970,7 @@ struct ReadAttrDirRequest : VolumeRequest {
 		visitor->Visit(this, rewind);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 	int32			count;
 	bool			rewind;
 };
@@ -1180,7 +1180,7 @@ struct OpenQueryReply : ReplyRequest {
 		visitor->Visit(this, cookie);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 };
 
 // ReadQueryRequest
@@ -1193,7 +1193,7 @@ struct ReadQueryRequest : Request {
 		visitor->Visit(this, cookie);
 	}
 
-	int32			cookie;
+	intptr_t		cookie;
 	int32			count;
 };
 
