@@ -205,10 +205,8 @@ NotifyApp::_Usage() const
 BBitmap*
 NotifyApp::_GetBitmap(const entry_ref* ref) const
 {
-	BBitmap* bitmap = NULL;
-
 	// First try by contents
-	bitmap = BTranslationUtils::GetBitmap(ref);
+	BBitmap* bitmap = BTranslationUtils::GetBitmap(ref);
 	if (bitmap)
 		return bitmap;
 
