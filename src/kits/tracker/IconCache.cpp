@@ -659,8 +659,6 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache>*,
 	if (wellKnownEntry == NULL)
 		return NULL;
 
-	IconCacheEntry* entry = NULL;
-
 	BString type("tracker/active_");
 	type += wellKnownEntry->name;
 
@@ -669,7 +667,7 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache>*,
 
 	source = kTrackerSupplied;
 
-	entry = fSharedCache.FindItem(type.String());
+	IconCacheEntry* entry = fSharedCache.FindItem(type.String());
 	if (entry != NULL) {
 		entry = entry->ResolveIfAlias(&fSharedCache, entry);
 		if (entry->HaveIconBitmap(mode, size))
