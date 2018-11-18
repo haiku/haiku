@@ -142,12 +142,11 @@ static status_t
 fw_module_init(void)
 {
 	status_t status;
-	pci_info *info = NULL;
 	int i, found;
 	fwohci_softc_t *fwohci_sc;
 	struct firewire_softc *fw_sc;
 
-	info = (pci_info*)malloc(sizeof(pci_info));
+	pci_info *info = (pci_info*)malloc(sizeof(pci_info));
 	if (!info)
 		return B_NO_MEMORY;
 
