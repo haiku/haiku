@@ -19,6 +19,7 @@
 #include <NodeInfo.h>
 #include <Resources.h>
 #include <String.h>
+#include <StringFormat.h>
 
 #include "pr_server.h"
 #include "Messages.h"
@@ -509,18 +510,16 @@ PrinterItem::Node()
 void
 PrinterItem::UpdatePendingJobs()
 {
-	if (fFolder) {
-		uint32 pendingJobs = fFolder->CountJobs();
-		if (pendingJobs == 1) {
-			fPendingJobs = B_TRANSLATE("1 pending job");
-			return;
-		} else if (pendingJobs > 1) {
-			fPendingJobs = "";
-			fPendingJobs << pendingJobs << B_TRANSLATE(" pending jobs");
-			return;
-		}
-	}
-	fPendingJobs = B_TRANSLATE("No pending jobs");
+	uint32 pendingJobs = 0;
+	if (fFolder)
+		pendingJobs = fFolder->CountJobs();
+
+	static BStringFormat format(B_TRANSLATE("{0, plural,"
+		"=0{No pending jobs}"
+		"=1{1 pending job}"
+		"other{# pending jobs}}"));
+
+	format.Format(fPendingJobs, pendingJobs);
 }
 
 
