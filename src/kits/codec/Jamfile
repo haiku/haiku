@@ -17,6 +17,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			AdapterIO.cpp
 			MediaIO.cpp
 
+			# Support API
+			MetaData.cpp
+
 			# Codec Plugin API
 			ChunkCache.cpp
 			DecoderPlugin.cpp
