@@ -76,6 +76,8 @@ status_t trash(const char *f)
 		return EALREADY;
 	entry_ref er;
 	err = get_ref_for_path(f, &er);
+	if (err < 0)
+		return err;
 	BPath orgPath(&er);
 	err = orgPath.InitCheck();
 	if (err < 0)
