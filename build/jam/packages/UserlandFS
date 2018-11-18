@@ -12,7 +12,7 @@ AddFilesToPackage servers : userlandfs_server ;
 
 # libs
 local userlandfsLibs = [ FFilterByBuildFeatures
-		libuserlandfs_beos_kernel.so@!x86_64
+		libuserlandfs_beos_kernel.so
 		libuserlandfs_haiku_kernel.so
 		libuserlandfs_fuse.so
 	]

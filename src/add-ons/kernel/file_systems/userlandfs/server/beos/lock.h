@@ -24,7 +24,7 @@
 
 struct beos_lock {
 	sem_id		s;
-	long		c;
+	int32		c;
 };
 
 struct beos_mlock {
