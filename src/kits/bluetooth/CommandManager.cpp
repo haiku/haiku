@@ -16,22 +16,11 @@ inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize,
 	CALLED();
 	struct hci_command_header* header;
 
-#ifdef BT_IOCTLS_PASS_SIZE
 	header = (struct hci_command_header*) malloc(psize
 		+ sizeof(struct hci_command_header));
 	*outsize = psize + sizeof(struct hci_command_header);
-#else
-	size_t* size = (size_t*)malloc(psize + sizeof(struct hci_command_header)
-		+ sizeof(size_t));
-	*outsize = psize + sizeof(struct hci_command_header) + sizeof(size_t);
-
-	*size = psize + sizeof(struct hci_command_header);
-	header = (struct hci_command_header*) (((uint8*)size)+4);
-#endif
-
 
 	if (header != NULL) {
-
 		header->opcode = B_HOST_TO_LENDIAN_INT16(PACK_OPCODE(ogf, ocf));
 		header->clen = psize;
 
@@ -39,11 +28,7 @@ inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize,
 			*param = ((uint8*)header) + sizeof(struct hci_command_header);
 		}
 	}
-#ifdef BT_IOCTLS_PASS_SIZE
 	return header;
-#else
-	return (void*)size;
-#endif
 }
 
 

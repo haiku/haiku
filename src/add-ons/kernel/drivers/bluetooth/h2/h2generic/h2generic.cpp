@@ -618,16 +618,11 @@ device_control(void* cookie, uint32 msg, void* params, size_t size)
 
 	switch (msg) {
 		case ISSUE_BT_COMMAND:
-#ifdef BT_IOCTLS_PASS_SIZE
 			if (size == 0) {
 				TRACE("%s: Invalid size control\n", __func__);
 				err = B_BAD_VALUE;
 				break;
 			}
-#else
-			size = (*((size_t*)params));
-			(*(size_t**)&params)++;
-#endif
 
 			// TODO: Reuse from some TXcompleted queue
 			// snbuf = snb_create(size);
