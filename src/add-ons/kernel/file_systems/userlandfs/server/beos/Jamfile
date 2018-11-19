@@ -4,7 +4,9 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 	file_systems userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
-SubDirCcFlags -Wno-error=format ;
+if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
+	SubDirCcFlags -Wno-error=format ;
+}
 
 SubDirSysHdrs [ FDirName $(userlandFSIncludes) ] ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) private ] ;
