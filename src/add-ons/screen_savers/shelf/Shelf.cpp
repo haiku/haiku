@@ -11,7 +11,10 @@
 #include <Application.h>
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <ControlLook.h>
 #include <Font.h>
+#include <LayoutBuilder.h>
 #include <Screen.h>
 #include <ScreenSaver.h>
 #include <Shelf.h>
@@ -20,6 +23,10 @@
 #include <View.h>
 #include <Window.h>
 #include <Debug.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Shelf Screen Saver"
 
 
 const rgb_color kMediumBlue = {0, 0, 100};
@@ -93,8 +100,34 @@ Shelf::StartConfig(BView *view)
 {
 	PRINT(("%p:%s()\n", this, __FUNCTION__));
 	fInConfig = true;
-	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "",
-		"Shelf, by François Revol."));
+
+	BStringView* titleString = new BStringView("Title",
+		B_TRANSLATE("Shelf"));
+	titleString->SetFont(be_bold_font);
+
+	BStringView* copyrightString = new BStringView("Copyright",
+		B_TRANSLATE("© 2012 François Revol."));
+
+	BTextView* helpText = new BTextView("Help Text");
+	helpText->MakeEditable(false);
+	helpText->SetViewColor(view->ViewColor());
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	helpText->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
+	BString help;
+	help << B_TRANSLATE("Drop replicants on the full-screen window "
+		"behind the preferences panel.");
+	//help << "\n\n";
+	//help << B_TRANSLATE("You can also drop colors.");
+	helpText->SetText(help.String());
+
+	BLayoutBuilder::Group<>(view, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleString)
+		.Add(copyrightString)
+		.AddStrut(roundf(be_control_look->DefaultItemSpacing() / 2))
+		.Add(helpText)
+		.AddGlue()
+	.End();
 
 	BScreen screen;
 	fConfigWindow = new BWindow(screen.Frame(), "Shelf Config",
