@@ -188,6 +188,7 @@ SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
 	Leaves
 	Message
 	Nebula
+	Shelf
 	Spider
 ] ;
 
