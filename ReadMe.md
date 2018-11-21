@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhaiku%2Fhaiku.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhaiku%2Fhaiku?ref=badge_shield)
+
 Haiku
 =======================
 **[Homepage](https://www.haiku-os.org/)
@@ -58,3 +60,7 @@ See [HaikuPorts](https://github.com/haikuports/haikuports/).
 
 ### Contributing to our infrastructure
 See [Infrastructure](https://github.com/haiku/infrastructure/).
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhaiku%2Fhaiku.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhaiku%2Fhaiku?ref=badge_large)
