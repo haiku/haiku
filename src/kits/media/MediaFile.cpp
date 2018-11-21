@@ -356,7 +356,9 @@ BMediaFile::AddCopyright(const char* copyright)
 	if (fWriter == NULL)
 		return B_NO_INIT;
 
-	return fWriter->SetCopyright(copyright);
+	BMetaData* data = new BMetaData();
+	data->SetString(kCopyright, copyright);
+	return fWriter->SetMetaData(data);
 }
 
 
