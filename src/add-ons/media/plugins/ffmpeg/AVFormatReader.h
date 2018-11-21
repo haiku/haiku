@@ -17,12 +17,10 @@ public:
 								AVFormatReader();
 								~AVFormatReader();
 
-	virtual	const char*			Copyright();
-
 	virtual	status_t			Sniff(int32* streamCount);
 
 	virtual	void				GetFileFormatInfo(media_file_format* mff);
-	virtual	status_t			GetMetaData(BMessage* _data);
+	virtual	status_t			GetMetaData(BMetaData* data);
 
 	virtual	status_t			AllocateCookie(int32 streamNumber,
 									void** cookie);
@@ -34,7 +32,7 @@ public:
 									size_t* infoSize);
 
 	virtual	status_t			GetStreamMetaData(void* cookie,
-									BMessage* _data);
+									BMetaData* data);
 
 	virtual	status_t			Seek(void* cookie, uint32 flags, int64* frame,
 									bigtime_t* time);
