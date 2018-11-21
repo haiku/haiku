@@ -301,7 +301,12 @@ BMediaTrack::GetMetaData(BMessage* _data) const
 
 	_data->MakeEmpty();
 
-	return fExtractor->GetStreamMetaData(fStream, _data);
+	BMetaData data;
+	if (fExtractor->GetStreamMetaData(fStream, &data) != B_OK) {
+		*_data = *data.Message();
+		return B_OK;
+	}
+	return B_ERROR;
 }
 
 

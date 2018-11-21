@@ -197,14 +197,25 @@ BMediaFile::GetMetaData(BMessage* _data) const
 
 	_data->MakeEmpty();
 
-	return fExtractor->GetMetaData(_data);
+	BMetaData* metaData = NULL;
+	if (fExtractor->GetMetaData(metaData) == B_OK) {
+		*_data = *metaData->Message();
+		return B_OK;
+	}
+
+	return B_ERROR;
 }
 
 
 const char*
 BMediaFile::Copyright() const
 {
-	return fExtractor->Copyright();
+	BMetaData data;
+	BString copyright;
+	if (fExtractor->GetMetaData(&data) == B_OK)
+		data.GetString(kCopyright, &copyright);
+
+	return copyright.String();
 }
 
 
