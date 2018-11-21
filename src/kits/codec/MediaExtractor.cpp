@@ -201,10 +201,10 @@ MediaExtractor::GetFileFormatInfo(media_file_format* fileFormat) const
 
 
 status_t
-MediaExtractor::GetMetaData(BMessage* _data) const
+MediaExtractor::GetMetaData(BMetaData* data) const
 {
 	CALLED();
-	return fReader->GetMetaData(_data);
+	return fReader->GetMetaData(data);
 }
 
 
@@ -213,13 +213,6 @@ MediaExtractor::StreamCount()
 {
 	CALLED();
 	return fStreamCount;
-}
-
-
-const char*
-MediaExtractor::Copyright()
-{
-	return fReader->Copyright();
 }
 
 
@@ -407,14 +400,14 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 
 
 status_t
-MediaExtractor::GetStreamMetaData(int32 stream, BMessage* _data) const
+MediaExtractor::GetStreamMetaData(int32 stream, BMetaData* data) const
 {
 	const stream_info& info = fStreamInfo[stream];
 
 	if (info.status != B_OK)
 		return info.status;
 
-	return fReader->GetStreamMetaData(fStreamInfo[stream].cookie, _data);
+	return fReader->GetStreamMetaData(fStreamInfo[stream].cookie, data);
 }
 
 

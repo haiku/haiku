@@ -35,11 +35,10 @@ public:
 
 			void				GetFileFormatInfo(
 									media_file_format* fileFormat) const;
-			status_t			GetMetaData(BMessage* _data) const;
+
+			status_t			GetMetaData(BMetaData* data) const;
 
 			int32				StreamCount();
-
-			const char*			Copyright();
 
 			const media_format*	EncodedFormat(int32 stream);
 			int64				CountFrames(int32 stream) const;
@@ -59,7 +58,7 @@ public:
 									media_codec_info* codecInfo);
 
 			status_t			GetStreamMetaData(int32 stream,
-									BMessage* _data) const;
+									BMetaData* data) const;
 
 			void				StopProcessing();
 

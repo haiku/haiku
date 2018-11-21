@@ -3,6 +3,7 @@
 
 
 #include <MediaTrack.h>
+#include <MetaData.h>
 
 #include "MediaPlugin.h"
 
@@ -22,12 +23,10 @@ public:
 								Reader();
 	virtual						~Reader();
 
-	virtual	const char*			Copyright() = 0;
-
 	virtual	status_t			Sniff(int32* streamCount) = 0;
 
 	virtual	void				GetFileFormatInfo(media_file_format* mff) = 0;
-	virtual	status_t			GetMetaData(BMessage* _data);
+	virtual	status_t			GetMetaData(BMetaData* data);
 
 	virtual	status_t			AllocateCookie(int32 streamNumber,
 									void** cookie) = 0;
@@ -48,7 +47,7 @@ public:
 									media_header* mediaHeader) = 0;
 
 	virtual	status_t			GetStreamMetaData(void* cookie,
-									BMessage* _data);
+									BMetaData* data);
 
 			BDataIO*			Source() const;
 
