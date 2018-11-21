@@ -5,6 +5,7 @@
 #ifndef _MEDIA_WRITER_H
 #define _MEDIA_WRITER_H
 
+#include <MetaData.h>
 
 #include "EncoderPlugin.h"
 #include "TList.h"
@@ -31,9 +32,12 @@ public:
 									const media_codec_info* codecInfo,
 									media_format* format, uint32 flags = 0);
 
-			status_t			SetCopyright(int32 streamIndex,
-									const char* copyright);
-			status_t			SetCopyright(const char* copyright);
+			// TODO: One of those is probably misplaced here.
+			// TODO: Why pointers? Just copy it
+			status_t			SetMetaData(BMetaData* data);
+			status_t			SetMetaData(int32 streamIndex,
+									BMetaData* data);
+
 			status_t			CommitHeader();
 			status_t			Flush();
 			status_t			Close();
