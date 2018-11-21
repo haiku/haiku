@@ -10,19 +10,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define P BPrivate::media::
 
-// TODO: probably we can do better
-const char*
-key_to_string(uint32 key)
-{
-	char buf[sizeof(char) * sizeof(uint32) * 4 + 1];
-	if (buf) {
-		sprintf(buf, "%" B_PRId32, key);
-	}
-	BString ret(buf);
-	ret.Prepend("codec:metadata:");
-	return ret.String();
-}
+const char* P kCanPause			= "canpause";
+const char* P kCanSeekBackward 	= "canseekbackward";
+const char* P kCanSeekForward 	= "canseekforward";
+const char* P kCanSeek			= "canseek";
+
+const char* P kAudioBitRate		= "audiobitrate";
+const char* P kVideoBitRate		= "videobitrate";
+const char* P kAudioSampleRate	= "audiosamplerate";
+const char* P kVideoFrameRate	= "videoframerate";
+
+const char* P kMimeType			= "mime";
+const char* P kAudioCodec		= "audiocodec";
+const char* P kVideoCodec		= "videocodec";
+const char* P kVideoHeight		= "videoheight";
+const char* P kVideoWidth		= "videowidth";
+const char* P kNumTracks		= "numtracks";
+const char* P kDrmCrippled		= "drmcrippled";
+
+const char* P kTitle			= "title";
+const char* P kComment			= "comment";
+const char* P kCopyright		= "copyright";
+const char* P kAlbum			= "album";
+const char* P kArtist			= "artist";
+const char* P kAuthor			= "author";
+const char* P kComposer			= "composer";
+const char* P kGenre			= "genre";
+const char* P kDuration			= "duration";
+const char* P kRating			= "rating";
+const char* P kCDTrackNum		= "cdtracknumber";
+const char* P kCDTrackMax		= "cdtrackmax";
 
 
 BMetaData::BMetaData()
@@ -33,65 +52,85 @@ BMetaData::BMetaData()
 }
 
 
+BMetaData::BMetaData(const BMessage& msg)
+	:
+	fMessage(NULL)
+{
+	fMessage = new BMessage(msg);
+}
+
+
 BMetaData::~BMetaData()
 {
 	delete fMessage;
 }
 
 
-status_t
-BMetaData::SetString(uint32 key, const BString& value)
+bool
+BMetaData::SetString(const char* key, const BString& value)
 {
-	return fMessage->AddString(key_to_string(key), value);
+	return fMessage->SetString(key, value) == B_OK ? true : false;
 }
 
 
-status_t
-BMetaData::SetBool(uint32 key, bool value)
+bool
+BMetaData::SetBool(const char* key, bool value)
 {
-	return fMessage->AddBool(key_to_string(key), value);
+	return fMessage->SetBool(key, value) == B_OK ? true : false;
 }
 
 
-status_t
-BMetaData::SetUInt32(uint32 key, uint32 value)
+bool
+BMetaData::SetUInt32(const char* key, uint32 value)
 {
-	return fMessage->AddUInt32(key_to_string(key), value);
+	return fMessage->SetUInt32(key, value) == B_OK ? true : false;
 }
 
 
-status_t
-BMetaData::FindString(uint32 key, BString* value) const
+bool
+BMetaData::GetString(const char* key, BString* value) const
 {
-	return fMessage->FindString(key_to_string(key), value);
+	return fMessage->FindString(key, value) == B_OK ? true : false;
 }
 
 
-status_t
-BMetaData::FindBool(uint32 key, bool* value) const
+bool
+BMetaData::GetBool(const char* key, bool* value) const
 {
-	return fMessage->FindBool(key_to_string(key), value);
+	return fMessage->FindBool(key, value) == B_OK ? true : false;
 }
 
 
-status_t
-BMetaData::FindUInt32(uint32 key, uint32* value) const
+bool
+BMetaData::GetUInt32(const char* key, uint32* value) const
 {
-	return fMessage->FindUInt32(key_to_string(key), value);
+	return fMessage->FindUInt32(key, value) == B_OK ? true : false;
 }
 
 
-status_t
-BMetaData::RemoveValue(uint32 key)
+bool
+BMetaData::RemoveValue(const char* key)
 {
-	return fMessage->RemoveName(key_to_string(key));
+	return fMessage->RemoveName(key) == B_OK ? true : false;
 }
 
 
-// Clean up all keys
 void
-BMetaData::Reset()
+BMetaData::MakeEmpty()
 {
-	delete fMessage;
-	fMessage = new BMessage();
+	fMessage->MakeEmpty();
+}
+
+
+bool
+BMetaData::IsEmpty()
+{
+	return fMessage->IsEmpty();
+}
+
+
+BMessage*
+BMetaData::Message()
+{
+	return fMessage;
 }

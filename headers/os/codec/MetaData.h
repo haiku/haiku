@@ -13,69 +13,71 @@ namespace BPrivate {
 namespace media {
 
 
-enum MetaDataKeys {
-	// Playback capabilities
-	CanPause = 0x1000,	// bool
-	CanSeekBackward,	// bool
-	CanSeekForward,		// bool
-	CanSeek,			// bool
+// Playback capabilities
+extern const char* kCanPause;			// bool
+extern const char* kCanSeekBackward;	// bool
+extern const char* kCanSeekForward;		// bool
+extern const char* kCanSeek;			// bool
 
-	// Bitrates
-	AudioBitRate,		// uint32 (bps)
-	VideoBitRate,		// uint32 (bps)
-	AudioSampleRate,	// uint32 (hz)
-	VideoFrameRate,		// uint32 (hz)
+// Bitrates
+extern const char* kAudioBitRate;		// uint32 (bps)
+extern const char* kVideoBitRate;		// uint32 (bps)
+extern const char* kAudioSampleRate;	// uint32 (hz)
+extern const char* kVideoFrameRate;		// uint32 (hz)
 
-	// RFC2046 and RFC4281
-	MimeType,			// BString
-	AudioCodec,			// BString
-	VideoCodec,			// BString
-	VideoHeight,		// uint32
-	VideoWidth,			// uint32
-	NumTracks,			// uint32
-	DrmCrippled,		// bool
+// RFC2046 and RFC4281
+extern const char* kMimeType;			// BString
+extern const char* kAudioCodec;			// BString
+extern const char* kVideoCodec;			// BString
+extern const char* kVideoHeight;		// uint32
+extern const char* kVideoWidth;			// uint32
+extern const char* kNumTracks;			// uint32
+extern const char* kDrmCrippled;		// bool
 
-	// General use attributes
-	Title,				// BString
-	Comment,			// BString
-	Copyright,			// BString
-	Album,				// BString
-	Artist,				// BString
-	Author,				// BString
-	Composer,			// BString
-	Genre,				// BString
-	// TODO: what we would use for encoded dates?
-	// Date,			// date
-	Duration,			// uint32 (ms)
-	Rating,				// BString
-	// TODO: BBitmap? uint8 array?
-	//AlbumArt,			// 
-	CDTrackNum,			// uint32
-	CDTrackMax			// uint32
-};
+// General use attributes
+extern const char* kTitle;				// BString
+extern const char* kComment;			// BString
+extern const char* kCopyright;			// BString
+extern const char* kAlbum;				// BString
+extern const char* kArtist;				// BString
+extern const char* kAuthor;				// BString
+extern const char* kComposer;			// BString
+extern const char* kGenre;				// BString
+// TODO: what we would use for encoded dates?
+// Date,			// date
+extern const char* kDuration;			// uint32 (ms)
+extern const char* kRating;				// BString
+// TODO: BBitmap? uint8 array?
+//AlbumArt,
+extern const char* kCDTrackNum;			// uint32
+extern const char* kCDTrackMax;			// uint32
 
 
 class BMetaData {
 public:
 						BMetaData();
+						BMetaData(const BMessage& msg);
+
 						~BMetaData();
 
 	// Woah. It seems we need BValue there.
-	status_t			SetString(uint32 key, const BString& value);
-	status_t			SetBool(uint32 key, bool value);
-	status_t			SetUInt32(uint32 key, uint32 value);
+	bool				SetString(const char* key, const BString& value);
+	bool				SetBool(const char* key, bool value);
+	bool				SetUInt32(const char* key, uint32 value);
 
-	status_t			FindString(uint32 key, BString* value) const;
-	status_t			FindBool(uint32 key, bool* value) const;
-    status_t			FindUInt32(uint32 key, uint32* value) const;
+	bool				GetString(const char* key, BString* value) const;
+	bool				GetBool(const char* key, bool* value) const;
+    bool				GetUInt32(const char* key, uint32* value) const;
 
-	status_t			RemoveValue(uint32 key);
+	bool				RemoveValue(const char* key);
 
 	// Clean up all keys
-	void 				Reset();
+	void 				MakeEmpty();
+	bool				IsEmpty();
 
-	status_t			FromMessage(const BMessage& msg);
-	const BMessage&		ToMessage();
+	// Retain ownership of the object, be careful with that
+	// that's why we need to introduce smart pointers!
+	BMessage*			Message();
 
 private:
 	// TODO: padding
