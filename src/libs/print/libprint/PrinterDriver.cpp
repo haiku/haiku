@@ -7,13 +7,14 @@
 #include "PrinterDriver.h"
 
 #include <fs_attr.h> // for attr_info
+#include <DataIO.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Message.h>
 #include <Node.h>
 #include <Path.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
-#include <memory> // for auto_ptr
 
 #include "AboutBox.h"
 #include "AddPrinterDlg.h"
@@ -38,7 +39,7 @@ PrinterDriver::PrinterDriver(BNode* spoolFolder)
 {
 }
 
-PrinterDriver::~PrinterDriver() 
+PrinterDriver::~PrinterDriver()
 {
 	delete fGraphicsDriver;
 	fGraphicsDriver = NULL;
@@ -57,7 +58,7 @@ PrinterDriver::InstantiatePrinterData(BNode* node)
 	return new PrinterData(node);
 }
 
-void 
+void
 PrinterDriver::InitPrinterDataAndCap() {
 	fPrinterData = InstantiatePrinterData(fSpoolFolder);
 	fPrinterData->Load();
@@ -67,8 +68,8 @@ PrinterDriver::InitPrinterDataAndCap() {
 	fPrinterCap = InstantiatePrinterCap(fPrinterData);
 }
 
-void 
-PrinterDriver::About() 
+void
+PrinterDriver::About()
 {
 	BString copyright;
 	copyright = "libprint Copyright © 1999-2000 Y.Takagi\n";
@@ -79,7 +80,7 @@ PrinterDriver::About()
 	app.Run();
 }
 
-char* 
+char*
 PrinterDriver::AddPrinter(char* printerName)
 {
 	// print_server has created a spool folder with name printerName in
@@ -110,7 +111,7 @@ PrinterDriver::AddPrinter(char* printerName)
 	return printerName;
 }
 
-BMessage* 
+BMessage*
 PrinterDriver::ConfigPage(BMessage* settings)
 {
 	DBGMSG((">%s: config_page\n", GetDriverName()));
@@ -128,7 +129,7 @@ PrinterDriver::ConfigPage(BMessage* settings)
 	return result;
 }
 
-BMessage* 
+BMessage*
 PrinterDriver::ConfigJob(BMessage* settings)
 {
 	DBGMSG((">%s: config_job\n", GetDriverName()));
@@ -146,7 +147,7 @@ PrinterDriver::ConfigJob(BMessage* settings)
 	return result;
 }
 
-BMessage* 
+BMessage*
 PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 {
 	DBGMSG((">%s: take_job\n", GetDriverName()));
@@ -171,18 +172,18 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 }
 
 // read settings from spool folder attribute
-bool 
+bool
 PrinterDriver::_ReadSettings(const char* attrName, BMessage* settings)
 {
 	attr_info info;
-	char*  data;
 	ssize_t size;
 
 	settings->MakeEmpty();
 	
 	if (fSpoolFolder->GetAttrInfo(attrName, &info) == B_OK && info.size > 0) {
-		data = new char[info.size];
-		auto_ptr<char> _data(data);
+		BStackOrHeapArray<char, 0> data(info.size);
+		if (!data.IsValid())
+			return false;
 		size = fSpoolFolder->ReadAttr(attrName, B_MESSAGE_TYPE, 0, data, info.size);
 		if (size == info.size && settings->Unflatten(data) == B_OK) {
 			return true;
@@ -192,25 +193,23 @@ PrinterDriver::_ReadSettings(const char* attrName, BMessage* settings)
 }
 
 // write settings to spool folder attribute
-void 
+void
 PrinterDriver::_WriteSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL || settings->what != 'okok') return;
 	
-	size_t size;
-	char* data;
+	status_t status;
+	BMallocIO data;
+	status = settings->Flatten(&data);
 	
-	size = settings->FlattenedSize();
-	data = new char[size];
-	auto_ptr<char> _data(data);
-	
-	if (data != NULL && settings->Flatten(data, size) == B_OK) {
-		fSpoolFolder->WriteAttr(attrName, B_MESSAGE_TYPE, 0, data, size);
+	if (status == B_OK) {
+		fSpoolFolder->WriteAttr(attrName, B_MESSAGE_TYPE, 0, data.Buffer(),
+			data.BufferLength());
 	}
 }
 
 // read settings from spool folder attribute and merge them to current settings
-void 
+void
 PrinterDriver::_MergeWithPreviousSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL) return;
@@ -222,9 +221,9 @@ PrinterDriver::_MergeWithPreviousSettings(const char* attrName, BMessage* settin
 	}
 }
 
-// Implementation of PrinterDriverInstance 
+// Implementation of PrinterDriverInstance
 
-class PrinterDriverInstance 
+class PrinterDriverInstance
 {
 public:
 	PrinterDriverInstance(BNode* spoolFolder = NULL);
