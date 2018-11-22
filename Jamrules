@@ -1,5 +1,17 @@
 # Haiku Jamrules
 
+# Make sure we are on a sane version of Jam.
+if ! [ Match "(.*)-haiku-(.*)" : $(JAMVERSION) ] {
+	Exit "You can only build Haiku with Haiku's Jam, not Perforce Jam or"
+		"some other variant (you are using $(JAMVERSION))." ;
+}
+
+# Make sure we are on a recent Jambase.
+if $(JAMBASEDATE) < 2018 {
+	Exit "Your Jambase is too old ($(JAMBASEDATE)); please update it (likely"
+		"by updating Jam itself.)" ;
+}
+
 # Make sure HAIKU_TOP is a relative path (and prefer it to be the current or
 # parent directory.)
 #

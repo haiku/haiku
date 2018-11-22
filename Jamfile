@@ -1,8 +1,3 @@
-if ! [ Match "(.*)-haiku-(.*)" : $(JAMVERSION) ] {
-	Exit "You can only build Haiku with Haiku's Jam, not Perforce Jam or"
-		"some other variant (you are using $(JAMVERSION))." ;
-}
-
 SubDir HAIKU_TOP ;
 
 NotFile doc_files ;

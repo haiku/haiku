@@ -1,15 +1,3 @@
-# Overridden to allow spaces in file names.
-actions Chmod1
-{
-	$(CHMOD) "$(MODE)" "$(1)"
-}
-
-# Overridden to allow spaces in file names.
-actions piecemeal together existing Clean
-{
-	$(RM) "$(>)"
-}
-
 #-------------------------------------------------------------------------------
 # Link rule/action are overwritten as they don't handle linking files who's name
 # contain spaces very well. Also adds resources and version to executable.
@@ -196,7 +184,6 @@ rule As
 		includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 		localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 		systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
-
 	} else {
 		flags = [ on $(1) return $(TARGET_ASFLAGS_$(TARGET_PACKAGING_ARCH))
 			$(ASFLAGS) ] ;
@@ -380,7 +367,6 @@ rule C++
 			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
-
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
@@ -462,8 +448,7 @@ rule LibraryFromObjects
 
 		# library depends on its member objects
 
-		if $(KEEPOBJS)
-		{
+		if $(KEEPOBJS) {
 			LocalDepends obj : $(_s) ;
 		}
 
@@ -474,8 +459,7 @@ rule LibraryFromObjects
 		# For compatibility, we only do this if the library doesn't
 		# already have a path.
 
-		if ! $(_l:D)
-		{
+		if ! $(_l:D) {
 			# locate the library only, if it hasn't been located yet
 			local dir = $(LOCATE[1]) ;
 			if ! $(dir) {
@@ -487,16 +471,13 @@ rule LibraryFromObjects
 			MakeLocate $(_l)($(_s:BS)) : $(dir) ;
 		}
 
-		if $(NOARSCAN)
-		{
+		if $(NOARSCAN) {
 			# If we can't scan the library to timestamp its contents,
 			# we have to just make the library depend directly on the
 			# on-disk object files.
 
 			Depends $(_l) : $(_s) ;
-		}
-		else
-		{
+		} else {
 			# If we can scan the library, we make the library depend
 			# on its members and each member depend on the on-disk
 			# object file.
@@ -510,9 +491,6 @@ rule LibraryFromObjects
 		}
 
 		LocalClean clean : $(_l) ;
-
-		# bonefish: Not needed on the supported platforms. Maybe later...
-		# if $(CRELIB) { CreLib $(_l) : $(_s[1]) ; }
 
 		Archive $(_l) : $(_s) ;
 
@@ -573,8 +551,7 @@ rule MakeLocate
 {
 	local dir = $(2[1]) ;
 
-	if $(dir)
-	{
+	if $(dir) {
 		if ! $(dir:G) {
 			dir = $(dir:G=dir) ;
 		}
@@ -739,10 +716,4 @@ rule SubInclude
 
 	# restore SUBDIR_TOKENS
 	SUBDIR_TOKENS = $(oldSubDirTokens) ;
-}
-
-
-actions File
-{
-	$(CP) "$(>)" "$(<)"
 }
