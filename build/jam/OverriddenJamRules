@@ -206,8 +206,6 @@ rule As
 	ASDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
 
-# TODO: The KERNEL_CCFLAGS were used here before. Check whether we need any
-# flags we don't have now.
 actions As
 {
 	$(CC) -c "$(2)" -O2 $(ASFLAGS) -D_ASSEMBLER $(ASDEFS) $(ASHDRS) -o "$(1)" ;
@@ -289,7 +287,6 @@ rule Cc
 			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
-
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
