@@ -21,6 +21,10 @@ rule SetupKernel
 		ObjectC++Flags $(object) : $(TARGET_KERNEL_C++FLAGS) $(2) ;
 		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
 
+		# override regular CCFLAGS/C++FLAGS, as we don't want them
+		TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object) = ;
+		TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH) on $(object) = ;
+
 		# override warning flags
 		TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
 			= $(TARGET_KERNEL_WARNING_CCFLAGS) ;
