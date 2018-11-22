@@ -540,7 +540,7 @@ BMediaFile::_InitReader(BDataIO* source, const BUrl* url, int32 flags)
 	fSource = fExtractor->Source();
 
 	fExtractor->GetFileFormatInfo(&fMFI);
-	fTrackNum = fExtractor->StreamCount();
+	fTrackNum = fExtractor->CountStreams();
 	fTrackList = (BMediaTrack**)malloc(fTrackNum * sizeof(BMediaTrack*));
 	if (fTrackList == NULL) {
 		fErr = B_NO_MEMORY;

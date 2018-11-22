@@ -209,7 +209,7 @@ MediaExtractor::GetMetaData(BMetaData* data) const
 
 
 int32
-MediaExtractor::StreamCount()
+MediaExtractor::CountStreams()
 {
 	CALLED();
 	return fStreamCount;
