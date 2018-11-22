@@ -67,10 +67,13 @@ rule BuildEFILoader {
 	MakeLocateDebug $(efiLoader) ;
 }
 
-actions BuildEFILoader {
+actions BuildEFILoader
+{
 	rm -f $(1)
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
-	-j .rel -j .rela -j .reloc --target=efi-app-x86_64 $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
+		-j .dynamic -j .dynsym -j .rel -j .rela -j .reloc -j .dynstr \
+		--input-target=efi-app-x86_64 --output-target=efi-app-x86_64 \
+		$(2) $(1)
 }
 
 
