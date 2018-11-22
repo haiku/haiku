@@ -19,6 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			# Support API
 			MetaData.cpp
+			CodecRoster.cpp
 
 			# Codec Plugin API
 			ChunkCache.cpp
