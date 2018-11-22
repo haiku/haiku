@@ -23,9 +23,6 @@ public:
 
 class Decoder {
 public:
-								Decoder();
-	virtual						~Decoder();
-
 	virtual	void				GetCodecInfo(media_codec_info* codecInfo) = 0;
 
 	// Setup get's called with the info data from Reader::GetStreamInfo
@@ -49,6 +46,11 @@ public:
 			void				SetChunkProvider(ChunkProvider* provider);
 
 	virtual status_t			Perform(perform_code code, void* data);
+
+protected:
+								Decoder();
+	virtual						~Decoder();
+
 
 private:
 			ChunkProvider*		fChunkProvider;
