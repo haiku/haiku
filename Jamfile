@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP ;
 
-NotFile doc_files ;
-Depends files : doc_files ;
-
 # Prepare the optional build features before parsing the Jamfile tree.
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
