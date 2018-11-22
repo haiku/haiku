@@ -28,9 +28,6 @@ public:
 
 class Encoder {
 public:
-								Encoder();
-	virtual						~Encoder();
-
 	// Some codecs may only support certain input color spaces, or output
 	// color spaces, or multiple of 16 width/height... This method is needed
 	// for get_next_encoder() functionality. If _acceptedInputFormat is NULL,
@@ -81,6 +78,10 @@ public:
 			void				SetChunkWriter(ChunkWriter* writer);
 
 	virtual status_t			Perform(perform_code code, void* data);
+
+protected:
+								Encoder();
+	virtual						~Encoder();
 
 private:
 			ChunkWriter*		fChunkWriter;
