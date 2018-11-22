@@ -117,7 +117,7 @@ environment variables:
                               Defaults to "".
   HAIKU_ARFLAGS_<arch>        The flags passed to HAIKU_AR for target
                               architecture <arch> for archiving. Defaults to
-                              "crD".
+                              "cru".
   HAIKU_UNARFLAGS_<arch>      The flags passed to HAIKU_AR for target
                               architecture <arch> for unarchiving. Defaults to
                               "x".
@@ -980,7 +980,7 @@ else
 		set_default_value HAIKU_CXXFLAGS_$targetArch	""
 		set_default_value HAIKU_LINKFLAGS_$targetArch	""
 		set_default_value HAIKU_LDFLAGS_$targetArch		""
-		set_default_value HAIKU_ARFLAGS_$targetArch		crD
+		set_default_value HAIKU_ARFLAGS_$targetArch		cru
 		set_default_value HAIKU_UNARFLAGS_$targetArch	x
 
 		# Override the cross tools variables, if the tools were built or a
