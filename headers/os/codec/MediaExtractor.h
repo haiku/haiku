@@ -36,6 +36,8 @@ public:
 									media_file_format* fileFormat) const;
 
 			status_t			GetMetaData(BMetaData* data) const;
+			status_t			GetStreamMetaData(int32 stream,
+									BMetaData* data) const;
 
 			int32				CountStreams();
 
@@ -56,9 +58,8 @@ public:
 			status_t			CreateDecoder(int32 stream, Decoder** _decoder,
 									media_codec_info* codecInfo);
 
-			status_t			GetStreamMetaData(int32 stream,
-									BMetaData* data) const;
-
+			// TODO: Explore if would be better to add a Start/Stop
+			// methods pair to MediaExtractor.
 			void				StopProcessing();
 
 private:

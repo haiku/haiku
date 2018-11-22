@@ -32,7 +32,6 @@ public:
 									const media_codec_info* codecInfo,
 									media_format* format, uint32 flags = 0);
 
-			// TODO: One of those is probably misplaced here.
 			// TODO: Why pointers? Just copy it
 			status_t			SetMetaData(BMetaData* data);
 			status_t			SetMetaData(int32 streamIndex,
