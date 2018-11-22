@@ -12,11 +12,6 @@ class PluginManager;
 
 class Writer {
 public:
-								Writer();
-	virtual						~Writer();
-
-	virtual	status_t			Init(const media_file_format* fileFormat) = 0;
-
 	virtual	status_t			SetMetaData(BMetaData* data) = 0;
 	virtual	status_t			CommitHeader() = 0;
 	virtual	status_t			Flush() = 0;
@@ -42,6 +37,12 @@ public:
 
 	virtual status_t			Perform(perform_code code, void* data);
 
+protected:
+								Writer();
+	virtual						~Writer();
+
+	virtual	status_t			Init(const media_file_format* fileFormat) = 0;
+
 private:
 			void				_Setup(BDataIO* target);
 
@@ -51,6 +52,7 @@ private:
 
 	// needed for plug-in reference count management
 	friend class PluginManager;
+	friend class MediaWriter;
 
 	virtual void				_ReservedWriter1();
 	virtual void				_ReservedWriter2();
