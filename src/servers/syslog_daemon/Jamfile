@@ -9,10 +9,6 @@ Server syslog_daemon :
 	SyslogDaemon.cpp
 	syslog_output.cpp
 	listener_output.cpp
-
-	# that's for a successful build on R5
-	# ToDo: this can be removed for the Haiku build
-	strlcpy.c
 	:
 	be [ TargetLibsupc++ ] localestub
 ;
@@ -22,7 +18,3 @@ DoCatalogs syslog_daemon :
 	:
 	SyslogDaemon.cpp
 ;
-
-SEARCH on [ FGristFiles
-		strlcpy.c
-	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
