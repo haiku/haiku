@@ -70,7 +70,6 @@ rule ArchitectureSetup architecture
 		ccBaseFlags += -floop-interchange -ftree-loop-distribution
 			-floop-strip-mine -floop-block ;
 	}
-	HAIKU_GCC_BASE_FLAGS_$(architecture) = $(ccBaseFlags) ;
 
 	# initial state for flags etc.
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
@@ -372,8 +371,7 @@ rule KernelArchitectureSetup architecture
 		;
 
 	# C/C++ flags
-	local ccBaseFlags = $(HAIKU_GCC_BASE_FLAGS_$(architecture))
-		-finline -fno-builtin ;
+	local ccBaseFlags = -finline -fno-builtin ;
 
 	if $(gccVersion[1]) >= 4 {
 		ccBaseFlags += -ffreestanding ;
