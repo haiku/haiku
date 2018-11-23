@@ -503,12 +503,8 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_NETWORK_LIBS = network ;
 	HOST_NETAPI_LIB = bnetapi ;
 	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
-} else if $(HOST_PLATFORM) = "sunos" {
-	HOST_NETWORK_LIBS = xnet ;
-	HOST_NETAPI_LIB = ;
-	HOST_SELECT_UNAME_ETC_LIB = ;
 } else {
-	# Linux,...
+	# Linux, ...
 	HOST_NETWORK_LIBS = ;
 	HOST_NETAPI_LIB = ;
 	HOST_SELECT_UNAME_ETC_LIB = ;

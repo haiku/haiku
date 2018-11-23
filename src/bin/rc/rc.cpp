@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2003 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -29,16 +29,10 @@
 #include "rdef.h"
 
 
-#ifndef HAIKU_HOST_PLATFORM_SUNOS
 extern const char *__progname;
-#endif
 
 static const char *kTitle = "Haiku Resource Compiler 1.1";
-#ifdef HAIKU_HOST_PLATFORM_SUNOS
-static const char *kProgramName = "rc";
-#else
 static const char *kProgramName = __progname;
-#endif
 
 
 static bool sQuiet = false;
@@ -81,7 +75,7 @@ error(const char *format, ...)
 }
 
 
-static void 
+static void
 usage()
 {
 	printf("%s\n\n"
@@ -133,7 +127,7 @@ version()
 }
 
 
-static bool 
+static bool
 has_extension(char *name, const char *ext)
 {
 	size_t nameLength = strlen(name);
@@ -242,7 +236,7 @@ parse_options(int argc, char *argv[])
 	}
 
 	if (sOutputFile[0] == '\0') {
-		// no output file name was given, use the name of the 
+		// no output file name was given, use the name of the
 		// first source file as base
 		strlcpy(sOutputFile, sFirstInputFile, sizeof(sOutputFile));
 
@@ -252,7 +246,7 @@ parse_options(int argc, char *argv[])
 }
 
 
-static void 
+static void
 compile()
 {
 	if (!has_extension(sOutputFile, ".rsrc"))
@@ -262,7 +256,7 @@ compile()
 }
 
 
-static void 
+static void
 decompile()
 {
 	if (!has_extension(sOutputFile, ".rdef"))
@@ -272,7 +266,7 @@ decompile()
 }
 
 
-static void 
+static void
 report_error()
 {
 	switch (rdef_err) {

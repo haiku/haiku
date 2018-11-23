@@ -15,13 +15,9 @@
 #include <string.h>
 
 
-#ifdef HAIKU_HOST_PLATFORM_SUNOS
-const char *kProgramName = "setversion";
-#else
 extern const char *__progname;
 
 const char *kProgramName = __progname;
-#endif
 
 
 enum arg_needed {
