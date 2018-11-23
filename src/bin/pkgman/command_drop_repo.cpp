@@ -43,7 +43,7 @@ DEFINE_COMMAND(DropRepoCommand, "drop-repo", kShortUsage, kLongUsage,
 int
 DropRepoCommand::Execute(int argc, const char* const* argv)
 {
-	bool yesMode = false;
+	bool interactive = true;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -63,7 +63,7 @@ DropRepoCommand::Execute(int argc, const char* const* argv)
 				break;
 
 			case 'y':
-				yesMode = true;
+				interactive = false;
 				break;
 
 			default:
@@ -79,8 +79,7 @@ DropRepoCommand::Execute(int argc, const char* const* argv)
 	const char* repoName = argv[optind];
 
 	DecisionProvider decisionProvider;
-//	if (yesMode)
-//		decisionProvider.SetAcceptEverything(true);
+	decisionProvider.SetInteractive(interactive);
 	JobStateListener listener;
 	BContext context(decisionProvider, listener);
 
