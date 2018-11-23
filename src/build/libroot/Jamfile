@@ -40,7 +40,7 @@ if $(HOST_PLATFORM) != darwin && $(HOST_PLATFORM) != haiku_host {
 	strlSources = strlcpy.c strlcat.c ;
 }
 
-if $(HOST_PLATFORM) = cygwin || $(HOST_PLATFORM) = sunos {
+if $(HOST_PLATFORM) = mingw {
 	strlSources += stpcpy.c strcasestr.c ;
 }
 

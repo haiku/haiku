@@ -1,36 +1,18 @@
 #ifndef BEOS_BUILD_COMPATIBILITY_H
 #define BEOS_BUILD_COMPATIBILITY_H
 
-#if defined(HAIKU_HOST_PLATFORM_CYGWIN)
-#	ifndef __addr_t_defined
-#		define __addr_t_defined
-#	endif
-#endif
-
-// DEFFILEMODE is not available on Cygwin, SunOS and when building with musl c
-#if defined(HAIKU_HOST_PLATFORM_CYGWIN) || defined(HAIKU_HOST_PLATFORM_SUNOS) \
-	|| !defined(DEFFILEMODE)
+// DEFFILEMODE is not available on MinGW and on platforms with MUSL
 #ifndef DEFFILEMODE
 #define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
 #endif
 
-// There's no ALLPERMS when building with musl c
+// There's no ALLPERMS on platforms with MUSL
 #ifndef ALLPERMS
 #	define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)
 #endif
 
 #ifndef S_IUMSK
 #define	S_IUMSK 07777
-#endif
-
-#include <ctype.h>
-#endif
-
-#ifdef HAIKU_HOST_PLATFORM_SUNOS
-#	include <limits.h>
-#	ifndef NAME_MAX
-#		define NAME_MAX	MAXNAMELEN
-#	endif
 #endif
 
 typedef unsigned long	haiku_build_addr_t;
@@ -62,7 +44,7 @@ extern size_t	strlcat(char* dest, const char* source, size_t length);
 extern size_t	strnlen(const char* string, size_t length);
 #endif
 
-#if defined(HAIKU_HOST_PLATFORM_CYGWIN) || defined(HAIKU_HOST_PLATFORM_SUNOS)
+#if defined(HAIKU_HOST_PLATFORM_MINGW)
 extern char*	stpcpy(char* dest, const char* src);
 extern char*	strcasestr(const char* s, const char* find);
 #endif
