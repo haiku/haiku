@@ -221,6 +221,6 @@ actions BuildMBR
 {
 	$(RM) $(1)
 	$(HAIKU_CC_$(HAIKU_PACKAGING_ARCH)) $(HAIKU_LINKFLAGS_$(HAIKU_PACKAGING_ARCH)) \
-		$(2) -o $(1) $(MBRFLAGS) -nostdlib -Xlinker --oformat=binary \
+		$(2) -o $(1) $(MBRFLAGS) -nostdlib -m32 -Wl,--oformat,binary -Wl,-z,notext \
 		-Xlinker -S -Xlinker -N -Xlinker --entry=start -Xlinker -Ttext=0x600
 }
