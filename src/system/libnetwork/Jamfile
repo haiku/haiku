@@ -1,0 +1,36 @@
+SubDir HAIKU_TOP src system libnetwork ;
+
+UsePrivateHeaders libroot net shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+local services = [ FGristFiles services ] ;
+SEARCH on $(services) = [ FDirName $(SUBDIR) netresolv defaults ] ;
+
+SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		local libnetwork = [ MultiArchDefaultGristFiles libnetwork.so ] ;
+		SharedLibrary $(libnetwork) :
+			init.cpp
+			interfaces.cpp
+			gethostbyname.c
+			getifaddrs.cpp
+			socket.cpp
+			r5_compatibility.cpp
+			:
+			<netresolv!$(architecture)>netresolv.o
+			[ MultiArchDefaultGristFiles libutil.a libbsd.so ]
+			[ TargetLibsupc++ ]
+			;
+
+		AddFileDataAttribute $(libnetwork) : services : string : $(services) ;
+	}
+}
+
+SubInclude HAIKU_TOP src system libnetwork netresolv ;

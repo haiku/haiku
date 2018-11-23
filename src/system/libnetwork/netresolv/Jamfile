@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src kits network netresolv ;
+SubDir HAIKU_TOP src system libnetwork netresolv ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
