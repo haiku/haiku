@@ -2539,9 +2539,6 @@ void
 TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 {
 	BRect drawRect;
-	rgb_color borderColor = mix_color(
-		fMasterView->Color(B_COLOR_HEADER_BACKGROUND),
-		make_color(0, 0, 0), 128);
 	drawRect = rect;
 
 	font_height fh;

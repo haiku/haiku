@@ -87,9 +87,7 @@ String::Truncate(int32 newLength)
 		newLength = 0;
 	if (newLength < fLength) {
 		char *string = fString;
-		int32 len = fLength;
 		fString = NULL;
-		len = 0;
 		if (!_SetTo(string, newLength)) {
 			fString = string;
 			fLength = newLength;

@@ -62,7 +62,7 @@ ValControlDigitSegment::ValControlDigitSegment(
 	int16												scaleFactor,
 	bool												negativeVisible,
 	display_flags								flags) :
-	
+
 	ValControlSegment(SOLID_UNDERLINE),
 
 	m_digitCount(digitCount),
@@ -75,7 +75,7 @@ ValControlDigitSegment::ValControlDigitSegment(
 	m_digitPadding(0.0),
 	m_flags(flags),
 	m_negativeVisible(negativeVisible) {}
-		
+
 ValControlDigitSegment::~ValControlDigitSegment() {}
 
 uint16 ValControlDigitSegment::digitCount() const {
@@ -102,12 +102,12 @@ int64 ValControlDigitSegment::value() const {
 void ValControlDigitSegment::setValue(
 	int64												value,
 	bool												negative) {
-	
+
 	if(
 		value == m_value &&
 		m_negative == negative)
 		return;
-	
+
 	m_value = value;
 	m_negative = negative;
 	Invalidate();
@@ -117,24 +117,24 @@ void ValControlDigitSegment::setValue(
 //void ValControlDigitSegment::setValue(double dfValue) {
 //
 //	printf("seg[%d]::setValue(%.12f)\n", m_digitCount, dfValue);
-//	
-//	// convert possibly-negative value into absolute value and 
+//
+//	// convert possibly-negative value into absolute value and
 //	// negative flag
 //	bool m_bWasNegative = m_negative;
 //	m_negative = (m_negativeVisible && dfValue < 0.0);
 //	dfValue = fabs(dfValue);
 //
 //	// prepare to scale the value to fit the digits this segment
-//	// represents	
-//	bool bMult = m_scaleFactor < 0;	
+//	// represents
+//	bool bMult = m_scaleFactor < 0;
 //	int64 nLowPow = m_scaleFactor ? (int64)pow(10.0, abs(m_scaleFactor)) : 1;
 //	int64 nHighPow = (int64)pow(10.0, m_digitCount);
-//	
+//
 ////	printf("  lowPow %Ld, highPow %Ld\n", nLowPow, nHighPow);
-//			
+//
 //	double dfTemp = bMult ? dfValue * nLowPow : dfValue / nLowPow;
 ////	printf("  -> %.8lf\n", dfTemp);
-//	
+//
 //	int64 nLocal;
 //	if(m_scaleFactor < 0) {
 //		// really ugly rounding business: there must be a cleaner
@@ -152,7 +152,7 @@ void ValControlDigitSegment::setValue(
 ////	printf("  -> %Ld\n", nLocal);
 //	nLocal %= nHighPow;
 ////	printf("  -> %Ld\n", nLocal);
-//	
+//
 //	if(nLocal != m_value || m_negative != m_bWasNegative) {
 //		m_value = nLocal;
 //		Invalidate();
@@ -172,10 +172,10 @@ float ValControlDigitSegment::handleDragUpdate(
 
 	int64 units = (int64)(distance / dragScaleFactor());
 	float remaining = distance;
-	
+
 	if(units) {
 		remaining = fmod(distance, dragScaleFactor());
-		
+
 		// +++++ echk [23aug99] -- is this the only way?
 		NumericValControl* numericParent = dynamic_cast<NumericValControl*>(parent());
 		ASSERT(numericParent);
@@ -183,16 +183,16 @@ float ValControlDigitSegment::handleDragUpdate(
 		// adjust value for parent:
 //		dfUnits = floor(dfUnits);
 //		dfUnits *= pow(10.0, m_scaleFactor);
-//	
+//
 //		// ++++++ 17sep99
 //		PRINT((
 //			"offset: %.8f\n", dfUnits));
-//			
+//
 //		numericParent->offsetValue(dfUnits);
 
 		numericParent->offsetSegmentValue(this, units);
 	}
-	
+
 	// return 'unused pixels'
 	return remaining;
 }
@@ -222,9 +222,9 @@ void ValControlDigitSegment::Draw(BRect updateRect) {
 	rgb_color black = {0,0,0,255};
 	rgb_color disabled = tint_color(black, B_LIGHTEN_2_TINT);
 	rgb_color viewColor = ViewColor();
-	
+
 	// +++++
-	
+
 	BRect b = Bounds();
 //	PRINT((
 //		"# ValControlDigitSegment::Draw(%.1f,%.1f,%.1f,%.1f) %s\n"
@@ -232,12 +232,12 @@ void ValControlDigitSegment::Draw(BRect updateRect) {
 //		updateRect.left, updateRect.top, updateRect.right, updateRect.bottom,
 //		pBufferBitmap ? "(BUFFERED)" : "(DIRECT)",
 //		Frame().left, Frame().top, Frame().right, Frame().bottom));
-		
+
 	float digitWidth = MaxDigitWidth(m_font);
 	BPoint p;
 	p.x = b.right - digitWidth;
 	p.y = m_yOffset;
-	
+
 //	// clear background
 //	pView->SetHighColor(white);
 //	pView->FillRect(b);
@@ -245,13 +245,13 @@ void ValControlDigitSegment::Draw(BRect updateRect) {
 	// draw a digit at a time, right to left (low->high)
 	pView->SetFont(m_font);
 	if(parent()->IsEnabled()) {
-			
+
 		pView->SetHighColor(black);
 	} else {
-			
+
 		pView->SetHighColor(disabled);
 	}
-	
+
 	pView->SetLowColor(viewColor);
 	int16 digit;
 	int64 cur = abs(m_value);
@@ -280,7 +280,7 @@ void ValControlDigitSegment::Draw(BRect updateRect) {
 		pBufferBitmap->Unlock();
 	}
 
-	_inherited::Draw(updateRect);	
+	_inherited::Draw(updateRect);
 }
 
 // must have parent at this point +++++
@@ -318,42 +318,40 @@ void ValControlDigitSegment::fontChanged(
 	const BFont*								font) {
 //	PRINT((
 //		"* ValControlDigitSegment::fontChanged()\n"));
-		
+
 	m_font = font;
 
 	m_font->GetHeight(&m_fontHeight);
-	
+
 	ASSERT(parent());
 	m_yOffset = parent()->baselineOffset();
 	char c = '-';
 	m_minusSignWidth = m_font->StringWidth(&c, 1) + s_widthTrim;
 
 	// space between digits should be the same as space between
-	// segments, for consistent look:	
+	// segments, for consistent look:
 	m_digitPadding = parent()->segmentPadding();
 }
-	
+
 // -------------------------------------------------------- //
 // BHandler impl.
 // -------------------------------------------------------- //
 
 void ValControlDigitSegment::MessageReceived(BMessage* pMsg) {
-	
+
 	double fVal;
-	status_t err;
-	
+
 	switch(pMsg->what) {
-				
+
 		case ValControl::M_SET_VALUE:
-			err = pMsg->FindDouble("value", &fVal);
-			ASSERT(err == B_OK);
+			pMsg->FindDouble("value", &fVal);
 			setValue((int64)fVal, fVal < 0);
 			break;
-			
+
 		case ValControl::M_GET_VALUE: {
 			BMessage reply(ValControl::M_VALUE);
 			reply.AddDouble("value", value());
-			pMsg->SendReply(&reply);	
+			pMsg->SendReply(&reply);
 			break;
 		}
 	}
@@ -371,11 +369,11 @@ ValControlDigitSegment::ValControlDigitSegment(BMessage* pArchive) :
 	// #/digits
 	status_t err = pArchive->FindInt16("digits", (int16*)&m_digitCount);
 	ASSERT(err == B_OK);
-	
-	// current value		
+
+	// current value
 	err = pArchive->FindInt64("value", &m_value);
 	ASSERT(err == B_OK);
-	
+
 	// scaling
 	err = pArchive->FindInt16("scaleFactor", &m_scaleFactor);
 	ASSERT(err == B_OK);
@@ -387,7 +385,7 @@ status_t ValControlDigitSegment::Archive(BMessage* pArchive, bool bDeep) const{
 	pArchive->AddInt16("digits", m_digitCount);
 	pArchive->AddInt64("value", m_value);
 	pArchive->AddInt16("scaleFactor", m_scaleFactor);
-	
+
 	return B_OK;
 }
 
@@ -408,7 +406,7 @@ float ValControlDigitSegment::MaxDigitWidth(const BFont* pFont) {
 	ASSERT(pFont);
 	if(s_cachedFont == pFont)
 		return s_cachedDigitWidth;
-	
+
 	s_cachedFont = pFont;
 	float fMax = 0.0;
 	for(char c = '0'; c <= '9'; c++) {
@@ -416,7 +414,7 @@ float ValControlDigitSegment::MaxDigitWidth(const BFont* pFont) {
 		if(fWidth > fMax)
 			fMax = fWidth;
 	}
-	
+
 	s_cachedDigitWidth = ceil(fMax + s_widthTrim);
 	return s_cachedDigitWidth;
 }

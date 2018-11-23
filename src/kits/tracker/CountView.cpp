@@ -243,7 +243,6 @@ BCountView::Draw(BRect updateRect)
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_2_TINT);
-	rgb_color lightShadow = tint_color(ViewColor(), B_DARKEN_1_TINT);
 
 	BeginLineArray(fShowingBarberPole && !fStartSpinningAfter ? 9 : 5);
 

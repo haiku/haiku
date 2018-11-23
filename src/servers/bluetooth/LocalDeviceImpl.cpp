@@ -703,7 +703,6 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 		default:
 			TRACE_BT("LocalDeviceImpl: Command Complete not handled\n");
 			break;
-
 	}
 }
 
@@ -712,10 +711,8 @@ void
 LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 	BMessage* request, int32 index)
 {
-
 	int16 opcodeExpected;
 	BMessage reply;
-	status_t status;
 
 	// Handle command complete information
 	request->FindInt16("opcodeExpected", index, &opcodeExpected);
@@ -733,7 +730,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 			TRACE_BT("LocalDeviceImpl: Inquiry status %x\n", event->status);
 
 			reply.AddInt8("status", event->status);
-			status = request->SendReply(&reply);
+			request->SendReply(&reply);
 			//printf("Sending reply... %ld\n", status);
 			// debug reply.PrintToStream();
 
@@ -752,7 +749,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 					event->status);
 
 				reply.AddInt8("status", event->status);
-				status = request->SendReply(&reply);
+				request->SendReply(&reply);
 				//printf("Sending reply... %ld\n", status);
 				// debug reply.PrintToStream();
 
@@ -779,7 +776,6 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event,
 			TRACE_BT("LocalDeviceImpl: Command Status not handled\n");
 		break;
 	}
-
 }
 
 

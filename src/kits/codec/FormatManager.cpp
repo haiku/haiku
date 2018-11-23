@@ -161,7 +161,7 @@ FormatManager::~FormatManager()
 	If there were any changes since the last time, the whole
 	list will be sent back.
 */
-void 
+void
 FormatManager::GetFormats(bigtime_t lastUpdate, BMessage& reply)
 {
 	BAutolock locker(fLock);
@@ -251,7 +251,7 @@ FormatManager::MakeFormatFor(const media_format_description* descriptions,
 		}
 	}
 
-	return B_OK;
+	return result;
 }
 
 

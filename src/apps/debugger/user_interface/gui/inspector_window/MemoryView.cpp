@@ -194,8 +194,6 @@ MemoryView::Draw(BRect rect)
 	BPoint drawPoint(1.0, (startLine + 1) * fLineHeight);
 	int32 currentBlocksPerLine = fHexBlocksPerLine;
 	int32 currentCharsPerLine = fTextCharsPerLine;
-	rgb_color addressColor = tint_color(HighColor(), B_LIGHTEN_1_TINT);
-	rgb_color dataColor = HighColor();
 	font_height fh;
 	GetFontHeight(&fh);
 	target_addr_t lineAddress = fTargetBlock->BaseAddress() + startLine

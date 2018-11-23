@@ -49,8 +49,6 @@ AppGroupView::Draw(BRect updateRect)
 {
 	rgb_color menuColor = ViewColor();
 	BRect bounds = Bounds();
-	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
-	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
 	bounds.bottom = bounds.top + fHeaderSize;
 
 	// Draw the header background
@@ -201,7 +199,7 @@ AppGroupView::MessageReceived(BMessage* msg)
 				removeSelfMessage.AddPointer("view", this);
 				fMessenger.SendMessage(&removeSelfMessage);
 			}
-			
+
 			break;
 		}
 		default:
