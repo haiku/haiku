@@ -733,7 +733,7 @@ Volume::Mount(const char* device)
 	fRootNode->AddAttribute(kCddbIdAttribute, B_UINT32_TYPE, fDiscID);
 
 	// Add CD:do_lookup attribute.
-	SetCDDBLookupsEnabled(true);
+	SetCDDBLookupsEnabled(doLookup);
 
 	// Add CD:toc attribute.
 	fRootNode->AddAttribute(kTocAttribute, B_RAW_TYPE, true,
