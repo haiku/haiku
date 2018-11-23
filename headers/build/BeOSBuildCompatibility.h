@@ -1,6 +1,21 @@
 #ifndef BEOS_BUILD_COMPATIBILITY_H
 #define BEOS_BUILD_COMPATIBILITY_H
 
+// These things have to be done before anything is included
+#if defined(HAIKU_HOST_PLATFORM_MINGW)
+#define _MODE_T_
+#define _POSIX_
+typedef int mode_t;
+
+#include <stdint.h>
+#include <limits.h>
+typedef uint32_t uid_t;
+typedef uint32_t gid_t;
+
+#include <io.h>
+#define mkdir(path, mode) mkdir(path)
+#endif
+
 // DEFFILEMODE is not available on MinGW and on platforms with MUSL
 #ifndef DEFFILEMODE
 #define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
@@ -25,8 +40,11 @@ typedef unsigned long	haiku_build_addr_t;
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/uio.h>
 #include <unistd.h>
+
+#if !defined(HAIKU_HOST_PLATFORM_MINGW)
+#include <sys/uio.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

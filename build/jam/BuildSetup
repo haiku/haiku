@@ -242,7 +242,7 @@ HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
-	: linux openbsd freebsd darwin ;
+	: linux openbsd freebsd darwin mingw ;
 HOST_PLATFORM_(host)_COMPATIBLE = 1 ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
@@ -670,6 +670,7 @@ switch $(HOST_PLATFORM) {
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
 	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
+	case mingw		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_MINGW ;
 }
 
 # define host platform 64 bit macro

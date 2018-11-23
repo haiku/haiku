@@ -322,7 +322,7 @@ rule Cc
 
 actions Cc
 {
-	$(CC) $(CCFLAGS) -c "$(2)" $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(CC) $(CCFLAGS) -c "$(2)" $(CCDEFS) $(CCHDRS) -o "$(1)"
 }
 
 rule C++
@@ -399,13 +399,13 @@ rule C++
 
 actions C++
 {
-	$(C++) -c "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(C++) -c "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)"
 }
 
+# Force recreation of the archive to avoid build errors caused by
+# stale dependencies after renaming or deleting object files.
 actions together Archive
 {
-	# Force recreation of the archive to avoid build errors caused by
-	# stale dependencies after renaming or deleting object files.
 	$(RM) $(<)
 	$(AR) $(<) $(>)
 }

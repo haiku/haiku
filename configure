@@ -782,6 +782,7 @@ case "${platform}" in
 	Haiku)	HOST_PLATFORM=haiku_host ;;
 	Linux)	HOST_PLATFORM=linux ;;
 	OpenBSD) HOST_PLATFORM=openbsd ;;
+	MINGW*) HOST_PLATFORM=mingw ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac

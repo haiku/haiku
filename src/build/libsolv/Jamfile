@@ -33,6 +33,8 @@ switch $(HOST_PLATFORM) {
 		DEFINES += HAVE_STRCHRNUL HAVE_FUNOPEN ;
 	case darwin :
 		DEFINES += HAVE_FUNOPEN HAVE_QSORT_R ;
+	case mingw :
+		DEFINES += ;
 	case * :
 		Exit $(SUBDIR)/Jamfile: "Please add a case for your platform"
 			"($(HOST_PLATFORM))!" ;

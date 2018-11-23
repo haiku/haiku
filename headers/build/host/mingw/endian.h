@@ -1,0 +1,15 @@
+#ifndef _HAIKU_BUILD_COMPATIBILITY_MINGW_ENDIAN
+#define _HAIKU_BUILD_COMPATIBILITY_MINGW_ENDIAN
+
+
+// There's no <endian.h> in MinGW.
+
+#include <sys/param.h>
+
+#define	__LITTLE_ENDIAN	LITTLE_ENDIAN
+#define	__BIG_ENDIAN	BIG_ENDIAN
+
+#define __BYTE_ORDER BYTE_ORDER
+
+
+#endif	// _HAIKU_BUILD_COMPATIBILITY_MINGW_ENDIAN
