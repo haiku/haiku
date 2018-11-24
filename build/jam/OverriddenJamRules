@@ -565,6 +565,14 @@ rule MakeLocate
 	}
 }
 
+# Overridden to use "-p", as Jam does not properly normalize
+# paths passed to NoUpdate, and so tries to make some directories
+# twice: once for the relative path, and once for the absolute path.
+actions MkDir1
+{
+	$(MKDIR) -p "$(<)"
+}
+
 rule MkDir
 {
 	local dir = $(<) ;
