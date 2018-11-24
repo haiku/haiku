@@ -516,9 +516,8 @@ rule KernelArchitectureSetup architecture
 	}
 
 	# warning flags
-	HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
-		-Wno-multichar ;
-	HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-multichar ;
+	HAIKU_KERNEL_WARNING_CCFLAGS = $(HAIKU_WARNING_CCFLAGS_$(architecture)) ;
+	HAIKU_KERNEL_WARNING_C++FLAGS = $(HAIKU_WARNING_C++FLAGS_$(architecture)) ;
 
 	# debug flags
 	local level ;
@@ -626,7 +625,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers bluetooth ;
 	EnableWerror src add-ons kernel drivers bus ;
 	EnableWerror src add-ons kernel drivers common ;
-	EnableWerror src add-ons kernel drivers disk ;
+#	EnableWerror src add-ons kernel drivers disk ;
 	EnableWerror src add-ons kernel drivers dvb ;
 #	EnableWerror src add-ons kernel drivers graphics ;
 	EnableWerror src add-ons kernel drivers graphics intel_extreme ;
@@ -649,7 +648,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel file_systems iso9660 ;
 	EnableWerror src add-ons kernel file_systems layers ;
 	EnableWerror src add-ons kernel file_systems netfs ;
-	EnableWerror src add-ons kernel file_systems nfs ;
+#	EnableWerror src add-ons kernel file_systems nfs ;
 	EnableWerror src add-ons kernel file_systems nfs4 ;
 #	EnableWerror src add-ons kernel file_systems ntfs ;
 	EnableWerror src add-ons kernel file_systems packagefs ;
