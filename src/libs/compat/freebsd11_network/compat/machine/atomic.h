@@ -28,7 +28,7 @@
 	atomic_set((int32 *)(ptr), 0)
 
 #define atomic_cmpset_int(ptr, old, new) \
-	(atomic_test_and_set((int32 *)(ptr), new, old) == old)
+	(atomic_test_and_set((int32 *)(ptr), new, old) == (int32)old)
 
 #define atomic_add_32			atomic_add_int
 #define atomic_subtract_32		atomic_subtract_int

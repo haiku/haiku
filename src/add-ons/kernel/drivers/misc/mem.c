@@ -176,6 +176,6 @@ mem_map_target(off_t position, size_t length, uint32 protection,
 	if (area < 0)
 		return area;
 
-	*virtualAddress += offset;
+	*virtualAddress = (void*)((addr_t)(*virtualAddress) + offset);
 	return area;
 }

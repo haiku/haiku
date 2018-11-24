@@ -883,9 +883,9 @@ rcl_byte(u8 d, u8 s)
     /* s is the rotate distance.  It varies from 0 - 8. */
     /* have
 
-       CF  B_7 B_6 B_5 B_4 B_3 B_2 B_1 B_0 
+       CF  B_7 B_6 B_5 B_4 B_3 B_2 B_1 B_0
 
-       want to rotate through the carry by "s" bits.  We could 
+       want to rotate through the carry by "s" bits.  We could
        loop, but that's inefficient.  So the width is 9,
        and we split into three parts:
 
@@ -895,12 +895,12 @@ rcl_byte(u8 d, u8 s)
 
        The new rotate is done mod 9, and given this,
        for a rotation of n bits (mod 9) the new carry flag is
-       then located n bits from the MSB.  The low part is 
+       then located n bits from the MSB.  The low part is
        then shifted up cnt bits, and the high part is or'd
-       in.  Using CAPS for new values, and lowercase for the 
+       in.  Using CAPS for new values, and lowercase for the
        original values, this can be expressed as:
 
-       IF n > 0 
+       IF n > 0
        1) CF <-  b_(8-n)
        2) B_(7) .. B_(n)  <-  b_(8-(n+1)) .. b_0
        3) B_(n-1) <- cf
@@ -912,17 +912,17 @@ rcl_byte(u8 d, u8 s)
         /* CF <-  b_(8-n)             */
         cf = (d >> (8 - cnt)) & 0x1;
 
-        /* get the low stuff which rotated 
+        /* get the low stuff which rotated
            into the range B_7 .. B_cnt */
         /* B_(7) .. B_(n)  <-  b_(8-(n+1)) .. b_0  */
         /* note that the right hand side done by the mask */
         res = (d << cnt) & 0xff;
 
-        /* now the high stuff which rotated around 
+        /* now the high stuff which rotated around
            into the positions B_cnt-2 .. B_0 */
         /* B_(n-2) .. B_0 <-  b_7 .. b_(8-(n-1)) */
-        /* shift it downward, 7-(n-2) = 9-n positions. 
-           and mask off the result before or'ing in. 
+        /* shift it downward, 7-(n-2) = 9-n positions.
+           and mask off the result before or'ing in.
          */
         mask = (1 << (cnt - 1)) - 1;
         res |= (d >> (9 - cnt)) & mask;
@@ -934,7 +934,7 @@ rcl_byte(u8 d, u8 s)
         }
         /* set the new carry flag, based on the variable "cf" */
         CONDITIONAL_SET_FLAG(cf, F_CF);
-        /* OVERFLOW is set *IFF* cnt==1, then it is the 
+        /* OVERFLOW is set *IFF* cnt==1, then it is the
            xor of CF and the most significant bit.  Blecck. */
         /* parenthesized this expression since it appears to
            be causing OF to be misset */
@@ -1003,22 +1003,22 @@ rcr_byte(u8 d, u8 s)
     u32 mask, cf, ocf = 0;
 
     /* rotate right through carry */
-    /* 
+    /*
        s is the rotate distance.  It varies from 0 - 8.
-       d is the byte object rotated.  
+       d is the byte object rotated.
 
-       have 
+       have
 
-       CF  B_7 B_6 B_5 B_4 B_3 B_2 B_1 B_0 
+       CF  B_7 B_6 B_5 B_4 B_3 B_2 B_1 B_0
 
        The new rotate is done mod 9, and given this,
        for a rotation of n bits (mod 9) the new carry flag is
-       then located n bits from the LSB.  The low part is 
+       then located n bits from the LSB.  The low part is
        then shifted up cnt bits, and the high part is or'd
-       in.  Using CAPS for new values, and lowercase for the 
+       in.  Using CAPS for new values, and lowercase for the
        original values, this can be expressed as:
 
-       IF n > 0 
+       IF n > 0
        1) CF <-  b_(n-1)
        2) B_(8-(n+1)) .. B_(0)  <-  b_(7) .. b_(n)
        3) B_(8-n) <- cf
@@ -1033,7 +1033,7 @@ rcr_byte(u8 d, u8 s)
             /* note hackery here.  Access_flag(..) evaluates to either
                0 if flag not set
                non-zero if flag is set.
-               doing access_flag(..) != 0 casts that into either 
+               doing access_flag(..) != 0 casts that into either
                0..1 in any representation of the flags register
                (i.e. packed bit array or unpacked.)
              */
@@ -1044,19 +1044,19 @@ rcr_byte(u8 d, u8 s)
 
         /* B_(8-(n+1)) .. B_(0)  <-  b_(7) .. b_n  */
         /* note that the right hand side done by the mask
-           This is effectively done by shifting the 
+           This is effectively done by shifting the
            object to the right.  The result must be masked,
-           in case the object came in and was treated 
+           in case the object came in and was treated
            as a negative number.  Needed??? */
 
         mask = (1 << (8 - cnt)) - 1;
         res = (d >> cnt) & mask;
 
-        /* now the high stuff which rotated around 
+        /* now the high stuff which rotated around
            into the positions B_cnt-2 .. B_0 */
         /* B_(7) .. B_(8-(n-1)) <-  b_(n-2) .. b_(0) */
-        /* shift it downward, 7-(n-2) = 9-n positions. 
-           and mask off the result before or'ing in. 
+        /* shift it downward, 7-(n-2) = 9-n positions.
+           and mask off the result before or'ing in.
          */
         res |= (d << (9 - cnt));
 
@@ -1067,7 +1067,7 @@ rcr_byte(u8 d, u8 s)
         }
         /* set the new carry flag, based on the variable "cf" */
         CONDITIONAL_SET_FLAG(cf, F_CF);
-        /* OVERFLOW is set *IFF* cnt==1, then it is the 
+        /* OVERFLOW is set *IFF* cnt==1, then it is the
            xor of CF and the most significant bit.  Blecck. */
         /* parenthesized... */
         if (cnt == 1) {
@@ -1154,18 +1154,18 @@ rol_byte(u8 d, u8 s)
     register unsigned int res, cnt, mask;
 
     /* rotate left */
-    /* 
+    /*
        s is the rotate distance.  It varies from 0 - 8.
-       d is the byte object rotated.  
+       d is the byte object rotated.
 
-       have 
+       have
 
-       CF  B_7 ... B_0 
+       CF  B_7 ... B_0
 
        The new rotate is done mod 8.
        Much simpler than the "rcl" or "rcr" operations.
 
-       IF n > 0 
+       IF n > 0
        1) B_(7) .. B_(n)  <-  b_(8-(n+1)) .. b_(0)
        2) B_(n-1) .. B_(0) <-  b_(7) .. b_(8-n)
      */
@@ -1256,17 +1256,17 @@ ror_byte(u8 d, u8 s)
     register unsigned int res, cnt, mask;
 
     /* rotate right */
-    /* 
+    /*
        s is the rotate distance.  It varies from 0 - 8.
-       d is the byte object rotated.  
+       d is the byte object rotated.
 
-       have 
+       have
 
-       B_7 ... B_0 
+       B_7 ... B_0
 
        The rotate is done mod 8.
 
-       IF n > 0 
+       IF n > 0
        1) B_(8-(n+1)) .. B_(0)  <-  b_(7) .. b_(n)
        2) B_(7) .. B_(8-n) <-  b_(n-1) .. b_(0)
      */
@@ -1279,7 +1279,7 @@ ror_byte(u8 d, u8 s)
         mask = (1 << (8 - cnt)) - 1;
         res |= (d >> (cnt)) & mask;
 
-        /* set the new carry flag, Note that it is the low order 
+        /* set the new carry flag, Note that it is the low order
            bit of the result!!!                               */
         CONDITIONAL_SET_FLAG(res & 0x80, F_CF);
         /* OVERFLOW is set *IFF* s==1, then it is the
@@ -2551,7 +2551,7 @@ div_long(u32 s)
         div <<= 1;
         carry = (l_dvd >= l_s) ? 0 : 1;
 
-        if (h_dvd < (h_s + carry)) {
+        if (h_dvd < (s32)(h_s + carry)) {
             h_s >>= 1;
             l_s = s << (--counter);
             continue;

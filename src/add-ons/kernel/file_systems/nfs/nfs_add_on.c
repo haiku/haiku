@@ -943,7 +943,7 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		struct dirent *buf, size_t bufsize, uint32 *num)
 {
 	nfs_cookie *cookie = (nfs_cookie *)_cookie;
-	int32 max = *num;
+	uint32 max = *num;
 	int32 eof;
 
 	fs_nspace *ns;
