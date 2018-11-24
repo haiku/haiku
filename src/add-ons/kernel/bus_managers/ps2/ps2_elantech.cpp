@@ -518,6 +518,8 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 	if (atomic_or(&dev->flags, PS2_FLAG_OPEN) & PS2_FLAG_OPEN)
 		return B_BUSY;
 
+	uint32 x_min = 0, x_max = 0, y_min = 0, y_max = 0, width = 0;
+
 	elantech_cookie* cookie = (elantech_cookie*)malloc(
 		sizeof(elantech_cookie));
 	if (cookie == NULL)
@@ -599,7 +601,6 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 	}
 	TRACE("ELANTECH: enabled absolute mode!\n");
 
-	uint32 x_min, x_max, y_min, y_max, width;
 	if (get_range(cookie, &x_min, &y_min, &x_max, &y_max, &width) != B_OK) {
 		TRACE("ELANTECH: get range failed!\n");
 		goto err4;
