@@ -118,12 +118,15 @@ rule ArchitectureSetup architecture
 	}
 
 	# warning flags
-	HAIKU_WARNING_CCFLAGS_$(architecture)
-		= -Wall -Wno-trigraphs -Wmissing-prototypes
-		-Wpointer-arith -Wcast-align -Wsign-compare -Wno-multichar ;
-	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall -Wno-trigraphs
-		-Wno-ctor-dtor-privacy -Woverloaded-virtual -Wpointer-arith -Wcast-align
-		-Wsign-compare -Wno-multichar ;
+	HAIKU_WARNING_CCFLAGS_$(architecture) = -Wall
+		-Wno-trigraphs -Wno-unused-parameter -Wno-multichar
+		-Wpointer-arith -Wcast-align -Wsign-compare
+		-Wmissing-prototypes ;
+	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall
+		-Wno-trigraphs -Wno-unused-parameter -Wno-multichar
+		-Wpointer-arith -Wcast-align -Wsign-compare
+		-Wno-ctor-dtor-privacy -Woverloaded-virtual ;
+
 	# disable some Clang warnings that are not very useful
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
 		HAIKU_WARNING_CCFLAGS_$(architecture) += -Wno-address-of-packed-member
@@ -135,12 +138,8 @@ rule ArchitectureSetup architecture
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
 
 	if $(gccVersion[1]) >= 4 {
-		# -Wuninitialized gives too many false positives.
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=uninitialized
-			-Wno-error=maybe-uninitialized ;
-
 		# TODO: remove the -Wno-unused-but-set-variable option
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unused-but-set-variable ;
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable ;
 	}
 
 	# debug flags
