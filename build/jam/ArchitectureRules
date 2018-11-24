@@ -119,11 +119,11 @@ rule ArchitectureSetup architecture
 
 	# warning flags
 	HAIKU_WARNING_CCFLAGS_$(architecture) = -Wall
-		-Wno-trigraphs -Wno-unused-parameter -Wno-multichar
+		-Wno-trigraphs -Wno-multichar
 		-Wpointer-arith -Wcast-align -Wsign-compare
 		-Wmissing-prototypes ;
 	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall
-		-Wno-trigraphs -Wno-unused-parameter -Wno-multichar
+		-Wno-trigraphs -Wno-multichar
 		-Wpointer-arith -Wcast-align -Wsign-compare
 		-Wno-ctor-dtor-privacy -Woverloaded-virtual ;
 
