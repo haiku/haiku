@@ -27,7 +27,7 @@
 #include <DataIO.h>
 #include <OS.h>
 #include <MediaRoster.h>
-#include <ReaderPlugin.h>
+#include <Reader.h>
 
 #include "RawFormats.h"
 #include "RawDecoderPlugin.h"
