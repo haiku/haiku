@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 
-class AVCodecDecoder : public Decoder {
+class AVCodecDecoder : public BDecoder {
 public:
 						AVCodecDecoder();
 

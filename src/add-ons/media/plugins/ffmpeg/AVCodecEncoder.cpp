@@ -39,7 +39,7 @@ static const size_t kDefaultChunkBufferSize = 2 * 1024 * 1024;
 
 AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
-	Encoder(),
+	BEncoder(),
 	fBitRateScale(bitRateScale),
 	fCodecID((CodecID)codecID),
 	fCodec(NULL),

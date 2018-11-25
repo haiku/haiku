@@ -20,7 +20,7 @@ extern "C" {
 typedef AVCodecID CodecID;
 
 
-class AVCodecEncoder : public Encoder {
+class AVCodecEncoder : public BEncoder {
 public:
 								AVCodecEncoder(uint32 codecID,
 									int bitRateScale);
