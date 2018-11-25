@@ -50,10 +50,10 @@ private:
 	uint8 fThreadCount;
 	thread_id fRenderThreads[MAX_RENDER_THREADS];
 	sem_id fRenderSem;
+	sem_id fRenderStoppedSem;
 
-	uint8 fThreadsRendering;
-	bool fRestartRenderThread[MAX_RENDER_THREADS];
-	bool fRenderThreadRunning[MAX_RENDER_THREADS];
+	bool fStopRender;
+	bool fRenderStopped;
 
 	double fLocationX;
 	double fLocationY;
@@ -66,6 +66,7 @@ private:
 	int32 (FractalEngine::*fDoSet)(double real, double imaginary);
 
 	void Render(double locationX, double locationY, double size);
+	void StopRender();
 	static status_t RenderThread(void* data);
 	void RenderPixel(uint32 x, uint32 y);
 
