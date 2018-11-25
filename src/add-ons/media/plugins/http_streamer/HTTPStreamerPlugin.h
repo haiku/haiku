@@ -6,9 +6,10 @@
 #define _HTTP_STREAMER_PLUGIN_H
 
 
-#include "StreamerPlugin.h"
+#include <Streamer.h>
 
-class HTTPStreamer : public Streamer
+
+class HTTPStreamer : public BStreamer
 {
 public:
 								HTTPStreamer();
@@ -18,10 +19,10 @@ public:
 };
 
 
-class HTTPStreamerPlugin : public StreamerPlugin
+class HTTPStreamerPlugin : public BStreamerPlugin
 {
 public:
-	virtual	Streamer*			NewStreamer();
+	virtual	BStreamer*			NewStreamer();
 };
 
 #endif // _HTTP_STREAMER_PLUGIN_H
