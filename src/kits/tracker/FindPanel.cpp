@@ -92,12 +92,6 @@ All rights reserved.
 
 const char* kAllMimeTypes = "mime/ALLTYPES";
 
-const BRect kInitialRect(0, 0, 0, 0);
-const int32 kInitialAttrModeWindowHeight = 140;
-const int32 kIncrementPerAttribute = 30;
-const float kMoreOptionsDelta = 20;
-
-const uint32 kMoreOptionsMessage = 'mrop';
 const uint32 kNameModifiedMessage = 'nmmd';
 const uint32 kSwitchToQueryTemplate = 'swqt';
 const uint32 kRunSaveAsTemplatePanel = 'svtm';
@@ -217,7 +211,7 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 
 FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	:
-	BWindow(kInitialRect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
+	BWindow(BRect(), B_TRANSLATE("Find"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFile(TryOpening(newRef)),

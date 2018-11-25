@@ -188,7 +188,6 @@ struct BTextView::LayoutData {
 };
 
 
-static const rgb_color kBlackColor = { 0, 0, 0, 255 };
 static const rgb_color kBlueInputColor = { 152, 203, 255, 255 };
 static const rgb_color kRedInputColor = { 255, 152, 152, 255 };
 

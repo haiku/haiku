@@ -51,7 +51,6 @@
 
 
 static const float kBorderResizeLength = 22.0;
-static const float kResizeKnobSize = 18.0;
 
 
 static inline uint8

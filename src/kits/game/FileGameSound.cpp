@@ -22,9 +22,7 @@
 #include "GSUtility.h"
 
 
-const int32 kPages = 20;
-struct _gs_media_tracker
-{
+struct _gs_media_tracker {
 	BMediaFile*	file;
 	BMediaTrack*	stream;
 	int64		frames;
@@ -384,7 +382,7 @@ BFileGameSound::Init(const entry_ref* file)
 		fAudioStream = NULL;
 		return B_NO_MEMORY;
 	}
-	
+
 	status_t error = fAudioStream->file->InitCheck();
 	if (error != B_OK)
 		return error;

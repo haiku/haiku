@@ -47,15 +47,7 @@ All rights reserved.
 #include "TeamMenuItem.h"
 #include "tracker_private.h"
 #include "WindowMenuItem.h"
-
-
-const int32 kDesktopWindow = 1024;
-const int32 kMenuWindow	= 1025;
-const uint32 kWindowScreen = 1026;
-const uint32 kNormalWindow = 0;
-const int32 kTeamFloater = 4;
-const int32 kListFloater = 5;
-const int32 kSystemFloater = 6;
+#include "WindowPrivate.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -68,7 +60,7 @@ const int32 kSystemFloater = 6;
 bool
 TWindowMenu::WindowShouldBeListed(client_window_info* info)
 {
-	return ((info->feel == kNormalWindow || info->feel == kWindowScreen)
+	return ((info->feel == B_NORMAL_WINDOW_FEEL || info->feel == kWindowScreenFeel)
 			// Window has the right feel
 		&& info->show_hide_level <= 0);
 			// Window is not hidden

@@ -37,7 +37,6 @@
 #include "StatusView.h"
 
 
-static const uint32 kSettingsViewChanged = 'Svch';
 static const char* kSettingsFileName = "prefs_window_settings";
 
 

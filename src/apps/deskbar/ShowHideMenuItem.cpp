@@ -44,7 +44,6 @@ All rights reserved.
 #include "tracker_private.h"
 
 
-const int32	kDesktopWindow = 4;
 const float kHPad = 10.0f;
 const float kVPad = 2.0f;
 

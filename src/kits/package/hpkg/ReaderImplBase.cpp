@@ -35,8 +35,6 @@ namespace BHPKG {
 namespace BPrivate {
 
 
-static const size_t kScratchBufferSize = 64 * 1024;
-
 static const uint16 kAttributeTypes[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT] = {
 	#define B_DEFINE_HPKG_ATTRIBUTE(id, type, name, constant)	\
 		B_HPKG_ATTRIBUTE_TYPE_##type,

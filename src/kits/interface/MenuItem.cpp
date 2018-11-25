@@ -27,9 +27,6 @@
 #include "utf8_functions.h"
 
 
-const float kLightBGTint
-	= (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3.0;
-
 // map control key shortcuts to drawable Unicode characters
 // cf. http://unicode.org/charts/PDF/U2190.pdf
 const char* kUTF8ControlMap[] = {

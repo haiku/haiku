@@ -27,9 +27,6 @@
 #endif
 
 
-static const float kResizeKnobSize = 18.0;
-
-
 static const rgb_color kFrameColors[4] = {
 	{ 152, 152, 152, 255 },
 	{ 240, 240, 240, 255 },

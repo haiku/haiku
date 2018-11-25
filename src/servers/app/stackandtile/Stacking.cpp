@@ -29,9 +29,6 @@
 using namespace BPrivate;
 
 
-const float kMaxTabWidth = 165.;
-
-
 bool
 StackingEventHandler::HandleMessage(SATWindow* sender,
 	BPrivate::LinkReceiver& link, BPrivate::LinkSender& reply)
@@ -206,13 +203,13 @@ SATStacking::SATStacking(SATWindow* window)
 	fSATWindow(window),
 	fStackingParent(NULL)
 {
-	
+
 }
 
 
 SATStacking::~SATStacking()
 {
-	
+
 }
 
 

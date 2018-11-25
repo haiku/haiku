@@ -93,7 +93,6 @@ static const char* kNetPositiveSignature = "application/x-vnd.Be-NPOS";
 static const char* kPeopleSignature = "application/x-vnd.Be-PEPL";
 
 static const BRect kDefaultFrame(40, 40, 695, 350);
-static const int32 sDefaultQueryTemplateCount = 3;
 
 
 struct ColumnData

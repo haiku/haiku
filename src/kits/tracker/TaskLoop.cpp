@@ -39,8 +39,6 @@ All rights reserved.
 #include "TaskLoop.h"
 
 
-const float kTaskOverhead = 0.01f;
-	// this should really be specified by the task itself
 const float kIdleTreshold = 0.15f;
 
 const bigtime_t kInfinity = B_INFINITE_TIMEOUT;

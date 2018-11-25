@@ -56,7 +56,6 @@ All rights reserved.
 #include "CalendarMenuWindow.h"
 
 
-static const char* const kMinString = "99:99 AM";
 static const float kHMargin = 2.0;
 
 

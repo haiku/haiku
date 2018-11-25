@@ -61,7 +61,6 @@ All rights reserved.
 
 
 const int32 kDefaultRecentDocCount = 10;
-const int32 kDefaultRecentFolderCount = 10;
 const int32 kDefaultRecentAppCount = 10;
 
 const int32 kMenuTrackMargin = 20;

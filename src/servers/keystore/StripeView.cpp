@@ -15,7 +15,6 @@
 #include <LayoutUtils.h>
 
 
-static const float kTopOffset = 10.0f;
 static const int kIconStripeWidth = 30;
 
 
