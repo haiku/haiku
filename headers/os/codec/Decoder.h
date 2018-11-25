@@ -14,7 +14,12 @@ class PluginManager;
 
 class BChunkProvider {
 public:
-	virtual						~BChunkProvider() {};
+								BChunkProvider();
+	virtual						~BChunkProvider();
+
+protected:
+	friend class BDecoder;
+
 	virtual	status_t			GetNextChunk(const void** chunkBuffer,
 									size_t* chunkSize,
 									media_header* mediaHeader) = 0;

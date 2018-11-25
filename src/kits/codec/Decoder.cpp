@@ -59,3 +59,13 @@ void BDecoder::_ReservedDecoder5() {}
 BDecoderPlugin::BDecoderPlugin()
 {
 }
+
+
+BChunkProvider::BChunkProvider()
+{
+}
+
+
+BChunkProvider::~BChunkProvider()
+{
+}

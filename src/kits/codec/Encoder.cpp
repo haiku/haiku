@@ -136,3 +136,13 @@ void BEncoder::_ReservedEncoder20() {}
 BEncoderPlugin::BEncoderPlugin()
 {
 }
+
+
+BChunkWriter::BChunkWriter()
+{
+}
+
+
+BChunkWriter::~BChunkWriter()
+{
+}
