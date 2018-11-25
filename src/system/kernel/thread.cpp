@@ -1708,8 +1708,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 			kprintf(" -");
 
 		kprintf("%4" B_PRId32 "  %p%5" B_PRId32 "  %s\n", thread->priority,
-			(void *)thread->kernel_stack_base, thread->team->id,
-			thread->name != NULL ? thread->name : "<NULL>");
+			(void *)thread->kernel_stack_base, thread->team->id, thread->name);
 
 		return;
 	}
