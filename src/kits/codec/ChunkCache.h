@@ -8,11 +8,10 @@
 
 #include <Locker.h>
 #include <MediaDefs.h>
+#include <Reader.h>
 #include <RealtimeAlloc.h>
 #include <queue>
 #include <deque>
-
-#include "ReaderPlugin.h"
 
 
 namespace BPrivate {

@@ -5,12 +5,12 @@
  */
 
 
-#include "EncoderPlugin.h"
+#include <Encoder.h>
+
+#include <MediaFormats.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <MediaFormats.h>
 
 
 Encoder::Encoder()

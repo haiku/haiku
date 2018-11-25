@@ -4,7 +4,7 @@
  */
 
 
-#include "StreamerPlugin.h"
+#include <Streamer.h>
 
 
 Streamer::Streamer()

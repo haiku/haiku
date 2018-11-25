@@ -7,7 +7,7 @@
  */
 
 
-#include "ReaderPlugin.h"
+#include <Reader.h>
 
 #include <stdio.h>
 

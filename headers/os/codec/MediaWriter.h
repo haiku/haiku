@@ -5,11 +5,11 @@
 #ifndef _MEDIA_WRITER_H
 #define _MEDIA_WRITER_H
 
+#include <Encoder.h>
 #include <MetaData.h>
+#include <Writer.h>
 
-#include "EncoderPlugin.h"
 #include "TList.h"
-#include "WriterPlugin.h"
 
 
 namespace BPrivate {

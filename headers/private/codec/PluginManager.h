@@ -10,15 +10,14 @@
 
 #include <string.h>
 
-
-#include "DecoderPlugin.h"
-#include "EncoderPlugin.h"
-#include "ReaderPlugin.h"
-#include "StreamerPlugin.h"
-#include "WriterPlugin.h"
-
-#include <TList.h>
+#include <Decoder.h>
+#include <Encoder.h>
 #include <Locker.h>
+#include <Reader.h>
+#include <Streamer.h>
+#include <Writer.h>
+
+#include "TList.h"
 
 
 namespace BPrivate { namespace media {

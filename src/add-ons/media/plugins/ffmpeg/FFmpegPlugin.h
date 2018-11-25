@@ -12,10 +12,10 @@
 
 #include <MediaFormats.h>
 
-#include "DecoderPlugin.h"
-#include "EncoderPlugin.h"
-#include "ReaderPlugin.h"
-#include "WriterPlugin.h"
+#include <Decoder.h>
+#include <Encoder.h>
+#include <Reader.h>
+#include <Writer.h>
 
 
 class FFmpegPlugin : public ReaderPlugin, public DecoderPlugin,

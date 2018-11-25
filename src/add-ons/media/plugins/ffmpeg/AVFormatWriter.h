@@ -6,9 +6,9 @@
 #define AV_FORMAT_WRITER_H
 
 
+#include <Writer.h>
 #include <Locker.h>
 
-#include "WriterPlugin.h"
 
 extern "C" {
 	#include "avformat.h"

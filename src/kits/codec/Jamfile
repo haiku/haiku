@@ -10,6 +10,7 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
+		# This will be removed someday
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits media ] ;
 
 		SharedLibrary [ MultiArchDefaultGristFiles libcodec.so ] :
@@ -20,23 +21,23 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# Support API
 			MetaData.cpp
 			CodecRoster.cpp
-
-			# Codec Plugin API
-			ChunkCache.cpp
-			DecoderPlugin.cpp
-			EncoderPlugin.cpp
 			MediaExtractor.cpp
-			MediaPlugin.cpp
 			MediaStreamer.cpp
 			MediaWriter.cpp
-			PluginManager.cpp
-			ReaderPlugin.cpp
-			StreamerPlugin.cpp
-			WriterPlugin.cpp
+
+			# Codec Plugin API
+			MediaPlugin.cpp
+			Decoder.cpp
+			Encoder.cpp
+			Reader.cpp
+			Streamer.cpp
+			Writer.cpp
 
 			# Internal Functionality
+			ChunkCache.cpp
 			AddOnManager.cpp
 			FormatManager.cpp
+			PluginManager.cpp
 
 			# We need this to do not depend on libmedia
 			# will be removed when libmedia2 is introduced

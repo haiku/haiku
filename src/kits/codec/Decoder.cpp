@@ -4,12 +4,12 @@
  */
 
 
-#include "DecoderPlugin.h"
+#include <Decoder.h>
+
+#include <MediaFormats.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include <MediaFormats.h>
 
 
 Decoder::Decoder()

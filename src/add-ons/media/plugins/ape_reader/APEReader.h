@@ -6,7 +6,7 @@
 #include "MonkeysAudioMIMEType.h"
 #include "PositionBridgeIO.h"
 
-#include "ReaderPlugin.h"		// Haiku private header
+#include "Reader.h"		// Haiku private header
 
 
 const int32		BLOCK_COUNT = 1024*4;	// number of blocks, get from MACLib at once

@@ -6,15 +6,15 @@
 #define AVCODEC_ENCODER_H
 
 
+#include <Encoder.h>
 #include <MediaFormats.h>
+
 
 extern "C" {
 	#include "avcodec.h"
 	#include "swscale.h"
 	#include "libavutil/fifo.h"
 }
-
-#include "EncoderPlugin.h"
 
 
 typedef AVCodecID CodecID;

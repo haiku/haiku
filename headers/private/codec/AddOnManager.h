@@ -16,14 +16,14 @@
 */
 
 
-#include "DataExchange.h"
-#include "TList.h"
+#include <Decoder.h>
+#include <Entry.h>
+#include <Encoder.h>
+#include <Reader.h>
+#include <Streamer.h>
+#include <Writer.h>
 
-#include "DecoderPlugin.h"
-#include "EncoderPlugin.h"
-#include "ReaderPlugin.h"
-#include "StreamerPlugin.h"
-#include "WriterPlugin.h"
+#include "TList.h"
 
 
 namespace BPrivate {

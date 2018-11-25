@@ -4,7 +4,7 @@
  *  DESCR: 
  ***********************************************************************/
 #include <MediaDecoder.h>
-#include <DecoderPlugin.h>
+#include <Decoder.h>
 #include <new>
 #include "PluginManager.h"
 #include "MediaDebug.h"
