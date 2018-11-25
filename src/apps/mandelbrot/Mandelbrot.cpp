@@ -242,7 +242,7 @@ void FractalView::MouseUp(BPoint where)
 			centerY = lt.y + dragFrame.Height() / 2;
 
 		SetLocationFromFrame(centerX, centerY);
-		fSize = (dragFrame.Width() * fSize) / frame.Width();
+		fSize = std::fabs((dragFrame.Width() * fSize) / frame.Width());
 	} else {
 		if (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) {
 			SetLocationFromFrame(where.x, where.y);
