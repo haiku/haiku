@@ -358,7 +358,12 @@ public:
 		MSG_ITER_4096,
 		MSG_ITER_8192,
 		MSG_ITER_12288,
-		MSG_ITER_16384
+		MSG_ITER_16384,
+
+		MSG_SUBSAMPLING_1,
+		MSG_SUBSAMPLING_2,
+		MSG_SUBSAMPLING_3,
+		MSG_SUBSAMPLING_4
 	};
 				MandelbrotWindow(BRect frame);
 				~MandelbrotWindow() {}
@@ -381,6 +386,7 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 	BMenu* setMenu;
 	BMenu* paletteMenu;
 	BMenu* iterMenu;
+	BMenu* subsamplingMenu;
 	BLayoutBuilder::Menu<>(menuBar)
 		.AddMenu(B_TRANSLATE("File"))
 			.AddItem(B_TRANSLATE("About"), B_ABOUT_REQUESTED)
@@ -417,6 +423,13 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 			.AddItem("12288", MSG_ITER_12288)
 			.AddItem("16384", MSG_ITER_16384)
 		.End()
+		.AddMenu(B_TRANSLATE("Subsampling"))
+			.GetMenu(subsamplingMenu)
+			.AddItem(B_TRANSLATE("1 (none)"), MSG_SUBSAMPLING_1)
+			.AddItem("4", MSG_SUBSAMPLING_2)
+			.AddItem("9", MSG_SUBSAMPLING_3)
+			.AddItem("16", MSG_SUBSAMPLING_4)
+		.End()
 	.End();
 	setMenu->SetRadioMode(true);
 	setMenu->FindItem(MSG_MANDELBROT_SET)->SetMarked(true);
@@ -424,6 +437,8 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 	paletteMenu->FindItem(MSG_ROYAL_PALETTE)->SetMarked(true);
 	iterMenu->SetRadioMode(true);
 	iterMenu->FindItem(MSG_ITER_1024)->SetMarked(true);
+	subsamplingMenu->SetRadioMode(true);
+	subsamplingMenu->FindItem(MSG_SUBSAMPLING_2)->SetMarked(true);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0)
@@ -458,6 +473,14 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 		fFractalView->RedrawFractal(); \
 		break; \
 	}
+#define HANDLE_SUBSAMPLING(uiwhat, id) \
+	case uiwhat: { \
+		BMessage msg(FractalEngine::MSG_SET_SUBSAMPLING); \
+		msg.AddUInt8("subsampling", id); \
+		fFractalView->fFractalEngine->PostMessage(&msg); \
+		fFractalView->RedrawFractal(); \
+		break; \
+	}
 void
 MandelbrotWindow::MessageReceived(BMessage* msg)
 {
@@ -487,6 +510,11 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 	HANDLE_ITER(MSG_ITER_12288, 12288)
 	HANDLE_ITER(MSG_ITER_16384, 16384)
 
+	HANDLE_SUBSAMPLING(MSG_SUBSAMPLING_1, 1)
+	HANDLE_SUBSAMPLING(MSG_SUBSAMPLING_2, 2)
+	HANDLE_SUBSAMPLING(MSG_SUBSAMPLING_3, 3)
+	HANDLE_SUBSAMPLING(MSG_SUBSAMPLING_4, 4)
+
 	case B_ABOUT_REQUESTED: {
 		BAboutWindow* wind = new BAboutWindow("Mandelbrot",
 			"application/x-vnd.Haiku-Mandelbrot");
@@ -510,6 +538,7 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 #undef HANDLE_SET
 #undef HANDLE_PALETTE
 #undef HANDLE_ITER
+#undef HANDLE_SUBSAMPLING
 
 
 bool

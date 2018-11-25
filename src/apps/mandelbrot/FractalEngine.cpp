@@ -91,6 +91,9 @@ void FractalEngine::MessageReceived(BMessage* msg)
 	case MSG_SET_ITERATIONS:
 		fIterations = msg->GetUInt16("iterations", 0);
 		break;
+	case MSG_SET_SUBSAMPLING:
+		fSubsampling = msg->GetUInt8("subsampling", 1);
+		break;
 
 	case MSG_RESIZE: {
 		TRACE("Got MSG_RESIZE threads rendering\n");
@@ -251,19 +254,38 @@ void FractalEngine::RenderPixel(uint32 x, uint32 y)
 	double real = (x * fSize + fLocationX) - (fWidth / 2 * fSize);
 	double imaginary = (y * -(fSize) + fLocationY) - (fHeight / 2 * -(fSize));
 
-	int32 iterToEscape = (this->*fDoSet)(real, imaginary);
-	uint16 loc = 0;
-	if (iterToEscape == -1)
-		// Didn't escape.
-		loc = 999;
-	else
-		loc = 998 - (iterToEscape % 999);
+	double subsampleDelta = fSize / fSubsampling;
+	uint16 nSamples = fSubsampling * fSubsampling;
+
+	int16 totalR = 0;
+	int16 totalG = 0;
+	int16 totalB = 0;
+	for (uint8 subX = 0; subX < fSubsampling; subX++) {
+		for (uint8 subY = 0; subY < fSubsampling; subY++) {
+			double sampleReal = real + subX * subsampleDelta;
+			double sampleImaginary = imaginary + subY * subsampleDelta;
+
+			int32 sampleIterToEscape = (this->*fDoSet)(sampleReal, sampleImaginary);
+
+			uint16 sampleLoc = 0;
+			if (sampleIterToEscape == -1)
+				// Didn't escape.
+				sampleLoc = 999;
+			else
+				sampleLoc = 998 - (sampleIterToEscape % 999);
+			sampleLoc *= 3;
+
+			totalR += fColorset[sampleLoc + 0];
+			totalG += fColorset[sampleLoc + 1];
+			totalB += fColorset[sampleLoc + 2];
+		}
+	}
+
 
 	uint32 offsetBase = fWidth * y * 3 + x * 3;
-	loc *= 3;
-	fRenderBuffer[offsetBase + 2] = fColorset[loc + 0]; // fRenderBuffer is BGR
-	fRenderBuffer[offsetBase + 1] = fColorset[loc + 1];
-	fRenderBuffer[offsetBase + 0] = fColorset[loc + 2];
+	fRenderBuffer[offsetBase + 2] = totalR / nSamples; // fRenderBuffer is BGR
+	fRenderBuffer[offsetBase + 1] = totalG / nSamples;
+	fRenderBuffer[offsetBase + 0] = totalB / nSamples;
 }
 
 

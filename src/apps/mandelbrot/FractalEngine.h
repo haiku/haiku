@@ -25,6 +25,7 @@ public:
 		MSG_CHANGE_SET = 'Frct',
 		MSG_SET_PALETTE,
 		MSG_SET_ITERATIONS,
+		MSG_SET_SUBSAMPLING,
 		MSG_RESIZE,
 		MSG_BUFFER_CREATED,
 		MSG_RENDER,
@@ -44,6 +45,9 @@ private:
 
 	uint8* fRenderBuffer;
 	uint32 fRenderBufferLen;
+
+	uint8 fSubsampling = 2;
+		// 1 disables subsampling.
 
 	BMessenger fMessenger;
 
