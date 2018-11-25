@@ -75,6 +75,7 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 			case PT_PHDR:
 				// we don't use it
 				break;
+			case PT_EH_FRAME:
 			case PT_RELRO:
 				// not implemented yet, but can be ignored
 				break;
@@ -199,6 +200,7 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 			case PT_PHDR:
 				// we don't use it
 				break;
+			case PT_EH_FRAME:
 			case PT_RELRO:
 				// not implemented yet, but can be ignored
 				break;

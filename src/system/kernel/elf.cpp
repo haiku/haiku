@@ -2283,6 +2283,7 @@ load_kernel_add_on(const char *path)
 				// should check here for appropriate interpreter
 				continue;
 			case PT_PHDR:
+			case PT_STACK:
 				// we don't use it
 				continue;
 			default:
