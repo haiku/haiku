@@ -10,8 +10,8 @@
 
 namespace BPrivate {
 	namespace media {
-		class Encoder;
-		class EncoderPlugin;
+		class BEncoder;
+		class BEncoderPlugin;
 	}
 }
 
@@ -84,7 +84,7 @@ private:
 			void				ReleaseEncoder();
 
 			uint32				_reserved_was_fEncoderMgr;
-			Encoder*			fEncoder;
+			BEncoder*			fEncoder;
 
 			int32				fEncoderID;
 			bool				fFormatValid;

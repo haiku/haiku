@@ -526,7 +526,7 @@ BMediaFile::_InitReader(BDataIO* source, const BUrl* url, int32 flags)
 	if (fErr != B_OK)
 		return;
 
-	fExtractor = new(std::nothrow) MediaExtractor(source, flags);
+	fExtractor = new(std::nothrow) BMediaExtractor(source, flags);
 
 	if (fExtractor == NULL)
 		fErr = B_NO_MEMORY;
@@ -574,7 +574,7 @@ BMediaFile::_InitWriter(BDataIO* target, const BUrl* url,
 			return;
 	}
 
-	fWriter = new(std::nothrow) MediaWriter(target, fMFI);
+	fWriter = new(std::nothrow) BMediaWriter(target, fMFI);
 
 	if (fWriter == NULL)
 		fErr = B_NO_MEMORY;
@@ -597,7 +597,7 @@ BMediaFile::_InitStreamer(const BUrl& url, BDataIO** adapter)
 
 	TRACE(url.UrlString());
 
-	fStreamer = new(std::nothrow) MediaStreamer(url);
+	fStreamer = new(std::nothrow) BMediaStreamer(url);
 	if (fStreamer == NULL) {
 		fErr = B_NO_MEMORY;
 		return;

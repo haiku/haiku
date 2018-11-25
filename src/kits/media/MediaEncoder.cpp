@@ -226,7 +226,7 @@ BMediaEncoder::ReleaseEncoder()
 status_t
 BMediaEncoder::_AttachToEncoder()
 {
-	class MediaEncoderChunkWriter : public ChunkWriter {
+	class MediaEncoderChunkWriter : public BChunkWriter {
 		public:
 			MediaEncoderChunkWriter(BMediaEncoder* encoder)
 			{

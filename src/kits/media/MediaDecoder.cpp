@@ -199,7 +199,7 @@ BMediaDecoder::BMediaDecoder & operator=(const BMediaDecoder &);
 status_t
 BMediaDecoder::AttachToDecoder()
 {
-	class MediaDecoderChunkProvider : public ChunkProvider {
+	class MediaDecoderChunkProvider : public BChunkProvider {
 	private:
 		BMediaDecoder * fDecoder;
 	public:

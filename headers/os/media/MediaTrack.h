@@ -10,10 +10,10 @@
 
 
 namespace BPrivate { namespace media {
-	class Decoder;
-	class Encoder;
-	class MediaExtractor;
-	class MediaWriter;
+	class BDecoder;
+	class BEncoder;
+	class BMediaExtractor;
+	class BMediaWriter;
 } }
 
 class BMessage;
@@ -219,12 +219,12 @@ private:
 
 	// For read-only access to a BMediaTrack
 								BMediaTrack(
-									BPrivate::media::MediaExtractor* extractor,
+									BPrivate::media::BMediaExtractor* extractor,
 									int32 streamIndex);
 
 	// For write-only access to a BMediaTrack
 								BMediaTrack(
-									BPrivate::media::MediaWriter* writer,
+									BPrivate::media::BMediaWriter* writer,
 									int32 streamIndex, media_format* format,
 									const media_codec_info* codecInfo);
 
@@ -235,9 +235,9 @@ private:
 
 private:
 			status_t			fInitStatus;
-			BPrivate::media::Decoder* fDecoder;
-			BPrivate::media::Decoder* fRawDecoder;
-			BPrivate::media::MediaExtractor* fExtractor;
+			BPrivate::media::BDecoder* fDecoder;
+			BPrivate::media::BDecoder* fRawDecoder;
+			BPrivate::media::BMediaExtractor* fExtractor;
 
 			int32				fStream;
 			int64				fCurrentFrame;
@@ -245,9 +245,9 @@ private:
 
 			media_codec_info	fCodecInfo;
 
-			BPrivate::media::Encoder* fEncoder;
+			BPrivate::media::BEncoder* fEncoder;
 			int32				fEncoderID;
-			BPrivate::media::MediaWriter* fWriter;
+			BPrivate::media::BMediaWriter* fWriter;
 			media_format		fFormat;
 
 			uint32				fWorkaroundFlags;
