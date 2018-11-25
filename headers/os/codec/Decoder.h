@@ -12,16 +12,16 @@ namespace BPrivate { namespace media {
 
 class PluginManager;
 
-class ChunkProvider {
+class BChunkProvider {
 public:
-	virtual						~ChunkProvider() {};
+	virtual						~BChunkProvider() {};
 	virtual	status_t			GetNextChunk(const void** chunkBuffer,
 									size_t* chunkSize,
 									media_header* mediaHeader) = 0;
 };
 
 
-class Decoder {
+class BDecoder {
 public:
 	virtual	void				GetCodecInfo(media_codec_info* codecInfo) = 0;
 
@@ -43,19 +43,19 @@ public:
 									size_t* chunkSize,
 									media_header* mediaHeader);
 
-			void				SetChunkProvider(ChunkProvider* provider);
+			void				SetChunkProvider(BChunkProvider* provider);
 
 	virtual status_t			Perform(perform_code code, void* data);
 
 protected:
-								Decoder();
-	virtual						~Decoder();
+								BDecoder();
+	virtual						~BDecoder();
 
 
 private:
-			ChunkProvider*		fChunkProvider;
+			BChunkProvider*		fChunkProvider;
 
-			MediaPlugin*		fMediaPlugin;
+			BMediaPlugin*		fMediaPlugin;
 
 	// needed for plug-in reference count management
 	friend class PluginManager;
@@ -70,11 +70,11 @@ private:
 };
 
 
-class DecoderPlugin : public virtual MediaPlugin {
+class BDecoderPlugin : public virtual BMediaPlugin {
 public:
-								DecoderPlugin();
+								BDecoderPlugin();
 
-	virtual	Decoder*			NewDecoder(uint index) = 0;
+	virtual	BDecoder*			NewDecoder(uint index) = 0;
 	virtual	status_t			GetSupportedFormats(media_format** formats,
 									size_t* count) = 0;
 };

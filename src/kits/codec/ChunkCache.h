@@ -41,9 +41,9 @@ public:
 			void				MakeEmpty();
 			bool				SpaceLeft() const;
 
-			chunk_buffer*		NextChunk(Reader* reader, void* cookie);
+			chunk_buffer*		NextChunk(BReader* reader, void* cookie);
 			void				RecycleChunk(chunk_buffer* chunk);
-			bool				ReadNextChunk(Reader* reader, void* cookie);
+			bool				ReadNextChunk(BReader* reader, void* cookie);
 
 private:
 			rtm_pool*			fRealTimePool;

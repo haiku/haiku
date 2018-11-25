@@ -16,11 +16,11 @@ namespace BPrivate {
 namespace media {
 
 
-class MediaWriter {
+class BMediaWriter {
 public:
-								MediaWriter(BDataIO* target,
+								BMediaWriter(BDataIO* target,
 									const media_file_format& fileFormat);
-								~MediaWriter();
+								~BMediaWriter();
 
 			status_t			InitCheck();
 
@@ -28,7 +28,7 @@ public:
 
 			void				GetFileFormatInfo(media_file_format* mfi) const;
 
-			status_t			CreateEncoder(Encoder** _encoder,
+			status_t			CreateEncoder(BEncoder** _encoder,
 									const media_codec_info* codecInfo,
 									media_format* format, uint32 flags = 0);
 
@@ -55,7 +55,7 @@ private:
 			};
 
 			BDataIO*			fTarget;
-			Writer*				fWriter;
+			BWriter*				fWriter;
 			List<StreamInfo>	fStreamInfos;
 			media_file_format	fFileFormat;
 

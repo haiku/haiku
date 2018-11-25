@@ -17,16 +17,16 @@ namespace BPrivate { namespace media {
 
 class PluginManager;
 
-class ChunkWriter {
+class BChunkWriter {
 public:
-	virtual						~ChunkWriter() {};
+	virtual						~BChunkWriter() {};
 	virtual	status_t			WriteChunk(const void* chunkBuffer,
 									size_t chunkSize,
 									media_encode_info* encodeInfo) = 0;
 };
 
 
-class Encoder {
+class BEncoder {
 public:
 	// Some codecs may only support certain input color spaces, or output
 	// color spaces, or multiple of 16 width/height... This method is needed
@@ -75,18 +75,18 @@ public:
 									size_t chunkSize,
 									media_encode_info* encodeInfo);
 
-			void				SetChunkWriter(ChunkWriter* writer);
+			void				SetChunkWriter(BChunkWriter* writer);
 
 	virtual status_t			Perform(perform_code code, void* data);
 
 protected:
-								Encoder();
-	virtual						~Encoder();
+								BEncoder();
+	virtual						~BEncoder();
 
 private:
-			ChunkWriter*		fChunkWriter;
+			BChunkWriter*		fChunkWriter;
 
-			MediaPlugin*		fMediaPlugin;
+			BMediaPlugin*		fMediaPlugin;
 
 	// needed for plug-in reference count management
 	friend class PluginManager;
@@ -117,14 +117,14 @@ private:
 };
 
 
-class EncoderPlugin : public virtual MediaPlugin {
+class BEncoderPlugin : public virtual BMediaPlugin {
 public:
-								EncoderPlugin();
+								BEncoderPlugin();
 
-	virtual	Encoder*			NewEncoder(
+	virtual	BEncoder*			NewEncoder(
 									const media_codec_info& codecInfo) = 0;
 
-	virtual	Encoder*			NewEncoder(
+	virtual	BEncoder*			NewEncoder(
 									const media_format& format) = 0;
 
 	virtual	status_t			RegisterNextEncoder(int32* cookie,

@@ -5,7 +5,8 @@
 #ifndef _CODEC_ROSTER_H
 #define _CODEC_ROSTER_H
 
-
+#include <Decoder.h>
+#include <Encoder.h>
 #include <MediaDefs.h>
 #include <Reader.h>
 #include <Streamer.h>
@@ -19,32 +20,32 @@ namespace media {
 class BCodecRoster {
 public:
 
-	static status_t		InstantiateReader(Reader** reader,
+	static status_t		InstantiateReader(BReader** reader,
 							int32* streamCount, media_file_format* mff,
 							BDataIO* source);
-	static void			ReleaseReader(Reader* reader);
+	static void			ReleaseReader(BReader* reader);
 
-	static status_t		InstantiateDecoder(Decoder** decoder,
+	static status_t		InstantiateDecoder(BDecoder** decoder,
 							const media_format& format);
-	static status_t		InstantiateDecoder(Decoder** decoder,
+	static status_t		InstantiateDecoder(BDecoder** decoder,
 							const media_codec_info& mci);
-	static void			ReleaseDecoder(Decoder* decoder);
+	static void			ReleaseDecoder(BDecoder* decoder);
 	
-	static status_t		InstantiateWriter(Writer** writer,
+	static status_t		InstantiateWriter(BWriter** writer,
 							const media_file_format& mff,
 							BDataIO* target);
-	static void			ReleaseWriter(Writer* writer);
+	static void			ReleaseWriter(BWriter* writer);
 
-	static status_t		InstantiateEncoder(Encoder** encoder,
+	static status_t		InstantiateEncoder(BEncoder** encoder,
 							const media_format& format);
-	static status_t		InstantiateEncoder(Encoder** encoder,
+	static status_t		InstantiateEncoder(BEncoder** encoder,
 							const media_codec_info* codecInfo,
 							uint32 flags);
-	static void			ReleaseEncoder(Encoder* encoder);
+	static void			ReleaseEncoder(BEncoder* encoder);
 
-	static status_t		InstantiateStreamer(Streamer** streamer,
+	static status_t		InstantiateStreamer(BStreamer** streamer,
 							BUrl url, BDataIO** source);
-	static void			ReleaseStreamer(Streamer* streamer);
+	static void			ReleaseStreamer(BStreamer* streamer);
 
 /*!	\brief	Use this to iterate through the available encoders for a given file
 			format.

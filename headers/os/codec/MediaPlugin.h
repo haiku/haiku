@@ -14,10 +14,10 @@ namespace BPrivate { namespace media {
 // TODO: This will replace BMediaAddOn in media2,
 // see if we need some more accessor method and
 // add the needed padding.
-class MediaPlugin {
+class BMediaPlugin {
 public:
-								MediaPlugin();
-	virtual						~MediaPlugin();
+								BMediaPlugin();
+	virtual						~BMediaPlugin();
 
 private:
 			int32				fRefCount;
@@ -31,13 +31,13 @@ private:
 			uint32				fReserved[5];
 };
 
-class Decoder;
-class Reader;
+class BDecoder;
+class BReader;
 
 } } // namespace BPrivate::media
 
 using namespace BPrivate::media;
 
-extern "C" MediaPlugin* instantiate_plugin();
+extern "C" BMediaPlugin* instantiate_plugin();
 
 #endif // _MEDIA_PLUGIN_H

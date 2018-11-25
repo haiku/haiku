@@ -345,7 +345,7 @@ AddOnManager::_RegisterAddOn(const entry_ref& ref)
 	if (status != B_OK)
 		return status;
 
-	MediaPlugin* (*instantiate_plugin_func)();
+	BMediaPlugin* (*instantiate_plugin_func)();
 
 	if (get_image_symbol(loader.Image(), "instantiate_plugin",
 			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_plugin_func) < B_OK) {
@@ -354,30 +354,30 @@ AddOnManager::_RegisterAddOn(const entry_ref& ref)
 		return B_BAD_TYPE;
 	}
 
-	MediaPlugin* plugin = (*instantiate_plugin_func)();
+	BMediaPlugin* plugin = (*instantiate_plugin_func)();
 	if (plugin == NULL) {
 		printf("AddOnManager::_RegisterAddOn(): instantiate_plugin in \"%s\" "
 			"returned NULL\n", path.Path());
 		return B_ERROR;
 	}
 
-	ReaderPlugin* reader = dynamic_cast<ReaderPlugin*>(plugin);
+	BReaderPlugin* reader = dynamic_cast<BReaderPlugin*>(plugin);
 	if (reader != NULL)
 		_RegisterReader(reader, ref);
 
-	DecoderPlugin* decoder = dynamic_cast<DecoderPlugin*>(plugin);
+	BDecoderPlugin* decoder = dynamic_cast<BDecoderPlugin*>(plugin);
 	if (decoder != NULL)
 		_RegisterDecoder(decoder, ref);
 
-	WriterPlugin* writer = dynamic_cast<WriterPlugin*>(plugin);
+	BWriterPlugin* writer = dynamic_cast<BWriterPlugin*>(plugin);
 	if (writer != NULL)
 		_RegisterWriter(writer, ref);
 
-	EncoderPlugin* encoder = dynamic_cast<EncoderPlugin*>(plugin);
+	BEncoderPlugin* encoder = dynamic_cast<BEncoderPlugin*>(plugin);
 	if (encoder != NULL)
 		_RegisterEncoder(encoder, ref);
 
-	StreamerPlugin* streamer = dynamic_cast<StreamerPlugin*>(plugin);
+	BStreamerPlugin* streamer = dynamic_cast<BStreamerPlugin*>(plugin);
 	if (streamer != NULL)
 		_RegisterStreamer(streamer, ref);
 
@@ -444,7 +444,7 @@ AddOnManager::_UnregisterAddOn(const entry_ref& ref)
 
 
 void
-AddOnManager::_RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
+AddOnManager::_RegisterReader(BReaderPlugin* reader, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
@@ -464,7 +464,7 @@ AddOnManager::_RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
 
 
 void
-AddOnManager::_RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
+AddOnManager::_RegisterDecoder(BDecoderPlugin* plugin, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
@@ -494,7 +494,7 @@ AddOnManager::_RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
 
 
 void
-AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
+AddOnManager::_RegisterWriter(BWriterPlugin* writer, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
@@ -534,7 +534,7 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 
 
 void
-AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
+AddOnManager::_RegisterEncoder(BEncoderPlugin* plugin, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
@@ -577,7 +577,7 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 
 
 void
-AddOnManager::_RegisterStreamer(StreamerPlugin* streamer, const entry_ref& ref)
+AddOnManager::_RegisterStreamer(BStreamerPlugin* streamer, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 

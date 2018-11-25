@@ -23,10 +23,10 @@ struct chunk_buffer;
 struct stream_info;
 
 
-class MediaExtractor {
+class BMediaExtractor {
 public:
-								MediaExtractor(BDataIO* source, int32 flags);
-								~MediaExtractor();
+								BMediaExtractor(BDataIO* source, int32 flags);
+								~BMediaExtractor();
 
 			status_t			InitCheck();
 
@@ -55,7 +55,7 @@ public:
 									size_t* _chunkSize,
 									media_header* mediaHeader);
 
-			status_t			CreateDecoder(int32 stream, Decoder** _decoder,
+			status_t			CreateDecoder(int32 stream, BDecoder** _decoder,
 									media_codec_info* codecInfo);
 
 			// TODO: Explore if would be better to add a Start/Stop
@@ -75,7 +75,7 @@ private:
 			thread_id			fExtractorThread;
 
 			BDataIO*			fSource;
-			Reader*				fReader;
+			BReader*			fReader;
 
 			stream_info*		fStreamInfo;
 			int32				fStreamCount;

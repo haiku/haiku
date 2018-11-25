@@ -15,16 +15,16 @@ namespace BPrivate {
 namespace media {
 
 
-class MediaStreamer {
+class BMediaStreamer {
 public:
-								MediaStreamer(BUrl url);
-								~MediaStreamer();
+								BMediaStreamer(BUrl url);
+								~BMediaStreamer();
 
 			status_t			CreateAdapter(BDataIO** adapter);
 
 private:
 			BUrl				fUrl;
-			Streamer*			fStreamer;
+			BStreamer*			fStreamer;
 
 			// No virtual padding needed. Looks like a design decision.
 			// Let's respect that, for now.

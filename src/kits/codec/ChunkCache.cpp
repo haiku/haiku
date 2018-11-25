@@ -70,7 +70,7 @@ ChunkCache::SpaceLeft() const
 
 
 chunk_buffer*
-ChunkCache::NextChunk(Reader* reader, void* cookie)
+ChunkCache::NextChunk(BReader* reader, void* cookie)
 {
 	ASSERT(IsLocked());
 
@@ -109,7 +109,7 @@ ChunkCache::RecycleChunk(chunk_buffer* chunk)
 
 
 bool
-ChunkCache::ReadNextChunk(Reader* reader, void* cookie)
+ChunkCache::ReadNextChunk(BReader* reader, void* cookie)
 {
 	ASSERT(IsLocked());
 

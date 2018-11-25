@@ -39,9 +39,9 @@ struct BPrivate::media::stream_info {
 };
 
 
-class MediaExtractorChunkProvider : public ChunkProvider {
+class BMediaExtractorChunkProvider : public BChunkProvider {
 public:
-	MediaExtractorChunkProvider(MediaExtractor* extractor, int32 stream)
+	BMediaExtractorChunkProvider(BMediaExtractor* extractor, int32 stream)
 		:
 		fExtractor(extractor),
 		fStream(stream)
@@ -56,7 +56,7 @@ public:
 	}
 
 private:
-	MediaExtractor*	fExtractor;
+	BMediaExtractor*	fExtractor;
 	int32			fStream;
 };
 
@@ -64,7 +64,7 @@ private:
 // #pragma mark -
 
 
-MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
+BMediaExtractor::BMediaExtractor(BDataIO* source, int32 flags)
 	:
 	fExtractorThread(-1),
 	fReader(NULL),
@@ -76,7 +76,7 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 
 
 void
-MediaExtractor::_Init(BDataIO* source, int32 flags)
+BMediaExtractor::_Init(BDataIO* source, int32 flags)
 {
 	CALLED();
 
@@ -122,7 +122,7 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 			fStreamInfo[i].cookie = 0;
 			fStreamInfo[i].hasCookie = false;
 			fStreamInfo[i].status = B_ERROR;
-			ERROR("MediaExtractor::MediaExtractor: AllocateCookie for stream %"
+			ERROR("BMediaExtractor::BMediaExtractor: AllocateCookie for stream %"
 				B_PRId32 " failed\n", i);
 		} else
 			fStreamInfo[i].hasCookie = true;
@@ -140,7 +140,7 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 				&fStreamInfo[i].infoBuffer, &fStreamInfo[i].infoBufferSize)
 					!= B_OK) {
 			fStreamInfo[i].status = B_ERROR;
-			ERROR("MediaExtractor::MediaExtractor: GetStreamInfo for "
+			ERROR("BMediaExtractor::BMediaExtractor: GetStreamInfo for "
 				"stream %" B_PRId32 " failed\n", i);
 		}
 	}
@@ -154,7 +154,7 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 }
 
 
-MediaExtractor::~MediaExtractor()
+BMediaExtractor::~BMediaExtractor()
 {
 	CALLED();
 
@@ -178,7 +178,7 @@ MediaExtractor::~MediaExtractor()
 
 
 status_t
-MediaExtractor::InitCheck()
+BMediaExtractor::InitCheck()
 {
 	CALLED();
 	return fInitStatus;
@@ -186,14 +186,14 @@ MediaExtractor::InitCheck()
 
 
 BDataIO*
-MediaExtractor::Source() const
+BMediaExtractor::Source() const
 {
 	return fSource;
 }
 
 
 void
-MediaExtractor::GetFileFormatInfo(media_file_format* fileFormat) const
+BMediaExtractor::GetFileFormatInfo(media_file_format* fileFormat) const
 {
 	CALLED();
 	*fileFormat = fFileFormat;
@@ -201,7 +201,7 @@ MediaExtractor::GetFileFormatInfo(media_file_format* fileFormat) const
 
 
 status_t
-MediaExtractor::GetMetaData(BMetaData* data) const
+BMediaExtractor::GetMetaData(BMetaData* data) const
 {
 	CALLED();
 	return fReader->GetMetaData(data);
@@ -209,7 +209,7 @@ MediaExtractor::GetMetaData(BMetaData* data) const
 
 
 int32
-MediaExtractor::CountStreams()
+BMediaExtractor::CountStreams()
 {
 	CALLED();
 	return fStreamCount;
@@ -217,14 +217,14 @@ MediaExtractor::CountStreams()
 
 
 const media_format*
-MediaExtractor::EncodedFormat(int32 stream)
+BMediaExtractor::EncodedFormat(int32 stream)
 {
 	return &fStreamInfo[stream].encodedFormat;
 }
 
 
 int64
-MediaExtractor::CountFrames(int32 stream) const
+BMediaExtractor::CountFrames(int32 stream) const
 {
 	CALLED();
 	if (fStreamInfo[stream].status != B_OK)
@@ -244,7 +244,7 @@ MediaExtractor::CountFrames(int32 stream) const
 
 
 bigtime_t
-MediaExtractor::Duration(int32 stream) const
+BMediaExtractor::Duration(int32 stream) const
 {
 	CALLED();
 
@@ -265,7 +265,7 @@ MediaExtractor::Duration(int32 stream) const
 
 
 status_t
-MediaExtractor::Seek(int32 stream, uint32 seekTo, int64* _frame,
+BMediaExtractor::Seek(int32 stream, uint32 seekTo, int64* _frame,
 	bigtime_t* _time)
 {
 	CALLED();
@@ -288,7 +288,7 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo, int64* _frame,
 
 
 status_t
-MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64* _frame,
+BMediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64* _frame,
 	bigtime_t* _time) const
 {
 	CALLED();
@@ -302,7 +302,7 @@ MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64* _frame,
 
 
 status_t
-MediaExtractor::GetNextChunk(int32 stream, const void** _chunkBuffer,
+BMediaExtractor::GetNextChunk(int32 stream, const void** _chunkBuffer,
 	size_t* _chunkSize, media_header* mediaHeader)
 {
 	stream_info& info = fStreamInfo[stream];
@@ -336,21 +336,21 @@ MediaExtractor::GetNextChunk(int32 stream, const void** _chunkBuffer,
 
 
 status_t
-MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
+BMediaExtractor::CreateDecoder(int32 stream, BDecoder** _decoder,
 	media_codec_info* codecInfo)
 {
 	CALLED();
 
 	status_t status = fStreamInfo[stream].status;
 	if (status != B_OK) {
-		ERROR("MediaExtractor::CreateDecoder can't create decoder for "
+		ERROR("BMediaExtractor::CreateDecoder can't create decoder for "
 			"stream %" B_PRId32 ": %s\n", stream, strerror(status));
 		return status;
 	}
 
 	// TODO: Here we should work out a way so that if there is a setup
 	// failure we can try the next decoder
-	Decoder* decoder;
+	BDecoder* decoder;
 	status = gPluginManager.CreateDecoder(&decoder,
 		fStreamInfo[stream].encodedFormat);
 	if (status != B_OK) {
@@ -359,18 +359,18 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 		string_for_format(fStreamInfo[stream].encodedFormat, formatString,
 			sizeof(formatString));
 
-		ERROR("MediaExtractor::CreateDecoder gPluginManager.CreateDecoder "
+		ERROR("BMediaExtractor::CreateDecoder gPluginManager.CreateDecoder "
 			"failed for stream %" B_PRId32 ", format: %s: %s\n", stream,
 			formatString, strerror(status));
 #endif
 		return status;
 	}
 
-	ChunkProvider* chunkProvider
-		= new(std::nothrow) MediaExtractorChunkProvider(this, stream);
+	BChunkProvider* chunkProvider
+		= new(std::nothrow) BMediaExtractorChunkProvider(this, stream);
 	if (chunkProvider == NULL) {
 		gPluginManager.DestroyDecoder(decoder);
-		ERROR("MediaExtractor::CreateDecoder can't create chunk provider "
+		ERROR("BMediaExtractor::CreateDecoder can't create chunk provider "
 			"for stream %" B_PRId32 "\n", stream);
 		return B_NO_MEMORY;
 	}
@@ -381,7 +381,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 		fStreamInfo[stream].infoBuffer, fStreamInfo[stream].infoBufferSize);
 	if (status != B_OK) {
 		gPluginManager.DestroyDecoder(decoder);
-		ERROR("MediaExtractor::CreateDecoder Setup failed for stream %" B_PRId32
+		ERROR("BMediaExtractor::CreateDecoder Setup failed for stream %" B_PRId32
 			": %s\n", stream, strerror(status));
 		return status;
 	}
@@ -389,7 +389,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 	status = gPluginManager.GetDecoderInfo(decoder, codecInfo);
 	if (status != B_OK) {
 		gPluginManager.DestroyDecoder(decoder);
-		ERROR("MediaExtractor::CreateDecoder GetCodecInfo failed for stream %"
+		ERROR("BMediaExtractor::CreateDecoder GetCodecInfo failed for stream %"
 			B_PRId32 ": %s\n", stream, strerror(status));
 		return status;
 	}
@@ -400,7 +400,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 
 
 status_t
-MediaExtractor::GetStreamMetaData(int32 stream, BMetaData* data) const
+BMediaExtractor::GetStreamMetaData(int32 stream, BMetaData* data) const
 {
 	const stream_info& info = fStreamInfo[stream];
 
@@ -412,7 +412,7 @@ MediaExtractor::GetStreamMetaData(int32 stream, BMetaData* data) const
 
 
 void
-MediaExtractor::StopProcessing()
+BMediaExtractor::StopProcessing()
 {
 #if !DISABLE_CHUNK_CACHE
 	if (fExtractorWaitSem > -1) {
@@ -428,7 +428,7 @@ MediaExtractor::StopProcessing()
 
 
 void
-MediaExtractor::_RecycleLastChunk(stream_info& info)
+BMediaExtractor::_RecycleLastChunk(stream_info& info)
 {
 	if (info.lastChunk != NULL) {
 		info.chunkCache->RecycleChunk(info.lastChunk);
@@ -438,15 +438,15 @@ MediaExtractor::_RecycleLastChunk(stream_info& info)
 
 
 status_t
-MediaExtractor::_ExtractorEntry(void* extractor)
+BMediaExtractor::_ExtractorEntry(void* extractor)
 {
-	static_cast<MediaExtractor*>(extractor)->_ExtractorThread();
+	static_cast<BMediaExtractor*>(extractor)->_ExtractorThread();
 	return B_OK;
 }
 
 
 void
-MediaExtractor::_ExtractorThread()
+BMediaExtractor::_ExtractorThread()
 {
 	while (true) {
 		status_t status;

@@ -10,7 +10,7 @@ namespace BPrivate { namespace media {
 
 class PluginManager;
 
-class Writer {
+class BWriter {
 public:
 	virtual	status_t			SetMetaData(BMetaData* data) = 0;
 	virtual	status_t			CommitHeader() = 0;
@@ -38,8 +38,8 @@ public:
 	virtual status_t			Perform(perform_code code, void* data);
 
 protected:
-								Writer();
-	virtual						~Writer();
+								BWriter();
+	virtual						~BWriter();
 
 	virtual	status_t			Init(const media_file_format* fileFormat) = 0;
 
@@ -48,11 +48,11 @@ private:
 
 			BDataIO*			fTarget;
 
-			MediaPlugin*		fMediaPlugin;
+			BMediaPlugin*		fMediaPlugin;
 
 	// needed for plug-in reference count management
 	friend class PluginManager;
-	friend class MediaWriter;
+	friend class BMediaWriter;
 
 	virtual void				_ReservedWriter1();
 	virtual void				_ReservedWriter2();
@@ -64,9 +64,9 @@ private:
 };
 
 
-class WriterPlugin : public virtual MediaPlugin {
+class BWriterPlugin : public virtual BMediaPlugin {
 public:
-	virtual	Writer*				NewWriter() = 0;
+	virtual	BWriter*			NewWriter() = 0;
 	virtual	status_t			GetSupportedFileFormats(
 									const media_file_format** _fileFormats,
 									size_t* _count) = 0;

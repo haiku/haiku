@@ -12,7 +12,7 @@
 #include <string.h>
 
 
-Decoder::Decoder()
+BDecoder::BDecoder()
 	:
 	fChunkProvider(NULL),
 	fMediaPlugin(NULL)
@@ -20,14 +20,14 @@ Decoder::Decoder()
 }
 
 
-Decoder::~Decoder()
+BDecoder::~BDecoder()
 {
 	delete fChunkProvider;
 }
 
 	
 status_t
-Decoder::GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
+BDecoder::GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 					  media_header *mediaHeader)
 {
 	return fChunkProvider->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
@@ -35,7 +35,7 @@ Decoder::GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 
 
 void
-Decoder::SetChunkProvider(ChunkProvider *provider)
+BDecoder::SetChunkProvider(BChunkProvider *provider)
 {
 	delete fChunkProvider;
 	fChunkProvider = provider;
@@ -43,19 +43,19 @@ Decoder::SetChunkProvider(ChunkProvider *provider)
 
 
 status_t
-Decoder::Perform(perform_code code, void* _data)
+BDecoder::Perform(perform_code code, void* _data)
 {
 	return B_OK;
 }
 
 
-void Decoder::_ReservedDecoder1() {}
-void Decoder::_ReservedDecoder2() {}
-void Decoder::_ReservedDecoder3() {}
-void Decoder::_ReservedDecoder4() {}
-void Decoder::_ReservedDecoder5() {}
+void BDecoder::_ReservedDecoder1() {}
+void BDecoder::_ReservedDecoder2() {}
+void BDecoder::_ReservedDecoder3() {}
+void BDecoder::_ReservedDecoder4() {}
+void BDecoder::_ReservedDecoder5() {}
 
 
-DecoderPlugin::DecoderPlugin()
+BDecoderPlugin::BDecoderPlugin()
 {
 }
