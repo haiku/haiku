@@ -273,14 +273,14 @@ TAPEReaderPlugin::~TAPEReaderPlugin()
 }
 
 
-Reader*
+BReader*
 TAPEReaderPlugin::NewReader()
 {
 	return new TAPEReader();
 }
 
 
-MediaPlugin*
+BMediaPlugin*
 instantiate_plugin()
 {
 	return new TAPEReaderPlugin();

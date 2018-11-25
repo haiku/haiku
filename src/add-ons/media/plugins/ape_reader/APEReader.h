@@ -14,7 +14,7 @@ const int32		BUFFER_SIZE = 1024*4;	// size of audio data passing to Media Kit
 const int32		MEDIA_FILE_FORMAT_VERSION = 100;	// media_file_format::version
 
 
-class	TAPEReader : public Reader
+class	TAPEReader : public BReader
 {
 public:
 	TAPEReader();
@@ -43,7 +43,7 @@ public:
 								size_t* oChunkSize, media_header* oMediaHeader);
 
 private:
-	typedef	Reader	SUPER;
+	typedef	BReader	SUPER;
 
 	bigtime_t			CurrentTime() const;
 	status_t			LoadAPECheck() const;
@@ -62,17 +62,17 @@ private:
 };
 
 
-class	TAPEReaderPlugin : public ReaderPlugin
+class	TAPEReaderPlugin : public BReaderPlugin
 {
 public:
 	TAPEReaderPlugin();
 	virtual	~TAPEReaderPlugin();
 
-	virtual	Reader*	NewReader();
+	virtual	BReader* NewReader();
 };
 
 
-MediaPlugin*	instantiate_plugin();
+BMediaPlugin*	instantiate_plugin();
 
 
 #endif	// ___APEReader_H_
