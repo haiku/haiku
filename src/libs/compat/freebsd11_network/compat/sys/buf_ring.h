@@ -68,7 +68,7 @@ buf_ring_enqueue(struct buf_ring *br, void *buf)
 {
 	uint32_t prod_head, prod_next, cons_tail;
 #ifdef DEBUG_BUFRING
-	int i;
+	uint32_t i;
 	for (i = br->br_cons_head; i != br->br_prod_head;
 	     i = ((i + 1) & br->br_cons_mask))
 		if(br->br_ring[i] == buf)

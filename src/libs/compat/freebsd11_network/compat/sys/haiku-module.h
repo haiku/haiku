@@ -27,6 +27,7 @@ typedef int device_probe_t(device_t dev);
 typedef int device_attach_t(device_t dev);
 typedef int device_detach_t(device_t dev);
 typedef int device_resume_t(device_t dev);
+typedef int device_shutdown_t(device_t dev);
 typedef int device_suspend_t(device_t dev);
 
 typedef int bus_child_location_str_t(device_t dev __unused, device_t child,
