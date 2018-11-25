@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
-#include <memory>
 #include <new>
 #include <sstream>
 #include <string>
@@ -33,7 +32,6 @@
 
 using BPrivate::HashMapCatalog;
 using BPrivate::PlainTextCatalog;
-using std::auto_ptr;
 using std::min;
 using std::max;
 using std::pair;
