@@ -8,7 +8,6 @@
  */
 
 
-#include <memory>
 #include <new>
 #include <syslog.h>
 
@@ -24,6 +23,7 @@
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
+#include <StackOrHeapArray.h>
 
 #include <DefaultCatalog.h>
 #include <LocaleRoster.h>
@@ -32,7 +32,6 @@
 
 
 using BPrivate::DefaultCatalog;
-using std::auto_ptr;
 
 
 /*!	This file implements the default catalog-type for the opentracker locale
@@ -150,12 +149,12 @@ DefaultCatalog::ReadFromFile(const char *path)
 		return res;
 	}
 
-	auto_ptr<char> buf(new(std::nothrow) char [sz]);
-	if (buf.get() == NULL) {
+	BStackOrHeapArray<char, 0> buf(sz);
+	if (!buf.IsValid()) {
 		fprintf(stderr, "couldn't allocate array of %Ld chars\n", sz);
 		return B_NO_MEMORY;
 	}
-	res = catalogFile.Read(buf.get(), sz);
+	res = catalogFile.Read(buf, sz);
 	if (res < B_OK) {
 		fprintf(stderr, "couldn't read from catalog-file %s\n", path);
 		return res;
@@ -166,7 +165,7 @@ DefaultCatalog::ReadFromFile(const char *path)
 			path);
 		return res;
 	}
-	BMemoryIO memIO(buf.get(), sz);
+	BMemoryIO memIO(buf, sz);
 	res = Unflatten(&memIO);
 
 	if (res == B_OK) {
