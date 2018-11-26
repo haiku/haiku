@@ -30,6 +30,9 @@ public:
 	static status_t		InstantiateDecoder(BDecoder** decoder,
 							const media_codec_info& mci);
 	static void			ReleaseDecoder(BDecoder* decoder);
+
+	static status_t		GetDecoderInfo(BDecoder* decoder,
+							media_codec_info* info);
 	
 	static status_t		InstantiateWriter(BWriter** writer,
 							const media_file_format& mff,
