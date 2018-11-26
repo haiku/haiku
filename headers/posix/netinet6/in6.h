@@ -87,7 +87,7 @@ struct in6_pktinfo {
 	((a)->s6_addr[0] == 0x00 && (a)->s6_addr[1] == 0x00 \
 	&& (a)->s6_addr[2] == 0x00 && (a)->s6_addr[3] == 0x00 \
 	&& (a)->s6_addr[4] == 0x00 && (a)->s6_addr[5] == 0x00 \
-	&& (a)->s6_addr[6] == 0x00 && (a)->s6_addr[9] == 0x00 \
+	&& (a)->s6_addr[6] == 0x00 && (a)->s6_addr[7] == 0x00 \
 	&& (a)->s6_addr[8] == 0x00 && (a)->s6_addr[9] == 0x00 \
 	&& (a)->s6_addr[10] == 0xff && (a)->s6_addr[11] == 0xff)
 
@@ -95,7 +95,7 @@ struct in6_pktinfo {
 	((a)->s6_addr[0] == 0x00 && (a)->s6_addr[1] == 0x00 \
 	&& (a)->s6_addr[2] == 0x00 && (a)->s6_addr[3] == 0x00 \
 	&& (a)->s6_addr[4] == 0x00 && (a)->s6_addr[5] == 0x00 \
-	&& (a)->s6_addr[6] == 0x00 && (a)->s6_addr[9] == 0x00 \
+	&& (a)->s6_addr[6] == 0x00 && (a)->s6_addr[7] == 0x00 \
 	&& (a)->s6_addr[8] == 0x00 && (a)->s6_addr[9] == 0x00 \
 	&& (a)->s6_addr[10] == 0x00 && (a)->s6_addr[11] == 0x01)
 
