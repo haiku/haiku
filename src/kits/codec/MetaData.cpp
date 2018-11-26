@@ -10,56 +10,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define P BPrivate::media
 
-const char* P::kCanPause			= "canpause";
-const char* P::kCanSeekBackward 	= "canseekbackward";
-const char* P::kCanSeekForward	 	= "canseekforward";
-const char* P::kCanSeek				= "canseek";
+namespace BCodecKit {
 
-const char* P::kAudioBitRate		= "audiobitrate";
-const char* P::kVideoBitRate		= "videobitrate";
-const char* P::kAudioSampleRate		= "audiosamplerate";
-const char* P::kVideoFrameRate		= "videoframerate";
 
-const char* P::kMimeType			= "mime";
-const char* P::kAudioCodec			= "audiocodec";
-const char* P::kVideoCodec			= "videocodec";
-const char* P::kVideoHeight			= "videoheight";
-const char* P::kVideoWidth			= "videowidth";
-const char* P::kNumTracks			= "numtracks";
-const char* P::kDrmCrippled			= "drmcrippled";
+const char* kCanPause			= "canpause";
+const char* kCanSeekBackward 	= "canseekbackward";
+const char* kCanSeekForward	 	= "canseekforward";
+const char* kCanSeek			= "canseek";
 
-const char* P::kTitle				= "title";
-const char* P::kComment				= "comment";
-const char* P::kCopyright			= "copyright";
-const char* P::kAlbum				= "album";
-const char* P::kArtist				= "artist";
-const char* P::kAuthor				= "author";
-const char* P::kComposer			= "composer";
-const char* P::kGenre				= "genre";
-const char* P::kDuration			= "duration";
-const char* P::kRating				= "rating";
-const char* P::kCDTrackNum			= "cdtracknumber";
-const char* P::kCDTrackMax			= "cdtrackmax";
-const char* P::kDate				= "date";
-const char* P::kEncodedBy			= "encoded_by";
-const char* P::kLanguage			= "language";
-const char* P::kAlbumArtist			= "album_artist";
-const char* P::kPerformer			= "performer";
-const char* P::kDisc				= "disc";
-const char* P::kPublisher			= "publisher";
-const char* P::kTrack				= "track";
-const char* P::kEncoder				= "encoder";
-const char* P::kYear				= "year";
+const char* kAudioBitRate		= "audiobitrate";
+const char* kVideoBitRate		= "videobitrate";
+const char* kAudioSampleRate	= "audiosamplerate";
+const char* kVideoFrameRate		= "videoframerate";
 
-const char* P::kChapter				= "be:chapter";
-const char* P::kChapterStart	 	= "be:chapter:start";
-const char* P::kChapterEnd			= "be:chapter:end";
+const char* kMimeType			= "mime";
+const char* kAudioCodec			= "audiocodec";
+const char* kVideoCodec			= "videocodec";
+const char* kVideoHeight		= "videoheight";
+const char* kVideoWidth			= "videowidth";
+const char* kNumTracks			= "numtracks";
+const char* kDrmCrippled		= "drmcrippled";
 
-const char* P::kProgramData 		= "be:program";
+const char* kTitle				= "title";
+const char* kComment			= "comment";
+const char* kCopyright			= "copyright";
+const char* kAlbum				= "album";
+const char* kArtist				= "artist";
+const char* kAuthor				= "author";
+const char* kComposer			= "composer";
+const char* kGenre				= "genre";
+const char* kDuration			= "duration";
+const char* kRating				= "rating";
+const char* kCDTrackNum			= "cdtracknumber";
+const char* kCDTrackMax			= "cdtrackmax";
+const char* kDate				= "date";
+const char* kEncodedBy			= "encoded_by";
+const char* kLanguage			= "language";
+const char* kAlbumArtist		= "album_artist";
+const char* kPerformer			= "performer";
+const char* kDisc				= "disc";
+const char* kPublisher			= "publisher";
+const char* kTrack				= "track";
+const char* kEncoder			= "encoder";
+const char* kYear				= "year";
 
-#undef P
+const char* kChapter			= "be:chapter";
+const char* kChapterStart	 	= "be:chapter:start";
+const char* kChapterEnd			= "be:chapter:end";
+
+const char* kProgramData 		= "be:program";
 
 
 BMetaData::BMetaData()
@@ -189,3 +189,6 @@ BMetaData::operator=(const BMetaData& other)
 	fMessage = new BMessage(*other.fMessage);
 	return *this;
 }
+
+
+} // namespace BCodecKit

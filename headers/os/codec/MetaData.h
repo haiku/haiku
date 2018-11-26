@@ -2,7 +2,6 @@
  * Copyright 2018, Dario Casalinuovo. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _META_DATA_H
 #define _META_DATA_H
 
@@ -10,8 +9,7 @@
 #include <Message.h>
 
 
-namespace BPrivate {
-namespace media {
+namespace BCodecKit {
 
 
 // Playback capabilities
@@ -114,9 +112,8 @@ private:
 						BMetaData(const BMetaData&);
 };
 
-} // namespace media
-} // namespace BPrivate
 
-using namespace BPrivate::media;
+} // namespace BCodecKit
+
 
 #endif	// _META_DATA_H

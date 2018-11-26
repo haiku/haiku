@@ -8,9 +8,12 @@
 #include "MediaPlugin.h"
 
 
-namespace BPrivate { namespace media {
+namespace BCodecKit {
 
-class PluginManager;
+namespace BPrivate {
+	class PluginManager;
+}
+
 
 enum {
 	B_MEDIA_SEEK_TO_TIME	= 0x10000,
@@ -62,8 +65,7 @@ private:
 			BMediaPlugin*		fMediaPlugin;
 
 	// needed for plug-in reference count management
-	friend class PluginManager;
-	friend class MediaExtractor;
+	friend class BCodecKit::BPrivate::PluginManager;
 
 	virtual void				_ReservedReader1();
 	virtual void				_ReservedReader2();
@@ -80,8 +82,8 @@ public:
 	virtual	BReader*			NewReader() = 0;
 };
 
-} } // namespace BPrivate::media
 
-using namespace BPrivate::media;
+} // namespace BCodecKit
+
 
 #endif // _READER_PLUGIN_H

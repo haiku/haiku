@@ -14,12 +14,9 @@
 #include <Reader.h>
 
 
-namespace BPrivate {
-namespace media {
+namespace BCodecKit {
 
 
-class ChunkCache;
-struct chunk_buffer;
 struct stream_info;
 
 
@@ -85,9 +82,8 @@ private:
 			uint32				fReserved[5];
 };
 
-} // namespace media
-} // namespace BPrivate
 
-using namespace BPrivate::media;
+} // namespace BCodecKit
+
 
 #endif	// _MEDIA_EXTRACTOR_H

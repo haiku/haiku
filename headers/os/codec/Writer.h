@@ -6,9 +6,13 @@
 
 #include "MediaPlugin.h"
 
-namespace BPrivate { namespace media {
 
-class PluginManager;
+namespace BCodecKit {
+
+namespace BPrivate {
+	class PluginManager;
+}
+
 
 class BWriter {
 public:
@@ -51,7 +55,7 @@ private:
 			BMediaPlugin*		fMediaPlugin;
 
 	// needed for plug-in reference count management
-	friend class PluginManager;
+	friend class BCodecKit::BPrivate::PluginManager;
 	friend class BMediaWriter;
 
 	virtual void				_ReservedWriter1();
@@ -70,11 +74,10 @@ public:
 	virtual	status_t			GetSupportedFileFormats(
 									const media_file_format** _fileFormats,
 									size_t* _count) = 0;
-
 };
 
-} } // namespace BPrivate::media
 
-using namespace BPrivate::media;
+} // namespace BCodecKit
+
 
 #endif // _WRITER_PLUGIN_H

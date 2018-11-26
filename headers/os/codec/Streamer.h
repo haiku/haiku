@@ -12,9 +12,11 @@
 #include "MediaPlugin.h"
 
 
-namespace BPrivate { namespace media {
+namespace BCodecKit {
 
-class PluginManager;
+namespace BPrivate {
+	class PluginManager;
+}
 
 
 class BStreamer {
@@ -28,8 +30,7 @@ protected:
 private:
 			BMediaPlugin*		fMediaPlugin;
 
-	friend class PluginManager;
-	friend class MediaStreamer;
+	friend class BCodecKit::BPrivate::PluginManager;
 
 	virtual void				_ReservedStreamer1();
 	virtual void				_ReservedStreamer2();
@@ -48,9 +49,8 @@ public:
 	virtual	BStreamer*			NewStreamer() = 0;
 };
 
-} } // namespace BPrivate::media
 
-using namespace BPrivate::media;
+} // namespace BCodecKit
 
 
 #endif // _STREAMER_PLUGIN_H

@@ -9,6 +9,7 @@
 #include <Encoder.h>
 #include <MediaFormats.h>
 
+using namespace BCodecKit;
 
 extern "C" {
 	#include "avcodec.h"

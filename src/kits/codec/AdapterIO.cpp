@@ -5,13 +5,16 @@
  */
 
 
-#include "AdapterIO.h"
+#include <AdapterIO.h>
 
 #include <MediaIO.h>
 
 #include <string.h>
 
 #include "MediaDebug.h"
+
+
+namespace BCodecKit {
 
 
 #define TIMEOUT_QUANTA 100000
@@ -461,3 +464,6 @@ void BAdapterIO::_ReservedAdapterIO5() {}
 
 void BInputAdapter::_ReservedInputAdapter1() {}
 void BInputAdapter::_ReservedInputAdapter2() {}
+
+
+} // namespace BCodecKit

@@ -17,6 +17,8 @@
 #include <Reader.h>
 #include <Writer.h>
 
+using namespace BCodecKit;
+
 
 class FFmpegPlugin : public BReaderPlugin, public BDecoderPlugin,
 	public BWriterPlugin, public BEncoderPlugin {

@@ -15,6 +15,10 @@
 // #pragma mark -
 
 
+namespace BCodecKit {
+namespace BPrivate {
+
+
 ChunkCache::ChunkCache(sem_id waitSem, size_t maxBytes)
 	:
 	BLocker("media chunk cache"),
@@ -156,3 +160,7 @@ ChunkCache::ReadNextChunk(BReader* reader, void* cookie)
 	fChunkCache.push(chunk);
 	return chunk->status == B_OK;
 }
+
+
+} // namespace BPrivate
+} // namespace BCodecKit

@@ -6,16 +6,18 @@
 #define _ENCODER_PLUGIN_H
 
 
+#include <MediaPlugin.h>
 #include <MediaTrack.h>
 #include <MediaFormats.h>
 #include <View.h>
 
-#include "MediaPlugin.h"
 
+namespace BCodecKit {
 
-namespace BPrivate { namespace media {
+namespace BPrivate {
+	class PluginManager;
+}
 
-class PluginManager;
 
 class BChunkWriter {
 public:
@@ -94,7 +96,7 @@ private:
 			BMediaPlugin*		fMediaPlugin;
 
 	// needed for plug-in reference count management
-	friend class PluginManager;
+	friend class BCodecKit::BPrivate::PluginManager;
 
 	virtual void				_ReservedEncoder1();
 	virtual void				_ReservedEncoder2();
@@ -139,8 +141,8 @@ public:
 									media_format* outputFormat) = 0;
 };
 
-} } // namespace BPrivate::media
 
-using namespace BPrivate::media;
+}
+
 
 #endif // _ENCODER_PLUGIN_H

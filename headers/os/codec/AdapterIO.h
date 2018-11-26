@@ -12,6 +12,9 @@
 #include <SupportDefs.h>
 
 
+namespace BCodecKit {
+
+
 class BAdapterIO;
 class RelativePositionIO;
 
@@ -94,5 +97,9 @@ private:
 
 			uint32					_reserved[5];
 };
+
+
+} // namespace BCodecKit
+
 
 #endif	// _ADAPTER_IO_H

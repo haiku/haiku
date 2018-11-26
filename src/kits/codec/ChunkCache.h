@@ -14,8 +14,8 @@
 #include <deque>
 
 
+namespace BCodecKit {
 namespace BPrivate {
-namespace media {
 
 // Limit to 10 entries, we might want to instead limit to a length of time
 #define CACHE_MAX_ENTRIES 10
@@ -54,9 +54,9 @@ private:
 };
 
 
-}	// namespace media
 }	// namespace BPrivate
+}	// namespace BCodecKit
 
-using namespace BPrivate::media;
+//using namespace BPrivate::media;
 
 #endif	// _CHUNK_CACHE_H

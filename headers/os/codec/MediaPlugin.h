@@ -5,9 +5,15 @@
 #ifndef _MEDIA_PLUGIN_H
 #define _MEDIA_PLUGIN_H
 
+
 #include <SupportDefs.h>
 
-namespace BPrivate { namespace media {
+
+namespace BCodecKit {
+
+namespace BPrivate {
+	class PluginManager;
+}
 
 
 // TODO: Shouldn't this be a BReferenceable?
@@ -23,7 +29,7 @@ private:
 			int32				fRefCount;
 
 	// needed for plug-in reference count management
-	friend class PluginManager;
+	friend class BCodecKit::BPrivate::PluginManager;
 
 	virtual void				_ReservedMediaPlugin1();
 	virtual void				_ReservedMediaPlugin2();
@@ -31,13 +37,11 @@ private:
 			uint32				fReserved[5];
 };
 
-class BDecoder;
-class BReader;
-
-} } // namespace BPrivate::media
-
-using namespace BPrivate::media;
 
 extern "C" BMediaPlugin* instantiate_plugin();
+
+
+} // namespace BCodecKit
+
 
 #endif // _MEDIA_PLUGIN_H

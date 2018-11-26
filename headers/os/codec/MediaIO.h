@@ -10,6 +10,9 @@
 #include <SupportDefs.h>
 
 
+namespace BCodecKit {
+
+
 enum media_io_flags {
 	B_MEDIA_STREAMING = 0x00000001,
 
@@ -40,5 +43,9 @@ private:
 
 			uint32				_reserved[5];
 };
+
+
+} // namespace BCodecKit
+
 
 #endif	// _MEDIA_IO_H

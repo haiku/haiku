@@ -7,6 +7,9 @@
 #include <Streamer.h>
 
 
+namespace BCodecKit {
+
+
 BStreamer::BStreamer()
 	:
 	fMediaPlugin(NULL)
@@ -28,4 +31,7 @@ void BStreamer::_ReservedStreamer5() {}
 
 BStreamerPlugin::BStreamerPlugin()
 {
+}
+
+
 }

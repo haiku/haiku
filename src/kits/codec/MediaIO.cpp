@@ -8,6 +8,9 @@
 #include <MediaIO.h>
 
 
+namespace BCodecKit {
+
+
 BMediaIO::BMediaIO()
 {
 }
@@ -30,3 +33,6 @@ void BMediaIO::_ReservedMediaIO2() {}
 void BMediaIO::_ReservedMediaIO3() {}
 void BMediaIO::_ReservedMediaIO4() {}
 void BMediaIO::_ReservedMediaIO5() {}
+
+
+} // namespace BCodecKit

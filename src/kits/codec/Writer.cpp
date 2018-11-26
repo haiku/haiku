@@ -10,6 +10,9 @@
 #include <stdio.h>
 
 
+namespace BCodecKit {
+
+
 BWriter::BWriter()
 	:
 	fTarget(NULL),
@@ -49,3 +52,6 @@ void BWriter::_ReservedWriter2() {}
 void BWriter::_ReservedWriter3() {}
 void BWriter::_ReservedWriter4() {}
 void BWriter::_ReservedWriter5() {}
+
+
+}

@@ -26,8 +26,9 @@
 #include "TList.h"
 
 
+namespace BCodecKit {
 namespace BPrivate {
-namespace media {
+
 
 class AddOnManager {
 public:
@@ -131,7 +132,9 @@ private:
 			static AddOnManager	sInstance;
 };
 
-} // namespace media
+
 } // namespace BPrivate
+} // namespace BCodecKit
+
 
 #endif // _ADD_ON_MANAGER_H

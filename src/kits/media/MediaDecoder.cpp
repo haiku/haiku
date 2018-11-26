@@ -3,11 +3,16 @@
  *   FILE: MediaDecoder.cpp
  *  DESCR: 
  ***********************************************************************/
-#include <MediaDecoder.h>
+#include <CodecRoster.h>
 #include <Decoder.h>
+#include <MediaDecoder.h>
+
 #include <new>
-#include "PluginManager.h"
+
 #include "MediaDebug.h"
+
+using namespace BCodecKit;
+
 
 /*************************************************************
  * public BMediaDecoder
