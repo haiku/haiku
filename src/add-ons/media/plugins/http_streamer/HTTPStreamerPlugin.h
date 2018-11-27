@@ -8,6 +8,10 @@
 
 #include <Streamer.h>
 
+using BCodecKit::BMediaPlugin;
+using BCodecKit::BStreamer;
+using BCodecKit::BStreamerPlugin;
+
 
 class HTTPStreamer : public BStreamer
 {

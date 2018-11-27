@@ -27,6 +27,10 @@
 
 #include <Decoder.h>
 
+using BCodecKit::BMediaPlugin;
+using BCodecKit::BDecoder;
+using BCodecKit::BDecoderPlugin;
+
 
 class RawDecoder : public BDecoder
 {

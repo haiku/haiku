@@ -12,6 +12,9 @@
 #include <UrlContext.h>
 #include <UrlProtocolAsynchronousListener.h>
 
+using BCodecKit::BAdapterIO;
+using BCodecKit::BInputAdapter;
+
 
 class FileListener;
 
