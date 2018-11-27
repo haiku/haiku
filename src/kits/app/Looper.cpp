@@ -458,6 +458,24 @@ BLooper::Run()
 
 
 void
+BLooper::Loop()
+{
+	AssertLocked();
+
+	if (fRunCalled) {
+		// Not allowed to call Loop() or Run() more than once
+		debugger("can't call BLooper::Loop twice!");
+		return;
+	}
+
+	fThread = find_thread(NULL);
+	fRunCalled = true;
+
+	task_looper();
+}
+
+
+void
 BLooper::Quit()
 {
 	PRINT(("BLooper::Quit()\n"));

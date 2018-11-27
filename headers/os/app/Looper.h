@@ -69,6 +69,7 @@ public:
 
 	// Loop control
 	virtual	thread_id		Run();
+			void			Loop();
 	virtual	void			Quit();
 	virtual	bool			QuitRequested();
 			bool			Lock();

@@ -1,14 +1,15 @@
 /*
- * Copyright 2008-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2018 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *		John Scipione, jscipione@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/app/Looper.h	hrev47355
- *		src/kits/app/Looper.cpp	hrev47355
+ *		headers/os/app/Looper.h	hrev52501
+ *		src/kits/app/Looper.cpp	hrev52501
  */
 
 
@@ -72,14 +73,14 @@
 	derived from BLooper) to customize your window and handle the messages
 	sent to that window. You can override Run() in case you want to perform
 	additional tasks before (or right after) starting the message loop. You can
-	override QuitRequested() if you want to decline quitting in certain 
+	override QuitRequested() if you want to decline quitting in certain
 	circumstances. You can override Quit() in case you want to perform
 	additional procedures during closing time. You can also override
 	DispatchMessage() if you want to do something with all incoming messages
 	before they are dispatched to a handler.
 
 	BLooper is one of the major base classes of the Haiku application
-	programmers interface. Closely related classes are BMessage, BHandler and 
+	programmers interface. Closely related classes are BMessage, BHandler and
 	BMessenger. It is used in the interface kit, for example by the BWindow
 	class, which makes sure every window runs it its own thread.
 
@@ -115,7 +116,7 @@
 	       receives a lot of messages, or if the message handling thread runs
 	       at a lower priority than normal, which would decrease the processing
 	       speed. Finding a suitable value for these custom scenarios would be
-	       done by testing. 
+	       done by testing.
 
 	\see Run()
 
@@ -127,7 +128,7 @@
 	\fn BLooper::~BLooper()
 	\brief Destruct the looper.
 
-	You will never delete a looper yourself. You should pass a 
+	You will never delete a looper yourself. You should pass a
 	\c B_QUIT_REQUESTED message, or if you are destroying the looper from
 	inside its own message handling thread, you should call Quit().
 
@@ -186,7 +187,7 @@
 	\brief Archive a looper to a message
 
 	Currently, only the name and the port capacity are archived. Any other
-	data, such as the filters, is not stored. 
+	data, such as the filters, is not stored.
 
 	\param data The message to archive the object in.
 	\param deep This parameter is ignored, as BLooper does not have children.
@@ -312,7 +313,7 @@
 /*!
 	\fn status_t BLooper::PostMessage(BMessage* message, BHandler* handler,
 		BHandler* replyTo)
-	\brief Send a \a message to the \a handler associated with this looper, 
+	\brief Send a \a message to the \a handler associated with this looper,
 	       and (optionally) request a reply.
 
 	The target \a handler should be associated with this looper. This method
@@ -604,10 +605,24 @@
 
 
 /*!
+	\fn thread_id BLooper::Loop()
+	\brief Run the event loop in the current thread.
+
+	This method runs the event loop in an already existing thread. It blocks
+	until the looper stops looping. This can
+	be used to turn an existing thread into a BLooper.
+
+	Make sure the looper is not yet running before you call this method.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn void BLooper::Quit()
 	\brief Hook method that is called after a \c B_QUIT_REQUESTED message.
 
-	If you want to quit and delete the looper, you should post a 
+	If you want to quit and delete the looper, you should post a
 	\c B_QUIT_REQUESTED message. This will first call the hook method
 	QuitRequested(), which can be overridden in child classes in case there
 	are conditions that would prevent the looper to be quit. If you really
