@@ -590,15 +590,7 @@ BApplication::Run()
 	if (fInitError != B_OK)
 		return fInitError;
 
-	AssertLocked();
-
-	if (fRunCalled)
-		debugger("BApplication::Run was already called. Can only be called once.");
-
-	fThread = find_thread(NULL);
-	fRunCalled = true;
-
-	task_looper();
+	Loop();
 
 	delete fPulseRunner;
 	return fThread;
