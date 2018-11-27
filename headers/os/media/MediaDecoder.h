@@ -1,7 +1,7 @@
 #ifndef MEDIADECODER_H
 #define MEDIADECODER_H
 
-#include <MediaDefs.h>
+
 #include <MediaFormats.h>
 
 

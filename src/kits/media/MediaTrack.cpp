@@ -12,17 +12,18 @@
 
 #include <MediaTrack.h>
 
+#include <CodecRoster.h>
+#include <MediaExtractor.h>
+#include <MediaWriter.h>
+#include <Roster.h>
+
 #include <new>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <Roster.h>
-
-#include "MediaExtractor.h"
-#include "MediaWriter.h"
-#include "PluginManager.h"
+using namespace BCodecKit;
 
 
 //#define TRACE_MEDIA_TRACK
@@ -84,9 +85,9 @@ BMediaTrack::~BMediaTrack()
 {
 	CALLED();
 
-	gPluginManager.DestroyDecoder(fRawDecoder);
-	gPluginManager.DestroyDecoder(fDecoder);
-	gPluginManager.DestroyEncoder(fEncoder);
+	BCodecRoster::ReleaseDecoder(fRawDecoder);
+	BCodecRoster::ReleaseDecoder(fDecoder);
+	BCodecRoster::ReleaseEncoder(fEncoder);
 }
 
 /*************************************************************
@@ -163,7 +164,7 @@ BMediaTrack::DecodedFormat(media_format* _format, uint32 flags)
 	if (fExtractor == NULL || fDecoder == NULL)
 		return B_NO_INIT;
 
-	gPluginManager.DestroyDecoder(fRawDecoder);
+	BCodecRoster::ReleaseDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 
 #ifdef TRACE_MEDIA_TRACK
@@ -839,7 +840,7 @@ BMediaTrack::Perform(int32 selector, void* data)
 // #pragma mark - private
 
 
-BMediaTrack::BMediaTrack(BPrivate::media::BMediaExtractor* extractor,
+BMediaTrack::BMediaTrack(BCodecKit::BMediaExtractor* extractor,
 	int32 stream)
 {
 	CALLED();
@@ -871,7 +872,7 @@ BMediaTrack::BMediaTrack(BPrivate::media::BMediaExtractor* extractor,
 }
 
 
-BMediaTrack::BMediaTrack(BPrivate::media::BMediaWriter* writer,
+BMediaTrack::BMediaTrack(BCodecKit::BMediaWriter* writer,
 	int32 streamIndex, media_format* format,
 	const media_codec_info* codecInfo)
 {
@@ -950,7 +951,7 @@ BMediaTrack::SetupWorkaround()
 bool
 BMediaTrack::SetupFormatTranslation(const media_format &from, media_format* to)
 {
-	gPluginManager.DestroyDecoder(fRawDecoder);
+	BCodecRoster::ReleaseDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 
 #ifdef TRACE_MEDIA_TRACK
@@ -959,7 +960,7 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format* to)
 	printf("BMediaTrack::SetupFormatTranslation: from: %s\n", s);
 #endif
 
-	status_t result = gPluginManager.CreateDecoder(&fRawDecoder, from);
+	status_t result = BCodecRoster::InstantiateDecoder(&fRawDecoder, from);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SetupFormatTranslation: CreateDecoder failed\n");
 		return false;
@@ -1007,7 +1008,7 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format* to)
 	return true;
 
 error:
-	gPluginManager.DestroyDecoder(fRawDecoder);
+	BCodecRoster::ReleaseDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 	return false;
 }

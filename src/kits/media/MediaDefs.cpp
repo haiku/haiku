@@ -13,6 +13,7 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <CodecRoster.h>
 #include <LaunchRoster.h>
 #include <Locale.h>
 #include <MediaNode.h>
@@ -24,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "AddOnManager.h"
 #include "DataExchange.h"
 #include "MediaDebug.h"
 #include "MediaMisc.h"
@@ -1218,16 +1218,7 @@ operator<(const media_file_format_id& a, const media_file_format_id& b)
 status_t
 get_next_file_format(int32* cookie, media_file_format* mff)
 {
-	if (cookie == NULL || mff == NULL)
-		return B_BAD_VALUE;
-
-	status_t ret = AddOnManager::GetInstance()->GetFileFormat(mff, *cookie);
-	if (ret != B_OK)
-		return ret;
-
-	*cookie = *cookie + 1;
-
-	return B_OK;
+	return BCodecKit::BCodecRoster::GetNextFileFormat(cookie, mff);
 }
 
 
@@ -1255,5 +1246,3 @@ media_decode_info::media_decode_info()
 	codec_data = NULL;
 	codec_data_size = 0;
 }
-
-
