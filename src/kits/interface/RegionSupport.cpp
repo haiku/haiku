@@ -1542,7 +1542,7 @@ BRegion::Support::XXorRegion(const BRegion* sra, const BRegion* srb,
 }
 
 
-int
+bool
 BRegion::Support::XPointInRegion(
     const BRegion* pRegion,
     int x, int y)
@@ -1570,7 +1570,7 @@ BRegion::Support::XRectInRegion(
     register clipping_rect* pbox;
     register clipping_rect* pboxEnd;
     register const clipping_rect* prect = &rect;
-    int      partIn, partOut;
+    bool      partIn, partOut;
 
     int rx = prect->left;
     int ry = prect->top;

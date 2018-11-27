@@ -65,7 +65,7 @@ class BRegion::Support {
 	static	int					XXorRegion(const BRegion* sra,
 									const BRegion* srb, BRegion* dr);
 
-	static	int					XPointInRegion(const BRegion* region,
+	static	bool				XPointInRegion(const BRegion* region,
 									int x, int y);
 
 	enum {
