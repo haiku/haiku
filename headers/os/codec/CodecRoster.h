@@ -30,9 +30,6 @@ public:
 	static status_t		InstantiateDecoder(BDecoder** decoder,
 							const media_codec_info& mci);
 	static void			ReleaseDecoder(BDecoder* decoder);
-
-	static status_t		GetDecoderInfo(BDecoder* decoder,
-							media_codec_info* info);
 	
 	static status_t		InstantiateWriter(BWriter** writer,
 							const media_file_format& mff,
@@ -49,6 +46,32 @@ public:
 	static status_t		InstantiateStreamer(BStreamer** streamer,
 							BUrl url, BDataIO** source);
 	static void			ReleaseStreamer(BStreamer* streamer);
+
+	static status_t		GetDecoderInfo(BDecoder* decoder,
+							media_codec_info* info);
+
+	// The following API is from MediaFormats. The idea is to put
+	// there only the APIs really used in the BeOS/Haiku ecosystem
+	// so that we can discard unuseful code, thus reducing complexity.
+	// To choose the API I did a search among the Haiku codebase and
+	// programs for which we have the source available.
+
+	// TODO: At some point move all implementations here
+
+	static status_t		MakeFormatFor(
+							const media_format_description* descriptions,
+							int32 descriptionCount,
+							media_format& format, uint32 flags,
+							void* _reserved);
+
+	// TODO: media_format_family: really?
+	static status_t		GetCodecInfo(media_codec_info* _codecInfo,
+							media_format_family* _formatFamily,
+							media_format* _inputFormat,
+							media_format* _outputFormat, int32 cookie);
+
+	//! Use this function to iterate through available file format writers.
+	static status_t		GetNextFileFormat(int32* cookie, media_file_format* mff);
 
 /*!	\brief	Use this to iterate through the available encoders for a given file
 			format.

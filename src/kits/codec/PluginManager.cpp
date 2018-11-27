@@ -21,11 +21,13 @@
 #include "MediaDebug.h"
 
 
+// Need to stay outside namespace
+BCodecKit::BPrivate::PluginManager gPluginManager;
+
+
 namespace BCodecKit {
 namespace BPrivate {
 
-
-PluginManager gPluginManager;
 
 #define BLOCK_SIZE 4096
 #define MAX_STREAMERS 40

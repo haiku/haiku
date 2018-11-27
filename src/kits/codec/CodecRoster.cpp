@@ -7,6 +7,8 @@
 
 #include <MediaFormats.h>
 
+#include "AddOnManager.h"
+#include "FormatManager.h"
 #include "PluginManager.h"
 
 
@@ -133,6 +135,43 @@ status_t
 BCodecRoster::GetNextEncoder(int32* cookie, media_codec_info* _codecInfo)
 {
 	return get_next_encoder(cookie, _codecInfo);
+}
+
+
+status_t
+BCodecRoster::GetNextFileFormat(int32* cookie, media_file_format* mff)
+{
+	if (cookie == NULL || mff == NULL)
+		return B_BAD_VALUE;
+
+	status_t ret = BPrivate::AddOnManager::GetInstance()->GetFileFormat(mff,
+		*cookie);
+
+	if (ret != B_OK)
+		return ret;
+
+	*cookie = *cookie + 1;
+	return B_OK;
+}
+
+
+status_t
+BCodecRoster::GetCodecInfo(media_codec_info* codecInfo,
+	media_format_family* formatFamily, media_format* inputFormat,
+	media_format* outputFormat, int32 cookie)
+{
+	return BPrivate::AddOnManager::GetInstance()->GetCodecInfo(codecInfo,
+			formatFamily, inputFormat, outputFormat, cookie);
+}
+
+
+status_t
+BCodecRoster::MakeFormatFor(const media_format_description* descriptions,
+	int32 descriptionCount, media_format& format, uint32 flags,
+	void* _reserved)
+{
+	return FormatManager::GetInstance()->MakeFormatFor(descriptions,
+		descriptionCount, format, flags, _reserved);
 }
 
 
