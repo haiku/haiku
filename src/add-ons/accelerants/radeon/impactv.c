@@ -517,8 +517,6 @@ void Radeon_CalcImpacTVRegisters(
 	values->tv_hdisp = mode->timing.h_display - 1;
 	values->tv_hstart =
 		// TK: was -12, but this cuts off the left border of the image
-		internal_encoder ? 
-		values->tv_hdisp + 1 - params->mode888 + 12 :
 		values->tv_hdisp + 1 - params->mode888 + 12;
 		
 	values->tv_vtotal = mode->timing.v_total - 1;
