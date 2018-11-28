@@ -469,11 +469,11 @@ struct RequestRelocator {
 				void* data;
 				area = clone_area("cloned request data", &data,
 #ifdef _KERNEL_MODE
-					B_ANY_KERNEL_ADDRESS,
+					B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA,
 #else
-					B_ANY_ADDRESS,
+					B_ANY_ADDRESS, B_READ_AREA,
 #endif
-					B_READ_AREA, area);
+					area);
 				if (area < 0)
 					RETURN_ERROR(area);
 				fAreas[(*fAreaCount)++] = area;
