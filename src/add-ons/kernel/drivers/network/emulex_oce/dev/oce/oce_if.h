@@ -524,7 +524,7 @@ struct oce_aic_obj {             /* Adaptive interrupt coalescing (AIC) info */
 	uint32_t  max_eqd;            /* in usecs */
 	uint32_t  cur_eqd;            /* in usecs */
 	uint32_t  et_eqd;             /* configured value when aic is off */
-	uint64_t  ticks;
+	uint64_t  _ticks;
 	uint64_t  intr_prev;
 };
 

@@ -1910,10 +1910,10 @@ oce_eqd_set_periodic(POCE_SOFTC sc)
 		now = ticks;
 
 		/* Over flow check */
-		if ((now < aic->ticks) || (eqo->intr < aic->intr_prev))
+		if ((now < aic->_ticks) || (eqo->intr < aic->intr_prev))
 			goto done;
 
-		delta = now - aic->ticks;
+		delta = now - aic->_ticks;
 		tps = delta/hz;
 
 		/* Interrupt rate based on elapsed ticks */
@@ -1943,7 +1943,7 @@ modify_eqd:
 		}
 done:
 		aic->intr_prev = eqo->intr;
-		aic->ticks = now;
+		aic->_ticks = now;
 	}
 
 	/* Is there atleast one eq that needs to be modified? */
