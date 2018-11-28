@@ -8,6 +8,8 @@
 
 #include "Reader.h"		// Haiku private header
 
+using namespace BCodecKit;
+
 
 const int32		BLOCK_COUNT = 1024*4;	// number of blocks, get from MACLib at once
 const int32		BUFFER_SIZE = 1024*4;	// size of audio data passing to Media Kit
