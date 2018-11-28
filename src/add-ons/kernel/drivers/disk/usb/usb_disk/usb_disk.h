@@ -14,6 +14,8 @@
 #include <usb/USB_massbulk.h>
 
 
+#define REQUEST_MASS_STORAGE_RESET	0xff
+#define REQUEST_GET_MAX_LUN			0xfe
 #define MAX_LOGICAL_UNIT_NUMBER		15
 #define ATAPI_COMMAND_LENGTH		12
 
@@ -33,16 +35,22 @@ typedef struct disk_device_s {
 	// device state
 	usb_pipe	bulk_in;
 	usb_pipe	bulk_out;
+	usb_pipe	interrupt;
 	uint8		interface;
 	uint32		current_tag;
 	uint8		sync_support;
 	bool		tur_supported;
 	bool		is_atapi;
+	bool		is_ufi;
 
 	// used to store callback information
 	sem_id		notify;
 	status_t	status;
 	size_t		actual_length;
+
+	// used to store interrupt result
+	unsigned char interruptBuffer[2];
+	sem_id interruptLock;
 
 	// logical units of this device
 	uint8		lun_count;
@@ -70,6 +78,12 @@ struct device_lun_s {
 	char		product_name[16];
 	char		product_revision[4];
 };
+
+
+typedef struct interrupt_status_wrapper_s {
+	uint8		status;
+	uint8		misc;
+} _PACKED interrupt_status_wrapper;
 
 
 #endif // _USB_DISK_H_

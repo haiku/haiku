@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers disk usb usb_floppy ;
-
-SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel bus_managers usb ;
-UsePrivateKernelHeaders ;
-
-KernelAddon usb_floppy :
-	usb_disk.cpp
-	;

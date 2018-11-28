@@ -15,10 +15,13 @@ typedef enum {
 	SCSI_INQUIRY_6 = 0x12,
 	SCSI_MODE_SENSE_6 = 0x1a,
 	SCSI_START_STOP_UNIT_6 = 0x1b,
+	SCSI_SEND_DIAGNOSTIC = 0x1d,
 	SCSI_READ_CAPACITY_10 = 0x25,
 	SCSI_READ_10 = 0x28,
 	SCSI_WRITE_10 = 0x2a,
 	SCSI_SYNCHRONIZE_CACHE_10 = 0x35,
+	SCSI_READ_12 = 0xA8,
+	SCSI_WRITE_12 = 0xAA,
 } scsi_operations;
 
 // common command structures
