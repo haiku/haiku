@@ -491,7 +491,7 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 #ifndef __HAIKU__
 	ret += vfprintf(stream, format, args);
 #else
-	ret += vsnprintf(buffer, sizeof(buffer - 1), format, args);
+	ret += vsnprintf(buffer, sizeof(buffer), format, args);
 	dprintf("%s", buffer);
 #endif
 
