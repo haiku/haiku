@@ -1,13 +1,10 @@
 local haikuLoaderPackage = haiku_loader.hpkg ;
 HaikuPackage $(haikuLoaderPackage) ;
 
-# Add compiled boot loaders for architecture
-# NOTE: bios_ia32 *MUST* be first on x86 in the hpkg for the MBR loader.
-# It currently is based on name (b before e)
-local bootTarget ;
-for bootTarget in $(HAIKU_BOOT_TARGETS) {
-	AddFilesToPackage : haiku_loader.$(bootTarget) ;
-}
+
+# boot loader
+AddFilesToPackage : haiku_loader.$(HAIKU_KERNEL_PLATFORM) ;
+
 
 # Force no compression, so the stage one loader can directly execute the boot
 # loader.
