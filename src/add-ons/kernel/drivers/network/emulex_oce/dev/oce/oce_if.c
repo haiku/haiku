@@ -2256,8 +2256,9 @@ oce_check_ipv6_ext_hdr(struct mbuf *m)
 	caddr_t m_datatemp = m->m_data;
 
 	if (eh->ether_type == htons(ETHERTYPE_IPV6)) {
+		struct ip6_hdr *ip6;
 		m->m_data += sizeof(struct ether_header);
-		struct ip6_hdr *ip6 = mtod(m, struct ip6_hdr *);
+		ip6 = mtod(m, struct ip6_hdr *);
 
 		if((ip6->ip6_nxt != IPPROTO_TCP) && \
 				(ip6->ip6_nxt != IPPROTO_UDP)){

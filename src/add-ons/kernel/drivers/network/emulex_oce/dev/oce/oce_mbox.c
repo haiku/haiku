@@ -119,8 +119,8 @@ oce_fw_clean(POCE_SOFTC sc)
 static int
 oce_mbox_wait(POCE_SOFTC sc, uint32_t tmo_sec)
 {
-	tmo_sec *= 10000;
 	pd_mpu_mbox_db_t mbox_db;
+	tmo_sec *= 10000;
 
 	for (;;) {
 		if (tmo_sec != 0) {
