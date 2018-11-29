@@ -824,7 +824,14 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 	print_kernel_debugger_message();
 
-	kprintf("Welcome to Kernel Debugging Land...\n");
+	kprintf("----------------------------------------------------\n");
+	kprintf("If you have opened the KDL shell by choice, welcome.\n");
+	kprintf("----------------------------------------------------\n");
+	kprintf("IF THIS HAS RANDOMLY APPEARED...\n");
+	kprintf("You need to restart your computer. Type reboot to restart.\n");
+	kprintf("If you cannot restart, hold down the Power button.\n");
+	kprintf("----------------------------------------------------\n");
+
 
 	// Set a few temporary debug variables and print on which CPU and in which
 	// thread we are running.
