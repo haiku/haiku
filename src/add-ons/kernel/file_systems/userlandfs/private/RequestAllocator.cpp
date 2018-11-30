@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <KernelExport.h>
 
+#include <kernel.h>
+
 #include "AreaSupport.h"
 #include "Compatibility.h"
 #include "Debug.h"
@@ -279,8 +281,14 @@ RequestAllocator::AllocateData(Address& address, const void* data, int32 size,
 			deferredInit);
 		if (error != B_OK)
 			return error;
-		if (size > 0)
+		if (size > 0) {
+#ifndef _KERNEL_MODE
 			memcpy(destination, data, size);
+#else
+			if (user_memcpy(destination, data, size) < B_OK)
+				return B_BAD_ADDRESS;
+#endif
+		}
 	} else
 		address.SetTo(-1, 0, 0);
 	return error;
