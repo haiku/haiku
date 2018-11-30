@@ -2179,8 +2179,11 @@ Volume::Read(void* _node, void* cookie, off_t pos, void* buffer,
 		|| reply->bytesRead > bufferSize) {
 		return B_BAD_DATA;
 	}
-	if (reply->bytesRead > 0)
-		memcpy(buffer, readBuffer, reply->bytesRead);
+	if (reply->bytesRead > 0
+		&& user_memcpy(buffer, readBuffer, reply->bytesRead) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
 	*bytesRead = reply->bytesRead;
 	_SendReceiptAck(port);
 	return error;
