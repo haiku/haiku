@@ -74,7 +74,4 @@ public:
 };
 
 
-BMediaPlugin*	instantiate_plugin();
-
-
 #endif	// ___APEReader_H_
