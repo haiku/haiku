@@ -10,6 +10,13 @@
 #include "MACLib.h"
 
 
+B_DECLARE_CODEC_KIT_PLUGIN(
+	TAPEReaderPlugin,
+	"ape_reader",
+	B_CODEC_KIT_PLUGIN_VERSION
+);
+
+
 static const char*	kCopyrightString
 	= "Copyright " B_UTF8_COPYRIGHT " 2005-2009 by SHINTA";
 
@@ -277,11 +284,4 @@ BReader*
 TAPEReaderPlugin::NewReader()
 {
 	return new TAPEReader();
-}
-
-
-BMediaPlugin*
-instantiate_plugin()
-{
-	return new TAPEReaderPlugin();
 }

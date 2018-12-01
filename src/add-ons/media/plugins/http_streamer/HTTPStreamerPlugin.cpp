@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Dario Casalinuovo
+ * Copyright 2016-2018, Dario Casalinuovo
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,13 @@
 #include "HTTPMediaIO.h"
 
 #include "MediaDebug.h"
+
+
+B_DECLARE_CODEC_KIT_PLUGIN(
+	HTTPStreamerPlugin,
+	"http_streamer",
+	B_CODEC_KIT_PLUGIN_VERSION
+);
 
 
 HTTPStreamer::HTTPStreamer()
@@ -44,10 +51,4 @@ BStreamer*
 HTTPStreamerPlugin::NewStreamer()
 {
 	return new HTTPStreamer();
-}
-
-
-BMediaPlugin *instantiate_plugin()
-{
-	return new HTTPStreamerPlugin();
 }

@@ -1,5 +1,6 @@
 /* 
  * Copyright 2003, Marcus Overhagen. All rights reserved.
+ * Copyright 2018, Dario Casalinuovo. All rights reserverd.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _MEDIA_PLUGIN_H
@@ -39,6 +40,29 @@ private:
 
 
 extern "C" BMediaPlugin* instantiate_plugin();
+extern "C" uint32 get_plugin_version();
+extern "C" const char* get_plugin_name();
+
+
+#define B_CODEC_KIT_PLUGIN_VERSION 1
+
+#define B_DECLARE_CODEC_KIT_PLUGIN(className, name, version)	\
+extern "C" {													\
+	BCodecKit::BMediaPlugin* instantiate_plugin()				\
+	{															\
+		return new(std::nothrow) className();					\
+	}															\
+																\
+	uint32 get_plugin_version()									\
+	{															\
+		return version;											\
+	}															\
+																\
+	const char* get_plugin_name()								\
+	{															\
+		return name;											\
+	}															\
+}
 
 
 } // namespace BCodecKit
