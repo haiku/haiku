@@ -46,8 +46,8 @@ get_next_argument(uint32* _cookie, const char* mangledName, char* name,
 	if (looks_like_gcc3_symbol(mangledName)) {
 		status_t error = get_next_argument_gcc3(_cookie, mangledName, name,
 			nameSize, _type, _argumentLength);
-		if (error == B_OK)
-			return B_OK;
+		if (error == B_OK || error == B_BAD_INDEX)
+			return error;
 	}
 
 	// fallback is gcc2

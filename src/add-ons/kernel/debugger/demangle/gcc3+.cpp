@@ -3726,6 +3726,8 @@ get_next_argument_gcc3(uint32* _cookie, const char* mangledName, char* name,
 				return B_BUFFER_OVERFLOW;
 			case ERROR_NO_MEMORY:
 				return B_NO_MEMORY;
+			case ERROR_INVALID_PARAMETER_INDEX:
+				return B_BAD_INDEX;
 			case ERROR_INTERNAL:
 			default:
 				return B_ERROR;
