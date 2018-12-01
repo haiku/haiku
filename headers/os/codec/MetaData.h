@@ -19,18 +19,18 @@ extern const char* kCanSeekForward;		// bool
 extern const char* kCanSeek;			// bool
 
 // Bitrates
-extern const char* kAudioBitRate;		// uint32 (bps)
-extern const char* kVideoBitRate;		// uint32 (bps)
-extern const char* kAudioSampleRate;	// uint32 (hz)
-extern const char* kVideoFrameRate;		// uint32 (hz)
+extern const char* kAudioBitRate;		// int32 (bps)
+extern const char* kVideoBitRate;		// int32 (bps)
+extern const char* kAudioSampleRate;	// int32 (hz)
+extern const char* kVideoFrameRate;		// int32 (hz)
 
 // RFC2046 and RFC4281
 extern const char* kMimeType;			// BString
 extern const char* kAudioCodec;			// BString
 extern const char* kVideoCodec;			// BString
-extern const char* kVideoHeight;		// uint32
-extern const char* kVideoWidth;			// uint32
-extern const char* kNumTracks;			// uint32
+extern const char* kVideoHeight;		// int32
+extern const char* kVideoWidth;			// int32
+extern const char* kNumTracks;			// int32
 extern const char* kDrmCrippled;		// bool
 
 // General use attributes
@@ -52,12 +52,12 @@ extern const char* kPublisher;			// BString
 extern const char* kEncoder;			// BString
 extern const char* kTrack;
 extern const char* kDate;				// BString
-extern const char* kDuration;			// uint32 (ms)
+extern const char* kDuration;			// int32 (ms)
 extern const char* kRating;				// BString
 // TODO: BBitmap? uint8 array? url?
 //extern const char* kAlbumArt
-extern const char* kCDTrackNum;			// uint32
-extern const char* kCDTrackMax;			// uint32
+extern const char* kCDTrackNum;			// int32
+extern const char* kCDTrackMax;			// int32
 
 extern const char* kChapter;			// BMetaData
 extern const char* kChapterStart;		// int64
@@ -65,6 +65,9 @@ extern const char* kChapterEnd;			// int64
 
 // Others
 extern const char* kProgramData;		// BMetaData
+
+// TODO: Fully honour this:
+// https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata
 
 
 class BMetaData {
@@ -76,14 +79,12 @@ public:
 	// Woah. It seems we need BValue there.
 	bool				SetString(const char* key, const BString& value);
 	bool				SetBool(const char* key, bool value);
-	bool				SetUInt32(const char* key, uint32 value);
 	bool				SetInt32(const char* key, int32 value);
 	bool				SetInt64(const char* key, int64 value);
 
 	bool				GetString(const char* key, BString* value) const;
 	bool				GetBool(const char* key, bool* value) const;
-    bool				GetUInt32(const char* key, uint32* value) const;
-    bool				GetInt32(const char* key, int32* value) const;
+	bool				GetInt32(const char* key, int32* value) const;
 	bool				GetInt64(const char* key, int64* value) const;
 
 	// We allow embedding BMetaData into BMetaData. The BMetaData field
