@@ -497,10 +497,10 @@ dump_ipv4_header(ipv4_header &header)
 static int
 dump_ipv4_multicast(int argc, char** argv)
 {
-	MulticastState::Iterator it = sMulticastState->GetIterator();
+	MulticastState::Iterator groupIterator = sMulticastState->GetIterator();
 
-	while (it.HasNext()) {
-		IPv4GroupInterface* state = it.Next();
+	while (groupIterator.HasNext()) {
+		IPv4GroupInterface* state = groupIterator.Next();
 
 		char addressBuffer[64];
 
@@ -511,10 +511,11 @@ dump_ipv4_multicast(int argc, char** argv)
 				? "Exclude" : "Include");
 
 		int count = 0;
-		IPv4GroupInterface::AddressSet::Iterator it
+		IPv4GroupInterface::AddressSet::Iterator addressIterator
 			= state->Sources().GetIterator();
-		while (it.HasNext()) {
-			kprintf("%s%s", count > 0 ? ", " : "", print_address(&it.Next(),
+		while (addressIterator.HasNext()) {
+			kprintf("%s%s", count > 0 ? ", " : "",
+				print_address(&addressIterator.Next(),
 				addressBuffer, sizeof(addressBuffer)));
 			count++;
 		}
