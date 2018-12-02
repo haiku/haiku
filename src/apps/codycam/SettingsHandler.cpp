@@ -435,15 +435,15 @@ Settings::_MakeSettingsDirectory(BDirectory *resultingSettingsDir)
 void
 Settings::_SaveCurrentSettings(bool onlyIfNonDefault)
 {
-	BDirectory fSettingsDir;
-	_MakeSettingsDirectory(&fSettingsDir);
+	BDirectory settingsDir;
+	_MakeSettingsDirectory(&settingsDir);
 
-	if (fSettingsDir.InitCheck() != B_OK)
+	if (settingsDir.InitCheck() != B_OK)
 		return;
 
 	printf("+++++++++++ Settings::_SaveCurrentSettings %s\n", fFileName);
 	// nuke old settings
-	BEntry entry(&fSettingsDir, fFileName);
+	BEntry entry(&settingsDir, fFileName);
 	entry.Remove();
 
 	BFile prefs(&entry, O_RDWR | O_CREAT);
