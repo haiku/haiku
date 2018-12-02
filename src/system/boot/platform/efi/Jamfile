@@ -65,7 +65,7 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			= [ BuildFeatureAttribute gnuefi : libdir : path ] ;
 		Depends [ FGristFiles $(efi_glue_src) ]
 			: [ BuildFeatureAttribute gnuefi : libdir ] ;
-		Depends [ FGristFiles $(platform_src) ]
+		Depends [ FGristFiles $(platform_src) $(arch_src) ]
 			: [ BuildFeatureAttribute gnuefi : headers ] ;
 	}
 }
