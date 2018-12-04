@@ -1561,15 +1561,12 @@ AVCodecDecoder::_FlushOneVideoFrameFromDecoderBuffer()
 void
 AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 {
-	AVRational rationalTimestamp = av_make_q(
-		fRawDecodedPicture->pkt_dts, 1);
-	AVRational seconds = av_mul_q(rationalTimestamp, fCodecContext->time_base);
-	AVRational microseconds = av_mul_q(seconds, av_make_q(1000000, 1));
-
 	fHeader.type = B_MEDIA_RAW_VIDEO;
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
-	fHeader.start_time = (bigtime_t)(av_q2d(microseconds));
+	fHeader.start_time = fRawDecodedPicture->pkt_dts;
+		// The pkt_dts is already in microseconds, even if ffmpeg docs says
+		// 'in codec time_base units'
 	fHeader.size_used = av_image_get_buffer_size(
 		colorspace_to_pixfmt(fOutputColorSpace), fRawDecodedPicture->width,
 		fRawDecodedPicture->height, 1);
