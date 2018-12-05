@@ -21,10 +21,10 @@
 
 .section .init
 FUNCTION(_init):
-	bl	__haiku_init_before
+	jal	__haiku_init_before
 	// crtbegin.o stuff comes here
 
 .section .fini
 FUNCTION(_fini):
-	bl	__haiku_term_before
+	jal	__haiku_term_before
 	// crtbegin.o stuff comes here
