@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src system runtime_loader arch riscv32 ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup riscv32 ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateHeaders runtime_loader ;
+		UsePrivateSystemHeaders ;
+
+		SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+
+		StaticLibrary <$(architecture)>libruntime_loader_$(TARGET_ARCH).a :
+			arch_relocate.cpp
+			:
+			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
+
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>arch_string.o
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
+			;
+	}
+}

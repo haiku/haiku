@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src system kernel arch riscv64 ;
+
+SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
+UsePrivateKernelHeaders ;
