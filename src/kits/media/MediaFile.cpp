@@ -198,9 +198,9 @@ BMediaFile::GetMetaData(BMessage* _data) const
 
 	_data->MakeEmpty();
 
-	BMetaData* metaData = NULL;
-	if (fExtractor->GetMetaData(metaData) == B_OK) {
-		*_data = *metaData->Message();
+	BMetaData metaData;
+	if (fExtractor->GetMetaData(&metaData) == B_OK) {
+		*_data = *metaData.Message();
 		return B_OK;
 	}
 
