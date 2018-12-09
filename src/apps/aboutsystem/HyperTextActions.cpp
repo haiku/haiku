@@ -33,9 +33,8 @@ URLAction::Clicked(HyperTextView* view, BPoint where, BMessage* message)
 	if (get_ref_for_path("/bin/open", &ref))
 		return;
 
-	const char* args[] = { "/bin/open", fURL.String(), NULL };
-	be_roster->Launch(&ref, 2, args);
-
+	const char* args[] = { fURL.String(), NULL };
+	be_roster->Launch(&ref, 1, args);
 }
 
 
