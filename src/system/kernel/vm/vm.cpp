@@ -4914,6 +4914,7 @@ vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 
 
 /*!	This function enforces some protection properties:
+	 - kernel areas must be W^X
 	 - if B_WRITE_AREA is set, B_KERNEL_WRITE_AREA is set as well
 	 - if only B_READ_AREA has been set, B_KERNEL_READ_AREA is also set
 	 - if no protection is specified, it defaults to B_KERNEL_READ_AREA
@@ -4922,6 +4923,10 @@ vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 static void
 fix_protection(uint32* protection)
 {
+	if ((*protection & B_KERNEL_WRITE_AREA) != 0
+		&& (*protection & B_KERNEL_EXECUTE_AREA) != 0)
+		panic("kernel areas cannot be both writable and executable!");
+
 	if ((*protection & B_KERNEL_PROTECTION) == 0) {
 		if ((*protection & B_USER_PROTECTION) == 0
 			|| (*protection & B_WRITE_AREA) != 0)
