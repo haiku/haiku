@@ -38,8 +38,23 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 
 IMAPProtocol::~IMAPProtocol()
 {
-}
+	MutexLocker locker(fWorkerLock);
+	std::vector<thread_id> threads;
+	for (int32 i = 0; i < fWorkers.CountItems(); i++) {
+		threads.push_back(fWorkers.ItemAt(i)->Thread());
+		fWorkers.ItemAt(i)->Quit();
+	}
+	locker.Unlock();
 
+	for (uint32 i = 0; i < threads.size(); i++)
+		wait_for_thread(threads[i], NULL);
+
+	FolderMap::iterator iterator = fFolders.begin();
+	for (; iterator != fFolders.end(); iterator++) {
+		IMAPFolder* folder = iterator->second;
+		delete folder; // to stop thread
+	}
+}
 
 status_t
 IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
@@ -70,7 +85,7 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 
 	if (newFolders.IsEmpty() && fWorkers.CountItems() == workersWanted) {
 		// Nothing to do - we've already distributed everything
-		return B_OK;
+		return _EnqueueCheckMailboxes();
 	}
 
 	// Remove mailboxes from workers
@@ -187,8 +202,8 @@ IMAPProtocol::SyncMessages()
 		worker->EnqueueCheckSubscribedFolders();
 		return worker->Run();
 	}
-
-	return _EnqueueCheckMailboxes();
+	fWorkers.ItemAt(0)->EnqueueCheckSubscribedFolders();
+	return B_OK;
 }
 
 

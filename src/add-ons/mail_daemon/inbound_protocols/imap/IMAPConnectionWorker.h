@@ -40,6 +40,7 @@ public:
 			bool				UsesIdle() const { return fIdle; }
 
 			status_t			Run();
+			thread_id			Thread() const { return fThread; }
 			void				Quit();
 
 			status_t			EnqueueCheckSubscribedFolders();
@@ -65,6 +66,7 @@ private:
 			void				_SyncCommandDone();
 			uint32				_MessagesExist() const
 									{ return fMessagesExist; }
+			bool				_IsQuitPending();
 
 			status_t			_Connect();
 			void				_Disconnect();
@@ -91,6 +93,7 @@ private:
 			uint32				fMessagesExist;
 
 			BLocker				fLocker;
+			BLocker				fQueueLocker;
 			thread_id			fThread;
 			bool				fMain;
 			bool				fStopped;
