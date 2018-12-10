@@ -356,8 +356,9 @@ sdhci_generic_interrupt(void* data)
 	}
 
 	intmask &= ~(SDHCI_INT_BUS_POWER | SDHCI_INT_CARD_INS
-		|SDHCI_INT_CARD_REM | SDHCI_INT_CMD_MASK);
+		| SDHCI_INT_CARD_REM | SDHCI_INT_CMD_MASK);
 
+	return B_UNHANDLED_INTERRUPT;
 }
 
 
