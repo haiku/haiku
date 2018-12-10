@@ -929,42 +929,36 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 				dstBitsLength, 24, 16, 8, 32, 8, srcBytesPerRow,
 				dstBytesPerRow, 32, srcColorSpace, dstColorSpace, srcOffset,
 				dstOffset, width, height, false, NULL);
-			break;
 
 		case B_RGBA32_BIG:
 			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 16, 24, 32, 8, 8, srcBytesPerRow,
 				dstBytesPerRow, 32, srcColorSpace, dstColorSpace, srcOffset,
 				dstOffset, width, height, false, NULL);
-			break;
 
 		case B_RGB32:
 			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 24, 16, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				32, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, NULL);
-			break;
 
 		case B_RGB32_BIG:
 			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 16, 24, 32, 0, 0, srcBytesPerRow,
 				dstBytesPerRow, 32, srcColorSpace, dstColorSpace, srcOffset,
 				dstOffset, width, height, false, NULL);
-			break;
 
 		case B_RGB24:
 			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 24, 16, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				24, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, ReadRGB24);
-			break;
 
 		case B_RGB24_BIG:
 			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 8, 16, 24, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				24, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, ReadRGB24);
-			break;
 
 		case B_RGB16:
 		case B_RGB16_BIG:
@@ -972,7 +966,6 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 				dstBitsLength, 16, 11, 5, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				16, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, srcColorSpace == B_RGB16_BIG, NULL);
-			break;
 
 		case B_RGBA15:
 		case B_RGBA15_BIG:
@@ -980,7 +973,6 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 				dstBitsLength, 15, 10, 5, 16, 1, srcBytesPerRow,
 				dstBytesPerRow, 16, srcColorSpace, dstColorSpace, srcOffset,
 				dstOffset, width, height, srcColorSpace == B_RGBA15_BIG, NULL);
-			break;
 
 		case B_RGB15:
 		case B_RGB15_BIG:
@@ -988,21 +980,18 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 				dstBitsLength, 15, 10, 5, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				16, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, srcColorSpace == B_RGB15_BIG, NULL);
-			break;
 
 		case B_GRAY8:
 			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 8, 8, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				8, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, ReadGray8);
-			break;
 
 		case B_GRAY1:
 			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 8, 8, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
 				1, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, ReadGray1);
-			break;
 
 		case B_CMAP8:
 			PaletteConverter::InitializeDefault();
@@ -1010,11 +999,9 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 				dstBitsLength, 24, 16, 8, 32, 8, srcBytesPerRow,
 				dstBytesPerRow, 8, srcColorSpace, dstColorSpace, srcOffset,
 				dstOffset, width, height, false, ReadCMAP8);
-			break;
 
 		default:
 			return B_BAD_VALUE;
-			break;
 	}
 
 	return B_OK;
