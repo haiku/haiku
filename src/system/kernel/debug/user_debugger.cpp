@@ -894,7 +894,7 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 /**	\brief To be called when an unhandled processor exception (error/fault)
  *		   occurred.
  *	\param exception The debug_why_stopped value identifying the kind of fault.
- *	\param singal The signal corresponding to the exception.
+ *	\param signal The signal corresponding to the exception.
  *	\return \c true, if the caller shall continue normally, i.e. usually send
  *			a deadly signal. \c false, if the debugger insists to continue the
  *			program (e.g. because it has solved the removed the cause of the

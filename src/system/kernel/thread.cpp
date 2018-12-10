@@ -2865,15 +2865,14 @@ thread_block()
 
 /*!	Blocks the current thread with a timeout.
 
-	The thread is blocked until someone else unblock it or the specified timeout
-	occurs. Must be called after a call to thread_prepare_to_block(). If the
-	thread has already been unblocked after the previous call to
+	The current thread is blocked until someone else unblock it or the specified
+	timeout occurs. Must be called after a call to thread_prepare_to_block(). If
+	the thread has already been unblocked after the previous call to
 	thread_prepare_to_block(), this function will return immediately. See
 	thread_prepare_to_block() for more details.
 
 	The caller must not hold the scheduler lock.
 
-	\param thread The current thread.
 	\param timeoutFlags The standard timeout flags:
 		- \c B_RELATIVE_TIMEOUT: \a timeout specifies the time to wait.
 		- \c B_ABSOLUTE_TIMEOUT: \a timeout specifies the absolute end time when
