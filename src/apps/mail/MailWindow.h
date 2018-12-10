@@ -127,6 +127,8 @@ private:
 			status_t			_GetQueryPath(BPath* path) const;
 			void				_RebuildQueryMenu(bool firstTime = false);
 			char*				_BuildQueryString(BEntry* entry) const;
+			void				_LaunchQuery(const char* title,
+									const char* attribute, BString text);
 
 			void				_AddReadButton();
 			void				_UpdateReadButton();
