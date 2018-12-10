@@ -103,7 +103,7 @@ typedef struct rw_lock {
 #endif
 
 #define RW_LOCK_INITIALIZER(name) \
-	{ name, NULL, B_SPINLOCK_INITIALIZER, -1, 0, 0, 0 }
+	{ name, NULL, B_SPINLOCK_INITIALIZER, -1, 0, 0, 0, 0, 0 }
 
 
 #if KDEBUG
