@@ -34,7 +34,7 @@ glyph_length(uint32 glyph)
 }
 
 
-void
+static void
 encode_glyph(uint32 glyph, size_t glyphLength, char* buffer)
 {
 	if (glyphLength == 1) {
