@@ -19,12 +19,6 @@
 #include <KPath.h>
 
 
-// debugging
-//#define DBG(x)
-#define DBG(x) x
-#define OUT dprintf
-
-
 static const char* kFileDevicesDir = "/dev/disk/virtual/files";
 
 

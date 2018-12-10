@@ -153,9 +153,6 @@ static int32 sHandOverKDLToCPU = -1;
 static bool sCPUTrapped[SMP_MAX_CPUS];
 
 
-#define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
-
-
 // #pragma mark - DebugOutputFilter
 
 
