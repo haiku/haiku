@@ -245,7 +245,7 @@ private:
 			bool				_SelectNextItem(BMenuItem* item, bool forward);
 			BMenuItem*			_NextItem(BMenuItem* item, bool forward) const;
 			void				_SetIgnoreHidden(bool ignoreHidden)
-									{ fIgnoreHidden = ignoreHidden; };
+									{ fIgnoreHidden = ignoreHidden; }
 			void				_SetStickyMode(bool on);
 			bool				_IsStickyMode() const;
 

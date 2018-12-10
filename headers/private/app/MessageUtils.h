@@ -77,10 +77,10 @@ public:
 								throw fError;
 							}
 
-		status_t			Status() const { return fError >= B_OK ? B_OK : fError; };
+		status_t			Status() const { return fError >= B_OK ? B_OK : fError; }
 
-		void				SetSwap(bool yesNo) { fSwap = yesNo; };
-		bool				IsSwapping() const { return fSwap; };
+		void				SetSwap(bool yesNo) { fSwap = yesNo; }
+		bool				IsSwapping() const { return fSwap; }
 
 private:
 		BDataIO				*fStream;
