@@ -23,7 +23,6 @@
 #include "MemoryManager.h"
 
 
-#define DEBUG_ALLOCATOR
 //#define TEST_ALL_CACHES_DURING_BOOT
 
 static const size_t kBlockSizes[] = {

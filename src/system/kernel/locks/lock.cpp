@@ -40,10 +40,7 @@ struct rw_lock_waiter {
 	bool			writer;
 };
 
-#define MUTEX_FLAG_OWNS_NAME	MUTEX_FLAG_CLONE_NAME
 #define MUTEX_FLAG_RELEASED		0x2
-
-#define RW_LOCK_FLAG_OWNS_NAME	RW_LOCK_FLAG_CLONE_NAME
 
 
 int32

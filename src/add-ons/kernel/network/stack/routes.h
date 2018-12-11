@@ -15,7 +15,7 @@
 #include <util/DoublyLinkedList.h>
 
 
-class InterfaceAddress;
+struct InterfaceAddress;
 
 
 struct net_route_private

@@ -288,7 +288,6 @@ FileDevice::Control(void* _cookie, int32 op, void* buffer, size_t length)
 		case B_GET_ICON_NAME:
 			return user_strlcpy((char *)buffer, "devices/device-volume",
 				B_FILE_NAME_LENGTH);
-			break;
 
 		case B_GET_VECTOR_ICON:
 		{

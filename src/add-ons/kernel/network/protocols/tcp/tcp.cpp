@@ -34,10 +34,8 @@
 //#define TRACE_TCP
 #ifdef TRACE_TCP
 #	define TRACE(x) dprintf x
-#	define TRACE_BLOCK(x) dump_block x
 #else
 #	define TRACE(x)
-#	define TRACE_BLOCK(x)
 #endif
 
 

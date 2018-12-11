@@ -341,8 +341,8 @@ VMAddressSpace::_DumpCommand(int argc, char** argv)
 		} else {
 			aspace->Dump();
 		}
-		return 0;
 	}
+
 	return 0;
 }
 

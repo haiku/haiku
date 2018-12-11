@@ -152,8 +152,8 @@ public:
 			domain_datalink*	DomainDatalink(net_domain* domain)
 									{ return DomainDatalink(domain->family); }
 
-	inline	void				SetBusy(bool busy) { atomic_set(&fBusy, busy ? 1 : 0); };
-	inline	bool				IsBusy() const { return atomic_get((int32*)&fBusy) == 1 ;};
+	inline	void				SetBusy(bool busy) { atomic_set(&fBusy, busy ? 1 : 0); }
+	inline	bool				IsBusy() const { return atomic_get((int32*)&fBusy) == 1 ; }
 
 #if ENABLE_DEBUGGER_COMMANDS
 			void				Dump() const;

@@ -37,7 +37,6 @@
 
 // maximum number of iovecs per request
 #define MAX_IO_VECS			32	// 128 kB
-#define MAX_FILE_IO_VECS	32
 
 #define BYPASS_IO_SIZE		65536
 #define LAST_ACCESSES		3
