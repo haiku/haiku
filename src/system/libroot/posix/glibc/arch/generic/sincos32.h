@@ -26,7 +26,7 @@
 /******************************************************************/
 
 #ifndef SINCOS32_H
-#define SINCCOS32_H
+#define SINCOS32_H
 
 #ifdef BIG_ENDI
 static const number
