@@ -66,7 +66,7 @@ struct id_generator : DoublyLinkedListLinkImpl<id_generator> {
 typedef DoublyLinkedList<id_generator> GeneratorList;
 
 
-GeneratorList sGenerators;
+static GeneratorList sGenerators;
 static mutex sLock = MUTEX_INITIALIZER("id generator");
 
 
