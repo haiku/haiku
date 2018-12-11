@@ -1417,7 +1417,7 @@ MainWindow::_UpdateWindowZoomLimits()
 {
 	float maxHeight = 0;
 	int32 numColumns = fListView->CountColumns();
-	BRow* parentRow = NULL;
+	BRow* parentRow = fListView->RowAt(0, NULL);
 	BColumn* column = NULL;
 
 	maxHeight += _ColumnListViewHeight(fListView, NULL);
@@ -1428,7 +1428,6 @@ MainWindow::_UpdateWindowZoomLimits()
 		maxWidth += column->Width();
 	}
 
-	parentRow = fListView->RowAt(0, NULL);
 	maxHeight += B_H_SCROLL_BAR_HEIGHT;
 	maxHeight += 1.5 * parentRow->Height();	// the label row
 	maxHeight += fDiskView->Bounds().Height();
