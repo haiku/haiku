@@ -871,16 +871,17 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 	status = addressSpace->InsertArea(area, size, addressRestrictions,
 		allocationFlags, _virtualAddress);
-	if (status != B_OK) {
-		// TODO: wait and try again once this is working in the backend
-#if 0
-		if (status == B_NO_MEMORY && addressSpec == B_ANY_KERNEL_ADDRESS) {
-			low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size,
-				0, 0);
-		}
-#endif
-		goto err2;
+	if (status == B_NO_MEMORY
+		&& addressRestrictions->address_specification == B_ANY_KERNEL_ADDRESS) {
+		// issue a low resource notification and try again
+		low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size, B_RELATIVE_TIMEOUT,
+			((flags & CREATE_AREA_DONT_WAIT) != 0) ? 0 : 100000 /* 100ms*/);
+
+		status = addressSpace->InsertArea(area, size, addressRestrictions,
+			allocationFlags, _virtualAddress);
 	}
+	if (status != B_OK)
+		goto err2;
 
 	// attach the cache to the area
 	area->cache = cache;
