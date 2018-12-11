@@ -1,10 +1,10 @@
-#ifndef KERNEL_CPP_H
-#define KERNEL_CPP_H
-/* cpp - C++ in the kernel
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the MIT License.
-*/
+/*
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _KERNEL_UTIL_KERNEL_CPP_H
+#define _KERNEL_UTIL_KERNEL_CPP_H
 
 #ifdef __cplusplus
 
@@ -13,8 +13,7 @@
 
 #if _KERNEL_MODE || _LOADER_MODE
 
-using namespace std;
-extern const nothrow_t std::nothrow;
+using std::nothrow;
 
 // We need new() versions we can use when also linking against libgcc.
 // std::nothrow can't be used since it's defined in both libgcc and
@@ -47,4 +46,4 @@ extern void operator delete[](void* ptr, std::size_t) _NOEXCEPT;
 
 #endif	// __cplusplus
 
-#endif	/* KERNEL_CPP_H */
+#endif	/* _KERNEL_UTIL_KERNEL_CPP_H */
