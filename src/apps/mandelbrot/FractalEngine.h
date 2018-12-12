@@ -46,7 +46,7 @@ private:
 	uint8* fRenderBuffer;
 	uint32 fRenderBufferLen;
 
-	uint8 fSubsampling = 2;
+	uint8 fSubsampling;
 		// 1 disables subsampling.
 
 	BMessenger fMessenger;

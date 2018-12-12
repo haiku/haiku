@@ -32,6 +32,7 @@ FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
 	fWidth(0), fHeight(0),
 	fRenderBuffer(NULL),
 	fRenderBufferLen(0),
+	fSubsampling(2),
 	fMessenger(parent, looper),
 	fIterations(1024),
 	fColorset(Colorset_Royal)
