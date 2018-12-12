@@ -387,7 +387,6 @@ ZipperThread::InterruptExternalZip()
 	status_t status = get_thread_info(fZipProcess, &info);
 
 	if (status == B_OK && !strcmp(info.name, "zip")) {
-		status = B_OK;
 		status = send_signal(fZipProcess, SIGINT);
 		WaitOnExternalZip();
 		return status;
