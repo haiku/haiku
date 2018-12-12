@@ -650,7 +650,7 @@ void MediaJack::_drawInto(
 			}
 			else if (isOutput())
 			{
-				BRect r = targetRect;
+				BRect r;
 				BPoint p;
 
 				// fill rect
