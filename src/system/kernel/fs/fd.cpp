@@ -224,13 +224,11 @@ put_fd(struct file_descriptor* descriptor)
 			descriptor->ops->fd_free(descriptor);
 
 		// prevent this descriptor from being closed/freed again
-		descriptor->open_count = -1;
-		descriptor->ref_count = -1;
 		descriptor->ops = NULL;
 		descriptor->u.vnode = NULL;
 
 		// the file descriptor is kept intact, so that it's not
-		// reused until someone explicetly closes it
+		// reused until someone explicitly closes it
 	}
 }
 
@@ -299,13 +297,12 @@ get_fd_locked(struct io_context* context, int fd)
 	struct file_descriptor* descriptor = context->fds[fd];
 
 	if (descriptor != NULL) {
-		// Disconnected descriptors cannot be accessed anymore
+		// disconnected descriptors cannot be accessed anymore
 		if (descriptor->open_mode & O_DISCONNECTED)
-			descriptor = NULL;
-		else {
-			TFD(GetFD(context, fd, descriptor));
-			inc_fd_ref_count(descriptor);
-		}
+			return NULL;
+
+		TFD(GetFD(context, fd, descriptor));
+		inc_fd_ref_count(descriptor);
 	}
 
 	return descriptor;
