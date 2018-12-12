@@ -4990,8 +4990,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 			for (i = 0; i < tableSize; i++) {
 				struct file_descriptor* descriptor = parentContext->fds[i];
 
-				if (descriptor != NULL
-					&& (descriptor->open_mode & O_DISCONNECTED) == 0) {
+				if (descriptor != NULL) {
 					bool closeOnExec = fd_close_on_exec(parentContext, i);
 					if (closeOnExec && purgeCloseOnExec)
 						continue;
