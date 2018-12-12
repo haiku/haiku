@@ -872,13 +872,12 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	status = addressSpace->InsertArea(area, size, addressRestrictions,
 		allocationFlags, _virtualAddress);
 	if (status == B_NO_MEMORY
-		&& addressRestrictions->address_specification == B_ANY_KERNEL_ADDRESS) {
-		// issue a low resource notification and try again
-		low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size, B_RELATIVE_TIMEOUT,
-			((flags & CREATE_AREA_DONT_WAIT) != 0) ? 0 : 100000 /* 100ms*/);
-
-		status = addressSpace->InsertArea(area, size, addressRestrictions,
-			allocationFlags, _virtualAddress);
+			&& addressRestrictions->address_specification == B_ANY_KERNEL_ADDRESS) {
+		// Since the kernel address space is locked by the caller, we can't
+		// wait here as of course no resources can be released while the locks
+		// are held. But we can at least issue this so the next caller doesn't
+		// run into the same problem.
+		low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size, 0, 0);
 	}
 	if (status != B_OK)
 		goto err2;
