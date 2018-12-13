@@ -1955,21 +1955,23 @@ disconnect_mount_or_vnode_fds(struct fs_mount* mount,
 			sRoot, false);
 
 		for (uint32 i = 0; i < context->table_size; i++) {
-			if (struct file_descriptor* descriptor = context->fds[i]) {
-				inc_fd_ref_count(descriptor);
+			struct file_descriptor* descriptor = context->fds[i];
+			if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
+				continue;
 
-				// if this descriptor points at this mount, we
-				// need to disconnect it to be able to unmount
-				struct vnode* vnode = fd_vnode(descriptor);
-				if (vnodeToDisconnect != NULL) {
-					if (vnode == vnodeToDisconnect)
-						disconnect_fd(descriptor);
-				} else if ((vnode != NULL && vnode->mount == mount)
-					|| (vnode == NULL && descriptor->u.mount == mount))
+			inc_fd_ref_count(descriptor);
+
+			// if this descriptor points at this mount, we
+			// need to disconnect it to be able to unmount
+			struct vnode* vnode = fd_vnode(descriptor);
+			if (vnodeToDisconnect != NULL) {
+				if (vnode == vnodeToDisconnect)
 					disconnect_fd(descriptor);
+			} else if ((vnode != NULL && vnode->mount == mount)
+				|| (vnode == NULL && descriptor->u.mount == mount))
+				disconnect_fd(descriptor);
 
-				put_fd(descriptor);
-			}
+			put_fd(descriptor);
 		}
 	}
 }
@@ -4990,7 +4992,8 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 			for (i = 0; i < tableSize; i++) {
 				struct file_descriptor* descriptor = parentContext->fds[i];
 
-				if (descriptor != NULL) {
+				if (descriptor != NULL
+					&& (descriptor->open_mode & O_DISCONNECTED) == 0) {
 					bool closeOnExec = fd_close_on_exec(parentContext, i);
 					if (closeOnExec && purgeCloseOnExec)
 						continue;
