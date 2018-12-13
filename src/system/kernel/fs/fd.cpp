@@ -428,7 +428,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	// the table size could be changed)
 	if ((uint32)oldfd >= context->table_size
 		|| (uint32)newfd >= context->table_size
-		|| context->fds[oldfd] == NULL) {
+		|| context->fds[oldfd] == NULL
+		|| (context->fds[oldfd]->open_mode & O_DISCONNECTED) != 0) {
 		mutex_unlock(&context->io_mutex);
 		return B_FILE_ERROR;
 	}
