@@ -4891,6 +4891,8 @@ status_t
 vfs_release_posix_lock(io_context* context, struct file_descriptor* descriptor)
 {
 	struct vnode* vnode = descriptor->u.vnode;
+	if (vnode == NULL)
+		return B_OK;
 
 	if (HAS_FS_CALL(vnode, release_lock))
 		return FS_CALL(vnode, release_lock, descriptor->cookie, NULL);
