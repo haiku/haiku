@@ -211,7 +211,7 @@
 
 /*!
 	\typedef typedef int64 bigtime_t
-	\brief Represents time. The unit depends on the context of the function.
+	\brief Represents time in microseconds.
 
 	\since BeOS R3
 */
