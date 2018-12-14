@@ -338,6 +338,8 @@ BDirectory::GetNextEntry(BEntry* entry, bool traverse)
 		if (error == B_OK)
 			error = entry->SetTo(&ref, traverse);
 	}
+	if (error != B_OK && entry != NULL)
+		entry->Unset();
 	return error;
 }
 
