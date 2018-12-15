@@ -68,7 +68,7 @@ App::QuitRequested()
 		_StoreSettings(windowSettings);
 	}
 
-	return true;
+	return BApplication::QuitRequested();
 }
 
 
@@ -93,7 +93,7 @@ App::MessageReceived(BMessage* message)
 		case MSG_MAIN_WINDOW_CLOSED:
 		{
 			BMessage windowSettings;
-			if (message->FindMessage("window settings",
+			if (message->FindMessage(KEY_WINDOW_SETTINGS,
 					&windowSettings) == B_OK) {
 				_StoreSettings(windowSettings);
 			}
@@ -114,6 +114,10 @@ App::MessageReceived(BMessage* message)
 
 		case MSG_SERVER_ERROR:
 			ServerHelper::AlertServerJsonRpcError(message);
+			break;
+
+		case MSG_ALERT_SIMPLE_ERROR:
+			_AlertSimpleError(message);
 			break;
 
 		case MSG_SERVER_DATA_CHANGED:
@@ -308,6 +312,29 @@ App::ArgvReceived(int32 argc, char* argv[])
 }
 
 
+/*! This method will display an alert based on a message.  This message arrives
+    from a number of possible background threads / processes in the application.
+*/
+
+void
+App::_AlertSimpleError(BMessage* message)
+{
+	BString alertTitle;
+	BString alertText;
+
+	if (message->FindString(KEY_ALERT_TEXT, &alertText) != B_OK)
+		alertText = "?";
+
+	if (message->FindString(KEY_ALERT_TITLE, &alertTitle) != B_OK)
+		alertTitle = B_TRANSLATE("Error");
+
+	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"));
+
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go();
+}
+
+
 // #pragma mark - private
 
 
@@ -359,7 +386,7 @@ App::_LoadSettings(BMessage& settings)
 {
 	if (!fSettingsRead) {
 		fSettings = true;
-		if (load_settings(&fSettings, "main_settings", "HaikuDepot") != B_OK)
+		if (load_settings(&fSettings, KEY_MAIN_SETTINGS, "HaikuDepot") != B_OK)
 			fSettings.MakeEmpty();
 	}
 	settings = fSettings;
@@ -390,7 +417,7 @@ App::_StoreSettings(const BMessage& settings)
 		}
 	}
 
-	save_settings(&fSettings, "main_settings", "HaikuDepot");
+	save_settings(&fSettings, KEY_MAIN_SETTINGS, "HaikuDepot");
 }
 
 

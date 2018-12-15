@@ -16,13 +16,14 @@ enum {
 	MSG_NETWORK_TRANSPORT_ERROR	= 'nett',
 	MSG_SERVER_ERROR			= 'svre',
 	MSG_SERVER_DATA_CHANGED		= 'svdc',
+	MSG_ALERT_SIMPLE_ERROR		= 'nser',
 	MSG_DID_ADD_USER_RATING		= 'adur',
 	MSG_DID_UPDATE_USER_RATING	= 'upur'
 };
 
 
-#define RATING_MISSING	-1.0f
-#define RATING_MIN	0.0f
+#define RATING_MISSING					-1.0f
+#define RATING_MIN						0.0f
 
 
 #define HD_ERROR_BASE					(B_ERRORS_END + 1)
@@ -32,8 +33,16 @@ enum {
 #define HD_ERR_NO_DATA					(HD_ERROR_BASE + 4)
 
 
-#define REPOSITORY_NAME_SYSTEM "system"
-#define REPOSITORY_NAME_INSTALLED "installed"
+#define REPOSITORY_NAME_SYSTEM			"system"
+#define REPOSITORY_NAME_INSTALLED		"installed"
+
+
+#define KEY_ALERT_TEXT					"alert_text"
+#define KEY_ALERT_TITLE					"alert_title"
+#define KEY_WORK_STATUS_TEXT			"work_status_text"
+#define KEY_WORK_STATUS_PROGRESS		"work_status_progress"
+#define KEY_WINDOW_SETTINGS				"window_settings"
+#define KEY_MAIN_SETTINGS				"main_settings"
 
 
 // These constants reference resources in 'HaikuDepot.ref'

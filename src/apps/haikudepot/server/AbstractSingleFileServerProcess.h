@@ -1,7 +1,8 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #ifndef ABSTRACT_SINGLE_FILE_SERVER_PROCESS_H
 #define ABSTRACT_SINGLE_FILE_SERVER_PROCESS_H
@@ -12,9 +13,7 @@
 
 class AbstractSingleFileServerProcess : public AbstractServerProcess {
 public:
-								AbstractSingleFileServerProcess(
-									AbstractServerProcessListener* listener,
-									uint32 options);
+								AbstractSingleFileServerProcess(uint32 options);
 	virtual						~AbstractSingleFileServerProcess();
 
 protected:
@@ -24,7 +23,9 @@ protected:
 
 	virtual	BString				UrlPathComponent() = 0;
 
-	virtual	BPath&				LocalPath() = 0;
+	virtual	status_t			GetLocalPath(BPath& path) const = 0;
+
+	virtual	status_t			GetStandardMetaDataPath(BPath& path) const;
 };
 
 #endif // ABSTRACT_SINGLE_FILE_SERVER_PROCESS_H

@@ -1,7 +1,8 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include "TarArchiveService.h"
 
@@ -38,7 +39,8 @@ TarArchiveService::Unpack(BDataIO& tarDataIo, BPath& targetDirectory,
 		count_items_read++;
 
 		if (0 == memcmp(zero_buffer, buffer, sizeof zero_buffer)) {
-			fprintf(stdout, "detected end of tar-ball\n");
+			if (Logger::IsDebugEnabled())
+				printf("detected end of tar-ball\n");
 			return B_OK; // end of tar-ball.
 		} else {
 			TarArchiveHeader* header = TarArchiveHeader::CreateFromBlock(

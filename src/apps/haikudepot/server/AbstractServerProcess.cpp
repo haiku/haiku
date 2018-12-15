@@ -2,6 +2,8 @@
  * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "AbstractServerProcess.h"
 
 #include <unistd.h>
@@ -9,10 +11,8 @@
 #include <string.h>
 
 #include <AutoDeleter.h>
-#include <Autolock.h>
 #include <FileIO.h>
 #include <HttpTime.h>
-#include <Locker.h>
 #include <UrlProtocolRoster.h>
 
 #include <support/ZlibCompressionAlgorithm.h>
@@ -34,14 +34,9 @@
 #define TIMEOUT_MICROSECONDS 3e+7
 
 
-AbstractServerProcess::AbstractServerProcess(
-	AbstractServerProcessListener* listener, uint32 options)
+AbstractServerProcess::AbstractServerProcess(uint32 options)
 	:
-	fLock(),
-	fListener(listener),
-	fWasStopped(false),
-	fProcessState(SERVER_PROCESS_INITIAL),
-	fErrorStatus(B_OK),
+	AbstractProcess(),
 	fOptions(options),
 	fRequest(NULL)
 {
@@ -70,101 +65,13 @@ AbstractServerProcess::ShouldAttemptNetworkDownload(bool hasDataAlready)
 
 
 status_t
-AbstractServerProcess::Run()
-{
-	{
-		BAutolock locker(&fLock);
-
-		if (ProcessState() != SERVER_PROCESS_INITIAL) {
-			printf("cannot start server process as it is not idle");
-			return B_NOT_ALLOWED;
-		}
-
-		fProcessState = SERVER_PROCESS_RUNNING;
-	}
-
-	SetErrorStatus(RunInternal());
-
-	SetProcessState(SERVER_PROCESS_COMPLETE);
-
-		// this process may be part of a larger bulk-load process and
-		// if so, the process orchestration needs to know when this
-		// process has completed.
-
-	if (fListener != NULL)
-		fListener->ServerProcessExited();
-
-	return ErrorStatus();
-}
-
-
-bool
-AbstractServerProcess::WasStopped()
-{
-	BAutolock locker(&fLock);
-	return fWasStopped;
-}
-
-
-status_t
-AbstractServerProcess::ErrorStatus()
-{
-	BAutolock locker(&fLock);
-	return fErrorStatus;
-}
-
-
-status_t
-AbstractServerProcess::Stop()
-{
-	BAutolock locker(&fLock);
-	fWasStopped = true;
-	return StopInternal();
-}
-
-
-status_t
 AbstractServerProcess::StopInternal()
 {
 	if (fRequest != NULL) {
 		return fRequest->Stop();
 	}
 
-	return B_NOT_ALLOWED;
-}
-
-
-bool
-AbstractServerProcess::IsRunning()
-{
-	return ProcessState() == SERVER_PROCESS_RUNNING;
-}
-
-
-void
-AbstractServerProcess::SetErrorStatus(status_t value)
-{
-	BAutolock locker(&fLock);
-
-	if (fErrorStatus == B_OK) {
-		fErrorStatus = value;
-	}
-}
-
-
-void
-AbstractServerProcess::SetProcessState(process_state value)
-{
-	BAutolock locker(&fLock);
-	fProcessState = value;
-}
-
-
-process_state
-AbstractServerProcess::ProcessState()
-{
-	BAutolock locker(&fLock);
-	return fProcessState;
+	return AbstractProcess::StopInternal();
 }
 
 
@@ -174,7 +81,11 @@ AbstractServerProcess::IfModifiedSinceHeaderValue(BString& headerValue) const
 	BPath metaDataPath;
 	BString jsonPath;
 
-	GetStandardMetaDataPath(metaDataPath);
+	status_t result = GetStandardMetaDataPath(metaDataPath);
+
+	if (result != B_OK)
+		return result;
+
 	GetStandardMetaDataJsonPath(jsonPath);
 
 	return IfModifiedSinceHeaderValue(headerValue, metaDataPath, jsonPath);
@@ -246,8 +157,8 @@ AbstractServerProcess::PopulateMetaData(
 }
 
 
-bool
-AbstractServerProcess::LooksLikeGzip(const char *pathStr) const
+/* static */ bool
+AbstractServerProcess::LooksLikeGzip(const char *pathStr)
 {
 	int l = strlen(pathStr);
 	return l > 4 && 0 == strncmp(&pathStr[l - 3], ".gz", 3);
@@ -268,7 +179,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 	FILE* file = fopen(pathStr, "rb");
 
 	if (file == NULL) {
-		fprintf(stderr, "unable to find the meta data file at [%s]\n",
+		printf("[%s] unable to find the meta data file at [%s]\n", Name(),
 			path.Path());
 		return B_FILE_NOT_FOUND;
 	}
@@ -348,17 +259,18 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 		return B_CANCELED;
 
 	if (redirects > MAX_REDIRECTS) {
-		fprintf(stdout, "exceeded %d redirects --> failure\n", MAX_REDIRECTS);
+		printf("[%s] exceeded %d redirects --> failure\n", Name(),
+			MAX_REDIRECTS);
 		return B_IO_ERROR;
 	}
 
 	if (failures > MAX_FAILURES) {
-		fprintf(stdout, "exceeded %d failures\n", MAX_FAILURES);
+		printf("[%s] exceeded %d failures\n", Name(), MAX_FAILURES);
 		return B_IO_ERROR;
 	}
 
-	fprintf(stdout, "[%s] will stream '%s' to [%s]\n",
-		Name(), url.UrlString().String(), targetFilePath.Path());
+	printf("[%s] will stream '%s' to [%s]\n", Name(), url.UrlString().String(),
+		targetFilePath.Path());
 
 	ToFileUrlProtocolListener listener(targetFilePath, Name(),
 		Logger::IsTraceEnabled());

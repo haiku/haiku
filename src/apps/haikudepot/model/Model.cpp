@@ -1060,88 +1060,22 @@ Model::_NotifyAuthorizationChanged()
 }
 
 
+/*! This method will find the stored 'DepotInfo' that correlates to the
+    supplied 'url' and will invoke the mapper function in order to get a
+    replacement for the 'DepotInfo'.  The 'url' is a unique identifier
+    for the repository that holds across mirrors.
+*/
+
 void
-Model::ForAllDepots(void (*func)(const DepotInfo& depot, void* context),
+Model::ReplaceDepotByUrl(const BString& URL, DepotMapper* depotMapper,
 	void* context)
 {
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
 		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-		func(depotInfo, context);
-	}
-}
 
-
-/*! This method will find the stored 'DepotInfo' that correlates to the
-    supplied 'url' or 'baseUrl' and will invoke the mapper function in
-    order to get a replacement for the 'DepotInfo'.  The two URLs are
-    different.  The 'url' is a unique identifier for the repository that
-    holds across mirrors.  The 'baseUrl' is the URL stem that was used
-    to access the repository data in the first place.  The 'baseUrl' is
-    a legacy construct that exists from a time where the identifying
-    'url' was not being relayed properly.
-*/
-
-void
-Model::ReplaceDepotByUrl(
-	const BString& URL,
-	const BString& baseURL,
-		// deprecated
-	DepotMapper* depotMapper, void* context)
-{
-	for (int32 i = 0; i < fDepots.CountItems(); i++) {
-		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-
-		if (RepositoryUrlUtils::EqualsOnUrlOrBaseUrl(URL, depotInfo.URL(),
-			baseURL, depotInfo.BaseURL())) {
+		if (RepositoryUrlUtils::EqualsNormalized(URL, depotInfo.URL())) {
 			BAutolock locker(&fLock);
 			fDepots.Replace(i, depotMapper->MapDepot(depotInfo, context));
-		}
-	}
-}
-
-
-void
-Model::ForAllPackages(PackageConsumer* packageConsumer, void* context)
-{
-	for (int32 i = 0; i < fDepots.CountItems(); i++) {
-		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-		PackageList packages = depotInfo.Packages();
-		for(int32 j = 0; j < packages.CountItems(); j++) {
-			const PackageInfoRef& packageInfoRef = packages.ItemAtFast(j);
-
-			if (packageInfoRef != NULL) {
-				BAutolock locker(&fLock);
-				if (!packageConsumer->ConsumePackage(packageInfoRef, context))
-					return;
-			}
-		}
-	}
-}
-
-
-void
-Model::ForPackageByNameInDepot(const BString& depotName,
-	const BString& packageName, PackageConsumer* packageConsumer, void* context)
-{
-	int32 depotCount = fDepots.CountItems();
-
-	for (int32 i = 0; i < depotCount; i++) {
-		DepotInfo depotInfo = fDepots.ItemAtFast(i);
-
-		if (depotInfo.Name() == depotName) {
-			int32 packageIndex = depotInfo.PackageIndexByName(packageName);
-
-			if (-1 != packageIndex) {
-				PackageList packages = depotInfo.Packages();
-				const PackageInfoRef& packageInfoRef =
-					packages.ItemAtFast(packageIndex);
-
-				BAutolock locker(&fLock);
-				packageConsumer->ConsumePackage(packageInfoRef,
-					context);
-			}
-
-			return;
 		}
 	}
 }
@@ -1158,8 +1092,8 @@ Model::LogDepotsWithNoWebAppRepositoryCode() const
 		if (depot.WebAppRepositoryCode().Length() == 0) {
 			printf("depot [%s]", depot.Name().String());
 
-			if (depot.BaseURL().Length() > 0)
-				printf(" (%s)", depot.BaseURL().String());
+			if (depot.URL().Length() > 0)
+				printf(" (%s)", depot.URL().String());
 
 			printf(" correlates with no repository in the haiku"
 				"depot server system\n");

@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef APP_H
@@ -25,6 +26,7 @@ public:
 	virtual void				ArgvReceived(int32 argc, char* argv[]);
 
 private:
+			void				_AlertSimpleError(BMessage* message);
 			void				_Open(const BEntry& entry);
 			void				_ShowWindow(MainWindow* window);
 

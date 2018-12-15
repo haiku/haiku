@@ -3,12 +3,15 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "RepositoryDataUpdateProcess.h"
+
+#include "ServerRepositoryDataUpdateProcess.h"
 
 #include <stdio.h>
 #include <sys/stat.h>
 #include <time.h>
 
+#include <AutoDeleter.h>
+#include <Catalog.h>
 #include <FileIO.h>
 #include <Url.h>
 
@@ -18,6 +21,10 @@
 #include "DumpExportRepository.h"
 #include "DumpExportRepositorySource.h"
 #include "DumpExportRepositoryJsonListener.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ServerRepositoryDataUpdateProcess"
 
 
 /*! This repository listener (not at the JSON level) is feeding in the
@@ -91,14 +98,17 @@ DepotMatchingRepositoryListener::MapDepot(const DepotInfo& depot, void *context)
 		BString(*repositorySourceCode));
 
 	if (Logger::IsDebugEnabled()) {
-		printf("associated dept [%s] (%s) with server repository "
-			"source [%s] (%s)\n", modifiedDepotInfo.Name().String(),
-			modifiedDepotInfo.BaseURL().String(),
+		printf("[DepotMatchingRepositoryListener] associated depot [%s] (%s) "
+			"with server repository source [%s] (%s)\n",
+			modifiedDepotInfo.Name().String(),
+			modifiedDepotInfo.URL().String(),
 			repositorySourceCode->String(),
 			repositoryAndRepositorySource->repositorySource->Url()->String());
 	} else {
-		printf("associated depot [%s] with server repository source [%s]\n",
-			modifiedDepotInfo.Name().String(), repositorySourceCode->String());
+		printf("[DepotMatchingRepositoryListener] associated depot [%s] with "
+			"server repository source [%s]\n",
+			modifiedDepotInfo.Name().String(),
+			repositorySourceCode->String());
 	}
 
 	return modifiedDepotInfo;
@@ -116,20 +126,11 @@ DepotMatchingRepositoryListener::Handle(DumpExportRepository* repository)
 		repositoryAndRepositorySource.repositorySource =
 			repository->RepositorySourcesItemAt(i);
 
-		BString* baseURL = repositoryAndRepositorySource
-			.repositorySource->Url();
-		BString* URL = repositoryAndRepositorySource
+		BString* repoInfoURL = repositoryAndRepositorySource
 			.repositorySource->RepoInfoUrl();
 
-		// to be simplified soon because there will no longer be a need to
-		// check for the baseURL.
-
-		if ((baseURL != NULL && !baseURL->IsEmpty())
-			|| (URL != NULL && !URL->IsEmpty())) {
-			fModel->ReplaceDepotByUrl(
-				URL == NULL ? BString() : *URL,
-				baseURL == NULL ? BString() : *baseURL,
-				this,
+		if (!repoInfoURL->IsEmpty()) {
+			fModel->ReplaceDepotByUrl(*repoInfoURL, this,
 				&repositoryAndRepositorySource);
 		}
 	}
@@ -144,72 +145,86 @@ DepotMatchingRepositoryListener::Complete()
 }
 
 
-RepositoryDataUpdateProcess::RepositoryDataUpdateProcess(
-	AbstractServerProcessListener* listener,
-	const BPath& localFilePath,
+ServerRepositoryDataUpdateProcess::ServerRepositoryDataUpdateProcess(
 	Model* model,
-	uint32 options)
+	uint32 serverProcessOptions)
 	:
-	AbstractSingleFileServerProcess(listener, options),
-	fLocalFilePath(localFilePath),
+	AbstractSingleFileServerProcess(serverProcessOptions),
 	fModel(model)
 {
 }
 
 
-RepositoryDataUpdateProcess::~RepositoryDataUpdateProcess()
+ServerRepositoryDataUpdateProcess::~ServerRepositoryDataUpdateProcess()
 {
 }
 
 
 const char*
-RepositoryDataUpdateProcess::Name()
+ServerRepositoryDataUpdateProcess::Name() const
 {
-	return "RepositoryDataUpdateProcess";
+	return "ServerRepositoryDataUpdateProcess";
+}
+
+
+const char*
+ServerRepositoryDataUpdateProcess::Description() const
+{
+	return B_TRANSLATE("Synchronizing meta-data about repositories");
 }
 
 
 BString
-RepositoryDataUpdateProcess::UrlPathComponent()
+ServerRepositoryDataUpdateProcess::UrlPathComponent()
 {
 	return BString("/__repository/all-en.json.gz");
 }
 
 
-BPath&
-RepositoryDataUpdateProcess::LocalPath()
+status_t
+ServerRepositoryDataUpdateProcess::GetLocalPath(BPath& path) const
 {
-	return fLocalFilePath;
+	return fModel->DumpExportRepositoryDataPath(path);
 }
 
 
 status_t
-RepositoryDataUpdateProcess::ProcessLocalData()
+ServerRepositoryDataUpdateProcess::ProcessLocalData()
 {
 	DepotMatchingRepositoryListener* itemListener =
 		new DepotMatchingRepositoryListener(fModel, this);
+	ObjectDeleter<DepotMatchingRepositoryListener>
+		itemListenerDeleter(itemListener);
 
 	BulkContainerDumpExportRepositoryJsonListener* listener =
 		new BulkContainerDumpExportRepositoryJsonListener(itemListener);
+	ObjectDeleter<BulkContainerDumpExportRepositoryJsonListener>
+		listenerDeleter(listener);
 
-	status_t result = ParseJsonFromFileWithListener(listener, fLocalFilePath);
+	BPath localPath;
+	status_t result = GetLocalPath(localPath);
 
-	if (B_OK != result)
+	if (result != B_OK)
+		return result;
+
+	result = ParseJsonFromFileWithListener(listener, localPath);
+
+	if (result != B_OK)
 		return result;
 
 	return listener->ErrorStatus();
 }
 
 
-void
-RepositoryDataUpdateProcess::GetStandardMetaDataPath(BPath& path) const
+status_t
+ServerRepositoryDataUpdateProcess::GetStandardMetaDataPath(BPath& path) const
 {
-	path.SetTo(fLocalFilePath.Path());
+	return GetLocalPath(path);
 }
 
 
 void
-RepositoryDataUpdateProcess::GetStandardMetaDataJsonPath(
+ServerRepositoryDataUpdateProcess::GetStandardMetaDataJsonPath(
 	BString& jsonPath) const
 {
 	jsonPath.SetTo("$.info");

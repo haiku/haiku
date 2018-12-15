@@ -3,13 +3,16 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "PkgDataUpdateProcess.h"
+
+#include "ServerPkgDataUpdateProcess.h"
 
 #include <stdio.h>
 #include <sys/stat.h>
 #include <time.h>
 
-#include <Autolock.h>
+#include <AutoDeleter.h>
+#include <AutoLocker.h>
+#include <Catalog.h>
 #include <FileIO.h>
 #include <support/StopWatch.h>
 #include <Url.h>
@@ -25,19 +28,22 @@
 #include "HaikuDepotConstants.h"
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "ServerPkgDataUpdateProcess"
+
+
 /*! This package listener (not at the JSON level) is feeding in the
     packages as they are parsed and processing them.
 */
 
-class PackageFillingPkgListener :
-	public DumpExportPkgListener, public PackageConsumer {
+class PackageFillingPkgListener : public DumpExportPkgListener {
 public:
 								PackageFillingPkgListener(Model *model,
 									BString& depotName, Stoppable* stoppable);
 	virtual						~PackageFillingPkgListener();
 
 	virtual bool				ConsumePackage(const PackageInfoRef& package,
-									void *context);
+									DumpExportPkg* pkg);
 	virtual	bool				Handle(DumpExportPkg* item);
 	virtual	void				Complete();
 
@@ -99,9 +105,8 @@ PackageFillingPkgListener::IndexOfCategoryByName(
 
 bool
 PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
-	void *context)
+	DumpExportPkg* pkg)
 {
-	DumpExportPkg* pkg = static_cast<DumpExportPkg*>(context);
 	int32 i;
 
 		// Collects all of the changes here into one set of notifications to
@@ -195,7 +200,28 @@ PackageFillingPkgListener::Count()
 bool
 PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 {
-	fModel->ForPackageByNameInDepot(fDepotName, *(pkg->Name()), this, pkg);
+	const DepotInfo* depotInfo = fModel->DepotForName(fDepotName);
+
+	if (depotInfo != NULL) {
+		BString packageName = *(pkg->Name());
+		int32 packageIndex = depotInfo->PackageIndexByName(packageName);
+
+		if (-1 != packageIndex) {
+			PackageList packages = depotInfo->Packages();
+			const PackageInfoRef& packageInfoRef =
+				packages.ItemAtFast(packageIndex);
+
+			AutoLocker<BLocker> locker(fModel->Lock());
+			ConsumePackage(packageInfoRef, pkg);
+		} else {
+			printf("[PackageFillingPkgListener] unable to find the pkg [%s]\n",
+				packageName.String());
+		}
+	} else {
+		printf("[PackageFillingPkgListener] unable to find the depot [%s]\n",
+			fDepotName.String());
+	}
+
 	return !fStoppable->WasStopped();
 }
 
@@ -206,92 +232,143 @@ PackageFillingPkgListener::Complete()
 }
 
 
-PkgDataUpdateProcess::PkgDataUpdateProcess(
-	AbstractServerProcessListener* listener,
-	const BPath& localFilePath,
+ServerPkgDataUpdateProcess::ServerPkgDataUpdateProcess(
 	BString naturalLanguageCode,
-	BString repositorySourceCode,
 	BString depotName,
 	Model *model,
-	uint32 options)
+	uint32 serverProcessOptions)
 	:
-	AbstractSingleFileServerProcess(listener, options),
-	fLocalFilePath(localFilePath),
+	AbstractSingleFileServerProcess(serverProcessOptions),
 	fNaturalLanguageCode(naturalLanguageCode),
-	fRepositorySourceCode(repositorySourceCode),
 	fModel(model),
 	fDepotName(depotName)
 {
-	fName.SetToFormat("PkgDataUpdateProcess<%s>", depotName.String());
+	fName.SetToFormat("ServerPkgDataUpdateProcess<%s>", depotName.String());
+	fDescription.SetTo(
+		B_TRANSLATE("Synchronizing package data for repository "
+			"'%REPO_NAME%'"));
+	fDescription.ReplaceAll("%REPO_NAME%", depotName.String());
 }
 
 
-PkgDataUpdateProcess::~PkgDataUpdateProcess()
+ServerPkgDataUpdateProcess::~ServerPkgDataUpdateProcess()
 {
 }
 
 
 const char*
-PkgDataUpdateProcess::Name()
+ServerPkgDataUpdateProcess::Name() const
 {
 	return fName.String();
 }
 
 
+const char*
+ServerPkgDataUpdateProcess::Description() const
+{
+	return fDescription.String();
+}
+
+
 BString
-PkgDataUpdateProcess::UrlPathComponent()
+ServerPkgDataUpdateProcess::UrlPathComponent()
 {
 	BString urlPath;
 	urlPath.SetToFormat("/__pkg/all-%s-%s.json.gz",
-		fRepositorySourceCode.String(),
+		_DeriveWebAppRepositorySourceCode().String(),
 		fNaturalLanguageCode.String());
 	return urlPath;
 }
 
 
-BPath&
-PkgDataUpdateProcess::LocalPath()
+status_t
+ServerPkgDataUpdateProcess::GetLocalPath(BPath& path) const
 {
-	return fLocalFilePath;
+	BString webAppRepositorySourceCode = _DeriveWebAppRepositorySourceCode();
+
+	if (!webAppRepositorySourceCode.IsEmpty()) {
+		return fModel->DumpExportPkgDataPath(path, webAppRepositorySourceCode);
+	}
+
+	return B_ERROR;
 }
 
 
 status_t
-PkgDataUpdateProcess::ProcessLocalData()
+ServerPkgDataUpdateProcess::ProcessLocalData()
 {
-	BStopWatch watch("PkgDataUpdateProcess::ProcessLocalData", true);
+	BStopWatch watch("ServerPkgDataUpdateProcess::ProcessLocalData", true);
 
 	PackageFillingPkgListener* itemListener =
 		new PackageFillingPkgListener(fModel, fDepotName, this);
+	ObjectDeleter<PackageFillingPkgListener>
+		itemListenerDeleter(itemListener);
 
 	BulkContainerDumpExportPkgJsonListener* listener =
 		new BulkContainerDumpExportPkgJsonListener(itemListener);
+	ObjectDeleter<BulkContainerDumpExportPkgJsonListener>
+		listenerDeleter(listener);
 
-	status_t result = ParseJsonFromFileWithListener(listener, fLocalFilePath);
+	BPath localPath;
+	status_t result = GetLocalPath(localPath);
 
-	if (Logger::IsInfoEnabled()) {
-		double secs = watch.ElapsedTime() / 1000000.0;
-		fprintf(stdout, "[%s] did process %" B_PRIi32 " packages' data "
-			"in  (%6.3g secs)\n", Name(), itemListener->Count(), secs);
-	}
+	if (result != B_OK)
+		return result;
+
+	result = ParseJsonFromFileWithListener(listener, localPath);
 
 	if (B_OK != result)
 		return result;
+
+	if (Logger::IsInfoEnabled()) {
+		double secs = watch.ElapsedTime() / 1000000.0;
+		printf("[%s] did process %" B_PRIi32 " packages' data "
+			"in  (%6.3g secs)\n", Name(), itemListener->Count(), secs);
+	}
 
 	return listener->ErrorStatus();
 }
 
 
-void
-PkgDataUpdateProcess::GetStandardMetaDataPath(BPath& path) const
+status_t
+ServerPkgDataUpdateProcess::GetStandardMetaDataPath(BPath& path) const
 {
-	path.SetTo(fLocalFilePath.Path());
+	return GetLocalPath(path);
 }
 
 
 void
-PkgDataUpdateProcess::GetStandardMetaDataJsonPath(
+ServerPkgDataUpdateProcess::GetStandardMetaDataJsonPath(
 	BString& jsonPath) const
 {
 	jsonPath.SetTo("$.info");
+}
+
+
+BString
+ServerPkgDataUpdateProcess::_DeriveWebAppRepositorySourceCode() const
+{
+	const DepotInfo* depot = fModel->DepotForName(fDepotName);
+
+	if (depot == NULL) {
+		return BString();
+	}
+
+	return depot->WebAppRepositorySourceCode();
+}
+
+
+status_t
+ServerPkgDataUpdateProcess::RunInternal()
+{
+	if (_DeriveWebAppRepositorySourceCode().IsEmpty()) {
+		if (Logger::IsInfoEnabled()) {
+			printf("[%s] am not updating data for depot [%s] as there is no"
+				" web app repository source code available\n",
+				Name(), fDepotName.String());
+		}
+		return B_OK;
+	}
+
+	return AbstractSingleFileServerProcess::RunInternal();
 }

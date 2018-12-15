@@ -423,13 +423,10 @@ public:
 
 			bool				AddPackage(const PackageInfoRef& package);
 
-			int32				PackageIndexByName(const BString& packageName);
+			int32				PackageIndexByName(const BString& packageName)
+									const;
 
 			void				SyncPackages(const PackageList& packages);
-
-			void				SetBaseURL(const BString& baseURL);
-			const BString&		BaseURL() const
-									{ return fBaseURL; }
 
 			void				SetURL(const BString& URL);
 			const BString&		URL() const
@@ -449,9 +446,6 @@ private:
 			PackageList			fPackages;
 			BString				fWebAppRepositoryCode;
 			BString				fWebAppRepositorySourceCode;
-			BString				fBaseURL;
-				// this is the URL at which the configured repository will be
-				// accessed to get data.
 			BString				fURL;
 				// this is actually a unique identifier for the repository.
 };

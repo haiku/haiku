@@ -11,11 +11,11 @@
 #include <Window.h>
 
 #include "TabView.h"
-#include "BulkLoadStateMachine.h"
 #include "Model.h"
 #include "PackageAction.h"
 #include "PackageActionHandler.h"
 #include "PackageInfoListener.h"
+#include "ProcessCoordinator.h"
 #include "HaikuDepotConstants.h"
 
 
@@ -33,7 +33,7 @@ class WorkStatusView;
 
 
 class MainWindow : public BWindow, private PackageInfoListener,
-	private PackageActionHandler {
+	private PackageActionHandler, public ProcessCoordinatorListener {
 public:
 								MainWindow(const BMessage& settings);
 								MainWindow(const BMessage& settings,
@@ -46,6 +46,9 @@ public:
 
 			void				StoreSettings(BMessage& message) const;
 
+	// ProcessCoordinatorListener
+	virtual void				CoordinatorChanged(
+									ProcessCoordinatorState& coordinatorState);
 private:
 	// PackageInfoListener
 	virtual	void				PackageChanged(
@@ -58,6 +61,9 @@ private:
 	virtual	Model*				GetModel();
 
 private:
+			void				_BulkLoadProcessCoordinatorFinished(
+									ProcessCoordinatorState&
+									processCoordinatorState);
 			bool				_SelectedPackageHasWebAppRepositoryCode();
 
 			void				_BuildMenu(BMenuBar* menuBar);
@@ -73,18 +79,20 @@ private:
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 
-			void				_RefreshRepositories(bool force);
-			void				_RefreshPackageList(bool force);
-
 			void				_PopulatePackageAsync(bool forcePopulate);
-			void				_StartRefreshWorker(bool force = false);
+			void				_StopBulkLoad();
+			void				_StartBulkLoad(bool force = false);
+			void				_BulkLoadCompleteReceived();
+
+			void				_NotifyWorkStatusChange(const BString& text,
+									float progress);
+			void				_HandleWorkStatusChangeMessageReceived(
+									const BMessage* message);
+
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PackageActionWorker(void* arg);
 	static	status_t			_PopulatePackageWorker(void* arg);
 	static	status_t			_PackagesToShowWorker(void* arg);
-
-			void				_NotifyUser(const char* title,
-									const char* message);
 
 			void				_OpenLoginWindow(
 									const BMessage& onSuccessMessage);
@@ -114,15 +122,15 @@ private:
 			BMenuItem*			fShowDevelopPackagesItem;
 			BMenuItem*			fShowSourcePackagesItem;
 
+			BMenuItem*			fRefreshRepositoriesItem;
+
 			Model				fModel;
 			ModelListenerRef	fModelListener;
 			PackageList			fVisiblePackages;
-			BulkLoadStateMachine
-								fBulkLoadStateMachine;
+			ProcessCoordinator*	fBulkLoadProcessCoordinator;
+			BLocker				fBulkLoadProcessCoordinatorLock;
 
-			bool				fTerminating;
 			bool				fSinglePackageMode;
-			thread_id			fModelWorker;
 
 			thread_id			fPendingActionsWorker;
 			PackageActionList	fPendingActions;

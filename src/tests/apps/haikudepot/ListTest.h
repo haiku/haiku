@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 #ifndef LIST_TEST_H
@@ -17,6 +17,7 @@ public:
 
 			void				TestAddOrdered();
 			void				TestBinarySearch();
+			void				TestAddUnordered();
 
 	static	void				AddTests(BTestSuite& suite);
 };

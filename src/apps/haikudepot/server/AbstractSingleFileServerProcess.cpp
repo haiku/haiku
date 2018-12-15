@@ -2,18 +2,21 @@
  * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "AbstractSingleFileServerProcess.h"
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "ServerHelper.h"
 #include "ServerSettings.h"
 #include "StorageUtils.h"
 
 
 AbstractSingleFileServerProcess::AbstractSingleFileServerProcess(
-	AbstractServerProcessListener* listener, uint32 options)
+	uint32 options)
 	:
-	AbstractServerProcess(listener, options)
+	AbstractServerProcess(options)
 {
 }
 
@@ -29,9 +32,13 @@ AbstractSingleFileServerProcess::RunInternal()
 	if (Logger::IsInfoEnabled())
 		printf("[%s] will fetch data\n", Name());
 
-	BPath localPath = LocalPath();
+	BPath localPath;
+	status_t result = GetLocalPath(localPath);
+
+	if (result != B_OK)
+		return result;
+
 	BString urlPathComponent = UrlPathComponent();
-	status_t result = B_OK;
 
 	if (IsSuccess(result) && HasOption(SERVER_PROCESS_DROP_CACHE))
 		result = DeleteLocalFile(localPath);
@@ -48,6 +55,19 @@ AbstractSingleFileServerProcess::RunInternal()
 		result = DownloadToLocalFileAtomically(
 			localPath,
 			ServerSettings::CreateFullUrl(urlPathComponent));
+
+		if (!IsSuccess(result)) {
+			if (hasData) {
+				printf("[%s] failed to update data, but have old data "
+					"anyway so carry on with that\n", Name());
+				result = B_OK;
+			} else {
+				printf("[%s] failed to obtain data\n", Name());
+			}
+		} else {
+			if (Logger::IsInfoEnabled())
+				printf("[%s] did fetch data\n", Name());
+		}
 	}
 
 	if (IsSuccess(result)) {
@@ -61,11 +81,6 @@ AbstractSingleFileServerProcess::RunInternal()
 	}
 
 	if (IsSuccess(result)) {
-		if (Logger::IsInfoEnabled())
-			printf("[%s] did fetch data\n", Name());
-
-			// now load the data in and process it.
-
 		printf("[%s] will process data\n", Name());
 		result = ProcessLocalData();
 
@@ -82,3 +97,9 @@ AbstractSingleFileServerProcess::RunInternal()
 	return result;
 }
 
+
+status_t
+AbstractSingleFileServerProcess::GetStandardMetaDataPath(BPath& path) const
+{
+	return GetLocalPath(path);
+}

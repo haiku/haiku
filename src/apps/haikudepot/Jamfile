@@ -69,8 +69,6 @@ Application HaikuDepot :
 	MarkupTextView.cpp
 	MessagePackageListener.cpp
 	Model.cpp
-	BulkLoadContext.cpp
-	BulkLoadStateMachine.cpp
 	PackageAction.cpp
 	PackageActionHandler.cpp
 	PackageContentsView.cpp
@@ -98,23 +96,30 @@ Application HaikuDepot :
 	DumpExportRepositorySource.cpp
 	DumpExportRepositoryJsonListener.cpp
 
-	# network + server
+	# network + server / local processes
+	AbstractProcess.cpp
 	AbstractServerProcess.cpp
 	AbstractSingleFileServerProcess.cpp
+	LocalPkgDataLoadProcess.cpp
+	LocalRepositoryUpdateProcess.cpp
+	ProcessCoordinator.cpp
+	ProcessCoordinatorFactory.cpp
+	ProcessNode.cpp
 	ServerHelper.cpp
 	ServerSettings.cpp
-	WebAppInterface.cpp
-	PkgDataUpdateProcess.cpp
-	RepositoryDataUpdateProcess.cpp
+	ServerPkgDataUpdateProcess.cpp
+	ServerRepositoryDataUpdateProcess.cpp
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaData.cpp
+	WebAppInterface.cpp
 
 	# tar
 	TarArchiveHeader.cpp
 	TarArchiveService.cpp
 
 	#util
+	AppUtils.cpp
 	DataIOUtils.cpp
 	RepositoryUrlUtils.cpp
 	StorageUtils.cpp

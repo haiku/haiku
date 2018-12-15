@@ -17,9 +17,6 @@ public:
 								const BString& url2);
 	static bool				EqualsNormalized(const BUrl& normalizedUrl1,
 								const BString& url2);
-	static bool				EqualsOnUrlOrBaseUrl(const BString& url1,
-								const BString& url2, const BString& baseUrl1,
-								const BString& baseUrl2);
 };
 
 

@@ -1,54 +1,53 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef PACKAGE_DATA_UPDATE_PROCESS_H
 #define PACKAGE_DATA_UPDATE_PROCESS_H
 
 
 #include "AbstractSingleFileServerProcess.h"
 
-#include "Model.h"
-#include "PackageInfo.h"
-
 #include <File.h>
 #include <Path.h>
 #include <String.h>
 #include <Url.h>
 
+#include "Model.h"
+#include "PackageInfo.h"
 
-class PkgDataUpdateProcess : public AbstractSingleFileServerProcess {
+
+class ServerPkgDataUpdateProcess : public AbstractSingleFileServerProcess {
 public:
-								PkgDataUpdateProcess(
-									AbstractServerProcessListener* listener,
-									const BPath& localFilePath,
+								ServerPkgDataUpdateProcess(
 									BString naturalLanguageCode,
-									BString repositorySourceCode,
 									BString depotName,
 									Model *model,
-									uint32 options);
-	virtual						~PkgDataUpdateProcess();
+									uint32 serverProcessOptions);
+	virtual						~ServerPkgDataUpdateProcess();
 
-			const char*				Name();
+			const char*			Name() const;
+			const char*			Description() const;
 
 protected:
-			void				GetStandardMetaDataPath(BPath& path) const;
+	virtual status_t			RunInternal();
+
+			status_t			GetStandardMetaDataPath(BPath& path) const;
 			void				GetStandardMetaDataJsonPath(
 									BString& jsonPath) const;
 
 			BString				UrlPathComponent();
 			status_t			ProcessLocalData();
-			BPath&				LocalPath();
+			status_t			GetLocalPath(BPath& path) const;
 
 private:
+			BString				_DeriveWebAppRepositorySourceCode() const;
 
-			BPath				fLocalFilePath;
 			BString				fNaturalLanguageCode;
-			BString				fRepositorySourceCode;
 			Model*				fModel;
 			BString				fDepotName;
 			BString				fName;
+			BString				fDescription;
 
 };
 

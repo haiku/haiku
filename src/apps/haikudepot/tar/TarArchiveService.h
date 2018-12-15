@@ -1,12 +1,10 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef TAR_ARCHIVE_SERVICE_H
 #define TAR_ARCHIVE_SERVICE_H
 
-#include "AbstractServerProcess.h"
 #include "Stoppable.h"
 #include "TarArchiveHeader.h"
 

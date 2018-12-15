@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -59,7 +59,7 @@ ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
 	int32 statusCode = httpResult.StatusCode();
 
 	if (!BHttpRequest::IsSuccessStatusCode(statusCode)) {
-		fprintf(stdout, "received %" B_PRId32
+		fprintf(stdout, "received http status %" B_PRId32
 			" --> will not store download to file\n", statusCode);
 		fShouldDownload = false;
 	}

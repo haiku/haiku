@@ -9,9 +9,8 @@
 #include <FindDirectory.h>
 #include <Locker.h>
 
-#include "AbstractServerProcess.h"
+#include "AbstractProcess.h"
 #include "LocalIconStore.h"
-#include "BulkLoadContext.h"
 #include "PackageInfo.h"
 #include "WebAppInterface.h"
 
@@ -168,22 +167,7 @@ public:
 
 			void				ReplaceDepotByUrl(
 									const BString& URL,
-									const BString& baseURL,
 									DepotMapper* depotMapper,
-									void* context);
-
-			void				ForAllDepots(
-									void (*func)(const DepotInfo& depot,
-										void* context),
-									void* context);
-
-			void				ForAllPackages(PackageConsumer* packageConsumer,
-									void* context);
-
-			void				ForPackageByNameInDepot(
-									const BString& depotName,
-									const BString& packageName,
-									PackageConsumer* packageConsumer,
 									void* context);
 
 			status_t			IconStoragePath(BPath& path) const;

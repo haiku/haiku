@@ -15,7 +15,6 @@
 #include <Path.h>
 
 
-
 // #pragma mark - UserInfo
 
 
@@ -1036,13 +1035,40 @@ PackageInfo::_NotifyListenersImmediate(uint32 changes)
 }
 
 
+// #pragma mark - Sorting Functions
+
+
+/*! This function is used with the List class in order to facilitate fast
+    ordered inserting of packages.
+ */
+
+static int32
+PackageCompare(const PackageInfoRef& p1, const PackageInfoRef& p2)
+{
+	return p1->Name().Compare(p2->Name());
+}
+
+
+/*! This function is used with the List class in order to facilitate fast
+    searching of packages.
+ */
+
+static int32
+PackageFixedNameCompare(const void* context,
+	const PackageInfoRef& package)
+{
+	const BString* packageName = static_cast<const BString*>(context);
+	return packageName->Compare(package->Name());
+}
+
+
 // #pragma mark -
 
 
 DepotInfo::DepotInfo()
 	:
 	fName(),
-	fPackages(),
+	fPackages(&PackageCompare, &PackageFixedNameCompare),
 	fWebAppRepositoryCode()
 {
 }
@@ -1051,7 +1077,7 @@ DepotInfo::DepotInfo()
 DepotInfo::DepotInfo(const BString& name)
 	:
 	fName(name),
-	fPackages(),
+	fPackages(&PackageCompare, &PackageFixedNameCompare),
 	fWebAppRepositoryCode(),
 	fWebAppRepositorySourceCode()
 {
@@ -1064,7 +1090,6 @@ DepotInfo::DepotInfo(const DepotInfo& other)
 	fPackages(other.fPackages),
 	fWebAppRepositoryCode(other.fWebAppRepositoryCode),
 	fWebAppRepositorySourceCode(other.fWebAppRepositorySourceCode),
-	fBaseURL(other.fBaseURL),
 	fURL(other.fURL)
 {
 }
@@ -1075,7 +1100,6 @@ DepotInfo::operator=(const DepotInfo& other)
 {
 	fName = other.fName;
 	fPackages = other.fPackages;
-	fBaseURL = other.fBaseURL;
 	fURL = other.fURL;
 	fWebAppRepositoryCode = other.fWebAppRepositoryCode;
 	fWebAppRepositorySourceCode = other.fWebAppRepositorySourceCode;
@@ -1098,12 +1122,6 @@ DepotInfo::operator!=(const DepotInfo& other) const
 }
 
 
-static int32 PackageCompare(const PackageInfoRef& p1, const PackageInfoRef& p2)
-{
-	return p1->Name().Compare(p2->Name());
-}
-
-
 /*! This method will insert the package into the list of packages
     in order so that the list of packages remains in order.
  */
@@ -1111,23 +1129,14 @@ static int32 PackageCompare(const PackageInfoRef& p1, const PackageInfoRef& p2)
 bool
 DepotInfo::AddPackage(const PackageInfoRef& package)
 {
-	return fPackages.AddOrdered(package, &PackageCompare);
-}
-
-
-static int32
-PackageFixedNameCompare(const void* context,
-	const PackageInfoRef& package)
-{
-	const BString* packageName = static_cast<const BString*>(context);
-	return packageName->Compare(package->Name());
+ 	return fPackages.Add(package);
 }
 
 
 int32
-DepotInfo::PackageIndexByName(const BString& packageName)
+DepotInfo::PackageIndexByName(const BString& packageName) const
 {
-	return fPackages.BinarySearch(&packageName, &PackageFixedNameCompare);
+	return fPackages.Search(&packageName);
 }
 
 
@@ -1142,8 +1151,6 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 		for (int32 j = packages.CountItems() - 1; j >= 0; j--) {
 			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (package->Name() == otherPackage->Name()) {
-//				printf("%s: found package: '%s'\n", fName.String(),
-//					package->Name().String());
 				package->SetState(otherPackage->State());
 				package->SetLocalFilePath(otherPackage->LocalFilePath());
 				package->SetSystemDependency(
@@ -1166,13 +1173,6 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 			package->Name().String());
 		fPackages.Remove(package);
 	}
-}
-
-
-void
-DepotInfo::SetBaseURL(const BString& baseURL)
-{
-	fBaseURL = baseURL;
 }
 
 

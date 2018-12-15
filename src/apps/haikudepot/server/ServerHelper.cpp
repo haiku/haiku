@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "ServerHelper.h"
 
 #include <stdio.h>
@@ -21,6 +22,7 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ServerHelper"
+
 #define KEY_MSG_MINIMUM_VERSION "minimumVersion"
 #define KEY_HEADER_MINIMUM_VERSION "X-Desktop-Application-Minimum-Version"
 
@@ -31,7 +33,7 @@
     to the looper and then onto the user to see.
 */
 
-void
+/*static*/ void
 ServerHelper::NotifyServerJsonRpcError(BMessage& error)
 {
 	BMessage message(MSG_SERVER_ERROR);
@@ -40,7 +42,7 @@ ServerHelper::NotifyServerJsonRpcError(BMessage& error)
 }
 
 
-void
+/*static*/ void
 ServerHelper::AlertServerJsonRpcError(BMessage* message)
 {
 	BMessage error;
@@ -84,7 +86,7 @@ ServerHelper::AlertServerJsonRpcError(BMessage* message)
 }
 
 
-void
+/*static*/ void
 ServerHelper::NotifyTransportError(status_t error)
 {
 	switch (error) {
@@ -105,7 +107,7 @@ ServerHelper::NotifyTransportError(status_t error)
 }
 
 
-void
+/*static*/ void
 ServerHelper::AlertTransportError(BMessage* message)
 {
 	status_t errno = B_OK;
@@ -139,7 +141,7 @@ ServerHelper::AlertTransportError(BMessage* message)
 }
 
 
-void
+/*static*/ void
 ServerHelper::NotifyClientTooOld(const BHttpHeaders& responseHeaders)
 {
 	if (!ServerSettings::IsClientTooOld()) {
@@ -157,7 +159,7 @@ ServerHelper::NotifyClientTooOld(const BHttpHeaders& responseHeaders)
 }
 
 
-void
+/*static*/ void
 ServerHelper::AlertClientTooOld(BMessage* message)
 {
 	BString minimumVersion;
@@ -182,14 +184,14 @@ ServerHelper::AlertClientTooOld(BMessage* message)
 }
 
 
-bool
+/*static*/ bool
 ServerHelper::IsNetworkAvailable()
 {
 	return !ServerSettings::ForceNoNetwork() && IsPlatformNetworkAvailable();
 }
 
 
-bool
+/*static*/ bool
 ServerHelper::IsPlatformNetworkAvailable()
 {
 	BNetworkRoster& roster = BNetworkRoster::Default();
