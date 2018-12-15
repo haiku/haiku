@@ -773,7 +773,8 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	bool isBootPartition = false;
 	if (partition->IsMounted()) {
 		BPath mountPoint;
-		partition->GetMountPoint(&mountPoint);
+		if (partition->GetMountPoint(&mountPoint) != B_OK)
+			return false;
 		isBootPartition = strcmp(BOOT_PATH, mountPoint.Path()) == 0;
 	}
 
