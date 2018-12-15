@@ -825,27 +825,6 @@ Model::SetLinkTo(Model* model)
 }
 
 
-void
-Model::GetPreferredAppForBrokenSymLink(BString &result)
-{
-	if (!IsSymLink() || LinkTo()) {
-		result = "";
-		return;
-	}
-
-	BModelOpener opener(this);
-	BNodeInfo info(fNode);
-	status_t error
-		= info.GetPreferredApp(result.LockBuffer(B_MIME_TYPE_LENGTH));
-	result.UnlockBuffer();
-
-	if (error != B_OK) {
-		// Tracker will have to do
-		result = kTrackerSignature;
-	}
-}
-
-
 //	#pragma mark - Node monitor updating methods
 
 

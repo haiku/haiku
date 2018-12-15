@@ -817,30 +817,15 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 	BEntry entry(ref, true);
 	status_t result = entry.InitCheck();
 
-	bool brokenLinkWithSpecificHandler = false;
-	BString brokenLinkPreferredApp;
-
 	if (result != B_OK) {
-		model = new Model(ref, false);
-		if (model->IsSymLink() && !model->LinkTo()) {
-			model->GetPreferredAppForBrokenSymLink(brokenLinkPreferredApp);
-			if (brokenLinkPreferredApp.Length()
-				&& brokenLinkPreferredApp != kTrackerSignature) {
-				brokenLinkWithSpecificHandler = true;
-			}
-		}
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("There was an error resolving the link."),
+			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
 
-		if (!brokenLinkWithSpecificHandler) {
-			delete model;
-			BAlert* alert = new BAlert("",
-				B_TRANSLATE("There was an error resolving the link."),
-				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
-					B_WARNING_ALERT);
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go();
-
-			return result;
-		}
+		return result;
 	} else
 		model = new Model(&entry);
 
@@ -896,14 +881,7 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 				refsReceived.what = B_REFS_RECEIVED;
 			}
 			refsReceived.AddRef("refs", ref);
-			if (brokenLinkWithSpecificHandler) {
-				// This cruft is to support a hacky workaround for
-				// double-clicking broken refs for cifs; should get fixed
-				// in R5
-				LaunchBrokenLink(brokenLinkPreferredApp.String(),
-					&refsReceived);
-			} else
-				TrackerLaunch(&refsReceived, true);
+			TrackerLaunch(&refsReceived, true);
 		}
 	}
 

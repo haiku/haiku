@@ -126,11 +126,6 @@ public:
 		// only not-null if not default for type and not self for app
 	void SetPreferredAppSignature(const char*);
 
-	void GetPreferredAppForBrokenSymLink(BString &result);
-		// special purpose call - if a symlink is unresolvable, it makes
-		// sense to be able to get at it's preferred handler which may be
-		// different from the Tracker. Used by the network neighborhood.
-
 	// type getters
 	bool IsFile() const;
 	bool IsDirectory() const;

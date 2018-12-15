@@ -249,7 +249,6 @@ status_t TrackerLaunch(const BMessage* refs, bool async,
 	bool okToRunOpenWith = true);
 status_t TrackerLaunch(const entry_ref* appRef, const BMessage* refs,
 	bool async, bool okToRunOpenWith = true);
-status_t LaunchBrokenLink(const char*, const BMessage*);
 
 status_t FSFindTrackerSettingsDir(BPath*, bool autoCreate = true);
 

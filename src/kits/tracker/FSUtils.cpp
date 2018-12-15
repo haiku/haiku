@@ -3759,15 +3759,6 @@ TrackerLaunch(const BMessage* refs, bool async, bool openWithOK)
 	return B_OK;
 }
 
-status_t
-LaunchBrokenLink(const char* signature, const BMessage* refs)
-{
-	// This call is to support a hacky workaround for double-clicking
-	// broken refs for cifs
-	be_roster->Launch(signature, const_cast<BMessage*>(refs));
-	return B_OK;
-}
-
 
 // external launch calls; need to be robust, work if Tracker is not running
 
