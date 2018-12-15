@@ -39,8 +39,8 @@ public:
 			void				WriteBootSector(BMenu* dstMenu);
 
 private:
-			void				_LaunchInitScript(BPath& path);
-			void				_LaunchFinishScript(BPath& path);
+			status_t			_LaunchInitScript(BPath& path);
+			status_t			_LaunchFinishScript(BPath& path);
 
 			status_t			_PerformInstall(partition_id sourcePartitionID,
 									partition_id targetPartitionID);

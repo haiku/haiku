@@ -221,8 +221,11 @@ WorkerThread::MessageReceived(BMessage* message)
 				}
 			}
 
-			_LaunchFinishScript(targetDirectory);
-			// TODO: Get error from executing script!
+			if (_LaunchFinishScript(targetDirectory) != B_OK) {
+				_SetStatusMessage(
+					B_TRANSLATE("Error writing boot sector."));
+				break;
+			}
 			_SetStatusMessage(
 				B_TRANSLATE("Boot sector successfully written."));
 		}
@@ -296,7 +299,7 @@ WorkerThread::WriteBootSector(BMenu* targetMenu)
 // #pragma mark -
 
 
-void
+status_t
 WorkerThread::_LaunchInitScript(BPath &path)
 {
 	BPath bootPath;
@@ -307,12 +310,12 @@ WorkerThread::_LaunchInitScript(BPath &path)
 	command += "\"";
 	command += path.Path();
 	command += "\"";
-	_SetStatusMessage(B_TRANSLATE("Starting Installation."));
-	system(command.String());
+	_SetStatusMessage(B_TRANSLATE("Starting installation."));
+	return system(command.String());
 }
 
 
-void
+status_t
 WorkerThread::_LaunchFinishScript(BPath &path)
 {
 	BPath bootPath;
@@ -323,8 +326,8 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 	command += "\"";
 	command += path.Path();
 	command += "\"";
-	_SetStatusMessage(B_TRANSLATE("Finishing Installation."));
-	system(command.String());
+	_SetStatusMessage(B_TRANSLATE("Finishing installation."));
+	return system(command.String());
 }
 
 
@@ -482,7 +485,9 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 	CopyEngine engine(&reporter, &entryFilter);
 	BList unzipEngines;
 
-	_LaunchInitScript(targetDirectory);
+	err = _LaunchInitScript(targetDirectory);
+	if (err != B_OK)
+		return _InstallationError(err);
 
 	// Create the default indices which should always be present on a proper
 	// boot volume. We don't care if the source volume does not have them.
@@ -556,7 +561,9 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 	if (err != B_OK)
 		return _InstallationError(err);
 
-	_LaunchFinishScript(targetDirectory);
+	err = _LaunchFinishScript(targetDirectory);
+	if (err != B_OK)
+		return _InstallationError(err);
 
 	fOwner.SendMessage(MSG_INSTALL_FINISHED);
 	return B_OK;
@@ -762,9 +769,8 @@ bool
 SourceVisitor::Visit(BPartition *partition, int32 level)
 {
 	BPath path;
-	if (partition->GetPath(&path) == B_OK)
-		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
-	printf("SourceVisitor::Visit(BPartition *) : %s\n",
+	printf("SourceVisitor::Visit(BPartition *) : %s '%s'\n",
+		(partition->GetPath(&path) == B_OK) ? path.Path() : "",
 		partition->ContentName());
 
 	if (partition->ContentType() == NULL)
