@@ -38,10 +38,6 @@ using BPrivate::gDefaultTokens;
 using BPrivate::gLooperList;
 using BPrivate::BLooperList;
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
-
 
 BMessenger::BMessenger()
 	:

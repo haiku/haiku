@@ -33,11 +33,6 @@
 #define OUT	printf
 
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
-
-
 /*!	\brief Creates an unitialized BMessenger.
 */
 BMessenger::BMessenger()

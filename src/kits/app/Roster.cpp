@@ -63,11 +63,6 @@ using namespace BPrivate;
 #endif
 
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
-
-
 const BRoster* be_roster;
 
 

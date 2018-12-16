@@ -36,10 +36,6 @@
 
 using namespace BPrivate;
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
-
 
 // Helper function that contacts the registrar for mime update calls
 status_t
