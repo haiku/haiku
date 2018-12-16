@@ -793,6 +793,8 @@ bfe_list_newbuf(struct bfe_softc *sc, int c)
 	int nsegs;
 
 	m = m_getcl(M_NOWAIT, MT_DATA, M_PKTHDR);
+	if (!m)
+		return (ENOBUFS);
 	m->m_len = m->m_pkthdr.len = MCLBYTES;
 
 	if (bus_dmamap_load_mbuf_sg(sc->bfe_rxmbuf_tag, sc->bfe_rx_sparemap,
@@ -817,7 +819,7 @@ bfe_list_newbuf(struct bfe_softc *sc, int c)
 	rx_header->len = 0;
 	rx_header->flags = 0;
 	bus_dmamap_sync(sc->bfe_rxmbuf_tag, r->bfe_map, BUS_DMASYNC_PREREAD);
-	
+
 	ctrl = segs[0].ds_len & BFE_DESC_LEN;
 	KASSERT(ctrl > ETHER_MAX_LEN + 32, ("%s: buffer size too small(%d)!",
 	    __func__, ctrl));
@@ -1400,7 +1402,7 @@ bfe_rxeof(struct bfe_softc *sc)
 		 * Rx status should be read from mbuf such that we can't
 		 * delay bus_dmamap_sync(9). This hardware limiation
 		 * results in inefficent mbuf usage as bfe(4) couldn't
-		 * reuse mapped buffer from errored frame. 
+		 * reuse mapped buffer from errored frame.
 		 */
 		if (bfe_list_newbuf(sc, cons) != 0) {
 			if_inc_counter(ifp, IFCOUNTER_IQDROPS, 1);
