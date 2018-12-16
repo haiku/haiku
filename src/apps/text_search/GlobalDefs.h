@@ -13,7 +13,6 @@
 #define HISTORY_LIMIT		20
 
 #define TRACKER_SIGNATURE	"application/x-vnd.Be-TRAK"
-#define PE_SIGNATURE		"application/x-vnd.beunited.pe"
 
 
 #endif // GLOBAL_DEFS_H

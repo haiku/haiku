@@ -37,7 +37,7 @@ Model::Model()
 	fCaseSensitive(false),
 	fRegularExpression(false),
 	fTextOnly(true),
-	fInvokePe(false),
+	fInvokeEditor(false),
 
 	fFrame(100, 100, 500, 400),
 
@@ -53,12 +53,6 @@ Model::Model()
 		fFilePanelPath = path.Path();
 	else
 		fFilePanelPath = "/boot/home";
-
-	entry_ref dummy;
-	if (be_roster->FindApp(PE_SIGNATURE, &dummy) == B_OK) {
-		// Pe is installed, change the default settings
-		fInvokePe = true;
-	}
 }
 
 
@@ -92,14 +86,16 @@ Model::LoadPrefs()
 			sizeof(int32)) > 0)
 		fCaseSensitive = (value != 0);
 
-	if (file.ReadAttr("RegularExpression", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
+	if (file.ReadAttr("RegularExpression", B_INT32_TYPE, 0, &value,
+			sizeof(int32)) > 0)
 		fRegularExpression = (value != 0);
 
 	if (file.ReadAttr("TextOnly", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fTextOnly = (value != 0);
 
-	if (file.ReadAttr("InvokePe", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
-		fInvokePe = (value != 0);
+	if (file.ReadAttr("InvokeEditor", B_INT32_TYPE, 0, &value, sizeof(int32))
+			> 0)
+		fInvokeEditor = (value != 0);
 
 	char buffer [B_PATH_NAME_LENGTH+1];
 	int32 length = file.ReadAttr("FilePanelPath", B_STRING_TYPE, 0, &buffer,
@@ -158,8 +154,8 @@ Model::SavePrefs()
 	value = fTextOnly ? 1 : 0;
 	file.WriteAttr("TextOnly", B_INT32_TYPE, 0, &value, sizeof(int32));
 
-	value = fInvokePe ? 1 : 0;
-	file.WriteAttr("InvokePe", B_INT32_TYPE, 0, &value, sizeof(int32));
+	value = fInvokeEditor ? 1 : 0;
+	file.WriteAttr("InvokeEditor", B_INT32_TYPE, 0, &value, sizeof(int32));
 
 	file.WriteAttr("WindowFrame", B_RECT_TYPE, 0, &fFrame, sizeof(BRect));
 

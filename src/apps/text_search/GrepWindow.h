@@ -57,7 +57,7 @@ private:
 			void				_OnRegularExpression();
 			void				_OnCaseSensitive();
 			void				_OnTextOnly();
-			void				_OnInvokePe();
+			void				_OnInvokeEditor();
 			void				_OnCheckboxShowLines();
 			void				_OnInvokeItem();
 			void				_OnSearchText();
@@ -74,7 +74,7 @@ private:
 			void				_OnNewWindow();
 
 			void				_ModelChanged();
-			bool				_OpenInPe(const entry_ref& ref, int32 lineNum);
+			bool				_OpenInEditor(const entry_ref& ref, int32 lineNum);
 			void				_RemoveFolderListDuplicates(BList* folderList);
 			status_t			_OpenFoldersInTracker(BList* folderList);
 			bool				_AreAllFoldersOpenInTracker(BList* folderList);
@@ -105,7 +105,7 @@ private:
 			BMenuItem*			fCaseSensitive;
 			BMenuItem*			fRegularExpression;
 			BMenuItem*			fTextOnly;
-			BMenuItem*			fInvokePe;
+			BMenuItem*			fInvokeEditor;
 			BMenu*				fHistoryMenu;
 			BMenu*				fEncodingMenu;
 			BMenuItem*			fUTF8;

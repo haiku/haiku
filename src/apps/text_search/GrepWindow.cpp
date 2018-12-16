@@ -18,6 +18,7 @@
 #include <Clipboard.h>
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
+#include <MimeType.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Roster.h>
@@ -92,7 +93,7 @@ GrepWindow::GrepWindow(BMessage* message)
 	fCaseSensitive(NULL),
 	fRegularExpression(NULL),
 	fTextOnly(NULL),
-	fInvokePe(NULL),
+	fInvokeEditor(NULL),
 	fHistoryMenu(NULL),
 	fEncodingMenu(NULL),
 	fUTF8(NULL),
@@ -218,8 +219,8 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnTextOnly();
 			break;
 
-		case MSG_INVOKE_PE:
-			_OnInvokePe();
+		case MSG_INVOKE_EDITOR:
+			_OnInvokeEditor();
 			break;
 
 		case MSG_SEARCH_TEXT:
@@ -457,8 +458,8 @@ GrepWindow::_CreateMenus()
 	fTextOnly = new BMenuItem(
 		B_TRANSLATE("Text files only"), new BMessage(MSG_TEXT_ONLY));
 
-	fInvokePe = new BMenuItem(
-		B_TRANSLATE("Open files in Pe"), new BMessage(MSG_INVOKE_PE));
+	fInvokeEditor = new BMenuItem(
+		B_TRANSLATE("Open files in code editor"), new BMessage(MSG_INVOKE_EDITOR));
 
 	fUTF8 = new BMenuItem("UTF8", new BMessage('utf8'));
 	fShiftJIS = new BMenuItem("ShiftJIS", new BMessage(B_SJIS_CONVERSION));
@@ -487,7 +488,7 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddItem(fCaseSensitive);
 	fPreferencesMenu->AddItem(fRegularExpression);
 	fPreferencesMenu->AddItem(fTextOnly);
-	fPreferencesMenu->AddItem(fInvokePe);
+	fPreferencesMenu->AddItem(fInvokeEditor);
 
 	fEncodingMenu->AddItem(fUTF8);
 	fEncodingMenu->AddItem(fShiftJIS);
@@ -608,7 +609,7 @@ GrepWindow::_LoadPrefs()
 	fCaseSensitive->SetMarked(fModel->fCaseSensitive);
 	fRegularExpression->SetMarked(fModel->fRegularExpression);
 	fTextOnly->SetMarked(fModel->fTextOnly);
-	fInvokePe->SetMarked(fModel->fInvokePe);
+	fInvokeEditor->SetMarked(fModel->fInvokeEditor);
 
 	fShowLinesCheckbox->SetValue(fModel->fShowLines);
 
@@ -1088,10 +1089,10 @@ GrepWindow::_OnTextOnly()
 
 
 void
-GrepWindow::_OnInvokePe()
+GrepWindow::_OnInvokeEditor()
 {
-	fModel->fInvokePe = !fModel->fInvokePe;
-	fInvokePe->SetMarked(fModel->fInvokePe);
+	fModel->fInvokeEditor = !fModel->fInvokeEditor;
+	fInvokeEditor->SetMarked(fModel->fInvokeEditor);
 	_SavePrefs();
 }
 
@@ -1179,7 +1180,7 @@ GrepWindow::_OnInvokeItem()
 
 		ResultItem* entry = dynamic_cast<ResultItem*>(item);
 		if (entry != NULL) {
-			if (fModel->fInvokePe && _OpenInPe(entry->ref, lineNum))
+			if (fModel->fInvokeEditor && _OpenInEditor(entry->ref, lineNum))
 				return;
 
 			// ask tracker to open it for us
@@ -1511,26 +1512,32 @@ GrepWindow::_ModelChanged()
 	_SavePrefs();
 }
 
-
 bool
-GrepWindow::_OpenInPe(const entry_ref &ref, int32 lineNum)
+GrepWindow::_OpenInEditor(const entry_ref &ref, int32 lineNum)
 {
-	BMessage message('Cmdl');
+	BMessage message(B_REFS_RECEIVED);
 	message.AddRef("refs", &ref);
 
-	if (lineNum != -1)
-		message.AddInt32("line", lineNum);
+	if (lineNum != -1) {
+		message.AddInt32("line", lineNum);	// for Pe
+		message.AddInt32("be:line", lineNum);
+	}
 
-	entry_ref pe;
-	if (be_roster->FindApp(PE_SIGNATURE, &pe) != B_OK)
+	// Find the preferred code editor
+	char editorSig[B_MIME_TYPE_LENGTH];
+	BMimeType mimeType("text/x-source-code");
+	mimeType.GetPreferredApp(editorSig);
+
+	entry_ref editor;
+	if (be_roster->FindApp(editorSig, &editor) != B_OK)
 		return false;
 
-	if (be_roster->IsRunning(&pe)) {
-		BMessenger msngr(NULL, be_roster->TeamFor(&pe));
+	if (be_roster->IsRunning(&editor)) {
+		BMessenger msngr(NULL, be_roster->TeamFor(&editor));
 		if (msngr.SendMessage(&message) != B_OK)
 			return false;
 	} else {
-		if (be_roster->Launch(&pe, &message) != B_OK)
+		if (be_roster->Launch(&editor, &message) != B_OK)
 			return false;
 	}
 
