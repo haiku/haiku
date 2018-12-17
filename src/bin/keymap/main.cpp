@@ -151,7 +151,7 @@ main(int argc, char** argv)
 	if (argc > optind && input == NULL)
 		input = argv[optind];
 
-	BApplication app("application/x-vnd.Haiku-keymap-cli");
+	BApplication* app = new BApplication("application/x-vnd.Haiku-keymap-cli");
 	Keymap keymap;
 
 	switch (mode) {
