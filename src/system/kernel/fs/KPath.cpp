@@ -356,6 +356,9 @@ KPath::Normalize(bool traverseLeafLink)
 KPath&
 KPath::operator=(const KPath& other)
 {
+	if (other.fBuffer == fBuffer)
+		return *this;
+
 	SetTo(other.fBuffer, fLazy ? KPath::LAZY_ALLOC : KPath::DEFAULT,
 		other.fBufferSize);
 	return *this;
