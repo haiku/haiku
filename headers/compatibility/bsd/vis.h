@@ -35,6 +35,10 @@
 #ifndef _VIS_H_
 #define	_VIS_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 #include <sys/types.h>
 
 /*
@@ -118,5 +122,7 @@ int	strnunvisx(char *, size_t, const char *, int);
 int	unvis(char *, int, int *, int);
 #endif
 __END_DECLS
+
+#endif
 
 #endif /* !_VIS_H_ */
