@@ -12,7 +12,12 @@
 
 #include <tls.h>
 
+#include <locks.h>
 #include <util/kernel_cpp.h>
+
+
+static const char* const kLockName = "runtime loader tls";
+static mutex sLock = MUTEX_INITIALIZER(kLockName);
 
 
 class TLSBlock {
@@ -277,6 +282,13 @@ DynamicThreadVector::_ResizeVector(unsigned minimumSize)
 	static const unsigned kInitialSize = 4;
 	unsigned size = std::max(minimumSize, kInitialSize);
 	unsigned oldSize = _Size();
+	if (size <= oldSize)
+		return B_OK;
+
+	MutexLocker _(sLock);
+
+	// If the size has changed in the meantime, we're done.
+	oldSize = _Size();
 	if (size <= oldSize)
 		return B_OK;
 
