@@ -314,14 +314,17 @@ FindURL(const BString& string, int32 startIndex, int32& urlPos,
 	urlLength = strcspn(str, " \t<>)\"\\,\r\n");
 
 	// filter out some punctuation marks if they are the last character
-	char suffix = str[urlLength - 1];
-	while (suffix == '.'
-			|| suffix == ','
-			|| suffix == '?'
-			|| suffix == '!'
-			|| suffix == ':'
-			|| suffix == ';')
+	while (urlLength > 0) {
+		char suffix = str[urlLength - 1];
+		if (suffix != '.'
+				&& suffix != ','
+				&& suffix != '?'
+				&& suffix != '!'
+				&& suffix != ':'
+				&& suffix != ';')
+			break;
 		urlLength--;
+	}
 
 	if (urlString != NULL)
 		*urlString = BString(string.String() + urlPos, urlLength);
