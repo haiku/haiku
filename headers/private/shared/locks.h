@@ -117,6 +117,24 @@ public:
 	}
 };
 
+typedef AutoLocker<mutex, MutexLocking> MutexLocker;
+
+
+class RecursiveLockLocking {
+public:
+	inline bool Lock(recursive_lock *lockable)
+	{
+		return recursive_lock_lock(lockable) == B_OK;
+	}
+
+	inline void Unlock(recursive_lock *lockable)
+	{
+		recursive_lock_unlock(lockable);
+	}
+};
+
+typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
+
 
 class RWLockReadLocking {
 public:
@@ -146,7 +164,6 @@ public:
 };
 
 
-typedef AutoLocker<mutex, MutexLocking> MutexLocker;
 typedef AutoLocker<rw_lock, RWLockReadLocking> ReadLocker;
 typedef AutoLocker<rw_lock, RWLockWriteLocking> WriteLocker;
 
