@@ -288,9 +288,17 @@ grow_heap(size_t bytes)
 
 
 status_t
-heap_init(void)
+heap_init()
 {
 	return add_area(kInitialHeapSize);
+}
+
+
+status_t
+heap_reinit_after_fork()
+{
+	recursive_lock_init(&sLock, kLockName);
+	return B_OK;
 }
 
 
