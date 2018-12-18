@@ -34,6 +34,7 @@ SimpleTest signal_in_allocator_test2 : signal_in_allocator_test2.cpp ;
 SimpleTest signal_test : signal_test.cpp ;
 SimpleTest sigsetjmp_test : sigsetjmp_test.c ;
 SimpleTest test_time : test_time.c ;
+#SimpleTest tls_concurrency_test : tls_concurrency_test.cpp ;
 SimpleTest tst-mktime : tst-mktime.c ;
 SimpleTest <test>truncate : truncate.cpp ;
 SimpleTest init_rld_after_fork_test : init_rld_after_fork_test.cpp ;
