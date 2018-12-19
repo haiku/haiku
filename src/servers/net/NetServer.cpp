@@ -769,9 +769,11 @@ NetServer::_BringUpInterfaces()
 	// TODO: also check if the networking driver is correctly initialized!
 	//	(and check for other devices to take over its configuration)
 
-	// if a missing device has been found, add it to /dev/net
-	_ConfigureDevices("/dev/net",
-		missingDevice.HasString("device") ? &missingDevice : NULL);
+	if (!_TestForInterface("/dev/net/")) {
+		// there is no driver configured - see if there is one and try to use it
+		_ConfigureDevices("/dev/net",
+			missingDevice.HasString("device") ? &missingDevice : NULL);
+	}
 }
 
 
