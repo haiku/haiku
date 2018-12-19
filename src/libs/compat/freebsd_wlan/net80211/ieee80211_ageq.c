@@ -37,7 +37,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_ageq.c 326272 2017-11-27 
 #include <sys/systm.h> 
 #include <sys/kernel.h>
 #include <sys/malloc.h>
- 
+
 #include <sys/socket.h>
 
 #include <net/if.h>

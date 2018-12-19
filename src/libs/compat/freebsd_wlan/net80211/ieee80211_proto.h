@@ -152,10 +152,12 @@ uint8_t *ieee80211_add_qos(uint8_t *, const struct ieee80211_node *);
 uint16_t ieee80211_getcapinfo(struct ieee80211vap *,
 		struct ieee80211_channel *);
 struct ieee80211_wme_state;
-uint8_t * ieee80211_add_wme_info(uint8_t *frm, struct ieee80211_wme_state *wme);
+uint8_t * ieee80211_add_wme_info(uint8_t *frm, struct ieee80211_wme_state *wme,
+	    struct ieee80211_node *ni);
 
+void	ieee80211_vap_reset_erp(struct ieee80211vap *);
 void	ieee80211_reset_erp(struct ieee80211com *);
-void	ieee80211_set_shortslottime(struct ieee80211com *, int onoff);
+void	ieee80211_vap_set_shortslottime(struct ieee80211vap *, int onoff);
 int	ieee80211_iserp_rateset(const struct ieee80211_rateset *);
 void	ieee80211_setbasicrates(struct ieee80211_rateset *,
 		enum ieee80211_phymode);
@@ -284,7 +286,7 @@ struct ieee80211_wme_state {
 	u_int	wme_hipri_switch_thresh;/* aggressive mode switch thresh */
 	u_int	wme_hipri_switch_hysteresis;/* aggressive mode switch hysteresis */
 
-	struct wmeParams wme_params[4];		/* from assoc resp for each AC*/
+	struct wmeParams wme_params[WME_NUM_AC]; /* from assoc resp for each AC */
 	struct chanAccParams wme_wmeChanParams;	/* WME params applied to self */
 	struct chanAccParams wme_wmeBssChanParams;/* WME params bcast to stations */
 	struct chanAccParams wme_chanParams;	/* params applied to self */
@@ -301,6 +303,25 @@ void	ieee80211_wme_vap_getparams(struct ieee80211vap *vap,
 void	ieee80211_wme_ic_getparams(struct ieee80211com *ic,
 	    struct chanAccParams *);
 int	ieee80211_wme_vap_ac_is_noack(struct ieee80211vap *vap, int ac);
+void	ieee80211_vap_update_preamble(struct ieee80211vap *vap);
+void	ieee80211_vap_update_erp_protmode(struct ieee80211vap *vap);
+void	ieee80211_vap_update_ht_protmode(struct ieee80211vap *vap);
+
+/*
+ * Return pointer to the QoS field from a Qos frame.
+ */
+static __inline uint8_t *
+ieee80211_getqos(void *data)
+{
+	struct ieee80211_frame *wh = (struct ieee80211_frame *)data;
+
+	KASSERT(IEEE80211_QOS_HAS_SEQ(wh), ("QoS field is absent!"));
+
+	if (IEEE80211_IS_DSTODS(wh))
+		return (((struct ieee80211_qosframe_addr4 *)wh)->i_qos);
+	else
+		return (((struct ieee80211_qosframe *)wh)->i_qos);
+}
 
 /*
  * Return the WME TID from a QoS frame.  If no TID
@@ -439,4 +460,5 @@ void	ieee80211_notify_node_auth(struct ieee80211_node *);
 void	ieee80211_notify_country(struct ieee80211vap *, const uint8_t [],
 		const uint8_t cc[2]);
 void	ieee80211_notify_radio(struct ieee80211com *, int);
+void	ieee80211_notify_ifnet_change(struct ieee80211vap *);
 #endif /* _NET80211_IEEE80211_PROTO_H_ */

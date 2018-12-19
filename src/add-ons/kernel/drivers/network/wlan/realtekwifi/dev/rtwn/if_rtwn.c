@@ -153,9 +153,6 @@ static void		rtwn_stop(struct rtwn_softc *);
 
 MALLOC_DEFINE(M_RTWN_PRIV, "rtwn_priv", "rtwn driver private state");
 
-static const uint8_t rtwn_chan_2ghz[] =
-	{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-
 static const uint16_t wme2reg[] =
 	{ R92C_EDCA_BE_PARAM, R92C_EDCA_BK_PARAM,
 	  R92C_EDCA_VI_PARAM, R92C_EDCA_VO_PARAM };
@@ -1528,26 +1525,29 @@ rtwn_getradiocaps(struct ieee80211com *ic,
 {
 	struct rtwn_softc *sc = ic->ic_softc;
 	uint8_t bands[IEEE80211_MODE_BYTES];
-	int i;
+	int cbw_flags, i;
+
+	cbw_flags = (ic->ic_htcaps & IEEE80211_HTCAP_CHWIDTH40) ?
+	    NET80211_CBW_FLAG_HT40 : 0;
 
 	memset(bands, 0, sizeof(bands));
 	setbit(bands, IEEE80211_MODE_11B);
 	setbit(bands, IEEE80211_MODE_11G);
 	setbit(bands, IEEE80211_MODE_11NG);
-	ieee80211_add_channel_list_2ghz(chans, maxchans, nchans,
-	    rtwn_chan_2ghz, nitems(rtwn_chan_2ghz), bands,
-	    !!(ic->ic_htcaps & IEEE80211_HTCAP_CHWIDTH40));
+	ieee80211_add_channels_default_2ghz(chans, maxchans, nchans,
+	    bands, cbw_flags);
 
 	/* XXX workaround add_channel_list() limitations */
 	setbit(bands, IEEE80211_MODE_11A);
 	setbit(bands, IEEE80211_MODE_11NA);
 	for (i = 0; i < nitems(sc->chan_num_5ghz); i++) {
+
 		if (sc->chan_num_5ghz[i] == 0)
 			continue;
 
 		ieee80211_add_channel_list_5ghz(chans, maxchans, nchans,
 		    sc->chan_list_5ghz[i], sc->chan_num_5ghz[i], bands,
-		    !!(ic->ic_htcaps & IEEE80211_HTCAP_CHWIDTH40));
+		    cbw_flags);
 	}
 }
 
