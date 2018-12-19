@@ -359,13 +359,13 @@ AcpiUtPrefixedNamespaceError (
     case AE_NOT_FOUND:
 
         AcpiOsPrintf (ACPI_MSG_BIOS_ERROR);
-        Message = "Failure looking up";
+        Message = "Could not resolve";
         break;
 
     default:
 
         AcpiOsPrintf (ACPI_MSG_ERROR);
-        Message = "Failure looking up";
+        Message = "Failure resolving";
         break;
     }
 

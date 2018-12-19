@@ -586,6 +586,9 @@ AcpiDsEvalRegionOperands (
         ObjDesc, ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
         ObjDesc->Region.Length));
 
+    Status = AcpiUtAddAddressRange (ObjDesc->Region.SpaceId,
+        ObjDesc->Region.Address, ObjDesc->Region.Length, Node);
+
     /* Now the address and length are valid for this opregion */
 
     ObjDesc->Region.Flags |= AOPOBJ_DATA_VALID;
@@ -752,8 +755,8 @@ AcpiDsEvalDataObjectOperands (
     if (!Op->Common.Value.Arg)
     {
         ACPI_ERROR ((AE_INFO,
-            "Dispatch: Missing child while executing TermArg for %X",
-            Op->Common.AmlOpcode));
+            "Missing child while evaluating opcode %4.4X, Op %p",
+            Op->Common.AmlOpcode, Op));
         return_ACPI_STATUS (AE_OK);
     }
 

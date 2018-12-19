@@ -576,7 +576,7 @@ AcpiPsParseAml (
 
     if (!WalkState->ParserState.Aml)
     {
-        return_ACPI_STATUS (AE_NULL_OBJECT);
+        return_ACPI_STATUS (AE_BAD_ADDRESS);
     }
 
     /* Create and initialize a new thread state */
@@ -637,6 +637,18 @@ AcpiPsParseAml (
             "Completed one call to walk loop, %s State=%p\n",
             AcpiFormatException (Status), WalkState));
 
+        if (WalkState->MethodPathname && WalkState->MethodIsNested)
+        {
+            /* Optional object evaluation log */
+
+            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_EVALUATION, "%-26s:  %*s%s\n",
+                "   Exit nested method",
+                (WalkState->MethodNestingDepth + 1) * 3, " ",
+                &WalkState->MethodPathname[1]));
+
+            ACPI_FREE (WalkState->MethodPathname);
+            WalkState->MethodIsNested = FALSE;
+        }
         if (Status == AE_CTRL_TRANSFER)
         {
             /*

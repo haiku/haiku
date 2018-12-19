@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: nsload - namespace loading/expanding/contracting procedures
+ * Module Name: exserial - FieldUnit support for serial address spaces
  *
  *****************************************************************************/
 
@@ -151,328 +151,358 @@
 
 #include "acpi.h"
 #include "accommon.h"
-#include "acnamesp.h"
 #include "acdispat.h"
-#include "actables.h"
 #include "acinterp.h"
+#include "amlcode.h"
 
 
-#define _COMPONENT          ACPI_NAMESPACE
-        ACPI_MODULE_NAME    ("nsload")
-
-/* Local prototypes */
-
-#ifdef ACPI_FUTURE_IMPLEMENTATION
-ACPI_STATUS
-AcpiNsUnloadNamespace (
-    ACPI_HANDLE             Handle);
-
-static ACPI_STATUS
-AcpiNsDeleteSubtree (
-    ACPI_HANDLE             StartHandle);
-#endif
+#define _COMPONENT          ACPI_EXECUTER
+        ACPI_MODULE_NAME    ("exserial")
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiNsLoadTable
+ * FUNCTION:    AcpiExReadGpio
  *
- * PARAMETERS:  TableIndex      - Index for table to be loaded
- *              Node            - Owning NS node
+ * PARAMETERS:  ObjDesc             - The named field to read
+ *              Buffer              - Where the return data is returnd
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load one ACPI table into the namespace
+ * DESCRIPTION: Read from a named field that references a Generic Serial Bus
+ *              field
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsLoadTable (
-    UINT32                  TableIndex,
-    ACPI_NAMESPACE_NODE     *Node)
+AcpiExReadGpio (
+    ACPI_OPERAND_OBJECT     *ObjDesc,
+    void                    *Buffer)
 {
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE (NsLoadTable);
+    ACPI_FUNCTION_TRACE_PTR (ExReadGpio, ObjDesc);
 
-
-    /* If table already loaded into namespace, just return */
-
-    if (AcpiTbIsTableLoaded (TableIndex))
-    {
-        Status = AE_ALREADY_EXISTS;
-        goto Unlock;
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Loading table into namespace ****\n"));
-
-    Status = AcpiTbAllocateOwnerId (TableIndex);
-    if (ACPI_FAILURE (Status))
-    {
-        goto Unlock;
-    }
 
     /*
-     * Parse the table and load the namespace with all named
-     * objects found within. Control methods are NOT parsed
-     * at this time. In fact, the control methods cannot be
-     * parsed until the entire namespace is loaded, because
-     * if a control method makes a forward reference (call)
-     * to another control method, we can't continue parsing
-     * because we don't know how many arguments to parse next!
+     * For GPIO (GeneralPurposeIo), the Address will be the bit offset
+     * from the previous Connection() operator, making it effectively a
+     * pin number index. The BitLength is the length of the field, which
+     * is thus the number of pins.
      */
-    Status = AcpiNsParseTable (TableIndex, Node);
-    if (ACPI_SUCCESS (Status))
-    {
-        AcpiTbSetTableLoadedFlag (TableIndex, TRUE);
-    }
-    else
-    {
-        /*
-         * On error, delete any namespace objects created by this table.
-         * We cannot initialize these objects, so delete them. There are
-         * a couple of expecially bad cases:
-         * AE_ALREADY_EXISTS - namespace collision.
-         * AE_NOT_FOUND - the target of a Scope operator does not
-         * exist. This target of Scope must already exist in the
-         * namespace, as per the ACPI specification.
-         */
-        AcpiNsDeleteNamespaceByOwner (
-            AcpiGbl_RootTableList.Tables[TableIndex].OwnerId);
+    ACPI_DEBUG_PRINT ((ACPI_DB_BFIELD,
+        "GPIO FieldRead [FROM]:  Pin %u Bits %u\n",
+        ObjDesc->Field.PinNumberIndex, ObjDesc->Field.BitLength));
 
-        AcpiTbReleaseOwnerId (TableIndex);
-        return_ACPI_STATUS (Status);
-    }
+    /* Lock entire transaction if requested */
 
-Unlock:
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
+    AcpiExAcquireGlobalLock (ObjDesc->CommonField.FieldFlags);
+
+    /* Perform the read */
+
+    Status = AcpiExAccessRegion (
+        ObjDesc, 0, (UINT64 *) Buffer, ACPI_READ);
+
+    AcpiExReleaseGlobalLock (ObjDesc->CommonField.FieldFlags);
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiExWriteGpio
+ *
+ * PARAMETERS:  SourceDesc          - Contains data to write. Expect to be
+ *                                    an Integer object.
+ *              ObjDesc             - The named field
+ *              ResultDesc          - Where the return value is returned, if any
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Write to a named field that references a General Purpose I/O
+ *              field.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiExWriteGpio (
+    ACPI_OPERAND_OBJECT     *SourceDesc,
+    ACPI_OPERAND_OBJECT     *ObjDesc,
+    ACPI_OPERAND_OBJECT     **ReturnBuffer)
+{
+    ACPI_STATUS             Status;
+    void                    *Buffer;
+
+
+    ACPI_FUNCTION_TRACE_PTR (ExWriteGpio, ObjDesc);
+
 
     /*
-     * Now we can parse the control methods. We always parse
-     * them here for a sanity check, and if configured for
-     * just-in-time parsing, we delete the control method
-     * parse trees.
+     * For GPIO (GeneralPurposeIo), we will bypass the entire field
+     * mechanism and handoff the bit address and bit width directly to
+     * the handler. The Address will be the bit offset
+     * from the previous Connection() operator, making it effectively a
+     * pin number index. The BitLength is the length of the field, which
+     * is thus the number of pins.
      */
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Begin Table Object Initialization\n"));
+    if (SourceDesc->Common.Type != ACPI_TYPE_INTEGER)
+    {
+        return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
+    }
 
-    AcpiExEnterInterpreter ();
-    Status = AcpiDsInitializeObjects (TableIndex, Node);
-    AcpiExExitInterpreter ();
+    ACPI_DEBUG_PRINT ((ACPI_DB_BFIELD,
+        "GPIO FieldWrite [FROM]: (%s:%X), Value %.8X  [TO]: Pin %u Bits %u\n",
+        AcpiUtGetTypeName (SourceDesc->Common.Type),
+        SourceDesc->Common.Type, (UINT32) SourceDesc->Integer.Value,
+        ObjDesc->Field.PinNumberIndex, ObjDesc->Field.BitLength));
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Completed Table Object Initialization\n"));
+    Buffer = &SourceDesc->Integer.Value;
+
+    /* Lock entire transaction if requested */
+
+    AcpiExAcquireGlobalLock (ObjDesc->CommonField.FieldFlags);
+
+    /* Perform the write */
+
+    Status = AcpiExAccessRegion (
+        ObjDesc, 0, (UINT64 *) Buffer, ACPI_WRITE);
+    AcpiExReleaseGlobalLock (ObjDesc->CommonField.FieldFlags);
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiExReadSerialBus
+ *
+ * PARAMETERS:  ObjDesc             - The named field to read
+ *              ReturnBuffer        - Where the return value is returned, if any
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Read from a named field that references a serial bus
+ *              (SMBus, IPMI, or GSBus).
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiExReadSerialBus (
+    ACPI_OPERAND_OBJECT     *ObjDesc,
+    ACPI_OPERAND_OBJECT     **ReturnBuffer)
+{
+    ACPI_STATUS             Status;
+    UINT32                  BufferLength;
+    ACPI_OPERAND_OBJECT     *BufferDesc;
+    UINT32                  Function;
+    UINT16                  AccessorType;
+
+
+    ACPI_FUNCTION_TRACE_PTR (ExReadSerialBus, ObjDesc);
+
 
     /*
-     * This case handles the legacy option that groups all module-level
-     * code blocks together and defers execution until all of the tables
-     * are loaded. Execute all of these blocks at this time.
-     * Execute any module-level code that was detected during the table
-     * load phase.
+     * This is an SMBus, GSBus or IPMI read. We must create a buffer to
+     * hold the data and then directly access the region handler.
      *
-     * Note: this option is deprecated and will be eliminated in the
-     * future. Use of this option can cause problems with AML code that
-     * depends upon in-order immediate execution of module-level code.
+     * Note: SMBus and GSBus protocol value is passed in upper 16-bits
+     * of Function
+     *
+     * Common buffer format:
+     *     Status;    (Byte 0 of the data buffer)
+     *     Length;    (Byte 1 of the data buffer)
+     *     Data[x-1]: (Bytes 2-x of the arbitrary length data buffer)
      */
-    AcpiNsExecModuleCodeList ();
+    switch (ObjDesc->Field.RegionObj->Region.SpaceId)
+    {
+    case ACPI_ADR_SPACE_SMBUS:
+
+        BufferLength = ACPI_SMBUS_BUFFER_SIZE;
+        Function = ACPI_READ | (ObjDesc->Field.Attribute << 16);
+        break;
+
+    case ACPI_ADR_SPACE_IPMI:
+
+        BufferLength = ACPI_IPMI_BUFFER_SIZE;
+        Function = ACPI_READ;
+        break;
+
+    case ACPI_ADR_SPACE_GSBUS:
+
+        AccessorType = ObjDesc->Field.Attribute;
+        if (AccessorType == AML_FIELD_ATTRIB_RAW_PROCESS_BYTES)
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Invalid direct read using bidirectional write-then-read protocol"));
+
+            return_ACPI_STATUS (AE_AML_PROTOCOL);
+        }
+
+        Status = AcpiExGetProtocolBufferLength (AccessorType, &BufferLength);
+        if (ACPI_FAILURE (Status))
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Invalid protocol ID for GSBus: 0x%4.4X", AccessorType));
+
+            return_ACPI_STATUS (Status);
+        }
+
+        /* Add header length to get the full size of the buffer */
+
+        BufferLength += ACPI_SERIAL_HEADER_SIZE;
+        Function = ACPI_READ | (AccessorType << 16);
+        break;
+
+    default:
+        return_ACPI_STATUS (AE_AML_INVALID_SPACE_ID);
+    }
+
+    /* Create the local transfer buffer that is returned to the caller */
+
+    BufferDesc = AcpiUtCreateBufferObject (BufferLength);
+    if (!BufferDesc)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    /* Lock entire transaction if requested */
+
+    AcpiExAcquireGlobalLock (ObjDesc->CommonField.FieldFlags);
+
+    /* Call the region handler for the write-then-read */
+
+    Status = AcpiExAccessRegion (ObjDesc, 0,
+        ACPI_CAST_PTR (UINT64, BufferDesc->Buffer.Pointer), Function);
+    AcpiExReleaseGlobalLock (ObjDesc->CommonField.FieldFlags);
+
+    *ReturnBuffer = BufferDesc;
     return_ACPI_STATUS (Status);
 }
 
 
-#ifdef ACPI_OBSOLETE_FUNCTIONS
 /*******************************************************************************
  *
- * FUNCTION:    AcpiLoadNamespace
+ * FUNCTION:    AcpiExWriteSerialBus
  *
- * PARAMETERS:  None
+ * PARAMETERS:  SourceDesc          - Contains data to write
+ *              ObjDesc             - The named field
+ *              ReturnBuffer        - Where the return value is returned, if any
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Load the name space from what ever is pointed to by DSDT.
- *              (DSDT points to either the BIOS or a buffer.)
+ * DESCRIPTION: Write to a named field that references a serial bus
+ *              (SMBus, IPMI, GSBus).
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsLoadNamespace (
-    void)
+AcpiExWriteSerialBus (
+    ACPI_OPERAND_OBJECT     *SourceDesc,
+    ACPI_OPERAND_OBJECT     *ObjDesc,
+    ACPI_OPERAND_OBJECT     **ReturnBuffer)
 {
     ACPI_STATUS             Status;
+    UINT32                  BufferLength;
+    UINT32                  DataLength;
+    void                    *Buffer;
+    ACPI_OPERAND_OBJECT     *BufferDesc;
+    UINT32                  Function;
+    UINT16                  AccessorType;
 
 
-    ACPI_FUNCTION_TRACE (AcpiLoadNameSpace);
+    ACPI_FUNCTION_TRACE_PTR (ExWriteSerialBus, ObjDesc);
 
-
-    /* There must be at least a DSDT installed */
-
-    if (AcpiGbl_DSDT == NULL)
-    {
-        ACPI_ERROR ((AE_INFO, "DSDT is not in memory"));
-        return_ACPI_STATUS (AE_NO_ACPI_TABLES);
-    }
 
     /*
-     * Load the namespace. The DSDT is required,
-     * but the SSDT and PSDT tables are optional.
+     * This is an SMBus, GSBus or IPMI write. We will bypass the entire
+     * field mechanism and handoff the buffer directly to the handler.
+     * For these address spaces, the buffer is bidirectional; on a
+     * write, return data is returned in the same buffer.
+     *
+     * Source must be a buffer of sufficient size, these are fixed size:
+     * ACPI_SMBUS_BUFFER_SIZE, or ACPI_IPMI_BUFFER_SIZE.
+     *
+     * Note: SMBus and GSBus protocol type is passed in upper 16-bits
+     * of Function
+     *
+     * Common buffer format:
+     *     Status;    (Byte 0 of the data buffer)
+     *     Length;    (Byte 1 of the data buffer)
+     *     Data[x-1]: (Bytes 2-x of the arbitrary length data buffer)
      */
-    Status = AcpiNsLoadTableByType (ACPI_TABLE_ID_DSDT);
-    if (ACPI_FAILURE (Status))
+    if (SourceDesc->Common.Type != ACPI_TYPE_BUFFER)
     {
-        return_ACPI_STATUS (Status);
+        ACPI_ERROR ((AE_INFO,
+            "SMBus/IPMI/GenericSerialBus write requires "
+            "Buffer, found type %s",
+            AcpiUtGetObjectTypeName (SourceDesc)));
+
+        return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
     }
 
-    /* Ignore exceptions from these */
+    switch (ObjDesc->Field.RegionObj->Region.SpaceId)
+    {
+    case ACPI_ADR_SPACE_SMBUS:
 
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_SSDT);
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_PSDT);
+        BufferLength = ACPI_SMBUS_BUFFER_SIZE;
+        Function = ACPI_WRITE | (ObjDesc->Field.Attribute << 16);
+        break;
 
-    ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "ACPI Namespace successfully loaded at root %p\n",
-        AcpiGbl_RootNode));
+    case ACPI_ADR_SPACE_IPMI:
 
-    return_ACPI_STATUS (Status);
-}
-#endif
+        BufferLength = ACPI_IPMI_BUFFER_SIZE;
+        Function = ACPI_WRITE;
+        break;
 
-#ifdef ACPI_FUTURE_IMPLEMENTATION
-/*******************************************************************************
- *
- * FUNCTION:    AcpiNsDeleteSubtree
- *
- * PARAMETERS:  StartHandle         - Handle in namespace where search begins
- *
- * RETURNS      Status
- *
- * DESCRIPTION: Walks the namespace starting at the given handle and deletes
- *              all objects, entries, and scopes in the entire subtree.
- *
- *              Namespace/Interpreter should be locked or the subsystem should
- *              be in shutdown before this routine is called.
- *
- ******************************************************************************/
+    case ACPI_ADR_SPACE_GSBUS:
 
-static ACPI_STATUS
-AcpiNsDeleteSubtree (
-    ACPI_HANDLE             StartHandle)
-{
-    ACPI_STATUS             Status;
-    ACPI_HANDLE             ChildHandle;
-    ACPI_HANDLE             ParentHandle;
-    ACPI_HANDLE             NextChildHandle;
-    ACPI_HANDLE             Dummy;
-    UINT32                  Level;
+        AccessorType = ObjDesc->Field.Attribute;
+        Status = AcpiExGetProtocolBufferLength (AccessorType, &BufferLength);
+        if (ACPI_FAILURE (Status))
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Invalid protocol ID for GSBus: 0x%4.4X", AccessorType));
 
+            return_ACPI_STATUS (Status);
+        }
 
-    ACPI_FUNCTION_TRACE (NsDeleteSubtree);
+        /* Add header length to get the full size of the buffer */
 
+        BufferLength += ACPI_SERIAL_HEADER_SIZE;
+        Function = ACPI_WRITE | (AccessorType << 16);
+        break;
 
-    ParentHandle = StartHandle;
-    ChildHandle = NULL;
-    Level = 1;
+    default:
+        return_ACPI_STATUS (AE_AML_INVALID_SPACE_ID);
+    }
+
+    /* Create the transfer/bidirectional/return buffer */
+
+    BufferDesc = AcpiUtCreateBufferObject (BufferLength);
+    if (!BufferDesc)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    /* Copy the input buffer data to the transfer buffer */
+
+    Buffer = BufferDesc->Buffer.Pointer;
+    DataLength = (BufferLength < SourceDesc->Buffer.Length ?
+        BufferLength : SourceDesc->Buffer.Length);
+    memcpy (Buffer, SourceDesc->Buffer.Pointer, DataLength);
+
+    /* Lock entire transaction if requested */
+
+    AcpiExAcquireGlobalLock (ObjDesc->CommonField.FieldFlags);
 
     /*
-     * Traverse the tree of objects until we bubble back up
-     * to where we started.
+     * Perform the write (returns status and perhaps data in the
+     * same buffer)
      */
-    while (Level > 0)
-    {
-        /* Attempt to get the next object in this scope */
+    Status = AcpiExAccessRegion (
+        ObjDesc, 0, (UINT64 *) Buffer, Function);
+    AcpiExReleaseGlobalLock (ObjDesc->CommonField.FieldFlags);
 
-        Status = AcpiGetNextObject (ACPI_TYPE_ANY, ParentHandle,
-            ChildHandle, &NextChildHandle);
-
-        ChildHandle = NextChildHandle;
-
-        /* Did we get a new object? */
-
-        if (ACPI_SUCCESS (Status))
-        {
-            /* Check if this object has any children */
-
-            if (ACPI_SUCCESS (AcpiGetNextObject (ACPI_TYPE_ANY, ChildHandle,
-                NULL, &Dummy)))
-            {
-                /*
-                 * There is at least one child of this object,
-                 * visit the object
-                 */
-                Level++;
-                ParentHandle = ChildHandle;
-                ChildHandle  = NULL;
-            }
-        }
-        else
-        {
-            /*
-             * No more children in this object, go back up to
-             * the object's parent
-             */
-            Level--;
-
-            /* Delete all children now */
-
-            AcpiNsDeleteChildren (ChildHandle);
-
-            ChildHandle = ParentHandle;
-            Status = AcpiGetParent (ParentHandle, &ParentHandle);
-            if (ACPI_FAILURE (Status))
-            {
-                return_ACPI_STATUS (Status);
-            }
-        }
-    }
-
-    /* Now delete the starting object, and we are done */
-
-    AcpiNsRemoveNode (ChildHandle);
-    return_ACPI_STATUS (AE_OK);
-}
-
-
-/*******************************************************************************
- *
- *  FUNCTION:       AcpiNsUnloadNameSpace
- *
- *  PARAMETERS:     Handle          - Root of namespace subtree to be deleted
- *
- *  RETURN:         Status
- *
- *  DESCRIPTION:    Shrinks the namespace, typically in response to an undocking
- *                  event. Deletes an entire subtree starting from (and
- *                  including) the given handle.
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiNsUnloadNamespace (
-    ACPI_HANDLE             Handle)
-{
-    ACPI_STATUS             Status;
-
-
-    ACPI_FUNCTION_TRACE (NsUnloadNameSpace);
-
-
-    /* Parameter validation */
-
-    if (!AcpiGbl_RootNode)
-    {
-        return_ACPI_STATUS (AE_NO_NAMESPACE);
-    }
-
-    if (!Handle)
-    {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    /* This function does the real work */
-
-    Status = AcpiNsDeleteSubtree (Handle);
+    *ReturnBuffer = BufferDesc;
     return_ACPI_STATUS (Status);
 }
-#endif

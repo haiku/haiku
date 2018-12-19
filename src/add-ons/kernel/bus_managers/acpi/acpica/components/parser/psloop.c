@@ -164,6 +164,7 @@
 #include "acdispat.h"
 #include "amlcode.h"
 #include "acconvert.h"
+#include "acnamesp.h"
 
 #define _COMPONENT          ACPI_PARSER
         ACPI_MODULE_NAME    ("psloop")
@@ -283,14 +284,22 @@ AcpiPsGetArguments (
         }
 
         ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
-            "Final argument count: %u pass %u\n",
+            "Final argument count: %8.8X pass %u\n",
             WalkState->ArgCount, WalkState->PassNumber));
 
         /*
-         * Handle executable code at "module-level". This refers to
-         * executable opcodes that appear outside of any control method.
+         * This case handles the legacy option that groups all module-level
+         * code blocks together and defers execution until all of the tables
+         * are loaded. Execute all of these blocks at this time.
+         * Execute any module-level code that was detected during the table
+         * load phase.
+         *
+         * Note: this option is deprecated and will be eliminated in the
+         * future. Use of this option can cause problems with AML code that
+         * depends upon in-order immediate execution of module-level code.
          */
-        if ((WalkState->PassNumber <= ACPI_IMODE_LOAD_PASS2) &&
+        if (!AcpiGbl_ExecuteTablesAsMethods &&
+            (WalkState->PassNumber <= ACPI_IMODE_LOAD_PASS2) &&
             ((WalkState->ParseFlags & ACPI_PARSE_DISASSEMBLE) == 0))
         {
             /*
@@ -440,6 +449,16 @@ AcpiPsGetArguments (
  *              object to the global list. Note, the mutex field of the method
  *              object is used to link multiple module-level code objects.
  *
+ * NOTE: In this legacy option, each block of detected executable AML
+ * code that is outside of any control method is wrapped with a temporary
+ * control method object and placed on a global list below.
+ *
+ * This function executes the module-level code for all tables only after
+ * all of the tables have been loaded. It is a legacy option and is
+ * not compatible with other ACPI implementations. See AcpiNsLoadTable.
+ *
+ * This function will be removed when the legacy option is removed.
+ *
  ******************************************************************************/
 
 static void
@@ -547,6 +566,7 @@ AcpiPsParseLoop (
     ACPI_PARSE_OBJECT       *Op = NULL;     /* current op */
     ACPI_PARSE_STATE        *ParserState;
     UINT8                   *AmlOpStart = NULL;
+    UINT8                   OpcodeLength;
 
 
     ACPI_FUNCTION_TRACE_PTR (PsParseLoop, WalkState);
@@ -560,7 +580,7 @@ AcpiPsParseLoop (
     ParserState = &WalkState->ParserState;
     WalkState->ArgTypes = 0;
 
-#if (!defined (ACPI_NO_METHOD_EXECUTION) && !defined (ACPI_CONSTANT_EVAL_ONLY))
+#ifndef ACPI_CONSTANT_EVAL_ONLY
 
     if (WalkState->WalkType & ACPI_WALK_METHOD_RESTART)
     {
@@ -627,6 +647,18 @@ AcpiPsParseLoop (
             Status = AcpiPsCreateOp (WalkState, AmlOpStart, &Op);
             if (ACPI_FAILURE (Status))
             {
+                /*
+                 * ACPI_PARSE_MODULE_LEVEL means that we are loading a table by
+                 * executing it as a control method. However, if we encounter
+                 * an error while loading the table, we need to keep trying to
+                 * load the table rather than aborting the table load. Set the
+                 * status to AE_OK to proceed with the table load.
+                 */
+                if ((WalkState->ParseFlags & ACPI_PARSE_MODULE_LEVEL) &&
+                    ((Status == AE_ALREADY_EXISTS) || (Status == AE_NOT_FOUND)))
+                {
+                    Status = AE_OK;
+                }
                 if (Status == AE_CTRL_PARSE_CONTINUE)
                 {
                     continue;
@@ -646,6 +678,32 @@ AcpiPsParseLoop (
                 if (ACPI_FAILURE (Status))
                 {
                     return_ACPI_STATUS (Status);
+                }
+                if (AcpiNsOpensScope (
+                    AcpiPsGetOpcodeInfo (WalkState->Opcode)->ObjectType))
+                {
+                    /*
+                     * If the scope/device op fails to parse, skip the body of
+                     * the scope op because the parse failure indicates that
+                     * the device may not exist.
+                     */
+                    ACPI_INFO (("Skipping parse of AML opcode: %s (0x%4.4X)",
+                        AcpiPsGetOpcodeName (WalkState->Opcode), WalkState->Opcode));
+
+                    /*
+                     * Determine the opcode length before skipping the opcode.
+                     * An opcode can be 1 byte or 2 bytes in length.
+                     */
+                    OpcodeLength = 1;
+                    if ((WalkState->Opcode & 0xFF00) == AML_EXTENDED_OPCODE)
+                    {
+                        OpcodeLength = 2;
+                    }
+                    WalkState->ParserState.Aml = WalkState->Aml + OpcodeLength;
+
+                    WalkState->ParserState.Aml =
+                        AcpiPsGetNextPackageEnd(&WalkState->ParserState);
+                    WalkState->Aml = WalkState->ParserState.Aml;
                 }
 
                 continue;
@@ -689,7 +747,32 @@ AcpiPsParseLoop (
                 {
                     return_ACPI_STATUS (Status);
                 }
+                if ((WalkState->ControlState) &&
+                    ((WalkState->ControlState->Control.Opcode == AML_IF_OP) ||
+                    (WalkState->ControlState->Control.Opcode == AML_WHILE_OP)))
+                {
+                    /*
+                     * If the if/while op fails to parse, we will skip parsing
+                     * the body of the op.
+                     */
+                    ParserState->Aml =
+                        WalkState->ControlState->Control.AmlPredicateStart + 1;
+                    ParserState->Aml =
+                        AcpiPsGetNextPackageEnd (ParserState);
+                    WalkState->Aml = ParserState->Aml;
 
+                    ACPI_ERROR ((AE_INFO, "Skipping While/If block"));
+                    if (*WalkState->Aml == AML_ELSE_OP)
+                    {
+                        ACPI_ERROR ((AE_INFO, "Skipping Else block"));
+                        WalkState->ParserState.Aml = WalkState->Aml + 1;
+                        WalkState->ParserState.Aml =
+                            AcpiPsGetNextPackageEnd (ParserState);
+                        WalkState->Aml = ParserState->Aml;
+                    }
+                    ACPI_FREE(AcpiUtPopGenericState (&WalkState->ControlState));
+                }
+                Op = NULL;
                 continue;
             }
         }
@@ -697,7 +780,7 @@ AcpiPsParseLoop (
         /* Check for arguments that need to be processed */
 
         ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
-            "Parseloop: argument count: %u\n", WalkState->ArgCount));
+            "Parseloop: argument count: %8.8X\n", WalkState->ArgCount));
 
         if (WalkState->ArgCount)
         {
@@ -776,6 +859,22 @@ AcpiPsParseLoop (
             Status = AcpiPsNextParseState (WalkState, Op, Status);
             if (Status == AE_CTRL_PENDING)
             {
+                Status = AE_OK;
+            }
+            else if ((WalkState->ParseFlags & ACPI_PARSE_MODULE_LEVEL) &&
+                (ACPI_AML_EXCEPTION(Status) || Status == AE_ALREADY_EXISTS ||
+                Status == AE_NOT_FOUND))
+            {
+                /*
+                 * ACPI_PARSE_MODULE_LEVEL flag means that we are currently
+                 * loading a table by executing it as a control method.
+                 * However, if we encounter an error while loading the table,
+                 * we need to keep trying to load the table rather than
+                 * aborting the table load (setting the status to AE_OK
+                 * continues the table load). If we get a failure at this
+                 * point, it means that the dispatcher got an error while
+                 * trying to execute the Op.
+                 */
                 Status = AE_OK;
             }
         }
