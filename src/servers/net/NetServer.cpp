@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2018, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -82,8 +82,10 @@ private:
 			AutoconfigLooper*	_LooperForDevice(const char* device);
 			status_t			_ConfigureDevice(const char* path);
 			void				_ConfigureDevices(const char* path,
+									BStringList& devicesAlreadyConfigured,
 									BMessage* suggestedInterface = NULL);
 			void				_ConfigureInterfacesFromSettings(
+									BStringList& devicesSet,
 									BMessage* _missingDevice = NULL);
 			void				_ConfigureIPv6LinkLocal(const char* name);
 
@@ -195,7 +197,8 @@ NetServer::MessageReceived(BMessage* message)
 
 		case BNetworkSettings::kMsgInterfaceSettingsUpdated:
 		{
-			_ConfigureInterfacesFromSettings();
+			BStringList devicesSet;
+			_ConfigureInterfacesFromSettings(devicesSet);
 			break;
 		}
 
@@ -665,7 +668,7 @@ NetServer::_ConfigureDevice(const char* device)
 
 void
 NetServer::_ConfigureDevices(const char* startPath,
-	BMessage* suggestedInterface)
+	BStringList& devicesAlreadyConfigured, BMessage* suggestedInterface)
 {
 	BDirectory directory(startPath);
 	BEntry entry;
@@ -684,16 +687,19 @@ NetServer::_ConfigureDevices(const char* startPath,
 				&& suggestedInterface->AddString("device", path.Path()) == B_OK
 				&& _ConfigureInterface(*suggestedInterface) == B_OK)
 				suggestedInterface = NULL;
-			else
+			else if (!devicesAlreadyConfigured.HasString(path.Path()))
 				_ConfigureDevice(path.Path());
-		} else if (entry.IsDirectory())
-			_ConfigureDevices(path.Path(), suggestedInterface);
+		} else if (entry.IsDirectory()) {
+			_ConfigureDevices(path.Path(), devicesAlreadyConfigured,
+				suggestedInterface);
+		}
 	}
 }
 
 
 void
-NetServer::_ConfigureInterfacesFromSettings(BMessage* _missingDevice)
+NetServer::_ConfigureInterfacesFromSettings(BStringList& devicesSet,
+	BMessage* _missingDevice)
 {
 	BMessage interface;
 	uint32 cookie = 0;
@@ -722,7 +728,8 @@ NetServer::_ConfigureInterfacesFromSettings(BMessage* _missingDevice)
 			}
 		}
 
-		_ConfigureInterface(interface);
+		if (_ConfigureInterface(interface) == B_OK)
+			devicesSet.Add(device);
 	}
 }
 
@@ -740,12 +747,14 @@ NetServer::_BringUpInterfaces()
 
 	_RemoveInvalidInterfaces();
 
-	// First, we look into the settings, and try to bring everything up from there
+	// First, we look into the settings, and try to bring everything up from
+	// there
 
+	BStringList devicesAlreadyConfigured;
 	BMessage missingDevice;
-	_ConfigureInterfacesFromSettings(&missingDevice);
+	_ConfigureInterfacesFromSettings(devicesAlreadyConfigured, &missingDevice);
 
-	// check configuration
+	// Check configuration
 
 	if (!_TestForInterface("loop")) {
 		// there is no loopback interface, create one
@@ -769,11 +778,9 @@ NetServer::_BringUpInterfaces()
 	// TODO: also check if the networking driver is correctly initialized!
 	//	(and check for other devices to take over its configuration)
 
-	if (!_TestForInterface("/dev/net/")) {
-		// there is no driver configured - see if there is one and try to use it
-		_ConfigureDevices("/dev/net",
-			missingDevice.HasString("device") ? &missingDevice : NULL);
-	}
+	// There is no driver configured - see if there is one and try to use it
+	_ConfigureDevices("/dev/net", devicesAlreadyConfigured,
+		missingDevice.HasString("device") ? &missingDevice : NULL);
 }
 
 
