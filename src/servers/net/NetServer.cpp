@@ -666,6 +666,14 @@ NetServer::_ConfigureDevice(const char* device)
 }
 
 
+/*! \brief Traverses the device tree starting from \a startPath, and configures
+		everything that has not yet been configured via settings before.
+
+	\param suggestedInterface Contains the configuration of an interface that
+		does not have any hardware left. It is used to configure the first
+		unconfigured device. This allows to move a Haiku configuration around
+		without losing the network configuration.
+*/
 void
 NetServer::_ConfigureDevices(const char* startPath,
 	BStringList& devicesAlreadyConfigured, BMessage* suggestedInterface)
@@ -683,8 +691,7 @@ NetServer::_ConfigureDevices(const char* startPath,
 
 		if (S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode)) {
 			if (suggestedInterface != NULL
-				&& suggestedInterface->RemoveName("device") == B_OK
-				&& suggestedInterface->AddString("device", path.Path()) == B_OK
+				&& suggestedInterface->SetString("device", path.Path()) == B_OK
 				&& _ConfigureInterface(*suggestedInterface) == B_OK)
 				suggestedInterface = NULL;
 			else if (!devicesAlreadyConfigured.HasString(path.Path()))
