@@ -71,7 +71,7 @@ struct rld_export gRuntimeLoader = {
 	get_tls_address,
 	destroy_thread_tls,
 
-	elf_reinit_after_fork,
+	reinit_after_fork,
 	NULL, // call_atexit_hooks_for_range
 	terminate_program,
 
