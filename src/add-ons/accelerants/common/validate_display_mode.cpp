@@ -146,14 +146,14 @@ is_display_mode_within_bounds(display_mode& mode, const display_mode& low,
 		return false;
 
 	// Check vertical timing
-	if (mode.timing.h_display < low.timing.h_display
-		|| mode.timing.h_display > high.timing.h_display
-		|| mode.timing.h_sync_start < low.timing.h_sync_start
-		|| mode.timing.h_sync_start > high.timing.h_sync_start
-		|| mode.timing.h_sync_end < low.timing.h_sync_end
-		|| mode.timing.h_sync_end > high.timing.h_sync_end
-		|| mode.timing.h_total < low.timing.h_total
-		|| mode.timing.h_total > high.timing.h_total)
+	if (mode.timing.v_display < low.timing.v_display
+		|| mode.timing.v_display > high.timing.v_display
+		|| mode.timing.v_sync_start < low.timing.v_sync_start
+		|| mode.timing.v_sync_start > high.timing.v_sync_start
+		|| mode.timing.v_sync_end < low.timing.v_sync_end
+		|| mode.timing.v_sync_end > high.timing.v_sync_end
+		|| mode.timing.v_total < low.timing.v_total
+		|| mode.timing.v_total > high.timing.v_total)
 		return false;
 
 	// Check pixel clock
