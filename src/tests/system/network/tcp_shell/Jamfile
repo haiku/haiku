@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net tcp_shell ;
+SubDir HAIKU_TOP src tests system network tcp_shell ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -43,18 +43,18 @@ SimpleTest BufferQueueTest :
 	: be libkernelland_emu.so
 ;
 
-SEARCH on [ FGristFiles 
+SEARCH on [ FGristFiles
 		tcp.cpp TCPEndpoint.cpp BufferQueue.cpp EndpointManager.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
 
-SEARCH on [ FGristFiles 
+SEARCH on [ FGristFiles
 		ipv4_address.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ipv4 ] ;
 
-SEARCH on [ FGristFiles 
+SEARCH on [ FGristFiles
 		ancillary_data.cpp net_buffer.cpp utility.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
 
-SEARCH on [ FGristFiles 
+SEARCH on [ FGristFiles
 		argv.c
 	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;

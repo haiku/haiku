@@ -2,27 +2,7 @@ SubDir HAIKU_TOP src tests kits net ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SimpleTest firefox_crash : firefox_crash.cpp : $(TARGET_NETWORK_LIBS) ;
-
-SimpleTest udp_client : udp_client.c : $(TARGET_NETWORK_LIBS) ;
-SimpleTest udp_connect : udp_connect.cpp : $(TARGET_NETWORK_LIBS) ;
-SimpleTest udp_echo : udp_echo.c : $(TARGET_NETWORK_LIBS) ;
-SimpleTest udp_server : udp_server.c : $(TARGET_NETWORK_LIBS) ;
-
-SimpleTest tcp_server : tcp_server.c : $(TARGET_NETWORK_LIBS) ;
-SimpleTest tcp_client : tcp_client.c : $(TARGET_NETWORK_LIBS) ;
-
-SimpleTest ipv46_server : ipv46_server.cpp : $(TARGET_NETWORK_LIBS) ;
-SimpleTest ipv46_client : ipv46_client.cpp : $(TARGET_NETWORK_LIBS) ;
-
 SimpleTest link_echo : link_echo.cpp : $(TARGET_NETWORK_LIBS) bnetapi be ;
-
-SimpleTest getpeername : getpeername.cpp : $(TARGET_NETWORK_LIBS) ;
-
-SimpleTest if_nameindex : if_nameindex.c : $(TARGET_NETWORK_LIBS) ;
-
-SimpleTest tcp_connection_test : tcp_connection_test.cpp
-	: $(TARGET_NETWORK_LIBS) ;
 
 SimpleTest NetAddressTest : NetAddressTest.cpp
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) ;
@@ -33,13 +13,6 @@ SimpleTest NetEndpointTest : NetEndpointTest.cpp
 SimpleTest wlan_test : wlan_test.cpp : $(TARGET_NETWORK_LIBS) bnetapi be ;
 
 SubInclude HAIKU_TOP src tests kits net cookie ;
-SubInclude HAIKU_TOP src tests kits net icmp ;
-SubInclude HAIKU_TOP src tests kits net ipv6 ;
 HaikuSubInclude libnetapi ;
-SubInclude HAIKU_TOP src tests kits net multicast ;
-SubInclude HAIKU_TOP src tests kits net posixnet ;
 SubInclude HAIKU_TOP src tests kits net service ;
-SubInclude HAIKU_TOP src tests kits net sock ;
-SubInclude HAIKU_TOP src tests kits net tcp_shell ;
-SubInclude HAIKU_TOP src tests kits net tcptester ;
 SubInclude HAIKU_TOP src tests kits net urlRequest ;

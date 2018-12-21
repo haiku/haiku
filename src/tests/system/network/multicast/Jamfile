@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net multicast ;
+SubDir HAIKU_TOP src tests system network multicast ;
 
 BinCommand multicast :
 	multicast.cpp

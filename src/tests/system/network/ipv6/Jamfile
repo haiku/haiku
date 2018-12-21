@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net ipv6 ;
+SubDir HAIKU_TOP src tests system network ipv6 ;
 
 SimpleTest ipv6_raw_server : raw_server.cpp : $(TARGET_NETWORK_LIBS) ;
 SimpleTest ipv6_raw_client : raw_client.cpp : $(TARGET_NETWORK_LIBS) ;

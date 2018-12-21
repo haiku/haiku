@@ -5,3 +5,4 @@ SubInclude HAIKU_TOP src tests system boot ;
 SubInclude HAIKU_TOP src tests system glue ;
 SubInclude HAIKU_TOP src tests system kernel ;
 SubInclude HAIKU_TOP src tests system libroot ;
+SubInclude HAIKU_TOP src tests system network ;

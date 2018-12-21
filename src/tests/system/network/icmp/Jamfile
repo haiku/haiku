@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net icmp ;
+SubDir HAIKU_TOP src tests system network icmp ;
 
 SimpleTest big_datagram :
 	big_datagram.cpp

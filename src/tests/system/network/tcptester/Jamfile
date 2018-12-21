@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net tcptester ;
+SubDir HAIKU_TOP src tests system network tcptester ;
 
 BinCommand tcptester :
 	tcptester.cpp
