@@ -12,11 +12,11 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		broadcom440x broadcom570x ipro1000
 		rtl8139 rtl81xx
 		via_rhine ipro100 nforce
-		marvell_yukon syskonnect
+		marvell_yukon sis900 syskonnect
 		attansic_l2 ar81xx
 	}@ # x86
 
-	etherpci pegasus sis900 usb_ecm wb840
+	etherpci pegasus usb_ecm wb840
 	#vlance
 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures

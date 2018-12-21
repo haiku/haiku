@@ -190,13 +190,12 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		nforce
 		pcnet
 		rtl8139 rtl81xx
-		sis19x syskonnect
+		sis19x sis900 syskonnect
 		via_rhine vt612x
 	}@ # x86,x86_64
 
 	etherpci
 	pegasus
-	sis900
 	usb_asix usb_davicom usb_ecm
 	wb840
 

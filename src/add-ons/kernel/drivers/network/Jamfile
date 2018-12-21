@@ -9,7 +9,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network etherpci ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network pegasus ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network virtio ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network sis19x ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network sis900 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_asix ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_davicom ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_ecm ;
@@ -41,3 +40,4 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network vt612x ;
 
 # FreeBSD 11.2 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network emulex_oce ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network sis900 ;
