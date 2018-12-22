@@ -2879,11 +2879,11 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 	uint32 c;
 	const char* nextCharacter, *character;
 
-	// two runs: first we look out for uppercase letters
+	// two runs: first we look out for alphanumeric ASCII characters
 	nextCharacter = title;
 	character = nextCharacter;
 	while ((c = BUnicodeChar::FromUTF8(&nextCharacter)) != 0) {
-		if (!BUnicodeChar::IsUpper(c) || triggers.HasTrigger(c)) {
+		if (!(c < 255 && BUnicodeChar::IsAlNum(c)) || triggers.HasTrigger(c)) {
 			character = nextCharacter;
 			continue;
 		}
@@ -2892,7 +2892,7 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 		return triggers.AddTrigger(c);
 	}
 
-	// then, if we still haven't found anything, we accept them all
+	// then, if we still haven't found something, we accept anything
 	nextCharacter = title;
 	character = nextCharacter;
 	while ((c = BUnicodeChar::FromUTF8(&nextCharacter)) != 0) {
