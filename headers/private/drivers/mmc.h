@@ -12,7 +12,7 @@
 #include <device_manager.h>
 
 
-#define MMC_BUS_MODULE_NAME "bus_managers/mmc_bus/driver_v1"
+#define MMC_BUS_MODULE_NAME "bus_managers/mmc/driver_v1"
 
 
 enum {

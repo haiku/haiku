@@ -34,6 +34,7 @@ AddFilesToPackage add-ons kernel busses ata
 	: generic_ide_pci it8211 legacy_sata silicon_image_3112 highpoint_ide_pci ide_isa@x86 ;
 
 AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
+AddFilesToPackage add-ons kernel busses mmc : sdhci_pci ;
 AddFilesToPackage add-ons kernel busses random : virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
@@ -61,6 +62,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 # drivers
 AddNewDriversToPackage 				: wmi@x86,x86_64 ;
 AddNewDriversToPackage disk			: nvme_disk@x86,x86_64 ;
+AddNewDriversToPackage disk mmc		: mmc_disk ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
@@ -194,10 +196,12 @@ AddBootModuleSymlinksToPackage
 	generic_ide_pci
 	ide_isa@x86 isa@x86,x86_64 intel it8211
 	legacy_sata locked_pool
+	mmc mmc_disk
 	nvme_disk@x86,x86_64
 	openpic@ppc
 	packagefs pci
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
+	sdhci_pci
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
 	virtio virtio_block virtio_pci virtio_scsi
 ;

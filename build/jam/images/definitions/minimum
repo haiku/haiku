@@ -211,11 +211,12 @@ SYSTEM_ADD_ONS_DRIVERS_SENSOR = [ FFilterByBuildFeatures
 
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	acpi@x86,x86_64	agp_gart@x86,x86_64 ata
+	acpi@x86,x86_64 agp_gart@x86,x86_64 ata
 	config_manager
 	firewire@x86
-	i2c@x86,x86_64
-	scsi isa@x86,x86_64
+	i2c@x86,x86_64 isa@x86,x86_64
+	mmc
+	scsi
 	pci ps2@x86,x86_64
 	random
 	usb
