@@ -212,7 +212,7 @@ FilterHTMLTag(int32 &first, char **t, char *end)
 			{"ograve;", 0x00f2},
 			{"ouml;",	0x00f6},
 			{"quot;",	'"'},
-			{"szlig;",	0x00f6},
+			{"szlig;",	0x00df},
 			{"uacute;", 0x00fa},
 			{"ucirc;",	0x00fb},
 			{"ugrave;", 0x00f9},
