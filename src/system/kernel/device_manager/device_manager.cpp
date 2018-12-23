@@ -1661,6 +1661,10 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					case PCI_sd_host:
 						_AddPath(*stack, "busses", "mmc");
 						break;
+					case PCI_system_peripheral_other:
+						_AddPath(*stack, "busses", "mmc");
+						_AddPath(*stack, "drivers");
+						break;
 					default:
 						_AddPath(*stack, "drivers");
 						break;
@@ -1964,7 +1968,9 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 			// TODO: maybe make this extendible via settings file?
 			if (!strcmp(devicePath, "disk")) {
 				matches = type == PCI_mass_storage
-					|| (type == PCI_base_peripheral && subType == PCI_sd_host);
+					|| (type == PCI_base_peripheral
+						&& (subType == PCI_sd_host
+							|| subType == PCI_system_peripheral_other));
 			} else if (!strcmp(devicePath, "audio")) {
 				matches = type == PCI_multimedia
 					&& (subType == PCI_audio || subType == PCI_hd_audio);
