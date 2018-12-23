@@ -305,7 +305,12 @@ KeymapWindow::MessageReceived(BMessage* message)
 			KeymapListItem* item
 				= static_cast<KeymapListItem*>(listView->ItemAt(index));
 			if (item != NULL) {
-				fCurrentMap.Load(item->EntryRef());
+				status_t status = fCurrentMap.Load(item->EntryRef());
+				if (status != B_OK) {
+					listView->RemoveItem(item);
+					break;
+				}
+
 				fAppliedMap = fCurrentMap;
 				fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 				_UseKeymap();
