@@ -781,7 +781,7 @@ media_format::SpecializeTo(const media_format* otherFormat)
 status_t
 media_format::SetMetaData(const void* data, size_t size)
 {
-	if (!data || size < 0 || size > META_DATA_MAX_SIZE)
+	if (!data || size > META_DATA_MAX_SIZE)
 		return B_BAD_VALUE;
 
 	void* new_addr;
