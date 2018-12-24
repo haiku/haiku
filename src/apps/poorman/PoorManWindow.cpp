@@ -251,7 +251,6 @@ PoorManWindow::MessageReceived(BMessage* message)
 				struct in_addr sin_addr;
 				sin_addr.s_addr = address;
 				if (inet_ntop(AF_INET, &sin_addr, addr, sizeof(addr)) != NULL) {
-					addr[strlen(addr)] = '\0';
 					line << '(' << addr << ") ";
 				}
 			}
