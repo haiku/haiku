@@ -56,7 +56,7 @@ BCharacterSetRoster::StopWatching(BMessenger target)
 const BCharacterSet * 
 BCharacterSetRoster::GetCharacterSetByFontID(uint32 id)
 {
-	if ((id < 0) || (id >= character_sets_by_id_count)) {
+	if (id >= character_sets_by_id_count) {
 		return NULL;
 	}
 	return character_sets_by_id[id];
@@ -65,7 +65,7 @@ BCharacterSetRoster::GetCharacterSetByFontID(uint32 id)
 const BCharacterSet * 
 BCharacterSetRoster::GetCharacterSetByConversionID(uint32 id)
 {
-	if ((id+1 < 0) || (id+1 >= character_sets_by_id_count)) {
+	if (id + 1 >= character_sets_by_id_count) {
 		return NULL;
 	}
 	return character_sets_by_id[id+1];
@@ -74,7 +74,7 @@ BCharacterSetRoster::GetCharacterSetByConversionID(uint32 id)
 const BCharacterSet * 
 BCharacterSetRoster::GetCharacterSetByMIBenum(uint32 MIBenum)
 {
-	if ((MIBenum < 0) || (MIBenum > maximum_valid_MIBenum)) {
+	if (MIBenum > maximum_valid_MIBenum) {
 		return NULL;
 	}
 	return character_sets_by_MIBenum[MIBenum];
