@@ -138,7 +138,7 @@
 #  endif
 #  if defined(__HAIKU__)
 #    include <OS.h>
-#    include <pthread.h>
+#    include <TLS.h>
 #  endif
 #endif
 
@@ -463,8 +463,10 @@ static atomic32_t _mapped_pages_os;
 #endif
 
 //! Current thread heap
-#if (defined(__APPLE__) || defined(__HAIKU__)) && ENABLE_PRELOAD
+#if defined(__APPLE__) && ENABLE_PRELOAD
 static pthread_key_t _memory_thread_heap;
+#elif defined(__HAIKU__) && ENABLE_PRELOAD
+static int32 _memory_thread_heap;
 #else
 #  ifdef _MSC_VER
 #    define _Thread_local __declspec(thread)
@@ -481,8 +483,10 @@ static _Thread_local heap_t* _memory_thread_heap TLS_MODEL;
 //! Get the current thread heap
 static FORCEINLINE heap_t*
 get_thread_heap(void) {
-#if (defined(__APPLE__) || defined(__HAIKU__)) && ENABLE_PRELOAD
+#if defined(__APPLE__) && ENABLE_PRELOAD
 	return (heap_t*)pthread_getspecific(_memory_thread_heap);
+#elif defined(__HAIKU__) && ENABLE_PRELOAD
+	return (heap_t*)tls_get(_memory_thread_heap);
 #else
 	return _memory_thread_heap;
 #endif
@@ -491,8 +495,10 @@ get_thread_heap(void) {
 //! Set the current thread heap
 static void
 set_thread_heap(heap_t* heap) {
-#if (defined(__APPLE__) || defined(__HAIKU__)) && ENABLE_PRELOAD
+#if defined(__APPLE__) && ENABLE_PRELOAD
 	pthread_setspecific(_memory_thread_heap, heap);
+#elif defined(__HAIKU__) && ENABLE_PRELOAD
+	tls_set(_memory_thread_heap, heap);
 #else
 	_memory_thread_heap = heap;
 #endif
@@ -1523,9 +1529,11 @@ rpmalloc_initialize_config(const rpmalloc_config_t* config) {
 	_memory_span_release_count = (_memory_span_map_count > 4 ? ((_memory_span_map_count < 64) ? _memory_span_map_count : 64) : 4);
 	_memory_span_release_count_large = (_memory_span_release_count > 4 ? (_memory_span_release_count / 2) : 2);
 
-#if (defined(__APPLE__) || defined(__HAIKU__)) && ENABLE_PRELOAD
+#if defined(__APPLE__) && ENABLE_PRELOAD
 	if (pthread_key_create(&_memory_thread_heap, 0))
 		return -1;
+#elif defined(__HAIKU__) && ENABLE_PRELOAD
+	_memory_thread_heap = tls_allocate();
 #endif
 
 	atomic_store32(&_memory_heap_id, 0);
@@ -1616,7 +1624,7 @@ rpmalloc_finalize(void) {
 	assert(!atomic_load32(&_mapped_pages_os));
 #endif
 
-#if (defined(__APPLE__) || defined(__HAIKU__)) && ENABLE_PRELOAD
+#if defined(__APPLE__) && ENABLE_PRELOAD
 	pthread_key_delete(_memory_thread_heap);
 #endif
 }
