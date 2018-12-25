@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network broadcom440x dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom440x dev bfe ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom440x dev mii ;
