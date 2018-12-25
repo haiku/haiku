@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media plugins ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubInclude HAIKU_TOP src add-ons media plugins ape_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins au_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg ;
