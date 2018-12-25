@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network via_rhine ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -18,10 +18,10 @@ KernelAddon via_rhine :
 	ukphy.c
 	ukphy_subr.c
 	if_vr.c
-	: libfreebsd11_network.a
+	: libfreebsd_network.a
 	;
 
 ObjectHdrs [ FGristFiles ciphy$(SUFOBJ) ukphy$(SUFOBJ) ]
 	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
-		compat freebsd11_network ] ;
-Includes [ FGristFiles ciphy.c ukphy.c ] : <src!libs!compat!freebsd11_network>miidevs.h ;
+		compat freebsd_network ] ;
+Includes [ FGristFiles ciphy.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

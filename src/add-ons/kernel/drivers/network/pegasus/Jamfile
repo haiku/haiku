@@ -15,5 +15,5 @@ KernelAddon pegasus :
 
 ObjectHdrs [ FGristFiles driver$(SUFOBJ) if_aue$(SUFOBJ) ]
     : [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
-	    compat freebsd11_network ] ;
-Includes [ FGristFiles driver.c if_aue.c ] : <src!libs!compat!freebsd11_network>usbdevs.h ;
+	    compat freebsd_network ] ;
+Includes [ FGristFiles driver.c if_aue.c ] : <src!libs!compat!freebsd_network>usbdevs.h ;

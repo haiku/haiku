@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan wavelanwifi ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UsePrivateHeaders net system ;
@@ -25,5 +25,5 @@ KernelAddon wavelanwifi :
 	glue.c
 	:
 	libfreebsd11_wlan.a
-	libfreebsd11_network.a
+	libfreebsd_network.a
 	;

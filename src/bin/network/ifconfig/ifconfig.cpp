@@ -27,8 +27,8 @@
 #include <NetServer.h>
 
 extern "C" {
-#	include <freebsd11_network/compat/sys/cdefs.h>
-#	include <freebsd11_network/compat/sys/ioccom.h>
+#	include <freebsd_network/compat/sys/cdefs.h>
+#	include <freebsd_network/compat/sys/ioccom.h>
 #	include <net80211/ieee80211_ioctl.h>
 }
 

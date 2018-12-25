@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan broadcom43xx ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
 UsePrivateHeaders net system ;
@@ -29,5 +29,5 @@ KernelAddon broadcom43xx :
 	glue.c
 	:
 	libfreebsd11_wlan.a
-	libfreebsd11_network.a
+	libfreebsd_network.a
 	;

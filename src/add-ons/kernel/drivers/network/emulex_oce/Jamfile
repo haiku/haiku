@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network emulex_oce ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -19,5 +19,5 @@ KernelAddon emulex_oce :
 	oce_queue.c
 	oce_sysctl.c
 	oce_util.c
-	: libfreebsd11_network.a
+	: libfreebsd_network.a
 	;

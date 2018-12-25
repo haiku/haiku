@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network atheros813x dev alc ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_network compat ]
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 
 UsePrivateHeaders net system ;
@@ -13,6 +13,6 @@ SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 KernelAddon atheros813x :
 	if_alc.c
 	glue.c
-	: atheros813x_mii.a libfreebsd11_network.a
+	: atheros813x_mii.a libfreebsd_network.a
 	;
 
