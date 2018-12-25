@@ -1471,7 +1471,7 @@ BRoster::_SetSignature(team_id team, const char* signature) const
 
 	// compose the request message
 	BMessage request(B_REG_SET_SIGNATURE);
-	if (error == B_OK && team >= 0)
+	if (team >= 0)
 		error = request.AddInt32("team", team);
 
 	if (error == B_OK && signature)
@@ -1573,7 +1573,7 @@ BRoster::_CompleteRegistration(team_id team, thread_id thread,
 
 	// compose the request message
 	BMessage request(B_REG_COMPLETE_REGISTRATION);
-	if (error == B_OK && team >= 0)
+	if (team >= 0)
 		error = request.AddInt32("team", team);
 
 	if (error == B_OK && thread >= 0)
@@ -1624,7 +1624,7 @@ BRoster::_IsAppRegistered(const entry_ref* ref, team_id team,
 
 	// compose the request message
 	BMessage request(B_REG_IS_APP_REGISTERED);
-	if (error == B_OK && ref)
+	if (ref)
 		error = request.AddRef("ref", ref);
 	if (error == B_OK && team >= 0)
 		error = request.AddInt32("team", team);
@@ -1718,7 +1718,7 @@ BRoster::_RemoveApp(team_id team) const
 
 	// compose the request message
 	BMessage request(B_REG_REMOVE_APP);
-	if (error == B_OK && team >= 0)
+	if (team >= 0)
 		error = request.AddInt32("team", team);
 
 	// send the request
