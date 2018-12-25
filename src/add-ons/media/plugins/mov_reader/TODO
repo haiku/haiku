@@ -1,8 +1,0 @@
-Quicktime Reader TODO
-1.  Correct known issues
-2.  Performance improvements by precalculating some meta data
-
-KNOWN ISSUES
-Edits lists are ignored the track is played start to finish regardless of edit lists
-IMA4 sound tracks stop too early
-Seeking will not work for compressed audio

@@ -1,7 +1,0 @@
-MP4 Reader TODO
-1.  Correct known issues
-2.  Performance improvements by precalculating some meta data
-
-KNOWN ISSUES
-Edits lists are ignored the track is played start to finish regardless of edit lists
-Get some output :-)
