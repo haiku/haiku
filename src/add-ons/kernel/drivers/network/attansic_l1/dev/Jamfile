@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network attansic_l1 dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network attansic_l1 dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network attansic_l1 dev age ;
