@@ -1,3 +1,28 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network broadcom570x ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x dev ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev bce ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev bge ] ;
+
+KernelAddon broadcom570x :
+	glue.c
+	brgphy.c
+	ukphy.c
+	ukphy_subr.c
+	if_bge.c
+	: libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles brgphy$(SUFOBJ) ukphy$(SUFOBJ) if_bge$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles brgphy.c ukphy.c if_bge.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

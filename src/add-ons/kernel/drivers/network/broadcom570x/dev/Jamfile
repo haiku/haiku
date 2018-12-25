@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network broadcom570x dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x dev bge ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network broadcom570x dev mii ;
