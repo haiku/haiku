@@ -880,6 +880,8 @@ void __heap_after_fork_child() {}
 void __heap_after_fork_parent() {}
 void __heap_before_fork() {}
 void __heap_terminate_after() {}
+void __heap_thread_init() {}
+void __heap_thread_exit() {}
 void __hypot() {}
 void __hypotf() {}
 void __hypotl() {}

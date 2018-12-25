@@ -40,6 +40,8 @@ pthread_thread_entry(void*, void* _thread)
 {
 	pthread_thread* thread = (pthread_thread*)_thread;
 
+	__heap_thread_init();
+
 	pthread_exit(thread->entry(thread->entry_argument));
 	return 0;
 }

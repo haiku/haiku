@@ -220,6 +220,18 @@ __heap_after_fork_parent(void)
 }
 
 
+extern "C" void
+__heap_thread_init(void)
+{
+}
+
+
+extern "C" void
+__heap_thread_exit(void)
+{
+}
+
+
 // #pragma mark - Public API
 
 
