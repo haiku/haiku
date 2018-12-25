@@ -49,6 +49,8 @@
 #include "Services.h"
 
 extern "C" {
+#	include <freebsd_network/compat/sys/cdefs.h>
+#	include <freebsd_network/compat/sys/ioccom.h>
 #	include <net80211/ieee80211_ioctl.h>
 }
 
