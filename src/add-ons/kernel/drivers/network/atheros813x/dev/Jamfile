@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network atheros813x dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network atheros813x dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network atheros813x dev alc ;
