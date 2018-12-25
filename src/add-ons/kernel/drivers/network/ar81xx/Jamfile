@@ -1,3 +1,26 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ar81xx ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network ar81xx dev ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ale ] ;
+
+KernelAddon ar81xx :
+	glue.c
+	ukphy.c
+	ukphy_subr.c
+	if_ale.c
+	: libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles ukphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
