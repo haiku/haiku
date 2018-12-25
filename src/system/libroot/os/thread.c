@@ -37,10 +37,11 @@ thread_entry(void* _entry, void* _thread)
 {
 	thread_func entry = (thread_func)_entry;
 	pthread_thread* thread = (pthread_thread*)_thread;
+	status_t returnCode;
 
 	__heap_thread_init();
 
-	status_t returnCode = entry(thread->entry_argument);
+	returnCode = entry(thread->entry_argument);
 
 	_thread_do_exit_work();
 	__heap_thread_exit();
