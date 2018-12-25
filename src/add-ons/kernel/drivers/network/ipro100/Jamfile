@@ -1,3 +1,24 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ipro100 ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 dev ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev fxp ] ;
+
+KernelAddon ipro100 :
+	if_fxp.c
+	glue.c
+	inphy.c
+	: libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles inphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles inphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
