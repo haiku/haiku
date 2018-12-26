@@ -32,6 +32,21 @@ const char* kVideoWidth			= "videowidth";
 const char* kNumTracks			= "numtracks";
 const char* kDrmCrippled		= "drmcrippled";
 
+const char* kMediaType			= "mediatype";
+
+const char* kChannelCount		= "channelcount";
+const char* kAudioFormat		= "audioformat";
+const char* kByteOrder			= "byteorder";
+const char* kBufferSize			= "buffersize";
+
+const char* kLineWidth			= "linewidth";
+const char* kLineCount			= "linecount";
+const char* kBytesPerRow		= "bytesperrow";
+const char* kPixelOffset		= "pixeloffset";
+const char* kLineOffset			= "lineoffset";
+const char* kColorSpace			= "colorspace";
+const char* kOrientation		= "orientation";
+
 const char* kTitle				= "title";
 const char* kComment			= "comment";
 const char* kCopyright			= "copyright";
