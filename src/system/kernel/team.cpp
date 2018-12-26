@@ -1681,6 +1681,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	status_t status;
 	struct team_arg* teamArgs;
 	struct team_loading_info loadingInfo;
+	ConditionVariableEntry loadingWaitEntry;
 	io_context* parentIOContext = NULL;
 	team_id teamID;
 	bool teamLimitReached = false;
@@ -1713,10 +1714,10 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		return B_NO_MEMORY;
 	BReference<Team> teamReference(team, true);
 
-	if (flags & B_WAIT_TILL_LOADED) {
-		loadingInfo.thread = thread_get_current_thread();
+	if ((flags & B_WAIT_TILL_LOADED) != 0) {
+		loadingInfo.condition.Init(team, "image load");
+		loadingInfo.condition.Add(&loadingWaitEntry);
 		loadingInfo.result = B_ERROR;
-		loadingInfo.done = false;
 		team->loading_info = &loadingInfo;
 	}
 
@@ -1834,13 +1835,11 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 			thread_continue(mainThread);
 		}
 
-		// Now suspend ourselves until loading is finished. We will be woken
-		// either by the thread, when it finished or aborted loading, or when
-		// the team is going to die (e.g. is killed). In either case the one
-		// setting `loadingInfo.done' is responsible for removing the info from
-		// the team structure.
-		while (!loadingInfo.done)
-			thread_suspend();
+		// Now wait until loading is finished. We will be woken either by the
+		// thread, when it finished or aborted loading, or when the team is
+		// going to die (e.g. is killed). In either case the one notifying is
+		// responsible for unsetting `loading_info` in the team structure.
+		loadingWaitEntry.Wait();
 
 		if (loadingInfo.result < B_OK)
 			return loadingInfo.result;
@@ -3229,10 +3228,9 @@ team_delete_team(Team* team, port_id debuggerPort)
 		team->loading_info = NULL;
 
 		loadingInfo->result = B_ERROR;
-		loadingInfo->done = true;
 
 		// wake up the waiting thread
-		thread_continue(loadingInfo->thread);
+		loadingInfo->condition.NotifyAll();
 	}
 
 	// notify team watchers

@@ -83,9 +83,8 @@ struct thread_death_entry {
 };
 
 struct team_loading_info {
-	Thread*				thread;	// the waiting thread
+	ConditionVariable	condition;
 	status_t			result;		// the result of the loading
-	bool				done;		// set when loading is done/aborted
 };
 
 struct team_watcher {

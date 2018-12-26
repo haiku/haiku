@@ -431,7 +431,6 @@ notify_loading_app(status_t result, bool suspend)
 		team->loading_info = NULL;
 
 		loadingInfo->result = result;
-		loadingInfo->done = true;
 
 		// we're done with the team stuff, get the scheduler lock instead
 		teamLocker.Unlock();
@@ -439,7 +438,7 @@ notify_loading_app(status_t result, bool suspend)
 		thread_prepare_suspend();
 
 		// wake up the waiting thread
-		thread_continue(loadingInfo->thread);
+		loadingInfo->condition.NotifyAll();
 
 		// suspend ourselves, if desired
 		if (suspend)
