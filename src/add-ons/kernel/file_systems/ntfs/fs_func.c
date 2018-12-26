@@ -355,10 +355,8 @@ fs_mount(fs_volume *_vol, const char *device, uint32 flags, const char *args,
 	TRACE("fs_mount - ENTER\n");
 
 	ns = ntfs_malloc(sizeof(nspace));
-	if (!ns) {
-		result = ENOMEM;
-		goto exit;
-	}
+	if (ns == NULL)
+		return ENOMEM;
 
 	*ns = (nspace) {
 		.state = NF_FreeClustersOutdate | NF_FreeMFTOutdate,
@@ -444,7 +442,6 @@ fs_mount(fs_volume *_vol, const char *device, uint32 flags, const char *args,
 			if (result != B_NO_ERROR) {
 				free(ns);
 				result = EINVAL;
-				goto exit;
 			} else {
 				result = B_NO_ERROR;
 				ntfs_mark_free_space_outdated(ns);
@@ -454,12 +451,7 @@ fs_mount(fs_volume *_vol, const char *device, uint32 flags, const char *args,
 	} else
 		free(ns);
 
-	TRACE("fs_mount - EXIT\n");
-	return B_OK;
-
-exit:
-	ERROR("fs_mount - EXIT, result code is %s\n", strerror(result));
-
+	TRACE("fs_mount - EXIT, result code is %s\n", strerror(result));
 	return result;
 }
 
