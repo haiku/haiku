@@ -33,6 +33,23 @@ extern const char* kVideoWidth;			// int32
 extern const char* kNumTracks;			// int32
 extern const char* kDrmCrippled;		// bool
 
+// Stuff needed to fully describe the BMediaFormat
+extern const char* kMediaType;			// media_type
+// Audio stuff
+extern const char* kChannelCount;		// int32
+extern const char* kAudioFormat;		// int32
+extern const char* kByteOrder;			// int32
+extern const char* kBufferSize;			// size_t
+// This is also BMediaFormat stuff, but mostly video
+// NOTE: video width/height are defined as per RFC mentioned above
+extern const char* kLineWidth;			// int32
+extern const char* kLineCount;			// int32
+extern const char* kBytesPerRow;		// int32
+extern const char* kPixelOffset;		// int32
+extern const char* kLineOffset;			// int32
+extern const char* kColorSpace;			// color_space
+extern const char* kOrientation;		// int32
+
 // General use attributes
 extern const char* kTitle;				// BString
 extern const char* kComment;			// BString
