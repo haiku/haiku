@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network pcnet dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet dev le ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet dev pcn ;
