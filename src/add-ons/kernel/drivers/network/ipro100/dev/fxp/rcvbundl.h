@@ -1,4 +1,6 @@
 /*-
+SPDX-License-Identifier: BSD-3-Clause
+
 Copyright (c) 1999-2001, Intel Corporation 
 
 All rights reserved.
@@ -29,7 +31,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 */
 /*
- * $FreeBSD$
+ * $FreeBSD: releng/12.0/sys/dev/fxp/rcvbundl.h 326022 2017-11-20 19:36:21Z pfg $
  */
 /*
 rcvbundl.h
