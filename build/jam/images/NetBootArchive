@@ -17,7 +17,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	}@ # x86
 
 	etherpci pegasus usb_ecm wb840
-	#vlance
 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	pci isa@x86 ata@ata
