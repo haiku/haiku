@@ -1,6 +1,8 @@
 /*	$NetBSD: exphy.c,v 1.16 1999/04/23 04:24:32 thorpej Exp $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD AND BSD-2-Clause
+ *
  * Copyright (c) 1998, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -55,7 +57,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/xl/xlphy.c 257184 2013-10-26 18:40:17Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/xl/xlphy.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * driver for 3Com internal PHYs
