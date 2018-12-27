@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2008, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
  *
@@ -28,7 +30,7 @@
 /* Driver for Attansic Technology Corp. L1 Gigabit Ethernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/age/if_age.c 338948 2018-09-26 17:12:14Z imp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -181,6 +183,8 @@ static driver_t age_driver = {
 static devclass_t age_devclass;
 
 DRIVER_MODULE(age, pci, age_driver, age_devclass, 0, 0);
+MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, age, age_devs,
+    nitems(age_devs));
 DRIVER_MODULE(miibus, age, miibus_driver, miibus_devclass, 0, 0);
 
 static struct resource_spec age_res_spec_mem[] = {
@@ -1401,11 +1405,7 @@ age_setwol(struct age_softc *sc)
 					}
 				}
 				AGE_UNLOCK(sc);
-#ifdef __HAIKU__
-				DELAY(1);
-#else
 				pause("agelnk", hz);
-#endif
 				AGE_LOCK(sc);
 			}
 			if (i == MII_ANEGTICKS_GIGE)
@@ -2165,11 +2165,6 @@ age_int_task(void *arg, int pending)
 	    sc->age_cdata.age_cmb_block_map,
 	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
-#if 0
-	printf("INTR: 0x%08x\n", status);
-	status &= ~INTR_DIS_DMA;
-	CSR_WRITE_4(sc, AGE_INTR_STATUS, status | INTR_DIS_INT);
-#endif
 	ifp = sc->age_ifp;
 	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
 		if ((status & INTR_CMB_RX) != 0)

@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2008 Stanislav Sedov <stas@FreeBSD.org>.
  * All rights reserved.
  *
@@ -28,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ae/if_ae.c 339735 2018-10-25 17:00:39Z brooks $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -175,6 +177,8 @@ static driver_t ae_driver = {
 static devclass_t ae_devclass;
 
 DRIVER_MODULE(ae, pci, ae_driver, ae_devclass, 0, 0);
+MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, ae, ae_devs,
+    nitems(ae_devs));
 DRIVER_MODULE(miibus, ae, miibus_driver, miibus_devclass, 0, 0);
 MODULE_DEPEND(ae, pci, 1, 1, 1);
 MODULE_DEPEND(ae, ether, 1, 1, 1);
@@ -310,7 +314,7 @@ ae_attach(device_t dev)
 			goto fail;
 		}
 	}
-	
+
 	ae_init_tunables(sc);
 
 	ae_phy_reset(sc);		/* Reset PHY. */
@@ -395,7 +399,7 @@ ae_attach(device_t dev)
 fail:
 	if (error != 0)
 		ae_detach(dev);
-	
+
 	return (error);
 }
 
@@ -499,7 +503,7 @@ ae_reset(ae_softc_t *sc)
 	AE_WRITE_4(sc, AE_MASTER_REG, AE_MASTER_SOFT_RESET);
 	bus_barrier(sc->mem[0], AE_MASTER_REG, 4,
 	    BUS_SPACE_BARRIER_READ | BUS_SPACE_BARRIER_WRITE);
-	
+
 	/*
 	 * Wait for reset to complete.
 	 */
@@ -1018,7 +1022,7 @@ ae_get_vpd_eaddr(ae_softc_t *sc, uint32_t *eaddr)
 
 	if (found < 2)
 		return (ENOENT);
-	
+
 	eaddr[1] &= 0xffff;	/* Only last 2 bytes are used. */
 	if (AE_CHECK_EADDR_VALID(eaddr) != 0) {
 		if (bootverbose)
@@ -1065,11 +1069,7 @@ ae_retrieve_address(ae_softc_t *sc)
 		if (bootverbose)
 			device_printf(sc->dev,
 			    "Generating random ethernet address.\n");
-#ifdef __HAIKU__
-		eaddr[0] = random();
-#else
 		eaddr[0] = arc4random();
-#endif
 
 		/*
 		 * Set OUI to ASUSTek COMPUTER INC.
@@ -1288,7 +1288,7 @@ static void
 ae_powersave_disable(ae_softc_t *sc)
 {
 	uint32_t val;
-	
+
 	AE_LOCK_ASSERT(sc);
 
 	AE_PHY_WRITE(sc, AE_PHY_DBG_ADDR, 0);
@@ -1304,7 +1304,7 @@ static void
 ae_powersave_enable(ae_softc_t *sc)
 {
 	uint32_t val;
-	
+
 	AE_LOCK_ASSERT(sc);
 
 	/*
@@ -1362,7 +1362,7 @@ ae_pm_init(ae_softc_t *sc)
 			    IFM_FDX) != 0)
 				val |= AE_MAC_FULL_DUPLEX;
 			AE_WRITE_4(sc, AE_MAC_REG, val);
-			    
+
 		} else {	/* No link. */
 			AE_WRITE_4(sc, AE_WOL_REG, AE_WOL_LNKCHG | \
 			    AE_WOL_LNKCHG_PME);
@@ -1430,7 +1430,7 @@ static unsigned int
 ae_tx_avail_size(ae_softc_t *sc)
 {
 	unsigned int avail;
-	
+
 	if (sc->txd_cur >= sc->txd_ack)
 		avail = AE_TXD_BUFSIZE_DEFAULT - (sc->txd_cur - sc->txd_ack);
 	else
@@ -1451,7 +1451,7 @@ ae_encap(ae_softc_t *sc, struct mbuf **m_head)
 
 	m0 = *m_head;
 	len = m0->m_pkthdr.len;
-	
+
 	if ((sc->flags & AE_FLAG_TXAVAIL) == 0 ||
 	    len + sizeof(ae_txd_t) + 3 > ae_tx_avail_size(sc)) {
 #ifdef AE_DEBUG
@@ -1599,7 +1599,7 @@ ae_link_task(void *arg, int pending)
 		AE_UNLOCK(sc);	/* XXX: could happen? */
 		return;
 	}
-	
+
 	sc->flags &= ~AE_FLAG_LINK;
 	if ((mii->mii_media_status & (IFM_AVALID | IFM_ACTIVE)) ==
 	    (IFM_AVALID | IFM_ACTIVE)) {
@@ -1700,7 +1700,7 @@ ae_stop_txmac(ae_softc_t *sc)
 	/*
 	 * Wait for IDLE state.
 	 */
-	for (i = 0; i < AE_IDLE_TIMEOUT; i--) {
+	for (i = 0; i < AE_IDLE_TIMEOUT; i++) {
 		val = AE_READ_4(sc, AE_IDLE_REG);
 		if ((val & (AE_IDLE_TXMAC | AE_IDLE_DMAREAD)) == 0)
 			break;
