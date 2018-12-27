@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2003 Stuart Walsh<stu@ipng.org.uk>
  * and Duncan Barclay<dmlb@dmlb.org>
  *
@@ -26,7 +28,7 @@
 
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/bfe/if_bfe.c 338948 2018-09-26 17:12:14Z imp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -155,6 +157,8 @@ static driver_t bfe_driver = {
 static devclass_t bfe_devclass;
 
 DRIVER_MODULE(bfe, pci, bfe_driver, bfe_devclass, 0, 0);
+MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, bfe, bfe_devs,
+    nitems(bfe_devs) - 1);
 DRIVER_MODULE(miibus, bfe, miibus_driver, miibus_devclass, 0, 0);
 
 /*
@@ -793,7 +797,7 @@ bfe_list_newbuf(struct bfe_softc *sc, int c)
 	int nsegs;
 
 	m = m_getcl(M_NOWAIT, MT_DATA, M_PKTHDR);
-	if (!m)
+	if (m == NULL)
 		return (ENOBUFS);
 	m->m_len = m->m_pkthdr.len = MCLBYTES;
 
@@ -819,7 +823,7 @@ bfe_list_newbuf(struct bfe_softc *sc, int c)
 	rx_header->len = 0;
 	rx_header->flags = 0;
 	bus_dmamap_sync(sc->bfe_rxmbuf_tag, r->bfe_map, BUS_DMASYNC_PREREAD);
-
+	
 	ctrl = segs[0].ds_len & BFE_DESC_LEN;
 	KASSERT(ctrl > ETHER_MAX_LEN + 32, ("%s: buffer size too small(%d)!",
 	    __func__, ctrl));
@@ -1402,7 +1406,7 @@ bfe_rxeof(struct bfe_softc *sc)
 		 * Rx status should be read from mbuf such that we can't
 		 * delay bus_dmamap_sync(9). This hardware limiation
 		 * results in inefficent mbuf usage as bfe(4) couldn't
-		 * reuse mapped buffer from errored frame.
+		 * reuse mapped buffer from errored frame. 
 		 */
 		if (bfe_list_newbuf(sc, cons) != 0) {
 			if_inc_counter(ifp, IFCOUNTER_IQDROPS, 1);

@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ *
  * Copyright (c) 1998, 1999, 2000, 2001 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -56,7 +58,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/bmtphy.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * Driver for the Broadcom BCM5201/BCM5202 "Mini-Theta" PHYs.  This also
@@ -138,11 +140,12 @@ bmtphy_probe(device_t dev)
 	rval = mii_phy_dev_probe(dev, bmtphys_lp, BUS_PROBE_LOW_PRIORITY);
 #ifndef __HAIKU__
 	if (rval <= 0)
-#else
-	if (rval <= 0 && rval != ENXIO)
+		return (rval);
+#else /* __HAIKU__ */
+	/* our BUS_PROBE_* constants are > 0 since errors are < 0 */
+	if (rval > 0)
 		return (rval);
 #endif
-
 	return (mii_phy_dev_probe(dev, bmtphys_dp, BUS_PROBE_DEFAULT));
 }
 
