@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ *
  * Copyright (c) 1998, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -53,7 +55,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/mii/acphy.c 281821 2015-04-21 09:39:48Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/acphy.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * Driver for Altima AC101 10/100 PHY

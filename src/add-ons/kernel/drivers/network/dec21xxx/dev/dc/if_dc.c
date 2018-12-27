@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ee.columbia.edu>.  All rights reserved.
  *
@@ -31,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/dc/if_dc.c 277565 2015-01-23 15:14:30Z kevlo $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/dc/if_dc.c 338948 2018-09-26 17:12:14Z imp $");
 
 /*
  * DEC "tulip" clone ethernet driver. Supports the DEC/Intel 21143
@@ -357,6 +359,8 @@ static devclass_t dc_devclass;
 
 DRIVER_MODULE_ORDERED(dc, pci, dc_driver, dc_devclass, NULL, NULL,
     SI_ORDER_ANY);
+MODULE_PNP_INFO("W32:vendor/device;U8:revision;D:#", pci, dc, dc_devs,
+    nitems(dc_devs) - 1);
 DRIVER_MODULE(miibus, dc, miibus_driver, miibus_devclass, NULL, NULL);
 
 #define	DC_SETBIT(sc, reg, x)				\

@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ee.columbia.edu>.  All rights reserved.
  *
@@ -31,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/dc/pnphy.c 266974 2014-06-02 17:54:39Z marcel $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/dc/pnphy.c 325966 2017-11-18 14:26:50Z pfg $");
 
 /*
  * Pseudo-driver for media selection on the Lite-On PNIC 82c168

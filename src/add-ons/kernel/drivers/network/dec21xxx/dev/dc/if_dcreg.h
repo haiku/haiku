@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ee.columbia.edu>.  All rights reserved.
  *
@@ -29,7 +31,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/dc/if_dcreg.h 227675 2011-11-18 19:38:19Z yongari $
+ * $FreeBSD: releng/12.0/sys/dev/dc/if_dcreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 /*

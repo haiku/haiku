@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ee.columbia.edu>.  All rights reserved.
  *
@@ -29,7 +31,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/mii/amphyreg.h 139749 2005-01-06 01:43:34Z imp $
+ * $FreeBSD: releng/12.0/sys/dev/mii/amphyreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 #ifndef _DEV_MII_AMTPHYREG_H_

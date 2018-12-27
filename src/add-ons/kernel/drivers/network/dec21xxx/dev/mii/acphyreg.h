@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2001 Semen Ustimenko (semenu@FreeBSD.org)
  * All rights reserved.
  *
@@ -23,7 +25,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/mii/acphyreg.h 165986 2007-01-12 22:58:04Z marius $
+ * $FreeBSD: releng/12.0/sys/dev/mii/acphyreg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef _DEV_MII_ACPHYREG_H_

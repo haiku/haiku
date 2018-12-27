@@ -1,5 +1,7 @@
 /*	$NetBSD: if_de.c,v 1.86 1999/06/01 19:17:59 thorpej Exp $	*/
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ *
  * Copyright (c) 1994-1997 Matt Thomas (matt@3am-software.com)
  * All rights reserved.
  *
@@ -36,7 +38,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/de/if_de.c 315221 2017-03-14 02:06:03Z pfg $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/de/if_de.c 339735 2018-10-25 17:00:39Z brooks $");
 
 #define	TULIP_HDR_DATA
 
@@ -3916,7 +3918,7 @@ tulip_txput(tulip_softc_t * const sc, struct mbuf *m)
      * a bit reminiscent of going on the Ark two by two
      * since each descriptor for the TULIP can describe
      * two buffers.  So we advance through packet filling
-     * each of the two entries at a time to to fill each
+     * each of the two entries at a time to fill each
      * descriptor.  Clear the first and last segment bits
      * in each descriptor (actually just clear everything
      * but the end-of-ring or chain bits) to make sure
@@ -4262,18 +4264,6 @@ tulip_ifioctl(struct ifnet * ifp, u_long cmd, caddr_t data)
 	    break;
 	}
 
-#ifdef SIOCGADDRROM
-	case SIOCGADDRROM: {
-	    error = copyout(sc->tulip_rombuf, ifr->ifr_data, sizeof(sc->tulip_rombuf));
-	    break;
-	}
-#endif
-#ifdef SIOCGCHIPID
-	case SIOCGCHIPID: {
-	    ifr->ifr_metric = (int) sc->tulip_chipid;
-	    break;
-	}
-#endif
 	default: {
 	    error = ether_ioctl(ifp, cmd, data);
 	    break;
