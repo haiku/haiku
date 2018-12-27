@@ -79,6 +79,9 @@ CTASSERT(sizeof (struct ether_addr) == ETHER_ADDR_LEN);
 #endif
 
 #define	ETHER_IS_MULTICAST(addr) (*(addr) & 0x01) /* is address mcast/bcast? */
+#define	ETHER_IS_BROADCAST(addr) \
+	(((addr)[0] & (addr)[1] & (addr)[2] & \
+	  (addr)[3] & (addr)[4] & (addr)[5]) == 0xff)
 
 /*
  *  NOTE: 0x0000-0x05DC (0..1500) are generally IEEE 802.3 length fields.

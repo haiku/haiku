@@ -19,5 +19,6 @@ typedef enum modeventtype {
 
 #define MODULE_VERSION(name, version)
 #define MODULE_DEPEND(module, mdepend, vmin, vpref, vmax)
+#define	MODULE_PNP_INFO(d, b, unique, t, n)
 
 #endif
