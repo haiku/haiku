@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network marvell_yukon dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon dev msk ;

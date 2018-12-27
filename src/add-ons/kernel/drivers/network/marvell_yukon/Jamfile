@@ -1,3 +1,27 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network marvell_yukon ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network marvell_yukon dev ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev msk ] ;
+
+KernelAddon marvell_yukon :
+	glue.c
+	ukphy.c
+	ukphy_subr.c
+	e1000phy.c
+	if_msk.c
+	: libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles ukphy$(SUFOBJ) e1000phy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles ukphy.c e1000phy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
