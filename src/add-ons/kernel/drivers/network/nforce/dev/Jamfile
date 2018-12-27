@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network nforce dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network nforce dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network nforce dev nfe ;
