@@ -35,45 +35,8 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 	const media_format* inputFormat, media_format* _outputFormat,
 	media_codec_info* _codecInfo)
 {
-	// TODO: If fileFormat is provided (existing apps also pass NULL),
-	// we could at least check fileFormat->capabilities against
-	// outputFormat->type without even contacting the server.
-
-	if (cookie == NULL || inputFormat == NULL || _codecInfo == NULL)
-		return B_BAD_VALUE;
-
-	while (true) {
-		media_codec_info candidateCodecInfo;
-		media_format_family candidateFormatFamily;
-		media_format candidateInputFormat;
-		media_format candidateOutputFormat;
-
-		status_t ret = BCodecKit::BCodecRoster::GetCodecInfo(
-			&candidateCodecInfo, &candidateFormatFamily,
-			&candidateInputFormat, &candidateOutputFormat, *cookie);
-
-		if (ret != B_OK)
-			return ret;
-
-		*cookie = *cookie + 1;
-
-		if (fileFormat != NULL && candidateFormatFamily != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != candidateFormatFamily) {
-			continue;
-		}
-
-		if (!candidateInputFormat.Matches(inputFormat))
-			continue;
-
-		if (_outputFormat != NULL)
-			*_outputFormat = candidateOutputFormat;
-
-		*_codecInfo = candidateCodecInfo;
-		break;
-	}
-
-	return B_OK;
+	return BCodecKit::BCodecRoster::GetNextEncoder(cookie, fileFormat,
+		inputFormat, _outputFormat, _codecInfo);
 }
 
 
@@ -83,77 +46,16 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 	media_codec_info* _codecInfo, media_format* _acceptedInputFormat,
 	media_format* _acceptedOutputFormat)
 {
-	// TODO: If fileFormat is provided (existing apps also pass NULL),
-	// we could at least check fileFormat->capabilities against
-	// outputFormat->type without even contacting the server.
-
-	if (cookie == NULL || inputFormat == NULL || outputFormat == NULL
-		|| _codecInfo == NULL) {
-		return B_BAD_VALUE;
-	}
-
-	while (true) {
-		media_codec_info candidateCodecInfo;
-		media_format_family candidateFormatFamily;
-		media_format candidateInputFormat;
-		media_format candidateOutputFormat;
-
-		status_t ret = BCodecKit::BCodecRoster::GetCodecInfo(
-			&candidateCodecInfo, &candidateFormatFamily, &candidateInputFormat,
-			&candidateOutputFormat, *cookie);
-				
-		if (ret != B_OK)
-			return ret;
-
-		*cookie = *cookie + 1;
-
-		if (fileFormat != NULL && candidateFormatFamily != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != candidateFormatFamily) {
-			continue;
-		}
-
-		if (!candidateInputFormat.Matches(inputFormat)
-			|| !candidateOutputFormat.Matches(outputFormat)) {
-			continue;
-		}
-
-		// TODO: These formats are currently way too generic. For example,
-		// an encoder may want to adjust video width to a multiple of 16,
-		// or overwrite the intput and or output color space. To make this
-		// possible, we actually have to instantiate an Encoder here and
-		// ask it to specifiy the format.
-		if (_acceptedInputFormat != NULL)
-			*_acceptedInputFormat = candidateInputFormat;
-		if (_acceptedOutputFormat != NULL)
-			*_acceptedOutputFormat = candidateOutputFormat;
-
-		*_codecInfo = candidateCodecInfo;
-		break;
-	}
-
-	return B_OK;
+	return BCodecKit::BCodecRoster::GetNextEncoder(cookie, fileFormat,
+		inputFormat, outputFormat, _codecInfo, _acceptedInputFormat,
+			_acceptedOutputFormat);
 }
 
 
 status_t
 get_next_encoder(int32* cookie, media_codec_info* _codecInfo)
 {
-	if (cookie == NULL || _codecInfo == NULL)
-		return B_BAD_VALUE;
-
-	media_format_family formatFamily;
-	media_format inputFormat;
-	media_format outputFormat;
-
-	status_t ret = BCodecKit::BCodecRoster::GetCodecInfo(_codecInfo,
-		&formatFamily, &inputFormat, &outputFormat, *cookie);
-	if (ret != B_OK)
-		return ret;
-
-	*cookie = *cookie + 1;
-
-	return B_OK;
+	return BCodecKit::BCodecRoster::GetNextEncoder(cookie, _codecInfo);
 }
 
 
