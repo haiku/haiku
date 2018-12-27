@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2006-2014 QLogic Corporation
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,7 +24,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/12.0/sys/dev/bce/if_bcereg.h 326022 2017-11-20 19:36:21Z pfg $
  */
 
 #ifndef	_BCEREG_H_DEFINED

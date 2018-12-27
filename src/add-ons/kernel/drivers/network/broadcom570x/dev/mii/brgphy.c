@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 2000
  *	Bill Paul <wpaul@ee.columbia.edu>.  All rights reserved.
  *
@@ -31,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/brgphy.c 325966 2017-11-18 14:26:50Z pfg $");
 
 /*
  * Driver for the Broadcom BCM54xx/57xx 1000baseTX PHY.
