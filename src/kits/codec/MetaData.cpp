@@ -114,9 +114,23 @@ BMetaData::SetBool(const char* key, bool value)
 
 
 bool
-BMetaData::SetInt64(const char* key, int64 value)
+BMetaData::SetUInt32(const char* key, uint32 value)
 {
-	return fMessage->SetInt64(key, value) == B_OK ? true : false;
+	return fMessage->SetUInt32(key, value) == B_OK ? true : false;
+}
+
+
+bool
+BMetaData::SetUInt64(const char* key, uint64 value)
+{
+	return fMessage->SetUInt64(key, value) == B_OK ? true : false;
+}
+
+
+bool
+BMetaData::SetFloat(const char* key, float value)
+{
+	return fMessage->SetFloat(key, value) == B_OK ? true : false;
 }
 
 

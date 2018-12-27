@@ -19,36 +19,36 @@ extern const char* kCanSeekForward;		// bool
 extern const char* kCanSeek;			// bool
 
 // Bitrates
-extern const char* kAudioBitRate;		// int32 (bps)
-extern const char* kVideoBitRate;		// int32 (bps)
-extern const char* kAudioSampleRate;	// int32 (hz)
-extern const char* kVideoFrameRate;		// int32 (hz)
+extern const char* kAudioBitRate;		// uint32 (bps)
+extern const char* kVideoBitRate;		// uint32 (bps)
+extern const char* kAudioSampleRate;	// float (hz)
+extern const char* kVideoFrameRate;		// float (hz)
 
 // RFC2046 and RFC4281
 extern const char* kMimeType;			// BString
 extern const char* kAudioCodec;			// BString
 extern const char* kVideoCodec;			// BString
-extern const char* kVideoHeight;		// int32
-extern const char* kVideoWidth;			// int32
-extern const char* kNumTracks;			// int32
+extern const char* kVideoHeight;		// uint32
+extern const char* kVideoWidth;			// uint32
+extern const char* kNumTracks;			// uint32
 extern const char* kDrmCrippled;		// bool
 
 // Stuff needed to fully describe the BMediaFormat
 extern const char* kMediaType;			// media_type
 // Audio stuff
-extern const char* kChannelCount;		// int32
-extern const char* kAudioFormat;		// int32
-extern const char* kByteOrder;			// int32
+extern const char* kChannelCount;		// uint32
+extern const char* kAudioFormat;		// uint32
+extern const char* kByteOrder;			// uint32
 extern const char* kBufferSize;			// size_t
 // This is also BMediaFormat stuff, but mostly video
 // NOTE: video width/height are defined as per RFC mentioned above
-extern const char* kLineWidth;			// int32
-extern const char* kLineCount;			// int32
-extern const char* kBytesPerRow;		// int32
-extern const char* kPixelOffset;		// int32
-extern const char* kLineOffset;			// int32
+extern const char* kLineWidth;			// uint32
+extern const char* kLineCount;			// uint32
+extern const char* kBytesPerRow;		// uint32
+extern const char* kPixelOffset;		// uint32
+extern const char* kLineOffset;			// uint32
 extern const char* kColorSpace;			// color_space
-extern const char* kOrientation;		// int32
+extern const char* kOrientation;		// uint32
 
 // General use attributes
 extern const char* kTitle;				// BString
@@ -69,16 +69,16 @@ extern const char* kPublisher;			// BString
 extern const char* kEncoder;			// BString
 extern const char* kTrack;
 extern const char* kDate;				// BString
-extern const char* kDuration;			// int32 (ms)
+extern const char* kDuration;			// uint32 (ms)
 extern const char* kRating;				// BString
 // TODO: BBitmap? uint8 array? url?
 //extern const char* kAlbumArt
-extern const char* kCDTrackNum;			// int32
-extern const char* kCDTrackMax;			// int32
+extern const char* kCDTrackNum;			// uint32
+extern const char* kCDTrackMax;			// uint32
 
 extern const char* kChapter;			// BMetaData
-extern const char* kChapterStart;		// int64
-extern const char* kChapterEnd;			// int64
+extern const char* kChapterStart;		// uint64
+extern const char* kChapterEnd;			// uint64
 
 // Others
 extern const char* kProgramData;		// BMetaData
@@ -96,13 +96,21 @@ public:
 	// Woah. It seems we need BValue there.
 	bool				SetString(const char* key, const BString& value);
 	bool				SetBool(const char* key, bool value);
-	bool				SetInt32(const char* key, int32 value);
-	bool				SetInt64(const char* key, int64 value);
+	bool				SetUInt32(const char* key, uint32 value);
+	bool				SetUInt64(const char* key, uint64 value);
+	bool				SetFloat(const char* key, float value);
 
 	bool				GetString(const char* key, BString* value) const;
 	bool				GetBool(const char* key, bool* value) const;
-	bool				GetInt32(const char* key, int32* value) const;
-	bool				GetInt64(const char* key, int64* value) const;
+	bool				GetUInt32(const char* key, uint32* value) const;
+	bool				GetUInt64(const char* key, uint64* value) const;
+	bool				GetFloat(const char* key, float* value);
+
+	bool				HasString(const char* key) const;
+	bool				HasBool(const char* key) const;
+	bool				HasUInt32(const char* key) const;
+	bool				HasUInt64(const char* key) const;
+	bool				HasFloat(const char* key) const;
 
 	// We allow embedding BMetaData into BMetaData. The BMetaData field
 	// is the only one allowed to have more occurrences for a single key
@@ -110,6 +118,8 @@ public:
 	bool				AddMetaData(const char* key, BMetaData* data);
 	bool				GetMetaData(const char* key, BMetaData* data,
 							uint32 index = 0);
+	bool				HasMetaData(const char* key, uint32 index = 0);
+	bool				RemoveMetaData(const char* key, uint32 index = 0);
 
 	bool				RemoveValue(const char* key);
 
