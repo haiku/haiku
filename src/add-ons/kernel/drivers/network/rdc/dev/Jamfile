@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network rdc dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network rdc dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network rdc dev vte ;
-
