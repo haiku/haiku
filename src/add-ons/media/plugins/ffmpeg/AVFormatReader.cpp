@@ -1577,10 +1577,10 @@ AVFormatReader::GetMetaData(BMetaData* data)
 	for (unsigned i = 0; i < context->nb_chapters; i++) {
 		AVChapter* chapter = context->chapters[i];
 		BMetaData chapterData;
-		chapterData.SetInt64(kChapterStart, bigtime_t(1000000.0
+		chapterData.SetUInt64(kChapterStart, bigtime_t(1000000.0
 			* chapter->start * chapter->time_base.num
 			/ chapter->time_base.den + 0.5));
-		chapterData.SetInt64(kChapterEnd, bigtime_t(1000000.0
+		chapterData.SetUInt64(kChapterEnd, bigtime_t(1000000.0
 			* chapter->end * chapter->time_base.num
 			/ chapter->time_base.den + 0.5));
 
