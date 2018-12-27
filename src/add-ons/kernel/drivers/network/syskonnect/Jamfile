@@ -1,3 +1,28 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network syskonnect ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network syskonnect dev ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev sk ] ;
+
+KernelAddon syskonnect :
+	glue.c
+	e1000phy.c
+	xmphy.c
+	ukphy.c
+	ukphy_subr.c
+	if_sk.c
+	: libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles e1000phy$(SUFOBJ) xmphy$(SUFOBJ) ukphy$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles e1000phy.c xmphy.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

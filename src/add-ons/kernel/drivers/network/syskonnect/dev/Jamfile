@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network syskonnect dev ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network syskonnect dev mii ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network syskonnect dev sk ;
