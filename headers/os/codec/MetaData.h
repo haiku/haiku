@@ -87,6 +87,15 @@ extern const char* kProgramData;		// BMetaData
 // https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata
 
 
+/**
+ * @brief BMetaData stores the media metadata.
+ *
+ * The metadata model is sparse and each key can occur at most once,
+ * except for BMetaData itself.
+ * The key is an integer and the value is the actual metadata.
+ * The client of this class is required to know in advance the type
+ * of a particular metadata key.
+ */
 class BMetaData {
 public:
 						BMetaData();
