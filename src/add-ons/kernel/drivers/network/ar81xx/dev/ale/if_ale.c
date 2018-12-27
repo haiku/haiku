@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2008, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
  *
@@ -28,7 +30,7 @@
 /* Driver for Atheros AR8121/AR8113/AR8114 PCIe Ethernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ale/if_ale.c 338948 2018-09-26 17:12:14Z imp $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -176,6 +178,8 @@ static driver_t ale_driver = {
 static devclass_t ale_devclass;
 
 DRIVER_MODULE(ale, pci, ale_driver, ale_devclass, NULL, NULL);
+MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, ale, ale_devs,
+    nitems(ale_devs));
 DRIVER_MODULE(miibus, ale, miibus_driver, miibus_devclass, NULL, NULL);
 
 static struct resource_spec ale_res_spec_mem[] = {
