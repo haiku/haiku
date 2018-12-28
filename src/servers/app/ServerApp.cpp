@@ -2065,7 +2065,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Attached Data:
 			// 1) uint16 family ID
 			// 2) uint16 style ID
-			// 3 uint32 start of unicode block
+			// 3) uint32 start of unicode block
 			// 4) uint32 end of unicode block
 
 			// Returns:
@@ -2107,7 +2107,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 6) uint32 - flags
 			// 7) int32 - numChars
 			// 8) int32 - numBytes
-			// 8) char - chars (bytesInBuffer times)
+			// 8) char - chars (numBytes times)
 
 			// Returns:
 			// 1) BShape - glyph shape
@@ -2300,7 +2300,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				delete[] charArray;
 				delete[] escapements;
 				delete[] offsets;
-
 				fLink.StartMessage(B_NO_MEMORY);
 				fLink.Flush();
 				break;

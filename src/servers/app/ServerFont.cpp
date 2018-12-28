@@ -669,9 +669,11 @@ ServerFont::IncludesUnicodeBlock(uint32 start, uint32 end, bool& hasBlock)
 class HasGlyphsConsumer {
  public:
 	HasGlyphsConsumer(bool* hasArray)
-		: fHasArray(hasArray)
+		:
+		fHasArray(hasArray)
 	{
 	}
+
 	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
@@ -679,6 +681,7 @@ class HasGlyphsConsumer {
 	{
 		fHasArray[index] = false;
 	}
+
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y, double advanceX,
 			double advanceY)
@@ -711,10 +714,12 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes,
 class EdgesConsumer {
  public:
 	EdgesConsumer(edge_info* edges, float size)
-		: fEdges(edges)
-		, fSize(size)
+		:
+		fEdges(edges),
+		fSize(size)
 	{
 	}
+
 	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
@@ -723,6 +728,7 @@ class EdgesConsumer {
 		fEdges[index].left = 0.0;
 		fEdges[index].right = 0.0;
 	}
+
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y, double advanceX,
 			double advanceY)
@@ -894,6 +900,7 @@ ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 		&delta, fSpacing)) {
 		return B_OK;
 	}
+
 	return B_ERROR;
 }
 
@@ -902,14 +909,15 @@ class BoundingBoxConsumer {
  public:
 	BoundingBoxConsumer(Transformable& transform, BRect* rectArray,
 			bool asString)
-		: rectArray(rectArray)
-		, stringBoundingBox(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN)
-		, fAsString(asString)
-		, fCurves(fPathAdaptor)
-		, fContour(fCurves)
-		, fTransformedOutline(fCurves, transform)
-		, fTransformedContourOutline(fContour, transform)
-		, fTransform(transform)
+		:
+		rectArray(rectArray),
+		stringBoundingBox(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
+		fAsString(asString),
+		fCurves(fPathAdaptor),
+		fContour(fCurves),
+		fTransformedOutline(fCurves, transform),
+		fTransformedContourOutline(fContour, transform),
+		fTransform(transform)
 	{
 	}
 
@@ -917,6 +925,7 @@ class BoundingBoxConsumer {
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
+
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y, double advanceX,
 			double advanceY)
@@ -1038,7 +1047,12 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 
 class StringWidthConsumer {
  public:
-	StringWidthConsumer() : width(0.0) {}
+	StringWidthConsumer()
+		:
+		width(0.0)
+	{
+	}
+
 	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) { width = x; }
@@ -1046,7 +1060,9 @@ class StringWidthConsumer {
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y, double advanceX,
 			double advanceY)
-	{ return true; }
+	{
+		return true;
+	}
 
 	float width;
 };

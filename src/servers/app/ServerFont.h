@@ -27,12 +27,11 @@ class ServerFont {
  public:
 								ServerFont();
 								ServerFont(FontStyle& style,
-										   float size = 12.0,
-										   float rotation = 0.0,
-										   float shear = 90.0,
-										   float falseBoldWidth = 0.0,
-										   uint16 flags = 0,
-										   uint8 spacing = B_BITMAP_SPACING);
+									float size = 12.0, float rotation = 0.0,
+									float shear = 90.0,
+									float falseBoldWidth = 0.0,
+									uint16 flags = 0,
+									uint8 spacing = B_BITMAP_SPACING);
 								ServerFont(const ServerFont& font);
 	virtual						~ServerFont();
 
@@ -70,7 +69,7 @@ class ServerFont {
 
 			void				SetStyle(FontStyle* style);
 			status_t			SetFamilyAndStyle(uint16 familyID,
-												  uint16 styleID);
+									uint16 styleID);
 			status_t			SetFamilyAndStyle(uint32 fontID);
 
 			uint16				StyleID() const
@@ -159,19 +158,19 @@ class ServerFont {
 			void				GetHeight(font_height& height) const;
 
 			void				TruncateString(BString* inOut,
-											   uint32 mode,
-											   float width) const;
+									uint32 mode, float width) const;
 
 			Transformable		EmbeddedTransformation() const;
-			status_t 			GetUnicodeBlocks(unicode_block &blocksForFont);
-			status_t			IncludesUnicodeBlock(uint32 start, uint32 end, bool &hasBlock);
+			status_t			GetUnicodeBlocks(unicode_block &blocksForFont);
+			status_t			IncludesUnicodeBlock(uint32 start, uint32 end,
+									bool &hasBlock);
 
 protected:
 	friend class FontStyle;
 			FT_Face				GetTransformedFace(bool rotate,
 									bool shear) const;
 			void				PutTransformedFace(FT_Face face) const;
-			
+
 			FontStyle*			fStyle;
 			float				fSize;
 			float				fRotation;

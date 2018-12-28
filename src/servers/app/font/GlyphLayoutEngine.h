@@ -309,7 +309,7 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	// glyphs from it. We need to obtain the fallback font while we have not
 	// locked anything, since locking the FontManager with the write-lock held
 	// can obvisouly lead to a deadlock.
-	
+
 	bool writeLocked = entry->IsWriteLocked();
 
 	if (writeLocked) {
