@@ -294,8 +294,9 @@ int				m_dup_pkthdr(struct mbuf *to, const struct mbuf *from, int how);
 void			m_demote_pkthdr(struct mbuf *m);
 void			m_demote(struct mbuf *m0, int all, int flags);
 
-void			m_extadd(struct mbuf*, caddr_t, u_int, void(*) (void*, void*),
-	void*, void*, int, int);
+void			m_extadd(struct mbuf *mb, caddr_t buf, u_int size,
+	void (*freef)(struct mbuf *, void *, void *), void *arg1, void *arg2,
+	int flags, int type);
 
 u_int			m_fixhdr(struct mbuf*);
 struct mbuf*	m_free(struct mbuf*);

@@ -95,3 +95,61 @@ m_getm2(struct mbuf *m, int len, int how, short type, int flags)
 	return (m);
 }
 
+/*-
+ * Configure a provided mbuf to refer to the provided external storage
+ * buffer and setup a reference count for said buffer.
+ *
+ * Arguments:
+ *    mb     The existing mbuf to which to attach the provided buffer.
+ *    buf    The address of the provided external storage buffer.
+ *    size   The size of the provided buffer.
+ *    freef  A pointer to a routine that is responsible for freeing the
+ *           provided external storage buffer.
+ *    args   A pointer to an argument structure (of any type) to be passed
+ *           to the provided freef routine (may be NULL).
+ *    flags  Any other flags to be passed to the provided mbuf.
+ *    type   The type that the external storage buffer should be
+ *           labeled with.
+ *
+ * Returns:
+ *    Nothing.
+ */
+void
+m_extadd(struct mbuf *mb, caddr_t buf, u_int size,
+    void (*freef)(struct mbuf *, void *, void *), void *arg1, void *arg2,
+    int flags, int type)
+{
+
+	KASSERT(type != EXT_CLUSTER, ("%s: EXT_CLUSTER not allowed", __func__));
+
+	mb->m_flags |= (M_EXT | flags);
+	mb->m_ext.ext_buf = buf;
+	mb->m_data = mb->m_ext.ext_buf;
+	mb->m_ext.ext_size = size;
+#ifndef __HAIKU__
+	mb->m_ext.ext_free = freef;
+	mb->m_ext.ext_arg1 = arg1;
+	mb->m_ext.ext_arg2 = arg2;
+#else
+	if (freef != NULL)
+		panic("m_ext.ext_free not yet implemented");
+#endif
+	mb->m_ext.ext_type = type;
+
+	if (type != EXT_EXTREF) {
+		mb->m_ext.ext_count = 1;
+		mb->m_ext.ext_flags = EXT_FLAG_EMBREF;
+	} else
+		mb->m_ext.ext_flags = 0;
+}
+
+/*
+ * Free an entire chain of mbufs and associated external buffers, if
+ * applicable.
+ */
+void
+m_freem(struct mbuf *mb)
+{
+	while (mb != NULL)
+		mb = m_free(mb);
+}

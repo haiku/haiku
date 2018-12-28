@@ -214,15 +214,6 @@ m_cljget(struct mbuf *memoryBuffer, int how, int size)
 	return NULL;
 }
 
-
-void
-m_freem(struct mbuf *memoryBuffer)
-{
-	while (memoryBuffer)
-		memoryBuffer = m_free(memoryBuffer);
-}
-
-
 static void
 mb_free_ext(struct mbuf *memoryBuffer)
 {
@@ -272,7 +263,7 @@ mb_free_ext(struct mbuf *memoryBuffer)
 	else if (memoryBuffer->m_ext.ext_type == EXT_JUMBOP)
 		cache = sJumboPageSizeCache;
 	else
-		panic("unknown type");
+		panic("unknown mbuf ext_type %d", memoryBuffer->m_ext.ext_type);
 
 	object_cache_free(cache, memoryBuffer->m_ext.ext_buf, 0);
 	memoryBuffer->m_ext.ext_buf = NULL;
@@ -281,25 +272,18 @@ mb_free_ext(struct mbuf *memoryBuffer)
 
 
 struct mbuf *
-m_free(struct mbuf *memoryBuffer)
+m_free(struct mbuf* memoryBuffer)
 {
-	struct mbuf *next = memoryBuffer->m_next;
+	struct mbuf* next = memoryBuffer->m_next;
 
+	if ((memoryBuffer->m_flags & (M_PKTHDR|M_NOFREE)) == (M_PKTHDR|M_NOFREE))
+		m_tag_delete_chain(memoryBuffer, NULL);
 	if (memoryBuffer->m_flags & M_EXT)
 		mb_free_ext(memoryBuffer);
-	else
+	else if ((memoryBuffer->m_flags & M_NOFREE) == 0)
 		object_cache_free(sMBufCache, memoryBuffer, 0);
 
 	return next;
-}
-
-
-void
-m_extadd(struct mbuf *memoryBuffer, caddr_t buffer, u_int size,
-    void (*freeHook)(void *, void *), void *arg1, void *arg2, int flags, int type)
-{
-	// TODO: implement?
-	panic("m_extadd() called.");
 }
 
 
