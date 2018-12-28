@@ -394,7 +394,7 @@ determine_bounds_draw_shape(void* _state, const BShape& shape, bool fill)
 
 
 static void
-determine_bounds_draw_string(void* _state, const char* string, size_t _length,
+determine_bounds_draw_string(void* _state, const char* string, size_t length,
 	float deltaSpace, float deltaNonSpace)
 {
 	TRACE_BB("%p string '%s'\n", _state, string);
@@ -405,7 +405,6 @@ determine_bounds_draw_string(void* _state, const char* string, size_t _length,
 
 	escapement_delta delta = { deltaSpace, deltaNonSpace };
 	BRect rect;
-	int32 length = _length;
 	font.GetBoundingBoxesForStrings((char**)&string, &length, 1, &rect,
 		B_SCREEN_METRIC, &delta);
 

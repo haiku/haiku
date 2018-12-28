@@ -2563,8 +2563,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			for(int32 i = 0; i < numStrings; i++) {
 				// This version of ReadString allocates the strings, we free
 				// them below
-				// TODO: this does not work on 64-bit (size_t != int32)
-				link.ReadString(&stringArray[i], (size_t*)&lengthArray[i]);
+				link.ReadString(&stringArray[i], &lengthArray[i]);
 				link.Read<escapement_delta>(&deltaArray[i]);
 			}
 

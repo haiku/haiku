@@ -1017,7 +1017,7 @@ ServerFont::GetBoundingBoxes(const char* string, int32 numBytes,
 
 
 status_t
-ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
+ServerFont::GetBoundingBoxesForStrings(char *charArray[], size_t lengthArray[],
 	int32 numStrings, BRect rectArray[], font_metric_mode mode,
 	escapement_delta deltaArray[])
 {
@@ -1028,7 +1028,7 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 	Transformable transform(EmbeddedTransformation());
 
 	for (int32 i = 0; i < numStrings; i++) {
-		int32 numBytes = lengthArray[i];
+		size_t numBytes = lengthArray[i];
 		const char* string = charArray[i];
 		escapement_delta delta = deltaArray[i];
 

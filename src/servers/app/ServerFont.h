@@ -140,7 +140,7 @@ class ServerFont {
 									bool asString);
 
 			status_t			GetBoundingBoxesForStrings(char *charArray[],
-									int32 lengthArray[], int32 numStrings,
+									size_t lengthArray[], int32 numStrings,
 									BRect rectArray[], font_metric_mode mode,
 									escapement_delta deltaArray[]);
 
