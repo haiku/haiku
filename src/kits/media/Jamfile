@@ -60,6 +60,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DataExchange.cpp
 			DefaultMediaTheme.cpp
 			DormantNodeManager.cpp
+			FormatManager.cpp
 			MediaRecorderNode.cpp
 			Notifications.cpp
 			request_data.cpp

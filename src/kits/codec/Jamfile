@@ -36,11 +36,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# Internal Functionality
 			ChunkCache.cpp
 			AddOnManager.cpp
-			FormatManager.cpp
 			PluginManager.cpp
 
 			# We need this to do not depend on libmedia
 			# will be removed when libmedia2 is introduced
+			FormatManager.cpp
 			MediaDefs.cpp
 			MediaFormats.cpp
 			RealtimeAlloc.cpp
