@@ -832,8 +832,10 @@ ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 	escapement_delta delta, BPoint escapementArray[],
 	BPoint offsetArray[]) const
 {
-	if (!string || numBytes <= 0 || !escapementArray)
+	if (string == NULL || numBytes <= 0 || numChars <= 0
+		|| escapementArray == NULL) {
 		return B_BAD_DATA;
+	}
 
 	BPointEscapementConsumer consumer(escapementArray, offsetArray, fSize);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
@@ -881,7 +883,7 @@ status_t
 ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 	escapement_delta delta, float widthArray[]) const
 {
-	if (!string || numBytes <= 0 || !widthArray)
+	if (string == NULL || numBytes <= 0 || numChars <= 0 || widthArray == NULL)
 		return B_BAD_DATA;
 
 	WidthEscapementConsumer consumer(widthArray, fSize);
@@ -1011,8 +1013,10 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], size_t lengthArray[],
 	escapement_delta deltaArray[])
 {
 	// TODO: The font_metric_mode is never used
-	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
+	if (charArray == NULL || lengthArray == NULL || numStrings <= 0
+		|| rectArray == NULL || deltaArray == NULL) {
 		return B_BAD_DATA;
+	}
 
 	Transformable transform(EmbeddedTransformation());
 
