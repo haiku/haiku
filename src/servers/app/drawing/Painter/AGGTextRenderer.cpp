@@ -363,8 +363,8 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
 
-	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, delta,
-		fFont.Spacing(), NULL, cacheReference);
+	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, INT32_MAX,
+		delta, fFont.Spacing(), NULL, cacheReference);
 
 	return transform.TransformBounds(renderer.Bounds());
 }
@@ -400,8 +400,8 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
 
-	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, NULL,
-		fFont.Spacing(), offsets, cacheReference);
+	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, INT32_MAX,
+		NULL, fFont.Spacing(), offsets, cacheReference);
 
 	return transform.TransformBounds(renderer.Bounds());
 }

@@ -116,10 +116,12 @@ class ServerFont {
 									int32 numChars, BShape *shapeArray[]) const;
 
 			status_t			GetHasGlyphs(const char charArray[],
-									int32 numBytes, bool hasArray[]) const;
+									int32 numBytes, int32 numChars,
+									bool hasArray[]) const;
 
 			status_t			GetEdges(const char charArray[], int32 numBytes,
-									edge_info edgeArray[]) const;
+									int32 numChars, edge_info edgeArray[])
+									const;
 
 			status_t			GetEscapements(const char charArray[],
 									int32 numBytes, int32 numChars,
@@ -133,8 +135,8 @@ class ServerFont {
 									float widthArray[]) const;
 
 			status_t			GetBoundingBoxes(const char charArray[],
-									int32 numBytes, BRect rectArray[],
-									bool stringEscapement,
+									int32 numBytes, int32 numChars,
+									BRect rectArray[], bool stringEscapement,
 									font_metric_mode mode,
 									escapement_delta delta,
 									bool asString);

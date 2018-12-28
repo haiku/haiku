@@ -90,7 +90,7 @@ public:
 	static	bool				LayoutGlyphs(GlyphConsumer& consumer,
 									const ServerFont& font,
 									const char* utf8String,
-									int32 length,
+									int32 length, int32 maxChars,
 									const escapement_delta* delta = NULL,
 									uint8 spacing = B_BITMAP_SPACING,
 									const BPoint* offsets = NULL,
@@ -171,7 +171,7 @@ template<class GlyphConsumer>
 inline bool
 GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const ServerFont& font,
-	const char* utf8String, int32 length,
+	const char* utf8String, int32 length, int32 maxChars,
 	const escapement_delta* delta, uint8 spacing,
 	const BPoint* offsets, FontCacheReference* _cacheReference)
 {
@@ -217,7 +217,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	int32 index = 0;
 	bool writeLocked = false;
 	const char* start = utf8String;
-	while ((charCode = UTF8ToCharCode(&utf8String))) {
+	while (maxChars-- > 0 && (charCode = UTF8ToCharCode(&utf8String)) != 0) {
 
 		if (offsets != NULL) {
 			// Use direct glyph locations instead of calculating them

@@ -2204,7 +2204,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
-				status = font.GetHasGlyphs(charArray, numBytes, hasArray);
+				status = font.GetHasGlyphs(charArray, numBytes, numChars,
+					hasArray);
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(hasArray, numChars * sizeof(bool));
@@ -2251,7 +2252,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
-				status = font.GetEdges(charArray, numBytes, edgeArray);
+				status = font.GetEdges(charArray, numBytes, numChars,
+					edgeArray);
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(edgeArray, numChars * sizeof(edge_info));
@@ -2503,7 +2505,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 					// TODO: implement for real
 					if (font.GetBoundingBoxes(charArray, numBytes,
-							rectArray, stringEscapement, mode, delta,
+							numChars, rectArray, stringEscapement, mode, delta,
 							code == AS_GET_BOUNDINGBOXES_STRING) == B_OK) {
 
 						fLink.StartMessage(B_OK);
