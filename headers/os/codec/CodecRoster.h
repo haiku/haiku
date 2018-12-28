@@ -56,14 +56,6 @@ public:
 	// To choose the API I did a search among the Haiku codebase and
 	// programs for which we have the source available.
 
-	// TODO: At some point move all implementations here
-
-	static status_t		MakeFormatFor(
-							const media_format_description* descriptions,
-							int32 descriptionCount,
-							media_format& format, uint32 flags,
-							void* _reserved);
-
 	// TODO: media_format_family: really?
 	static status_t		GetCodecInfo(media_codec_info* _codecInfo,
 							media_format_family* _formatFamily,

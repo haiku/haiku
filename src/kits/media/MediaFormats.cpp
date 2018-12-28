@@ -524,7 +524,7 @@ BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
 	int32 descriptionCount, media_format* format, uint32 flags,
 	void* _reserved)
 {
-	return BCodecKit::BCodecRoster::MakeFormatFor(descriptions,
+	return FormatManager::GetInstance()->MakeFormatFor(descriptions,
 		descriptionCount, *format, flags, _reserved);
 }
 

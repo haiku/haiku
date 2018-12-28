@@ -269,14 +269,4 @@ BCodecRoster::GetCodecInfo(media_codec_info* codecInfo,
 }
 
 
-status_t
-BCodecRoster::MakeFormatFor(const media_format_description* descriptions,
-	int32 descriptionCount, media_format& format, uint32 flags,
-	void* _reserved)
-{
-	return FormatManager::GetInstance()->MakeFormatFor(descriptions,
-		descriptionCount, format, flags, _reserved);
-}
-
-
 } // namespace BCodecKit
