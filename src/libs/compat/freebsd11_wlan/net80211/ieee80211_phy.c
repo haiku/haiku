@@ -367,7 +367,9 @@ ieee80211_phy_init(void)
 		ieee80211_setup_ratetable(ratetables[i]);
 
 }
+#if 0
 SYSINIT(wlan_phy, SI_SUB_DRIVERS, SI_ORDER_FIRST, ieee80211_phy_init, NULL);
+#endif
 
 const struct ieee80211_rate_table *
 ieee80211_get_ratetable(struct ieee80211_channel *c)

@@ -261,7 +261,9 @@ ic_printf(struct ieee80211com *ic, const char * fmt, ...)
 
 static LIST_HEAD(, ieee80211com) ic_head = LIST_HEAD_INITIALIZER(ic_head);
 struct mtx ic_list_mtx;
+#if 0
 MTX_SYSINIT(ic_list, &ic_list_mtx, "ieee80211com list", MTX_DEF);
+#endif
 
 static int
 sysctl_ieee80211coms(SYSCTL_HANDLER_ARGS)
