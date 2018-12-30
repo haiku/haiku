@@ -284,6 +284,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	fAccountMenu(NULL),
 	fAccountID(defaultAccount),
 	fFromControl(NULL),
+	fCcControl(NULL),
 	fBccControl(NULL),
 	fDateControl(NULL),
 	fIncoming(incoming),
@@ -298,7 +299,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 
 	// From accounts menu
 	BMenuField* fromField = NULL;
-	if (!fIncoming || resending) {
+	if (!fIncoming || fResending) {
 		// And now the "from account" pop-up menu, on the left side, taking the
 		// remaining space.
 
@@ -351,7 +352,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	fToLabel = new LabelView(B_TRANSLATE("To:"));
 	fToControl = new AddressTextControl(B_TRANSLATE("To:"),
 		new BMessage(TO_FIELD));
-	if (fIncoming || resending) {
+	if (fIncoming || fResending) {
 		fToLabel->SetEnabled(false);
 		fToControl->SetEditable(false);
 		fToControl->SetEnabled(false);
@@ -417,7 +418,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		layout->AddItem(fFromControl->CreateTextViewLayoutItem(), 1, row);
 	}
 
-	if (fIncoming) {
+	if (fIncoming && !fResending) {
 		layout->AddView(fToLabel, 2, row);
 		layout->AddView(fToControl, 3, row++);
 	} else {
@@ -439,6 +440,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		layout->AddView(fCcLabel, 0, row);
 		layout->AddView(fCcControl, 1, row, 1, 1);
 	}
+
 	if (fBccControl != NULL) {
 		layout->AddView(new LabelView(B_TRANSLATE("Bcc:")), 2, row);
 		layout->AddView(fBccControl, 3, row++);
