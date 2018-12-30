@@ -24,12 +24,15 @@ mtx_init(struct mtx *mutex, const char *name, const char *type,
 	if ((options & MTX_RECURSE) != 0) {
 		recursive_lock_init_etc(&mutex->u.recursive, name,
 			MUTEX_FLAG_CLONE_NAME);
+		mutex->type = MTX_RECURSE;
+	} else if ((options & MTX_SPIN) != 0) {
+		B_INITIALIZE_SPINLOCK(&mutex->u.spinlock.lock);
+		mutex->type = MTX_SPIN;
 	} else {
 		mutex_init_etc(&mutex->u.mutex.lock, name, MUTEX_FLAG_CLONE_NAME);
 		mutex->u.mutex.owner = -1;
+		mutex->type = MTX_DEF;
 	}
-
-	mutex->type = options;
 }
 
 

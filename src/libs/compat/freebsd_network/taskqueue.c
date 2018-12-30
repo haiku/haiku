@@ -25,7 +25,7 @@
 #define	DT_DRAIN_IN_PROGRESS	(1 << 1)
 
 struct taskqueue {
-	char tq_name[64];
+	char tq_name[TASKQUEUE_NAMELEN];
 	struct mtx tq_mutex;
 	struct list tq_list;
 	taskqueue_enqueue_fn tq_enqueue;

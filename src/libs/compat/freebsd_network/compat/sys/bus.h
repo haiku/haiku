@@ -78,7 +78,7 @@ int bus_generic_suspend(device_t dev);
 int bus_generic_resume(device_t dev);
 void bus_generic_shutdown(device_t dev);
 
-typedef int (*driver_filter_t)(void *);
+typedef int (driver_filter_t)(void *arg);
 typedef void driver_intr_t(void *);
 
 
@@ -113,7 +113,7 @@ bus_alloc_resource_anywhere(device_t dev, int type, int *rid,
 bus_dma_tag_t bus_get_dma_tag(device_t dev);
 
 int bus_setup_intr(device_t dev, struct resource *r, int flags,
-	driver_filter_t filter, driver_intr_t handler, void *arg, void **_cookie);
+	driver_filter_t* filter, driver_intr_t handler, void *arg, void **_cookie);
 int bus_teardown_intr(device_t dev, struct resource *r, void *cookie);
 int bus_bind_intr(device_t dev, struct resource *r, int cpu);
 int bus_describe_intr(device_t dev, struct resource *irq, void *cookie,
@@ -123,6 +123,7 @@ const char *device_get_name(device_t dev);
 const char *device_get_nameunit(device_t dev);
 int device_get_unit(device_t dev);
 void *device_get_softc(device_t dev);
+void device_set_softc(device_t dev, void *softc);
 int device_printf(device_t dev, const char *, ...) __printflike(2, 3);
 void device_set_desc(device_t dev, const char *desc);
 void device_set_desc_copy(device_t dev, const char *desc);

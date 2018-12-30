@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2007-2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FBSD_COMPAT_SYS_TASKQUEUE_H_
@@ -11,9 +11,6 @@
 #include <sys/callout.h>
 
 
-#define PI_NET	(B_REAL_TIME_DISPLAY_PRIORITY - 1)
-
-
 struct timeout_task {
 	struct taskqueue *q;
 	struct task t;
@@ -21,6 +18,7 @@ struct timeout_task {
 	int    f;
 };
 
+#define	TASKQUEUE_NAMELEN		64
 
 typedef void (*taskqueue_enqueue_fn)(void *context);
 

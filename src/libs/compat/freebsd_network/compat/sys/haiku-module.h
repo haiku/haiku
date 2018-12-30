@@ -58,7 +58,7 @@ typedef struct device_method device_method_t;
 typedef struct {
 	const char *name;
 	device_method_t *methods;
-	size_t softc_size;
+	size_t size;
 } driver_t;
 
 #define DRIVER_MODULE_NAME(name, busname) \

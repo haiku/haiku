@@ -9,27 +9,27 @@
 typedef	void led_t(void*, int);
 
 
-static struct cdev*
+static inline struct cdev*
 led_create_state(led_t* func, void* priv, char const* name, int state)
 {
 	return NULL;
 }
 
 
-static struct cdev*
+static inline struct cdev*
 led_create(led_t* func, void* priv, char const* name)
 {
 	return NULL;
 }
 
 
-static void
+static inline void
 led_destroy(struct cdev* dev)
 {
 }
 
 
-static int
+static inline int
 led_set(char const* name, char const* cmd)
 {
 	return -1;

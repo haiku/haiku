@@ -24,7 +24,9 @@
 #define M_TRYWAIT	M_WAITOK
 #define M_WAIT		M_WAITOK
 
+/* mbuf types describing the content of the mbuf (including external storage). */
 #define MT_DATA		1
+#define	MT_NOINIT	255	/* not a type, a flag to allocate a non-initialized mbuf */
 
 /*
  * mbuf flags of global significance and layer crossing.
@@ -272,6 +274,9 @@ struct mbuf {
 #define m_ext		M_dat.MH.MH_dat.MH_ext
 #define m_pktdat	M_dat.MH.MH_dat.MH_databuf
 #define m_dat		M_dat.M_databuf
+
+int				m_init(struct mbuf *m, int how, short type, int flags);
+int				m_pkthdr_init(struct mbuf *m, int how);
 
 void			m_catpkt(struct mbuf *m, struct mbuf *n);
 void			m_adj(struct mbuf*, int);

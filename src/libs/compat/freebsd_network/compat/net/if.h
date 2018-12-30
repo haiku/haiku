@@ -13,7 +13,7 @@
 #include <sys/time.h>
 
 
-#define IF_Kbps(x)				((x) * 1000)
+#define IF_Kbps(x)				((uintmax_t)(x) * 1000)
 #define IF_Mbps(x)				(IF_Kbps((x) * 1000))
 #define IF_Gbps(x)				(IF_Mbps((x) * 1000))
 
@@ -52,7 +52,7 @@
 
 #define	IFCAP_CANTCHANGE	(IFCAP_NETMAP)
 
-/* Interface flags */
+/* interface flags -- these extend the Haiku-native ones from posix/net/if.h */
 #define IFF_DRV_RUNNING		0x00010000
 #define IFF_DRV_OACTIVE		0x00020000
 #define IFF_LINK0			0x00040000		/* per link layer defined bit */
@@ -60,6 +60,7 @@
 #define	IFF_LINK2			0x00100000		/* per link layer defined bit */
 #define IFF_DEBUG			0x00200000
 #define	IFF_MONITOR			0x00400000		/* (n) user-requested monitor mode */
+#define	IFF_NOGROUP			0x00800000		/* (n) interface is not part of any groups */
 
 #define LINK_STATE_UNKNOWN	0
 #define LINK_STATE_DOWN		1
@@ -111,6 +112,19 @@ struct  ifdrv {
 	unsigned long	ifd_cmd;
 	size_t			ifd_len;
 	void*			ifd_data;
+};
+
+/*
+ * Structure used to request i2c data
+ * from interface transceivers.
+ */
+struct ifi2creq {
+	uint8_t dev_addr;	/* i2c address (0xA0, 0xA2) */
+	uint8_t offset;		/* read offset */
+	uint8_t len;		/* read length */
+	uint8_t spare0;
+	uint32_t spare1;
+	uint8_t data[8];	/* read buffer */
 };
 
 #ifdef _KERNEL

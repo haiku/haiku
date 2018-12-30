@@ -265,6 +265,13 @@ device_get_softc(device_t dev)
 }
 
 
+void
+device_set_softc(device_t dev, void *softc)
+{
+	dev->softc = softc;
+}
+
+
 u_int32_t
 device_get_flags(device_t dev)
 {
@@ -277,11 +284,11 @@ device_set_driver(device_t dev, driver_t *driver)
 {
 	int i;
 
-	dev->softc = malloc(driver->softc_size);
+	dev->softc = malloc(driver->size);
 	if (dev->softc == NULL)
 		return -1;
 
-	memset(dev->softc, 0, driver->softc_size);
+	memset(dev->softc, 0, driver->size);
 	dev->driver = driver;
 
 	for (i = 0; driver->methods[i].name != NULL; i++) {

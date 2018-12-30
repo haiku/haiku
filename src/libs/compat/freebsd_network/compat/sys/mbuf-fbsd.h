@@ -153,6 +153,65 @@ m_extrefcnt(struct mbuf *m)
 		*m->m_ext.ext_cnt);
 }
 
+static __inline int
+m_gettype(int size)
+{
+	int type;
+
+	switch (size) {
+	case MCLBYTES:
+		type = EXT_CLUSTER;
+		break;
+#if MJUMPAGESIZE != MCLBYTES
+	case MJUMPAGESIZE:
+		type = EXT_JUMBOP;
+		break;
+#endif
+	case MJUM9BYTES:
+		type = EXT_JUMBO9;
+		break;
+	default:
+		panic("%s: invalid cluster size %d", __func__, size);
+	}
+
+	return (type);
+}
+
+/*
+ * XXX: m_cljset() is a dangerous API.  One must attach only a new,
+ * unreferenced cluster to an mbuf(9).  It is not possible to assert
+ * that, so care can be taken only by users of the API.
+ */
+static __inline void
+m_cljset(struct mbuf *m, void *cl, int type)
+{
+	int size;
+
+	switch (type) {
+	case EXT_CLUSTER:
+		size = MCLBYTES;
+		break;
+#if MJUMPAGESIZE != MCLBYTES
+	case EXT_JUMBOP:
+		size = MJUMPAGESIZE;
+		break;
+#endif
+	case EXT_JUMBO9:
+		size = MJUM9BYTES;
+		break;
+	default:
+		panic("%s: unknown cluster type %d", __func__, type);
+		break;
+	}
+
+	m->m_data = m->m_ext.ext_buf = cl;
+	m->m_ext.ext_size = size;
+	m->m_ext.ext_type = type;
+	m->m_ext.ext_flags = EXT_FLAG_EMBREF;
+	m->m_ext.ext_count = 1;
+	m->m_flags |= M_EXT;
+}
+
 /* mbufq */
 
 struct mbufq {

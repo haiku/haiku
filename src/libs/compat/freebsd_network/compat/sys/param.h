@@ -17,7 +17,7 @@
 
 
 /* The version this compatibility layer is based on */
-#define __FreeBSD_version 1101000
+#define __FreeBSD_version 1200000
 
 #define MAXBSIZE	0x10000
 
@@ -60,6 +60,16 @@
 #else
 #error Need definition of ALIGNED_POINTER for this arch!
 #endif
+
+/* defined in arch_cpu.h which we can't include here as it's C++ */
+#if defined(__x86_64__) || defined(__i386__)
+#define CACHE_LINE_SIZE 64
+#else
+#error Need definition of CACHE_LINE_SIZE for this arch!
+#endif
+
+/* defined in platform_kernel_args.h as SMP_MAX_CPUS */
+#define MAXCPU 		64 /* SMP_MAX_CPUS */
 
 /* Macros for counting and rounding. */
 #ifndef howmany

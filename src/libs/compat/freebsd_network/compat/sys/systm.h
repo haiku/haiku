@@ -56,7 +56,10 @@ int printf(const char *format, ...) __printflike(1, 2);
 			snooze(n);	\
 	} while (0)
 
+#define	cold 0
+
 void wakeup(void *);
+void wakeup_one(void *);
 
 #ifndef CTASSERT	/* Allow lint to override */
 #define	CTASSERT(x)	_Static_assert(x, "compile-time assertion failed")
@@ -96,6 +99,8 @@ int _pause(const char *, int);
 #define pause(waitMessage, timeout) _pause((waitMessage), (timeout))
 #define tsleep(channel, priority, waitMessage, timeout) \
 	msleep((channel), NULL, (priority), (waitMessage), (timeout))
+#define msleep_spin(chan, mtx, wmesg, timo) \
+	msleep(chan, mtx, PZERO, wmesg, timo)
 #define mtx_sleep msleep
 
 void critical_enter(void);

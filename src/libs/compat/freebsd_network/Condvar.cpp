@@ -79,3 +79,10 @@ publishedConditionNotifyAll(const void* waitChannel)
 {
 	ConditionVariable::NotifyAll(waitChannel, B_OK);
 }
+
+
+void
+publishedConditionNotifyOne(const void* waitChannel)
+{
+	ConditionVariable::NotifyOne(waitChannel, B_OK);
+}

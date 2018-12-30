@@ -42,3 +42,10 @@ wakeup(void* identifier)
 {
 	publishedConditionNotifyAll(identifier);
 }
+
+
+void
+wakeup_one(void* identifier)
+{
+	publishedConditionNotifyOne(identifier);
+}

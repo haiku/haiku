@@ -18,6 +18,7 @@ void conditionWait(struct cv*);
 void conditionNotifyOne(struct cv*);
 int publishedConditionTimedWait(const void*, const int);
 void publishedConditionNotifyAll(const void*);
+void publishedConditionNotifyOne(const void*);
 
 #ifdef __cplusplus
 }

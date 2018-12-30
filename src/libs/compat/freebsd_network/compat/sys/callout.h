@@ -18,11 +18,13 @@
 
 void callout_init(struct callout *c, int mpsafe);
 void callout_init_mtx(struct callout *c, struct mtx *mutex, int flags);
-/* Time values are in ticks, see compat/sys/kernel.h for its definition */
 int callout_schedule(struct callout *c, int _ticks);
 int callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg);
 int callout_pending(struct callout *c);
 int callout_active(struct callout *c);
+
+#define callout_reset_on(c, to_ticks, fn, arg, cpu) \
+	callout_reset(c, to_ticks, fn, arg)
 
 #define	callout_drain(c)	_callout_stop_safe(c, 1)
 #define	callout_stop(c)		_callout_stop_safe(c, 0)

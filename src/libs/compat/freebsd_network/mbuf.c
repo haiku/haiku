@@ -42,24 +42,26 @@ m_to_oc_flags(int how)
 }
 
 
-static int
-construct_mbuf(struct mbuf *memoryBuffer, short type, int flags)
+int
+m_init(struct mbuf *m, int how, short type, int flags)
 {
-	memoryBuffer->m_next = NULL;
-	memoryBuffer->m_nextpkt = NULL;
-	memoryBuffer->m_len = 0;
-	memoryBuffer->m_flags = flags;
-	memoryBuffer->m_type = type;
+	int error;
 
-	if (flags & M_PKTHDR) {
-		memoryBuffer->m_data = memoryBuffer->m_pktdat;
-		memset(&memoryBuffer->m_pkthdr, 0, sizeof(memoryBuffer->m_pkthdr));
-		SLIST_INIT(&memoryBuffer->m_pkthdr.tags);
-	} else {
-		memoryBuffer->m_data = memoryBuffer->m_dat;
-	}
+	if (type == MT_NOINIT)
+		return 0;
 
-	return 0;
+	m->m_next = NULL;
+	m->m_nextpkt = NULL;
+	m->m_data = m->m_dat;
+	m->m_len = 0;
+	m->m_flags = flags;
+	m->m_type = type;
+	if (flags & M_PKTHDR)
+		error = m_pkthdr_init(m, how);
+	else
+		error = 0;
+
+	return (error);
 }
 
 
@@ -107,7 +109,8 @@ construct_ext_mbuf(struct mbuf *memoryBuffer, int how)
 static int
 construct_pkt_mbuf(int how, struct mbuf *memoryBuffer, short type, int flags)
 {
-	construct_mbuf(memoryBuffer, type, flags);
+	if (m_init(memoryBuffer, how, type, flags) < 0)
+		return -1;
 	if (construct_ext_mbuf(memoryBuffer, how) < 0)
 		return -1;
 	memoryBuffer->m_ext.ext_type = EXT_CLUSTER;
@@ -140,7 +143,7 @@ _m_get(int how, short type, int flags)
 	if (memoryBuffer == NULL)
 		return NULL;
 
-	construct_mbuf(memoryBuffer, type, flags);
+	m_init(memoryBuffer, how, type, flags);
 
 	return memoryBuffer;
 }
@@ -184,7 +187,10 @@ m_getjcl(int how, short type, int flags, int size)
 		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
 	if (memoryBuffer == NULL)
 		return NULL;
-	construct_mbuf(memoryBuffer, type, flags);
+	if (m_init(memoryBuffer, how, type, flags) < 0) {
+		object_cache_free(sMBufCache, memoryBuffer, 0);
+		return NULL;
+	}
 	if (construct_ext_sized_mbuf(memoryBuffer, how, size) < 0) {
 		object_cache_free(sMBufCache, memoryBuffer, 0);
 		return NULL;

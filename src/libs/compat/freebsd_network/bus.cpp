@@ -48,7 +48,7 @@ extern "C" {
 
 struct internal_intr {
 	device_t		dev;
-	driver_filter_t	filter;
+	driver_filter_t* filter;
 	driver_intr_t	*handler;
 	void			*arg;
 	int				irq;
@@ -325,7 +325,7 @@ free_internal_intr(struct internal_intr *intr)
 
 int
 bus_setup_intr(device_t dev, struct resource *res, int flags,
-	driver_filter_t filter, driver_intr_t handler, void *arg, void **_cookie)
+	driver_filter_t* filter, driver_intr_t handler, void *arg, void **_cookie)
 {
 	/* TODO check MPSAFE etc */
 
