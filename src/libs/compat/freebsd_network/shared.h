@@ -34,6 +34,7 @@ struct device {
 	void			*ivars;
 
 	struct {
+		void* (*device_register)(device_t dev);
 		int (*probe)(device_t dev);
 		int (*attach)(device_t dev);
 		int (*detach)(device_t dev);

@@ -294,7 +294,9 @@ device_set_driver(device_t dev, driver_t *driver)
 	for (i = 0; driver->methods[i].name != NULL; i++) {
 		device_method_t *mth = &driver->methods[i];
 
-		if (strcmp(mth->name, "device_probe") == 0)
+		if (strcmp(mth->name, "device_register") == 0)
+			dev->methods.device_register = (void *)mth->method;
+		else if (strcmp(mth->name, "device_probe") == 0)
 			dev->methods.probe = (void *)mth->method;
 		else if (strcmp(mth->name, "device_attach") == 0)
 			dev->methods.attach = (void *)mth->method;
