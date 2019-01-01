@@ -47,6 +47,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	subr_autoconf.cpp
 	synch.c
 	systm.cpp
+	sysinit.c
 	taskqueue.c
 	unit.cpp
 	;

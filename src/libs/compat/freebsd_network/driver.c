@@ -13,6 +13,7 @@
 
 
 #include "device.h"
+#include "sysinit.h"
 
 #include <stdlib.h>
 #include <sys/sockio.h>
@@ -133,6 +134,8 @@ _fbsd_init_drivers(driver_t *drivers[])
 			goto err5;
 	}
 
+	init_sysinit();
+
 	status = init_wlan_stack();
 	if (status < B_OK)
 		goto err6;
@@ -194,9 +197,11 @@ err7:
 	uninit_wlan_stack();
 
 err6:
+	uninit_sysinit();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
 err5:
+	uninit_bounce_pages();
 	uninit_callout();
 err4:
 	uninit_mbufs();
@@ -224,6 +229,7 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 	}
 
 	uninit_wlan_stack();
+	uninit_sysinit();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
 	uninit_bounce_pages();

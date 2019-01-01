@@ -32,24 +32,45 @@ int32_t get_ticks();
 #define usecs_to_ticks(t) (((bigtime_t)t*hz) / 1000000)
 
 
-typedef void (*system_init_func_t)(void *);
-
-struct __system_init {
-	system_init_func_t func;
+/* sysinit */
+enum sysinit_elem_order {
+	SI_ORDER_FIRST = 0x0000000,
+	SI_ORDER_SECOND = 0x0000001,
+	SI_ORDER_THIRD = 0x0000002,
+	SI_ORDER_FOURTH = 0x0000003,
+	SI_ORDER_MIDDLE = 0x1000000,
+	SI_ORDER_ANY = 0xfffffff	/* last */
 };
 
-/* TODO implement SYSINIT/SYSUNINIT subsystem */
-#define SYSINIT(uniquifier, subsystem, order, func, ident) \
-	struct __system_init __init_##uniquifier = { (system_init_func_t) func }
+typedef void (*system_init_func_t)(void *);
 
-#define SYSUNINIT(uniquifier, subsystem, order, func, ident) \
-	struct __system_init __uninit_##uniquifier = { (system_init_func_t) func }
+struct sysinit {
+	const char* name;
+	enum sysinit_elem_order order;
+	system_init_func_t func;
+	const void* arg;
+};
+
+#define SYSINIT(uniquifier, subsystem, _order, _func, ident) \
+static struct sysinit sysinit_##uniquifier = { \
+	.name 		= #uniquifier,		\
+	.order 		= _order,			\
+	.func		= _func,			\
+	.arg		= ident,			\
+};									\
+DATA_SET(__freebsd_sysinit, sysinit_##uniquifier)
+
+#define SYSUNINIT(uniquifier, subsystem, _order, _func, ident) \
+static struct sysinit sysuninit_##uniquifier = { \
+	.name 		= #uniquifier,		\
+	.order 		= _order,			\
+	.func		= _func,			\
+	.arg		= ident,			\
+};									\
+DATA_SET(__freebsd_sysuninit, sysuninit_##uniquifier)
 
 
-#define TUNABLE_INT(path, var)
-#define TUNABLE_INT_FETCH(path, var)
-
-
+/* confighooks */
 typedef void (*ich_func_t)(void *_arg);
 
 struct intr_config_hook {
@@ -60,6 +81,11 @@ struct intr_config_hook {
 
 int config_intrhook_establish(struct intr_config_hook *hook);
 void config_intrhook_disestablish(struct intr_config_hook *hook);
+
+
+/* misc. */
+#define TUNABLE_INT(path, var)
+#define TUNABLE_INT_FETCH(path, var)
 
 
 #endif // _FBSD_COMPAT_SYS_KERNEL_H_
