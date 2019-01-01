@@ -67,6 +67,8 @@ static bool sKeyboardHandlerInstalled = false;
 
 static spinlock sSerialOutputSpinlock = B_SPINLOCK_INITIALIZER;
 
+static int32 sEarlyBootMessageLock = 0;
+
 
 static void
 init_serial_port(uint16 basePort, uint32 baudRate)
@@ -388,6 +390,16 @@ arch_debug_serial_putchar(const char c)
 }
 
 
+static void
+arch_debug_serial_puts_locked(const char *string)
+{
+	while (*string != '\0') {
+		_arch_debug_serial_putchar(*string);
+		string++;
+	}
+}
+
+
 void
 arch_debug_serial_puts(const char *s)
 {
@@ -397,10 +409,7 @@ arch_debug_serial_puts(const char *s)
 		acquire_spinlock(&sSerialOutputSpinlock);
 	}
 
-	while (*s != '\0') {
-		_arch_debug_serial_putchar(*s);
-		s++;
-	}
+	arch_debug_serial_puts_locked(s);
 
 	if (!debug_debugger_running()) {
 		release_spinlock(&sSerialOutputSpinlock);
@@ -414,8 +423,14 @@ arch_debug_serial_early_boot_message(const char *string)
 {
 	// this function will only be called in fatal situations
 	// ToDo: also enable output via text console?!
+
+	// Normal locking doesn't work this early as it needs a current thread.
+	while (atomic_test_and_set(&sEarlyBootMessageLock, 1, 0) != 0)
+		arch_cpu_pause();
+
 	arch_debug_console_init(NULL);
-	arch_debug_serial_puts(string);
+	arch_debug_serial_puts_locked(string);
+	atomic_set(&sEarlyBootMessageLock, 0);
 }
 
 
