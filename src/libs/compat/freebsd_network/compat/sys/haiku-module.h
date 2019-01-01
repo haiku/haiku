@@ -11,6 +11,7 @@
 #include <KernelExport.h>
 
 #include <kernel/lock.h>
+#include <sys/method-ids.h>
 
 #undef __unused
 #define __unused
@@ -45,24 +46,39 @@ typedef void miibus_statchg_t(device_t dev);
 typedef void miibus_linkchg_t(device_t dev);
 typedef void miibus_mediainit_t(device_t dev);
 
+
 struct device_method {
-	const char *name;
+	const char* name;
+	const int32 id;
+		/* interfaces w/o function pointer structs use IDs for method lookups */
 	device_method_signature_t method;
 };
 
 typedef struct device_method device_method_t;
 
-#define DEVMETHOD(name, func)	{ #name, (device_method_signature_t)&func }
-#define DEVMETHOD_END	{ 0, 0 }
+#define DEVMETHOD(name, func) { #name, ID_##name, (device_method_signature_t)&func }
+#define DEVMETHOD_END 		  { 0, 0 }
+
 
 typedef struct {
-	const char *name;
-	device_method_t *methods;
-	size_t size;
+	const char* name;
+	device_method_t* methods;
+	size_t size; /* softc size */
 } driver_t;
+
+#define DEFINE_CLASS_0(name, driver, methods, size) \
+	driver_t driver = { #name, methods, size }
+
+#define DRIVER_MODULE(name, busname, driver, devclass, evh, arg) \
+	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver); \
+	devclass_t *__class_ ## name ## _ ## busname ## _ ## devclass = &(devclass)
+
+#define DRIVER_MODULE_ORDERED(name, busname, driver, devclass, evh, arg, order) \
+	DRIVER_MODULE(name, busname, driver, devclass, evh, arg)
 
 #define DRIVER_MODULE_NAME(name, busname) \
 	__fbsd_ ## name ## _ ## busname
+
 
 status_t _fbsd_init_drivers(driver_t *driver[]);
 status_t _fbsd_uninit_drivers(driver_t *driver[]);
@@ -246,16 +262,6 @@ extern const char* __haiku_firmware_name_map[][2];
 	x;											\
 	HAIKU_INTR_REGISTER_LEAVE();				\
 } while (0)
-
-#define DEFINE_CLASS_0(name, driver, methods, size) \
-	driver_t driver = { #name, methods, size }
-
-#define DRIVER_MODULE(name, busname, driver, devclass, evh, arg) \
-	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver); \
-	devclass_t *__class_ ## name ## _ ## busname ## _ ## devclass = &(devclass)
-
-#define DRIVER_MODULE_ORDERED(name, busname, driver, devclass, evh, arg, order) \
-	DRIVER_MODULE(name, busname, driver, devclass, evh, arg)
 
 #define nitems(_a)     (sizeof((_a)) / sizeof((_a)[0]))
 
