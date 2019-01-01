@@ -154,6 +154,7 @@ extern const InterruptServiceRoutine
 
 static GlobalDescriptorTable	sGDT;
 static InterruptDescriptorTable	sIDT;
+static uint32 sGDTIDTConstructed = 0;
 
 typedef void interrupt_handler_function(iframe* frame);
 interrupt_handler_function*
@@ -379,7 +380,12 @@ x86_64_stack_fault_exception(iframe* frame)
 void
 x86_descriptors_preboot_init_percpu(kernel_args* args, int cpu)
 {
-	new(&sGDT) GlobalDescriptorTable;
+	if (cpu == 0) {
+		new(&sGDT) GlobalDescriptorTable;
+		new(&sIDT) InterruptDescriptorTable;
+	}
+
+	smp_cpu_rendezvous(&sGDTIDTConstructed);
 	sGDT.Load();
 
 	memset(&gCPU[cpu].arch.tss, 0, sizeof(struct tss));
@@ -398,7 +404,6 @@ x86_descriptors_preboot_init_percpu(kernel_args* args, int cpu)
 
 	sGDT.SetUserTLS(cpu, 0, TLS_COMPAT_SIZE);
 
-	new(&sIDT) InterruptDescriptorTable;
 	sIDT.Load();
 }
 
