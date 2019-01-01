@@ -21,7 +21,7 @@ The document has the following sections:</P>
 <A NAME="interface"></A><H2>BCursor Interface:</H2>
 
 <P>The BCursor class is a simple class used to represent a mouse cursor as an object instead of an array of pixel data.  The best source of information for the BCursor interface can be found
-<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/Cursor.html">here in the Be Book</A>.
+<A HREF="https://www.haiku-os.org/legacy-docs/bebook/BCursor_Overview.html#BCursor_Overview_CursorDataFormat">here in the Be Book</A>.
 </P>
 
 <A NAME="usecases"></A><H2>BCursor Use Cases:</H2>
@@ -30,7 +30,7 @@ The document has the following sections:</P>
 
 <OL>
 <LI><P><B>Construction 1:</B> The first BCursor constructor requires a pointer to the pixel data.  The format for the pixel data is described
-<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/Cursor.html#Cursor_Data_Format">here in the Be Book</A>.
+<A HREF="https://www.haiku-os.org/legacy-docs/bebook/BCursor_Overview.html">here in the Be Book</A>.
 This pixel data is used to initialize the BCursor, but BCursor does not take ownership of the data, therefore you are responsible for freeing the memory after construction.</P></LI>
 
 <LI><P><B>Construction 2:</B> The second BCursor constructor requires a BMessage as an archive, however BCursor does not currently support archiving.  Do not use this constructor.</P></LI>
