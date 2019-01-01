@@ -280,7 +280,7 @@ unsigned
 GlobalDescriptorTable::SetUserTLS(unsigned cpu, uintptr_t base, size_t limit)
 {
 	auto index = kFirstTSS + cpu * 3 + 2;
-	ASSERT(index + 1 < kDescriptorCount);
+	ASSERT(index < kDescriptorCount);
 	UserTLSDescriptor desc(base, limit);
 	fTable[index] = desc.GetDescriptor();
 	return index;
