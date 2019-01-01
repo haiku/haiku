@@ -97,8 +97,10 @@ main(int argc, char** argv)
 		} else if (strchr(*argv, ':')) {
 			// try to open it as an URI
 			BUrl url(*argv);
-			if (url.OpenWithPreferredApplication() == B_OK)
+			if (url.OpenWithPreferredApplication() == B_OK) {
+				result = B_OK;
 				continue;
+			}
 
 			// maybe it's "file:line" or "file:line:col"
 			int line = 0, col = 0, i;
