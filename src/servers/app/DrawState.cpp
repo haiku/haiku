@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2018, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -153,7 +153,7 @@ DrawState::PopState()
 }
 
 
-void
+uint16
 DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 {
 	uint16 mask;
@@ -213,6 +213,8 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 		link.Read<uint32>(&flags);
 		fFont.SetFlags(flags);
 	}
+
+	return mask;
 }
 
 

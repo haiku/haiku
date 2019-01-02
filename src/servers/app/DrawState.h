@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2018, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,7 +46,7 @@ public:
 		DrawState*			PopState();
 		DrawState*			PreviousState() const { return fPreviousState; }
 
-		void				ReadFontFromLink(BPrivate::LinkReceiver& link);
+		uint16				ReadFontFromLink(BPrivate::LinkReceiver& link);
 								// NOTE: ReadFromLink() does not read Font state!!
 								// It was separate in ServerWindow, and I didn't
 								// want to change it without knowing implications.
