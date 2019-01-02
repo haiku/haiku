@@ -77,7 +77,15 @@ DrawStuff(BView *view)
 	const rgb_color red = { 240, 0, 0, 0 };
 	view->SetHighColor(red);
 	view->SetFontSize(20);
-	view->DrawString("BPicture test", BPoint(30, 20));
+	view->DrawString("BPicture ", BPoint(30, 20));
+	view->DrawString("test");
+
+	// DrawLine with pen position
+	const rgb_color purple = { 200, 0, 220, 0 };
+	view->SetHighColor(purple);
+	view->StrokeLine(BPoint(50, 30), BPoint(30, 50));
+	view->StrokeLine(BPoint(80, 50));
+	view->StrokeLine(BPoint(50, 30));
 }
 
 
