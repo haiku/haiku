@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2018, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen (marcus@overhagen.de)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /**	PicturePlayer is used to play picture data. */
@@ -454,6 +455,87 @@ set_blending_mode(void* _context, source_alpha alphaSrcMode,
 }
 
 
+static void
+set_transform(void* _context, const BAffineTransform& transform)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, const BAffineTransform&))
+		context->function_table[48])(context->user_data, transform);
+}
+
+
+static void
+translate_by(void* _context, double x, double y)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, double, double))
+		context->function_table[49])(context->user_data, x, y);
+}
+
+
+static void
+scale_by(void* _context, double x, double y)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, double, double))
+		context->function_table[50])(context->user_data, x, y);
+}
+
+
+static void
+rotate_by(void* _context, double angleRadians)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, double))
+		context->function_table[51])(context->user_data, angleRadians);
+}
+
+
+static void
+blend_layer(void* _context, Layer* layer)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, Layer*))
+		context->function_table[52])(context->user_data, layer);
+}
+
+
+static void
+clip_to_rect(void* _context, const BRect& rect, bool inverse)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, const BRect&, bool))
+		context->function_table[53])(context->user_data, rect, inverse);
+}
+
+
+static void
+clip_to_shape(void* _context, int32 opCount, const uint32 opList[],
+	int32 ptCount, const BPoint ptList[], bool inverse)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, int32, const uint32*, int32, const BPoint*, bool))
+		context->function_table[54])(context->user_data, opCount, opList,
+			ptCount, ptList, inverse);
+}
+
+
+static void
+draw_string_locations(void* _context, const char* _string, size_t length,
+	const BPoint* locations, size_t locationCount)
+{
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	char* string = strndup(_string, length);
+
+	((void (*)(void*, char*, const BPoint*, size_t))
+		context->function_table[55])(context->user_data, string, locations,
+			locationCount);
+
+	free(string);
+}
+
+
+
 #if DEBUG > 1
 static const char *
 PictureOpToString(int op)
@@ -474,6 +556,7 @@ PictureOpToString(int op)
 		RETURN_STRING(B_PIC_STROKE_SHAPE);
 		RETURN_STRING(B_PIC_FILL_SHAPE);
 		RETURN_STRING(B_PIC_DRAW_STRING);
+		RETURN_STRING(B_PIC_DRAW_STRING_LOCATIONS);
 		RETURN_STRING(B_PIC_DRAW_PIXELS);
 		RETURN_STRING(B_PIC_DRAW_PICTURE);
 		RETURN_STRING(B_PIC_STROKE_ARC);
@@ -510,6 +593,13 @@ PictureOpToString(int op)
 		RETURN_STRING(B_PIC_SET_FONT_SHEAR);
 		RETURN_STRING(B_PIC_SET_FONT_BPP);
 		RETURN_STRING(B_PIC_SET_FONT_FACE);
+
+		RETURN_STRING(B_PIC_AFFINE_TRANSLATE);
+		RETURN_STRING(B_PIC_AFFINE_SCALE);
+		RETURN_STRING(B_PIC_AFFINE_ROTATE);
+
+		RETURN_STRING(B_PIC_BLEND_LAYER);
+
 		default: return "Unknown op";
 	}
 	#undef RETURN_STRING
@@ -572,7 +662,15 @@ PicturePlayer::Play(void** callBackTable, int32 tableEntries, void* userData)
 		set_font_flags,
 		set_font_shear,
 		set_font_face,
-		set_blending_mode
+		set_blending_mode,
+		set_transform,
+		translate_by,
+		scale_by,
+		rotate_by,
+		blend_layer,
+		clip_to_rect,
+		clip_to_shape,
+		draw_string_locations
 	};
 
 	// We don't check if the functions in the table are NULL, but we
@@ -868,6 +966,24 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 				callbacks.draw_string(userData, string, length,
 					*escapementSpace, *escapementNonSpace);
+				break;
+			}
+
+			case B_PIC_DRAW_STRING_LOCATIONS:
+			{
+				const uint32* pointCount;
+				const BPoint* pointList;
+				const char* string;
+				size_t length;
+				if (callbacks.draw_string_locations == NULL
+					|| !reader.Get(pointCount)
+					|| !reader.Get(pointList, *pointCount)
+					|| !reader.GetRemaining(string, length)) {
+					break;
+				}
+
+				callbacks.draw_string_locations(userData, string, length,
+					pointList, *pointCount);
 				break;
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2019, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include "ServerPicture.h"
@@ -402,6 +403,23 @@ draw_string(void* _canvas, const char* string, size_t length, float deltaSpace,
 	canvas->PenToScreenTransform().Apply(&location);
 	location = canvas->GetDrawingEngine()->DrawString(string, length,
 		location, &delta);
+
+	canvas->PenToScreenTransform().Apply(&location);
+	canvas->CurrentState()->SetPenLocation(location);
+	// the DrawingEngine/Painter does not need to be updated, since this
+	// effects only the view->screen coord conversion, which is handled
+	// by the view only
+}
+
+
+static void
+draw_string_locations(void* _canvas, const char* string, size_t length,
+	const BPoint* locations, size_t locationsCount)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+
+	BPoint location = canvas->GetDrawingEngine()->DrawString(string, length,
+		locations);
 
 	canvas->PenToScreenTransform().Apply(&location);
 	canvas->CurrentState()->SetPenLocation(location);
@@ -881,7 +899,8 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	rotate_by,
 	blend_layer,
 	clip_to_rect,
-	clip_to_shape
+	clip_to_shape,
+	draw_string_locations
 };
 
 
@@ -1046,68 +1065,46 @@ ServerPicture::SyncState(View* view)
 
 
 void
-ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
+ServerPicture::WriteFontState(const ServerFont& font, uint16 mask)
 {
 	BeginOp(B_PIC_ENTER_FONT_STATE);
 
-	uint16 mask;
-	link.Read<uint16>(&mask);
-
 	if (mask & B_FONT_FAMILY_AND_STYLE) {
-		uint32 fontID;
-		link.Read<uint32>(&fontID);
-		ServerFont font;
-		font.SetFamilyAndStyle(fontID);
 		WriteSetFontFamily(font.Family());
 		WriteSetFontStyle(font.Style());
 	}
 
 	if (mask & B_FONT_SIZE) {
-		float size;
-		link.Read<float>(&size);
-		WriteSetFontSize(size);
+		WriteSetFontSize(font.Size());
 	}
 
 	if (mask & B_FONT_SHEAR) {
-		float shear;
-		link.Read<float>(&shear);
-		WriteSetFontShear(shear);
+		WriteSetFontShear(font.Shear());
 	}
 
 	if (mask & B_FONT_ROTATION) {
-		float rotation;
-		link.Read<float>(&rotation);
-		WriteSetFontRotation(rotation);
+		WriteSetFontRotation(font.Rotation());
 	}
 
 	if (mask & B_FONT_FALSE_BOLD_WIDTH) {
-		float falseBoldWidth;
-		link.Read<float>(&falseBoldWidth);
-		//SetFalseBoldWidth(falseBoldWidth);
+		// TODO: Implement
+//		WriteSetFalseBoldWidth(font.FalseBoldWidth());
 	}
 
 	if (mask & B_FONT_SPACING) {
-		uint8 spacing;
-		link.Read<uint8>(&spacing);
-		WriteSetFontSpacing(spacing);
+		WriteSetFontSpacing(font.Spacing());
 	}
 
 	if (mask & B_FONT_ENCODING) {
-		uint8 encoding;
-		link.Read<uint8>((uint8*)&encoding);
-		WriteSetFontEncoding(encoding);
+		WriteSetFontEncoding(font.Encoding());
 	}
 
 	if (mask & B_FONT_FACE) {
-		uint16 face;
-		link.Read<uint16>(&face);
-		WriteSetFontFace(face);
+		WriteSetFontFace(font.Face());
 	}
 
 	if (mask & B_FONT_FLAGS) {
-		uint32 flags;
-		link.Read<uint32>(&flags);
-		WriteSetFontFlags(flags);
+		WriteSetFontFlags(font.Flags());
 	}
 
 	EndOp();

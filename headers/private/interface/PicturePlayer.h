@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2018, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen (marcus@overhagen.de)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef	_PICTURE_PLAYER_H
 #define	_PICTURE_PLAYER_H
@@ -91,6 +92,8 @@ struct picture_player_callbacks {
 	void (*clip_to_rect)(void* userData, const BRect& rect, bool inverse);
 	void (*clip_to_shape)(void* userData, int32 opCount, const uint32 opList[],
 		int32 ptCount, const BPoint ptList[], bool inverse);
+	void (*draw_string_locations)(void* userData, const char* string,
+		size_t length, const BPoint locations[], size_t locationCount);
 };
 
 

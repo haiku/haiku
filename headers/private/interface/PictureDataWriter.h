@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2018 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, burton666@libero.it
  *		Julian Harnath, <julian.harnath@rwth-achen.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef _PICTURE_DATA_WRITER_H
 #define _PICTURE_DATA_WRITER_H
@@ -84,6 +85,9 @@ public:
 			status_t			WriteDrawString(const BPoint& where,
 									const char* string, const int32& length,
 									const escapement_delta& delta);
+			status_t			WriteDrawString(const char* string,
+									int32 length, const BPoint* locations,
+									int32 locationCount);
 			status_t			WriteDrawShape(const int32& opCount,
 									const void* opList, const int32& ptCount,
 									const void* ptList, const bool& fill);

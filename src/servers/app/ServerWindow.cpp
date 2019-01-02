@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2019, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -3284,6 +3284,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			fCurrentView->CurrentState()->SetPenLocation(location);
 			break;
 		}
+
 		case AS_VIEW_SET_PEN_SIZE:
 		{
 			float penSize;
@@ -3332,6 +3333,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 				break;
 
 			picture->WriteSetTransform(transform);
+
+			fCurrentView->CurrentState()->SetTransform(transform);
+			_UpdateDrawState(fCurrentView);
 			break;
 		}
 
@@ -3342,6 +3346,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<double>(&y);
 
 			picture->WriteTranslateBy(x, y);
+
+			BAffineTransform current =
+				fCurrentView->CurrentState()->Transform();
+			current.PreTranslateBy(x, y);
+			fCurrentView->CurrentState()->SetTransform(current);
+			_UpdateDrawState(fCurrentView);
 			break;
 		}
 
@@ -3352,6 +3362,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<double>(&y);
 
 			picture->WriteScaleBy(x, y);
+
+			BAffineTransform current =
+				fCurrentView->CurrentState()->Transform();
+			current.PreScaleBy(x, y);
+			fCurrentView->CurrentState()->SetTransform(current);
+			_UpdateDrawState(fCurrentView);
 			break;
 		}
 
@@ -3361,6 +3377,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<double>(&angleRadians);
 
 			picture->WriteRotateBy(angleRadians);
+
+			BAffineTransform current =
+				fCurrentView->CurrentState()->Transform();
+			current.PreRotateBy(angleRadians);
+			fCurrentView->CurrentState()->SetTransform(current);
+			_UpdateDrawState(fCurrentView);
 			break;
 		}
 
@@ -3375,7 +3397,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_VIEW_SET_FONT_STATE:
 		{
-			picture->SetFontFromLink(link);
+			uint16 mask = fCurrentView->CurrentState()->ReadFontFromLink(link);
+			fWindow->GetDrawingEngine()->SetFont(
+				fCurrentView->CurrentState());
+
+			picture->WriteFontState(fCurrentView->CurrentState()->Font(), mask);
 			break;
 		}
 
@@ -3498,6 +3524,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<ViewStrokeLineInfo>(&info);
 
 			picture->WriteStrokeLine(info.startPoint, info.endPoint);
+
+			BPoint penPos = info.endPoint;
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			transform.Apply(&info.endPoint);
+			fCurrentView->CurrentState()->SetPenLocation(penPos);
 			break;
 		}
 
@@ -3585,7 +3617,75 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			picture->WriteDrawString(info.location, string, info.stringLength,
 				info.delta);
 
+			// We need to update the pen location
+			fCurrentView->PenToScreenTransform().Apply(&info.location);
+			BPoint penLocation = fWindow->GetDrawingEngine()->DrawStringDry(
+				string, info.stringLength, info.location, &info.delta);
+
+			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
+			fCurrentView->CurrentState()->SetPenLocation(penLocation);
+
 			free(string);
+			break;
+		}
+
+		case AS_DRAW_STRING_WITH_OFFSETS:
+		{
+			int32 stringLength;
+			if (link.Read<int32>(&stringLength) != B_OK || stringLength <= 0)
+				break;
+
+			int32 glyphCount;
+			if (link.Read<int32>(&glyphCount) != B_OK || glyphCount <= 0)
+				break;
+
+			const ssize_t kMaxStackStringSize = 512;
+			char stackString[kMaxStackStringSize];
+			char* string = stackString;
+			BPoint stackLocations[kMaxStackStringSize];
+			BPoint* locations = stackLocations;
+			MemoryDeleter stringDeleter;
+			MemoryDeleter locationsDeleter;
+			if (stringLength >= kMaxStackStringSize) {
+				// NOTE: Careful, the + 1 is for termination!
+				string = (char*)malloc((stringLength + 1 + 63) / 64 * 64);
+				if (string == NULL)
+					break;
+				stringDeleter.SetTo(string);
+			}
+			if (glyphCount > kMaxStackStringSize) {
+				locations = (BPoint*)malloc(
+					((glyphCount * sizeof(BPoint)) + 63) / 64 * 64);
+				if (locations == NULL)
+					break;
+				locationsDeleter.SetTo(locations);
+			}
+
+			if (link.Read(string, stringLength) != B_OK)
+				break;
+			// Count UTF8 glyphs and make sure we have enough locations
+			if ((int32)UTF8CountChars(string, stringLength) > glyphCount)
+				break;
+			if (link.Read(locations, glyphCount * sizeof(BPoint)) != B_OK)
+				break;
+			// Terminate the string
+			string[stringLength] = '\0';
+
+			const SimpleTransform transform =
+				fCurrentView->PenToScreenTransform();
+			for (int32 i = 0; i < glyphCount; i++)
+				transform.Apply(&locations[i]);
+
+			picture->WriteDrawString(string, stringLength, locations,
+				glyphCount);
+
+			// Update pen location
+			BPoint penLocation = fWindow->GetDrawingEngine()->DrawStringDry(
+				string, stringLength, locations);
+
+			fCurrentView->ScreenToPenTransform().Apply(&penLocation);
+			fCurrentView->CurrentState()->SetPenLocation(penLocation);
+
 			break;
 		}
 

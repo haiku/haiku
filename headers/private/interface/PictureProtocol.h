@@ -22,6 +22,7 @@ enum {
 	B_PIC_FILL_ARC				= 0x0114,
 	B_PIC_STROKE_ELLIPSE		= 0x0115,
 	B_PIC_FILL_ELLIPSE			= 0x0116,
+	B_PIC_DRAW_STRING_LOCATIONS	= 0x0117,
 
 	B_PIC_ENTER_STATE_CHANGE	= 0x0200,
 	B_PIC_SET_CLIPPING_RECTS	= 0x0201,
@@ -61,7 +62,7 @@ enum {
 };
 
 
-const static uint32 kOpsTableSize = 50;
+const static uint32 kOpsTableSize = 51;
 
 
 #endif

@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2018 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Julian Harnath, <julian.harnath@rwth-achen.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include <PictureDataWriter.h>
@@ -467,6 +468,27 @@ PictureDataWriter::WriteDrawString(const BPoint& where, const char* string,
 		Write<float>(escapement.nonspace);
 		//WriteData(string, length + 1);
 			// TODO: is string 0 terminated? why is length given?
+		WriteData(string, length);
+		Write<uint8>(0);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteDrawString(const char* string,
+	int32 length, const BPoint* locations, int32 locationCount)
+{
+	try {
+		BeginOp(B_PIC_DRAW_STRING_LOCATIONS);
+		Write<int32>(locationCount);
+		for (int32 i = 0; i < locationCount; i++) {
+			Write<BPoint>(locations[i]);
+		}
 		WriteData(string, length);
 		Write<uint8>(0);
 		EndOp();

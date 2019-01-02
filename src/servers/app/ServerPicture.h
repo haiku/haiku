@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2019, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef SERVER_PICTURE_H
 #define SERVER_PICTURE_H
@@ -21,6 +22,7 @@
 class BFile;
 class Canvas;
 class ServerApp;
+class ServerFont;
 class View;
 
 namespace BPrivate {
@@ -48,7 +50,8 @@ public:
 			void				ExitStateChange();
 
 			void				SyncState(View* view);
-			void				SetFontFromLink(BPrivate::LinkReceiver& link);
+			void				WriteFontState(const ServerFont& font,
+									uint16 mask);
 
 			void				Play(Canvas* target);
 
