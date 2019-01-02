@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku, Inc.
+ * Copyright 2001-2018, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -183,6 +183,13 @@ public:
 			float			StringWidth(const char* string,
 								int32 length, const ServerFont& font,
 								escapement_delta* delta = NULL);
+
+			BPoint			DrawStringDry(const char* string, int32 length,
+								const BPoint& pt,
+								escapement_delta* delta = NULL);
+			BPoint			DrawStringDry(const char* string, int32 length,
+								const BPoint* offsets);
+
 
 	// software rendering backend invoked by CopyRegion() for the sorted
 	// individual rects
