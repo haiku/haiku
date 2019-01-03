@@ -68,9 +68,6 @@
 #error Need definition of CACHE_LINE_SIZE for this arch!
 #endif
 
-/* defined in platform_kernel_args.h as SMP_MAX_CPUS */
-#define MAXCPU 		64 /* SMP_MAX_CPUS */
-
 /* Macros for counting and rounding. */
 #ifndef howmany
 #define	howmany(x, y)	(((x)+((y)-1))/(y))
