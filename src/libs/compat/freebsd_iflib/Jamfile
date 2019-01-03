@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src libs compat freebsd_iflib ;
+
+UseHeaders [ FDirName $(SUBDIR) compat ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. freebsd_network compat ] : true ;
+UsePrivateHeaders net ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ALTQ ] ;
+
+KernelStaticLibrary freebsd_iflib.a :
+	kthread.cpp
+	device_if.c
+	kobj.c
+
+	iflib.c
+	ifdi_if.c
+	md5c.c
+	mp_ring.c
+	nvlist.c
+	subr_gtaskqueue.c
+	strsep.c
+	;
