@@ -65,8 +65,8 @@ m_init(struct mbuf *m, int how, short type, int flags)
 }
 
 
-static int
-construct_ext_sized_mbuf(struct mbuf *memoryBuffer, int how, int size)
+static void*
+allocate_ext_buf(int how, int size, int* ext_type)
 {
 	object_cache *cache;
 	int extType;
@@ -84,7 +84,18 @@ construct_ext_sized_mbuf(struct mbuf *memoryBuffer, int how, int size)
 		extType = EXT_JUMBOP;
 	}
 
-	memoryBuffer->m_ext.ext_buf = object_cache_alloc(cache, m_to_oc_flags(how));
+	if (ext_type != NULL)
+		*ext_type = extType;
+	return object_cache_alloc(cache, m_to_oc_flags(how));
+}
+
+
+static int
+construct_ext_sized_mbuf(struct mbuf *memoryBuffer, int how, int size)
+{
+	int extType;
+
+	memoryBuffer->m_ext.ext_buf = allocate_ext_buf(how, size, &extType);
 	if (memoryBuffer->m_ext.ext_buf == NULL)
 		return B_NO_MEMORY;
 
@@ -209,16 +220,17 @@ m_clget(struct mbuf *memoryBuffer, int how)
 }
 
 
-void *
-m_cljget(struct mbuf *memoryBuffer, int how, int size)
+void*
+m_cljget(struct mbuf* memoryBuffer, int how, int size)
 {
 	if (memoryBuffer == NULL)
-		panic("m_cljget doesn't support allocate mbuf");
+		return allocate_ext_buf(how, size, NULL);
+
 	memoryBuffer->m_ext.ext_buf = NULL;
 	construct_ext_sized_mbuf(memoryBuffer, how, size);
-	/* shouldn't be used */
-	return NULL;
+	return memoryBuffer->m_ext.ext_buf;
 }
+
 
 static void
 mb_free_ext(struct mbuf *memoryBuffer)
