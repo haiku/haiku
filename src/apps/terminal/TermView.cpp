@@ -545,7 +545,7 @@ TermView::TerminalName() const
 
 //! Get width and height for terminal font
 void
-TermView::GetFontSize(int* _width, int* _height)
+TermView::GetFontSize(float* _width, float* _height)
 {
 	*_width = fFontWidth;
 	*_height = fFontHeight;
@@ -631,8 +631,8 @@ void
 TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
 	int *_columns)
 {
-	int columns = (rect.IntegerWidth() + 1) / fFontWidth;
-	int rows = (rect.IntegerHeight() + 1) / fFontHeight;
+	int columns = int((rect.IntegerWidth() + 1) / fFontWidth);
+	int rows = int((rect.IntegerHeight() + 1) / fFontHeight);
 
 	if (_rows)
 		*_rows = rows;
@@ -738,7 +738,7 @@ TermView::GetTermFont(BFont *font) const
 void
 TermView::SetTermFont(const BFont *font)
 {
-	int halfWidth = 0;
+	float halfWidth = 0;
 
 	fHalfFont = font;
 	fBoldFont = font;
@@ -752,7 +752,7 @@ TermView::SetTermFont(const BFont *font)
 	for (int c = 0x20; c <= 0x7e; c++) {
 		char buf[4];
 		sprintf(buf, "%c", c);
-		int tmpWidth = (int)fHalfFont.StringWidth(buf);
+		float tmpWidth = fHalfFont.StringWidth(buf);
 		if (tmpWidth > halfWidth)
 			halfWidth = tmpWidth;
 	}
@@ -958,7 +958,7 @@ TermView::_Deactivate()
 
 //! Draw part of a line in the given view.
 void
-TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
+TermView::_DrawLinePart(float x1, float y1, uint32 attr, char *buf,
 	int32 width, Highlight* highlight, bool cursor, BView *inView)
 {
 	if (highlight != NULL)
@@ -968,8 +968,8 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 		? &fBoldFont : &fHalfFont);
 
 	// Set pen point
-	int x2 = x1 + fFontWidth * width;
-	int y2 = y1 + fFontHeight;
+	float x2 = x1 + fFontWidth * width;
+	float y2 = y1 + fFontHeight;
 
 	rgb_color rgb_fore = fTextForeColor;
 	rgb_color rgb_back = fTextBackColor;
@@ -1238,8 +1238,8 @@ TermView::DetachedFromWindow()
 void
 TermView::Draw(BRect updateRect)
 {
-	int32 x1 = (int32)updateRect.left / fFontWidth;
-	int32 x2 = std::min((int)updateRect.right / fFontWidth, fColumns - 1);
+	int32 x1 = (int32)(updateRect.left / fFontWidth);
+	int32 x2 = std::min((int)(updateRect.right / fFontWidth), fColumns - 1);
 
 	int32 firstVisible = _LineAt(0);
 	int32 y1 = _LineAt(updateRect.top);
@@ -1444,8 +1444,8 @@ void
 TermView::FrameResized(float width, float height)
 {
 //debug_printf("TermView::FrameResized(%f, %f)\n", width, height);
-	int32 columns = ((int32)width + 1) / fFontWidth;
-	int32 rows = ((int32)height + 1) / fFontHeight;
+	int32 columns = (int32)((width + 1) / fFontWidth);
+	int32 rows = (int32)((height + 1) / fFontHeight);
 
 	if (columns == fColumns && rows == fRows)
 		return;

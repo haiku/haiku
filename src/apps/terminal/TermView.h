@@ -76,7 +76,7 @@ public:
 			void				GetTermFont(BFont* font) const;
 			void				SetTermFont(const BFont* font);
 
-			void				GetFontSize(int* width, int* height);
+			void				GetFontSize(float* width, float* height);
 			int					Rows() const;
 			int					Columns() const;
 			BRect				SetTermSize(int rows, int cols,
@@ -194,7 +194,7 @@ private:
 			void				_Activate();
 			void				_Deactivate();
 
-			void				_DrawLinePart(int32 x1, int32 y1, uint32 attr,
+			void				_DrawLinePart(float x1, float y1, uint32 attr,
 									char* buffer, int32 width,
 									Highlight* highlight, bool cursor,
 									BView* inView);
@@ -271,7 +271,7 @@ private:
 			// Font and Width
 			BFont				fHalfFont;
 			BFont				fBoldFont;
-			int					fFontWidth;
+			float					fFontWidth;
 			int					fFontHeight;
 			int					fFontAscent;
 			struct escapement_delta fEscapement;

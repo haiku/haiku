@@ -1267,7 +1267,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		_GetPreferredFont(font);
 		view->SetTermFont(&font);
 
-		int width, height;
+		float width, height;
 		view->GetFontSize(&width, &height);
 
 		float minimumHeight = -1;
@@ -1648,7 +1648,7 @@ TermWindow::NextTermView(TermView* view)
 void
 TermWindow::_ResizeView(TermView *view)
 {
-	int fontWidth, fontHeight;
+	float fontWidth, fontHeight;
 	view->GetFontSize(&fontWidth, &fontHeight);
 
 	float minimumHeight = -1;
