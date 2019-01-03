@@ -80,6 +80,7 @@ typedef struct {
 	__fbsd_ ## name ## _ ## busname
 
 
+status_t _fbsd_init_hardware(driver_t *driver[]);
 status_t _fbsd_init_drivers(driver_t *driver[]);
 status_t _fbsd_uninit_drivers(driver_t *driver[]);
 
@@ -106,7 +107,9 @@ status_t wlan_close(void*);
 	const char *gDriverName = #publicname;								\
 	int32 api_version = B_CUR_DRIVER_API_VERSION;						\
 	status_t init_hardware()											\
-		{ return B_OK; }												\
+	{																	\
+		return __haiku_handle_fbsd_drivers_list(_fbsd_init_hardware);	\
+	}																	\
 	status_t init_driver()												\
 	{																	\
 		return __haiku_handle_fbsd_drivers_list(_fbsd_init_drivers);	\
