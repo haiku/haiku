@@ -10,7 +10,7 @@ UsePrivateHeaders shared ;
 USES_BE_API on libpackage-add-on-libsolv_build.so = true ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
-
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver libsolv ] ;
 
 MakeLocate libpackage-add-on-libsolv_build.so
 	: $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
@@ -23,7 +23,6 @@ BuildPlatformSharedLibrary libpackage-add-on-libsolv_build.so
 	libpackage_build.so
 	libbe_build.so $(HOST_LIBSTDC++)
 ;
-
 
 Includes [ FGristFiles LibsolvSolver.cpp ]
 	: [ BuildFeatureAttribute libsolv : headers ] ;

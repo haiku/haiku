@@ -71,10 +71,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
-		AddResources $(libsolv) :
-			LibsolvSolver.rdef
-			;
-
 		SharedLibrary [ MultiArchDefaultGristFiles libpackage.so ]
 			:
 			ActivateRepositoryCacheJob.cpp
