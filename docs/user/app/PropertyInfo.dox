@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2018 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -82,7 +82,7 @@
 	\var property_info::types
 	\brief Type chunks?
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -90,7 +90,7 @@
 	\var property_info::ctypes
 	\brief Type chunks?
 
-	\since Haiku R1
+		\since BeOS R4
 */
 
 
@@ -98,7 +98,7 @@
 	\var property_info::_reserved
 	\brief Reserved for future expansion, do not use.
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
@@ -106,7 +106,7 @@
 	\enum value_kind
 	\brief Enumerates value types.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -114,7 +114,7 @@
 	\var value_kind B_COMMAND_KIND
 	\brief Command value.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -122,7 +122,7 @@
 	\var value_kind B_TYPE_CODE_KIND
 	\brief Type code value.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -151,7 +151,7 @@
 	\param freeOnDelete if \c true, free the memory associated with
            \a propertyInfo and \a valueInfo when the object is destroyed.
 
-	\since BeOS R3
+	\since BeOS R4
 */
 
 
@@ -252,7 +252,7 @@
 
 	Returns the pointer directly, does not make copy.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -260,7 +260,7 @@
 	\fn int32 BPropertyInfo::CountProperties() const
 	\brief Returns The number of properties specified as an int32.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -268,7 +268,7 @@
 	\fn int32 BPropertyInfo::CountValues() const
 	\brief Returns The number of values specified as an int32.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -291,7 +291,7 @@
 
 	\returns \c true if the command was found, \c false otherwise.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
@@ -304,5 +304,5 @@
 
 	\returns \c true if the specifier was found, \c false otherwise.
 
-	\since Haiku R1
+	\since BeOS R4
 */
