@@ -1,4 +1,5 @@
 /******************************************************************************
+  SPDX-License-Identifier: BSD-3-Clause
 
   Copyright (c) 2001-2015, Intel Corporation 
   All rights reserved.
@@ -30,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD$*/
+/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_i210.h 333345 2018-05-08 01:39:45Z mmacy $*/
 
 #ifndef _E1000_I210_H_
 #define _E1000_I210_H_
@@ -43,8 +44,6 @@ s32 e1000_write_nvm_srwr_i210(struct e1000_hw *hw, u16 offset,
 			      u16 words, u16 *data);
 s32 e1000_read_nvm_srrd_i210(struct e1000_hw *hw, u16 offset,
 			     u16 words, u16 *data);
-s32 e1000_acquire_swfw_sync_i210(struct e1000_hw *hw, u16 mask);
-void e1000_release_swfw_sync_i210(struct e1000_hw *hw, u16 mask);
 s32 e1000_read_xmdio_reg(struct e1000_hw *hw, u16 addr, u8 dev_addr,
 			 u16 *data);
 s32 e1000_write_xmdio_reg(struct e1000_hw *hw, u16 addr, u8 dev_addr,

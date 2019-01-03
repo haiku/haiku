@@ -1,4 +1,5 @@
 /******************************************************************************
+  SPDX-License-Identifier: BSD-3-Clause
 
   Copyright (c) 2001-2015, Intel Corporation 
   All rights reserved.
@@ -30,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD$*/
+/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_ich8lan.h 327312 2017-12-28 21:26:40Z sbruno $*/
 
 #ifndef _E1000_ICH8LAN_H_
 #define _E1000_ICH8LAN_H_
@@ -123,7 +124,8 @@
 #define NVM_SIZE_MULTIPLIER 4096  /*multiplier for NVMS field*/
 #define E1000_FLASH_BASE_ADDR 0xE000 /*offset of NVM access regs*/
 #define E1000_CTRL_EXT_NVMVS 0x3 /*NVM valid sector */
-#define E1000_TARC0_CB_MULTIQ_3_REQ	(1 << 28 | 1 << 29)
+#define E1000_TARC0_CB_MULTIQ_3_REQ	0x30000000
+#define E1000_TARC0_CB_MULTIQ_2_REQ	0x20000000
 #define PCIE_ICH8_SNOOP_ALL	PCIE_NO_SNOOP_ALL
 
 #define E1000_ICH_RAR_ENTRIES	7

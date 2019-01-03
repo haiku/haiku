@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
-	: true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_iflib compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
@@ -12,6 +12,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) dev e1000 ] ;
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] ;
 
 KernelAddon ipro1000 :
+	glue.c
 	e1000_80003es2lan.c
 	e1000_82540.c
 	e1000_82541.c
@@ -29,10 +30,8 @@ KernelAddon ipro1000 :
 	e1000_osdep.c
 	e1000_phy.c
 	e1000_vf.c
-	if_lem.c
+	em_txrx.c
 	if_em.c
-	if_igb.c
-
-	glue.c
-	: libfreebsd_network.a
+	igb_txrx.c
+	: freebsd_iflib.a libfreebsd_network.a
 	;

@@ -1,4 +1,5 @@
 /******************************************************************************
+  SPDX-License-Identifier: BSD-3-Clause
 
   Copyright (c) 2001-2015, Intel Corporation 
   All rights reserved.
@@ -30,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD$*/
+/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_manage.h 326022 2017-11-20 19:36:21Z pfg $*/
 
 #ifndef _E1000_MANAGE_H_
 #define _E1000_MANAGE_H_

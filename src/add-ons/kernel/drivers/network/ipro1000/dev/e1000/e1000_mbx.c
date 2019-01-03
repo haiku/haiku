@@ -1,4 +1,5 @@
 /******************************************************************************
+  SPDX-License-Identifier: BSD-3-Clause
 
   Copyright (c) 2001-2015, Intel Corporation 
   All rights reserved.
@@ -30,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD$*/
+/*$FreeBSD: releng/12.0/sys/dev/e1000/e1000_mbx.c 330803 2018-03-12 17:05:53Z tsoome $*/
 
 #include "e1000_mbx.h"
 
@@ -778,6 +779,7 @@ s32 e1000_init_mbx_params_pf(struct e1000_hw *hw)
 		mbx->stats.reqs = 0;
 		mbx->stats.acks = 0;
 		mbx->stats.rsts = 0;
+		/* FALLTHROUGH */
 	default:
 		return E1000_SUCCESS;
 	}
