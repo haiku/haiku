@@ -34,21 +34,26 @@ extern const char* kNumTracks;			// uint32
 extern const char* kDrmCrippled;		// bool
 
 // Stuff needed to fully describe the BMediaFormat
+// TODO: Shouldn't we just use MIME types for it?
 extern const char* kMediaType;			// media_type
 // Audio stuff
 extern const char* kChannelCount;		// uint32
 extern const char* kAudioFormat;		// uint32
 extern const char* kByteOrder;			// uint32
 extern const char* kBufferSize;			// size_t
+// Multiaudio
+extern const char* kChannelMask;		// size_t
+
 // This is also BMediaFormat stuff, but mostly video
 // NOTE: video width/height are defined as per RFC mentioned above
-extern const char* kLineWidth;			// uint32
-extern const char* kLineCount;			// uint32
 extern const char* kBytesPerRow;		// uint32
 extern const char* kPixelOffset;		// uint32
 extern const char* kLineOffset;			// uint32
 extern const char* kColorSpace;			// color_space
 extern const char* kOrientation;		// uint32
+extern const char* kVideoFrameSize;		// uint32
+
+extern const char* kEncoding;			// uint32
 
 // General use attributes
 extern const char* kTitle;				// BString
@@ -113,7 +118,7 @@ public:
 	bool				GetBool(const char* key, bool* value) const;
 	bool				GetUInt32(const char* key, uint32* value) const;
 	bool				GetUInt64(const char* key, uint64* value) const;
-	bool				GetFloat(const char* key, float* value);
+	bool				GetFloat(const char* key, float* value) const;
 
 	bool				HasString(const char* key) const;
 	bool				HasBool(const char* key) const;

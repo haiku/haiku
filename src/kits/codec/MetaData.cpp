@@ -38,6 +38,7 @@ const char* kChannelCount		= "channelcount";
 const char* kAudioFormat		= "audioformat";
 const char* kByteOrder			= "byteorder";
 const char* kBufferSize			= "buffersize";
+const char* kChannelMask		= "channelmask";
 
 const char* kLineWidth			= "linewidth";
 const char* kLineCount			= "linecount";
@@ -46,6 +47,10 @@ const char* kPixelOffset		= "pixeloffset";
 const char* kLineOffset			= "lineoffset";
 const char* kColorSpace			= "colorspace";
 const char* kOrientation		= "orientation";
+
+const char* kVideoFrameSize		= "orientation";
+
+const char* kEncoding			= "encoding";
 
 const char* kTitle				= "title";
 const char* kComment			= "comment";
@@ -131,6 +136,20 @@ bool
 BMetaData::SetFloat(const char* key, float value)
 {
 	return fMessage->SetFloat(key, value) == B_OK ? true : false;
+}
+
+
+bool
+BMetaData::GetUInt32(const char* key, uint32* value) const
+{
+	return fMessage->FindUInt32(key, value) == B_OK ? true : false;
+}
+
+
+bool
+BMetaData::GetFloat(const char* key, float* value) const
+{
+	return fMessage->FindFloat(key, value) == B_OK ? true : false;
 }
 
 
