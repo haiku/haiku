@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -161,9 +161,6 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	if (!pkg->ProminenceOrderingIsNull())
 		package->SetProminence(pkg->ProminenceOrdering());
-
-	if (!pkg->PkgChangelogContentIsNull())
-		package->SetChangelog(*(pkg->PkgChangelogContent()));
 
 	int32 countPkgScreenshots = pkg->CountPkgScreenshots();
 

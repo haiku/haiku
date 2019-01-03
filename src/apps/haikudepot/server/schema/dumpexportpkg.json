@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "http://depot.haiku-os.org/schema/pkg/dumpexport.json",
+  "title": "Pkg",
+  "javaType": "org.haiku.haikudepotserver.pkg.model.dumpexport.DumpExportPkg",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "modifyTimestamp": {
+      "type": "integer"
+    },
+    "prominenceOrdering": {
+      "type": "integer"
+    },
+    "derivedRating": {
+      "type": "number"
+    },
+    "pkgScreenshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaType": "org.haiku.haikudepotserver.pkg.model.dumpexport.DumpExportPkgScreenshot",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "length": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "ordering": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "pkgCategories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaType": "org.haiku.haikudepotserver.pkg.model.dumpexport.DumpExportPkgCategory",
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pkgVersions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaType": "org.haiku.haikudepotserver.pkg.model.dumpexport.DumpExportPkgVersion",
+        "properties": {
+          "major": {
+            "type": "string"
+          },
+          "minor": {
+            "type": "string"
+          },
+          "micro": {
+            "type": "string"
+          },
+          "preRelease": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "architectureCode": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "payloadLength": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

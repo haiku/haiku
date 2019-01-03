@@ -1,0 +1,93 @@
+# =====================================
+# Copyright 2019, Andrew Lindesay
+# Distributed under the terms of the MIT License.
+# =====================================
+
+# HaikuDepotServer has a number of data-transfer-objects (DTO) that are defined
+# by JSON schemas.  The server uses these schemas to produce the objects at
+# compile time.  Likewise, the schema files also generate C++ side DTO model
+# objects in the form of .cpp and .h files as well.  This way the
+# HaikuDepotServer server and HaikuDepot desktop application are able to
+# communicate more 'safely'.  The schema files still need to be copied from
+# the server source to the Haiku source, but the generation process will ensure
+# that the data-structures are consistent.
+#
+# The C++ side classes are generated with python scripts that are included in
+# the Haiku source.  These rules and actions take care of making sure that the
+# python scripts are run when necessary to generate the C++ side classes.  Note
+# that there are two sorts of classes generated here; the model DTO objects and
+# also the supporting classes that parse the DTO objects.  The parsing classes
+# are intended to be used with Haiku JSON parsing systems.
+
+# pragma mark - Generic
+
+actions HdsSchemaGenTouch
+{
+	touch $(1)
+}
+
+# pragma mark - Model Class Generation
+
+# 1 : the dummy file in the class generation directory (target)
+# 2 : the JSON schema file
+# 3 : the Python script to use
+
+rule HdsSchemaGenModel
+{
+	SEARCH on $(2) = [ FDirName $(SUBDIR) server schema ] ;
+	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
+
+	Clean $(1:D) ;
+	Depends $(1) : $(2) $(3) ;
+
+	MkDir $(1:D) ;
+	HdsSchemaGenModel1 $(1) : $(2) $(3) $(1:D) ;
+	HdsSchemaGenTouch $(1) ;
+}
+
+actions HdsSchemaGenModel1
+{
+	python $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
+}
+
+# pragma mark - Bulk Parsing Class Generation
+
+# 1 : the dummy file in the class generation directory (target)
+# 2 : the JSON schema file
+# 3 : the Python script to use
+
+rule HdsSchemaGenBulkParser
+{
+	SEARCH on $(2) = [ FDirName $(SUBDIR) server schema ] ;
+	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
+
+	Clean $(1:D) ;
+	Depends $(1) : $(2) $(3) ;
+
+	MkDir $(1:D) ;
+	HdsSchemaGenBulkParser1 $(1) : $(2) $(3) $(1:D) ;
+	HdsSchemaGenTouch $(1) ;
+}
+
+actions HdsSchemaGenBulkParser1
+{
+	python $(2[2]) -i $(2[1]) --outputdirectory $(2[3]) --supportbulkcontainer
+}
+
+# pragma mark - Registering Generated Classes
+
+# Because a number of .cpp and .h files will be generated from a single python
+# script's run, it is necessary to introduce a dependency between the known
+# output files and the target for a given python script run.
+
+# 1 : generated files (.h and .cpp)
+# 2 : target that will generate the generated files
+
+rule HdsSchemaGenAppSrcDependsOnGeneration {
+	local generatedSource ;
+	local applicationSource ;
+
+	MakeLocate $(1) : $(2:D) ;
+	Depends $(1) : $(2) ;
+	Clean $(1) ;
+}
