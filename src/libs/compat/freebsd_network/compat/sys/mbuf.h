@@ -250,19 +250,16 @@ struct mbuf {
 	int32_t		 m_len;		/* amount of data in this mbuf */
 	uint32_t	 m_type:8,	/* type of data in this mbuf */
 			 m_flags:24;
-#if !defined(__LP64__)
-	uint32_t	 m_pad;		/* pad for 64bit alignment */
-#endif
 
 	union {
 		struct {
 			struct pkthdr	MH_pkthdr;
 			union {
 				struct m_ext	MH_ext;
-				char			MH_databuf[0];
+				char			MH_databuf[0] __aligned(8);
 			} MH_dat;
 		} MH;
-		char M_databuf[0];
+		char M_databuf[0] __aligned(8);
 	} M_dat;
 };
 
