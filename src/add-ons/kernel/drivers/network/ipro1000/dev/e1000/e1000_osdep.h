@@ -83,11 +83,15 @@ ms_scale(int x) {
 
 static inline void
 safe_pause_us(int x) {
+#ifndef __HAIKU__
 	if (cold) {
 		DELAY(x);
 	} else {
 		pause("e1000_delay", max(1,  x/(1000000/hz)));
 	}
+#else
+	DELAY(x);
+#endif
 }
 
 static inline void
