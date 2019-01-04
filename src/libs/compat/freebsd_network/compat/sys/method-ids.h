@@ -26,6 +26,7 @@ enum device_method_ids {
 	ID_bus_hinted_child,
 	ID_bus_print_child,
 	ID_bus_read_ivar,
+	ID_bus_get_dma_tag,
 
 	ID_ifdi_knlist_add,
 	ID_ifdi_knote_event,
