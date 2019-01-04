@@ -204,7 +204,7 @@ m_cljset(struct mbuf *m, void *cl, int type)
 		break;
 	}
 
-	m->m_data = m->m_ext.ext_buf = cl;
+	m->m_data = m->m_ext.ext_buf = (caddr_t)cl;
 	m->m_ext.ext_size = size;
 	m->m_ext.ext_type = type;
 	m->m_ext.ext_flags = EXT_FLAG_EMBREF;
