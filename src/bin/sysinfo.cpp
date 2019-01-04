@@ -30,16 +30,20 @@ struct cache_description {
 	{0x05, "Data TLB: 4M-byte pages, 4-way set associative, 32 entries"},
 	{0x06, "L1 inst cache: 8 KB, 4-way set associative, 32 bytes/line"},
 	{0x08, "L1 inst cache: 16 KB, 4-way set associative, 32 bytes/line"},
+	{0x09, "L1 inst cache: 43 KB, 4-way set associative, 32 bytes/line"},
 	{0x0A, "L1 data cache: 8 KB, 2-way set associative, 32 bytes/line"},
+	{0x0B, "Code TLB: 4M-byte pages, 4-way set associative, 4 entries"},
 	{0x0C, "L1 data cache: 16 KB, 4-way set associative, 32 bytes/line"},
 	{0x0D, "L1 data cache: 16 KB, 4-way set associative, 64-bytes/line, ECC"},
 	{0x0E, "L1 data cache, 24 KB, 6-way set associative, 64-bytes/line"},
 	{0x10, /* IA-64 */ "L1 data cache: 16 KB, 4-way set associative, 32 bytes/line"},
 	{0x15, /* IA-64 */ "L1 inst cache: 16 KB, 4-way set associative, 32 bytes/line"},
 	{0x1A, /* IA-64 */ "L2 cache: 96 KB, 6-way set associative, 64 bytes/line"},
+	{0x1D, "L2 cache: 128 KB, 2-way set associative, 64 bytes/line"},
 	{0x21, "L2 cache: 256 KB (MLC), 8-way set associative, 64-bytes/line"},
 	{0x22, "L3 cache: 512 KB, 4-way set associative (!), 64 bytes/line, dual-sectored"},
 	{0x23, "L3 cache: 1 MB, 8-way set associative, 64 bytes/line, dual-sectored"},
+	{0x24, "L2 cache: 1 MB, 8-way set associative, 64 bytes/line"},
 	{0x25, "L3 cache: 2 MB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x29, "L3 cache: 4 MB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x2c, "L1 data cache: 32 KB, 8-way set associative, 64 bytes/line"},
@@ -78,15 +82,27 @@ struct cache_description {
 	{0x5B, "Data TLB: 4K/4M-bytes pages, fully associative, 64 entries"},
 	{0x5C, "Data TLB: 4K/4M-bytes pages, fully associative, 128 entries"},
 	{0x5D, "Data TLB: 4K/4M-bytes pages, fully associative, 256 entries"},
+	{0x60, "L1 data cache: 16 KB, 8-way set associative, 64 bytes/line, sectored"},
+	{0x61, "Code TLB: 4K pages, fully associative, 48 entries"},
 	{0x63, "Data TLB: 2M/4M-bytes pages, 4-way set associative, 32 entries"},
+	{0x64, "Data TLB: 4K pages, 4-way set associative, 512 entries"},
 	{0x66, "L1 data cache: 8 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x67, "L1 data cache: 16 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x68, "L1 data cache: 32 KB, 4-way set associative, 64 bytes/line, sectored"},
+	{0x6A, "L0 Data TLB: 4K pages, 8-way set associative, 64 entries"},
+	{0x6B, "Data TLB: 4K pages, 8-way set associative, 256 entries"},
+	{0x6C, "Data TLB: 2M/4M pages, 8-way set associative, 128 entries"},
+	{0x6D, "Data TLB: 1G pages, fully associative, 16 entries"},
+//	{0x70, "Cyrix specific: Code and data TLB: 4k-bytes pages, 4-way set associative, 32 entries"},
 	{0x70, "Inst trace cache: 12K µOPs, 8-way set associative"},
 	{0x71, "Inst trace cache: 16K µOPs, 8-way set associative"},
 	{0x72, "Inst trace cache: 32K µOPs, 8-way set associative"},
-	{0x76, "Code TLB: 2M/4M pages, fully, 8 entries"},
+	{0x73, "Inst trace cache: 64K µOPs, 8-way set associative"},
+//	{0x74, "Cyrix specific: ???"},
+	{0x76, "Code TLB: 2M/4M pages, fully associative, 8 entries"},
 	{0x77, /* IA-64 */ "L1 inst cache: 16 KB, 4-way set associative, 64 bytes/line, sectored"},
+//	{0x77, "Cyrix specific: ???"},
+	{0x78, "L2 cache: 1024 KB, 4-way set associative, 64 bytes/line"},
 	{0x79, "L2 cache: 128 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7A, "L2 cache: 256 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7B, "L2 cache: 512 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
@@ -94,10 +110,13 @@ struct cache_description {
 	{0x7D, "L2 cache: 2048 KB, 8-way set associative, 64 bytes/line"},
 	{0x7E, /* IA-64 */ "L2 cache: 256 KB, 8-way set associative, 128 bytes/line, sectored"},
 	{0x7F, "L2 cache: 512 KB, 2-way set associative, 64 bytes/line"},
+	{0x80, /* Cyrix specific */ "L1 cache: 16 KB, 4-way set associative, 16 bytes/line"},
 	{0x81, "L2 cache: 128 KB, 8-way set associative, 32 bytes/line"},
 	{0x82, "L2 cache: 256 KB, 8-way set associative, 32 bytes/line"},
+//	{0x82, "Cyrix specific: ???"},
 	{0x83, "L2 cache: 512 KB, 8-way set associative, 32 bytes/line"},
 	{0x84, "L2 cache: 1024 KB, 8-way set associative, 32 bytes/line"},
+//	{0x84, "Cyrix specific: ???"},
 	{0x85, "L2 cache: 2048 KB, 8-way set associative, 32 bytes/line"},
 	{0x86, "L2 cache: 512 KB, 4-way set associative, 64 bytes/line"},
 	{0x87, "L2 cache: 1024 KB, 8-way set associative, 64 bytes/line"},
@@ -108,12 +127,7 @@ struct cache_description {
 	{0x90, /* IA-64 */ "Inst TLB: 4K-256Mbytes pages, fully associative, 64 entries"},
 	{0x96, /* IA-64 */ "L1 data TLB: 4K-256M bytes pages, fully associative, 32 entries"},
 	{0x9B, /* IA-64 */ "L2 data TLB: 4K-256M bytes pages, fully associative, 96 entries"},
-//	{0x70, "Cyrix specific: Code and data TLB: 4k-bytes pages, 4-way set associative, 32 entries"},
-//	{0x74, "Cyrix specific: ???"},
-//	{0x77, "Cyrix specific: ???"},
-	{0x80, /* Cyrix specific */ "L1 cache: 16 KB, 4-way set associative, 16 bytes/line"},
-//	{0x82, "Cyrix specific: ???"},
-//	{0x84, "Cyrix specific: ???"},
+	{0xA0, "Data TLB: 4K-bytes pages, fully associative, 32 entries"},
 	{0xB0, "Inst TLB: 4K-bytes pages, 4-way set associative, 128 entries"},
 	{0xB1, "Inst TLB: 2M-bytes pages, 4-way set associative, 8 entries OR 4M, 4-way, 4 entries"},
 		// Intel doesn't give any details how to determine which of the two options is the case
@@ -125,7 +139,10 @@ struct cache_description {
 	{0xB6, "Code TLB: 4K-bytes pages, 8-way set associative, 128 entries"},
 	{0xBA, "Data TLB, 4K-bytes pages, 4-way set associative, 64 entries"},
 	{0xC0, "Data TLB, 4K-4M bytes pages, 4-way set associative, 8 entries"},
+	{0xC1, "L2 cache: 4K/2M bytes pages, 8-way set associative, 1024 entries"},
+	{0xC2, "Data TLB, 2M/4M bytes pages, 4-way set associative, 16 entries"},
 	{0xC3, "Shared 2nd-level TLB: 4K/2M, 6-way set associative, 1536 entries"},
+	{0xC4, "Data TLB, 2M/4M bytes pages, 4-way set associative, 32 entries"},
 	{0xCA, "Shared 2nd-level TLB: 4K, 4-way set associative, 512 entries"},
 	{0xD0, "L3 cache: 512 KB, 4-way set associative, 64-bytes/line"},
 	{0xD1, "L3 cache: 1024 KB, 4-way set associative, 64-bytes/line"},
@@ -139,9 +156,12 @@ struct cache_description {
 	{0xE2, "L3 cache: 2048 KB, 16-way set associative, 64-bytes/line"},
 	{0xE3, "L3 cache: 4096 KB, 16-way set associative, 64-bytes/line"},
 	{0xE4, "L3 cache: 8192 KB, 16-way set associative, 64-bytes/line"},
+	{0xEA, "L3 cache: 12288 KB, 24-way set associative, 64-bytes/line"},
+	{0xEB, "L3 cache: 18432 KB, 24-way set associative, 64-bytes/line"},
+	{0xEC, "L3 cache: 24576 KB, 24-way set associative, 64-bytes/line"},
 	{0xF0, "64-byte Prefetching"},
 	{0xF1, "128-byte Prefetching"},
-	{0xFF, "TODO: Query standard level 0000_0004h instead"},
+	{0xFF, NULL}, // print_intel_cache_desc() will query level 0000_0004h
 	{0, NULL}
 };
 
@@ -155,13 +175,13 @@ static const char *kFeatures[32] = {
 	"PAT", "PSE36", "PSN", "CFLUSH",
 	NULL, "DS", "ACPI", "MMX",
 	"FXSTR", "SSE", "SSE2", "SS",
-	"HTT", "TM", NULL, "PBE",
+	"HTT", "TM", "IA64", "PBE",
 };
 
 /* CPU Extended features */
 static const char *kExtendedFeatures[32] = {
 	"SSE3", "PCLMULDQ", "DTES64", "MONITOR", "DS-CPL", "VMX", "SMX", "EST",
-	"TM2", "SSSE3", "CNTXT-ID", NULL, "FMA", "CX16", "xTPR", "PDCM",
+	"TM2", "SSSE3", "CNTXT-ID", "SDBG", "FMA", "CX16", "xTPR", "PDCM",
 	NULL, "PCID", "DCA", "SSE4.1", "SSE4.2", "x2APIC", "MOVEB", "POPCNT",
 	"TSC-DEADLINE", "AES", "XSAVE", "OSXSAVE", "AVX", "F16C", "RDRND",
 	"HYPERVISOR"
@@ -172,8 +192,8 @@ static const char *kExtendedFeatures[32] = {
 static const char *kAMDExtFeatures[32] = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 	NULL, NULL, NULL, "SCE", NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, "NX", NULL, "AMD-MMX", NULL,
-	"FXSR", "FFXSR", NULL, "RDTSCP", NULL, "64", "3DNow+", "3DNow!"
+	NULL, NULL, NULL, "MP", "NX", NULL, "AMD-MMX", NULL,
+	"FXSR", "FFXSR", "GBPAGES", "RDTSCP", NULL, "64", "3DNow+", "3DNow!"
 };
 
 
@@ -188,10 +208,10 @@ static const char *kAMDExtFeaturesPower[32] = {
 
 /* AMD Extended features leaf 0x80000008 */
 static const char *kAMDExtFeaturesTwo[32] = {
-	"CLZERO", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	"CLZERO", "IRPERF", "XSAVEPTR", NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, "AMD_IBPB", NULL, "AMD_IBRS", "AMD_STIBP",
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	"AMD_SSBD", "VIRT_SSBD", "AMD_SSB_NO", NULL, NULL, NULL, NULL, NULL
 };
 
 
@@ -253,6 +273,8 @@ print_intel_cache_descriptors(enum cpu_vendor vendor, uint32 model,
 					printf("\tNo integrated L%u cache\n",
 						((model >> 8) & 0xf) == 0xf
 						&& vendor == B_CPU_VENDOR_INTEL ? 3 : 2);
+				} else if (cacheDescriptors[i] == 0xff) {
+					break;
 				} else
 					printf("\t%s\n", sIntelCacheDescriptions[j].description);
 				break;
@@ -374,8 +396,6 @@ print_intel_cache_desc(int32 cpu)
 	uint32 linesPerTag = ((info.regs.ebx & 0x3ff000) >> 12) + 1;
 	uint32 ways = ((info.regs.ebx & 0xffc00000) >> 22) + 1;
 
-	uint32 sets = info.regs.ecx;
-
 	printf("\tL%" B_PRId32 " ",level);
 
 	switch (type) {
@@ -393,6 +413,7 @@ print_intel_cache_desc(int32 cpu)
 		lineSize);
 
 	get_cpuid(&info, 0x80000006, cpu);
+	uint32 sets = info.regs.ecx;
 	print_level2_cache(sets, "L2 cache");
 }
 
