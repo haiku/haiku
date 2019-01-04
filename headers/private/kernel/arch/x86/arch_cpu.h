@@ -42,6 +42,7 @@
 #define IA32_MSR_APERF					0xe8
 #define IA32_MSR_MTRR_CAPABILITIES		0xfe
 #define IA32_MSR_ARCH_CAPABILITIES		0x10a
+#define IA32_MSR_FLUSH_CMD				0x10b
 #define IA32_MSR_SYSENTER_CS			0x174
 #define IA32_MSR_SYSENTER_ESP			0x175
 #define IA32_MSR_SYSENTER_EIP			0x176
@@ -56,6 +57,7 @@
 // MSR SPEC CTRL bits
 #define IA32_MSR_SPEC_CTRL_IBRS			(1 << 0)
 #define IA32_MSR_SPEC_CTRL_STIBP		(1 << 1)
+#define IA32_MSR_SPEC_CTRL_SSBD			(1 << 2)
 
 // MSR PRED CMD bits
 #define IA32_MSR_PRED_CMD_IBPB			(1 << 0)
@@ -72,8 +74,14 @@
 #define IA32_MSR_EFER_NX				(1 << 11)
 
 // MSR ARCH CAPABILITIES bits
-#define IA32_MSR_ARCH_CAP_RDCL_NO		(1 << 0)
-#define IA32_MSR_ARCH_CAP_IBRS_ALL		(1 << 1)
+#define IA32_MSR_ARCH_CAP_RDCL_NO			(1 << 0)
+#define IA32_MSR_ARCH_CAP_IBRS_ALL			(1 << 1)
+#define IA32_MSR_ARCH_CAP_RSBA				(1 << 2)
+#define IA32_MSR_ARCH_CAP_SKIP_L1D_VMENTRY	(1 << 3)
+#define IA32_MSR_ARCH_CAP_SSB_NO			(1 << 4)
+
+// MSR FLUSH CMD bits
+#define IA32_MSR_L1D_FLUSH			(1 << 1)
 
 // X2APIC MSRs.
 #define IA32_MSR_APIC_ID					0x00000802
@@ -276,8 +284,9 @@
 #define IA32_FEATURE_AVX512_4FMAPS	(1 << 3) // AVX-512 4-register Multiply Accumulation Single precision
 #define IA32_FEATURE_IBRS			(1 << 26)	// IBRS / IBPB Speculation Control
 #define IA32_FEATURE_STIBP			(1 << 27)	// STIBP Speculation Control
+#define IA32_FEATURE_L1D_FLUSH		(1 << 28)	// L1D_FLUSH supported
 #define IA32_FEATURE_ARCH_CAPABILITIES	(1 << 29)	// IA32_ARCH_CAPABILITIES MSR
-
+#define IA32_FEATURE_SSBD			(1 << 30)	// Speculative Store Bypass Disable
 
 // x86 defined features from cpuid eax 0x80000007, edx register
 #define IA32_FEATURE_INVARIANT_TSC		(1 << 8)
