@@ -159,6 +159,8 @@ console_wait_for_key(void)
 		return (int) key.UnicodeChar;
 
 	switch (key.ScanCode) {
+		case SCAN_ESC:
+			return TEXT_CONSOLE_KEY_ESCAPE;
 		case SCAN_UP:
 			return TEXT_CONSOLE_KEY_UP;
 		case SCAN_DOWN:
