@@ -117,7 +117,8 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 	uint32 addr = bar & PCI_address_memory_32_mask;
 	pci_write_config(dev, regid, ~0, 4);
 	uint32 size = pci_read_config(dev, regid, 4) & PCI_address_memory_32_mask;
-	size = (~size) + 1;
+	//size = (~size) + 1;
+	size = 1024 * 128; /* XXX */
 	pci_write_config(dev, regid, bar, 4);
 	void *virtualAddr;
 
