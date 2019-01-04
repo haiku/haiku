@@ -36,14 +36,16 @@ kthread_add(void (*func)(void *), void *arg, void* p,
 void
 sched_prio(struct thread* td, u_char prio)
 {
-	set_thread_priority((thread_id)td, prio);
+	uintptr_t tdi = (uintptr_t)td;
+	set_thread_priority((thread_id)tdi, prio);
 }
 
 
 void
 sched_add(struct thread* td, int /* flags */)
 {
-	resume_thread((thread_id)td);
+	uintptr_t tdi = (uintptr_t)td;
+	resume_thread((thread_id)tdi);
 }
 
 
