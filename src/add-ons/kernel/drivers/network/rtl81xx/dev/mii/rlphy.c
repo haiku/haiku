@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -31,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/rlphy.c 325966 2017-11-18 14:26:50Z pfg $");
 
 /*
  * driver for RealTek 8139 internal PHYs
@@ -111,11 +113,12 @@ rlphy_probe(device_t dev)
 	int rv;
 
 	rv = mii_phy_dev_probe(dev, rlphys, BUS_PROBE_DEFAULT);
-#ifdef __HAIKU__
-	if (rv == BUS_PROBE_DEFAULT)
-		return (rv);
-#else
+#ifndef __HAIKU__
 	if (rv <= 0)
+		return (rv);
+#else /* __HAIKU__ */
+	/* our BUS_PROBE_* constants are > 0 since errors are < 0 */
+	if (rv > 0)
 		return (rv);
 #endif
 

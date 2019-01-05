@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/rl/if_rl.c 338951 2018-09-26 19:41:00Z imp $");
 
 /*
  * RealTek 8129/8139 PCI NIC driver
@@ -259,6 +259,8 @@ static driver_t rl_driver = {
 static devclass_t rl_devclass;
 
 DRIVER_MODULE(rl, pci, rl_driver, rl_devclass, 0, 0);
+MODULE_PNP_INFO("U16:vendor;U16:device", pci, rl, rl_devs,
+    nitems(rl_devs) - 1);
 DRIVER_MODULE(rl, cardbus, rl_driver, rl_devclass, 0, 0);
 DRIVER_MODULE(miibus, rl, miibus_driver, miibus_devclass, 0, 0);
 
@@ -276,7 +278,7 @@ DRIVER_MODULE(miibus, rl, miibus_driver, miibus_devclass, 0, 0);
 static void
 rl_eeprom_putbyte(struct rl_softc *sc, int addr)
 {
-	register int		d, i;
+	int			d, i;
 
 	d = addr | sc->rl_eecmd_read;
 
@@ -303,7 +305,7 @@ rl_eeprom_putbyte(struct rl_softc *sc, int addr)
 static void
 rl_eeprom_getword(struct rl_softc *sc, int addr, uint16_t *dest)
 {
-	register int		i;
+	int			i;
 	uint16_t		word = 0;
 
 	/* Enter EEPROM access mode. */
@@ -561,7 +563,7 @@ rl_rxfilter(struct rl_softc *sc)
 static void
 rl_reset(struct rl_softc *sc)
 {
-	register int		i;
+	int			i;
 
 	RL_LOCK_ASSERT(sc);
 
@@ -1912,7 +1914,7 @@ rl_watchdog(struct rl_softc *sc)
 static void
 rl_stop(struct rl_softc *sc)
 {
-	register int		i;
+	int			i;
 	struct ifnet		*ifp = sc->rl_ifp;
 
 	RL_LOCK_ASSERT(sc);
