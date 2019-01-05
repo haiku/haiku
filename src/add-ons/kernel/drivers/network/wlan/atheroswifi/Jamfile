@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers network wlan atheroswifi ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
@@ -45,7 +45,7 @@ KernelAddon atheroswifi :
 	atheroswifi_hal.o
 	atheroswifi_rate.o
 	:
-	libfreebsd11_wlan.a
+	freebsd_wlan.a
 	libfreebsd_network.a
 	;
 

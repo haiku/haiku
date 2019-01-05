@@ -4,7 +4,7 @@ UsePrivateHeaders app net shared storage support ;
 UsePrivateHeaders locale shared ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
 	: true ;
 

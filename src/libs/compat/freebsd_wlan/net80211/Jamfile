@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src libs compat freebsd11_wlan net80211 ;
+SubDir HAIKU_TOP src libs compat freebsd_wlan net80211 ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. freebsd_network ] : true ;
 UseHeaders [ FDirName $(SUBDIR) .. .. freebsd_network compat ] : true ;
@@ -18,7 +18,7 @@ SubDirC++Flags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto rijndael ] ;
 
-KernelStaticLibrary libfreebsd11_wlan.a :
+KernelStaticLibrary freebsd_wlan.a :
 	ieee80211.c
 	ieee80211_action.c
 	ieee80211_adhoc.c

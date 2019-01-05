@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src bin network ifconfig ;
 UsePrivateHeaders net ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
 SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 

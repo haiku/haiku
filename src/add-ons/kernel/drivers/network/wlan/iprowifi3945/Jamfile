@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers network wlan iprowifi3945 ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
@@ -19,7 +19,7 @@ KernelAddon iprowifi3945 :
 	if_wpi.c
 	glue.c
 	:
-	libfreebsd11_wlan.a
+	freebsd_wlan.a
 	libfreebsd_network.a
 	;
 

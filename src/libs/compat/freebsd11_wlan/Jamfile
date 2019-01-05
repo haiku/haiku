@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src libs compat freebsd11_wlan ;
-
-SubInclude HAIKU_TOP src libs compat freebsd11_wlan net80211 ;

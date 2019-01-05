@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers network wlan ralinkwifi ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd11_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
@@ -22,7 +22,7 @@ KernelAddon ralinkwifi :
 	rt2860.c
 	glue.c
 	:
-	libfreebsd11_wlan.a
+	freebsd_wlan.a
 	libfreebsd_network.a
 	;
 
