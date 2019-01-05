@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -31,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/vr/if_vr.c 296272 2016-03-01 17:47:32Z jhb $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/vr/if_vr.c 333813 2018-05-18 20:13:34Z mmacy $");
 
 /*
  * VIA Rhine fast ethernet PCI NIC driver

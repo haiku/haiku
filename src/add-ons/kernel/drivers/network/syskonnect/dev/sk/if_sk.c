@@ -1,6 +1,8 @@
 /*	$OpenBSD: if_sk.c,v 2.33 2003/08/12 05:23:06 nate Exp $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999, 2000
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -48,21 +50,21 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/sk/if_sk.c 336757 2018-07-27 10:40:48Z eadler $");
 
 /*
  * SysKonnect SK-NET gigabit ethernet driver for FreeBSD. Supports
  * the SK-984x series adapters, both single port and dual port.
  * References:
  * 	The XaQti XMAC II datasheet,
- *  http://www.freebsd.org/~wpaul/SysKonnect/xmacii_datasheet_rev_c_9-29.pdf
+ *  https://www.freebsd.org/~wpaul/SysKonnect/xmacii_datasheet_rev_c_9-29.pdf
  *	The SysKonnect GEnesis manual, http://www.syskonnect.com
  *
  * Note: XaQti has been acquired by Vitesse, and Vitesse does not have the
  * XMAC II datasheet online. I have put my copy at people.freebsd.org as a
  * convenience to others until Vitesse corrects this problem:
  *
- * http://people.freebsd.org/~wpaul/SysKonnect/xmacii_datasheet_rev_c_9-29.pdf
+ * https://people.freebsd.org/~wpaul/SysKonnect/xmacii_datasheet_rev_c_9-29.pdf
  *
  * Written by Bill Paul <wpaul@ee.columbia.edu>
  * Department of Electrical Engineering
@@ -263,7 +265,7 @@ static int sysctl_hw_sk_int_mod(SYSCTL_HANDLER_ARGS);
 /* Tunables. */
 static int jumbo_disable = 0;
 TUNABLE_INT("hw.skc.jumbo_disable", &jumbo_disable);
-
+ 
 #ifdef __HAIKU__
 static u_short in_addword(u_short a, u_short b);
 #endif

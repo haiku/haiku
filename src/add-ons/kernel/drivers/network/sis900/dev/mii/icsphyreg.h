@@ -1,6 +1,8 @@
 /*	$NetBSD: icsphyreg.h,v 1.2 2003/07/01 22:46:08 msaitoh Exp $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ *
  * Copyright (c) 1998 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -29,7 +31,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: releng/12.0/sys/dev/mii/icsphyreg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef _DEV_MII_ICSPHYREG_H_
