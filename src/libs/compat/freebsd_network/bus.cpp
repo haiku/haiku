@@ -112,14 +112,31 @@ bus_alloc_irq_resource(device_t dev, struct resource *res)
 static int
 bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 {
-	/* TODO: check the offset really is of a BAR */
-	uint32 bar = pci_read_config(dev, regid, 4);
-	uint32 addr = bar & PCI_address_memory_32_mask;
-	pci_write_config(dev, regid, ~0, 4);
-	uint32 size = pci_read_config(dev, regid, 4) & PCI_address_memory_32_mask;
-	//size = (~size) + 1;
-	size = 1024 * 128; /* XXX */
-	pci_write_config(dev, regid, bar, 4);
+	pci_info *info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+
+	// check the offset really is of a BAR
+	if (regid < PCI_base_registers || (regid % sizeof(uint32) != 0)
+		|| (regid >= PCI_base_registers + 6 * (int)sizeof(uint32)))
+		return -1;
+
+	// turn offset into array index
+	regid -= PCI_base_registers;
+	regid /= sizeof(uint32);
+
+	uint32 addr = info->u.h0.base_registers[regid];
+	uint32 size = info->u.h0.base_register_sizes[regid];
+	uchar flags = info->u.h0.base_register_flags[regid];
+
+	// reject empty regions
+	if (size == 0)
+		return -1;
+
+	// reject I/O space
+	if (flags & PCI_address_space)
+		return -1;
+
+	// TODO: check flags & PCI_address_prefetchable ?
+
 	void *virtualAddr;
 
 	res->r_mapped_area = map_mem(&virtualAddr, addr, size, 0,
