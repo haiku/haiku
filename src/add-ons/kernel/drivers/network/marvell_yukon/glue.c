@@ -17,6 +17,7 @@
 #include <dev/msk/if_mskreg.h>
 
 
+HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE | FBSD_SWI_TASKQUEUE);
 HAIKU_FBSD_DRIVER_GLUE(marvell_yukon, mskc, pci)
 
 extern driver_t *DRIVER_MODULE_NAME(e1000phy, miibus);
@@ -67,6 +68,3 @@ HAIKU_REENABLE_INTERRUPTS(device_t dev)
 	struct msk_softc *sc = device_get_softc(dev);
 	CSR_WRITE_4(sc, B0_Y2_SP_ICR, 2);
 }
-
-
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE | FBSD_SWI_TASKQUEUE);

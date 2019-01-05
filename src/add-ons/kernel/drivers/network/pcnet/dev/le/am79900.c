@@ -1,6 +1,8 @@
 /*	$NetBSD: am79900.c,v 1.17 2005/12/24 20:27:29 perry Exp $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD AND BSD-3-Clause
+ *
  * Copyright (c) 1997 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -103,7 +105,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/le/am79900.c 326255 2017-11-27 14:52:40Z pfg $");
 
 #include <sys/param.h>
 #include <sys/bus.h>
@@ -254,7 +256,7 @@ am79900_rint(struct lance_softc *sc)
 	struct lermd rmd;
 	uint32_t rmd1;
 	int bix, rp;
-#if defined(__i386__) && !defined(PC98)
+#if defined(__i386__)
 	struct ether_header *eh;
 #endif
 
@@ -315,7 +317,7 @@ am79900_rint(struct lance_softc *sc)
 		if (m != NULL) {
 			if_inc_counter(ifp, IFCOUNTER_IPACKETS, 1);
 
-#if defined(__i386__) && !defined(PC98)
+#if defined(__i386__)
 			/*
 			 * The VMware LANCE does not present IFF_SIMPLEX
 			 * behavior on multicast packets. Thus drop the

@@ -46,6 +46,8 @@
  ******************************************************************************/
 
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause AND BSD-3-Clause
+ *
  * Copyright (c) 1997, 1998, 1999, 2000
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -93,7 +95,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*$FreeBSD$*/
+/*$FreeBSD: releng/12.0/sys/dev/msk/if_mskreg.h 325966 2017-11-18 14:26:50Z pfg $*/
 
 /*
  * SysKonnect PCI vendor ID

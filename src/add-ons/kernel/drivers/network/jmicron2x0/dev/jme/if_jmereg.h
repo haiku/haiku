@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2008, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/jme/if_jmereg.h 298955 2016-05-03 03:41:25Z pfg $
+ * $FreeBSD: releng/12.0/sys/dev/jme/if_jmereg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef	_IF_JMEREG_H

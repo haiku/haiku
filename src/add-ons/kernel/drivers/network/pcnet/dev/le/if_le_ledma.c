@@ -1,6 +1,8 @@
 /*	$NetBSD: if_le_ledma.c,v 1.26 2005/12/11 12:23:44 christos Exp $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ *
  * Copyright (c) 1997, 1998 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
@@ -31,7 +33,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/le/if_le_ledma.c 326255 2017-11-27 14:52:40Z pfg $");
 
 #include <sys/param.h>
 #include <sys/systm.h>

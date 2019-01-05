@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2008, Pyun YongHyeon
  * All rights reserved.
  *              
@@ -24,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/mii/jmphyreg.h 216551 2010-12-18 23:52:50Z yongari $
+ * $FreeBSD: releng/12.0/sys/dev/mii/jmphyreg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef	_DEV_MII_JMPHYREG_H_

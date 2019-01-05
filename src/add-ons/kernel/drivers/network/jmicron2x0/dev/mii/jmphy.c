@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2008, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/mii/jmphy.c 277108 2015-01-13 06:56:04Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/jmphy.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * Driver for the JMicron JMP211 10/100/1000, JMP202 10/100 PHY.

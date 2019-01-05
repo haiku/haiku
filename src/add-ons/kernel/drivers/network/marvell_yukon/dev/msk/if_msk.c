@@ -46,6 +46,8 @@
  *****************************************************************************/
 
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause AND BSD-3-Clause
+ *
  * Copyright (c) 1997, 1998, 1999, 2000
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -99,7 +101,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/msk/if_msk.c 333813 2018-05-18 20:13:34Z mmacy $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -4511,7 +4513,7 @@ msk_sysctl_node(struct msk_if_softc *sc_if)
 
 	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats", CTLFLAG_RD,
 	    NULL, "MSK Statistics");
-	schild = child = SYSCTL_CHILDREN(tree);
+	schild = SYSCTL_CHILDREN(tree);
 	tree = SYSCTL_ADD_NODE(ctx, schild, OID_AUTO, "rx", CTLFLAG_RD,
 	    NULL, "MSK RX Statistics");
 	child = SYSCTL_CHILDREN(tree);

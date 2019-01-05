@@ -30,6 +30,8 @@
  */
 
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -63,7 +65,7 @@
  *	@(#)if_lereg.h	8.1 (Berkeley) 6/10/93
  */
 
-/* $FreeBSD$ */
+/* $FreeBSD: releng/12.0/sys/dev/le/am7990reg.h 326255 2017-11-27 14:52:40Z pfg $ */
 
 #ifndef _DEV_LE_AM7990REG_H_
 #define	_DEV_LE_AM7990REG_H_

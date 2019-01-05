@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2010, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
  *
@@ -28,7 +30,7 @@
 /* Driver for DM&P Electronics, Inc, Vortex86 RDC R6040 FastEthernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/vte/if_vte.c 333813 2018-05-18 20:13:34Z mmacy $");
 
 #include <sys/param.h>
 #include <sys/systm.h>
