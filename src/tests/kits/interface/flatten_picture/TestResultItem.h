@@ -39,4 +39,19 @@ private:
 	BBitmap *fArchivedBitmap;
 };
 
+
+class HeaderListItem : public BListItem {
+public:
+	HeaderListItem(const char* label1, const char* label2,
+					const char* label3, const char* label4, const char* label5,
+					const char* label6, BRect rect);
+	virtual void DrawItem(BView *owner, BRect itemRect, bool drawEverthing);
+	virtual void Update(BView *owner, const BFont *font);
+
+private:
+	BString fLabels[6];
+	BRect fRect;
+};
+
+
 #endif

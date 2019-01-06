@@ -21,6 +21,7 @@
 #include "PictureTestWindow.h"
 #include "TestResultItem.h"
 
+
 PictureTestWindow::PictureTestWindow()
 	: Inherited(BRect(10, 30, 630, 470), "Bitmap Drawing Tests", B_DOCUMENT_WINDOW, 0)
 	, fFailedTests(0)
@@ -61,7 +62,7 @@ void PictureTestWindow::BuildGUI()
 
 	BRect b = Bounds();
 	b.top = mb->Bounds().bottom + 1;
-	
+
 	fHeader = new BStringView(b, "header", 
 		"X", B_FOLLOW_LEFT | B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	float width, height;
@@ -69,7 +70,7 @@ void PictureTestWindow::BuildGUI()
 	fHeader->ResizeTo(b.Width(), height);
 	backdrop->AddChild(fHeader);
 	b.top = fHeader->Frame().bottom + 1;
-	
+
 	b.right -= B_V_SCROLL_BAR_WIDTH;
 	b.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	fListView = new BListView(b, "Results", B_SINGLE_SELECTION_LIST, 
@@ -83,8 +84,8 @@ void PictureTestWindow::BuildGUI()
 void
 PictureTestWindow::UpdateHeader()
 {
-	BString text("Direct Drawing, Picture Drawing, Restored Picture Drawing, Test Name, Error Message");
-	text << " (failures = " << fFailedTests << ",  tests =" << fNumberOfTests << ")";
+	BString text;
+	text << "failures = " << fFailedTests << ",  tests =" << fNumberOfTests;
 	fHeader->SetText(text.String());
 }
 
@@ -144,7 +145,7 @@ PictureTestWindow::RunTests(color_space *colorSpaces, int32 n)
 		fListView->AddItem(new BStringItem(text.String()));
 		RunTests(testIndex, colorSpaces, n);
 	}
-		
+
 	UpdateHeader();
 }
 
@@ -179,6 +180,10 @@ PictureTestWindow::RunTests(int32 testIndex, color_space *colorSpaces, int32 n)
 		text += csText;
 		fListView->AddItem(new BStringItem(text.String()));
 		
+		BRect frame(0, 0, 100, 30);
+		fListView->AddItem(new HeaderListItem("Direct Drawing", "Picture Drawing",
+						"Restored Picture", "", "Test Name", "Error Message", frame));
+
 		RunTests(testIndex, colorSpace);
 	}
 }
