@@ -129,16 +129,16 @@ struct mtx_args {
 	int		 ma_opts;
 };
 
-#define	MTX_SYSINIT(name, mtx, desc, opts)				\
-	static struct mtx_args name##_args = {				\
-		(mtx),							\
-		(desc),							\
-		(opts)							\
-	};								\
-	SYSINIT(name##_mtx_sysinit, SI_SUB_LOCK, SI_ORDER_MIDDLE,	\
-	    mtx_sysinit, &name##_args);					\
-	SYSUNINIT(name##_mtx_sysuninit, SI_SUB_LOCK, SI_ORDER_MIDDLE,	\
-	    mtx_destroy, __DEVOLATILE(void *, &(mtx)->mtx_lock))
+#define	MTX_SYSINIT(name, mtx, desc, opts) \
+	static struct mtx_args name##_args = {	\
+		(mtx), \
+		(desc), \
+		(opts), \
+	}; \
+	SYSINIT(name##_mtx, SI_SUB_LOCK, SI_ORDER_MIDDLE, \
+		mtx_sysinit, &name##_args); \
+	SYSUNINIT(name##_mtx, SI_SUB_LOCK, SI_ORDER_MIDDLE, \
+	    (system_init_func_t)mtx_destroy, (void*)mtx)
 
 
 #endif	/* _FBSD_COMPAT_SYS_MUTEX_H_ */
