@@ -772,7 +772,7 @@ Words::FindBestMatches(BList* matches, const char* s)
 						&& word_match(gCmpKey, testWord)
 							<= int32(float(strlen(gCmpKey)-1)*.75)) {
 						// printf("Added: %s\n", testWord);
-						matches->AddItem((void*)(new BString(testWord)));
+						matches->AddItem(new BString(testWord));
 					}
 
 					// If suffix, transform and test
