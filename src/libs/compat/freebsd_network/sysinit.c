@@ -24,16 +24,18 @@ SET_DECLARE(__freebsd_sysuninit, struct sysinit);
 SYSINIT(__dummy, 0, 0, NULL, NULL);
 SYSUNINIT(__dummy, 0, 0, NULL, NULL);
 
+/* orders */
+static const enum sysinit_elem_order orders[6] = {
+	SI_ORDER_FIRST, SI_ORDER_SECOND, SI_ORDER_THIRD, SI_ORDER_FOURTH,
+	SI_ORDER_MIDDLE, SI_ORDER_ANY,
+};
+
 
 void
 init_sysinit()
 {
 	struct sysinit* const* initee;
-	const enum sysinit_elem_order orders[6] = {
-		SI_ORDER_FIRST, SI_ORDER_SECOND, SI_ORDER_THIRD, SI_ORDER_FOURTH,
-		SI_ORDER_MIDDLE, SI_ORDER_ANY,
-	};
-	uint32 i;
+	int32 i;
 
 	for (i = 0; i < 6; i++) {
 		SET_FOREACH(initee, __freebsd_sysinit) {
@@ -51,17 +53,13 @@ void
 uninit_sysinit()
 {
 	struct sysinit* const* initee;
-	const enum sysinit_elem_order orders[6] = {
-		SI_ORDER_FIRST, SI_ORDER_SECOND, SI_ORDER_THIRD, SI_ORDER_FOURTH,
-		SI_ORDER_MIDDLE, SI_ORDER_ANY,
-	};
-	uint32 i;
+	int32 i;
 
 	for (i = 5; i >= 0; i--) {
 		SET_FOREACH(initee, __freebsd_sysuninit) {
 			if ((*initee)->order != orders[i] || (*initee)->func == NULL)
 				continue;
-			TRACE("sysinit: de-initializing %s\n", (*initee)->name);
+			TRACE("sysinit: de-initializing %s %p\n", (*initee)->name, (*initee)->func);
 			(*initee)->func((*initee)->arg);
 		}
 	}
