@@ -76,6 +76,7 @@
     m_getm2((m), (len), (how), (type), M_PKTHDR)
 
 #define mtod(m, type)	((type)((m)->m_data))
+#define	mtodo(m, o)	((void *)(((m)->m_data) + (o)))
 
 // Check if the supplied mbuf has a packet header, or else panic.
 #define M_ASSERTPKTHDR(m) KASSERT(m != NULL && m->m_flags & M_PKTHDR, \

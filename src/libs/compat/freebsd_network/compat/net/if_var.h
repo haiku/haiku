@@ -990,6 +990,14 @@ void if_settransmitfn(if_t ifp, if_transmit_fn_t);
 void if_setqflushfn(if_t ifp, if_qflush_fn_t);
 void if_setgetcounterfn(if_t ifp, if_get_counter_t);
 
+/* accessors for struct ifreq */
+static inline void*
+ifr_data_get_ptr(void* ifrp)
+{
+	struct ifreq* ifr = (struct ifreq *)ifrp;
+	return ifr->ifr_data;
+}
+
 #ifdef DEVICE_POLLING
 enum poll_cmd {	POLL_ONLY, POLL_AND_CHECK_STATUS };
 
