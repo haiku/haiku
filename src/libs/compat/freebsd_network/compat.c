@@ -347,26 +347,29 @@ device_is_alive(device_t device)
 
 
 device_t
-device_add_child(device_t parent, const char *name, int unit)
+device_add_child_driver(device_t parent, const char* name, driver_t* _driver,
+	int unit)
 {
 	device_t child = NULL;
 
-	if (name != NULL) {
+	if (_driver == NULL && name != NULL) {
 		if (strcmp(name, "miibus") == 0)
 			child = new_device(&miibus_driver);
 		else {
 			// find matching driver structure
-			driver_t **driver;
+			driver_t** driver;
 			char symbol[128];
 
 			snprintf(symbol, sizeof(symbol), "__fbsd_%s_%s", name,
 				parent->driver->name);
 			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
-					(void **)&driver) == B_OK) {
+					(void**)&driver) == B_OK) {
 				child = new_device(*driver);
 			} else
 				device_printf(parent, "couldn't find symbol %s\n", symbol);
 		}
+	} else if (_driver != NULL) {
+		child = new_device(_driver);
 	} else
 		child = new_device(NULL);
 
@@ -388,6 +391,13 @@ device_add_child(device_t parent, const char *name, int unit)
 	}
 
 	return child;
+}
+
+
+device_t
+device_add_child(device_t parent, const char* name, int unit)
+{
+	return device_add_child_driver(parent, name, NULL, unit);
 }
 
 

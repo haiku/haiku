@@ -78,9 +78,9 @@ init_root_device(device_t *_root)
 
 
 static status_t
-add_child_device(driver_t *driver, device_t root, device_t *_child)
+add_child_device(driver_t* driver, device_t root, device_t* _child)
 {
-	device_t child = device_add_child(root, driver->name, 0);
+	device_t child = device_add_child_driver(root, driver->name, driver, 0);
 	if (child == NULL) {
 		return B_ERROR;
 	}
