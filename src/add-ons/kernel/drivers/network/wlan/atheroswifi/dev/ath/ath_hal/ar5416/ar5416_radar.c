@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2010-2011 Atheros Communications, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -13,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_radar.c 297793 2016-04-10 23:07:00Z pfg $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_radar.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 

@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2006 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5211/ar5211.h 290612 2015-11-09 15:59:42Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5211/ar5211.h 326695 2017-12-08 15:57:29Z pfg $
  */
 #ifndef _ATH_AR5211_H_
 #define _ATH_AR5211_H_
@@ -271,6 +273,8 @@ extern	HAL_BOOL ar5211SetSifsTime(struct ath_hal *, u_int);
 extern	u_int ar5211GetSifsTime(struct ath_hal *);
 extern  HAL_BOOL ar5211SetDecompMask(struct ath_hal *, uint16_t, int);
 extern	void ar5211SetCoverageClass(struct ath_hal *, uint8_t, int);
+extern	HAL_STATUS ar5211SetQuiet(struct ath_hal *, uint32_t, uint32_t,
+		uint32_t, HAL_QUIET_FLAG);
 extern	uint32_t ar5211GetCurRssi(struct ath_hal *);
 extern	u_int ar5211GetDefAntenna(struct ath_hal *);
 extern	void ar5211SetDefAntenna(struct ath_hal *ah, u_int antenna);

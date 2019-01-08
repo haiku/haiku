@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_athvar.h 302100 2016-06-23 00:54:14Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_athvar.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*
@@ -314,8 +316,9 @@ typedef TAILQ_HEAD(ath_bufhead_s, ath_buf) ath_bufhead;
 #define	ATH_BUF_BUSY	0x00000002	/* (tx) desc owned by h/w */
 #define	ATH_BUF_FIFOEND	0x00000004
 #define	ATH_BUF_FIFOPTR	0x00000008
+#define	ATH_BUF_TOA_PROBE	0x00000010	/* ToD/ToA exchange probe */
 
-#define	ATH_BUF_FLAGS_CLONE	(ATH_BUF_MGMT)
+#define	ATH_BUF_FLAGS_CLONE	(ATH_BUF_MGMT | ATH_BUF_TOA_PROBE)
 
 /*
  * DMA state for tx/rx descriptors.
@@ -489,6 +492,7 @@ struct ath_vap {
 	int		(*av_set_tim)(struct ieee80211_node *, int);
 	void		(*av_recv_pspoll)(struct ieee80211_node *,
 				struct mbuf *);
+	struct ieee80211_quiet_ie	quiet_ie;
 };
 #define	ATH_VAP(vap)	((struct ath_vap *)(vap))
 
@@ -1374,9 +1378,12 @@ void	ath_intr(void *);
 	0, NULL) == HAL_OK)
 #define	ath_hal_gtxto_supported(_ah) \
 	(ath_hal_getcapability(_ah, HAL_CAP_GTXTO, 0, NULL) == HAL_OK)
-#define	ath_hal_has_long_rxdesc_tsf(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_LONG_RXDESC_TSF, \
-	0, NULL) == HAL_OK)
+#define	ath_hal_get_rx_tsf_prec(_ah, _pr) \
+	(ath_hal_getcapability((_ah), HAL_CAP_RXTSTAMP_PREC, 0, (_pr)) \
+	    == HAL_OK)
+#define	ath_hal_get_tx_tsf_prec(_ah, _pr) \
+	(ath_hal_getcapability((_ah), HAL_CAP_TXTSTAMP_PREC, 0, (_pr)) \
+	    == HAL_OK)
 #define	ath_hal_setuprxdesc(_ah, _ds, _size, _intreq) \
 	((*(_ah)->ah_setupRxDesc)((_ah), (_ds), (_size), (_intreq)))
 #define	ath_hal_rxprocdesc(_ah, _ds, _dspa, _dsnext, _rs) \
@@ -1484,6 +1491,8 @@ void	ath_intr(void *);
 	((*(_ah)->ah_get11nExtBusy)((_ah)))
 #define	ath_hal_setchainmasks(_ah, _txchainmask, _rxchainmask) \
 	((*(_ah)->ah_setChainMasks)((_ah), (_txchainmask), (_rxchainmask)))
+#define	ath_hal_set_quiet(_ah, _p, _d, _o, _f) \
+	((*(_ah)->ah_setQuiet)((_ah), (_p), (_d), (_o), (_f)))
 
 #define	ath_hal_spectral_supported(_ah) \
 	(ath_hal_getcapability(_ah, HAL_CAP_SPECTRAL_SCAN, 0, NULL) == HAL_OK)

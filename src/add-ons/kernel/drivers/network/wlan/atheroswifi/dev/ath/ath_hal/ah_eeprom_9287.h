@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2008-2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -13,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_eeprom_9287.h 223615 2011-06-28 00:01:55Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ah_eeprom_9287.h 326695 2017-12-08 15:57:29Z pfg $
  */
 
 #ifndef	__AH_EEPROM_9287_H__

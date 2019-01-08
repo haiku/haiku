@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2005 John Bicket
  * All rights reserved.
  *
@@ -33,7 +35,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_rate/sample/sample.h 287197 2015-08-27 08:56:39Z glebius $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_rate/sample/sample.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*
@@ -212,9 +214,9 @@ static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 		if (rts)		/* SIFS + CTS */
 			ctsduration += rt->info[cix].spAckDuration;
 
-		/* XXX assumes short preamble */
+		/* XXX assumes short preamble, include SIFS */
 		ctsduration += ath_hal_pkt_txtime(sc->sc_ah, rt, length, rix,
-		    is_ht40, 0);
+		    is_ht40, 0, 1);
 
 		if (cts)	/* SIFS + ACK */
 			ctsduration += rt->info[cix].spAckDuration;
@@ -223,9 +225,9 @@ static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 	}
 	tt += t_difs;
 
-	/* XXX assumes short preamble */
+	/* XXX assumes short preamble, include SIFS */
 	tt += (long_retries+1)*ath_hal_pkt_txtime(sc->sc_ah, rt, length, rix,
-	    is_ht40, 0);
+	    is_ht40, 0, 1);
 
 	tt += (long_retries+1)*(t_sifs + rt->info[rix].spAckDuration);
 

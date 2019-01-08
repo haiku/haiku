@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_debug.h 301008 2016-05-31 04:09:17Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_debug.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__IF_ATH_DEBUG_H__
 #define	__IF_ATH_DEBUG_H__
@@ -70,6 +72,7 @@ enum {
 	ATH_DEBUG_DIVERSITY	= 0x1000000000ULL,	/* Diversity logic */
 	ATH_DEBUG_PWRSAVE	= 0x2000000000ULL,
 	ATH_DEBUG_BTCOEX	= 0x4000000000ULL,	/* BT Coex */
+	ATH_DEBUG_QUIETIE	= 0x8000000000ULL,	/* Quiet time handling */
 
 	ATH_DEBUG_ANY		= 0xffffffffffffffffULL
 };

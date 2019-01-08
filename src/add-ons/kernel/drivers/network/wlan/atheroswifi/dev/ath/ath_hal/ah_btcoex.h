@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2014 Qualcomm Atheros, Inc.
  * All Rights Reserved.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_btcoex.h 301303 2016-06-04 07:28:09Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ah_btcoex.h 326695 2017-12-08 15:57:29Z pfg $
  */
 #ifndef	__ATH_HAL_BTCOEX_H__
 #define	__ATH_HAL_BTCOEX_H__

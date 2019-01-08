@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -28,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/if_ath_sysctl.c 301766 2016-06-09 21:59:36Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_sysctl.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * Driver for the Atheros Wireless LAN controller.

@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2005-2006 Atheros Communications, Inc.
  * All rights reserved.
@@ -15,7 +17,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_regdomain/ah_rd_domains.h 248677 2013-03-24 04:42:56Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ah_regdomain/ah_rd_domains.h 326695 2017-12-08 15:57:29Z pfg $
  */
 
 #ifndef	__AH_REGDOMAIN_DOMAINS_H__
@@ -240,6 +242,17 @@ static REG_DOMAIN regDomains[] = {
 	 .chan11a_dyn_turbo	= BM3(T1_5200_5240, T1_5280_5280, T1_5765_5805),
 	 .chan11a_half		= BM3(F7_5180_5240, F7_5260_5320, F9_5745_5825),
 	 .chan11a_quarter	= BM3(F8_5180_5240, F8_5260_5320,F10_5745_5825),
+	},
+
+	{.regDmnEnum		= FCC6,
+	 .conformanceTestLimit	= FCC,
+	 .chan11a		= BM5(F8_5180_5240, F5_5260_5320, F1_5500_5580, F2_5660_5720, F6_5745_5825),
+	 .chan11a_turbo		= BM3(T7_5210_5210, T3_5250_5290, T2_5760_5800),
+	 .chan11a_dyn_turbo	= BM4(T7_5200_5200, T1_5240_5240, T2_5280_5280, T1_5765_5805),
+#if 0
+	 .chan11a_half		= BM3(F7_5180_5240, F7_5260_5320, F9_5745_5825),
+	 .chan11a_quarter	= BM3(F8_5180_5240, F8_5260_5320,F10_5745_5825),
+#endif
 	},
 
 	{.regDmnEnum		= MKK1,

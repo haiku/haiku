@@ -28,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/if_ath_descdma.c 291233 2015-11-24 03:42:58Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_descdma.c 291233 2015-11-24 03:42:58Z adrian $");
 
 /*
  * Driver for the Atheros Wireless LAN controller.

@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_reset.c 290612 2015-11-09 15:59:42Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_reset.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -2833,6 +2835,9 @@ ar5416SetIFSTiming(struct ath_hal *ah, const struct ieee80211_channel *chan)
 		clk_44 = 1;
 
 	/* XXX does this need save/restoring for the 11n chips? */
+	/*
+	 * XXX TODO: should mask out the txlat/rxlat/usec values?
+	 */
 	refClock = OS_REG_READ(ah, AR_USEC) & AR_USEC_USEC32;
 
 	/*

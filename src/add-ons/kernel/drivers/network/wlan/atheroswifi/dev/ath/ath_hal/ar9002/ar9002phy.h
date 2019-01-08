@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2010-2011 Adrian Chadd, Xenion Pty Ltd.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9002/ar9002phy.h 220590 2011-04-13 04:40:59Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar9002/ar9002phy.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__ATH_AR9002PHY_H__
 #define	__ATH_AR9002PHY_H__

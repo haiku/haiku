@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_gpio.c 237611 2012-06-26 22:16:53Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_gpio.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -85,8 +87,6 @@ ar5416GpioCfgOutput(struct ath_hal *ah, uint32_t gpio, HAL_GPIO_MUX_TYPE type)
 {
 	uint32_t gpio_shift, reg;
 
-#define	N(a)	(sizeof(a) / sizeof(a[0]))
-
 	/*
 	 * This table maps the HAL GPIO pins to the actual hardware
 	 * values.
@@ -100,6 +100,8 @@ ar5416GpioCfgOutput(struct ath_hal *ah, uint32_t gpio, HAL_GPIO_MUX_TYPE type)
 		AR_GPIO_OUTPUT_MUX_AS_RX_CLEAR_EXTERNAL,
 		AR_GPIO_OUTPUT_MUX_AS_TX_FRAME,
 	};
+
+#define	N(a)	(sizeof(a) / sizeof(a[0]))
 
 	HALASSERT(gpio < AH_PRIVATE(ah)->ah_caps.halNumGpioPins);
 

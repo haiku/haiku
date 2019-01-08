@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2005 John Bicket
  * All rights reserved.
  *
@@ -36,7 +38,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/ath_rate/sample/sample.c 287197 2015-08-27 08:56:39Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/ath_rate/sample/sample.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * John Bicket's SampleRate control algorithm.
@@ -775,6 +777,10 @@ update_stats(struct ath_softc *sc, struct ath_node *an,
 	 * XXX Don't mark the higher bit rates as also having failed; as this
 	 * unfortunately stops those rates from being tasted when trying to
 	 * TX. This happens with 11n aggregation.
+	 *
+	 * This is valid for higher CCK rates, higher OFDM rates, and higher
+	 * HT rates within the current number of streams (eg MCS0..7, 8..15,
+	 * etc.)
 	 */
 	if (nframes == nbad) {
 #if 0

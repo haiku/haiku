@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2013 Adrian Chadd <adrian@FreeBSD.org>
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_lna_div.h 251730 2013-06-14 03:42:10Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_lna_div.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__IF_ATH_LNA_DIV_H__
 #define	__IF_ATH_LNA_DIV_H__
@@ -84,6 +86,6 @@ extern	int ath_lna_div_enable(struct ath_softc *sc,
 	    const struct ieee80211_channel *ch);
 
 extern	void ath_lna_rx_comb_scan(struct ath_softc *sc,
-	    struct ath_rx_status *rs, unsigned long ticks, int thz);
+	    struct ath_rx_status *rs, unsigned long _ticks, int _hz);
 
 #endif	/* __IF_ATH_LNA_DIV_H__ */

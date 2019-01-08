@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_btcoex_mci.h 301181 2016-06-02 00:51:36Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_btcoex_mci.h 301181 2016-06-02 00:51:36Z adrian $
  */
 #ifndef	__IF_ATH_BTCOEX_MCI_H__
 #define	__IF_ATH_BTCOEX_MCI_H__

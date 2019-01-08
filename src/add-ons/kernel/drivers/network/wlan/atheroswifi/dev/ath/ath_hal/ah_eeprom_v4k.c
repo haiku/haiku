@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2009 Rui Paulo <rpaulo@FreeBSD.org>
  * Copyright (c) 2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2008 Atheros Communications, Inc.
@@ -15,7 +17,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_eeprom_v4k.c 234508 2012-04-20 21:56:13Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ah_eeprom_v4k.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 

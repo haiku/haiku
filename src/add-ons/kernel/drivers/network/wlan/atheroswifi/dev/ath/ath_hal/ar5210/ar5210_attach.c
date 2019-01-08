@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2004 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5210/ar5210_attach.c 272292 2014-09-30 03:19:29Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5210/ar5210_attach.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -135,6 +137,7 @@ static const struct ath_hal_private ar5210hal = {{
 	.ah_getCTSTimeout		= ar5210GetCTSTimeout,
 	.ah_setDecompMask		= ar5210SetDecompMask,
 	.ah_setCoverageClass		= ar5210SetCoverageClass,
+	.ah_setQuiet			= ar5210SetQuiet,
 	.ah_get11nExtBusy		= ar5210Get11nExtBusy,
 	.ah_getMibCycleCounts		= ar5210GetMibCycleCounts,
 	.ah_setChainMasks		= ar5210SetChainMasks,
@@ -390,7 +393,8 @@ ar5210FillCapabilityInfo(struct ath_hal *ah)
 		pCap->halRfSilentSupport = AH_TRUE;
 	}
 
-	pCap->halTstampPrecision = 15;		/* NB: s/w extended from 13 */
+	pCap->halTxTstampPrecision = 16;
+	pCap->halRxTstampPrecision = 15;	/* NB: s/w extended from 13 */
 	pCap->halIntrMask = (HAL_INT_COMMON - HAL_INT_BNR)
 			| HAL_INT_RX
 			| HAL_INT_TX

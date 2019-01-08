@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2013 Adrian Chadd <adrian@FreeBSD.org>
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_spectral.h 244951 2013-01-02 03:59:02Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_spectral.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__IF_ATH_SPECTRAL_H__
 #define	__IF_ATH_SPECTRAL_H__

@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_led.h 228888 2011-12-26 05:46:22Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_led.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__IF_ATH_LED_H__
 #define	__IF_ATH_LED_H__

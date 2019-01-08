@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2011 Adrian Chadd, Xenion Pty Ltd
  * All rights reserved.
  *
@@ -26,10 +28,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_dfs/null/dfs_null.c 298939 2016-05-02 19:56:48Z pfg $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_dfs/null/dfs_null.c 326255 2017-11-27 14:52:40Z pfg $
  */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/ath_dfs/null/dfs_null.c 298939 2016-05-02 19:56:48Z pfg $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/ath_dfs/null/dfs_null.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * This implements an empty DFS module.
@@ -102,7 +104,7 @@ ath_dfs_detach(struct ath_softc *sc)
 int
 ath_dfs_radar_enable(struct ath_softc *sc, struct ieee80211_channel *chan)
 {
-#if 0
+#if 1
 	HAL_PHYERR_PARAM pe;
 
 	/* Check if the hardware supports radar reporting */
@@ -155,7 +157,7 @@ ath_dfs_radar_enable(struct ath_softc *sc, struct ieee80211_channel *chan)
 int
 ath_dfs_radar_disable(struct ath_softc *sc)
 {
-#if 0
+#if 1
 	HAL_PHYERR_PARAM pe;
 
 	(void) ath_hal_getdfsthresh(sc->sc_ah, &pe);

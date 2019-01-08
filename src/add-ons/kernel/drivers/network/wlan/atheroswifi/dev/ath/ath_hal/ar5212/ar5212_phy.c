@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar5212_phy.c 191022 2009-04-13 21:01:08Z sam $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5212/ar5212_phy.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 

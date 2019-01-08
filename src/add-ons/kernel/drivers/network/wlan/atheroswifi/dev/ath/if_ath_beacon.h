@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_beacon.h 265115 2014-04-30 02:19:41Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_beacon.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__IF_ATH_BEACON_H__
 #define	__IF_ATH_BEACON_H__

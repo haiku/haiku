@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2007 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_rate/onoe/onoe.h 178354 2008-04-20 20:35:46Z sam $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_rate/onoe/onoe.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*

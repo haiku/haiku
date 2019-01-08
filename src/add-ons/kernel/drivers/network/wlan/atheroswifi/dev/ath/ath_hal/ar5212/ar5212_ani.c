@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5212/ar5212_ani.c 280940 2015-04-01 03:42:46Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5212/ar5212_ani.c 334848 2018-06-08 18:15:23Z adrian $
  */
 #include "opt_ah.h"
 
@@ -998,6 +1000,9 @@ ar5212AniPoll(struct ath_hal *ah, const struct ieee80211_channel *chan)
 		ahp->ah_stats.ast_ani_lneg++;
 		/* restart ANI period if listenTime is invalid */
 		ar5212AniRestart(ah, aniState);
+
+		/* Don't do any further ANI processing here */
+		return;
 	}
 	/* XXX beware of overflow? */
 	aniState->listenTime += listenTime;

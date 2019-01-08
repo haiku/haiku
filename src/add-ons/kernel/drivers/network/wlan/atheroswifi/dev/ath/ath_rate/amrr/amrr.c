@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2004 INRIA
  * Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -37,7 +39,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/ath_rate/amrr/amrr.c 238633 2012-07-20 01:36:02Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/ath_rate/amrr/amrr.c 326255 2017-11-27 14:52:40Z pfg $");
 
 /*
  * AMRR rate control. See:

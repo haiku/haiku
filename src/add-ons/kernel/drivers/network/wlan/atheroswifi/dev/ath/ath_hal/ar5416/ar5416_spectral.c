@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2012 Qualcomm Atheros, All Rights Reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -13,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_spectral.c 298939 2016-05-02 19:56:48Z pfg $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_spectral.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 

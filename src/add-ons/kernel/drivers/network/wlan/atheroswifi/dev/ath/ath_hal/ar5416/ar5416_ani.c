@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_ani.c 280828 2015-03-29 21:50:21Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_ani.c 334848 2018-06-08 18:15:23Z adrian $
  */
 #include "opt_ah.h"
 
@@ -948,6 +950,9 @@ ar5416AniPoll(struct ath_hal *ah, const struct ieee80211_channel *chan)
 		HALDEBUG(ah, HAL_DEBUG_ANI, "%s: invalid listenTime\n",
 		    __func__);
 		ar5416AniRestart(ah, aniState);
+
+		/* Don't do any further processing */
+		return;
 	}
 	/* XXX beware of overflow? */
 	aniState->listenTime += listenTime;

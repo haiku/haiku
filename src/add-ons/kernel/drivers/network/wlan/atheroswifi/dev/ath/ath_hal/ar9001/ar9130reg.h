@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2010 Adrian Chadd, Xenion Pty Ltd
  * Copyright (c) 2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2008 Atheros Communications, Inc.
@@ -15,7 +17,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9001/ar9130reg.h 221163 2011-04-28 12:47:40Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar9001/ar9130reg.h 326695 2017-12-08 15:57:29Z pfg $
  */
 #ifndef	__AR9130REG_H__
 #define	__AR9130REG_H__

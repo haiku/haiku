@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416.h 290616 2015-11-09 20:22:59Z garga $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416.h 334197 2018-05-25 01:27:39Z adrian $
  */
 #ifndef _ATH_AR5416_H_
 #define _ATH_AR5416_H_
@@ -24,12 +26,6 @@
 #include "ah_eeprom_v14.h"	/* for CAL_TARGET_POWER_* */
 
 #define	AR5416_MAGIC	0x20065416
-
-enum {
-	HAL_RESET_POWER_ON,
-	HAL_RESET_WARM,
-	HAL_RESET_COLD,
-};
 
 typedef struct {
 	uint16_t	synth_center;

@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2011 Atheros Communications, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -13,7 +15,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar9003/ar9300_btcoex.h 237611 2012-06-26 22:16:53Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar9003/ar9300_btcoex.h 326695 2017-12-08 15:57:29Z pfg $
  */
 
 #ifndef	__ATH_AR9300_BTCOEX_H__

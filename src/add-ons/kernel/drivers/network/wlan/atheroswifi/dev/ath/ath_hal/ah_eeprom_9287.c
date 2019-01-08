@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2010 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ah_eeprom_9287.c 239704 2012-08-26 04:26:49Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ah_eeprom_9287.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 

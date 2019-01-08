@@ -1,6 +1,6 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de.
- * All Rights Reserved. Distributed under the terms of the MIT License.
+ * Copyright 2009, Colin Günther, coling@gmx.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -15,7 +15,7 @@
 #include <dev/ath/if_athvar.h>
 
 
-HAIKU_FBSD_WLAN_DRIVER_GLUE(atheroswifi, ath_pci, pci)
+HAIKU_FBSD_WLAN_DRIVER_GLUE(atheroswifi, if_ath_pci, pci)
 NO_HAIKU_FBSD_MII_DRIVER();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_WLAN);
 

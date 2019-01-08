@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2012 Adrian Chadd <adrian@FreeBSD.org>
  * All rights reserved.
  *
@@ -28,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ath/if_ath_rx_edma.c 301994 2016-06-17 17:01:32Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_rx_edma.c 337573 2018-08-10 13:38:23Z kevans $");
 
 /*
  * Driver for the Atheros Wireless LAN controller.

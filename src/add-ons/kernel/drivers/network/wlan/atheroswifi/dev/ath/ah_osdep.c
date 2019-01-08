@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ah_osdep.c 293111 2016-01-03 17:58:11Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ah_osdep.c 326255 2017-11-27 14:52:40Z pfg $
  */
 #include "opt_ah.h"
 
@@ -41,6 +43,7 @@
 #include <sys/pcpu.h>
 #include <sys/lock.h>
 #include <sys/mutex.h>
+#include <sys/conf.h>
 
 #include <machine/stdarg.h>
 
@@ -70,15 +73,9 @@
  * XXX This is a global lock for now; it should be pushed to
  * a per-device lock in some platform-independent fashion.
  */
-#ifndef __HAIKU__
 struct mtx ah_regser_mtx;
 MTX_SYSINIT(ah_regser, &ah_regser_mtx, "Atheros register access mutex",
     MTX_SPIN);
-#else
-spinlock ah_regser_mtx = B_SPINLOCK_INITIALIZER;
-#define mtx_lock_spin(a) acquire_spinlock(a)
-#define mtx_unlock_spin(a) release_spinlock(a)
-#endif
 
 extern	void ath_hal_printf(struct ath_hal *, const char*, ...)
 		__printflike(2,3);
@@ -426,3 +423,33 @@ ath_hal_assert_failed(const char* filename, int lineno, const char *msg)
 	panic("ath_hal_assert");
 }
 #endif /* AH_ASSERT */
+
+static int
+ath_hal_modevent(module_t mod __unused, int type, void *data __unused)
+{
+	int error = 0;
+
+	switch (type) {
+	case MOD_LOAD:
+		printf("[ath_hal] loaded\n");
+		break;
+
+	case MOD_UNLOAD:
+		printf("[ath_hal] unloaded\n");
+		break;
+
+	case MOD_SHUTDOWN:
+		break;
+
+	default:
+		error = EOPNOTSUPP;
+		break;
+
+	}
+	return (error);
+}
+
+MODULE_VERSION(ath_hal, 1);
+#if	defined(AH_DEBUG_ALQ)
+MODULE_DEPEND(ath_hal, alq, 1, 1, 1);
+#endif

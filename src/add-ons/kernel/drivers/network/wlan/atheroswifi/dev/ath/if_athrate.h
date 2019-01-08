@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2004-2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2004 Video54 Technologies, Inc.
  * All rights reserved.
@@ -27,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_athrate.h 249578 2013-04-17 07:21:30Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_athrate.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef _ATH_RATECTRL_H_
 #define _ATH_RATECTRL_H_

@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2011 Adrian Chadd, Xenion Pty Ltd.
  * All rights reserved.
  *
@@ -26,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/if_ath_sysctl.h 223459 2011-06-23 02:38:36Z adrian $
+ * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_sysctl.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef	__IF_ATH_SYSCTL_H__

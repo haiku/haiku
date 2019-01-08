@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2002-2008 Atheros Communications, Inc.
  *
@@ -14,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/ath/ath_hal/ar5416/ar5416_attach.c 305614 2016-09-08 15:05:25Z pfg $
+ * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_attach.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -967,7 +969,8 @@ ar5416FillCapabilityInfo(struct ath_hal *ah)
 	pCap->halChanHalfRate = AH_TRUE;
 	pCap->halChanQuarterRate = AH_TRUE;
 
-	pCap->halTstampPrecision = 32;
+	pCap->halTxTstampPrecision = 32;
+	pCap->halRxTstampPrecision = 32;
 	pCap->halHwPhyCounterSupport = AH_TRUE;
 	pCap->halIntrMask = HAL_INT_COMMON
 			| HAL_INT_RX
@@ -1019,8 +1022,6 @@ ar5416FillCapabilityInfo(struct ath_hal *ah)
 	pCap->halGTTSupport = AH_TRUE;
 	pCap->halCSTSupport = AH_TRUE;
 	pCap->halEnhancedDfsSupport = AH_FALSE;
-	/* Hardware supports 32 bit TSF values in the RX descriptor */
-	pCap->halHasLongRxDescTsf = AH_TRUE;
 	/*
 	 * BB Read WAR: this is only for AR5008/AR9001 NICs
 	 * It is also set individually in the AR91xx attach functions.
