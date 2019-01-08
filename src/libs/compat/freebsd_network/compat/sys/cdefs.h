@@ -226,6 +226,7 @@
 /* XXX Find out what to do for __packed, __aligned and __section */
 #endif
 #if __GNUC_PREREQ__(2, 7) || defined(__INTEL_COMPILER)
+#undef __dead2
 #define	__dead2		__attribute__((__noreturn__))
 #define	__pure2		__attribute__((__const__))
 #define	__unused	__attribute__((__unused__))
