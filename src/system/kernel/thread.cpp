@@ -1551,10 +1551,12 @@ make_thread_resumed(int argc, char **argv)
 		if (thread->id != id)
 			continue;
 
-		if (thread->state == B_THREAD_SUSPENDED) {
+		if (thread->state == B_THREAD_SUSPENDED || thread->state == B_THREAD_ASLEEP
+				|| thread->state == B_THREAD_WAITING) {
 			scheduler_enqueue_in_run_queue(thread);
 			kprintf("thread %" B_PRId32 " resumed\n", thread->id);
-		}
+		} else
+			kprintf("thread %" B_PRId32 " is already running\n", thread->id);
 		found = true;
 		break;
 	}
