@@ -103,7 +103,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_scan.c 330455 2018-03-05 08:05:30Z eadler $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_scan.c 321507 2017-07-26 05:26:01Z adrian $");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -162,6 +162,9 @@ __FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_scan.c 330455 2018-03-05 08:0
  * BEGIN mvm/scan.c
  */
 
+#define IWM_DENSE_EBS_SCAN_RATIO 5
+#define IWM_SPARSE_EBS_SCAN_RATIO 1
+
 static uint16_t
 iwm_mvm_scan_rx_chain(struct iwm_softc *sc)
 {
@@ -174,6 +177,15 @@ iwm_mvm_scan_rx_chain(struct iwm_softc *sc)
 	rx_chain |= rx_ant << IWM_PHY_RX_CHAIN_FORCE_SEL_POS;
 	rx_chain |= 0x1 << IWM_PHY_RX_CHAIN_DRIVER_FORCE_POS;
 	return htole16(rx_chain);
+}
+
+static uint32_t
+iwm_mvm_scan_rxon_flags(struct ieee80211_channel *c)
+{
+	if (IEEE80211_IS_CHAN_2GHZ(c))
+		return htole32(IWM_PHY_BAND_24);
+	else
+		return htole32(IWM_PHY_BAND_5);
 }
 
 static uint32_t
@@ -199,6 +211,80 @@ iwm_mvm_scan_rate_n_flags(struct iwm_softc *sc, int flags, int no_cck)
 		return htole32(IWM_RATE_6M_PLCP | tx_ant);
 }
 
+static inline boolean_t
+iwm_mvm_rrm_scan_needed(struct iwm_softc *sc)
+{
+	/* require rrm scan whenever the fw supports it */
+	return fw_has_capa(&sc->ucode_capa,
+			   IWM_UCODE_TLV_CAPA_DS_PARAM_SET_IE_SUPPORT);
+}
+
+#ifdef IWM_DEBUG
+static const char *
+iwm_mvm_ebs_status_str(enum iwm_scan_ebs_status status)
+{
+	switch (status) {
+	case IWM_SCAN_EBS_SUCCESS:
+		return "successful";
+	case IWM_SCAN_EBS_INACTIVE:
+		return "inactive";
+	case IWM_SCAN_EBS_FAILED:
+	case IWM_SCAN_EBS_CHAN_NOT_FOUND:
+	default:
+		return "failed";
+	}
+}
+
+static const char *
+iwm_mvm_offload_status_str(enum iwm_scan_offload_complete_status status)
+{
+	return (status == IWM_SCAN_OFFLOAD_ABORTED) ? "aborted" : "completed";
+}
+#endif
+
+void
+iwm_mvm_rx_lmac_scan_complete_notif(struct iwm_softc *sc,
+    struct iwm_rx_packet *pkt)
+{
+	struct iwm_periodic_scan_complete *scan_notif = (void *)pkt->data;
+
+	/* If this happens, the firmware has mistakenly sent an LMAC
+	 * notification during UMAC scans -- warn and ignore it.
+	 */
+	if (fw_has_capa(&sc->ucode_capa, IWM_UCODE_TLV_CAPA_UMAC_SCAN)) {
+		device_printf(sc->sc_dev,
+		    "%s: Mistakenly got LMAC notification during UMAC scan\n",
+		    __func__);
+		return;
+	}
+
+	IWM_DPRINTF(sc, IWM_DEBUG_SCAN, "Regular scan %s, EBS status %s (FW)\n",
+	    iwm_mvm_offload_status_str(scan_notif->status),
+	    iwm_mvm_ebs_status_str(scan_notif->ebs_status));
+
+	sc->last_ebs_successful =
+			scan_notif->ebs_status == IWM_SCAN_EBS_SUCCESS ||
+			scan_notif->ebs_status == IWM_SCAN_EBS_INACTIVE;
+
+}
+
+void
+iwm_mvm_rx_umac_scan_complete_notif(struct iwm_softc *sc,
+    struct iwm_rx_packet *pkt)
+{
+	struct iwm_umac_scan_complete *notif = (void *)pkt->data;
+
+	IWM_DPRINTF(sc, IWM_DEBUG_SCAN,
+	    "Scan completed, uid %u, status %s, EBS status %s\n",
+	    le32toh(notif->uid),
+	    iwm_mvm_offload_status_str(notif->status),
+	    iwm_mvm_ebs_status_str(notif->ebs_status));
+
+	if (notif->ebs_status != IWM_SCAN_EBS_SUCCESS &&
+	    notif->ebs_status != IWM_SCAN_EBS_INACTIVE)
+		sc->last_ebs_successful = FALSE;
+}
+
 static int
 iwm_mvm_scan_skip_channel(struct ieee80211_channel *c)
 {
@@ -221,15 +307,13 @@ iwm_mvm_lmac_scan_fill_channels(struct iwm_softc *sc,
 	int j;
 
 	for (nchan = j = 0;
-	    j < ic->ic_nchans && nchan < sc->ucode_capa.n_scan_channels; j++) {
-		c = &ic->ic_channels[j];
-		/* For 2GHz, only populate 11b channels */
-		/* For 5GHz, only populate 11a channels */
+	    j < ss->ss_last && nchan < sc->ucode_capa.n_scan_channels; j++) {
+		c = ss->ss_chans[j];
 		/*
 		 * Catch other channels, in case we have 900MHz channels or
 		 * something in the chanlist.
 		 */
-		if (iwm_mvm_scan_skip_channel(c)) {
+		if (!IEEE80211_IS_CHAN_2GHZ(c) && !IEEE80211_IS_CHAN_5GHZ(c)) {
 			IWM_DPRINTF(sc, IWM_DEBUG_RESET | IWM_DEBUG_EEPROM,
 			    "%s: skipping channel (freq=%d, ieee=%d, flags=0x%08x)\n",
 			    __func__, c->ic_freq, c->ic_ieee, c->ic_flags);
@@ -260,20 +344,19 @@ iwm_mvm_umac_scan_fill_channels(struct iwm_softc *sc,
     struct iwm_scan_channel_cfg_umac *chan, int n_ssids)
 {
 	struct ieee80211com *ic = &sc->sc_ic;
+	struct ieee80211_scan_state *ss = ic->ic_scan;
 	struct ieee80211_channel *c;
 	uint8_t nchan;
 	int j;
 
 	for (nchan = j = 0;
-	    j < ic->ic_nchans && nchan < sc->ucode_capa.n_scan_channels; j++) {
-		c = &ic->ic_channels[j];
-		/* For 2GHz, only populate 11b channels */
-		/* For 5GHz, only populate 11a channels */
+	    j < ss->ss_last && nchan < sc->ucode_capa.n_scan_channels; j++) {
+		c = ss->ss_chans[j];
 		/*
 		 * Catch other channels, in case we have 900MHz channels or
 		 * something in the chanlist.
 		 */
-		if (iwm_mvm_scan_skip_channel(c)) {
+		if (!IEEE80211_IS_CHAN_2GHZ(c) && !IEEE80211_IS_CHAN_5GHZ(c)) {
 			IWM_DPRINTF(sc, IWM_DEBUG_RESET | IWM_DEBUG_EEPROM,
 			    "%s: skipping channel (freq=%d, ieee=%d, flags=0x%08x)\n",
 			    __func__, c->ic_freq, c->ic_ieee, c->ic_flags);
@@ -347,8 +430,7 @@ iwm_mvm_fill_probe_req(struct iwm_softc *sc, struct iwm_scan_probe_req *preq)
 	preq->band_data[0].len = htole16(frm - pos);
 	remain -= frm - pos;
 
-	if (fw_has_capa(&sc->ucode_capa,
-	    IWM_UCODE_TLV_CAPA_DS_PARAM_SET_IE_SUPPORT)) {
+	if (iwm_mvm_rrm_scan_needed(sc)) {
 		if (remain < 3)
 			return ENOBUFS;
 		*frm++ = IEEE80211_ELEMID_DSPARMS;
@@ -481,6 +563,21 @@ iwm_mvm_config_umac_scan(struct iwm_softc *sc)
 	return ret;
 }
 
+static boolean_t
+iwm_mvm_scan_use_ebs(struct iwm_softc *sc)
+{
+	const struct iwm_ucode_capabilities *capa = &sc->ucode_capa;
+
+	/* We can only use EBS if:
+	 *	1. the feature is supported;
+	 *	2. the last EBS was successful;
+	 *	3. if only single scan, the single scan EBS API is supported;
+	 *	4. it's not a p2p find operation.
+	 */
+	return ((capa->flags & IWM_UCODE_TLV_FLAGS_EBS_SUPPORT) &&
+		sc->last_ebs_successful);
+}
+
 int
 iwm_mvm_umac_scan(struct iwm_softc *sc)
 {
@@ -550,8 +647,12 @@ iwm_mvm_umac_scan(struct iwm_softc *sc)
 	} else
 		req->general_flags |= htole32(IWM_UMAC_SCAN_GEN_FLAGS_PASSIVE);
 
-	if (fw_has_capa(&sc->ucode_capa,
-	    IWM_UCODE_TLV_CAPA_DS_PARAM_SET_IE_SUPPORT))
+	if (iwm_mvm_scan_use_ebs(sc))
+		req->channel_flags = IWM_SCAN_CHANNEL_FLAG_EBS |
+				     IWM_SCAN_CHANNEL_FLAG_EBS_ACCURATE |
+				     IWM_SCAN_CHANNEL_FLAG_CACHE_ADD;
+
+	if (iwm_mvm_rrm_scan_needed(sc))
 		req->general_flags |=
 		    htole32(IWM_UMAC_SCAN_GEN_FLAGS_RRM_ENABLED);
 
@@ -619,13 +720,11 @@ iwm_mvm_lmac_scan(struct iwm_softc *sc)
 	req->scan_flags = htole32(IWM_MVM_LMAC_SCAN_FLAG_PASS_ALL |
 	    IWM_MVM_LMAC_SCAN_FLAG_ITER_COMPLETE |
 	    IWM_MVM_LMAC_SCAN_FLAG_EXTENDED_DWELL);
-	if (fw_has_capa(&sc->ucode_capa,
-	    IWM_UCODE_TLV_CAPA_DS_PARAM_SET_IE_SUPPORT))
+	if (iwm_mvm_rrm_scan_needed(sc))
 		req->scan_flags |= htole32(IWM_MVM_LMAC_SCAN_FLAGS_RRM_ENABLED);
 
-	req->flags = htole32(IWM_PHY_BAND_24);
-	if (sc->nvm_data->sku_cap_band_52GHz_enable)
-		req->flags |= htole32(IWM_PHY_BAND_5);
+	req->flags = iwm_mvm_scan_rxon_flags(sc->sc_ic.ic_scan->ss_chans[0]);
+
 	req->filter_flags =
 	    htole32(IWM_MAC_FILTER_ACCEPT_GRP | IWM_MAC_FILTER_IN_BEACON);
 
@@ -675,9 +774,20 @@ iwm_mvm_lmac_scan(struct iwm_softc *sc)
 	req->schedule[0].iterations = 1;
 	req->schedule[0].full_scan_mul = 1;
 
-	/* Disable EBS. */
-	req->channel_opt[0].non_ebs_ratio = 1;
-	req->channel_opt[1].non_ebs_ratio = 1;
+	if (iwm_mvm_scan_use_ebs(sc)) {
+		req->channel_opt[0].flags =
+			htole16(IWM_SCAN_CHANNEL_FLAG_EBS |
+				IWM_SCAN_CHANNEL_FLAG_EBS_ACCURATE |
+				IWM_SCAN_CHANNEL_FLAG_CACHE_ADD);
+		req->channel_opt[0].non_ebs_ratio =
+			htole16(IWM_DENSE_EBS_SCAN_RATIO);
+		req->channel_opt[1].flags =
+			htole16(IWM_SCAN_CHANNEL_FLAG_EBS |
+				IWM_SCAN_CHANNEL_FLAG_EBS_ACCURATE |
+				IWM_SCAN_CHANNEL_FLAG_CACHE_ADD);
+		req->channel_opt[1].non_ebs_ratio =
+			htole16(IWM_SPARSE_EBS_SCAN_RATIO);
+	}
 
 	ret = iwm_send_cmd(sc, &hcmd);
 	if (!ret) {

@@ -1,5 +1,5 @@
 /*	$OpenBSD: if_iwmreg.h,v 1.4 2015/06/15 08:06:11 stsp Exp $	*/
-/*	$FreeBSD: releng/11.2/sys/dev/iwm/if_iwmreg.h 330446 2018-03-05 06:59:30Z eadler $ */
+/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwmreg.h 327231 2017-12-27 03:23:21Z eadler $ */
 
 /******************************************************************************
  *
@@ -844,7 +844,7 @@ struct iwm_fw_cipher_scheme {
  */
 struct iwm_fw_cscheme_list {
 	uint8_t size;
-	struct iwm_fw_cipher_scheme cs[0];
+	struct iwm_fw_cipher_scheme cs[];
 } __packed;
 
 /*
@@ -2012,7 +2012,7 @@ struct iwm_nvm_access_cmd {
 	uint16_t type;
 	uint16_t offset;
 	uint16_t length;
-	uint8_t data[0];
+	uint8_t data[];
 } __packed; /* IWM_NVM_ACCESS_CMD_API_S_VER_2 */
 
 #define IWM_NUM_OF_FW_PAGING_BLOCKS 33 /* 32 for data and 1 block for CSS */
@@ -2066,7 +2066,7 @@ struct iwm_nvm_access_resp {
 	uint16_t length;
 	uint16_t type;
 	uint16_t status;
-	uint8_t data[0];
+	uint8_t data[];
 } __packed; /* IWM_NVM_ACCESS_CMD_RESP_API_S_VER_2 */
 
 /* IWM_MVM_ALIVE 0x1 */
@@ -4932,7 +4932,7 @@ struct iwm_scan_req_lmac {
 	uint32_t delay;
 	struct iwm_scan_schedule_lmac schedule[IWM_MAX_SCHED_SCAN_PLANS];
 	struct iwm_scan_channel_opt channel_opt[2];
-	uint8_t data[0];
+	uint8_t data[];
 } __packed;
 
 /**
@@ -5082,6 +5082,13 @@ enum iwm_scan_offload_complete_status {
 	IWM_SCAN_OFFLOAD_ABORTED	= 2,
 };
 
+enum iwm_scan_ebs_status {
+	IWM_SCAN_EBS_SUCCESS,
+	IWM_SCAN_EBS_FAILED,
+	IWM_SCAN_EBS_CHAN_NOT_FOUND,
+	IWM_SCAN_EBS_INACTIVE,
+};
+
 /**
  * struct iwm_lmac_scan_complete_notif - notifies end of scanning (all channels)
  *	SCAN_COMPLETE_NTF_API_S_VER_3
@@ -5100,7 +5107,7 @@ struct iwm_lmac_scan_complete_notif {
 	uint8_t last_channel;
 	uint32_t tsf_low;
 	uint32_t tsf_high;
-	struct iwm_scan_results_notif results[0];
+	struct iwm_scan_results_notif results[];
 } __packed;
 
 
@@ -5203,7 +5210,7 @@ struct iwm_scan_config {
 	uint8_t mac_addr[IEEE80211_ADDR_LEN];
 	uint8_t bcast_sta_id;
 	uint8_t channel_flags;
-	uint8_t channel_array[0];
+	uint8_t channel_array[];
 } __packed; /* SCAN_CONFIG_DB_CMD_API_S */
 
 /**
@@ -5322,7 +5329,7 @@ struct iwm_scan_req_umac {
 	uint8_t channel_flags;
 	uint8_t n_channels;
 	uint16_t reserved;
-	uint8_t data[0];
+	uint8_t data[];
 } __packed; /* SCAN_REQUEST_CMD_UMAC_API_S_VER_1 */
 
 /**
@@ -5419,7 +5426,7 @@ struct iwm_umac_scan_iter_complete_notif {
 	uint8_t last_channel;
 	uint32_t tsf_low;
 	uint32_t tsf_high;
-	struct iwm_scan_results_notif results[0];
+	struct iwm_scan_results_notif results[];
 } __packed; /* SCAN_ITER_COMPLETE_NTF_UMAC_API_S_VER_1 */
 
 /* Please keep this enum *SORTED* by hex value.
@@ -6086,7 +6093,7 @@ struct iwm_rx_packet {
 	 */
 	uint32_t len_n_flags;
 	struct iwm_cmd_header hdr;
-	uint8_t data[0];
+	uint8_t data[];
 } __packed;
 
 #define	IWM_FH_RSCSR_FRAME_SIZE_MSK	0x00003fff

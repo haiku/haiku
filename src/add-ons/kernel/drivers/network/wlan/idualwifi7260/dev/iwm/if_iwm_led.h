@@ -86,7 +86,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_led.h 303628 2016-08-01 17:51:35Z sbruno $
+ * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_led.h 303327 2016-07-26 00:02:17Z sbruno $
  */
 #ifndef	__IF_IWM_LED_H__
 #define	__IF_IWM_LED_H__

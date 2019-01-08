@@ -13,7 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_debug.h 330217 2018-03-01 06:47:52Z eadler $
+ * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_debug.h 319578 2017-06-04 21:10:14Z adrian $
  */
 
 #ifndef	__IF_IWM_DEBUG_H__
@@ -51,7 +51,7 @@ enum {
 };
 
 #define IWM_DPRINTF(sc, m, fmt, ...) do {			\
-	if (sc->sc_debug & (m))			\
+	if (sc->sc_debug & (m))				\
 		device_printf(sc->sc_dev, fmt, ##__VA_ARGS__);	\
 } while (0)
 #else

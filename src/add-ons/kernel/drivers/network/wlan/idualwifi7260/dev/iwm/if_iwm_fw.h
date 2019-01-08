@@ -71,7 +71,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
- * $FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_fw.h 330192 2018-03-01 06:22:14Z eadler $
+ * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_fw.h 314209 2017-02-24 15:17:43Z adrian $
  */
 #ifndef	__IF_IWM_FW_H__
 #define	__IF_IWM_FW_H__

@@ -103,7 +103,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm.c 330784 2018-03-11 22:49:46Z eadler $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm.c 339038 2018-10-01 10:44:33Z bz $");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -164,6 +164,7 @@ __FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm.c 330784 2018-03-11 22:49:46Z
 #include <dev/iwm/if_iwm_time_event.h>
 #include <dev/iwm/if_iwm_power.h>
 #include <dev/iwm/if_iwm_scan.h>
+#include <dev/iwm/if_iwm_sf.h>
 #include <dev/iwm/if_iwm_sta.h>
 
 #include <dev/iwm/if_iwm_pcie_trans.h>
@@ -230,8 +231,8 @@ struct iwm_nvm_section {
 	uint8_t *data;
 };
 
-#define IWM_MVM_UCODE_ALIVE_TIMEOUT	(10*hz)
-#define IWM_MVM_UCODE_CALIB_TIMEOUT	(2*hz)
+#define IWM_MVM_UCODE_ALIVE_TIMEOUT	(5*hz)
+#define IWM_MVM_UCODE_CALIB_TIMEOUT	(10*hz)
 
 struct iwm_mvm_alive_data {
 	int valid;
@@ -348,7 +349,6 @@ static int	iwm_raw_xmit(struct ieee80211_node *, struct mbuf *,
 			     const struct ieee80211_bpf_params *);
 static int	iwm_mvm_update_quotas(struct iwm_softc *, struct iwm_vap *);
 static int	iwm_auth(struct ieee80211vap *, struct iwm_softc *);
-static int	iwm_assoc(struct ieee80211vap *, struct iwm_softc *);
 static int	iwm_release(struct iwm_softc *, struct iwm_node *);
 static struct ieee80211_node *
 		iwm_node_alloc(struct ieee80211vap *,
@@ -357,10 +357,6 @@ static void	iwm_setrates(struct iwm_softc *, struct iwm_node *);
 static int	iwm_media_change(struct ifnet *);
 static int	iwm_newstate(struct ieee80211vap *, enum ieee80211_state, int);
 static void	iwm_endscan_cb(void *, int);
-static void	iwm_mvm_fill_sf_command(struct iwm_softc *,
-					struct iwm_sf_cfg_cmd *,
-					struct ieee80211_node *);
-static int	iwm_mvm_sf_config(struct iwm_softc *, enum iwm_sf_state);
 static int	iwm_send_bt_init_conf(struct iwm_softc *);
 static boolean_t iwm_mvm_is_lar_supported(struct iwm_softc *);
 static boolean_t iwm_mvm_is_wifi_mcc_supported(struct iwm_softc *);
@@ -547,12 +543,14 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 {
 	struct iwm_fw_info *fw = &sc->sc_fw;
 	const struct iwm_tlv_ucode_header *uhdr;
-	struct iwm_ucode_tlv tlv;
+	const struct iwm_ucode_tlv *tlv;
 	struct iwm_ucode_capabilities *capa = &sc->ucode_capa;
 	enum iwm_ucode_tlv_type tlv_type;
 	const struct firmware *fwp;
 	const uint8_t *data;
+	uint32_t tlv_len;
 	uint32_t usniffer_img;
+	const uint8_t *tlv_data;
 	uint32_t paging_mem_size;
 	int num_of_cpus;
 	int error = 0;
@@ -605,24 +603,20 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 		goto out;
 	}
 
-	snprintf(sc->sc_fwver, sizeof(sc->sc_fwver), "%d.%d (API ver %d)",
+	snprintf(sc->sc_fwver, sizeof(sc->sc_fwver), "%u.%u (API ver %u)",
 	    IWM_UCODE_MAJOR(le32toh(uhdr->ver)),
 	    IWM_UCODE_MINOR(le32toh(uhdr->ver)),
 	    IWM_UCODE_API(le32toh(uhdr->ver)));
 	data = uhdr->data;
 	len = fw->fw_fp->datasize - sizeof(*uhdr);
 
-	while (len >= sizeof(tlv)) {
-		size_t tlv_len;
-		const void *tlv_data;
+	while (len >= sizeof(*tlv)) {
+		len -= sizeof(*tlv);
+		tlv = (const void *)data;
 
-		memcpy(&tlv, data, sizeof(tlv));
-		tlv_len = le32toh(tlv.length);
-		tlv_type = le32toh(tlv.type);
-
-		len -= sizeof(tlv);
-		data += sizeof(tlv);
-		tlv_data = data;
+		tlv_len = le32toh(tlv->length);
+		tlv_type = le32toh(tlv->type);
+		tlv_data = tlv->data;
 
 		if (len < tlv_len) {
 			device_printf(sc->sc_dev,
@@ -631,19 +625,21 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 			error = EINVAL;
 			goto parse_out;
 		}
+		len -= roundup2(tlv_len, 4);
+		data += sizeof(tlv) + roundup2(tlv_len, 4);
 
 		switch ((int)tlv_type) {
 		case IWM_UCODE_TLV_PROBE_MAX_LEN:
-			if (tlv_len < sizeof(uint32_t)) {
+			if (tlv_len != sizeof(uint32_t)) {
 				device_printf(sc->sc_dev,
-				    "%s: PROBE_MAX_LEN (%d) < sizeof(uint32_t)\n",
+				    "%s: PROBE_MAX_LEN (%d) != sizeof(uint32_t)\n",
 				    __func__,
 				    (int) tlv_len);
 				error = EINVAL;
 				goto parse_out;
 			}
 			capa->max_probe_length =
-			    le32toh(*(const uint32_t *)tlv_data);
+			    le32_to_cpup((const uint32_t *)tlv_data);
 			/* limit it to something sensible */
 			if (capa->max_probe_length >
 			    IWM_SCAN_OFFLOAD_PROBE_REQ_SIZE) {
@@ -674,6 +670,14 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 				error = EINVAL;
 				goto parse_out;
 			}
+			if (tlv_len % sizeof(uint32_t)) {
+				device_printf(sc->sc_dev,
+				    "%s: IWM_UCODE_TLV_FLAGS: tlv_len (%d) %% sizeof(uint32_t)\n",
+				    __func__,
+				    (int) tlv_len);
+				error = EINVAL;
+				goto parse_out;
+			}
 			/*
 			 * Apparently there can be many flags, but Linux driver
 			 * parses only the first one, and so do we.
@@ -685,7 +689,7 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 			 *  2) TLV_FLAGS contains TLV_FLAGS_PAN
 			 * ==> this resets TLV_PAN to itself... hnnnk
 			 */
-			capa->flags = le32toh(*(const uint32_t *)tlv_data);
+			capa->flags = le32_to_cpup((const uint32_t *)tlv_data);
 			break;
 		case IWM_UCODE_TLV_CSCHEME:
 			if ((error = iwm_store_cscheme(sc,
@@ -706,7 +710,7 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 				error = EINVAL;
 				goto parse_out;
 			}
-			num_of_cpus = le32toh(*(const uint32_t *)tlv_data);
+			num_of_cpus = le32_to_cpup((const uint32_t *)tlv_data);
 			if (num_of_cpus == 2) {
 				fw->fw_sects[IWM_UCODE_REGULAR].is_dual_cpus =
 					TRUE;
@@ -780,7 +784,7 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 				goto parse_out;
 			}
 			sc->sc_fw.phy_config =
-			    le32toh(*(const uint32_t *)tlv_data);
+			    le32_to_cpup((const uint32_t *)tlv_data);
 			sc->sc_fw.valid_tx_ant = (sc->sc_fw.phy_config &
 						  IWM_FW_PHY_CFG_TX_CHAIN) >>
 						  IWM_FW_PHY_CFG_TX_CHAIN_POS;
@@ -831,7 +835,7 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 				error = EINVAL;
 				goto parse_out;
 			}
-			paging_mem_size = le32toh(*(const uint32_t *)tlv_data);
+			paging_mem_size = le32_to_cpup((const uint32_t *)tlv_data);
 
 			IWM_DPRINTF(sc, IWM_DEBUG_FIRMWARE_TLV,
 			    "%s: Paging: paging enabled (size = %u bytes)\n",
@@ -864,7 +868,7 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 				goto parse_out;
 			}
 			capa->n_scan_channels =
-			    le32toh(*(const uint32_t *)tlv_data);
+			    le32_to_cpup((const uint32_t *)tlv_data);
 			break;
 
 		case IWM_UCODE_TLV_FW_VERSION:
@@ -889,9 +893,6 @@ iwm_read_firmware(struct iwm_softc *sc, enum iwm_ucode_type ucode_type)
 			error = EINVAL;
 			goto parse_out;
 		}
-
-		len -= roundup(tlv_len, 4);
-		data += roundup(tlv_len, 4);
 	}
 
 	KASSERT(error == 0, ("unhandled error"));
@@ -1439,10 +1440,10 @@ iwm_nic_rx_init(struct iwm_softc *sc)
 	IWM_WRITE(sc, IWM_FH_MEM_RCSR_CHNL0_CONFIG_REG,
 	    IWM_FH_RCSR_RX_CONFIG_CHNL_EN_ENABLE_VAL		|
 	    IWM_FH_RCSR_CHNL0_RX_IGNORE_RXF_EMPTY		|  /* HW bug */
-//#ifdef __HAIKU__
+#ifdef __HAIKU__
 		/* multi-frame RX seems to cause UAFs and double-frees */
 		IWM_FH_RCSR_CHNL0_RX_CONFIG_SINGLE_FRAME_MSK |
-//#endif
+#endif
 	    IWM_FH_RCSR_CHNL0_RX_CONFIG_IRQ_DEST_INT_HOST_VAL	|
 	    IWM_FH_RCSR_RX_CONFIG_REG_VAL_RB_SIZE_4K		|
 	    (IWM_RX_RB_TIMEOUT << IWM_FH_RCSR_RX_CONFIG_REG_IRQ_RBTH_POS) |
@@ -3004,11 +3005,6 @@ iwm_run_init_mvm_ucode(struct iwm_softc *sc, int justnvm)
 		goto error;
 	}
 
-	/* Init Smart FIFO. */
-	ret = iwm_mvm_sf_config(sc, IWM_SF_INIT_OFF);
-	if (ret)
-		goto error;
-
 	/* Send TX valid antennas before triggering calibrations */
 	ret = iwm_send_tx_ant_cfg(sc, iwm_mvm_get_valid_tx_ant(sc));
 	if (ret) {
@@ -3265,8 +3261,11 @@ iwm_mvm_rx_rx_mpdu(struct iwm_softc *sc, struct mbuf *m, uint32_t offset,
 	/* rssi is in 1/2db units */
 	rxs.c_rssi = rssi * 2;
 	rxs.c_nf = sc->sc_noise;
-	if (ieee80211_add_rx_params(m, &rxs) == 0)
+	if (ieee80211_add_rx_params(m, &rxs) == 0) {
+		if (ni)
+			ieee80211_free_node(ni);
 		goto fail;
+	}
 
 	if (ieee80211_radiotap_active_vap(vap)) {
 		struct iwm_rx_radiotap_header *tap = &sc->sc_rxtap;
@@ -3313,7 +3312,8 @@ iwm_mvm_rx_rx_mpdu(struct iwm_softc *sc, struct mbuf *m, uint32_t offset,
 
 	return TRUE;
 
-fail:	counter_u64_add(ic->ic_ierrors, 1);
+fail:
+	counter_u64_add(ic->ic_ierrors, 1);
 	return FALSE;
 }
 
@@ -3557,7 +3557,9 @@ iwm_tx_fill_cmd(struct iwm_softc *sc, struct iwm_node *in,
 	tx->rts_retry_limit = IWM_RTS_DFAULT_RETRY_LIMIT;
 	tx->data_retry_limit = IWM_DEFAULT_TX_RETRY;
 
-	if (type == IEEE80211_FC0_TYPE_MGT) {
+	if (type == IEEE80211_FC0_TYPE_MGT ||
+	    type == IEEE80211_FC0_TYPE_CTL ||
+	    (m->m_flags & M_EAPOL) != 0) {
 		ridx = iwm_tx_rateidx_global_lookup(sc, tp->mgmtrate);
 		IWM_DPRINTF(sc, IWM_DEBUG_TXRATE,
 		    "%s: MGT (%d)\n", __func__, tp->mgmtrate);
@@ -3569,11 +3571,7 @@ iwm_tx_fill_cmd(struct iwm_softc *sc, struct iwm_node *in,
 		ridx = iwm_tx_rateidx_global_lookup(sc, tp->ucastrate);
 		IWM_DPRINTF(sc, IWM_DEBUG_TXRATE,
 		    "%s: FIXED_RATE (%d)\n", __func__, tp->ucastrate);
-	} else if (m->m_flags & M_EAPOL) {
-		ridx = iwm_tx_rateidx_global_lookup(sc, tp->mgmtrate);
-		IWM_DPRINTF(sc, IWM_DEBUG_TXRATE,
-		    "%s: EAPOL\n", __func__);
-	} else if (type == IEEE80211_FC0_TYPE_DATA) {
+	} else {
 		int i;
 
 		/* for data frames, use RS table */
@@ -3590,10 +3588,6 @@ iwm_tx_fill_cmd(struct iwm_softc *sc, struct iwm_node *in,
 		IWM_DPRINTF(sc, IWM_DEBUG_XMIT | IWM_DEBUG_TXRATE,
 		    "%s: start with i=%d, txrate %d\n",
 		    __func__, i, iwm_rates[ridx].rate);
-	} else {
-		ridx = iwm_tx_rateidx_global_lookup(sc, tp->mgmtrate);
-		IWM_DPRINTF(sc, IWM_DEBUG_TXRATE, "%s: DEFAULT (%d)\n",
-		    __func__, tp->mgmtrate);
 	}
 
 	IWM_DPRINTF(sc, IWM_DEBUG_XMIT | IWM_DEBUG_TXRATE,
@@ -4016,10 +4010,6 @@ iwm_auth(struct ieee80211vap *vap, struct iwm_softc *sc)
 		goto out;
 	}
 
-	error = iwm_mvm_sf_config(sc, IWM_SF_FULL_ON);
-	if (error != 0)
-		return error;
-
 	error = iwm_allow_mcast(vap, sc);
 	if (error) {
 		device_printf(sc->sc_dev,
@@ -4048,55 +4038,45 @@ iwm_auth(struct ieee80211vap *vap, struct iwm_softc *sc)
 			    "%s: failed to update MAC\n", __func__);
 			goto out;
 		}
-		if ((error = iwm_mvm_phy_ctxt_changed(sc, &sc->sc_phyctxt[0],
-		    in->in_ni.ni_chan, 1, 1)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: failed update phy ctxt\n", __func__);
-			goto out;
-		}
-		iv->phy_ctxt = &sc->sc_phyctxt[0];
-
-		if ((error = iwm_mvm_binding_add_vif(sc, iv)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: binding update cmd\n", __func__);
-			goto out;
-		}
-		if ((error = iwm_mvm_update_sta(sc, in)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: failed to update sta\n", __func__);
-			goto out;
-		}
 	} else {
 		if ((error = iwm_mvm_mac_ctxt_add(sc, vap)) != 0) {
 			device_printf(sc->sc_dev,
 			    "%s: failed to add MAC\n", __func__);
 			goto out;
 		}
-		if ((error = iwm_mvm_power_update_mac(sc)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: failed to update power management\n",
-			    __func__);
-			goto out;
-		}
-		if ((error = iwm_mvm_phy_ctxt_changed(sc, &sc->sc_phyctxt[0],
-		    in->in_ni.ni_chan, 1, 1)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: failed add phy ctxt!\n", __func__);
-			error = ETIMEDOUT;
-			goto out;
-		}
-		iv->phy_ctxt = &sc->sc_phyctxt[0];
+	}
 
-		if ((error = iwm_mvm_binding_add_vif(sc, iv)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: binding add cmd\n", __func__);
-			goto out;
-		}
-		if ((error = iwm_mvm_add_sta(sc, in)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: failed to add sta\n", __func__);
-			goto out;
-		}
+	if ((error = iwm_mvm_phy_ctxt_changed(sc, &sc->sc_phyctxt[0],
+	    in->in_ni.ni_chan, 1, 1)) != 0) {
+		device_printf(sc->sc_dev,
+		    "%s: failed update phy ctxt\n", __func__);
+		goto out;
+	}
+	iv->phy_ctxt = &sc->sc_phyctxt[0];
+
+	if ((error = iwm_mvm_binding_add_vif(sc, iv)) != 0) {
+		device_printf(sc->sc_dev,
+		    "%s: binding update cmd\n", __func__);
+		goto out;
+	}
+	/*
+	 * Authentication becomes unreliable when powersaving is left enabled
+	 * here. Powersaving will be activated again when association has
+	 * finished or is aborted.
+	 */
+	iv->ps_disabled = TRUE;
+	error = iwm_mvm_power_update_mac(sc);
+	iv->ps_disabled = FALSE;
+	if (error != 0) {
+		device_printf(sc->sc_dev,
+		    "%s: failed to update power management\n",
+		    __func__);
+		goto out;
+	}
+	if ((error = iwm_mvm_add_sta(sc, in)) != 0) {
+		device_printf(sc->sc_dev,
+		    "%s: failed to add sta\n", __func__);
+		goto out;
 	}
 
 	/*
@@ -4112,28 +4092,6 @@ iwm_auth(struct ieee80211vap *vap, struct iwm_softc *sc)
 out:
 	ieee80211_free_node(ni);
 	return (error);
-}
-
-static int
-iwm_assoc(struct ieee80211vap *vap, struct iwm_softc *sc)
-{
-	struct iwm_node *in = IWM_NODE(vap->iv_bss);
-	int error;
-
-	if ((error = iwm_mvm_update_sta(sc, in)) != 0) {
-		device_printf(sc->sc_dev,
-		    "%s: failed to update STA\n", __func__);
-		return error;
-	}
-
-	in->in_assoc = 1;
-	if ((error = iwm_mvm_mac_ctxt_changed(sc, vap)) != 0) {
-		device_printf(sc->sc_dev,
-		    "%s: failed to update MAC\n", __func__);
-		return error;
-	}
-
-	return 0;
 }
 
 static int
@@ -4472,6 +4430,12 @@ iwm_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
                                     __func__, error);
                         }
 			ivp->phy_ctxt = NULL;
+			error = iwm_mvm_power_update_mac(sc);
+			if (error != 0) {
+				device_printf(sc->sc_dev,
+				    "%s: failed to update power management\n",
+				    __func__);
+			}
 			IWM_UNLOCK(sc);
 			IEEE80211_LOCK(ic);
 			return myerr;
@@ -4483,33 +4447,38 @@ iwm_newstate(struct ieee80211vap *vap, enum ieee80211_state nstate, int arg)
 			device_printf(sc->sc_dev,
 			    "%s: could not move to auth state: %d\n",
 			    __func__, error);
-			break;
 		}
 		break;
 
 	case IEEE80211_S_ASSOC:
-		if ((error = iwm_assoc(vap, sc)) != 0) {
-			device_printf(sc->sc_dev,
-			    "%s: failed to associate: %d\n", __func__,
-			    error);
-			break;
-		}
+		/*
+		 * EBS may be disabled due to previous failures reported by FW.
+		 * Reset EBS status here assuming environment has been changed.
+		 */
+		sc->last_ebs_successful = TRUE;
 		break;
 
 	case IEEE80211_S_RUN:
+		in = IWM_NODE(vap->iv_bss);
 		/* Update the association state, now we have it all */
 		/* (eg associd comes in at this point */
-		error = iwm_assoc(vap, sc);
+		error = iwm_mvm_update_sta(sc, in);
 		if (error != 0) {
 			device_printf(sc->sc_dev,
-			    "%s: failed to update association state: %d\n",
-			    __func__,
-			    error);
-			break;
+			    "%s: failed to update STA\n", __func__);
+			IWM_UNLOCK(sc);
+			IEEE80211_LOCK(ic);
+			return error;
+		}
+		in->in_assoc = 1;
+		error = iwm_mvm_mac_ctxt_changed(sc, vap);
+		if (error != 0) {
+			device_printf(sc->sc_dev,
+			    "%s: failed to update MAC: %d\n", __func__, error);
 		}
 
-		in = IWM_NODE(vap->iv_bss);
-		iwm_mvm_enable_beacon_filter(sc, in);
+		iwm_mvm_sf_update(sc, vap, FALSE);
+		iwm_mvm_enable_beacon_filter(sc, ivp);
 		iwm_mvm_power_update_mac(sc);
 		iwm_mvm_update_quotas(sc, ivp);
 		iwm_setrates(sc, in);
@@ -4542,142 +4511,6 @@ iwm_endscan_cb(void *arg, int pending)
 	    __func__);
 
 	ieee80211_scan_done(TAILQ_FIRST(&ic->ic_vaps));
-}
-
-/*
- * Aging and idle timeouts for the different possible scenarios
- * in default configuration
- */
-static const uint32_t
-iwm_sf_full_timeout_def[IWM_SF_NUM_SCENARIO][IWM_SF_NUM_TIMEOUT_TYPES] = {
-	{
-		htole32(IWM_SF_SINGLE_UNICAST_AGING_TIMER_DEF),
-		htole32(IWM_SF_SINGLE_UNICAST_IDLE_TIMER_DEF)
-	},
-	{
-		htole32(IWM_SF_AGG_UNICAST_AGING_TIMER_DEF),
-		htole32(IWM_SF_AGG_UNICAST_IDLE_TIMER_DEF)
-	},
-	{
-		htole32(IWM_SF_MCAST_AGING_TIMER_DEF),
-		htole32(IWM_SF_MCAST_IDLE_TIMER_DEF)
-	},
-	{
-		htole32(IWM_SF_BA_AGING_TIMER_DEF),
-		htole32(IWM_SF_BA_IDLE_TIMER_DEF)
-	},
-	{
-		htole32(IWM_SF_TX_RE_AGING_TIMER_DEF),
-		htole32(IWM_SF_TX_RE_IDLE_TIMER_DEF)
-	},
-};
-
-/*
- * Aging and idle timeouts for the different possible scenarios
- * in single BSS MAC configuration.
- */
-static const uint32_t
-iwm_sf_full_timeout[IWM_SF_NUM_SCENARIO][IWM_SF_NUM_TIMEOUT_TYPES] = {
-	{
-		htole32(IWM_SF_SINGLE_UNICAST_AGING_TIMER),
-		htole32(IWM_SF_SINGLE_UNICAST_IDLE_TIMER)
-	},
-	{
-		htole32(IWM_SF_AGG_UNICAST_AGING_TIMER),
-		htole32(IWM_SF_AGG_UNICAST_IDLE_TIMER)
-	},
-	{
-		htole32(IWM_SF_MCAST_AGING_TIMER),
-		htole32(IWM_SF_MCAST_IDLE_TIMER)
-	},
-	{
-		htole32(IWM_SF_BA_AGING_TIMER),
-		htole32(IWM_SF_BA_IDLE_TIMER)
-	},
-	{
-		htole32(IWM_SF_TX_RE_AGING_TIMER),
-		htole32(IWM_SF_TX_RE_IDLE_TIMER)
-	},
-};
-
-static void
-iwm_mvm_fill_sf_command(struct iwm_softc *sc, struct iwm_sf_cfg_cmd *sf_cmd,
-    struct ieee80211_node *ni)
-{
-	int i, j, watermark;
-
-	sf_cmd->watermark[IWM_SF_LONG_DELAY_ON] = htole32(IWM_SF_W_MARK_SCAN);
-
-	/*
-	 * If we are in association flow - check antenna configuration
-	 * capabilities of the AP station, and choose the watermark accordingly.
-	 */
-	if (ni) {
-		if (ni->ni_flags & IEEE80211_NODE_HT) {
-#ifdef notyet
-			if (ni->ni_rxmcs[2] != 0)
-				watermark = IWM_SF_W_MARK_MIMO3;
-			else if (ni->ni_rxmcs[1] != 0)
-				watermark = IWM_SF_W_MARK_MIMO2;
-			else
-#endif
-				watermark = IWM_SF_W_MARK_SISO;
-		} else {
-			watermark = IWM_SF_W_MARK_LEGACY;
-		}
-	/* default watermark value for unassociated mode. */
-	} else {
-		watermark = IWM_SF_W_MARK_MIMO2;
-	}
-	sf_cmd->watermark[IWM_SF_FULL_ON] = htole32(watermark);
-
-	for (i = 0; i < IWM_SF_NUM_SCENARIO; i++) {
-		for (j = 0; j < IWM_SF_NUM_TIMEOUT_TYPES; j++) {
-			sf_cmd->long_delay_timeouts[i][j] =
-					htole32(IWM_SF_LONG_DELAY_AGING_TIMER);
-		}
-	}
-
-	if (ni) {
-		memcpy(sf_cmd->full_on_timeouts, iwm_sf_full_timeout,
-		       sizeof(iwm_sf_full_timeout));
-	} else {
-		memcpy(sf_cmd->full_on_timeouts, iwm_sf_full_timeout_def,
-		       sizeof(iwm_sf_full_timeout_def));
-	}
-}
-
-static int
-iwm_mvm_sf_config(struct iwm_softc *sc, enum iwm_sf_state new_state)
-{
-	struct ieee80211com *ic = &sc->sc_ic;
-	struct ieee80211vap *vap = TAILQ_FIRST(&ic->ic_vaps);
-	struct iwm_sf_cfg_cmd sf_cmd = {
-		.state = htole32(IWM_SF_FULL_ON),
-	};
-	int ret = 0;
-
-	if (sc->cfg->device_family == IWM_DEVICE_FAMILY_8000)
-		sf_cmd.state |= htole32(IWM_SF_CFG_DUMMY_NOTIF_OFF);
-
-	switch (new_state) {
-	case IWM_SF_UNINIT:
-	case IWM_SF_INIT_OFF:
-		iwm_mvm_fill_sf_command(sc, &sf_cmd, NULL);
-		break;
-	case IWM_SF_FULL_ON:
-		iwm_mvm_fill_sf_command(sc, &sf_cmd, vap->iv_bss);
-		break;
-	default:
-		IWM_DPRINTF(sc, IWM_DEBUG_PWRSAVE,
-		    "Invalid state: %d. not sending Smart Fifo cmd\n",
-			  new_state);
-		return EINVAL;
-	}
-
-	ret = iwm_mvm_send_cmd_pdu(sc, IWM_REPLY_SF_CFG_CMD, IWM_CMD_ASYNC,
-				   sizeof(sf_cmd), &sf_cmd);
-	return ret;
 }
 
 static int
@@ -4815,6 +4648,8 @@ iwm_init_hw(struct iwm_softc *sc)
 	struct ieee80211com *ic = &sc->sc_ic;
 	int error, i, ac;
 
+	sc->sf_state = IWM_SF_UNINIT;
+
 	if ((error = iwm_start_hw(sc)) != 0) {
 		printf("iwm_start_hw: failed %d\n", error);
 		return error;
@@ -4842,6 +4677,10 @@ iwm_init_hw(struct iwm_softc *sc)
 		device_printf(sc->sc_dev, "could not load firmware\n");
 		goto error;
 	}
+
+	error = iwm_mvm_sf_update(sc, NULL, FALSE);
+	if (error)
+		device_printf(sc->sc_dev, "Failed to initialize Smart Fifo\n");
 
 	if ((error = iwm_send_bt_init_conf(sc)) != 0) {
 		device_printf(sc->sc_dev, "bt init conf failed\n");
@@ -5543,36 +5382,27 @@ iwm_handle_rxb(struct iwm_softc *sc, struct mbuf *m)
 		case IWM_INIT_COMPLETE_NOTIF:
 			break;
 
-		case IWM_SCAN_OFFLOAD_COMPLETE: {
-			struct iwm_periodic_scan_complete *notif;
-			notif = (void *)pkt->data;
+		case IWM_SCAN_OFFLOAD_COMPLETE:
+			iwm_mvm_rx_lmac_scan_complete_notif(sc, pkt);
 			if (sc->sc_flags & IWM_FLAG_SCAN_RUNNING) {
 				sc->sc_flags &= ~IWM_FLAG_SCAN_RUNNING;
 				ieee80211_runtask(ic, &sc->sc_es_task);
 			}
 			break;
-		}
 
 		case IWM_SCAN_ITERATION_COMPLETE: {
 			struct iwm_lmac_scan_complete_notif *notif;
 			notif = (void *)pkt->data;
-			ieee80211_runtask(&sc->sc_ic, &sc->sc_es_task);
- 			break;
+			break;
 		}
 
-		case IWM_SCAN_COMPLETE_UMAC: {
-			struct iwm_umac_scan_complete *notif;
-			notif = (void *)pkt->data;
-
-			IWM_DPRINTF(sc, IWM_DEBUG_SCAN,
-			    "UMAC scan complete, status=0x%x\n",
-			    notif->status);
+		case IWM_SCAN_COMPLETE_UMAC:
+			iwm_mvm_rx_umac_scan_complete_notif(sc, pkt);
 			if (sc->sc_flags & IWM_FLAG_SCAN_RUNNING) {
 				sc->sc_flags &= ~IWM_FLAG_SCAN_RUNNING;
 				ieee80211_runtask(ic, &sc->sc_es_task);
 			}
 			break;
-		}
 
 		case IWM_SCAN_ITERATION_COMPLETE_UMAC: {
 			struct iwm_umac_scan_iter_complete_notif *notif;
@@ -5581,7 +5411,6 @@ iwm_handle_rxb(struct iwm_softc *sc, struct mbuf *m)
 			IWM_DPRINTF(sc, IWM_DEBUG_SCAN, "UMAC scan iteration "
 			    "complete, status=0x%x, %d channels scanned\n",
 			    notif->status, notif->scanned_channels);
-			ieee80211_runtask(&sc->sc_ic, &sc->sc_es_task);
 			break;
 		}
 
@@ -5868,6 +5697,7 @@ iwm_intr(void *arg)
 #define	PCI_PRODUCT_INTEL_WL_3160_2	0x08b4
 #define	PCI_PRODUCT_INTEL_WL_3165_1	0x3165
 #define	PCI_PRODUCT_INTEL_WL_3165_2	0x3166
+#define	PCI_PRODUCT_INTEL_WL_3168_1	0x24fb
 #define	PCI_PRODUCT_INTEL_WL_7260_1	0x08b1
 #define	PCI_PRODUCT_INTEL_WL_7260_2	0x08b2
 #define	PCI_PRODUCT_INTEL_WL_7265_1	0x095a
@@ -5884,6 +5714,7 @@ static const struct iwm_devices {
 	{ PCI_PRODUCT_INTEL_WL_3160_2, &iwm3160_cfg },
 	{ PCI_PRODUCT_INTEL_WL_3165_1, &iwm3165_cfg },
 	{ PCI_PRODUCT_INTEL_WL_3165_2, &iwm3165_cfg },
+	{ PCI_PRODUCT_INTEL_WL_3168_1, &iwm3168_cfg },
 	{ PCI_PRODUCT_INTEL_WL_7260_1, &iwm7260_cfg },
 	{ PCI_PRODUCT_INTEL_WL_7260_2, &iwm7260_cfg },
 	{ PCI_PRODUCT_INTEL_WL_7265_1, &iwm7265_cfg },
@@ -6026,12 +5857,17 @@ iwm_attach(device_t dev)
 		goto fail;
 	}
 
+	sc->sf_state = IWM_SF_UNINIT;
+
 	/* Init phy db */
 	sc->sc_phy_db = iwm_phy_db_init(sc);
 	if (!sc->sc_phy_db) {
 		device_printf(dev, "Cannot init phy_db\n");
 		goto fail;
 	}
+
+	/* Set EBS as successful as long as not stated otherwise by the FW. */
+	sc->last_ebs_successful = TRUE;
 
 	/* PCI attach */
 	error = iwm_pci_attach(dev);
@@ -6165,9 +6001,7 @@ iwm_attach(device_t dev)
 //	    IEEE80211_C_BGSCAN		/* capable of bg scanning */
 	    ;
 	/* Advertise full-offload scanning */
-#ifndef __HAIKU__
 	ic->ic_flags_ext = IEEE80211_FEXT_SCAN_OFFLOAD;
-#endif
 	for (i = 0; i < nitems(sc->sc_phyctxt); i++) {
 		sc->sc_phyctxt[i].id = i;
 		sc->sc_phyctxt[i].color = 0;
@@ -6222,6 +6056,7 @@ iwm_wme_update(struct ieee80211com *ic)
 {
 #define IWM_EXP2(x)	((1 << (x)) - 1)	/* CWmin = 2^ECWmin - 1 */
 	struct iwm_softc *sc = ic->ic_softc;
+	struct chanAccParams chp;
 	struct ieee80211vap *vap = TAILQ_FIRST(&ic->ic_vaps);
 	struct iwm_vap *ivp = IWM_VAP(vap);
 	struct iwm_node *in;
@@ -6231,9 +6066,11 @@ iwm_wme_update(struct ieee80211com *ic)
 	if (vap == NULL)
 		return (0);
 
+	ieee80211_wme_ic_getparams(ic, &chp);
+
 	IEEE80211_LOCK(ic);
 	for (aci = 0; aci < WME_NUM_AC; aci++)
-		tmp[aci] = ic->ic_wme.wme_chanParams.cap_wmeParams[aci];
+		tmp[aci] = chp.cap_wmeParams[aci];
 	IEEE80211_UNLOCK(ic);
 
 	IWM_LOCK(sc);
@@ -6376,6 +6213,7 @@ iwm_vap_create(struct ieee80211com *ic, const char name[IFNAMSIZ], int unit,
 	ivp->color = IWM_DEFAULT_COLOR;
 
 	ivp->have_wme = FALSE;
+	ivp->ps_disabled = FALSE;
 
 	ieee80211_ratectl_init(vap);
 	/* Complete setup. */
@@ -6637,6 +6475,8 @@ static driver_t iwm_pci_driver = {
 static devclass_t iwm_devclass;
 
 DRIVER_MODULE(iwm, pci, iwm_pci_driver, iwm_devclass, NULL, NULL);
+MODULE_PNP_INFO("U16:device;P:#;T:vendor=0x8086", pci, iwm_pci_driver,
+    iwm_devices, nitems(iwm_devices));
 MODULE_DEPEND(iwm, firmware, 1, 1, 1);
 MODULE_DEPEND(iwm, pci, 1, 1, 1);
 MODULE_DEPEND(iwm, wlan, 1, 1, 1);

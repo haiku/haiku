@@ -103,7 +103,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_phy_ctxt.c 330455 2018-03-05 08:05:30Z eadler $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_phy_ctxt.c 318012 2017-05-09 05:31:38Z adrian $");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"

@@ -1,28 +1,9 @@
-/*	$OpenBSD: if_iwm.c,v 1.39 2015/03/23 00:35:19 jsg Exp $	*/
-/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_binding.h 318212 2017-05-12 05:19:08Z adrian $ */
-/*
- * Copyright (c) 2014 genua mbh <info@genua.de>
- * Copyright (c) 2014 Fixup Software Ltd.
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 /*-
  * Based on BSD-licensed source modules in the Linux iwlwifi driver,
  * which were used as the reference documentation for this implementation.
  *
  * Driver version we are currently based off of is
- * Linux 3.14.3 (tag id a2df521e42b1d9a23f620ac79dbfe8655a8391dd)
+ * Linux 4.7.3 (tag id d7f6728f57e3ecbb7ef34eb7d9f564d514775d75)
  *
  ***********************************************************************
  *
@@ -31,7 +12,9 @@
  *
  * GPL LICENSE SUMMARY
  *
- * Copyright(c) 2007 - 2013 Intel Corporation. All rights reserved.
+ * Copyright(c) 2013 - 2014 Intel Corporation. All rights reserved.
+ * Copyright(c) 2013 - 2014 Intel Mobile Communications GmbH
+ * Copyright(c) 2016        Intel Deutschland GmbH
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of version 2 of the GNU General Public License as
@@ -51,13 +34,14 @@
  * in the file called COPYING.
  *
  * Contact Information:
- *  Intel Linux Wireless <ilw@linux.intel.com>
+ *  Intel Linux Wireless <linuxwifi@intel.com>
  * Intel Corporation, 5200 N.E. Elam Young Parkway, Hillsboro, OR 97124-6497
- *
  *
  * BSD LICENSE
  *
- * Copyright(c) 2005 - 2013 Intel Corporation. All rights reserved.
+ * Copyright(c) 2012 - 2014 Intel Corporation. All rights reserved.
+ * Copyright(c) 2013 - 2014 Intel Mobile Communications GmbH
+ * Copyright(c) 2016        Intel Deutschland GmbH
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -85,27 +69,14 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*-
- * Copyright (c) 2007-2010 Damien Bergamini <damien.bergamini@free.fr>
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_sf.h 319577 2017-06-04 21:05:58Z adrian $
  */
-#ifndef	__IF_IWM_BINDING_H__
-#define	__IF_IWM_BINDING_H__
+#ifndef	__IF_IWM_SF_H__
+#define	__IF_IWM_SF_H__
 
-extern	int iwm_mvm_binding_add_vif(struct iwm_softc *sc, struct iwm_vap *ivp);
-extern	int iwm_mvm_binding_remove_vif(struct iwm_softc *sc, struct iwm_vap *ivp);
+extern	int iwm_mvm_sf_update(struct iwm_softc *sc,
+			      struct ieee80211vap *changed_vif,
+			      boolean_t remove_vif);
 
-#endif	/* __IF_IWM_BINDING_H__ */
+#endif	/* __IF_IWM_SF_H__ */

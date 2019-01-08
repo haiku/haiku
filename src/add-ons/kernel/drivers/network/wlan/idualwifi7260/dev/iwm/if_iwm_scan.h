@@ -1,5 +1,5 @@
 /*	$OpenBSD: if_iwm.c,v 1.39 2015/03/23 00:35:19 jsg Exp $	*/
-/*	$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_scan.h 330173 2018-03-01 05:51:35Z eadler $ */
+/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_scan.h 315925 2017-03-25 02:49:20Z adrian $ */
 
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>
@@ -106,9 +106,13 @@
 #ifndef	__IF_IWN_SCAN_H__
 #define	__IF_IWN_SCAN_H__
 
-extern	int iwm_mvm_lmac_scan(struct iwm_softc *sc);
+extern	int iwm_mvm_lmac_scan(struct iwm_softc *);
 extern	int iwm_mvm_config_umac_scan(struct iwm_softc *);
 extern	int iwm_mvm_umac_scan(struct iwm_softc *);
-extern	int iwm_mvm_scan_stop_wait(struct iwm_softc *sc);
+extern	int iwm_mvm_scan_stop_wait(struct iwm_softc *);
+extern	void iwm_mvm_rx_lmac_scan_complete_notif(struct iwm_softc *,
+						 struct iwm_rx_packet *);
+extern	void iwm_mvm_rx_umac_scan_complete_notif(struct iwm_softc *,
+						 struct iwm_rx_packet *);
 
 #endif	/* __IF_IWN_SCAN_H__ */

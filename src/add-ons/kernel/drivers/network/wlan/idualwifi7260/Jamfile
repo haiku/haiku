@@ -28,6 +28,7 @@ KernelAddon idualwifi7260 :
 	if_iwm_phy_db.c
 	if_iwm_power.c
 	if_iwm_scan.c
+	if_iwm_sf.c
 	if_iwm_sta.c
 	if_iwm_time_event.c
 	if_iwm_util.c

@@ -73,7 +73,7 @@
  *****************************************************************************/
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_sta.c 330223 2018-03-01 06:55:46Z eadler $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_sta.c 321508 2017-07-26 05:29:08Z adrian $");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"

@@ -73,7 +73,7 @@
  *
  *****************************************************************************/
 
-/* $FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_sta.h 330213 2018-03-01 06:44:32Z eadler $ */
+/* $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_sta.h 318229 2017-05-12 06:33:07Z adrian $ */
 
 #ifndef __IF_IWM_STA_H__
 #define __IF_IWM_STA_H__

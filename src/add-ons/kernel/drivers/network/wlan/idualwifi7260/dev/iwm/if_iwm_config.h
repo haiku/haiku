@@ -68,7 +68,7 @@
  *****************************************************************************/
 
 /*
- * $FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_config.h 330227 2018-03-01 06:57:38Z eadler $
+ * $FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_config.h 331665 2018-03-28 07:59:16Z eadler $
  */
 
 #ifndef __IWM_CONFIG_H__
@@ -128,6 +128,7 @@ struct iwm_cfg {
 extern const struct iwm_cfg iwm7260_cfg;
 extern const struct iwm_cfg iwm3160_cfg;
 extern const struct iwm_cfg iwm3165_cfg;
+extern const struct iwm_cfg iwm3168_cfg;
 extern const struct iwm_cfg iwm7265_cfg;
 extern const struct iwm_cfg iwm7265d_cfg;
 extern const struct iwm_cfg iwm8260_cfg;

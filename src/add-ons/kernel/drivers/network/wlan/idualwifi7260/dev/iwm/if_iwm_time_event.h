@@ -1,5 +1,5 @@
 /*	$OpenBSD: if_iwm.c,v 1.39 2015/03/23 00:35:19 jsg Exp $	*/
-/*	$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_time_event.h 330204 2018-03-01 06:36:41Z eadler $ */
+/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_time_event.h 318212 2017-05-12 05:19:08Z adrian $ */
 
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>

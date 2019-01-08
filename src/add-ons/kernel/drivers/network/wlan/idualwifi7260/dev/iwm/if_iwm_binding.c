@@ -87,7 +87,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_binding.c 330455 2018-03-05 08:05:30Z eadler $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_binding.c 319577 2017-06-04 21:05:58Z adrian $");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -140,6 +140,7 @@ __FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_binding.c 330455 2018-03-05 0
 #include <dev/iwm/if_iwm_debug.h>
 #include <dev/iwm/if_iwm_util.h>
 #include <dev/iwm/if_iwm_binding.h>
+#include <dev/iwm/if_iwm_sf.h>
 
 /*
  * BEGIN iwlwifi/mvm/binding.c
@@ -223,14 +224,12 @@ iwm_mvm_binding_add_vif(struct iwm_softc *sc, struct iwm_vap *ivp)
 	if (!ivp->phy_ctxt)
 		return EINVAL;
 
-#ifdef notyet
 	/*
 	 * Update SF - Disable if needed. if this fails, SF might still be on
 	 * while many macs are bound, which is forbidden - so fail the binding.
 	 */
-	if (iwm_mvm_sf_update(sc, ivp, FALSE))
+	if (iwm_mvm_sf_update(sc, &ivp->iv_vap, FALSE))
 		return EINVAL;
-#endif
 
 	return iwm_mvm_binding_update(sc, ivp, ivp->phy_ctxt, TRUE);
 }
@@ -245,13 +244,11 @@ iwm_mvm_binding_remove_vif(struct iwm_softc *sc, struct iwm_vap *ivp)
 
 	ret = iwm_mvm_binding_update(sc, ivp, ivp->phy_ctxt, FALSE);
 
-#ifdef notyet
 	if (!ret) {
-		if (iwm_mvm_sf_update(sc, ivp, TRUE))
+		if (iwm_mvm_sf_update(sc, &ivp->iv_vap, TRUE))
 			device_printf(sc->sc_dev,
 			    "Failed to update SF state\n");
 	}
-#endif
 
 	return ret;
 }

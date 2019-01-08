@@ -103,7 +103,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.2/sys/dev/iwm/if_iwm_util.c 330455 2018-03-05 08:05:30Z eadler $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwm/if_iwm_util.c 321510 2017-07-26 05:51:31Z adrian $");
 
 #include "opt_wlan.h"
 #include "opt_iwm.h"
@@ -225,12 +225,11 @@ iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 	}
 
 	if (paylen > datasz) {
-		size_t totlen;
 		IWM_DPRINTF(sc, IWM_DEBUG_CMD,
 		    "large command paylen=%u len0=%u\n",
 			paylen, hcmd->len[0]);
 		/* Command is too large */
-		totlen = hdrlen + paylen;
+		size_t totlen = hdrlen + paylen;
 		if (paylen > IWM_MAX_CMD_PAYLOAD_SIZE) {
 			device_printf(sc->sc_dev,
 			    "firmware command too long (%zd bytes)\n",

@@ -1,5 +1,5 @@
 /*	$OpenBSD: if_iwmvar.h,v 1.7 2015/03/02 13:51:10 jsg Exp $	*/
-/*	$FreeBSD: releng/11.2/sys/dev/iwm/if_iwmvar.h 330224 2018-03-01 06:56:10Z eadler $ */
+/*	$FreeBSD: releng/12.0/sys/dev/iwm/if_iwmvar.h 321509 2017-07-26 05:40:52Z adrian $ */
 
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>
@@ -233,7 +233,7 @@ struct iwm_nvm_data {
 	uint8_t max_tx_pwr_half_dbm;
 
 	boolean_t lar_enabled;
-	uint16_t nvm_ch_flags[0];
+	uint16_t nvm_ch_flags[];
 };
 
 /* max bufs per tfd the driver will use */
@@ -391,6 +391,9 @@ struct iwm_vap {
 		uint16_t edca_txop;
 		uint8_t aifsn;
 	} queue_params[WME_NUM_AC];
+
+	/* indicates that this interface requires PS to be disabled */
+	boolean_t		ps_disabled;
 };
 #define IWM_VAP(_vap)		((struct iwm_vap *)(_vap))
 
@@ -554,11 +557,18 @@ struct iwm_softc {
 	uint16_t		num_of_paging_blk;
 	uint16_t		num_of_pages_in_last_blk;
 
+	boolean_t		last_ebs_successful;
+
+	/* last smart fifo state that was successfully sent to firmware */
+	enum iwm_sf_state	sf_state;
+
 	/* Indicate if device power save is allowed */
 	boolean_t		sc_ps_disabled;
 
+#ifdef __HAIKU__
 	uint32_t sc_intr_status_1;
 	uint32_t sc_intr_status_2;
+#endif
 };
 
 #define IWM_LOCK_INIT(_sc) \

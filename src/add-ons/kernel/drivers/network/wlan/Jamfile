@@ -14,5 +14,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network wlan realtekwifi ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan wavelanwifi ;
 
 # FreeBSD 11.2 drivers
-SubInclude HAIKU_TOP src add-ons kernel drivers network wlan idualwifi7260 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan iprowifi2200 ;
+
+# FreeBSD 12 drivers
+SubInclude HAIKU_TOP src add-ons kernel drivers network wlan idualwifi7260 ;
