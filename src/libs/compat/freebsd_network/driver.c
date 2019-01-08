@@ -259,6 +259,12 @@ err4:
 err3:
 	uninit_mutexes();
 err2:
+	for (p = 0; sProbedDevices[p].driver != NULL; p++) {
+		gPci->unreserve_device(sProbedDevices[p].info.bus,
+			sProbedDevices[p].info.device, sProbedDevices[p].info.function,
+			gDriverName, NULL);
+	}
+
 	put_module(B_PCI_MODULE_NAME);
 	if (gPCIx86 != NULL)
 		put_module(B_PCI_X86_MODULE_NAME);
@@ -270,7 +276,7 @@ err2:
 status_t
 _fbsd_uninit_drivers(driver_t *drivers[])
 {
-	int i;
+	int i, p;
 
 	for (i = 0; drivers[i]; i++)
 		TRACE(("%s: uninit_driver(%p)\n", gDriverName, drivers[i]));
@@ -287,6 +293,12 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 	uninit_callout();
 	uninit_mbufs();
 	uninit_mutexes();
+
+	for (p = 0; sProbedDevices[p].driver != NULL; p++) {
+		gPci->unreserve_device(sProbedDevices[p].info.bus,
+			sProbedDevices[p].info.device, sProbedDevices[p].info.function,
+			gDriverName, NULL);
+	}
 
 	put_module(B_PCI_MODULE_NAME);
 	if (gPCIx86 != NULL)
