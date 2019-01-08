@@ -96,11 +96,6 @@ get_ifnet(device_t device, int& i)
 status_t
 init_wlan_stack(void)
 {
-	mtx_init(&ic_list_mtx, "ieee80211com list", NULL, MTX_DEF);
-	ieee80211_phy_init();
-	ieee80211_auth_setup();
-	ieee80211_ht_init();
-
 	get_module(NET_NOTIFICATIONS_MODULE_NAME,
 		(module_info**)&sNotificationModule);
 
@@ -111,8 +106,6 @@ init_wlan_stack(void)
 void
 uninit_wlan_stack(void)
 {
-	mtx_destroy(&ic_list_mtx);
-
 	if (sNotificationModule != NULL)
 		put_module(NET_NOTIFICATIONS_MODULE_NAME);
 }
@@ -220,7 +213,7 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			else if (request.i_type == IEEE80211_IOC_HAIKU_COMPAT_WLAN_DOWN)
 				return wlan_close(cookie);
 
-			TRACE("wlan_control: %ld, %d\n", op, request.i_type);
+			TRACE("wlan_control: %" B_PRIu32 ", %d\n", op, request.i_type);
 			status_t status = ifp->if_ioctl(ifp, op, (caddr_t)&request);
 			if (status != B_OK)
 				return status;
@@ -257,18 +250,28 @@ get_random_bytes(void* p, size_t n)
 }
 
 
-struct mbuf*
-ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
+struct mbuf *
+ieee80211_getmgtframe(uint8_t **frm, int headroom, int pktlen)
 {
-	struct mbuf* m;
+	struct mbuf *m;
 	u_int len;
 
+	/*
+	 * NB: we know the mbuf routines will align the data area
+	 *     so we don't need to do anything special.
+	 */
 	len = roundup2(headroom + pktlen, 4);
 	KASSERT(len <= MCLBYTES, ("802.11 mgt frame too large: %u", len));
 	if (len < MINCLSIZE) {
 		m = m_gethdr(M_NOWAIT, MT_DATA);
+		/*
+		 * Align the data in case additional headers are added.
+		 * This should only happen when a WEP header is added
+		 * which only happens for shared key authentication mgt
+		 * frames which all fit in MHLEN.
+		 */
 		if (m != NULL)
-			MH_ALIGN(m, len);
+			M_ALIGN(m, len);
 	} else {
 		m = m_getcl(M_NOWAIT, MT_DATA, M_PKTHDR);
 		if (m != NULL)
@@ -498,6 +501,21 @@ ieee80211_get_rx_params(struct mbuf *m, struct ieee80211_rx_stats *rxs)
 }
 
 
+const struct ieee80211_rx_stats *
+ieee80211_get_rx_params_ptr(struct mbuf *m)
+{
+	struct m_tag *mtag;
+	struct ieee80211_rx_params *rx;
+
+	mtag = m_tag_locate(m, MTAG_ABI_NET80211, NET80211_TAG_RECV_PARAMS,
+	    NULL);
+	if (mtag == NULL)
+		return (NULL);
+	rx = (struct ieee80211_rx_params *)(mtag + 1);
+	return (&rx->params);
+}
+
+
 /*
  * Transmit a frame to the parent interface.
  */
@@ -580,7 +598,9 @@ ieee80211_vap_destroy(struct ieee80211vap* vap)
 void
 ieee80211_load_module(const char* modname)
 {
+#if 0
 	dprintf("%s not implemented, yet: modname %s\n", __func__, modname);
+#endif
 }
 
 
@@ -590,10 +610,10 @@ ieee80211_notify_node_join(struct ieee80211_node* ni, int newassoc)
 	struct ieee80211vap* vap = ni->ni_vap;
 	struct ifnet* ifp = vap->iv_ifp;
 
+	TRACE("%s\n", __FUNCTION__);
+
 	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_UP);
-
-	TRACE("%s\n", __FUNCTION__);
 
 	if (sNotificationModule != NULL) {
 		char messageBuffer[512];
