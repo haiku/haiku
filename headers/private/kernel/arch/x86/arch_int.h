@@ -41,7 +41,7 @@ static inline void
 arch_int_restore_interrupts_inline(int oldState)
 {
 	if (oldState)
-		asm("sti");
+		asm volatile("sti");
 }
 
 
