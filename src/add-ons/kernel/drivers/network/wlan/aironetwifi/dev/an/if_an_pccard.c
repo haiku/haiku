@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -38,7 +40,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/an/if_an_pccard.c 292079 2015-12-11 05:27:56Z imp $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/an/if_an_pccard.c 325966 2017-11-18 14:26:50Z pfg $");
 
 #include "opt_inet.h"
 

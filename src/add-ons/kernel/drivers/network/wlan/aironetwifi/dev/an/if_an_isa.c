@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -38,7 +40,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/an/if_an_isa.c 199756 2009-11-24 16:54:54Z jhb $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/an/if_an_isa.c 327102 2017-12-23 06:49:27Z imp $");
 
 #include "opt_inet.h"
 
@@ -148,3 +150,4 @@ static devclass_t an_isa_devclass;
 DRIVER_MODULE(an, isa, an_isa_driver, an_isa_devclass, 0, 0);
 MODULE_DEPEND(an, isa, 1, 1, 1);
 MODULE_DEPEND(an, wlan, 1, 1, 1);
+ISA_PNP_INFO(an_ids);

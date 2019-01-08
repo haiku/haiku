@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 1997, 1998, 1999
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -38,7 +40,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/an/if_an.c 315221 2017-03-14 02:06:03Z pfg $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/an/if_an.c 331797 2018-03-30 18:50:13Z brooks $");
 
 /*
  * The Aironet 4500/4800 series cards come in PCMCIA, ISA and PCI form.
@@ -1932,7 +1934,8 @@ an_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 		error = 0;
 		break;
 	case SIOCGAIRONET:
-		error = copyin(ifr->ifr_data, &sc->areq, sizeof(sc->areq));
+		error = copyin(ifr_data_get_ptr(ifr), &sc->areq,
+		    sizeof(sc->areq));
 		if (error != 0)
 			break;
 		AN_LOCK(sc);
@@ -1961,13 +1964,15 @@ an_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 			break;
 		}
 		AN_UNLOCK(sc);
-		error = copyout(&sc->areq, ifr->ifr_data, sizeof(sc->areq));
+		error = copyout(&sc->areq, ifr_data_get_ptr(ifr),
+		    sizeof(sc->areq));
 		break;
 	case SIOCSAIRONET:
 		if ((error = priv_check(td, PRIV_DRIVER)))
 			goto out;
 		AN_LOCK(sc);
-		error = copyin(ifr->ifr_data, &sc->areq, sizeof(sc->areq));
+		error = copyin(ifr_data_get_ptr(ifr), &sc->areq,
+		    sizeof(sc->areq));
 		if (error != 0)
 			break;
 		an_setdef(sc, &sc->areq);
@@ -1976,7 +1981,8 @@ an_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 	case SIOCGPRIVATE_0:		/* used by Cisco client utility */
 		if ((error = priv_check(td, PRIV_DRIVER)))
 			goto out;
-		error = copyin(ifr->ifr_data, &l_ioctl, sizeof(l_ioctl));
+		error = copyin(ifr_data_get_ptr(ifr), &l_ioctl,
+		    sizeof(l_ioctl));
 		if (error)
 			goto out;
 		mode = l_ioctl.command;
@@ -1994,13 +2000,15 @@ an_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 		AN_UNLOCK(sc);
 		if (!error) {
 			/* copy out the updated command info */
-			error = copyout(&l_ioctl, ifr->ifr_data, sizeof(l_ioctl));
+			error = copyout(&l_ioctl, ifr_data_get_ptr(ifr),
+			    sizeof(l_ioctl));
 		}
 		break;
 	case SIOCGPRIVATE_1:		/* used by Cisco client utility */
 		if ((error = priv_check(td, PRIV_DRIVER)))
 			goto out;
-		error = copyin(ifr->ifr_data, &l_ioctl, sizeof(l_ioctl));
+		error = copyin(ifr_data_get_ptr(ifr), &l_ioctl,
+		    sizeof(l_ioctl));
 		if (error)
 			goto out;
 		l_ioctl.command = 0;
