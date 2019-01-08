@@ -124,7 +124,7 @@ typedef void (*ieee80211vap_attach)(struct ieee80211vap *);
 
 struct ieee80211_appie {
 	uint16_t		ie_len;		/* size of ie_data */
-	uint8_t			ie_data[];	/* user-specified IE's */
+	uint8_t			ie_data[0];	/* user-specified IE's */
 };
 
 struct ieee80211_tdma_param;
