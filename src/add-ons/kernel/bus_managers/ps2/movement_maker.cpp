@@ -219,13 +219,6 @@ void
 MovementMaker::GetMovement(uint32 posX, uint32 posY)
 {
 	_GetRawMovement(posX, posY);
-
-//	TRACE("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
-//		posX, posY, xDelta, yDelta,
-//		fDeltaSumX, fDeltaSumY);
-
-	xDelta = xDelta;
-	yDelta = yDelta;
 }
 
 
