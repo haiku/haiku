@@ -141,15 +141,17 @@ UTF8CountChars(const char *bytes, int32 numBytes)
 		return 0;
 
 	uint32 length = 0;
-	const char *last;
-	if (numBytes < 0)
-		last = (const char *)SIZE_MAX;
-	else
-		last = bytes + numBytes - 1;
-
-	while (bytes[0] && bytes <= last) {
-		if ((bytes++[0] & 0xc0) != 0x80)
-			length++;
+	if (numBytes < 0) {
+		while (bytes[0]) {
+			if ((bytes++[0] & 0xc0) != 0x80)
+				length++;
+		}
+	} else {
+		const char *last = bytes + numBytes - 1;
+		while (bytes[0] && bytes <= last) {
+			if ((bytes++[0] & 0xc0) != 0x80)
+				length++;
+		}
 	}
 
 	return length;
