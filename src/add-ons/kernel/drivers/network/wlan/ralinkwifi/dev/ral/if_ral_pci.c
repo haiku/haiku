@@ -44,6 +44,7 @@ __FBSDID("$FreeBSD: releng/11.1/sys/dev/ral/if_ral_pci.c 287197 2015-08-27 08:56
 
 #include <net80211/ieee80211_var.h>
 #include <net80211/ieee80211_radiotap.h>
+#include <net80211/ieee80211_ratectl.h>
 
 #include <dev/pci/pcireg.h>
 #include <dev/pci/pcivar.h>

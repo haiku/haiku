@@ -14,6 +14,7 @@
 #include <net/if_media.h>
 
 #include <net80211/ieee80211_var.h>
+#include <net80211/ieee80211_ratectl.h>
 
 #include <dev/wpi/if_wpireg.h>
 #include <dev/wpi/if_wpivar.h>

@@ -16,6 +16,7 @@
 
 #include <net80211/ieee80211_var.h>
 #include <net80211/ieee80211_amrr.h>
+#include <net80211/ieee80211_ratectl.h>
 
 #include <dev/ral/rt2560reg.h>
 #include <dev/ral/rt2560var.h>
