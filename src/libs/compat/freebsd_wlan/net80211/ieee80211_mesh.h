@@ -1,4 +1,6 @@
 /*- 
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2009 The FreeBSD Foundation 
  * All rights reserved. 
  * 
@@ -26,7 +28,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
  * SUCH DAMAGE. 
  * 
- * $FreeBSD: releng/11.1/sys/net80211/ieee80211_mesh.h 283555 2015-05-26 04:25:11Z adrian $
+ * $FreeBSD: releng/12.0/sys/net80211/ieee80211_mesh.h 326272 2017-11-27 15:23:17Z pfg $
  */
 #ifndef _NET80211_IEEE80211_MESH_H_
 #define _NET80211_IEEE80211_MESH_H_
@@ -40,8 +42,6 @@
 /*
  * 802.11s Information Elements.
 */
-void ieee80211_mesh_init(void);
-
 /* Mesh Configuration */
 #define IEEE80211_MESH_CONF_SZ		(7)
 struct ieee80211_meshconf_ie {

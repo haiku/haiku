@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_radiotap.c 283530 2015-05-25 14:54:10Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_radiotap.c 326272 2017-11-27 15:23:17Z pfg $");
 
 /*
  * IEEE 802.11 radiotap support.

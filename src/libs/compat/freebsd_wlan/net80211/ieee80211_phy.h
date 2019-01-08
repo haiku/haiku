@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2007-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -22,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/net80211/ieee80211_phy.h 297595 2016-04-05 22:01:56Z adrian $
+ * $FreeBSD: releng/12.0/sys/net80211/ieee80211_phy.h 326272 2017-11-27 15:23:17Z pfg $
  */
 
 #ifndef _NET80211_IEEE80211_PHY_H_
@@ -32,7 +34,6 @@
 /*
  * IEEE 802.11 PHY-related definitions.
  */
-void ieee80211_phy_init(void);
 
 /*
  * Contention window (slots).
@@ -95,10 +96,9 @@ ieee80211_ack_rate(const struct ieee80211_rate_table *rt, uint8_t rate)
 	 * If the caller wishes to use it for a basic rate, they should
 	 * clear the high bit first.
 	 */
-	uint8_t cix;
 	KASSERT(! (rate & 0x80), ("rate %d is basic/mcs?", rate));
 
-	cix = rt->info[rt->rateCodeToIndex[rate & IEEE80211_RATE_VAL]].ctlRateIndex;
+	uint8_t cix = rt->info[rt->rateCodeToIndex[rate & IEEE80211_RATE_VAL]].ctlRateIndex;
 	KASSERT(cix != (uint8_t)-1, ("rate %d has no info", rate));
 	return rt->info[cix].dot11Rate;
 }
@@ -111,10 +111,9 @@ ieee80211_ctl_rate(const struct ieee80211_rate_table *rt, uint8_t rate)
 	 * If the caller wishes to use it for a basic rate, they should
 	 * clear the high bit first.
 	 */
-	uint8_t cix;
 	KASSERT(! (rate & 0x80), ("rate %d is basic/mcs?", rate));
 
-	cix = rt->info[rt->rateCodeToIndex[rate & IEEE80211_RATE_VAL]].ctlRateIndex;
+	uint8_t cix = rt->info[rt->rateCodeToIndex[rate & IEEE80211_RATE_VAL]].ctlRateIndex;
 	KASSERT(cix != (uint8_t)-1, ("rate %d has no info", rate));
 	return rt->info[cix].dot11Rate;
 }
@@ -127,10 +126,9 @@ ieee80211_rate2phytype(const struct ieee80211_rate_table *rt, uint8_t rate)
 	 * If the caller wishes to use it for a basic rate, they should
 	 * clear the high bit first.
 	 */
-	uint8_t rix;
 	KASSERT(! (rate & 0x80), ("rate %d is basic/mcs?", rate));
 
-	rix = rt->rateCodeToIndex[rate & IEEE80211_RATE_VAL];
+	uint8_t rix = rt->rateCodeToIndex[rate & IEEE80211_RATE_VAL];
 	KASSERT(rix != (uint8_t)-1, ("rate %d has no info", rate));
 	return (enum ieee80211_phytype)rt->info[rix].phy;
 }

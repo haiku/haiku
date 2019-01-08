@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_scan.c 298392 2016-04-21 06:19:33Z avos $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_scan.c 326272 2017-11-27 15:23:17Z pfg $");
 
 /*
  * IEEE 802.11 scanning support.
@@ -32,12 +34,12 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_scan.c 298392 2016-04-21 
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h> 
+#include <sys/systm.h>
 #include <sys/proc.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
 #include <sys/condvar.h>
- 
+
 #include <sys/socket.h>
 
 #include <net/if.h>
@@ -68,6 +70,7 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_scan.c 298392 2016-04-21 
 #define	ROAM_RATE_HALF_DEFAULT		2*6	/* half-width 11a/g bss */
 #define	ROAM_RATE_QUARTER_DEFAULT	2*3	/* quarter-width 11a/g bss */
 #define	ROAM_MCS_11N_DEFAULT		(1 | IEEE80211_RATE_MCS) /* 11n bss */
+#define	ROAM_MCS_11AC_DEFAULT		(1 | IEEE80211_RATE_MCS) /* 11ac bss; XXX not used yet */
 
 void
 ieee80211_scan_attach(struct ieee80211com *ic)
@@ -80,10 +83,6 @@ ieee80211_scan_attach(struct ieee80211com *ic)
 		ieee80211_swscan_attach(ic);
 	else
 		ic->ic_scan_methods->sc_attach(ic);
-
-#if defined(__HAIKU__)
-	ieee80211_scan_sta_init();
-#endif
 }
 
 void
@@ -97,10 +96,6 @@ ieee80211_scan_detach(struct ieee80211com *ic)
 	 * I'll do that later.
 	 */
 	ic->ic_scan_methods->sc_detach(ic);
-
-#if defined(__HAIKU__)
-	ieee80211_scan_sta_uninit();
-#endif
 }
 
 static const struct ieee80211_roamparam defroam[IEEE80211_MODE_MAX] = {
@@ -124,6 +119,11 @@ static const struct ieee80211_roamparam defroam[IEEE80211_MODE_MAX] = {
 				    .rate = ROAM_MCS_11N_DEFAULT },
 	[IEEE80211_MODE_11NG]	= { .rssi = ROAM_RSSI_11B_DEFAULT,
 				    .rate = ROAM_MCS_11N_DEFAULT },
+	[IEEE80211_MODE_VHT_2GHZ]	= { .rssi = ROAM_RSSI_11B_DEFAULT,
+				    .rate = ROAM_MCS_11AC_DEFAULT },
+	[IEEE80211_MODE_VHT_5GHZ]	= { .rssi = ROAM_RSSI_11A_DEFAULT,
+				    .rate = ROAM_MCS_11AC_DEFAULT },
+
 };
 
 void
@@ -460,6 +460,9 @@ ieee80211_cancel_scan(struct ieee80211vap *vap)
 
 /*
  * Cancel any scan currently going on.
+ *
+ * This is called during normal 802.11 data path to cancel
+ * a scan so a newly arrived normal data packet can be sent.
  */
 void
 ieee80211_cancel_anyscan(struct ieee80211vap *vap)
@@ -563,7 +566,7 @@ ieee80211_scan_dump_probe_beacon(uint8_t subtype, int isnew,
 	printf(" rssi %d\n", rssi);
 
 	if (isnew) {
-		printf("[%s] caps 0x%x bintval %u erp 0x%x", 
+		printf("[%s] caps 0x%x bintval %u erp 0x%x",
 			ether_sprintf(mac), sp->capinfo, sp->bintval, sp->erp);
 		if (sp->country != NULL)
 			dump_country(sp->country);

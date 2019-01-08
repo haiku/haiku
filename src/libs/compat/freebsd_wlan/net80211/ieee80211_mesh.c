@@ -1,34 +1,36 @@
-/*-
- * Copyright (c) 2009 The FreeBSD Foundation
- * All rights reserved.
+/*- 
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
  *
+ * Copyright (c) 2009 The FreeBSD Foundation 
+ * All rights reserved. 
+ * 
  * This software was developed by Rui Paulo under sponsorship from the
- * FreeBSD Foundation.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+ * FreeBSD Foundation. 
+ *  
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions 
+ * are met: 
+ * 1. Redistributions of source code must retain the above copyright 
+ *    notice, this list of conditions and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in the 
+ *    documentation and/or other materials provided with the distribution. 
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND 
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE 
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+ * SUCH DAMAGE. 
+ */ 
 #include <sys/cdefs.h>
 #ifdef __FreeBSD__
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_mesh.c 300232 2016-05-19 21:08:33Z avos $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_mesh.c 326272 2017-11-27 15:23:17Z pfg $");
 #endif
 
 /*
@@ -40,8 +42,8 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_mesh.c 300232 2016-05-19 
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h>
-#include <sys/mbuf.h>
+#include <sys/systm.h> 
+#include <sys/mbuf.h>   
 #include <sys/malloc.h>
 #include <sys/kernel.h>
 
@@ -545,7 +547,7 @@ mesh_gatemode_cb(void *arg)
 	mesh_gatemode_setup(vap);
 }
 
-void
+static void
 ieee80211_mesh_init(void)
 {
 
@@ -600,9 +602,7 @@ ieee80211_mesh_init(void)
 	ieee80211_mesh_register_proto_metric(&mesh_metric_airtime);
 
 }
-#if 0
 SYSINIT(wlan_mesh, SI_SUB_DRIVERS, SI_ORDER_FIRST, ieee80211_mesh_init, NULL);
-#endif
 
 void
 ieee80211_mesh_attach(struct ieee80211com *ic)
@@ -946,7 +946,7 @@ static void
 mesh_checkid(void *arg, struct ieee80211_node *ni)
 {
 	uint16_t *r = arg;
-
+	
 	if (*r == ni->ni_mllid)
 		*(uint16_t *)arg = 0;
 }
@@ -1582,7 +1582,7 @@ mesh_input(struct ieee80211_node *ni, struct mbuf *m,
 			if (IEEE80211_QOS_HAS_SEQ(wh) &&
 			    TID_TO_WME_AC(tid) >= WME_AC_VI)
 				ic->ic_wme.wme_hipri_traffic++;
-			if (! ieee80211_check_rxseq(ni, wh, wh->i_addr1))
+			if (! ieee80211_check_rxseq(ni, wh, wh->i_addr1, rxs))
 				goto out;
 		}
 	}
@@ -1790,7 +1790,7 @@ mesh_input(struct ieee80211_node *ni, struct mbuf *m,
 			goto out;
 		}
 #ifdef IEEE80211_DEBUG
-		if ((ieee80211_msg_debug(vap) &&
+		if ((ieee80211_msg_debug(vap) && 
 		    (vap->iv_ic->ic_flags & IEEE80211_F_SCAN)) ||
 		    ieee80211_msg_dumppkts(vap)) {
 			if_printf(ifp, "received %s from %s rssi %d\n",
@@ -2185,7 +2185,7 @@ mesh_parse_meshpeering_action(struct ieee80211_node *ni,
 			return NULL;
 		}
 	}
-
+	
 	/*
 	 * Close frames are accepted if meshid is the same.
 	 * Verify the other two types.
@@ -2230,7 +2230,7 @@ mesh_parse_meshpeering_action(struct ieee80211_node *ni,
 		}
 		return NULL;
 	}
-
+	
 	return (const struct ieee80211_meshpeer_ie *) mp;
 }
 
@@ -2509,7 +2509,7 @@ mesh_recv_action_meshlmetric(struct ieee80211_node *ni,
 	    (const struct ieee80211_meshlmetric_ie *)
 	    (frm+2); /* action + code */
 	struct ieee80211_meshlmetric_ie lm_rep;
-
+	
 	if (ie->lm_flags & IEEE80211_MESH_LMETRIC_FLAGS_REQ) {
 		lm_rep.lm_flags = 0;
 		lm_rep.lm_metric = mesh_airtime_calc(ni);
@@ -2632,7 +2632,7 @@ mesh_recv_action_meshgate(struct ieee80211_node *ni,
 	/* popagate only if decremented ttl >= 1 && forwarding is enabled */
 	if ((ie.gann_ttl - 1) < 1 && !(ms->ms_flags & IEEE80211_MESHFLAGS_FWD))
 		return 0;
-		pgann.gann_flags = ie.gann_flags; /* Reserved */
+	pgann.gann_flags = ie.gann_flags; /* Reserved */
 	pgann.gann_hopcount = ie.gann_hopcount + 1;
 	pgann.gann_ttl = ie.gann_ttl - 1;
 	IEEE80211_ADDR_COPY(pgann.gann_addr, ie.gann_addr);
@@ -3004,7 +3004,7 @@ static void
 mesh_peer_timeout_backoff(struct ieee80211_node *ni)
 {
 	uint32_t r;
-
+	
 	r = arc4random();
 	ni->ni_mltval += r % ni->ni_mltval;
 	callout_reset(&ni->ni_mltimer, ni->ni_mltval, mesh_peer_timeout_cb,
@@ -3038,7 +3038,7 @@ mesh_peer_timeout_cb(void *arg)
 	IEEE80211_NOTE(ni->ni_vap, IEEE80211_MSG_MESH,
 	    ni, "mesh link timeout, state %d, retry counter %d",
 	    ni->ni_mlstate, ni->ni_mlrcnt);
-
+	
 	switch (ni->ni_mlstate) {
 	case IEEE80211_NODE_MESH_IDLE:
 	case IEEE80211_NODE_MESH_ESTABLISHED:

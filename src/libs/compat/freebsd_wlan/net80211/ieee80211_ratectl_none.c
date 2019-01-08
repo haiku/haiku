@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2010 Bernhard Schmidt <bschmidt@FreeBSD.org>
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_ratectl_none.c 283614 2015-05-27 14:05:46Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_ratectl_none.c 326272 2017-11-27 15:23:17Z pfg $");
 
 #include "opt_wlan.h"
 
@@ -80,15 +82,14 @@ none_rate(struct ieee80211_node *ni, void *arg __unused, uint32_t iarg __unused)
 }
 
 static void
-none_tx_complete(const struct ieee80211vap *vap,
-    const struct ieee80211_node *ni, int ok,
-    void *arg1, void *arg2 __unused)
+none_tx_complete(const struct ieee80211_node *ni,
+    const struct ieee80211_ratectl_tx_status *status)
 {
 }
 
 static void
-none_tx_update(const struct ieee80211vap *vap, const struct ieee80211_node *ni,
-    void *arg1, void *arg2, void *arg3)
+none_tx_update(struct ieee80211vap *vap,
+    struct ieee80211_ratectl_tx_stats *stats)
 {
 }
 

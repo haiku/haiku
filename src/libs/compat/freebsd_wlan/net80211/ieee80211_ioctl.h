@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2001 Atsushi Onoe
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -23,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/net80211/ieee80211_ioctl.h 298603 2016-04-26 01:26:11Z adrian $
+ * $FreeBSD: releng/12.0/sys/net80211/ieee80211_ioctl.h 326272 2017-11-27 15:23:17Z pfg $
  */
 #ifndef _NET80211_IEEE80211_IOCTL_H_
 #define _NET80211_IEEE80211_IOCTL_H_
@@ -84,7 +86,11 @@ struct ieee80211_nodestats {
 	uint32_t	ns_tx_deauth_code;	/* last deauth reason */
 	uint32_t	ns_tx_disassoc;		/* disassociations */
 	uint32_t	ns_tx_disassoc_code;	/* last disassociation reason */
-	uint32_t	ns_spare[8];
+
+	/* Hardware A-MSDU decode */
+	uint32_t	ns_rx_amsdu_more;	/* RX decap A-MSDU, more coming from A-MSDU */
+	uint32_t	ns_rx_amsdu_more_end;	/* RX decap A-MSDU (or any other frame), no more coming */
+	uint32_t	ns_spare[6];
 };
 
 /*
@@ -312,7 +318,7 @@ struct ieee80211req_mlme {
 	uint8_t		im_ssid[IEEE80211_NWID_LEN];
 };
 
-/* 
+/*
  * MAC ACL operations.
  */
 enum {
@@ -423,7 +429,9 @@ struct ieee80211req_sta_info {
 	uint16_t	isi_ie_off;		/* offset to IE data */
 	uint16_t	isi_ie_len;		/* IE length */
 #ifdef __HAIKU__
-	struct ieee80211_channel	isi_chan;	/* Handing out the conmplete channel info */
+	uint32_t	isi_flags;		/* MHz */
+	uint16_t	isi_freq;		/* channel flags */
+	int8_t		padding[10];
 #else
 	uint16_t	isi_freq;		/* MHz */
 	uint32_t	isi_flags;		/* channel flags */
@@ -560,6 +568,9 @@ struct ieee80211_devcaps_req {
 	uint32_t	dc_drivercaps;		/* general driver caps */
 	uint32_t	dc_cryptocaps;		/* hardware crypto support */
 	uint32_t	dc_htcaps;		/* HT/802.11n support */
+#ifndef __HAIKU__
+	uint32_t	dc_vhtcaps;		/* VHT/802.11ac capabilities */
+#endif
 	struct ieee80211req_chaninfo dc_chaninfo;
 };
 #define	IEEE80211_DEVCAPS_SIZE(_nchan) \
@@ -708,6 +719,9 @@ struct ieee80211req {
 #define	IEEE80211_IOC_STBC		113	/* STBC Tx/RX (on, off) */
 #define	IEEE80211_IOC_LDPC		114	/* LDPC Tx/RX (on, off) */
 
+/* VHT */
+#define	IEEE80211_IOC_VHTCONF		130	/* VHT config (off, on; widths) */
+
 #define	IEEE80211_IOC_MESH_ID		170	/* mesh identifier */
 #define	IEEE80211_IOC_MESH_AP		171	/* accepting peerings */
 #define	IEEE80211_IOC_MESH_FWRD		172	/* forward frames */
@@ -824,7 +838,9 @@ struct ieee80211req_scan_result {
 	uint16_t	isr_ie_off;		/* offset to SSID+IE data */
 	uint16_t	isr_ie_len;		/* IE length */
 #ifdef __HAIKU__
-	struct ieee80211_channel	isr_chan;	/* Handing out the conmplete channel info */
+	uint32_t	isr_flags;		/* channel flags */
+	uint16_t	isr_freq;		/* MHz */
+	int8_t		padding[10];
 #else
 	uint16_t	isr_freq;		/* MHz */
 	uint16_t	isr_flags;		/* channel flags */

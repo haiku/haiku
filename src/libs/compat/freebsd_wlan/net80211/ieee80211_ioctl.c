@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2001 Atsushi Onoe
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -25,7 +27,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_ioctl.c 304715 2016-08-24 01:44:53Z bdrewery $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_ioctl.c 331797 2018-03-30 18:50:13Z brooks $");
 
 /*
  * IEEE 802.11 ioctl support (FreeBSD-specific)
@@ -42,7 +44,7 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_ioctl.c 304715 2016-08-24
 #include <sys/socket.h>
 #include <sys/sockio.h>
 #include <sys/systm.h>
- 
+
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_dl.h>
@@ -278,12 +280,8 @@ get_scan_result(void *arg, const struct ieee80211_scan_entry *se)
 	sr->isr_len = len;
 	sr->isr_ie_off = sizeof(struct ieee80211req_scan_result);
 	sr->isr_ie_len = ielen;
-#ifdef __HAIKU__
-	memcpy(&sr->isr_chan, se->se_chan, sizeof(sr->isr_chan));
-#else
 	sr->isr_freq = se->se_chan->ic_freq;
 	sr->isr_flags = se->se_chan->ic_flags;
-#endif
 	sr->isr_rssi = se->se_rssi;
 	sr->isr_noise = se->se_noise;
 	sr->isr_intval = se->se_intval;
@@ -351,7 +349,6 @@ ieee80211_ioctl_getscanresults(struct ieee80211vap *vap,
 }
 
 struct stainforeq {
-	struct ieee80211vap *vap;
 	struct ieee80211req_sta_info *si;
 	size_t	space;
 };
@@ -370,8 +367,6 @@ get_sta_space(void *arg, struct ieee80211_node *ni)
 	struct stainforeq *req = arg;
 	size_t ielen;
 
-	if (req->vap != ni->ni_vap)
-		return;
 	if (ni->ni_vap->iv_opmode == IEEE80211_M_HOSTAP &&
 	    ni->ni_associd == 0)	/* only associated stations */
 		return;
@@ -387,8 +382,6 @@ get_sta_info(void *arg, struct ieee80211_node *ni)
 	size_t ielen, len;
 	uint8_t *cp;
 
-	if (req->vap != ni->ni_vap)
-		return;
 	if (vap->iv_opmode == IEEE80211_M_HOSTAP &&
 	    ni->ni_associd == 0)	/* only associated stations */
 		return;
@@ -401,12 +394,8 @@ get_sta_info(void *arg, struct ieee80211_node *ni)
 	si->isi_len = len;
 	si->isi_ie_off = sizeof(struct ieee80211req_sta_info);
 	si->isi_ie_len = ielen;
-#ifdef __HAIKU__
-	memcpy(&si->isi_chan, ni->ni_chan, sizeof(si->isi_chan));
-#else
 	si->isi_freq = ni->ni_chan->ic_freq;
 	si->isi_flags = ni->ni_chan->ic_flags;
-#endif
 	si->isi_state = ni->ni_flags;
 	si->isi_authmode = ni->ni_authmode;
 	vap->iv_ic->ic_node_getsignal(ni, &si->isi_rssi, &si->isi_noise);
@@ -480,10 +469,10 @@ getstainfo_common(struct ieee80211vap *vap, struct ieee80211req *ireq,
 
 	error = 0;
 	req.space = 0;
-	req.vap = vap;
-	if (ni == NULL)
-		ieee80211_iterate_nodes(&ic->ic_sta, get_sta_space, &req);
-	else
+	if (ni == NULL) {
+		ieee80211_iterate_nodes_vap(&ic->ic_sta, vap, get_sta_space,
+		    &req);
+	} else
 		get_sta_space(&req, ni);
 	if (req.space > ireq->i_len)
 		req.space = ireq->i_len;
@@ -497,9 +486,10 @@ getstainfo_common(struct ieee80211vap *vap, struct ieee80211req *ireq,
 			goto bad;
 		}
 		req.si = p;
-		if (ni == NULL)
-			ieee80211_iterate_nodes(&ic->ic_sta, get_sta_info, &req);
-		else
+		if (ni == NULL) {
+			ieee80211_iterate_nodes_vap(&ic->ic_sta, vap,
+			    get_sta_info, &req);
+		} else
 			get_sta_info(&req, ni);
 		ireq->i_len = space - req.space;
 		error = copyout(p, (uint8_t *) ireq->i_data+off, ireq->i_len);
@@ -710,7 +700,11 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 	    sizeof(struct ieee80211_channel));
 	/* NB: require 1 so we know ic_nchans is accessible */
 	if (maxchans < 1)
+#ifndef __HAIKU__
 		return EINVAL;
+#else
+		maxchans = 0;
+#endif
 	/* constrain max request size, 2K channels is ~24Kbytes */
 	if (maxchans > 2048)
 		maxchans = 2048;
@@ -722,10 +716,18 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 	dc->dc_drivercaps = ic->ic_caps;
 	dc->dc_cryptocaps = ic->ic_cryptocaps;
 	dc->dc_htcaps = ic->ic_htcaps;
+#ifndef __HAIKU__
+	dc->dc_vhtcaps = ic->ic_vhtcaps;
+#endif
 	ci = &dc->dc_chaninfo;
 	ic->ic_getradiocaps(ic, maxchans, &ci->ic_nchans, ci->ic_chans);
 	KASSERT(ci->ic_nchans <= maxchans,
 	    ("nchans %d maxchans %d", ci->ic_nchans, maxchans));
+#ifdef __HAIKU__
+	if (maxchans == 0)
+		dc->dc_chaninfo.ic_nchans = 1; /* HACK: so it will really be 0 */
+	else
+#endif
 	ieee80211_sort_channels(ci->ic_chans, ci->ic_nchans);
 	error = copyout(dc, ireq->i_data, IEEE80211_DEVCAPS_SPACE(dc));
 	IEEE80211_FREE(dc, M_TEMP);
@@ -867,6 +869,8 @@ ieee80211_ioctl_get80211(struct ieee80211vap *vap, u_long cmd,
 		 * Tx power limit is the min of max regulatory
 		 * power, any user-set limit, and the max the
 		 * radio can do.
+		 *
+		 * TODO: methodize this
 		 */
 		ireq->i_val = 2*ic->ic_curchan->ic_maxregpower;
 		if (ireq->i_val > ic->ic_txpowlimit)
@@ -1025,6 +1029,7 @@ ieee80211_ioctl_get80211(struct ieee80211vap *vap, u_long cmd,
 			ireq->i_val |= 2;
 		break;
 	case IEEE80211_IOC_AMPDU_LIMIT:
+		/* XXX TODO: make this a per-node thing; and leave this as global */
 		if (vap->iv_opmode == IEEE80211_M_HOSTAP)
 			ireq->i_val = vap->iv_ampdu_rxmax;
 		else if (vap->iv_state == IEEE80211_S_RUN || vap->iv_state == IEEE80211_S_SLEEP)
@@ -1038,6 +1043,7 @@ ieee80211_ioctl_get80211(struct ieee80211vap *vap, u_long cmd,
 			ireq->i_val = vap->iv_ampdu_limit;
 		break;
 	case IEEE80211_IOC_AMPDU_DENSITY:
+		/* XXX TODO: make this a per-node thing; and leave this as global */
 		if (vap->iv_opmode == IEEE80211_M_STA &&
 		    (vap->iv_state == IEEE80211_S_RUN || vap->iv_state == IEEE80211_S_SLEEP))
 			/*
@@ -1143,6 +1149,29 @@ ieee80211_ioctl_get80211(struct ieee80211vap *vap, u_long cmd,
 		if (vap->iv_flags_ht & IEEE80211_FHT_STBC_RX)
 			ireq->i_val |= 2;
 		break;
+	case IEEE80211_IOC_LDPC:
+		ireq->i_val = 0;
+		if (vap->iv_flags_ht & IEEE80211_FHT_LDPC_TX)
+			ireq->i_val |= 1;
+		if (vap->iv_flags_ht & IEEE80211_FHT_LDPC_RX)
+			ireq->i_val |= 2;
+		break;
+
+	/* VHT */
+	case IEEE80211_IOC_VHTCONF:
+		ireq->i_val = 0;
+		if (vap->iv_flags_vht & IEEE80211_FVHT_VHT)
+			ireq->i_val |= 1;
+		if (vap->iv_flags_vht & IEEE80211_FVHT_USEVHT40)
+			ireq->i_val |= 2;
+		if (vap->iv_flags_vht & IEEE80211_FVHT_USEVHT80)
+			ireq->i_val |= 4;
+		if (vap->iv_flags_vht & IEEE80211_FVHT_USEVHT80P80)
+			ireq->i_val |= 8;
+		if (vap->iv_flags_vht & IEEE80211_FVHT_USEVHT160)
+			ireq->i_val |= 16;
+		break;
+
 	default:
 		error = ieee80211_ioctl_getdefault(vap, ireq);
 		break;
@@ -1216,7 +1245,15 @@ ieee80211_ioctl_setkey(struct ieee80211vap *vap, struct ieee80211req *ireq)
 		if (!ieee80211_crypto_setkey(vap, wk))
 			error = EIO;
 		else if ((ik.ik_flags & IEEE80211_KEY_DEFAULT))
-			vap->iv_def_txkey = kid;
+			/*
+			 * Inform the driver that this is the default
+			 * transmit key.  Now, ideally we'd just set
+			 * a flag in the key update that would
+			 * say "yes, we're the default key", but
+			 * that currently isn't the way the ioctl ->
+			 * key interface works.
+			 */
+			ieee80211_crypto_set_deftxkey(vap, kid);
 	} else
 		error = ENXIO;
 	ieee80211_key_update_end(vap);
@@ -1326,7 +1363,7 @@ domlme(void *arg, struct ieee80211_node *ni)
 	 * NB: if ni_associd is zero then the node is already cleaned
 	 * up and we don't need to do this (we're safely holding a
 	 * reference but should otherwise not modify it's state).
-	 */ 
+	 */
 	if (ni->ni_associd == 0)
 		return;
 	mlmedebug(vap, ni->ni_macaddr, mop->op, mop->reason);
@@ -1608,26 +1645,26 @@ ieee80211_ioctl_setmlme(struct ieee80211vap *vap, struct ieee80211req *ireq)
 	if  (vap->iv_opmode == IEEE80211_M_STA &&
 	    mlme.im_op == IEEE80211_MLME_ASSOC)
 #ifndef __HAIKU__
-		return setmlme_assoc_sta(vap, mlme.im_macaddr,
-			vap->iv_des_ssid[0].len, vap->iv_des_ssid[0].ssid);
+		   return setmlme_assoc_sta(vap, mlme.im_macaddr,
+				   vap->iv_des_ssid[0].len, vap->iv_des_ssid[0].ssid);
 #else
-		/*	The wpa_supplicant (rightfully) supplies the SSID with this request.
-			However, with the code above it gets ignored and the desired SSID,
-			as set by IEEE80211_IOC_SSID is used instead. This still works if
-			the wpa_supplicant is the only client in use and IEEE80211_IOC_SSID
-			is never used, as then the mlme.im_macaddr is used as the only
-			identifying element. If we used IEEE80211_IOC_SSID before though,
-			for example because we joined an open network from the net_server
-			directly, there will always be a mismatch between the desired SSID
-			and the one the wpa_supplicant tries to associate with using this
-			MLME request. No association is then possible. As there is no
-			obvious reason why the request supplied SSID shouldn't be used, we
-			simply do so. */
+	   /* The wpa_supplicant (rightfully) supplies the SSID with this request.
+		  However, with the code above it gets ignored and the desired SSID,
+		  as set by IEEE80211_IOC_SSID is used instead. This still works if
+		  the wpa_supplicant is the only client in use and IEEE80211_IOC_SSID
+		  is never used, as then the mlme.im_macaddr is used as the only
+		  identifying element. If we used IEEE80211_IOC_SSID before though,
+		  for example because we joined an open network from the net_server
+		  directly, there will always be a mismatch between the desired SSID
+		  and the one the wpa_supplicant tries to associate with using this
+		  MLME request. No association is then possible. As there is no
+		  obvious reason why the request supplied SSID shouldn't be used, we
+		  simply do so. */
 		return setmlme_assoc_sta(vap, mlme.im_macaddr,
 			mlme.im_ssid_len, mlme.im_ssid);
 #endif
-	else if ((vap->iv_opmode == IEEE80211_M_IBSS || 
-	    vap->iv_opmode == IEEE80211_M_AHDEMO) && 
+	else if ((vap->iv_opmode == IEEE80211_M_IBSS ||
+	    vap->iv_opmode == IEEE80211_M_AHDEMO) &&
 	    mlme.im_op == IEEE80211_MLME_ASSOC)
 		return setmlme_assoc_adhoc(vap, mlme.im_macaddr,
 		    mlme.im_ssid_len, mlme.im_ssid);
@@ -1886,6 +1923,8 @@ findchannel(struct ieee80211com *ic, int ieee, int mode)
 	    /* NB: handled specially below */
 	    [IEEE80211_MODE_11NA]	= IEEE80211_CHAN_A,
 	    [IEEE80211_MODE_11NG]	= IEEE80211_CHAN_G,
+	    [IEEE80211_MODE_VHT_5GHZ]	= IEEE80211_CHAN_A,
+	    [IEEE80211_MODE_VHT_2GHZ]	= IEEE80211_CHAN_G,
 	};
 	u_int modeflags;
 	int i;
@@ -1910,11 +1949,27 @@ findchannel(struct ieee80211com *ic, int ieee, int mode)
 			    !find11gchannel(ic, i, c->ic_freq))
 				return c;
 		} else {
-			/* must check HT specially */
+			/* must check VHT specifically */
+			if ((mode == IEEE80211_MODE_VHT_5GHZ ||
+			    mode == IEEE80211_MODE_VHT_2GHZ) &&
+			    !IEEE80211_IS_CHAN_VHT(c))
+				continue;
+
+			/*
+			 * Must check HT specially - only match on HT,
+			 * not HT+VHT channels
+			 */
 			if ((mode == IEEE80211_MODE_11NA ||
 			    mode == IEEE80211_MODE_11NG) &&
 			    !IEEE80211_IS_CHAN_HT(c))
 				continue;
+
+			if ((mode == IEEE80211_MODE_11NA ||
+			    mode == IEEE80211_MODE_11NG) &&
+			    IEEE80211_IS_CHAN_VHT(c))
+				continue;
+
+			/* Check that the modeflags above match */
 			if ((c->ic_flags & modeflags) == modeflags)
 				return c;
 		}
@@ -1989,9 +2044,10 @@ setcurchan(struct ieee80211vap *vap, struct ieee80211_channel *c)
 			/* XXX need state machine for other vap's to follow */
 			ieee80211_setcurchan(ic, vap->iv_des_chan);
 			vap->iv_bss->ni_chan = ic->ic_curchan;
-		} else
+		} else {
 			ic->ic_curchan = vap->iv_des_chan;
 			ic->ic_rt = ieee80211_get_ratetable(ic->ic_curchan);
+		}
 	} else {
 		/*
 		 * Need to go through the state machine in case we
@@ -2038,6 +2094,7 @@ ieee80211_ioctl_setchannel(struct ieee80211vap *vap,
 			if (c == NULL)
 				return EINVAL;
 		}
+
 		/*
 		 * Fine tune channel selection based on desired mode:
 		 *   if 11b is requested, find the 11b version of any
@@ -2048,6 +2105,9 @@ ieee80211_ioctl_setchannel(struct ieee80211vap *vap,
 		 *      11a channel returned,
 		 *   if 11ng is requested, find the ht version of any
 		 *      11g channel returned,
+		 *   if 11ac is requested, find the 11ac version
+		 *      of any 11a/11na channel returned,
+		 *   (TBD) 11acg (2GHz VHT)
 		 *   otherwise we should be ok with what we've got.
 		 */
 		switch (vap->iv_des_mode) {
@@ -2084,6 +2144,17 @@ ieee80211_ioctl_setchannel(struct ieee80211vap *vap,
 					c = c2;
 			}
 			break;
+		case IEEE80211_MODE_VHT_2GHZ:
+			printf("%s: TBD\n", __func__);
+			break;
+		case IEEE80211_MODE_VHT_5GHZ:
+			if (IEEE80211_IS_CHAN_A(c)) {
+				c2 = findchannel(ic, ireq->i_val,
+					IEEE80211_MODE_VHT_5GHZ);
+				if (c2 != NULL)
+					c = c2;
+			}
+			break;
 		default:		/* NB: no static turboG */
 			break;
 		}
@@ -2109,6 +2180,7 @@ ieee80211_ioctl_setcurchan(struct ieee80211vap *vap,
 	error = copyin(ireq->i_data, &chan, sizeof(chan));
 	if (error != 0)
 		return error;
+
 	/* XXX 0xffff overflows 16-bit signed */
 	if (chan.ic_freq == 0 || chan.ic_freq == IEEE80211_CHAN_ANY) {
 		c = IEEE80211_CHAN_ANYC;
@@ -2185,13 +2257,19 @@ checkrate(const struct ieee80211_rateset *rs, int rate)
 }
 
 static int
-checkmcs(int mcs)
+checkmcs(const struct ieee80211_htrateset *rs, int mcs)
 {
+	int rate_val = IEEE80211_RV(mcs);
+	int i;
+
 	if (mcs == IEEE80211_FIXED_RATE_NONE)
 		return 1;
 	if ((mcs & IEEE80211_RATE_MCS) == 0)	/* MCS always have 0x80 set */
 		return 0;
-	return (mcs & 0x7f) <= 15;	/* XXX could search ht rate set */
+	for (i = 0; i < rs->rs_nrates; i++)
+		if (IEEE80211_RV(rs->rs_rates[i]) == rate_val)
+			return 1;
+	return 0;
 }
 
 static int
@@ -2201,6 +2279,7 @@ ieee80211_ioctl_settxparams(struct ieee80211vap *vap,
 	struct ieee80211com *ic = vap->iv_ic;
 	struct ieee80211_txparams_req parms;	/* XXX stack use? */
 	struct ieee80211_txparam *src, *dst;
+	const struct ieee80211_htrateset *rs_ht;
 	const struct ieee80211_rateset *rs;
 	int error, mode, changed, is11n, nmodes;
 
@@ -2219,23 +2298,24 @@ ieee80211_ioctl_settxparams(struct ieee80211vap *vap,
 		src = &parms.params[mode];
 		dst = &vap->iv_txparms[mode];
 		rs = &ic->ic_sup_rates[mode];	/* NB: 11n maps to legacy */
+		rs_ht = &ic->ic_sup_htrates;
 		is11n = (mode == IEEE80211_MODE_11NA ||
 			 mode == IEEE80211_MODE_11NG);
 		if (src->ucastrate != dst->ucastrate) {
 			if (!checkrate(rs, src->ucastrate) &&
-			    (!is11n || !checkmcs(src->ucastrate)))
+			    (!is11n || !checkmcs(rs_ht, src->ucastrate)))
 				return EINVAL;
 			changed++;
 		}
 		if (src->mcastrate != dst->mcastrate) {
 			if (!checkrate(rs, src->mcastrate) &&
-			    (!is11n || !checkmcs(src->mcastrate)))
+			    (!is11n || !checkmcs(rs_ht, src->mcastrate)))
 				return EINVAL;
 			changed++;
 		}
 		if (src->mgmtrate != dst->mgmtrate) {
 			if (!checkrate(rs, src->mgmtrate) &&
-			    (!is11n || !checkmcs(src->mgmtrate)))
+			    (!is11n || !checkmcs(rs_ht, src->mgmtrate)))
 				return EINVAL;
 			changed++;
 		}
@@ -2716,7 +2796,17 @@ ieee80211_ioctl_set80211(struct ieee80211vap *vap, u_long cmd, struct ieee80211r
 		if (kid >= IEEE80211_WEP_NKID &&
 		    (uint16_t) kid != IEEE80211_KEYIX_NONE)
 			return EINVAL;
-		vap->iv_def_txkey = kid;
+		/*
+		 * Firmware devices may need to be told about an explicit
+		 * key index here, versus just inferring it from the
+		 * key set / change.  Since we may also need to pause
+		 * things like transmit before the key is updated,
+		 * give the driver a chance to flush things by tying
+		 * into key update begin/end.
+		 */
+		ieee80211_key_update_begin(vap);
+		ieee80211_crypto_set_deftxkey(vap, kid);
+		ieee80211_key_update_end(vap);
 		break;
 	case IEEE80211_IOC_AUTHMODE:
 		switch (ireq->i_val) {
@@ -3123,6 +3213,7 @@ ieee80211_ioctl_set80211(struct ieee80211vap *vap, u_long cmd, struct ieee80211r
 			error = ERESTART;
 		break;
 	case IEEE80211_IOC_AMPDU_LIMIT:
+		/* XXX TODO: figure out ampdu_limit versus ampdu_rxmax */
 		if (!(IEEE80211_HTCAP_MAXRXAMPDU_8K <= ireq->i_val &&
 		      ireq->i_val <= IEEE80211_HTCAP_MAXRXAMPDU_64K))
 			return EINVAL;
@@ -3327,6 +3418,62 @@ ieee80211_ioctl_set80211(struct ieee80211vap *vap, u_long cmd, struct ieee80211r
 		if (isvapht(vap))
 			error = ERESTART;
 		break;
+	case IEEE80211_IOC_LDPC:
+		/* Check if we can do LDPC TX/RX before changing the setting */
+		if ((ireq->i_val & 1) &&
+		    (vap->iv_htcaps & IEEE80211_HTC_TXLDPC) == 0)
+			return EOPNOTSUPP;
+		if ((ireq->i_val & 2) &&
+		    (vap->iv_htcaps & IEEE80211_HTCAP_LDPC) == 0)
+			return EOPNOTSUPP;
+
+		/* TX */
+		if (ireq->i_val & 1)
+			vap->iv_flags_ht |= IEEE80211_FHT_LDPC_TX;
+		else
+			vap->iv_flags_ht &= ~IEEE80211_FHT_LDPC_TX;
+
+		/* RX */
+		if (ireq->i_val & 2)
+			vap->iv_flags_ht |= IEEE80211_FHT_LDPC_RX;
+		else
+			vap->iv_flags_ht &= ~IEEE80211_FHT_LDPC_RX;
+
+		/* NB: reset only if we're operating on an 11n channel */
+		if (isvapht(vap))
+			error = ERESTART;
+		break;
+
+	/* VHT */
+	case IEEE80211_IOC_VHTCONF:
+		if (ireq->i_val & 1)
+			ieee80211_syncflag_vht(vap, IEEE80211_FVHT_VHT);
+		else
+			ieee80211_syncflag_vht(vap, -IEEE80211_FVHT_VHT);
+
+		if (ireq->i_val & 2)
+			ieee80211_syncflag_vht(vap, IEEE80211_FVHT_USEVHT40);
+		else
+			ieee80211_syncflag_vht(vap, -IEEE80211_FVHT_USEVHT40);
+
+		if (ireq->i_val & 4)
+			ieee80211_syncflag_vht(vap, IEEE80211_FVHT_USEVHT80);
+		else
+			ieee80211_syncflag_vht(vap, -IEEE80211_FVHT_USEVHT80);
+
+		if (ireq->i_val & 8)
+			ieee80211_syncflag_vht(vap, IEEE80211_FVHT_USEVHT80P80);
+		else
+			ieee80211_syncflag_vht(vap, -IEEE80211_FVHT_USEVHT80P80);
+
+		if (ireq->i_val & 16)
+			ieee80211_syncflag_vht(vap, IEEE80211_FVHT_USEVHT160);
+		else
+			ieee80211_syncflag_vht(vap, -IEEE80211_FVHT_USEVHT160);
+
+		error = ENETRESET;
+		break;
+
 	default:
 		error = ieee80211_ioctl_setdefault(vap, ireq);
 		break;
@@ -3376,9 +3523,7 @@ ieee80211_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 			 * 3. In monitor (or adhoc-demo) mode.
 			 */
 			if (ifp->if_bridge == NULL ||
-#ifndef __HAIKU__
 			    (ifp->if_flags & IFF_PPROMISC) != 0 ||
-#endif
 			    vap->iv_opmode == IEEE80211_M_MONITOR ||
 			    (vap->iv_opmode == IEEE80211_M_AHDEMO &&
 			    (vap->iv_caps & IEEE80211_C_TDMA) == 0)) {
@@ -3450,7 +3595,8 @@ ieee80211_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		break;
 	case SIOCG80211STATS:
 		ifr = (struct ifreq *)data;
-		copyout(&vap->iv_stats, ifr->ifr_data, sizeof (vap->iv_stats));
+		copyout(&vap->iv_stats, ifr_data_get_ptr(ifr),
+		    sizeof (vap->iv_stats));
 		break;
 	case SIOCSIFMTU:
 		ifr = (struct ifreq *)data;

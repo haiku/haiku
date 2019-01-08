@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2001 Atsushi Onoe
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * Copyright (c) 2012 IEEE
@@ -26,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_proto.c 298995 2016-05-03 18:05:43Z pfg $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_proto.c 326737 2017-12-09 23:16:02Z adrian $");
 
 /*
  * IEEE 802.11 protocol support.
@@ -241,7 +243,7 @@ static void update_mcast(void *, int);
 static void update_promisc(void *, int);
 static void update_channel(void *, int);
 static void update_chw(void *, int);
-static void update_wme(void *, int);
+static void vap_update_wme(void *, int);
 static void restart_vaps(void *, int);
 static void ieee80211_newstate_cb(void *, int);
 
@@ -280,7 +282,6 @@ ieee80211_proto_attach(struct ieee80211com *ic)
 	TASK_INIT(&ic->ic_chan_task, 0, update_channel, ic);
 	TASK_INIT(&ic->ic_bmiss_task, 0, beacon_miss, ic);
 	TASK_INIT(&ic->ic_chw_task, 0, update_chw, ic);
-	TASK_INIT(&ic->ic_wme_task, 0, update_wme, ic);
 	TASK_INIT(&ic->ic_restart_task, 0, restart_vaps, ic);
 
 	ic->ic_wme.wme_hipri_switch_hysteresis =
@@ -338,6 +339,7 @@ ieee80211_proto_vattach(struct ieee80211vap *vap)
 	callout_init(&vap->iv_mgtsend, 1);
 	TASK_INIT(&vap->iv_nstate_task, 0, ieee80211_newstate_cb, vap);
 	TASK_INIT(&vap->iv_swbmiss_task, 0, beacon_swmiss, vap);
+	TASK_INIT(&vap->iv_wme_task, 0, vap_update_wme, vap);
 	/*
 	 * Install default tx rate handling: no fixed rate, lowest
 	 * supported rate for mgmt and multicast frames.  Default
@@ -369,7 +371,7 @@ ieee80211_proto_vattach(struct ieee80211vap *vap)
 		} else {
 			vap->iv_txparms[i].mgmtrate =
 			    rs->rs_rates[0] & IEEE80211_RATE_VAL;
-			vap->iv_txparms[i].mcastrate =
+			vap->iv_txparms[i].mcastrate = 
 			    rs->rs_rates[0] & IEEE80211_RATE_VAL;
 		}
 #endif
@@ -447,16 +449,14 @@ static const struct ieee80211_authenticator auth_internal = {
 /*
  * Setup internal authenticators once; they are never unregistered.
  */
-void
+static void
 ieee80211_auth_setup(void)
 {
 	ieee80211_authenticator_register(IEEE80211_AUTH_OPEN, &auth_internal);
 	ieee80211_authenticator_register(IEEE80211_AUTH_SHARED, &auth_internal);
 	ieee80211_authenticator_register(IEEE80211_AUTH_AUTO, &auth_internal);
 }
-#if 0
 SYSINIT(wlan_auth, SI_SUB_DRIVERS, SI_ORDER_FIRST, ieee80211_auth_setup, NULL);
-#endif
 
 const struct ieee80211_authenticator *
 ieee80211_authenticator_get(int auth)
@@ -583,7 +583,7 @@ ieee80211_dump_pkt(struct ieee80211com *ic,
 		break;
 	}
 	if (IEEE80211_QOS_HAS_SEQ(wh)) {
-		const struct ieee80211_qosframe *qwh =
+		const struct ieee80211_qosframe *qwh = 
 			(const struct ieee80211_qosframe *)buf;
 		printf(" QoS [TID %u%s]", qwh->i_qos[0] & IEEE80211_QOS_TID,
 			qwh->i_qos[0] & IEEE80211_QOS_ACKPOLICY ? " ACM" : "");
@@ -844,6 +844,9 @@ setbasicrates(struct ieee80211_rateset *rs,
 	    [IEEE80211_MODE_11NA]	= { 3, { 12, 24, 48 } },
 					    /* NB: mixed b/g */
 	    [IEEE80211_MODE_11NG]	= { 4, { 2, 4, 11, 22 } },
+					    /* NB: mixed b/g */
+	    [IEEE80211_MODE_VHT_2GHZ]	= { 4, { 2, 4, 11, 22 } },
+	    [IEEE80211_MODE_VHT_5GHZ]	= { 3, { 12, 24, 48 } },
 	};
 	int i, j;
 
@@ -908,6 +911,8 @@ static const struct phyParamType phyParamForAC_BE[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_QUARTER]= { 3, 4,  6,  0, 0 },
 	[IEEE80211_MODE_11NA]	= { 3, 4,  6,  0, 0 },
 	[IEEE80211_MODE_11NG]	= { 3, 4,  6,  0, 0 },
+	[IEEE80211_MODE_VHT_2GHZ]	= { 3, 4,  6,  0, 0 },
+	[IEEE80211_MODE_VHT_5GHZ]	= { 3, 4,  6,  0, 0 },
 };
 static const struct phyParamType phyParamForAC_BK[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_AUTO]	= { 7, 4, 10,  0, 0 },
@@ -922,6 +927,8 @@ static const struct phyParamType phyParamForAC_BK[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_QUARTER]= { 7, 4, 10,  0, 0 },
 	[IEEE80211_MODE_11NA]	= { 7, 4, 10,  0, 0 },
 	[IEEE80211_MODE_11NG]	= { 7, 4, 10,  0, 0 },
+	[IEEE80211_MODE_VHT_2GHZ]	= { 7, 4, 10,  0, 0 },
+	[IEEE80211_MODE_VHT_5GHZ]	= { 7, 4, 10,  0, 0 },
 };
 static const struct phyParamType phyParamForAC_VI[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_AUTO]	= { 1, 3, 4,  94, 0 },
@@ -936,6 +943,8 @@ static const struct phyParamType phyParamForAC_VI[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_QUARTER]= { 1, 3, 4,  94, 0 },
 	[IEEE80211_MODE_11NA]	= { 1, 3, 4,  94, 0 },
 	[IEEE80211_MODE_11NG]	= { 1, 3, 4,  94, 0 },
+	[IEEE80211_MODE_VHT_2GHZ]	= { 1, 3, 4,  94, 0 },
+	[IEEE80211_MODE_VHT_5GHZ]	= { 1, 3, 4,  94, 0 },
 };
 static const struct phyParamType phyParamForAC_VO[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_AUTO]	= { 1, 2, 3,  47, 0 },
@@ -950,6 +959,8 @@ static const struct phyParamType phyParamForAC_VO[IEEE80211_MODE_MAX] = {
 	[IEEE80211_MODE_QUARTER]= { 1, 2, 3,  47, 0 },
 	[IEEE80211_MODE_11NA]	= { 1, 2, 3,  47, 0 },
 	[IEEE80211_MODE_11NG]	= { 1, 2, 3,  47, 0 },
+	[IEEE80211_MODE_VHT_2GHZ]	= { 1, 2, 3,  47, 0 },
+	[IEEE80211_MODE_VHT_5GHZ]	= { 1, 2, 3,  47, 0 },
 };
 
 static const struct phyParamType bssPhyParamForAC_BE[IEEE80211_MODE_MAX] = {
@@ -999,8 +1010,8 @@ static void
 _setifsparams(struct wmeParams *wmep, const paramType *phy)
 {
 	wmep->wmep_aifsn = phy->aifsn;
-	wmep->wmep_logcwmin = phy->logcwmin;
-	wmep->wmep_logcwmax = phy->logcwmax;
+	wmep->wmep_logcwmin = phy->logcwmin;	
+	wmep->wmep_logcwmax = phy->logcwmax;		
 	wmep->wmep_txopLimit = phy->txopLimit;
 }
 
@@ -1077,7 +1088,7 @@ ieee80211_wme_initparams_locked(struct ieee80211vap *vap)
 			setwmeparams(vap, "chan", i, wmep, pPhyParam);
 		} else {
 			setwmeparams(vap, "chan", i, wmep, pBssPhyParam);
-		}
+		}	
 		wmep = &wme->wme_wmeBssChanParams.cap_wmeParams[i];
 		setwmeparams(vap, "bss ", i, wmep, pBssPhyParam);
 	}
@@ -1125,6 +1136,8 @@ ieee80211_wme_updateparams_locked(struct ieee80211vap *vap)
 	    [IEEE80211_MODE_QUARTER]	= { 2, 4, 10, 64, 0 },
 	    [IEEE80211_MODE_11NA]	= { 2, 4, 10, 64, 0 },	/* XXXcheck*/
 	    [IEEE80211_MODE_11NG]	= { 2, 4, 10, 64, 0 },	/* XXXcheck*/
+	    [IEEE80211_MODE_VHT_2GHZ]	= { 2, 4, 10, 64, 0 },	/* XXXcheck*/
+	    [IEEE80211_MODE_VHT_5GHZ]	= { 2, 4, 10, 64, 0 },	/* XXXcheck*/
 	};
 	struct ieee80211com *ic = vap->iv_ic;
 	struct ieee80211_wme_state *wme = &ic->ic_wme;
@@ -1203,7 +1216,7 @@ ieee80211_wme_updateparams_locked(struct ieee80211vap *vap)
 	/* XXX WDS? */
 
 	/* XXX MBSS? */
-
+	
 	if (do_aggrmode) {
 		chanp = &wme->wme_chanParams.cap_wmeParams[WME_AC_BE];
 		bssp = &wme->wme_bssChanParams.cap_wmeParams[WME_AC_BE];
@@ -1215,7 +1228,7 @@ ieee80211_wme_updateparams_locked(struct ieee80211vap *vap)
 		    aggrParam[mode].logcwmax;
 		chanp->wmep_txopLimit = bssp->wmep_txopLimit =
 		    (vap->iv_flags & IEEE80211_F_BURST) ?
-			aggrParam[mode].txopLimit : 0;
+			aggrParam[mode].txopLimit : 0;		
 		IEEE80211_DPRINTF(vap, IEEE80211_MSG_WME,
 		    "update %s (chan+bss) [acm %u aifsn %u logcwmin %u "
 		    "logcwmax %u txop %u]\n", ieee80211_wme_acnames[WME_AC_BE],
@@ -1245,6 +1258,8 @@ ieee80211_wme_updateparams_locked(struct ieee80211vap *vap)
 		    [IEEE80211_MODE_QUARTER]	= 3,
 		    [IEEE80211_MODE_11NA]	= 3,
 		    [IEEE80211_MODE_11NG]	= 3,
+		    [IEEE80211_MODE_VHT_2GHZ]	= 3,
+		    [IEEE80211_MODE_VHT_5GHZ]	= 3,
 		};
 		chanp = &wme->wme_chanParams.cap_wmeParams[WME_AC_BE];
 		bssp = &wme->wme_bssChanParams.cap_wmeParams[WME_AC_BE];
@@ -1272,7 +1287,7 @@ ieee80211_wme_updateparams_locked(struct ieee80211vap *vap)
 	}
 
 	/* schedule the deferred WME update */
-	ieee80211_runtask(ic, &ic->ic_wme_task);
+	ieee80211_runtask(ic, &vap->iv_wme_task);
 
 	IEEE80211_DPRINTF(vap, IEEE80211_MSG_WME,
 	    "%s: WME params updated, cap_info 0x%x\n", __func__,
@@ -1291,6 +1306,52 @@ ieee80211_wme_updateparams(struct ieee80211vap *vap)
 		ieee80211_wme_updateparams_locked(vap);
 		IEEE80211_UNLOCK(ic);
 	}
+}
+
+/*
+ * Fetch the WME parameters for the given VAP.
+ *
+ * When net80211 grows p2p, etc support, this may return different
+ * parameters for each VAP.
+ */
+void
+ieee80211_wme_vap_getparams(struct ieee80211vap *vap, struct chanAccParams *wp)
+{
+
+	memcpy(wp, &vap->iv_ic->ic_wme.wme_chanParams, sizeof(*wp));
+}
+
+/*
+ * For NICs which only support one set of WME paramaters (ie, softmac NICs)
+ * there may be different VAP WME parameters but only one is "active".
+ * This returns the "NIC" WME parameters for the currently active
+ * context.
+ */
+void
+ieee80211_wme_ic_getparams(struct ieee80211com *ic, struct chanAccParams *wp)
+{
+
+	memcpy(wp, &ic->ic_wme.wme_chanParams, sizeof(*wp));
+}
+
+/*
+ * Return whether to use QoS on a given WME queue.
+ *
+ * This is intended to be called from the transmit path of softmac drivers
+ * which are setting NoAck bits in transmit descriptors.
+ *
+ * Ideally this would be set in some transmit field before the packet is
+ * queued to the driver but net80211 isn't quite there yet.
+ */
+int
+ieee80211_wme_vap_ac_is_noack(struct ieee80211vap *vap, int ac)
+{
+	/* Bounds/sanity check */
+	if (ac < 0 || ac >= WME_NUM_AC)
+		return (0);
+
+	/* Again, there's only one global context for now */
+	return (!! vap->iv_ic->ic_wme.wme_chanParams.cap_wmeParams[ac].wmep_noackPolicy);
 }
 
 static void
@@ -1337,15 +1398,25 @@ update_chw(void *arg, int npending)
 	ic->ic_update_chw(ic);
 }
 
+/*
+ * Deferred WME update.
+ *
+ * In preparation for per-VAP WME configuration, call the VAP
+ * method if the VAP requires it.  Otherwise, just call the
+ * older global method.  There isn't a per-VAP WME configuration
+ * just yet so for now just use the global configuration.
+ */
 static void
-update_wme(void *arg, int npending)
+vap_update_wme(void *arg, int npending)
 {
-	struct ieee80211com *ic = arg;
+	struct ieee80211vap *vap = arg;
+	struct ieee80211com *ic = vap->iv_ic;
 
-	/*
-	 * XXX should we defer the WME configuration update until now?
-	 */
-	ic->ic_wme.wme_update(ic);
+	if (vap->iv_wme_update != NULL)
+		vap->iv_wme_update(vap,
+		    ic->ic_wme.wme_chanParams.cap_wmeParams);
+	else
+		ic->ic_wme.wme_update(ic);
 }
 
 static void
@@ -1372,7 +1443,6 @@ ieee80211_waitfor_parent(struct ieee80211com *ic)
 	ieee80211_draintask(ic, &ic->ic_chan_task);
 	ieee80211_draintask(ic, &ic->ic_bmiss_task);
 	ieee80211_draintask(ic, &ic->ic_chw_task);
-	ieee80211_draintask(ic, &ic->ic_wme_task);
 	taskqueue_unblock(ic->ic_tq);
 }
 
@@ -1469,7 +1539,7 @@ ieee80211_start_locked(struct ieee80211vap *vap)
 			 * we should be able to apply any new state/parameters
 			 * simply by re-associating.  Otherwise we need to
 			 * re-scan to select an appropriate ap.
-			 */
+			 */ 
 			if (vap->iv_state >= IEEE80211_S_RUN)
 				ieee80211_new_state_locked(vap,
 				    IEEE80211_S_ASSOC, 1);
@@ -1842,7 +1912,7 @@ ieee80211_cac_completeswitch(struct ieee80211vap *vap0)
 	ieee80211_new_state_locked(vap0, IEEE80211_S_RUN, 0);
 
 	TAILQ_FOREACH(vap, &ic->ic_vaps, iv_next)
-		if (vap->iv_state == IEEE80211_S_CAC)
+		if (vap->iv_state == IEEE80211_S_CAC && vap != vap0)
 			ieee80211_new_state_locked(vap, IEEE80211_S_RUN, 0);
 	IEEE80211_UNLOCK(ic);
 }

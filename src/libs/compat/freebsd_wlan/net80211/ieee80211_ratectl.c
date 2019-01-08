@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2010 Rui Paulo <rpaulo@FreeBSD.org>
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_ratectl.c 296925 2016-03-16 02:07:04Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_ratectl.c 326272 2017-11-27 15:23:17Z pfg $");
 
 #include <sys/param.h>
 #include <sys/kernel.h>
@@ -52,30 +54,6 @@ static const char *ratectl_modnames[IEEE80211_RATECTL_MAX] = {
 };
 
 MALLOC_DEFINE(M_80211_RATECTL, "80211ratectl", "802.11 rate control");
-
-#if defined(__HAIKU__)
-/*
- * Setup ratectl support for a device/shared instance.
- */
-void
-ieee80211_ratectl_attach(struct ieee80211com *ic)
-{
-	ieee80211_ratectl_none_load();
-	ieee80211_ratectl_amrr_load();
-	ieee80211_ratectl_rssadapt_load();
-}
-
-/*
- * Teardown ratectl support.
- */
-void
-ieee80211_ratectl_detach(struct ieee80211com *ic)
-{
-	ieee80211_ratectl_none_unload();
-	ieee80211_ratectl_amrr_unload();
-	ieee80211_ratectl_rssadapt_unload();
-}
-#endif
 
 void
 ieee80211_ratectl_register(int type, const struct ieee80211_ratectl *ratectl)

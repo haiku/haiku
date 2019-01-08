@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2009 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -22,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/net80211/ieee80211_superg.h 302283 2016-06-29 17:25:46Z avos $
+ * $FreeBSD: releng/12.0/sys/net80211/ieee80211_superg.h 326272 2017-11-27 15:23:17Z pfg $
  */
 #ifndef _NET80211_IEEE80211_SUPERG_H_
 #define _NET80211_IEEE80211_SUPERG_H_
@@ -66,6 +68,8 @@ struct ieee80211_stageq {
 struct ieee80211_superg {
 	/* fast-frames staging q */
 	struct ieee80211_stageq	ff_stageq[WME_NUM_AC];
+	/* flush queues automatically */
+	struct timeout_task	ff_qtimer;
 };
 
 void	ieee80211_superg_attach(struct ieee80211com *);

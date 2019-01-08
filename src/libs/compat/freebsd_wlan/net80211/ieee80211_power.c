@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_power.c 297405 2016-03-30 00:44:10Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_power.c 326272 2017-11-27 15:23:17Z pfg $");
 
 /*
  * IEEE 802.11 power save support.
@@ -32,10 +34,10 @@ __FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_power.c 297405 2016-03-30
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h>
+#include <sys/systm.h> 
 #include <sys/kernel.h>
 #include <sys/malloc.h>
-
+ 
 #include <sys/socket.h>
 
 #include <net/if.h>

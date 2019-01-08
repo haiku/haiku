@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2007-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
@@ -24,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/net80211/ieee80211_phy.c 300232 2016-05-19 21:08:33Z avos $");
+__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_phy.c 326272 2017-11-27 15:23:17Z pfg $");
 
 /*
  * IEEE 802.11 PHY-related support.
@@ -347,7 +349,7 @@ ieee80211_setup_ratetable(struct ieee80211_rate_table *rt)
 }
 
 /* Setup all rate tables */
-void
+static void
 ieee80211_phy_init(void)
 {
 	static struct ieee80211_rate_table * const ratetables[] = {
@@ -367,9 +369,7 @@ ieee80211_phy_init(void)
 		ieee80211_setup_ratetable(ratetables[i]);
 
 }
-#if 0
 SYSINIT(wlan_phy, SI_SUB_DRIVERS, SI_ORDER_FIRST, ieee80211_phy_init, NULL);
-#endif
 
 const struct ieee80211_rate_table *
 ieee80211_get_ratetable(struct ieee80211_channel *c)

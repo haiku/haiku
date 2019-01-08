@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2001 Atsushi Onoe
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -23,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/net80211/ieee80211_proto.h 298995 2016-05-03 18:05:43Z pfg $
+ * $FreeBSD: releng/12.0/sys/net80211/ieee80211_proto.h 330688 2018-03-09 11:33:56Z avos $
  */
 #ifndef _NET80211_IEEE80211_PROTO_H_
 #define _NET80211_IEEE80211_PROTO_H_
@@ -31,7 +33,6 @@
 /*
  * 802.11 protocol implementation definitions.
  */
-void ieee80211_auth_setup(void);
 
 enum ieee80211_state {
 	IEEE80211_S_INIT	= 0,	/* default state */
@@ -78,16 +79,15 @@ void	ieee80211_promisc(struct ieee80211vap *, bool);
 void	ieee80211_allmulti(struct ieee80211vap *, bool);
 void	ieee80211_syncflag(struct ieee80211vap *, int flag);
 void	ieee80211_syncflag_ht(struct ieee80211vap *, int flag);
+void	ieee80211_syncflag_vht(struct ieee80211vap *, int flag);
 void	ieee80211_syncflag_ext(struct ieee80211vap *, int flag);
 
 #define	ieee80211_input(ni, m, rssi, nf) \
 	((ni)->ni_vap->iv_input(ni, m, NULL, rssi, nf))
 int	ieee80211_input_all(struct ieee80211com *, struct mbuf *, int, int);
 
-int	ieee80211_input_mimo(struct ieee80211_node *, struct mbuf *,
-	    struct ieee80211_rx_stats *);
-int	ieee80211_input_mimo_all(struct ieee80211com *, struct mbuf *,
-	    struct ieee80211_rx_stats *);
+int	ieee80211_input_mimo(struct ieee80211_node *, struct mbuf *);
+int	ieee80211_input_mimo_all(struct ieee80211com *, struct mbuf *);
 
 struct ieee80211_bpf_params;
 int	ieee80211_mgmt_output(struct ieee80211_node *, struct mbuf *, int,
@@ -140,6 +140,8 @@ struct mbuf *ieee80211_alloc_rts(struct ieee80211com *ic,
 		const uint8_t [IEEE80211_ADDR_LEN], uint16_t);
 struct mbuf *ieee80211_alloc_cts(struct ieee80211com *,
 		const uint8_t [IEEE80211_ADDR_LEN], uint16_t);
+struct mbuf *ieee80211_alloc_prot(struct ieee80211_node *,
+		const struct mbuf *, uint8_t, int);
 
 uint8_t *ieee80211_add_rates(uint8_t *, const struct ieee80211_rateset *);
 uint8_t *ieee80211_add_xrates(uint8_t *, const struct ieee80211_rateset *);
@@ -166,7 +168,7 @@ void	ieee80211_addbasicrates(struct ieee80211_rateset *,
 static __inline int
 ieee80211_hdrsize(const void *data)
 {
-	const struct ieee80211_frame *wh = (struct ieee80211_frame *)data;
+	const struct ieee80211_frame *wh = (const struct ieee80211_frame*)data;
 	int size = sizeof(struct ieee80211_frame);
 
 	/* NB: we don't handle control frames */
@@ -185,7 +187,7 @@ ieee80211_hdrsize(const void *data)
 static __inline int
 ieee80211_anyhdrsize(const void *data)
 {
-	const struct ieee80211_frame *wh = (struct ieee80211_frame *)data;
+	const struct ieee80211_frame *wh = (const struct ieee80211_frame*)data;
 
 	if ((wh->i_fc[0]&IEEE80211_FC0_TYPE_MASK) == IEEE80211_FC0_TYPE_CTL) {
 		switch (wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK) {
@@ -294,6 +296,11 @@ struct ieee80211_wme_state {
 void	ieee80211_wme_initparams(struct ieee80211vap *);
 void	ieee80211_wme_updateparams(struct ieee80211vap *);
 void	ieee80211_wme_updateparams_locked(struct ieee80211vap *);
+void	ieee80211_wme_vap_getparams(struct ieee80211vap *vap,
+	    struct chanAccParams *);
+void	ieee80211_wme_ic_getparams(struct ieee80211com *ic,
+	    struct chanAccParams *);
+int	ieee80211_wme_vap_ac_is_noack(struct ieee80211vap *vap, int ac);
 
 /*
  * Return the WME TID from a QoS frame.  If no TID
@@ -364,7 +371,8 @@ struct ieee80211_beacon_offsets {
 	uint8_t		*bo_csa;	/* start of CSA element */
 	uint8_t		*bo_quiet;	/* start of Quiet element */
 	uint8_t		*bo_meshconf;	/* start of MESHCONF element */
-	uint8_t		*bo_spare[3];
+	uint8_t		*bo_vhtinfo;	/* start of VHT info element (XXX VHTCAP?) */
+	uint8_t		*bo_spare[2];
 };
 struct mbuf *ieee80211_beacon_alloc(struct ieee80211_node *);
 
@@ -392,6 +400,8 @@ enum {
 	IEEE80211_BEACON_TDMA	= 9,	/* TDMA Info */
 	IEEE80211_BEACON_ATH	= 10,	/* ATH parameters */
 	IEEE80211_BEACON_MESHCONF = 11,	/* Mesh Configuration */
+	IEEE80211_BEACON_QUIET	= 12,	/* Quiet time IE */
+	IEEE80211_BEACON_VHTINFO	= 13,	/* VHT information */
 };
 int	ieee80211_beacon_update(struct ieee80211_node *,
 		struct mbuf *, int mcast);
