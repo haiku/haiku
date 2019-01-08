@@ -925,6 +925,12 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		return B_BAD_SEM_ID;
 	if (count <= 0 && (flags & B_RELEASE_ALL) == 0)
 		return B_BAD_VALUE;
+#if KDEBUG
+	if ((flags & B_DO_NOT_RESCHEDULE) == 0 && !are_interrupts_enabled()) {
+		panic("release_sem_etc(): called with interrupts disabled and "
+			"rescheduling allowed for sem_id %ld", id);
+	}
+#endif
 
 	InterruptsLocker _;
 	SpinLocker semLocker(sSems[slot].lock);
