@@ -344,8 +344,10 @@ struct ieee80211_cb {
 	void	*arg;
 };
 #define	NET80211_TAG_CALLBACK		0 /* xmit complete callback */
-#define	NET80211_TAG_XMIT_PARAMS	1 /* See below; this is after the bpf_params definition */
+#define	NET80211_TAG_XMIT_PARAMS	1
+	/* See below; this is after the bpf_params definition */
 #define	NET80211_TAG_RECV_PARAMS	2
+#define	NET80211_TAG_TOA_PARAMS		3
 
 int	ieee80211_add_callback(struct mbuf *m,
 		void (*func)(struct ieee80211_node *, void *, int), void *arg);
@@ -472,6 +474,12 @@ struct ieee80211_rx_stats;
 int ieee80211_add_rx_params(struct mbuf *m, const struct ieee80211_rx_stats *rxs);
 int ieee80211_get_rx_params(struct mbuf *m, struct ieee80211_rx_stats *rxs);
 const struct ieee80211_rx_stats * ieee80211_get_rx_params_ptr(struct mbuf *m);
+
+struct ieee80211_toa_params {
+	int request_id;
+};
+int	ieee80211_add_toa_params(struct mbuf *m, const struct ieee80211_toa_params *p);
+int	ieee80211_get_toa_params(struct mbuf *m, struct ieee80211_toa_params *p);
 
 #ifdef __cplusplus
 }
