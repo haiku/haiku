@@ -429,8 +429,8 @@ struct ieee80211req_sta_info {
 	uint16_t	isi_ie_off;		/* offset to IE data */
 	uint16_t	isi_ie_len;		/* IE length */
 #ifdef __HAIKU__
-	uint32_t	isi_flags;		/* MHz */
-	uint16_t	isi_freq;		/* channel flags */
+	uint32_t	isi_flags;		/* channel flags */
+	uint16_t	isi_freq;		/* MHz */
 	int8_t		padding[10];
 #else
 	uint16_t	isi_freq;		/* MHz */

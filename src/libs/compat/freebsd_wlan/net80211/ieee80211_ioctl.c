@@ -720,15 +720,17 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 	dc->dc_vhtcaps = ic->ic_vhtcaps;
 #endif
 	ci = &dc->dc_chaninfo;
+#ifdef __HAIKU__
+	if (maxchans != 0) {
+#endif
 	ic->ic_getradiocaps(ic, maxchans, &ci->ic_nchans, ci->ic_chans);
 	KASSERT(ci->ic_nchans <= maxchans,
 	    ("nchans %d maxchans %d", ci->ic_nchans, maxchans));
-#ifdef __HAIKU__
-	if (maxchans == 0)
-		dc->dc_chaninfo.ic_nchans = 1; /* HACK: so it will really be 0 */
-	else
-#endif
 	ieee80211_sort_channels(ci->ic_chans, ci->ic_nchans);
+#ifdef __HAIKU__
+	} else
+		dc->dc_chaninfo.ic_nchans = 0; /* HACK */
+#endif
 	error = copyout(dc, ireq->i_data, IEEE80211_DEVCAPS_SPACE(dc));
 	IEEE80211_FREE(dc, M_TEMP);
 	return error;
