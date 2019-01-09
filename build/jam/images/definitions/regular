@@ -226,7 +226,7 @@ SYSTEM_ADD_ONS_DRIVERS_MIDI +=
 	usb_midi
 ;
 
-SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
+SYSTEM_ADD_ONS_DRIVERS_NET += [ FFilterByBuildFeatures
 	# WLAN drivers
 	x86,x86_64 @{
 		aironetwifi atheroswifi
@@ -237,7 +237,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		ralinkwifi realtekwifi
 		wavelanwifi
 	}@ # x86,x86_64
-];
+] ;
 
 SYSTEM_ADD_ONS_DRIVERS_POWER += [ FFilterByBuildFeatures
 	acpi_battery@x86,x86_64
