@@ -30,6 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			lockf.cpp
 			lseek.c
 			mount.c
+			nice.c
 			pause.c
 			pipe.c
 			process.c

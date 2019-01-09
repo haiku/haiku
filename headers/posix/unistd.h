@@ -246,6 +246,8 @@ extern pid_t	setpgrp(void);
 
 extern int		chroot(const char *path);
 
+extern int		nice(int incr);
+
 /* access permissions */
 extern gid_t	getegid(void);
 extern uid_t	geteuid(void);
