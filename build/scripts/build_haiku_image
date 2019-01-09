@@ -329,18 +329,13 @@ if [ $isCD ]; then
 	echo "Copying boot image ..."
 	$cp "$cdBootFloppy" "$outputDir"
 
-	if [ $(which mkisofs) ]; then
-		# build the iso image using mkisofs
-		echo "Building CD image (mkisofs)..."
-		mkisofs -uid 0 -gid 0 -b `basename $cdBootFloppy` -R -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
-	elif [ $(which genisoimage) ]; then
-		# build the iso image using genisoimage
-		echo "Building CD image (genisoimage)..."
-		echo "WARNING: genisoimage fallback has known problems with long filenames!"
-		echo "         Please install mkisofs before making production releases!"
-		genisoimage -r -iso-level 4 -b `basename $cdBootFloppy` -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
+	if [ $(which xorriso) ]; then
+		# build the iso image using xorriso
+		echo "Building CD image..."
+		xorriso -as mkisofs -r -b `basename $cdBootFloppy` \
+			-V "$cdLabel" -o "$cdImagePath" "$tPrefix"
 	else
-		echo "you need mkisofs (preferred) or genisoimage to create a CD image."
+		echo "you need xorriso to create a CD image."
 		exit 1
 	fi
 
