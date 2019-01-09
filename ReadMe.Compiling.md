@@ -16,11 +16,11 @@ Required Software
 ----------------------------
 Tools provided within Haiku's repositories:
  * `jam` (Jam 2.5-haiku-20111222)
- * Haiku's cross-compiler (needed only for non-Haiku platforms)
+ * Haiku's cross-compiler
 
 The tools to compile Haiku will vary, depending on the platform that you are
 using to build Haiku. When building from Haiku, all of the necessary
-development tools are included in official releases (e.g. R1/alpha4) and in the
+development tools are included in official releases (e.g. R1/beta1) and in the
 nightly builds.
 
  * `git`
@@ -35,7 +35,8 @@ nightly builds.
  * `nasm`
  * `wget`
  * `[un]zip`
- * `cdrtools` (preferred) or `genisoimage`
+ * `xorriso`
+ * `mtools` (<https://gnu.org/software/mtools/intro.html>)
  * case-sensitive file system
 
 Whether they are installed can be tested by running them in a shell with
@@ -48,7 +49,6 @@ The following libraries (and their respective headers) are required:
 If you want to compile Haiku for ARM, you will also need:
 
  * `mkimage` (<http://www.denx.de/wiki/U-Boot/WebHome>)
- * Mtools (<https://gnu.org/software/mtools/intro.html>)
 
 ### On macOS
 
@@ -79,10 +79,9 @@ The buildtools are needed only for non-Haiku platforms.
 
 Anonymous checkout:
 ```
-git clone https://git.haiku-os.org/haiku
-git clone https://git.haiku-os.org/buildtools
+git clone https://review.haiku-os.org/haiku.git
+git clone https://review.haiku-os.org/buildtools.git
 ```
-(You can also use the `git://` protocol, but it is not secure).
 
 If you have commit access:
 ```
@@ -126,7 +125,7 @@ haiku/
 haiku/generated.x86gcc2
 ```
 
-### Configure a GCC 2.95/GCC 5 Hybrid, from a non-Haiku platform
+### Configure a GCC 2.95/GCC 7 Hybrid, from a non-Haiku platform
 ```bash
 cd haiku/generated.x86gcc2
 ../configure \
@@ -134,13 +133,13 @@ cd haiku/generated.x86gcc2
 	--build-cross-tools x86
 ```
 
-### Configure an x86_64 (GCC 5) build, from a non-Haiku platform
+### Configure an x86_64 (GCC 7) build, from a non-Haiku platform
 ```
 cd haiku/generated.x86_64
 ../configure --build-cross-tools x86_64 ../../buildtools/
 ```
 
-### Configure a GCC 2.95/GCC 5 Hybrid, from Haiku
+### Configure a GCC 2.95/GCC 7 Hybrid, from Haiku
 ```
 cd haiku/generated.x86gcc2
 ../configure --target-arch x86_gcc2 --target-arch x86
