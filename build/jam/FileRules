@@ -442,15 +442,20 @@ rule DownloadLocatedFile target : url : source
 	DownloadLocatedFile1 $(target) : $(source) ;
 }
 
-actions DownloadLocatedFile1
-{
-	source="$(2)"
-	if [ "$(HAIKU_NO_DOWNLOADS)" = 1 ]; then
-		echo "ERROR: Would need to download $(URL), but HAIKU_NO_DOWNLOADS is set!"
+if $(HAIKU_NO_DOWNLOADS) = 1 {
+	actions DownloadLocatedFile1
+	{
+		source="$(2)"
+		echo "ERROR: Would need to download $(UR2L), but HAIKU_NO_DOWNLOADS is set!"
 		exit 1
-	fi
-	wget --retry-connrefused --timeout 30 -O "$(1)" $(URL) || exit 1
-	touch "$(1)"
+	}
+} else {
+	actions DownloadLocatedFile1
+	{
+		source="$(2)"
+		wget --retry-connrefused --timeout 30 -O "$(1)" $(URL) || exit 1
+		touch "$(1)"
+	}
 }
 
 rule DownloadFile file : url : source
