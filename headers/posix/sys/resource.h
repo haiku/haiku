@@ -64,9 +64,8 @@ extern int getrusage(int who, struct rusage *rusage);
 extern int getrlimit(int resource, struct rlimit * rlp);
 extern int setrlimit(int resource, const struct rlimit * rlp);
 
-/* ToDo: The following POSIX calls are missing (in BeOS as well):
- * int getpriority(int which, id_t who);
- * int setpriority(int which, id_t who, int priority); */
+extern int getpriority(int which, id_t who);
+extern int setpriority(int which, id_t who, int priority);
 
 __END_DECLS
 

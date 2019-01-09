@@ -90,6 +90,7 @@ status_t __pthread_init_creation_attributes(
 	status_t (*entryFunction)(void*, void*), void* argument1,
 	void* argument2, const char* name,
 	struct thread_creation_attributes* attributes);
+void __pthread_set_default_priority(int32 priority);
 
 #ifdef __cplusplus
 }

@@ -76,11 +76,14 @@
 
 #define _POSIX2_LINE_MAX		(2048)
 
+#ifdef _XOPEN_SOURCE
 /* The XSI name for PAGESIZE, with extra underscore included. Only define if
  * _XOPEN_SOURCE was requested, otherwise it could conflict with the application.
  */
-#ifdef _XOPEN_SOURCE
 #define PAGE_SIZE				PAGESIZE
+/* XSI extension: Default process priority. This is used by the implementation
+ * of getpriority(), setpriority() and nice(). */
+#define NZERO					20
 #endif
 
 /* _GCC_LIMITS_H_ is defined by GCC's internal limits.h to avoid
