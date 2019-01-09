@@ -3041,17 +3041,37 @@ receive_data(thread_id *sender, void *buffer, size_t bufferSize)
 }
 
 
-bool
-has_data(thread_id thread)
+static bool
+thread_has_data(thread_id id, bool kernel)
 {
-	// TODO: The thread argument is ignored.
-	int32 count;
+	Thread* currentThread = thread_get_current_thread();
+	Thread* thread;
+	BReference<Thread> threadReference;
+	if (id == currentThread->id) {
+		thread = currentThread;
+	} else {
+		thread = Thread::Get(id);
+		if (thread == NULL)
+			return false;
 
-	if (get_sem_count(thread_get_current_thread()->msg.read_sem,
-			&count) != B_OK)
+		threadReference.SetTo(thread, true);
+	}
+
+	if (!kernel && thread->team != currentThread->team)
+		return false;
+
+	int32 count;
+	if (get_sem_count(thread->msg.read_sem, &count) != B_OK)
 		return false;
 
 	return count == 0 ? false : true;
+}
+
+
+bool
+has_data(thread_id thread)
+{
+	return thread_has_data(thread, true);
 }
 
 
@@ -3581,7 +3601,7 @@ _user_wait_for_thread(thread_id id, status_t *userReturnCode)
 bool
 _user_has_data(thread_id thread)
 {
-	return has_data(thread);
+	return thread_has_data(thread, false);
 }
 
 
