@@ -32,6 +32,7 @@ void taskqueue_free(struct taskqueue *tq);
 void taskqueue_drain(struct taskqueue *tq, struct task *task);
 void taskqueue_drain_timeout(struct taskqueue *queue,
 	struct timeout_task *timeout_task);
+void taskqueue_drain_all(struct taskqueue *tq);
 void taskqueue_block(struct taskqueue *queue);
 void taskqueue_unblock(struct taskqueue *queue);
 int taskqueue_enqueue(struct taskqueue *tq, struct task *task);

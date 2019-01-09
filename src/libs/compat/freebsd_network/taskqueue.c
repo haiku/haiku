@@ -294,6 +294,28 @@ taskqueue_drain_timeout(struct taskqueue *queue,
 
 
 static void
+taskqueue_task_nop_fn(void* context, int pending)
+{
+}
+
+
+void
+taskqueue_drain_all(struct taskqueue *taskQueue)
+{
+	struct task t_barrier;
+
+	if (taskQueue == NULL) {
+		printf("taskqueue_drain_all called with NULL taskqueue\n");
+		return;
+	}
+
+	TASK_INIT(&t_barrier, USHRT_MAX, taskqueue_task_nop_fn, &t_barrier);
+	taskqueue_enqueue(taskQueue, &t_barrier);
+	taskqueue_drain(taskQueue, &t_barrier);
+}
+
+
+static void
 taskqueue_enqueue_locked(struct taskqueue *taskQueue, struct task *task,
 	cpu_status status)
 {
