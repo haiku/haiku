@@ -40,7 +40,7 @@ FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
 	fDoSet = &FractalEngine::DoSet_Mandelbrot;
 
 	fRenderSem = create_sem(0, "RenderSem");
-	fRenderStoppedSem = create_sem(0,"RenderStopped");
+	fRenderStoppedSem = create_sem(0, "RenderStopped");
 
 	system_info info;
 	get_system_info(&info);
@@ -60,6 +60,8 @@ FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
 
 FractalEngine::~FractalEngine()
 {
+	delete_sem(fRenderSem);
+	delete_sem(fRenderStoppedSem);
 }
 
 
@@ -158,6 +160,7 @@ void FractalEngine::WriteToBitmap(BBitmap* bitmap)
 		B_RGB24);
 }
 
+
 void FractalEngine::StopRender()
 {
 	if (fRenderStopped)
@@ -167,7 +170,7 @@ void FractalEngine::StopRender()
 		// the fRenderStoppedSem semaphores have already been acquired.
 	TRACE("Stopping render...\n");
 	fStopRender = true;
-	for (uint i = 0; i<fThreadCount; i++)
+	for (uint i = 0; i < fThreadCount; i++)
 		acquire_sem(fRenderStoppedSem);
 
 	TRACE("Render stopped.\n");
