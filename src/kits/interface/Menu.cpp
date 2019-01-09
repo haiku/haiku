@@ -2883,7 +2883,7 @@ BMenu::_ChooseTrigger(const char* title, int32& index, uint32& trigger,
 	nextCharacter = title;
 	character = nextCharacter;
 	while ((c = BUnicodeChar::FromUTF8(&nextCharacter)) != 0) {
-		if (!(c < 255 && BUnicodeChar::IsAlNum(c)) || triggers.HasTrigger(c)) {
+		if (!(c < 128 && BUnicodeChar::IsAlNum(c)) || triggers.HasTrigger(c)) {
 			character = nextCharacter;
 			continue;
 		}
