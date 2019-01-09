@@ -13,7 +13,7 @@ UsePrivateBuildHeaders kernel libroot system ;
 
 {
 	local defines = [ FDefines
-		HAIKU_BUILD_ATTRIBUTES_DIR="\\\"$(HAIKU_BUILD_ATTRIBUTES_DIR)\\\""
+		'HAIKU_BUILD_ATTRIBUTES_DIR="\"$(HAIKU_BUILD_ATTRIBUTES_DIR)\""'
 		_HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS=1
 	] ;
 	SubDirCcFlags $(defines) ;

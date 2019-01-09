@@ -216,7 +216,7 @@ real_path()
 relative_to()
 {
 	perl -e 'use File::Spec; print File::Spec->abs2rel(@ARGV) . "\n"' \
-		$1 $2
+		"$1" "$2"
 }
 
 # valid_toolchain
@@ -525,7 +525,7 @@ if [ "$1" = "--update" ]; then
 			"encoded into '$buildConfigFile' - updating not possible."
 		exit 1
 	fi
-	cd $lastPwd
+	cd "$lastPwd"
 	if [ -n "$lastEnv" ]; then
 		export $lastEnv
 	fi
@@ -556,7 +556,7 @@ if [ `umask` -gt 22 ]; then
 	exit 1
 fi
 # ensure git checkout was not done with a restrictive umask
-if [ `stat -c '%a' $sourceDir/data/system/boot/SetupEnvironment` -lt 644 ]; then
+if [ `stat -c '%a' "$sourceDir/data/system/boot/SetupEnvironment"` -lt 644 ]; then
 	echo "The source tree was cloned with a umask > 0022. It seems you"
 	echo have already corrected your umask, but not re-checked-out the
 	echo source tree. Try running:
@@ -1055,7 +1055,7 @@ HOST_EXTENDED_REGEX_SED		?= ${HOST_EXTENDED_REGEX_SED} ;
 HOST_SHA256					?= ${HOST_SHA256} ;
 HAIKU_NASM					?= ${HAIKU_NASM} ;
 
-HAIKU_BUILD_ATTRIBUTES_DIR	?= ${HAIKU_BUILD_ATTRIBUTES_DIR} ;
+HAIKU_BUILD_ATTRIBUTES_DIR	?= "${HAIKU_BUILD_ATTRIBUTES_DIR}" ;
 
 HOST_HAIKU_PORTER			?= ${HOST_HAIKU_PORTER} ;
 HAIKU_PORTS					?= ${HAIKU_PORTS} ;
