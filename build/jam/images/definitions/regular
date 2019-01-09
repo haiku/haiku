@@ -262,17 +262,3 @@ AddDirectoryToHaikuImage home config settings printers Preview
 	: home-config-settings-printers-preview.rdef ;
 AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 	: home-config-settings-printers-save-as-pdf.rdef ;
-
-# repository config and cache files
-local repository ;
-for repository in $(HAIKU_REPOSITORIES) {
-	local config = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
-	local cache = [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
-	if $(HAIKU_UPDATE_ALL_PACKAGES) {
-		HAIKU_INCLUDE_IN_IMAGE on $(config) $(cache) = 1 ;
-	}
-	AddFilesToHaikuImage system settings package-repositories
-		: $(config) : $(repository:G=) ;
-	AddFilesToHaikuImage system cache package-repositories
-		: $(cache) : $(repository:G=) ;
-}
