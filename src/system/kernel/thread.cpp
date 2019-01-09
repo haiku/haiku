@@ -73,7 +73,7 @@ typedef BKernel::TeamThreadTable<Thread> ThreadHashTable;
 // thread list
 static Thread sIdleThreads[SMP_MAX_CPUS];
 static ThreadHashTable sThreadHash;
-static spinlock sThreadHashLock = B_SPINLOCK_INITIALIZER;
+static rw_spinlock sThreadHashLock = B_RW_SPINLOCK_INITIALIZER;
 static thread_id sNextThreadID = 2;
 	// ID 1 is allocated for the kernel by Team::Team() behind our back
 
@@ -227,7 +227,7 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	msg.read_sem = -1;
 
 	// add to thread table -- yet invisible
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsWriteSpinLocker threadHashLocker(sThreadHashLock);
 	sThreadHash.Insert(this);
 }
 
@@ -261,7 +261,7 @@ Thread::~Thread()
 	mutex_destroy(&fLock);
 
 	// remove from thread table
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsWriteSpinLocker threadHashLocker(sThreadHashLock);
 	sThreadHash.Remove(this);
 }
 
@@ -287,7 +287,7 @@ Thread::Create(const char* name, Thread*& _thread)
 /*static*/ Thread*
 Thread::Get(thread_id id)
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	Thread* thread = sThreadHash.Lookup(id);
 	if (thread != NULL)
 		thread->AcquireReference();
@@ -299,7 +299,7 @@ Thread::Get(thread_id id)
 Thread::GetAndLock(thread_id id)
 {
 	// look it up and acquire a reference
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	Thread* thread = sThreadHash.Lookup(id);
 	if (thread == NULL)
 		return NULL;
@@ -333,7 +333,7 @@ Thread::GetDebug(thread_id id)
 /*static*/ bool
 Thread::IsAlive(thread_id id)
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	return sThreadHash.Lookup(id) != NULL;
 }
 
@@ -395,7 +395,7 @@ Thread::Init(bool idleThread)
 bool
 Thread::IsAlive() const
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 
 	return sThreadHash.Lookup(id) != NULL;
 }
@@ -486,7 +486,7 @@ Thread::DeactivateCPUTimeUserTimers()
 ThreadListIterator::ThreadListIterator()
 {
 	// queue the entry
-	InterruptsSpinLocker locker(sThreadHashLock);
+	InterruptsWriteSpinLocker locker(sThreadHashLock);
 	sThreadHash.InsertIteratorEntry(&fEntry);
 }
 
@@ -494,7 +494,7 @@ ThreadListIterator::ThreadListIterator()
 ThreadListIterator::~ThreadListIterator()
 {
 	// remove the entry
-	InterruptsSpinLocker locker(sThreadHashLock);
+	InterruptsWriteSpinLocker locker(sThreadHashLock);
 	sThreadHash.RemoveIteratorEntry(&fEntry);
 }
 
@@ -503,7 +503,7 @@ Thread*
 ThreadListIterator::Next()
 {
 	// get the next team -- if there is one, get reference for it
-	InterruptsSpinLocker locker(sThreadHashLock);
+	InterruptsWriteSpinLocker locker(sThreadHashLock);
 	Thread* thread = sThreadHash.NextElement(&fEntry);
 	if (thread != NULL)
 		thread->AcquireReference();
@@ -1016,7 +1016,7 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	ThreadLocker threadLocker(thread);
 
 	InterruptsSpinLocker threadCreationLocker(gThreadCreationLock);
-	SpinLocker threadHashLocker(sThreadHashLock);
+	WriteSpinLocker threadHashLocker(sThreadHashLock);
 
 	// check the thread limit
 	if (sUsedThreads >= sMaxThreads) {
@@ -2164,7 +2164,7 @@ thread_exit(void)
 	SpinLocker threadCreationLocker(gThreadCreationLock);
 
 	// mark invisible in global hash/list, so it's no longer accessible
-	SpinLocker threadHashLocker(sThreadHashLock);
+	WriteSpinLocker threadHashLocker(sThreadHashLock);
 	thread->visible = false;
 	sUsedThreads--;
 	threadHashLocker.Unlock();
@@ -2375,7 +2375,7 @@ thread_reset_for_exec(void)
 thread_id
 allocate_thread_id()
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsWriteSpinLocker threadHashLocker(sThreadHashLock);
 
 	// find the next unused ID
 	thread_id id;
@@ -2396,7 +2396,7 @@ allocate_thread_id()
 thread_id
 peek_next_thread_id()
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	return sNextThreadID;
 }
 
@@ -2423,7 +2423,7 @@ thread_yield(void)
 void
 thread_map(void (*function)(Thread* thread, void* data), void* data)
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsWriteSpinLocker threadHashLocker(sThreadHashLock);
 
 	for (ThreadHashTable::Iterator it = sThreadHash.GetIterator();
 		Thread* thread = it.Next();) {
@@ -2609,7 +2609,7 @@ thread_max_threads(void)
 int32
 thread_used_threads(void)
 {
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 	return sUsedThreads;
 }
 
@@ -3153,10 +3153,11 @@ find_thread(const char* name)
 	if (name == NULL)
 		return thread_get_current_thread_id();
 
-	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+	InterruptsReadSpinLocker threadHashLocker(sThreadHashLock);
 
-	// TODO: Scanning the whole hash with the thread hash lock held isn't
-	// exactly cheap -- although this function is probably used very rarely.
+	// Scanning the whole hash with the thread hash lock held isn't exactly
+	// cheap, but since this function is probably used very rarely, and we
+	// only need a read lock, it's probably acceptable.
 
 	for (ThreadHashTable::Iterator it = sThreadHash.GetIterator();
 			Thread* thread = it.Next();) {
