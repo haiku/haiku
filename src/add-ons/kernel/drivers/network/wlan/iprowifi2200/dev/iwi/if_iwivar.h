@@ -1,6 +1,8 @@
-/*	$FreeBSD: releng/11.2/sys/dev/iwi/if_iwivar.h 331722 2018-03-29 02:50:57Z eadler $	*/
+/*	$FreeBSD: releng/12.0/sys/dev/iwi/if_iwivar.h 326255 2017-11-27 14:52:40Z pfg $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2004, 2005
  *      Damien Bergamini <damien.bergamini@free.fr>. All rights reserved.
  *
