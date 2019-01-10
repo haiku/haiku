@@ -11,11 +11,23 @@
 #include <AboutWindow.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <BitmapStream.h>
+#include <String.h>
 #include <Catalog.h>
+#include <Directory.h>
+#include <File.h>
+#include <FilePanel.h>
+#include <FindDirectory.h>
 #include <MenuBar.h>
+#include <NodeInfo.h>
+#include <Path.h>
+#include <TranslationUtils.h>
+#include <TranslatorRoster.h>
 #include <LayoutBuilder.h>
 #include <View.h>
 #include <Window.h>
+#include <Screen.h>
+#include <ScrollView.h>
 
 #include <algorithm>
 
@@ -62,7 +74,16 @@ public:
 			void RedrawFractal();
 			void UpdateSize();
 			void CreateDisplayBitmap(uint16 width, uint16 height);
+
+			void StartSave();
+			void WriteImage(entry_ref*, char*);
+			void EndSave();
+
 			FractalEngine* fFractalEngine;
+	enum {
+		MSG_START_SAVE,
+		MSG_WRITE_IMAGE
+	};
 
 private:
 			BRect GetDragFrame();
@@ -77,6 +98,10 @@ private:
 	double fLocationX;
 	double fLocationY;
 	double fSize;
+
+	BFilePanel* fSavePanel;
+
+	bool fSaving;
 };
 
 
@@ -88,7 +113,9 @@ FractalView::FractalView()
 	fDisplayBitmap(NULL),
 	fLocationX(0),
 	fLocationY(0),
-	fSize(0.005)
+	fSize(0.005),
+	fSavePanel(NULL),
+	fSaving(false)
 {
 	SetHighColor(make_color(255, 255, 255, 255));
 }
@@ -128,15 +155,15 @@ void FractalView::UpdateSize()
 	TRACE("Update Size\n");
 	BMessage msg(FractalEngine::MSG_RESIZE);
 
-	uint16 width = (uint16)Frame().Width()+1;
-	uint16 height = (uint16)Frame().Height()+1;
+	uint16 width = (uint16)Frame().Width();
+	uint16 height = (uint16)Frame().Height();
 
 	msg.AddUInt16("width", width);
 	msg.AddUInt16("height", height);
 
-	CreateDisplayBitmap(width,height);
+	CreateDisplayBitmap(width, height);
 
-	msg.AddPointer("bitmap",fDisplayBitmap);
+	msg.AddPointer("bitmap", fDisplayBitmap);
 
 	fFractalEngine->PostMessage(&msg); // Create the new buffer
 }
@@ -287,6 +314,24 @@ void FractalView::MessageReceived(BMessage* msg)
 		ImportBitsAndInvalidate();
 		break;
 
+	case MSG_WRITE_IMAGE: {
+		delete fSavePanel;
+		fSavePanel = NULL;
+
+		entry_ref dirRef;
+		char* name;
+		msg->FindRef("directory", &dirRef);
+		msg->FindString((const char*)"name", (const char**) &name);
+
+		WriteImage(&dirRef, name);
+		break;
+	}
+
+	case B_CANCEL:
+		//	image is frozen before the FilePanel is shown
+		EndSave();
+		break;
+
 	default:
 		BView::MessageReceived(msg);
 		break;
@@ -302,6 +347,10 @@ void FractalView::Pulse()
 
 void FractalView::ImportBitsAndInvalidate()
 {
+	if (fSaving) {
+		TRACE("Not importing bits because saving.\n");
+		return;
+	}
 	TRACE("Importing bits...\n");
 
 	fFractalEngine->WriteToBitmap(fDisplayBitmap);
@@ -325,6 +374,56 @@ void FractalView::Draw(BRect updateRect)
 	DrawBitmap(fDisplayBitmap, updateRect, updateRect);
 	if (fSelecting)
 		StrokeRect(GetDragFrame());
+}
+
+
+void FractalView::StartSave() {
+	TRACE("Got to start save\n");
+	fSaving = true;
+
+	BMessenger messenger(this);
+	BMessage message(MSG_WRITE_IMAGE);
+	fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, 0, 0, false,
+		&message);
+	BString* filename = new BString();
+	filename->SetToFormat("%g-%g-%g.png", fLocationX, fLocationY, fSize);
+
+	fSavePanel->SetSaveText(filename->String());
+	fSavePanel->Show();
+}
+
+
+void FractalView::WriteImage(entry_ref* dirRef, char* name)
+{
+	TRACE("Got to write save handler\n");
+
+	BFile file;
+	BDirectory parentDir(dirRef);
+	parentDir.CreateFile(name, &file);
+
+	// Write the screenshot bitmap to the file
+	BBitmapStream stream(fDisplayBitmap);
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	roster->Translate(&stream, NULL, NULL, &file, B_PNG_FORMAT,
+		B_TRANSLATOR_BITMAP);
+
+	BNodeInfo info(&file);
+	if (info.InitCheck() == B_OK)
+		info.SetType("image/png");
+
+	BBitmap* bitmap;
+	stream.DetachBitmap(&bitmap);
+	// The stream takes over ownership of the bitmap
+
+	// unfreeze the image, image was frozen before invoke of FilePanel
+	EndSave();
+}
+
+
+void FractalView::EndSave()
+{
+	fSaving = false;
+	ImportBitsAndInvalidate();
 }
 
 
@@ -363,13 +462,23 @@ public:
 		MSG_SUBSAMPLING_1,
 		MSG_SUBSAMPLING_2,
 		MSG_SUBSAMPLING_3,
-		MSG_SUBSAMPLING_4
+		MSG_SUBSAMPLING_4,
+
+		MSG_TOGGLE_FULLSCREEN
 	};
 				MandelbrotWindow(BRect frame);
 				~MandelbrotWindow() {}
 
+	void ToggleFullscreen();
+
+	virtual void DispatchMessage(BMessage* message, BHandler* target);
 	virtual void MessageReceived(BMessage* msg);
 	virtual bool QuitRequested();
+
+	bool fFullScreen;
+
+	BMenuBar* fMenuBar;
+	BRect fWindowFrame;
 
 private:
 		FractalView* fFractalView;
@@ -382,15 +491,23 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 		B_NORMAL_WINDOW_FEEL, 0L),
 	fFractalView(new FractalView)
 {
-	BMenuBar* menuBar = new BMenuBar("MenuBar");
+	fFullScreen = false;
+	fMenuBar = new BMenuBar("MenuBar");
 	BMenu* setMenu;
 	BMenu* paletteMenu;
 	BMenu* iterMenu;
 	BMenu* subsamplingMenu;
-	BLayoutBuilder::Menu<>(menuBar)
+	BLayoutBuilder::Menu<>(fMenuBar)
 		.AddMenu(B_TRANSLATE("File"))
+			.AddItem(B_TRANSLATE("Save as image" B_UTF8_ELLIPSIS), 
+				FractalView::MSG_START_SAVE, 'S')
+			.AddSeparator()
 			.AddItem(B_TRANSLATE("About"), B_ABOUT_REQUESTED)
 			.AddItem(B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q')
+		.End()
+		.AddMenu(B_TRANSLATE("View"))
+			.AddItem(B_TRANSLATE("Full screen"), MSG_TOGGLE_FULLSCREEN,
+				B_RETURN)
 		.End()
 		.AddMenu(B_TRANSLATE("Set"))
 			.GetMenu(setMenu)
@@ -442,9 +559,37 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0)
-		.Add(menuBar)
+		.Add(fMenuBar)
 		.Add(fFractalView)
 	.End();
+}
+
+void
+MandelbrotWindow::ToggleFullscreen() {
+	BRect frame;
+	fFullScreen = !fFullScreen;
+	if (fFullScreen) {
+		TRACE("Enabling fullscreen\n");
+		BScreen screen;
+		fWindowFrame = Frame();
+		frame = screen.Frame();
+		frame.top -= fMenuBar->Bounds().Height() + 1;
+
+		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
+
+		Activate();
+		// make the window frontmost
+	} else {
+		TRACE("Disabling fullscreen\n");
+		frame = fWindowFrame;
+
+		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
+	}
+
+	MoveTo(frame.left, frame.top);
+	ResizeTo(frame.Width(), frame.Height());
+
+	Layout(false);
 }
 
 
@@ -481,6 +626,37 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 		fFractalView->RedrawFractal(); \
 		break; \
 	}
+
+
+void
+MandelbrotWindow::DispatchMessage(BMessage* message, BHandler* target)
+{
+	const char* bytes;
+	int32 modifierKeys;
+	if ((message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN)
+		&& message->FindString("bytes", &bytes) == B_OK
+		&& message->FindInt32("modifiers", &modifierKeys) == B_OK) {
+		if (bytes[0] == B_FUNCTION_KEY) {
+			// Matches WebPositive fullscreen key (F11)
+			int32 key;
+			if (message->FindInt32("key", &key) == B_OK) {
+				switch (key) {
+					case B_F11_KEY: {
+						ToggleFullscreen();
+						break;
+					}
+
+					default:
+						break;
+				}
+			}
+		}
+	}
+
+	BWindow::DispatchMessage(message, target);
+}
+
+
 void
 MandelbrotWindow::MessageReceived(BMessage* msg)
 {
@@ -515,6 +691,15 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 	HANDLE_SUBSAMPLING(MSG_SUBSAMPLING_3, 3)
 	HANDLE_SUBSAMPLING(MSG_SUBSAMPLING_4, 4)
 
+	case FractalView::MSG_START_SAVE: {
+		fFractalView->StartSave();
+		break;
+	}
+
+	case MSG_TOGGLE_FULLSCREEN:
+		ToggleFullscreen();
+		break;
+
 	case B_ABOUT_REQUESTED: {
 		BAboutWindow* wind = new BAboutWindow("Mandelbrot",
 			"application/x-vnd.Haiku-Mandelbrot");
@@ -527,6 +712,14 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 		wind->AddCopyright(2016, "Haiku, Inc.");
 		wind->AddAuthors(authors);
 		wind->Show();
+		break;
+	}
+
+	case B_KEY_DOWN: {
+		int8 val;
+		if (msg->FindInt8("byte", &val) == B_OK && val == B_ESCAPE
+			&& fFullScreen)
+			ToggleFullscreen();
 		break;
 	}
 
