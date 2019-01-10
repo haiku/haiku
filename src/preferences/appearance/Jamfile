@@ -23,10 +23,6 @@ Preference Appearance :
 	#CursorWhichItem.cpp
 	#SysCursorAPI.cpp
 
-	# These exist for post-R1, so they are disabled for now
-	#FontMenu.cpp
-	#MenuView.cpp
-
 	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	: Appearance.rdef
 	;
