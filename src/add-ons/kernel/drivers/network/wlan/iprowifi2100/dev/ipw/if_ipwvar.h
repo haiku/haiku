@@ -1,6 +1,8 @@
-/*      $FreeBSD: releng/11.1/sys/dev/ipw/if_ipwvar.h 300239 2016-05-19 22:19:35Z avos $	*/
+/*      $FreeBSD: releng/12.0/sys/dev/ipw/if_ipwvar.h 326255 2017-11-27 14:52:40Z pfg $	*/
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2004-2006
  *      Damien Bergamini <damien.bergamini@free.fr>. All rights reserved.
  *
