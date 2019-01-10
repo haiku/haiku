@@ -16,7 +16,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/11.1/sys/dev/wpi/if_wpi_debug.h 292176 2015-12-13 22:08:27Z avos $
+ * $FreeBSD: releng/12.0/sys/dev/wpi/if_wpi_debug.h 292176 2015-12-13 22:08:27Z avos $
  */
 
 #ifndef __IF_WPI_DEBUG_H__

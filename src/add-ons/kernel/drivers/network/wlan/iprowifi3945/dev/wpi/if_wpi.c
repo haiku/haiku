@@ -18,7 +18,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/wpi/if_wpi.c 298848 2016-04-30 14:41:18Z pfg $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/wpi/if_wpi.c 327479 2018-01-02 00:07:28Z adrian $");
 
 /*
  * Driver for Intel PRO/Wireless 3945ABG 802.11 network adapters.
@@ -468,10 +468,8 @@ wpi_attach(device_t dev)
 		| IEEE80211_C_PMGT		/* Station-side power mgmt */
 		;
 
-#ifndef __HAIKU__
 	ic->ic_cryptocaps =
 		  IEEE80211_CRYPTO_AES_CCM;
-#endif
 
 	/*
 	 * Read in the eeprom and also setup the channels for
@@ -526,7 +524,8 @@ wpi_attach(device_t dev)
 	wpi_radiotap_attach(sc);
 
 	/* Setup Tx status flags (constant). */
-	sc->sc_txs.flags = IEEE80211_RATECTL_STATUS_SHORT_RETRY |
+	sc->sc_txs.flags = IEEE80211_RATECTL_STATUS_PKTLEN |
+	    IEEE80211_RATECTL_STATUS_SHORT_RETRY |
 	    IEEE80211_RATECTL_STATUS_LONG_RETRY;
 
 	callout_init_mtx(&sc->calib_to, &sc->rxon_mtx, 0);
@@ -718,7 +717,7 @@ wpi_detach(device_t dev)
 
 	if (sc->fw_dma.tag)
 		wpi_free_fwmem(sc);
-
+		
 	if (sc->mem != NULL)
 		bus_release_resource(dev, SYS_RES_MEMORY,
 		    rman_get_rid(sc->mem), sc->mem);
@@ -1011,7 +1010,7 @@ wpi_alloc_rx_ring(struct wpi_softc *sc)
 	}
 
 	/* Create RX buffer DMA tag. */
-	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
+	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    MJUMPAGESIZE, 1, MJUMPAGESIZE, 0, NULL, NULL, &ring->data_dmat);
 	if (error != 0) {
@@ -2041,8 +2040,7 @@ wpi_rx_done(struct wpi_softc *sc, struct wpi_rx_desc *desc,
 
 fail2:	m_freem(m);
 
-fail1:
-	counter_u64_add(ic->ic_ierrors, 1);
+fail1:	counter_u64_add(ic->ic_ierrors, 1);
 }
 
 static void
@@ -2079,9 +2077,15 @@ wpi_tx_done(struct wpi_softc *sc, struct wpi_rx_desc *desc)
 	m = data->m, data->m = NULL;
 	ni = data->ni, data->ni = NULL;
 
+	/* Restore frame header. */
+	KASSERT(M_LEADINGSPACE(m) >= data->hdrlen, ("no frame header!"));
+	M_PREPEND(m, data->hdrlen, M_NOWAIT);
+	KASSERT(m != NULL, ("%s: m is NULL\n", __func__));
+
 	/*
 	 * Update rate control statistics for the node.
 	 */
+	txs->pktlen = m->m_pkthdr.len;
 	txs->short_retries = stat->rtsfailcnt;
 	txs->long_retries = stat->ackfailcnt / WPI_NTRIES_DEFAULT;
 	if (!(status & WPI_TX_STATUS_FAIL))
@@ -2729,6 +2733,7 @@ wpi_cmd2(struct wpi_softc *sc, struct wpi_buf *buf)
 
 	data->m = buf->m;
 	data->ni = buf->ni;
+	data->hdrlen = hdrlen;
 
 	DPRINTF(sc, WPI_DEBUG_XMIT, "%s: qid %d idx %d len %d nsegs %d\n",
 	    __func__, ring->qid, cur, totlen, nsegs);
@@ -2784,11 +2789,10 @@ end:	DPRINTF(sc, WPI_DEBUG_TRACE, error ? TRACE_STR_END_ERR : TRACE_STR_END,
 static int
 wpi_tx_data(struct wpi_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 {
-	const struct ieee80211_txparam *tp;
+	const struct ieee80211_txparam *tp = ni->ni_txparms;
 	struct ieee80211vap *vap = ni->ni_vap;
 	struct ieee80211com *ic = ni->ni_ic;
 	struct wpi_node *wn = WPI_NODE(ni);
-	struct ieee80211_channel *chan;
 	struct ieee80211_frame *wh;
 	struct ieee80211_key *k = NULL;
 	struct wpi_buf tx_data;
@@ -2813,19 +2817,15 @@ wpi_tx_data(struct wpi_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 	}
 	ac = M_WME_GETAC(m);
 
-	chan = (ni->ni_chan != IEEE80211_CHAN_ANYC) ?
-		ni->ni_chan : ic->ic_curchan;
-	tp = &vap->iv_txparms[ieee80211_chan2mode(chan)];
-
 	/* Choose a TX rate index. */
-	if (type == IEEE80211_FC0_TYPE_MGT)
+	if (type == IEEE80211_FC0_TYPE_MGT ||
+	    type == IEEE80211_FC0_TYPE_CTL ||
+	    (m->m_flags & M_EAPOL) != 0)
 		rate = tp->mgmtrate;
 	else if (ismcast)
 		rate = tp->mcastrate;
 	else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE)
 		rate = tp->ucastrate;
-	else if (m->m_flags & M_EAPOL)
-		rate = tp->mgmtrate;
 	else {
 		/* XXX pass pktlen */
 		(void) ieee80211_ratectl_rate(ni, NULL, 0);
@@ -3526,20 +3526,22 @@ wpi_updateedca(struct ieee80211com *ic)
 {
 #define WPI_EXP2(x)	((1 << (x)) - 1)	/* CWmin = 2^ECWmin - 1 */
 	struct wpi_softc *sc = ic->ic_softc;
+	struct chanAccParams chp;
 	struct wpi_edca_params cmd;
 	int aci, error;
+
+	ieee80211_wme_ic_getparams(ic, &chp);
 
 	DPRINTF(sc, WPI_DEBUG_TRACE, TRACE_STR_BEGIN, __func__);
 
 	memset(&cmd, 0, sizeof cmd);
 	cmd.flags = htole32(WPI_EDCA_UPDATE);
 	for (aci = 0; aci < WME_NUM_AC; aci++) {
-		const struct wmeParams *ac =
-		    &ic->ic_wme.wme_chanParams.cap_wmeParams[aci];
+		const struct wmeParams *ac = &chp.cap_wmeParams[aci];
 		cmd.ac[aci].aifsn = ac->wmep_aifsn;
 		cmd.ac[aci].cwmin = htole16(WPI_EXP2(ac->wmep_logcwmin));
 		cmd.ac[aci].cwmax = htole16(WPI_EXP2(ac->wmep_logcwmax));
-		cmd.ac[aci].txoplimit =
+		cmd.ac[aci].txoplimit = 
 		    htole16(IEEE80211_TXOP_TO_US(ac->wmep_txopLimit));
 
 		DPRINTF(sc, WPI_DEBUG_EDCA,

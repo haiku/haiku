@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/11.1/sys/dev/wpi/if_wpireg.h 289163 2015-10-12 04:05:12Z adrian $	*/
+/*	$FreeBSD: releng/12.0/sys/dev/wpi/if_wpireg.h 289163 2015-10-12 04:05:12Z adrian $	*/
 
 /*-
  * Copyright (c) 2006,2007
