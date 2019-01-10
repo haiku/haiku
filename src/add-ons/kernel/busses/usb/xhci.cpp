@@ -306,6 +306,11 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		}
 	}
 
+	if (fIRQ == 0 || fIRQ == 0xFF) {
+		TRACE_MODULE_ERROR("device was assigned an invalid IRQ\n");
+		return;
+	}
+
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
 	install_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this, 0);
@@ -839,15 +844,8 @@ XHCI::AddTo(Stack *stack)
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
 			&& item->class_api == PCI_usb_xhci) {
-			if (item->u.h0.interrupt_line == 0
-				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_MODULE_ERROR("found device with invalid IRQ - check IRQ "
-					"assignment\n");
-				continue;
-			}
-
-			TRACE_MODULE("found device at IRQ %u\n",
-				item->u.h0.interrupt_line);
+			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
+				item->bus, item->device, item->funcion);
 			XHCI *bus = new(std::nothrow) XHCI(item, stack);
 			if (!bus) {
 				delete item;
