@@ -736,7 +736,11 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 	} else
 		dc->dc_chaninfo.ic_nchans = 0; /* HACK */
 #endif
+#ifdef __HAIKU__
+	error = copyout(dc, ireq->i_data, ireq->i_len);
+#else
 	error = copyout(dc, ireq->i_data, IEEE80211_DEVCAPS_SPACE(dc));
+#endif
 	IEEE80211_FREE(dc, M_TEMP);
 	return error;
 }
