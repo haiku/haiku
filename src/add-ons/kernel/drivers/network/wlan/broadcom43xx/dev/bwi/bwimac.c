@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2007 The DragonFly Project.  All rights reserved.
  * 
  * This code is derived from software contributed to The DragonFly Project
@@ -35,7 +37,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/bwi/bwimac.c 288087 2015-09-22 02:44:59Z adrian $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/bwi/bwimac.c 326022 2017-11-20 19:36:21Z pfg $");
 
 #include "opt_inet.h"
 #include "opt_bwi.h"

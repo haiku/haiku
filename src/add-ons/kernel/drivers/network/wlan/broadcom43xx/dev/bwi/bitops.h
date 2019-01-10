@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2004, 2005 David Young.  All rights reserved.
  *
  * Programmed for NetBSD by David Young.
@@ -29,7 +31,7 @@
  * OF SUCH DAMAGE.
  *
  * $DragonFly: src/sys/dev/netif/bwi/bitops.h,v 1.1 2007/09/08 06:15:54 sephe Exp $
- * $FreeBSD: releng/11.1/sys/dev/bwi/bitops.h 191762 2009-05-03 04:01:43Z imp $
+ * $FreeBSD: releng/12.0/sys/dev/bwi/bitops.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef _BITOPS_H
