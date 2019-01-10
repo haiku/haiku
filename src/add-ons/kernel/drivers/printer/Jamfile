@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers printer ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers printer usb ;

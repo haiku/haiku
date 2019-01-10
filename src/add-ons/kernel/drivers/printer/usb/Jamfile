@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers printer usb ;
-
-SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel bus_managers usb ;
-UsePrivateKernelHeaders ;
-
-KernelAddon usb_printer :
-	usb_printer.cpp
-	;

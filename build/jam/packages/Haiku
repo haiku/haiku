@@ -73,7 +73,6 @@ AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
 AddDriversToPackage disk floppy		: pc_floppy@x86 ;
 AddDriversToPackage disk usb		: usb_disk ;
-AddDriversToPackage printer usb		: usb_printer ;
 AddDriversToPackage disk virtual	: nbd ;
 AddDriversToPackage dvb				: cx23882 ;
 AddDriversToPackage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
