@@ -3,10 +3,6 @@ SubDir HAIKU_TOP src preferences appearance ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders app interface [ FDirName servers app ] ;
-UseBuildFeatureHeaders freetype ;
-
-Includes [ FGristFiles AntialiasingSettingsView.cpp ]
-	: [ BuildFeatureAttribute freetype : headers ] ;
 
 Preference Appearance :
 	APRMain.cpp

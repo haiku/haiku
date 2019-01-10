@@ -34,7 +34,6 @@ private:
 			void			_BuildHintingMenu();
 			void			_SetCurrentHinting();
 			void			_SetCurrentAverageWeight();
-			void			_UpdateColors();
 
 protected:
 			float			fDivider;
@@ -44,7 +43,6 @@ protected:
 			BMenuField*		fHintingMenuField;
 			BPopUpMenu*		fHintingMenu;
 			BSlider*		fAverageWeightControl;
-			BTextView*		fSubpixelAntialiasingDisabledLabel;
 
 			bool			fSavedSubpixelAntialiasing;
 			bool			fCurrentSubpixelAntialiasing;

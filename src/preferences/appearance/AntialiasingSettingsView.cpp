@@ -10,10 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <ft2build.h>
-#include FT_CONFIG_OPTIONS_H
-	// for detected the availablility of subpixel anti-aliasing
-
 #include <Box.h>
 #include <Catalog.h>
 #include <LayoutBuilder.h>
@@ -114,21 +110,6 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	fHintingMenuField->SetEnabled(false);
 #endif
 
-#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-	// subpixelAntialiasingDisabledLabel
-	// TODO: Replace with layout friendly constructor once available.
-	fSubpixelAntialiasingDisabledLabel
-		= new BTextView("unavailable label");
-	fSubpixelAntialiasingDisabledLabel->SetText(B_TRANSLATE(
-		"Subpixel based anti-aliasing in combination with glyph hinting is not "
-		"available in this build of Haiku to avoid possible patent issues. To "
-		"enable this feature, you have to build Haiku yourself and enable "
-		"certain options in the libfreetype configuration header."));
-	fSubpixelAntialiasingDisabledLabel->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	fSubpixelAntialiasingDisabledLabel->MakeEditable(false);
-	fSubpixelAntialiasingDisabledLabel->MakeSelectable(false);
-#endif // !FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-
 	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	// controls pane
 		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
@@ -139,19 +120,12 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 
 		.Add(fAverageWeightControl, 0, 2, 2)
 
-#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-		// hinting+subpixel unavailable info
-		.Add(fSubpixelAntialiasingDisabledLabel, 0, 3, 2)
-#else
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2)
-#endif
 		.AddGlue(0, 4)
 		.SetInsets(B_USE_WINDOW_SPACING);
 
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
-	_UpdateColors();
 }
 
 
@@ -217,14 +191,6 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			set_average_weight(fCurrentAverageWeight);
 
 			Window()->PostMessage(kMsgUpdate);
-			break;
-		}
-		case B_COLORS_UPDATED:
-		{
-			if (msg->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))
-				|| msg->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
-				_UpdateColors();
-			}
 			break;
 		}
 		default:
@@ -319,23 +285,6 @@ void
 AntialiasingSettingsView::_SetCurrentAverageWeight()
 {
 	fAverageWeightControl->SetValue(fCurrentAverageWeight);
-}
-
-
-void
-AntialiasingSettingsView::_UpdateColors()
-{
-#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-	rgb_color infoColor = disable_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		ui_color(B_PANEL_TEXT_COLOR));
-
-	BFont font;
-	uint32 mode = 0;
-	fSubpixelAntialiasingDisabledLabel->GetFontAndColor(&font, &mode);
-	font.SetFace(B_ITALIC_FACE);
-	fSubpixelAntialiasingDisabledLabel->SetFontAndColor(&font, mode,
-		&infoColor);
-#endif
 }
 
 
