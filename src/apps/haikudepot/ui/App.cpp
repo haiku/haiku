@@ -385,7 +385,7 @@ bool
 App::_LoadSettings(BMessage& settings)
 {
 	if (!fSettingsRead) {
-		fSettings = true;
+		fSettingsRead = true;
 		if (load_settings(&fSettings, KEY_MAIN_SETTINGS, "HaikuDepot") != B_OK)
 			fSettings.MakeEmpty();
 	}
