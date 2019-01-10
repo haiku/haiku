@@ -29,10 +29,6 @@
 #define B_TRANSLATION_CONTEXT "AntialiasingSettingsView"
 
 
-//#define DISABLE_HINTING_CONTROL
-	// if defined, the hinting menu is disabled (hinting not properly
-	// implemented)
-
 static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetHinting = 'hint';
 static const int32 kMsgSetAverageWeight = 'avrg';
@@ -55,7 +51,7 @@ enum {
 
 static const uint8 kDefaultHintingMode = HINTING_MODE_ON;
 static const unsigned char kDefaultAverageWeight = 120;
-static const bool kDefaultSubpixelAntialiasing = false;
+static const bool kDefaultSubpixelAntialiasing = true;
 
 extern void set_subpixel_antialiasing(bool subpix);
 extern status_t get_subpixel_antialiasing(bool* subpix);
@@ -106,9 +102,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	fHintingMenuField = new BMenuField("hinting", B_TRANSLATE("Glyph hinting:"),
 		fHintingMenu);
 
-#ifdef DISABLE_HINTING_CONTROL
 	fHintingMenuField->SetEnabled(false);
-#endif
 
 	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	// controls pane

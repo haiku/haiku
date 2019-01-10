@@ -82,7 +82,7 @@ DesktopSettingsPrivate::_SetDefaults()
 	memcpy(fShared.colors, BPrivate::kDefaultColors,
 		sizeof(rgb_color) * kColorWhichCount);
 
-	gSubpixelAntialiasing = false;
+	gSubpixelAntialiasing = true;
 	gDefaultHintingMode = HINTING_MODE_ON;
 	gSubpixelAverageWeight = 120;
 	gSubpixelOrderingRGB = true;
