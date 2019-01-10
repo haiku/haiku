@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2007-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2007-2009 Marvell Semiconductor, Inc.
  * All rights reserved.
@@ -27,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/mwl/if_mwlioctl.h 193240 2009-06-01 18:07:01Z sam $
+ * $FreeBSD: releng/12.0/sys/dev/mwl/if_mwlioctl.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*

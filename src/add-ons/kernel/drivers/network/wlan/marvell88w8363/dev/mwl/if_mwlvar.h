@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2007-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2007-2009 Marvell Semiconductor, Inc.
  * All rights reserved.
@@ -27,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
  *
- * $FreeBSD: releng/11.1/sys/dev/mwl/if_mwlvar.h 298955 2016-05-03 03:41:25Z pfg $
+ * $FreeBSD: releng/12.0/sys/dev/mwl/if_mwlvar.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*
@@ -67,7 +69,7 @@
 #ifndef MWL_AGGR_SIZE
 #define	MWL_AGGR_SIZE	3839		/* max tx aggregation size */
 #endif
-#define	MWL_AGEINTERVAL	1		/* poke f/w every sec to age q's */
+#define	MWL_AGEINTERVAL	1		/* poke f/w every sec to age q's */ 
 #define	MWL_MAXSTAID	64		/* max of 64 stations */
 
 /*
@@ -179,7 +181,7 @@ typedef STAILQ_HEAD(, mwl_rxbuf) mwl_rxbufhead;
  * to identify which BA stream to use (assigning the h/w q to
  * the TxPriority field of the descriptor).
  *
- * NB: Each station may have at most MWL_MAXBA streams at one time.
+ * NB: Each station may have at most MWL_MAXBA streams at one time.  
  */
 struct mwl_bastate {
 	uint16_t	qos;		/* QoS ctl for BA stream */

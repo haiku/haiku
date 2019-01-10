@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright (c) 2007-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2007-2009 Marvell Semiconductor, Inc.
  * All rights reserved.
@@ -30,7 +32,7 @@
 
 #include <sys/cdefs.h>
 #ifdef __FreeBSD__
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/mwl/if_mwl_pci.c 287197 2015-08-27 08:56:39Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/mwl/if_mwl_pci.c 326255 2017-11-27 14:52:40Z pfg $");
 #endif
 
 /*
