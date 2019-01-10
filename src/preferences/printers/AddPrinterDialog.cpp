@@ -369,9 +369,11 @@ AddPrinterDialog::_FillTransportMenu(BMenu* menu)
 		msg.MakeEmpty();
 		msg.what = B_GET_PROPERTY;
 		msg.AddSpecifier("Ports");
-		if (transport.SendMessage(&msg, &reply) != B_OK ||
-			reply.FindInt32("error", &error) != B_OK ||
-			error != B_OK) {
+		if (transport.SendMessage(&msg, &reply) != B_OK
+				|| reply.FindInt32("error", &error) != B_OK
+				|| error != B_OK
+				|| (transportName == "IPP"
+						&& reply.FindString("port_id", &portId) != B_OK)) {
 			// Transport does not provide list of ports
 			BMessage* menuMsg = new BMessage(kTransportSelectedMsg);
 			menuMsg->AddString("name", transportName);
