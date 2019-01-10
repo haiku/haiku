@@ -446,7 +446,7 @@ if $(HAIKU_NO_DOWNLOADS) = 1 {
 	actions DownloadLocatedFile1
 	{
 		source="$(2)"
-		echo "ERROR: Would need to download $(UR2L), but HAIKU_NO_DOWNLOADS is set!"
+		echo "ERROR: Would need to download $(URL), but HAIKU_NO_DOWNLOADS is set!"
 		exit 1
 	}
 } else {
