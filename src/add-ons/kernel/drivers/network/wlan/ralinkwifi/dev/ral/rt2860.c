@@ -18,7 +18,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ral/rt2860.c 306851 2016-10-08 16:39:21Z avos $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ral/rt2860.c 327479 2018-01-02 00:07:28Z adrian $");
 
 /*-
  * Ralink Technology RT2860/RT3090/RT3390/RT3562/RT5390/RT5392 chipset driver
@@ -1463,7 +1463,7 @@ rt2860_tx(struct rt2860_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 	struct rt2860_txd *txd;
 	struct rt2860_txwi *txwi;
 	struct ieee80211_frame *wh;
-	const struct ieee80211_txparam *tp;
+	const struct ieee80211_txparam *tp = ni->ni_txparms;
 	struct ieee80211_key *k;
 	struct mbuf *m1;
 	bus_dma_segment_t segs[RT2860_MAX_SCATTER];
@@ -1492,11 +1492,10 @@ rt2860_tx(struct rt2860_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 	hdrlen = ieee80211_anyhdrsize(wh);
 	type = wh->i_fc[0] & IEEE80211_FC0_TYPE_MASK;
 
-	tp = &vap->iv_txparms[ieee80211_chan2mode(ni->ni_chan)];
-	if (IEEE80211_IS_MULTICAST(wh->i_addr1)) {
-		rate = tp->mcastrate;
-	} else if (m->m_flags & M_EAPOL) {
+	if (m->m_flags & M_EAPOL) {
 		rate = tp->mgmtrate;
+	} else if (IEEE80211_IS_MULTICAST(wh->i_addr1)) {
+		rate = tp->mcastrate;
 	} else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE) {
 		rate = tp->ucastrate;
 	} else {
@@ -1941,7 +1940,7 @@ rt2860_tx_raw(struct rt2860_softc *sc, struct mbuf *m,
 }
 
 static int
-rt2860_transmit(struct ieee80211com *ic, struct mbuf *m)
+rt2860_transmit(struct ieee80211com *ic, struct mbuf *m)   
 {
 	struct rt2860_softc *sc = ic->ic_softc;
 	int error;
@@ -2594,7 +2593,7 @@ rt5390_set_chan(struct rt2860_softc *sc, u_int chan)
 	rf = MIN(rf, 0x5f);
 	if (tmp != rf)
 		rt2860_mcu_cmd(sc, 0x74, (tmp << 8 ) | rf, 0);
-
+	
 	if (sc->mac_ver == 0x5390) {
 		if (chan <= 4)
 			rf = 0x73;
@@ -2890,7 +2889,7 @@ rt5390_rf_wakeup(struct rt2860_softc *sc)
 	uint8_t rf;
 
 	rf = rt3090_rf_read(sc, 1);
-	rf |= RT3070_RF_BLOCK | RT3070_PLL_PD | RT3070_RX0_PD |
+	rf |= RT3070_RF_BLOCK | RT3070_PLL_PD | RT3070_RX0_PD | 
 	    RT3070_TX0_PD;
 	if (sc->mac_ver == 0x5392)
 		rf |= RT3070_RX1_PD | RT3070_TX1_PD;
@@ -3120,10 +3119,13 @@ static int
 rt2860_updateedca(struct ieee80211com *ic)
 {
 	struct rt2860_softc *sc = ic->ic_softc;
+	struct chanAccParams chp;
 	const struct wmeParams *wmep;
 	int aci;
 
-	wmep = ic->ic_wme.wme_chanParams.cap_wmeParams;
+	ieee80211_wme_ic_getparams(ic, &chp);
+
+	wmep = chp.cap_wmeParams;
 
 	/* update MAC TX configuration registers */
 	for (aci = 0; aci < WME_NUM_AC; aci++) {
@@ -4220,7 +4222,7 @@ rt3090_set_rx_antenna(struct rt2860_softc *sc, int aux)
 
 	if (aux) {
 		if (sc->mac_ver == 0x5390) {
-			rt2860_mcu_bbp_write(sc, 152,
+			rt2860_mcu_bbp_write(sc, 152, 
 			    rt2860_mcu_bbp_read(sc, 152) & ~0x80);
 		} else {
 			tmp = RAL_READ(sc, RT2860_PCI_EECTRL);
@@ -4230,7 +4232,7 @@ rt3090_set_rx_antenna(struct rt2860_softc *sc, int aux)
 		}
 	} else {
 		if (sc->mac_ver == 0x5390) {
-			rt2860_mcu_bbp_write(sc, 152,
+			rt2860_mcu_bbp_write(sc, 152, 
 			    rt2860_mcu_bbp_read(sc, 152) | 0x80);
 		} else {
 			tmp = RAL_READ(sc, RT2860_PCI_EECTRL);

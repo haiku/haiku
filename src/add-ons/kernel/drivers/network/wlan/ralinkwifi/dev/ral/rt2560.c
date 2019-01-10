@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/11.1/sys/dev/ral/rt2560.c 300752 2016-05-26 16:05:19Z avos $	*/
+/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2560.c 330688 2018-03-09 11:33:56Z avos $	*/
 
 /*-
  * Copyright (c) 2005, 2006
@@ -18,7 +18,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/ral/rt2560.c 300752 2016-05-26 16:05:19Z avos $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/ral/rt2560.c 330688 2018-03-09 11:33:56Z avos $");
 
 /*-
  * Ralink Technology RT2560 chipset driver
@@ -345,7 +345,7 @@ rt2560_detach(void *xsc)
 {
 	struct rt2560_softc *sc = xsc;
 	struct ieee80211com *ic = &sc->sc_ic;
-
+	
 	rt2560_stop(sc);
 
 	ieee80211_ifdetach(ic);
@@ -464,7 +464,7 @@ rt2560_alloc_tx_ring(struct rt2560_softc *sc, struct rt2560_tx_ring *ring,
 	ring->cur = ring->next = 0;
 	ring->cur_encrypt = ring->next_encrypt = 0;
 
-	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 4, 0,
+	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 4, 0, 
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    count * RT2560_TX_DESC_SIZE, 1, count * RT2560_TX_DESC_SIZE,
 	    0, NULL, NULL, &ring->desc_dmat);
@@ -496,7 +496,7 @@ rt2560_alloc_tx_ring(struct rt2560_softc *sc, struct rt2560_tx_ring *ring,
 		goto fail;
 	}
 
-	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
+	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    MCLBYTES, RT2560_MAX_SCATTER, MCLBYTES, 0, NULL, NULL,
 	    &ring->data_dmat);
@@ -608,7 +608,7 @@ rt2560_alloc_rx_ring(struct rt2560_softc *sc, struct rt2560_rx_ring *ring,
 	ring->cur = ring->next = 0;
 	ring->cur_decrypt = 0;
 
-	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 4, 0,
+	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 4, 0, 
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    count * RT2560_RX_DESC_SIZE, 1, count * RT2560_RX_DESC_SIZE,
 	    0, NULL, NULL, &ring->desc_dmat);
@@ -643,7 +643,7 @@ rt2560_alloc_rx_ring(struct rt2560_softc *sc, struct rt2560_rx_ring *ring,
 	/*
 	 * Pre-allocate Rx buffers and populate Rx ring.
 	 */
-	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0,
+	error = bus_dma_tag_create(bus_get_dma_tag(sc->sc_dev), 1, 0, 
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL, MCLBYTES,
 	    1, MCLBYTES, 0, NULL, NULL, &ring->data_dmat);
 	if (error != 0) {
@@ -1294,7 +1294,7 @@ rt2560_beacon_expire(struct rt2560_softc *sc)
 	if (ic->ic_opmode != IEEE80211_M_IBSS &&
 	    ic->ic_opmode != IEEE80211_M_HOSTAP &&
 	    ic->ic_opmode != IEEE80211_M_MBSS)
-		return;
+		return;	
 
 	data = &sc->bcnq.data[sc->bcnq.next];
 	/*
@@ -1520,7 +1520,7 @@ rt2560_tx_mgt(struct rt2560_softc *sc, struct mbuf *m0,
 	desc = &sc->prioq.desc[sc->prioq.cur];
 	data = &sc->prioq.data[sc->prioq.cur];
 
-	rate = vap->iv_txparms[ieee80211_chan2mode(ic->ic_curchan)].mgmtrate;
+	rate = ni->ni_txparms->mgmtrate;
 
 	wh = mtod(m0, struct ieee80211_frame *);
 
@@ -1596,38 +1596,18 @@ rt2560_sendprot(struct rt2560_softc *sc,
     const struct mbuf *m, struct ieee80211_node *ni, int prot, int rate)
 {
 	struct ieee80211com *ic = ni->ni_ic;
-	const struct ieee80211_frame *wh;
 	struct rt2560_tx_desc *desc;
 	struct rt2560_tx_data *data;
 	struct mbuf *mprot;
-	int protrate, ackrate, pktlen, flags, isshort, error;
-	uint16_t dur;
+	int protrate, flags, error;
 	bus_dma_segment_t segs[RT2560_MAX_SCATTER];
 	int nsegs;
 
-	KASSERT(prot == IEEE80211_PROT_RTSCTS || prot == IEEE80211_PROT_CTSONLY,
-	    ("protection %d", prot));
-
-	wh = mtod(m, const struct ieee80211_frame *);
-	pktlen = m->m_pkthdr.len + IEEE80211_CRC_LEN;
-
-	protrate = ieee80211_ctl_rate(ic->ic_rt, rate);
-	ackrate = ieee80211_ack_rate(ic->ic_rt, rate);
-
-	isshort = (ic->ic_flags & IEEE80211_F_SHPREAMBLE) != 0;
-	dur = ieee80211_compute_duration(ic->ic_rt, pktlen, rate, isshort)
-	    + ieee80211_ack_duration(ic->ic_rt, rate, isshort);
-	flags = RT2560_TX_MORE_FRAG;
-	if (prot == IEEE80211_PROT_RTSCTS) {
-		/* NB: CTS is the same size as an ACK */
-		dur += ieee80211_ack_duration(ic->ic_rt, rate, isshort);
-		flags |= RT2560_TX_ACK;
-		mprot = ieee80211_alloc_rts(ic, wh->i_addr1, wh->i_addr2, dur);
-	} else {
-		mprot = ieee80211_alloc_cts(ic, ni->ni_vap->iv_myaddr, dur);
-	}
+	mprot = ieee80211_alloc_prot(ni, m, rate, prot);
 	if (mprot == NULL) {
-		/* XXX stat + msg */
+		if_inc_counter(ni->ni_vap->iv_ifp, IFCOUNTER_OERRORS, 1);
+		device_printf(sc->sc_dev,
+		    "could not allocate mbuf for protection mode %d\n", prot);
 		return ENOBUFS;
 	}
 
@@ -1647,6 +1627,11 @@ rt2560_sendprot(struct rt2560_softc *sc,
 	data->ni = ieee80211_ref_node(ni);
 	/* ctl frames are not taken into account for amrr */
 	data->rix = IEEE80211_FIXED_RATE_NONE;
+
+	protrate = ieee80211_ctl_rate(ic->ic_rt, rate);
+	flags = RT2560_TX_MORE_FRAG;
+	if (prot == IEEE80211_PROT_RTSCTS)
+		flags |= RT2560_TX_ACK;
 
 	rt2560_setup_tx_desc(sc, desc, flags, mprot->m_pkthdr.len, protrate, 1,
 	    segs->ds_addr);
@@ -1748,7 +1733,7 @@ rt2560_tx_data(struct rt2560_softc *sc, struct mbuf *m0,
 	struct rt2560_tx_desc *desc;
 	struct rt2560_tx_data *data;
 	struct ieee80211_frame *wh;
-	const struct ieee80211_txparam *tp;
+	const struct ieee80211_txparam *tp = ni->ni_txparms;
 	struct ieee80211_key *k;
 	struct mbuf *mnew;
 	bus_dma_segment_t segs[RT2560_MAX_SCATTER];
@@ -1758,11 +1743,10 @@ rt2560_tx_data(struct rt2560_softc *sc, struct mbuf *m0,
 
 	wh = mtod(m0, struct ieee80211_frame *);
 
-	tp = &vap->iv_txparms[ieee80211_chan2mode(ni->ni_chan)];
-	if (IEEE80211_IS_MULTICAST(wh->i_addr1)) {
-		rate = tp->mcastrate;
-	} else if (m0->m_flags & M_EAPOL) {
+	if (m0->m_flags & M_EAPOL) {
 		rate = tp->mgmtrate;
+	} else if (IEEE80211_IS_MULTICAST(wh->i_addr1)) {
+		rate = tp->mcastrate;
 	} else if (tp->ucastrate != IEEE80211_FIXED_RATE_NONE) {
 		rate = tp->ucastrate;
 	} else {
@@ -1881,7 +1865,7 @@ rt2560_tx_data(struct rt2560_softc *sc, struct mbuf *m0,
 }
 
 static int
-rt2560_transmit(struct ieee80211com *ic, struct mbuf *m)
+rt2560_transmit(struct ieee80211com *ic, struct mbuf *m)   
 {
 	struct rt2560_softc *sc = ic->ic_softc;
 	int error;
@@ -2125,7 +2109,7 @@ rt2560_set_chan(struct rt2560_softc *sc, struct ieee80211_channel *c)
 		rt2560_rf_write(sc, RAL_RF3, power << 7 | 0x00040);
 		rt2560_rf_write(sc, RAL_RF4, rt2560_rf5222[i].r4);
 		break;
-	default:
+	default: 
  	        printf("unknown ral rev=%d\n", sc->rf_rev);
 	}
 
@@ -2693,7 +2677,7 @@ rt2560_stop_locked(struct rt2560_softc *sc)
 
 		/* abort Tx */
 		RAL_WRITE(sc, RT2560_TXCSR0, RT2560_ABORT_TX);
-
+		
 		/* disable Rx */
 		RAL_WRITE(sc, RT2560_RXCSR0, RT2560_DISABLE_RX);
 
@@ -2703,7 +2687,7 @@ rt2560_stop_locked(struct rt2560_softc *sc)
 
 		/* disable interrupts */
 		RAL_WRITE(sc, RT2560_CSR8, 0xffffffff);
-
+		
 		/* reset Tx and Rx rings */
 		rt2560_reset_tx_ring(sc, &sc->txq);
 		rt2560_reset_tx_ring(sc, &sc->atimq);

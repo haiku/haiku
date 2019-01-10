@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/11.1/sys/dev/ral/rt2560reg.h 258780 2013-11-30 22:17:27Z eadler $	*/
+/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2560reg.h 258780 2013-11-30 22:17:27Z eadler $	*/
 
 /*-
  * Copyright (c) 2005, 2006
