@@ -698,6 +698,11 @@ ieee80211_ioctl_getdevcaps(struct ieee80211com *ic,
 
 	maxchans = 1 + ((ireq->i_len - sizeof(struct ieee80211_devcaps_req)) /
 	    sizeof(struct ieee80211_channel));
+#ifdef __HAIKU__
+	/* HACK */
+	if (ireq->i_len < sizeof(struct ieee80211_devcaps_req))
+		maxchans = 0;
+#endif
 	/* NB: require 1 so we know ic_nchans is accessible */
 	if (maxchans < 1)
 #ifndef __HAIKU__
