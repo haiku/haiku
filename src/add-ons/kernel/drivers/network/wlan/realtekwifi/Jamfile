@@ -82,6 +82,8 @@ KernelAddon realtekwifi :
 	libfreebsd_network.a
 	;
 
-HAIKU_WIFI_FIRMWARE_PACKAGES on realtekwifi = rtwn-rtl8192cfw ;
-HAIKU_WIFI_FIRMWARE_ARCHIVES on realtekwifi = rtwn-rtl8192cfw.tgz ;
+HAIKU_WIFI_FIRMWARE_PACKAGES on realtekwifi =
+	rtwn-rtl8188fw rtwn-rtl8192cfw ;
+HAIKU_WIFI_FIRMWARE_ARCHIVES on realtekwifi =
+	rtwn-rtl8188fw.tgz rtwn-rtl8192cfw.tgz ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on realtekwifi = true ;
