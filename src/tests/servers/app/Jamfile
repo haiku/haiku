@@ -55,13 +55,24 @@ SharedLibrary libhwinterface.so :
 	RGBColor.cpp
 	UpdateQueue.cpp
 
-	: libtestappserver.so
+	: # will depend on libtestappserver.so
 ;
 
+# We include --no-undefined in LINKFLAGS by default, which we can't use here
+# because otherwise we would be trapped in a circular dependency.
+local hwinterfaceLinkFlags ;
+for flag in [ on libhwinterface.so return $(LINKFLAGS) ] {
+	if $(flag) = "--no-undefined" {
+		hwinterfaceLinkFlags += "--allow-shlib-undefined" ;
+		continue ;
+	}
+	hwinterfaceLinkFlags += $(flag) ;
+}
+LINKFLAGS on libhwinterface.so = $(hwinterfaceLinkFlags) ;
 
-# The reason for this is that libhwinterfaceimpl.so needs to link against
-# libbe *first*, but simply adding it to the library list would add it to
-# LINKLIBS which is always appended after NEEDLIBS in the command line.
+# libhwinterfaceimpl.so needs to link against libbe *first*, but simply
+# adding it to the library list would add it to LINKLIBS which is always
+# appended after NEEDLIBS in the command line.
 LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
 LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
 
@@ -174,7 +185,7 @@ SharedLibrary libtestappserver.so :
 
 	# libraries
 	: be libpainter.a libagg.a libtextencoding.so shared libstackandtile.a
-	liblinprog.a
+	liblinprog.a libhwinterface.so libhwinterfaceimpl.so
 	[ BuildFeatureAttribute freetype : library ]
 ;
 
