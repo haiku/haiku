@@ -102,8 +102,6 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	fHintingMenuField = new BMenuField("hinting", B_TRANSLATE("Glyph hinting:"),
 		fHintingMenu);
 
-	fHintingMenuField->SetEnabled(false);
-
 	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	// controls pane
 		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
