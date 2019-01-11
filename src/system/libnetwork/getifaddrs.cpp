@@ -50,69 +50,34 @@ copy_address(const sockaddr& address)
 }
 
 
-/*! Returns a chained list of all interfaces.
-
-	We follow BSD semantics, and only return one entry per interface,
-	not per address; since this is mainly used by NetBSD's netresolv, it's
-	probably what it expects.
-*/
-int
-getifaddrs(struct ifaddrs** _ifaddrs)
+static int
+_getifaddrs(int domain, char* buffer, size_t len, struct ifaddrs** previous)
 {
-	if (_ifaddrs == NULL) {
-		errno = B_BAD_VALUE;
-		return -1;
-	}
-
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	int socket = ::socket(domain, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return -1;
-
 	FileDescriptorCloser closer(socket);
 
-	// Get interface count
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return -1;
-
-	size_t count = (size_t)config.ifc_value;
-	if (count == 0) {
-		// No interfaces found
-		*_ifaddrs = NULL;
-		return 0;
-	}
-
-	// Allocate a buffer for ifreqs for all interfaces
-	char* buffer = (char*)malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL) {
-		errno = B_NO_MEMORY;
-		return -1;
-	}
-
-	MemoryDeleter deleter(buffer);
-
 	// Get interfaces configuration
-	config.ifc_len = count * sizeof(struct ifreq);
+	ifconf config;
 	config.ifc_buf = buffer;
+	config.ifc_len = len;
 	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
 		return -1;
 
 	ifreq* interfaces = (ifreq*)buffer;
 	ifreq* end = (ifreq*)(buffer + config.ifc_len);
-	struct ifaddrs* previous = NULL;
 
-	for (uint32_t i = 0; interfaces < end; i++) {
+	while (interfaces < end) {
 		struct ifaddrs* current = new(std::nothrow) ifaddrs();
 		if (current == NULL) {
-			freeifaddrs(previous);
 			errno = B_NO_MEMORY;
 			return -1;
 		}
 
 		// Chain this interface with the next one
-		current->ifa_next = previous;
-		previous = current;
+		current->ifa_next = *previous;
+		*previous = current;
 
 		current->ifa_name = strdup(interfaces[0].ifr_name);
 		current->ifa_addr = copy_address(interfaces[0].ifr_addr);
@@ -138,6 +103,72 @@ getifaddrs(struct ifaddrs** _ifaddrs)
 		interfaces = (ifreq*)((uint8_t*)interfaces
 			+ _SIZEOF_ADDR_IFREQ(interfaces[0]));
 	}
+
+	return 0;
+}
+
+
+/*! Returns a chained list of all interfaces. */
+int
+getifaddrs(struct ifaddrs** _ifaddrs)
+{
+	if (_ifaddrs == NULL) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return -1;
+
+	FileDescriptorCloser closer(socket);
+
+	// Get interface count
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
+		return -1;
+
+	socket = -1;
+	closer.Unset();
+
+	size_t count = (size_t)config.ifc_value;
+	if (count == 0) {
+		// No interfaces found
+		*_ifaddrs = NULL;
+		return 0;
+	}
+
+	// Allocate a buffer for ifreqs for all interfaces
+	size_t buflen = count * sizeof(struct ifreq);
+	char* buffer = (char*)malloc(buflen);
+	if (buffer == NULL) {
+		errno = B_NO_MEMORY;
+		return -1;
+	}
+
+	MemoryDeleter deleter(buffer);
+
+	struct ifaddrs* previous = NULL;
+	int serrno = errno;
+	if (_getifaddrs(AF_INET, buffer, buflen, &previous) < 0 &&
+		errno != B_UNSUPPORTED) {
+		freeifaddrs(previous);
+		return -1;
+	}
+	if (_getifaddrs(AF_INET6, buffer, buflen, &previous) < 0 &&
+		errno != B_UNSUPPORTED) {
+		freeifaddrs(previous);
+		return -1;
+	}
+	if (_getifaddrs(AF_LINK, buffer, buflen, &previous) < 0 &&
+		errno != B_UNSUPPORTED) {
+		freeifaddrs(previous);
+		return -1;
+	}
+	if (previous == NULL)
+		return -1;
+	errno = serrno;
 
 	*_ifaddrs = previous;
 	return 0;

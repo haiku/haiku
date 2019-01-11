@@ -43,6 +43,29 @@ GetAddrInfoTest::EmptyTest()
 }
 
 
+void
+GetAddrInfoTest::AddrConfigTest()
+{
+	struct addrinfo *info = NULL, hints = {0};
+	hints.ai_flags = AI_ADDRCONFIG;
+
+	// localhost is guaranteed to have an IPv6 address.
+	int result = getaddrinfo("localhost", NULL, &hints, &info);
+	CPPUNIT_ASSERT(result == 0);
+	CPPUNIT_ASSERT(info != NULL);
+
+	bool check;
+	for (struct addrinfo* iter = info; iter != NULL; iter = iter->ai_next) {
+		// only IPv4 addresses should be returned as we don't have IPv6 routing.
+		check = iter->ai_family == AF_INET;
+		if (!check) break;
+	}
+
+	freeaddrinfo(info);
+	CPPUNIT_ASSERT(check);
+}
+
+
 /* static */ void
 GetAddrInfoTest::AddTests(BTestSuite& parent)
 {
@@ -50,6 +73,8 @@ GetAddrInfoTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(new CppUnit::TestCaller<GetAddrInfoTest>(
 		"GetAddrInfoTest::EmptyTest", &GetAddrInfoTest::EmptyTest));
+	suite.addTest(new CppUnit::TestCaller<GetAddrInfoTest>(
+		"GetAddrInfoTest::AddrConfigTest", &GetAddrInfoTest::AddrConfigTest));
 
 	parent.addTest("GetAddrInfoTest", &suite);
 }

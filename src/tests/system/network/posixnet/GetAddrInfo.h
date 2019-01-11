@@ -16,6 +16,7 @@ public:
 	virtual			~GetAddrInfoTest();
 
 			void	EmptyTest();
+			void	AddrConfigTest();
 
 	static	void	AddTests(BTestSuite& suite);
 };
