@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/usb/r92cu.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 #ifndef RTL8192CU_H
@@ -47,7 +47,6 @@ void	r92cu_post_init(struct rtwn_softc *);
 void	r92cu_set_led(struct rtwn_softc *, int, int);
 
 /* r92cu_rx.c */
-int	r92cu_classify_intr(struct rtwn_softc *, void *, int);
 int	r92cu_align_rx(int, int);
 
 /* r92cu_tx.c */

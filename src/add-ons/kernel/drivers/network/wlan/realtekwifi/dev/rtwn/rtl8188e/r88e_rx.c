@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e_rx.c 331043 2018-03-16 01:03:10Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -55,6 +55,25 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e_rx.c 331043 2018-03-1
 #include <dev/rtwn/rtl8188e/r88e.h>
 #include <dev/rtwn/rtl8188e/r88e_rx_desc.h>
 
+
+int
+r88e_classify_intr(struct rtwn_softc *sc, void *buf, int len)
+{
+	struct r92c_rx_stat *stat = buf;
+	int report_sel = MS(le32toh(stat->rxdw3), R88E_RXDW3_RPT);
+
+	switch (report_sel) {
+	case R88E_RXDW3_RPT_RX:
+		return (RTWN_RX_DATA);
+	case R88E_RXDW3_RPT_TX1:	/* per-packet Tx report */
+	case R88E_RXDW3_RPT_TX2:	/* periodical Tx report */
+		return (RTWN_RX_TX_REPORT);
+	case R88E_RXDW3_RPT_HIS:
+		return (RTWN_RX_OTHER);
+	default:			/* shut up the compiler */
+		return (RTWN_RX_DATA);
+	}
+}
 
 void
 r88e_ratectl_tx_complete(struct rtwn_softc *sc, uint8_t *buf, int len)

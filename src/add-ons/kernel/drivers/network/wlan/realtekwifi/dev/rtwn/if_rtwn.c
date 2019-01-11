@@ -19,11 +19,12 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/if_rtwn.c 327479 2018-01-02 00:07:28Z adrian $");
+__FBSDID("$FreeBSD$");
 
 /*
  * Driver for Realtek RTL8188CE-VAU/RTL8188CUS/RTL8188EU/RTL8188RU/RTL8192CU/RTL8812AU/RTL8821AU.
  */
+#include "opt_wlan.h"
 
 #include <sys/param.h>
 #include <sys/sockio.h>

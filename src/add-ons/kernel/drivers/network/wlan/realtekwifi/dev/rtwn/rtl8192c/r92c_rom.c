@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/r92c_rom.c 307529 2016-10-17 20:38:24Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -96,7 +96,7 @@ r92c_parse_rom(struct rtwn_softc *sc, uint8_t *buf)
 	    __func__, rs->regulatory);
 
 	/* Need to be set before postinit() (but after preinit()). */
-	rtwn_r92c_set_name(sc);
+	rtwn_r92c_set_rom_opts(sc, buf);
 	r92c_set_chains(sc);
 
 	for (j = 0; j < R92C_GROUP_2G; j++) {

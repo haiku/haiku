@@ -13,7 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e_rom_image.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 #ifndef R88E_ROM_IMAGE_H
@@ -44,11 +44,24 @@ struct r88e_rom {
 	uint8_t		reserved4[3];
 	uint8_t		rf_ant_opt;
 	uint8_t		reserved5[6];
-	uint16_t	vid;
-	uint16_t	pid;
-	uint8_t		usb_opt;
-	uint8_t		reserved6[2];
-	uint8_t		macaddr[IEEE80211_ADDR_LEN];
+
+	union {
+		struct {
+			uint16_t	vid;
+			uint16_t	pid;
+			uint8_t		usb_opt;
+			uint8_t		reserved6[2];
+			uint8_t		macaddr[IEEE80211_ADDR_LEN];
+		} __packed usb;
+
+		struct {
+			uint8_t		macaddr[IEEE80211_ADDR_LEN];
+			uint16_t	vid;
+			uint16_t	pid;
+			uint8_t		reserved6[3];
+		} __packed pci;
+	} __packed diff_d0;
+
 	uint8_t		reserved7[2];
 	uint8_t		string[33];	/* "realtek 802.11n NIC" */
 	uint8_t		reserved8[256];

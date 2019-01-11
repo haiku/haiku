@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/usb/r92cu_rx.c 307529 2016-10-17 20:38:24Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -48,13 +48,6 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/usb/r92cu_rx.c 307529 2016
 
 #include <dev/rtwn/rtl8192c/usb/r92cu.h>
 
-
-int
-r92cu_classify_intr(struct rtwn_softc *sc, void *buf, int len)
-{
-	/* NB: reports are fetched from C2H_MSG register. */
-	return (RTWN_RX_DATA);
-}
 
 int
 r92cu_align_rx(int totlen, int len)

@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e_rom.c 307529 2016-10-17 20:38:24Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -81,5 +81,6 @@ r88e_parse_rom(struct rtwn_softc *sc, uint8_t *buf)
 	    __func__,rs->regulatory);
 
 	sc->thermal_meter = rom->thermal_meter;
-	IEEE80211_ADDR_COPY(sc->sc_ic.ic_macaddr, rom->macaddr);
+
+	rtwn_r92c_set_rom_opts(sc, buf);
 }

@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/usb/r88eu_attach.c 320055 2017-06-17 14:39:25Z kevlo $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -57,6 +57,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/usb/r88eu_attach.c 320055 
 #include <dev/rtwn/rtl8192c/usb/r92cu_tx_desc.h>
 
 #include <dev/rtwn/rtl8188e/r88e_priv.h>
+#include <dev/rtwn/rtl8188e/r88e_rom_image.h>	/* for 'macaddr' field */
 
 #include <dev/rtwn/rtl8188e/usb/r88eu.h>
 
@@ -64,6 +65,14 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/usb/r88eu_attach.c 320055 
 static struct rtwn_r88e_txpwr r88e_txpwr;
 
 void	r88eu_attach(struct rtwn_usb_softc *);
+
+static void
+r88eu_set_macaddr(struct rtwn_softc *sc, uint8_t *buf)
+{
+	struct r88e_rom *rom = (struct r88e_rom *)buf;
+
+	IEEE80211_ADDR_COPY(sc->sc_ic.ic_macaddr, rom->diff_d0.usb.macaddr);
+}
 
 static void
 r88e_postattach(struct rtwn_softc *sc)
@@ -93,7 +102,7 @@ r88eu_attach_private(struct rtwn_softc *sc)
 	rs->rs_tx_enable_ampdu		= r88e_tx_enable_ampdu;
 	rs->rs_tx_setup_hwseq		= r88e_tx_setup_hwseq;
 	rs->rs_tx_setup_macid		= r88e_tx_setup_macid;
-	rs->rs_set_name			= rtwn_nop_softc;	/* not used */
+	rs->rs_set_rom_opts		= r88eu_set_macaddr;
 
 	rs->rf_read_delay[0]		= 10;
 	rs->rf_read_delay[1]		= 100;
@@ -130,7 +139,7 @@ r88eu_attach(struct rtwn_usb_softc *uc)
 	sc->sc_get_rx_stats		= r88e_get_rx_stats;
 	sc->sc_get_rssi_cck		= r88e_get_rssi_cck;
 	sc->sc_get_rssi_ofdm		= r88e_get_rssi_ofdm;
-	sc->sc_classify_intr		= r88eu_classify_intr;
+	sc->sc_classify_intr		= r88e_classify_intr;
 	sc->sc_handle_tx_report		= r88e_ratectl_tx_complete;
 	sc->sc_handle_c2h_report	= r88e_handle_c2h_report;
 	sc->sc_check_frame		= rtwn_nop_int_softc_mbuf;
@@ -140,7 +149,7 @@ r88eu_attach(struct rtwn_usb_softc *uc)
 	sc->sc_efuse_postread		= rtwn_nop_softc;
 	sc->sc_parse_rom		= r88e_parse_rom;
 	sc->sc_set_led			= r88e_set_led;
-	sc->sc_power_on			= r88e_power_on;
+	sc->sc_power_on			= r88eu_power_on;
 	sc->sc_power_off		= r88eu_power_off;
 #ifndef RTWN_WITHOUT_UCODE
 	sc->sc_fw_reset			= r88e_fw_reset;
@@ -149,7 +158,7 @@ r88eu_attach(struct rtwn_usb_softc *uc)
 	sc->sc_llt_init			= r92c_llt_init;
 	sc->sc_set_page_size		= r92c_set_page_size;
 	sc->sc_lc_calib			= r92c_lc_calib;
-	sc->sc_iq_calib			= r88e_iq_calib;	/* XXX TODO */
+	sc->sc_iq_calib			= r88e_iq_calib;
 	sc->sc_read_chipid_vendor	= rtwn_nop_softc_uint32;
 	sc->sc_adj_devcaps		= r88eu_adj_devcaps;
 	sc->sc_vap_preattach		= rtwn_nop_softc_vap;
@@ -172,29 +181,29 @@ r88eu_attach(struct rtwn_usb_softc *uc)
 	sc->sc_init_ampdu		= rtwn_nop_softc;
 	sc->sc_init_intr		= r88eu_init_intr;
 	sc->sc_init_edca		= r92c_init_edca;
-	sc->sc_init_bb			= r88e_init_bb;
+	sc->sc_init_bb			= r88eu_init_bb;
 	sc->sc_init_rf			= r92c_init_rf;
 	sc->sc_init_antsel		= rtwn_nop_softc;
 	sc->sc_post_init		= r88eu_post_init;
 	sc->sc_init_bcnq1_boundary	= rtwn_nop_int_softc;
 
-	sc->mac_prog			= &rtl8188eu_mac[0];
-	sc->mac_size			= nitems(rtl8188eu_mac);
-	sc->bb_prog			= &rtl8188eu_bb[0];
-	sc->bb_size			= nitems(rtl8188eu_bb);
-	sc->agc_prog			= &rtl8188eu_agc[0];
-	sc->agc_size			= nitems(rtl8188eu_agc);
-	sc->rf_prog			= &rtl8188eu_rf[0];
+	sc->mac_prog			= &rtl8188e_mac[0];
+	sc->mac_size			= nitems(rtl8188e_mac);
+	sc->bb_prog			= &rtl8188e_bb[0];
+	sc->bb_size			= nitems(rtl8188e_bb);
+	sc->agc_prog			= &rtl8188e_agc[0];
+	sc->agc_size			= nitems(rtl8188e_agc);
+	sc->rf_prog			= &rtl8188e_rf[0];
 
 	sc->name			= "RTL8188EU";
 	sc->fwname			= "rtwn-rtl8188eufw";
 	sc->fwsig			= 0x88e;
 
-	sc->page_count			= R88E_TX_PAGE_COUNT;
+	sc->page_count			= R88EU_TX_PAGE_COUNT;
 	sc->pktbuf_count		= R88E_TXPKTBUF_COUNT;
 
 	sc->ackto			= 0x40;
-	sc->npubqpages			= R88E_PUBQ_NPAGES;
+	sc->npubqpages			= R88EU_PUBQ_NPAGES;
 	sc->page_size			= R92C_TX_PAGE_SIZE;
 
 	sc->txdesc_len			= sizeof(struct r92cu_tx_desc);

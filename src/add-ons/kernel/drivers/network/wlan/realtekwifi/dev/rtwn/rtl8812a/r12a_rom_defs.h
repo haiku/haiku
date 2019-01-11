@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8812a/r12a_rom_defs.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 #ifndef R12A_ROM_DEFS_H

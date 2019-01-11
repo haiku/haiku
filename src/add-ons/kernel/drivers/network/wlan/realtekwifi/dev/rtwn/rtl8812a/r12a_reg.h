@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8812a/r12a_reg.h 335351 2018-06-19 00:38:28Z avos $
+ * $FreeBSD$
  */
 
 #ifndef R12A_REG_H

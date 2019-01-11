@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/r92c.h 322950 2017-08-27 13:02:51Z avos $
+ * $FreeBSD$
  */
 
 #ifndef RTL8192C_H
@@ -102,6 +102,7 @@ void	r92c_efuse_postread(struct rtwn_softc *);
 void	r92c_parse_rom(struct rtwn_softc *, uint8_t *);
 
 /* r92c_rx.c */
+int	r92c_classify_intr(struct rtwn_softc *, void *, int);
 int8_t	r92c_get_rssi_cck(struct rtwn_softc *, void *);
 int8_t	r92c_get_rssi_ofdm(struct rtwn_softc *, void *);
 uint8_t	r92c_rx_radiotap_flags(const void *);

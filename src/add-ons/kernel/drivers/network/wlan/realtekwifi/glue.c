@@ -39,7 +39,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct rtwn_pci_softc* pc = (struct rtwn_pci_softc*)device_get_softc(dev);
 	int32_t status, tx_rings;
 
-	status = rtwn_classify_intr(&pc->pc_sc, &tx_rings, 0);
+	status = rtwn_pci_get_intr_status(pc, &tx_rings);
 	if (status == 0 && tx_rings == 0)
 		return 0;
 

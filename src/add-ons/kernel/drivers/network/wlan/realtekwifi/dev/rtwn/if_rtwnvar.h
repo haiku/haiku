@@ -15,11 +15,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/if_rtwnvar.h 320640 2017-07-04 07:07:08Z avos $
+ * $FreeBSD$
  */
 
 #ifndef IF_RTWNVAR_H
 #define IF_RTWNVAR_H
+
+#include "opt_rtwn.h"
 
 #define RTWN_TX_DESC_SIZE	64
 

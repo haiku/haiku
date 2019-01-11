@@ -25,7 +25,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8812a/r12a_tx.c 322988 2017-08-28 22:14:16Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 

@@ -15,6 +15,8 @@ UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn pci ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn rtl8188e ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn rtl8188e pci ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn rtl8192c ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn rtl8192c pci ] ;
 
@@ -36,6 +38,23 @@ KernelAddon realtekwifi :
 	rtwn_pci_reg.c
 	rtwn_pci_rx.c
 	rtwn_pci_tx.c
+
+	# rtl8188e/
+	r88e_beacon.c
+	r88e_calib.c
+	r88e_chan.c
+	r88e_fw.c
+	r88e_init.c
+	r88e_led.c
+	r88e_rf.c
+	r88e_rom.c
+	r88e_rx.c
+	r88e_tx.c
+
+	# rtl8188e/pci/
+	r88ee_attach.c
+	r88ee_init.c
+	r88ee_rx.c
 
 	# rtl8192c/
 	r92c_attach.c

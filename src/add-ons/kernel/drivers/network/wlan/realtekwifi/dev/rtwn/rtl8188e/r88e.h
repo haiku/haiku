@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e.h 322949 2017-08-27 12:44:56Z avos $
+ * $FreeBSD$
  */
 
 #ifndef RTL8188E_H
@@ -24,9 +24,7 @@
 /*
  * Global definitions.
  */
-#define R88E_PUBQ_NPAGES	142
 #define R88E_TXPKTBUF_COUNT	177
-#define R88E_TX_PAGE_COUNT	169
 
 #define R88E_MACID_MAX		63
 #define R88E_RX_DMA_BUFFER_SIZE	0x2400
@@ -67,9 +65,8 @@ int	r88e_set_pwrmode(struct rtwn_softc *, struct ieee80211vap *, int);
 #endif
 
 /* r88e_init.c */
-void	r88e_init_bb(struct rtwn_softc *);
+void	r88e_init_bb_common(struct rtwn_softc *);
 void	r88e_init_rf(struct rtwn_softc *);
-int	r88e_power_on(struct rtwn_softc *);
 
 /* r88e_led.c */
 void	r88e_set_led(struct rtwn_softc *, int, int);
@@ -81,6 +78,7 @@ void	r88e_rf_write(struct rtwn_softc *, int, uint8_t, uint32_t);
 void	r88e_parse_rom(struct rtwn_softc *, uint8_t *);
 
 /* r88e_rx.c */
+int	r88e_classify_intr(struct rtwn_softc *, void *, int);
 void	r88e_ratectl_tx_complete(struct rtwn_softc *, uint8_t *, int);
 void	r88e_handle_c2h_report(struct rtwn_softc *, uint8_t *, int);
 int8_t	r88e_get_rssi_cck(struct rtwn_softc *, void *);

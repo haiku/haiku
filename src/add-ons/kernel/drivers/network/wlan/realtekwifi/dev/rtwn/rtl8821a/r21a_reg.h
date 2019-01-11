@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8821a/r21a_reg.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 #ifndef R21A_REG_H

@@ -13,13 +13,15 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
- * $FreeBSD: releng/12.0/sys/dev/rtwn/pci/rtwn_pci_attach.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 void	r92ce_attach(struct rtwn_pci_softc *);
+void	r88ee_attach(struct rtwn_pci_softc *);
 
 enum {
 	RTWN_CHIP_RTL8192CE,
+	RTWN_CHIP_RTL8188EE,
 	RTWN_CHIP_MAX_PCI
 };
 
@@ -32,13 +34,15 @@ struct rtwn_pci_ident {
 
 static const struct rtwn_pci_ident rtwn_pci_ident_table[] = {
 	{ 0x10ec, 0x8176, "Realtek RTL8188CE", RTWN_CHIP_RTL8192CE },
+	{ 0x10ec, 0x8179, "Realtek RTL8188EE", RTWN_CHIP_RTL8188EE },
 	{ 0, 0, NULL, RTWN_CHIP_MAX_PCI }
 };
 
 typedef void	(*chip_pci_attach)(struct rtwn_pci_softc *);
 
 static const chip_pci_attach rtwn_chip_pci_attach[RTWN_CHIP_MAX_PCI] = {
-	[RTWN_CHIP_RTL8192CE] = r92ce_attach
+	[RTWN_CHIP_RTL8192CE] = r92ce_attach,
+	[RTWN_CHIP_RTL8188EE] = r88ee_attach
 };
 
 static __inline void

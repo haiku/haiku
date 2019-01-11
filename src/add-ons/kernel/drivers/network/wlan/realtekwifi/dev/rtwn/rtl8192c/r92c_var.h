@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/r92c_var.h 322949 2017-08-27 12:44:56Z avos $
+ * $FreeBSD$
  */
 
 #ifndef R92C_VAR_H
@@ -58,7 +58,7 @@ struct r92c_softc {
 	void		(*rs_tx_enable_ampdu)(void *, int);
 	void		(*rs_tx_setup_hwseq)(void *);
 	void		(*rs_tx_setup_macid)(void *, int);
-	void		(*rs_set_name)(struct rtwn_softc *);
+	void		(*rs_set_rom_opts)(struct rtwn_softc *, uint8_t *);
 
 	int		rf_read_delay[3];
 	uint32_t	rf_chnlbw[R92C_MAX_CHAINS];
@@ -77,7 +77,7 @@ struct r92c_softc {
 	((R92C_SOFTC(_sc)->rs_tx_setup_hwseq)((_buf)))
 #define rtwn_r92c_tx_setup_macid(_sc, _buf, _id) \
 	((R92C_SOFTC(_sc)->rs_tx_setup_macid)((_buf), (_id)))
-#define rtwn_r92c_set_name(_sc) \
-	((R92C_SOFTC(_sc)->rs_set_name)((_sc)))
+#define rtwn_r92c_set_rom_opts(_sc, _buf) \
+	((R92C_SOFTC(_sc)->rs_set_rom_opts)((_sc), (_buf)))
 
 #endif	/* R92C_VAR_H */

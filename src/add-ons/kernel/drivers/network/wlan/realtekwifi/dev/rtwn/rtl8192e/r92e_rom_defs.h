@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192e/r92e_rom_defs.h 312680 2017-01-24 02:35:38Z kevlo $
+ * $FreeBSD$
  */
 
 #ifndef R92E_ROM_DEFS_H

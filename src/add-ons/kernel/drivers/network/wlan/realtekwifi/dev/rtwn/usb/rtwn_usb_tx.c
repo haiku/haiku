@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/usb/rtwn_usb_tx.c 320640 2017-07-04 07:07:08Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 

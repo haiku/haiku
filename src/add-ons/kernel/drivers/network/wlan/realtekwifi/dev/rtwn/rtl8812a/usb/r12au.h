@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8812a/usb/r12au.h 335351 2018-06-19 00:38:28Z avos $
+ * $FreeBSD$
  */
 
 #ifndef RTL8812AU_H

@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/usb/r92cu_init.c 311347 2017-01-05 02:04:53Z kevlo $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 

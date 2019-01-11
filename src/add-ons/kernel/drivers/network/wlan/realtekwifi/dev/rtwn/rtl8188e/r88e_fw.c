@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e_fw.c 312002 2017-01-13 02:11:16Z kevlo $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -109,7 +109,11 @@ r88e_fw_reset(struct rtwn_softc *sc, int reason)
 
 	reg = rtwn_read_2(sc, R92C_SYS_FUNC_EN);
 	rtwn_write_2(sc, R92C_SYS_FUNC_EN, reg & ~R92C_SYS_FUNC_EN_CPUEN);
-	rtwn_write_2(sc, R92C_SYS_FUNC_EN, reg | R92C_SYS_FUNC_EN_CPUEN);
+
+	if (reason != RTWN_FW_RESET_SHUTDOWN) {
+		rtwn_write_2(sc, R92C_SYS_FUNC_EN,
+		    reg | R92C_SYS_FUNC_EN_CPUEN);
+	}
 }
 
 void

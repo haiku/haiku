@@ -19,7 +19,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/pci/r92ce_rx.c 307529 2016-10-17 20:38:24Z avos $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_wlan.h"
 
@@ -58,10 +58,10 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/pci/r92ce_rx.c 307529 2016
 
 
 int
-r92ce_classify_intr(struct rtwn_softc *sc, void *arg, int len __unused)
+r92ce_get_intr_status(struct rtwn_pci_softc *pc, int *rings)
 {
+	struct rtwn_softc *sc = &pc->pc_sc;
 	uint32_t status;
-	int *rings = arg;
 	int ret;
 
 	*rings = 0;

@@ -17,11 +17,13 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $FreeBSD: releng/12.0/sys/dev/rtwn/if_rtwn_debug.h 310867 2016-12-30 22:24:01Z avos $
+ * $FreeBSD$
  */
 
 #ifndef IF_RTWN_DEBUG_H
 #define IF_RTWN_DEBUG_H
+
+#include "opt_rtwn.h"
 
 #ifdef RTWN_DEBUG
 enum {

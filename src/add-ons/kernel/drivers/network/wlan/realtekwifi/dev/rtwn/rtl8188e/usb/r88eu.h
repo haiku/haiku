@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/usb/r88eu.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 #ifndef RTL8188EU_H
@@ -25,15 +25,21 @@
 
 
 /*
+ * Global definitions.
+ */
+#define R88EU_PUBQ_NPAGES	142
+#define R88EU_TX_PAGE_COUNT	169
+
+
+/*
  * Function declarations.
  */
 /* r88eu_init.c */
+void	r88eu_init_bb(struct rtwn_softc *);
+int	r88eu_power_on(struct rtwn_softc *);
 void	r88eu_power_off(struct rtwn_softc *);
 void	r88eu_init_intr(struct rtwn_softc *);
 void	r88eu_init_rx_agg(struct rtwn_softc *);
 void	r88eu_post_init(struct rtwn_softc *);
-
-/* r88eu_rx.c */
-int	r88eu_classify_intr(struct rtwn_softc *, void *, int);
 
 #endif	/* RTL8188EU_H */

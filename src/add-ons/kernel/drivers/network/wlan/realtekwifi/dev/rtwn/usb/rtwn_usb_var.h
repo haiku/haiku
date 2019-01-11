@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/usb/rtwn_usb_var.h 321735 2017-07-30 23:35:21Z avos $
+ * $FreeBSD$
  */
 
 #ifndef RTWN_USBVAR_H

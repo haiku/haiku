@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8188e/r88e_reg.h 307529 2016-10-17 20:38:24Z avos $
+ * $FreeBSD$
  */
 
 #ifndef R88E_REG_H
@@ -32,6 +32,7 @@
 #define R88E_HISR			0x0b4
 #define R88E_HIMRE			0x0b8
 #define R88E_HISRE			0x0bc
+#define R88E_XCK_OUT_CTRL	0x07c
 /* MAC General Configuration. */
 #define R88E_32K_CTRL			0x194
 #define R88E_HMEBOX_EXT(idx)		(0x1f0 + (idx) * 4)
@@ -45,16 +46,49 @@
 
 
 /* Bits for R88E_HIMR. */
-#define R88E_HIMR_CPWM			0x00000100
-#define R88E_HIMR_CPWM2			0x00000200
-#define R88E_HIMR_TBDER			0x04000000
-#define R88E_HIMR_PSTIMEOUT		0x20000000
+#define R88E_HIMR_ROK		0x00000001	/* receive DMA OK */
+#define R88E_HIMR_RDU		0x00000002	/* Rx descriptor unavailable */
+#define R88E_HIMR_VODOK		0x00000004	/* AC_VO DMA OK */
+#define R88E_HIMR_VIDOK		0x00000008	/* AC_VI DMA OK */
+#define R88E_HIMR_BEDOK		0x00000010	/* AC_BE DMA OK */
+#define R88E_HIMR_BKDOK		0x00000020	/* AC_BK DMA OK */
+#define R88E_HIMR_MGNTDOK	0x00000040	/* management queue DMA OK */
+#define R88E_HIMR_HIGHDOK	0x00000080	/* high queue DMA OK */
+#define R88E_HIMR_CPWM		0x00000100	/* CPU power mode intr 1 */
+#define R88E_HIMR_CPWM2		0x00000200	/* CPU power mode intr 2 */
+#define R88E_HIMR_C2HCMD	0x00000400	/* C2H command interrupt */
+#define R88E_HIMR_HISR		0x00000800	/* (HISR & HIMR) != 0 */
+#define R88E_HIMR_ATIMEND	0x00001000	/* ATIM window end interrupt */
+#define R88E_HIMR_HSISR		0x00008000	/* (HSIMR & HSISR) != 0 */
+#define R88E_HIMR_BCNDERR	0x00010000	/* beacon queue DMA error */
+#define R88E_HIMR_BCNINT	0x00100000	/* beacon DMA interrupt 0 */
+#define R88E_HIMR_TSF32		0x01000000	/* TSF 32 bit interrupt */
+#define R88E_HIMR_TBDOK		0x02000000	/* beacon transmit OK */
+#define R88E_HIMR_TBDER		0x04000000	/* beacon transmit error */
+#define R88E_HIMR_GTIMER3	0x08000000	/* GTIMER3 interrupt */
+#define R88E_HIMR_GTIMER4	0x10000000	/* GTIMER4 interrupt */
+#define R88E_HIMR_PSTIMEOUT	0x20000000	/* powersave timeout */
+#define R88E_HIMR_TXRPT		0x40000000	/* Tx report interrupt */
 
 /* Bits for R88E_HIMRE.*/
-#define R88E_HIMRE_RXFOVW		0x00000100
-#define R88E_HIMRE_TXFOVW		0x00000200
-#define R88E_HIMRE_RXERR		0x00000400
-#define R88E_HIMRE_TXERR		0x00000800
+#define R88E_HIMRE_RXFOVW	0x00000100	/* receive FIFO overflow */
+#define R88E_HIMRE_TXFOVW	0x00000200	/* transmit FIFO overflow */
+#define R88E_HIMRE_RXERR	0x00000400	/* receive error */
+#define R88E_HIMRE_TXERR	0x00000800	/* transmit error */
+#define R88E_HIMRE_BCNDOK1	0x00004000	/* beacon queue DMA OK (1) */
+#define R88E_HIMRE_BCNDOK2	0x00008000	/* beacon queue DMA OK (2) */
+#define R88E_HIMRE_BCNDOK3	0x00010000	/* beacon queue DMA OK (3) */
+#define R88E_HIMRE_BCNDOK4	0x00020000	/* beacon queue DMA OK (4) */
+#define R88E_HIMRE_BCNDOK5	0x00040000	/* beacon queue DMA OK (5) */
+#define R88E_HIMRE_BCNDOK6	0x00080000	/* beacon queue DMA OK (6) */
+#define R88E_HIMRE_BCNDOK7	0x00100000	/* beacon queue DMA OK (7) */
+#define R88E_HIMRE_BCNDMAINT1	0x00200000	/* beacon DMA interrupt 1 */
+#define R88E_HIMRE_BCNDMAINT2	0x00400000	/* beacon DMA interrupt 2 */
+#define R88E_HIMRE_BCNDMAINT3	0x00800000	/* beacon DMA interrupt 3 */
+#define R88E_HIMRE_BCNDMAINT4	0x01000000	/* beacon DMA interrupt 4 */
+#define R88E_HIMRE_BCNDMAINT5	0x02000000	/* beacon DMA interrupt 5 */
+#define R88E_HIMRE_BCNDMAINT6	0x04000000	/* beacon DMA interrupt 6 */
+#define R88E_HIMRE_BCNDMAINT7	0x08000000	/* beacon DMA interrupt 7 */
 
 /* Bits for R88E_TX_RPT_CTRL. */
 #define R88E_TX_RPT1_ENA		0x01
@@ -79,6 +113,7 @@
  * RF (6052) registers.
  */
 #define R88E_RF_T_METER		0x42
+#define R88E_RF_WE_LUT		0xef
 
 /* Bits for R92C_RF_CHNLBW. */
 #define R88E_RF_CHNLBW_BW20	0x00c00
@@ -87,5 +122,8 @@
 #define R88E_RF_T_METER_VAL_M	0x0fc00
 #define R88E_RF_T_METER_VAL_S	10
 #define R88E_RF_T_METER_START	0x30000
+
+/* Bits for R88E_XCK_OUT_CTRL. */
+#define R88E_XCK_OUT_CTRL_EN	1
 
 #endif	/* R88E_REG_H */

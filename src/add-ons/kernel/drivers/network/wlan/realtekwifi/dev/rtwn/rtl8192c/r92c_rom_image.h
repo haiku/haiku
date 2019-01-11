@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD: releng/12.0/sys/dev/rtwn/rtl8192c/r92c_rom_image.h 320055 2017-06-17 14:39:25Z kevlo $
+ * $FreeBSD$
  */
 
 #ifndef R92C_ROM_IMAGE_H
