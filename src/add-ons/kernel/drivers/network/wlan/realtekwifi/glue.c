@@ -17,10 +17,11 @@
 #include <net80211/ieee80211_var.h>
 #include <net80211/ieee80211_amrr.h>
 
-#include <dev/rtwn/if_rtwnreg.h>
+#include <dev/rtwn/if_rtwnvar.h>
+#include <dev/rtwn/pci/rtwn_pci_var.h>
 
 
-HAIKU_FBSD_WLAN_DRIVER_GLUE(realtekwifi, rtwn, pci)
+HAIKU_FBSD_WLAN_DRIVER_GLUE(realtekwifi, rtwn_pci, pci)
 HAIKU_DRIVER_REQUIREMENTS(FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(0);
 HAIKU_FIRMWARE_NAME_MAP(2) = {
@@ -31,24 +32,19 @@ HAIKU_FIRMWARE_NAME_MAP(2) = {
 NO_HAIKU_FBSD_MII_DRIVER();
 NO_HAIKU_REENABLE_INTERRUPTS();
 
-void	 rtwn_write_4(struct rtwn_softc *, uint16_t, uint32_t);
-uint32_t rtwn_read_4(struct rtwn_softc *, uint16_t);
 
 int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 {
-	struct rtwn_softc* sc = (struct rtwn_softc*)device_get_softc(dev);
-	uint32_t status;
+	struct rtwn_pci_softc* pc = (struct rtwn_pci_softc*)device_get_softc(dev);
+	int32_t status, tx_rings;
 
-	status = rtwn_read_4(sc, R92C_HISR);
-	if (status == 0 || status == 0xffffffff) {
+	status = rtwn_classify_intr(&pc->pc_sc, &tx_rings, 0);
+	if (status == 0 && tx_rings == 0)
 		return 0;
-	}
 
-	atomic_set((int32*)&sc->sc_intr_status, status);
-
-	/* Disable interrupts. */
-	rtwn_write_4(sc, R92C_HIMR, 0x00000000);
+	atomic_set(&pc->pc_intr_status, status);
+	atomic_set(&pc->pc_intr_tx_rings, tx_rings);
 
 	return 1;
 }

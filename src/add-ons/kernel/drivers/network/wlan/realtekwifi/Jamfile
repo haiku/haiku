@@ -14,10 +14,50 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ]
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn pci ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn rtl8192c ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev rtwn rtl8192c pci ] ;
 
 KernelAddon realtekwifi :
-	if_rtwn.c
 	glue.c
+
+	if_rtwn.c
+	if_rtwn_beacon.c
+	if_rtwn_calib.c
+	if_rtwn_cam.c
+	if_rtwn_efuse.c
+	if_rtwn_fw.c
+	if_rtwn_rx.c
+	if_rtwn_task.c
+	if_rtwn_tx.c
+
+	# pci/
+	rtwn_pci_attach.c
+	rtwn_pci_reg.c
+	rtwn_pci_rx.c
+	rtwn_pci_tx.c
+
+	# rtl8192c/
+	r92c_attach.c
+	r92c_beacon.c
+	r92c_calib.c
+	r92c_chan.c
+	r92c_fw.c
+	r92c_init.c
+	r92c_llt.c
+	r92c_rf.c
+	r92c_rom.c
+	r92c_rx.c
+	r92c_tx.c
+
+	# rtl8192c/pci/
+	r92ce_attach.c
+	r92ce_calib.c
+	r92ce_fw.c
+	r92ce_init.c
+	r92ce_led.c
+	r92ce_rx.c
+	r92ce_tx.c
 	:
 	freebsd_wlan.a
 	libfreebsd_network.a
