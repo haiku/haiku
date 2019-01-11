@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 2002
  *	M Warner Losh <imp@freebsd.org>.  All rights reserved.
  * Copyright (c) 1997, 1998, 1999
@@ -31,7 +33,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/11.1/sys/dev/wi/if_wivar.h 300238 2016-05-19 22:14:35Z avos $
+ * $FreeBSD: releng/12.0/sys/dev/wi/if_wivar.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 /*

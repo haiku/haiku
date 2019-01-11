@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-4-Clause
+ *
  * Copyright (c) 2013	Justin Hibbits
  * All rights reserved.
  * Copyright (c) 1997, 1998, 1999
@@ -42,7 +44,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/11.1/sys/dev/wi/if_wi_macio.c 287197 2015-08-27 08:56:39Z glebius $");
+__FBSDID("$FreeBSD: releng/12.0/sys/dev/wi/if_wi_macio.c 325966 2017-11-18 14:26:50Z pfg $");
 
 #include <sys/param.h>
 #include <sys/kernel.h>
