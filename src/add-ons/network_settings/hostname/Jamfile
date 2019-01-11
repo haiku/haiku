@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src add-ons network_settings hostname ;
+
+UsePublicHeaders [ FDirName add-ons network_settings ] ;
+UsePrivateHeaders app libroot kernel net ;
+UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
+
+AddResources Hostname : Hostname.rdef ;
+
+Addon Hostname :
+	HostnameAddOn.cpp
+	HostnameView.cpp
+
+	: be network bnetapi <nogrist>Network [ TargetLibsupc++ ]
+		[ TargetLibstdc++ ] localestub
+;
+
+DoCatalogs Hostname : x-vnd.Haiku-Hostname :
+	HostnameAddOn.cpp
+	HostnameView.cpp
+;

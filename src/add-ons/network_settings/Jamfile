@@ -15,3 +15,5 @@ SubInclude HAIKU_TOP src add-ons network_settings telnetd ;
 # VPN add-ons
 SubInclude HAIKU_TOP src add-ons network_settings openvpn ;
 
+# Other add-ons
+SubInclude HAIKU_TOP src add-ons network_settings hostname ;
