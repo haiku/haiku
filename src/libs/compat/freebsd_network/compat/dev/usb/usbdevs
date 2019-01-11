@@ -467,6 +467,7 @@ vendor PLEXTOR		0x093b	Plextor
 vendor INTREPIDCS	0x093c	Intrepid
 vendor YANO		0x094f	Yano
 vendor KINGSTON		0x0951	Kingston Technology
+vendor NVIDIA		0x0955	NVIDIA Corporation
 vendor BLUEWATER	0x0956	BlueWater Systems
 vendor AGILENT		0x0957	Agilent Technologies
 vendor GUDE		0x0959	Gude ADS
@@ -497,6 +498,7 @@ vendor ASAHIOPTICAL	0x0a17	Asahi Optical
 vendor BOCASYSTEMS	0x0a43	Boca Systems
 vendor SHANTOU		0x0a46	ShanTou
 vendor MEDIAGEAR	0x0a48	MediaGear
+vendor PLOYTEC		0x0a4a	Ploytec GmbH
 vendor BROADCOM		0x0a5c	Broadcom
 vendor GREENHOUSE	0x0a6b	GREENHOUSE
 vendor MEDELI		0x0a67	Medeli
@@ -1704,6 +1706,7 @@ product DLINK DUBE100B1		0x3c05	DUB-E100 rev B1
 product DLINK RT2870		0x3c09	RT2870
 product DLINK RT3072		0x3c0a	RT3072
 product DLINK DWA140B3		0x3c15	DWA-140 rev B3
+product DLINK DWA125A3		0x3c19	DWA-125 rev A3
 product DLINK DWA160B2		0x3c1a	DWA-160 rev B2
 product DLINK DWA127		0x3c1b	DWA-127 Wireless Adapter
 product DLINK DWA162		0x3c1f	DWA-162 Wireless Adapter
@@ -2760,6 +2763,8 @@ product LEADTEK 9531		0x2101	9531 GPS
 product LENOVO GIGALAN		0x304b	USB 3.0 Ethernet
 product LENOVO ETHERNET		0x7203	USB 2.0 Ethernet
 product LENOVO RTL8153		0x7205	USB 3.0 Ethernet
+product LENOVO TBT3LAN		0x3069	LAN port in Thinkpad TB3 dock
+product LENOVO USBCLAN		0x3062	LAN port in Thinkpad USB-C dock
 
 /* Lexar products */
 product LEXAR JUMPSHOT		0x0001	jumpSHOT CompactFlash Reader
@@ -3455,6 +3460,9 @@ product NOVATEL MC547		0x7042	Novatel MC547
 product NOVATEL MC679		0x7031	Novatel MC679
 product NOVATEL2 FLEXPACKGPS	0x0100	NovAtel FlexPack GPS receiver
 
+/* NVIDIA products */
+product NVIDIA RTL8153		0x09ff	USB 3.0 Ethernet
+
 /* Merlin products */
 product	MERLIN V620		0x1110	Merlin V620
 
@@ -3686,6 +3694,9 @@ product PLANEX2 GWUSNANO	0xab28	GW-USNano
 /* Plextor Corp. */
 product PLEXTOR 40_12_40U	0x0011	PlexWriter 40/12/40U
 
+/* Ploytec GmbH */
+product PLOYTEC SPL_CRIMSON_1	0xc150	SPL Crimson Revision 1
+
 /* PLX products */
 product PLX TESTBOARD		0x9060	test board
 product PLX CA42		0xac70	CA-42
@@ -3900,6 +3911,7 @@ product RALINK RT3370		0x3370	RT3370
 product RALINK RT3572		0x3572	RT3572
 product RALINK RT3573		0x3573	RT3573
 product RALINK RT5370		0x5370	RT5370
+product RALINK RT5372		0x5372	RT5372
 product RALINK RT5572		0x5572	RT5572
 product RALINK RT8070		0x8070	RT8070
 product RALINK RT2570_3		0x9020	RT2500USB Wireless Adapter
@@ -4338,6 +4350,7 @@ product SITECOMEU RT3072_4	0x0048	RT3072
 product SITECOMEU RT3072_5	0x004a	RT3072
 product SITECOMEU WL349V1	0x004b	WL-349 v1
 product SITECOMEU RT3072_6	0x004d	RT3072
+product SITECOMEU WLA1000	0x005b	WLA-1000
 product SITECOMEU RTL8188CU_1	0x0052	RTL8188CU
 product SITECOMEU RTL8188CU_2	0x005c	RTL8188CU
 product SITECOMEU RTL8192CU	0x0061	RTL8192CU
@@ -4601,9 +4614,12 @@ product TOSHIBA TRANSMEMORY	0x6545	USB ThumbDrive
 
 /* TP-Link products */
 product TPLINK T4U		0x0101	Archer T4U
+product TPLINK WN821NV5		0x0107	TL-WN821N v5
 product TPLINK WN822NV4		0x0108	TL-WN822N v4
 product TPLINK WN823NV2		0x0109	TL-WN823N v2
+product TPLINK WN722NV2		0x010c	TL-WN722N v2
 product TPLINK T4UV2		0x010d	Archer T4U ver 2
+product TPLINK T4UHV1		0x0103	Archer T4UH ver 1
 product TPLINK T4UHV2		0x010e	Archer T4UH ver 2
 product TPLINK RTL8153		0x0601	RTL8153 USB 10/100/1000 LAN
 
