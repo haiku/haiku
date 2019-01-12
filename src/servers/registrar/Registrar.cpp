@@ -16,9 +16,11 @@
 #include <Application.h>
 #include <Clipboard.h>
 #include <Message.h>
+#include <MessengerPrivate.h>
 #include <OS.h>
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
+#include <system_info.h>
 
 #include "AuthenticationManager.h"
 #include "ClipboardHandler.h"
@@ -47,9 +49,6 @@ using namespace BPrivate;
 //! Name of the event queue.
 static const char *kEventQueueName = "timer_thread";
 
-//! Time interval between two roster sanity checks (1 s).
-static const bigtime_t kRosterSanityEventInterval = 1000000LL;
-
 
 /*!	\brief Creates the registrar application class.
 	\param error Passed to the BApplication constructor for returning an
@@ -63,7 +62,6 @@ Registrar::Registrar(status_t* _error)
 	fMIMEManager(NULL),
 	fEventQueue(NULL),
 	fMessageRunnerManager(NULL),
-	fSanityEvent(NULL),
 	fShutdownProcess(NULL),
 	fAuthenticationManager(NULL),
 	fPackageWatchingManager(NULL)
@@ -88,7 +86,6 @@ Registrar::~Registrar()
 	delete fPackageWatchingManager;
 	delete fMessageRunnerManager;
 	delete fEventQueue;
-	delete fSanityEvent;
 	fMIMEManager->Lock();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
@@ -172,11 +169,15 @@ Registrar::ReadyToRun()
 	// create the package watching manager
 	fPackageWatchingManager = new PackageWatchingManager;
 
-	// create and schedule the sanity message event
-	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
-		this, B_REG_ROSTER_SANITY_EVENT);
-	fSanityEvent->SetAutoDelete(false);
-	fEventQueue->AddEvent(fSanityEvent);
+	// Sanity check roster after team deletion
+	BMessenger target(this);
+	BMessenger::Private messengerPrivate(target);
+
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+	__start_watching_system(-1, B_WATCH_SYSTEM_TEAM_DELETION, port, token);
+	fRoster->CheckSanity();
+		// Clean up any teams that exited before we started watching
 
 	FUNCTION_END();
 }
@@ -352,11 +353,13 @@ Registrar::_MessageReceived(BMessage *message)
 			break;
 
 		// internal messages
-		case B_REG_ROSTER_SANITY_EVENT:
-			fRoster->CheckSanity();
-			fSanityEvent->SetTime(system_time() + kRosterSanityEventInterval);
-			fEventQueue->AddEvent(fSanityEvent);
+		case B_SYSTEM_OBJECT_UPDATE:
+		{
+			team_id team = (team_id)message->GetInt32("team", -1);
+			if (team >= 0 && message->GetInt32("opcode", 0) == B_TEAM_DELETED)
+				fRoster->HandleRemoveApp(message);
 			break;
+		}
 		case B_REG_SHUTDOWN_FINISHED:
 			if (fShutdownProcess) {
 				fShutdownProcess->PostMessage(B_QUIT_REQUESTED,

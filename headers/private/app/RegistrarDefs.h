@@ -96,7 +96,6 @@ enum {
 	B_REG_GET_MESSAGE_RUNNER_INFO			= 'rgri',
 
 	// internal registrar messages
-	B_REG_ROSTER_SANITY_EVENT				= 'rgir',
 	B_REG_SHUTDOWN_FINISHED					= 'rgsf',
 	B_REG_ROSTER_DEVICE_RESCAN				= 'rgrs',
 
