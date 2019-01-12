@@ -91,7 +91,7 @@ login(const char* user, struct passwd** _passwd)
 	struct spwd* spwd = getspnam(user);
 
 	bool ok = verify_password(passwd, spwd, password);
-	memset(password, 0, sizeof(password));
+	explicit_bzero(password, sizeof(password));
 
 	if (!ok)
 		return B_PERMISSION_DENIED;

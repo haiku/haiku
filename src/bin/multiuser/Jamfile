@@ -6,14 +6,16 @@ UsePrivateHeaders kernel ;
 	# for <util/KMessage.h>
 UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
 StaticLibrary libmultiuser_utils.a : multiuser_utils.cpp ;
 
-BinCommand login : login.cpp : libmultiuser_utils.a ;
+BinCommand login : login.cpp : libmultiuser_utils.a libbsd.so ;
 
-BinCommand su : su.cpp : libmultiuser_utils.a ;
+BinCommand su : su.cpp : libmultiuser_utils.a libbsd.so ;
 
-BinCommand passwd : passwd.cpp : libmultiuser_utils.a ;
+BinCommand passwd : passwd.cpp : libmultiuser_utils.a libbsd.so ;
 
 BinCommand useradd : useradd.cpp ;
 
