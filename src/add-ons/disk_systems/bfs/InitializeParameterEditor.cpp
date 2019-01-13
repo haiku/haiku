@@ -139,10 +139,10 @@ InitializeBFSEditor::_CreateViewControls()
 	fUseIndicesCheckBox = new BCheckBox(B_TRANSLATE("Enable query support"),
 		NULL);
 	fUseIndicesCheckBox->SetValue(true);
-	fUseIndicesCheckBox->SetToolTip(B_TRANSLATE("Disabling query support may "
-		"speed up certain file system operations, but should only be used "
-		"if one is absolutely certain that one will not need queries.\n"
-		"Any volume that is intended for booting Haiku must have query "
+	fUseIndicesCheckBox->SetToolTip(B_TRANSLATE("Disabling query support "
+		"may speed up certain file system operations, but should\nonly be "
+		"used if one is absolutely certain that one will not need queries."
+		"\nAny volume that is intended for booting Haiku must have query "
 		"support enabled."));
 
 	float spacing = be_control_look->DefaultItemSpacing();
