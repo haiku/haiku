@@ -26,7 +26,6 @@
 #include "DrawingModeBlend.h"
 #include "DrawingModeCopy.h"
 #include "DrawingModeCopySolid.h"
-#include "DrawingModeCopyText.h"
 #include "DrawingModeErase.h"
 #include "DrawingModeInvert.h"
 #include "DrawingModeMin.h"
@@ -46,7 +45,6 @@
 #include "DrawingModeBlendSUBPIX.h"
 #include "DrawingModeCopySUBPIX.h"
 #include "DrawingModeCopySolidSUBPIX.h"
-#include "DrawingModeCopyTextSUBPIX.h"
 #include "DrawingModeEraseSUBPIX.h"
 #include "DrawingModeInvertSUBPIX.h"
 #include "DrawingModeMinSUBPIX.h"
@@ -139,7 +137,6 @@ PixelFormat::PixelFormat(agg::rendering_buffer& rb,
 						 const PatternHandler* handler)
 	: fBuffer(&rb),
 	  fPatternHandler(handler),
-	  fUsesOpCopyForText(false),
 
 	  fBlendPixel(blend_pixel_empty),
 	  fBlendHLine(blend_hline_empty),
@@ -162,10 +159,9 @@ void
 PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 							alpha_function alphaFncMode, bool text)
 {
-	fUsesOpCopyForText = false;
 	switch (mode) {
-		// these drawing modes discard source pixels
-		// which have the current low color
+		// These drawing modes discard source pixels
+		// which have the current low color.
 		case B_OP_OVER:
 			if (fPatternHandler->IsSolid()) {
 				fBlendPixel = blend_pixel_over_solid;
@@ -207,21 +203,10 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 			fBlendColorHSpan = blend_color_hspan_select;
 			break;
 
-		// in these drawing modes, the current high
-		// and low color are treated equally
+		// In these drawing modes, the current high
+		// and low color are treated equally.
 		case B_OP_COPY:
-			if (text) {
-				fBlendPixel = blend_pixel_copy_text;
-				fBlendHLine = blend_hline_copy_text;
-				fBlendSolidHSpanSubpix = blend_solid_hspan_copy_text_subpix;
-				fBlendSolidHSpan = blend_solid_hspan_copy_text;
-				fBlendSolidVSpan = blend_solid_vspan_copy_text;
-				fBlendColorHSpan = blend_color_hspan_copy_text;
-				// set the special flag so that Painter
-				// knows if an update is needed even though
-				// "nothing changed"
-				fUsesOpCopyForText = true;
-			} else if (fPatternHandler->IsSolid()) {
+			if (fPatternHandler->IsSolid()) {
 				fBlendPixel = blend_pixel_copy_solid;
 				fBlendHLine = blend_hline_copy_solid;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_copy_solid_subpix;
@@ -278,7 +263,7 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 			fBlendColorHSpan = blend_color_hspan_max;
 			break;
 
-		// this drawing mode is the only one considering
+		// This drawing mode is the only one considering
 		// alpha at all. In B_CONSTANT_ALPHA, the alpha
 		// value from the current high color is used for
 		// all computations. In B_PIXEL_ALPHA, the alpha

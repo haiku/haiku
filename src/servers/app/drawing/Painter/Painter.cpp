@@ -322,7 +322,7 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 	SetHighColor(state->HighColor());
 	SetLowColor(state->LowColor());
 
-	if (updateDrawingMode || fPixelFormat.UsesOpCopyForText())
+	if (updateDrawingMode)
 		_UpdateDrawingMode();
 }
 
