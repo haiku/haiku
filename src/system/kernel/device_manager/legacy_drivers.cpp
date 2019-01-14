@@ -358,7 +358,7 @@ republish_driver(legacy_driver* driver)
 
 
 static status_t
-load_driver(legacy_driver *driver)
+load_driver(legacy_driver* driver)
 {
 	status_t (*init_hardware)(void);
 	status_t (*init_driver)(void);
@@ -376,9 +376,9 @@ load_driver(legacy_driver *driver)
 
 	// For a valid device driver the following exports are required
 
-	int32 *apiVersion;
+	int32* apiVersion;
 	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
-			(void **)&apiVersion) == B_OK) {
+			(void**)&apiVersion) == B_OK) {
 #if B_CUR_DRIVER_API_VERSION != 2
 		// just in case someone decides to bump up the api version
 #error Add checks here for new vs old api version!
@@ -400,9 +400,9 @@ load_driver(legacy_driver *driver)
 		dprintf("devfs: \"%s\" api_version missing\n", driver->name);
 
 	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
-				(void **)&driver->publish_devices) != B_OK
+				(void**)&driver->publish_devices) != B_OK
 		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
-				(void **)&driver->find_device) != B_OK) {
+				(void**)&driver->find_device) != B_OK) {
 		dprintf("devfs: \"%s\" mandatory driver symbol(s) missing!\n",
 			driver->name);
 		status = B_BAD_VALUE;
@@ -412,7 +412,7 @@ load_driver(legacy_driver *driver)
 	// Init the driver
 
 	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
-			(void **)&init_hardware) == B_OK
+			(void**)&init_hardware) == B_OK
 		&& (status = init_hardware()) != B_OK) {
 		TRACE(("%s: init_hardware() failed: %s\n", driver->name,
 			strerror(status)));
@@ -421,7 +421,7 @@ load_driver(legacy_driver *driver)
 	}
 
 	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
-			(void **)&init_driver) == B_OK
+			(void**)&init_driver) == B_OK
 		&& (status = init_driver()) != B_OK) {
 		TRACE(("%s: init_driver() failed: %s\n", driver->name,
 			strerror(status)));
@@ -431,10 +431,10 @@ load_driver(legacy_driver *driver)
 
 	// resolve and cache those for the driver unload code
 	if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
-		(void **)&driver->uninit_driver) != B_OK)
+		(void**)&driver->uninit_driver) != B_OK)
 		driver->uninit_driver = NULL;
 	if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
-		(void **)&driver->uninit_hardware) != B_OK)
+		(void**)&driver->uninit_hardware) != B_OK)
 		driver->uninit_hardware = NULL;
 
 	// The driver has successfully been initialized, now we can
@@ -458,7 +458,7 @@ error1:
 
 
 static status_t
-unload_driver(legacy_driver *driver)
+unload_driver(legacy_driver* driver)
 {
 	if (driver->image < 0) {
 		// driver is not currently loaded
@@ -485,7 +485,7 @@ unload_driver(legacy_driver *driver)
 
 /*!	Unpublishes all devices belonging to the \a driver. */
 static void
-unpublish_driver(legacy_driver *driver)
+unpublish_driver(legacy_driver* driver)
 {
 	while (LegacyDevice* device = driver->devices.RemoveHead()) {
 		device->SetRemovedFromParent(true);
@@ -542,10 +542,10 @@ get_priority(const char* path)
 }
 
 
-static const char *
-get_leaf(const char *path)
+static const char*
+get_leaf(const char* path)
 {
-	const char *name = strrchr(path, '/');
+	const char* name = strrchr(path, '/');
 	if (name == NULL)
 		return path;
 
@@ -553,12 +553,12 @@ get_leaf(const char *path)
 }
 
 
-static legacy_driver *
+static legacy_driver*
 find_driver(dev_t device, ino_t node)
 {
 	DriverTable::Iterator iterator(sDriverHash);
 	while (iterator.HasNext()) {
-		legacy_driver *driver = iterator.Next();
+		legacy_driver* driver = iterator.Next();
 		if (driver->device == device && driver->node == node)
 			return driver;
 	}
@@ -568,7 +568,7 @@ find_driver(dev_t device, ino_t node)
 
 
 static status_t
-add_driver(const char *path, image_id image)
+add_driver(const char* path, image_id image)
 {
 	// Check if we already know this driver
 
@@ -588,7 +588,7 @@ add_driver(const char *path, image_id image)
 
 	RecursiveLocker _(sLock);
 
-	legacy_driver *driver = sDriverHash->Lookup(get_leaf(path));
+	legacy_driver* driver = sDriverHash->Lookup(get_leaf(path));
 	if (driver != NULL) {
 		// we know this driver
 		if (strcmp(driver->path, path) != 0) {
@@ -620,7 +620,7 @@ add_driver(const char *path, image_id image)
 
 	// we don't know this driver, create a new entry for it
 
-	driver = (legacy_driver *)malloc(sizeof(legacy_driver));
+	driver = (legacy_driver*)malloc(sizeof(legacy_driver));
 	if (driver == NULL)
 		return B_NO_MEMORY;
 
@@ -659,9 +659,9 @@ add_driver(const char *path, image_id image)
 /*!	This is no longer part of the public kernel API, so we just export the
 	symbol
 */
-extern "C" status_t load_driver_symbols(const char *driverName);
+extern "C" status_t load_driver_symbols(const char* driverName);
 status_t
-load_driver_symbols(const char *driverName)
+load_driver_symbols(const char* driverName)
 {
 	// This is done globally for the whole kernel via the settings file.
 	// We don't have to do anything here.
@@ -671,7 +671,7 @@ load_driver_symbols(const char *driverName)
 
 
 static status_t
-reload_driver(legacy_driver *driver)
+reload_driver(legacy_driver* driver)
 {
 	dprintf("devfs: reload driver \"%s\" (%" B_PRIdDEV ", %" B_PRIdINO ")\n",
 		driver->name, driver->device, driver->node);
@@ -699,7 +699,7 @@ reload_driver(legacy_driver *driver)
 
 
 static void
-handle_driver_events(void */*_fs*/, int /*iteration*/)
+handle_driver_events(void* /*_fs*/, int /*iteration*/)
 {
 	if (atomic_and(&sDriverEventsPending, 0) == 0)
 		return;
@@ -770,7 +770,7 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 
 	DriverTable::Iterator iterator(sDriverHash);
 	while (iterator.HasNext()) {
-		legacy_driver *driver = iterator.Next();
+		legacy_driver* driver = iterator.Next();
 
 		if (!driver->binary_updated || driver->devices_used != 0)
 			continue;
@@ -997,7 +997,7 @@ next_entry:
 		goto next_entry;
 
 	if (S_ISDIR(stat.st_mode) && fRecursive) {
-		KPath *nextPath = new(nothrow) KPath(path);
+		KPath* nextPath = new(nothrow) KPath(path);
 		if (!nextPath)
 			return B_NO_MEMORY;
 		if (fPaths.Push(nextPath) != B_OK)
@@ -1021,7 +1021,7 @@ DirectoryIterator::Unset()
 	delete fBasePath;
 	fBasePath = NULL;
 
-	KPath *path;
+	KPath* path;
 	while (fPaths.Pop(&path))
 		delete path;
 }
@@ -1030,7 +1030,7 @@ DirectoryIterator::Unset()
 void
 DirectoryIterator::AddPath(const char* basePath, const char* subPath)
 {
-	KPath *path = new(nothrow) KPath(basePath);
+	KPath* path = new(nothrow) KPath(basePath);
 	if (!path)
 		panic("out of memory");
 	if (subPath != NULL)
@@ -1107,7 +1107,7 @@ DirectoryWatcher::EventOccurred(NotificationService& service,
 
 
 static void
-start_watching(const char *base, const char *sub)
+start_watching(const char* base, const char* sub)
 {
 	KPath path(base);
 	path.Append(sub);
@@ -1120,7 +1120,7 @@ start_watching(const char *base, const char *sub)
 	add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
 		sDirectoryWatcher);
 
-	directory_node_entry *entry = new(std::nothrow) directory_node_entry;
+	directory_node_entry* entry = new(std::nothrow) directory_node_entry;
 	if (entry != NULL) {
 		entry->node = stat.st_ino;
 		sDirectoryNodeHash.Insert(entry);
@@ -1179,7 +1179,7 @@ try_drivers(DriverEntryList& list)
 
 
 static status_t
-probe_for_drivers(const char *type)
+probe_for_drivers(const char* type)
 {
 	TRACE(("probe_for_drivers(type = %s)\n", type));
 
@@ -1199,7 +1199,7 @@ probe_for_drivers(const char *type)
 			add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
 				sDirectoryWatcher);
 
-			directory_node_entry *entry
+			directory_node_entry* entry
 				= new(std::nothrow) directory_node_entry;
 			if (entry != NULL) {
 				entry->node = stat.st_ino;
@@ -1220,7 +1220,7 @@ probe_for_drivers(const char *type)
 			continue;
 		}
 
-		driver_entry *entry = new_driver_entry(path.Path(), stat.st_dev,
+		driver_entry* entry = new_driver_entry(path.Path(), stat.st_dev,
 			stat.st_ino);
 		if (entry == NULL)
 			return B_NO_MEMORY;
@@ -1413,7 +1413,7 @@ legacy_driver_add_preloaded(kernel_args* args)
 			status = add_driver(imagePath.Path(), image->id);
 		if (status != B_OK) {
 			dprintf("legacy_driver_add_preloaded: Failed to add \"%s\": %s\n",
-				(char *)image->name, strerror(status));
+				(char*)image->name, strerror(status));
 			unload_kernel_add_on(image->id);
 		}
 	}
@@ -1428,7 +1428,7 @@ legacy_driver_add(const char* path)
 
 
 extern "C" status_t
-legacy_driver_publish(const char *path, device_hooks *hooks)
+legacy_driver_publish(const char* path, device_hooks* hooks)
 {
 	// we don't have a driver, just publish the hooks
 	LegacyDevice* device = new(std::nothrow) LegacyDevice(NULL, path, hooks);
