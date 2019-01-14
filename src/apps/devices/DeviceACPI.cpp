@@ -1,8 +1,9 @@
 /*
- * Copyright 2008-2010 Haiku Inc. All rights reserved.
+ * Copyright 2008-2019 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Rob Gill <rrobgill@protonmail.com>
  *		Alexander von Gluck (kallisti5)
  */
 
@@ -36,8 +37,10 @@ DeviceACPI::InitFromAttributes()
 	BString outlineName;
 	BString nodeACPIPath;
 	BString rootACPIPath;
+	BString nodeACPIHid;
 
 	rootACPIPath = nodeACPIPath = GetAttribute("acpi/path").fValue;
+	nodeACPIHid = GetAttribute("acpi/hid").fValue;
 
 	// Grab just the root node info
 	// We grab 6 characters to not identify sub nodes of root node
@@ -60,16 +63,28 @@ DeviceACPI::InitFromAttributes()
 		outlineName << string.String();
 	} else if (rootACPIPath == "\\_SI_") {
 		outlineName = B_TRANSLATE("ACPI System Indicator");
-	} else {
+	} else if (nodeACPIPath != "") {
 		// This allows to localize apostrophes, too
 		BString string(B_TRANSLATE("ACPI node '%1'"));
 		string.ReplaceFirst("%1", nodeACPIPath);
 		outlineName << string.String();
-	}
+	} else if (nodeACPIPath == "" && nodeACPIHid != "") {
+		// Handle ACPI HID entries that do not return a path
+		nodeACPIHid.Remove(0, nodeACPIHid.FindLast("_") + 1);
+		BString string(B_TRANSLATE("ACPI Button '%1'")); 
+		string.ReplaceFirst("%1", nodeACPIHid); 
+		outlineName << string.String();
+	} else {
+		BString string(B_TRANSLATE("ACPI <unknown>"));
+		outlineName << string.String();
+	} 
 
 	SetAttribute(B_TRANSLATE("Device name"), outlineName.String());
+#if 0
+	// These are a source of confusion for users.
+	// Until we can display something useful, let's not show the lines at all.
 	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE("Not implemented"));
-
+#endif
 	SetText(outlineName.String());
 }
 
