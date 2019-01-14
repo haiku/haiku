@@ -254,6 +254,13 @@ static status_t unload_driver(legacy_driver *driver);
 static status_t load_driver(legacy_driver *driver);
 
 
+static const directory_which kDriverPaths[] = {
+	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+	B_USER_ADDONS_DIRECTORY,
+	B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
+	B_SYSTEM_ADDONS_DIRECTORY
+};
+
 static DriverWatcher sDriverWatcher;
 static int32 sDriverEventsPending;
 static DriverEventList sDriverEvents;
@@ -514,7 +521,7 @@ get_priority(const char* path)
 	// TODO: would it be better to initialize a static structure here
 	// using find_directory()?
 	const directory_which whichPath[] = {
-		B_BEOS_DIRECTORY,
+		B_SYSTEM_DIRECTORY,
 		B_SYSTEM_NONPACKAGED_DIRECTORY,
 		B_USER_DIRECTORY
 	};
@@ -932,22 +939,16 @@ DirectoryIterator::SetTo(const char* path, const char* subPath, bool recursive)
 
 	if (path == NULL) {
 		// add default paths
-		const directory_which whichPath[] = {
-			B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-			B_USER_ADDONS_DIRECTORY,
-			B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-			B_BEOS_ADDONS_DIRECTORY
-		};
 		KPath pathBuffer;
 
 		bool disableUserAddOns = get_safemode_boolean(
 			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
 
-		for (uint32 i = 0; i < sizeof(whichPath) / sizeof(whichPath[0]); i++) {
+		for (uint32 i = 0; i < sizeof(kDriverPaths) / sizeof(kDriverPaths[0]); i++) {
 			if (i < 2 && disableUserAddOns)
 				continue;
 
-			if (__find_directory(whichPath[i], gBootDevice, true,
+			if (__find_directory(kDriverPaths[i], gBootDevice, true,
 					pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
 				pathBuffer.UnlockBuffer();
 				pathBuffer.Append("kernel");
@@ -1381,7 +1382,7 @@ legacy_driver_add_preloaded(kernel_args* args)
 	// NOTE: The initialization success of the path objects is implicitely
 	// checked by the immediately following functions.
 	KPath basePath;
-	status_t status = __find_directory(B_BEOS_ADDONS_DIRECTORY,
+	status_t status = __find_directory(B_SYSTEM_ADDONS_DIRECTORY,
 		gBootDevice, false, basePath.LockBuffer(), basePath.BufferSize());
 	if (status != B_OK) {
 		dprintf("legacy_driver_add_preloaded: find_directory() failed: "
@@ -1471,12 +1472,6 @@ legacy_driver_probe(const char* subPath)
 	if (!sWatching && gBootDevice > 0) {
 		// We're probing the actual boot volume for the first time,
 		// let's watch its driver directories for changes
-		const directory_which whichPath[] = {
-			B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-			B_USER_ADDONS_DIRECTORY,
-			B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-			B_BEOS_ADDONS_DIRECTORY
-		};
 		KPath path;
 
 		new(&sDirectoryWatcher) DirectoryWatcher;
@@ -1484,11 +1479,11 @@ legacy_driver_probe(const char* subPath)
 		bool disableUserAddOns = get_safemode_boolean(
 			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
 
-		for (uint32 i = 0; i < sizeof(whichPath) / sizeof(whichPath[0]); i++) {
+		for (uint32 i = 0; i < sizeof(kDriverPaths) / sizeof(kDriverPaths[0]); i++) {
 			if (i < 2 && disableUserAddOns)
 				continue;
 
-			if (__find_directory(whichPath[i], gBootDevice, true,
+			if (__find_directory(kDriverPaths[i], gBootDevice, true,
 					path.LockBuffer(), path.BufferSize()) == B_OK) {
 				path.UnlockBuffer();
 				path.Append("kernel/drivers");
