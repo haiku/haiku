@@ -1060,7 +1060,7 @@ DirectoryWatcher::EventOccurred(NotificationService& service,
 	int32 opcode = event->GetInt32("opcode", -1);
 	dev_t device = event->GetInt32("device", -1);
 	ino_t directory = event->GetInt64("directory", -1);
-	const char *name = event->GetString("name", NULL);
+	const char* name = event->GetString("name", NULL);
 
 	if (opcode == B_ENTRY_MOVED) {
 		// Determine whether it's a move within, out of, or into one
@@ -1488,7 +1488,6 @@ legacy_driver_probe(const char* subPath)
 				path.UnlockBuffer();
 				path.Append("kernel/drivers");
 
-				start_watching(path.Path(), "dev");
 				start_watching(path.Path(), "bin");
 			} else
 				path.UnlockBuffer();
