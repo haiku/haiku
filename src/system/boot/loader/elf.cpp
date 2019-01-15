@@ -633,17 +633,14 @@ ELFLoader<Class>::_ParseDynamicSection(ImageType* image)
 void
 elf_init()
 {
-// TODO: This cannot work, since the driver settings are loaded *after* the
-// kernel has been loaded successfully.
-#if 0
-	void *settings = load_driver_settings("kernel");
+	void* settings = load_driver_settings("kernel");
 	if (settings == NULL)
 		return;
 
-	sLoadElfSymbols = !get_driver_boolean_parameter(settings, "load_symbols",
+	sLoadElfSymbols = get_driver_boolean_parameter(settings, "load_symbols",
 		false, false);
+
 	unload_driver_settings(settings);
-#endif
 }
 
 
