@@ -4,6 +4,9 @@ local zstdSourceDirectory = [ BuildFeatureAttribute zstd : sources : path ] ;
 UseHeaders [ FDirName $(zstdSourceDirectory) lib ] ;
 UseHeaders [ FDirName $(zstdSourceDirectory) lib common ] ;
 
+# disable -Werror for this directory only
+SubDirCcFlags -Wno-error ;
+
 local zstdCommonSources =
 	error_private.c
 	entropy_common.c fse_decompress.c zstd_common.c
