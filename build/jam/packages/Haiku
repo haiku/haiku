@@ -214,7 +214,7 @@ AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
 AddFilesToPackage add-ons Network\ Settings
-	: IPv4Interface IPv6Interface DNSClientService FTPService SSHService
+	: IPv4Interface IPv6Interface DNSClientService Hostname FTPService SSHService
 		TelnetService ;
 
 AddFilesToPackage add-ons Tracker
