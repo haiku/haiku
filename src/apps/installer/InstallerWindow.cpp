@@ -563,11 +563,14 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				} else {
 					// If neither DriveSetup nor Bootman is running, we need
 					// to scan partitions in case DriveSetup has quit, or
-					// we need to update the guidance message.
+					// we need to update the guidance message, unless install
+					// was already finished.
 					if (scanPartitions)
 						_ScanPartitions();
-					else
+					else if (fInstallStatus != kFinished)
 						_UpdateControls();
+					else
+						PostMessage(MSG_INSTALL_FINISHED);
 				}
 			}
 			break;
