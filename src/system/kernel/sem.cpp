@@ -928,7 +928,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 #if KDEBUG
 	if ((flags & B_DO_NOT_RESCHEDULE) == 0 && !are_interrupts_enabled()) {
 		panic("release_sem_etc(): called with interrupts disabled and "
-			"rescheduling allowed for sem_id %ld", id);
+			"rescheduling allowed for sem_id %" B_PRId32, id);
 	}
 #endif
 
