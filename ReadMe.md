@@ -10,11 +10,29 @@ Haiku is an open-source operating system that specifically targets personal
 computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn
 and yet very powerful.
 
+---
+
+## Table of Contents
+
+- [Goals](#goals)
+- [Trying Haiku](#trying-haiku)
+- [Compiling Haiku](#compiling-haiku)
+- [Contributing](#contributing)
+- [Contributing Code](#contributing-code)
+- [Contributing Documentation](#contributing-documentation)
+- [Contributing Translations](#contributing-translations)
+- [Contributing software ports](#contributing-software-ports)
+- [Contributing to our infrastructure](#contributing-to-our-infrastructure)
+
+---
+
 Goals
 ------------
  * Sensible defaults with minimal configuration required.
  * Clean, clear, concise code.
  * Unified desktop environment.
+
+---
 
 Trying Haiku
 ---------------
@@ -25,9 +43,12 @@ plunge" and install Haiku on bare metal, you can install it on a virtual
 machine (VM) instead. If you've never used a VM before, you can follow one of
 the ["Emulating Haiku"](https://www.haiku-os.org/guides/virtualizing/) guides.
 
+---
+
 Compiling Haiku
 ---------------
 See `ReadMe.Compiling`.
+
 
 Contributing
 -------------------
@@ -46,7 +67,7 @@ one of our OpenGrok servers:
  * http://code.metager.de/source/xref/haiku (provided by MetaGer)
 
 ### Contributing documentation
-The main piece of documentation that still needs work are the API docs (found
+The main piece of documentation that still needs work is the API docs (found
 in the tree at `docs/user`). Just find an undocumented class, write
 documentation for it, and [submit a patch](https://dev.haiku-os.org/wiki/CodingGuidelines/SubmittingPatches).
 
@@ -58,3 +79,7 @@ See [HaikuPorts](https://github.com/haikuports/haikuports/).
 
 ### Contributing to our infrastructure
 See [Infrastructure](https://github.com/haiku/infrastructure/).
+
+---
+
+<img src="https://cdn.cultofmac.com/wp-content/uploads/2009/09/post-16784-image-48ac814b2016cb09418029bca57bccc6.jpg" width="150"></img>
