@@ -25,6 +25,7 @@
 
 #include <AutoDeleter.h>
 #include <commpage.h>
+#include <driver_settings.h>
 #include <boot/kernel_args.h>
 #include <debug.h>
 #include <image_defs.h>
@@ -93,6 +94,7 @@ static mutex sImageMutex = MUTEX_INITIALIZER("kimages_lock");
 static mutex sImageLoadMutex = MUTEX_INITIALIZER("kimages_load_lock");
 	// serializes loading/unloading add-ons locking order
 	// sImageLoadMutex -> sImageMutex
+static bool sLoadElfSymbols = false;
 static bool sInitialized = false;
 
 
@@ -2393,8 +2395,7 @@ load_kernel_add_on(const char *path)
 	vm_unreserve_address_range(VMAddressSpace::KernelID(), reservedAddress,
 		reservedSize);
 
-	// ToDo: this should be enabled by kernel settings!
-	if (1)
+	if (sLoadElfSymbols)
 		load_elf_symbol_table(fd, image);
 
 	free(programHeaders);
@@ -2721,11 +2722,18 @@ elf_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
 
 
 status_t
-elf_init(kernel_args *args)
+elf_init(kernel_args* args)
 {
-	struct preloaded_image *image;
+	struct preloaded_image* image;
 
 	image_init();
+
+	if (void* handle = load_driver_settings("kernel")) {
+		sLoadElfSymbols = get_driver_boolean_parameter(handle, "load_symbols",
+			false, false);
+
+		unload_driver_settings(handle);
+	}
 
 	sImagesHash = new(std::nothrow) ImageHash();
 	if (sImagesHash == NULL)
