@@ -86,6 +86,8 @@ main(stage2_args *args)
 
 	if (bootVolume.IsValid()) {
 		// we got a volume to boot from!
+		load_driver_settings(args, bootVolume.RootDirectory());
+
 		status_t status;
 		while ((status = load_kernel(args, bootVolume)) < B_OK) {
 			// loading the kernel failed, so let the user choose another
@@ -122,7 +124,6 @@ main(stage2_args *args)
 				platform_switch_to_logo();
 
 			load_modules(args, bootVolume);
-			load_driver_settings(args, bootVolume.RootDirectory());
 
 			// apply boot settings
 			apply_boot_settings();
