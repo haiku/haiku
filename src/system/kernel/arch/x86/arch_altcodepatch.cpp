@@ -52,6 +52,6 @@ arch_altcodepatch_replace(uint16 tag, void* newcodepatch, size_t length)
 	// disable write after patch
 	set_area_protection(info->text_region.id, kernelProtection);
 
-	dprintf("arch_altcodepatch_replace found %d altcodepatches\n", count);
+	dprintf("arch_altcodepatch_replace found %" B_PRIu32 " altcodepatches\n", count);
 }
 
