@@ -1,14 +1,17 @@
 /*
- * Copyright 2001-2013, Haiku.
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
+ * Copyright 2001-2018, Haiku.
+ * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Kian Duffy, myob@users.sourceforge.net
- *		Siarzhuk Zharski, zharik@gmx.li
+ *		Jeremiah Bailey, <jjbailey@gmail.com>
+ *		Kian Duffy, <myob@users.sourceforge.net>
+ *		Siarzhuk Zharski, <zharik@gmx.li>
  */
+
+
 #ifndef TERM_APP_H
 #define TERM_APP_H
 
@@ -54,6 +57,7 @@ private:
 			bool				fTerminating;
 			bool				fStartFullscreen;
 			BString				fWindowTitle;
+			BString				fWorkingDirectory;
 
 			BWindow*			fTermWindow;
 			Arguments*			fArgs;

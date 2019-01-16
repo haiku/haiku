@@ -1,6 +1,12 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2019, Haiku, Inc. All rights reserved.
+ * Copyright 2005, Ingo Weinhold, <bonefish@users.sf.net>
+ *
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *	Jeremiah Bailey, <jjbailey@gmail.com>
+ *	Ingo Weinhold, <bonefish@users.sf.net>
  */
 
 
@@ -25,7 +31,8 @@ Arguments::Arguments(int defaultArgsNum, const char* const* defaultArgs)
 	  fFullScreen(false),
 	  fShellArgumentCount(0),
 	  fShellArguments(NULL),
-	  fTitle(NULL)
+	  fTitle(NULL),
+	  fWorkingDirectory(NULL)
 {
 	_SetShellArguments(defaultArgsNum, defaultArgs);
 }
@@ -53,9 +60,14 @@ Arguments::Parse(int argc, const char* const* argv)
 					fUsageRequested = true;
 				else
 					fTitle = argv[++argi];
-
-			} else if (strcmp(arg, "-f") == 0 || strcmp(arg, "--fullscreen")
-					== 0)
+			} else if (strcmp(arg, "-w") == 0
+					|| strcmp(arg, "--working-directory") == 0) {
+				if (argi >= argc)
+					fUsageRequested = true;
+				else
+					fWorkingDirectory = argv[++argi];
+			} else if (strcmp(arg, "-f") == 0
+					|| strcmp(arg, "--fullscreen") == 0)
 				fFullScreen = true;
 			else {
 				// illegal option

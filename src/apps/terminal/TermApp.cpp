@@ -1,13 +1,14 @@
 /*
- * Copyright 2001-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2019, Haiku.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT license.
  *
  * Authors:
- *		Kian Duffy, myob@users.sourceforge.net
- *		Siarzhuk Zharski, zharik@gmx.li
+ *		Jeremiah Bailey, <jjbailey@gmail.com>
+ *		Kian Duffy, <myob@users.sourceforge.net>
+ *		Siarzhuk Zharski, <zharik@gmx.li>
  */
 
 
@@ -204,6 +205,11 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 	if (fArgs->Title() != NULL)
 		fWindowTitle = fArgs->Title();
 
+	if (fArgs->WorkingDir() != NULL) {
+		fWorkingDirectory = fArgs->WorkingDir();
+		chdir(fWorkingDirectory);
+	}
+
 	fStartFullscreen = fArgs->FullScreen();
 }
 
@@ -299,7 +305,7 @@ TermApp::_ChildCleanupThreadEntry(void* data)
 	return ((TermApp*)data)->_ChildCleanupThread();
 }
 
-	
+
 status_t
 TermApp::_ChildCleanupThread()
 {
@@ -307,7 +313,7 @@ TermApp::_ChildCleanupThread()
 	sigemptyset(&waitForSignals);
 	sigaddset(&waitForSignals, SIGCHLD);
 	sigaddset(&waitForSignals, SIGUSR1);
-	
+
 	for (;;) {
 		int signal;
 		int error = sigwait(&waitForSignals, &signal);
@@ -327,18 +333,19 @@ void
 TermApp::_Usage(char *name)
 {
 	fprintf(stderr, B_TRANSLATE("Haiku Terminal\n"
-		"Copyright 2001-2009 Haiku, Inc.\n"
+		"Copyright 2001-2019 Haiku, Inc.\n"
 		"Copyright(C) 1999 Kazuho Okui and Takashi Murai.\n"
 		"\n"
 		"Usage: %s [OPTION] [SHELL]\n"), name);
 
-	fprintf(stderr,
-		B_TRANSLATE("  -h,     --help               print this help\n"
-		//"  -p,     --preference         load preference file\n"
-		"  -t,     --title              set window title\n"
-		"  -f,     --fullscreen         start fullscreen\n")
-		//"  -geom,  --geometry           set window geometry\n"
-		//"                               An example of geometry is \"80x25+100+100\"\n"
+	fprintf(stderr, B_TRANSLATE(
+			"  -h,     --help               print this help\n"
+			//"  -p,     --preference         load preference file\n"
+			"  -t,     --title              set window title\n"
+			"  -f,     --fullscreen         start fullscreen\n"
+			"  -w,     --working-directory  set initial working directory\n")
+			//"  -geom,  --geometry           set window geometry\n"
+			//"                               An example of geometry is \"80x25+100+100\"\n"
 		);
 }
 
