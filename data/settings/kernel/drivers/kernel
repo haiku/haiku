@@ -1,5 +1,32 @@
 #disable_smp true
-	# Disables multiprocessor support, which is enabled by default
+	# Disables multiprocessor support, which is enabled by default.
+
+#disable_ioapic true
+	# Disables IO-APIC support, which is enabled by default.
+
+#apm true
+	# APM (advanced power management) support (shutdown, battery info, etc.
+	# for legacy hardware), disabled by default.
+
+#acpi false
+	# ACPI support (interrupt routing, shutdown/reboot, battery info for modern
+	# hardware), enabled by default.
+
+#4gb_memory_limit true
+	# Ignores all memory beyond 4 GB, disabled by default.
+
+#fail_safe_video_mode true
+	# Use failsafe (VESA/framebuffer) video mode on every boot.
+
+#bluescreen false
+	# Enables/disables on-screen KDL, which defaults to enabled.
+	# You likely want to disable this when using serial debugging.
+
+load_symbols true
+	# Load kernel and kernel add-on symbols, disabled by default.
+
+#emergency_keys false
+	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default.
 
 #serial_debug_output false
 	# Disables serial debug output, which is enabled by default
@@ -28,10 +55,6 @@
 #syslog_max_size 20MB
 	# Sets the maximum syslog file size, default is 512kB.
 
-#bluescreen false
-	# Enables/disables on-screen KDL, which defaults to enabled.
-	# You likely want to disable this when using serial debugging.
-
 #bochs_debug_output true
 	# Activates Bochs debug output if enabled in the kernel (available on x86
 	# as a build option only)
@@ -41,26 +64,4 @@
 	# driver on the other end.
 
 #qemu_single_step_hack true
-	# Activates a hack that allows single-stepping under qemu to work.
-
-load_symbols true
-	# Load kernel and kernel add-on symbols, disabled by default.
-
-#apm true
-	# APM (advanced power management) support (shutdown, battery info, ...),
-	# disabled by default.
-
-#emergency_keys false
-	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default.
-
-#acpi false
-	# ACPI support, enabled by default.
-
-#disable_ioapic true
-	# Disables IO-APIC support, which is enabled by default.
-
-#4gb_memory_limit true
-	# Ignores all memory beyond 4 GB, disabled by default.
-
-#fail_safe_video_mode true
-	# Use failsafe (VESA/framebuffer) video mode on every boot.
+	# Activates a hack that allows single-stepping under QEMU to work.
