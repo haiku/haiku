@@ -53,7 +53,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/bwi/if_bwi_pci.c 338948 2018-09-26 17:12
 #include <sys/rman.h>
 
 #include <sys/socket.h>
- 
+
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_media.h>
@@ -246,7 +246,6 @@ static device_method_t bwi_pci_methods[] = {
 	DEVMETHOD(device_shutdown,	bwi_pci_shutdown),
 	DEVMETHOD(device_suspend,	bwi_pci_suspend),
 	DEVMETHOD(device_resume,	bwi_pci_resume),
-
 	{ 0,0 }
 };
 static driver_t bwi_driver = {
