@@ -64,6 +64,7 @@ private:
 	MIMEManager				*fMIMEManager;
 	EventQueue				*fEventQueue;
 	MessageRunnerManager	*fMessageRunnerManager;
+	MessageEvent			*fSanityEvent;
 	ShutdownProcess			*fShutdownProcess;
 	AuthenticationManager	*fAuthenticationManager;
 	PackageWatchingManager	*fPackageWatchingManager;
