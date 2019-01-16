@@ -210,14 +210,13 @@ private:
 	static	pci_module_info *	sPCIModule;
 	static	pci_x86_module_info *sPCIx86Module;
 
-			uint8 *				fCapabilityRegisters;
-			uint32				fCapabilityLength;
-			uint8 *				fOperationalRegisters;
-			uint32				fOperationalLength;
-			uint8 *				fRuntimeRegisters;
-			uint32				fRuntimeLength;
-			uint8 *				fDoorbellRegisters;
 			area_id				fRegisterArea;
+			uint8 *				fRegisters;
+			uint32				fCapabilityRegisterOffset;
+			uint32				fOperationalRegisterOffset;
+			uint32				fRuntimeRegisterOffset;
+			uint32				fDoorbellRegisterOffset;
+
 			pci_info *			fPCIInfo;
 			Stack *				fStack;
 			uint8				fIRQ;

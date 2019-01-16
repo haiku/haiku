@@ -1,8 +1,6 @@
 /*
- * Copyright 2006-2014, Haiku Inc. All rights reserved.
+ * Copyright 2006-2019, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Some code borrowed from the Haiku EHCI driver
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
@@ -108,9 +106,8 @@ module_info *modules[] = {
 
 XHCI::XHCI(pci_info *info, Stack *stack)
 	:	BusManager(stack),
-		fCapabilityRegisters(NULL),
-		fOperationalRegisters(NULL),
 		fRegisterArea(-1),
+		fRegisters(NULL),
 		fPCIInfo(info),
 		fStack(stack),
 		fIRQ(0),
@@ -160,37 +157,33 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	if ((fPCIInfo->u.h0.base_register_flags[0] & 0xC) == PCI_address_type_64)
 		physicalAddress += (phys_addr_t)fPCIInfo->u.h0.base_registers[1] << 32;
 
-	uint32 offset = physicalAddress & (B_PAGE_SIZE - 1);
-	phys_addr_t physicalAddressAligned = physicalAddress - offset;
-	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0]
-		+ offset + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	size_t mapSize = fPCIInfo->u.h0.base_register_sizes[0];
 
-	TRACE("map physical memory 0x%08" B_PRIx32 " : 0x%08" B_PRIx32 " "
-		"(base: 0x%08" B_PRIxPHYSADDR "; offset: 0x%" B_PRIx32 ");"
+	TRACE("map physical memory %08" B_PRIx32 " : %08" B_PRIx32 " "
+		"(base: %08" B_PRIxPHYSADDR "; offset: %" B_PRIx32 ");"
 		"size: %" B_PRId32 "\n", fPCIInfo->u.h0.base_registers[0],
 		fPCIInfo->u.h0.base_registers[1], physicalAddress, offset,
 		fPCIInfo->u.h0.base_register_sizes[0]);
 
 	fRegisterArea = map_physical_memory("XHCI memory mapped registers",
-		physicalAddressAligned, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
+		physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		(void **)&fCapabilityRegisters);
+		(void **)&fRegisters);
 	if (fRegisterArea < B_OK) {
-		TRACE("failed to map register memory\n");
+		TRACE_ERROR("failed to map register memory\n");
 		return;
 	}
 
-	uint32 hciCapLength = ReadCapReg32(XHCI_HCI_CAPLENGTH);
-	fCapabilityRegisters += offset;
-	fCapabilityLength = HCI_CAPLENGTH(hciCapLength);
-	TRACE("mapped capability length: 0x%" B_PRIx32 "\n", fCapabilityLength);
-	fOperationalRegisters = fCapabilityRegisters + fCapabilityLength;
-	fRuntimeRegisters = fCapabilityRegisters + ReadCapReg32(XHCI_RTSOFF);
-	fDoorbellRegisters = fCapabilityRegisters + ReadCapReg32(XHCI_DBOFF);
-	TRACE("mapped capability registers: 0x%p\n", fCapabilityRegisters);
-	TRACE("mapped operational registers: 0x%p\n", fOperationalRegisters);
-	TRACE("mapped runtime registers: 0x%p\n", fRuntimeRegisters);
-	TRACE("mapped doorbell registers: 0x%p\n", fDoorbellRegisters);
+	// determine the register offsets
+	fCapabilityRegisterOffset = 0;
+	fOperationalRegisterOffset = HCI_CAPLENGTH(ReadCapReg32(XHCI_HCI_CAPLENGTH));
+	fRuntimeRegisterOffset = ReadCapReg32(XHCI_RTSOFF) & ~0x1F;
+	fDoorbellRegisterOffset = ReadCapReg32(XHCI_DBOFF) & ~0x3;
+
+	TRACE("mapped registers: %p\n", fRegisters);
+	TRACE("operational register offset: %d\n", fOperationalRegisterOffset);
+	TRACE("runtime register offset: %p\n", fRuntimeRegisterOffset);
+	TRACE("doorbell register offset: %p\n", fDoorbellRegisterOffset);
 
 	TRACE_ALWAYS("interface version: 0x%04" B_PRIx32 "\n",
 		HCI_VERSION(ReadCapReg32(XHCI_HCI_VERSION)));
@@ -521,11 +514,11 @@ XHCI::Start()
 
 	TRACE("setting ERDP addr = 0x%" B_PRIx64 "\n", fErst->rs_addr);
 	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)fErst->rs_addr);
-	WriteRunReg32(XHCI_ERDP_HI(0), /*(uint32)(fErst->rs_addr >> 32)*/0);
+	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(fErst->rs_addr >> 32));
 
 	TRACE("setting ERST base addr = 0x%" B_PRIxPHYSADDR "\n", dmaAddress);
 	WriteRunReg32(XHCI_ERSTBA_LO(0), (uint32)dmaAddress);
-	WriteRunReg32(XHCI_ERSTBA_HI(0), /*(uint32)(dmaAddress >> 32)*/0);
+	WriteRunReg32(XHCI_ERSTBA_HI(0), (uint32)(dmaAddress >> 32));
 
 	dmaAddress += sizeof(xhci_erst_element) + XHCI_MAX_EVENTS
 		* sizeof(xhci_trb);
@@ -544,7 +537,7 @@ XHCI::Start()
 	}
 	TRACE("setting CRCR addr = 0x%" B_PRIxPHYSADDR "\n", dmaAddress);
 	WriteOpReg(XHCI_CRCR_LO, (uint32)dmaAddress | CRCR_RCS);
-	WriteOpReg(XHCI_CRCR_HI, /*(uint32)(dmaAddress >> 32)*/0);
+	WriteOpReg(XHCI_CRCR_HI, (uint32)(dmaAddress >> 32));
 	// link trb
 	fCmdRing[XHCI_MAX_COMMANDS - 1].qwtrb0 = dmaAddress;
 
@@ -2134,7 +2127,7 @@ XHCI::DoCommand(xhci_trb* trb)
 	TRACE("Command Complete. Result: %" B_PRId32 "\n", completionCode);
 	if (completionCode != COMP_SUCCESS) {
 		uint32 errorCode = TRB_2_COMP_CODE_GET(fCmdResult[0]);
-		TRACE_ERROR("unsuccessful command %s (%" B_PRId32 ")\n",
+		TRACE_ERROR("unsuccessful command, error %s (%" B_PRId32 ")\n",
 			xhci_error_string(errorCode), errorCode);
 		status = B_IO_ERROR;
 	}
@@ -2456,7 +2449,6 @@ XHCI::FinishTransfers()
 			Lock();
 		}
 		Unlock();
-
 	}
 }
 
@@ -2464,14 +2456,14 @@ XHCI::FinishTransfers()
 inline void
 XHCI::WriteOpReg(uint32 reg, uint32 value)
 {
-	*(volatile uint32 *)(fOperationalRegisters + reg) = value;
+	*(volatile uint32 *)(fRegisters + fOperationalRegisterOffset + reg) = value;
 }
 
 
 inline uint32
 XHCI::ReadOpReg(uint32 reg)
 {
-	return *(volatile uint32 *)(fOperationalRegisters + reg);
+	return *(volatile uint32 *)(fRegisters + fOperationalRegisterOffset + reg);
 }
 
 
@@ -2501,42 +2493,42 @@ XHCI::WaitOpBits(uint32 reg, uint32 mask, uint32 expected)
 inline uint32
 XHCI::ReadCapReg32(uint32 reg)
 {
-	return *(volatile uint32 *)(fCapabilityRegisters + reg);
+	return *(volatile uint32 *)(fRegisters + fCapabilityRegisterOffset + reg);
 }
 
 
 inline void
 XHCI::WriteCapReg32(uint32 reg, uint32 value)
 {
-	*(volatile uint32 *)(fCapabilityRegisters + reg) = value;
+	*(volatile uint32 *)(fRegisters + fCapabilityRegisterOffset + reg) = value;
 }
 
 
 inline uint32
 XHCI::ReadRunReg32(uint32 reg)
 {
-	return *(volatile uint32 *)(fRuntimeRegisters + reg);
+	return *(volatile uint32 *)(fRegisters + fRuntimeRegisterOffset + reg);
 }
 
 
 inline void
 XHCI::WriteRunReg32(uint32 reg, uint32 value)
 {
-	*(volatile uint32 *)(fRuntimeRegisters + reg) = value;
+	*(volatile uint32 *)(fRegisters + fRuntimeRegisterOffset + reg) = value;
 }
 
 
 inline uint32
 XHCI::ReadDoorReg32(uint32 reg)
 {
-	return *(volatile uint32 *)(fDoorbellRegisters + reg);
+	return *(volatile uint32 *)(fRegisters + fDoorbellRegisterOffset + reg);
 }
 
 
 inline void
 XHCI::WriteDoorReg32(uint32 reg, uint32 value)
 {
-	*(volatile uint32 *)(fDoorbellRegisters + reg) = value;
+	*(volatile uint32 *)(fRegisters + fDoorbellRegisterOffset + reg) = value;
 }
 
 
