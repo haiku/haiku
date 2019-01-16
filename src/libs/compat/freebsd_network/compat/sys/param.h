@@ -62,7 +62,7 @@
 #endif
 
 /* defined in arch_cpu.h which we can't include here as it's C++ */
-#if defined(__x86_64__) || defined(__i386__)
+#if defined(__x86_64__) || defined(__i386__) || defined(__arm__)
 #define CACHE_LINE_SIZE 64
 #else
 #error Need definition of CACHE_LINE_SIZE for this arch!
