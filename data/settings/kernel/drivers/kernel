@@ -1,70 +1,66 @@
 #disable_smp true
-	# disables multiprocessor support, default is enabled
+	# Disables multiprocessor support, which is enabled by default
 
 #serial_debug_output false
-	# disables serial debug output, default is enabled
+	# Disables serial debug output, which is enabled by default
 
 #serial_debug_port 1
-	# possible values: <num>|<port>
-	# serial interface number (as enumerated by the BIOS) or the
-	# base port of the serial interface to be used for kernel
-	# debug output and the kernel debugger
-	# default is 0 (COM1)
+	# Possible values: <num>|<port>
+	# Serial interface number (as enumerated by the BIOS) or the base port of
+	# the serial interface to be used for kernel debug output and KDL.
+	# Default is 0 (COM1).
 
 #serial_debug_speed 57600
-	# possible values: <9600|19200|38400|57600|115200>
-	# default is 115200
+	# Possible values: <9600|19200|38400|57600|115200>, default is 115200.
 
 #syslog_debug_output false
-	# disables syslog debug output - all debug output is also sent to
-	# the syslog service by default.
+	# Disables sending debug output to syslog_daemon, which is enabled by default.
+	# Does not affect serial and onscreen debug output.
 
 #syslog_buffer_size 131768
 	# The default size of the internal syslog ring buffer - if you often see
 	# <DROP> or <TRUNC> messages in your syslog, you might want to increase
-	# this value. Defaults to 65536 bytes.
+	# this value. Defaults to 65536 (bytes).
 
 #syslog_time_stamps true
 	# Include time stamps in syslog debug output, defaults to false.
 
 #syslog_max_size 20MB
-	# change maximum syslog file size, default is 512kB
+	# Sets the maximum syslog file size, default is 512kB.
 
 #bluescreen false
-	# enables/disables on-screen KDL (defaults to on),
-	# you want to disable this for serial debugging
+	# Enables/disables on-screen KDL, which defaults to enabled.
+	# You likely want to disable this when using serial debugging.
 
 #bochs_debug_output true
-	# Activates Bochs debug output if enabled in the kernel
-	# (available on x86 as a build option only)
+	# Activates Bochs debug output if enabled in the kernel (available on x86
+	# as a build option only)
 
 #laplinkll_debug_output true
-	# Activates parallel debug output. Requires a laplink cable
-	# and a custom BeOS driver on the other end.
+	# Activates parallel debug output. Requires a laplink cable and a custom
+	# driver on the other end.
 
 #qemu_single_step_hack true
-	# Activates a hack that allows single-stepping under qemu
-	# to work.
+	# Activates a hack that allows single-stepping under qemu to work.
 
 load_symbols true
-	# load kernel and kernel add-on symbols, default is off
+	# Load kernel and kernel add-on symbols, disabled by default.
 
 #apm true
-	# APM (advanced power management) support
-	# (system shutdown, battery info, ...)
-	# default is off
+	# APM (advanced power management) support (shutdown, battery info, ...),
+	# disabled by default.
 
 #emergency_keys false
-	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default
+	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default.
 
 #acpi false
-	# ACPI support, enabled by default
+	# ACPI support, enabled by default.
 
 #disable_ioapic true
-	# Disables IO-APIC support, enabled by default
+	# Disables IO-APIC support, which is enabled by default.
 
 #4gb_memory_limit true
-	# Ignores all memory beyond the 4 GB address limit. Default is false.
+	# Ignores all memory beyond 4 GB, disabled by default.
 
 #fail_safe_video_mode true
-	# Use failsafe (vesa) video mode on every boot.
+	# Use failsafe (VESA/framebuffer) video mode on every boot.
