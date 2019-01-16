@@ -235,9 +235,16 @@ status_t
 vesa_get_accelerant_device_info(accelerant_device_info *info)
 {
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, "VESA Driver");
-	strcpy(info->chipset, "VESA");
-		// ToDo: provide some more insight here...
+
+	// TODO: provide some more insight here...
+	if (gInfo->vesa_modes != NULL) {
+		strcpy(info->name, "VESA driver");
+		strcpy(info->chipset, "VESA");
+	} else {
+		strcpy(info->name, "Framebuffer");
+		strcpy(info->chipset, "");
+	}
+
 	strcpy(info->serial_no, "None");
 
 #if 0
