@@ -729,11 +729,9 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 		// status register each time we get one.  It's possible to get a
 		// GPE for an event we're not interested in here (i.e., SCI for
 		// EC query).
-		status_t waitStatus = B_NO_ERROR;
 		for (i = 0; i < ec_timeout; i++) {
 			if (generationCount == sc->ec_gencount) {
-				waitStatus =
-					sc->ec_condition_var.Wait(B_RELATIVE_TIMEOUT, 1000);
+				sc->ec_condition_var.Wait(B_RELATIVE_TIMEOUT, 1000);
 			}
 			/*
 			 * Record new generation count.  It's possible the GPE was
