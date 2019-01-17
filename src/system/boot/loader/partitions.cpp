@@ -357,7 +357,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 	}
 
 	// find the best FS module
-	const file_system_module_info *bestFSModule = NULL;
+	file_system_module_info *bestFSModule = NULL;
 	float bestFSPriority = -1;
 	for (int32 i = 0; i < sNumFileSystemModules; i++) {
 		if (sFileSystemModules[i]->identify_file_system == NULL)
@@ -426,12 +426,8 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 	}
 
 	// scan for file systems
-
-	if (mountFileSystems) {
-		// TODO: Use the FS module we've got, if any. Requires to implement the
-		// identify_file_system() hook in every FS.
-		return Mount();
-	}
+	if (mountFileSystems)
+		return _Mount(bestFSModule, NULL);
 
 	return B_ENTRY_NOT_FOUND;
 }
