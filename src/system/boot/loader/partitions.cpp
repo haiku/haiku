@@ -426,7 +426,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 	}
 
 	// scan for file systems
-	if (mountFileSystems)
+	if (mountFileSystems && bestFSModule != NULL)
 		return _Mount(bestFSModule, NULL);
 
 	return B_ENTRY_NOT_FOUND;
