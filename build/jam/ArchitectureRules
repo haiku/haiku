@@ -112,18 +112,13 @@ rule ArchitectureSetup architecture
 	# set variables for gcc header options
 	SetIncludePropertiesVariables HAIKU : _$(architecture) ;
 
-	# C/C++ flags
-	if $(gccVersion[1]) >= 4 {
-		HAIKU_C++FLAGS_$(architecture) += -Wno-deprecated ;
-	}
-
 	# warning flags
 	HAIKU_WARNING_CCFLAGS_$(architecture) = -Wall
-		-Wno-trigraphs -Wno-multichar
+		-Wno-multichar
 		-Wpointer-arith -Wcast-align -Wsign-compare
 		-Wmissing-prototypes ;
 	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall
-		-Wno-trigraphs -Wno-multichar
+		-Wno-multichar
 		-Wpointer-arith -Wcast-align -Wsign-compare
 		-Wno-ctor-dtor-privacy -Woverloaded-virtual ;
 
@@ -138,8 +133,10 @@ rule ArchitectureSetup architecture
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
 
 	if $(gccVersion[1]) >= 4 {
-		# TODO: remove the -Wno-unused-but-set-variable option
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable ;
+		# TODO: Remove all these.
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable
+			-Wno-error=deprecated -Wno-error=deprecated-declarations
+			-Wno-error=cpp -Wno-error=trigraphs ;
 	}
 
 	# debug flags
