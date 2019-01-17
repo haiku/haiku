@@ -183,7 +183,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			kprintf("<%s> %.*s<\33[32m%#" B_PRIx32 "\33[0m>%s", image,
 				namespaceLength, name, argValue, lastName);
 		} else
-			kprintf("<%s> %.*s<???>%s", image, namespaceLength, name, lastName);
+			kprintf("<%s> %.*s<\?\?\?>%s", image, namespaceLength, name, lastName);
 
 		if (addDebugVariables)
 			set_debug_variable("_this", argValue);
@@ -299,7 +299,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 				kprintf(" \33[31m\"<NULL>\"\33[0m");
 			else if (debug_strlcpy(B_CURRENT_TEAM, buffer, (char*)(addr_t)value,
 					kBufferSize) < B_OK) {
-				kprintf(" \33[31m\"<???>\"\33[0m");
+				kprintf(" \33[31m\"<\?\?\?>\"\33[0m");
 			} else
 				kprintf(" \33[36m\"%s\"\33[0m", buffer);
 		}
@@ -1172,7 +1172,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 				break;
 			}
 		}
-		
+
 		if (ip == 0)
 			break;
 
