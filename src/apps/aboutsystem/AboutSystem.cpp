@@ -92,6 +92,7 @@ static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
 static const rgb_color kBeOSBlue = { 0, 0, 200, 255 };
 static const rgb_color kBeOSRed = { 200, 0, 0, 255 };
 
+static const char* kBerkeley = B_TRANSLATE_MARK("Berkeley");
 static const char* kBSDTwoClause = B_TRANSLATE_MARK("BSD (2-clause)");
 static const char* kBSDThreeClause = B_TRANSLATE_MARK("BSD (3-clause)");
 static const char* kBSDFourClause = B_TRANSLATE_MARK("BSD (4-clause)");
@@ -1124,8 +1125,9 @@ AboutView::_CreateCreditsView()
 		"ftp, tput\n"
 		COPYRIGHT_STRING "1996-2008 The NetBSD Foundation, Inc. "
 		"All rights reserved."),
+		StringVector(kBerkeley, kBSDFourClause, NULL),
+		StringVector(),
 		"https://www.netbsd.org");
-			// TODO: License!
 
 	// FFmpeg copyrights
 	_AddPackageCredit(PackageCredit("FFmpeg")
@@ -1182,8 +1184,8 @@ AboutView::_CreateCreditsView()
 			"Corporation, Maynard, Massachusetts.\n"
 			"All rights reserved."),
 			NULL)
-		.SetLicenses("OpenGroup", "DEC", NULL));
-			// TODO: URL
+		.SetLicenses("OpenGroup", "DEC", NULL)
+		.SetURL("https://xfree86.org"));
 
 	// Bitstream Charter font
 	_AddPackageCredit(PackageCredit("Bitstream Charter font")
