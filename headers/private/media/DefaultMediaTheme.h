@@ -14,21 +14,21 @@ class BParameterGroup;
 namespace BPrivate {
 
 class DefaultMediaTheme : public BMediaTheme {
-	public:
+public:
 		DefaultMediaTheme();
 
 		virtual	BControl* MakeControlFor(BParameter* parameter);
 
-		static BControl* MakeViewFor(BParameter* parameter, const BRect* hintRect = NULL);
+		static BControl* MakeViewFor(BParameter* parameter);
 			// this is also called by the BMediaTheme::MakeFallbackViewFor()
 			// method - that's why it's a static.
 
-	protected:
+protected:
 		virtual	BView* MakeViewFor(BParameterWeb* web, const BRect* hintRect = NULL);
 
-	private:
-		BView* MakeViewFor(BParameterGroup& group, const BRect* hintRect);
-		BView* MakeSelfHostingViewFor(BParameter& parameter, const BRect* hintRect);
+private:
+		BView* MakeViewFor(BParameterGroup& group);
+		BView* MakeSelfHostingViewFor(BParameter& parameter);
 };
 
 }	// namespace BPrivate

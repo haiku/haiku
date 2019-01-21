@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,13 +11,16 @@
 #include <Button.h>
 #include <ChannelSlider.h>
 #include <CheckBox.h>
+#include <GroupView.h>
 #include <MediaRoster.h>
 #include <MenuField.h>
 #include <MessageFilter.h>
 #include <OptionPopUp.h>
 #include <ParameterWeb.h>
 #include <ScrollBar.h>
+#include <ScrollView.h>
 #include <Slider.h>
+#include <SpaceLayoutItem.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <TextControl.h>
@@ -30,61 +34,20 @@ using namespace BPrivate;
 
 namespace BPrivate {
 
-class DynamicScrollView : public BView {
+class DynamicScrollView : public BScrollView {
 	public:
 		DynamicScrollView(const char *name, BView *target);
 		virtual ~DynamicScrollView();
 
-		virtual void AttachedToWindow(void);
 		virtual void FrameResized(float width, float height);
-		virtual void FrameMoved(BPoint newPosition);
-		virtual void GetPreferredSize(float *_width, float *_height);
-
-		void SetContentBounds(BRect bounds);
-		BRect ContentBounds() const { return fContentBounds; }
 
 	private:
 		void UpdateBars();
-
-		BScrollBar	*fHorizontalScrollBar, *fVerticalScrollBar;
-		BRect		fContentBounds;
-		BView		*fTarget;
-		bool		fIsDocumentScroller;
-};
-
-class GroupView : public BView {
-	public:
-		GroupView(BRect frame, const char *name);
-		virtual ~GroupView();
-
-		virtual void AttachedToWindow();
-		virtual void AllAttached();
-		virtual void GetPreferredSize(float *_width, float *_height);
-
-		virtual	BSize MinSize();
-		virtual	BSize MaxSize();
-		virtual	BSize PreferredSize();
-
-		void SetContentBounds(BRect bounds);
-		BRect ContentBounds() const { return fContentBounds; }
-
-	private:
-		BRect		fContentBounds;
-};
-
-class TabView : public BTabView {
-	public:
-		TabView(BRect frame, const char *name, button_width width = B_WIDTH_FROM_LABEL,
-			uint32 resizingMode = B_FOLLOW_ALL, uint32 flags = B_FULL_UPDATE_ON_RESIZE
-				| B_WILL_DRAW | B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_NAVIGABLE);
-
-		virtual void FrameResized(float width, float height);
-		virtual void Select(int32 tab);
 };
 
 class SeparatorView : public BView {
 	public:
-		SeparatorView(BRect frame);
+		SeparatorView(orientation orientation);
 		virtual ~SeparatorView();
 
 		virtual void Draw(BRect updateRect);
@@ -95,19 +58,19 @@ class SeparatorView : public BView {
 
 class TitleView : public BView {
 	public:
-		TitleView(BRect frame, const char *title);
+		TitleView(const char *title);
 		virtual ~TitleView();
 
 		virtual void Draw(BRect updateRect);
 		virtual void GetPreferredSize(float *width, float *height);
 
 	private:
-		const char *fTitle;
+		BString fTitle;
 };
 
 class CheckBox : public BCheckBox {
 	public:
-		CheckBox(BRect area, const char* name, const char* label,
+		CheckBox(const char* name, const char* label,
 			BDiscreteParameter &parameter);
 		virtual ~CheckBox();
 
@@ -119,7 +82,7 @@ class CheckBox : public BCheckBox {
 
 class OptionPopUp : public BOptionPopUp {
 	public:
-		OptionPopUp(BRect area, const char* name, const char* label,
+		OptionPopUp(const char* name, const char* label,
 			BDiscreteParameter &parameter);
 		virtual ~OptionPopUp();
 
@@ -131,7 +94,7 @@ class OptionPopUp : public BOptionPopUp {
 
 class Slider : public BSlider {
 	public:
-		Slider(BRect area, const char* name, const char*label, int32 minValue,
+		Slider(const char* name, const char*label, int32 minValue,
 			int32 maxValue, BContinuousParameter &parameter);
 		virtual ~Slider();
 
@@ -143,7 +106,7 @@ class Slider : public BSlider {
 
 class ChannelSlider : public BChannelSlider {
 	public:
-		ChannelSlider(BRect area, const char* name, const char* label,
+		ChannelSlider(const char* name, const char* label,
 			orientation orientation, int32 channels,
 			BContinuousParameter &parameter);
 		virtual ~ChannelSlider();
@@ -238,16 +201,10 @@ stop_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 
 
 DynamicScrollView::DynamicScrollView(const char *name, BView *target)
-	: BView(target->Frame(), name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
-	fHorizontalScrollBar(NULL),
-	fVerticalScrollBar(NULL),
-	fTarget(target),
-	fIsDocumentScroller(false)
+	: BScrollView(name, target, 0, true, true, B_NO_BORDER)
 {
-	fContentBounds.Set(-1, -1, -1, -1);
-	AdoptViewColors(fTarget);
-	target->MoveTo(B_ORIGIN);
-	AddChild(target);
+	SetExplicitMinSize(BSize(B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT));
+	SetFlags(Flags() | B_FRAME_EVENTS);
 }
 
 
@@ -257,167 +214,43 @@ DynamicScrollView::~DynamicScrollView()
 
 
 void
-DynamicScrollView::AttachedToWindow(void)
-{
-	BRect frame = ConvertToScreen(Bounds());
-	BRect windowFrame = Window()->Frame();
-
-	fIsDocumentScroller = Parent() == NULL
-		&& Window() != NULL
-		&& Window()->Look() == B_DOCUMENT_WINDOW_LOOK
-		&& frame.right == windowFrame.right
-		&& frame.bottom == windowFrame.bottom;
-
-	UpdateBars();
-}
-
-
-void
 DynamicScrollView::FrameResized(float width, float height)
 {
+	BScrollView::FrameResized(width, height);
 	UpdateBars();
-}
-
-
-void
-DynamicScrollView::FrameMoved(BPoint newPosition)
-{
-	UpdateBars();
-}
-
-
-void
-DynamicScrollView::GetPreferredSize(float *_width, float *_height)
-{
-	float width = 50;
-	if (fVerticalScrollBar)
-		width += B_V_SCROLL_BAR_WIDTH;
-	float height = 50;
-	if (fHorizontalScrollBar)
-		height += B_H_SCROLL_BAR_HEIGHT;
-	if (_width)
-		*_width = width;
-	if (_height)
-		*_height = height;
-}
-
-
-void
-DynamicScrollView::SetContentBounds(BRect bounds)
-{
-	fContentBounds = bounds;
-	if (Window())
-		UpdateBars();
 }
 
 
 void
 DynamicScrollView::UpdateBars()
 {
-	// we need the size that the view wants to have, and the one
-	// it could have (without the space for the scroll bars)
-
-	float width, height;
-	if (fContentBounds == BRect(-1, -1, -1, -1))
-		fTarget->GetPreferredSize(&width, &height);
-	else {
-		width = fContentBounds.Width();
-		height = fContentBounds.Height();
-	}
-
 	BRect bounds = Bounds();
+	BSize size = Target()->PreferredSize();
 
-	// do we have to remove a scroll bar?
+	BScrollBar *horizontalBar = ScrollBar(B_HORIZONTAL),
+		*verticalBar = ScrollBar(B_VERTICAL);
 
-	bool horizontal = width > bounds.Width();
-	bool vertical = height > bounds.Height();
+	// update the scroll bar range & proportions
 
-	if (!horizontal && fHorizontalScrollBar != NULL) {
-		RemoveChild(fHorizontalScrollBar);
-		delete fHorizontalScrollBar;
-		fHorizontalScrollBar = NULL;
-	}
-
-	if (!vertical && fVerticalScrollBar != NULL) {
-		RemoveChild(fVerticalScrollBar);
-		delete fVerticalScrollBar;
-		fVerticalScrollBar = NULL;
-	}
-
-	// or do we have to add a scroll bar?
-
-	if (horizontal && fHorizontalScrollBar == NULL) {
-		BRect rect = Bounds();
-		rect.top = rect.bottom + 1 - B_H_SCROLL_BAR_HEIGHT;
-		if (vertical || fIsDocumentScroller)
-			rect.right -= B_V_SCROLL_BAR_WIDTH;
-
-		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0,
-			width, B_HORIZONTAL);
-		AddChild(fHorizontalScrollBar);
-	}
-
-	if (vertical && fVerticalScrollBar == NULL) {
-		BRect rect = Bounds();
-		rect.left = rect.right + 1 - B_V_SCROLL_BAR_WIDTH;
-		if (horizontal || fIsDocumentScroller)
-			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0,
-			height, B_VERTICAL);
-		AddChild(fVerticalScrollBar);
-	}
-
-	// update the scroll bar range & proportions and layout views
-
-	bounds = Bounds();
-	if (fHorizontalScrollBar != NULL)
-		bounds.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
-	if (fVerticalScrollBar != NULL)
-		bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
-
-	fTarget->MoveTo(bounds.LeftTop());
-	fTarget->ResizeTo(bounds.Width(), bounds.Height());
-
-	if (fHorizontalScrollBar != NULL) {
-		float delta = width - bounds.Width();
+	if (horizontalBar != NULL) {
+		float delta = size.Width() - bounds.Width(),
+			proportion = bounds.Width() / size.Width();
 		if (delta < 0)
 			delta = 0;
 
-		fHorizontalScrollBar->SetRange(0, delta);
-		fHorizontalScrollBar->SetSteps(1, bounds.Width());
-		fHorizontalScrollBar->SetProportion(bounds.Width() / width);
-
-		float barWidth = Bounds().Width();
-		if (vertical) {
-			// scrollbars overlap one pixel of the frame
-			barWidth += 1;
-		}
-		if (vertical || fIsDocumentScroller)
-			barWidth -= B_V_SCROLL_BAR_WIDTH + 1;
-
-		fHorizontalScrollBar->MoveTo(bounds.left, bounds.bottom + 1);
-		fHorizontalScrollBar->ResizeTo(barWidth, B_H_SCROLL_BAR_HEIGHT);
+		horizontalBar->SetRange(0, delta);
+		horizontalBar->SetSteps(1, bounds.Width());
+		horizontalBar->SetProportion(proportion);
 	}
-	if (fVerticalScrollBar != NULL) {
-		float delta = height - bounds.Height();
+	if (verticalBar != NULL) {
+		float delta = size.Height() - bounds.Height(),
+			proportion = bounds.Height() / size.Height();
 		if (delta < 0)
 			delta = 0;
 
-		fVerticalScrollBar->SetRange(0, delta);
-		fVerticalScrollBar->SetSteps(1, bounds.Height());
-		fVerticalScrollBar->SetProportion(bounds.Height() / height);
-
-		float barHeight = Bounds().Height();
-		if (horizontal) {
-			// scrollbars overlap one pixel of the frame
-			barHeight += 1;
-		}
-		if (horizontal || fIsDocumentScroller)
-			barHeight -= B_H_SCROLL_BAR_HEIGHT + 1;
-
-		fVerticalScrollBar->MoveTo(bounds.right + 1, bounds.top);
-		fVerticalScrollBar->ResizeTo(B_V_SCROLL_BAR_WIDTH, barHeight);
+		verticalBar->SetRange(0, delta);
+		verticalBar->SetSteps(1, bounds.Height());
+		verticalBar->SetProportion(proportion);
 	}
 }
 
@@ -425,128 +258,17 @@ DynamicScrollView::UpdateBars()
 //	#pragma mark -
 
 
-GroupView::GroupView(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
+SeparatorView::SeparatorView(orientation orientation)
+	: BView("-", B_WILL_DRAW),
+	fVertical(orientation == B_VERTICAL)
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-}
-
-
-GroupView::~GroupView()
-{
-}
-
-
-void
-GroupView::AttachedToWindow()
-{
-	for (int32 i = CountChildren(); i-- > 0;) {
-		BControl *control = dynamic_cast<BControl *>(ChildAt(i));
-		if (control == NULL)
-			continue;
-
-		control->SetTarget(control);
+	if (fVertical) {
+		SetExplicitMinSize(BSize(5, 0));
+		SetExplicitMaxSize(BSize(5, MaxSize().height));
+	} else {
+		SetExplicitMinSize(BSize(0, 5));
+		SetExplicitMaxSize(BSize(MaxSize().width, 5));
 	}
-}
-
-
-void
-GroupView::AllAttached()
-{
-}
-
-
-void
-GroupView::GetPreferredSize(float *_width, float *_height)
-{
-	if (_width)
-		*_width = fContentBounds.Width();
-
-	if (_height)
-		*_height = fContentBounds.Height();
-}
-
-
-BSize
-GroupView::MinSize()
-{
-	return BSize(100, 100);
-}
-
-
-BSize
-GroupView::PreferredSize()
-{
-	return MinSize();
-}
-
-
-BSize
-GroupView::MaxSize()
-{
-	BSize max;
-	GetPreferredSize(&max.width, &max.height);
-	return max;
-}
-
-
-void
-GroupView::SetContentBounds(BRect bounds)
-{
-	fContentBounds = bounds;
-}
-
-
-//	#pragma mark -
-
-
-/** BTabView is really stupid - it doesn't even resize its content
- *	view when it is resized itself.
- *	This derived class fixes this issue, and also resizes all tab
- *	content views to the size of the container view when they are
- *	selected (does not take their resize flags into account, though).
- */
-
-TabView::TabView(BRect frame, const char *name, button_width width,
-	uint32 resizingMode, uint32 flags)
-	: BTabView(frame, name, width, resizingMode, flags)
-{
-}
-
-
-void
-TabView::FrameResized(float width, float height)
-{
-	BRect rect = Bounds();
-	rect.top += TabHeight();
-	rect.InsetBy(3.0f, 3.0f);
-		//ContainerView is inseted by 3.0 in BTabView::_InitObject()
-
-	ContainerView()->ResizeTo(rect.Width(), rect.Height());
-}
-
-
-void
-TabView::Select(int32 tab)
-{
-	BTabView::Select(tab);
-
-	BView *view = ViewForTab(Selection());
-	if (view != NULL) {
-		BRect rect = ContainerView()->Bounds();
-		view->ResizeTo(rect.Width(), rect.Height());
-	}
-}
-
-
-//	#pragma mark -
-
-
-SeparatorView::SeparatorView(BRect frame)
-	: BView(frame, "-", B_FOLLOW_NONE, B_WILL_DRAW)
-{
-	fVertical = frame.Width() < frame.Height();
-	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -578,17 +300,16 @@ SeparatorView::Draw(BRect updateRect)
 //	#pragma mark -
 
 
-TitleView::TitleView(BRect frame, const char *title)
-	: BView(frame, title, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW)
+TitleView::TitleView(const char *title)
+	: BView(title, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	fTitle(title)
 {
-	fTitle = strdup(title);
 	AdoptSystemColors();
 }
 
 
 TitleView::~TitleView()
 {
-	free((char *)fTitle);
 }
 
 
@@ -596,6 +317,7 @@ void
 TitleView::Draw(BRect updateRect)
 {
 	BRect rect(Bounds());
+	rect.left = (rect.Width() - StringWidth(fTitle)) / 2;
 
 	SetDrawingMode(B_OP_COPY);
 	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_2_TINT));
@@ -626,9 +348,9 @@ TitleView::GetPreferredSize(float *_width, float *_height)
 //	#pragma mark -
 
 
-CheckBox::CheckBox(BRect area, const char* name, const char* label,
+CheckBox::CheckBox(const char* name, const char* label,
 	BDiscreteParameter &parameter)
-	: BCheckBox(area, name, label, NULL),
+	: BCheckBox(name, label, NULL),
 	fParameter(parameter)
 {
 }
@@ -653,9 +375,9 @@ CheckBox::DetachedFromWindow()
 }
 
 
-OptionPopUp::OptionPopUp(BRect area, const char* name, const char* label,
+OptionPopUp::OptionPopUp(const char* name, const char* label,
 	BDiscreteParameter &parameter)
-	: BOptionPopUp(area, name, label, NULL),
+	: BOptionPopUp(name, label, NULL),
 	fParameter(parameter)
 {
 }
@@ -680,9 +402,9 @@ OptionPopUp::DetachedFromWindow()
 }
 
 
-Slider::Slider(BRect area, const char* name, const char* label, int32 minValue,
+Slider::Slider(const char* name, const char* label, int32 minValue,
 	int32 maxValue, BContinuousParameter &parameter)
-	: BSlider(area, name, label, NULL, minValue, maxValue),
+	: BSlider(name, label, NULL, minValue, maxValue, B_HORIZONTAL),
 	fParameter(parameter)
 {
 }
@@ -707,9 +429,9 @@ Slider::DetachedFromWindow()
 }
 
 
-ChannelSlider::ChannelSlider(BRect area, const char* name, const char* label,
+ChannelSlider::ChannelSlider(const char* name, const char* label,
 	orientation orientation, int32 channels, BContinuousParameter &parameter)
-	: BChannelSlider(area, name, label, NULL, orientation, channels),
+	: BChannelSlider(name, label, NULL, orientation, channels),
 	fParameter(parameter)
 {
 }
@@ -724,6 +446,8 @@ void
 ChannelSlider::AttachedToWindow()
 {
 	start_watching_for_parameter_changes(this, fParameter);
+
+	BChannelSlider::AttachedToWindow();
 }
 
 
@@ -731,6 +455,8 @@ void
 ChannelSlider::DetachedFromWindow()
 {
 	stop_watching_for_parameter_changes(this, fParameter);
+
+	BChannelSlider::DetachedFromWindow();
 }
 
 
@@ -984,8 +710,7 @@ DefaultMediaTheme::MakeControlFor(BParameter *parameter)
 {
 	CALLED();
 
-	BRect rect(0, 0, 150, 100);
-	return MakeViewFor(parameter, &rect);
+	return MakeViewFor(parameter);
 }
 
 
@@ -997,212 +722,104 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 	if (web == NULL)
 		return NULL;
 
-	BRect rect;
-	if (hintRect)
-		rect = *hintRect;
-
-	BRect bestRect;
-
 	// do we have more than one attached parameter group?
 	// if so, use a tabbed view with a tab for each group
 
-	TabView *tabView = NULL;
-
+	BTabView *tabView = NULL;
 	if (web->CountGroups() > 1)
-		tabView = new TabView(rect, "web");
-
-	rect.OffsetTo(B_ORIGIN);
+		tabView = new BTabView("web");
 
 	for (int32 i = 0; i < web->CountGroups(); i++) {
 		BParameterGroup *group = web->GroupAt(i);
 		if (group == NULL)
 			continue;
 
-		BView *groupView = MakeViewFor(*group, hintRect ? &rect : NULL);
+		BView *groupView = MakeViewFor(*group);
 		if (groupView == NULL)
 			continue;
 
-		if (GroupView *view = dynamic_cast<GroupView *>(groupView)) {
-			// the top-level group views must not be larger than their hintRect,
-			// but unlike their children, they should follow all sides when
-			// their parent is resized
-			if (hintRect != NULL)
-				view->ResizeTo(rect.Width() - 10, rect.Height() - 10);
-			view->SetResizingMode(B_FOLLOW_ALL);
-		}
-
+		DynamicScrollView *scrollView = new DynamicScrollView(groupView->Name(),
+			groupView);
 		if (tabView == NULL) {
-			// if we don't need a container to put that view into,
-			// we're done here (but the groupView may span over the
-			// whole hintRect)
-			if (groupView->Frame().LeftTop() == BPoint(5, 5)) {
-				// remove insets, as they are not needed
-				groupView->MoveBy(-5, -5);
-				groupView->ResizeBy(10, 10);
+			if (hintRect != NULL) {
+				scrollView->MoveTo(hintRect->LeftTop());
+				scrollView->ResizeTo(hintRect->Size());
+			} else {
+				scrollView->ResizeTo(600, 400);
+					// See comment below.
 			}
-
-			return new DynamicScrollView(groupView->Name(), groupView);
+			return scrollView;
 		}
-
-		DynamicScrollView *scrollView = new DynamicScrollView(groupView->Name(), groupView);
 		tabView->AddTab(scrollView);
-
-		if (!hintRect) {
-			bestRect = bestRect | scrollView->Bounds();
-		}
 	}
 
-	if (tabView != NULL) {
-		// this adjustment must be kept in sync with TabView::FrameResized
-		bestRect.bottom += tabView->TabHeight();
-		bestRect.InsetBy(-3.0,-3.0);
-
-		tabView->ResizeTo(bestRect.Width(), bestRect.Height());
-		tabView->FrameResized(bestRect.Width(), bestRect.Height());
-			//needed since we're not attached to a window yet
+	if (hintRect != NULL) {
+		tabView->MoveTo(hintRect->LeftTop());
+		tabView->ResizeTo(hintRect->Size());
+	} else {
+		// Apps not using layouted views may expect PreferredSize() to return
+		// a sane value right away, and use this to set the maximum size of
+		// things. Layouted views return their current size until the view has
+		// been attached to the window, so in order to prevent breakage, we set
+		// a default view size here.
+		tabView->ResizeTo(600, 400);
 	}
-
 	return tabView;
 }
 
 
 BView *
-DefaultMediaTheme::MakeViewFor(BParameterGroup& group, const BRect* hintRect)
+DefaultMediaTheme::MakeViewFor(BParameterGroup& group)
 {
 	CALLED();
 
 	if (group.Flags() & B_HIDDEN_PARAMETER)
 		return NULL;
 
-	BRect rect;
-	if (hintRect != NULL)
-		rect = *hintRect;
+	BGroupView *view = new BGroupView(group.Name(), B_HORIZONTAL,
+		B_USE_HALF_ITEM_SPACING);
+	BGroupLayout *layout = view->GroupLayout();
+	layout->SetInsets(B_USE_HALF_ITEM_INSETS);
 
-	GroupView *view = new GroupView(rect, group.Name());
+	// Create and add the parameter views
+	if (group.CountParameters() > 0) {
+		BGroupView *paramView = new BGroupView(group.Name(), B_VERTICAL,
+			B_USE_HALF_ITEM_SPACING);
+		BGroupLayout *paramLayout = paramView->GroupLayout();
+		paramLayout->SetInsets(0);
 
-	// Create the parameter views - but don't add them yet
+		for (int32 i = 0; i < group.CountParameters(); i++) {
+			BParameter *parameter = group.ParameterAt(i);
+			if (parameter == NULL)
+				continue;
 
-	rect.OffsetTo(B_ORIGIN);
-	rect.InsetBySelf(5, 5);
+			BView *parameterView = MakeSelfHostingViewFor(*parameter);
+			if (parameterView == NULL)
+				continue;
 
-	BList views;
-	for (int32 i = 0; i < group.CountParameters(); i++) {
-		BParameter *parameter = group.ParameterAt(i);
-		if (parameter == NULL)
-			continue;
-
-		BView *parameterView = MakeSelfHostingViewFor(*parameter,
-			hintRect ? &rect : NULL);
-		if (parameterView == NULL)
-			continue;
-
-		parameterView->AdoptViewColors(view);
-			// ToDo: dunno why this is needed, but the controls
-			// sometimes (!) have a white background without it
-
-		views.AddItem(parameterView);
-	}
-
-	// Identify a title view, and add it at the top if present
-
-	TitleView *titleView = dynamic_cast<TitleView *>((BView *)views.ItemAt(0));
-	if (titleView != NULL) {
-		view->AddChild(titleView);
-		rect.OffsetBy(0, titleView->Bounds().Height());
+			paramLayout->AddView(parameterView);
+		}
+		paramLayout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(10));
+		layout->AddView(paramView);
 	}
 
 	// Add the sub-group views
-
-	rect.right = rect.left + 20;
-	rect.bottom = rect.top + 20;
-	float lastHeight = 0;
-
 	for (int32 i = 0; i < group.CountGroups(); i++) {
 		BParameterGroup *subGroup = group.GroupAt(i);
 		if (subGroup == NULL)
 			continue;
 
-		BView *groupView = MakeViewFor(*subGroup, &rect);
+		BView *groupView = MakeViewFor(*subGroup);
 		if (groupView == NULL)
 			continue;
 
-		if (i > 0) {
-			// add separator view
-			BRect separatorRect(groupView->Frame());
-			separatorRect.left -= 3;
-			separatorRect.right = separatorRect.left + 1;
-			if (lastHeight > separatorRect.Height())
-				separatorRect.bottom = separatorRect.top + lastHeight;
+		if (i > 0)
+			layout->AddView(new SeparatorView(B_VERTICAL));
 
-			view->AddChild(new SeparatorView(separatorRect));
-		}
-
-		view->AddChild(groupView);
-
-		rect.OffsetBy(groupView->Bounds().Width() + 5, 0);
-
-		lastHeight = groupView->Bounds().Height();
-		if (lastHeight > rect.Height())
-			rect.bottom = rect.top + lastHeight - 1;
+		layout->AddView(groupView);
 	}
 
-	view->ResizeTo(rect.left + 10, rect.bottom + 5);
-	view->SetContentBounds(view->Bounds());
-
-	if (group.CountParameters() == 0)
-		return view;
-
-	// add the parameter views part of the group
-
-	if (group.CountGroups() > 0) {
-		rect.top = rect.bottom + 10;
-		rect.bottom = rect.top + 20;
-	}
-
-	bool center = false;
-
-	for (int32 i = 0; i < views.CountItems(); i++) {
-		BView *parameterView = static_cast<BView *>(views.ItemAt(i));
-
-		if (parameterView->Bounds().Width() + 5 > rect.Width())
-			rect.right = parameterView->Bounds().Width() + rect.left + 5;
-
-		// we don't need to add the title view again
-		if (parameterView == titleView)
-			continue;
-
-		// if there is a BChannelSlider (ToDo: or any vertical slider?)
-		// the views will be centered
-		if (dynamic_cast<BChannelSlider *>(parameterView) != NULL)
-			center = true;
-
-		parameterView->MoveTo(parameterView->Frame().left, rect.top);
-		view->AddChild(parameterView);
-
-		rect.OffsetBy(0, parameterView->Bounds().Height() + 5);
-	}
-
-	if (views.CountItems() > (titleView != NULL ? 1 : 0))
-		view->ResizeTo(rect.right + 5, rect.top + 5);
-
-	// center the parameter views if needed, and tweak some views
-
-	float width = view->Bounds().Width();
-
-	for (int32 i = 0; i < views.CountItems(); i++) {
-		BView *subView = static_cast<BView *>(views.ItemAt(i));
-		BRect frame = subView->Frame();
-
-		if (center)
-			subView->MoveTo((width - frame.Width()) / 2, frame.top);
-		else {
-			// tweak the PopUp views to look better
-			if (dynamic_cast<BOptionPopUp *>(subView) != NULL)
-				subView->ResizeTo(width, frame.Height());
-		}
-	}
-
-	view->SetContentBounds(view->Bounds());
+	layout->AddItem(BSpaceLayoutItem::CreateGlue());
 	return view;
 }
 
@@ -1211,14 +828,13 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup& group, const BRect* hintRect)
 	what is meant with self-hosting.
 */
 BView *
-DefaultMediaTheme::MakeSelfHostingViewFor(BParameter& parameter,
-	const BRect* hintRect)
+DefaultMediaTheme::MakeSelfHostingViewFor(BParameter& parameter)
 {
 	if (parameter.Flags() & B_HIDDEN_PARAMETER
 		|| parameter_should_be_hidden(parameter))
 		return NULL;
 
-	BView *view = MakeViewFor(&parameter, hintRect);
+	BView *view = MakeViewFor(&parameter);
 	if (view == NULL) {
 		// The MakeViewFor() method above returns a BControl - which we
 		// don't need for a null parameter; that's why it returns NULL.
@@ -1228,16 +844,11 @@ DefaultMediaTheme::MakeSelfHostingViewFor(BParameter& parameter,
 			if (parameter.Group()->ParameterAt(0) == &parameter) {
 				// this is the first parameter in this group, so
 				// let's use a nice title view
-
-				TitleView *titleView = new TitleView(BRect(0, 0, 10, 10), parameter.Name());
-				titleView->ResizeToPreferred();
-
-				return titleView;
+				return new TitleView(parameter.Name());
 			}
-			BStringView *stringView = new BStringView(BRect(0, 0, 10, 10),
-				parameter.Name(), parameter.Name());
+			BStringView *stringView = new BStringView(parameter.Name(),
+				parameter.Name());
 			stringView->SetAlignment(B_ALIGN_CENTER);
-			stringView->ResizeToPreferred();
 
 			return stringView;
 		}
@@ -1254,14 +865,8 @@ DefaultMediaTheme::MakeSelfHostingViewFor(BParameter& parameter,
 
 
 BControl *
-DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
+DefaultMediaTheme::MakeViewFor(BParameter *parameter)
 {
-	BRect rect;
-	if (hintRect)
-		rect = *hintRect;
-	else
-		rect.Set(0, 0, 50, 100);
-
 	switch (parameter->Type()) {
 		case BParameter::B_NULL_PARAMETER:
 			// there is no default view for a null parameter
@@ -1269,43 +874,21 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 
 		case BParameter::B_DISCRETE_PARAMETER:
 		{
-			BDiscreteParameter &discrete = static_cast<BDiscreteParameter &>(*parameter);
+			BDiscreteParameter &discrete
+				= static_cast<BDiscreteParameter &>(*parameter);
 
 			if (!strcmp(discrete.Kind(), B_ENABLE)
 				|| !strcmp(discrete.Kind(), B_MUTE)
 				|| discrete.CountItems() == 0) {
-				// create a checkbox item
-
-				BCheckBox *checkBox = new CheckBox(rect, discrete.Name(),
-					discrete.Name(), discrete);
-				checkBox->ResizeToPreferred();
-
-				return checkBox;
+				return new CheckBox(discrete.Name(), discrete.Name(), discrete);
 			} else {
-				// create a pop up menu field
-
-				// ToDo: replace BOptionPopUp (or fix it in Haiku...)
-				// this is a workaround for a bug in BOptionPopUp - you need to
-				// know the actual width before creating the object - very nice...
-
-				BFont font;
-				float width = 0;
-				for (int32 i = 0; i < discrete.CountItems(); i++) {
-					float labelWidth = font.StringWidth(discrete.ItemNameAt(i));
-					if (labelWidth > width)
-						width = labelWidth;
-				}
-				width += font.StringWidth(discrete.Name()) + 55;
-				rect.right = rect.left + width;
-
-				BOptionPopUp *popUp = new OptionPopUp(rect, discrete.Name(),
+				BOptionPopUp *popUp = new OptionPopUp(discrete.Name(),
 					discrete.Name(), discrete);
 
 				for (int32 i = 0; i < discrete.CountItems(); i++) {
-					popUp->AddOption(discrete.ItemNameAt(i), discrete.ItemValueAt(i));
+					popUp->AddOption(discrete.ItemNameAt(i),
+						discrete.ItemValueAt(i));
 				}
-
-				popUp->ResizeToPreferred();
 
 				return popUp;
 			}
@@ -1313,30 +896,26 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 
 		case BParameter::B_CONTINUOUS_PARAMETER:
 		{
-			BContinuousParameter &continuous = static_cast<BContinuousParameter &>(*parameter);
+			BContinuousParameter &continuous
+				= static_cast<BContinuousParameter &>(*parameter);
 
 			if (!strcmp(continuous.Kind(), B_MASTER_GAIN)
 				|| !strcmp(continuous.Kind(), B_GAIN)) {
-				BChannelSlider *slider = new ChannelSlider(rect,
+				BChannelSlider *slider = new ChannelSlider(
 					continuous.Name(), continuous.Name(), B_VERTICAL,
 					continuous.CountChannels(), continuous);
 
-				char minLabel[64], maxLabel[64];
-
+				BString minLabel, maxLabel;
 				const char *unit = continuous.Unit();
 				if (unit[0]) {
 					// if we have a unit, print it next to the limit values
-					sprintf(minLabel, "%g %s", continuous.MinValue(), continuous.Unit());
-					sprintf(maxLabel, "%g %s", continuous.MaxValue(), continuous.Unit());
+					minLabel.SetToFormat("%g %s", continuous.MinValue(), continuous.Unit());
+					maxLabel.SetToFormat("%g %s", continuous.MaxValue(), continuous.Unit());
 				} else {
-					sprintf(minLabel, "%g", continuous.MinValue());
-					sprintf(maxLabel, "%g", continuous.MaxValue());
+					minLabel.SetToFormat("%g", continuous.MinValue());
+					maxLabel.SetToFormat("%g", continuous.MaxValue());
 				}
 				slider->SetLimitLabels(minLabel, maxLabel);
-
-				float width, height;
-				slider->GetPreferredSize(&width, &height);
-				slider->ResizeTo(width, 190);
 
 				// ToDo: take BContinuousParameter::GetResponse() & ValueStep() into account!
 
@@ -1348,12 +927,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				return slider;
 			}
 
-			BSlider *slider = new Slider(rect, parameter->Name(),
+			BSlider *slider = new Slider(parameter->Name(),
 				parameter->Name(), 0, 100, continuous);
-
-			float width, height;
-			slider->GetPreferredSize(&width, &height);
-			slider->ResizeTo(100, height);
 
 			return slider;
 		}
