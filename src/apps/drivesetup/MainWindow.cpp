@@ -967,6 +967,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	if (diskSystem.IsFileSystem()) {
+		BString intelExtendedPartition = "Intel Extended Partition";
 		if (disk->ID() == selectedPartition) {
 			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
 				"want to format a raw disk? (Most people initialize the disk "
@@ -978,6 +979,12 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 				"want to format the partition \"%s\"? You will be asked "
 				"again before changes are written to the disk."),
 				partition->ContentName());
+		} else if (partition->Type() == intelExtendedPartition) {
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to format the Intel Extended Partition? Any "
+				"subpartitions it contains will be overwritten if you "
+				"continue. You will be asked again before changes are "
+				"written to the disk."));
 		} else {
 			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
 				"want to format the partition? You will be asked again "
