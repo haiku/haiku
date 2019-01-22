@@ -94,7 +94,7 @@ public:
 			};
 
 								BTabView(const char* name,
-									button_width width = B_WIDTH_AS_USUAL,
+									button_width width = B_WIDTH_FROM_WIDEST,
 									uint32 flags = B_FULL_UPDATE_ON_RESIZE
 										| B_WILL_DRAW | B_NAVIGABLE_JUMP
 										| B_FRAME_EVENTS | B_NAVIGABLE);
