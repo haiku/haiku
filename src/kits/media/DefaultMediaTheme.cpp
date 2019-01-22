@@ -34,17 +34,6 @@ using namespace BPrivate;
 
 namespace BPrivate {
 
-class DynamicScrollView : public BScrollView {
-	public:
-		DynamicScrollView(const char *name, BView *target);
-		virtual ~DynamicScrollView();
-
-		virtual void FrameResized(float width, float height);
-
-	private:
-		void UpdateBars();
-};
-
 class SeparatorView : public BView {
 	public:
 		SeparatorView(orientation orientation);
@@ -194,63 +183,6 @@ stop_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 	if (roster != NULL) {
 		roster->StopWatching(control, parameter.Web()->Node(),
 			B_MEDIA_NEW_PARAMETER_VALUE);
-	}
-}
-
-//	#pragma mark -
-
-
-DynamicScrollView::DynamicScrollView(const char *name, BView *target)
-	: BScrollView(name, target, 0, true, true, B_NO_BORDER)
-{
-	SetExplicitMinSize(BSize(B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT));
-	SetFlags(Flags() | B_FRAME_EVENTS);
-}
-
-
-DynamicScrollView::~DynamicScrollView()
-{
-}
-
-
-void
-DynamicScrollView::FrameResized(float width, float height)
-{
-	BScrollView::FrameResized(width, height);
-	UpdateBars();
-}
-
-
-void
-DynamicScrollView::UpdateBars()
-{
-	BRect bounds = Bounds();
-	BSize size = Target()->PreferredSize();
-
-	BScrollBar *horizontalBar = ScrollBar(B_HORIZONTAL),
-		*verticalBar = ScrollBar(B_VERTICAL);
-
-	// update the scroll bar range & proportions
-
-	if (horizontalBar != NULL) {
-		float delta = size.Width() - bounds.Width(),
-			proportion = bounds.Width() / size.Width();
-		if (delta < 0)
-			delta = 0;
-
-		horizontalBar->SetRange(0, delta);
-		horizontalBar->SetSteps(1, bounds.Width());
-		horizontalBar->SetProportion(proportion);
-	}
-	if (verticalBar != NULL) {
-		float delta = size.Height() - bounds.Height(),
-			proportion = bounds.Height() / size.Height();
-		if (delta < 0)
-			delta = 0;
-
-		verticalBar->SetRange(0, delta);
-		verticalBar->SetSteps(1, bounds.Height());
-		verticalBar->SetProportion(proportion);
 	}
 }
 
@@ -738,8 +670,10 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 		if (groupView == NULL)
 			continue;
 
-		DynamicScrollView *scrollView = new DynamicScrollView(groupView->Name(),
-			groupView);
+		BScrollView *scrollView = new BScrollView(groupView->Name(), groupView, 0,
+			true, true, B_NO_BORDER);
+		scrollView->SetExplicitMinSize(BSize(B_V_SCROLL_BAR_WIDTH,
+			B_H_SCROLL_BAR_HEIGHT));
 		if (tabView == NULL) {
 			if (hintRect != NULL) {
 				scrollView->MoveTo(hintRect->LeftTop());
