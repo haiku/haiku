@@ -8104,6 +8104,18 @@ err:
 }
 
 
+static status_t
+user_copy_name(char* to, const char* from, size_t length)
+{
+	ssize_t len = user_strlcpy(to, from, length);
+	if (len < 0)
+		return len;
+	if (len >= (ssize_t)length)
+		return B_NAME_TOO_LONG;
+	return B_OK;
+}
+
+
 //	#pragma mark - kernel mirrored syscalls
 
 
@@ -8744,17 +8756,23 @@ _user_mount(const char* userPath, const char* userDevice,
 	if (path.InitCheck() != B_OK || device.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	if (user_strlcpy(path.LockBuffer(), userPath, B_PATH_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
+	status = user_copy_name(path.LockBuffer(), userPath,
+		B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
-	if (userFileSystem != NULL
-		&& user_strlcpy(fileSystem, userFileSystem, sizeof(fileSystem)) < B_OK)
-		return B_BAD_ADDRESS;
+	if (userFileSystem != NULL) {
+		status = user_copy_name(fileSystem, userFileSystem, sizeof(fileSystem));
+		if (status != B_OK)
+			return status;
+	}
 
-	if (userDevice != NULL
-		&& user_strlcpy(device.LockBuffer(), userDevice, B_PATH_NAME_LENGTH)
-			< B_OK)
-		return B_BAD_ADDRESS;
+	if (userDevice != NULL) {
+		status = user_copy_name(device.LockBuffer(), userDevice,
+			B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
+	}
 
 	if (userArgs != NULL && argsLength > 0) {
 		if (!IS_USER_ADDRESS(userArgs))
@@ -8768,9 +8786,10 @@ _user_mount(const char* userPath, const char* userDevice,
 		if (args == NULL)
 			return B_NO_MEMORY;
 
-		if (user_strlcpy(args, userArgs, argsLength + 1) < B_OK) {
+		status = user_copy_name(args, userArgs, argsLength + 1);
+		if (status != B_OK) {
 			free(args);
-			return B_BAD_ADDRESS;
+			return status;
 		}
 	}
 	path.UnlockBuffer();
@@ -8798,8 +8817,9 @@ _user_unmount(const char* userPath, uint32 flags)
 
 	char* path = pathBuffer.LockBuffer();
 
-	if (user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return fs_unmount(path, -1, flags & ~B_UNMOUNT_BUSY_PARTITION, false);
 }
@@ -8920,11 +8940,9 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 		if (!IS_USER_ADDRESS(leaf))
 			return B_BAD_ADDRESS;
 
-		int length = user_strlcpy(stackLeaf, leaf, B_FILE_NAME_LENGTH);
-		if (length < 0)
-			return length;
-		if (length >= B_FILE_NAME_LENGTH)
-			return B_NAME_TOO_LONG;
+		int status = user_copy_name(stackLeaf, leaf, B_FILE_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 
 		leaf = stackLeaf;
 	}
@@ -8960,8 +8978,9 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 		return B_NO_MEMORY;
 	char* path = pathBuffer.LockBuffer();
 
-	if (user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	status_t error = normalize_path(path, pathBuffer.BufferSize(), traverseLink,
 		false);
@@ -8987,9 +9006,11 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char* userName,
 
 	if (userName == NULL || device < 0 || inode < 0)
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
+	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(name, userName, sizeof(name));
+	if (status != B_OK)
+		return status;
 
 	if ((openMode & O_CREAT) != 0) {
 		return file_create_entry_ref(device, inode, name, openMode, perms,
@@ -9009,9 +9030,11 @@ _user_open(int fd, const char* userPath, int openMode, int perms)
 
 	char* buffer = path.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(buffer, userPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(buffer, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	if ((openMode & O_CREAT) != 0)
 		return file_create(fd, buffer, openMode, perms, false);
@@ -9026,9 +9049,11 @@ _user_open_dir_entry_ref(dev_t device, ino_t inode, const char* userName)
 	if (userName != NULL) {
 		char name[B_FILE_NAME_LENGTH];
 
-		if (!IS_USER_ADDRESS(userName)
-			|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
+		if (!IS_USER_ADDRESS(userName))
 			return B_BAD_ADDRESS;
+		status_t status = user_copy_name(name, userName, sizeof(name));
+		if (status != B_OK)
+			return status;
 
 		return dir_open_entry_ref(device, inode, name, false);
 	}
@@ -9048,9 +9073,11 @@ _user_open_dir(int fd, const char* userPath)
 
 	char* buffer = path.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(buffer, userPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(buffer, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return dir_open(fd, buffer, false);
 }
@@ -9214,8 +9241,8 @@ _user_create_dir_entry_ref(dev_t device, ino_t inode, const char* userName,
 	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(name, userName, sizeof(name));
-	if (status < 0)
+	status = user_copy_name(name, userName, sizeof(name));
+	if (status != B_OK)
 		return status;
 
 	return dir_create_entry_ref(device, inode, name, perms, false);
@@ -9231,9 +9258,11 @@ _user_create_dir(int fd, const char* userPath, int perms)
 
 	char* path = pathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return dir_create(fd, path, perms, false);
 }
@@ -9249,9 +9278,11 @@ _user_remove_dir(int fd, const char* userPath)
 	char* path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		if (!IS_USER_ADDRESS(userPath)) 
 			return B_BAD_ADDRESS;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 	}
 
 	return dir_remove(fd, userPath ? path : NULL, false);
@@ -9276,9 +9307,11 @@ _user_read_link(int fd, const char* userPath, char* userBuffer,
 	char* buffer = linkBuffer.LockBuffer();
 
 	if (userPath) {
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 
 		if (bufferSize > B_PATH_NAME_LENGTH)
 			bufferSize = B_PATH_NAME_LENGTH;
@@ -9314,11 +9347,14 @@ _user_create_symlink(int fd, const char* userPath, const char* userToPath,
 	char* path = pathBuffer.LockBuffer();
 	char* toPath = toPathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userToPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
-		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
+	status = user_copy_name(toPath, userToPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return common_create_symlink(fd, path, toPath, mode, false);
 }
@@ -9336,13 +9372,16 @@ _user_create_link(int pathFD, const char* userPath, int toFD,
 	char* path = pathBuffer.LockBuffer();
 	char* toPath = toPathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userToPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
-		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
+	status = user_copy_name(toPath, userToPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
-	status_t status = check_path(toPath);
+	status = check_path(toPath);
 	if (status != B_OK)
 		return status;
 
@@ -9360,9 +9399,11 @@ _user_unlink(int fd, const char* userPath)
 
 	char* path = pathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return common_unlink(fd, path, false);
 }
@@ -9380,10 +9421,14 @@ _user_rename(int oldFD, const char* userOldPath, int newFD,
 	char* oldPath = oldPathBuffer.LockBuffer();
 	char* newPath = newPathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userOldPath) || !IS_USER_ADDRESS(userNewPath)
-		|| user_strlcpy(oldPath, userOldPath, B_PATH_NAME_LENGTH) < B_OK
-		|| user_strlcpy(newPath, userNewPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userOldPath) || !IS_USER_ADDRESS(userNewPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(oldPath, userOldPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
+	status = user_copy_name(newPath, userNewPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return common_rename(oldFD, oldPath, newFD, newPath, false);
 }
@@ -9398,15 +9443,16 @@ _user_create_fifo(int fd, const char* userPath, mode_t perms)
 
 	char* path = pathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK) {
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
-	}
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	// split into directory vnode and filename path
 	char filename[B_FILE_NAME_LENGTH];
 	struct vnode* dir;
-	status_t status = fd_and_path_to_dir_vnode(fd, path, &dir, filename, false);
+	status = fd_and_path_to_dir_vnode(fd, path, &dir, filename, false);
 	if (status != B_OK)
 		return status;
 
@@ -9493,9 +9539,11 @@ _user_access(int fd, const char* userPath, int mode, bool effectiveUserGroup)
 
 	char* path = pathBuffer.LockBuffer();
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return common_access(fd, path, mode, effectiveUserGroup, false);
 }
@@ -9525,11 +9573,9 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 
 		char* path = pathBuffer.LockBuffer();
 
-		ssize_t length = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-		if (length < B_OK)
-			return length;
-		if (length >= B_PATH_NAME_LENGTH)
-			return B_NAME_TOO_LONG;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 
 		status = common_path_read_stat(fd, path, traverseLink, &stat, false);
 	} else {
@@ -9584,11 +9630,9 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 
 		char* path = pathBuffer.LockBuffer();
 
-		ssize_t length = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-		if (length < B_OK)
-			return length;
-		if (length >= B_PATH_NAME_LENGTH)
-			return B_NAME_TOO_LONG;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 
 		status = common_path_write_stat(fd, path, traverseLeafLink, &stat,
 			statMask, false);
@@ -9622,9 +9666,11 @@ _user_open_attr_dir(int fd, const char* userPath, bool traverseLeafLink)
 	char* path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 	}
 
 	return attr_dir_open(fd, userPath ? path : NULL, traverseLeafLink, false);
@@ -9639,10 +9685,11 @@ _user_read_attr(int fd, const char* userAttribute, off_t pos, void* userBuffer,
 
 	if (userAttribute == NULL)
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userAttribute)
-		|| user_strlcpy(attribute, userAttribute, sizeof(attribute)) < B_OK) {
+	if (!IS_USER_ADDRESS(userAttribute))
 		return B_BAD_ADDRESS;
-	}
+	status_t status = user_copy_name(attribute, userAttribute, sizeof(attribute));
+	if (status != B_OK)
+		return status;
 
 	int attr = attr_open(fd, NULL, attribute, O_RDONLY, false);
 	if (attr < 0)
@@ -9663,10 +9710,11 @@ _user_write_attr(int fd, const char* userAttribute, uint32 type, off_t pos,
 
 	if (userAttribute == NULL)
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userAttribute)
-		|| user_strlcpy(attribute, userAttribute, sizeof(attribute)) < B_OK) {
+	if (!IS_USER_ADDRESS(userAttribute))
 		return B_BAD_ADDRESS;
-	}
+	status_t status = user_copy_name(attribute, userAttribute, sizeof(attribute));
+	if (status != B_OK)
+		return status;
 
 	// Try to support the BeOS typical truncation as well as the position
 	// argument
@@ -9690,10 +9738,12 @@ _user_stat_attr(int fd, const char* userAttribute,
 
 	if (userAttribute == NULL || userAttrInfo == NULL)
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userAttribute) || !IS_USER_ADDRESS(userAttrInfo)
-		|| user_strlcpy(attribute, userAttribute, sizeof(attribute)) < B_OK) {
+	if (!IS_USER_ADDRESS(userAttribute) || !IS_USER_ADDRESS(userAttrInfo))
 		return B_BAD_ADDRESS;
-	}
+	status_t status = user_copy_name(attribute, userAttribute,
+		sizeof(attribute));
+	if (status != B_OK)
+		return status;
 
 	int attr = attr_open(fd, NULL, attribute, O_RDONLY, false);
 	if (attr < 0)
@@ -9707,7 +9757,6 @@ _user_stat_attr(int fd, const char* userAttribute,
 	}
 
 	struct stat stat;
-	status_t status;
 	if (descriptor->ops->fd_read_stat)
 		status = descriptor->ops->fd_read_stat(descriptor, &stat);
 	else
@@ -9735,9 +9784,11 @@ _user_open_attr(int fd, const char* userPath, const char* userName,
 {
 	char name[B_FILE_NAME_LENGTH];
 
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(name, userName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -9746,9 +9797,11 @@ _user_open_attr(int fd, const char* userPath, const char* userName,
 	char* path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 	}
 
 	if ((openMode & O_CREAT) != 0) {
@@ -9765,9 +9818,11 @@ _user_remove_attr(int fd, const char* userName)
 {
 	char name[B_FILE_NAME_LENGTH];
 
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(name, userName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return attr_remove(fd, name, false);
 }
@@ -9789,9 +9844,12 @@ _user_rename_attr(int fromFile, const char* userFromName, int toFile,
 	char* fromName = fromNameBuffer.LockBuffer();
 	char* toName = toNameBuffer.LockBuffer();
 
-	if (user_strlcpy(fromName, userFromName, B_FILE_NAME_LENGTH) < B_OK
-		|| user_strlcpy(toName, userToName, B_FILE_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(fromName, userFromName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
+	status = user_copy_name(toName, userToName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return attr_rename(fromFile, fromName, toFile, toName, false);
 }
@@ -9810,9 +9868,11 @@ _user_create_index(dev_t device, const char* userName, uint32 type,
 {
 	char name[B_FILE_NAME_LENGTH];
 
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(name, userName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return index_create(device, name, type, flags, false);
 }
@@ -9825,10 +9885,11 @@ _user_read_index_stat(dev_t device, const char* userName, struct stat* userStat)
 	struct stat stat;
 	status_t status;
 
-	if (!IS_USER_ADDRESS(userName)
-		|| !IS_USER_ADDRESS(userStat)
-		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userName) || !IS_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
+	status = user_copy_name(name, userName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	status = index_name_read_stat(device, name, &stat, false);
 	if (status == B_OK) {
@@ -9845,9 +9906,11 @@ _user_remove_index(dev_t device, const char* userName)
 {
 	char name[B_FILE_NAME_LENGTH];
 
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
+	status_t status = user_copy_name(name, userName, B_FILE_NAME_LENGTH);
+	if (status != B_OK)
+		return status;
 
 	return index_remove(device, name, false);
 }
@@ -9896,9 +9959,11 @@ _user_setcwd(int fd, const char* userPath)
 	char* path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 	}
 
 	return set_cwd(fd, userPath != NULL ? path : NULL, false);
@@ -9920,9 +9985,11 @@ _user_change_root(const char* userPath)
 	// copy userland path to kernel
 	char* path = pathBuffer.LockBuffer();
 	if (userPath != NULL) {
-		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
+		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
 	}
 
 	// get the vnode
