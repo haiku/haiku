@@ -9278,7 +9278,7 @@ _user_remove_dir(int fd, const char* userPath)
 	char* path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
-		if (!IS_USER_ADDRESS(userPath)) 
+		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
 		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
 		if (status != B_OK)
@@ -9554,7 +9554,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 	struct stat* userStat, size_t statSize)
 {
 	struct stat stat;
-	status_t status;
+	status_t status = B_OK;
 
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
@@ -9617,7 +9617,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 	if (statSize < sizeof(struct stat))
 		memset((uint8*)&stat + statSize, 0, sizeof(struct stat) - statSize);
 
-	status_t status;
+	status_t status = B_OK;
 
 	if (userPath != NULL) {
 		// path given: write the stat of the node referred to by (fd, path)
