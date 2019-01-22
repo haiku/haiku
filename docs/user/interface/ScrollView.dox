@@ -1,13 +1,13 @@
 /*
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/ScrollView.h	 hrev47312
- *		src/kits/interface/ScrollView.cpp	 hrev47312
+ *		headers/os/interface/ScrollView.h	 hrev52792
+ *		src/kits/interface/ScrollView.cpp	 hrev52792
  */
 
 
@@ -216,7 +216,8 @@
 	\fn void BScrollView::FrameResized(float newWidth, float newHeight)
 	\brief Hook method called when the scroll view is resized.
 
-	\copydetails BView::FrameResized()
+	If the scroll view is part of a layout, the default implementation will
+	re-proportion the attached scrollbars relative to the new size.
 */
 
 

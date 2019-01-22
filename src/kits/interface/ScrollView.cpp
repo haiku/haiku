@@ -42,7 +42,7 @@ BScrollView::BScrollView(const char* name, BView* target, uint32 resizingMode,
 BScrollView::BScrollView(const char* name, BView* target, uint32 flags,
 	bool horizontal, bool vertical, border_style border)
 	:
-	BView(name, _ModifyFlags(flags, border)),
+	BView(name, _ModifyFlags(flags | B_SUPPORTS_LAYOUT, border)),
 	fTarget(target),
 	fBorder(border)
 {
@@ -271,10 +271,37 @@ BScrollView::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
 
+	const BRect bounds = Bounds();
+
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
+		BSize size = fTarget != NULL ? fTarget->PreferredSize() : BSize();
+		if (fHorizontalScrollBar != NULL) {
+			float delta = size.Width() - bounds.Width(),
+				proportion = bounds.Width() / size.Width();
+			if (delta < 0)
+				delta = 0;
+
+			fHorizontalScrollBar->SetRange(0, delta);
+			fHorizontalScrollBar->SetSteps(be_plain_font->Size() * 1.33,
+				bounds.Width());
+			fHorizontalScrollBar->SetProportion(proportion);
+		}
+		if (fVerticalScrollBar != NULL) {
+			float delta = size.Height() - bounds.Height(),
+				proportion = bounds.Height() / size.Height();
+			if (delta < 0)
+				delta = 0;
+
+			fVerticalScrollBar->SetRange(0, delta);
+			fVerticalScrollBar->SetSteps(be_plain_font->Size() * 1.33,
+				bounds.Height());
+			fVerticalScrollBar->SetProportion(proportion);
+		}
+	}
+
 	if (fBorder == B_NO_BORDER)
 		return;
 
-	BRect bounds = Bounds();
 	float border = _BorderSize() - 1;
 
 	if (fHorizontalScrollBar != NULL && fVerticalScrollBar != NULL) {
@@ -443,7 +470,7 @@ BScrollView::SetBorder(border_style border)
 	if (fBorder == border)
 		return;
 
-	if (Flags() & B_SUPPORTS_LAYOUT) {
+	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
 		fBorder = border;
 		SetFlags(_ModifyFlags(Flags(), border));
 
@@ -928,12 +955,17 @@ BScrollView::_BorderSize(border_style border)
 /*static*/ int32
 BScrollView::_ModifyFlags(int32 flags, border_style border)
 {
-	// We either need B_FULL_UPDATE_ON_RESIZE or
-	// B_FRAME_EVENTS if we have to draw a border
-	if (border != B_NO_BORDER)
-		return flags | B_WILL_DRAW | (flags & B_FULL_UPDATE_ON_RESIZE ? 0 : B_FRAME_EVENTS);
+	if ((flags & B_SUPPORTS_LAYOUT) != 0)
+		flags |= B_FRAME_EVENTS;
 
-	return flags & ~(B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
+	// We either need B_FULL_UPDATE_ON_RESIZE or B_FRAME_EVENTS if we have
+	// to draw a border.
+	if (border != B_NO_BORDER) {
+		flags |= B_WILL_DRAW | ((flags & B_FULL_UPDATE_ON_RESIZE) != 0 ?
+			0 : B_FRAME_EVENTS);
+	}
+
+	return flags;
 }
 
 
