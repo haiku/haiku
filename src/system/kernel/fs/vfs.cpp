@@ -9554,7 +9554,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 	struct stat* userStat, size_t statSize)
 {
 	struct stat stat;
-	status_t status = B_OK;
+	status_t status;
 
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
@@ -9573,7 +9573,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 
 		char* path = pathBuffer.LockBuffer();
 
-		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
 		if (status != B_OK)
 			return status;
 
@@ -9617,7 +9617,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 	if (statSize < sizeof(struct stat))
 		memset((uint8*)&stat + statSize, 0, sizeof(struct stat) - statSize);
 
-	status_t status = B_OK;
+	status_t status;
 
 	if (userPath != NULL) {
 		// path given: write the stat of the node referred to by (fd, path)
@@ -9630,7 +9630,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 
 		char* path = pathBuffer.LockBuffer();
 
-		status_t status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
+		status = user_copy_name(path, userPath, B_PATH_NAME_LENGTH);
 		if (status != B_OK)
 			return status;
 
