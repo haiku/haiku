@@ -14,22 +14,24 @@
 #include <string.h>
 
 
-extern char *__progname;
+extern char* __progname;
 
 
 void
-__assert_fail(const char *assertion, const char *file,
-	unsigned int line, const char *function)
+__assert_fail(const char *assertion, const char* file, unsigned int line,
+	const char* function)
 {
-	fprintf(stderr, "%s: %s:%d:%s: %s\n", __progname, file, line, function, assertion);
+	fprintf(stderr, "%s: %s:%d:%s: %s\n", __progname, file, line, function,
+		assertion);
 	abort();
 }
 
 
 void
-__assert_perror_fail(int error, const char *file,
-	unsigned int line, const char *function)
+__assert_perror_fail(int error, const char* file, unsigned int line,
+	const char* function)
 {
-	fprintf(stderr, "%s: %s:%d:%s: %s\n", __progname, file, line, function, strerror(error));
+	fprintf(stderr, "%s: %s:%d:%s: %s\n", __progname, file, line, function,
+		strerror(error));
 	abort();
 }
