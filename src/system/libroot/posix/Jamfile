@@ -18,7 +18,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			PWD_BACKEND = pwd.cpp grp.cpp shadow.cpp user_group_common.cpp ;
 		}
 		MergeObject <$(architecture)>posix_main.o :
-			assert.c
+			assert.cpp
 			dlfcn.c
 			dirent.c
 			errno.c
