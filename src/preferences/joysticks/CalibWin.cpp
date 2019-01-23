@@ -58,18 +58,18 @@ CalibWin::CalibWin(BRect frame,const char *title, window_look look,
 
 	// Adding object
   	fBox->AddChild(fStringView3);
-   
+
 	fView->AddChild(fButton3);
 	fView->AddChild(fButton4);
 	fView->AddChild(fBox);
-   
+
 	fView->AddChild(fStringView4);
 	fView->AddChild(fStringView5);
 	fView->AddChild(fStringView6);
 	fView->AddChild(fStringView7);
 	fView->AddChild(fStringView8);
 	fView->AddChild(fStringView9);
-   
+
 	fView->AddChild(fButton5);
 	fView->AddChild(fButton6);
 	fView->AddChild(fButton7);
@@ -78,8 +78,8 @@ CalibWin::CalibWin(BRect frame,const char *title, window_look look,
 	fView->AddChild(fButton10);
 	fView->AddChild(fButton11);
 	fView->AddChild(fButton12);
-   
-   AddChild(fView);
+
+	AddChild(fView);
 }
 
 

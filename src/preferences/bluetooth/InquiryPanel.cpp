@@ -281,10 +281,10 @@ InquiryPanel::MessageReceived(BMessage* message)
 						((DeviceListItem*)fRemoteList->ItemAt(retrievalIndex))
 							->SetDevice((BluetoothDevice*) fDiscoveryAgent
 							->RetrieveDevices(0).ItemAt(retrievalIndex));
-        				fRemoteList->InvalidateItem(retrievalIndex);
+						fRemoteList->InvalidateItem(retrievalIndex);
 
-        				retrievalIndex++;
-        				labelPlaced = false;
+						retrievalIndex++;
+						labelPlaced = false;
 					}
 
 					BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 500000, 1);

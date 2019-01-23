@@ -113,7 +113,7 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	// control layout
 	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 		.Add(fDecorMenuField->CreateLabelLayoutItem(), 0, 0)
-        .Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
+		.Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
 		.Add(fDecorInfoButton, 2, 0)
 		.Add(scrollBarLabel, 0, 1)
 		.Add(arrowStyleBox, 1, 1)

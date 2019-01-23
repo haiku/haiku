@@ -24,9 +24,9 @@ MessageWin::MessageWin(BRect parentFrame, const char *title,
 	fBox->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fBox->SetLowColor(fBox->ViewColor());
 
-    // Rects for the text view
-    BRect outside(fBox->Bounds());
-    outside.InsetBy(10, 10);
+	// Rects for the text view
+	BRect outside(fBox->Bounds());
+	outside.InsetBy(10, 10);
 	BRect insider(outside);
 	insider.OffsetTo(B_ORIGIN);
 
@@ -37,7 +37,7 @@ MessageWin::MessageWin(BRect parentFrame, const char *title,
 
 	fBox->AddChild(fText);
  	AddChild(fBox);
-   
+
  	/* Relocate the window to the center of what its being given */
   	ResizeTo(parentFrame.Width(), floor(parentFrame.Height() / 3));
  	MoveBy(0, floor(parentFrame.Height() / 2 - (parentFrame.Height()/3) / 2 ));
@@ -47,10 +47,10 @@ MessageWin::MessageWin(BRect parentFrame, const char *title,
 
 void MessageWin::SetText(const char* str)
 {
-   Lock();
-   fText->SetText(str);
-   fText->Flush();
-   Unlock();
+	Lock();
+	fText->SetText(str);
+	fText->Flush();
+	Unlock();
 }
 
 
