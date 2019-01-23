@@ -6,6 +6,11 @@ resource(1, "META:TYPE") "text/plain";
 resource(2, "META:S:DESC") #'MSDC' "Text file";
 
 resource(3, "META:EXTENS") message(234) {
+	"extensions" = "cfg",
+	"extensions" = "conf",
+	"extensions" = "config",
+	"extensions" = "ini",
+	"extensions" = "log",
 	"extensions" = "txt",
 	"type" = "text/plain"
 };
