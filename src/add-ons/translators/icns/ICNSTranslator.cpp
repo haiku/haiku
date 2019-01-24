@@ -133,9 +133,7 @@ ICNSTranslator::DerivedIdentify(BPositionIO *stream,
 			documentIndex = 1;
 		if (documentIndex < 1 || documentIndex > documentCount)
 			return B_NO_TRANSLATOR;
-	}	
-	
-	if (ioExtension) {
+
 		ioExtension->RemoveName(DOCUMENT_COUNT);
 		ioExtension->AddInt32(DOCUMENT_COUNT, documentCount);
 	}	
