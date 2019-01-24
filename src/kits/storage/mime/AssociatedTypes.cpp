@@ -195,10 +195,9 @@ AssociatedTypes::SetFileExtensions(const char *type, const BMessage *extensions)
 	std::set<std::string> oldExtensions;
 	std::set<std::string> &newExtensions = fFileExtensions[type];
 	// Make a copy of the previous extensions
-	if (!err)
+	if (!err) {
 		oldExtensions = newExtensions;
 
-	if (!err) {
 		// Read through the list of new extensions, creating the new
 		// file extensions list and adding the type as an associated type
 		// for each extension
