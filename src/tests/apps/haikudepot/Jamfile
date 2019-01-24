@@ -18,11 +18,16 @@ local sourceDir ;
 for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
 }
+SEARCH_SOURCE += [ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
+	dumpexportrepositorybulklistener ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
+	dumpexportrepositorymodel ] ;
 
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
 
 	DumpExportRepositorySource.cpp
+	DumpExportRepositorySourceMirror.cpp
 	DumpExportRepository.cpp
 	DumpExportRepositoryJsonListener.cpp
 	DumpExportRepositoryJsonListenerTest.cpp

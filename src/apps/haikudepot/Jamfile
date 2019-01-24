@@ -5,22 +5,22 @@ include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam
 
 UsePrivateHeaders interface kernel net package shared storage support ;
 
-local generatedTargetDirectory = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
+HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
 # During the build process, some sources are generated into directories.  These
 # are the directories.
 
 local dumpExportRepositoryBulkListerTargetDirectory =
-	[ FDirName $(TARGET_COMMON_DEBUG_LOCATE_TARGET)
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportrepositorybulklistener ] ;
 local dumpExportPkgBulkListenerTargetDirectory =
-	[ FDirName $(TARGET_COMMON_DEBUG_LOCATE_TARGET)
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportpkgbulklistener ] ;
 local dumpExportPkgModelTargetDirectory =
-	[ FDirName $(TARGET_COMMON_DEBUG_LOCATE_TARGET)
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportpkgmodel ] ;
 local dumpExportRepositoryModelTargetDirectory =
-	[ FDirName $(TARGET_COMMON_DEBUG_LOCATE_TARGET)
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportrepositorymodel ] ;
 
 # During the build process, some sources are generated into a directory.  In
@@ -69,6 +69,7 @@ local textDocumentSources =
 	EditManager.cpp
 	EditStack.cpp
 	UndoableEdit.cpp
+
 	# textview
 	Bullet.cpp
 	BulletData.cpp
@@ -147,7 +148,7 @@ local applicationSources =
 	TarArchiveHeader.cpp
 	TarArchiveService.cpp
 
-	#util
+	# util
 	AppUtils.cpp
 	DataIOUtils.cpp
 	RepositoryUrlUtils.cpp
@@ -177,21 +178,6 @@ local generatedPkgParserSourceFiles =
 ;
 
 local generatedRepositoryParserSourceFiles =
-	DumpExportRepositoryJsonListener.cpp
-;
-
-local generatedSourceFiles =
-	# network + server - model
-	DumpExportPkg.cpp
-	DumpExportPkgCategory.cpp
-	DumpExportPkgScreenshot.cpp
-	DumpExportPkgVersion.cpp
-	DumpExportRepository.cpp
-	DumpExportRepositorySource.cpp
-	DumpExportRepositorySourceMirror.cpp
-
-	# network + server - parser
-	DumpExportPkgJsonListener.cpp
 	DumpExportRepositoryJsonListener.cpp
 ;
 
