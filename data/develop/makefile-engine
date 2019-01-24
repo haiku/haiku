@@ -366,7 +366,7 @@ ifeq ($(INSTALL_DIR), )
 	@echo "No install directory specified for \"$(NAME)\" (INSTALL_DIR is empty)" >&2
 else
 	mkdir -p "$(INSTALL_DIR)"
-	cp $(TARGET) $(INSTALL_DIR)/$(NAME)
+	cp $(TARGET) "$(INSTALL_DIR)"/$(NAME)
 endif
 
 # Set the catalog installation directory if it isn't already.
