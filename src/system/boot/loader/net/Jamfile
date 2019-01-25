@@ -9,13 +9,6 @@ for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
 		UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
-		local tcp = ;
-		local iscsi = ;
-		if $(TARGET_ARCH) = ppc {
-			tcp = TCP.cpp ;
-			iscsi = iSCSITarget.cpp ;
-		}
-
 		BootStaticLibrary [ MultiBootGristFiles boot_net ] :
 			ARP.cpp
 			ChainBuffer.cpp
@@ -24,9 +17,8 @@ for platform in [ MultiBootSubDirSetup ] {
 			NetDefs.cpp
 			NetStack.cpp
 			RemoteDisk.cpp
+			TCP.cpp
 			UDP.cpp
-			$(tcp)
-			$(iscsi)
 		;
 	}
 }

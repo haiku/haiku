@@ -13,7 +13,6 @@
 #include <boot/stdio.h>
 #include <boot/stage2.h>
 #include <boot/net/IP.h>
-#include <boot/net/iSCSITarget.h>
 #include <boot/net/NetStack.h>
 #include <boot/net/RemoteDisk.h>
 #include <platform/openfirmware/devices.h>
@@ -76,20 +75,12 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 				}
 			}
 
-			// init a remote disk, if possible
+			// init a native remote disk, if possible
 			RemoteDisk *remoteDisk = RemoteDisk::FindAnyRemoteDisk();
 			if (remoteDisk != NULL) {
 				devicesList->Add(remoteDisk);
 				return B_OK;
 			}
-
-#ifdef ENABLE_ISCSI
-			if (bootAddress != 0) {
-				if (iSCSITarget::DiscoverTargets(bootAddress, ISCSI_PORT,
-						devicesList))
-					return B_OK;
-			}
-#endif
 
 			return B_ENTRY_NOT_FOUND;
 		}
