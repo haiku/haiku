@@ -120,7 +120,7 @@ status_t
 SignalSet::BlockInCurrentThread(SignalSet* oldMask) const
 {
 	return pthread_sigmask(SIG_BLOCK, &fSignals,
-       oldMask != NULL ? &oldMask->fSignals : NULL);
+		oldMask != NULL ? &oldMask->fSignals : NULL);
 }
 
 
@@ -128,7 +128,7 @@ status_t
 SignalSet::UnblockInCurrentThread(SignalSet* oldMask) const
 {
 	return pthread_sigmask(SIG_UNBLOCK, &fSignals,
-       oldMask != NULL ? &oldMask->fSignals : NULL);
+		oldMask != NULL ? &oldMask->fSignals : NULL);
 }
 
 
@@ -136,7 +136,7 @@ status_t
 SignalSet::SetCurrentThreadSignalMask(SignalSet* oldMask) const
 {
 	return pthread_sigmask(SIG_SETMASK, &fSignals,
-       oldMask != NULL ? &oldMask->fSignals : NULL);
+		oldMask != NULL ? &oldMask->fSignals : NULL);
 }
 
 

@@ -86,14 +86,14 @@ const char *kKeypadDescriptionBasic = B_TRANSLATE_MARK(
 
 // scientific mode keypad layout
 const char *kKeypadDescriptionScientific = B_TRANSLATE_MARK(
-    "ln    sin   cos   tan   π    \n"
-    "log   asin  acos  atan  sqrt \n"
-    "exp   sinh  cosh  tanh  cbrt \n"
-    "!     ceil  floor E     ^    \n"
-    "7     8     9     (     )    \n"
-    "4     5     6     *     /    \n"
-    "1     2     3     +     -    \n"
-    "0     .     BS    =     C    \n");
+	"ln    sin   cos   tan   π    \n"
+	"log   asin  acos  atan  sqrt \n"
+	"exp   sinh  cosh  tanh  cbrt \n"
+	"!     ceil  floor E     ^    \n"
+	"7     8     9     (     )    \n"
+	"4     5     6     *     /    \n"
+	"1     2     3     +     -    \n"
+	"0     .     BS    =     C    \n");
 
 
 enum {

@@ -80,9 +80,9 @@ static const char* const kUsage =
 static void
 print_usage_and_exit(bool error)
 {
-    fprintf(error ? stderr : stdout, kUsage, kProgramName, kProgramName,
-    	kProgramName, kProgramName, kProgramName);
-    exit(error ? 1 : 0);
+	fprintf(error ? stderr : stdout, kUsage, kProgramName, kProgramName,
+	kProgramName, kProgramName, kProgramName);
+	exit(error ? 1 : 0);
 }
 
 

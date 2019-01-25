@@ -364,7 +364,7 @@ Grepper::_RunnerThread()
 	}
 
 	fd_set readSet;
-    struct timeval timeout = { 0, 100000 };
+	struct timeval timeout = { 0, 100000 };
 	char line[B_PATH_NAME_LENGTH * 2];
 
 	FILE* output = fdopen(out, "r");

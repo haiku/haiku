@@ -12,7 +12,7 @@ Addon cortex_audioadapter.media_addon :
 	AudioAdapterParams.cpp
 
 	# audioOps/
-        AudioAdapterOp.cpp
+	AudioAdapterOp.cpp
 
 	# common/
 	AudioBuffer.cpp

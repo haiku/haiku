@@ -22,8 +22,8 @@ Application SoftwareUpdater :
 ;
 
 DoCatalogs SoftwareUpdater :
-    x-vnd.haiku-softwareupdater
-    :
+	x-vnd.haiku-softwareupdater
+	:
 	CheckAction.cpp
 	CheckManager.cpp
 	SoftwareUpdaterApp.cpp

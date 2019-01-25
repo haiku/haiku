@@ -66,7 +66,7 @@ printf("ReadyToRun()\n");
 
 	}
 
-    virtual void RefsReceived(BMessage* message)
+	virtual void RefsReceived(BMessage* message)
 	{
 printf("RefsReceived()\n");
 	}

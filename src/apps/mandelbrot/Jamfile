@@ -12,7 +12,7 @@ Application Mandelbrot :
 	;
 
 DoCatalogs Mandelbrot :
-    x-vnd.Haiku-Mandelbrot
-    :
+	x-vnd.Haiku-Mandelbrot
+	:
 	Mandelbrot.cpp
 ;

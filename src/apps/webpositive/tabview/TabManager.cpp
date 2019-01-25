@@ -701,9 +701,9 @@ TabManagerController::SetDoubleClickOutsideTabsMessage(const BMessage& message,
 
 
 TabManager::TabManager(const BMessenger& target, BMessage* newTabMessage)
-    :
-    fController(new TabManagerController(this)),
-    fTarget(target)
+	:
+	fController(new TabManagerController(this)),
+	fTarget(target)
 {
 	fController->SetDoubleClickOutsideTabsMessage(*newTabMessage,
 		be_app_messenger);
@@ -749,14 +749,14 @@ TabManager::~TabManager()
 void
 TabManager::SetTarget(const BMessenger& target)
 {
-    fTarget = target;
+	fTarget = target;
 }
 
 
 const BMessenger&
 TabManager::Target() const
 {
-    return fTarget;
+	return fTarget;
 }
 
 
@@ -826,9 +826,9 @@ TabManager::SelectTab(int32 tabIndex)
 	fCardLayout->SetVisibleItem(tabIndex);
 	fTabContainerView->SelectTab(tabIndex);
 
-    BMessage message(TAB_CHANGED);
-    message.AddInt32("tab index", tabIndex);
-    fTarget.SendMessage(&message);
+	BMessage message(TAB_CHANGED);
+	message.AddInt32("tab index", tabIndex);
+	fTarget.SendMessage(&message);
 }
 
 
@@ -851,9 +851,9 @@ TabManager::SelectedTabIndex() const
 void
 TabManager::CloseTab(int32 tabIndex)
 {
-    BMessage message(CLOSE_TAB);
-    message.AddInt32("tab index", tabIndex);
-    fTarget.SendMessage(&message);
+	BMessage message(CLOSE_TAB);
+	message.AddInt32("tab index", tabIndex);
+	fTarget.SendMessage(&message);
 }
 
 

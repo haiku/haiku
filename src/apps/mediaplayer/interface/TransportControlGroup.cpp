@@ -81,7 +81,7 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	fSeekLayout = seekGroup->GroupLayout();
 	GroupLayout()->AddView(seekGroup);
 
-    // Seek slider
+	// Seek slider
 	fSeekSlider = new SeekSlider("seek slider", new BMessage(MSG_SEEK),
 		0, kPositionFactor);
 	fSeekLayout->AddView(fSeekSlider);
@@ -89,11 +89,11 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	fPositionToolTip = new PositionToolTip();
 	fSeekSlider->SetToolTip(fPositionToolTip);
 
-    // Duration view
+	// Duration view
 	fDurationView = new DurationView("duration view");
 	fSeekLayout->AddView(fDurationView);
 
-    // Buttons
+	// Buttons
 
 	uint32 topBottomBorder = BControlLook::B_TOP_BORDER
 		| BControlLook::B_BOTTOM_BORDER;
@@ -285,8 +285,8 @@ TransportControlGroup::MessageReceived(BMessage* message)
 		}
 
 		default:
-		    BView::MessageReceived(message);
-		    break;
+			BView::MessageReceived(message);
+			break;
 	}
 }
 

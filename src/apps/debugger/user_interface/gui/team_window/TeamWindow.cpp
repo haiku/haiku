@@ -441,9 +441,9 @@ TeamWindow::MessageReceived(BMessage* message)
 						fInspectorWindow->LoadSettings(fUiSettings);
 						fInspectorWindow->Show();
 					}
-	           	} catch (...) {
-	           		// TODO: notify user
-	           	}
+				} catch (...) {
+					// TODO: notify user
+				}
 			}
 
 			target_addr_t address;
@@ -452,7 +452,7 @@ TeamWindow::MessageReceived(BMessage* message)
 				addressMessage.AddUInt64("address", address);
 				fInspectorWindow->PostMessage(&addressMessage);
 			}
-           	break;
+			break;
 		}
 		case MSG_INSPECTOR_WINDOW_CLOSED:
 		{
@@ -520,9 +520,9 @@ TeamWindow::MessageReceived(BMessage* message)
 						fTeam, fListener, this);
 					if (fTeamSettingsWindow != NULL)
 						fTeamSettingsWindow->Show();
-	           	} catch (...) {
-	           		// TODO: notify user
-	           	}
+				} catch (...) {
+					// TODO: notify user
+				}
 			}
 			break;
 		}
@@ -550,9 +550,9 @@ TeamWindow::MessageReceived(BMessage* message)
 						fTeam, breakpoint, fListener, this);
 					if (fBreakpointEditWindow != NULL)
 						fBreakpointEditWindow->Show();
-	           	} catch (...) {
-	           		// TODO: notify user
-	           	}
+				} catch (...) {
+					// TODO: notify user
+				}
 			}
 			break;
 		}

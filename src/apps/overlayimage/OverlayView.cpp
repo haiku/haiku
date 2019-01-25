@@ -24,22 +24,22 @@
 #define B_TRANSLATION_CONTEXT "Main view"
 
 const float kDraggerSize = 7;
-	
 
-OverlayView::OverlayView(BRect frame) 
+
+OverlayView::OverlayView(BRect frame)
 	:
 	BView(frame, "OverlayImage", B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	fBitmap = NULL;
 	fReplicated = false;
-	
+
 	frame.left = frame.right - kDraggerSize;
 	frame.top = frame.bottom - kDraggerSize;
 	BDragger *dragger = new BDragger(frame, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
-	
+
 	SetViewColor(B_TRANSPARENT_COLOR);
-	
+
 	fText = new BTextView(Bounds(), "bgView", Bounds(), B_FOLLOW_ALL, B_WILL_DRAW);
 	fText->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	rgb_color color = ui_color(B_PANEL_TEXT_COLOR);
@@ -58,7 +58,7 @@ OverlayView::OverlayView(BRect frame)
 }
 
 
-OverlayView::OverlayView(BMessage *archive) 
+OverlayView::OverlayView(BMessage *archive)
 	:
 	BView(archive)
 {
@@ -88,11 +88,11 @@ void
 OverlayView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case B_SIMPLE_DATA: 
+		case B_SIMPLE_DATA:
 		{
 			if (fReplicated)
 				break;
-			
+
 			entry_ref ref;
 			msg->FindRef("refs", &ref);
 			BEntry entry(&ref);
@@ -100,13 +100,13 @@ OverlayView::MessageReceived(BMessage *msg)
 
 			delete fBitmap;
 			fBitmap = BTranslationUtils::GetBitmap(path.Path());
-			
+
 			if (fBitmap != NULL) {
 				if (fText != NULL) {
 					RemoveChild(fText);
 					fText = NULL;
 				}
-				
+
 				BRect rect = fBitmap->Bounds();
 				if (!fReplicated) {
 					Window()->ResizeTo(rect.right, rect.bottom);
@@ -117,9 +117,11 @@ OverlayView::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-	    case B_ABOUT_REQUESTED:
-	      	OverlayAboutRequested(); 
-    		break; 
+		case B_ABOUT_REQUESTED:
+		{
+			OverlayAboutRequested();
+			break;
+		}
 		case B_COLORS_UPDATED:
 		{
 			rgb_color color;
@@ -153,7 +155,7 @@ OverlayView::Archive(BMessage *archive, bool deep) const
 		fBitmap->Lock();
 		fBitmap->Archive(archive);
 		fBitmap->Unlock();
-	}			
+	}
 	//archive->PrintToStream();
 
 	return B_OK;
@@ -169,7 +171,7 @@ OverlayView::OverlayAboutRequested()
 		"originally by Seth Flaxman\n\t"
 		"modified by Hartmuth Reh\n\t"
 		"further modified by Humdinger\n",
-		"OK");	
+		"OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 	view->SetStylable(true);
@@ -177,6 +179,6 @@ OverlayView::OverlayAboutRequested()
 	font.SetSize(font.Size() + 7.0f);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 12, &font);
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);	
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
 }

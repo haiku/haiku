@@ -16,8 +16,8 @@ Application Sudoku :
 	;
 
 DoCatalogs Sudoku :
-    x-vnd.Haiku-Sudoku
-    :
+	x-vnd.Haiku-Sudoku
+	:
 	ProgressWindow.cpp
 	Sudoku.cpp
 	SudokuGenerator.cpp

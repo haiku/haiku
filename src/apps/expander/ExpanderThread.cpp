@@ -224,7 +224,7 @@ ExpanderThread::PipeCommand(int argc, const char** argv, int& in, int& out,
 	// create a tty for stdin, as utilities don't generally use stdin
 	int master = posix_openpt(O_RDWR);
 	if (master < 0)
-    	return -1;
+		return -1;
 
 	int slave;
 	const char* ttyName;

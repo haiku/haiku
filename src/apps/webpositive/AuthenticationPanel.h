@@ -14,7 +14,7 @@ class BTextControl;
 
 class AuthenticationPanel : public BWindow {
 public:
-    AuthenticationPanel(BRect parentFrame = BRect());
+	AuthenticationPanel(BRect parentFrame = BRect());
 	virtual ~AuthenticationPanel();
 
 	virtual bool QuitRequested();
@@ -27,7 +27,7 @@ public:
 		bool* rememberCredentials);
 
 private:
-    BRect m_parentWindowFrame;
+	BRect m_parentWindowFrame;
 	BTextControl* m_usernameTextControl;
 	BTextControl* m_passwordTextControl;
 	BCheckBox* m_hidePasswordCheckBox;

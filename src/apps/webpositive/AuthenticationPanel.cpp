@@ -83,7 +83,7 @@ AuthenticationPanel::MessageReceived(BMessage* message)
 		int32 selectionEnd;
 		m_passwordTextControl->TextView()->GetSelection(&selectionStart,
 			&selectionEnd);
-        m_passwordTextControl->TextView()->HideTyping(
+		m_passwordTextControl->TextView()->HideTyping(
 			m_hidePasswordCheckBox->Value() == B_CONTROL_ON);
 		m_passwordTextControl->SetText(text.String());
 		m_passwordTextControl->TextView()->Select(selectionStart,

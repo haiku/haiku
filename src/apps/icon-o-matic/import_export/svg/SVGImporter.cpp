@@ -69,7 +69,7 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 		return B_ERROR;
 	}
 
-    try {
+	try {
 		agg::svg::DocumentBuilder builder;
 		agg::svg::Parser parser(builder);
 		parser.parse(path.Path());

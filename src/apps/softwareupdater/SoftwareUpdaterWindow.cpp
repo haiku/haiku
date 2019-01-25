@@ -863,9 +863,9 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	owner->PushState();
 	
 	float width = owner->Frame().Width();
-    float nameWidth = width / 2.0;
-    float offsetWidth = 0;
-    bool showMoreDetails = fSuperItem->GetDetailLevel();
+	float nameWidth = width / 2.0;
+	float offsetWidth = 0;
+	bool showMoreDetails = fSuperItem->GetDetailLevel();
 	
 	BBitmap* icon = fSuperItem->GetIcon(showMoreDetails);
 	if (icon != NULL && icon->IsValid()) {
@@ -886,8 +886,8 @@ PackageItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	
 	// Package name
-    BString name(fName);
-    owner->TruncateString(&name, B_TRUNCATE_END, nameWidth);
+	BString name(fName);
+	owner->TruncateString(&name, B_TRUNCATE_END, nameWidth);
 	BPoint cursor(item_rect.left + offsetWidth,
 		item_rect.bottom - fSmallTotalHeight - fSmallFontHeight.descent - 2);
 	if (showMoreDetails)

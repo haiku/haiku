@@ -558,7 +558,7 @@ ObjectView::FrameResized(float width, float height)
 	width = Bounds().Width();
 	height = Bounds().Height();
 	fYxRatio = height / width;
-    glViewport(0, 0, (GLint)width + 1, (GLint)height + 1);
+	glViewport(0, 0, (GLint)width + 1, (GLint)height + 1);
 
 	// To prevent weird buffer contents
 	glClear(GL_COLOR_BUFFER_BIT);

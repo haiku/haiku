@@ -197,7 +197,7 @@ HyperTextView::_ActionAt(const BPoint& where) const
 
 	ActionInfo pointer(offset, offset + 1, NULL);
 
-    const ActionInfo* action = fActionInfos->BinarySearch(pointer,
+	const ActionInfo* action = fActionInfos->BinarySearch(pointer,
 			ActionInfo::CompareEqualIfIntersecting);
 	if (action != NULL) {
 		// verify that the text region was hit
