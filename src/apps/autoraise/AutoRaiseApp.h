@@ -20,6 +20,9 @@ class AutoRaiseApp: public BApplication{
 		virtual void ReadyToRun();
 		
 		void PutInTray(bool);
+
+	private:
+		BString usageNote;
 };
 
 #endif

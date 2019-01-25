@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src apps autoraise ;
 
+UsePrivateHeaders interface shared ;
+UsePrivateHeaders private shared ;
+
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application AutoRaise :

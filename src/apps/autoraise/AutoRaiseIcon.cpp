@@ -1,10 +1,4 @@
-/* this is for the DANO hack (new, simpler version than the BStringIO hack) */
 #include <BeBuild.h>
-#ifdef B_BEOS_VERSION_DANO
-#define private public
-#include <Messenger.h>
-#undef private
-#endif
 
 #include "AutoRaiseIcon.h"
 #include <stdlib.h>
@@ -21,13 +15,14 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void)
 }
 
 
-long removeFromDeskbar(void *)
+status_t removeFromDeskbar(void *)
 {
 	BDeskbar db;
-	if (db.RemoveItem(APP_NAME) != B_OK)
+	if (db.RemoveItem(APP_NAME) != B_OK) {
 		printf("Unable to remove AutoRaise from BDeskbar\n");
+	}
 
-	return 0;
+	return B_OK;
 }
 
 //**************************************************
@@ -61,9 +56,6 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	msg->AddInt32(AR_MODE, Mode_DeskbarOver);
 	tmpi = new BMenuItem("Deskbar only (over its area)", msg);
 	tmpi->SetMarked(s->Mode() == Mode_DeskbarOver);
-#ifdef USE_DANO_HACK
-	tmpi->SetEnabled(false);
-#endif
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_MODE);
@@ -170,7 +162,7 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	AddSeparatorItem();
 //	AddItem(new BMenuItem("Settings...", new BMessage(OPEN_SETTINGS)));
 
-	AddItem(new BMenuItem("About "APP_NAME B_UTF8_ELLIPSIS,
+	AddItem(new BMenuItem("About " APP_NAME B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	AddItem(new BMenuItem("Remove from tray", new BMessage(REMOVE_FROM_TRAY)));
 
@@ -221,10 +213,8 @@ void TrayView::_init()
 	get_thread_info(find_thread(NULL), &ti);
 	fDeskbarTeam = ti.team;
 
-#ifndef USE_DANO_HACK
 	resume_thread(poller_thread = spawn_thread(poller, "AutoRaise desktop "
 		"poller", B_NORMAL_PRIORITY, (void *)this));
-#endif
 
 	//determine paths to icon files based on app path in settings file
 
@@ -269,18 +259,11 @@ TrayView::~TrayView(){
 	status_t ret;
 
 	if (watching) {
-#ifdef USE_DANO_HACK
-		be_roster->StopWatching(this);
-#else
-//		acquire_sem(fPollerSem);
-#endif
 		set_mouse_mode(fNormalMM);
 		watching = false;
 	}
 	delete_sem(fPollerSem);
-#ifndef USE_DANO_HACK
 	wait_for_thread(poller_thread, &ret);
-#endif
 	if (_activeIcon) delete _activeIcon;
 	if (_inactiveIcon) delete _inactiveIcon;
 	if (_settings) delete _settings;
@@ -303,8 +286,7 @@ status_t TrayView::Archive(BMessage *data, bool deep) const {
 //Rehydrate the View from a given message (called by the DeskBar)
 TrayView *TrayView::Instantiate(BMessage *data) {
 
-	if (!validate_instantiation(data, "TrayView"))
-	{
+	if (!validate_instantiation(data, "TrayView")) {
 		return NULL;
 	}
 
@@ -314,16 +296,12 @@ TrayView *TrayView::Instantiate(BMessage *data) {
 void TrayView::AttachedToWindow() {
 	if(Parent())
 		SetViewColor(Parent()->ViewColor());
-		if (_settings->Active()) {
-			fNormalMM = mouse_mode();
-			set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
-#ifdef USE_DANO_HACK
-			be_roster->StartWatching(this, B_REQUEST_WINDOW_ACTIVATED);
-#else
-			release_sem(fPollerSem);
-#endif
-			watching = true;
-		}
+	if (_settings->Active()) {
+		fNormalMM = mouse_mode();
+		set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
+		release_sem(fPollerSem);
+		watching = true;
+	}
 }
 
 void TrayView::Draw(BRect updaterect) {
@@ -389,16 +367,14 @@ void TrayView::MouseDown(BPoint where) {
 int32 fronter(void *arg)
 {
 	TrayView *tv = (TrayView *)arg;
-	int32 tok = tv->current_window;
 	int32 ws = current_workspace();
+	volatile int32 tok = tv->current_window;
 	sem_id sem = tv->fPollerSem;
 
 	snooze(tv->raise_delay);
 
-#ifndef USE_DANO_HACK
 	if (acquire_sem(sem) != B_OK)
 		return B_OK; // this really needs a better locking model...
-#endif
 	if (ws != current_workspace())
 		goto end; // don't touch windows if we changed workspace
 	if (tv->last_raiser_thread != find_thread(NULL))
@@ -415,7 +391,6 @@ PRINT(("tok = %ld cw = %ld\n", tok, tv->current_window));
 	return B_OK;
 }
 
-#ifndef USE_DANO_HACK
 
 int32 poller(void *arg)
 {
@@ -451,7 +426,8 @@ int32 poller(void *arg)
 					goto zzz; // invalid window ?
 /*
 printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi->is_mini?"true":"false",
-	(long)mouse.x, (long)mouse.y, i, wi->window_left, wi->window_right, wi->window_top, wi->window_bottom, wi->id, tok);
+	(long)mouse.x, (long)mouse.y, i, wi->window_left, wi->window_right,
+	wi->window_top, wi->window_bottom, wi-server_token, tok);
 */
 
 
@@ -460,12 +436,13 @@ printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi
 						&& (((long)mouse.y) > wi->window_top) && (((long)mouse.y) < wi->window_bottom)) {
 //((tv->_settings->Mode() != Mode_DeskbarOver) || (wi->team == tv->fDeskbarTeam))
 
-					if ((tv->_settings->Mode() == Mode_All) && (wi->id == tv->current_window))
+					if ((tv->_settings->Mode() == Mode_All) && 
+					(wi->server_token == tv->current_window))
 						goto zzz; // already raised
 
 					if ((tv->_settings->Mode() == Mode_All) || (wi->team == tv->fDeskbarTeam)) {
-						tv->current_window = wi->id;
-						tok = wi->id;
+						tv->current_window = wi->server_token;
+						tok = wi->server_token;
 						resume_thread(tv->last_raiser_thread = spawn_thread(fronter, "fronter", B_NORMAL_PRIORITY, (void *)tv));
 						goto zzz;
 					} else if (tv->_settings->Mode() == Mode_DeskbarTouch) // give up, before we find Deskbar under it
@@ -487,7 +464,6 @@ printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi
 	return B_OK;
 }
 
-#endif
 
 void TrayView::MessageReceived(BMessage* message)
 {
@@ -533,72 +509,22 @@ void TrayView::MessageReceived(BMessage* message)
 		}
 		case REMOVE_FROM_TRAY:
 		{
-			thread_id tid = spawn_thread(removeFromDeskbar, "RemoveFromDeskbar", B_NORMAL_PRIORITY, NULL);
-			if (tid) resume_thread(tid);
+			thread_id tid = spawn_thread(removeFromDeskbar, "RemoveFromDeskbar", B_NORMAL_PRIORITY, (void*)this);
+			if (tid != 0) resume_thread(tid);
 
 			break;
 		}
 		case B_ABOUT_REQUESTED:
 			alert = new BAlert("about box", "AutoRaise, (c) 2002, mmu_man\nEnjoy :-)", "OK", NULL, NULL,
-                B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
-	        alert->SetShortcut(0, B_ENTER);
-	        alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-    	    alert->Go(NULL); // use asynchronous version
+				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
+			alert->SetShortcut(0, B_ENTER);
+			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+			alert->Go(NULL); // use asynchronous version
 			break;
 		case OPEN_SETTINGS:
 
 			break;
-#ifdef USE_DANO_HACK
-		case B_SOME_WINDOW_ACTIVATED:
-//			printf("Window Activated\n");
-//			message->PrintToStream();
-			BPoint mouse;
-			uint32 buttons;
-			GetMouse(&mouse, &buttons);
-			if (buttons)
-				break;
-			if (message->FindMessenger("be:window", &msgr) < B_OK)
-				puts("BMsgr ERROR");
-			else {
-				bool doZoom = false;
-                BRect zoomRect(0.0f, 0.0f, 0.0f, 0.0f);
-				port_id pi = msgr.fPort;
-//				printf("port:%li (%lx)\n", pi, pi);
 
-				int32 *tl, tlc;
-				tl = get_token_list(msgr.Team(), &tlc);
-//				printf("tokens (team %li): (%li) ", msgr.Team(), tlc);
-				for (tlc; tlc; tlc--) {
-//					printf("%li ", tl[tlc-1]);
-					window_info *wi = get_window_info(tl[tlc-1]);
-					if (wi) {
-						if (wi->client_port == pi) {
-							if ((wi->layer < 3) // we hit the desktop or a window not on this WS
-									|| (wi->window_left > wi->window_right) || (wi->window_top > wi->window_bottom)
-									|| (wi->is_mini)
-									|| (/*(_settings->Mode() == Mode_All) && */(wi->id == current_window))) {
-								// already raised
-								free(wi);
-								break;
-							}
-
-							if ((_settings->Mode() == Mode_All) || (wi->team == fDeskbarTeam)) {
-								PRINT(("raising wi=%li, cp=%ld, pi=%ld team=%ld DBteam=%ld\n", wi->id, wi->client_port, pi, wi->team, fDeskbarTeam));
-								current_window = wi->id;
-								int32 tok = wi->id;
-								resume_thread(last_raiser_thread = spawn_thread(fronter, "fronter", B_NORMAL_PRIORITY, (void *)this));
-							} else {
-								current_window = wi->id;
-							}
-						}
-						free(wi);
-					}
-				}
-//				puts("");
-				free(tl);
-			}
-			break;
-#endif
 		default:
 			BView::MessageReceived(message);
 	}
@@ -617,22 +543,14 @@ void TrayView::SetActive(bool st)
 		if (!watching) {
 			fNormalMM = mouse_mode();
 			set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
-#ifdef USE_DANO_HACK
-			be_roster->StartWatching(this, B_REQUEST_WINDOW_ACTIVATED);
-#else
 			release_sem(fPollerSem);
-#endif
 			watching = true;
 		}
 	}
 	else
 	{
 		if (watching) {
-#ifdef USE_DANO_HACK
-			be_roster->StopWatching(this);
-#else
 			acquire_sem(fPollerSem);
-#endif
 			set_mouse_mode(fNormalMM);
 			watching = false;
 		}
