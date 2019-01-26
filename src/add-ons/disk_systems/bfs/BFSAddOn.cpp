@@ -255,7 +255,7 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result,
 			sizeof(result)) == 0) {
 		if (++counter % 50 == 0)
-			printf("%9" B_PRId64 " nodes processed\x1b[1A\n", counter);
+			printf("%9" B_PRIu64 " nodes processed\x1b[1A\n", counter);
 
 		if (result.pass == BFS_CHECK_PASS_BITMAP) {
 			if (result.errors) {
