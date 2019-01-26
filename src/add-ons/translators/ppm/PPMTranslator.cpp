@@ -4,11 +4,9 @@
 */
 
 /*	Parse the ASCII and raw versions of PPM.	*/
-/*	Note that the parsing of ASCII is very inefficient, because BFile	*/
-/*	does not buffer data. We should wrap a buffering thing around	*/
-/*	the input or output when they are in ASCII mode.				*/
 
 #include <Bitmap.h>
+#include <BufferedDataIO.h>
 #include <ByteOrder.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -204,6 +202,7 @@ public:
 			fclose(f);
 		}
 	}
+
 	~PrefsLoader()
 	{
 		/*	No need writing settings if there aren't any	*/
@@ -242,16 +241,13 @@ status_t copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes,
 	int height, int max, bool in_ascii, bool out_ascii, color_space in_space,
 	color_space out_space);
 
+
 /*	Return B_NO_TRANSLATOR if not handling this data.	*/
 /*	Even if inputFormats exists, may be called for data without hints	*/
 /*	If outType is not 0, must be able to export in wanted format	*/
-
 status_t
-Identify(/*	required	*/
-	BPositionIO* inSource,
-	const translation_format* inFormat, /*	can beNULL	*/
-	BMessage* ioExtension, /*	can be NULL	*/
-	translator_info* outInfo, uint32 outType)
+Identify(BPositionIO* inSource, const translation_format* inFormat,
+	BMessage* ioExtension, translator_info* outInfo, uint32 outType)
 {
 	dprintf(("PPMTranslator: Identify()\n"));
 	/* Silence compiler warnings. */
@@ -629,11 +625,8 @@ private:
 /*	settings that is atomically copied into the translator function 	*/
 /*	as a local when translation starts.	*/
 /*	Store your settings wherever you feel like it.	*/
-
 status_t
-MakeConfig(/*	optional	*/
-	BMessage* ioExtension, /*	can be NULL	*/
-	BView** outView, BRect* outExtent)
+MakeConfig(BMessage* ioExtension, BView** outView, BRect* outExtent)
 {
 	PPMView* v
 		= new PPMView(B_TRANSLATE("PPMTranslator Settings"), B_WILL_DRAW);
@@ -651,10 +644,8 @@ MakeConfig(/*	optional	*/
 /*	Copy your current settings to a BMessage that may be passed 	*/
 /*	to BTranslators::Translate at some later time when the user wants to 	*/
 /*	use whatever settings you're using right now.	*/
-
 status_t
-GetConfigMessage(/*	optional	*/
-	BMessage* ioExtension)
+GetConfigMessage(BMessage* ioExtension)
 {
 	status_t err = B_OK;
 	const char* name = B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE;
@@ -985,6 +976,10 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 {
 	dprintf(("copy_data(%d, %d, %d, %d, %x, %x)\n", rowbytes, out_rowbytes,
 		height, max, in_space, out_space));
+
+	// We will be reading 1 char at a time, so use a buffer
+	BBufferedDataIO inBuffer(*in, 65536, false);
+
 	/*	We read/write one scanline at a time.	*/
 	unsigned char* data = (unsigned char*) malloc(rowbytes);
 	unsigned char* out_data = (unsigned char*) malloc(out_rowbytes);
@@ -1001,9 +996,9 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 	/*	There is no data format conversion, so we can just copy data.	*/
 	while ((height-- > 0) && !err) {
 		if (in_ascii) {
-			err = read_ascii_line(in, max, data, rowbytes);
+			err = read_ascii_line(&inBuffer, max, data, rowbytes);
 		} else {
-			err = in->Read(data, rowbytes);
+			err = inBuffer.Read(data, rowbytes);
 			if (err == rowbytes) {
 				err = B_OK;
 			}
