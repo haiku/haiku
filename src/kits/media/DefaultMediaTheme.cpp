@@ -169,9 +169,14 @@ static void
 start_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 {
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL) {
-		roster->StartWatching(control, parameter.Web()->Node(),
-			B_MEDIA_NEW_PARAMETER_VALUE);
+	if (roster == NULL)
+		return;
+
+	if (roster->StartWatching(control, parameter.Web()->Node(),
+			B_MEDIA_NEW_PARAMETER_VALUE) != B_OK) {
+		fprintf(stderr, "DefaultMediaTheme: Failed to start watching parameter"
+			"\"%s\"\n", parameter.Name());
+		return;
 	}
 }
 
@@ -180,10 +185,11 @@ static void
 stop_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 {
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL) {
-		roster->StopWatching(control, parameter.Web()->Node(),
-			B_MEDIA_NEW_PARAMETER_VALUE);
-	}
+	if (roster == NULL)
+		return;
+
+	roster->StopWatching(control, parameter.Web()->Node(),
+		B_MEDIA_NEW_PARAMETER_VALUE);
 }
 
 
@@ -296,6 +302,9 @@ CheckBox::~CheckBox()
 void
 CheckBox::AttachedToWindow()
 {
+	BCheckBox::AttachedToWindow();
+
+	SetTarget(this);
 	start_watching_for_parameter_changes(this, fParameter);
 }
 
@@ -323,6 +332,9 @@ OptionPopUp::~OptionPopUp()
 void
 OptionPopUp::AttachedToWindow()
 {
+	BOptionPopUp::AttachedToWindow();
+
+	SetTarget(this);
 	start_watching_for_parameter_changes(this, fParameter);
 }
 
@@ -350,6 +362,9 @@ Slider::~Slider()
 void
 Slider::AttachedToWindow()
 {
+	BSlider::AttachedToWindow();
+
+	SetTarget(this);
 	start_watching_for_parameter_changes(this, fParameter);
 }
 
@@ -377,9 +392,10 @@ ChannelSlider::~ChannelSlider()
 void
 ChannelSlider::AttachedToWindow()
 {
-	start_watching_for_parameter_changes(this, fParameter);
-
 	BChannelSlider::AttachedToWindow();
+
+	SetTarget(this);
+	start_watching_for_parameter_changes(this, fParameter);
 }
 
 
