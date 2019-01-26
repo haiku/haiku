@@ -43,21 +43,6 @@
 #endif
 
 
-#if !defined(_PR3_COMPATIBLE_) /* R4 headers? Else we need to define these \
-								  constants. */
-#define B_CMY24 \
-	((color_space) 0xC001) /* C[7:0]  M[7:0]  Y[7:0]          No gray removal \
-							  done */
-#define B_CMY32 \
-	((color_space) 0xC002) /* C[7:0]  M[7:0]  Y[7:0]  X[7:0]  No gray removal \
-							  done */
-#define B_CMYA32 \
-	((color_space) 0xE002) /* C[7:0]  M[7:0]  Y[7:0]  A[7:0] No gray removal \
-							  done */
-#define B_CMYK32 \
-	((color_space) 0xC003) /* C[7:0]  M[7:0]  Y[7:0]  K[7:0] */
-#endif
-
 #define PPM_TRANSLATOR_VERSION 0x100
 
 /* These three data items are exported by every translator. */
@@ -316,13 +301,9 @@ Identify(/*	required	*/
 
 /*	Return B_NO_TRANSLATOR if not handling the output format	*/
 /*	If outputFormats exists, will only be called for those formats	*/
-
 status_t
-Translate(/*	required	*/
-	BPositionIO* inSource,
-	const translator_info* /* inInfo*/, /* silence compiler warning */
-	BMessage* ioExtension, /*	can be NULL	*/
-	uint32 outType, BPositionIO* outDestination)
+Translate(BPositionIO* inSource, const translator_info* /*inInfo*/,
+	BMessage* ioExtension, uint32 outType, BPositionIO* outDestination)
 {
 	dprintf(("PPMTranslator: Translate()\n"));
 	inSource->Seek(0, SEEK_SET); /* paranoia */
@@ -348,11 +329,7 @@ Translate(/*	required	*/
 		&ascii, &space, &is_ppm, &comment);
 	if (comment != NULL) {
 		if (ioExtension != NULL) {
-#if defined(_PR3_COMPATIBLE_) /* R4 headers? */
 			ioExtension->AddString(B_TRANSLATOR_EXT_COMMENT, comment);
-#else
-			ioExtension->AddString("/comment", comment);
-#endif
 		}
 		free(comment);
 	}
@@ -379,16 +356,10 @@ Translate(/*	required	*/
 		out_rowbytes = 3 * width;
 	} else { /*	When outputting to B_TRANSLATOR_BITMAP, follow user's wishes.
 			  */
-#if defined(_PR3_COMPATIBLE_) /* R4 headers? */
 		if (!ioExtension
-			|| ioExtension->FindInt32(
-				   B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE, (int32*) &out_space)
-			||
-#else
-		if (!ioExtension
-			|| ioExtension->FindInt32("bits/space", (int32*) &out_space) ||
-#endif
-			(out_space == B_NO_COLOR_SPACE)) {
+			|| ioExtension->FindInt32( B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE,
+				(int32*) &out_space)
+			|| (out_space == B_NO_COLOR_SPACE)) {
 			if (g_settings.out_space == B_NO_COLOR_SPACE) {
 				switch (space) { /*	The 24-bit versions are pretty silly, use 32
 									instead.	*/
@@ -422,13 +393,8 @@ Translate(/*	required	*/
 			err = 0;
 		// comment = NULL;
 		const char* fsComment;
-#if defined(_PR3_COMPATIBLE_) /* R4 headers? */
 		if ((ioExtension != NULL)
 			&& !ioExtension->FindString(B_TRANSLATOR_EXT_COMMENT, &fsComment)) {
-#else
-		if ((ioExtension != NULL)
-			&& !ioExtension->FindString("/comment", &fsComment)) {
-#endif
 			err = write_comment(fsComment, outDestination);
 		}
 		if (err == B_OK) {
@@ -691,11 +657,7 @@ GetConfigMessage(/*	optional	*/
 	BMessage* ioExtension)
 {
 	status_t err = B_OK;
-#if defined(_PR3_COMPATIBLE_)
 	const char* name = B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE;
-#else
-	const char* name = B_TRANSLATE_MARK("bits/space");
-#endif
 	g_settings_lock.Lock();
 	(void) ioExtension->RemoveName(name);
 	err = ioExtension->AddInt32(name, g_settings.out_space);
@@ -995,7 +957,7 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 	int max, bool in_ascii, bool out_ascii, color_space in_space,
 	color_space out_space)
 {
-	dprintf(("copy_data(%x, %x, %x, %x, %x, %x)\n", rowbytes, out_rowbytes,
+	dprintf(("copy_data(%d, %d, %d, %d, %x, %x)\n", rowbytes, out_rowbytes,
 		height, max, in_space, out_space));
 	/*	We read/write one scanline at a time.	*/
 	unsigned char* data = (unsigned char*) malloc(rowbytes);
