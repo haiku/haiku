@@ -16,25 +16,10 @@
 #include "colorspace.h"
 
 
-#if !defined(_PR3_COMPATIBLE_)
-#define B_CMY24 \
-	((color_space) 0xC001) /* C[7:0]  M[7:0]  Y[7:0]           No gray removal \
-							  done */
-#define B_CMY32 \
-	((color_space) 0xC002) /* C[7:0]  M[7:0]  Y[7:0]  X[7:0]   No gray removal \
-							  done */
-#define B_CMYA32 \
-	((color_space) 0xE002) /* C[7:0]  M[7:0]  Y[7:0]  A[7:0]   No gray removal \
-							  done */
-#define B_CMYK32 \
-	((color_space) 0xC003) /* C[7:0]  M[7:0]  Y[7:0]  K[7:0] */
-#endif
-
+/* expands to BGRA in the output buffer from <whatever> in the input buffer */
 int
-expand_data(/* expands to BGRA in the output buffer from <whatever> in the input
-			   buffer */
-	color_space from_space,
-	unsigned char* in_data, int rowbytes, unsigned char* out_buf)
+expand_data(color_space from_space, unsigned char* in_data, int rowbytes,
+	unsigned char* out_buf)
 {
 	ASSERT(in_data != out_buf);
 

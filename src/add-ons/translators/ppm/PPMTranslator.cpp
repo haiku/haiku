@@ -672,6 +672,8 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 {
 	/* check for PPM magic number */
 	char ch[2];
+	bool monochrome = false;
+	bool greyscale = false;
 	if (inSource->Read(ch, 2) != 2) {
 		return B_NO_TRANSLATOR;
 	}
@@ -686,13 +688,19 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 		return B_NO_TRANSLATOR;
 	}
 	*is_ppm = true;
-	if (ch[1] == '6') {
+	if (ch[1] == '6' || ch[1] == '5' || ch[1] == '4') {
 		*ascii = false;
-	} else if (ch[1] == '3') {
+	} else if (ch[1] == '3' || ch[1] == '2' || ch[1] == '1') {
 		*ascii = true;
 	} else {
 		return B_NO_TRANSLATOR;
 	}
+
+	if (ch[1] == '4' || ch[1] == '1')
+		monochrome = true;
+	else if (ch[1] == '5' || ch[1] == '2')
+		greyscale = true;
+
 	// status_t err = B_NO_TRANSLATOR;
 	enum scan_state {
 		scan_width,
@@ -703,7 +711,12 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 		= scan_width;
 	int* scan = NULL;
 	bool in_comment = false;
-	*space = B_RGB24_BIG;
+	if (monochrome)
+		*space = B_GRAY1;
+	else if (greyscale)
+		*space = B_GRAY8;
+	else
+		*space = B_RGB24_BIG;
 	/* The description of PPM is slightly ambiguous as far as comments */
 	/* go. We choose to allow comments anywhere, in the spirit of laxness. */
 	/* See http://www.dcs.ed.ac.uk/~mxr/gfx/2d/PPM.txt */
@@ -739,7 +752,12 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 						scan = width;
 						break;
 					case scan_height:
-						*rowbytes = *width * 3;
+						if (monochrome)
+							*rowbytes = (*width + 7) / 8;
+						else if (greyscale)
+							*rowbytes = *width;
+						else
+							*rowbytes = *width * 3;
 						scan = height;
 						break;
 					case scan_max:
@@ -755,7 +773,15 @@ read_ppm_header(BDataIO* inSource, int* width, int* rowbytes, int* height,
 			if (scan) { /* are we done with one value? */
 				scan = NULL;
 				state = (enum scan_state)(state + 1);
+
+				/* in monochrome ppm, there is no max in the file, so we
+				 * skip that step. */
+				if ((state == scan_max) && monochrome) {
+					state = (enum scan_state)(state + 1);
+					*max = 1;
+				}
 			}
+
 			if (state == scan_white) { /* we only ever read one whitespace,
 										  since we skip space */
 				return B_OK; /* when reading ASCII, and there is a single
@@ -968,7 +994,7 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 		return B_NO_MEMORY;
 	}
 	unsigned char* scale = NULL;
-	if (max != 255) {
+	if (max != 255 && in_space != B_GRAY1) {
 		scale = make_scale_data(max);
 	}
 	status_t err = B_OK;
@@ -983,6 +1009,7 @@ copy_data(BDataIO* in, BDataIO* out, int rowbytes, int out_rowbytes, int height,
 			}
 			if (scale) { /* for reading PPM that is smaller than 8 bit */
 				scale_data(scale, data, rowbytes);
+
 			}
 		}
 		if (err == B_OK) {
