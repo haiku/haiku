@@ -46,80 +46,77 @@
  */
 int SSL_SESSION_print_keylog(BIO *bp, const SSL_SESSION *x)
 {
-    size_t i;
+	size_t i;
 
-    if (x == NULL)
-        goto err;
-    if (x->session_id_length == 0 || x->master_key_length == 0)
-        goto err;
+	if (x == NULL)
+		goto err;
+	if (x->session_id_length == 0 || x->master_key_length == 0)
+		goto err;
 
-    /*
-     * the RSA prefix is required by the format's definition although there's
-     * nothing RSA-specific in the output, therefore, we don't have to check if
-     * the cipher suite is based on RSA
-     */
-    if (BIO_puts(bp, "RSA ") <= 0)
-        goto err;
+	// the RSA prefix is required by the format's definition although there's
+	// nothing RSA-specific in the output, therefore, we don't have to check if
+	// the cipher suite is based on RSA
+	if (BIO_puts(bp, "RSA ") <= 0)
+		goto err;
 
-    if (BIO_puts(bp, "Session-ID:") <= 0)
-        goto err;
-    for (i = 0; i < x->session_id_length; i++) {
-        if (BIO_printf(bp, "%02X", x->session_id[i]) <= 0)
-            goto err;
-    }
-    if (BIO_puts(bp, " Master-Key:") <= 0)
-        goto err;
-    for (i = 0; i < (size_t)x->master_key_length; i++) {
-        if (BIO_printf(bp, "%02X", x->master_key[i]) <= 0)
-            goto err;
-    }
-    if (BIO_puts(bp, "\n") <= 0)
-        goto err;
+	if (BIO_puts(bp, "Session-ID:") <= 0)
+		goto err;
+	for (i = 0; i < x->session_id_length; i++) {
+		if (BIO_printf(bp, "%02X", x->session_id[i]) <= 0)
+			goto err;
+	}
+	if (BIO_puts(bp, " Master-Key:") <= 0)
+		goto err;
+	for (i = 0; i < (size_t)x->master_key_length; i++) {
+		if (BIO_printf(bp, "%02X", x->master_key[i]) <= 0)
+			goto err;
+	}
+	if (BIO_puts(bp, "\n") <= 0)
+		goto err;
 
-    return (1);
- err:
-    return (0);
+	return (1);
+err:
+	return (0);
 }
+
+
 #endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
-/*
- * print client random id and master key in NSS keylog format
- * as session ID is not enough.
- */
+
+
+// print client random id and master key in NSS keylog format
+// as session ID is not enough.
 int SSL_SESSION_print_client_random(BIO *bp, const SSL *ssl)
 {
 	const SSL_SESSION *x = SSL_get_session(ssl);
-    size_t i;
+	size_t i;
 
-    if (x == NULL)
-        goto err;
-    if (x->session_id_length == 0 || x->master_key_length == 0)
-        goto err;
+	if (x == NULL)
+		goto err;
+	if (x->session_id_length == 0 || x->master_key_length == 0)
+		goto err;
 
-    /*
-     * the RSA prefix is required by the format's definition although there's
-     * nothing RSA-specific in the output, therefore, we don't have to check if
-     * the cipher suite is based on RSA
-     */
-    if (BIO_puts(bp, "CLIENT_RANDOM ") <= 0)
-        goto err;
+	if (BIO_puts(bp, "CLIENT_RANDOM ") <= 0)
+		goto err;
 
-    for (i = 0; i < sizeof(ssl->s3->client_random); i++) {
-        if (BIO_printf(bp, "%02X", ssl->s3->client_random[i]) <= 0)
-            goto err;
-    }
-    if (BIO_puts(bp, " ") <= 0)
-        goto err;
-    for (i = 0; i < (size_t)x->master_key_length; i++) {
-        if (BIO_printf(bp, "%02X", x->master_key[i]) <= 0)
-            goto err;
-    }
-    if (BIO_puts(bp, "\n") <= 0)
-        goto err;
+	for (i = 0; i < sizeof(ssl->s3->client_random); i++) {
+		if (BIO_printf(bp, "%02X", ssl->s3->client_random[i]) <= 0)
+			goto err;
+	}
+	if (BIO_puts(bp, " ") <= 0)
+		goto err;
+	for (i = 0; i < (size_t)x->master_key_length; i++) {
+		if (BIO_printf(bp, "%02X", x->master_key[i]) <= 0)
+			goto err;
+	}
+	if (BIO_puts(bp, "\n") <= 0)
+		goto err;
 
-    return (1);
- err:
-    return (0);
+	return (1);
+err:
+	return (0);
 }
+
+
 #endif /* TRACE_SESSION_KEY */
 
 class BSecureSocket::Private {
@@ -211,7 +208,7 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 		{
 			unsigned long error2;
 			// Check for extra errors in the error stack...
-			for(;;) {
+			for (;;) {
 				error2 = ERR_get_error();
 				if (error2 == 0)
 					break;
@@ -316,23 +313,25 @@ static void apps_ssl_info_callback(const SSL *s, int where, int ret)
 		str="undefined";
 
 	if (where & SSL_CB_LOOP) {
-		fprintf(stderr,"%s:%s\n", str, SSL_state_string_long(s));
+		fprintf(stderr, "%s:%s\n", str, SSL_state_string_long(s));
 	} else if (where & SSL_CB_ALERT) {
 		str = (where & SSL_CB_READ) ? "read" : "write";
-		fprintf(stderr,"SSL3 alert %s:%s:%s\n",
+		fprintf(stderr, "SSL3 alert %s:%s:%s\n",
 				str,
 				SSL_alert_type_string_long(ret),
 				SSL_alert_desc_string_long(ret));
 	} else if (where & SSL_CB_EXIT) {
 		if (ret == 0)
-			fprintf(stderr,"%s:failed in %s\n",
-					str,SSL_state_string_long(s));
+			fprintf(stderr, "%s:failed in %s\n",
+					str, SSL_state_string_long(s));
 		else if (ret < 0) {
-			fprintf(stderr,"%s:error in %s\n",
-					str,SSL_state_string_long(s));
+			fprintf(stderr, "%s:error in %s\n",
+					str, SSL_state_string_long(s));
 		}
 	}
 }
+
+
 #endif
 
 
@@ -342,6 +341,8 @@ BSecureSocket::Private::_CreateContext()
 	// We want SSL to report errors in human readable format.
 	SSL_load_error_strings();
 
+	// "SSLv23" means "any SSL or TLS version". We disable SSL v2 and v3 below
+	// to keep only TLS 1.0 and above.
 	sContext = SSL_CTX_new(SSLv23_method());
 
 #if TRACE_SSL
@@ -375,15 +376,17 @@ BSecureSocket::Private::_CreateContext()
 	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
 	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
 
-	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to validate certificate
-	// chains. This makes the validation stop as soon as a recognized certificate is found in the
-	// chain, instead of validating the whole chain, then seeing if the root certificate is known.
+	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to
+	// validate certificate chains. This makes the validation stop as soon as a
+	// recognized certificate is found in the chain, instead of validating the
+	// whole chain, then seeing if the root certificate is known.
 #ifdef X509_V_FLAG_TRUSTED_FIRST
 	X509_VERIFY_PARAM* verifyParam = X509_VERIFY_PARAM_new();
 	X509_VERIFY_PARAM_set_flags(verifyParam, X509_V_FLAG_TRUSTED_FIRST);
 	SSL_CTX_set1_param(sContext, verifyParam);
 
-	// TODO we need to free this after freeing the SSL context (which we currently never do)
+	// TODO we need to free this after freeing the SSL context (which we
+	// currently never do)
 	// X509_VERIFY_PARAM_free(verifyParam);
 #endif
 
