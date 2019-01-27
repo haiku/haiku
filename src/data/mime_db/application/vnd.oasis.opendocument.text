@@ -3,9 +3,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/vnd.oasis.opendocument.text";
 
-resource(2, "META:SNIFF_RULE") "0.50 (\"PK\")
-	[0:512] ( -i \"text-web\" | -i \"text-master\" | -i \"text-template\" |
-	\"oasis.opendocument.text\")";
+resource(2, "META:SNIFF_RULE") "0.50 (\"PK\") [0:512]( -i \"text-web\" | -i \"text-master\" | -i \"text-template\" | \"oasis.opendocument.text\")";
 
 resource(3, "META:S:DESC") #'MSDC' "OpenDocument Text";
 
