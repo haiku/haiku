@@ -68,8 +68,8 @@ private:
 			status_t			_ProtocolLoop();
 			status_t			_MakeRequest();
 
-			void				_SendRequest();
-			void				_SendHeaders();
+			BString				_SerializeRequest();
+			BString				_SerializeHeaders();
 			void				_SendPostData();
 
 			void				_ParseStatus();

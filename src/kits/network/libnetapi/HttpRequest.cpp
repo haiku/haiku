@@ -551,9 +551,11 @@ BHttpRequest::_MakeRequest()
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
 		"Connection opened, sending request.");
 
-	_SendRequest();
-	_SendHeaders();
-	fSocket->Write("\r\n", 2);
+	BString requestHeaders;
+	requestHeaders.Append(_SerializeRequest());
+	requestHeaders.Append(_SerializeHeaders());
+	requestHeaders.Append("\r\n");
+	fSocket->Write(requestHeaders.String(), requestHeaders.Length());
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Request sent.");
 
 	_SendPostData();
@@ -835,8 +837,8 @@ BHttpRequest::_ParseHeaders()
 }
 
 
-void
-BHttpRequest::_SendRequest()
+BString
+BHttpRequest::_SerializeRequest()
 {
 	BString request(fRequestMethod);
 	request << ' ';
@@ -868,12 +870,14 @@ BHttpRequest::_SendRequest()
 			break;
 	}
 
-	fSocket->Write(request.String(), request.Length());
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", request.String());
+
+	return request;
 }
 
 
-void
-BHttpRequest::_SendHeaders()
+BString
+BHttpRequest::_SerializeHeaders()
 {
 	BHttpHeaders outputHeaders;
 
@@ -996,7 +1000,7 @@ BHttpRequest::_SendHeaders()
 		_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", header);
 	}
 
-	fSocket->Write(headerData.String(), headerData.Length());
+	return headerData;
 }
 
 
