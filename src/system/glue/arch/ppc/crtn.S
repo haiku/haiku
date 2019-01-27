@@ -10,10 +10,8 @@
 
 .section .init
 	// the image ID and program args are still on the stack
-	bl	__haiku_init_after
 	blr
 
 .section .fini
 	// the image ID and program args are still on the stack
-	bl	__haiku_term_after
 	blr

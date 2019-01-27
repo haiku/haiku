@@ -10,14 +10,12 @@
 
 .section .init
 	// the image ID is still on the stack
-	call	__haiku_init_after
 	movl	%ebp, %esp
 	popl	%ebp
 	ret
 
 .section .fini
 	// the image ID is still on the stack
-	call	__haiku_term_after
 	movl	%ebp, %esp
 	popl	%ebp
 	ret

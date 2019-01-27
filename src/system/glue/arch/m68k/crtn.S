@@ -10,10 +10,8 @@
 
 .section .init
 	// the image ID and program args are still on the stack
-	jsr	__haiku_init_after
 	rts
 
 .section .fini
 	// the image ID and program args are still on the stack
-	jsr	__haiku_term_after
 	rts

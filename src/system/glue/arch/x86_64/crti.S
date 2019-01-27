@@ -15,7 +15,6 @@
  *	stacked together like this:
  *
  *	crti.S		entry point
- *				call to _init_before/_term_before
  *	crtbegin.S	GCC specific: constructors/destructors are called, ...
  *	crtend.S
  *	crtn.S		call to _init_after/_term_after
@@ -28,18 +27,18 @@ FUNCTION(_init):
 	push	%rbp
 	movq	%rsp, %rbp
 
-	// Preserve image ID for call to __haiku_init_after.
+	// Preserve image ID.
 	push	%rdi
 	sub		$0x8, %rsp
 
-	call	__haiku_init_before
 	// crtbegin.o stuff comes here
 
 .section .fini
 FUNCTION(_fini):
 	push	%rbp
 	movq	%rsp, %rbp
+
 	push	%rdi
 	sub		$0x8, %rsp
-	call	__haiku_term_before
+
 	// crtend.o stuff comes here

@@ -42,6 +42,7 @@ static const char* const kLockName = "runtime loader";
 
 
 typedef void (*init_term_function)(image_id);
+typedef void (*initfini_array_function)();
 
 bool gProgramLoaded = false;
 image_t* gProgramImage;
@@ -260,7 +261,14 @@ init_dependencies(image_t *image, bool initHead)
 		if (image->preinit_array) {
 			uint count_preinit = image->preinit_array_len / sizeof(addr_t);
 			for (uint j = 0; j < count_preinit; j++)
-				((init_term_function)image->preinit_array[j])(image->id);
+				((initfini_array_function)image->preinit_array[j])();
+		}
+
+		init_term_function before;
+		if (find_symbol(image,
+				SymbolLookupInfo(B_INIT_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
+				(void**)&before) == B_OK) {
+			before(image->id);
 		}
 
 		if (image->init_routine != 0)
@@ -269,12 +277,19 @@ init_dependencies(image_t *image, bool initHead)
 		if (image->init_array) {
 			uint count_init = image->init_array_len / sizeof(addr_t);
 			for (uint j = 0; j < count_init; j++)
-				((init_term_function)image->init_array[j])(image->id);
+				((initfini_array_function)image->init_array[j])();
+		}
+
+		init_term_function after;
+		if (find_symbol(image,
+				SymbolLookupInfo(B_INIT_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
+				(void**)&after) == B_OK) {
+			after(image->id);
 		}
 
 		image_event(image, IMAGE_EVENT_INITIALIZED);
 	}
-	TRACE(("%ld:  init done.\n", find_thread(NULL)));
+	TRACE(("%ld: init done.\n", find_thread(NULL)));
 
 	free(initList);
 }
@@ -645,14 +660,28 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 			image_event(image, IMAGE_EVENT_UNINITIALIZING);
 
+			init_term_function before;
+			if (find_symbol(image,
+					SymbolLookupInfo(B_TERM_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
+					(void**)&before) == B_OK) {
+				before(image->id);
+			}
+
 			if (image->term_array) {
 				uint count_term = image->term_array_len / sizeof(addr_t);
 				for (uint i = count_term; i-- > 0;)
-					((init_term_function)image->term_array[i])(image->id);
+					((initfini_array_function)image->term_array[i])();
 			}
 
 			if (image->term_routine)
 				((init_term_function)image->term_routine)(image->id);
+
+			init_term_function after;
+			if (find_symbol(image,
+					SymbolLookupInfo(B_TERM_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT),
+					(void**)&after) == B_OK) {
+				after(image->id);
+			}
 
 			TLSBlockTemplates::Get().Unregister(image->dso_tls_id);
 
@@ -810,6 +839,15 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 	if (imageID < B_OK)
 		return B_BAD_IMAGE_ID;
 	if (symbolName == NULL)
+		return B_BAD_VALUE;
+
+	// Previously, these functions were called in __haiku_init_before
+	// and __haiku_init_after. Now we call them inside runtime_loader,
+	// so we prevent applications from fetching them.
+	if (strcmp(symbolName, B_INIT_BEFORE_FUNCTION_NAME) == 0
+		|| strcmp(symbolName, B_INIT_AFTER_FUNCTION_NAME) == 0
+		|| strcmp(symbolName, B_TERM_BEFORE_FUNCTION_NAME) == 0
+		|| strcmp(symbolName, B_TERM_AFTER_FUNCTION_NAME) == 0)
 		return B_BAD_VALUE;
 
 	rld_lock();
