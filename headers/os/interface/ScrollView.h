@@ -113,7 +113,8 @@ private:
 									bool vertical, border_style border,
 									uint32 borders);
 	static	float				_BorderSize(border_style border);
-	static	int32				_ModifyFlags(int32 flags, border_style border);
+	static	uint32				_ModifyFlags(uint32 flags, BView* target,
+									border_style border);
 	static	void				_InsetBorders(BRect& frame, border_style border,
 									uint32 borders, bool expand = false);
 private:

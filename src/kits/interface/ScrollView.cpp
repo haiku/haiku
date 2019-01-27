@@ -31,7 +31,7 @@ BScrollView::BScrollView(const char* name, BView* target, uint32 resizingMode,
 	:
 	BView(_ComputeFrame(target, horizontal, vertical, border,
 		BControlLook::B_ALL_BORDERS), name, resizingMode,
-		_ModifyFlags(flags, border)),
+		_ModifyFlags(flags, target, border)),
 	fTarget(target),
 	fBorder(border)
 {
@@ -42,7 +42,7 @@ BScrollView::BScrollView(const char* name, BView* target, uint32 resizingMode,
 BScrollView::BScrollView(const char* name, BView* target, uint32 flags,
 	bool horizontal, bool vertical, border_style border)
 	:
-	BView(name, _ModifyFlags(flags | B_SUPPORTS_LAYOUT, border)),
+	BView(name, _ModifyFlags(flags, target, border)),
 	fTarget(target),
 	fBorder(border)
 {
@@ -273,8 +273,8 @@ BScrollView::FrameResized(float newWidth, float newHeight)
 
 	const BRect bounds = Bounds();
 
-	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
-		BSize size = fTarget != NULL ? fTarget->PreferredSize() : BSize();
+	if (fTarget != NULL && (fTarget->Flags() & B_SUPPORTS_LAYOUT) != 0) {
+		BSize size = fTarget->PreferredSize();
 		if (fHorizontalScrollBar != NULL) {
 			float delta = size.Width() - bounds.Width(),
 				proportion = bounds.Width() / size.Width();
@@ -472,7 +472,7 @@ BScrollView::SetBorder(border_style border)
 
 	if ((Flags() & B_SUPPORTS_LAYOUT) != 0) {
 		fBorder = border;
-		SetFlags(_ModifyFlags(Flags(), border));
+		SetFlags(_ModifyFlags(Flags(), fTarget, border));
 
 		DoLayout();
 		Invalidate();
@@ -520,7 +520,7 @@ BScrollView::SetBorder(border_style border)
 		fVerticalScrollBar->ResizeBy(0, resize + verticalGap - change);
 	}
 
-	SetFlags(_ModifyFlags(Flags(), border));
+	SetFlags(_ModifyFlags(Flags(), fTarget, border));
 }
 
 
@@ -621,6 +621,8 @@ BScrollView::SetTarget(BView* target)
 			// be added top most in the list (which is important
 			// for unarchiving)
 	}
+
+	SetFlags(_ModifyFlags(Flags(), fTarget, fBorder));
 }
 
 
@@ -952,10 +954,10 @@ BScrollView::_BorderSize(border_style border)
 /*!	This method changes the "flags" argument as passed on to
 	the BView constructor.
 */
-/*static*/ int32
-BScrollView::_ModifyFlags(int32 flags, border_style border)
+/*static*/ uint32
+BScrollView::_ModifyFlags(uint32 flags, BView* target, border_style border)
 {
-	if ((flags & B_SUPPORTS_LAYOUT) != 0)
+	if (target != NULL && (target->Flags() & B_SUPPORTS_LAYOUT) != 0)
 		flags |= B_FRAME_EVENTS;
 
 	// We either need B_FULL_UPDATE_ON_RESIZE or B_FRAME_EVENTS if we have
