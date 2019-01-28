@@ -89,8 +89,8 @@ NetworkStatus::ArgvReceived(int32 argc, char** argv)
 		|| strcmp(argv[1], "-h") == 0) {
 		const char* str = B_TRANSLATE("NetworkStatus options:\n"
 			"\t--deskbar\tautomatically add replicant to Deskbar\n"
-			"\t--help\t\tprint this info and exit\n");
-		printf(str);
+			"\t--help\t\tprint this info and exit");
+		puts(str);
 		fQuitImmediately = true;
 		return;
 	}
@@ -142,7 +142,8 @@ NetworkStatus::ReadyToRun()
 		}
 #endif
 		if (!isDeskbarRunning) {
-			printf("Deskbar is not running, giving up.\n");
+			const char* str = B_TRANSLATE("Deskbar is not running, giving up.");
+			puts(str);
 			Quit();
 			return;
 		}
