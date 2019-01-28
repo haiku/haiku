@@ -576,7 +576,7 @@ CopyEngine::_WriteThread()
 	}
 
 	double megaBytes = (double)fBytesWritten / (1024 * 1024);
-	double seconds = (fTimeWritten / 1000000);
+	double seconds = (double)fTimeWritten / 1000000;
 	if (seconds > 0) {
 		printf("%.2f MB written (%.2f MB/s)\n", megaBytes,
 			megaBytes / seconds);
