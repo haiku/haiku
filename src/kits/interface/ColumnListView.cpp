@@ -565,8 +565,8 @@ BRow::ValidateField(const BField* field, int32 logicalFieldIndex) const
 	if (column == NULL) {
 		BString dbmessage("\n\n\tThe parent BColumnListView does not have "
 			"\n\ta BColumn at the logical field index ");
-		dbmessage << logicalFieldIndex << ".\n\n";
-		printf(dbmessage.String());
+		dbmessage << logicalFieldIndex << ".\n";
+		puts(dbmessage.String());
 	} else {
 		if (!column->AcceptsField(field)) {
 			BString dbmessage("\n\n\tThe BColumn of type ");
