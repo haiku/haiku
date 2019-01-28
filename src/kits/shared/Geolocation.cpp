@@ -131,8 +131,11 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 
 	double lat, lon;
 	result = location.FindDouble("lat", &lat);
-	if (result == B_OK)
-		result = location.FindDouble("lng", &lon);
+	if (result != B_OK)
+		return result;
+	result = location.FindDouble("lng", &lon);
+	if (result != B_OK)
+		return result;
 
 	latitude = lat;
 	longitude = lon;
