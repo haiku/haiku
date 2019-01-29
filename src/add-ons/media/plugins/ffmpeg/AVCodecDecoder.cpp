@@ -1456,11 +1456,15 @@ status_t
 AVCodecDecoder::_CopyChunkToChunkBufferAndAddPadding(const void* chunk,
 	size_t chunkSize)
 {
-	fChunkBuffer = static_cast<uint8_t*>(realloc(fChunkBuffer,
+	uint8_t* tmpBuffer = static_cast<uint8_t*>(realloc(fChunkBuffer,
 		chunkSize + AV_INPUT_BUFFER_PADDING_SIZE));
-	if (fChunkBuffer == NULL) {
+	if (tmpBuffer == NULL) {
+		free(fChunkBuffer);
+		fChunkBuffer = NULL;
 		fChunkBufferSize = 0;
 		return B_NO_MEMORY;
+	} else {
+		fChunkBuffer = tmpBuffer;
 	}
 
 	memcpy(fChunkBuffer, chunk, chunkSize);
