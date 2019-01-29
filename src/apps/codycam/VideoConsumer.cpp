@@ -95,9 +95,9 @@ VideoConsumer::~VideoConsumer()
 	Quit();
 
 	if (fWindow) {
-		printf(B_TRANSLATE("Locking the window\n"));
+		puts(B_TRANSLATE("Locking the window"));
 		if (fWindow->Lock()) {
-			printf(B_TRANSLATE("Closing the window\n"));
+			puts(B_TRANSLATE("Closing the window"));
 			fWindow->Close();
 			fWindow = 0;
 		}
