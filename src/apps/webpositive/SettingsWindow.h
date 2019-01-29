@@ -36,8 +36,6 @@ private:
 			BView*				_CreateGeneralPage(float spacing);
 			BView*				_CreateFontsPage(float spacing);
 			BView*				_CreateProxyPage(float spacing);
-			void				_BuildSizesMenu(BMenu* menu,
-									uint32 messageWhat);
 			void				_SetupFontSelectionView(
 									FontSelectionView* view,
 									BMessage* message);
@@ -53,9 +51,6 @@ private:
 
 			uint32				_NewWindowPolicy() const;
 			uint32				_NewTabPolicy() const;
-
-			void				_SetSizesMenuValue(BMenu* menu, int32 value);
-			int32				_SizesMenuValue(BMenu* menu) const;
 
 			BFont				_FindDefaultSerifFont() const;
 
@@ -102,8 +97,8 @@ private:
 			BButton*			fRevertButton;
 			BButton*			fChooseButton;
 
-			BMenuField*			fStandardSizesMenu;
-			BMenuField*			fFixedSizesMenu;
+			BSpinner*			fStandardSizesSpinner;
+			BSpinner*			fFixedSizesSpinner;
 
 			BFilePanel*			fOpenFilePanel;
 };
