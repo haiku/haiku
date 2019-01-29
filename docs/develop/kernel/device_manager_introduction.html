@@ -240,9 +240,16 @@ omitted.</p>
 the ISA bus. Since it doesn't know anything about its children, it does not
 publish any child nodes, instead, it will just specify the
 B_FIND_MULTIPLE_CHILDREN and B_FIND_CHILD_ON_DEMAND flags for its device node.
-Since there are no additional informations about this bus, the device manager
+Since there is no additional information about this bus, the device manager
 will assume a simple bus, and will try to find drivers on demand only.</p>
 
+<h2>The generic bus</h2>
+
+Some devices are not tied to a specific bus. This is the case for all drivers
+that do not relate to a physical device: /dev/null, /dev/zero, /dev/random,
+etc.
+
+A "generic" bus has been added, and these drivers can attach to it.
 
 <h2>6. Open Issues</h2>
 
@@ -253,11 +260,6 @@ parts just haven't been written yet.
 <h4>6.1. generic/simple busses</h4>
 
 <h4>6.2. Unpublishing</h4>
-
-<h4>6.3. listdev functionality</h4>
-
-The "listdev" command has been removed from the image, and it is currently not
-functional anymore.
 
 <h4>6.4. Versioning</h4>
 
