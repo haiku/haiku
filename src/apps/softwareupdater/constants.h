@@ -1,9 +1,10 @@
 /*
- * Copyright 2017, Haiku, Inc. All Rights Reserved.
+ * Copyright 2017-2019, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Brian Hill <supernova@tycho.email>
+ *		Jacob Secunda
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -54,6 +55,8 @@ static const uint32 kMsgFinalQuit = 'iFIN';
 static const uint32 kMsgMoreDetailsToggle = 'iDTO';
 static const uint32 kMsgWindowFrameChanged = 'iWFC';
 static const uint32 kMsgSetZoomLimits = 'iSZL';
+static const uint32 kMsgReboot = 'iREB';
+static const uint32 kMsgShowReboot = 'iSRB';
 
 // Message data keys
 #define kKeyHeader "key_header"

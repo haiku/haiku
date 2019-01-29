@@ -1,10 +1,11 @@
 /*
- * Copyright 2016-2017 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license
  *
  * Authors:
  *		Alexander von Gluck IV <kallisti5@unixzen.com>
  *		Brian Hill <supernova@tycho.email>
+ *		Jacob Secunda
  */
 #ifndef _SOFTWARE_UPDATER_WINDOW_H
 #define _SOFTWARE_UPDATER_WINDOW_H
@@ -50,7 +51,7 @@ public:
 
 private:
 			BBitmap*			_GetPackageIcon(float listItemHeight);
-			
+
 			BString				fLabel;
 			BString				fItemText;
 			BFont				fRegularFont;
@@ -84,7 +85,7 @@ public:
 									{ return fMoreDetailsWidth; };
 	float						LessDetailsWidth()
 									{ return fLessDetailsWidth; };
-	
+
 private:
 			void				_DrawBar(BPoint where, BView* view,
 									icon_size which);
@@ -172,13 +173,14 @@ private:
 			uint32				_GetState();
 			status_t			_WriteSettings();
 			status_t			_ReadSettings(BMessage& settings);
-			
+
 			BRect				fDefaultRect;
 			StripeView*			fStripeView;
 			BStringView*		fHeaderView;
 			BStringView*		fDetailView;
 			BButton*			fUpdateButton;
 			BButton*			fCancelButton;
+			BButton*			fRebootButton;
 			BStatusBar*			fStatusBar;
 			PackageListView*	fListView;
 			BScrollView*		fScrollView;
@@ -188,8 +190,9 @@ private:
 			BLayoutItem*		fProgressLayoutItem;
 			BLayoutItem*		fCancelButtonLayoutItem;
 			BLayoutItem*		fUpdateButtonLayoutItem;
+			BLayoutItem*		fRebootButtonLayoutItem;
 			BLayoutItem*		fDetailsCheckboxLayoutItem;
-			
+
 			uint32				fCurrentState;
 			sem_id				fWaitingSem;
 			bool				fWaitingForButton;

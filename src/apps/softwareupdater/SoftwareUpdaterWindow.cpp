@@ -1,10 +1,11 @@
 /*
- * Copyright 2016-2017 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license
  *
  * Authors:
  *		Alexander von Gluck IV <kallisti5@unixzen.com>
  *		Brian Hill <supernova@tycho.email>
+ *		Jacob Secunda
  */
 
 
@@ -20,6 +21,7 @@
 #include <LayoutUtils.h>
 #include <Message.h>
 #include <Roster.h>
+#include <RosterPrivate.h>
 #include <Screen.h>
 #include <String.h>
 
@@ -60,6 +62,8 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fUpdateButton->MakeDefault(true);
 	fCancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(kMsgCancel));
+	fRebootButton = new BButton(B_TRANSLATE("Reboot"),
+		new BMessage(kMsgReboot));
 
 	fHeaderView = new BStringView("header",
 		B_TRANSLATE("Checking for updates"), B_WILL_DRAW);
@@ -104,6 +108,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 				.AddGlue()
 				.Add(fCancelButton)
 				.Add(fUpdateButton)
+				.Add(fRebootButton)
 			.End()
 		.End()
 	.End();
@@ -113,6 +118,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fPackagesLayoutItem = layout_item_for(fScrollView);
 	fCancelButtonLayoutItem = layout_item_for(fCancelButton);
 	fUpdateButtonLayoutItem = layout_item_for(fUpdateButton);
+	fRebootButtonLayoutItem = layout_item_for(fRebootButton);
 	fDetailsCheckboxLayoutItem = layout_item_for(fDetailsCheckbox);
 
 	_SetState(STATE_DISPLAY_STATUS);
@@ -304,6 +310,33 @@ SoftwareUpdaterWindow::MessageReceived(BMessage* message)
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(&fCancelAlertResponse);
+			break;
+		}
+
+		case kMsgShowReboot:
+		{
+			fRebootButtonLayoutItem->SetVisible(true);
+			fRebootButton->SetLabel(B_TRANSLATE_COMMENT("Reboot",
+				"Button label"));
+			fRebootButton->MakeDefault(true);
+			break;
+		}
+
+		case kMsgReboot:
+		{
+			if (_GetState() != STATE_FINAL_MESSAGE)
+				break;
+
+			BRoster roster;
+			BRoster::Private rosterPrivate(roster);
+			status_t error = rosterPrivate.ShutDown(true, true, false);
+			if (error != B_OK) {
+				BAlert* alert = new BAlert("reboot request", B_TRANSLATE(
+					"For some reason, we could not reboot your computer."),
+					B_TRANSLATE("Ok"), NULL, NULL,
+					B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				alert->Go();
+			}
 			break;
 		}
 
@@ -567,6 +600,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 		fPackagesLayoutItem->SetVisible(false);
 		fDetailsCheckboxLayoutItem->SetVisible(false);
 		fCancelButtonLayoutItem->SetVisible(false);
+		fRebootButtonLayoutItem->SetVisible(false);
 	}
 	fCurrentState = state;
 
@@ -655,7 +689,7 @@ SoftwareUpdaterWindow::_SetState(uint32 state)
 	if (fCurrentState == STATE_FINAL_MESSAGE) {
 		fCancelButtonLayoutItem->SetVisible(true);
  		fCancelButton->SetLabel(B_TRANSLATE_COMMENT("Quit", "Button label"));
- 		fCancelButton->MakeDefault(true);
+		fCancelButton->MakeDefault(true);
 	}
 
 	Unlock();

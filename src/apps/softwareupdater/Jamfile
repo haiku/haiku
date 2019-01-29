@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps softwareupdater ;
 
-UsePrivateHeaders interface shared package ;
+UsePrivateHeaders app interface shared package ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 
