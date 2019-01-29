@@ -240,9 +240,9 @@ GetMinimumViewWidth()
 void
 Usage()
 {
-	printf(B_TRANSLATE("Usage: Pulse [--mini] [-w width] [--width=width]\n"
-	       "\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n"
-	       "\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n"));
+	puts(B_TRANSLATE("Usage: Pulse [--mini] [-w width] [--width=width]\n"
+		"\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n"
+		"\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]"));
 	exit(0);
 }
 
