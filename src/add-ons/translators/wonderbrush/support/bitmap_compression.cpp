@@ -36,11 +36,17 @@ compress_bitmap_zlib(const BBitmap* bitmap, void** buffer, unsigned* size)
 								srcLength,
 								3);
 			if (ret == Z_OK) {
-//printf("zlib compressed %ld bytes bitmap into %d bytes (%f%%)\n", srcLength, *size, ((float)*size / (float)srcLength) * 100.0);
-				if ((unsigned)ceilf(srcLength * 1.01) + 12 != *size)
-					*buffer = realloc(*buffer, *size);
-				result = true;
-			} else {
+// printf("zlib compressed %ld bytes bitmap into %d bytes (%f%%)\n",
+//	srcLength, *size, ((float)*size / (float)srcLength) * 100.0);
+				if ((unsigned)ceilf(srcLength * 1.01) + 12 != *size) {
+					void* tmpBuffer = realloc(*buffer, *size);
+					if (tmpBuffer) {
+						*buffer = tmpBuffer;
+						result = true;
+					}
+				}
+			}
+			if (ret != Z_OK || !result) {
 				// error compressing
 				free(*buffer);
 				*buffer = NULL;
