@@ -345,7 +345,10 @@ BMidiLocalConsumer::EventThread()
 			break;  // error reading port
 
 		if (msg_size > buf_size) {
-			buffer = (uint8*) realloc(buffer, msg_size);
+			uint8* tmp_buffer = (uint8*) realloc(buffer, msg_size);
+			if (tmp_buffer == NULL)
+				break; // error in realloc()
+			buffer = tmp_buffer;
 			buf_size = msg_size;
 		}
 
