@@ -598,30 +598,73 @@ NetServer::_ConfigureInterface(BMessage& message)
 status_t
 NetServer::_ConfigureResolver(BMessage& resolverConfiguration)
 {
-	// TODO: resolv.conf should be parsed, all information should be
-	// maintained and it should be distinguished between user entered
-	// and auto-generated parts of the file, with this method only re-writing
-	// the auto-generated parts of course.
+	// Store resolver settings in resolv.conf file, while maintaining any
+	// user specified settings already present.
 
 	BPath path;
 	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path) != B_OK
 		|| path.Append("network/resolv.conf") != B_OK)
 		return B_ERROR;
 
-	FILE* file = fopen(path.Path(), "w");
-	if (file != NULL) {
-		const char* nameserver;
-		for (int32 i = 0; resolverConfiguration.FindString("nameserver", i,
-				&nameserver) == B_OK; i++) {
-			fprintf(file, "nameserver %s\n", nameserver);
+	FILE* file = fopen(path.Path(), "r+");
+	// open existing resolv.conf if possible
+	if (file == NULL) {
+		// no existing resolv.conf, create a new one
+		file = fopen(path.Path(), "w");
+		if (file == NULL) {
+			fprintf(stderr, "Could not open resolv.conf: %s\n",
+				strerror(errno));
+			return errno;
+		}
+	} else {
+		// An existing resolv.conf was found, parse it for user settings
+		const char* staticDNS = "# Static DNS Only";
+		size_t sizeStaticDNS = strlen(staticDNS);
+		const char* dynamicDNS = "# Dynamic DNS entries";
+		size_t sizeDynamicDNS = strlen(dynamicDNS);
+		char resolveConfBuffer[80];
+		size_t sizeResolveConfBuffer = sizeof(resolveConfBuffer);
+
+		while (fgets(resolveConfBuffer, sizeResolveConfBuffer, file)) {
+			if (strncmp(resolveConfBuffer, staticDNS, sizeStaticDNS) == 0) {
+				// If DNS is set to static only, don't modify
+				fclose(file);
+				return B_OK;
+			} else if (strncmp(resolveConfBuffer, dynamicDNS, sizeDynamicDNS)
+					== 0) {
+				// Overwrite existing dynamic entries
+				break;
+			}
 		}
 
-		const char* domain;
-		if (resolverConfiguration.FindString("domain", &domain) == B_OK)
-			fprintf(file, "domain %s\n", domain);
-
-		fclose(file);
+		if (feof(file) != 0) {
+			// No static entries found, close and re-open as new file
+			fclose(file);
+			file = fopen(path.Path(), "w");
+			if (file == NULL) {
+				fprintf(stderr, "Could not open resolv.conf: %s\n",
+					strerror(errno));
+				return errno;
+			}
+		}
 	}
+
+	fprintf(file, "# Added automatically by DHCP\n");
+
+	const char* nameserver;
+	for (int32 i = 0; resolverConfiguration.FindString("nameserver", i,
+			&nameserver) == B_OK; i++) {
+		fprintf(file, "nameserver %s\n", nameserver);
+	}
+
+	const char* domain;
+	if (resolverConfiguration.FindString("domain", &domain) == B_OK)
+		fprintf(file, "domain %s\n", domain);
+
+	fprintf(file, "# End of automatic DHCP additions\n");
+
+	fclose(file);
+
 	return B_OK;
 }
 
