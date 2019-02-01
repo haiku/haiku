@@ -666,10 +666,12 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		TRACE_ERROR("Invalid Endpoint");
 		return B_BAD_VALUE;
 	}
-	setupDescriptor->transfer = transfer;
-	transfer->InitKernelAccess();
-	_LinkDescriptorForPipe(setupDescriptor, endpoint);
+	status_t status = transfer->InitKernelAccess();
+	if (status != B_OK)
+		return status;
 
+	setupDescriptor->transfer = transfer;
+	_LinkDescriptorForPipe(setupDescriptor, endpoint);
 	TRACE("SubmitControlRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
@@ -694,6 +696,10 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	if (id >= XHCI_MAX_ENDPOINTS)
 		return B_BAD_VALUE;
 	bool directionIn = (pipe->Direction() == Pipe::In);
+
+	status_t status = transfer->InitKernelAccess();
+	if (status != B_OK)
+		return status;
 
 	int32 trbCount = 0;
 	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength(), trbCount);
@@ -740,18 +746,14 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	if (!directionIn) {
 		TRACE("copying out iov count %ld\n", transfer->VectorCount());
+		transfer->PrepareKernelAccess();
 		WriteDescriptorChain(descriptor, transfer->Vector(),
 			transfer->VectorCount());
 	}
-	/*	memcpy(descriptor->buffer_log[index],
-				(uint8 *)transfer->Vector()[index].iov_base, transfer->VectorLength());
-		}*/
 
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	descriptor->transfer = transfer;
-	transfer->InitKernelAccess();
 	_LinkDescriptorForPipe(descriptor, endpoint);
-
 	TRACE("SubmitNormalRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
