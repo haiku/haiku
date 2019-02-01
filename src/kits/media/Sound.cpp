@@ -143,7 +143,7 @@ BSound::Duration() const
 		media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	int64 frameCount = Size() / (fFormat.channel_count * bytesPerSample);
 
-	return ceil((1000000LL * frameCount) / frameRate);
+	return (bigtime_t)ceil((1000000LL * frameCount) / frameRate);
 }
 
 
@@ -174,7 +174,7 @@ BSound::Size() const
 }
 
 
-bool 
+bool
 BSound::GetDataAt(off_t offset, void* intoBuffer, size_t bufferSize,
 	size_t* outUsed)
 {
