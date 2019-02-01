@@ -268,9 +268,14 @@ WIndex::_BlockCheck(void)
 	if (fEntries < fMaxEntries)
 		return B_OK;
 	fBlocks = fEntries / fEntriesPerBlock + 1;
-	fEntryList = (uint8 *)realloc(fEntryList, fBlockSize * fBlocks);
-	if (!fEntryList)
+	uint8* tmpEntryList = (uint8 *)realloc(fEntryList, fBlockSize * fBlocks);
+	if (!tmpEntryList) {
+		free(fEntryList);
+		fEntryList = NULL;
 		return B_ERROR;
+	} else {
+		fEntryList = tmpEntryList;
+	}
 	return B_OK;
 }
 
