@@ -2977,6 +2977,47 @@ user_unblock_thread(thread_id threadID, status_t status)
 }
 
 
+static bool
+thread_check_permissions(const Thread* currentThread, const Thread* thread,
+	bool kernel)
+{
+	if (kernel)
+		return true;
+
+	if (thread->team->id == team_get_kernel_team_id())
+		return false;
+
+	if (thread->team != currentThread->team
+			&& currentThread->team->effective_uid != 0
+			&& thread->team->real_uid != currentThread->team->real_uid)
+		return false;
+
+	return true;
+}
+
+
+static status_t
+thread_send_signal(thread_id id, uint32 number, int32 signalCode,
+	int32 errorCode, bool kernel)
+{
+	if (id <= 0)
+		return B_BAD_VALUE;
+
+	Thread* currentThread = thread_get_current_thread();
+	Thread* thread = Thread::Get(id);
+	if (thread == NULL)
+		return B_BAD_THREAD_ID;
+	BReference<Thread> threadReference(thread, true);
+
+	// check whether sending the signal is allowed
+	if (!thread_check_permissions(currentThread, thread, kernel))
+		return B_NOT_ALLOWED;
+
+	Signal signal(number, signalCode, errorCode, currentThread->team->id);
+	return send_signal_to_thread(thread, signal, 0);
+}
+
+
 //	#pragma mark - public kernel API
 
 
@@ -3014,16 +3055,17 @@ exit_thread(status_t returnValue)
 }
 
 
+static status_t
+thread_kill_thread(thread_id id, bool kernel)
+{
+	return thread_send_signal(id, SIGKILLTHR, SI_USER, B_OK, kernel);
+}
+
+
 status_t
 kill_thread(thread_id id)
 {
-	if (id <= 0)
-		return B_BAD_VALUE;
-
-	Thread* currentThread = thread_get_current_thread();
-
-	Signal signal(SIGKILLTHR, SI_USER, B_OK, currentThread->team->id);
-	return send_signal_to_thread_id(id, signal, 0);
+	return thread_kill_thread(id, true);
 }
 
 
@@ -3203,8 +3245,8 @@ rename_thread(thread_id id, const char* name)
 }
 
 
-status_t
-set_thread_priority(thread_id id, int32 priority)
+static status_t
+thread_set_thread_priority(thread_id id, int32 priority, bool kernel)
 {
 	// make sure the passed in priority is within bounds
 	if (priority > THREAD_MAX_SET_PRIORITY)
@@ -3220,10 +3262,18 @@ set_thread_priority(thread_id id, int32 priority)
 	ThreadLocker threadLocker(thread, true);
 
 	// check whether the change is allowed
-	if (thread_is_idle_thread(thread))
+	if (thread_is_idle_thread(thread) || !thread_check_permissions(
+			thread_get_current_thread(), thread, kernel))
 		return B_NOT_ALLOWED;
 
 	return scheduler_set_thread_priority(thread, priority);
+}
+
+
+status_t
+set_thread_priority(thread_id id, int32 priority)
+{
+	return thread_set_thread_priority(id, priority, true);
 }
 
 
@@ -3259,33 +3309,34 @@ wait_for_thread(thread_id thread, status_t *_returnCode)
 }
 
 
+static status_t
+thread_suspend_thread(thread_id id, bool kernel)
+{
+	return thread_send_signal(id, SIGSTOP, SI_USER, B_OK, kernel);
+}
+
+
 status_t
 suspend_thread(thread_id id)
 {
-	if (id <= 0)
-		return B_BAD_VALUE;
+	return thread_suspend_thread(id, true);
+}
 
-	Thread* currentThread = thread_get_current_thread();
 
-	Signal signal(SIGSTOP, SI_USER, B_OK, currentThread->team->id);
-	return send_signal_to_thread_id(id, signal, 0);
+static status_t
+thread_resume_thread(thread_id id, bool kernel)
+{
+	// Using the kernel internal SIGNAL_CONTINUE_THREAD signal retains
+	// compatibility to BeOS which documents the combination of suspend_thread()
+	// and resume_thread() to interrupt threads waiting on semaphores.
+	return thread_send_signal(id, SIGNAL_CONTINUE_THREAD, SI_USER, B_OK, kernel);
 }
 
 
 status_t
 resume_thread(thread_id id)
 {
-	if (id <= 0)
-		return B_BAD_VALUE;
-
-	Thread* currentThread = thread_get_current_thread();
-
-	// Using the kernel internal SIGNAL_CONTINUE_THREAD signal retains
-	// compatibility to BeOS which documents the combination of suspend_thread()
-	// and resume_thread() to interrupt threads waiting on semaphores.
-	Signal signal(SIGNAL_CONTINUE_THREAD, SI_USER, B_OK,
-		currentThread->team->id);
-	return send_signal_to_thread_id(id, signal, 0);
+	return thread_resume_thread(id, true);
 }
 
 
@@ -3338,8 +3389,7 @@ _user_exit_thread(status_t returnValue)
 status_t
 _user_kill_thread(thread_id thread)
 {
-	// TODO: Don't allow kernel threads to be killed!
-	return kill_thread(thread);
+	return thread_kill_thread(thread, false);
 }
 
 
@@ -3374,16 +3424,14 @@ _user_cancel_thread(thread_id threadID, void (*cancelFunction)(int))
 status_t
 _user_resume_thread(thread_id thread)
 {
-	// TODO: Don't allow kernel threads to be resumed!
-	return resume_thread(thread);
+	return thread_resume_thread(thread, false);
 }
 
 
 status_t
 _user_suspend_thread(thread_id thread)
 {
-	// TODO: Don't allow kernel threads to be suspended!
-	return suspend_thread(thread);
+	return thread_suspend_thread(thread, false);
 }
 
 
@@ -3397,7 +3445,8 @@ _user_rename_thread(thread_id thread, const char *userName)
 		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	// TODO: Don't allow kernel threads to be renamed!
+	// rename_thread() forbids thread renames across teams, so we don't
+	// need a "kernel" flag here.
 	return rename_thread(thread, name);
 }
 
@@ -3405,8 +3454,7 @@ _user_rename_thread(thread_id thread, const char *userName)
 int32
 _user_set_thread_priority(thread_id thread, int32 newPriority)
 {
-	// TODO: Don't allow setting priority of kernel threads!
-	return set_thread_priority(thread, newPriority);
+	return thread_set_thread_priority(thread, newPriority, false);
 }
 
 
