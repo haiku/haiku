@@ -86,7 +86,7 @@ static property_info sProperties[] = {
 BListView::BListView(BRect frame, const char* name, list_view_type type,
 	uint32 resizingMode, uint32 flags)
 	:
-	BView(frame, name, resizingMode, flags)
+	BView(frame, name, resizingMode, flags | B_SCROLL_VIEW_AWARE)
 {
 	_InitObject(type);
 }
@@ -94,7 +94,7 @@ BListView::BListView(BRect frame, const char* name, list_view_type type,
 
 BListView::BListView(const char* name, list_view_type type, uint32 flags)
 	:
-	BView(name, flags)
+	BView(name, flags | B_SCROLL_VIEW_AWARE)
 {
 	_InitObject(type);
 }
@@ -102,7 +102,8 @@ BListView::BListView(const char* name, list_view_type type, uint32 flags)
 
 BListView::BListView(list_view_type type)
 	:
-	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
+	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE
+		| B_SCROLL_VIEW_AWARE)
 {
 	_InitObject(type);
 }

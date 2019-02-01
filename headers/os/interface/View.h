@@ -77,7 +77,7 @@ const uint32 B_NAVIGABLE				= 0x02000000UL;	/* 25 */
 const uint32 B_SUBPIXEL_PRECISE			= 0x01000000UL;	/* 24 */
 const uint32 B_DRAW_ON_CHILDREN			= 0x00800000UL;	/* 23 */
 const uint32 B_INPUT_METHOD_AWARE		= 0x00400000UL;	/* 23 */
-const uint32 _B_RESERVED7_				= 0x00200000UL;	/* 22 */
+const uint32 B_SCROLL_VIEW_AWARE		= 0x00200000UL;	/* 22 */
 const uint32 B_SUPPORTS_LAYOUT			= 0x00100000UL;	/* 21 */
 const uint32 B_INVALIDATE_AFTER_LAYOUT	= 0x00080000UL;	/* 20 */
 

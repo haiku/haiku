@@ -273,7 +273,8 @@ BScrollView::FrameResized(float newWidth, float newHeight)
 
 	const BRect bounds = Bounds();
 
-	if (fTarget != NULL && (fTarget->Flags() & B_SUPPORTS_LAYOUT) != 0) {
+	if (fTarget != NULL && (fTarget->Flags() & B_SUPPORTS_LAYOUT) != 0
+			&& (fTarget->Flags() & B_SCROLL_VIEW_AWARE) == 0) {
 		BSize size = fTarget->PreferredSize();
 		if (fHorizontalScrollBar != NULL) {
 			float delta = size.Width() - bounds.Width(),
@@ -957,7 +958,8 @@ BScrollView::_BorderSize(border_style border)
 /*static*/ uint32
 BScrollView::_ModifyFlags(uint32 flags, BView* target, border_style border)
 {
-	if (target != NULL && (target->Flags() & B_SUPPORTS_LAYOUT) != 0)
+	if (target != NULL && (target->Flags() & B_SUPPORTS_LAYOUT) != 0
+			&& (target->Flags() & B_SCROLL_VIEW_AWARE) == 0)
 		flags |= B_FRAME_EVENTS;
 
 	// We either need B_FULL_UPDATE_ON_RESIZE or B_FRAME_EVENTS if we have

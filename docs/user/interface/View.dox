@@ -308,13 +308,17 @@
 	\var B_SUBPIXEL_PRECISE
 	\brief The view draws with sub-pixel precision.
 
-	\since Haiku R1
+	If this flag is not specified, drawing coordinates will be rounded
+	to the nearest integer.
+
+	\since BeOS R5
 */
 
 
 /*!
 	\var B_DRAW_ON_CHILDREN
-	\brief Indicates that the view responds to the DrawAfterChildren() hook method.
+	\brief Indicates that the view responds to the DrawAfterChildren() hook
+		method.
 
 	\since BeOS R5
 */
@@ -322,16 +326,17 @@
 
 /*!
 	\var B_INPUT_METHOD_AWARE
-	\brief Allows the view to use input method add-ons to gain access to the
-	       input methods needed for Japanese and other languages.
+	\brief Indicates the view understands input method add-ons, as used
+		for complex text input in CJK and other languages.
 
-	\since Haiku R1
+	\since BeOS R5
 */
 
 
 /*!
-	\var _B_RESERVED7_
-	\brief Reserved for future use.
+	\var B_SCROLL_VIEW_AWARE
+	\brief Indicates the view will properly manage scrollbars that
+		have been targeted to it, i.e. update their ranges and proportions.
 
 	\since Haiku R1
 */
