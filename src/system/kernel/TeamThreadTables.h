@@ -98,7 +98,7 @@ public:
 	/*! Gets an iterator.
 		The iterator iterates through all, including invisible, entries!
 	*/
-	Iterator GetIterator()
+	Iterator GetIterator() const
 	{
 		return Iterator(fList.Head());
 	}
