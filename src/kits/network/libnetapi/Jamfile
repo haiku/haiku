@@ -36,7 +36,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		}
 
 		SharedLibrary [ MultiArchDefaultGristFiles libbnetapi.so ] :
-			init.cpp
 			DynamicBuffer.cpp
 			NetEndpoint.cpp
 			NetAddress.cpp
