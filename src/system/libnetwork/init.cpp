@@ -19,12 +19,10 @@
 bool __gR5Compatibility = false;
 addr_t __gNetworkStart;
 addr_t __gNetworkEnd;
-addr_t __gNetAPIStart;
-addr_t __gNetAPIEnd;
 
 
 static void
-find_own_image(image_id id)
+set_own_image_location(image_id id)
 {
 	image_info info;
 	if (get_image_info(id, &info) == B_OK) {
@@ -74,7 +72,7 @@ initialize_before(image_id our_image)
 
 		if (enable > 0) {
 			__gR5Compatibility = true;
-			find_own_image(our_image);
+			set_own_image_location(our_image);
 			debug_printf("libnetwork.so running in R5 compatibility mode.\n");
 			return;
 		}
