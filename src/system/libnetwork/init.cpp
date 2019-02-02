@@ -43,7 +43,7 @@ find_own_image()
 
 
 extern "C" void
-initialize_before()
+initialize_before(image_id)
 {
 	// determine if we have to run in BeOS compatibility mode
 

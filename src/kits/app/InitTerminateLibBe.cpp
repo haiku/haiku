@@ -43,7 +43,7 @@ initialize_forked_child()
 
 
 extern "C" void
-initialize_before()
+initialize_before(image_id)
 {
 	DBG(OUT("initialize_before()\n"));
 
@@ -57,7 +57,7 @@ initialize_before()
 
 
 extern "C" void
-initialize_after()
+initialize_after(image_id)
 {
 	DBG(OUT("initialize_after()\n"));
 
@@ -68,7 +68,7 @@ initialize_after()
 
 
 extern "C" void
-terminate_after()
+terminate_after(image_id)
 {
 	DBG(OUT("terminate_after()\n"));
 

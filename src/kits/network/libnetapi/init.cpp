@@ -33,7 +33,7 @@ find_own_image()
 
 
 extern "C" void
-initialize_before()
+initialize_before(image_id)
 {
 	// If in compatibility mode get our code address range.
 	if (__gR5Compatibility)

@@ -64,6 +64,11 @@ extern "C" {
 #define B_TERM_BEFORE_FUNCTION_NAME	"terminate_before"
 #define B_TERM_AFTER_FUNCTION_NAME	"terminate_after"
 
+void initialize_before(image_id);
+void initialize_after(image_id);
+void terminate_before(image_id);
+void terminate_after(image_id);
+
 
 #define B_APP_IMAGE_SYMBOL		((void*)(addr_t)0)
 	/* value that can be used instead of a pointer to a symbol in the program

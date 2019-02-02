@@ -19,9 +19,6 @@
 #include <pthread_private.h>
 
 
-void initialize_before(image_id imageID);
-void terminate_after(image_id imageID);
-
 struct rld_export *__gRuntimeLoader = NULL;
 	// This little bugger is set to something meaningful by the runtime loader
 	// Ugly, eh?
