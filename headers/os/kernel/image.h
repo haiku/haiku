@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2019, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _IMAGE_H
@@ -39,28 +39,33 @@ typedef struct {
 	int32		abi;			/* the Haiku ABI used by the image */
 } image_info;
 
+
 /* flags for clear_caches() */
 #define B_FLUSH_DCACHE				0x0001	/* data cache */
 #define B_FLUSH_ICACHE				0x0004	/* instruction cache */
 #define B_INVALIDATE_DCACHE			0x0002
 #define B_INVALIDATE_ICACHE			0x0008
 
+
 /* symbol types */
-#define	B_SYMBOL_TYPE_DATA			0x1
-#define	B_SYMBOL_TYPE_TEXT			0x2
+#define B_SYMBOL_TYPE_DATA			0x1
+#define B_SYMBOL_TYPE_TEXT			0x2
 #define B_SYMBOL_TYPE_ANY			0x5
 
+
 /* initialization/termination functions of shared objects */
-#define	B_INIT_BEFORE_FUNCTION_NAME	"initialize_before"
+#define B_INIT_BEFORE_FUNCTION_NAME	"initialize_before"
 #define B_INIT_AFTER_FUNCTION_NAME	"initialize_after"
-#define	B_TERM_BEFORE_FUNCTION_NAME	"terminate_before"
+#define B_TERM_BEFORE_FUNCTION_NAME	"terminate_before"
 #define B_TERM_AFTER_FUNCTION_NAME	"terminate_after"
+
 
 #define B_APP_IMAGE_SYMBOL		((void*)(addr_t)0)
 	/* value that can be used instead of a pointer to a symbol in the program
 	   image. */
 #define B_CURRENT_IMAGE_SYMBOL	((void*)&__haiku_init_before)
 	/* pointer to a symbol in the callers image */
+
 
 /* flags for _kern_load_image() (private API) */
 enum {
@@ -72,9 +77,11 @@ enum {
 		   doesn't exist. */
 };
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 thread_id load_image(int32 argc, const char **argv, const char **environ);
 image_id load_add_on(const char *path);
@@ -95,11 +102,10 @@ status_t _get_image_info(image_id image, image_info *info, size_t size);
 status_t _get_next_image_info(team_id team, int32 *cookie, image_info *info,
 				size_t size);
 
-/* private */
-void __haiku_init_before(image_id id);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* _IMAGE_H */
