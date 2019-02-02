@@ -82,13 +82,6 @@ initialize_before(image_id imageID)
 }
 
 
-void
-terminate_after(image_id id)
-{
-	__heap_terminate_after();
-}
-
-#ifdef _BEOS_R5_COMPATIBLE_
 void _init_c_library_(void);
 void
 _init_c_library_(void)
@@ -98,4 +91,10 @@ _init_c_library_(void)
 	// Our libroot functions are already initialized above, so we don't have to
 	// do anything here.
 }
-#endif
+
+
+void
+terminate_after(image_id id)
+{
+	__heap_terminate_after();
+}

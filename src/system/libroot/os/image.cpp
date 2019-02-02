@@ -489,7 +489,6 @@ __flatten_process_args(const char* const* args, int32 argCount,
 }
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
 extern "C" void _call_init_routines_(void);
 void
 _call_init_routines_(void)
@@ -497,4 +496,4 @@ _call_init_routines_(void)
 	// This is called by the original BeOS startup code.
 	// We don't need it, because our loader already does the job, right?
 }
-#endif
+
