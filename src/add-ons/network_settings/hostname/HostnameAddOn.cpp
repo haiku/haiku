@@ -80,7 +80,7 @@ HostnameItem::~HostnameItem()
 BNetworkSettingsType
 HostnameItem::Type() const
 {
-	return B_NETWORK_SETTINGS_TYPE_OTHER;
+	return B_NETWORK_SETTINGS_TYPE_SERVICE;
 }
 
 
