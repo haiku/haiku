@@ -73,7 +73,6 @@ initialize_before(image_id our_image)
 		if (enable > 0) {
 			__gR5Compatibility = true;
 			set_own_image_location(our_image);
-			debug_printf("libnetwork.so running in R5 compatibility mode.\n");
 			return;
 		}
 	} while (enable == 0
