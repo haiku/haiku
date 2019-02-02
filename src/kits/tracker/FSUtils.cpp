@@ -75,6 +75,7 @@ respective holders. All rights reserved.
 #include <AutoLocker.h>
 #include <libroot/libroot_private.h>
 #include <system/syscalls.h>
+#include <system/syscall_load_image.h>
 
 #include "Attributes.h"
 #include "Bitmaps.h"

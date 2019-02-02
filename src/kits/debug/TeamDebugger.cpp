@@ -17,6 +17,7 @@
 
 #include <libroot_private.h>
 #include <syscalls.h>
+#include <syscall_load_image.h>
 
 
 BTeamDebugger::BTeamDebugger()

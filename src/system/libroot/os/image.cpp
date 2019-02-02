@@ -19,6 +19,7 @@
 #include <libroot_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
+#include <syscall_load_image.h>
 #include <user_runtime.h>
 
 

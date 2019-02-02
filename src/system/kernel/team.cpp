@@ -45,6 +45,7 @@
 #include <posix/xsi_semaphore.h>
 #include <sem.h>
 #include <syscall_process_info.h>
+#include <syscall_load_image.h>
 #include <syscall_restart.h>
 #include <syscalls.h>
 #include <tls.h>
