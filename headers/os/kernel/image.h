@@ -40,6 +40,11 @@ typedef struct {
 } image_info;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* flags for clear_caches() */
 #define B_FLUSH_DCACHE				0x0001	/* data cache */
 #define B_FLUSH_ICACHE				0x0004	/* instruction cache */
@@ -63,13 +68,8 @@ typedef struct {
 #define B_APP_IMAGE_SYMBOL		((void*)(addr_t)0)
 	/* value that can be used instead of a pointer to a symbol in the program
 	   image. */
-#define B_CURRENT_IMAGE_SYMBOL	((void*)&__haiku_init_before)
+#define B_CURRENT_IMAGE_SYMBOL	((void*)&__func__)
 	/* pointer to a symbol in the callers image */
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 thread_id load_image(int32 argc, const char **argv, const char **environ);
