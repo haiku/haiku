@@ -84,6 +84,21 @@ BrowserApp::BrowserApp()
 	fConsoleWindow(NULL),
 	fCookieWindow(NULL)
 {
+#ifdef __INTEL__
+	// First let's check SSE2 is available
+	cpuid_info info;
+	get_cpuid(&info, 1, 0);
+
+	if ((info.eax_1.features & (1 << 26)) == 0) {
+		BAlert alert("No SSE2 support", B_TRANSLATE("Your CPU is too old and "
+			"does not support the SSE2 extensions, without which WebPositive "
+			"cannot run. We recommend installing NetSurf instead."),
+			B_TRANSLATE("Darn!"));
+		alert.Go();
+		exit(-1);
+	}
+#endif
+
 #if ENABLE_NATIVE_COOKIES
 	BString cookieStorePath = kApplicationName;
 	cookieStorePath << "/Cookies";
