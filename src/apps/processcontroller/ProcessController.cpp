@@ -622,10 +622,11 @@ ProcessController::DoDraw(bool force)
 	}
 	// interspace
 	float right = left + gCPUcount * (barWidth + barGap) - barGap;
+	float leftMem = bounds.Width() - memWidth;
 		// right of CPU frame...
 	if (force && Parent()) {
 		SetHighColor(Parent()->ViewColor());
-		FillRect(BRect(right + 1, top - 1, right + 2, bottom + 1));
+		FillRect(BRect(right + 1, top - 1, leftMem, bottom + 1));
 	}
 
 	if (force) {
@@ -637,7 +638,7 @@ ProcessController::DoDraw(bool force)
 					BPoint(left + x * barWidth + x - 1, bottom));
 		}
 	}
-	float leftMem = bounds.Width() - memWidth;
+
 	if (force)
 		StrokeRect(BRect(leftMem - 1, top - 1, leftMem + memWidth, bottom + 1));
 
