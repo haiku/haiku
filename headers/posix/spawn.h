@@ -23,6 +23,7 @@
 #endif	/* 0 */
 #define POSIX_SPAWN_SETSIGDEF		0x10
 #define POSIX_SPAWN_SETSIGMASK		0x20
+#define POSIX_SPAWN_SETSID			0x40
 
 
 typedef struct _posix_spawnattr	*posix_spawnattr_t;

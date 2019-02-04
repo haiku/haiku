@@ -361,6 +361,11 @@ process_spawnattr(const posix_spawnattr_t *_attr)
 			return errno;
 	}
 
+	if ((attr->flags & POSIX_SPAWN_SETSID) != 0) {
+		if (setsid() != 0)
+			return errno;
+	}
+
 	if ((attr->flags & POSIX_SPAWN_SETPGROUP) != 0) {
 		if (setpgid(0, attr->pgroup) != 0)
 			return errno;
