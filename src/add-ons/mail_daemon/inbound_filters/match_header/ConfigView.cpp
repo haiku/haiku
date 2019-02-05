@@ -72,7 +72,7 @@ RuleFilterConfig::RuleFilterConfig(const BMailAddOnSettings& addOnSettings)
 
 	fAttributeControl = new BTextControl("attr", B_TRANSLATE("If"), NULL, NULL);
 	fAttributeControl->SetToolTip(
-		B_TRANSLATE("Header field (e.g. Subject, From, ...)"));
+		B_TRANSLATE("Header field (e.g. Subject, From, " B_UTF8_ELLIPSIS ")"));
 	fAttributeControl->SetText(settings.Attribute());
 
 	fRegexControl = new BTextControl("regex", B_TRANSLATE("has"), NULL, NULL);

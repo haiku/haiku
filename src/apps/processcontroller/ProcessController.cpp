@@ -456,7 +456,8 @@ ProcessController::MessageReceived(BMessage *message)
 				}
 				if (last) {
 					alert = new BAlert(B_TRANSLATE("Info"),
-						B_TRANSLATE("This is the last active processor...\n"
+						B_TRANSLATE("This is the last active processor"
+						B_UTF8_ELLIPSIS "\n"
 						"You can't turn it off!"),
 						B_TRANSLATE("That's no Fun!"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_WARNING_ALERT);

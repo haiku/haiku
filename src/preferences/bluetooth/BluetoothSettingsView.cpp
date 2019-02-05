@@ -213,7 +213,7 @@ BluetoothSettingsView::_BuildConnectionPolicy()
 	BMessage* message = NULL;
 	BMenuItem* item = NULL;
 
-	fPolicyMenu = new BPopUpMenu(B_TRANSLATE("Policy..."));
+	fPolicyMenu = new BPopUpMenu(B_TRANSLATE("Policy" B_UTF8_ELLIPSIS));
 
 	message = new BMessage(kMsgSetConnectionPolicy);
 	message->AddInt8("Policy", 1);
@@ -237,7 +237,7 @@ BluetoothSettingsView::_BuildClassMenu()
 	BMessage* message = NULL;
 	BMenuItem* item = NULL;
 
-	fClassMenu = new BPopUpMenu(B_TRANSLATE("Identify us as..."));
+	fClassMenu = new BPopUpMenu(B_TRANSLATE("Identify us as" B_UTF8_ELLIPSIS));
 
 	message = new BMessage(kMsgSetDeviceClass);
 	message->AddInt8("DeviceClass", 1);
@@ -292,7 +292,8 @@ BluetoothSettingsView::_BuildLocalDevicesMenu()
 	LocalDevice* lDevice;
 
 	if (!fLocalDevicesMenu)
-		fLocalDevicesMenu = new BPopUpMenu(B_TRANSLATE("Pick device..."));
+		fLocalDevicesMenu = new BPopUpMenu(B_TRANSLATE("Pick device"
+			B_UTF8_ELLIPSIS));
 
 	while (fLocalDevicesMenu->CountItems() > 0) {
 		BMenuItem* item = fLocalDevicesMenu->RemoveItem((int32)0);

@@ -214,7 +214,8 @@ InquiryPanel::MessageReceived(BMessage* message)
 			fRemoteList->MakeEmpty();
 			fScanProgress->Reset();
 			fScanProgress->SetTo(1);
-			fScanProgress->SetTrailingText(B_TRANSLATE("Starting scan..."));
+			fScanProgress->SetTrailingText(B_TRANSLATE("Starting scan"
+				B_UTF8_ELLIPSIS));
 			fScanProgress->SetBarColor(activeColor);
 
 			fAddButton->SetEnabled(false);
@@ -234,7 +235,8 @@ InquiryPanel::MessageReceived(BMessage* message)
 			fRetrieving = true;
 			labelPlaced = false;
 			fScanProgress->SetTo(100);
-			fScanProgress->SetTrailingText(B_TRANSLATE("Retrieving names..."));
+			fScanProgress->SetTrailingText(B_TRANSLATE("Retrieving names"
+				B_UTF8_ELLIPSIS));
 			BMessageRunner::StartSending(fMessenger, fRetrieveMessage, 1000000, 1);
 
 		break;

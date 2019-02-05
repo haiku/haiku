@@ -310,7 +310,7 @@ void
 FolderConfigWindow::_LoadFolders()
 {
 	StatusWindow* statusWindow = new StatusWindow(this,
-		B_TRANSLATE("Fetching IMAP folders, have patience..."));
+		B_TRANSLATE("Fetching IMAP folders, have patience" B_UTF8_ELLIPSIS));
 	statusWindow->Show();
 
 	status_t status = fProtocol.Connect(fSettings.ServerAddress(),
@@ -374,7 +374,8 @@ FolderConfigWindow::_ApplyChanges()
 		return;
 
 	StatusWindow* status = new StatusWindow(this,
-		B_TRANSLATE("Update subcription of IMAP folders, have patience..."));
+		B_TRANSLATE("Update subcription of IMAP folders, have patience"
+		B_UTF8_ELLIPSIS));
 	status->Show();
 
 	for (size_t i = 0; i < fFolderList.size(); i++) {

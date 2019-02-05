@@ -100,7 +100,7 @@ BluetoothApplication::AboutRequested()
 		" - Mika Lindqvist\n"
 		" - Adrien Destugues\n"
 		" - Maksym Yevmenkin\n\n"
-		"Thanks to the individuals who helped...\n\n"
+		"Thanks to the individuals who helped" B_UTF8_ELLIPSIS "\n\n"
 		"Shipping/donating hardware:\n"
 		" - Henry Jair Abril Florez (el Colombian)\n"
 		"	& Stefanie Bartolich\n"
