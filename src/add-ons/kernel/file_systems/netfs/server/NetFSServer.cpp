@@ -963,10 +963,8 @@ NetFSServer::_LoadSettings()
 		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<SecurityContext> securityContextDeleter(securityContext);
 	error = securityContext->InitCheck();
-	if (error != B_OK) {
-		delete securityContext;
+	if (error != B_OK)
 		RETURN_ERROR(error);
-	}
 
 	// set it
 	delete fSecurityContext;
