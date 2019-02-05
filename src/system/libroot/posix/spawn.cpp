@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Jérôme Duval, jerome.Duval@gmail.com
+ * Copyright 2017-2019, Jérôme Duval, jerome.Duval@gmail.com
  * Distributed under the terms of the MIT license.
  */
 
@@ -20,7 +20,9 @@
 enum action_type {
 	file_action_open,
 	file_action_close,
-	file_action_dup2
+	file_action_dup2,
+	file_action_chdir,
+	file_action_fchdir
 };
 
 struct _file_action {
@@ -35,6 +37,9 @@ struct _file_action {
 		struct {
 			int srcfd;
 		} dup2_action;
+		struct {
+			char* path;
+		} chdir_action;
 	} action;
 };
 
@@ -89,6 +94,15 @@ posix_spawn_file_actions_destroy(posix_spawn_file_actions_t *_actions)
 
 	if (actions == NULL)
 		return EINVAL;
+
+	for (int i = 0; i < actions->count; i++) {
+		struct _file_action *action = &actions->actions[i];
+
+		if (action->type == file_action_open)
+			free(action->action.open_action.path);
+		else if (action->type == file_action_chdir)
+			free(action->action.chdir_action.path);
+	}
 
 	free(actions);
 
@@ -174,6 +188,58 @@ posix_spawn_file_actions_adddup2(posix_spawn_file_actions_t *_actions,
 	action->type = file_action_dup2;
 	action->fd = newfildes;
 	action->action.dup2_action.srcfd = fildes;
+	actions->count++;
+	return 0;
+}
+
+
+int
+posix_spawn_file_actions_addchdir_np(posix_spawn_file_actions_t *_actions,
+	const char *path)
+{
+	struct _posix_spawn_file_actions* actions = _actions != NULL ? *_actions : NULL;
+
+	if (actions == NULL)
+		return EINVAL;
+
+	char* npath = strdup(path);
+	if (npath == NULL)
+		return ENOMEM;
+	if (actions->count == actions->size
+		&& posix_spawn_file_actions_extend(actions) != 0) {
+		free(npath);
+		return ENOMEM;
+	}
+
+	struct _file_action *action = &actions->actions[actions->count];
+	action->type = file_action_chdir;
+	action->fd = -1;
+	action->action.chdir_action.path = npath;
+	actions->count++;
+	return 0;
+}
+
+
+int
+posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *_actions,
+	int fildes)
+{
+	struct _posix_spawn_file_actions* actions = _actions != NULL ? *_actions : NULL;
+
+	if (actions == NULL)
+		return EINVAL;
+
+	if (fildes < 0 || fildes >= sysconf(_SC_OPEN_MAX))
+		return EBADF;
+
+	if (actions->count == actions->size
+		&& posix_spawn_file_actions_extend(actions) != 0) {
+		return ENOMEM;
+	}
+
+	struct _file_action *action = &actions->actions[actions->count];
+	action->type = file_action_fchdir;
+	action->fd = fildes;
 	actions->count++;
 	return 0;
 }
@@ -414,6 +480,12 @@ process_file_actions(const posix_spawn_file_actions_t *_actions, int *errfd)
 			}
 		} else if (action->type == file_action_dup2) {
 			if (dup2(action->action.dup2_action.srcfd, action->fd) == -1)
+				return errno;
+		} else if (action->type == file_action_chdir) {
+			if (chdir(action->action.chdir_action.path) == -1)
+				return errno;
+		} else if (action->type == file_action_fchdir) {
+			if (fchdir(action->fd) == -1)
 				return errno;
 		}
 	}
