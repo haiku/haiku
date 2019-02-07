@@ -1,11 +1,14 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2019 Haiku Inc. All rights reserved.
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 #include "StringForSize.h"
 
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <StringFormat.h>
 #include <SystemCatalog.h>
@@ -61,6 +64,41 @@ string_for_size(double size, char* string, size_t stringSize)
 	snprintf(string, stringSize, gSystemCatalog.GetString(trKey,
 		B_TRANSLATION_CONTEXT), tib);
 	return string;
+}
+
+
+int64
+parse_size(const char* sizeString)
+{
+	int64 parsedSize = -1;
+	char* end;
+	parsedSize = strtoll(sizeString, &end, 0);
+	if (end != sizeString && parsedSize > 0) {
+		int64 rawSize = parsedSize;
+		switch (tolower(*end)) {
+			case 't':
+				parsedSize *= 1024;
+			case 'g':
+				parsedSize *= 1024;
+			case 'm':
+				parsedSize *= 1024;
+			case 'k':
+				parsedSize *= 1024;
+				end++;
+				break;
+			case '\0':
+				break;
+			default:
+				parsedSize = -1;
+				break;
+		}
+
+		// Check for overflow
+		if (parsedSize > 0 && rawSize > parsedSize)
+			parsedSize = -1;
+	}
+
+	return parsedSize;
 }
 
 
