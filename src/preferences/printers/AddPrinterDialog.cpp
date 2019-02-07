@@ -40,7 +40,8 @@ AddPrinterDialog::AddPrinterDialog(BWindow *parent)
 	:
 	Inherited(BRect(78, 71, 400, 300), B_TRANSLATE("Add printer"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS
+		| B_CLOSE_ON_ESCAPE),
 	fPrintersPrefletMessenger(parent)
 {
 	_BuildGUI(0);
@@ -220,6 +221,8 @@ AddPrinterDialog::_BuildGUI(int stage)
 			, 0, 3, 2)
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 			B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
+
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	SetDefaultButton(fOk);
 	fOk->MakeDefault(true);
