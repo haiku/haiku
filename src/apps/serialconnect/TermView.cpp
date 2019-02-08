@@ -77,7 +77,7 @@ TermView::Draw(BRect updateRect)
 		VTermScreenCell cell;
 		int width = 0;
 		bool isCursor = false;
-		
+
 		pos.col = updatedChars.start_col;
 		_GetCell(pos, cell);
 
@@ -99,7 +99,7 @@ TermView::Draw(BRect updateRect)
 				|| pos.col >= updatedChars.end_col
 				|| (pos.col == cursorPos.col && pos.row == cursorPos.row)
 				|| (pos.col == cursorPos.col + 1 && pos.row == cursorPos.row)) {
-				
+
 				rgb_color foreground, background;
 				foreground.red = cell.fg.red;
 				foreground.green = cell.fg.green;
@@ -156,7 +156,7 @@ TermView::Draw(BRect updateRect)
 				isCursor = true;
 			else
 				isCursor = false;
-			
+
 			if (newCell.chars[0] == 0) {
 				string += " ";
 				pos.col ++;
@@ -234,7 +234,7 @@ TermView::KeyDown(const char* bytes, int32 numBytes)
 void
 TermView::MessageReceived(BMessage* message)
 {
-	switch(message->what)
+	switch (message->what)
 	{
 		case 'DATA':
 		{

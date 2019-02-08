@@ -65,5 +65,5 @@ class TermView: public BView
 		static const int kDefaultWidth = 80;
 		static const int kDefaultHeight = 25;
 		static const int kBorderSpacing = 3;
-		static const int kScrollBackSize = 1000;
+		static const int kScrollBackSize = 10000;
 };
