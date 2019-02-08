@@ -10,6 +10,7 @@
 
 #include <Errors.h>
 #include <SupportDefs.h>
+#include <Url.h>
 
 #include <package/AddRepositoryRequest.h>
 #include <package/Context.h>
@@ -87,6 +88,13 @@ AddRepoCommand::Execute(int argc, const char* const* argv)
 
 	status_t result;
 	for (int i = 0; i < urlCount; ++i) {
+		// Test if a valid URL has been supplied before attempting to add
+		BUrl repoURL(repoURLs[i]);
+		if (!repoURL.IsValid()) {
+			result = B_BAD_VALUE;
+			DIE(result, "request for adding repository \"%s\" failed",
+				repoURLs[i]);
+		}
 		AddRepositoryRequest addRequest(context, repoURLs[i], asUserRepository);
 		result = addRequest.Process(true);
 		if (result != B_OK) {
@@ -102,7 +110,7 @@ AddRepoCommand::Execute(int argc, const char* const* argv)
 		BPackageRoster roster;
 		BRepositoryConfig repoConfig;
 		roster.GetRepositoryConfig(repoName, &repoConfig);
-		
+
 		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
 		result = refreshRequest.Process(true);
 		if (result != B_OK) {
