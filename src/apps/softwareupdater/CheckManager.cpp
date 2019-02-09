@@ -24,6 +24,7 @@
 #include <NodeInfo.h>
 #include <Notification.h>
 #include <Roster.h>
+#include <StringFormat.h>
 
 #include <package/manager/Exceptions.h>
 #include <package/solver/SolverPackage.h>
@@ -74,7 +75,7 @@ CheckManager::CheckNetworkConnection()
 			return;
 		}
 	}
-	
+
 	// No network connection detected, cannot continue
 	fputs(B_TRANSLATE("No active network connection was found.\n"), stderr);
 	throw BAbortedByUserException();
@@ -126,12 +127,12 @@ CheckManager::HandleProblems()
 		printf("problem %" B_PRId32 ": %s\n", i + 1,
 			problem->ToString().String());
 	}
-	
+
 	BString title(B_TRANSLATE("Available updates found"));
 	BString text(B_TRANSLATE("Click here to run SoftwareUpdater. Some updates "
 		"will require a problem solution to be selected."));
 	_SendNotification(title, text);
-	
+
 	throw BAbortedByUserException();
 }
 
@@ -141,7 +142,7 @@ CheckManager::ConfirmChanges(bool fromMostSpecific)
 {
 	int32 count = fInstalledRepositories.CountItems();
 	int32 updateCount = 0;
-	
+
 	if (fromMostSpecific) {
 		for (int32 i = count - 1; i >= 0; i--)
 			_CountUpdates(*fInstalledRepositories.ItemAt(i), updateCount);
@@ -149,14 +150,19 @@ CheckManager::ConfirmChanges(bool fromMostSpecific)
 		for (int32 i = 0; i < count; i++)
 			_CountUpdates(*fInstalledRepositories.ItemAt(i), updateCount);
 	}
-	
+
 	printf("Update count=%" B_PRId32 "\n", updateCount);
 	if (updateCount > 0) {
-		BString title(B_TRANSLATE("%count% packages have available updates"));
-		BString count;
-		count << updateCount;
-		title.ReplaceFirst("%count%", count);
-		BString text(B_TRANSLATE("Click here to install updates."));
+		BString title;
+		static BStringFormat formatTitle(B_TRANSLATE(
+			"Software {0, plural, one{update} other{updates}} available"));
+		formatTitle.Format(title, updateCount);
+		BString text;
+		static BStringFormat formatText(B_TRANSLATE("Click here to "
+			"install {0, plural, one{# updated package} "
+			"other{# updated packages}}."));
+		formatText.Format(text, updateCount);
+
 		_SendNotification(title.String(), text.String());
 	}
 	throw BAbortedByUserException();
@@ -183,7 +189,7 @@ CheckManager::ProgressPackageDownloadStarted(const char* packageName)
 {
 	if (fVerbose)
 		_SendNotification(fHeaderChecking.String(), fTextContacting.String());
-	
+
 	printf("Downloading %s...\n", packageName);
 }
 
@@ -235,7 +241,7 @@ CheckManager::ProgressPackageDownloadActive(const char* packageName,
 	printf(" %3d%%", (int)(completionPercentage * 100));
 
 	fflush(stdout);
-	
+
 }
 
 
@@ -259,7 +265,7 @@ CheckManager::ProgressPackageChecksumStarted(const char* title)
 {
 	if (fVerbose)
 		_SendNotification(fHeaderChecking.String(), title);
-	
+
 	printf("%s...", title);
 }
 
