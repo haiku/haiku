@@ -59,33 +59,38 @@ static pci_x86_module_info* sPCIx86Module;
 static void
 sdhci_register_dump(uint8_t slot, struct registers* regs)
 {
+#ifdef TRACE_SDHCI
 	TRACE("Register values for slot %d:\n", slot);
 	TRACE("system_address: %d\n", regs->system_address);
 	TRACE("%d blocks of size %d\n", regs->block_count, regs->block_size);
 	TRACE("argument: %d\n", regs->argument);
 	TRACE("transfer_mode: %d\n", regs->transfer_mode);
-	TRACE("command: %d\n", regs->command);
+	TRACE("command: %d\n", regs->command.Bits());
 	TRACE("response:");
 	for (int i = 0; i < 8; i++)
-		TRACE(" %d", regs->response[i]);
-	TRACE("\nbuffer_data_port: %d\n", regs->buffer_data_port);
-	TRACE("present_state: %d\n", regs->present_state);
-	TRACE("power_control: %d\n", regs->power_control);
+		dprintf(" %d", regs->response[i]);
+	dprintf("\n");
+	TRACE("buffer_data_port: %d\n", regs->buffer_data_port);
+	TRACE("present_state: %x\n", regs->present_state.Bits());
+	TRACE("power_control: %d\n", regs->power_control.Bits());
 	TRACE("host_control: %d\n", regs->host_control);
 	TRACE("wakeup_control: %d\n", regs->wakeup_control);
 	TRACE("block_gap_control: %d\n", regs->block_gap_control);
-	TRACE("clock_control: %d\n", regs->clock_control);
-	TRACE("software_reset: %d\n", regs->software_reset);
+	TRACE("clock_control: %x\n", regs->clock_control.Bits());
+	TRACE("software_reset: %d\n", regs->software_reset.Bits());
 	TRACE("timeout_control: %d\n", regs->timeout_control);
 	TRACE("interrupt_status: %x enable: %x signal: %x\n",
 		regs->interrupt_status, regs->interrupt_status_enable,
 		regs->interrupt_signal_enable);
 	TRACE("auto_cmd12_error_status: %d\n", regs->auto_cmd12_error_status);
-	TRACE("capabilities: %lld\n", regs->capabilities);
+	TRACE("capabilities: %lld\n", regs->capabilities.Bits());
 	TRACE("max_current_capabilities: %lld\n",
 		regs->max_current_capabilities);
 	TRACE("slot_interrupt_status: %d\n", regs->slot_interrupt_status);
-	TRACE("host_controller_version %x\n", regs->host_controller_version);
+	TRACE("host_controller_version spec %x vendor %x\n",
+		regs->host_controller_version.specVersion,
+		regs->host_controller_version.vendorVersion);
+#endif
 }
 
 
@@ -93,73 +98,85 @@ static void
 sdhci_reset(struct registers* regs)
 {
 	// if card is not present then no point of reseting the registers
-	if (!(regs->present_state & SDHCI_CARD_DETECT))
+	if (!regs->present_state.IsCardInserted())
 		return;
 
 	// enabling software reset all
-	regs->software_reset |= SDHCI_SOFTWARE_RESET_ALL;
-
-	// waiting for clock and power to get off
-	while (regs->clock_control != 0 && regs->power_control != 0);
+	regs->software_reset.ResetAll();
 }
 
 
 static void
-sdhci_set_clock(struct registers* regs, uint16_t base_clock_div)
+sdhci_set_clock(struct registers* regs)
 {
-	uint32_t clock_control = regs->clock_control;
-	int base_clock = SDHCI_BASE_CLOCK_FREQ(regs->capabilities);
+	int base_clock = regs->capabilities.BaseClockFrequency();
+	// Try to get as close to 400kHz as possible, but not faster
+	int divider = base_clock * 1000 / 400;
 
-	TRACE("SDCLK frequency: %dMHz\n", base_clock);
+	if (regs->host_controller_version.specVersion <= 1) {
+		// Old controller only support power of two dividers up to 256,
+		// round to next power of two up to 256
+		if (divider > 256)
+			divider = 256;
 
-	// clearing previous frequency
-	clock_control &= SDHCI_CLR_FREQ_SEL;
-	clock_control |= base_clock_div;
+		divider--;
+		divider |= divider >> 1;
+		divider |= divider >> 2;
+		divider |= divider >> 4;
+		divider++;
+	}
 
-	// enabling internal clock
-	clock_control |= SDHCI_INTERNAL_CLOCK_ENABLE;
-	regs->clock_control = clock_control;
+	divider = regs->clock_control.SetDivider(divider);
 
-	// waiting till internal clock gets stable
-	while (!(regs->clock_control & SDHCI_INTERNAL_CLOCK_STABLE));
+	// Log the value after possible rounding by SetDivider (only even values
+	// are allowed).
+	TRACE("SDCLK frequency: %dMHz / %d = %dkHz\n", base_clock, divider,
+		base_clock * 1000 / divider);
 
-	regs->clock_control |= SDHCI_SD_CLOCK_ENABLE; // enabling the SD clock
+	// We have set the divider, now we can enable the internal clock.
+	regs->clock_control.EnableInternal();
+
+	// wait until internal clock is stabilized
+	while (!(regs->clock_control.InternalStable()));
+
+	regs->clock_control.EnablePLL();
+	while (!(regs->clock_control.InternalStable()));
+
+	// Finally, route the clock to the SD card
+	regs->clock_control.EnableSD();
 }
 
 
 static void
 sdhci_stop_clock(struct registers* regs)
 {
-	regs->clock_control &= SDHCI_SD_CLOCK_DISABLE;
+	regs->clock_control.DisableSD();
 }
 
 
 static void
 sdhci_set_power(struct registers* _regs)
 {
-	uint16_t command = _regs->command;
+	uint8_t supportedVoltages = _regs->capabilities.SupportedVoltages();
+	if ((supportedVoltages & Capabilities::k3v3) != 0)
+		_regs->power_control.SetVoltage(PowerControl::k3v3);
+	else if ((supportedVoltages & Capabilities::k3v0) != 0)
+		_regs->power_control.SetVoltage(PowerControl::k3v0);
+	else if ((supportedVoltages & Capabilities::k1v8) != 0)
+		_regs->power_control.SetVoltage(PowerControl::k1v8);
+	else {
+		_regs->power_control.PowerOff();
+		ERROR("No voltage is supported\n");
+		return;
+	}
 
-	if (SDHCI_VOLTAGE_SUPPORTED(_regs->capabilities))
-		if (SDHCI_VOLTAGE_SUPPORTED_33(_regs->capabilities))
-			_regs->power_control |= SDHCI_VOLTAGE_SUPPORT_33;
-		else if (SDHCI_VOLTAGE_SUPPORTED_30(_regs->capabilities))
-			_regs->power_control |= SDHCI_VOLTAGE_SUPPORT_30;
-		else
-			_regs->power_control |= SDHCI_VOLTAGE_SUPPORT_18;
-	else
-		TRACE("No voltage is supported\n");
-
-	if (SDHCI_CARD_INSERTED(_regs->present_state) == 0) {
+	if (!_regs->present_state.IsCardInserted()) {
 		TRACE("Card not inserted\n");
 		return;
 	}
 
-	_regs->power_control |= SDHCI_BUS_POWER_ON;
-	TRACE("Executed CMD0\n");
-
-	command = SDHCI_RESPONSE_R1 | SDHCI_CMD_CRC_EN
-		| SDHCI_CMD_INDEX_EN | SDHCI_CMD_0;
-	_regs->command |= command;
+	TRACE("Execute CMD0\n");
+	_regs->command.SendCommand(0, false);
 
 	DELAY(1000);
 }
@@ -203,6 +220,8 @@ init_bus(device_node* node, void** bus_cookie)
 	if (gDeviceManager->get_attr_uint8(node, SLOT_NUMBER, &slot, false) < B_OK
 		|| gDeviceManager->get_attr_uint8(node, BAR_INDEX, &bar, false) < B_OK)
 		return -1;
+
+	TRACE("Controller has %d slots, first bar is %d\n", slot + 1, bar);
 
 	bus->node = node;
 	bus->pci = pci;
@@ -272,9 +291,8 @@ init_bus(device_node* node, void** bus_cookie)
 		| SDHCI_INT_BUS_POWER | SDHCI_INT_END_BIT;
 
 	sdhci_register_dump(slot, _regs);
-	sdhci_set_clock(_regs, SDHCI_BASE_CLOCK_DIV_128);
+	sdhci_set_clock(_regs);
 	sdhci_set_power(_regs);
-	sdhci_register_dump(slot, _regs);
 
 	*bus_cookie = bus;
 	return status;
@@ -287,10 +305,8 @@ sdhci_error_interrupt_recovery(struct registers* _regs)
 	_regs->interrupt_signal_enable &= ~(SDHCI_INT_CMD_CMP
 		| SDHCI_INT_TRANS_CMP | SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM);
 
-	if (_regs->interrupt_status & 7) {
-		_regs->software_reset |= 1 << 1;
-		while (_regs->command);
-	}
+	if (_regs->interrupt_status & 7)
+		_regs->software_reset.ResetTransaction();
 
 	int16_t erorr_status = _regs->interrupt_status;
 	_regs->interrupt_status &= ~(erorr_status);
@@ -303,11 +319,11 @@ sdhci_generic_interrupt(void* data)
 	TRACE("interrupt function called\n");
 	sdhci_pci_mmc_bus_info* bus = (sdhci_pci_mmc_bus_info*)data;
 
-	uint16_t intmask, card_present;
+	uint32_t intmask, card_present;
 
 	intmask = bus->_regs->slot_interrupt_status;
 
-	if (intmask == 0 || intmask == 0xffffffff) {
+	if ((intmask == 0) || (intmask == 0xffffffff)) {
 		TRACE("invalid command interrupt\n");
 
 		return B_UNHANDLED_INTERRUPT;
@@ -335,8 +351,8 @@ sdhci_generic_interrupt(void* data)
 
 	// handling command interrupt
 	if (intmask & SDHCI_INT_CMD_MASK) {
-		TRACE("interrupt status error: %d\n", bus->_regs->interrupt_status);
 		bus->_regs->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
+		// TODO do something with the interrupt
 		TRACE("Command interrupt handled\n");
 
 		return B_HANDLED_INTERRUPT;
