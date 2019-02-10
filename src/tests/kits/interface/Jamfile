@@ -67,17 +67,6 @@ ObjectDefines
 	: BCheckBox=HCheckBox
 	;
 
-SimpleTest ScrollViewTest_r5 :
-	ScrollViewTest.cpp
-	: be [ TargetLibsupc++ ]
-	;
-
-SimpleTest ScrollViewTest :
-	ScrollViewTest.cpp
-	ScrollView.cpp
-	: be [ TargetLibsupc++ ]
-	;
-
 SimpleTest AlertTest :
 	SimpleAlertTest.cpp
 	: be [ TargetLibsupc++ ]
@@ -101,6 +90,10 @@ SimpleTest ControlLookTest :
 	: be [ TargetLibsupc++ ]
 	;
 
+SimpleTest DrawBitmapTest :
+	DrawBitmapTest.cpp
+	: be ;
+
 SimpleTest ListViewTest :
 	ListViewTest.cpp
 	: be [ TargetLibsupc++ ]
@@ -109,6 +102,17 @@ SimpleTest ListViewTest :
 SimpleTest ScreenTest :
 	ScreenTest.cpp
 	: be
+	;
+
+SimpleTest ScrollViewTest_r5 :
+	ScrollViewTest.cpp
+	: be [ TargetLibsupc++ ]
+	;
+
+SimpleTest ScrollViewTest :
+	ScrollViewTest.cpp
+	ScrollView.cpp
+	: be [ TargetLibsupc++ ]
 	;
 
 SimpleTest StatusBarTest :

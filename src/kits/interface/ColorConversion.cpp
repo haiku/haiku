@@ -546,7 +546,9 @@ uint32
 ReadGray1(const uint8 **source, int32 index)
 {
 	int32 shift = 7 - (index % 8);
-	uint32 result = ((**source >> shift) & 0x01) ? 0xff : 0x00;
+	// In B_GRAY1, a set bit means black (highcolor), a clear bit means white
+	// (low/view color). So we map them to 00 and 0xFF, respectively.
+	uint32 result = ((**source >> shift) & 0x01) ? 0x00 : 0xFF;
 	if (shift == 0)
 		(*source)++;
 	return result;
@@ -656,8 +658,8 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 		return B_OK;
 	}
 
-	int32 srcLinePad = (srcBitsPerRow - width * srcBitsPerPixel) >> 3;
-	int32 dstLinePad = (dstBitsPerRow - width * dstBitsPerPixel) >> 3;
+	int32 srcLinePad = (srcBitsPerRow - width * srcBitsPerPixel + 7) >> 3;
+	int32 dstLinePad = (dstBitsPerRow - width * dstBitsPerPixel + 7) >> 3;
 	uint32 result;
 	uint32 source;
 
