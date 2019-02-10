@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers mmc ;
 
 UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers ;
 
 KernelAddon mmc_bus :
 	mmc_module.cpp

@@ -25,10 +25,17 @@ class Command {
 	public:
 		uint16_t Bits() { return fBits; }
 
-		void SendCommand(uint8_t command, bool data)
+		void SendCommand(uint8_t command, uint8_t type)
 		{
-			fBits = (command << 8) | (data << 5);
+			fBits = (command << 8) | type;
 		}
+
+		static const uint8_t kNoReplyType = 0;
+		static const uint8_t kR1Type = 0x1C;
+		static const uint8_t kR2Type = 0x09;
+		static const uint8_t kR3Type = 0x02;
+		static const uint8_t kR6Type = 0x1C;
+		static const uint8_t kR7Type = 0x3C;
 
 	private:
 		volatile uint16_t fBits;
@@ -43,6 +50,7 @@ class PresentState {
 		uint32_t Bits() { return fBits; }
 
 		bool IsCardInserted() { return fBits & (1 << 16); }
+		bool CommandInhibit() { return fBits & (1 << 0); }
 
 	private:
 		volatile uint32_t fBits;
@@ -166,7 +174,7 @@ struct registers {
 	Command command;
 
 	// Response
-	volatile uint16_t response[8];
+	volatile uint32_t response[4];
 
 	// Buffer Data Port
 	volatile uint32_t buffer_data_port;
@@ -249,25 +257,6 @@ struct registers {
 
 typedef void* sdhci_mmc_bus;
 
-#define DELAY(n)	snooze(n)
-
-#define SDHCI_BUS_CONTROLLER_MODULE_NAME "bus_managers/mmc_bus/driver_v1"
-
-#define	MMC_BUS_MODULE_NAME "bus_managers/mmc_bus/device/v1"
-
-static void sdhci_register_dump(uint8_t, struct registers*);
-static void sdhci_reset(struct registers*);
-static void sdhci_set_clock(struct registers*);
-static void sdhci_set_power(struct registers*);
-static void sdhci_stop_clock(struct registers*);
-void sdhci_error_interrupt_recovery(struct registers*);
-
-status_t sdhci_generic_interrupt(void*);
-
-typedef struct {
-	driver_module_info info;
-
-} sdhci_mmc_bus_interface;
 
 
 #endif /*_SDHCI_PCI_H*/

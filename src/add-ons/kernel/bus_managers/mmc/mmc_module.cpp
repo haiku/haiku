@@ -8,6 +8,9 @@
 #include "mmc_bus.h"
 
 
+#define	MMC_BUS_DEVICE_NAME "bus_managers/mmc_bus/device/v1"
+
+
 device_manager_info* gDeviceManager = NULL;
 
 
@@ -53,23 +56,13 @@ status_t
 mmc_bus_added_device(device_node* parent)
 {
 	CALLED();
-	uint16 deviceType;
-	if (gDeviceManager->get_attr_uint16(parent,
-			SDHCI_DEVICE_TYPE_ITEM, &deviceType, true) != B_OK) {
-		TRACE("device is missing\n");
-		return B_ERROR;
-	}
-
-	TRACE("MMC bus device added\n");
 
 	device_attr attributes[] = {
 		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "mmc bus"}},
-		{ SDHCI_DEVICE_TYPE_ITEM, B_UINT16_TYPE,
-			{ ui16: deviceType }},
 		{ NULL }
 	};
 
-	return gDeviceManager->register_node(parent, MMC_BUS_MODULE_NAME,
+	return gDeviceManager->register_node(parent, MMC_BUS_DEVICE_NAME,
 		attributes, NULL, NULL);
 }
 
@@ -93,7 +86,7 @@ std_ops(int32 op, ...)
 
 driver_module_info mmc_bus_device_module = {
 	{
-		MMC_BUS_MODULE_NAME,
+		MMC_BUS_DEVICE_NAME,
 		0,
 		std_ops
 	},
@@ -111,7 +104,7 @@ driver_module_info mmc_bus_device_module = {
 
 driver_module_info mmc_bus_controller_module = {
 	{
-		SDHCI_BUS_CONTROLLER_MODULE_NAME,
+		MMC_BUS_MODULE_NAME,
 		0,
 		&std_ops
 	},
