@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Haiku, Inc. All rights reserved.
+ * Copyright 2018-2019 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,23 +31,13 @@
 #define SDHCI_PCI_DEVICE_MODULE_NAME "busses/mmc/sdhci_pci/driver_v1"
 #define SDHCI_PCI_MMC_BUS_MODULE_NAME "busses/mmc/sdhci_pci/device/v1"
 
-#define SDHCI_PCI_CONTROLLER_TYPE_NAME "sdhci pci controller"
-
 #define SLOTS_COUNT				"device/slots_count"
 #define SLOT_NUMBER				"device/slot"
 #define BAR_INDEX				"device/bar"
 
 typedef struct {
-	pci_device_module_info* pci;
-	pci_device* device;
-	addr_t base_addr;
-	uint8 irq;
-	sdhci_mmc_bus mmc_bus;
-	area_id regs_area;
-	device_node* node;
-	pci_info info;
-	struct registers* _regs;
-
+	struct registers* fRegisters;
+	uint8_t fIrq;
 } sdhci_pci_mmc_bus_info;
 
 
@@ -195,7 +185,6 @@ init_bus(device_node* node, void** bus_cookie)
 	if (bus == NULL)
 		return B_NO_MEMORY;
 
-	pci_info* pciInfo = &bus->info;
 	pci_device_module_info* pci;
 	pci_device* device;
 
@@ -212,25 +201,17 @@ init_bus(device_node* node, void** bus_cookie)
 		TRACE("PCIx86Module not loaded\n");
 	}
 
-	int msiCount = sPCIx86Module->get_msi_count(pciInfo->bus,
-		pciInfo->device, pciInfo->function);
-
-	TRACE("interrupts count: %d\n",msiCount);
-
 	if (gDeviceManager->get_attr_uint8(node, SLOT_NUMBER, &slot, false) < B_OK
 		|| gDeviceManager->get_attr_uint8(node, BAR_INDEX, &bar, false) < B_OK)
 		return -1;
 
-	TRACE("Controller has %d slots, first bar is %d\n", slot + 1, bar);
+	TRACE("Register SD bus at slot %d, using bar %d\n", slot + 1, bar);
 
-	bus->node = node;
-	bus->pci = pci;
-	bus->device = device;
-
-	pci->get_pci_info(device, pciInfo);
-
-	// legacy interrupt
-	bus->base_addr = pciInfo->u.h0.base_registers[bar];
+	pci_info pciInfo;
+	pci->get_pci_info(device, &pciInfo);
+	int msiCount = sPCIx86Module->get_msi_count(pciInfo.bus,
+		pciInfo.device, pciInfo.function);
+	TRACE("interrupts count: %d\n",msiCount);
 
 	// enable bus master and io
 	uint16 pcicmd = pci->read_pci_config(device, PCI_command, 2);
@@ -239,14 +220,14 @@ init_bus(device_node* node, void** bus_cookie)
 	pci->write_pci_config(device, PCI_command, 2, pcicmd);
 
 	TRACE("init_bus() %p node %p pci %p device %p\n", bus, node,
-		bus->pci, bus->device);
+		pci, device);
 
 	// mapping the registers by MMUIO method
 	int bar_size = pciInfo->u.h0.base_register_sizes[bar];
 
 	regs_area = map_physical_memory("sdhc_regs_map",
-		pciInfo->u.h0.base_registers[bar],
-		pciInfo->u.h0.base_register_sizes[bar], B_ANY_KERNEL_BLOCK_ADDRESS,
+		pciInfo.u.h0.base_registers[bar],
+		pciInfo.u.h0.base_register_sizes[bar], B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&regs);
 
 	if (regs_area < B_OK) {
@@ -254,29 +235,40 @@ init_bus(device_node* node, void** bus_cookie)
 		return B_BAD_VALUE;
 	}
 
-	bus->regs_area = regs_area;
 	struct registers* _regs = (struct registers*)regs;
-	bus->_regs = _regs;
+	bus->fRegisters = _regs;
 	sdhci_reset(_regs);
-	bus->irq = pciInfo->u.h0.interrupt_line;
 
-	TRACE("irq interrupt line: %d\n",bus->irq);
+	// the interrupt is shared between all busses in an SDHC controller, but
+	// they each register an handler. Not a problem, we will just test the
+	// interrupt registers for all busses one after the other and find no
+	// interrupts on the idle busses.
+	bus->fIrq = pciInfo.u.h0.interrupt_line;
 
-	if (bus->irq == 0 || bus->irq == 0xff) {
+	TRACE("irq interrupt line: %d\n", bus->fIrq);
+
+	if (bus->fIrq == 0 || bus->fIrq == 0xff) {
 		TRACE("PCI IRQ not assigned\n");
 		if (sPCIx86Module != NULL) {
 			put_module(B_PCI_X86_MODULE_NAME);
 			sPCIx86Module = NULL;
 		}
+		delete_area(regs_area);
 		delete bus;
 		return B_ERROR;
 	}
 
-	status = install_io_interrupt_handler(bus->irq,
+	status = install_io_interrupt_handler(bus->fIrq,
 		sdhci_generic_interrupt, bus, 0);
 
 	if (status != B_OK) {
 		TRACE("can't install interrupt handler\n");
+		if (sPCIx86Module != NULL) {
+			put_module(B_PCI_X86_MODULE_NAME);
+			sPCIx86Module = NULL;
+		}
+		delete_area(regs_area);
+		delete bus;
 		return status;
 	}
 	TRACE("interrupt handler installed\n");
@@ -296,6 +288,25 @@ init_bus(device_node* node, void** bus_cookie)
 
 	*bus_cookie = bus;
 	return status;
+}
+
+
+static void
+uninit_bus(void* bus_cookie)
+{
+	sdhci_pci_mmc_bus_info* bus = (sdhci_pci_mmc_bus_info*)bus_cookie;
+
+	bus->fRegisters->interrupt_signal_enable = 0;
+	bus->fRegisters->interrupt_status_enable = 0;
+
+	remove_io_interrupt_handler(bus->fIrq, sdhci_generic_interrupt, bus);
+
+	area_id regs_area = area_for(bus->fRegisters);
+	delete_area(regs_area);
+
+	// FIXME do we need to put() the PCI module here?
+
+	delete bus;
 }
 
 
@@ -321,7 +332,7 @@ sdhci_generic_interrupt(void* data)
 
 	uint32_t intmask, card_present;
 
-	intmask = bus->_regs->slot_interrupt_status;
+	intmask = bus->fRegisters->slot_interrupt_status;
 
 	if ((intmask == 0) || (intmask == 0xffffffff)) {
 		TRACE("invalid command interrupt\n");
@@ -332,17 +343,17 @@ sdhci_generic_interrupt(void* data)
 	// handling card presence interrupt
 	if (intmask & (SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM)) {
 		card_present = ((intmask & SDHCI_INT_CARD_INS) != 0);
-		bus->_regs->interrupt_status_enable &= ~(SDHCI_INT_CARD_INS
+		bus->fRegisters->interrupt_status_enable &= ~(SDHCI_INT_CARD_INS
 			| SDHCI_INT_CARD_REM);
-		bus->_regs->interrupt_signal_enable &= ~(SDHCI_INT_CARD_INS
+		bus->fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CARD_INS
 			| SDHCI_INT_CARD_REM);
 
-		bus->_regs->interrupt_status_enable |= card_present
+		bus->fRegisters->interrupt_status_enable |= card_present
 		 	? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
-		bus->_regs->interrupt_signal_enable |= card_present
+		bus->fRegisters->interrupt_signal_enable |= card_present
 			? SDHCI_INT_CARD_REM : SDHCI_INT_CARD_INS;
 
-		bus->_regs->interrupt_status |= (intmask &
+		bus->fRegisters->interrupt_status |= (intmask &
 			(SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM));
 		TRACE("Card presence interrupt handled\n");
 
@@ -351,7 +362,7 @@ sdhci_generic_interrupt(void* data)
 
 	// handling command interrupt
 	if (intmask & SDHCI_INT_CMD_MASK) {
-		bus->_regs->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
+		bus->fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
 		// TODO do something with the interrupt
 		TRACE("Command interrupt handled\n");
 
@@ -360,7 +371,7 @@ sdhci_generic_interrupt(void* data)
 
 	// handling bus power interrupt
 	if (intmask & SDHCI_INT_BUS_POWER) {
-		bus->_regs->interrupt_status |= SDHCI_INT_BUS_POWER;
+		bus->fRegisters->interrupt_status |= SDHCI_INT_BUS_POWER;
 		TRACE("card is consuming too much power\n");
 
 		return B_HANDLED_INTERRUPT;
@@ -370,14 +381,6 @@ sdhci_generic_interrupt(void* data)
 		| SDHCI_INT_CARD_REM | SDHCI_INT_CMD_MASK);
 
 	return B_UNHANDLED_INTERRUPT;
-}
-
-
-static void
-uninit_bus(void* bus_cookie)
-{
-	sdhci_pci_mmc_bus_info* bus = (sdhci_pci_mmc_bus_info*)bus_cookie;
-	delete bus;
 }
 
 
@@ -453,7 +456,7 @@ static status_t
 register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "SDHC PCI controller"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "SD Host Controller"}},
 		{}
 	};
 
