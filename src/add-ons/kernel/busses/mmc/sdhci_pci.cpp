@@ -65,9 +65,10 @@ sdhci_register_dump(uint8_t slot, struct registers* regs)
 	TRACE("argument: %d\n", regs->argument);
 	TRACE("transfer_mode: %d\n", regs->transfer_mode);
 	TRACE("command: %d\n", regs->command);
-	TRACE("response: %d %d %d %d\n", regs->response0, regs->response2,
-		regs->response4, regs->response6);
-	TRACE("buffer_data_port: %d\n", regs->buffer_data_port);
+	TRACE("response:");
+	for (int i = 0; i < 8; i++)
+		TRACE(" %d", regs->response[i]);
+	TRACE("\nbuffer_data_port: %d\n", regs->buffer_data_port);
 	TRACE("present_state: %d\n", regs->present_state);
 	TRACE("power_control: %d\n", regs->power_control);
 	TRACE("host_control: %d\n", regs->host_control);
@@ -80,14 +81,11 @@ sdhci_register_dump(uint8_t slot, struct registers* regs)
 		regs->interrupt_status, regs->interrupt_status_enable,
 		regs->interrupt_signal_enable);
 	TRACE("auto_cmd12_error_status: %d\n", regs->auto_cmd12_error_status);
-	TRACE("capabilities: %d\n", regs->capabilities);
-	TRACE("capabilities_rsvd: %d\n", regs->capabilities_rsvd);
-	TRACE("max_current_capabilities: %d\n",
+	TRACE("capabilities: %lld\n", regs->capabilities);
+	TRACE("max_current_capabilities: %lld\n",
 		regs->max_current_capabilities);
-	TRACE("max_current_capabilities_rsvd: %d\n",
-		regs->max_current_capabilities_rsvd);
 	TRACE("slot_interrupt_status: %d\n", regs->slot_interrupt_status);
-	TRACE("host_control_version %x\n", regs->host_control_version);
+	TRACE("host_controller_version %x\n", regs->host_controller_version);
 }
 
 
