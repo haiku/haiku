@@ -59,17 +59,14 @@ static pci_x86_module_info* sPCIx86Module;
 static void
 sdhci_register_dump(uint8_t slot, struct registers* regs)
 {
-	TRACE("Register values for slot: %d\n", slot);
+	TRACE("Register values for slot %d:\n", slot);
 	TRACE("system_address: %d\n", regs->system_address);
-	TRACE("block_size: %d\n", regs->block_size);
-	TRACE("block_count: %d\n", regs->block_count);
+	TRACE("%d blocks of size %d\n", regs->block_count, regs->block_size);
 	TRACE("argument: %d\n", regs->argument);
 	TRACE("transfer_mode: %d\n", regs->transfer_mode);
 	TRACE("command: %d\n", regs->command);
-	TRACE("response0: %d\n", regs->response0);
-	TRACE("response2: %d\n", regs->response2);
-	TRACE("response4: %d\n", regs->response4);
-	TRACE("response6: %d\n", regs->response6);
+	TRACE("response: %d %d %d %d\n", regs->response0, regs->response2,
+		regs->response4, regs->response6);
 	TRACE("buffer_data_port: %d\n", regs->buffer_data_port);
 	TRACE("present_state: %d\n", regs->present_state);
 	TRACE("power_control: %d\n", regs->power_control);
@@ -79,9 +76,9 @@ sdhci_register_dump(uint8_t slot, struct registers* regs)
 	TRACE("clock_control: %d\n", regs->clock_control);
 	TRACE("software_reset: %d\n", regs->software_reset);
 	TRACE("timeout_control: %d\n", regs->timeout_control);
-	TRACE("interrupt_status: %d\n", regs->interrupt_status);
-	TRACE("interrupt_status_enable: %d\n", regs->interrupt_status_enable);
-	TRACE("interrupt_signal_enable: %d\n", regs->interrupt_signal_enable);
+	TRACE("interrupt_status: %x enable: %x signal: %x\n",
+		regs->interrupt_status, regs->interrupt_status_enable,
+		regs->interrupt_signal_enable);
 	TRACE("auto_cmd12_error_status: %d\n", regs->auto_cmd12_error_status);
 	TRACE("capabilities: %d\n", regs->capabilities);
 	TRACE("capabilities_rsvd: %d\n", regs->capabilities_rsvd);
@@ -90,7 +87,7 @@ sdhci_register_dump(uint8_t slot, struct registers* regs)
 	TRACE("max_current_capabilities_rsvd: %d\n",
 		regs->max_current_capabilities_rsvd);
 	TRACE("slot_interrupt_status: %d\n", regs->slot_interrupt_status);
-	TRACE("host_control_version %d\n", regs->host_control_version);
+	TRACE("host_control_version %x\n", regs->host_control_version);
 }
 
 
