@@ -327,22 +327,18 @@ sdhci_error_interrupt_recovery(struct registers* _regs)
 int32
 sdhci_generic_interrupt(void* data)
 {
-	TRACE("interrupt function called\n");
 	sdhci_pci_mmc_bus_info* bus = (sdhci_pci_mmc_bus_info*)data;
-
-	uint32_t intmask, card_present;
-
-	intmask = bus->fRegisters->slot_interrupt_status;
+	uint32_t intmask = bus->fRegisters->slot_interrupt_status;
 
 	if ((intmask == 0) || (intmask == 0xffffffff)) {
-		TRACE("invalid command interrupt\n");
-
 		return B_UNHANDLED_INTERRUPT;
 	}
 
+	TRACE("interrupt function called\n");
+
 	// handling card presence interrupt
 	if (intmask & (SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM)) {
-		card_present = ((intmask & SDHCI_INT_CARD_INS) != 0);
+		uint32_t card_present = ((intmask & SDHCI_INT_CARD_INS) != 0);
 		bus->fRegisters->interrupt_status_enable &= ~(SDHCI_INT_CARD_INS
 			| SDHCI_INT_CARD_REM);
 		bus->fRegisters->interrupt_signal_enable &= ~(SDHCI_INT_CARD_INS
@@ -377,8 +373,12 @@ sdhci_generic_interrupt(void* data)
 		return B_HANDLED_INTERRUPT;
 	}
 
-	intmask &= ~(SDHCI_INT_BUS_POWER | SDHCI_INT_CARD_INS
-		| SDHCI_INT_CARD_REM | SDHCI_INT_CMD_MASK);
+	intmask = bus->fRegisters->slot_interrupt_status;
+	if (intmask != 0) {
+		ERROR("Remaining interrupts at end of handler: %x\n", intmask);
+		intmask &= ~(SDHCI_INT_BUS_POWER | SDHCI_INT_CARD_INS
+			| SDHCI_INT_CARD_REM | SDHCI_INT_CMD_MASK);
+	}
 
 	return B_UNHANDLED_INTERRUPT;
 }
