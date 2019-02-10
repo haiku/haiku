@@ -325,6 +325,9 @@ LegacyBootMenu::CanBeInstalled(const BootDrive& drive)
 	if (visitor.FirstOffset() < (int)sizeof(kBootLoader))
 		return B_PARTITION_TOO_SMALL;
 
+	if (device.IsReadOnlyMedia())
+		return B_READ_ONLY_DEVICE;
+
 	return B_OK;
 }
 

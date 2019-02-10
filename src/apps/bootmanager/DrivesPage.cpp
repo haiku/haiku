@@ -195,6 +195,10 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 				message = B_TRANSLATE_COMMENT("Incompatible format!",
 					"Cannot install");
 				break;
+			case B_READ_ONLY_DEVICE:
+				message = B_TRANSLATE_COMMENT("Read only!",
+					"Cannot install");
+				break;
 			default:
 				message = B_TRANSLATE_COMMENT("Cannot access!",
 					"Cannot install");
