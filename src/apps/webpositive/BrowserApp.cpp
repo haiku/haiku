@@ -90,9 +90,9 @@ BrowserApp::BrowserApp()
 	get_cpuid(&info, 1, 0);
 
 	if ((info.eax_1.features & (1 << 26)) == 0) {
-		BAlert alert("No SSE2 support", B_TRANSLATE("Your CPU is too old and "
-			"does not support the SSE2 extensions, without which WebPositive "
-			"cannot run. We recommend installing NetSurf instead."),
+		BAlert alert(B_TRANSLATE("No SSE2 support"), B_TRANSLATE("Your CPU is "
+			"too old and does not support the SSE2 extensions, without which "
+			"WebPositive cannot run. We recommend installing NetSurf instead."),
 			B_TRANSLATE("Darn!"));
 		alert.Go();
 		exit(-1);
@@ -133,7 +133,7 @@ BrowserApp::AboutRequested()
 {
 	BAboutWindow* window = new BAboutWindow(kApplicationName,
 		kApplicationSignature);
-	
+
 	// create the about window
 
 	const char* authors[] = {
@@ -234,7 +234,7 @@ BrowserApp::ReadyToRun()
 	fSettingsWindow = new SettingsWindow(settingsWindowFrame, fSettings);
 
 	BWebPage::SetDownloadListener(BMessenger(fDownloadWindow));
-	
+
 	fConsoleWindow = new ConsoleWindow(consoleWindowFrame);
 	fCookieWindow = new CookieWindow(cookieWindowFrame, fContext->GetCookieJar());
 
@@ -393,7 +393,7 @@ BrowserApp::QuitRequested()
 	 * In that case we only need to save that one, which is already archived */
 	BMessage* message = CurrentMessage();
 	BMessage windowMessage;
-	
+
 	status_t ret = message->FindMessage("window", &windowMessage);
 	if (ret == B_OK) {
 		fSession->AddMessage("window", &windowMessage);
