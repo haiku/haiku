@@ -134,32 +134,6 @@ void
 VirtualDirectoryWindow::AddWindowMenu(BMenu* menu)
 {
 	BMenuItem* item;
-	BMessage* message;
-
-	BMenu* listViewMenu = new BMenu(B_TRANSLATE("List view"));
-
-	message = new BMessage(kListMode);
-	message->AddInt32("icon_size", B_MINI_ICON);
-	item = new BMenuItem(listViewMenu, message);
-	item->SetShortcut('3', B_COMMAND_KEY);
-	item->SetTarget(PoseView());
-	menu->AddItem(item);
-
-	message = new BMessage(kListMode);
-	message->AddInt32("icon_size", B_MINI_ICON);
-	item = new BMenuItem(B_TRANSLATE("Mini"), message);
-	item->SetTarget(PoseView());
-	listViewMenu->AddItem(item);
-
-	message = new BMessage(kListMode);
-	message->AddInt32("icon_size", B_LARGE_ICON);
-	item = new BMenuItem(B_TRANSLATE("Large"), message);
-	item->SetTarget(PoseView());
-	listViewMenu->AddItem(item);
-
-	listViewMenu->SetTargetForItems(PoseView());
-
-	menu->AddSeparatorItem();
 
 	item = new BMenuItem(B_TRANSLATE("Resize to fit"),
 		new BMessage(kResizeToFit), 'Y');
