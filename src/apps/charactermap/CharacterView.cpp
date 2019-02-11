@@ -27,7 +27,8 @@ static const uint32 kMsgCopyAsEscapedString = 'cesc';
 
 
 CharacterView::CharacterView(const char* name)
-	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS
+		| B_SCROLL_VIEW_AWARE),
 	fTargetCommand(0),
 	fClickPoint(-1, 0),
 	fHasCharacter(false),
