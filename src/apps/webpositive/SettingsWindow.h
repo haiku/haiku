@@ -49,6 +49,7 @@ private:
 									const BMessage* message);
 			void				_ValidateControlsEnabledStatus();
 
+			uint32				_StartUpPolicy() const;
 			uint32				_NewWindowPolicy() const;
 			uint32				_NewTabPolicy() const;
 
@@ -73,6 +74,10 @@ private:
 			BMenuItem*			fNewTabBehaviorOpenHomeItem;
 			BMenuItem*			fNewTabBehaviorOpenSearchItem;
 			BMenuItem*			fNewTabBehaviorOpenBlankItem;
+
+			BMenuField*			fStartUpBehaviorMenu;
+			BMenuItem*			fStartUpBehaviorResumePriorSession;
+			BMenuItem*			fStartUpBehaviorStartNewSession;
 
 			BSpinner*			fDaysInHistory;
 			BCheckBox*			fShowTabsIfOnlyOnePage;

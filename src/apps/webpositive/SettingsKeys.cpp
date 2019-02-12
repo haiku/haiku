@@ -23,9 +23,9 @@ const char* kSettingsKeyShowHomeButton = "show home button";
 
 const char* kSettingsKeyNewWindowPolicy = "new window policy";
 const char* kSettingsKeyNewTabPolicy = "new tab policy";
+const char* kSettingsKeyStartUpPolicy = "start up policy";
 const char* kSettingsKeyStartPageURL = "start page url";
 const char* kSettingsKeySearchPageURL = "search page url";
-
 
 const char* kDefaultDownloadPath = "/boot/home/Desktop/";
 const char* kDefaultStartPageURL

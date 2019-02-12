@@ -51,6 +51,7 @@ enum {
 	MSG_DOWNLOAD_FOLDER_CHANGED					= 'dnfc',
 	MSG_NEW_WINDOWS_BEHAVIOR_CHANGED			= 'nwbc',
 	MSG_NEW_TABS_BEHAVIOR_CHANGED				= 'ntbc',
+	MSG_START_UP_BEHAVIOR_CHANGED				= 'subc',
 	MSG_HISTORY_MENU_DAYS_CHANGED				= 'digm',
 	MSG_TAB_DISPLAY_BEHAVIOR_CHANGED			= 'tdbc',
 	MSG_AUTO_HIDE_INTERFACE_BEHAVIOR_CHANGED	= 'ahic',
@@ -194,6 +195,7 @@ SettingsWindow::MessageReceived(BMessage* message)
 		case MSG_START_PAGE_CHANGED:
 		case MSG_SEARCH_PAGE_CHANGED:
 		case MSG_DOWNLOAD_FOLDER_CHANGED:
+		case MSG_START_UP_BEHAVIOR_CHANGED:
 		case MSG_NEW_WINDOWS_BEHAVIOR_CHANGED:
 		case MSG_NEW_TABS_BEHAVIOR_CHANGED:
 		case MSG_HISTORY_MENU_DAYS_CHANGED:
@@ -276,6 +278,13 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 	fDownloadFolderControl->SetText(
 		fSettings->GetValue(kSettingsKeyDownloadPath, kDefaultDownloadPath));
 
+	fStartUpBehaviorResumePriorSession = new BMenuItem(
+		B_TRANSLATE("Resume prior session"),
+		new BMessage(MSG_START_UP_BEHAVIOR_CHANGED));
+	fStartUpBehaviorStartNewSession = new BMenuItem(
+		B_TRANSLATE("Start new session"),
+		new BMessage(MSG_START_UP_BEHAVIOR_CHANGED));
+
 	fNewWindowBehaviorOpenHomeItem = new BMenuItem(
 		B_TRANSLATE("Open start page"),
 		new BMessage(MSG_NEW_WINDOWS_BEHAVIOR_CHANGED));
@@ -303,6 +312,14 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 
 	fNewWindowBehaviorOpenHomeItem->SetMarked(true);
 	fNewTabBehaviorOpenBlankItem->SetMarked(true);
+	fStartUpBehaviorResumePriorSession->SetMarked(true);
+
+	BPopUpMenu* startUpBehaviorMenu = new BPopUpMenu("Start up");
+	startUpBehaviorMenu->AddItem(fStartUpBehaviorResumePriorSession);
+	startUpBehaviorMenu->AddItem(fStartUpBehaviorStartNewSession);
+	fStartUpBehaviorMenu = new BMenuField("start up behavior",
+		B_TRANSLATE("Start up:"), startUpBehaviorMenu);
+
 
 	BPopUpMenu* newWindowBehaviorMenu = new BPopUpMenu("New windows");
 	newWindowBehaviorMenu->AddItem(fNewWindowBehaviorOpenHomeItem);
@@ -354,15 +371,18 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 			.Add(fSearchPageControl->CreateLabelLayoutItem(), 0, 1)
 			.Add(fSearchPageControl->CreateTextViewLayoutItem(), 1, 1)
 
-			.Add(fNewWindowBehaviorMenu->CreateLabelLayoutItem(), 0, 2)
-			.Add(fNewWindowBehaviorMenu->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fStartUpBehaviorMenu->CreateLabelLayoutItem(), 0, 2)
+			.Add(fStartUpBehaviorMenu->CreateMenuBarLayoutItem(), 1, 2)
 
-			.Add(fDownloadFolderControl->CreateLabelLayoutItem(), 0, 3)
-			.Add(fDownloadFolderControl->CreateTextViewLayoutItem(), 1, 3)
+			.Add(fNewWindowBehaviorMenu->CreateLabelLayoutItem(), 0, 3)
+			.Add(fNewWindowBehaviorMenu->CreateMenuBarLayoutItem(), 1, 3)
+
+			.Add(fDownloadFolderControl->CreateLabelLayoutItem(), 0, 4)
+			.Add(fDownloadFolderControl->CreateTextViewLayoutItem(), 1, 4)
 			.Add(fChooseButton, 2, 3)
 
-			.Add(fNewTabBehaviorMenu->CreateLabelLayoutItem(), 0, 4)
-			.Add(fNewTabBehaviorMenu->CreateMenuBarLayoutItem(), 1, 4)
+			.Add(fNewTabBehaviorMenu->CreateLabelLayoutItem(), 0, 5)
+			.Add(fNewTabBehaviorMenu->CreateMenuBarLayoutItem(), 1, 5)
 		)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
@@ -552,6 +572,11 @@ SettingsWindow::_CanApplySettings() const
 	canApply = canApply || (fDaysInHistory->Value()
 		!= BrowsingHistory::DefaultInstance()->MaxHistoryItemAge());
 
+	// Start up policy
+	canApply = canApply || (_StartUpPolicy()
+		!= fSettings->GetValue(kSettingsKeyStartUpPolicy,
+			(uint32)ResumePriorSession));
+
 	// New window policy
 	canApply = canApply || (_NewWindowPolicy()
 		!= fSettings->GetValue(kSettingsKeyNewWindowPolicy,
@@ -623,6 +648,7 @@ SettingsWindow::_ApplySettings()
 		fShowHomeButton->Value() == B_CONTROL_ON);
 
 	// New page policies
+	fSettings->SetValue(kSettingsKeyStartUpPolicy, _StartUpPolicy());
 	fSettings->SetValue(kSettingsKeyNewWindowPolicy, _NewWindowPolicy());
 	fSettings->SetValue(kSettingsKeyNewTabPolicy, _NewTabPolicy());
 
@@ -704,6 +730,19 @@ SettingsWindow::_RevertSettings()
 
 	fDaysInHistory->SetValue(
 		BrowsingHistory::DefaultInstance()->MaxHistoryItemAge());
+
+	// Start Up policy
+	uint32 startUpPolicy = fSettings->GetValue(kSettingsKeyStartUpPolicy,
+		(uint32)ResumePriorSession);
+	switch (startUpPolicy) {
+		default:
+		case ResumePriorSession:
+			fStartUpBehaviorResumePriorSession->SetMarked(true);
+			break;
+		case StartNewSession:
+			fStartUpBehaviorStartNewSession->SetMarked(true);
+			break;
+	}
 
 	// New window policy
 	uint32 newWindowPolicy = fSettings->GetValue(kSettingsKeyNewWindowPolicy,
@@ -826,6 +865,16 @@ SettingsWindow::_ValidateControlsEnabledStatus()
 
 // #pragma mark -
 
+
+uint32
+SettingsWindow::_StartUpPolicy() const
+{
+	uint32 startUpPolicy = ResumePriorSession;
+	BMenuItem* markedItem = fStartUpBehaviorMenu->Menu()->FindMarked();
+	if (markedItem == fStartUpBehaviorStartNewSession)
+		startUpPolicy = StartNewSession;
+	return startUpPolicy;
+}
 
 uint32
 SettingsWindow::_NewWindowPolicy() const
