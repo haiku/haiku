@@ -735,6 +735,7 @@ main(int argc, const char *const *argv)
 	const char *destination = files[fileCount];
 	files[fileCount] = NULL;
 	copy_files(files, fileCount, destination, parameters);
+	delete[] files;
 
 	return 0;
 }

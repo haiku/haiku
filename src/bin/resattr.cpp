@@ -309,5 +309,7 @@ main(int argc, const char *const *argv)
 			overwrite);
 	}
 
+	delete[] inputFiles;
+
 	return 0;
 }

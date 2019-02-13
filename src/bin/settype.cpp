@@ -85,7 +85,7 @@ check_mime_type(const char *type)
 	if (type) {
 		if (!BMimeType::IsValid(type)) {
 			fprintf(stderr, "\"%s\" is no valid MIME type.\n", type);
-			
+
 			exit(1);
 		}
 	}
@@ -104,7 +104,7 @@ main(int argc, const char *const *argv)
 	const char *type = NULL;
 	const char *signature = NULL;
 	const char *preferredApp = NULL;
-	
+
 	// parse the arguments
 	for (int argi = 1; argi < argc; ) {
 		const char *arg = argv[argi++];
@@ -141,7 +141,7 @@ main(int argc, const char *const *argv)
 	if (fileCount == 0) {
 		fprintf(stderr, "Error: No file specified.\n");
 		print_usage_and_exit(true);
-	}	
+	}
 
 	// check for valid MIME types
 	check_mime_type(preferredApp);
@@ -236,6 +236,8 @@ main(int argc, const char *const *argv)
 			}
 		}
 	}
+
+	delete[] files;
 
 	return 0;
 }

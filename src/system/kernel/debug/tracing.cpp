@@ -1122,6 +1122,7 @@ private:
 			TraceFilter* filter = new(&fFilters[fFilterCount++]) NotTraceFilter;
 			if ((filter->fSubFilters.first = _ParseExpression()) != NULL)
 				return filter;
+			delete(filter);
 			return NULL;
 		} else if (strcmp(token, "and") == 0) {
 			TraceFilter* filter = new(&fFilters[fFilterCount++]) AndTraceFilter;
@@ -1129,6 +1130,7 @@ private:
 				&& (filter->fSubFilters.second = _ParseExpression()) != NULL) {
 				return filter;
 			}
+			delete(filter);
 			return NULL;
 		} else if (strcmp(token, "or") == 0) {
 			TraceFilter* filter = new(&fFilters[fFilterCount++]) OrTraceFilter;
@@ -1136,6 +1138,7 @@ private:
 				&& (filter->fSubFilters.second = _ParseExpression()) != NULL) {
 				return filter;
 			}
+			delete(filter);
 			return NULL;
 		} else if (strcmp(token, "thread") == 0) {
 			const char* arg = _NextToken();

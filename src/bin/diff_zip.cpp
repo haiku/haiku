@@ -369,6 +369,7 @@ main(int argc, const char* const* argv)
 	execvp("zip", zipArgs);
 
 	fprintf(stderr, "Error: Failed exec*() zip: %s\n", strerror(errno));
+	delete[] rootNodes;
 
 	return 1;
 }

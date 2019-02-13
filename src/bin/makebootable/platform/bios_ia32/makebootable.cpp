@@ -672,5 +672,7 @@ main(int argc, const char *const *argv)
 		close(fd);
 	}
 
+	delete[] files;
+
 	return 0;
 }

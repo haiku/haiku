@@ -130,6 +130,7 @@ main(int argc, char **argv)
 	if (read(fd, buffer, stat.st_size) < 0) {
 		fprintf(stderr, "Could not read from fortune file: %s\n",
 			strerror(errno));
+		free(buffer);
 		return -1;
 	}
 
@@ -148,6 +149,7 @@ main(int argc, char **argv)
 
 	if (!count) {
 		printf("Out of cookies...\n");
+		free(buffer);
 		return 0;
 	}
 
@@ -168,5 +170,6 @@ main(int argc, char **argv)
 	}
 
 	puts(buffer + start);
+	free(buffer)
 	return 0;
 }
