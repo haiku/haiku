@@ -530,7 +530,7 @@ Journal::_WriteTransactionToLog()
 		"the commit block, block size %" B_PRIu32 "\n", fBlockSize);
 	JournalHeader* commitBlock =
 		(JournalHeader*)new(std::nothrow) uint8[fBlockSize];
-	if (descriptorBlock == NULL) {
+	if (commitBlock == NULL) {
 		TRACE("Journal::_WriteTransactionToLog(): Failed to allocate a buffer "
 			"for the commit block\n");
 		return B_NO_MEMORY;
