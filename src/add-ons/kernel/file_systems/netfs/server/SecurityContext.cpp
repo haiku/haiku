@@ -525,7 +525,11 @@ SecurityContext::Archive(BMessage* archive, bool deep) const
 	if (!tmpUserArchives)
 		return B_NO_MEMORY;
 	ArrayDeleter<BMessage> deleter(tmpUserArchives);
-	HashMap<HashKeyPointer<User*>, BMessage*> userArchives;
+#ifdef B_HAIKU_64_BIT
+	HashMap<HashKey64<User*>, BMessage*> userArchives;
+#else
+	HashMap<HashKey32<User*>, BMessage*> userArchives;
+#endif
 	int32 i = 0;
 	for (UserMap::Iterator it = fUsers->GetIterator(); it.HasNext();) {
 		User* user = it.Next().value;
