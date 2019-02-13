@@ -31,10 +31,12 @@ status_t nm_crtc_validate_timing(
 	if (*hd_e < 640) *hd_e = 640;
 	if (*hd_e > si->ps.max_crtc_width) *hd_e = si->ps.max_crtc_width;
 
-	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
+	/* if hor. total does not leave room for a sensible sync pulse,*/
+	/* increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
 
-	/* if hor. total does not adhere to max. blanking pulse width, decrease it! */
+	/* if hor. total does not adhere to max. blanking pulse width,*/
+	/* decrease it! */
 	if (*ht > (*hd_e + 0x1f8)) *ht = (*hd_e + 0x1f8);
 
 	/* make sure sync pulse is not during display */
@@ -69,7 +71,8 @@ status_t nm_crtc_validate_timing(
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
 
-	/* if vert. total does not adhere to max. blanking pulse width, decrease it! */
+	/* if vert. total does not adhere to max. blanking pulse width,*/
+	/* decrease it! */
 	if (*vt > (*vd_e + 0xff)) *vt = (*vd_e + 0xff);
 
 	/* make sure sync pulse is not during display */
@@ -114,15 +117,19 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		if (target.timing.h_display > si->ps.panel_width)
 		{
 			target.timing.h_display = si->ps.panel_width;
-			LOG(4, ("CRTC: req. width > panel width: setting panning mode\n"));
+			LOG(4,
+				("CRTC: req. width > panel width: setting panning mode\n"));
 		}
 		if (target.timing.v_display > si->ps.panel_height)
 		{
 			target.timing.v_display = si->ps.panel_height;
-			LOG(4, ("CRTC: req. height > panel height: setting scrolling mode\n"));
+			LOG(4,
+				("CRTC: req. height > panel height: setting scrolling "
+				"mode\n"));
 		}
 
-		/* modify sync polarities (needed to maintain correct panel centering):
+		/* modify sync polarities
+		 * (needed to maintain correct panel centering):
 		 * both polarities must be negative (confirmed NM2160) */
 		target.timing.flags &= ~(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC);
 	}
@@ -131,7 +138,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 	htotal = ((target.timing.h_total >> 3) - 5);
 	hdisp_e = ((target.timing.h_display >> 3) - 1);
 	hblnk_s = hdisp_e;
-	hblnk_e = (htotal + 0); /* this register differs from standard VGA! (says + 4) */		
+	hblnk_e = (htotal + 0); /* this register differs from standard VGA! */
+		/* (says + 4) */
 	hsync_s = (target.timing.h_sync_start >> 3);
 	hsync_e = (target.timing.h_sync_end >> 3);
 
@@ -142,7 +150,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 	vsync_s = target.timing.v_sync_start;//-1;
 	vsync_e = target.timing.v_sync_end;//-1;
 
-	/* prevent memory adress counter from being reset (linecomp may not occur) */
+	/* prevent memory adress counter from being reset */
+	/* (linecomp may not occur) */
 	linecomp = target.timing.v_display;
 
 	if (crt_only)
@@ -156,7 +165,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		/* actually program the card! */
 		/* unlock CRTC registers at index 0-7 */
 		temp = (ISACRTCR(VSYNCE) & 0x7f);
-		/* we need to wait a bit or the card will mess-up it's register values.. */
+		/* we need to wait a bit or the card will mess-up it's */
+		/* register values.. */
 		snooze(10);
 		ISACRTCW(VSYNCE, temp);
 		/* horizontal standard VGA regs */
@@ -178,10 +188,12 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 			((vblnk_s & 0x100) >> (8 - 3)) | ((linecomp & 0x100) >> (8 - 4))
 		));
 		ISACRTCW(PRROWSCN, 0x00); /* not used */
-		ISACRTCW(MAXSCLIN, (((vblnk_s & 0x200) >> (9 - 5)) | ((linecomp & 0x200) >> (9 - 6))));
+		ISACRTCW(MAXSCLIN, (((vblnk_s & 0x200) >> (9 - 5))
+			| ((linecomp & 0x200) >> (9 - 6))));
 		ISACRTCW(VSYNCS, (vsync_s & 0xff));
 		temp = (ISACRTCR(VSYNCE) & 0xf0);
-		/* we need to wait a bit or the card will mess-up it's register values.. */
+		/* we need to wait a bit or the card will mess-up it's */
+		/* register values.. */
 		snooze(10);
 		ISACRTCW(VSYNCE, (temp | (vsync_e & 0x0f)));
 		ISACRTCW(VDISPE, (vdisp_e & 0xff));
@@ -191,7 +203,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 //	regp->CRTC[23] = 0xC3;
 		ISACRTCW(LINECOMP, (linecomp & 0xff));
 
-		/* horizontal - no extended regs available or needed on NeoMagic chips */
+		/* horizontal - no extended regs available or needed on */
+		/* NeoMagic chips */
 
 		/* vertical - extended regs */
 //fixme: checkout if b2 or 3 should be switched! (linux contains error here)
@@ -210,12 +223,14 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 	}
 	else
 	{
-		LOG(4,("CRTC: internal flatpanel active, setting display region only\n"));
+		LOG(4,
+			("CRTC: internal flatpanel active, setting display region only\n"));
 
 		/* actually program the card! */
 		/* unlock CRTC registers at index 0-7 */
 		temp = (ISACRTCR(VSYNCE) & 0x7f);
-		/* we need to wait a bit or the card will mess-up it's register values.. */
+		/* we need to wait a bit or the card will mess-up it's */
+		/* register values.. */
 		snooze(10);
 		ISACRTCW(VSYNCE, temp);
 		/* horizontal standard VGA regs */
@@ -223,10 +238,11 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 
 		/* vertical standard VGA regs */
 		temp = (ISACRTCR(OVERFLOW) & ~0x52);
-		/* we need to wait a bit or the card will mess-up it's register values.. */
+		/* we need to wait a bit or the card will mess-up it's */
+		/* register values.. */
 		snooze(10);
 		ISACRTCW(OVERFLOW,
-		(	
+		(
 			temp |
 			((vdisp_e & 0x100) >> (8 - 1)) |
 			((vdisp_e & 0x200) >> (9 - 6)) |
@@ -236,7 +252,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		ISACRTCW(PRROWSCN, 0x00); /* not used */
 
 		temp = (ISACRTCR(MAXSCLIN) & ~0x40);
-		/* we need to wait a bit or the card will mess-up it's register values.. */
+		/* we need to wait a bit or the card will mess-up it's */
+		/* register values.. */
 		snooze(10);
 		ISACRTCW(MAXSCLIN, (temp | ((linecomp & 0x200) >> (9 - 6))));
 
@@ -245,7 +262,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 //	regp->CRTC[23] = 0xC3;
 		ISACRTCW(LINECOMP, (linecomp & 0xff));
 
-		/* horizontal - no extended regs available or needed on NeoMagic chips */
+		/* horizontal - no extended regs available or needed on */
+		/* NeoMagic chips */
 
 		/* vertical - extended regs */
 //fixme: linecomp should have an extra bit... testable by setting linecomp
@@ -254,7 +272,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		if (si->ps.card_type >= NM2200)
 		{
 			temp = (ISACRTCR(VEXT) & ~0x02);
-			/* we need to wait a bit or the card will mess-up it's register values.. */
+			/* we need to wait a bit or the card will mess-up it's */
+			/* register values.. */
 			snooze(10);
 			ISACRTCW(VEXT,
 			(
@@ -374,7 +393,8 @@ status_t nm_crtc_depth(int mode)
 		vid_delay |= (ISAGRPHR(COLDEPTH) & 0x70);
 		break;
 	}
-	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	/* we need to wait a bit or the card will mess-up it's */
+	/* register values.. (NM2160) */
 	snooze(10);
 	ISAGRPHW(COLDEPTH, vid_delay);
 
@@ -387,6 +407,10 @@ status_t nm_crtc_depth(int mode)
 status_t nm_crtc_dpms(bool display, bool h, bool v)
 {
 	char msg[100];
+	const char* displayStatus;
+	const char* horizontalSync;
+	const char* verticalSync;
+
 	uint8 temp, size_outputs;
 
 	sprintf(msg, "CRTC: setting DPMS: ");
@@ -396,7 +420,8 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 
 	/* turn screen off */
 	temp = ISASEQR(CLKMODE);
-	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	/* we need to wait a bit or the card will mess-up it's */
+	/* register values.. (NM2160) */
 	snooze(10);
 
 	if (display)
@@ -405,39 +430,43 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 
 		/* end synchronous reset if display should be enabled */
 		ISASEQW(RESET, 0x03);
-		sprintf(msg, "%sdisplay on, ", msg);
+		displayStatus = "on";
 	}
 	else
 	{
 		ISASEQW(CLKMODE, (temp | 0x20));
-		sprintf(msg, "%sdisplay off, ", msg);
+		displayStatus = "off";
 	}
 
 	temp = 0x00;
 	if (h)
 	{
-		sprintf(msg, "%shsync enabled, ", msg);
+		horizontalSync = "enabled";
 	}
 	else
 	{
 		temp |= 0x10;
-		sprintf(msg, "%shsync disabled, ", msg);
+		horizontalSync = "disabled";
 	}
 	if (v)
 	{
-		sprintf(msg, "%svsync enabled\n", msg);
+		verticalSync = "enabled";
 	}
 	else
 	{
 		temp |= 0x20;
-		sprintf(msg, "%svsync disabled\n", msg);
+		verticalSync = "disabled";
 	}
 
+	snprintf(msg, sizeof(msg),
+	"CRTC: setting DPMS: display %s, hsync %s, vsync %s\n",
+		displayStatus, horizontalSync, verticalSync);
 	LOG(4, (msg));
 
 	/* read panelsize and currently active outputs */
 	size_outputs = nm_general_output_read();
-	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	/* we need to wait a bit or the card will mess-up it's register */
+	/* values.. (NM2160) */
 	snooze(10);
 
 	if (si->ps.card_type < NM2200)
@@ -445,7 +474,8 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 		/* no full DPMS support */
 		if (temp)
 		{
-		    /* Turn panel plus backlight and external monitor's sync signals off */
+		    /* Turn panel plus backlight and external monitor's */
+			/* sync signals off */
     		ISAGRPHW(PANELCTRL1, (size_outputs & 0xfc));
 		}
 		else
@@ -473,19 +503,21 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 			/* we have full DPMS support for external monitors */
 			//fixme: checkout if so...
 			temp |= ((ISAGRPHR(ENSETRESET) & 0x0f) | 0x80);
-			/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+			/* we need to wait a bit or the card will mess-up it's */
+			/* register values.. (NM2160) */
 			snooze(10);
 			ISAGRPHW(ENSETRESET, temp);
 
 			snooze(10);
-			LOG(4,("CRTC: DPMS readback $%02x, programmed $%02x\n", ISAGRPHR(ENSETRESET), temp));
+			LOG(4,("CRTC: DPMS readback $%02x, programmed $%02x\n",
+				ISAGRPHR(ENSETRESET), temp));
 		}
 	}
 
 	return B_OK;
 }
 
-status_t nm_crtc_set_display_pitch() 
+status_t nm_crtc_set_display_pitch()
 {
 	uint32 offset;
 
@@ -495,7 +527,7 @@ status_t nm_crtc_set_display_pitch()
 	offset = si->fbc.bytes_per_row / 8;
 
 	LOG(2,("CRTC: offset register set to: $%04x\n", offset));
-		
+
 	/* program the card */
 	ISACRTCW(PITCHL, (offset & 0xff));
 	//fixme: test for max supported pitch if possible,
@@ -507,7 +539,7 @@ status_t nm_crtc_set_display_pitch()
 	return B_OK;
 }
 
-status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp) 
+status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 {
 	uint8 val;
 	uint32 timeout = 0;
@@ -516,8 +548,9 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC: frameRAM: $%08x\n",si->framebuffer));
 	LOG(2,("CRTC: framebuffer: $%08x\n",si->fbc.frame_buffer));
 
-	/* make sure we _just_ left retrace, because otherwise distortions might occur
-	 * during our reprogramming (no double buffering) (verified on NM2160) */
+	/* make sure we _just_ left retrace, because otherwise distortions */
+	/* might occur during our reprogramming (no double buffering) */
+	/* (verified on NM2160) */
 
 	/* we might have no retraces during setmode! So:
 	 * wait 25mS max. for retrace to occur (refresh > 40Hz) */
@@ -545,7 +578,8 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	//this is testable via virtualscreen in 640x480x8 mode...
 	//(b4 is >256Kb adresswrap bit, so that's already occupied)
 	val = ISAGRPHR(FBSTADDE);
-	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	/* we need to wait a bit or the card will mess-up it's */
+	/* register values.. (NM2160) */
 	snooze(10);
 	if (si->ps.card_type < NM2200)
 		/* extended bits: (b18-20) */
@@ -573,11 +607,13 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	return B_OK;
 }
 
-/* setup centering mode for current internal or simultaneous flatpanel mode */
+/* setup centering mode for current internal or simultaneous  */
+/* flatpanel mode */
 status_t nm_crtc_center(display_mode target, bool crt_only)
 {
 	/* note:
-	 * NM2070 apparantly doesn't support horizontal centering this way... */
+	 * NM2070 apparantly doesn't support horizontal */
+	/* centering this way... */
 
 	uint8 vcent1, vcent2, vcent3, vcent4, vcent5;
 	uint8 hcent1, hcent2, hcent3, hcent4, hcent5;
@@ -637,8 +673,8 @@ status_t nm_crtc_center(display_mode target, bool crt_only)
 			vcent5 = voffset;
 			break;
 		case 1280:
-			/* this mode equals the largest possible panel on the newest chip:
-			 * so no centering needed here. */
+			/* this mode equals the largest possible panel on the *
+			 * newest chip: so no centering needed here. */
 			break;
 		default:
 			//fixme?: block non-standard modes? for now: not centered.
@@ -669,15 +705,18 @@ status_t nm_crtc_center(display_mode target, bool crt_only)
 
 	/* program panel control register 2: don't touch bit 3-5 */
 	ctrl2 |= (ISAGRPHR(PANELCTRL2) & 0x38);
-	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	/* we need to wait a bit or the card will mess-up it's register */
+	/* values.. (NM2160) */
 	snooze(10);
 	ISAGRPHW(PANELCTRL2, ctrl2);
 
 	if (si->ps.card_type > NM2070)
 	{
-		/* program panel control register 3: don't touch bit 7-5 and bit 3-0 */
+		/* program panel control register 3: don't touch bit 7-5 */
+		/* and bit 3-0 */
 		ctrl3 |= (ISAGRPHR(PANELCTRL3) & 0xef);
-		/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+		/* we need to wait a bit or the card will mess-up it's  */
+		/* register values.. (NM2160) */
 		snooze(10);
 		ISAGRPHW(PANELCTRL3, ctrl3);
 	}
@@ -690,7 +729,8 @@ status_t nm_crtc_prg_panel()
 {
 status_t stat = B_ERROR;
 
-	/* only NM2070 requires this apparantly (because it's BIOS doesn't do it OK) */
+	/* only NM2070 requires this apparantly */
+	/* (because it's BIOS doesn't do it OK) */
 	if (si->ps.card_type > NM2070) return B_OK;
 
 	switch(si->ps.panel_width)
@@ -910,7 +950,8 @@ status_t nm_crtc_cursor_init()
 
 	/* we must set a valid colordepth to get full RAM access on Neomagic cards:
 	 * in old pre 8-bit color VGA modes some planemask is in effect apparantly,
-	 * allowing access only to every 7th and 8th RAM byte across the entire RAM. */
+	 * allowing access only to every 7th and 8th RAM byte across the
+	 * entire RAM. */
 	nm_crtc_depth(BPP8);
 
 	/* clear cursor: so we need full RAM access! */
@@ -941,7 +982,8 @@ status_t nm_crtc_cursor_show()
 
 status_t nm_crtc_cursor_hide()
 {
-//linux fixme: using this kills PCI(?) access sometimes, so use ISA access as below...
+//linux fixme: using this kills PCI(?) access sometimes,
+//so use ISA access as below...
 /*
 	if (si->ps.card_type < NM2200)
 	{

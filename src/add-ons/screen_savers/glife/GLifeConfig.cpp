@@ -47,7 +47,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 		0, 4, B_BLOCK_THUMB);
 
 	fGridDelay->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fGridDelay->SetLimitLabels(B_TRANSLATE("None"), B_TRANSLATE_COMMENT("4x", 
+	fGridDelay->SetLimitLabels(B_TRANSLATE("None"), B_TRANSLATE_COMMENT("4x",
 			"This is a factor: the x represents 'times'"));
 	fGridDelay->SetValue(pglsState->GridDelay());
 	fGridDelay->SetHashMarkCount(5);
@@ -114,7 +114,7 @@ GLifeConfig::AttachedToWindow(void)
 	fGridDelay->SetTarget(this);
 
 #ifdef _USE_ASYNCHRONOUS
-	
+
 	m_uiWindowFlags = Window()->Flags();
 	Window()->SetFlags(m_uiWindowFlags | B_ASYNCHRONOUS_CONTROLS);
 
@@ -125,28 +125,26 @@ GLifeConfig::AttachedToWindow(void)
 void
 GLifeConfig::_UpdateLabels()
 {
-	char newLabel[64];
-	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Width: %li"),
-		fGridWidth->Value());
+	BString newLabel;
+	newLabel.SetToFormat(B_TRANSLATE("Grid Width: %li"), fGridWidth->Value());
 	fGridWidth->SetLabel(newLabel);
-	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Height: %li"),
-		fGridHeight->Value());
+
+	newLabel.SetToFormat(B_TRANSLATE("Grid Height: %li"), fGridHeight->Value());
 	fGridHeight->SetLabel(newLabel);
-	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Border: %li"),
-		fGridBorder->Value());
+
+	newLabel.SetToFormat(B_TRANSLATE("Grid Border: %li"), fGridBorder->Value());
 	fGridBorder->SetLabel(newLabel);
 
-	char delay[16];
+	BString delay;
 	if (fGridDelay->Value() <= 0)
-		sprintf(delay, B_TRANSLATE("none"));
+		delay = B_TRANSLATE("none");
 	else {
-		sprintf(delay, "%" B_PRId32, fGridDelay->Value());
-		sprintf(delay, B_TRANSLATE_COMMENT("%sx", 
-				"This is a factor: the x represents 'times'"), delay);
+		BString format = (B_TRANSLATE_CONTEXT("Grid Life Delay: <number>x",
+			"This is a factor: the x represents 'times'"));
+		format.ReplaceAll("<number>", B_PRId32);
+		format.SetToFormat(format.String(), fGridDelay->Value());
 	}
-	snprintf(newLabel, sizeof(newLabel), B_TRANSLATE("Grid Life Delay: %s"), 
-		delay);
-	fGridDelay->SetLabel(newLabel);
+	fGridDelay->SetLabel(delay);
 }
 
 
