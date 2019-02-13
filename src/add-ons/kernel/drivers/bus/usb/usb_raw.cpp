@@ -693,11 +693,14 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				return B_BUFFER_OVERFLOW;
 
 			void *controlData = malloc(command.control.length);
+			if (controlData == NULL)
+				return B_NO_MEMORY;
 			bool inTransfer = (command.control.request_type
 				& USB_ENDPOINT_ADDR_DIR_IN) != 0;
 			if (!IS_USER_ADDRESS(command.control.data)
 				|| (!inTransfer && user_memcpy(controlData,
 					command.control.data, command.control.length) != B_OK)) {
+				free(controlData);
 				return B_BAD_ADDRESS;
 			}
 
