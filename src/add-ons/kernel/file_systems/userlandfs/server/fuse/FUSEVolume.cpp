@@ -2201,9 +2201,13 @@ FUSEVolume::OpenAttr(void* _node, const char* name, int openMode,
 	}
 
 	AttrCookie* cookie = new(std::nothrow)AttrCookie(name);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
 	error = cookie->Allocate(attrSize);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete cookie;
 		RETURN_ERROR(error);
+	}
 
 	int bytesRead = fuse_fs_getxattr(fFS, path, name, cookie->Buffer(),
 		attrSize);
