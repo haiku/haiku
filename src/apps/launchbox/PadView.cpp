@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include <Directory.h>
+#include <File.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <GroupLayout.h>
@@ -19,6 +21,7 @@
 
 #include "LaunchButton.h"
 #include "MainWindow.h"
+#include "App.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -399,6 +402,11 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	item->SetMarked(what == MSG_HIDE_BORDER);
 	settingsM->AddItem(item);
 
+	item = new BMenuItem(B_TRANSLATE("Autostart"), new BMessage(MSG_TOGGLE_AUTOSTART));
+	item->SetTarget(be_app);
+	item->SetMarked(((App*)be_app)->AutoStart());
+	settingsM->AddItem(item);
+
 	item = new BMenuItem(B_TRANSLATE("Auto-raise"), new BMessage(MSG_TOGGLE_AUTORAISE));
 	item->SetTarget(window);
 	item->SetMarked(window->AutoRaise());
@@ -512,4 +520,3 @@ PadView::_NotifySettingsChanged()
 {
 	be_app->PostMessage(MSG_SETTINGS_CHANGED);
 }
-

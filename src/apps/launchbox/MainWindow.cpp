@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include <Directory.h>
+#include <File.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -49,7 +51,6 @@ MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 		else
 			_AddEmptyButtons();
 	}
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(fPadView);
 }
@@ -653,4 +654,3 @@ MainWindow::_NotifySettingsChanged()
 {
 	be_app->PostMessage(MSG_SETTINGS_CHANGED);
 }
-

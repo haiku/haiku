@@ -21,6 +21,7 @@ enum {
 
 	MSG_ADD_WINDOW				= 'addw',
 	MSG_SETTINGS_CHANGED		= 'stch',
+	MSG_TOGGLE_AUTOSTART		= 'tast'
 };
 
 

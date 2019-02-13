@@ -11,6 +11,8 @@
 #include <Entry.h>
 #include <Message.h>
 #include <String.h>
+#include <Directory.h>
+#include <File.h>
 
 #include "support.h"
 
@@ -19,11 +21,13 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "LaunchBox"
 
+
 App::App()
 	:
 	BApplication("application/x-vnd.Haiku-LaunchBox"),
 	fSettingsChanged(false),
-	fNamePanelSize(200, 50)
+	fNamePanelSize(200, 50),
+	fAutoStart(false)
 {
 	SetPulseRate(3000000);
 }
@@ -69,6 +73,9 @@ App::ReadyToRun()
 		BSize size;
 		if (settings.FindSize("name panel size", &size) == B_OK)
 			fNamePanelSize = size;
+		bool auto_start;
+		if (settings.FindBool("autostart", &auto_start) == B_OK)
+			fAutoStart = auto_start;
 	}
 
 	if (!windowAdded) {
@@ -97,6 +104,9 @@ App::MessageReceived(BMessage* message)
 			fSettingsChanged = true;
 			break;
 		}
+		case MSG_TOGGLE_AUTOSTART:
+			ToggleAutoStart();
+			break;
 		case MSG_SETTINGS_CHANGED:
 			fSettingsChanged = true;
 			break;
@@ -121,6 +131,14 @@ App::SetNamePanelSize(const BSize& size)
 		fNamePanelSize = size;
 		Unlock();
 	}
+}
+
+
+void
+App::ToggleAutoStart()
+{
+	fSettingsChanged = true;
+	fAutoStart = !AutoStart();
 }
 
 
@@ -156,6 +174,7 @@ App::_StoreSettingsIfNeeded()
 		}
 	}
 	settings.AddSize("name panel size", fNamePanelSize);
+	settings.AddBool("autostart", AutoStart());
 
 	save_settings(&settings, "main_settings", "LaunchBox");
 

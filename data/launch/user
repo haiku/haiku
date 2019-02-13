@@ -12,6 +12,14 @@ target desktop {
 		on initial_volumes_mounted
 	}
 
+	job x-vnd.Haiku-LaunchBox {
+		launch /system/apps/LaunchBox
+		if setting ~/config/settings/LaunchBox/main_settings autostart
+		on initial_volumes_mounted
+		legacy
+		no_safemode
+	}
+
 	service x-vnd.Be-POST {
 		launch /system/servers/mail_daemon
 		if setting ~/config/settings/Mail/new_mail_daemon DaemonAutoStarts
