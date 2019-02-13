@@ -15,6 +15,7 @@
 #	include <util/kernel_cpp.h>
 #	include <util/TypeOperation.h>
 #else
+#	include <new>
 #	include <TypeOperation.h>
 #endif
 
