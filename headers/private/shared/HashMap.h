@@ -1,74 +1,63 @@
-// HashMap.h
-//
-// Copyright (c) 2004-2007, Ingo Weinhold (bonefish@cs.tu-berlin.de)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-//
-// Except as contained in this notice, the name of a copyright holder shall
-// not be used in advertising or otherwise to promote the sale, use or other
-// dealings in this Software without prior written authorization of the
-// copyright holder.
-
+/*
+ * Copyright 2004-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef HASH_MAP_H
 #define HASH_MAP_H
 
+//#include <Debug.h>
 
-#include <Locker.h>
+#include <util/OpenHashTable.h>
 
 #include "AutoLocker.h"
-#include "OpenHashTable.h"
+#include "Locker.h"
 
-
-namespace BPrivate {
 
 // HashMapElement
 template<typename Key, typename Value>
-class HashMapElement : public OpenHashElement {
+class HashMapElement {
 private:
 	typedef HashMapElement<Key, Value> Element;
+
 public:
-
-	HashMapElement() : OpenHashElement(), fKey(), fValue()
+	HashMapElement()
+		:
+		fKey(),
+		fValue(),
+		fNext(NULL)
 	{
-		fNext = -1;
 	}
 
-	inline uint32 Hash() const
+	HashMapElement(const Key& key, const Value& value)
+		:
+		fKey(key),
+		fValue(value),
+		fNext(NULL)
 	{
-		return fKey.GetHashCode();
 	}
 
-	inline bool operator==(const OpenHashElement &_element) const
-	{
-		const Element &element = static_cast<const Element&>(_element);
-		return (fKey == element.fKey);
-	}
-
-	inline void Adopt(Element &element)
-	{
-		fKey = element.fKey;
-		fValue = element.fValue;
-	}
-
-	Key		fKey;
-	Value	fValue;
+	Key				fKey;
+	Value			fValue;
+	HashMapElement*	fNext;
 };
+
+
+// HashMapTableDefinition
+template<typename Key, typename Value>
+struct HashMapTableDefinition {
+	typedef Key							KeyType;
+	typedef	HashMapElement<Key, Value>	ValueType;
+
+	size_t HashKey(const KeyType& key) const
+		{ return key.GetHashCode(); }
+	size_t Hash(const ValueType* value) const
+		{ return HashKey(value->fKey); }
+	bool Compare(const KeyType& key, const ValueType* value) const
+		{ return value->fKey == key; }
+	ValueType*& GetLink(ValueType* value) const
+		{ return value->fNext; }
+};
+
 
 // HashMap
 template<typename Key, typename Value>
@@ -90,87 +79,64 @@ public:
 		Iterator(const Iterator& other)
 			:
 			fMap(other.fMap),
-			fIndex(other.fIndex),
-			fElement(other.fElement),
-			fLastElement(other.fElement)
+			fIterator(other.fIterator),
+			fElement(other.fElement)
 		{
 		}
 
 		bool HasNext() const
 		{
-			return fElement;
+			return fIterator.HasNext();
 		}
 
 		Entry Next()
 		{
-			if (!fElement)
-				return Entry();
-			Entry result(fElement->fKey, fElement->fValue);
-			_FindNext();
-			return result;
-		}
-
-		Value* NextValue()
-		{
+			fElement = fIterator.Next();
 			if (fElement == NULL)
-				return NULL;
+				return Entry();
 
-			Value* value = &fElement->fValue;
-			_FindNext();
-			return value;
+			return Entry(fElement->fKey, fElement->fValue);
 		}
 
 		Entry Remove()
 		{
-			if (!fLastElement)
+			if (fElement == NULL)
 				return Entry();
-			Entry result(fLastElement->fKey, fLastElement->fValue);
-			fMap->fTable.Remove(fLastElement, true);
-			fLastElement = NULL;
+
+			Entry result(fElement->fKey, fElement->fValue);
+
+			fMap->fTable.RemoveUnchecked(fElement);
+			delete fElement;
+			fElement = NULL;
+
 			return result;
 		}
 
 		Iterator& operator=(const Iterator& other)
 		{
 			fMap = other.fMap;
-			fIndex = other.fIndex;
+			fIterator = other.fIterator;
 			fElement = other.fElement;
-			fLastElement = other.fLastElement;
 			return *this;
 		}
 
 	private:
-		Iterator(const HashMap<Key, Value>* map)
+		Iterator(HashMap<Key, Value>* map)
 			:
-			fMap(const_cast<HashMap<Key, Value>*>(map)),
-			fIndex(0),
-			fElement(NULL),
-			fLastElement(NULL)
+			fMap(map),
+			fIterator(map->fTable.GetIterator()),
+			fElement(NULL)
 		{
-			// find first
-			_FindNext();
-		}
-
-		void _FindNext()
-		{
-			fLastElement = fElement;
-			if (fElement && fElement->fNext >= 0) {
-				fElement = fMap->fTable.ElementAt(fElement->fNext);
-				return;
-			}
-			fElement = NULL;
-			int32 arraySize = fMap->fTable.ArraySize();
-			for (; !fElement && fIndex < arraySize; fIndex++)
-				fElement = fMap->fTable.FindFirst(fIndex);
 		}
 
 	private:
 		friend class HashMap<Key, Value>;
+		typedef BOpenHashTable<HashMapTableDefinition<Key, Value> >
+			ElementTable;
 
-		HashMap<Key, Value>*	fMap;
-		int32					fIndex;
-		Element*				fElement;
-		Element*				fLastElement;
+		HashMap<Key, Value>*			fMap;
+		typename ElementTable::Iterator	fIterator;
+		Element*						fElement;
 	};
 
 	HashMap();
@@ -178,38 +144,35 @@ public:
 
 	status_t InitCheck() const;
 
-	status_t Put(const Key& key, Value value);
+	status_t Put(const Key& key, const Value& value);
 	Value Remove(const Key& key);
 	void Clear();
 	Value Get(const Key& key) const;
-	bool Get(const Key& key, Value*& _value) const;
 
 	bool ContainsKey(const Key& key) const;
 
 	int32 Size() const;
 
-	Iterator GetIterator() const;
+	Iterator GetIterator();
 
 protected:
+	typedef BOpenHashTable<HashMapTableDefinition<Key, Value> > ElementTable;
 	typedef HashMapElement<Key, Value>	Element;
 	friend class Iterator;
 
-private:
-	Element *_FindElement(const Key& key) const;
-
 protected:
-	OpenHashElementArray<Element>							fElementArray;
-	OpenHashTable<Element, OpenHashElementArray<Element> >	fTable;
+	ElementTable	fTable;
 };
+
 
 // SynchronizedHashMap
 template<typename Key, typename Value>
-class SynchronizedHashMap : public BLocker {
+class SynchronizedHashMap : public Locker {
 public:
-	typedef struct HashMap<Key, Value>::Entry Entry;
-	typedef struct HashMap<Key, Value>::Iterator Iterator;
+	typedef typename HashMap<Key, Value>::Entry Entry;
+	typedef typename HashMap<Key, Value>::Iterator Iterator;
 
-	SynchronizedHashMap() : BLocker("synchronized hash map")	{}
+	SynchronizedHashMap() : Locker("synchronized hash map")	{}
 	~SynchronizedHashMap()	{ Lock(); }
 
 	status_t InitCheck() const
@@ -217,7 +180,7 @@ public:
 		return fMap.InitCheck();
 	}
 
-	status_t Put(const Key& key, Value value)
+	status_t Put(const Key& key, const Value& value)
 	{
 		MapLocker locker(this);
 		if (!locker.IsLocked())
@@ -241,8 +204,8 @@ public:
 
 	Value Get(const Key& key) const
 	{
-		const BLocker* lock = this;
-		MapLocker locker(const_cast<BLocker*>(lock));
+		const Locker* lock = this;
+		MapLocker locker(const_cast<Locker*>(lock));
 		if (!locker.IsLocked())
 			return Value();
 		return fMap.Get(key);
@@ -250,8 +213,8 @@ public:
 
 	bool ContainsKey(const Key& key) const
 	{
-		const BLocker* lock = this;
-		MapLocker locker(const_cast<BLocker*>(lock));
+		const Locker* lock = this;
+		MapLocker locker(const_cast<Locker*>(lock));
 		if (!locker.IsLocked())
 			return false;
 		return fMap.ContainsKey(key);
@@ -259,8 +222,8 @@ public:
 
 	int32 Size() const
 	{
-		const BLocker* lock = this;
-		MapLocker locker(const_cast<BLocker*>(lock));
+		const Locker* lock = this;
+		MapLocker locker(const_cast<Locker*>(lock));
 		return fMap.Size();
 	}
 
@@ -274,7 +237,7 @@ public:
 	HashMap<Key, Value>& GetUnsynchronizedMap()				{ return fMap; }
 
 protected:
-	typedef AutoLocker<BLocker> MapLocker;
+	typedef AutoLocker<Locker> MapLocker;
 
 	HashMap<Key, Value>	fMap;
 };
@@ -342,103 +305,149 @@ struct HashKey64 {
 };
 
 
+// HashKeyPointer
+template<typename Value>
+struct HashKeyPointer {
+	HashKeyPointer() {}
+	HashKeyPointer(const Value& value) : value(value) {}
+
+	uint32 GetHashCode() const
+	{
+#if __HAIKU_ARCH_BITS == 32
+		return (uint32)(addr_t)value;
+#elif __HAIKU_ARCH_BITS == 64
+		uint64 v = (uint64)(addr_t)value;
+		return (uint32)(v >> 32) ^ (uint32)v;
+#else
+		#error unknown bitness
+#endif
+	}
+
+	HashKeyPointer<Value> operator=(const HashKeyPointer<Value>& other)
+	{
+		value = other.value;
+		return *this;
+	}
+
+	bool operator==(const HashKeyPointer<Value>& other) const
+	{
+		return (value == other.value);
+	}
+
+	bool operator!=(const HashKeyPointer<Value>& other) const
+	{
+		return (value != other.value);
+	}
+
+	Value	value;
+};
+
+
 // HashMap
 
 // constructor
 template<typename Key, typename Value>
 HashMap<Key, Value>::HashMap()
 	:
-	fElementArray(1000),
-	fTable(1000, &fElementArray)
+	fTable()
 {
+	fTable.Init();
 }
+
 
 // destructor
 template<typename Key, typename Value>
 HashMap<Key, Value>::~HashMap()
 {
+	Clear();
 }
+
 
 // InitCheck
 template<typename Key, typename Value>
 status_t
 HashMap<Key, Value>::InitCheck() const
 {
-	return (fTable.InitCheck() && fElementArray.InitCheck()
-			? B_OK : B_NO_MEMORY);
+	return (fTable.TableSize() > 0 ? B_OK : B_NO_MEMORY);
 }
+
 
 // Put
 template<typename Key, typename Value>
 status_t
-HashMap<Key, Value>::Put(const Key& key, Value value)
+HashMap<Key, Value>::Put(const Key& key, const Value& value)
 {
-	Element* element = _FindElement(key);
+	Element* element = fTable.Lookup(key);
 	if (element) {
 		// already contains the key: just set the new value
 		element->fValue = value;
 		return B_OK;
 	}
-	// does not contain the key yet: add an element
-	element = fTable.Add(key.GetHashCode());
+
+	// does not contain the key yet: create an element and add it
+	element = new(std::nothrow) Element(key, value);
 	if (!element)
 		return B_NO_MEMORY;
-	element->fKey = key;
-	element->fValue = value;
-	return B_OK;
+
+	status_t error = fTable.Insert(element);
+	if (error != B_OK)
+		delete element;
+
+	return error;
 }
+
 
 // Remove
 template<typename Key, typename Value>
 Value
 HashMap<Key, Value>::Remove(const Key& key)
 {
-	Value value = Value();
-	if (Element* element = _FindElement(key)) {
-		value = element->fValue;
-		fTable.Remove(element);
-	}
+	Element* element = fTable.Lookup(key);
+	if (element == NULL)
+		return Value();
+
+	fTable.Remove(element);
+	Value value = element->fValue;
+	delete element;
+
 	return value;
 }
+
 
 // Clear
 template<typename Key, typename Value>
 void
 HashMap<Key, Value>::Clear()
 {
-	fTable.RemoveAll();
+	// clear the table and delete the elements
+	Element* element = fTable.Clear(true);
+	while (element != NULL) {
+		Element* next = element->fNext;
+		delete element;
+		element = next;
+	}
 }
+
 
 // Get
 template<typename Key, typename Value>
 Value
 HashMap<Key, Value>::Get(const Key& key) const
 {
-	if (Element* element = _FindElement(key))
+	if (Element* element = fTable.Lookup(key))
 		return element->fValue;
 	return Value();
 }
 
-// Get
-template<typename Key, typename Value>
-bool
-HashMap<Key, Value>::Get(const Key& key, Value*& _value) const
-{
-	if (Element* element = _FindElement(key)) {
-		_value = &element->fValue;
-		return true;
-	}
-
-	return false;
-}
 
 // ContainsKey
 template<typename Key, typename Value>
 bool
 HashMap<Key, Value>::ContainsKey(const Key& key) const
 {
-	return _FindElement(key);
+	return fTable.Lookup(key) != NULL;
 }
+
 
 // Size
 template<typename Key, typename Value>
@@ -448,34 +457,14 @@ HashMap<Key, Value>::Size() const
 	return fTable.CountElements();
 }
 
+
 // GetIterator
 template<typename Key, typename Value>
-class HashMap<Key, Value>::Iterator
-HashMap<Key, Value>::GetIterator() const
+typename HashMap<Key, Value>::Iterator
+HashMap<Key, Value>::GetIterator()
 {
 	return Iterator(this);
 }
 
-// _FindElement
-template<typename Key, typename Value>
-typename HashMap<Key, Value>::Element *
-HashMap<Key, Value>::_FindElement(const Key& key) const
-{
-	Element* element = fTable.FindFirst(key.GetHashCode());
-	while (element && element->fKey != key) {
-		if (element->fNext >= 0)
-			element = fTable.ElementAt(element->fNext);
-		else
-			element = NULL;
-	}
-	return element;
-}
-
-}	// namespace BPrivate
-
-using BPrivate::HashMap;
-using BPrivate::HashKey32;
-using BPrivate::HashKey64;
-using BPrivate::SynchronizedHashMap;
 
 #endif	// HASH_MAP_H

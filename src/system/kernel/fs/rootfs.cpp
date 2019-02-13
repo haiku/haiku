@@ -10,7 +10,7 @@
 #if FS_SHELL
 #	include "fssh_api_wrapper.h"
 
-#	include "KOpenHashTable.h"
+#	include "OpenHashTable.h"
 #	include "list.h"
 #else
 #	include <stdio.h>
