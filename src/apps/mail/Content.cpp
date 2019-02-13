@@ -3090,11 +3090,16 @@ TTextView::AddQuote(int32 start, int32 finish)
 			// add quote to this line
 			int32 lineLength = index - lastLine + 1;
 
-			target = (char *)realloc(target, targetLength + lineLength + quoteLength);
-			if (target == NULL) {
-				// free the old buffer?
+			char* newTarget = (char *)realloc(target,
+				targetLength + lineLength + quoteLength);
+			if (newTarget == NULL) {
+				// free the old buffer
+				free(target);
+				target = NULL;
 				free(text);
 				return;
+			} else {
+				target = newTarget;
 			}
 
 			// copy the quote sign
