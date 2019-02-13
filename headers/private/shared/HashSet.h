@@ -1,36 +1,43 @@
 /*
  * Copyright 2004-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HASH_SET_H
 #define HASH_SET_H
 
-#include <util/OpenHashTable.h>
+#include <OpenHashTable.h>
+#include <Locker.h>
 
 #include "AutoLocker.h"
-#include "Locker.h"
+
+
+namespace BPrivate {
 
 
 // HashSetElement
 template<typename Key>
-class HashSetElement : public HashTableLink<HashSetElement<Key> > {
+class HashSetElement {
 private:
 	typedef HashSetElement<Key> Element;
 
 public:
 	HashSetElement()
 		:
-		fKey()
+		fKey(),
+		fNext(NULL)
 	{
 	}
 
 	HashSetElement(const Key& key)
 		:
-		fKey(key)
+		fKey(key),
+		fNext(NULL)
 	{
 	}
 
-	Key		fKey;
+	Key				fKey;
+	HashSetElement*	fNext;
 };
 
 
@@ -46,8 +53,8 @@ struct HashSetTableDefinition {
 		{ return HashKey(value->fKey); }
 	bool Compare(const KeyType& key, const ValueType* value) const
 		{ return value->fKey == key; }
-	HashTableLink<ValueType>* GetLink(ValueType* value) const
-		{ return value; }
+	ValueType*& GetLink(ValueType* value) const
+		{ return value->fNext; }
 };
 
 
@@ -111,8 +118,7 @@ public:
 		}
 
 	private:
-		friend class HashMap<Key, Value>;
-		typedef OpenHashTable<HashSetTableDefinition<Key> > ElementTable;
+		typedef BOpenHashTable<HashSetTableDefinition<Key> > ElementTable;
 
 		HashSet<Key>*			fSet;
 		ElementTable::Iterator	fIterator;
@@ -137,7 +143,7 @@ public:
 	Iterator GetIterator();
 
 protected:
-	typedef OpenHashTable<HashSetTableDefinition<Key> > ElementTable;
+	typedef BOpenHashTable<HashSetTableDefinition<Key> > ElementTable;
 	typedef HashSetElement<Key>	Element;
 	friend class Iterator;
 
@@ -147,7 +153,7 @@ protected:
 
 
 // SynchronizedHashSet
-template<typename Key>
+template<typename Key, typename Locker = BLocker>
 class SynchronizedHashSet : public Locker {
 public:
 	typedef HashSet<Key>::Iterator Iterator;
@@ -284,7 +290,7 @@ HashSet<Key>::Remove(const Key& key)
 
 
 // Clear
-template<typename Key, typename Value>
+template<typename Key>
 void
 HashSet<Key>::Clear()
 {
@@ -315,6 +321,7 @@ HashSet<Key>::Size() const
 	return fTable.CountElements();
 }
 
+
 // GetIterator
 template<typename Key>
 HashSet<Key>::Iterator
@@ -323,20 +330,8 @@ HashSet<Key>::GetIterator()
 	return Iterator(this);
 }
 
-// _FindElement
-template<typename Key>
-HashSet<Key>::Element *
-HashSet<Key>::_FindElement(const Key& key) const
-{
-	Element* element = fTable.FindFirst(key.GetHashCode());
-	while (element && element->fKey != key) {
-		if (element->fNext >= 0)
-			element = fTable.ElementAt(element->fNext);
-		else
-			element = NULL;
-	}
-	return element;
-}
+} // namespace BPrivate
 
+using BPrivate::HashSet;
 
 #endif	// HASH_SET_H

@@ -1,16 +1,18 @@
 /*
  * Copyright 2004-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HASH_MAP_H
 #define HASH_MAP_H
 
-//#include <Debug.h>
-
-#include <util/OpenHashTable.h>
+#include <OpenHashTable.h>
+#include <Locker.h>
 
 #include "AutoLocker.h"
-#include "Locker.h"
+
+
+namespace BPrivate {
 
 
 // HashMapElement
@@ -98,20 +100,6 @@ public:
 			return Entry(fElement->fKey, fElement->fValue);
 		}
 
-		Entry Remove()
-		{
-			if (fElement == NULL)
-				return Entry();
-
-			Entry result(fElement->fKey, fElement->fValue);
-
-			fMap->fTable.RemoveUnchecked(fElement);
-			delete fElement;
-			fElement = NULL;
-
-			return result;
-		}
-
 		Iterator& operator=(const Iterator& other)
 		{
 			fMap = other.fMap;
@@ -121,7 +109,7 @@ public:
 		}
 
 	private:
-		Iterator(HashMap<Key, Value>* map)
+		Iterator(const HashMap<Key, Value>* map)
 			:
 			fMap(map),
 			fIterator(map->fTable.GetIterator()),
@@ -134,7 +122,7 @@ public:
 		typedef BOpenHashTable<HashMapTableDefinition<Key, Value> >
 			ElementTable;
 
-		HashMap<Key, Value>*			fMap;
+		const HashMap<Key, Value>*		fMap;
 		typename ElementTable::Iterator	fIterator;
 		Element*						fElement;
 	};
@@ -146,14 +134,16 @@ public:
 
 	status_t Put(const Key& key, const Value& value);
 	Value Remove(const Key& key);
+	Value Remove(Iterator& it);
 	void Clear();
 	Value Get(const Key& key) const;
+	bool Get(const Key& key, Value*& _value) const;
 
 	bool ContainsKey(const Key& key) const;
 
 	int32 Size() const;
 
-	Iterator GetIterator();
+	Iterator GetIterator() const;
 
 protected:
 	typedef BOpenHashTable<HashMapTableDefinition<Key, Value> > ElementTable;
@@ -166,7 +156,7 @@ protected:
 
 
 // SynchronizedHashMap
-template<typename Key, typename Value>
+template<typename Key, typename Value, typename Locker = BLocker>
 class SynchronizedHashMap : public Locker {
 public:
 	typedef typename HashMap<Key, Value>::Entry Entry;
@@ -414,6 +404,25 @@ HashMap<Key, Value>::Remove(const Key& key)
 }
 
 
+// Remove
+template<typename Key, typename Value>
+Value
+HashMap<Key, Value>::Remove(Iterator& it)
+{
+	Element* element = it.fElement;
+	if (element == NULL)
+		return Value();
+
+	Value value = element->fValue;
+
+	fTable.RemoveUnchecked(element);
+	delete element;
+	it.fElement = NULL;
+
+	return value;
+}
+
+
 // Clear
 template<typename Key, typename Value>
 void
@@ -440,6 +449,19 @@ HashMap<Key, Value>::Get(const Key& key) const
 }
 
 
+// Get
+template<typename Key, typename Value>
+bool
+HashMap<Key, Value>::Get(const Key& key, Value*& _value) const
+{
+	if (Element* element = fTable.Lookup(key)) {
+		_value = &element->fValue;
+		return true;
+	}
+	return false;
+}
+
+
 // ContainsKey
 template<typename Key, typename Value>
 bool
@@ -461,10 +483,17 @@ HashMap<Key, Value>::Size() const
 // GetIterator
 template<typename Key, typename Value>
 typename HashMap<Key, Value>::Iterator
-HashMap<Key, Value>::GetIterator()
+HashMap<Key, Value>::GetIterator() const
 {
 	return Iterator(this);
 }
 
+} // namespace BPrivate
+
+using BPrivate::HashMap;
+using BPrivate::HashKey32;
+using BPrivate::HashKey64;
+using BPrivate::HashKeyPointer;
+using BPrivate::SynchronizedHashMap;
 
 #endif	// HASH_MAP_H
