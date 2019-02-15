@@ -14,12 +14,6 @@
 #include <Referenceable.h>
 
 
-namespace BPrivate {
-	template <class key, class value> class SynchronizedHashMap;
-	class HashString;
-}
-
-
 class BUrlContext: public BReferenceable {
 public:
 								BUrlContext();
@@ -42,9 +36,10 @@ public:
 			bool				HasCertificateException(const BCertificate& certificate);
 
 private:
+			class 				BHttpAuthenticationMap;
+
+private:
 			BNetworkCookieJar	fCookieJar;
-			typedef BPrivate::SynchronizedHashMap<BPrivate::HashString,
-				BHttpAuthentication*> BHttpAuthenticationMap;
 			BHttpAuthenticationMap* fAuthenticationMap;
 			typedef BObjectList<const BCertificate> BCertificateSet;
 			BCertificateSet		fCertificates;

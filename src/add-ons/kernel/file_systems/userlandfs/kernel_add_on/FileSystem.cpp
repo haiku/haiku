@@ -35,7 +35,7 @@ static const bigtime_t kNotificationRequestTimeout = 50000;	// 50 ms
 
 
 struct FileSystem::SelectSyncMap
-	: public SynchronizedHashMap<HashKeyPointer<selectsync*>, int32*> {
+	: public SynchronizedHashMap<HashKeyPointer<selectsync*>, int32*, Locker> {
 };
 
 

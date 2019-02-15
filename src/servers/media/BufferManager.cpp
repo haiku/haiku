@@ -174,7 +174,7 @@ BufferManager::Dump()
 
 	BufferInfoMap::Iterator iterator = fBufferInfoMap.GetIterator();
 	while (iterator.HasNext()) {
-		buffer_info& info = *iterator.NextValue();
+		buffer_info info = iterator.Next().value;
 		printf(" buffer-id %" B_PRId32 ", area-id %" B_PRId32 ", offset %ld, "
 			"size %ld, flags %#08" B_PRIx32 "\n", info.id, info.area,
 			info.offset, info.size, info.flags);

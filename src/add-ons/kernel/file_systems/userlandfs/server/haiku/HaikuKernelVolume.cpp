@@ -26,7 +26,7 @@
 
 // NodeMap
 class HaikuKernelVolume::NodeMap
-	: public SynchronizedHashMap<HashKey64<ino_t>, HaikuKernelNode*> {
+	: public SynchronizedHashMap<HashKey64<ino_t>, HaikuKernelNode*, Locker> {
 };
 
 

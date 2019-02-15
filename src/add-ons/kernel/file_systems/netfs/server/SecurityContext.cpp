@@ -682,7 +682,7 @@ SecurityContext::RemoveUser(User* user)
 		 it.HasNext();) {
 		PermissionMap::Entry entry = it.Next();
 		if (entry.key.user == user)
-			it.Remove();
+			fPermissions->Remove(it);
 	}
 
 	// surrender our user reference

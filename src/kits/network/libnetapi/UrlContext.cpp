@@ -16,6 +16,10 @@
 #include <HashString.h>
 
 
+class BUrlContext::BHttpAuthenticationMap : public
+	SynchronizedHashMap<BPrivate::HashString, BHttpAuthentication*> {};
+
+
 BUrlContext::BUrlContext()
 	:
 	fCookieJar(),
@@ -38,7 +42,7 @@ BUrlContext::~BUrlContext()
 	BHttpAuthenticationMap::Iterator iterator
 		= fAuthenticationMap->GetIterator();
 	while (iterator.HasNext())
-		delete *iterator.NextValue();
+		delete iterator.Next().value;
 
 	delete fAuthenticationMap;
 }

@@ -345,9 +345,9 @@ PRINT(("ShareVolume::PrepareToUnmount()\n"));
 			entry->GetDirectory()->GetID(), 0, entry->GetNode()->GetID(),
 			entry->GetName());
 
-		it.Remove();
 		_RemoveEntry(entry);
 	}
+	fEntries->Clear();
 
 	// get all IDs
 	int32 count = fNodes->Size();
