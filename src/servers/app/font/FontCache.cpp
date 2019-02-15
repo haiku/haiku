@@ -154,7 +154,7 @@ FontCache::_ConstrainEntryCount()
 	iterator = fFontCacheEntries.GetIterator();
 	while (iterator.HasNext()) {
 		if (iterator.Next().value == leastUsedEntry) {
-			iterator.Remove();
+			fFontCacheEntries.Remove(iterator);
 			leastUsedEntry->ReleaseReference();
 			break;
 		}
