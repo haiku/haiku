@@ -26,6 +26,8 @@ ENV GIT_HAIKUPORTS_CROSS="https://github.com/haikuports/haikuports.cross.git"
 ADD prep.sh /usr/local/bin/prep
 ADD crosstools.sh /usr/local/bin/crosstools
 ADD bootstrap.sh /usr/local/bin/bootstrap
+ADD haikuports_chroot.sh /usr/local/bin/haikuports_chroot
+ADD haikuports_build.sh /usr/local/bin/haikuports_build
 
 ENV WORKPATH="/work"
 ENV PATH="$PATH:$WORKPATH/bin"
