@@ -120,9 +120,9 @@ public:
 	private:
 		typedef BOpenHashTable<HashSetTableDefinition<Key> > ElementTable;
 
-		HashSet<Key>*			fSet;
-		ElementTable::Iterator	fIterator;
-		Element*				fElement;
+		HashSet<Key>*					fSet;
+		typename ElementTable::Iterator fIterator;
+		Element*						fElement;
 
 	private:
 		friend class HashSet<Key>;
@@ -156,10 +156,10 @@ protected:
 template<typename Key, typename Locker = BLocker>
 class SynchronizedHashSet : public Locker {
 public:
-	typedef HashSet<Key>::Iterator Iterator;
+	typedef typename HashSet<Key>::Iterator Iterator;
 
 	SynchronizedHashSet() : Locker("synchronized hash set")	{}
-	~SynchronizedHashSet()	{ Lock(); }
+	~SynchronizedHashSet()	{ Locker::Lock(); }
 
 	status_t InitCheck() const
 	{
@@ -324,7 +324,7 @@ HashSet<Key>::Size() const
 
 // GetIterator
 template<typename Key>
-HashSet<Key>::Iterator
+typename HashSet<Key>::Iterator
 HashSet<Key>::GetIterator()
 {
 	return Iterator(this);
