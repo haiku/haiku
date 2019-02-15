@@ -347,7 +347,6 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 		panic("unknown extent compression; %d\n", compression);
 		return B_BAD_DATA;
 	}
-	free(extent_data);
 	return B_OK;
 
 }
