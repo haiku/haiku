@@ -158,7 +158,7 @@ BufferManager::CleanupTeam(team_id team)
 			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %"
 				B_PRId32 " that has no teams\n", entry.key.GetHashCode());
 			_ReleaseClonedArea(entry.value.area);
-			iterator.Remove();
+			fBufferInfoMap.Remove(iterator);
 		}
 	}
 }
