@@ -88,18 +88,6 @@ public:
 			return fElement->fKey;
 		}
 
-		bool Remove()
-		{
-			if (fElement == NULL)
-				return false;
-
-			fSet->fTable.RemoveUnchecked(fElement);
-			delete fElement;
-			fElement = NULL;
-
-			return true;
-		}
-
 		Iterator& operator=(const Iterator& other)
 		{
 			fSet = other.fSet;
@@ -109,7 +97,7 @@ public:
 		}
 
 	private:
-		Iterator(HashSet<Key>* set)
+		Iterator(const HashSet<Key>* set)
 			:
 			fSet(set),
 			fIterator(set->fTable.GetIterator()),
@@ -120,7 +108,7 @@ public:
 	private:
 		typedef BOpenHashTable<HashSetTableDefinition<Key> > ElementTable;
 
-		HashSet<Key>*					fSet;
+		const HashSet<Key>*				fSet;
 		typename ElementTable::Iterator fIterator;
 		Element*						fElement;
 
@@ -135,12 +123,13 @@ public:
 
 	status_t Add(const Key& key);
 	bool Remove(const Key& key);
+	bool Remove(Iterator& it);
 	void Clear();
 	bool Contains(const Key& key) const;
 
 	int32 Size() const;
 
-	Iterator GetIterator();
+	Iterator GetIterator() const;
 
 protected:
 	typedef BOpenHashTable<HashSetTableDefinition<Key> > ElementTable;
@@ -204,7 +193,7 @@ public:
 		return fSet.Size();
 	}
 
-	Iterator GetIterator()
+	Iterator GetIterator() const
 	{
 		return fSet.GetIterator();
 	}
@@ -289,6 +278,23 @@ HashSet<Key>::Remove(const Key& key)
 }
 
 
+// Remove
+template<typename Key>
+bool
+HashSet<Key>::Remove(Iterator& it)
+{
+	Element* element = it.fElement;
+	if (element == NULL)
+		return false;
+
+	fTable.RemoveUnchecked(element);
+	delete element;
+	it.fElement = NULL;
+
+	return true;
+}
+
+
 // Clear
 template<typename Key>
 void
@@ -325,7 +331,7 @@ HashSet<Key>::Size() const
 // GetIterator
 template<typename Key>
 typename HashSet<Key>::Iterator
-HashSet<Key>::GetIterator()
+HashSet<Key>::GetIterator() const
 {
 	return Iterator(this);
 }
