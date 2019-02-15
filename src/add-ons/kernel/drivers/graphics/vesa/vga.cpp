@@ -39,6 +39,10 @@ status_t
 vga_planar_blit(vesa_shared_info *info, uint8 *src, int32 srcBPR,
 	int32 left, int32 top, int32 right, int32 bottom)
 {
+	// If we don't actually have a frame_buffer, bail.
+	if (info->frame_buffer == NULL)
+		return B_BAD_ADDRESS;
+
 	int32 dstBPR = info->bytes_per_row;
 	uint8 *dst = info->frame_buffer + top * dstBPR + left / 8;
 
