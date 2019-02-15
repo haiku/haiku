@@ -85,7 +85,6 @@ BNetworkCookieJar::~BNetworkCookieJar()
 	PrivateHashMap::Iterator it = fCookieHashMap->GetIterator();
 	while (it.HasNext()) {
 		BNetworkCookieList* list = it.Next().value;
-		it.Remove();
 		list->LockForWriting();
 		delete list;
 	}
@@ -787,7 +786,7 @@ BNetworkCookieJar::UrlIterator::Remove()
 			fLastList->RemoveItemAt(fLastIndex);
 
 			if (fLastList->CountItems() == 0) {
-				fIterator->fCookieMapIterator.Remove();
+				fCookieJar->fCookieHashMap->Remove(fIterator->fCookieMapIterator);
 				delete fLastList;
 				fLastList = NULL;
 			} else {

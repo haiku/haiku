@@ -163,7 +163,7 @@ public:
 	typedef typename HashMap<Key, Value>::Iterator Iterator;
 
 	SynchronizedHashMap() : Locker("synchronized hash map")	{}
-	~SynchronizedHashMap()	{ Lock(); }
+	~SynchronizedHashMap()	{ Locker::Lock(); }
 
 	status_t InitCheck() const
 	{
@@ -184,6 +184,14 @@ public:
 		if (!locker.IsLocked())
 			return Value();
 		return fMap.Remove(key);
+	}
+
+	Value Remove(Iterator& it)
+	{
+		MapLocker locker(this);
+		if (!locker.IsLocked())
+			return Value();
+		return fMap.Remove(it);
 	}
 
 	void Clear()
