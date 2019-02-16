@@ -113,7 +113,7 @@ class SoftwareReset {
 			while(fBits & 1);
 		}
 
-		void ResetTransaction() {
+		void ResetCommandLine() {
 			fBits |= 2;
 			while(fBits & 2);
 		}
@@ -128,6 +128,7 @@ class SoftwareReset {
 #define SDHCI_INT_TRANS_CMP		0x00000002		// transfer complete enable
 #define SDHCI_INT_CARD_INS 		0x00000040 		// card insertion enable
 #define SDHCI_INT_CARD_REM 		0x00000080 		// card removal enable
+#define SDHCI_INT_ERROR         0x00008000      // error
 #define SDHCI_INT_TIMEOUT		0x00010000 		// Timeout error
 #define SDHCI_INT_CRC			0x00020000 		// CRC error
 #define SDHCI_INT_END_BIT		0x00040000 		// end bit error

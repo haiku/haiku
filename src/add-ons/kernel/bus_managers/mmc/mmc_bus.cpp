@@ -89,8 +89,12 @@ MMCBus::WorkerThread(void* cookie)
 	// SD v1 cards will also not reply, but we can proceed to ACMD41
 	// If ACMD41 also does not work, it may be an SDIO card, too
 	uint32_t probe = (1 << 8) | 0x55;
-	bus->ExecuteCommand(8, probe, &response);
-	if (response != probe) {
+	uint32_t hcs = 1 << 30;
+	if (bus->ExecuteCommand(8, probe, &response) != B_OK) {
+		TRACE("Card does not implement CMD8, may be a V1 SD card\n");
+		// Do not check for SDHC support in this case
+		hcs = 0;
+	} else if (response != probe) {
 		ERROR("Card does not support voltage range (expected %x, reply %x)\n",
 			probe, response);
 		// TODO what now?
@@ -111,7 +115,7 @@ MMCBus::WorkerThread(void* cookie)
 		if ((cardStatus & (1 << 5)) == 0)
 			ERROR("Card did not enter ACMD mode");
 
-		bus->ExecuteCommand(41, (1 << 30) | 0xFF8000, &ocr);
+		bus->ExecuteCommand(41, hcs | 0xFF8000, &ocr);
 
 		if ((ocr & (1 << 31)) == 0) {
 			TRACE("Card is busy\n");
@@ -119,11 +123,11 @@ MMCBus::WorkerThread(void* cookie)
 		}
 	} while (((ocr & (1 << 31)) == 0));
 
-	if (ocr & (1 << 30))
+	if (ocr & hcs != 0)
 		TRACE("Card is SDHC");
-	if (ocr & (1 << 29))
+	if (ocr & (1 << 29) != 0)
 		TRACE("Card supports UHS-II");
-	if (ocr & (1 << 24))
+	if (ocr & (1 << 24) != 0)
 		TRACE("Card supports 1.8v");
 	TRACE("Voltage range: %x\n", ocr & 0xFFFFFF);
 

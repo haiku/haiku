@@ -120,6 +120,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq)
 		| SDHCI_INT_TIMEOUT | SDHCI_INT_CRC | SDHCI_INT_INDEX
 		| SDHCI_INT_BUS_POWER | SDHCI_INT_END_BIT);
 
+	fRegisters->interrupt_status_enable |= SDHCI_INT_ERROR;
 }
 
 
@@ -223,6 +224,21 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 	fRegisters->command.SendCommand(command, replyType);
 	acquire_sem(fSemaphore);
+
+	if (fRegisters->interrupt_status & SDHCI_INT_ERROR) {
+		fRegisters->interrupt_status |= SDHCI_INT_ERROR;
+		ERROR("Command execution failed\n");
+		// TODO look at errors in interrupt_status register for more details
+		// and return a more appropriate error code
+		return B_ERROR;
+	}
+
+	if (fRegisters->present_state.CommandInhibit()) {
+		TRACE("Command execution failed, card stalled\n");
+		// Clear the stall
+		fRegisters->software_reset.ResetCommandLine();
+		return B_ERROR;
+	}
 
 	if (replyType == Command::kNoReplyType) {
 		// No response
@@ -437,7 +453,7 @@ SdhciBus::RecoverError()
 		| SDHCI_INT_TRANS_CMP | SDHCI_INT_CARD_INS | SDHCI_INT_CARD_REM);
 
 	if (fRegisters->interrupt_status & 7)
-		fRegisters->software_reset.ResetTransaction();
+		fRegisters->software_reset.ResetCommandLine();
 
 	int16_t error_status = fRegisters->interrupt_status;
 	fRegisters->interrupt_status &= ~(error_status);
