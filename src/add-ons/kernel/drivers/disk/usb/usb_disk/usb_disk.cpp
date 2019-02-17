@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <kernel.h>
 #include <fs/devfs.h>
 
 #include "scsi_sense.h"
@@ -2027,7 +2028,10 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 		result = usb_disk_prepare_partial_buffer(lun, position, *length,
 			partialBuffer, blockBuffer, blockPosition, blockCount);
 		if (result == B_OK) {
-			memcpy(buffer, partialBuffer, *length);
+			if (IS_USER_ADDRESS(buffer))
+				result = user_memcpy(buffer, partialBuffer, *length);
+			else
+				memcpy(buffer, partialBuffer, *length);
 			free(blockBuffer);
 		}
 	} else {
@@ -2075,7 +2079,12 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 		result = usb_disk_prepare_partial_buffer(lun, position, *length,
 			partialBuffer, blockBuffer, blockPosition, blockCount);
 		if (result == B_OK) {
-			memcpy(partialBuffer, buffer, *length);
+			if (IS_USER_ADDRESS(buffer))
+				result = user_memcpy(partialBuffer, buffer, *length);
+			else
+				memcpy(partialBuffer, buffer, *length);
+		}
+		if (result == B_OK) {
 			size_t blockLength = blockCount * lun->block_size;
 			result = usb_disk_block_write(lun, blockPosition, blockCount,
 				blockBuffer, &blockLength);
