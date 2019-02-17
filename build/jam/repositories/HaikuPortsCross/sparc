@@ -1,0 +1,72 @@
+BootstrapPackageRepository HaikuPortsCross
+	: sparc
+	:
+	# architecture "any" packages
+	haikuporter-0-1
+	noto-20170202-7
+	:
+	# repository architecture packages (stage 0)
+	gcc_bootstrap-7.3.0_2018_05_01-1
+	gcc_bootstrap_syslibs-7.3.0_2018_05_01-1
+	gcc_bootstrap_syslibs_devel-7.3.0_2018_05_01-1
+
+	:
+	# repository architecture packages (stage 1)
+	bash_bootstrap-4.4.012-1
+	binutils_bootstrap-2.28.1_2017_08_05-1
+	bison_bootstrap-3.0.4-5
+	coreutils_bootstrap-8.22-1
+	curl_bootstrap-7.40.0-1
+	curl_bootstrap_devel-7.40.0-1
+	expat_bootstrap-2.1.0-1
+	expat_bootstrap_devel-2.1.0-1
+	findutils_bootstrap-4.6.0-1
+	flex_bootstrap-2.5.35-1
+	freetype_bootstrap-2.6.3-1
+	freetype_bootstrap_devel-2.6.3-1
+	gawk_bootstrap-3.1.8-2
+	grep_bootstrap-2.14-1
+	icu_bootstrap-57.1-2
+	icu_bootstrap_devel-57.1-2
+	less_bootstrap-451-1
+	m4_bootstrap-1.4.16-1
+	make_bootstrap-4.1-2
+	ncurses6_bootstrap-6.0-1
+	ncurses6_bootstrap_devel-6.0-1
+	python_bootstrap-2.7.6-1
+	sed_bootstrap-4.2.1-1
+	texinfo_bootstrap-4.13a-1
+	zlib_bootstrap-1.2.11-1
+	zlib_bootstrap_devel-1.2.11-1
+
+	:
+	# repository architecture packages (stage 2)
+	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1
+	libsolv_bootstrap_devel-0.3.0_haiku_2014_12_22-1
+
+	:
+	# source packages
+	bash_bootstrap
+	binutils_bootstrap
+	bison_bootstrap
+	coreutils_bootstrap
+	curl_bootstrap
+	expat_bootstrap
+	findutils_bootstrap
+	flex_bootstrap
+	freetype_bootstrap
+	gawk_bootstrap
+	gcc_bootstrap
+	grep_bootstrap
+	less_bootstrap
+	libsolv_bootstrap
+	m4_bootstrap
+	make_bootstrap
+	ncurses6_bootstrap
+	python_bootstrap
+	sed_bootstrap
+	texinfo_bootstrap
+	zlib_bootstrap
+	:
+	# debuginfo packages
+	;

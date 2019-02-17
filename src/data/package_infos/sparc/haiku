@@ -1,0 +1,135 @@
+name 			haiku
+version			%HAIKU_VERSION%
+architecture	sparc
+summary			"The Haiku base system"
+
+description		"The Haiku base system includes all system core software, like
+boot loader, kernel, the system libraries, servers, and applications."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2019 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+flags			system_package
+
+provides {
+	haiku=%HAIKU_VERSION% compat>=R1~beta1
+	cmd:arp
+	cmd:chop
+	cmd:clear
+	cmd:compress
+	cmd:df
+	cmd:ftp
+	cmd:ftpd
+	cmd:hd
+	cmd:hey
+	cmd:login
+	cmd:more
+	cmd:passwd
+	cmd:ping
+	cmd:ping6
+	cmd:prio
+	cmd:ps
+	cmd:renice
+	cmd:resattr
+	cmd:su
+	cmd:telnet
+	cmd:telnetd
+	cmd:top
+	cmd:tput
+	cmd:traceroute
+	cmd:trash
+	cmd:unchop
+	cmd:useradd
+	cmd:watch
+	cmd:xres
+}
+
+requires {
+	coreutils
+	cmd:sh
+#ifdef HAIKU_REGULAR_BUILD
+	cmd:bunzip2
+	cmd:gunzip
+	cmd:tar
+	cmd:unzip
+#endif
+	lib:libfreetype
+#ifdef HAIKU_BUILD_FEATURE_SPARC_FONTCONFIG_ENABLED
+	lib:libfontconfig
+#endif
+	lib:libgcc_s
+	lib:libicudata >= 57
+	lib:libicui18n >= 57
+	lib:libicuio >= 57
+	lib:libicule >= 57
+	lib:libiculx >= 57
+	lib:libicutest >= 57
+	lib:libicutu >= 57
+	lib:libicuuc >= 57
+	lib:libncurses >= 6.0
+#ifdef HAIKU_REGULAR_BUILD
+#ifdef HAIKU_BUILD_FEATURE_SPARC_EXPAT_ENABLED
+	lib:libexpat
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_GUTENPRINT_ENABLED
+	lib:libgutenprint
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_LIBICNS_ENABLED
+	lib:libicns
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_JASPER_ENABLED
+	lib:libjasper
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_JPEG_ENABLED
+	lib:libjpeg
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_LIBPNG_ENABLED
+	lib:libpng >= 16.0
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_TIFF_ENABLED
+	lib:libtiff >= 5.2
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_LIBWEBP_ENABLED
+	lib:libwebp
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_ILMBASE_ENABLED
+	lib:libhalf
+	lib:libiex
+	lib:libiexmath
+	lib:libilmthread
+	lib:libimath
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_OPENEXR_ENABLED
+	lib:libilmimf
+	lib:libilmimfutil
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_OPENSSL_ENABLED
+	lib:libssl >= 1.0.0
+	lib:libcrypto >= 1.0.0
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_FFMPEG_ENABLED
+	lib:libavcodec >= 58
+	lib:libavfilter >= 7
+	lib:libavformat >= 58
+	lib:libavutil >= 56
+	lib:libswresample >= 3
+#endif
+#ifdef HAIKU_BUILD_FEATURE_SPARC_ZSTD_ENABLED
+	lib:libzstd >= 1
+#endif
+#endif
+	lib:libsolv
+	lib:libsolvext
+	lib:libstdc++
+	lib:libsupc++
+	lib:libz
+	noto
+#ifdef HAIKU_REGULAR_BUILD
+	noto_sans_cjk_jp
+#endif
+}

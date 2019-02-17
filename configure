@@ -33,7 +33,7 @@ options:
                               variables will be set accordingly.
                               <arch> specifies the target architecture, either
                               "x86_gcc2", "x86", "x86_64", "ppc", "m68k",
-                              "arm", "arm64", "riscv32", "riscv64"
+                              "arm", "arm64", "riscv32", "riscv64", "sparc"
                               This option and --cross-tools-prefix can be
                               specified multiple times. The first cross tools
                               specify the primary tools, the subsequent ones the
@@ -273,6 +273,7 @@ standard_gcc_settings()
 		powerpc-*)	targetCpu=ppc;;
 		riscv32-*)	targetCpu=riscv32;;
 		riscv64-*)	targetCpu=riscv64;;
+		sparc64-*)	targetCpu=sparc;;
 		x86_64-*)	targetCpu=x86_64;;
 		*)
 			echo "Unsupported gcc target machine: $gccMachine" >&2
@@ -682,6 +683,7 @@ while [ $# -gt 0 ] ; do
 				arm)		targetMachine=arm-unknown-haiku;;
 				riscv32)	targetMachine=riscv32-unknown-haiku;;
 				riscv64)	targetMachine=riscv64-unknown-haiku;;
+				sparc)		targetMachine=sparc64-unknown-haiku;;
 				*)
 					echo "Unsupported target architecture: $targetArch" >&2
 					exit 1
@@ -742,6 +744,7 @@ while [ $# -gt 0 ] ; do
 				arm64)		targetMachine=arm64-unknown-haiku;;
 				riscv32)	targetMachine=riscv32-unknown-haiku;;
 				riscv64)	targetMachine=riscv64-unknown-haiku;;
+				sparc)		targetMachine=sparc64-unknown-haiku;;
 				*)
 					echo "Unsupported target architecture: $2" >&2
 					exit 1

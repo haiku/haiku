@@ -620,6 +620,7 @@ B_HPKG_ATTRIBUTE_ID_PACKAGE_ARCHITECTURE ("package:architecture")
     5 B_PACKAGE_ARCHITECTURE_PPC      PowerPC
     6 B_PACKAGE_ARCHITECTURE_ARM      ARM
     7 B_PACKAGE_ARCHITECTURE_M68K     m68k
+    8 B_PACKAGE_ARCHITECTURE_SPARC    sparc
     = =============================== =========================================
 
   :Child Attributes: none

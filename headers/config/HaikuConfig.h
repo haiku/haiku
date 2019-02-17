@@ -71,6 +71,13 @@
 #	define __HAIKU_ARCH_ABI				"riscv64"
 #	define __HAIKU_ARCH_RISCV32			1
 #	define __HAIKU_ARCH_BITS			64
+#elif defined(__sparc64__)
+#	define __HAIKU_ARCH					sparc64
+#	define __HAIKU_ARCH_ABI				"sparc"
+#	define __HAIKU_ARCH_SPARC			1
+#	define __HAIKU_ARCH_PHYSICAL_BITS	64
+#	define __HAIKU_BIG_ENDIAN			1
+#	define __HAIKU_ARCH_BITS			64
 #else
 #	error Unsupported architecture!
 #endif
