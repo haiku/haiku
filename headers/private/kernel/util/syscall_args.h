@@ -6,12 +6,6 @@
 #include <kernel.h>
 
 
-// Hack to be able to use the IS_USER_ADDRESS macro when compiling for R5.
-#ifdef R5_MEMORY_LAYOUT
-#	undef KERNEL_BASE
-#	define KERNEL_BASE 0x0
-#endif
-
 // copy_ref_var_from_user
 template<typename T>
 inline
