@@ -8,6 +8,7 @@
 #include <AdapterIO.h>
 
 #include <MediaIO.h>
+#include <RWLocker.h>
 
 #include <string.h>
 
