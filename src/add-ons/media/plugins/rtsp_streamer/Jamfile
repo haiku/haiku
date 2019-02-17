@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons media plugins rtsp_streamer ;
 
+UsePrivateHeaders shared ;
+
 # TODO: Investigate this
 SubDirC++Flags -w ;
 
@@ -21,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			rtsp.cpp
 			:
 			[ BuildFeatureAttribute live555 : libraries ]
-			be codec network bnetapi shared
+			be codec network shared
 			[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		;
 	}
