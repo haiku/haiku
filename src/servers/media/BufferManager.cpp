@@ -70,7 +70,8 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 	size_t offset, area_id area, media_buffer_id* _bufferID)
 {
 	BAutolock lock(fLocker);
-	TRACE("RegisterBuffer team = %ld, area = %ld, offset = %ld, size = %ld\n",
+	TRACE("RegisterBuffer team = %" B_PRId32 ", area = %"
+		B_PRId32 ", offset = %" B_PRIuSIZE ", size = %" B_PRIuSIZE "\n",
 		team, area, offset, size);
 
 	area_id clonedArea = _CloneArea(area);
@@ -98,7 +99,7 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 		return B_NO_MEMORY;
 	}
 
-	TRACE("RegisterBuffer: done, bufferID = %ld\n", info.id);
+	TRACE("RegisterBuffer: done, bufferID = %" B_PRId32 "\n", info.id);
 
 	*_bufferID = info.id;
 	return B_OK;
