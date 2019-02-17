@@ -763,11 +763,12 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		return B_OK;
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
-
+#if KDEBUG
 	if (!are_interrupts_enabled()) {
 		panic("switch_sem_etc: called with interrupts disabled for sem "
 			"%" B_PRId32 "\n", id);
 	}
+#endif
 
 	if (id < 0)
 		return B_BAD_SEM_ID;
