@@ -922,7 +922,7 @@ ServerApp::_ControlThread(void* _server)
 void
 ServerApp::MessageReceived(BMessage* msg)
 {
-	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
+	TRACE("ServerApp::MessageReceived %" B_PRIu32 " enter\n", msg->what);
 	switch (msg->what) {
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS:
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS:
@@ -964,7 +964,7 @@ ServerApp::MessageReceived(BMessage* msg)
 			TRACE("\nmedia_server: unknown message received!\n");
 			break;
 	}
-	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);
+	TRACE("ServerApp::MessageReceived %" B_PRIu32 " leave\n", msg->what);
 }
 
 
