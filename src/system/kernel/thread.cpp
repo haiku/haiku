@@ -1373,6 +1373,13 @@ static status_t
 common_snooze_etc(bigtime_t timeout, clockid_t clockID, uint32 flags,
 	bigtime_t* _remainingTime)
 {
+#if KDEBUG
+	if (!are_interrupts_enabled()) {
+		panic("common_snooze_etc(): called with interrupts disabled, timeout "
+			"%" B_PRIdBIGTIME, timeout);
+	}
+#endif
+
 	switch (clockID) {
 		case CLOCK_REALTIME:
 			// make sure the B_TIMEOUT_REAL_TIME_BASE flag is set and fall
