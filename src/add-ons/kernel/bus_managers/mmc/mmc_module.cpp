@@ -45,6 +45,16 @@ mmc_bus_uninit(void* _device)
 }
 
 
+static status_t
+mmc_bus_register_child(void* _device)
+{
+	CALLED();
+	MMCBus* device = (MMCBus*)_device;
+	device->Rescan();
+	return B_OK;
+}
+
+
 static void
 mmc_bus_removed(void* _device)
 {
@@ -58,7 +68,8 @@ mmc_bus_added_device(device_node* parent)
 	CALLED();
 
 	device_attr attributes[] = {
-		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "mmc bus"}},
+		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "mmc"}},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "MMC bus root"}},
 		{ NULL }
 	};
 
@@ -94,7 +105,7 @@ driver_module_info mmc_bus_device_module = {
 	NULL, // register node
 	mmc_bus_init,
 	mmc_bus_uninit,
-	NULL, // register child devices
+	mmc_bus_register_child,
 	NULL, // rescan
 	mmc_bus_removed,
 	NULL, // suspend

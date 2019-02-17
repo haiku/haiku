@@ -88,7 +88,7 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq)
 		return;
 	}
 
-	fSemaphore = create_sem(0, "SDHCI command");
+	fSemaphore = create_sem(0, "SDHCI interrupts");
 
 	fStatus = install_io_interrupt_handler(fIrq,
 		sdhci_generic_interrupt, this, 0);

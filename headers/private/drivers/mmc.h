@@ -15,6 +15,16 @@
 #define MMC_BUS_MODULE_NAME "bus_managers/mmc_bus/driver_v1"
 
 
+enum {
+	CARD_TYPE_MMC,
+	CARD_TYPE_SD,
+	CARD_TYPE_SDHC,
+	CARD_TYPE_UHS1,
+	CARD_TYPE_UHS2,
+	CARD_TYPE_SDIO
+};
+
+
 // Interface between mmc_bus and underlying implementation
 typedef struct mmc_bus_interface {
 	driver_module_info info;

@@ -39,6 +39,7 @@ public:
 								MMCBus(device_node *node);
 								~MMCBus();
 				status_t		InitCheck();
+				void			Rescan();
 
 private:
 				status_t		ExecuteCommand(uint8_t command,
@@ -52,6 +53,7 @@ private:
 		void* 					fCookie;
 		status_t				fStatus;
 		thread_id				fWorkerThread;
+		sem_id					fSemaphore;
 };
 
 
