@@ -44,7 +44,7 @@ extern "C" uint32 get_plugin_version();
 extern "C" const char* get_plugin_name();
 
 
-#define B_CODEC_KIT_PLUGIN_VERSION 1
+#define B_CODEC_KIT_PLUGIN_VERSION 100
 
 #define B_DECLARE_CODEC_KIT_PLUGIN(className, name, version)	\
 extern "C" {													\
