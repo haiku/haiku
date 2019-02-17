@@ -1,9 +1,17 @@
+/*
+ * Copyright 2016-2019, Dario Casalinuovo
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _RTSP_STREAMER_PLUGIN_H
 #define _RTSP_STREAMER_PLUGIN_H
 
-#include "StreamerPlugin.h"
+#include <Streamer.h>
 
-class RTSPStreamer : public Streamer
+using BCodecKit::BStreamer;
+using BCodecKit::BStreamerPlugin;
+
+
+class RTSPStreamer : public BStreamer
 {
 public:
 								RTSPStreamer();
@@ -13,9 +21,9 @@ public:
 };
 
 
-class RTSPStreamerPlugin : public StreamerPlugin {
+class RTSPStreamerPlugin : public BStreamerPlugin {
 public:
-	virtual	Streamer*			NewStreamer();
+	virtual	BStreamer*			NewStreamer();
 };
 
 #endif // _RTSP_STREAMER_PLUGIN_H

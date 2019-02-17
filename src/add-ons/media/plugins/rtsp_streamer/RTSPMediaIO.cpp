@@ -10,6 +10,9 @@
 #define LIVE555_VERBOSITY 1
 
 
+using namespace BCodecKit;
+
+
 RTSPMediaIO::RTSPMediaIO(BUrl ourUrl)
 	:
 	BAdapterIO(

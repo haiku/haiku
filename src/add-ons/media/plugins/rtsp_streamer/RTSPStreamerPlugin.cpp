@@ -8,7 +8,16 @@
 #include "RTSPMediaIO.h"
 
 
+B_DECLARE_CODEC_KIT_PLUGIN(
+	RTSPStreamerPlugin,
+	"rtsp_streamer",
+	B_CODEC_KIT_PLUGIN_VERSION
+);
+
+
 RTSPStreamer::RTSPStreamer()
+	:
+	BStreamer()
 {
 }
 
@@ -32,14 +41,8 @@ RTSPStreamer::Sniff(const BUrl& url, BDataIO** source)
 }
 
 
-Streamer*
+BStreamer*
 RTSPStreamerPlugin::NewStreamer()
 {
 	return new RTSPStreamer();
-}
-
-
-MediaPlugin *instantiate_plugin()
-{
-	return new RTSPStreamerPlugin();
 }
