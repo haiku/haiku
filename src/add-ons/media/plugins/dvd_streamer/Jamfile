@@ -1,0 +1,32 @@
+SubDir HAIKU_TOP src add-ons media plugins dvd_streamer ;
+
+# For MediaDebug.h
+UsePrivateHeaders media ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+
+		UseBuildFeatureHeaders libdvdnav ;
+		UseBuildFeatureHeaders libdvdread ;
+
+		Includes [ FGristFiles
+			DVDStreamerPlugin.cpp
+			DVDMediaIO.cpp ]
+		: [ BuildFeatureAttribute libdvdnav : headers ] ;
+
+		Includes [ FGristFiles
+			DVDStreamerPlugin.cpp
+			DVDMediaIO.cpp ]
+		: [ BuildFeatureAttribute libdvdread : headers ] ;
+
+		Addon [ MultiArchDefaultGristFiles dvd_streamer ] :
+			DVDStreamerPlugin.cpp
+			DVDMediaIO.cpp
+			:
+			[ BuildFeatureAttribute libdvdnav : libraries ]
+			be codec shared
+			[ TargetLibstdc++ ] [ TargetLibsupc++ ]
+		;
+	}
+}

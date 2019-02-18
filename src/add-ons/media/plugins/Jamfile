@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons media plugins ;
 
 SubInclude HAIKU_TOP src add-ons media plugins ape_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins au_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins dvd_streamer ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg ;
 SubInclude HAIKU_TOP src add-ons media plugins http_streamer ;
 SubInclude HAIKU_TOP src add-ons media plugins raw_decoder ;
