@@ -403,6 +403,8 @@ XHCI::Start()
 	}
 
 	fSlotCount = HCS_MAX_SLOTS(capabilities);
+	if (fSlotCount > XHCI_MAX_DEVICES)
+		fSlotCount = XHCI_MAX_DEVICES;
 	WriteOpReg(XHCI_CONFIG, fSlotCount);
 
 	// find out which protocol is used for each port
@@ -446,6 +448,8 @@ XHCI::Start()
 	fExitLatMax = HCS_U1_DEVICE_LATENCY(params3)
 		+ HCS_U2_DEVICE_LATENCY(params3);
 
+	// clear interrupts & disable device notifications
+	WriteOpReg(XHCI_STS, ReadOpReg(XHCI_STS));
 	WriteOpReg(XHCI_DNCTRL, 0);
 
 	// allocate Device Context Base Address array
@@ -478,7 +482,7 @@ XHCI::Start()
 
 	TRACE("setting DCBAAP %" B_PRIxPHYSADDR "\n", dmaAddress);
 	WriteOpReg(XHCI_DCBAAP_LO, (uint32)dmaAddress);
-	WriteOpReg(XHCI_DCBAAP_HI, /*(uint32)(dmaAddress >> 32)*/0);
+	WriteOpReg(XHCI_DCBAAP_HI, (uint32)(dmaAddress >> 32));
 
 	// allocate Event Ring Segment Table
 	uint8 *addr;
