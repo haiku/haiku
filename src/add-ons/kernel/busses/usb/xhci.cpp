@@ -1257,7 +1257,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	// configure the Control endpoint 0 (type 4)
 	if (ConfigureEndpoint(slot, 0, 4, device->trb_addr, 0,
-		maxPacketSize, maxPacketSize & 0x7ff, speed) != B_OK) {
+			maxPacketSize, maxPacketSize & 0x7ff, speed) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
 		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
@@ -1472,18 +1472,6 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 
 		uint8 endpoint = id + 1;
 
-		/* TODO: invalid Context State running the 3 following commands
-		StopEndpoint(false, endpoint, device->slot);
-
-		ResetEndpoint(false, endpoint, device->slot);
-
-		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
-			device->slot); */
-
-		_WriteContext(&device->input_ctx->input.dropFlags, 0);
-		_WriteContext(&device->input_ctx->input.addFlags,
-			(1 << endpoint) | (1 << 0));
-
 		// configure the Control endpoint 0 (type 4)
 		uint32 type = 4;
 		if ((pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) != 0)
@@ -1496,17 +1484,29 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 
 		TRACE("trb_addr 0x%" B_PRIxPHYSADDR "\n", device->endpoints[id].trb_addr);
 
-		if (ConfigureEndpoint(device->slot, id, type,
+		status_t status = ConfigureEndpoint(device->slot, id, type,
 			device->endpoints[id].trb_addr, pipe->Interval(),
 			pipe->MaxPacketSize(), pipe->MaxPacketSize() & 0x7ff,
-			usbDevice->Speed()) != B_OK) {
+			usbDevice->Speed());
+		if (status != B_OK) {
 			TRACE_ERROR("unable to configure endpoint\n");
-			return B_ERROR;
+			return status;
 		}
 
-		EvaluateContext(device->input_ctx_addr, device->slot);
+		StopEndpoint(false, endpoint, device->slot);
+		ResetEndpoint(false, endpoint, device->slot);
+		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
+			device->slot);
 
-		ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
+		_WriteContext(&device->input_ctx->input.dropFlags, 0);
+		_WriteContext(&device->input_ctx->input.addFlags,
+			(1 << endpoint) | (1 << 0));
+
+		if (endpoint > 1)
+			ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
+		else
+			EvaluateContext(device->input_ctx_addr, device->slot);
+
 		TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n",
 			device->address, SLOT_3_SLOT_STATE_GET(_ReadContext(
 				&device->device_ctx->slot.dwslot3)));
@@ -1516,6 +1516,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		TRACE("endpoint[%d] state 0x%08" B_PRIx32 "\n", id,
 			ENDPOINT_0_STATE_GET(_ReadContext(
 				&device->device_ctx->endpoints[id].dwendpoint0)));
+
 		device->state = XHCI_STATE_CONFIGURED;
 	}
 	pipe->SetControllerCookie(&device->endpoints[id]);
@@ -1622,52 +1623,48 @@ XHCI::ConfigureEndpoint(uint8 slot, uint8 number, uint8 type, uint64 ringAddr,
 {
 	struct xhci_device* device = &fDevices[slot];
 
-	uint8 maxBurst = (maxPacketSize & 0x1800) >> 11;
-	maxPacketSize = (maxPacketSize & 0x7ff);
-
 	uint32 dwendpoint0 = 0;
 	uint32 dwendpoint1 = 0;
 	uint64 qwendpoint2 = 0;
 	uint32 dwendpoint4 = 0;
 
-	// Assigning Interval
+	// Compute interval
 	uint16 calcInterval = 0;
 	if (speed == USB_SPEED_HIGHSPEED && (type == 4 || type == 2)) {
 		if (interval != 0) {
-			while ((1<<calcInterval) <= interval)
+			while ((1 << calcInterval) <= interval)
 				calcInterval++;
 			calcInterval--;
 		}
 	}
-	if ((type & 0x3) == 3 &&
-		(speed == USB_SPEED_FULLSPEED || speed == USB_SPEED_LOWSPEED)) {
-		while ((1<<calcInterval) <= interval * 8)
+	if ((type & 0x3) == 3
+			&& (speed == USB_SPEED_FULLSPEED || speed == USB_SPEED_LOWSPEED)) {
+		while ((1 << calcInterval) <= interval * 8)
 			calcInterval++;
 		calcInterval--;
 	}
 	if ((type & 0x3) == 1 && speed == USB_SPEED_FULLSPEED) {
 		calcInterval = interval + 2;
 	}
-	if (((type & 0x3) == 1 || (type & 0x3) == 3) &&
-		(speed == USB_SPEED_HIGHSPEED || speed == USB_SPEED_SUPER)) {
+	if (((type & 0x3) == 1 || (type & 0x3) == 3)
+			&& (speed == USB_SPEED_HIGHSPEED || speed == USB_SPEED_SUPER)) {
 		calcInterval = interval - 1;
 	}
-
 	dwendpoint0 |= ENDPOINT_0_INTERVAL(calcInterval);
 
-	// Assigning CERR for non-isoch endpoints
-	if ((type & 0x3) != 1) {
+	// Assigning CERR for non-isochronous endpoints
+	if ((type & 0x3) != 1)
 		dwendpoint1 |= ENDPOINT_1_CERR(3);
-	}
 
 	dwendpoint1 |= ENDPOINT_1_EPTYPE(type);
 
 	// Assigning MaxBurst for HighSpeed
+	uint8 maxBurst = (maxPacketSize & 0x1800) >> 11;
+	maxPacketSize = (maxPacketSize & 0x7ff);
 	if (speed == USB_SPEED_HIGHSPEED &&
-		((type & 0x3) == 1 || (type & 0x3) == 3)) {
+			((type & 0x3) == 1 || (type & 0x3) == 3)) {
 		dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
 	}
-
 	// TODO Assign MaxBurst for SuperSpeed
 
 	dwendpoint1 |= ENDPOINT_1_MAXPACKETSIZE(maxPacketSize);
