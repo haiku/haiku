@@ -590,6 +590,40 @@ if [ IsPackageAvailable ilmbase_devel ] {
 }
 
 
+# libdvdread
+if [ IsPackageAvailable libdvdread_devel ] {
+	ExtractBuildFeatureArchives libdvdread :
+		file: base libdvdread
+			runtime: lib
+		file: devel libdvdread_devel
+			depends: base
+			libraries: $(developLibDir)/libdvdread.so.4
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libdvdread ;
+} else {
+	Echo "libdvdread support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
+# libdvdnav
+if [ IsPackageAvailable libdvdnav_devel ] {
+	ExtractBuildFeatureArchives libdvdnav :
+		file: base libdvdnav
+			runtime: lib
+		file: devel libdvdnav_devel
+			depends: base
+			libraries: $(developLibDir)/libdvdnav.so.4
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libdvdnav ;
+} else {
+	Echo "libdvdnav support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # libwebp
 if [ IsPackageAvailable libwebp_devel ] {
 	if $(HAIKU_PACKAGING_ARCH) = x86 && $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
