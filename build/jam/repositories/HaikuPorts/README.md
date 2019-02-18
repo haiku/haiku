@@ -30,7 +30,7 @@ Process
 Here is the fastest way to update this as of today.
 Improvements are needed. Replace (ARCH) with architecture, (USER) with your non-root user.
 
-1) Copy the current repository define to walter at /var/lib/docker/volumes/buildmaster_data_master_(ARCH)/_data/
+1) (as root) wget https://git.haiku-os.org/haiku/plain/build/jam/repositories/HaikuPorts/(ARCH) -O /var/lib/docker/volumes/buildmaster_data_master_(ARCH)/_data/
 2) Enter the buildmaster container:
    docker exec -it $(docker ps | grep buildmaster_buildmaster_master_(ARCH) | awk '{ print $1 }') /bin/bash -l
 3) apt install vim python3
