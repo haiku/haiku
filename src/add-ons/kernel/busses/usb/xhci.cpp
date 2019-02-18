@@ -883,6 +883,9 @@ XHCI::CreateDescriptorChain(size_t bufferSize, int32 &trbCount)
 {
 	size_t packetSize = B_PAGE_SIZE * 16;
 	trbCount = (bufferSize + packetSize - 1) / packetSize;
+	if (trbCount == 0)
+		trbCount = 1;
+
 	// keep one trb for linking
 	int32 tdCount = (trbCount + XHCI_MAX_TRBS_PER_TD - 2)
 		/ (XHCI_MAX_TRBS_PER_TD - 1);
