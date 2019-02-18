@@ -159,11 +159,8 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	size_t mapSize = fPCIInfo->u.h0.base_register_sizes[0];
 
-	TRACE("map physical memory %08" B_PRIx32 " : %08" B_PRIx32 " "
-		"(base: %08" B_PRIxPHYSADDR "; offset: %" B_PRIx32 ");"
-		"size: %" B_PRId32 "\n", fPCIInfo->u.h0.base_registers[0],
-		fPCIInfo->u.h0.base_registers[1], physicalAddress, offset,
-		fPCIInfo->u.h0.base_register_sizes[0]);
+	TRACE("map physical memory %08" B_PRIxPHYSADDR ", size: %" B_PRId32 "\n",
+		physicalAddress, mapSize);
 
 	fRegisterArea = map_physical_memory("XHCI memory mapped registers",
 		physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
@@ -181,9 +178,9 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	fDoorbellRegisterOffset = ReadCapReg32(XHCI_DBOFF) & ~0x3;
 
 	TRACE("mapped registers: %p\n", fRegisters);
-	TRACE("operational register offset: %d\n", fOperationalRegisterOffset);
-	TRACE("runtime register offset: %p\n", fRuntimeRegisterOffset);
-	TRACE("doorbell register offset: %p\n", fDoorbellRegisterOffset);
+	TRACE("operational register offset: %" B_PRId32 "\n", fOperationalRegisterOffset);
+	TRACE("runtime register offset: %" B_PRId32 "\n", fRuntimeRegisterOffset);
+	TRACE("doorbell register offset: %" B_PRId32 "\n", fDoorbellRegisterOffset);
 
 	TRACE_ALWAYS("interface version: 0x%04" B_PRIx32 "\n",
 		HCI_VERSION(ReadCapReg32(XHCI_HCI_VERSION)));
@@ -402,9 +399,9 @@ XHCI::Start()
 	fPortCount = HCS_MAX_PORTS(capabilities);
 	if (fPortCount == 0) {
 		TRACE_ERROR("Invalid number of ports: %u\n", fPortCount);
-		fPortCount = 0;
 		return B_ERROR;
 	}
+
 	fSlotCount = HCS_MAX_SLOTS(capabilities);
 	WriteOpReg(XHCI_CONFIG, fSlotCount);
 
@@ -471,7 +468,7 @@ XHCI::Start()
 	for (uint32 i = 0; i < fScratchpadCount; i++) {
 		phys_addr_t scratchDmaAddress;
 		fScratchpadArea[i] = fStack->AllocateArea((void **)&fScratchpad[i],
-		&scratchDmaAddress, B_PAGE_SIZE, "Scratchpad Area");
+			&scratchDmaAddress, B_PAGE_SIZE, "Scratchpad Area");
 		if (fScratchpadArea[i] < B_OK) {
 			TRACE_ERROR("unable to create the scratchpad area\n");
 			return B_ERROR;
@@ -840,7 +837,7 @@ XHCI::AddTo(Stack *stack)
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
 			&& item->class_api == PCI_usb_xhci) {
 			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
-				item->bus, item->device, item->funcion);
+				item->bus, item->device, item->function);
 			XHCI *bus = new(std::nothrow) XHCI(item, stack);
 			if (!bus) {
 				delete item;
