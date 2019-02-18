@@ -672,7 +672,9 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		return status;
 
 	setupDescriptor->transfer = transfer;
-	_LinkDescriptorForPipe(setupDescriptor, endpoint);
+	status = _LinkDescriptorForPipe(setupDescriptor, endpoint);
+	if (status != B_OK)
+		return status;
 	TRACE("SubmitControlRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
@@ -754,7 +756,9 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	descriptor->transfer = transfer;
-	_LinkDescriptorForPipe(descriptor, endpoint);
+	status = _LinkDescriptorForPipe(descriptor, endpoint);
+	if (status != B_OK)
+		return status;
 	TRACE("SubmitNormalRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
