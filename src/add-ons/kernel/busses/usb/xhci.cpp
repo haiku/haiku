@@ -2130,8 +2130,8 @@ XHCI::DoCommand(xhci_trb* trb)
 	TRACE("Command Complete. Result: %" B_PRId32 "\n", completionCode);
 	if (completionCode != COMP_SUCCESS) {
 		uint32 errorCode = TRB_2_COMP_CODE_GET(fCmdResult[0]);
-		TRACE_ERROR("unsuccessful command, error %s (%" B_PRId32 ")\n",
-			xhci_error_string(errorCode), errorCode);
+		TRACE_ERROR("unsuccessful command %" B_PRId32 ", error %s (%" B_PRId32 ")\n",
+			TRB_3_TYPE_GET(trb->dwtrb3), xhci_error_string(errorCode), errorCode);
 		status = B_IO_ERROR;
 	}
 
