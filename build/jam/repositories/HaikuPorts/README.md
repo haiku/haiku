@@ -22,3 +22,22 @@ HaikuPorts package server.
 4) hardlink_packages performs additional modification of the RemotePackageRepository and creates
    build repositories (https://eu.hpkg.haiku-os.org/haikuports/master/build-packages/)
 5) The modified RemotePackageRepository file is copied back to the developers system and checked in to git.
+
+
+Process
+-------
+
+Here is the fastest way to update this as of today.
+Improvements are needed. Replace (ARCH) with architecture, (USER) with your non-root user.
+
+1) Copy the current repository define to walter at /var/lib/docker/volumes/buildmaster_data_master_(ARCH)/_data/
+2) Enter the buildmaster container:
+   docker exec -it $(docker ps | grep buildmaster_buildmaster_master_(ARCH) | awk '{ print $1 }') /bin/bash -l
+3) apt install vim python3
+4) edit the repository define, add the needed packages, _devel packages, and add base package to source section.
+5) ln -s /var/buildmaster/package_tools/package_repo /usr/bin/package_tools
+6) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/var/buildmaster/package_tools
+7) ./package_tools/hardlink_packages.py (ARCH) ./(ARCH) /var/packages/repository/master/(ARCH)/current/packages/ /var/packages/build-packages/master/
+8) exit; cp /var/lib/docker/volumes/buildmaster_data_master_(ARCH)/_data/(ARCH) /home/(USER)/(ARCH); chown (USER) /home/(USER)/(ARCH);
+9) scp -P2222 (USER)@walter.haikuos.org:./(ARCH) .
+10) commit the updated repostory define *without modifying it*
