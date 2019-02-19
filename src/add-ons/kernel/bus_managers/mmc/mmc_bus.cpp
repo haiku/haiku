@@ -185,8 +185,8 @@ MMCBus::WorkerThread(void* cookie)
 				{ "mmc/revision", B_UINT16_TYPE, {ui16: revision}},
 				{ "mmc/month", B_UINT8_TYPE, {ui8: month}},
 				{ "mmc/year", B_UINT16_TYPE, {ui16: year}},
-				{ "mmc/rca", B_UINT16_TYPE, {ui16: rca}},
-				{ "mmc/type", B_UINT8_TYPE, {ui8: cardType}},
+				{ kMmcRcaAttribute, B_UINT16_TYPE, {ui16: rca}},
+				{ kMmcTypeAttribute, B_UINT8_TYPE, {ui8: cardType}},
 				{}
 			};
 

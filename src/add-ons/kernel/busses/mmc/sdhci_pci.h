@@ -17,7 +17,6 @@
 #define SDHCI_PCI_SLOTS(x) 								((( x >> 4) & 7))
 #define SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(x)			(( x ) & 7)
 
-#define SDHCI_DEVICE_TYPE_ITEM 							"sdhci/type"
 #define SDHCI_BUS_TYPE_NAME 							"bus/sdhci/v1"
 
 
