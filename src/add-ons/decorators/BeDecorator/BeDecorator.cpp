@@ -981,14 +981,6 @@ BeDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
 			_DrawBevelRect(sBitmapDrawingEngine, rect, tab->closePressed,
 				buttonColorLight2, buttonColorShadow2);
 
-			if (!tab->closePressed) {
-				// undraw bottom left and top right corners
-				sBitmapDrawingEngine->StrokePoint(rect.LeftBottom(),
-					buttonColor);
-				sBitmapDrawingEngine->StrokePoint(rect.RightTop(),
-					buttonColor);
-			}
-
 			if (fCStatus != B_OK) {
 				// If we ran out of memory while initializing bitmaps
 				// fall back to a linear gradient.
@@ -1147,14 +1139,6 @@ BeDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
 			// draw big rect bevel
 			_DrawBevelRect(sBitmapDrawingEngine, bigRect, tab->zoomPressed,
 				buttonColorLight2, buttonColorShadow2);
-
-			if (!tab->zoomPressed) {
-				// undraw bottom left and top right corners
-				sBitmapDrawingEngine->StrokePoint(bigRect.LeftBottom(),
-					buttonColor);
-				sBitmapDrawingEngine->StrokePoint(bigRect.RightTop(),
-					buttonColor);
-			}
 
 			if (fCStatus != B_OK) {
 				// If we ran out of memory while initializing bitmaps
