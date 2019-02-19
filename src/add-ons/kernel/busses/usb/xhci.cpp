@@ -864,8 +864,10 @@ XHCI::AddTo(Stack *stack)
 			// the bus took it away
 			item = new(std::nothrow) pci_info;
 
-			bus->Start();
-			stack->AddBusManager(bus);
+			if (bus->Start() != B_OK) {
+				delete bus;
+				continue;
+			}
 			found = true;
 		}
 	}

@@ -14,7 +14,7 @@ BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
 		fStack(stack),
 		fRootHub(NULL),
-		fUSBID(fStack->IndexOfBusManager(this))
+		fUSBID((uint32)-1)
 {
 	mutex_init(&fLock, "usb busmanager lock");
 
@@ -253,6 +253,8 @@ BusManager::FreeDevice(Device *device)
 status_t
 BusManager::Start()
 {
+	fStack->AddBusManager(this);
+	fUSBID = fStack->IndexOfBusManager(this);
 	return B_OK;
 }
 
