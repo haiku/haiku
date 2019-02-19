@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Haiku, Inc.
+ * Copyright 2011-2019, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__PACKAGE_ARCHITECTURE_H_
@@ -18,6 +18,9 @@ enum BPackageArchitecture {
 	B_PACKAGE_ARCHITECTURE_PPC	= 5,
 	B_PACKAGE_ARCHITECTURE_ARM	= 6,
 	B_PACKAGE_ARCHITECTURE_M68K	= 7,
+	B_PACKAGE_ARCHITECTURE_SPARC	= 8,
+	B_PACKAGE_ARCHITECTURE_ARM64	= 9,
+	B_PACKAGE_ARCHITECTURE_RISCV64	= 10,
 	//
 	B_PACKAGE_ARCHITECTURE_ENUM_COUNT,
 };
