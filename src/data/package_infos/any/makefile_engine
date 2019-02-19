@@ -7,7 +7,7 @@ description 	"A simple generic makefile-engine and Makefile template."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"? Be Inc. 2001-2018 Haiku, Inc."
+copyrights		"? Be Inc. 2001-2019 Haiku, Inc."
 licenses		MIT
 
 provides {

@@ -10,14 +10,14 @@ other files required to run programs build for that architecture."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2001-2018 Haiku, Inc. et al"
+copyrights		"2001-2019 Haiku, Inc. et al"
 licenses {
 	MIT
 	"GNU LGPL v2.1"
 }
 
 provides {
-	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% = %HAIKU_VERSION% compat>=R1~alpha1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% = %HAIKU_VERSION% compat>=R1~beta1
 }
 
 requires {

@@ -8,7 +8,7 @@ userland. FUSE compatibiity is also provided."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2007-2014 Haiku, Inc."
+copyrights		"2007-2019 Haiku, Inc."
 licenses		MIT
 
 provides {

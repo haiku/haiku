@@ -10,7 +10,7 @@ other files required to run programs build for that architecture."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2001-2018 Haiku, Inc. et al"
+copyrights		"2001-2019 Haiku, Inc. et al"
 licenses {
 	MIT
 	"GNU LGPL v2.1"
