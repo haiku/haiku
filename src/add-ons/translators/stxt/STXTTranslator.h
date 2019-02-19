@@ -37,7 +37,6 @@
 #include <TranslationDefs.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
-#include <DataIO.h>
 #include <File.h>
 #include <ByteOrder.h>
 #include <fs_attr.h>

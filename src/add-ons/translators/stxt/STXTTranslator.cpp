@@ -521,7 +521,6 @@ translate_from_text(BPositionIO* source, const char* outEncoding, bool forceEnco
 			void*	fBuffer;
 			size_t	fSize;
 	} encodingBuffer;
-	BMallocIO encodingIO;
 
 	BNode* node = dynamic_cast<BNode*>(source);
 	BString encoding(outEncoding);
@@ -593,7 +592,7 @@ translate_from_text(BPositionIO* source, const char* outEncoding, bool forceEnco
 		} else {
 			// decode text file to UTF-8
 			const char* pos = (char*)buffer;
-			size_t encodingLength = encodingIO.BufferLength();
+			size_t encodingLength;
 			int32 bytesLeft = bytesRead;
 			size_t bytes;
 			do {
