@@ -1,12 +1,13 @@
 /*
- * Copyright 2006-2019, Haiku Inc. All rights reserved.
+ * Copyright 2011-2019, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Lotz <mmlr@mlotz.ch>
+ *		Augustin Cavalier <waddlesplash>
  * 		Jian Chiang <j.jian.chiang@gmail.com>
  *		Jérôme Duval <jerome.duval@gmail.com>
  *		Akshay Jaggi <akshay1994.leo@gmail.com>
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 
