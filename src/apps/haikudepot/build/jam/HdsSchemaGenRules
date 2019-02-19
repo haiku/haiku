@@ -41,8 +41,8 @@ rule HdsSchemaGenModel
 	Depends $(1) : $(2) $(3) ;
 
 	MkDir $(1:D) ;
-	HdsSchemaGenModel1 $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenTouch $(1) ;
+	HdsSchemaGenModel1 $(1) : $(2) $(3) $(1:D) ;
 }
 
 actions HdsSchemaGenModel1
@@ -65,8 +65,8 @@ rule HdsSchemaGenBulkParser
 	Depends $(1) : $(2) $(3) ;
 
 	MkDir $(1:D) ;
-	HdsSchemaGenBulkParser1 $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenTouch $(1) ;
+	HdsSchemaGenBulkParser1 $(1) : $(2) $(3) $(1:D) ;
 }
 
 actions HdsSchemaGenBulkParser1
@@ -81,7 +81,7 @@ actions HdsSchemaGenBulkParser1
 # output files and the target for a given python script run.
 
 # 1 : generated files (.h and .cpp)
-# 2 : target that will generate the generated files
+# 2 : target that will generate the generated files (dummy file)
 
 rule HdsSchemaGenAppSrcDependsOnGeneration {
 	local generatedSource ;
@@ -90,4 +90,8 @@ rule HdsSchemaGenAppSrcDependsOnGeneration {
 	MakeLocate $(1) : $(2:D) ;
 	Depends $(1) : $(2) ;
 	Clean $(1) ;
+
+	# just in case the dummy file ends up being newer than the generated
+	# sources, update the modified timestamp on the generated files.
+	HdsSchemaGenTouch $(1) ;
 }
