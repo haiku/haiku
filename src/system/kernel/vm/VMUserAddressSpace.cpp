@@ -186,18 +186,13 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_RANDOMIZED_ANY_ADDRESS:
-			searchBase = fBase;
+			searchBase = std::max(fBase, USER_BASE_ANY);
 			searchEnd = fEndAddress;
 			break;
 
 		default:
 			return B_BAD_VALUE;
 	}
-
-	// TODO: remove this again when vm86 mode is moved into the kernel
-	// completely (currently needs a userland address space!)
-	if (addressRestrictions->address_specification != B_EXACT_ADDRESS)
-		searchBase = std::max(searchBase, (addr_t)USER_BASE_ANY);
 
 	status = _InsertAreaSlot(searchBase, size, searchEnd,
 		addressRestrictions->address_specification,

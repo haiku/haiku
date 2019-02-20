@@ -587,10 +587,6 @@ VMKernelAddressSpace::_AllocateRange(
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 			address = fBase;
-			// TODO: remove this again when vm86 mode is moved into the kernel
-			// completely (currently needs a userland address space!)
-			if (address == USER_BASE)
-				address = USER_BASE_ANY;
 			break;
 
 		default:
