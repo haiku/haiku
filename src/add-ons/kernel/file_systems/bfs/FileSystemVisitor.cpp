@@ -161,8 +161,14 @@ FileSystemVisitor::Next()
 		// If the inode has an attribute directory that we want to visit,
 		// push it on the stack
 		if ((fFlags & VISIT_ATTRIBUTE_DIRECTORIES)
-			&& !inode->Attributes().IsZero()) {
+				&& !inode->Attributes().IsZero()) {
 			fStack.Push(inode->Attributes());
+
+			// We may already be keeping the associated Vnode, so we can't
+			// just call vnode.Keep() here, but rather acquire another reference
+			// to it specifically.
+			Vnode attrNode(fVolume, inode->Attributes());
+			attrNode.Keep();
 		}
 
 		bool visitingCurrentDirectory = inode->BlockRun() == fCurrent;
