@@ -1496,11 +1496,6 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 			return status;
 		}
 
-		StopEndpoint(false, endpoint, device->slot);
-		ResetEndpoint(false, endpoint, device->slot);
-		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
-			device->slot);
-
 		_WriteContext(&device->input_ctx->input.dropFlags, 0);
 		_WriteContext(&device->input_ctx->input.addFlags,
 			(1 << endpoint) | (1 << 0));
@@ -1509,6 +1504,11 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 			ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
 		else
 			EvaluateContext(device->input_ctx_addr, device->slot);
+
+		StopEndpoint(false, endpoint, device->slot);
+		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
+			device->slot);
+		ResetEndpoint(false, endpoint, device->slot);
 
 		TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n",
 			device->address, SLOT_3_SLOT_STATE_GET(_ReadContext(
