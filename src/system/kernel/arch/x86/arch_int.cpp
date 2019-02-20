@@ -233,9 +233,7 @@ x86_hardware_interrupt(struct iframe* frame)
 			apic_end_of_interrupt();
 	}
 
-	thread->pinned_to_cpu++;
 	int_io_interrupt_handler(vector, levelTriggered);
-	thread->pinned_to_cpu--;
 
 	if (levelTriggered) {
 		if (!sCurrentPIC->end_of_interrupt(vector))

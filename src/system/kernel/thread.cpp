@@ -2847,11 +2847,6 @@ thread_block_timeout(timer* timer)
 static inline status_t
 thread_block_locked(Thread* thread)
 {
-	if (thread->pinned_to_cpu > 0) {
-		panic("attempting to block thread %" B_PRId32 ", which is pinned!",
-			thread->id);
-	}
-
 	if (thread->wait.status == 1) {
 		// check for signals, if interruptible
 		if (thread_is_interrupted(thread, thread->wait.flags)) {
