@@ -45,9 +45,9 @@
 // There is a 2MB hole just before the end of the bottom half of the address
 // space. This means that if userland passes in a buffer that crosses into the
 // uncanonical address region, it will be caught through a page fault.
-#define USER_BASE				0x0
-#define USER_BASE_ANY			0x100000
-#define USER_SIZE				(0x800000000000 - 0x200000)
+#define USER_BASE				0x100000
+#define USER_BASE_ANY			USER_BASE
+#define USER_SIZE				(0x800000000000 - (0x200000 + 0x100000))
 #define USER_TOP				(USER_BASE + (USER_SIZE - 1))
 
 #define KERNEL_USER_DATA_BASE	0x7f0000000000
@@ -80,14 +80,11 @@
  * kernel. There is a gap of 64kb between the user and kernel space. The 64kb
  * region assures a user space thread cannot pass a buffer into the kernel as
  * part of a syscall that would cross into kernel space.
- * Furthermore no areas are placed in the lower 1Mb unless the application
- * explicitly requests it to find null pointer references.
- * TODO: introduce the 1Mb lower barrier again - it's only used for vm86 mode,
- *	and this should be moved into the kernel (and address space) completely.
+ * Further, there is a 1MB hole starting at 0x0 to prevent NULL from being mapped.
  */
-#define USER_BASE				0x0
-#define USER_BASE_ANY			0x100000
-#define USER_SIZE				(KERNEL_BASE - 0x10000)
+#define USER_BASE				0x100000
+#define USER_BASE_ANY			USER_BASE
+#define USER_SIZE				(KERNEL_BASE - (0x10000 + 0x100000))
 #define USER_TOP				(USER_BASE + (USER_SIZE - 1))
 
 #define KERNEL_USER_DATA_BASE	0x60000000
