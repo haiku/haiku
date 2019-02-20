@@ -178,7 +178,7 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 
 		case B_BASE_ADDRESS:
 		case B_RANDOMIZED_BASE_ADDRESS:
-			searchBase = (addr_t)addressRestrictions->address;
+			searchBase = std::max(fBase, (addr_t)addressRestrictions->address);
 			searchEnd = fEndAddress;
 			break;
 
@@ -186,7 +186,7 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_RANDOMIZED_ANY_ADDRESS:
-			searchBase = std::max(fBase, USER_BASE_ANY);
+			searchBase = std::max(fBase, (addr_t)USER_BASE_ANY);
 			searchEnd = fEndAddress;
 			break;
 
