@@ -216,7 +216,7 @@ DVDMediaIO::HandleDVDEvent(int event, int len)
 		}
 
 		case DVDNAV_NAV_PACKET:
-		break;
+			break;
 
 		case DVDNAV_HOP_CHANNEL:
 			break;
@@ -242,12 +242,17 @@ DVDMediaIO::SeekRequested(off_t position)
 }
 
 
-//void
-//DVDMediaIO::MouseMoved()
-//{
-	// if Mouse moved
-	// dvdnav_mouse_select(fDvdNav, pci, x, y);
-	// else button pressed
-	// update button
-	// dvdnav_mouse_activate(fDvdNav, pci, x, y);
-//}
+void
+DVDMediaIO::MouseMoved(uint32 x, uint32 y)
+{
+	pci_t* pci = dvdnav_get_current_nav_pci(fDvdNav);
+	dvdnav_mouse_select(fDvdNav, pci, x, y);
+}
+
+
+void
+DVDMediaIO::MouseDown(uint32 x, uint32 y)
+{
+	pci_t* pci = dvdnav_get_current_nav_pci(fDvdNav);
+	dvdnav_mouse_activate(fDvdNav, pci, x, y);
+}

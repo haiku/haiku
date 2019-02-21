@@ -7,6 +7,7 @@
 
 
 #include <AdapterIO.h>
+#include <String.h>
 #include <Url.h>
 
 #include <dvdnav/dvdnav.h>
@@ -36,16 +37,18 @@ public:
 
 			void						HandleDVDEvent(int event, int len);
 
+			void						MouseMoved(uint32 x, uint32 y);
+			void						MouseDown(uint32 x, uint32 y);
+
 private:
 			static int32				_LoopThread(void* data);
-
-			const char*					fPath;
 
 			thread_id					fLoopThread;
 			bool						fExit;
 
 			BInputAdapter*				fInputAdapter;
 
+			const char*					fPath;
 			dvdnav_t*					fDvdNav;
 			uint8_t*					fBuffer;
 };
