@@ -16,7 +16,7 @@ licenses {
 }
 
 provides {
-	haiku=%HAIKU_VERSION% compat>=R1~beta1
+	haiku=%HAIKU_VERSION% compat>=R1~alpha4_pm_hrev51198
 	cmd:arp
 	cmd:chop
 	cmd:clear
