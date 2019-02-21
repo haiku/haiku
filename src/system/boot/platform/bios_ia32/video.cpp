@@ -439,11 +439,29 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 }
 
 
+static void
+vesa_fixups(vbe_info_block *info)
+{
+	const char *oem_string = (const char *)info->oem_string;
+
+	if (!strcmp(oem_string, "NVIDIA")) {
+		dprintf("Disabling nvidia scaling.\n");
+		struct bios_regs regs;
+		regs.eax = 0x4f14;
+		regs.ebx = 0x0102;
+		regs.ecx = 1;	// centered unscaled
+		call_bios(0x10, &regs);
+	}
+}
+
+
 static status_t
 vesa_init(vbe_info_block *info, video_mode **_standardMode)
 {
 	if (vesa_get_vbe_info_block(info) != B_OK)
 		return B_ERROR;
+
+	vesa_fixups(info);
 
 	// fill mode list and find standard video mode
 
