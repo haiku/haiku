@@ -11,6 +11,7 @@
 
 
 #include <Decoder.h>
+#include <MediaStreamer.h>
 #include <Reader.h>
 
 
@@ -23,6 +24,8 @@ struct stream_info;
 class BMediaExtractor {
 public:
 								BMediaExtractor(BDataIO* source, int32 flags);
+								// TODO
+								//BMediaExtractor(BMediaStreamer* streamer);
 								~BMediaExtractor();
 
 			status_t			InitCheck();

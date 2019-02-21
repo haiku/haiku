@@ -604,7 +604,8 @@ BMediaFile::_InitStreamer(const BUrl& url, BDataIO** adapter)
 		return;
 	}
 
-	fErr = fStreamer->CreateAdapter(adapter);
+	fErr = fStreamer->Open();
+	*adapter = fStreamer->Adapter();
 }
 
 /*

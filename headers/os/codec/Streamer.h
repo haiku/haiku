@@ -20,7 +20,12 @@ namespace BPrivate {
 
 class BStreamer {
 public:
-	virtual status_t			Sniff(const BUrl& url, BDataIO** source) = 0;
+	virtual status_t			Sniff(const BUrl& url) = 0;
+	virtual BMediaIO*			Adapter() const = 0;
+
+	// Base impl does nothing
+	virtual void				MouseMoved(uint32 x, uint32 y);
+	virtual void				MouseDown(uint32 x, uint32 y);
 
 protected:
 								BStreamer();

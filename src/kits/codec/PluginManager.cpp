@@ -602,7 +602,7 @@ PluginManager::DestroyEncoder(BEncoder* encoder)
 
 
 status_t
-PluginManager::CreateStreamer(BStreamer** streamer, BUrl url, BDataIO** source)
+PluginManager::CreateStreamer(BStreamer** streamer, BUrl url)
 {
 	BAutolock _(fLocker);
 
@@ -645,10 +645,8 @@ PluginManager::CreateStreamer(BStreamer** streamer, BUrl url, BDataIO** source)
 		(*streamer)->fMediaPlugin = plugin;
 		plugin->fRefCount++;
 
-		BDataIO* streamSource = NULL;
-		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
+		if ((*streamer)->Sniff(url) == B_OK) {
 			TRACE("PluginManager::CreateStreamer: Sniff success\n");
-			*source = streamSource;
 			return B_OK;
 		}
 
