@@ -8,6 +8,9 @@
 
 #include <Streamer.h>
 
+#include "HTTPMediaIO.h"
+
+using BCodecKit::BMediaIO;
 using BCodecKit::BMediaPlugin;
 using BCodecKit::BStreamer;
 using BCodecKit::BStreamerPlugin;
@@ -19,7 +22,11 @@ public:
 								HTTPStreamer();
 	virtual						~HTTPStreamer();
 
-	virtual status_t			Sniff(const BUrl& url, BDataIO** source);
+	virtual status_t			Sniff(const BUrl& url);
+	virtual BMediaIO*			Adapter() const;
+
+private:
+			HTTPMediaIO*		fAdapter;
 };
 
 
