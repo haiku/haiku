@@ -28,7 +28,7 @@ public:
 								//BMediaExtractor(BMediaStreamer* streamer);
 								~BMediaExtractor();
 
-			status_t			InitCheck();
+			status_t			InitCheck() const;
 
 			BDataIO*			Source() const;
 
@@ -39,7 +39,7 @@ public:
 			status_t			GetStreamMetaData(int32 stream,
 									BMetaData* data) const;
 
-			int32				CountStreams();
+			int32				CountStreams() const;
 
 			const media_format*	EncodedFormat(int32 stream);
 			int64				CountFrames(int32 stream) const;

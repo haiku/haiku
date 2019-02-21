@@ -56,6 +56,8 @@ BMediaWriter::BMediaWriter(BDataIO* target, const media_file_format& fileFormat)
 	CALLED();
 
 	gPluginManager.CreateWriter(&fWriter, fFileFormat, fTarget);
+
+	fInitCheck = fWriter->Init(&fFileFormat);
 }
 
 
@@ -78,11 +80,11 @@ BMediaWriter::~BMediaWriter()
 
 
 status_t
-BMediaWriter::InitCheck()
+BMediaWriter::InitCheck() const
 {
 	CALLED();
 
-	return fWriter != NULL ? fWriter->Init(&fFileFormat) : B_NO_INIT;
+	return fWriter != NULL ? fInitCheck : B_NO_INIT;
 }
 
 
