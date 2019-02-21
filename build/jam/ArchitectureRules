@@ -125,9 +125,11 @@ rule ArchitectureSetup architecture
 	# disable some Clang warnings that are not very useful
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
 		HAIKU_WARNING_CCFLAGS_$(architecture) += -Wno-address-of-packed-member
-			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator ;
+			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator
+			-Wno-builtin-requires-header ;
 		HAIKU_WARNING_C++FLAGS_$(architecture) += -Wno-address-of-packed-member
-			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator ;
+			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator
+			-Wno-builtin-requires-header ;
 	}
 
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
