@@ -221,7 +221,7 @@ extern const BAffineTransform B_AFFINE_IDENTITY_TRANSFORM;
 inline void
 BAffineTransform::Apply(double* x, double* y) const
 {
-	register double tmp = *x;
+	double tmp = *x;
 	*x = tmp * sx + *y * shx + tx;
 	*y = tmp * shy + *y * sy + ty;
 }
@@ -230,9 +230,9 @@ BAffineTransform::Apply(double* x, double* y) const
 inline void
 BAffineTransform::ApplyInverse(double* x, double* y) const
 {
-	register double d = InverseDeterminant();
-	register double a = (*x - tx) * d;
-	register double b = (*y - ty) * d;
+	double d = InverseDeterminant();
+	double a = (*x - tx) * d;
+	double b = (*y - ty) * d;
 	*x = a * sy - b * shx;
 	*y = b * sx - a * shy;
 }
