@@ -63,7 +63,7 @@ public:
 	void Draw(BRect invalidate)
 	{
 		RotateBy(-M_PI / 5);
-		TranslateBy(0, Bounds().Height() / 1.5);
+		TranslateBy(0, Bounds().Height() / 3);
 		BStringView::Draw(invalidate);
 	}
 };
@@ -182,7 +182,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	}
 
 	const float kTextControlLeft = 170, kTextControlRight = 270,
-		kTextControlTop = kRowLabelTop - 19,
+		kTextControlTop = kRowLabelTop - 29,
 		kTextControlHeight = 14, kTextControlSpacing = 16;
 
 	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop,
@@ -202,9 +202,9 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	AddChild(fOwnerTextControl);
 
 	strView = new BStringView(BRect(kTextControlLeft,
-			kTextControlTop + 5 + 2 * kTextControlSpacing,
+			kTextControlTop + 11 + 2 * kTextControlSpacing,
 			kTextControlRight,
-			kTextControlTop + 2 + 2 * kTextControlSpacing
+			kTextControlTop + 11 + 2 * kTextControlSpacing
 				+ kTextControlHeight),
 		"", B_TRANSLATE("Group"));
 	strView->SetAlignment(B_ALIGN_CENTER);
@@ -212,9 +212,9 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	AddChild(strView);
 
 	fGroupTextControl = new BTextControl(BRect(kTextControlLeft,
-			kTextControlTop + 3 * kTextControlSpacing,
+			kTextControlTop + 10 + 3 * kTextControlSpacing,
 			kTextControlRight,
-			kTextControlTop + 3 * kTextControlSpacing + kTextControlHeight),
+			kTextControlTop + 10 + 3 * kTextControlSpacing + kTextControlHeight),
 		"", "", "", new BMessage(kNewGroupEntered));
 	fGroupTextControl->SetDivider(0);
 	AddChild(fGroupTextControl);
