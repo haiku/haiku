@@ -209,7 +209,7 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$binutilsSourceDir/configure" \
 $MAKE $additionalMakeArgs || exit 1
 $MAKE $additionalMakeArgs install || exit 1
 
-export PATH=$PATH:"$installDir/bin"
+export PATH="$PATH:$installDir/bin"
 
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	# build gmp
