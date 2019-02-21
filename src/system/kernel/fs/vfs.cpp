@@ -8789,9 +8789,7 @@ _user_mount(const char* userPath, const char* userDevice,
 	char* args = NULL;
 	status_t status;
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userFileSystem)
-		|| !IS_USER_ADDRESS(userDevice))
+	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
 	if (path.InitCheck() != B_OK || device.InitCheck() != B_OK)
@@ -8803,12 +8801,18 @@ _user_mount(const char* userPath, const char* userDevice,
 		return status;
 
 	if (userFileSystem != NULL) {
+		if (!IS_USER_ADDRESS(userFileSystem))
+			return B_BAD_ADDRESS;
+
 		status = user_copy_name(fileSystem, userFileSystem, sizeof(fileSystem));
 		if (status != B_OK)
 			return status;
 	}
 
 	if (userDevice != NULL) {
+		if (!IS_USER_ADDRESS(userDevice))
+			return B_BAD_ADDRESS;
+
 		status = user_copy_name(device.LockBuffer(), userDevice,
 			B_PATH_NAME_LENGTH);
 		if (status != B_OK)
