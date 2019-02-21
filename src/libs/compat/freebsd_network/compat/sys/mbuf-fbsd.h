@@ -156,7 +156,7 @@ m_extrefcnt(struct mbuf *m)
 static __inline int
 m_gettype(int size)
 {
-	int type;
+	int type = 0;
 
 	switch (size) {
 	case MCLBYTES:
@@ -185,7 +185,7 @@ m_gettype(int size)
 static __inline void
 m_cljset(struct mbuf *m, void *cl, int type)
 {
-	int size;
+	int size = 0;
 
 	switch (type) {
 	case EXT_CLUSTER:
