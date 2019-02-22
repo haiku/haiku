@@ -2147,10 +2147,10 @@ XHCI::DoCommand(xhci_trb* trb)
 	QueueCommand(trb);
 	Ring(0, 0);
 
-	if (acquire_sem(fCmdCompSem) < B_OK) {
-		TRACE("Unable to obtain fCmdCompSem semaphore!\n");
+	if (acquire_sem_etc(fCmdCompSem, 1, B_RELATIVE_TIMEOUT, 1 * 1000 * 1000) < B_OK) {
+		TRACE("Unable to obtain fCmdCompSem!\n");
 		Unlock();
-		return B_ERROR;
+		return B_TIMED_OUT;
 	}
 	// eat up sems that have been released by multiple interrupts
 	int32 semCount = 0;
