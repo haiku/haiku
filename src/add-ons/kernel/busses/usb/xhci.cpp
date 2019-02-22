@@ -1425,6 +1425,11 @@ XHCI::FreeDevice(Device *device)
 {
 	uint8 slot = fPortSlots[device->HubPort()];
 	TRACE("FreeDevice() port %d slot %d\n", device->HubPort(), slot);
+
+	// Delete the device first, so it cleans up its pipes and tells us
+	// what we need to destroy before we tear down our internal state.
+	delete device;
+
 	DisableSlot(slot);
 	fDcba->baseAddress[slot] = 0;
 	fPortSlots[device->HubPort()] = 0;
@@ -1432,7 +1437,6 @@ XHCI::FreeDevice(Device *device)
 	delete_area(fDevices[slot].input_ctx_area);
 	delete_area(fDevices[slot].device_ctx_area);
 	fDevices[slot].state = XHCI_STATE_DISABLED;
-	delete device;
 }
 
 
