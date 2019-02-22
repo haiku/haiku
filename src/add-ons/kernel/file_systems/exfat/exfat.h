@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2011-2019, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2014 Haiku, Inc. All Rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -26,6 +26,7 @@ typedef uint32 cluster_t;
 
 
 #define EXFAT_SUPER_BLOCK_OFFSET	0x0
+#define EXFAT_FIRST_DATA_CLUSTER	2
 
 
 struct exfat_super_block {

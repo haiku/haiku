@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2011-2019, Jérôme Duval, jerome.duval@gmail.com.
  * Copyright 2014 Haiku, Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -416,9 +416,10 @@ Volume::LoadSuperBlock()
 status_t
 Volume::ClusterToBlock(cluster_t cluster, fsblock_t &block)
 {
-	if (cluster < 2)
+	if (cluster < EXFAT_FIRST_DATA_CLUSTER)
 		return B_BAD_VALUE;
-	block = ((cluster - 2) << SuperBlock().BlocksPerClusterShift())
+	block = ((fsblock_t)(cluster - EXFAT_FIRST_DATA_CLUSTER)
+		<< SuperBlock().BlocksPerClusterShift())
 		+ SuperBlock().FirstDataBlock();
 	TRACE("Volume::ClusterToBlock() cluster %" B_PRIu32 " %u %" B_PRIu32 ": %"
 		B_PRIu64 ", %" B_PRIu32 "\n", cluster,
