@@ -160,7 +160,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	size_t mapSize = fPCIInfo->u.h0.base_register_sizes[0];
 
-	TRACE("map physical memory %08" B_PRIxPHYSADDR ", size: %" B_PRId32 "\n",
+	TRACE("map physical memory %08" B_PRIxPHYSADDR ", size: %" B_PRIuSIZE "\n",
 		physicalAddress, mapSize);
 
 	fRegisterArea = map_physical_memory("XHCI memory mapped registers",
@@ -1238,7 +1238,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	memset(device->device_ctx, 0, sizeof(*device->device_ctx) << fContextSizeShift);
 
 	device->trb_area = fStack->AllocateArea((void **)&device->trbs,
-		&device->trb_addr, sizeof(*device->trbs) * (XHCI_MAX_ENDPOINTS - 1)
+		&device->trb_addr, sizeof(xhci_trb) * (XHCI_MAX_ENDPOINTS - 1)
 			* XHCI_MAX_TRANSFERS, "XHCI endpoint trbs");
 	if (device->trb_area < B_OK) {
 		TRACE_ERROR("unable to create a device trbs area\n");
