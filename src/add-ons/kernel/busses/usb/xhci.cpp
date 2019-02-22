@@ -1478,11 +1478,17 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		device->endpoints[id].device = device;
 		device->endpoints[id].trbs = device->trbs
 			+ id * XHCI_MAX_TRANSFERS;
-		device->endpoints[id].td_head = NULL;
-		device->endpoints[id].used = 0;
 		device->endpoints[id].trb_addr = device->trb_addr
 			+ id * XHCI_MAX_TRANSFERS * sizeof(xhci_trb);
+		device->endpoints[id].td_head = NULL;
+		device->endpoints[id].used = 0;
+		device->endpoints[id].current = 0;
+
+		memset(device->endpoints[id].trbs, 0,
+			sizeof(xhci_trb) * XHCI_MAX_TRANSFERS);
+
 		mutex_init(&device->endpoints[id].lock, "xhci endpoint lock");
+		MutexLocker endpointLocker(device->endpoints[id].lock);
 
 		TRACE("_InsertEndpointForPipe trbs device %p endpoint %p\n",
 			device->trbs, device->endpoints[id].trbs);
@@ -2059,7 +2065,6 @@ XHCI::HandleCmdComplete(xhci_trb* trb)
 		fCmdResult[1] = B_LENDIAN_TO_HOST_INT32(trb->dwtrb3);
 		release_sem_etc(fCmdCompSem, 1, B_DO_NOT_RESCHEDULE);
 	}
-
 }
 
 
