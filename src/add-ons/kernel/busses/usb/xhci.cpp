@@ -618,50 +618,6 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	usb_request_data *requestData = transfer->RequestData();
 	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) != 0;
 
-	TRACE("SubmitControlRequest() length %d\n", requestData->Length);
-
-	xhci_td *setupDescriptor = CreateDescriptor(requestData->Length);
-
-	// set SetupStage
-	uint8 index = 0;
-	setupDescriptor->trbs[index].qwtrb0 = 0;
-	setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0) | TRB_2_BYTES(8);
-	setupDescriptor->trbs[index].dwtrb3
-		= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_SETUP_STAGE)
-			| TRB_3_IDT_BIT | TRB_3_CYCLE_BIT);
-	if (requestData->Length > 0) {
-		setupDescriptor->trbs[index].dwtrb3 |= B_HOST_TO_LENDIAN_INT32(
-			directionIn ? TRB_3_TRT_IN : TRB_3_TRT_OUT);
-	}
-	memcpy(&setupDescriptor->trbs[index].qwtrb0, requestData,
-		sizeof(usb_request_data));
-
-	index++;
-
-	if (requestData->Length > 0) {
-		// set DataStage if any
-		setupDescriptor->trbs[index].qwtrb0 = setupDescriptor->buffer_phy[0];
-		setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0)
-			| TRB_2_BYTES(requestData->Length)
-			| TRB_2_TD_SIZE(transfer->VectorCount());
-		setupDescriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
-			TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
-				| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
-				| TRB_3_CYCLE_BIT);
-
-		// TODO copy data for out transfers
-		index++;
-	}
-
-	// set StatusStage
-	setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0);
-	setupDescriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
-		TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
-			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
-			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
-
-	setupDescriptor->trb_count = index + 1;
-
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	uint8 id = XHCI_ENDPOINT_ID(pipe);
 	if (id >= XHCI_MAX_ENDPOINTS) {
@@ -672,8 +628,59 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	if (status != B_OK)
 		return status;
 
-	setupDescriptor->transfer = transfer;
-	status = _LinkDescriptorForPipe(setupDescriptor, endpoint);
+	TRACE("SubmitControlRequest() length %d\n", requestData->Length);
+
+	xhci_td *descriptor = CreateDescriptor(requestData->Length);
+	descriptor->transfer = transfer;
+
+	// Setup Stage
+	uint8 index = 0;
+	memcpy(&descriptor->trbs[index].qwtrb0, requestData,
+		sizeof(usb_request_data));
+	descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0) | TRB_2_BYTES(8);
+	descriptor->trbs[index].dwtrb3
+		= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_SETUP_STAGE)
+			| TRB_3_IDT_BIT | TRB_3_CYCLE_BIT);
+	if (requestData->Length > 0) {
+		descriptor->trbs[index].dwtrb3 |= B_HOST_TO_LENDIAN_INT32(
+			directionIn ? TRB_3_TRT_IN : TRB_3_TRT_OUT);
+	}
+
+	index++;
+
+	// Data Stage (if any)
+	if (requestData->Length > 0) {
+		descriptor->trbs[index].qwtrb0 = descriptor->buffer_phy[0];
+		descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0)
+			| TRB_2_BYTES(requestData->Length)
+			| TRB_2_TD_SIZE(0);
+		descriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+			TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
+				| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
+				| TRB_3_CYCLE_BIT);
+
+		if (!directionIn) {
+			transfer->PrepareKernelAccess();
+			memcpy(descriptor->buffer_log[0],
+				(uint8 *)transfer->Vector()[0].iov_base, requestData->Length);
+		}
+
+		index++;
+	}
+
+	// Status Stage
+	descriptor->trbs[index].qwtrb0 = 0;
+	descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0);
+	descriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+		TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
+			| TRB_3_DIR_IN | TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
+		// Note that TRB_3_DIR on a TRB_TYPE_STATUS_STAGE does not refer to the
+		// Data Stage, but rather to which way the status notification should
+		// go, i.e. device to host, or host to device. (XHCI 1.1 § 4.11.2.2 p205.)
+
+	descriptor->trb_count = index + 1;
+
+	status = _LinkDescriptorForPipe(descriptor, endpoint);
 	if (status != B_OK)
 		return status;
 	TRACE("SubmitControlRequest() request linked\n");
