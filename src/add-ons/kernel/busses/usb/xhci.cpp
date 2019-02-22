@@ -1395,8 +1395,12 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		deviceObject = new(std::nothrow) Device(parent, hubAddress, hubPort,
 			deviceDescriptor, device->address + 1, speed, false, device);
 	}
-	if (deviceObject == NULL) {
-		TRACE_ERROR("no memory to allocate device\n");
+	if (deviceObject == NULL || deviceObject->InitCheck() != B_OK) {
+		if (deviceObject == NULL) {
+			TRACE_ERROR("no memory to allocate device\n");
+		} else {
+			TRACE_ERROR("device object failed to initialize\n");
+		}
 		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
