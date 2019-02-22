@@ -222,7 +222,10 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 		TRACE_ERROR(("PMA: found no free slot to store %ld bytes, waiting\n",
 			size));
 
-		entry.Wait();
+		if (entry.Wait(B_RELATIVE_TIMEOUT, 2 * 1000 * 1000) == B_TIMED_OUT) {
+			TRACE_ERROR(("PMA: timed out waiting for a free slot, giving up\n"));
+			break;
+		}
 
 		if (!_Lock())
 			return B_ERROR;
