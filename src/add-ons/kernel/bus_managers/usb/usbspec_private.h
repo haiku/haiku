@@ -37,24 +37,16 @@
 
 
 /*
-	Important data from the USB spec (not interesting for drivers)
-*/
+ * Important data from the USB spec.
+ */
 
-struct memory_chunk
-{
-	uint32 next_item;
-	uint32 physical;
-};
-
-
-struct usb_request_data
-{
+struct usb_request_data {
 	uint8   RequestType;
 	uint8   Request;
 	uint16  Value;
 	uint16  Index;
 	uint16  Length;
-};
+} _PACKED;
 
 
 struct usb_isochronous_data {
@@ -65,8 +57,7 @@ struct usb_isochronous_data {
 };
 
 
-struct usb_hub_descriptor
-{
+struct usb_hub_descriptor {
 	uint8 length;
 	uint8 descriptor_type;
 	uint8 num_ports;
