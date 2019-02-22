@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Augustin Cavalier <waddlesplash>
- * 		Jian Chiang <j.jian.chiang@gmail.com>
+ *		Jian Chiang <j.jian.chiang@gmail.com>
  *		Jérôme Duval <jerome.duval@gmail.com>
  *		Akshay Jaggi <akshay1994.leo@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
@@ -1312,7 +1312,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor deviceDescriptor;
 
 	TRACE("getting the device descriptor\n");
-	pipe.SendRequest(
+	status_t status = pipe.SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
 		USB_DESCRIPTOR_DEVICE << 8,							// value
@@ -1323,7 +1323,8 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		&actualLength);										// actual length
 
 	if (actualLength != 8) {
-		TRACE_ERROR("error while getting the device descriptor\n");
+		TRACE_ERROR("error while getting the device descriptor: %s\n",
+			strerror(status));
 		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
@@ -1355,7 +1356,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		TRACE("getting the hub descriptor\n");
 		size_t actualLength = 0;
 		usb_hub_descriptor hubDescriptor;
-		pipe.SendRequest(
+		status = pipe.SendRequest(
 			USB_REQTYPE_DEVICE_IN | USB_REQTYPE_CLASS,			// type
 			USB_REQUEST_GET_DESCRIPTOR,							// request
 			USB_DESCRIPTOR_HUB << 8,							// value
@@ -1366,7 +1367,8 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			&actualLength);
 
 		if (actualLength != sizeof(usb_hub_descriptor)) {
-			TRACE_ERROR("error while getting the hub descriptor\n");
+			TRACE_ERROR("error while getting the hub descriptor: %s\n",
+				strerror(status));
 			device->state = XHCI_STATE_DISABLED;
 			delete_area(device->input_ctx_area);
 			delete_area(device->device_ctx_area);
@@ -2092,7 +2094,6 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			}
 		}
 	}
-
 }
 
 
@@ -2438,7 +2439,7 @@ XHCI::FinishTransfers()
 
 			size_t actualLength = 0;
 			if (callbackStatus == B_OK) {
-				actualLength = requestData ? requestData->Length
+				actualLength = requestData != NULL ? requestData->Length
 					: transfer->DataLength();
 
 				if (td->trb_completion_code == COMP_SHORT_PACKET)
