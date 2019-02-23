@@ -16,6 +16,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <BytePointer.h>
 
 #include <syscalls.h>
 #include <syscall_restart.h>
@@ -966,11 +967,11 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 
 	// copy the buffer back -- determine the total buffer size first
 	size_t sizeToCopy = 0;
-	struct dirent* entry = buffer;
+	BytePointer<struct dirent> entry = buffer;
 	for (uint32 i = 0; i < count; i++) {
 		size_t length = entry->d_reclen;
 		sizeToCopy += length;
-		entry = (struct dirent*)((uint8*)entry + length);
+		entry += length;
 	}
 
 	if (user_memcpy(userBuffer, buffer, sizeToCopy) != B_OK)
