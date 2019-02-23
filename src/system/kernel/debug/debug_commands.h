@@ -27,7 +27,7 @@ typedef struct debugger_command_pipe_segment {
 	int					argc;
 	char**				argv;
 	int32				invocations;
-	uint32				user_data[8];	// can be used by the command
+	uint64				user_data[4];	// can be used by the command
 } debugger_command_pipe_segment;
 
 typedef struct debugger_command_pipe {
