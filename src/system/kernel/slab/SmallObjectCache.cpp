@@ -8,6 +8,7 @@
 
 #include "SmallObjectCache.h"
 
+#include <BytePointer.h>
 #include "MemoryManager.h"
 #include "slab_private.h"
 
@@ -18,7 +19,8 @@ RANGE_MARKER_FUNCTION_BEGIN(SlabSmallObjectCache)
 static inline slab *
 slab_in_pages(const void *pages, size_t slab_size)
 {
-	return (slab *)(((uint8 *)pages) + slab_size - sizeof(slab));
+	BytePointer<slab> pointer(((uint8 *)pages) + slab_size - sizeof(slab));
+	return &pointer;
 }
 
 
