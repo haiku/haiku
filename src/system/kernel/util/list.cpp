@@ -5,11 +5,13 @@
 
 
 #include <util/list.h>
+#include <BytePointer.h>
 
 
-#define GET_ITEM(list, item) ((void *)((uint8 *)item - list->offset))
-#define GET_LINK(list, item) ((list_link *)((uint8 *)item + list->offset))
-
+#define GET_ITEM(list, item) ({ BytePointer<void> pointer((uint8*)item \
+	- list->offset); &pointer; })
+#define GET_LINK(list, item) ({ BytePointer<list_link> pointer((uint8*)item \
+	+ list->offset); &pointer; })
 
 /** Initializes the list with a specified offset to the link
  *	structure in the items that will be part of the list.
