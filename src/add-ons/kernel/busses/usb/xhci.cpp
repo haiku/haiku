@@ -768,8 +768,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	descriptor->transfer = transfer;
 	status = _LinkDescriptorForPipe(descriptor, endpoint);
 	if (status != B_OK) {
-		return status;
 		FreeDescriptor(descriptor);
+		return status;
 	}
 	TRACE("SubmitNormalRequest() request linked\n");
 
