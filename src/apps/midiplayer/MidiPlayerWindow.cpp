@@ -427,17 +427,18 @@ MidiPlayerWindow::_StopHook(int32 arg)
 void
 MidiPlayerWindow::StopHook()
 {
-	Lock();
+	if (Lock()) {
 		// we may be called from the synth's thread
 
-	fIsPlaying = false;
+		fIsPlaying = false;
 
-	fScopeView->SetPlaying(false);
-	fScopeView->Invalidate();
-	fPlayButton->SetEnabled(true);
-	fPlayButton->SetLabel(B_TRANSLATE("Play"));
+		fScopeView->SetPlaying(false);
+		fScopeView->Invalidate();
+		fPlayButton->SetEnabled(true);
+		fPlayButton->SetLabel(B_TRANSLATE("Play"));
 
-	Unlock();
+		Unlock();
+	}
 }
 
 
