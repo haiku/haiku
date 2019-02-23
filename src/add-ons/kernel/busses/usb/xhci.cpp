@@ -675,8 +675,8 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
 			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
 			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
-		// Status Stage is an OUT transfer when the device sent data
-		// (see XHCI 1.1 § 4.11.2.2 Table 4-6)
+		// Status Stage is an OUT transfer when the device is sending data.
+		// (XHCI 1.1 § 4.11.2.2 Table 4-6 p205.)
 
 	descriptor->trb_count = index + 1;
 
