@@ -7,6 +7,7 @@
 #include <system_profiler.h>
 
 #include <AutoDeleter.h>
+#include <BytePointer.h>
 #include <Referenceable.h>
 
 #include <util/AutoLock.h>
@@ -1338,8 +1339,8 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count)
 		// Buffer is wrapped or needs wrapping.
 		if (end < fBufferCapacity) {
 			// not wrapped yet, but needed
-			system_profiler_event_header* header
-				= (system_profiler_event_header*)(fBufferBase + end);
+			BytePointer<system_profiler_event_header> header(
+				fBufferBase + end);
 			header->event = B_SYSTEM_PROFILER_BUFFER_END;
 			fBufferSize = fBufferCapacity - fBufferStart;
 			end = 0;
@@ -1352,8 +1353,7 @@ SystemProfiler::_AllocateBuffer(size_t size, int event, int cpu, int count)
 		}
 	}
 
-	system_profiler_event_header* header
-		= (system_profiler_event_header*)(fBufferBase + end);
+	BytePointer<system_profiler_event_header> header(fBufferBase + end);
 	header->event = event;
 	header->cpu = cpu;
 	header->size = size - sizeof(system_profiler_event_header);
