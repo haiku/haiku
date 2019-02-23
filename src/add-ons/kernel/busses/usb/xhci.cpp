@@ -673,16 +673,18 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0);
 	descriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
 		TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
-			| TRB_3_DIR_IN | TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
-		// Note that TRB_3_DIR on a TRB_TYPE_STATUS_STAGE does not refer to the
-		// Data Stage, but rather to which way the status notification should
-		// go, i.e. device to host, or host to device. (XHCI 1.1 § 4.11.2.2 p205.)
+			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
+			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
+		// Status Stage is an OUT transfer when the device sent data
+		// (see XHCI 1.1 § 4.11.2.2 Table 4-6)
 
 	descriptor->trb_count = index + 1;
 
 	status = _LinkDescriptorForPipe(descriptor, endpoint);
-	if (status != B_OK)
+	if (status != B_OK) {
+		FreeDescriptor(descriptor);
 		return status;
+	}
 	TRACE("SubmitControlRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
@@ -765,8 +767,10 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	descriptor->transfer = transfer;
 	status = _LinkDescriptorForPipe(descriptor, endpoint);
-	if (status != B_OK)
+	if (status != B_OK) {
 		return status;
+		FreeDescriptor(descriptor);
+	}
 	TRACE("SubmitNormalRequest() request linked\n");
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
