@@ -2952,7 +2952,7 @@ display_mem(int argc, char** argv)
 	} else {
 		// number mode
 		for (i = 0; i < num; i++) {
-			uint32 value;
+			uint64 value;
 
 			if ((i % displayWidth) == 0) {
 				int32 displayed = min_c(displayWidth, (num-i)) * itemSize;
