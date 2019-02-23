@@ -752,9 +752,9 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	if (last->trb_count > 0) {
 		last->trbs[last->trb_count - 1].dwtrb3
-			|= B_HOST_TO_LENDIAN_INT32(TRB_3_IOC_BIT);
-		last->trbs[last->trb_count - 1].dwtrb3
 			&= B_HOST_TO_LENDIAN_INT32(~TRB_3_CHAIN_BIT);
+		last->trbs[last->trb_count - 1].dwtrb3
+			|= B_HOST_TO_LENDIAN_INT32(TRB_3_IOC_BIT);
 	}
 
 	if (!directionIn) {
@@ -1604,7 +1604,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	last->trbs[last->trb_count].qwtrb0 = addr;
 	last->trbs[last->trb_count].dwtrb2 = TRB_2_IRQ(0);
 	last->trbs[last->trb_count].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
-		TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
+		TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_CYCLE_BIT);
 
 	endpoint->trbs[next].qwtrb0 = 0;
 	endpoint->trbs[next].dwtrb2 = 0;
@@ -2076,48 +2076,60 @@ void
 XHCI::HandleTransferComplete(xhci_trb* trb)
 {
 	TRACE("HandleTransferComplete trb %p\n", trb);
-	addr_t source = trb->qwtrb0;
-	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
-	uint32 remainder = TRB_2_REM_GET(trb->dwtrb2);
+
 	uint8 endpointNumber
 		= TRB_3_ENDPOINT_GET(B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
 	uint8 slot = TRB_3_SLOT_GET(B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
+	uint8 type = TRB_3_TYPE_GET(B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
 
 	if (slot > fSlotCount)
 		TRACE_ERROR("invalid slot\n");
 	if (endpointNumber == 0 || endpointNumber >= XHCI_MAX_ENDPOINTS)
 		TRACE_ERROR("invalid endpoint\n");
+	if (type == TRB_TYPE_EVENT_DATA) {
+		// TODO: Implement these. (Do we trigger any at present?)
+		TRACE_ERROR("event data TRBs are not handled yet!\n");
+		return;
+	}
 
+	addr_t source = trb->qwtrb0;
+	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
+	uint32 remainder = TRB_2_REM_GET(trb->dwtrb2);
 	xhci_device *device = &fDevices[slot];
 	xhci_endpoint *endpoint = &device->endpoints[endpointNumber - 1];
-	xhci_td *td = endpoint->td_head;
-	for (; td != NULL; td = td->next) {
-		xhci_td *td_chain = td;
-		for (; td_chain != NULL; td_chain = td_chain->next_chain) {
-			int64 offset = source - td_chain->this_phy;
-			TRACE("HandleTransferComplete td %p offset %" B_PRId64 " %"
-				B_PRIxADDR "\n", td_chain, offset, source);
-			offset = offset / sizeof(xhci_trb) + 1;
-			if (offset <= td_chain->trb_count && offset >= 1) {
-				TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found "
-					"\n", td_chain, offset);
-				// is it the last trb?
-				if (offset == td_chain->trb_count) {
-					_UnlinkDescriptorForPipe(td, endpoint);
-					td->trb_completion_code = completionCode;
-					td->trb_left = remainder;
-					// add descriptor to finished list
-					Lock();
-					td->next = fFinishedHead;
-					fFinishedHead = td;
-					Unlock();
-					release_sem(fFinishTransfersSem);
-					TRACE("HandleTransferComplete td %p\n", td);
-				}
-				return;
+
+	for (xhci_td *td = endpoint->td_head; td != NULL; td = td->next) {
+		for (xhci_td *td_chain = td; td_chain != NULL;
+				td_chain = td_chain->next_chain) {
+			int64 offset = (source - td_chain->this_phy) / sizeof(xhci_trb);
+			if (offset < 0 || offset >= XHCI_MAX_TRBS_PER_TD)
+				continue;
+
+			TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found\n"
+				td_chain, offset);
+
+			// The TRB at offset trb_count will be the link TRB, which we do not
+			// care about (and should not generate an interrupt at all.)
+			// We really care about the properly last TRB, at index "count - 1".
+			if (offset == td_chain->trb_count - 1) {
+				_UnlinkDescriptorForPipe(td, endpoint);
+				td->trb_completion_code = completionCode;
+				td->trb_left = remainder;
+				// add descriptor to finished list
+				Lock();
+				td->next = fFinishedHead;
+				fFinishedHead = td;
+				Unlock();
+				release_sem(fFinishTransfersSem);
+				TRACE("HandleTransferComplete td %p done\n", td);
+			} else {
+				TRACE_ERROR("TRB %" B_PRIxADDR " was found, but it wasn't the "
+					"last in the TD!\n", source);
 			}
+			return;
 		}
 	}
+	TRACE_ERROR("TRB %" B_PRIxADDR " was not found in the endpoint!\n", source);
 }
 
 
