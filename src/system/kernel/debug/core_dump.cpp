@@ -1125,6 +1125,8 @@ private:
 		header.e_machine = EM_MIPS;
 #elif defined(__HAIKU_ARCH_ARM)
 		header.e_machine = EM_ARM;
+#elif defined(__HAIKU_ARCH_SPARC)
+		header.e_machine = EM_SPARCV9;
 #else
 #	error Unsupported architecture!
 #endif

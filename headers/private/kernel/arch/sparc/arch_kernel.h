@@ -8,27 +8,29 @@
 
 #include <arch/cpu.h>
 
-// memory layout
-#define KERNEL_BASE 0x80000000
-#define KERNEL_SIZE 0x80000000
-#define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
+// Base of the kernel address space.
+// KERNEL_BASE is the base of the kernel address space. This differs from the
+// address where the kernel is loaded to: the kernel is loaded in the top 2GB
+// of the virtual address space as required by GCC's kernel code model. The
+// whole kernel address space is the top 512GB of the address space.
+#define KERNEL_BASE				0xffffff0000000000
+#define KERNEL_SIZE				0x10000000000
+#define KERNEL_TOP  			(KERNEL_BASE + (KERNEL_SIZE - 1))
+#define KERNEL_LOAD_BASE		0xffffffff80000000
 
-/*
-** User space layout is a little special:
-** The user space does not completely cover the space not covered by the kernel.
-** This is accomplished by starting user space at 1Mb and running to 64kb short of kernel space.
-** The lower 1Mb reserved spot makes it easy to find null pointer references and guarantees a
-** region wont be placed there. The 64kb region assures a user space thread cannot pass
-** a buffer into the kernel as part of a syscall that would cross into kernel space.
-*/
-#define USER_BASE     0x100000
-#define USER_BASE_ANY USER_BASE
-#define USER_SIZE     (0x80000000 - (0x10000 + 0x100000))
-#define USER_TOP      (USER_BASE + (USER_SIZE - 1))
 
-#define KERNEL_USER_DATA_BASE	0x60000000
-#define USER_STACK_REGION              0x70000000
-#define USER_STACK_REGION_SIZE ((USER_TOP - USER_STACK_REGION) + 1)
+// Userspace address space layout.
+// There is a 2MB hole just before the end of the bottom half of the address
+// space. This means that if userland passes in a buffer that crosses into the
+// uncanonical address region, it will be caught through a page fault.
+#define USER_BASE				0x100000
+#define USER_BASE_ANY			USER_BASE
+#define USER_SIZE				(0x800000000000 - (0x200000 + 0x100000))
+#define USER_TOP				(USER_BASE + (USER_SIZE - 1))
+
+#define KERNEL_USER_DATA_BASE	0x7f0000000000
+#define USER_STACK_REGION		0x7f0000000000
+#define USER_STACK_REGION_SIZE	((USER_TOP - USER_STACK_REGION) + 1)
 
 #endif	/* _KERNEL_ARCH_SPARC_KERNEL_H */
 
