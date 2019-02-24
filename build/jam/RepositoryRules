@@ -334,7 +334,7 @@ actions BootstrapRepositoryFetchPackage1
 	# make Haiku cross devel package path absolute
 	haikuCrossDevelPackage="$(2[1])"
 	if [ "x$haikuCrossDevelPackage" = "x" ]; then
-		echo "$portSpec does not have a cross-devel package defined!"
+		echo "$package does not have a cross-devel package defined!"
 		exit 1
 	fi
 
