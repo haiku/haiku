@@ -8,6 +8,7 @@
 
 
 #include <arch_cpu.h>
+#include <kernel.h>
 
 
 #define	IFRAME_TRACE_DEPTH 4
