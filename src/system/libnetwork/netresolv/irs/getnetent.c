@@ -119,12 +119,6 @@ getnetent(void)
 
 	if (netf == NULL && (netf = fopen(_PATH_NETWORKS, "re")) == NULL)
 		return (NULL);
-#if (defined(__sparc__) && defined(_LP64)) ||		\
-    defined(__alpha__) ||				\
-    (defined(__i386__) && defined(_LP64)) ||		\
-    (defined(__sh__) && defined(_LP64))
-	net.__n_pad0 = 0;
-#endif
 again:
 	p = fgets(line, (int)sizeof line, netf);
 	if (p == NULL)
