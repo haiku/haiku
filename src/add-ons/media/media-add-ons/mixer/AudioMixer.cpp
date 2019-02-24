@@ -275,7 +275,7 @@ AudioMixer::GetNextInput(int32 *cookie, media_input *out_input)
 		out_input->source = media_source::null;
 		out_input->destination.port = ControlPort();
 		out_input->destination.id = 0;
-		memset(&out_input->format, 0, sizeof(out_input->format));
+		out_input->format.Clear();
 		out_input->format.type = B_MEDIA_RAW_AUDIO;
 		strcpy(out_input->name, "Free Input");
 		*cookie += 1;
@@ -532,7 +532,7 @@ AudioMixer::FormatSuggestionRequested(media_type type, int32 quality,
 		return B_MEDIA_BAD_FORMAT;
 
 	// we can produce any (wildcard) raw audio format
-	memset(format, 0, sizeof(*format));
+	format->Clear();
 	format->type = B_MEDIA_RAW_AUDIO;
 	return B_OK;
 }
@@ -686,7 +686,7 @@ AudioMixer::GetNextOutput(int32 *cookie, media_output *out_output)
 		out_output->source.port = ControlPort();
 		out_output->source.id = 0;
 		out_output->destination = media_destination::null;
-		memset(&out_output->format, 0, sizeof(out_output->format));
+		out_output->format.Clear();
 		out_output->format.type = B_MEDIA_RAW_AUDIO;
 		strcpy(out_output->name, "Mixer Output");
 	}

@@ -29,7 +29,6 @@ AudioMixerAddon::AudioMixerAddon(image_id image)
 	fFormat(new media_format),
 	fInfo(new flavor_info)
 {
-	memset(fFormat, 0, sizeof(*fFormat));
 	fFormat->type = B_MEDIA_RAW_AUDIO;
 	fFormat->u.raw_audio = media_raw_audio_format::wildcard;
 
