@@ -115,12 +115,14 @@ rule ArchitectureSetup architecture
 	# warning flags
 	HAIKU_WARNING_CCFLAGS_$(architecture) = -Wall
 		-Wno-multichar
-		-Wpointer-arith -Wcast-align -Wsign-compare
-		-Wmissing-prototypes ;
+		-Wpointer-arith -Wsign-compare
+		-Wmissing-prototypes 
+		-Wcast-align -Wno-error=cast-align ;
 	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall
 		-Wno-multichar
-		-Wpointer-arith -Wcast-align -Wsign-compare
-		-Wno-ctor-dtor-privacy -Woverloaded-virtual ;
+		-Wpointer-arith -Wsign-compare
+		-Wno-ctor-dtor-privacy -Woverloaded-virtual
+		-Wcast-align -Wno-error=cast-align ;
 
 	# disable some Clang warnings that are not very useful
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
