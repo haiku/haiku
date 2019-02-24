@@ -1631,7 +1631,8 @@ status_t
 XHCI::_UnlinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 {
 	TRACE("_UnlinkDescriptorForPipe\n");
-	MutexLocker endpointLocker(endpoint->lock);
+	// We presume that the caller has already locked or owns the endpoint.
+
 	endpoint->used--;
 	if (descriptor == endpoint->td_head) {
 		endpoint->td_head = descriptor->next;
@@ -2092,11 +2093,13 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		return;
 	}
 
+	xhci_device *device = &fDevices[slot];
+	xhci_endpoint *endpoint = &device->endpoints[endpointNumber - 1];
+	MutexLocker endpointLocker(endpoint->lock);
+
 	addr_t source = trb->qwtrb0;
 	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
 	uint32 remainder = TRB_2_REM_GET(trb->dwtrb2);
-	xhci_device *device = &fDevices[slot];
-	xhci_endpoint *endpoint = &device->endpoints[endpointNumber - 1];
 
 	for (xhci_td *td = endpoint->td_head; td != NULL; td = td->next) {
 		for (xhci_td *td_chain = td; td_chain != NULL;
@@ -2105,7 +2108,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			if (offset < 0 || offset >= XHCI_MAX_TRBS_PER_TD)
 				continue;
 
-			TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found\n"
+			TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found\n",
 				td_chain, offset);
 
 			// The TRB at offset trb_count will be the link TRB, which we do not
@@ -2113,6 +2116,8 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			// We really care about the properly last TRB, at index "count - 1".
 			if (offset == td_chain->trb_count - 1) {
 				_UnlinkDescriptorForPipe(td, endpoint);
+				endpointLocker.Unlock();
+
 				td->trb_completion_code = completionCode;
 				td->trb_left = remainder;
 				// add descriptor to finished list
@@ -2376,7 +2381,6 @@ XHCI::CompleteEvents()
 			uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
 			if (j != k)
 				break;
-
 
 			switch (event) {
 			case TRB_TYPE_COMMAND_COMPLETION:
