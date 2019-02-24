@@ -346,7 +346,7 @@ static void
 print_socket_line(net_socket_private* socket, const char* prefix)
 {
 	BReference<net_socket_private> parent;
-	if (socket->parent.PrivatePointer())
+	if (socket->parent.PrivatePointer() != NULL)
 		parent = socket->parent.GetReference();
 	kprintf("%s%p %2d.%2d.%2d %6" B_PRId32 " %p %p  %p%s\n", prefix, socket,
 		socket->family, socket->type, socket->protocol, socket->owner,
@@ -369,7 +369,7 @@ dump_socket(int argc, char** argv)
 	kprintf("  family.type.protocol: %d.%d.%d\n",
 		socket->family, socket->type, socket->protocol);
 	BReference<net_socket_private> parent;
-	if (socket->parent.PrivatePointer())
+	if (socket->parent.PrivatePointer() != NULL)
 		parent = socket->parent.GetReference();
 	kprintf("  parent:               %p\n", parent.Get());
 	kprintf("  first protocol:       %p\n", socket->first_protocol);
