@@ -123,7 +123,7 @@ Controller::ConnectInterface(int i)
 
 	BParameterWeb *web;
 	status_t err;
-	
+
 	err = gDeviceRoster->MediaRoster()->GetParameterWebFor(gDeviceRoster->DeviceNode(i), &web);
 	if (err != B_OK) {
 		printf("Controller::ConnectInterface: can't get parameter web\n");
@@ -133,7 +133,7 @@ Controller::ConnectInterface(int i)
 	delete fWeb;
 	fWeb = web;
 	fCurrentInterface = i;
-	
+
 	// XXX we may need to monitor for parameter web changes
 	// and reassing fWeb and fChannelParam on demand.
 
@@ -141,14 +141,14 @@ Controller::ConnectInterface(int i)
 	fChannelParam = NULL;
 	int count = fWeb->CountParameters();
 	for (int i = 0; i < count; i++) {
-		BParameter *parameter = fWeb->ParameterAt(i);	
+		BParameter *parameter = fWeb->ParameterAt(i);
 
 		printf("parameter %d\n", i);
 		printf("  name '%s'\n", parameter->Name());
 		printf("  kind '%s'\n", parameter->Kind());
 		printf("  unit '%s'\n", parameter->Unit());
 		printf("  flags 0x%08" B_PRIx32 "\n", parameter->Flags());
-		
+
 		// XXX TODO: matching on Name is weak
 		if (strcmp(parameter->Name(), "Channel") == 0 || strcmp(parameter->Kind(), B_TUNER_CHANNEL) == 0) {
 			fChannelParam = dynamic_cast<BDiscreteParameter *>(parameter);
@@ -212,7 +212,7 @@ Controller::SelectChannel(int i)
 {
 	if (!fChannelParam)
 		return B_ERROR;
-	
+
 	int32 index;
 	status_t err;
 	index = i;
@@ -232,7 +232,7 @@ Controller::ChannelCount()
 {
 	if (fCurrentInterface == -1)
 		return 0;
-		
+
 	if (!fChannelParam)
 		return 0;
 
@@ -245,7 +245,7 @@ Controller::ChannelName(int i)
 {
 	if (fCurrentInterface == -1)
 		return NULL;
-		
+
 	if (!fChannelParam)
 		return NULL;
 
@@ -296,8 +296,7 @@ Controller::ConnectNodes()
 	HandleError("Can't find free audio input", err);
 	if (count < 1)
 		HandleError("No free audio input", -1);
-		
-	memset(&fmt, 0, sizeof(fmt));
+
 	err = gMediaRoster->Connect(output.source, input.destination, &fmt, &audio_output, &audio_input);
 	HandleError("Can't connect audio", err);
 
@@ -312,7 +311,7 @@ Controller::ConnectNodes()
 	HandleError("Can't find free video input", err);
 	if (count < 1)
 		HandleError("No free video input", -1);
-		
+
 	color_space cspaces_overlay[] = { B_YCbCr422, B_RGB32, B_NO_COLOR_SPACE };
 	color_space cspaces_bitmap[] = { B_RGB32, B_NO_COLOR_SPACE };
 
@@ -322,7 +321,7 @@ Controller::ConnectNodes()
 		fVideoNode->SetOverlayEnabled(true);
 		for (int i = 0; cspaces_overlay[i] != B_NO_COLOR_SPACE; i++) {
 			printf("trying connect with colorspace 0x%08x\n", cspaces_overlay[i]);
-			memset(&fmt, 0, sizeof(fmt));
+			fmt.Clear();
 			fmt.type = B_MEDIA_RAW_VIDEO;
 			fmt.u.raw_video.display.format = cspaces_overlay[i];
 			err = gMediaRoster->Connect(output.source, input.destination, &fmt, &video_output, &video_input);
@@ -334,18 +333,18 @@ Controller::ConnectNodes()
 		fVideoNode->SetOverlayEnabled(false);
 		for (int i = 0; cspaces_bitmap[i] != B_NO_COLOR_SPACE; i++) {
 			printf("trying connect with colorspace 0x%08x\n", cspaces_bitmap[i]);
-			memset(&fmt, 0, sizeof(fmt));
+			fmt.Clear();
 			fmt.type = B_MEDIA_RAW_VIDEO;
 			fmt.u.raw_video.display.format = cspaces_bitmap[i];
 			err = gMediaRoster->Connect(output.source, input.destination, &fmt, &video_output, &video_input);
 			if (err == B_OK)
 				break;
 		}
-	}	
+	}
 	HandleError("Can't connect video", err);
 
 	// set time sources
-		
+
 	err = gMediaRoster->GetTimeSource(&time_node);
 	HandleError("Can't get time source", err);
 
@@ -369,12 +368,12 @@ Controller::ConnectNodes()
 	err = gMediaRoster->SetProducerRunModeDelay(dvb_node, 80000);
 	HandleError("Can't set DVB producer delay", err);
 
-	bigtime_t start_time = ts->Now() + 50000;	
-	
+	bigtime_t start_time = ts->Now() + 50000;
+
 	ts->Release();
-	
+
 	// start nodes
-	
+
 	err = gMediaRoster->StartNode(dvb_node, start_time);
 	HandleError("Can't start dvb node", err);
 
@@ -384,10 +383,10 @@ Controller::ConnectNodes()
 	err = gMediaRoster->StartNode(video_window_node, start_time);
 	HandleError("Can't start video window node", err);
 
-	printf("running...\n");	
-	
+	printf("running...\n");
+
 	fConnected = true;
-	
+
 	return B_OK;
 }
 
@@ -396,12 +395,12 @@ status_t
 Controller::DisconnectNodes()
 {
 	printf("stopping...\n");
-	
+
 	if (!fConnected)
 		return B_OK;
-	
+
 	status_t err;
-	
+
 	// stop nodes
 
 	err = gMediaRoster->StopNode(dvb_node, 0, true);
@@ -414,7 +413,7 @@ Controller::DisconnectNodes()
 	HandleError("Can't stop video window node", err);
 
 	// disconnect nodes
-	
+
 	err = MediaRoster_Disconnect(video_output, video_input);
 	HandleError("Can't disconnect video", err);
 
@@ -426,7 +425,7 @@ Controller::DisconnectNodes()
 	fVideoView->RemoveVideoDisplay();
 
 	// release other nodes
-	
+
 	err = gMediaRoster->ReleaseNode(audio_mixer_node);
 	HandleError("Can't release audio mixer node", err);
 
@@ -440,9 +439,9 @@ Controller::DisconnectNodes()
 
 	err = gMediaRoster->ReleaseNode(dvb_node);
 	HandleError("Can't release DVB node", err);
-	
+
 	fConnected = false;
-	
+
 	return B_OK;
 }
 
