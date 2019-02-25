@@ -132,12 +132,12 @@ struct fs_mount {
 		volume(NULL),
 		device_name(NULL)
 	{
-		recursive_lock_init(&rlock, "mount rlock");
+		mutex_init(&lock, "mount lock");
 	}
 
 	~fs_mount()
 	{
-		recursive_lock_destroy(&rlock);
+		mutex_destroy(&lock);
 		free(device_name);
 
 		while (volume) {
@@ -156,8 +156,7 @@ struct fs_mount {
 	dev_t			id;
 	fs_volume*		volume;
 	char*			device_name;
-	recursive_lock	rlock;	// guards the vnodes list
-		// TODO: Make this a mutex! It is never used recursively.
+	mutex			lock;	// guards the vnodes list
 	struct vnode*	root_vnode;
 	struct vnode*	covers_vnode;	// immutable
 	KPartition*		partition;
@@ -865,7 +864,7 @@ get_file_system_name_for_layer(const char* fsNames, int32 layer)
 static void
 add_vnode_to_mount_list(struct vnode* vnode, struct fs_mount* mount)
 {
-	RecursiveLocker _(mount->rlock);
+	MutexLocker _(mount->lock);
 	mount->vnodes.Add(vnode);
 }
 
@@ -873,7 +872,7 @@ add_vnode_to_mount_list(struct vnode* vnode, struct fs_mount* mount)
 static void
 remove_vnode_from_mount_list(struct vnode* vnode, struct fs_mount* mount)
 {
-	RecursiveLocker _(mount->rlock);
+	MutexLocker _(mount->lock);
 	mount->vnodes.Remove(vnode);
 }
 
@@ -3017,7 +3016,7 @@ _dump_mount(struct fs_mount* mount)
 	kprintf(" root_vnode:    %p\n", mount->root_vnode);
 	kprintf(" covers:        %p\n", mount->root_vnode->covers);
 	kprintf(" partition:     %p\n", mount->partition);
-	kprintf(" lock:          %p\n", &mount->rlock);
+	kprintf(" lock:          %p\n", &mount->lock);
 	kprintf(" flags:        %s%s\n", mount->unmounting ? " unmounting" : "",
 		mount->owns_file_device ? " owns_file_device" : "");
 
@@ -7903,10 +7902,10 @@ fs_sync(dev_t device)
 			// a lot of concurrency. Using a read lock would be possible, but
 			// also more involved, since we had to lock the individual nodes
 			// and take care of the locking order, which we might not want to
-			// do while holding fs_mount::rlock.
+			// do while holding fs_mount::lock.
 
 		// synchronize access to vnode list
-		recursive_lock_lock(&mount->rlock);
+		mutex_lock(&mount->lock);
 
 		struct vnode* vnode;
 		if (!marker.IsRemoved()) {
@@ -7929,7 +7928,7 @@ fs_sync(dev_t device)
 			marker.SetRemoved(false);
 		}
 
-		recursive_lock_unlock(&mount->rlock);
+		mutex_unlock(&mount->lock);
 
 		if (vnode == NULL)
 			break;
