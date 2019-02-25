@@ -56,7 +56,7 @@ struct exfat_super_block {
 	bool IsValid();
 		// implemented in Volume.cpp
 	uint64 FirstBlock() const { return B_LENDIAN_TO_HOST_INT64(first_block); }
-	uint64 NumBlocks() const { return B_LENDIAN_TO_HOST_INT32(num_blocks); }
+	uint64 NumBlocks() const { return B_LENDIAN_TO_HOST_INT64(num_blocks); }
 	uint32 FirstFatBlock() const
 		{ return B_LENDIAN_TO_HOST_INT32(first_fat_block); }
 	uint32 FatLength() const
