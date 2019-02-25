@@ -406,7 +406,7 @@ BFileGameSound::Init(const entry_ref* file)
 	gs_audio_format dformat = Device()->Format();
 
 	// request the format we want the sound
-	memset(&playFormat, 0, sizeof(media_format));
+	playFormat.Clear();
 	playFormat.type = B_MEDIA_RAW_AUDIO;
 	if (fAudioStream->stream->DecodedFormat(&playFormat) != B_OK) {
 		fAudioStream->file->ReleaseTrack(fAudioStream->stream);

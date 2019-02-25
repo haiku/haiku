@@ -159,7 +159,7 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 
 	int64 frames = audioStream->CountFrames();
 
-	memset(&mformat, 0, sizeof(media_format));
+	mformat.Clear();
 	mformat.type = B_MEDIA_RAW_AUDIO;
 //	mformat.u.raw_audio.byte_order
 //		= (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
