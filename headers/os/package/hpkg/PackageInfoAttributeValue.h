@@ -123,7 +123,14 @@ BPackageInfoAttributeValue::SetTo(BPackageInfoAttributeID id,
 inline void
 BPackageInfoAttributeValue::Clear()
 {
-	memset(this, 0, sizeof(BPackageInfoAttributeValue));
+	unsignedInt = 0;
+	string = NULL;
+	version = {};
+	resolvable = {};
+	resolvableExpression = {};
+	globalWritableFileInfo = {};
+	userSettingsFileInfo = {};
+	user = {};
 	attributeID = B_PACKAGE_INFO_ENUM_COUNT;
 }
 
