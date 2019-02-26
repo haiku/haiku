@@ -275,7 +275,8 @@ DirectoryIterator::_NextEntry()
 {
 	if (fCurrent == NULL) {
 		fsblock_t block;
-		fInode->GetVolume()->ClusterToBlock(fCluster, block);
+		if (fInode->GetVolume()->ClusterToBlock(fCluster, block) != B_OK)
+			return B_BAD_DATA;
 		block += (fOffset / fInode->GetVolume()->EntriesPerBlock())
 			% (1 << fInode->GetVolume()->SuperBlock().BlocksPerClusterShift());
 		TRACE("DirectoryIterator::_NextEntry() init to block %" B_PRIu64 "\n",
@@ -289,7 +290,8 @@ DirectoryIterator::_NextEntry()
 			if (fCluster == EXFAT_CLUSTER_END)
 				return B_ENTRY_NOT_FOUND;
 
-			fInode->GetVolume()->ClusterToBlock(fCluster, block);
+			if (fInode->GetVolume()->ClusterToBlock(fCluster, block) != B_OK)
+				return B_BAD_DATA;
 		} else
 			block = fBlock.BlockNumber() + 1;
 

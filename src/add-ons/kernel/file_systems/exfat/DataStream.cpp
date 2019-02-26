@@ -52,7 +52,8 @@ DataStream::FindBlock(off_t pos, off_t& physical, off_t *_length)
 	for (uint32 i = 0; i < clusterIndex; i++)
 		cluster = fInode->NextCluster(cluster);
 	fsblock_t block;
-	fVolume->ClusterToBlock(cluster, block);
+	if (fVolume->ClusterToBlock(cluster, block) != B_OK)
+		return B_BAD_DATA;
 	physical = block * kBlockSize + offset;
 	for (uint32 i = 0; i < 64; i++) {
 		cluster_t extentEnd = fInode->NextCluster(cluster);

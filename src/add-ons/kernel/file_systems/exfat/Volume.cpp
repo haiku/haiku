@@ -416,8 +416,10 @@ Volume::LoadSuperBlock()
 status_t
 Volume::ClusterToBlock(cluster_t cluster, fsblock_t &block)
 {
-	if (cluster < EXFAT_FIRST_DATA_CLUSTER)
+	if ((cluster - EXFAT_FIRST_DATA_CLUSTER) >= SuperBlock().ClusterCount()
+		|| cluster < EXFAT_FIRST_DATA_CLUSTER) {
 		return B_BAD_VALUE;
+	}
 	block = ((fsblock_t)(cluster - EXFAT_FIRST_DATA_CLUSTER)
 		<< SuperBlock().BlocksPerClusterShift())
 		+ SuperBlock().FirstDataBlock();

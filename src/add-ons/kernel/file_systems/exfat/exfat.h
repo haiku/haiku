@@ -170,7 +170,7 @@ struct exfat_entry {
 			void SetFlag(uint8 newFlag)
 				{ flag = newFlag; }
 			uint64 Size() const
-				{ return B_LENDIAN_TO_HOST_INT64(size1); }
+				{ return B_LENDIAN_TO_HOST_INT64(size2); }
 		} _PACKED file_info;
 		struct {
 			uint8 flags;
