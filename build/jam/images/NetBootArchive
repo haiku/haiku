@@ -19,7 +19,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	etherpci pegasus usb_ecm wb840
 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	pci isa@x86 ata@ata
+	pci isa@x86 ata
 	scsi config_manager agp_gart
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs packagefs ;
@@ -39,7 +39,7 @@ AddFilesToNetBootArchive system add-ons kernel console
 AddFilesToNetBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToNetBootArchive system add-ons kernel generic
-	: ata_adapter@ata locked_pool scsi_periph ;
+	: ata_adapter locked_pool scsi_periph ;
 AddFilesToNetBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToNetBootArchive system add-ons kernel interrupt_controllers
@@ -87,7 +87,7 @@ AddBootModuleSymlinksToNetBootArchive
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	ahci generic_ide_pci ide_isa@x86 silicon_image_3112
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
-	ata_adapter@ata locked_pool scsi_periph
+	ata_adapter locked_pool scsi_periph
 	intel session
 	openpic@ppc
 	generic_x86@x86

@@ -205,7 +205,7 @@ SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	acpi@x86,x86_64	agp_gart@x86,x86_64 ata@ata
+	acpi@x86,x86_64	agp_gart@x86,x86_64 ata
 	config_manager
 	firewire@x86
 	scsi isa@x86,x86_64

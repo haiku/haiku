@@ -45,7 +45,7 @@ AddFilesToPackage add-ons kernel debugger
 	  <kdebug>run_on_exit ;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
-	: ata_adapter@ata bios@x86,x86_64 dpc
+	: ata_adapter bios@x86,x86_64 dpc
 		locked_pool mpu401 scsi_periph <module>tty ;
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@m68k apple@ppc efi_gpt intel session ;
@@ -183,7 +183,7 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ahci ata@ata ata_adapter@ata
+	acpi@x86,x86_64 ahci ata ata_adapter
 	bfs
 	config_manager
 	dpc
