@@ -1,7 +1,7 @@
-SubDir HAIKU_TOP src system libroot posix string arch ppc ;
+SubDir HAIKU_TOP src system libroot posix string arch riscv64 ;
 
 local architectureObject ;
-for architectureObject in [ MultiArchSubDirSetup ppc ] {
+for architectureObject in [ MultiArchSubDirSetup riscv64 ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
