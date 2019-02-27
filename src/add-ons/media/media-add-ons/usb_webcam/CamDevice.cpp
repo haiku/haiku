@@ -47,7 +47,6 @@ CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	  fLocker("WebcamDeviceLock")
 {
 	// fill in the generic flavor
-	memset(&fFlavorInfo, 0, sizeof(fFlavorInfo));
 	_addon.WebCamAddOn()->FillDefaultFlavorInfo(&fFlavorInfo);
 	// if we use id matching, cache the index to the list
 	if (fCamDeviceAddon.SupportedDevices()) {
