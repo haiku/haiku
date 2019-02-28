@@ -21,6 +21,17 @@ KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	siglongjmp.S
 	sigsetjmp.S
 
+	fpu_add.c
+	fpu_compare.c
+	fpu_div.c
+	fpu_explode.c
+	fpu_implode.c
+	fpu_mul.c
+	fpu_reg.S
+	fpu_sqrt.c
+	fpu_subr.c
+	softfloat.c
+
 	memcpy.c
 	memset.c
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
