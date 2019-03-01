@@ -502,6 +502,7 @@ static const Translation kTranslations[] = {
 	"Carwyn Jones\n" \
 	"Prasad Joshi\n" \
 	"Vasilis Kaoutsis\n" \
+	"Preetpal Kaur\n" \
 	"James Kim\n" \
 	"Shintaro Kinugawa\n" \
 	"Jan Klötzke\n" \
