@@ -56,6 +56,8 @@ public:
 								BPackageRoster();
 								~BPackageRoster();
 
+			bool				IsRebootNeeded();
+
 			status_t			GetCommonRepositoryCachePath(BPath* path,
 									bool create = false) const;
 			status_t			GetUserRepositoryCachePath(BPath* path,

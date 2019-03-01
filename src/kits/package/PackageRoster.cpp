@@ -52,6 +52,27 @@ BPackageRoster::~BPackageRoster()
 }
 
 
+bool
+BPackageRoster::IsRebootNeeded()
+{
+	BInstallationLocationInfo info;
+
+	// We get information on the system package installation location.
+	// If we fail, we just have to assume a reboot is not needed.
+	if (GetInstallationLocationInfo(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM,
+		info) != B_OK)
+		return false;
+
+	// CurrentlyActivePackageInfos() will return 0 if no packages need to be
+	// activated with a reboot. Otherwise, the method will return the total
+	// number of packages in the system package directory.
+	if (info.CurrentlyActivePackageInfos().CountInfos() != 0)
+		return true;
+
+	return false;
+}
+
+
 status_t
 BPackageRoster::GetCommonRepositoryConfigPath(BPath* path, bool create) const
 {
