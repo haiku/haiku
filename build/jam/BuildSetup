@@ -567,6 +567,10 @@ HOST_BE_API_CCFLAGS = -include [ FDirName $(HAIKU_TOP) headers build
 	BeOSBuildCompatibility.h ] ;
 HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 
+if ! $(HOST_PYTHON) {
+	Echo "HOST_PYTHON variable not defined --> will default to 'python'" ;
+	HOST_PYTHON ?= "python" ;
+}
 
 #pragma mark - target platform settings
 

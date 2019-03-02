@@ -45,7 +45,7 @@ rule HdsSchemaGenModel
 actions HdsSchemaGenModel1
 {
 	mkdir -p $(2[3])
-	python $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
+	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
 	touch $(1)
 }
 
@@ -68,7 +68,7 @@ rule HdsSchemaGenBulkParser
 actions HdsSchemaGenBulkParser1
 {
 	mkdir -p $(2[3])
-	python $(2[2]) -i $(2[1]) --outputdirectory $(2[3]) --supportbulkcontainer
+	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3]) --supportbulkcontainer
 	touch $(1)
 }
 

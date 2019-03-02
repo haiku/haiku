@@ -821,6 +821,15 @@ if [ $HOST_PLATFORM = "darwin" ]; then
 	HOST_EXTENDED_REGEX_SED="sed -E"
 fi
 
+if command -v "python3" ; then
+	HOST_PYTHON="python3"
+elif command -v "python" ; then
+	HOST_PYTHON="python"
+else
+	echo "a python interpreter is required"
+	exit 1
+fi
+
 # check if nasm can actually output ELF files
 # (the stock version in OSX can't)
 # XXX: should probably only test for x86* arch
@@ -1056,6 +1065,7 @@ HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
 HOST_EXTENDED_REGEX_SED		?= ${HOST_EXTENDED_REGEX_SED} ;
 HOST_SHA256					?= ${HOST_SHA256} ;
+HOST_PYTHON					?= ${HOST_PYTHON} ;
 HAIKU_NASM					?= ${HAIKU_NASM} ;
 
 HAIKU_BUILD_ATTRIBUTES_DIR	?= "${HAIKU_BUILD_ATTRIBUTES_DIR}" ;
