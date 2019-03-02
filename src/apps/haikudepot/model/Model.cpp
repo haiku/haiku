@@ -406,7 +406,7 @@ Model::Model()
 		// Force the preferred language to one of the currently supported
 		// ones, until the web application supports all ISO language codes.
 		printf("User preferred language '%s' not currently supported, "
-			"defaulting to 'en'.", fPreferredLanguage.String());
+			"defaulting to 'en'.\n", fPreferredLanguage.String());
 		fPreferredLanguage = "en";
 	}
 	fWebAppInterface.SetPreferredLanguage(fPreferredLanguage);
