@@ -2531,10 +2531,10 @@ XHCI::WaitOpBits(uint32 reg, uint32 mask, uint32 expected)
 	while ((value & mask) != expected) {
 		snooze(1000);
 		value = ReadOpReg(reg);
-		if (loops == 25) {
+		if (loops == 100) {
 			TRACE("delay waiting on reg 0x%" B_PRIX32 " match 0x%" B_PRIX32
 				" (0x%" B_PRIX32 ")\n",	reg, expected, mask);
-		} else if (loops > 100) {
+		} else if (loops > 250) {
 			TRACE_ERROR("timeout waiting on reg 0x%" B_PRIX32
 				" match 0x%" B_PRIX32 " (0x%" B_PRIX32 ")\n", reg, expected,
 				mask);
