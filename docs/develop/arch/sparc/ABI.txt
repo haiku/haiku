@@ -1,0 +1,32 @@
+The SPARC architecture has 32 integer registers, divided as follows:
+
+- global registers (g0-g7)
+- input (i0-i7)
+- local (l0-l7)
+- output (o0-o7)
+
+Parameter passing and return is done using the output registers, which are
+generally considered scratch registers and can be corrupted by the callee. The
+caller must take care of preserving them.
+
+The input and local registers are callee-saved, but we have hardware assistance
+in the form of a register window. There is an instruction to shift the registers
+so that:
+- o registers become i registers
+- local and output registers are replaced with fresh sets, for use by the
+  current function
+- global registers are not affected
+
+Note that as a side-effect, o7 is moved to i7, this is convenient because these
+are usually the stack and frame pointers, respectively. So basically this sets
+the frame pointer for free.
+
+Simple enough functions may end up using just the o registers, in that case
+nothing special is necessary, of course.
+
+When shifting the register window, the extra registers come from the register
+stack in the CPU. This is not infinite, however, most implementations of SPARC
+will only have 8 windows available. When the internal stack is full, an overflow
+trap is raised, and the handler must free up old windows by storing them on the
+stack, likewise, when the internal stack is empty, an underflow trap must fill
+it back from the stack-saved data.

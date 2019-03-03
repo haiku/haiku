@@ -1,0 +1,12 @@
+The SPARC instruction set specifies instruction for handling long double
+values, however, no hardware implementation actually provides them. They
+generate a trap, which is expected to be handled by the softfloat library.
+
+Since traps are slow, and gcc knows better, it will never generate those 
+instructions. Instead it directly calls into the C library, to functions
+specified in the ABI and used to do long double math using softfloats.
+
+The support code for this is, in our case, compiled into both the kernel and
+libroot. It lives in src/system/libroot/os/arch/sparc/softfloat.c (and other
+support files). This code was extracted from FreeBSD, rather than the glibc,
+because that made it much easier to get it building in the kernel.

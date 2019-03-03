@@ -1,0 +1,37 @@
+The SPARC CPU is not designed to gracefully handle misaligned accesses.
+You can access a single byte at any address, but 16-bit access only at even
+addresses, 32bit access at multiple of 4 addresses, etc.
+
+For example, on x86, such accesses are not a problem, it is allowed and handled
+directly by the instructions doing the access. So there is no performance cost.
+
+On SPARC, however, such accesses will cause a SIGBUS. This means a trap handler
+has to catch the misaligned access and do it in software, byte by byte, then
+give back control to the application. This is, of course, very slow, so we
+should avoid it when possible.
+
+Fortunately, gcc knows about this, and will normally do the right thing:
+- For usual variables and structures, it will make sure to lay them out so that
+  they are aligned. It relies on stack alignment, as well as malloc returning
+  sufficiently aligned memory (as required by the C standard).
+- On packed structure, gcc knows the data is misaligned, and will automatically
+  use the appropriate way to access it (most likely, byte-by-byte).
+
+This leaves us with two undesirable cases:
+- Pointer arithmetics and casting. When computing addresses manually, it's
+  possible to generate a misaligned address and cast it to a type with a wider
+  alignment requirement. In this case, gcc may access the pointer using a
+  multi byte instruction and cause a SIGBUS. Solution: make sure the struct
+  is aligned, or declare it as packed so unaligned access are used instead.
+- Access to hardware: it is a common pattern to declare a struct as packed,
+  and map it to hardware registers. If the alignment isn't known, gcc will use
+  byte by byte access. It seems volatile would cause gcc to use the proper way
+  to access the struct, assuming that a volatile value is necessarily
+  aligned as it should.
+
+In the end, we just need to be careful about pointer math resulting in unalined
+access. -Wcast-align helps with that, but it also raises a lot of false positives
+(where the alignment is preserved even when casting to other types). So we
+enable it only as a warning for now. We will need to ceck the sigbus handler to
+identify places where we do a lot of misaligned accesses that trigger it, and
+rework the code as needed. But in general, except for these cases, we're fine.
