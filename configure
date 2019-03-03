@@ -821,9 +821,10 @@ if [ $HOST_PLATFORM = "darwin" ]; then
 	HOST_EXTENDED_REGEX_SED="sed -E"
 fi
 
-if command -v "python3" ; then
+# locate python
+if python3 --version < /dev/null > /dev/null 2>&1; then
 	HOST_PYTHON="python3"
-elif command -v "python" ; then
+elif python --version < /dev/null > /dev/null 2>&1; then
 	HOST_PYTHON="python"
 else
 	echo "a python interpreter is required"
