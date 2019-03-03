@@ -35,9 +35,6 @@
 #define	_SYSEXITS_H_
 
 
-#ifdef _BSD_SOURCE
-
-
 /*
  *  SYSEXITS.H -- Exit status codes for system programs.
  *
@@ -116,9 +113,6 @@
 #define EX_CONFIG	78	/* configuration error */
 
 #define EX__MAX	78	/* maximum listed value */
-
-
-#endif
 
 
 #endif /* !_SYSEXITS_H_ */
