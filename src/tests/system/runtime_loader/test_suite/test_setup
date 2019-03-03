@@ -22,6 +22,12 @@ test_run_ok()
 		exit 1
 	fi
 
+	case $os in
+		FreeBSD|Linux)	export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH;;
+		Haiku)		export LIBRARY_PATH=.:$LIBRARY_PATH;;
+		*)			echo "Unsupported OS: $os"; exit 1;;
+	esac
+
 	# run
 	$1
 	retval=$?
@@ -33,7 +39,7 @@ test_run_ok()
 
 compile_lib()
 {
-	gcc -shared $@ -D_GNU_SOURCE -fPIC
+	gcc -shared -Wl,--no-as-needed -D_GNU_SOURCE -fPIC $@
 }
 
 compile_lib_dl()
@@ -43,7 +49,7 @@ compile_lib_dl()
 
 compile_program()
 {
-	gcc $@ -D_GNU_SOURCE -Wl,-rpath,.,--export-dynamic
+	gcc -Wl,--no-as-needed $@ -D_GNU_SOURCE -Wl,-rpath,.,--export-dynamic
 }
 
 compile_program_dl()

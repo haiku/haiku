@@ -70,7 +70,7 @@ main()
 EOI
 
 # build
-compile_lib_dl -o program program.c
+compile_program_dl -o program program.c
 
 # run
 test_run_ok ./program 1
