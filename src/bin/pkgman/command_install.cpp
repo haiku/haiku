@@ -53,7 +53,7 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(InstallCommand, "install", kShortUsage, kLongUsage,
-	kCommandCategoryPackages)
+	COMMAND_CATEGORY_PACKAGES)
 
 
 int

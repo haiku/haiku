@@ -62,7 +62,7 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(ResolveDependenciesCommand, "resolve-dependencies", kShortUsage,
-	kLongUsage, kCommandCategoryOther)
+	kLongUsage, COMMAND_CATEGORY_OTHER)
 
 
 static void

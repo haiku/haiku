@@ -38,9 +38,9 @@ do {																\
 void	print_usage_and_exit(bool error);
 
 
-extern const BString kCommandCategoryPackages;
-extern const BString kCommandCategoryRepositories;
-extern const BString kCommandCategoryOther;
+#define COMMAND_CATEGORY_PACKAGES		"packages"
+#define COMMAND_CATEGORY_REPOSITORIES	"repositories"
+#define COMMAND_CATEGORY_OTHER			"other"
 
 
 #endif	// PKGMAN_H

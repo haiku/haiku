@@ -47,7 +47,7 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(FullSyncCommand, "full-sync", kShortUsage, kLongUsage,
-	kCommandCategoryPackages)
+	COMMAND_CATEGORY_PACKAGES)
 
 
 int

@@ -43,7 +43,7 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(ListReposCommand, "list-repos", kShortUsage, kLongUsage,
-	kCommandCategoryRepositories)
+	COMMAND_CATEGORY_REPOSITORIES)
 
 
 int

@@ -37,7 +37,7 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(DropRepoCommand, "drop-repo", kShortUsage, kLongUsage,
-	kCommandCategoryRepositories)
+	COMMAND_CATEGORY_REPOSITORIES)
 
 
 int

@@ -23,11 +23,6 @@ extern const char* __progname;
 const char* kProgramName = __progname;
 
 
-const BString kCommandCategoryPackages("packages");
-const BString kCommandCategoryRepositories("repositories");
-const BString kCommandCategoryOther("other");
-
-
 static const char* const kUsage =
 	"Usage: %s <command> <command args>\n"
 	"Manages packages and package repositories.\n"
@@ -59,11 +54,11 @@ void
 print_usage_and_exit(bool error)
 {
 	BString packageCommandsUsage
-		= get_commands_usage_for_category(kCommandCategoryPackages);
+		= get_commands_usage_for_category(COMMAND_CATEGORY_PACKAGES);
 	BString repositoryCommandsUsage
-		= get_commands_usage_for_category(kCommandCategoryRepositories);
+		= get_commands_usage_for_category(COMMAND_CATEGORY_REPOSITORIES);
 	BString otherCommandsUsage
-		= get_commands_usage_for_category(kCommandCategoryOther);
+		= get_commands_usage_for_category(COMMAND_CATEGORY_OTHER);
 
     fprintf(error ? stderr : stdout, kUsage, kProgramName,
     	packageCommandsUsage.String(), repositoryCommandsUsage.String(),

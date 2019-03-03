@@ -49,7 +49,7 @@ static const char* const kLongUsage =
 
 
 DEFINE_COMMAND(UpdateCommand, "update", kShortUsage, kLongUsage,
-	kCommandCategoryPackages)
+	COMMAND_CATEGORY_PACKAGES)
 
 
 int
