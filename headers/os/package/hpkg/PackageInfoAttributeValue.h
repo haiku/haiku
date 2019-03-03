@@ -1,5 +1,5 @@
 /*
- * Copyright 2009,2011, Haiku, Inc.
+ * Copyright 2009-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__PACKAGE_INFO_ATTRIBUTE_VALUE_H_
@@ -22,28 +22,28 @@ namespace BHPKG {
 
 
 struct BPackageVersionData {
-			const char*			major;
-			const char*			minor;
-			const char*			micro;
-			const char*			preRelease;
-			uint32				revision;
+	const char*			major;
+	const char*			minor;
+	const char*			micro;
+	const char*			preRelease;
+	uint32				revision;
 };
 
 
 struct BPackageResolvableData {
-			const char*			name;
-			bool				haveVersion;
-			bool				haveCompatibleVersion;
-			BPackageVersionData	version;
-			BPackageVersionData	compatibleVersion;
+	const char*			name;
+	bool				haveVersion;
+	bool				haveCompatibleVersion;
+	BPackageVersionData	version;
+	BPackageVersionData	compatibleVersion;
 };
 
 
 struct BPackageResolvableExpressionData {
-			const char*			name;
-			bool				haveOpAndVersion;
-			BPackageResolvableOperator	op;
-			BPackageVersionData	version;
+	const char*			name;
+	bool				haveOpAndVersion;
+	BPackageResolvableOperator	op;
+	BPackageVersionData	version;
 };
 
 
@@ -125,12 +125,12 @@ BPackageInfoAttributeValue::Clear()
 {
 	unsignedInt = 0;
 	string = NULL;
-	version = {};
-	resolvable = {};
-	resolvableExpression = {};
-	globalWritableFileInfo = {};
-	userSettingsFileInfo = {};
-	user = {};
+	memset(&version, 0, sizeof(version));
+	memset(&resolvable, 0, sizeof(resolvable));
+	memset(&resolvableExpression, 0, sizeof(resolvableExpression));
+	memset(&globalWritableFileInfo, 0, sizeof(globalWritableFileInfo));
+	memset(&userSettingsFileInfo, 0, sizeof(userSettingsFileInfo));
+	memset(&user, 0, sizeof(user));
 	attributeID = B_PACKAGE_INFO_ENUM_COUNT;
 }
 
