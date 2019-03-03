@@ -63,19 +63,11 @@
 #endif
 
 #ifndef __SYMBOL_PREFIX
-# ifdef NO_UNDERSCORES
 #  define __SYMBOL_PREFIX
-# else
-#  define __SYMBOL_PREFIX "_"
-# endif
 #endif
 
 #ifndef C_SYMBOL_NAME
-# ifdef NO_UNDERSCORES
 #  define C_SYMBOL_NAME(name) name
-# else
-#  define C_SYMBOL_NAME(name) _##name
-# endif
 #endif
 
 #ifndef ASM_LINE_SEP

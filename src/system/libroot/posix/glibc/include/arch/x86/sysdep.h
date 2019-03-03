@@ -31,10 +31,6 @@
 #define ASM_TYPE_DIRECTIVE(name,typearg) .type name,typearg;
 #define ASM_SIZE_DIRECTIVE(name) .size name,.-name;
 
-/* In ELF C symbols are asm symbols.  */
-#undef	NO_UNDERSCORES
-#define NO_UNDERSCORES
-
 #else
 
 #define ALIGNARG(log2) log2
@@ -88,13 +84,11 @@
 #define CALL_MCOUNT		/* Do nothing.  */
 #endif
 
-#ifdef	NO_UNDERSCORES
 /* Since C identifiers are not normally prefixed with an underscore
    on this system, the asm identifier `syscall_error' intrudes on the
    C name space.  Make sure we use an innocuous name.  */
 #define	syscall_error	__syscall_error
 #define mcount		_mcount
-#endif
 
 #define	PSEUDO(name, syscall_name, args)				      \
 lose: SYSCALL_PIC_SETUP							      \

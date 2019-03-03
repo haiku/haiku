@@ -1,5 +1,5 @@
 /* Generic asm macros used on many machines.
-   Copyright (C) 1991, 92, 93, 96, 98 Free Software Foundation, Inc.
+   Copyright (C) 1991-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -13,27 +13,18 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #include "libc-symbols.h"
 
 #ifndef C_LABEL
 
 /* Define a macro we can use to construct the asm name for a C symbol.  */
-#ifdef	NO_UNDERSCORES
 #ifdef	__STDC__
 #define C_LABEL(name)		name##:
 #else
 #define C_LABEL(name)		name/**/:
-#endif
-#else
-#ifdef	__STDC__
-#define C_LABEL(name)		_##name##:
-#else
-#define C_LABEL(name)		_/**/name/**/:
-#endif
 #endif
 
 #endif
@@ -42,4 +33,27 @@
    to generate correct debugging information.  */
 #ifndef END
 #define END(sym)
+#endif
+
+/* Makros to generate eh_frame unwind information.  */
+#ifdef __ASSEMBLER__
+# define cfi_startproc			.cfi_startproc
+# define cfi_endproc			.cfi_endproc
+# define cfi_def_cfa(reg, off)		.cfi_def_cfa reg, off
+# define cfi_def_cfa_register(reg)	.cfi_def_cfa_register reg
+# define cfi_def_cfa_offset(off)	.cfi_def_cfa_offset off
+# define cfi_adjust_cfa_offset(off)	.cfi_adjust_cfa_offset off
+# define cfi_offset(reg, off)		.cfi_offset reg, off
+# define cfi_rel_offset(reg, off)	.cfi_rel_offset reg, off
+# define cfi_register(r1, r2)		.cfi_register r1, r2
+# define cfi_return_column(reg)	.cfi_return_column reg
+# define cfi_restore(reg)		.cfi_restore reg
+# define cfi_same_value(reg)		.cfi_same_value reg
+# define cfi_undefined(reg)		.cfi_undefined reg
+# define cfi_remember_state		.cfi_remember_state
+# define cfi_restore_state		.cfi_restore_state
+# define cfi_window_save		.cfi_window_save
+# define cfi_personality(enc, exp)	.cfi_personality enc, exp
+# define cfi_lsda(enc, exp)		.cfi_lsda enc, exp
+
 #endif
