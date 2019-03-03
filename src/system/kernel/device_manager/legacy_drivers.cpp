@@ -945,7 +945,7 @@ DirectoryIterator::SetTo(const char* path, const char* subPath, bool recursive)
 			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
 
 		for (uint32 i = 0; i < sizeof(kDriverPaths) / sizeof(kDriverPaths[0]); i++) {
-			if (i < 2 && disableUserAddOns)
+			if (i < 3 && disableUserAddOns)
 				continue;
 
 			if (__find_directory(kDriverPaths[i], gBootDevice, true,
@@ -1480,7 +1480,7 @@ legacy_driver_probe(const char* subPath)
 			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
 
 		for (uint32 i = 0; i < sizeof(kDriverPaths) / sizeof(kDriverPaths[0]); i++) {
-			if (i < 2 && disableUserAddOns)
+			if (i < 3 && disableUserAddOns)
 				continue;
 
 			if (__find_directory(kDriverPaths[i], gBootDevice, true,
