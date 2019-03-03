@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2012 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -19,70 +19,61 @@
 # error "Never use <bits/fenv.h> directly; include <fenv.h> instead."
 #endif
 
+#include <bits/wordsize.h>
+
+
 /* Define bits representing the exception.  We use the bit positions
-   of the appropriate bits in the FPU control word.  */
+   of the appropriate accrued exception bits from the FSR.  */
 enum
   {
-    FE_INVALID = 0x01,
-#define FE_INVALID	FE_INVALID
-    __FE_DENORM = 0x02,
-    FE_DIVBYZERO = 0x04,
-#define FE_DIVBYZERO	FE_DIVBYZERO
-    FE_OVERFLOW = 0x08,
-#define FE_OVERFLOW	FE_OVERFLOW
-    FE_UNDERFLOW = 0x10,
-#define FE_UNDERFLOW	FE_UNDERFLOW
-    FE_INEXACT = 0x20
-#define FE_INEXACT	FE_INEXACT
+    FE_INVALID =
+#define FE_INVALID	(1 << 9)
+      FE_INVALID,
+    FE_OVERFLOW =
+#define FE_OVERFLOW	(1 << 8)
+      FE_OVERFLOW,
+    FE_UNDERFLOW =
+#define FE_UNDERFLOW	(1 << 7)
+      FE_UNDERFLOW,
+    FE_DIVBYZERO =
+#define FE_DIVBYZERO	(1 << 6)
+      FE_DIVBYZERO,
+    FE_INEXACT =
+#define FE_INEXACT	(1 << 5)
+      FE_INEXACT
   };
 
 #define FE_ALL_EXCEPT \
 	(FE_INEXACT | FE_DIVBYZERO | FE_UNDERFLOW | FE_OVERFLOW | FE_INVALID)
 
-/* The ix87 FPU supports all of the four defined rounding modes.  We
+/* The Sparc FPU supports all of the four defined rounding modes.  We
    use again the bit positions in the FPU control word as the values
    for the appropriate macros.  */
 enum
   {
-    FE_TONEAREST = 0,
-#define FE_TONEAREST	FE_TONEAREST
-    FE_DOWNWARD = 0x400,
-#define FE_DOWNWARD	FE_DOWNWARD
-    FE_UPWARD = 0x800,
-#define FE_UPWARD	FE_UPWARD
-    FE_TOWARDZERO = 0xc00
-#define FE_TOWARDZERO	FE_TOWARDZERO
+    FE_TONEAREST =
+#define FE_TONEAREST	(0 << 30)
+      FE_TONEAREST,
+    FE_TOWARDZERO =
+#define FE_TOWARDZERO	(1 << 30)
+      FE_TOWARDZERO,
+    FE_UPWARD =
+#define FE_UPWARD	(-0x7fffffff - 1) /* (2 << 30) */
+      FE_UPWARD,
+    FE_DOWNWARD =
+#define FE_DOWNWARD	(-0x40000000) /* (3 << 30) */
+      FE_DOWNWARD
   };
+
+#define __FE_ROUND_MASK	(3U << 30)
 
 
 /* Type representing exception flags.  */
-typedef unsigned short int fexcept_t;
+typedef unsigned long int fexcept_t;
 
 
-/* Type representing floating-point environment.  This structure
-   corresponds to the layout of the block written by the `fstenv'
-   instruction and has additional fields for the contents of the MXCSR
-   register as written by the `stmxcsr' instruction.  */
-typedef struct
-  {
-    unsigned short int __control_word;
-    unsigned short int __unused1;
-    unsigned short int __status_word;
-    unsigned short int __unused2;
-    unsigned short int __tags;
-    unsigned short int __unused3;
-    unsigned int __eip;
-    unsigned short int __cs_selector;
-    unsigned int __opcode:11;
-    unsigned int __unused4:5;
-    unsigned int __data_offset;
-    unsigned short int __data_selector;
-    unsigned short int __unused5;
-#ifdef __x86_64__
-    unsigned int __mxcsr;
-#endif
-  }
-fenv_t;
+/* Type representing floating-point environment.  */
+typedef unsigned long int fenv_t;
 
 /* If the default argument is used we use this value.  */
 #define FE_DFL_ENV	((const fenv_t *) -1)
@@ -92,3 +83,6 @@ fenv_t;
 # define FE_NOMASK_ENV	((const fenv_t *) -2)
 #endif
 
+/* For internal use only: access the fp state register.  */
+# define __fenv_stfsr(X)   __asm__ __volatile__ ("stx %%fsr,%0" : "=m" (X))
+# define __fenv_ldfsr(X)   __asm__ __volatile__ ("ldx %0,%%fsr" : : "m" (X))

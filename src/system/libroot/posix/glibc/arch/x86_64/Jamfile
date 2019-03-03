@@ -140,6 +140,8 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 
 		SEARCH on [ FGristFiles $(genericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
-				generic ] ;
+				generic ]
+			  [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic longdouble 80bit ] ;
 	}
 }

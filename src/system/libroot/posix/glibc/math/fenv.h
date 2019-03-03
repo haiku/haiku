@@ -23,6 +23,7 @@
 #ifndef _FENV_H
 #define _FENV_H	1
 
+#include <stdbool.h>
 #include <features.h>
 
 /* Get the architecture dependend definitions.  The following definitions
@@ -132,5 +133,14 @@ extern int fegetexcept (void) __THROW;
 #endif
 
 __END_DECLS
+
+/* Rounding mode context.  This allows functions to set/restore rounding mode
+ *    only when the desired rounding mode is different from the current rounding
+ *       mode.  */
+struct rm_ctx
+{
+	fenv_t env;
+	bool updated_status;
+};
 
 #endif /* fenv.h */
