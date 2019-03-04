@@ -173,30 +173,15 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 #pragma mark - host platform settings
 
 
-# determine the endianness of the host
-switch $(HOST_GCC_MACHINE) {
-	case amd64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case i?86-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case powerpc-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
-	case x86_64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-
-	# the following are rather unlikely as hosts ...
-	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case armv7l-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case armv7hl-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case armv7b-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
-	case arm64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
-	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
-}
-
 # analyze the host gcc machine spec to find out about 64-bitness
 HOST_PLATFORM_IS_64_BIT = ;
 switch $(HOST_GCC_MACHINE) {
-	case amd64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
 	case i686-apple-darwin10 :	HOST_PLATFORM_IS_64_BIT = 1 ;
 	case i686-apple-darwin11 :	HOST_PLATFORM_IS_64_BIT = 1 ;
 	case x86_64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+	case amd64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
+
+	case arm64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
 	case aarch64-* :			HOST_PLATFORM_IS_64_BIT = 1 ;
 }
 
