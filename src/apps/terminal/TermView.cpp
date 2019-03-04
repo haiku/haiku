@@ -283,7 +283,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fFontHeight = 0;
 	fFontAscent = 0;
 	fEmulateBold = false;
-	fAllowBold = false;
+	fAllowBold = true;
 	fFrameResized = false;
 	fResizeViewDisableCount = 0;
 	fLastActivityTime = 0;
