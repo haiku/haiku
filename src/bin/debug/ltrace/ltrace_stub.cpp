@@ -33,6 +33,7 @@ struct PatchEntry {
 
 	static PatchEntry* Create(const char* name, void* function)
 	{
+		// TODO memory should be executable, use mmap with PROT_EXEC
 		void* memory = malloc(_ALIGN(sizeof(PatchEntry))
 			+ arch_call_stub_size());
 		if (memory == NULL)
@@ -125,7 +126,7 @@ TRACE_PRINTF("function_call_callback(): CALLED FOR UNKNOWN FUNCTION!\n");
 	size_t bufferSize = sizeof(buffer);
 	size_t written = 0;
 
-	const uint32* args = (const uint32*)_args;
+	const ulong* args = (const ulong*)_args;
 	written += snprintf(buffer, bufferSize, "ltrace: %s(",
 		entry->functionName);
 	for (int32 i = 0; i < 5; i++) {
@@ -143,7 +144,7 @@ static void
 symbol_patcher(void* cookie, image_t* rootImage, image_t* image,
 	const char* name, image_t** foundInImage, void** symbol, int32* type)
 {
-	TRACE_PRINTF("symbol_patcher(%p, %p, %p, \"%s\", %p, %p, %ld)\n",
+	TRACE_PRINTF("symbol_patcher(%p, %p, %p, \"%s\", %p, %p, %" B_PRId32 ")\n",
 		cookie, rootImage, image, name, *foundInImage, *symbol, *type);
 
 	// patch functions only
@@ -188,8 +189,8 @@ ltrace_stub_init(rld_export* standardInterface,
 static void
 ltrace_stub_image_loaded(image_t* image)
 {
-	TRACE_PRINTF("ltrace_stub_image_loaded(%p): \"%s\" (%ld)\n", image, image->path,
-		image->id);
+	TRACE_PRINTF("ltrace_stub_image_loaded(%p): \"%s\" (%" B_PRId32 ")\n",
+		image, image->path, image->id);
 
 	if (sRuntimeLoaderAddOnInterface->register_undefined_symbol_patcher(image,
 			symbol_patcher, (void*)(addr_t)0xc0011eaf) != B_OK) {
@@ -201,32 +202,32 @@ ltrace_stub_image_loaded(image_t* image)
 static void
 ltrace_stub_image_relocated(image_t* image)
 {
-	TRACE_PRINTF("ltrace_stub_image_relocated(%p): \"%s\" (%ld)\n", image,
-		image->path, image->id);
+	TRACE_PRINTF("ltrace_stub_image_relocated(%p): \"%s\" (%" B_PRId32 ")\n",
+		image, image->path, image->id);
 }
 
 
 static void
 ltrace_stub_image_initialized(image_t* image)
 {
-	TRACE_PRINTF("ltrace_stub_image_initialized(%p): \"%s\" (%ld)\n", image,
-		image->path, image->id);
+	TRACE_PRINTF("ltrace_stub_image_initialized(%p): \"%s\" (%" B_PRId32 ")\n",
+		image, image->path, image->id);
 }
 
 
 static void
 ltrace_stub_image_uninitializing(image_t* image)
 {
-	TRACE_PRINTF("ltrace_stub_image_uninitializing(%p): \"%s\" (%ld)\n", image,
-		image->path, image->id);
+	TRACE_PRINTF("ltrace_stub_image_uninitializing(%p): \"%s\" (%" B_PRId32
+		")\n",image, image->path, image->id);
 }
 
 
 static void
 ltrace_stub_image_unloading(image_t* image)
 {
-	TRACE_PRINTF("ltrace_stub_image_unloading(%p): \"%s\" (%ld)\n", image,
-		image->path, image->id);
+	TRACE_PRINTF("ltrace_stub_image_unloading(%p): \"%s\" (%" B_PRId32 ")\n",
+		image, image->path, image->id);
 }
 
 
