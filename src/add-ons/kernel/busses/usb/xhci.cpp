@@ -105,6 +105,79 @@ module_info *modules[] = {
 };
 
 
+status_t
+XHCI::AddTo(Stack *stack)
+{
+	if (!sPCIModule) {
+		status_t status = get_module(B_PCI_MODULE_NAME,
+			(module_info **)&sPCIModule);
+		if (status < B_OK) {
+			TRACE_MODULE_ERROR("getting pci module failed! 0x%08" B_PRIx32
+				"\n", status);
+			return status;
+		}
+	}
+
+	TRACE_MODULE("searching devices\n");
+	bool found = false;
+	pci_info *item = new(std::nothrow) pci_info;
+	if (!item) {
+		sPCIModule = NULL;
+		put_module(B_PCI_MODULE_NAME);
+		return B_NO_MEMORY;
+	}
+
+	// Try to get the PCI x86 module as well so we can enable possible MSIs.
+	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
+			(module_info **)&sPCIx86Module) != B_OK) {
+		// If it isn't there, that's not critical though.
+		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
+		sPCIx86Module = NULL;
+	}
+
+	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
+		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
+			&& item->class_api == PCI_usb_xhci) {
+			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
+				item->bus, item->device, item->function);
+			XHCI *bus = new(std::nothrow) XHCI(item, stack);
+			if (!bus) {
+				delete item;
+				sPCIModule = NULL;
+				put_module(B_PCI_MODULE_NAME);
+				return B_NO_MEMORY;
+			}
+
+			if (bus->InitCheck() < B_OK) {
+				TRACE_MODULE_ERROR("bus failed init check\n");
+				delete bus;
+				continue;
+			}
+
+			// the bus took it away
+			item = new(std::nothrow) pci_info;
+
+			if (bus->Start() != B_OK) {
+				delete bus;
+				continue;
+			}
+			found = true;
+		}
+	}
+
+	if (!found) {
+		TRACE_MODULE_ERROR("no devices found\n");
+		delete item;
+		sPCIModule = NULL;
+		put_module(B_PCI_MODULE_NAME);
+		return ENODEV;
+	}
+
+	delete item;
+	return B_OK;
+}
+
+
 XHCI::XHCI(pci_info *info, Stack *stack)
 	:	BusManager(stack),
 		fRegisterArea(-1),
@@ -822,76 +895,42 @@ XHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 }
 
 
-status_t
-XHCI::AddTo(Stack *stack)
+xhci_td *
+XHCI::CreateDescriptor(size_t bufferSize)
 {
-	if (!sPCIModule) {
-		status_t status = get_module(B_PCI_MODULE_NAME,
-			(module_info **)&sPCIModule);
-		if (status < B_OK) {
-			TRACE_MODULE_ERROR("getting pci module failed! 0x%08" B_PRIx32
-				"\n", status);
-			return status;
-		}
+	xhci_td *result;
+	phys_addr_t physicalAddress;
+
+	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
+			sizeof(xhci_td)) < B_OK) {
+		TRACE_ERROR("failed to allocate a transfer descriptor\n");
+		return NULL;
 	}
 
-	TRACE_MODULE("searching devices\n");
-	bool found = false;
-	pci_info *item = new(std::nothrow) pci_info;
-	if (!item) {
-		sPCIModule = NULL;
-		put_module(B_PCI_MODULE_NAME);
-		return B_NO_MEMORY;
+	result->this_phy = physicalAddress;
+	result->buffer_size[0] = bufferSize;
+	result->trb_count = 0;
+	result->buffer_count = 1;
+	result->next = NULL;
+	result->next_chain = NULL;
+	if (bufferSize <= 0) {
+		result->buffer_log[0] = NULL;
+		result->buffer_phy[0] = 0;
+		return result;
 	}
 
-	// Try to get the PCI x86 module as well so we can enable possible MSIs.
-	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
-			(module_info **)&sPCIx86Module) != B_OK) {
-		// If it isn't there, that's not critical though.
-		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
-		sPCIx86Module = NULL;
+	if (fStack->AllocateChunk(&result->buffer_log[0],
+			&result->buffer_phy[0], bufferSize) < B_OK) {
+		TRACE_ERROR("unable to allocate space for the buffer (size %ld)\n",
+			bufferSize);
+		fStack->FreeChunk(result, result->this_phy, sizeof(xhci_td));
+		return NULL;
 	}
 
-	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
-		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
-			&& item->class_api == PCI_usb_xhci) {
-			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
-				item->bus, item->device, item->function);
-			XHCI *bus = new(std::nothrow) XHCI(item, stack);
-			if (!bus) {
-				delete item;
-				sPCIModule = NULL;
-				put_module(B_PCI_MODULE_NAME);
-				return B_NO_MEMORY;
-			}
+	TRACE("CreateDescriptor allocated buffer_size %ld %p\n",
+		result->buffer_size[0], result->buffer_log[0]);
 
-			if (bus->InitCheck() < B_OK) {
-				TRACE_MODULE_ERROR("bus failed init check\n");
-				delete bus;
-				continue;
-			}
-
-			// the bus took it away
-			item = new(std::nothrow) pci_info;
-
-			if (bus->Start() != B_OK) {
-				delete bus;
-				continue;
-			}
-			found = true;
-		}
-	}
-
-	if (!found) {
-		TRACE_MODULE_ERROR("no devices found\n");
-		delete item;
-		sPCIModule = NULL;
-		put_module(B_PCI_MODULE_NAME);
-		return ENODEV;
-	}
-
-	delete item;
-	return B_OK;
+	return result;
 }
 
 
@@ -943,45 +982,6 @@ XHCI::CreateDescriptorChain(size_t bufferSize, int32 &trbCount)
 	}
 
 	return first;
-}
-
-
-xhci_td *
-XHCI::CreateDescriptor(size_t bufferSize)
-{
-	xhci_td *result;
-	phys_addr_t physicalAddress;
-
-	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
-			sizeof(xhci_td)) < B_OK) {
-		TRACE_ERROR("failed to allocate a transfer descriptor\n");
-		return NULL;
-	}
-
-	result->this_phy = physicalAddress;
-	result->buffer_size[0] = bufferSize;
-	result->trb_count = 0;
-	result->buffer_count = 1;
-	result->next = NULL;
-	result->next_chain = NULL;
-	if (bufferSize <= 0) {
-		result->buffer_log[0] = NULL;
-		result->buffer_phy[0] = 0;
-		return result;
-	}
-
-	if (fStack->AllocateChunk(&result->buffer_log[0],
-			&result->buffer_phy[0], bufferSize) < B_OK) {
-		TRACE_ERROR("unable to allocate space for the buffer (size %ld)\n",
-			bufferSize);
-		fStack->FreeChunk(result, result->this_phy, sizeof(xhci_td));
-		return NULL;
-	}
-
-	TRACE("CreateDescriptor allocated buffer_size %ld %p\n",
-		result->buffer_size[0], result->buffer_log[0]);
-
-	return result;
 }
 
 

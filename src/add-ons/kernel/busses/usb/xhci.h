@@ -84,8 +84,12 @@ typedef struct xhci_device {
 
 class XHCI : public BusManager {
 public:
+	static	status_t			AddTo(Stack *stack);
+
 								XHCI(pci_info *info, Stack *stack);
 								~XHCI();
+
+	virtual	const char *		TypeName() const { return "xhci"; }
 
 			status_t			Start();
 	virtual	status_t			SubmitTransfer(Transfer *transfer);
@@ -96,19 +100,10 @@ public:
 	virtual	status_t			NotifyPipeChange(Pipe *pipe,
 									usb_change change);
 
-	static	status_t			AddTo(Stack *stack);
-
 	virtual	Device *			AllocateDevice(Hub *parent,
 									int8 hubAddress, uint8 hubPort,
 									usb_speed speed);
-			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
-									uint8 type, uint64 ringAddr,
-									uint16 interval, uint16 maxPacketSize,
-									uint16 maxFrameSize, usb_speed speed);
 	virtual	void				FreeDevice(Device *device);
-
-			status_t			_InsertEndpointForPipe(Pipe *pipe);
-			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 
 			// Port operations for root hub
 			uint8				PortCount() const { return fPortCount; }
@@ -119,8 +114,6 @@ public:
 
 			status_t			GetPortSpeed(uint8 index, usb_speed *speed);
 
-	virtual	const char *		TypeName() const { return "xhci"; }
-
 private:
 			// Controller resets
 			status_t			ControllerReset();
@@ -129,6 +122,14 @@ private:
 			// Interrupt functions
 	static	int32				InterruptHandler(void *data);
 			int32				Interrupt();
+
+			// Endpoint management
+			status_t			ConfigureEndpoint(uint8 slot, uint8 number,
+									uint8 type, uint64 ringAddr,
+									uint16 interval, uint16 maxPacketSize,
+									uint16 maxFrameSize, usb_speed speed);
+			status_t			_InsertEndpointForPipe(Pipe *pipe);
+			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 
 			// Event management
 	static	int32				EventThread(void *data);
@@ -160,7 +161,8 @@ private:
 			void				HandleCmdComplete(xhci_trb *trb);
 			void				HandleTransferComplete(xhci_trb *trb);
 			status_t			DoCommand(xhci_trb *trb);
-			//Doorbell
+
+			// Doorbell
 			void				Ring(uint8 slot, uint8 endpoint);
 
 			// Commands
@@ -207,6 +209,7 @@ private:
 
 			void				_SwitchIntelPorts();
 
+private:
 	static	pci_module_info *	sPCIModule;
 	static	pci_x86_module_info *sPCIx86Module;
 
