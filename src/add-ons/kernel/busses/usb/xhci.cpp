@@ -715,7 +715,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		return status;
 
 	int32 trbCount = 0;
-	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength(), trbCount);
+	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength(),
+		trbCount);
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
 
@@ -739,7 +740,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		}
 		// link next td, if any
 		if (td_chain->next_chain != NULL) {
-			td_chain->trbs[td_chain->trb_count].qwtrb0 = td_chain->next_chain->this_phy;
+			td_chain->trbs[td_chain->trb_count].qwtrb0 =
+				td_chain->next_chain->this_phy;
 			td_chain->trbs[td_chain->trb_count].dwtrb2 = TRB_2_IRQ(0);
 			td_chain->trbs[td_chain->trb_count].dwtrb3
 				= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK)
@@ -822,10 +824,6 @@ XHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 status_t
 XHCI::AddTo(Stack *stack)
 {
-#ifdef TRACE_USB
-	set_dprintf_enabled(true);
-#endif
-
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME,
 			(module_info **)&sPCIModule);
@@ -923,8 +921,8 @@ XHCI::CreateDescriptorChain(size_t bufferSize, int32 &trbCount)
 		TRACE("CreateDescriptorChain trbs %d for td %" B_PRId32 "\n", trbs, i);
 		for (int j = 0; j < trbs; j++) {
 			if (fStack->AllocateChunk(&descriptor->buffer_log[j],
-				&descriptor->buffer_phy[j],
-				min_c(packetSize, bufferSize)) < B_OK) {
+					&descriptor->buffer_phy[j],
+					min_c(packetSize, bufferSize)) < B_OK) {
 				TRACE_ERROR("unable to allocate space for the buffer (size %"
 					B_PRIuSIZE ")\n", bufferSize);
 				return NULL;
@@ -954,7 +952,7 @@ XHCI::CreateDescriptor(size_t bufferSize)
 	phys_addr_t physicalAddress;
 
 	if (fStack->AllocateChunk((void **)&result, &physicalAddress,
-		sizeof(xhci_td)) < B_OK) {
+			sizeof(xhci_td)) < B_OK) {
 		TRACE_ERROR("failed to allocate a transfer descriptor\n");
 		return NULL;
 	}
@@ -972,7 +970,7 @@ XHCI::CreateDescriptor(size_t bufferSize)
 	}
 
 	if (fStack->AllocateChunk(&result->buffer_log[0],
-		&result->buffer_phy[0], bufferSize) < B_OK) {
+			&result->buffer_phy[0], bufferSize) < B_OK) {
 		TRACE_ERROR("unable to allocate space for the buffer (size %ld)\n",
 			bufferSize);
 		fStack->FreeChunk(result, result->this_phy, sizeof(xhci_td));
@@ -980,7 +978,7 @@ XHCI::CreateDescriptor(size_t bufferSize)
 	}
 
 	TRACE("CreateDescriptor allocated buffer_size %ld %p\n",
-				result->buffer_size[0], result->buffer_log[0]);
+		result->buffer_size[0], result->buffer_log[0]);
 
 	return result;
 }
@@ -990,7 +988,6 @@ void
 XHCI::FreeDescriptor(xhci_td *descriptor)
 {
 	while (descriptor != NULL) {
-
 		for (int i = 0; i < descriptor->buffer_count; i++) {
 			if (descriptor->buffer_size[i] == 0)
 				continue;
@@ -1450,7 +1447,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 	TRACE("_InsertEndpointForPipe endpoint address %" B_PRId8 "\n",
 		pipe->EndpointAddress());
 	if (pipe->ControllerCookie() != NULL
-		|| pipe->Parent()->Type() != USB_OBJECT_DEVICE) {
+			|| pipe->Parent()->Type() != USB_OBJECT_DEVICE) {
 		// default pipe is already referenced
 		return B_OK;
 	}
@@ -1522,16 +1519,6 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 			TRACE_ERROR("unable to configure endpoint\n");
 			return status;
 		}
-
-#if 0
-		/* These commands error with "Context state" on some devices,
-		 * and on others break transfers altogether. So just disable them
-		 * for now. */
-		StopEndpoint(false, endpoint, device->slot);
-		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
-			device->slot);
-		ResetEndpoint(false, endpoint, device->slot);
-#endif
 
 		_WriteContext(&device->input_ctx->input.dropFlags, 0);
 		_WriteContext(&device->input_ctx->input.addFlags,
@@ -2011,6 +1998,7 @@ XHCI::Ring(uint8 slot, uint8 endpoint)
 		panic("Ring() invalid slot/endpoint combination\n");
 	if (slot > fSlotCount || endpoint >= XHCI_MAX_ENDPOINTS)
 		panic("Ring() invalid slot or endpoint\n");
+
 	WriteDoorReg32(XHCI_DOORBELL(slot), XHCI_DOORBELL_TARGET(endpoint)
 		| XHCI_DOORBELL_STREAMID(0));
 	/* Flush PCI posted writes */
@@ -2064,6 +2052,8 @@ XHCI::QueueCommand(xhci_trb* trb)
 void
 XHCI::HandleCmdComplete(xhci_trb* trb)
 {
+	TRACE("HandleCmdComplete trb %p\n", trb);
+
 	if (fCmdAddr == trb->qwtrb0) {
 		TRACE("Received command event\n");
 		fCmdResult[0] = trb->dwtrb2;
