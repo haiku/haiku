@@ -621,7 +621,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	uint8 id = XHCI_ENDPOINT_ID(pipe);
 	if (id >= XHCI_MAX_ENDPOINTS) {
-		TRACE_ERROR("Invalid Endpoint");
+		TRACE_ERROR("invalid endpoint!\n");
 		return B_BAD_VALUE;
 	}
 	status_t status = transfer->InitKernelAccess();
@@ -704,6 +704,7 @@ status_t
 XHCI::SubmitNormalRequest(Transfer *transfer)
 {
 	TRACE("SubmitNormalRequest() length %ld\n", transfer->DataLength());
+
 	Pipe *pipe = transfer->TransferPipe();
 	uint8 id = XHCI_ENDPOINT_ID(pipe);
 	if (id >= XHCI_MAX_ENDPOINTS)
@@ -1455,6 +1456,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
 	TRACE("_InsertEndpointForPipe endpoint address %" B_PRId8 "\n",
 		pipe->EndpointAddress());
+
 	if (pipe->ControllerCookie() != NULL
 			|| pipe->Parent()->Type() != USB_OBJECT_DEVICE) {
 		// default pipe is already referenced
@@ -1573,6 +1575,12 @@ status_t
 XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 {
 	TRACE("_LinkDescriptorForPipe\n");
+
+	if (endpoint->device == NULL) {
+		TRACE_ERROR("trying to submit a transfer to a non-existent endpoint!\n");
+		return B_NO_INIT;
+	}
+
 	MutexLocker endpointLocker(endpoint->lock);
 	if (endpoint->used >= XHCI_MAX_TRANSFERS) {
 		TRACE_ERROR("_LinkDescriptorForPipe max transfers count exceeded\n");
@@ -2133,7 +2141,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			return;
 		}
 	}
-	TRACE_ERROR("TRB %" B_PRIxADDR " was not found in the endpoint!\n", source);
+	TRACE_ERROR("TRB 0x%" B_PRIxADDR " was not found in the endpoint!\n", source);
 }
 
 
