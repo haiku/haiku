@@ -1232,8 +1232,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI device context");
 	if (device->device_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a device context area\n");
-		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
+		memset(device, 0, sizeof(xhci_device));
+		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 	memset(device->device_ctx, 0, sizeof(*device->device_ctx) << fContextSizeShift);
@@ -1243,9 +1244,10 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			* XHCI_MAX_TRANSFERS, "XHCI endpoint trbs");
 	if (device->trb_area < B_OK) {
 		TRACE_ERROR("unable to create a device trbs area\n");
-		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
+		memset(device, 0, sizeof(xhci_device));
+		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1270,10 +1272,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (ConfigureEndpoint(slot, 0, 4, device->trb_addr, 0,
 			maxPacketSize, maxPacketSize & 0x7ff, speed) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
-		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
+		memset(device, 0, sizeof(xhci_device));
+		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1288,10 +1291,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// device should get to addressed state (bsr = 0)
 	if (SetAddress(device->input_ctx_addr, false, slot) != B_OK) {
 		TRACE_ERROR("unable to set address\n");
-		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
+		memset(device, 0, sizeof(xhci_device));
+		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1333,10 +1337,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (actualLength != 8) {
 		TRACE_ERROR("error while getting the device descriptor: %s\n",
 			strerror(status));
-		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
+		memset(device, 0, sizeof(xhci_device));
+		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 
@@ -1377,10 +1382,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		if (actualLength != sizeof(usb_hub_descriptor)) {
 			TRACE_ERROR("error while getting the hub descriptor: %s\n",
 				strerror(status));
-			device->state = XHCI_STATE_DISABLED;
 			delete_area(device->input_ctx_area);
 			delete_area(device->device_ctx_area);
 			delete_area(device->trb_area);
+			memset(device, 0, sizeof(xhci_device));
+			device->state = XHCI_STATE_DISABLED;
 			return NULL;
 		}
 
@@ -1409,10 +1415,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		} else {
 			TRACE_ERROR("device object failed to initialize\n");
 		}
-		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		delete_area(device->device_ctx_area);
 		delete_area(device->trb_area);
+		memset(device, 0, sizeof(xhci_device));
+		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
 	fPortSlots[hubPort] = slot;
@@ -1437,6 +1444,8 @@ XHCI::FreeDevice(Device *device)
 	delete_area(fDevices[slot].trb_area);
 	delete_area(fDevices[slot].input_ctx_area);
 	delete_area(fDevices[slot].device_ctx_area);
+
+	memset(&fDevices[slot], 0, sizeof(xhci_device));
 	fDevices[slot].state = XHCI_STATE_DISABLED;
 }
 
