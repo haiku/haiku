@@ -36,6 +36,7 @@ struct ifaltq {
 #define ALTQ_ENQUEUE(ifr, m, foo, error) \
 	do { m_freem(m); error = -1; } while (0)
 #define ALTQ_DEQUEUE(ifr, m)	(m) = NULL
+#define ALTQ_PURGE(ifq)
 
 #define TBR_IS_ENABLED(ifq)		0
 #define tbr_dequeue_ptr(ifq, v)	NULL

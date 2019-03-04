@@ -86,6 +86,14 @@ sysctl_wire_old_buffer(struct sysctl_req *req, size_t len)
 }
 
 
+static inline struct sbuf *
+sbuf_new_for_sysctl(struct sbuf *s, char *buf, int length,
+    struct sysctl_req *req)
+{
+	return NULL;
+}
+
+
 static inline void *
 sysctl_add_oid(struct sysctl_ctx_list *clist, void *parent, int nbr,
 	const char *name, int kind, void *arg1, int arg2,
