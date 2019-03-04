@@ -790,7 +790,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	int32 trbCount = 0;
 	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength(),
-		trbCount);
+		&trbCount);
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
 
@@ -798,15 +798,17 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	xhci_td *last = descriptor;
 	int32 rest = trbCount - 1;
 
-	// set NormalStage
+	// Normal Stage
 	while (td_chain != NULL) {
 		td_chain->trb_count = td_chain->buffer_count;
 		uint8 index;
 		for (index = 0; index < td_chain->buffer_count; index++) {
 			td_chain->trbs[index].qwtrb0 = descriptor->buffer_phy[index];
+			// TODO: TD Size is actually supposed to be number of packets
+			// remaining, *not* number of TRBs remaining as it is presently.
 			td_chain->trbs[index].dwtrb2 = TRB_2_IRQ(0)
 				| TRB_2_BYTES(descriptor->buffer_size[index])
-				| TRB_2_TD_SIZE(rest);
+				| TRB_2_TD_SIZE(rest > 31 ? 31 : rest);
 			td_chain->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
 				TRB_3_TYPE(TRB_TYPE_NORMAL) | TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT
 					| (directionIn ? TRB_3_ISP_BIT : 0));
@@ -935,29 +937,30 @@ XHCI::CreateDescriptor(size_t bufferSize)
 
 
 xhci_td *
-XHCI::CreateDescriptorChain(size_t bufferSize, int32 &trbCount)
+XHCI::CreateDescriptorChain(size_t bufferSize, int32 *trbCount)
 {
 	size_t packetSize = B_PAGE_SIZE * 16;
-	trbCount = (bufferSize + packetSize - 1) / packetSize;
-	if (trbCount == 0)
-		trbCount = 1;
+	int32 trbsTotal = (bufferSize + packetSize - 1) / packetSize;
+	if (trbsTotal == 0)
+		trbsTotal = 1;
+	*trbCount = trbsTotal;
 
 	// keep one trb for linking
-	int32 tdCount = (trbCount + XHCI_MAX_TRBS_PER_TD - 2)
+	int32 tdCount = (trbsTotal + XHCI_MAX_TRBS_PER_TD - 2)
 		/ (XHCI_MAX_TRBS_PER_TD - 1);
 
 	xhci_td *first = NULL;
 	xhci_td *last = NULL;
 	for (int32 i = 0; i < tdCount; i++) {
 		xhci_td *descriptor = CreateDescriptor(0);
-		if (!descriptor) {
-			if (first != NULL)
-				FreeDescriptor(first);
+		if (descriptor == NULL) {
+			FreeDescriptor(first);
 			return NULL;
-		} else if (first == NULL)
+		}
+		if (first == NULL)
 			first = descriptor;
 
-		uint8 trbs = min_c(trbCount, XHCI_MAX_TRBS_PER_TD - 1);
+		uint8 trbs = min_c(trbsTotal, XHCI_MAX_TRBS_PER_TD - 1);
 		TRACE("CreateDescriptorChain trbs %d for td %" B_PRId32 "\n", trbs, i);
 		for (int j = 0; j < trbs; j++) {
 			if (fStack->AllocateChunk(&descriptor->buffer_log[j],
@@ -975,7 +978,7 @@ XHCI::CreateDescriptorChain(size_t bufferSize, int32 &trbCount)
 		}
 
 		descriptor->buffer_count = trbs;
-		trbCount -= trbs;
+		trbsTotal -= trbs;
 		if (last != NULL)
 			last->next_chain = descriptor;
 		last = descriptor;
