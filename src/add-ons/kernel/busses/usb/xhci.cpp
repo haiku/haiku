@@ -828,10 +828,21 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		remainingPackets -= packetsPerTrb;
 	}
 
-	// Set the IOC (Interrupt On Completion) bit and unset the CHAIN bit on
-	// the final TRB in the transfer. (XHCI 1.1 § 6.4.1.1 Table 6-22 p443.)
-	td->trbs[td->trb_used - 1].dwtrb3 &= ~TRB_3_CHAIN_BIT;
+	// Set the IOC (Interrupt On Completion) bit so that we will get an event
+	// and interrupt for this TRB as the transfer will be finished.
+	// (XHCI 1.1 § 6.4.1.1 Table 6-22 p443.)
 	td->trbs[td->trb_used - 1].dwtrb3 |= TRB_3_IOC_BIT;
+
+	// Set the ENT (Evaluate Next TRB) bit, so that the HC will not switch
+	// contexts before evaluating the Link TRB that _LinkDescriptorForPipe
+	// will insert, as otherwise there would be a race between us freeing
+	// and unlinking the descriptor, and the HC evaluating the Link TRB
+	// and thus getting back onto the main ring.
+	//
+	// Note that we *do not* unset the CHAIN bit in this TRB, thus including
+	// the Link TRB in this TD formally, which is required when using the
+	// ENT bit. (XHCI 1.1 § 4.12.3 p241.)
+	td->trbs[td->trb_used - 1].dwtrb3 |= TRB_3_ENT_BIT;
 
 	if (!directionIn) {
 		TRACE("copying out iov count %ld\n", transfer->VectorCount());
