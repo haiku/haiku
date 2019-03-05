@@ -25,7 +25,7 @@
  */
 #define USER_BASE     0x100000
 #define USER_BASE_ANY USER_BASE
-#define USER_SIZE     (0x80000000 - (0x10000 + 0x100000))
+#define USER_SIZE     (0x80000000 - (0x10000 + USER_BASE))
 #define USER_TOP      (USER_BASE + (USER_SIZE - 1))
 
 #define KERNEL_USER_DATA_BASE	0x60000000
