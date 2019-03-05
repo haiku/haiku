@@ -1873,7 +1873,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	port_id appPort = -1;
 	uint32 appToken = 0;
 
-	do {
+	while (true) {
 		// find the app
 		entry_ref appRef;
 		char signature[B_MIME_TYPE_LENGTH];
@@ -1971,7 +1971,9 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 				}
 			}
 		}
-	} while (false);
+		// Don't try again
+		break;
+	}
 
 	if (alreadyRunning && current_team() == team) {
 		// The target team is calling us, so we don't send it the message
