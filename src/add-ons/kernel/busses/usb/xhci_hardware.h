@@ -309,7 +309,6 @@
 #define XHCI_MAX_SCRATCHPADS	256
 #define XHCI_MAX_DEVICES		128
 #define XHCI_MAX_TRANSFERS		8
-#define XHCI_MAX_TRBS_PER_TD	18
 
 
 struct xhci_trb {

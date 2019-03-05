@@ -34,31 +34,36 @@ enum xhci_state {
 
 
 typedef struct xhci_td {
-	struct xhci_trb	trbs[XHCI_MAX_TRBS_PER_TD];
+	xhci_trb*	trbs;
+	phys_addr_t	trb_addr;
+	uint32		trb_count;
+	uint32		trb_used;
 
-	phys_addr_t	this_phy;				// A physical pointer to this address
-	phys_addr_t	buffer_phy[XHCI_MAX_TRBS_PER_TD];
-	void	*buffer_log[XHCI_MAX_TRBS_PER_TD];	// Pointer to the logical buffer
-	size_t	buffer_size[XHCI_MAX_TRBS_PER_TD];	// Size of the buffer
-	uint8	buffer_count;
+	void**		buffers;
+	phys_addr_t* buffer_addrs;
+	size_t		buffer_size;
+	uint32		buffer_count;
 
-	struct xhci_td	*next_chain;
-	struct xhci_td	*next;
-	Transfer *transfer;
-	uint8	trb_count;
-	uint8	trb_completion_code;
-	uint32	trb_left;
-} xhci_td __attribute__((__aligned__(16)));
+	Transfer*	transfer;
+	uint8		trb_completion_code;
+	uint32		trb_left;
+
+	xhci_td*	next;
+} xhci_td;
 
 
 typedef struct xhci_endpoint {
-	xhci_device		*device;
-	xhci_td 		*td_head;
-	struct xhci_trb *trbs; // [XHCI_MAX_TRANSFERS]
-	phys_addr_t trb_addr;
-	uint8	used;
-	uint8	current;
-	mutex	lock;
+	mutex 			lock;
+
+	xhci_device*	device;
+	size_t			max_packet_size;
+
+	xhci_td*		td_head;
+	uint8			used;
+	uint8			current;
+
+	xhci_trb*		trbs; // [XHCI_MAX_TRANSFERS]
+	phys_addr_t 	trb_addr;
 } xhci_endpoint;
 
 
@@ -139,15 +144,14 @@ private:
 	static	int32				FinishThread(void *data);
 			void				FinishTransfers();
 
-			// Descriptor
-			xhci_td *			CreateDescriptor(size_t bufferSize);
-			xhci_td *			CreateDescriptorChain(size_t bufferSize,
-									int32 &trbCount);
+			// Descriptor management
+			xhci_td *			CreateDescriptor(uint32 trbCount,
+									size_t trbBufferSize);
 			void				FreeDescriptor(xhci_td *descriptor);
 
-			size_t				WriteDescriptorChain(xhci_td *descriptor,
+			size_t				WriteDescriptor(xhci_td *descriptor,
 									iovec *vector, size_t vectorCount);
-			size_t				ReadDescriptorChain(xhci_td *descriptor,
+			size_t				ReadDescriptor(xhci_td *descriptor,
 									iovec *vector, size_t vectorCount);
 
 			status_t			_LinkDescriptorForPipe(xhci_td *descriptor,
