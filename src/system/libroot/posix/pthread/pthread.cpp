@@ -27,7 +27,8 @@ static pthread_attr pthread_attr_default = {
 	PTHREAD_CREATE_JOINABLE,
 	B_NORMAL_PRIORITY,
 	USER_STACK_SIZE,
-	USER_STACK_GUARD_SIZE
+	USER_STACK_GUARD_SIZE,
+	NULL
 };
 
 
@@ -119,7 +120,7 @@ __pthread_init_creation_attributes(const pthread_attr_t* pthreadAttributes,
 	attributes->priority = attr->sched_priority;
 	attributes->args1 = argument1;
 	attributes->args2 = argument2;
-	attributes->stack_address = NULL;
+	attributes->stack_address = attr->stack_address;
 	attributes->stack_size = attr->stack_size;
 	attributes->guard_size = attr->guard_size;
 	attributes->pthread = thread;

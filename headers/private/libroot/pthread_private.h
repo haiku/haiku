@@ -46,6 +46,7 @@ typedef struct _pthread_attr {
 	int32		sched_priority;
 	size_t		stack_size;
 	size_t		guard_size;
+	void		*stack_address;
 } pthread_attr;
 
 typedef struct _pthread_rwlockattr {

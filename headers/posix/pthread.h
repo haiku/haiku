@@ -209,6 +209,11 @@ extern int pthread_attr_getguardsize(const pthread_attr_t *attr,
 	size_t *guardsize);
 extern int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
 
+extern int pthread_attr_getstack(const pthread_attr_t *attr,
+	void **stackaddr, size_t *stacksize);
+extern int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr,
+	size_t stacksize);
+
 #if 0   /* Unimplemented attribute functions: */
 
 /* [TPS] */
@@ -220,18 +225,7 @@ extern int pthread_attr_getschedpolicy(const pthread_attr_t *attr,
 	int *policy);
 extern int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy);
 
-/* [TSA] */
-extern int pthread_attr_getstackaddr(const pthread_attr_t *attr,
-	void **stackaddr);
-extern int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr);
-
-/* [TSA TSS] */
-extern int pthread_attr_getstack(const pthread_attr_t *attr,
-	void **stackaddr, size_t *stacksize);
-extern int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
-
 #endif	/* 0 */
-
 
 /* thread functions */
 extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr,

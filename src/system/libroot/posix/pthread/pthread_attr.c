@@ -33,6 +33,7 @@ pthread_attr_init(pthread_attr_t *_attr)
 	attr->sched_priority = B_NORMAL_PRIORITY;
 	attr->stack_size = USER_STACK_SIZE;
 	attr->guard_size = USER_STACK_GUARD_SIZE;
+	attr->stack_address = NULL;
 
 	*_attr = attr;
 	return B_OK;
@@ -194,3 +195,43 @@ pthread_attr_setguardsize(pthread_attr_t *_attr, size_t guardsize)
 
 	return 0;
 }
+
+
+int
+pthread_attr_getstack(const pthread_attr_t *_attr, void **stackaddr,
+	size_t *stacksize)
+{
+	pthread_attr *attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL || stackaddr == NULL
+		|| stacksize == NULL) {
+		return B_BAD_VALUE;
+	}
+
+	*stacksize = attr->stack_size;
+	*stackaddr = attr->stack_address;
+
+	return 0;
+}
+
+
+int
+pthread_attr_setstack(pthread_attr_t *_attr, void *stackaddr,
+	size_t stacksize)
+{
+	pthread_attr *attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL)
+		return B_BAD_VALUE;
+
+	STATIC_ASSERT(PTHREAD_STACK_MIN >= MIN_USER_STACK_SIZE
+		&& PTHREAD_STACK_MIN <= MAX_USER_STACK_SIZE);
+	if (stacksize < PTHREAD_STACK_MIN || stacksize > MAX_USER_STACK_SIZE)
+		return B_BAD_VALUE;
+
+	attr->stack_size = stacksize;
+	attr->stack_address = stackaddr;
+
+	return 0;
+}
+
