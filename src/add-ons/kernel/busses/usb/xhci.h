@@ -146,7 +146,7 @@ private:
 
 			// Descriptor management
 			xhci_td *			CreateDescriptor(uint32 trbCount,
-									size_t trbBufferSize);
+									uint32 bufferCount, size_t bufferSize);
 			void				FreeDescriptor(xhci_td *descriptor);
 
 			size_t				WriteDescriptor(xhci_td *descriptor,

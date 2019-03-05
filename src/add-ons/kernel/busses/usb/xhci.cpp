@@ -703,7 +703,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 	TRACE("SubmitControlRequest() length %d\n", requestData->Length);
 
-	xhci_td *descriptor = CreateDescriptor(3, requestData->Length);
+	xhci_td *descriptor = CreateDescriptor(3, 1, requestData->Length);
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
 	descriptor->transfer = transfer;
@@ -798,7 +798,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	const size_t trbSize = packetsPerTrb * maxPacketSize;
 	int32 trbCount = (dataLength + trbSize - 1) / trbSize;
 
-	xhci_td *td = CreateDescriptor(trbCount, trbSize);
+	xhci_td *td = CreateDescriptor(trbCount, trbCount, trbSize);
 	if (td == NULL)
 		return B_NO_MEMORY;
 
@@ -895,15 +895,13 @@ XHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 
 
 xhci_td *
-XHCI::CreateDescriptor(uint32 trbCount, size_t trbBufferSize)
+XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 {
 	xhci_td *result = new xhci_td;
 	if (result == NULL) {
 		TRACE_ERROR("failed to allocate a transfer descriptor\n");
 		return NULL;
 	}
-
-	uint32 bufferCount = trbCount;
 
 	// We always allocate 1 more TRB than requested, so that
 	// _LinkDescriptorForPipe() has room to insert a link TRB.
@@ -917,7 +915,7 @@ XHCI::CreateDescriptor(uint32 trbCount, size_t trbBufferSize)
 	result->trb_count = trbCount;
 	result->trb_used = 0;
 
-	if (trbBufferSize > 0) {
+	if (bufferSize > 0) {
 		// Due to how the USB stack allocates physical memory, we can't just
 		// request one large chunk the size of the transfer, and so instead we
 		// create a series of buffers as requested by our caller.
@@ -932,20 +930,41 @@ XHCI::CreateDescriptor(uint32 trbCount, size_t trbBufferSize)
 		}
 		result->buffer_addrs = (phys_addr_t*)&result->buffers[bufferCount];
 
-		for (uint32 i = 0; i < bufferCount; i++) {
-			if (fStack->AllocateChunk(&result->buffers[i],
-					&result->buffer_addrs[i], trbBufferSize) < B_OK) {
-				TRACE_ERROR("unable to allocate space for the buffer (size %ld)\n",
-					trbBufferSize);
+		// Optimization: If the requested total size of all buffers is less
+		// than 32*B_PAGE_SIZE (the maximum size that the physical memory
+		// allocator can handle), we allocate only one buffer and segment it.
+		size_t totalSize = bufferSize * bufferCount;
+		if (totalSize < (32 * B_PAGE_SIZE)) {
+			if (fStack->AllocateChunk(&result->buffers[0],
+					&result->buffer_addrs[0], totalSize) < B_OK) {
+				TRACE_ERROR("unable to allocate space for large buffer (size %ld)\n",
+					totalSize);
 				FreeDescriptor(result);
 				return NULL;
+			}
+			for (uint32 i = 1; i < bufferCount; i++) {
+				result->buffers[i] = (void*)((addr_t)(result->buffers[i - 1])
+					+ bufferSize);
+				result->buffer_addrs[i] = result->buffer_addrs[i - 1]
+					+ bufferSize;
+			}
+		} else {
+			// Otherwise, we allocate each buffer individually.
+			for (uint32 i = 0; i < bufferCount; i++) {
+				if (fStack->AllocateChunk(&result->buffers[i],
+						&result->buffer_addrs[i], bufferSize) < B_OK) {
+					TRACE_ERROR("unable to allocate space for the buffer (size %ld)\n",
+						bufferSize);
+					FreeDescriptor(result);
+					return NULL;
+				}
 			}
 		}
 	} else {
 		result->buffers = NULL;
 		result->buffer_addrs = NULL;
 	}
-	result->buffer_size = trbBufferSize;
+	result->buffer_size = bufferSize;
 	result->buffer_count = bufferCount;
 
 	// Initialize all other fields.
@@ -972,11 +991,18 @@ XHCI::FreeDescriptor(xhci_td *descriptor)
 			(descriptor->trb_count * sizeof(xhci_trb)));
 	}
 	if (descriptor->buffers != NULL) {
-		for (uint32 i = 0; i < descriptor->buffer_count; i++) {
-			if (descriptor->buffers[i] == NULL)
-				continue;
-			fStack->FreeChunk(descriptor->buffers[i], descriptor->buffer_addrs[i],
-				descriptor->buffer_size);
+		size_t totalSize = descriptor->buffer_size * descriptor->buffer_count;
+		if (totalSize < (32 * B_PAGE_SIZE)) {
+			// This was allocated as one contiguous buffer.
+			fStack->FreeChunk(descriptor->buffers[0], descriptor->buffer_addrs[0],
+				totalSize);
+		} else {
+			for (uint32 i = 0; i < descriptor->buffer_count; i++) {
+				if (descriptor->buffers[i] == NULL)
+					continue;
+				fStack->FreeChunk(descriptor->buffers[i], descriptor->buffer_addrs[i],
+					descriptor->buffer_size);
+			}
 		}
 		free(descriptor->buffers);
 	}
