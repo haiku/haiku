@@ -1508,13 +1508,20 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 {
 	TRACE("_LinkDescriptorForPipe\n");
 
+	// We must check this before we lock the endpoint, because if it is
+	// NULL, the mutex is probably uninitialized, too.
 	if (endpoint->device == NULL) {
 		TRACE_ERROR("trying to submit a transfer to a non-existent endpoint!\n");
 		return B_NO_INIT;
 	}
 
 	MutexLocker endpointLocker(endpoint->lock);
-	if (endpoint->used >= XHCI_MAX_TRANSFERS) {
+
+	// We will be modifying 2 TRBs as part of linking a new descriptor:
+	// the "current" TRB (which will link to the passed descriptor), and
+	// the "next" (current + 1) TRB (which will be zeroed, as we have
+	// likely used it before.) Hence the "+ 1" in this check.
+	if ((endpoint->used + 1) >= XHCI_MAX_TRANSFERS) {
 		TRACE_ERROR("_LinkDescriptorForPipe max transfers count exceeded\n");
 		return B_BAD_VALUE;
 	}
