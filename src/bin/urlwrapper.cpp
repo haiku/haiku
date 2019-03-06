@@ -135,8 +135,18 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					continue;
 				BString contents;
 				BString url;
-				if (f.ReadAt(0LL, contents.LockBuffer(size), size) < B_OK)
+				char *buffer = contents.LockBuffer(size);
+				const char bplist_match[] = "bplist00\xd1\x01\x02SURL_\x10";
+				if (f.ReadAt(0LL, buffer, size) < B_OK)
 					continue;
+					printf("webloc\n");
+				if (size > (sizeof(bplist_match) + 2)
+					&& !strncmp(buffer, bplist_match, sizeof(bplist_match) - 1)) {
+					// binary plist, let's be crude
+					uint8 len = buffer[sizeof(bplist_match) - 1];
+					url.SetTo(buffer + sizeof(bplist_match), len);
+					*buffer = 0; // make sure we don't try to interpret as xml
+				}
 				contents.UnlockBuffer();
 				int state = 0;
 				while (contents.Length()) {
