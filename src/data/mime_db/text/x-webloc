@@ -1,0 +1,18 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "text/x-webloc";
+
+resource(2, "META:SNIFF_RULE") "0.80 (\"<?xml\" | \"bplist\") ([6:100]\"<key>URL</key>\" | [6]\"00\\209\\001\\002SURL_\\016\")";
+
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-urlwrapper";
+
+resource(4, "META:S:DESC") #'MSDC' "Website Location";
+
+resource(5, "META:L:DESC") #'MLDC' "Apple OSX Website Location";
+
+resource(6, "META:EXTENS") message(234) {
+	"extensions" = "webloc",
+	"type" = "text/x-webloc"
+};
+
