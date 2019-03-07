@@ -14,7 +14,11 @@
 
 #include <Debug.h>
 
+#include <syscalls.h>
 #include <thread_defs.h>
+
+
+int __pthread_getattr_np(pthread_t thread, pthread_attr_t *_attr);
 
 
 int
@@ -234,4 +238,36 @@ pthread_attr_setstack(pthread_attr_t *_attr, void *stackaddr,
 
 	return 0;
 }
+
+
+int
+__pthread_getattr_np(pthread_t thread, pthread_attr_t *_attr)
+{
+	pthread_attr *attr;
+	status_t status;
+	thread_info info;
+
+	if (_attr == NULL || (attr = *_attr) == NULL)
+		return B_BAD_VALUE;
+
+	status = _kern_get_thread_info(thread->id, &info);
+	if (status == B_BAD_THREAD_ID)
+		return ESRCH;
+
+	if ((thread->flags & THREAD_DETACHED) != 0)
+		attr->detach_state = PTHREAD_CREATE_DETACHED;
+	else
+		attr->detach_state = PTHREAD_CREATE_JOINABLE;
+	attr->sched_priority = info.priority;
+	attr->stack_address = info.stack_base;
+	attr->stack_size = (size_t)info.stack_end - (size_t)info.stack_base;
+	// not in thread_info
+	attr->guard_size = 0;
+
+	return 0;
+}
+
+
+B_DEFINE_WEAK_ALIAS(__pthread_getattr_np, pthread_getattr_np);
+B_DEFINE_WEAK_ALIAS(__pthread_getattr_np, pthread_attr_get_np);
 
