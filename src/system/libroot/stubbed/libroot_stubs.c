@@ -290,6 +290,8 @@ void _Z18HMAC_SHA256_UpdateP15HMAC_SHA256_CTXPKvm() {}
 void _Z18crypto_scrypt_smixPhmmPvS0_() {}
 void _Z22internal_path_for_pathPcmPKcS1_19path_base_directoryS1_jS_m() {}
 void _Z26get_driver_settings_stringPvPcPlb() {}
+void _Z36posix_spawn_file_actions_addchdir_npPP25_posix_spawn_file_actionsPKc() {}
+void _Z37posix_spawn_file_actions_addfchdir_npPP25_posix_spawn_file_actionsi() {}
 void _Z5exectPKcPKPc() {}
 void _Z6fcryptPKcS0_() {}
 void _ZGTtNKSt13bad_exception4whatEv() {}
@@ -536,11 +538,8 @@ void _ZSt14get_unexpectedv() {}
 void _ZSt14set_unexpectedPFvvE() {}
 void _ZSt15get_new_handlerv() {}
 void _ZSt15set_new_handlerPFvvE() {}
-void _ZSt16__insertion_sortIPN17EnvironmentFilter5EntryEN9__gnu_cxx5__ops15_Iter_less_iterEEvT_S6_T0_() {}
-void _ZSt16__introsort_loopIPN17EnvironmentFilter5EntryElN9__gnu_cxx5__ops15_Iter_less_iterEEvT_S6_T0_T1_() {}
 void _ZSt18uncaught_exceptionv() {}
 void _ZSt19uncaught_exceptionsv() {}
-void _ZSt25__unguarded_linear_insertIPN17EnvironmentFilter5EntryEN9__gnu_cxx5__ops14_Val_less_iterEEvT_T0_() {}
 void _ZSt7nothrow() {}
 void _ZSt9terminatev() {}
 void _ZTIN10__cxxabiv115__forced_unwindE() {}
@@ -782,6 +781,7 @@ void __exp_atable() {}
 void __exp_deltatable() {}
 void __expf() {}
 void __expl() {}
+void __expl_finite() {}
 void __expm1() {}
 void __expm1f() {}
 void __expm1l() {}
@@ -880,8 +880,8 @@ void __heap_after_fork_child() {}
 void __heap_after_fork_parent() {}
 void __heap_before_fork() {}
 void __heap_terminate_after() {}
-void __heap_thread_init() {}
 void __heap_thread_exit() {}
+void __heap_thread_init() {}
 void __hypot() {}
 void __hypotf() {}
 void __hypotl() {}
@@ -1133,8 +1133,10 @@ void __pselect_beos() {}
 void __pthread_cleanup_pop_handler() {}
 void __pthread_cleanup_push_handler() {}
 void __pthread_destroy_thread() {}
+void __pthread_getattr_np() {}
 void __pthread_init_creation_attributes() {}
 void __pthread_key_call_destructors() {}
+void __pthread_set_default_priority() {}
 void __pthread_sigmask() {}
 void __pthread_sigmask_beos() {}
 void __random_r() {}
@@ -2167,6 +2169,7 @@ void getpgid() {}
 void getpgrp() {}
 void getpid() {}
 void getppid() {}
+void getpriority() {}
 void getpwent() {}
 void getpwent_r() {}
 void getpwnam() {}
@@ -2394,6 +2397,7 @@ void nexttoward() {}
 void nexttowardf() {}
 void nexttowardl() {}
 void nftw() {}
+void nice() {}
 void nl_langinfo() {}
 void nrand48() {}
 void nrand48_r() {}
@@ -2454,16 +2458,19 @@ void psiginfo() {}
 void psignal() {}
 void pthread_atfork() {}
 void pthread_attr_destroy() {}
+void pthread_attr_get_np() {}
 void pthread_attr_getdetachstate() {}
 void pthread_attr_getguardsize() {}
 void pthread_attr_getschedparam() {}
 void pthread_attr_getscope() {}
+void pthread_attr_getstack() {}
 void pthread_attr_getstacksize() {}
 void pthread_attr_init() {}
 void pthread_attr_setdetachstate() {}
 void pthread_attr_setguardsize() {}
 void pthread_attr_setschedparam() {}
 void pthread_attr_setscope() {}
+void pthread_attr_setstack() {}
 void pthread_attr_setstacksize() {}
 void pthread_barrier_destroy() {}
 void pthread_barrier_init() {}
@@ -2489,6 +2496,7 @@ void pthread_create() {}
 void pthread_detach() {}
 void pthread_equal() {}
 void pthread_exit() {}
+void pthread_getattr_np() {}
 void pthread_getconcurrency() {}
 void pthread_getschedparam() {}
 void pthread_getspecific() {}
@@ -2681,6 +2689,7 @@ void setlogmask_team() {}
 void setlogmask_thread() {}
 void setpgid() {}
 void setpgrp() {}
+void setpriority() {}
 void setpwent() {}
 void setregid() {}
 void setreuid() {}

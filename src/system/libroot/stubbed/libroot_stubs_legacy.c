@@ -704,6 +704,8 @@ void __heap_after_fork_child() {}
 void __heap_after_fork_parent() {}
 void __heap_before_fork() {}
 void __heap_terminate_after() {}
+void __heap_thread_exit() {}
+void __heap_thread_init() {}
 void __hypot() {}
 void __hypotf() {}
 void __hypotl() {}
@@ -944,8 +946,10 @@ void __pselect_beos() {}
 void __pthread_cleanup_pop_handler() {}
 void __pthread_cleanup_push_handler() {}
 void __pthread_destroy_thread() {}
+void __pthread_getattr_np() {}
 void __pthread_init_creation_attributes() {}
 void __pthread_key_call_destructors() {}
+void __pthread_set_default_priority() {}
 void __pthread_sigmask() {}
 void __pthread_sigmask_beos() {}
 void __pure_virtual() {}
@@ -2078,6 +2082,7 @@ void getpgid() {}
 void getpgrp() {}
 void getpid() {}
 void getppid() {}
+void getpriority() {}
 void getpwent() {}
 void getpwent_r() {}
 void getpwnam() {}
@@ -2283,6 +2288,7 @@ void mkfifoat() {}
 void mknod() {}
 void mknodat() {}
 void mkstemp() {}
+void mkstemps() {}
 void mktemp() {}
 void mktime() {}
 void mmap() {}
@@ -2317,6 +2323,7 @@ void nexttoward() {}
 void nexttowardf() {}
 void nexttowardl() {}
 void nftw() {}
+void nice() {}
 void nl_langinfo() {}
 void nothrow() {}
 void nrand48() {}
@@ -2351,8 +2358,10 @@ void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}
 void posix_spawn() {}
+void posix_spawn_file_actions_addchdir_np__FPP25_posix_spawn_file_actionsPCc() {}
 void posix_spawn_file_actions_addclose() {}
 void posix_spawn_file_actions_adddup2() {}
+void posix_spawn_file_actions_addfchdir_np__FPP25_posix_spawn_file_actionsi() {}
 void posix_spawn_file_actions_addopen() {}
 void posix_spawn_file_actions_destroy() {}
 void posix_spawn_file_actions_init() {}
@@ -2381,16 +2390,19 @@ void psiginfo() {}
 void psignal() {}
 void pthread_atfork() {}
 void pthread_attr_destroy() {}
+void pthread_attr_get_np() {}
 void pthread_attr_getdetachstate() {}
 void pthread_attr_getguardsize() {}
 void pthread_attr_getschedparam() {}
 void pthread_attr_getscope() {}
+void pthread_attr_getstack() {}
 void pthread_attr_getstacksize() {}
 void pthread_attr_init() {}
 void pthread_attr_setdetachstate() {}
 void pthread_attr_setguardsize() {}
 void pthread_attr_setschedparam() {}
 void pthread_attr_setscope() {}
+void pthread_attr_setstack() {}
 void pthread_attr_setstacksize() {}
 void pthread_barrier_destroy() {}
 void pthread_barrier_init() {}
@@ -2416,6 +2428,7 @@ void pthread_create() {}
 void pthread_detach() {}
 void pthread_equal() {}
 void pthread_exit() {}
+void pthread_getattr_np() {}
 void pthread_getconcurrency() {}
 void pthread_getschedparam() {}
 void pthread_getspecific() {}
@@ -2618,6 +2631,7 @@ void setlogmask_team() {}
 void setlogmask_thread() {}
 void setpgid() {}
 void setpgrp() {}
+void setpriority() {}
 void setpwent() {}
 void setregid() {}
 void setreuid() {}
