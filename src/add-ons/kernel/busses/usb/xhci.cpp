@@ -189,16 +189,16 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fErstArea(-1),
 		fDcbaArea(-1),
 		fCmdCompSem(-1),
-		fFinishTransfersSem(-1),
-		fFinishThread(-1),
 		fStopThreads(false),
-		fFinishedHead(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fPortCount(0),
 		fSlotCount(0),
 		fScratchpadCount(0),
 		fContextSizeShift(0),
+		fFinishedHead(NULL),
+		fFinishTransfersSem(-1),
+		fFinishThread(-1),
 		fEventSem(-1),
 		fEventThread(-1),
 		fEventIdx(0),
@@ -207,6 +207,8 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fCmdCcs(1)
 {
 	B_INITIALIZE_SPINLOCK(&fSpinlock);
+	mutex_init(&fFinishedLock, "XHCI finished transfers");
+	mutex_init(&fEventLock, "XHCI event handler");
 
 	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR("bus manager failed to init\n");
@@ -401,6 +403,9 @@ XHCI::~XHCI()
 	delete_sem(fEventSem);
 	wait_for_thread(fFinishThread, &result);
 	wait_for_thread(fEventThread, &result);
+
+	mutex_destroy(&fFinishedLock);
+	mutex_destroy(&fEventLock);
 
 	remove_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this);
 
@@ -2114,11 +2119,13 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 
 			td->trb_completion_code = completionCode;
 			td->trb_left = remainder;
+
 			// add descriptor to finished list
-			Lock();
+			mutex_lock(&fFinishedLock);
 			td->next = fFinishedHead;
 			fFinishedHead = td;
-			Unlock();
+			mutex_unlock(&fFinishedLock);
+
 			release_sem(fFinishTransfersSem);
 			TRACE("HandleTransferComplete td %p done\n", td);
 		} else {
@@ -2361,52 +2368,61 @@ XHCI::CompleteEvents()
 		if (semCount > 0)
 			acquire_sem_etc(fEventSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
-		uint16 i = fEventIdx;
-		uint8 j = fEventCcs;
-		uint8 t = 2;
+		ProcessEvents();
+	}
+}
 
-		while (1) {
-			uint32 temp = B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3);
-			uint8 event = TRB_3_TYPE_GET(temp);
-			TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
-				B_PRIx32 ")\n", i, event, fEventRing[i].qwtrb0,
-				fEventRing[i].dwtrb2, B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3));
-			uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
-			if (j != k)
-				break;
 
-			switch (event) {
-			case TRB_TYPE_COMMAND_COMPLETION:
-				HandleCmdComplete(&fEventRing[i]);
-				break;
-			case TRB_TYPE_TRANSFER:
-				HandleTransferComplete(&fEventRing[i]);
-				break;
-			case TRB_TYPE_PORT_STATUS_CHANGE:
-				TRACE("port change detected\n");
-				break;
-			default:
-				TRACE_ERROR("Unhandled event = %u\n", event);
-				break;
-			}
+void
+XHCI::ProcessEvents()
+{
+	MutexLocker _(fEventLock);
 
-			i++;
-			if (i == XHCI_MAX_EVENTS) {
-				i = 0;
-				j ^= 1;
-				if (!--t)
-					break;
-			}
+	uint16 i = fEventIdx;
+	uint8 j = fEventCcs;
+	uint8 t = 2;
+
+	while (1) {
+		uint32 temp = B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3);
+		uint8 event = TRB_3_TYPE_GET(temp);
+		TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
+			B_PRIx32 ")\n", i, event, fEventRing[i].qwtrb0,
+			fEventRing[i].dwtrb2, B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3));
+		uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
+		if (j != k)
+			break;
+
+		switch (event) {
+		case TRB_TYPE_COMMAND_COMPLETION:
+			HandleCmdComplete(&fEventRing[i]);
+			break;
+		case TRB_TYPE_TRANSFER:
+			HandleTransferComplete(&fEventRing[i]);
+			break;
+		case TRB_TYPE_PORT_STATUS_CHANGE:
+			TRACE("port change detected\n");
+			break;
+		default:
+			TRACE_ERROR("Unhandled event = %u\n", event);
+			break;
 		}
 
-		fEventIdx = i;
-		fEventCcs = j;
-
-		uint64 addr = fErst->rs_addr + i * sizeof(xhci_trb);
-		addr |= ERST_EHB;
-		WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr);
-		WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(addr >> 32));
+		i++;
+		if (i == XHCI_MAX_EVENTS) {
+			i = 0;
+			j ^= 1;
+			if (!--t)
+				break;
+		}
 	}
+
+	fEventIdx = i;
+	fEventCcs = j;
+
+	uint64 addr = fErst->rs_addr + i * sizeof(xhci_trb);
+	addr |= ERST_EHB;
+	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr);
+	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(addr >> 32));
 }
 
 
@@ -2431,13 +2447,13 @@ XHCI::FinishTransfers()
 		if (semCount > 0)
 			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
-		Lock();
+		mutex_lock(&fFinishedLock);
 		TRACE("finishing transfers\n");
 		while (fFinishedHead != NULL) {
 			xhci_td* td = fFinishedHead;
 			fFinishedHead = td->next;
 			td->next = NULL;
-			Unlock();
+			mutex_unlock(&fFinishedLock);
 
 			TRACE("finishing transfer td %p\n", td);
 
@@ -2495,9 +2511,9 @@ XHCI::FinishTransfers()
 			transfer->Finished(callbackStatus, actualLength);
 			delete transfer;
 			FreeDescriptor(td);
-			Lock();
+			mutex_lock(&fFinishedLock);
 		}
-		Unlock();
+		mutex_unlock(&fFinishedLock);
 	}
 }
 

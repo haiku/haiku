@@ -139,6 +139,7 @@ private:
 			// Event management
 	static	int32				EventThread(void *data);
 			void				CompleteEvents();
+			void				ProcessEvents();
 
 			// Transfer management
 	static	int32				FinishThread(void *data);
@@ -242,11 +243,7 @@ private:
 			spinlock			fSpinlock;
 
 			sem_id				fCmdCompSem;
-			sem_id				fFinishTransfersSem;
-			thread_id			fFinishThread;
 			bool				fStopThreads;
-
-			xhci_td	*			fFinishedHead;
 
 			// Root Hub
 			XHCIRootHub *		fRootHub;
@@ -267,8 +264,16 @@ private:
 			struct xhci_device	fDevices[XHCI_MAX_DEVICES];
 			int32				fContextSizeShift; // 0/1 for 32/64 bytes
 
+			// Transfers
+			mutex				fFinishedLock;
+			xhci_td	*			fFinishedHead;
+			sem_id				fFinishTransfersSem;
+			thread_id			fFinishThread;
+
+			// Events
 			sem_id				fEventSem;
 			thread_id			fEventThread;
+			mutex				fEventLock;
 			uint16				fEventIdx;
 			uint16				fCmdIdx;
 			uint8				fEventCcs;
