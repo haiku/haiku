@@ -1653,12 +1653,12 @@ AudioControlInterface::_ListMixControlsForMixerUnit(int32& index,
 
 	Vector<_MixPageCollector*> mixControls;
 
-	_MixPageCollector* genericPage = new(std::nothrow) _MixPageCollector("Mixer"); 
+	_MixPageCollector* genericPage = new(std::nothrow) _MixPageCollector("Mixer");
 	mixControls.PushBack(genericPage);
 
 	// page for extended in (>2) and out (>2) mixer controls
 	size_t controlsOnExMixerPage = 0;
-	_MixPageCollector* exMixerPage = new(std::nothrow) _MixPageCollector("Mixer"); 
+	_MixPageCollector* exMixerPage = new(std::nothrow) _MixPageCollector("Mixer");
 
 	AudioChannelCluster* outCluster = mixer->OutCluster();
 
