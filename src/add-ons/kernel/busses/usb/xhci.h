@@ -102,6 +102,10 @@ public:
 			status_t			SubmitNormalRequest(Transfer *transfer);
 	virtual	status_t			CancelQueuedTransfers(Pipe *pipe, bool force);
 
+	virtual	status_t			StartDebugTransfer(Transfer *transfer);
+	virtual	status_t			CheckDebugTransfer(Transfer *transfer);
+	virtual	void				CancelDebugTransfer(Transfer *transfer);
+
 	virtual	status_t			NotifyPipeChange(Pipe *pipe,
 									usb_change change);
 

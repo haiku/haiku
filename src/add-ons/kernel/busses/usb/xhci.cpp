@@ -887,6 +887,91 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 
 
 status_t
+XHCI::StartDebugTransfer(Transfer *transfer)
+{
+	Pipe *pipe = transfer->TransferPipe();
+	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
+	if (endpoint == NULL)
+		return B_BAD_VALUE;
+
+	// Check all locks that we are going to hit when running transfers.
+	if (mutex_trylock(&endpoint->lock) != B_OK)
+		return B_WOULD_BLOCK;
+	if (mutex_trylock(&fFinishedLock) != B_OK) {
+		mutex_unlock(&endpoint->lock);
+		return B_WOULD_BLOCK;
+	}
+	if (mutex_trylock(&fEventLock) != B_OK) {
+		mutex_unlock(&endpoint->lock);
+		mutex_unlock(&fFinishedLock);
+		return B_WOULD_BLOCK;
+	}
+	mutex_unlock(&endpoint->lock);
+	mutex_unlock(&fFinishedLock);
+	mutex_unlock(&fEventLock);
+
+	status_t status = SubmitTransfer(transfer);
+	if (status != B_OK)
+		return status;
+
+	// The endpoint's head TD is the TD of the just-submitted transfer.
+	// Just like EHCI, abuse the callback cookie to hold the TD pointer.
+	transfer->SetCallback(NULL, endpoint->td_head);
+
+	return B_OK;
+}
+
+
+status_t
+XHCI::CheckDebugTransfer(Transfer *transfer)
+{
+	xhci_td *transfer_td = (xhci_td *)transfer->CallbackCookie();
+	if (transfer_td == NULL)
+		return B_NO_INIT;
+
+	// Process events once, and then look for it in the finished list.
+	ProcessEvents();
+	xhci_td *previous = NULL;
+	for (xhci_td *td = fFinishedHead; td != NULL; td = td->next) {
+		if (td != transfer_td) {
+			previous = td;
+			continue;
+		}
+
+		// We've found it!
+		if (previous == NULL) {
+			fFinishedHead = fFinishedHead->next;
+		} else {
+			previous->next = td->next;
+		}
+
+		bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
+		status_t status = (td->trb_completion_code == COMP_SUCCESS
+			|| td->trb_completion_code == COMP_SHORT_PACKET) ? B_OK : B_ERROR;
+
+		if (status == B_OK && directionIn)
+			ReadDescriptor(td, transfer->Vector(), transfer->VectorCount());
+
+		FreeDescriptor(td);
+		transfer->SetCallback(NULL, NULL);
+		return status;
+	}
+
+	// We didn't find it.
+	spin(75);
+	return B_DEV_PENDING;
+}
+
+
+void
+XHCI::CancelDebugTransfer(Transfer *transfer)
+{
+	while (CheckDebugTransfer(transfer) == B_DEV_PENDING)
+		spin(100);
+}
+
+
+status_t
 XHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
 	TRACE("pipe change %d for pipe %p (%d)\n", change, pipe,
@@ -913,7 +998,18 @@ XHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 xhci_td *
 XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 {
-	xhci_td *result = new xhci_td;
+	const bool inKDL = debug_debugger_running();
+
+	xhci_td *result;
+	if (!inKDL) {
+		result = (xhci_td*)calloc(1, sizeof(xhci_td));
+	} else {
+		// Just use the physical memory allocator while in KDL; it's less
+		// secure than using the regular heap, but it's easier to deal with.
+		phys_addr_t dummy;
+		fStack->AllocateChunk((void **)&result, &dummy, sizeof(xhci_td));
+	}
+
 	if (result == NULL) {
 		TRACE_ERROR("failed to allocate a transfer descriptor\n");
 		return NULL;
@@ -925,7 +1021,7 @@ XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 	if (fStack->AllocateChunk((void **)&result->trbs, &result->trb_addr,
 			(trbCount * sizeof(xhci_trb))) < B_OK) {
 		TRACE_ERROR("failed to allocate TRBs\n");
-		delete result;
+		FreeDescriptor(result);
 		return NULL;
 	}
 	result->trb_count = trbCount;
@@ -937,8 +1033,14 @@ XHCI::CreateDescriptor(uint32 trbCount, uint32 bufferCount, size_t bufferSize)
 		// create a series of buffers as requested by our caller.
 
 		// We store the buffer pointers and addresses in one memory block.
-		result->buffers = (void**)calloc(bufferCount,
-			(sizeof(void*) + sizeof(phys_addr_t)));
+		if (!inKDL) {
+			result->buffers = (void**)calloc(bufferCount,
+				(sizeof(void*) + sizeof(phys_addr_t)));
+		} else {
+			phys_addr_t dummy;
+			fStack->AllocateChunk((void **)&result->buffers, &dummy,
+				bufferCount * (sizeof(void*) + sizeof(phys_addr_t)));
+		}
 		if (result->buffers == NULL) {
 			TRACE_ERROR("unable to allocate space for buffer infos\n");
 			FreeDescriptor(result);
@@ -1002,6 +1104,8 @@ XHCI::FreeDescriptor(xhci_td *descriptor)
 	if (descriptor == NULL)
 		return;
 
+	const bool inKDL = debug_debugger_running();
+
 	if (descriptor->trbs != NULL) {
 		fStack->FreeChunk(descriptor->trbs, descriptor->trb_addr,
 			(descriptor->trb_count * sizeof(xhci_trb)));
@@ -1020,10 +1124,19 @@ XHCI::FreeDescriptor(xhci_td *descriptor)
 					descriptor->buffer_size);
 			}
 		}
-		free(descriptor->buffers);
+
+		if (!inKDL) {
+			free(descriptor->buffers);
+		} else {
+			fStack->FreeChunk(descriptor->buffers, 0,
+				descriptor->buffer_count * (sizeof(void*) + sizeof(phys_addr_t)));
+		}
 	}
 
-	delete descriptor;
+	if (!inKDL)
+		free(descriptor);
+	else
+		fStack->FreeChunk(descriptor, 0, sizeof(xhci_td));
 }
 
 
@@ -1548,7 +1661,9 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		return B_NO_INIT;
 	}
 
-	MutexLocker endpointLocker(endpoint->lock);
+	// Use mutex_trylock first, in case we are in KDL.
+	if (mutex_trylock(&endpoint->lock) != B_OK)
+		mutex_lock(&endpoint->lock);
 
 	// We will be modifying 2 TRBs as part of linking a new descriptor:
 	// the "current" TRB (which will link to the passed descriptor), and
@@ -1556,6 +1671,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	// likely used it before.) Hence the "+ 1" in this check.
 	if ((endpoint->used + 1) >= XHCI_MAX_TRANSFERS) {
 		TRACE_ERROR("_LinkDescriptorForPipe max transfers count exceeded\n");
+		mutex_unlock(&endpoint->lock);
 		return B_BAD_VALUE;
 	}
 
@@ -1594,6 +1710,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		B_LENDIAN_TO_HOST_INT32(endpoint->trbs[current].dwtrb3));
 
 	endpoint->current = next;
+	mutex_unlock(&endpoint->lock);
 	return B_OK;
 }
 
@@ -2096,7 +2213,10 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 
 	xhci_device *device = &fDevices[slot];
 	xhci_endpoint *endpoint = &device->endpoints[endpointNumber - 1];
-	MutexLocker endpointLocker(endpoint->lock);
+
+	// Use mutex_trylock first, in case we are in KDL.
+	if (mutex_trylock(&endpoint->lock) != B_OK)
+		mutex_lock(&endpoint->lock);
 
 	addr_t source = trb->qwtrb0;
 	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
@@ -2115,25 +2235,28 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		// We really care about the properly last TRB, at index "count - 1".
 		if (offset == td->trb_used - 1) {
 			_UnlinkDescriptorForPipe(td, endpoint);
-			endpointLocker.Unlock();
+			mutex_unlock(&endpoint->lock);
 
 			td->trb_completion_code = completionCode;
 			td->trb_left = remainder;
 
 			// add descriptor to finished list
-			mutex_lock(&fFinishedLock);
+			if (mutex_trylock(&fFinishedLock) != B_OK)
+				mutex_lock(&fFinishedLock);
 			td->next = fFinishedHead;
 			fFinishedHead = td;
 			mutex_unlock(&fFinishedLock);
 
-			release_sem(fFinishTransfersSem);
+			release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 			TRACE("HandleTransferComplete td %p done\n", td);
 		} else {
+			mutex_unlock(&endpoint->lock);
 			TRACE_ERROR("TRB %" B_PRIxADDR " was found, but it wasn't the "
 				"last in the TD!\n", source);
 		}
 		return;
 	}
+	mutex_unlock(&endpoint->lock);
 	TRACE_ERROR("TRB 0x%" B_PRIxADDR " was not found in the endpoint!\n", source);
 }
 
@@ -2376,7 +2499,9 @@ XHCI::CompleteEvents()
 void
 XHCI::ProcessEvents()
 {
-	MutexLocker _(fEventLock);
+	// Use mutex_trylock first, in case we are in KDL.
+	if (mutex_trylock(&fEventLock) != B_OK)
+		mutex_lock(&fEventLock);
 
 	uint16 i = fEventIdx;
 	uint8 j = fEventCcs;
@@ -2423,6 +2548,8 @@ XHCI::ProcessEvents()
 	addr |= ERST_EHB;
 	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr);
 	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(addr >> 32));
+
+	mutex_unlock(&fEventLock);
 }
 
 
