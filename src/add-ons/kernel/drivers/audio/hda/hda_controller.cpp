@@ -356,53 +356,58 @@ hda_interrupt_handler(hda_controller* controller)
 static status_t
 reset_controller(hda_controller* controller)
 {
-	// stop streams
+	uint32 control = controller->Read32(HDAC_GLOBAL_CONTROL);
+	if ((control & GLOBAL_CONTROL_RESET) != 0) {
+		controller->Write32(HDAC_INTR_CONTROL, 0);
 
-	for (uint32 i = 0; i < controller->num_input_streams; i++) {
-		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
-			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
-		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
-			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
-	}
-	for (uint32 i = 0; i < controller->num_output_streams; i++) {
-		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
-			+ HDAC_OUTPUT_STREAM_OFFSET(controller, i), 0);
-		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
-			+ HDAC_OUTPUT_STREAM_OFFSET(controller, i), 0);
-	}
-	for (uint32 i = 0; i < controller->num_bidir_streams; i++) {
-		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
-			+ HDAC_BIDIR_STREAM_OFFSET(controller, i), 0);
-		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
-			+ HDAC_BIDIR_STREAM_OFFSET(controller, i), 0);
-	}
+		// stop streams
 
-	// stop DMA
-	controller->ReadModifyWrite8(HDAC_CORB_CONTROL, HDAC_CORB_CONTROL_MASK, 0);
-	controller->ReadModifyWrite8(HDAC_RIRB_CONTROL, HDAC_RIRB_CONTROL_MASK, 0);
+		for (uint32 i = 0; i < controller->num_input_streams; i++) {
+			controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
+				+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+			controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
+				+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+		}
+		for (uint32 i = 0; i < controller->num_output_streams; i++) {
+			controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
+				+ HDAC_OUTPUT_STREAM_OFFSET(controller, i), 0);
+			controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
+				+ HDAC_OUTPUT_STREAM_OFFSET(controller, i), 0);
+		}
+		for (uint32 i = 0; i < controller->num_bidir_streams; i++) {
+			controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
+				+ HDAC_BIDIR_STREAM_OFFSET(controller, i), 0);
+			controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
+				+ HDAC_BIDIR_STREAM_OFFSET(controller, i), 0);
+		}
 
-	uint8 corbControl = 0;
-	uint8 rirbControl = 0;
-	for (int timeout = 0; timeout < 10; timeout++) {
-		snooze(100);
+		// stop DMA
+		controller->ReadModifyWrite8(HDAC_CORB_CONTROL, HDAC_CORB_CONTROL_MASK, 0);
+		controller->ReadModifyWrite8(HDAC_RIRB_CONTROL, HDAC_RIRB_CONTROL_MASK, 0);
 
-		corbControl = controller->Read8(HDAC_CORB_CONTROL);
-		rirbControl = controller->Read8(HDAC_RIRB_CONTROL);
-		if (corbControl == 0 && rirbControl == 0)
-			break;
+		uint8 corbControl = 0;
+		uint8 rirbControl = 0;
+		for (int timeout = 0; timeout < 10; timeout++) {
+			snooze(100);
+
+			corbControl = controller->Read8(HDAC_CORB_CONTROL);
+			rirbControl = controller->Read8(HDAC_RIRB_CONTROL);
+			if (corbControl == 0 && rirbControl == 0)
+				break;
+		}
+		if (corbControl != 0 || rirbControl != 0) {
+			dprintf("hda: unable to stop dma\n");
+			return B_BUSY;
+		}
+
+		// reset DMA position buffer
+		controller->Write32(HDAC_DMA_POSITION_BASE_LOWER, 0);
+		controller->Write32(HDAC_DMA_POSITION_BASE_UPPER, 0);
+
+		control = controller->Read32(HDAC_GLOBAL_CONTROL);
 	}
-	if (corbControl != 0 || rirbControl != 0) {
-		dprintf("hda: unable to stop dma\n");
-		return B_BUSY;
-	}
-
-	// reset DMA position buffer
-	controller->Write32(HDAC_DMA_POSITION_BASE_LOWER, 0);
-	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER, 0);
 
 	// Set reset bit - it must be asserted for at least 100us
-
-	uint32 control = controller->Read32(HDAC_GLOBAL_CONTROL);
 	controller->Write32(HDAC_GLOBAL_CONTROL, control & ~GLOBAL_CONTROL_RESET);
 
 	for (int timeout = 0; timeout < 10; timeout++) {
@@ -416,6 +421,9 @@ reset_controller(hda_controller* controller)
 		dprintf("hda: unable to reset controller\n");
 		return B_BUSY;
 	}
+
+	// Wait for codec PLL to lock at least 100us, section 5.5.1.2
+	snooze(1000);
 
 	// Unset reset bit
 
