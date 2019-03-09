@@ -2223,7 +2223,9 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		// The TRB at offset trb_used will be the link TRB, which we do not
 		// care about (and should not generate an interrupt at all.)
 		// We really care about the properly last TRB, at index "count - 1".
-		if (offset == td->trb_used - 1) {
+		// Additionally, if we have an unsuccessful completion code, the transfer
+		// likely failed midway; so just accept it anyway.
+		if (offset == (td->trb_used - 1) || completionCode != COMP_SUCCESS) {
 			_UnlinkDescriptorForPipe(td, endpoint);
 			mutex_unlock(&endpoint->lock);
 
@@ -2241,8 +2243,8 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			TRACE("HandleTransferComplete td %p done\n", td);
 		} else {
 			mutex_unlock(&endpoint->lock);
-			TRACE_ERROR("TRB %" B_PRIxADDR " was found, but it wasn't the "
-				"last in the TD!\n", source);
+			TRACE_ERROR("successful TRB %" B_PRIxADDR " was found, but it wasn't "
+				"the last in the TD!\n", source);
 		}
 		return;
 	}
