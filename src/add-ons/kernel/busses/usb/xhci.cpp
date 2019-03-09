@@ -697,8 +697,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) != 0;
 
 	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
-	uint8 id = XHCI_ENDPOINT_ID(pipe);
-	if (id >= XHCI_MAX_ENDPOINTS) {
+	if (endpoint == NULL) {
 		TRACE_ERROR("invalid endpoint!\n");
 		return B_BAD_VALUE;
 	}
@@ -767,15 +766,6 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	}
 	TRACE("SubmitControlRequest() request linked\n");
 
-	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
-	Ring(endpoint->device->slot, id);
-	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
 	return B_OK;
 }
 
@@ -786,8 +776,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	TRACE("SubmitNormalRequest() length %ld\n", transfer->DataLength());
 
 	Pipe *pipe = transfer->TransferPipe();
-	uint8 id = XHCI_ENDPOINT_ID(pipe);
-	if (id >= XHCI_MAX_ENDPOINTS)
+	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
+	if (endpoint == NULL)
 		return B_BAD_VALUE;
 	bool directionIn = (pipe->Direction() == Pipe::In);
 
@@ -855,7 +845,6 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		WriteDescriptor(td, transfer->Vector(), transfer->VectorCount());
 	}
 
-	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
 	td->transfer = transfer;
 	status = _LinkDescriptorForPipe(td, endpoint);
 	if (status != B_OK) {
@@ -864,15 +853,6 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	}
 	TRACE("SubmitNormalRequest() request linked\n");
 
-	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
-	Ring(endpoint->device->slot, id);
-	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1),
-		_ReadContext(&endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2));
 	return B_OK;
 }
 
@@ -976,22 +956,20 @@ XHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
 	TRACE("pipe change %d for pipe %p (%d)\n", change, pipe,
 		pipe->EndpointAddress());
-	switch (change) {
-		case USB_CHANGE_CREATED:
-			_InsertEndpointForPipe(pipe);
-			break;
-		case USB_CHANGE_DESTROYED:
-			_RemoveEndpointForPipe(pipe);
-			break;
 
-		case USB_CHANGE_PIPE_POLICY_CHANGED: {
-			// ToDo: for isochronous pipes we might need to adapt to new
-			// pipe policy settings here
-			break;
-		}
+	switch (change) {
+	case USB_CHANGE_CREATED:
+		return _InsertEndpointForPipe(pipe);
+	case USB_CHANGE_DESTROYED:
+		return _RemoveEndpointForPipe(pipe);
+
+	case USB_CHANGE_PIPE_POLICY_CHANGED:
+		// We don't care about these, at least for now.
+		return B_OK;
 	}
 
-	return B_OK;
+	TRACE_ERROR("unknown pipe change!\n");
+	return B_UNSUPPORTED;
 }
 
 
@@ -1367,7 +1345,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	mutex_init(&device->endpoints[0].lock, "xhci endpoint lock");
 	device->endpoints[0].device = device;
-	device->endpoints[0].max_packet_size = maxPacketSize;
+	device->endpoints[0].id = 0;
 	device->endpoints[0].td_head = NULL;
 	device->endpoints[0].used = 0;
 	device->endpoints[0].current = 0;
@@ -1447,8 +1425,6 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		_WriteContext(&device->input_ctx->input.dropFlags, 0);
 		_WriteContext(&device->input_ctx->input.addFlags, (1 << 1));
 		EvaluateContext(device->input_ctx_addr, device->slot);
-
-		device->endpoints[0].max_packet_size = deviceDescriptor.max_packet_size_0;
 	}
 
 	Device *deviceObject = NULL;
@@ -1557,10 +1533,11 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		return B_OK;
 	if (device == NULL) {
 		panic("_InsertEndpointForPipe device is NULL\n");
-		return B_OK;
+		return B_NO_INIT;
 	}
 
-	uint8 id = XHCI_ENDPOINT_ID(pipe) - 1;
+	uint8 id = (2 * pipe->EndpointAddress()
+		+ (pipe->Direction() != Pipe::Out ? 1 : 0)) - 1;
 	if (id >= XHCI_MAX_ENDPOINTS - 1)
 		return B_BAD_VALUE;
 
@@ -1578,7 +1555,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		MutexLocker endpointLocker(device->endpoints[id].lock);
 
 		device->endpoints[id].device = device;
-		device->endpoints[id].max_packet_size = pipe->MaxPacketSize();
+		device->endpoints[id].id = id;
 		device->endpoints[id].td_head = NULL;
 		device->endpoints[id].used = 0;
 		device->endpoints[id].current = 0;
@@ -1711,6 +1688,19 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 	endpoint->current = next;
 	mutex_unlock(&endpoint->lock);
+
+	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
+		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].dwendpoint0),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].dwendpoint1),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].qwendpoint2));
+
+	Ring(endpoint->device->slot, endpoint->id + 1);
+
+	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
+		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].dwendpoint0),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].dwendpoint1),
+		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].qwendpoint2));
+
 	return B_OK;
 }
 
@@ -2586,7 +2576,6 @@ XHCI::FinishTransfers()
 
 			Transfer* transfer = td->transfer;
 			bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
-			usb_request_data *requestData = transfer->RequestData();
 
 			status_t callbackStatus = B_OK;
 			switch (td->trb_completion_code) {
@@ -2615,24 +2604,16 @@ XHCI::FinishTransfers()
 
 			size_t actualLength = 0;
 			if (callbackStatus == B_OK) {
-				actualLength = requestData != NULL ? requestData->Length
-					: transfer->DataLength();
+				actualLength = transfer->DataLength();
 
 				if (td->trb_completion_code == COMP_SHORT_PACKET)
 					actualLength -= td->trb_left;
 
 				if (directionIn && actualLength > 0) {
-					if (requestData) {
-						TRACE("copying in data %d bytes\n", requestData->Length);
-						transfer->PrepareKernelAccess();
-						memcpy((uint8 *)transfer->Vector()[0].iov_base,
-							td->buffers[0], requestData->Length);
-					} else {
-						TRACE("copying in iov count %ld\n", transfer->VectorCount());
-						transfer->PrepareKernelAccess();
-						ReadDescriptor(td, transfer->Vector(),
-							transfer->VectorCount());
-					}
+					TRACE("copying in iov count %ld\n", transfer->VectorCount());
+					transfer->PrepareKernelAccess();
+					ReadDescriptor(td, transfer->Vector(),
+						transfer->VectorCount());
 				}
 			}
 			transfer->Finished(callbackStatus, actualLength);

@@ -56,7 +56,7 @@ typedef struct xhci_endpoint {
 	mutex 			lock;
 
 	xhci_device*	device;
-	size_t			max_packet_size;
+	uint8			id;
 
 	xhci_td*		td_head;
 	uint8			used;

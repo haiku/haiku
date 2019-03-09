@@ -451,8 +451,4 @@ struct xhci_device_ctx {
 };
 
 
-#define XHCI_ENDPOINT_ID(pipe)	(2 * pipe->EndpointAddress()	\
-		+ (pipe->Direction() != Pipe::Out ? 1 : 0))
-
-
 #endif // !XHCI_HARDWARE_H
