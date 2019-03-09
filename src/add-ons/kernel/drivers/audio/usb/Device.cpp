@@ -168,13 +168,12 @@ Device::Control(uint32 op, void* buffer, size_t length)
 
 		case B_MULTI_GET_ENABLED_CHANNELS:
 		{
-			multi_channel_enable* data = (multi_channel_enable*)buffer;
 			multi_channel_enable enable;
 			uint32 enable_bits;
 			uchar* orig_enable_bits;
 
-			if (user_memcpy(&enable, data, sizeof(enable)) != B_OK
-				|| !IS_USER_ADDRESS(enable.enable_bits)) {
+			if (user_memcpy(&enable, buffer, sizeof(enable)) != B_OK
+					|| !IS_USER_ADDRESS(enable.enable_bits)) {
 				return B_BAD_ADDRESS;
 			}
 
@@ -229,7 +228,7 @@ Device::Control(uint32 op, void* buffer, size_t length)
 
 			status_t status = _MultiGetGlobalFormat(&info);
 			if (status != B_OK)
-				return B_OK;
+				return status;
 			if (user_memcpy(buffer, &info, sizeof(multi_format_info)) != B_OK)
 				return B_BAD_ADDRESS;
 			return B_OK;
@@ -242,7 +241,7 @@ Device::Control(uint32 op, void* buffer, size_t length)
 
 			status_t status = _MultiSetGlobalFormat(&info);
 			if (status != B_OK)
-				return B_OK;
+				return status;
 			return user_memcpy(buffer, &info, sizeof(multi_format_info));
 		}
 		case B_MULTI_GET_CHANNEL_FORMATS:
@@ -254,10 +253,28 @@ Device::Control(uint32 op, void* buffer, size_t length)
 			return B_ERROR;
 
 		case B_MULTI_GET_MIX:
-			return _MultiGetMix((multi_mix_value_info*)buffer);
+		case B_MULTI_SET_MIX: {
+			multi_mix_value_info info;
+			if (user_memcpy(&info, buffer, sizeof(multi_mix_value_info)) != B_OK)
+				return B_BAD_ADDRESS;
 
-		case B_MULTI_SET_MIX:
-			return _MultiSetMix((multi_mix_value_info*)buffer);
+			multi_mix_value* originalValues = info.values;
+			size_t mixValueSize = info.item_count * sizeof(multi_mix_value);
+			multi_mix_value* values = (multi_mix_value*)alloca(mixValueSize);
+			if (user_memcpy(values, info.values, mixValueSize) != B_OK)
+				return B_BAD_ADDRESS;
+			info.values = values;
+
+			status_t status;
+			if (op == B_MULTI_GET_MIX)
+				status = _MultiGetMix(&info);
+			else
+				status = _MultiSetMix(&info);
+			if (status != B_OK)
+				return status;
+			// the multi_mix_value_info is not modified
+			return user_memcpy(originalValues, values, mixValueSize);
+		}
 
 		case B_MULTI_LIST_MIX_CHANNELS:
 			TRACE(ERR, "B_MULTI_LIST_MIX_CHANNELS n/i\n");
