@@ -652,10 +652,7 @@ mutex_switch_lock(mutex* from, mutex* to)
 {
 	InterruptsSpinLocker locker(to->lock);
 
-#if !KDEBUG
-	if (atomic_add(&from->count, 1) < -1)
-#endif
-		_mutex_unlock(from);
+	mutex_unlock(from);
 
 	return mutex_lock_threads_locked(to, &locker);
 }
@@ -802,8 +799,10 @@ _mutex_trylock(mutex* lock)
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
 	}
-#endif
 	return B_WOULD_BLOCK;
+#else
+	return mutex_trylock(lock);
+#endif
 }
 
 
