@@ -13,6 +13,8 @@ for architectureObject in [ MultiArchSubDirSetup sparc ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
+			byteorder.S
+
 			stack_frame.c
 			system_time.c
 			thread.c
