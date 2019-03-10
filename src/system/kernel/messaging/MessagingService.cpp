@@ -200,7 +200,8 @@ MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
 	}
 
 	// init the command
-	BytePointer<messaging_command> command((char*)fHeader + commandOffset);
+	BytePointer<messaging_command> command(fHeader);
+	command += commandOffset;
 	command->next_command = 0;
 	command->command = commandWhat;
 	command->size = size;
@@ -243,7 +244,8 @@ MessagingArea::_CheckCommand(int32 offset, int32 &size)
 	}
 
 	// get and check size
-	BytePointer<messaging_command> command((char*)fHeader + offset);
+	BytePointer<messaging_command> command(fHeader);
+	command += offset;
 	size = command->size;
 	if (size < (int32)sizeof(messaging_command))
 		return NULL;
