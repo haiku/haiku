@@ -17,6 +17,7 @@ resource(4, "META:EXTENS") message(234) {
 	"extensions" = "cc",
 	"extensions" = "cpp",
 	"extensions" = "cs",
+	"extensions" = "cxx",
 	"extensions" = "e",
 	"extensions" = "go",
 	"extensions" = "h",
@@ -29,6 +30,7 @@ resource(4, "META:EXTENS") message(234) {
 	"extensions" = "jsp",
 	"extensions" = "lua",
 	"extensions" = "pas",
+	"extensions" = "m",
 	"extensions" = "php",
 	"extensions" = "pl",
 	"extensions" = "pp",
@@ -39,6 +41,7 @@ resource(4, "META:EXTENS") message(234) {
 	"extensions" = "S",
 	"extensions" = "swift",
 	"extensions" = "sql",
+	"extensions" = "tcl",
 	"extensions" = "toml",
 	"extensions" = "yaml",
 	"type" = "text/x-source-code"
