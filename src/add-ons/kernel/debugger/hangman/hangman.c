@@ -283,9 +283,8 @@ play_hangman(void)
 						while (*str) {
 							if (!(BIT_FROM_LETTER(*str) & tried_letters))
 								gotit=0;
-							if (*str == try) {
+							if (try == *str)
 								gotone = 1;
-							}
 							str++;
 						}
 					}

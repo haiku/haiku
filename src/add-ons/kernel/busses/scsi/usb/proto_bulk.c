@@ -218,7 +218,7 @@ read_status(usb_device_info *udi, usb_mass_CSW* csw, int transfer_len)
 	int try = 0;
 	do{
 		status = queue_bulk(udi, csw, CSW_LENGTH, true);
-		if(0 == try){
+		if(try == 0){
 			if(B_OK != status || B_OK != udi->status){
 				status = (*udi->usb_m->clear_feature)(udi->pipe_in, USB_FEATURE_ENDPOINT_HALT);
 				if(status != 0){

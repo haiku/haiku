@@ -614,7 +614,6 @@ supports_device(device_node* parent)
 
 	if (strcmp(bus, "pci") != 0)
 		return 0.0f;
-	}
 
 	if (type == PCI_base_peripheral) {
 		if (subType != PCI_sd_host)

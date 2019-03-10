@@ -124,8 +124,8 @@ spawn_device(usb_device usb_dev)
 	}
 	release_sem_etc(dev_table_sem, 1, B_DO_NOT_RESCHEDULE);
 
-	// In the case we cannot us
-	if (bt_usb_devices[i] != new_bt_dev) {
+	// In the case we cannot find a free slot
+	if (i >= MAX_BT_GENERIC_USB_DEVICES) {
 		ERROR("%s: Device could not be added\n", __func__);
 		goto bail2;
 	}
