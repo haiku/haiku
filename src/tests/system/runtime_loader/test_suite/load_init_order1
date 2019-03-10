@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# program
+# <- liba.so
+# Expected: preinit function in program runs before constructor in liba.so.
+
+
+. ./test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+extern int i;
+void __attribute__((constructor)) a() { i = 2 * i + 1; }
+EOI
+
+# build
+compile_lib -o liba.so liba.c
+
+# create program
+cat > program.c << EOI
+
+int i = 1;
+
+void b() { i = 4 * i + 1; }
+
+int
+main()
+{
+	return i;
+}
+
+__attribute__((section(".preinit_array"), used))
+void (*__local_b_preinit)(void) = b;
+
+EOI
+
+# build
+compile_program -o program program.c ./liba.so -pie
+
+# run
+test_run_ok ./program 11
+

@@ -228,6 +228,12 @@ init_dependencies(image_t *image, bool initHead)
 	image_t **initList;
 	ssize_t count, i;
 
+	if (initHead && image->preinit_array) {
+		uint count_preinit = image->preinit_array_len / sizeof(addr_t);
+		for (uint j = 0; j < count_preinit; j++)
+			((initfini_array_function)image->preinit_array[j])();
+	}
+
 	count = get_sorted_image_list(image, &initList, RFLAG_INITIALIZED);
 	if (count <= 0)
 		return;
@@ -243,12 +249,6 @@ init_dependencies(image_t *image, bool initHead)
 		image = initList[i];
 
 		TRACE(("%ld:  init: %s\n", find_thread(NULL), image->name));
-
-		if (image->preinit_array) {
-			uint count_preinit = image->preinit_array_len / sizeof(addr_t);
-			for (uint j = 0; j < count_preinit; j++)
-				((initfini_array_function)image->preinit_array[j])();
-		}
 
 		init_term_function before;
 		if (find_symbol(image,
