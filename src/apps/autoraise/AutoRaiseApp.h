@@ -9,8 +9,6 @@
 
 
 class AutoRaiseApp: public BApplication{
-	protected:
-		bool _directToDeskbar;
 
 	public:
 		AutoRaiseApp();
@@ -22,7 +20,8 @@ class AutoRaiseApp: public BApplication{
 		void PutInTray(bool);
 
 	private:
-		BString usageNote;
+		bool fPersist;
+		bool fDone;
 };
 
 #endif
