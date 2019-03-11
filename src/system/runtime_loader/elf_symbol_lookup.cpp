@@ -377,15 +377,8 @@ find_undefined_symbol_global(image_t* rootImage, image_t* image,
 					&& (otherImage->flags
 						& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0)) {
 			if (elf_sym* symbol = find_symbol(otherImage, lookupInfo)) {
-				if (symbol->Bind() != STB_WEAK) {
-					*_foundInImage = otherImage;
-					return symbol;
-				}
-
-				if (candidateSymbol == NULL) {
-					candidateSymbol = symbol;
-					candidateImage = otherImage;
-				}
+				*_foundInImage = otherImage;
+				return symbol;
 			}
 		}
 		otherImage = otherImage->next;

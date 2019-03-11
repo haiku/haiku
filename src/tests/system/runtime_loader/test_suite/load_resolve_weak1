@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# program
+# <- liba.so
+#
+# Expected: Weak symbol in liba.so resolves to symbol in program,
+# not to symbol in liba.so.
+
+
+. ./test_setup
+
+
+# create liba.so
+cat > liba.c << EOI
+int __attribute__((weak)) c() { return 2; }
+int __attribute__((weak)) a() { return c(); }
+int (*a_p)() = &c;
+int b() { return (*a_p)(); }
+EOI
+
+# build
+compile_lib -o liba.so liba.c
+
+# create program
+cat > program.c << EOI
+extern int a();
+extern int b();
+
+int c()
+{
+	return 4;
+}
+
+int
+main()
+{
+	return a() + b();
+}
+EOI
+
+# build
+compile_program -o program program.c ./liba.so
+
+# run
+test_run_ok ./program 8
+

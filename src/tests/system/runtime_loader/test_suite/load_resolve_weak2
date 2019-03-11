@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# program
+# <- liba.so
+#   <- libb.so
+# <- libb.so
+# Expected: symbol in program resolves to weak alias in liba.so,
+# not to symbol in libb.so.
+
+
+. ./test_setup
+
+
+# create libb.so
+cat > libb.c << EOI
+int a() { return 4; }
+EOI
+
+# build
+compile_lib -o libb.so libb.c
+
+
+# create liba.so
+cat > liba.c << EOI
+int __a() { return 2; }
+int a() __attribute__((weak, alias("__a")));
+EOI
+
+# build
+compile_lib -o liba.so liba.c ./libb.so
+
+# create program
+cat > program.c << EOI
+extern int a();
+
+int
+main()
+{
+	return a();
+}
+EOI
+
+# build
+compile_program -o program program.c ./liba.so ./libb.so
+
+# run
+test_run_ok ./program 2
+
