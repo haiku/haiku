@@ -16,7 +16,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_APPS += [ FFilterByBuildFeatures
-	ActivityMonitor
+	ActivityMonitor AutoRaise
 	CodyCam
 	GLInfo@mesa
 	HaikuDepot
