@@ -1,3 +1,4 @@
+//#define DEBUG 1
 #include <BeBuild.h>
 
 #include "AutoRaiseIcon.h"
@@ -418,22 +419,25 @@ int32 poller(void *arg)
 
 		tl = get_token_list(-1, &tlc);
 		for (i=0; i<tlc; i++) {
+			free(wi);
 			wi = get_window_info(tl[i]);
 			if (wi) {
+PRINT(("wi [%ld] = %p, %ld %s\n", i, wi, wi->layer, ((struct client_window_info *)wi)->name));
 				if (wi->layer < 3) // we hit the desktop or a window not on this WS
-					goto zzz;
+					continue;
 				if ((wi->window_left > wi->window_right) || (wi->window_top > wi->window_bottom))
-					goto zzz; // invalid window ?
-/*
-printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi->is_mini?"true":"false",
+					continue; // invalid window ?
+				if (wi->is_mini)
+					continue;
+
+PRINT(("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) \n", wi->is_mini?"true":"false",
 	(long)mouse.x, (long)mouse.y, i, wi->window_left, wi->window_right,
-	wi->window_top, wi->window_bottom, wi-server_token, tok);
-*/
+	wi->window_top, wi->window_bottom, wi->server_token, tok));
 
 
-				if ((!wi->is_mini)
-						&& (((long)mouse.x) > wi->window_left) && (((long)mouse.x) < wi->window_right)
-						&& (((long)mouse.y) > wi->window_top) && (((long)mouse.y) < wi->window_bottom)) {
+
+				if ((((long)mouse.x) > wi->window_left) && (((long)mouse.x) < wi->window_right)
+					&& (((long)mouse.y) > wi->window_top) && (((long)mouse.y) < wi->window_bottom)) {
 //((tv->_settings->Mode() != Mode_DeskbarOver) || (wi->team == tv->fDeskbarTeam))
 
 					if ((tv->_settings->Mode() == Mode_All) && 
