@@ -97,7 +97,7 @@ struct fs_nspace
 	struct fs_node *root; /* fast access for stat time change */
 	struct fs_node *nodes;
 	struct fs_node *queries;
-	vint32 nodecount; /* just for statvfs() */
+	int32 nodecount; /* just for statvfs() */
 	
 	lock l;
 };

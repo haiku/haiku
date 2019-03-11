@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <KernelExport.h>
 #include <OS.h>
 #include "lists2.h"
 
@@ -38,7 +39,7 @@ status_t sll_insert_head(long nextoff, void **head, void *item)
 
 status_t sll_insert_tail(long nextoff, void **head, void *item)
 {
-	void *p, *next = NULL;
+	void *p;
 	if (head == NULL || item == NULL)
 		return EINVAL;
 

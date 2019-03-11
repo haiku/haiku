@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <ctype.h>
 #include <malloc.h>
 #include <string.h>
 #include "string_utils.h"

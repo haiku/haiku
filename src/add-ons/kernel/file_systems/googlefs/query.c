@@ -15,9 +15,11 @@
 #ifdef TESTME
 #include <stdio.h>
 #endif
+#include <stdlib.h>
+#include <string.h>
 // ('foo'<>"bar\"")&&!(()||())
 
-void free_query_tree(query_exp *tree)
+static void free_query_tree(query_exp *tree)
 {
 	if (!tree)
 		return;
@@ -110,15 +112,17 @@ enum pqs_state {
 	QS_
 };
 
+/*
 static const char *parse_qs_r(const char *query, query_exp *tree)
 {
 	int parens = 0;
 	return NULL;
 }
+*/
 
 status_t query_parse(const char *query, query_exp **tree)
 {
-	query_exp *t;
+	//query_exp *t;
 	
 	return B_OK;
 }

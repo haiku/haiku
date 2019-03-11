@@ -41,12 +41,12 @@
 
 KSOCKET_MODULE_DECL;
 
-status_t http_init()
+status_t http_init(void)
 {
 	return ksocket_init();
 }
 
-status_t http_uninit()
+status_t http_uninit(void)
 {
 	return ksocket_cleanup();
 }
@@ -82,7 +82,7 @@ status_t http_delete(struct http_cnx *cnx)
 	}
 	if (cnx->buffer)
 		free(cnx->buffer);
-	cnx->buffer = 0xaa55aa55;//XXX
+	cnx->buffer = (char *)0xaa55aa55;//XXX
 	free(cnx);
 	return B_OK;
 }
@@ -98,7 +98,7 @@ status_t http_connect(struct http_cnx *cnx, struct sockaddr_in *sin)
 	}
 	ip = sin->sin_addr.s_addr;
 	port = sin->sin_port;
-	dprintf("http_connect(, %d.%d.%d.%d:%d), sock = %ld\n", ip & 0xff, (ip >> 8) & 0xff, (ip >> 16) & 0xff, (ip >> 24) & 0xff, ntohs(port), cnx->sock);
+	dprintf("http_connect(, %ld.%ld.%ld.%ld:%d), sock = %d\n", ip & 0xff, (ip >> 8) & 0xff, (ip >> 16) & 0xff, (ip >> 24) & 0xff, ntohs(port), cnx->sock);
 	err = kconnect(cnx->sock, (struct sockaddr *)sin, sin->sin_len);
 	cnx->err = 0;
 	if (err == -1)
@@ -182,7 +182,7 @@ status_t http_get(struct http_cnx *cnx, const char *url)
 	cnx->err = strtol(p, &p, 10);
 	if (cnx->err < 200 || cnx->err > 299)
 		goto err0;
-	printf("REQ: %d\n", cnx->err);
+	printf("REQ: %ld\n", cnx->err);
 	contentlen = len - headerslen;
 //	if (!strstr(req, "\n\n") && !strstr(req, "\r\n\r\n"))
 //		goto err0;

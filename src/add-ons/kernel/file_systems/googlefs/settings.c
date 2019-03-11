@@ -4,7 +4,9 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <driver_settings.h>
+#include <KernelExport.h>
 #include "settings.h"
 
 #define DEFAULT_GOOGLE_SERVER "74.125.136.105"
@@ -18,7 +20,7 @@ bool sync_unlink_queries = false;
 status_t load_settings(void)
 {
 	void *handle;
-	char *val;
+	const char *val;
 	handle = load_driver_settings("googlefs");
 	if (!handle)
 		return ENOENT;

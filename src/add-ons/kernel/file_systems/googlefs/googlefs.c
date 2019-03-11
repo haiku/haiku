@@ -15,6 +15,7 @@
 #include <KernelExport.h>
 //#include <NodeMonitor.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <signal.h>
 #include <string.h>
 #include <fs_query.h>
@@ -39,7 +40,7 @@
 /* needed to get /bin/df tell the mountpoint... */
 #define ALLOW_DIR_OPEN
 
-vint32 refcount = 0;
+int32 refcount = 0;
 
 
 extern struct attr_entry root_folder_attrs[];
@@ -83,10 +84,10 @@ static int googlefs_publish_static_entries(fs_volume *_volume)
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	status_t err = B_OK;
 	fs_node *dir = ns->root;
-	fs_node *n, *dummy;
-	char ename[GOOGLEFS_NAME_LEN];
-	char *p;
-	int i;
+	fs_node *n;// *dummy;
+	//char ename[GOOGLEFS_NAME_LEN];
+	//char *p;
+	//int i;
 	TRACE((PFS"googlefs_publish_static_entries(%ld)\n", ns->nsid));
 	if (!ns || !dir)
 		return EINVAL;
@@ -110,12 +111,14 @@ static int googlefs_publish_static_entries(fs_volume *_volume)
 
 	return B_OK;
 
+/*
 err:
 	TRACE((PFS"push_result_to_query: error 0x%08lx\n", err));
 	return err;
+*/
 }
 
-int googlefs_mount(fs_volume *_vol, const char *devname, uint32 flags,
+static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flags,
 		const char *parms, ino_t *vnid)
 {
 	fs_nspace *ns;
@@ -185,7 +188,7 @@ err_http:
 	return err;
 }
 
-status_t googlefs_unmount(fs_volume *_volume)
+static status_t googlefs_unmount(fs_volume *_volume)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	status_t err;
@@ -233,7 +236,7 @@ static int googlefs_free_vnode(fs_volume *_volume, fs_node *node)
 	return 0;
 }
 
-int googlefs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
+static status_t googlefs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
@@ -264,7 +267,7 @@ TRACE((PFS "SLL_REMOVE(node->parent->children %p, next, %p)\n", node->parent->ch
 	return err;
 }
 
-int googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int* _type, uint32* _flags, bool reenter)
+static status_t googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int* _type, uint32* _flags, bool reenter)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *n;
@@ -288,7 +291,7 @@ int googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int* _t
 	return err;
 }
 
-int googlefs_release_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
+static status_t googlefs_release_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
 	fs_node *node = (fs_node *)_node->private_node;
 	TRACE((PFS "%s(%ld, %Ld, %s)\n", __FUNCTION__, _volume->id, node->vnid, reenter?"r":"!r"));
@@ -302,18 +305,18 @@ static int compare_fs_node_by_name(fs_node *node, char *name)
 	return strncmp(node->name, name, GOOGLEFS_NAME_LEN);
 }
 
-int googlefs_get_vnode_name(fs_volume *_volume, fs_vnode *_node, char *buffer, size_t len)
+static status_t googlefs_get_vnode_name(fs_volume *_volume, fs_vnode *_node, char *buffer, size_t len)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
-	status_t err = B_OK;
+
 	TRACE((PFS "get_vnode_name(%ld, %Ld, )\n", ns->nsid, (int64)(node?node->vnid:-1)));
 	strlcpy(buffer, node->name, MIN(GOOGLEFS_NAME_LEN, len));
 	return B_OK;
 }
 
 
-int googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
+static status_t googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *base = _base->private_node;
@@ -356,7 +359,7 @@ int googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *
 	return err;
 }
 
-int googlefs_opendir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie **cookie)
+static status_t googlefs_opendir(fs_volume *_volume, fs_vnode *_node, void **cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
@@ -377,7 +380,7 @@ int googlefs_opendir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie **cookie
 		c->type = S_IFDIR;
 		c->node = node;
 		c->dir_current = 0;
-		*cookie = c;
+		*cookie = (void *)c;
 		SLL_INSERT(node->opened, next, c);
 		UNLOCK(&node->l);
 		return B_OK;
@@ -387,10 +390,11 @@ int googlefs_opendir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie **cookie
 	return err;
 }
 
-int googlefs_closedir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie)
+static status_t googlefs_closedir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
 	status_t err = B_OK;
 //	node = cookie->node; // work around VFS bug
 	TRACE((PFS "closedir(%ld, %Ld, %p)\n", ns->nsid, node->vnid, cookie));
@@ -404,19 +408,21 @@ int googlefs_closedir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie
 	return err;
 }
 
-int googlefs_rewinddir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie)
+static status_t googlefs_rewinddir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
 	TRACE((PFS "rewinddir(%ld, %Ld)\n", ns->nsid, node->vnid));
 	cookie->dir_current = 0;
 	return B_OK;
 }
 
-int googlefs_readdir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie, struct dirent *buf, size_t bufsize, uint32 *num)
+static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
 	status_t err = B_OK;
 	fs_node *n = NULL;
 	fs_node *parent = node->parent;
@@ -468,10 +474,11 @@ int googlefs_readdir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie,
 	return B_OK;
 }
 
-int googlefs_free_dircookie(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie)
+static status_t googlefs_free_dircookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
 	status_t err = B_OK;
 //	node = cookie->node; // work around VFS bug
 	TRACE((PFS"freedircookie(%ld, %Ld, %p)\n", ns->nsid, node?node->vnid:0LL, cookie));
@@ -484,7 +491,7 @@ int googlefs_free_dircookie(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *
 	return B_OK;
 }
 
-int googlefs_rstat(fs_volume *_volume, fs_vnode *_node, struct stat *st)
+static status_t googlefs_rstat(fs_volume *_volume, fs_vnode *_node, struct stat *st)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
@@ -504,7 +511,7 @@ int googlefs_rstat(fs_volume *_volume, fs_vnode *_node, struct stat *st)
 	return err;
 }
 
-int googlefs_rfsstat(fs_volume *_volume, struct fs_info *info)
+static status_t googlefs_rfsstat(fs_volume *_volume, struct fs_info *info)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	info->block_size=1024;//googlefs_BUFF_SIZE;
@@ -522,12 +529,12 @@ int googlefs_rfsstat(fs_volume *_volume, struct fs_info *info)
 	return B_OK;
 }
 
-int googlefs_open(fs_volume *_volume, fs_vnode *_node, int omode, fs_file_cookie **cookie)
+static status_t googlefs_open(fs_volume *_volume, fs_vnode *_node, int omode, void **cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
-	fs_node *dummy;
+	//fs_node *dummy;
 	fs_file_cookie *fc;
 	TRACE((PFS"open(%ld, %Ld, 0x%x)\n", ns->nsid, node->vnid, omode));
 	if (!node || !cookie)
@@ -560,13 +567,13 @@ int googlefs_open(fs_volume *_volume, fs_vnode *_node, int omode, fs_file_cookie
 	if (err)
 		goto err_getvn;*/
 	//*vnid = node->vnid;
-	*cookie = fc;
+	*cookie = (void *)fc;
 	err = B_OK;
 	goto all_ok;
 //err_:
 //	put_vnode(ns->nsid, node->nsid);
-err_getvn:
-	SLL_REMOVE(node->opened, next, fc);
+//err_getvn:
+//	SLL_REMOVE(node->opened, next, fc);
 err_linsert:
 	free(fc);
 err_malloc:
@@ -577,10 +584,11 @@ err_n_l:
 	return err;
 }
 
-int googlefs_close(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie)
+static status_t googlefs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err;
 	TRACE((PFS"close(%ld, %Ld)\n", ns->nsid, node->vnid));
 	if (!ns || !node || !cookie)
@@ -590,16 +598,17 @@ int googlefs_close(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie)
 		return err;
 	SLL_REMOVE(node->opened, next, cookie);
 
-all_ok:
-err_n_l:
+//all_ok:
+//err_n_l:
 	UNLOCK(&node->l);
 	return err;
 }
 
-int googlefs_free_cookie(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie)
+static status_t googlefs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
 	TRACE((PFS"freecookie(%ld, %Ld)\n", ns->nsid, node->vnid));
 	err = LOCK(&node->l);
@@ -619,11 +628,11 @@ int googlefs_free_cookie(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *co
 	UNLOCK(&node->l);
 	free(cookie);
 //	err = B_OK;
-err_n_l:
+//err_n_l:
 	return err;
 }
 
-int googlefs_read(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, off_t pos, void *buf, size_t *len)
+static status_t googlefs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos, void *buf, size_t *len)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
@@ -640,7 +649,7 @@ int googlefs_read(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, o
 	return B_OK;
 }
 
-int googlefs_write(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, off_t pos, const void *buf, size_t *len)
+static status_t googlefs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos, const void *buf, size_t *len)
 {
 	fs_node *node = (fs_node *)_node->private_node;
 	TRACE((PFS"write(%ld, %Ld, %Ld, %ld)\n", _volume->id, node->vnid, pos, *len));
@@ -648,14 +657,14 @@ int googlefs_write(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, 
 	return ENOSYS;
 }
 
-int googlefs_wstat(fs_volume *_volume, fs_vnode *_node, struct stat *st, long mask)
+static status_t googlefs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask)
 {
 	fs_node *node = (fs_node *)_node->private_node;
 	TRACE((PFS"wstat(%ld, %Ld, , 0x%08lx)\n", _volume->id, node->vnid, mask));
 	return ENOSYS;
 }
 
-int googlefs_wfsstat(fs_volume *_volume, struct fs_info *info, long mask)
+static status_t googlefs_wfsstat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 {
 	TRACE((PFS"wfsstat(%ld, , 0x%08lx)\n", _volume->id, mask));
 	return ENOSYS;
@@ -679,7 +688,7 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	status_t err;
 	fs_node *n;
 	int i;
-	TRACE((PFS"create_gen(%ld, %Ld, '%s', 0x%08lx, %c, %c)\n", ns->nsid, dir->vnid, name, omode, mkdir?'t':'f', uniq?'t':'f'));
+	TRACE((PFS"create_gen(%ld, %Ld, '%s', 0x%08x, %c, %c)\n", ns->nsid, dir->vnid, name, omode, mkdir?'t':'f', uniq?'t':'f'));
 
 	if (strlen(name) > GOOGLEFS_NAME_LEN-1)
 		return ENAMETOOLONG;
@@ -775,20 +784,23 @@ done:
 	return err;
 }
 
-int googlefs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int perms, ino_t *vnid, fs_file_cookie **cookie)
+static status_t googlefs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int perms, void **cookie, ino_t *vnid)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *dir = (fs_node *)_dir->private_node;
 	status_t err;
 	fs_node *n;
-	TRACE((PFS"create(%ld, %Ld, '%s', 0x%08lx)\n", ns->nsid, dir->vnid, name, omode));
+	struct fs_vnode child = { NULL, &sGoogleFSVnodeOps };
+	TRACE((PFS"create(%ld, %Ld, '%s', 0x%08x)\n", ns->nsid, dir->vnid, name, omode));
 	/* don't let ppl mess our fs up */
 	return ENOSYS;
 
 	err = googlefs_create_gen(_volume, dir, name, omode, perms, vnid, &n, NULL, false, false);
 	if (err)
 		return err;
-	err = googlefs_open(ns, n, omode, cookie);
+
+	child.private_node = (void *)n;
+	err = googlefs_open(_volume, &child, omode, cookie);
 	return err;
 }
 
@@ -827,16 +839,16 @@ static int googlefs_unlink_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	return err;
 }
 
-int googlefs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
+static status_t googlefs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 {
-	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
-	fs_node *dir = (fs_node *)_dir->private_node;
+	//fs_nspace *ns = (fs_nspace *)_volume->private_volume;
+	//fs_node *dir = (fs_node *)_dir->private_node;
 	return googlefs_unlink_gen(_volume, (fs_node *)_dir->private_node, name);
 }
 
-int googlefs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
+static status_t googlefs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 {
-	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
+	//fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *dir = (fs_node *)_dir->private_node;
 	TRACE((PFS"rmdir(%ld, %Ld, %s)\n", _volume->id, dir->vnid, name));
 	return googlefs_unlink(_volume, _dir, name);
@@ -865,7 +877,7 @@ static int googlefs_unlink_node_rec(fs_volume *_volume, fs_node *node)
 	return err;
 }
 
-int googlefs_access(fs_volume *_volume, fs_vnode *_node, int mode)
+static status_t googlefs_access(fs_volume *_volume, fs_vnode *_node, int mode)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
@@ -873,10 +885,12 @@ int googlefs_access(fs_volume *_volume, fs_vnode *_node, int mode)
 	return B_OK;
 }
 
-int googlefs_setflags(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, int flags)
+/*
+static int googlefs_setflags(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, int flags)
 {
 	return EINVAL;
 }
+*/
 
 #if 0
 static int googlefs_mkdir_gen(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms, fs_node **node, bool uniq)
@@ -969,17 +983,17 @@ done:
 }
 #endif
 
-int googlefs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
+static status_t googlefs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *dir = (fs_node *)_dir->private_node;
-	TRACE((PFS"mkdir(%ld, %Ld, '%s', 0x%08lx)\n", ns->nsid, dir->vnid, name, perms));
+	TRACE((PFS"mkdir(%ld, %Ld, '%s', 0x%08x)\n", ns->nsid, dir->vnid, name, perms));
 	return googlefs_create_gen(_volume, dir, name, O_EXCL, perms, NULL, NULL, folders_attrs, true, false);
 }
 
 /* attr stuff */
 
-int googlefs_open_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cookie **cookie)
+static status_t googlefs_open_attrdir(fs_volume *_volume, fs_vnode *_node, void **cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
@@ -998,7 +1012,7 @@ int googlefs_open_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cooki
 		c->type = S_ATTR_DIR;
 		c->node = node;
 		c->dir_current = 0;
-		*cookie = c;
+		*cookie = (void *)c;
 		SLL_INSERT(node->opened, next, c);
 		UNLOCK(&node->l);
 		return B_OK;
@@ -1008,10 +1022,11 @@ int googlefs_open_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cooki
 	return err;
 }
 
-int googlefs_close_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cookie *cookie)
+static status_t googlefs_close_attrdir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_attr_dir_cookie *cookie = (fs_attr_dir_cookie *)_cookie;
 	status_t err = B_OK;
 	TRACE((PFS "close_attrdir(%ld, %Ld)\n", ns->nsid, node->vnid));
 	err = LOCK(&node->l);
@@ -1022,10 +1037,11 @@ int googlefs_close_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cook
 	return err;
 }
 
-int googlefs_free_attrdircookie(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cookie *cookie)
+static status_t googlefs_free_attrdircookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_attr_dir_cookie *cookie = (fs_attr_dir_cookie *)_cookie;
 	status_t err = B_OK;
 	TRACE((PFS"free_attrdircookie(%ld, %Ld)\n", ns->nsid, node->vnid));
 	err = LOCK(&node->l);
@@ -1037,22 +1053,24 @@ int googlefs_free_attrdircookie(fs_volume *_volume, fs_vnode *_node, fs_attr_dir
 	return B_OK;
 }
 
-int googlefs_rewind_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cookie *cookie)
+static status_t googlefs_rewind_attrdir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_attr_dir_cookie *cookie = (fs_attr_dir_cookie *)_cookie;
 	TRACE((PFS "rewind_attrdir(%ld, %Ld)\n", ns->nsid, node->vnid));
 	cookie->dir_current = 0;
 	return B_OK;
 }
 
-int googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cookie *cookie, struct dirent *buf, size_t bufsize, uint32 *num)
+static status_t googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
-	fs_node *n = NULL;
-	fs_node *parent = node->parent;
+	//fs_node *n = NULL;
+	//fs_node *parent = node->parent;
 	attr_entry *ae = NULL;
 	int i;
 	int count_indirect;
@@ -1092,12 +1110,12 @@ int googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cooki
  */
 
 /* for Haiku, but also used by BeOS calls to factorize code */
-int googlefs_open_attr_h(fs_volume *_volume, fs_vnode *_node, const char *name, int omode, fs_file_cookie **cookie)
+static status_t googlefs_open_attr_h(fs_volume *_volume, fs_vnode *_node, const char *name, int omode, void **cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
-	fs_node *dummy;
+	//fs_node *dummy;
 	fs_file_cookie *fc;
 	attr_entry *ae = NULL;
 	int i;
@@ -1136,13 +1154,13 @@ int googlefs_open_attr_h(fs_volume *_volume, fs_vnode *_node, const char *name, 
 	if (err)
 		goto err_linsert;
 
-	*cookie = fc;
+	*cookie = (void *)fc;
 	err = B_OK;
 	goto all_ok;
 //err_:
 //	put_vnode(ns->nsid, node->nsid);
-err_getvn:
-	SLL_REMOVE(node->opened, next, fc);
+//err_getvn:
+//	SLL_REMOVE(node->opened, next, fc);
 err_linsert:
 	free(fc);
 err_malloc:
@@ -1153,10 +1171,11 @@ err_n_l:
 	return err;
 }
 
-int googlefs_close_attr_h(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie)
+static status_t googlefs_close_attr_h(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err;
 	TRACE((PFS"close_attr(%ld, %Ld:%s)\n", ns->nsid, node->vnid, cookie->attr?cookie->attr->name:"?"));
 	if (!ns || !node || !cookie)
@@ -1166,16 +1185,17 @@ int googlefs_close_attr_h(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *c
 		return err;
 	SLL_REMOVE(node->opened, next, cookie);
 
-all_ok:
-err_n_l:
+//all_ok:
+//err_n_l:
 	UNLOCK(&node->l);
 	return err;
 }
 
-int googlefs_free_attr_cookie_h(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie)
+static status_t googlefs_free_attr_cookie_h(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
 	TRACE((PFS"free_attrcookie(%ld, %Ld:%s)\n", ns->nsid, node->vnid, cookie->attr?cookie->attr->name:"?"));
 	err = LOCK(&node->l);
@@ -1187,14 +1207,15 @@ int googlefs_free_attr_cookie_h(fs_volume *_volume, fs_vnode *_node, fs_file_coo
 	UNLOCK(&node->l);
 	free(cookie);
 //	err = B_OK;
-err_n_l:
+//err_n_l:
 	return err;
 }
 
-int	googlefs_read_attr_stat(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, struct stat *st)
+static status_t googlefs_read_attr_stat(fs_volume *_volume, fs_vnode *_node, void *_cookie, struct stat *st)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
 	attr_entry *ae = cookie->attr;
 	TRACE((PFS"stat_attr(%ld, %Ld:%s)\n", ns->nsid, node->vnid, ae->name));
@@ -1207,10 +1228,11 @@ int	googlefs_read_attr_stat(fs_volume *_volume, fs_vnode *_node, fs_file_cookie 
 	return err;
 }
 
-int	googlefs_read_attr(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie, off_t pos, void *buf, size_t *len)
+static status_t googlefs_read_attr(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos, void *buf, size_t *len)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
 	attr_entry *ae = cookie->attr;
 	TRACE((PFS"read_attr(%ld, %Ld:%s)\n", ns->nsid, node->vnid, ae->name));
@@ -1249,19 +1271,20 @@ static int compare_fs_node_by_recent_query_string(fs_node *node, char *query)
 	return strcmp(node->request->query_string, query);
 }
 
-int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
-					port_id port, long token, fs_query_cookie **cookie)
+static status_t googlefs_open_query(fs_volume *_volume, const char *query, uint32 flags,
+					port_id port, uint32 token, void **cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	status_t err = B_OK;
 	fs_query_cookie *c;
-	fs_node *qn, *n, *dummy;
+	fs_node *qn, *dummy;
 	const char *p;
+	char *q;
 	char *qstring = NULL;
 	char qname[GOOGLEFS_NAME_LEN];
 	bool accepted = true;
 	bool reused = false;
-	int i;
+	//int i;
 	TRACE((PFS"open_query(%ld, '%s', 0x%08lx, %ld, %ld)\n", ns->nsid, query, flags, port, token));
 //	if (flags & B_LIVE_QUERY)
 //		return ENOSYS; /* no live query yet, they are live enough anyway */
@@ -1304,7 +1327,7 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	if (!accepted) {
 		free(qstring);
 		/* return an empty cookie */
-		*cookie = c;
+		*cookie = (void *)c;
 		return B_OK;
 	}
 	TRACE((PFS"open_query: QUERY: '%s'\n", qstring));
@@ -1330,9 +1353,9 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	qname[GOOGLEFS_NAME_LEN-1] = '\0';
 
 	/* strip out slashes */
-	p = qname;
-	while ((p = strchr(p, '/')))
-		strcpy(p, p + 1);
+	q = qname;
+	while ((q = strchr(q, '/')))
+		strcpy(q, q + 1);
 
 	/* should get/put_vnode(ns->root); around that I think... */
 	err = googlefs_create_gen(_volume, ns->root, qname, 0, 0755, NULL, &qn, folders_attrs, true, true);
@@ -1385,11 +1408,11 @@ reuse:
 	SLL_INSERT(qn->opened, next, c);
 	UNLOCK(&qn->l);
 	qn->qcompleted = 1; /* tell other cookies we're done */
-	*cookie = c;
+	*cookie = (void *)c;
 	free(qstring);
 	return B_OK;
 
-err_grp:
+//err_grp:
 err_gro:
 	if (qn->request)
 		google_request_close(qn->request);
@@ -1400,17 +1423,18 @@ err_mkdir:
 		googlefs_unlink_gen(_volume, ns->root, qn->name);
 err_qs:
 	free(qstring);
-err_m:
+//err_m:
 	free(c);
 	TRACE((PFS"open_query: error 0x%08lx\n", err));
 	return err;
 }
 
-int googlefs_close_query(fs_volume *_volume, fs_query_cookie *cookie)
+static status_t googlefs_close_query(fs_volume *_volume, void *_cookie)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
+	fs_query_cookie *cookie = (fs_query_cookie *)_cookie;
 	status_t err;
-	fs_node *q, *n;
+	fs_node *q;
 	TRACE((PFS"close_query(%ld, %Ld)\n", ns->nsid, cookie->node?cookie->node->vnid:0LL));
 	//return ENOSYS;
 	q = cookie->node;
@@ -1432,8 +1456,9 @@ int googlefs_close_query(fs_volume *_volume, fs_query_cookie *cookie)
 
 #ifdef __HAIKU__
 /* protos are different... */
-int googlefs_free_query_cookie(fs_volume *_volume, fs_dir_cookie *cookie)
+static status_t googlefs_free_query_cookie(fs_volume *_volume, void *_cookie)
 {
+	fs_query_cookie *cookie = (fs_query_cookie *)_cookie;
 	status_t err = B_OK;
 	fs_node *q;
 	TRACE((PFS"free_query_cookie(%ld)\n", _volume->id));
@@ -1456,9 +1481,10 @@ no_node:
 }
 #endif
 
-int	googlefs_read_query(fs_volume *_volume, fs_query_cookie *cookie, struct dirent *buf, size_t bufsize, uint32 *num)
+static status_t googlefs_read_query(fs_volume *_volume, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
+	fs_query_cookie *cookie = (fs_query_cookie *)_cookie;
 	status_t err = B_OK;
 	fs_node *n = NULL;
 	fs_node *node = cookie->node;
@@ -1498,11 +1524,11 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 	fs_volume *_volume = request->volume;
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *qn = request->query_node;
-	fs_node *n, *dummy;
+	fs_node *n;
 	char ename[GOOGLEFS_NAME_LEN];
 	char *p;
 	int i;
-	TRACE((PFS"push_result_to_query(%ld, %Ld, %d:'%s')\n", ns->nsid, qn->vnid, result->id, result->name));
+	TRACE((PFS"push_result_to_query(%ld, %Ld, %ld:'%s')\n", ns->nsid, qn->vnid, result->id, result->name));
 	//dprintf(PFS"push_result_to_query(%ld, %Ld, %d:'%s')\n", ns->nsid, qn->vnid, result->id, result->name);
 	//return ENOSYS;
 	if (!ns || !qn)
@@ -1575,7 +1601,6 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 	UNLOCK(&n->l);
 	return B_OK;
 
-err:
 	TRACE((PFS"push_result_to_query: error 0x%08lx\n", err));
 	return err;
 }

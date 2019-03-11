@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <OS.h>
+#include <KernelExport.h>
 #include "google_request.h"
 #include "string_utils.h"
 
@@ -87,7 +88,7 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 	printf(DBG"parsing...\n");
 	do {
 		char *item;
-		long itemlen;
+		unsigned long itemlen;
 		char *tmp;
 		char *urlp;
 		int i;
@@ -218,7 +219,7 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 				printf(DBG"[%ld] cache/sim beyond next\n", numres);
 				p = nextresult; /* reset */
 			} else if (q && (!nextresult || (q < nextresult))) {
-				int iscache;
+				//int iscache;
 				p = q;
 				p+= strlen(G_BEGIN_CACHESIM);
 				//printf(DBG"[%ld] found token 6\n", numres);

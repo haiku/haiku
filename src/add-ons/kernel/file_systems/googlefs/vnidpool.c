@@ -39,7 +39,7 @@ status_t vnidpool_alloc(struct vnidpool **pool, size_t size)
 }
 
 status_t vnidpool_free(struct vnidpool *pool) {
-	int i;
+	unsigned int i;
 	dprintf("vnidpool_free: pool @ %p\n", pool);
 	if (!pool)
 		return EINVAL;

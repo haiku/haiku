@@ -39,4 +39,6 @@ extern status_t google_request_close(struct google_request *req);
 extern status_t google_request_open(const char *query_string, struct fs_volume *volume, struct fs_node *query_node, struct google_request **req);
 extern status_t google_request_free(struct google_request *req);
 
+extern int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results);
+
 #endif /* _GOOGLE_REQUEST_H */

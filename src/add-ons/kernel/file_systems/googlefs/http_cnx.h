@@ -20,8 +20,8 @@ struct http_cnx {
 
 struct sockaddr_in;
 
-extern status_t http_init();
-extern status_t http_uninit();
+extern status_t http_init(void);
+extern status_t http_uninit(void);
 
 extern status_t http_create(struct http_cnx **);
 extern status_t http_delete(struct http_cnx *cnx);

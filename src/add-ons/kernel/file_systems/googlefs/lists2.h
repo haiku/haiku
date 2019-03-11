@@ -21,10 +21,10 @@ extern void *sll_next(long nextoff, void *item);
 #define SLLNEXT(type,item,nextp) (*(typeof(item))(((char *)(item)) + offsetof(item, nextp)))
 
 #define SLL_FIND(_head,_nextp,_func,_with) (typeof(_head))sll_find(offsetof(typeof(*_head),_nextp), (void *)(_head), _func, _with)
-#define SLL_INSERT(_head,_nextp,_item) (typeof(_head))sll_insert_head(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
+#define SLL_INSERT(_head,_nextp,_item) sll_insert_head(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
 //#define SLL_INSERT_TAIL(_head,_nextp,_item) (typeof(_head))sll_insert_tail(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
 #define SLL_INSERT_TAIL(_head,_nextp,_item) sll_insert_head(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
 #define SLL_DEQUEUE(_head,_nextp) (typeof(_head))sll_dequeue_tail(offsetof(typeof(*_head),_nextp), (void **)&(_head))
-#define SLL_REMOVE(_head,_nextp,_item) (typeof(_head))sll_remove(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
+#define SLL_REMOVE(_head,_nextp,_item) sll_remove(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
 
 #endif /* _LISTS2_H */

@@ -357,9 +357,9 @@ struct attr_entry root_folder_attrs[] = {
 { "BEOS:TYPE", /*B_MIME_STRING_TYPE*/'MIMS', SZSTR("application/x-vnd.Be-directory") },
 { "BEOS:M:STD_ICON", 'MICN', 16*16, (char *)google_icon_M },
 { "BEOS:L:STD_ICON", 'ICON', 32*32, (char *)google_icon_L },
-{ "BEOS:V:STD_ICON", 'zICO', sizeof(google_icon_SVG), google_icon_SVG },
+{ "BEOS:V:STD_ICON", 'zICO', sizeof(google_icon_SVG), (char *)google_icon_SVG },
 { "BEOS:D:STD_ICON", 0x6949434F, sizeof(root_folder_attrs_1), &root_folder_attrs_1 },
-{ "BEOS:ICON", 'VICN', sizeof(google_icon_HVIF), google_icon_HVIF },
+{ "BEOS:ICON", 'VICN', sizeof(google_icon_HVIF), (char *)google_icon_HVIF },
 //{ "BEOS:EMBLEMS", 'CSTR', SZSTR("palm") },
 { "be:volume_id", B_UINT64_TYPE, sizeof(root_folder_attrs_2), &root_folder_attrs_2 },
 { NULL, 0, 0, NULL } /* end of list */
