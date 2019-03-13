@@ -156,7 +156,7 @@ get_kind_name(uint32 kind)
 			return "bus-in";
 		case B_MULTI_AUX_BUS:
 			return "bus-aux";
-		
+
 		default:
 			return "unknown";
 	}

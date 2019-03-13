@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel drivers audio ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
-UsePrivateHeaders [ FDirName media ] ;
+UsePrivateHeaders [ FDirName audio ] ;
 
 SubDirCcFlags [ FDefines HAIKU_MULTI_AUDIO=1 ] ;
 
