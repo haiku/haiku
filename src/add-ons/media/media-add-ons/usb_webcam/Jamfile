@@ -2,17 +2,7 @@ SubDir HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# Zeta has a libusb.so, we have it in libdevice.so
-if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	usbKitLibraryName = libdevice.so ;
-} else {
-#	usbKitLibraryName = USBKit.a ;
-#	UsePublicHeaders [ FDirName drivers ] ;
-#	UsePublicHeaders [ FDirName device ] ;
-	# use -lusb on ZETA
-	usbKitLibraryName = usb ;
-}
-
+usbKitLibraryName = libdevice.so ;
 
 # source directories
 local sourceDirs =
