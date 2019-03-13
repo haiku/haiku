@@ -50,7 +50,7 @@ Journal::_TransactionDone(bool success)
 	}
 	cache_end_transaction(fVolume->BlockCache(), fTransactionID,
 		&_TransactionWritten, this);
-	//cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
+	// cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
 	return B_OK;
 }
 

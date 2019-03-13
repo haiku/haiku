@@ -69,7 +69,7 @@ struct TreeDefinition {
 	int Compare(const Value* a, const Value* b) const
 	{
 		int comp = Compare(a->offset, b);
-		//TODO: check more conditions here if necessary
+		// TODO: check more conditions here if necessary
 		return comp;
 	}
 };

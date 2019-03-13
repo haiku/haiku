@@ -57,6 +57,7 @@ BTree::Node::Keep()
 	fNode = NULL;
 }
 
+
 void
 BTree::Node::Unset()
 {
@@ -96,7 +97,7 @@ status_t
 BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
 	const
 {
-	//binary search for item slot in a node
+	// binary search for item slot in a node
 	int entrySize = sizeof(btrfs_entry);
 	if (Level() != 0) {
 		// internal node
@@ -117,7 +118,7 @@ BTree::Node::SearchSlot(const btrfs_key& key, int* slot, btree_traversing type)
 			low = mid + 1;
 		else {
 			*slot = mid;
-			return B_OK; 		//if key is in node
+			return B_OK;		// if key is in node
 		}
 	}
 
@@ -244,7 +245,7 @@ BTree::Node::Copy(const Node* origin, uint32 start, uint32 end, int length)
 		length = -origin->_CalculateSpace(0, start - 1, 2);
 		_Copy(origin, 0, start, end, length);
 	} else if (length < 0) {
-		//removing all items in [start, end]
+		// removing all items in [start, end]
 		if (start > 0)
 			_Copy(origin, 0, 0, start - 1, 0);	// <-- [start,...
 		if (end + 1 < origin->ItemCount()) {
@@ -254,7 +255,7 @@ BTree::Node::Copy(const Node* origin, uint32 start, uint32 end, int length)
 			_Copy(origin, start, end + 1, origin->ItemCount() - 1, length);
 		}
 	} else {
-		//inserting in [start, end] - make a hole for later
+		// inserting in [start, end] - make a hole for later
 		if (start > 0)
 			_Copy(origin, 0, 0, start - 1, 0);
 		if (start < origin->ItemCount()) {

@@ -165,7 +165,7 @@ public:
 	private:
 		Node(const Node&);
 		Node& operator=(const Node&);
-			//no implementation
+			// no implementation
 
 		void	_Copy(const Node* origin, uint32 at, uint32 from, uint32 to,
 					int length) const;

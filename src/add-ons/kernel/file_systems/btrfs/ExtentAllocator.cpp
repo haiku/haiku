@@ -610,8 +610,8 @@ status_t
 ExtentAllocator::_Allocate(uint64& found, uint64 start, uint64 size,
 	uint64 type)
 {
-	TRACE("ExtentAllocator::_Allocate() start %" B_PRIu64 " size %" B_PRIu64 " type %"
-		B_PRIu64 "\n", start, size, type);
+	TRACE("ExtentAllocator::_Allocate() start %" B_PRIu64 " size %" B_PRIu64
+		" type %" B_PRIu64 "\n", start, size, type);
 	CachedExtent* chosen;
 	status_t status;
 	while (true) {
