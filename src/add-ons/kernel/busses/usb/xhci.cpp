@@ -2297,6 +2297,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	// Use mutex_trylock first, in case we are in KDL.
 	if (mutex_trylock(&endpoint->lock) != B_OK)
 		mutex_lock(&endpoint->lock);
+	MutexLocker endpointLocker(endpoint->lock, true);
 
 	addr_t source = trb->qwtrb0;
 	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
@@ -2317,7 +2318,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		// likely failed midway; so just accept it anyway.
 		if (offset == (td->trb_used - 1) || completionCode != COMP_SUCCESS) {
 			_UnlinkDescriptorForPipe(td, endpoint);
-			mutex_unlock(&endpoint->lock);
+			endpointLocker.Unlock();
 
 			td->trb_completion_code = completionCode;
 			td->trb_left = remainder;
@@ -2332,13 +2333,11 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 			TRACE("HandleTransferComplete td %p done\n", td);
 		} else {
-			mutex_unlock(&endpoint->lock);
 			TRACE_ERROR("successful TRB %" B_PRIxADDR " was found, but it wasn't "
 				"the last in the TD!\n", source);
 		}
 		return;
 	}
-	mutex_unlock(&endpoint->lock);
 	TRACE_ERROR("TRB 0x%" B_PRIxADDR " was not found in the endpoint!\n", source);
 }
 
