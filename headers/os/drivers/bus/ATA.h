@@ -1,5 +1,6 @@
 /*
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef __ATA_H__
@@ -13,13 +14,13 @@
 // attributes:
 
 // node type
-#define ATA_BUS_TYPE_NAME "bus/ide/v1"
+#define ATA_BUS_TYPE_NAME "bus/ata/v1"
 // maximum number of devices connected to controller (uint8, optional, default:2)
-#define ATA_CONTROLLER_MAX_DEVICES_ITEM "ide/max_devices"
+#define ATA_CONTROLLER_MAX_DEVICES_ITEM "ata/max_devices"
 // set to not-0 if DMA is supported (uint8, optional, default:0)
-#define ATA_CONTROLLER_CAN_DMA_ITEM "ide/can_DMA"
+#define ATA_CONTROLLER_CAN_DMA_ITEM "ata/can_DMA"
 // name of controller (string, required)
-#define ATA_CONTROLLER_CONTROLLER_NAME_ITEM "ide/controller_name"
+#define ATA_CONTROLLER_CONTROLLER_NAME_ITEM "ata/controller_name"
 
 union ata_task_file;
 typedef unsigned int ata_reg_mask;
@@ -65,6 +66,6 @@ typedef struct {
 	status_t	(*interrupt_handler)(ata_channel channel, uint8 status);
 } ata_for_controller_interface;
 
-#define ATA_FOR_CONTROLLER_MODULE_NAME "bus_managers/ide/controller/driver_v1"
+#define ATA_FOR_CONTROLLER_MODULE_NAME "bus_managers/ata/controller/driver_v1"
 
 #endif	/* __ATA_H__ */
