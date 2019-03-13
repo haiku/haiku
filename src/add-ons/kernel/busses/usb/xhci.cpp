@@ -862,6 +862,61 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
 	TRACE_ALWAYS("cancel queued transfers for pipe %p (%d)\n", pipe,
 		pipe->EndpointAddress());
+
+	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
+	if (endpoint == NULL || endpoint->trbs == NULL) {
+		// Someone's de-allocated this pipe or endpoint in the meantime.
+		// (Possibly AllocateDevice failed, and we were the temporary pipe.)
+		return B_NO_INIT;
+	}
+
+	MutexLocker endpointLocker(endpoint->lock);
+
+	if (endpoint->td_head == NULL) {
+		// There aren't any currently pending transfers to cancel.
+		return B_OK;
+	}
+
+	// Get the head TD from the endpoint. We don't want to free the TDs while
+	// holding the endpoint lock, as the callbacks could potentially cause
+	// deadlocks.
+	xhci_td* td_head = endpoint->td_head;
+	endpoint->td_head = NULL;
+
+	if (StopEndpoint(false, endpoint->id + 1, endpoint->device->slot) == B_OK) {
+		// Clear the endpoint's TRBs.
+		memset(endpoint->trbs, 0, sizeof(xhci_trb) * XHCI_MAX_TRANSFERS);
+		endpoint->used = 0;
+		endpoint->current = 0;
+
+		// Set dequeue pointer location to the beginning of the ring.
+		SetTRDequeue(endpoint->trb_addr, 0, endpoint->id + 1,
+			endpoint->device->slot);
+
+		// We don't need to do anything else to restart the ring, as it will resume
+		// operation as normal upon the next doorbell. (XHCI 1.1 § 4.6.9 p132.)
+	} else {
+		// We couldn't stop the endpoint. Most likely the device has been
+		// removed and the endpoint was stopped by the hardware.
+		TRACE("CancelQueuedTransfers: could not stop endpoint\n");
+	}
+
+	endpointLocker.Unlock();
+
+	xhci_td* td;
+	while ((td = td_head) != NULL) {
+		td_head = td_head->next;
+
+		// We can't cancel or delete transfers under "force", as they probably
+		// are not safe to use anymore.
+		if (!force && td->transfer != NULL) {
+			td->transfer->Finished(B_CANCELED, 0);
+			delete td->transfer;
+			td->transfer = NULL;
+		}
+		FreeDescriptor(td);
+	}
+
 	return B_OK;
 }
 
@@ -1486,6 +1541,11 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		device->state = XHCI_STATE_DISABLED;
 		return NULL;
 	}
+
+	// We don't want to disable the default endpoint, naturally, which would
+	// otherwise happen when this Pipe object is destroyed.
+	pipe.SetControllerCookie(NULL);
+
 	fPortSlots[hubPort] = slot;
 	TRACE("AllocateDevice() port %d slot %d\n", hubPort, slot);
 	return deviceObject;
@@ -1517,8 +1577,7 @@ XHCI::FreeDevice(Device *device)
 status_t
 XHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
-	TRACE("_InsertEndpointForPipe endpoint address %" B_PRId8 "\n",
-		pipe->EndpointAddress());
+	TRACE("insert endpoint for pipe %p (%d)\n", pipe, pipe->EndpointAddress());
 
 	if (pipe->ControllerCookie() != NULL
 			|| pipe->Parent()->Type() != USB_OBJECT_DEVICE) {
@@ -1618,9 +1677,40 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 status_t
 XHCI::_RemoveEndpointForPipe(Pipe *pipe)
 {
+	TRACE("remove endpoint for pipe %p (%d)\n", pipe, pipe->EndpointAddress());
+
 	if (pipe->Parent()->Type() != USB_OBJECT_DEVICE)
 		return B_OK;
-	//Device* device = (Device *)pipe->Parent();
+	Device* usbDevice = (Device *)pipe->Parent();
+	if (usbDevice->Parent() == RootObject())
+		return B_BAD_VALUE;
+
+	xhci_endpoint *endpoint = (xhci_endpoint *)pipe->ControllerCookie();
+	if (endpoint == NULL || endpoint->trbs == NULL)
+		return B_NO_INIT;
+
+	xhci_device *device = endpoint->device;
+
+	if (endpoint->id > 0) {
+		mutex_lock(&endpoint->lock);
+
+		uint8 epNumber = endpoint->id + 1;
+		StopEndpoint(true, epNumber, device->slot);
+
+		mutex_destroy(&endpoint->lock);
+		memset(endpoint, 0, sizeof(xhci_endpoint));
+
+		_WriteContext(&device->input_ctx->input.dropFlags, (1 << epNumber));
+		_WriteContext(&device->input_ctx->input.addFlags, 0);
+
+		if (epNumber > 1)
+			ConfigureEndpoint(device->input_ctx_addr, true, device->slot);
+		else
+			EvaluateContext(device->input_ctx_addr, device->slot);
+
+		device->state = XHCI_STATE_ADDRESSED;
+	}
+	pipe->SetControllerCookie(NULL);
 
 	return B_OK;
 }
