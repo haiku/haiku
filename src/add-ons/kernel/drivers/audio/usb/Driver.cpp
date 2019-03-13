@@ -30,7 +30,7 @@ usb_audio_device_added(usb_device device, void** cookie)
 {
 	*cookie = NULL;
 
-	MutexLocker driverLock;
+	MutexLocker _(gDriverLock);
 
 	// check if this is a replug of an existing device first
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
@@ -84,7 +84,7 @@ usb_audio_device_added(usb_device device, void** cookie)
 status_t
 usb_audio_device_removed(void* cookie)
 {
-	MutexLocker driverLock;
+	MutexLocker _(gDriverLock);
 
 	Device* device = (Device*)cookie;
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
@@ -173,14 +173,16 @@ uninit_driver()
 static status_t
 usb_audio_open(const char* name, uint32 flags, void** cookie)
 {
-	MutexLocker driverLock;
+	MutexLocker _(gDriverLock);
 
 	*cookie = NULL;
 	status_t status = ENODEV;
-	int32 index = strtol(name + strlen(sDeviceBaseName), NULL, 10) - 1;
-	if (index >= 0 && index < MAX_DEVICES && gDevices[index]) {
-		status = gDevices[index]->Open(flags);
-		*cookie = gDevices[index];
+	for (int32 i = 0; i < MAX_DEVICES && gDevices[i] != NULL; i++) {
+		if (strcmp(gDeviceNames[i], name) == 0) {
+			status = gDevices[i]->Open(flags);
+			*cookie = gDevices[i];
+			break;
+		}
 	}
 
 	return status;
@@ -224,34 +226,19 @@ static status_t
 usb_audio_free(void* cookie)
 {
 	Device* device = (Device*)cookie;
-
-	MutexLocker driverLock;
-
-	status_t status = device->Free();
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gDevices[i] == device) {
-			// the device is removed already but as it was open the
-			// removed hook has not deleted the object
-			gDevices[i] = NULL;
-			delete device;
-			TRACE(INF, "Device at %ld deleted.\n", i);
-			break;
-		}
-	}
-
-	return status;
+	return device->Free();
 }
 
 
 const char**
 publish_devices()
 {
+	MutexLocker _(gDriverLock);
+
 	for (int32 i = 0; gDeviceNames[i]; i++) {
 		free(gDeviceNames[i]);
 		gDeviceNames[i] = NULL;
 	}
-
-	MutexLocker driverLock;
 
 	int32 deviceCount = 0;
 	for (size_t i = 0; i < MAX_DEVICES; i++) {
