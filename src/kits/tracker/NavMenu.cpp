@@ -606,7 +606,7 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 			if (newResolvedModel->InitCheck() != B_OK) {
 				// broken link, still can show though, bail
 				delete newResolvedModel;
-				result = 0;
+				result = NULL;
 			} else
 				result = newResolvedModel;
 		}

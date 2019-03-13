@@ -464,6 +464,8 @@ ShelfContainerViewFilter::_ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		BDragger *dragger = NULL;
 		if (handler)
 			dragger = dynamic_cast<BDragger*>(handler);
+		else
+			return B_SKIP_MESSAGE;
 
 		BRect rect;
 		if (dragger->fRelation == BDragger::TARGET_IS_CHILD)

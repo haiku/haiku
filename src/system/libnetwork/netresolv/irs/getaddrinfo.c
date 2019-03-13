@@ -614,8 +614,8 @@ getaddrinfo(const char *hostname, const char *servname,
 				cur = cur->ai_next;
 			}
 		}
-	}
 #endif
+	}
 
 	/* XXX */
 	if (sentinel.ai_next)

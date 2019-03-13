@@ -91,7 +91,7 @@ atari_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 	if (arb->Checksum() == 0x55aa)
 		weight -= 0.1; /* possible but likely a PC sector */
-	if (arb->_reserved_1[1] != 0x00)
+	if (arb->_reserved_1[0] != 0x00)
 		weight -= 10;
 	/* hope so */
 	if (arb->MaxPartitionSize() < 10)

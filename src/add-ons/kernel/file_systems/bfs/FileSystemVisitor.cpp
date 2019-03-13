@@ -47,6 +47,7 @@ FileSystemVisitor::Next()
 
 	while (true) {
 		const char* name = NULL;
+		char treeName[B_FILE_NAME_LENGTH];
 		Inode* inode;
 		Vnode vnode;
 
@@ -97,7 +98,6 @@ FileSystemVisitor::Next()
 				vnode.Keep();
 			}
 		} else {
-			char treeName[B_FILE_NAME_LENGTH];
 			uint16 length;
 			ino_t id;
 

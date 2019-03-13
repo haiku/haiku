@@ -178,7 +178,7 @@ scan_char (char *cp, char *valp)
 }
 
 /* Scan a string delimited by white-space.  Fails on empty string or
-   if string is doesn't fit in the specified buffer.  */
+   if string doesn't fit in the specified buffer.  */
 static inline char *
 scan_string (char *cp, char *valp, size_t buf_size)
 {
@@ -195,7 +195,8 @@ scan_string (char *cp, char *valp, size_t buf_size)
     }
   if (i == 0 || i >= buf_size)
     return NULL;
-  valp[i] = '\0';
+  if (valp != NULL)
+    valp[i] = '\0';
   return cp;
 }
 
