@@ -323,14 +323,14 @@ const char*
 FindWindow::QueryName() const
 {
 	if (fFromTemplate) {
-		if (!fQueryNameFromTemplate.Length()) {
+		if (!fQueryNameFromTemplate.Length() && fFile != NULL) {
 			fFile->ReadAttrString(kAttrQueryTemplateName,
 				&fQueryNameFromTemplate);
 		}
 
 		return fQueryNameFromTemplate.String();
 	}
-	if (!fFile)
+	if (fFile == NULL)
 		return "";
 
 	return fRef.name;
