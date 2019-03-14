@@ -47,8 +47,8 @@ typedef void (*initfini_array_function)();
 bool gProgramLoaded = false;
 image_t* gProgramImage;
 
-static image_t** sPreloadedImages = NULL;
-static uint32 sPreloadedImageCount = 0;
+static image_t** sPreloadedAddons = NULL;
+static uint32 sPreloadedAddonCount = 0;
 
 static recursive_lock sLock = RECURSIVE_LOCK_INITIALIZER(kLockName);
 
@@ -68,8 +68,81 @@ find_dt_rpath(image_t *image)
 }
 
 
+image_id
+preload_image(char const* path, image_t **image)
+{
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	KTRACE("rld: preload_image(\"%s\")", path);
+
+	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, image);
+	if (status < B_OK) {
+		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
+			strerror(status));
+		return status;
+	}
+
+	if ((*image)->find_undefined_symbol == NULL)
+		(*image)->find_undefined_symbol = find_undefined_symbol_global;
+
+	KTRACE("rld: preload_image(\"%s\") done: id: %" B_PRId32, path, (*image)->id);
+
+	return (*image)->id;
+}
+
+
+static void
+preload_images(image_t **image, int32 *_count = NULL)
+{
+	const char* imagePaths = getenv("LD_PRELOAD");
+	if (imagePaths == NULL) {
+		if (_count != NULL)
+			*_count = 0;
+		return;
+	}
+
+	int32 count = 0;
+
+	while (*imagePaths != '\0') {
+		// find begin of image path
+		while (*imagePaths != '\0' && isspace(*imagePaths))
+			imagePaths++;
+
+		if (*imagePaths == '\0')
+			break;
+
+		// find end of image path
+		const char* imagePath = imagePaths;
+		while (*imagePaths != '\0' && !isspace(*imagePaths))
+			imagePaths++;
+
+		// extract the path
+		char path[B_PATH_NAME_LENGTH];
+		size_t pathLen = imagePaths - imagePath;
+		if (pathLen > sizeof(path) - 1)
+			continue;
+
+		if (image == NULL) {
+			count++;
+			continue;
+		}
+		memcpy(path, imagePath, pathLen);
+		path[pathLen] = '\0';
+
+		// load the image
+		preload_image(path, &image[count++]);
+	}
+
+	KTRACE("rld: preload_images count: %d", count);
+
+	if (_count != NULL)
+		*_count = count;
+}
+
+
 static status_t
-load_immediate_dependencies(image_t *image)
+load_immediate_dependencies(image_t *image, bool preload)
 {
 	elf_dyn *d = (elf_dyn *)image->dynamic_ptr;
 	bool reportErrors = report_errors();
@@ -82,6 +155,11 @@ load_immediate_dependencies(image_t *image)
 
 	image->flags |= RFLAG_DEPENDENCIES_LOADED;
 
+	int32 preloadedCount = 0;
+	if (preload) {
+		preload_images(NULL, &preloadedCount);
+		image->num_needed += preloadedCount;
+	}
 	if (image->num_needed == 0)
 		return B_OK;
 
@@ -97,9 +175,11 @@ load_immediate_dependencies(image_t *image)
 	}
 
 	memset(image->needed, 0, image->num_needed * sizeof(image_t *));
+	if (preload)
+		preload_images(image->needed);
 	rpath = find_dt_rpath(image);
 
-	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
+	for (i = 0, j = preloadedCount; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
 			{
@@ -159,14 +239,15 @@ load_immediate_dependencies(image_t *image)
 
 
 static status_t
-load_dependencies(image_t* image)
+load_dependencies(image_t* image, bool preload = false)
 {
 	// load dependencies (breadth-first)
 	for (image_t* otherImage = image; otherImage != NULL;
 			otherImage = otherImage->next) {
-		status_t status = load_immediate_dependencies(otherImage);
+		status_t status = load_immediate_dependencies(otherImage, preload);
 		if (status != B_OK)
 			return status;
+		preload = false;
 	}
 
 	// Check the needed versions for the given image and all newly loaded
@@ -297,34 +378,34 @@ inject_runtime_loader_api(image_t* rootImage)
 
 
 static status_t
-add_preloaded_image(image_t* image)
+add_preloaded_addon(image_t* image)
 {
 	// We realloc() everytime -- not particularly efficient, but good enough for
-	// small number of preloaded images.
-	image_t** newArray = (image_t**)realloc(sPreloadedImages,
-		sizeof(image_t*) * (sPreloadedImageCount + 1));
+	// small number of preloaded addons.
+	image_t** newArray = (image_t**)realloc(sPreloadedAddons,
+		sizeof(image_t*) * (sPreloadedAddonCount + 1));
 	if (newArray == NULL)
 		return B_NO_MEMORY;
 
-	sPreloadedImages = newArray;
-	newArray[sPreloadedImageCount++] = image;
+	sPreloadedAddons = newArray;
+	newArray[sPreloadedAddonCount++] = image;
 
 	return B_OK;
 }
 
 
 image_id
-preload_image(char const* path)
+preload_addon(char const* path)
 {
 	if (path == NULL)
 		return B_BAD_VALUE;
 
-	KTRACE("rld: preload_image(\"%s\")", path);
+	KTRACE("rld: preload_addon(\"%s\")", path);
 
 	image_t *image = NULL;
 	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, &image);
 	if (status < B_OK) {
-		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
+		KTRACE("rld: preload_addon(\"%s\") failed to load container: %s", path,
 			strerror(status));
 		return status;
 	}
@@ -342,7 +423,7 @@ preload_image(char const* path)
 	if (status < B_OK)
 		goto err;
 
-	status = add_preloaded_image(image);
+	status = add_preloaded_addon(image);
 	if (status < B_OK)
 		goto err;
 
@@ -359,12 +440,12 @@ preload_image(char const* path)
 		add_add_on(image, addOnStruct);
 	}
 
-	KTRACE("rld: preload_image(\"%s\") done: id: %" B_PRId32, path, image->id);
+	KTRACE("rld: preload_addon(\"%s\") done: id: %" B_PRId32, path, image->id);
 
 	return image->id;
 
 err:
-	KTRACE("rld: preload_image(\"%s\") failed: %s", path, strerror(status));
+	KTRACE("rld: preload_addon(\"%s\") failed: %s", path, strerror(status));
 
 	dequeue_loaded_image(image);
 	delete_image(image);
@@ -373,9 +454,9 @@ err:
 
 
 static void
-preload_images()
+preload_addons()
 {
-	const char* imagePaths = getenv("LD_PRELOAD");
+	const char* imagePaths = getenv("LD_PRELOAD_ADDONS");
 	if (imagePaths == NULL)
 		return;
 
@@ -401,7 +482,7 @@ preload_images()
 		path[pathLen] = '\0';
 
 		// load the image
-		preload_image(path);
+		preload_addon(path);
 	}
 }
 
@@ -420,7 +501,7 @@ load_program(char const *path, void **_entry)
 	RecursiveLocker _(sLock);
 		// for now, just do stupid simple global locking
 
-	preload_images();
+	preload_addons();
 
 	TRACE(("rld: load %s\n", path));
 
@@ -431,7 +512,7 @@ load_program(char const *path, void **_entry)
 	if (gProgramImage->find_undefined_symbol == NULL)
 		gProgramImage->find_undefined_symbol = find_undefined_symbol_global;
 
-	status = load_dependencies(gProgramImage);
+	status = load_dependencies(gProgramImage, true);
 	if (status < B_OK)
 		goto err;
 
