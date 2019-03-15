@@ -949,10 +949,24 @@ DHCPClient::_TimeoutShift(int socket, dhcp_state& state,
 	socket_timeout& timeout)
 {
 	bigtime_t stateMaxTime = -1;
+
+	// Compute the date at which we must consider the DHCP negociation failed.
+	// This varies depending on the current state. In renewing and rebinding
+	// states, it is based on the lease expiration.
+	// We can stay for up to 1 minute in the selecting and requesting states
+	// (these correspond to sending DHCP_DISCOVER and DHCP_REQUEST,
+	// respectively).
+	// All other states time out immediately after a single try.
+	// If this timeout expires, the DHCP negociation is aborted and starts
+	// over. As long as the timeout is not expired, we repeat the message with
+	// increasing delays (the delay is computed in timeout.shift below, and is
+	// at most equal to the timeout, but usually much shorter).
 	if (state == RENEWING)
 		stateMaxTime = fRebindingTime;
 	else if (state == REBINDING)
 		stateMaxTime = fLeaseTime;
+	else if (state == SELECTING || state == REQUESTING)
+		stateMaxTime = fRequestTime + AS_USECS(MAX_TIMEOUT);
 
 	if (system_time() > stateMaxTime) {
 		state = state == REBINDING ? INIT : REBINDING;
