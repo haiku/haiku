@@ -795,10 +795,11 @@ _mutex_trylock(mutex* lock)
 #if KDEBUG
 	InterruptsSpinLocker _(lock->lock);
 
-	if (lock->holder <= 0) {
+	if (lock->holder < 0) {
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
-	}
+	} else if (lock->holder == 0)
+		panic("_mutex_trylock(): using uninitialized lock %p", lock);
 	return B_WOULD_BLOCK;
 #else
 	return mutex_trylock(lock);
@@ -828,7 +829,7 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
 	} else if (lock->holder == 0)
-		panic("_mutex_lock(): using unitialized lock %p", lock);
+		panic("_mutex_lock(): using uninitialized lock %p", lock);
 #else
 	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
 		lock->flags &= ~MUTEX_FLAG_RELEASED;
