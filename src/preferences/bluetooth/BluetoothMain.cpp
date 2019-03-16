@@ -86,6 +86,7 @@ BluetoothApplication::MessageReceived(BMessage* message)
 
 		default:
 			BApplication::MessageReceived(message);
+			break;
 	}
 }
 

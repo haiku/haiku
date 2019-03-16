@@ -86,6 +86,7 @@ AddPrinterDialog::MessageReceived(BMessage* msg)
 
 		default:
 			Inherited::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -403,4 +404,3 @@ AddPrinterDialog::_Update()
 
 	fTransport->SetEnabled(fPrinterText != "Preview");
 }
-
