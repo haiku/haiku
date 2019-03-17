@@ -1060,24 +1060,25 @@ NetServer::_JoinNetwork(const BMessage& message, const BNetworkAddress* address,
 		askForConfig = true;
 	}
 
-	const char* string;
-	if (message.FindString("authentication", &string) == B_OK
+	BString string;
+	if ((message.FindString("authentication", &string) == B_OK
+			&& !string.IsEmpty())
 		|| (found && networkMessage.FindString("authentication", &string)
-				== B_OK)) {
+				== B_OK && !string.IsEmpty())) {
 		askForConfig = false;
-		if (!strcasecmp(string, "wpa2")) {
+		if (string.ICompare("wpa2") == 0) {
 			network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA2;
 			network.key_mode = B_KEY_MODE_IEEE802_1X;
 			network.cipher = network.group_cipher = B_NETWORK_CIPHER_CCMP;
-		} else if (!strcasecmp(string, "wpa")) {
+		} else if (string.ICompare("wpa") == 0) {
 			network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA;
 			network.key_mode = B_KEY_MODE_IEEE802_1X;
 			network.cipher = network.group_cipher = B_NETWORK_CIPHER_TKIP;
-		} else if (!strcasecmp(string, "wep")) {
+		} else if (string.ICompare("wep") == 0) {
 			network.authentication_mode = B_NETWORK_AUTHENTICATION_WEP;
 			network.key_mode = B_KEY_MODE_NONE;
 			network.cipher = network.group_cipher = B_NETWORK_CIPHER_WEP_40;
-		} else if (strcasecmp(string, "none") && strcasecmp(string, "open")) {
+		} else if (string.ICompare("none") != 0 && string.ICompare("open") != 0) {
 			fprintf(stderr, "%s: invalid authentication mode.\n", name);
 			askForConfig = true;
 		}
