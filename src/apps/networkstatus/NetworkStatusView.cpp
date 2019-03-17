@@ -299,6 +299,7 @@ NetworkStatusView::MessageReceived(BMessage* message)
 
 		default:
 			BView::MessageReceived(message);
+			break;
 	}
 }
 
@@ -569,4 +570,3 @@ instantiate_deskbar_item(float maxWidth, float maxHeight)
 	return new NetworkStatusView(BRect(0, 0, maxHeight - 1, maxHeight - 1),
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, true);
 }
-

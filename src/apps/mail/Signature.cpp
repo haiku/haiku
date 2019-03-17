@@ -249,6 +249,7 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 
 		default:
 			BWindow::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -536,6 +537,7 @@ TSigTextView::KeyDown(const char *key, int32 count)
 
 		default:
 			BTextView::KeyDown(key, count);
+			break;
 	}
 }
 
@@ -584,6 +586,6 @@ TSigTextView::MessageReceived(BMessage *msg)
 
 		default:
 			BTextView::MessageReceived(msg);
+			break;
 	}
 }
-

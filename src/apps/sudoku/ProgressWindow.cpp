@@ -145,6 +145,6 @@ ProgressWindow::MessageReceived(BMessage *message)
 
 		default:
 			BWindow::MessageReceived(message);
+			break;
 	}
 }
-

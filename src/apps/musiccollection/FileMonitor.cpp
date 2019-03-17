@@ -79,7 +79,7 @@ FileMonitor::MessageReceived(BMessage* msg)
 			}
 			if (fCurrentReadList)
 				Looper()->PostMessage(kMsgAddRefs, this);
-				
+
 			break;
 		}
 
@@ -89,6 +89,7 @@ FileMonitor::MessageReceived(BMessage* msg)
 
 		default:
 			NodeMonitorHandler::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -307,4 +308,3 @@ ReadThread::_PublishEntrys(BMessenger& messenger)
 	fNReaded = 0;
 	messenger.SendMessage(kMsgAddRefs);
 }
-

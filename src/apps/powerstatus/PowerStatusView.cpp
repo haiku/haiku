@@ -150,6 +150,7 @@ PowerStatusView::MessageReceived(BMessage *message)
 
 		default:
 			BView::MessageReceived(message);
+			break;
 	}
 }
 
@@ -705,6 +706,7 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 
 		default:
 			PowerStatusView::MessageReceived(message);
+			break;
 	}
 }
 

@@ -423,6 +423,7 @@ TMailApp::MessageReceived(BMessage *msg)
 
 		default:
 			BApplication::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -1276,4 +1277,3 @@ main()
 	TMailApp().Run();
 	return B_OK;
 }
-
