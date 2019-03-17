@@ -2294,10 +2294,19 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	xhci_device *device = &fDevices[slot];
 	xhci_endpoint *endpoint = &device->endpoints[endpointNumber - 1];
 
+	if (endpoint->trbs == NULL) {
+		TRACE_ERROR("got TRB but endpoint is not allocated!\n");
+		return;
+	}
+
 	// Use mutex_trylock first, in case we are in KDL.
-	if (mutex_trylock(&endpoint->lock) != B_OK)
-		mutex_lock(&endpoint->lock);
-	MutexLocker endpointLocker(endpoint->lock, true);
+	MutexLocker endpointLocker(endpoint->lock,
+		mutex_trylock(&endpoint->lock) == B_OK);
+	if (!endpointLocker.IsLocked()) {
+		// We failed to get the lock. Most likely it was destroyed
+		// while we were waiting for it.
+		return;
+	}
 
 	addr_t source = trb->qwtrb0;
 	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
@@ -2581,8 +2590,12 @@ void
 XHCI::ProcessEvents()
 {
 	// Use mutex_trylock first, in case we are in KDL.
-	if (mutex_trylock(&fEventLock) != B_OK)
-		mutex_lock(&fEventLock);
+	MutexLocker locker(fEventLock, mutex_trylock(&fEventLock) == B_OK);
+	if (!locker.IsLocked()) {
+		// We failed to get the lock. This really should not happen.
+		TRACE_ERROR("failed to acquire event lock!\n");
+		return;
+	}
 
 	uint16 i = fEventIdx;
 	uint8 j = fEventCcs;
@@ -2629,8 +2642,6 @@ XHCI::ProcessEvents()
 	addr |= ERST_EHB;
 	WriteRunReg32(XHCI_ERDP_LO(0), (uint32)addr);
 	WriteRunReg32(XHCI_ERDP_HI(0), (uint32)(addr >> 32));
-
-	mutex_unlock(&fEventLock);
 }
 
 
