@@ -16,6 +16,10 @@ RUN apt-get install -y python
 RUN apt-get install -y cmake
 # ICU Requirements
 RUN apt-get install -y pkg-config
+# Developer sundries (that won't impact bootstrap)
+RUN apt-get install -y vim nano
+RUN echo "source /usr/share/vim/vim80/defaults.vim" > ~/.vimrc
+RUN echo "set mouse=" >> ~/.vimrc
 
 ENV GIT_BUILDTOOLS="https://git.haiku-os.org/buildtools"
 ENV GIT_HAIKU="https://git.haiku-os.org/haiku"
