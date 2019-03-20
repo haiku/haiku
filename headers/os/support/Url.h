@@ -14,7 +14,7 @@
 
 class BUrl : public BArchivable {
 public:
-								BUrl(const char* url);
+								BUrl(const char* url, bool encode = true);
 								BUrl(BMessage* archive);
 								BUrl(const BUrl& other);
 								BUrl(const BUrl& base, const BString& relative);
@@ -23,7 +23,8 @@ public:
 	virtual						~BUrl();
 
 	// URL fields modifiers
-			BUrl&				SetUrlString(const BString& url);
+			BUrl&				SetUrlString(const BString& url,
+			                    	bool encode = true);
 			BUrl&				SetProtocol(const BString& scheme);
 			BUrl&				SetUserName(const BString& user);
 			BUrl&				SetPassword(const BString& password);
@@ -60,10 +61,6 @@ public:
 			bool				HasRequest() const;
 			bool				HasFragment() const;
 
-	// Url encoding/decoding of needed fields
-			void				UrlEncode(bool strict = false);
-			void				UrlDecode(bool strict = false);
-
 			status_t			IDNAToAscii();
 			status_t			IDNAToUnicode();
 
@@ -98,6 +95,12 @@ public:
 								operator const char*() const;
 
 private:
+	// Deprecated methods, use the new constructor with bool parameter
+	explicit					BUrl(const char* url);
+			void				SetUrlString(const BString& url);
+			void				UrlEncode(bool strict = false);
+			void				UrlDecode(bool strict = false);
+
 			void				_ResetFields();
 			bool				_ContainsDelimiter(const BString& url);
 			status_t			_ExplodeUrlString(const BString& urlString,

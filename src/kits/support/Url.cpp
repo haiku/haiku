@@ -36,7 +36,7 @@ const uint32 PARSE_NO_MASK_BIT				= 0x00000000;
 const uint32 PARSE_RAW_PATH_MASK_BIT		= 0x00000001;
 
 
-BUrl::BUrl(const char* url)
+BUrl::BUrl(const char* url, bool encode)
 	:
 	fUrlString(),
 	fProtocol(),
@@ -49,7 +49,7 @@ BUrl::BUrl(const char* url)
 	fHasHost(false),
 	fHasFragment(false)
 {
-	SetUrlString(url);
+	SetUrlString(url, encode);
 }
 
 
@@ -69,7 +69,7 @@ BUrl::BUrl(BMessage* archive)
 	BString url;
 
 	if (archive->FindString(kArchivedUrl, &url) == B_OK)
-		SetUrlString(url);
+		SetUrlString(url, false);
 	else
 		_ResetFields();
 }
@@ -206,7 +206,7 @@ BUrl::BUrl(const BPath& path)
 	fHasHost(false),
 	fHasFragment(false)
 {
-	SetUrlString(UrlEncode(path.Path(), true, true));
+	SetUrlString(path.Path(), true);
 	SetProtocol("file");
 }
 
@@ -220,8 +220,11 @@ BUrl::~BUrl()
 
 
 BUrl&
-BUrl::SetUrlString(const BString& url)
+BUrl::SetUrlString(const BString& url, bool encode)
 {
+	if (encode)
+		UrlEncode(url, true, true);
+
 	_ExplodeUrlString(url, PARSE_NO_MASK_BIT);
 	return *this;
 }
@@ -611,31 +614,6 @@ BUrl::HasFragment() const
 }
 
 
-// #pragma mark URL encoding/decoding of needed fields
-
-
-void
-BUrl::UrlEncode(bool strict)
-{
-	fUser = _DoUrlEncodeChunk(fUser, strict);
-	fPassword = _DoUrlEncodeChunk(fPassword, strict);
-	fHost = _DoUrlEncodeChunk(fHost, strict);
-	fFragment = _DoUrlEncodeChunk(fFragment, strict);
-	fPath = _DoUrlEncodeChunk(fPath, strict, true);
-}
-
-
-void
-BUrl::UrlDecode(bool strict)
-{
-	fUser = _DoUrlDecodeChunk(fUser, strict);
-	fPassword = _DoUrlDecodeChunk(fPassword, strict);
-	fHost = _DoUrlDecodeChunk(fHost, strict);
-	fFragment = _DoUrlDecodeChunk(fFragment, strict);
-	fPath = _DoUrlDecodeChunk(fPath, strict);
-}
-
-
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 status_t
 BUrl::IDNAToAscii()
@@ -864,7 +842,7 @@ BUrl::operator=(const BUrl& other)
 const BUrl&
 BUrl::operator=(const BString& string)
 {
-	SetUrlString(string);
+	SetUrlString(string, true);
 	return *this;
 }
 
@@ -872,7 +850,7 @@ BUrl::operator=(const BString& string)
 const BUrl&
 BUrl::operator=(const char* string)
 {
-	SetUrlString(string);
+	SetUrlString(string, true);
 	return *this;
 }
 
@@ -1484,4 +1462,54 @@ BUrl::_UrlMimeType() const
 	mime << "application/x-vnd.Be.URL." << fProtocol;
 
 	return BString(mime);
+}
+
+
+// #pragma mark Deprecated methods
+
+
+BUrl::BUrl(const char* string)
+	:
+	fPort(0),
+	fHasHost(false),
+	fHasFragment(false)
+{
+	SetUrlString(string, false);
+}
+
+
+void
+BUrl::SetUrlString(const BString& string)
+{
+	SetUrlString(string, false);
+}
+
+
+void
+BUrl::UrlEncode(bool strict)
+{
+	fUser = _DoUrlEncodeChunk(fUser, strict, false);
+	fPassword = _DoUrlEncodeChunk(fPassword, strict, false);
+	fHost = _DoUrlEncodeChunk(fHost, strict, false);
+	fFragment = _DoUrlEncodeChunk(fFragment, strict, false);
+	fPath = _DoUrlEncodeChunk(fPath, strict, true);
+
+	fUrlStringValid = false;
+	fAuthorityValid = false;
+	fUserInfoValid = false;
+}
+
+
+void
+BUrl::UrlDecode(bool strict)
+{
+	fUser = _DoUrlDecodeChunk(fUser, strict);
+	fPassword = _DoUrlDecodeChunk(fPassword, strict);
+	fHost = _DoUrlDecodeChunk(fHost, strict);
+	fFragment = _DoUrlDecodeChunk(fFragment, strict);
+	fPath = _DoUrlDecodeChunk(fPath, strict);
+
+	fUrlStringValid = false;
+	fAuthorityValid = false;
+	fUserInfoValid = false;
 }

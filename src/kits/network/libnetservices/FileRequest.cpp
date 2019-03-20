@@ -25,7 +25,6 @@ BFileRequest::BFileRequest(const BUrl& url, BDataIO* output,
 	BUrlRequest(url, output, listener, context, "BUrlProtocol.File", "file"),
 	fResult()
 {
-	fUrl.UrlDecode(true);
 }
 
 

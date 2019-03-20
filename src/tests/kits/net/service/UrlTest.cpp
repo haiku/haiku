@@ -537,7 +537,7 @@ UrlTest::RelativeUriTest()
 
 		CPPUNIT_ASSERT_EQUAL_MESSAGE(message.String(),
 			BString(tests[index].absolute),
-			BUrl(baseUrl, tests[index].relative).UrlString());
+			BUrl(baseUrl, BString(tests[index].relative)).UrlString());
 	}
 }
 
@@ -597,8 +597,6 @@ UrlTest::IDNTest()
 		NextSubTest();
 
 		BUrl url(tests[i].escaped);
-		url.UrlDecode();
-
 		BUrl idn(tests[i].decoded);
 		status_t success = idn.IDNAToUnicode();
 

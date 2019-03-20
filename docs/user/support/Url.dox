@@ -66,10 +66,14 @@
 //! @{
 
 /*!
-	\fn BUrl::BUrl(const char* url);
+	\fn BUrl::BUrl(const char* url, bool encode = true);
 	\brief Constructs a BUrl and fills it.
 
 	\param url A string to parse and populate the URL fields from.
+	\param encode Wether to urlencode the string.
+
+	The URL fields are extracted from the passed string and encoded. If you are constructing an
+	URL from a string that is already URL-encoded, set encode to false.
 
 	Call InitCheck() to verify that the string was succesfully parsed and
 	resulted in a valid URL.
@@ -143,10 +147,13 @@
 //! @{
 
 /*!
-	\fn BUrl& BUrl::SetUrlString(const BString& url);
+	\fn BUrl& BUrl::SetUrlString(const BString& url, bool encode = true);
 	\brief Parse a string and set the URL accordingly
 
 	\param url A string to parse as an absolute URL.
+	\param encode Wether to URL-encode the string.
+
+	Set encode to false if the URL string is already URL-encoded.
 */
 
 /*!
@@ -225,8 +232,8 @@
 
 	\returns the string representation of the URL.
 
-	A complete URL string is of the form protocol://username:passord\@host:port/path?request#fragment . All the fields are optional, for example a file URL will
-	have only a protocol and a path.
+	A complete URL string is of the form protocol://username:passord\@host:port/path?request#fragment .
+	All the fields are optional, for example a file URL will have only a protocol and a path.
 */
 
 /*!
@@ -404,20 +411,31 @@
 
 
 /*!
-	\fn void BUrl::UrlEncode(bool strict=false)
-	\brief Undocumented public method
+	\fn static BString BUrl::UrlEncode(const BString& url, bool strict=false, bool directory=false)
+	\brief URL-encode a string containing an URL or URL component.
 
-	\param strict Undocumented
+	\param strict Use strict mode
+	\param directory Use directory mode
+
+	In strict mode, space are replaced by %20. In non-strict mode they are replaced by a +
+	character.
+
+	In directory mode, / and \\ characters are not encoded. In the other fields they are
+	percent-encoded.
+
+	\return The encoded URL string
 
 	\since Haiku R1
 */
 
 
 /*!
-	\fn void BUrl::UrlDecode(bool strict=false)
-	\brief Undocumented public method
+	\fn static BString BUrl::UrlDecode(const BString& url, bool strict=false)
+	\brief URL-decode a string containing an URL or URL component.
 
-	\param strict Undocumented
+	\param strict Use strict mode.
+
+	\return The decoded URL string
 
 	\since Haiku R1
 */
