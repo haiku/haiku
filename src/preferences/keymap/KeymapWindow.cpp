@@ -73,6 +73,8 @@ static const char* kDeadKeyTriggerNone = "<none>";
 static const char* kCurrentKeymapName = "(Current)";
 static const char* kDefaultKeymapName = "US-International";
 
+static const float kDefaultHeight = 440;
+static const float kDefaultWidth = 1000;
 
 static int
 compare_key_list_items(const void* a, const void* b)
@@ -82,12 +84,24 @@ compare_key_list_items(const void* a, const void* b)
 	return BLocale::Default()->StringCompare(item1->Text(), item2->Text());
 }
 
-
 KeymapWindow::KeymapWindow()
 	:
-	BWindow(BRect(80, 50, 650, 300), B_TRANSLATE_SYSTEM_NAME("Keymap"),
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(80, 50, kDefaultWidth, kDefaultHeight),
+		B_TRANSLATE_SYSTEM_NAME("Keymap"), B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	// If the window doesn't fit the screen, make it smaller but keep the
+	// aspect ratio
+	BScreen screen(this);
+	display_mode mode;
+	status_t status = screen.GetMode(&mode);
+	if(status == B_OK && (mode.virtual_width <= kDefaultWidth
+			|| mode.virtual_height <= kDefaultHeight)) {
+		float width = mode.virtual_width - 64;
+		ResizeTo(mode.virtual_width - 64,
+			width * kDefaultHeight / kDefaultWidth);
+	}
+
 	fKeyboardLayoutView = new KeyboardLayoutView("layout");
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 	fKeyboardLayoutView->SetExplicitMinSize(BSize(B_SIZE_UNSET, 192));
