@@ -205,7 +205,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 		printf("\t%s\n", path);
 
-		int handle = of_open(path);
+		intptr_t handle = of_open(path);
 		if (handle == OF_FAILED) {
 			puts("\t\t(failed)");
 			continue;

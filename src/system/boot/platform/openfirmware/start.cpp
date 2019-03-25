@@ -116,7 +116,7 @@ platform_start_kernel(void)
 
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry, stackTop);
 
-	panic("Kernel returned! Return value: %ld\n", error);
+	panic("Kernel returned! Return value: %" B_PRId32 "\n", error);
 }
 
 
