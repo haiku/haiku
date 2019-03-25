@@ -633,6 +633,7 @@ supportedTargetArchs="
 	ppc
 	riscv32
 	riscv64
+	sparc
 	x86
 	x86_64
 	x86_gcc2
