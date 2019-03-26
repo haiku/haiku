@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BYTE_ORDER_H
@@ -22,14 +22,6 @@ typedef enum {
 	B_SWAP_ALWAYS
 } swap_action;
 
-
-/* BSD/networking macros */
-#ifndef htonl
-#	define htonl(x) B_HOST_TO_BENDIAN_INT32(x)
-#	define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
-#	define htons(x) B_HOST_TO_BENDIAN_INT16(x)
-#	define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
-#endif
 
 /* always swap macros */
 #define B_SWAP_DOUBLE(arg)   __swap_double(arg)

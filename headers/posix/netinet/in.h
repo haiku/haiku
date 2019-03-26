@@ -22,16 +22,19 @@ extern "C" {
 typedef uint16_t in_port_t;
 typedef uint32_t in_addr_t;
 
-/* We can't include <ByteOrder.h> since we are a posix file,
- * and we are not allowed to import all the BeOS types here.
- */
-#ifndef htonl
-#	ifdef __HAIKU_BEOS_COMPATIBLE_TYPES
-		extern unsigned long __swap_int32(unsigned long);	/* private */
+/* We can't include <ByteOrder.h> since we are a POSIX file,
+ * and we are not allowed to import all the BeOS types here. */
+#if !defined(__swap_int32)
+#	if __GNUC__ >= 4
+#		define __swap_int32(arg)	(uint32)__builtin_bswap32(arg)
+#		define __swap_int16(arg)	(uint16)__builtin_bswap16(arg)
 #	else
-		extern unsigned int __swap_int32(unsigned int);	/* private */
+		extern unsigned long __swap_int32(unsigned long); /* private */
+		extern uint16_t __swap_int16(uint16_t);	/* private */
 #	endif
-	extern uint16_t __swap_int16(uint16_t);	/* private */
+#endif
+
+#ifndef htonl
 #	if BYTE_ORDER == LITTLE_ENDIAN
 #		define htonl(x) ((uint32_t)__swap_int32(x))
 #		define ntohl(x) ((uint32_t)__swap_int32(x))
