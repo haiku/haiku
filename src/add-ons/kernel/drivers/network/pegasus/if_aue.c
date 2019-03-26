@@ -1,6 +1,6 @@
 /*
  * Pegasus BeOS Driver
- * 
+ *
  * Copyright 2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -64,7 +64,7 @@ aue_csr_read_1(pegasus_dev *sc, int reg)
 
 	AUE_LOCK(sc);
 
-	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, 
+	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
 		AUE_UR_READREG, 0, reg, 1, &val, &length);
 	AUE_UNLOCK(sc);
 
@@ -87,9 +87,9 @@ aue_csr_read_2(pegasus_dev *sc, int reg)
 
 	AUE_LOCK(sc);
 
-	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN, 
+	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
 		AUE_UR_READREG, 0, reg, 2, &val, &length);
-	
+
 	AUE_UNLOCK(sc);
 
 	if (err) {
@@ -110,9 +110,9 @@ aue_csr_write_1(pegasus_dev *sc, int reg, int val)
 
 	AUE_LOCK(sc);
 
-	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, 
+	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		AUE_UR_WRITEREG, val, reg, 1, &val, &length);
-	
+
 	AUE_UNLOCK(sc);
 
 	if (err) {
@@ -127,15 +127,15 @@ aue_csr_write_2(pegasus_dev *sc, int reg, int val)
 {
 	status_t		err;
 	size_t			length = 2;
-	
+
 	if (sc->aue_dying)
 		return (0);
 
 	AUE_LOCK(sc);
 
-	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT, 
+	err = usb->send_request(sc->dev, USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		AUE_UR_WRITEREG, val, reg, 2, &val, &length);
-	
+
 	AUE_UNLOCK(sc);
 
 	if (err) {
@@ -189,7 +189,7 @@ aue_read_eeprom(pegasus_dev *sc, caddr_t dest, int off, int cnt, int swap)
 		aue_eeprom_getword(sc, off + i, &word);
 		ptr = (u_int16_t *)(dest + (i * 2));
 		if (swap)
-			*ptr = ntohs(word);
+			*ptr = B_BENDIAN_TO_HOST_INT16(word);
 		else
 			*ptr = word;
 	}
@@ -268,14 +268,14 @@ aue_miibus_writereg(pegasus_dev *sc, int phy, int reg, int data)
 }
 
 
-static uint16 
+static uint16
 aue_miibus_read(pegasus_dev *dev, uint16 reg)
 {
 	return aue_miibus_readreg(dev, dev->phy, reg);
 }
 
 
-static void 
+static void
 aue_miibus_write(pegasus_dev *dev, uint16 reg, uint16 value)
 {
 	aue_miibus_writereg(dev, dev->phy, reg, value);
@@ -309,7 +309,7 @@ aue_init_phy(pegasus_dev *dev)
 {
 	uint16 phy, status;
 	int i;
-	
+
 	dev->phy = 255;
 
 	// search for total of 32 possible MII PHY addresses
@@ -329,7 +329,7 @@ aue_init_phy(pegasus_dev *dev)
 		return B_ENTRY_NOT_FOUND;
 	}
 	DPRINTF_INFO("aue_init_phy MII PHY found at %d\n", dev->phy);
-	
+
 	status = aue_miibus_read(dev, MII_CONTROL);
 	status &= ~MII_CONTROL_ISOLATE;
 
@@ -341,7 +341,7 @@ aue_init_phy(pegasus_dev *dev)
 			break;
 		DELAY(1000);
 	}
-	
+
 	dev->link = aue_miibus_status(dev) & MII_STATUS_LINK;
 
 	return B_OK;
@@ -408,7 +408,7 @@ aue_reset(pegasus_dev *sc)
 
 
 /*
- * Attach 
+ * Attach
  */
 void
 aue_attach(pegasus_dev *sc)
@@ -426,10 +426,10 @@ aue_attach(pegasus_dev *sc)
 	aue_read_eeprom(sc, (caddr_t)&eaddr, 0, 3, 0);
 
 	memcpy(sc->macaddr, eaddr, ETHER_ADDRESS_LENGTH);
-	
+
 	if (aue_init_phy(sc) != B_OK)
 		goto done;
-			
+
 	sc->aue_dying = 0;
 
 done:

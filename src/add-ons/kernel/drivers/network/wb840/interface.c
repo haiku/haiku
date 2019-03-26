@@ -51,22 +51,22 @@
 		read32(device->reg_base + WB_SIO) & ~x)
 
 #define MII_DELAY(x)	read32(x->reg_base + WB_SIO)
-			
+
 
 static void
 mii_sync(struct wb_device *device)
 {
 	// Set data bit and strobe the clock 32 times
 	int bits = 32;
-	 
+
 	SIO_SET(WB_SIO_MII_DIR|WB_SIO_MII_DATAIN);
 
-	while (--bits >= 0) { 
-		SIO_SET(WB_SIO_MII_CLK); 
+	while (--bits >= 0) {
+		SIO_SET(WB_SIO_MII_CLK);
 		MII_DELAY(device);
 		SIO_CLR(WB_SIO_MII_CLK);
-		MII_DELAY(device); 
-	} 
+		MII_DELAY(device);
+	}
 }
 
 
@@ -93,7 +93,7 @@ mii_send(wb_device *device, uint32 bits, int count)
  * Read an PHY register through the MII.
  */
 static int
-wb_mii_readreg(wb_device *device, wb_mii_frame *frame)	
+wb_mii_readreg(wb_device *device, wb_mii_frame *frame)
 {
 	int	i, ack;
 
@@ -104,7 +104,7 @@ wb_mii_readreg(wb_device *device, wb_mii_frame *frame)
 	frame->mii_opcode = WB_MII_READOP;
 	frame->mii_turnaround = 0;
 	frame->mii_data = 0;
-	
+
 	write32(device->reg_base + WB_SIO, 0);
 
 	/*
@@ -192,7 +192,7 @@ wb_mii_writereg(wb_device *device, wb_mii_frame	*frame)
 	frame->mii_stdelim = WB_MII_STARTDELIM;
 	frame->mii_opcode = WB_MII_WRITEOP;
 	frame->mii_turnaround = WB_MII_TURNAROUND;
-	
+
 	/*
  	 * Turn on data output.
 	 */
@@ -212,7 +212,7 @@ wb_mii_writereg(wb_device *device, wb_mii_frame	*frame)
 	MII_DELAY(device);
 	SIO_CLR(WB_SIO_MII_CLK);
 	MII_DELAY(device);
-	
+
 	/*
 	 * Turn off xmit.
 	 */
@@ -262,7 +262,7 @@ wb_eeprom_putbyte(wb_device *device, int addr)
 {
 	int	d, i;
 	int delay;
-	
+
 	d = addr | WB_EECMD_READ;
 
 	/*
@@ -276,41 +276,41 @@ wb_eeprom_putbyte(wb_device *device, int addr)
 		}
 		for (delay = 0; delay < 100; delay++)
 			MII_DELAY(device);
-		
+
 		SIO_SET(WB_SIO_EE_CLK);
-		
+
 		for (delay = 0; delay < 150; delay++)
-			MII_DELAY(device);		
-		
+			MII_DELAY(device);
+
 		SIO_CLR(WB_SIO_EE_CLK);
-		
+
 		for (delay = 0; delay < 100; delay++)
 			MII_DELAY(device);
-		
+
 	}
 
 	return;
 }
 #endif
 
-		
+
 static void
 wb_eeprom_askdata(wb_device *device, int addr)
 {
 	int command, i;
 	int delay;
-	
+
 	command = addr | WB_EECMD_READ;
-	
-	/* Feed in each bit and strobe the clock. */	
+
+	/* Feed in each bit and strobe the clock. */
 	for(i = 0x400; i; i >>= 1) {
-		if (command & i) 
+		if (command & i)
 			SIO_SET(WB_SIO_EE_DATAIN);
 		else
 			SIO_CLR(WB_SIO_EE_DATAIN);
-		
+
 		SIO_SET(WB_SIO_EE_CLK);
-		
+
 		SIO_CLR(WB_SIO_EE_CLK);
 		for (delay = 0; delay < 100; delay++)
 			EEPROM_DELAY(device);
@@ -327,12 +327,12 @@ wb_eeprom_getword(wb_device *device, int addr, uint16 *dest)
 
 	/* Enter EEPROM access mode */
 	write32(device->reg_base + WB_SIO, WB_SIO_EESEL|WB_SIO_EE_CS);
-	
+
 	/* Send address of word we want to read. */
 	wb_eeprom_askdata(device, addr);
-	
+
 	write32(device->reg_base + WB_SIO, WB_SIO_EESEL|WB_SIO_EE_CS);
-	
+
 	/* Start reading bits from EEPROM */
 	for (i = 0x8000; i > 0; i >>= 1) {
 		SIO_SET(WB_SIO_EE_CLK);
@@ -340,10 +340,10 @@ wb_eeprom_getword(wb_device *device, int addr, uint16 *dest)
 			word |= i;
 		SIO_CLR(WB_SIO_EE_CLK);
 	}
-	
+
 	/* Turn off EEPROM access mode */
 	write32(device->reg_base + WB_SIO, 0);
-	
+
 	*dest = word;
 }
 
@@ -354,12 +354,12 @@ wb_read_eeprom(wb_device *device, void* dest,
 {
 	int i;
 	uint16 word = 0, *ptr;
-	
+
 	for (i = 0; i < count; i++) {
 		wb_eeprom_getword(device, offset + i, &word);
 		ptr = (uint16 *)((uint8 *)dest + (i * 2));
 		if (swap)
-			*ptr = ntohs(word);
+			*ptr = B_BENDIAN_TO_HOST_INT16(word);
 		else
 			*ptr = word;
 	}

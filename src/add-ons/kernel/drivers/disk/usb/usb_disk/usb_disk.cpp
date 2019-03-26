@@ -1195,8 +1195,9 @@ usb_disk_update_capacity(device_lun *lun)
 
 	lun->media_present = true;
 	lun->media_changed = false;
-	lun->block_size = ntohl(parameter.logical_block_length);
-	lun->block_count = ntohl(parameter.last_logical_block_address) + 1;
+	lun->block_size = B_BENDIAN_TO_HOST_INT32(parameter.logical_block_length);
+	lun->block_count =
+		B_BENDIAN_TO_HOST_INT32(parameter.last_logical_block_address) + 1;
 	return B_OK;
 }
 

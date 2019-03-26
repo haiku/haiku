@@ -8,6 +8,7 @@
 
 
 #include <posix/sys/param.h>
+#include <ByteOrder.h>
 
 #include <sys/types.h>
 #include <sys/cdefs.h>
@@ -93,5 +94,13 @@
 	(((const unsigned char *)(a))[(i)/NBBY] & (1<<((i)%NBBY)))
 #define	isclr(a,i)							\
 	((((const unsigned char *)(a))[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
+
+/* byteswap macros */
+#ifndef htonl
+#	define htonl(x) B_HOST_TO_BENDIAN_INT32(x)
+#	define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
+#	define htons(x) B_HOST_TO_BENDIAN_INT16(x)
+#	define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
+#endif
 
 #endif	/* _FBSD_COMPAT_SYS_PARAM_H_ */

@@ -30,7 +30,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $FreeBSD: src/sys/dev/firewire/firewire.h,v 1.21 2007/04/24 12:15:05 simokawa Exp $
  *
  */
@@ -457,6 +457,13 @@ struct fw_crom_buf {
 #ifdef _KERNEL
 
 #define FWMAXNDMA 0x100 /* 8 bits DMA channel id. in device No. */
+
+#ifndef htonl
+#	define htonl(x) B_HOST_TO_BENDIAN_INT32(x)
+#	define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
+#	define htons(x) B_HOST_TO_BENDIAN_INT16(x)
+#	define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
+#endif
 
 #ifndef __HAIKU__
 #if defined(__DragonFly__) || __FreeBSD_version < 500000
