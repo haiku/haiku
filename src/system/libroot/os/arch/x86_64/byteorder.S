@@ -7,6 +7,28 @@
 #include <asm_defs.h>
 
 
+/* uint16 __swap_int16(uint16 value) */
+FUNCTION(__swap_int16):
+	movl	%edi, %eax
+	bswap	%eax
+	shr		$16, %eax
+	ret
+FUNCTION_END(__swap_int16)
+
+/* uint32 __swap_int32(uint32 value) */
+FUNCTION(__swap_int32):
+	movl	%edi, %eax
+	bswap	%eax
+	ret
+FUNCTION_END(__swap_int32)
+
+/* uint64 __swap_int64(uint64 value) */
+FUNCTION(__swap_int64):
+	movq	%rdi, %rax
+	bswap	%rax
+	ret
+FUNCTION_END(__swap_int64)
+
 /* float __swap_float(float value) */
 FUNCTION(__swap_float):
 	sub		$8, %rsp
