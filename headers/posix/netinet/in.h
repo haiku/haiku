@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NETINET_IN_H_
@@ -24,16 +24,14 @@ typedef uint32_t in_addr_t;
 
 /* We can't include <ByteOrder.h> since we are a POSIX file,
  * and we are not allowed to import all the BeOS types here. */
-#if !defined(__swap_int32)
-#	if __GNUC__ >= 4
-#		define __net_swap_int32(arg)	(uint32_t)__builtin_bswap32(arg)
-#		define __net_swap_int16(arg)	(uint16_t)__builtin_bswap16(arg)
-#	else
-		extern unsigned long __swap_int32(unsigned long); /* private */
-		extern uint16_t __swap_int16(uint16_t);	/* private */
-#		define __net_swap_int32(arg)	__swap_int32(arg)
-#		define __net_swap_int16(arg)	__swap_int16(arg)
-#	endif
+#if __GNUC__ >= 4
+#	define __net_swap_int32(arg)	(uint32_t)__builtin_bswap32(arg)
+#	define __net_swap_int16(arg)	(uint16_t)__builtin_bswap16(arg)
+#else
+	extern unsigned long __swap_int32(unsigned long); /* private */
+	extern uint16_t __swap_int16(uint16_t);	/* private */
+#	define __net_swap_int32(arg)	__swap_int32(arg)
+#	define __net_swap_int16(arg)	__swap_int16(arg)
 #endif
 
 #ifndef htonl
