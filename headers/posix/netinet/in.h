@@ -26,20 +26,22 @@ typedef uint32_t in_addr_t;
  * and we are not allowed to import all the BeOS types here. */
 #if !defined(__swap_int32)
 #	if __GNUC__ >= 4
-#		define __swap_int32(arg)	(uint32_t)__builtin_bswap32(arg)
-#		define __swap_int16(arg)	(uint16_t)__builtin_bswap16(arg)
+#		define __net_swap_int32(arg)	(uint32_t)__builtin_bswap32(arg)
+#		define __net_swap_int16(arg)	(uint16_t)__builtin_bswap16(arg)
 #	else
 		extern unsigned long __swap_int32(unsigned long); /* private */
 		extern uint16_t __swap_int16(uint16_t);	/* private */
+#		define __net_swap_int32(arg)	__swap_int32(arg)
+#		define __net_swap_int16(arg)	__swap_int16(arg)
 #	endif
 #endif
 
 #ifndef htonl
 #	if BYTE_ORDER == LITTLE_ENDIAN
-#		define htonl(x) ((uint32_t)__swap_int32(x))
-#		define ntohl(x) ((uint32_t)__swap_int32(x))
-#		define htons(x) __swap_int16(x)
-#		define ntohs(x) __swap_int16(x)
+#		define htonl(x) ((uint32_t)__net_swap_int32(x))
+#		define ntohl(x) ((uint32_t)__net_swap_int32(x))
+#		define htons(x) __net_swap_int16(x)
+#		define ntohs(x) __net_swap_int16(x)
 #	elif BYTE_ORDER == BIG_ENDIAN
 #		define htonl(x) (x)
 #		define ntohl(x) (x)
