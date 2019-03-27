@@ -62,11 +62,11 @@ struct tcp_header {
 	uint16	urgent_offset;
 
 	uint32	HeaderLength() const { return (uint32)header_length << 2; }
-	uint32	Sequence() const { return ntohl(sequence); }
-	uint32	Acknowledge() const { return ntohl(acknowledge); }
-	uint16	AdvertisedWindow() const { return ntohs(advertised_window); }
-	uint16	Checksum() const { return ntohs(checksum); }
-	uint16	UrgentOffset() const { return ntohs(urgent_offset); }
+	uint32	Sequence() const { return B_BENDIAN_TO_HOST_INT32(sequence); }
+	uint32	Acknowledge() const { return B_BENDIAN_TO_HOST_INT32(acknowledge); }
+	uint16	AdvertisedWindow() const { return B_BENDIAN_TO_HOST_INT16(advertised_window); }
+	uint16	Checksum() const { return B_BENDIAN_TO_HOST_INT16(checksum); }
+	uint16	UrgentOffset() const { return B_BENDIAN_TO_HOST_INT16(urgent_offset); }
 } _PACKED;
 
 class tcp_sequence {

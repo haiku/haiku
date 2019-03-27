@@ -43,7 +43,7 @@ ethernet_deframe(net_device* device, net_buffer* buffer)
 		return bufferHeader.Status();
 
 	ether_header& header = bufferHeader.Data();
-	uint16 type = ntohs(header.type);
+	uint16 type = B_BENDIAN_TO_HOST_INT16(header.type);
 
 	struct sockaddr_dl& source = *(struct sockaddr_dl*)buffer->source;
 	struct sockaddr_dl& destination = *(struct sockaddr_dl*)buffer->destination;
