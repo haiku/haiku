@@ -26,8 +26,8 @@ typedef uint32_t in_addr_t;
  * and we are not allowed to import all the BeOS types here. */
 #if !defined(__swap_int32)
 #	if __GNUC__ >= 4
-#		define __swap_int32(arg)	(uint32)__builtin_bswap32(arg)
-#		define __swap_int16(arg)	(uint16)__builtin_bswap16(arg)
+#		define __swap_int32(arg)	(uint32_t)__builtin_bswap32(arg)
+#		define __swap_int16(arg)	(uint16_t)__builtin_bswap16(arg)
 #	else
 		extern unsigned long __swap_int32(unsigned long); /* private */
 		extern uint16_t __swap_int16(uint16_t);	/* private */
