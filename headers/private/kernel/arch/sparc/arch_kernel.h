@@ -8,6 +8,9 @@
 
 #include <arch/cpu.h>
 
+// memory layout
+#define KERNEL_LOAD_BASE_64_BIT 0xffffffff80000000ll
+
 // Base of the kernel address space.
 // KERNEL_BASE is the base of the kernel address space. This differs from the
 // address where the kernel is loaded to: the kernel is loaded in the top 2GB
@@ -16,7 +19,6 @@
 #define KERNEL_BASE				0xffffff0000000000
 #define KERNEL_SIZE				0x10000000000
 #define KERNEL_TOP  			(KERNEL_BASE + (KERNEL_SIZE - 1))
-#define KERNEL_LOAD_BASE		0xffffffff80000000
 
 
 // Userspace address space layout.
