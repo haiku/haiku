@@ -7,7 +7,8 @@
 
 
 struct sparc_debug_cpu_state {
-	uint32	dummy;
+	uint64	pc;
+	uint64 i6; // frame pointer
 } __attribute__((aligned(8)));
 
 

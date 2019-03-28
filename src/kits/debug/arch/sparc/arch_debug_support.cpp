@@ -18,7 +18,7 @@ struct stack_frame {
 
 status_t
 arch_debug_get_instruction_pointer(debug_context *context, thread_id thread,
-	void **ip, void **stackFrameAddress)
+	void **pc, void **stackFrameAddress)
 {
 	// get the CPU state
 	debug_cpu_state cpuState;
@@ -26,8 +26,8 @@ arch_debug_get_instruction_pointer(debug_context *context, thread_id thread,
 	if (error != B_OK)
 		return error;
 
-	*ip = (void*)cpuState.rip;
-	*stackFrameAddress = (void*)cpuState.rbp;
+	*pc = (void*)cpuState.pc;
+	*stackFrameAddress = (void*)cpuState.i6;
 
 	return B_OK;
 }
