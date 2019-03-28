@@ -7,7 +7,7 @@ if $(TARGET_ARCH) = x86_64
 }
 
 local architectureObject ;
-for architectureObject in [ MultiArchSubDirSetup ] {
+for architectureObject in [ MultiArchSubDirSetup sparc ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
