@@ -159,6 +159,9 @@ new_fd_etc(struct io_context* context, struct file_descriptor* descriptor,
 	int fd = -1;
 	uint32 i;
 
+	if (firstIndex < 0 || (uint32)firstIndex >= context->table_size)
+		return B_BAD_VALUE;
+
 	mutex_lock(&context->io_mutex);
 
 	for (i = firstIndex; i < context->table_size; i++) {
