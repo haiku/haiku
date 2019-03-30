@@ -13,15 +13,15 @@ void dump_uimage(struct image_header *image)
 {
 	uint32 *sizes;
 	int i;
-	
+
 	dprintf("uimage @ %p:\n", image);
-	
+
 	if (!image)
 		return;
-	dprintf("magic: %x\n", ntohl(image->ih_magic));
-	dprintf("size: %d\n", ntohl(image->ih_size));
-	dprintf("load: %p\n", (void *)ntohl(image->ih_load));
-	dprintf("ep: %p\n", (void *)ntohl(image->ih_ep));
+	dprintf("magic: %x\n", B_BENDIAN_TO_HOST_INT32(image->ih_magic));
+	dprintf("size: %d\n", B_BENDIAN_TO_HOST_INT32(image->ih_size));
+	dprintf("load: %p\n", (void *)B_BENDIAN_TO_HOST_INT32(image->ih_load));
+	dprintf("ep: %p\n", (void *)B_BENDIAN_TO_HOST_INT32(image->ih_ep));
 	dprintf("os: %d\n", image->ih_os);
 	dprintf("arch: %d\n", image->ih_arch);
 	dprintf("type: %d\n", image->ih_type);
@@ -32,7 +32,7 @@ void dump_uimage(struct image_header *image)
 	sizes = (uint32 *)(&image[1]);
 	for (i = 0; sizes[i]; i++) {
 		dprintf("contents[%d] :", i);
-		dprintf("%d bytes\n", (int)ntohl(sizes[i]));
+		dprintf("%d bytes\n", (int)B_BENDIAN_TO_HOST_INT32(sizes[i]));
 	}
 }
 
@@ -52,10 +52,10 @@ image_multi_getimg(struct image_header *image, uint32 idx, uint32 *data, uint32 
 	for (i = 0; sizes[i] && i < count; i++) {
 		if (idx == i) {
 			*data = base;
-			*size = ntohl(sizes[i]);
+			*size = B_BENDIAN_TO_HOST_INT32(sizes[i]);
 			return true;
 		}
-		base += (ntohl(sizes[i]) + 3) & ~3;
+		base += (B_BENDIAN_TO_HOST_INT32(sizes[i]) + 3) & ~3;
 	}
 	return false;
 }
