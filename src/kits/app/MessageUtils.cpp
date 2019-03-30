@@ -22,11 +22,7 @@ CalculateChecksum(const uint8 *buffer, int32 size)
 	uint32 temp = 0;
 
 	while (size > 3) {
-#if defined(__i386__)
-		sum += B_SWAP_INT32(*(int32 *)buffer);
-#else
-		sum += *(int32 *)buffer;
-#endif
+		sum += B_BENDIAN_TO_HOST_INT32(*(int32 *)buffer);
 		buffer += 4;
 		size -= 4;
 	}
