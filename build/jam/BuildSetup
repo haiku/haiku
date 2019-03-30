@@ -433,16 +433,6 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 		}
 	}
 
-	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
-	# build platform we need to make sure, this is also defined.
-	if $(HOST_CPU) = x86 {
-		HOST_DEFINES += __INTEL__ ;
-	} else if $(HOST_CPU) = ppc {
-		HOST_DEFINES += __POWERPC__ ;
-	} else if $(HOST_CPU) = m68k {
-		HOST_DEFINES += __M68K__ ;
-	}
-
 	# Supposing this is a glibc platform, let's try to get features like large
 	# file support, ISO C 99 definitions, etc. On some platforms we need to
 	# request 64 bit off_t support explicitely.
