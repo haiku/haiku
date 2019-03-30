@@ -24,13 +24,13 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 
 # platform specific libraries
 local fsShellCommandLibs ;
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 }

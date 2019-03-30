@@ -65,8 +65,6 @@ SimpleTest spinlock_contention : spinlock_contention.cpp ;
 SimpleTest syscall_restart_test : syscall_restart_test.cpp
 	: network [ TargetLibsupc++ ] ;
 
-SetSupportedPlatformsForTarget syscall_time
-	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest syscall_time : syscall_time.cpp ;
 
 SimpleTest transfer_area_test : transfer_area_test.cpp ;
@@ -80,12 +78,8 @@ SimpleTest wait_for_objects_test : wait_for_objects_test.cpp ;
 
 SimpleTest yield_test : yield_test.cpp ;
 
-SetSupportedPlatformsForTarget sigint_bug113_test
-	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest sigint_bug113_test : sigint_bug113_test.cpp ;
 
-SetSupportedPlatformsForTarget set_area_protection_test1
-	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;
 
 SimpleTest sigsuspend_test : sigsuspend_test.cpp ;

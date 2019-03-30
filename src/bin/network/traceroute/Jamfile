@@ -1,13 +1,5 @@
 SubDir HAIKU_TOP src bin network traceroute ;
 
-SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
-
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# We need the public network headers also when not compiling for Haiku.
-		# Unfortunately we get more than we want, namely all POSIX headers.
-}
-
 local defines = [ FDefines HAVE_MALLOC_H=1 HAVE_SYS_SELECT=1 HAVE_NET_ROUTE_H=1
 			   HAVE_STRERROR=1 HAVE_USLEEP=1 HAVE_SETLINEBUF=1
 			   BYTESWAP_IP_HDR=1 HAVE_MALLOC_H=1
@@ -28,7 +20,7 @@ HaikuInstall install-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: traceroute ;
 
-HaikuInstall install-userland-networking 
+HaikuInstall install-userland-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
 	: traceroute
 	: installed-userland-networking

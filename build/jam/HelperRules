@@ -170,33 +170,16 @@ rule SetPlatformCompatibilityFlagVariables
 		EXIT "specify it manually." ;
 	}
 
-	# special case: Haiku libbe.so built for testing under BeOS
+	# special case: Haiku libbe.so built for testing under Haiku
 	if $(platform) = libbe_test {
 		platform = $(HOST_PLATFORM) ;
 	}
 
-	$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = ;
-	$(varPrefix)_PLATFORM_BONE_COMPATIBLE = ;
-	$(varPrefix)_PLATFORM_DANO_COMPATIBLE = ;
+	# unset variables first
 	$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = ;
 
 	switch $(platform)
 	{
-		case r5 :
-		{
-			$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = true ;
-		}
-
-		case bone :
-		{
-			$(varPrefix)_PLATFORM_BONE_COMPATIBLE = true ;
-		}
-
-		case dano :
-		{
-			$(varPrefix)_PLATFORM_DANO_COMPATIBLE = true ;
-		}
-
 		case haiku_host :
 		{
 			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
@@ -218,30 +201,11 @@ rule SetPlatformCompatibilityFlagVariables
 		}
 	}
 
-	# set lesser flags, e.g. "DANO" for "HAIKU" and "BEOS" for "BONE"
-	$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
-	$(varPrefix)_PLATFORM_DANO_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
-	$(varPrefix)_PLATFORM_BONE_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_DANO_COMPATIBLE) ;
-	$(varPrefix)_PLATFORM_BEOS_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_BONE_COMPATIBLE) ;
-
 	# set the machine friendly flags
 	$(varPrefix)_PLATFORM_(haiku)_COMPATIBLE
 		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
 	$(varPrefix)_PLATFORM_(haiku_host)_COMPATIBLE
 		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
-	$(varPrefix)_PLATFORM_(dano)_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_DANO_COMPATIBLE) ;
-	$(varPrefix)_PLATFORM_(bone)_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_BONE_COMPATIBLE) ;
-	$(varPrefix)_PLATFORM_(r5)_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_BEOS_COMPATIBLE) ;
-
-	$(varPrefix)_PLATFORM_(libbe_test)_COMPATIBLE
-		?= $($(varPrefix)_PLATFORM_BEOS_COMPATIBLE) ;
 }
 
 rule FAnalyzeGCCVersion
@@ -328,9 +292,6 @@ rule AddSubDirSupportedPlatforms
 
 rule SetSubDirSupportedPlatformsBeOSCompatible
 {
-	# SetSubDirSupportedPlatformsBeOSCompatible ;
-
-	SUPPORTED_PLATFORMS = $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 }
 
 rule IsPlatformSupportedForTarget

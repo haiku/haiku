@@ -4,7 +4,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin zip ] ;
 
 USES_BE_API on <build>zip = true ;
 
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	DEFINES += UNIX ;
 }
 

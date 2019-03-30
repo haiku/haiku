@@ -10,13 +10,6 @@
 	kludges in our source files at a minimum.
 */
 
-#ifdef HAIKU_HOST_PLATFORM_DANO
-#	include <be_setup.h>
-#	include <be_errors.h>
-#	define _ERRORS_H
-		// this is what Haiku/BeOS is using
-#endif
-
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 #	define _BE_ERRNO_H_
 		// this is what Dano/Zeta is using
@@ -149,26 +142,13 @@ extern float	roundf(float value);
 #	endif
 #endif	// HAIKU_TARGET_PLATFORM_LIBBE_TEST
 
-#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
-#	define B_REDO						'REDO'
-#	define B_BAD_DATA					(B_NOT_ALLOWED + 1)
-#	define B_DOCUMENT_BACKGROUND_COLOR	B_PANEL_BACKGROUND_COLOR
-#	define B_DOCUMENT_TEXT_COLOR		B_MENU_ITEM_TEXT_COLOR
-#endif
-
 #if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) \
 	&& !defined(HAIKU_HOST_PLATFORM_HAIKU)
-#	if !defined(B_NOT_SUPPORTED) && !defined(HAIKU_HOST_PLATFORM_DANO)
+#	if !defined(B_NOT_SUPPORTED)
 #		define B_NOT_SUPPORTED			(B_ERROR)
 #	endif
 #	define B_KERNEL_READ_AREA			0
 #	define B_KERNEL_WRITE_AREA			0
-#endif
-
-#if defined(HAIKU_TARGET_PLATFORM_BONE) || defined(HAIKU_TARGET_PLATFORM_DANO)
-#	define IF_NAMESIZE IFNAMSIZ
-#	define ifc_value ifc_val
-#	define IFF_AUTO_CONFIGURED 0
 #endif
 
 #include <limits.h>

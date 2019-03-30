@@ -1,13 +1,5 @@
 SubDir HAIKU_TOP src bin network pppconfig ;
 
-SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
-
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# We need the public network headers also when not compiling for Haiku.
-		# Unfortunately we get more than we want, namely all POSIX headers.
-}
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp

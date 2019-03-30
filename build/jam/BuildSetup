@@ -96,12 +96,6 @@ ProcessCommandLineArguments ;
 # supported debug levels
 HAIKU_DEBUG_LEVELS = 0 1 2 3 4 5 ;
 
-# BeOS, BONE, Dan0 compatible platforms
-HAIKU_BEOS_COMPATIBLE_PLATFORMS = haiku r5 bone dano haiku_host ;
-HAIKU_BONE_COMPATIBLE_PLATFORMS = haiku bone dano haiku_host ;
-HAIKU_DANO_COMPATIBLE_PLATFORMS = haiku dano haiku_host ;
-HAIKU_HAIKU_COMPATIBLE_PLATFORMS = haiku haiku_host ;
-
 # configuration header directories
 HAIKU_CONFIG_HEADERS = [ FDirName $(HAIKU_TOP) build user_config_headers ]
 	[ FDirName $(HAIKU_TOP) build config_headers ] ;
@@ -118,11 +112,6 @@ HAIKU_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HAIKU_OBJECT_BASE_DIR) common ] ;
 local architecture ;
 for architecture in $(HAIKU_PACKAGING_ARCHS) {
 	ArchitectureSetup $(architecture) ;
-}
-
-# TODO: Might not be needed anymore.
-if $(HAIKU_HOST_BUILD_ONLY) = 1 {
-	HAIKU_GCC_VERSION = 0 0 0 ;
 }
 
 if $(HAIKU_PACKAGING_ARCH) {
@@ -368,8 +357,8 @@ HOST_PRIVATE_KERNEL_HEADERS = ;
 # private shared kernel/libroot headers
 HOST_PRIVATE_SYSTEM_HEADERS = ;
 
-# under BeOS use copyattr instead of cp
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+# under Haiku use copyattr instead of cp
+if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	CP = copyattr --data ;
 }
 
@@ -387,7 +376,7 @@ HOST_LIBROOT = libroot_build_function_remapper.a libroot_build.so ;
 HOST_STATIC_LIBROOT = libroot_build_function_remapper.a libroot_build.a ;
 HOST_LIBBE = libbe_build.so ;
 
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	# the C++ standard and support libraries
 	if $(HOST_GCC_VERSION[1]) < 3 {
 		HOST_LIBSTDC++ = stdc++.r4 ;

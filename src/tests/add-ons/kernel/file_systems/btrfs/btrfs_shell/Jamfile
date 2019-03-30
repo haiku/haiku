@@ -21,7 +21,7 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 
 # platform specific libraries
 local fsShellCommandLibs ;
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
