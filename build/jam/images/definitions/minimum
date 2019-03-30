@@ -28,7 +28,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	tcptester telnet telnetd top
 	traceroute trash
 	unchop unmount
-	uptime urlwrapper useradd userdel
+	urlwrapper useradd userdel
 	version vmstat
 	waitfor watch writembr@x86,x86_64 xres
 ] ;

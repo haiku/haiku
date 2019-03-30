@@ -50,7 +50,6 @@ StdBinCommands
 	rescan.c
 	system_time.cpp
 	unchop.c
-	uptime.cpp
 	vmstat.cpp
 	: : $(haiku-utils_rsrc) ;
 
