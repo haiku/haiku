@@ -102,7 +102,7 @@ crash_assert()
 }
 
 
-#if __INTEL__
+#if __i386__
 
 static int
 crash_int3()
@@ -118,7 +118,7 @@ crash_protection()
 	return 0;
 }
 
-#endif	// __INTEL__
+#endif	// __i386__
 
 
 typedef int crash_function_t();
@@ -159,12 +159,12 @@ get_crash_function(const char* mode)
 		return crash_debugger;
 	} else if (strcmp(mode, "assert") == 0) {
 		return crash_assert;
-#if __INTEL__
+#if __i386__
 	} else if (strcmp(mode, "int3") == 0) {
 		return crash_int3;
 	} else if (strcmp(mode, "protection") == 0) {
 		return crash_protection;
-#endif	// __INTEL__
+#endif	// __i386__
 	}
 
 	return NULL;

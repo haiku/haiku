@@ -89,7 +89,7 @@ static char	pci_name[] = B_PCI_MODULE_NAME;
 #define inb(p) (*pci->read_io_8)(p)
 #define outb(p,v) (*pci->write_io_8)(p,v)
 
-#ifdef __INTEL__
+#ifdef __i386__
 #define toLE(x) (x)
 #define unLE(x) (x)
 #else
@@ -799,7 +799,7 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
 
     BusLogic *bl = (BusLogic *) malloc(sizeof(BusLogic));
 
-#ifndef __INTEL__
+#ifndef __i386__
 	i = map_physical_memory("bl_regs", iobase,  4096,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, &a);
 	iobase = (uint32) a;
@@ -926,7 +926,7 @@ sim_install_buslogic(void)
         if ((h.vendor_id == PCI_VENDOR_BUSLOGIC) &&
             (h.device_id == PCI_DEVICE_MULTIMASTER)) {
 
-#ifdef __INTEL__
+#ifdef __i386__
             iobase = h.u.h0.base_registers[0];
 #else
             iobase = h.u.h0.base_registers[1];

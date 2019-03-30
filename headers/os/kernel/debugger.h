@@ -24,7 +24,7 @@
 
 #if defined(__x86_64__)
 	typedef struct x86_64_debug_cpu_state debug_cpu_state;
-#elif defined(__INTEL__)
+#elif defined(__i386__)
 	typedef struct x86_debug_cpu_state debug_cpu_state;
 #elif defined(__POWERPC__)
 	typedef struct ppc_debug_cpu_state debug_cpu_state;

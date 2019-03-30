@@ -103,7 +103,7 @@ static const char* kLGPLv21 = B_TRANSLATE_MARK("GNU LGPL v2.1");
 #if 0
 static const char* kPublicDomain = B_TRANSLATE_MARK("Public Domain");
 #endif
-#ifdef __INTEL__
+#ifdef __i386__
 static const char* kIntel2xxxFirmware = B_TRANSLATE_MARK("Intel (2xxx firmware)");
 static const char* kIntelFirmware = B_TRANSLATE_MARK("Intel (firmware)");
 static const char* kMarvellFirmware = B_TRANSLATE_MARK("Marvell (firmware)");
@@ -1324,7 +1324,7 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDTwoClause)
 		.SetURL("http://www.acme.com/software/thttpd/"));
 
-#ifdef __INTEL__
+#ifdef __i386__
 	// Udis86 copyrights
 	_AddPackageCredit(PackageCredit("Udis86")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2004 "

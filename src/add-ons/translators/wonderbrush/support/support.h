@@ -21,7 +21,7 @@ constrain(float& value, float min, float max)
 		value = max;
 }
 
-#ifdef __INTEL__
+#ifdef __i386__
 
 // constrain_int32_0_255_asm
 inline int32

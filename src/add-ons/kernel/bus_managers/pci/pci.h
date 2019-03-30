@@ -15,7 +15,7 @@
 
 #include "pci_controller.h"
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 #include "pci_arch_info.h"
 #endif
 
@@ -47,7 +47,7 @@ struct PCIDev {
 	uint8				device;
 	uint8				function;
 	pci_info			info;
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	pci_arch_info		arch_info;
 #endif
 };

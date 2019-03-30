@@ -93,7 +93,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 
 
 
-#if defined(__x86_64__) || defined(__INTEL__)
+#if defined(__x86_64__) || defined(__i386__)
 
 /* sysdeps/x86_64/fpu/printf_fphex.c */
 
@@ -169,7 +169,7 @@ do {									      \
 	}								      \
 } while (0)
 
-#endif	/* __x86_64__ || __INTEL__ */
+#endif	/* __x86_64__ || __i386__ */
 
 
 int

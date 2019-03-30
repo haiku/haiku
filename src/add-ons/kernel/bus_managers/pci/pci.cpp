@@ -586,7 +586,7 @@ PCI::~PCI()
 status_t
 PCI::_CreateVirtualBus(uint8 domain, uint8 bus, uint8 *virtualBus)
 {
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 
 	// IA32 doesn't use domains
 	if (domain)
@@ -625,7 +625,7 @@ PCI::_CreateVirtualBus(uint8 domain, uint8 bus, uint8 *virtualBus)
 status_t
 PCI::ResolveVirtualBus(uint8 virtualBus, uint8 *domain, uint8 *bus)
 {
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 
 	// IA32 doesn't use domains
 	*bus = virtualBus;
@@ -1467,7 +1467,7 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		_ReadBasicInfo(dev);
 		_ReadHeaderInfo(dev);
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 		pci_read_arch_info(dev);
 #endif
 		if (dev->child)

@@ -178,7 +178,7 @@ typedef struct etherpci_private {
 #endif
 
 #if 0
-#if __INTEL__
+#if __i386__
 
 uint8  ether_inb(etherpci_private_t *device, uint32 offset) {
   	uint8 result;
@@ -567,7 +567,7 @@ etherpci_min(etherpci_private_t *data, unsigned char *dst,
 		unsigned short word;
 
 		word = ether_inw(data, NE_DATA);
-#if __INTEL__
+#if __i386__
 		dst[i + 1] = word >> 8;
 		dst[i + 0] = word & 0xff;
 #else
@@ -628,7 +628,7 @@ again:
 	for (i = 0; i < len; i += 2) {
 		unsigned short word;
 
-#if __INTEL__
+#if __i386__
 		word = (src[i + 1] << 8) | src[i + 0];
 #else
 		word = (src[i] << 8) | src[i + 1];
@@ -1181,7 +1181,7 @@ enable_addressing(etherpci_private_t *data)
 {
 	unsigned char cmd;
 
-#if __INTEL__
+#if __i386__
 	data->reg_base = data->pciInfo->u.h0.base_registers[0];
 #else
 	uint32 base, size, offset;
@@ -1532,7 +1532,7 @@ open_hook(const char *name, uint32 flags, void **cookie)
 	return B_NO_ERROR;
 
 err2:
-#if !__INTEL__
+#if !__i386__
 	delete_area(data->ioarea);
 #endif
 err1:
@@ -1624,7 +1624,7 @@ free_hook(void *_data)
 
 	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": free dev=%p\n", data);
 
-#if !__INTEL__
+#if !__i386__
 	delete_area(data->ioarea);
 #endif
 

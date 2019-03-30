@@ -147,7 +147,7 @@ add_address(void* address, size_t size)
 {
 	block *b = (block *)address - 1;
 
-#ifdef __INTEL__
+#ifdef __i386__
 	// set call stack
 	struct stack_frame {
 		struct stack_frame*	previous;

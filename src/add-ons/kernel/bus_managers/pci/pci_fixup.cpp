@@ -159,7 +159,7 @@ static void
 ati_fixup_ixp(PCI *pci, uint8 domain, uint8 bus, uint8 device, uint8 function,
 	uint16 deviceId)
 {
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	/* ATI Technologies Inc, IXP chipset:
 	 * This chipset seems broken, at least on my laptop I must force 
 	 * the timer IRQ trigger mode, else no interrupt comes in.

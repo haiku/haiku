@@ -19,7 +19,7 @@ CPUCapabilities::~CPUCapabilities()
 
 CPUCapabilities::CPUCapabilities()
 {
-	#ifdef __INTEL__
+	#ifdef __i386__
 		setIntelCapabilities();
 	#endif
 	

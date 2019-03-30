@@ -49,7 +49,7 @@ check_r5_compatibility()
 	if (!__gR5Compatibility)
 		return false;
 
-#ifndef __INTEL__
+#ifndef __i386__
 	return false;
 #else
 

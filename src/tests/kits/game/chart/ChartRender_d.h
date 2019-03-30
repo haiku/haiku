@@ -71,7 +71,7 @@ typedef struct {
    Using the CPU native mode is faster than the C-standard
    mode. Another crazy optimisation you shouldn't care too
    much about (except if you're a crazy geek). */ 
-#ifdef __INTEL__
+#ifdef __i386__
 #define ROUNDING	0.0
 #else
 #define ROUNDING	0.5

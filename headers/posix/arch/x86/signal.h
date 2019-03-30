@@ -10,7 +10,7 @@
  * Architecture-specific structure passed to signal handlers
  */
 
-#if __INTEL__
+#if __i386__
 
 typedef struct packed_fp_stack {
 	unsigned char	st0[10];
@@ -146,6 +146,6 @@ struct vregs {
 	unsigned long			ebx;
 };
 
-#endif /* __INTEL__ */
+#endif /* __i386__ */
 
 #endif /* _ARCH_SIGNAL_H_ */

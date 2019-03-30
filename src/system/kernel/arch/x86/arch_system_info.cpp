@@ -106,7 +106,7 @@ arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 {
 	switch (node->type) {
 		case B_TOPOLOGY_ROOT:
-#if __INTEL__
+#if __i386__
 			node->data.root.platform = B_CPU_x86;
 #elif __x86_64__
 			node->data.root.platform = B_CPU_x86_64;

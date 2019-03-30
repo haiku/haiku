@@ -126,7 +126,7 @@ NormalPulseView::DetermineVendorAndProcessor()
 
 #if __POWERPC__
 	logo = PowerPCLogo;
-#elif __INTEL__
+#elif __i386__
 	uint32 topologyNodeCount = 0;
 	cpu_topology_node_info* topology = NULL;
 
@@ -193,7 +193,7 @@ NormalPulseView::Draw(BRect rect)
 	// Processor picture
 	DrawBitmap(fCpuLogo, BPoint(10, 10));
 
-#if __INTEL__
+#if __i386__
 	// Do nothing in the case of non-Intel CPUs - they already have a logo
 	if (!fHasBrandLogo) {
 		SetDrawingMode(B_OP_OVER);

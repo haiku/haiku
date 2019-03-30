@@ -38,7 +38,7 @@ using std::nothrow;
 #endif
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 #	ifndef _USER_MODE
 #		define MBR_HEADER "MBR.h"
 #		include MBR_HEADER

@@ -17,7 +17,7 @@
 
 // TODO: -disable_cpu_sn option is not yet implemented
 // TODO: most of this file should go into an architecture dependent source file
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 
 struct cache_description {
 	uint8		code;
@@ -288,7 +288,7 @@ print_intel_cache_descriptors(enum cpu_vendor vendor, uint32 model,
 }
 
 
-#endif	// __INTEL__ || __x86_64__
+#endif	// __i386__ || __x86_64__
 
 
 static void
@@ -354,7 +354,7 @@ print_level1_cache(uint32 reg, const char *name)
 }
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 
 static void
 print_cache_desc(int32 cpu)
@@ -425,7 +425,7 @@ print_transmeta_features(uint32 features)
 		printf("\t\tFCMOV\n");
 }
 
-#endif	// __INTEL__ || __x86_64__
+#endif	// __i386__ || __x86_64__
 
 
 static void
@@ -449,7 +449,7 @@ print_features(const char** table, uint32 features)
 }
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 
 static void
 print_processor_signature(enum cpu_vendor vendor, cpuid_info *info)
@@ -481,7 +481,7 @@ print_processor_signature(enum cpu_vendor vendor, cpuid_info *info)
 	}
 }
 
-#endif	// __INTEL__ || __x86_64__
+#endif	// __i386__ || __x86_64__
 
 
 static void
@@ -510,7 +510,7 @@ dump_platform(system_info *info)
 }
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 
 static void
 dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
@@ -661,7 +661,7 @@ dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
 	putchar('\n');
 }
 
-#endif	// __INTEL__ || __x86_64__
+#endif	// __i386__ || __x86_64__
 
 
 static void
@@ -717,10 +717,10 @@ dump_cpus(system_info *info)
 		cpuModel,
 		frequency / 1000000);
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	for (uint32 cpu = 0; cpu < info->cpu_count; cpu++)
 		dump_cpu(cpuVendor, cpuModel, cpu);
-#endif	// __INTEL__ || __x86_64__
+#endif	// __i386__ || __x86_64__
 }
 
 

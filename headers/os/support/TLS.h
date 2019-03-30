@@ -23,7 +23,7 @@ extern "C" {
 
 extern int32 tls_allocate(void);
 
-#if !_NO_INLINE_ASM && __INTEL__ && __GNUC__
+#if !_NO_INLINE_ASM && __i386__ && __GNUC__
 
 static inline void *
 tls_get(int32 index)
@@ -54,13 +54,13 @@ tls_set(int32 index, void *value)
 		: : "r" (index), "r" (value));
 }
 
-#else	/* !_NO_INLINE_ASM && __INTEL__ && __GNUC__ */
+#else	/* !_NO_INLINE_ASM && __i386__ && __GNUC__ */
 
 extern void *tls_get(int32 index);
 extern void **tls_address(int32 index);
 extern void tls_set(int32 index, void *value);
 
-#endif	/* !_NO_INLINE_ASM && __INTEL__ && __GNUC__ */
+#endif	/* !_NO_INLINE_ASM && __i386__ && __GNUC__ */
 
 #ifdef __cplusplus
 }

@@ -1030,7 +1030,7 @@ void version(__G)
 #ifdef __POWERPC__
       "(PowerPC)",
 #else
-# ifdef __INTEL__
+# ifdef __i386__
       "(x86)",
 # else
       "(unknown)",   /* someday we may have other architectures... */

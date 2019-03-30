@@ -31,7 +31,7 @@ int32 get_rounded_cpu_speed(void);
 #endif
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 /*!	Tries to parse an Intel CPU ID string to match our usual naming scheme.
 	Note, this function is not thread safe, and must only be called once
 	at a time.
@@ -182,7 +182,7 @@ get_cpu_vendor_string(enum cpu_vendor cpuVendor)
 }
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 /*! Parameter 'name' needs to point to an allocated array of 49 characters. */
 void
 get_cpuid_model_string(char *name)
@@ -237,21 +237,21 @@ get_cpuid_model_string(char *name)
 		}
 	}
 }
-#endif	/* __INTEL__ || __x86_64__ */
+#endif	/* __i386__ || __x86_64__ */
 
 
 static const char*
 get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
 	uint32 cpuModel)
 {
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	char cpuidName[49];
 #endif
 
 	(void)cpuVendor;
 	(void)cpuModel;
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	if (platform != B_CPU_x86 && platform != B_CPU_x86_64)
 		return NULL;
 

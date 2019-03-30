@@ -405,7 +405,7 @@ struct BilinearLowFilterRatio :
 };
 
 
-#ifdef __INTEL__
+#ifdef __i386__
 
 struct BilinearSimd : DrawBitmapBilinearOptimized<BilinearSimd> {
 	void DrawToClipRect(int32 xIndexL, int32 xIndexR, int32 y1, int32 y2)
@@ -475,7 +475,7 @@ struct BilinearSimd : DrawBitmapBilinearOptimized<BilinearSimd> {
 	}
 };
 
-#endif	// __INTEL__
+#endif	// __i386__
 
 
 template<class ColorType, class DrawMode>
@@ -626,7 +626,7 @@ struct DrawBitmapBilinear {
 				break;
 			}
 
-#ifdef __INTEL__
+#ifdef __i386__
 			case kUseSIMDVersion:
 			{
 				BilinearSimd bilinearPainter;
@@ -634,7 +634,7 @@ struct DrawBitmapBilinear {
 					filterData);
 				break;
 			}
-#endif	// __INTEL__
+#endif	// __i386__
 		}
 
 #ifdef FILTER_INFOS_ON_HEAP

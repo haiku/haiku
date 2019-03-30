@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 // bonefish: What was this needed for?
-//#if __INTEL__
+//#if __i386__
 //# ifdef _BUILDING_RDEF
 //#  define _IMPEXP_RDEF __declspec(dllexport)
 //# else

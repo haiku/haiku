@@ -137,7 +137,7 @@ dbg_printf(const char *format,...)
 	va_list args;
 	va_start(args, format);
 	// no vsnprintf() on PPC and in kernel
-	#if defined(__INTEL__) && USER
+	#if defined(__i386__) && USER
 		vsnprintf(buffer, sizeof(buffer) - 1, format, args);
 	#else
 		vsprintf(buffer, format, args);

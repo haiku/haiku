@@ -6670,7 +6670,7 @@ _user_get_memory_properties(team_id teamID, const void* address,
 // #pragma mark -- compatibility
 
 
-#if defined(__INTEL__) && B_HAIKU_PHYSICAL_BITS > 32
+#if defined(__i386__) && B_HAIKU_PHYSICAL_BITS > 32
 
 
 struct physical_entry_beos {
@@ -6785,4 +6785,4 @@ DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__create_area_haiku", "create_area@@",
 	"BASE");
 
 
-#endif	// defined(__INTEL__) && B_HAIKU_PHYSICAL_BITS > 32
+#endif	// defined(__i386__) && B_HAIKU_PHYSICAL_BITS > 32

@@ -534,7 +534,7 @@ extern status_t		get_cpu_info(uint32 firstCPU, uint32 cpuCount,
 extern status_t		get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 						uint32* topologyInfoCount);
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 typedef union {
 	struct {
 		uint32	max_eax;

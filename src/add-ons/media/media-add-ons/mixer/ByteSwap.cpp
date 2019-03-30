@@ -49,7 +49,7 @@ do_nothing(void *buffer, size_t bytecount)
 }
 
 
-#if __INTEL__
+#if __i386__
 // #pragma mark - optimized for IA32 platform
 
 
@@ -122,7 +122,7 @@ swap_int16(void *buffer, size_t bytecount)
 }
 
 
-#else	// !__INTEL__
+#else	// !__i386__
 // #pragma mark - generic versions
 
 

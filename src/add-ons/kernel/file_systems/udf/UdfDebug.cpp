@@ -308,7 +308,7 @@ dbg_printf(const char *format,...)
 	va_list args;
 	va_start(args, format);
 	// no vsnprintf() on PPC 
-	#if defined(__INTEL__) && !_KERNEL_MODE
+	#if defined(__i386__) && !_KERNEL_MODE
 		vsnprintf(buffer, sizeof(buffer) - 1, format, args);
 	#else
 		vsprintf(buffer, format, args);

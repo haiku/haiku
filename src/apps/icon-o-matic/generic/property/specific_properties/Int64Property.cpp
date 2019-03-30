@@ -44,7 +44,7 @@ Int64Property::Clone() const
 bool
 Int64Property::SetValue(const char* value)
 {
-	// TODO: atoll is defined for __INTEL__ only
+	// TODO: atoll is defined for __i386__ only
 	return SetValue(atoll(value));
 }
 

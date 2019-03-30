@@ -154,7 +154,7 @@ ArchitectureX86::Init()
 	if (fAssemblyLanguage == NULL)
 		return B_NO_MEMORY;
 
-#if defined(__INTEL__)
+#if defined(__i386__)
 	// TODO: this needs to be determined/retrieved indirectly from the
 	// target host interface, as in the remote case the CPU features may
 	// differ from those of the local CPU.

@@ -84,7 +84,7 @@ BrowserApp::BrowserApp()
 	fConsoleWindow(NULL),
 	fCookieWindow(NULL)
 {
-#ifdef __INTEL__
+#ifdef __i386__
 	// First let's check SSE2 is available
 	cpuid_info info;
 	get_cpuid(&info, 1, 0);

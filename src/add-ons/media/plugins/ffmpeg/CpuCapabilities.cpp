@@ -23,13 +23,13 @@ CPUCapabilities::~CPUCapabilities()
 CPUCapabilities::CPUCapabilities()
 	: fCapabilities(0)
 {
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	_SetIntelCapabilities();
 #endif
 }
 
 
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 void
 CPUCapabilities::_SetIntelCapabilities()
 {
@@ -88,7 +88,7 @@ CPUCapabilities::_SetIntelCapabilities()
 		}
 	}
 }
-#endif // __INTEL__ || __x86_64__
+#endif // __i386__ || __x86_64__
 
 
 bool

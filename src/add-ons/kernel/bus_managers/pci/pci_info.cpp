@@ -13,7 +13,7 @@
 #include "pci.h"
 
 #define PCI_VERBOSE	1
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 // enabling it makes the pci bus_manager binary about 1MB
 // some other platforms have issues with floppy image size...
 // TODO: Move this define to BuildSetup?

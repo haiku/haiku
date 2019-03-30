@@ -18,7 +18,7 @@
    __HAIKU_BIG_ENDIAN			- defined to 1 on big endian architectures
    								  (defaults to undefined)
 */
-#if defined(__INTEL__)
+#if defined(__i386__)
 #	define __HAIKU_ARCH					x86
 #	if __GNUC__ == 2
 #		define __HAIKU_ARCH_ABI			"x86_gcc2"

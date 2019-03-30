@@ -35,9 +35,9 @@ public:
 			void 				PrintCapabilities();
 	
 private:
-#if defined(__INTEL__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 			void 				_SetIntelCapabilities();
-#endif // __INTEL__ || __x86_64__
+#endif // __i386__ || __x86_64__
 
 			uint32				fCapabilities;
 };
