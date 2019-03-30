@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app draw_after_children ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;

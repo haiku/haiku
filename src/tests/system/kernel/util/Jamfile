@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests system kernel util ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;

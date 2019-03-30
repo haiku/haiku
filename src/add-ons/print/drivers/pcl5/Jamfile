@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print drivers pcl5 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources PCL5\ Compatible : PCL5.rdef ;

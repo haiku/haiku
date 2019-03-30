@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics radeon_hd ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders graphics kernel ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network protocols icmp6 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ] : true ;

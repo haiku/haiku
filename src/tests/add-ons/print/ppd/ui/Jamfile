@@ -1,13 +1,11 @@
 SubDir HAIKU_TOP src tests add-ons print ppd ui ;
 
-# SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd model ;
 SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd parser ;
 
-StaticLibrary 
+StaticLibrary
 	libppdtest.a
-	: 
+	:
 	PPDConfigView.cpp
 	PrinterSelection.cpp
 	UIUtils.cpp

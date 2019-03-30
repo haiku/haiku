@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src data keymaps ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 NotFile keymap_files ;
 Depends files : keymap_files ;
 

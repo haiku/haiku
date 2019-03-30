@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems googlefs ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 
 #SubDirCcFlags -DTRACK_FILENAME ;

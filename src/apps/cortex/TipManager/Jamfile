@@ -5,8 +5,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 StaticLibrary cortex_tip_manager.a :
 	TipManager.cpp
 	TipManagerImpl.cpp

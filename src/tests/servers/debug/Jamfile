@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers debug ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 BinCommand crashing_app : crashing_app.cpp ;

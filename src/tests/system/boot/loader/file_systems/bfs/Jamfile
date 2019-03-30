@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests system boot loader file_systems bfs ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateSystemHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;

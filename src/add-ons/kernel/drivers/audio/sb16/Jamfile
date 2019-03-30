@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio sb16 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders audio ;
 
 KernelAddon sb16 :

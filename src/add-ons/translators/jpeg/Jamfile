@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators jpeg ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) raw ] ;
 	# for TIFF.h and ReadHelper.h
 

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps fontdemo ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 Application FontDemo :
 	ControlView.cpp
 	FontDemo.cpp

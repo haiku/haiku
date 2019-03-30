@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print drivers postscript ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources PS\ Compatible : PS.rdef ;

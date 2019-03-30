@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits app common ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 TestObjects CommonTestApp.cpp ;

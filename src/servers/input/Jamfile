@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src servers input ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 rule MkKeymapHeader {
 	local binary = $(1) ;
 	local source = $(2) ;

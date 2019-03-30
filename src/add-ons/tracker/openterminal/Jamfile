@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons tracker openterminal ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources Open\ Terminal : OpenTerminal.rdef ;
 
 Addon Open\ Terminal :

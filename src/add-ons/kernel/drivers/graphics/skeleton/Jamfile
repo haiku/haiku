@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders graphics libroot ;
 UsePrivateHeaders [ FDirName graphics skeleton ] ;
 

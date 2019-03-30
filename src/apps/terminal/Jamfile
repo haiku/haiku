@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps terminal ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 UsePrivateHeaders libroot kernel shared system ;

@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp pap ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
 
 UsePrivateKernelHeaders ;

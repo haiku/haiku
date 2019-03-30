@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons input_server filters switch_workspace ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders app ;
 
 Addon switch_workspace

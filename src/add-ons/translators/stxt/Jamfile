@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators stxt ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders textencoding ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits storage mime ] ;
 	# for the text identification

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators gif ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources GIFTranslator : GIFTranslator.rdef ;

@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app stress_test ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;

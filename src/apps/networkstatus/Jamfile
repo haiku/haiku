@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps networkstatus ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface net ;
 UseLibraryHeaders agg ;
 

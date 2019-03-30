@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tools cppunit ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers tools elfsymbolpatcher ] : true ;

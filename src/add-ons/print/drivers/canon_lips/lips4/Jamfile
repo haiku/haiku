@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print drivers canon_lips lips4 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources Canon\ LIPS4\ Compatible : Lips4.rdef ;

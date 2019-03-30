@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits interface ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders interface shared ;

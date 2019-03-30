@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests apps miniterminal ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UseHeaders [ FDirName $(HAIKU_TOP) src tests apps miniterminal ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 

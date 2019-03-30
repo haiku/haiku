@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits bluetooth ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders bluetooth ;

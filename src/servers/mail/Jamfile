@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src servers mail ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
 }

@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src libs glut ;
 
 UseLibraryHeaders glut ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 local sourcesCc =
 	# C sources
 	glut_8x13.c

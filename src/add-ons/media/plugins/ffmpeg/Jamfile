@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media plugins ffmpeg ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 
 SubDirC++Flags -D__STDC_CONSTANT_MACROS -Wdeprecated ;

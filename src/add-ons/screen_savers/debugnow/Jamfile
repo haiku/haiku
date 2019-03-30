@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons screen_savers debugnow ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders screen_saver ;
 	# For BuildDefaultSettingsView
 

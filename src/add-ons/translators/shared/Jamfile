@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators shared ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

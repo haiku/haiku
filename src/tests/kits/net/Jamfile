@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests kits net ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SimpleTest link_echo : link_echo.cpp : $(TARGET_NETWORK_LIBS) bnetapi be ;
 
 SimpleTest NetAddressTest : NetAddressTest.cpp

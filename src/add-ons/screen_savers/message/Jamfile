@@ -5,8 +5,6 @@ UsePrivateHeaders screen_saver ;
 UsePrivateHeaders shared ;
 	# For ObjectList
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources Message : Message.rdef ;
 
 ScreenSaver Message :

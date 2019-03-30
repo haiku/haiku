@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons mixer ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources mixer.media_addon : AudioMixer.rdef ;
 
 local architectureObject ;

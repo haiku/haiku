@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel busses scsi 53c8xx ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirCcFlags -DBUILD_LOADABLE ;
 
 KernelAddon 53c8xx :

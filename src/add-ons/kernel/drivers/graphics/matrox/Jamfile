@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics matrox ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateSystemHeaders ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;

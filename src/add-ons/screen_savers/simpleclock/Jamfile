@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons screen_savers simpleclock ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources Message : SimpleClock.rdef ;
 
 ScreenSaver SimpleClock :

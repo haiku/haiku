@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics intel_extreme ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;

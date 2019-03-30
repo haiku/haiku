@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons accelerants common ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 SetSubDirSupportedPlatforms haiku haiku_host libbe_test ;
 
 UsePrivateHeaders graphics ;

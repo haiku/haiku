@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app workspace_switcher ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;

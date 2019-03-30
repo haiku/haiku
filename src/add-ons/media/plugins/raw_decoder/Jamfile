@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media plugins raw_decoder ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders media ;
 
 local architectureObject ;

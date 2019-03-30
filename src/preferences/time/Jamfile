@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences time ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface locale shared [ FDirName libroot time ] ;
 UsePrivateSystemHeaders ;
 UseBuildFeatureHeaders icu ;

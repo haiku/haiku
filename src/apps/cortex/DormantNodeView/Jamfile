@@ -9,8 +9,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 StaticLibrary cortex_dormant_node_view.a :
 	DormantNodeListItem.cpp
 	DormantNodeView.cpp

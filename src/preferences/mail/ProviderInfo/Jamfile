@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences mail ProviderInfo ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 HAIKU_PROVIDER_INFOS =
 	aol.com
 	arcor.de

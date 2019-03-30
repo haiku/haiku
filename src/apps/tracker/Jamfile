@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src apps tracker ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared ;

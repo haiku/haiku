@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel busses scsi usb ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders drivers ;
 
 KernelAddon usb_scsi :

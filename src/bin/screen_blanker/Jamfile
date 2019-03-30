@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin screen_blanker ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UseHeaders [ FDirName headers os add-ons screen_saver ] ;
 	# we also need our headers when build for BeOS
 

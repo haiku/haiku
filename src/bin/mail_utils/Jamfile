@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin mail_utils ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders mail ;
 
 StdBinCommands

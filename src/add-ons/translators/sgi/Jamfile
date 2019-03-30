@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators sgi ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources SGITranslator : SGITranslator.rdef ; 

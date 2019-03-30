@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app event_mask ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;

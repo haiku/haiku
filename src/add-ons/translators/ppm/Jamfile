@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators ppm ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources PPMTranslator : PPMTranslator.rdef ;
 
 local architectureObject ;

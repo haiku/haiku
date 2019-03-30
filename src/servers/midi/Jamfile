@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src servers midi ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders app midi shared storage ;
 
 Server midi_server :

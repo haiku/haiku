@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests add-ons input_server ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs $(HAIKU_TOP) src add-ons input_server devices keyboard ;
 UsePrivateHeaders input shared tracker  ;
 UsePrivateSystemHeaders ;

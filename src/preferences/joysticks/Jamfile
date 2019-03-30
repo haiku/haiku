@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences joysticks ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 Preference Joysticks :
 	CalibWin.cpp
 	JoyWin.cpp

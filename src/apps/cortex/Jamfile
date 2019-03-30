@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubInclude HAIKU_TOP src apps cortex RouteApp ;
 SubInclude HAIKU_TOP src apps cortex AddOnHost ;
 

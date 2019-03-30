@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src kits screensaver ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons screen_saver ] ;
 	# we also need our headers when build for BeOS
 

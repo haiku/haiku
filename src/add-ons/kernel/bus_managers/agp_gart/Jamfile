@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers agp_gart ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
 
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;

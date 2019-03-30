@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media plugins au_reader ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders media ;
 
 Addon au_reader :

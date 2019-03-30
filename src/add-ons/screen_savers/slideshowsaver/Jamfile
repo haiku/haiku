@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons screen_savers slideshowsaver ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources Message : SlideShowSaver.rdef ;
 
 ScreenSaver SlideShowSaver :

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps login ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders app interface ;
 UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
 

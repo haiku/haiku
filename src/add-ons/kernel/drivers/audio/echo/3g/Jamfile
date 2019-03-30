@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio echo 3g ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;

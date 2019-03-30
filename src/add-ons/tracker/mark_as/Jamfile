@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons tracker mark_as ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders mail ;
 
 AddResources Mark\ as… : MarkAs.rdef ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests apps installer ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;

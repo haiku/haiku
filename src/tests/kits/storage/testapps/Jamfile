@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src tests kits storage testapps ;
 
 UsePrivateHeaders shared storage ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 SEARCH_SOURCE += [ FDirName $(TOP) src kits storage ] ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders graphics ;
 UsePrivateSystemHeaders ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;

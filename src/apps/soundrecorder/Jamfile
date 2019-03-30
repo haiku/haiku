@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps soundrecorder ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared media ;
 
 Application SoundRecorder :

@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src apps charactermap ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared system ;

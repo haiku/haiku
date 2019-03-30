@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons screen_savers spider ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources Spider : Spider.rdef ;
 
 UsePrivateHeaders interface ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences sounds ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface ;
 
 Preference Sounds : 

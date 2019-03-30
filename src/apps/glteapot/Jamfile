@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src apps glteapot ;
 UseBuildFeatureHeaders glu ;
 UseBuildFeatureHeaders mesa ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 local sources =
 	FPS.cpp
 	GLObject.cpp

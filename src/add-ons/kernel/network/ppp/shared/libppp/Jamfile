@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp shared libppp ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp

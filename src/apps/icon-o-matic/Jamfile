@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src apps icon-o-matic ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 # defines (get all the extra stuff in from libicon.a classes)

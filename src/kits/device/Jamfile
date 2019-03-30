@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src kits device ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders device ;
 
 # for usb_raw.h that defines the ioctl protocol used by the USB classes

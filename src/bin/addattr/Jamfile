@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin addattr ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 BinCommand addattr :
 	main.cpp
 	addAttr.cpp

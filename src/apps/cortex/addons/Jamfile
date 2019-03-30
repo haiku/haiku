@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps cortex addons ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubInclude HAIKU_TOP src apps cortex addons AudioAdapter ;
 SubInclude HAIKU_TOP src apps cortex addons Flanger ;
 SubInclude HAIKU_TOP src apps cortex addons LoggingConsumer ;

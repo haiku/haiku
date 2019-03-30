@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print transports lpr ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 

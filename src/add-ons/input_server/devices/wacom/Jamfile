@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons input_server devices wacom ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders input ;
 
 Addon <input>wacom : 

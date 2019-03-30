@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin bfs_tools ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs $(HAIKU_TOP) src bin bfs_tools lib ;
 UsePrivateHeaders [ FDirName shared ] ;
 

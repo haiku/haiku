@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network devices dialup ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 

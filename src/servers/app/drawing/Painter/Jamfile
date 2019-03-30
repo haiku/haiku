@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src servers app drawing Painter ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders agg ;

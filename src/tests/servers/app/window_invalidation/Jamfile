@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app window_invalidation ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders interface ;

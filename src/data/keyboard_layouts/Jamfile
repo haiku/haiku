@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src data keyboard_layouts ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 
 rule GenerateKeyboardLayoutLocalizationHeader
 {

@@ -4,8 +4,6 @@ UseHeaders [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) data keymaps ] ;
 UseHeaders [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) data
 	keyboard_layouts ] ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface shared ;
 
 Includes [ FGristFiles KeymapWindow.cpp ] : <keymap-locale>KeymapNames.h ;

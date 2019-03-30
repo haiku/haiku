@@ -4,8 +4,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 StaticLibrary cortex_support.a :
 	debug_tools.cpp
 	MediaIcon.cpp

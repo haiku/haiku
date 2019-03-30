@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests kits interface bshelf ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface ;
 
 SimpleTest ShelfTest :

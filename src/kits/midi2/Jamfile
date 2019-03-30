@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src kits midi2 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders midi ;
 
 local architectureObject ;

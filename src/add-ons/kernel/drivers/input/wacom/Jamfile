@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers input wacom ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 
 KernelAddon wacom :

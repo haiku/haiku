@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network protocols tcp ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 

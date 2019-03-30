@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print drivers preview ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources Preview : Preview.rdef ;

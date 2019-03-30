@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators bmp ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources BMPTranslator : BMPTranslator.rdef ;

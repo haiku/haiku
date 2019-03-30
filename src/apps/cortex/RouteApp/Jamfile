@@ -14,8 +14,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) expat xmlparse ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 Application Cortex :
 	ConnectionIO.cpp
 	DormantNodeIO.cpp

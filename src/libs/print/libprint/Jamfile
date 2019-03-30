@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src libs print libprint ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ; 
 
 StaticLibrary libprint.a :

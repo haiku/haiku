@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons input_server methods pen ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface ;
 SubDirSysHdrs [ FDirName $(SUBDIR) compat ] ;
 

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network sis19x ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin desklink ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders app interface shared ;
 
 BinCommand desklink :

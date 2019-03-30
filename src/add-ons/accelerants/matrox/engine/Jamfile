@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons accelerants matrox engine ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
 

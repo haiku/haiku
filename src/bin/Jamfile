@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src bin ;
 
 HAIKU_MULTIPLE_LOCALIZED_TARGETS on $(SUBDIR) = 1 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders app interface shared storage support tracker usb ;

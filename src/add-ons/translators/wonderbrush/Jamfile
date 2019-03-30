@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators wonderbrush ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources WonderBrushTranslator : WonderBrushTranslator.rdef ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin rc ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
 SubDirC++Flags -Wno-sign-compare -Wno-unused ;

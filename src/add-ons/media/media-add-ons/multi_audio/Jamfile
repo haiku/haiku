@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons multi_audio ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders audio shared ;
 
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons usb_vision ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders usb_vision ;
 
 local architectureObject ;

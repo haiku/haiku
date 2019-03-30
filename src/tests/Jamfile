@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UnitTestLib libexampletest.so

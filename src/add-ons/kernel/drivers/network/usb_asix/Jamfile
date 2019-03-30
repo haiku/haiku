@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network usb_asix ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders kernel net ;
 UsePrivateKernelHeaders ;
 

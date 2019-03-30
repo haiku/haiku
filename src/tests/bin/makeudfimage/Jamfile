@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests bin makeudfimage ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePublicHeaders add-ons/file_system ;			# For fsproto.h

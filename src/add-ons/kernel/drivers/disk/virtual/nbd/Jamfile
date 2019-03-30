@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers disk virtual nbd ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders drivers ;
 UsePrivateKernelHeaders ;
 

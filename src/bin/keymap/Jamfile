@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src bin keymap ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders shared storage ;
 
 BinCommand keymap :

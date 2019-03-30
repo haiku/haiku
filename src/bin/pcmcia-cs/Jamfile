@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin pcmcia-cs ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
 		# We need the public pcmcia headers also when not compiling for Haiku.

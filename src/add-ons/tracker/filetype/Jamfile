@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons tracker filetype ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources FileType : FileType.rdef ;
 
 Addon FileType :

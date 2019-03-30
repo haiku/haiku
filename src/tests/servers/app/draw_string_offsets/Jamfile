@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app draw_string_offsets ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;

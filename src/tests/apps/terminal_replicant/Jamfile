@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests apps terminal_replicant ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 
 Application RepliTerminal : 

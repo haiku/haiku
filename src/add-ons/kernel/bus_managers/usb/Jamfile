@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers usb ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirC++Flags -fno-rtti ;
 
 UsePrivateKernelHeaders ;

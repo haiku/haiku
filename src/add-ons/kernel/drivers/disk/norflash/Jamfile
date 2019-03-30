@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers disk norflash ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders drivers kernel ;
 
 KernelAddon norflash :

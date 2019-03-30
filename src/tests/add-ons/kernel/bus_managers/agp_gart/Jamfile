@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests add-ons kernel bus_managers agp_gart ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
 UsePrivateHeaders graphics kernel ;

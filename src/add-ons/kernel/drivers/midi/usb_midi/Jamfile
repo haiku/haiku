@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers midi usb_midi ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelAddon usb_midi :

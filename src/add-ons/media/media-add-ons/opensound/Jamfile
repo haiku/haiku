@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons opensound ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders audio ;
 
 local architectureObject ;

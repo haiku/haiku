@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests add-ons mail imap ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders mail shared ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems
 	fs_shell ] ;

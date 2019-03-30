@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests servers app lagging_get_mouse ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;

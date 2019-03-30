@@ -290,10 +290,6 @@ rule AddSubDirSupportedPlatforms
 	SUPPORTED_PLATFORMS += $(1) ;
 }
 
-rule SetSubDirSupportedPlatformsBeOSCompatible
-{
-}
-
 rule IsPlatformSupportedForTarget
 {
 	# IsPlatformSupportedForTarget <target> [ : <platform> ]

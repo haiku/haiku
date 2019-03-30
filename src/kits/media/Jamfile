@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src kits media ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders app codec media shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 

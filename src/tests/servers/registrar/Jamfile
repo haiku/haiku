@@ -5,8 +5,6 @@ UseArchHeaders $(TARGET_KERNEL_ARCH) ;
 
 # some test programs
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
 	: be [ TargetLibsupc++ ]

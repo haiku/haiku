@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ich ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders libroot audio ;
 
 KernelAddon ich_ac97 :

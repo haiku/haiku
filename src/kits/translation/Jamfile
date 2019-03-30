@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src kits translation ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders translation textencoding ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 usbKitLibraryName = libdevice.so ;
 
 # source directories

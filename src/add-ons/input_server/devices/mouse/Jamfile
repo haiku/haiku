@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons input_server devices mouse ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders input shared ;
 
 Addon <input>mouse :

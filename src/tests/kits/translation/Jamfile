@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits translation ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 local libtranslation = translation ;

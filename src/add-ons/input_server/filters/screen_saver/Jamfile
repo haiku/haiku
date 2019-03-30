@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons input_server filters screen_saver ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders screen_saver ;
 
 Addon screen_saver :

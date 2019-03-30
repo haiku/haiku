@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests add-ons opengl fake_renderer ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface opengl ;
 
 

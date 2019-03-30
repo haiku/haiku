@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers video usb_vision ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders libroot usb_vision ;
 
 #local defines = [ FDefines DB_USB_USE_V2_MODULE ] ;

@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 auich ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders audio ;
 

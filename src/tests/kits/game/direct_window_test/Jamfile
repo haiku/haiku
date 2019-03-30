@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits game direct_window_test ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 SimpleTest DirectWindowStars

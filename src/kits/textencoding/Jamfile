@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src kits textencoding ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 AddResources libtextencoding.so : libtextencoding.rdef ;

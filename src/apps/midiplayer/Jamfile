@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps midiplayer ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface ;
 
 Application MidiPlayer :

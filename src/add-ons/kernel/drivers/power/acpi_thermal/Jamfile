@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers power acpi_thermal ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 KernelAddon acpi_thermal :
 	acpi_thermal.c
 	;

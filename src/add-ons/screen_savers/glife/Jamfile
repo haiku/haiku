@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src add-ons screen_savers glife ;
 UseBuildFeatureHeaders glu ;
 UseBuildFeatureHeaders mesa ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders screen_saver ;
 	# For BuildDefaultSettingsView
 

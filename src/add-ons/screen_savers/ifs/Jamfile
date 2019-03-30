@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons screen_savers ifs ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 AddResources IFS : IFS.rdef ;
 
 ScreenSaver IFS :

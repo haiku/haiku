@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators psd ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources PSDTranslator : PSDTranslator.rdef ;

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers bluetooth h2 h2generic ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders net kernel bluetooth ;
 UsePrivateKernelHeaders ;
 

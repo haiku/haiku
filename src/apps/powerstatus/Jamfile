@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps powerstatus ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders interface shared ;
 UsePrivateSystemHeaders ;
 

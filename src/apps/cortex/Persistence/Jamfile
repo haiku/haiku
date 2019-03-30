@@ -7,8 +7,6 @@ UseBuildFeatureHeaders expat ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 StaticLibrary cortex_persistence.a :
 	ExportContext.cpp
 	ImportContext.cpp

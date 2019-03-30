@@ -5,8 +5,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 Application CortexAddOnHost :
 	AddOnHostApp.cpp
 	: be media [ TargetLibstdc++ ] cortex_support.a

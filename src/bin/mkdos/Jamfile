@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src bin mkdos ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 BinCommand mkdos :
 	mkdos.cpp
 ;

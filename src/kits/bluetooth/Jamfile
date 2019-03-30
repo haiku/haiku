@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src kits bluetooth ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 #if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 #       UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
 #}

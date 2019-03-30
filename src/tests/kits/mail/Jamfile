@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests kits mail ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders mail shared ;
 
 SimpleTest header_test :

@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits game chart ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 Application Chart :

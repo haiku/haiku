@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src kits print ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared print ;
 
 StaticLibrary libprintutils.a :

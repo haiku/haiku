@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio hda ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders audio ;
 

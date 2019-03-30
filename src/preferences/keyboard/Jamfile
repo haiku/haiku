@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences keyboard ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
         SubDirC++Flags -DCOMPILE_FOR_R5 ;
 #        SubDirC++Flags -fmultiple-symbol-spaces ;

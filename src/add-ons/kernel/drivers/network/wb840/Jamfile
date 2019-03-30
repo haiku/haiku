@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wb840 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 # set some additional flags
 # For ether_driver.h
 UsePrivateHeaders net ;

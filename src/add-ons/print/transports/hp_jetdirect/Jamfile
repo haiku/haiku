@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print transports hp_jetdirect ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 Addon HP\ JetDirect :

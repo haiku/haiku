@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons input_server devices keyboard ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders input interface shared tracker ;
 UsePrivateSystemHeaders ;
 

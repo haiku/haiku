@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits app bmessenger ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UnitTest SMRemoteTargetApp

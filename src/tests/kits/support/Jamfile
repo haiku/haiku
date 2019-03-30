@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits support ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 # Let Jam know where to find some of our source files

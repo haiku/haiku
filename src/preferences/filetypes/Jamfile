@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src preferences filetypes ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders icon ;

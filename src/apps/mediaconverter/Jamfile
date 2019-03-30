@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps mediaconverter ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 
 Application MediaConverter :

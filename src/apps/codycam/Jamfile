@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps codycam ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 
 Application CodyCam :

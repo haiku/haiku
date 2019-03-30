@@ -5,8 +5,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 StaticLibrary cortex_persistence_wrappers.a :
 	MediaFormatIO.cpp
 	MessageIO.cpp

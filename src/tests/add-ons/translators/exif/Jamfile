@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests add-ons translators exif ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirSysHdrs [ FDirName $(HAIKU_TOP) src add-ons translators jpeg ] ;
 SubDirSysHdrs [ FDirName $(HAIKU_TOP) src add-ons translators raw ] ;
 	# for TIFF.h and ReadHelper.h

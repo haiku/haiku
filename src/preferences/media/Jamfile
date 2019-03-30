@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences media ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders media midi shared ;
 
 Preference Media :

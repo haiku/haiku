@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons print transports serial_port ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders print ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits print ] ;

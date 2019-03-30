@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests system network ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SimpleTest firefox_crash : firefox_crash.cpp : $(TARGET_NETWORK_LIBS) ;
 
 SimpleTest udp_client : udp_client.c : $(TARGET_NETWORK_LIBS) ;

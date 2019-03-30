@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators jpeg2000 ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
 	

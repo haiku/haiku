@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits app bmessenger testapps ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src tests kits app common ] ;

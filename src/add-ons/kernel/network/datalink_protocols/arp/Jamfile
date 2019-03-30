@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network datalink_protocols arp ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 

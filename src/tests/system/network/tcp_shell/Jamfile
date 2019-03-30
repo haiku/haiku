@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests system network tcp_shell ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;

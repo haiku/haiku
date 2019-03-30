@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network stack ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 UsePrivateHeaders net shared ;
 

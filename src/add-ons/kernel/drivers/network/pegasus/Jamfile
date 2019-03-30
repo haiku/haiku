@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network pegasus ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 
 # For ether_driver.h

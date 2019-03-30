@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers bus usb ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateKernelHeaders ;
 
 KernelAddon usb_raw :

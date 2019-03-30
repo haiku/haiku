@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp modem ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
 
 UsePrivateKernelHeaders ;

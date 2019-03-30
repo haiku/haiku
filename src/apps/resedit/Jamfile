@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps resedit ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared interface ;
 
 local columnViewSources ;

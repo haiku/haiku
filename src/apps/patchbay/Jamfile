@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps patchbay ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 Application PatchBay
 	:
 	PatchApp.cpp

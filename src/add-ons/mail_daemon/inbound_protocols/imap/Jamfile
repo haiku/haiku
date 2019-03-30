@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons mail_daemon inbound_protocols imap ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail shared ;
 SubDirHdrs [ FDirName $(SUBDIR) imap_lib ] ;
