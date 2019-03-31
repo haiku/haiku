@@ -9,7 +9,7 @@ Application Login :
 	LoginWindow.cpp
 	LoginView.cpp
 	main.cpp
-	: be tracker libmultiuser_utils.a [ TargetLibstdc++ ] localestub
+	: be tracker bsd libmultiuser_utils.a [ TargetLibstdc++ ] localestub
 	: Login.rdef
 ;
 
