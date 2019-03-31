@@ -117,6 +117,7 @@ TouchpadView::MouseUp(BPoint point)
 	} else {
 		if (GetRightScrollRatio() > kSoftScrollLimit)
 			fXScrollRange = fOldXScrollRange;
+
 		if (GetBottomScrollRatio() > kSoftScrollLimit)
 			fYScrollRange = fOldYScrollRange;
 		DrawSliders();
@@ -271,6 +272,8 @@ TouchpadPrefView::TouchpadPrefView()
 	SetupView();
 	// set view values
 	SetValues(&fTouchpadPref.Settings());
+	if (fTouchpadPref.IsTouchPadConnected() == false)
+		ShowTouchpadWarning();
 }
 
 
@@ -370,7 +373,6 @@ TouchpadPrefView::SetupView()
 
 	fTouchpadView = new TouchpadView(BRect(0, 0, 130, 120));
 	fTouchpadView->SetExplicitMaxSize(BSize(130, 120));
-
 	// Create the "Mouse Speed" slider...
 	fScrollAccelSlider = new BSlider("scroll_accel",
 		B_TRANSLATE("Acceleration"),
@@ -484,4 +486,14 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fScrollStepYSlider->SetValue(20 - settings->scroll_ystepsize / 2);
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);
 	fTapSlider->SetValue(settings->tapgesture_sensibility);
+}
+
+
+void
+TouchpadPrefView::ShowTouchpadWarning()
+{
+	BAlert* alert = new BAlert(B_TRANSLATE("Touchpad Status"),
+		B_TRANSLATE("Currently, Touchpad is not connected. So changes will not see."),
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->Go();
 }

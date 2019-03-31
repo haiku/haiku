@@ -102,6 +102,7 @@ private:
 			BButton*		fRevertButton;
 
 			TouchpadPref	fTouchpadPref;
+			void 			ShowTouchpadWarning();
 };
 
 

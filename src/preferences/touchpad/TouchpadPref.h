@@ -37,7 +37,8 @@ public:
 
 			touchpad_settings&	Settings()
 									{ return fSettings; }
-
+			bool 				IsTouchPadConnected()
+									{ return fConnected; }
 			status_t			UpdateSettings();
 
 private:
@@ -46,7 +47,6 @@ private:
 			status_t			SaveSettings();
 
 			status_t			ConnectToTouchPad();
-
 			bool 				fConnected;
 			BInputDevice* 		fTouchPad;
 
