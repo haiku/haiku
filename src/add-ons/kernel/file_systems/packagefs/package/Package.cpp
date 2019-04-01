@@ -649,7 +649,8 @@ Package::Open()
 	}
 
 	// open the file
-	fFD = openat(fPackagesDirectory->DirectoryFD(), fFileName, O_RDONLY);
+	fFD = openat(fPackagesDirectory->DirectoryFD(), fFileName,
+		O_RDONLY | O_NOCACHE);
 	if (fFD < 0) {
 		ERROR("Failed to open package file \"%s\": %s\n", fFileName.Data(),
 			strerror(errno));
