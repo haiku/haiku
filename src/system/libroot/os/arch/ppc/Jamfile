@@ -17,7 +17,6 @@ for architectureObject in [ MultiArchSubDirSetup ppc ] {
 			byteorder.S
 			compatibility.c	# only here until the places where those functions
 							# are used are fixed
-			stack_trace.cpp
 			stack_frame.c
 #			systeminfo.c
 			system_time.c
@@ -27,6 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ppc ] {
 			tls.c
 
 			generic_system_time_nsecs.cpp
+			stack_trace.cpp
 			;
 	}
 }

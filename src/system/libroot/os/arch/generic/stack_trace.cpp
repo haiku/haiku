@@ -6,8 +6,10 @@
  *		Michael Lotz, mmlr@mlotz.ch
  */
 
+#include <arch_config.h>
 #include <libroot_private.h>
 
+#ifdef STACK_GROWS_DOWNWARDS
 
 /*!	Captures a stack trace (the return addresses) of the current thread.
 	\param returnAddresses The array the return address shall be written to.
@@ -45,3 +47,9 @@ __arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 
 	return count;
 }
+
+#else
+
+#error Implementation needed for upwards growing stacks
+
+#endif

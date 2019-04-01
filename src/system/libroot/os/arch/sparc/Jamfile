@@ -27,6 +27,7 @@ for architectureObject in [ MultiArchSubDirSetup sparc ] {
 
 			generic_atomic.cpp
 			generic_system_time_nsecs.cpp
+			stack_trace.cpp
 			;
 	}
 }

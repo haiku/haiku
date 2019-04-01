@@ -12,7 +12,6 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 
 		SEARCH_SOURCE +=
 			[ FDirName $(SUBDIR) $(DOTDOT) generic ]
-			[ FDirName $(SUBDIR) $(DOTDOT) x86_common ]
 			;
 
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
@@ -24,11 +23,9 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 			time.cpp
 			tls.cpp
 
-			# sources from x86_common
-			stack_trace.cpp
-
 			# sources from generic
 			generic_atomic.cpp
+			stack_trace.cpp
 			;
 	}
 }
