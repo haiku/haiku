@@ -16,19 +16,15 @@
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
-#include <package/hpkg/v1/PackageEntry.h>
-#include <package/hpkg/v1/PackageEntryAttribute.h>
 
 #include <AutoDeleter.h>
 #include <FdIO.h>
 #include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/PackageReaderImpl.h>
-#include <package/hpkg/v1/PackageReaderImpl.h>
 #include <util/AutoLock.h>
 
 #include "CachedDataReader.h"
 #include "DebugSupport.h"
-#include "GlobalFactory.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackagesDirectory.h"
@@ -51,12 +47,6 @@ typedef BPackageKit::BHPKG::BPackageContentHandler BPackageContentHandler;
 typedef BPackageKit::BHPKG::BPackageEntry BPackageEntry;
 typedef BPackageKit::BHPKG::BPackageEntryAttribute BPackageEntryAttribute;
 typedef BPackageKit::BHPKG::BPrivate::PackageReaderImpl PackageReaderImpl;
-
-// format version V1 types
-typedef BPackageKit::BHPKG::V1::BPackageContentHandler BPackageContentHandlerV1;
-typedef BPackageKit::BHPKG::V1::BPackageEntry BPackageEntryV1;
-typedef BPackageKit::BHPKG::V1::BPackageEntryAttribute BPackageEntryAttributeV1;
-typedef BPackageKit::BHPKG::V1::BPrivate::PackageReaderImpl PackageReaderImplV1;
 
 
 const char* const kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
@@ -384,258 +374,6 @@ private:
 };
 
 
-// #pragma mark - LoaderContentHandlerV1
-
-
-struct Package::LoaderContentHandlerV1 : BPackageContentHandlerV1 {
-	LoaderContentHandlerV1(Package* package)
-		:
-		fPackage(package),
-		fErrorOccurred(false)
-	{
-	}
-
-	status_t Init()
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntry(BPackageEntryV1* entry)
-	{
-		if (fErrorOccurred)
-			return B_OK;
-
-		PackageDirectory* parentDir = NULL;
-		if (entry->Parent() != NULL) {
-			parentDir = dynamic_cast<PackageDirectory*>(
-				(PackageNode*)entry->Parent()->UserToken());
-			if (parentDir == NULL)
-				RETURN_ERROR(B_BAD_DATA);
-		}
-
-		// get the file mode -- filter out write permissions
-		mode_t mode = entry->Mode() & ~(mode_t)(S_IWUSR | S_IWGRP | S_IWOTH);
-
-		// create the package node
-		PackageNode* node;
-		if (S_ISREG(mode)) {
-			// file
-			node = new(std::nothrow) PackageFile(fPackage, mode,
-				PackageData(entry->Data()));
-		} else if (S_ISLNK(mode)) {
-			// symlink
-			String path;
-			if (!path.SetTo(entry->SymlinkPath()))
-				RETURN_ERROR(B_NO_MEMORY);
-
-			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
-				fPackage, mode);
-			if (symlink == NULL)
-				RETURN_ERROR(B_NO_MEMORY);
-
-			symlink->SetSymlinkPath(path);
-			node = symlink;
-		} else if (S_ISDIR(mode)) {
-			// directory
-			node = new(std::nothrow) PackageDirectory(fPackage, mode);
-		} else
-			RETURN_ERROR(B_BAD_DATA);
-
-		if (node == NULL)
-			RETURN_ERROR(B_NO_MEMORY);
-		BReference<PackageNode> nodeReference(node, true);
-
-		String entryName;
-		if (!entryName.SetTo(entry->Name()))
-			RETURN_ERROR(B_NO_MEMORY);
-
-		status_t error = node->Init(parentDir, entryName);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		node->SetModifiedTime(entry->ModifiedTime());
-
-		// add it to the parent directory
-		if (parentDir != NULL)
-			parentDir->AddChild(node);
-		else
-			fPackage->AddNode(node);
-
-		entry->SetUserToken(node);
-
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryAttribute(BPackageEntryV1* entry,
-		BPackageEntryAttributeV1* attribute)
-	{
-		if (fErrorOccurred)
-			return B_OK;
-
-		PackageNode* node = (PackageNode*)entry->UserToken();
-
-		String name;
-		if (!name.SetTo(attribute->Name()))
-			RETURN_ERROR(B_NO_MEMORY);
-
-		PackageNodeAttribute* nodeAttribute = new(std::nothrow)
-			PackageNodeAttribute(attribute->Type(),
-			PackageData(attribute->Data()));
-		if (nodeAttribute == NULL)
-			RETURN_ERROR(B_NO_MEMORY)
-
-		nodeAttribute->Init(name);
-		node->AddAttribute(nodeAttribute);
-
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryDone(BPackageEntryV1* entry)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandlePackageAttribute(
-		const BPackageInfoAttributeValue& value)
-	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-			{
-				String name;
-				if (!name.SetTo(value.string))
-					return B_NO_MEMORY;
-				fPackage->SetName(name);
-				return B_OK;
-			}
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-			{
-				String path;
-				if (!path.SetTo(value.string))
-					return B_NO_MEMORY;
-				fPackage->SetInstallPath(path);
-				return B_OK;
-			}
-
-			case B_PACKAGE_INFO_VERSION:
-			{
-				::Version* version;
-				status_t error = Version::Create(value.version.major,
-					value.version.minor, value.version.micro,
-					value.version.preRelease, value.version.revision, version);
-				if (error != B_OK)
-					RETURN_ERROR(error);
-
-				fPackage->SetVersion(version);
-
-				break;
-			}
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				if (value.unsignedInt >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT)
-					RETURN_ERROR(B_BAD_VALUE);
-
-				fPackage->SetArchitecture(
-					(BPackageArchitecture)value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-			{
-				// create a version object, if a version is specified
-				::Version* version = NULL;
-				if (value.resolvable.haveVersion) {
-					const BPackageVersionData& versionInfo
-						= value.resolvable.version;
-					status_t error = Version::Create(versionInfo.major,
-						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.revision, version);
-					if (error != B_OK)
-						RETURN_ERROR(error);
-				}
-				ObjectDeleter< ::Version> versionDeleter(version);
-
-				// create a version object, if a compatible version is specified
-				::Version* compatibleVersion = NULL;
-				if (value.resolvable.haveCompatibleVersion) {
-					const BPackageVersionData& versionInfo
-						= value.resolvable.compatibleVersion;
-					status_t error = Version::Create(versionInfo.major,
-						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.revision,
-						compatibleVersion);
-					if (error != B_OK)
-						RETURN_ERROR(error);
-				}
-				ObjectDeleter< ::Version> compatibleVersionDeleter(
-					compatibleVersion);
-
-				// create the resolvable
-				Resolvable* resolvable = new(std::nothrow) Resolvable(fPackage);
-				if (resolvable == NULL)
-					RETURN_ERROR(B_NO_MEMORY);
-				ObjectDeleter<Resolvable> resolvableDeleter(resolvable);
-
-				status_t error = resolvable->Init(value.resolvable.name,
-					versionDeleter.Detach(), compatibleVersionDeleter.Detach());
-				if (error != B_OK)
-					RETURN_ERROR(error);
-
-				fPackage->AddResolvable(resolvableDeleter.Detach());
-
-				break;
-			}
-
-			case B_PACKAGE_INFO_REQUIRES:
-			{
-				// create the dependency
-				Dependency* dependency = new(std::nothrow) Dependency(fPackage);
-				if (dependency == NULL)
-					RETURN_ERROR(B_NO_MEMORY);
-				ObjectDeleter<Dependency> dependencyDeleter(dependency);
-
-				status_t error = dependency->Init(
-					value.resolvableExpression.name);
-				if (error != B_OK)
-					RETURN_ERROR(error);
-
-				// create a version object, if a version is specified
-				::Version* version = NULL;
-				if (value.resolvableExpression.haveOpAndVersion) {
-					const BPackageVersionData& versionInfo
-						= value.resolvableExpression.version;
-					status_t error = Version::Create(versionInfo.major,
-						versionInfo.minor, versionInfo.micro,
-						versionInfo.preRelease, versionInfo.revision, version);
-					if (error != B_OK)
-						RETURN_ERROR(error);
-
-					dependency->SetVersionRequirement(
-						value.resolvableExpression.op, version);
-				}
-
-				fPackage->AddDependency(dependencyDeleter.Detach());
-
-				break;
-			}
-
-			default:
-				break;
-		}
-
-		return B_OK;
-	}
-
-	virtual void HandleErrorOccurred()
-	{
-		fErrorOccurred = true;
-	}
-
-private:
-	Package*	fPackage;
-	bool		fErrorOccurred;
-};
-
-
 // #pragma mark - HeapReader
 
 
@@ -648,46 +386,6 @@ struct Package::HeapReader {
 
 	virtual status_t CreateDataReader(const PackageData& data,
 		BAbstractBufferedDataReader*& _reader) = 0;
-};
-
-
-// #pragma mark - HeapReaderV1
-
-
-struct Package::HeapReaderV1 : public HeapReader, private BDataReader {
-public:
-	HeapReaderV1(int fd)
-		:
-		fFileReader(fd)
-	{
-	}
-
-	~HeapReaderV1()
-	{
-	}
-
-	virtual void UpdateFD(int fd)
-	{
-		fFileReader.SetFD(fd);
-	}
-
-	virtual status_t CreateDataReader(const PackageData& data,
-		BAbstractBufferedDataReader*& _reader)
-	{
-		return GlobalFactory::Default()->CreatePackageDataReader(this,
-			data.DataV1(), _reader);
-	}
-
-private:
-	// BDataReader
-
-	virtual status_t ReadData(off_t offset, void* buffer, size_t size)
-	{
-		return fFileReader.ReadData(offset, buffer, size);
-	}
-
-private:
-	BFDDataReader	fFileReader;
 };
 
 
@@ -1050,28 +748,8 @@ Package::_Load(const PackageSettings& settings)
 			RETURN_ERROR(error);
 	}
 
-	// try package file format version 1
-	PackageReaderImplV1 packageReader(&errorOutput);
-	status_t error = packageReader.Init(fd, false);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// parse content
-	LoaderContentHandlerV1 handler(this);
-	error = handler.Init();
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	error = packageReader.ParseContent(&handler);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// create a heap reader
-	fHeapReader = new(std::nothrow) HeapReaderV1(fd);
-	if (fHeapReader == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	return B_OK;
+	// we don't support this package file format
+	RETURN_ERROR(B_BAD_DATA);
 }
 
 

@@ -18,11 +18,11 @@
 #include "AttributeIndexer.h"
 #include "AutoPackageAttributes.h"
 #include "DebugSupport.h"
-#include "GlobalFactory.h"
 #include "Package.h"
 #include "PackageNode.h"
 
 
+using BPackageKit::BHPKG::BDataReader;
 using BPackageKit::BHPKG::BBufferDataReader;
 using BPackageKit::BHPKG::BFDDataReader;
 

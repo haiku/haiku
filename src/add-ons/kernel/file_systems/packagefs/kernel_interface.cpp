@@ -21,7 +21,6 @@
 #include "AttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "Directory.h"
-#include "GlobalFactory.h"
 #include "Query.h"
 #include "PackageFSRoot.h"
 #include "StringConstants.h"
@@ -1076,19 +1075,9 @@ packagefs_std_ops(int32 op, ...)
 				return error;
 			}
 
-			error = GlobalFactory::CreateDefault();
-			if (error != B_OK) {
-				ERROR("Failed to init GlobalFactory\n");
-				StringConstants::Cleanup();
-				StringPool::Cleanup();
-				exit_debugging();
-				return error;
-			}
-
 			error = PackageFSRoot::GlobalInit();
 			if (error != B_OK) {
 				ERROR("Failed to init PackageFSRoot\n");
-				GlobalFactory::DeleteDefault();
 				StringConstants::Cleanup();
 				StringPool::Cleanup();
 				exit_debugging();
@@ -1102,7 +1091,6 @@ packagefs_std_ops(int32 op, ...)
 		{
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
 			PackageFSRoot::GlobalUninit();
-			GlobalFactory::DeleteDefault();
 			StringConstants::Cleanup();
 			StringPool::Cleanup();
 			exit_debugging();
