@@ -19,7 +19,6 @@
 #include <util/AutoLock.h>
 
 #include "DebugSupport.h"
-#include "GlobalFactory.h"
 #include "Package.h"
 
 
