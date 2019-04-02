@@ -271,6 +271,13 @@ TouchpadPrefView::TouchpadPrefView()
 	SetupView();
 	// set view values
 	SetValues(&fTouchpadPref.Settings());
+	if (fTouchpadPref.IsTouchpadConnected() == false) {
+		DisablePref();
+		fShowWarning->SetText(B_TRANSLATE("No touchpad found, the settings "
+			"will have no effect."));
+	}
+	else
+		fShowWarning->Hide();
 }
 
 
@@ -457,8 +464,11 @@ TouchpadPrefView::SetupView()
 		new BMessage(REVERT_SETTINGS));
 	fRevertButton->SetEnabled(false);
 
+	fShowWarning = new BStringView("warning", "");
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_WINDOW_SPACING)
+		.Add(fShowWarning)
 		.Add(scrollBox)
 		.Add(tapBox)
 		.AddGroup(B_HORIZONTAL)
@@ -484,4 +494,18 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fScrollStepYSlider->SetValue(20 - settings->scroll_ystepsize / 2);
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);
 	fTapSlider->SetValue(settings->tapgesture_sensibility);
+}
+
+
+void
+TouchpadPrefView::DisablePref()
+{
+	fTwoFingerBox->SetEnabled(false);
+	fTwoFingerHorizontalBox->SetEnabled(false);
+	fRevertButton->SetEnabled(false);
+	fDefaultButton->SetEnabled(false);
+	fTapSlider->SetEnabled(false);
+	fScrollAccelSlider->SetEnabled(false);
+	fScrollStepXSlider->SetEnabled(false);
+	fScrollStepYSlider->SetEnabled(false);
 }

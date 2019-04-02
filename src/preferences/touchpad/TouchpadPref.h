@@ -37,7 +37,8 @@ public:
 
 			touchpad_settings&	Settings()
 									{ return fSettings; }
-
+			bool 				IsTouchpadConnected()
+									{ return fConnected; }
 			status_t			UpdateSettings();
 
 private:

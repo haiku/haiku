@@ -17,6 +17,7 @@
 #include <Slider.h>
 #include <View.h>
 #include <GroupView.h>
+#include <StringView.h>
 
 #include "TouchpadPref.h"
 #include "touchpad_settings.h"
@@ -91,6 +92,8 @@ public:
 			void			SetValues(touchpad_settings *settings);
 
 private:
+			void 			DisablePref();
+
 			TouchpadView*	fTouchpadView;
 			BCheckBox*		fTwoFingerBox;
 			BCheckBox*		fTwoFingerHorizontalBox;
@@ -100,6 +103,7 @@ private:
 			BSlider*		fTapSlider;
 			BButton*		fDefaultButton;
 			BButton*		fRevertButton;
+			BStringView*	fShowWarning;
 
 			TouchpadPref	fTouchpadPref;
 };
