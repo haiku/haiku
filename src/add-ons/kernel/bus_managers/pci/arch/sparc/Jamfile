@@ -11,6 +11,6 @@ KernelStaticLibrary pci_arch_bus_manager :
 	pci_io.c
 
 	# openfirmware
-	# TODO
+	pci_openfirmware.cpp
 ;
 
