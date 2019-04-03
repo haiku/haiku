@@ -466,7 +466,7 @@ of_write(int handle, const void *buffer, int bufferSize)
 
 
 int
-of_seek(int handle, long long pos)
+of_seek(int handle, off_t pos)
 {
 	struct {
 		const char	*name;
