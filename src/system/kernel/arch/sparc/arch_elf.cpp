@@ -36,9 +36,15 @@ is_in_image(struct elf_image_info *image, addr_t address)
 #endif	// !_BOOT_MODE
 
 
+#ifdef _BOOT_MODE
+status_t
+boot_arch_elf_relocate_rel(struct preloaded_elf64_image *image, Elf64_Rel *rel,
+	int rel_len)
+#else
 int
 arch_elf_relocate_rel(struct elf_image_info *image,
 	struct elf_image_info *resolve_image, Elf64_Rel *rel, int rel_len)
+#endif
 {
 	// there are no rel entries in M68K elf
 	return B_NO_ERROR;
@@ -91,9 +97,15 @@ write_8_check(addr_t P, Elf32_Word value)
 }
 
 
+#ifdef _BOOT_MODE
+status_t
+boot_arch_elf_relocate_rela(struct preloaded_elf64_image *image,
+	Elf64_Rela *rel, int rel_len)
+#else
 int
 arch_elf_relocate_rela(struct elf_image_info *image,
 	struct elf_image_info *resolve_image, Elf64_Rela *rel, int rel_len)
+#endif
 {
 	return B_OK;
 }
