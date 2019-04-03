@@ -39,7 +39,7 @@ Demangler::Demangle(const BString& mangledName)
 	int32 type;
 	int32 i = 0;
 	uint32 cookie = 0;
-	while (get_next_argument(&cookie, mangledName.String(), buffer,
+	while (get_next_argument_gcc2(&cookie, mangledName.String(), buffer,
 			sizeof(buffer), &type, &length) == B_OK) {
 		if (i++ > 0)
 			demangledName << ", ";
