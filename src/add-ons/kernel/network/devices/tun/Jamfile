@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel network devices tun ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+
+KernelAddon tun :
+	tun.cpp
+;
+
