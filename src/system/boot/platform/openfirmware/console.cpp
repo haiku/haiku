@@ -191,11 +191,13 @@ InputConsoleHandle::GetChar()
 status_t
 console_init(void)
 {
-	int input, output;
-	if (of_getprop(gChosen, "stdin", &input, sizeof(int)) == OF_FAILED)
+	unsigned int input, output;
+	if (of_getprop(gChosen, "stdin", &input, sizeof(input)) != sizeof(input))
 		return B_ERROR;
-	if (of_getprop(gChosen, "stdout", &output, sizeof(int)) == OF_FAILED)
+	if (of_getprop(gChosen, "stdout", &output, sizeof(output))
+			!= sizeof(output)) {
 		return B_ERROR;
+	}
 
 	sInput.SetHandle(input);
 	sOutput.SetHandle(output);

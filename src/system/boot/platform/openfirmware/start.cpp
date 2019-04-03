@@ -93,7 +93,8 @@ start(void *openFirmwareEntry)
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;
 
-	of_init((int (*)(void*))openFirmwareEntry);
+	if (of_init((intptr_t (*)(void*))openFirmwareEntry) != B_OK)
+		return;
 
 	// check for arguments
 	if (of_getprop(gChosen, "bootargs", bootargs, sizeof(bootargs))
@@ -105,7 +106,8 @@ start(void *openFirmwareEntry)
 	}
 
 	determine_machine();
-	console_init();
+	if (console_init() != B_OK)
+		return;
 
 #ifdef __powerpc__
 	if ((gMachine & MACHINE_QEMU) != 0)

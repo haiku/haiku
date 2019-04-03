@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-status_t of_get_next_device(int *_cookie, int root, const char *type,
+status_t of_get_next_device(intptr_t *_cookie, intptr_t root, const char *type,
 	char *path, size_t pathSize);
 
 #ifdef __cplusplus

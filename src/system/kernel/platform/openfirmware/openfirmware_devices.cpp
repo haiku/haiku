@@ -18,13 +18,13 @@
  *	The cookie has to be initialized to zero.
  */
 status_t
-of_get_next_device(int *_cookie, int root, const char *type, char *path,
-	size_t pathSize)
+of_get_next_device(intptr_t *_cookie, intptr_t root, const char *type,
+	char *path, size_t pathSize)
 {
-	int node = *_cookie;
+	intptr_t node = *_cookie;
 
 	while (true) {
-		int next;
+		intptr_t next;
 
 		if (node == 0) {
 			// node is NULL, meaning that this is the initial function call.

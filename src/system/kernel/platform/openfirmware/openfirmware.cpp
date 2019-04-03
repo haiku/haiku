@@ -1,5 +1,6 @@
 /*
  * Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2019, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,12 +10,12 @@
 
 
 // OpenFirmware entry function
-static int (*gCallOpenFirmware)(void *) = 0;
-int gChosen;
+static intptr_t (*gCallOpenFirmware)(void *) = 0;
+intptr_t gChosen;
 
 
 status_t
-of_init(int (*openFirmwareEntry)(void *))
+of_init(intptr_t (*openFirmwareEntry)(void *))
 {
 	gCallOpenFirmware = openFirmwareEntry;
 
@@ -26,13 +27,14 @@ of_init(int (*openFirmwareEntry)(void *))
 }
 
 
-int
-of_call_client_function(const char *method, int numArgs, int numReturns, ...)
+intptr_t
+of_call_client_function(const char *method, intptr_t numArgs,
+	intptr_t numReturns, ...)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 		void		*args[10];
 	} args = {method, numArgs, numReturns};
 	va_list list;
@@ -69,13 +71,13 @@ of_call_client_function(const char *method, int numArgs, int numReturns, ...)
 }
 
 
-int
-of_interpret(const char *command, int numArgs, int numReturns, ...)
+intptr_t
+of_interpret(const char *command, intptr_t numArgs, intptr_t numReturns, ...)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 			// "IN:	[string] cmd, stack_arg1, ..., stack_argP
 			// OUT:	catch-result, stack_result1, ..., stack_resultQ
 			// [...]
@@ -119,20 +121,21 @@ of_interpret(const char *command, int numArgs, int numReturns, ...)
 }
 
 
-int
-of_call_method(int handle, const char *method, int numArgs, int numReturns, ...)
+intptr_t
+of_call_method(intptr_t handle, const char *method, intptr_t numArgs,
+	intptr_t numReturns, ...)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 			// "IN:	[string] method, ihandle, stack_arg1, ..., stack_argP
 			// OUT:	catch-result, stack_result1, ..., stack_resultQ
 			// [...]
 			// An implementation shall allow at least six stack_arg and six
 			// stack_result items."
 		const char	*method;
-		int			handle;
+		intptr_t	handle;
 		void		*args[13];
 	} args = {"call-method", numArgs + 2, numReturns + 1, method, handle};
 	va_list list;
@@ -170,15 +173,15 @@ of_call_method(int handle, const char *method, int numArgs, int numReturns, ...)
 }
 
 
-int
+intptr_t
 of_finddevice(const char *device)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 		const char	*device;
-		int			handle;
+		intptr_t	handle;
 	} args = {"finddevice", 1, 1, device, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -191,15 +194,15 @@ of_finddevice(const char *device)
 /** Returns the first child of the given node
  */
 
-int
-of_child(int node)
+intptr_t
+of_child(intptr_t node)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			node;
-		int			child;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	node;
+		intptr_t	child;
 	} args = {"child", 1, 1, node, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -212,15 +215,15 @@ of_child(int node)
 /** Returns the next sibling of the given node
  */
 
-int
-of_peer(int node)
+intptr_t
+of_peer(intptr_t node)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			node;
-		int			next_sibling;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	node;
+		intptr_t	next_sibling;
 	} args = {"peer", 1, 1, node, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -233,15 +236,15 @@ of_peer(int node)
 /** Returns the parent of the given node
  */
 
-int
-of_parent(int node)
+intptr_t
+of_parent(intptr_t node)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			node;
-		int			parent;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	node;
+		intptr_t	parent;
 	} args = {"parent", 1, 1, node, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -251,17 +254,17 @@ of_parent(int node)
 }
 
 
-int
-of_instance_to_path(int instance, char *pathBuffer, int bufferSize)
+intptr_t
+of_instance_to_path(uint32_t instance, char *pathBuffer, intptr_t bufferSize)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			instance;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	instance;
 		char		*path_buffer;
-		int			buffer_size;
-		int			size;
+		intptr_t	buffer_size;
+		intptr_t	size;
 	} args = {"instance-to-path", 3, 1, instance, pathBuffer, bufferSize, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -271,15 +274,15 @@ of_instance_to_path(int instance, char *pathBuffer, int bufferSize)
 }
 
 
-int
-of_instance_to_package(int instance)
+intptr_t
+of_instance_to_package(uint32_t instance)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			instance;
-		int			package;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	instance;
+		intptr_t	package;
 	} args = {"instance-to-package", 1, 1, instance, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -289,18 +292,18 @@ of_instance_to_package(int instance)
 }
 
 
-int
-of_getprop(int package, const char *property, void *buffer, int bufferSize)
+intptr_t
+of_getprop(intptr_t package, const char *property, void *buffer, intptr_t bufferSize)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			package;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	package;
 		const char	*property;
 		void		*buffer;
-		int			buffer_size;
-		int			size;
+		intptr_t	buffer_size;
+		intptr_t	size;
 	} args = {"getprop", 4, 1, package, property, buffer, bufferSize, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -310,18 +313,19 @@ of_getprop(int package, const char *property, void *buffer, int bufferSize)
 }
 
 
-int
-of_setprop(int package, const char *property, const void *buffer, int bufferSize)
+intptr_t
+of_setprop(intptr_t package, const char *property, const void *buffer,
+	intptr_t bufferSize)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			package;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	package;
 		const char	*property;
 		const void	*buffer;
-		int			buffer_size;
-		int			size;
+		intptr_t	buffer_size;
+		intptr_t	size;
 	} args = {"setprop", 4, 1, package, property, buffer, bufferSize, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -331,16 +335,16 @@ of_setprop(int package, const char *property, const void *buffer, int bufferSize
 }
 
 
-int
-of_getproplen(int package, const char *property)
+intptr_t
+of_getproplen(intptr_t package, const char *property)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			package;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	package;
 		const char	*property;
-		int			size;
+		intptr_t	size;
 	} args = {"getproplen", 2, 1, package, property, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -350,17 +354,17 @@ of_getproplen(int package, const char *property)
 }
 
 
-int
-of_nextprop(int package, const char *previousProperty, char *nextProperty)
+intptr_t
+of_nextprop(intptr_t package, const char *previousProperty, char *nextProperty)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			package;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	package;
 		const char	*previous_property;
 		char		*next_property;
-		int			flag;
+		intptr_t	flag;
 	} args = {"nextprop", 3, 1, package, previousProperty, nextProperty, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -370,17 +374,17 @@ of_nextprop(int package, const char *previousProperty, char *nextProperty)
 }
 
 
-int
-of_package_to_path(int package, char *pathBuffer, int bufferSize)
+intptr_t
+of_package_to_path(intptr_t package, char *pathBuffer, intptr_t bufferSize)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			package;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	package;
 		char		*path_buffer;
-		int			buffer_size;
-		int			size;
+		intptr_t	buffer_size;
+		intptr_t	size;
 	} args = {"package-to-path", 3, 1, package, pathBuffer, bufferSize, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -393,15 +397,15 @@ of_package_to_path(int package, char *pathBuffer, int bufferSize)
 //	I/O functions
 
 
-int
+intptr_t
 of_open(const char *nodeName)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 		const char	*node_name;
-		int			handle;
+		intptr_t	handle;
 	} args = {"open", 1, 1, nodeName, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED || args.handle == 0)
@@ -412,30 +416,30 @@ of_open(const char *nodeName)
 
 
 void
-of_close(int handle)
+of_close(intptr_t handle)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			handle;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	handle;
 	} args = {"close", 1, 0, handle};
 
 	gCallOpenFirmware(&args);
 }
 
 
-int
-of_read(int handle, void *buffer, int bufferSize)
+intptr_t
+of_read(intptr_t handle, void *buffer, intptr_t bufferSize)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			handle;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	handle;
 		void		*buffer;
-		int			buffer_size;
-		int			size;
+		intptr_t	buffer_size;
+		intptr_t	size;
 	} args = {"read", 3, 1, handle, buffer, bufferSize, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -445,17 +449,17 @@ of_read(int handle, void *buffer, int bufferSize)
 }
 
 
-int
-of_write(int handle, const void *buffer, int bufferSize)
+intptr_t
+of_write(intptr_t handle, const void *buffer, intptr_t bufferSize)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			handle;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	handle;
 		const void	*buffer;
-		int			buffer_size;
-		int			size;
+		intptr_t	buffer_size;
+		intptr_t	size;
 	} args = {"write", 3, 1, handle, buffer, bufferSize, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -465,16 +469,16 @@ of_write(int handle, const void *buffer, int bufferSize)
 }
 
 
-int
-of_seek(int handle, off_t pos)
+intptr_t
+of_seek(intptr_t handle, off_t pos)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			handle;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	handle;
 		int64		pos;
-		int			status;
+		intptr_t	status;
 	} args = {"seek", 3, 1, handle, pos, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -487,15 +491,15 @@ of_seek(int handle, off_t pos)
 // memory functions
 
 
-int
-of_release(void *virtualAddress, int size)
+intptr_t
+of_release(void *virtualAddress, intptr_t size)
 {
 	struct {
 		const char *name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 		void		*virtualAddress;
-		int			size;
+		intptr_t	size;
 	} args = {"release", 2, 0, virtualAddress, size};
 
 	return gCallOpenFirmware(&args);
@@ -503,15 +507,15 @@ of_release(void *virtualAddress, int size)
 
 
 void *
-of_claim(void *virtualAddress, int size, int align)
+of_claim(void *virtualAddress, intptr_t size, intptr_t align)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 		void		*virtualAddress;
-		int			size;
-		int			align;
+		intptr_t	size;
+		intptr_t	align;
 		void		*address;
 	} args = {"claim", 3, 1, virtualAddress, size, align};
 
@@ -528,15 +532,15 @@ of_claim(void *virtualAddress, int size, int align)
 /** tests if the given service is missing
  */
 
-int
+intptr_t
 of_test(const char *service)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 		const char	*service;
-		int			missing;
+		intptr_t	missing;
 	} args = {"test", 1, 1, service, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -549,14 +553,14 @@ of_test(const char *service)
 /** Returns the millisecond counter
  */
 
-int
+intptr_t
 of_milliseconds(void)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
-		int			milliseconds;
+		intptr_t	num_args;
+		intptr_t	num_returns;
+		intptr_t	milliseconds;
 	} args = {"milliseconds", 0, 1, 0};
 
 	if (gCallOpenFirmware(&args) == OF_FAILED)
@@ -571,8 +575,8 @@ of_exit(void)
 {
 	struct {
 		const char	*name;
-		int			num_args;
-		int			num_returns;
+		intptr_t	num_args;
+		intptr_t	num_returns;
 	} args = {"exit", 0, 0};
 
 	gCallOpenFirmware(&args);

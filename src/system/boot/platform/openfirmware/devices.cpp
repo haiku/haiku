@@ -182,7 +182,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
 	// add all block devices to the list of possible boot devices
 
-	int cookie = 0;
+	intptr_t cookie = 0;
 	char path[256];
 	status_t status;
 	while ((status = of_get_next_device(&cookie, 0, "block", path,

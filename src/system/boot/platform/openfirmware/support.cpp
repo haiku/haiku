@@ -26,7 +26,7 @@ system_time(void)
 + */
 
 int32
-of_address_cells(int package) {
+of_address_cells(intptr_t package) {
 	uint32 address_cells;
 	if (of_getprop(package, "#address-cells",
 		&address_cells, sizeof(address_cells)) == OF_FAILED)
@@ -37,7 +37,7 @@ of_address_cells(int package) {
 
 
 int32
-of_size_cells(int package) {
+of_size_cells(intptr_t package) {
 	uint32 size_cells;
 	if (of_getprop(package, "#size-cells",
 		&size_cells, sizeof(size_cells)) == OF_FAILED)

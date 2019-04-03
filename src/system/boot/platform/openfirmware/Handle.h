@@ -13,11 +13,11 @@
 
 class Handle : public ConsoleNode {
 	public:
-		Handle(int handle, bool takeOwnership = true);
+		Handle(intptr_t handle, bool takeOwnership = true);
 		Handle();
 		virtual ~Handle();
 
-		void SetHandle(int handle, bool takeOwnership = true);
+		void SetHandle(intptr_t handle, bool takeOwnership = true);
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
@@ -25,8 +25,8 @@ class Handle : public ConsoleNode {
 		virtual off_t Size() const;
 
 	protected:
-		int		fHandle;
-		bool	fOwnHandle;
+		intptr_t	fHandle;
+		bool		fOwnHandle;
 };
 
 #endif	/* __cplusplus */

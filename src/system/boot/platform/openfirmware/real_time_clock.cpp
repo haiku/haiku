@@ -22,7 +22,7 @@ status_t
 init_real_time_clock(void)
 {
 	// find RTC
-	int rtcCookie = 0;
+	intptr_t rtcCookie = 0;
 	if (of_get_next_device(&rtcCookie, 0, "rtc",
 			gKernelArgs.platform_args.rtc_path,
 			sizeof(gKernelArgs.platform_args.rtc_path)) != B_OK) {
