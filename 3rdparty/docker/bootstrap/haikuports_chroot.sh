@@ -22,5 +22,5 @@ echo "Entering chroot with $STAGE chroot..."
 
 $WORKPATH/src/haikuporter/haikuporter \
 	--config=$GENERATED/objects/haiku/$TARGET_ARCH/packaging/repositories/HaikuPortsCross-build/haikuports.conf \
-	--cross-devel-package $GENERATED/objects/haiku/$TARGET_ARCH/packaging/packages/haiku_cross_devel_sysroot_$STAGE_$TARGET_ARCH.hpkg \
+	--cross-devel-package $GENERATED/objects/haiku/$TARGET_ARCH/packaging/packages/haiku_cross_devel_sysroot_${STAGE}_$TARGET_ARCH.hpkg \
 	--enter-chroot $1
