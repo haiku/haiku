@@ -61,11 +61,6 @@
 #	define __HAIKU_ARCH_ABI				"arm64"
 #	define __HAIKU_ARCH_ARM64			1
 #	define __HAIKU_ARCH_BITS			64
-#elif defined(__riscv32__) || (defined(__riscv) && __riscv_xlen == 32)
-#	define __HAIKU_ARCH					riscv32
-#	define __HAIKU_ARCH_ABI				"riscv32"
-#	define __HAIKU_ARCH_RISCV32			1
-#	define __HAIKU_ARCH_BITS			32
 #elif defined(__riscv64__) || (defined(__riscv) && __riscv_xlen == 64)
 #	define __HAIKU_ARCH					riscv64
 #	define __HAIKU_ARCH_ABI				"riscv64"

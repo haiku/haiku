@@ -14,7 +14,7 @@ from pprint import pprint
 parser = argparse.ArgumentParser(description='Configure a build of Haiku')
 parser.add_argument('--target-arch', nargs=1,
     help='Target architectures. First provided is primary.', type=str, action='append',
-    choices=('x86_gcc2', 'x86', 'x86_64', 'ppc', 'm68k', 'arm', 'arm64', 'riscv32', 'riscv64'))
+    choices=('x86_gcc2', 'x86', 'x86_64', 'ppc', 'm68k', 'arm', 'arm64', 'riscv64'))
 parser.add_argument('--bootstrap', nargs=3,
     help='Prepare for a bootstrap build. No pre-built packages will be used, instead they will be built from the sources (in several phases).',
     metavar=('<haikuporter>','<haikuports.cross>', '<haikuports>'))
@@ -129,8 +129,6 @@ def triplet_lookup(arch):
         return "m68k-unknown-haiku"
     elif arch == "arm":
         return "arm-unknown-haiku"
-    elif arch == "riscv32":
-        return "riscv32-unknown-haiku"
     elif arch == "riscv64":
         return "riscv64-unknown-haiku"
     else:

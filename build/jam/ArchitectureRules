@@ -302,19 +302,6 @@ rule KernelArchitectureSetup architecture
 				Exit "HAIKU_NASM not set. Please re-run configure." ;
 			}
 
-		case riscv32 :
-			HAIKU_BOOT_PLATFORM ?= u-boot ;
-			HAIKU_BOOT_TARGETS += u-boot ;
-
-			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
-			# SOC's like allwinner need an offset to skip the hardcoded initial loader
-			HAIKU_BOOT_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
-
-			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-			# offset in floppy image (>= sizeof(haiku_loader))
-			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
-			HAIKU_BOOT_LOADER_BASE ?= 0x1000000 ;
-
 		case riscv64 :
 			HAIKU_BOOT_PLATFORM ?= u-boot ;
 			HAIKU_BOOT_TARGETS += u-boot ;
