@@ -378,7 +378,6 @@ static const Translation kTranslations[] = {
 
 #define kCurrentMaintainers \
 	"Stephan Aßmus\n" \
-	"Dario Casalinuovo\n" \
 	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
 	"Adrien Destugues\n" \
@@ -412,6 +411,7 @@ static const Translation kTranslations[] = {
 	"Bruno G. Albuquerque\n" \
 	"Andrew Bachmann\n" \
 	"Salvatore Benedetto\n" \
+	"Dario Casalinuovo\n" \
 	"Rudolf Cornelissen\n" \
 	"Tyler Dauwalder\n" \
 	"Alexandre Deckner\n" \
