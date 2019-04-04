@@ -10,6 +10,8 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 			# TODO in time.c!
 		UsePrivateSystemHeaders ;
 
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
 		local compatibilitySources ;
 		if $(TARGET_GCC_VERSION_$(architecture)[1]) = 2 {
 			compatibilitySources =
@@ -29,7 +31,8 @@ for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 
 			$(compatibilitySources)
 
-			stack_trace.cpp
+			# sources from generic
+			generic_stack_trace.cpp
 			;
 	}
 }
