@@ -277,7 +277,7 @@ rule KernelArchitectureSetup architecture
 			    bootm ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}" ;
 
 		case arm64 :
-			HAIKU_BOOT_PLATFORM ?= efi ;
+			HAIKU_KERNEL_PLATFORM ?= efi ;
 
 			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
 			# SOC's like allwinner need an offset to skip the hardcoded initial loader
@@ -303,7 +303,7 @@ rule KernelArchitectureSetup architecture
 			}
 
 		case riscv64 :
-			HAIKU_BOOT_PLATFORM ?= u-boot ;
+			HAIKU_KERNEL_PLATFORM ?= u-boot ;
 			HAIKU_BOOT_TARGETS += u-boot ;
 
 			HAIKU_BOOT_SDIMAGE_SIZE ?= 128 ;
