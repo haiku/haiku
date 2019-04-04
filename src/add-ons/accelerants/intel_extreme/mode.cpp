@@ -315,6 +315,8 @@ set_frame_buffer_base()
 status_t
 create_mode_list(void)
 {
+	CALLED();
+
 	for (uint32 i = 0; i < gInfo->port_count; i++) {
 		if (gInfo->ports[i] == NULL)
 			continue;
@@ -324,37 +326,25 @@ create_mode_list(void)
 			gInfo->has_edid = true;
 	}
 
+	display_mode* list;
+	uint32 count = 0;
+
 	// If no EDID, but have vbt from driver, use that mode
 	if (!gInfo->has_edid && gInfo->shared_info->got_vbt) {
 		// We could not read any EDID info. Fallback to creating a list with
 		// only the mode set up by the BIOS.
 
 		// TODO: support lower modes via scaling and windowing
-		size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
-			& ~(B_PAGE_SIZE - 1);
-
-		display_mode* list;
-		area_id area = create_area("intel extreme modes",
-			(void**)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
-			B_READ_AREA | B_WRITE_AREA);
-		if (area < 0)
-			return area;
-
-		memcpy(list, &gInfo->shared_info->panel_mode, sizeof(display_mode));
-
-		gInfo->mode_list_area = area;
-		gInfo->mode_list = list;
-		gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
-		gInfo->shared_info->mode_count = 1;
-		return B_OK;
+		gInfo->mode_list_area = create_display_modes("intel extreme modes",
+			NULL, &gInfo->shared_info->panel_mode, 1, NULL, 0, NULL,
+			&list, &count);
+	} else {
+		// Otherwise return the 'real' list of modes
+		gInfo->mode_list_area = create_display_modes("intel extreme modes",
+			gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
+			&list, &count);
 	}
 
-	// Otherwise return the 'real' list of modes
-	display_mode* list;
-	uint32 count = 0;
-	gInfo->mode_list_area = create_display_modes("intel extreme modes",
-		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
-		&list, &count);
 	if (gInfo->mode_list_area < B_OK)
 		return gInfo->mode_list_area;
 
