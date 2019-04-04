@@ -15,8 +15,8 @@
 
 /* void arch_int_enable_interrupts(void) */
 FUNCTION(arch_int_enable_interrupts):
-	// TODO
-	csrs sstatus, ARCH_SR_SIE
+	li	t0, ARCH_SR_SIE
+	csrrs	zero, sstatus, t0
 	ret
 FUNCTION_END(arch_int_enable_interrupts)
 
@@ -24,8 +24,8 @@ FUNCTION_END(arch_int_enable_interrupts)
 /* int arch_int_disable_interrupts(void)
  */
 FUNCTION(arch_int_disable_interrupts):
-	csrrc 0, sstatus, ARCH_SR_SIE
-	// TODO
+	li	t0, ARCH_SR_SIE
+	csrrc	zero, sstatus, ARCH_SR_SIE
 	ret
 FUNCTION_END(arch_int_disable_interrupts)
 
