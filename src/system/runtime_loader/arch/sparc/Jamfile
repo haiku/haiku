@@ -15,6 +15,7 @@ for architectureObject in [ MultiArchSubDirSetup sparc ] {
 			:
 			<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>thread.o
 
+			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memcpy.o
 			<src!system!libroot!posix!string!arch!$(TARGET_ARCH)!$(architecture)>memset.o
 		;
 	}
