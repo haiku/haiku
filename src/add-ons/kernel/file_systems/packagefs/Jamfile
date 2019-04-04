@@ -35,7 +35,6 @@ HAIKU_PACKAGE_FS_SOURCES =
 	AttributeIndex.cpp
 	AutoPackageAttributeDirectoryCookie.cpp
 	AutoPackageAttributes.cpp
-	BlockBufferPoolKernel.cpp
 	CachedDataReader.cpp
 	Dependency.cpp
 	Directory.cpp
@@ -84,13 +83,10 @@ HAIKU_PACKAGE_FS_SHARED_SOURCES =
 ;
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
-	BlockBufferPoolImpl.cpp
-	BufferPool.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
 	HPKGDefs.cpp
-	PoolBuffer.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
