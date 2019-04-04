@@ -1,11 +1,52 @@
 /*
-** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the MIT license.
-*/
-#ifndef _KERNEL_ARCH_CPU_H
-#define _KERNEL_ARCH_CPU_H
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2019, Adrien Destugues, pulkomandy@pulkomandy.tk.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _KERNEL_ARCH_RISCV64_CPU_H
+#define _KERNEL_ARCH_RISCV64_CPU_H
 
-#define CPU_MAX_CACHE_LEVEL 8
-#define ATOMIC_FUNCS_ARE_SYSCALLS 1
 
+#include <arch/riscv64/arch_thread_types.h>
+//#include <arch/riscv64/cpu.h>
+#include <kernel.h>
+
+
+#define CPU_MAX_CACHE_LEVEL	8
+#define CACHE_LINE_SIZE		64
+
+
+#define set_ac()
+#define clear_ac()
+
+
+typedef struct arch_cpu_info {
+	int null;
+} arch_cpu_info;
+
+
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+
+static inline void
+arch_cpu_pause(void)
+{
+	// TODO: CPU pause
+}
+
+
+static inline void
+arch_cpu_idle(void)
+{
+	// TODO: CPU idle call
+}
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif	/* _KERNEL_ARCH_RISCV64_CPU_H */
