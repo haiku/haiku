@@ -20,7 +20,6 @@
 #define KERNEL_BASE             0xffffff0000000000
 #define KERNEL_SIZE             0x10000000000
 #define KERNEL_TOP              (KERNEL_BASE + (KERNEL_SIZE - 1))
-#define KERNEL_LOAD_BASE        0xffffffff80000000
 
 // Kernel physical memory map area.
 #define KERNEL_PMAP_BASE        0xffffff0000000000
