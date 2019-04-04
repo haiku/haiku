@@ -172,6 +172,7 @@ switch $(HOST_GCC_MACHINE) {
 
 	case arm64-* :				HOST_PLATFORM_IS_64_BIT = 1 ;
 	case aarch64-* :			HOST_PLATFORM_IS_64_BIT = 1 ;
+	case riscv64-* :			HOST_PLATFORM_IS_64_BIT = 1 ;
 }
 
 # If HAIKU_HOST_USE_32BIT is set, add the required gcc base flag (the LD flag
