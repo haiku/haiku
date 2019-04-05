@@ -84,12 +84,14 @@ recursive_lock_destroy(recursive_lock *lock)
 status_t
 recursive_lock_lock(recursive_lock *lock)
 {
-	thread_id thread = thread_get_current_thread_id();
-
+#if KDEBUG
 	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("recursive_lock_lock: called with interrupts disabled for lock "
 			"%p (\"%s\")\n", lock, lock->lock.name);
 	}
+#endif
+
+	thread_id thread = thread_get_current_thread_id();
 
 	if (thread != RECURSIVE_LOCK_HOLDER(lock)) {
 		mutex_lock(&lock->lock);
@@ -108,9 +110,12 @@ recursive_lock_trylock(recursive_lock *lock)
 {
 	thread_id thread = thread_get_current_thread_id();
 
-	if (!gKernelStartup && !are_interrupts_enabled())
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("recursive_lock_lock: called with interrupts disabled for lock "
 			"%p (\"%s\")\n", lock, lock->lock.name);
+	}
+#endif
 
 	if (thread != RECURSIVE_LOCK_HOLDER(lock)) {
 		status_t status = mutex_trylock(&lock->lock);
@@ -302,6 +307,13 @@ rw_lock_destroy(rw_lock* lock)
 status_t
 _rw_lock_read_lock(rw_lock* lock)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("_rw_lock_read_lock(): called with interrupts disabled for lock %p",
+			lock);
+	}
+#endif
+
 	InterruptsSpinLocker locker(lock->lock);
 
 	// We might be the writer ourselves.
@@ -334,6 +346,13 @@ status_t
 _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 	bigtime_t timeout)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("_rw_lock_read_lock_with_timeout(): called with interrupts "
+			"disabled for lock %p", lock);
+	}
+#endif
+
 	InterruptsSpinLocker locker(lock->lock);
 
 	// We might be the writer ourselves.
@@ -418,6 +437,13 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 void
 _rw_lock_read_unlock(rw_lock* lock)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("_rw_lock_read_unlock(): called with interrupts disabled for lock %p",
+			lock);
+	}
+#endif
+
 	InterruptsSpinLocker locker(lock->lock);
 
 	// If we're still holding the write lock or if there are other readers,
@@ -446,6 +472,13 @@ _rw_lock_read_unlock(rw_lock* lock)
 status_t
 rw_lock_write_lock(rw_lock* lock)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("_rw_lock_write_lock(): called with interrupts disabled for lock %p",
+			lock);
+	}
+#endif
+
 	InterruptsSpinLocker locker(lock->lock);
 
 	// If we're already the lock holder, we just need to increment the owner
@@ -484,6 +517,13 @@ rw_lock_write_lock(rw_lock* lock)
 void
 _rw_lock_write_unlock(rw_lock* lock)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("_rw_lock_write_unlock(): called with interrupts disabled for lock %p",
+			lock);
+	}
+#endif
+
 	InterruptsSpinLocker locker(lock->lock);
 
 	if (thread_get_current_thread_id() != lock->holder) {
