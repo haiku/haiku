@@ -437,13 +437,6 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 void
 _rw_lock_read_unlock(rw_lock* lock)
 {
-#if KDEBUG
-	if (!gKernelStartup && !are_interrupts_enabled()) {
-		panic("_rw_lock_read_unlock(): called with interrupts disabled for lock %p",
-			lock);
-	}
-#endif
-
 	InterruptsSpinLocker locker(lock->lock);
 
 	// If we're still holding the write lock or if there are other readers,
@@ -517,13 +510,6 @@ rw_lock_write_lock(rw_lock* lock)
 void
 _rw_lock_write_unlock(rw_lock* lock)
 {
-#if KDEBUG
-	if (!gKernelStartup && !are_interrupts_enabled()) {
-		panic("_rw_lock_write_unlock(): called with interrupts disabled for lock %p",
-			lock);
-	}
-#endif
-
 	InterruptsSpinLocker locker(lock->lock);
 
 	if (thread_get_current_thread_id() != lock->holder) {
