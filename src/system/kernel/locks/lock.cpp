@@ -676,6 +676,13 @@ mutex_lock_threads_locked(mutex* lock, InterruptsSpinLocker* locker)
 status_t
 mutex_switch_lock(mutex* from, mutex* to)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("mutex_switch_lock(): called with interrupts disabled "
+			"for locks %p, %p", from, to);
+	}
+#endif
+
 	InterruptsSpinLocker locker(to->lock);
 
 	mutex_unlock(from);
@@ -687,6 +694,13 @@ mutex_switch_lock(mutex* from, mutex* to)
 status_t
 mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 {
+#if KDEBUG
+	if (!gKernelStartup && !are_interrupts_enabled()) {
+		panic("mutex_switch_from_read_lock(): called with interrupts disabled "
+			"for locks %p, %p", from, to);
+	}
+#endif
+
 	InterruptsSpinLocker locker(to->lock);
 
 #if KDEBUG_RW_LOCK_DEBUG
