@@ -371,8 +371,8 @@ fixup_shebang(char *invoker)
 		++current;
 	}
 
-	// replace /usr/bin/env with /bin/env
-	if (memcmp(commandStart, "/usr/bin/env", current - commandStart) == 0)
+	// replace /usr/bin/ with /bin/
+	if (memcmp(commandStart, "/usr/bin/", current - commandStart) == 0)
 		memmove(commandStart, commandStart + 4, strlen(commandStart + 4) + 1);
 }
 
