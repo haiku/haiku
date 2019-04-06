@@ -30,7 +30,7 @@ extern struct iframe_stack gBootFrameStack;
 
 
 static bool
-already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 fp)
+already_visited(addr_t *visited, int32 *_last, int32 *_num, addr_t fp)
 {
 	int32 last = *_last;
 	int32 num = *_num;
