@@ -419,7 +419,7 @@ struct btrfs_block_group {
 
 	uint64 UsedSpace() const { return B_LENDIAN_TO_HOST_INT64(used_space); }
 	uint64 ChunkObjectID() const
-		{ return B_HOST_TO_LENDIAN_INT64(chunk_object_id); }
+		{ return B_LENDIAN_TO_HOST_INT64(chunk_object_id); }
 	uint64 Flags() const { return B_LENDIAN_TO_HOST_INT64(flags); }
 } _PACKED;
 
