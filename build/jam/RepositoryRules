@@ -582,6 +582,7 @@ rule BuildHaikuPortsSourcePackageDirectory
 {
 	local architecture = $(TARGET_PACKAGING_ARCH) ;
 	local outputDir = [ FDirName
+		$(PWD)
 		$(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture))
 		HaikuPorts-sources-build ] ;
 
