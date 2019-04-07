@@ -18,7 +18,7 @@ resource app_version {
 	long_info  = "GLTeapot ©2006-2009 Haiku, Inc."
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_MULTIPLE_LAUNCH;
 
 resource vector_icon {
 	$"6E6369660B03010000020106043E00000000000000003E080049000049D80000"
