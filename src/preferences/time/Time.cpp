@@ -91,9 +91,6 @@ main(int argc, char** argv)
 			return 0;
 
 		Settings settings;
-		if (!settings.GetSynchronizeAtBoot())
-			return 0;
-
 		const char* errorString = NULL;
 		int32 errorCode = 0;
 		if (update_time(settings, &errorString, &errorCode) == B_OK) {
