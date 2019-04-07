@@ -73,30 +73,20 @@ search_path_for_type(image_type type)
 	// Since the kernel does not set any variables, this is also needed
 	// to start the root shell.
 
-	// TODO: The user specific paths should not be used by default.
 	switch (type) {
 		case B_APP_IMAGE:
-			return kUserNonpackagedBinDirectory
-				":" kUserBinDirectory
-						// TODO: Remove!
-				":" kSystemNonpackagedBinDirectory
+			return kSystemNonpackagedBinDirectory
 				":" kGlobalBinDirectory
 				":" kSystemAppsDirectory
 				":" kSystemPreferencesDirectory;
 
 		case B_LIBRARY_IMAGE:
 			return kAppLocalLibDirectory
-				":" kUserNonpackagedLibDirectory
-				":" kUserLibDirectory
-					// TODO: Remove!
 				":" kSystemNonpackagedLibDirectory
 				":" kSystemLibDirectory;
 
 		case B_ADD_ON_IMAGE:
 			return kAppLocalAddonsDirectory
-				":" kUserNonpackagedAddonsDirectory
-				":" kUserAddonsDirectory
-					// TODO: Remove!
 				":" kSystemNonpackagedAddonsDirectory
 				":" kSystemAddonsDirectory;
 
