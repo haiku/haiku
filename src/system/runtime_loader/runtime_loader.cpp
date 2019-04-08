@@ -362,7 +362,7 @@ fixup_shebang(char *invoker)
 	}
 
 	// replace /usr/bin/ with /bin/
-	if (memcmp(commandStart, "/usr/bin/", current - commandStart) == 0)
+	if (memcmp(commandStart, "/usr/bin/", strlen("/usr/bin/")) == 0)
 		memmove(commandStart, commandStart + 4, strlen(commandStart + 4) + 1);
 }
 
