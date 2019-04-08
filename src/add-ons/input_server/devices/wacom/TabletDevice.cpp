@@ -11,6 +11,7 @@
  *		Stefan Werner		<stefan@keindesign.de>
  *		Hiroyuki Tsutsumi	<???>
  *		Jeroen Oortwijn		<oortwijn@gmail.com>
+ * 		Calvin Hill			<calvin@hakobaito.co.uk>
  */
 
 #include <stdio.h>
@@ -253,6 +254,9 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 			break;
 		case 0xDB:	// Wacom Bamboo CTH-661 (from Linux Wacom Project)
 			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xDD:	// Wacom Bamboo Pen/Connect (CTL-470) (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
 			break;
 		default:
 			status = B_BAD_VALUE;
@@ -860,6 +864,9 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0xDB:
 			*name = "Wacom Bamboo (CTH-661)";
+			break;
+		case 0xDD:
+			*name = "Wacom Bamboo Pen/Connect (CTL-470)";
 			break;
 
 		default:
