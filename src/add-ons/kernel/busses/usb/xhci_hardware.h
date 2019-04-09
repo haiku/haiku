@@ -311,9 +311,9 @@
 
 
 struct xhci_trb {
-	uint64	qwtrb0;
-	uint32	dwtrb2;
-	uint32	dwtrb3;
+	uint64 address;
+	uint32 status;
+	uint32 flags;
 } __attribute__((__aligned__(4)));
 
 
