@@ -32,7 +32,7 @@
 
 #define AMIGA_FFS_NAME					"AmigaFFS File System"
 #define BFS_NAME						"Be File System"
-#define BTRFS_NAME						"BTRFS File System"
+#define BTRFS_NAME						"Btrfs File System"
 #define EXFAT_FS_NAME					"exFAT File System"
 #define EXT2_FS_NAME					"EXT2 File System"
 #define EXT3_FS_NAME					"EXT3 File System"

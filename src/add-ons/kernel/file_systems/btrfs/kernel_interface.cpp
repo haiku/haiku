@@ -942,7 +942,7 @@ static file_system_module_info sBtrfsFileSystem = {
 	},
 
 	"btrfs",						// short_name
-	"btrfs File System",			// pretty_name
+	"Btrfs File System",			// pretty_name
 	0,								// DDM flags
 
 	// scanning
