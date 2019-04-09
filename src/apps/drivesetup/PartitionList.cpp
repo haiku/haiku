@@ -1,5 +1,6 @@
 /*
- * Copyright 2006-2013, Haiku Inc. All rights reserved.
+ * Copyright 2006-2019, Haiku Inc. All rights reserved.
+ * Copyright 2014, Dancsó Róbert <dancso.robert@d-rendszer.hu>
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,20 +8,29 @@
  *		James Urquhart
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
 
 #include "PartitionList.h"
 
+#include <stdio.h>
 #include <Catalog.h>
 #include <ColumnTypes.h>
+#include <DiskDevice.h>
+#include <File.h>
+#include <IconUtils.h>
 #include <Locale.h>
 #include <Path.h>
+#include <Volume.h>
+#include <VolumeRoster.h>
 
 #include <driver_settings.h>
 
+#include "EncryptionUtils.h"
 #include "Support.h"
 #include "MainWindow.h"
+#include "icons.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -35,6 +45,8 @@ enum {
 	kVolumeNameColumn,
 	kMountedAtColumn,
 	kSizeColumn,
+	kFreeSizeColumn,
+	kBlockSizeColumn,
 	kParametersColumn,
 	kPartitionTypeColumn,
 };
@@ -195,6 +207,17 @@ PartitionColumn::InitTextMargin(BView* parent)
 // #pragma mark - PartitionListRow
 
 
+static inline void
+appendParameter(BString& string, bool append, const char* parameter)
+{
+	if (!append)
+		return;
+	if (string.Length() > 0)
+		string.Append(", ");
+	string.Append(parameter);
+}
+
+
 PartitionListRow::PartitionListRow(BPartition* partition)
 	:
 	Inherited(),
@@ -208,14 +231,58 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 
 	// Device icon
 
-	BBitmap* icon = NULL;
-	if (partition->IsDevice()) {
-		icon_size size = B_MINI_ICON;
-		icon = new BBitmap(BRect(0, 0, size - 1, size - 1), B_RGBA32);
-		if (partition->GetIcon(icon, size) != B_OK) {
+	BVolume volume;
+	partition->GetVolume(&volume);
+
+	BVolume boot;
+	BVolumeRoster().GetBootVolume(&boot);
+
+	bool fBoot;
+	bool fReadOnly;
+	bool fShared;
+	bool fEncrypted = false;
+
+	fBoot = volume == boot;
+	fReadOnly = volume.IsReadOnly();
+	fShared = volume.IsShared();
+
+	BString parameters;
+	appendParameter(parameters, fBoot, B_TRANSLATE("Boot"));
+	appendParameter(parameters, partition->Device()->IsFile(),
+		B_TRANSLATE("Virtual"));
+	appendParameter(parameters, fReadOnly, B_TRANSLATE("Read only"));
+	appendParameter(parameters, volume.IsRemovable(), B_TRANSLATE("Removable"));
+	appendParameter(parameters, fShared, B_TRANSLATE("Shared"));
+	appendParameter(parameters, volume.KnowsMime(), B_TRANSLATE("Mimes"));
+	appendParameter(parameters, volume.KnowsAttr(), B_TRANSLATE("Attributes"));
+	appendParameter(parameters, volume.KnowsQuery(), B_TRANSLATE("Queries"));
+
+	const char* encrypter = EncryptionType(path.Path());
+	if (encrypter != NULL) {
+		appendParameter(parameters, true, encrypter);
+		fEncrypted = true;
+	}
+
+	BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
+
+	if (fBoot)
+		BIconUtils::GetVectorIcon(kLeaf, sizeof(kLeaf), icon);
+	else if (fEncrypted)
+		BIconUtils::GetVectorIcon(kEncrypted, sizeof(kEncrypted), icon);
+	else if (fReadOnly)
+		BIconUtils::GetVectorIcon(kReadOnly, sizeof(kReadOnly), icon);
+	else if (fShared)
+		BIconUtils::GetVectorIcon(kShared, sizeof(kShared), icon);
+	else if (partition->Device()->IsFile())
+		BIconUtils::GetVectorIcon(kFile, sizeof(kFile), icon);
+	else if (partition->IsDevice()) {
+		if (partition->GetIcon(icon, B_MINI_ICON) != B_OK) {
 			delete icon;
 			icon = NULL;
 		}
+	} else {
+		delete icon;
+		icon = NULL;
 	}
 
 	SetField(new BBitmapStringField(icon, path.Path()), kDeviceColumn);
@@ -260,29 +327,36 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		char size[1024];
 		SetField(new BStringField(string_for_size(partition->Size(), size,
 			sizeof(size))), kSizeColumn);
-	} else {
+	} else
 		SetField(new BStringField(kUnavailableString), kSizeColumn);
-	}
+
+	if (volume.FreeBytes() > 0) {
+		char size[1024];
+		SetField(new BStringField(string_for_size(volume.FreeBytes(), size,
+			sizeof(size))), kFreeSizeColumn);
+	} else
+		SetField(new BStringField(kUnavailableString), kFreeSizeColumn);
+
+	char blocksize[16];
+	snprintf(blocksize, sizeof(blocksize), "%" B_PRIu32,
+		partition->BlockSize());
+	SetField(new BStringField(blocksize), kBlockSizeColumn);
 
 	// Additional parameters
 
 	if (partition->Parameters() != NULL) {
-		BString parameters;
-
 		// check parameters
 		void* handle = parse_driver_settings_string(partition->Parameters());
 		if (handle != NULL) {
-			bool active = get_driver_boolean_parameter(handle, "active", false, true);
-			if (active)
-				parameters += B_TRANSLATE("Active");
+			bool active = get_driver_boolean_parameter(handle, "active", false,
+				true);
+			appendParameter(parameters, active, B_TRANSLATE("Active"));
 
 			delete_driver_settings(handle);
 		}
-
-		SetField(new BStringField(parameters), kParametersColumn);
-	} else {
-		SetField(new BStringField(kUnavailableString), kParametersColumn);
 	}
+
+	SetField(new BStringField(parameters), kParametersColumn);
 
 	// Partition type
 
@@ -304,7 +378,8 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 	// TODO: design icon for spaces on partitions
 	SetField(new BBitmapStringField(NULL, "-"), kDeviceColumn);
 
-	SetField(new BStringField(B_TRANSLATE("<empty>")), kFilesystemColumn);
+	SetField(new BStringField(B_TRANSLATE("<empty or unknown>")),
+		kFilesystemColumn);
 	SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 
 	SetField(new BStringField(kUnavailableString), kMountedAtColumn);
@@ -342,8 +417,12 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_MIDDLE), kVolumeNameColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Mounted at"), 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
-	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 100, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 80, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Free space"), 80, 50, 500,
+		B_TRUNCATE_END, B_ALIGN_RIGHT), kFreeSizeColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Block size"), 50, 50, 500,
+		B_TRUNCATE_END, B_ALIGN_RIGHT), kBlockSizeColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 100, 50, 500,
 		B_TRUNCATE_END), kParametersColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Partition type"), 200, 50, 500,

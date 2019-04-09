@@ -10,6 +10,7 @@ Preference DriveSetup :
 	CreateParametersPanel.cpp
 	DiskView.cpp
 	DriveSetup.cpp
+	EncryptionUtils.cpp
 	InitParametersPanel.cpp
 	MainWindow.cpp
 	PartitionList.cpp
@@ -27,6 +28,7 @@ DoCatalogs DriveSetup :
 	ChangeParametersPanel.cpp
 	CreateParametersPanel.cpp
 	DiskView.cpp
+	EncryptionUtils.cpp
 	InitParametersPanel.cpp
 	MainWindow.cpp
 	PartitionList.cpp
