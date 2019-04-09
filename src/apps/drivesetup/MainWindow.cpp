@@ -65,6 +65,7 @@ enum {
 	MSG_INITIALIZE				= 'init',
 	MSG_DELETE					= 'delt',
 	MSG_EJECT					= 'ejct',
+	MSG_OPEN_DISKPROBE			= 'opdp',
 	MSG_SURFACE_TEST			= 'sfct',
 	MSG_RESCAN					= 'rscn',
 
@@ -217,6 +218,9 @@ MainWindow::MainWindow()
 		new BMessage(MSG_FORMAT));
 	fEjectMenuItem = new BMenuItem(B_TRANSLATE("Eject"),
 		new BMessage(MSG_EJECT), 'E');
+	fOpenDiskProbeMenuItem = new BMenuItem(B_TRANSLATE("Open with DiskProbe"),
+		new BMessage(MSG_OPEN_DISKPROBE));
+
 	fSurfaceTestMenuItem = new BMenuItem(
 		B_TRANSLATE("Surface test (not implemented)"),
 		new BMessage(MSG_SURFACE_TEST));
@@ -271,6 +275,10 @@ MainWindow::MainWindow()
 	fPartitionMenu->AddSeparatorItem();
 
 	fPartitionMenu->AddItem(fMountAllMenuItem);
+
+	fPartitionMenu->AddSeparatorItem();
+
+	fPartitionMenu->AddItem(fOpenDiskProbeMenuItem);
 	fMenuBar->AddItem(fPartitionMenu);
 
 	AddChild(fMenuBar);
@@ -288,6 +296,8 @@ MainWindow::MainWindow()
 		new BMessage(MSG_MOUNT), 'M');
 	fUnmountContextMenuItem = new BMenuItem(B_TRANSLATE("Unmount"),
 		new BMessage(MSG_UNMOUNT), 'U');
+	fOpenDiskProbeContextMenuItem = new BMenuItem(B_TRANSLATE("Open with DiskProbe"),
+		new BMessage(MSG_OPEN_DISKPROBE));
 	fFormatContextMenuItem = new BMenu(B_TRANSLATE("Format"));
 
 	fContextMenu->AddItem(fCreateContextMenuItem);
@@ -297,6 +307,8 @@ MainWindow::MainWindow()
 	fContextMenu->AddSeparatorItem();
 	fContextMenu->AddItem(fMountContextMenuItem);
 	fContextMenu->AddItem(fUnmountContextMenuItem);
+	fContextMenu->AddSeparatorItem();
+	fContextMenu->AddItem(fOpenDiskProbeContextMenuItem);
 	fContextMenu->SetTargetForItems(this);
 
 	// add DiskView
@@ -389,6 +401,17 @@ MainWindow::MessageReceived(BMessage* message)
 				_ScanDrives();
 			}
 			break;
+		case MSG_OPEN_DISKPROBE:
+		{
+			PartitionListRow* row = dynamic_cast<PartitionListRow*>(
+				fListView->CurrentSelection());
+			const char* args[] = { row->DevicePath(), NULL };
+
+			be_roster->Launch("application/x-vnd.Haiku-DiskProbe", 1,
+				(char**)args);
+
+			break;
+		}
 		case MSG_SURFACE_TEST:
 			printf("MSG_SURFACE_TEST\n");
 			break;
@@ -765,6 +788,9 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fMountContextMenuItem->SetEnabled(false);
 			fFormatContextMenuItem->SetEnabled(false);
 		}
+
+		fOpenDiskProbeMenuItem->SetEnabled(true);
+		fOpenDiskProbeContextMenuItem->SetEnabled(true);
 
 		if (prepared)
 			disk->CancelModifications();

@@ -111,6 +111,7 @@ private:
 			BMenuItem*			fMountMenuItem;
 			BMenuItem*			fUnmountMenuItem;
 			BMenuItem*			fMountAllMenuItem;
+			BMenuItem*			fOpenDiskProbeMenuItem;
 
 			BMenu*				fFormatContextMenuItem;
 			BMenuItem*			fCreateContextMenuItem;
@@ -118,6 +119,7 @@ private:
 			BMenuItem*			fDeleteContextMenuItem;
 			BMenuItem*			fMountContextMenuItem;
 			BMenuItem*			fUnmountContextMenuItem;
+			BMenuItem*			fOpenDiskProbeContextMenuItem;
 			BPopUpMenu*			fContextMenu;
 };
 
