@@ -150,7 +150,6 @@
 #define XHCI_SUPPORTED_PROTOCOLS_1_OFFSET(x) (((x) >> 0) & 0xff)
 
 
-
 // Port status Registers
 // Section 5.4.8
 #define XHCI_PORTSC(n)			(0x400 + (0x10 * (n)))

@@ -718,11 +718,10 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		sizeof(usb_request_data));
 	descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0) | TRB_2_BYTES(8);
 	descriptor->trbs[index].dwtrb3
-		= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_SETUP_STAGE)
-			| TRB_3_IDT_BIT | TRB_3_CYCLE_BIT);
+		= TRB_3_TYPE(TRB_TYPE_SETUP_STAGE) | TRB_3_IDT_BIT | TRB_3_CYCLE_BIT;
 	if (requestData->Length > 0) {
-		descriptor->trbs[index].dwtrb3 |= B_HOST_TO_LENDIAN_INT32(
-			directionIn ? TRB_3_TRT_IN : TRB_3_TRT_OUT);
+		descriptor->trbs[index].dwtrb3 |=
+			directionIn ? TRB_3_TRT_IN : TRB_3_TRT_OUT;
 	}
 
 	index++;
@@ -733,10 +732,9 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0)
 			| TRB_2_BYTES(requestData->Length)
 			| TRB_2_TD_SIZE(0);
-		descriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
-			TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
+		descriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
 				| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
-				| TRB_3_CYCLE_BIT);
+				| TRB_3_CYCLE_BIT;
 
 		if (!directionIn) {
 			transfer->PrepareKernelAccess();
@@ -750,10 +748,9 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	// Status Stage
 	descriptor->trbs[index].qwtrb0 = 0;
 	descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0);
-	descriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
-		TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
+	descriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
 			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
-			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
+			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT;
 		// Status Stage is an OUT transfer when the device is sending data.
 		// (XHCI 1.1 § 4.11.2.2 Table 4-6 p205.)
 
@@ -1751,24 +1748,39 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 	TRACE("_LinkDescriptorForPipe current %d, next %d\n", current, next);
 
-	// Compute next link
+	// Compute next link.
 	addr_t addr = endpoint->trb_addr + next * sizeof(xhci_trb);
 	descriptor->trbs[descriptor->trb_used].qwtrb0 = addr;
 	descriptor->trbs[descriptor->trb_used].dwtrb2 = TRB_2_IRQ(0);
-	descriptor->trbs[descriptor->trb_used].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
-		TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_CYCLE_BIT);
+	descriptor->trbs[descriptor->trb_used].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
+		| TRB_3_CYCLE_BIT;
 
+#if !B_HOST_IS_LENDIAN
+	// Convert endianness.
+	for (uint32 i = 0; i <= descriptor->trb_used; i++) {
+		descriptor->trbs[i].qwtrb0 =
+			B_HOST_TO_LENDIAN_INT64(descriptor->trbs[i].qwtrb0);
+		descriptor->trbs[i].dwtrb2 =
+			B_HOST_TO_LENDIAN_INT32(descriptor->trbs[i].dwtrb2);
+		descriptor->trbs[i].dwtrb3 =
+			B_HOST_TO_LENDIAN_INT32(descriptor->trbs[i].dwtrb3);
+	}
+#endif
+
+	// Link the descriptor.
 	endpoint->trbs[next].qwtrb0 = 0;
 	endpoint->trbs[next].dwtrb2 = 0;
 	endpoint->trbs[next].dwtrb3 = 0;
 
-	// Link the descriptor.
-	endpoint->trbs[current].qwtrb0 = descriptor->trb_addr;
-	endpoint->trbs[current].dwtrb2 = TRB_2_IRQ(0);
-	endpoint->trbs[current].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK);
+	endpoint->trbs[current].qwtrb0 =
+		B_HOST_TO_LENDIAN_INT64(descriptor->trb_addr);
+	endpoint->trbs[current].dwtrb2 =
+		B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
+	endpoint->trbs[current].dwtrb3 =
+		B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK));
 
 	// Everything is ready, so write the cycle bit.
-	endpoint->trbs[current].dwtrb3 |= TRB_3_CYCLE_BIT;
+	endpoint->trbs[current].dwtrb3 |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
 
 	TRACE("_LinkDescriptorForPipe pCurrent %p phys 0x%" B_PRIxPHYSADDR
 		" 0x%" B_PRIxPHYSADDR " 0x%08" B_PRIx32 "\n", &endpoint->trbs[current],
