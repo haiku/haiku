@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons disk_systems ;
 
 SubInclude HAIKU_TOP src add-ons disk_systems bfs ;
+SubInclude HAIKU_TOP src add-ons disk_systems btrfs ;
 SubInclude HAIKU_TOP src add-ons disk_systems fat ;
 SubInclude HAIKU_TOP src add-ons disk_systems gpt ;
 SubInclude HAIKU_TOP src add-ons disk_systems intel ;

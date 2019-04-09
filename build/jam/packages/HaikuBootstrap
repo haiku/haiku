@@ -102,7 +102,7 @@ if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToPackage  				: runtime_loader Deskbar Tracker ;
+AddFilesToPackage				: runtime_loader Deskbar Tracker ;
 AddFilesToPackage bin			: $(SYSTEM_BIN) consoled ;
 AddFilesToPackage apps			: $(SYSTEM_APPS) ;
 AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
