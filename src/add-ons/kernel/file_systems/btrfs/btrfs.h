@@ -13,7 +13,11 @@
 typedef uint64 fileblock_t;		// file block number
 typedef uint64 fsblock_t;		// filesystem block number
 
-#define BTRFS_SUPER_BLOCK_OFFSET	0x10000
+#define BTRFS_LABEL_SIZE					256
+
+#define BTRFS_SUPER_BLOCK_OFFSET			0x10000	 // 64KiB
+#define BTRFS_RESERVED_SPACE_OFFSET			0x100000 // 1MiB
+
 #define BTRFS_NUM_ROOT_BACKUPS				4
 
 
@@ -93,10 +97,10 @@ struct btrfs_timespec {
 
 struct btrfs_header {
 	uint8	checksum[32];
-	uint8	fsid[16];
+	uuid_t	fsid;
 	uint64	logical_address;
 	uint64	flags;
-	uint8	chunk_tree_uuid[16];
+	uuid_t	chunk_tree_uuid;
 	uint64	generation;
 	uint64	owner;
 	uint32	item_count;
@@ -162,7 +166,7 @@ struct btrfs_stream {
 struct btrfs_stripe {
 	uint64	device_id;
 	uint64	offset;
-	uint8	device_uuid[16];
+	uuid_t	device_uuid;
 	uint64	DeviceID() const { return B_LENDIAN_TO_HOST_INT64(device_id); }
 	uint64	Offset() const { return B_LENDIAN_TO_HOST_INT64(offset); }
 } _PACKED;
@@ -208,14 +212,14 @@ struct btrfs_device {
 	uint32	group;
 	uint8	seek_speed;
 	uint8	bandwidth;
-	uint8	uuid[16];
-	uint8	fsid[16];
+	uuid_t	uuid;
+	uuid_t	fsid;
 } _PACKED;
 
 
 struct btrfs_super_block {
 	uint8	checksum[32];
-	uint8	fsid[16];
+	uuid_t	fsid;
 	uint64	blocknum;
 	uint64	flags;
 	char	magic[8];
@@ -242,13 +246,15 @@ struct btrfs_super_block {
 	uint8	chunk_root_level;
 	uint8	log_root_level;
 	btrfs_device device;
-	char	label[256];
+	char	label[BTRFS_LABEL_SIZE];
 	uint64	reserved[32];
 	uint8	system_chunk_array[2048];
 	btrfs_backup_roots backup_roots[BTRFS_NUM_ROOT_BACKUPS];
 
-	bool IsValid();
-		// implemented in Volume.cpp
+	// implemented in Volume.cpp:
+	bool IsValid() const;
+	void Initialize(const char* name, off_t numBlocks,
+			uint32 blockSize, uint32 sectorSize);
 	uint64 TotalSize() const { return B_LENDIAN_TO_HOST_INT64(total_size); }
 	uint32 BlockSize() const { return B_LENDIAN_TO_HOST_INT32(node_size); }
 	uint32 SectorSize() const { return B_LENDIAN_TO_HOST_INT32(sector_size); }
@@ -456,9 +462,12 @@ struct btrfs_extent_data_ref {
 	uint32 RefCount() const { return B_LENDIAN_TO_HOST_INT32(ref_count); }
 } _PACKED;
 
-
 #define BTRFS_SUPER_BLOCK_MAGIC				"_BHRfS_M"
+#define BTRFS_SUPER_BLOCK_MAGIC_TEMPORARY	"!BHRfS_M"
+
 #define BTRFS_FIRST_SUBVOLUME				256
+
+#define BTRFS_CSUM_TYPE_CRC32				0
 
 #define BTRFS_OBJECT_ID_ROOT_TREE			1
 #define BTRFS_OBJECT_ID_EXTENT_TREE			2

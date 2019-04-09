@@ -45,6 +45,7 @@ public:
 							Transaction();
 							~Transaction();
 
+			Journal*		GetJournal() const { return fJournal; }
 			int32			ID() const { return fJournal->TransactionID(); }
 			uint64			SystemID() const
 								{ return fJournal->SystemTransactionID(); }

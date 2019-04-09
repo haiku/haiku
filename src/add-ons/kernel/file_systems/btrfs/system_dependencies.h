@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <ByteOrder.h>
+#include <driver_settings.h>
 #include <fs_cache.h>
 #include <fs_interface.h>
 #include <fs_info.h>
@@ -43,6 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <uuid.h>
 #include <zlib.h>
 
 #endif	// !FS_SHELL

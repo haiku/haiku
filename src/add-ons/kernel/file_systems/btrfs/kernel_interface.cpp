@@ -1,7 +1,9 @@
 /*
+ * Copyright 2019, Les De Ridder, les@lesderid.net
  * Copyright 2017, Chế Vũ Gia Hy, cvghy116@gmail.com.
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ *
  * This file may be used under the terms of the MIT License.
  */
 
@@ -9,6 +11,8 @@
 #include "Attribute.h"
 #include "AttributeIterator.h"
 #include "btrfs.h"
+#include "btrfs_disk_system.h"
+#include "DebugSupport.h"
 #include "DirectoryIterator.h"
 #include "Inode.h"
 #include "Utility.h"
@@ -20,8 +24,6 @@
 #else
 #	define TRACE(x...) ;
 #endif
-#define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
-
 
 #define BTRFS_IO_SIZE	65536
 
@@ -833,6 +835,85 @@ btrfs_remove_attr(fs_volume* _volume, fs_vnode* vnode,
 	return EROFS;
 }
 
+static uint32
+btrfs_get_supported_operations(partition_data* partition, uint32 mask)
+{
+	// TODO: We should at least check the partition size.
+	return B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+//		| B_DISK_SYSTEM_SUPPORTS_WRITING
+		;
+}
+
+
+static status_t
+btrfs_initialize(int fd, partition_id partitionID, const char* name,
+	const char* parameterString, off_t partitionSize, disk_job_id job)
+{
+	// check name
+	status_t status = check_volume_name(name);
+	if (status != B_OK)
+		return status;
+
+	// parse parameters
+	initialize_parameters parameters;
+	status = parse_initialize_parameters(parameterString, parameters);
+	if (status != B_OK)
+		return status;
+
+	update_disk_device_job_progress(job, 0);
+
+	// initialize the volume
+	Volume volume(NULL);
+	status = volume.Initialize(fd, name, parameters.blockSize,
+		parameters.sectorSize);
+	if (status < B_OK) {
+		INFORM("Initializing volume failed: %s\n", strerror(status));
+		return status;
+	}
+
+	// rescan partition
+	status = scan_partition(partitionID);
+	if (status != B_OK)
+		return status;
+
+	update_disk_device_job_progress(job, 1);
+
+	// print some info, if desired
+	if (parameters.verbose) {
+		btrfs_super_block super = volume.SuperBlock();
+
+		INFORM(("Disk was initialized successfully.\n"));
+		INFORM("\tlabel: \"%s\"\n", super.label);
+		INFORM("\tblock size: %u bytes\n", (unsigned)super.BlockSize());
+		INFORM("\tsector size: %u bytes\n", (unsigned)super.SectorSize());
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+btrfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
+	uint32 blockSize, disk_job_id job)
+{
+	if (blockSize == 0)
+		return B_BAD_VALUE;
+
+	update_disk_device_job_progress(job, 0.0);
+
+	// just overwrite the superblock
+	btrfs_super_block superBlock;
+	memset(&superBlock, 0, sizeof(superBlock));
+
+	if (write_pos(fd, BTRFS_SUPER_BLOCK_OFFSET, &superBlock,
+			sizeof(superBlock)) < 0)
+		return errno;
+
+	update_disk_device_job_progress(job, 1.0);
+
+	return B_OK;
+}
 
 //	#pragma mark -
 
@@ -842,8 +923,12 @@ btrfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			init_debugging();
+
 			return B_OK;
 		case B_MODULE_UNINIT:
+			exit_debugging();
+
 			return B_OK;
 
 		default:
@@ -943,7 +1028,13 @@ static file_system_module_info sBtrfsFileSystem = {
 
 	"btrfs",						// short_name
 	"Btrfs File System",			// pretty_name
-	0,								// DDM flags
+
+	// DDM flags
+	0
+	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+//	| B_DISK_SYSTEM_SUPPORTS_WRITING
+	,
 
 	// scanning
 	btrfs_identify_partition,
@@ -955,7 +1046,7 @@ static file_system_module_info sBtrfsFileSystem = {
 
 
 	/* capability querying operations */
-	NULL,
+	&btrfs_get_supported_operations,
 
 	NULL,	// validate_resize
 	NULL,	// validate_move
@@ -973,8 +1064,8 @@ static file_system_module_info sBtrfsFileSystem = {
 	NULL,	// move
 	NULL,	// set_content_name
 	NULL,	// set_content_parameters
-	NULL,	// initialize
-	NULL	// unitialize
+	btrfs_initialize,
+	btrfs_uninitialize
 };
 
 

@@ -30,6 +30,8 @@ public:
 
 			status_t			Mount(const char* device, uint32 flags);
 			status_t			Unmount();
+			status_t			Initialize(int fd, const char* label,
+									uint32 blockSize, uint32 sectorSize);
 
 			bool				IsValidSuperBlock();
 			bool				IsReadOnly() const
@@ -58,6 +60,7 @@ public:
 			btrfs_super_block&	SuperBlock() { return fSuperBlock; }
 
 			status_t			LoadSuperBlock();
+			status_t			WriteSuperBlock();
 
 			// cache access
 			void*				BlockCache() { return fBlockCache; }

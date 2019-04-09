@@ -1,24 +1,35 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems btrfs ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders shared storage ;
+UsePrivateHeaders shared storage file_systems ;
 UsePrivateKernelHeaders ;
 UseBuildFeatureHeaders zlib ;
+
+DEFINES += DEBUG_APP="\\\"btrfs\\\"" ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] : true ;
 
 Includes [ FGristFiles Inode.cpp ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
 KernelAddon btrfs :
+	btrfs_disk_system.cpp
 	kernel_interface.cpp
 	Attribute.cpp
 	AttributeIterator.cpp
 	BTree.cpp
 	Chunk.cpp
 	CRCTable.cpp
+	DebugSupport.cpp
 	DirectoryIterator.cpp
 	ExtentAllocator.cpp
 	Inode.cpp
 	Journal.cpp
 	Volume.cpp
-	: kernel_libz.a
+	:
+	kernel_libz.a
+	libuuid_kernel.a
 ;
+
+SEARCH on [ FGristFiles DebugSupport.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
