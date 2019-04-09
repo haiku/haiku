@@ -16,7 +16,7 @@ Application DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be localestub libcolumnlistview.a shared
+	: be localestub libcolumnlistview.a shared tracker
 		[ TargetLibsupc++ ]
 	: DriveSetup.rdef
 ;

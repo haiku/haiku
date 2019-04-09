@@ -13,19 +13,25 @@
 
 #include "MainWindow.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <Alert.h>
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <DiskDevice.h>
+#include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <DiskSystem.h>
+#include <IconUtils.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MenuBar.h>
@@ -68,6 +74,11 @@ enum {
 	MSG_OPEN_DISKPROBE			= 'opdp',
 	MSG_SURFACE_TEST			= 'sfct',
 	MSG_RESCAN					= 'rscn',
+	MSG_REGISTER				= 'regi',
+	MSG_UNREGISTER				= 'unrg',
+	MSG_SAVE					= 'save',
+	MSG_WRITE					= 'writ',
+	MSG_COMPLETE				= 'comp',
 
 	MSG_PARTITION_ROW_SELECTED	= 'prsl',
 };
@@ -242,6 +253,19 @@ MainWindow::MainWindow()
 	fMountAllMenuItem = new BMenuItem(B_TRANSLATE("Mount all"),
 		new BMessage(MSG_MOUNT_ALL), 'M', B_SHIFT_KEY);
 
+	fRegisterMenuItem = new BMenuItem(
+		B_TRANSLATE("Register disk image" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_REGISTER));
+	fUnRegisterMenuItem = new BMenuItem(
+		B_TRANSLATE("Unregister disk image"),
+		new BMessage(MSG_UNREGISTER));
+	fSaveMenuItem = new BMenuItem(
+		B_TRANSLATE("Save image" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_SAVE));
+	fWriteMenuItem = new BMenuItem(
+		B_TRANSLATE("Write image" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_WRITE));
+
 	// Disk menu
 	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
 
@@ -280,6 +304,19 @@ MainWindow::MainWindow()
 
 	fPartitionMenu->AddItem(fOpenDiskProbeMenuItem);
 	fMenuBar->AddItem(fPartitionMenu);
+
+	// Disk image menu
+	fDiskImageMenu = new BMenu(B_TRANSLATE("Disk image"));
+
+	fDiskImageMenu->AddItem(fRegisterMenuItem);
+	fDiskImageMenu->AddItem(fUnRegisterMenuItem);
+
+	fDiskImageMenu->AddSeparatorItem();
+
+	fDiskImageMenu->AddItem(fSaveMenuItem);
+	fDiskImageMenu->AddItem(fWriteMenuItem);
+
+	fMenuBar->AddItem(fDiskImageMenu);
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
 	layout->SetInsets(-1, 0, -1, -1);
@@ -328,6 +365,20 @@ MainWindow::MainWindow()
 	fListView->SetTarget(this);
 	fListView->MakeFocus(true);
 
+	fRegisterFilePanel = NULL;
+	fWriteImageFilePanel = NULL;
+	fReadImageFilePanel = NULL;
+
+	fNotification = new BNotification(B_INFORMATION_NOTIFICATION);
+	fNotification->SetGroup(BString(B_TRANSLATE_SYSTEM_NAME("DriveSetup")));
+
+	app_info info;
+	be_roster->GetAppInfo("application/x-vnd.Haiku-DriveSetup", &info);
+	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+	BNode node(&info.ref);
+	if (BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon) == B_OK)
+		fNotification->SetIcon(&icon);
+
 	status_t status = fDiskDeviceRoster.StartWatching(BMessenger(this));
 	if (status != B_OK) {
 		fprintf(stderr, "Failed to start watching for device changes: %s\n",
@@ -354,6 +405,10 @@ MainWindow::~MainWindow()
 	BDiskDeviceRoster().StopWatching(this);
 	delete fCurrentDisk;
 	delete fContextMenu;
+
+	delete fRegisterFilePanel;
+	delete fReadImageFilePanel;
+	delete fWriteImageFilePanel;
 }
 
 
@@ -459,9 +514,144 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_REGISTER:
+		{
+			entry_ref entryRef;
+			message->FindRef("refs", &entryRef);
+			BEntry entry(&entryRef);
+			BPath path;
+			if (entry.GetPath(&path) == B_OK) {
+				RegisterFileDiskDevice(path.Path());
+				break;
+			}
+
+			if (fRegisterFilePanel == NULL) {
+				fRegisterFilePanel = new(std::nothrow) BFilePanel(B_OPEN_PANEL,
+					new BMessenger(this), NULL, B_FILE_NODE, false,
+					new BMessage(MSG_REGISTER), NULL, true);
+			}
+
+			if (fRegisterFilePanel != NULL)
+				fRegisterFilePanel->Show();
+			break;
+		}
+		case MSG_UNREGISTER:
+		{
+			BPath path;
+			fCurrentDisk->GetPath(&path);
+			UnRegisterFileDiskDevice(path.Path());
+			break;
+		}
+		case MSG_WRITE:
+		{
+			entry_ref entryRef;
+			message->FindRef("refs", &entryRef);
+			BEntry entry(&entryRef);
+			BPath path;
+			if (entry.GetPath(&path) == B_OK) {
+				BMessage* msg = new BMessage();
+
+				PartitionListRow* row = dynamic_cast<PartitionListRow*>(
+					fListView->CurrentSelection());
+
+				msg->AddString("source", path.Path());
+				msg->AddString("target", row->DevicePath());
+				msg->AddMessenger("messenger", BMessenger(this));
+
+				thread_id write_thread = spawn_thread(WriteDiskImage,
+					"WriteDiskImage", B_LOW_PRIORITY, (void*)msg);
+				resume_thread(write_thread);
+			} else {
+				if (fWriteImageFilePanel == NULL) {
+					fWriteImageFilePanel = new(std::nothrow) BFilePanel(
+						B_OPEN_PANEL, new BMessenger(this), NULL, B_FILE_NODE,
+						false, new BMessage(MSG_WRITE), NULL, true);
+				}
+				if (fWriteImageFilePanel != NULL)
+					fWriteImageFilePanel->Show();
+			}
+			break;
+		}
+		case MSG_SAVE:
+		{
+			PartitionListRow* row = dynamic_cast<PartitionListRow*>(
+				fListView->CurrentSelection());
+
+			if (fReadImageFilePanel == NULL) {
+				fReadImageFilePanel = new(std::nothrow) BFilePanel(B_SAVE_PANEL,
+					new BMessenger(this), NULL, B_FILE_NODE, false, NULL, NULL,
+					true);
+			}
+
+			if (fReadImageFilePanel != NULL) {
+				BStringField* field = (BStringField*)row->GetField(2);
+				fReadImageFilePanel->SetSaveText(field->String());
+				fReadImageFilePanel->Show();
+			}
+			break;
+		}
+		case B_SAVE_REQUESTED:
+		{
+			BMessage* msg = new BMessage();
+
+			entry_ref entryRef;
+			message->FindRef("directory", &entryRef);
+			BEntry entry(&entryRef);
+			BPath path;
+			entry.GetPath(&path);
+			msg->AddString("targetfolder", path.Path());
+			const char* name;
+			message->FindString("name", &name);
+			path.Append(name);
+
+			PartitionListRow* row = dynamic_cast<PartitionListRow*>(
+				fListView->CurrentSelection());
+
+			msg->AddString("source", row->DevicePath());
+			msg->AddString("target", path.Path());
+			msg->AddInt32("partitionID", row->ID());
+			msg->AddMessenger("messenger", BMessenger(this));
+
+			thread_id save_thread = spawn_thread(SaveDiskImage, "SaveDiskImage",
+				B_LOW_PRIORITY, (void*)msg);
+			resume_thread(save_thread);
+
+			break;
+		}
+		case MSG_COMPLETE:
+		{
+			const char* status = "";
+
+			message->FindString("status", &status);
+
+			fNotification->SetTitle(BString(B_TRANSLATE("Disk image")));
+			fNotification->SetContent(BString(status));
+			fNotification->Send();
+
+			break;
+		}
+
 		case MSG_UPDATE_ZOOM_LIMITS:
 			_UpdateWindowZoomLimits();
 			break;
+
+		case B_REFS_RECEIVED:
+		{
+			entry_ref ref;
+			int32 i = 0;
+
+			while (message->FindRef("refs", i++, &ref) == B_OK) {
+				BEntry entry(&ref, true);
+				BPath path(&entry);
+				BNode node(&entry);
+
+				if (node.IsFile()) {
+					if (entry.GetPath(&path) == B_OK)
+						RegisterFileDiskDevice(path.Path());
+				}
+			}
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -550,6 +740,296 @@ MainWindow::ApplyDefaultSettings()
 	CenterOnScreen();
 
 	Unlock();
+}
+
+
+static void
+FileErrorAlert(const char* text, const char* fileName, alert_type type)
+{
+	BString message;
+	message.SetToFormat(text, fileName);
+	BAlert* alert = new BAlert(B_TRANSLATE("DriveSetup error"), message.String(),
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_WIDEST, type);
+	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+	alert->Go(NULL);
+}
+
+
+status_t
+MainWindow::RegisterFileDiskDevice(const char* fileName)
+{
+	BString message;
+
+	struct stat st;
+	if (lstat(fileName, &st) != 0) {
+		status_t error = errno;
+
+		FileErrorAlert(B_TRANSLATE("Failed to get information about %s"),
+			fileName, B_STOP_ALERT);
+		return error;
+	}
+
+	if (!S_ISREG(st.st_mode)) {
+		FileErrorAlert(B_TRANSLATE("%s is not a regular file."), fileName,
+			B_STOP_ALERT);
+		return B_BAD_VALUE;
+	}
+
+	// register the file
+	BDiskDeviceRoster roster;
+	partition_id id = roster.RegisterFileDevice(fileName);
+	if (id < 0) {
+		FileErrorAlert(B_TRANSLATE("Failed to register file disk device: %s"),
+			fileName, B_STOP_ALERT);
+		return id;
+	}
+
+	fNotification->SetTitle(BString(B_TRANSLATE("Disk image")));
+	fNotification->SetContent(BString(
+		B_TRANSLATE("Disk image has been added.")));
+	fNotification->Send();
+
+	return B_OK;
+}
+
+
+status_t
+MainWindow::UnRegisterFileDiskDevice(const char* fileNameOrID)
+{
+	BString message;
+
+	// try to parse the parameter as ID
+	char* numberEnd;
+	partition_id id = strtol(fileNameOrID, &numberEnd, 0);
+	BDiskDeviceRoster roster;
+	if (id >= 0 && numberEnd != fileNameOrID && *numberEnd == '\0') {
+		BDiskDevice device;
+		if (roster.GetDeviceWithID(id, &device) == B_OK && device.IsFile()) {
+			status_t error = roster.UnregisterFileDevice(id);
+			if (error != B_OK) {
+				FileErrorAlert(B_TRANSLATE(
+					"Failed to unregister file disk device."), NULL,
+					B_STOP_ALERT);
+				return error;
+			}
+
+			fNotification->SetTitle(BString(B_TRANSLATE("Disk image")));
+			fNotification->SetContent(BString(
+				B_TRANSLATE("Disk image has been removed.")));
+			fNotification->Send();
+
+			return B_OK;
+		} else {
+			FileErrorAlert(B_TRANSLATE(
+				"No file disk device found with the given ID, trying file %s"),
+				fileNameOrID, B_WARNING_ALERT);
+		}
+	}
+
+	// the parameter must be a file name -- stat() it
+	struct stat st;
+	if (lstat(fileNameOrID, &st) != 0) {
+		status_t error = errno;
+		FileErrorAlert(B_TRANSLATE("Failed to get information about %s"),
+			fileNameOrID, B_STOP_ALERT);
+		return error;
+	}
+
+	// remember the volume and node ID, so we can identify the file
+	// NOTE: There's a race condition -- we would need to open the file and
+	// keep it open to avoid it.
+	dev_t volumeID = st.st_dev;
+	ino_t nodeID = st.st_ino;
+
+	// iterate through all file disk devices and try to find a match
+	BDiskDevice device;
+	while (roster.GetNextDevice(&device) == B_OK) {
+		if (!device.IsFile())
+			continue;
+
+		// get file path and stat it, same for the device path
+		BPath path;
+		if ((device.GetFilePath(&path) == B_OK && lstat(path.Path(), &st) == 0
+				&& volumeID == st.st_dev && nodeID == st.st_ino)
+			|| (device.GetPath(&path) == B_OK && lstat(path.Path(), &st) == 0
+				&& volumeID == st.st_dev && nodeID == st.st_ino)) {
+			status_t error = roster.UnregisterFileDevice(device.ID());
+			if (error != B_OK) {
+				FileErrorAlert(B_TRANSLATE(
+					"Failed to unregister file disk device %s"), fileNameOrID,
+					B_STOP_ALERT);
+				return error;
+			}
+
+			fNotification->SetTitle(BString(B_TRANSLATE("Disk image")));
+			fNotification->SetContent(BString(
+				B_TRANSLATE("Disk image has been removed.")));
+			fNotification->Send();
+
+			return B_OK;
+		}
+	}
+
+	FileErrorAlert(B_TRANSLATE("%s does not refer to a file disk device."),
+		fileNameOrID, B_WARNING_ALERT);
+	return B_BAD_VALUE;
+}
+
+
+int32
+MainWindow::SaveDiskImage(void* data)
+{
+	BMessage* msg = (BMessage*)data;
+	const char* sourcepath;
+	const char* targetpath;
+	const char* targetfolder;
+	int32 partitionID;
+	BMessenger messenger;
+
+	msg->FindString("source", &sourcepath);
+	msg->FindString("target", &targetpath);
+	msg->FindString("targetfolder", &targetfolder);
+	msg->FindInt32("partitionID", &partitionID);
+	msg->FindMessenger("messenger", &messenger);
+
+	BFile source(sourcepath, B_READ_ONLY);
+	BFile target(targetpath, B_READ_WRITE | B_CREATE_FILE);
+
+	if (source.InitCheck() != B_OK) {
+		FileErrorAlert(B_TRANSLATE("Cannot init source volume."), NULL,
+			B_STOP_ALERT);
+		return -1;
+	}
+
+	if (target.InitCheck() != B_OK) {
+		FileErrorAlert(B_TRANSLATE("Cannot init target file."), NULL,
+			B_STOP_ALERT);
+		return -1;
+	}
+
+	BDirectory* targetdir = new BDirectory(targetfolder);
+	node_ref node;
+	targetdir->GetNodeRef(&node);
+	BVolume volume(node.device);
+
+	if (volume.InitCheck()) {
+		FileErrorAlert(B_TRANSLATE("Cannot init target volume."), NULL,
+			B_STOP_ALERT);
+		return -1;
+	}
+
+	if (volume.IsReadOnly()) {
+		FileErrorAlert(B_TRANSLATE("Target volume is read only."), NULL,
+			B_STOP_ALERT);
+		return -1;
+	}
+
+	BPartition *partition;
+	BDiskDevice device;
+
+	BDiskDeviceRoster().GetPartitionWithID(partitionID, &device, &partition);
+
+	if (volume.FreeBytes() < partition->Size()) {
+		FileErrorAlert(B_TRANSLATE("There is not enough free space on target "
+			"device."), NULL, B_STOP_ALERT);
+		return -1;
+	}
+
+	size_t bufsize = 1024*1024;
+	off_t sourcesize, targetsize;
+	ssize_t targetbytes = 0;
+
+	source.GetSize(&sourcesize);
+
+	char* buffer = (char*)malloc(bufsize);
+	while (true) {
+		ssize_t bytes = source.Read(buffer, bufsize);
+
+		if (bytes > 0) {
+			target.Write(buffer, (size_t)bytes);
+			target.GetSize(&targetsize);
+
+			targetbytes += bytes;
+		} else
+			break;
+	}
+	free(buffer);
+
+	BMessage message(MSG_COMPLETE);
+	message.AddString("status",
+		B_TRANSLATE("Disk image successfully created."));
+	messenger.SendMessage(&message);
+
+	return 0;
+}
+
+
+int32
+MainWindow::WriteDiskImage(void* data)
+{
+	BMessage* msg = (BMessage*)data;
+	const char* sourcepath;
+	const char* targetpath;
+	BMessenger messenger;
+
+	msg->FindString("source", &sourcepath);
+	msg->FindString("target", &targetpath);
+	msg->FindMessenger("messenger", &messenger);
+
+	BFile source(sourcepath, B_READ_ONLY);
+	BFile target(targetpath, B_READ_WRITE);
+
+	if (target.InitCheck() != B_OK) {
+		FileErrorAlert(B_TRANSLATE("Cannot init target partition."), NULL,
+			B_STOP_ALERT);
+		return -1;
+	}
+
+	BPartition *partition;
+	BDiskDevice device;
+
+	BDiskDeviceRoster().GetPartitionForPath(targetpath, &device, &partition);
+
+	if (partition->IsReadOnly()) {
+		FileErrorAlert(B_TRANSLATE("Target partition is read only."), NULL,
+			B_STOP_ALERT);
+		return -1;
+	}
+
+	off_t size;
+	source.GetSize(&size);
+
+	if (partition->Size() < size) {
+		FileErrorAlert(B_TRANSLATE("The target partition is smaller than the "
+			"image file."), NULL, B_STOP_ALERT);
+		return -1;
+	}
+
+	size_t bufsize = 1024 * 1024;
+	off_t sourcesize;
+	ssize_t targetbytes = 0;
+
+	source.GetSize(&sourcesize);
+
+	char* buffer = (char*)malloc(bufsize);
+	while (true) {
+		ssize_t bytes = source.Read(buffer, bufsize);
+
+		if (bytes > 0) {
+			target.Write(buffer, (size_t)bytes);
+
+			targetbytes += bytes;
+		} else
+			break;
+	}
+	free(buffer);
+
+	BMessage message(MSG_COMPLETE);
+	message.AddString("status",
+		B_TRANSLATE("Disk image successfully written to the target."));
+	messenger.SendMessage(&message);
+
+	return 0;
 }
 
 
@@ -671,6 +1151,9 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fWipeMenuItem->SetEnabled(false);
 		fEjectMenuItem->SetEnabled(false);
 		fSurfaceTestMenuItem->SetEnabled(false);
+		fUnRegisterMenuItem->SetEnabled(false);
+		fSaveMenuItem->SetEnabled(false);
+		fWriteMenuItem->SetEnabled(false);
 		fOpenDiskProbeMenuItem->SetEnabled(false);
 		fOpenDiskProbeContextMenuItem->SetEnabled(false);
 	} else {
@@ -679,6 +1162,11 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fEjectMenuItem->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMenuItem->SetEnabled(true);
 		fSurfaceTestMenuItem->SetEnabled(false);
+
+		fUnRegisterMenuItem->SetEnabled(disk->IsFile());
+
+		fSaveMenuItem->SetEnabled(true);
+		fWriteMenuItem->SetEnabled(!disk->IsReadOnly());
 
 		// Create menu and items
 		BPartition* parentPartition = NULL;
