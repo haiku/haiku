@@ -439,6 +439,11 @@ void
 DiskView::SetDiskCount(int32 count)
 {
 	fDiskCount = count;
+	if (count == 1) {
+		BMessage message(MSG_SELECTED_PARTITION_ID);
+		message.AddInt32("partition_id", 0);
+		Window()->PostMessage(&message);
+	}
 }
 
 
