@@ -436,6 +436,12 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_CCFLAGS += -mtune=68020-60 ;
 			HAIKU_KERNEL_C++FLAGS += -mtune=68020-60 ;
 
+		case riscv64 :
+			# Kernel lives within any single 2 GiB address space.
+			# Default is medlow (-2GiB / +2GiB)
+			HAIKU_KERNEL_CCFLAGS += -mcmodel=medany ;
+			HAIKU_KERNEL_C++FLAGS += -mcmodel=medany ;
+
 		case x86 :
 			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
 			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
