@@ -27,9 +27,11 @@ extern "C" void _start(uint32 _unused1, uint32 _unused2,
 	void *openFirmwareEntry);
 extern "C" void start(void *openFirmwareEntry);
 
+#ifdef __powerpc__
 // XCOFF "entry-point" is actually a pointer to the real code
 extern "C" void *_coff_start;
 void *_coff_start = (void *)&_start;
+#endif
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -52,11 +54,13 @@ call_ctors(void)
 }
 
 
+#ifdef __powerpc__
 static void
 clear_bss(void)
 {
 	memset(&__bss_start, 0, &_end - &__bss_start);
 }
+#endif
 
 
 static void
@@ -134,13 +138,15 @@ platform_boot_options(void)
 }
 
 
-extern "C" void
+extern "C" void __attribute__((section(".text.start")))
 _start(uint32 _unused1, uint32 _unused3, void *openFirmwareEntry)
 {
 	// According to the PowerPC bindings, OpenFirmware should have created
 	// a stack of 32kB or higher for us at this point
 
+#ifndef __sparc__
 	clear_bss();
+#endif
 	call_ctors();
 		// call C++ constructors before doing anything else
 

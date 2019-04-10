@@ -5,12 +5,13 @@ ENTRY(_start)
 
 SECTIONS
 {
-	. = 0x202000 + SIZEOF_HEADERS;
+	. = 0x202000;
 
 	__text_begin = .;
 
 	/* text/read-only data */
-	.text :	{ *(.text .text.* .gnu.linkonce.t.*)
+	.text :	{ *(.text.start) /* Make sure entry point is at start of file */
+			  *(.text .text.* .gnu.linkonce.t.*)
 	          *(.rodata .rodata.* .gnu.linkonce.r.*)
 	          *(.sdata2) }
 

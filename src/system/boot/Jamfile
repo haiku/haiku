@@ -38,7 +38,7 @@ rule BuildAoutLoader {
 
 actions BuildAoutLoader {
 	rm -f $(1)
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(AOUT_FORMAT) $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(AOUT_FORMAT) --impure -S $(2) $(1)
 }
 
 
