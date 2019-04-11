@@ -668,6 +668,8 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fWipeMenuItem->SetEnabled(false);
 		fEjectMenuItem->SetEnabled(false);
 		fSurfaceTestMenuItem->SetEnabled(false);
+		fOpenDiskProbeMenuItem->SetEnabled(false);
+		fOpenDiskProbeContextMenuItem->SetEnabled(false);
 	} else {
 //		fWipeMenuItem->SetEnabled(true);
 		fWipeMenuItem->SetEnabled(false);
