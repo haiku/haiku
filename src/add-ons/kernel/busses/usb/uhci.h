@@ -94,6 +94,8 @@ typedef struct isochronous_transfer_data {
 
 class UHCI : public BusManager {
 public:
+static	status_t					AddTo(Stack *stack);
+
 									UHCI(pci_info *info, Stack *stack);
 									~UHCI();
 
@@ -108,8 +110,6 @@ virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe, bool force);
 		status_t					SubmitRequest(Transfer *transfer);
 		status_t					SubmitIsochronous(Transfer *transfer);
-
-static	status_t					AddTo(Stack *stack);
 
 		// Port operations
 		status_t					GetPortStatus(uint8 index, usb_port_status *status);

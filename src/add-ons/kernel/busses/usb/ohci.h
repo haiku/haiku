@@ -34,6 +34,8 @@ typedef struct transfer_data {
 
 class OHCI : public BusManager {
 public:
+static	status_t					AddTo(Stack *stack);
+
 									OHCI(pci_info *info, Stack *stack);
 									~OHCI();
 
@@ -44,8 +46,6 @@ virtual status_t					CancelQueuedTransfers(Pipe *pipe,
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
-
-static	status_t					AddTo(Stack *stack);
 
 		// Port operations
 		uint8						PortCount() { return fPortCount; };

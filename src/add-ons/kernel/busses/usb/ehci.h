@@ -51,6 +51,8 @@ typedef struct isochronous_transfer_data {
 
 class EHCI : public BusManager {
 public:
+static	status_t					AddTo(Stack *stack);
+
 									EHCI(pci_info *info, Stack *stack);
 									~EHCI();
 
@@ -72,8 +74,6 @@ virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
-
-static	status_t					AddTo(Stack *stack);
 
 		// Port operations for root hub
 		uint8						PortCount() { return fPortCount; }
