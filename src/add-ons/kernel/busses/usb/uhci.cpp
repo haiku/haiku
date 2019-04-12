@@ -329,17 +329,10 @@ UHCI::AddTo(Stack *stack)
 	}
 
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
-
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
 			&& item->class_api == PCI_usb_uhci) {
-			if (item->u.h0.interrupt_line == 0
-				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_MODULE_ERROR("AddTo(): found with invalid IRQ - check IRQ assignement\n");
-				continue;
-			}
-
-			TRACE_MODULE("AddTo(): found at IRQ %u\n",
-				item->u.h0.interrupt_line);
+			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
+				item->bus, item->device, item->function);
 			UHCI *bus = new(std::nothrow) UHCI(item, stack);
 			if (!bus) {
 				delete item;
@@ -575,6 +568,11 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 			fIRQ = msiVector;
 			fUseMSI = true;
 		}
+	}
+
+	if (fIRQ == 0 || fIRQ == 0xFF) {
+		TRACE_MODULE_ERROR("device was assigned an invalid IRQ\n");
+		return;
 	}
 
 	// Install the interrupt handler
