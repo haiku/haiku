@@ -6,6 +6,8 @@
 
 #include "QueryList.h"
 
+#include <pthread.h>
+
 #include <Autolock.h>
 #include <Debug.h>
 #include <NodeMonitor.h>

@@ -21,6 +21,7 @@
 
 #include <new>
 #include <string.h>
+#include <pthread.h>
 
 
 using std::nothrow;

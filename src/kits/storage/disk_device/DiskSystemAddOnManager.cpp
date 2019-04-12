@@ -11,6 +11,7 @@
 #include <string>
 
 #include <stdio.h>
+#include <pthread.h>
 
 #include <Directory.h>
 #include <Entry.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OS_H
@@ -7,7 +7,7 @@
 
 /** Kernel specific structures and functions */
 
-#include <pthread.h>
+#include <sys/types.h>
 #include <stdarg.h>
 
 #include <SupportDefs.h>

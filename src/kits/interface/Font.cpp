@@ -30,6 +30,8 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+
 
 using namespace std;
 

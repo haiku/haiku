@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include <OS.h>
 
