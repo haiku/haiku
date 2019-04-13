@@ -97,18 +97,19 @@ OHCI::AddTo(Stack *stack)
 			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
 				item->bus, item->device, item->function);
 			OHCI *bus = new(std::nothrow) OHCI(item, stack);
-			if (!bus) {
+			if (bus == NULL) {
 				delete item;
-				sPCIModule = NULL;
 				put_module(B_PCI_MODULE_NAME);
-
-				if (sPCIx86Module != NULL) {
-					sPCIx86Module = NULL;
+				if (sPCIx86Module != NULL)
 					put_module(B_PCI_X86_MODULE_NAME);
-				}
-
 				return B_NO_MEMORY;
 			}
+
+			// The bus will put the PCI modules when it is destroyed, so get
+			// them again to increase their reference count.
+			get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
+			if (sPCIx86Module != NULL)
+				get_module(B_PCI_X86_MODULE_NAME, (module_info **)&sPCIx86Module);
 
 			if (bus->InitCheck() < B_OK) {
 				TRACE_MODULE_ERROR("bus failed init check\n");
@@ -127,22 +128,16 @@ OHCI::AddTo(Stack *stack)
 		}
 	}
 
-	if (!found) {
+	// The modules will have been gotten again if we successfully
+	// initialized a bus, so we should put them here.
+	put_module(B_PCI_MODULE_NAME);
+	if (sPCIx86Module != NULL)
+		put_module(B_PCI_X86_MODULE_NAME);
+
+	if (!found)
 		TRACE_MODULE_ERROR("no devices found\n");
-		delete item;
-		sPCIModule = NULL;
-		put_module(B_PCI_MODULE_NAME);
-
-		if (sPCIx86Module != NULL) {
-			sPCIx86Module = NULL;
-			put_module(B_PCI_X86_MODULE_NAME);
-		}
-
-		return ENODEV;
-	}
-
 	delete item;
-	return B_OK;
+	return found ? B_OK : ENODEV;
 }
 
 
@@ -491,11 +486,10 @@ OHCI::~OHCI()
 		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function);
 	}
+
 	put_module(B_PCI_MODULE_NAME);
-	if (sPCIx86Module != NULL) {
-		sPCIx86Module = NULL;
+	if (sPCIx86Module != NULL)
 		put_module(B_PCI_X86_MODULE_NAME);
-	}
 }
 
 

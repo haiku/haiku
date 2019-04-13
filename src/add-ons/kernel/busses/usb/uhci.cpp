@@ -336,10 +336,17 @@ UHCI::AddTo(Stack *stack)
 			UHCI *bus = new(std::nothrow) UHCI(item, stack);
 			if (!bus) {
 				delete item;
-				sPCIModule = NULL;
 				put_module(B_PCI_MODULE_NAME);
+				if (sPCIx86Module != NULL)
+					put_module(B_PCI_X86_MODULE_NAME);
 				return B_NO_MEMORY;
 			}
+
+			// The bus will put the PCI modules when it is destroyed, so get
+			// them again to increase their reference count.
+			get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
+			if (sPCIx86Module != NULL)
+				get_module(B_PCI_X86_MODULE_NAME, (module_info **)&sPCIx86Module);
 
 			if (bus->InitCheck() < B_OK) {
 				TRACE_MODULE_ERROR("AddTo(): InitCheck() failed 0x%08" B_PRIx32
@@ -359,16 +366,16 @@ UHCI::AddTo(Stack *stack)
 		}
 	}
 
-	if (!found) {
-		TRACE_MODULE_ERROR("no devices found\n");
-		delete item;
-		sPCIModule = NULL;
-		put_module(B_PCI_MODULE_NAME);
-		return ENODEV;
-	}
+	// The modules will have been gotten again if we successfully
+	// initialized a bus, so we should put them here.
+	put_module(B_PCI_MODULE_NAME);
+	if (sPCIx86Module != NULL)
+		put_module(B_PCI_X86_MODULE_NAME);
 
+	if (!found)
+		TRACE_MODULE_ERROR("no devices found\n");
 	delete item;
-	return B_OK;
+	return found ? B_OK : ENODEV;
 }
 
 
@@ -639,11 +646,11 @@ UHCI::~UHCI()
 		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function);
 	}
+
 	put_module(B_PCI_MODULE_NAME);
-	if (sPCIx86Module != NULL) {
-		sPCIx86Module = NULL;
+	if (sPCIx86Module != NULL)
 		put_module(B_PCI_X86_MODULE_NAME);
-	}
+
 	Unlock();
 }
 
