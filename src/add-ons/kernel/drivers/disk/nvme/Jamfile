@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src add-ons kernel drivers disk nvme ;
+
+UsePrivateKernelHeaders ;
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libnvme ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) compat ] ;
+
+KernelAddon nvme_disk :
+	nvme_disk.cpp
+	libnvme_haiku.cpp
+
+	nvme.c
+	nvme_admin.c
+	nvme_common.c
+	nvme_ctrlr.c
+	nvme_ns.c
+	nvme_qpair.c
+	nvme_quirks.c
+	nvme_request.c
+;
