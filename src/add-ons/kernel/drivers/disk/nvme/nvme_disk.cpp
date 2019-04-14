@@ -162,19 +162,17 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	// construct the libnvme pci_device struct
 	pci_device* device = new pci_device;
-	*device = {
-		.vendor_id = info->info.vendor_id,
-		.device_id = info->info.device_id,
-		.subvendor_id = 0,
-		.subdevice_id = 0,
+	device->vendor_id = info->info.vendor_id;
+	device->device_id = info->info.device_id;
+	device->subvendor_id = 0;
+	device->subdevice_id = 0;
 
-		.domain = 0,
-		.bus = info->info.bus,
-		.dev = info->info.device,
-		.func = info->info.function,
+	device->domain = 0;
+	device->bus = info->info.bus;
+	device->dev = info->info.device;
+	device->func = info->info.function;
 
-		.pci_info = &info->info,
-	};
+	device->pci_info = &info->info;
 
 	// open the controller
 	info->ctrlr = nvme_ctrlr_open(device, NULL);

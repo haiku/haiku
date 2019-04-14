@@ -68,14 +68,22 @@
  * Check if a branch is likely to be taken.
  */
 #ifndef likely
+#if __GNUC__ < 3
+#define likely(x) x
+#else
 #define likely(x)  __builtin_expect((x),1)
+#endif
 #endif /* likely */
 
 /*
  * Check if a branch is unlikely to be taken.
  */
 #ifndef unlikely
+#if __GNUC__ < 3
+#define unlikely(x) x
+#else
 #define unlikely(x)  __builtin_expect((x),0)
+#endif
 #endif /* unlikely */
 
 #ifndef typeof
