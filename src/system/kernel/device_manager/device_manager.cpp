@@ -1560,6 +1560,9 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						_AddPath(*stack, "busses", "ata");
 						_AddPath(*stack, "busses", "ide");
 						break;
+					case PCI_nvm:
+						_AddPath(*stack, "drivers", "disk");
+						break;
 					default:
 						_AddPath(*stack, "busses");
 						break;
