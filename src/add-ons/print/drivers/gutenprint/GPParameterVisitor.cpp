@@ -203,12 +203,12 @@ GPParameterVisitor::VisitStringList(stp_parameter_t* parameter)
 		} else if (strcmp(name, kPageSize) == 0) {
 			stp_set_string_parameter(fVariables, kPageSize, key);
 
-			int width;
-			int height;
+			stp_dimension_t width;
+			stp_dimension_t height;
 			stp_get_media_size(fVariables, &width, &height);
 			BSize pageSize(width, height);
 
-			int left, right, top, bottom;
+			stp_dimension_t left, right, top, bottom;
 			stp_get_imageable_area(fVariables, &left, &right, &bottom, &top);
 			BRect imageableArea(left, top, right, bottom);
 
@@ -266,9 +266,9 @@ GPParameterVisitor::VisitDimensionParameter(stp_parameter_t* description,
 {
 	const char* name = description->name;
 	const char* text = description->text;
-	int lower = description->bounds.dimension.lower;
-	int upper = description->bounds.dimension.upper;
-	int defaultValue = description->deflt.dimension;
+	double lower = description->bounds.dimension.lower;
+	double upper = description->bounds.dimension.upper;
+	double defaultValue = description->deflt.dimension;
 	if (lower <= defaultValue && defaultValue <= upper)
 		DimensionParameter(name, text, lower, upper, defaultValue,
 			parameterClass);

@@ -37,7 +37,6 @@ GPDriver::GPDriver(BMessage* message, PrinterData* printerData,
 
 void
 GPDriver::Write(const void* buffer, size_t size)
-	throw (TransportException)
 {
 	WriteSpoolData(buffer, size);
 }

@@ -44,10 +44,10 @@ public:
 					GPCapabilities* capabilities);
 
 	status_t	BeginJob(GPJobConfiguration* configuration,
-		OutputStream* outputStream) throw(TransportException);
-	void		EndJob() throw(TransportException);
-	void		BeginPage() throw(TransportException);
-	void		EndPage() throw(TransportException);
+		OutputStream* outputStream) /* throw(TransportException) */;
+	void		EndJob() /* throw(TransportException) */;
+	void		BeginPage() /* throw(TransportException) */;
+	void		EndPage() /* throw(TransportException) */;
 	status_t	AddBitmapToPage(BBitmap* bitmap, BRect validRect, BPoint where);
 
 private:

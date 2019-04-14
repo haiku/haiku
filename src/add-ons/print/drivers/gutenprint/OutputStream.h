@@ -15,7 +15,7 @@ class OutputStream
 {
 public:
 	virtual void	Write(const void *buffer, size_t size)
-						throw(TransportException) = 0;
+						/* throw(TransportException) */ = 0;
 };
 
 

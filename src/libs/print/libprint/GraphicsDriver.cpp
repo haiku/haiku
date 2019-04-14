@@ -758,7 +758,6 @@ GraphicsDriver::EndDocument(bool)
 
 void
 GraphicsDriver::WriteSpoolData(const void* buffer, size_t size)
-	throw (TransportException)
 {
 	if (fTransport == NULL)
 		return;
@@ -768,7 +767,6 @@ GraphicsDriver::WriteSpoolData(const void* buffer, size_t size)
 
 void
 GraphicsDriver::WriteSpoolString(const char* format, ...)
-	throw (TransportException)
 {
 	if (fTransport == NULL)
 		return;
@@ -784,7 +782,6 @@ GraphicsDriver::WriteSpoolString(const char* format, ...)
 
 void
 GraphicsDriver::WriteSpoolChar(char c)
-	throw (TransportException)
 {
 	if (fTransport == NULL)
 		return;
@@ -795,7 +792,6 @@ GraphicsDriver::WriteSpoolChar(char c)
 
 void
 GraphicsDriver::ReadSpoolData(void* buffer, size_t size)
-	throw (TransportException)
 {
 	if (fTransport == NULL)
 		return;
@@ -805,7 +801,6 @@ GraphicsDriver::ReadSpoolData(void* buffer, size_t size)
 
 int
 GraphicsDriver::ReadSpoolChar()
-	throw (TransportException)
 {
 	if (fTransport == NULL)
 		return -1;

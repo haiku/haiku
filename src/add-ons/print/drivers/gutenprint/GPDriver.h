@@ -21,7 +21,7 @@ public:
 					const PrinterCap* printer_cap);
 
 	void		Write(const void *buffer, size_t size)
-					throw(TransportException);
+					/* throw(TransportException) */;
 
 protected:
 	bool		StartDocument();

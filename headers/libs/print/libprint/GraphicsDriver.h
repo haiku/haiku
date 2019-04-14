@@ -48,16 +48,16 @@ protected:
 	virtual	bool	EndDocument(bool success);
 
 			void	WriteSpoolData(const void* buffer, size_t size)
-						throw (TransportException);
+						/* throw (TransportException) */;
 			void	WriteSpoolString(const char* buffer, ...)
-						throw (TransportException);
+						/* throw (TransportException) */;
 			void	WriteSpoolChar(char c)
-						throw (TransportException);
+						/* throw (TransportException) */;
 
 			void	ReadSpoolData(void* buffer, size_t size)
-						throw (TransportException);
+						/* throw (TransportException) */;
 			int		ReadSpoolChar()
-						throw (TransportException);
+						/* throw (TransportException) */;
 
 	static	void	ConvertToRGB24(const void* src, void* dst, int width,
 						color_space cs);

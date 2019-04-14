@@ -30,32 +30,34 @@ public:
 	}
 
 
-	void ToGutenprint(int32 fromX, int32 fromY, int32& toX, int32& toY) {
+	void ToGutenprint(int32 fromX, int32 fromY, double& toX, double& toY) {
 		toX = fromX * kGutenprintUnit / fXDPI;
 		toY = fromY * kGutenprintUnit / fYDPI;
 	}
 
 
-	void ToGutenprintCeiling(int32 fromX, int32 fromY, int32& toX, int32& toY) {
+	void ToGutenprintCeiling(int32 fromX, int32 fromY, double& toX,
+		double& toY) {
 		toX = (fromX * kGutenprintUnit + fXDPI - 1) / fXDPI;
 		toY = (fromY * kGutenprintUnit + fYDPI - 1) / fYDPI;
 	}
 
 
-	void FromGutenprint(int32 fromX, int32 fromY, int32& toX, int32& toY) {
-		toX = fromX * fXDPI / kGutenprintUnit;
-		toY = fromY * fYDPI / kGutenprintUnit;
+	void FromGutenprint(double fromX, double fromY, int32& toX, int32& toY) {
+		toX = (int32)(fromX * fXDPI / kGutenprintUnit);
+		toY = (int32)(fromY * fYDPI / kGutenprintUnit);
 	}
 
-	void FromGutenprintCeiling(int32 fromX, int32 fromY, int32& toX, int32& toY) {
-		toX = (fromX * fXDPI + kGutenprintUnit - 1) / kGutenprintUnit;
-		toY = (fromY * fYDPI + kGutenprintUnit - 1) / kGutenprintUnit;
+	void FromGutenprintCeiling(double fromX, double fromY, int32& toX,
+		int32& toY) {
+		toX = (int32)((fromX * fXDPI + kGutenprintUnit - 1) / kGutenprintUnit);
+		toY = (int32)((fromY * fYDPI + kGutenprintUnit - 1) / kGutenprintUnit);
 	}
 
-	void SizeFromGutenprint(int32 fromWidth, int32 fromHeight,
+	void SizeFromGutenprint(double fromWidth, double fromHeight,
 		int32& toWidth, int32& toHeight) {
-		toWidth = fromWidth * fXDPI / kGutenprintUnit;
-		toHeight = fromHeight * fYDPI / kGutenprintUnit;
+		toWidth = (int32)(fromWidth * fXDPI / kGutenprintUnit);
+		toHeight = (int32)(fromHeight * fYDPI / kGutenprintUnit);
 	}
 
 	void RoundUpToWholeInches(int32& width, int32& height) {
@@ -66,8 +68,8 @@ public:
 	}
 
 private:
-	int32 fXDPI;
-	int32 fYDPI;
+	double fXDPI;
+	double fYDPI;
 };
 
 
@@ -239,18 +241,18 @@ GPJob::PrintPage(list<GPBand*>& bands) {
 	fBands = &bands;
 	fCachedBand = NULL;
 
-	Rectangle<int> imageableArea;
+	Rectangle<stp_dimension_t> imageableArea;
 	stp_get_imageable_area(fVariables, &imageableArea.left,
 		&imageableArea.right, &imageableArea.bottom, &imageableArea.top);
-	fprintf(stderr, "GPJob imageable area left %d, top %d, right %d, "
-		"bottom %d\n",
+	fprintf(stderr, "GPJob imageable area left %f, top %f, right %f, "
+		"bottom %f\n",
 		imageableArea.left, imageableArea.top, imageableArea.right,
 		imageableArea.bottom);
-	fprintf(stderr, "GPJob width %d %s, height %d %s\n",
+	fprintf(stderr, "GPJob width %f %s, height %f %s\n",
 		imageableArea.Width(),
-		imageableArea.Width() % 72 == 0 ? "whole inches" : "not whole inches",
+		std::fmod(imageableArea.Width(), 72.) == 0.0 ? "whole inches" : "not whole inches",
 		imageableArea.Height(),
-		imageableArea.Height() % 72 == 0 ? "whole inches" : "not whole inches"
+		std::fmod(imageableArea.Height(), 72.) == 0.0 ? "whole inches" : "not whole inches"
 		);
 
 	CoordinateSystem coordinateSystem;
@@ -286,16 +288,16 @@ GPJob::PrintPage(list<GPBand*>& bands) {
 	// calculate the position and size of the image to be printed on the page
 	// unit: 1/72 Inches
 	// constraints: the image must be inside the imageable area
-	int32 left;
-	int32 top;
+	double left;
+	double top;
 	coordinateSystem.ToGutenprint(fPrintRect.left, fPrintRect.top, left, top);
 	if (left < imageableArea.left)
 		left = imageableArea.left;
 	if (top < imageableArea.top)
 		top = imageableArea.top;
 
-	int32 right;
-	int32 bottom;
+	double right;
+	double bottom;
 	coordinateSystem.ToGutenprintCeiling(fPrintRect.right, fPrintRect.bottom,
 		right, bottom);
 	if (right > imageableArea.right)
@@ -303,8 +305,8 @@ GPJob::PrintPage(list<GPBand*>& bands) {
 	if (bottom > imageableArea.bottom)
 		bottom = imageableArea.bottom;
 
-	int32 width = right - left;
-	int32 height = bottom - top;
+	double width = right - left;
+	double height = bottom - top;
 
 	// because of rounding and clipping in the previous step,
 	// now the image frame has to be synchronized

@@ -156,7 +156,6 @@ GPBinding::GetCapabilities(const char* driver, GPCapabilities* capabilities)
 status_t
 GPBinding::BeginJob(GPJobConfiguration* configuration,
 	OutputStream* outputStream)
-	throw(TransportException)
 {
 	fOutputStream = outputStream;
 	fJob.SetApplicationName("Gutenprint");
@@ -168,7 +167,7 @@ GPBinding::BeginJob(GPJobConfiguration* configuration,
 
 
 void
-GPBinding::EndJob() throw(TransportException)
+GPBinding::EndJob()
 {
 	fJob.End();
 	fOutputStream = NULL;
@@ -176,13 +175,13 @@ GPBinding::EndJob() throw(TransportException)
 
 
 void
-GPBinding::BeginPage() throw(TransportException)
+GPBinding::BeginPage()
 {
 }
 
 
 void
-GPBinding::EndPage() throw(TransportException)
+GPBinding::EndPage()
 {
 	status_t status = fJob.PrintPage(fBands);
 	DeleteBands();

@@ -78,7 +78,7 @@ requires {
 	lib:libexpat
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_GCC2_GUTENPRINT_ENABLED
-	lib:libgutenprint
+	lib:libgutenprint >= 8
 #endif
 #ifdef HAIKU_BUILD_FEATURE_X86_GCC2_LIBICNS_ENABLED
 	lib:libicns

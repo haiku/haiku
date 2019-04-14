@@ -137,7 +137,7 @@ Transport::SetLastError(const char *e)
 
 
 void
-Transport::Write(const void* buffer, size_t size) throw(TransportException)
+Transport::Write(const void* buffer, size_t size)
 {
 	if (fDataStream) {
 		if (size == (size_t)fDataStream->Write(buffer, size)) {
@@ -150,7 +150,7 @@ Transport::Write(const void* buffer, size_t size) throw(TransportException)
 
 
 void
-Transport::Read(void* buffer, size_t size) throw(TransportException)
+Transport::Read(void* buffer, size_t size)
 {
 	if (fDataStream) {
 		if (size == (size_t)fDataStream->Read(buffer, size)) {
