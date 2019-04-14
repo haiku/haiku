@@ -67,8 +67,6 @@ static device_manager_info* sDeviceManager;
 
 typedef struct {
 	device_node*			node;
-	pci_device_module_info*	pci;
-	pci_device*				device;
 	pci_info				info;
 
 	struct nvme_ctrlr*		ctrlr;
@@ -151,14 +149,13 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	CALLED();
 	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_info;
 
+	pci_device_module_info* pci;
+	pci_device* pcidev;
 	device_node* parent = sDeviceManager->get_parent_node(info->node);
-	device_node* pciParent = sDeviceManager->get_parent_node(parent);
-	sDeviceManager->get_driver(pciParent, (driver_module_info**)&info->pci,
-		(void**)&info->device);
-	sDeviceManager->put_node(pciParent);
+	sDeviceManager->get_driver(parent, (driver_module_info**)&pci,
+		(void**)&pcidev);
+	pci->get_pci_info(pcidev, &info->info);
 	sDeviceManager->put_node(parent);
-
-	info->pci->get_pci_info(info->device, &info->info);
 
 	// construct the libnvme pci_device struct
 	pci_device* device = new pci_device;
@@ -425,16 +422,15 @@ nvme_disk_supports_device(device_node *parent)
 
 
 static status_t
-nvme_disk_register_device(device_node *node)
+nvme_disk_register_device(device_node* parent)
 {
 	CALLED();
 
-	// ready to register
 	device_attr attrs[] = {
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node, NVME_DISK_DRIVER_MODULE_NAME,
+	return sDeviceManager->register_node(parent, NVME_DISK_DRIVER_MODULE_NAME,
 		attrs, NULL, NULL);
 }
 
