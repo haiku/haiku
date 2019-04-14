@@ -182,7 +182,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	int err = nvme_ctrlr_stat(info->ctrlr, &cstat);
 	if (err != 0) {
 		TRACE_ERROR("failed to get controller information!\n");
-		return -err;
+		return err;
 	}
 
 	// TODO: export more than just the first namespace!
@@ -196,7 +196,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	err = nvme_ns_stat(info->ns, &nsstat);
 	if (err != 0) {
 		TRACE_ERROR("failed to get namespace information!\n");
-		return -err;
+		return err;
 	}
 
 	// store capacity information
@@ -268,9 +268,9 @@ nvme_disk_free(void* cookie)
 
 
 static void
-disk_read_callback(bool* done, const struct nvme_cpl*)
+disk_read_callback(status_t* status, const struct nvme_cpl* cpl)
 {
-	*done = true;
+	*status = nvme_cpl_is_error(cpl) ? B_IO_ERROR : B_OK;
 }
 
 
@@ -280,28 +280,39 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 
-	bool done = false;
-	size_t rounded_len = ROUNDUP(*_length, handle->info->block_size);
+	status_t status = EINPROGRESS;
 
+	// libnvme does transfers in units of device sectors, so we must
+	// round up the length to the sector size, and then allocate a
+	// bounce buffer.
+	const size_t block_size = handle->info->block_size;
+	size_t rounded_len = ROUNDUP(*_length, block_size);
 	void* real_buffer;
 	if (rounded_len == *_length && !IS_USER_ADDRESS(buffer))
 		real_buffer = buffer;
 	else
 		real_buffer = malloc(rounded_len);
 
+	if (real_buffer == NULL)
+		return B_NO_MEMORY;
+
 	MutexLocker _(handle->info->qpair_mtx);
 	int ret = nvme_ns_read(handle->info->ns, handle->info->qpair,
-		real_buffer, pos / handle->info->block_size, rounded_len / handle->info->block_size,
-		(nvme_cmd_cb)disk_read_callback, &done, 0);
+		real_buffer, pos / block_size, rounded_len / block_size,
+		(nvme_cmd_cb)disk_read_callback, &status, 0);
 	if (ret != 0)
 		return ret;
 
-	while (!done) {
+	while (status == EINPROGRESS) {
 		nvme_ioqp_poll(handle->info->qpair, 1);
-		snooze(1);
+		snooze(5);
 	}
 
-	status_t status = B_OK;
+	if (status != B_OK) {
+		*_length = 0;
+		return status;
+	}
+
 	if (real_buffer != buffer) {
 		if (IS_USER_ADDRESS(buffer))
 			status = user_memcpy(buffer, real_buffer, *_length);
