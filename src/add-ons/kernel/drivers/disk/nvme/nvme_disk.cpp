@@ -267,6 +267,9 @@ nvme_disk_free(void* cookie)
 }
 
 
+// #pragma mark - I/O functions
+
+
 static void
 disk_read_callback(status_t* status, const struct nvme_cpl* cpl)
 {
@@ -275,30 +278,44 @@ disk_read_callback(status_t* status, const struct nvme_cpl* cpl)
 
 
 static status_t
-nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* _length)
+nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 {
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
+	const size_t block_size = handle->info->block_size;
 
 	status_t status = EINPROGRESS;
 
-	// libnvme does transfers in units of device sectors, so we must
-	// round up the length to the sector size, and then allocate a
-	// bounce buffer.
-	const size_t block_size = handle->info->block_size;
-	size_t rounded_len = ROUNDUP(*_length, block_size);
-	void* real_buffer;
-	if (rounded_len == *_length && !IS_USER_ADDRESS(buffer))
-		real_buffer = buffer;
-	else
-		real_buffer = malloc(rounded_len);
+	// libnvme does transfers in units of device sectors, so if we have to
+	// round either the position or the length, we will need a bounce buffer.
+	off_t rounded_pos = ROUNDDOWN(pos, block_size);
+	size_t rounded_len = ROUNDUP(*length, block_size);
+	if (rounded_pos != pos || rounded_len != *length
+			|| IS_USER_ADDRESS(buffer)) {
+		void* bounceBuffer = malloc(rounded_len);
+		if (bounceBuffer == NULL)
+			return B_NO_MEMORY;
 
-	if (real_buffer == NULL)
-		return B_NO_MEMORY;
+		status = nvme_disk_read(cookie, rounded_pos, bounceBuffer,
+			&rounded_len);
+		if (status != B_OK) {
+			*length = 0;
+			return status;
+		}
 
+		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
+		if (IS_USER_ADDRESS(buffer))
+			status = user_memcpy(buffer, offsetBuffer, *length);
+		else
+			memcpy(buffer, offsetBuffer, *length);
+		free(bounceBuffer);
+		return status;
+	}
+
+	// Actually perform the read.
 	MutexLocker _(handle->info->qpair_mtx);
 	int ret = nvme_ns_read(handle->info->ns, handle->info->qpair,
-		real_buffer, pos / block_size, rounded_len / block_size,
+		buffer, rounded_pos / block_size, rounded_len / block_size,
 		(nvme_cmd_cb)disk_read_callback, &status, 0);
 	if (ret != 0)
 		return ret;
@@ -308,19 +325,8 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 		snooze(5);
 	}
 
-	if (status != B_OK) {
-		*_length = 0;
-		return status;
-	}
-
-	if (real_buffer != buffer) {
-		if (IS_USER_ADDRESS(buffer))
-			status = user_memcpy(buffer, real_buffer, *_length);
-		else
-			memcpy(buffer, real_buffer, *_length);
-		free(real_buffer);
-	}
-
+	if (status != B_OK)
+		*length = 0;
 	return status;
 }
 
@@ -418,8 +424,6 @@ nvme_disk_supports_device(device_node *parent)
 		|| sDeviceManager->get_attr_uint16(parent, B_DEVICE_TYPE, &baseClass, false) != B_OK
 		|| sDeviceManager->get_attr_uint16(parent, B_DEVICE_SUB_TYPE, &subClass, false) != B_OK)
 		return -1.0f;
-
-	TRACE("strcmp: %d, baseclass: %d\n", strcmp(bus, "pci") != 0, baseClass != PCI_mass_storage);
 
 	if (strcmp(bus, "pci") != 0 || baseClass != PCI_mass_storage)
 		return 0.0f;
