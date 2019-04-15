@@ -58,6 +58,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 }
 
 # drivers
+AddNewDriversToPackage disk			: nvme_disk ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
@@ -191,6 +192,7 @@ AddBootModuleSymlinksToPackage
 	generic_ide_pci
 	ide_isa@x86 isa@x86,x86_64 intel it8211
 	legacy_sata locked_pool
+	nvme_disk
 	openpic@ppc
 	packagefs pci
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
