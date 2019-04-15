@@ -288,8 +288,8 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 
 	// libnvme does transfers in units of device sectors, so if we have to
 	// round either the position or the length, we will need a bounce buffer.
-	off_t rounded_pos = ROUNDDOWN(pos, block_size);
-	size_t rounded_len = ROUNDUP(*length, block_size);
+	const off_t rounded_pos = ROUNDDOWN(pos, block_size);
+	size_t rounded_len = ROUNDUP((*length) + (pos - rounded_pos), block_size);
 	if (rounded_pos != pos || rounded_len != *length
 			|| IS_USER_ADDRESS(buffer)) {
 		void* bounceBuffer = malloc(rounded_len);
