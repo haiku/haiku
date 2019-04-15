@@ -561,7 +561,7 @@ add_memory_type_range(area_id areaID, uint64 base, uint64 size, uint32 type)
 			return B_BAD_VALUE;
 	}
 
-	TRACE_MTRR("add_memory_type_range(%" B_PRId32 ", %#" B_PRIx64 ", %#"
+	TRACE_MTRR2("add_memory_type_range(%" B_PRId32 ", %#" B_PRIx64 ", %#"
 		B_PRIx64 ", %" B_PRIu32 ")\n", areaID, base, size, type);
 
 	MutexLocker locker(sMemoryTypeLock);
@@ -614,7 +614,7 @@ remove_memory_type_range(area_id areaID)
 
 	memory_type_range* range = find_range(areaID);
 	if (range != NULL) {
-		TRACE_MTRR("remove_memory_type_range(%" B_PRId32 ", %#" B_PRIx64 ", %#"
+		TRACE_MTRR2("remove_memory_type_range(%" B_PRId32 ", %#" B_PRIx64 ", %#"
 			B_PRIx64 ", %" B_PRIu32 ")\n", range->area, range->base,
 			range->size, range->type);
 
