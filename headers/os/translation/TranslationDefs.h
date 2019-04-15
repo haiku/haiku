@@ -7,7 +7,6 @@
 
 
 #include <SupportDefs.h>
-#include <TranslationErrors.h>
 
 
 #define B_TRANSLATION_CURRENT_VERSION	B_BEOS_VERSION

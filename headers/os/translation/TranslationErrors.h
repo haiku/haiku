@@ -6,6 +6,7 @@
 #define _TRANSLATION_ERRORS_H
 
 
+// deprecated: use Errors.h instead
 #include <Errors.h>
 
 
