@@ -805,6 +805,14 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		_area, areaName));
 	cache->AssertLocked();
 
+	if (size == 0) {
+#if KDEBUG
+		panic("map_backing_store(): called with size=0 for area '%s'!",
+			areaName);
+#endif
+		return B_BAD_VALUE;
+	}
+
 	uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
 		| HEAP_DONT_LOCK_KERNEL_SPACE;
 	int priority;
@@ -873,11 +881,11 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		allocationFlags, _virtualAddress);
 	if (status == B_NO_MEMORY
 			&& addressRestrictions->address_specification == B_ANY_KERNEL_ADDRESS) {
-		// Since the kernel address space is locked by the caller, we can't
-		// wait here as of course no resources can be released while the locks
-		// are held. But we can at least issue this so the next caller doesn't
-		// run into the same problem.
-		low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size, 0, 0);
+		// TODO: At present, there is no way to notify the low_resource monitor
+		// that kernel addresss space is fragmented, nor does it check for this
+		// automatically. Due to how many locks are held, we cannot wait here
+		// for space to be freed up, but it would be good to at least notify
+		// that we tried and failed to allocate some amount.
 	}
 	if (status != B_OK)
 		goto err2;
