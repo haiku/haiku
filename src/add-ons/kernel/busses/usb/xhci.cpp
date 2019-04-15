@@ -271,12 +271,16 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	TRACE_ALWAYS("structural parameters: 1:0x%08" B_PRIx32 " 2:0x%08"
 		B_PRIx32 " 3:0x%08" B_PRIx32 "\n", ReadCapReg32(XHCI_HCSPARAMS1),
 		ReadCapReg32(XHCI_HCSPARAMS2), ReadCapReg32(XHCI_HCSPARAMS3));
+
 	uint32 cparams = ReadCapReg32(XHCI_HCCPARAMS);
+	if (cparams == 0xffffffff)
+		return;
 	TRACE_ALWAYS("capability params: 0x%08" B_PRIx32 "\n", cparams);
 
 	// if 64 bytes context structures, then 1
 	fContextSizeShift = HCC_CSZ(cparams);
 
+	// Assume ownership of the controller from the BIOS.
 	uint32 eec = 0xffffffff;
 	uint32 eecp = HCS0_XECP(cparams) << 2;
 	for (; eecp != 0 && XECP_NEXT(eec); eecp += XECP_NEXT(eec) << 2) {
