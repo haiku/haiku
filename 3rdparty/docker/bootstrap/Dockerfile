@@ -21,8 +21,8 @@ RUN apt-get install -y vim nano
 RUN echo "source /usr/share/vim/vim80/defaults.vim" > ~/.vimrc
 RUN echo "set mouse=" >> ~/.vimrc
 
-ENV GIT_BUILDTOOLS="https://git.haiku-os.org/buildtools"
-ENV GIT_HAIKU="https://git.haiku-os.org/haiku"
+ENV GIT_BUILDTOOLS="https://review.haiku-os.org/buildtools"
+ENV GIT_HAIKU="https://review.haiku-os.org/haiku"
 ENV GIT_HAIKUPORTER="https://github.com/haikuports/haikuporter.git"
 ENV GIT_HAIKUPORTS="https://github.com/haikuports/haikuports.git"
 ENV GIT_HAIKUPORTS_CROSS="https://github.com/haikuports/haikuports.cross.git"
