@@ -21,7 +21,7 @@ extern "C" {
 }
 
 
-#define TRACE_NVME_DISK
+//#define TRACE_NVME_DISK
 #ifdef TRACE_NVME_DISK
 #	define TRACE(x...) dprintf("nvme_disk: " x)
 #else
