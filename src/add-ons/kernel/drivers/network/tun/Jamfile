@@ -7,6 +7,3 @@ UsePrivateHeaders net ;
 KernelAddon tun_config :
 	driver.c
 	;
-
-
-

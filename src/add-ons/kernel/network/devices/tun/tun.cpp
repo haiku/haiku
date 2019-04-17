@@ -23,8 +23,8 @@
 
 
 
-struct net_buffer_module_info *gBufferModule;
-static struct net_stack_module_info *sStackModule;
+struct net_buffer_module_info* gBufferModule;
+static struct net_stack_module_info* sStackModule;
 
 //static mutex sListLock;
 //static DoublyLinkedList<ethernet_device> sCheckList;
@@ -34,9 +34,9 @@ static struct net_stack_module_info *sStackModule;
 
 
 status_t
-tun_init(const char *name, net_device **_device)
+tun_init(const char* name, net_device** _device)
 {
-	tun_device *device;
+	tun_device* device;
 
 	if (strncmp(name, "tun", 3)
 		&& strncmp(name, "tap", 3)
@@ -62,9 +62,9 @@ tun_init(const char *name, net_device **_device)
 
 
 status_t
-tun_uninit(net_device *_device)
+tun_uninit(net_device* _device)
 {
-	tun_device *device = (tun_device *)_device;
+	tun_device* device = (tun_device*)_device;
 
 	put_module(NET_STACK_MODULE_NAME);
 	put_module(NET_BUFFER_MODULE_NAME);
@@ -75,20 +75,20 @@ tun_uninit(net_device *_device)
 
 
 status_t
-tun_up(net_device *device)
+tun_up(net_device* device)
 {
 	return B_OK;
 }
 
 
 void
-tun_down(net_device *device)
+tun_down(net_device* device)
 {
 }
 
 
 status_t
-tun_control(net_device *device, int32 op, void *argument,
+tun_control(net_device* device, int32 op, void* argument,
 	size_t length)
 {
 	return B_BAD_VALUE;
@@ -96,14 +96,14 @@ tun_control(net_device *device, int32 op, void *argument,
 
 
 status_t
-tun_send_data(net_device *device, net_buffer *buffer)
+tun_send_data(net_device* device, net_buffer* buffer)
 {
 	return sStackModule->device_enqueue_buffer(device, buffer);
 }
 
 
 status_t
-tun_set_mtu(net_device *device, size_t mtu)
+tun_set_mtu(net_device* device, size_t mtu)
 {
 	if (mtu > 65536 || mtu < 16)
 		return B_BAD_VALUE;
@@ -114,28 +114,28 @@ tun_set_mtu(net_device *device, size_t mtu)
 
 
 status_t
-tun_set_promiscuous(net_device *device, bool promiscuous)
+tun_set_promiscuous(net_device* device, bool promiscuous)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-tun_set_media(net_device *device, uint32 media)
+tun_set_media(net_device* device, uint32 media)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-tun_add_multicast(net_device *device, const sockaddr *address)
+tun_add_multicast(net_device* device, const sockaddr* address)
 {
 	return B_OK;
 }
 
 
 status_t
-tun_remove_multicast(net_device *device, const sockaddr *address)
+tun_remove_multicast(net_device* device, const sockaddr* address)
 {
 	return B_OK;
 }
@@ -148,11 +148,11 @@ tun_std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 		{
 			status_t status = get_module(NET_STACK_MODULE_NAME,
-				(module_info **)&sStackModule);
+				(module_info**)&sStackModule);
 			if (status < B_OK)
 				return status;
 			status = get_module(NET_BUFFER_MODULE_NAME,
-				(module_info **)&gBufferModule);
+				(module_info**)&gBufferModule);
 			if (status < B_OK) {
 				put_module(NET_STACK_MODULE_NAME);
 				return status;
@@ -190,7 +190,7 @@ net_device_module_info sLoopbackModule = {
 
 };
 
-module_info *modules[] = {
-	(module_info *)&sLoopbackModule,
+module_info* modules[] = {
+	(module_info*)&sLoopbackModule,
 	NULL
 };

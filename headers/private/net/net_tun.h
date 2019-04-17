@@ -1,6 +1,6 @@
 /*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2008-2019, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef NET_TUN_H
 #define NET_TUN_H

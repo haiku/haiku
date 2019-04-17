@@ -1,3 +1,8 @@
+/*
+ * /dev/config/tun network tunnel driver for BeOS
+ * (c) 2003, mmu_man, revol@free.fr
+ * licenced under MIT licence.
+ */
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <OS.h>
@@ -10,14 +15,8 @@
 #include <fsproto.h>
 #include "bone_tun.h"
 
-/*
- * /dev/config/tun network tunnel driver for BeOS
- * (c) 2003, mmu_man, revol@free.fr
- * licenced under MIT licence.
- */
 
-
-const char * device_names[]={TUN_DRIVER_NAME, NULL};
+const char * device_names[] = {TUN_DRIVER_NAME, NULL};
 extern device_hooks tun_hooks;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -26,30 +25,48 @@ vint32 if_mod_ref_count = 0;
 bone_tun_interface_info_t *gIfaceModule = NULL;
 bone_util_info_t *gUtil = NULL;
 
-status_t init_hardware(void) {
+
+status_t
+init_hardware(void)
+{
 	dprintf("tun:init_hardware()\n");
 	return B_OK;
 }
 
-status_t init_driver(void) {
+
+status_t
+init_driver(void)
+{
 	dprintf("tun:init_driver()\n");
 	return B_OK;
 }
 
-void uninit_driver(void) {
+
+void
+uninit_driver(void)
+{
 	dprintf("tun:uninit_driver()\n");
 }
 
-const char **publish_devices() {
+
+const char**
+publish_devices()
+{
 	return device_names;
 }
 
-device_hooks *find_device(const char *name) {
+
+device_hooks*
+find_device(const char *name)
+{
 	(void)name;
 	return &tun_hooks;
 }
 
-status_t tun_open(const char *name, uint32 flags, cookie_t **cookie) {
+
+status_t
+tun_open(const char *name, uint32 flags, cookie_t **cookie)
+{
 	status_t err = B_OK;
 	(void)name; (void)flags;
 	/* XXX: add O_NONBLOCK + FIONBIO */
@@ -88,12 +105,18 @@ err0:
 	return B_ERROR;
 }
 
-status_t tun_close(void *cookie) {
+
+status_t
+tun_close(void *cookie)
+{
 	(void)cookie;
 	return B_OK;
 }
 
-status_t tun_free(cookie_t *cookie) {
+
+status_t
+tun_free(cookie_t *cookie)
+{
 	status_t err = B_OK;
 #if DEBUG > 1
 	dprintf("tun_close()\n");
@@ -107,7 +130,10 @@ status_t tun_free(cookie_t *cookie) {
 	return err;
 }
 
-status_t tun_ioctl(cookie_t *cookie, uint32 op, void *data, size_t len) {
+
+status_t
+tun_ioctl(cookie_t *cookie, uint32 op, void *data, size_t len)
+{
 	ifreq_t *ifr;
 	bone_tun_if_interface_t *iface;
 	(void)cookie; (void)op; (void)data; (void)len;
@@ -165,7 +191,10 @@ status_t tun_ioctl(cookie_t *cookie, uint32 op, void *data, size_t len) {
 	return B_ERROR;
 }
 
-status_t tun_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes) {
+
+status_t
+tun_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes)
+{
 	bone_data_t *bdata;
 	uint32 got;
 	ssize_t pktsize;
@@ -201,7 +230,10 @@ ERROR_EOF:
 	return B_OK;
 }
 
-status_t tun_write(cookie_t *cookie, off_t position, const void *data, size_t *numbytes) {
+
+status_t
+tun_write(cookie_t *cookie, off_t position, const void *data, size_t *numbytes)
+{
 	bone_data_t *bdata = NULL;
 	void *buf;
 	status_t err = B_NO_MEMORY;
@@ -233,7 +265,9 @@ ERROR_1:
 	return err;
 }
 
-status_t tun_select(cookie_t *cookie, uint8 event, uint32 ref, selectsync *sync)
+
+status_t
+tun_select(cookie_t *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
 	status_t err = B_OK;
 #if DEBUG > 1
@@ -291,7 +325,10 @@ status_t tun_select(cookie_t *cookie, uint8 event, uint32 ref, selectsync *sync)
 	/* iface UNLOCKED */
 	return err;
 }
-status_t tun_deselect(cookie_t *cookie, uint8 event, selectsync *sync)
+
+
+status_t
+tun_deselect(cookie_t *cookie, uint8 event, selectsync *sync)
 {
 	status_t err = B_OK;
 #if DEBUG > 1
@@ -310,18 +347,25 @@ status_t tun_deselect(cookie_t *cookie, uint8 event, selectsync *sync)
 	/* iface LOCKED */
 	return B_OK;
 }
-status_t tun_readv(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size_t *numBytes)
+
+
+status_t
+tun_readv(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size_t *numBytes)
 {
 	dprintf("tun: readv(, %Ld, , %ld)\n", position, count);
 	return EOPNOTSUPP;
 }
-status_t tun_writev(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size_t *numBytes)
+
+
+status_t
+tun_writev(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size_t *numBytes)
 {
 	dprintf("tun: writev(, %Ld, , %ld)\n", position, count);
 	return EOPNOTSUPP;
 }
 
-device_hooks tun_hooks={
+
+device_hooks tun_hooks = {
 	(device_open_hook)tun_open,
 	tun_close,
 	(device_free_hook)tun_free,
