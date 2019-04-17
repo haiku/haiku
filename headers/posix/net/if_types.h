@@ -12,5 +12,7 @@
 #define IFT_LOOP		0x18
 #define IFT_SLIP		0x1c
 #define IFT_MODEM		0x30
+#define IFT_TUN			0x40
+
 
 #endif	/* _NET_IF_TYPES_H */

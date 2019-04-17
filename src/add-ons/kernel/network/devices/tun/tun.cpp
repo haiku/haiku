@@ -6,6 +6,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+#include <net_tun.h>
 
 #include <net_buffer.h>
 #include <net_device.h>
@@ -36,7 +37,6 @@ status_t
 tun_init(const char *name, net_device **_device)
 {
 	tun_device *device;
-	status_t status;
 
 	if (strncmp(name, "tun", 3)
 		&& strncmp(name, "tap", 3)
@@ -146,23 +146,23 @@ tun_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+		{
 			status_t status = get_module(NET_STACK_MODULE_NAME,
 				(module_info **)&sStackModule);
 			if (status < B_OK)
 				return status;
-
 			status = get_module(NET_BUFFER_MODULE_NAME,
 				(module_info **)&gBufferModule);
 			if (status < B_OK) {
 				put_module(NET_STACK_MODULE_NAME);
 				return status;
 			}
-
+			return B_OK;
+		}
 		case B_MODULE_UNINIT:
 			put_module(NET_BUFFER_MODULE_NAME);
 			put_module(NET_STACK_MODULE_NAME);
 			return B_OK;
-
 		default:
 			return B_ERROR;
 	}

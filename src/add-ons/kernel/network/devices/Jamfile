@@ -3,4 +3,5 @@ SubDir HAIKU_TOP src add-ons kernel network devices ;
 SubInclude HAIKU_TOP src add-ons kernel network devices dialup ;
 SubInclude HAIKU_TOP src add-ons kernel network devices ethernet ;
 SubInclude HAIKU_TOP src add-ons kernel network devices loopback ;
+SubInclude HAIKU_TOP src add-ons kernel network devices tun ;
 
