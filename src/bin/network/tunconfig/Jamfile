@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src bin network tunconfig ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
+	headers ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
+
+BinCommand tunconfig :
+	tunconfig.cpp
+	:
+	be libppp.a [ TargetLibsupc++ ] libbsd.so $(TARGET_NETWORK_LIBS)
+;
+
+# Installation
+HaikuInstall install-tun
+	: /boot/home/config/non-packaged/bin
+	: tunconfig ;
