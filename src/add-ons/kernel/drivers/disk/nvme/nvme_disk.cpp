@@ -27,6 +27,7 @@ extern "C" {
 #else
 #	define TRACE(x...) ;
 #endif
+#define TRACE_ALWAYS(x...)	dprintf("nvme_disk: " x)
 #define TRACE_ERROR(x...)	dprintf("\33[33mnvme_disk:\33[0m " x)
 #define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
@@ -62,6 +63,8 @@ static const uint8 kDriveIcon[] = {
 #define NVME_DISK_DEVICE_MODULE_NAME 	"drivers/disk/nvme_disk/device_v1"
 #define NVME_DISK_DEVICE_ID_GENERATOR	"nvme_disk/device_id"
 
+#define NVME_MAX_QPAIRS					(8)
+
 
 static device_manager_info* sDeviceManager;
 
@@ -76,9 +79,14 @@ typedef struct {
 	uint32					block_size;
 	status_t				media_status;
 
-	struct nvme_qpair*		qpair;
-	mutex					qpair_mtx;
+	struct qpair_info {
+		struct nvme_qpair*	qpair;
+		mutex				mtx;
+	}						qpairs[NVME_MAX_QPAIRS];
+	uint32					qpair_count;
+	uint32					next_qpair;
 } nvme_disk_driver_info;
+typedef nvme_disk_driver_info::qpair_info qpair_info;
 
 
 typedef struct {
@@ -185,6 +193,8 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		return err;
 	}
 
+	TRACE_ALWAYS("attached to NVMe device \"%s (%s)\n", cstat.mn, cstat.sn);
+
 	// TODO: export more than just the first namespace!
 	info->ns = nvme_ns_open(info->ctrlr, cstat.ns_ids[0]);
 	if (info->ns == NULL) {
@@ -205,15 +215,21 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	TRACE("capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
 
-	// allocate a qpair
-	// TODO: allocate more than one qpair
-	info->qpair = nvme_ioqp_get(info->ctrlr, (enum nvme_qprio)0, 0);
-	if (info->qpair == NULL) {
-		TRACE_ERROR("failed to allocate qpair!\n");
-		return B_ERROR;
-	}
+	// allocate qpairs
+	info->qpair_count = info->next_qpair = 0;
+	for (uint32 i = 0; i < NVME_MAX_QPAIRS && i < cstat.io_qpairs; i++) {
+		info->qpairs[i].qpair = nvme_ioqp_get(info->ctrlr,
+			(enum nvme_qprio)0, 0);
+		if (info->qpairs[i].qpair == NULL)
+			break;
 
-	mutex_init(&info->qpair_mtx, "qpair mtx");
+		mutex_init(&info->qpairs[i].mtx, "qpair mutex");
+		info->qpair_count++;
+	}
+	if (info->qpair_count == 0) {
+		TRACE_ERROR("failed to allocate qpairs!\n");
+		return B_NO_MEMORY;
+	}
 
 	*_cookie = info;
 	return B_OK;
@@ -270,8 +286,16 @@ nvme_disk_free(void* cookie)
 // #pragma mark - I/O functions
 
 
+static qpair_info*
+get_next_qpair(nvme_disk_driver_info* info)
+{
+	return &info->qpairs[atomic_add((int32*)&info->next_qpair, 1)
+		% info->qpair_count];
+}
+
+
 static void
-disk_read_callback(status_t* status, const struct nvme_cpl* cpl)
+disk_io_callback(status_t* status, const struct nvme_cpl* cpl)
 {
 	*status = nvme_cpl_is_error(cpl) ? B_IO_ERROR : B_OK;
 }
@@ -313,16 +337,23 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 	}
 
 	// Actually perform the read.
-	MutexLocker _(handle->info->qpair_mtx);
-	int ret = nvme_ns_read(handle->info->ns, handle->info->qpair,
-		buffer, rounded_pos / block_size, rounded_len / block_size,
-		(nvme_cmd_cb)disk_read_callback, &status, 0);
+	qpair_info* qpinfo = get_next_qpair(handle->info);
+	mutex_lock(&qpinfo->mtx);
+	int ret = nvme_ns_read(handle->info->ns, qpinfo->qpair, buffer,
+		rounded_pos / block_size, rounded_len / block_size,
+		(nvme_cmd_cb)disk_io_callback, &status, 0);
+	mutex_unlock(&qpinfo->mtx);
 	if (ret != 0)
 		return ret;
 
 	while (status == EINPROGRESS) {
-		nvme_ioqp_poll(handle->info->qpair, 1);
-		snooze(5);
+		// nvme_ioqp_poll uses locking internally on the entire device,
+		// not just this qpair, so it is entirely possible that it could
+		// return 0 (i.e. no completions processed) and yet our status
+		// changed, because some other thread processed the completion
+		// before we got to it. So, recheck it before sleeping.
+		if (nvme_ioqp_poll(qpinfo->qpair, 0) == 0 && status == EINPROGRESS)
+			snooze(5);
 	}
 
 	if (status != B_OK)
