@@ -169,7 +169,7 @@ tun_std_ops(int32 op, ...)
 }
 
 
-net_device_module_info sLoopbackModule = {
+net_device_module_info sTunModule = {
 	{
 		"network/devices/tun/v1",
 		0,
@@ -191,6 +191,6 @@ net_device_module_info sLoopbackModule = {
 };
 
 module_info* modules[] = {
-	(module_info*)&sLoopbackModule,
+	(module_info*)&sTunModule,
 	NULL
 };
