@@ -659,6 +659,7 @@ EHCI::~EHCI()
 	delete_sem(fAsyncAdvanceSem);
 	delete_sem(fFinishTransfersSem);
 	delete_sem(fFinishIsochronousTransfersSem);
+	delete_sem(fCleanupSem);
 	wait_for_thread(fFinishThread, &result);
 	wait_for_thread(fCleanupThread, &result);
 	wait_for_thread(fFinishIsochronousThread, &result);
