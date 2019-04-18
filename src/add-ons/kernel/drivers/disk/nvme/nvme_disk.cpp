@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <AutoDeleter.h>
 #include <kernel.h>
 #include <util/AutoLock.h>
 
@@ -104,7 +105,7 @@ get_geometry(nvme_disk_handle* handle, device_geometry* geometry)
 	geometry->device_type = B_DISK;
 	geometry->removable = false;
 
-	geometry->read_only = true; /* TODO: Write support! */
+	geometry->read_only = false;
 	geometry->write_once = false;
 
 	TRACE("get_geometry(): %" B_PRId32 ", %" B_PRId32 ", %" B_PRId32 ", %" B_PRId32 ", %d, %d, %d, %d\n",
@@ -193,7 +194,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		return err;
 	}
 
-	TRACE_ALWAYS("attached to NVMe device \"%s (%s)\n", cstat.mn, cstat.sn);
+	TRACE_ALWAYS("attached to NVMe device \"%s (%s)\"\n", cstat.mn, cstat.sn);
 
 	// TODO: export more than just the first namespace!
 	info->ns = nvme_ns_open(info->ctrlr, cstat.ns_ids[0]);
@@ -301,14 +302,60 @@ disk_io_callback(status_t* status, const struct nvme_cpl* cpl)
 }
 
 
+static void
+await_status(struct nvme_qpair* qpair, status_t& status)
+{
+	while (status == EINPROGRESS) {
+		// nvme_ioqp_poll uses locking internally on the entire device,
+		// not just this qpair, so it is entirely possible that it could
+		// return 0 (i.e. no completions processed) and yet our status
+		// changed, because some other thread processed the completion
+		// before we got to it. So, recheck it before sleeping.
+		if (nvme_ioqp_poll(qpair, 0) == 0 && status == EINPROGRESS)
+			snooze(5);
+	}
+}
+
+
+static status_t
+do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
+	size_t* rounded_len, bool write = false)
+{
+	CALLED();
+	const size_t block_size = info->block_size;
+
+	status_t status = EINPROGRESS;
+
+	qpair_info* qpinfo = get_next_qpair(info);
+	mutex_lock(&qpinfo->mtx);
+	int ret = -1;
+	if (write) {
+		ret = nvme_ns_write(info->ns, qpinfo->qpair, buffer,
+			rounded_pos / block_size, *rounded_len / block_size,
+			(nvme_cmd_cb)disk_io_callback, &status, 0);
+	} else {
+		ret = nvme_ns_read(info->ns, qpinfo->qpair, buffer,
+			rounded_pos / block_size, *rounded_len / block_size,
+			(nvme_cmd_cb)disk_io_callback, &status, 0);
+	}
+	mutex_unlock(&qpinfo->mtx);
+	if (ret != 0)
+		return ret;
+
+	await_status(qpinfo->qpair, status);
+
+	if (status != B_OK)
+		*rounded_len = 0;
+	return status;
+}
+
+
 static status_t
 nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 {
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 	const size_t block_size = handle->info->block_size;
-
-	status_t status = EINPROGRESS;
 
 	// libnvme does transfers in units of device sectors, so if we have to
 	// round either the position or the length, we will need a bounce buffer.
@@ -317,10 +364,11 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 	if (rounded_pos != pos || rounded_len != *length
 			|| IS_USER_ADDRESS(buffer)) {
 		void* bounceBuffer = malloc(rounded_len);
+		MemoryDeleter _(bounceBuffer);
 		if (bounceBuffer == NULL)
 			return B_NO_MEMORY;
 
-		status = nvme_disk_read(cookie, rounded_pos, bounceBuffer,
+		status_t status = nvme_disk_read(cookie, rounded_pos, bounceBuffer,
 			&rounded_len);
 		if (status != B_OK) {
 			*length = 0;
@@ -332,44 +380,83 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 			status = user_memcpy(buffer, offsetBuffer, *length);
 		else
 			memcpy(buffer, offsetBuffer, *length);
-		free(bounceBuffer);
 		return status;
 	}
 
-	// Actually perform the read.
-	qpair_info* qpinfo = get_next_qpair(handle->info);
-	mutex_lock(&qpinfo->mtx);
-	int ret = nvme_ns_read(handle->info->ns, qpinfo->qpair, buffer,
-		rounded_pos / block_size, rounded_len / block_size,
-		(nvme_cmd_cb)disk_io_callback, &status, 0);
-	mutex_unlock(&qpinfo->mtx);
-	if (ret != 0)
-		return ret;
-
-	while (status == EINPROGRESS) {
-		// nvme_ioqp_poll uses locking internally on the entire device,
-		// not just this qpair, so it is entirely possible that it could
-		// return 0 (i.e. no completions processed) and yet our status
-		// changed, because some other thread processed the completion
-		// before we got to it. So, recheck it before sleeping.
-		if (nvme_ioqp_poll(qpinfo->qpair, 0) == 0 && status == EINPROGRESS)
-			snooze(5);
-	}
-
-	if (status != B_OK)
-		*length = 0;
-	return status;
+	// If we got here, that means the arguments are already rounded to LBAs,
+	// so just do the I/O directly.
+	return do_nvme_io(handle->info, pos, buffer, length);
 }
 
 
 static status_t
-nvme_disk_write(void* cookie, off_t pos, const void* buffer,
-	size_t* _length)
+nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 {
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
+	const size_t block_size = handle->info->block_size;
 
-	return B_NOT_SUPPORTED;
+	const off_t rounded_pos = ROUNDDOWN(pos, block_size);
+	size_t rounded_len = ROUNDUP((*length) + (pos - rounded_pos), block_size);
+	if (rounded_pos != pos || rounded_len != *length
+			|| IS_USER_ADDRESS(buffer)) {
+		void* bounceBuffer = malloc(rounded_len);
+		MemoryDeleter _(bounceBuffer);
+		if (bounceBuffer == NULL)
+			return B_NO_MEMORY;
+
+		// Since we rounded, we need to read in the first and last logical
+		// blocks before we copy our information to the bounce buffer.
+		// TODO: This would be faster if we queued both reads at once!
+		size_t readlen = block_size;
+		status_t status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
+			&readlen);
+		if (status != B_OK)
+			return status;
+		if (rounded_len > block_size) {
+			off_t offset = rounded_len - block_size;
+			status = do_nvme_io(handle->info, rounded_pos + offset,
+				((int8*)bounceBuffer) + offset, &readlen);
+			if (status != B_OK)
+				return status;
+		}
+
+		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
+		if (IS_USER_ADDRESS(buffer))
+			status = user_memcpy(offsetBuffer, buffer, *length);
+		else
+			memcpy(offsetBuffer, buffer, *length);
+		if (status != B_OK)
+			return status;
+
+		status = nvme_disk_write(cookie, rounded_pos, bounceBuffer,
+			&rounded_len);
+		if (status != B_OK)
+			*length = 0;
+		return status;
+	}
+
+	// If we got here, that means the arguments are already rounded to LBAs,
+	// so just do the I/O directly.
+	return do_nvme_io(handle->info, pos, (void*)buffer, length, true);
+}
+
+
+static status_t
+nvme_disk_flush(nvme_disk_driver_info* info)
+{
+	status_t status = EINPROGRESS;
+
+	qpair_info* qpinfo = get_next_qpair(info);
+	mutex_lock(&qpinfo->mtx);
+	int ret = nvme_ns_flush(info->ns, qpinfo->qpair,
+		(nvme_cmd_cb)disk_io_callback, &status);
+	mutex_unlock(&qpinfo->mtx);
+	if (ret != 0)
+		return ret;
+
+	await_status(qpinfo->qpair, status);
+	return status;
 }
 
 
@@ -432,8 +519,8 @@ nvme_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			return user_memcpy(buffer, &iconData, sizeof(device_icon));
 		}
 
-		/*case B_FLUSH_DRIVE_CACHE:
-			return synchronize_cache(info);*/
+		case B_FLUSH_DRIVE_CACHE:
+			return nvme_disk_flush(info);
 	}
 
 	return B_DEV_INVALID_IOCTL;
