@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <algorithm>
 #include <AutoDeleter.h>
 #include <kernel.h>
 #include <util/AutoLock.h>
@@ -78,6 +79,7 @@ typedef struct {
 
 	uint64					capacity;
 	uint32					block_size;
+	size_t					max_transfer_size;
 	status_t				media_status;
 
 	struct qpair_info {
@@ -195,6 +197,8 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	TRACE_ALWAYS("attached to NVMe device \"%s (%s)\"\n", cstat.mn, cstat.sn);
+	TRACE_ALWAYS("\tmaximum transfer size: %" B_PRIuSIZE "\n", cstat.max_xfer_size);
+	TRACE_ALWAYS("\tqpair count: %d\n", cstat.io_qpairs);
 
 	// TODO: export more than just the first namespace!
 	info->ns = nvme_ns_open(info->ctrlr, cstat.ns_ids[0]);
@@ -212,6 +216,8 @@ nvme_disk_init_device(void* _info, void** _cookie)
 
 	// store capacity information
 	nvme_disk_set_capacity(info, nsstat.sectors, nsstat.sector_size);
+	info->max_transfer_size = ROUNDDOWN(cstat.max_xfer_size,
+		nsstat.sector_size);
 
 	TRACE("capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
@@ -351,6 +357,42 @@ do_nvme_io(nvme_disk_driver_info* info, off_t rounded_pos, void* buffer,
 
 
 static status_t
+do_nvme_segmented_io(nvme_disk_driver_info* info, off_t rounded_pos,
+	void* buffer, size_t* rounded_len, bool write = false)
+{
+	// The max transfer size is already a multiple of the block size,
+	// so divide and iterate appropriately. In the case where the length
+	// is less than the maximum transfer size, we'll wind up with 0 in the
+	// division, and only one transfer to take care of.
+	const size_t max_xfer = info->max_transfer_size;
+	int32 transfers = *rounded_len / max_xfer;
+	if ((*rounded_len % max_xfer) != 0)
+		transfers++;
+
+	size_t transferred = 0;
+	for (int32 i = 0; i < transfers; i++) {
+		size_t transfer_len = max_xfer;
+		// The last transfer will usually be smaller.
+		if (i == (transfers - 1))
+			transfer_len = *rounded_len - transferred;
+
+		status_t status = do_nvme_io(info, rounded_pos, buffer,
+			&transfer_len, write);
+		if (status != B_OK) {
+			*rounded_len = transferred;
+			return transferred > 0 ? (write ? B_PARTIAL_WRITE : B_PARTIAL_READ)
+				: status;
+		}
+
+		transferred += transfer_len;
+		rounded_pos += transfer_len;
+		buffer = ((int8*)buffer) + transfer_len;
+	}
+	return B_OK;
+}
+
+
+static status_t
 nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 {
 	CALLED();
@@ -365,14 +407,20 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 			|| IS_USER_ADDRESS(buffer)) {
 		void* bounceBuffer = malloc(rounded_len);
 		MemoryDeleter _(bounceBuffer);
-		if (bounceBuffer == NULL)
+		if (bounceBuffer == NULL) {
+			*length = 0;
 			return B_NO_MEMORY;
+		}
 
 		status_t status = nvme_disk_read(cookie, rounded_pos, bounceBuffer,
 			&rounded_len);
 		if (status != B_OK) {
-			*length = 0;
-			return status;
+			// The "rounded_len" will be the actual transferred length, but
+			// of course it will contain the padding.
+			*length = std::min(*length, (size_t)std::max((off_t)0,
+				rounded_len - (pos - rounded_pos)));
+			if (*length == 0)
+				return status;
 		}
 
 		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
@@ -385,7 +433,7 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 
 	// If we got here, that means the arguments are already rounded to LBAs,
 	// so just do the I/O directly.
-	return do_nvme_io(handle->info, pos, buffer, length);
+	return do_nvme_segmented_io(handle->info, pos, buffer, length);
 }
 
 
@@ -402,8 +450,10 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 			|| IS_USER_ADDRESS(buffer)) {
 		void* bounceBuffer = malloc(rounded_len);
 		MemoryDeleter _(bounceBuffer);
-		if (bounceBuffer == NULL)
+		if (bounceBuffer == NULL) {
+			*length = 0;
 			return B_NO_MEMORY;
+		}
 
 		// Since we rounded, we need to read in the first and last logical
 		// blocks before we copy our information to the bounce buffer.
@@ -411,14 +461,18 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 		size_t readlen = block_size;
 		status_t status = do_nvme_io(handle->info, rounded_pos, bounceBuffer,
 			&readlen);
-		if (status != B_OK)
+		if (status != B_OK) {
+			*length = 0;
 			return status;
+		}
 		if (rounded_len > block_size) {
 			off_t offset = rounded_len - block_size;
 			status = do_nvme_io(handle->info, rounded_pos + offset,
 				((int8*)bounceBuffer) + offset, &readlen);
-			if (status != B_OK)
+			if (status != B_OK) {
+				*length = 0;
 				return status;
+			}
 		}
 
 		void* offsetBuffer = ((int8*)bounceBuffer) + (pos - rounded_pos);
@@ -426,19 +480,23 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 			status = user_memcpy(offsetBuffer, buffer, *length);
 		else
 			memcpy(offsetBuffer, buffer, *length);
-		if (status != B_OK)
+		if (status != B_OK) {
+			*length = 0;
 			return status;
+		}
 
 		status = nvme_disk_write(cookie, rounded_pos, bounceBuffer,
 			&rounded_len);
-		if (status != B_OK)
-			*length = 0;
+		if (status != B_OK) {
+			*length = std::min(*length, (size_t)std::max((off_t)0,
+				rounded_len - (pos - rounded_pos)));
+		}
 		return status;
 	}
 
 	// If we got here, that means the arguments are already rounded to LBAs,
 	// so just do the I/O directly.
-	return do_nvme_io(handle->info, pos, (void*)buffer, length, true);
+	return do_nvme_segmented_io(handle->info, pos, (void*)buffer, length, true);
 }
 
 
