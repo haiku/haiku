@@ -417,8 +417,8 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 		if (status != B_OK) {
 			// The "rounded_len" will be the actual transferred length, but
 			// of course it will contain the padding.
-			*length = std::min(*length, (size_t)std::max((off_t)0,
-				rounded_len - (pos - rounded_pos)));
+			*length = std::min(*length, std::max((size_t)0,
+				rounded_len - (size_t)(pos - rounded_pos)));
 			if (*length == 0)
 				return status;
 		}
@@ -488,8 +488,8 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 		status = nvme_disk_write(cookie, rounded_pos, bounceBuffer,
 			&rounded_len);
 		if (status != B_OK) {
-			*length = std::min(*length, (size_t)std::max((off_t)0,
-				rounded_len - (pos - rounded_pos)));
+			*length = std::min(*length, std::max((size_t)0,
+				rounded_len - (size_t)(pos - rounded_pos)));
 		}
 		return status;
 	}
