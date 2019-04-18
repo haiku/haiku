@@ -433,7 +433,8 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 
 	if (fIRQ == 0 || fIRQ == 0xFF) {
-		TRACE_MODULE_ERROR("device was assigned an invalid IRQ\n");
+		TRACE_MODULE_ERROR("device PCI:%d:%d:%d was assigned an invalid IRQ\n",
+			fPCIInfo->bus, fPCIInfo->device, fPCIInfo->function);
 		return;
 	}
 

@@ -349,8 +349,7 @@ UHCI::AddTo(Stack *stack)
 				get_module(B_PCI_X86_MODULE_NAME, (module_info **)&sPCIx86Module);
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_MODULE_ERROR("AddTo(): InitCheck() failed 0x%08" B_PRIx32
-					"\n", bus->InitCheck());
+				TRACE_MODULE_ERROR("bus failed init check\n");
 				delete bus;
 				continue;
 			}
@@ -578,7 +577,8 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	}
 
 	if (fIRQ == 0 || fIRQ == 0xFF) {
-		TRACE_MODULE_ERROR("device was assigned an invalid IRQ\n");
+		TRACE_MODULE_ERROR("device PCI:%d:%d:%d was assigned an invalid IRQ\n",
+			fPCIInfo->bus, fPCIInfo->device, fPCIInfo->function);
 		return;
 	}
 
