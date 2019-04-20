@@ -24,7 +24,7 @@
  * SUCH DAMAGE.
  */
 
-/* $FreeBSD: releng/12.0/sys/dev/e1000/igb_txrx.c 340366 2018-11-12 16:28:07Z shurd $ */
+/* $FreeBSD$ */
 #include "if_em.h"
 
 #ifdef RSS
@@ -56,7 +56,7 @@ static int igb_tx_ctx_setup(struct tx_ring *txr, if_pkt_info_t pi, u32 *cmd_type
 static int igb_tso_setup(struct tx_ring *txr, if_pkt_info_t pi, u32 *cmd_type_len, u32 *olinfo_status);
 
 static void igb_rx_checksum(u32 staterr, if_rxd_info_t ri, u32 ptype);
-static int igb_determine_rsstype(u16 pkt_info);
+static int igb_determine_rsstype(u16 pkt_info);	
 
 extern void igb_if_enable_intr(if_ctx_t ctx);
 extern int em_intr(void *arg);
@@ -148,7 +148,7 @@ static int
 igb_tx_ctx_setup(struct tx_ring *txr, if_pkt_info_t pi, u32 *cmd_type_len, u32 *olinfo_status)
 {
 	struct e1000_adv_tx_context_desc *TXD;
-	struct adapter *adapter = txr->adapter;
+	struct adapter *adapter = txr->adapter; 
 	u32 vlan_macip_lens, type_tucmd_mlhl;
 	u32 mss_l4len_idx;
 	mss_l4len_idx = vlan_macip_lens = type_tucmd_mlhl = 0;
@@ -164,7 +164,7 @@ igb_tx_ctx_setup(struct tx_ring *txr, if_pkt_info_t pi, u32 *cmd_type_len, u32 *
 	TXD = (struct e1000_adv_tx_context_desc *) &txr->tx_base[pi->ipi_pidx];
 
 	/*
-	** In advanced descriptors the vlan tag must
+	** In advanced descriptors the vlan tag must 
 	** be placed into the context descriptor. Hence
 	** we need to make one even if not doing offloads.
 	*/
@@ -173,7 +173,7 @@ igb_tx_ctx_setup(struct tx_ring *txr, if_pkt_info_t pi, u32 *cmd_type_len, u32 *
 	} else if ((pi->ipi_csum_flags & IGB_CSUM_OFFLOAD) == 0) {
 		return (0);
 	}
-
+	
 	/* Set the ether header length */
 	vlan_macip_lens |= pi->ipi_ehdrlen << E1000_ADVTXD_MACLEN_SHIFT;
 
@@ -334,16 +334,11 @@ igb_isc_txd_credits_update(void *arg, uint16_t txqid, bool clear)
 	prev = txr->tx_cidx_processed;
 	ntxd = scctx->isc_ntxd[0];
 	do {
+		MPASS(prev != cur);
 		delta = (int32_t)cur - (int32_t)prev;
-		/*
-		 * XXX This appears to be a hack for first-packet.
-		 * A correct fix would prevent prev == cur in the first place.
-		 */
-		MPASS(prev == 0 || delta != 0);
-		if (prev == 0 && cur == 0)
-			delta += 1;
 		if (delta < 0)
 			delta += ntxd;
+		MPASS(delta > 0);
 
 		processed += delta;
 		prev  = cur;
@@ -423,7 +418,7 @@ igb_isc_rxd_available(void *arg, uint16_t rxqid, qidx_t idx, qidx_t budget)
 
 /****************************************************************
  * Routine sends data which has been dma'ed into host memory
- * to upper layer. Initialize ri structure.
+ * to upper layer. Initialize ri structure. 
  *
  * Returns 0 upon success, errno on failure
  ***************************************************************/

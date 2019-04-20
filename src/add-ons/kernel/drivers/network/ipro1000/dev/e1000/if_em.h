@@ -26,7 +26,7 @@
  * SUCH DAMAGE.
  */
 
-/*$FreeBSD: releng/12.0/sys/dev/e1000/if_em.h 339267 2018-10-09 20:16:19Z shurd $*/
+/*$FreeBSD$*/
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"
@@ -221,7 +221,7 @@
  * Micellaneous constants
  */
 #define EM_VENDOR_ID                    0x8086
-#define EM_FLASH                        0x0014
+#define EM_FLASH                        0x0014 
 
 #define EM_JUMBO_PBA                    0x00000028
 #define EM_DEFAULT_PBA                  0x00000030
@@ -303,7 +303,7 @@
 #define EM_BAR_TYPE_MASK	0x00000001
 #define EM_BAR_TYPE_MMEM	0x00000000
 #define EM_BAR_TYPE_IO		0x00000001
-#define EM_BAR_TYPE_FLASH	0x0014
+#define EM_BAR_TYPE_FLASH	0x0014 
 #define EM_BAR_MEM_TYPE(v)	((v) & EM_BAR_MEM_TYPE_MASK)
 #define EM_BAR_MEM_TYPE_MASK	0x00000006
 #define EM_BAR_MEM_TYPE_32BIT	0x00000000
@@ -349,8 +349,8 @@
 
 /*
  * 82574 has a nonstandard address for EIAC
- * and since its only used in MSIX, and in
- * the em driver only 82574 uses MSIX we can
+ * and since its only used in MSI-X, and in
+ * the em driver only 82574 uses MSI-X we can
  * solve it just using this define.
  */
 #define EM_EIAC 0x000DC
@@ -377,7 +377,7 @@ struct em_int_delay_info {
 struct tx_ring {
         struct adapter          *adapter;
 	struct e1000_tx_desc	*tx_base;
-	uint64_t                tx_paddr;
+	uint64_t                tx_paddr; 
 	qidx_t			*tx_rsq;
 	bool			tx_tso;		/* last tx was tso */
 	uint8_t			me;
@@ -411,7 +411,7 @@ struct rx_ring {
         u32                     me;
         u32                     payload;
         union e1000_rx_desc_extended	*rx_base;
-        uint64_t                rx_paddr;
+        uint64_t                rx_paddr; 
 
         /* Interrupt resources */
         void                    *tag;
@@ -440,8 +440,8 @@ struct em_rx_queue {
 	u32                    eims;
 	struct rx_ring         rxr;
 	u64                    irqs;
-	struct if_irq          que_irq;
-};
+	struct if_irq          que_irq; 
+};  
 
 /* Our adapter structure */
 struct adapter {
@@ -459,13 +459,12 @@ struct adapter {
 	struct cdev	*led_dev;
 
         struct em_tx_queue *tx_queues;
-        struct em_rx_queue *rx_queues;
+        struct em_rx_queue *rx_queues; 
         struct if_irq   irq;
 
 	struct resource *memory;
 	struct resource *flash;
 	struct resource	*ioport;
-	int		io_rid;
 
 	struct resource	*res;
 	void		*tag;
@@ -486,7 +485,7 @@ struct adapter {
 	u16	        num_vlans;
         u32		txd_cmd;
 
-        u32             tx_process_limit;
+        u32             tx_process_limit; 
         u32             rx_process_limit;
 	u32		rx_mbuf_sz;
 
@@ -517,7 +516,6 @@ struct adapter {
 
 	u64		que_mask;
 
-
 	struct em_int_delay_info tx_int_delay;
 	struct em_int_delay_info tx_abs_int_delay;
 	struct em_int_delay_info rx_int_delay;
@@ -527,9 +525,6 @@ struct adapter {
 	/* Misc stats maintained by the driver */
 	unsigned long	dropped_pkts;
 	unsigned long	link_irq;
-	unsigned long	mbuf_defrag_failed;
-	unsigned long	no_tx_dma_setup;
-	unsigned long	no_tx_map_avail;
 	unsigned long	rx_overruns;
 	unsigned long	watchdog_events;
 
