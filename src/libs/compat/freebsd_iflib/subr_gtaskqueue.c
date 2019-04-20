@@ -70,6 +70,8 @@ struct gtaskqueue_busy {
 
 static struct gtask * const TB_DRAIN_WAITER = (struct gtask *)0x1;
 
+typedef void (*gtaskqueue_enqueue_fn)(void *context);
+
 struct gtaskqueue {
 	STAILQ_HEAD(, gtask)	tq_queue;
 	gtaskqueue_enqueue_fn	tq_enqueue;
@@ -562,7 +564,6 @@ gtaskqueue_run_callback(struct gtaskqueue *tq,
 		tq_callback(tq->tq_cb_contexts[cb_type]);
 }
 
-
 static void
 gtaskqueue_thread_loop(void *arg)
 {
@@ -717,7 +718,7 @@ taskqgroup_find(struct taskqgroup *qgroup, void *uniq)
 		}
 	}
 	if (idx == -1)
-		panic("taskqgroup_find: Failed to pick a qid.");
+		panic("%s: failed to pick a qid.", __func__);
 
 	return (idx);
 }
@@ -734,9 +735,9 @@ taskqgroup_find(struct taskqgroup *qgroup, void *uniq)
  * adjustment is properly delayed.  SI_ORDER_FOURTH is clearly before
  * SI_ORDER_ANY and unclearly after the CPUs are started.  It would be
  * simpler for adjustment to pass a flag indicating if it is delayed.
- */
+ */ 
 
-static int tqg_smp_started = 0;
+static int tqg_smp_started;
 
 static void
 tqg_record_smp_started(void *arg)
@@ -749,35 +750,28 @@ SYSINIT(tqg_record_smp_started, SI_SUB_SMP, SI_ORDER_FOURTH,
 
 void
 taskqgroup_attach(struct taskqgroup *qgroup, struct grouptask *gtask,
-    void *uniq, int irq, const char *name)
+    void *uniq, device_t dev, struct resource *irq, const char *name)
 {
-#ifndef __HAIKU__
-	cpuset_t mask;
-#endif
-	int qid, error;
+	int cpu, qid, error;
 
 	gtask->gt_uniq = uniq;
 	snprintf(gtask->gt_name, GROUPTASK_NAMELEN, "%s", name ? name : "grouptask");
+	gtask->gt_dev = dev;
 	gtask->gt_irq = irq;
 	gtask->gt_cpu = -1;
 	mtx_lock(&qgroup->tqg_lock);
 	qid = taskqgroup_find(qgroup, uniq);
 	qgroup->tqg_queue[qid].tgc_cnt++;
 	LIST_INSERT_HEAD(&qgroup->tqg_queue[qid].tgc_tasks, gtask, gt_list);
-	MPASS(qgroup->tqg_queue[qid].tgc_taskq != NULL);
 	gtask->gt_taskqueue = qgroup->tqg_queue[qid].tgc_taskq;
-	if (irq != -1 && tqg_smp_started) {
-		gtask->gt_cpu = qgroup->tqg_queue[qid].tgc_cpu;
-#ifndef __HAIKU__
-		CPU_ZERO(&mask);
-		CPU_SET(qgroup->tqg_queue[qid].tgc_cpu, &mask);
-#endif
+	if (dev != NULL && irq != NULL && tqg_smp_started) {
+		cpu = qgroup->tqg_queue[qid].tgc_cpu;
+		gtask->gt_cpu = cpu;
 		mtx_unlock(&qgroup->tqg_lock);
-#ifndef __HAIKU__
-		error = intr_setaffinity(irq, CPU_WHICH_IRQ, &mask);
+		error = bus_bind_intr(dev, irq, cpu);
 		if (error)
-			printf("%s: setaffinity failed for %s: %d\n", __func__, gtask->gt_name, error);
-#endif
+			printf("%s: binding interrupt failed for %s: %d\n",
+			    __func__, gtask->gt_name, error);
 	} else
 		mtx_unlock(&qgroup->tqg_lock);
 }
@@ -785,31 +779,22 @@ taskqgroup_attach(struct taskqgroup *qgroup, struct grouptask *gtask,
 static void
 taskqgroup_attach_deferred(struct taskqgroup *qgroup, struct grouptask *gtask)
 {
-#ifndef __HAIKU__
-	cpuset_t mask;
-#endif
 	int qid, cpu, error;
 
 	mtx_lock(&qgroup->tqg_lock);
 	qid = taskqgroup_find(qgroup, gtask->gt_uniq);
 	cpu = qgroup->tqg_queue[qid].tgc_cpu;
-#ifndef __HAIKU__
-	if (gtask->gt_irq != -1) {
+	if (gtask->gt_dev != NULL && gtask->gt_irq != NULL) {
 		mtx_unlock(&qgroup->tqg_lock);
-
-		CPU_ZERO(&mask);
-		CPU_SET(cpu, &mask);
-		error = intr_setaffinity(gtask->gt_irq, CPU_WHICH_IRQ, &mask);
+		error = bus_bind_intr(gtask->gt_dev, gtask->gt_irq, cpu);
 		mtx_lock(&qgroup->tqg_lock);
 		if (error)
-			printf("%s: %s setaffinity failed: %d\n", __func__, gtask->gt_name, error);
+			printf("%s: binding interrupt failed for %s: %d\n",
+			    __func__, gtask->gt_name, error);
 
 	}
-#endif
 	qgroup->tqg_queue[qid].tgc_cnt++;
-
-	LIST_INSERT_HEAD(&qgroup->tqg_queue[qid].tgc_tasks, gtask,
-			 gt_list);
+	LIST_INSERT_HEAD(&qgroup->tqg_queue[qid].tgc_tasks, gtask, gt_list);
 	MPASS(qgroup->tqg_queue[qid].tgc_taskq != NULL);
 	gtask->gt_taskqueue = qgroup->tqg_queue[qid].tgc_taskq;
 	mtx_unlock(&qgroup->tqg_lock);
@@ -817,16 +802,14 @@ taskqgroup_attach_deferred(struct taskqgroup *qgroup, struct grouptask *gtask)
 
 int
 taskqgroup_attach_cpu(struct taskqgroup *qgroup, struct grouptask *gtask,
-	void *uniq, int cpu, int irq, const char *name)
+    void *uniq, int cpu, device_t dev, struct resource *irq, const char *name)
 {
-#ifndef __HAIKU__
-	cpuset_t mask;
-#endif
 	int i, qid, error;
 
 	qid = -1;
 	gtask->gt_uniq = uniq;
 	snprintf(gtask->gt_name, GROUPTASK_NAMELEN, "%s", name ? name : "grouptask");
+	gtask->gt_dev = dev;
 	gtask->gt_irq = irq;
 	gtask->gt_cpu = cpu;
 	mtx_lock(&qgroup->tqg_lock);
@@ -849,27 +832,24 @@ taskqgroup_attach_cpu(struct taskqgroup *qgroup, struct grouptask *gtask,
 	cpu = qgroup->tqg_queue[qid].tgc_cpu;
 	mtx_unlock(&qgroup->tqg_lock);
 
-#ifndef __HAIKU__
-	CPU_ZERO(&mask);
-	CPU_SET(cpu, &mask);
-	if (irq != -1 && tqg_smp_started) {
-		error = intr_setaffinity(irq, CPU_WHICH_IRQ, &mask);
+	if (dev != NULL && irq != NULL && tqg_smp_started) {
+		error = bus_bind_intr(dev, irq, cpu);
 		if (error)
-			printf("%s: setaffinity failed: %d\n", __func__, error);
+			printf("%s: binding interrupt failed for %s: %d\n",
+			    __func__, gtask->gt_name, error);
 	}
-#endif
 	return (0);
 }
 
 static int
 taskqgroup_attach_cpu_deferred(struct taskqgroup *qgroup, struct grouptask *gtask)
 {
-#ifndef __HAIKU__
-	cpuset_t mask;
-#endif
-	int i, qid, irq, cpu, error;
+	device_t dev;
+	struct resource *irq;
+	int cpu, error, i, qid;
 
 	qid = -1;
+	dev = gtask->gt_dev;
 	irq = gtask->gt_irq;
 	cpu = gtask->gt_cpu;
 	MPASS(tqg_smp_started);
@@ -890,16 +870,12 @@ taskqgroup_attach_cpu_deferred(struct taskqgroup *qgroup, struct grouptask *gtas
 	gtask->gt_taskqueue = qgroup->tqg_queue[qid].tgc_taskq;
 	mtx_unlock(&qgroup->tqg_lock);
 
-#ifndef __HAIKU__
-	CPU_ZERO(&mask);
-	CPU_SET(cpu, &mask);
-
-	if (irq != -1) {
-		error = intr_setaffinity(irq, CPU_WHICH_IRQ, &mask);
+	if (dev != NULL && irq != NULL) {
+		error = bus_bind_intr(dev, irq, cpu);
 		if (error)
-			printf("%s: setaffinity failed: %d\n", __func__, error);
+			printf("%s: binding interrupt failed for %s: %d\n",
+			    __func__, gtask->gt_name, error);
 	}
-#endif
 	return (0);
 }
 
@@ -914,7 +890,7 @@ taskqgroup_detach(struct taskqgroup *qgroup, struct grouptask *gtask)
 		if (qgroup->tqg_queue[i].tgc_taskq == gtask->gt_taskqueue)
 			break;
 	if (i == qgroup->tqg_cnt)
-		panic("taskqgroup_detach: task %s not in group\n", gtask->gt_name);
+		panic("%s: task %s not in group", __func__, gtask->gt_name);
 	qgroup->tqg_queue[i].tgc_cnt--;
 	LIST_REMOVE(gtask, gt_list);
 	mtx_unlock(&qgroup->tqg_lock);
@@ -938,8 +914,7 @@ taskqgroup_binder(void *ctx)
 	thread_unlock(curthread);
 
 	if (error)
-		printf("%s: setaffinity failed: %d\n", __func__,
-		    error);
+		printf("%s: binding curthread failed: %d\n", __func__, error);
 #endif
 	free(gtask, M_DEVBUF);
 }
@@ -1108,15 +1083,16 @@ taskqgroup_destroy(struct taskqgroup *qgroup)
 
 void
 taskqgroup_config_gtask_init(void *ctx, struct grouptask *gtask, gtask_fn_t *fn,
-	const char *name)
+    const char *name)
 {
 
 	GROUPTASK_INIT(gtask, 0, fn, ctx);
-	taskqgroup_attach(qgroup_config, gtask, gtask, -1, name);
+	taskqgroup_attach(qgroup_config, gtask, gtask, NULL, NULL, name);
 }
 
 void
 taskqgroup_config_gtask_deinit(struct grouptask *gtask)
 {
+
 	taskqgroup_detach(qgroup_config, gtask);
 }

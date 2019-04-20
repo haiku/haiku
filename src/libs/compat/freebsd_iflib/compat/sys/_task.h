@@ -22,16 +22,5 @@ struct gtask {
 	void	*ta_context;		/* (c) argument for handler */
 };
 
-struct grouptask {
-	struct	gtask		gt_task;
-	void			*gt_taskqueue;
-	LIST_ENTRY(grouptask)	gt_list;
-	void			*gt_uniq;
-#define GROUPTASK_NAMELEN	32
-	char			gt_name[GROUPTASK_NAMELEN];
-	int16_t			gt_irq;
-	int16_t			gt_cpu;
-};
-
 
 #endif
