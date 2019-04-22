@@ -88,7 +88,7 @@ device_consumer_thread(void* _interface)
 	net_device* device = interface->device;
 	net_buffer* buffer;
 
-	while (true) {
+	while (atomic_get(&interface->ref_count) > 0) {
 		ssize_t status = fifo_dequeue_buffer(&interface->receive_queue, 0,
 			B_INFINITE_TIMEOUT, &buffer);
 		if (status != B_OK) {
@@ -380,13 +380,16 @@ put_device_interface(struct net_device_interface* interface)
 	if (atomic_add(&interface->ref_count, -1) != 1)
 		return;
 
+	// Indicate we are in the process of destroying this interface
+	// by setting its ref_count to 0.
+	interface->ref_count = 0;
+
 	MutexLocker locker(sLock);
 	sInterfaces.Remove(interface);
 	locker.Unlock();
 
 	uninit_fifo(&interface->receive_queue);
-	status_t status;
-	wait_for_thread(interface->consumer_thread, &status);
+	wait_for_thread(interface->consumer_thread, NULL);
 
 	net_device* device = interface->device;
 	const char* moduleName = device->module->info.name;
