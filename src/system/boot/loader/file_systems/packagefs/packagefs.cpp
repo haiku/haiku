@@ -287,6 +287,9 @@ struct PackageLoaderErrorOutput : BErrorOutput {
 
 	virtual void PrintErrorVarArgs(const char* format, va_list args)
 	{
+		char buffer[256];
+		vsnprintf(buffer, sizeof(buffer), format, args);
+		dprintf("%s", buffer);
 	}
 };
 
