@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2019 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NET_IF_TYPES_H
@@ -17,7 +17,6 @@
 #define IFT_MODEM		0x30
 #define IFT_TUN			0x83
 #define IFT_L2VLAN		0x87
-#define IFT_IEEE1394	0x90
 #define IFT_BRIDGE		0xd1
 
 
