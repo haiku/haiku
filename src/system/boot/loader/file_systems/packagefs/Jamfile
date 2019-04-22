@@ -25,11 +25,6 @@ for platform in [ MultiBootSubDirSetup ] {
 			PackageSettingsItem.cpp
 
 			# package kit/hpkg
-			BlockBufferPool.cpp
-			BlockBufferPoolImpl.cpp
-			BlockBufferPoolNoLock.cpp
-			BufferPool.cpp
-			PoolBuffer.cpp
 			DataReader.cpp
 			ErrorOutput.cpp
 			FDDataReader.cpp
