@@ -18,6 +18,7 @@
 #include <thread_defs.h>
 
 
+int __pthread_attr_get_np(pthread_t thread, pthread_attr_t *_attr);
 int __pthread_getattr_np(pthread_t thread, pthread_attr_t *_attr);
 
 
@@ -241,7 +242,7 @@ pthread_attr_setstack(pthread_attr_t *_attr, void *stackaddr,
 
 
 int
-__pthread_getattr_np(pthread_t thread, pthread_attr_t *_attr)
+__pthread_attr_get_np(pthread_t thread, pthread_attr_t *_attr)
 {
 	pthread_attr *attr;
 	status_t status;
@@ -268,6 +269,16 @@ __pthread_getattr_np(pthread_t thread, pthread_attr_t *_attr)
 }
 
 
+int
+__pthread_getattr_np(pthread_t thread, pthread_attr_t *_attr)
+{
+	int err = pthread_attr_init(_attr);
+	if (err == 0)
+		err = __pthread_attr_get_np(thread, _attr);
+	return err;
+}
+
+
 B_DEFINE_WEAK_ALIAS(__pthread_getattr_np, pthread_getattr_np);
-B_DEFINE_WEAK_ALIAS(__pthread_getattr_np, pthread_attr_get_np);
+B_DEFINE_WEAK_ALIAS(__pthread_attr_get_np, pthread_attr_get_np);
 
