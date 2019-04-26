@@ -1,12 +1,16 @@
 /*
- * Copyright 2007, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2019, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
+
 #include <Drivers.h>
 #include <KernelExport.h>
+
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+
 
 #define DRIVER_NAME "mem"
 #define DEVICE_NAME "misc/mem"
@@ -44,6 +48,7 @@ device_hooks mem_hooks = {
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 
 status_t
 init_hardware(void)
@@ -107,6 +112,7 @@ mem_read(void* cookie, off_t position, void* buffer, size_t* numBytes)
 {
 	void *virtualAddress;
 	area_id area;
+	status_t status = B_OK;
 
 	/* check permissions */
 	if (getuid() != 0 && geteuid() != 0) {
@@ -120,9 +126,11 @@ mem_read(void* cookie, off_t position, void* buffer, size_t* numBytes)
 		return area;
 	}
 
-	memcpy(buffer, virtualAddress, *numBytes);
+	if (user_memcpy(buffer, virtualAddress, *numBytes) != B_OK)
+		status = B_BAD_ADDRESS;
+
 	delete_area(area);
-	return B_OK;
+	return status;
 }
 
 
@@ -131,6 +139,7 @@ mem_write(void* cookie, off_t position, const void* buffer, size_t* numBytes)
 {
 	void *virtualAddress;
 	area_id area;
+	status_t status = B_OK;
 
 	/* check permissions */
 	if (getuid() != 0 && geteuid() != 0) {
@@ -144,9 +153,11 @@ mem_write(void* cookie, off_t position, const void* buffer, size_t* numBytes)
 		return area;
 	}
 
-	memcpy(virtualAddress, buffer, *numBytes);
+	if (user_memcpy(virtualAddress, buffer, *numBytes) != B_OK)
+		status = B_BAD_ADDRESS;
+
 	delete_area(area);
-	return B_OK;
+	return status;
 }
 
 
