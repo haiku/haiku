@@ -239,8 +239,6 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 
 	while (inByteCount > 0 && !fPaused) {
 		if (!fPaused || fPausing) {
-			printf("mixout %ld, inByteCount %ld, decin %ld, BufferSize %ld\n",
-				out_offset, inByteCount, fPlayPosition, fBufferSize);
 			if (fPlayPosition == 0 || fPlayPosition >= fBufferSize) {
 				Load();
 			}
