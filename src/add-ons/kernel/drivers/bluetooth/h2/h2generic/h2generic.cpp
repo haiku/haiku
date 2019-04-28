@@ -2,7 +2,6 @@
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * Copyright 2008 Mika Lindqvist, monni1995_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
- *
  */
 
 
@@ -591,7 +590,7 @@ device_free(void* cookie)
 
 // implements the POSIX ioctl()
 static status_t
-device_control(void* cookie, uint32 msg, void* _params, size_t size)
+device_control(void* cookie, uint32 msg, void* params, size_t size)
 {
 	status_t 	err = B_ERROR;
 	bt_usb_dev*	bdev = (bt_usb_dev*)cookie;
@@ -609,33 +608,34 @@ device_control(void* cookie, uint32 msg, void* _params, size_t size)
 		return B_BAD_VALUE;
 	}
 
-	if (_params == NULL || !IS_USER_ADDRESS(_params)) {
+	if (params == NULL || !IS_USER_ADDRESS(params)) {
 		TRACE("%s: Invalid pointer control\n", __func__);
 		return B_BAD_VALUE;
 	}
 
-	void* params = alloca(size);
-	if (user_memcpy(params, _params, size) != B_OK)
-		return B_BAD_ADDRESS;
-
 	acquire_sem(bdev->lock);
 
 	switch (msg) {
-		case ISSUE_BT_COMMAND:
+		case ISSUE_BT_COMMAND: {
 			if (size == 0) {
 				TRACE("%s: Invalid size control\n", __func__);
 				err = B_BAD_VALUE;
 				break;
 			}
 
+			void* _params = alloca(size);
+			if (user_memcpy(_params, params, size) != B_OK)
+				return B_BAD_ADDRESS;
+
 			// TODO: Reuse from some TXcompleted queue
 			// snbuf = snb_create(size);
 			snbuf = snb_fetch(&bdev->snetBufferRecycleTrash, size);
-			snb_put(snbuf, params, size);
+			snb_put(snbuf, _params, size);
 
 			err = submit_tx_command(bdev, snbuf);
 			TRACE("%s: command launched\n", __func__);
-		break;
+			break;
+		}
 
 		case BT_UP:
 			//  EVENTS
@@ -669,13 +669,11 @@ device_control(void* cookie, uint32 msg, void* _params, size_t size)
 		break;
 
 		case GET_STATS:
-			memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
-			err = B_OK;
+			err = user_memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
 		break;
 
 		case GET_HCI_ID:
-			*(hci_id*)params = bdev->hdev;
-			err = B_OK;
+			err = user_memcpy(params, &bdev->hdev, sizeof(hci_id));
 		break;
 
 
