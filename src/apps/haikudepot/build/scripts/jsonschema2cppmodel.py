@@ -152,7 +152,27 @@ def writescalaraccessors(outputfile, cppclassname, cppname, cppmembername, cppty
         string.Template("""
 ${cpptype}
 ${cppclassname}::${cppname}()
-{
+{""").substitute(dict))
+
+    if cpptype == jscom.CPP_TYPE_BOOLEAN:
+        outputfile.write(string.Template("""
+    if (${cppname}IsNull())
+        return false;
+""").substitute(dict))
+
+    if cpptype == jscom.CPP_TYPE_INTEGER:
+        outputfile.write(string.Template("""
+    if (${cppname}IsNull())
+        return 0;
+""").substitute(dict))
+
+    if cpptype == jscom.CPP_TYPE_NUMBER:
+        outputfile.write(string.Template("""
+    if (${cppname}IsNull())
+        return 0.0;
+""").substitute(dict))
+
+    outputfile.write(string.Template("""
     return *${cppmembername};
 }
 

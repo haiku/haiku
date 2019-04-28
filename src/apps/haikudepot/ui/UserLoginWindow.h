@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_LOGIN_WINDOW_H
@@ -84,7 +85,7 @@ private:
 
 			BString				fCaptchaToken;
 			BitmapRef			fCaptchaImage;
-			BString				fPreferredLanguage;
+			BString				fPreferredLanguageCode;
 
 			Model&				fModel;
 

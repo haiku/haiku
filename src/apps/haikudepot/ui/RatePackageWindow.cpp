@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +22,7 @@
 #include <StringView.h>
 
 #include "HaikuDepotConstants.h"
+#include "LanguageMenuUtils.h"
 #include "MarkupParser.h"
 #include "RatingView.h"
 #include "ServerHelper.h"
@@ -37,7 +38,6 @@ enum {
 	MSG_SEND						= 'send',
 	MSG_PACKAGE_RATED				= 'rpkg',
 	MSG_STABILITY_SELECTED			= 'stbl',
-	MSG_LANGUAGE_SELECTED			= 'lngs',
 	MSG_RATING_ACTIVE_CHANGED		= 'rtac',
 	MSG_RATING_DETERMINATE_CHANGED	= 'rdch'
 };
@@ -180,19 +180,6 @@ add_stabilities_to_menu(const StabilityRatingList& stabilities, BMenu* menu)
 }
 
 
-static void
-add_languages_to_menu(const StringList& languages, BMenu* menu)
-{
-	for (int i = 0; i < languages.CountItems(); i++) {
-		const BString& language = languages.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_LANGUAGE_SELECTED);
-		message->AddString("code", language);
-		BMenuItem* item = new BMenuItem(language, message);
-		menu->AddItem(item);
-	}
-}
-
-
 RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	Model& model)
 	:
@@ -204,7 +191,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fTextEditor(new TextEditor(), true),
 	fRating(RATING_NONE),
 	fRatingDeterminate(false),
-	fCommentLanguage(fModel.PreferredLanguage()),
+	fCommentLanguageCode(fModel.Language().PreferredLanguage().Code()),
 	fWorkerThread(-1)
 {
 	AddToSubset(parent);
@@ -260,13 +247,12 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fCommentLanguageField = new BMenuField("language",
 		B_TRANSLATE("Comment language:"), languagesMenu);
 
-	add_languages_to_menu(fModel.SupportedLanguages(), languagesMenu);
+	LanguageMenuUtils::AddLanguagesToMenu(
+		fModel.Language().SupportedLanguages(),
+		languagesMenu);
 	languagesMenu->SetTargetForItems(this);
-
-	BMenuItem* defaultItem = languagesMenu->ItemAt(
-		fModel.SupportedLanguages().IndexOf(fCommentLanguage));
-	if (defaultItem != NULL)
-		defaultItem->SetMarked(true);
+	LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode,
+		languagesMenu);
 
 	fRatingActiveCheckBox = new BCheckBox("rating active",
 		B_TRANSLATE("Other users can see this rating"),
@@ -348,7 +334,7 @@ RatePackageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
-			message->FindString("code", &fCommentLanguage);
+			message->FindString("code", &fCommentLanguageCode);
 			break;
 
 		case MSG_RATING_DETERMINATE_CHANGED:
@@ -514,11 +500,9 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 				item->SetMarked(true);
 		}
 		if (response.FindString("naturalLanguageCode",
-			&fCommentLanguage) == B_OK) {
-			BMenuItem* item = fCommentLanguageField->Menu()->ItemAt(
-				fModel.SupportedLanguages().IndexOf(fCommentLanguage));
-			if (item != NULL)
-				item->SetMarked(true);
+			&fCommentLanguageCode) == B_OK) {
+			LanguageMenuUtils::MarkLanguageInMenu(
+				fCommentLanguageCode, fCommentLanguageField->Menu());
 		}
 		double rating;
 		if (response.FindDouble("rating", &rating) == B_OK) {
@@ -649,7 +633,7 @@ RatePackageWindow::_SendRatingThread()
 	int rating = (int)fRating;
 	BString stability = fStability;
 	BString comment = fRatingText->Text();
-	BString languageCode = fCommentLanguage;
+	BString languageCode = fCommentLanguageCode;
 	BString ratingID = fRatingID;
 	bool active = fRatingActive;
 

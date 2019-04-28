@@ -9,9 +9,9 @@
 #include <string.h>
 
 #include <Application.h>
-#include <Messenger.h>
 
 #include "HaikuDepotConstants.h"
+
 
 /*! This method can be called to pop up an error in the user interface;
     typically in a background thread.

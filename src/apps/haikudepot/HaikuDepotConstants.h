@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -18,7 +18,8 @@ enum {
 	MSG_SERVER_DATA_CHANGED		= 'svdc',
 	MSG_ALERT_SIMPLE_ERROR		= 'nser',
 	MSG_DID_ADD_USER_RATING		= 'adur',
-	MSG_DID_UPDATE_USER_RATING	= 'upur'
+	MSG_DID_UPDATE_USER_RATING	= 'upur',
+	MSG_LANGUAGE_SELECTED		= 'lngs'
 };
 
 
@@ -53,5 +54,10 @@ enum {
 	RSRC_ARROW_LEFT		= 540,
 	RSRC_ARROW_RIGHT	= 550,
 };
+
+
+#define LANGUAGE_DEFAULT_CODE "en"
+#define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_CODE, "English", true)
+
 
 #endif // HAIKU_DEPOT_CONSTANTS_H

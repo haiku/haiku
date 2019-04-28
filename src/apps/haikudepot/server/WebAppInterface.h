@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -50,9 +50,6 @@ public:
 									const BString& password);
 			const BString&		Username() const
 									{ return fUsername; }
-
-			void				SetPreferredLanguage(const BString& language);
-			void				SetArchitecture(const BString& architecture);
 
 			status_t			GetChangelog(
 									const BString& packageName,
@@ -130,7 +127,6 @@ private:
 private:
 			BString				fUsername;
 			BString				fPassword;
-			BString				fLanguage;
 	static	int					fRequestIndex;
 };
 

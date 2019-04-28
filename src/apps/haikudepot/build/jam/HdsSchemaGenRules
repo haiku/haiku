@@ -72,6 +72,29 @@ actions HdsSchemaGenBulkParser1
 	touch $(1)
 }
 
+# pragma mark - Non-Bulk Parsing Class Generation
+
+# 1 : the dummy file in the class generation directory (target)
+# 2 : the JSON schema file
+# 3 : the Python script to use
+
+rule HdsSchemaGenParser
+{
+	SEARCH on $(2) = [ FDirName $(SUBDIR) server schema ] ;
+	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
+
+	Clean $(1:D) ;
+	Depends $(1) : $(2) $(3) ;
+	HdsSchemaGenParser1 $(1) : $(2) $(3) $(1:D) ;
+}
+
+actions HdsSchemaGenParser1
+{
+	mkdir -p $(2[3])
+	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
+	touch $(1)
+}
+
 # pragma mark - Registering Generated Classes
 
 # Because a number of .cpp and .h files will be generated from a single python

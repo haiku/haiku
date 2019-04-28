@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -177,7 +177,10 @@ ServerRepositoryDataUpdateProcess::Description() const
 BString
 ServerRepositoryDataUpdateProcess::UrlPathComponent()
 {
-	return BString("/__repository/all-en.json.gz");
+	BString result;
+	result.SetToFormat("/__repository/all-%s.json.gz",
+		fModel->Language().PreferredLanguage().Code());
+	return result;
 }
 
 

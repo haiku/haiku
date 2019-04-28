@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,7 @@
 #include "ServerHelper.h"
 #include "ServerIconExportUpdateProcess.h"
 #include "ServerPkgDataUpdateProcess.h"
+#include "ServerReferenceDataUpdateProcess.h"
 #include "ServerRepositoryDataUpdateProcess.h"
 #include "ServerSettings.h"
 
@@ -62,6 +63,11 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 	serverRepositoryDataUpdate->AddPredecessor(localPkgDataLoad);
 	processCoordinator->AddNode(serverRepositoryDataUpdate);
 
+	ProcessNode *serverReferenceDataUpdate =
+		new ProcessNode(new ServerReferenceDataUpdateProcess(model,
+			serverProcessOptions));
+	processCoordinator->AddNode(serverReferenceDataUpdate);
+
 	// create a process for each of the repositories that are configured on the
 	// local system.  Later, only those that have a web-app repository server
 	// code will be actually processed, but this means that the creation of the
@@ -74,9 +80,11 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 	if (repoNamesResult == B_OK) {
 		for (int32 i = 0; i < repoNames.CountStrings(); i++) {
 			ProcessNode* processNode = new ProcessNode(
-				new ServerPkgDataUpdateProcess(model->PreferredLanguage(),
+				new ServerPkgDataUpdateProcess(
+					model->Language().PreferredLanguage().Code(),
 					repoNames.StringAt(i), model, serverProcessOptions));
 			processNode->AddPredecessor(serverRepositoryDataUpdate);
+			processNode->AddPredecessor(serverReferenceDataUpdate);
 			processCoordinator->AddNode(processNode);
 		}
 	} else {

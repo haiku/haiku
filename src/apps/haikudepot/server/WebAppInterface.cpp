@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -271,8 +271,6 @@ enum {
 
 
 WebAppInterface::WebAppInterface()
-	:
-	fLanguage("en")
 {
 }
 
@@ -280,8 +278,7 @@ WebAppInterface::WebAppInterface()
 WebAppInterface::WebAppInterface(const WebAppInterface& other)
 	:
 	fUsername(other.fUsername),
-	fPassword(other.fPassword),
-	fLanguage(other.fLanguage)
+	fPassword(other.fPassword)
 {
 }
 
@@ -296,11 +293,8 @@ WebAppInterface::operator=(const WebAppInterface& other)
 {
 	if (this == &other)
 		return *this;
-
 	fUsername = other.fUsername;
 	fPassword = other.fPassword;
-	fLanguage = other.fLanguage;
-
 	return *this;
 }
 
@@ -311,13 +305,6 @@ WebAppInterface::SetAuthorization(const BString& username,
 {
 	fUsername = username;
 	fPassword = password;
-}
-
-
-void
-WebAppInterface::SetPreferredLanguage(const BString& language)
-{
-	fLanguage = language;
 }
 
 

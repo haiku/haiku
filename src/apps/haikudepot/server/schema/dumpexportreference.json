@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "http://depot.haiku-os.org/schema/reference/dumpreference.json",
+  "title": "Reference",
+  "javaType": "org.haiku.haikudepotserver.reference.model.dumpexport.DumpExportReference",
+  "type": "object",
+  "properties": {
+	"naturalLanguages": {
+	  "type": "array",
+	  "items": {
+		"type": "object",
+		"javaType": "org.haiku.haikudepotserver.reference.model.dumpexport.DumpExportReferenceNaturalLanguage",
+		"properties": {
+		  "code": {
+			"type": "string"
+		  },
+		  "name": {
+			"type": "string"
+		  },
+		  "isPopular": {
+			"type": "boolean"
+		  }
+		}
+	  }
+	},
+	"pkgCategories": {
+	  "type": "array",
+	  "items": {
+		"type": "object",
+		"javaType": "org.haiku.haikudepotserver.reference.model.dumpexport.DumpExportReferencePkgCategory",
+		"properties": {
+		  "code": {
+			"type": "string"
+		  },
+		  "name": {
+			"type": "string"
+		  }
+		}
+	  }
+	},
+	"userRatingStabilities": {
+	  "type": "array",
+	  "items": {
+		"type": "object",
+		"javaType": "org.haiku.haikudepotserver.reference.model.dumpexport.DumpExportReferenceUserRatingStability",
+		"properties": {
+		  "code": {
+			"type": "string"
+		  },
+		  "name": {
+			"type": "string"
+		  }
+		}
+	  }
+	},
+	"countries": {
+	  "type": "array",
+	  "items": {
+		"type": "object",
+		"javaType": "org.haiku.haikudepotserver.reference.model.dumpexport.DumpExportReferenceCountry",
+		"properties": {
+		  "code": {
+			"type": "string"
+		  },
+		  "name": {
+			"type": "string"
+		  }
+		}
+	  }
+	}
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -1050,8 +1050,6 @@ public:
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
-
-		_InitPreferredLanguages();
 	}
 
 	virtual ~UserRatingsView()
@@ -1114,32 +1112,8 @@ public:
 	}
 
 private:
-	void _InitPreferredLanguages()
-	{
-		fPreferredLanguages.Clear();
-
-		BLocaleRoster* localeRoster = BLocaleRoster::Default();
-		if (localeRoster == NULL)
-			return;
-
-		BMessage preferredLanguages;
-		if (localeRoster->GetPreferredLanguages(&preferredLanguages) != B_OK)
-			return;
-
-		BString language;
-		int32 index = 0;
-		while (preferredLanguages.FindString("language", index++,
-				&language) == B_OK) {
-			BString languageCode;
-			language.CopyInto(languageCode, 0, 2);
-				fPreferredLanguages.Add(languageCode);
-		}
-	}
-
-private:
 	BGroupLayout*			fRatingContainerLayout;
 	RatingSummaryView*		fRatingSummaryView;
-	StringList				fPreferredLanguages;
 };
 
 

@@ -16,12 +16,19 @@ local dumpExportRepositoryBulkListerTargetDirectory =
 local dumpExportPkgBulkListenerTargetDirectory =
 	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportpkgbulklistener ] ;
+local dumpExportReferenceListenerTargetDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
+		dumpexportreferencelistener ] ;
+
 local dumpExportPkgModelTargetDirectory =
 	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportpkgmodel ] ;
 local dumpExportRepositoryModelTargetDirectory =
 	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
 		dumpexportrepositorymodel ] ;
+local dumpExportReferenceModelTargetDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY)
+		dumpexportreferencemodel ] ;
 
 # During the build process, some sources are generated into a directory.  In
 # order to maintain a timestamp on that generation process, a dummy file is
@@ -34,10 +41,15 @@ local dumpExportRepositoryBulkListerTargetFile =
 	[ FDirName $(dumpExportRepositoryBulkListerTargetDirectory) $(dummyFile) ] ;
 local dumpExportPkgBulkListenerTargetFile =
 	[ FDirName $(dumpExportPkgBulkListenerTargetDirectory) $(dummyFile) ] ;
+local dumpExportReferenceListenerTargetFile =
+	[ FDirName $(dumpExportReferenceListenerTargetDirectory) $(dummyFile) ] ;
+
 local dumpExportPkgModelTargetFile =
 	[ FDirName $(dumpExportPkgModelTargetDirectory) $(dummyFile) ] ;
 local dumpExportRepositoryModelTargetFile =
 	[ FDirName $(dumpExportRepositoryModelTargetDirectory) $(dummyFile) ] ;
+local dumpExportReferenceModelTargetFile =
+	[ FDirName $(dumpExportReferenceModelTargetDirectory) $(dummyFile) ] ;
 
 # source directories
 local sourceDirs =
@@ -57,10 +69,14 @@ for sourceDir in $(sourceDirs) {
 }
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
+
 SEARCH_SOURCE += $(dumpExportRepositoryBulkListerTargetDirectory) ;
 SEARCH_SOURCE += $(dumpExportPkgBulkListenerTargetDirectory) ;
+SEARCH_SOURCE += $(dumpExportReferenceListenerTargetDirectory) ;
+
 SEARCH_SOURCE += $(dumpExportPkgModelTargetDirectory) ;
 SEARCH_SOURCE += $(dumpExportRepositoryModelTargetDirectory) ;
+SEARCH_SOURCE += $(dumpExportReferenceModelTargetDirectory) ;
 
 local textDocumentSources =
 	# edits_generic
@@ -101,6 +117,7 @@ local applicationSources =
 	FilterView.cpp
 	LocalIconStore.cpp
 	JobStateListener.cpp
+	LanguageModel.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp
 	Logger.cpp
@@ -138,6 +155,7 @@ local applicationSources =
 	ServerHelper.cpp
 	ServerSettings.cpp
 	ServerPkgDataUpdateProcess.cpp
+	ServerReferenceDataUpdateProcess.cpp
 	ServerRepositoryDataUpdateProcess.cpp
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
@@ -151,6 +169,7 @@ local applicationSources =
 	# util
 	AppUtils.cpp
 	DataIOUtils.cpp
+	LanguageMenuUtils.cpp
 	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
 	ToFileUrlProtocolListener.cpp
@@ -173,6 +192,14 @@ local generatedRepositoryModelSourceFiles =
 	DumpExportRepositorySourceMirror.cpp
 ;
 
+local generatedReferenceModelSourceFiles =
+	DumpExportReference.cpp
+	DumpExportReferenceNaturalLanguage.cpp
+	DumpExportReferencePkgCategory.cpp
+	DumpExportReferenceUserRatingStability.cpp
+	DumpExportReferenceCountry.cpp
+;
+
 local generatedPkgParserSourceFiles =
 	DumpExportPkgJsonListener.cpp
 ;
@@ -181,10 +208,19 @@ local generatedRepositoryParserSourceFiles =
 	DumpExportRepositoryJsonListener.cpp
 ;
 
+local generatedReferenceParserSourceFiles =
+	DumpExportReferenceJsonListener.cpp
+;
+
 Application HaikuDepot
-	: $(applicationSources) $(textDocumentSources)
-		$(generatedPkgModelSourceFiles) $(generatedRepositoryModelSourceFiles)
-		$(generatedPkgParserSourceFiles) $(generatedRepositoryParserSourceFiles)
+	: $(applicationSources)
+		$(textDocumentSources)
+		$(generatedPkgModelSourceFiles)
+		$(generatedRepositoryModelSourceFiles)
+		$(generatedReferenceModelSourceFiles)
+		$(generatedPkgParserSourceFiles)
+		$(generatedRepositoryParserSourceFiles)
+		$(generatedReferenceParserSourceFiles)
 	: be package bnetapi translation libcolumnlistview.a shared
 		[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	: HaikuDepot.rdef
@@ -225,11 +261,17 @@ HdsSchemaGenModel $(dumpExportPkgModelTargetFile)
 HdsSchemaGenModel $(dumpExportRepositoryModelTargetFile)
 	: dumpexportrepository.json : jsonschema2cppmodel.py ;
 
+HdsSchemaGenModel $(dumpExportReferenceModelTargetFile)
+	: dumpexportreference.json : jsonschema2cppmodel.py ;
+
 HdsSchemaGenBulkParser $(dumpExportRepositoryBulkListerTargetFile)
 	: dumpexportrepository.json : jsonschema2cppparser.py ;
 
 HdsSchemaGenBulkParser $(dumpExportPkgBulkListenerTargetFile)
 	: dumpexportpkg.json : jsonschema2cppparser.py ;
+
+HdsSchemaGenParser $(dumpExportReferenceListenerTargetFile)
+	: dumpexportreference.json : jsonschema2cppparser.py ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedPkgParserSourceFiles) ]
@@ -242,6 +284,11 @@ HdsSchemaGenAppSrcDependsOnGeneration
 	: $(dumpExportRepositoryBulkListerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
+	[ FGristFiles $(generatedReferenceParserSourceFiles) ]
+	[ FGristFiles $(generatedReferenceParserSourceFiles:S=.h) ]
+	: $(dumpExportReferenceListenerTargetFile) ;
+
+HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedRepositoryModelSourceFiles) ]
 	[ FGristFiles $(generatedRepositoryModelSourceFiles:S=.h) ]
 	: $(dumpExportRepositoryModelTargetFile) ;
@@ -251,13 +298,20 @@ HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedPkgModelSourceFiles:S=.h) ]
 	: $(dumpExportPkgModelTargetFile) ;
 
+HdsSchemaGenAppSrcDependsOnGeneration
+	[ FGristFiles $(generatedReferenceModelSourceFiles) ]
+	[ FGristFiles $(generatedReferenceModelSourceFiles:S=.h) ]
+	: $(dumpExportReferenceModelTargetFile) ;
+
 # This will ensure that if any of the generated files' header files change, then
 # the application should be re-built.
 
 Depends [ FGristFiles $(applicationSources:S=.o) ]
 	:
 	[ FGristFiles $(generatedPkgParserSourceFiles:S=.h) ]
+	[ FGristFiles $(generatedPkgModelSourceFiles:S=.h) ]
 	[ FGristFiles $(generatedRepositoryParserSourceFiles:S=.h) ]
 	[ FGristFiles $(generatedRepositoryModelSourceFiles:S=.h) ]
-	[ FGristFiles $(generatedPkgModelSourceFiles:S=.h) ]
+	[ FGristFiles $(generatedReferenceParserSourceFiles:S=.h) ]
+	[ FGristFiles $(generatedReferenceModelSourceFiles:S=.h) ]
 ;

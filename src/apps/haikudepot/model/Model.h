@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -10,6 +10,7 @@
 #include <Locker.h>
 
 #include "AbstractProcess.h"
+#include "LanguageModel.h"
 #include "LocalIconStore.h"
 #include "PackageInfo.h"
 #include "WebAppInterface.h"
@@ -62,6 +63,8 @@ class Model {
 public:
 								Model();
 	virtual						~Model();
+
+			LanguageModel&		Language();
 
 			BLocker*			Lock()
 									{ return &fLock; }
@@ -150,12 +153,6 @@ public:
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);
 
-			const StringList&	SupportedLanguages() const
-									{ return fSupportedLanguages; }
-
-			const BString&		PreferredLanguage() const
-									{ return fPreferredLanguage; }
-
 			void				SetUsername(BString username);
 			const BString&		Username() const;
 			void				SetAuthorization(const BString& username,
@@ -171,6 +168,7 @@ public:
 									void* context);
 
 			status_t			IconStoragePath(BPath& path) const;
+			status_t			DumpExportReferenceDataPath(BPath& path) const;
 			status_t			DumpExportRepositoryDataPath(BPath& path) const;
 			status_t			DumpExportPkgDataPath(BPath& path,
 									const BString& repositorySourceCode) const;
@@ -178,6 +176,9 @@ public:
 			void				LogDepotsWithNoWebAppRepositoryCode() const;
 
 private:
+			status_t			_LocalDataPath(const BString leaf,
+									BPath& path) const;
+
 			void				_MaybeLogJsonRpcError(
 									const BMessage &responsePayload,
 									const char *sourceDescription) const;
@@ -245,9 +246,7 @@ private:
 			bool				fShowSourcePackages;
 			bool				fShowDevelopPackages;
 
-			StringList			fSupportedLanguages;
-			BString				fPreferredLanguage;
-
+			LanguageModel		fLanguageModel;
 			WebAppInterface		fWebAppInterface;
 
 			ModelListenerList	fListeners;

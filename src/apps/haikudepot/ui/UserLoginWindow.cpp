@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +22,8 @@
 #include <UnicodeChar.h>
 
 #include "BitmapView.h"
+#include "HaikuDepotConstants.h"
+#include "LanguageMenuUtils.h"
 #include "Model.h"
 #include "TabView.h"
 #include "WebAppInterface.h"
@@ -34,22 +37,8 @@ enum {
 	MSG_SEND					= 'send',
 	MSG_TAB_SELECTED			= 'tbsl',
 	MSG_CAPTCHA_OBTAINED		= 'cpob',
-	MSG_VALIDATE_FIELDS			= 'vldt',
-	MSG_LANGUAGE_SELECTED		= 'lngs',
+	MSG_VALIDATE_FIELDS			= 'vldt'
 };
-
-
-static void
-add_languages_to_menu(const StringList& languages, BMenu* menu)
-{
-	for (int i = 0; i < languages.CountItems(); i++) {
-		const BString& language = languages.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_LANGUAGE_SELECTED);
-		message->AddString("code", language);
-		BMenuItem* item = new BMenuItem(language, message);
-		menu->AddItem(item);
-	}
-}
 
 
 UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
@@ -58,7 +47,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
-	fPreferredLanguage(model.PreferredLanguage()),
+	fPreferredLanguageCode(model.Language().PreferredLanguage().Code()),
 	fModel(model),
 	fMode(NONE),
 	fWorkerThread(-1)
@@ -83,14 +72,15 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	fLanguageCodeField = new BMenuField("language",
 		B_TRANSLATE("Preferred language:"), languagesMenu);
 
-	add_languages_to_menu(fModel.SupportedLanguages(), languagesMenu);
+	LanguageMenuUtils::AddLanguagesToMenu(
+		fModel.Language().SupportedLanguages(),
+		languagesMenu);
 	languagesMenu->SetTargetForItems(this);
 
-	BMenuItem* defaultItem = languagesMenu->ItemAt(
-		fModel.SupportedLanguages().IndexOf(fPreferredLanguage));
-	if (defaultItem != NULL)
-		defaultItem->SetMarked(true);
-
+	printf("using preferred language code [%s]\n",
+		fPreferredLanguageCode.String());
+	LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageCode,
+		languagesMenu);
 
 	fEmailField = new BTextControl(B_TRANSLATE("Email address:"), "", NULL);
 	fCaptchaView = new BitmapView("captcha view");
@@ -218,7 +208,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
-			message->FindString("code", &fPreferredLanguage);
+			message->FindString("code", &fPreferredLanguageCode);
 			break;
 
 		default:
@@ -623,7 +613,7 @@ UserLoginWindow::_CreateAccountThread()
 	BString email(fEmailField->Text());
 	BString captchaToken(fCaptchaToken);
 	BString captchaResponse(fCaptchaResultField->Text());
-	BString languageCode(fPreferredLanguage);
+	BString languageCode(fPreferredLanguageCode);
 
 	Unlock();
 

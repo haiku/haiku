@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -353,7 +353,6 @@ Model::Model()
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
 	fIsFeaturedFilter(),
-
 	fShowFeaturedPackages(true),
 	fShowAvailablePackages(true),
 	fShowInstalledPackages(true),
@@ -378,43 +377,18 @@ Model::Model()
 	// get the defined categories and their translated names.
 	// This should then be used instead of hard-coded
 	// categories and translations in the app.
-
-	fPreferredLanguage = "en";
-	BLocaleRoster* localeRoster = BLocaleRoster::Default();
-	if (localeRoster != NULL) {
-		BMessage preferredLanguages;
-		if (localeRoster->GetPreferredLanguages(&preferredLanguages) == B_OK) {
-			BString language;
-			if (preferredLanguages.FindString("language", 0, &language) == B_OK)
-				language.CopyInto(fPreferredLanguage, 0, 2);
-		}
-	}
-
-	// TODO: Fetch this from the web-app.
-	fSupportedLanguages.Add("en");
-	fSupportedLanguages.Add("es");
-	fSupportedLanguages.Add("de");
-	fSupportedLanguages.Add("fr");
-	fSupportedLanguages.Add("it");
-	fSupportedLanguages.Add("ja");
-	fSupportedLanguages.Add("pt");
-	fSupportedLanguages.Add("ru");
-	fSupportedLanguages.Add("sk");
-	fSupportedLanguages.Add("zh");
-
-	if (!fSupportedLanguages.Contains(fPreferredLanguage)) {
-		// Force the preferred language to one of the currently supported
-		// ones, until the web application supports all ISO language codes.
-		printf("User preferred language '%s' not currently supported, "
-			"defaulting to 'en'.\n", fPreferredLanguage.String());
-		fPreferredLanguage = "en";
-	}
-	fWebAppInterface.SetPreferredLanguage(fPreferredLanguage);
 }
 
 
 Model::~Model()
 {
+}
+
+
+LanguageModel&
+Model::Language()
+{
+	return fLanguageModel;
 }
 
 
@@ -903,6 +877,30 @@ Model::SetAuthorization(const BString& username, const BString& password,
 }
 
 
+status_t
+Model::_LocalDataPath(const BString leaf, BPath& path) const
+{
+	BString leafAssembled(leaf);
+	leafAssembled.ReplaceAll("%languageCode%",
+		LanguageModel().PreferredLanguage().Code());
+
+	BPath repoDataPath;
+
+	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
+		&& repoDataPath.Append("HaikuDepot") == B_OK
+		&& create_directory(repoDataPath.Path(), 0777) == B_OK
+		&& repoDataPath.Append(leafAssembled) == B_OK) {
+		path.SetTo(repoDataPath.Path());
+		return B_OK;
+	}
+
+	path.Unset();
+	fprintf(stdout, "unable to find the user cache file for [%s] data",
+		leaf.String());
+	return B_ERROR;
+}
+
+
 /*! When bulk repository data comes down from the server, it will
     arrive as a json.gz payload.  This is stored locally as a cache
     and this method will provide the on-disk storage location for
@@ -912,20 +910,19 @@ Model::SetAuthorization(const BString& username, const BString& password,
 status_t
 Model::DumpExportRepositoryDataPath(BPath& path) const
 {
-	BPath repoDataPath;
+	return _LocalDataPath("repository-all_%languageCode%.json.gz", path);
+}
 
-	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
-		&& repoDataPath.Append("HaikuDepot") == B_OK
-		&& create_directory(repoDataPath.Path(), 0777) == B_OK
-		&& repoDataPath.Append("repository-all_en.json.gz") == B_OK) {
-		path.SetTo(repoDataPath.Path());
-		return B_OK;
-	}
 
-	path.Unset();
-	fprintf(stdout, "unable to find the user cache file for repositories'"
-		" data");
-	return B_ERROR;
+/*! When the system downloads reference data (eg; categories) from the server
+    then the downloaded data is stored and cached at the path defined by this
+    method.
+*/
+
+status_t
+Model::DumpExportReferenceDataPath(BPath& path) const
+{
+	return _LocalDataPath("reference-all_%languageCode%.json.gz", path);
 }
 
 
@@ -956,7 +953,7 @@ Model::DumpExportPkgDataPath(BPath& path,
 	BString leafName;
 
 	leafName.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
-		fPreferredLanguage.String());
+		LanguageModel().PreferredLanguage().Code());
 
 	if (find_directory(B_USER_CACHE_DIRECTORY, &repoDataPath) == B_OK
 		&& repoDataPath.Append("HaikuDepot") == B_OK

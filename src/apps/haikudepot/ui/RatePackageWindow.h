@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2019, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef RATE_PACKAGE_WINDOW_H
@@ -56,7 +56,7 @@ private:
 			bool				fRatingDeterminate;
 			BString				fStability;
 			StabilityRatingList	fStabilityCodes;
-			BString				fCommentLanguage;
+			BString				fCommentLanguageCode;
 			BString				fRatingID;
 			bool				fRatingActive;
 			PackageInfoRef		fPackage;
