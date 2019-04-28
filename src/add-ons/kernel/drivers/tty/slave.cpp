@@ -45,7 +45,8 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 			return B_ERROR;
 	}
 
-	TRACE(("slave_open: TTY index = %ld (name = %s)\n", index, name));
+	TRACE(("slave_open: TTY index = %" B_PRId32 " (name = %s)\n", index,
+		name));
 
 	MutexLocker globalLocker(gGlobalTTYLock);
 
@@ -161,7 +162,8 @@ slave_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
-	TRACE(("slave_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
+	TRACE(("slave_ioctl: cookie %p, op %" B_PRIu32 ", buffer %p, length %lu\n",
+		_cookie, op, buffer, length));
 
 	return tty_ioctl(cookie, op, buffer, length);
 }
@@ -172,12 +174,12 @@ slave_read(void *_cookie, off_t offset, void *buffer, size_t *_length)
 {
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
-	TRACE(("slave_read: cookie %p, offset %Ld, buffer %p, length %lu\n",
-		_cookie, offset, buffer, *_length));
+	TRACE(("slave_read: cookie %p, offset %" B_PRIdOFF ", buffer %p, length "
+		"%lu\n", _cookie, offset, buffer, *_length));
 
 	status_t result = tty_input_read(cookie, buffer, _length);
 
-	TRACE(("slave_read done: cookie %p, result %lx, length %lu\n",
+	TRACE(("slave_read done: cookie %p, result %" B_PRIx32 ", length %lu\n",
 		_cookie, result, *_length));
 
 	return result;
@@ -189,12 +191,12 @@ slave_write(void *_cookie, off_t offset, const void *buffer, size_t *_length)
 {
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
-	TRACE(("slave_write: cookie %p, offset %Ld, buffer %p, length %lu\n",
-		_cookie, offset, buffer, *_length));
+	TRACE(("slave_write: cookie %p, offset %" B_PRIdOFF", buffer %p, length "
+		"%lu\n", _cookie, offset, buffer, *_length));
 
 	status_t result = tty_write_to_tty_slave(cookie, buffer, _length);
 
-	TRACE(("slave_write done: cookie %p, result %lx, length %lu\n",
+	TRACE(("slave_write done: cookie %p, result %" B_PRIx32 ", length %lu\n",
 		_cookie, result, *_length));
 
 	return result;

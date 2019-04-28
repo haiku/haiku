@@ -181,7 +181,7 @@ public:
 
 		if (semaphore >= 0) {
 			TRACE(("TTYReference: cookie %p closed, last operation done, "
-				"releasing blocking sem %ld\n", cookie, semaphore));
+				"releasing blocking sem %" B_PRId32 "\n", cookie, semaphore));
 
 			release_sem(semaphore);
 		}
@@ -430,8 +430,8 @@ RequestOwner::Wait(bool interruptable, bigtime_t timeout)
 			(interruptable ? B_CAN_INTERRUPT : 0) | B_RELATIVE_TIMEOUT,
 			timeout);
 
-		TRACE(("%p->RequestOwner::Wait(): condition occurred: %lx\n", this,
-			error));
+		TRACE(("%p->RequestOwner::Wait(): condition occurred: %" B_PRIx32 "\n",
+			this, error));
 
 		// remove the condition variable
 		locker.Lock();
@@ -485,7 +485,8 @@ RequestOwner::Notify(Request* request)
 void
 RequestOwner::NotifyError(Request* request, status_t error)
 {
-	TRACE(("%p->RequestOwner::NotifyError(%p, %lx)\n", this, request, error));
+	TRACE(("%p->RequestOwner::NotifyError(%p, %" B_PRIx32 ")\n", this, request,
+		error));
 
 	if (fError == B_OK) {
 		fError = error;
@@ -1033,7 +1034,7 @@ tty_close_cookie(struct tty_cookie* cookie)
 	// critical code
 	if (unblock) {
 		TRACE(("tty_close_cookie(): cookie %p, there're still pending "
-			"operations, acquire blocking sem %ld\n", cookie,
+			"operations, acquire blocking sem %" B_PRId32 "\n", cookie,
 			cookie->blocking_semaphore));
 
 		acquire_sem(cookie->blocking_semaphore);
@@ -1599,7 +1600,8 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 	if (!ttyReference.IsLocked())
 		return B_FILE_ERROR;
 
-	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", tty, op, buffer, length));
+	TRACE(("tty_ioctl: tty %p, op %" B_PRIu32 ", buffer %p, length %"
+		B_PRIuSIZE "\n", tty, op, buffer, length));
 	MutexLocker locker(tty->lock);
 
 	// values marked BeOS are non-standard codes we support for legacy apps
@@ -1623,9 +1625,10 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		case TCSETA:
 		case TCSETAW:
 		case TCSETAF:
-			TRACE(("tty: set attributes (iflag = %lx, oflag = %lx, "
-				"cflag = %lx, lflag = %lx)\n", tty->settings->termios.c_iflag,
-				tty->settings->termios.c_oflag, tty->settings->termios.c_cflag,
+			TRACE(("tty: set attributes (iflag = %" B_PRIx32 ", oflag = %"
+				B_PRIx32 ", cflag = %" B_PRIx32 ", lflag = %" B_PRIx32 ")\n",
+				tty->settings->termios.c_iflag, tty->settings->termios.c_oflag,
+				tty->settings->termios.c_cflag,
 				tty->settings->termios.c_lflag));
 
 			return user_memcpy(&tty->settings->termios, buffer,
@@ -1804,7 +1807,7 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			break;
 	}
 
-	TRACE(("tty: unsupported opcode %lu\n", op));
+	TRACE(("tty: unsupported opcode %" B_PRIu32 "\n", op));
 	return B_BAD_VALUE;
 }
 
@@ -1822,7 +1825,8 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	bigtime_t interCharTimeout = 0;
 	size_t bytesNeeded = 1;
 
-	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
+	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %" B_PRIu32 ")\n",
+		tty, length, mode));
 
 	if (length == 0)
 		return B_OK;
@@ -1841,8 +1845,8 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 			// Non-blocking mode. Handle VMIN and VTIME.
 			bytesNeeded = tty->settings->termios.c_cc[VMIN];
 			bigtime_t vtime = tty->settings->termios.c_cc[VTIME] * 100000;
-			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", bytesNeeded,
-				vtime));
+			TRACE(("tty_input_read: icanon vmin %lu, vtime %" B_PRIdBIGTIME
+				"us\n", bytesNeeded, vtime));
 
 			if (bytesNeeded == 0) {
 				// In this case VTIME specifies a relative total timeout. We
@@ -1865,8 +1869,8 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	*_length = 0;
 
 	do {
-		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout,
-			bytesNeeded));
+		TRACE(("tty_input_read: AcquireReader(%" B_PRIdBIGTIME "us, %ld)\n",
+			timeout, bytesNeeded));
 		status = locker.AcquireReader(timeout, bytesNeeded);
 		if (status != B_OK)
 			break;
@@ -1989,8 +1993,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 {
 	struct tty* tty = cookie->tty;
 
-	TRACE(("tty_select(cookie = %p, event = %u, ref = %lu, sync = %p)\n",
-		cookie, event, ref, sync));
+	TRACE(("tty_select(cookie = %p, event = %u, ref = %" B_PRIu32 ", sync = "
+		"%p)\n", cookie, event, ref, sync));
 
 	// we don't support all kinds of events
 	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
@@ -2017,8 +2021,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 	// add the event to the TTY's pool
 	status_t error = add_select_sync_pool_entry(&tty->select_pool, sync, event);
 	if (error != B_OK) {
-		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %lx\n",
-			error));
+		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %"
+			B_PRIx32 "\n", error));
 
 		return error;
 	}

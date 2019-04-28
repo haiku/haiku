@@ -67,7 +67,8 @@ master_open(const char *name, uint32 flags, void **_cookie)
 			return B_ERROR;
 	}
 
-	TRACE(("master_open: TTY index = %ld (name = %s)\n", index, name));
+	TRACE(("master_open: TTY index = %" B_PRId32 " (name = %s)\n", index,
+		name));
 
 	MutexLocker globalLocker(gGlobalTTYLock);
 
@@ -146,7 +147,8 @@ master_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	TRACE(("master_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
+	TRACE(("master_ioctl: cookie %p, op %" B_PRIu32 ", buffer %p, length %lu"
+		"\n", _cookie, op, buffer, length));
 
 	return tty_ioctl(cookie, op, buffer, length);
 }
@@ -157,13 +159,13 @@ master_read(void *_cookie, off_t offset, void *buffer, size_t *_length)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	TRACE(("master_read: cookie %p, offset %Ld, buffer %p, length %lu\n",
-		_cookie, offset, buffer, *_length));
+	TRACE(("master_read: cookie %p, offset %" B_PRIdOFF ", buffer %p, length "
+		"%lu\n", _cookie, offset, buffer, *_length));
 
 	status_t result = tty_input_read(cookie, buffer, _length);
 
-	TRACE(("master_read done: cookie %p, result: %lx, length %lu\n", _cookie,
-		result, *_length));
+	TRACE(("master_read done: cookie %p, result: %" B_PRIx32 ", length %lu\n",
+		_cookie, result, *_length));
 
 	return result;
 }
@@ -174,13 +176,13 @@ master_write(void *_cookie, off_t offset, const void *buffer, size_t *_length)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	TRACE(("master_write: cookie %p, offset %Ld, buffer %p, length %lu\n",
-		_cookie, offset, buffer, *_length));
+	TRACE(("master_write: cookie %p, offset %" B_PRIdOFF ", buffer %p, length "
+		"%lu\n", _cookie, offset, buffer, *_length));
 
 	status_t result = tty_write_to_tty_master(cookie, buffer, _length);
 
-	TRACE(("master_write done: cookie %p, result: %lx, length %lu\n", _cookie,
-		result, *_length));
+	TRACE(("master_write done: cookie %p, result: %" B_PRIx32 ", length %lu\n",
+		_cookie, result, *_length));
 
 	return result;
 }
