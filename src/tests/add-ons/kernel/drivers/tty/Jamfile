@@ -3,4 +3,5 @@ SubDir HAIKU_TOP src tests add-ons kernel drivers tty ;
 UsePrivateHeaders [ FDirName kernel ] ;
 
 SimpleTest tty-test : tty-test.cpp : libroot.so [ TargetLibstdc++ ] ;
+SimpleTest posix_openpt_test : posix_openpt_test.cpp : libroot.so ;
 
