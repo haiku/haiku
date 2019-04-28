@@ -84,6 +84,8 @@ master_open(const char *name, uint32 flags, void **_cookie)
 		return B_BUSY;
 	}
 
+	gMasterTTYs[index].opened_count = 0;
+	gSlaveTTYs[index].opened_count = 0;
 	status_t status = tty_open(&gMasterTTYs[index], &master_service);
 	if (status < B_OK) {
 		// initializing TTY failed

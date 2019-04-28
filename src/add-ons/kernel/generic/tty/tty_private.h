@@ -128,6 +128,7 @@ struct tty_settings {
 struct tty {
 	int32				ref_count;	// referenced by cookies
 	int32				open_count;
+	int32				opened_count;
 	struct mutex		lock;
 	tty_settings		settings;
 	select_sync_pool*	select_pool;

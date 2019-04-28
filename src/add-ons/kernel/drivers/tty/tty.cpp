@@ -617,12 +617,8 @@ WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 	if (status == B_OK)
 		status = _CheckBackgroundWrite();
 
-	if (status == B_OK) {
-		if (fTarget->open_count > 0)
-			fBytes = _CheckAvailableBytes();
-		else
-			status = B_FILE_ERROR;
-	}
+	if (status == B_OK)
+		fBytes = _CheckAvailableBytes();
 
 	return status;
 }
@@ -642,7 +638,6 @@ WriterLocker::_CheckBackgroundWrite() const
 			&& processGroup != fSource->settings->pgrp_id) {
 		if (team_get_controlling_tty() == fSource->index)
 			send_signal(-processGroup, SIGTTOU);
-		return EIO;
 	}
 
 	return B_OK;
@@ -701,6 +696,13 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t bytesNeeded)
 			return B_OK;
 	}
 
+	if (fCookie->other_tty->open_count == 0
+		&& fCookie->other_tty->opened_count > 0) {
+		TRACE(("ReaderLocker::AcquireReader() opened_count %" B_PRId32 "\n",
+			fCookie->other_tty->opened_count));
+		return B_FILE_ERROR;
+	}
+
 	// We are not the first in queue or currently there's nothing to read:
 	// bail out, if we shall not block.
 	if (timeout <= 0)
@@ -717,8 +719,10 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t bytesNeeded)
 	if (status == B_OK)
 		status = _CheckBackgroundRead();
 
-	if (status == B_OK)
-		fBytes = _CheckAvailableBytes();
+	fBytes = _CheckAvailableBytes();
+
+	TRACE(("ReaderLocker::AcquireReader() ended status 0x%" B_PRIx32 "\n",
+		status));
 
 	return status;
 }
@@ -751,7 +755,6 @@ ReaderLocker::_CheckBackgroundRead() const
 			&& processGroup != fTTY->settings->pgrp_id) {
 		if (team_get_controlling_tty() == fTTY->index)
 			send_signal(-processGroup, SIGTTIN);
-		return EIO;
 	}
 
 	return B_OK;
@@ -825,6 +828,7 @@ reset_tty(struct tty* tty, int32 index, mutex* lock, bool isMaster)
 {
 	tty->ref_count = 0;
 	tty->open_count = 0;
+	tty->opened_count = 0;
 	tty->index = index;
 	tty->lock = lock;
 	tty->settings = &gTTYSettings[index];
@@ -998,6 +1002,7 @@ add_tty_cookie(tty_cookie* cookie)
 	// add to the TTY's cookie list
 	cookie->tty->cookies.Add(cookie);
 	cookie->tty->open_count++;
+	cookie->tty->opened_count++;
 }
 
 
@@ -1872,10 +1877,12 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 		TRACE(("tty_input_read: AcquireReader(%" B_PRIdBIGTIME "us, %ld)\n",
 			timeout, bytesNeeded));
 		status = locker.AcquireReader(timeout, bytesNeeded);
-		if (status != B_OK)
-			break;
-
 		size_t toRead = locker.AvailableBytes();
+		if (status != B_OK && toRead == 0) {
+			TRACE(("tty_input_read() AcquireReader failed\n"));
+			break;
+		}
+
 		if (toRead > length)
 			toRead = length;
 
@@ -1913,6 +1920,8 @@ tty_input_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 		if (!dontBlock && !canon)
 			status = B_OK;
 	}
+
+	TRACE(("tty_input_read() status 0x%" B_PRIx32 "\n", status));
 
 	return *_length == 0 ? status : B_OK;
 }

@@ -131,6 +131,7 @@ struct tty_settings {
 struct tty {
 	int32				ref_count;	// referenced by cookies
 	int32				open_count;
+	int32				opened_count;
 	int32				index;
 	struct mutex*		lock;
 	tty_settings*		settings;
