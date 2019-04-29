@@ -83,12 +83,6 @@ struct PackageFile::DataAccessor {
 
 	status_t ReadData(off_t offset, void* buffer, size_t* bufferSize)
 	{
-		if (offset < 0 || (uint64)offset > fData->UncompressedSize())
-			return B_BAD_VALUE;
-
-		*bufferSize = std::min((uint64)*bufferSize,
-			fData->UncompressedSize() - offset);
-
 		return file_cache_read(fFileCache, NULL, offset, buffer, bufferSize);
 	}
 

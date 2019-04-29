@@ -528,16 +528,6 @@ fs_read(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
 	if ((node->flags & ISO_IS_DIR) != 0)
 		return EISDIR;
 
-	uint32 fileSize = node->dataLen[FS_DATA_FORMAT];
-
-	// set/check boundaries for pos/length
-	if (pos < 0)
-		return B_BAD_VALUE;
-	if (pos >= fileSize) {
-		*_length = 0;
-		return B_OK;
-	}
-
 	return file_cache_read(node->cache, NULL, pos, buffer, _length);
 }
 

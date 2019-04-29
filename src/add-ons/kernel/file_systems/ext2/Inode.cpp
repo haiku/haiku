@@ -206,22 +206,6 @@ Inode::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
-	size_t length = *_length;
-
-	// set/check boundaries for pos/length
-	if (pos < 0) {
-		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF
-			", length %" B_PRIuSIZE ")\n", ID(), pos, length);
-		return B_BAD_VALUE;
-	}
-
-	if (pos >= Size() || length == 0) {
-		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %" B_PRIdOFF ", length %"
-			B_PRIuSIZE ")\n", ID(), pos, length);
-		*_length = 0;
-		return B_NO_ERROR;
-	}
-
 	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
 }
 

@@ -370,20 +370,8 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	DPRINTF(0, ("dosfs_read called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
 		" (vnode id %" B_PRIdINO ")\n", *len, pos, node->vnid));
 
-	if (pos < 0) pos = 0;
-
-	if ((node->st_size == 0) || (*len == 0) || (pos >= node->st_size)) {
-		*len = 0;
-		goto bi;
-	}
-
-	// truncate bytes to read to file size
-	if (pos + *len >= node->st_size)
-		*len = node->st_size - pos;
-
 	result = file_cache_read(node->cache, cookie, pos, buf, len);
 
-bi:
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_read (%s)\n", strerror(result)));
 	} else {

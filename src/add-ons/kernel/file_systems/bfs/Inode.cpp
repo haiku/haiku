@@ -1556,21 +1556,6 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
-	size_t length = *_length;
-
-	// set/check boundaries for pos/length
-	if (pos < 0)
-		return B_BAD_VALUE;
-
-	InodeReadLocker locker(this);
-
-	if (pos >= Size() || length == 0) {
-		*_length = 0;
-		return B_NO_ERROR;
-	}
-
-	locker.Unlock();
-
 	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
 }
 

@@ -232,7 +232,7 @@ Icb::FindBlock(uint32 logicalBlock, off_t &block, bool &recorded)
 	long_address extent;
 	bool isEmpty = false;
 	recorded = false;
-		
+
 	switch (_IcbTag().descriptor_flags()) {
 		case ICB_DESCRIPTOR_TYPE_SHORT:
 		{
@@ -299,6 +299,11 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 	TRACE(("Icb::Read: pos = %" B_PRIdOFF ", buffer = %p, length = (%p)->%ld\n",
 		pos, buffer, length, (length ? *length : 0)));
 
+	DEBUG_INIT_ETC("Icb", ("pos: %lld, length: %ld", pos, *length));
+
+	if (fFileCache != NULL)
+		return file_cache_read(fFileCache, NULL, pos, buffer, length);
+
 	if (!buffer || !length || pos < 0)
 		return B_BAD_VALUE;
 
@@ -306,11 +311,6 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 		*length = 0;
 		return B_OK;
 	}
-
-	DEBUG_INIT_ETC("Icb", ("pos: %lld, length: %ld", pos, *length));
-
-	if (fFileCache != NULL)
-		return file_cache_read(fFileCache, NULL, pos, buffer, length);
 
 	switch (_IcbTag().descriptor_flags()) {
 		case ICB_DESCRIPTOR_TYPE_SHORT:
