@@ -707,29 +707,14 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 	VMCache* cache = ref->cache;
-	off_t fileSize = cache->virtual_end;
 	bool useBuffer = buffer != 0;
 
 	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
 		ref, offset, (void*)buffer, *_size, doWrite ? "write" : "read"));
 
-	// out of bounds access?
-	if (offset >= fileSize || offset < 0) {
-		*_size = 0;
-		return B_OK;
-	}
-
 	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
 	size_t size = *_size;
 	offset -= pageOffset;
-
-	if ((off_t)(offset + pageOffset + size) > fileSize) {
-		// adapt size to be within the file's offsets
-		size = fileSize - pageOffset - offset;
-		*_size = size;
-	}
-	if (size == 0)
-		return B_OK;
 
 	// "offset" and "lastOffset" are always aligned to B_PAGE_SIZE,
 	// the "last*" variables always point to the end of the last
@@ -1287,6 +1272,17 @@ file_cache_read(void* _cacheRef, void* cookie, off_t offset, void* buffer,
 	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
 		ref, offset, buffer, *_size));
 
+	// Bounds checking. We do this here so it applies to uncached I/O.
+	if (offset < 0)
+		return B_BAD_VALUE;
+	const off_t fileSize = ref->cache->virtual_end;
+	if (offset >= fileSize || *_size == 0) {
+		*_size = 0;
+		return B_OK;
+	}
+	if ((off_t)(offset + *_size) > fileSize)
+		*_size = fileSize - offset;
+
 	if (ref->disabled_count > 0) {
 		// Caching is disabled -- read directly from the file.
 		generic_io_vec vec;
@@ -1307,6 +1303,10 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 	const void* buffer, size_t* _size)
 {
 	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
+
+	// We don't do bounds checking here, as we are relying on the
+	// file system which called us to already have done that and made
+	// adjustments as necessary, unlike in read().
 
 	if (ref->disabled_count > 0) {
 		// Caching is disabled -- write directly to the file.
