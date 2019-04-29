@@ -3,488 +3,404 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Name, email@email.com
+ *      Nabanita Dash, dashnabanita@gmail.com
+ *
+ * Proofreaders:
+ *      Adrien Destugues, pulkomandy@gmail.com
  *
  * Corresponds to:
  *		headers/os/support/Url.h	 hrev52332
  *		src/kits/support/Url.cpp	 hrev52332
  */
 
-
 /*!
 	\file Url.h
 	\ingroup support
-	\brief Undocumented file.
-
+	\ingroup libbe
+	\brief Provides the BUrl class
 	\since Haiku R1
 */
-
 
 /*!
 	\class BUrl
 	\ingroup support
 	\ingroup libbe
-	\brief Undocumented class.
-
+	\brief Represents and manipulates an URL (Uniform Resource Locator).
 	\since Haiku R1
+
+	An "Uniform Resource Locator" identifies a place where a resource can
+	be found. It specifies both a location and a mechanism to retrieve the
+	data. For example, http://www.example.com/index.html indicates a protocol
+	(http), a hostname (www.example.com), and a file name (index.html).
+
+	Every URL consists of a sequence of up to five components:
+	protocol, authority (consisting of login and password, hostname and port)
+	path, request and fragment.
+
+	The format is provided in RFC3986 (URI generic syntax), Appendix B as a regular expression:
+	^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?
+
+	This regular expression makes it possible to parse any string as an URL (if there are no
+	special characters to spearate the fields, everything will end up in the path compopent).
+	However, some characters are not allowed: space, newlines, tabs, <, > and ". If any of these
+	is present in the URL string, the parsing results in an empty URL.
+
+	The protocols (http, https, ftp, irc, etc) identifies which way the resource
+	can be accessed.
+
+	Authority consists of userinfo such as username and password, a host
+	subcomponent consisting of IP address or hostname and a port subcomponent.
+
+	The path component locates the resource inside the authority's hierarchy,
+	and can have different formats (for example, directory names separated by
+	slashes) depending on the protocol in use.
+
+	The request component (preceeded by a question mark) contains a query
+	string of non-hierarchial data.
+
+	The fragment contains a fragment identifier providing direction to a
+	secondary resource, usually an identifier for a specific element into the
+	resource such as a paragraph in a text.
 */
 
+//! @{
 
 /*!
-	\fn BUrl::BUrl(const char *url)
-	\brief Undocumented public method
+	\fn BUrl::BUrl(const char* url);
+	\brief Constructs a BUrl and fills it.
 
-	\param url Undocumented
+	\param url A string to parse and populate the URL fields from.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	Call InitCheck() to verify that the string was succesfully parsed and
+	resulted in a valid URL.
 */
-
 
 /*!
-	\fn BUrl::BUrl(BMessage *archive)
-	\brief Undocumented public method
+	\fn BUrl::BUrl(BMessage* archive);
+	\brief Restore an URL from archived data.
 
-	\param archive Undocumented
+	\param archive An archived BUrl (using BArchive()).
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	Usually, archived messages are restored using BArchivable::Unarchive()
+	which will automatically instanciate the correct class.
 */
-
 
 /*!
-	\fn BUrl::BUrl(const BUrl &other)
-	\brief Undocumented public method
+	\fn BUrl::BUrl(const BUrl& other);
+	\brief Copy constructor
 
-	\param other Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param other A BUrl object to copy.
 */
-
 
 /*!
-	\fn BUrl::BUrl(const BUrl &base, const BString &relative)
-	\brief Undocumented public method
+	\fn BUrl::BUrl(const BUrl& base, const BString& relative);
+	\brief Construct a BUrl using a known base and a string representing a relative URL.
 
-	\param base Undocumented
-	\param relative Undocumented
+	\param base A BUrl object that holds base URL.
+	\param relative A path relative to the base URL.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	URLs can sometimes be represented in relative form. For example, links in
+	a webpage may refer to only a path, assuming the same protocol and authority
+	are the same as the current page. This constructor applies the required
+	resolution process to construct a complete, standalone URL from such a
+	string.
 
-	\since Haiku R1
+	For example, the following:
+
+	BUrl base("http://example.org/path/page.html");
+	BUrl relative(base, "sudirectory/otherpage.html");
+
+	results in:
+
+	"http://example.org/path/subdirectory/otherpage.hhtml"
+
+	The relative URL can override any of the fields from the original one. The algorithm
+	for resolution is documented in RFC3986 section 5.
 */
-
 
 /*!
-	\fn BUrl::BUrl(const BPath &path)
-	\brief Undocumented public method
+	\fn BUrl::BUrl(const BPath& path);
+	\brief Constructs a BUrl identifying a local file.
 
-	\param path Undocumented
+	\param path The path to convert into an URL
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	The generated URL uses the file protocol, and its path component is the
+	path given as a parameter.
 */
-
 
 /*!
-	\fn BUrl::BUrl()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\fn BUrl::BUrl();
+	\brief Constructs an empty BUrl.
 */
-
 
 /*!
-	\fn virtual virtual BUrl::~BUrl()
-	\brief Undocumented public method
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\fn BUrl::~BUrl();
+	\brief Destructor for BUrl.
 */
 
+//! @}
+
+//! @{
 
 /*!
-	\fn BUrl& BUrl::SetUrlString(const BString &url)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetUrlString(const BString& url);
+	\brief Parse a string and set the URL accordingly
 
-	\param url Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param url A string to parse as an absolute URL.
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetProtocol(const BString &scheme)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetProtocol(const BString& scheme);
+	\brief Set the protocol
 
-	\param scheme Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param scheme The protocol to use.
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetUserName(const BString &user)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetUserName(const BString& user);
+	\brief Set the username in the authority component
 
-	\param user Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param user The username.
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetPassword(const BString &password)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetPassword(const BString& password);
+	\brief Set the password in the authority component
 
-	\param password Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param password The password.
 */
-
 
 /*!
-	\fn void BUrl::SetAuthority(const BString &authority)
-	\brief Undocumented public method
+	\fn void BUrl::SetAuthority(const BString& authority);
+	\brief Replace the complete authority component
 
-	\param authority Undocumented
+	\param authority The authority component.
 
-	\since Haiku R1
+	The username, password, host and port fields are replaced. The authority
+	can be of the form username:password@host:port
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetHost(const BString &host)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetHost(const BString& host);
+	\brief Sets the host part of the authority component.
 
-	\param host Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param host The hostname or address to use.
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetPort(int port)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetPort(int port);
+	\brief Set the port of the authority component
 
-	\param port Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param port The port number to use (usually a TCP or UDP port).
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetPath(const BString &path)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetPath(const BString& path);
+	\brief Set the path of the URL.
 
-	\param path Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param path Set the path to use.
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetRequest(const BString &request)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetRequest(const BString& request);
+	\brief Set the request part of the URL.
 
-	\param request Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param request The request string.
 */
-
 
 /*!
-	\fn BUrl& BUrl::SetFragment(const BString &fragment)
-	\brief Undocumented public method
+	\fn BUrl& BUrl::SetFragment(const BString& fragment);
+	\brief Set the fragment part of the URL.
 
-	\param fragment Undocumented
-
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\param fragment The fragment to use.
 */
 
+//! @}
+
+//! @{
 
 /*!
-	\fn const BString& BUrl::UrlString() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::UrlString() const;
+	\brief Returns the string representation of the URL.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\returns the string representation of the URL.
 
-	\since Haiku R1
+	A complete URL string is of the form protocol://username:passord@host:port/path?request#fragment . All the fields are optional, for example a file URL will
+	have only a protocol and a path.
 */
-
 
 /*!
-	\fn const BString& BUrl::Protocol() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Protocol() const;
+	\brief Returns the protocol used in the url.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The URL protocol.
 */
-
 
 /*!
-	\fn const BString& BUrl::UserName() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::UserName() const;
+	\brief Returns the username.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The username.
 */
-
 
 /*!
-	\fn const BString& BUrl::Password() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Password() const;
+	\brief Returns the password.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The password.
 */
-
 
 /*!
-	\fn const BString& BUrl::UserInfo() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::UserInfo() const;
+	\brief Returns the user information (username:password)
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\returns The username and password.
 
-	\since Haiku R1
+	If there is no password, the username alone is returned. If there is no
+	username, a string of the form ":password" is returned.
 */
-
 
 /*!
-	\fn const BString& BUrl::Host() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Host() const;
+	\brief Returns the URL host component.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The URL host.
 */
-
 
 /*!
-	\fn int BUrl::Port() const
-	\brief Undocumented public method
+	\fn int BUrl::Port() const;
+	\brief Returns the URL port number.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\returns The URL port number.
 
-	\since Haiku R1
+	-1 is returned if no port is set.
 */
-
 
 /*!
-	\fn const BString& BUrl::Authority() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Authority() const;
+	\brief Returns the authority url as a string.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\returns The authority url as a string.
 
-	\since Haiku R1
+	The authority is of the form username:password@host:port.
 */
-
 
 /*!
-	\fn const BString& BUrl::Path() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Path() const;
+	\brief Returns the url path.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The url-path.
 */
-
 
 /*!
-	\fn const BString& BUrl::Request() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Request() const;
+	\brief Returns the url-request.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The url-request as a string.
 */
-
 
 /*!
-	\fn const BString& BUrl::Fragment() const
-	\brief Undocumented public method
+	\fn const BString& BUrl::Fragment() const;
+	\brief Returns the fragment of the url.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns The fragment of the url as a string.
 */
 
+//! @}
+
+//! @{
 
 /*!
-	\fn bool BUrl::IsValid() const
-	\brief Undocumented public method
+	\fn bool BUrl::IsValid() const;
+	\brief Check if the URL is valid.
 
-	\return Undocumented
-	\retval <value> Undocumented
+	\returns true if the URL is valid.
 
-	\since Haiku R1
+	This function verifies that the mandatory fields are present and perform
+	some other sanity checks on the URL.
+
+	An URL is valid if:
+	- It has a protocol, starting with an alphabetic character and folowed by alphanumeric or +, -,
+	  or . characters exclusively,
+	- If the protocol requires one, there is a valid host,
+	- If the protocol requires one, there is a path.
+	- If there is a host, it is either an IPv4 address or valid DNS name, or an IPv6 address
+	  enclosed in brackets
+
+	An invalid URL can still be modified using the various setters to turn it into a valid one.
 */
-
 
 /*!
-	\fn bool BUrl::HasProtocol() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasProtocol() const;
+	\brief Check wether the URL has a protocol.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has a protocol.
 */
-
 
 /*!
-	\fn bool BUrl::HasUserName() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasUserName() const;
+	\brief Check wether the URL has an username.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has an username.
 */
-
 
 /*!
-	\fn bool BUrl::HasPassword() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasPassword() const;
+	\brief Check wether the URL has a password.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has a password.
 */
-
 
 /*!
-	\fn bool BUrl::HasUserInfo() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasUserInfo() const;
+	\brief Check wether the URL has user information.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has an username or password.
 */
-
 
 /*!
-	\fn bool BUrl::HasHost() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasHost() const;
+	\brief Check wether the URL has an host.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has an host.
 */
-
 
 /*!
-	\fn bool BUrl::HasPort() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasPort() const;
+	\brief Check wether the URL has a port.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has a port.
 */
-
 
 /*!
-	\fn bool BUrl::HasAuthority() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasAuthority() const;
+	\brief Check if the URL has an host or port.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has an host or port.
 */
-
 
 /*!
-	\fn bool BUrl::HasPath() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasPath() const;
+	\brief Check wether the URL has a path.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has a path.
 */
-
 
 /*!
-	\fn bool BUrl::HasRequest() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasRequest() const;
+	\brief Check wether the URL has a request.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has a request.
 */
-
 
 /*!
-	\fn bool BUrl::HasFragment() const
-	\brief Undocumented public method
+	\fn bool BUrl::HasFragment() const;
+	\brief Check wether the URL has a fragment.
 
-	\return Undocumented
-	\retval <value> Undocumented
-
-	\since Haiku R1
+	\returns True if the URL has a fragment.
 */
+
+//! @}
 
 
 /*!
