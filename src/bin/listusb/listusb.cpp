@@ -73,6 +73,14 @@ SubclassName(int classNumber, int subclass)
 	if (classNumber == 0xEF) {
 		if (subclass == 0x02)
 			return " (Common)";
+		if (subclass == 0x04)
+			return " (RNDIS)";
+		if (subclass == 0x05)
+			return " (USB3 Vision)";
+		if (subclass == 0x06)
+			return " (STEP)";
+		if (subclass == 0x07)
+			return " (DVB Command Interface)";
 	}
 
 	if (classNumber == USB_VIDEO_DEVICE_CLASS) {
@@ -87,6 +95,16 @@ SubclassName(int classNumber, int subclass)
 				return " (Collection)";
 		}
 	}
+
+	if (classNumber == 0xFE) {
+		if (subclass == 0x01)
+			return " (Firmware Upgrade)";
+		if (subclass == 0x02)
+			return " (IrDA)";
+		if (subclass == 0x03)
+			return " (Test and measurement)";
+	}
+
 	return "";
 }
 
