@@ -1301,8 +1301,17 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 					&dev->info.u.h0.base_register_sizes[i],
 					&dev->info.u.h0.base_register_flags[i],
 					i < 5 ? &dev->info.u.h0.base_registers_pci[i + 1] : NULL);
-				dev->info.u.h0.base_registers[i] = (uint32)pci_ram_address(
-					dev->info.u.h0.base_registers_pci[i]);
+
+				phys_addr_t addr = dev->info.u.h0.base_registers_pci[i];
+				if (barSize == 2) {
+					addr += ((phys_addr_t)dev->info.u.h0.base_registers_pci[i + 1])
+						<< 32;
+				}
+				addr = pci_ram_address(addr);
+				dev->info.u.h0.base_registers[i] = (uint32)addr;
+				if (barSize == 2)
+					dev->info.u.h0.base_registers[i + 1] = (uint32)(addr >> 32);
+
 				i += barSize;
 			}
 
@@ -1346,9 +1355,17 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 					&dev->info.u.h1.base_registers_pci[i],
 					&dev->info.u.h1.base_register_sizes[i],
 					&dev->info.u.h1.base_register_flags[i],
-					i < 5 ? &dev->info.u.h1.base_registers_pci[i + 1] : NULL);
-				dev->info.u.h1.base_registers[i] = (uint32)pci_ram_address(
-					dev->info.u.h1.base_registers_pci[i]);
+					i < 2 ? &dev->info.u.h1.base_registers_pci[i + 1] : NULL);
+
+				phys_addr_t addr = dev->info.u.h1.base_registers_pci[i];
+				if (barSize == 2) {
+					addr += ((phys_addr_t)dev->info.u.h0.base_registers_pci[i + 1])
+						<< 32;
+				}
+				addr = pci_ram_address(addr);
+				dev->info.u.h1.base_registers[i] = (uint32)addr;
+				if (barSize == 2)
+					dev->info.u.h1.base_registers[i + 1] = (uint32)(addr >> 32);
 				i += barSize;
 			}
 
@@ -1597,7 +1614,7 @@ PCI::FindCapability(uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 	for (int i = 0; i < 48; i++) {
 		if (ReadConfig(domain, bus, device, function, capPointer, 1) == capID) {
-			if (offset != NULL)			
+			if (offset != NULL)
 				*offset = capPointer;
 			return B_OK;
 		}
@@ -1684,7 +1701,7 @@ PCI::FindHTCapability(uint8 domain, uint8 bus, uint8 device,
 			"not supported\n", bus, device, function, capID);
 		return B_NAME_NOT_FOUND;
 	}
-	
+
 	uint16 mask = PCI_ht_command_cap_mask_5_bits;
 	if (capID == PCI_ht_command_cap_slave || capID == PCI_ht_command_cap_host)
 		mask = PCI_ht_command_cap_mask_3_bits;
