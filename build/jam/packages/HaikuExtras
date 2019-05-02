@@ -7,5 +7,7 @@ HaikuPackage $(extrasPackage) ;
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@!m68k apple@!ppc ;
 
+AddFilesToPackage add-ons control_look	: BeControlLook ;
+
 BuildHaikuPackage $(extrasPackage) : haiku_extras ;
 
